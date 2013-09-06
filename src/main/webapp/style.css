@@ -1,0 +1,155 @@
+body {
+	font: normal 12px Verdana;
+	background: #e0e6e9;
+}
+
+hr {
+	color: black;
+	background: black;
+	height: 1px;
+	border: 0;
+}
+
+p.top-buttons {
+	text-align: right;
+}
+
+table {
+	width: 100%;
+}
+
+table td:first-child {
+	text-align: right;
+	width: 45%;
+	padding: 3px;
+}
+
+table input {
+	width: 65%;
+	font-size: 12px;
+}
+
+table.top-menu {
+	text-align: right;
+}
+
+table.top-menu tr {
+	vertical-align: bottom;
+}
+
+table.top-menu td:first-child {
+	width: 130px;
+}
+
+button, input[type="submit"], input[type="button"]{
+	width: 120px;
+	font-size: 12px;
+	-webkit-appearance: none;
+	-webkit-border-radius: 3px;
+}
+
+#wrapper {
+	width: 1000px;
+	margin: 0 auto;
+	overflow: auto; /* so the size of the wrapper is alway the size of the longest content */
+}
+
+#menu {
+	float: left;
+	width: 180px;
+	margin: 0;
+	list-style-type: none;
+}
+
+#menu ul {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+}
+
+#menu li a {
+	color: #000;
+	height: 24px;
+	display: block;
+	voice-family: inherit;
+	text-decoration: none;
+	padding: 8px 16px;
+	margin: 0 0 2px 0;
+	border: 1px solid #CCC;
+	border-radius: 4px 0 0 4px;
+	outline: none;
+	background: #F0F0F0 url(tabbg.gif) 0 0 repeat-x;
+}
+
+#menu li a:link,#menu5 li a:visited {
+	color: #000;
+	background: #F0F0F0 url(tabbg.gif) 0 0 repeat-x;
+	padding: 8px 0 0 10px;
+}
+
+#menu li a:hover,#menu li a:active {
+	color: #000;
+	background: #F0F0F0 url(tabbg.gif) 0 -36px repeat-x;
+	padding: 8px 0 0 10px;
+}
+
+#menu li a:hover,#menu li a:active {
+	color: #000;
+	background: #F0F0F0 url(tabbg.gif) 0 -36px repeat-x;
+	padding: 8px 0 0 10px;
+}
+
+#menu li a.highlight {
+	color: #fff;
+	background: #F0F0F0 url(tabbg_2.gif) 0 0 repeat-x;
+	padding: 8px 0 0 10px;
+}
+
+#content {
+	border: 1px solid #CCC;
+	border-radius: 0 4px 4px 0;
+	background: #fff;
+	padding: 8px 16px;
+	margin: 0 0 0 179px; /* considering the border you need to use a margin so the content does not float under the first div*/
+}
+
+#reserv {
+	border: 1px solid #CCC;
+	border-radius: 4px;
+	background: #fff;
+	padding: 8px 16px;
+}
+
+#add_space {
+  padding-top: 20px;
+}
+
+table.res {
+	width: 90%;
+	border-collapse: collapse;
+}
+
+table.res th {
+	font-style: italic;
+	text-align: center;
+	padding: 5px;
+}
+
+table.res tr {
+	border-bottom: 1px solid #CCC;
+}
+
+table.res td {
+	padding: 5px;
+	text-align: center;
+	width: 17%;
+}
+
+select {
+	font-size: 12px;
+	padding:1px;
+}
+
+select option {
+	font-size: 12px;
+}

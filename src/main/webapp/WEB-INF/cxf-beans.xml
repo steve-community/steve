@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xmlns:jaxws="http://cxf.apache.org/jaxws"
+	xmlns:cxf="http://cxf.apache.org/core"
+	xmlns:wsa="http://cxf.apache.org/ws/addressing"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd 
+	http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd 
+	http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd">
+	
+	<import resource="classpath:META-INF/cxf/cxf.xml" />
+	<import resource="classpath:META-INF/cxf/cxf-extension-soap.xml" />
+	<import resource="classpath:META-INF/cxf/cxf-servlet.xml" />
+	
+	<!-- Configure general properties -->
+    <cxf:bus>
+        <cxf:features>
+            <cxf:logging />
+        </cxf:features>
+    </cxf:bus> 
+	
+	<!-- Configure the service -->
+	<jaxws:endpoint xmlns:tns="urn://Ocpp/Cs/2010/08/" id="centralsystemservice"
+		implementor="css.CentralSystemServiceImpl" wsdlLocation="centralsystemservice_0.wsdl"
+		endpointName="tns:CentralSystemServiceSoap12" serviceName="tns:CentralSystemService"
+		address="/CentralSystemServiceSoap12">
+	<jaxws:features>
+		<!-- The following is required to enable WS-A in CXF -->
+		<!-- http://cxf.apache.org/docs/ws-addressing.html -->
+		<wsa:addressing />
+	</jaxws:features>  
+		<!-- The following is required for CXF 2.3.1 to recognize specific Headers in incoming messages -->
+		<!-- http://cxf.547215.n5.nabble.com/Example-of-handling-SOAP-Header-with-mustUnderstand-td568441.html -->
+		<jaxws:properties>
+			<entry key="endpoint-processes-headers" value="{urn://Ocpp/Cs/2010/08/}chargeBoxIdentity" />
+		</jaxws:properties>
+	</jaxws:endpoint>
+
+	<!-- Configure the client -->
+<!-- 	<jaxws:client id="chargepointclient" serviceClass="cps.ChargePointService"> -->
+<!-- 		<jaxws:features> -->
+<!-- 			<wsa:addressing /> -->
+<!-- 		</jaxws:features> -->
+<!-- 		<jaxws:properties> -->
+<!-- 			<entry key="endpoint-processes-headers" value="{urn://Ocpp/Cs/2010/08/}chargeBoxIdentity" /> -->
+<!-- 		</jaxws:properties> -->
+<!-- 	</jaxws:client> -->
+
+</beans>

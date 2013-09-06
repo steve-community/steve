@@ -1,6 +1,8 @@
 body {
 	font: normal 12px Verdana;
 	background: #e0e6e9;
+	padding: 0;
+	margin: 0;
 }
 
 hr {
@@ -8,10 +10,6 @@ hr {
 	background: black;
 	height: 1px;
 	border: 0;
-}
-
-p.top-buttons {
-	text-align: right;
 }
 
 table {
@@ -29,35 +27,19 @@ table input {
 	font-size: 12px;
 }
 
-table.top-menu {
-	text-align: right;
-}
-
-table.top-menu tr {
-	vertical-align: bottom;
-}
-
-table.top-menu td:first-child {
-	width: 130px;
-}
-
-button, input[type="submit"], input[type="button"]{
+button,input[type="submit"],input[type="button"] {
 	width: 120px;
 	font-size: 12px;
 	-webkit-appearance: none;
 	-webkit-border-radius: 3px;
 }
 
-#wrapper {
-	width: 1000px;
-	margin: 0 auto;
-	overflow: auto; /* so the size of the wrapper is alway the size of the longest content */
-}
-
 #menu {
 	float: left;
 	width: 180px;
 	margin: 0;
+	padding: 0; 
+	border-right: 1px solid #CCC;
 	list-style-type: none;
 }
 
@@ -69,59 +51,51 @@ button, input[type="submit"], input[type="button"]{
 
 #menu li a {
 	color: #000;
-	height: 24px;
 	display: block;
 	voice-family: inherit;
 	text-decoration: none;
-	padding: 8px 16px;
-	margin: 0 0 2px 0;
-	border: 1px solid #CCC;
-	border-radius: 4px 0 0 4px;
+	padding: 0;
 	outline: none;
-	background: #F0F0F0 url(tabbg.gif) 0 0 repeat-x;
+	background: #fff;
+	padding: 8px;
 }
 
 #menu li a:link,#menu5 li a:visited {
 	color: #000;
-	background: #F0F0F0 url(tabbg.gif) 0 0 repeat-x;
-	padding: 8px 0 0 10px;
+	background: #fff;
 }
 
 #menu li a:hover,#menu li a:active {
 	color: #000;
-	background: #F0F0F0 url(tabbg.gif) 0 -36px repeat-x;
-	padding: 8px 0 0 10px;
-}
-
-#menu li a:hover,#menu li a:active {
-	color: #000;
-	background: #F0F0F0 url(tabbg.gif) 0 -36px repeat-x;
-	padding: 8px 0 0 10px;
+	background: #CCC;
+	border-radius: 3px 0 0 3px;
 }
 
 #menu li a.highlight {
-	color: #fff;
-	background: #F0F0F0 url(tabbg_2.gif) 0 0 repeat-x;
-	padding: 8px 0 0 10px;
+	color: #000;
+	background: #CCC;
+	border-radius: 3px 0 0 3px;
 }
 
-#content {
-	border: 1px solid #CCC;
-	border-radius: 0 4px 4px 0;
-	background: #fff;
-	padding: 8px 16px;
-	margin: 0 0 0 179px; /* considering the border you need to use a margin so the content does not float under the first div*/
-}
-
-#reserv {
+#wrapper {
+	width: 1000px;
 	border: 1px solid #CCC;
 	border-radius: 4px;
 	background: #fff;
-	padding: 8px 16px;
+	margin: 0 auto;
+	padding: 12px;
+	overflow: auto;
+	/* so the size of the wrapper is alway the size of the longest content */
+}
+
+#content {
+	padding: 0px 0px 0px 16px;
+	margin: 0 0 0 179px;
+	/* considering the border you need to use a margin so the content does not float under the first div*/
 }
 
 #add_space {
-  padding-top: 20px;
+	padding-top: 20px;
 }
 
 table.res {
@@ -147,9 +121,53 @@ table.res td {
 
 select {
 	font-size: 12px;
-	padding:1px;
+	padding: 1px;
 }
 
 select option {
 	font-size: 12px;
+}
+
+.top-menu {
+	height: 40px;
+	border-radius: 0;
+	background: black;
+	margin-bottom: 10px;
+}
+
+.top-banner {
+	border-radius: 0;
+	background: #71797d;
+}
+
+.container {
+	width: 1000px;
+	margin-right: auto;
+	margin-left: auto;
+	*zoom: 1;
+}
+
+.nav-list {
+	text-align: right;
+	margin: 0;
+	padding: 0;
+}
+
+.nav-list  li {
+	display: inline;
+	list-style-type: none;
+}
+
+.nav-list li a {
+	line-height: 40px;
+	padding: 0;
+	margin-left: 20px;
+	color: #fff;
+	text-shadow: none;
+	text-decoration: none;
+}
+
+.nav-list li a:hover {
+	color: #fff;
+	text-decoration: underline;
 }

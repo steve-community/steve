@@ -120,7 +120,7 @@ public class CPS_Servlet extends HttpServlet {
 		PrintWriter writer = response.getWriter();
 		String command = request.getPathInfo();	
 
-		//// The command can be booking of a new reservation ... ////
+		//// The command can be a reservation operation ... ////
 
 		if (command.equals("/reservation/book")){
 			String idTag = request.getParameter("idTag");
@@ -271,30 +271,34 @@ public class CPS_Servlet extends HttpServlet {
 		writer.println("<title>SteVe - Steckdosenverwaltung</title>");
 		writer.println("</head>");
 
-		writer.println("<body>");		
-		writer.println("<div id=\"wrapper\">");
-		writer.println("<table class=\"top-menu\">");
-		writer.println("<tr><td>");
+		writer.println("<body>");
+		writer.println("<div class=\"top-banner\">");
+		writer.println("<div class=\"container\">");
 		writer.println("<img src=\""+ contextPath + "/logo.png\" height=\"100\">");
-		writer.println("</td><td>");
-		writer.println("<button onclick=\"window.location.href='" + contextPath + servletPath + "'\">HOME</button>");
-		writer.println("<button onclick=\"window.location.href='" + contextPath + servletPath + "/reservation'\">RESERVATION</button>");
-		writer.println("<button onclick=\"window.location.href='" + contextPath + servletPath + "/operations'\">OPERATIONS</button>");
-		writer.println("<button onclick=\"window.location.href='" + contextPath + servletPath + "/log'\">LOG</button>");
-		writer.println("</td></tr>");
-		writer.println("</table>");
+		writer.println("</div>");
+		writer.println("</div>");
+		writer.println("<div class=\"top-menu\">");
+		writer.println("<div class=\"container\">");
+		writer.println("<ul class=\"nav-list\">");	
+		writer.println("<li><a href=\"" + contextPath + servletPath + "\">HOME</a></li>");
+		writer.println("<li><a href=\"" + contextPath + servletPath + "/reservation\">RESERVATION</a></li>");
+		writer.println("<li><a href=\"" + contextPath + servletPath + "/operations\">OPERATIONS</a></li>");
+		writer.println("<li><a href=\"" + contextPath + servletPath + "/log\">LOG</a></li>");
+		writer.println("</ul>");	
+		writer.println("</div>");
+		writer.println("</div>");
+		
+		writer.println("<div id=\"wrapper\">");
 
 	}
 
 
 	private void printHomepage(PrintWriter writer) {
-		writer.println("<div id=\"reserv\">");
 		writer.println("<b>Welcome!</b><hr>");
 		writer.println("<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Qui ita affectus, beatum esse numquam probabis; Nihil opus est exemplis hoc facere longius. Itaque ab his ordiamur. Quid turpius quam sapientis vitam ex insipientium sermone pendere? Nam adhuc, meo fortasse vitio, quid ego quaeram non perspicis. Non igitur bene. Dic in quovis conventu te omnia facere, ne doleas. Duo Reges: constructio interrete. Iam enim adesse poterit.</p>");
 		writer.println("<p>Ergo, inquit, tibi Q. Neque solum ea communia, verum etiam paria esse dixerunt. Itaque nostrum est-quod nostrum dico, artis est-ad ea principia, quae accepimus. In qua quid est boni praeter summam voluptatem, et eam sempiternam? Qui enim voluptatem ipsam contemnunt, iis licet dicere se acupenserem maenae non anteponere. Nos quidem Virtutes sic natae sumus, ut tibi serviremus, aliud negotii nihil habemus. Mihi vero, inquit, placet agi subtilius et, ut ipse dixisti, pressius. Esse enim quam vellet iniquus iustus poterat inpune. Ut in geometria, prima si dederis, danda sunt omnia.</p>");
 		writer.println("<p>Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie consequat, vel illum dolore eu feugiat nulla facilisis at vero eros et accumsan et iusto odio dignissim qui blandit praesent luptatum zzril delenit augue duis dolore te feugait nulla facilisi. Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat.</p>");
 		writer.println("<p>Ut wisi enim ad minim veniam, quis nostrud exerci tation ullamcorper suscipit lobortis nisl ut aliquip ex ea commodo consequat. Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie consequat, vel illum dolore eu feugiat nulla facilisis at vero eros et accumsan et iusto odio dignissim qui blandit praesent luptatum zzril delenit augue duis dolore te feugait nulla facilisi.</p>");
-		writer.println("</div>");
 	}
 
 	///////////////// Log Stuff /////////////////
@@ -378,14 +382,11 @@ public class CPS_Servlet extends HttpServlet {
 	}
 
 	private void printReservationPage(PrintWriter writer) {
-
-		writer.println("<div id=\"reserv\">");
 		printExistingReservations(writer);
 		writer.println("<br>");
 		printBookReservation(writer);
 		writer.println("<br>");
-		printDeleteReservation(writer);
-		writer.println("</div>");			
+		printDeleteReservation(writer);			
 	}
 
 	private void printExistingReservations(PrintWriter writer) {

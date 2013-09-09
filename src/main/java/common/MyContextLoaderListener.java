@@ -19,7 +19,7 @@ import com.mysql.jdbc.AbandonedConnectionCleanupThread;
  * 
  * 
  * 
- * Bootstrap listener to start up and shut down Spring's root {@link WebApplicationContext}.
+ * Bootstr ap listener to start up and shut down Spring's root {@link WebApplicationContext}.
  * Simply delegates to {@link ContextLoader} as well as to {@link ContextCleanupListener}.
  *
  * <p>This listener should be registered after

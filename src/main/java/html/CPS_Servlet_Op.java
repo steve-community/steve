@@ -48,7 +48,8 @@ public class CPS_Servlet_Op extends HttpServlet {
 		}
 		
 		PrintWriter writer = response.getWriter();
-		printHead(response, writer);
+		response.setContentType("text/html");
+		writer.println(CPS_Common.printHead(contextPath));
 		
 		if (command.equals("/ChangeAvailability")){	
 			printChangeAvail(writer);
@@ -207,39 +208,6 @@ public class CPS_Servlet_Op extends HttpServlet {
 			}
 		}		
 		writer.close();	
-	}
-
-	private void printHead(HttpServletResponse response, PrintWriter writer) throws IOException {		
-		// Start printing regular HTML content
-		response.setContentType("text/html");
-
-		writer.println("<!DOCTYPE html>");
-		writer.println("<html>");
-		writer.println("<head>");
-		writer.println("<link rel=\"stylesheet\" type=\"text/css\" href=\"" + contextPath + "/style.css\">");
-		writer.println("<script src=\"" + contextPath + "/script.js\" type=\"text/javascript\"></script>");
-		writer.println("<title>SteVe - Steckdosenverwaltung</title>");
-		writer.println("</head>");
-
-		writer.println("<body>");
-		writer.println("<div class=\"top-banner\">");
-		writer.println("<div class=\"container\">");
-		writer.println("<img src=\""+ contextPath + "/logo.png\" height=\"100\">");
-		writer.println("</div>");
-		writer.println("</div>");
-		writer.println("<div class=\"top-menu\">");
-		writer.println("<div class=\"container\">");
-		writer.println("<ul class=\"nav-list\">");	
-		writer.println("<li><a href=\"" + contextPath + "/manager\">HOME</a></li>");
-		writer.println("<li><a href=\"" + contextPath + "/manager/reservation\">RESERVATION</a></li>");
-		writer.println("<li><a href=\"" + contextPath + "/manager/operations\">OPERATIONS</a></li>");
-		writer.println("<li><a href=\"" + contextPath + "/manager/log\">LOG</a></li>");
-		writer.println("</ul>");	
-		writer.println("</div>");
-		writer.println("</div>");
-		
-		writer.println("<div id=\"wrapper\">");
-
 	}
 
 	private void printChangeAvail(PrintWriter writer) {

@@ -415,7 +415,7 @@ public class CentralSystemServiceImpl implements CentralSystemService {
 		ResultSet rs = null;		
 		try {
 			// PreparedStatements can use parameter indices as question marks
-			pt = connect.prepareStatement("SELECT * FROM user WHERE idTag = ?");
+			pt = connect.prepareStatement("SELECT parentIdTag, expiryDate, inTransaction, blocked FROM user WHERE idTag = ?");
 			// Set the parameter indices
 			pt.setString(1, idTag);
 			// Execute and get the result of the SQL query
@@ -430,10 +430,10 @@ public class CentralSystemServiceImpl implements CentralSystemService {
 				LOG.info("The idTag of this user is INVALID (not present in DB).");
 			}else{			
 				// Read the DB row values
-				String parentIdTag = rs.getString(2);
-				Timestamp expiryDate = rs.getTimestamp(3);
-				boolean inTransaction = rs.getBoolean(4);
-				boolean blocked = rs.getBoolean(5);
+				String parentIdTag = rs.getString(1);
+				Timestamp expiryDate = rs.getTimestamp(2);
+				boolean inTransaction = rs.getBoolean(3);
+				boolean blocked = rs.getBoolean(4);
 
 				if ( inTransaction==true ){
 					_returnIdTagInfoStatus = AuthorizationStatus.CONCURRENT_TX;

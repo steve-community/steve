@@ -5,6 +5,10 @@ import java.io.PrintWriter;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -26,16 +30,14 @@ public class CPS_Servlet_Res extends HttpServlet {
 		servletPath = request.getServletPath();	
 
 		PrintWriter writer = response.getWriter();		
-		
-		printHead(response, writer);
+		response.setContentType("text/html");
+		writer.println(CPS_Common.printHead(contextPath));
 		printReservationPage(writer);
 		
 		writer.println("</div>");
 		writer.println("</body></html>");
 		writer.close();	
-
 	}
-
 
 	@Override
 	public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
@@ -48,60 +50,49 @@ public class CPS_Servlet_Res extends HttpServlet {
 			String chargeBoxId = request.getParameter("chargeBoxId");
 			String startDatetime = request.getParameter("startDatetime");
 			String stopDatetime = request.getParameter("stopDatetime");
-
-			bookReservation(idTag, chargeBoxId, startDatetime, stopDatetime);
-			response.sendRedirect(contextPath + servletPath);
+			
+			if ( areDatesValid(startDatetime, stopDatetime) ) {				
+				if ( bookReservation(idTag, chargeBoxId, startDatetime, stopDatetime) ){
+					response.sendRedirect(contextPath + servletPath);
+					return;
+				}				
+				response.setContentType("text/plain");
+				writer.println("The desired reservation overlaps with another reservation.");
+				writer.println("Go back and try again.");
+				writer.close();
+				return;
+			}
+			
+			response.setContentType("text/plain");
+			writer.println("Invalid startDatetime and/or stopDatetime. Allowed input:");
+			writer.println("1. startDatetime and stopDatetime must match the expected pattern.");
+			writer.println("2. startDatetime must be before the stopDatetime.");
+			writer.println("3. startDatetime must be in the future.");
+			writer.println("Go back and try again.");
+			writer.close();
 
 		} else if (command.equals("/delete")){
 			int connector_pk = Integer.parseInt(request.getParameter("reservation_pk"));
 
 			deleteReservation(connector_pk);
 			response.sendRedirect(contextPath + servletPath);
+			return;
 		}
-		
-		writer.close();	
 	}
-
-	private void printHead(HttpServletResponse response, PrintWriter writer) throws IOException {		
-		// Start printing regular HTML content
-		response.setContentType("text/html");
-
-		writer.println("<!DOCTYPE html>");
-		writer.println("<html>");
-		writer.println("<head>");
-		writer.println("<link rel=\"stylesheet\" type=\"text/css\" href=\"" + contextPath + "/style.css\">");
-		writer.println("<script src=\"" + contextPath + "/script.js\" type=\"text/javascript\"></script>");
-		writer.println("<title>SteVe - Steckdosenverwaltung</title>");
-		writer.println("</head>");
-
-		writer.println("<body>");
-		writer.println("<div class=\"top-banner\">");
-		writer.println("<div class=\"container\">");
-		writer.println("<img src=\""+ contextPath + "/logo.png\" height=\"100\">");
-		writer.println("</div>");
-		writer.println("</div>");
-		writer.println("<div class=\"top-menu\">");
-		writer.println("<div class=\"container\">");
-		writer.println("<ul class=\"nav-list\">");	
-		writer.println("<li><a href=\"" + contextPath + "/manager\">HOME</a></li>");
-		writer.println("<li><a href=\"" + contextPath + "/manager/reservation\">RESERVATION</a></li>");
-		writer.println("<li><a href=\"" + contextPath + "/manager/operations\">OPERATIONS</a></li>");
-		writer.println("<li><a href=\"" + contextPath + "/manager/log\">LOG</a></li>");
-		writer.println("</ul>");	
-		writer.println("</div>");
-		writer.println("</div>");
-		
-		writer.println("<div id=\"wrapper\">");
-
-	}
-
-	private void bookReservation(String idTag, String chargeBoxId, String startDatetime, String stopDatetime) {
+	
+	private boolean bookReservation(String idTag, String chargeBoxId, String startDatetime, String stopDatetime) {
 
 		Connection connect = null;
 		PreparedStatement pt = null;
 		try { 
 			// Prepare Database Access
 			connect = Utils.getConnectionFromPool();
+
+			if ( isOverlapping(connect, pt, startDatetime, stopDatetime) ){
+				// The reservation cannot be booked
+				return false;
+			}
+			
 			connect.setAutoCommit(false);
 			pt = connect.prepareStatement("INSERT INTO reservation (idTag, chargeBoxId, startDatetime, stopDatetime) VALUES (?,?,?,?)");
 
@@ -110,13 +101,14 @@ public class CPS_Servlet_Res extends HttpServlet {
 			pt.setString(2, chargeBoxId);
 			pt.setString(3, startDatetime);
 			pt.setString(4, stopDatetime);
-
 			// Insert the new status
 			int count = pt.executeUpdate();
 			// Validate the change
 			Utils.validateDMLChanges(count);          
 			// Now we can commit
 			connect.commit();
+			// The reservation is booked
+			return true;
 
 		} catch (Exception ex) {
 			ex.printStackTrace();
@@ -124,6 +116,32 @@ public class CPS_Servlet_Res extends HttpServlet {
 		} finally {
 			Utils.releaseResources(connect, pt, null);
 		}		
+	}
+	
+	/**
+	 * Returns true, if there are rows whose date/time ranges overlap with the input
+	 *
+	 */
+	private boolean isOverlapping(Connection connect, PreparedStatement pt, String inputStartDatetime, String inputStopDatetime) {
+		
+		ResultSet rs = null;
+		boolean overlaps = true;
+		try {
+			// This WHERE clause covers all three cases
+			pt = connect.prepareStatement("SELECT 1 FROM reservation WHERE ? <= stopDatetime AND ? >= startDatetime");
+			pt.setString(1, inputStartDatetime);
+			pt.setString(2, inputStopDatetime);
+			
+			rs = pt.executeQuery();
+			// If the result set does NOT have an entry, then there are no overlaps
+			if ( !rs.next() ) overlaps = false;
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			Utils.releaseResources(null, pt, rs);
+		}
+		return overlaps;
 	}
 
 	private void deleteReservation(int reservation_pk) {
@@ -148,6 +166,32 @@ public class CPS_Servlet_Res extends HttpServlet {
 		} finally {
 			Utils.releaseResources(connect, pt, null);
 		}		
+	}	
+	
+	/**
+	 * Returns false, if
+	 * 1. the syntax does NOT match the expected pattern
+	 * 2. startDatetime > stopDatetime
+	 * 3. now > startDatetime
+	 *
+	 */
+	private boolean areDatesValid(String startDatetime, String stopDatetime) {
+
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+		sdf.setLenient(false);
+		
+		Date start = null;
+		Date stop = null;
+		try {
+			start = sdf.parse(startDatetime);
+		    stop = sdf.parse(stopDatetime);
+		} catch (ParseException e) {
+		    //e.printStackTrace();
+		    return false;
+		}
+
+		Date now = new Date();
+		return ( now.before(start) && start.before(stop) );
 	}
 
 	private void printReservationPage(PrintWriter writer) {
@@ -171,7 +215,8 @@ public class CPS_Servlet_Res extends HttpServlet {
 		try {	
 			// Prepare Database Access
 			connect = Utils.getConnectionFromPool();
-			pt = connect.prepareStatement("SELECT reservation_pk, idTag, chargeBoxId, DATE_FORMAT(startDatetime, '%Y-%m-%d %H:%i'), DATE_FORMAT(stopDatetime, '%Y-%m-%d %H:%i'), active FROM reservation");
+			pt = connect.prepareStatement("SELECT reservation_pk, idTag, chargeBoxId, DATE_FORMAT(startDatetime, '%Y-%m-%d %H:%i'), "
+					+ "DATE_FORMAT(stopDatetime, '%Y-%m-%d %H:%i'), active FROM reservation ORDER BY startDatetime");
 			rs = pt.executeQuery();
 
 			while( rs.next() ) {

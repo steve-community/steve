@@ -1,3 +1,5 @@
+html, body { height: 100%; }
+
 body {
 	font-family: Verdana, sans-serif;
 	font-size: 12px;
@@ -26,77 +28,6 @@ table td:first-child {
 table input {
 	width: 65%;
 	font-size: 12px;
-}
-
-button,input[type="submit"],input[type="button"] {
-	width: 120px;
-	font-size: 12px;
-	-webkit-appearance: none;
-	-webkit-border-radius: 3px;
-}
-
-#menu {
-	float: left;
-	width: 180px;
-	margin: 0;
-	padding: 0; 
-	border-right: 1px solid #CCC;
-	list-style-type: none;
-}
-
-#menu ul {
-	list-style: none;
-	margin: 0;
-	padding: 0;
-}
-
-#menu li a {
-	color: #000;
-	display: block;
-	voice-family: inherit;
-	text-decoration: none;
-	padding: 0;
-	outline: none;
-	background: #fff;
-	padding: 8px;
-}
-
-#menu li a:link,#menu5 li a:visited {
-	color: #000;
-	background: #fff;
-}
-
-#menu li a:hover,#menu li a:active {
-	color: #000;
-	background: #CCC;
-	border-radius: 3px 0 0 3px;
-}
-
-#menu li a.highlight {
-	color: #000;
-	background: #CCC;
-	border-radius: 3px 0 0 3px;
-}
-
-#wrapper {
-	width: 1000px;
-	border: 1px solid #CCC;
-	border-radius: 4px;
-	background: #fff;
-	margin: 0 auto;
-	padding: 12px;
-	overflow: auto;
-	/* so the size of the wrapper is alway the size of the longest content */
-}
-
-#content {
-	padding: 0px 0px 0px 16px;
-	margin: 0 0 0 179px;
-	/* considering the border you need to use a margin so the content does not float under the first div*/
-}
-
-#add_space {
-	padding-top: 20px;
 }
 
 table.res {
@@ -129,24 +60,18 @@ select option {
 	font-size: 12px;
 }
 
-.top-menu {
-	height: 40px;
-	border-radius: 0;
-	background: black;
-	margin-bottom: 10px;
+input[type="submit"],input[type="button"] {
+	width: 100px;
+	font-size: 12px;
+	-webkit-appearance: none;
+	-webkit-border-radius: 3px;
 }
 
-.top-banner {
-	border-radius: 0;
-	background: #71797d;
+#add_space {
+	padding-top: 20px;
 }
 
-.container {
-	width: 1000px;
-	margin-right: auto;
-	margin-left: auto;
-	*zoom: 1;
-}
+/*************** top menu navigation div ***************/
 
 .nav-list {
 	text-align: right;
@@ -172,3 +97,103 @@ select option {
 	color: #fff;
 	text-decoration: underline;
 }
+
+/*************** operations page divs ***************/
+
+.op-menu {
+	float: left;
+	width: 180px;
+	margin: 0;
+	padding: 0; 
+	border-right: 1px solid #CCC;
+	list-style-type: none;
+}
+
+.op-menu ul {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+}
+
+.op-menu li a {
+	color: #000;
+	display: block;
+	voice-family: inherit;
+	text-decoration: none;
+	padding: 0;
+	outline: none;
+	background: #fff;
+	padding: 8px;
+}
+
+.op-menu li a:link,#menu5 li a:visited {
+	color: #000;
+	background: #fff;
+}
+
+.op-menu li a:hover,#menu li a:active {
+	color: #000;
+	background: #CCC;
+	border-radius: 3px 0 0 3px;
+}
+
+.op-menu li a.highlight {
+	color: #000;
+	background: #CCC;
+	border-radius: 3px 0 0 3px;
+}
+
+.op-content {
+	padding: 0px 0px 0px 16px;
+	margin: 0 0 0 180px; /* considering the border you need to use a margin so the content does not float under the first div*/
+}
+
+/*************** other divs ***************/
+.main {
+	height: auto; min-height: 100%;
+}
+
+.main-wrapper {
+	padding-bottom: 70px;
+	height: auto; 
+}
+
+.top-banner {
+	width: 100%;
+	border-radius: 0;
+	background: #71797d;
+}
+
+.top-menu {
+	height: 40px;
+	border-radius: 0;
+	background: black;
+}
+
+.container {
+	width: 1000px;
+	margin-right: auto;
+	margin-left: auto;
+	*zoom: 1;
+}
+
+.content {
+	width: 1000px;
+	border: 1px solid #CCC;
+	border-radius: 4px;
+	background: #fff;
+	margin: 12px auto 12px auto;
+	padding: 12px;
+	overflow: auto; /* so the size of the wrapper is always the size of the longest content */
+}
+
+.footer {
+	position: relative;
+	padding: 0;
+	margin-top: -70px;
+	height: 70px;
+	text-align: center;
+	background: #71797d;
+}
+
+.footer img { margin-right: 10px; margin-top: 10px;}

@@ -13,7 +13,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import common.Utils;
-
 import cps.CPS_Client;
 import cps.ChangeAvailabilityRequest;
 import cps.ChangeConfigurationRequest;
@@ -79,8 +78,7 @@ public class CPS_Servlet_Op extends HttpServlet {
 			printUpdateFirmware(writer);
 		}
 
-		writer.println("</div>");
-		writer.println("</body></html>");
+		writer.println(CPS_Common.printFoot(contextPath));
 		writer.close();	
 	}
 
@@ -212,7 +210,7 @@ public class CPS_Servlet_Op extends HttpServlet {
 
 	private void printChangeAvail(PrintWriter writer) {
 		// Print navigation div
-		writer.println("<div id=\"menu\">");
+		writer.println("<div class=\"op-menu\">");
 		writer.println("<ul>");
 		writer.println("<li><a class=\"highlight\" href=\"" + contextPath + servletPath + "/ChangeAvailability\" >Change Availability</a></li>");
 		writer.println("<li><a href=\"" + contextPath + servletPath + "/ChangeConfiguration\">Change Configuration</a></li>");
@@ -227,7 +225,7 @@ public class CPS_Servlet_Op extends HttpServlet {
 		writer.println("</div>");	
 
 		// Print the div on the right
-		writer.println("<div id=\"content\">");
+		writer.println("<div class=\"op-content\">");
 		writer.println("<form method=\"POST\" action=\""+ contextPath + servletPath + "/ChangeAvailability\">");
 
 		printChargePoints(writer);
@@ -258,7 +256,7 @@ public class CPS_Servlet_Op extends HttpServlet {
 
 	private void printChangeConf(PrintWriter writer) {
 		// Print navigation div
-		writer.println("<div id=\"menu\">");
+		writer.println("<div class=\"op-menu\">");
 		writer.println("<ul>");
 		writer.println("<li><a href=\"" + contextPath + servletPath + "/ChangeAvailability\" >Change Availability</a></li>");
 		writer.println("<li><a class=\"highlight\" href=\"" + contextPath + servletPath + "/ChangeConfiguration\">Change Configuration</a></li>");
@@ -273,7 +271,7 @@ public class CPS_Servlet_Op extends HttpServlet {
 		writer.println("</div>");
 
 		// Print the div on the right
-		writer.println("<div id=\"content\">");
+		writer.println("<div class=\"op-content\">");
 		writer.println("<form method=\"POST\" action=\""+ contextPath + servletPath + "/ChangeConfiguration\">");
 
 		printChargePoints(writer);
@@ -311,7 +309,7 @@ public class CPS_Servlet_Op extends HttpServlet {
 
 	private void printClearCache(PrintWriter writer) {
 		// Print navigation div
-		writer.println("<div id=\"menu\">");
+		writer.println("<div class=\"op-menu\">");
 		writer.println("<ul>");
 		writer.println("<li><a href=\"" + contextPath + servletPath + "/ChangeAvailability\" >Change Availability</a></li>");
 		writer.println("<li><a href=\"" + contextPath + servletPath + "/ChangeConfiguration\">Change Configuration</a></li>");
@@ -326,7 +324,7 @@ public class CPS_Servlet_Op extends HttpServlet {
 		writer.println("</div>");	
 
 		// Print the div on the right
-		writer.println("<div id=\"content\">");
+		writer.println("<div class=\"op-content\">");
 		writer.println("<form method=\"POST\" action=\""+ contextPath + servletPath + "/ClearCache\">");	
 
 		printChargePoints(writer);
@@ -343,7 +341,7 @@ public class CPS_Servlet_Op extends HttpServlet {
 
 	private void printGetDiagnostics(PrintWriter writer) {
 		// Print navigation div
-		writer.println("<div id=\"menu\">");
+		writer.println("<div class=\"op-menu\">");
 		writer.println("<ul>");
 		writer.println("<li><a href=\"" + contextPath + servletPath + "/ChangeAvailability\" >Change Availability</a></li>");
 		writer.println("<li><a href=\"" + contextPath + servletPath + "/ChangeConfiguration\">Change Configuration</a></li>");
@@ -358,7 +356,7 @@ public class CPS_Servlet_Op extends HttpServlet {
 		writer.println("</div>");	
 
 		// Print the div on the right
-		writer.println("<div id=\"content\">");
+		writer.println("<div class=\"op-content\">");
 		writer.println("<form method=\"POST\" action=\""+ contextPath + servletPath + "/GetDiagnostics\">");	
 
 		printChargePoints(writer);
@@ -397,7 +395,7 @@ public class CPS_Servlet_Op extends HttpServlet {
 
 	private void printRemoteStartTrans(PrintWriter writer) {
 		// Print navigation div
-		writer.println("<div id=\"menu\">");
+		writer.println("<div class=\"op-menu\">");
 		writer.println("<ul>");
 		writer.println("<li><a href=\"" + contextPath + servletPath + "/ChangeAvailability\" >Change Availability</a></li>");
 		writer.println("<li><a href=\"" + contextPath + servletPath + "/ChangeConfiguration\">Change Configuration</a></li>");
@@ -412,7 +410,7 @@ public class CPS_Servlet_Op extends HttpServlet {
 		writer.println("</div>");	
 
 		// Print the div on the right
-		writer.println("<div id=\"content\">");
+		writer.println("<div class=\"op-content\">");
 		writer.println("<form method=\"POST\" action=\""+ contextPath + servletPath + "/RemoteStartTransaction\">");
 
 		printChargePoints(writer);
@@ -439,7 +437,7 @@ public class CPS_Servlet_Op extends HttpServlet {
 
 	private void printRemoteStopTrans(PrintWriter writer) {
 		// Print navigation div
-		writer.println("<div id=\"menu\">");
+		writer.println("<div class=\"op-menu\">");
 		writer.println("<ul>");
 		writer.println("<li><a href=\"" + contextPath + servletPath + "/ChangeAvailability\" >Change Availability</a></li>");
 		writer.println("<li><a href=\"" + contextPath + servletPath + "/ChangeConfiguration\">Change Configuration</a></li>");
@@ -454,7 +452,7 @@ public class CPS_Servlet_Op extends HttpServlet {
 		writer.println("</div>");
 
 		// Print the div on the right
-		writer.println("<div id=\"content\">");
+		writer.println("<div class=\"op-content\">");
 		writer.println("<form method=\"POST\" action=\""+ contextPath + servletPath + "/RemoteStopTransaction\">");	
 
 		printChargePoints(writer);
@@ -477,7 +475,7 @@ public class CPS_Servlet_Op extends HttpServlet {
 
 	private void printReset(PrintWriter writer) throws IOException {
 		// Print navigation div
-		writer.println("<div id=\"menu\">");
+		writer.println("<div class=\"op-menu\">");
 		writer.println("<ul>");
 		writer.println("<li><a href=\"" + contextPath + servletPath + "/ChangeAvailability\" >Change Availability</a></li>");
 		writer.println("<li><a href=\"" + contextPath + servletPath + "/ChangeConfiguration\">Change Configuration</a></li>");
@@ -492,7 +490,7 @@ public class CPS_Servlet_Op extends HttpServlet {
 		writer.println("</div>");
 
 		// Print the div on the right
-		writer.println("<div id=\"content\">");
+		writer.println("<div class=\"op-content\">");
 		writer.println("<form method=\"POST\" action=\""+ contextPath + servletPath + "/Reset\">");	
 
 		printChargePoints(writer);
@@ -518,7 +516,7 @@ public class CPS_Servlet_Op extends HttpServlet {
 
 	private void printUnlockConnector(PrintWriter writer) {
 		// Print navigation div
-		writer.println("<div id=\"menu\">");
+		writer.println("<div class=\"op-menu\">");
 		writer.println("<ul>");
 		writer.println("<li><a href=\"" + contextPath + servletPath + "/ChangeAvailability\" >Change Availability</a></li>");
 		writer.println("<li><a href=\"" + contextPath + servletPath + "/ChangeConfiguration\">Change Configuration</a></li>");
@@ -533,7 +531,7 @@ public class CPS_Servlet_Op extends HttpServlet {
 		writer.println("</div>");
 
 		// Print the div on the right
-		writer.println("<div id=\"content\">");
+		writer.println("<div class=\"op-content\">");
 		writer.println("<form method=\"POST\" action=\""+ contextPath + servletPath + "/UnlockConnector\">");	
 
 		printChargePoints(writer);
@@ -556,7 +554,7 @@ public class CPS_Servlet_Op extends HttpServlet {
 
 	private void printUpdateFirmware(PrintWriter writer) {
 		// Print navigation div
-		writer.println("<div id=\"menu\">");
+		writer.println("<div class=\"op-menu\">");
 		writer.println("<ul>");
 		writer.println("<li><a href=\"" + contextPath + servletPath + "/ChangeAvailability\" >Change Availability</a></li>");
 		writer.println("<li><a href=\"" + contextPath + servletPath + "/ChangeConfiguration\">Change Configuration</a></li>");
@@ -571,7 +569,7 @@ public class CPS_Servlet_Op extends HttpServlet {
 		writer.println("</div>");	
 
 		// Print the div on the right
-		writer.println("<div id=\"content\">");
+		writer.println("<div class=\"op-content\">");
 		writer.println("<form method=\"POST\" action=\""+ contextPath + servletPath + "/UpdateFirmware\">");
 
 		printChargePoints(writer);
@@ -631,8 +629,8 @@ public class CPS_Servlet_Op extends HttpServlet {
 		writer.println("<b>Charge Points</b><hr>");
 		writer.println("<table>");
 		writer.println("<tr><td style=\"vertical-align:top\">");
-		writer.println("<input type=\"button\" value=\"Select All\" style=\"width:100px\" onClick=\"selectAll(document.getElementById('cp_items'))\">");
-		writer.println("<input type=\"button\" value=\"Select None\" style=\"width:100px\" onClick=\"selectNone(document.getElementById('cp_items'))\">");
+		writer.println("<input type=\"button\" value=\"Select All\" onClick=\"selectAll(document.getElementById('cp_items'))\">");
+		writer.println("<input type=\"button\" value=\"Select None\" onClick=\"selectNone(document.getElementById('cp_items'))\">");
 		writer.println("</td><td>");
 		writer.println("<select name=\"cp_items\" id=\"cp_items\" size=\"5\" multiple>");
 

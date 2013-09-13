@@ -76,7 +76,7 @@
 	<!-- Security -->
 	<security-constraint>
 		<web-resource-collection>
-			<web-resource-name>CPS_Servlet Web Interface</web-resource-name>
+			<web-resource-name>SteVe Web Interface</web-resource-name>
 			<url-pattern>/manager/*</url-pattern>
 		</web-resource-collection>
 		<auth-constraint>
@@ -85,10 +85,10 @@
 	</security-constraint>
 	<login-config>
 		<auth-method>BASIC</auth-method>
-		<realm-name>CPS_Servlet Web Interface</realm-name>
+		<realm-name>SteVe Web Interface</realm-name>
 	</login-config>
 	<security-role>
-		<description>The role that is required to access the CPS_Servlet Web Interface</description>
+		<description>The role that is required to access the SteVe Web Interface</description>
 		<role-name>admin</role-name>
 	</security-role>
 

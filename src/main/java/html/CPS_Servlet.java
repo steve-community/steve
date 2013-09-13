@@ -24,8 +24,8 @@ public class CPS_Servlet extends HttpServlet {
 		writer.println(CPS_Common.printHead(contextPath));
 		
 		printHomepage(writer);
-		writer.println("</div>");
-		writer.println("</body></html>");
+		
+		writer.println(CPS_Common.printFoot(contextPath));
 		writer.close();	
 	}
 

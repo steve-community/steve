@@ -32,10 +32,10 @@ public class CPS_Servlet_Res extends HttpServlet {
 		PrintWriter writer = response.getWriter();		
 		response.setContentType("text/html");
 		writer.println(CPS_Common.printHead(contextPath));
-		printReservationPage(writer);
 		
-		writer.println("</div>");
-		writer.println("</body></html>");
+		printReservationPage(writer);
+
+		writer.println(CPS_Common.printFoot(contextPath));
 		writer.close();	
 	}
 
@@ -50,7 +50,7 @@ public class CPS_Servlet_Res extends HttpServlet {
 			String chargeBoxId = request.getParameter("chargeBoxId");
 			String startDatetime = request.getParameter("startDatetime");
 			String stopDatetime = request.getParameter("stopDatetime");
-			
+
 			if ( areDatesValid(startDatetime, stopDatetime) ) {				
 				if ( bookReservation(idTag, chargeBoxId, startDatetime, stopDatetime) ){
 					response.sendRedirect(contextPath + servletPath);
@@ -62,7 +62,7 @@ public class CPS_Servlet_Res extends HttpServlet {
 				writer.close();
 				return;
 			}
-			
+
 			response.setContentType("text/plain");
 			writer.println("Invalid startDatetime and/or stopDatetime. Allowed input:");
 			writer.println("1. startDatetime and stopDatetime must match the expected pattern.");
@@ -79,7 +79,7 @@ public class CPS_Servlet_Res extends HttpServlet {
 			return;
 		}
 	}
-	
+
 	private boolean bookReservation(String idTag, String chargeBoxId, String startDatetime, String stopDatetime) {
 
 		Connection connect = null;
@@ -92,7 +92,7 @@ public class CPS_Servlet_Res extends HttpServlet {
 				// The reservation cannot be booked
 				return false;
 			}
-			
+
 			connect.setAutoCommit(false);
 			pt = connect.prepareStatement("INSERT INTO reservation (idTag, chargeBoxId, startDatetime, stopDatetime) VALUES (?,?,?,?)");
 
@@ -117,13 +117,13 @@ public class CPS_Servlet_Res extends HttpServlet {
 			Utils.releaseResources(connect, pt, null);
 		}		
 	}
-	
+
 	/**
 	 * Returns true, if there are rows whose date/time ranges overlap with the input
 	 *
 	 */
 	private boolean isOverlapping(Connection connect, PreparedStatement pt, String inputStartDatetime, String inputStopDatetime) {
-		
+
 		ResultSet rs = null;
 		boolean overlaps = true;
 		try {
@@ -131,11 +131,11 @@ public class CPS_Servlet_Res extends HttpServlet {
 			pt = connect.prepareStatement("SELECT 1 FROM reservation WHERE ? <= stopDatetime AND ? >= startDatetime");
 			pt.setString(1, inputStartDatetime);
 			pt.setString(2, inputStopDatetime);
-			
+
 			rs = pt.executeQuery();
 			// If the result set does NOT have an entry, then there are no overlaps
 			if ( !rs.next() ) overlaps = false;
-			
+
 		} catch (SQLException e) {
 			e.printStackTrace();
 		} finally {
@@ -167,7 +167,7 @@ public class CPS_Servlet_Res extends HttpServlet {
 			Utils.releaseResources(connect, pt, null);
 		}		
 	}	
-	
+
 	/**
 	 * Returns false, if
 	 * 1. the syntax does NOT match the expected pattern
@@ -179,15 +179,15 @@ public class CPS_Servlet_Res extends HttpServlet {
 
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
 		sdf.setLenient(false);
-		
+
 		Date start = null;
 		Date stop = null;
 		try {
 			start = sdf.parse(startDatetime);
-		    stop = sdf.parse(stopDatetime);
+			stop = sdf.parse(stopDatetime);
 		} catch (ParseException e) {
-		    //e.printStackTrace();
-		    return false;
+			//e.printStackTrace();
+			return false;
 		}
 
 		Date now = new Date();
@@ -216,7 +216,7 @@ public class CPS_Servlet_Res extends HttpServlet {
 			// Prepare Database Access
 			connect = Utils.getConnectionFromPool();
 			pt = connect.prepareStatement("SELECT reservation_pk, idTag, chargeBoxId, DATE_FORMAT(startDatetime, '%Y-%m-%d %H:%i'), "
-					+ "DATE_FORMAT(stopDatetime, '%Y-%m-%d %H:%i'), active FROM reservation ORDER BY startDatetime");
+					+ "DATE_FORMAT(stopDatetime, '%Y-%m-%d %H:%i'), active FROM reservation");
 			rs = pt.executeQuery();
 
 			while( rs.next() ) {

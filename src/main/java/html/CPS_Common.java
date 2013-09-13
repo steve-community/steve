@@ -12,9 +12,10 @@ public class CPS_Common {
 		"<title>SteVe - Steckdosenverwaltung</title>\n" +
 		"</head>\n" +
 		"<body>\n" +
+		"<div class=\"main\">\n" +
 		"<div class=\"top-banner\">\n" +
 		"<div class=\"container\">\n" +
-		"<img src=\""+ contextPath + "/logo.png\" height=\"100\">\n" +
+		"<a href=\"" + contextPath + "/manager\"><img src=\""+ contextPath + "/logo.png\" height=\"100\"></a>\n" +
 		"</div>\n" +
 		"</div>\n" +
 		"<div class=\"top-menu\">\n" +
@@ -27,7 +28,23 @@ public class CPS_Common {
 		"</ul>\n" +
 		"</div>\n" +
 		"</div>\n" +
-		"<div id=\"wrapper\">";
+		"<div class=\"main-wrapper\">" +
+		"<div class=\"content\">";
 	}
-
+	
+	public static String printFoot(String contextPath){
+		return
+		"</div>\n" +
+		"</div>\n" +
+		"</div>\n" +
+		"<div class=\"footer\">\n" +
+		"<div class=\"container\">\n" +
+		"<a href=\"http://www.rwth-aachen.de\"><img src=\""+ contextPath + "/logo_rwth.png\"></a>\n" + 
+		"<a href=\"http://dbis.rwth-aachen.de\"><img src=\""+ contextPath + "/logo_i5.png\"></a>\n" + 
+		"<a href=\"http://dbis.rwth-aachen.de/cms/teaching/IDSG\"><img src=\""+ contextPath + "/logo_idsg.png\"></a>\n" + 
+		"</div>\n" +
+		"</div>\n" +
+		"</body>\n" +
+		"</html>";
+	}
 }

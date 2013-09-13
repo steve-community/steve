@@ -189,11 +189,11 @@ input[type="submit"],input[type="button"] {
 
 .footer {
 	position: relative;
-	padding: 0;
+	padding-top: 10px;
 	margin-top: -70px;
-	height: 70px;
+	height: 60px;
 	text-align: center;
 	background: #71797d;
 }
 
-.footer img { margin-right: 10px; margin-top: 10px;}
+.footer a { margin-right: 10px; }

@@ -85,7 +85,7 @@ public class CPS_Client {
 		req.setRetryInterval(retryInterval);
 		return req;
 	}
-	
+
 	/////// SEND Request Payloads /////// 
 
 	public String sendChangeAvailability(String chargeBoxId, String endpoint_address, ChangeAvailabilityRequest req){

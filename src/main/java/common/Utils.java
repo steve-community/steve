@@ -18,11 +18,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class Utils {
-	
+
 	private static final Logger LOG = LoggerFactory.getLogger(Utils.class);
 	private static DataSource dataSource = null;	
 	private static DatatypeFactory factory;
-	
+
 	// DatatypeFactory.newInstance() is expensive. Generate one DatatypeFactory always to be used.
 	static{
 		try {
@@ -31,29 +31,29 @@ public class Utils {
 			throw new RuntimeException("Unable to create an XML datatype factory", e);
 		}
 	}	
-	
-    /**
-     * Returns a connection from the JDBC pool.
-     * If the pool is not created yet, it first creates one.
-     */
+
+	/**
+	 * Returns a connection from the JDBC pool.
+	 * If the pool is not created yet, it first creates one.
+	 */
 	public static Connection getConnectionFromPool() {
 		Connection con = null;
-        try {
-        	if (dataSource==null){
-    			Context initContext = new InitialContext();
-    			dataSource = (DataSource) initContext.lookup("java:comp/env/jdbc/cssdb");
-    			LOG.info("DB connection pool is opened.");
-        	}
+		try {
+			if (dataSource==null){
+				Context initContext = new InitialContext();
+				dataSource = (DataSource) initContext.lookup("java:comp/env/jdbc/cssdb");
+				LOG.info("DB connection pool is opened.");
+			}
 			con = dataSource.getConnection();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-        return con;
-    }
-	
-    /**
-     * Returns the current date/time for dateTime (XML).
-     */
+		return con;
+	}
+
+	/**
+	 * Returns the current date/time for dateTime (XML).
+	 */
 	public static XMLGregorianCalendar getCurrentDateTimeXML(){
 		// Returns a GregorianCalendar with the current date/time
 		GregorianCalendar gc = new GregorianCalendar();
@@ -64,10 +64,10 @@ public class Utils {
 
 		return xgc;
 	}
-	
-    /**
-     * Returns the current date/time in Timestamp (SQL).
-     */
+
+	/**
+	 * Returns the current date/time in Timestamp (SQL).
+	 */
 	public static Timestamp getCurrentDateTimeTS(){
 		// Returns a GregorianCalendar with the current date/time
 		GregorianCalendar gc = new GregorianCalendar();
@@ -76,11 +76,11 @@ public class Utils {
 		// Converts to SQL Timestamp
 		return new Timestamp(gc.getTimeInMillis());
 	}
-	
 
-    /**
-     * Sets the date/time for the whitelist of the chargebox to expire.
-     */
+
+	/**
+	 * Sets the date/time for the whitelist of the chargebox to expire.
+	 */
 	public static XMLGregorianCalendar setExpiryDateTime(int hours){
 		// Returns a GregorianCalendar with the current date/time
 		GregorianCalendar gc = new GregorianCalendar();
@@ -94,25 +94,25 @@ public class Utils {
 		return xgc;
 	}
 
-    /**
-     * Converts XMLGregorianCalendar in Timestamp (SQL)
-     */
+	/**
+	 * Converts XMLGregorianCalendar in Timestamp (SQL)
+	 */
 	public static Timestamp convertToTimestamp(XMLGregorianCalendar xmlDateTime) {
 		Timestamp newTimestamp = new Timestamp(xmlDateTime.toGregorianCalendar().getTimeInMillis());
 		return newTimestamp;
 	}
-		
-    /**
-     * Converts a String to XMLGregorianCalendar.
-     */
+
+	/**
+	 * Converts a String to XMLGregorianCalendar.
+	 */
 	public static XMLGregorianCalendar convertToXMLGregCal(String str){
 		// Converts to XML dateTime
 		return factory.newXMLGregorianCalendar(str);
 	}	
-	
-    /**
-     * Validates the execution of Data Manipulation Language (DML) statements, such as INSERT, UPDATE or DELETE.
-     */
+
+	/**
+	 * Validates the execution of Data Manipulation Language (DML) statements, such as INSERT, UPDATE or DELETE.
+	 */
 	public static boolean validateDMLChanges(int updateCount) {
 		if (updateCount >= 1) {
 			return true;
@@ -122,16 +122,16 @@ public class Utils {
 		}
 	}
 
-    /**
-     * Validates the BATCH execution of Data Manipulation Language (DML) statements, such as INSERT, UPDATE or DELETE.
+	/**
+	 * Validates the BATCH execution of Data Manipulation Language (DML) statements, such as INSERT, UPDATE or DELETE.
 	 * 
 	 * If the row value in the updateCounts array is 0 or greater, the update was successfully executed.
 	 * A value of SUCCESS_NO_INFO means update was successfully executed, but MySQL server unable to determine the number of rows affected.
 	 * A value of EXECUTE_FAILED means that an error has occured.
-     */
+	 */
 	public static boolean validateDMLChanges(int [] updateCounts) {
 		boolean updatedAll = false;
-		
+
 		for (int i = 1; i < updateCounts.length; i++) {
 			if (updateCounts[i] >= 1) {
 				updatedAll = true;
@@ -143,10 +143,10 @@ public class Utils {
 		}
 		return updatedAll;
 	}
-	
-    /**
-     * Releases all resources and returns the DB connection back to the pool.
-     */
+
+	/**
+	 * Releases all resources and returns the DB connection back to the pool.
+	 */
 	public static void releaseResources(Connection con, PreparedStatement pt, ResultSet rs) {
 		try {
 			if (rs != null) rs.close();

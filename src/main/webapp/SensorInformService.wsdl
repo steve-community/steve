@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+
+<!-- SteVe (service) and sensor (client) -->
+
+<wsdl:definitions xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/"
+	xmlns:tns="http://idsg.informatik.rwth-aachen.de/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="InformService"
+	targetNamespace="http://idsg.informatik.rwth-aachen.de/">
+	
+	<wsdl:types>
+		<xsd:schema targetNamespace="http://idsg.informatik.rwth-aachen.de/">
+
+			<xsd:complexType name="InformParkingRequest">
+			    <xsd:annotation>
+         			<xsd:documentation>Informs SteVe about the new status of a parking spot/connector</xsd:documentation>
+        		</xsd:annotation>
+				<xsd:sequence>
+					<xsd:element name="connectorId" type="xsd:int" minOccurs="1" maxOccurs="1" />
+					<xsd:element name="status" type="tns:status" minOccurs="1" maxOccurs="1" />
+				</xsd:sequence>
+			</xsd:complexType>
+
+			<xsd:complexType name="InformParkingResponse">
+				<xsd:annotation>
+         			<xsd:documentation>Empty response</xsd:documentation>
+        		</xsd:annotation>
+			</xsd:complexType>
+
+			<xsd:simpleType name="status">
+				<xsd:annotation>
+         			<xsd:documentation>Free (no vehicle parking), Occupied (vehicle parked), Violated (vehicle still parking after the timeout)</xsd:documentation>
+        		</xsd:annotation>
+				<xsd:restriction base="xsd:string">
+					<xsd:enumeration value="Free" />
+					<xsd:enumeration value="Occupied" />
+					<xsd:enumeration value="Violated" />
+				</xsd:restriction>
+			</xsd:simpleType>
+
+			<xsd:element name="ChargeBoxIdentity" type="xsd:string" />
+			<xsd:element name="InformParkingRequest" type="tns:InformParkingRequest" />
+			<xsd:element name="InformParkingResponse" type="tns:InformParkingResponse" />
+		</xsd:schema>
+	</wsdl:types>
+
+	<wsdl:message name="InformParkingRequest">
+		<wsdl:part name="parameters" element="tns:InformParkingRequest" />
+	</wsdl:message>
+	<wsdl:message name="InformParkingResponse">
+		<wsdl:part name="parameters" element="tns:InformParkingResponse" />
+	</wsdl:message>
+
+
+	<wsdl:portType name="InformService">
+		<wsdl:operation name="InformParking">
+			<wsdl:input message="tns:InformParkingRequest" />
+			<wsdl:output message="tns:InformParkingResponse" />
+		</wsdl:operation>	
+	</wsdl:portType>
+
+	<wsdl:binding name="InformServiceSOAP12" type="tns:InformService">
+		<soap12:binding style="document" transport="http://schemas.xmlsoap.org/soap/http" />
+
+		<wsdl:operation name="InformParking">
+			<soap12:operation soapAction="/InformParking" />
+			<wsdl:input>
+				<soap12:header use="literal" message="tns:Header" part="ChargeBoxIdentity" />
+				<soap12:body use="literal" />
+			</wsdl:input>
+			<wsdl:output>
+				<soap12:body use="literal" />
+			</wsdl:output>
+		</wsdl:operation>	
+
+	</wsdl:binding>
+
+	<wsdl:service name="InformService">
+		<wsdl:port binding="tns:InformServiceSOAP12" name="InformServiceSOAP12">
+			<soap12:address location="here-comes-the-endpoint-address-of-service-in-steve" />
+		</wsdl:port>
+	</wsdl:service>
+</wsdl:definitions>

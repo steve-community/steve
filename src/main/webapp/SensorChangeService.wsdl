@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+
+<!-- SteVe (client) and sensor (service) -->
+
+<wsdl:definitions xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/"
+	xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	xmlns:tns="http://idsg.informatik.rwth-aachen.de/" name="SensorService"
+	targetNamespace="http://idsg.informatik.rwth-aachen.de/">
+
+	<wsdl:types>
+		<xsd:schema targetNamespace="http://idsg.informatik.rwth-aachen.de/">
+		
+			<xsd:complexType name="ChangeConfigurationRequest">
+			    <xsd:annotation>
+         			<xsd:documentation>Defines the amount of time (in seconds) the sensor will wait for the authorization of the user after parking, 
+         			or for the vehicle to leave the parking spot before it times out.</xsd:documentation>
+        		</xsd:annotation>
+				<xsd:sequence>
+					<xsd:element name="timeoutValue" type="xsd:int" minOccurs="1" maxOccurs="1" />
+				</xsd:sequence>
+			</xsd:complexType>
+
+			<xsd:complexType name="ChangeConfigurationResponse">
+			    <xsd:annotation>
+         			<xsd:documentation>Informs whether the request has been processed successfully or not</xsd:documentation>
+        		</xsd:annotation>
+				<xsd:sequence>
+					<xsd:element name="configChanged" type="xsd:boolean" minOccurs="1" maxOccurs="1" />
+				</xsd:sequence>
+			</xsd:complexType>
+			
+			<xsd:complexType name="ChangeStatusRequest">
+			    <xsd:annotation>
+         			<xsd:documentation>Instructs the sensor of the connectorId to change its status</xsd:documentation>
+        		</xsd:annotation>
+				<xsd:sequence>
+					<xsd:element name="connectorId" type="xsd:int" minOccurs="1" maxOccurs="1" />
+					<xsd:element name="status" type="tns:status" minOccurs="1" maxOccurs="1" />	
+				</xsd:sequence>
+			</xsd:complexType>
+			
+			<xsd:complexType name="ChangeStatusResponse">
+			    <xsd:annotation>
+         			<xsd:documentation>Informs whether the request has been processed successfully or not</xsd:documentation>
+        		</xsd:annotation>
+				<xsd:sequence>
+					<xsd:element name="statusChanged" type="xsd:boolean" minOccurs="1" maxOccurs="1" />
+				</xsd:sequence>
+			</xsd:complexType>
+
+			<xsd:simpleType name="status">
+			    <xsd:annotation>
+         			<xsd:documentation>SteVe can instruct a sensor to change its status if there is a reservation (Reserved), 
+         			if the charge point is not functional at the moment (Inoperative), or otherwise ready to charge for any one (Free).
+         			Moreover, Steve informs the sensor about the charging status (Trans_Started, Trans_Stopped) and 
+         			if the user is not authorized to charge (Trans_Rejected).
+         			</xsd:documentation>
+        		</xsd:annotation>
+				<xsd:restriction base="xsd:string">
+					<xsd:enumeration value="Free" />
+					<xsd:enumeration value="Reserved" />
+					<xsd:enumeration value="Inoperative" />
+					<xsd:enumeration value="Trans_Started" />
+					<xsd:enumeration value="Trans_Stopped" />
+					<xsd:enumeration value="Trans_Rejected" />
+				</xsd:restriction>
+			</xsd:simpleType>
+
+			<xsd:element name="ChargeBoxIdentity" type="xsd:string" />
+			<xsd:element name="ChangeStatusRequest" type="tns:ChangeStatusRequest" />
+			<xsd:element name="ChangeStatusResponse" type="tns:ChangeStatusResponse" />
+			<xsd:element name="ChangeConfigurationRequest" type="tns:ChangeConfigurationRequest" />
+			<xsd:element name="ChangeConfigurationResponse" type="tns:ChangeConfigurationResponse" />
+		</xsd:schema>
+
+	</wsdl:types>
+	
+	<wsdl:message name="Header">
+    	<wsdl:part name="ChargeBoxIdentity" element="tns:ChargeBoxIdentity" />
+  	</wsdl:message>
+
+	<wsdl:message name="ChangeStatusRequest">
+		<wsdl:part name="parameters" element="tns:ChangeStatusRequest" />
+	</wsdl:message>
+	<wsdl:message name="ChangeStatusResponse">
+		<wsdl:part name="parameters" element="tns:ChangeStatusResponse" />
+	</wsdl:message>
+	
+	<wsdl:message name="ChangeConfigurationRequest">
+		<wsdl:part name="parameters" element="tns:ChangeConfigurationRequest" />
+	</wsdl:message>
+		<wsdl:message name="ChangeConfigurationResponse">
+		<wsdl:part name="parameters" element="tns:ChangeConfigurationResponse" />
+	</wsdl:message>
+
+	<wsdl:portType name="ChangeServiceSOAP">
+		<wsdl:operation name="ChangeStatus">
+			<wsdl:input message="tns:ChangeStatusRequest" />
+			<wsdl:output message="tns:ChangeStatusResponse" />
+		</wsdl:operation>
+		<wsdl:operation name="ChangeConfiguration">
+			<wsdl:input message="tns:ChangeConfigurationRequest" />
+			<wsdl:output message="tns:ChangeConfigurationResponse" />
+		</wsdl:operation>
+	</wsdl:portType>
+
+	<wsdl:binding name="ChangeServiceSOAP12" type="tns:ChangeServiceSOAP">
+		<soap12:binding style="document" transport="http://schemas.xmlsoap.org/soap/http" />
+		
+		<wsdl:operation name="ChangeStatus">
+			<soap12:operation soapAction="/ChangeStatus" />
+				<wsdl:input>
+					<soap12:header use="literal" message="tns:Header" part="ChargeBoxIdentity"/>
+					<soap12:body use="literal" />
+				</wsdl:input>
+				<wsdl:output>
+        			<soap12:body use="literal"/>
+      			</wsdl:output>
+		</wsdl:operation>
+
+		<wsdl:operation name="ChangeConfiguration">
+			<soap12:operation soapAction="/ChangeConfiguration" />
+				<wsdl:input>
+					<soap12:header use="literal" message="tns:Header" part="ChargeBoxIdentity"/>
+					<soap12:body use="literal"/>
+				</wsdl:input>
+				<wsdl:output>
+        			<soap12:body use="literal"/>
+      			</wsdl:output>
+		</wsdl:operation>
+    
+	</wsdl:binding>
+
+	<wsdl:service name="ChangeService">
+		<wsdl:port binding="tns:ChangeServiceSOAP12" name="ChangeServiceSOAP12">
+			<soap12:address location="here-comes-the-endpoint-address-of-service-in-the-sensor" />
+		</wsdl:port>
+	</wsdl:service>
+</wsdl:definitions>

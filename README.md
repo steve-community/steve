@@ -1,4 +1,4 @@
-![SteVe](src/main/webapps/logo.png)
+![SteVe](src/main/webapp/logo.png)
 =====
 
 More to come...

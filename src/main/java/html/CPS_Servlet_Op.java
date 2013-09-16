@@ -45,43 +45,44 @@ public class CPS_Servlet_Op extends HttpServlet {
 			response.sendRedirect(contextPath + servletPath + "/ChangeAvailability");
 			return;
 		}
-		
-		PrintWriter writer = response.getWriter();
-		response.setContentType("text/html");
-		writer.println(CPS_Common.printHead(contextPath));
-		
+				
+		StringBuilder mainBuilder = new StringBuilder(CPS_Common.printHead(contextPath));
+				
 		if (command.equals("/ChangeAvailability")){	
-			printChangeAvail(writer);
+			mainBuilder.append(printChangeAvail());
 
 		} else if (command.equals("/ChangeConfiguration")){
-			printChangeConf(writer);
+			mainBuilder.append(printChangeConf());
 
 		} else if (command.equals("/ClearCache")){
-			printClearCache(writer);
+			mainBuilder.append(printClearCache());
 
 		} else if (command.equals("/GetDiagnostics")){		
-			printGetDiagnostics(writer);
+			mainBuilder.append(printGetDiagnostics());
 
 		} else if (command.equals("/RemoteStartTransaction")){		
-			printRemoteStartTrans(writer);
+			mainBuilder.append(printRemoteStartTrans());
 
 		} else if (command.equals("/RemoteStopTransaction")){			
-			printRemoteStopTrans(writer);
+			mainBuilder.append(printRemoteStopTrans());
 
 		} else if (command.equals("/Reset")){			
-			printReset(writer);
+			mainBuilder.append(printReset());
 
 		} else if (command.equals("/UnlockConnector")){			
-			printUnlockConnector(writer);
+			mainBuilder.append(printUnlockConnector());
 
 		} else if (command.equals("/UpdateFirmware")){		
-			printUpdateFirmware(writer);
+			mainBuilder.append(printUpdateFirmware());
 		}
 
-		writer.println(CPS_Common.printFoot(contextPath));
+		mainBuilder.append(CPS_Common.printFoot(contextPath));
+		
+		response.setContentType("text/html");
+		PrintWriter writer = response.getWriter();
+		writer.write(mainBuilder.toString());
 		writer.close();	
 	}
-
 
 	@Override
 	public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
@@ -208,399 +209,287 @@ public class CPS_Servlet_Op extends HttpServlet {
 		writer.close();	
 	}
 
-	private void printChangeAvail(PrintWriter writer) {
-		// Print navigation div
-		writer.println("<div class=\"op-menu\">");
-		writer.println("<ul>");
-		writer.println("<li><a class=\"highlight\" href=\"" + contextPath + servletPath + "/ChangeAvailability\" >Change Availability</a></li>");
-		writer.println("<li><a href=\"" + contextPath + servletPath + "/ChangeConfiguration\">Change Configuration</a></li>");
-		writer.println("<li><a href=\"" + contextPath + servletPath + "/ClearCache\">Clear Cache</a></li>");
-		writer.println("<li><a href=\"" + contextPath + servletPath + "/GetDiagnostics\">Get Diagnostics</a></li>");
-		writer.println("<li><a href=\"" + contextPath + servletPath + "/RemoteStartTransaction\">Remote Start Transaction</a></li>");
-		writer.println("<li><a href=\"" + contextPath + servletPath + "/RemoteStopTransaction\">Remote Stop Transaction</a></li>");
-		writer.println("<li><a href=\"" + contextPath + servletPath + "/Reset\">Reset</a></li>");
-		writer.println("<li><a href=\"" + contextPath + servletPath + "/UnlockConnector\">Unlock Connector</a></li>");
-		writer.println("<li><a href=\"" + contextPath + servletPath + "/UpdateFirmware\">Update Firmware</a></li>");
-		writer.println("</ul>");
-		writer.println("</div>");	
+	private String printChangeAvail() {
+
+		return				
+		// Print the menu div on the left 
+		"<div class=\"op-menu\">\n"
+		+ "<ul>\n"
+		+ "<li><a class=\"highlight\" href=\"" + contextPath + servletPath + "/ChangeAvailability\" >Change Availability</a></li>\n"
+		+ "<li><a href=\"" + contextPath + servletPath + "/ChangeConfiguration\">Change Configuration</a></li>\n"
+		+ "<li><a href=\"" + contextPath + servletPath + "/ClearCache\">Clear Cache</a></li>\n"
+		+ "<li><a href=\"" + contextPath + servletPath + "/GetDiagnostics\">Get Diagnostics</a></li>\n"
+		+ "<li><a href=\"" + contextPath + servletPath + "/RemoteStartTransaction\">Remote Start Transaction</a></li>\n"
+		+ "<li><a href=\"" + contextPath + servletPath + "/RemoteStopTransaction\">Remote Stop Transaction</a></li>\n"
+		+ "<li><a href=\"" + contextPath + servletPath + "/Reset\">Reset</a></li>\n"
+		+ "<li><a href=\"" + contextPath + servletPath + "/UnlockConnector\">Unlock Connector</a></li>\n"
+		+ "<li><a href=\"" + contextPath + servletPath + "/UpdateFirmware\">Update Firmware</a></li>\n"
+		+ "</ul>\n"
+		+ "</div>\n"
 
 		// Print the div on the right
-		writer.println("<div class=\"op-content\">");
-		writer.println("<form method=\"POST\" action=\""+ contextPath + servletPath + "/ChangeAvailability\">");
-
-		printChargePoints(writer);
-
-		writer.println("<b>Parameters</b><hr>");
-		writer.println("<table class=\"params\">");		
-		writer.println("<tr><td>");
-		writer.println("Connector Id (integer, 0 = charge point as a whole): ");
-		writer.println("</td><td>");
-		writer.println("<input type=\"number\" min=\"0\" name=\"ConnectorId\">");
-		writer.println("</td></tr>");
-		writer.println("<tr><td>");
-		writer.println("Availability Type: ");
-		writer.println("</td><td>");
-		writer.println("<select name=\"availType\">");
-		writer.println("<option value=\"Inoperative\">Inoperative</option>");
-		writer.println("<option value=\"Operative\">Operative</option>");
-		writer.println("</select>");
-		writer.println("</td></tr>");
-		writer.println("<tr><td></td>");
-		writer.println("<td id=\"add_space\">");
-		writer.println("<input type=\"submit\" value=\"Perform\">");
-		writer.println("</td>");   	   	
-		writer.println("</table>");			
-		writer.println("</form>");
-		writer.println("</div>");
+		+ "<div class=\"op-content\">\n<form method=\"POST\" action=\"" + contextPath + servletPath + "/ChangeAvailability\">\n" 				
+		+ printChargePoints()				
+		+ "<b>Parameters</b><hr>\n"
+		+ "<table class=\"params\">\n"
+		+ "<tr><td>Connector Id (integer, 0 = charge point as a whole):</td><td><input type=\"number\" min=\"0\" name=\"ConnectorId\"></td></tr>\n"
+		+ "<tr><td>Availability Type:</td><td><select name=\"availType\">"
+		+ "<option value=\"Inoperative\">Inoperative</option>"
+		+ "<option value=\"Operative\">Operative</option>"
+		+ "</select></td></tr>\n"
+		+ "<tr><td></td><td id=\"add_space\"><input type=\"submit\" value=\"Perform\"></td></tr>\n"	   	
+		+ "</table>\n</form>\n</div>";
 	}
 
-	private void printChangeConf(PrintWriter writer) {
-		// Print navigation div
-		writer.println("<div class=\"op-menu\">");
-		writer.println("<ul>");
-		writer.println("<li><a href=\"" + contextPath + servletPath + "/ChangeAvailability\" >Change Availability</a></li>");
-		writer.println("<li><a class=\"highlight\" href=\"" + contextPath + servletPath + "/ChangeConfiguration\">Change Configuration</a></li>");
-		writer.println("<li><a href=\"" + contextPath + servletPath + "/ClearCache\">Clear Cache</a></li>");
-		writer.println("<li><a href=\"" + contextPath + servletPath + "/GetDiagnostics\">Get Diagnostics</a></li>");
-		writer.println("<li><a href=\"" + contextPath + servletPath + "/RemoteStartTransaction\">Remote Start Transaction</a></li>");
-		writer.println("<li><a href=\"" + contextPath + servletPath + "/RemoteStopTransaction\">Remote Stop Transaction</a></li>");
-		writer.println("<li><a href=\"" + contextPath + servletPath + "/Reset\">Reset</a></li>");
-		writer.println("<li><a href=\"" + contextPath + servletPath + "/UnlockConnector\">Unlock Connector</a></li>");
-		writer.println("<li><a href=\"" + contextPath + servletPath + "/UpdateFirmware\">Update Firmware</a></li>");
-		writer.println("</ul>");
-		writer.println("</div>");
+	private String printChangeConf() {
+		
+		return
+		// Print the menu div on the left 
+		"<div class=\"op-menu\">\n"
+		+ "<ul>\n"
+		+ "<li><a href=\"" + contextPath + servletPath + "/ChangeAvailability\" >Change Availability</a></li>\n"
+		+ "<li><a class=\"highlight\" href=\"" + contextPath + servletPath + "/ChangeConfiguration\">Change Configuration</a></li>\n"
+		+ "<li><a href=\"" + contextPath + servletPath + "/ClearCache\">Clear Cache</a></li>\n"
+		+ "<li><a href=\"" + contextPath + servletPath + "/GetDiagnostics\">Get Diagnostics</a></li>\n"
+		+ "<li><a href=\"" + contextPath + servletPath + "/RemoteStartTransaction\">Remote Start Transaction</a></li>\n"
+		+ "<li><a href=\"" + contextPath + servletPath + "/RemoteStopTransaction\">Remote Stop Transaction</a></li>\n"
+		+ "<li><a href=\"" + contextPath + servletPath + "/Reset\">Reset</a></li>\n"
+		+ "<li><a href=\"" + contextPath + servletPath + "/UnlockConnector\">Unlock Connector</a></li>\n"
+		+ "<li><a href=\"" + contextPath + servletPath + "/UpdateFirmware\">Update Firmware</a></li>\n"
+		+ "</ul>\n"
+		+ "</div>\n"
 
 		// Print the div on the right
-		writer.println("<div class=\"op-content\">");
-		writer.println("<form method=\"POST\" action=\""+ contextPath + servletPath + "/ChangeConfiguration\">");
-
-		printChargePoints(writer);
-
-		writer.println("<b>Parameters</b><hr>");
-		writer.println("<table class=\"params\">");		
-		writer.println("<tr><td>");
-		writer.println("Configuration key:");
-		writer.println("</td><td>");
-		writer.println("<select name=\"confKey\">");
-		writer.println("<option value=\"HeartBeatInterval\">HeartBeatInterval (in seconds)</option>");
-		writer.println("<option value=\"ConnectionTimeOut\">ConnectionTimeOut (in seconds)</option>");
-		writer.println("<option value=\"ProximityContactRetries\">ProximityContactRetries (in times)</option>");
-		writer.println("<option value=\"ProximityLockRetries\">ProximityLockRetries (in times)</option>");
-		writer.println("<option value=\"ResetRetries\">ResetRetries (in times)</option>");
-		writer.println("<option value=\"BlinkRepeat\">BlinkRepeat (in times)</option>");
-		writer.println("<option value=\"LightIntensity\">LightIntensity (in %)</option>");
-		writer.println("<option value=\"ChargePointId\">ChargePointId (string)</option>");
-		writer.println("<option value=\"MeterValueSampleInterval\">MeterValueSampleInterval (in seconds)</option>");		
-		writer.println("</select>");
-		writer.println("</td></tr>");
-		writer.println("<tr><td>");
-		writer.println("Value:");
-		writer.println("</td><td>");
-		writer.println("<input type=\"text\" name=\"value\">");		
-		writer.println("</td></tr>");
-		writer.println("<tr><td></td>");
-		writer.println("<td id=\"add_space\">");
-		writer.println("<input type=\"submit\" value=\"Perform\">");
-		writer.println("</td>");   	   	
-		writer.println("</table>");			
-		writer.println("</form>");
-		writer.println("</div>");
+		+ "<div class=\"op-content\">\n<form method=\"POST\" action=\"" + contextPath + servletPath + "/ChangeConfiguration\">\n" 
+		+ printChargePoints()
+		+ "<b>Parameters</b><hr>\n"
+		+ "<table class=\"params\">\n"
+		+ "<tr><td>Configuration key:</td><td>\n"
+		+ "<select name=\"confKey\">\n"
+		+ "<option value=\"HeartBeatInterval\">HeartBeatInterval (in seconds)</option>\n"
+		+ "<option value=\"ConnectionTimeOut\">ConnectionTimeOut (in seconds)</option>\n"
+		+ "<option value=\"ProximityContactRetries\">ProximityContactRetries (in times)</option>\n"
+		+ "<option value=\"ProximityLockRetries\">ProximityLockRetries (in times)</option>\n"
+		+ "<option value=\"ResetRetries\">ResetRetries (in times)</option>\n"
+		+ "<option value=\"BlinkRepeat\">BlinkRepeat (in times)</option>\n"
+		+ "<option value=\"LightIntensity\">LightIntensity (in %)</option>\n"
+		+ "<option value=\"ChargePointId\">ChargePointId (string)</option>\n"
+		+ "<option value=\"MeterValueSampleInterval\">MeterValueSampleInterval (in seconds)</option>\n"
+		+ "</select>\n"
+		+ "</td></tr>\n"
+		+ "<tr><td>Value:</td><td><input type=\"text\" name=\"value\"></td></tr>\n"
+		+ "<tr><td></td><td id=\"add_space\"><input type=\"submit\" value=\"Perform\"></td></tr>\n"
+		+ "</table>\n</form>\n</div>";		
 	}
 
-	private void printClearCache(PrintWriter writer) {
-		// Print navigation div
-		writer.println("<div class=\"op-menu\">");
-		writer.println("<ul>");
-		writer.println("<li><a href=\"" + contextPath + servletPath + "/ChangeAvailability\" >Change Availability</a></li>");
-		writer.println("<li><a href=\"" + contextPath + servletPath + "/ChangeConfiguration\">Change Configuration</a></li>");
-		writer.println("<li><a class=\"highlight\" href=\"" + contextPath + servletPath + "/ClearCache\">Clear Cache</a></li>");
-		writer.println("<li><a href=\"" + contextPath + servletPath + "/GetDiagnostics\">Get Diagnostics</a></li>");
-		writer.println("<li><a href=\"" + contextPath + servletPath + "/RemoteStartTransaction\">Remote Start Transaction</a></li>");
-		writer.println("<li><a href=\"" + contextPath + servletPath + "/RemoteStopTransaction\">Remote Stop Transaction</a></li>");
-		writer.println("<li><a href=\"" + contextPath + servletPath + "/Reset\">Reset</a></li>");
-		writer.println("<li><a href=\"" + contextPath + servletPath + "/UnlockConnector\">Unlock Connector</a></li>");
-		writer.println("<li><a href=\"" + contextPath + servletPath + "/UpdateFirmware\">Update Firmware</a></li>");
-		writer.println("</ul>");
-		writer.println("</div>");	
+	private String printClearCache() {
+		
+		return				
+		// Print the menu div on the left 
+		"<div class=\"op-menu\">\n"
+		+ "<ul>\n"
+		+ "<li><a href=\"" + contextPath + servletPath + "/ChangeAvailability\" >Change Availability</a></li>\n"
+		+ "<li><a href=\"" + contextPath + servletPath + "/ChangeConfiguration\">Change Configuration</a></li>\n"
+		+ "<li><a class=\"highlight\" href=\"" + contextPath + servletPath + "/ClearCache\">Clear Cache</a></li>\n"
+		+ "<li><a href=\"" + contextPath + servletPath + "/GetDiagnostics\">Get Diagnostics</a></li>\n"
+		+ "<li><a href=\"" + contextPath + servletPath + "/RemoteStartTransaction\">Remote Start Transaction</a></li>\n"
+		+ "<li><a href=\"" + contextPath + servletPath + "/RemoteStopTransaction\">Remote Stop Transaction</a></li>\n"
+		+ "<li><a href=\"" + contextPath + servletPath + "/Reset\">Reset</a></li>\n"
+		+ "<li><a href=\"" + contextPath + servletPath + "/UnlockConnector\">Unlock Connector</a></li>\n"
+		+ "<li><a href=\"" + contextPath + servletPath + "/UpdateFirmware\">Update Firmware</a></li>\n"
+		+ "</ul>\n"
+		+ "</div>\n"
 
 		// Print the div on the right
-		writer.println("<div class=\"op-content\">");
-		writer.println("<form method=\"POST\" action=\""+ contextPath + servletPath + "/ClearCache\">");	
-
-		printChargePoints(writer);
-
-		writer.println("<b>Parameters</b><hr>");
-		writer.println("<center>");
-		writer.println("<i>No parameters required.</i>");
-		writer.println("<br><br>");
-		writer.println("<input type=\"submit\" value=\"Perform\">");
-		writer.println("</center>");
-		writer.println("</form>");
-		writer.println("</div>");
+		+ "<div class=\"op-content\">\n<form method=\"POST\" action=\"" + contextPath + servletPath + "/ClearCache\">\n" 
+		+ printChargePoints()
+		+ "<b>Parameters</b><hr>\n"
+		+ "<center>"
+		+ "<i>No parameters required.</i>"
+		+ "<br><br>"
+		+ "<input type=\"submit\" value=\"Perform\">"
+		+ "</center>\n</form>\n</div>";		
 	}
 
-	private void printGetDiagnostics(PrintWriter writer) {
-		// Print navigation div
-		writer.println("<div class=\"op-menu\">");
-		writer.println("<ul>");
-		writer.println("<li><a href=\"" + contextPath + servletPath + "/ChangeAvailability\" >Change Availability</a></li>");
-		writer.println("<li><a href=\"" + contextPath + servletPath + "/ChangeConfiguration\">Change Configuration</a></li>");
-		writer.println("<li><a href=\"" + contextPath + servletPath + "/ClearCache\">Clear Cache</a></li>");
-		writer.println("<li><a class=\"highlight\" href=\"" + contextPath + servletPath + "/GetDiagnostics\">Get Diagnostics</a></li>");
-		writer.println("<li><a href=\"" + contextPath + servletPath + "/RemoteStartTransaction\">Remote Start Transaction</a></li>");
-		writer.println("<li><a href=\"" + contextPath + servletPath + "/RemoteStopTransaction\">Remote Stop Transaction</a></li>");
-		writer.println("<li><a href=\"" + contextPath + servletPath + "/Reset\">Reset</a></li>");
-		writer.println("<li><a href=\"" + contextPath + servletPath + "/UnlockConnector\">Unlock Connector</a></li>");
-		writer.println("<li><a href=\"" + contextPath + servletPath + "/UpdateFirmware\">Update Firmware</a></li>");
-		writer.println("</ul>");
-		writer.println("</div>");	
+	private String printGetDiagnostics() {
+
+		return				
+		// Print the menu div on the left 
+		"<div class=\"op-menu\">\n"
+		+ "<ul>\n"
+		+ "<li><a href=\"" + contextPath + servletPath + "/ChangeAvailability\" >Change Availability</a></li>\n"
+		+ "<li><a href=\"" + contextPath + servletPath + "/ChangeConfiguration\">Change Configuration</a></li>\n"
+		+ "<li><a href=\"" + contextPath + servletPath + "/ClearCache\">Clear Cache</a></li>\n"
+		+ "<li><a class=\"highlight\" href=\"" + contextPath + servletPath + "/GetDiagnostics\">Get Diagnostics</a></li>\n"
+		+ "<li><a href=\"" + contextPath + servletPath + "/RemoteStartTransaction\">Remote Start Transaction</a></li>\n"
+		+ "<li><a href=\"" + contextPath + servletPath + "/RemoteStopTransaction\">Remote Stop Transaction</a></li>\n"
+		+ "<li><a href=\"" + contextPath + servletPath + "/Reset\">Reset</a></li>\n"
+		+ "<li><a href=\"" + contextPath + servletPath + "/UnlockConnector\">Unlock Connector</a></li>\n"
+		+ "<li><a href=\"" + contextPath + servletPath + "/UpdateFirmware\">Update Firmware</a></li>\n"
+		+ "</ul>\n"
+		+ "</div>\n"
 
 		// Print the div on the right
-		writer.println("<div class=\"op-content\">");
-		writer.println("<form method=\"POST\" action=\""+ contextPath + servletPath + "/GetDiagnostics\">");	
-
-		printChargePoints(writer);
-
-		writer.println("<b>Parameters</b><hr>");
-		writer.println("<table class=\"params\">");
-		writer.println("<tr><td>");		
-		writer.println("Location (directory URI):");
-		writer.println("</td><td>");
-		writer.println("<input type=\"text\" name=\"location\">");
-		writer.println("</td></tr><tr><td>");
-		writer.println("Retries (integer):");
-		writer.println("</td><td>");
-		writer.println("<input type=\"number\" min=\"0\" name=\"retries\">");
-		writer.println("</td></tr><tr><td>");
-		writer.println("Retry Interval (integer):");
-		writer.println("</td><td>");
-		writer.println("<input type=\"number\" min=\"0\" name=\"retryInterval\">");
-		writer.println("</td></tr><tr><td>");
-		writer.println("Start time (ex: 2011-12-21T11:33:23Z):");
-		writer.println("</td><td>");
-		writer.println("<input type=\"datetime\" name=\"startTime\">");
-		writer.println("</td></tr><tr><td>");
-		writer.println("Stop time (ex: 2011-12-21T11:33:23Z):");
-		writer.println("</td><td>");
-		writer.println("<input type=\"datetime\" name=\"stopTime\">");		
-		writer.println("</td></tr>");
-		writer.println("<tr><td></td>");
-		writer.println("<td id=\"add_space\">");
-		writer.println("<input type=\"submit\" value=\"Perform\">");
-		writer.println("</td>");   	   	
-		writer.println("</table>");			
-		writer.println("</form>");
-		writer.println("</div>");
+		+ "<div class=\"op-content\">\n<form method=\"POST\" action=\"" + contextPath + servletPath + "/GetDiagnostics\">\n" 
+		+ printChargePoints()
+		+ "<b>Parameters</b><hr>\n"
+		+ "<table class=\"params\">\n"
+		+ "<tr><td>Location (directory URI):</td><td><input type=\"text\" name=\"location\"></td></tr>\n"		
+		+ "<tr><td>Retries (integer):</td><td><input type=\"number\" min=\"0\" name=\"retries\"></td></tr>\n"
+		+ "<tr><td>Retry Interval (integer):</td><td><input type=\"number\" min=\"0\" name=\"retryInterval\"></td></tr>\n"
+		+ "<tr><td>Start time (ex: 2011-12-21T11:33:23Z):</td><td><input type=\"datetime\" name=\"startTime\"></td></tr>\n"
+		+ "<tr><td>Stop time (ex: 2011-12-21T11:33:23Z):</td><td><input type=\"datetime\" name=\"stopTime\"></td></tr>\n"
+		+ "<tr><td></td><td id=\"add_space\"><input type=\"submit\" value=\"Perform\"></td></tr>\n"  	   	
+		+ "</table>\n</form>\n</div>";
 	}
 
-	private void printRemoteStartTrans(PrintWriter writer) {
-		// Print navigation div
-		writer.println("<div class=\"op-menu\">");
-		writer.println("<ul>");
-		writer.println("<li><a href=\"" + contextPath + servletPath + "/ChangeAvailability\" >Change Availability</a></li>");
-		writer.println("<li><a href=\"" + contextPath + servletPath + "/ChangeConfiguration\">Change Configuration</a></li>");
-		writer.println("<li><a href=\"" + contextPath + servletPath + "/ClearCache\">Clear Cache</a></li>");
-		writer.println("<li><a href=\"" + contextPath + servletPath + "/GetDiagnostics\">Get Diagnostics</a></li>");
-		writer.println("<li><a class=\"highlight\" href=\"" + contextPath + servletPath + "/RemoteStartTransaction\">Remote Start Transaction</a></li>");
-		writer.println("<li><a href=\"" + contextPath + servletPath + "/RemoteStopTransaction\">Remote Stop Transaction</a></li>");
-		writer.println("<li><a href=\"" + contextPath + servletPath + "/Reset\">Reset</a></li>");
-		writer.println("<li><a href=\"" + contextPath + servletPath + "/UnlockConnector\">Unlock Connector</a></li>");
-		writer.println("<li><a href=\"" + contextPath + servletPath + "/UpdateFirmware\">Update Firmware</a></li>");
-		writer.println("</ul>");
-		writer.println("</div>");	
+	private String printRemoteStartTrans() {
+
+		return
+		// Print the menu div on the left 
+		"<div class=\"op-menu\">\n"
+		+ "<ul>\n"
+		+ "<li><a href=\"" + contextPath + servletPath + "/ChangeAvailability\" >Change Availability</a></li>\n"
+		+ "<li><a href=\"" + contextPath + servletPath + "/ChangeConfiguration\">Change Configuration</a></li>\n"
+		+ "<li><a href=\"" + contextPath + servletPath + "/ClearCache\">Clear Cache</a></li>\n"
+		+ "<li><a href=\"" + contextPath + servletPath + "/GetDiagnostics\">Get Diagnostics</a></li>\n"
+		+ "<li><a class=\"highlight\" href=\"" + contextPath + servletPath + "/RemoteStartTransaction\">Remote Start Transaction</a></li>\n"
+		+ "<li><a href=\"" + contextPath + servletPath + "/RemoteStopTransaction\">Remote Stop Transaction</a></li>\n"
+		+ "<li><a href=\"" + contextPath + servletPath + "/Reset\">Reset</a></li>\n"
+		+ "<li><a href=\"" + contextPath + servletPath + "/UnlockConnector\">Unlock Connector</a></li>\n"
+		+ "<li><a href=\"" + contextPath + servletPath + "/UpdateFirmware\">Update Firmware</a></li>\n"
+		+ "</ul>\n"
+		+ "</div>\n"
 
 		// Print the div on the right
-		writer.println("<div class=\"op-content\">");
-		writer.println("<form method=\"POST\" action=\""+ contextPath + servletPath + "/RemoteStartTransaction\">");
-
-		printChargePoints(writer);
-
-		writer.println("<b>Parameters</b><hr>");
-		writer.println("<table class=\"params\">");
-		writer.println("<tr><td>");		
-		writer.println("Connector Id (integer, not 0): ");
-		writer.println("</td><td>");
-		writer.println("<input type=\"number\" min=\"1\" name=\"ConnectorId\">");
-		writer.println("</td></tr><tr><td>");
-		writer.println("idTag (string): ");
-		writer.println("</td><td>");
-		writer.println("<input type=\"text\" name=\"idTag\">");	
-		writer.println("</td></tr>");
-		writer.println("<tr><td></td>");
-		writer.println("<td id=\"add_space\">");
-		writer.println("<input type=\"submit\" value=\"Perform\">");
-		writer.println("</td>");   	   	
-		writer.println("</table>");			
-		writer.println("</form>");
-		writer.println("</div>");
+		+ "<div class=\"op-content\">\n<form method=\"POST\" action=\"" + contextPath + servletPath + "/RemoteStartTransaction\">\n" 
+		+ printChargePoints()
+		+ "<b>Parameters</b><hr>\n"
+		+ "<table class=\"params\">\n"
+		+ "<tr><td>Connector Id (integer, not 0):</td><td><input type=\"number\" min=\"1\" name=\"ConnectorId\"></td></tr>\n"
+		+ "<tr><td>idTag (string):</td><td><input type=\"text\" name=\"idTag\"></td></tr>\n"
+		+ "<tr><td></td><td id=\"add_space\"><input type=\"submit\" value=\"Perform\"></td></tr>\n"
+		+ "</table>\n</form>\n</div>";
 	}
 
-	private void printRemoteStopTrans(PrintWriter writer) {
-		// Print navigation div
-		writer.println("<div class=\"op-menu\">");
-		writer.println("<ul>");
-		writer.println("<li><a href=\"" + contextPath + servletPath + "/ChangeAvailability\" >Change Availability</a></li>");
-		writer.println("<li><a href=\"" + contextPath + servletPath + "/ChangeConfiguration\">Change Configuration</a></li>");
-		writer.println("<li><a href=\"" + contextPath + servletPath + "/ClearCache\">Clear Cache</a></li>");
-		writer.println("<li><a href=\"" + contextPath + servletPath + "/GetDiagnostics\">Get Diagnostics</a></li>");
-		writer.println("<li><a href=\"" + contextPath + servletPath + "/RemoteStartTransaction\">Remote Start Transaction</a></li>");
-		writer.println("<li><a class=\"highlight\" href=\"" + contextPath + servletPath + "/RemoteStopTransaction\">Remote Stop Transaction</a></li>");
-		writer.println("<li><a href=\"" + contextPath + servletPath + "/Reset\">Reset</a></li>");
-		writer.println("<li><a href=\"" + contextPath + servletPath + "/UnlockConnector\">Unlock Connector</a></li>");
-		writer.println("<li><a href=\"" + contextPath + servletPath + "/UpdateFirmware\">Update Firmware</a></li>");
-		writer.println("</ul>");
-		writer.println("</div>");
+	private String printRemoteStopTrans() {
+
+		return
+		// Print the menu div on the left 
+		"<div class=\"op-menu\">\n"
+		+ "<ul>\n"
+		+ "<li><a href=\"" + contextPath + servletPath + "/ChangeAvailability\" >Change Availability</a></li>\n"
+		+ "<li><a href=\"" + contextPath + servletPath + "/ChangeConfiguration\">Change Configuration</a></li>\n"
+		+ "<li><a href=\"" + contextPath + servletPath + "/ClearCache\">Clear Cache</a></li>\n"
+		+ "<li><a href=\"" + contextPath + servletPath + "/GetDiagnostics\">Get Diagnostics</a></li>\n"
+		+ "<li><a href=\"" + contextPath + servletPath + "/RemoteStartTransaction\">Remote Start Transaction</a></li>\n"
+		+ "<li><a class=\"highlight\" href=\"" + contextPath + servletPath + "/RemoteStopTransaction\">Remote Stop Transaction</a></li>\n"
+		+ "<li><a href=\"" + contextPath + servletPath + "/Reset\">Reset</a></li>\n"
+		+ "<li><a href=\"" + contextPath + servletPath + "/UnlockConnector\">Unlock Connector</a></li>\n"
+		+ "<li><a href=\"" + contextPath + servletPath + "/UpdateFirmware\">Update Firmware</a></li>\n"
+		+ "</ul>\n"
+		+ "</div>\n"
 
 		// Print the div on the right
-		writer.println("<div class=\"op-content\">");
-		writer.println("<form method=\"POST\" action=\""+ contextPath + servletPath + "/RemoteStopTransaction\">");	
-
-		printChargePoints(writer);
-
-		writer.println("<b>Parameters</b><hr>");
-		writer.println("<table class=\"params\">");
-		writer.println("<tr><td>");		
-		writer.println("Transaction Id (integer): ");
-		writer.println("</td><td>");
-		writer.println("<input type=\"number\" name=\"transactionId\">");		
-		writer.println("</td></tr>");
-		writer.println("<tr><td></td>");
-		writer.println("<td id=\"add_space\">");
-		writer.println("<input type=\"submit\" value=\"Perform\">");
-		writer.println("</td>");   	   	
-		writer.println("</table>");			
-		writer.println("</form>");
-		writer.println("</div>");
+		+ "<div class=\"op-content\">\n<form method=\"POST\" action=\"" + contextPath + servletPath + "/RemoteStopTransaction\">\n" 
+		+ printChargePoints()
+		+ "<b>Parameters</b><hr>\n"
+		+ "<table class=\"params\">\n"
+		+ "<tr><td>Transaction Id (integer):</td><td><input type=\"number\" name=\"transactionId\"></td></tr>\n"	
+		+ "<tr><td></td><td id=\"add_space\"><input type=\"submit\" value=\"Perform\"></td></tr>\n"
+		+ "</table>\n</form>\n</div>";
 	}
 
-	private void printReset(PrintWriter writer) throws IOException {
-		// Print navigation div
-		writer.println("<div class=\"op-menu\">");
-		writer.println("<ul>");
-		writer.println("<li><a href=\"" + contextPath + servletPath + "/ChangeAvailability\" >Change Availability</a></li>");
-		writer.println("<li><a href=\"" + contextPath + servletPath + "/ChangeConfiguration\">Change Configuration</a></li>");
-		writer.println("<li><a href=\"" + contextPath + servletPath + "/ClearCache\">Clear Cache</a></li>");
-		writer.println("<li><a href=\"" + contextPath + servletPath + "/GetDiagnostics\">Get Diagnostics</a></li>");
-		writer.println("<li><a href=\"" + contextPath + servletPath + "/RemoteStartTransaction\">Remote Start Transaction</a></li>");
-		writer.println("<li><a href=\"" + contextPath + servletPath + "/RemoteStopTransaction\">Remote Stop Transaction</a></li>");
-		writer.println("<li><a class=\"highlight\" href=\"" + contextPath + servletPath + "/Reset\">Reset</a></li>");
-		writer.println("<li><a href=\"" + contextPath + servletPath + "/UnlockConnector\">Unlock Connector</a></li>");
-		writer.println("<li><a href=\"" + contextPath + servletPath + "/UpdateFirmware\">Update Firmware</a></li>");
-		writer.println("</ul>");
-		writer.println("</div>");
+	private String printReset() {
+
+		return				
+		// Print the menu div on the left 
+		"<div class=\"op-menu\">\n"
+		+ "<ul>\n"
+		+ "<li><a href=\"" + contextPath + servletPath + "/ChangeAvailability\" >Change Availability</a></li>\n"
+		+ "<li><a href=\"" + contextPath + servletPath + "/ChangeConfiguration\">Change Configuration</a></li>\n"
+		+ "<li><a href=\"" + contextPath + servletPath + "/ClearCache\">Clear Cache</a></li>\n"
+		+ "<li><a href=\"" + contextPath + servletPath + "/GetDiagnostics\">Get Diagnostics</a></li>\n"
+		+ "<li><a href=\"" + contextPath + servletPath + "/RemoteStartTransaction\">Remote Start Transaction</a></li>\n"
+		+ "<li><a href=\"" + contextPath + servletPath + "/RemoteStopTransaction\">Remote Stop Transaction</a></li>\n"
+		+ "<li><a class=\"highlight\" href=\"" + contextPath + servletPath + "/Reset\">Reset</a></li>\n"
+		+ "<li><a href=\"" + contextPath + servletPath + "/UnlockConnector\">Unlock Connector</a></li>\n"
+		+ "<li><a href=\"" + contextPath + servletPath + "/UpdateFirmware\">Update Firmware</a></li>\n"
+		+ "</ul>\n"
+		+ "</div>\n"
 
 		// Print the div on the right
-		writer.println("<div class=\"op-content\">");
-		writer.println("<form method=\"POST\" action=\""+ contextPath + servletPath + "/Reset\">");	
-
-		printChargePoints(writer);
-
-		writer.println("<b>Parameters</b><hr>");
-		writer.println("<table class=\"params\">");
-		writer.println("<tr><td>");
-		writer.println("Reset type:");
-		writer.println("</td><td>");
-		writer.println("<select name=\"resetType\">");
-		writer.println("<option value=\"Hard\">Hard</option>");
-		writer.println("<option value=\"Soft\">Soft</option>");
-		writer.println("</select>");
-		writer.println("</td></tr>");
-		writer.println("<tr><td></td>");
-		writer.println("<td id=\"add_space\">");
-		writer.println("<input type=\"submit\" value=\"Perform\">");
-		writer.println("</td>");   	   	
-		writer.println("</table>");			
-		writer.println("</form>");
-		writer.println("</div>");
+		+ "<div class=\"op-content\">\n<form method=\"POST\" action=\"" + contextPath + servletPath + "/Reset\">\n" 
+		+ printChargePoints()
+		+ "<b>Parameters</b><hr>\n"
+		+ "<table class=\"params\">\n"
+		+ "<tr><td>Reset type:</td><td>\n"
+		+ "<select name=\"resetType\">\n"
+		+ "<option value=\"Hard\">Hard</option>\n"
+		+ "<option value=\"Soft\">Soft</option>\n"
+		+ "</select>\n"
+		+ "</td></tr>\n"
+		+ "<tr><td></td><td id=\"add_space\"><input type=\"submit\" value=\"Perform\"></td></tr>\n"
+		+ "</table>\n</form>\n</div>";
 	}
 
-	private void printUnlockConnector(PrintWriter writer) {
-		// Print navigation div
-		writer.println("<div class=\"op-menu\">");
-		writer.println("<ul>");
-		writer.println("<li><a href=\"" + contextPath + servletPath + "/ChangeAvailability\" >Change Availability</a></li>");
-		writer.println("<li><a href=\"" + contextPath + servletPath + "/ChangeConfiguration\">Change Configuration</a></li>");
-		writer.println("<li><a href=\"" + contextPath + servletPath + "/ClearCache\">Clear Cache</a></li>");
-		writer.println("<li><a href=\"" + contextPath + servletPath + "/GetDiagnostics\">Get Diagnostics</a></li>");
-		writer.println("<li><a href=\"" + contextPath + servletPath + "/RemoteStartTransaction\">Remote Start Transaction</a></li>");
-		writer.println("<li><a href=\"" + contextPath + servletPath + "/RemoteStopTransaction\">Remote Stop Transaction</a></li>");
-		writer.println("<li><a href=\"" + contextPath + servletPath + "/Reset\">Reset</a></li>");
-		writer.println("<li><a class=\"highlight\" href=\"" + contextPath + servletPath + "/UnlockConnector\">Unlock Connector</a></li>");
-		writer.println("<li><a href=\"" + contextPath + servletPath + "/UpdateFirmware\">Update Firmware</a></li>");
-		writer.println("</ul>");
-		writer.println("</div>");
+	private String printUnlockConnector() {
+
+		return				
+		// Print the menu div on the left 
+		"<div class=\"op-menu\">\n"
+		+ "<ul>\n"
+		+ "<li><a href=\"" + contextPath + servletPath + "/ChangeAvailability\" >Change Availability</a></li>\n"
+		+ "<li><a href=\"" + contextPath + servletPath + "/ChangeConfiguration\">Change Configuration</a></li>\n"
+		+ "<li><a href=\"" + contextPath + servletPath + "/ClearCache\">Clear Cache</a></li>\n"
+		+ "<li><a href=\"" + contextPath + servletPath + "/GetDiagnostics\">Get Diagnostics</a></li>\n"
+		+ "<li><a href=\"" + contextPath + servletPath + "/RemoteStartTransaction\">Remote Start Transaction</a></li>\n"
+		+ "<li><a href=\"" + contextPath + servletPath + "/RemoteStopTransaction\">Remote Stop Transaction</a></li>\n"
+		+ "<li><a href=\"" + contextPath + servletPath + "/Reset\">Reset</a></li>\n"
+		+ "<li><a class=\"highlight\" href=\"" + contextPath + servletPath + "/UnlockConnector\">Unlock Connector</a></li>\n"
+		+ "<li><a href=\"" + contextPath + servletPath + "/UpdateFirmware\">Update Firmware</a></li>\n"
+		+ "</ul>\n"
+		+ "</div>\n"
 
 		// Print the div on the right
-		writer.println("<div class=\"op-content\">");
-		writer.println("<form method=\"POST\" action=\""+ contextPath + servletPath + "/UnlockConnector\">");	
-
-		printChargePoints(writer);
-
-		writer.println("<b>Parameters</b><hr>");
-		writer.println("<table class=\"params\">");
-		writer.println("<tr><td>");		
-		writer.println("Connector Id (integer, not 0): ");
-		writer.println("</td><td>");
-		writer.println("<input type=\"number\" min=\"1\" name=\"ConnectorId\">");		
-		writer.println("</td></tr>");
-		writer.println("<tr><td></td>");
-		writer.println("<td id=\"add_space\">");
-		writer.println("<input type=\"submit\" value=\"Perform\">");
-		writer.println("</td>");   	   	
-		writer.println("</table>");			
-		writer.println("</form>");
-		writer.println("</div>");
+		+ "<div class=\"op-content\">\n<form method=\"POST\" action=\"" + contextPath + servletPath + "/UnlockConnector\">\n" 
+		+ printChargePoints()
+		+ "<b>Parameters</b><hr>\n"
+		+ "<table class=\"params\">\n"
+		+ "<tr><td>Connector Id (integer, not 0):</td><td><input type=\"number\" min=\"1\" name=\"ConnectorId\"></td></tr>\n"	
+		+ "<tr><td></td><td id=\"add_space\"><input type=\"submit\" value=\"Perform\"></td></tr>\n"
+		+ "</table>\n</form>\n</div>";
 	}
 
-	private void printUpdateFirmware(PrintWriter writer) {
-		// Print navigation div
-		writer.println("<div class=\"op-menu\">");
-		writer.println("<ul>");
-		writer.println("<li><a href=\"" + contextPath + servletPath + "/ChangeAvailability\" >Change Availability</a></li>");
-		writer.println("<li><a href=\"" + contextPath + servletPath + "/ChangeConfiguration\">Change Configuration</a></li>");
-		writer.println("<li><a href=\"" + contextPath + servletPath + "/ClearCache\">Clear Cache</a></li>");
-		writer.println("<li><a href=\"" + contextPath + servletPath + "/GetDiagnostics\">Get Diagnostics</a></li>");
-		writer.println("<li><a href=\"" + contextPath + servletPath + "/RemoteStartTransaction\">Remote Start Transaction</a></li>");
-		writer.println("<li><a href=\"" + contextPath + servletPath + "/RemoteStopTransaction\">Remote Stop Transaction</a></li>");
-		writer.println("<li><a href=\"" + contextPath + servletPath + "/Reset\">Reset</a></li>");
-		writer.println("<li><a href=\"" + contextPath + servletPath + "/UnlockConnector\">Unlock Connector</a></li>");
-		writer.println("<li><a class=\"highlight\" href=\"" + contextPath + servletPath + "/UpdateFirmware\">Update Firmware</a></li>");
-		writer.println("</ul>");
-		writer.println("</div>");	
+	private String printUpdateFirmware() {
+
+		return				
+		// Print the menu div on the left 
+		"<div class=\"op-menu\">\n"
+		+ "<ul>\n"
+		+ "<li><a href=\"" + contextPath + servletPath + "/ChangeAvailability\" >Change Availability</a></li>\n"
+		+ "<li><a href=\"" + contextPath + servletPath + "/ChangeConfiguration\">Change Configuration</a></li>\n"
+		+ "<li><a href=\"" + contextPath + servletPath + "/ClearCache\">Clear Cache</a></li>\n"
+		+ "<li><a href=\"" + contextPath + servletPath + "/GetDiagnostics\">Get Diagnostics</a></li>\n"
+		+ "<li><a href=\"" + contextPath + servletPath + "/RemoteStartTransaction\">Remote Start Transaction</a></li>\n"
+		+ "<li><a href=\"" + contextPath + servletPath + "/RemoteStopTransaction\">Remote Stop Transaction</a></li>\n"
+		+ "<li><a href=\"" + contextPath + servletPath + "/Reset\">Reset</a></li>\n"
+		+ "<li><a href=\"" + contextPath + servletPath + "/UnlockConnector\">Unlock Connector</a></li>\n"
+		+ "<li><a class=\"highlight\" href=\"" + contextPath + servletPath + "/UpdateFirmware\">Update Firmware</a></li>\n"
+		+ "</ul>\n"
+		+ "</div>\n"
 
 		// Print the div on the right
-		writer.println("<div class=\"op-content\">");
-		writer.println("<form method=\"POST\" action=\""+ contextPath + servletPath + "/UpdateFirmware\">");
-
-		printChargePoints(writer);
-
-		writer.println("<b>Parameters</b><hr>");
-		writer.println("<table class=\"params\">");		
-		writer.println("<tr><td>");		
-		writer.println("Location (URI):");
-		writer.println("</td><td>");
-		writer.println("<input type=\"text\" name=\"location\">");
-		writer.println("</td></tr>");
-		writer.println("<tr><td>");	
-		writer.println("Retries (integer):");
-		writer.println("</td><td>");
-		writer.println("<input type=\"number\" min=\"0\" name=\"retries\">");
-		writer.println("</td></tr><tr><td>");
-		writer.println("Retrieve Date (ex: 2011-12-21T11:33:23Z):");
-		writer.println("</td><td>");
-		writer.println("<input type=\"datetime\" name=\"retrieveDate\">");
-		writer.println("</td></tr><tr><td>");
-		writer.println("Retry Interval (integer):");
-		writer.println("</td><td>");
-		writer.println("<input type=\"number\" min=\"0\" name=\"retryInterval\">");		
-		writer.println("</td></tr>");
-		writer.println("<tr><td></td>");
-		writer.println("<td id=\"add_space\">");
-		writer.println("<input type=\"submit\" value=\"Perform\">");
-		writer.println("</td>");   	   	
-		writer.println("</table>");			
-		writer.println("</form>");
-		writer.println("</div>");
+		+ "<div class=\"op-content\">\n<form method=\"POST\" action=\"" + contextPath + servletPath + "/UpdateFirmware\">\n" 
+		+ printChargePoints()
+		+ "<b>Parameters</b><hr>\n"
+		+ "<table class=\"params\">\n"
+		+ "<tr><td>Location (URI):</td><td><input type=\"text\" name=\"location\"></td></tr>\n"
+		+ "<tr><td>Retries (integer):</td><td><input type=\"number\" min=\"0\" name=\"retries\"></td></tr>\n"
+		+ "<tr><td>Retrieve Date (ex: 2011-12-21T11:33:23Z):</td><td><input type=\"datetime\" name=\"retrieveDate\"></td></tr>\n"
+		+ "<tr><td>Retry Interval (integer):</td><td><input type=\"number\" min=\"0\" name=\"retryInterval\"></td></tr>\n"
+		+ "<tr><td></td><td id=\"add_space\"><input type=\"submit\" value=\"Perform\"></td></tr>\n"	
+		+ "</table>\n</form>\n</div>";
 	}
 
 	private static HashMap<String,String> getChargePoints(){
@@ -625,27 +514,22 @@ public class CPS_Servlet_Op extends HttpServlet {
 		}
 	}
 
-	private void printChargePoints(PrintWriter writer) {		
-		writer.println("<b>Charge Points</b><hr>");
-		writer.println("<table>");
-		writer.println("<tr><td style=\"vertical-align:top\">");
-		writer.println("<input type=\"button\" value=\"Select All\" onClick=\"selectAll(document.getElementById('cp_items'))\">");
-		writer.println("<input type=\"button\" value=\"Select None\" onClick=\"selectNone(document.getElementById('cp_items'))\">");
-		writer.println("</td><td>");
-		writer.println("<select name=\"cp_items\" id=\"cp_items\" size=\"5\" multiple>");
+	private String printChargePoints() {		
+		StringBuilder builder = new StringBuilder(
+				"<b>Charge Points</b><hr>\n"
+				+ "<table>\n"
+				+ "<tr><td style=\"vertical-align:top\">\n"
+				+ "<input type=\"button\" value=\"Select All\" onClick=\"selectAll(document.getElementById('cp_items'))\">\n"
+				+ "<input type=\"button\" value=\"Select None\" onClick=\"selectNone(document.getElementById('cp_items'))\">\n"
+				+ "</td><td>\n"
+				+ "<select name=\"cp_items\" id=\"cp_items\" size=\"5\" multiple>\n");
 
 		for(String key : chargePointsList.keySet()) {
 			String value = chargePointsList.get(key);
-			writer.print("<option value=\"" + key + ";" + value + "\"> ");
-			writer.print(key);
-			writer.print(" &#8212; ");
-			writer.print(value);
-			writer.print("</option>");
+			builder.append("<option value=\"" + key + ";" + value + "\">" + key + " &#8212; " + value + "</option>\n");
 		}
-
-		writer.println("</select>");
-		writer.println("</td></tr>");
-		writer.println("</table>");
-		writer.println("<br>");
+		
+		builder.append("</select>\n</td>\n</tr>\n</table>\n<br>\n");
+		return builder.toString();
 	}
 }

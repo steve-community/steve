@@ -80,15 +80,16 @@ input[type="submit"],input[type="button"] {
 }
 
 .nav-list  li {
-	display: inline;
+	display: inline-block;
 	list-style-type: none;
 }
 
 .nav-list li a {
-	line-height: 40px;
 	padding: 0;
-	margin-left: 20px;
+	margin-left: 10px;
+	margin-right: 10px;
 	color: #fff;
+	line-height: 40px;
 	text-shadow: none;
 	text-decoration: none;
 }

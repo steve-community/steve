@@ -16,8 +16,7 @@ public class CPS_Common {
 		"<div class=\"top-banner\">\n" +
 		"<div class=\"container\">\n" +
 		"<a href=\"" + contextPath + "/manager\"><img src=\""+ contextPath + "/logo.png\" height=\"100\"></a>\n" +
-		"</div>\n" +
-		"</div>\n" +
+		"</div></div>\n" +
 		"<div class=\"top-menu\">\n" +
 		"<div class=\"container\">\n" +
 		"<ul class=\"nav-list\">\n" +
@@ -26,17 +25,14 @@ public class CPS_Common {
 		"<li><a href=\"" + contextPath + "/manager/operations\">OPERATIONS</a></li>\n" +
 		"<li><a href=\"" + contextPath + "/manager/log\">LOG</a></li>\n" +
 		"</ul>\n" +
-		"</div>\n" +
-		"</div>\n" +
-		"<div class=\"main-wrapper\">" +
+		"</div></div>\n" +
+		"<div class=\"main-wrapper\">\n" +
 		"<div class=\"content\">";
 	}
 	
 	public static String printFoot(String contextPath){
 		return
-		"</div>\n" +
-		"</div>\n" +
-		"</div>\n" +
+		"</div></div></div>\n" +
 		"<div class=\"footer\">\n" +
 		"<a href=\"http://www.rwth-aachen.de\"><img src=\""+ contextPath + "/logo_rwth.png\"></a>\n" + 
 		"<a href=\"http://dbis.rwth-aachen.de\"><img src=\""+ contextPath + "/logo_i5.png\"></a>\n" + 

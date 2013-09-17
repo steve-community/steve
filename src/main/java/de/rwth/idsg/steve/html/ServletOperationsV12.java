@@ -5,6 +5,7 @@ import java.io.PrintWriter;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.HashMap;
 
 import javax.servlet.ServletException;
@@ -502,7 +503,7 @@ public class ServletOperationsV12 extends HttpServlet {
 			while (rs.next()) { results.put(rs.getString(1), rs.getString(2));	}
 
 			return results;
-		} catch (Exception ex) {
+		} catch (SQLException ex) {
 			ex.printStackTrace();
 			throw new RuntimeException(ex);
 		} finally {

@@ -102,18 +102,9 @@ public class CentralSystemServiceImpl implements CentralSystemService {
 				_returnStatus = RegistrationStatus.REJECTED;
 			}
 			connect.setAutoCommit(true);
-			_return.setStatus(_returnStatus);
-			
+			_return.setStatus(_returnStatus);			
 		} catch (SQLException e1) {
-			e1.printStackTrace();
-			if (connect != null) {
-				try {
-					LOG.error("Transaction is being rolled back.");
-					connect.rollback(); 
-				} catch (SQLException e2) { 
-					e2.printStackTrace(); 
-				}
-			}			
+			e1.printStackTrace();		
 		} finally {
 			Utils.releaseResources(connect, pt, null);
 		}					
@@ -151,14 +142,6 @@ public class CentralSystemServiceImpl implements CentralSystemService {
 			connect.setAutoCommit(true);
 		} catch (SQLException e1) {
 			e1.printStackTrace();
-			if (connect != null) {
-				try {
-					LOG.error("Transaction is being rolled back.");
-					connect.rollback(); 
-				} catch (SQLException e2) { 
-					e2.printStackTrace(); 
-				}
-			}
 		} finally {
 			Utils.releaseResources(connect, pt, null);
 		}		
@@ -221,14 +204,6 @@ public class CentralSystemServiceImpl implements CentralSystemService {
 			connect.setAutoCommit(true);
 		} catch (SQLException e1) {
 			e1.printStackTrace();
-			if (connect != null) {
-				try {
-					LOG.error("Transaction is being rolled back.");
-					connect.rollback(); 
-				} catch (SQLException e2) { 
-					e2.printStackTrace(); 
-				}
-			}
 		} finally {
 			Utils.releaseResources(connect, pt, null);
 		}
@@ -274,14 +249,6 @@ public class CentralSystemServiceImpl implements CentralSystemService {
 			connect.setAutoCommit(true);
 		} catch (SQLException e1) {
 			e1.printStackTrace();
-			if (connect != null) {
-				try {
-					LOG.error("Transaction is being rolled back.");
-					connect.rollback(); 
-				} catch (SQLException e2) { 
-					e2.printStackTrace(); 
-				}
-			}
 		}  finally {
 			Utils.releaseResources(connect, pt, null);
 		}
@@ -317,14 +284,6 @@ public class CentralSystemServiceImpl implements CentralSystemService {
 			connect.setAutoCommit(true);
 		} catch (SQLException e1) {
 			e1.printStackTrace();
-			if (connect != null) {
-				try {
-					LOG.error("Transaction is being rolled back.");
-					connect.rollback(); 
-				} catch (SQLException e2) { 
-					e2.printStackTrace(); 
-				}
-			}
 		}  finally {
 			Utils.releaseResources(connect, pt, null);
 		}
@@ -386,14 +345,6 @@ public class CentralSystemServiceImpl implements CentralSystemService {
 			connect.setAutoCommit(true);
 		} catch (SQLException e1) {
 			e1.printStackTrace();
-			if (connect != null) {
-				try {
-					LOG.error("Transaction is being rolled back.");
-					connect.rollback(); 
-				} catch (SQLException e2) { 
-					e2.printStackTrace(); 
-				}
-			}
 		} finally {
 			// Release only PreparedStatement. Connection will be used in the next step.
 			Utils.releaseResources(null, pt, null);	
@@ -460,18 +411,10 @@ public class CentralSystemServiceImpl implements CentralSystemService {
 				connect.setAutoCommit(true);
 				Utils.releaseResources(null, pt, rs);
 			}
+			_return.setIdTagInfo(_returnIdTagInfo);	
 
-			_return.setIdTagInfo(_returnIdTagInfo);			
 		} catch (SQLException e1) {
 			e1.printStackTrace();
-			if (connect != null) {
-				try {
-					LOG.error("Transaction is being rolled back.");
-					connect.rollback(); 
-				} catch (SQLException e2) { 
-					e2.printStackTrace(); 
-				}
-			}
 		} finally {
 			Utils.releaseResources(connect, null, null);
 		}
@@ -485,7 +428,8 @@ public class CentralSystemServiceImpl implements CentralSystemService {
 	private IdTagInfo authorizeInternal(Connection connect, String idTag) {
 		
 		PreparedStatement pt = null;
-		ResultSet rs = null;		
+		ResultSet rs = null;
+		IdTagInfo _returnIdTagInfo = new IdTagInfo();
 		try {
 			// PreparedStatements can use parameter indices as question marks
 			pt = connect.prepareStatement("SELECT parentIdTag, expiryDate, inTransaction, blocked FROM user WHERE idTag = ?");
@@ -494,9 +438,8 @@ public class CentralSystemServiceImpl implements CentralSystemService {
 			// Execute and get the result of the SQL query
 			rs = pt.executeQuery();
 
-			IdTagInfo _returnIdTagInfo = new IdTagInfo();
 			AuthorizationStatus _returnIdTagInfoStatus = null;
-
+			
 			if (rs.next() == false) {
 				// Id is not in DB (unknown id). Not allowed for charging.
 				_returnIdTagInfoStatus = AuthorizationStatus.INVALID;
@@ -525,14 +468,13 @@ public class CentralSystemServiceImpl implements CentralSystemService {
 					LOG.info("The idTag of this user is ACCEPTED.");
 				}
 			}
-
-			_returnIdTagInfo.setStatus(_returnIdTagInfoStatus);		
-			return _returnIdTagInfo;
-		} catch (Exception ex) {
-			ex.printStackTrace();
-			throw new RuntimeException(ex);
+			_returnIdTagInfo.setStatus(_returnIdTagInfoStatus);	
+			
+		} catch (SQLException e1) {
+			e1.printStackTrace();
 		} finally {
 			Utils.releaseResources(null, pt, rs);
 		}
+		return _returnIdTagInfo;
 	}
 }

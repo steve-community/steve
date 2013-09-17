@@ -120,14 +120,6 @@ public class ServletReservation extends HttpServlet {
 			connect.setAutoCommit(true);
 		} catch (SQLException e1) {
 			e1.printStackTrace();
-			if (connect != null) {
-				try {
-					LOG.error("Transaction is being rolled back.");
-					connect.rollback(); 
-				} catch (SQLException e2) { 
-					e2.printStackTrace(); 
-				}
-			}
 		} finally {
 			Utils.releaseResources(connect, pt, null);
 		}
@@ -153,8 +145,8 @@ public class ServletReservation extends HttpServlet {
 			// If the result set does NOT have an entry, then there are no overlaps
 			if ( !rs.next() ) overlaps = false;
 
-		} catch (SQLException e) {
-			e.printStackTrace();
+		} catch (SQLException e1) {
+			e1.printStackTrace();
 		} finally {
 			Utils.releaseResources(null, pt, rs);
 		}
@@ -185,14 +177,6 @@ public class ServletReservation extends HttpServlet {
 			connect.setAutoCommit(true);
 		} catch (SQLException e1) {
 			e1.printStackTrace();
-			if (connect != null) {
-				try {
-					LOG.error("Transaction is being rolled back.");
-					connect.rollback(); 
-				} catch (SQLException e2) { 
-					e2.printStackTrace(); 
-				}
-			}
 		} finally {
 			Utils.releaseResources(connect, pt, null);
 		}		
@@ -251,7 +235,7 @@ public class ServletReservation extends HttpServlet {
 						+ "<td>" + rs.getBoolean(6) + "</td>"
 						+ "</tr>\n");
 			}			
-		} catch (Exception ex) {
+		} catch (SQLException ex) {
 			ex.printStackTrace();
 			throw new RuntimeException(ex);
 		} finally {

@@ -3,7 +3,7 @@
 	xmlns="http://java.sun.com/xml/ns/javaee"
 	xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd"
 	version="3.0">
-	<display-name>steve</display-name>
+	<display-name>SteVe - Steckdosenverwaltung</display-name>
 
 	<session-config>
 		<session-timeout>60</session-timeout>
@@ -13,7 +13,7 @@
 		<param-value>WEB-INF/cxf-beans.xml</param-value>
 	</context-param>
 	<listener>
-		<listener-class>common.MyContextLoaderListener</listener-class>
+		<listener-class>de.rwth.idsg.steve.common.MyContextLoaderListener</listener-class>
 	</listener>
 	<welcome-file-list>
 		<welcome-file>index.jsp</welcome-file>
@@ -27,20 +27,20 @@
 		<load-on-startup>1</load-on-startup>
 	</servlet>
 	<servlet>
-		<servlet-name>CPS_Servlet</servlet-name>
-		<servlet-class>html.CPS_Servlet</servlet-class>
+		<servlet-name>ServletHome</servlet-name>
+		<servlet-class>de.rwth.idsg.steve.html.ServletHome</servlet-class>
 	</servlet>
 	<servlet>
-		<servlet-name>CPS_Servlet_Res</servlet-name>
-		<servlet-class>html.CPS_Servlet_Res</servlet-class>
+		<servlet-name>ServletReservation</servlet-name>
+		<servlet-class>de.rwth.idsg.steve.html.ServletReservation</servlet-class>
 	</servlet>
 	<servlet>
-		<servlet-name>CPS_Servlet_Op</servlet-name>
-		<servlet-class>html.CPS_Servlet_Op</servlet-class>
+		<servlet-name>ServletOperationsV12</servlet-name>
+		<servlet-class>de.rwth.idsg.steve.html.ServletOperationsV12</servlet-class>
 	</servlet>
 	<servlet>
-		<servlet-name>CPS_Servlet_Log</servlet-name>
-		<servlet-class>html.CPS_Servlet_Log</servlet-class>
+		<servlet-name>ServletLog</servlet-name>
+		<servlet-class>de.rwth.idsg.steve.html.ServletLog</servlet-class>
 	</servlet>
 
 	<!-- Servlet mappings -->
@@ -49,19 +49,19 @@
 		<url-pattern>/services/*</url-pattern>
 	</servlet-mapping>
 	<servlet-mapping>
-		<servlet-name>CPS_Servlet</servlet-name>
+		<servlet-name>ServletHome</servlet-name>
 		<url-pattern>/manager</url-pattern>
 	</servlet-mapping>
 	<servlet-mapping>
-		<servlet-name>CPS_Servlet_Res</servlet-name>
+		<servlet-name>ServletReservation</servlet-name>
 		<url-pattern>/manager/reservation/*</url-pattern>
 	</servlet-mapping>
 	<servlet-mapping>
-		<servlet-name>CPS_Servlet_Op</servlet-name>
-		<url-pattern>/manager/operations/*</url-pattern>
+		<servlet-name>ServletOperationsV12</servlet-name>
+		<url-pattern>/manager/operations/v1.2/*</url-pattern>
 	</servlet-mapping>
 	<servlet-mapping>
-		<servlet-name>CPS_Servlet_Log</servlet-name>
+		<servlet-name>ServletLog</servlet-name>
 		<url-pattern>/manager/log</url-pattern>
 	</servlet-mapping>
 

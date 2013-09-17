@@ -133,7 +133,8 @@
 
 	<wsdl:service name="ChangeService">
 		<wsdl:port binding="tns:ChangeServiceSOAP12" name="ChangeServiceSOAP12">
-			<soap12:address location="here-comes-the-endpoint-address-of-service-in-the-sensor" />
+			<!-- here-comes-the-endpoint-address-of-service-in-the-sensor -->
+			<soap12:address location="http://localhost:8080/" />
 		</wsdl:port>
 	</wsdl:service>
 </wsdl:definitions>

@@ -21,7 +21,7 @@
 	
 	<!-- Configure the service -->
 	<jaxws:endpoint xmlns:tns="urn://Ocpp/Cs/2010/08/" id="centralsystemservice"
-		implementor="css.CentralSystemServiceImpl" wsdlLocation="centralsystemservice_0.wsdl"
+		implementor="de.rwth.idsg.steve.css.v12.CentralSystemServiceImpl" wsdlLocation="centralsystemservice_0.wsdl"
 		endpointName="tns:CentralSystemServiceSoap12" serviceName="tns:CentralSystemService"
 		address="/CentralSystemServiceSoap12">
 	<jaxws:features>

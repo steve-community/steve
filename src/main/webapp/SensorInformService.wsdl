@@ -76,7 +76,8 @@
 
 	<wsdl:service name="InformService">
 		<wsdl:port binding="tns:InformServiceSOAP12" name="InformServiceSOAP12">
-			<soap12:address location="here-comes-the-endpoint-address-of-service-in-steve" />
+			<!-- here-comes-the-endpoint-address-of-service-in-steve -->
+			<soap12:address location="http://localhost:8080/" />
 		</wsdl:port>
 	</wsdl:service>
 </wsdl:definitions>

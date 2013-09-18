@@ -3,12 +3,12 @@
 <!-- SteVe (service) and sensor (client) -->
 
 <wsdl:definitions xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/"
-	xmlns:tns="http://idsg.informatik.rwth-aachen.de/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+	xmlns:tns="urn://de/rwth/idsg/sensor/inform" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
 	xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="InformService"
-	targetNamespace="http://idsg.informatik.rwth-aachen.de/">
+	targetNamespace="urn://de/rwth/idsg/sensor/inform">
 	
 	<wsdl:types>
-		<xsd:schema targetNamespace="http://idsg.informatik.rwth-aachen.de/">
+		<xsd:schema targetNamespace="urn://de/rwth/idsg/sensor/inform">
 
 			<xsd:complexType name="InformParkingRequest">
 			    <xsd:annotation>
@@ -43,6 +43,10 @@
 		</xsd:schema>
 	</wsdl:types>
 
+	<wsdl:message name="Header">
+    	<wsdl:part name="ChargeBoxIdentity" element="tns:ChargeBoxIdentity" />
+  	</wsdl:message>
+  	
 	<wsdl:message name="InformParkingRequest">
 		<wsdl:part name="parameters" element="tns:InformParkingRequest" />
 	</wsdl:message>

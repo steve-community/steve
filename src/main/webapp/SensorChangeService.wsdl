@@ -4,11 +4,11 @@
 
 <wsdl:definitions xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/"
 	xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-	xmlns:tns="http://idsg.informatik.rwth-aachen.de/" name="SensorService"
-	targetNamespace="http://idsg.informatik.rwth-aachen.de/">
+	xmlns:tns="urn://de/rwth/idsg/sensor/change" name="SensorService"
+	targetNamespace="urn://de/rwth/idsg/sensor/change">
 
 	<wsdl:types>
-		<xsd:schema targetNamespace="http://idsg.informatik.rwth-aachen.de/">
+		<xsd:schema targetNamespace="urn://de/rwth/idsg/sensor/change">
 		
 			<xsd:complexType name="ChangeConfigurationRequest">
 			    <xsd:annotation>
@@ -93,7 +93,7 @@
 		<wsdl:part name="parameters" element="tns:ChangeConfigurationResponse" />
 	</wsdl:message>
 
-	<wsdl:portType name="ChangeServiceSOAP">
+	<wsdl:portType name="ChangeService">
 		<wsdl:operation name="ChangeStatus">
 			<wsdl:input message="tns:ChangeStatusRequest" />
 			<wsdl:output message="tns:ChangeStatusResponse" />
@@ -104,7 +104,7 @@
 		</wsdl:operation>
 	</wsdl:portType>
 
-	<wsdl:binding name="ChangeServiceSOAP12" type="tns:ChangeServiceSOAP">
+	<wsdl:binding name="ChangeServiceSOAP12" type="tns:ChangeService">
 		<soap12:binding style="document" transport="http://schemas.xmlsoap.org/soap/http" />
 		
 		<wsdl:operation name="ChangeStatus">

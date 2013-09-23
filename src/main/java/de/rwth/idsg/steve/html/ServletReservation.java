@@ -49,7 +49,6 @@ public class ServletReservation extends HttpServlet {
 	@Override
 	public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
 
-		PrintWriter writer = response.getWriter();
 		String command = request.getPathInfo();	
 
 		if (command.equals("/book")){
@@ -57,48 +56,30 @@ public class ServletReservation extends HttpServlet {
 			String chargeBoxId = request.getParameter("chargeBoxId");
 			String startDatetime = request.getParameter("startDatetime");
 			String stopDatetime = request.getParameter("stopDatetime");
+			
+			// Check the dates first
+			areDatesValid(startDatetime, stopDatetime);
 
-			if ( areDatesValid(startDatetime, stopDatetime) ) {				
-				if ( bookReservation(idTag, chargeBoxId, startDatetime, stopDatetime) ){
-					response.sendRedirect(contextPath + servletPath);
-					return;
-				}				
-				response.setContentType("text/plain");
-				writer.print("The desired reservation overlaps with another reservation.\n"
-						+ "Go back and try again.");
-				writer.close();
-				return;
-			}
-
-			response.setContentType("text/plain");
-			writer.print("Invalid startDatetime and/or stopDatetime. Allowed input:\n"
-					+ "1. startDatetime and stopDatetime must match the expected pattern.\n"
-					+ "2. startDatetime must be before the stopDatetime.\n"
-					+ "3. startDatetime must be in the future.\n"
-					+ "Go back and try again.");
-			writer.close();
+			bookReservation(idTag, chargeBoxId, startDatetime, stopDatetime);
 
 		} else if (command.equals("/delete")){
 			int connector_pk = Integer.parseInt(request.getParameter("reservation_pk"));
-
 			deleteReservation(connector_pk);
-			response.sendRedirect(contextPath + servletPath);
-			return;
-		}
+		}		
+		response.sendRedirect(contextPath + servletPath);
+		return;
 	}
 
-	private boolean bookReservation(String idTag, String chargeBoxId, String startDatetime, String stopDatetime) {
+	private void bookReservation(String idTag, String chargeBoxId, String startDatetime, String stopDatetime) {
 
 		Connection connect = null;
 		PreparedStatement pt = null;
 		try { 
 			// Prepare Database Access
-			connect = Utils.getConnectionFromPool();			
-
-			if ( isOverlapping(connect, pt, startDatetime, stopDatetime) ){
-				// The reservation cannot be booked
-				return false;
-			}
+			connect = Utils.getConnectionFromPool();
+			
+			// Check overlapping first
+			isOverlapping(connect, pt, startDatetime, stopDatetime);
 			
 			connect.setAutoCommit(false);
 			pt = connect.prepareStatement("INSERT INTO reservation (idTag, chargeBoxId, startDatetime, stopDatetime) VALUES (?,?,?,?)");
@@ -123,18 +104,15 @@ public class ServletReservation extends HttpServlet {
 		} finally {
 			Utils.releaseResources(connect, pt, null);
 		}
-		// The reservation is booked
-		return true;
 	}
 
 	/**
-	 * Returns true, if there are rows whose date/time ranges overlap with the input
+	 * Throws exception, if there are rows whose date/time ranges overlap with the input
 	 *
 	 */
-	private boolean isOverlapping(Connection connect, PreparedStatement pt, String inputStartDatetime, String inputStopDatetime) {
+	private void isOverlapping(Connection connect, PreparedStatement pt, String inputStartDatetime, String inputStopDatetime) {
 		
 		ResultSet rs = null;
-		boolean overlaps = true;
 		try {
 			// This WHERE clause covers all three cases
 			pt = connect.prepareStatement("SELECT 1 FROM reservation WHERE ? <= stopDatetime AND ? >= startDatetime");
@@ -142,15 +120,15 @@ public class ServletReservation extends HttpServlet {
 			pt.setString(2, inputStopDatetime);
 
 			rs = pt.executeQuery();
-			// If the result set does NOT have an entry, then there are no overlaps
-			if ( !rs.next() ) overlaps = false;
-
+			// If the result set does have an entry, then there are overlaps
+			if ( rs.next() ) {
+				throw new InputException(Common.EXCEPTION_OVERLAPPING_RESERVATION);
+			}
 		} catch (SQLException e1) {
 			e1.printStackTrace();
 		} finally {
 			Utils.releaseResources(null, pt, rs);
 		}
-		return overlaps;
 	}
 
 	private void deleteReservation(int reservation_pk) {
@@ -183,13 +161,13 @@ public class ServletReservation extends HttpServlet {
 	}	
 
 	/**
-	 * Returns false, if
+	 * Throws exception, if
 	 * 1. the syntax does NOT match the expected pattern
 	 * 2. startDatetime > stopDatetime
 	 * 3. now > startDatetime
 	 *
 	 */
-	private boolean areDatesValid(String startDatetime, String stopDatetime) {
+	private void areDatesValid(String startDatetime, String stopDatetime) {
 
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
 		sdf.setLenient(false);
@@ -200,12 +178,13 @@ public class ServletReservation extends HttpServlet {
 			start = sdf.parse(startDatetime);
 			stop = sdf.parse(stopDatetime);
 		} catch (ParseException e) {
-			//e.printStackTrace();
-			return false;
+			throw new InputException(Common.EXCEPTION_PARSING_DATETIME);
 		}
 
 		Date now = new Date();
-		return ( now.before(start) && start.before(stop) );
+		if ( !(now.before(start) && start.before(stop)) ) {
+			throw new InputException(Common.EXCEPTION_INVALID_DATETIME);
+		}
 	}
 
 	private String printExistingReservations() {
@@ -252,7 +231,7 @@ public class ServletReservation extends HttpServlet {
 				+ "<form method=\"POST\" action=\"" + contextPath + servletPath + "/book\">\n"
 				+ "<table>\n"		
 				+ "<tr><td>idTag (of the user):</td><td><input type=\"text\" name=\"idTag\"></td></tr>\n"
-				+ "<tr><td>chargeBoxId (of the charging point):</td><td><input type=\"text\" name=\"chargeBoxId\"></td></tr>\n"
+				+ "<tr><td>chargeBoxId (of the charge point):</td><td><input type=\"text\" name=\"chargeBoxId\"></td></tr>\n"
 				+ "<tr><td>Start date and time (ex: 2011-12-21 11:30):</td><td><input type=\"text\" name=\"startDatetime\"></td></tr>\n"
 				+ "<tr><td>Stop date and time (ex: 2011-12-21 11:30):</td><td><input type=\"text\" name=\"stopDatetime\"></td></tr>\n"
 				+ "<tr><td></td><td id=\"add_space\"><input type=\"submit\" value=\"Book\"></td></tr>\n" 	   	

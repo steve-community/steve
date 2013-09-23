@@ -1,95 +1,114 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xmlns="http://java.sun.com/xml/ns/javaee"
-	xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd"
-	version="3.0">
-	<display-name>SteVe - Steckdosenverwaltung</display-name>
-
-	<session-config>
-		<session-timeout>60</session-timeout>
-	</session-config>
-	<context-param>
-		<param-name>contextConfigLocation</param-name>
-		<param-value>WEB-INF/cxf-beans.xml</param-value>
-	</context-param>
-	<listener>
-		<listener-class>de.rwth.idsg.steve.common.MyContextLoaderListener</listener-class>
-	</listener>
-	<welcome-file-list>
-		<welcome-file>index.jsp</welcome-file>
-	</welcome-file-list>
-
-	<!-- Servlet definitions -->
-	<servlet>
-		<description>Apache CXF Endpoint</description>
-		<servlet-name>cxf</servlet-name>
-		<servlet-class>org.apache.cxf.transport.servlet.CXFServlet</servlet-class>
-		<load-on-startup>1</load-on-startup>
-	</servlet>
-	<servlet>
-		<servlet-name>ServletHome</servlet-name>
-		<servlet-class>de.rwth.idsg.steve.html.ServletHome</servlet-class>
-	</servlet>
-	<servlet>
-		<servlet-name>ServletReservation</servlet-name>
-		<servlet-class>de.rwth.idsg.steve.html.ServletReservation</servlet-class>
-	</servlet>
-	<servlet>
-		<servlet-name>ServletOperationsV12</servlet-name>
-		<servlet-class>de.rwth.idsg.steve.html.ServletOperationsV12</servlet-class>
-	</servlet>
-	<servlet>
-		<servlet-name>ServletLog</servlet-name>
-		<servlet-class>de.rwth.idsg.steve.html.ServletLog</servlet-class>
-	</servlet>
-
-	<!-- Servlet mappings -->
-	<servlet-mapping>
-		<servlet-name>cxf</servlet-name>
-		<url-pattern>/services/*</url-pattern>
-	</servlet-mapping>
-	<servlet-mapping>
-		<servlet-name>ServletHome</servlet-name>
-		<url-pattern>/manager</url-pattern>
-	</servlet-mapping>
-	<servlet-mapping>
-		<servlet-name>ServletReservation</servlet-name>
-		<url-pattern>/manager/reservation/*</url-pattern>
-	</servlet-mapping>
-	<servlet-mapping>
-		<servlet-name>ServletOperationsV12</servlet-name>
-		<url-pattern>/manager/operations/v1.2/*</url-pattern>
-	</servlet-mapping>
-	<servlet-mapping>
-		<servlet-name>ServletLog</servlet-name>
-		<url-pattern>/manager/log</url-pattern>
-	</servlet-mapping>
-
-	<!-- Database connection -->
-	<resource-ref>
-		<description>DB Connection</description>
-		<res-ref-name>jdbc/cssdb</res-ref-name>
-		<res-type>javax.sql.DataSource</res-type>
-		<res-auth>Container</res-auth>
-	</resource-ref>
-
-	<!-- Security -->
-	<security-constraint>
-		<web-resource-collection>
-			<web-resource-name>SteVe Web Interface</web-resource-name>
-			<url-pattern>/manager/*</url-pattern>
-		</web-resource-collection>
-		<auth-constraint>
-			<role-name>admin</role-name>
-		</auth-constraint>
-	</security-constraint>
-	<login-config>
-		<auth-method>BASIC</auth-method>
-		<realm-name>SteVe Web Interface</realm-name>
-	</login-config>
-	<security-role>
-		<description>The role that is required to access the SteVe Web Interface</description>
-		<role-name>admin</role-name>
-	</security-role>
-
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://java.sun.com/xml/ns/javaee" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd" version="3.0">
+  <display-name>SteVe - Steckdosenverwaltung</display-name>
+  <session-config>
+    <session-timeout>60</session-timeout>
+  </session-config>
+  <context-param>
+    <param-name>contextConfigLocation</param-name>
+    <param-value>WEB-INF/cxf-beans.xml</param-value>
+  </context-param>
+  <listener>
+    <listener-class>de.rwth.idsg.steve.common.MyContextLoaderListener</listener-class>
+  </listener>
+  <welcome-file-list>
+    <welcome-file>index.jsp</welcome-file>
+  </welcome-file-list>
+  
+  <servlet>
+    <description>Apache CXF Endpoint</description>
+    <servlet-name>cxf</servlet-name>
+    <servlet-class>org.apache.cxf.transport.servlet.CXFServlet</servlet-class>
+    <load-on-startup>1</load-on-startup>
+  </servlet>
+  <servlet>
+    <servlet-name>ServletHome</servlet-name>
+    <servlet-class>de.rwth.idsg.steve.html.ServletHome</servlet-class>
+  </servlet>
+  <servlet>
+    <servlet-name>ServletReservation</servlet-name>
+    <servlet-class>de.rwth.idsg.steve.html.ServletReservation</servlet-class>
+  </servlet>
+  <servlet>
+    <servlet-name>ServletOperationsV12</servlet-name>
+    <servlet-class>de.rwth.idsg.steve.html.ServletOperationsV12</servlet-class>
+  </servlet>
+  <servlet>
+    <servlet-name>ServletOperationsV15</servlet-name>
+    <servlet-class>de.rwth.idsg.steve.html.ServletOperationsV15</servlet-class>
+  </servlet>
+    <servlet>
+    <servlet-name>ServletStatus</servlet-name>
+    <servlet-class>de.rwth.idsg.steve.html.ServletStatus</servlet-class>
+  </servlet>
+  <servlet>
+    <servlet-name>ServletLog</servlet-name>
+    <servlet-class>de.rwth.idsg.steve.html.ServletLog</servlet-class>
+  </servlet>
+  <servlet>
+    <servlet-name>ServletError</servlet-name>
+    <servlet-class>de.rwth.idsg.steve.html.ServletError</servlet-class>
+  </servlet>  
+  
+  <servlet-mapping>
+    <servlet-name>cxf</servlet-name>
+    <url-pattern>/services/*</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>ServletHome</servlet-name>
+    <url-pattern>/manager</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>ServletReservation</servlet-name>
+    <url-pattern>/manager/reservation/*</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>ServletOperationsV12</servlet-name>
+    <url-pattern>/manager/operations/v1.2/*</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>ServletOperationsV15</servlet-name>
+    <url-pattern>/manager/operations/v1.5/*</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>ServletStatus</servlet-name>
+    <url-pattern>/manager/status</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>ServletLog</servlet-name>
+    <url-pattern>/manager/log</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>ServletError</servlet-name>
+    <url-pattern>/manager/error</url-pattern>
+  </servlet-mapping>
+  
+  <error-page>
+  	<exception-type>de.rwth.idsg.steve.html.InputException</exception-type>
+  	<location>/manager/error</location>
+  </error-page>
+    
+  <resource-ref>
+    <description>DB Connection</description>
+    <res-ref-name>jdbc/cssdb</res-ref-name>
+    <res-type>javax.sql.DataSource</res-type>
+    <res-auth>Container</res-auth>
+  </resource-ref>
+  <security-constraint>
+    <web-resource-collection>
+      <web-resource-name>SteVe Web Interface</web-resource-name>
+      <url-pattern>/manager/*</url-pattern>
+    </web-resource-collection>
+    <auth-constraint>
+      <role-name>admin</role-name>
+    </auth-constraint>
+  </security-constraint>
+  <login-config>
+    <auth-method>BASIC</auth-method>
+    <realm-name>SteVe Web Interface</realm-name>
+  </login-config>
+  <security-role>
+    <description>The role that is required to access the SteVe Web Interface</description>
+    <role-name>admin</role-name>
+  </security-role>
 </web-app>

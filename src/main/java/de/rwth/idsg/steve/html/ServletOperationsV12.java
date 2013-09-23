@@ -2,10 +2,6 @@ package de.rwth.idsg.steve.html;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.HashMap;
 
 import javax.servlet.ServletException;
@@ -13,17 +9,17 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import de.rwth.idsg.steve.common.Utils;
-import de.rwth.idsg.steve.cps.v12.CPS_Client;
-import de.rwth.idsg.steve.cps.v12.ChangeAvailabilityRequest;
-import de.rwth.idsg.steve.cps.v12.ChangeConfigurationRequest;
-import de.rwth.idsg.steve.cps.v12.ClearCacheRequest;
-import de.rwth.idsg.steve.cps.v12.GetDiagnosticsRequest;
-import de.rwth.idsg.steve.cps.v12.RemoteStartTransactionRequest;
-import de.rwth.idsg.steve.cps.v12.RemoteStopTransactionRequest;
-import de.rwth.idsg.steve.cps.v12.ResetRequest;
-import de.rwth.idsg.steve.cps.v12.UnlockConnectorRequest;
-import de.rwth.idsg.steve.cps.v12.UpdateFirmwareRequest;
+import ocpp.cp._2010._08.ChangeAvailabilityRequest;
+import ocpp.cp._2010._08.ChangeConfigurationRequest;
+import ocpp.cp._2010._08.ClearCacheRequest;
+import ocpp.cp._2010._08.GetDiagnosticsRequest;
+import ocpp.cp._2010._08.RemoteStartTransactionRequest;
+import ocpp.cp._2010._08.RemoteStopTransactionRequest;
+import ocpp.cp._2010._08.ResetRequest;
+import ocpp.cp._2010._08.UnlockConnectorRequest;
+import ocpp.cp._2010._08.UpdateFirmwareRequest;
+import de.rwth.idsg.steve.ChargePointService12_Client;
+import de.rwth.idsg.steve.common.ClientDBAccess;
 
 
 /**
@@ -46,7 +42,7 @@ public class ServletOperationsV12 extends HttpServlet {
 
 		if (command == null || command.length() == 0) {
 			// Only refresh the list of charge points when displaying operations page
-			chargePointsList = getChargePoints();
+			chargePointsList = ClientDBAccess.getChargePoints("1.2");
 			// Redirect to the page of the first operation
 			response.sendRedirect(contextPath + servletPath + "/ChangeAvailability");
 			return;
@@ -99,16 +95,13 @@ public class ServletOperationsV12 extends HttpServlet {
 		// Retrieve values from HTML select multiple
 		String[] chargePointItems = request.getParameterValues("cp_items");
 
-		response.setContentType("text/plain");	
-
-		if (chargePointItems==null) {		
-			writer.println("You did not select any charge points, did you!?");
-			writer.close();	
-			return;		
+		if (chargePointItems == null) {
+			throw new InputException(Common.EXCEPTION_CHARGEPOINTS_NULL);	
 		}
 
+		response.setContentType("text/plain");
 		String result = null;
-		CPS_Client cpsClient = new CPS_Client();
+		ChargePointService12_Client cpsClient = new ChargePointService12_Client();
 
 		// chargePointItem[0] : chargebox id
 		// chargePointItem[1] : endpoint (IP) address
@@ -214,6 +207,25 @@ public class ServletOperationsV12 extends HttpServlet {
 		}		
 		writer.close();	
 	}
+	
+	private String printChargePoints() {		
+		StringBuilder builder = new StringBuilder(
+				"<b>Charge Points with OCPP v1.2</b><hr>\n"
+				+ "<table>\n"
+				+ "<tr><td style=\"vertical-align:top\">\n"
+				+ "<input type=\"button\" value=\"Select All\" onClick=\"selectAll(document.getElementById('cp_items'))\">\n"
+				+ "<input type=\"button\" value=\"Select None\" onClick=\"selectNone(document.getElementById('cp_items'))\">\n"
+				+ "</td><td>\n"
+				+ "<select name=\"cp_items\" id=\"cp_items\" size=\"5\" multiple>\n");
+
+		for(String key : chargePointsList.keySet()) {
+			String value = chargePointsList.get(key);
+			builder.append("<option value=\"" + key + ";" + value + "\">" + key + " &#8212; " + value + "</option>\n");
+		}
+		
+		builder.append("</select>\n</td>\n</tr>\n</table>\n<br>\n");
+		return builder.toString();
+	}
 
 	private String printChangeAvail() {
 		return				
@@ -237,7 +249,7 @@ public class ServletOperationsV12 extends HttpServlet {
 		+ printChargePoints()				
 		+ "<b>Parameters</b><hr>\n"
 		+ "<table class=\"params\">\n"
-		+ "<tr><td>Connector Id (integer, 0 = charge point as a whole):</td><td><input type=\"number\" min=\"0\" name=\"ConnectorId\"></td></tr>\n"
+		+ "<tr><td>Connector Id (integer, 0 = charge point as a whole):</td><td><input type=\"number\" min=\"0\" name=\"connectorId\"></td></tr>\n"
 		+ "<tr><td>Availability Type:</td><td><select name=\"availType\">"
 		+ "<option value=\"Inoperative\">Inoperative</option>"
 		+ "<option value=\"Operative\">Operative</option>"
@@ -367,7 +379,7 @@ public class ServletOperationsV12 extends HttpServlet {
 		+ printChargePoints()
 		+ "<b>Parameters</b><hr>\n"
 		+ "<table class=\"params\">\n"
-		+ "<tr><td>Connector Id (integer, not 0):</td><td><input type=\"number\" min=\"1\" name=\"ConnectorId\"></td></tr>\n"
+		+ "<tr><td>Connector Id (integer, not 0):</td><td><input type=\"number\" min=\"1\" name=\"connectorId\"></td></tr>\n"
 		+ "<tr><td>idTag (string):</td><td><input type=\"text\" name=\"idTag\"></td></tr>\n"
 		+ "<tr><td></td><td id=\"add_space\"><input type=\"submit\" value=\"Perform\"></td></tr>\n"
 		+ "</table>\n</form>\n</div>";
@@ -454,7 +466,7 @@ public class ServletOperationsV12 extends HttpServlet {
 		+ printChargePoints()
 		+ "<b>Parameters</b><hr>\n"
 		+ "<table class=\"params\">\n"
-		+ "<tr><td>Connector Id (integer, not 0):</td><td><input type=\"number\" min=\"1\" name=\"ConnectorId\"></td></tr>\n"	
+		+ "<tr><td>Connector Id (integer, not 0):</td><td><input type=\"number\" min=\"1\" name=\"connectorId\"></td></tr>\n"	
 		+ "<tr><td></td><td id=\"add_space\"><input type=\"submit\" value=\"Perform\"></td></tr>\n"
 		+ "</table>\n</form>\n</div>";
 	}
@@ -487,46 +499,5 @@ public class ServletOperationsV12 extends HttpServlet {
 		+ "<tr><td>Retry Interval (integer):</td><td><input type=\"number\" min=\"0\" name=\"retryInterval\"></td></tr>\n"
 		+ "<tr><td></td><td id=\"add_space\"><input type=\"submit\" value=\"Perform\"></td></tr>\n"	
 		+ "</table>\n</form>\n</div>";
-	}
-
-	private static HashMap<String,String> getChargePoints(){
-		Connection connect = null;
-		PreparedStatement pt = null;
-		ResultSet rs = null;
-		try {	
-			// Prepare Database Access
-			connect = Utils.getConnectionFromPool();
-			pt = connect.prepareStatement("SELECT chargeBoxId, endpoint_address FROM chargebox");
-			rs = pt.executeQuery();
-
-			HashMap<String,String> results = new HashMap<String,String>();
-			while (rs.next()) { results.put(rs.getString(1), rs.getString(2));	}
-
-			return results;
-		} catch (SQLException ex) {
-			ex.printStackTrace();
-			throw new RuntimeException(ex);
-		} finally {
-			Utils.releaseResources(connect, pt, rs);
-		}
-	}
-
-	private String printChargePoints() {		
-		StringBuilder builder = new StringBuilder(
-				"<b>Charge Points</b><hr>\n"
-				+ "<table>\n"
-				+ "<tr><td style=\"vertical-align:top\">\n"
-				+ "<input type=\"button\" value=\"Select All\" onClick=\"selectAll(document.getElementById('cp_items'))\">\n"
-				+ "<input type=\"button\" value=\"Select None\" onClick=\"selectNone(document.getElementById('cp_items'))\">\n"
-				+ "</td><td>\n"
-				+ "<select name=\"cp_items\" id=\"cp_items\" size=\"5\" multiple>\n");
-
-		for(String key : chargePointsList.keySet()) {
-			String value = chargePointsList.get(key);
-			builder.append("<option value=\"" + key + ";" + value + "\">" + key + " &#8212; " + value + "</option>\n");
-		}
-		
-		builder.append("</select>\n</td>\n</tr>\n</table>\n<br>\n");
-		return builder.toString();
 	}
 }

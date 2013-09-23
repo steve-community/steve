@@ -9,18 +9,18 @@ body {
 }
 
 hr {
-	color: black;
-	background: black;
+	color: #000;
+	background: #000;
 	height: 1px;
 	border: 0;
 }
 
-table {
-	width: 100%;
-}
+ul hr { color: #CCC; background: #CCC;}
 
-table td:first-child {
-	text-align: right;
+table {	width: 100%; }
+
+table td:first-child { 
+	text-align: right; 
 	width: 45%;
 	padding: 3px;
 }
@@ -39,11 +39,12 @@ table.res th {
 	font-style: italic;
 	text-align: center;
 	padding: 5px;
+	background: #fff;
+	border-bottom: double #CCC;
 }
 
-table.res tr {
-	border-bottom: 1px solid #CCC;
-}
+table.res tr { border-bottom: 1px solid #CCC; }
+table.res tr:nth-child(odd){ background: #fcfaf2; }
 
 table.res td {
 	padding: 5px;
@@ -56,9 +57,7 @@ select {
 	padding: 1px;
 }
 
-select option {
-	font-size: 12px;
-}
+select option { font-size: 12px; }
 
 input[type="submit"],input[type="button"] {
 	width: 100px;
@@ -67,14 +66,12 @@ input[type="submit"],input[type="button"] {
 	-webkit-border-radius: 3px;
 }
 
-#add_space {
-	padding-top: 20px;
-}
+#add_space { padding-top: 20px; }
 
 /*************** top menu navigation div ***************/
 
 ul.navigation {
-	margin:0px;
+	margin:0;
 	position:relative;
 	float:right;
 }
@@ -97,13 +94,8 @@ ul.navigation li a {
 	cursor: pointer;
 }
 
-ul.navigation li a:link, ul.navigation li a:visited {
-	color:#CCC;
-}
-
-ul.navigation li a:hover, ul.navigation li a:active {
-	color:#fff;
-}
+ul.navigation li a:link, ul.navigation li a:visited { color:#CCC; }
+ul.navigation li a:hover, ul.navigation li a:active { color:#fff; }
 
 ul.navigation li:hover > ul {
 	visibility:visible;
@@ -179,14 +171,12 @@ ul.navigation ul li a {
 }
 
 .op-content {
-	padding: 0px 0px 0px 16px;
+	padding: 0 0 0 16px;
 	margin: 0 0 0 180px; /* considering the border you need to use a margin so the content does not float under the first div*/
 }
 
 /*************** other divs ***************/
-.main {
-	height: auto; min-height: 100%;
-}
+.main { height: auto; min-height: 100%; }
 
 .main-wrapper {
 	padding-bottom: 70px;
@@ -202,7 +192,7 @@ ul.navigation ul li a {
 .top-menu {
 	height: 40px;
 	border-radius: 0;
-	background: black;
+	background: #000;
 }
 
 .container {
@@ -217,7 +207,7 @@ ul.navigation ul li a {
 	border: 1px solid #CCC;
 	border-radius: 4px;
 	background: #fff;
-	margin: 12px auto 12px auto;
+	margin: 12px auto;
 	padding: 12px;
 	overflow: auto; /* so the size of the wrapper is always the size of the longest content */
 }

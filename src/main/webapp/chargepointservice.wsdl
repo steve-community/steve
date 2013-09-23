@@ -527,7 +527,7 @@ See: http://ev-services.net/ocpp/
   <wsdl:service name="ChargePointService">
     <wsdl:documentation>The ChargePoint Service for the Open Charge Point Protocol</wsdl:documentation>
     <wsdl:port name="ChargePointServiceSoap12" binding="tns:ChargePointServiceSoap">
-      <soap12:address location="http://localhost/Ocpp/ChargePointService/" />
+      <soap12:address location="http://localhost:8080/" />
     </wsdl:port>
   </wsdl:service>
 </wsdl:definitions>

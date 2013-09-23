@@ -2,6 +2,25 @@ package de.rwth.idsg.steve.html;
 
 public class Common {
 	
+	static String EXCEPTION_CHARGEPOINTS_NULL = 
+			"Error: You did not select any charge points, did you!?\n"
+			+ "Go back and try again.";
+	
+	static String EXCEPTION_PARSING_DATETIME = 
+			"Error: startDatetime and stopDatetime must match the expected pattern.\n"
+			+ "Go back and try again.";
+	
+	static String EXCEPTION_INVALID_DATETIME = 
+			"Error: Invalid startDatetime and/or stopDatetime.\n"
+			+ "Allowed input:\n"
+			+ "1. startDatetime must be before the stopDatetime.\n"
+			+ "2. startDatetime must be in the future.\n"
+			+ "Go back and try again.";
+	
+	static String EXCEPTION_OVERLAPPING_RESERVATION = 
+			"Error: The desired reservation overlaps with another reservation.\n"
+			+ "Go back and try again.";
+	
 	public static String printHead(String contextPath){
 		return
 		"<!DOCTYPE html>\n"
@@ -28,11 +47,12 @@ public class Common {
 		+ "<li><a href=\"" + contextPath + "/manager/operations/v1.5\">OCPP v1.5</a></li>\n"
 		+ "</ul>\n"
 		+ "</li>\n"
+		+ "<li><a href=\"" + contextPath + "/manager/status\">STATUS</a></li>\n"
 		+ "<li><a href=\"" + contextPath + "/manager/log\">LOG</a></li>\n"
 		+ "</ul>\n"
 		+ "</div></div>\n"
 		+ "<div class=\"main-wrapper\">\n"
-		+ "<div class=\"content\">";
+		+ "<div class=\"content\">\n";
 	}
 	
 	public static String printFoot(String contextPath){
@@ -41,7 +61,6 @@ public class Common {
 		+ "<div class=\"footer\">\n"
 		+ "<a href=\"http://www.rwth-aachen.de\"><img src=\""+ contextPath + "/logo_rwth.png\"></a>\n"
 		+ "<a href=\"http://dbis.rwth-aachen.de\"><img src=\""+ contextPath + "/logo_i5.png\"></a>\n"
-		+ "<a href=\"http://dbis.rwth-aachen.de/cms/teaching/IDSG\"><img src=\""+ contextPath + "/logo_idsg.png\"></a>\n"
 		+ "</div>\n"
 		+ "</body>\n"
 		+ "</html>";

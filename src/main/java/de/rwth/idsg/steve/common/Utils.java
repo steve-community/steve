@@ -120,7 +120,7 @@ public class Utils {
 	public static boolean validateDMLChanges(int [] updateCounts) {
 		boolean updatedAll = false;
 
-		for (int i = 0; i <= updateCounts.length; i++) {
+		for (int i = 0; i < updateCounts.length; i++) {
 			if (updateCounts[i] >= 1) {
 				updatedAll = true;
 			} else if (updateCounts[i] == (PreparedStatement.SUCCESS_NO_INFO | PreparedStatement.EXECUTE_FAILED)) {

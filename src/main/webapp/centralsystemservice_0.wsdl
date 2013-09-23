@@ -545,7 +545,7 @@ See: http://ev-services.net/ocpp/
   <wsdl:service name="CentralSystemService">
     <wsdl:documentation>The Central System Service for the Open Charge Point Protocol</wsdl:documentation>
     <wsdl:port name="CentralSystemServiceSoap12" binding="tns:CentralSystemServiceSoap">
-      <soap12:address location="http://localhost:8080/mano/services/CentralSystemServiceSoap12" />
+      <soap12:address location="http://localhost:8080/" />
     </wsdl:port>
   </wsdl:service>
 </wsdl:definitions>

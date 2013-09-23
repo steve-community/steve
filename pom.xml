@@ -25,14 +25,52 @@
 					<warSourceDirectory>${basedir}/src/main/webapp</warSourceDirectory>
 					<failOnMissingWebXml>false</failOnMissingWebXml>
 				</configuration>
-			</plugin>
+			</plugin>			
+<!-- 			<plugin> -->
+<!-- 				<groupId>org.apache.cxf</groupId> -->
+<!-- 				<artifactId>cxf-codegen-plugin</artifactId> -->
+<!-- 				<version>${cxf.version}</version> -->
+<!-- 				<dependencies> -->
+<!--                   <dependency> -->
+<!--                     <groupId>org.apache.cxf</groupId> -->
+<!--                     <artifactId>cxf-rt-bindings-soap</artifactId> -->
+<!--                     <version>${cxf.version}</version> -->
+<!--                   </dependency> -->
+<!--                 </dependencies> -->
+<!-- 				<executions> -->
+<!-- 					<execution> -->
+<!-- 						<id>generate-sources</id> -->
+<!-- 						<phase>generate-sources</phase> -->
+<!-- 						<configuration> -->
+<!-- 							<sourceRoot>${basedir}/src/main/java</sourceRoot> -->
+<!-- 							<wsdlOptions> -->
+<!-- 								<wsdlOption> -->
+<!-- 									<wsdl>${basedir}/src/main/webapp/SensorChangeService.wsdl</wsdl> -->
+<!-- 										<extraargs> -->
+<!--                     					<extraarg>-impl</extraarg> -->
+<!--                     					<extraarg>-client</extraarg> -->
+<!--                    						<extraarg>-verbose</extraarg> -->
+<!--                    						<extraarg>-exsh</extraarg> -->
+<!--                    						<extraarg>true</extraarg> -->
+<!--                 						</extraargs> -->
+<!-- 								</wsdlOption> -->
+<!-- 							</wsdlOptions> -->
+<!-- 						</configuration> -->
+<!-- 						<goals> -->
+<!-- 							<goal>wsdl2java</goal> -->
+<!-- 						</goals> -->
+<!-- 					</execution> -->
+<!-- 				</executions> -->
+<!-- 			</plugin> -->
 		</plugins>
 	</build>
+	
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<cxf.version>2.3.1</cxf.version>
 	</properties>
-	<dependencies>               
+	
+	<dependencies>              
             
 		<!-- Required for logging -->
 		<dependency>

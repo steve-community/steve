@@ -51,13 +51,13 @@ public class ClientDBAccess {
 		// startDatetime can be null, if the reservation starts from current time on
 		if (startDatetime == null) {
 			startDatetime = new DateTime();
-			// Continue only if: startDatetime < stopDatetime
+			// Continue only if: startDatetime < expiryDatetime
 			if ( startDatetime.isAfter(expiryDatetime) ) {
 				throw new InputException(Common.EXCEPTION_INVALID_DATETIME);
 			}
 		} else {
 			DateTime now = new DateTime();
-			// Continue only if: now < startDatetime < stopDatetime
+			// Continue only if: now < startDatetime < expiryDatetime
 			if ( !(now.isBefore(startDatetime) && startDatetime.isBefore(expiryDatetime)) ) {
 				throw new InputException(Common.EXCEPTION_INVALID_DATETIME);
 			}

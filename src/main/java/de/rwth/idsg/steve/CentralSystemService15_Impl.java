@@ -38,6 +38,7 @@ import org.apache.cxf.ws.addressing.AddressingProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import de.rwth.idsg.steve.common.ClientDBAccess;
 import de.rwth.idsg.steve.common.Constants;
 import de.rwth.idsg.steve.common.SQLIdTagData;
 import de.rwth.idsg.steve.common.ServiceDBAccess;
@@ -169,18 +170,24 @@ public class CentralSystemService15_Impl implements CentralSystemService {
 		
 		int transactionId = -1;
 		if (_returnIdTagInfo.getStatus() == AuthorizationStatus.ACCEPTED){
+			// Get parameters and insert transaction to DB
 			int connectorId = parameters.getConnectorId();
 			Timestamp startTimestamp = Utils.convertToTimestamp(parameters.getTimestamp());
 			String startMeterValue = Integer.toString(parameters.getMeterStart());
-
+			transactionId = ServiceDBAccess.insertTransaction(chargeBoxIdentity, connectorId, idTag, startTimestamp, startMeterValue);
+			
+			// Get the parameter and end the reservation
 			Integer obj_reservId = parameters.getReservationId();
 			if (obj_reservId != null) {
 				int reservId = obj_reservId.intValue();
-				// TODO: Do something
-			}
-			transactionId = ServiceDBAccess.insertNewTransaction(chargeBoxIdentity, connectorId, idTag, startTimestamp, startMeterValue);
-		}
-		
+				boolean ended = ClientDBAccess.endReservation(reservId);
+				if (ended == true) {
+					LOG.info("The reservation " + reservId + " has been ended.");
+				} else {
+					LOG.info("The reservation " + reservId + " could NOT be ended.");
+				}
+			}			
+		}		
 		StartTransactionResponse _return = new StartTransactionResponse();
 		_return.setIdTagInfo(_returnIdTagInfo);
 		if (transactionId != -1) { _return.setTransactionId(transactionId); }
@@ -191,11 +198,11 @@ public class CentralSystemService15_Impl implements CentralSystemService {
 	public StopTransactionResponse stopTransaction(StopTransactionRequest parameters,java.lang.String chargeBoxIdentity) { 
 		LOG.info("Executing operation stopTransaction");
 
+		// Get parameters and update transaction in DB
 		int transactionId = parameters.getTransactionId();
 		Timestamp stopTimestamp = Utils.convertToTimestamp(parameters.getTimestamp());
-		String stopMeterValue = Integer.toString(parameters.getMeterStop());
-		
-		ServiceDBAccess.updateExistingTransaction(chargeBoxIdentity, transactionId, stopTimestamp, stopMeterValue, true);
+		String stopMeterValue = Integer.toString(parameters.getMeterStop());		
+		ServiceDBAccess.updateTransaction(chargeBoxIdentity, transactionId, stopTimestamp, stopMeterValue);
 		
 		List<TransactionData> transData = parameters.getTransactionData();
 		if (transData != null){
@@ -234,7 +241,7 @@ public class CentralSystemService15_Impl implements CentralSystemService {
 		return _return;
 	}
 
-	// TODO: This is new in OCPP 1.5. Not sure what it is about. Implementation must be vendor-specific?
+	// Dummy implementation. This is new in OCPP 1.5. It must be vendor-specific.
 	public DataTransferResponse dataTransfer(DataTransferRequest parameters,java.lang.String chargeBoxIdentity) { 
 		LOG.info("Executing operation dataTransfer");
 		
@@ -242,13 +249,9 @@ public class CentralSystemService15_Impl implements CentralSystemService {
 		String messageId = parameters.getMessageId();
 		String data = parameters.getData();
 		
-		if (!messageId.isEmpty()){
-			
-		}
-		
-		if (!data.isEmpty()){
-			
-		}
+		LOG.info(vendorId);
+		if (!messageId.isEmpty()) LOG.info(messageId);		
+		if (!data.isEmpty()) LOG.info(data);
 		
 		DataTransferResponse _return = new DataTransferResponse();
 		//_return.setData(value);

@@ -2,22 +2,22 @@ package de.rwth.idsg.steve.html;
 
 public class Common {
 	
-	static String EXCEPTION_CHARGEPOINTS_NULL = 
+	public static String EXCEPTION_CHARGEPOINTS_NULL = 
 			"Error: You did not select any charge points, did you!?\n"
 			+ "Go back and try again.";
 	
-	static String EXCEPTION_PARSING_DATETIME = 
-			"Error: startDatetime and stopDatetime must match the expected pattern.\n"
+	public static String EXCEPTION_PARSING_DATETIME = 
+			"Error: Date/time input(s) must match the expected pattern.\n"
 			+ "Go back and try again.";
 	
-	static String EXCEPTION_INVALID_DATETIME = 
+	public static String EXCEPTION_INVALID_DATETIME = 
 			"Error: Invalid startDatetime and/or stopDatetime.\n"
 			+ "Allowed input:\n"
 			+ "1. startDatetime must be before the stopDatetime.\n"
 			+ "2. startDatetime must be in the future.\n"
 			+ "Go back and try again.";
 	
-	static String EXCEPTION_OVERLAPPING_RESERVATION = 
+	public static String EXCEPTION_OVERLAPPING_RESERVATION = 
 			"Error: The desired reservation overlaps with another reservation.\n"
 			+ "Go back and try again.";
 	

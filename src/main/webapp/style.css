@@ -17,7 +17,7 @@ hr {
 
 ul hr { color: #CCC; background: #CCC;}
 
-table {	width: 100%; }
+table { width: 100%;}
 
 table td:first-child { 
 	text-align: right; 
@@ -25,10 +25,19 @@ table td:first-child {
 	padding: 3px;
 }
 
-table input {
-	width: 65%;
+input[type="text"], input[type="number"], input[type="datetime"]{
+	width: 350px;
 	font-size: 12px;
 }
+
+input[type="submit"] {
+	width: 100px;
+	font-size: 12px;
+	-webkit-appearance: none;
+	-webkit-border-radius: 3px;
+}
+
+table.bc td {width: 50%;}
 
 table.res {
 	width: 90%;
@@ -53,6 +62,7 @@ table.res td {
 }
 
 select {
+	width: 355px;
 	font-size: 12px;
 	padding: 1px;
 }
@@ -171,7 +181,7 @@ ul.navigation ul li a {
 }
 
 .op-content {
-	padding: 0 0 0 16px;
+	padding: 0 0 0 12px;
 	margin: 0 0 0 180px; /* considering the border you need to use a margin so the content does not float under the first div*/
 }
 

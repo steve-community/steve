@@ -10,6 +10,9 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import de.rwth.idsg.sensor.change.Status;
+import de.rwth.idsg.steve.ChangeService_Client;
+
 public class ServiceDBAccess {
 	
 	private static final Logger LOG = LoggerFactory.getLogger(ServiceDBAccess.class);
@@ -269,51 +272,76 @@ public class ServiceDBAccess {
 		}		
 	}
 
-	// TODO: process with transactionId
 	public static synchronized void insertMeterValues15(
 			String chargeBoxIdentity, 
 			int connectorId,
 			Integer transactionId,
 			List<ocpp.cs._2012._06.MeterValue> list){
 		
+		// Initialize with an invalid id
+		int transactionIdINT = -1;
+		if (transactionId != null) transactionIdINT = transactionId.intValue();
+		
 		Connection connect = null;
-		PreparedStatement pt = null;	
+		PreparedStatement pt = null;
 		try {
 			// Prepare Database Access
 			connect = Utils.getConnectionFromPool();
 			// Disable the auto commit since we are making batch execution. By default, it is always true.
 			connect.setAutoCommit(false);
-
 			// We store a log of connector meter values with their timestamps.
-			pt = connect.prepareStatement("INSERT INTO connector_metervalue (connector_pk, valueTimestamp, value, readingContext, format, measurand, location, unit) "
-					+ "SELECT connector_pk , ? , ? , ? , ? , ? , ? , ? FROM connector WHERE chargeBoxId = ? AND connectorId = ?");
-
-			// OCPP 1.5 allows multiple "values" elements
-			for (ocpp.cs._2012._06.MeterValue valuesElement : list) {
-				Timestamp timestamp = Utils.convertToTimestamp(valuesElement.getTimestamp());
-				String value = null;
-				
-				// OCPP 1.5 allows multiple "value" elements under each "values" element.
-				List<ocpp.cs._2012._06.MeterValue.Value> valueList = valuesElement.getValue();
-				for (ocpp.cs._2012._06.MeterValue.Value valueElement : valueList){
-					value = valueElement.getValue();
-					// Set the parameter indices for batch execution
-					pt.setTimestamp(1, timestamp);
-					pt.setString(2, value);					
-					/** Start: OCPP 1.5 allows for each "value" element to have optional attributes **/
-					pt.setString(3, valueElement.getContext().value());
-					pt.setString(4, valueElement.getFormat().value());
-					pt.setString(5, valueElement.getMeasurand().value());
-					pt.setString(6, valueElement.getLocation().value());
-					pt.setString(7, valueElement.getUnit().value());
-					/** Finish **/					
-					pt.setString(8, chargeBoxIdentity);
-					pt.setInt(9, connectorId);
-					pt.addBatch();
+			pt = connect.prepareStatement("INSERT INTO connector_metervalue (connector_pk, transaction_pk, valueTimestamp, value, readingContext, format, measurand, location, unit) "
+					+ "SELECT connector_pk , ? , ? , ? , ? , ? , ? , ? , ? FROM connector WHERE chargeBoxId = ? AND connectorId = ?");
+			
+			// if transactionId is NOT present, write NULL to the field ...
+			if (transactionIdINT == -1){			
+				// OCPP 1.5 allows multiple "values" elements
+				for (ocpp.cs._2012._06.MeterValue valuesElement : list) {
+					Timestamp timestamp = Utils.convertToTimestamp(valuesElement.getTimestamp());
+					
+					// OCPP 1.5 allows multiple "value" elements under each "values" element.
+					List<ocpp.cs._2012._06.MeterValue.Value> valueList = valuesElement.getValue();
+					for (ocpp.cs._2012._06.MeterValue.Value valueElement : valueList){
+						// Set the parameter indices for batch execution
+						pt.setNull(1, java.sql.Types.INTEGER);
+						pt.setTimestamp(2, timestamp);
+						pt.setString(3, valueElement.getValue());					
+						/** Start: OCPP 1.5 allows for each "value" element to have optional attributes **/
+						pt.setString(4, valueElement.getContext().value());
+						pt.setString(5, valueElement.getFormat().value());
+						pt.setString(6, valueElement.getMeasurand().value());
+						pt.setString(7, valueElement.getLocation().value());
+						pt.setString(8, valueElement.getUnit().value());
+						/** Finish **/					
+						pt.setString(9, chargeBoxIdentity);
+						pt.setInt(10, connectorId);
+						pt.addBatch();
+					}
 				}
-				
-				if (transactionId != null){
-					updateExistingTransaction(chargeBoxIdentity, transactionId, timestamp, value, false);
+			// ... Otherwise write the value of the transactionId
+			} else {
+				// OCPP 1.5 allows multiple "values" elements
+				for (ocpp.cs._2012._06.MeterValue valuesElement : list) {
+					Timestamp timestamp = Utils.convertToTimestamp(valuesElement.getTimestamp());
+					
+					// OCPP 1.5 allows multiple "value" elements under each "values" element.
+					List<ocpp.cs._2012._06.MeterValue.Value> valueList = valuesElement.getValue();
+					for (ocpp.cs._2012._06.MeterValue.Value valueElement : valueList){
+						// Set the parameter indices for batch execution
+						pt.setInt(1, transactionIdINT);
+						pt.setTimestamp(2, timestamp);
+						pt.setString(3, valueElement.getValue());					
+						/** Start: OCPP 1.5 allows for each "value" element to have optional attributes **/
+						pt.setString(4, valueElement.getContext().value());
+						pt.setString(5, valueElement.getFormat().value());
+						pt.setString(6, valueElement.getMeasurand().value());
+						pt.setString(7, valueElement.getLocation().value());
+						pt.setString(8, valueElement.getUnit().value());
+						/** Finish **/					
+						pt.setString(9, chargeBoxIdentity);
+						pt.setInt(10, connectorId);
+						pt.addBatch();
+					}
 				}
 			}
 
@@ -335,8 +363,7 @@ public class ServiceDBAccess {
 		}		
 	}
 
-
-	public static synchronized int insertNewTransaction(
+	public static synchronized int insertTransaction(
 			String chargeBoxIdentity, 
 			int connectorId, 
 			String idTag, 
@@ -386,9 +413,11 @@ public class ServiceDBAccess {
 
 			/**** START SENSOR MODIFICATION ****/
 
-//			// Send message to the sensor that the transaction is granted to start
-//			ChangeService_Client sensorClient = new ChangeService_Client();
-//			sensorClient.sendChangeStatus(chargeBoxIdentity, Constants.SENSOR_ENDPOINT_ADDRESS, connectorId, Status.TRANS_STARTED);
+			if (Constants.SENSORS_ENABLED) {
+				// Send message to the sensor that the transaction is granted to start
+				ChangeService_Client sensorClient = new ChangeService_Client();
+				sensorClient.sendChangeStatus(chargeBoxIdentity, Constants.SENSOR_ENDPOINT_ADDRESS, connectorId, Status.TRANS_STARTED);
+			}
 
 			/**** END SENSOR MODIFICATION ****/
 
@@ -400,12 +429,11 @@ public class ServiceDBAccess {
 		return transactionId;
 	}
 	
-	public static synchronized void updateExistingTransaction(
+	public static synchronized void updateTransaction(
 			String chargeBoxIdentity,
 			int transactionId,
-			Timestamp lastTimestamp, 
-			String lastMeterValue,
-			boolean stopped){
+			Timestamp stopTimestamp, 
+			String stopMeterValue){
 			
 		Connection connect = null;
 		PreparedStatement pt = null;
@@ -416,13 +444,12 @@ public class ServiceDBAccess {
 
 			// PreparedStatements can use parameter indices as question marks
 			// After update, a DB trigger sets the user.inTransaction field to 0
-			pt = connect.prepareStatement("UPDATE transaction SET lastTimestamp = ?, lastValue = ?, stopped = ? WHERE transaction_pk = ?");
+			pt = connect.prepareStatement("UPDATE transaction SET stopTimestamp = ?, stopValue = ?, WHERE transaction_pk = ?");
 
 			// Set the parameter indices
-			pt.setTimestamp(1, lastTimestamp);
-			pt.setString(2, lastMeterValue);	
-			pt.setBoolean(3, stopped);
-			pt.setInt(4, transactionId);
+			pt.setTimestamp(1, stopTimestamp);
+			pt.setString(2, stopMeterValue);
+			pt.setInt(3, transactionId);
 
 			// Insert the transaction into DB
 			int count = pt.executeUpdate();
@@ -440,20 +467,22 @@ public class ServiceDBAccess {
 			connect.setAutoCommit(true);
 			
 			/**** START SENSOR MODIFICATION ****/
-						
-//			pt = connect.prepareStatement("SELECT connectorId FROM connector WHERE connector_pk = (SELECT connector_pk FROM transaction WHERE transaction_pk = ?)");
-//			pt.setInt(1, transactionId);
-//			// Execute and get the result of the SQL query
-//			ResultSet rs = pt.executeQuery();
-//			
-//			if (rs.next() == true) {
-//				// Send message to the sensor that the transaction is granted to STOP
-//				ChangeService_Client sensorClient = new ChangeService_Client();
-//				sensorClient.sendChangeStatus(chargeBoxIdentity, Constants.SENSOR_ENDPOINT_ADDRESS, rs.getInt(1), Status.TRANS_STOPPED);
-//			}
-//			
-//			// Release PreparedStatement and ResultSet. Connection will be reused.
-//			Utils.releaseResources(null, pt, rs);
+			
+			if (Constants.SENSORS_ENABLED) {
+				pt = connect.prepareStatement("SELECT connectorId FROM connector WHERE connector_pk = (SELECT connector_pk FROM transaction WHERE transaction_pk = ?)");
+				pt.setInt(1, transactionId);
+				// Execute and get the result of the SQL query
+				ResultSet rs = pt.executeQuery();
+				
+				if (rs.next() == true) {
+					// Send message to the sensor that the transaction is granted to STOP
+					ChangeService_Client sensorClient = new ChangeService_Client();
+					sensorClient.sendChangeStatus(chargeBoxIdentity, Constants.SENSOR_ENDPOINT_ADDRESS, rs.getInt(1), Status.TRANS_STOPPED);
+				}
+				
+				// Release PreparedStatement and ResultSet. Connection will be reused.
+				Utils.releaseResources(null, pt, rs);
+			}
 			
 			/**** END SENSOR MODIFICATION ****/
 			

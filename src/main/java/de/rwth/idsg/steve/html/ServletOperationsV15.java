@@ -9,6 +9,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import ocpp.cp._2010._08.ChangeAvailabilityRequest;
+import ocpp.cp._2012._06.ReserveNowRequest;
 import de.rwth.idsg.steve.ChargePointService15_Client;
 import de.rwth.idsg.steve.common.ClientDBAccess;
 
@@ -115,6 +117,28 @@ public class ServletOperationsV15 extends HttpServlet {
 		// chargePointItem[0] : chargebox id
 		// chargePointItem[1] : endpoint (IP) address
 		
+		
+		if (command.equals("/ReserveNow")){
+			int connectorId = Integer.parseInt(request.getParameter("connectorId"));
+			String expiryString = request.getParameter("expiryDate");
+			String idTag = request.getParameter("idTag");
+			String parentIdTag = request.getParameter("parentIdTag");
+			
+			// Only select the first item
+			String[] chargePointItem = chargePointItems[0].split(";");
+			
+			result = cpsClient.reserveNow(chargePointItem[0], chargePointItem[1], connectorId, expiryString, idTag, parentIdTag);
+			writer.println(result);
+			
+		} else if (command.equals("/CancelReservation")){
+			int reservationId = Integer.parseInt(request.getParameter("reservationId"));
+			
+			// Only select the first item
+			String[] chargePointItem = chargePointItems[0].split(";");
+			
+			result = cpsClient.cancelReservation(chargePointItem[0], chargePointItem[1], reservationId);
+			writer.println(result);
+		}	
 		writer.close();	
 	}
 	
@@ -167,11 +191,9 @@ public class ServletOperationsV15 extends HttpServlet {
 		+ "<b>Parameters</b><hr>\n"
 		+ "<table class=\"params\">\n"
 		+ "<tr><td>Connector Id (integer, 0 = charge point as a whole):</td><td><input type=\"number\" min=\"0\" name=\"connectorId\"></td></tr>\n"
-		+ "<tr><td>Availability Type:</td><td><select name=\"availType\">"
-		+ "<option value=\"Inoperative\">Inoperative</option>"
-		+ "<option value=\"Operative\">Operative</option>"
-		+ "</select></td></tr>\n"
-		+ "<tr><td></td><td id=\"add_space\"><input type=\"submit\" value=\"Perform\"></td></tr>\n"	   	
+		+ "<tr><td>Availability Type:</td><td><input type=\"radio\" name=\"availType\" value=\"Inoperative\"> Inoperative</td></tr>\n"
+		+ "<tr><td></td><td><input type=\"radio\" name=\"availType\" value=\"Operative\"> Operative</td></tr>\n"
+		+ "<tr><td></td><td id=\"add_space\"><input type=\"submit\" value=\"Perform\"></td></tr>\n"  	
 		+ "</table>\n</form>\n</div>";
 	}
 	
@@ -294,8 +316,8 @@ public class ServletOperationsV15 extends HttpServlet {
 		+ "<tr><td>Location (directory URI):</td><td><input type=\"text\" name=\"location\"></td></tr>\n"		
 		+ "<tr><td>Retries (integer):</td><td><input type=\"number\" min=\"0\" name=\"retries\"></td></tr>\n"
 		+ "<tr><td>Retry Interval (integer):</td><td><input type=\"number\" min=\"0\" name=\"retryInterval\"></td></tr>\n"
-		+ "<tr><td>Start time (ex: 2011-12-21T11:33:23Z):</td><td><input type=\"datetime\" name=\"startTime\"></td></tr>\n"
-		+ "<tr><td>Stop time (ex: 2011-12-21T11:33:23Z):</td><td><input type=\"datetime\" name=\"stopTime\"></td></tr>\n"
+		+ "<tr><td>Start time (ex: 2011-12-21 11:33):</td><td><input type=\"datetime\" name=\"startTime\"></td></tr>\n"
+		+ "<tr><td>Stop time (ex: 2011-12-21 11:33):</td><td><input type=\"datetime\" name=\"stopTime\"></td></tr>\n"
 		+ "<tr><td></td><td id=\"add_space\"><input type=\"submit\" value=\"Perform\"></td></tr>\n"  	   	
 		+ "</table>\n</form>\n</div>";
 	}
@@ -398,12 +420,8 @@ public class ServletOperationsV15 extends HttpServlet {
 		+ printChargePoints()
 		+ "<b>Parameters</b><hr>\n"
 		+ "<table class=\"params\">\n"
-		+ "<tr><td>Reset type:</td><td>\n"
-		+ "<select name=\"resetType\">\n"
-		+ "<option value=\"Hard\">Hard</option>\n"
-		+ "<option value=\"Soft\">Soft</option>\n"
-		+ "</select>\n"
-		+ "</td></tr>\n"
+		+ "<tr><td>Reset Type:</td><td><input type=\"radio\" name=\"resetType\" value=\"Hard\"> Hard</td></tr>\n"
+		+ "<tr><td></td><td><input type=\"radio\" name=\"resetType\" value=\"Soft\"> Soft</td></tr>\n"		
 		+ "<tr><td></td><td id=\"add_space\"><input type=\"submit\" value=\"Perform\"></td></tr>\n"
 		+ "</table>\n</form>\n</div>";
 	}
@@ -473,7 +491,7 @@ public class ServletOperationsV15 extends HttpServlet {
 		+ "<table class=\"params\">\n"
 		+ "<tr><td>Location (URI):</td><td><input type=\"text\" name=\"location\"></td></tr>\n"
 		+ "<tr><td>Retries (integer):</td><td><input type=\"number\" min=\"0\" name=\"retries\"></td></tr>\n"
-		+ "<tr><td>Retrieve Date (ex: 2011-12-21T11:33:23Z):</td><td><input type=\"datetime\" name=\"retrieveDate\"></td></tr>\n"
+		+ "<tr><td>Retrieve Date (ex: 2011-12-21 11:33):</td><td><input type=\"datetime\" name=\"retrieveDate\"></td></tr>\n"
 		+ "<tr><td>Retry Interval (integer):</td><td><input type=\"number\" min=\"0\" name=\"retryInterval\"></td></tr>\n"
 		+ "<tr><td></td><td id=\"add_space\"><input type=\"submit\" value=\"Perform\"></td></tr>\n"	
 		+ "</table>\n</form>\n</div>";
@@ -510,10 +528,9 @@ public class ServletOperationsV15 extends HttpServlet {
 		+ "<b>Parameters</b><hr>\n"
 		+ "<table class=\"params\">\n"
 		+ "<tr><td>Connector Id (integer, 0 = not for a specific connector):</td><td><input type=\"number\" min=\"0\" name=\"connectorId\"></td></tr>\n"	
-		+ "<tr><td>Expiry Date (ex: 2011-12-21T11:33:23Z):</td><td><input type=\"datetime\" name=\"expiryDate\"></td></tr>\n"
+		+ "<tr><td>Expiry Date (ex: 2011-12-21 11:33):</td><td><input type=\"datetime\" name=\"expiryDate\"></td></tr>\n"
 		+ "<tr><td>idTag (string):</td><td><input type=\"text\" name=\"idTag\"></td></tr>\n"
-		+ "<tr><td>parentIdTag (string):</td><td><input type=\"text\" name=\"idTag\"></td></tr>\n"
-		+ "<tr><td>Reservation Id (integer):</td><td><input type=\"number\" min=\"0\" name=\"reservationId\"></td></tr>\n"
+		+ "<tr><td>parentIdTag (string):</td><td><input type=\"text\" name=\"parentIdTag\" placeholder=\"optional\"></td></tr>\n"
 		+ "<tr><td></td><td id=\"add_space\"><input type=\"submit\" value=\"Perform\"></td></tr>\n"
 		+ "</table>\n</form>\n</div>";
 	}
@@ -618,8 +635,23 @@ public class ServletOperationsV15 extends HttpServlet {
 		+ "<div class=\"op-content\">\n<form method=\"POST\" action=\"" + contextPath + servletPath + "/GetConfiguration\">\n" 
 		+ printChargePoints()
 		+ "<b>Parameters</b><hr>\n"
-		+ "<table class=\"params\">\n"
-		+ "<tr><td>key (String):</td><td><input type=\"text\" name=\"key\"></td></tr>\n"
+		+ "<table>\n"
+		+ "<tr><td>"
+		+ "</td><td>\n"
+		+ "<input type=\"checkbox\" name=\"confKeys\" value=\"HeartBeatInterval\"> HeartBeatInterval<br>\n"
+		+ "<input type=\"checkbox\" name=\"confKeys\" value=\"ConnectionTimeOut\"> ConnectionTimeOut<br>\n"
+		+ "<input type=\"checkbox\" name=\"confKeys\" value=\"ProximityContactRetries\"> ProximityContactRetries<br>\n"
+		+ "<input type=\"checkbox\" name=\"confKeys\" value=\"ProximityLockRetries\"> ProximityLockRetries<br>\n"
+		+ "<input type=\"checkbox\" name=\"confKeys\" value=\"ResetRetries\"> ResetRetries<br>\n"
+		+ "<input type=\"checkbox\" name=\"confKeys\" value=\"BlinkRepeat\"> BlinkRepeat<br>\n"
+		+ "<input type=\"checkbox\" name=\"confKeys\" value=\"LightIntensity\"> LightIntensity<br>\n"
+		+ "<input type=\"checkbox\" name=\"confKeys\" value=\"ChargePointId\"> ChargePointId<br>\n"
+		+ "<input type=\"checkbox\" name=\"confKeys\" value=\"MeterValueSampleInterval\"> MeterValueSampleInterval<br>\n"
+		+ "<input type=\"checkbox\" name=\"confKeys\" value=\"ClockAlignedDataInterval\"> ClockAlignedDataInterval<br>\n"
+		+ "<input type=\"checkbox\" name=\"confKeys\" value=\"MeterValuesSampledData\"> MeterValuesSampledData<br>\n"
+		+ "<input type=\"checkbox\" name=\"confKeys\" value=\"MeterValuesAlignedData\"> MeterValuesAlignedData<br>\n"
+		+ "<input type=\"checkbox\" name=\"confKeys\" value=\"StopTxnSampledData\"> StopTxnSampledData<br>\n"
+		+ "<input type=\"checkbox\" name=\"confKeys\" value=\"StopTxnAlignedData\"> StopTxnSampledData<br></td></tr>\n"
 		+ "<tr><td></td><td id=\"add_space\"><input type=\"submit\" value=\"Perform\"></td></tr>\n"
 		+ "</table>\n</form>\n</div>";
 	}
@@ -691,15 +723,11 @@ public class ServletOperationsV15 extends HttpServlet {
 		+ printChargePoints()
 		+ "<b>Parameters</b><hr>\n"
 		+ "<table class=\"params\">\n"
-		+ "<tr><td>hash (String):</td><td><input type=\"text\" name=\"hash\"></td></tr>\n"
+		+ "<tr><td>hash (String):</td><td><input type=\"number\" name=\"hash\"></td></tr>\n"
 		+ "<tr><td>listVersion (integer):</td><td><input type=\"number\" name=\"listVersion\"></td></tr>\n"
-		+ "<tr><td>localAuthorisationList (integer):</td><td><input type=\"text\" name=\"localAuthorisationList\"></td></tr>\n"		
-		+ "<tr><td>updateType (integer):</td><td>"
-		+ "<select name=\"confKey\">\n"
-		+ "<option value=\"Differential\">Differential</option>\n"
-		+ "<option value=\"Full\">Full</option>\n"
-		+ "</select>\n"
-		+ "</td></tr>\n"	
+		+ "<tr><td>localAuthorisationList:</td><td><input type=\"text\" name=\"localAuthorisationList\"></td></tr>\n"
+		+ "<tr><td>Update Type:</td><td><input type=\"radio\" name=\"updateType\" value=\"Hard\"> Differential</td></tr>\n"
+		+ "<tr><td></td><td><input type=\"radio\" name=\"updateType\" value=\"Full\"> Full</td></tr>\n"		
 		+ "<tr><td></td><td id=\"add_space\"><input type=\"submit\" value=\"Perform\"></td></tr>\n"
 		+ "</table>\n</form>\n</div>";
 	}

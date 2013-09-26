@@ -155,7 +155,7 @@ public class CentralSystemService12_Impl implements CentralSystemService {
 			int connectorId = parameters.getConnectorId();
 			Timestamp startTimestamp = Utils.convertToTimestamp(parameters.getTimestamp());
 			String startMeterValue = Integer.toString(parameters.getMeterStart());
-			transactionId = ServiceDBAccess.insertNewTransaction(chargeBoxIdentity, connectorId, idTag, startTimestamp, startMeterValue);
+			transactionId = ServiceDBAccess.insertTransaction(chargeBoxIdentity, connectorId, idTag, startTimestamp, startMeterValue);
 		}
 		
 		StartTransactionResponse _return = new StartTransactionResponse();
@@ -170,7 +170,7 @@ public class CentralSystemService12_Impl implements CentralSystemService {
 		int transactionId = parameters.getTransactionId();
 		Timestamp stopTimestamp = Utils.convertToTimestamp(parameters.getTimestamp());
 		String stopMeterValue = Integer.toString(parameters.getMeterStop());
-		ServiceDBAccess.updateExistingTransaction(chargeBoxIdentity, transactionId, stopTimestamp, stopMeterValue, true);
+		ServiceDBAccess.updateTransaction(chargeBoxIdentity, transactionId, stopTimestamp, stopMeterValue);
 		
 		// Get the authorization info of the user
 		StopTransactionResponse _return = new StopTransactionResponse();

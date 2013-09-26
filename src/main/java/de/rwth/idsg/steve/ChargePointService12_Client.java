@@ -115,7 +115,7 @@ public class ChargePointService12_Client {
 		factory.setAddress(endpoint_address);
 		ChargePointService client = (ChargePointService) factory.create();
 		ChangeAvailabilityResponse response = client.changeAvailability(req, chargeBoxId);
-		return "The charge point " + chargeBoxId + " responded to change its availability with: " + response.getStatus().value();
+		return "Charge point: " + chargeBoxId + ", Request: ChangeAvailability, Response: " + response.getStatus().value();
 	}
 
 	public String sendChangeConfiguration(String chargeBoxId, String endpoint_address, ChangeConfigurationRequest req){   	
@@ -123,7 +123,7 @@ public class ChargePointService12_Client {
 		factory.setAddress(endpoint_address);
 		ChargePointService client = (ChargePointService) factory.create();
 		ChangeConfigurationResponse response = client.changeConfiguration(req, chargeBoxId);
-		return "The charge point " + chargeBoxId + " responded to change its configration with: " + response.getStatus().value();
+		return "Charge point: " + chargeBoxId + ", Request: ChangeConfiguration, Response: " + response.getStatus().value();
 	} 
 
 	public String sendClearCache(String chargeBoxId, String endpoint_address, ClearCacheRequest req){   	
@@ -131,7 +131,7 @@ public class ChargePointService12_Client {
 		factory.setAddress(endpoint_address);
 		ChargePointService client = (ChargePointService) factory.create();
 		ClearCacheResponse response = client.clearCache(req, chargeBoxId);
-		return "The charge point " + chargeBoxId + " responded to clear its cache with: " + response.getStatus().value();
+		return "Charge point: " + chargeBoxId + ", Request: ClearCache, Response: " + response.getStatus().value();
 	} 
 
 	public String sendGetDiagnostics(String chargeBoxId, String endpoint_address, GetDiagnosticsRequest req){  
@@ -139,7 +139,7 @@ public class ChargePointService12_Client {
 		factory.setAddress(endpoint_address);
 		ChargePointService client = (ChargePointService) factory.create();
 		GetDiagnosticsResponse response = client.getDiagnostics(req, chargeBoxId);
-		return "The charge point " + chargeBoxId + " will upload the diagonostic information to the file: " + response.getFileName();
+		return "Charge point: " + chargeBoxId + ", Request: GetDiagnostics, Response: " + response.getFileName();
 	} 
 
 	public String sendRemoteStartTransaction(String chargeBoxId, String endpoint_address, RemoteStartTransactionRequest req){  
@@ -147,7 +147,7 @@ public class ChargePointService12_Client {
 		factory.setAddress(endpoint_address);
 		ChargePointService client = (ChargePointService) factory.create();
 		RemoteStartTransactionResponse response = client.remoteStartTransaction(req, chargeBoxId);
-		return "The charge point " + chargeBoxId + " responded to remotely start the transaction with: " + response.getStatus().value();
+		return "Charge point: " + chargeBoxId + ", Request: RemoteStartTransaction, Response: " + response.getStatus().value();
 	}
 
 	public String sendRemoteStopTransaction(String chargeBoxId, String endpoint_address, RemoteStopTransactionRequest req){  
@@ -155,7 +155,7 @@ public class ChargePointService12_Client {
 		factory.setAddress(endpoint_address);
 		ChargePointService client = (ChargePointService) factory.create();
 		RemoteStopTransactionResponse response = client.remoteStopTransaction(req, chargeBoxId);
-		return "The charge point " + chargeBoxId + " responded to remotely stop the transaction with: " + response.getStatus().value();
+		return "Charge point: " + chargeBoxId + ", Request: RemoteStopTransaction, Response: " + response.getStatus().value();
 	} 
 
 	public String sendReset(String chargeBoxId, String endpoint_address, ResetRequest req){   	
@@ -163,7 +163,7 @@ public class ChargePointService12_Client {
 		factory.setAddress(endpoint_address);
 		ChargePointService client = (ChargePointService) factory.create();
 		ResetResponse response = client.reset(req, chargeBoxId);
-		return "The charge point " + chargeBoxId + " responded to reset itself with: " + response.getStatus().value();
+		return "Charge point: " + chargeBoxId + ", Request: Reset, Response: " + response.getStatus().value();
 	}   
 
 	public String sendUnlockConnector(String chargeBoxId, String endpoint_address, UnlockConnectorRequest req){   	
@@ -171,7 +171,7 @@ public class ChargePointService12_Client {
 		factory.setAddress(endpoint_address);
 		ChargePointService client = (ChargePointService) factory.create();
 		UnlockConnectorResponse response = client.unlockConnector(req, chargeBoxId);
-		return "The charge point " + chargeBoxId + " responded to unlock the connector with: " + response.getStatus().value();
+		return "Charge point: " + chargeBoxId + ", Request: UnlockConnector, Response: " + response.getStatus().value();
 	}
 
 	public String sendUpdateFirmware(String chargeBoxId, String endpoint_address, UpdateFirmwareRequest req){   
@@ -179,10 +179,8 @@ public class ChargePointService12_Client {
 		factory.setAddress(endpoint_address);
 		ChargePointService client = (ChargePointService) factory.create();
 		UpdateFirmwareResponse response = client.updateFirmware(req, chargeBoxId);
-		if( response != null ){
-			return "The charge point " + chargeBoxId + " has responded to update its firmware.";
-		}else{
-			return "The charge point " + chargeBoxId + " has NOT responded to update its firmware.";
-		}
+		String str = "";
+		if (response != null) str = "OK";
+		return "Charge point: " + chargeBoxId + ", Request: UpdateFirmware, Response: " + str;
 	}
 }

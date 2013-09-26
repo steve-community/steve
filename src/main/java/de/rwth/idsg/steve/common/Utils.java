@@ -4,34 +4,46 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Timestamp;
-import java.util.GregorianCalendar;
 
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.xml.datatype.DatatypeConfigurationException;
-import javax.xml.datatype.DatatypeConstants;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 
 import org.apache.tomcat.jdbc.pool.DataSource;
+import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
+import org.joda.time.format.ISODateTimeFormat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import de.rwth.idsg.steve.html.Common;
+import de.rwth.idsg.steve.html.InputException;
 
 public class Utils {
 
 	private static final Logger LOG = LoggerFactory.getLogger(Utils.class);
 	private static DataSource dataSource = null;	
 	private static DatatypeFactory factory;
-
-	// DatatypeFactory.newInstance() is expensive. Generate one DatatypeFactory always to be used.
+	private static DateTimeFormatter noMilliFormatter = ISODateTimeFormat.dateTimeNoMillis();
+	private static DateTimeFormatter inputFormatter = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm");
+	
+//	private static DateTimeParser[] parsers = { 
+//			DateTimeFormat.forPattern("yyyy-MM-dd HH:mm").getParser(),
+//			DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss").getParser() };
+//	private static DateTimeFormatter inputFormatter = new DateTimeFormatterBuilder().append(null,parsers).toFormatter();
+	
 	static{
 		try {
+			// DatatypeFactory.newInstance() is expensive. Generate one DatatypeFactory always to be used.
 			factory = DatatypeFactory.newInstance();
 		} catch (DatatypeConfigurationException e) {
 			throw new RuntimeException("Unable to create an XML datatype factory", e);
 		}
-	}	
-
+	}
+ 
 	/**
 	 * Returns a connection from the JDBC pool.
 	 * If the pool is not created yet, it first creates one.
@@ -39,7 +51,7 @@ public class Utils {
 	public static Connection getConnectionFromPool() {
 		Connection con = null;
 		try {
-			if (dataSource==null){
+			if (dataSource == null) {
 				Context initContext = new InitialContext();
 				dataSource = (DataSource) initContext.lookup("java:comp/env/jdbc/cssdb");
 				LOG.info("DB connection pool is opened.");
@@ -55,60 +67,59 @@ public class Utils {
 	 * Returns the current date/time for dateTime (XML).
 	 */
 	public static XMLGregorianCalendar getCurrentDateTimeXML(){
-		// Returns a GregorianCalendar with the current date/time
-		GregorianCalendar gc = new GregorianCalendar();
-		// Converts to XML dateTime
-		XMLGregorianCalendar xgc = factory.newXMLGregorianCalendar(gc);
-		// Remove the ms information
-		xgc.setMillisecond(DatatypeConstants.FIELD_UNDEFINED);
-
-		return xgc;
+		DateTime dt = new DateTime();
+		String st = noMilliFormatter.print(dt);
+		return factory.newXMLGregorianCalendar(st);
 	}
 
 	/**
 	 * Returns the current date/time in Timestamp (SQL).
 	 */
 	public static Timestamp getCurrentDateTimeTS(){
-		// Returns a GregorianCalendar with the current date/time
-		GregorianCalendar gc = new GregorianCalendar();
-		// Remove the ms information
-		gc.set(GregorianCalendar.MILLISECOND, 0);
-		// Converts to SQL Timestamp
-		return new Timestamp(gc.getTimeInMillis());
+		DateTime dt = new DateTime();
+		return new Timestamp(dt.getMillis());
 	}
 
 
 	/**
 	 * Sets the date/time for the whitelist of the chargebox to expire.
 	 */
-	public static XMLGregorianCalendar setExpiryDateTime(int hours){
-		// Returns a GregorianCalendar with the current date/time
-		GregorianCalendar gc = new GregorianCalendar();
-		// Add hours
-		gc.add(GregorianCalendar.HOUR_OF_DAY, hours);
-		// Converts to XML dateTime
-		XMLGregorianCalendar xgc = factory.newXMLGregorianCalendar(gc);
-		// remove the ms information
-		xgc.setMillisecond(DatatypeConstants.FIELD_UNDEFINED);
-
-		return xgc;
+	public static XMLGregorianCalendar setExpiryDateTime(int hours){		
+		DateTime dt = new DateTime().plusHours(hours);
+		String st = noMilliFormatter.print(dt);
+		return factory.newXMLGregorianCalendar(st);
 	}
 
 	/**
 	 * Converts XMLGregorianCalendar in Timestamp (SQL)
 	 */
 	public static Timestamp convertToTimestamp(XMLGregorianCalendar xmlDateTime) {
-		Timestamp newTimestamp = new Timestamp(xmlDateTime.toGregorianCalendar().getTimeInMillis());
-		return newTimestamp;
+		DateTime dt = new DateTime(xmlDateTime);
+		Timestamp ts = new Timestamp(dt.getMillis());
+		return ts;
 	}
 
 	/**
 	 * Converts a String to XMLGregorianCalendar.
 	 */
 	public static XMLGregorianCalendar convertToXMLGregCal(String str){
-		// Converts to XML dateTime
-		return factory.newXMLGregorianCalendar(str);
-	}	
+		DateTime dt = convertToDateTime(str);
+		String st = noMilliFormatter.print(dt);
+		return factory.newXMLGregorianCalendar(st);
+	}
+	
+	/**
+	 * Converts a String of pattern "yyyy-MM-dd HH:mm" to DateTime.
+	 */
+	public static DateTime convertToDateTime(String str){
+		DateTime dt = null;
+		try {
+			dt = inputFormatter.parseDateTime(str);
+		} catch (IllegalArgumentException e) {
+			throw new InputException(Common.EXCEPTION_PARSING_DATETIME);
+		}
+		return dt;
+	}
 
 	/**
 	 * Validates the BATCH execution of Data Manipulation Language (DML) statements, such as INSERT, UPDATE or DELETE.

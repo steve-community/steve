@@ -250,11 +250,9 @@ public class ServletOperationsV12 extends HttpServlet {
 		+ "<b>Parameters</b><hr>\n"
 		+ "<table class=\"params\">\n"
 		+ "<tr><td>Connector Id (integer, 0 = charge point as a whole):</td><td><input type=\"number\" min=\"0\" name=\"connectorId\"></td></tr>\n"
-		+ "<tr><td>Availability Type:</td><td><select name=\"availType\">"
-		+ "<option value=\"Inoperative\">Inoperative</option>"
-		+ "<option value=\"Operative\">Operative</option>"
-		+ "</select></td></tr>\n"
-		+ "<tr><td></td><td id=\"add_space\"><input type=\"submit\" value=\"Perform\"></td></tr>\n"	   	
+		+ "<tr><td>Availability Type:</td><td><input type=\"radio\" name=\"availType\" value=\"Inoperative\"> Inoperative</td></tr>\n"
+		+ "<tr><td></td><td><input type=\"radio\" name=\"availType\" value=\"Operative\"> Operative</td></tr>\n"
+		+ "<tr><td></td><td id=\"add_space\"><input type=\"submit\" value=\"Perform\"></td></tr>\n"  	
 		+ "</table>\n</form>\n</div>";
 	}
 
@@ -351,9 +349,9 @@ public class ServletOperationsV12 extends HttpServlet {
 		+ "<tr><td>Location (directory URI):</td><td><input type=\"text\" name=\"location\"></td></tr>\n"		
 		+ "<tr><td>Retries (integer):</td><td><input type=\"number\" min=\"0\" name=\"retries\"></td></tr>\n"
 		+ "<tr><td>Retry Interval (integer):</td><td><input type=\"number\" min=\"0\" name=\"retryInterval\"></td></tr>\n"
-		+ "<tr><td>Start time (ex: 2011-12-21T11:33:23Z):</td><td><input type=\"datetime\" name=\"startTime\"></td></tr>\n"
-		+ "<tr><td>Stop time (ex: 2011-12-21T11:33:23Z):</td><td><input type=\"datetime\" name=\"stopTime\"></td></tr>\n"
-		+ "<tr><td></td><td id=\"add_space\"><input type=\"submit\" value=\"Perform\"></td></tr>\n"  	   	
+		+ "<tr><td>Start time (ex: 2011-12-21 11:33):</td><td><input type=\"datetime\" name=\"startTime\"></td></tr>\n"
+		+ "<tr><td>Stop time (ex: 2011-12-21 11:33):</td><td><input type=\"datetime\" name=\"stopTime\"></td></tr>\n"
+		+ "<tr><td></td><td id=\"add_space\"><input type=\"submit\" value=\"Perform\"></td></tr>\n"	   	
 		+ "</table>\n</form>\n</div>";
 	}
 
@@ -433,13 +431,9 @@ public class ServletOperationsV12 extends HttpServlet {
 		+ "<div class=\"op-content\">\n<form method=\"POST\" action=\"" + contextPath + servletPath + "/Reset\">\n" 
 		+ printChargePoints()
 		+ "<b>Parameters</b><hr>\n"
-		+ "<table class=\"params\">\n"
-		+ "<tr><td>Reset type:</td><td>\n"
-		+ "<select name=\"resetType\">\n"
-		+ "<option value=\"Hard\">Hard</option>\n"
-		+ "<option value=\"Soft\">Soft</option>\n"
-		+ "</select>\n"
-		+ "</td></tr>\n"
+		+ "<table class=\"params\">\n"		
+		+ "<tr><td>Reset Type:</td><td><input type=\"radio\" name=\"resetType\" value=\"Hard\"> Hard</td></tr>\n"
+		+ "<tr><td></td><td><input type=\"radio\" name=\"resetType\" value=\"Soft\"> Soft</td></tr>\n"		
 		+ "<tr><td></td><td id=\"add_space\"><input type=\"submit\" value=\"Perform\"></td></tr>\n"
 		+ "</table>\n</form>\n</div>";
 	}
@@ -495,9 +489,9 @@ public class ServletOperationsV12 extends HttpServlet {
 		+ "<table class=\"params\">\n"
 		+ "<tr><td>Location (URI):</td><td><input type=\"text\" name=\"location\"></td></tr>\n"
 		+ "<tr><td>Retries (integer):</td><td><input type=\"number\" min=\"0\" name=\"retries\"></td></tr>\n"
-		+ "<tr><td>Retrieve Date (ex: 2011-12-21T11:33:23Z):</td><td><input type=\"datetime\" name=\"retrieveDate\"></td></tr>\n"
+		+ "<tr><td>Retrieve Date (ex: 2011-12-21 11:33):</td><td><input type=\"datetime\" name=\"retrieveDate\"></td></tr>\n"
 		+ "<tr><td>Retry Interval (integer):</td><td><input type=\"number\" min=\"0\" name=\"retryInterval\"></td></tr>\n"
-		+ "<tr><td></td><td id=\"add_space\"><input type=\"submit\" value=\"Perform\"></td></tr>\n"	
+		+ "<tr><td></td><td id=\"add_space\"><input type=\"submit\" value=\"Perform\"></td></tr>\n"
 		+ "</table>\n</form>\n</div>";
 	}
 }

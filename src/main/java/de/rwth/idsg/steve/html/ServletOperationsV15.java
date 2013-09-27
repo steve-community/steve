@@ -9,8 +9,19 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import ocpp.cp._2010._08.ChangeAvailabilityRequest;
-import ocpp.cp._2012._06.ReserveNowRequest;
+import ocpp.cp._2012._06.ChangeAvailabilityRequest;
+import ocpp.cp._2012._06.ChangeConfigurationRequest;
+import ocpp.cp._2012._06.ClearCacheRequest;
+import ocpp.cp._2012._06.DataTransferRequest;
+import ocpp.cp._2012._06.GetConfigurationRequest;
+import ocpp.cp._2012._06.GetDiagnosticsRequest;
+import ocpp.cp._2012._06.GetLocalListVersionRequest;
+import ocpp.cp._2012._06.RemoteStartTransactionRequest;
+import ocpp.cp._2012._06.RemoteStopTransactionRequest;
+import ocpp.cp._2012._06.ResetRequest;
+import ocpp.cp._2012._06.SendLocalListRequest;
+import ocpp.cp._2012._06.UnlockConnectorRequest;
+import ocpp.cp._2012._06.UpdateFirmwareRequest;
 import de.rwth.idsg.steve.ChargePointService15_Client;
 import de.rwth.idsg.steve.common.ClientDBAccess;
 
@@ -117,12 +128,125 @@ public class ServletOperationsV15 extends HttpServlet {
 		// chargePointItem[0] : chargebox id
 		// chargePointItem[1] : endpoint (IP) address
 		
-		
-		if (command.equals("/ReserveNow")){
+		if (command.equals("/ChangeAvailability")){
+			String availType = request.getParameter("availType");
+			String connectorIdSTR = request.getParameter("connectorId");
+			int connectorId;
+			if (connectorIdSTR.isEmpty()) {
+				connectorId = 0;
+			} else {
+				connectorId = Integer.parseInt(connectorIdSTR);
+			}
+			ChangeAvailabilityRequest req = cpsClient.prepareChangeAvailability(connectorId, availType);
+
+			for(String temp: chargePointItems){
+				String[] chargePointItem = temp.split(";");
+				result = cpsClient.sendChangeAvailability(chargePointItem[0], chargePointItem[1], req);
+				writer.println(result);
+			}
+
+		} else if (command.equals("/ChangeConfiguration")) {
+			String confKey = request.getParameter("confKey");
+			String value = request.getParameter("value");
+			ChangeConfigurationRequest req = cpsClient.prepareChangeConfiguration(confKey, value);
+
+			for(String temp: chargePointItems){
+				String[] chargePointItem = temp.split(";");
+				result = cpsClient.sendChangeConfiguration(chargePointItem[0], chargePointItem[1], req);
+				writer.println(result);
+			}
+
+		} else if (command.equals("/ClearCache")) {
+			ClearCacheRequest req = cpsClient.prepareClearCache();
+
+			for(String temp: chargePointItems){
+				String[] chargePointItem = temp.split(";");
+				result = cpsClient.sendClearCache(chargePointItem[0], chargePointItem[1], req);
+				writer.println(result);
+			}	
+
+		} else if (command.equals("/GetDiagnostics")) {
+			String location = request.getParameter("location");
+			int retries = Integer.parseInt(request.getParameter("retries"));
+			int retryInterval = Integer.parseInt(request.getParameter("retryInterval"));
+			String startTime = request.getParameter("startTime");
+			String stopTime = request.getParameter("stopTime");
+			GetDiagnosticsRequest req = cpsClient.prepareGetDiagnostics(location, retries, retryInterval, startTime, stopTime);
+
+			for(String temp: chargePointItems){
+				String[] chargePointItem = temp.split(";");
+				result = cpsClient.sendGetDiagnostics(chargePointItem[0], chargePointItem[1], req);
+				writer.println(result);
+			}
+
+		} else if (command.equals("/RemoteStartTransaction")) {
 			int connectorId = Integer.parseInt(request.getParameter("connectorId"));
+			String idTag = request.getParameter("idTag");
+			RemoteStartTransactionRequest req = cpsClient.prepareRemoteStartTransaction(connectorId, idTag);
+
+			for(String temp: chargePointItems){
+				String[] chargePointItem = temp.split(";");
+				result = cpsClient.sendRemoteStartTransaction(chargePointItem[0], chargePointItem[1], req);
+				writer.println(result);
+			}
+
+		} else if (command.equals("/RemoteStopTransaction")) {
+			int transactionId = Integer.parseInt(request.getParameter("transactionId"));
+			RemoteStopTransactionRequest req = cpsClient.prepareRemoteStopTransaction(transactionId);
+
+			for(String temp: chargePointItems){
+				String[] chargePointItem = temp.split(";");
+				result = cpsClient.sendRemoteStopTransaction(chargePointItem[0], chargePointItem[1], req);
+				writer.println(result);
+			}
+
+		} else if (command.equals("/Reset")){			
+			String resetType = request.getParameter("resetType");
+			ResetRequest req = cpsClient.prepareReset(resetType);
+
+			for(String temp: chargePointItems){
+				String[] chargePointItem = temp.split(";");
+				result = cpsClient.sendReset(chargePointItem[0], chargePointItem[1], req);
+				writer.println(result);
+			}
+
+		} else if (command.equals("/UnlockConnector")) {
+			int connectorId = Integer.parseInt(request.getParameter("connectorId"));
+			UnlockConnectorRequest req = cpsClient.prepareUnlockConnector(connectorId);
+
+			for(String temp: chargePointItems){
+				String[] chargePointItem = temp.split(";");
+				result = cpsClient.sendUnlockConnector(chargePointItem[0], chargePointItem[1], req);
+				writer.println(result);
+			}
+
+		} else if (command.equals("/UpdateFirmware")){
+			String location = request.getParameter("location");
+			int retries = Integer.parseInt(request.getParameter("retries"));
+			String retrieveDate = request.getParameter("retrieveDate");
+			int retryInterval = Integer.parseInt(request.getParameter("retryInterval"));
+			UpdateFirmwareRequest req = cpsClient.prepareUpdateFirmware(location, retries, retrieveDate, retryInterval);
+
+			for(String temp: chargePointItems){
+				String[] chargePointItem = temp.split(";");
+				result = cpsClient.sendUpdateFirmware(chargePointItem[0], chargePointItem[1], req);
+				writer.println(result);
+			}
+		
+		///// New operations with OCPP 1.5 /////
+			
+		} else if (command.equals("/ReserveNow")){			
 			String expiryString = request.getParameter("expiryDate");
 			String idTag = request.getParameter("idTag");
 			String parentIdTag = request.getParameter("parentIdTag");
+			String connectorIdSTR = request.getParameter("connectorId");
+			
+			int connectorId;
+			if (connectorIdSTR.isEmpty()) {
+				connectorId = 0;
+			} else {
+				connectorId = Integer.parseInt(connectorIdSTR);
+			}
 			
 			// Only select the first item
 			String[] chargePointItem = chargePointItems[0].split(";");
@@ -138,7 +262,51 @@ public class ServletOperationsV15 extends HttpServlet {
 			
 			result = cpsClient.cancelReservation(chargePointItem[0], chargePointItem[1], reservationId);
 			writer.println(result);
-		}	
+			
+		} else if (command.equals("/DataTransfer")){
+			String vendorId = request.getParameter("vendorId");
+			String messageId = request.getParameter("messageId");
+			String data = request.getParameter("data");
+			DataTransferRequest req = cpsClient.prepareDataTransfer(vendorId, messageId, data);
+			
+			for(String temp: chargePointItems){
+				String[] chargePointItem = temp.split(";");
+				result = cpsClient.sendDataTransfer(chargePointItem[0], chargePointItem[1], req);
+				writer.println(result);
+			}
+			
+		} else if (command.equals("/GetConfiguration")){
+			String[] confKeys = request.getParameterValues("confKeys");
+			GetConfigurationRequest req = cpsClient.prepareGetConfiguration(confKeys);
+			
+			for(String temp: chargePointItems){
+				String[] chargePointItem = temp.split(";");
+				result = cpsClient.sendGetConfiguration(chargePointItem[0], chargePointItem[1], req);
+				writer.println(result);
+			}
+			
+		} else if (command.equals("/GetLocalListVersion")){			
+			GetLocalListVersionRequest req = cpsClient.prepareGetLocalListVersion();
+			
+			for(String temp: chargePointItems){
+				String[] chargePointItem = temp.split(";");
+				result = cpsClient.sendGetLocalListVersion(chargePointItem[0], chargePointItem[1], req);
+				writer.println(result);
+			}
+		
+			//TODO: Needs more work for localAuthorisationList
+		} else if (command.equals("/SendLocalList")){
+			int listVersion = Integer.parseInt(request.getParameter("listVersion"));
+			String localAuthorisationList = request.getParameter("localAuthorisationList");
+			String updateType = request.getParameter("updateType");			
+			SendLocalListRequest req = cpsClient.prepareSendLocalList(listVersion, localAuthorisationList, updateType);
+			
+			for(String temp: chargePointItems){
+				String[] chargePointItem = temp.split(";");
+				result = cpsClient.sendSendLocalList(chargePointItem[0], chargePointItem[1], req);
+				writer.println(result);
+			}			
+		} 
 		writer.close();	
 	}
 	
@@ -190,7 +358,7 @@ public class ServletOperationsV15 extends HttpServlet {
 		+ printChargePoints()				
 		+ "<b>Parameters</b><hr>\n"
 		+ "<table class=\"params\">\n"
-		+ "<tr><td>Connector Id (integer, 0 = charge point as a whole):</td><td><input type=\"number\" min=\"0\" name=\"connectorId\"></td></tr>\n"
+		+ "<tr><td>Connector Id (integer):</td><td><input type=\"number\" min=\"0\" name=\"connectorId\" placeholder=\"if empty, 0 = charge point as a whole\"></td></tr>\n"
 		+ "<tr><td>Availability Type:</td><td><input type=\"radio\" name=\"availType\" value=\"Inoperative\"> Inoperative</td></tr>\n"
 		+ "<tr><td></td><td><input type=\"radio\" name=\"availType\" value=\"Operative\"> Operative</td></tr>\n"
 		+ "<tr><td></td><td id=\"add_space\"><input type=\"submit\" value=\"Perform\"></td></tr>\n"  	
@@ -497,7 +665,6 @@ public class ServletOperationsV15 extends HttpServlet {
 		+ "</table>\n</form>\n</div>";
 	}
 	
-
 	private String printReserveNow() {
 		return				
 		// Print the menu div on the left 
@@ -527,7 +694,7 @@ public class ServletOperationsV15 extends HttpServlet {
 		+ printChargePoints()
 		+ "<b>Parameters</b><hr>\n"
 		+ "<table class=\"params\">\n"
-		+ "<tr><td>Connector Id (integer, 0 = not for a specific connector):</td><td><input type=\"number\" min=\"0\" name=\"connectorId\"></td></tr>\n"	
+		+ "<tr><td>Connector Id (integer):</td><td><input type=\"number\" min=\"0\" name=\"connectorId\" placeholder=\"if empty, 0 = not for a specific connector\"></td></tr>\n"	
 		+ "<tr><td>Expiry Date (ex: 2011-12-21 11:33):</td><td><input type=\"datetime\" name=\"expiryDate\"></td></tr>\n"
 		+ "<tr><td>idTag (string):</td><td><input type=\"text\" name=\"idTag\"></td></tr>\n"
 		+ "<tr><td>parentIdTag (string):</td><td><input type=\"text\" name=\"parentIdTag\" placeholder=\"optional\"></td></tr>\n"
@@ -569,7 +736,6 @@ public class ServletOperationsV15 extends HttpServlet {
 		+ "</table>\n</form>\n</div>";
 	}
 	
-
 	private String printDataTransfer() {
 		return				
 		// Print the menu div on the left 
@@ -656,7 +822,6 @@ public class ServletOperationsV15 extends HttpServlet {
 		+ "</table>\n</form>\n</div>";
 	}
 	
-
 	private String printGetLocalListVersion() {
 		return				
 		// Print the menu div on the left 
@@ -692,8 +857,6 @@ public class ServletOperationsV15 extends HttpServlet {
 		+ "</center>\n</form>\n</div>";	
 	}
 	
-
-
 	private Object printSendLocalList() {
 		return				
 		// Print the menu div on the left 
@@ -723,7 +886,7 @@ public class ServletOperationsV15 extends HttpServlet {
 		+ printChargePoints()
 		+ "<b>Parameters</b><hr>\n"
 		+ "<table class=\"params\">\n"
-		+ "<tr><td>hash (String):</td><td><input type=\"number\" name=\"hash\"></td></tr>\n"
+		+ "<tr><td>hash (String):</td><td><i>Optional, omitted for now</i></td></tr>\n"
 		+ "<tr><td>listVersion (integer):</td><td><input type=\"number\" name=\"listVersion\"></td></tr>\n"
 		+ "<tr><td>localAuthorisationList:</td><td><input type=\"text\" name=\"localAuthorisationList\"></td></tr>\n"
 		+ "<tr><td>Update Type:</td><td><input type=\"radio\" name=\"updateType\" value=\"Hard\"> Differential</td></tr>\n"

@@ -1,8 +1,8 @@
 
 package de.rwth.idsg.steve;
 	
+import java.util.Arrays;
 import java.util.List;
-import java.util.UUID;
 
 import ocpp.cp._2012._06.AvailabilityType;
 import ocpp.cp._2012._06.CancelReservationRequest;
@@ -35,6 +35,7 @@ import ocpp.cp._2012._06.ResetRequest;
 import ocpp.cp._2012._06.ResetResponse;
 import ocpp.cp._2012._06.ResetType;
 import ocpp.cp._2012._06.SendLocalListRequest;
+import ocpp.cp._2012._06.SendLocalListResponse;
 import ocpp.cp._2012._06.UnlockConnectorRequest;
 import ocpp.cp._2012._06.UnlockConnectorResponse;
 import ocpp.cp._2012._06.UpdateFirmwareRequest;
@@ -131,15 +132,21 @@ public class ChargePointService15_Client {
 	
 	/** Start: New with OCPP 1.5  **/	
 	
-	// TODO
+	// TODO: Needs more work, makes no sense as it is right now
 	public DataTransferRequest prepareDataTransfer(String vendorId, String messageId, String data){
 		DataTransferRequest req = new DataTransferRequest();
+		req.setVendorId(vendorId);
+		req.setMessageId(messageId);
+		req.setData(data);
 		return req;	
 	}
 	
-	public GetConfigurationRequest prepareGetConfiguration(List<String> confKeys){
-		GetConfigurationRequest req = new GetConfigurationRequest();
-		if (confKeys != null) req.getKey().addAll(confKeys);
+	public GetConfigurationRequest prepareGetConfiguration(String[] confKeys){
+		GetConfigurationRequest req = new GetConfigurationRequest();		
+		if (confKeys.length != 0){
+			List<String> confKeysLIST = Arrays.asList(confKeys);
+			req.getKey().addAll(confKeysLIST);
+		}
 		return req;
 	}	
 	
@@ -148,9 +155,12 @@ public class ChargePointService15_Client {
 		return req;
 	}
 	
-	// TODO
-	public SendLocalListRequest prepareSendLocalList(){	
+	//TODO: Needs more work for localAuthorisationList
+	public SendLocalListRequest prepareSendLocalList(int listVersion, String localAuthorisationList, String updateType){	
 		SendLocalListRequest req = new SendLocalListRequest();
+		req.setListVersion(listVersion);
+		req.setUpdateType( UpdateType.fromValue(updateType) );
+		//req.getLocalAuthorisationList().add(e)
 		return req;
 	}
 	
@@ -234,9 +244,15 @@ public class ChargePointService15_Client {
 
 	/** Start: New with OCPP 1.5  **/
 	
-	// TODO
+	// TODO: Needs more work, makes no sense as it is right now
 	public String sendDataTransfer(String chargeBoxId, String endpoint_address, DataTransferRequest req){
-		return "";
+		LOG.info("Invoking dataTransfer...");
+		factory.setAddress(endpoint_address);
+		ChargePointService client = (ChargePointService) factory.create();
+		DataTransferResponse response = client.dataTransfer(req, chargeBoxId);
+		
+		return "Charge point: " + chargeBoxId + ", Request: DataTransfer, Response: " + response.getStatus().value() 
+				+ "\n+ Data: " + response.getData();
 	}
 	
 	public String sendGetConfiguration(String chargeBoxId, String endpoint_address, GetConfigurationRequest req){
@@ -265,8 +281,7 @@ public class ChargePointService15_Client {
 			} else {
 				builder.append(temp + ", ");
 			}
-		}
-		
+		}	
 		return builder.toString();
 	}
 	
@@ -278,9 +293,15 @@ public class ChargePointService15_Client {
 		return "Charge point: " + chargeBoxId + ", Request: GetLocalListVersion, Response: " + response.getListVersion();
 	}
 	
-	// TODO
+	// TODO: Needs more work, makes no sense as it is right now
 	public String sendSendLocalList(String chargeBoxId, String endpoint_address, SendLocalListRequest req){
-		return "";
+		LOG.info("Invoking sendLocalList...");
+		factory.setAddress(endpoint_address);
+		ChargePointService client = (ChargePointService) factory.create();
+		SendLocalListResponse response = client.sendLocalList(req, chargeBoxId);
+		
+		return "Charge point: " + chargeBoxId + ", Request: SendLocalList, Response: " + response.getStatus().value() 
+				+ "\n+ Hash: " + response.getHash();
 	}
 		
 	/////// The following operations are specific to charge point: PREPARE and SEND Request Payloads ///////
@@ -310,7 +331,7 @@ public class ChargePointService15_Client {
 		ChargePointService client = (ChargePointService) factory.create();
 		ReserveNowResponse response = client.reserveNow(req, chargeBoxId);
 		
-		// Check response, and delete reservation from DB if it is not accepted by the charging point
+		// Check response, and cancel reservation from DB if it is not accepted by the charging point
 		ReservationStatus responseStatus = response.getStatus();
 		if (responseStatus != ReservationStatus.ACCEPTED) {
 			ClientDBAccess.cancelReservation(reservationId);

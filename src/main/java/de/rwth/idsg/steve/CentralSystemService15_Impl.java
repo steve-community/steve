@@ -38,7 +38,6 @@ import org.apache.cxf.ws.addressing.AddressingProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import de.rwth.idsg.steve.common.ClientDBAccess;
 import de.rwth.idsg.steve.common.Constants;
 import de.rwth.idsg.steve.common.SQLIdTagData;
 import de.rwth.idsg.steve.common.ServiceDBAccess;
@@ -159,42 +158,33 @@ public class CentralSystemService15_Impl implements CentralSystemService {
 		return _return;
 	}
 	
-
+	// DONE
 	public StartTransactionResponse startTransaction(StartTransactionRequest parameters,java.lang.String chargeBoxIdentity) { 
 		LOG.info("Executing operation startTransaction");
 
 		// Get the authorization info of the user
 		String idTag = parameters.getIdTag();		
-		SQLIdTagData sqlData = ServiceDBAccess.readIdTagColumns(idTag);
+		SQLIdTagData sqlData = ServiceDBAccess.getIdTagColumns(idTag);
 		IdTagInfo _returnIdTagInfo = createIdTagInfo(sqlData);
 		
 		int transactionId = -1;
 		if (_returnIdTagInfo.getStatus() == AuthorizationStatus.ACCEPTED){
+			
 			// Get parameters and insert transaction to DB
 			int connectorId = parameters.getConnectorId();
+			Integer reservationId = parameters.getReservationId();
 			Timestamp startTimestamp = Utils.convertToTimestamp(parameters.getTimestamp());
 			String startMeterValue = Integer.toString(parameters.getMeterStart());
-			transactionId = ServiceDBAccess.insertTransaction(chargeBoxIdentity, connectorId, idTag, startTimestamp, startMeterValue);
-			
-			// Get the parameter and end the reservation
-			Integer obj_reservId = parameters.getReservationId();
-			if (obj_reservId != null) {
-				int reservId = obj_reservId.intValue();
-				boolean ended = ClientDBAccess.endReservation(reservId);
-				if (ended == true) {
-					LOG.info("The reservation " + reservId + " has been ended.");
-				} else {
-					LOG.info("The reservation " + reservId + " could NOT be ended.");
-				}
-			}			
-		}		
+			transactionId = ServiceDBAccess.insertTransaction(chargeBoxIdentity, connectorId, idTag, startTimestamp, startMeterValue, reservationId);			
+		}
+		
 		StartTransactionResponse _return = new StartTransactionResponse();
 		_return.setIdTagInfo(_returnIdTagInfo);
 		if (transactionId != -1) { _return.setTransactionId(transactionId); }
 		return _return;
 	}
 	
-
+	// DONE
 	public StopTransactionResponse stopTransaction(StopTransactionRequest parameters,java.lang.String chargeBoxIdentity) { 
 		LOG.info("Executing operation stopTransaction");
 
@@ -204,16 +194,22 @@ public class CentralSystemService15_Impl implements CentralSystemService {
 		String stopMeterValue = Integer.toString(parameters.getMeterStop());		
 		ServiceDBAccess.updateTransaction(chargeBoxIdentity, transactionId, stopTimestamp, stopMeterValue);
 		
-		List<TransactionData> transData = parameters.getTransactionData();
-		if (transData != null){
-			// TODO: Do something
+		// Get the connectorId that is used for transactionId, and insert meter values
+		List<TransactionData> transDataList = parameters.getTransactionData();
+		if (transDataList != null){
+			for (TransactionData temp : transDataList) {
+				int connectorId = ServiceDBAccess.getConnectorId(transactionId);
+				if (connectorId != -1) {
+					ServiceDBAccess.insertMeterValues15(chargeBoxIdentity, connectorId, transactionId, temp.getValues());
+				}
+			}
 		}
 		
 		// Get the authorization info of the user
 		StopTransactionResponse _return = new StopTransactionResponse();
 		String idTag = parameters.getIdTag();
 		if (idTag != null) {
-			SQLIdTagData sqlData = ServiceDBAccess.readIdTagColumns(idTag);
+			SQLIdTagData sqlData = ServiceDBAccess.getIdTagColumns(idTag);
 			_return.setIdTagInfo(createIdTagInfo(sqlData));
 		}
 		return _return;
@@ -234,7 +230,7 @@ public class CentralSystemService15_Impl implements CentralSystemService {
 
 		// Get the authorization info of the user
 		String idTag = parameters.getIdTag();
-		SQLIdTagData sqlData = ServiceDBAccess.readIdTagColumns(idTag);
+		SQLIdTagData sqlData = ServiceDBAccess.getIdTagColumns(idTag);
 
 		AuthorizeResponse _return = new AuthorizeResponse();
 		_return.setIdTagInfo(createIdTagInfo(sqlData));
@@ -249,9 +245,9 @@ public class CentralSystemService15_Impl implements CentralSystemService {
 		String messageId = parameters.getMessageId();
 		String data = parameters.getData();
 		
-		LOG.info(vendorId);
-		if (!messageId.isEmpty()) LOG.info(messageId);		
-		if (!data.isEmpty()) LOG.info(data);
+		LOG.info("[Data Transfer] Charge point: {}, Vendor Id: {}", chargeBoxIdentity, vendorId);
+		if (!messageId.isEmpty()) LOG.info("[Data Transfer] Message Id: {}", messageId);		
+		if (!data.isEmpty()) LOG.info("[Data Transfer] Data: {}", data);
 		
 		DataTransferResponse _return = new DataTransferResponse();
 		//_return.setData(value);

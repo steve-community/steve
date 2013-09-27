@@ -278,10 +278,6 @@ public class ServiceDBAccess {
 			Integer transactionId,
 			List<ocpp.cs._2012._06.MeterValue> list){
 		
-		// Initialize with an invalid id
-		int transactionIdINT = -1;
-		if (transactionId != null) transactionIdINT = transactionId.intValue();
-		
 		Connection connect = null;
 		PreparedStatement pt = null;
 		try {
@@ -294,7 +290,7 @@ public class ServiceDBAccess {
 					+ "SELECT connector_pk , ? , ? , ? , ? , ? , ? , ? , ? FROM connector WHERE chargeBoxId = ? AND connectorId = ?");
 			
 			// if transactionId is NOT present, write NULL to the field ...
-			if (transactionIdINT == -1){			
+			if (transactionId == null){			
 				// OCPP 1.5 allows multiple "values" elements
 				for (ocpp.cs._2012._06.MeterValue valuesElement : list) {
 					Timestamp timestamp = Utils.convertToTimestamp(valuesElement.getTimestamp());
@@ -328,7 +324,7 @@ public class ServiceDBAccess {
 					List<ocpp.cs._2012._06.MeterValue.Value> valueList = valuesElement.getValue();
 					for (ocpp.cs._2012._06.MeterValue.Value valueElement : valueList){
 						// Set the parameter indices for batch execution
-						pt.setInt(1, transactionIdINT);
+						pt.setInt(1, transactionId.intValue());
 						pt.setTimestamp(2, timestamp);
 						pt.setString(3, valueElement.getValue());					
 						/** Start: OCPP 1.5 allows for each "value" element to have optional attributes **/
@@ -366,14 +362,16 @@ public class ServiceDBAccess {
 	public static synchronized int insertTransaction(
 			String chargeBoxIdentity, 
 			int connectorId, 
-			String idTag, 
+			String idTag,
 			Timestamp startTimestamp, 
-			String startMeterValue){
+			String startMeterValue,
+			Integer reservationId){
 
 		// Initialize with an invalid id
 		int transactionId = -1;
 		Connection connect = null;
 		PreparedStatement pt = null;
+		ResultSet rs = null;
 		try {
 			// Prepare Database Access
 			connect = Utils.getConnectionFromPool();
@@ -392,40 +390,59 @@ public class ServiceDBAccess {
 			pt.setInt(5, connectorId);
 
 			// Insert the transaction into DB
-			int count = pt.executeUpdate();
+			int countTrans = pt.executeUpdate();
 
-			// Get the generated key in order to obtain the auto-incremented transaction_id
-			ResultSet rs = pt.getGeneratedKeys();	
+			// Get the generated key in order to obtain the auto-incremented transaction_pk
+			rs = pt.getGeneratedKeys();	
 			if (rs.next()) {
 				transactionId = rs.getInt(1); // transaction_pk is the 1. column
 			}
 
 			// Validate the change
-			if (count == 1) {
-				// Now we can commit
-				connect.commit();
+			if (countTrans == 1) {
+				// For OCPP 1.5: a startTransaction may be related to a reservation
+				if (reservationId != null) {
+					// Okay, now end the reservation
+					Utils.releaseResources(null, pt, rs);
+					pt = connect.prepareStatement("UPDATE reservation SET ended = 1 WHERE reservation_pk=?");
+					pt.setInt(1, reservationId.intValue());
+					// Execute the query
+					int countRes = pt.executeUpdate();
+					// Validate the change
+					if (countRes == 1) {
+						// Both operations successful, now we can commit
+						connect.commit();
+					} else {
+						// Ending the reservation failed, dismiss both changes
+						LOG.error("Transaction is being rolled back.");
+						connect.rollback();			
+					}					
+				} else {
+					// No reservationId, we can commit
+					connect.commit();
+				}
 			} else {
+				// startTransaction failed, dismiss the change
 				LOG.error("Transaction is being rolled back.");
 				connect.rollback();
 			}
 			connect.setAutoCommit(true);
-			Utils.releaseResources(null, pt, rs);
-
-			/**** START SENSOR MODIFICATION ****/
-
-			if (Constants.SENSORS_ENABLED) {
-				// Send message to the sensor that the transaction is granted to start
-				ChangeService_Client sensorClient = new ChangeService_Client();
-				sensorClient.sendChangeStatus(chargeBoxIdentity, Constants.SENSOR_ENDPOINT_ADDRESS, connectorId, Status.TRANS_STARTED);
-			}
-
-			/**** END SENSOR MODIFICATION ****/
-
 		} catch (SQLException e1) {
 			e1.printStackTrace();
 		} finally {
-			Utils.releaseResources(connect, null, null);
+			Utils.releaseResources(connect, pt, rs);
 		}
+		
+		/**** START SENSOR MODIFICATION ****/
+
+		if (Constants.SENSORS_ENABLED) {
+			// Send message to the sensor that the transaction is granted to start
+			ChangeService_Client sensorClient = new ChangeService_Client();
+			sensorClient.sendChangeStatus(chargeBoxIdentity, Constants.SENSOR_ENDPOINT_ADDRESS, connectorId, Status.TRANS_STARTED);
+		}
+
+		/**** END SENSOR MODIFICATION ****/
+		
 		return transactionId;
 	}
 	
@@ -461,46 +478,59 @@ public class ServiceDBAccess {
 				LOG.error("Transaction is being rolled back.");
 				connect.rollback();
 			}
-			
-			// Release only PreparedStatement. Connection will be reused.
-			Utils.releaseResources(null, pt, null);
-			connect.setAutoCommit(true);
-			
-			/**** START SENSOR MODIFICATION ****/
-			
-			if (Constants.SENSORS_ENABLED) {
-				pt = connect.prepareStatement("SELECT connectorId FROM connector WHERE connector_pk = (SELECT connector_pk FROM transaction WHERE transaction_pk = ?)");
-				pt.setInt(1, transactionId);
-				// Execute and get the result of the SQL query
-				ResultSet rs = pt.executeQuery();
+			connect.setAutoCommit(true);			
+		} catch (SQLException e1) {
+			e1.printStackTrace();
+		} finally {
+			Utils.releaseResources(connect, pt, null);	
+		}
 				
-				if (rs.next() == true) {
-					// Send message to the sensor that the transaction is granted to STOP
-					ChangeService_Client sensorClient = new ChangeService_Client();
-					sensorClient.sendChangeStatus(chargeBoxIdentity, Constants.SENSOR_ENDPOINT_ADDRESS, rs.getInt(1), Status.TRANS_STOPPED);
-				}
-				
-				// Release PreparedStatement and ResultSet. Connection will be reused.
-				Utils.releaseResources(null, pt, rs);
-			}
+		/**** START SENSOR MODIFICATION ****/
+		
+		if (Constants.SENSORS_ENABLED) {
 			
-			/**** END SENSOR MODIFICATION ****/
+			int connectorId = getConnectorId(transactionId);				
+			if (connectorId != -1) {
+				// Send message to the sensor that the transaction is granted to STOP
+				ChangeService_Client sensorClient = new ChangeService_Client();
+				sensorClient.sendChangeStatus(chargeBoxIdentity, Constants.SENSOR_ENDPOINT_ADDRESS, connectorId, Status.TRANS_STOPPED);
+			}	
+		}
+		
+		/**** END SENSOR MODIFICATION ****/
+	}
+	
+	public static synchronized int getConnectorId (int transactionId){
+		
+		int connectorId = -1;
+		Connection connect = null;
+		PreparedStatement pt = null;
+		ResultSet rs = null;
+		try {			
+			// Prepare Database Access
+			connect = Utils.getConnectionFromPool();
+			
+			pt = connect.prepareStatement("SELECT connectorId FROM connector WHERE connector_pk = (SELECT connector_pk FROM transaction WHERE transaction_pk = ?)");
+			pt.setInt(1, transactionId);
+			
+			// Execute and get the result of the SQL query
+			rs = pt.executeQuery();			
+			if (rs.next() == true) connectorId = rs.getInt(1);
 			
 		} catch (SQLException e1) {
 			e1.printStackTrace();
 		} finally {
-			// Release only PreparedStatement. Connection will be reused.
-			Utils.releaseResources(connect, null, null);	
+			Utils.releaseResources(connect, pt, rs);	
 		}	
+		return connectorId;
 	}
-	
 	
 	/**
 	 * Helper method to read the columns of an idTag row.
 	 * Returns null if the idTag is not found.
 	 * 
 	 */
-	public static synchronized SQLIdTagData readIdTagColumns(String idTag) {
+	public static synchronized SQLIdTagData getIdTagColumns(String idTag) {
 		
 		SQLIdTagData sqlAuthData = null;
 		Connection connect = null;

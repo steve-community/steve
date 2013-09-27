@@ -147,7 +147,7 @@ public class CentralSystemService12_Impl implements CentralSystemService {
 		
 		// Get the authorization info of the user
 		String idTag = parameters.getIdTag();		
-		SQLIdTagData sqlData = ServiceDBAccess.readIdTagColumns(idTag);
+		SQLIdTagData sqlData = ServiceDBAccess.getIdTagColumns(idTag);
 		IdTagInfo _returnIdTagInfo = createIdTagInfo(sqlData);
 		
 		int transactionId = -1;
@@ -155,7 +155,7 @@ public class CentralSystemService12_Impl implements CentralSystemService {
 			int connectorId = parameters.getConnectorId();
 			Timestamp startTimestamp = Utils.convertToTimestamp(parameters.getTimestamp());
 			String startMeterValue = Integer.toString(parameters.getMeterStart());
-			transactionId = ServiceDBAccess.insertTransaction(chargeBoxIdentity, connectorId, idTag, startTimestamp, startMeterValue);
+			transactionId = ServiceDBAccess.insertTransaction(chargeBoxIdentity, connectorId, idTag, startTimestamp, startMeterValue, null);
 		}
 		
 		StartTransactionResponse _return = new StartTransactionResponse();
@@ -176,7 +176,7 @@ public class CentralSystemService12_Impl implements CentralSystemService {
 		StopTransactionResponse _return = new StopTransactionResponse();
 		String idTag = parameters.getIdTag();
 		if (idTag != null) {
-			SQLIdTagData sqlData = ServiceDBAccess.readIdTagColumns(idTag);
+			SQLIdTagData sqlData = ServiceDBAccess.getIdTagColumns(idTag);
 			_return.setIdTagInfo(createIdTagInfo(sqlData));
 		}
 		return _return;
@@ -195,7 +195,7 @@ public class CentralSystemService12_Impl implements CentralSystemService {
 
 		// Get the authorization info of the user
 		String idTag = parameters.getIdTag();
-		SQLIdTagData sqlData = ServiceDBAccess.readIdTagColumns(idTag);
+		SQLIdTagData sqlData = ServiceDBAccess.getIdTagColumns(idTag);
 
 		AuthorizeResponse _return = new AuthorizeResponse();
 		_return.setIdTagInfo(createIdTagInfo(sqlData));

@@ -45,6 +45,7 @@ public class ClientDBAccess {
 	 * Returns the id of the reservation, if the reservation is booked.
 	 *
 	 */
+	//TODO: check first if the chargebox has available connectors to be reserved
 	public static synchronized int bookReservation(String idTag, String chargeBoxId, DateTime startDatetime, DateTime expiryDatetime) {
 
 		// Check the dates first
@@ -108,42 +109,6 @@ public class ClientDBAccess {
 			Utils.releaseResources(connect, pt, null);
 		}
 		return reservationId;
-	}
-	
-	/**
-	 * Ends a reservation
-	 *
-	 */
-	public static synchronized boolean endReservation(int reservation_pk) {
-		
-		boolean ended = false;
-		Connection connect = null;
-		PreparedStatement pt = null;
-		try { 
-			// Prepare Database Access
-			connect = Utils.getConnectionFromPool();
-			connect.setAutoCommit(false);
-			pt = connect.prepareStatement("UPDATE reservation SET ended = 1 WHERE reservation_pk=?");
-
-			// Set the parameter indices 
-			pt.setInt(1, reservation_pk);
-			// Execute the query
-			int count = pt.executeUpdate();
-			// Validate the change
-			if (count == 1) {
-				connect.commit();
-				ended = true;
-			}else{
-				LOG.error("Transaction is being rolled back.");
-				connect.rollback();
-			}
-			connect.setAutoCommit(true);
-		} catch (SQLException e1) {
-			e1.printStackTrace();
-		} finally {
-			Utils.releaseResources(connect, pt, null);
-		}
-		return ended;
 	}
 
 	/**

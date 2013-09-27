@@ -108,7 +108,13 @@ public class ServletOperationsV12 extends HttpServlet {
 
 		if (command.equals("/ChangeAvailability")){
 			String availType = request.getParameter("availType");
-			int connectorId = Integer.parseInt(request.getParameter("connectorId"));
+			String connectorIdSTR = request.getParameter("connectorId");
+			int connectorId;
+			if (connectorIdSTR.isEmpty()) {
+				connectorId = 0;
+			} else {
+				connectorId = Integer.parseInt(connectorIdSTR);
+			}
 			ChangeAvailabilityRequest req = cpsClient.prepareChangeAvailability(connectorId, availType);
 
 			for(String temp: chargePointItems){
@@ -249,7 +255,7 @@ public class ServletOperationsV12 extends HttpServlet {
 		+ printChargePoints()				
 		+ "<b>Parameters</b><hr>\n"
 		+ "<table class=\"params\">\n"
-		+ "<tr><td>Connector Id (integer, 0 = charge point as a whole):</td><td><input type=\"number\" min=\"0\" name=\"connectorId\"></td></tr>\n"
+		+ "<tr><td>Connector Id (integer):</td><td><input type=\"number\" min=\"0\" name=\"connectorId\" placeholder=\"if empty, 0 = charge point as a whole\"></td></tr>\n"
 		+ "<tr><td>Availability Type:</td><td><input type=\"radio\" name=\"availType\" value=\"Inoperative\"> Inoperative</td></tr>\n"
 		+ "<tr><td></td><td><input type=\"radio\" name=\"availType\" value=\"Operative\"> Operative</td></tr>\n"
 		+ "<tr><td></td><td id=\"add_space\"><input type=\"submit\" value=\"Perform\"></td></tr>\n"  	

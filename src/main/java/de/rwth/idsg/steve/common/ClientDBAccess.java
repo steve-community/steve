@@ -98,6 +98,7 @@ public class ClientDBAccess {
 					reservationId = rs.getInt(1); // transaction_pk is the 1. column
 				}
 				connect.commit();
+				LOG.info("A new reservation {} is booked.", reservationId);
 			}else{
 				LOG.error("Transaction is being rolled back.");
 				connect.rollback();
@@ -115,9 +116,8 @@ public class ClientDBAccess {
 	 * Returns true, if the reservation is canceled.
 	 *
 	 */
-	public static synchronized boolean cancelReservation(int reservation_pk) {
+	public static synchronized void cancelReservation(int reservation_pk) {
 
-		boolean canceled = false;
 		Connection connect = null;
 		PreparedStatement pt = null;
 		try { 
@@ -133,10 +133,11 @@ public class ClientDBAccess {
 			// Validate the change
 			if (count == 1) {
 				connect.commit();
-				canceled = true;
+				LOG.info("The reservation {} is canceled.", reservation_pk);
 			}else{
 				LOG.error("Transaction is being rolled back.");
 				connect.rollback();
+				LOG.info("The reservation {} could NOT be canceled.", reservation_pk);
 			}
 			connect.setAutoCommit(true);
 		} catch (SQLException e1) {
@@ -144,7 +145,6 @@ public class ClientDBAccess {
 		} finally {
 			Utils.releaseResources(connect, pt, null);
 		}
-		return canceled;
 	}
 	
 	/**

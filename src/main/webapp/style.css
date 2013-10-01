@@ -1,5 +1,11 @@
 html, body { height: 100%; }
 
+
+#diffElements span a:link, #diffElements span  span a:visited { color:#000; text-decoration:none; cursor: default;}
+#diffElements span a:hover, #diffElements span a:active { color:#ce2828; text-decoration:none; cursor: default;}
+
+#diffElements input, #diffElements select {width: 130px;}
+
 body {
 	font-family: Verdana, sans-serif;
 	font-size: 12px;

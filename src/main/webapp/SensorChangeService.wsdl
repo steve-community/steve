@@ -51,13 +51,13 @@
 			<xsd:simpleType name="status">
 			    <xsd:annotation>
          			<xsd:documentation>SteVe can instruct a sensor to change its status if there is a reservation (Reserved), 
-         			if the charge point is not functional at the moment (Inoperative), or otherwise ready to charge for any one (Free).
+         			if the charge point is not functional at the moment (Inoperative), or otherwise ready to charge for any one (Ready).
          			Moreover, Steve informs the sensor about the charging status (Trans_Started, Trans_Stopped) and 
          			if the user is not authorized to charge (Trans_Rejected).
          			</xsd:documentation>
         		</xsd:annotation>
 				<xsd:restriction base="xsd:string">
-					<xsd:enumeration value="Free" />
+					<xsd:enumeration value="Ready" />
 					<xsd:enumeration value="Reserved" />
 					<xsd:enumeration value="Inoperative" />
 					<xsd:enumeration value="Trans_Started" />

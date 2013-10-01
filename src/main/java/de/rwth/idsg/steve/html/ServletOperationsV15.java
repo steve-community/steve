@@ -359,7 +359,7 @@ public class ServletOperationsV15 extends HttpServlet {
 		+ "<b>Parameters</b><hr>\n"
 		+ "<table class=\"params\">\n"
 		+ "<tr><td>Connector Id (integer):</td><td><input type=\"number\" min=\"0\" name=\"connectorId\" placeholder=\"if empty, 0 = charge point as a whole\"></td></tr>\n"
-		+ "<tr><td>Availability Type:</td><td><input type=\"radio\" name=\"availType\" value=\"Inoperative\"> Inoperative</td></tr>\n"
+		+ "<tr><td>Availability Type:</td><td><input type=\"radio\" name=\"availType\" value=\"Inoperative\" checked> Inoperative</td></tr>\n"
 		+ "<tr><td></td><td><input type=\"radio\" name=\"availType\" value=\"Operative\"> Operative</td></tr>\n"
 		+ "<tr><td></td><td id=\"add_space\"><input type=\"submit\" value=\"Perform\"></td></tr>\n"  	
 		+ "</table>\n</form>\n</div>";
@@ -588,7 +588,7 @@ public class ServletOperationsV15 extends HttpServlet {
 		+ printChargePoints()
 		+ "<b>Parameters</b><hr>\n"
 		+ "<table class=\"params\">\n"
-		+ "<tr><td>Reset Type:</td><td><input type=\"radio\" name=\"resetType\" value=\"Hard\"> Hard</td></tr>\n"
+		+ "<tr><td>Reset Type:</td><td><input type=\"radio\" name=\"resetType\" value=\"Hard\" checked> Hard</td></tr>\n"
 		+ "<tr><td></td><td><input type=\"radio\" name=\"resetType\" value=\"Soft\"> Soft</td></tr>\n"		
 		+ "<tr><td></td><td id=\"add_space\"><input type=\"submit\" value=\"Perform\"></td></tr>\n"
 		+ "</table>\n</form>\n</div>";
@@ -888,9 +888,9 @@ public class ServletOperationsV15 extends HttpServlet {
 		+ "<table class=\"params\">\n"
 		+ "<tr><td>hash (String):</td><td><i>Optional, omitted for now</i></td></tr>\n"
 		+ "<tr><td>listVersion (integer):</td><td><input type=\"number\" name=\"listVersion\"></td></tr>\n"
-		+ "<tr><td>localAuthorisationList:</td><td><input type=\"text\" name=\"localAuthorisationList\"></td></tr>\n"
-		+ "<tr><td>Update Type:</td><td><input type=\"radio\" name=\"updateType\" value=\"Hard\"> Differential</td></tr>\n"
-		+ "<tr><td></td><td><input type=\"radio\" name=\"updateType\" value=\"Full\"> Full</td></tr>\n"		
+		+ "<tr><td>Update Type:</td><td><input type=\"radio\" name=\"updateType\" value=\"Full\" onclick=\"removeElements()\" checked> Full</td></tr>\n"		
+		+ "<tr><td></td><td><input type=\"radio\" name=\"updateType\" value=\"Differential\" onclick=\"showElements()\"> Differential</td></tr>\n"
+		+ "<tr><td></td><td id=\"diffElements\"></td></tr>\n"
 		+ "<tr><td></td><td id=\"add_space\"><input type=\"submit\" value=\"Perform\"></td></tr>\n"
 		+ "</table>\n</form>\n</div>";
 	}

@@ -256,7 +256,7 @@ public class ServletOperationsV12 extends HttpServlet {
 		+ "<b>Parameters</b><hr>\n"
 		+ "<table class=\"params\">\n"
 		+ "<tr><td>Connector Id (integer):</td><td><input type=\"number\" min=\"0\" name=\"connectorId\" placeholder=\"if empty, 0 = charge point as a whole\"></td></tr>\n"
-		+ "<tr><td>Availability Type:</td><td><input type=\"radio\" name=\"availType\" value=\"Inoperative\"> Inoperative</td></tr>\n"
+		+ "<tr><td>Availability Type:</td><td><input type=\"radio\" name=\"availType\" value=\"Inoperative\" checked> Inoperative</td></tr>\n"
 		+ "<tr><td></td><td><input type=\"radio\" name=\"availType\" value=\"Operative\"> Operative</td></tr>\n"
 		+ "<tr><td></td><td id=\"add_space\"><input type=\"submit\" value=\"Perform\"></td></tr>\n"  	
 		+ "</table>\n</form>\n</div>";
@@ -438,7 +438,7 @@ public class ServletOperationsV12 extends HttpServlet {
 		+ printChargePoints()
 		+ "<b>Parameters</b><hr>\n"
 		+ "<table class=\"params\">\n"		
-		+ "<tr><td>Reset Type:</td><td><input type=\"radio\" name=\"resetType\" value=\"Hard\"> Hard</td></tr>\n"
+		+ "<tr><td>Reset Type:</td><td><input type=\"radio\" name=\"resetType\" value=\"Hard\" checked> Hard</td></tr>\n"
 		+ "<tr><td></td><td><input type=\"radio\" name=\"resetType\" value=\"Soft\"> Soft</td></tr>\n"		
 		+ "<tr><td></td><td id=\"add_space\"><input type=\"submit\" value=\"Perform\"></td></tr>\n"
 		+ "</table>\n</form>\n</div>";

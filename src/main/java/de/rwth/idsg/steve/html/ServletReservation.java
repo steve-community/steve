@@ -13,15 +13,12 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.joda.time.DateTime;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import de.rwth.idsg.steve.common.ClientDBAccess;
 import de.rwth.idsg.steve.common.Utils;
 
 public class ServletReservation extends HttpServlet {
-	
-	private static final Logger LOG = LoggerFactory.getLogger(ServletReservation.class);
+
 	private static final long serialVersionUID = 8576766110806723303L;
 	String contextPath, servletPath;
 
@@ -59,17 +56,11 @@ public class ServletReservation extends HttpServlet {
 			DateTime startDateTime = Utils.convertToDateTime(startString);
 			DateTime expiryDateTime = Utils.convertToDateTime(expiryString);
 
-			int reservationId = ClientDBAccess.bookReservation(idTag, chargeBoxId, startDateTime, expiryDateTime);
-			LOG.info("A new reservation " + reservationId + " is booked.");
+			ClientDBAccess.bookReservation(idTag, chargeBoxId, startDateTime, expiryDateTime);
 			
 		} else if (command.equals("/cancel")){
 			int reservation_pk = Integer.parseInt(request.getParameter("reservation_pk"));
-			boolean canceled = ClientDBAccess.cancelReservation(reservation_pk);
-			if (canceled == true) {
-				LOG.info("The reservation " + reservation_pk + " is canceled.");	
-			} else {
-				LOG.info("The reservation " + reservation_pk + " could NOT be canceled.");
-			}
+			ClientDBAccess.cancelReservation(reservation_pk);
 		}		
 		response.sendRedirect(contextPath + servletPath);
 		return;

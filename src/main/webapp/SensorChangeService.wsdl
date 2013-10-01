@@ -16,7 +16,8 @@
          			or for the vehicle to leave the parking spot before it times out.</xsd:documentation>
         		</xsd:annotation>
 				<xsd:sequence>
-					<xsd:element name="timeoutValue" type="xsd:int" minOccurs="1" maxOccurs="1" />
+					<xsd:element name="timeoutValue1" type="xsd:int" minOccurs="1" maxOccurs="1" />
+					<xsd:element name="timeoutValue2" type="xsd:int" minOccurs="1" maxOccurs="1" />
 				</xsd:sequence>
 			</xsd:complexType>
 

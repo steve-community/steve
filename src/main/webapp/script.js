@@ -44,12 +44,12 @@ function addElement() {
 	select.appendChild(option1);
 
 	var option2 = document.createElement("option");
-	option2.setAttribute("value", "Remove");
-	option2.innerHTML = "Remove";
+	option2.setAttribute("value", "Delete");
+	option2.innerHTML = "Delete";
 	select.appendChild(option2);
 	
 	var rem = document.createElement("a");
-	rem.setAttribute("title", "Delete this row");
+	rem.setAttribute("title", "Remove this row");
 	rem.setAttribute("onclick", "removeElement(this.parentNode)");
 	
 	var text = document.createTextNode("x");

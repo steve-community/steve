@@ -2,6 +2,7 @@ package de.rwth.idsg.steve.html;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 import javax.servlet.ServletException;
@@ -129,14 +130,19 @@ public class ServletOperationsV15 extends HttpServlet {
 		// chargePointItem[1] : endpoint (IP) address
 		
 		if (command.equals("/ChangeAvailability")){
-			String availType = request.getParameter("availType");
 			String connectorIdSTR = request.getParameter("connectorId");
 			int connectorId;
 			if (connectorIdSTR.isEmpty()) {
 				connectorId = 0;
 			} else {
-				connectorId = Integer.parseInt(connectorIdSTR);
+				try {
+					connectorId = Integer.parseInt(request.getParameter("connectorId"));	
+				} catch (NumberFormatException e) {
+					throw new InputException(Common.EXCEPTION_PARSING_NUMBER);
+				}
 			}
+			String availType = request.getParameter("availType");		
+
 			ChangeAvailabilityRequest req = cpsClient.prepareChangeAvailability(connectorId, availType);
 
 			for(String temp: chargePointItems){
@@ -166,13 +172,20 @@ public class ServletOperationsV15 extends HttpServlet {
 			}	
 
 		} else if (command.equals("/GetDiagnostics")) {
+			int retries;
+			int retryInterval;			
+			try {
+				retries = Integer.parseInt(request.getParameter("retries"));
+				retryInterval = Integer.parseInt(request.getParameter("retryInterval"));				
+			} catch (NumberFormatException e) {
+				throw new InputException(Common.EXCEPTION_PARSING_NUMBER);
+			}
 			String location = request.getParameter("location");
-			int retries = Integer.parseInt(request.getParameter("retries"));
-			int retryInterval = Integer.parseInt(request.getParameter("retryInterval"));
 			String startTime = request.getParameter("startTime");
-			String stopTime = request.getParameter("stopTime");
-			GetDiagnosticsRequest req = cpsClient.prepareGetDiagnostics(location, retries, retryInterval, startTime, stopTime);
+			String stopTime = request.getParameter("stopTime");	
 
+			GetDiagnosticsRequest req = cpsClient.prepareGetDiagnostics(location, retries, retryInterval, startTime, stopTime);
+			
 			for(String temp: chargePointItems){
 				String[] chargePointItem = temp.split(";");
 				result = cpsClient.sendGetDiagnostics(chargePointItem[0], chargePointItem[1], req);
@@ -180,8 +193,14 @@ public class ServletOperationsV15 extends HttpServlet {
 			}
 
 		} else if (command.equals("/RemoteStartTransaction")) {
-			int connectorId = Integer.parseInt(request.getParameter("connectorId"));
+			int connectorId;			
+			try {
+				connectorId = Integer.parseInt(request.getParameter("connectorId"));	
+			} catch (NumberFormatException e) {
+				throw new InputException(Common.EXCEPTION_PARSING_NUMBER);
+			}
 			String idTag = request.getParameter("idTag");
+			
 			RemoteStartTransactionRequest req = cpsClient.prepareRemoteStartTransaction(connectorId, idTag);
 
 			for(String temp: chargePointItems){
@@ -191,7 +210,13 @@ public class ServletOperationsV15 extends HttpServlet {
 			}
 
 		} else if (command.equals("/RemoteStopTransaction")) {
-			int transactionId = Integer.parseInt(request.getParameter("transactionId"));
+			int transactionId;			
+			try {
+				transactionId = Integer.parseInt(request.getParameter("transactionId"));
+			} catch (NumberFormatException e) {
+				throw new InputException(Common.EXCEPTION_PARSING_NUMBER);
+			}
+			
 			RemoteStopTransactionRequest req = cpsClient.prepareRemoteStopTransaction(transactionId);
 
 			for(String temp: chargePointItems){
@@ -211,7 +236,13 @@ public class ServletOperationsV15 extends HttpServlet {
 			}
 
 		} else if (command.equals("/UnlockConnector")) {
-			int connectorId = Integer.parseInt(request.getParameter("connectorId"));
+			int connectorId;			
+			try {
+				connectorId = Integer.parseInt(request.getParameter("connectorId"));	
+			} catch (NumberFormatException e) {
+				throw new InputException(Common.EXCEPTION_PARSING_NUMBER);
+			}
+			
 			UnlockConnectorRequest req = cpsClient.prepareUnlockConnector(connectorId);
 
 			for(String temp: chargePointItems){
@@ -221,10 +252,17 @@ public class ServletOperationsV15 extends HttpServlet {
 			}
 
 		} else if (command.equals("/UpdateFirmware")){
+			int retries;
+			int retryInterval;			
+			try {
+				retries = Integer.parseInt(request.getParameter("retries"));
+				retryInterval = Integer.parseInt(request.getParameter("retryInterval"));				
+			} catch (NumberFormatException e) {
+				throw new InputException(Common.EXCEPTION_PARSING_NUMBER);
+			}
 			String location = request.getParameter("location");
-			int retries = Integer.parseInt(request.getParameter("retries"));
-			String retrieveDate = request.getParameter("retrieveDate");
-			int retryInterval = Integer.parseInt(request.getParameter("retryInterval"));
+			String retrieveDate = request.getParameter("retrieveDate");	
+			
 			UpdateFirmwareRequest req = cpsClient.prepareUpdateFirmware(location, retries, retrieveDate, retryInterval);
 
 			for(String temp: chargePointItems){
@@ -236,17 +274,20 @@ public class ServletOperationsV15 extends HttpServlet {
 		///// New operations with OCPP 1.5 /////
 			
 		} else if (command.equals("/ReserveNow")){			
-			String expiryString = request.getParameter("expiryDate");
-			String idTag = request.getParameter("idTag");
-			String parentIdTag = request.getParameter("parentIdTag");
-			String connectorIdSTR = request.getParameter("connectorId");
-			
+			String connectorIdSTR = request.getParameter("connectorId");			
 			int connectorId;
 			if (connectorIdSTR.isEmpty()) {
 				connectorId = 0;
 			} else {
-				connectorId = Integer.parseInt(connectorIdSTR);
+				try {
+					connectorId = Integer.parseInt(connectorIdSTR);
+				} catch (NumberFormatException e) {
+					throw new InputException(Common.EXCEPTION_PARSING_NUMBER);
+				}
 			}
+			String expiryString = request.getParameter("expiryDate");
+			String idTag = request.getParameter("idTag");
+			String parentIdTag = request.getParameter("parentIdTag");
 			
 			// Only select the first item
 			String[] chargePointItem = chargePointItems[0].split(";");
@@ -255,7 +296,12 @@ public class ServletOperationsV15 extends HttpServlet {
 			writer.println(result);
 			
 		} else if (command.equals("/CancelReservation")){
-			int reservationId = Integer.parseInt(request.getParameter("reservationId"));
+			int reservationId;
+			try {
+				reservationId = Integer.parseInt(request.getParameter("reservationId"));
+			} catch (NumberFormatException e) {
+				throw new InputException(Common.EXCEPTION_PARSING_NUMBER);
+			}
 			
 			// Only select the first item
 			String[] chargePointItem = chargePointItems[0].split(";");
@@ -293,13 +339,37 @@ public class ServletOperationsV15 extends HttpServlet {
 				result = cpsClient.sendGetLocalListVersion(chargePointItem[0], chargePointItem[1], req);
 				writer.println(result);
 			}
-		
-			//TODO: Needs more work for localAuthorisationList
+	
 		} else if (command.equals("/SendLocalList")){
-			int listVersion = Integer.parseInt(request.getParameter("listVersion"));
-			String localAuthorisationList = request.getParameter("localAuthorisationList");
+			int listVersion;
+			try {
+				listVersion = Integer.parseInt(request.getParameter("listVersion"));
+			} catch (NumberFormatException e) {
+				throw new InputException(Common.EXCEPTION_PARSING_NUMBER);
+			}			
 			String updateType = request.getParameter("updateType");			
-			SendLocalListRequest req = cpsClient.prepareSendLocalList(listVersion, localAuthorisationList, updateType);
+			SendLocalListRequest req;
+			
+			if (updateType.equals("Differential")){
+				String[] idTagItems = request.getParameterValues("idTag");
+				String[] idTagDataItems = request.getParameterValues("idTagData");			
+				
+				// Depending on the selected value (AddUpdate or Delete)
+				// insert the idTags into corresponding lists.
+				ArrayList<String> addUpdateList = new ArrayList<String>();
+				ArrayList<String> deleteList = new ArrayList<String>();
+				for (int i = 0; i < idTagItems.length; i++) {
+					String instruction = idTagDataItems[i];					
+					if ( instruction.equals("AddUpdate") ) addUpdateList.add(idTagItems[i]);
+					else if ( instruction.equals("Delete") ) deleteList.add(idTagItems[i]);
+					
+				}
+				req = cpsClient.prepareSendLocalList(listVersion, addUpdateList, deleteList);
+				
+			} else {
+				// The update type is Full
+				req = cpsClient.prepareSendLocalList(listVersion);
+			}
 			
 			for(String temp: chargePointItems){
 				String[] chargePointItem = temp.split(";");

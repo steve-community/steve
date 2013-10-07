@@ -1,9 +1,11 @@
 
 package de.rwth.idsg.steve;
 	
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import ocpp.cp._2012._06.AuthorisationData;
 import ocpp.cp._2012._06.AvailabilityType;
 import ocpp.cp._2012._06.CancelReservationRequest;
 import ocpp.cp._2012._06.CancelReservationResponse;
@@ -132,7 +134,7 @@ public class ChargePointService15_Client {
 	
 	/** Start: New with OCPP 1.5  **/	
 	
-	// TODO: Needs more work, makes no sense as it is right now
+	// Dummy implementation. This is new in OCPP 1.5. It must be vendor-specific.
 	public DataTransferRequest prepareDataTransfer(String vendorId, String messageId, String data){
 		DataTransferRequest req = new DataTransferRequest();
 		req.setVendorId(vendorId);
@@ -155,12 +157,31 @@ public class ChargePointService15_Client {
 		return req;
 	}
 	
-	//TODO: Needs more work for localAuthorisationList
-	public SendLocalListRequest prepareSendLocalList(int listVersion, String localAuthorisationList, String updateType){	
+	// Method for FULL update
+	public SendLocalListRequest prepareSendLocalList(int listVersion){	
 		SendLocalListRequest req = new SendLocalListRequest();
 		req.setListVersion(listVersion);
-		req.setUpdateType( UpdateType.fromValue(updateType) );
-		//req.getLocalAuthorisationList().add(e)
+		req.setUpdateType(UpdateType.FULL);
+		req.getLocalAuthorisationList().addAll( ClientDBAccess.getIdTags(null) );
+		return req;
+	}
+	
+	// Method for DIFFERENTIAL update
+	public SendLocalListRequest prepareSendLocalList(int listVersion, ArrayList<String> addUpdateList, ArrayList<String> deleteList){	
+		SendLocalListRequest req = new SendLocalListRequest();
+		req.setListVersion(listVersion);
+		req.setUpdateType(UpdateType.DIFFERENTIAL);
+		
+		// Step 1: For the idTags to be deleted, insert only the idTag
+		for (String idTag : deleteList) {
+			AuthorisationData item = new AuthorisationData();
+			item.setIdTag(idTag);
+			req.getLocalAuthorisationList().add(item);
+		}
+		
+		// Step 2: For the idTags to be added or updated, insert them with their IdTagInfos
+		req.getLocalAuthorisationList().addAll( ClientDBAccess.getIdTags(addUpdateList) );
+		
 		return req;
 	}
 	
@@ -244,7 +265,7 @@ public class ChargePointService15_Client {
 
 	/** Start: New with OCPP 1.5  **/
 	
-	// TODO: Needs more work, makes no sense as it is right now
+	// Dummy implementation. This is new in OCPP 1.5. It must be vendor-specific.
 	public String sendDataTransfer(String chargeBoxId, String endpoint_address, DataTransferRequest req){
 		LOG.info("Invoking dataTransfer...");
 		factory.setAddress(endpoint_address);
@@ -293,12 +314,18 @@ public class ChargePointService15_Client {
 		return "Charge point: " + chargeBoxId + ", Request: GetLocalListVersion, Response: " + response.getListVersion();
 	}
 	
-	// TODO: Needs more work, makes no sense as it is right now
 	public String sendSendLocalList(String chargeBoxId, String endpoint_address, SendLocalListRequest req){
 		LOG.info("Invoking sendLocalList...");
 		factory.setAddress(endpoint_address);
 		ChargePointService client = (ChargePointService) factory.create();
 		SendLocalListResponse response = client.sendLocalList(req, chargeBoxId);
+		
+		// TODO: If the status is Failed or VersionMismatch and the updateType was Differential,
+		// then Central System SHOULD retry sending the full local authorization list with updateType Full.
+//		UpdateStatus answer = response.getStatus();
+//		if (answer.equals(UpdateStatus.FAILED) || answer.equals(UpdateStatus.VERSION_MISMATCH)) {
+//			
+//		}		
 		
 		return "Charge point: " + chargeBoxId + ", Request: SendLocalList, Response: " + response.getStatus().value() 
 				+ "\n+ Hash: " + response.getHash();
@@ -306,6 +333,8 @@ public class ChargePointService15_Client {
 		
 	/////// The following operations are specific to charge point: PREPARE and SEND Request Payloads ///////
 	
+	// TODO: It's cumbersome now: First book, then cancel if it is not accepted by the charge point.
+	// Needs a better idea: Book only if it is accepted by the charge point.
 	public String reserveNow(
 			String chargeBoxId, 
 			String endpoint_address, 
@@ -331,7 +360,7 @@ public class ChargePointService15_Client {
 		ChargePointService client = (ChargePointService) factory.create();
 		ReserveNowResponse response = client.reserveNow(req, chargeBoxId);
 		
-		// Check response, and cancel reservation from DB if it is not accepted by the charging point
+		// Check response, and cancel reservation from DB if it is not accepted by the charge point
 		ReservationStatus responseStatus = response.getStatus();
 		if (responseStatus != ReservationStatus.ACCEPTED) {
 			ClientDBAccess.cancelReservation(reservationId);

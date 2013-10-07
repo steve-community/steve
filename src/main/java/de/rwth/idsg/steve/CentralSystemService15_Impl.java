@@ -63,7 +63,6 @@ public class CentralSystemService15_Impl implements CentralSystemService {
 
 	private static final Logger LOG = LoggerFactory.getLogger(CentralSystemService15_Impl.class);
 	
-	// DONE
 	public BootNotificationResponse bootNotification(BootNotificationRequest parameters,java.lang.String chargeBoxIdentity) { 
 		LOG.info("Executing operation bootNotification");
 		
@@ -99,7 +98,6 @@ public class CentralSystemService15_Impl implements CentralSystemService {
 		return _return;
 	}
 	
-	// DONE
 	public FirmwareStatusNotificationResponse firmwareStatusNotification(FirmwareStatusNotificationRequest parameters,java.lang.String chargeBoxIdentity) { 
 		LOG.info("Executing operation firmwareStatusNotification");
 
@@ -109,8 +107,7 @@ public class CentralSystemService15_Impl implements CentralSystemService {
 		FirmwareStatusNotificationResponse _return = new FirmwareStatusNotificationResponse();
 		return _return;
 	}	
-	
-	// DONE
+
 	public StatusNotificationResponse statusNotification(StatusNotificationRequest parameters,java.lang.String chargeBoxIdentity) { 
 		LOG.info("Executing operation statusNotification");
 
@@ -131,7 +128,6 @@ public class CentralSystemService15_Impl implements CentralSystemService {
 		return _return;
 	}
 
-	// DONE
 	public MeterValuesResponse meterValues(MeterValuesRequest parameters,java.lang.String chargeBoxIdentity) { 
 		LOG.info("Executing operation meterValues");
 
@@ -147,7 +143,6 @@ public class CentralSystemService15_Impl implements CentralSystemService {
 		return _return;
 	}
 
-	// DONE
 	public DiagnosticsStatusNotificationResponse diagnosticsStatusNotification(DiagnosticsStatusNotificationRequest parameters,java.lang.String chargeBoxIdentity) { 
 		LOG.info("Executing operation diagnosticsStatusNotification");
 		
@@ -158,7 +153,6 @@ public class CentralSystemService15_Impl implements CentralSystemService {
 		return _return;
 	}
 	
-	// DONE
 	public StartTransactionResponse startTransaction(StartTransactionRequest parameters,java.lang.String chargeBoxIdentity) { 
 		LOG.info("Executing operation startTransaction");
 
@@ -184,7 +178,6 @@ public class CentralSystemService15_Impl implements CentralSystemService {
 		return _return;
 	}
 	
-	// DONE
 	public StopTransactionResponse stopTransaction(StopTransactionRequest parameters,java.lang.String chargeBoxIdentity) { 
 		LOG.info("Executing operation stopTransaction");
 
@@ -215,7 +208,6 @@ public class CentralSystemService15_Impl implements CentralSystemService {
 		return _return;
 	}
 
-	// DONE
 	public HeartbeatResponse heartbeat(HeartbeatRequest parameters,java.lang.String chargeBoxIdentity) { 
 		LOG.info("Executing operation heartbeat");
 
@@ -224,7 +216,6 @@ public class CentralSystemService15_Impl implements CentralSystemService {
 		return _return;
 	}
 
-	// DONE
 	public AuthorizeResponse authorize(AuthorizeRequest parameters,java.lang.String chargeBoxIdentity) { 
 		LOG.info("Executing operation authorize");
 
@@ -255,7 +246,6 @@ public class CentralSystemService15_Impl implements CentralSystemService {
 		return _return;
 	}
 	
-	// DONE	
 	private static IdTagInfo createIdTagInfo(SQLIdTagData sqlData){
 		IdTagInfo _returnIdTagInfo = new IdTagInfo();
 		AuthorizationStatus _returnIdTagInfoStatus = null;

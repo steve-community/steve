@@ -107,14 +107,19 @@ public class ServletOperationsV12 extends HttpServlet {
 		// chargePointItem[1] : endpoint (IP) address
 
 		if (command.equals("/ChangeAvailability")){
-			String availType = request.getParameter("availType");
 			String connectorIdSTR = request.getParameter("connectorId");
 			int connectorId;
 			if (connectorIdSTR.isEmpty()) {
 				connectorId = 0;
 			} else {
-				connectorId = Integer.parseInt(connectorIdSTR);
+				try {
+					connectorId = Integer.parseInt(request.getParameter("connectorId"));	
+				} catch (NumberFormatException e) {
+					throw new InputException(Common.EXCEPTION_PARSING_NUMBER);
+				}
 			}
+			String availType = request.getParameter("availType");
+			
 			ChangeAvailabilityRequest req = cpsClient.prepareChangeAvailability(connectorId, availType);
 
 			for(String temp: chargePointItems){
@@ -144,11 +149,18 @@ public class ServletOperationsV12 extends HttpServlet {
 			}	
 
 		} else if (command.equals("/GetDiagnostics")) {
+			int retries;
+			int retryInterval;			
+			try {
+				retries = Integer.parseInt(request.getParameter("retries"));
+				retryInterval = Integer.parseInt(request.getParameter("retryInterval"));				
+			} catch (NumberFormatException e) {
+				throw new InputException(Common.EXCEPTION_PARSING_NUMBER);
+			}
 			String location = request.getParameter("location");
-			int retries = Integer.parseInt(request.getParameter("retries"));
-			int retryInterval = Integer.parseInt(request.getParameter("retryInterval"));
 			String startTime = request.getParameter("startTime");
-			String stopTime = request.getParameter("stopTime");
+			String stopTime = request.getParameter("stopTime");	
+			
 			GetDiagnosticsRequest req = cpsClient.prepareGetDiagnostics(location, retries, retryInterval, startTime, stopTime);
 
 			for(String temp: chargePointItems){
@@ -158,8 +170,14 @@ public class ServletOperationsV12 extends HttpServlet {
 			}
 
 		} else if (command.equals("/RemoteStartTransaction")) {
-			int connectorId = Integer.parseInt(request.getParameter("connectorId"));
+			int connectorId;			
+			try {
+				connectorId = Integer.parseInt(request.getParameter("connectorId"));	
+			} catch (NumberFormatException e) {
+				throw new InputException(Common.EXCEPTION_PARSING_NUMBER);
+			}
 			String idTag = request.getParameter("idTag");
+			
 			RemoteStartTransactionRequest req = cpsClient.prepareRemoteStartTransaction(connectorId, idTag);
 
 			for(String temp: chargePointItems){
@@ -169,7 +187,13 @@ public class ServletOperationsV12 extends HttpServlet {
 			}
 
 		} else if (command.equals("/RemoteStopTransaction")) {
-			int transactionId = Integer.parseInt(request.getParameter("transactionId"));
+			int transactionId;			
+			try {
+				transactionId = Integer.parseInt(request.getParameter("transactionId"));
+			} catch (NumberFormatException e) {
+				throw new InputException(Common.EXCEPTION_PARSING_NUMBER);
+			}
+			
 			RemoteStopTransactionRequest req = cpsClient.prepareRemoteStopTransaction(transactionId);
 
 			for(String temp: chargePointItems){
@@ -189,7 +213,13 @@ public class ServletOperationsV12 extends HttpServlet {
 			}
 
 		} else if (command.equals("/UnlockConnector")) {
-			int connectorId = Integer.parseInt(request.getParameter("connectorId"));
+			int connectorId;			
+			try {
+				connectorId = Integer.parseInt(request.getParameter("connectorId"));	
+			} catch (NumberFormatException e) {
+				throw new InputException(Common.EXCEPTION_PARSING_NUMBER);
+			}
+			
 			UnlockConnectorRequest req = cpsClient.prepareUnlockConnector(connectorId);
 
 			for(String temp: chargePointItems){
@@ -199,10 +229,17 @@ public class ServletOperationsV12 extends HttpServlet {
 			}
 
 		} else if (command.equals("/UpdateFirmware")){
+			int retries;
+			int retryInterval;			
+			try {
+				retries = Integer.parseInt(request.getParameter("retries"));
+				retryInterval = Integer.parseInt(request.getParameter("retryInterval"));				
+			} catch (NumberFormatException e) {
+				throw new InputException(Common.EXCEPTION_PARSING_NUMBER);
+			}
 			String location = request.getParameter("location");
-			int retries = Integer.parseInt(request.getParameter("retries"));
-			String retrieveDate = request.getParameter("retrieveDate");
-			int retryInterval = Integer.parseInt(request.getParameter("retryInterval"));
+			String retrieveDate = request.getParameter("retrieveDate");	
+			
 			UpdateFirmwareRequest req = cpsClient.prepareUpdateFirmware(location, retries, retrieveDate, retryInterval);
 
 			for(String temp: chargePointItems){

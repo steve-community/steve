@@ -6,6 +6,10 @@ public class Common {
 			"Error: You did not select any charge points, did you!?\n"
 			+ "Go back and try again.";
 	
+	public static String EXCEPTION_PARSING_NUMBER = 
+			"Error: One input field should be a number, but wasn't.\n"
+			+ "Go back and try again.";
+	
 	public static String EXCEPTION_PARSING_DATETIME = 
 			"Error: Date/time input(s) must match the expected pattern.\n"
 			+ "Go back and try again.";

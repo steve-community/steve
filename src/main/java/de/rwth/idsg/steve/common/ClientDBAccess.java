@@ -5,7 +5,14 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.HashMap;
+
+import javax.xml.datatype.XMLGregorianCalendar;
+
+import ocpp.cp._2012._06.AuthorisationData;
+import ocpp.cp._2012._06.IdTagInfo;
+import ocpp.cp._2012._06.AuthorizationStatus;
 
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
@@ -171,5 +178,80 @@ public class ClientDBAccess {
 			Utils.releaseResources(null, pt, rs);
 		}
 	}
+	
+	/**
+	 * For OCPP 1.5: Helper method to read idTags from the DB for the operation SendLocalList.
+	 * 
+	 */
+	public static synchronized ArrayList<AuthorisationData> getIdTags(ArrayList<String> inputList) {
+		
+		XMLGregorianCalendar xcal = Utils.setExpiryDateTime(Constants.HOURS_TO_EXPIRE);
+		Timestamp now = Utils.getCurrentDateTimeTS();
+		
+		ArrayList<AuthorisationData> list = new ArrayList<AuthorisationData>();
+		Connection connect = null;
+		PreparedStatement pt = null;
+		ResultSet rs = null;
+		try {
+			// Prepare Database Access
+			connect = Utils.getConnectionFromPool();
+			
+			if (inputList == null) {
+				// Read ALL idTags
+				pt = connect.prepareStatement("SELECT * FROM user");
+				
+			} else {
+				// Read only ENTERED idTags
+				pt = connect.prepareStatement("SELECT * FROM user WHERE idTag = ?");				
+				for (String inputIdTag : inputList){
+					pt.setString(1, inputIdTag);
+					pt.addBatch();
+				}
+			}
 
+			// Execute and get the result of the SQL query
+			rs = pt.executeQuery();
+
+			while (rs.next()) {
+				// Read the DB row values
+				String idTag = rs.getString(1);
+				String parentIdTag = rs.getString(2);
+				Timestamp expiryDate = rs.getTimestamp(3);
+				boolean inTransaction = rs.getBoolean(4);
+				boolean blocked = rs.getBoolean(5);
+
+				// Create IdTagInfo of an idTag
+				IdTagInfo _returnIdTagInfo = new IdTagInfo();				
+				AuthorizationStatus _returnIdTagInfoStatus = null;
+
+				if (inTransaction == true) {
+					_returnIdTagInfoStatus = AuthorizationStatus.CONCURRENT_TX;
+					
+				} else if (blocked == true) {
+					_returnIdTagInfoStatus = AuthorizationStatus.BLOCKED;
+
+				} else if (expiryDate != null && now.after(expiryDate)) {
+					_returnIdTagInfoStatus = AuthorizationStatus.EXPIRED;
+
+				} else {
+					_returnIdTagInfoStatus = AuthorizationStatus.ACCEPTED;
+					// When accepted, set the additional fields
+					_returnIdTagInfo.setExpiryDate(xcal);
+					if ( parentIdTag != null ) _returnIdTagInfo.setParentIdTag(parentIdTag);
+				}
+				_returnIdTagInfo.setStatus(_returnIdTagInfoStatus);
+				
+				// Put the information into the list			
+				AuthorisationData item = new AuthorisationData();
+				item.setIdTag(idTag);
+				item.setIdTagInfo(_returnIdTagInfo);
+				list.add(item);
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			Utils.releaseResources(connect, pt, rs);
+		}
+		return list;
+	}
 }

@@ -141,7 +141,7 @@ public class ClientDBAccess {
 			if (count == 1) {
 				connect.commit();
 				LOG.info("The reservation {} is canceled.", reservation_pk);
-			}else{
+			} else {
 				LOG.error("Transaction is being rolled back.");
 				connect.rollback();
 				LOG.info("The reservation {} could NOT be canceled.", reservation_pk);

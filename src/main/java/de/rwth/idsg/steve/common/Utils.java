@@ -120,6 +120,15 @@ public class Utils {
 		}
 		return dt;
 	}
+	
+	/**
+	 * Converts a Timestamp to a String of the pattern "yyyy-MM-dd HH:mm".
+	 */
+	public static String convertToString(Timestamp ts){
+		long timeLong = ts.getTime();
+		String st = inputFormatter.print(timeLong);
+		return st;
+	}
 
 	/**
 	 * Validates the BATCH execution of Data Manipulation Language (DML) statements, such as INSERT, UPDATE or DELETE.

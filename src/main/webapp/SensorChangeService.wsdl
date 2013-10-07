@@ -12,12 +12,14 @@
 		
 			<xsd:complexType name="ChangeConfigurationRequest">
 			    <xsd:annotation>
-         			<xsd:documentation>Defines the amount of time (in seconds) the sensor will wait for the authorization of the user after parking, 
-         			or for the vehicle to leave the parking spot before it times out.</xsd:documentation>
+         			<xsd:documentation>Defines the amount of time (in seconds) the sensor permits for the authorization of the user after parking (occupiedTimeout), 
+         			for the user to plug the cable in order to charge (authorizedTimeout),
+         			or for the vehicle to leave the parking spot (warningTimeout).</xsd:documentation>
         		</xsd:annotation>
 				<xsd:sequence>
-					<xsd:element name="timeoutValue1" type="xsd:int" minOccurs="1" maxOccurs="1" />
-					<xsd:element name="timeoutValue2" type="xsd:int" minOccurs="1" maxOccurs="1" />
+					<xsd:element name="occupiedTimeout" type="xsd:int" minOccurs="1" maxOccurs="1" />
+					<xsd:element name="authorizedTimeout" type="xsd:int" minOccurs="1" maxOccurs="1" />
+					<xsd:element name="warningTimeout" type="xsd:int" minOccurs="1" maxOccurs="1" />
 				</xsd:sequence>
 			</xsd:complexType>
 
@@ -53,17 +55,19 @@
 			    <xsd:annotation>
          			<xsd:documentation>SteVe can instruct a sensor to change its status if there is a reservation (Reserved), 
          			if the charge point is not functional at the moment (Inoperative), or otherwise ready to charge for any one (Ready).
-         			Moreover, Steve informs the sensor about the charging status (Trans_Started, Trans_Stopped) and 
-         			if the user is not authorized to charge (Trans_Rejected).
+         			Moreover, Steve informs the sensor about the authorization status of the user (AuthAccepted, AuthFailed) and 
+         			about the charging status (ChargingStarted, ChargingStopped).
          			</xsd:documentation>
         		</xsd:annotation>
 				<xsd:restriction base="xsd:string">
 					<xsd:enumeration value="Ready" />
 					<xsd:enumeration value="Reserved" />
 					<xsd:enumeration value="Inoperative" />
-					<xsd:enumeration value="Trans_Started" />
-					<xsd:enumeration value="Trans_Stopped" />
-					<xsd:enumeration value="Trans_Rejected" />
+					<xsd:enumeration value="AuthAccepted" />
+					<xsd:enumeration value="AuthFailed" />
+					<xsd:enumeration value="ChargingStarted" />
+					<xsd:enumeration value="ChargingStopped" />
+					
 				</xsd:restriction>
 			</xsd:simpleType>
 

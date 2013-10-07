@@ -6,6 +6,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -71,7 +72,7 @@ public class ServletReservation extends HttpServlet {
 				"<b>Existing Reservations</b><hr>\n"
 				+ "<center>\n"
 				+ "<table class=\"res\">\n"
-				+ "<tr><th>Reservation Id</th><th>idTag</th><th>chargeBoxId</th><th>startDatetime</th><th>expiryDatetime</th><th>ended</th></tr>\n");
+				+ "<tr><th>Reservation Id</th><th>idTag</th><th>chargeBoxId</th><th>startDatetime</th><th>expiryDatetime</th><th>expired</th></tr>\n");
 
 		Connection connect = null;
 		PreparedStatement pt = null;
@@ -79,20 +80,21 @@ public class ServletReservation extends HttpServlet {
 		try {	
 			// Prepare Database Access
 			connect = Utils.getConnectionFromPool();
-			pt = connect.prepareStatement("SELECT reservation_pk, idTag, chargeBoxId, DATE_FORMAT(startDatetime, '%Y-%m-%d %H:%i'), "
-					+ "DATE_FORMAT(expiryDatetime, '%Y-%m-%d %H:%i'), ended FROM reservation");
+			pt = connect.prepareStatement("SELECT reservation_pk, idTag, chargeBoxId, startDatetime, expiryDatetime FROM reservation ORDER BY expiryDatetime;");
 			rs = pt.executeQuery();
 
-			while( rs.next() ) {
+			Timestamp now = Utils.getCurrentDateTimeTS();
+			while ( rs.next() ) {
+				Timestamp ex = rs.getTimestamp(5);
 				builder.append("<tr>"
 						+ "<td>" + rs.getInt(1) + "</td>"
 						+ "<td>" + rs.getString(2) + "</td>"
 						+ "<td>" + rs.getString(3) + "</td>"
-						+ "<td>" + rs.getString(4) + "</td>"
-						+ "<td>" + rs.getString(5) + "</td>"
-						+ "<td>" + rs.getBoolean(6) + "</td>"
+						+ "<td>" + Utils.convertToString(rs.getTimestamp(4)) + "</td>"
+						+ "<td>" + Utils.convertToString(ex)+ "</td>"
+						+ "<td>" + now.after(ex) + "</td>"
 						+ "</tr>\n");
-			}			
+			}
 		} catch (SQLException ex) {
 			ex.printStackTrace();
 			throw new RuntimeException(ex);

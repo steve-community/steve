@@ -20,7 +20,7 @@ import javax.xml.bind.annotation.XmlType;
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *       &lt;sequence>
  *         &lt;element name="connectorId" type="{http://www.w3.org/2001/XMLSchema}int"/>
- *         &lt;element name="status" type="{urn://de/rwth/idsg/sensor/inform}status"/>
+ *         &lt;element name="status" type="{urn://de/rwth/idsg/sensor/inform/}status"/>
  *       &lt;/sequence>
  *     &lt;/restriction>
  *   &lt;/complexContent>

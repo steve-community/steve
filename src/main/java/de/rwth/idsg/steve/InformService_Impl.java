@@ -15,11 +15,11 @@ import de.rwth.idsg.sensor.inform.InformService;
  */
 
 @javax.jws.WebService(
-                      serviceName = "InformService",
-                      portName = "InformServiceSOAP12",
-                      targetNamespace = "urn://de/rwth/idsg/sensor/inform",
-                      wsdlLocation = "file:/Users/sgokay/git/steve/src/main/webapp/SensorInformService.wsdl",
-                      endpointInterface = "de.rwth.idsg.sensor.inform.InformService")
+        serviceName = "InformService",
+        portName = "InformServiceSOAP12",
+        targetNamespace = "urn://de/rwth/idsg/sensor/inform/",
+        wsdlLocation = "file:/Users/sgokay/git/steve/src/main/webapp/SensorInformService.wsdl",
+        endpointInterface = "de.rwth.idsg.sensor.inform.InformService")
                       
 public class InformService_Impl implements InformService {
 

@@ -24,9 +24,9 @@ import javax.xml.namespace.QName;
 @XmlRegistry
 public class ObjectFactory {
 
-    private final static QName _ChargeBoxIdentity_QNAME = new QName("urn://de/rwth/idsg/sensor/inform", "ChargeBoxIdentity");
-    private final static QName _InformParkingResponse_QNAME = new QName("urn://de/rwth/idsg/sensor/inform", "InformParkingResponse");
-    private final static QName _InformParkingRequest_QNAME = new QName("urn://de/rwth/idsg/sensor/inform", "InformParkingRequest");
+    private final static QName _ChargeBoxIdentity_QNAME = new QName("urn://de/rwth/idsg/sensor/inform/", "ChargeBoxIdentity");
+    private final static QName _InformParkingResponse_QNAME = new QName("urn://de/rwth/idsg/sensor/inform/", "InformParkingResponse");
+    private final static QName _InformParkingRequest_QNAME = new QName("urn://de/rwth/idsg/sensor/inform/", "InformParkingRequest");
 
     /**
      * Create a new ObjectFactory that can be used to create new instances of schema derived classes for package: de.rwth.idsg.sensor.inform
@@ -55,7 +55,7 @@ public class ObjectFactory {
      * Create an instance of {@link JAXBElement }{@code <}{@link String }{@code >}}
      * 
      */
-    @XmlElementDecl(namespace = "urn://de/rwth/idsg/sensor/inform", name = "ChargeBoxIdentity")
+    @XmlElementDecl(namespace = "urn://de/rwth/idsg/sensor/inform/", name = "ChargeBoxIdentity")
     public JAXBElement<String> createChargeBoxIdentity(String value) {
         return new JAXBElement<String>(_ChargeBoxIdentity_QNAME, String.class, null, value);
     }
@@ -64,7 +64,7 @@ public class ObjectFactory {
      * Create an instance of {@link JAXBElement }{@code <}{@link InformParkingResponse }{@code >}}
      * 
      */
-    @XmlElementDecl(namespace = "urn://de/rwth/idsg/sensor/inform", name = "InformParkingResponse")
+    @XmlElementDecl(namespace = "urn://de/rwth/idsg/sensor/inform/", name = "InformParkingResponse")
     public JAXBElement<InformParkingResponse> createInformParkingResponse(InformParkingResponse value) {
         return new JAXBElement<InformParkingResponse>(_InformParkingResponse_QNAME, InformParkingResponse.class, null, value);
     }
@@ -73,7 +73,7 @@ public class ObjectFactory {
      * Create an instance of {@link JAXBElement }{@code <}{@link InformParkingRequest }{@code >}}
      * 
      */
-    @XmlElementDecl(namespace = "urn://de/rwth/idsg/sensor/inform", name = "InformParkingRequest")
+    @XmlElementDecl(namespace = "urn://de/rwth/idsg/sensor/inform/", name = "InformParkingRequest")
     public JAXBElement<InformParkingRequest> createInformParkingRequest(InformParkingRequest value) {
         return new JAXBElement<InformParkingRequest>(_InformParkingRequest_QNAME, InformParkingRequest.class, null, value);
     }

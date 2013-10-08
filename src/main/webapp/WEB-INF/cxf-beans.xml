@@ -49,6 +49,15 @@
 		address="/CentralSystemServiceOCPP15">
 		<jaxws:features><wsa:addressing /></jaxws:features>  
 		<jaxws:properties><entry key="endpoint-processes-headers" value="{urn://Ocpp/Cs/2012/06/}chargeBoxIdentity" /></jaxws:properties>
+	</jaxws:endpoint>	
+	
+	<!-- Configure the service for SensorInformService -->
+	<jaxws:endpoint xmlns:tns="urn://de/rwth/idsg/sensor/inform/" id="InformService"
+		implementor="de.rwth.idsg.steve.InformService_Impl" wsdlLocation="SensorInformService.wsdl"
+		endpointName="tns:InformServiceSOAP12" serviceName="tns:InformService"
+		address="/InformService">
+		<jaxws:features><wsa:addressing /></jaxws:features>  
+		<jaxws:properties><entry key="endpoint-processes-headers" value="{urn://de/rwth/idsg/sensor/inform/}ChargeBoxIdentity" /></jaxws:properties>
 	</jaxws:endpoint>
 
 	<!-- Configure the client -->

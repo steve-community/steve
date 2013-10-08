@@ -10,9 +10,6 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import de.rwth.idsg.sensor.change.Status;
-import de.rwth.idsg.steve.ChangeService_Client;
-
 public class ServiceDBAccess {
 	
 	private static final Logger LOG = LoggerFactory.getLogger(ServiceDBAccess.class);
@@ -435,11 +432,11 @@ public class ServiceDBAccess {
 		
 		/**** START SENSOR MODIFICATION ****/
 
-		if (Constants.SENSORS_ENABLED) {
-			// Send message to the sensor that the transaction is granted to start
-			ChangeService_Client sensorClient = new ChangeService_Client();
-			sensorClient.sendChangeStatus(chargeBoxIdentity, Constants.SENSOR_ENDPOINT_ADDRESS, connectorId, Status.TRANS_STARTED);
-		}
+//		if (Constants.SENSORS_ENABLED) {
+//			// Send message to the sensor that the transaction is granted to start
+//			ChangeService_Client sensorClient = new ChangeService_Client();
+//			sensorClient.sendChangeStatus(chargeBoxIdentity, Constants.SENSOR_ENDPOINT_ADDRESS, connectorId, Status.TRANS_STARTED);
+//		}
 
 		/**** END SENSOR MODIFICATION ****/
 		
@@ -487,15 +484,15 @@ public class ServiceDBAccess {
 				
 		/**** START SENSOR MODIFICATION ****/
 		
-		if (Constants.SENSORS_ENABLED) {
-			
-			int connectorId = getConnectorId(transactionId);				
-			if (connectorId != -1) {
-				// Send message to the sensor that the transaction is granted to STOP
-				ChangeService_Client sensorClient = new ChangeService_Client();
-				sensorClient.sendChangeStatus(chargeBoxIdentity, Constants.SENSOR_ENDPOINT_ADDRESS, connectorId, Status.TRANS_STOPPED);
-			}	
-		}
+//		if (Constants.SENSORS_ENABLED) {
+//			
+//			int connectorId = getConnectorId(transactionId);				
+//			if (connectorId != -1) {
+//				// Send message to the sensor that the transaction is granted to STOP
+//				ChangeService_Client sensorClient = new ChangeService_Client();
+//				sensorClient.sendChangeStatus(chargeBoxIdentity, Constants.SENSOR_ENDPOINT_ADDRESS, connectorId, Status.TRANS_STOPPED);
+//			}	
+//		}
 		
 		/**** END SENSOR MODIFICATION ****/
 	}

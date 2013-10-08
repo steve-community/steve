@@ -45,7 +45,7 @@
 <!-- 							<sourceRoot>${basedir}/src/main/java</sourceRoot> -->
 <!-- 							<wsdlOptions> -->
 <!-- 								<wsdlOption> -->
-<!-- 									<wsdl>${basedir}/src/main/webapp/SensorChangeService.wsdl</wsdl> -->
+<!-- 									<wsdl>${basedir}/src/main/webapp/SensorInformService.wsdl</wsdl> -->
 <!-- 										<extraargs> -->
 <!--                     					<extraarg>-impl</extraarg> -->
 <!--                     					<extraarg>-client</extraarg> -->

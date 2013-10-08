@@ -27,7 +27,7 @@ public class InformService_Impl implements InformService {
 
 	// Dummy implementation to test
     public InformParkingResponse informParking(InformParkingRequest parameters,java.lang.String chargeBoxIdentity) { 
-        LOG.info("Executing operation informParking");
+        LOG.info("[SENSOR] Executing operation informParking");
         InformParkingResponse _return = new InformParkingResponse();
         return _return;
     }

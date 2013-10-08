@@ -64,7 +64,7 @@ public class CentralSystemService15_Impl implements CentralSystemService {
 	private static final Logger LOG = LoggerFactory.getLogger(CentralSystemService15_Impl.class);
 	
 	public BootNotificationResponse bootNotification(BootNotificationRequest parameters,java.lang.String chargeBoxIdentity) { 
-		LOG.info("Executing operation bootNotification");
+		LOG.info("Executing bootNotification for {}", chargeBoxIdentity);
 		
 		// Get the Address value from WS-A Header
 		MessageContext messageContext = webServiceContext.getMessageContext();
@@ -99,7 +99,7 @@ public class CentralSystemService15_Impl implements CentralSystemService {
 	}
 	
 	public FirmwareStatusNotificationResponse firmwareStatusNotification(FirmwareStatusNotificationRequest parameters,java.lang.String chargeBoxIdentity) { 
-		LOG.info("Executing operation firmwareStatusNotification");
+		LOG.info("Executing firmwareStatusNotification for {}", chargeBoxIdentity);
 
 		String status = parameters.getStatus().toString();
 		ServiceDBAccess.updateChargeboxFirmwareStatus(chargeBoxIdentity, status);
@@ -109,7 +109,7 @@ public class CentralSystemService15_Impl implements CentralSystemService {
 	}	
 
 	public StatusNotificationResponse statusNotification(StatusNotificationRequest parameters,java.lang.String chargeBoxIdentity) { 
-		LOG.info("Executing operation statusNotification");
+		LOG.info("Executing statusNotification for {}", chargeBoxIdentity);
 
 		// Mandatory fields
 		int connectorId = parameters.getConnectorId();
@@ -129,7 +129,7 @@ public class CentralSystemService15_Impl implements CentralSystemService {
 	}
 
 	public MeterValuesResponse meterValues(MeterValuesRequest parameters,java.lang.String chargeBoxIdentity) { 
-		LOG.info("Executing operation meterValues");
+		LOG.info("Executing meterValues for {}", chargeBoxIdentity);
 
 		int connectorId = parameters.getConnectorId();
 		Integer transactionId = parameters.getTransactionId();	
@@ -144,7 +144,7 @@ public class CentralSystemService15_Impl implements CentralSystemService {
 	}
 
 	public DiagnosticsStatusNotificationResponse diagnosticsStatusNotification(DiagnosticsStatusNotificationRequest parameters,java.lang.String chargeBoxIdentity) { 
-		LOG.info("Executing operation diagnosticsStatusNotification");
+		LOG.info("Executing diagnosticsStatusNotification for {}", chargeBoxIdentity);
 		
 		String status = parameters.getStatus().toString();
 		ServiceDBAccess.updateChargeboxDiagnosticsStatus(chargeBoxIdentity, status);
@@ -154,7 +154,7 @@ public class CentralSystemService15_Impl implements CentralSystemService {
 	}
 	
 	public StartTransactionResponse startTransaction(StartTransactionRequest parameters,java.lang.String chargeBoxIdentity) { 
-		LOG.info("Executing operation startTransaction");
+		LOG.info("Executing startTransaction for {}", chargeBoxIdentity);
 
 		// Get the authorization info of the user
 		String idTag = parameters.getIdTag();		
@@ -179,7 +179,7 @@ public class CentralSystemService15_Impl implements CentralSystemService {
 	}
 	
 	public StopTransactionResponse stopTransaction(StopTransactionRequest parameters,java.lang.String chargeBoxIdentity) { 
-		LOG.info("Executing operation stopTransaction");
+		LOG.info("Executing stopTransaction for {}", chargeBoxIdentity);
 
 		// Get parameters and update transaction in DB
 		int transactionId = parameters.getTransactionId();
@@ -209,7 +209,7 @@ public class CentralSystemService15_Impl implements CentralSystemService {
 	}
 
 	public HeartbeatResponse heartbeat(HeartbeatRequest parameters,java.lang.String chargeBoxIdentity) { 
-		LOG.info("Executing operation heartbeat");
+		LOG.info("Executing heartbeat for {}", chargeBoxIdentity);
 
 		HeartbeatResponse _return = new HeartbeatResponse();
 		_return.setCurrentTime(Utils.getCurrentDateTimeXML());
@@ -217,7 +217,7 @@ public class CentralSystemService15_Impl implements CentralSystemService {
 	}
 
 	public AuthorizeResponse authorize(AuthorizeRequest parameters,java.lang.String chargeBoxIdentity) { 
-		LOG.info("Executing operation authorize");
+		LOG.info("Executing authorize for {}", chargeBoxIdentity);
 
 		// Get the authorization info of the user
 		String idTag = parameters.getIdTag();
@@ -230,7 +230,7 @@ public class CentralSystemService15_Impl implements CentralSystemService {
 
 	// Dummy implementation. This is new in OCPP 1.5. It must be vendor-specific.
 	public DataTransferResponse dataTransfer(DataTransferRequest parameters,java.lang.String chargeBoxIdentity) { 
-		LOG.info("Executing operation dataTransfer");
+		LOG.info("Executing dataTransfer for {}", chargeBoxIdentity);
 		
 		String vendorId = parameters.getVendorId();
 		String messageId = parameters.getMessageId();
@@ -275,6 +275,4 @@ public class CentralSystemService15_Impl implements CentralSystemService {
 		_returnIdTagInfo.setStatus(_returnIdTagInfoStatus);
 		return _returnIdTagInfo;
 	}
-
-
 }

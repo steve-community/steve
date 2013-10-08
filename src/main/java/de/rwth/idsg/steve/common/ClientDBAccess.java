@@ -120,7 +120,7 @@ public class ClientDBAccess {
 	}
 
 	/**
-	 * Returns true, if the reservation is canceled.
+	 * Cancels a reservation.
 	 *
 	 */
 	public static synchronized void cancelReservation(int reservation_pk) {

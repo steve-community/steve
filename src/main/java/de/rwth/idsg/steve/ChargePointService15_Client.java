@@ -190,7 +190,7 @@ public class ChargePointService15_Client {
 	/////// SEND Request Payloads /////// 
 
 	public String sendChangeAvailability(String chargeBoxId, String endpoint_address, ChangeAvailabilityRequest req){
-		LOG.info("Invoking changeAvailability...");
+		LOG.info("Invoking changeAvailability at {}", chargeBoxId);
 		factory.setAddress(endpoint_address);
 		ChargePointService client = (ChargePointService) factory.create();
 		ChangeAvailabilityResponse response = client.changeAvailability(req, chargeBoxId);
@@ -198,7 +198,7 @@ public class ChargePointService15_Client {
 	}
 
 	public String sendChangeConfiguration(String chargeBoxId, String endpoint_address, ChangeConfigurationRequest req){   	
-		LOG.info("Invoking changeConfiguration...");
+		LOG.info("Invoking changeConfiguration at {}", chargeBoxId);
 		factory.setAddress(endpoint_address);
 		ChargePointService client = (ChargePointService) factory.create();
 		ChangeConfigurationResponse response = client.changeConfiguration(req, chargeBoxId);
@@ -206,7 +206,7 @@ public class ChargePointService15_Client {
 	} 
 
 	public String sendClearCache(String chargeBoxId, String endpoint_address, ClearCacheRequest req){   	
-		LOG.info("Invoking clearCache...");
+		LOG.info("Invoking clearCache at {}", chargeBoxId);
 		factory.setAddress(endpoint_address);
 		ChargePointService client = (ChargePointService) factory.create();
 		ClearCacheResponse response = client.clearCache(req, chargeBoxId);
@@ -214,7 +214,7 @@ public class ChargePointService15_Client {
 	} 
 
 	public String sendGetDiagnostics(String chargeBoxId, String endpoint_address, GetDiagnosticsRequest req){  
-		LOG.info("Invoking getDiagnostics...");
+		LOG.info("Invoking getDiagnostics at {}", chargeBoxId);
 		factory.setAddress(endpoint_address);
 		ChargePointService client = (ChargePointService) factory.create();
 		GetDiagnosticsResponse response = client.getDiagnostics(req, chargeBoxId);
@@ -222,7 +222,7 @@ public class ChargePointService15_Client {
 	} 
 
 	public String sendRemoteStartTransaction(String chargeBoxId, String endpoint_address, RemoteStartTransactionRequest req){  
-		LOG.info("Invoking remoteStartTransaction...");
+		LOG.info("Invoking remoteStartTransaction at {}", chargeBoxId);
 		factory.setAddress(endpoint_address);
 		ChargePointService client = (ChargePointService) factory.create();
 		RemoteStartTransactionResponse response = client.remoteStartTransaction(req, chargeBoxId);
@@ -230,7 +230,7 @@ public class ChargePointService15_Client {
 	}
 
 	public String sendRemoteStopTransaction(String chargeBoxId, String endpoint_address, RemoteStopTransactionRequest req){  
-		LOG.info("Invoking remoteStopTransaction...");	
+		LOG.info("Invoking remoteStopTransaction at {}", chargeBoxId);
 		factory.setAddress(endpoint_address);
 		ChargePointService client = (ChargePointService) factory.create();
 		RemoteStopTransactionResponse response = client.remoteStopTransaction(req, chargeBoxId);
@@ -238,7 +238,7 @@ public class ChargePointService15_Client {
 	} 
 
 	public String sendReset(String chargeBoxId, String endpoint_address, ResetRequest req){   	
-		LOG.info("Invoking reset...");
+		LOG.info("Invoking reset at {}", chargeBoxId);
 		factory.setAddress(endpoint_address);
 		ChargePointService client = (ChargePointService) factory.create();
 		ResetResponse response = client.reset(req, chargeBoxId);
@@ -246,7 +246,7 @@ public class ChargePointService15_Client {
 	}   
 
 	public String sendUnlockConnector(String chargeBoxId, String endpoint_address, UnlockConnectorRequest req){   	
-		LOG.info("Invoking unlockConnector...");
+		LOG.info("Invoking unlockConnector at {}", chargeBoxId);
 		factory.setAddress(endpoint_address);
 		ChargePointService client = (ChargePointService) factory.create();
 		UnlockConnectorResponse response = client.unlockConnector(req, chargeBoxId);
@@ -254,7 +254,7 @@ public class ChargePointService15_Client {
 	}
 
 	public String sendUpdateFirmware(String chargeBoxId, String endpoint_address, UpdateFirmwareRequest req){   
-		LOG.info("Invoking updateFirmware...");
+		LOG.info("Invoking updateFirmware at {}", chargeBoxId);
 		factory.setAddress(endpoint_address);
 		ChargePointService client = (ChargePointService) factory.create();
 		UpdateFirmwareResponse response = client.updateFirmware(req, chargeBoxId);
@@ -267,7 +267,7 @@ public class ChargePointService15_Client {
 	
 	// Dummy implementation. This is new in OCPP 1.5. It must be vendor-specific.
 	public String sendDataTransfer(String chargeBoxId, String endpoint_address, DataTransferRequest req){
-		LOG.info("Invoking dataTransfer...");
+		LOG.info("Invoking dataTransfer at {}", chargeBoxId);
 		factory.setAddress(endpoint_address);
 		ChargePointService client = (ChargePointService) factory.create();
 		DataTransferResponse response = client.dataTransfer(req, chargeBoxId);
@@ -277,7 +277,7 @@ public class ChargePointService15_Client {
 	}
 	
 	public String sendGetConfiguration(String chargeBoxId, String endpoint_address, GetConfigurationRequest req){
-		LOG.info("Invoking getConfiguration...");
+		LOG.info("Invoking getConfiguration at {}", chargeBoxId);
 		factory.setAddress(endpoint_address);
 		ChargePointService client = (ChargePointService) factory.create();
 		GetConfigurationResponse response = client.getConfiguration(req, chargeBoxId);
@@ -307,7 +307,7 @@ public class ChargePointService15_Client {
 	}
 	
 	public String sendGetLocalListVersion(String chargeBoxId, String endpoint_address, GetLocalListVersionRequest req){
-		LOG.info("Invoking getLocalListVersion...");
+		LOG.info("Invoking getLocalListVersion at {}", chargeBoxId);
 		factory.setAddress(endpoint_address);
 		ChargePointService client = (ChargePointService) factory.create();
 		GetLocalListVersionResponse response = client.getLocalListVersion(req, chargeBoxId);
@@ -315,7 +315,7 @@ public class ChargePointService15_Client {
 	}
 	
 	public String sendSendLocalList(String chargeBoxId, String endpoint_address, SendLocalListRequest req){
-		LOG.info("Invoking sendLocalList...");
+		LOG.info("Invoking sendLocalList at {}", chargeBoxId);
 		factory.setAddress(endpoint_address);
 		ChargePointService client = (ChargePointService) factory.create();
 		SendLocalListResponse response = client.sendLocalList(req, chargeBoxId);
@@ -343,7 +343,7 @@ public class ChargePointService15_Client {
 			String idTag, 
 			String parentIdTag){
 		
-		LOG.info("Invoking reserveNow...");		
+		LOG.info("Invoking reserveNow at {}", chargeBoxId);
 		
 		DateTime expiryDateTime = Utils.convertToDateTime(expiryString);
 		// Book the reservation and get the id
@@ -369,7 +369,7 @@ public class ChargePointService15_Client {
 	}
 	
 	public String cancelReservation(String chargeBoxId, String endpoint_address, int reservationId){		
-		LOG.info("Invoking cancelReservation...");
+		LOG.info("Invoking cancelReservation at {}", chargeBoxId);
 		
 		CancelReservationRequest req = new CancelReservationRequest();
 		req.setReservationId(reservationId);

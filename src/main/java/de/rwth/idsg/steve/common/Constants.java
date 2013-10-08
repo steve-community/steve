@@ -3,7 +3,7 @@ package de.rwth.idsg.steve.common;
 public class Constants {	
 	
 	// Heartbeat interval in seconds
-	public static final int HEARTBEAT_INTERVAL = 7200;
+	public static final int HEARTBEAT_INTERVAL = 14400;
 	// Determines how many hours the idtag should be stored in the local whitelist of a chargebox
 	public static final int HOURS_TO_EXPIRE = 1;
 	

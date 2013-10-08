@@ -67,12 +67,12 @@ public class ServiceDBAccess {
 			// Validate the change
 			if (count == 1) {
 				connect.commit();
-				LOG.info("The chargebox " + chargeBoxIdentity + " is registered and its boot acknowledged.");
+				LOG.info("The chargebox {} is registered and its boot acknowledged.", chargeBoxIdentity);
 				isRegistered = true;
 			} else {
 				LOG.error("Transaction is being rolled back.");
 				connect.rollback();
-				LOG.error("The chargebox " + chargeBoxIdentity + " is not registered and its boot not acknowledged.");
+				LOG.error("The chargebox {} is NOT registered and its boot NOT acknowledged.", chargeBoxIdentity);
 			}
 			connect.setAutoCommit(true);						
 		} catch (SQLException e1) {
@@ -181,9 +181,9 @@ public class ServiceDBAccess {
 			int count = pt.executeUpdate();
 			// Validate the change
 			if (count >= 1) {
-				LOG.info("This NEW connector of the chargebox is inserted into DB.");
+				LOG.info("The connector {}/{} is NEW, and inserted into DB.", chargeBoxIdentity, connectorId);
 			}else{
-				LOG.info("This connector of the chargebox is ALREADY known to DB.");
+				LOG.info("The connector {}/{} is ALREADY known to DB.", chargeBoxIdentity, connectorId);
 			}
 
 			Utils.releaseResources(null, pt, null);

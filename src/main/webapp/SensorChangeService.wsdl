@@ -17,9 +17,9 @@
          			or for the vehicle to leave the parking spot (warningTimeout).</xsd:documentation>
         		</xsd:annotation>
 				<xsd:sequence>
-					<xsd:element name="occupiedTimeout" type="xsd:int" minOccurs="1" maxOccurs="1" />
-					<xsd:element name="authorizedTimeout" type="xsd:int" minOccurs="1" maxOccurs="1" />
-					<xsd:element name="warningTimeout" type="xsd:int" minOccurs="1" maxOccurs="1" />
+					<xsd:element name="occupiedTimeout" type="xsd:int" minOccurs="0" maxOccurs="1" />
+					<xsd:element name="authorizedTimeout" type="xsd:int" minOccurs="0" maxOccurs="1" />
+					<xsd:element name="warningTimeout" type="xsd:int" minOccurs="0" maxOccurs="1" />
 				</xsd:sequence>
 			</xsd:complexType>
 

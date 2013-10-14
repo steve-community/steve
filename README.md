@@ -9,9 +9,11 @@ How to use?
 -----
 
 1. SteVe is designed as a Web application to run under Apache Tomcat. Therefore, the source code must be compiled and deployed in Tomcat before use.
+
 Important: For security reasons, SteVe's Web interface can only be accessed with Tomcat's admin role by default. This should be changed according to your preference in [web.xml](src/main/webapp/WEB-INF/web.xml)
 
 2. SteVe requires MySQL to store the data. SteVe comes with a MySQL [dump file](steve-dump-no-data.sql) that contains the database structure for all tables with no data. This should be imported in your MySQL database before deployment of SteVe.
-Important: The default configuration for the database connection can be changed in [context.xml](src/main/webapp/META-INF/context.xml). The required changes are username, password and url.
+
+Important: The default configuration for the database connection can be changed in [context.xml](src/main/webapp/META-INF/context.xml). The required fields to change are *username*, *password* and *url*.
 
 

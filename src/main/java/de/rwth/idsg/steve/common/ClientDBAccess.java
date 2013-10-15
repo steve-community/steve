@@ -156,7 +156,6 @@ public class ClientDBAccess {
 	 * Returns the id of the reservation, if the reservation is booked.
 	 *
 	 */
-	//TODO: check first if the chargebox has available connectors to be reserved
 	public static synchronized int bookReservation(String idTag, String chargeBoxId, DateTime startDatetime, DateTime expiryDatetime) {
 
 		// Check the dates first

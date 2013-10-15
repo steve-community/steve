@@ -42,6 +42,7 @@ import ocpp.cp._2012._06.UnlockConnectorRequest;
 import ocpp.cp._2012._06.UnlockConnectorResponse;
 import ocpp.cp._2012._06.UpdateFirmwareRequest;
 import ocpp.cp._2012._06.UpdateFirmwareResponse;
+import ocpp.cp._2012._06.UpdateStatus;
 import ocpp.cp._2012._06.UpdateType;
 
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
@@ -161,7 +162,10 @@ public class ChargePointService15_Client {
 		return req;
 	}
 	
-	// Method for FULL update
+	/**
+	 * Method for FULL update
+	 * 
+	 */
 	public SendLocalListRequest prepareSendLocalList(int listVersion){	
 		SendLocalListRequest req = new SendLocalListRequest();
 		req.setListVersion(listVersion);
@@ -170,7 +174,11 @@ public class ChargePointService15_Client {
 		return req;
 	}
 	
-	// Method for DIFFERENTIAL update
+	
+	/**
+	 * Method for DIFFERENTIAL update
+	 * 
+	 */
 	public SendLocalListRequest prepareSendLocalList(int listVersion, ArrayList<String> addUpdateList, ArrayList<String> deleteList){	
 		SendLocalListRequest req = new SendLocalListRequest();
 		req.setListVersion(listVersion);
@@ -324,21 +332,33 @@ public class ChargePointService15_Client {
 		ChargePointService client = (ChargePointService) factory.create();
 		SendLocalListResponse response = client.sendLocalList(req, chargeBoxId);
 		
-		// TODO: If the status is Failed or VersionMismatch and the updateType was Differential,
-		// then Central System SHOULD retry sending the full local authorization list with updateType Full.
-//		UpdateStatus answer = response.getStatus();
-//		if (answer.equals(UpdateStatus.FAILED) || answer.equals(UpdateStatus.VERSION_MISMATCH)) {
-//			
-//		}		
-		
-		return "Charge point: " + chargeBoxId + ", Request: SendLocalList, Response: " + response.getStatus().value() 
-				+ "\n+ Hash: " + response.getHash();
+		String result;
+		UpdateStatus answer = response.getStatus();
+		if (answer.equals(UpdateStatus.FAILED) || answer.equals(UpdateStatus.VERSION_MISMATCH)) {
+			LOG.error("The charge point {} did NOT accept to update its local list because: {}. "
+					+ "Retrying sending the FULL local authorization list now.", chargeBoxId, answer.value());
+			
+			// Does it even make sense to increment the version number by 1?
+			int listVersionRETRY = req.getListVersion() + 1 ;
+			SendLocalListRequest reqRETRY = this.prepareSendLocalList(listVersionRETRY);
+			SendLocalListResponse responseRETRY = client.sendLocalList(reqRETRY, chargeBoxId);
+			
+			result = "Charge point: " + chargeBoxId + ", Request: SendLocalList, Response: " + responseRETRY.getStatus().value() 
+					+ "\n+ Hash: " + responseRETRY.getHash();
+		} else {
+			
+			result = "Charge point: " + chargeBoxId + ", Request: SendLocalList, Response: " + response.getStatus().value() 
+					+ "\n+ Hash: " + response.getHash();
+		}
+		return result;
 	}
 		
 	/////// The following operations are specific to charge point: PREPARE and SEND Request Payloads ///////
 	
-	// TODO: It's cumbersome now: First book, then cancel if it is not accepted by the charge point.
-	// Needs a better idea: Book only if it is accepted by the charge point?
+	// TODO: It's cumbersome now: First book, then cancel if it is not accepted by the charge point. 
+	// Needs a better idea:
+	// a) Book only after it is accepted by the charge point?
+	// b) Check first if the chargebox has available connectors to be reserved?
 	public String reserveNow(
 			String chargeBoxId, 
 			String endpoint_address, 

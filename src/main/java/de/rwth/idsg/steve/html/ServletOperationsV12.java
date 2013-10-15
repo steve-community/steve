@@ -25,6 +25,7 @@ import de.rwth.idsg.steve.common.ClientDBAccess;
 /**
  * This servlet provides the Web interface to manage charging points with OCPP v1.2
  * 
+ * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
  */
 public class ServletOperationsV12 extends HttpServlet {
 
@@ -89,7 +90,6 @@ public class ServletOperationsV12 extends HttpServlet {
 	@Override
 	public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
 
-		PrintWriter writer = response.getWriter();
 		String command = request.getPathInfo();	
 
 		// Retrieve values from HTML select multiple
@@ -98,159 +98,45 @@ public class ServletOperationsV12 extends HttpServlet {
 		if (chargePointItems == null) {
 			throw new InputException(Common.EXCEPTION_CHARGEPOINTS_NULL);	
 		}
-
-		response.setContentType("text/plain");
-		String result = null;
-		ChargePointService12_Client cpsClient = new ChargePointService12_Client();
-
-		// chargePointItem[0] : chargebox id
-		// chargePointItem[1] : endpoint (IP) address
+		
+		StringBuilder returnBuilder = null;
 
 		if (command.equals("/ChangeAvailability")){
-			String connectorIdSTR = request.getParameter("connectorId");
-			int connectorId;
-			if (connectorIdSTR.isEmpty()) {
-				connectorId = 0;
-			} else {
-				try {
-					connectorId = Integer.parseInt(request.getParameter("connectorId"));	
-				} catch (NumberFormatException e) {
-					throw new InputException(Common.EXCEPTION_PARSING_NUMBER);
-				}
-			}
-			String availType = request.getParameter("availType");
-			
-			ChangeAvailabilityRequest req = cpsClient.prepareChangeAvailability(connectorId, availType);
-
-			for(String temp: chargePointItems){
-				String[] chargePointItem = temp.split(";");
-				result = cpsClient.sendChangeAvailability(chargePointItem[0], chargePointItem[1], req);
-				writer.println(result);
-			}
+			returnBuilder = processChangeAvail(request, chargePointItems);
 
 		} else if (command.equals("/ChangeConfiguration")) {
-			String confKey = request.getParameter("confKey");
-			String value = request.getParameter("value");
-			ChangeConfigurationRequest req = cpsClient.prepareChangeConfiguration(confKey, value);
-
-			for(String temp: chargePointItems){
-				String[] chargePointItem = temp.split(";");
-				result = cpsClient.sendChangeConfiguration(chargePointItem[0], chargePointItem[1], req);
-				writer.println(result);
-			}
+			returnBuilder = processChangeConf(request, chargePointItems);
 
 		} else if (command.equals("/ClearCache")) {
-			ClearCacheRequest req = cpsClient.prepareClearCache();
+			returnBuilder = processClearCache(chargePointItems);
 
-			for(String temp: chargePointItems){
-				String[] chargePointItem = temp.split(";");
-				result = cpsClient.sendClearCache(chargePointItem[0], chargePointItem[1], req);
-				writer.println(result);
-			}	
-
-		} else if (command.equals("/GetDiagnostics")) {
-			int retries;
-			int retryInterval;			
-			try {
-				retries = Integer.parseInt(request.getParameter("retries"));
-				retryInterval = Integer.parseInt(request.getParameter("retryInterval"));				
-			} catch (NumberFormatException e) {
-				throw new InputException(Common.EXCEPTION_PARSING_NUMBER);
-			}
-			String location = request.getParameter("location");
-			String startTime = request.getParameter("startTime");
-			String stopTime = request.getParameter("stopTime");	
-			
-			GetDiagnosticsRequest req = cpsClient.prepareGetDiagnostics(location, retries, retryInterval, startTime, stopTime);
-
-			for(String temp: chargePointItems){
-				String[] chargePointItem = temp.split(";");
-				result = cpsClient.sendGetDiagnostics(chargePointItem[0], chargePointItem[1], req);
-				writer.println(result);
-			}
+		} else if (command.equals("/GetDiagnostics")) {			
+			returnBuilder = processGetDiagnostics(request, chargePointItems);
 
 		} else if (command.equals("/RemoteStartTransaction")) {
-			int connectorId;			
-			try {
-				connectorId = Integer.parseInt(request.getParameter("connectorId"));	
-			} catch (NumberFormatException e) {
-				throw new InputException(Common.EXCEPTION_PARSING_NUMBER);
-			}
-			String idTag = request.getParameter("idTag");
-			
-			RemoteStartTransactionRequest req = cpsClient.prepareRemoteStartTransaction(connectorId, idTag);
-
-			for(String temp: chargePointItems){
-				String[] chargePointItem = temp.split(";");
-				result = cpsClient.sendRemoteStartTransaction(chargePointItem[0], chargePointItem[1], req);
-				writer.println(result);
-			}
+			returnBuilder = processRemoteStartTrans(request, chargePointItems);
 
 		} else if (command.equals("/RemoteStopTransaction")) {
-			int transactionId;			
-			try {
-				transactionId = Integer.parseInt(request.getParameter("transactionId"));
-			} catch (NumberFormatException e) {
-				throw new InputException(Common.EXCEPTION_PARSING_NUMBER);
-			}
-			
-			RemoteStopTransactionRequest req = cpsClient.prepareRemoteStopTransaction(transactionId);
-
-			for(String temp: chargePointItems){
-				String[] chargePointItem = temp.split(";");
-				result = cpsClient.sendRemoteStopTransaction(chargePointItem[0], chargePointItem[1], req);
-				writer.println(result);
-			}
+			returnBuilder = processRemoteStopTrans(request, chargePointItems);
 
 		} else if (command.equals("/Reset")){			
-			String resetType = request.getParameter("resetType");
-			ResetRequest req = cpsClient.prepareReset(resetType);
-
-			for(String temp: chargePointItems){
-				String[] chargePointItem = temp.split(";");
-				result = cpsClient.sendReset(chargePointItem[0], chargePointItem[1], req);
-				writer.println(result);
-			}
+			returnBuilder = processReset(request, chargePointItems);
 
 		} else if (command.equals("/UnlockConnector")) {
-			int connectorId;			
-			try {
-				connectorId = Integer.parseInt(request.getParameter("connectorId"));	
-			} catch (NumberFormatException e) {
-				throw new InputException(Common.EXCEPTION_PARSING_NUMBER);
-			}
-			
-			UnlockConnectorRequest req = cpsClient.prepareUnlockConnector(connectorId);
-
-			for(String temp: chargePointItems){
-				String[] chargePointItem = temp.split(";");
-				result = cpsClient.sendUnlockConnector(chargePointItem[0], chargePointItem[1], req);
-				writer.println(result);
-			}
+			returnBuilder = processUnlockConnector(request, chargePointItems);
 
 		} else if (command.equals("/UpdateFirmware")){
-			int retries;
-			int retryInterval;			
-			try {
-				retries = Integer.parseInt(request.getParameter("retries"));
-				retryInterval = Integer.parseInt(request.getParameter("retryInterval"));				
-			} catch (NumberFormatException e) {
-				throw new InputException(Common.EXCEPTION_PARSING_NUMBER);
-			}
-			String location = request.getParameter("location");
-			String retrieveDate = request.getParameter("retrieveDate");	
-			
-			UpdateFirmwareRequest req = cpsClient.prepareUpdateFirmware(location, retries, retrieveDate, retryInterval);
-
-			for(String temp: chargePointItems){
-				String[] chargePointItem = temp.split(";");
-				result = cpsClient.sendUpdateFirmware(chargePointItem[0], chargePointItem[1], req);
-				writer.println(result);
-			}
-		}		
+			returnBuilder = processUpdateFirmware(request, chargePointItems);
+		}
+		
+		response.setContentType("text/plain");
+		PrintWriter writer = response.getWriter();
+		writer.write(returnBuilder.toString());
 		writer.close();	
 	}
 	
+	/////// HTTP GET: Print HTML /////// 
+		
 	private String printChargePoints() {		
 		StringBuilder builder = new StringBuilder(
 				"<b>Charge Points with OCPP v1.2</b><hr>\n"
@@ -261,7 +147,7 @@ public class ServletOperationsV12 extends HttpServlet {
 				+ "</td><td>\n"
 				+ "<select name=\"cp_items\" id=\"cp_items\" size=\"5\" multiple>\n");
 
-		for(String key : chargePointsList.keySet()) {
+		for (String key : chargePointsList.keySet()) {
 			String value = chargePointsList.get(key);
 			builder.append("<option value=\"" + key + ";" + value + "\">" + key + " &#8212; " + value + "</option>\n");
 		}
@@ -532,9 +418,254 @@ public class ServletOperationsV12 extends HttpServlet {
 		+ "<table class=\"params\">\n"
 		+ "<tr><td>Location (URI):</td><td><input type=\"text\" name=\"location\"></td></tr>\n"
 		+ "<tr><td>Retries (integer):</td><td><input type=\"number\" min=\"0\" name=\"retries\"></td></tr>\n"
-		+ "<tr><td>Retrieve Date (ex: 2011-12-21 11:33):</td><td><input type=\"datetime\" name=\"retrieveDate\"></td></tr>\n"
 		+ "<tr><td>Retry Interval (integer):</td><td><input type=\"number\" min=\"0\" name=\"retryInterval\"></td></tr>\n"
+		+ "<tr><td>Retrieve Date (ex: 2011-12-21 11:33):</td><td><input type=\"datetime\" name=\"retrieveDate\"></td></tr>\n"
 		+ "<tr><td></td><td id=\"add_space\"><input type=\"submit\" value=\"Perform\"></td></tr>\n"
 		+ "</table>\n</form>\n</div>";
+	}
+	
+	/////// HTTP POST: Process Request /////// 
+		
+	// chargePointItem[0] : chargebox id
+	// chargePointItem[1] : endpoint (IP) address
+	
+	private StringBuilder processChangeAvail(HttpServletRequest request, String[] chargePointItems) {
+		String connectorIdSTR = request.getParameter("connectorId");
+		int connectorId;
+		if (connectorIdSTR.isEmpty()) {
+			connectorId = 0;
+		} else {
+			try {
+				connectorId = Integer.parseInt(request.getParameter("connectorId"));	
+			} catch (NumberFormatException e) {
+				throw new InputException(Common.EXCEPTION_PARSING_NUMBER);
+			}
+		}
+		String availType = request.getParameter("availType");
+		
+		ChargePointService12_Client cpsClient = new ChargePointService12_Client();
+		ChangeAvailabilityRequest req = cpsClient.prepareChangeAvailability(connectorId, availType);
+
+		StringBuilder builder = new StringBuilder();
+		String result;
+		for (String temp: chargePointItems) {
+			String[] chargePointItem = temp.split(";");
+			result = cpsClient.sendChangeAvailability(chargePointItem[0], chargePointItem[1], req);
+			builder.append(result + "\n");
+		}
+		return builder;
+	}
+	
+	private StringBuilder processChangeConf(HttpServletRequest request, String[] chargePointItems) {
+		String confKey = request.getParameter("confKey");
+		String value = request.getParameter("value");
+		if (value.isEmpty()) {
+			throw new InputException(Common.EXCEPTION_INPUT_EMPTY);
+		}
+		
+		ChargePointService12_Client cpsClient = new ChargePointService12_Client();
+		ChangeConfigurationRequest req = cpsClient.prepareChangeConfiguration(confKey, value);
+
+		StringBuilder builder = new StringBuilder();
+		String result;
+		for (String temp: chargePointItems) {
+			String[] chargePointItem = temp.split(";");
+			result = cpsClient.sendChangeConfiguration(chargePointItem[0], chargePointItem[1], req);
+			builder.append(result + "\n");
+		}
+		return builder;
+	}
+	
+	private StringBuilder processClearCache(String[] chargePointItems) {
+		ChargePointService12_Client cpsClient = new ChargePointService12_Client();
+		ClearCacheRequest req = cpsClient.prepareClearCache();
+
+		StringBuilder builder = new StringBuilder();
+		String result;
+		for (String temp: chargePointItems) {
+			String[] chargePointItem = temp.split(";");
+			result = cpsClient.sendClearCache(chargePointItem[0], chargePointItem[1], req);
+			builder.append(result + "\n");
+		}
+		return builder;
+	}
+	
+	private StringBuilder processGetDiagnostics(HttpServletRequest request, String[] chargePointItems) {
+		String location = request.getParameter("location");
+		String retriesSTR = request.getParameter("retries");
+		String retryIntervalSTR = request.getParameter("retryInterval");
+		String startTime = request.getParameter("startTime");
+		String stopTime = request.getParameter("stopTime");
+		
+		if (location.isEmpty()
+				|| retriesSTR.isEmpty() 
+				|| retryIntervalSTR.isEmpty()
+				|| startTime.isEmpty()
+				|| stopTime.isEmpty()){
+			throw new InputException(Common.EXCEPTION_INPUT_EMPTY);
+		}			
+		
+		int retries;
+		int retryInterval;			
+		try {
+			retries = Integer.parseInt(retriesSTR);
+			retryInterval = Integer.parseInt(retryIntervalSTR);				
+		} catch (NumberFormatException e) {
+			throw new InputException(Common.EXCEPTION_PARSING_NUMBER);
+		}	
+		
+		ChargePointService12_Client cpsClient = new ChargePointService12_Client();
+		GetDiagnosticsRequest req = cpsClient.prepareGetDiagnostics(location, retries, retryInterval, startTime, stopTime);
+
+		StringBuilder builder = new StringBuilder();
+		String result;
+		for (String temp: chargePointItems) {
+			String[] chargePointItem = temp.split(";");
+			result = cpsClient.sendGetDiagnostics(chargePointItem[0], chargePointItem[1], req);
+			builder.append(result + "\n");
+		}
+		return builder;
+	}
+	
+	private StringBuilder processRemoteStartTrans(HttpServletRequest request, String[] chargePointItems) {
+		String connectorIdSTR = request.getParameter("connectorId");
+		if (connectorIdSTR.isEmpty()) {
+			throw new InputException(Common.EXCEPTION_INPUT_EMPTY);
+		}
+		
+		int connectorId;			
+		try {
+			connectorId = Integer.parseInt(connectorIdSTR);	
+		} catch (NumberFormatException e) {
+			throw new InputException(Common.EXCEPTION_PARSING_NUMBER);
+		}
+		
+		if (connectorId == 0) {
+			throw new InputException(Common.EXCEPTION_INPUT_ZERO);
+		}
+		
+		String idTag = request.getParameter("idTag");
+		if (idTag.isEmpty()) {
+			throw new InputException(Common.EXCEPTION_INPUT_EMPTY);
+		}
+		
+		ChargePointService12_Client cpsClient = new ChargePointService12_Client();
+		RemoteStartTransactionRequest req = cpsClient.prepareRemoteStartTransaction(connectorId, idTag);
+
+		StringBuilder builder = new StringBuilder();
+		String result;
+		for (String temp: chargePointItems) {
+			String[] chargePointItem = temp.split(";");
+			result = cpsClient.sendRemoteStartTransaction(chargePointItem[0], chargePointItem[1], req);
+			builder.append(result + "\n");
+		}
+		return builder;
+	}
+	
+	private StringBuilder processRemoteStopTrans(HttpServletRequest request, String[] chargePointItems) {
+		String transactionIdSTR = request.getParameter("transactionId");
+		if (transactionIdSTR.isEmpty()) {
+			throw new InputException(Common.EXCEPTION_INPUT_EMPTY);
+		}
+		
+		int transactionId;			
+		try {
+			transactionId = Integer.parseInt(transactionIdSTR);
+		} catch (NumberFormatException e) {
+			throw new InputException(Common.EXCEPTION_PARSING_NUMBER);
+		}
+		
+		ChargePointService12_Client cpsClient = new ChargePointService12_Client();
+		RemoteStopTransactionRequest req = cpsClient.prepareRemoteStopTransaction(transactionId);
+
+		StringBuilder builder = new StringBuilder();
+		String result;
+		for (String temp: chargePointItems) {
+			String[] chargePointItem = temp.split(";");
+			result = cpsClient.sendRemoteStopTransaction(chargePointItem[0], chargePointItem[1], req);
+			builder.append(result + "\n");
+		}
+		return builder;
+	}
+	
+	private StringBuilder processReset(HttpServletRequest request, String[] chargePointItems) {
+		String resetType = request.getParameter("resetType");
+		
+		ChargePointService12_Client cpsClient = new ChargePointService12_Client();
+		ResetRequest req = cpsClient.prepareReset(resetType);
+
+		StringBuilder builder = new StringBuilder();
+		String result;
+		for (String temp: chargePointItems) {
+			String[] chargePointItem = temp.split(";");
+			result = cpsClient.sendReset(chargePointItem[0], chargePointItem[1], req);
+			builder.append(result + "\n");
+		}
+		return builder;
+	}
+	
+	private StringBuilder processUnlockConnector(HttpServletRequest request, String[] chargePointItems) {
+		String connectorIdSTR = request.getParameter("connectorId");
+		if (connectorIdSTR.isEmpty()) {
+			throw new InputException(Common.EXCEPTION_INPUT_EMPTY);
+		}
+		
+		int connectorId;			
+		try {
+			connectorId = Integer.parseInt(connectorIdSTR);	
+		} catch (NumberFormatException e) {
+			throw new InputException(Common.EXCEPTION_PARSING_NUMBER);
+		}
+		
+		if (connectorId == 0) {
+			throw new InputException(Common.EXCEPTION_INPUT_ZERO);
+		}
+		
+		ChargePointService12_Client cpsClient = new ChargePointService12_Client();
+		UnlockConnectorRequest req = cpsClient.prepareUnlockConnector(connectorId);
+
+		StringBuilder builder = new StringBuilder();
+		String result;
+		for (String temp: chargePointItems) {
+			String[] chargePointItem = temp.split(";");
+			result = cpsClient.sendUnlockConnector(chargePointItem[0], chargePointItem[1], req);
+			builder.append(result + "\n");
+		}
+		return builder;
+	}
+	
+	private StringBuilder processUpdateFirmware(HttpServletRequest request, String[] chargePointItems) {
+		String location = request.getParameter("location");
+		String retriesSTR = request.getParameter("retries");
+		String retryIntervalSTR = request.getParameter("retryInterval");
+		String retrieveDate = request.getParameter("retrieveDate");	
+		
+		if (location.isEmpty()
+				|| retriesSTR.isEmpty() 
+				|| retryIntervalSTR.isEmpty()
+				|| retrieveDate.isEmpty()){
+			throw new InputException(Common.EXCEPTION_INPUT_EMPTY);
+		}			
+		
+		int retries;
+		int retryInterval;			
+		try {
+			retries = Integer.parseInt(retriesSTR);
+			retryInterval = Integer.parseInt(retryIntervalSTR);				
+		} catch (NumberFormatException e) {
+			throw new InputException(Common.EXCEPTION_PARSING_NUMBER);
+		}
+		
+		ChargePointService12_Client cpsClient = new ChargePointService12_Client();
+		UpdateFirmwareRequest req = cpsClient.prepareUpdateFirmware(location, retries, retrieveDate, retryInterval);
+
+		StringBuilder builder = new StringBuilder();
+		String result;
+		for (String temp: chargePointItems) {
+			String[] chargePointItem = temp.split(";");
+			result = cpsClient.sendUpdateFirmware(chargePointItem[0], chargePointItem[1], req);
+			builder.append(result + "\n");
+		}
+		return builder;
 	}
 }

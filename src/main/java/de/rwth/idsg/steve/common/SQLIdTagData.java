@@ -8,6 +8,7 @@ import java.sql.Timestamp;
  * version-specific OCPP IdTagInfo. Based on this instances content, 
  * an IdTagInfo will be created by version-specific OCPP service implementation.
  * 
+ * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
  */
 public class SQLIdTagData {
 	

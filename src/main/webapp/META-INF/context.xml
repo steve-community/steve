@@ -4,6 +4,7 @@
 	auth="Container" 
 	type="javax.sql.DataSource"
 	factory="org.apache.tomcat.jdbc.pool.DataSourceFactory" 
+	driverClassName="com.mysql.jdbc.Driver" 
 	initialSize="1"
 	maxActive="5" 
 	minIdle="1" 
@@ -14,6 +15,5 @@
 	validationInterval="60000"
 	username="root" 
 	password="come47on"
-	driverClassName="com.mysql.jdbc.Driver" 
 	url="jdbc:mysql://localhost:3306/cssdb" />
 </Context>

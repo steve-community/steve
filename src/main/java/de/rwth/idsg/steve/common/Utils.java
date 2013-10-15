@@ -22,6 +22,11 @@ import org.slf4j.LoggerFactory;
 import de.rwth.idsg.steve.html.Common;
 import de.rwth.idsg.steve.html.InputException;
 
+/**
+ *
+ * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
+ * 
+ */
 public class Utils {
 
 	private static final Logger LOG = LoggerFactory.getLogger(Utils.class);

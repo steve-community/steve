@@ -227,12 +227,20 @@ ul.navigation ul li a {
 }
 
 .footer {
+	width: 1024px;
+	border-left: 1px solid #CCC;
+	border-top: 1px solid #CCC;
+	border-right: 1px solid #CCC;
+	border-top-left-radius: 4px;
+	border-top-right-radius: 4px;
 	position: relative;
 	padding-top: 10px;
 	margin-top: -70px;
+	margin-right: auto;
+	margin-left: auto;
 	height: 60px;
 	text-align: center;
-	background: #71797d;
+	background: #fff;
 }
 
 .footer a { margin-right: 10px; }

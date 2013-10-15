@@ -8,6 +8,11 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+/**
+* 
+* @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
+* 
+*/
 public class ServletHome extends HttpServlet {
 
 	private static final long serialVersionUID = 8576766110806723303L;

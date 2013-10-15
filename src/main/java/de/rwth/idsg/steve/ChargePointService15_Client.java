@@ -53,8 +53,12 @@ import de.rwth.idsg.steve.common.ClientDBAccess;
 import de.rwth.idsg.steve.common.Utils;
 
 /**
+ * Client implementation of OCPP V1.5.
+ * 
  * This class has methods to create request payloads, and methods to send these to charge points from dynamically created clients.
  * Since there are multiple charge points and their endpoint addresses vary, the clients need to be created dynamically.
+ * 
+ * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
  * 
  */
 public class ChargePointService15_Client {
@@ -334,7 +338,7 @@ public class ChargePointService15_Client {
 	/////// The following operations are specific to charge point: PREPARE and SEND Request Payloads ///////
 	
 	// TODO: It's cumbersome now: First book, then cancel if it is not accepted by the charge point.
-	// Needs a better idea: Book only if it is accepted by the charge point.
+	// Needs a better idea: Book only if it is accepted by the charge point?
 	public String reserveNow(
 			String chargeBoxId, 
 			String endpoint_address, 

@@ -30,8 +30,12 @@ import org.slf4j.LoggerFactory;
 import de.rwth.idsg.steve.common.Utils;
 
 /**
+ * Client implementation of OCPP V1.2.
+ * 
  * This class has methods to create request payloads, and methods to send these to charge points from dynamically created clients.
  * Since there are multiple charge points and their endpoint addresses vary, the clients need to be created dynamically.
+ * 
+ * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
  * 
  */
 public class ChargePointService12_Client {

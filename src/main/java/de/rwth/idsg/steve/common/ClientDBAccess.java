@@ -21,6 +21,13 @@ import org.slf4j.LoggerFactory;
 import de.rwth.idsg.steve.html.Common;
 import de.rwth.idsg.steve.html.InputException;
 
+
+/**
+ * This class has helper methods for database access that are used by the OCPP client, or the HTTP servlet.
+ * 
+ * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
+ *  
+ */
 public class ClientDBAccess {
 	
 	private static final Logger LOG = LoggerFactory.getLogger(ClientDBAccess.class);
@@ -32,8 +39,10 @@ public class ClientDBAccess {
 		try {	
 			// Prepare Database Access
 			connect = Utils.getConnectionFromPool();
+
 			pt = connect.prepareStatement("SELECT chargeBoxId, endpoint_address FROM chargebox WHERE ocppVersion=?");
 			pt.setString(1, ocppVersion);
+
 			rs = pt.executeQuery();
 
 			HashMap<String,String> results = new HashMap<String,String>();
@@ -45,6 +54,101 @@ public class ClientDBAccess {
 			throw new RuntimeException(ex);
 		} finally {
 			Utils.releaseResources(connect, pt, rs);
+		}
+	}
+	
+	public static synchronized void addChargePoint(String chargeBoxId) {
+		Connection connect = null;
+		PreparedStatement pt = null;
+		try { 
+			// Prepare Database Access
+			connect = Utils.getConnectionFromPool();
+			pt = connect.prepareStatement("INSERT IGNORE INTO chargebox (chargeBoxId) VALUES (?)");
+			pt.setString(1, chargeBoxId);
+			pt.executeUpdate();
+		
+		} catch (SQLException e1) {
+			e1.printStackTrace();
+		} finally {
+			Utils.releaseResources(connect, pt, null);
+		}
+	}
+	
+	public static synchronized void deleteChargePoint(String chargeBoxId) {
+		Connection connect = null;
+		PreparedStatement pt = null;
+		try { 
+			// Prepare Database Access
+			connect = Utils.getConnectionFromPool();
+			connect.setAutoCommit(false);
+			
+			pt = connect.prepareStatement("DELETE FROM chargebox WHERE chargeBoxId=?");
+			pt.setString(1, chargeBoxId);			
+			int count = pt.executeUpdate();
+			
+			// Validate the change
+			if (count == 1) {
+				connect.commit();
+				LOG.info("The charge point with chargeBoxId {} is deleted.", chargeBoxId);
+			} else {
+				LOG.error("Transaction is being rolled back.");
+				connect.rollback();
+				LOG.info("The charge point with chargeBoxId {} could NOT be deleted.", chargeBoxId);
+			}
+			connect.setAutoCommit(true);
+		} catch (SQLException e1) {
+			e1.printStackTrace();
+		} finally {
+			Utils.releaseResources(connect, pt, null);
+		}
+	}
+		
+	public static synchronized void addUser(String idTag, String parentIdTag, Timestamp expiryTimestamp) {
+
+		Connection connect = null;
+		PreparedStatement pt = null;
+		try { 
+			// Prepare Database Access
+			connect = Utils.getConnectionFromPool();
+			pt = connect.prepareStatement("INSERT IGNORE INTO user (idTag, parentIdTag, expiryDate) VALUES (?,?,?)");
+			pt.setString(1, idTag);
+			pt.setString(2, parentIdTag);
+			pt.setTimestamp(3, expiryTimestamp);			
+			pt.executeUpdate();
+			
+		} catch (SQLException e1) {
+			e1.printStackTrace();
+		} finally {
+			Utils.releaseResources(connect, pt, null);
+		}
+	}
+	
+	public static synchronized void deleteUser(String idTag) {
+		Connection connect = null;
+		PreparedStatement pt = null;
+		try { 
+			// Prepare Database Access
+			connect = Utils.getConnectionFromPool();
+			connect.setAutoCommit(false);
+			
+			pt = connect.prepareStatement("DELETE FROM user WHERE idTag=?");
+			pt.setString(1, idTag);			
+			int count = pt.executeUpdate();
+			
+			// Validate the change
+			if (count == 1) {
+				connect.commit();
+				LOG.info("The user with idTag {} is deleted.", idTag);
+			} else {
+				LOG.error("Transaction is being rolled back.");
+				connect.rollback();
+				LOG.info("The user with idTag {} could NOT be deleted.", idTag);
+			}
+			connect.setAutoCommit(true);
+		} catch (SQLException e1) {
+			e1.printStackTrace();
+		} finally {
+			Utils.releaseResources(connect, pt, null);
 		}
 	}
 	
@@ -155,31 +259,6 @@ public class ClientDBAccess {
 	}
 	
 	/**
-	 * Throws exception, if there are rows whose date/time ranges overlap with the input
-	 *
-	 */
-	private static void isOverlapping(Connection connect, PreparedStatement pt, Timestamp start, Timestamp stop) {
-		
-		ResultSet rs = null;
-		try {
-			// This WHERE clause covers all three cases
-			pt = connect.prepareStatement("SELECT 1 FROM reservation WHERE ? <= expiryDatetime AND ? >= startDatetime");
-			pt.setTimestamp(1, start);
-			pt.setTimestamp(2, stop);
-
-			rs = pt.executeQuery();
-			// If the result set does have an entry, then there are overlaps
-			if ( rs.next() ) {
-				throw new InputException(Common.EXCEPTION_OVERLAPPING_RESERVATION);
-			}
-		} catch (SQLException e1) {
-			e1.printStackTrace();
-		} finally {
-			Utils.releaseResources(null, pt, rs);
-		}
-	}
-	
-	/**
 	 * For OCPP 1.5: Helper method to read idTags from the DB for the operation SendLocalList.
 	 * 
 	 */
@@ -253,5 +332,30 @@ public class ClientDBAccess {
 			Utils.releaseResources(connect, pt, rs);
 		}
 		return list;
+	}	
+	
+	/**
+	 * Throws exception, if there are rows whose date/time ranges overlap with the input
+	 *
+	 */
+	private static void isOverlapping(Connection connect, PreparedStatement pt, Timestamp start, Timestamp stop) {
+		
+		ResultSet rs = null;
+		try {
+			// This WHERE clause covers all three cases
+			pt = connect.prepareStatement("SELECT 1 FROM reservation WHERE ? <= expiryDatetime AND ? >= startDatetime");
+			pt.setTimestamp(1, start);
+			pt.setTimestamp(2, stop);
+
+			rs = pt.executeQuery();
+			// If the result set does have an entry, then there are overlaps
+			if ( rs.next() ) {
+				throw new InputException(Common.EXCEPTION_OVERLAPPING_RESERVATION);
+			}
+		} catch (SQLException e1) {
+			e1.printStackTrace();
+		} finally {
+			Utils.releaseResources(null, pt, rs);
+		}
 	}
 }

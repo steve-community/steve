@@ -18,7 +18,12 @@ import org.joda.time.DateTime;
 import de.rwth.idsg.steve.common.ClientDBAccess;
 import de.rwth.idsg.steve.common.Utils;
 
-public class ServletReservation extends HttpServlet {
+/**
+* 
+* @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
+* 
+*/
+public class ServletUsers extends HttpServlet {
 
 	private static final long serialVersionUID = 8576766110806723303L;
 	String contextPath, servletPath;
@@ -35,9 +40,9 @@ public class ServletReservation extends HttpServlet {
 		
 		writer.println(
 				Common.printHead(contextPath)
-				+ printExistingReservations()
-				+ printBookReservation()
-				+ printCancelReservation()
+				+ printUsers()
+				+ printAddUser()
+				+ printDeleteUser()
 				+ Common.printFoot(contextPath));
 		
 		writer.close();	
@@ -47,32 +52,45 @@ public class ServletReservation extends HttpServlet {
 	public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
 
 		String command = request.getPathInfo();	
-
-		if (command.equals("/book")){
+		
+		if (command.equals("/add")){
 			String idTag = request.getParameter("idTag");
-			String chargeBoxId = request.getParameter("chargeBoxId");
-			String startString = request.getParameter("startDatetime");
-			String expiryString = request.getParameter("expiryDatetime");
+			String parentIdTagSTR = request.getParameter("parentIdTag");
+			String expiryDateSTR = request.getParameter("expiryDate");
 			
-			DateTime startDateTime = Utils.convertToDateTime(startString);
-			DateTime expiryDateTime = Utils.convertToDateTime(expiryString);
-
-			ClientDBAccess.bookReservation(idTag, chargeBoxId, startDateTime, expiryDateTime);
+			if (idTag.isEmpty()) {
+				throw new InputException(Common.EXCEPTION_INPUT_EMPTY);
+			}
+						
+			Timestamp expiryTimestamp = null;
+			if (!expiryDateSTR.isEmpty()) {
+				DateTime expiryDatetime = Utils.convertToDateTime(expiryDateSTR);
+				expiryTimestamp = new Timestamp(expiryDatetime.getMillis());
+			}
 			
-		} else if (command.equals("/cancel")){
-			int reservation_pk = Integer.parseInt(request.getParameter("reservation_pk"));
-			ClientDBAccess.cancelReservation(reservation_pk);
+			String parentIdTag = null;
+			if (!parentIdTagSTR.isEmpty()) {
+				parentIdTag = parentIdTagSTR;
+			}			
+			ClientDBAccess.addUser(idTag, parentIdTag, expiryTimestamp);
+			
+		} else if (command.equals("/delete")){
+			String idTag = request.getParameter("idTag");
+			if (idTag.isEmpty()) {
+				throw new InputException(Common.EXCEPTION_INPUT_EMPTY);
+			}			
+			ClientDBAccess.deleteUser(idTag);			
 		}		
 		response.sendRedirect(contextPath + servletPath);
 		return;
-	}
+	}	
 
-	private String printExistingReservations() {
+	private String printUsers() {
 		StringBuilder builder = new StringBuilder(
-				"<b>Existing Reservations</b><hr>\n"
+				"<b>Registered Users</b><hr>\n"
 				+ "<center>\n"
 				+ "<table class=\"res\">\n"
-				+ "<tr><th>Reservation Id</th><th>idTag</th><th>chargeBoxId</th><th>startDatetime</th><th>expiryDatetime</th><th>expired</th></tr>\n");
+				+ "<tr><th>idTag</th><th>parentIdTag</th><th>expiryDate</th><th>inTransaction</th><th>blocked</th></tr>\n");
 
 		Connection connect = null;
 		PreparedStatement pt = null;
@@ -80,19 +98,21 @@ public class ServletReservation extends HttpServlet {
 		try {	
 			// Prepare Database Access
 			connect = Utils.getConnectionFromPool();
-			pt = connect.prepareStatement("SELECT reservation_pk, idTag, chargeBoxId, startDatetime, expiryDatetime FROM reservation ORDER BY expiryDatetime;");
+			pt = connect.prepareStatement("SELECT * FROM user;");
 			rs = pt.executeQuery();
 
-			Timestamp now = Utils.getCurrentDateTimeTS();
 			while ( rs.next() ) {
-				Timestamp ex = rs.getTimestamp(5);
+				
+				Timestamp ts = rs.getTimestamp(3);
+				String str = "null";
+				if (ts != null) str = Utils.convertToString(ts);
+							
 				builder.append("<tr>"
-						+ "<td>" + rs.getInt(1) + "</td>"
+						+ "<td>" + rs.getString(1) + "</td>"
 						+ "<td>" + rs.getString(2) + "</td>"
-						+ "<td>" + rs.getString(3) + "</td>"
-						+ "<td>" + Utils.convertToString(rs.getTimestamp(4)) + "</td>"
-						+ "<td>" + Utils.convertToString(ex)+ "</td>"
-						+ "<td>" + now.after(ex) + "</td>"
+						+ "<td>" + str + "</td>"
+						+ "<td>" + rs.getBoolean(4) + "</td>"
+						+ "<td>" + rs.getBoolean(5) + "</td>"
 						+ "</tr>\n");
 			}
 		} catch (SQLException ex) {
@@ -105,30 +125,29 @@ public class ServletReservation extends HttpServlet {
 		return builder.toString();
 	}
 
-	private String printBookReservation() {		
+	private String printAddUser() {		
 		StringBuilder builder = new StringBuilder(
-				"<b>Book A New Reservation</b><hr>\n"
+				"<b>Add A New User</b><hr>\n"
 				+ "<center>\n"
-				+ "<form method=\"POST\" action=\"" + contextPath + servletPath + "/book\">\n"
+				+ "<form method=\"POST\" action=\"" + contextPath + servletPath + "/add\">\n"
 				+ "<table class=\"bc\">\n"		
-				+ "<tr><td>idTag (of the user):</td><td><input type=\"text\" name=\"idTag\"></td></tr>\n"
-				+ "<tr><td>chargeBoxId (of the charge point):</td><td><input type=\"text\" name=\"chargeBoxId\"></td></tr>\n"
-				+ "<tr><td>Start date and time (ex: 2011-12-21 11:30):</td><td><input type=\"text\" name=\"startDatetime\"></td></tr>\n"
-				+ "<tr><td>Expiry date and time (ex: 2011-12-21 11:30):</td><td><input type=\"text\" name=\"expiryDatetime\"></td></tr>\n"
-				+ "<tr><td></td><td id=\"add_space\"><input type=\"submit\" value=\"Book\"></td></tr>\n" 	   	
+				+ "<tr><td>idTag (string):</td><td><input type=\"text\" name=\"idTag\"></td></tr>\n"
+				+ "<tr><td>parentIdTag (string):</td><td><input type=\"text\" name=\"parentIdTag\" placeholder=\"optional\"></td></tr>\n"
+				+ "<tr><td>Expiry date and time (ex: 2011-12-21 11:30):</td><td><input type=\"text\" name=\"expiryDate\" placeholder=\"optional\"></td></tr>\n"
+				+ "<tr><td></td><td id=\"add_space\"><input type=\"submit\" value=\"Add\"></td></tr>\n" 	   	
 				+ "</table>\n"		
 				+ "</form>\n"
 				+ "</center>\n<br>\n");		
 		return builder.toString();
 	}
 
-	private String printCancelReservation() {
+	private String printDeleteUser() {
 		StringBuilder builder = new StringBuilder(
-				"<b>Cancel An Existing Reservation</b><hr>\n"
+				"<b>Delete A User</b><hr>\n"
 				+ "<center>\n"	
-				+ "<form method=\"POST\" action=\""+ contextPath + servletPath + "/cancel\">\n"
+				+ "<form method=\"POST\" action=\""+ contextPath + servletPath + "/delete\">\n"
 				+ "<table class=\"bc\">\n"
-				+ "<tr><td>Reservation Id:</td><td><input type=\"number\" min=\"1\" name=\"reservation_pk\"></td></tr>\n"
+				+ "<tr><td>idTag (string):</td><td><input type=\"text\" name=\"idTag\"></td></tr>\n"
 				+ "<tr><td></td><td id=\"add_space\"><input type=\"submit\" value=\"Delete\"></td></tr>\n"
 				+ "</table>\n"
 				+ "</form>\n"

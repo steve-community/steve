@@ -26,8 +26,16 @@
     <servlet-class>de.rwth.idsg.steve.html.ServletHome</servlet-class>
   </servlet>
   <servlet>
-    <servlet-name>ServletReservation</servlet-name>
-    <servlet-class>de.rwth.idsg.steve.html.ServletReservation</servlet-class>
+    <servlet-name>ServletReservations</servlet-name>
+    <servlet-class>de.rwth.idsg.steve.html.ServletReservations</servlet-class>
+  </servlet>
+  <servlet>
+    <servlet-name>ServletChargePoints</servlet-name>
+    <servlet-class>de.rwth.idsg.steve.html.ServletChargePoints</servlet-class>
+  </servlet>
+  <servlet>
+    <servlet-name>ServletUsers</servlet-name>
+    <servlet-class>de.rwth.idsg.steve.html.ServletUsers</servlet-class>
   </servlet>
   <servlet>
     <servlet-name>ServletOperationsV12</servlet-name>
@@ -38,8 +46,8 @@
     <servlet-class>de.rwth.idsg.steve.html.ServletOperationsV15</servlet-class>
   </servlet>
     <servlet>
-    <servlet-name>ServletStatus</servlet-name>
-    <servlet-class>de.rwth.idsg.steve.html.ServletStatus</servlet-class>
+    <servlet-name>ServletSettings</servlet-name>
+    <servlet-class>de.rwth.idsg.steve.html.ServletSettings</servlet-class>
   </servlet>
   <servlet>
     <servlet-name>ServletLog</servlet-name>
@@ -59,8 +67,16 @@
     <url-pattern>/manager</url-pattern>
   </servlet-mapping>
   <servlet-mapping>
-    <servlet-name>ServletReservation</servlet-name>
-    <url-pattern>/manager/reservation/*</url-pattern>
+    <servlet-name>ServletChargePoints</servlet-name>
+    <url-pattern>/manager/chargepoints/*</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>ServletUsers</servlet-name>
+    <url-pattern>/manager/users/*</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>ServletReservations</servlet-name>
+    <url-pattern>/manager/reservations/*</url-pattern>
   </servlet-mapping>
   <servlet-mapping>
     <servlet-name>ServletOperationsV12</servlet-name>
@@ -71,8 +87,8 @@
     <url-pattern>/manager/operations/v1.5/*</url-pattern>
   </servlet-mapping>
   <servlet-mapping>
-    <servlet-name>ServletStatus</servlet-name>
-    <url-pattern>/manager/status</url-pattern>
+    <servlet-name>ServletSettings</servlet-name>
+    <url-pattern>/manager/settings/*</url-pattern>
   </servlet-mapping>
   <servlet-mapping>
     <servlet-name>ServletLog</servlet-name>

@@ -10,6 +10,13 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+
+/**
+ * This class has helper methods for database access that are used by the OCPP service.
+ * 
+ * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
+ *  
+ */
 public class ServiceDBAccess {
 	
 	private static final Logger LOG = LoggerFactory.getLogger(ServiceDBAccess.class);
@@ -401,7 +408,7 @@ public class ServiceDBAccess {
 				if (reservationId != null) {
 					// Okay, now end the reservation
 					Utils.releaseResources(null, pt, rs);
-					pt = connect.prepareStatement("UPDATE reservation SET ended = 1 WHERE reservation_pk=?");
+					pt = connect.prepareStatement("DELETE FROM reservation WHERE reservation_pk=?");
 					pt.setInt(1, reservationId.intValue());
 					// Execute the query
 					int countRes = pt.executeUpdate();
@@ -429,17 +436,6 @@ public class ServiceDBAccess {
 		} finally {
 			Utils.releaseResources(connect, pt, rs);
 		}
-		
-		/**** START SENSOR MODIFICATION ****/
-
-//		if (Constants.SENSORS_ENABLED) {
-//			// Send message to the sensor that the transaction is granted to start
-//			ChangeService_Client sensorClient = new ChangeService_Client();
-//			sensorClient.sendChangeStatus(chargeBoxIdentity, Constants.SENSOR_ENDPOINT_ADDRESS, connectorId, Status.TRANS_STARTED);
-//		}
-
-		/**** END SENSOR MODIFICATION ****/
-		
 		return transactionId;
 	}
 	
@@ -481,45 +477,6 @@ public class ServiceDBAccess {
 		} finally {
 			Utils.releaseResources(connect, pt, null);	
 		}
-				
-		/**** START SENSOR MODIFICATION ****/
-		
-//		if (Constants.SENSORS_ENABLED) {
-//			
-//			int connectorId = getConnectorId(transactionId);				
-//			if (connectorId != -1) {
-//				// Send message to the sensor that the transaction is granted to STOP
-//				ChangeService_Client sensorClient = new ChangeService_Client();
-//				sensorClient.sendChangeStatus(chargeBoxIdentity, Constants.SENSOR_ENDPOINT_ADDRESS, connectorId, Status.TRANS_STOPPED);
-//			}	
-//		}
-		
-		/**** END SENSOR MODIFICATION ****/
-	}
-	
-	public static synchronized int getConnectorId (int transactionId){
-		
-		int connectorId = -1;
-		Connection connect = null;
-		PreparedStatement pt = null;
-		ResultSet rs = null;
-		try {			
-			// Prepare Database Access
-			connect = Utils.getConnectionFromPool();
-			
-			pt = connect.prepareStatement("SELECT connectorId FROM connector WHERE connector_pk = (SELECT connector_pk FROM transaction WHERE transaction_pk = ?)");
-			pt.setInt(1, transactionId);
-			
-			// Execute and get the result of the SQL query
-			rs = pt.executeQuery();			
-			if (rs.next() == true) connectorId = rs.getInt(1);
-			
-		} catch (SQLException e1) {
-			e1.printStackTrace();
-		} finally {
-			Utils.releaseResources(connect, pt, rs);	
-		}	
-		return connectorId;
 	}
 	
 	/**
@@ -557,5 +514,35 @@ public class ServiceDBAccess {
 			Utils.releaseResources(connect, pt, rs);
 		}
 		return sqlAuthData;
+	}
+	
+	/**
+	 * Helper method to get the connector id of a charge point
+	 * where a transaction started.
+	 * 
+	 */
+	public static synchronized int getConnectorId (int transactionId){
+		
+		int connectorId = -1;
+		Connection connect = null;
+		PreparedStatement pt = null;
+		ResultSet rs = null;
+		try {			
+			// Prepare Database Access
+			connect = Utils.getConnectionFromPool();
+			
+			pt = connect.prepareStatement("SELECT connectorId FROM connector WHERE connector_pk = (SELECT connector_pk FROM transaction WHERE transaction_pk = ?)");
+			pt.setInt(1, transactionId);
+			
+			// Execute and get the result of the SQL query
+			rs = pt.executeQuery();			
+			if (rs.next() == true) connectorId = rs.getInt(1);
+			
+		} catch (SQLException e1) {
+			e1.printStackTrace();
+		} finally {
+			Utils.releaseResources(connect, pt, rs);	
+		}	
+		return connectorId;
 	}
 }

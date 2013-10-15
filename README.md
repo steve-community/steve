@@ -14,4 +14,11 @@ How to use?
 2. SteVe requires MySQL to store the data. SteVe comes with a MySQL [dump file](steve-dump-no-data.sql) that contains the database structure for all tables with no data. This should be imported in your MySQL database before deployment of SteVe.  
 **Important**: The default configuration for the database connection can be changed in [context.xml](src/main/webapp/META-INF/context.xml). The required fields to change are *username*, *password* and *url*.
 
-
+Screenshots
+-----
+1. [Data Management - Reservations](src/main/webapp/images/SteVe_res.png)
+2. [Data Management - Charge Points](src/main/webapp/images/SteVe_cp.png)
+3. [Data Management - Users](src/main/webapp/images/SteVe_users.png)
+4. [Operations for OCPP v1.2](src/main/webapp/images/SteVe_ocpp12.png)
+5. [Operations for OCPP v1.5](src/main/webapp/images/SteVe_ocpp15.png)
+6. [Settings](src/main/webapp/images/SteVe_set.png)

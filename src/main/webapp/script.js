@@ -12,7 +12,7 @@ function selectNone(selectBox) {
 
 function showElements() {
 	var elem = document.getElementById("diffElements");
-	var s = "<input type='button' value='Add' onClick='addElement()'><br>";
+	var s = "<input type='button' value='Add row' onClick='addElement()'><br>";
 	elem.innerHTML = s;
 	addElement();
 }

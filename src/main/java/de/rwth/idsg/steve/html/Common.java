@@ -1,5 +1,7 @@
 package de.rwth.idsg.steve.html;
 
+import java.util.HashMap;
+
 /**
 *
 * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
@@ -91,5 +93,38 @@ public class Common {
 		+ "</div>\n"
 		+ "</body>\n"
 		+ "</html>";
+	}
+	
+	public static String printChargePointsMultipleSelect(HashMap<String,String> chargePointsList, String ocppVersion) {		
+		StringBuilder builder = new StringBuilder(
+				"<b>Charge Points with OCPP v" + ocppVersion + "</b><hr>\n"
+				+ "<table>\n"
+				+ "<tr><td style=\"vertical-align:top\">"
+				+ "<input type=\"button\" value=\"Select All\" onClick=\"selectAll(document.getElementById('cp_items'))\">\n"
+				+ "<input type=\"button\" value=\"Select None\" onClick=\"selectNone(document.getElementById('cp_items'))\">\n"
+				+ "</td>\n"
+				+ "<td><select name=\"cp_items\" id=\"cp_items\" size=\"5\" multiple>\n");
+
+		for (String key : chargePointsList.keySet()) {
+			String value = chargePointsList.get(key);
+			builder.append("<option value=\"" + key + ";" + value + "\">" + key + " &#8212; " + value + "</option>\n");
+		}		
+		builder.append("</select></td>\n</tr>\n</table>\n<br>\n");
+		return builder.toString();
+	}
+	
+	public static String printChargePointsSingleSelect(HashMap<String,String> chargePointsList, String ocppVersion) {		
+		StringBuilder builder = new StringBuilder(
+				"<b>Charge Points with OCPP v" + ocppVersion + "</b><hr>\n"
+				+ "<table>\n"
+				+ "<tr><td style=\"vertical-align:top\">Select one:</td>\n"
+				+ "<td><select name=\"cp_items\" id=\"cp_items\" size=\"5\">\n");
+
+		for (String key : chargePointsList.keySet()) {
+			String value = chargePointsList.get(key);
+			builder.append("<option value=\"" + key + ";" + value + "\">" + key + " &#8212; " + value + "</option>\n");
+		}		
+		builder.append("</select>\n</td>\n</tr>\n</table>\n<br>\n");
+		return builder.toString();
 	}
 }

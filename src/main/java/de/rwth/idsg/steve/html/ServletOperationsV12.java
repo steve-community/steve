@@ -136,25 +136,6 @@ public class ServletOperationsV12 extends HttpServlet {
 	}
 	
 	/////// HTTP GET: Print HTML /////// 
-		
-	private String printChargePoints() {		
-		StringBuilder builder = new StringBuilder(
-				"<b>Charge Points with OCPP v1.2</b><hr>\n"
-				+ "<table>\n"
-				+ "<tr><td style=\"vertical-align:top\">\n"
-				+ "<input type=\"button\" value=\"Select All\" onClick=\"selectAll(document.getElementById('cp_items'))\">\n"
-				+ "<input type=\"button\" value=\"Select None\" onClick=\"selectNone(document.getElementById('cp_items'))\">\n"
-				+ "</td><td>\n"
-				+ "<select name=\"cp_items\" id=\"cp_items\" size=\"5\" multiple>\n");
-
-		for (String key : chargePointsList.keySet()) {
-			String value = chargePointsList.get(key);
-			builder.append("<option value=\"" + key + ";" + value + "\">" + key + " &#8212; " + value + "</option>\n");
-		}
-		
-		builder.append("</select>\n</td>\n</tr>\n</table>\n<br>\n");
-		return builder.toString();
-	}
 
 	private String printChangeAvail() {
 		return				
@@ -175,14 +156,15 @@ public class ServletOperationsV12 extends HttpServlet {
 
 		// Print the div on the right
 		+ "<div class=\"op-content\">\n<form method=\"POST\" action=\"" + contextPath + servletPath + "/ChangeAvailability\">\n" 				
-		+ printChargePoints()				
+		+ Common.printChargePointsMultipleSelect(chargePointsList, "1.2")	
 		+ "<b>Parameters</b><hr>\n"
 		+ "<table class=\"params\">\n"
 		+ "<tr><td>Connector Id (integer):</td><td><input type=\"number\" min=\"0\" name=\"connectorId\" placeholder=\"if empty, 0 = charge point as a whole\"></td></tr>\n"
 		+ "<tr><td>Availability Type:</td><td><input type=\"radio\" name=\"availType\" value=\"Inoperative\" checked> Inoperative</td></tr>\n"
 		+ "<tr><td></td><td><input type=\"radio\" name=\"availType\" value=\"Operative\"> Operative</td></tr>\n"
-		+ "<tr><td></td><td id=\"add_space\"><input type=\"submit\" value=\"Perform\"></td></tr>\n"  	
-		+ "</table>\n</form>\n</div>";
+		+ "</table>\n"
+		+ "<div class=\"submit-button\"><input type=\"submit\" value=\"Perform\"></div>\n"
+		+ "</form>\n</div>\n";
 	}
 
 	private String printChangeConf() {
@@ -204,7 +186,7 @@ public class ServletOperationsV12 extends HttpServlet {
 
 		// Print the div on the right
 		+ "<div class=\"op-content\">\n<form method=\"POST\" action=\"" + contextPath + servletPath + "/ChangeConfiguration\">\n" 
-		+ printChargePoints()
+		+ Common.printChargePointsMultipleSelect(chargePointsList, "1.2")	
 		+ "<b>Parameters</b><hr>\n"
 		+ "<table class=\"params\">\n"
 		+ "<tr><td>Configuration key:</td><td>\n"
@@ -221,8 +203,9 @@ public class ServletOperationsV12 extends HttpServlet {
 		+ "</select>\n"
 		+ "</td></tr>\n"
 		+ "<tr><td>Value:</td><td><input type=\"text\" name=\"value\"></td></tr>\n"
-		+ "<tr><td></td><td id=\"add_space\"><input type=\"submit\" value=\"Perform\"></td></tr>\n"
-		+ "</table>\n</form>\n</div>";		
+		+ "</table>\n"
+		+ "<div class=\"submit-button\"><input type=\"submit\" value=\"Perform\"></div>\n"
+		+ "</form>\n</div>\n";
 	}
 
 	private String printClearCache() {		
@@ -244,13 +227,11 @@ public class ServletOperationsV12 extends HttpServlet {
 
 		// Print the div on the right
 		+ "<div class=\"op-content\">\n<form method=\"POST\" action=\"" + contextPath + servletPath + "/ClearCache\">\n" 
-		+ printChargePoints()
+		+ Common.printChargePointsMultipleSelect(chargePointsList, "1.2")	
 		+ "<b>Parameters</b><hr>\n"
-		+ "<center>"
-		+ "<i>No parameters required.</i>"
-		+ "<br><br>"
-		+ "<input type=\"submit\" value=\"Perform\">"
-		+ "</center>\n</form>\n</div>";		
+		+ "<center><i>No parameters required.</i></center>"
+		+ "<div class=\"submit-button\"><input type=\"submit\" value=\"Perform\"></div>\n"
+		+ "</form>\n</div>\n";			
 	}
 
 	private String printGetDiagnostics() {
@@ -272,7 +253,7 @@ public class ServletOperationsV12 extends HttpServlet {
 
 		// Print the div on the right
 		+ "<div class=\"op-content\">\n<form method=\"POST\" action=\"" + contextPath + servletPath + "/GetDiagnostics\">\n" 
-		+ printChargePoints()
+		+ Common.printChargePointsMultipleSelect(chargePointsList, "1.2")	
 		+ "<b>Parameters</b><hr>\n"
 		+ "<table class=\"params\">\n"
 		+ "<tr><td>Location (directory URI):</td><td><input type=\"text\" name=\"location\"></td></tr>\n"		
@@ -280,8 +261,9 @@ public class ServletOperationsV12 extends HttpServlet {
 		+ "<tr><td>Retry Interval (integer):</td><td><input type=\"number\" min=\"0\" name=\"retryInterval\"></td></tr>\n"
 		+ "<tr><td>Start time (ex: 2011-12-21 11:33):</td><td><input type=\"datetime\" name=\"startTime\"></td></tr>\n"
 		+ "<tr><td>Stop time (ex: 2011-12-21 11:33):</td><td><input type=\"datetime\" name=\"stopTime\"></td></tr>\n"
-		+ "<tr><td></td><td id=\"add_space\"><input type=\"submit\" value=\"Perform\"></td></tr>\n"	   	
-		+ "</table>\n</form>\n</div>";
+		+ "</table>\n"
+		+ "<div class=\"submit-button\"><input type=\"submit\" value=\"Perform\"></div>\n"
+		+ "</form>\n</div>\n";
 	}
 
 	private String printRemoteStartTrans() {
@@ -303,13 +285,14 @@ public class ServletOperationsV12 extends HttpServlet {
 
 		// Print the div on the right
 		+ "<div class=\"op-content\">\n<form method=\"POST\" action=\"" + contextPath + servletPath + "/RemoteStartTransaction\">\n" 
-		+ printChargePoints()
+		+ Common.printChargePointsSingleSelect(chargePointsList, "1.2")	
 		+ "<b>Parameters</b><hr>\n"
 		+ "<table class=\"params\">\n"
 		+ "<tr><td>Connector Id (integer, not 0):</td><td><input type=\"number\" min=\"1\" name=\"connectorId\"></td></tr>\n"
 		+ "<tr><td>idTag (string):</td><td><input type=\"text\" name=\"idTag\"></td></tr>\n"
-		+ "<tr><td></td><td id=\"add_space\"><input type=\"submit\" value=\"Perform\"></td></tr>\n"
-		+ "</table>\n</form>\n</div>";
+		+ "</table>\n"
+		+ "<div class=\"submit-button\"><input type=\"submit\" value=\"Perform\"></div>\n"
+		+ "</form>\n</div>\n";
 	}
 
 	private String printRemoteStopTrans() {
@@ -331,12 +314,13 @@ public class ServletOperationsV12 extends HttpServlet {
 
 		// Print the div on the right
 		+ "<div class=\"op-content\">\n<form method=\"POST\" action=\"" + contextPath + servletPath + "/RemoteStopTransaction\">\n" 
-		+ printChargePoints()
+		+ Common.printChargePointsSingleSelect(chargePointsList, "1.2")	
 		+ "<b>Parameters</b><hr>\n"
 		+ "<table class=\"params\">\n"
 		+ "<tr><td>Transaction Id (integer):</td><td><input type=\"number\" name=\"transactionId\"></td></tr>\n"	
-		+ "<tr><td></td><td id=\"add_space\"><input type=\"submit\" value=\"Perform\"></td></tr>\n"
-		+ "</table>\n</form>\n</div>";
+		+ "</table>\n"
+		+ "<div class=\"submit-button\"><input type=\"submit\" value=\"Perform\"></div>\n"
+		+ "</form>\n</div>\n";
 	}
 
 	private String printReset() {
@@ -358,13 +342,14 @@ public class ServletOperationsV12 extends HttpServlet {
 
 		// Print the div on the right
 		+ "<div class=\"op-content\">\n<form method=\"POST\" action=\"" + contextPath + servletPath + "/Reset\">\n" 
-		+ printChargePoints()
+		+ Common.printChargePointsMultipleSelect(chargePointsList, "1.2")	
 		+ "<b>Parameters</b><hr>\n"
 		+ "<table class=\"params\">\n"		
 		+ "<tr><td>Reset Type:</td><td><input type=\"radio\" name=\"resetType\" value=\"Hard\" checked> Hard</td></tr>\n"
 		+ "<tr><td></td><td><input type=\"radio\" name=\"resetType\" value=\"Soft\"> Soft</td></tr>\n"		
-		+ "<tr><td></td><td id=\"add_space\"><input type=\"submit\" value=\"Perform\"></td></tr>\n"
-		+ "</table>\n</form>\n</div>";
+		+ "</table>\n"
+		+ "<div class=\"submit-button\"><input type=\"submit\" value=\"Perform\"></div>\n"
+		+ "</form>\n</div>\n";
 	}
 
 	private String printUnlockConnector() {
@@ -386,12 +371,13 @@ public class ServletOperationsV12 extends HttpServlet {
 
 		// Print the div on the right
 		+ "<div class=\"op-content\">\n<form method=\"POST\" action=\"" + contextPath + servletPath + "/UnlockConnector\">\n" 
-		+ printChargePoints()
+		+ Common.printChargePointsSingleSelect(chargePointsList, "1.2")	
 		+ "<b>Parameters</b><hr>\n"
 		+ "<table class=\"params\">\n"
 		+ "<tr><td>Connector Id (integer, not 0):</td><td><input type=\"number\" min=\"1\" name=\"connectorId\"></td></tr>\n"	
-		+ "<tr><td></td><td id=\"add_space\"><input type=\"submit\" value=\"Perform\"></td></tr>\n"
-		+ "</table>\n</form>\n</div>";
+		+ "</table>\n"
+		+ "<div class=\"submit-button\"><input type=\"submit\" value=\"Perform\"></div>\n"
+		+ "</form>\n</div>\n";
 	}
 
 	private String printUpdateFirmware() {
@@ -413,15 +399,16 @@ public class ServletOperationsV12 extends HttpServlet {
 
 		// Print the div on the right
 		+ "<div class=\"op-content\">\n<form method=\"POST\" action=\"" + contextPath + servletPath + "/UpdateFirmware\">\n" 
-		+ printChargePoints()
+		+ Common.printChargePointsMultipleSelect(chargePointsList, "1.2")	
 		+ "<b>Parameters</b><hr>\n"
 		+ "<table class=\"params\">\n"
 		+ "<tr><td>Location (URI):</td><td><input type=\"text\" name=\"location\"></td></tr>\n"
 		+ "<tr><td>Retries (integer):</td><td><input type=\"number\" min=\"0\" name=\"retries\"></td></tr>\n"
 		+ "<tr><td>Retry Interval (integer):</td><td><input type=\"number\" min=\"0\" name=\"retryInterval\"></td></tr>\n"
 		+ "<tr><td>Retrieve Date (ex: 2011-12-21 11:33):</td><td><input type=\"datetime\" name=\"retrieveDate\"></td></tr>\n"
-		+ "<tr><td></td><td id=\"add_space\"><input type=\"submit\" value=\"Perform\"></td></tr>\n"
-		+ "</table>\n</form>\n</div>";
+		+ "</table>\n"
+		+ "<div class=\"submit-button\"><input type=\"submit\" value=\"Perform\"></div>\n"
+		+ "</form>\n</div>\n";
 	}
 	
 	/////// HTTP POST: Process Request /////// 

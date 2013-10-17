@@ -33,7 +33,7 @@ public class ServletSettings extends HttpServlet {
 		
 		writer.println(
 				Common.printHead(contextPath)
-				+ printStatus()
+				+ printSettings()
 				+ Common.printFoot(contextPath));
 		
 		writer.close();	
@@ -74,7 +74,7 @@ public class ServletSettings extends HttpServlet {
 		return;
 	}
 
-	private String printStatus() {
+	private String printSettings() {
 		return
 		"<h3><span>Settings</span></h3>\n"
 		+ "<center>"

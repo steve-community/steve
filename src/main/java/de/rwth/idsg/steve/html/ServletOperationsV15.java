@@ -207,7 +207,7 @@ public class ServletOperationsV15 extends HttpServlet {
 		+ "<div class=\"op-content\">\n<form method=\"POST\" action=\"" + contextPath + servletPath + "/ChangeAvailability\">\n" 				
 		+ Common.printChargePointsMultipleSelect(chargePointsList, "1.5")		
 		+ "<b>Parameters</b><hr>\n"
-		+ "<table class=\"params\">\n"
+		+ "<table>\n"
 		+ "<tr><td>Connector Id (integer):</td><td><input type=\"number\" min=\"0\" name=\"connectorId\" placeholder=\"if empty, 0 = charge point as a whole\"></td></tr>\n"
 		+ "<tr><td>Availability Type:</td><td><input type=\"radio\" name=\"availType\" value=\"Inoperative\" checked> Inoperative</td></tr>\n"
 		+ "<tr><td></td><td><input type=\"radio\" name=\"availType\" value=\"Operative\"> Operative</td></tr>\n"  	
@@ -244,7 +244,7 @@ public class ServletOperationsV15 extends HttpServlet {
 		+ "<div class=\"op-content\">\n<form method=\"POST\" action=\"" + contextPath + servletPath + "/ChangeConfiguration\">\n" 
 		+ Common.printChargePointsMultipleSelect(chargePointsList, "1.5")
 		+ "<b>Parameters</b><hr>\n"
-		+ "<table class=\"params\">\n"
+		+ "<table>\n"
 		+ "<tr><td>Configuration key:</td><td>\n"
 		+ "<select name=\"confKey\">\n"
 		+ "<option value=\"HeartBeatInterval\">HeartBeatInterval (in seconds)</option>\n"
@@ -330,7 +330,7 @@ public class ServletOperationsV15 extends HttpServlet {
 		+ "<div class=\"op-content\">\n<form method=\"POST\" action=\"" + contextPath + servletPath + "/GetDiagnostics\">\n" 
 		+ Common.printChargePointsMultipleSelect(chargePointsList, "1.5")
 		+ "<b>Parameters</b><hr>\n"
-		+ "<table class=\"params\">\n"
+		+ "<table>\n"
 		+ "<tr><td>Location (directory URI):</td><td><input type=\"text\" name=\"location\"></td></tr>\n"		
 		+ "<tr><td>Retries (integer):</td><td><input type=\"number\" min=\"0\" name=\"retries\"></td></tr>\n"
 		+ "<tr><td>Retry Interval (integer):</td><td><input type=\"number\" min=\"0\" name=\"retryInterval\"></td></tr>\n"
@@ -369,7 +369,7 @@ public class ServletOperationsV15 extends HttpServlet {
 		+ "<div class=\"op-content\">\n<form method=\"POST\" action=\"" + contextPath + servletPath + "/RemoteStartTransaction\">\n" 
 		+ Common.printChargePointsSingleSelect(chargePointsList, "1.5")
 		+ "<b>Parameters</b><hr>\n"
-		+ "<table class=\"params\">\n"
+		+ "<table>\n"
 		+ "<tr><td>Connector Id (integer, not 0):</td><td><input type=\"number\" min=\"1\" name=\"connectorId\"></td></tr>\n"
 		+ "<tr><td>idTag (string):</td><td><input type=\"text\" name=\"idTag\"></td></tr>\n"
 		+ "</table>\n"
@@ -405,7 +405,7 @@ public class ServletOperationsV15 extends HttpServlet {
 		+ "<div class=\"op-content\">\n<form method=\"POST\" action=\"" + contextPath + servletPath + "/RemoteStopTransaction\">\n" 
 		+ Common.printChargePointsSingleSelect(chargePointsList, "1.5")
 		+ "<b>Parameters</b><hr>\n"
-		+ "<table class=\"params\">\n"
+		+ "<table>\n"
 		+ "<tr><td>Transaction Id (integer):</td><td><input type=\"number\" name=\"transactionId\"></td></tr>\n"	
 		+ "</table>\n"
 		+ "<div class=\"submit-button\"><input type=\"submit\" value=\"Perform\"></div>\n"
@@ -440,7 +440,7 @@ public class ServletOperationsV15 extends HttpServlet {
 		+ "<div class=\"op-content\">\n<form method=\"POST\" action=\"" + contextPath + servletPath + "/Reset\">\n" 
 		+ Common.printChargePointsMultipleSelect(chargePointsList, "1.5")
 		+ "<b>Parameters</b><hr>\n"
-		+ "<table class=\"params\">\n"
+		+ "<table>\n"
 		+ "<tr><td>Reset Type:</td><td><input type=\"radio\" name=\"resetType\" value=\"Hard\" checked> Hard</td></tr>\n"
 		+ "<tr><td></td><td><input type=\"radio\" name=\"resetType\" value=\"Soft\"> Soft</td></tr>\n"		
 		+ "</table>\n"
@@ -476,7 +476,7 @@ public class ServletOperationsV15 extends HttpServlet {
 		+ "<div class=\"op-content\">\n<form method=\"POST\" action=\"" + contextPath + servletPath + "/UnlockConnector\">\n" 
 		+ Common.printChargePointsSingleSelect(chargePointsList, "1.5")
 		+ "<b>Parameters</b><hr>\n"
-		+ "<table class=\"params\">\n"
+		+ "<table>\n"
 		+ "<tr><td>Connector Id (integer, not 0):</td><td><input type=\"number\" min=\"1\" name=\"ConnectorId\"></td></tr>\n"	
 		+ "</table>\n"
 		+ "<div class=\"submit-button\"><input type=\"submit\" value=\"Perform\"></div>\n"
@@ -511,7 +511,7 @@ public class ServletOperationsV15 extends HttpServlet {
 		+ "<div class=\"op-content\">\n<form method=\"POST\" action=\"" + contextPath + servletPath + "/UpdateFirmware\">\n" 
 		+ Common.printChargePointsMultipleSelect(chargePointsList, "1.5")
 		+ "<b>Parameters</b><hr>\n"
-		+ "<table class=\"params\">\n"
+		+ "<table>\n"
 		+ "<tr><td>Location (URI):</td><td><input type=\"text\" name=\"location\"></td></tr>\n"
 		+ "<tr><td>Retries (integer):</td><td><input type=\"number\" min=\"0\" name=\"retries\"></td></tr>\n"
 		+ "<tr><td>Retry Interval (integer):</td><td><input type=\"number\" min=\"0\" name=\"retryInterval\"></td></tr>\n"
@@ -549,7 +549,7 @@ public class ServletOperationsV15 extends HttpServlet {
 		+ "<div class=\"op-content\">\n<form method=\"POST\" action=\"" + contextPath + servletPath + "/ReserveNow\">\n" 
 		+ Common.printChargePointsSingleSelect(chargePointsList, "1.5")
 		+ "<b>Parameters</b><hr>\n"
-		+ "<table class=\"params\">\n"
+		+ "<table>\n"
 		+ "<tr><td>Connector Id (integer):</td><td><input type=\"number\" min=\"0\" name=\"connectorId\" placeholder=\"if empty, 0 = not for a specific connector\"></td></tr>\n"	
 		+ "<tr><td>Expiry Date (ex: 2011-12-21 11:33):</td><td><input type=\"datetime\" name=\"expiryDate\"></td></tr>\n"
 		+ "<tr><td>idTag (string):</td><td><input type=\"text\" name=\"idTag\"></td></tr>\n"
@@ -587,7 +587,7 @@ public class ServletOperationsV15 extends HttpServlet {
 		+ "<div class=\"op-content\">\n<form method=\"POST\" action=\"" + contextPath + servletPath + "/CancelReservation\">\n" 
 		+ Common.printChargePointsSingleSelect(chargePointsList, "1.5")
 		+ "<b>Parameters</b><hr>\n"
-		+ "<table class=\"params\">\n"
+		+ "<table>\n"
 		+ "<tr><td>Reservation Id (integer):</td><td><input type=\"number\" min=\"0\" name=\"reservationId\"></td></tr>\n"
 		+ "</table>\n"
 		+ "<div class=\"submit-button\"><input type=\"submit\" value=\"Perform\"></div>\n"
@@ -622,7 +622,7 @@ public class ServletOperationsV15 extends HttpServlet {
 		+ "<div class=\"op-content\">\n<form method=\"POST\" action=\"" + contextPath + servletPath + "/DataTransfer\">\n" 
 		+ Common.printChargePointsMultipleSelect(chargePointsList, "1.5")
 		+ "<b>Parameters</b><hr>\n"
-		+ "<table class=\"params\">\n"
+		+ "<table>\n"
 		+ "<tr><td>Vendor Id (String):</td><td><input type=\"text\" name=\"vendorId\"></td></tr>\n"
 		+ "<tr><td>Message Id (String):</td><td><input type=\"text\" name=\"messageId\"></td></tr>\n"
 		+ "<tr><td>data (Text):</td><td><input type=\"text\" name=\"data\"></td></tr>\n"
@@ -666,7 +666,7 @@ public class ServletOperationsV15 extends HttpServlet {
 		+ "<input type=\"button\" value=\"Select None\" onClick=\"selectNone(document.getElementById('confKeys'))\">\n"
 		+ "</td>\n"
 		+ "<td>\n"
-		+ "<select name=\"confKeys\" id=\"confKeys\" size=\"15\" multiple>\n"
+		+ "<select name=\"confKeys\" id=\"confKeys\" size=\"14\" multiple>\n"
 		+ "<option value=\"HeartBeatInterval\">HeartBeatInterval</option>\n"
 		+ "<option value=\"ConnectionTimeOut\">ConnectionTimeOut</option>\n"
 		+ "<option value=\"ProximityContactRetries\">ProximityContactRetries</option>\n"
@@ -749,7 +749,7 @@ public class ServletOperationsV15 extends HttpServlet {
 		+ "<div class=\"op-content\">\n<form method=\"POST\" action=\"" + contextPath + servletPath + "/SendLocalList\">\n" 
 		+ Common.printChargePointsMultipleSelect(chargePointsList, "1.5")
 		+ "<b>Parameters</b><hr>\n"
-		+ "<table class=\"params\">\n"
+		+ "<table class=\"sll\">\n"
 		+ "<tr><td>hash (String):</td><td><i>Optional, omitted for now</i></td></tr>\n"
 		+ "<tr><td>listVersion (integer):</td><td><input type=\"number\" name=\"listVersion\"></td></tr>\n"
 		+ "<tr><td>Update Type:</td><td><input type=\"radio\" name=\"updateType\" value=\"Full\" onclick=\"removeElements()\" checked> Full</td></tr>\n"		

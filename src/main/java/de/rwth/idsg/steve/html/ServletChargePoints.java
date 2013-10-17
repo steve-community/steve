@@ -106,7 +106,7 @@ public class ServletChargePoints extends HttpServlet {
 				+ "<table class=\"bc\">\n"		
 				+ "<tr><td>chargeBoxId (string):</td><td><input type=\"text\" name=\"chargeBoxId\"></td></tr>\n"
 				+ "<tr><td><i>chargeBoxId is sufficient enough to register a charge point.<br> "
-				+ "After every reset of a charge point the remaining fields are updated.</i></td><td></td></tr>"
+				+ "After every reset of a charge point the remaining fields are updated.</i></td><td></td></tr>\n"
 				+ "<tr><td></td><td id=\"add_space\"><input type=\"submit\" value=\"Add\"></td></tr>\n" 	   	
 				+ "</table>\n"		
 				+ "</form>\n"

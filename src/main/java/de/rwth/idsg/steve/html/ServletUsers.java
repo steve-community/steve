@@ -87,7 +87,7 @@ public class ServletUsers extends HttpServlet {
 
 	private String printUsers() {
 		StringBuilder builder = new StringBuilder(
-				"<b>Registered Users</b><hr>\n"
+				"<h3><span>Registered Users</span></h3>\n"
 				+ "<center>\n"
 				+ "<table class=\"res\">\n"
 				+ "<tr><th>idTag</th><th>parentIdTag</th><th>expiryDate</th><th>inTransaction</th><th>blocked</th></tr>\n");
@@ -127,7 +127,7 @@ public class ServletUsers extends HttpServlet {
 
 	private String printAddUser() {		
 		StringBuilder builder = new StringBuilder(
-				"<b>Add A New User</b><hr>\n"
+				"<h3><span>Add A New User</span></h3>\n"
 				+ "<center>\n"
 				+ "<form method=\"POST\" action=\"" + contextPath + servletPath + "/add\">\n"
 				+ "<table class=\"bc\">\n"		
@@ -143,7 +143,7 @@ public class ServletUsers extends HttpServlet {
 
 	private String printDeleteUser() {
 		StringBuilder builder = new StringBuilder(
-				"<b>Delete A User</b><hr>\n"
+				"<h3><span>Delete A User</span></h3>\n"
 				+ "<center>\n"	
 				+ "<form method=\"POST\" action=\""+ contextPath + servletPath + "/delete\">\n"
 				+ "<table class=\"bc\">\n"

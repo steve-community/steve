@@ -91,7 +91,7 @@ public class ServletReservations extends HttpServlet {
 
 	private String printExistingReservations() {
 		StringBuilder builder = new StringBuilder(
-				"<b>Existing Reservations</b><hr>\n"
+				"<h3><span>Existing Reservations</span></h3>\n"
 				+ "<center>\n"
 				+ "<table class=\"res\">\n"
 				+ "<tr><th>Reservation Id</th><th>idTag</th><th>chargeBoxId</th><th>startDatetime</th><th>expiryDatetime</th><th>expired</th></tr>\n");
@@ -129,7 +129,7 @@ public class ServletReservations extends HttpServlet {
 
 	private String printBookReservation() {		
 		StringBuilder builder = new StringBuilder(
-				"<b>Book A New Reservation</b><hr>\n"
+				"<h3><span>Book A New Reservation</span></h3>\n"
 				+ "<center>\n"
 				+ "<form method=\"POST\" action=\"" + contextPath + servletPath + "/book\">\n"
 				+ "<table class=\"bc\">\n"		
@@ -146,7 +146,7 @@ public class ServletReservations extends HttpServlet {
 
 	private String printCancelReservation() {
 		StringBuilder builder = new StringBuilder(
-				"<b>Cancel An Existing Reservation</b><hr>\n"
+				"<h3><span>Cancel An Existing Reservation</span></h3>\n"
 				+ "<center>\n"	
 				+ "<form method=\"POST\" action=\""+ contextPath + servletPath + "/cancel\">\n"
 				+ "<table class=\"bc\">\n"

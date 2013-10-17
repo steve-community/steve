@@ -97,7 +97,7 @@ public class Common {
 	
 	public static String printChargePointsMultipleSelect(HashMap<String,String> chargePointsList, String ocppVersion) {		
 		StringBuilder builder = new StringBuilder(
-				"<b>Charge Points with OCPP v" + ocppVersion + "</b><hr>\n"
+				"<h3><span>Charge Points with OCPP v" + ocppVersion + "</span></h3>\n"
 				+ "<table>\n"
 				+ "<tr><td style=\"vertical-align:top\">"
 				+ "<input type=\"button\" value=\"Select All\" onClick=\"selectAll(document.getElementById('cp_items'))\">\n"
@@ -115,7 +115,7 @@ public class Common {
 	
 	public static String printChargePointsSingleSelect(HashMap<String,String> chargePointsList, String ocppVersion) {		
 		StringBuilder builder = new StringBuilder(
-				"<b>Charge Points with OCPP v" + ocppVersion + "</b><hr>\n"
+				"<h3><span>Charge Points with OCPP v" + ocppVersion + "</span></h3>\n"
 				+ "<table>\n"
 				+ "<tr><td style=\"vertical-align:top\">Select one:</td>\n"
 				+ "<td><select name=\"cp_items\" id=\"cp_items\" size=\"5\">\n");

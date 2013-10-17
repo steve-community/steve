@@ -1,8 +1,8 @@
-CREATE DATABASE  IF NOT EXISTS `cssdb` /*!40100 DEFAULT CHARACTER SET latin1 */;
-USE `cssdb`;
+CREATE DATABASE  IF NOT EXISTS `stevedb` /*!40100 DEFAULT CHARACTER SET latin1 */;
+USE `stevedb`;
 -- MySQL dump 10.13  Distrib 5.6.13, for osx10.7 (x86_64)
 --
--- Host: localhost    Database: cssdb
+-- Host: localhost    Database: stevedb
 -- ------------------------------------------------------
 -- Server version	5.5.32-0ubuntu0.13.04.1
 
@@ -214,4 +214,4 @@ CREATE TABLE `user` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2013-10-14 13:05:45
+-- Dump completed on 2013-10-17 15:40:35

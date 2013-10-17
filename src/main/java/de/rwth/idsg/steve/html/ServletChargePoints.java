@@ -43,7 +43,7 @@ public class ServletChargePoints extends HttpServlet {
 	private String printChargeBoxes() {
 		
 		StringBuilder builder = new StringBuilder(
-				"<b>Registered Charge Points</b><hr>\n"
+				"<h3><span>Registered Charge Points</span></h3>\n"
 				+ "<center>\n"
 				+ "<table class=\"res\">\n"
 				+ "<tr><th>chargeBoxId</th><th>endpoint_address</th><th>ocppVersion</th><th>chargePointVendor</th><th>chargePointModel</th><th>fwVersion</th></tr>\n");
@@ -100,7 +100,7 @@ public class ServletChargePoints extends HttpServlet {
 
 	private String printAddChargeBox() {		
 		StringBuilder builder = new StringBuilder(
-				"<b>Add A New Charge Point</b><hr>\n"
+				"<h3><span>Add A New Charge Point</span></h3>\n"
 				+ "<center>\n"
 				+ "<form method=\"POST\" action=\"" + contextPath + servletPath + "/add\">\n"
 				+ "<table class=\"bc\">\n"		
@@ -116,7 +116,7 @@ public class ServletChargePoints extends HttpServlet {
 
 	private String printDeleteChargeBox() {
 		StringBuilder builder = new StringBuilder(
-				"<b>Delete A Charge Point</b><hr>\n"
+				"<h3><span>Delete A Charge Point</span></h3>\n"
 				+ "<center>\n"	
 				+ "<form method=\"POST\" action=\""+ contextPath + servletPath + "/delete\">\n"
 				+ "<table class=\"bc\">\n"

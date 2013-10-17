@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Context>
-	<Resource name="jdbc/cssdb" 
+	<Resource name="jdbc/stevedb" 
 	auth="Container" 
 	type="javax.sql.DataSource"
 	factory="org.apache.tomcat.jdbc.pool.DataSourceFactory" 
@@ -15,5 +15,5 @@
 	validationInterval="60000"
 	username="root" 
 	password="come47on"
-	url="jdbc:mysql://localhost:3306/cssdb" />
+	url="jdbc:mysql://localhost:3306/stevedb" />
 </Context>

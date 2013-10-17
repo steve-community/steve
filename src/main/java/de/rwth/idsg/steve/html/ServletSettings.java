@@ -76,7 +76,7 @@ public class ServletSettings extends HttpServlet {
 
 	private String printStatus() {
 		return
-		"<b>Settings</b><hr>\n"
+		"<h3><span>Settings</span></h3>\n"
 		+ "<center>"
 		+ "<form method=\"POST\" action=\"" + contextPath + servletPath + "/change\">\n" 
 		+ "<table class=\"bc\">\n"

@@ -19,6 +19,6 @@ Screenshots
 1. [Data Management - Reservations](https://raw.github.com/RWTH-i5-IDSG/steve/master/src/main/webapp/images/SteVe_res.png)
 2. [Data Management - Charge Points](https://raw.github.com/RWTH-i5-IDSG/steve/master/src/main/webapp/images/SteVe_cp.png)
 3. [Data Management - Users](https://raw.github.com/RWTH-i5-IDSG/steve/master/src/main/webapp/images/SteVe_users.png)
-4. [Operations for OCPP v1.2](https://raw.github.com/RWTH-i5-IDSG/steve/master/src/main/webapp/images/SteVe_ocpp12.png)
-5. [Operations for OCPP v1.5](https://raw.github.com/RWTH-i5-IDSG/steve/master/src/main/webapp/images/SteVe_ocpp15.png)
+4. [Operations - OCPP v1.2](https://raw.github.com/RWTH-i5-IDSG/steve/master/src/main/webapp/images/SteVe_ocpp12.png)
+5. [Operations - OCPP v1.5](https://raw.github.com/RWTH-i5-IDSG/steve/master/src/main/webapp/images/SteVe_ocpp15.png)
 6. [Settings](https://raw.github.com/RWTH-i5-IDSG/steve/master/src/main/webapp/images/SteVe_set.png)

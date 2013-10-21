@@ -20,14 +20,7 @@ span.section-title {
 h3 { width:100%; text-align:left; border-bottom: 1px solid #ccc; line-height:0.1em; margin:10px 0 20px; }
 h3 span { color:#454545; background:#fff; padding-right:10px; font-family:Optima; font-size: 14px; font-weight: normal;}
 
-hr {
-	color: #000;
-	background: #000;
-	height: 1px;
-	border: 0;
-}
-
-ul hr { color: #CCC; background: #CCC;}
+ul hr { color: #CCC; background: #CCC; 	height: 1px; border: 0;}
 
 table { width: 100%;}
 

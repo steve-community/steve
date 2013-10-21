@@ -150,7 +150,7 @@ public class ChargePointService15_Client {
 	
 	public GetConfigurationRequest prepareGetConfiguration(String[] confKeys){
 		GetConfigurationRequest req = new GetConfigurationRequest();		
-		if (confKeys.length != 0){
+		if (confKeys != null) {
 			List<String> confKeysLIST = Arrays.asList(confKeys);
 			req.getKey().addAll(confKeysLIST);
 		}
@@ -377,7 +377,7 @@ public class ChargePointService15_Client {
 		req.setConnectorId(connectorId);
 		req.setExpiryDate( Utils.convertToXMLGregCal(expiryString) );
 		req.setIdTag(idTag);
-		if ( !parentIdTag.isEmpty() ) req.setParentIdTag(parentIdTag);
+		if (parentIdTag != null && !parentIdTag.isEmpty()) req.setParentIdTag(parentIdTag);
 		req.setReservationId(reservationId);
 		
 		factory.setAddress(endpoint_address);
@@ -386,7 +386,7 @@ public class ChargePointService15_Client {
 		
 		// Check response, and cancel reservation from DB if it is not accepted by the charge point
 		ReservationStatus responseStatus = response.getStatus();
-		if (responseStatus != ReservationStatus.ACCEPTED) {
+		if ( responseStatus.equals(ReservationStatus.ACCEPTED) ) {
 			ClientDBAccess.cancelReservation(reservationId);
 		}
 		return "Charge point: " + chargeBoxId + ", Request: ReserveNow, Response: " + responseStatus.value();
@@ -403,7 +403,7 @@ public class ChargePointService15_Client {
 		CancelReservationResponse response = client.cancelReservation(req, chargeBoxId);
 		
 		CancelReservationStatus responseStatus = response.getStatus();
-		if (responseStatus == CancelReservationStatus.ACCEPTED){
+		if ( responseStatus.equals(CancelReservationStatus.ACCEPTED) ){
 			ClientDBAccess.cancelReservation(reservationId);
 		}		
 		return "Charge point: " + chargeBoxId + ", Request: CancelReservation, Response: " + responseStatus.value();

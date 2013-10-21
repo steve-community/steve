@@ -40,6 +40,27 @@ public class ServletChargePoints extends HttpServlet {
 		writer.close();	
 	}
 
+	@Override
+	public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+
+		String command = request.getPathInfo();	
+		String chargeBoxId = request.getParameter("chargeBoxId");
+		
+		if (chargeBoxId == null || chargeBoxId.isEmpty()) {
+			throw new InputException(Common.EXCEPTION_INPUT_EMPTY);
+		}
+		
+		if (command.equals("/add")){
+			ClientDBAccess.addChargePoint(chargeBoxId);
+			
+		} else if (command.equals("/delete")){
+			ClientDBAccess.deleteChargePoint(chargeBoxId);
+			
+		}		
+		response.sendRedirect(contextPath + servletPath);
+		return;
+	}	
+
 	private String printChargeBoxes() {
 		
 		StringBuilder builder = new StringBuilder(
@@ -75,27 +96,6 @@ public class ServletChargePoints extends HttpServlet {
 		}			
 		builder.append("</table>\n</center>\n<br>\n");
 		return builder.toString();
-	}
-
-	@Override
-	public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-
-		String command = request.getPathInfo();	
-		String chargeBoxId = request.getParameter("chargeBoxId");
-		
-		if (chargeBoxId.isEmpty()) {
-			throw new InputException(Common.EXCEPTION_INPUT_EMPTY);
-		}
-		
-		if (command.equals("/add")){
-			ClientDBAccess.addChargePoint(chargeBoxId);
-			
-		} else if (command.equals("/delete")){
-			ClientDBAccess.deleteChargePoint(chargeBoxId);
-			
-		}		
-		response.sendRedirect(contextPath + servletPath);
-		return;
 	}
 
 	private String printAddChargeBox() {		

@@ -419,7 +419,7 @@ public class ServletOperationsV12 extends HttpServlet {
 	private StringBuilder processChangeAvail(HttpServletRequest request, String[] chargePointItems) {
 		String connectorIdSTR = request.getParameter("connectorId");
 		int connectorId;
-		if (connectorIdSTR.isEmpty()) {
+		if (connectorIdSTR == null || connectorIdSTR.isEmpty()) {
 			connectorId = 0;
 		} else {
 			try {
@@ -446,7 +446,7 @@ public class ServletOperationsV12 extends HttpServlet {
 	private StringBuilder processChangeConf(HttpServletRequest request, String[] chargePointItems) {
 		String confKey = request.getParameter("confKey");
 		String value = request.getParameter("value");
-		if (value.isEmpty()) {
+		if (value == null || value.isEmpty()) {
 			throw new InputException(Common.EXCEPTION_INPUT_EMPTY);
 		}
 		
@@ -484,13 +484,13 @@ public class ServletOperationsV12 extends HttpServlet {
 		String startTime = request.getParameter("startTime");
 		String stopTime = request.getParameter("stopTime");
 		
-		if (location.isEmpty()
-				|| retriesSTR.isEmpty() 
-				|| retryIntervalSTR.isEmpty()
-				|| startTime.isEmpty()
-				|| stopTime.isEmpty()){
+		if (location == null || location.isEmpty()
+				|| retriesSTR == null || retriesSTR.isEmpty() 
+				|| retryIntervalSTR == null || retryIntervalSTR.isEmpty()
+				|| startTime == null || startTime.isEmpty()
+				|| stopTime == null || stopTime.isEmpty()) {
 			throw new InputException(Common.EXCEPTION_INPUT_EMPTY);
-		}			
+		}		
 		
 		int retries;
 		int retryInterval;			
@@ -516,7 +516,10 @@ public class ServletOperationsV12 extends HttpServlet {
 	
 	private StringBuilder processRemoteStartTrans(HttpServletRequest request, String[] chargePointItems) {
 		String connectorIdSTR = request.getParameter("connectorId");
-		if (connectorIdSTR.isEmpty()) {
+		String idTag = request.getParameter("idTag");
+		
+		if (connectorIdSTR == null || connectorIdSTR.isEmpty()
+				|| idTag == null || idTag.isEmpty()) {
 			throw new InputException(Common.EXCEPTION_INPUT_EMPTY);
 		}
 		
@@ -529,11 +532,6 @@ public class ServletOperationsV12 extends HttpServlet {
 		
 		if (connectorId == 0) {
 			throw new InputException(Common.EXCEPTION_INPUT_ZERO);
-		}
-		
-		String idTag = request.getParameter("idTag");
-		if (idTag.isEmpty()) {
-			throw new InputException(Common.EXCEPTION_INPUT_EMPTY);
 		}
 		
 		ChargePointService12_Client cpsClient = new ChargePointService12_Client();
@@ -551,7 +549,7 @@ public class ServletOperationsV12 extends HttpServlet {
 	
 	private StringBuilder processRemoteStopTrans(HttpServletRequest request, String[] chargePointItems) {
 		String transactionIdSTR = request.getParameter("transactionId");
-		if (transactionIdSTR.isEmpty()) {
+		if (transactionIdSTR == null || transactionIdSTR.isEmpty()) {
 			throw new InputException(Common.EXCEPTION_INPUT_EMPTY);
 		}
 		
@@ -593,7 +591,7 @@ public class ServletOperationsV12 extends HttpServlet {
 	
 	private StringBuilder processUnlockConnector(HttpServletRequest request, String[] chargePointItems) {
 		String connectorIdSTR = request.getParameter("connectorId");
-		if (connectorIdSTR.isEmpty()) {
+		if (connectorIdSTR == null || connectorIdSTR.isEmpty()) {
 			throw new InputException(Common.EXCEPTION_INPUT_EMPTY);
 		}
 		
@@ -627,10 +625,10 @@ public class ServletOperationsV12 extends HttpServlet {
 		String retryIntervalSTR = request.getParameter("retryInterval");
 		String retrieveDate = request.getParameter("retrieveDate");	
 		
-		if (location.isEmpty()
-				|| retriesSTR.isEmpty() 
-				|| retryIntervalSTR.isEmpty()
-				|| retrieveDate.isEmpty()){
+		if (location == null || location.isEmpty()
+				|| retriesSTR == null || retriesSTR.isEmpty() 
+				|| retryIntervalSTR == null || retryIntervalSTR.isEmpty()
+				|| retrieveDate == null || retrieveDate.isEmpty()) {
 			throw new InputException(Common.EXCEPTION_INPUT_EMPTY);
 		}			
 		

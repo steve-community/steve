@@ -58,25 +58,25 @@ public class ServletUsers extends HttpServlet {
 			String parentIdTagSTR = request.getParameter("parentIdTag");
 			String expiryDateSTR = request.getParameter("expiryDate");
 			
-			if (idTag.isEmpty()) {
+			if (idTag == null || idTag.isEmpty()) {
 				throw new InputException(Common.EXCEPTION_INPUT_EMPTY);
 			}
 						
 			Timestamp expiryTimestamp = null;
-			if (!expiryDateSTR.isEmpty()) {
+			if (expiryDateSTR != null && !expiryDateSTR.isEmpty()) {
 				DateTime expiryDatetime = Utils.convertToDateTime(expiryDateSTR);
 				expiryTimestamp = new Timestamp(expiryDatetime.getMillis());
 			}
 			
 			String parentIdTag = null;
-			if (!parentIdTagSTR.isEmpty()) {
+			if (parentIdTagSTR != null && !parentIdTagSTR.isEmpty()) {
 				parentIdTag = parentIdTagSTR;
 			}			
 			ClientDBAccess.addUser(idTag, parentIdTag, expiryTimestamp);
 			
 		} else if (command.equals("/delete")){
 			String idTag = request.getParameter("idTag");
-			if (idTag.isEmpty()) {
+			if (idTag == null || idTag.isEmpty()) {
 				throw new InputException(Common.EXCEPTION_INPUT_EMPTY);
 			}			
 			ClientDBAccess.deleteUser(idTag);			

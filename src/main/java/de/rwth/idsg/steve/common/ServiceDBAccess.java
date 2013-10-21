@@ -419,7 +419,8 @@ public class ServiceDBAccess {
 					} else {
 						// Ending the reservation failed, dismiss both changes
 						LOG.error("Transaction is being rolled back.");
-						connect.rollback();			
+						connect.rollback();
+						transactionId = -1;
 					}					
 				} else {
 					// No reservationId, we can commit
@@ -429,6 +430,7 @@ public class ServiceDBAccess {
 				// startTransaction failed, dismiss the change
 				LOG.error("Transaction is being rolled back.");
 				connect.rollback();
+				transactionId = -1;
 			}
 			connect.setAutoCommit(true);
 		} catch (SQLException e1) {

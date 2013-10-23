@@ -40,6 +40,7 @@ CREATE TABLE `chargebox` (
   `meterType` varchar(25) DEFAULT NULL,
   `meterSerialNumber` varchar(25) DEFAULT NULL,
   `diagnosticsStatus` varchar(20) DEFAULT NULL,
+  `diagnosticsTimestamp` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`chargeBoxId`),
   UNIQUE KEY `chargeBoxId_UNIQUE` (`chargeBoxId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
@@ -60,7 +61,7 @@ CREATE TABLE `connector` (
   UNIQUE KEY `connector_pk_UNIQUE` (`connector_pk`),
   UNIQUE KEY `connector_cbid_cid_UNIQUE` (`chargeBoxId`,`connectorId`),
   CONSTRAINT `FK_chargeBoxId_c` FOREIGN KEY (`chargeBoxId`) REFERENCES `chargebox` (`chargeBoxId`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB AUTO_INCREMENT=28 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -82,8 +83,8 @@ CREATE TABLE `connector_metervalue` (
   `unit` varchar(10) DEFAULT NULL,
   KEY `FK_cm_pk_idx` (`connector_pk`),
   KEY `FK_tid_cm_idx` (`transaction_pk`),
-  CONSTRAINT `FK_tid_cm` FOREIGN KEY (`transaction_pk`) REFERENCES `transaction` (`transaction_pk`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  CONSTRAINT `FK_pk_cm` FOREIGN KEY (`connector_pk`) REFERENCES `connector` (`connector_pk`) ON DELETE NO ACTION ON UPDATE NO ACTION
+  CONSTRAINT `FK_pk_cm` FOREIGN KEY (`connector_pk`) REFERENCES `connector` (`connector_pk`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `FK_tid_cm` FOREIGN KEY (`transaction_pk`) REFERENCES `transaction` (`transaction_pk`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -150,7 +151,7 @@ CREATE TABLE `transaction` (
   KEY `connector_pk_idx` (`connector_pk`),
   CONSTRAINT `FK_connector_pk_t` FOREIGN KEY (`connector_pk`) REFERENCES `connector` (`connector_pk`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `FK_idTag_t` FOREIGN KEY (`idTag`) REFERENCES `user` (`idTag`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!50003 SET @saved_cs_client      = @@character_set_client */ ;
 /*!50003 SET @saved_cs_results     = @@character_set_results */ ;
@@ -214,4 +215,4 @@ CREATE TABLE `user` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2013-10-17 15:40:35
+-- Dump completed on 2013-10-23 18:53:50

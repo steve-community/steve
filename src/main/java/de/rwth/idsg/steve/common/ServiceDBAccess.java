@@ -244,17 +244,24 @@ public class ServiceDBAccess {
 			// Disable the auto commit since we are making batch execution. By default, it is always true.
 			connect.setAutoCommit(false);
 			
+			// Select the connector primary key
+			pt = connect.prepareStatement("SELECT connector_pk FROM connector WHERE chargeBoxId = ? AND connectorId = ?");
+			pt.setString(1, chargeBoxIdentity);
+			pt.setInt(2, connectorId);
+			ResultSet rs = pt.executeQuery();
+			int connector_pk = -1;
+			if (rs.next() == true) connector_pk = rs.getInt(1); else throw new SQLException();
+			Utils.releaseResources(null, pt, rs);
+			
 			// We store a log of connector meter values with their timestamps.
-			pt = connect.prepareStatement("INSERT INTO connector_metervalue (connector_pk, valueTimestamp, value) "
-					+ "SELECT connector_pk , ? , ? FROM connector WHERE chargeBoxId = ? AND connectorId = ?");
+			pt = connect.prepareStatement("INSERT INTO connector_metervalue (connector_pk, valueTimestamp, value) VALUES (?,?,?)");
 
 			// OCPP 1.2 allows multiple "values" elements
 			for(ocpp.cs._2010._08.MeterValue valuesElement : list){
 				// Set the parameter indices for batch execution
-				pt.setTimestamp(1, Utils.convertToTimestamp(valuesElement.getTimestamp()));
-				pt.setString(2, String.valueOf(valuesElement.getValue()));	
-				pt.setString(3, chargeBoxIdentity);
-				pt.setInt(4, connectorId);
+				pt.setInt(1, connector_pk);
+				pt.setTimestamp(2, Utils.convertToTimestamp(valuesElement.getTimestamp()));
+				pt.setString(3, String.valueOf(valuesElement.getValue()));	
 				pt.addBatch();
 			}
 
@@ -289,37 +296,50 @@ public class ServiceDBAccess {
 			connect = Utils.getConnectionFromPool();
 			// Disable the auto commit since we are making batch execution. By default, it is always true.
 			connect.setAutoCommit(false);
+			
+			// Select the connector primary key
+			pt = connect.prepareStatement("SELECT connector_pk FROM connector WHERE chargeBoxId = ? AND connectorId = ?");
+			pt.setString(1, chargeBoxIdentity);
+			pt.setInt(2, connectorId);
+			ResultSet rs = pt.executeQuery();
+			int connector_pk = -1;
+			if (rs.next() == true) connector_pk = rs.getInt(1); else throw new SQLException();
+			Utils.releaseResources(null, pt, rs);
+			
 			// We store a log of connector meter values with their timestamps.
 			pt = connect.prepareStatement("INSERT INTO connector_metervalue (connector_pk, transaction_pk, valueTimestamp, value, readingContext, format, measurand, location, unit) "
-					+ "SELECT connector_pk , ? , ? , ? , ? , ? , ? , ? , ? FROM connector WHERE chargeBoxId = ? AND connectorId = ?");
+					+ "VALUES (?,?,?,?,?,?,?,?,?)");
 			
 			// if transactionId is NOT present, write NULL to the field ...
-			if (transactionId == null){			
+			if (transactionId == null){	
+				LOG.info("level deep 1");
 				// OCPP 1.5 allows multiple "values" elements
 				for (ocpp.cs._2012._06.MeterValue valuesElement : list) {
+					LOG.info("level deep 2");
 					Timestamp timestamp = Utils.convertToTimestamp(valuesElement.getTimestamp());
-					
+					LOG.info("level deep 3");
 					// OCPP 1.5 allows multiple "value" elements under each "values" element.
 					List<ocpp.cs._2012._06.MeterValue.Value> valueList = valuesElement.getValue();
 					for (ocpp.cs._2012._06.MeterValue.Value valueElement : valueList){
+						LOG.info("level deep 4");
 						// Set the parameter indices for batch execution
-						pt.setNull(1, java.sql.Types.INTEGER);
-						pt.setTimestamp(2, timestamp);
-						pt.setString(3, valueElement.getValue());					
+						pt.setInt(1, connector_pk);
+						pt.setNull(2, java.sql.Types.INTEGER);
+						pt.setTimestamp(3, timestamp);
+						pt.setString(4, valueElement.getValue());					
 						/** Start: OCPP 1.5 allows for each "value" element to have optional attributes **/
-						pt.setString(4, valueElement.getContext().value());
-						pt.setString(5, valueElement.getFormat().value());
-						pt.setString(6, valueElement.getMeasurand().value());
-						pt.setString(7, valueElement.getLocation().value());
-						pt.setString(8, valueElement.getUnit().value());
-						/** Finish **/					
-						pt.setString(9, chargeBoxIdentity);
-						pt.setInt(10, connectorId);
+						if (valueElement.getContext() != null) pt.setString(5, valueElement.getContext().value()); else pt.setNull(5, java.sql.Types.VARCHAR);
+						if (valueElement.getFormat() != null) pt.setString(6, valueElement.getFormat().value()); else pt.setNull(6, java.sql.Types.VARCHAR);
+						if (valueElement.getMeasurand() != null) pt.setString(7, valueElement.getMeasurand().value()); else pt.setNull(7, java.sql.Types.VARCHAR);
+						if (valueElement.getLocation() != null) pt.setString(8, valueElement.getLocation().value()); else pt.setNull(8, java.sql.Types.VARCHAR);
+						if (valueElement.getUnit() != null) pt.setString(9, valueElement.getUnit().value()); else pt.setNull(9, java.sql.Types.VARCHAR);
+						/** Finish **/
 						pt.addBatch();
 					}
 				}
 			// ... Otherwise write the value of the transactionId
 			} else {
+				LOG.info("level deep 5");
 				// OCPP 1.5 allows multiple "values" elements
 				for (ocpp.cs._2012._06.MeterValue valuesElement : list) {
 					Timestamp timestamp = Utils.convertToTimestamp(valuesElement.getTimestamp());
@@ -328,18 +348,17 @@ public class ServiceDBAccess {
 					List<ocpp.cs._2012._06.MeterValue.Value> valueList = valuesElement.getValue();
 					for (ocpp.cs._2012._06.MeterValue.Value valueElement : valueList){
 						// Set the parameter indices for batch execution
-						pt.setInt(1, transactionId.intValue());
-						pt.setTimestamp(2, timestamp);
-						pt.setString(3, valueElement.getValue());					
+						pt.setInt(1, connector_pk);
+						pt.setInt(2, transactionId.intValue());
+						pt.setTimestamp(3, timestamp);
+						pt.setString(4, valueElement.getValue());					
 						/** Start: OCPP 1.5 allows for each "value" element to have optional attributes **/
-						pt.setString(4, valueElement.getContext().value());
-						pt.setString(5, valueElement.getFormat().value());
-						pt.setString(6, valueElement.getMeasurand().value());
-						pt.setString(7, valueElement.getLocation().value());
-						pt.setString(8, valueElement.getUnit().value());
-						/** Finish **/					
-						pt.setString(9, chargeBoxIdentity);
-						pt.setInt(10, connectorId);
+						if (valueElement.getContext() != null) pt.setString(5, valueElement.getContext().value()); else pt.setNull(5, java.sql.Types.VARCHAR);
+						if (valueElement.getFormat() != null) pt.setString(6, valueElement.getFormat().value()); else pt.setNull(6, java.sql.Types.VARCHAR);
+						if (valueElement.getMeasurand() != null) pt.setString(7, valueElement.getMeasurand().value()); else pt.setNull(7, java.sql.Types.VARCHAR);
+						if (valueElement.getLocation() != null) pt.setString(8, valueElement.getLocation().value()); else pt.setNull(8, java.sql.Types.VARCHAR);
+						if (valueElement.getUnit() != null) pt.setString(9, valueElement.getUnit().value()); else pt.setNull(9, java.sql.Types.VARCHAR);
+						/** Finish **/
 						pt.addBatch();
 					}
 				}
@@ -384,14 +403,14 @@ public class ServiceDBAccess {
 			// PreparedStatements can use parameter indices as question marks
 			// After insert, a DB trigger sets the user.inTransaction field to 1
 			pt = connect.prepareStatement("INSERT INTO transaction (connector_pk, idTag, startTimestamp, startValue) "
-					+ "SELECT connector_pk , ? , ? , ? , ? FROM connector WHERE chargeBoxId = ? AND connectorId = ?", PreparedStatement.RETURN_GENERATED_KEYS);
+					+ "SELECT connector_pk , ? , ? , ? FROM connector WHERE chargeBoxId = ? AND connectorId = ?", PreparedStatement.RETURN_GENERATED_KEYS);
 
 			// Set the parameter indices
 			pt.setString(1, idTag);
 			pt.setTimestamp(2, startTimestamp);
 			pt.setString(3, startMeterValue);
 			pt.setString(4, chargeBoxIdentity);
-			pt.setInt(5, connectorId);
+			pt.setInt(5, connectorId); 				
 
 			// Insert the transaction into DB
 			int countTrans = pt.executeUpdate();
@@ -456,7 +475,7 @@ public class ServiceDBAccess {
 
 			// PreparedStatements can use parameter indices as question marks
 			// After update, a DB trigger sets the user.inTransaction field to 0
-			pt = connect.prepareStatement("UPDATE transaction SET stopTimestamp = ?, stopValue = ?, WHERE transaction_pk = ?");
+			pt = connect.prepareStatement("UPDATE transaction SET stopTimestamp = ?, stopValue = ? WHERE transaction_pk = ?");
 
 			// Set the parameter indices
 			pt.setTimestamp(1, stopTimestamp);

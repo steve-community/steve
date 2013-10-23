@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Timestamp;
+import java.util.GregorianCalendar;
 
 import javax.naming.Context;
 import javax.naming.InitialContext;
@@ -99,8 +100,8 @@ public class Utils {
 	 * Converts XMLGregorianCalendar in Timestamp (SQL)
 	 */
 	public static Timestamp convertToTimestamp(XMLGregorianCalendar xmlDateTime) {
-		DateTime dt = new DateTime(xmlDateTime);
-		Timestamp ts = new Timestamp(dt.getMillis());
+		GregorianCalendar gc = xmlDateTime.toGregorianCalendar();
+		Timestamp ts = new Timestamp(gc.getTimeInMillis());
 		return ts;
 	}
 

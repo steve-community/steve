@@ -312,16 +312,15 @@ public class ServiceDBAccess {
 			
 			// if transactionId is NOT present, write NULL to the field ...
 			if (transactionId == null){	
-				LOG.info("level deep 1");
+
 				// OCPP 1.5 allows multiple "values" elements
 				for (ocpp.cs._2012._06.MeterValue valuesElement : list) {
-					LOG.info("level deep 2");
 					Timestamp timestamp = Utils.convertToTimestamp(valuesElement.getTimestamp());
-					LOG.info("level deep 3");
+
 					// OCPP 1.5 allows multiple "value" elements under each "values" element.
 					List<ocpp.cs._2012._06.MeterValue.Value> valueList = valuesElement.getValue();
 					for (ocpp.cs._2012._06.MeterValue.Value valueElement : valueList){
-						LOG.info("level deep 4");
+
 						// Set the parameter indices for batch execution
 						pt.setInt(1, connector_pk);
 						pt.setNull(2, java.sql.Types.INTEGER);
@@ -339,7 +338,6 @@ public class ServiceDBAccess {
 				}
 			// ... Otherwise write the value of the transactionId
 			} else {
-				LOG.info("level deep 5");
 				// OCPP 1.5 allows multiple "values" elements
 				for (ocpp.cs._2012._06.MeterValue valuesElement : list) {
 					Timestamp timestamp = Utils.convertToTimestamp(valuesElement.getTimestamp());

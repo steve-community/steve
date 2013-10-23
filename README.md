@@ -14,6 +14,8 @@ How to use?
 2. SteVe requires MySQL to store the data. SteVe comes with a MySQL [dump file](steve-dump-no-data.sql) that contains the database structure for all tables with no data. This should be imported in your MySQL database before deployment of SteVe.  
 **Important**: The default configuration for the database connection can be changed in [context.xml](src/main/webapp/META-INF/context.xml). The required fields to change are *username*, *password* and *url*.
 
+3. The HTTP URL of the OCPP service is http://`your-server-ip:port`**/steve/services/CentralSystemService**. The charge points must be configured to communicate with this address. Depending on the OCPP version of the charge point, SteVe will automatically route messages to the version-specific implementation.
+
 Screenshots
 -----
 1. [Data Management - Reservations](https://raw.github.com/RWTH-i5-IDSG/steve/master/src/main/webapp/images/SteVe_res.png)

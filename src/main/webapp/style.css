@@ -53,7 +53,7 @@ table.res tr:nth-child(odd){ background: #fcfaf2; }
 table.res td {
 	padding: 5px;
 	text-align: center;
-	width: 17%;
+	width: auto;
 }
 
 select {

@@ -3,17 +3,26 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
 	xmlns:jaxws="http://cxf.apache.org/jaxws"
 	xmlns:cxf="http://cxf.apache.org/core"
+	xmlns:soap="http://cxf.apache.org/bindings/soap"
 	xmlns:wsa="http://cxf.apache.org/ws/addressing"
+	xmlns:http="http://cxf.apache.org/transports/http/configuration"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd 
 	http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd 
-	http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd">
+	http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd
+	http://cxf.apache.org/bindings/soap http://cxf.apache.org/schemas/configuration/soap.xsd
+	http://cxf.apache.org/transports/http/configuration http://cxf.apache.org/schemas/configuration/http-conf.xsd">
 	
 	<import resource="classpath:META-INF/cxf/cxf.xml" />
 	<import resource="classpath:META-INF/cxf/cxf-extension-soap.xml" />
 	<import resource="classpath:META-INF/cxf/cxf-servlet.xml" />
 	
 	<!-- Configure general properties -->
-    <cxf:bus><cxf:features><cxf:logging /></cxf:features></cxf:bus> 
+    <cxf:bus>
+    	<cxf:features>
+    		<cxf:logging />
+    		<wsa:addressing />
+    	</cxf:features>
+    </cxf:bus> 
     
     <!-- Just a dummy service to route incoming messages to the appropriate service version. -->
 	<jaxws:endpoint xmlns:tns="urn://Ocpp/Cs/2010/08/" id="CentralSystemService"
@@ -30,16 +39,6 @@
 		implementor="de.rwth.idsg.steve.CentralSystemService12_Impl" wsdlLocation="centralsystemservice_0.wsdl"
 		endpointName="tns:CentralSystemServiceSoap12" serviceName="tns:CentralSystemService"
 		address="/CentralSystemServiceOCPP12">
-		<jaxws:features>
-			<!-- The following is required to enable WS-A in CXF -->
-			<!-- http://cxf.apache.org/docs/ws-addressing.html -->
-			<wsa:addressing />
-		</jaxws:features>  
-		<!-- The following is required for CXF 2.3.1 to recognize specific Headers in incoming messages -->
-		<!-- http://cxf.547215.n5.nabble.com/Example-of-handling-SOAP-Header-with-mustUnderstand-td568441.html -->
-		<jaxws:properties>
-			<entry key="endpoint-processes-headers" value="{urn://Ocpp/Cs/2010/08/}chargeBoxIdentity" />
-		</jaxws:properties>
 	</jaxws:endpoint>
 	
 		<!-- Configure the service for OCPP v1.5 -->
@@ -47,18 +46,10 @@
 		implementor="de.rwth.idsg.steve.CentralSystemService15_Impl" wsdlLocation="ocpp_centralsystemservice_1.5_final.wsdl"
 		endpointName="tns:CentralSystemServiceSoap12" serviceName="tns:CentralSystemService"
 		address="/CentralSystemServiceOCPP15">
-		<jaxws:features><wsa:addressing /></jaxws:features>  
-		<jaxws:properties><entry key="endpoint-processes-headers" value="{urn://Ocpp/Cs/2012/06/}chargeBoxIdentity" /></jaxws:properties>
-	</jaxws:endpoint>	
-
-	<!-- Configure the client -->
-<!-- 	<jaxws:client id="chargepointclient" serviceClass="cps.ChargePointService"> -->
-<!-- 		<jaxws:features> -->
-<!-- 			<wsa:addressing /> -->
-<!-- 		</jaxws:features> -->
-<!-- 		<jaxws:properties> -->
-<!-- 			<entry key="endpoint-processes-headers" value="{urn://Ocpp/Cs/2010/08/}chargeBoxIdentity" /> -->
-<!-- 		</jaxws:properties> -->
-<!-- 	</jaxws:client> -->
+	</jaxws:endpoint>
+	
+	<http:conduit name="*.http-conduit">
+    	<http:client Connection="close" ContentType="application/soap+xml; charset=utf-8"/>
+  	</http:conduit>
 
 </beans>

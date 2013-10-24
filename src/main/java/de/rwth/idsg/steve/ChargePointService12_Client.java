@@ -23,7 +23,11 @@ import ocpp.cp._2010._08.UnlockConnectorResponse;
 import ocpp.cp._2010._08.UpdateFirmwareRequest;
 import ocpp.cp._2010._08.UpdateFirmwareResponse;
 
+import org.apache.cxf.endpoint.Client;
+import org.apache.cxf.frontend.ClientProxy;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
+import org.apache.cxf.transport.http.HTTPConduit;
+import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,6 +48,7 @@ public class ChargePointService12_Client {
 	private static JaxWsProxyFactoryBean factory = new JaxWsProxyFactoryBean();
 
 	static {
+		factory.setBindingId("http://schemas.xmlsoap.org/wsdl/soap12/");
 		factory.setServiceClass(ChargePointService.class);
 	}
 
@@ -117,7 +122,7 @@ public class ChargePointService12_Client {
 	public String sendChangeAvailability(String chargeBoxId, String endpoint_address, ChangeAvailabilityRequest req){
 		LOG.info("Invoking changeAvailability at {}", chargeBoxId);
 		factory.setAddress(endpoint_address);
-		ChargePointService client = (ChargePointService) factory.create();
+		ChargePointService client = (ChargePointService) factory.create();        
 		ChangeAvailabilityResponse response = client.changeAvailability(req, chargeBoxId);
 		return "Charge point: " + chargeBoxId + ", Request: ChangeAvailability, Response: " + response.getStatus().value();
 	}

@@ -68,6 +68,7 @@ public class ChargePointService15_Client {
 	private static JaxWsProxyFactoryBean factory = new JaxWsProxyFactoryBean();
 
 	static {
+		factory.setBindingId("http://schemas.xmlsoap.org/wsdl/soap12/");
 		factory.setServiceClass(ChargePointService.class);
 	}
 

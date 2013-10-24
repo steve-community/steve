@@ -121,6 +121,8 @@ public class ServletChargePoints extends HttpServlet {
 				+ "<form method=\"POST\" action=\""+ contextPath + servletPath + "/delete\">\n"
 				+ "<table class=\"bc\">\n"
 				+ "<tr><td>chargeBoxId (string):</td><td><input type=\"text\" name=\"chargeBoxId\"></td></tr>\n"
+				+ "<tr><td><i><b>Warning:</b> Deleting a charge point causes losing all related information including<br>"
+				+ "transactions, reservations, connector status and connector meter values.</i></td><td></td></tr>\n"
 				+ "<tr><td></td><td id=\"add_space\"><input type=\"submit\" value=\"Delete\"></td></tr>\n"
 				+ "</table>\n"
 				+ "</form>\n"

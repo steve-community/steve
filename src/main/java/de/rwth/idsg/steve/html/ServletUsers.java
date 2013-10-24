@@ -148,6 +148,8 @@ public class ServletUsers extends HttpServlet {
 				+ "<form method=\"POST\" action=\""+ contextPath + servletPath + "/delete\">\n"
 				+ "<table class=\"bc\">\n"
 				+ "<tr><td>idTag (string):</td><td><input type=\"text\" name=\"idTag\"></td></tr>\n"
+				+ "<tr><td><i><b>Warning:</b> Deleting a user causes losing all related information including<br>"
+				+ "transactions and reservations</i></td><td></td></tr>\n"
 				+ "<tr><td></td><td id=\"add_space\"><input type=\"submit\" value=\"Delete\"></td></tr>\n"
 				+ "</table>\n"
 				+ "</form>\n"

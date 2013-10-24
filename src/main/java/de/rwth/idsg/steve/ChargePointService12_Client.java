@@ -23,11 +23,7 @@ import ocpp.cp._2010._08.UnlockConnectorResponse;
 import ocpp.cp._2010._08.UpdateFirmwareRequest;
 import ocpp.cp._2010._08.UpdateFirmwareResponse;
 
-import org.apache.cxf.endpoint.Client;
-import org.apache.cxf.frontend.ClientProxy;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
-import org.apache.cxf.transport.http.HTTPConduit;
-import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

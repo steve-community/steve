@@ -3,13 +3,11 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
 	xmlns:jaxws="http://cxf.apache.org/jaxws"
 	xmlns:cxf="http://cxf.apache.org/core"
-	xmlns:soap="http://cxf.apache.org/bindings/soap"
 	xmlns:wsa="http://cxf.apache.org/ws/addressing"
 	xmlns:http="http://cxf.apache.org/transports/http/configuration"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd 
 	http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd 
 	http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd
-	http://cxf.apache.org/bindings/soap http://cxf.apache.org/schemas/configuration/soap.xsd
 	http://cxf.apache.org/transports/http/configuration http://cxf.apache.org/schemas/configuration/http-conf.xsd">
 	
 	<import resource="classpath:META-INF/cxf/cxf.xml" />

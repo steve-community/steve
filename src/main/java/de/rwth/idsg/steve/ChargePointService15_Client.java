@@ -306,14 +306,16 @@ public class ChargePointService15_Client {
 		}
 		
 		List<String> unknownList = response.getUnknownKey();
-		builder.append("- Unknown keys: ");
 		int counter = unknownList.size();
-		for (String temp : unknownList){
-			counter--;
-			if (counter == 0) {
-				builder.append(temp);
-			} else {
-				builder.append(temp + ", ");
+		if (counter > 0) {
+			builder.append("- Unknown keys: ");
+			for (String temp : unknownList){
+				counter--;
+				if (counter == 0) {
+					builder.append(temp);
+				} else {
+					builder.append(temp + ", ");
+				}
 			}
 		}	
 		return builder.toString();
@@ -387,7 +389,7 @@ public class ChargePointService15_Client {
 		
 		// Check response, and cancel reservation from DB if it is not accepted by the charge point
 		ReservationStatus responseStatus = response.getStatus();
-		if ( responseStatus.equals(ReservationStatus.ACCEPTED) ) {
+		if ( !responseStatus.equals(ReservationStatus.ACCEPTED) ) {
 			ClientDBAccess.cancelReservation(reservationId);
 		}
 		return "Charge point: " + chargeBoxId + ", Request: ReserveNow, Response: " + responseStatus.value();

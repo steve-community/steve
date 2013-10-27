@@ -186,7 +186,7 @@ public class ClientDBAccess {
 			connect = Utils.getConnectionFromPool();
 			
 			// Check overlapping
-			isOverlapping(connect, pt, startTimestamp, expiryTimestamp);
+			isOverlapping(connect, pt, startTimestamp, expiryTimestamp, chargeBoxId);
 			
 			connect.setAutoCommit(false);
 			pt = connect.prepareStatement("INSERT INTO reservation (idTag, chargeBoxId, startDatetime, expiryDatetime) VALUES (?,?,?,?)",
@@ -335,16 +335,18 @@ public class ClientDBAccess {
 	
 	/**
 	 * Throws exception, if there are rows whose date/time ranges overlap with the input
+	 * @param chargeBoxId 
 	 *
 	 */
-	private static void isOverlapping(Connection connect, PreparedStatement pt, Timestamp start, Timestamp stop) {
+	private static void isOverlapping(Connection connect, PreparedStatement pt, Timestamp start, Timestamp stop, String chargeBoxId) {
 		
 		ResultSet rs = null;
 		try {
 			// This WHERE clause covers all three cases
-			pt = connect.prepareStatement("SELECT 1 FROM reservation WHERE ? <= expiryDatetime AND ? >= startDatetime");
+			pt = connect.prepareStatement("SELECT 1 FROM reservation WHERE ? <= expiryDatetime AND ? >= startDatetime AND chargeBoxId = ?");
 			pt.setTimestamp(1, start);
 			pt.setTimestamp(2, stop);
+			pt.setString(3, chargeBoxId);
 
 			rs = pt.executeQuery();
 			// If the result set does have an entry, then there are overlaps

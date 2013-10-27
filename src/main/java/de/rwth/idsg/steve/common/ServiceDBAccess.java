@@ -414,7 +414,7 @@ public class ServiceDBAccess {
 			int countTrans = pt.executeUpdate();
 
 			// Get the generated key in order to obtain the auto-incremented transaction_pk
-			rs = pt.getGeneratedKeys();	
+			rs = pt.getGeneratedKeys();
 			if (rs.next()) {
 				transactionId = rs.getInt(1); // transaction_pk is the 1. column
 			}

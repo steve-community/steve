@@ -477,7 +477,7 @@ public class ServletOperationsV15 extends HttpServlet {
 		+ Common.printChargePointsSingleSelect(chargePointsList, "1.5")
 		+ "<h3><span>Parameters</span></h3>\n"
 		+ "<table>\n"
-		+ "<tr><td>Connector Id (integer, not 0):</td><td><input type=\"number\" min=\"1\" name=\"ConnectorId\"></td></tr>\n"	
+		+ "<tr><td>Connector Id (integer, not 0):</td><td><input type=\"number\" min=\"1\" name=\"connectorId\"></td></tr>\n"	
 		+ "</table>\n"
 		+ "<div class=\"submit-button\"><input type=\"submit\" value=\"Perform\"></div>\n"
 		+ "</form>\n</div>\n";	

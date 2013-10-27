@@ -200,7 +200,7 @@ public class CentralSystemService15_Impl implements CentralSystemService {
 		// Get the authorization info of the user
 		StopTransactionResponse _return = new StopTransactionResponse();
 		String idTag = parameters.getIdTag();
-		if (idTag != null) {
+		if (!idTag.isEmpty()) {
 			SQLIdTagData sqlData = ServiceDBAccess.getIdTagColumns(idTag);
 			_return.setIdTagInfo(createIdTagInfo(sqlData));
 		}

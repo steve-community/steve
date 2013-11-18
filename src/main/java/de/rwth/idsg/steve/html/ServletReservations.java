@@ -103,7 +103,7 @@ public class ServletReservations extends HttpServlet {
 		try {	
 			// Prepare Database Access
 			connect = Utils.getConnectionFromPool();
-			pt = connect.prepareStatement("SELECT * FROM reservation WHERE reservation.expiryDatetime <= NOW() ORDER BY expiryDatetime;");
+			pt = connect.prepareStatement("SELECT * FROM reservation WHERE expiryDatetime >= NOW() ORDER BY expiryDatetime;");
 			rs = pt.executeQuery();
 
 			while ( rs.next() ) {

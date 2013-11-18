@@ -20,7 +20,7 @@ import org.joda.time.format.ISODateTimeFormat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import de.rwth.idsg.steve.html.Common;
+import de.rwth.idsg.steve.html.ExceptionMessage;
 import de.rwth.idsg.steve.html.InputException;
 
 /**
@@ -64,7 +64,7 @@ public class Utils {
 			}
 			con = dataSource.getConnection();
 		} catch (Exception e) {
-			e.printStackTrace();
+			LOG.error("SQL exception", e);
 		}
 		return con;
 	}
@@ -122,7 +122,7 @@ public class Utils {
 		try {
 			dt = inputFormatter.parseDateTime(str);
 		} catch (IllegalArgumentException e) {
-			throw new InputException(Common.EXCEPTION_PARSING_DATETIME);
+			throw new InputException(ExceptionMessage.EXCEPTION_PARSING_DATETIME);
 		}
 		return dt;
 	}

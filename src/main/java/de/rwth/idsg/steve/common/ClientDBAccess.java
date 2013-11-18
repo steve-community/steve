@@ -11,14 +11,14 @@ import java.util.HashMap;
 import javax.xml.datatype.XMLGregorianCalendar;
 
 import ocpp.cp._2012._06.AuthorisationData;
-import ocpp.cp._2012._06.IdTagInfo;
 import ocpp.cp._2012._06.AuthorizationStatus;
+import ocpp.cp._2012._06.IdTagInfo;
 
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import de.rwth.idsg.steve.html.Common;
+import de.rwth.idsg.steve.html.ExceptionMessage;
 import de.rwth.idsg.steve.html.InputException;
 
 
@@ -50,7 +50,7 @@ public class ClientDBAccess {
 
 			return results;
 		} catch (SQLException ex) {
-			ex.printStackTrace();
+			LOG.error("SQL exception", ex);
 			throw new RuntimeException(ex);
 		} finally {
 			Utils.releaseResources(connect, pt, rs);
@@ -67,8 +67,9 @@ public class ClientDBAccess {
 			pt.setString(1, chargeBoxId);
 			pt.executeUpdate();
 		
-		} catch (SQLException e1) {
-			e1.printStackTrace();
+		} catch (SQLException ex) {
+			LOG.error("SQL exception", ex);
+			throw new RuntimeException(ex);
 		} finally {
 			Utils.releaseResources(connect, pt, null);
 		}
@@ -96,8 +97,9 @@ public class ClientDBAccess {
 				LOG.info("The charge point with chargeBoxId {} could NOT be deleted.", chargeBoxId);
 			}
 			connect.setAutoCommit(true);
-		} catch (SQLException e1) {
-			e1.printStackTrace();
+		} catch (SQLException ex) {
+			LOG.error("SQL exception", ex);
+			throw new RuntimeException(ex);
 		} finally {
 			Utils.releaseResources(connect, pt, null);
 		}
@@ -116,8 +118,9 @@ public class ClientDBAccess {
 			pt.setTimestamp(3, expiryTimestamp);			
 			pt.executeUpdate();
 			
-		} catch (SQLException e1) {
-			e1.printStackTrace();
+		} catch (SQLException ex) {
+			LOG.error("SQL exception", ex);
+			throw new RuntimeException(ex);
 		} finally {
 			Utils.releaseResources(connect, pt, null);
 		}
@@ -145,8 +148,9 @@ public class ClientDBAccess {
 				LOG.info("The user with idTag {} could NOT be deleted.", idTag);
 			}
 			connect.setAutoCommit(true);
-		} catch (SQLException e1) {
-			e1.printStackTrace();
+		} catch (SQLException ex) {
+			LOG.error("SQL exception", ex);
+			throw new RuntimeException(ex);
 		} finally {
 			Utils.releaseResources(connect, pt, null);
 		}
@@ -164,13 +168,13 @@ public class ClientDBAccess {
 			startDatetime = new DateTime();
 			// Continue only if: startDatetime < expiryDatetime
 			if ( startDatetime.isAfter(expiryDatetime) ) {
-				throw new InputException(Common.EXCEPTION_INVALID_DATETIME);
+				throw new InputException(ExceptionMessage.EXCEPTION_INVALID_DATETIME);
 			}
 		} else {
 			DateTime now = new DateTime();
 			// Continue only if: now < startDatetime < expiryDatetime
 			if ( !(now.isBefore(startDatetime) && startDatetime.isBefore(expiryDatetime)) ) {
-				throw new InputException(Common.EXCEPTION_INVALID_DATETIME);
+				throw new InputException(ExceptionMessage.EXCEPTION_INVALID_DATETIME);
 			}
 		}
 		
@@ -214,8 +218,8 @@ public class ClientDBAccess {
 				connect.rollback();
 			}
 			connect.setAutoCommit(true);
-		} catch (SQLException e1) {
-			e1.printStackTrace();
+		} catch (SQLException ex) {
+			LOG.error("SQL exception", ex);
 		} finally {
 			Utils.releaseResources(connect, pt, null);
 		}
@@ -250,8 +254,8 @@ public class ClientDBAccess {
 				LOG.info("The reservation {} could NOT be canceled.", reservation_pk);
 			}
 			connect.setAutoCommit(true);
-		} catch (SQLException e1) {
-			e1.printStackTrace();
+		} catch (SQLException ex) {
+			LOG.error("SQL exception", ex);
 		} finally {
 			Utils.releaseResources(connect, pt, null);
 		}
@@ -325,8 +329,8 @@ public class ClientDBAccess {
 				item.setIdTagInfo(_returnIdTagInfo);
 				list.add(item);
 			}
-		} catch (SQLException e) {
-			e.printStackTrace();
+		} catch (SQLException ex) {
+			LOG.error("SQL exception", ex);
 		} finally {
 			Utils.releaseResources(connect, pt, rs);
 		}
@@ -351,10 +355,10 @@ public class ClientDBAccess {
 			rs = pt.executeQuery();
 			// If the result set does have an entry, then there are overlaps
 			if ( rs.next() ) {
-				throw new InputException(Common.EXCEPTION_OVERLAPPING_RESERVATION);
+				throw new InputException(ExceptionMessage.EXCEPTION_OVERLAPPING_RESERVATION);
 			}
-		} catch (SQLException e1) {
-			e1.printStackTrace();
+		} catch (SQLException ex) {
+			LOG.error("SQL exception", ex);
 		} finally {
 			Utils.releaseResources(null, pt, rs);
 		}

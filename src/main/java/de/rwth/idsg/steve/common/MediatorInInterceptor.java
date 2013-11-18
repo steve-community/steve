@@ -70,10 +70,10 @@ public class MediatorInInterceptor extends AbstractPhaseInterceptor<SoapMessage>
             schemaNamespace = xmlReader.getName().getNamespaceURI(); 
             bis.reset();
             
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (XMLStreamException e) {
-            e.printStackTrace();
+        } catch (IOException ex) {
+        	LOG.error("Exception happened", ex);
+        } catch (XMLStreamException ex) {
+        	LOG.error("Exception happened", ex);
         }
  
         // Look up for all available endpoints registered on the bus

@@ -13,9 +13,9 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.joda.time.DateTime;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import de.rwth.idsg.steve.common.ClientDBAccess;
 import de.rwth.idsg.steve.common.Utils;
 
 /**
@@ -25,6 +25,7 @@ import de.rwth.idsg.steve.common.Utils;
 */
 public class ServletReservations extends HttpServlet {
 
+	private static final Logger LOG = LoggerFactory.getLogger(ServletReservations.class);
 	private static final long serialVersionUID = 8576766110806723303L;
 	String contextPath, servletPath;
 
@@ -63,7 +64,7 @@ public class ServletReservations extends HttpServlet {
 //					|| chargeBoxId.isEmpty() 
 //					|| startString.isEmpty()
 //					|| expiryString.isEmpty()){
-//				throw new InputException(Common.EXCEPTION_INPUT_EMPTY);
+//				throw new InputException(ExceptionMessage.EXCEPTION_INPUT_EMPTY);
 //			}
 //			
 //			DateTime startDateTime = Utils.convertToDateTime(startString);
@@ -74,14 +75,14 @@ public class ServletReservations extends HttpServlet {
 //		} else if (command.equals("/cancel")){
 //			String reservSTR = request.getParameter("reservation_pk");
 //			if (reservSTR.isEmpty()){
-//				throw new InputException(Common.EXCEPTION_INPUT_EMPTY);
+//				throw new InputException(ExceptionMessage.EXCEPTION_INPUT_EMPTY);
 //			}
 //			
 //			int reservation_pk;			
 //			try {
 //				reservation_pk = Integer.parseInt(reservSTR);	
 //			} catch (NumberFormatException e) {
-//				throw new InputException(Common.EXCEPTION_PARSING_NUMBER);
+//				throw new InputException(ExceptionMessage.EXCEPTION_PARSING_NUMBER);
 //			}
 //			ClientDBAccess.cancelReservation(reservation_pk);
 //		}		
@@ -94,7 +95,7 @@ public class ServletReservations extends HttpServlet {
 				"<h3><span>Existing Reservations</span></h3>\n"
 				+ "<center>\n"
 				+ "<table class=\"res\">\n"
-				+ "<tr><th>Reservation Id</th><th>idTag</th><th>chargeBoxId</th><th>startDatetime</th><th>expiryDatetime</th><th>expired</th></tr>\n");
+				+ "<tr><th>Reservation Id</th><th>idTag</th><th>chargeBoxId</th><th>startDatetime</th><th>expiryDatetime</th></tr>\n");
 
 		Connection connect = null;
 		PreparedStatement pt = null;
@@ -102,10 +103,9 @@ public class ServletReservations extends HttpServlet {
 		try {	
 			// Prepare Database Access
 			connect = Utils.getConnectionFromPool();
-			pt = connect.prepareStatement("SELECT reservation_pk, idTag, chargeBoxId, startDatetime, expiryDatetime FROM reservation ORDER BY expiryDatetime;");
+			pt = connect.prepareStatement("SELECT * FROM reservation WHERE reservation.expiryDatetime <= NOW() ORDER BY expiryDatetime;");
 			rs = pt.executeQuery();
 
-			Timestamp now = Utils.getCurrentDateTimeTS();
 			while ( rs.next() ) {
 				Timestamp ex = rs.getTimestamp(5);
 				builder.append("<tr>"
@@ -114,11 +114,10 @@ public class ServletReservations extends HttpServlet {
 						+ "<td>" + rs.getString(3) + "</td>"
 						+ "<td>" + Utils.convertToString(rs.getTimestamp(4)) + "</td>"
 						+ "<td>" + Utils.convertToString(ex)+ "</td>"
-						+ "<td>" + now.after(ex) + "</td>"
 						+ "</tr>\n");
 			}
 		} catch (SQLException ex) {
-			ex.printStackTrace();
+			LOG.error("SQL exception", ex);	
 			throw new RuntimeException(ex);
 		} finally {
 			Utils.releaseResources(connect, pt, rs);

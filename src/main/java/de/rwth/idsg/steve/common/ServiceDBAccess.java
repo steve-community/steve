@@ -82,8 +82,8 @@ public class ServiceDBAccess {
 				LOG.error("The chargebox {} is NOT registered and its boot NOT acknowledged.", chargeBoxIdentity);
 			}
 			connect.setAutoCommit(true);						
-		} catch (SQLException e1) {
-			e1.printStackTrace();		
+		} catch (SQLException ex) {
+			LOG.error("SQL exception", ex);	
 		} finally {
 			Utils.releaseResources(connect, pt, null);
 		}
@@ -119,8 +119,8 @@ public class ServiceDBAccess {
 				connect.rollback();
 			}
 			connect.setAutoCommit(true);
-		} catch (SQLException e1) {
-			e1.printStackTrace();
+		} catch (SQLException ex) {
+			LOG.error("SQL exception", ex);
 		} finally {
 			Utils.releaseResources(connect, pt, null);
 		}		
@@ -153,8 +153,8 @@ public class ServiceDBAccess {
 				connect.rollback();
 			}
 			connect.setAutoCommit(true);
-		} catch (SQLException e1) {
-			e1.printStackTrace();
+		} catch (SQLException ex) {
+			LOG.error("SQL exception", ex);
 		}  finally {
 			Utils.releaseResources(connect, pt, null);
 		}
@@ -224,8 +224,8 @@ public class ServiceDBAccess {
 				connect.rollback();
 			}
 			connect.setAutoCommit(true);
-		} catch (SQLException e1) {
-			e1.printStackTrace();
+		} catch (SQLException ex) {
+			LOG.error("SQL exception", ex);
 		} finally {
 			Utils.releaseResources(connect, pt, null);
 		}
@@ -276,8 +276,8 @@ public class ServiceDBAccess {
 				connect.rollback();
 			}
 			connect.setAutoCommit(true);
-		} catch (SQLException e1) {
-			e1.printStackTrace();
+		} catch (SQLException ex) {
+			LOG.error("SQL exception", ex);
 		} finally {
 			Utils.releaseResources(connect, pt, null);
 		}		
@@ -373,8 +373,8 @@ public class ServiceDBAccess {
 				connect.rollback();
 			}
 			connect.setAutoCommit(true);
-		} catch (SQLException e1) {
-			e1.printStackTrace();
+		} catch (SQLException ex) {
+			LOG.error("SQL exception", ex);
 		}  finally {
 			Utils.releaseResources(connect, pt, null);
 		}		
@@ -450,8 +450,8 @@ public class ServiceDBAccess {
 				transactionId = -1;
 			}
 			connect.setAutoCommit(true);
-		} catch (SQLException e1) {
-			e1.printStackTrace();
+		} catch (SQLException ex) {
+			LOG.error("SQL exception", ex);
 		} finally {
 			Utils.releaseResources(connect, pt, rs);
 		}
@@ -491,8 +491,8 @@ public class ServiceDBAccess {
 				connect.rollback();
 			}
 			connect.setAutoCommit(true);			
-		} catch (SQLException e1) {
-			e1.printStackTrace();
+		} catch (SQLException ex) {
+			LOG.error("SQL exception", ex);
 		} finally {
 			Utils.releaseResources(connect, pt, null);	
 		}
@@ -527,8 +527,8 @@ public class ServiceDBAccess {
 				sqlAuthData.inTransaction = rs.getBoolean(3);
 				sqlAuthData.blocked = rs.getBoolean(4);		
 			}			
-		} catch (SQLException e1) {
-			e1.printStackTrace();
+		} catch (SQLException ex) {
+			LOG.error("SQL exception", ex);
 		} finally {
 			Utils.releaseResources(connect, pt, rs);
 		}
@@ -557,8 +557,8 @@ public class ServiceDBAccess {
 			rs = pt.executeQuery();			
 			if (rs.next() == true) connectorId = rs.getInt(1);
 			
-		} catch (SQLException e1) {
-			e1.printStackTrace();
+		} catch (SQLException ex) {
+			LOG.error("SQL exception", ex);
 		} finally {
 			Utils.releaseResources(connect, pt, rs);	
 		}	

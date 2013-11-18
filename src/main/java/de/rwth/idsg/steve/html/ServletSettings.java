@@ -52,7 +52,7 @@ public class ServletSettings extends HttpServlet {
 				try {
 					heartbeat = Integer.parseInt(heartbeatSTR);	
 				} catch (NumberFormatException e) {
-					throw new InputException(Common.EXCEPTION_PARSING_NUMBER);
+					throw new InputException(ExceptionMessage.EXCEPTION_PARSING_NUMBER);
 				}
 				Constants.HEARTBEAT_INTERVAL = heartbeat;
 				
@@ -61,13 +61,13 @@ public class ServletSettings extends HttpServlet {
 				try {
 					expiration = Integer.parseInt(expirationSTR);	
 				} catch (NumberFormatException e) {
-					throw new InputException(Common.EXCEPTION_PARSING_NUMBER);
+					throw new InputException(ExceptionMessage.EXCEPTION_PARSING_NUMBER);
 				}
 				Constants.HOURS_TO_EXPIRE = expiration;
 				
 			} else {
 				// Both input fields are empty
-				throw new InputException(Common.EXCEPTION_INPUT_EMPTY);
+				throw new InputException(ExceptionMessage.EXCEPTION_INPUT_EMPTY);
 			}
 		}
 		response.sendRedirect(contextPath + servletPath);

@@ -31,7 +31,7 @@ public class ServletOperationsV12 extends HttpServlet {
 
 	private static final long serialVersionUID = 8576766110806723303L;
 	String contextPath, servletPath;
-	HashMap<String,String> chargePointsList;
+	HashMap<String,String> chargePointsList = null;
 
 	@Override
 	public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
@@ -39,7 +39,7 @@ public class ServletOperationsV12 extends HttpServlet {
 		// Get the request details
 		String command = request.getPathInfo();				
 		contextPath = request.getContextPath();
-		servletPath = request.getServletPath();			
+		servletPath = request.getServletPath();
 
 		if (command == null || command.length() == 0) {
 			// Only refresh the list of charge points when displaying operations page
@@ -96,7 +96,7 @@ public class ServletOperationsV12 extends HttpServlet {
 		String[] chargePointItems = request.getParameterValues("cp_items");
 
 		if (chargePointItems == null) {
-			throw new InputException(Common.EXCEPTION_CHARGEPOINTS_NULL);	
+			throw new InputException(ExceptionMessage.EXCEPTION_CHARGEPOINTS_NULL);	
 		}
 		
 		StringBuilder returnBuilder = null;
@@ -425,7 +425,7 @@ public class ServletOperationsV12 extends HttpServlet {
 			try {
 				connectorId = Integer.parseInt(request.getParameter("connectorId"));	
 			} catch (NumberFormatException e) {
-				throw new InputException(Common.EXCEPTION_PARSING_NUMBER);
+				throw new InputException(ExceptionMessage.EXCEPTION_PARSING_NUMBER);
 			}
 		}
 		String availType = request.getParameter("availType");
@@ -447,7 +447,7 @@ public class ServletOperationsV12 extends HttpServlet {
 		String confKey = request.getParameter("confKey");
 		String value = request.getParameter("value");
 		if (value == null || value.isEmpty()) {
-			throw new InputException(Common.EXCEPTION_INPUT_EMPTY);
+			throw new InputException(ExceptionMessage.EXCEPTION_INPUT_EMPTY);
 		}
 		
 		ChargePointService12_Client cpsClient = new ChargePointService12_Client();
@@ -489,7 +489,7 @@ public class ServletOperationsV12 extends HttpServlet {
 				|| retryIntervalSTR == null || retryIntervalSTR.isEmpty()
 				|| startTime == null || startTime.isEmpty()
 				|| stopTime == null || stopTime.isEmpty()) {
-			throw new InputException(Common.EXCEPTION_INPUT_EMPTY);
+			throw new InputException(ExceptionMessage.EXCEPTION_INPUT_EMPTY);
 		}		
 		
 		int retries;
@@ -498,7 +498,7 @@ public class ServletOperationsV12 extends HttpServlet {
 			retries = Integer.parseInt(retriesSTR);
 			retryInterval = Integer.parseInt(retryIntervalSTR);				
 		} catch (NumberFormatException e) {
-			throw new InputException(Common.EXCEPTION_PARSING_NUMBER);
+			throw new InputException(ExceptionMessage.EXCEPTION_PARSING_NUMBER);
 		}	
 		
 		ChargePointService12_Client cpsClient = new ChargePointService12_Client();
@@ -520,18 +520,18 @@ public class ServletOperationsV12 extends HttpServlet {
 		
 		if (connectorIdSTR == null || connectorIdSTR.isEmpty()
 				|| idTag == null || idTag.isEmpty()) {
-			throw new InputException(Common.EXCEPTION_INPUT_EMPTY);
+			throw new InputException(ExceptionMessage.EXCEPTION_INPUT_EMPTY);
 		}
 		
 		int connectorId;			
 		try {
 			connectorId = Integer.parseInt(connectorIdSTR);	
 		} catch (NumberFormatException e) {
-			throw new InputException(Common.EXCEPTION_PARSING_NUMBER);
+			throw new InputException(ExceptionMessage.EXCEPTION_PARSING_NUMBER);
 		}
 		
 		if (connectorId == 0) {
-			throw new InputException(Common.EXCEPTION_INPUT_ZERO);
+			throw new InputException(ExceptionMessage.EXCEPTION_INPUT_ZERO);
 		}
 		
 		ChargePointService12_Client cpsClient = new ChargePointService12_Client();
@@ -550,14 +550,14 @@ public class ServletOperationsV12 extends HttpServlet {
 	private StringBuilder processRemoteStopTrans(HttpServletRequest request, String[] chargePointItems) {
 		String transactionIdSTR = request.getParameter("transactionId");
 		if (transactionIdSTR == null || transactionIdSTR.isEmpty()) {
-			throw new InputException(Common.EXCEPTION_INPUT_EMPTY);
+			throw new InputException(ExceptionMessage.EXCEPTION_INPUT_EMPTY);
 		}
 		
 		int transactionId;			
 		try {
 			transactionId = Integer.parseInt(transactionIdSTR);
 		} catch (NumberFormatException e) {
-			throw new InputException(Common.EXCEPTION_PARSING_NUMBER);
+			throw new InputException(ExceptionMessage.EXCEPTION_PARSING_NUMBER);
 		}
 		
 		ChargePointService12_Client cpsClient = new ChargePointService12_Client();
@@ -592,18 +592,18 @@ public class ServletOperationsV12 extends HttpServlet {
 	private StringBuilder processUnlockConnector(HttpServletRequest request, String[] chargePointItems) {
 		String connectorIdSTR = request.getParameter("connectorId");
 		if (connectorIdSTR == null || connectorIdSTR.isEmpty()) {
-			throw new InputException(Common.EXCEPTION_INPUT_EMPTY);
+			throw new InputException(ExceptionMessage.EXCEPTION_INPUT_EMPTY);
 		}
 		
 		int connectorId;			
 		try {
 			connectorId = Integer.parseInt(connectorIdSTR);	
 		} catch (NumberFormatException e) {
-			throw new InputException(Common.EXCEPTION_PARSING_NUMBER);
+			throw new InputException(ExceptionMessage.EXCEPTION_PARSING_NUMBER);
 		}
 		
 		if (connectorId == 0) {
-			throw new InputException(Common.EXCEPTION_INPUT_ZERO);
+			throw new InputException(ExceptionMessage.EXCEPTION_INPUT_ZERO);
 		}
 		
 		ChargePointService12_Client cpsClient = new ChargePointService12_Client();
@@ -629,7 +629,7 @@ public class ServletOperationsV12 extends HttpServlet {
 				|| retriesSTR == null || retriesSTR.isEmpty() 
 				|| retryIntervalSTR == null || retryIntervalSTR.isEmpty()
 				|| retrieveDate == null || retrieveDate.isEmpty()) {
-			throw new InputException(Common.EXCEPTION_INPUT_EMPTY);
+			throw new InputException(ExceptionMessage.EXCEPTION_INPUT_EMPTY);
 		}			
 		
 		int retries;
@@ -638,7 +638,7 @@ public class ServletOperationsV12 extends HttpServlet {
 			retries = Integer.parseInt(retriesSTR);
 			retryInterval = Integer.parseInt(retryIntervalSTR);				
 		} catch (NumberFormatException e) {
-			throw new InputException(Common.EXCEPTION_PARSING_NUMBER);
+			throw new InputException(ExceptionMessage.EXCEPTION_PARSING_NUMBER);
 		}
 		
 		ChargePointService12_Client cpsClient = new ChargePointService12_Client();

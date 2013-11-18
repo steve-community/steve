@@ -47,7 +47,7 @@ public class ServletChargePoints extends HttpServlet {
 		String chargeBoxId = request.getParameter("chargeBoxId");
 		
 		if (chargeBoxId == null || chargeBoxId.isEmpty()) {
-			throw new InputException(Common.EXCEPTION_INPUT_EMPTY);
+			throw new InputException(ExceptionMessage.EXCEPTION_INPUT_EMPTY);
 		}
 		
 		if (command.equals("/add")){

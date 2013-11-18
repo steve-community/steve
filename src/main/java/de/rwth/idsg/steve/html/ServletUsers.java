@@ -14,6 +14,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.joda.time.DateTime;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import de.rwth.idsg.steve.common.ClientDBAccess;
 import de.rwth.idsg.steve.common.Utils;
@@ -25,6 +27,7 @@ import de.rwth.idsg.steve.common.Utils;
 */
 public class ServletUsers extends HttpServlet {
 
+	private static final Logger LOG = LoggerFactory.getLogger(ServletUsers.class);
 	private static final long serialVersionUID = 8576766110806723303L;
 	String contextPath, servletPath;
 
@@ -59,7 +62,7 @@ public class ServletUsers extends HttpServlet {
 			String expiryDateSTR = request.getParameter("expiryDate");
 			
 			if (idTag == null || idTag.isEmpty()) {
-				throw new InputException(Common.EXCEPTION_INPUT_EMPTY);
+				throw new InputException(ExceptionMessage.EXCEPTION_INPUT_EMPTY);
 			}
 						
 			Timestamp expiryTimestamp = null;
@@ -77,7 +80,7 @@ public class ServletUsers extends HttpServlet {
 		} else if (command.equals("/delete")){
 			String idTag = request.getParameter("idTag");
 			if (idTag == null || idTag.isEmpty()) {
-				throw new InputException(Common.EXCEPTION_INPUT_EMPTY);
+				throw new InputException(ExceptionMessage.EXCEPTION_INPUT_EMPTY);
 			}			
 			ClientDBAccess.deleteUser(idTag);			
 		}		
@@ -116,7 +119,7 @@ public class ServletUsers extends HttpServlet {
 						+ "</tr>\n");
 			}
 		} catch (SQLException ex) {
-			ex.printStackTrace();
+			LOG.error("SQL exception", ex);
 			throw new RuntimeException(ex);
 		} finally {
 			Utils.releaseResources(connect, pt, rs);

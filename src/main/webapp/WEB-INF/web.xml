@@ -96,7 +96,7 @@
 
 	<filter>
 		<filter-name>ExceptionFilter</filter-name>
-		<filter-class>de.rwth.idsg.steve.common.ExceptionFilter</filter-class>
+		<filter-class>de.rwth.idsg.steve.html.ExceptionFilter</filter-class>
 	</filter>
 	<filter-mapping>
 		<filter-name>ExceptionFilter</filter-name>

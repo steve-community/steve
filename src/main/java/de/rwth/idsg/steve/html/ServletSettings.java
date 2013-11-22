@@ -47,6 +47,7 @@ public class ServletSettings extends HttpServlet {
 			String heartbeatSTR = request.getParameter("heartbeat");
 			String expirationSTR = request.getParameter("expiration");
 			
+			// If heartbeat input exists
 			if (heartbeatSTR != null && !heartbeatSTR.isEmpty()) {
 				int heartbeat;
 				try {
@@ -56,7 +57,10 @@ public class ServletSettings extends HttpServlet {
 				}
 				Constants.HEARTBEAT_INTERVAL = heartbeat;
 				
-			} else if (expirationSTR != null && !expirationSTR.isEmpty()) {
+			}
+			
+			// If expiration input exists
+			if (expirationSTR != null && !expirationSTR.isEmpty()) {
 				int expiration;
 				try {
 					expiration = Integer.parseInt(expirationSTR);	
@@ -65,8 +69,10 @@ public class ServletSettings extends HttpServlet {
 				}
 				Constants.HOURS_TO_EXPIRE = expiration;
 				
-			} else {
-				// Both input fields are empty
+			}
+			
+			// If both input fields are empty
+			if ((heartbeatSTR == null || heartbeatSTR.isEmpty()) && (expirationSTR == null || expirationSTR.isEmpty())) {				
 				throw new InputException(ExceptionMessage.EXCEPTION_INPUT_EMPTY);
 			}
 		}

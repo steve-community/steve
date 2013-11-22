@@ -3,6 +3,7 @@ package de.rwth.idsg.steve.common;
 
 /**
  * This class has the constant variables that are used by the OCPP service implementation.
+ * These default values can be overwritten from the properties file, if one exists.
  * 
  * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
  *  

@@ -59,7 +59,7 @@ public class Utils {
 		try {
 			if (dataSource == null) {
 				Context initContext = new InitialContext();
-				dataSource = (DataSource) initContext.lookup("java:comp/env/jdbc/stevedb");
+				dataSource = (DataSource) initContext.lookup("java:comp/env/jdbc/stevedb");			
 				LOG.info("DB connection pool is opened.");
 			}
 			con = dataSource.getConnection();

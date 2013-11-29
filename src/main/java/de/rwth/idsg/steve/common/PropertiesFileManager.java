@@ -12,26 +12,29 @@ import org.slf4j.LoggerFactory;
 
 public class PropertiesFileManager {
 
-	private static final Logger LOG = LoggerFactory.getLogger(PropertiesFileManager.class);
-	private static final File catalinaBase = new File(System.getProperty("catalina.base")).getAbsoluteFile();
-	private static final File stevePropFile = new File(catalinaBase, "conf" + File.separator + "steve.properties");
+    private static final Logger LOG = LoggerFactory.getLogger(PropertiesFileManager.class);
+    private static final File catalinaBase = new File(System.getProperty("catalina.base")).getAbsoluteFile();
+    private static final File stevePropFile = new File(catalinaBase, "conf" + File.separator + "steve.properties");
 
 	/**
-	 * Reads the properties from file.
+	 * Reads the properties from file if there is one.
+	 * If the file is not created yet, it first creates one.
 	 */
-	public static void getFile() {
+	public void readPropFile() {
 		try {
-			if (stevePropFile.exists()) {
-				FileInputStream input = new FileInputStream(stevePropFile);
-				Properties prop = new Properties();
-				prop.load(input);
-				input.close();
+            if (stevePropFile.exists()) {
+                FileInputStream input = new FileInputStream(stevePropFile);
+                Properties prop = new Properties();
+                prop.load(input);
+                input.close();
 
-				Constants.HEARTBEAT_INTERVAL = Integer.parseInt(prop.getProperty("hearbeatInterval"));
-				Constants.HOURS_TO_EXPIRE = Integer.parseInt(prop.getProperty("hoursToExpire"));
-			} else {
-				writeFile();
-			}
+                Constants.HEARTBEAT_INTERVAL = Integer.parseInt(prop.getProperty("hearbeatInterval"));
+                Constants.HOURS_TO_EXPIRE = Integer.parseInt(prop.getProperty("hoursToExpire"));
+            
+            } else {
+            	stevePropFile.createNewFile();
+            	writePropFile();
+            }
 		} catch (FileNotFoundException e) {
 			LOG.error("Exception happened", e);
 		} catch (IOException e) {
@@ -41,24 +44,16 @@ public class PropertiesFileManager {
 
 	/**
 	 * Writes properties to file.
-	 * If the file is not created yet, it first creates one.
+	 * 
 	 */
-	public static void writeFile() {
-		
-		if (!stevePropFile.exists()){
-			try {
-				stevePropFile.createNewFile();
-			} catch (IOException e) {
-				LOG.error("Exception happened", e);
-			}
-		}
+	public void writePropFile() {
 
 		Properties prop = new Properties();
 		prop.setProperty("hearbeatInterval", String.valueOf(Constants.HEARTBEAT_INTERVAL));
 		prop.setProperty("hoursToExpire", String.valueOf(Constants.HOURS_TO_EXPIRE));
 
 		try {
-			prop.store(new FileOutputStream(stevePropFile), null);
+			prop.store(new FileOutputStream(stevePropFile), "Settings for SteVe (https://github.com/RWTH-i5-IDSG/steve)");
 		} catch (FileNotFoundException e) {
 			LOG.error("Exception happened", e);
 		} catch (IOException e) {

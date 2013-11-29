@@ -61,7 +61,7 @@ CREATE TABLE `connector` (
   UNIQUE KEY `connector_pk_UNIQUE` (`connector_pk`),
   UNIQUE KEY `connector_cbid_cid_UNIQUE` (`chargeBoxId`,`connectorId`),
   CONSTRAINT `FK_chargeBoxId_c` FOREIGN KEY (`chargeBoxId`) REFERENCES `chargebox` (`chargeBoxId`) ON DELETE CASCADE ON UPDATE NO ACTION
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -83,8 +83,8 @@ CREATE TABLE `connector_metervalue` (
   `unit` varchar(10) DEFAULT NULL,
   KEY `FK_cm_pk_idx` (`connector_pk`),
   KEY `FK_tid_cm_idx` (`transaction_pk`),
-  CONSTRAINT `FK_tid_cm` FOREIGN KEY (`transaction_pk`) REFERENCES `transaction` (`transaction_pk`) ON DELETE SET NULL ON UPDATE NO ACTION,
-  CONSTRAINT `FK_pk_cm` FOREIGN KEY (`connector_pk`) REFERENCES `connector` (`connector_pk`) ON DELETE CASCADE ON UPDATE NO ACTION
+  CONSTRAINT `FK_pk_cm` FOREIGN KEY (`connector_pk`) REFERENCES `connector` (`connector_pk`) ON DELETE CASCADE ON UPDATE NO ACTION,
+  CONSTRAINT `FK_tid_cm` FOREIGN KEY (`transaction_pk`) REFERENCES `transaction` (`transaction_pk`) ON DELETE SET NULL ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -109,6 +109,19 @@ CREATE TABLE `connector_status` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Table structure for table `dbVersion`
+--
+
+DROP TABLE IF EXISTS `dbVersion`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `dbVersion` (
+  `version` varchar(10) NOT NULL,
+  `upateTimestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
 -- Table structure for table `reservation`
 --
 
@@ -125,9 +138,25 @@ CREATE TABLE `reservation` (
   UNIQUE KEY `reservation_pk_UNIQUE` (`reservation_pk`),
   KEY `FK_idTag_r_idx` (`idTag`),
   KEY `FK_chargeBoxId_r_idx` (`chargeBoxId`),
-  CONSTRAINT `FK_idTag_r` FOREIGN KEY (`idTag`) REFERENCES `user` (`idTag`) ON DELETE CASCADE ON UPDATE NO ACTION,
-  CONSTRAINT `FK_chargeBoxId_r` FOREIGN KEY (`chargeBoxId`) REFERENCES `chargebox` (`chargeBoxId`) ON DELETE CASCADE ON UPDATE NO ACTION
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=latin1;
+  CONSTRAINT `FK_chargeBoxId_r` FOREIGN KEY (`chargeBoxId`) REFERENCES `chargebox` (`chargeBoxId`) ON DELETE CASCADE ON UPDATE NO ACTION,
+  CONSTRAINT `FK_idTag_r` FOREIGN KEY (`idTag`) REFERENCES `user` (`idTag`) ON DELETE CASCADE ON UPDATE NO ACTION
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `reservation_expired`
+--
+
+DROP TABLE IF EXISTS `reservation_expired`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `reservation_expired` (
+  `reservation_pk` int(10) unsigned NOT NULL,
+  `idTag` varchar(15) NOT NULL,
+  `chargeBoxId` varchar(30) NOT NULL,
+  `startDatetime` datetime NOT NULL,
+  `expiryDatetime` datetime NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -149,9 +178,9 @@ CREATE TABLE `transaction` (
   UNIQUE KEY `transaction_pk_UNIQUE` (`transaction_pk`),
   KEY `idTag_idx` (`idTag`),
   KEY `connector_pk_idx` (`connector_pk`),
-  CONSTRAINT `FK_idTag_t` FOREIGN KEY (`idTag`) REFERENCES `user` (`idTag`) ON DELETE CASCADE ON UPDATE NO ACTION,
-  CONSTRAINT `FK_connector_pk_t` FOREIGN KEY (`connector_pk`) REFERENCES `connector` (`connector_pk`) ON DELETE CASCADE ON UPDATE NO ACTION
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=latin1;
+  CONSTRAINT `FK_connector_pk_t` FOREIGN KEY (`connector_pk`) REFERENCES `connector` (`connector_pk`) ON DELETE CASCADE ON UPDATE NO ACTION,
+  CONSTRAINT `FK_idTag_t` FOREIGN KEY (`idTag`) REFERENCES `user` (`idTag`) ON DELETE CASCADE ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!50003 SET @saved_cs_client      = @@character_set_client */ ;
 /*!50003 SET @saved_cs_results     = @@character_set_results */ ;
@@ -205,6 +234,34 @@ CREATE TABLE `user` (
   UNIQUE KEY `idTag_UNIQUE` (`idTag`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping events for database 'stevedb'
+--
+/*!50106 SET @save_time_zone= @@TIME_ZONE */ ;
+/*!50106 DROP EVENT IF EXISTS `expire_reservations` */;
+DELIMITER ;;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;;
+/*!50003 SET character_set_client  = utf8 */ ;;
+/*!50003 SET character_set_results = utf8 */ ;;
+/*!50003 SET collation_connection  = utf8_general_ci */ ;;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;;
+/*!50003 SET sql_mode              = '' */ ;;
+/*!50003 SET @saved_time_zone      = @@time_zone */ ;;
+/*!50003 SET time_zone             = 'SYSTEM' */ ;;
+/*!50106 CREATE*/ /*!50117 DEFINER=`root`@`localhost`*/ /*!50106 EVENT `expire_reservations` ON SCHEDULE EVERY 1 DAY STARTS '2013-11-16 03:00:00' ON COMPLETION NOT PRESERVE ENABLE DO BEGIN
+INSERT INTO reservation_expired (SELECT * FROM reservation WHERE reservation.expiryDatetime <= NOW());
+DELETE FROM reservation WHERE reservation.expiryDatetime <= NOW();
+END */ ;;
+/*!50003 SET time_zone             = @saved_time_zone */ ;;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;;
+/*!50003 SET character_set_results = @saved_cs_results */ ;;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;;
+DELIMITER ;
+/*!50106 SET TIME_ZONE= @save_time_zone */ ;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
@@ -215,4 +272,4 @@ CREATE TABLE `user` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2013-10-24 16:58:04
+-- Dump completed on 2013-11-29 15:37:19

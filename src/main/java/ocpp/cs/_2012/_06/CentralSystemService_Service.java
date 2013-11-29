@@ -22,7 +22,7 @@ import javax.xml.ws.Service;
 
 
 @WebServiceClient(name = "CentralSystemService", 
-                  wsdlLocation = "file:/Users/sgokay/git/steve/src/main/webapp/ocpp_centralsystemservice_1.5_final.wsdl",
+                  wsdlLocation = "file:/Users/sgokay/git/steve/src/main/webapp/wsdl/ocpp_centralsystemservice_1.5_final.wsdl",
                   targetNamespace = "urn://Ocpp/Cs/2012/06/") 
 public class CentralSystemService_Service extends Service {
 
@@ -32,9 +32,9 @@ public class CentralSystemService_Service extends Service {
     static {
         URL url = null;
         try {
-            url = new URL("file:/Users/sgokay/git/steve/src/main/webapp/ocpp_centralsystemservice_1.5_final.wsdl");
+            url = new URL("file:/Users/sgokay/git/steve/src/main/webapp/wsdl/ocpp_centralsystemservice_1.5_final.wsdl");
         } catch (MalformedURLException e) {
-            System.err.println("Can not initialize the default wsdl from file:/Users/sgokay/git/steve/src/main/webapp/ocpp_centralsystemservice_1.5_final.wsdl");
+            System.err.println("Can not initialize the default wsdl from file:/Users/sgokay/git/steve/src/main/webapp/wsdl/ocpp_centralsystemservice_1.5_final.wsdl");
             // e.printStackTrace();
         }
         WSDL_LOCATION = url;

@@ -31,7 +31,7 @@ import de.rwth.idsg.steve.html.InputException;
 public class Utils {
 
 	private static final Logger LOG = LoggerFactory.getLogger(Utils.class);
-	private static DataSource dataSource = null;	
+	private static DataSource dataSource = null;
 	private static DatatypeFactory factory;
 	private static DateTimeFormatter noMilliFormatter = ISODateTimeFormat.dateTimeNoMillis();
 	private static DateTimeFormatter inputFormatter = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm");
@@ -52,15 +52,14 @@ public class Utils {
  
 	/**
 	 * Returns a connection from the JDBC pool.
-	 * If the pool is not created yet, it first creates one.
 	 */
 	public static Connection getConnectionFromPool() {
 		Connection con = null;
 		try {
 			if (dataSource == null) {
 				Context initContext = new InitialContext();
-				dataSource = (DataSource) initContext.lookup("java:comp/env/jdbc/stevedb");			
-				LOG.info("DB connection pool is opened.");
+				dataSource = (DataSource) initContext.lookup("java:comp/env/jdbc/stevedb");	
+				LOG.info("Data source is retrieved.");
 			}
 			con = dataSource.getConnection();
 		} catch (Exception e) {
@@ -122,7 +121,7 @@ public class Utils {
 		try {
 			dt = inputFormatter.parseDateTime(str);
 		} catch (IllegalArgumentException e) {
-			throw new InputException(ExceptionMessage.EXCEPTION_PARSING_DATETIME);
+			throw new InputException(ExceptionMessage.PARSING_DATETIME);
 		}
 		return dt;
 	}

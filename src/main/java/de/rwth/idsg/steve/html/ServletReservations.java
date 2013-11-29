@@ -34,7 +34,7 @@ public class ServletReservations extends HttpServlet {
 
 		// Get the request details			
 		contextPath = request.getContextPath();
-		servletPath = request.getServletPath();	
+		servletPath = contextPath + request.getServletPath();	
 
 		PrintWriter writer = response.getWriter();		
 		response.setContentType("text/html");
@@ -86,7 +86,7 @@ public class ServletReservations extends HttpServlet {
 //			}
 //			ClientDBAccess.cancelReservation(reservation_pk);
 //		}		
-		response.sendRedirect(contextPath + servletPath);
+		response.sendRedirect(servletPath);
 		return;
 	}
 
@@ -127,33 +127,31 @@ public class ServletReservations extends HttpServlet {
 	}
 
 	private String printBookReservation() {		
-		StringBuilder builder = new StringBuilder(
-				"<h3><span>Book A New Reservation</span></h3>\n"
-				+ "<center>\n"
-				+ "<form method=\"POST\" action=\"" + contextPath + servletPath + "/book\">\n"
-				+ "<table class=\"bc\">\n"		
-				+ "<tr><td>idTag (of the user):</td><td><input type=\"text\" name=\"idTag\"></td></tr>\n"
-				+ "<tr><td>chargeBoxId (of the charge point):</td><td><input type=\"text\" name=\"chargeBoxId\"></td></tr>\n"
-				+ "<tr><td>Start date and time (ex: 2011-12-21 11:30):</td><td><input type=\"text\" name=\"startDatetime\"></td></tr>\n"
-				+ "<tr><td>Expiry date and time (ex: 2011-12-21 11:30):</td><td><input type=\"text\" name=\"expiryDatetime\"></td></tr>\n"
-				+ "<tr><td></td><td id=\"add_space\"><input type=\"submit\" value=\"Book\"></td></tr>\n" 	   	
-				+ "</table>\n"		
-				+ "</form>\n"
-				+ "</center>\n<br>\n");		
-		return builder.toString();
+		return
+		"<h3><span>Book A New Reservation</span></h3>\n"
+		+ "<center>\n"
+		+ "<form method=\"POST\" action=\"" + servletPath + "/book\">\n"
+		+ "<table class=\"bc\">\n"		
+		+ "<tr><td>idTag (of the user):</td><td><input type=\"text\" name=\"idTag\"></td></tr>\n"
+		+ "<tr><td>chargeBoxId (of the charge point):</td><td><input type=\"text\" name=\"chargeBoxId\"></td></tr>\n"
+		+ "<tr><td>Start date and time (ex: 2011-12-21 11:30):</td><td><input type=\"text\" name=\"startDatetime\"></td></tr>\n"
+		+ "<tr><td>Expiry date and time (ex: 2011-12-21 11:30):</td><td><input type=\"text\" name=\"expiryDatetime\"></td></tr>\n"
+		+ "<tr><td></td><td id=\"add_space\"><input type=\"submit\" value=\"Book\"></td></tr>\n" 	   	
+		+ "</table>\n"		
+		+ "</form>\n"
+		+ "</center>\n<br>\n";
 	}
 
 	private String printCancelReservation() {
-		StringBuilder builder = new StringBuilder(
-				"<h3><span>Cancel An Existing Reservation</span></h3>\n"
-				+ "<center>\n"	
-				+ "<form method=\"POST\" action=\""+ contextPath + servletPath + "/cancel\">\n"
-				+ "<table class=\"bc\">\n"
-				+ "<tr><td>Reservation Id:</td><td><input type=\"number\" min=\"1\" name=\"reservation_pk\"></td></tr>\n"
-				+ "<tr><td></td><td id=\"add_space\"><input type=\"submit\" value=\"Delete\"></td></tr>\n"
-				+ "</table>\n"
-				+ "</form>\n"
-				+ "</center>\n");
-		return builder.toString();
+		return
+		"<h3><span>Cancel An Existing Reservation</span></h3>\n"
+		+ "<center>\n"	
+		+ "<form method=\"POST\" action=\""+ servletPath + "/cancel\">\n"
+		+ "<table class=\"bc\">\n"
+		+ "<tr><td>Reservation Id:</td><td><input type=\"number\" min=\"1\" name=\"reservation_pk\"></td></tr>\n"
+		+ "<tr><td></td><td id=\"add_space\"><input type=\"submit\" value=\"Delete\"></td></tr>\n"
+		+ "</table>\n"
+		+ "</form>\n"
+		+ "</center>\n";
 	}
 }

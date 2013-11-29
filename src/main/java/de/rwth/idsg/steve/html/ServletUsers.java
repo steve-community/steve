@@ -36,7 +36,7 @@ public class ServletUsers extends HttpServlet {
 
 		// Get the request details			
 		contextPath = request.getContextPath();
-		servletPath = request.getServletPath();	
+		servletPath = contextPath + request.getServletPath();	
 
 		PrintWriter writer = response.getWriter();		
 		response.setContentType("text/html");
@@ -62,7 +62,7 @@ public class ServletUsers extends HttpServlet {
 			String expiryDateSTR = request.getParameter("expiryDate");
 			
 			if (idTag == null || idTag.isEmpty()) {
-				throw new InputException(ExceptionMessage.EXCEPTION_INPUT_EMPTY);
+				throw new InputException(ExceptionMessage.INPUT_EMPTY);
 			}
 						
 			Timestamp expiryTimestamp = null;
@@ -80,11 +80,11 @@ public class ServletUsers extends HttpServlet {
 		} else if (command.equals("/delete")){
 			String idTag = request.getParameter("idTag");
 			if (idTag == null || idTag.isEmpty()) {
-				throw new InputException(ExceptionMessage.EXCEPTION_INPUT_EMPTY);
+				throw new InputException(ExceptionMessage.INPUT_EMPTY);
 			}			
 			ClientDBAccess.deleteUser(idTag);			
 		}		
-		response.sendRedirect(contextPath + servletPath);
+		response.sendRedirect(servletPath);
 		return;
 	}	
 
@@ -129,34 +129,32 @@ public class ServletUsers extends HttpServlet {
 	}
 
 	private String printAddUser() {		
-		StringBuilder builder = new StringBuilder(
-				"<h3><span>Add A New User</span></h3>\n"
-				+ "<center>\n"
-				+ "<form method=\"POST\" action=\"" + contextPath + servletPath + "/add\">\n"
-				+ "<table class=\"bc\">\n"		
-				+ "<tr><td>idTag (string):</td><td><input type=\"text\" name=\"idTag\"></td></tr>\n"
-				+ "<tr><td>parentIdTag (string):</td><td><input type=\"text\" name=\"parentIdTag\" placeholder=\"optional\"></td></tr>\n"
-				+ "<tr><td>Expiry date and time (ex: 2011-12-21 11:30):</td><td><input type=\"text\" name=\"expiryDate\" placeholder=\"optional\"></td></tr>\n"
-				+ "<tr><td></td><td id=\"add_space\"><input type=\"submit\" value=\"Add\"></td></tr>\n" 	   	
-				+ "</table>\n"		
-				+ "</form>\n"
-				+ "</center>\n<br>\n");		
-		return builder.toString();
+		return
+		"<h3><span>Add A New User</span></h3>\n"
+		+ "<center>\n"
+		+ "<form method=\"POST\" action=\"" + servletPath + "/add\">\n"
+		+ "<table class=\"bc\">\n"		
+		+ "<tr><td>idTag (string):</td><td><input type=\"text\" name=\"idTag\"></td></tr>\n"
+		+ "<tr><td>parentIdTag (string):</td><td><input type=\"text\" name=\"parentIdTag\" placeholder=\"optional\"></td></tr>\n"
+		+ "<tr><td>Expiry date and time (ex: 2011-12-21 11:30):</td><td><input type=\"text\" name=\"expiryDate\" placeholder=\"optional\"></td></tr>\n"
+		+ "<tr><td></td><td id=\"add_space\"><input type=\"submit\" value=\"Add\"></td></tr>\n" 	   	
+		+ "</table>\n"		
+		+ "</form>\n"
+		+ "</center>\n<br>\n";		
 	}
 
 	private String printDeleteUser() {
-		StringBuilder builder = new StringBuilder(
-				"<h3><span>Delete A User</span></h3>\n"
-				+ "<center>\n"	
-				+ "<form method=\"POST\" action=\""+ contextPath + servletPath + "/delete\">\n"
-				+ "<table class=\"bc\">\n"
-				+ "<tr><td>idTag (string):</td><td><input type=\"text\" name=\"idTag\"></td></tr>\n"
-				+ "<tr><td><i><b>Warning:</b> Deleting a user causes losing all related information including<br>"
-				+ "transactions and reservations</i></td><td></td></tr>\n"
-				+ "<tr><td></td><td id=\"add_space\"><input type=\"submit\" value=\"Delete\"></td></tr>\n"
-				+ "</table>\n"
-				+ "</form>\n"
-				+ "</center>\n");
-		return builder.toString();
+		return
+		"<h3><span>Delete A User</span></h3>\n"
+		+ "<center>\n"	
+		+ "<form method=\"POST\" action=\""+ servletPath + "/delete\">\n"
+		+ "<table class=\"bc\">\n"
+		+ "<tr><td>idTag (string):</td><td><input type=\"text\" name=\"idTag\"></td></tr>\n"
+		+ "<tr><td><i><b>Warning:</b> Deleting a user causes losing all related information including<br>"
+		+ "transactions and reservations</i></td><td></td></tr>\n"
+		+ "<tr><td></td><td id=\"add_space\"><input type=\"submit\" value=\"Delete\"></td></tr>\n"
+		+ "</table>\n"
+		+ "</form>\n"
+		+ "</center>\n";
 	}
 }

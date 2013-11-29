@@ -50,7 +50,7 @@ import de.rwth.idsg.steve.common.Utils;
 		serviceName = "CentralSystemService",
 		portName = "CentralSystemServiceSoap12",
 		targetNamespace = "urn://Ocpp/Cs/2010/08/",
-		wsdlLocation = "file:/Users/sgokay/git/steve/src/main/webapp/centralsystemservice_0.wsdl",
+		wsdlLocation = "file:/Users/sgokay/git/steve/src/main/webapp/wsdl/centralsystemservice_0.wsdl",
 		endpointInterface = "ocpp.cs._2010._08.CentralSystemService")
 
 public class CentralSystemService12_Impl implements CentralSystemService {

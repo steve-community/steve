@@ -22,7 +22,7 @@ import javax.xml.ws.Service;
 
 
 @WebServiceClient(name = "ChargePointService", 
-                  wsdlLocation = "file:/Users/sgokay/git/steve/src/main/webapp/chargepointservice.wsdl",
+                  wsdlLocation = "file:/Users/sgokay/git/steve/src/main/webapp/wsdl/chargepointservice.wsdl",
                   targetNamespace = "urn://Ocpp/Cp/2010/08/") 
 public class ChargePointService_Service extends Service {
 
@@ -32,9 +32,9 @@ public class ChargePointService_Service extends Service {
     static {
         URL url = null;
         try {
-            url = new URL("file:/Users/sgokay/git/steve/src/main/webapp/chargepointservice.wsdl");
+            url = new URL("file:/Users/sgokay/git/steve/src/main/webapp/wsdl/chargepointservice.wsdl");
         } catch (MalformedURLException e) {
-            System.err.println("Can not initialize the default wsdl from file:/Users/sgokay/git/steve/src/main/webapp/chargepointservice.wsdl");
+            System.err.println("Can not initialize the default wsdl from file:/Users/sgokay/git/steve/src/main/webapp/wsdl/chargepointservice.wsdl");
             // e.printStackTrace();
         }
         WSDL_LOCATION = url;

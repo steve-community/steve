@@ -13,7 +13,9 @@
 	testOnReturn="false"
 	validationQuery="SELECT 1"
 	validationInterval="60000"
+	removeAbandoned="true"
+	removeAbandonedTimeout="60"
 	username="root" 
 	password="come47on"
-	url="jdbc:mysql://localhost:3306/stevedb" />
+	url="jdbc:mysql://localhost:3306/stevedb"/>
 </Context>

@@ -10,10 +10,6 @@
 	http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd
 	http://cxf.apache.org/transports/http/configuration http://cxf.apache.org/schemas/configuration/http-conf.xsd">
 	
-	<import resource="classpath:META-INF/cxf/cxf.xml" />
-	<import resource="classpath:META-INF/cxf/cxf-extension-soap.xml" />
-	<import resource="classpath:META-INF/cxf/cxf-servlet.xml" />
-	
 	<!-- Configure general properties -->
     <cxf:bus>
     	<cxf:features>
@@ -24,7 +20,7 @@
     
     <!-- Just a dummy service to route incoming messages to the appropriate service version. -->
 	<jaxws:endpoint xmlns:tns="urn://Ocpp/Cs/2010/08/" id="CentralSystemService"
-		implementor="de.rwth.idsg.steve.CentralSystemService12_Impl" wsdlLocation="centralsystemservice_0.wsdl"
+		implementor="de.rwth.idsg.steve.CentralSystemService12_Impl" wsdlLocation="wsdl/centralsystemservice_0.wsdl"
 		endpointName="tns:CentralSystemServiceSoap12" serviceName="tns:CentralSystemService"
 		address="/CentralSystemService">
 		<jaxws:inInterceptors>
@@ -34,14 +30,14 @@
 	
 	<!-- Configure the service for OCPP v1.2 -->
 	<jaxws:endpoint xmlns:tns="urn://Ocpp/Cs/2010/08/" id="CentralSystemServiceOCPP12"
-		implementor="de.rwth.idsg.steve.CentralSystemService12_Impl" wsdlLocation="centralsystemservice_0.wsdl"
+		implementor="de.rwth.idsg.steve.CentralSystemService12_Impl" wsdlLocation="wsdl/centralsystemservice_0.wsdl"
 		endpointName="tns:CentralSystemServiceSoap12" serviceName="tns:CentralSystemService"
 		address="/CentralSystemServiceOCPP12">
 	</jaxws:endpoint>
 	
 		<!-- Configure the service for OCPP v1.5 -->
 	<jaxws:endpoint xmlns:tns="urn://Ocpp/Cs/2012/06/" id="CentralSystemServiceOCPP15"
-		implementor="de.rwth.idsg.steve.CentralSystemService15_Impl" wsdlLocation="ocpp_centralsystemservice_1.5_final.wsdl"
+		implementor="de.rwth.idsg.steve.CentralSystemService15_Impl" wsdlLocation="wsdl/ocpp_centralsystemservice_1.5_final.wsdl"
 		endpointName="tns:CentralSystemServiceSoap12" serviceName="tns:CentralSystemService"
 		address="/CentralSystemServiceOCPP15">
 	</jaxws:endpoint>

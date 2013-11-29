@@ -39,13 +39,13 @@ public class ServletOperationsV12 extends HttpServlet {
 		// Get the request details
 		String command = request.getPathInfo();				
 		contextPath = request.getContextPath();
-		servletPath = request.getServletPath();
+		servletPath = contextPath + request.getServletPath();
 
 		if (command == null || command.length() == 0) {
 			// Only refresh the list of charge points when displaying operations page
 			chargePointsList = ClientDBAccess.getChargePoints("1.2");
 			// Redirect to the page of the first operation
-			response.sendRedirect(contextPath + servletPath + "/ChangeAvailability");
+			response.sendRedirect(servletPath + "/ChangeAvailability");
 			return;
 		}
 				
@@ -96,7 +96,7 @@ public class ServletOperationsV12 extends HttpServlet {
 		String[] chargePointItems = request.getParameterValues("cp_items");
 
 		if (chargePointItems == null) {
-			throw new InputException(ExceptionMessage.EXCEPTION_CHARGEPOINTS_NULL);	
+			throw new InputException(ExceptionMessage.CHARGEPOINTS_NULL);	
 		}
 		
 		StringBuilder returnBuilder = null;
@@ -142,20 +142,20 @@ public class ServletOperationsV12 extends HttpServlet {
 		// Print the menu div on the left 
 		"<div class=\"op-menu\">\n"
 		+ "<ul>\n"
-		+ "<li><a class=\"highlight\" href=\"" + contextPath + servletPath + "/ChangeAvailability\" >Change Availability</a></li>\n"
-		+ "<li><a href=\"" + contextPath + servletPath + "/ChangeConfiguration\">Change Configuration</a></li>\n"
-		+ "<li><a href=\"" + contextPath + servletPath + "/ClearCache\">Clear Cache</a></li>\n"
-		+ "<li><a href=\"" + contextPath + servletPath + "/GetDiagnostics\">Get Diagnostics</a></li>\n"
-		+ "<li><a href=\"" + contextPath + servletPath + "/RemoteStartTransaction\">Remote Start Transaction</a></li>\n"
-		+ "<li><a href=\"" + contextPath + servletPath + "/RemoteStopTransaction\">Remote Stop Transaction</a></li>\n"
-		+ "<li><a href=\"" + contextPath + servletPath + "/Reset\">Reset</a></li>\n"
-		+ "<li><a href=\"" + contextPath + servletPath + "/UnlockConnector\">Unlock Connector</a></li>\n"
-		+ "<li><a href=\"" + contextPath + servletPath + "/UpdateFirmware\">Update Firmware</a></li>\n"
+		+ "<li><a class=\"highlight\" href=\"" + servletPath + "/ChangeAvailability\" >Change Availability</a></li>\n"
+		+ "<li><a href=\"" + servletPath + "/ChangeConfiguration\">Change Configuration</a></li>\n"
+		+ "<li><a href=\"" + servletPath + "/ClearCache\">Clear Cache</a></li>\n"
+		+ "<li><a href=\"" + servletPath + "/GetDiagnostics\">Get Diagnostics</a></li>\n"
+		+ "<li><a href=\"" + servletPath + "/RemoteStartTransaction\">Remote Start Transaction</a></li>\n"
+		+ "<li><a href=\"" + servletPath + "/RemoteStopTransaction\">Remote Stop Transaction</a></li>\n"
+		+ "<li><a href=\"" + servletPath + "/Reset\">Reset</a></li>\n"
+		+ "<li><a href=\"" + servletPath + "/UnlockConnector\">Unlock Connector</a></li>\n"
+		+ "<li><a href=\"" + servletPath + "/UpdateFirmware\">Update Firmware</a></li>\n"
 		+ "</ul>\n"
 		+ "</div>\n"
 
 		// Print the div on the right
-		+ "<div class=\"op-content\">\n<form method=\"POST\" action=\"" + contextPath + servletPath + "/ChangeAvailability\">\n" 				
+		+ "<div class=\"op-content\">\n<form method=\"POST\" action=\"" + servletPath + "/ChangeAvailability\">\n" 				
 		+ Common.printChargePointsMultipleSelect(chargePointsList, "1.2")	
 		+ "<h3><span>Parameters</span></h3>\n"
 		+ "<table>\n"
@@ -172,20 +172,20 @@ public class ServletOperationsV12 extends HttpServlet {
 		// Print the menu div on the left 
 		"<div class=\"op-menu\">\n"
 		+ "<ul>\n"
-		+ "<li><a href=\"" + contextPath + servletPath + "/ChangeAvailability\" >Change Availability</a></li>\n"
-		+ "<li><a class=\"highlight\" href=\"" + contextPath + servletPath + "/ChangeConfiguration\">Change Configuration</a></li>\n"
-		+ "<li><a href=\"" + contextPath + servletPath + "/ClearCache\">Clear Cache</a></li>\n"
-		+ "<li><a href=\"" + contextPath + servletPath + "/GetDiagnostics\">Get Diagnostics</a></li>\n"
-		+ "<li><a href=\"" + contextPath + servletPath + "/RemoteStartTransaction\">Remote Start Transaction</a></li>\n"
-		+ "<li><a href=\"" + contextPath + servletPath + "/RemoteStopTransaction\">Remote Stop Transaction</a></li>\n"
-		+ "<li><a href=\"" + contextPath + servletPath + "/Reset\">Reset</a></li>\n"
-		+ "<li><a href=\"" + contextPath + servletPath + "/UnlockConnector\">Unlock Connector</a></li>\n"
-		+ "<li><a href=\"" + contextPath + servletPath + "/UpdateFirmware\">Update Firmware</a></li>\n"
+		+ "<li><a href=\"" + servletPath + "/ChangeAvailability\" >Change Availability</a></li>\n"
+		+ "<li><a class=\"highlight\" href=\"" + servletPath + "/ChangeConfiguration\">Change Configuration</a></li>\n"
+		+ "<li><a href=\"" + servletPath + "/ClearCache\">Clear Cache</a></li>\n"
+		+ "<li><a href=\"" + servletPath + "/GetDiagnostics\">Get Diagnostics</a></li>\n"
+		+ "<li><a href=\"" + servletPath + "/RemoteStartTransaction\">Remote Start Transaction</a></li>\n"
+		+ "<li><a href=\"" + servletPath + "/RemoteStopTransaction\">Remote Stop Transaction</a></li>\n"
+		+ "<li><a href=\"" + servletPath + "/Reset\">Reset</a></li>\n"
+		+ "<li><a href=\"" + servletPath + "/UnlockConnector\">Unlock Connector</a></li>\n"
+		+ "<li><a href=\"" + servletPath + "/UpdateFirmware\">Update Firmware</a></li>\n"
 		+ "</ul>\n"
 		+ "</div>\n"
 
 		// Print the div on the right
-		+ "<div class=\"op-content\">\n<form method=\"POST\" action=\"" + contextPath + servletPath + "/ChangeConfiguration\">\n" 
+		+ "<div class=\"op-content\">\n<form method=\"POST\" action=\"" + servletPath + "/ChangeConfiguration\">\n" 
 		+ Common.printChargePointsMultipleSelect(chargePointsList, "1.2")	
 		+ "<h3><span>Parameters</span></h3>\n"
 		+ "<table>\n"
@@ -213,20 +213,20 @@ public class ServletOperationsV12 extends HttpServlet {
 		// Print the menu div on the left 
 		"<div class=\"op-menu\">\n"
 		+ "<ul>\n"
-		+ "<li><a href=\"" + contextPath + servletPath + "/ChangeAvailability\" >Change Availability</a></li>\n"
-		+ "<li><a href=\"" + contextPath + servletPath + "/ChangeConfiguration\">Change Configuration</a></li>\n"
-		+ "<li><a class=\"highlight\" href=\"" + contextPath + servletPath + "/ClearCache\">Clear Cache</a></li>\n"
-		+ "<li><a href=\"" + contextPath + servletPath + "/GetDiagnostics\">Get Diagnostics</a></li>\n"
-		+ "<li><a href=\"" + contextPath + servletPath + "/RemoteStartTransaction\">Remote Start Transaction</a></li>\n"
-		+ "<li><a href=\"" + contextPath + servletPath + "/RemoteStopTransaction\">Remote Stop Transaction</a></li>\n"
-		+ "<li><a href=\"" + contextPath + servletPath + "/Reset\">Reset</a></li>\n"
-		+ "<li><a href=\"" + contextPath + servletPath + "/UnlockConnector\">Unlock Connector</a></li>\n"
-		+ "<li><a href=\"" + contextPath + servletPath + "/UpdateFirmware\">Update Firmware</a></li>\n"
+		+ "<li><a href=\"" + servletPath + "/ChangeAvailability\" >Change Availability</a></li>\n"
+		+ "<li><a href=\"" + servletPath + "/ChangeConfiguration\">Change Configuration</a></li>\n"
+		+ "<li><a class=\"highlight\" href=\"" + servletPath + "/ClearCache\">Clear Cache</a></li>\n"
+		+ "<li><a href=\"" + servletPath + "/GetDiagnostics\">Get Diagnostics</a></li>\n"
+		+ "<li><a href=\"" + servletPath + "/RemoteStartTransaction\">Remote Start Transaction</a></li>\n"
+		+ "<li><a href=\"" + servletPath + "/RemoteStopTransaction\">Remote Stop Transaction</a></li>\n"
+		+ "<li><a href=\"" + servletPath + "/Reset\">Reset</a></li>\n"
+		+ "<li><a href=\"" + servletPath + "/UnlockConnector\">Unlock Connector</a></li>\n"
+		+ "<li><a href=\"" + servletPath + "/UpdateFirmware\">Update Firmware</a></li>\n"
 		+ "</ul>\n"
 		+ "</div>\n"
 
 		// Print the div on the right
-		+ "<div class=\"op-content\">\n<form method=\"POST\" action=\"" + contextPath + servletPath + "/ClearCache\">\n" 
+		+ "<div class=\"op-content\">\n<form method=\"POST\" action=\"" + servletPath + "/ClearCache\">\n" 
 		+ Common.printChargePointsMultipleSelect(chargePointsList, "1.2")	
 		+ "<h3><span>Parameters</span></h3>\n"
 		+ "<center><i>No parameters required.</i></center>"
@@ -239,20 +239,20 @@ public class ServletOperationsV12 extends HttpServlet {
 		// Print the menu div on the left 
 		"<div class=\"op-menu\">\n"
 		+ "<ul>\n"
-		+ "<li><a href=\"" + contextPath + servletPath + "/ChangeAvailability\" >Change Availability</a></li>\n"
-		+ "<li><a href=\"" + contextPath + servletPath + "/ChangeConfiguration\">Change Configuration</a></li>\n"
-		+ "<li><a href=\"" + contextPath + servletPath + "/ClearCache\">Clear Cache</a></li>\n"
-		+ "<li><a class=\"highlight\" href=\"" + contextPath + servletPath + "/GetDiagnostics\">Get Diagnostics</a></li>\n"
-		+ "<li><a href=\"" + contextPath + servletPath + "/RemoteStartTransaction\">Remote Start Transaction</a></li>\n"
-		+ "<li><a href=\"" + contextPath + servletPath + "/RemoteStopTransaction\">Remote Stop Transaction</a></li>\n"
-		+ "<li><a href=\"" + contextPath + servletPath + "/Reset\">Reset</a></li>\n"
-		+ "<li><a href=\"" + contextPath + servletPath + "/UnlockConnector\">Unlock Connector</a></li>\n"
-		+ "<li><a href=\"" + contextPath + servletPath + "/UpdateFirmware\">Update Firmware</a></li>\n"
+		+ "<li><a href=\"" + servletPath + "/ChangeAvailability\" >Change Availability</a></li>\n"
+		+ "<li><a href=\"" + servletPath + "/ChangeConfiguration\">Change Configuration</a></li>\n"
+		+ "<li><a href=\"" + servletPath + "/ClearCache\">Clear Cache</a></li>\n"
+		+ "<li><a class=\"highlight\" href=\"" + servletPath + "/GetDiagnostics\">Get Diagnostics</a></li>\n"
+		+ "<li><a href=\"" + servletPath + "/RemoteStartTransaction\">Remote Start Transaction</a></li>\n"
+		+ "<li><a href=\"" + servletPath + "/RemoteStopTransaction\">Remote Stop Transaction</a></li>\n"
+		+ "<li><a href=\"" + servletPath + "/Reset\">Reset</a></li>\n"
+		+ "<li><a href=\"" + servletPath + "/UnlockConnector\">Unlock Connector</a></li>\n"
+		+ "<li><a href=\"" + servletPath + "/UpdateFirmware\">Update Firmware</a></li>\n"
 		+ "</ul>\n"
 		+ "</div>\n"
 
 		// Print the div on the right
-		+ "<div class=\"op-content\">\n<form method=\"POST\" action=\"" + contextPath + servletPath + "/GetDiagnostics\">\n" 
+		+ "<div class=\"op-content\">\n<form method=\"POST\" action=\"" + servletPath + "/GetDiagnostics\">\n" 
 		+ Common.printChargePointsMultipleSelect(chargePointsList, "1.2")	
 		+ "<h3><span>Parameters</span></h3>\n"
 		+ "<table>\n"
@@ -271,20 +271,20 @@ public class ServletOperationsV12 extends HttpServlet {
 		// Print the menu div on the left 
 		"<div class=\"op-menu\">\n"
 		+ "<ul>\n"
-		+ "<li><a href=\"" + contextPath + servletPath + "/ChangeAvailability\" >Change Availability</a></li>\n"
-		+ "<li><a href=\"" + contextPath + servletPath + "/ChangeConfiguration\">Change Configuration</a></li>\n"
-		+ "<li><a href=\"" + contextPath + servletPath + "/ClearCache\">Clear Cache</a></li>\n"
-		+ "<li><a href=\"" + contextPath + servletPath + "/GetDiagnostics\">Get Diagnostics</a></li>\n"
-		+ "<li><a class=\"highlight\" href=\"" + contextPath + servletPath + "/RemoteStartTransaction\">Remote Start Transaction</a></li>\n"
-		+ "<li><a href=\"" + contextPath + servletPath + "/RemoteStopTransaction\">Remote Stop Transaction</a></li>\n"
-		+ "<li><a href=\"" + contextPath + servletPath + "/Reset\">Reset</a></li>\n"
-		+ "<li><a href=\"" + contextPath + servletPath + "/UnlockConnector\">Unlock Connector</a></li>\n"
-		+ "<li><a href=\"" + contextPath + servletPath + "/UpdateFirmware\">Update Firmware</a></li>\n"
+		+ "<li><a href=\"" + servletPath + "/ChangeAvailability\" >Change Availability</a></li>\n"
+		+ "<li><a href=\"" + servletPath + "/ChangeConfiguration\">Change Configuration</a></li>\n"
+		+ "<li><a href=\"" + servletPath + "/ClearCache\">Clear Cache</a></li>\n"
+		+ "<li><a href=\"" + servletPath + "/GetDiagnostics\">Get Diagnostics</a></li>\n"
+		+ "<li><a class=\"highlight\" href=\"" + servletPath + "/RemoteStartTransaction\">Remote Start Transaction</a></li>\n"
+		+ "<li><a href=\"" + servletPath + "/RemoteStopTransaction\">Remote Stop Transaction</a></li>\n"
+		+ "<li><a href=\"" + servletPath + "/Reset\">Reset</a></li>\n"
+		+ "<li><a href=\"" + servletPath + "/UnlockConnector\">Unlock Connector</a></li>\n"
+		+ "<li><a href=\"" + servletPath + "/UpdateFirmware\">Update Firmware</a></li>\n"
 		+ "</ul>\n"
 		+ "</div>\n"
 
 		// Print the div on the right
-		+ "<div class=\"op-content\">\n<form method=\"POST\" action=\"" + contextPath + servletPath + "/RemoteStartTransaction\">\n" 
+		+ "<div class=\"op-content\">\n<form method=\"POST\" action=\"" + servletPath + "/RemoteStartTransaction\">\n" 
 		+ Common.printChargePointsSingleSelect(chargePointsList, "1.2")	
 		+ "<h3><span>Parameters</span></h3>\n"
 		+ "<table>\n"
@@ -300,20 +300,20 @@ public class ServletOperationsV12 extends HttpServlet {
 		// Print the menu div on the left 
 		"<div class=\"op-menu\">\n"
 		+ "<ul>\n"
-		+ "<li><a href=\"" + contextPath + servletPath + "/ChangeAvailability\" >Change Availability</a></li>\n"
-		+ "<li><a href=\"" + contextPath + servletPath + "/ChangeConfiguration\">Change Configuration</a></li>\n"
-		+ "<li><a href=\"" + contextPath + servletPath + "/ClearCache\">Clear Cache</a></li>\n"
-		+ "<li><a href=\"" + contextPath + servletPath + "/GetDiagnostics\">Get Diagnostics</a></li>\n"
-		+ "<li><a href=\"" + contextPath + servletPath + "/RemoteStartTransaction\">Remote Start Transaction</a></li>\n"
-		+ "<li><a class=\"highlight\" href=\"" + contextPath + servletPath + "/RemoteStopTransaction\">Remote Stop Transaction</a></li>\n"
-		+ "<li><a href=\"" + contextPath + servletPath + "/Reset\">Reset</a></li>\n"
-		+ "<li><a href=\"" + contextPath + servletPath + "/UnlockConnector\">Unlock Connector</a></li>\n"
-		+ "<li><a href=\"" + contextPath + servletPath + "/UpdateFirmware\">Update Firmware</a></li>\n"
+		+ "<li><a href=\"" + servletPath + "/ChangeAvailability\" >Change Availability</a></li>\n"
+		+ "<li><a href=\"" + servletPath + "/ChangeConfiguration\">Change Configuration</a></li>\n"
+		+ "<li><a href=\"" + servletPath + "/ClearCache\">Clear Cache</a></li>\n"
+		+ "<li><a href=\"" + servletPath + "/GetDiagnostics\">Get Diagnostics</a></li>\n"
+		+ "<li><a href=\"" + servletPath + "/RemoteStartTransaction\">Remote Start Transaction</a></li>\n"
+		+ "<li><a class=\"highlight\" href=\"" + servletPath + "/RemoteStopTransaction\">Remote Stop Transaction</a></li>\n"
+		+ "<li><a href=\"" + servletPath + "/Reset\">Reset</a></li>\n"
+		+ "<li><a href=\"" + servletPath + "/UnlockConnector\">Unlock Connector</a></li>\n"
+		+ "<li><a href=\"" + servletPath + "/UpdateFirmware\">Update Firmware</a></li>\n"
 		+ "</ul>\n"
 		+ "</div>\n"
 
 		// Print the div on the right
-		+ "<div class=\"op-content\">\n<form method=\"POST\" action=\"" + contextPath + servletPath + "/RemoteStopTransaction\">\n" 
+		+ "<div class=\"op-content\">\n<form method=\"POST\" action=\"" + servletPath + "/RemoteStopTransaction\">\n" 
 		+ Common.printChargePointsSingleSelect(chargePointsList, "1.2")	
 		+ "<h3><span>Parameters</span></h3>\n"
 		+ "<table>\n"
@@ -328,20 +328,20 @@ public class ServletOperationsV12 extends HttpServlet {
 		// Print the menu div on the left 
 		"<div class=\"op-menu\">\n"
 		+ "<ul>\n"
-		+ "<li><a href=\"" + contextPath + servletPath + "/ChangeAvailability\" >Change Availability</a></li>\n"
-		+ "<li><a href=\"" + contextPath + servletPath + "/ChangeConfiguration\">Change Configuration</a></li>\n"
-		+ "<li><a href=\"" + contextPath + servletPath + "/ClearCache\">Clear Cache</a></li>\n"
-		+ "<li><a href=\"" + contextPath + servletPath + "/GetDiagnostics\">Get Diagnostics</a></li>\n"
-		+ "<li><a href=\"" + contextPath + servletPath + "/RemoteStartTransaction\">Remote Start Transaction</a></li>\n"
-		+ "<li><a href=\"" + contextPath + servletPath + "/RemoteStopTransaction\">Remote Stop Transaction</a></li>\n"
-		+ "<li><a class=\"highlight\" href=\"" + contextPath + servletPath + "/Reset\">Reset</a></li>\n"
-		+ "<li><a href=\"" + contextPath + servletPath + "/UnlockConnector\">Unlock Connector</a></li>\n"
-		+ "<li><a href=\"" + contextPath + servletPath + "/UpdateFirmware\">Update Firmware</a></li>\n"
+		+ "<li><a href=\"" + servletPath + "/ChangeAvailability\" >Change Availability</a></li>\n"
+		+ "<li><a href=\"" + servletPath + "/ChangeConfiguration\">Change Configuration</a></li>\n"
+		+ "<li><a href=\"" + servletPath + "/ClearCache\">Clear Cache</a></li>\n"
+		+ "<li><a href=\"" + servletPath + "/GetDiagnostics\">Get Diagnostics</a></li>\n"
+		+ "<li><a href=\"" + servletPath + "/RemoteStartTransaction\">Remote Start Transaction</a></li>\n"
+		+ "<li><a href=\"" + servletPath + "/RemoteStopTransaction\">Remote Stop Transaction</a></li>\n"
+		+ "<li><a class=\"highlight\" href=\"" + servletPath + "/Reset\">Reset</a></li>\n"
+		+ "<li><a href=\"" + servletPath + "/UnlockConnector\">Unlock Connector</a></li>\n"
+		+ "<li><a href=\"" + servletPath + "/UpdateFirmware\">Update Firmware</a></li>\n"
 		+ "</ul>\n"
 		+ "</div>\n"
 
 		// Print the div on the right
-		+ "<div class=\"op-content\">\n<form method=\"POST\" action=\"" + contextPath + servletPath + "/Reset\">\n" 
+		+ "<div class=\"op-content\">\n<form method=\"POST\" action=\"" + servletPath + "/Reset\">\n" 
 		+ Common.printChargePointsMultipleSelect(chargePointsList, "1.2")	
 		+ "<h3><span>Parameters</span></h3>\n"
 		+ "<table>\n"
@@ -357,20 +357,20 @@ public class ServletOperationsV12 extends HttpServlet {
 		// Print the menu div on the left 
 		"<div class=\"op-menu\">\n"
 		+ "<ul>\n"
-		+ "<li><a href=\"" + contextPath + servletPath + "/ChangeAvailability\" >Change Availability</a></li>\n"
-		+ "<li><a href=\"" + contextPath + servletPath + "/ChangeConfiguration\">Change Configuration</a></li>\n"
-		+ "<li><a href=\"" + contextPath + servletPath + "/ClearCache\">Clear Cache</a></li>\n"
-		+ "<li><a href=\"" + contextPath + servletPath + "/GetDiagnostics\">Get Diagnostics</a></li>\n"
-		+ "<li><a href=\"" + contextPath + servletPath + "/RemoteStartTransaction\">Remote Start Transaction</a></li>\n"
-		+ "<li><a href=\"" + contextPath + servletPath + "/RemoteStopTransaction\">Remote Stop Transaction</a></li>\n"
-		+ "<li><a href=\"" + contextPath + servletPath + "/Reset\">Reset</a></li>\n"
-		+ "<li><a class=\"highlight\" href=\"" + contextPath + servletPath + "/UnlockConnector\">Unlock Connector</a></li>\n"
-		+ "<li><a href=\"" + contextPath + servletPath + "/UpdateFirmware\">Update Firmware</a></li>\n"
+		+ "<li><a href=\"" + servletPath + "/ChangeAvailability\" >Change Availability</a></li>\n"
+		+ "<li><a href=\"" + servletPath + "/ChangeConfiguration\">Change Configuration</a></li>\n"
+		+ "<li><a href=\"" + servletPath + "/ClearCache\">Clear Cache</a></li>\n"
+		+ "<li><a href=\"" + servletPath + "/GetDiagnostics\">Get Diagnostics</a></li>\n"
+		+ "<li><a href=\"" + servletPath + "/RemoteStartTransaction\">Remote Start Transaction</a></li>\n"
+		+ "<li><a href=\"" + servletPath + "/RemoteStopTransaction\">Remote Stop Transaction</a></li>\n"
+		+ "<li><a href=\"" + servletPath + "/Reset\">Reset</a></li>\n"
+		+ "<li><a class=\"highlight\" href=\"" + servletPath + "/UnlockConnector\">Unlock Connector</a></li>\n"
+		+ "<li><a href=\"" + servletPath + "/UpdateFirmware\">Update Firmware</a></li>\n"
 		+ "</ul>\n"
 		+ "</div>\n"
 
 		// Print the div on the right
-		+ "<div class=\"op-content\">\n<form method=\"POST\" action=\"" + contextPath + servletPath + "/UnlockConnector\">\n" 
+		+ "<div class=\"op-content\">\n<form method=\"POST\" action=\"" + servletPath + "/UnlockConnector\">\n" 
 		+ Common.printChargePointsSingleSelect(chargePointsList, "1.2")	
 		+ "<h3><span>Parameters</span></h3>\n"
 		+ "<table>\n"
@@ -385,20 +385,20 @@ public class ServletOperationsV12 extends HttpServlet {
 		// Print the menu div on the left 
 		"<div class=\"op-menu\">\n"
 		+ "<ul>\n"
-		+ "<li><a href=\"" + contextPath + servletPath + "/ChangeAvailability\" >Change Availability</a></li>\n"
-		+ "<li><a href=\"" + contextPath + servletPath + "/ChangeConfiguration\">Change Configuration</a></li>\n"
-		+ "<li><a href=\"" + contextPath + servletPath + "/ClearCache\">Clear Cache</a></li>\n"
-		+ "<li><a href=\"" + contextPath + servletPath + "/GetDiagnostics\">Get Diagnostics</a></li>\n"
-		+ "<li><a href=\"" + contextPath + servletPath + "/RemoteStartTransaction\">Remote Start Transaction</a></li>\n"
-		+ "<li><a href=\"" + contextPath + servletPath + "/RemoteStopTransaction\">Remote Stop Transaction</a></li>\n"
-		+ "<li><a href=\"" + contextPath + servletPath + "/Reset\">Reset</a></li>\n"
-		+ "<li><a href=\"" + contextPath + servletPath + "/UnlockConnector\">Unlock Connector</a></li>\n"
-		+ "<li><a class=\"highlight\" href=\"" + contextPath + servletPath + "/UpdateFirmware\">Update Firmware</a></li>\n"
+		+ "<li><a href=\"" + servletPath + "/ChangeAvailability\" >Change Availability</a></li>\n"
+		+ "<li><a href=\"" + servletPath + "/ChangeConfiguration\">Change Configuration</a></li>\n"
+		+ "<li><a href=\"" + servletPath + "/ClearCache\">Clear Cache</a></li>\n"
+		+ "<li><a href=\"" + servletPath + "/GetDiagnostics\">Get Diagnostics</a></li>\n"
+		+ "<li><a href=\"" + servletPath + "/RemoteStartTransaction\">Remote Start Transaction</a></li>\n"
+		+ "<li><a href=\"" + servletPath + "/RemoteStopTransaction\">Remote Stop Transaction</a></li>\n"
+		+ "<li><a href=\"" + servletPath + "/Reset\">Reset</a></li>\n"
+		+ "<li><a href=\"" + servletPath + "/UnlockConnector\">Unlock Connector</a></li>\n"
+		+ "<li><a class=\"highlight\" href=\"" + servletPath + "/UpdateFirmware\">Update Firmware</a></li>\n"
 		+ "</ul>\n"
 		+ "</div>\n"
 
 		// Print the div on the right
-		+ "<div class=\"op-content\">\n<form method=\"POST\" action=\"" + contextPath + servletPath + "/UpdateFirmware\">\n" 
+		+ "<div class=\"op-content\">\n<form method=\"POST\" action=\"" + servletPath + "/UpdateFirmware\">\n" 
 		+ Common.printChargePointsMultipleSelect(chargePointsList, "1.2")	
 		+ "<h3><span>Parameters</span></h3>\n"
 		+ "<table>\n"
@@ -425,7 +425,7 @@ public class ServletOperationsV12 extends HttpServlet {
 			try {
 				connectorId = Integer.parseInt(request.getParameter("connectorId"));	
 			} catch (NumberFormatException e) {
-				throw new InputException(ExceptionMessage.EXCEPTION_PARSING_NUMBER);
+				throw new InputException(ExceptionMessage.PARSING_NUMBER);
 			}
 		}
 		String availType = request.getParameter("availType");
@@ -447,7 +447,7 @@ public class ServletOperationsV12 extends HttpServlet {
 		String confKey = request.getParameter("confKey");
 		String value = request.getParameter("value");
 		if (value == null || value.isEmpty()) {
-			throw new InputException(ExceptionMessage.EXCEPTION_INPUT_EMPTY);
+			throw new InputException(ExceptionMessage.INPUT_EMPTY);
 		}
 		
 		ChargePointService12_Client cpsClient = new ChargePointService12_Client();
@@ -489,7 +489,7 @@ public class ServletOperationsV12 extends HttpServlet {
 				|| retryIntervalSTR == null || retryIntervalSTR.isEmpty()
 				|| startTime == null || startTime.isEmpty()
 				|| stopTime == null || stopTime.isEmpty()) {
-			throw new InputException(ExceptionMessage.EXCEPTION_INPUT_EMPTY);
+			throw new InputException(ExceptionMessage.INPUT_EMPTY);
 		}		
 		
 		int retries;
@@ -498,7 +498,7 @@ public class ServletOperationsV12 extends HttpServlet {
 			retries = Integer.parseInt(retriesSTR);
 			retryInterval = Integer.parseInt(retryIntervalSTR);				
 		} catch (NumberFormatException e) {
-			throw new InputException(ExceptionMessage.EXCEPTION_PARSING_NUMBER);
+			throw new InputException(ExceptionMessage.PARSING_NUMBER);
 		}	
 		
 		ChargePointService12_Client cpsClient = new ChargePointService12_Client();
@@ -520,18 +520,18 @@ public class ServletOperationsV12 extends HttpServlet {
 		
 		if (connectorIdSTR == null || connectorIdSTR.isEmpty()
 				|| idTag == null || idTag.isEmpty()) {
-			throw new InputException(ExceptionMessage.EXCEPTION_INPUT_EMPTY);
+			throw new InputException(ExceptionMessage.INPUT_EMPTY);
 		}
 		
 		int connectorId;			
 		try {
 			connectorId = Integer.parseInt(connectorIdSTR);	
 		} catch (NumberFormatException e) {
-			throw new InputException(ExceptionMessage.EXCEPTION_PARSING_NUMBER);
+			throw new InputException(ExceptionMessage.PARSING_NUMBER);
 		}
 		
 		if (connectorId == 0) {
-			throw new InputException(ExceptionMessage.EXCEPTION_INPUT_ZERO);
+			throw new InputException(ExceptionMessage.INPUT_ZERO);
 		}
 		
 		ChargePointService12_Client cpsClient = new ChargePointService12_Client();
@@ -550,14 +550,14 @@ public class ServletOperationsV12 extends HttpServlet {
 	private StringBuilder processRemoteStopTrans(HttpServletRequest request, String[] chargePointItems) {
 		String transactionIdSTR = request.getParameter("transactionId");
 		if (transactionIdSTR == null || transactionIdSTR.isEmpty()) {
-			throw new InputException(ExceptionMessage.EXCEPTION_INPUT_EMPTY);
+			throw new InputException(ExceptionMessage.INPUT_EMPTY);
 		}
 		
 		int transactionId;			
 		try {
 			transactionId = Integer.parseInt(transactionIdSTR);
 		} catch (NumberFormatException e) {
-			throw new InputException(ExceptionMessage.EXCEPTION_PARSING_NUMBER);
+			throw new InputException(ExceptionMessage.PARSING_NUMBER);
 		}
 		
 		ChargePointService12_Client cpsClient = new ChargePointService12_Client();
@@ -592,18 +592,18 @@ public class ServletOperationsV12 extends HttpServlet {
 	private StringBuilder processUnlockConnector(HttpServletRequest request, String[] chargePointItems) {
 		String connectorIdSTR = request.getParameter("connectorId");
 		if (connectorIdSTR == null || connectorIdSTR.isEmpty()) {
-			throw new InputException(ExceptionMessage.EXCEPTION_INPUT_EMPTY);
+			throw new InputException(ExceptionMessage.INPUT_EMPTY);
 		}
 		
 		int connectorId;			
 		try {
 			connectorId = Integer.parseInt(connectorIdSTR);	
 		} catch (NumberFormatException e) {
-			throw new InputException(ExceptionMessage.EXCEPTION_PARSING_NUMBER);
+			throw new InputException(ExceptionMessage.PARSING_NUMBER);
 		}
 		
 		if (connectorId == 0) {
-			throw new InputException(ExceptionMessage.EXCEPTION_INPUT_ZERO);
+			throw new InputException(ExceptionMessage.INPUT_ZERO);
 		}
 		
 		ChargePointService12_Client cpsClient = new ChargePointService12_Client();
@@ -629,7 +629,7 @@ public class ServletOperationsV12 extends HttpServlet {
 				|| retriesSTR == null || retriesSTR.isEmpty() 
 				|| retryIntervalSTR == null || retryIntervalSTR.isEmpty()
 				|| retrieveDate == null || retrieveDate.isEmpty()) {
-			throw new InputException(ExceptionMessage.EXCEPTION_INPUT_EMPTY);
+			throw new InputException(ExceptionMessage.INPUT_EMPTY);
 		}			
 		
 		int retries;
@@ -638,7 +638,7 @@ public class ServletOperationsV12 extends HttpServlet {
 			retries = Integer.parseInt(retriesSTR);
 			retryInterval = Integer.parseInt(retryIntervalSTR);				
 		} catch (NumberFormatException e) {
-			throw new InputException(ExceptionMessage.EXCEPTION_PARSING_NUMBER);
+			throw new InputException(ExceptionMessage.PARSING_NUMBER);
 		}
 		
 		ChargePointService12_Client cpsClient = new ChargePointService12_Client();

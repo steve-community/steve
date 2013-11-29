@@ -4,6 +4,9 @@ html, body { height: 100%; overflow: auto; }
 #diffElements span a:hover, #diffElements span a:active { color:#ce2828; text-decoration:none; cursor: default;}
 #diffElements input, #diffElements select {width: 130px;}
 
+a:link, a:visited {color: #000; text-decoration: underline}
+a:hover, a:active {color: #af6021; text-decoration: underline}
+
 body {
 	font-family: Verdana, sans-serif;
 	font-size: 12px;
@@ -35,12 +38,10 @@ table.bc td {width: 50%;}
 table.sll { margin-bottom: 40px; }
 
 table.res {
-	width: 90%;
 	border-collapse: collapse;
 }
 
 table.res th {
-	font-style: italic;
 	text-align: center;
 	padding: 5px;
 	background: #fff;
@@ -55,6 +56,36 @@ table.res td {
 	text-align: center;
 	width: auto;
 }
+
+/*** Table for charge point details ***/
+table.cpd {
+	border-collapse: collapse;
+	width: 70%;
+}
+
+table.cpd th {
+	text-align: left;
+	padding: 5px 5px 5px 15px;
+	background: #fff;
+	border-bottom: double #CCC;
+}
+
+table.cpd tr { 
+	border-bottom: 1px solid #CCC; 
+}
+
+table.cpd td {
+	padding: 5px;
+	text-align: center;
+}
+
+table.cpd td:first-child {
+	text-align: left;
+	width: 200px;
+	padding-left: 15px;
+	background: #f7f7f7;
+}
+/*** Fin ***/
 
 select {
 	width: 356px;

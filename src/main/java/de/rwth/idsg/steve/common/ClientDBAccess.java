@@ -7,6 +7,7 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import javax.xml.datatype.XMLGregorianCalendar;
 
@@ -54,6 +55,28 @@ public class ClientDBAccess {
 			throw new RuntimeException(ex);
 		} finally {
 			Utils.releaseResources(connect, pt, rs);
+		}
+	}
+	
+	public static synchronized List<String> getChargePoints() {
+		Connection connect = null;
+		PreparedStatement pt = null;
+		ResultSet rs = null;
+		try { 
+			// Prepare Database Access
+			connect = Utils.getConnectionFromPool();
+			pt = connect.prepareStatement("SELECT chargeBoxId FROM chargebox");
+			rs = pt.executeQuery();
+			
+			List<String> list = new ArrayList<String>();
+			while (rs.next()) { list.add(rs.getString(1)); }
+			
+			return list;
+		} catch (SQLException ex) {
+			LOG.error("SQL exception", ex);
+			throw new RuntimeException(ex);
+		} finally {
+			Utils.releaseResources(connect, pt, null);
 		}
 	}
 	
@@ -168,13 +191,13 @@ public class ClientDBAccess {
 			startDatetime = new DateTime();
 			// Continue only if: startDatetime < expiryDatetime
 			if ( startDatetime.isAfter(expiryDatetime) ) {
-				throw new InputException(ExceptionMessage.EXCEPTION_INVALID_DATETIME);
+				throw new InputException(ExceptionMessage.INVALID_DATETIME);
 			}
 		} else {
 			DateTime now = new DateTime();
 			// Continue only if: now < startDatetime < expiryDatetime
 			if ( !(now.isBefore(startDatetime) && startDatetime.isBefore(expiryDatetime)) ) {
-				throw new InputException(ExceptionMessage.EXCEPTION_INVALID_DATETIME);
+				throw new InputException(ExceptionMessage.INVALID_DATETIME);
 			}
 		}
 		
@@ -338,6 +361,32 @@ public class ClientDBAccess {
 	}	
 	
 	/**
+	 * Returns DB version of SteVe
+	 * 
+	 */
+	public static synchronized String getDBVersion() {
+		Connection connect = null;
+		PreparedStatement pt = null;
+		ResultSet rs = null;
+		try { 
+			// Prepare Database Access
+			connect = Utils.getConnectionFromPool();
+			pt = connect.prepareStatement("SELECT version FROM dbVersion");
+			rs = pt.executeQuery();
+			
+			String ver = null;
+			if (rs.next()) ver = rs.getString(1);
+			
+			return ver;
+		} catch (SQLException ex) {
+			LOG.error("SQL exception", ex);
+			throw new RuntimeException(ex);
+		} finally {
+			Utils.releaseResources(connect, pt, null);
+		}
+	}
+	
+	/**
 	 * Throws exception, if there are rows whose date/time ranges overlap with the input
 	 * @param chargeBoxId 
 	 *
@@ -355,7 +404,7 @@ public class ClientDBAccess {
 			rs = pt.executeQuery();
 			// If the result set does have an entry, then there are overlaps
 			if ( rs.next() ) {
-				throw new InputException(ExceptionMessage.EXCEPTION_OVERLAPPING_RESERVATION);
+				throw new InputException(ExceptionMessage.OVERLAPPING_RESERVATION);
 			}
 		} catch (SQLException ex) {
 			LOG.error("SQL exception", ex);

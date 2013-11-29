@@ -16,7 +16,7 @@ import javax.xml.ws.Service;
  */
 
 @WebServiceClient(name = "CentralSystemService", 
-                  wsdlLocation = "file:/Users/sgokay/git/steve/src/main/webapp/centralsystemservice_0.wsdl",
+                  wsdlLocation = "file:/Users/sgokay/git/steve/src/main/webapp/wsdl/centralsystemservice_0.wsdl",
                   targetNamespace = "urn://Ocpp/Cs/2010/08/") 
 public class CentralSystemService_Service extends Service {
 
@@ -26,9 +26,9 @@ public class CentralSystemService_Service extends Service {
     static {
         URL url = null;
         try {
-            url = new URL("file:/Users/sgokay/git/steve/src/main/webapp/centralsystemservice_0.wsdl");
+            url = new URL("file:/Users/sgokay/git/steve/src/main/webapp/wsdl/centralsystemservice_0.wsdl");
         } catch (MalformedURLException e) {
-            System.err.println("Can not initialize the default wsdl from file:/Users/sgokay/git/steve/src/main/webapp/centralsystemservice_0.wsdl");
+            System.err.println("Can not initialize the default wsdl from file:/Users/sgokay/git/steve/src/main/webapp/wsdl/centralsystemservice_0.wsdl");
             // e.printStackTrace();
         }
         WSDL_LOCATION = url;

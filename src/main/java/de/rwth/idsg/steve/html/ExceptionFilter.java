@@ -40,14 +40,12 @@ public class ExceptionFilter implements Filter {
 			response.getWriter().write("Something bad happened. Check the log for details.");
 		}
 	}
-
-	@Override
+	
 	public void destroy() {
-		// TODO Auto-generated method stub
+		// Auto-generated method stub		
 	}
 
-	@Override
 	public void init(FilterConfig arg0) throws ServletException {
-		// TODO Auto-generated method stub
+		// Auto-generated method stub		
 	}
 }

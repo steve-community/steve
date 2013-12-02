@@ -56,6 +56,10 @@
 		<servlet-name>ServletLog</servlet-name>
 		<servlet-class>de.rwth.idsg.steve.html.ServletLog</servlet-class>
 	</servlet>
+	<servlet>
+		<servlet-name>ServletAbout</servlet-name>
+		<servlet-class>de.rwth.idsg.steve.html.ServletAbout</servlet-class>
+	</servlet>
 
 	<servlet-mapping>
 		<servlet-name>cxf</servlet-name>
@@ -92,6 +96,10 @@
 	<servlet-mapping>
 		<servlet-name>ServletLog</servlet-name>
 		<url-pattern>/manager/log</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>ServletAbout</servlet-name>
+		<url-pattern>/manager/about</url-pattern>
 	</servlet-mapping>
 
 	<filter>

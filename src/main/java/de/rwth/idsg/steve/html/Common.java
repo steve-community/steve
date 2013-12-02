@@ -43,6 +43,7 @@ public class Common {
 		+ "</li>\n"
 		+ "<li><a href=\"" + contextPath + "/manager/settings\">SETTINGS</a></li>\n"
 		+ "<li><a href=\"" + contextPath + "/manager/log\">LOG</a></li>\n"
+		+ "<li><a href=\"" + contextPath + "/manager/about\">ABOUT</a></li>\n"
 		+ "</ul>\n"
 		+ "</div></div>\n"
 		+ "<div class=\"main-wrapper\">\n"

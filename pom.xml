@@ -109,19 +109,7 @@
 			<groupId>org.apache.cxf</groupId>
 			<artifactId>cxf-rt-transports-http</artifactId>
 			<version>${cxf.version}</version>
-		</dependency>		
-				
-		<!-- Cargo -->
-<!-- 		<dependency> -->
-<!-- 			<groupId>org.codehaus.cargo</groupId> -->
-<!-- 			<artifactId>cargo-core-api-container</artifactId> -->
-<!-- 			<version>1.4.5</version> -->
-<!-- 		</dependency> -->
-<!--    	 	<dependency> -->
-<!-- 			<groupId>org.codehaus.cargo</groupId> -->
-<!-- 			<artifactId>cargo-core-container-tomcat</artifactId> -->
-<!-- 			<version>1.4.5</version> -->
-<!-- 		</dependency> -->
+		</dependency>
 	
 		<!-- Provided by Tomcat -->
 		<dependency>
@@ -141,19 +129,7 @@
 			<artifactId>mysql-connector-java</artifactId>
 			<version>5.1.26</version>
 			<scope>provided</scope>
-		</dependency> 		
-
-		<!-- Required during the update to modify war file -->
-		<dependency>
-			<groupId>de.schlichtherle.truezip</groupId>
-			<artifactId>truezip-driver-zip</artifactId>
-			<version>7.7.5</version>
 		</dependency>
-		<dependency>
-			<groupId>de.schlichtherle.truezip</groupId>
-			<artifactId>truezip-file</artifactId>
-			<version>7.7.5</version>
-		</dependency> 
 
 </dependencies>
 </project>

@@ -249,6 +249,7 @@ ul.navigation ul li a {
 
 .top-banner {
 	width: 100%;
+	height: 80px;
 	border-radius: 0;
 	background: #71797d;
 }

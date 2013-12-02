@@ -10,7 +10,7 @@ package de.rwth.idsg.steve.common;
  */
 public class Constants {	
 	// Current version of the application
-	public static final String STEVE_VERSION = "0.6.6";
+	public static final String STEVE_VERSION = "0.6.7";	
 	// Heartbeat interval in seconds
 	public static int HEARTBEAT_INTERVAL = 14400;
 	// Determines how many hours the idtag should be stored in the local whitelist of a chargebox

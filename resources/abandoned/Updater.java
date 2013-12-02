@@ -18,6 +18,7 @@ import de.schlichtherle.truezip.socket.sl.IOPoolLocator;
 
 /**
  * This class updates SteVe without losing context descriptor (context.xml) modifications done by the user.
+ * It requires the de.schlichtherle.truezip packages.
  *
  */
 public class Updater {

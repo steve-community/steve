@@ -17,14 +17,12 @@ public class MyContextLoaderListener extends ContextLoaderListener {
 	 */
 	public void contextInitialized(ServletContextEvent event) {
 		super.contextInitialized(event);
-		new PropertiesFileManager().readPropFile();
 	}
 
 	/**
 	 * Close the root web application context.
 	 */
 	public void contextDestroyed(ServletContextEvent event) {
-		new PropertiesFileManager().writePropFile();
 		super.contextDestroyed(event);
 		
 		// http://docs.oracle.com/cd/E17952_01/connector-j-relnotes-en/news-5-1-23.html

@@ -39,9 +39,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import de.rwth.idsg.steve.common.Constants;
-import de.rwth.idsg.steve.common.SQLIdTagData;
 import de.rwth.idsg.steve.common.ServiceDBAccess;
-import de.rwth.idsg.steve.common.Utils;
+import de.rwth.idsg.steve.common.utils.DateTimeUtils;
+import de.rwth.idsg.steve.model.SQLIdTagData;
 
 /**
  * Service implementation of OCPP V1.5
@@ -88,7 +88,7 @@ public class CentralSystemService15_Impl implements CentralSystemService {
 		
 		if (isRegistered) {
 			_returnStatus = RegistrationStatus.ACCEPTED;
-			_return.setCurrentTime(Utils.getCurrentDateTimeXML());
+			_return.setCurrentTime(DateTimeUtils.getCurrentDateTimeXML());
 			_return.setHeartbeatInterval(Integer.valueOf(Constants.HEARTBEAT_INTERVAL));
 		} else {
 			_returnStatus = RegistrationStatus.REJECTED;
@@ -117,7 +117,7 @@ public class CentralSystemService15_Impl implements CentralSystemService {
 		
 		// Optional fields
 		String errorInfo = parameters.getInfo();
-		Timestamp timeStamp = Utils.convertToTimestamp(parameters.getTimestamp());
+		Timestamp timeStamp = DateTimeUtils.convertToTimestamp(parameters.getTimestamp());
 		String vendorId = parameters.getVendorId();
 		String vendorErrorCode = parameters.getVendorErrorCode();
 		
@@ -166,7 +166,7 @@ public class CentralSystemService15_Impl implements CentralSystemService {
 			// Get parameters and insert transaction to DB
 			int connectorId = parameters.getConnectorId();
 			Integer reservationId = parameters.getReservationId();
-			Timestamp startTimestamp = Utils.convertToTimestamp(parameters.getTimestamp());
+			Timestamp startTimestamp = DateTimeUtils.convertToTimestamp(parameters.getTimestamp());
 			String startMeterValue = Integer.toString(parameters.getMeterStart());
 			transactionId = ServiceDBAccess.insertTransaction(chargeBoxIdentity, connectorId, idTag, startTimestamp, startMeterValue, reservationId);			
 		}
@@ -182,7 +182,7 @@ public class CentralSystemService15_Impl implements CentralSystemService {
 
 		// Get parameters and update transaction in DB
 		int transactionId = parameters.getTransactionId();
-		Timestamp stopTimestamp = Utils.convertToTimestamp(parameters.getTimestamp());
+		Timestamp stopTimestamp = DateTimeUtils.convertToTimestamp(parameters.getTimestamp());
 		String stopMeterValue = Integer.toString(parameters.getMeterStop());		
 		ServiceDBAccess.updateTransaction(chargeBoxIdentity, transactionId, stopTimestamp, stopMeterValue);
 		
@@ -211,7 +211,7 @@ public class CentralSystemService15_Impl implements CentralSystemService {
 		LOG.info("Executing heartbeat for {}", chargeBoxIdentity);
 
 		HeartbeatResponse _return = new HeartbeatResponse();
-		_return.setCurrentTime(Utils.getCurrentDateTimeXML());
+		_return.setCurrentTime(DateTimeUtils.getCurrentDateTimeXML());
 		return _return;
 	}
 
@@ -254,20 +254,20 @@ public class CentralSystemService15_Impl implements CentralSystemService {
 			_returnIdTagInfoStatus = AuthorizationStatus.INVALID;
 			LOG.info("The idTag of this user is INVALID (not present in DB).");
 		} else {	
-			if (sqlData.inTransaction == true) {
+			if (sqlData.isInTransaction()) {
 				_returnIdTagInfoStatus = AuthorizationStatus.CONCURRENT_TX;
 				LOG.info("The idTag of this user is ALREADY in another transaction.");
-			} else if (sqlData.blocked == true) {
+			} else if (sqlData.isBlocked()) {
 				_returnIdTagInfoStatus = AuthorizationStatus.BLOCKED;
 				LOG.info("The idTag of this user is BLOCKED.");
-			} else if (sqlData.expiryDate != null && Utils.getCurrentDateTimeTS().after(sqlData.expiryDate)) {
+			} else if (sqlData.getExpiryDate() != null && DateTimeUtils.getCurrentDateTimeTS().after(sqlData.getExpiryDate())) {
 				_returnIdTagInfoStatus = AuthorizationStatus.EXPIRED;
 				LOG.info("The idTag of this user is EXPIRED.");
 			} else {
 				_returnIdTagInfoStatus = AuthorizationStatus.ACCEPTED;
 				// When accepted, set the additional fields
-				_returnIdTagInfo.setExpiryDate(Utils.setExpiryDateTime(Constants.HOURS_TO_EXPIRE));
-				if ( sqlData.parentIdTag != null ) _returnIdTagInfo.setParentIdTag(sqlData.parentIdTag);
+				_returnIdTagInfo.setExpiryDate(DateTimeUtils.setExpiryDateTime(Constants.HOURS_TO_EXPIRE));
+				if ( sqlData.getParentIdTag() != null ) _returnIdTagInfo.setParentIdTag(sqlData.getParentIdTag());
 				LOG.info("The idTag of this user is ACCEPTED.");
 			}
 		}

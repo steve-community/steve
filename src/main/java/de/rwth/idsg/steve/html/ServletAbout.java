@@ -1,7 +1,6 @@
 package de.rwth.idsg.steve.html;
 
 import java.io.IOException;
-import java.io.PrintWriter;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -25,30 +24,16 @@ public class ServletAbout extends HttpServlet {
 	@Override
 	public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
 
-		// Get the request details			
 		contextPath = request.getContextPath();
-		servletPath = contextPath + request.getServletPath();	
-
-		PrintWriter writer = response.getWriter();		
-		response.setContentType("text/html");
-
-		writer.println(
-				Common.printHead(contextPath)
-				+ printAbout()
-				+ Common.printFoot(contextPath));
-
-		writer.close();	
-	}
-
-	private String printAbout() {
-		return
-        "<h3><span>About SteVe</span></h3>\n"
-        + "<center>"
-        + "<table class=\"bc\">\n"
-        + "<tr><td>Version:</td><td>" + Constants.STEVE_VERSION + "</td></tr>\n"
-        + "<tr><td>Database Version:</td><td>" + ClientDBAccess.getDBVersion() + "</td></tr>\n"
-        + "<tr><td>GitHub Page:</td><td><a href=\"https://github.com/RWTH-i5-IDSG/steve\">https://github.com/RWTH-i5-IDSG/steve</a></td></tr>\n"
-        + "</table>"
-        + "</center>\n";
+		servletPath = contextPath + request.getServletPath();
+		
+		request.setAttribute("contextPath", contextPath );
+		request.setAttribute("servletPath", servletPath );
+		
+		request.setAttribute("version", Constants.STEVE_VERSION );
+		request.setAttribute("dbversion", ClientDBAccess.getDBVersion() );
+		
+		// forward the request
+		request.getRequestDispatcher("/WEB-INF/jsp/about.jsp").forward(request, response);
 	}
 }

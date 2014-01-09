@@ -1,12 +1,11 @@
-html, body { height: 100%; overflow: auto; }
+@charset "UTF-8";
 
+html, body { height: 100%; overflow: auto; }
 #diffElements span a:link, #diffElements span  span a:visited { color:#000; text-decoration:none; cursor: default;}
 #diffElements span a:hover, #diffElements span a:active { color:#ce2828; text-decoration:none; cursor: default;}
 #diffElements input, #diffElements select {width: 130px;}
-
 a:link, a:visited {color: #000; text-decoration: underline}
 a:hover, a:active {color: #af6021; text-decoration: underline}
-
 body {
 	font-family: Verdana, sans-serif;
 	font-size: 12px;
@@ -14,71 +13,56 @@ body {
 	padding: 0;
 	margin: 0;
 }
-
-span.section-title {	
-	font-weight: bold;
-	color: rgb(95, 95, 95);
+section {
+	margin-bottom: 12px;
+    background-repeat: repeat-x;
+    background-position: 50% 50%;
+	background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAytpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuNS1jMDE0IDc5LjE1MTQ4MSwgMjAxMy8wMy8xMy0xMjowOToxNSAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wTU09Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9tbS8iIHhtbG5zOnN0UmVmPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvc1R5cGUvUmVzb3VyY2VSZWYjIiB4bWxuczp4bXA9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC8iIHhtcE1NOkRvY3VtZW50SUQ9InhtcC5kaWQ6MEI2QkFDMDQ3MDA1MTFFMzhFRTdFMUM3MjQzQjM3QzEiIHhtcE1NOkluc3RhbmNlSUQ9InhtcC5paWQ6MEI2QkFDMDM3MDA1MTFFMzhFRTdFMUM3MjQzQjM3QzEiIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIENDIChNYWNpbnRvc2gpIj4gPHhtcE1NOkRlcml2ZWRGcm9tIHN0UmVmOmluc3RhbmNlSUQ9InhtcC5kaWQ6MTczM2IzZGQtYTIxNS00MDk4LThhM2EtYzE1MzkyZGUzZmQwIiBzdFJlZjpkb2N1bWVudElEPSJ4bXAuZGlkOjE3MzNiM2RkLWEyMTUtNDA5OC04YTNhLWMxNTM5MmRlM2ZkMCIvPiA8L3JkZjpEZXNjcmlwdGlvbj4gPC9yZGY6UkRGPiA8L3g6eG1wbWV0YT4gPD94cGFja2V0IGVuZD0iciI/Ptw6u3kAAAAPSURBVHjaYjhz5gxAgAEABMwCZTQYvMQAAAAASUVORK5CYII=');
 }
-
-h3 { width:100%; text-align:left; border-bottom: 1px solid #ccc; line-height:0.1em; margin:10px 0 20px; }
-h3 span { color:#454545; background:#fff; padding-right:10px; font-family:Optima; font-size: 14px; font-weight: normal;}
-
+section span { color:#454545; background:#fff; padding-right:10px; font-family:Optima; font-size: 14px; font-weight: normal;}
 ul hr { color: #CCC; background: #CCC; 	height: 1px; border: 0;}
-
 table { width: 100%;}
-
 table td:first-child { 
 	text-align: right; 
 	width: 45%;
 	padding: 3px;
 }
-
 table.bc td {width: 50%;}
-
-table.sll { margin-bottom: 40px; }
-
+table.sll { padding-bottom: 40px; }
 table.res {
 	border-collapse: collapse;
 }
-
 table.res th {
 	text-align: center;
 	padding: 5px;
 	background: #fff;
 	border-bottom: double #CCC;
 }
-
 table.res tr { border-bottom: 1px solid #CCC; }
 table.res tr:nth-child(odd){ background: #fcfaf2; }
-
 table.res td {
 	padding: 5px;
 	text-align: center;
 	width: auto;
 }
-
 /*** Table for charge point details ***/
 table.cpd {
 	border-collapse: collapse;
 	width: 70%;
 }
-
 table.cpd th {
 	text-align: left;
 	padding: 5px 5px 5px 15px;
 	background: #fff;
 	border-bottom: double #CCC;
 }
-
 table.cpd tr { 
 	border-bottom: 1px solid #CCC; 
 }
-
 table.cpd td {
 	padding: 5px;
 	text-align: center;
 }
-
 table.cpd td:first-child {
 	text-align: left;
 	width: 200px;
@@ -86,32 +70,63 @@ table.cpd td:first-child {
 	background: #f7f7f7;
 }
 /*** Fin ***/
-
 select {
-	width: 356px;
+	width: 358px;
 	font-size: 12px;
-	padding: 2px 0 2px 0;
+	margin: 1px 0 1px 0;
+	padding: 2px;
 	outline: none;
+	border: 1px solid #CCC;
+	border-radius: 0;
+  	-webkit-border-radius: 0;
 }
-
 select option { font-size: 12px; }
-
 input[type="text"], input[type="number"], input[type="datetime"]{
 	appearance: none;
 	-webkit-appearance: none;
-	padding: 2px;
+	margin: 1px 0 1px 0;
+	padding: 3px;
 	border: 1px solid #CCC;
 	border-radius: 0;
 	width: 350px;
 	font-size: 12px;
 }
-
 input[type="button"] {
+	margin: 0 0 5px 5px;
+	display:inline;
 	width: 100px;
-	font-size: 12px;
-	-webkit-appearance: button;
+	font-size:12px;
+	height: 25px;
+	-moz-border-radius:3px;
+	-webkit-border-radius:3px;
+	border-radius:3px;
+	background:-webkit-gradient(linear, left top, left bottom, color-stop(0.05, #ededed), color-stop(1, #dfdfdf));
+	background:-moz-linear-gradient(top, #ededed 5%, #dfdfdf 100%);
+	background:-webkit-linear-gradient(top, #ededed 5%, #dfdfdf 100%);
+	background:-o-linear-gradient(top, #ededed 5%, #dfdfdf 100%);
+	background:-ms-linear-gradient(top, #ededed 5%, #dfdfdf 100%);
+	background:linear-gradient(to bottom, #ededed 5%, #dfdfdf 100%);
+	filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#ededed', endColorstr='#dfdfdf',GradientType=0);
+	background-color:#ededed;
+	border:1px solid #b0b0b0;
+	display:inline-block;
+	color:#575757;
+	text-decoration:none;
 }
-
+input[type="button"]:hover {
+	background:-webkit-gradient(linear, left top, left bottom, color-stop(0.05, #dfdfdf), color-stop(1, #ededed));
+	background:-moz-linear-gradient(top, #dfdfdf 5%, #ededed 100%);
+	background:-webkit-linear-gradient(top, #dfdfdf 5%, #ededed 100%);
+	background:-o-linear-gradient(top, #dfdfdf 5%, #ededed 100%);
+	background:-ms-linear-gradient(top, #dfdfdf 5%, #ededed 100%);
+	background:linear-gradient(to bottom, #dfdfdf 5%, #ededed 100%);
+	filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#dfdfdf', endColorstr='#ededed',GradientType=0);
+	background-color:#dfdfdf;
+}
+input[type="button"]:active, input[type="submit"]:active {
+	position:relative;
+	top:1px;
+}
 input[type="submit"] {
 	width: 100px;
 	font-size: 12px;
@@ -128,18 +143,21 @@ input[type="submit"] {
 	-moz-border-radius: 3px;
 	-webkit-border-radius: 3px;
 }
+input[type="submit"]:hover {
+	background:-webkit-gradient(linear, left top, left bottom, from(#aec0c9), to(#6b7f89));
+	background:-moz-linear-gradient(top,  #aec0c9,  #6b7f89);
+	background-color:#dfdfdf;
+}
 
 #add_space { padding-top: 20px; }
-
+tr.violated { color: #fff; background:#e12727 !important; }
 /*************** top menu navigation div ***************/
-
 ul.navigation {
 	color: #ccc;
 	margin:0;
 	position:relative;
 	float:right;
 }
-
 ul.navigation li {
 	display:inline;
 	margin:0;
@@ -147,7 +165,6 @@ ul.navigation li {
 	float:left;
 	position:relative;
 }
-
 ul.navigation li a {
 	padding-left:10px;
 	padding-right:10px;
@@ -156,15 +173,12 @@ ul.navigation li a {
 	display:inline-block;
 	cursor: pointer;
 }
-
 ul.navigation li a:link, ul.navigation li a:visited { color:#CCC; }
 ul.navigation li a:hover, ul.navigation li a:active { color:#fff; }
-
 ul.navigation li:hover > ul {
 	visibility:visible;
 	opacity:1;
 }
-
 ul.navigation ul {
 	list-style: none;
     margin: 0;
@@ -175,38 +189,31 @@ ul.navigation ul {
     z-index: 99999;
     text-align: center;
 }
-
 ul.navigation ul li {
 	background:#000;
 	width:100%;
 }
-
 ul.navigation ul li a {
 	text-decoration:none;
 	display:inline-block;
     width:100%;
     padding: 0;
 }
-
-/*************** operations page divs ***************/
-
-.op-menu {
+/*************** fin ***************/
+.left-menu {
 	float: left;
 	width: 180px;
 	height: 100%;
 	margin: 0;
 	padding: 0; 
-	border-right: 1px solid #CCC;
 	list-style-type: none;
 }
-
-.op-menu ul {
+.left-menu ul {
 	list-style: none;
 	margin: 0;
 	padding: 0;
 }
-
-.op-menu li a {
+.left-menu li a {
 	color:#000;
 	display: block;
 	voice-family: inherit;
@@ -216,57 +223,54 @@ ul.navigation ul li a {
 	background: #fff;
 	padding: 7px;
 }
-
-.op-menu li a:link,#menu5 li a:visited {
+.left-menu li a:link{
 	color:#000;
 	background: #fff;
 }
-
-.op-menu li a:hover,#menu li a:active {
+.left-menu li a:hover{
 	color:#000;
 	background: #cddecf;
 	border-radius: 2px 0 0 2px;
 }
-
-.op-menu li a.highlight {
+.left-menu li a.highlight {
 	color:#000;
 	background: #CCC;
 	border-radius: 2px 0 0 2px;
 }
-
 .op-content {
 	min-height: 350px;
-	margin: 0 0 0 192px; /* 180 (op-menu width) + 12 (padding) - the content should not float under the first div*/
+	margin: 0 0 0 180px;
+	padding: 0 0 0 12px;
+	border-left: 1px solid #CCC;
 }
-
-/*************** other divs ***************/
+.op15-content {
+	min-height: 470px;
+	margin: 0 0 0 180px;
+	padding: 0 0 0 12px;
+	border-left: 1px solid #CCC;
+}
 .main { height: auto; min-height: 100%; }
-
 .main-wrapper {
 	padding-bottom: 70px;
 	height: auto; 
 }
-
 .top-banner {
 	width: 100%;
 	height: 80px;
 	border-radius: 0;
 	background: #71797d;
 }
-
 .top-menu {
 	height: 35px;
 	border-radius: 0;
 	background: #000;
 }
-
 .container {
 	width: 1000px;
 	margin-right: auto;
 	margin-left: auto;
 	*zoom: 1;
 }
-
 .content {
 	position: relative;
 	width: 1000px;
@@ -277,13 +281,11 @@ ul.navigation ul li a {
 	padding: 12px;
 	overflow: auto; /* so the size of the wrapper is always the size of the longest content */
 }
-
 .submit-button {
 	position: absolute;
     bottom: 12px;
     right: 354px;
 }
-
 .footer {
 	width: 1024px;
 	border-left: 1px solid #CCC;
@@ -300,5 +302,11 @@ ul.navigation ul li a {
 	text-align: center;
 	background: #fff;
 }
-
 .footer a { margin-right: 10px; }
+.right-content { margin: 0 0 0 180px; border-left: 1px solid #CCC; padding-left:12px; }
+.right-content div { display:none; }
+.right-content div:first-child { display:block; }
+.info, .warning { text-align: left; border: 1px solid; margin-bottom: 10px; padding:15px 30px 15px 30px; }
+.info { color: #00529B; background-color: #daecf4; }
+.warning { color: #9F6000; background-color: #FEEFB3; }
+input:disabled { background-color:#dddddd; } 

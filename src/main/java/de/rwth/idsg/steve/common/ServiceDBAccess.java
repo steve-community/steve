@@ -10,6 +10,10 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import de.rwth.idsg.steve.common.utils.DBUtils;
+import de.rwth.idsg.steve.common.utils.DateTimeUtils;
+import de.rwth.idsg.steve.model.SQLIdTagData;
+
 
 /**
  * This class has helper methods for database access that are used by the OCPP service.
@@ -41,7 +45,7 @@ public class ServiceDBAccess {
 		PreparedStatement pt = null;
 		try {	
 			// Prepare Database Access
-			connect = Utils.getConnectionFromPool();
+			connect = DBUtils.getConnectionFromPool();
 			connect.setAutoCommit(false);
 
 			// One DB call with two functions:
@@ -85,7 +89,7 @@ public class ServiceDBAccess {
 		} catch (SQLException ex) {
 			LOG.error("SQL exception", ex);	
 		} finally {
-			Utils.releaseResources(connect, pt, null);
+			DBUtils.releaseResources(connect, pt, null);
 		}
 		return isRegistered;
 	}
@@ -98,7 +102,7 @@ public class ServiceDBAccess {
 		PreparedStatement pt = null;		
 		try {		
 			// Prepare Database Access
-			connect = Utils.getConnectionFromPool();
+			connect = DBUtils.getConnectionFromPool();
 			connect.setAutoCommit(false);
 
 			// PreparedStatements can use parameter indices as question marks
@@ -106,7 +110,7 @@ public class ServiceDBAccess {
 
 			// Set the parameter indices
 			pt.setString(1, firmwareStatus);
-			pt.setTimestamp(2, Utils.getCurrentDateTimeTS());
+			pt.setTimestamp(2, DateTimeUtils.getCurrentDateTimeTS());
 			pt.setString(3, chargeBoxIdentity);
 
 			// Update the Firmware Status of the Chargebox with the new one
@@ -122,7 +126,7 @@ public class ServiceDBAccess {
 		} catch (SQLException ex) {
 			LOG.error("SQL exception", ex);
 		} finally {
-			Utils.releaseResources(connect, pt, null);
+			DBUtils.releaseResources(connect, pt, null);
 		}		
 	}	
 	
@@ -134,14 +138,14 @@ public class ServiceDBAccess {
 		PreparedStatement pt = null;
 		try {
 			// Prepare Database Access
-			connect = Utils.getConnectionFromPool();
+			connect = DBUtils.getConnectionFromPool();
 			connect.setAutoCommit(false);
 			
 			// PreparedStatements can use parameter indices as question marks
 			pt = connect.prepareStatement("UPDATE chargebox SET diagnosticsStatus = ?, diagnosticsTimestamp = ? WHERE chargeBoxId = ?");
 			// Set the parameter indices
 			pt.setString(1, status);
-			pt.setTimestamp(2, Utils.getCurrentDateTimeTS());
+			pt.setTimestamp(2, DateTimeUtils.getCurrentDateTimeTS());
 			pt.setString(3, chargeBoxIdentity);
 			// Perform update
 			int count = pt.executeUpdate();
@@ -156,7 +160,7 @@ public class ServiceDBAccess {
 		} catch (SQLException ex) {
 			LOG.error("SQL exception", ex);
 		}  finally {
-			Utils.releaseResources(connect, pt, null);
+			DBUtils.releaseResources(connect, pt, null);
 		}
 	}
 	
@@ -174,7 +178,7 @@ public class ServiceDBAccess {
 		PreparedStatement pt = null;
 		try { 
 			// Prepare Database Access
-			connect = Utils.getConnectionFromPool();
+			connect = DBUtils.getConnectionFromPool();
 			connect.setAutoCommit(false);
 
 			// For the first boot of the chargebox: Insert its connectors in DB
@@ -193,7 +197,7 @@ public class ServiceDBAccess {
 				LOG.info("The connector {}/{} is ALREADY known to DB.", chargeBoxIdentity, connectorId);
 			}
 
-			Utils.releaseResources(null, pt, null);
+			DBUtils.releaseResources(null, pt, null);
 
 			// We store a log of connector statuses
 			pt = connect.prepareStatement("INSERT INTO connector_status (connector_pk, statusTimestamp, status, errorCode, errorInfo, vendorId, vendorErrorCode) "
@@ -201,7 +205,7 @@ public class ServiceDBAccess {
 
 			// Set the parameter indices             			
 			if (timeStamp == null ) {
-				pt.setTimestamp(1, Utils.getCurrentDateTimeTS());
+				pt.setTimestamp(1, DateTimeUtils.getCurrentDateTimeTS());
 			} else {
 				pt.setTimestamp(1, timeStamp);
 			}
@@ -227,7 +231,7 @@ public class ServiceDBAccess {
 		} catch (SQLException ex) {
 			LOG.error("SQL exception", ex);
 		} finally {
-			Utils.releaseResources(connect, pt, null);
+			DBUtils.releaseResources(connect, pt, null);
 		}
 	}
 	
@@ -240,7 +244,7 @@ public class ServiceDBAccess {
 		PreparedStatement pt = null;	
 		try {
 			// Prepare Database Access
-			connect = Utils.getConnectionFromPool();
+			connect = DBUtils.getConnectionFromPool();
 			// Disable the auto commit since we are making batch execution. By default, it is always true.
 			connect.setAutoCommit(false);
 			
@@ -251,7 +255,7 @@ public class ServiceDBAccess {
 			ResultSet rs = pt.executeQuery();
 			int connector_pk = -1;
 			if (rs.next() == true) connector_pk = rs.getInt(1); else throw new SQLException();
-			Utils.releaseResources(null, pt, rs);
+			DBUtils.releaseResources(null, pt, rs);
 			
 			// We store a log of connector meter values with their timestamps.
 			pt = connect.prepareStatement("INSERT INTO connector_metervalue (connector_pk, valueTimestamp, value) VALUES (?,?,?)");
@@ -260,7 +264,7 @@ public class ServiceDBAccess {
 			for(ocpp.cs._2010._08.MeterValue valuesElement : list){
 				// Set the parameter indices for batch execution
 				pt.setInt(1, connector_pk);
-				pt.setTimestamp(2, Utils.convertToTimestamp(valuesElement.getTimestamp()));
+				pt.setTimestamp(2, DateTimeUtils.convertToTimestamp(valuesElement.getTimestamp()));
 				pt.setString(3, String.valueOf(valuesElement.getValue()));	
 				pt.addBatch();
 			}
@@ -268,7 +272,7 @@ public class ServiceDBAccess {
 			// Execute the batch.
 			int[] count = pt.executeBatch();
 			// Validate the change
-			if (Utils.validateDMLChanges(count)) {
+			if (DBUtils.validateDMLChanges(count)) {
 				// Now we can commit everything
 				connect.commit();
 			} else {
@@ -279,7 +283,7 @@ public class ServiceDBAccess {
 		} catch (SQLException ex) {
 			LOG.error("SQL exception", ex);
 		} finally {
-			Utils.releaseResources(connect, pt, null);
+			DBUtils.releaseResources(connect, pt, null);
 		}		
 	}
 
@@ -293,7 +297,7 @@ public class ServiceDBAccess {
 		PreparedStatement pt = null;
 		try {
 			// Prepare Database Access
-			connect = Utils.getConnectionFromPool();
+			connect = DBUtils.getConnectionFromPool();
 			// Disable the auto commit since we are making batch execution. By default, it is always true.
 			connect.setAutoCommit(false);
 			
@@ -304,7 +308,7 @@ public class ServiceDBAccess {
 			ResultSet rs = pt.executeQuery();
 			int connector_pk = -1;
 			if (rs.next() == true) connector_pk = rs.getInt(1); else throw new SQLException();
-			Utils.releaseResources(null, pt, rs);
+			DBUtils.releaseResources(null, pt, rs);
 			
 			// We store a log of connector meter values with their timestamps.
 			pt = connect.prepareStatement("INSERT INTO connector_metervalue (connector_pk, transaction_pk, valueTimestamp, value, readingContext, format, measurand, location, unit) "
@@ -315,7 +319,7 @@ public class ServiceDBAccess {
 
 				// OCPP 1.5 allows multiple "values" elements
 				for (ocpp.cs._2012._06.MeterValue valuesElement : list) {
-					Timestamp timestamp = Utils.convertToTimestamp(valuesElement.getTimestamp());
+					Timestamp timestamp = DateTimeUtils.convertToTimestamp(valuesElement.getTimestamp());
 
 					// OCPP 1.5 allows multiple "value" elements under each "values" element.
 					List<ocpp.cs._2012._06.MeterValue.Value> valueList = valuesElement.getValue();
@@ -340,7 +344,7 @@ public class ServiceDBAccess {
 			} else {
 				// OCPP 1.5 allows multiple "values" elements
 				for (ocpp.cs._2012._06.MeterValue valuesElement : list) {
-					Timestamp timestamp = Utils.convertToTimestamp(valuesElement.getTimestamp());
+					Timestamp timestamp = DateTimeUtils.convertToTimestamp(valuesElement.getTimestamp());
 					
 					// OCPP 1.5 allows multiple "value" elements under each "values" element.
 					List<ocpp.cs._2012._06.MeterValue.Value> valueList = valuesElement.getValue();
@@ -365,7 +369,7 @@ public class ServiceDBAccess {
 			// Execute the batch.
 			int[] count = pt.executeBatch();
 			// Validate the change
-			if (Utils.validateDMLChanges(count)) {
+			if (DBUtils.validateDMLChanges(count)) {
 				// Now we can commit everything
 				connect.commit();
 			} else {
@@ -376,7 +380,7 @@ public class ServiceDBAccess {
 		} catch (SQLException ex) {
 			LOG.error("SQL exception", ex);
 		}  finally {
-			Utils.releaseResources(connect, pt, null);
+			DBUtils.releaseResources(connect, pt, null);
 		}		
 	}
 
@@ -395,7 +399,7 @@ public class ServiceDBAccess {
 		ResultSet rs = null;
 		try {
 			// Prepare Database Access
-			connect = Utils.getConnectionFromPool();
+			connect = DBUtils.getConnectionFromPool();
 			connect.setAutoCommit(false);
 
 			// PreparedStatements can use parameter indices as question marks
@@ -424,7 +428,7 @@ public class ServiceDBAccess {
 				// For OCPP 1.5: a startTransaction may be related to a reservation
 				if (reservationId != null) {
 					// Okay, now end the reservation
-					Utils.releaseResources(null, pt, rs);
+					DBUtils.releaseResources(null, pt, rs);
 					pt = connect.prepareStatement("DELETE FROM reservation WHERE reservation_pk=?");
 					pt.setInt(1, reservationId.intValue());
 					// Execute the query
@@ -453,7 +457,7 @@ public class ServiceDBAccess {
 		} catch (SQLException ex) {
 			LOG.error("SQL exception", ex);
 		} finally {
-			Utils.releaseResources(connect, pt, rs);
+			DBUtils.releaseResources(connect, pt, rs);
 		}
 		return transactionId;
 	}
@@ -468,7 +472,7 @@ public class ServiceDBAccess {
 		PreparedStatement pt = null;
 		try {			
 			// Prepare Database Access
-			connect = Utils.getConnectionFromPool();
+			connect = DBUtils.getConnectionFromPool();
 			connect.setAutoCommit(false);
 
 			// PreparedStatements can use parameter indices as question marks
@@ -494,7 +498,7 @@ public class ServiceDBAccess {
 		} catch (SQLException ex) {
 			LOG.error("SQL exception", ex);
 		} finally {
-			Utils.releaseResources(connect, pt, null);	
+			DBUtils.releaseResources(connect, pt, null);	
 		}
 	}
 	
@@ -511,7 +515,7 @@ public class ServiceDBAccess {
 		ResultSet rs = null;
 		try {
 			// Prepare Database Access
-			connect = Utils.getConnectionFromPool();			
+			connect = DBUtils.getConnectionFromPool();			
 			// PreparedStatements can use parameter indices as question marks
 			pt = connect.prepareStatement("SELECT parentIdTag, expiryDate, inTransaction, blocked FROM user WHERE idTag = ?");
 			// Set the parameter indices
@@ -521,16 +525,16 @@ public class ServiceDBAccess {
 
 			if (rs.next() == true) {	
 				// Read the DB row values
-				sqlAuthData = new SQLIdTagData();
-				sqlAuthData.parentIdTag = rs.getString(1);
-				sqlAuthData.expiryDate = rs.getTimestamp(2);
-				sqlAuthData.inTransaction = rs.getBoolean(3);
-				sqlAuthData.blocked = rs.getBoolean(4);		
+				sqlAuthData = new SQLIdTagData(
+						rs.getString(1),
+						rs.getTimestamp(2),
+						rs.getBoolean(3),
+						rs.getBoolean(4));	
 			}			
 		} catch (SQLException ex) {
 			LOG.error("SQL exception", ex);
 		} finally {
-			Utils.releaseResources(connect, pt, rs);
+			DBUtils.releaseResources(connect, pt, rs);
 		}
 		return sqlAuthData;
 	}
@@ -548,7 +552,7 @@ public class ServiceDBAccess {
 		ResultSet rs = null;
 		try {			
 			// Prepare Database Access
-			connect = Utils.getConnectionFromPool();
+			connect = DBUtils.getConnectionFromPool();
 			
 			pt = connect.prepareStatement("SELECT connectorId FROM connector WHERE connector_pk = (SELECT connector_pk FROM transaction WHERE transaction_pk = ?)");
 			pt.setInt(1, transactionId);
@@ -560,7 +564,7 @@ public class ServiceDBAccess {
 		} catch (SQLException ex) {
 			LOG.error("SQL exception", ex);
 		} finally {
-			Utils.releaseResources(connect, pt, rs);	
+			DBUtils.releaseResources(connect, pt, rs);	
 		}	
 		return connectorId;
 	}

@@ -1,11 +1,6 @@
 package de.rwth.idsg.steve.html;
 
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.sql.Timestamp;
 
 import javax.servlet.ServletException;
@@ -13,12 +8,9 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.joda.time.DateTime;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import de.rwth.idsg.steve.common.ClientDBAccess;
-import de.rwth.idsg.steve.common.Utils;
+import de.rwth.idsg.steve.common.utils.DateTimeUtils;
+import de.rwth.idsg.steve.common.utils.InputUtils;
 
 /**
 * 
@@ -27,8 +19,7 @@ import de.rwth.idsg.steve.common.Utils;
 */
 public class ServletUsers extends HttpServlet {
 
-	private static final Logger LOG = LoggerFactory.getLogger(ServletUsers.class);
-	private static final long serialVersionUID = 8576766110806723303L;
+	private static final long serialVersionUID = 1L;
 	String contextPath, servletPath;
 
 	@Override
@@ -38,17 +29,11 @@ public class ServletUsers extends HttpServlet {
 		contextPath = request.getContextPath();
 		servletPath = contextPath + request.getServletPath();	
 
-		PrintWriter writer = response.getWriter();		
-		response.setContentType("text/html");
+		request.setAttribute("contextPath", contextPath );
+		request.setAttribute("servletPath", servletPath );
+		request.setAttribute("userList", ClientDBAccess.getUsers() );
 		
-		writer.println(
-				Common.printHead(contextPath)
-				+ printUsers()
-				+ printAddUser()
-				+ printDeleteUser()
-				+ Common.printFoot(contextPath));
-		
-		writer.close();	
+		request.getRequestDispatcher("/WEB-INF/jsp/data-man/users.jsp").forward(request, response);
 	}
 
 	@Override
@@ -57,104 +42,63 @@ public class ServletUsers extends HttpServlet {
 		String command = request.getPathInfo();	
 		
 		if (command.equals("/add")){
-			String idTag = request.getParameter("idTag");
-			String parentIdTagSTR = request.getParameter("parentIdTag");
-			String expiryDateSTR = request.getParameter("expiryDate");
-			
-			if (idTag == null || idTag.isEmpty()) {
-				throw new InputException(ExceptionMessage.INPUT_EMPTY);
-			}
-						
-			Timestamp expiryTimestamp = null;
-			if (expiryDateSTR != null && !expiryDateSTR.isEmpty()) {
-				DateTime expiryDatetime = Utils.convertToDateTime(expiryDateSTR);
-				expiryTimestamp = new Timestamp(expiryDatetime.getMillis());
-			}
-			
-			String parentIdTag = null;
-			if (parentIdTagSTR != null && !parentIdTagSTR.isEmpty()) {
-				parentIdTag = parentIdTagSTR;
-			}			
-			ClientDBAccess.addUser(idTag, parentIdTag, expiryTimestamp);
+			processAddUser(request);
 			
 		} else if (command.equals("/delete")){
-			String idTag = request.getParameter("idTag");
-			if (idTag == null || idTag.isEmpty()) {
-				throw new InputException(ExceptionMessage.INPUT_EMPTY);
-			}			
-			ClientDBAccess.deleteUser(idTag);			
-		}		
+			processDeleteUser(request);
+			
+		} else if (command.equals("/update")) {
+			processUpdateUser(request);
+		}			
 		response.sendRedirect(servletPath);
 		return;
+	}
+	
+	private void processAddUser(HttpServletRequest request) {		
+		String idTag = request.getParameter("idTag");
+		String parentIdTagSTR = request.getParameter("parentIdTag");
+		String expiryDateSTR = request.getParameter("expiryDate");
+		InputUtils.checkNullOrEmpty(idTag);
+					
+		Timestamp expiryTimestamp = null;
+		if ( !InputUtils.isNullOrEmpty(expiryDateSTR) ) {
+			expiryTimestamp = DateTimeUtils.convertToTimestamp(expiryDateSTR);
+		}
+		
+		String parentIdTag = null;
+		if ( !InputUtils.isNullOrEmpty(parentIdTagSTR) ) {
+			parentIdTag = parentIdTagSTR;
+		}			
+		ClientDBAccess.addUser(idTag, parentIdTag, expiryTimestamp);		
 	}	
 
-	private String printUsers() {
-		StringBuilder builder = new StringBuilder(
-				"<h3><span>Registered Users</span></h3>\n"
-				+ "<center>\n"
-				+ "<table class=\"res\">\n"
-				+ "<tr><th>idTag</th><th>parentIdTag</th><th>expiryDate</th><th>inTransaction</th><th>blocked</th></tr>\n");
+	private void processUpdateUser(HttpServletRequest request) {
+		String idTag = request.getParameter("idTag");
+		String parentIdTagSTR = request.getParameter("parentIdTag");
+		String expiryDateSTR = request.getParameter("expiryDate");
+		String blockUserSTR = request.getParameter("blockUser");
+		
+		Timestamp expiryTimestamp = null;
+		if ( !InputUtils.isNullOrEmpty(expiryDateSTR) ) {
+			expiryTimestamp = DateTimeUtils.convertToTimestamp(expiryDateSTR);
+		}
+		
+		String parentIdTag = null;
+		if ( !InputUtils.isNullOrEmpty(parentIdTagSTR) ) {
+			parentIdTag = parentIdTagSTR;
+		}
+		
+		boolean blockUser = false;
+		if ( blockUserSTR.equals("true") ) {
+			blockUser = true;
+		}		
+		ClientDBAccess.updateUser(idTag, parentIdTag, expiryTimestamp, blockUser);		
+	}	
 
-		Connection connect = null;
-		PreparedStatement pt = null;
-		ResultSet rs = null;
-		try {	
-			// Prepare Database Access
-			connect = Utils.getConnectionFromPool();
-			pt = connect.prepareStatement("SELECT * FROM user;");
-			rs = pt.executeQuery();
-
-			while ( rs.next() ) {
-				
-				Timestamp ts = rs.getTimestamp(3);
-				String str = "null";
-				if (ts != null) str = Utils.convertToString(ts);
-							
-				builder.append("<tr>"
-						+ "<td>" + rs.getString(1) + "</td>"
-						+ "<td>" + rs.getString(2) + "</td>"
-						+ "<td>" + str + "</td>"
-						+ "<td>" + rs.getBoolean(4) + "</td>"
-						+ "<td>" + rs.getBoolean(5) + "</td>"
-						+ "</tr>\n");
-			}
-		} catch (SQLException ex) {
-			LOG.error("SQL exception", ex);
-			throw new RuntimeException(ex);
-		} finally {
-			Utils.releaseResources(connect, pt, rs);
-		}			
-		builder.append("</table>\n</center>\n<br>\n");
-		return builder.toString();
-	}
-
-	private String printAddUser() {		
-		return
-		"<h3><span>Add A New User</span></h3>\n"
-		+ "<center>\n"
-		+ "<form method=\"POST\" action=\"" + servletPath + "/add\">\n"
-		+ "<table class=\"bc\">\n"		
-		+ "<tr><td>idTag (string):</td><td><input type=\"text\" name=\"idTag\"></td></tr>\n"
-		+ "<tr><td>parentIdTag (string):</td><td><input type=\"text\" name=\"parentIdTag\" placeholder=\"optional\"></td></tr>\n"
-		+ "<tr><td>Expiry date and time (ex: 2011-12-21 11:30):</td><td><input type=\"text\" name=\"expiryDate\" placeholder=\"optional\"></td></tr>\n"
-		+ "<tr><td></td><td id=\"add_space\"><input type=\"submit\" value=\"Add\"></td></tr>\n" 	   	
-		+ "</table>\n"		
-		+ "</form>\n"
-		+ "</center>\n<br>\n";		
-	}
-
-	private String printDeleteUser() {
-		return
-		"<h3><span>Delete A User</span></h3>\n"
-		+ "<center>\n"	
-		+ "<form method=\"POST\" action=\""+ servletPath + "/delete\">\n"
-		+ "<table class=\"bc\">\n"
-		+ "<tr><td>idTag (string):</td><td><input type=\"text\" name=\"idTag\"></td></tr>\n"
-		+ "<tr><td><i><b>Warning:</b> Deleting a user causes losing all related information including<br>"
-		+ "transactions and reservations</i></td><td></td></tr>\n"
-		+ "<tr><td></td><td id=\"add_space\"><input type=\"submit\" value=\"Delete\"></td></tr>\n"
-		+ "</table>\n"
-		+ "</form>\n"
-		+ "</center>\n";
+	private void processDeleteUser(HttpServletRequest request) {
+		String idTag = request.getParameter("idTag");
+		InputUtils.checkNullOrEmpty(idTag);
+		
+		ClientDBAccess.deleteUser(idTag);		
 	}
 }

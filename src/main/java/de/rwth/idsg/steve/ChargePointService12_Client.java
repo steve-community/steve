@@ -1,4 +1,3 @@
-
 package de.rwth.idsg.steve;
 
 import ocpp.cp._2010._08.AvailabilityType;
@@ -27,7 +26,7 @@ import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import de.rwth.idsg.steve.common.Utils;
+import de.rwth.idsg.steve.common.utils.DateTimeUtils;
 
 /**
  * Client implementation of OCPP V1.2.
@@ -74,8 +73,8 @@ public class ChargePointService12_Client {
 		req.setLocation(location);
 		req.setRetries(retries);
 		req.setRetryInterval(retryInterval);
-		req.setStartTime( Utils.convertToXMLGregCal(startTime) );
-		req.setStopTime( Utils.convertToXMLGregCal(stopTime) );		
+		req.setStartTime( DateTimeUtils.convertToXMLGregCal(startTime) );
+		req.setStopTime( DateTimeUtils.convertToXMLGregCal(stopTime) );		
 		return req;
 	} 
 
@@ -108,7 +107,7 @@ public class ChargePointService12_Client {
 		UpdateFirmwareRequest req = new UpdateFirmwareRequest(); 
 		req.setLocation(location);
 		req.setRetries(retries);
-		req.setRetrieveDate( Utils.convertToXMLGregCal(retrieveDate) );
+		req.setRetrieveDate( DateTimeUtils.convertToXMLGregCal(retrieveDate) );
 		req.setRetryInterval(retryInterval);
 		return req;
 	}

@@ -1,4 +1,3 @@
-
 package de.rwth.idsg.steve;
 	
 import java.util.ArrayList;
@@ -51,7 +50,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import de.rwth.idsg.steve.common.ClientDBAccess;
-import de.rwth.idsg.steve.common.Utils;
+import de.rwth.idsg.steve.common.utils.DateTimeUtils;
 
 /**
  * Client implementation of OCPP V1.5.
@@ -98,8 +97,8 @@ public class ChargePointService15_Client {
 		req.setLocation(location);
 		req.setRetries(retries);
 		req.setRetryInterval(retryInterval);
-		req.setStartTime( Utils.convertToXMLGregCal(startTime) );
-		req.setStopTime( Utils.convertToXMLGregCal(stopTime) );		
+		req.setStartTime( DateTimeUtils.convertToXMLGregCal(startTime) );
+		req.setStopTime( DateTimeUtils.convertToXMLGregCal(stopTime) );		
 		return req;
 	} 
 
@@ -132,7 +131,7 @@ public class ChargePointService15_Client {
 		UpdateFirmwareRequest req = new UpdateFirmwareRequest(); 
 		req.setLocation(location);
 		req.setRetries(retries);
-		req.setRetrieveDate( Utils.convertToXMLGregCal(retrieveDate) );
+		req.setRetrieveDate( DateTimeUtils.convertToXMLGregCal(retrieveDate) );
 		req.setRetryInterval(retryInterval);
 		return req;
 	}
@@ -372,13 +371,13 @@ public class ChargePointService15_Client {
 		
 		LOG.info("Invoking reserveNow at {}", chargeBoxId);
 		
-		DateTime expiryDateTime = Utils.convertToDateTime(expiryString);
+		DateTime expiryDateTime = DateTimeUtils.convertToDateTime(expiryString);
 		// Book the reservation and get the id
 		int reservationId = ClientDBAccess.bookReservation(idTag, chargeBoxId, null, expiryDateTime);
 		
 		ReserveNowRequest req = new ReserveNowRequest();
 		req.setConnectorId(connectorId);
-		req.setExpiryDate( Utils.convertToXMLGregCal(expiryString) );
+		req.setExpiryDate( DateTimeUtils.convertToXMLGregCal(expiryString) );
 		req.setIdTag(idTag);
 		if (parentIdTag != null && !parentIdTag.isEmpty()) req.setParentIdTag(parentIdTag);
 		req.setReservationId(reservationId);

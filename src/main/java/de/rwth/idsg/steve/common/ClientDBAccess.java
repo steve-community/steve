@@ -19,8 +19,13 @@ import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import de.rwth.idsg.steve.common.utils.DBUtils;
+import de.rwth.idsg.steve.common.utils.DateTimeUtils;
 import de.rwth.idsg.steve.html.ExceptionMessage;
 import de.rwth.idsg.steve.html.InputException;
+import de.rwth.idsg.steve.model.ChargePoint;
+import de.rwth.idsg.steve.model.Reservation;
+import de.rwth.idsg.steve.model.User;
 
 
 /**
@@ -39,11 +44,9 @@ public class ClientDBAccess {
 		ResultSet rs = null;
 		try {	
 			// Prepare Database Access
-			connect = Utils.getConnectionFromPool();
-
+			connect = DBUtils.getConnectionFromPool();
 			pt = connect.prepareStatement("SELECT chargeBoxId, endpoint_address FROM chargebox WHERE ocppVersion=?");
 			pt.setString(1, ocppVersion);
-
 			rs = pt.executeQuery();
 
 			HashMap<String,String> results = new HashMap<String,String>();
@@ -54,7 +57,7 @@ public class ClientDBAccess {
 			LOG.error("SQL exception", ex);
 			throw new RuntimeException(ex);
 		} finally {
-			Utils.releaseResources(connect, pt, rs);
+			DBUtils.releaseResources(connect, pt, rs);
 		}
 	}
 	
@@ -64,7 +67,7 @@ public class ClientDBAccess {
 		ResultSet rs = null;
 		try { 
 			// Prepare Database Access
-			connect = Utils.getConnectionFromPool();
+			connect = DBUtils.getConnectionFromPool();
 			pt = connect.prepareStatement("SELECT chargeBoxId FROM chargebox");
 			rs = pt.executeQuery();
 			
@@ -76,8 +79,48 @@ public class ClientDBAccess {
 			LOG.error("SQL exception", ex);
 			throw new RuntimeException(ex);
 		} finally {
-			Utils.releaseResources(connect, pt, null);
+			DBUtils.releaseResources(connect, pt, null);
 		}
+	}
+	
+	public static synchronized ChargePoint getChargePointDetails(String chargeBoxId) {
+		Connection connect = null;
+		PreparedStatement pt = null;
+		ResultSet rs = null;		
+		try {	
+			// Prepare Database Access
+			connect = DBUtils.getConnectionFromPool();
+			pt = connect.prepareStatement("SELECT * FROM chargebox WHERE chargeBoxId=?;");
+			pt.setString(1, chargeBoxId);
+			rs = pt.executeQuery();
+			
+			ChargePoint cp = null;
+			if ( rs.next() ) {				
+				cp = new ChargePoint(
+						rs.getString(1), 
+						rs.getString(2), 
+						rs.getString(3), 
+						rs.getString(4),
+						rs.getString(5), 
+						rs.getString(6), 
+						rs.getString(7), 
+						rs.getString(8), 
+						rs.getString(9),
+						DateTimeUtils.convertToString(rs.getTimestamp(10)),
+						rs.getString(11), 
+						rs.getString(12), 
+						rs.getString(13), 
+						rs.getString(14), 
+						rs.getString(15),
+						DateTimeUtils.convertToString(rs.getTimestamp(16)));				
+			}
+			return cp;
+		} catch (SQLException ex) {
+			ex.printStackTrace();
+			throw new RuntimeException(ex);
+		} finally {
+			DBUtils.releaseResources(connect, pt, rs);
+		}		
 	}
 	
 	public static synchronized void addChargePoint(String chargeBoxId) {
@@ -85,7 +128,7 @@ public class ClientDBAccess {
 		PreparedStatement pt = null;
 		try { 
 			// Prepare Database Access
-			connect = Utils.getConnectionFromPool();
+			connect = DBUtils.getConnectionFromPool();
 			pt = connect.prepareStatement("INSERT IGNORE INTO chargebox (chargeBoxId) VALUES (?)");
 			pt.setString(1, chargeBoxId);
 			pt.executeUpdate();
@@ -94,7 +137,7 @@ public class ClientDBAccess {
 			LOG.error("SQL exception", ex);
 			throw new RuntimeException(ex);
 		} finally {
-			Utils.releaseResources(connect, pt, null);
+			DBUtils.releaseResources(connect, pt, null);
 		}
 	}
 	
@@ -103,7 +146,7 @@ public class ClientDBAccess {
 		PreparedStatement pt = null;
 		try { 
 			// Prepare Database Access
-			connect = Utils.getConnectionFromPool();
+			connect = DBUtils.getConnectionFromPool();
 			connect.setAutoCommit(false);
 			
 			pt = connect.prepareStatement("DELETE FROM chargebox WHERE chargeBoxId=?");
@@ -124,17 +167,79 @@ public class ClientDBAccess {
 			LOG.error("SQL exception", ex);
 			throw new RuntimeException(ex);
 		} finally {
-			Utils.releaseResources(connect, pt, null);
+			DBUtils.releaseResources(connect, pt, null);
 		}
 	}
+	
+	public static synchronized List<User> getUsers(){
+		Connection connect = null;
+		PreparedStatement pt = null;
+		ResultSet rs = null;
+		try {	
+			// Prepare Database Access
+			connect = DBUtils.getConnectionFromPool();
+			pt = connect.prepareStatement("SELECT * FROM user;");
+			rs = pt.executeQuery();
+
+			List<User> userList = new ArrayList<User>();
+			while ( rs.next() ) {				
+				User user = new User(
+						rs.getString(1), 
+						rs.getString(2),
+						DateTimeUtils.convertToString(rs.getTimestamp(3)),
+						rs.getBoolean(4), 
+						rs.getBoolean(5));
+
+				userList.add(user);
+			}
+			return userList;
+		} catch (SQLException ex) {
+			LOG.error("SQL exception", ex);	
+			throw new RuntimeException(ex);
+		} finally {
+			DBUtils.releaseResources(connect, pt, rs);
+		}
+	}
+
+	public static synchronized void updateUser(String idTag, String parentIdTag, Timestamp expiryTimestamp, boolean blockUser) {		
+		Connection connect = null;
+		PreparedStatement pt = null;
+		try { 
+			// Prepare Database Access
+			connect = DBUtils.getConnectionFromPool();
+			connect.setAutoCommit(false);
+			
+			pt = connect.prepareStatement("UPDATE user SET parentIdTag = ?, expiryDate = ?, blocked = ? WHERE idTag = ?");
+			pt.setString(1, parentIdTag);
+			pt.setTimestamp(2, expiryTimestamp);
+			pt.setBoolean(3, blockUser);
+			pt.setString(4, idTag);
+			
+			int count = pt.executeUpdate();			
+			// Validate the change
+			if (count == 1) {
+				connect.commit();
+			} else {
+				LOG.error("Transaction is being rolled back.");
+				connect.rollback();
+			}
+			connect.setAutoCommit(true);
 		
+		} catch (SQLException ex) {
+			LOG.error("SQL exception", ex);
+			throw new RuntimeException(ex);
+		} finally {
+			DBUtils.releaseResources(connect, pt, null);
+		}		
+	}
+			
 	public static synchronized void addUser(String idTag, String parentIdTag, Timestamp expiryTimestamp) {
 
 		Connection connect = null;
 		PreparedStatement pt = null;
 		try { 
 			// Prepare Database Access
-			connect = Utils.getConnectionFromPool();
+			connect = DBUtils.getConnectionFromPool();
 			pt = connect.prepareStatement("INSERT IGNORE INTO user (idTag, parentIdTag, expiryDate) VALUES (?,?,?)");
 			pt.setString(1, idTag);
 			pt.setString(2, parentIdTag);
@@ -145,7 +250,7 @@ public class ClientDBAccess {
 			LOG.error("SQL exception", ex);
 			throw new RuntimeException(ex);
 		} finally {
-			Utils.releaseResources(connect, pt, null);
+			DBUtils.releaseResources(connect, pt, null);
 		}
 	}
 	
@@ -154,7 +259,7 @@ public class ClientDBAccess {
 		PreparedStatement pt = null;
 		try { 
 			// Prepare Database Access
-			connect = Utils.getConnectionFromPool();
+			connect = DBUtils.getConnectionFromPool();
 			connect.setAutoCommit(false);
 			
 			pt = connect.prepareStatement("DELETE FROM user WHERE idTag=?");
@@ -175,7 +280,38 @@ public class ClientDBAccess {
 			LOG.error("SQL exception", ex);
 			throw new RuntimeException(ex);
 		} finally {
-			Utils.releaseResources(connect, pt, null);
+			DBUtils.releaseResources(connect, pt, null);
+		}
+	}
+	
+	
+	public static synchronized List<Reservation> getReservations(){
+		Connection connect = null;
+		PreparedStatement pt = null;
+		ResultSet rs = null;
+		try {	
+			// Prepare Database Access
+			connect = DBUtils.getConnectionFromPool();
+			pt = connect.prepareStatement("SELECT * FROM reservation WHERE expiryDatetime >= NOW() ORDER BY expiryDatetime;");
+			rs = pt.executeQuery();
+
+			List<Reservation> reservList = new ArrayList<Reservation>();
+			while ( rs.next() ) {
+				Reservation res = new Reservation(
+						rs.getInt(1),
+						rs.getString(2), 
+						rs.getString(3),
+						DateTimeUtils.convertToString(rs.getTimestamp(4)),
+						DateTimeUtils.convertToString(rs.getTimestamp(5)));
+
+				reservList.add(res);
+			}
+			return reservList;
+		} catch (SQLException ex) {
+			LOG.error("SQL exception", ex);	
+			throw new RuntimeException(ex);
+		} finally {
+			DBUtils.releaseResources(connect, pt, rs);
 		}
 	}
 	
@@ -210,10 +346,10 @@ public class ClientDBAccess {
 		PreparedStatement pt = null;
 		try { 
 			// Prepare Database Access
-			connect = Utils.getConnectionFromPool();
+			connect = DBUtils.getConnectionFromPool();
 			
 			// Check overlapping
-			isOverlapping(connect, pt, startTimestamp, expiryTimestamp, chargeBoxId);
+			//isOverlapping(connect, pt, startTimestamp, expiryTimestamp, chargeBoxId);
 			
 			connect.setAutoCommit(false);
 			pt = connect.prepareStatement("INSERT INTO reservation (idTag, chargeBoxId, startDatetime, expiryDatetime) VALUES (?,?,?,?)",
@@ -244,7 +380,7 @@ public class ClientDBAccess {
 		} catch (SQLException ex) {
 			LOG.error("SQL exception", ex);
 		} finally {
-			Utils.releaseResources(connect, pt, null);
+			DBUtils.releaseResources(connect, pt, null);
 		}
 		return reservationId;
 	}
@@ -259,7 +395,7 @@ public class ClientDBAccess {
 		PreparedStatement pt = null;
 		try { 
 			// Prepare Database Access
-			connect = Utils.getConnectionFromPool();
+			connect = DBUtils.getConnectionFromPool();
 			connect.setAutoCommit(false);
 			pt = connect.prepareStatement("DELETE FROM reservation WHERE reservation_pk=?");
 
@@ -280,7 +416,7 @@ public class ClientDBAccess {
 		} catch (SQLException ex) {
 			LOG.error("SQL exception", ex);
 		} finally {
-			Utils.releaseResources(connect, pt, null);
+			DBUtils.releaseResources(connect, pt, null);
 		}
 	}
 	
@@ -290,8 +426,8 @@ public class ClientDBAccess {
 	 */
 	public static synchronized ArrayList<AuthorisationData> getIdTags(ArrayList<String> inputList) {
 		
-		XMLGregorianCalendar xcal = Utils.setExpiryDateTime(Constants.HOURS_TO_EXPIRE);
-		Timestamp now = Utils.getCurrentDateTimeTS();
+		XMLGregorianCalendar xcal = DateTimeUtils.setExpiryDateTime(Constants.HOURS_TO_EXPIRE);
+		Timestamp now = DateTimeUtils.getCurrentDateTimeTS();
 		
 		ArrayList<AuthorisationData> list = new ArrayList<AuthorisationData>();
 		Connection connect = null;
@@ -299,7 +435,7 @@ public class ClientDBAccess {
 		ResultSet rs = null;
 		try {
 			// Prepare Database Access
-			connect = Utils.getConnectionFromPool();
+			connect = DBUtils.getConnectionFromPool();
 			
 			if (inputList == null) {
 				// Read ALL idTags
@@ -355,7 +491,7 @@ public class ClientDBAccess {
 		} catch (SQLException ex) {
 			LOG.error("SQL exception", ex);
 		} finally {
-			Utils.releaseResources(connect, pt, rs);
+			DBUtils.releaseResources(connect, pt, rs);
 		}
 		return list;
 	}	
@@ -370,7 +506,7 @@ public class ClientDBAccess {
 		ResultSet rs = null;
 		try { 
 			// Prepare Database Access
-			connect = Utils.getConnectionFromPool();
+			connect = DBUtils.getConnectionFromPool();
 			pt = connect.prepareStatement("SELECT version FROM dbVersion");
 			rs = pt.executeQuery();
 			
@@ -382,7 +518,7 @@ public class ClientDBAccess {
 			LOG.error("SQL exception", ex);
 			throw new RuntimeException(ex);
 		} finally {
-			Utils.releaseResources(connect, pt, null);
+			DBUtils.releaseResources(connect, pt, null);
 		}
 	}
 	
@@ -409,7 +545,7 @@ public class ClientDBAccess {
 		} catch (SQLException ex) {
 			LOG.error("SQL exception", ex);
 		} finally {
-			Utils.releaseResources(null, pt, rs);
+			DBUtils.releaseResources(null, pt, rs);
 		}
 	}
 }

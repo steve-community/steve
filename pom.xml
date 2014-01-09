@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>idsg</groupId>
 	<artifactId>steve</artifactId>
-	<version>0.6.6</version>
+	<version>0.6.8</version>
 	<packaging>war</packaging>
 	<build>
 		<plugins>
@@ -69,17 +69,28 @@
 	</properties>
 	
 	<dependencies>
-	
+
+		<dependency>
+			<groupId>com.google.code.gson</groupId>
+			<artifactId>gson</artifactId>
+			<version>2.2.4</version>
+		</dependency>           	
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-web</artifactId>
 			<version>3.2.4.RELEASE</version>
-		</dependency>           	
+		</dependency>        	
 		<dependency>
 			<groupId>joda-time</groupId>
 			<artifactId>joda-time</artifactId>
 			<version>2.3</version>
-		</dependency>       
+		</dependency>
+		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>jstl</artifactId>
+			<version>1.2</version>
+			<scope>runtime</scope>
+		</dependency>        
             
 		<!-- Required for logging -->
 		<dependency>

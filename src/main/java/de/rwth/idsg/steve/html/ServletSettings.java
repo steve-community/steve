@@ -53,7 +53,7 @@ public class ServletSettings extends HttpServlet {
 			Constants.HOURS_TO_EXPIRE = InputUtils.toInt(expirationSTR);
 		}
 		
-		response.sendRedirect(request.getContextPath() + request.getServletPath());
+		response.sendRedirect(servletPath);
 		return;
 	}
 }

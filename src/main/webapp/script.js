@@ -53,12 +53,12 @@ function addElement() {
 	elem.appendChild(span);
 }
 $(document).ready(function() {
-	var menuItem = $('#dm-menu a');
+	var menuItem = $("#dm-menu a");
 	menuItem.click(function(){
-		var attr = '#' + $(this).attr('name');
+		var attr = "#" + $(this).attr("name");
 		$(attr).siblings().hide();
 		$(attr).show();
-		menuItem.removeAttr('class');
-		$(this).addClass('highlight');
+		menuItem.removeAttr("class");
+		$(this).addClass("highlight");
 	});
 });

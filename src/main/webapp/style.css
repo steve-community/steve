@@ -309,4 +309,9 @@ ul.navigation ul li a {
 .info, .warning { text-align: left; border: 1px solid; margin-bottom: 10px; padding:15px 30px 15px 30px; }
 .info { color: #00529B; background-color: #daecf4; }
 .warning { color: #9F6000; background-color: #FEEFB3; }
-input:disabled { background-color:#dddddd; } 
+input:disabled { background-color:#dddddd; }
+input[type="submit"]:disabled, input[type="submit"]:hover:disabled, input[type="submit"]:active:disabled {
+	cursor: not-allowed;
+	background:-webkit-gradient(linear, left top, left bottom, from(#a5a5a5), to(#5b5b5b));
+	background:-moz-linear-gradient(top,  #a5a5a5,  #5b5b5b);
+}

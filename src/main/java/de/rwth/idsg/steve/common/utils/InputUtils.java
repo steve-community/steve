@@ -11,24 +11,36 @@ import de.rwth.idsg.steve.html.InputException;
 public class InputUtils {
 	
 	/**
+	 * Returns true, if parameter string is null or empty.
+	 * 
+	 */
+	public static boolean isNullOrEmpty(String str) {
+		return str == null || str.trim().length() == 0;
+	}
+	
+	/**
 	 * Throws exception, if the parameter string(s) is/are null or empty.
 	 * 
-	 * @param inArray	string(s)
+	 * @param strArray	string(s)
 	 */
 	public static void checkNullOrEmpty(String... strArray) {
 		for (String str : strArray) {
-			if (str == null || str.trim().length() == 0) {
+			if (isNullOrEmpty(str)) {
 				throw new InputException(ExceptionMessage.INPUT_EMPTY);
 			}
 		}
 	}
 	
 	/**
-	 * Returns true, if parameter string is null or empty.
+	 * Converts parameter into integer. Throws exception, if parameter cannot be converted.
 	 * 
 	 */
-	public static boolean isNullOrEmpty(String str) {
-		return str == null || str.trim().length() == 0;
+	public static int toInt(String str) {
+		try {
+			return Integer.parseInt(str.trim());
+		} catch (NumberFormatException e) {
+			throw new InputException(ExceptionMessage.PARSING_NUMBER);
+		}
 	}
 	
 	/**
@@ -53,17 +65,5 @@ public class InputUtils {
 			throw new InputException(ExceptionMessage.INPUT_ZERO);
 		}
 		return out;
-	}
-	
-	/**
-	 * Converts parameter into integer. Throws exception, if parameter cannot be converted.
-	 * 
-	 */
-	public static int toInt(String str) {
-		try {
-			return Integer.parseInt(str);
-		} catch (NumberFormatException e) {
-			throw new InputException(ExceptionMessage.PARSING_NUMBER);
-		}
 	}
 }

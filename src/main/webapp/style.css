@@ -1,4 +1,5 @@
 @charset "UTF-8";
+@font-face{font-family:DroidSerif; src:url(DroidSerif.ttf);}
 
 html, body { height: 100%; overflow: auto; }
 #diffElements span a:link, #diffElements span  span a:visited { color:#000; text-decoration:none; cursor: default;}
@@ -19,7 +20,7 @@ section {
     background-position: 50% 50%;
 	background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAytpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuNS1jMDE0IDc5LjE1MTQ4MSwgMjAxMy8wMy8xMy0xMjowOToxNSAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wTU09Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9tbS8iIHhtbG5zOnN0UmVmPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvc1R5cGUvUmVzb3VyY2VSZWYjIiB4bWxuczp4bXA9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC8iIHhtcE1NOkRvY3VtZW50SUQ9InhtcC5kaWQ6MEI2QkFDMDQ3MDA1MTFFMzhFRTdFMUM3MjQzQjM3QzEiIHhtcE1NOkluc3RhbmNlSUQ9InhtcC5paWQ6MEI2QkFDMDM3MDA1MTFFMzhFRTdFMUM3MjQzQjM3QzEiIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIENDIChNYWNpbnRvc2gpIj4gPHhtcE1NOkRlcml2ZWRGcm9tIHN0UmVmOmluc3RhbmNlSUQ9InhtcC5kaWQ6MTczM2IzZGQtYTIxNS00MDk4LThhM2EtYzE1MzkyZGUzZmQwIiBzdFJlZjpkb2N1bWVudElEPSJ4bXAuZGlkOjE3MzNiM2RkLWEyMTUtNDA5OC04YTNhLWMxNTM5MmRlM2ZkMCIvPiA8L3JkZjpEZXNjcmlwdGlvbj4gPC9yZGY6UkRGPiA8L3g6eG1wbWV0YT4gPD94cGFja2V0IGVuZD0iciI/Ptw6u3kAAAAPSURBVHjaYjhz5gxAgAEABMwCZTQYvMQAAAAASUVORK5CYII=');
 }
-section span { color:#454545; background:#fff; padding-right:10px; font-family:Optima; font-size: 14px; font-weight: normal;}
+section span { color:#5c5c5c; background:#fff; padding-right:10px; font-family:DroidSerif; font-size: 14px; font-weight: normal;}
 ul hr { color: #CCC; background: #CCC; 	height: 1px; border: 0;}
 table { width: 100%;}
 table td:first-child { 
@@ -81,7 +82,7 @@ select {
   	-webkit-border-radius: 0;
 }
 select option { font-size: 12px; }
-input[type="text"], input[type="number"], input[type="datetime"]{
+input[type="text"], input[type="number"], input[type="datetime"], input[type="password"]{
 	appearance: none;
 	-webkit-appearance: none;
 	margin: 1px 0 1px 0;
@@ -130,9 +131,11 @@ input[type="button"]:active, input[type="submit"]:active {
 input[type="submit"] {
 	width: 100px;
 	font-size: 12px;
-	background: #71797d;
+	background: #577377;
 	background: -webkit-gradient(linear, left top, left bottom, from(#aec0c9), to(#4c5e67));
-	background: -moz-linear-gradient(top,  #aec0c9,  #4c5e67);	
+	background: -moz-linear-gradient(top,  #aec0c9,  #4c5e67);
+	background:-o-linear-gradient(top, #aec0c9, #4c5e67);
+	background:-ms-linear-gradient(top, #aec0c9, #4c5e67);	
 	color: #fff;
 	text-shadow: -1px -1px 0 rgba(0,0,0,0.4);
 	cursor: pointer;
@@ -146,7 +149,9 @@ input[type="submit"] {
 input[type="submit"]:hover {
 	background:-webkit-gradient(linear, left top, left bottom, from(#aec0c9), to(#6b7f89));
 	background:-moz-linear-gradient(top,  #aec0c9,  #6b7f89);
-	background-color:#dfdfdf;
+	background:-o-linear-gradient(top, #aec0c9, #6b7f89);
+	background:-ms-linear-gradient(top, #aec0c9, #6b7f89);
+	background-color:#6e8b8f;
 }
 
 #add_space { padding-top: 20px; }
@@ -165,6 +170,7 @@ ul.navigation li {
 	float:left;
 	position:relative;
 }
+
 ul.navigation li a {
 	padding-left:10px;
 	padding-right:10px;
@@ -306,12 +312,15 @@ ul.navigation ul li a {
 .right-content { margin: 0 0 0 180px; border-left: 1px solid #CCC; padding-left:12px; }
 .right-content div { display:none; }
 .right-content div:first-child { display:block; }
-.info, .warning { text-align: left; border: 1px solid; margin-bottom: 10px; padding:15px 30px 15px 30px; }
+.info, .warning, .error { text-align: left; border: 1px solid; margin-bottom: 10px; padding:15px 30px 15px 30px; }
 .info { color: #00529B; background-color: #daecf4; }
 .warning { color: #9F6000; background-color: #FEEFB3; }
+.error { color: #D8000C; background-color: #FFBABA; }
 input:disabled { background-color:#dddddd; }
 input[type="submit"]:disabled, input[type="submit"]:hover:disabled, input[type="submit"]:active:disabled {
 	cursor: not-allowed;
 	background:-webkit-gradient(linear, left top, left bottom, from(#a5a5a5), to(#5b5b5b));
 	background:-moz-linear-gradient(top,  #a5a5a5,  #5b5b5b);
+	background:-o-linear-gradient(top, #a5a5a5, #5b5b5b);
+	background:-ms-linear-gradient(top, #a5a5a5, #5b5b5b);
 }

@@ -90,7 +90,7 @@
 			<artifactId>jstl</artifactId>
 			<version>1.2</version>
 			<scope>runtime</scope>
-		</dependency>        
+		</dependency>
             
 		<!-- Required for logging -->
 		<dependency>
@@ -129,6 +129,12 @@
 			<version>2.5</version>
 			<scope>provided</scope>
 		</dependency>
+		<dependency>
+            <groupId>javax</groupId>
+            <artifactId>javaee-web-api</artifactId>
+            <version>7.0</version>
+            <scope>provided</scope>
+        </dependency>
 		<dependency>
 			<groupId>org.apache.tomcat</groupId>
 			<artifactId>tomcat-jdbc</artifactId>

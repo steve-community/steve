@@ -1,3 +1,4 @@
+<%@ page contentType="text/html" pageEncoding="utf-8" language="java" trimDirectiveWhitespaces="true" %>
 <!DOCTYPE html>
 <html>
 <head>

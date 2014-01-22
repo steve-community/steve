@@ -1,7 +1,9 @@
+<%@ page contentType="text/html" pageEncoding="utf-8" language="java" trimDirectiveWhitespaces="true" %>
 <!DOCTYPE html>
-<%@ page trimDirectiveWhitespaces="true" %>
 <html>
 <head>
+	<link rel="icon" href="${contextPath}/images/favicon.ico" type="image/x-icon" />
+	<link rel="shortcut icon" href="${contextPath}/images/favicon.ico" type="image/x-icon" />
 	<link rel="stylesheet" type="text/css" href="${contextPath}/style.css">
 	<script type="text/javascript" src="${contextPath}/jquery-2.0.3.min.js" ></script>
 	<script type="text/javascript" src="${contextPath}/script.js" ></script>
@@ -30,6 +32,7 @@
 	<li><a href="${contextPath}/manager/settings">SETTINGS</a></li>
 	<li><a href="${contextPath}/manager/log">LOG</a></li>
 	<li><a href="${contextPath}/manager/about">ABOUT</a></li>
+	<li><a href="${contextPath}/manager/signout">SIGN OUT</a></li>
 </ul>
 </div></div>
 <div class="main-wrapper">

@@ -3,6 +3,7 @@ package de.rwth.idsg.steve.html;
 import java.io.IOException;
 
 import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -16,6 +17,7 @@ import de.rwth.idsg.steve.common.utils.InputUtils;
  * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
  * 
  */
+@WebServlet("/manager/settings/*")
 public class ServletSettings extends HttpServlet {
 
 	private static final long serialVersionUID = 1L;

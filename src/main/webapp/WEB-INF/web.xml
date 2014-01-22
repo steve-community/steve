@@ -5,7 +5,7 @@
 	version="3.0">
 	<display-name>SteVe - Steckdosenverwaltung</display-name>
 	<session-config>
-		<session-timeout>60</session-timeout>
+		<session-timeout>10</session-timeout>
 	</session-config>
 	<context-param>
 		<param-name>contextConfigLocation</param-name>
@@ -28,82 +28,9 @@
 		<servlet-class>org.apache.cxf.transport.servlet.CXFServlet</servlet-class>
 		<load-on-startup>1</load-on-startup>
 	</servlet>
-	<servlet>
-		<servlet-name>ServletHome</servlet-name>
-		<servlet-class>de.rwth.idsg.steve.html.ServletHome</servlet-class>
-	</servlet>
-	<servlet>
-		<servlet-name>ServletReservations</servlet-name>
-		<servlet-class>de.rwth.idsg.steve.html.ServletReservations</servlet-class>
-	</servlet>
-	<servlet>
-		<servlet-name>ServletChargePoints</servlet-name>
-		<servlet-class>de.rwth.idsg.steve.html.ServletChargePoints</servlet-class>
-	</servlet>
-	<servlet>
-		<servlet-name>ServletUsers</servlet-name>
-		<servlet-class>de.rwth.idsg.steve.html.ServletUsers</servlet-class>
-	</servlet>
-	<servlet>
-		<servlet-name>ServletOperationsV12</servlet-name>
-		<servlet-class>de.rwth.idsg.steve.html.ServletOperationsV12</servlet-class>
-	</servlet>
-	<servlet>
-		<servlet-name>ServletOperationsV15</servlet-name>
-		<servlet-class>de.rwth.idsg.steve.html.ServletOperationsV15</servlet-class>
-	</servlet>
-	<servlet>
-		<servlet-name>ServletSettings</servlet-name>
-		<servlet-class>de.rwth.idsg.steve.html.ServletSettings</servlet-class>
-	</servlet>
-	<servlet>
-		<servlet-name>ServletLog</servlet-name>
-		<servlet-class>de.rwth.idsg.steve.html.ServletLog</servlet-class>
-	</servlet>
-	<servlet>
-		<servlet-name>ServletAbout</servlet-name>
-		<servlet-class>de.rwth.idsg.steve.html.ServletAbout</servlet-class>
-	</servlet>
-
 	<servlet-mapping>
 		<servlet-name>cxf</servlet-name>
 		<url-pattern>/services/*</url-pattern>
-	</servlet-mapping>
-	<servlet-mapping>
-		<servlet-name>ServletHome</servlet-name>
-		<url-pattern>/manager</url-pattern>
-	</servlet-mapping>
-	<servlet-mapping>
-		<servlet-name>ServletChargePoints</servlet-name>
-		<url-pattern>/manager/chargepoints/*</url-pattern>
-	</servlet-mapping>
-	<servlet-mapping>
-		<servlet-name>ServletUsers</servlet-name>
-		<url-pattern>/manager/users/*</url-pattern>
-	</servlet-mapping>
-	<servlet-mapping>
-		<servlet-name>ServletReservations</servlet-name>
-		<url-pattern>/manager/reservations/*</url-pattern>
-	</servlet-mapping>
-	<servlet-mapping>
-		<servlet-name>ServletOperationsV12</servlet-name>
-		<url-pattern>/manager/operations/v1.2/*</url-pattern>
-	</servlet-mapping>
-	<servlet-mapping>
-		<servlet-name>ServletOperationsV15</servlet-name>
-		<url-pattern>/manager/operations/v1.5/*</url-pattern>
-	</servlet-mapping>
-	<servlet-mapping>
-		<servlet-name>ServletSettings</servlet-name>
-		<url-pattern>/manager/settings/*</url-pattern>
-	</servlet-mapping>
-	<servlet-mapping>
-		<servlet-name>ServletLog</servlet-name>
-		<url-pattern>/manager/log</url-pattern>
-	</servlet-mapping>
-	<servlet-mapping>
-		<servlet-name>ServletAbout</servlet-name>
-		<url-pattern>/manager/about</url-pattern>
 	</servlet-mapping>
 
 	<filter>
@@ -121,6 +48,7 @@
 		<res-type>javax.sql.DataSource</res-type>
 		<res-auth>Container</res-auth>
 	</resource-ref>
+	
 	<security-constraint>
 		<web-resource-collection>
 			<web-resource-name>SteVe Web Interface</web-resource-name>
@@ -129,13 +57,23 @@
 		<auth-constraint>
 			<role-name>admin</role-name>
 		</auth-constraint>
+		<user-data-constraint>
+			<!-- CONFIDENTIAL, INTEGRAL, or NONE -->
+			<transport-guarantee>NONE</transport-guarantee>
+		</user-data-constraint>
 	</security-constraint>
+	
 	<login-config>
-		<auth-method>BASIC</auth-method>
-		<realm-name>SteVe Web Interface</realm-name>
+		<auth-method>FORM</auth-method>
+		<form-login-config>
+			<form-login-page>/WEB-INF/jsp/signin.jsp</form-login-page>
+			<form-error-page>/WEB-INF/jsp/signin.jsp?error=true</form-error-page>
+		</form-login-config>
 	</login-config>
+	
 	<security-role>
 		<description>The role that is required to access the SteVe Web Interface</description>
 		<role-name>admin</role-name>
 	</security-role>
+	
 </web-app>

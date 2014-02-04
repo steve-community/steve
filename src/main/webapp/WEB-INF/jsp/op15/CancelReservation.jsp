@@ -1,4 +1,9 @@
 <%@ include file="/WEB-INF/jsp/00-header.jsp" %>
+<script type="text/javascript">
+$(document).ready(function() {
+<%@ include file="/WEB-INF/jsp/00-js-snippets/getReservationIds.js" %>
+});
+</script>
 <div class="left-menu">
 <ul>
 	<li><a href="${servletPath}/ChangeAvailability">Change Availability</a></li>
@@ -23,8 +28,8 @@
 <form method="POST" action="${servletPath}/CancelReservation">
 <%@ include file="00-cp-single.jsp" %>
 <section><span>Parameters</span></section>
-<table>
-<tr><td>Reservation Id (integer):</td><td><input type="number" min="0" name="reservationId"></td></tr>
+<table class="userInput">
+<tr><td>ID of the Existing Reservation:</td><td><select name="reservationId" id="reservationId" required disabled></select></td></tr>
 </table>
 <div class="submit-button"><input type="submit" value="Perform"></div>
 </form>

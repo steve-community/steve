@@ -1,3 +1,18 @@
+## 1.0.0
+ - DB updated to 0.6.7.
+ - Home page displays various statistics now (See the screenshot). Data is returned by a stored procedure in DB.
+ - Transactions can be accessed under Data Management.
+ - Latest received heartbeats are stored in DB and can be accessed from home page.
+ - Latest connector status information can be accessed from home page.
+ - "Humanize" the date if it's from today or yesterday.
+ - Drop-down date picker (JQuery plugin) for user-friendly input.
+ - Time input field defaults to 00:00 when left empty.
+ - Drop-down select list of user and parent id tags where applicable.
+ - Drop-down select list for connector, transaction and reservation ids (via Ajax calls) for user-friendly input after a charge point is selected for an OCPP operation.
+ - Client-side input control for required fields (needs HTML5).
+ - Server-side fixes for mandatory/optional fields to conform to OCPP.
+ - User ID Tag restriction: It must be between 1 and 20 characters long. Allowed characters are upper or lower case letters, numbers and dot, dash, underscore symbols.
+ 
 ## 0.6.8
  - Started using MVC, JQuery and Ajax.
  - InputUtils for user input validation.

@@ -23,7 +23,7 @@
 <form method="POST" action="${servletPath}/GetConfiguration">
 <%@ include file="00-cp-multiple.jsp" %>
 <section><span>Parameters</span></section>
-<table>
+<table class="userInput">
 <tr><td style="vertical-align:top"><input type="button" value="Select All" onClick="selectAll(document.getElementById('confKeys'))"><input type="button" value="Select None" onClick="selectNone(document.getElementById('confKeys'))">
 <div class="info"><b>Info:</b> If none selected, the charge point returns a list of <b>all</b> configuration settings.</div>
 </td>

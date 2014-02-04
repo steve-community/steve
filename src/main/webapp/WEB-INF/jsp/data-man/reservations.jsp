@@ -2,7 +2,7 @@
 <%@ include file="/WEB-INF/jsp/00-header.jsp" %>
 <section><span>Existing Reservations</span></section>
 <table class="res">
-	<thead><tr><th>Reservation Id</th><th>idTag</th><th>chargeBoxId</th><th>startDatetime</th><th>expiryDatetime</th></tr></thead>
+	<thead><tr><th>Reservation ID</th><th>User ID Tag</th><th>ChargeBox ID</th><th>Start Date/Time</th><th>Expiry Date/Time</th></tr></thead>
 	<tbody>
 	<%-- Start --%>
 	<c:forEach items="${reservList}" var="res">

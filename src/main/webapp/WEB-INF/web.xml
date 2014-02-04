@@ -5,7 +5,7 @@
 	version="3.0">
 	<display-name>SteVe - Steckdosenverwaltung</display-name>
 	<session-config>
-		<session-timeout>10</session-timeout>
+		<session-timeout>60</session-timeout>
 	</session-config>
 	<context-param>
 		<param-name>contextConfigLocation</param-name>

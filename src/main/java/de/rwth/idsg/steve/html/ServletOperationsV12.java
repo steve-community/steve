@@ -2,7 +2,6 @@ package de.rwth.idsg.steve.html;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.HashMap;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -35,27 +34,27 @@ public class ServletOperationsV12 extends HttpServlet {
 
 	private static final long serialVersionUID = 1L;
 	String contextPath, servletPath;
-	HashMap<String,String> chargePointsList;
 
 	@Override
 	public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
 		
 		// Get the request details
-		String command = request.getPathInfo();				
+		String command = request.getPathInfo();	
 		contextPath = request.getContextPath();
-		servletPath = contextPath + request.getServletPath();	
+		servletPath = contextPath + request.getServletPath();
 
 		if (command == null || command.length() == 0) {
-			// Only refresh the list of charge points when displaying operations page
-			chargePointsList = ClientDBAccess.getChargePoints("1.2");
 			// Redirect to the page of the first operation
 			response.sendRedirect(servletPath + "/ChangeAvailability");
 			return;
+			
+		} else if (command.equals("/RemoteStartTransaction")) {			
+			request.setAttribute("userList", ClientDBAccess.getUsers() );
 		}
 		
 		request.setAttribute("contextPath", contextPath );
 		request.setAttribute("servletPath", servletPath );
-		request.setAttribute("cpList", chargePointsList );
+		request.setAttribute("cpList", ClientDBAccess.getChargePoints("1.2") );
 		
 		// Command is equal to the JSP file name. Forward to JSP.
 		String path = "/WEB-INF/jsp/op12" + command + ".jsp";
@@ -171,15 +170,38 @@ public class ServletOperationsV12 extends HttpServlet {
 		String location = request.getParameter("location");
 		String retriesSTR = request.getParameter("retries");
 		String retryIntervalSTR = request.getParameter("retryInterval");
-		String startTime = request.getParameter("startTime");
-		String stopTime = request.getParameter("stopTime");		
-		InputUtils.checkNullOrEmpty(location, retriesSTR, retryIntervalSTR, startTime, stopTime);
 		
-		int retries = InputUtils.toInt(retriesSTR);
-		int retryInterval = InputUtils.toInt(retryIntervalSTR);
+		String startDate = request.getParameter("startDate");
+		String startTime = request.getParameter("startTime");
+		String stopDate = request.getParameter("stopDate");
+		String stopTime = request.getParameter("stopTime");	
+		
+		InputUtils.checkNullOrEmpty(location);
+		
+		int retries = -1;
+		if ( !InputUtils.isNullOrEmpty(retriesSTR) ) {
+			retries = InputUtils.toInt(retriesSTR);
+		}
+		
+		int retryInterval = -1;
+		if ( !InputUtils.isNullOrEmpty(retryIntervalSTR) ) {
+			retryInterval = InputUtils.toInt(retryIntervalSTR);
+		}
+		
+		String startDateTime = null;
+		if ( !InputUtils.isNullOrEmpty(startDate) ) {
+			if (InputUtils.isNullOrEmpty(startTime)) startTime = "00:00";
+			startDateTime = startDate + " " + startTime;
+		}
+		
+		String stopDateTime = null;
+		if ( !InputUtils.isNullOrEmpty(stopDate) ) {
+			if (InputUtils.isNullOrEmpty(stopTime)) stopTime = "00:00";
+			stopDateTime = stopDate + " " + stopTime;
+		}
 		
 		ChargePointService12_Client cpsClient = new ChargePointService12_Client();
-		GetDiagnosticsRequest req = cpsClient.prepareGetDiagnostics(location, retries, retryInterval, startTime, stopTime);
+		GetDiagnosticsRequest req = cpsClient.prepareGetDiagnostics(location, retries, retryInterval, startDateTime, stopDateTime);
 
 		StringBuilder builder = new StringBuilder();
 		String result;
@@ -196,7 +218,7 @@ public class ServletOperationsV12 extends HttpServlet {
 		String idTag = request.getParameter("idTag");		
 		InputUtils.checkNullOrEmpty(connectorIdSTR, idTag);
 		
-		int connectorId = InputUtils.toNonZeroInt(connectorIdSTR);
+		int connectorId = InputUtils.toInt(connectorIdSTR);
 		
 		ChargePointService12_Client cpsClient = new ChargePointService12_Client();
 		RemoteStartTransactionRequest req = cpsClient.prepareRemoteStartTransaction(connectorId, idTag);
@@ -251,7 +273,7 @@ public class ServletOperationsV12 extends HttpServlet {
 		String connectorIdSTR = request.getParameter("connectorId");		
 		InputUtils.checkNullOrEmpty(connectorIdSTR);
 		
-		int connectorId = InputUtils.toNonZeroInt(connectorIdSTR);
+		int connectorId = InputUtils.toInt(connectorIdSTR);
 		
 		ChargePointService12_Client cpsClient = new ChargePointService12_Client();
 		UnlockConnectorRequest req = cpsClient.prepareUnlockConnector(connectorId);
@@ -270,14 +292,27 @@ public class ServletOperationsV12 extends HttpServlet {
 		String location = request.getParameter("location");
 		String retriesSTR = request.getParameter("retries");
 		String retryIntervalSTR = request.getParameter("retryInterval");
-		String retrieveDate = request.getParameter("retrieveDate");			
-		InputUtils.checkNullOrEmpty(location, retriesSTR, retryIntervalSTR, retrieveDate);
 		
-		int retries = InputUtils.toInt(retriesSTR);
-		int retryInterval = InputUtils.toInt(retryIntervalSTR);
+		String retrieveDate = request.getParameter("retrieveDate");
+		String retrieveTime = request.getParameter("retrieveTime");	
+		
+		InputUtils.checkNullOrEmpty(location, retrieveDate);
+		
+		int retries = -1;
+		if ( !InputUtils.isNullOrEmpty(retriesSTR) ) {
+			retries = InputUtils.toInt(retriesSTR);
+		}
+		
+		int retryInterval = -1;
+		if ( !InputUtils.isNullOrEmpty(retryIntervalSTR) ) {
+			retryInterval = InputUtils.toInt(retryIntervalSTR);
+		}
+		
+		if (InputUtils.isNullOrEmpty(retrieveTime)) retrieveTime = "00:00";
+		String retrieveDateTime = retrieveDate + " " + retrieveTime;
 		
 		ChargePointService12_Client cpsClient = new ChargePointService12_Client();
-		UpdateFirmwareRequest req = cpsClient.prepareUpdateFirmware(location, retries, retrieveDate, retryInterval);
+		UpdateFirmwareRequest req = cpsClient.prepareUpdateFirmware(location, retries, retrieveDateTime, retryInterval);
 
 		StringBuilder builder = new StringBuilder();
 		String result;

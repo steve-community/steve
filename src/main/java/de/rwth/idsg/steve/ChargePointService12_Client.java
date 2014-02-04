@@ -71,16 +71,16 @@ public class ChargePointService12_Client {
 	public GetDiagnosticsRequest prepareGetDiagnostics(String location, int retries, int retryInterval, String startTime, String stopTime){  
 		GetDiagnosticsRequest req = new GetDiagnosticsRequest();
 		req.setLocation(location);
-		req.setRetries(retries);
-		req.setRetryInterval(retryInterval);
-		req.setStartTime( DateTimeUtils.convertToXMLGregCal(startTime) );
-		req.setStopTime( DateTimeUtils.convertToXMLGregCal(stopTime) );		
+		if (retries != -1) req.setRetries(retries);
+		if (retryInterval != -1) req.setRetryInterval(retryInterval);
+		if (startTime != null) req.setStartTime( DateTimeUtils.convertToXMLGregCal(startTime) );
+		if (stopTime != null) req.setStopTime( DateTimeUtils.convertToXMLGregCal(stopTime) );		
 		return req;
 	} 
 
 	public RemoteStartTransactionRequest prepareRemoteStartTransaction(int connectorId, String idTag){  
 		RemoteStartTransactionRequest req = new RemoteStartTransactionRequest();
-		req.setConnectorId(connectorId);
+		if (connectorId != 0) req.setConnectorId(connectorId);
 		req.setIdTag(idTag);
 		return req;
 	} 	
@@ -106,9 +106,9 @@ public class ChargePointService12_Client {
 	public UpdateFirmwareRequest prepareUpdateFirmware(String location, int retries, String retrieveDate, int retryInterval){   
 		UpdateFirmwareRequest req = new UpdateFirmwareRequest(); 
 		req.setLocation(location);
-		req.setRetries(retries);
 		req.setRetrieveDate( DateTimeUtils.convertToXMLGregCal(retrieveDate) );
-		req.setRetryInterval(retryInterval);
+		if (retries != -1) req.setRetries(retries);
+		if (retryInterval != -1) req.setRetryInterval(retryInterval);
 		return req;
 	}
 

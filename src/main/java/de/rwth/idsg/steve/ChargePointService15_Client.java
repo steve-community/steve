@@ -51,6 +51,7 @@ import org.slf4j.LoggerFactory;
 
 import de.rwth.idsg.steve.common.ClientDBAccess;
 import de.rwth.idsg.steve.common.utils.DateTimeUtils;
+import de.rwth.idsg.steve.common.utils.InputUtils;
 
 /**
  * Client implementation of OCPP V1.5.
@@ -95,16 +96,16 @@ public class ChargePointService15_Client {
 	public GetDiagnosticsRequest prepareGetDiagnostics(String location, int retries, int retryInterval, String startTime, String stopTime){  
 		GetDiagnosticsRequest req = new GetDiagnosticsRequest();
 		req.setLocation(location);
-		req.setRetries(retries);
-		req.setRetryInterval(retryInterval);
-		req.setStartTime( DateTimeUtils.convertToXMLGregCal(startTime) );
-		req.setStopTime( DateTimeUtils.convertToXMLGregCal(stopTime) );		
+		if (retries != -1) req.setRetries(retries);
+		if (retryInterval != -1) req.setRetryInterval(retryInterval);
+		if (startTime != null) req.setStartTime( DateTimeUtils.convertToXMLGregCal(startTime) );
+		if (stopTime != null) req.setStopTime( DateTimeUtils.convertToXMLGregCal(stopTime) );		
 		return req;
 	} 
 
 	public RemoteStartTransactionRequest prepareRemoteStartTransaction(int connectorId, String idTag){  
 		RemoteStartTransactionRequest req = new RemoteStartTransactionRequest();
-		req.setConnectorId(connectorId);
+		if (connectorId != 0) req.setConnectorId(connectorId);
 		req.setIdTag(idTag);
 		return req;
 	} 	
@@ -130,9 +131,9 @@ public class ChargePointService15_Client {
 	public UpdateFirmwareRequest prepareUpdateFirmware(String location, int retries, String retrieveDate, int retryInterval){   
 		UpdateFirmwareRequest req = new UpdateFirmwareRequest(); 
 		req.setLocation(location);
-		req.setRetries(retries);
 		req.setRetrieveDate( DateTimeUtils.convertToXMLGregCal(retrieveDate) );
-		req.setRetryInterval(retryInterval);
+		if (retries != -1) req.setRetries(retries);
+		if (retryInterval != -1) req.setRetryInterval(retryInterval);
 		return req;
 	}
 	
@@ -143,8 +144,8 @@ public class ChargePointService15_Client {
 	public DataTransferRequest prepareDataTransfer(String vendorId, String messageId, String data){
 		DataTransferRequest req = new DataTransferRequest();
 		req.setVendorId(vendorId);
-		req.setMessageId(messageId);
-		req.setData(data);
+		if ( !InputUtils.isNullOrEmpty(messageId) ) req.setMessageId(messageId);
+		if ( !InputUtils.isNullOrEmpty(data) ) req.setData(data);
 		return req;	
 	}
 	
@@ -379,7 +380,7 @@ public class ChargePointService15_Client {
 		req.setConnectorId(connectorId);
 		req.setExpiryDate( DateTimeUtils.convertToXMLGregCal(expiryString) );
 		req.setIdTag(idTag);
-		if (parentIdTag != null && !parentIdTag.isEmpty()) req.setParentIdTag(parentIdTag);
+		if (parentIdTag != null) req.setParentIdTag(parentIdTag);
 		req.setReservationId(reservationId);
 		
 		factory.setAddress(endpoint_address);

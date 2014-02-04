@@ -23,8 +23,8 @@
 <form method="POST" action="${servletPath}/Reset">
 <%@ include file="00-cp-multiple.jsp" %>
 <section><span>Parameters</span></section>
-<table>
-<tr><td>Reset Type:</td><td><input type="radio" name="resetType" value="Hard" checked> Hard</td></tr>
+<table class="userInput">
+<tr><td>Reset Type:</td><td><input type="radio" name="resetType" value="Hard" required> Hard</td></tr>
 <tr><td></td><td><input type="radio" name="resetType" value="Soft"> Soft</td></tr>
 </table>
 <div class="submit-button"><input type="submit" value="Perform"></div>

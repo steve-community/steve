@@ -1,4 +1,9 @@
 <%@ include file="/WEB-INF/jsp/00-header.jsp" %>
+<script type="text/javascript">
+$(document).ready(function() {
+<%@ include file="/WEB-INF/jsp/00-js-snippets/datepicker.js" %>
+});
+</script>
 <div class="left-menu">
 <ul>
 	<li><a href="${servletPath}/ChangeAvailability">Change Availability</a></li>
@@ -16,11 +21,16 @@
 <form method="POST" action="${servletPath}/UpdateFirmware">
 <%@ include file="00-cp-multiple.jsp" %>
 <section><span>Parameters</span></section>
-<table>
-<tr><td>Location (URI):</td><td><input type="text" name="location"></td></tr>
-<tr><td>Retries (integer):</td><td><input type="number" min="0" name="retries"></td></tr>
-<tr><td>Retry Interval (integer):</td><td><input type="number" min="0" name="retryInterval"></td></tr>
-<tr><td>Retrieve Date (ex: 2011-12-21 11:33):</td><td><input type="datetime" name="retrieveDate"></td></tr>
+<table class="userInput">
+	<tr><td>Location (URI):</td><td><input type="text" name="location" required></td></tr>
+	<tr><td>Retries (integer):</td><td><input type="number" min="0" name="retries" placeholder="optional"></td></tr>
+	<tr><td>Retry Interval (integer):</td><td><input type="number" min="0" name="retryInterval" placeholder="optional"></td></tr>
+	<tr><td>Retrieve Date/Time (ex: 2011-12-21 at 11:30):</td>
+		<td>
+			<input type="text" name="retrieveDate" class="datepicker" required> at 
+			<input type="text" name="retrieveTime" class="timepicker" placeholder="optional">
+		</td>
+	</tr>
 </table>
 <div class="submit-button"><input type="submit" value="Perform"></div>
 </form>

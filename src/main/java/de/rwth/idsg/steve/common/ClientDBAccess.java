@@ -1,5 +1,6 @@
 package de.rwth.idsg.steve.common;
 
+import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -24,7 +25,11 @@ import de.rwth.idsg.steve.common.utils.DateTimeUtils;
 import de.rwth.idsg.steve.html.ExceptionMessage;
 import de.rwth.idsg.steve.html.InputException;
 import de.rwth.idsg.steve.model.ChargePoint;
+import de.rwth.idsg.steve.model.ConnectorStatus;
+import de.rwth.idsg.steve.model.Heartbeat;
 import de.rwth.idsg.steve.model.Reservation;
+import de.rwth.idsg.steve.model.Statistics;
+import de.rwth.idsg.steve.model.Transaction;
 import de.rwth.idsg.steve.model.User;
 
 
@@ -37,8 +42,46 @@ import de.rwth.idsg.steve.model.User;
 public class ClientDBAccess {
 	
 	private static final Logger LOG = LoggerFactory.getLogger(ClientDBAccess.class);
+	
+	
+	public static Statistics getStats(){		
+		Connection connect = null;
+		CallableStatement cs = null;
+		ResultSet rs = null;
+		try {	
+			// Prepare Database Access
+			connect = DBUtils.getConnectionFromPool();
+			// getStats is the stored procedure in our MySQL DB
+			cs = connect.prepareCall("{CALL getStats(?,?,?,?,?,?,?,?,?,?,?)}");
+			
+			for (int i=1; i<=11; i++) {
+				cs.registerOutParameter(i, java.sql.Types.INTEGER);
+			}
+			cs.execute();
+			
+			Statistics stat = new Statistics(
+					cs.getInt(1),
+					cs.getInt(2),
+					cs.getInt(3),
+					cs.getInt(4),
+					cs.getInt(5),
+					cs.getInt(6),
+					cs.getInt(7),
+					cs.getInt(8),
+					cs.getInt(9),
+					cs.getInt(10),
+					cs.getInt(11));				
+				
+			return stat;
+		} catch (SQLException ex) {
+			LOG.error("SQL exception", ex);
+			throw new RuntimeException(ex);
+		} finally {
+			DBUtils.releaseResources(connect, cs, rs);
+		}
+	}
 
-	public static synchronized HashMap<String,String> getChargePoints(String ocppVersion){
+	public static HashMap<String,String> getChargePoints(String ocppVersion){
 		Connection connect = null;
 		PreparedStatement pt = null;
 		ResultSet rs = null;
@@ -61,7 +104,7 @@ public class ClientDBAccess {
 		}
 	}
 	
-	public static synchronized List<String> getChargePoints() {
+	public static List<String> getChargePoints() {
 		Connection connect = null;
 		PreparedStatement pt = null;
 		ResultSet rs = null;
@@ -83,7 +126,7 @@ public class ClientDBAccess {
 		}
 	}
 	
-	public static synchronized ChargePoint getChargePointDetails(String chargeBoxId) {
+	public static ChargePoint getChargePointDetails(String chargeBoxId) {
 		Connection connect = null;
 		PreparedStatement pt = null;
 		ResultSet rs = null;		
@@ -106,13 +149,14 @@ public class ClientDBAccess {
 						rs.getString(7), 
 						rs.getString(8), 
 						rs.getString(9),
-						DateTimeUtils.convertToString(rs.getTimestamp(10)),
+						DateTimeUtils.humanize(rs.getTimestamp(10)),
 						rs.getString(11), 
 						rs.getString(12), 
 						rs.getString(13), 
 						rs.getString(14), 
 						rs.getString(15),
-						DateTimeUtils.convertToString(rs.getTimestamp(16)));				
+						DateTimeUtils.humanize(rs.getTimestamp(16)),
+						DateTimeUtils.humanize(rs.getTimestamp(17)));
 			}
 			return cp;
 		} catch (SQLException ex) {
@@ -121,6 +165,67 @@ public class ClientDBAccess {
 		} finally {
 			DBUtils.releaseResources(connect, pt, rs);
 		}		
+	}	
+	
+	public static List<Heartbeat> getChargePointHeartbeats() {
+		Connection connect = null;
+		PreparedStatement pt = null;
+		ResultSet rs = null;
+		try {	
+			// Prepare Database Access
+			connect = DBUtils.getConnectionFromPool();
+			pt = connect.prepareStatement("SELECT chargeBoxId, lastHeartbeatTimestamp FROM chargebox ORDER BY lastHeartbeatTimestamp DESC;");
+			rs = pt.executeQuery();
+
+			List<Heartbeat> list = new ArrayList<Heartbeat>();
+			while ( rs.next() ) {
+				Heartbeat hb = new Heartbeat(
+						rs.getString(1),
+						DateTimeUtils.humanize(rs.getTimestamp(2)));
+
+				list.add(hb);
+			}
+			return list;
+		} catch (SQLException ex) {
+			LOG.error("SQL exception", ex);
+			throw new RuntimeException(ex);
+		} finally {
+			DBUtils.releaseResources(connect, pt, rs);
+		}
+	}
+	
+	public static List<ConnectorStatus> getChargePointConnectorStatus() {
+		Connection connect = null;
+		PreparedStatement pt = null;
+		ResultSet rs = null;
+		try {	
+			// Prepare Database Access
+			connect = DBUtils.getConnectionFromPool();
+			pt = connect.prepareStatement("SELECT c.chargeBoxId, c.connectorId, cs.statustimeStamp, cs.status, cs.errorCode "
+					+ "FROM connector_status cs "
+					+ "INNER JOIN connector c ON cs.connector_pk = c.connector_pk "
+					+ "INNER JOIN (SELECT connector_pk, MAX(statusTimestamp) AS Max FROM connector_status GROUP BY connector_pk) AS t1 ON cs.connector_pk = t1.connector_pk AND cs.statusTimestamp = t1.Max "
+					+ "ORDER BY cs.statustimeStamp DESC;");
+			rs = pt.executeQuery();
+
+			List<ConnectorStatus> list = new ArrayList<ConnectorStatus>();
+			while ( rs.next() ) {
+				ConnectorStatus cs = new ConnectorStatus(
+						rs.getString(1),
+						rs.getInt(2),
+						DateTimeUtils.humanize(rs.getTimestamp(3)),
+						rs.getString(4),
+						rs.getString(5));
+
+				list.add(cs);
+			}
+			return list;
+		} catch (SQLException ex) {
+			LOG.error("SQL exception", ex);
+			throw new RuntimeException(ex);
+		} finally {
+			DBUtils.releaseResources(connect, pt, rs);
+		}
 	}
 	
 	public static synchronized void addChargePoint(String chargeBoxId) {
@@ -171,7 +276,30 @@ public class ClientDBAccess {
 		}
 	}
 	
-	public static synchronized List<User> getUsers(){
+	public static List<Integer> getConnectorIds(String chargeBoxId) {
+		Connection connect = null;
+		PreparedStatement pt = null;
+		ResultSet rs = null;
+		try { 
+			// Prepare Database Access
+			connect = DBUtils.getConnectionFromPool();
+			pt = connect.prepareStatement("SELECT connectorId FROM connector WHERE chargeBoxId = ?");
+			pt.setString(1, chargeBoxId);
+			rs = pt.executeQuery();
+			
+			List<Integer> connList = new ArrayList<Integer>();
+			while (rs.next()) { connList.add(rs.getInt(1)); }
+			
+			return connList;
+		} catch (SQLException ex) {
+			LOG.error("SQL exception", ex);
+			throw new RuntimeException(ex);
+		} finally {
+			DBUtils.releaseResources(connect, pt, null);
+		}
+	}
+	
+	public static List<User> getUsers(){
 		Connection connect = null;
 		PreparedStatement pt = null;
 		ResultSet rs = null;
@@ -186,7 +314,7 @@ public class ClientDBAccess {
 				User user = new User(
 						rs.getString(1), 
 						rs.getString(2),
-						DateTimeUtils.convertToString(rs.getTimestamp(3)),
+						DateTimeUtils.humanize(rs.getTimestamp(3)),
 						rs.getBoolean(4), 
 						rs.getBoolean(5));
 
@@ -285,7 +413,7 @@ public class ClientDBAccess {
 	}
 	
 	
-	public static synchronized List<Reservation> getReservations(){
+	public static List<Reservation> getReservations(){
 		Connection connect = null;
 		PreparedStatement pt = null;
 		ResultSet rs = null;
@@ -301,14 +429,38 @@ public class ClientDBAccess {
 						rs.getInt(1),
 						rs.getString(2), 
 						rs.getString(3),
-						DateTimeUtils.convertToString(rs.getTimestamp(4)),
-						DateTimeUtils.convertToString(rs.getTimestamp(5)));
+						DateTimeUtils.humanize(rs.getTimestamp(4)),
+						DateTimeUtils.humanize(rs.getTimestamp(5)));
 
 				reservList.add(res);
 			}
 			return reservList;
 		} catch (SQLException ex) {
 			LOG.error("SQL exception", ex);	
+			throw new RuntimeException(ex);
+		} finally {
+			DBUtils.releaseResources(connect, pt, rs);
+		}
+	}
+	
+	public static List<Integer> getExistingReservationIds(String chargeBoxId){
+		Connection connect = null;
+		PreparedStatement pt = null;
+		ResultSet rs = null;
+		try {	
+			// Prepare Database Access
+			connect = DBUtils.getConnectionFromPool();
+			pt = connect.prepareStatement("SELECT reservation_pk FROM reservation WHERE chargeBoxId=? AND expiryDatetime >= NOW()");
+			
+			pt.setString(1, chargeBoxId);
+			rs = pt.executeQuery();
+
+			List<Integer> list = new ArrayList<Integer>();
+			while (rs.next()) { list.add(rs.getInt(1)); }
+			
+			return list;
+		} catch (SQLException ex) {
+			LOG.error("SQL exception", ex);
 			throw new RuntimeException(ex);
 		} finally {
 			DBUtils.releaseResources(connect, pt, rs);
@@ -420,11 +572,79 @@ public class ClientDBAccess {
 		}
 	}
 	
+	public static List<Transaction> getTransactions() {
+		Connection connect = null;
+		PreparedStatement pt = null;
+		ResultSet rs = null;
+		try {	
+			// Prepare Database Access
+			connect = DBUtils.getConnectionFromPool();
+			pt = connect.prepareStatement("SELECT transaction.transaction_pk, connector.chargeBoxId, connector.connectorId, transaction.idTag, "
+					+ "transaction.startTimestamp, transaction.startValue,  transaction.stopTimestamp, transaction.stopValue "
+					+ "FROM transaction JOIN connector ON transaction.connector_pk = connector.connector_pk;");
+			rs = pt.executeQuery();
+
+			List<Transaction> list = new ArrayList<Transaction>();
+			while ( rs.next() ) {
+								
+				String chargedValue = "";				
+				int stopValue = rs.getInt(8);
+				if (stopValue != 0) {
+					// rs.getInt(6) is the start value
+					chargedValue = String.valueOf(stopValue - rs.getInt(6));
+				}
+				
+				Transaction ta = new Transaction(
+						rs.getInt(1),
+						rs.getString(2),
+						rs.getInt(3),
+						rs.getString(4),
+						DateTimeUtils.humanize(rs.getTimestamp(5)),
+						DateTimeUtils.humanize(rs.getTimestamp(7)),
+						chargedValue);
+
+				list.add(ta);
+			}
+			return list;
+		} catch (SQLException ex) {
+			LOG.error("SQL exception", ex);
+			throw new RuntimeException(ex);
+		} finally {
+			DBUtils.releaseResources(connect, pt, rs);
+		}
+	}
+	
+	public static List<Integer> getActiveTransactionIds(String chargeBoxId) {
+		Connection connect = null;
+		PreparedStatement pt = null;
+		ResultSet rs = null;
+		try {	
+			// Prepare Database Access
+			connect = DBUtils.getConnectionFromPool();
+			pt = connect.prepareStatement("SELECT transaction.transaction_pk FROM transaction "
+					+ "JOIN connector ON transaction.connector_pk = connector.connector_pk "
+					+ "WHERE chargeBoxId = ? AND stopTimestamp IS NULL");
+			
+			pt.setString(1, chargeBoxId);
+			rs = pt.executeQuery();
+
+			List<Integer> list = new ArrayList<Integer>();
+			while (rs.next()) { list.add(rs.getInt(1)); }
+			
+			return list;
+		} catch (SQLException ex) {
+			LOG.error("SQL exception", ex);
+			throw new RuntimeException(ex);
+		} finally {
+			DBUtils.releaseResources(connect, pt, rs);
+		}
+	}
+	
 	/**
 	 * For OCPP 1.5: Helper method to read idTags from the DB for the operation SendLocalList.
 	 * 
 	 */
-	public static synchronized ArrayList<AuthorisationData> getIdTags(ArrayList<String> inputList) {
+	public static ArrayList<AuthorisationData> getIdTags(ArrayList<String> inputList) {
 		
 		XMLGregorianCalendar xcal = DateTimeUtils.setExpiryDateTime(Constants.HOURS_TO_EXPIRE);
 		Timestamp now = DateTimeUtils.getCurrentDateTimeTS();
@@ -500,18 +720,21 @@ public class ClientDBAccess {
 	 * Returns DB version of SteVe
 	 * 
 	 */
-	public static synchronized String getDBVersion() {
+	public static String[] getDBVersion() {
 		Connection connect = null;
 		PreparedStatement pt = null;
 		ResultSet rs = null;
 		try { 
 			// Prepare Database Access
 			connect = DBUtils.getConnectionFromPool();
-			pt = connect.prepareStatement("SELECT version FROM dbVersion");
+			pt = connect.prepareStatement("SELECT * FROM dbVersion");
 			rs = pt.executeQuery();
 			
-			String ver = null;
-			if (rs.next()) ver = rs.getString(1);
+			String[] ver = new String[2];
+			if (rs.next()) {
+				ver[0] = rs.getString(1);
+				ver[1] = DateTimeUtils.humanize(rs.getTimestamp(2));
+			}
 			
 			return ver;
 		} catch (SQLException ex) {

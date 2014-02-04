@@ -17,21 +17,21 @@ import de.rwth.idsg.steve.common.utils.InputUtils;
  * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
  * 
  */
-@WebServlet("/manager/settings/*")
+@WebServlet({ "/manager/settings/*" })
 public class ServletSettings extends HttpServlet {
-
+	
 	private static final long serialVersionUID = 1L;
 	String contextPath, servletPath;
 
 	@Override
 	public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-		
+
 		contextPath = request.getContextPath();
 		servletPath = contextPath + request.getServletPath();
-		
+
 		request.setAttribute("contextPath", contextPath );
 		request.setAttribute("servletPath", servletPath );
-		
+
 		request.setAttribute("heartbeat", Constants.HEARTBEAT_INTERVAL );
 		request.setAttribute("expire", Constants.HOURS_TO_EXPIRE );
 
@@ -40,7 +40,7 @@ public class ServletSettings extends HttpServlet {
 	}
 
 	@Override
-	public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {		
+	public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {	
 
 		String heartbeatSTR = request.getParameter("heartbeat");
 		String expirationSTR = request.getParameter("expiration");
@@ -54,8 +54,10 @@ public class ServletSettings extends HttpServlet {
 		if ( !InputUtils.isNullOrEmpty(expirationSTR) ) {
 			Constants.HOURS_TO_EXPIRE = InputUtils.toInt(expirationSTR);
 		}
-		
+
 		response.sendRedirect(servletPath);
 		return;
 	}
+
+
 }

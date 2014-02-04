@@ -32,6 +32,7 @@ import ocpp.cs._2010._08.StopTransactionRequest;
 import ocpp.cs._2010._08.StopTransactionResponse;
 
 import org.apache.cxf.ws.addressing.AddressingProperties;
+import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -67,6 +68,8 @@ public class CentralSystemService12_Impl implements CentralSystemService {
 		AddressingProperties addressProp = (AddressingProperties) messageContext.get(org.apache.cxf.ws.addressing.JAXWSAConstants.SERVER_ADDRESSING_PROPERTIES_INBOUND);
 		String endpoint_address = addressProp.getFrom().getAddress().getValue();
 		
+		DateTime now = new DateTime();
+		
 		boolean isRegistered = ServiceDBAccess.updateChargebox(endpoint_address, 
 				"1.2",
 				parameters.getChargePointVendor(),
@@ -78,14 +81,15 @@ public class CentralSystemService12_Impl implements CentralSystemService {
 				parameters.getImsi(),
 				parameters.getMeterType(),
 				parameters.getMeterSerialNumber(),
-				chargeBoxIdentity);
+				chargeBoxIdentity, 
+				new Timestamp(now.getMillis()));
 				
 		BootNotificationResponse _return = new BootNotificationResponse();
 		RegistrationStatus _returnStatus = null;
 		
 		if (isRegistered) {
 			_returnStatus = RegistrationStatus.ACCEPTED;
-			_return.setCurrentTime(DateTimeUtils.getCurrentDateTimeXML());
+			_return.setCurrentTime(DateTimeUtils.convertToXMLGregCal(now));
 			_return.setHeartbeatInterval(Integer.valueOf(Constants.HEARTBEAT_INTERVAL));
 		} else {
 			_returnStatus = RegistrationStatus.REJECTED;		
@@ -177,15 +181,18 @@ public class CentralSystemService12_Impl implements CentralSystemService {
 		if (!idTag.isEmpty()) {
 			SQLIdTagData sqlData = ServiceDBAccess.getIdTagColumns(idTag);
 			_return.setIdTagInfo(createIdTagInfo(sqlData));
-		}		
+		}
 		return _return;
 	}
 
 	public HeartbeatResponse heartbeat(HeartbeatRequest parameters,java.lang.String chargeBoxIdentity) {	
 		LOG.info("Executing heartbeat for {}", chargeBoxIdentity);
-
+		
+		DateTime now = new DateTime();
+		ServiceDBAccess.updateChargeboxHeartbeat(chargeBoxIdentity, new Timestamp(now.getMillis()));
+		
 		HeartbeatResponse _return = new HeartbeatResponse();
-		_return.setCurrentTime(DateTimeUtils.getCurrentDateTimeXML());
+		_return.setCurrentTime(DateTimeUtils.convertToXMLGregCal(now));
 		return _return;
 	}
 	
@@ -196,8 +203,9 @@ public class CentralSystemService12_Impl implements CentralSystemService {
 		String idTag = parameters.getIdTag();
 		SQLIdTagData sqlData = ServiceDBAccess.getIdTagColumns(idTag);
 
-		AuthorizeResponse _return = new AuthorizeResponse();
-		_return.setIdTagInfo(createIdTagInfo(sqlData));		
+        AuthorizeResponse _return = new AuthorizeResponse();
+        IdTagInfo iti = createIdTagInfo(sqlData);
+        _return.setIdTagInfo(iti);
 		return _return;
 	}
 
@@ -229,6 +237,5 @@ public class CentralSystemService12_Impl implements CentralSystemService {
 		}
 		_returnIdTagInfo.setStatus(_returnIdTagInfoStatus);
 		return _returnIdTagInfo;
-	}
-	
+	}	
 }

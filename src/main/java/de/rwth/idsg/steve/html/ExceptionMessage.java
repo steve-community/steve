@@ -40,4 +40,10 @@ public class ExceptionMessage {
 	public static String OVERLAPPING_RESERVATION = 
 			"Error: The desired reservation overlaps with another reservation.\n"
 			+ "Go back and try again.";
+	
+	public static String INVALID_IDTAG = 
+			"Error: The input string is invalid for a user ID Tag.\n"
+			+ "1. Allowed characters are: Upper or lower case letters, numbers and dot, dash, underscore symbols.\n"
+			+ "2. It must be between 1 and 20 characters long.\n"
+			+ "Go back and try again.";
 }

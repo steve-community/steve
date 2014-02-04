@@ -27,7 +27,8 @@ function addElement() {
 	var input = document.createElement("input");
 	input.setAttribute("type", "text");
 	input.setAttribute("name", "idTag");
-	input.setAttribute("placeholder", "idTag");
+	input.setAttribute("placeholder", "ID Tag");
+	input.required = true;
 	var select = document.createElement("select");
 	select.setAttribute("name", "idTagData");
 	var option1 = document.createElement("option");

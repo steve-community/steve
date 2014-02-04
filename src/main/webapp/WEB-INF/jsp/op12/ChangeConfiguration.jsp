@@ -16,11 +16,12 @@
 <form method="POST" action="${servletPath}/ChangeConfiguration">
 <%@ include file="00-cp-multiple.jsp" %>
 <section><span>Parameters</span></section>
-<table>
+<table class="userInput">
 <tr>
-<td>Configuration key:</td>
+<td>Configuration Key:</td>
 <td>
-<select name="confKey">
+<select name="confKey" required>
+<option selected="selected" disabled="disabled" style="display:none;">Choose...</option>
 <option value="HeartBeatInterval">HeartBeatInterval (in seconds)</option>
 <option value="ConnectionTimeOut">ConnectionTimeOut (in seconds)</option>
 <option value="ProximityContactRetries">ProximityContactRetries (in times)</option>
@@ -33,7 +34,7 @@
 </select>
 </td>
 </tr>
-<tr><td>Value:</td><td><input type="text" name="value"></td></tr>
+<tr><td>Value:</td><td><input type="text" name="value" required></td></tr>
 </table>
 <div class="submit-button"><input type="submit" value="Perform"></div>
 </form>

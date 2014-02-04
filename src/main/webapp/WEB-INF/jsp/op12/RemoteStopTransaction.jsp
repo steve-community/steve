@@ -1,4 +1,9 @@
 <%@ include file="/WEB-INF/jsp/00-header.jsp" %>
+<script type="text/javascript">
+$(document).ready(function() {
+<%@ include file="/WEB-INF/jsp/00-js-snippets/getTransactionIds.js" %>
+});
+</script>
 <div class="left-menu">
 <ul>
 	<li><a href="${servletPath}/ChangeAvailability">Change Availability</a></li>
@@ -16,8 +21,8 @@
 <form method="POST" action="${servletPath}/RemoteStopTransaction">
 <%@ include file="00-cp-single.jsp" %>
 <section><span>Parameters</span></section>
-<table>
-<tr><td>Transaction Id (integer):</td><td><input type="number" name="transactionId"></td></tr>
+<table class="userInput">
+<tr><td>ID of the Active Transaction:</td><td><select name="transactionId" id="transactionId" required disabled></select></td></tr>
 </table>
 <div class="submit-button"><input type="submit" value="Perform"></div>
 </form>

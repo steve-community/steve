@@ -1,7 +1,59 @@
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ include file="/WEB-INF/jsp/00-header.jsp" %>
-<section><span>Welcome!</span></section>
-	<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Qui ita affectus, beatum esse numquam probabis; Nihil opus est exemplis hoc facere longius. Itaque ab his ordiamur. Quid turpius quam sapientis vitam ex insipientium sermone pendere? Nam adhuc, meo fortasse vitio, quid ego quaeram non perspicis. Non igitur bene. Dic in quovis conventu te omnia facere, ne doleas. Duo Reges: constructio interrete. Iam enim adesse poterit.</p>
-	<p>Ergo, inquit, tibi Q. Neque solum ea communia, verum etiam paria esse dixerunt. Itaque nostrum est-quod nostrum dico, artis est-ad ea principia, quae accepimus. In qua quid est boni praeter summam voluptatem, et eam sempiternam? Qui enim voluptatem ipsam contemnunt, iis licet dicere se acupenserem maenae non anteponere. Nos quidem Virtutes sic natae sumus, ut tibi serviremus, aliud negotii nihil habemus. Mihi vero, inquit, placet agi subtilius et, ut ipse dixisti, pressius. Esse enim quam vellet iniquus iustus poterat inpune. Ut in geometria, prima si dederis, danda sunt omnia.</p>
-	<p>Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie consequat, vel illum dolore eu feugiat nulla facilisis at vero eros et accumsan et iusto odio dignissim qui blandit praesent luptatum zzril delenit augue duis dolore te feugait nulla facilisi. Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat.</p>
-	<p>Ut wisi enim ad minim veniam, quis nostrud exerci tation ullamcorper suscipit lobortis nisl ut aliquip ex ea commodo consequat. Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie consequat, vel illum dolore eu feugiat nulla facilisis at vero eros et accumsan et iusto odio dignissim qui blandit praesent luptatum zzril delenit augue duis dolore te feugait nulla facilisi.</p>
+<div class="tileWrapper">
+	<a class="tileRow1" href="${contextPath}/manager/chargepoints">
+		Number of<br>Charge Points
+		<span class="base formatNumber">${stats.numChargeBoxes}</span>
+	</a>
+	<a class="tileRow1" href="${contextPath}/manager/users">
+		Number of<br>Users
+		<span class="base formatNumber">${stats.numUsers}</span>
+	</a>
+	<a class="tileRow1" href="${contextPath}/manager/reservations">
+		Number of<br>Existing Reservations
+		<span class="base formatNumber">${stats.numReservs}</span>
+	</a>
+	<a class="tileRow1" href="${contextPath}/manager/transactions">
+		Number of<br>Active Transactions
+		<span class="base formatNumber">${stats.numTranses}</span>
+	</a>
+	<a class="tileRow2" href="${contextPath}/manager/home/heartbeats">
+		Received Heartbeats
+		<span class="baseTable">
+			<span class="baseRow">
+				<span class="baseCell">Today :</span>
+				<span class="baseCell formatNumber">${stats.heartbeatToday}</span>
+			</span>
+			<span class="baseRow">
+				<span class="baseCell">Yesterday :</span>
+				<span class="baseCell formatNumber">${stats.heartbeatYester}</span>
+			</span>
+			<span class="baseRow">
+				<span class="baseCell">Earlier :</span>
+				<span class="baseCell formatNumber">${stats.heartbeatEarl}</span>
+			</span>
+		</span>
+	</a>
+	<a class="tileRow2" href="${contextPath}/manager/home/connectorStatus">
+		Connector Status
+		<span class="baseTable">
+			<span class="baseRow">
+				<span class="baseCell">Available :</span>
+				<span class="baseCell formatNumber">${stats.connAvail}</span>
+			</span>
+			<span class="baseRow">
+				<span class="baseCell">Occupied :</span>
+				<span class="baseCell formatNumber">${stats.connOcc}</span>
+			</span>
+			<span class="baseRow">
+				<span class="baseCell">Faulted :</span>
+				<span class="baseCell formatNumber">${stats.connFault}</span>
+			</span>
+			<span class="baseRow">
+				<span class="baseCell">Unavailable :</span>
+				<span class="baseCell formatNumber">${stats.connUnavail}</span>
+			</span>
+		</span>	
+	</a>
+</div>
 <%@ include file="/WEB-INF/jsp/00-footer.jsp" %>

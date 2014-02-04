@@ -37,7 +37,8 @@ public class ServiceDBAccess {
 			String imsi,
 			String meterType,
 			String meterSerial,
-			String chargeBoxIdentity) {
+			String chargeBoxIdentity,
+			Timestamp now) {
 		
 		boolean isRegistered = false;
 		
@@ -56,7 +57,7 @@ public class ServiceDBAccess {
 			// 2. If the chargebox not registered => no chargeboxes to update => updated/returned row count = 0
 			pt = connect.prepareStatement("UPDATE chargebox SET endpoint_address=?, ocppVersion=?, chargePointVendor=?, chargePointModel=?,"
 					+ "chargePointSerialNumber=?, chargeBoxSerialNumber=?, fwVersion=?, "
-					+ "iccid=?, imsi=?, meterType=?, meterSerialNumber=? WHERE chargeBoxId = ?");
+					+ "iccid=?, imsi=?, meterType=?, meterSerialNumber=?, lastHeartbeatTimestamp=? WHERE chargeBoxId = ?");
 
 			// Set the parameter indices
 			pt.setString(1, endpoint_address);
@@ -70,7 +71,8 @@ public class ServiceDBAccess {
 			pt.setString(9, imsi);
 			pt.setString(10, meterType);
 			pt.setString(11, meterSerial);
-			pt.setString(12, chargeBoxIdentity);
+			pt.setTimestamp(12, now);
+			pt.setString(13, chargeBoxIdentity);
 
 			// Execute the SQL query
 			int count = pt.executeUpdate();
@@ -147,6 +149,37 @@ public class ServiceDBAccess {
 			pt.setString(1, status);
 			pt.setTimestamp(2, DateTimeUtils.getCurrentDateTimeTS());
 			pt.setString(3, chargeBoxIdentity);
+			// Perform update
+			int count = pt.executeUpdate();
+			// Validate the change
+			if (count == 1) {
+				connect.commit();
+			} else {
+				LOG.error("Transaction is being rolled back.");
+				connect.rollback();
+			}
+			connect.setAutoCommit(true);
+		} catch (SQLException ex) {
+			LOG.error("SQL exception", ex);
+		}  finally {
+			DBUtils.releaseResources(connect, pt, null);
+		}
+	}
+	
+	public static synchronized void updateChargeboxHeartbeat(String chargeBoxIdentity, Timestamp ts) {
+
+		Connection connect = null;
+		PreparedStatement pt = null;
+		try {
+			// Prepare Database Access
+			connect = DBUtils.getConnectionFromPool();
+			connect.setAutoCommit(false);
+			
+			// PreparedStatements can use parameter indices as question marks
+			pt = connect.prepareStatement("UPDATE chargebox SET lastHeartbeatTimestamp = ? WHERE chargeBoxId = ?");
+			// Set the parameter indices
+			pt.setTimestamp(1, ts);
+			pt.setString(2, chargeBoxIdentity);
 			// Perform update
 			int count = pt.executeUpdate();
 			// Validate the change
@@ -507,7 +540,7 @@ public class ServiceDBAccess {
 	 * Returns null if the idTag is not found.
 	 * 
 	 */
-	public static synchronized SQLIdTagData getIdTagColumns(String idTag) {
+	public static SQLIdTagData getIdTagColumns(String idTag) {
 		
 		SQLIdTagData sqlAuthData = null;
 		Connection connect = null;
@@ -544,7 +577,7 @@ public class ServiceDBAccess {
 	 * where a transaction started.
 	 * 
 	 */
-	public static synchronized int getConnectorId (int transactionId){
+	public static int getConnectorId (int transactionId){
 		
 		int connectorId = -1;
 		Connection connect = null;

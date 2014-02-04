@@ -23,10 +23,10 @@
 <form method="POST" action="${servletPath}/DataTransfer">
 <%@ include file="00-cp-multiple.jsp" %>
 <section><span>Parameters</span></section>
-<table>
-<tr><td>Vendor Id (String):</td><td><input type="text" name="vendorId"></td></tr>
-<tr><td>Message Id (String):</td><td><input type="text" name="messageId"></td></tr>
-<tr><td>data (Text):</td><td><input type="text" name="data"></td></tr>
+<table class="userInput">
+<tr><td>Vendor ID (String):</td><td><input type="text" name="vendorId" required></td></tr>
+<tr><td>Message ID (String):</td><td><input type="text" name="messageId" placeholder="optional"></td></tr>
+<tr><td>Data (Text):</td><td><input type="text" name="data" placeholder="optional"></td></tr>
 </table>
 <div class="submit-button"><input type="submit" value="Perform"></div>
 </form>

@@ -5,7 +5,7 @@
 <head>
 	<link rel="icon" href="${pageContext.request.contextPath}/images/favicon.ico" type="image/x-icon" />
 	<link rel="shortcut icon" href="${pageContext.request.contextPath}/images/favicon.ico" type="image/x-icon" />
-	<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/style.css">
+	<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/style.css">
 	<title>SteVe - Steckdosenverwaltung</title>
 </head>
 <body>
@@ -20,9 +20,9 @@
 	<div class="error"><b>Error:</b> Your name or password is incorrect.</div>
 	</c:if>
 	<form method="POST" action="j_security_check">
-	<table>
-		<tr><td>Name:</td><td><input type="text" name="j_username" /></td></tr>
-		<tr><td>Password:</td><td><input type="password" name="j_password" /></td></tr>
+	<table class="userInput">
+		<tr><td>Name:</td><td><input type="text" name="j_username" required /></td></tr>
+		<tr><td>Password:</td><td><input type="password" name="j_password" required /></td></tr>
 		<tr><td></td><td id="add_space"><input type="submit" value="Sign In"></td></tr>
 	</table>
 	</form>

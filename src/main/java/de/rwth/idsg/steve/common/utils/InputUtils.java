@@ -1,5 +1,8 @@
 package de.rwth.idsg.steve.common.utils;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import de.rwth.idsg.steve.html.ExceptionMessage;
 import de.rwth.idsg.steve.html.InputException;
 
@@ -56,14 +59,17 @@ public class InputUtils {
 	}
 	
 	/**
-	 * Converts parameter string to integer. Throws exception, if integer is 0.
+	 * Validates the input string.
+	 * Allowed characters are: Upper or lower case letters, numbers and dot, dash, underscore symbols.
 	 * 
 	 */
-	public static int toNonZeroInt(String str) {
-		int out = toInt(str);
-		if (out == 0) {
-			throw new InputException(ExceptionMessage.INPUT_ZERO);
+	public static void validateIdTag(String str) {
+		String REGEX = "^[a-zA-Z0-9._-]{1,20}$";
+	
+		Matcher matcher = Pattern.compile(REGEX).matcher(str);
+		
+		if ( !matcher.matches() ) {
+			throw new InputException(ExceptionMessage.INVALID_IDTAG);
 		}
-		return out;
 	}
 }

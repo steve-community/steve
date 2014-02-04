@@ -60,29 +60,40 @@ public class ServletUsers extends HttpServlet {
 		String idTag = request.getParameter("idTag");
 		String parentIdTagSTR = request.getParameter("parentIdTag");
 		String expiryDateSTR = request.getParameter("expiryDate");
+		String expiryTimeSTR = request.getParameter("expiryTime");
+		
 		InputUtils.checkNullOrEmpty(idTag);
+		InputUtils.validateIdTag(idTag);
 					
 		Timestamp expiryTimestamp = null;
 		if ( !InputUtils.isNullOrEmpty(expiryDateSTR) ) {
-			expiryTimestamp = DateTimeUtils.convertToTimestamp(expiryDateSTR);
+			
+			if (InputUtils.isNullOrEmpty(expiryTimeSTR)) expiryTimeSTR = "00:00";
+			String dateTime = expiryDateSTR + " " + expiryTimeSTR;
+			expiryTimestamp = DateTimeUtils.convertToTimestamp(dateTime);
 		}
 		
 		String parentIdTag = null;
 		if ( !InputUtils.isNullOrEmpty(parentIdTagSTR) ) {
 			parentIdTag = parentIdTagSTR;
-		}			
+		}
+		
 		ClientDBAccess.addUser(idTag, parentIdTag, expiryTimestamp);		
 	}	
 
 	private void processUpdateUser(HttpServletRequest request) {
 		String idTag = request.getParameter("idTag");
-		String parentIdTagSTR = request.getParameter("parentIdTag");
+		String parentIdTagSTR = request.getParameter("parentIdTag");		
 		String expiryDateSTR = request.getParameter("expiryDate");
+		String expiryTimeSTR = request.getParameter("expiryTime");		
 		String blockUserSTR = request.getParameter("blockUser");
 		
 		Timestamp expiryTimestamp = null;
 		if ( !InputUtils.isNullOrEmpty(expiryDateSTR) ) {
-			expiryTimestamp = DateTimeUtils.convertToTimestamp(expiryDateSTR);
+			
+			if (InputUtils.isNullOrEmpty(expiryTimeSTR)) expiryTimeSTR = "00:00";
+			String dateTime = expiryDateSTR + " " + expiryTimeSTR;
+			expiryTimestamp = DateTimeUtils.convertToTimestamp(dateTime);
 		}
 		
 		String parentIdTag = null;

@@ -1,25 +1,11 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ include file="/WEB-INF/jsp/00-header.jsp" %>
 <script type="text/javascript">
-$(document).ready(function() {                       
-    $("#gdb").click(function() {
-		var ddiv = $("#details-div");
-		ddiv.html("<br>Loading...");		
-    	$.getJSON("${servletPath}/getDetails?chargeBoxId=" + $("#cbi").val(), function(data) {
-    		ddiv.html("<table id='details' class='cpd'><thead><tr><th>Charge Point Details</th><th></th></tr></thead></table>");
-    		var table = $("#details");
-            $.each(data, function(key, val) {
-	            $("<tr>").appendTo(table)
-		            .append($("<td>").text(key))
-		            .append($("<td>").text(val));
-            });
-    	});
-    });
-});
+<%@ include file="/WEB-INF/jsp/00-js-snippets/getCPDetails.js" %>
 </script>
 <section><span>Registered Charge Points</span></section>
 <center>
-	chargeBoxId:
+	ChargeBox ID:
 	<select id="cbi">
 	<%-- Start --%>
 	<c:forEach items="${cpList}" var="cp">
@@ -41,10 +27,10 @@ $(document).ready(function() {
 </div>
 <div class="right-content">
 	<div id="add">
-		<div class="info"><b>Info:</b> chargeBoxId is sufficient enough to register a charge point. After every reset of a charge point the remaining fields are updated.</div>
+		<div class="info"><b>Info:</b> ChargeBox ID is sufficient enough to register a charge point. After every reset of a charge point the remaining fields are updated.</div>
 		<form method="POST" action="${servletPath}/add">
-			<table>
-				<tr><td>chargeBoxId (string):</td><td><input type="text" name="chargeBoxId"></td></tr>
+			<table class="userInput">
+				<tr><td>ChargeBox ID (string):</td><td><input type="text" name="chargeBoxId" required></td></tr>
 				<tr><td></td><td id="add_space"><input type="submit" value="Add"></td></tr>
 			</table>
 		</form>
@@ -52,9 +38,10 @@ $(document).ready(function() {
 	<div id="delete">
 		<div class="warning"><b>Warning:</b> Deleting a charge point causes losing all related information including transactions, reservations, connector status and connector meter values.</div>
 		<form method="POST" action="${servletPath}/delete">
-			<table>
-				<tr><td>chargeBoxId:</td><td>
-					<select name="chargeBoxId">
+			<table class="userInput">
+				<tr><td>ChargeBox ID:</td><td>
+					<select name="chargeBoxId" required>
+					<option selected="selected" disabled="disabled" style="display:none;">Choose...</option>
 					<%-- Start --%>
 					<c:forEach items="${cpList}" var="cp">
 					<option value="${cp}">${cp}</option>

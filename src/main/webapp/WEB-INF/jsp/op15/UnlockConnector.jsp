@@ -1,4 +1,9 @@
 <%@ include file="/WEB-INF/jsp/00-header.jsp" %>
+<script type="text/javascript">
+$(document).ready(function() {
+<%@ include file="/WEB-INF/jsp/00-js-snippets/getConnectorIds.js" %>
+});
+</script>
 <div class="left-menu">
 <ul>
 	<li><a href="${servletPath}/ChangeAvailability">Change Availability</a></li>
@@ -23,8 +28,10 @@
 <form method="POST" action="${servletPath}/UnlockConnector">
 <%@ include file="00-cp-single.jsp" %>
 <section><span>Parameters</span></section>
-<table>
-<tr><td>Connector Id (integer, not 0):</td><td><input type="number" min="1" name="connectorId"></td></tr>
+<table class="userInput">
+<tr><td>Connector ID:</td>
+	<td><select name="connectorId" id="connectorId" required disabled></select></td>
+</tr>
 </table>
 <div class="submit-button"><input type="submit" value="Perform"></div>
 </form>

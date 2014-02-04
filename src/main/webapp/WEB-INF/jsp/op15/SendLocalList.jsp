@@ -23,10 +23,10 @@
 <form method="POST" action="${servletPath}/SendLocalList">
 <%@ include file="00-cp-multiple.jsp" %>
 <section><span>Parameters</span></section>
-<table class="sll">
-<tr><td>hash (String):</td><td><i>Optional, omitted for now</i></td></tr>
-<tr><td>listVersion (integer):</td><td><input type="number" name="listVersion"></td></tr>
-<tr><td>Update Type:</td><td><input type="radio" name="updateType" value="Full" onclick="removeElements()" checked> Full</td></tr>
+<table class="userInput sll">
+<tr><td>Hash (String):</td><td><i>Optional, omitted for now</i></td></tr>
+<tr><td>List Version (integer):</td><td><input type="number" name="listVersion" required></td></tr>
+<tr><td>Update Type:</td><td><input type="radio" name="updateType" value="Full" onclick="removeElements()" required> Full</td></tr>
 <tr><td></td><td><input type="radio" name="updateType" value="Differential" onclick="showElements()"> Differential</td></tr>
 <tr><td></td><td id="diffElements"></td></tr>
 </table>

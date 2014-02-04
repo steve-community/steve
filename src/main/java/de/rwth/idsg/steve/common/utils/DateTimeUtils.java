@@ -83,6 +83,14 @@ public class DateTimeUtils {
 		Timestamp ts = new Timestamp(dt.getMillis());
 		return ts;
 	}
+	
+	/**
+	 * Converts a DateTime to XMLGregorianCalendar.
+	 */
+	public static XMLGregorianCalendar convertToXMLGregCal(DateTime dt){
+		String st = noMilliFormatter.print(dt);
+		return factory.newXMLGregorianCalendar(st);
+	}
 
 	/**
 	 * Converts a String to XMLGregorianCalendar.
@@ -107,13 +115,59 @@ public class DateTimeUtils {
 	}
 	
 	/**
-	 * Converts a Timestamp to a String of the pattern "yyyy-MM-dd HH:mm".
+	 * Converts a Timestamp to a String of the pattern "yyyy-MM-dd 'at' HH:mm".
 	 */
 	public static String convertToString(Timestamp ts){
 		if (ts == null) return "";
 		
 		long timeLong = ts.getTime();
-		String st = inputFormatter.print(timeLong);
+		String st = DateTimeFormat.forPattern("yyyy-MM-dd 'at' HH:mm").print(timeLong);
 		return st;
+	}
+	
+	/**
+	 * Print the date/time nicer, if it's from today or yesterday.
+	 */
+	public static String humanize(Timestamp ts){		
+		DateTime input = new DateTime(ts);
+		DateTime now = new DateTime();
+				
+		String result;
+		
+		if (input.isBefore(now)) {
+			
+			// Equalize time fields before comparing date fields
+			DateTime inputAtMidnight = input.withTimeAtStartOfDay();
+			DateTime todayAtMidnight = now.withTimeAtStartOfDay();
+			
+			// Is it today?
+			if (inputAtMidnight.equals(todayAtMidnight)) {
+				result = "Today at " + DateTimeFormat.forPattern("HH:mm").print(input);
+				
+//				PeriodFormatter pf = new PeriodFormatterBuilder()
+//						.printZeroNever()
+//						.appendHours().appendSuffix(" hour ", " hours ")
+//						.appendMinutes().appendSuffix(" minute ", " minutes ")
+//						.toFormatter();
+//				
+//				String elapsed = pf.print(new Period(input, now));			
+//				if (elapsed.length() == 0) elapsed = "Less than a minute ";			
+//				result.append(elapsed).append(" ago");				
+			
+			// Is it yesterday?
+			} else if (inputAtMidnight.equals(todayAtMidnight.minusDays(1))) {				
+				result = "Yesterday at " + DateTimeFormat.forPattern("HH:mm").print(input);
+				
+			// So long ago...
+			} else {
+				result = convertToString(ts);
+			}
+		
+		// It is in the future
+		} else {
+			result = convertToString(ts);
+		}
+		
+		return result;
 	}
 }

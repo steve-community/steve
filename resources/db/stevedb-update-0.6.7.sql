@@ -1,6 +1,6 @@
 ALTER TABLE `stevedb`.`dbVersion` CHANGE COLUMN `upateTimestamp` `updateTimestamp` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP  ;
 
-INSERT INTO `stevedb`.`dbVersion` (`version`) VALUES ('0.6.7') ON DUPLICATE KEY UPDATE `version` = '0.6.7';
+UPDATE `stevedb`.`dbVersion` SET `version` = '0.6.7';
 
 ALTER TABLE `stevedb`.`chargebox` ADD COLUMN `lastHeartbeatTimestamp` TIMESTAMP NULL DEFAULT NULL  AFTER `diagnosticsTimestamp` ;
 

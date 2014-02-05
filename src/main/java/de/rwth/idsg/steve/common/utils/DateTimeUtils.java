@@ -126,44 +126,43 @@ public class DateTimeUtils {
 	}
 	
 	/**
-	 * Print the date/time nicer, if it's from today or yesterday.
+	 * Print the date/time nicer, if it's from today, yesterday or tomorrow.
 	 */
-	public static String humanize(Timestamp ts){		
+	public static String humanize(Timestamp ts){
+		if (ts == null) return "";
+		
 		DateTime input = new DateTime(ts);
 		DateTime now = new DateTime();
 				
 		String result;
 		
-		if (input.isBefore(now)) {
-			
-			// Equalize time fields before comparing date fields
-			DateTime inputAtMidnight = input.withTimeAtStartOfDay();
-			DateTime todayAtMidnight = now.withTimeAtStartOfDay();
-			
-			// Is it today?
-			if (inputAtMidnight.equals(todayAtMidnight)) {
-				result = "Today at " + DateTimeFormat.forPattern("HH:mm").print(input);
-				
-//				PeriodFormatter pf = new PeriodFormatterBuilder()
-//						.printZeroNever()
-//						.appendHours().appendSuffix(" hour ", " hours ")
-//						.appendMinutes().appendSuffix(" minute ", " minutes ")
-//						.toFormatter();
-//				
-//				String elapsed = pf.print(new Period(input, now));			
-//				if (elapsed.length() == 0) elapsed = "Less than a minute ";			
-//				result.append(elapsed).append(" ago");				
-			
-			// Is it yesterday?
-			} else if (inputAtMidnight.equals(todayAtMidnight.minusDays(1))) {				
-				result = "Yesterday at " + DateTimeFormat.forPattern("HH:mm").print(input);
-				
-			// So long ago...
-			} else {
-				result = convertToString(ts);
-			}
+		// Equalize time fields before comparing date fields
+		DateTime inputAtMidnight = input.withTimeAtStartOfDay();
+		DateTime todayAtMidnight = now.withTimeAtStartOfDay();
 		
-		// It is in the future
+		// Is it today?
+		if (inputAtMidnight.equals(todayAtMidnight)) {
+			result = "Today at " + DateTimeFormat.forPattern("HH:mm").print(input);
+			
+//			PeriodFormatter pf = new PeriodFormatterBuilder()
+//					.printZeroNever()
+//					.appendHours().appendSuffix(" hour ", " hours ")
+//					.appendMinutes().appendSuffix(" minute ", " minutes ")
+//					.toFormatter();
+//			
+//			String elapsed = pf.print(new Period(input, now));			
+//			if (elapsed.length() == 0) elapsed = "Less than a minute ";			
+//			result.append(elapsed).append(" ago");				
+		
+		// Is it yesterday?
+		} else if (inputAtMidnight.equals(todayAtMidnight.minusDays(1))) {				
+			result = "Yesterday at " + DateTimeFormat.forPattern("HH:mm").print(input);
+			
+		// Is it tomorrow?
+		} else if (inputAtMidnight.equals(todayAtMidnight.plusDays(1))) {				
+			result = "Tomorrow at " + DateTimeFormat.forPattern("HH:mm").print(input);
+			
+		// So long ago OR in the future...
 		} else {
 			result = convertToString(ts);
 		}

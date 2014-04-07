@@ -34,3 +34,8 @@ Screenshots
 Change log
 -----
 See the [CHANGELOG](CHANGELOG.md)
+
+To-Do List
+-----
+1. Hubject integration
+2. User-friendly error displaying: Rendering error messages on request page rather than as plain text

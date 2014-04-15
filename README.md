@@ -37,5 +37,6 @@ See the [CHANGELOG](CHANGELOG.md)
 
 To-Do List
 -----
-1. Hubject integration
+1. Hubject/OICP integration
 2. User-friendly error displaying: Rendering error messages on request page rather than as plain text
+3. Pagination for data tables

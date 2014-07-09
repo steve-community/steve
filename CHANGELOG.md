@@ -1,3 +1,7 @@
+## 1.0.1
+ - Fix: Start and stop date/time values for Get Diagnostics must be in the past. Frontend allows to do that now.
+ - New: Backend validates input date/time variables for Get Diagnostics.
+
 ## 1.0.0
  - DB updated to 0.6.7.
  - Home page displays various statistics now (See the screenshot). Data is returned by a stored procedure in DB.

@@ -1,57 +1,18 @@
 package de.rwth.idsg.steve;
-	
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
-import ocpp.cp._2012._06.AuthorisationData;
-import ocpp.cp._2012._06.AvailabilityType;
-import ocpp.cp._2012._06.CancelReservationRequest;
-import ocpp.cp._2012._06.CancelReservationResponse;
-import ocpp.cp._2012._06.CancelReservationStatus;
-import ocpp.cp._2012._06.ChangeAvailabilityRequest;
-import ocpp.cp._2012._06.ChangeAvailabilityResponse;
-import ocpp.cp._2012._06.ChangeConfigurationRequest;
-import ocpp.cp._2012._06.ChangeConfigurationResponse;
-import ocpp.cp._2012._06.ChargePointService;
-import ocpp.cp._2012._06.ClearCacheRequest;
-import ocpp.cp._2012._06.ClearCacheResponse;
-import ocpp.cp._2012._06.DataTransferRequest;
-import ocpp.cp._2012._06.DataTransferResponse;
-import ocpp.cp._2012._06.GetConfigurationRequest;
-import ocpp.cp._2012._06.GetConfigurationResponse;
-import ocpp.cp._2012._06.GetDiagnosticsRequest;
-import ocpp.cp._2012._06.GetDiagnosticsResponse;
-import ocpp.cp._2012._06.GetLocalListVersionRequest;
-import ocpp.cp._2012._06.GetLocalListVersionResponse;
-import ocpp.cp._2012._06.KeyValue;
-import ocpp.cp._2012._06.RemoteStartTransactionRequest;
-import ocpp.cp._2012._06.RemoteStartTransactionResponse;
-import ocpp.cp._2012._06.RemoteStopTransactionRequest;
-import ocpp.cp._2012._06.RemoteStopTransactionResponse;
-import ocpp.cp._2012._06.ReservationStatus;
-import ocpp.cp._2012._06.ReserveNowRequest;
-import ocpp.cp._2012._06.ReserveNowResponse;
-import ocpp.cp._2012._06.ResetRequest;
-import ocpp.cp._2012._06.ResetResponse;
-import ocpp.cp._2012._06.ResetType;
-import ocpp.cp._2012._06.SendLocalListRequest;
-import ocpp.cp._2012._06.SendLocalListResponse;
-import ocpp.cp._2012._06.UnlockConnectorRequest;
-import ocpp.cp._2012._06.UnlockConnectorResponse;
-import ocpp.cp._2012._06.UpdateFirmwareRequest;
-import ocpp.cp._2012._06.UpdateFirmwareResponse;
-import ocpp.cp._2012._06.UpdateStatus;
-import ocpp.cp._2012._06.UpdateType;
-
+import de.rwth.idsg.steve.common.ClientDBAccess;
+import de.rwth.idsg.steve.common.utils.DateTimeUtils;
+import de.rwth.idsg.steve.common.utils.InputUtils;
+import de.rwth.idsg.steve.html.InputException;
+import ocpp.cp._2012._06.*;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import de.rwth.idsg.steve.common.ClientDBAccess;
-import de.rwth.idsg.steve.common.utils.DateTimeUtils;
-import de.rwth.idsg.steve.common.utils.InputUtils;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * Client implementation of OCPP V1.5.
@@ -98,8 +59,39 @@ public class ChargePointService15_Client {
 		req.setLocation(location);
 		if (retries != -1) req.setRetries(retries);
 		if (retryInterval != -1) req.setRetryInterval(retryInterval);
-		if (startTime != null) req.setStartTime( DateTimeUtils.convertToXMLGregCal(startTime) );
-		if (stopTime != null) req.setStopTime( DateTimeUtils.convertToXMLGregCal(stopTime) );		
+
+        //// Act according to four boolean combinations of the two variables ////
+
+        if (startTime == null && stopTime == null) {
+            // Do not set the fields
+
+        } else if (startTime == null && stopTime != null) {
+            DateTime stop = DateTimeUtils.convertToDateTime(stopTime);
+            if (stop.isBeforeNow()) {
+                req.setStopTime(DateTimeUtils.convertToXMLGregCal(stop));
+            } else {
+                throw new InputException("Stop date/time must be in the past.");
+            }
+
+        } else if (startTime != null && stopTime == null) {
+            DateTime start = DateTimeUtils.convertToDateTime(startTime);
+            if (start.isBeforeNow()) {
+                req.setStartTime( DateTimeUtils.convertToXMLGregCal(start) );
+            } else {
+                throw new InputException("Start date/time must be in the past.");
+            }
+
+        } else {
+            DateTime start = DateTimeUtils.convertToDateTime(startTime);
+            DateTime stop = DateTimeUtils.convertToDateTime(stopTime);
+            if (stop.isBeforeNow() && start.isBefore(stop)) {
+                req.setStartTime( DateTimeUtils.convertToXMLGregCal(start) );
+                req.setStopTime( DateTimeUtils.convertToXMLGregCal(stop) );
+            } else {
+                throw new InputException("Start date/time must be before the stop date/time, and both must be in the past.");
+            }
+        }
+
 		return req;
 	} 
 

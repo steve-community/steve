@@ -1,7 +1,7 @@
 <%@ include file="/WEB-INF/jsp/00-header.jsp" %>
 <script type="text/javascript">
 $(document).ready(function() {
-<%@ include file="/WEB-INF/jsp/00-js-snippets/datepicker.js" %>
+<%@ include file="/WEB-INF/jsp/00-js-snippets/datepicker-future.js" %>
 <%@ include file="/WEB-INF/jsp/00-js-snippets/getConnectorIdsZeroAllowed.js" %>
 });
 </script>

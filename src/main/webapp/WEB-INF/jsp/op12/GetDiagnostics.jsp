@@ -1,7 +1,7 @@
 <%@ include file="/WEB-INF/jsp/00-header.jsp" %>
 <script type="text/javascript">
 $(document).ready(function() {
-<%@ include file="/WEB-INF/jsp/00-js-snippets/datepicker.js" %>
+<%@ include file="/WEB-INF/jsp/00-js-snippets/datepicker-past.js" %>
 });
 </script>
 <div class="left-menu">
@@ -27,13 +27,13 @@ $(document).ready(function() {
 	<tr><td>Retry Interval (integer):</td><td><input type="number" min="0" name="retryInterval" placeholder="optional"></td></tr>
 	<tr><td>Start Date/Time (ex: 2011-12-21 at 11:30):</td>
 		<td>
-			<input type="text" name="startDate" class="datepicker" placeholder="optional"> at 
+			<input type="text" name="startDate" id="startDate" class="datepicker" placeholder="optional"> at
 			<input type="text" name="startTime" class="timepicker" placeholder="optional">
 		</td>
 	</tr>
 	<tr><td>Stop Date/Time (ex: 2011-12-21 at 11:30):</td>
 		<td>
-			<input type="text" name="stopDate" class="datepicker" placeholder="optional"> at 
+			<input type="text" name="stopDate" id="stopDate" class="datepicker" placeholder="optional"> at
 			<input type="text" name="stopTime" class="timepicker" placeholder="optional">
 		</td>
 	</tr>

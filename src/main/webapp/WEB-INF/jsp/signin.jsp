@@ -3,14 +3,14 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<link rel="icon" href="${pageContext.request.contextPath}/images/favicon.ico" type="image/x-icon" />
-	<link rel="shortcut icon" href="${pageContext.request.contextPath}/images/favicon.ico" type="image/x-icon" />
-	<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/style.css">
+	<link rel="icon" href="${pageContext.request.contextPath}/resources/images/favicon.ico" type="image/x-icon" />
+	<link rel="shortcut icon" href="${pageContext.request.contextPath}/resources/images/favicon.ico" type="image/x-icon" />
+	<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/resources/css/style.css">
 	<title>SteVe - Steckdosenverwaltung</title>
 </head>
 <body>
 <div class="main">
-<div class="top-banner"><div class="container"><a href="${pageContext.request.contextPath}"><img src="${pageContext.request.contextPath}/images/logo2.png" height="80"></a></div></div>
+<div class="top-banner"><div class="container"><a href="${pageContext.request.contextPath}"><img src="${pageContext.request.contextPath}/resources/images/logo2.png" height="80"></a></div></div>
 <div class="top-menu"></div>
 <div class="main-wrapper">
 <div class="content">
@@ -30,8 +30,8 @@
 </div>
 </div>
 <div class="footer">
-	<a href="http://www.rwth-aachen.de"><img src="${pageContext.request.contextPath}/images/logo_rwth.png"></a>
-	<a href="http://dbis.rwth-aachen.de"><img src="${pageContext.request.contextPath}/images/logo_i5.png"></a>
+	<a href="http://www.rwth-aachen.de"><img src="${pageContext.request.contextPath}/resources/images/logo_rwth.png"></a>
+	<a href="http://dbis.rwth-aachen.de"><img src="${pageContext.request.contextPath}/resources/images/logo_i5.png"></a>
 </div>
 </body>
 </html>

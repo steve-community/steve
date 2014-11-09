@@ -2,7 +2,7 @@
 <%@ include file="/WEB-INF/jsp/00-header.jsp" %>
 <div>
 <section><span>
-Connector Status <a class="tooltip" href="#"><img src="${contextPath}/images/info.png" style="vertical-align:middle"><span>Last status information and corresponding date/time of connectors received from charging stations.</span></a>
+Connector Status <a class="tooltip" href="#"><img src="../resources/images/info.png" style="vertical-align:middle"><span>Last status information and corresponding date/time of connectors received from charging stations.</span></a>
 </span></section>
 <table class="res" id="connectorStatusTable">
 	<thead><tr><th>ChargeBox ID</th><th>Connector ID</th><th>Date/Time</th><th>Status</th><th>Error Code</th></tr></thead>

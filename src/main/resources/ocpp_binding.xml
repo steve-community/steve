@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<jaxb:bindings jaxb:version="2.1"
+               xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
+               xmlns:xs="http://www.w3.org/2001/XMLSchema"
+               xmlns:xjc="http://java.sun.com/xml/ns/jaxb/xjc"
+               jaxb:extensionBindingPrefixes="xjc">
+
+    <jaxb:globalBindings generateIsSetMethod="true">
+
+        <xjc:javaType name="org.joda.time.DateTime" xmlType="xs:dateTime"
+                      adapter="de.rwth.idsg.steve.utils.JodaDateTimeConverter" />
+
+    </jaxb:globalBindings>
+
+</jaxb:bindings>

@@ -1,4 +1,8 @@
-![SteVe](src/main/webapp/images/logo.png)
+## Disclaimer: This branch is for migrating to latest versions of dependencies plus Jooq, Spring MVC and Hibernate Validator. The aim is to refactor in order to improve the overall design. Everything is experimental, unfinished, subject to change and break. Don't use it. When done, it will be merged with the master branch. So... Really, don't use it.
+
+---
+
+![SteVe](src/main/webapp/resources/images/logo.png)
 =====
 
 SteVe was developed at the RWTH Aachen University and means Steckdosenverwaltung, namely socket administration in German. The aim of SteVe is to support the deployment and popularity of electric mobility, so it is easy to install and to use. SteVe provides basic functions for the administration of charge points, user data, and RFID cards for user authentication. It supports Open Charge Point Protocol (OCPP) 1.5 and 1.2 and was tested successfully in operation.

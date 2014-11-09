@@ -2,7 +2,7 @@
 <%@ include file="/WEB-INF/jsp/00-header.jsp" %>
 <section><span>
 Transactions 
-<a class="tooltip" href="#"><img src="${contextPath}/images/info.png" style="vertical-align:middle">
+<a class="tooltip" href="#"><img src="../resources/images/info.png" style="vertical-align:middle">
 <span>If stop date/time and value are empty, this means that a transaction is still active 
 (i.e. it has started but not stopped yet or the charging station did not inform SteVe about the stopped transaction yet).<br>
 Value column is the meter difference between the start and stop of a transaction, and therefore represents the charged value.</span>
@@ -13,7 +13,7 @@ Value column is the meter difference between the start and stop of a transaction
 	<tbody>
 	<%-- Start --%>
 	<c:forEach items="${transList}" var="ta">
-	<tr><td>${ta.transaction_pk}</td><td>${ta.chargeBoxId}</td><td>${ta.connectorId}</td><td>${ta.idTag}</td><td>${ta.startTimestamp}</td><td>${ta.stopTimestamp}</td><td>${ta.chargedMeterValue}</td></tr>
+	<tr><td>${ta.id}</td><td>${ta.chargeBoxId}</td><td>${ta.connectorId}</td><td>${ta.idTag}</td><td>${ta.startTimestamp}</td><td>${ta.stopTimestamp}</td><td>${ta.chargedMeterValue}</td></tr>
 	</c:forEach>
 	<%-- End --%>
 	</tbody>

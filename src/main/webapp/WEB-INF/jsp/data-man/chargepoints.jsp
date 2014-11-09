@@ -28,7 +28,7 @@
 <div class="right-content">
 	<div id="add">
 		<div class="info"><b>Info:</b> ChargeBox ID is sufficient enough to register a charge point. After every reset of a charge point the remaining fields are updated.</div>
-		<form method="POST" action="${servletPath}/add">
+        <form method="POST" action="/steve/manager/chargepoints/add">
 			<table class="userInput">
 				<tr><td>ChargeBox ID (string):</td><td><input type="text" name="chargeBoxId" required></td></tr>
 				<tr><td></td><td id="add_space"><input type="submit" value="Add"></td></tr>
@@ -37,7 +37,7 @@
 	</div>
 	<div id="delete">
 		<div class="warning"><b>Warning:</b> Deleting a charge point causes losing all related information including transactions, reservations, connector status and connector meter values.</div>
-		<form method="POST" action="${servletPath}/delete">
+        <form method="POST" action="/steve/manager/chargepoints/delete">
 			<table class="userInput">
 				<tr><td>ChargeBox ID:</td><td>
 					<select name="chargeBoxId" required>

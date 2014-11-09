@@ -1,89 +1,218 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>idsg</groupId>
+	<groupId>de.rwth.idsg</groupId>
 	<artifactId>steve</artifactId>
-	<version>1.0.1</version>
+	<version>1.0.2</version>
 	<packaging>war</packaging>
+
+	<properties>
+		<java.version>1.7</java.version>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<jooq.version>3.4.2</jooq.version>
+		<cxf.version>3.0.2</cxf.version>
+		<spring.version>4.1.1.RELEASE</spring.version>
+		<mysql.jdbc.version>5.1.33</mysql.jdbc.version>
+	</properties>
+
 	<build>
 		<plugins>
 			<plugin>
 				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.1</version>
+				<version>3.2</version>
 				<configuration>
-					<source>1.7</source>
-					<target>1.7</target>
+					<source>${java.version}</source>
+					<target>${java.version}</target>
 				</configuration>
 			</plugin>
 			<plugin>
 				<artifactId>maven-war-plugin</artifactId>
-				<version>2.4</version>
+				<version>2.5</version>
 				<configuration>
 					<warName>${project.artifactId}</warName>
 					<warSourceDirectory>${basedir}/src/main/webapp</warSourceDirectory>
 					<failOnMissingWebXml>false</failOnMissingWebXml>
 				</configuration>
-			</plugin>			
-<!-- 			<plugin> -->
-<!-- 				<groupId>org.apache.cxf</groupId> -->
-<!-- 				<artifactId>cxf-codegen-plugin</artifactId> -->
-<!-- 				<version>${cxf.version}</version> -->
-<!-- 				<dependencies> -->
-<!--                   <dependency> -->
-<!--                     <groupId>org.apache.cxf</groupId> -->
-<!--                     <artifactId>cxf-rt-bindings-soap</artifactId> -->
-<!--                     <version>${cxf.version}</version> -->
-<!--                   </dependency> -->
-<!--                 </dependencies> -->
-<!-- 				<executions> -->
-<!-- 					<execution> -->
-<!-- 						<id>generate-sources</id> -->
-<!-- 						<phase>generate-sources</phase> -->
-<!-- 						<configuration> -->
-<!-- 							<sourceRoot>${basedir}/src/main/java</sourceRoot> -->
-<!-- 							<wsdlOptions> -->
-<!-- 								<wsdlOption> -->
-<!-- 									<wsdl>${basedir}/src/main/webapp/SensorChangeService.wsdl</wsdl> -->
-<!-- 										<extraargs> -->
-<!--                     					<extraarg>-impl</extraarg> -->
-<!--                     					<extraarg>-client</extraarg> -->
-<!--                    						<extraarg>-verbose</extraarg> -->
-<!--                    						<extraarg>-exsh</extraarg> -->
-<!--                    						<extraarg>true</extraarg> -->
-<!--                 						</extraargs> -->
-<!-- 								</wsdlOption> -->
-<!-- 							</wsdlOptions> -->
-<!-- 						</configuration> -->
-<!-- 						<goals> -->
-<!-- 							<goal>wsdl2java</goal> -->
-<!-- 						</goals> -->
-<!-- 					</execution> -->
-<!-- 				</executions> -->
-<!-- 			</plugin> -->
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.cxf</groupId>
+				<artifactId>cxf-codegen-plugin</artifactId>
+				<version>${cxf.version}</version>
+				<configuration>
+					<sourceRoot>${project.build.directory}/generated-sources</sourceRoot>
+					<defaultOptions>
+						<bindingFiles>
+							<bindingFile>${basedir}/src/main/resources/ocpp_binding.xml</bindingFile>
+						</bindingFiles>
+						<extraargs>
+							<extraarg>-exsh</extraarg>
+							<extraarg>true</extraarg>
+						</extraargs>
+					</defaultOptions>
+				</configuration>
+				<executions>
+					<execution>
+						<id>generate-sources</id>
+						<phase>generate-sources</phase>
+						<configuration>
+							<wsdlOptions>
+								<wsdlOption><wsdl>${basedir}/src/main/webapp/WEB-INF/wsdl/centralsystemservice_0.wsdl</wsdl></wsdlOption>
+								<wsdlOption><wsdl>${basedir}/src/main/webapp/WEB-INF/wsdl/chargepointservice.wsdl</wsdl></wsdlOption>
+								<wsdlOption><wsdl>${basedir}/src/main/webapp/WEB-INF/wsdl/ocpp_centralsystemservice_1.5_final.wsdl</wsdl></wsdlOption>
+								<wsdlOption><wsdl>${basedir}/src/main/webapp/WEB-INF/wsdl/ocpp_chargepointservice_1.5_final.wsdl</wsdl></wsdlOption>
+							</wsdlOptions>
+						</configuration>
+						<goals>
+							<goal>wsdl2java</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+
+			<plugin>
+				<!-- Specify the maven code generator plugin -->
+				<groupId>org.jooq</groupId>
+				<artifactId>jooq-codegen-maven</artifactId>
+				<version>${jooq.version}</version>
+
+				<!-- The plugin should hook into the generate goal -->
+				<executions>
+					<execution>
+						<goals>
+							<goal>generate</goal>
+						</goals>
+					</execution>
+				</executions>
+
+				<!-- Manage the plugin's dependency. In this example, we'll use a PostgreSQL database -->
+				<dependencies>
+					<dependency>
+						<groupId>org.jooq</groupId>
+						<artifactId>jooq-meta</artifactId>
+						<version>${jooq.version}</version>
+					</dependency>
+					<dependency>
+						<groupId>org.jooq</groupId>
+						<artifactId>jooq-codegen</artifactId>
+						<version>${jooq.version}</version>
+					</dependency>
+					<dependency>
+						<groupId>mysql</groupId>
+						<artifactId>mysql-connector-java</artifactId>
+						<version>${mysql.jdbc.version}</version>
+					</dependency>
+				</dependencies>
+
+				<!-- Specify the plugin configuration.
+                     The configuration format is the same as for the standalone code generator -->
+				<configuration>
+					<!-- Configure the database connection here -->
+					<jdbc>
+						<driver>com.mysql.jdbc.Driver</driver>
+						<url>jdbc:mysql://localhost:3306/stevedb</url>
+						<user>root</user>
+						<password>come47on</password>
+					</jdbc>
+
+					<generator>
+						<database>
+							<name>org.jooq.util.mysql.MySQLDatabase</name>
+
+							<!-- All elements that are generated from your schema (A Java regular expression.
+                                 Use the pipe to separate several expressions) Watch out for
+                                 case-sensitivity. Depending on your database, this might be
+                                 important! You can create case-insensitive regular expressions
+                                 using this syntax: (?i:expr) -->
+							<includes>.*</includes>
+
+							<!-- All elements that are excluded from your schema (A Java regular expression.
+                                 Use the pipe to separate several expressions). Excludes match before
+                                 includes -->
+							<excludes></excludes>
+
+							<!-- The schema that is used locally as a source for meta information.
+                                 This could be your development schema or the production schema, etc
+                                 This cannot be combined with the schemata element.
+
+                                 If left empty, jOOQ will generate all available schemata. See the
+                                 manual's next section to learn how to generate several schemata -->
+							<inputSchema>stevedb</inputSchema>
+
+							<!-- Generate jOOU data types for your unsigned data types, which are
+                                 not natively supported in Java.
+                                 Defaults to true -->
+							<unsignedTypes>false</unsignedTypes>
+
+							<!-- Associate data type rewrites with database columns -->
+							<forcedTypes>
+								<forcedType>
+									<!-- Specify any data type from org.jooq.impl.SQLDataType -->
+									<name>BOOLEAN</name>
+
+									<!-- https://groups.google.com/forum/#!topic/jooq-user/cpcf_Vk8Vd0 -->
+									<types>(?i:TINYINT(\s*\(\d+\))?(\s*UNSIGNED)?)</types>
+								</forcedType>
+							</forcedTypes>
+						</database>
+
+						<generate>
+							<!-- Generation flags: See advanced configuration properties -->
+						</generate>
+
+						<target>
+							<!-- The destination package of your generated classes (within the
+                                 destination directory) -->
+							<packageName>jooq.steve.db</packageName>
+
+							<!-- The destination directory of your generated classes -->
+							<directory>${project.build.directory}/generated-sources</directory>
+						</target>
+					</generator>
+				</configuration>
+			</plugin>
+
 		</plugins>
 	</build>
 	
-	<properties>
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<cxf.version>2.7.7</cxf.version>
-	</properties>
-	
 	<dependencies>
+
+		<dependency>
+			<groupId>org.jooq</groupId>
+			<artifactId>jooq</artifactId>
+			<version>${jooq.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.projectlombok</groupId>
+			<artifactId>lombok</artifactId>
+			<version>1.14.8</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.google.guava</groupId>
+			<artifactId>guava</artifactId>
+			<version>18.0</version>
+		</dependency>
+		<dependency>
+			<groupId>org.hibernate</groupId>
+			<artifactId>hibernate-validator</artifactId>
+			<version>5.1.3.Final</version>
+		</dependency>
 
 		<dependency>
 			<groupId>com.google.code.gson</groupId>
 			<artifactId>gson</artifactId>
 			<version>2.2.4</version>
-		</dependency>           	
+		</dependency>
 		<dependency>
 			<groupId>org.springframework</groupId>
-			<artifactId>spring-web</artifactId>
-			<version>3.2.4.RELEASE</version>
-		</dependency>        	
+			<artifactId>spring-webmvc</artifactId>
+			<version>${spring.version}</version>
+		</dependency>
 		<dependency>
 			<groupId>joda-time</groupId>
 			<artifactId>joda-time</artifactId>
-			<version>2.3</version>
+			<version>2.5</version>
 		</dependency>
 		<dependency>
 			<groupId>javax.servlet</groupId>
@@ -91,19 +220,14 @@
 			<version>1.2</version>
 			<scope>runtime</scope>
 		</dependency>
-            
-		<!-- Required for logging -->
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-api</artifactId>
-			<version>1.7.5</version>
-		</dependency>
+
+		<!-- Logging -->
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-log4j12</artifactId>
-			<version>1.7.5</version>
+			<version>1.7.7</version>
 		</dependency>
-		
+
 		<!-- CXF -->
 		<dependency>
 			<groupId>org.apache.cxf</groupId>
@@ -114,39 +238,55 @@
 					<artifactId>jaxb-impl</artifactId>
 					<groupId>com.sun.xml.bind</groupId>
 				</exclusion>
+				<exclusion>
+					<groupId>org.slf4j</groupId>
+					<artifactId>slf4j-jdk14</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.slf4j</groupId>
+					<artifactId>jcl-over-slf4j</artifactId>
+				</exclusion>
 			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.cxf</groupId>
 			<artifactId>cxf-rt-transports-http</artifactId>
 			<version>${cxf.version}</version>
+			<exclusions>
+				<exclusion>
+					<artifactId>jaxb-impl</artifactId>
+					<groupId>com.sun.xml.bind</groupId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.slf4j</groupId>
+					<artifactId>slf4j-jdk14</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.slf4j</groupId>
+					<artifactId>jcl-over-slf4j</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
-	
+
 		<!-- Provided by Tomcat -->
 		<dependency>
 			<groupId>javax.servlet</groupId>
-			<artifactId>servlet-api</artifactId>
-			<version>2.5</version>
+			<artifactId>javax.servlet-api</artifactId>
+			<version>3.1.0</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
-            <groupId>javax</groupId>
-            <artifactId>javaee-web-api</artifactId>
-            <version>7.0</version>
-            <scope>provided</scope>
-        </dependency>
-		<dependency>
 			<groupId>org.apache.tomcat</groupId>
 			<artifactId>tomcat-jdbc</artifactId>
-			<version>7.0.35</version>
+			<version>8.0.14</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>mysql</groupId>
 			<artifactId>mysql-connector-java</artifactId>
-			<version>5.1.26</version>
+			<version>${mysql.jdbc.version}</version>
 			<scope>provided</scope>
 		</dependency>
 
-</dependencies>
+	</dependencies>
 </project>

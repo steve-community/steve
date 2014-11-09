@@ -1,23 +1,23 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ include file="/WEB-INF/jsp/00-header.jsp" %>
 <div class="tileWrapper">
-	<a class="tileRow1" href="${contextPath}/manager/chargepoints">
+	<a class="tileRow1" href="/steve/manager/chargepoints">
 		Number of<br>Charge Points
 		<span class="base formatNumber">${stats.numChargeBoxes}</span>
 	</a>
-	<a class="tileRow1" href="${contextPath}/manager/users">
+	<a class="tileRow1" href="/steve/manager/users">
 		Number of<br>Users
 		<span class="base formatNumber">${stats.numUsers}</span>
 	</a>
-	<a class="tileRow1" href="${contextPath}/manager/reservations">
+	<a class="tileRow1" href="/steve/manager/reservations">
 		Number of<br>Existing Reservations
-		<span class="base formatNumber">${stats.numReservs}</span>
+		<span class="base formatNumber">${stats.numReservations}</span>
 	</a>
-	<a class="tileRow1" href="${contextPath}/manager/transactions">
+	<a class="tileRow1" href="/steve/manager/transactions">
 		Number of<br>Active Transactions
-		<span class="base formatNumber">${stats.numTranses}</span>
+		<span class="base formatNumber">${stats.numTransactions}</span>
 	</a>
-	<a class="tileRow2" href="${contextPath}/manager/home/heartbeats">
+	<a class="tileRow2" href="/steve/manager/home/heartbeats">
 		Received Heartbeats
 		<span class="baseTable">
 			<span class="baseRow">
@@ -26,32 +26,32 @@
 			</span>
 			<span class="baseRow">
 				<span class="baseCell">Yesterday :</span>
-				<span class="baseCell formatNumber">${stats.heartbeatYester}</span>
+				<span class="baseCell formatNumber">${stats.heartbeatYesterday}</span>
 			</span>
 			<span class="baseRow">
 				<span class="baseCell">Earlier :</span>
-				<span class="baseCell formatNumber">${stats.heartbeatEarl}</span>
+				<span class="baseCell formatNumber">${stats.heartbeatEarlier}</span>
 			</span>
 		</span>
 	</a>
-	<a class="tileRow2" href="${contextPath}/manager/home/connectorStatus">
+	<a class="tileRow2" href="/steve/manager/home/connectorStatus">
 		Connector Status
 		<span class="baseTable">
 			<span class="baseRow">
 				<span class="baseCell">Available :</span>
-				<span class="baseCell formatNumber">${stats.connAvail}</span>
+				<span class="baseCell formatNumber">${stats.connAvailable}</span>
 			</span>
 			<span class="baseRow">
 				<span class="baseCell">Occupied :</span>
-				<span class="baseCell formatNumber">${stats.connOcc}</span>
+				<span class="baseCell formatNumber">${stats.connOccupied}</span>
 			</span>
 			<span class="baseRow">
 				<span class="baseCell">Faulted :</span>
-				<span class="baseCell formatNumber">${stats.connFault}</span>
+				<span class="baseCell formatNumber">${stats.connFaulted}</span>
 			</span>
 			<span class="baseRow">
 				<span class="baseCell">Unavailable :</span>
-				<span class="baseCell formatNumber">${stats.connUnavail}</span>
+				<span class="baseCell formatNumber">${stats.connUnavailable}</span>
 			</span>
 		</span>	
 	</a>

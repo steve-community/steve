@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE log4j:configuration SYSTEM "log4j.dtd">
+<log4j:configuration xmlns:log4j="http://jakarta.apache.org/log4j/">
+
+    <!-- Size based rolling file appender -->
+    <appender name="fileAppender" class="org.apache.log4j.RollingFileAppender">
+        <param name="File" value="${catalina.base}/logs/steve.log"/>
+        <param name="MaxFileSize" value="2MB"/>
+        <param name="MaxBackupIndex" value="10"/>
+        <layout class="org.apache.log4j.PatternLayout">
+            <param name="ConversionPattern" value="[%-5p] %d %c - %m%n"/>
+        </layout>
+    </appender>
+
+    <!-- Console appender -->
+    <appender name="consoleAppender" class="org.apache.log4j.ConsoleAppender">
+        <layout class="org.apache.log4j.PatternLayout">
+            <param name="ConversionPattern" value="[%-5p] %d %c - %m%n"/>
+        </layout>
+    </appender>
+
+    <category name="org.apache.cxf">
+        <level value="INFO" />
+    </category>
+
+    <category name="org.springframework">
+        <level value="DEBUG" />
+    </category>
+
+    <category name="org.springframework.web.servlet">
+        <level value="DEBUG" />
+    </category>
+
+    <!-- Root category -->
+    <root>
+        <priority value="DEBUG"/>
+        <appender-ref ref="consoleAppender"/>
+    </root>
+
+</log4j:configuration>

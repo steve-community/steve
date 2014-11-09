@@ -34,13 +34,13 @@ import java.util.List;
 @Slf4j
 public class MediatorInInterceptor extends AbstractPhaseInterceptor<SoapMessage> {
 
-	public MediatorInInterceptor() {
+    public MediatorInInterceptor() {
         super(Phase.POST_STREAM);
         super.addBefore(StaxInInterceptor.class.getName());
-	}
+    }
 
-	public final void handleMessage(SoapMessage message) {
-		String schemaNamespace = "";
+    public final void handleMessage(SoapMessage message) {
+        String schemaNamespace = "";
         InterceptorChain chain = message.getInterceptorChain();
  
         // Scan the incoming message for its schema namespace
@@ -67,7 +67,7 @@ public class MediatorInInterceptor extends AbstractPhaseInterceptor<SoapMessage>
             bis.reset();
             
         } catch (IOException | XMLStreamException ex) {
-        	log.error("Exception happened", ex);
+            log.error("Exception happened", ex);
         }
 
         // Look up for all available endpoints registered on the bus
@@ -83,11 +83,11 @@ public class MediatorInInterceptor extends AbstractPhaseInterceptor<SoapMessage>
             String address = server.getEndpoint().getEndpointInfo().getAddress();
             if (schemaNamespace.endsWith("2012/06/")) {
                 if (address.endsWith("OCPP15")) {
-                	log.info("Routing the message to CentralSystemServiceOCPP15...");
+                    log.info("Routing the message to CentralSystemServiceOCPP15...");
                     break;
                 }
             } else if (address.endsWith("OCPP12")) {
-            	log.info("Routing the message to CentralSystemServiceOCPP12...");
+                log.info("Routing the message to CentralSystemServiceOCPP12...");
                 break;
             }
         }
@@ -100,5 +100,5 @@ public class MediatorInInterceptor extends AbstractPhaseInterceptor<SoapMessage>
 
         // Now the response has been put in the message, abort the chain
         chain.abort();	
-	}
+    }
 }

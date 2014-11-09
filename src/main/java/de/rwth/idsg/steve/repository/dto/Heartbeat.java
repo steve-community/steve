@@ -11,5 +11,5 @@ import lombok.experimental.Builder;
 @Getter
 @Builder
 public final class Heartbeat {
-	private final String chargeBoxId, lastTimestamp;
+    private final String chargeBoxId, lastTimestamp;
 }

@@ -14,9 +14,9 @@ public final class OcppConstants {
     public static final String V15 = "1.5";
 
     // Heartbeat interval in seconds
-	private static int heartbeatInterval = 14400;
-	// Determines how many hours the idtag should be stored in the local whitelist of a chargebox
-	private static int hoursToExpire = 1;
+    private static int heartbeatInterval = 14400;
+    // Determines how many hours the idtag should be stored in the local whitelist of a chargebox
+    private static int hoursToExpire = 1;
 
     private static final Object HEARTBEAT_LOCK = new Object();
     private static final Object HOURS_LOCK = new Object();

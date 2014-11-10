@@ -16,7 +16,7 @@ import java.sql.Timestamp;
 @Service
 public class ReservationService {
 
-    @Autowired ReservationRepository reservationRepository;
+    @Autowired private ReservationRepository reservationRepository;
 
     public int bookReservation(String idTag, String chargeBoxId, DateTime expiryDateTime) {
         DateTime now = new DateTime();

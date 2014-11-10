@@ -88,9 +88,11 @@ public class TransactionRepositoryImpl implements TransactionRepository {
         public Transaction map(Record8<Integer, String, Integer, String, Timestamp, String, Timestamp, String> r) {
 
             String chargedValue = "";
-            int stopValue = Integer.valueOf(r.value8());
-            if (stopValue != 0) {
-                chargedValue = String.valueOf(stopValue - Integer.valueOf(r.value6()));
+            String stopValueColumn = r.value8();
+            if (stopValueColumn != null) {
+                int stopValue = Integer.valueOf(stopValueColumn);
+                int startValue = Integer.valueOf(r.value6());
+                chargedValue = String.valueOf(stopValue - startValue);
             }
 
             return Transaction.builder()

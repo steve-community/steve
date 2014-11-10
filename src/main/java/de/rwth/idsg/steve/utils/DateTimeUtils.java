@@ -16,7 +16,7 @@ import java.sql.Timestamp;
 public final class DateTimeUtils {
     private DateTimeUtils() {}
 
-    private static DateTimeFormatter INPUT_FORMATTER = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm");
+    private static final DateTimeFormatter INPUT_FORMATTER = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm");
 
     public static Timestamp getCurrentDateTime(){
         return new Timestamp(new DateTime().getMillis());
@@ -27,14 +27,6 @@ public final class DateTimeUtils {
         return new Timestamp(dt.getMillis());
     }
 
-    public static Timestamp toTimestamp(DateTime dt) {
-        if (dt == null) {
-            return null;
-        } else {
-            return new Timestamp(dt.getMillis());
-        }
-    }
-
     /**
      * Converts a String of pattern "yyyy-MM-dd HH:mm" to DateTime.
      */
@@ -43,7 +35,7 @@ public final class DateTimeUtils {
         try {
             dt = INPUT_FORMATTER.parseDateTime(str);
         } catch (IllegalArgumentException e) {
-            throw new SteveException(ExceptionMessage.PARSING_DATETIME);
+            throw new SteveException(ExceptionMessage.PARSING_DATETIME, e);
         }
         return dt;
     }

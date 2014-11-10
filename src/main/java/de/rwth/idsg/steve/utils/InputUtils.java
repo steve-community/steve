@@ -43,7 +43,7 @@ public final class InputUtils {
         try {
             return Integer.parseInt(str.trim());
         } catch (NumberFormatException e) {
-            throw new SteveException(ExceptionMessage.PARSING_NUMBER);
+            throw new SteveException(ExceptionMessage.PARSING_NUMBER, e);
         }
     }
 

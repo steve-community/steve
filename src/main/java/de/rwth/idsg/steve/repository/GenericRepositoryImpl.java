@@ -36,8 +36,6 @@ public class GenericRepositoryImpl implements GenericRepository {
         Getstats gs = new Getstats();
         gs.execute(config);
 
-        //TODO mysql returns null when count = 0. remove group by.. at the end of every query
-
         return Statistics.builder()
                 .numChargeBoxes(gs.getNumchargeboxes())
                 .numUsers(gs.getNumusers())

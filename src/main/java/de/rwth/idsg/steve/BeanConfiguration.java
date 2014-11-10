@@ -98,7 +98,7 @@ public class BeanConfiguration extends WebMvcConfigurerAdapter {
     public JaxWsServerFactoryBean routerService() {
         JaxWsServerFactoryBean f = new JaxWsServerFactoryBean();
         f.setServiceBean(centralSystemService12());
-        f.setAddress(SteveConfiguration.OCPP_ROUTER);
+        f.setAddress("/CentralSystemService");
         f.getInInterceptors().add(new MediatorInInterceptor());
         f.create();
         return f;
@@ -116,7 +116,6 @@ public class BeanConfiguration extends WebMvcConfigurerAdapter {
     @Qualifier("ocpp12")
     public JaxWsProxyFactoryBean ocpp12ClientFactory() {
         JaxWsProxyFactoryBean f = new JaxWsProxyFactoryBean();
-//        f.setBindingId("http://schemas.xmlsoap.org/wsdl/soap12/");
         f.setBindingId(SOAPBinding.SOAP12HTTP_BINDING);
         f.setServiceClass(ocpp.cp._2010._08.ChargePointService.class);
         return f;
@@ -134,7 +133,7 @@ public class BeanConfiguration extends WebMvcConfigurerAdapter {
         f.setBindingId(SOAPBinding.SOAP12HTTP_BINDING);
         f.setEndpointName(new QName("urn://Ocpp/Cs/2010/08/", "CentralSystemServiceSoap12"));
         f.setServiceName(new QName("urn://Ocpp/Cs/2010/08/", "CentralSystemService"));
-        f.setAddress(SteveConfiguration.OCPP_12);
+        f.setAddress("/CentralSystemServiceOCPP12");
         f.getFeatures().add(new WSAddressingFeature());
         f.create();
         return f;
@@ -152,7 +151,6 @@ public class BeanConfiguration extends WebMvcConfigurerAdapter {
     @Qualifier("ocpp15")
     public JaxWsProxyFactoryBean ocpp15ClientFactory() {
         JaxWsProxyFactoryBean f = new JaxWsProxyFactoryBean();
-//        f.setBindingId("http://schemas.xmlsoap.org/wsdl/soap12/");
         f.setBindingId(SOAPBinding.SOAP12HTTP_BINDING);
         f.setServiceClass(ocpp.cp._2012._06.ChargePointService.class);
         return f;
@@ -170,7 +168,7 @@ public class BeanConfiguration extends WebMvcConfigurerAdapter {
         f.setBindingId(SOAPBinding.SOAP12HTTP_BINDING);
         f.setEndpointName(new QName("urn://Ocpp/Cs/2012/06/", "CentralSystemServiceSoap12"));
         f.setServiceName(new QName("urn://Ocpp/Cs/2012/06/", "CentralSystemService"));
-        f.setAddress(SteveConfiguration.OCPP_15);
+        f.setAddress("/CentralSystemServiceOCPP15");
         f.getFeatures().add(new WSAddressingFeature());
         f.create();
         return f;

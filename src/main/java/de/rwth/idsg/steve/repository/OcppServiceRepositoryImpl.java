@@ -154,23 +154,17 @@ public class OcppServiceRepositoryImpl implements OcppServiceRepository {
     }
 
     @Override
-    public void insertConnectorStatus12(String chargeBoxIdentity, int connectorId,
-                                        String status, String errorCode) {
+    public void insertConnectorStatus12(String chargeBoxIdentity, int connectorId, String status, Timestamp timestamp,
+                                        String errorCode) {
         // Delegate
-        this.insertConnectorStatus15(chargeBoxIdentity, connectorId, status, null, errorCode, null, null, null);
+        this.insertConnectorStatus15(chargeBoxIdentity, connectorId, status, timestamp, errorCode, null, null, null);
     }
 
     @Override
     public void insertConnectorStatus15(final String chargeBoxIdentity, final int connectorId, final String status,
-                                        Timestamp timeStamp,
+                                        final Timestamp timestamp,
                                         final String errorCode, final String errorInfo,
                                         final String vendorId, final String vendorErrorCode) {
-
-        // OCPP 1.5 spec: If timestamp absent, time of receipt of the message will be assumed
-        if (timeStamp == null) {
-            timeStamp = DateTimeUtils.getCurrentDateTime();
-        }
-        final Timestamp finalTimeStamp = timeStamp;
 
         try {
             DSL.using(config).transaction(new TransactionalRunnable() {
@@ -226,7 +220,7 @@ public class OcppServiceRepositoryImpl implements OcppServiceRepository {
 
                     ctx.insertInto(CONNECTOR_STATUS)
                        .set(CONNECTOR_STATUS.CONNECTOR_PK, t1.field(t1_pk))
-                       .set(CONNECTOR_STATUS.STATUSTIMESTAMP, finalTimeStamp)
+                       .set(CONNECTOR_STATUS.STATUSTIMESTAMP, timestamp)
                        .set(CONNECTOR_STATUS.STATUS, status)
                        .set(CONNECTOR_STATUS.ERRORCODE, errorCode)
                        .set(CONNECTOR_STATUS.ERRORINFO, errorInfo)

@@ -26,9 +26,9 @@ public class LogController {
             response.setContentType("text/plain");
 
             File logDir = new File(System.getProperty("catalina.base"), "logs");
-            File cxfLog = new File(logDir, "steve.log");
+            File logFile = new File(logDir, "steve.log");
 
-            try (BufferedReader bufferedReader = new BufferedReader(new FileReader(cxfLog))) {
+            try (BufferedReader bufferedReader = new BufferedReader(new FileReader(logFile))) {
                 String sCurrentLine;
                 while ((sCurrentLine = bufferedReader.readLine()) != null) {
                     writer.println(sCurrentLine);

@@ -29,9 +29,9 @@ public interface OcppServiceRepository {
     void updateChargeboxDiagnosticsStatus(String chargeBoxIdentity, String status);
     void updateChargeboxHeartbeat(String chargeBoxIdentity, Timestamp ts);
 
-    void insertConnectorStatus12(String chargeBoxIdentity, int connectorId,
-                                 String status, String errorCode);
-    void insertConnectorStatus15(String chargeBoxIdentity, int connectorId, String status, Timestamp timeStamp,
+    void insertConnectorStatus12(String chargeBoxIdentity, int connectorId, String status, Timestamp timestamp,
+                                 String errorCode);
+    void insertConnectorStatus15(String chargeBoxIdentity, int connectorId, String status, Timestamp timestamp,
                                  String errorCode, String errorInfo,
                                  String vendorId, String vendorErrorCode);
 

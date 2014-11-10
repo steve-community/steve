@@ -29,12 +29,12 @@ import java.util.List;
 @Service
 public class ChargePointService15_Client {
 
-    @Autowired UserRepository userRepository;
-    @Autowired ReservationService reservationService;
+    @Autowired private UserRepository userRepository;
+    @Autowired private ReservationService reservationService;
 
     @Autowired
     @Qualifier("ocpp15")
-    JaxWsProxyFactoryBean factory;
+    private JaxWsProxyFactoryBean factory;
 
     // -------------------------------------------------------------------------
     // CREATE Request Payloads
@@ -172,7 +172,7 @@ public class ChargePointService15_Client {
      * Method for DIFFERENTIAL update
      *
      */
-    public SendLocalListRequest prepareSendLocalList(int listVersion, ArrayList<String> addUpdateList, ArrayList<String> deleteList) {
+    public SendLocalListRequest prepareSendLocalList(int listVersion, List<String> addUpdateList, List<String> deleteList) {
         SendLocalListRequest req = new SendLocalListRequest();
         req.setListVersion(listVersion);
         req.setUpdateType(UpdateType.DIFFERENTIAL);

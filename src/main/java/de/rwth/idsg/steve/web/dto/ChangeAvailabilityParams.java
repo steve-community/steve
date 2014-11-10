@@ -2,9 +2,6 @@ package de.rwth.idsg.steve.web.dto;
 
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.validator.constraints.NotEmpty;
-
-import javax.validation.constraints.Min;
 
 /**
  * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>

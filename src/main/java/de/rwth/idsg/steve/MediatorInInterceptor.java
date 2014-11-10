@@ -34,9 +34,12 @@ import java.util.List;
 @Slf4j
 public class MediatorInInterceptor extends AbstractPhaseInterceptor<SoapMessage> {
 
+    private XMLInputFactory xmlInputFactory;
+
     public MediatorInInterceptor() {
         super(Phase.POST_STREAM);
         super.addBefore(StaxInInterceptor.class.getName());
+        xmlInputFactory = XMLInputFactory.newInstance();
     }
 
     public final void handleMessage(SoapMessage message) {
@@ -52,7 +55,7 @@ public class MediatorInInterceptor extends AbstractPhaseInterceptor<SoapMessage>
             message.setContent(InputStream.class, bis);
  
             String encoding = (String)message.get(Message.ENCODING);
-            XMLStreamReader reader = XMLInputFactory.newInstance().createXMLStreamReader(bis, encoding);
+            XMLStreamReader reader = xmlInputFactory.createXMLStreamReader(bis, encoding);
             DepthXMLStreamReader xmlReader = new DepthXMLStreamReader(reader);
  
             if (xmlReader.nextTag() == XMLStreamConstants.START_ELEMENT) {

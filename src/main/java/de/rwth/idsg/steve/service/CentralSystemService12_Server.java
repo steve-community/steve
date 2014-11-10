@@ -46,11 +46,11 @@ public class CentralSystemService12_Server implements CentralSystemService {
         // Get the Address value from WS-A Header
         MessageContext messageContext = webServiceContext.getMessageContext();
         AddressingProperties addressProp = (AddressingProperties) messageContext.get(JAXWSAConstants.ADDRESSING_PROPERTIES_INBOUND);
-        String endpoint_address = addressProp.getFrom().getAddress().getValue();
+        String endpointAddress = addressProp.getFrom().getAddress().getValue();
 
         DateTime now = new DateTime();
 
-        boolean isRegistered = ocppServiceRepository.updateChargebox(endpoint_address,
+        boolean isRegistered = ocppServiceRepository.updateChargebox(endpointAddress,
                                                                      OcppConstants.V12,
                                                                      parameters.getChargePointVendor(),
                                                                      parameters.getChargePointModel(),
@@ -93,7 +93,8 @@ public class CentralSystemService12_Server implements CentralSystemService {
         int connectorId = parameters.getConnectorId();
         String status = parameters.getStatus().toString();
         String errorCode = parameters.getErrorCode().toString();
-        ocppServiceRepository.insertConnectorStatus12(chargeBoxIdentity, connectorId, status, errorCode);
+        ocppServiceRepository.insertConnectorStatus12(chargeBoxIdentity, connectorId, status,
+                                                      DateTimeUtils.getCurrentDateTime(), errorCode);
         return new StatusNotificationResponse();
     }
 
@@ -102,7 +103,8 @@ public class CentralSystemService12_Server implements CentralSystemService {
 
         int connectorId = parameters.getConnectorId();
         List<MeterValue> valuesList = parameters.getValues();
-        if (valuesList != null){
+
+        if (valuesList != null) {
             ocppServiceRepository.insertMeterValues12(chargeBoxIdentity, connectorId, valuesList);
         }
         return new MeterValuesResponse();
@@ -127,7 +129,7 @@ public class CentralSystemService12_Server implements CentralSystemService {
         StartTransactionResponse response = new StartTransactionResponse();
         response.setIdTagInfo(idTagInfo);
 
-        if (idTagInfo.getStatus().equals(AuthorizationStatus.ACCEPTED)) {
+        if (AuthorizationStatus.ACCEPTED.equals(idTagInfo.getStatus())) {
             int connectorId = parameters.getConnectorId();
             Timestamp startTimestamp = new Timestamp(parameters.getTimestamp().getMillis());
             String startMeterValue = Integer.toString(parameters.getMeterStart());

@@ -24,7 +24,7 @@ import java.sql.Timestamp;
 @Controller
 public class UsersController {
 
-    @Autowired UserRepository userRepository;
+    @Autowired private UserRepository userRepository;
 
     @RequestMapping(value = "/users", method = RequestMethod.GET)
     public String get(Model model) {

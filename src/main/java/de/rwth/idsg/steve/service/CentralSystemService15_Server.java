@@ -1,6 +1,7 @@
 package de.rwth.idsg.steve.service;
 
 import com.google.common.base.Optional;
+import com.sun.tools.corba.se.idl.constExpr.Times;
 import de.rwth.idsg.steve.OcppConstants;
 import de.rwth.idsg.steve.repository.OcppServiceRepository;
 import de.rwth.idsg.steve.repository.UserRepository;
@@ -13,9 +14,7 @@ import org.apache.cxf.ws.addressing.JAXWSAConstants;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.context.support.SpringBeanAutowiringSupport;
 
-import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import javax.jws.WebService;
 import javax.xml.ws.WebServiceContext;
@@ -42,11 +41,6 @@ public class CentralSystemService15_Server implements CentralSystemService {
     @Autowired private OcppServiceRepository ocppServiceRepository;
     @Autowired private UserRepository userRepository;
 
-    @PostConstruct
-    public void init() {
-        SpringBeanAutowiringSupport.processInjectionBasedOnCurrentContext(this);
-    }
-
     public BootNotificationResponse bootNotification(BootNotificationRequest parameters,
                                                      String chargeBoxIdentity) {
         log.debug("Executing bootNotification for {}", chargeBoxIdentity);
@@ -54,11 +48,11 @@ public class CentralSystemService15_Server implements CentralSystemService {
         // Get the Address value from WS-A Header
         MessageContext messageContext = webServiceContext.getMessageContext();
         AddressingProperties addressProp = (AddressingProperties) messageContext.get(JAXWSAConstants.ADDRESSING_PROPERTIES_INBOUND);
-        String endpoint_address = addressProp.getFrom().getAddress().getValue();
+        String endpointAddress = addressProp.getFrom().getAddress().getValue();
 
         DateTime now = new DateTime();
 
-        boolean isRegistered = ocppServiceRepository.updateChargebox(endpoint_address,
+        boolean isRegistered = ocppServiceRepository.updateChargebox(endpointAddress,
                                                                      OcppConstants.V15,
                                                                      parameters.getChargePointVendor(),
                                                                      parameters.getChargePointModel(),
@@ -105,12 +99,18 @@ public class CentralSystemService15_Server implements CentralSystemService {
 
         // Optional fields
         String errorInfo = parameters.getInfo();
-        Timestamp timeStamp = DateTimeUtils.toTimestamp(parameters.getTimestamp());
+        DateTime dt = parameters.getTimestamp();
+        Timestamp timestamp;
+        if (dt == null) {
+            timestamp = DateTimeUtils.getCurrentDateTime();
+        } else {
+            timestamp = new Timestamp(dt.getMillis());
+        }
         String vendorId = parameters.getVendorId();
         String vendorErrorCode = parameters.getVendorErrorCode();
 
-        ocppServiceRepository.insertConnectorStatus15(chargeBoxIdentity, connectorId, status, timeStamp,
-                errorCode, errorInfo, vendorId, vendorErrorCode);
+        ocppServiceRepository.insertConnectorStatus15(chargeBoxIdentity, connectorId, status, timestamp,
+                                                      errorCode, errorInfo, vendorId, vendorErrorCode);
 
         return new StatusNotificationResponse();
     }
@@ -147,7 +147,7 @@ public class CentralSystemService15_Server implements CentralSystemService {
         StartTransactionResponse response = new StartTransactionResponse();
         response.setIdTagInfo(idTagInfo);
 
-        if (idTagInfo.getStatus().equals(AuthorizationStatus.ACCEPTED)){
+        if (AuthorizationStatus.ACCEPTED.equals(idTagInfo.getStatus())) {
             int connectorId = parameters.getConnectorId();
             Integer reservationId = parameters.getReservationId();
             Timestamp startTimestamp = new Timestamp(parameters.getTimestamp().getMillis());

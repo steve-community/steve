@@ -19,7 +19,6 @@ import javax.jws.WebService;
 import javax.xml.ws.WebServiceContext;
 import javax.xml.ws.handler.MessageContext;
 import java.sql.Timestamp;
-import java.util.List;
 
 /**
  * Service implementation of OCPP V1.2
@@ -102,10 +101,8 @@ public class CentralSystemService12_Server implements CentralSystemService {
         log.debug("Executing meterValues for {}", chargeBoxIdentity);
 
         int connectorId = parameters.getConnectorId();
-        List<MeterValue> valuesList = parameters.getValues();
-
-        if (valuesList != null) {
-            ocppServiceRepository.insertMeterValues12(chargeBoxIdentity, connectorId, valuesList);
+        if (parameters.isSetValues()) {
+            ocppServiceRepository.insertMeterValues12(chargeBoxIdentity, connectorId, parameters.getValues());
         }
         return new MeterValuesResponse();
     }
@@ -157,9 +154,8 @@ public class CentralSystemService12_Server implements CentralSystemService {
 
         // Get the authorization info of the user
         StopTransactionResponse response = new StopTransactionResponse();
-        String idTag = parameters.getIdTag();
-        if (!idTag.isEmpty()) {
-            IdTagInfo idTagInfo = createIdTagInfo(idTag);
+        if (parameters.isSetIdTag()) {
+            IdTagInfo idTagInfo = createIdTagInfo(parameters.getIdTag());
             response.setIdTagInfo(idTagInfo);
         }
         return response;

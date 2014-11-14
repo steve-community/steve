@@ -104,10 +104,9 @@
 					</dependency>
 				</dependencies>
 
-				<!-- Specify the plugin configuration.
-                     The configuration format is the same as for the standalone code generator -->
+                <!-- http://www.jooq.org/doc/3.4/manual/code-generation/codegen-configuration/
+                     http://www.jooq.org/doc/3.4/manual/code-generation/codegen-advanced/ -->
 				<configuration>
-					<!-- Configure the database connection here -->
 					<jdbc>
 						<driver>com.mysql.jdbc.Driver</driver>
 						<url>jdbc:mysql://localhost:3306/stevedb</url>
@@ -118,54 +117,23 @@
 					<generator>
 						<database>
 							<name>org.jooq.util.mysql.MySQLDatabase</name>
-
-							<!-- All elements that are generated from your schema (A Java regular expression.
-                                 Use the pipe to separate several expressions) Watch out for
-                                 case-sensitivity. Depending on your database, this might be
-                                 important! You can create case-insensitive regular expressions
-                                 using this syntax: (?i:expr) -->
 							<includes>.*</includes>
-
-							<!-- All elements that are excluded from your schema (A Java regular expression.
-                                 Use the pipe to separate several expressions). Excludes match before
-                                 includes -->
-							<excludes></excludes>
-
-							<!-- The schema that is used locally as a source for meta information.
-                                 This could be your development schema or the production schema, etc
-                                 This cannot be combined with the schemata element.
-
-                                 If left empty, jOOQ will generate all available schemata. See the
-                                 manual's next section to learn how to generate several schemata -->
+							<excludes/>
 							<inputSchema>stevedb</inputSchema>
-
-							<!-- Generate jOOU data types for your unsigned data types, which are
-                                 not natively supported in Java.
-                                 Defaults to true -->
 							<unsignedTypes>false</unsignedTypes>
 
 							<!-- Associate data type rewrites with database columns -->
 							<forcedTypes>
 								<forcedType>
-									<!-- Specify any data type from org.jooq.impl.SQLDataType -->
 									<name>BOOLEAN</name>
-
 									<!-- https://groups.google.com/forum/#!topic/jooq-user/cpcf_Vk8Vd0 -->
 									<types>(?i:TINYINT(\s*\(\d+\))?(\s*UNSIGNED)?)</types>
 								</forcedType>
 							</forcedTypes>
 						</database>
 
-						<generate>
-							<!-- Generation flags: See advanced configuration properties -->
-						</generate>
-
 						<target>
-							<!-- The destination package of your generated classes (within the
-                                 destination directory) -->
 							<packageName>jooq.steve.db</packageName>
-
-							<!-- The destination directory of your generated classes -->
 							<directory>${project.build.directory}/generated-sources</directory>
 						</target>
 					</generator>

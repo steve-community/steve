@@ -1,7 +1,6 @@
 package de.rwth.idsg.steve.service;
 
 import com.google.common.base.Optional;
-import com.sun.tools.corba.se.idl.constExpr.Times;
 import de.rwth.idsg.steve.OcppConstants;
 import de.rwth.idsg.steve.repository.OcppServiceRepository;
 import de.rwth.idsg.steve.repository.UserRepository;
@@ -20,6 +19,7 @@ import javax.jws.WebService;
 import javax.xml.ws.WebServiceContext;
 import javax.xml.ws.handler.MessageContext;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -99,12 +99,11 @@ public class CentralSystemService15_Server implements CentralSystemService {
 
         // Optional fields
         String errorInfo = parameters.getInfo();
-        DateTime dt = parameters.getTimestamp();
         Timestamp timestamp;
-        if (dt == null) {
-            timestamp = DateTimeUtils.getCurrentDateTime();
+        if (parameters.isSetTimestamp()) {
+            timestamp = new Timestamp(parameters.getTimestamp().getMillis());
         } else {
-            timestamp = new Timestamp(dt.getMillis());
+            timestamp = DateTimeUtils.getCurrentDateTime();
         }
         String vendorId = parameters.getVendorId();
         String vendorErrorCode = parameters.getVendorErrorCode();
@@ -120,10 +119,8 @@ public class CentralSystemService15_Server implements CentralSystemService {
 
         int connectorId = parameters.getConnectorId();
         Integer transactionId = parameters.getTransactionId();
-        List<MeterValue> valuesList = parameters.getValues();
-
-        if (valuesList != null) {
-            ocppServiceRepository.insertMeterValues15(chargeBoxIdentity, connectorId, valuesList, transactionId);
+        if (parameters.isSetValues()) {
+            ocppServiceRepository.insertMeterValues15(chargeBoxIdentity, connectorId, parameters.getValues(), transactionId);
         }
         return new MeterValuesResponse();
     }
@@ -172,19 +169,27 @@ public class CentralSystemService15_Server implements CentralSystemService {
         String stopMeterValue = Integer.toString(parameters.getMeterStop());
         ocppServiceRepository.updateTransaction(transactionId, stopTimestamp, stopMeterValue);
 
-        // Insert meter values into DB
-        List<TransactionData> transDataList = parameters.getTransactionData();
-        if (transDataList != null){
-            for (TransactionData temp : transDataList) {
-                ocppServiceRepository.insertMeterValuesOfTransaction(chargeBoxIdentity, transactionId, temp.getValues());
+        /**
+         * If TransactionData is included:
+         *
+         * Aggregate MeterValues from multiple TransactionData in one big, happy list. TransactionData is just
+         * a container for MeterValues without any additional data/semantics anyway. This enables us to write
+         * into DB in one repository call (query), rather than multiple calls as it was before (for each TransactionData)
+         *
+         * Saved the world again with this micro-optimization.
+         */
+        if (parameters.isSetTransactionData()) {
+            List<MeterValue> combinedList = new ArrayList<>();
+            for (TransactionData data : parameters.getTransactionData()) {
+                combinedList.addAll(data.getValues());
             }
+            ocppServiceRepository.insertMeterValuesOfTransaction(chargeBoxIdentity, transactionId, combinedList);
         }
 
         // Get the authorization info of the user
         StopTransactionResponse response = new StopTransactionResponse();
-        String idTag = parameters.getIdTag();
-        if (!idTag.isEmpty()) {
-            IdTagInfo idTagInfo = createIdTagInfo(idTag);
+        if (parameters.isSetIdTag()) {
+            IdTagInfo idTagInfo = createIdTagInfo(parameters.getIdTag());
             response.setIdTagInfo(idTagInfo);
         }
         return response;
@@ -217,18 +222,11 @@ public class CentralSystemService15_Server implements CentralSystemService {
     public DataTransferResponse dataTransfer(DataTransferRequest parameters, String chargeBoxIdentity) {
         log.debug("Executing dataTransfer for {}", chargeBoxIdentity);
 
-        String vendorId = parameters.getVendorId();
-        String messageId = parameters.getMessageId();
-        String data = parameters.getData();
+        log.info("[Data Transfer] Charge point: {}, Vendor Id: {}", chargeBoxIdentity, parameters.getVendorId());
+        if (parameters.isSetMessageId()) log.info("[Data Transfer] Message Id: {}", parameters.getMessageId());
+        if (parameters.isSetData()) log.info("[Data Transfer] Data: {}", parameters.getData());
 
-        log.info("[Data Transfer] Charge point: {}, Vendor Id: {}", chargeBoxIdentity, vendorId);
-        if (!messageId.isEmpty()) log.info("[Data Transfer] Message Id: {}", messageId);
-        if (!data.isEmpty()) log.info("[Data Transfer] Data: {}", data);
-
-        DataTransferResponse response = new DataTransferResponse();
-        //response.setData(value);
-        //response.setStatus(value);
-        return response;
+        return new DataTransferResponse();
     }
 
     // -------------------------------------------------------------------------

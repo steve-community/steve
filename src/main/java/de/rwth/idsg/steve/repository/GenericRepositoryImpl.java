@@ -30,7 +30,7 @@ public class GenericRepositoryImpl implements GenericRepository {
      * {CALL getStats(?,?,?,?,?,?,?,?,?,?,?)}
      */
     @Override
-    public final Statistics getStats() {
+    public Statistics getStats() {
 
         // getStats is the stored procedure in our MySQL DB
         Getstats gs = new Getstats();
@@ -56,7 +56,7 @@ public class GenericRepositoryImpl implements GenericRepository {
      * FROM dbVersion
      */
     @Override
-    public final DbVersion getDBVersion() {
+    public DbVersion getDBVersion() {
         DbversionRecord record = DSL.using(config)
                                     .selectFrom(DBVERSION)
                                     .fetchOne();

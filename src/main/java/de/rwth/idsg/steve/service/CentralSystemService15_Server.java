@@ -41,8 +41,7 @@ public class CentralSystemService15_Server implements CentralSystemService {
     @Autowired private OcppServiceRepository ocppServiceRepository;
     @Autowired private UserRepository userRepository;
 
-    public BootNotificationResponse bootNotification(BootNotificationRequest parameters,
-                                                     String chargeBoxIdentity) {
+    public BootNotificationResponse bootNotification(BootNotificationRequest parameters, String chargeBoxIdentity) {
         log.debug("Executing bootNotification for {}", chargeBoxIdentity);
 
         // Get the Address value from WS-A Header

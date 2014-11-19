@@ -1,5 +1,7 @@
 package de.rwth.idsg.steve;
 
+import de.rwth.idsg.steve.config.BeanConfiguration;
+import de.rwth.idsg.steve.config.OcppConfiguration;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.common.logging.LogUtils;
@@ -27,15 +29,16 @@ public class WebInitializer implements WebApplicationInitializer {
     public void onStartup(ServletContext servletContext) throws ServletException {
         AnnotationConfigWebApplicationContext ctx = new AnnotationConfigWebApplicationContext();
         ctx.register(BeanConfiguration.class);
+        ctx.register(OcppConfiguration.class);
         ctx.setServletContext(servletContext);
 
         // -------------------------------------------------------------------------
         // Web Manager
         // -------------------------------------------------------------------------
 
-        ServletRegistration.Dynamic servlet = servletContext.addServlet("dispatcher", new DispatcherServlet(ctx));
-        servlet.addMapping(SteveConfiguration.SPRING_WEB_MAPPING);
-        servlet.setLoadOnStartup(1);
+        ServletRegistration.Dynamic manager = servletContext.addServlet("dispatcher", new DispatcherServlet(ctx));
+        manager.addMapping(SteveConfiguration.SPRING_WEB_MAPPING);
+        manager.setLoadOnStartup(1);
 
         // -------------------------------------------------------------------------
         // Apache CXF
@@ -50,10 +53,10 @@ public class WebInitializer implements WebApplicationInitializer {
         bus.setFeatures(list);
         BusFactory.setDefaultBus(bus);
 
-        CXFServlet s = new CXFServlet();
-        s.setBus(bus);
+        CXFServlet cxfServlet = new CXFServlet();
+        cxfServlet.setBus(bus);
 
-        ServletRegistration.Dynamic cxf = servletContext.addServlet("cxf", s);
+        ServletRegistration.Dynamic cxf = servletContext.addServlet("cxf", cxfServlet);
         cxf.addMapping(SteveConfiguration.CXF_MAPPING);
         cxf.setLoadOnStartup(1);
     }

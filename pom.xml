@@ -85,7 +85,7 @@
                     </execution>
                 </executions>
 
-                <!-- Manage the plugin's dependency. In this example, we'll use a PostgreSQL database -->
+                <!-- Manage the plugin's dependency -->
                 <dependencies>
                     <dependency>
                         <groupId>org.jooq</groupId>

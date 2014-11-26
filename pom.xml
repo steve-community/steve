@@ -9,7 +9,7 @@
     <properties>
         <java.version>1.7</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <jooq.version>3.4.2</jooq.version>
+        <jooq.version>3.5.0</jooq.version>
         <cxf.version>3.0.2</cxf.version>
         <spring.version>4.1.1.RELEASE</spring.version>
         <mysql.jdbc.version>5.1.33</mysql.jdbc.version>

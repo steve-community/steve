@@ -2,6 +2,7 @@ package de.rwth.idsg.steve.service;
 
 import com.google.common.base.Optional;
 import de.rwth.idsg.steve.OcppConstants;
+import de.rwth.idsg.steve.OcppVersion;
 import de.rwth.idsg.steve.repository.OcppServiceRepository;
 import de.rwth.idsg.steve.repository.UserRepository;
 import de.rwth.idsg.steve.utils.DateTimeUtils;
@@ -52,7 +53,7 @@ public class CentralSystemService15_Server implements CentralSystemService {
         DateTime now = new DateTime();
 
         boolean isRegistered = ocppServiceRepository.updateChargebox(endpointAddress,
-                                                                     OcppConstants.V15,
+                                                                     OcppVersion.V_15,
                                                                      parameters.getChargePointVendor(),
                                                                      parameters.getChargePointModel(),
                                                                      parameters.getChargePointSerialNumber(),

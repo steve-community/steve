@@ -10,9 +10,6 @@ package de.rwth.idsg.steve;
 public final class OcppConstants {
     private OcppConstants() {}
 
-    public static final String V12 = "1.2";
-    public static final String V15 = "1.5";
-
     // Heartbeat interval in seconds
     private static int heartbeatInterval = 14400;
     // Determines how many hours the idtag should be stored in the local whitelist of a chargebox

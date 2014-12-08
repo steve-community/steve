@@ -1,6 +1,7 @@
 package de.rwth.idsg.steve.repository;
 
 import com.google.common.base.Optional;
+import de.rwth.idsg.steve.OcppVersion;
 
 import java.sql.Timestamp;
 import java.util.List;
@@ -21,7 +22,7 @@ public interface OcppServiceRepository {
      * 2. If the chargebox not registered => no chargeboxes to update => updated/returned row count = 0
      *
      */
-    boolean updateChargebox(String endpoint_address, String ocppVersion, String vendor, String model,
+    boolean updateChargebox(String endpoint_address, OcppVersion ocppVersion, String vendor, String model,
                             String pointSerial, String boxSerial, String fwVersion, String iccid, String imsi,
                             String meterType, String meterSerial, String chargeBoxIdentity, Timestamp now);
 

@@ -1,6 +1,7 @@
 package de.rwth.idsg.steve.repository;
 
 import com.google.common.base.Optional;
+import de.rwth.idsg.steve.OcppVersion;
 import de.rwth.idsg.steve.utils.DateTimeUtils;
 import lombok.extern.slf4j.Slf4j;
 import ocpp.cs._2012._06.Location;
@@ -65,14 +66,14 @@ public class OcppServiceRepositoryImpl implements OcppServiceRepository {
      * WHERE chargeBoxId = ?
      */
     @Override
-    public boolean updateChargebox(String endpoint_address, String ocppVersion, String vendor, String model,
+    public boolean updateChargebox(String endpoint_address, OcppVersion ocppVersion, String vendor, String model,
                                    String pointSerial, String boxSerial, String fwVersion, String iccid, String imsi,
                                    String meterType, String meterSerial, String chargeBoxIdentity, Timestamp now) {
 
         int count = DSL.using(config)
                        .update(CHARGEBOX)
                        .set(CHARGEBOX.ENDPOINT_ADDRESS, endpoint_address)
-                       .set(CHARGEBOX.OCPPVERSION, ocppVersion)
+                       .set(CHARGEBOX.OCPPVERSION, ocppVersion.getValue())
                        .set(CHARGEBOX.CHARGEPOINTVENDOR, vendor)
                        .set(CHARGEBOX.CHARGEPOINTMODEL, model)
                        .set(CHARGEBOX.CHARGEPOINTSERIALNUMBER, pointSerial)

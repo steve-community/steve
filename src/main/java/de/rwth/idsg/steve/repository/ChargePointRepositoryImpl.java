@@ -1,6 +1,6 @@
 package de.rwth.idsg.steve.repository;
 
-import de.rwth.idsg.steve.OcppConstants;
+import de.rwth.idsg.steve.OcppVersion;
 import de.rwth.idsg.steve.SteveException;
 import de.rwth.idsg.steve.repository.dto.ChargePoint;
 import de.rwth.idsg.steve.repository.dto.ConnectorStatus;
@@ -42,12 +42,12 @@ public class ChargePointRepositoryImpl implements ChargePointRepository {
 
     @Override
     public Map<String, String> getChargePointsV12() {
-        return this.internalGetChargePoints(OcppConstants.V12);
+        return this.internalGetChargePoints(OcppVersion.V_12);
     }
 
     @Override
     public Map<String, String> getChargePointsV15() {
-        return this.internalGetChargePoints(OcppConstants.V15);
+        return this.internalGetChargePoints(OcppVersion.V_15);
     }
 
     /**
@@ -55,10 +55,10 @@ public class ChargePointRepositoryImpl implements ChargePointRepository {
      * FROM chargebox
      * WHERE ocppVersion = ?
      */
-    private Map<String,String> internalGetChargePoints(String ocppVersion) {
+    private Map<String,String> internalGetChargePoints(OcppVersion version) {
         return DSL.using(config)
                   .selectFrom(CHARGEBOX)
-                  .where(CHARGEBOX.OCPPVERSION.equal(ocppVersion))
+                  .where(CHARGEBOX.OCPPVERSION.equal(version.getValue()))
                   .fetchMap(CHARGEBOX.CHARGEBOXID, CHARGEBOX.ENDPOINT_ADDRESS);
     }
 

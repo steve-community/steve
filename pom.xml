@@ -10,8 +10,8 @@
         <java.version>1.7</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <jooq.version>3.5.0</jooq.version>
-        <cxf.version>3.0.2</cxf.version>
-        <spring.version>4.1.1.RELEASE</spring.version>
+        <cxf.version>3.0.3</cxf.version>
+        <spring.version>4.1.2.RELEASE</spring.version>
         <mysql.jdbc.version>5.1.33</mysql.jdbc.version>
     </properties>
 
@@ -41,11 +41,14 @@
                 <version>${cxf.version}</version>
                 <configuration>
                     <sourceRoot>${project.build.directory}/generated-sources</sourceRoot>
+                    <wsdlRoot>${basedir}/src/main/resources/wsdl</wsdlRoot>
                     <defaultOptions>
                         <bindingFiles>
                             <bindingFile>${basedir}/src/main/resources/ocpp_binding.xml</bindingFile>
                         </bindingFiles>
                         <extraargs>
+                            <extraarg>-xjc-Xfluent-api</extraarg>
+                            <extraarg>-verbose</extraarg>
                             <extraarg>-exsh</extraarg>
                             <extraarg>true</extraarg>
                         </extraargs>
@@ -55,19 +58,18 @@
                     <execution>
                         <id>generate-sources</id>
                         <phase>generate-sources</phase>
-                        <configuration>
-                            <wsdlOptions>
-                                <wsdlOption><wsdl>${basedir}/src/main/webapp/WEB-INF/wsdl/centralsystemservice_0.wsdl</wsdl></wsdlOption>
-                                <wsdlOption><wsdl>${basedir}/src/main/webapp/WEB-INF/wsdl/chargepointservice.wsdl</wsdl></wsdlOption>
-                                <wsdlOption><wsdl>${basedir}/src/main/webapp/WEB-INF/wsdl/ocpp_centralsystemservice_1.5_final.wsdl</wsdl></wsdlOption>
-                                <wsdlOption><wsdl>${basedir}/src/main/webapp/WEB-INF/wsdl/ocpp_chargepointservice_1.5_final.wsdl</wsdl></wsdlOption>
-                            </wsdlOptions>
-                        </configuration>
                         <goals>
                             <goal>wsdl2java</goal>
                         </goals>
                     </execution>
                 </executions>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.jvnet.jaxb2_commons</groupId>
+                        <artifactId>jaxb2-fluent-api</artifactId>
+                        <version>3.0</version>
+                    </dependency>
+                </dependencies>
             </plugin>
 
             <plugin>

@@ -35,17 +35,15 @@ public class ChargePointService12_Client {
     // -------------------------------------------------------------------------
 
     public ChangeAvailabilityRequest prepareChangeAvail(ChangeAvailabilityParams params) {
-        ChangeAvailabilityRequest req = new ChangeAvailabilityRequest();
-        req.setConnectorId(params.getConnectorId());
-        req.setType(AvailabilityType.fromValue(params.getAvailType()));
-        return req;
+        return new ChangeAvailabilityRequest()
+                .withConnectorId(params.getConnectorId())
+                .withType(AvailabilityType.fromValue(params.getAvailType()));
     }
 
     public ChangeConfigurationRequest prepareChangeConfiguration(String confKey, String value) {
-        ChangeConfigurationRequest req = new ChangeConfigurationRequest();
-        req.setKey(confKey);
-        req.setValue(value);
-        return req;
+        return new ChangeConfigurationRequest()
+                .withKey(confKey)
+                .withValue(value);
     }
 
     public ClearCacheRequest prepareClearCache() {
@@ -54,8 +52,7 @@ public class ChargePointService12_Client {
 
     public GetDiagnosticsRequest prepareGetDiagnostics(String location, int retries, int retryInterval,
                                                        String startTime, String stopTime) {
-        GetDiagnosticsRequest req = new GetDiagnosticsRequest();
-        req.setLocation(location);
+        GetDiagnosticsRequest req = new GetDiagnosticsRequest().withLocation(location);
         if (retries != -1) req.setRetries(retries);
         if (retryInterval != -1) req.setRetryInterval(retryInterval);
 
@@ -92,34 +89,30 @@ public class ChargePointService12_Client {
     }
 
     public RemoteStartTransactionRequest prepareRemoteStartTransaction(int connectorId, String idTag) {
-        RemoteStartTransactionRequest req = new RemoteStartTransactionRequest();
-        if (connectorId != 0) req.setConnectorId(connectorId);
-        req.setIdTag(idTag);
-        return req;
+        if (connectorId == 0) {
+            return new RemoteStartTransactionRequest().withIdTag(idTag);
+        } else {
+            return new RemoteStartTransactionRequest().withIdTag(idTag).withConnectorId(connectorId);
+        }
     }
 
     public RemoteStopTransactionRequest prepareRemoteStopTransaction(int transactionId) {
-        RemoteStopTransactionRequest req = new RemoteStopTransactionRequest();
-        req.setTransactionId(transactionId);
-        return req;
+        return new RemoteStopTransactionRequest().withTransactionId(transactionId);
     }
 
     public ResetRequest prepareReset(String resetTypeStr){
-        ResetRequest req = new ResetRequest();
-        req.setType(ResetType.fromValue(resetTypeStr));
-        return req;
+        return new ResetRequest().withType(ResetType.fromValue(resetTypeStr));
     }
 
     public UnlockConnectorRequest prepareUnlockConnector(int connectorId) {
-        UnlockConnectorRequest req = new UnlockConnectorRequest();
-        req.setConnectorId(connectorId);
-        return req;
+        return new UnlockConnectorRequest().withConnectorId(connectorId);
     }
 
     public UpdateFirmwareRequest prepareUpdateFirmware(String location, int retries, String retrieveDate, int retryInterval) {
-        UpdateFirmwareRequest req = new UpdateFirmwareRequest();
-        req.setLocation(location);
-        req.setRetrieveDate(DateTimeUtils.toDateTime(retrieveDate));
+        UpdateFirmwareRequest req = new UpdateFirmwareRequest()
+                .withLocation(location)
+                .withRetrieveDate(DateTimeUtils.toDateTime(retrieveDate));
+
         if (retries != -1) req.setRetries(retries);
         if (retryInterval != -1) req.setRetryInterval(retryInterval);
         return req;

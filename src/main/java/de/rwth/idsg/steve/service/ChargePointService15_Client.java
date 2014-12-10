@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -41,17 +42,15 @@ public class ChargePointService15_Client {
     // -------------------------------------------------------------------------
 
     public ChangeAvailabilityRequest prepareChangeAvailability(int connectorId, String availTypeStr) {
-        ChangeAvailabilityRequest req = new ChangeAvailabilityRequest();
-        req.setConnectorId(connectorId);
-        req.setType(AvailabilityType.fromValue(availTypeStr));
-        return req;
+        return new ChangeAvailabilityRequest()
+                .withConnectorId(connectorId)
+                .withType(AvailabilityType.fromValue(availTypeStr));
     }
 
     public ChangeConfigurationRequest prepareChangeConfiguration(String confKey, String value) {
-        ChangeConfigurationRequest req = new ChangeConfigurationRequest();
-        req.setKey(confKey);
-        req.setValue(value);
-        return req;
+        return new ChangeConfigurationRequest()
+                .withKey(confKey)
+                .withValue(value);
     }
 
     public ClearCacheRequest prepareClearCache() {
@@ -60,8 +59,7 @@ public class ChargePointService15_Client {
 
     public GetDiagnosticsRequest prepareGetDiagnostics(String location, int retries, int retryInterval,
                                                        String startTime, String stopTime) {
-        GetDiagnosticsRequest req = new GetDiagnosticsRequest();
-        req.setLocation(location);
+        GetDiagnosticsRequest req = new GetDiagnosticsRequest().withLocation(location);
         if (retries != -1) req.setRetries(retries);
         if (retryInterval != -1) req.setRetryInterval(retryInterval);
 
@@ -98,34 +96,30 @@ public class ChargePointService15_Client {
     }
 
     public RemoteStartTransactionRequest prepareRemoteStartTransaction(int connectorId, String idTag) {
-        RemoteStartTransactionRequest req = new RemoteStartTransactionRequest();
-        if (connectorId != 0) req.setConnectorId(connectorId);
-        req.setIdTag(idTag);
-        return req;
+        if (connectorId == 0) {
+            return new RemoteStartTransactionRequest().withIdTag(idTag);
+        } else {
+            return new RemoteStartTransactionRequest().withIdTag(idTag).withConnectorId(connectorId);
+        }
     }
 
     public RemoteStopTransactionRequest prepareRemoteStopTransaction(int transactionId) {
-        RemoteStopTransactionRequest req = new RemoteStopTransactionRequest();
-        req.setTransactionId(transactionId);
-        return req;
+        return new RemoteStopTransactionRequest().withTransactionId(transactionId);
     }
 
     public ResetRequest prepareReset(String resetTypeStr) {
-        ResetRequest req = new ResetRequest();
-        req.setType( ResetType.fromValue(resetTypeStr) );
-        return req;
+        return new ResetRequest().withType(ResetType.fromValue(resetTypeStr));
     }
 
     public UnlockConnectorRequest prepareUnlockConnector(int connectorId) {
-        UnlockConnectorRequest req = new UnlockConnectorRequest();
-        req.setConnectorId(connectorId);
-        return req;
+        return new UnlockConnectorRequest().withConnectorId(connectorId);
     }
 
     public UpdateFirmwareRequest prepareUpdateFirmware(String location, int retries, String retrieveDate, int retryInterval) {
-        UpdateFirmwareRequest req = new UpdateFirmwareRequest();
-        req.setLocation(location);
-        req.setRetrieveDate(DateTimeUtils.toDateTime(retrieveDate));
+        UpdateFirmwareRequest req = new UpdateFirmwareRequest()
+                .withLocation(location)
+                .withRetrieveDate(DateTimeUtils.toDateTime(retrieveDate));
+
         if (retries != -1) req.setRetries(retries);
         if (retryInterval != -1) req.setRetryInterval(retryInterval);
         return req;
@@ -136,20 +130,14 @@ public class ChargePointService15_Client {
 
     // Dummy implementation. This is new in OCPP 1.5. It must be vendor-specific.
     public DataTransferRequest prepareDataTransfer(String vendorId, String messageId, String data) {
-        DataTransferRequest req = new DataTransferRequest();
-        req.setVendorId(vendorId);
+        DataTransferRequest req = new DataTransferRequest().withVendorId(vendorId);
         if (!InputUtils.isNullOrEmpty(messageId)) req.setMessageId(messageId);
         if (!InputUtils.isNullOrEmpty(data)) req.setData(data);
         return req;
     }
 
     public GetConfigurationRequest prepareGetConfiguration(String[] confKeys) {
-        GetConfigurationRequest req = new GetConfigurationRequest();
-        if (confKeys != null) {
-            List<String> confKeysLIST = Arrays.asList(confKeys);
-            req.getKey().addAll(confKeysLIST);
-        }
-        return req;
+        return (confKeys == null) ? new GetConfigurationRequest() : new GetConfigurationRequest().withKey(confKeys);
     }
 
     public GetLocalListVersionRequest prepareGetLocalListVersion() {
@@ -161,11 +149,10 @@ public class ChargePointService15_Client {
      *
      */
     public SendLocalListRequest prepareSendLocalList(int listVersion) {
-        SendLocalListRequest req = new SendLocalListRequest();
-        req.setListVersion(listVersion);
-        req.setUpdateType(UpdateType.FULL);
-        req.getLocalAuthorisationList().addAll(userRepository.getAllUserDetails());
-        return req;
+        return new SendLocalListRequest()
+                .withListVersion(listVersion)
+                .withUpdateType(UpdateType.FULL)
+                .withLocalAuthorisationList(userRepository.getAllUserDetails());
     }
 
     /**
@@ -173,21 +160,20 @@ public class ChargePointService15_Client {
      *
      */
     public SendLocalListRequest prepareSendLocalList(int listVersion, List<String> addUpdateList, List<String> deleteList) {
-        SendLocalListRequest req = new SendLocalListRequest();
-        req.setListVersion(listVersion);
-        req.setUpdateType(UpdateType.DIFFERENTIAL);
+        List<AuthorisationData> auths = new ArrayList<>();
 
         // Step 1: For the idTags to be deleted, insert only the idTag
         for (String idTag : deleteList) {
-            AuthorisationData item = new AuthorisationData();
-            item.setIdTag(idTag);
-            req.getLocalAuthorisationList().add(item);
+            auths.add(new AuthorisationData().withIdTag(idTag));
         }
 
         // Step 2: For the idTags to be added or updated, insert them with their IdTagInfos
-        req.getLocalAuthorisationList().addAll(userRepository.getUserDetails(addUpdateList));
+        auths.addAll(userRepository.getUserDetails(addUpdateList));
 
-        return req;
+        return new SendLocalListRequest()
+                .withListVersion(listVersion)
+                .withUpdateType(UpdateType.DIFFERENTIAL)
+                .withLocalAuthorisationList(auths);
     }
 
     /** End: New with OCPP 1.5  **/

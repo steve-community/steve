@@ -66,25 +66,19 @@ public class CentralSystemService15_Server implements CentralSystemService {
                                                                      chargeBoxIdentity,
                                                                      new Timestamp(now.getMillis()));
 
-        BootNotificationResponse response = new BootNotificationResponse();
-        RegistrationStatus status;
+        RegistrationStatus status = (isRegistered) ? RegistrationStatus.ACCEPTED : RegistrationStatus.REJECTED;
 
-        if (isRegistered) {
-            status = RegistrationStatus.ACCEPTED;
-            response.setCurrentTime(now);
-            response.setHeartbeatInterval(OcppConstants.getHeartbeatInterval());
-        } else {
-            status = RegistrationStatus.REJECTED;
-        }
-        response.setStatus(status);
-        return response;
+        return new BootNotificationResponse()
+                .withStatus(status)
+                .withCurrentTime(now)
+                .withHeartbeatInterval(OcppConstants.getHeartbeatInterval());
     }
 
     public FirmwareStatusNotificationResponse firmwareStatusNotification(FirmwareStatusNotificationRequest parameters,
                                                                          String chargeBoxIdentity) {
         log.debug("Executing firmwareStatusNotification for {}", chargeBoxIdentity);
 
-        String status = parameters.getStatus().toString();
+        String status = parameters.getStatus().value();
         ocppServiceRepository.updateChargeboxFirmwareStatus(chargeBoxIdentity, status);
         return new FirmwareStatusNotificationResponse();
     }
@@ -94,8 +88,8 @@ public class CentralSystemService15_Server implements CentralSystemService {
 
         // Mandatory fields
         int connectorId = parameters.getConnectorId();
-        String status = parameters.getStatus().toString();
-        String errorCode = parameters.getErrorCode().toString();
+        String status = parameters.getStatus().value();
+        String errorCode = parameters.getErrorCode().value();
 
         // Optional fields
         String errorInfo = parameters.getInfo();
@@ -129,7 +123,7 @@ public class CentralSystemService15_Server implements CentralSystemService {
                                                                                String chargeBoxIdentity) {
         log.debug("Executing diagnosticsStatusNotification for {}", chargeBoxIdentity);
 
-        String status = parameters.getStatus().toString();
+        String status = parameters.getStatus().value();
         ocppServiceRepository.updateChargeboxDiagnosticsStatus(chargeBoxIdentity, status);
         return new DiagnosticsStatusNotificationResponse();
     }
@@ -201,9 +195,7 @@ public class CentralSystemService15_Server implements CentralSystemService {
         DateTime now = new DateTime();
         ocppServiceRepository.updateChargeboxHeartbeat(chargeBoxIdentity, new Timestamp(now.getMillis()));
 
-        HeartbeatResponse response = new HeartbeatResponse();
-        response.setCurrentTime(now);
-        return response;
+        return new HeartbeatResponse().withCurrentTime(now);
     }
 
     public AuthorizeResponse authorize(AuthorizeRequest parameters, String chargeBoxIdentity) {
@@ -213,9 +205,7 @@ public class CentralSystemService15_Server implements CentralSystemService {
         String idTag = parameters.getIdTag();
         IdTagInfo idTagInfo = createIdTagInfo(idTag);
 
-        AuthorizeResponse response = new AuthorizeResponse();
-        response.setIdTagInfo(idTagInfo);
-        return response;
+        return new AuthorizeResponse().withIdTagInfo(idTagInfo);
     }
 
     // Dummy implementation. This is new in OCPP 1.5. It must be vendor-specific.

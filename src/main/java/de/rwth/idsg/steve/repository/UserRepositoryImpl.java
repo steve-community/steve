@@ -179,17 +179,15 @@ public class UserRepositoryImpl implements UserRepository {
             String idTag = record.getIdtag();
             String parentIdTag = record.getParentidtag();
             Timestamp expiryDate = record.getExpirydate();
-            boolean inTransaction = record.getIntransaction();
-            boolean blocked = record.getBlocked();
 
             // Create IdTagInfo of an idTag
             IdTagInfo idTagInfo = new IdTagInfo();
             AuthorizationStatus authStatus;
 
-            if (inTransaction) {
+            if (record.getIntransaction()) {
                 authStatus = AuthorizationStatus.CONCURRENT_TX;
 
-            } else if (blocked) {
+            } else if (record.getBlocked()) {
                 authStatus = AuthorizationStatus.BLOCKED;
 
             } else if (expiryDate != null && now.after(expiryDate)) {
@@ -205,10 +203,7 @@ public class UserRepositoryImpl implements UserRepository {
             }
             idTagInfo.setStatus(authStatus);
 
-            AuthorisationData item = new AuthorisationData();
-            item.setIdTag(idTag);
-            item.setIdTagInfo(idTagInfo);
-            return item;
+            return new AuthorisationData().withIdTag(idTag).withIdTagInfo(idTagInfo);
         }
     }
 }

@@ -135,8 +135,7 @@ public class CentralSystemService15_Server implements CentralSystemService {
         String idTag = parameters.getIdTag();
         IdTagInfo idTagInfo = createIdTagInfo(idTag);
 
-        StartTransactionResponse response = new StartTransactionResponse();
-        response.setIdTagInfo(idTagInfo);
+        StartTransactionResponse response = new StartTransactionResponse().withIdTagInfo(idTagInfo);
 
         if (AuthorizationStatus.ACCEPTED.equals(idTagInfo.getStatus())) {
             int connectorId = parameters.getConnectorId();
@@ -181,12 +180,12 @@ public class CentralSystemService15_Server implements CentralSystemService {
         }
 
         // Get the authorization info of the user
-        StopTransactionResponse response = new StopTransactionResponse();
         if (parameters.isSetIdTag()) {
             IdTagInfo idTagInfo = createIdTagInfo(parameters.getIdTag());
-            response.setIdTagInfo(idTagInfo);
+            return new StopTransactionResponse().withIdTagInfo(idTagInfo);
+        } else {
+            return new StopTransactionResponse();
         }
-        return response;
     }
 
     public HeartbeatResponse heartbeat(HeartbeatRequest parameters, String chargeBoxIdentity) {

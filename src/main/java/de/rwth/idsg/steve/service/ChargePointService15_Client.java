@@ -13,8 +13,6 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
 
 /**
@@ -359,12 +357,13 @@ public class ChargePointService15_Client {
         DateTime expiryDateTime = DateTimeUtils.toDateTime(expiryString);
         int reservationId = reservationService.bookReservation(idTag, chargeBoxId, expiryDateTime);
 
-        ReserveNowRequest req = new ReserveNowRequest();
-        req.setConnectorId(connectorId);
-        req.setExpiryDate(DateTimeUtils.toDateTime(expiryString));
-        req.setIdTag(idTag);
+        ReserveNowRequest req = new ReserveNowRequest()
+                .withConnectorId(connectorId)
+                .withReservationId(reservationId)
+                .withExpiryDate(DateTimeUtils.toDateTime(expiryString))
+                .withIdTag(idTag);
+
         if (parentIdTag != null) req.setParentIdTag(parentIdTag);
-        req.setReservationId(reservationId);
 
         factory.setAddress(endpoint_address);
         ChargePointService client = (ChargePointService) factory.create();
@@ -381,8 +380,7 @@ public class ChargePointService15_Client {
     public String cancelReservation(String chargeBoxId, String endpoint_address, int reservationId) throws SteveException {
         log.debug("Invoking cancelReservation at {}", chargeBoxId);
 
-        CancelReservationRequest req = new CancelReservationRequest();
-        req.setReservationId(reservationId);
+        CancelReservationRequest req = new CancelReservationRequest().withReservationId(reservationId);
 
         factory.setAddress(endpoint_address);
         ChargePointService client = (ChargePointService) factory.create();

@@ -19,6 +19,7 @@ import javax.annotation.Resource;
 import javax.jws.WebService;
 import javax.xml.ws.WebServiceContext;
 import javax.xml.ws.handler.MessageContext;
+import javax.xml.ws.soap.Addressing;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
@@ -31,6 +32,7 @@ import java.util.List;
  */
 @Slf4j
 @Service
+@Addressing(enabled = true, required = true)
 @WebService(
         serviceName = "CentralSystemService",
         portName = "CentralSystemServiceSoap12",

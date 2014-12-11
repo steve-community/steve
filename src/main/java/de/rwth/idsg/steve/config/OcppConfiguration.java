@@ -10,7 +10,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import javax.annotation.PostConstruct;
-import javax.xml.namespace.QName;
 import javax.xml.ws.soap.SOAPBinding;
 
 /**
@@ -37,6 +36,7 @@ public class OcppConfiguration {
     public JaxWsProxyFactoryBean ocpp12ClientFactory() {
         JaxWsProxyFactoryBean f = new JaxWsProxyFactoryBean();
         f.setBindingId(SOAPBinding.SOAP12HTTP_BINDING);
+        f.getFeatures().add(new WSAddressingFeature());
         f.setServiceClass(ocpp.cp._2010._08.ChargePointService.class);
         return f;
     }
@@ -46,6 +46,7 @@ public class OcppConfiguration {
     public JaxWsProxyFactoryBean ocpp15ClientFactory() {
         JaxWsProxyFactoryBean f = new JaxWsProxyFactoryBean();
         f.setBindingId(SOAPBinding.SOAP12HTTP_BINDING);
+        f.getFeatures().add(new WSAddressingFeature());
         f.setServiceClass(ocpp.cp._2012._06.ChargePointService.class);
         return f;
     }
@@ -66,7 +67,6 @@ public class OcppConfiguration {
         f.setServiceBean(ocpp12Server);
         f.setBindingId(SOAPBinding.SOAP12HTTP_BINDING);
         f.setAddress("/CentralSystemServiceOCPP12");
-        f.getFeatures().add(new WSAddressingFeature());
         f.create();
     }
 
@@ -75,7 +75,6 @@ public class OcppConfiguration {
         f.setServiceBean(ocpp15Server);
         f.setBindingId(SOAPBinding.SOAP12HTTP_BINDING);
         f.setAddress("/CentralSystemServiceOCPP15");
-        f.getFeatures().add(new WSAddressingFeature());
         f.create();
     }
 }

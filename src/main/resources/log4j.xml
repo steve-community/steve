@@ -4,7 +4,7 @@
 
     <!-- Size based rolling file appender -->
     <appender name="fileAppender" class="org.apache.log4j.RollingFileAppender">
-        <param name="File" value="${catalina.base}/logs/steve.log"/>
+        <param name="File" value="${user.home}/logs/steve.log"/>
         <param name="MaxFileSize" value="2MB"/>
         <param name="MaxBackupIndex" value="10"/>
         <layout class="org.apache.log4j.PatternLayout">
@@ -19,22 +19,16 @@
         </layout>
     </appender>
 
-    <category name="org.apache.cxf">
-        <level value="INFO" />
-    </category>
-
-    <category name="org.springframework">
-        <level value="DEBUG" />
-    </category>
-
-    <category name="org.springframework.web.servlet">
-        <level value="DEBUG" />
-    </category>
+    <category name="org.apache.cxf"><level value="INFO"/></category>
+    <category name="org.eclipse.jetty"><level value="INFO"/></category>
+    <category name="com.zaxxer"><level value="INFO"/></category>
+    <category name="org.springframework"><level value="DEWBUG"/></category>
+    <category name="org.springframework.web.servlet"><level value="DEBUG"/></category>
 
     <!-- Root category -->
     <root>
         <priority value="DEBUG"/>
-        <appender-ref ref="consoleAppender"/>
+        <appender-ref ref="fileAppender"/>
     </root>
 
 </log4j:configuration>

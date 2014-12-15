@@ -141,7 +141,7 @@ public class Ocpp12Controller {
 
         model.addAttribute("context", context);
 
-        //TODO add jsp
+        //TODO add views
         return "response";
     }
 

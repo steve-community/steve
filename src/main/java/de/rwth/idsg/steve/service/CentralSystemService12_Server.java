@@ -17,9 +17,11 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import javax.jws.WebService;
+import javax.xml.ws.BindingType;
 import javax.xml.ws.WebServiceContext;
 import javax.xml.ws.handler.MessageContext;
 import javax.xml.ws.soap.Addressing;
+import javax.xml.ws.soap.SOAPBinding;
 import java.sql.Timestamp;
 
 /**
@@ -31,6 +33,7 @@ import java.sql.Timestamp;
 @Slf4j
 @Service
 @Addressing(enabled = true, required = true)
+@BindingType(value = SOAPBinding.SOAP12HTTP_BINDING)
 @WebService(
         serviceName = "CentralSystemService",
         portName = "CentralSystemServiceSoap12",

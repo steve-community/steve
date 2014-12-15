@@ -19,23 +19,25 @@ import java.io.PrintWriter;
 @Controller
 public class LogController {
 
+    private File logDir = new File(System.getProperty("user.home"), "logs");
+    private File logFile = new File(logDir, "steve.log");
+
     @RequestMapping(value = "/log", method = RequestMethod.GET)
     public void log(HttpServletResponse response) {
+        try (BufferedReader bufferedReader = new BufferedReader(new FileReader(logFile));
+             PrintWriter writer = response.getWriter()) {
 
-        try (PrintWriter writer = response.getWriter()) {
             response.setContentType("text/plain");
-
-            File logDir = new File(System.getProperty("catalina.base"), "logs");
-            File logFile = new File(logDir, "steve.log");
-
-            try (BufferedReader bufferedReader = new BufferedReader(new FileReader(logFile))) {
-                String sCurrentLine;
-                while ((sCurrentLine = bufferedReader.readLine()) != null) {
-                    writer.println(sCurrentLine);
-                }
+            String sCurrentLine;
+            while ((sCurrentLine = bufferedReader.readLine()) != null) {
+                writer.println(sCurrentLine);
             }
         } catch (Exception e) {
             log.error("Exception happened", e);
         }
+    }
+
+    public String getLogFilePath() {
+        return logFile.getAbsolutePath();
     }
 }

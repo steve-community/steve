@@ -24,11 +24,13 @@ import javax.validation.Valid;
 public class AboutSettingsController {
 
     @Autowired private GenericRepository genericRepository;
+    @Autowired private LogController logController;
 
     @RequestMapping(value = "/about", method = RequestMethod.GET)
     public String getAbout(Model model) {
         model.addAttribute("version", SteveConfiguration.STEVE_VERSION);
         model.addAttribute("db", genericRepository.getDBVersion());
+        model.addAttribute("logFile", logController.getLogFilePath());
         return "about";
     }
 

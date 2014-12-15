@@ -65,7 +65,6 @@ public class OcppConfiguration {
     private void createOcpp12Service() {
         JaxWsServerFactoryBean f = new JaxWsServerFactoryBean();
         f.setServiceBean(ocpp12Server);
-        f.setBindingId(SOAPBinding.SOAP12HTTP_BINDING);
         f.setAddress("/CentralSystemServiceOCPP12");
         f.create();
     }
@@ -73,7 +72,6 @@ public class OcppConfiguration {
     private void createOcpp15Service() {
         JaxWsServerFactoryBean f = new JaxWsServerFactoryBean();
         f.setServiceBean(ocpp15Server);
-        f.setBindingId(SOAPBinding.SOAP12HTTP_BINDING);
         f.setAddress("/CentralSystemServiceOCPP15");
         f.create();
     }

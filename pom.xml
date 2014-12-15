@@ -4,7 +4,15 @@
     <groupId>de.rwth.idsg</groupId>
     <artifactId>steve</artifactId>
     <version>1.0.2</version>
-    <packaging>war</packaging>
+    <packaging>jar</packaging>
+
+    <developers>
+        <developer>
+            <name>Sevket Goekay</name>
+            <email>goekay@dbis.rwth-aachen.de</email>
+            <url>https://github.com/goekay</url>
+        </developer>
+    </developers>
 
     <properties>
         <java.version>1.7</java.version>
@@ -12,10 +20,21 @@
         <jooq.version>3.5.0</jooq.version>
         <cxf.version>3.0.3</cxf.version>
         <spring.version>4.1.2.RELEASE</spring.version>
-        <mysql.jdbc.version>5.1.33</mysql.jdbc.version>
+        <mysql.jdbc.version>5.1.34</mysql.jdbc.version>
+        <jetty.version>9.2.5.v20141112</jetty.version>
     </properties>
 
     <build>
+        <!--<resources>-->
+            <!--<resource>-->
+                <!--<targetPath>/webapp</targetPath>-->
+                <!--<directory>src/main/webapp</directory>-->
+            <!--</resource>-->
+            <!--<resource>-->
+                <!--<directory>src/main/resources</directory>-->
+            <!--</resource>-->
+        <!--</resources>-->
+
         <plugins>
             <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -25,15 +44,92 @@
                     <target>${java.version}</target>
                 </configuration>
             </plugin>
+
+            <!-- Build the JAR with dependencies -->
+            <!--<plugin>-->
+                <!--<groupId>org.apache.maven.plugins</groupId>-->
+                <!--<artifactId>maven-assembly-plugin</artifactId>-->
+                <!--<version>2.5.2</version>-->
+                <!--<configuration>-->
+                    <!--<descriptorRefs>-->
+                        <!--<descriptorRef>jar-with-dependencies</descriptorRef>-->
+                    <!--</descriptorRefs>-->
+                    <!--<archive>-->
+                        <!--<manifest>-->
+                            <!--<mainClass>de.rwth.idsg.steve.JettyServer</mainClass>-->
+                        <!--</manifest>-->
+                    <!--</archive>-->
+                <!--</configuration>-->
+                <!--<executions>-->
+                    <!--<execution>-->
+                        <!--<id>make-assembly</id> &lt;!&ndash; this is used for inheritance merges &ndash;&gt;-->
+                        <!--<phase>package</phase> &lt;!&ndash; bind to the packaging phase &ndash;&gt;-->
+                        <!--<goals>-->
+                            <!--<goal>single</goal>-->
+                        <!--</goals>-->
+                    <!--</execution>-->
+                <!--</executions>-->
+            <!--</plugin>-->
+
+            <!-- Help: http://stackoverflow.com/questions/6831954 -->
             <plugin>
-                <artifactId>maven-war-plugin</artifactId>
-                <version>2.5</version>
-                <configuration>
-                    <warName>${project.artifactId}</warName>
-                    <warSourceDirectory>${basedir}/src/main/webapp</warSourceDirectory>
-                    <failOnMissingWebXml>false</failOnMissingWebXml>
-                </configuration>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>2.3</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                        <configuration>
+                            <minimizeJar>false</minimizeJar>
+                            <createDependencyReducedPom>false</createDependencyReducedPom>
+                            <transformers>
+                                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                                    <mainClass>de.rwth.idsg.steve.JettyServer</mainClass>
+                                </transformer>
+                                <transformer implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
+                                    <resource>META-INF/spring.schemas</resource>
+                                </transformer>
+                                <transformer implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
+                                    <resource>META-INF/cxf/bus-extensions.txt</resource>
+                                </transformer>
+                            </transformers>
+                            <filters>
+                                <filter>
+                                    <artifact>*:*</artifact>
+                                    <excludes>
+                                        <exclude>META-INF/*.SF</exclude>
+                                        <exclude>META-INF/*.DSA</exclude>
+                                        <exclude>META-INF/*.RSA</exclude>
+                                    </excludes>
+                                </filter>
+                            </filters>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
+
+            <!-- Pre-compiles JSPs. With pre-compiled JSPs it is not necessary to shade the jar
+            so the taglibs can be found when the JSPs are compiled at run time. -->
+            <!--<plugin>-->
+                <!--<groupId>org.eclipse.jetty</groupId>-->
+                <!--<artifactId>jetty-jspc-maven-plugin</artifactId>-->
+                <!--<version>${jetty.version}</version>-->
+                <!--<executions>-->
+                    <!--<execution>-->
+                        <!--<phase>compile</phase>-->
+                        <!--<id>jspc</id>-->
+                        <!--<goals>-->
+                            <!--<goal>jspc</goal>-->
+                        <!--</goals>-->
+                        <!--<configuration>-->
+                            <!--<webAppSourceDirectory>${basedir}/src/main/resources/webapp</webAppSourceDirectory>-->
+                        <!--</configuration>-->
+                    <!--</execution>-->
+                <!--</executions>-->
+            <!--</plugin>-->
 
             <plugin>
                 <groupId>org.apache.cxf</groupId>
@@ -172,7 +268,7 @@
         <dependency>
             <groupId>com.google.code.gson</groupId>
             <artifactId>gson</artifactId>
-            <version>2.2.4</version>
+            <version>2.3.1</version>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
@@ -182,7 +278,7 @@
         <dependency>
             <groupId>joda-time</groupId>
             <artifactId>joda-time</artifactId>
-            <version>2.5</version>
+            <version>2.6</version>
         </dependency>
         <dependency>
             <groupId>javax.servlet</groupId>
@@ -237,25 +333,32 @@
                 </exclusion>
             </exclusions>
         </dependency>
+        <!--<dependency>-->
+            <!--<groupId>org.apache.cxf</groupId>-->
+            <!--<artifactId>cxf-rt-bindings-soap</artifactId>-->
+            <!--<version>${cxf.version}</version>-->
+        <!--</dependency>-->
 
-        <!-- Provided by Tomcat -->
+        <!-- Jetty related dependencies -->
         <dependency>
-            <groupId>javax.servlet</groupId>
-            <artifactId>javax.servlet-api</artifactId>
-            <version>3.1.0</version>
-            <scope>provided</scope>
+            <groupId>org.eclipse.jetty</groupId>
+            <artifactId>jetty-webapp</artifactId>
+            <version>${jetty.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.apache.tomcat</groupId>
-            <artifactId>tomcat-jdbc</artifactId>
-            <version>8.0.14</version>
-            <scope>provided</scope>
+            <groupId>org.eclipse.jetty</groupId>
+            <artifactId>jetty-jsp</artifactId>
+            <version>${jetty.version}</version>
         </dependency>
         <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
             <version>${mysql.jdbc.version}</version>
-            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.zaxxer</groupId>
+            <artifactId>HikariCP-java6</artifactId>
+            <version>2.2.5</version>
         </dependency>
 
     </dependencies>

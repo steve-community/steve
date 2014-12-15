@@ -2,12 +2,16 @@ package de.rwth.idsg.steve;
 
 
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.jetty.rewrite.handler.RedirectPatternRule;
+import org.eclipse.jetty.rewrite.handler.RewriteHandler;
+import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.HttpConfiguration;
 import org.eclipse.jetty.server.HttpConnectionFactory;
 import org.eclipse.jetty.server.SecureRequestCustomizer;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.server.SslConnectionFactory;
+import org.eclipse.jetty.server.handler.HandlerCollection;
 import org.eclipse.jetty.servlet.ServletHolder;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.eclipse.jetty.util.thread.QueuedThreadPool;
@@ -101,7 +105,14 @@ public class JettyServer {
             server.addConnector(https);
         }
 
-        server.setHandler(getWebAppContext());
+        HandlerCollection handlerCollection = new HandlerCollection();
+        handlerCollection.setHandlers(
+                new Handler[] {
+                        getRedirectHandler(),
+                        getWebAppContext()
+        });
+
+        server.setHandler(handlerCollection);
     }
 
     private WebAppContext getWebAppContext() throws IOException {
@@ -118,6 +129,20 @@ public class JettyServer {
         context.addServlet(web, SteveConfiguration.SPRING_WEB_MAPPING);
         context.addServlet(cxf, SteveConfiguration.CXF_MAPPING);
         return context;
+    }
+
+    private Handler getRedirectHandler() {
+        RewriteHandler rewrite = new RewriteHandler();
+        rewrite.setRewriteRequestURI(true);
+        rewrite.setRewritePathInfo(true);
+        rewrite.setOriginalPathAttribute("requestedPath");
+
+        RedirectPatternRule baseToHome = new RedirectPatternRule();
+        baseToHome.setPattern("");
+        baseToHome.setLocation("/steve/manager/home");
+
+        rewrite.addRule(baseToHome);
+        return rewrite;
     }
 
     /**

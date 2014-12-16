@@ -32,7 +32,7 @@ public class ReservationRepositoryImpl implements ReservationRepository {
     private Configuration config;
 
     /**
-     * SELECT reservation_pk, idTag, chargeBoxId, startDatetime, expiryDatetime
+     * SELECT *
      * FROM reservation
      * WHERE expiryDatetime >= NOW()
      * ORDER BY expiryDatetime
@@ -55,7 +55,7 @@ public class ReservationRepositoryImpl implements ReservationRepository {
     @Override
     public List<Integer> getExistingReservationIds(String chargeBoxId) {
         return DSL.using(config)
-                  .select()
+                  .select(RESERVATION.RESERVATION_PK)
                   .from(RESERVATION)
                   .where(RESERVATION.CHARGEBOXID.equal(chargeBoxId))
                     .and(RESERVATION.EXPIRYDATETIME.greaterOrEqual(DSL.currentTimestamp()))

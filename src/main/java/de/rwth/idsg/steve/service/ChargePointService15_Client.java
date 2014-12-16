@@ -150,7 +150,7 @@ public class ChargePointService15_Client {
         return new SendLocalListRequest()
                 .withListVersion(listVersion)
                 .withUpdateType(UpdateType.FULL)
-                .withLocalAuthorisationList(userRepository.getAllUserDetails());
+                .withLocalAuthorisationList(userRepository.getAuthDataOfAllUsers());
     }
 
     /**
@@ -166,7 +166,7 @@ public class ChargePointService15_Client {
         }
 
         // Step 2: For the idTags to be added or updated, insert them with their IdTagInfos
-        auths.addAll(userRepository.getUserDetails(addUpdateList));
+        auths.addAll(userRepository.getAuthData(addUpdateList));
 
         return new SendLocalListRequest()
                 .withListVersion(listVersion)

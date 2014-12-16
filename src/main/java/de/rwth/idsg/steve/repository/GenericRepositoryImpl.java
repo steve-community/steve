@@ -52,7 +52,7 @@ public class GenericRepositoryImpl implements GenericRepository {
     }
 
     /**
-     * SELECT version, updateTimestamp
+     * SELECT *
      * FROM dbVersion
      */
     @Override

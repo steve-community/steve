@@ -57,7 +57,8 @@ public class ChargePointRepositoryImpl implements ChargePointRepository {
      */
     private Map<String,String> internalGetChargePoints(OcppVersion version) {
         return DSL.using(config)
-                  .selectFrom(CHARGEBOX)
+                  .select(CHARGEBOX.CHARGEBOXID, CHARGEBOX.ENDPOINT_ADDRESS)
+                  .from(CHARGEBOX)
                   .where(CHARGEBOX.OCPPVERSION.equal(version.getValue()))
                   .fetchMap(CHARGEBOX.CHARGEBOXID, CHARGEBOX.ENDPOINT_ADDRESS);
     }
@@ -69,7 +70,7 @@ public class ChargePointRepositoryImpl implements ChargePointRepository {
     @Override
     public List<String> getChargeBoxIds() {
         return DSL.using(config)
-                  .select()
+                  .select(CHARGEBOX.CHARGEBOXID)
                   .from(CHARGEBOX)
                   .fetch(CHARGEBOX.CHARGEBOXID);
     }
@@ -201,7 +202,7 @@ public class ChargePointRepositoryImpl implements ChargePointRepository {
     @Override
     public List<Integer> getConnectorIds(String chargeBoxId) {
         return DSL.using(config)
-                  .select()
+                  .select(CONNECTOR.CONNECTORID)
                   .from(CONNECTOR)
                   .where(CONNECTOR.CHARGEBOXID.equal(chargeBoxId))
                   .fetch(CONNECTOR.CONNECTORID);

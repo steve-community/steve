@@ -228,6 +228,8 @@ public class OcppServiceRepositoryImpl implements OcppServiceRepository {
                        .set(CONNECTOR_STATUS.VENDORID, vendorId)
                        .set(CONNECTOR_STATUS.VENDORERRORCODE, vendorErrorCode)
                        .execute();
+
+                    log.debug("Stored a new connector status for {}/{}.", chargeBoxIdentity, connectorId);
                 }
             });
         } catch (Exception e) {

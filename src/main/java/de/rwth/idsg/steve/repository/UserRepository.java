@@ -24,14 +24,14 @@ public interface UserRepository {
      * from the DB for the operation SendLocalList.
      *
      */
-    List<AuthorisationData> getAllUserDetails();
+    List<AuthorisationData> getAuthDataOfAllUsers();
 
     /**
      * For OCPP 1.5: Helper method to read user details of GIVEN idTags
      * from the DB for the operation SendLocalList.
      *
      */
-    List<AuthorisationData> getUserDetails(List<String> idTagList);
+    List<AuthorisationData> getAuthData(List<String> idTagList);
 
     Optional<UserRecord> getUserDetails(String idTag);
 }

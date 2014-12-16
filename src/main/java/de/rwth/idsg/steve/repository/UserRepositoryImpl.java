@@ -13,6 +13,7 @@ import ocpp.cp._2012._06.IdTagInfo;
 import org.joda.time.DateTime;
 import org.jooq.Configuration;
 import org.jooq.RecordMapper;
+import org.jooq.Result;
 import org.jooq.exception.DataAccessException;
 import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,16 +37,9 @@ public class UserRepositoryImpl implements UserRepository {
     @Qualifier("jooqConfig")
     private Configuration config;
 
-    /**
-     * SELECT *
-     * FROM user
-     */
     @Override
     public List<User> getUsers() {
-        return DSL.using(config)
-                  .selectFrom(USER)
-                  .fetch()
-                  .map(new UserMapper());
+        return getUserRecord().map(new UserMapper());
     }
 
     /**
@@ -105,16 +99,9 @@ public class UserRepositoryImpl implements UserRepository {
         }
     }
 
-    /**
-     * SELECT *
-     * FROM user
-     */
     @Override
-    public List<AuthorisationData> getAllUserDetails() {
-        return DSL.using(config)
-                  .selectFrom(USER)
-                  .fetch()
-                  .map(new AuthorisationDataMapper());
+    public List<AuthorisationData> getAuthDataOfAllUsers() {
+        return getUserRecord().map(new AuthorisationDataMapper());
     }
 
     /**
@@ -123,7 +110,7 @@ public class UserRepositoryImpl implements UserRepository {
      * WHERE idTag IN (?,?,...,?)
      */
     @Override
-    public List<AuthorisationData> getUserDetails(List<String> idTagList) {
+    public List<AuthorisationData> getAuthData(List<String> idTagList) {
         return DSL.using(config)
                   .selectFrom(USER)
                   .where(USER.IDTAG.in(idTagList))
@@ -153,6 +140,16 @@ public class UserRepositoryImpl implements UserRepository {
     // -------------------------------------------------------------------------
     // Private helpers
     // -------------------------------------------------------------------------
+
+    /**
+     * SELECT *
+     * FROM user
+     */
+    private Result<UserRecord> getUserRecord() {
+        return DSL.using(config)
+                  .selectFrom(USER)
+                  .fetch();
+    }
 
     private class UserMapper implements RecordMapper<UserRecord, User> {
         @Override

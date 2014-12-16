@@ -69,7 +69,7 @@ public class TransactionRepositoryImpl implements TransactionRepository {
     @Override
     public List<Integer> getActiveTransactionIds(String chargeBoxId) {
         return DSL.using(config)
-                  .select()
+                  .select(TRANSACTION.TRANSACTION_PK)
                   .from(TRANSACTION)
                   .join(CONNECTOR)
                     .on(TRANSACTION.CONNECTOR_PK.equal(CONNECTOR.CONNECTOR_PK))

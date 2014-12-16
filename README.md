@@ -15,9 +15,21 @@ How to use?
 1. SteVe requires MySQL to store the data. It comes with MySQL [dump files](resources/db/) that contain the database structures for all tables with no data. These should be imported *in the right order* in your MySQL database before deployment of SteVe.  
 **Important**: The default configuration (*username*, *password* and *url*) for the database connection has to be changed in [pom.xml](pom.xml#L210-212) and [SteveConfiguration.java](src/main/java/de/rwth/idsg/steve/SteveConfiguration.java#L53-L55).
 
-2. SteVe is designed as a Web application with embedded [Jetty](http://eclipse.org/jetty/). In order to build it, you need [Maven](http://maven.apache.org/). The command `mvn package` compiles and builds an archive ready to run it. With `java -jar steve-***.jar` you can start the application.
+2. SteVe is designed as a Web application with embedded [Jetty](http://eclipse.org/jetty/). In order to build it, you need [Maven](http://maven.apache.org/). The command 
 
-3. The HTTP URL of the OCPP service is **http://**`your-server-ip:port`**/steve/services/CentralSystemService**. The charge points must be configured to communicate with this address. Depending on the OCPP version of the charge point, SteVe will automatically route messages to the version-specific implementation.
+`mvn package`
+ 
+compiles and builds an archive ready to run it. With 
+
+`java -jar steve-***.jar` 
+
+you can start the application.
+
+3. The HTTP URL of the OCPP service is 
+
+**http://**`your-server-ip:port`**/steve/services/CentralSystemService**. 
+
+The charge points must be configured to communicate with this address. Depending on the OCPP version of the charge point, SteVe will automatically route messages to the version-specific implementation.
 
 4. Optional: To access the application via HTTPS, ...
 

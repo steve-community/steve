@@ -2,7 +2,7 @@
 
 ---
 
-![SteVe](src/main/webapp/resources/images/logo.png)
+![SteVe](src/main/resources/webapp/static/images/logo.png)
 =====
 
 SteVe was developed at the RWTH Aachen University and means Steckdosenverwaltung, namely socket administration in German. The aim of SteVe is to support the deployment and popularity of electric mobility, so it is easy to install and to use. SteVe provides basic functions for the administration of charge points, user data, and RFID cards for user authentication. It supports Open Charge Point Protocol (OCPP) 1.5 and 1.2 and was tested successfully in operation.
@@ -12,15 +12,14 @@ SteVe is considered as an open platform to implement, test and evaluate novel id
 How to use?
 -----
 
-1. SteVe is designed as a Web application to run under Apache Tomcat. Therefore, the source code must be compiled and deployed in Tomcat before use.  
-**Important**: For security reasons, the Web interface can only be accessed with a username and password. By default, it grants access to users with Tomcat's *admin* role. This should be changed according to your preference in [web.xml](src/main/webapp/WEB-INF/web.xml).
+1. SteVe requires MySQL to store the data. It comes with MySQL [dump files](resources/db/) that contain the database structures for all tables with no data. These should be imported *in the right order* in your MySQL database before deployment of SteVe.  
+**Important**: The default configuration (*username*, *password* and *url*) for the database connection has to be changed in [pom.xml](pom.xml#L210-212) and [SteveConfiguration.java](src/main/java/de/rwth/idsg/steve/SteveConfiguration.java#L53-L55).
 
-2. SteVe requires MySQL to store the data. SteVe comes with a MySQL [dump file](resources/db/stevedb-v0.6.6.sql) that contains the database structure for all tables with no data. This should be imported in your MySQL database before deployment of SteVe.  
-**Important**: The default configuration for the database connection can be changed in [context.xml](src/main/webapp/META-INF/context.xml#L18-20). The required fields to change are *username*, *password* and *url*.
+2. SteVe is designed as a Web application with embedded [Jetty](http://eclipse.org/jetty/). In order to build it, you need [Maven](http://maven.apache.org/). The command `mvn package` compiles and builds an archive ready to run it. With `java -jar steve-***.jar` you can start the application.
 
 3. The HTTP URL of the OCPP service is **http://**`your-server-ip:port`**/steve/services/CentralSystemService**. The charge points must be configured to communicate with this address. Depending on the OCPP version of the charge point, SteVe will automatically route messages to the version-specific implementation.
 
-4. Optional: To access the application via HTTPS, change NONE to CONFIDENTIAL in [web.xml](src/main/webapp/WEB-INF/web.xml#L62). But before that, your Tomcat installation must be configured to use SSL connections. [Here](http://java.dzone.com/articles/setting-ssl-tomcat-5-minutes) is a simple tutorial.
+4. Optional: To access the application via HTTPS, ...
 
 Screenshots
 -----

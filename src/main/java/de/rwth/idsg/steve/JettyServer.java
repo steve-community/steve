@@ -1,6 +1,8 @@
 package de.rwth.idsg.steve;
 
 
+import de.rwth.idsg.steve.config.BeanConfiguration;
+import de.rwth.idsg.steve.config.OcppConfiguration;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.jetty.rewrite.handler.RedirectPatternRule;
 import org.eclipse.jetty.rewrite.handler.RewriteHandler;
@@ -18,6 +20,10 @@ import org.eclipse.jetty.util.thread.QueuedThreadPool;
 import org.eclipse.jetty.util.thread.ScheduledExecutorScheduler;
 import org.eclipse.jetty.webapp.WebAppContext;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.web.context.ContextLoaderListener;
+import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
+import org.springframework.web.servlet.DispatcherServlet;
 
 import java.io.IOException;
 
@@ -109,26 +115,34 @@ public class JettyServer {
         handlerCollection.setHandlers(
                 new Handler[] {
                         getRedirectHandler(),
-                        getWebAppContext()
+                        getJettyContext(getSpringContext())
         });
 
         server.setHandler(handlerCollection);
     }
 
-    private WebAppContext getWebAppContext() throws IOException {
-        WebAppContext context = new WebAppContext();
-        context.setContextPath(SteveConfiguration.Jetty.CONTEXT_PATH);
-        context.setResourceBase(new ClassPathResource("webapp").getURI().toString());
+    private WebAppContext getJettyContext(WebApplicationContext springContext) throws IOException {
+        WebAppContext jettyContext = new WebAppContext();
+        jettyContext.setContextPath(SteveConfiguration.Jetty.CONTEXT_PATH);
+        jettyContext.setResourceBase(new ClassPathResource("webapp").getURI().toString());
 
         // Disable directory listings if no index.html is found.
-        context.setInitParameter("org.eclipse.jetty.servlet.Default.dirAllowed", "false");
+        jettyContext.setInitParameter("org.eclipse.jetty.servlet.Default.dirAllowed", "false");
 
-        ServletHolder web = new ServletHolder("spring-dispatcher", JettyServlets.getWebManager());
+        ServletHolder web = new ServletHolder("spring-dispatcher", new DispatcherServlet(springContext));
         ServletHolder cxf = new ServletHolder("cxf", JettyServlets.getApacheCXF());
 
-        context.addServlet(web, SteveConfiguration.SPRING_WEB_MAPPING);
-        context.addServlet(cxf, SteveConfiguration.CXF_MAPPING);
-        return context;
+        jettyContext.addEventListener(new ContextLoaderListener(springContext));
+        jettyContext.addServlet(web, SteveConfiguration.SPRING_WEB_MAPPING);
+        jettyContext.addServlet(cxf, SteveConfiguration.CXF_MAPPING);
+        return jettyContext;
+    }
+
+    private WebApplicationContext getSpringContext() {
+        AnnotationConfigWebApplicationContext ctx = new AnnotationConfigWebApplicationContext();
+        ctx.register(BeanConfiguration.class);
+        ctx.register(OcppConfiguration.class);
+        return ctx;
     }
 
     private Handler getRedirectHandler() {

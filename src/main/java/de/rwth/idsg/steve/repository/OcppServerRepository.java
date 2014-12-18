@@ -10,7 +10,7 @@ import java.util.List;
  * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
  * @since 19.08.2014
  */
-public interface OcppServiceRepository {
+public interface OcppServerRepository {
 
     /**
      * One DB call with two functions:

@@ -3,7 +3,7 @@ package de.rwth.idsg.steve.service;
 import com.google.common.base.Optional;
 import de.rwth.idsg.steve.OcppConstants;
 import de.rwth.idsg.steve.OcppVersion;
-import de.rwth.idsg.steve.repository.OcppServiceRepository;
+import de.rwth.idsg.steve.repository.OcppServerRepository;
 import de.rwth.idsg.steve.repository.UserRepository;
 import de.rwth.idsg.steve.utils.DateTimeUtils;
 import jooq.steve.db.tables.records.UserRecord;
@@ -42,7 +42,7 @@ import java.sql.Timestamp;
 public class CentralSystemService12_Server implements CentralSystemService {
 
     @Resource private WebServiceContext webServiceContext;
-    @Autowired private OcppServiceRepository ocppServiceRepository;
+    @Autowired private OcppServerRepository ocppServerRepository;
     @Autowired private UserRepository userRepository;
 
     public BootNotificationResponse bootNotification(BootNotificationRequest parameters, String chargeBoxIdentity) {
@@ -55,7 +55,7 @@ public class CentralSystemService12_Server implements CentralSystemService {
 
         DateTime now = new DateTime();
 
-        boolean isRegistered = ocppServiceRepository.updateChargebox(endpointAddress,
+        boolean isRegistered = ocppServerRepository.updateChargebox(endpointAddress,
                                                                      OcppVersion.V_12,
                                                                      parameters.getChargePointVendor(),
                                                                      parameters.getChargePointModel(),
@@ -86,7 +86,7 @@ public class CentralSystemService12_Server implements CentralSystemService {
         log.debug("Executing firmwareStatusNotification for {}", chargeBoxIdentity);
 
         String status = parameters.getStatus().value();
-        ocppServiceRepository.updateChargeboxFirmwareStatus(chargeBoxIdentity, status);
+        ocppServerRepository.updateChargeboxFirmwareStatus(chargeBoxIdentity, status);
         return new FirmwareStatusNotificationResponse();
     }
 
@@ -96,7 +96,7 @@ public class CentralSystemService12_Server implements CentralSystemService {
         int connectorId = parameters.getConnectorId();
         String status = parameters.getStatus().value();
         String errorCode = parameters.getErrorCode().value();
-        ocppServiceRepository.insertConnectorStatus12(chargeBoxIdentity, connectorId, status,
+        ocppServerRepository.insertConnectorStatus12(chargeBoxIdentity, connectorId, status,
                                                       DateTimeUtils.getCurrentDateTime(), errorCode);
         return new StatusNotificationResponse();
     }
@@ -106,7 +106,7 @@ public class CentralSystemService12_Server implements CentralSystemService {
 
         int connectorId = parameters.getConnectorId();
         if (parameters.isSetValues()) {
-            ocppServiceRepository.insertMeterValues12(chargeBoxIdentity, connectorId, parameters.getValues());
+            ocppServerRepository.insertMeterValues12(chargeBoxIdentity, connectorId, parameters.getValues());
         }
         return new MeterValuesResponse();
     }
@@ -116,7 +116,7 @@ public class CentralSystemService12_Server implements CentralSystemService {
         log.debug("Executing diagnosticsStatusNotification for {}", chargeBoxIdentity);
 
         String status = parameters.getStatus().value();
-        ocppServiceRepository.updateChargeboxDiagnosticsStatus(chargeBoxIdentity, status);
+        ocppServerRepository.updateChargeboxDiagnosticsStatus(chargeBoxIdentity, status);
         return new DiagnosticsStatusNotificationResponse();
     }
 
@@ -134,7 +134,7 @@ public class CentralSystemService12_Server implements CentralSystemService {
             Timestamp startTimestamp = new Timestamp(parameters.getTimestamp().getMillis());
             String startMeterValue = Integer.toString(parameters.getMeterStart());
 
-            Optional<Integer> transactionId = ocppServiceRepository.insertTransaction12(chargeBoxIdentity,
+            Optional<Integer> transactionId = ocppServerRepository.insertTransaction12(chargeBoxIdentity,
                                                                                         connectorId,
                                                                                         idTag,
                                                                                         startTimestamp,
@@ -153,7 +153,7 @@ public class CentralSystemService12_Server implements CentralSystemService {
         int transactionId = parameters.getTransactionId();
         Timestamp stopTimestamp = new Timestamp(parameters.getTimestamp().getMillis());
         String stopMeterValue = Integer.toString(parameters.getMeterStop());
-        ocppServiceRepository.updateTransaction(transactionId, stopTimestamp, stopMeterValue);
+        ocppServerRepository.updateTransaction(transactionId, stopTimestamp, stopMeterValue);
 
         // Get the authorization info of the user
         if (parameters.isSetIdTag()) {
@@ -168,7 +168,7 @@ public class CentralSystemService12_Server implements CentralSystemService {
         log.debug("Executing heartbeat for {}", chargeBoxIdentity);
 
         DateTime now = new DateTime();
-        ocppServiceRepository.updateChargeboxHeartbeat(chargeBoxIdentity, new Timestamp(now.getMillis()));
+        ocppServerRepository.updateChargeboxHeartbeat(chargeBoxIdentity, new Timestamp(now.getMillis()));
 
         return new HeartbeatResponse().withCurrentTime(now);
     }

@@ -43,7 +43,7 @@ import static jooq.steve.db.tables.Transaction.TRANSACTION;
  */
 @Slf4j
 @Repository
-public class OcppServiceRepositoryImpl implements OcppServiceRepository {
+public class OcppServerRepositoryImpl implements OcppServerRepository {
 
     @Autowired
     @Qualifier("jooqConfig")

@@ -25,6 +25,7 @@ public class AboutSettingsController {
 
     @Autowired private GenericRepository genericRepository;
     @Autowired private LogController logController;
+    @Autowired private OcppConstants ocppConstants;
 
     @RequestMapping(value = "/about", method = RequestMethod.GET)
     public String getAbout(Model model) {
@@ -37,8 +38,8 @@ public class AboutSettingsController {
     @RequestMapping(value = "/settings", method = RequestMethod.GET)
     public String getSettings(Model model) {
         OcppSettings os = new OcppSettings();
-        os.setExpiration(OcppConstants.getHoursToExpire());
-        os.setHeartbeat(OcppConstants.getHeartbeatInterval());
+        os.setExpiration(ocppConstants.getHoursToExpire());
+        os.setHeartbeat(ocppConstants.getHeartbeatIntervalInMinutes());
 
         model.addAttribute("settingsForm", os);
         return "settings";
@@ -52,8 +53,8 @@ public class AboutSettingsController {
             return "settings";
         }
 
-        OcppConstants.setHeartbeatInterval(settingsForm.getHeartbeat());
-        OcppConstants.setHoursToExpire(settingsForm.getExpiration());
+        ocppConstants.setHeartbeatIntervalInMinutes(settingsForm.getHeartbeat());
+        ocppConstants.setHoursToExpire(settingsForm.getExpiration());
         return "redirect:/manager/settings";
     }
 }

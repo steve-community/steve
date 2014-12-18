@@ -37,6 +37,8 @@ public class UserRepositoryImpl implements UserRepository {
     @Qualifier("jooqConfig")
     private Configuration config;
 
+    @Autowired private OcppConstants ocppConstants;
+
     @Override
     public List<User> getUsers() {
         return getUserRecord().map(new UserMapper());
@@ -167,7 +169,7 @@ public class UserRepositoryImpl implements UserRepository {
     private class AuthorisationDataMapper implements RecordMapper<UserRecord, AuthorisationData> {
 
         DateTime nowDt = new DateTime();
-        DateTime cacheExpiry = nowDt.plus(OcppConstants.getHoursToExpire());
+        DateTime cacheExpiry = nowDt.plus(ocppConstants.getHoursToExpire());
         Timestamp now = new Timestamp(nowDt.getMillis());
 
         @Override

@@ -46,6 +46,7 @@ public class CentralSystemService15_Server implements CentralSystemService {
     @Resource private WebServiceContext webServiceContext;
     @Autowired private OcppServerRepository ocppServerRepository;
     @Autowired private UserRepository userRepository;
+    @Autowired private OcppConstants ocppConstants;
 
     public BootNotificationResponse bootNotification(BootNotificationRequest parameters, String chargeBoxIdentity) {
         log.debug("Executing bootNotification for {}", chargeBoxIdentity);
@@ -76,7 +77,7 @@ public class CentralSystemService15_Server implements CentralSystemService {
         return new BootNotificationResponse()
                 .withStatus(status)
                 .withCurrentTime(now)
-                .withHeartbeatInterval(OcppConstants.getHeartbeatInterval());
+                .withHeartbeatInterval(ocppConstants.getHeartbeatIntervalInSeconds());
     }
 
     public FirmwareStatusNotificationResponse firmwareStatusNotification(FirmwareStatusNotificationRequest parameters,
@@ -251,7 +252,7 @@ public class CentralSystemService15_Server implements CentralSystemService {
                 log.debug("The user with idTag '{}' is ACCEPTED.", idTag);
                 idTagInfo.setStatus(AuthorizationStatus.ACCEPTED);
 
-                int hours = OcppConstants.getHoursToExpire();
+                int hours = ocppConstants.getHoursToExpire();
                 idTagInfo.setExpiryDate(new DateTime().plusHours(hours));
 
                 if (record.getParentidtag() != null) {

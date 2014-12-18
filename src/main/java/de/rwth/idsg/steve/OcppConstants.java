@@ -1,5 +1,11 @@
 package de.rwth.idsg.steve;
 
+import lombok.Getter;
+import lombok.Setter;
+import org.springframework.stereotype.Component;
+
+import java.util.concurrent.TimeUnit;
+
 /**
  * This class holds the values that are relevant to OCPP
  * and used by the application.
@@ -7,38 +13,24 @@ package de.rwth.idsg.steve;
  * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
  *  
  */
-public final class OcppConstants {
-    private OcppConstants() {}
+@Component
+public class OcppConstants {
 
     // Heartbeat interval in seconds
-    private static int heartbeatInterval = 14400;
+    private int heartbeatInterval = 14400;
+
     // Determines how many hours the idtag should be stored in the local whitelist of a chargebox
-    private static int hoursToExpire = 1;
+    @Getter @Setter private int hoursToExpire = 1;
 
-    private static final Object HEARTBEAT_LOCK = new Object();
-    private static final Object HOURS_LOCK = new Object();
-
-    public static int getHeartbeatInterval() {
-        synchronized (HEARTBEAT_LOCK) {
-            return heartbeatInterval;
-        }
+    public int getHeartbeatIntervalInSeconds() {
+        return heartbeatInterval;
     }
 
-    public static void setHeartbeatInterval(int interval) {
-        synchronized (HEARTBEAT_LOCK) {
-            heartbeatInterval = interval;
-        }
+    public void setHeartbeatIntervalInMinutes(int heartbeatIntervalInMinutes) {
+        this.heartbeatInterval = (int) TimeUnit.MINUTES.toSeconds(heartbeatIntervalInMinutes);
     }
 
-    public static int getHoursToExpire() {
-        synchronized (HOURS_LOCK) {
-            return hoursToExpire;
-        }
-    }
-
-    public static void setHoursToExpire(int expire) {
-        synchronized (HOURS_LOCK) {
-            hoursToExpire = expire;
-        }
+    public int getHeartbeatIntervalInMinutes() {
+        return (int) TimeUnit.SECONDS.toMinutes(heartbeatInterval);
     }
 }

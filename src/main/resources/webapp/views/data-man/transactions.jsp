@@ -1,5 +1,6 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ include file="../00-header.jsp" %>
+<div class="content">
 <section><span>
 Transactions 
 <a class="tooltip" href="#"><img src="/steve/static/images/info.png" style="vertical-align:middle">
@@ -19,4 +20,5 @@ Value column is the meter difference between the start and stop of a transaction
 	</tbody>
 </table>
 <br>
+</div>
 <%@ include file="../00-footer.jsp" %>

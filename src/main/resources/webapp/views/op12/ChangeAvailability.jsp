@@ -1,4 +1,5 @@
 <%@ include file="../00-header.jsp" %>
+<div class="content">
 <div class="left-menu">
 <ul>
 	<li><a class="highlight" href="/steve/manager/operations/v1.2/ChangeAvailability">Change Availability</a></li>
@@ -23,5 +24,5 @@
 </table>
 <div class="submit-button"><input type="submit" value="Perform"></div>
 </form>
-</div>
+</div></div>
 <%@ include file="../00-footer.jsp" %>

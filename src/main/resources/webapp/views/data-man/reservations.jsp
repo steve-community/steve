@@ -1,5 +1,6 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ include file="../00-header.jsp" %>
+<div class="content">
 <section><span>Existing Reservations</span></section>
 <table class="res">
 	<thead><tr><th>Reservation ID</th><th>User ID Tag</th><th>ChargeBox ID</th><th>Start Date/Time</th><th>Expiry Date/Time</th></tr></thead>
@@ -12,4 +13,5 @@
 	</tbody>
 </table>
 <br>
+</div>
 <%@ include file="../00-footer.jsp" %>

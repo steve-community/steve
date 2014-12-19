@@ -1,5 +1,6 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ include file="00-header.jsp" %>
+<div class="content">
 <div class="tileWrapper">
 	<a class="tileRow1" href="/steve/manager/chargepoints">
 		Number of<br>Charge Points
@@ -55,5 +56,5 @@
 			</span>
 		</span>	
 	</a>
-</div>
+</div></div>
 <%@ include file="00-footer.jsp" %>

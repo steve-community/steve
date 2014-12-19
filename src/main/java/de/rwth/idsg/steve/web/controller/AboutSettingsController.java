@@ -37,19 +37,21 @@ public class AboutSettingsController {
 
     @RequestMapping(value = "/settings", method = RequestMethod.GET)
     public String getSettings(Model model) {
-        OcppSettings os = new OcppSettings();
-        os.setExpiration(ocppConstants.getHoursToExpire());
-        os.setHeartbeat(ocppConstants.getHeartbeatIntervalInMinutes());
+        int heartbeat = ocppConstants.getHeartbeatIntervalInMinutes();
+        int expiration = ocppConstants.getHoursToExpire();
 
-        model.addAttribute("settingsForm", os);
+        model.addAttribute("currentHeartbeat", heartbeat);
+        model.addAttribute("currentExpiration", expiration);
+        model.addAttribute("settingsForm", new OcppSettings(heartbeat, expiration));
         return "settings";
     }
 
     @RequestMapping(value = "/settings", method = RequestMethod.POST)
     public String postSettings(@Valid @ModelAttribute("settingsForm") OcppSettings settingsForm,
-                               Model model, BindingResult result) {
-
+                               BindingResult result, Model model) {
         if (result.hasErrors()) {
+            model.addAttribute("currentHeartbeat", ocppConstants.getHeartbeatIntervalInMinutes());
+            model.addAttribute("currentExpiration", ocppConstants.getHoursToExpire());
             return "settings";
         }
 

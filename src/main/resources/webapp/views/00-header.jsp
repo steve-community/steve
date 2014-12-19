@@ -39,4 +39,4 @@
             </ul>
         </div></div>
     <div class="main-wrapper">
-        <div class="content">
+

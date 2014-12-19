@@ -1,6 +1,6 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ include file="00-header.jsp" %>
-<div>
+<div class="content"><div>
 <section><span>
 Connector Status <a class="tooltip" href="#"><img src="/steve/static/images/info.png" style="vertical-align:middle"><span>Last status information and corresponding date/time of connectors received from charging stations.</span></a>
 </span></section>
@@ -14,5 +14,5 @@ Connector Status <a class="tooltip" href="#"><img src="/steve/static/images/info
 	<%-- End --%>
 	</tbody>
 </table>
-</div>
+</div></div>
 <%@ include file="00-footer.jsp" %>

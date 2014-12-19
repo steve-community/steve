@@ -6,6 +6,7 @@ $(document).ready(function() {
 <%@ include file="../../static/js/snippets/populateUpdate.js" %>
 });
 </script>
+<div class="content">
 <section><span>Registered Users</span></section>
 <table class="res" id="usersTable">
 	<thead><tr><th>User ID Tag</th><th>Parent ID Tag</th><th>Expiry Date/Time</th><th>In Transaction?</th><th>Blocked?</th></tr></thead>
@@ -106,5 +107,6 @@ $(document).ready(function() {
 			</table>
 		</form>
 	</div>
+</div>
 </div>
 <%@ include file="../00-footer.jsp" %>

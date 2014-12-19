@@ -4,6 +4,7 @@ $(document).ready(function() {
 <%@ include file="../../static/js/snippets/getConnectorIds.js" %>
 });
 </script>
+<div class="content">
 <div class="left-menu">
 <ul>
 	<li><a href="/steve/manager/operations/v1.5/ChangeAvailability">Change Availability</a></li>
@@ -35,5 +36,5 @@ $(document).ready(function() {
 </table>
 <div class="submit-button"><input type="submit" value="Perform"></div>
 </form>
-</div>
+</div></div>
 <%@ include file="../00-footer.jsp" %>

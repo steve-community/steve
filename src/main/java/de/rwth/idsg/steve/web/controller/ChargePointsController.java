@@ -34,6 +34,7 @@ public class ChargePointsController {
     @RequestMapping(value = "/chargepoints/add", method = RequestMethod.POST)
     public String add(@Valid @ModelAttribute("chargeBoxAddForm") ChargeBoxForm chargeBoxForm,
                       BindingResult result, Model model) throws SteveException {
+
         if (result.hasErrors()) {
             model.addAttribute("cpList", chargePointRepository.getChargeBoxIds());
             model.addAttribute("chargeBoxDeleteForm", new ChargeBoxForm());
@@ -47,6 +48,7 @@ public class ChargePointsController {
     @RequestMapping(value = "/chargepoints/delete", method = RequestMethod.POST)
     public String delete(@Valid @ModelAttribute("chargeBoxDeleteForm") ChargeBoxForm chargeBoxForm,
                          BindingResult result, Model model) throws SteveException {
+
         if (result.hasErrors()) {
             model.addAttribute("cpList", chargePointRepository.getChargeBoxIds());
             model.addAttribute("chargeBoxAddForm", new ChargeBoxForm());

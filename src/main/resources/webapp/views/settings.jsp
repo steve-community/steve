@@ -13,7 +13,7 @@
 </spring:hasBindErrors>
 <div class="content">
 <section><span>Settings</span></section>
-<form:form action="/steve/manager/settings" commandName="settingsForm">
+<form:form action="/steve/manager/settings" modelAttribute="settingsForm">
 <table class="userInputFullPage">
 <tr><td>Heartbeat Interval:</td><td>
     <form:input path="heartbeat"/>

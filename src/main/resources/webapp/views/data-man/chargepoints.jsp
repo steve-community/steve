@@ -7,6 +7,17 @@
 </script>
 <spring:hasBindErrors name="chargeBoxAddForm">
     <div class="error">
+        Error while trying to add a charge point:
+        <ul>
+            <c:forEach var="error" items="${errors.allErrors}">
+                <li>${error.defaultMessage}</li>
+            </c:forEach>
+        </ul>
+    </div>
+</spring:hasBindErrors>
+<spring:hasBindErrors name="chargeBoxDeleteForm">
+    <div class="error">
+        Error while trying to delete a charge point:
         <ul>
             <c:forEach var="error" items="${errors.allErrors}">
                 <li>${error.defaultMessage}</li>
@@ -40,7 +51,7 @@
 <div class="right-content">
 	<div id="add">
 		<div class="info"><b>Info:</b> ChargeBox ID is sufficient enough to register a charge point. After every reset of a charge point the remaining fields are updated.</div>
-        <form:form action="/steve/manager/chargepoints/add" commandName="chargeBoxAddForm">
+        <form:form action="/steve/manager/chargepoints/add" modelAttribute="chargeBoxAddForm">
 			<table class="userInput">
 				<tr><td>ChargeBox ID (string):</td><td><form:input path="chargeBoxId"/></td></tr>
 				<tr><td></td><td id="add_space"><input type="submit" value="Add"></td></tr>
@@ -49,12 +60,11 @@
 	</div>
 	<div id="delete">
 		<div class="warning"><b>Warning:</b> Deleting a charge point causes losing all related information including transactions, reservations, connector status and connector meter values.</div>
-        <form:form action="/steve/manager/chargepoints/delete" commandName="chargeBoxDeleteForm">
+        <form:form action="/steve/manager/chargepoints/delete" modelAttribute="chargeBoxDeleteForm">
 			<table class="userInput">
 				<tr><td>ChargeBox ID:</td><td>
                     <form:select path="chargeBoxId">
                         <option selected="selected" disabled="disabled" style="display:none;">Choose...</option>
-                        <%--<form:option value="" cssStyle="display:none;" label="Choose..."/>--%>
                         <form:options items="${cpList}" />
                     </form:select>
 				</td></tr>

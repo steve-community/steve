@@ -141,6 +141,7 @@
                     <defaultOptions>
                         <bindingFiles>
                             <bindingFile>${basedir}/src/main/resources/ocpp_binding.xml</bindingFile>
+                            <bindingFile>${basedir}/src/main/resources/async_binding.xml</bindingFile>
                         </bindingFiles>
                         <extraargs>
                             <extraarg>-xjc-Xfluent-api</extraarg>
@@ -332,6 +333,11 @@
                     <artifactId>jcl-over-slf4j</artifactId>
                 </exclusion>
             </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.cxf</groupId>
+           	<artifactId>cxf-rt-transports-http-hc</artifactId>
+            <version>${cxf.version}</version>
         </dependency>
 
         <!-- Jetty related dependencies -->

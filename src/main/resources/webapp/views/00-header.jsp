@@ -30,6 +30,7 @@
                     <ul>
                         <li><a href="/steve/manager/operations/v1.2">OCPP v1.2</a></li>
                         <li><a href="/steve/manager/operations/v1.5">OCPP v1.5</a></li>
+                        <li><a href="/steve/manager/operations/tasks">Tasks</a></li>
                     </ul>
                 </li>
                 <li><a href="/steve/manager/settings">SETTINGS</a></li>
@@ -39,4 +40,3 @@
             </ul>
         </div></div>
     <div class="main-wrapper">
-

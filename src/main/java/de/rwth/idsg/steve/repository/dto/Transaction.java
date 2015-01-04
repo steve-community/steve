@@ -12,5 +12,5 @@ import lombok.experimental.Builder;
 @Builder
 public final class Transaction {
     private final int id, connectorId;
-    private final String chargeBoxId, idTag, startTimestamp, stopTimestamp, chargedMeterValue;
+    private final String chargeBoxId, idTag, startTimestamp, startValue, stopTimestamp, stopValue;
 }

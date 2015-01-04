@@ -10,5 +10,6 @@ import java.util.List;
  */
 public interface TransactionRepository {
     List<Transaction> getTransactions();
+    String getTransactionsCSV();
     List<Integer> getActiveTransactionIds(String chargeBoxId);
 }

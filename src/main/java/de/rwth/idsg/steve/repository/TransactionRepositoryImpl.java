@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.jooq.Configuration;
 import org.jooq.Record8;
 import org.jooq.RecordMapper;
+import org.jooq.Result;
 import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -29,6 +30,16 @@ public class TransactionRepositoryImpl implements TransactionRepository {
     @Qualifier("jooqConfig")
     private Configuration config;
 
+    @Override
+    public List<Transaction> getTransactions() {
+        return internalGetTransactions().map(new TransactionMapper());
+    }
+
+    @Override
+    public String getTransactionsCSV() {
+        return internalGetTransactions().formatCSV();
+    }
+
     /**
      * SELECT transaction.transaction_pk,
      *        connector.chargeBoxId,
@@ -42,21 +53,19 @@ public class TransactionRepositoryImpl implements TransactionRepository {
      * JOIN connector
      *      ON transaction.connector_pk = connector.connector_pk
      */
-    @Override
-    public List<Transaction> getTransactions() {
+    private Result<Record8<Integer, String, Integer, String, Timestamp, String, Timestamp, String>> internalGetTransactions() {
         return DSL.using(config)
-                  .select(TRANSACTION.TRANSACTION_PK,
-                          CONNECTOR.CHARGEBOXID,
-                          CONNECTOR.CONNECTORID,
-                          TRANSACTION.IDTAG,
-                          TRANSACTION.STARTTIMESTAMP,
-                          TRANSACTION.STARTVALUE,
-                          TRANSACTION.STOPTIMESTAMP,
-                          TRANSACTION.STOPVALUE)
-                  .from(TRANSACTION)
-                  .join(CONNECTOR).onKey()
-                  .fetch()
-                  .map(new TransactionMapper());
+                .select(TRANSACTION.TRANSACTION_PK,
+                        CONNECTOR.CHARGEBOXID,
+                        CONNECTOR.CONNECTORID,
+                        TRANSACTION.IDTAG,
+                        TRANSACTION.STARTTIMESTAMP,
+                        TRANSACTION.STARTVALUE,
+                        TRANSACTION.STOPTIMESTAMP,
+                        TRANSACTION.STOPVALUE)
+                .from(TRANSACTION)
+                .join(CONNECTOR).onKey()
+                .fetch();
     }
 
     /**
@@ -86,23 +95,15 @@ public class TransactionRepositoryImpl implements TransactionRepository {
             RecordMapper<Record8<Integer, String, Integer, String, Timestamp, String, Timestamp, String>, Transaction> {
         @Override
         public Transaction map(Record8<Integer, String, Integer, String, Timestamp, String, Timestamp, String> r) {
-
-            String chargedValue = "";
-            String stopValueColumn = r.value8();
-            if (stopValueColumn != null) {
-                int stopValue = Integer.valueOf(stopValueColumn);
-                int startValue = Integer.valueOf(r.value6());
-                chargedValue = String.valueOf(stopValue - startValue);
-            }
-
             return Transaction.builder()
                     .id(r.value1())
                     .chargeBoxId(r.value2())
                     .connectorId(r.value3())
                     .idTag(r.value4())
                     .startTimestamp(DateTimeUtils.humanize(r.value5()))
+                    .startValue(r.value6())
                     .stopTimestamp(DateTimeUtils.humanize(r.value7()))
-                    .chargedMeterValue(chargedValue)
+                    .stopValue(r.value8())
                     .build();
         }
     }

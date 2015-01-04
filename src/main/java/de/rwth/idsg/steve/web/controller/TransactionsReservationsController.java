@@ -8,6 +8,9 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+
 /**
  * One controller for transactions and reservations pages
  *
@@ -24,6 +27,16 @@ public class TransactionsReservationsController {
     public String getTransactions(Model model) {
         model.addAttribute("transList", transactionRepository.getTransactions());
         return "data-man/transactions";
+    }
+
+    @RequestMapping(value = "/transactions/csv", method = RequestMethod.GET)
+    public void getTransactionsCSV(HttpServletResponse response) throws IOException {
+        String fileName = "transactions.csv";
+        String headerKey = "Content-Disposition";
+        String headerValue = String.format("attachment; filename=\"%s\"", fileName);
+        response.setContentType("text/csv");
+        response.setHeader(headerKey, headerValue);
+        response.getOutputStream().print(transactionRepository.getTransactionsCSV());
     }
 
     @RequestMapping(value = "/reservations", method = RequestMethod.GET)

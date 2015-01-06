@@ -15,7 +15,7 @@ import javax.validation.constraints.Pattern;
 public class ChargeBoxForm {
 
     @NotBlank(message = "ChargeBox ID is required")
-    @Pattern(regexp = "\\s", message = "ChargeBox ID cannot contain any whitespace")
+    @Pattern(regexp = "\\S+", message = "ChargeBox ID cannot contain any whitespace")
     private String chargeBoxId;
 
 }

@@ -5,23 +5,23 @@ import de.rwth.idsg.steve.handler.ocpp15.*;
 import de.rwth.idsg.steve.repository.RequestTaskStore;
 import de.rwth.idsg.steve.repository.ReservationRepository;
 import de.rwth.idsg.steve.repository.UserRepository;
+import de.rwth.idsg.steve.repository.dto.ChargePointSelect;
 import de.rwth.idsg.steve.web.RequestTask;
-import de.rwth.idsg.steve.web.dto.common.ChargePointSelect;
 import de.rwth.idsg.steve.web.dto.common.GetDiagnosticsParams;
 import de.rwth.idsg.steve.web.dto.common.MultipleChargePointSelect;
 import de.rwth.idsg.steve.web.dto.common.RemoteStartTransactionParams;
 import de.rwth.idsg.steve.web.dto.common.RemoteStopTransactionParams;
 import de.rwth.idsg.steve.web.dto.common.UnlockConnectorParams;
 import de.rwth.idsg.steve.web.dto.common.UpdateFirmwareParams;
-import de.rwth.idsg.steve.web.dto.op15.CancelReservationParams;
-import de.rwth.idsg.steve.web.dto.op15.ChangeAvailabilityParams;
-import de.rwth.idsg.steve.web.dto.op15.ChangeConfigurationParams;
-import de.rwth.idsg.steve.web.dto.op15.ConfigurationKeyEnum;
-import de.rwth.idsg.steve.web.dto.op15.DataTransferParams;
-import de.rwth.idsg.steve.web.dto.op15.GetConfigurationParams;
-import de.rwth.idsg.steve.web.dto.op15.ReserveNowParams;
-import de.rwth.idsg.steve.web.dto.op15.ResetParams;
-import de.rwth.idsg.steve.web.dto.op15.SendLocalListParams;
+import de.rwth.idsg.steve.web.dto.ocpp15.CancelReservationParams;
+import de.rwth.idsg.steve.web.dto.ocpp15.ChangeAvailabilityParams;
+import de.rwth.idsg.steve.web.dto.ocpp15.ChangeConfigurationParams;
+import de.rwth.idsg.steve.web.dto.ocpp15.ConfigurationKeyEnum;
+import de.rwth.idsg.steve.web.dto.ocpp15.DataTransferParams;
+import de.rwth.idsg.steve.web.dto.ocpp15.GetConfigurationParams;
+import de.rwth.idsg.steve.web.dto.ocpp15.ReserveNowParams;
+import de.rwth.idsg.steve.web.dto.ocpp15.ResetParams;
+import de.rwth.idsg.steve.web.dto.ocpp15.SendLocalListParams;
 import lombok.extern.slf4j.Slf4j;
 import ocpp.cp._2012._06.*;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
@@ -48,6 +48,7 @@ import java.util.List;
 public class ChargePointService15_Client {
 
     @Autowired private UserRepository userRepository;
+    @Autowired private UserService userService;
     @Autowired private ReservationRepository reservationRepository;
     @Autowired private RequestTaskStore requestTaskStore;
 
@@ -90,8 +91,8 @@ public class ChargePointService15_Client {
                 .withLocation(params.getLocation())
                 .withRetries(params.getRetries())
                 .withRetryInterval(params.getRetryInterval())
-                .withStartTime(params.getStart().getDateTime())
-                .withStopTime(params.getStop().getDateTime());
+                .withStartTime(params.getStart().toDateTime())
+                .withStopTime(params.getStop().toDateTime());
     }
 
     private RemoteStartTransactionRequest prepareRemoteStartTransaction(RemoteStartTransactionParams params) {
@@ -118,7 +119,7 @@ public class ChargePointService15_Client {
     private UpdateFirmwareRequest prepareUpdateFirmware(UpdateFirmwareParams params) {
         return new UpdateFirmwareRequest()
                 .withLocation(params.getLocation())
-                .withRetrieveDate(params.getRetrieve().getDateTime())
+                .withRetrieveDate(params.getRetrieve().toDateTime())
                 .withRetries(params.getRetries())
                 .withRetryInterval(params.getRetryInterval());
     }
@@ -148,27 +149,16 @@ public class ChargePointService15_Client {
 
     private SendLocalListRequest prepareSendLocalList(SendLocalListParams params) {
         // DIFFERENTIAL update
-        if (UpdateType.DIFFERENTIAL.equals(params.getUpdateType()) && params.isSetPairList()) {
+        if (UpdateType.DIFFERENTIAL.equals(params.getUpdateType())) {
             List<AuthorisationData> auths = new ArrayList<>();
-            List<String> addUpdateList = new ArrayList<>();
 
-            for (SendLocalListParams.DifferentialPair p : params.getPairList()) {
-                String idTag = p.getIdTag();
-                SendLocalListParams.OperationType op = p.getType();
-                switch (op) {
-                    case DELETE:
-                        // Step 1: For the idTags to be deleted, insert only the idTag
-                        auths.add(new AuthorisationData().withIdTag(idTag));
-                        break;
-
-                    case ADD_UPDATE:
-                        addUpdateList.add(idTag);
-                        break;
-                }
+            // Step 1: For the idTags to be deleted, insert only the idTag
+            for (String idTag : params.getDeleteList()) {
+                auths.add(new AuthorisationData().withIdTag(idTag));
             }
 
             // Step 2: For the idTags to be added or updated, insert them with their IdTagInfos
-            auths.addAll(userRepository.getAuthData(addUpdateList));
+            auths.addAll(userService.getAuthData(params.getAddUpdateList()));
 
             return new SendLocalListRequest()
                     .withListVersion(params.getListVersion())
@@ -180,7 +170,7 @@ public class ChargePointService15_Client {
             return new SendLocalListRequest()
                     .withListVersion(params.getListVersion())
                     .withUpdateType(UpdateType.FULL)
-                    .withLocalAuthorisationList(userRepository.getAuthDataOfAllUsers());
+                    .withLocalAuthorisationList(userService.getAuthDataOfAllUsers());
         }
     }
 
@@ -189,7 +179,7 @@ public class ChargePointService15_Client {
         return new ReserveNowRequest()
                 .withConnectorId(params.getConnectorId())
                 .withReservationId(reservationId)
-                .withExpiryDate(params.getExpiry().getDateTime())
+                .withExpiryDate(params.getExpiry().toDateTime())
                 .withIdTag(idTag)
                 .withParentIdTag(userRepository.getParentIdtag(idTag));
     }
@@ -287,7 +277,7 @@ public class ChargePointService15_Client {
         return requestTaskStore.add(requestTask);
     }
 
-    public int sendDataTransfer(DataTransferParams params) {
+    public int dataTransfer(DataTransferParams params) {
         DataTransferRequest req = this.prepareDataTransfer(params);
         List<ChargePointSelect> chargePointSelectList = params.getChargePointSelectList();
         RequestTask requestTask = new RequestTask(OcppVersion.V_15, "Data Transfer", chargePointSelectList);
@@ -301,7 +291,7 @@ public class ChargePointService15_Client {
         return requestTaskStore.add(requestTask);
     }
 
-    public int sendGetConfiguration(GetConfigurationParams params) {
+    public int getConfiguration(GetConfigurationParams params) {
         GetConfigurationRequest req = this.prepareGetConfiguration(params);
         List<ChargePointSelect> chargePointSelectList = params.getChargePointSelectList();
         RequestTask requestTask = new RequestTask(OcppVersion.V_15, "Get Configuration", chargePointSelectList);
@@ -315,7 +305,7 @@ public class ChargePointService15_Client {
         return requestTaskStore.add(requestTask);
     }
 
-    public int sendGetLocalListVersion(MultipleChargePointSelect params) {
+    public int getLocalListVersion(MultipleChargePointSelect params) {
         GetLocalListVersionRequest req = this.prepareGetLocalListVersion();
         List<ChargePointSelect> chargePointSelectList = params.getChargePointSelectList();
         RequestTask requestTask = new RequestTask(OcppVersion.V_15, "Get Local List Version", chargePointSelectList);
@@ -329,7 +319,7 @@ public class ChargePointService15_Client {
         return requestTaskStore.add(requestTask);
     }
 
-    public int sendSendLocalList(SendLocalListParams params) {
+    public int sendLocalList(SendLocalListParams params) {
         SendLocalListRequest req = this.prepareSendLocalList(params);
         List<ChargePointSelect> chargePointSelectList = params.getChargePointSelectList();
         RequestTask requestTask = new RequestTask(OcppVersion.V_15, "Send Local List", chargePointSelectList);
@@ -390,11 +380,9 @@ public class ChargePointService15_Client {
     }
 
     public int reserveNow(ReserveNowParams params) {
-
         // Insert into DB
-        //
         Timestamp startTimestamp = new Timestamp(new DateTime().getMillis());
-        Timestamp expiryTimestamp = new Timestamp(params.getExpiry().getDateTime().getMillis());
+        Timestamp expiryTimestamp = new Timestamp(params.getExpiry().toDateTime().getMillis());
         int reservationId = reservationRepository.bookReservation(params.getIdTag(), params.getIdTag(),
                                                                   startTimestamp, expiryTimestamp);
 

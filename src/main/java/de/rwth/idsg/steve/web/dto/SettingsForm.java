@@ -16,7 +16,7 @@ import javax.validation.constraints.NotNull;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class OcppSettings {
+public class SettingsForm {
 
     @Min(value = 1, message = "Heartbeat Interval must be at least {value}")
     @NotNull(message = "Heartbeat Interval is required")

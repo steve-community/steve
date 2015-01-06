@@ -11,17 +11,17 @@ import de.rwth.idsg.steve.handler.ocpp12.ResetResponseHandler;
 import de.rwth.idsg.steve.handler.ocpp12.UnlockConnectorResponseHandler;
 import de.rwth.idsg.steve.handler.ocpp12.UpdateFirmwareResponseHandler;
 import de.rwth.idsg.steve.repository.RequestTaskStore;
+import de.rwth.idsg.steve.repository.dto.ChargePointSelect;
 import de.rwth.idsg.steve.web.RequestTask;
-import de.rwth.idsg.steve.web.dto.common.ChargePointSelect;
 import de.rwth.idsg.steve.web.dto.common.GetDiagnosticsParams;
 import de.rwth.idsg.steve.web.dto.common.MultipleChargePointSelect;
 import de.rwth.idsg.steve.web.dto.common.RemoteStartTransactionParams;
 import de.rwth.idsg.steve.web.dto.common.RemoteStopTransactionParams;
 import de.rwth.idsg.steve.web.dto.common.UnlockConnectorParams;
 import de.rwth.idsg.steve.web.dto.common.UpdateFirmwareParams;
-import de.rwth.idsg.steve.web.dto.op12.ChangeAvailabilityParams;
-import de.rwth.idsg.steve.web.dto.op12.ChangeConfigurationParams;
-import de.rwth.idsg.steve.web.dto.op12.ResetParams;
+import de.rwth.idsg.steve.web.dto.ocpp12.ChangeAvailabilityParams;
+import de.rwth.idsg.steve.web.dto.ocpp12.ChangeConfigurationParams;
+import de.rwth.idsg.steve.web.dto.ocpp12.ResetParams;
 import lombok.extern.slf4j.Slf4j;
 import ocpp.cp._2010._08.*;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
@@ -85,8 +85,8 @@ public class ChargePointService12_Client {
                 .withLocation(params.getLocation())
                 .withRetries(params.getRetries())
                 .withRetryInterval(params.getRetryInterval())
-                .withStartTime(params.getStart().getDateTime())
-                .withStopTime(params.getStop().getDateTime());
+                .withStartTime(params.getStart().toDateTime())
+                .withStopTime(params.getStop().toDateTime());
     }
 
     private RemoteStartTransactionRequest prepareRemoteStartTransaction(RemoteStartTransactionParams params) {
@@ -113,7 +113,7 @@ public class ChargePointService12_Client {
     private UpdateFirmwareRequest prepareUpdateFirmware(UpdateFirmwareParams params) {
         return new UpdateFirmwareRequest()
                 .withLocation(params.getLocation())
-                .withRetrieveDate(params.getRetrieve().getDateTime())
+                .withRetrieveDate(params.getRetrieve().toDateTime())
                 .withRetries(params.getRetries())
                 .withRetryInterval(params.getRetryInterval());
     }

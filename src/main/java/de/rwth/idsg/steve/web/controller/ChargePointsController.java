@@ -10,6 +10,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.validation.Valid;
 
@@ -19,25 +20,34 @@ import javax.validation.Valid;
  *
  */
 @Controller
+@RequestMapping(value = "/chargepoints")
 public class ChargePointsController {
 
     @Autowired private ChargePointRepository chargePointRepository;
 
-    @RequestMapping(value = "/chargepoints", method = RequestMethod.GET)
+    // -------------------------------------------------------------------------
+    // Paths
+    // -------------------------------------------------------------------------
+
+    private static final String ADD_PATH = "/add";
+    private static final String DELETE_PATH = "/delete";
+
+    // -------------------------------------------------------------------------
+    // HTTP methods
+    // -------------------------------------------------------------------------
+
+    @RequestMapping(method = RequestMethod.GET)
     public String getAbout(Model model) {
         model.addAttribute("cpList", chargePointRepository.getChargeBoxIds());
         model.addAttribute("chargeBoxAddForm", new ChargeBoxForm());
-        model.addAttribute("chargeBoxDeleteForm", new ChargeBoxForm());
         return "data-man/chargepoints";
     }
 
-    @RequestMapping(value = "/chargepoints/add", method = RequestMethod.POST)
+    @RequestMapping(value = ADD_PATH, method = RequestMethod.POST)
     public String add(@Valid @ModelAttribute("chargeBoxAddForm") ChargeBoxForm chargeBoxForm,
                       BindingResult result, Model model) throws SteveException {
-
         if (result.hasErrors()) {
             model.addAttribute("cpList", chargePointRepository.getChargeBoxIds());
-            model.addAttribute("chargeBoxDeleteForm", new ChargeBoxForm());
             return "data-man/chargepoints";
         }
 
@@ -45,17 +55,9 @@ public class ChargePointsController {
         return "redirect:/manager/chargepoints";
     }
 
-    @RequestMapping(value = "/chargepoints/delete", method = RequestMethod.POST)
-    public String delete(@Valid @ModelAttribute("chargeBoxDeleteForm") ChargeBoxForm chargeBoxForm,
-                         BindingResult result, Model model) throws SteveException {
-
-        if (result.hasErrors()) {
-            model.addAttribute("cpList", chargePointRepository.getChargeBoxIds());
-            model.addAttribute("chargeBoxAddForm", new ChargeBoxForm());
-            return "data-man/chargepoints";
-        }
-
-        chargePointRepository.deleteChargePoint(chargeBoxForm.getChargeBoxId());
+    @RequestMapping(value = DELETE_PATH, method = RequestMethod.POST)
+    public String delete(@RequestParam String chargeBoxId) throws SteveException {
+        chargePointRepository.deleteChargePoint(chargeBoxId);
         return "redirect:/manager/chargepoints";
     }
 }

@@ -23,13 +23,25 @@ public class TransactionsReservationsController {
     @Autowired private TransactionRepository transactionRepository;
     @Autowired private ReservationRepository reservationRepository;
 
-    @RequestMapping(value = "/transactions", method = RequestMethod.GET)
+    // -------------------------------------------------------------------------
+    // Paths
+    // -------------------------------------------------------------------------
+
+    private static final String TRANSACTIONS_PATH = "/transactions";
+    private static final String TRANSACTIONS_CSV_PATH = "/transactions/csv";
+    private static final String RESERVATIONS_PATH = "/reservations";
+
+    // -------------------------------------------------------------------------
+    // HTTP methods
+    // -------------------------------------------------------------------------
+
+    @RequestMapping(value = TRANSACTIONS_PATH, method = RequestMethod.GET)
     public String getTransactions(Model model) {
         model.addAttribute("transList", transactionRepository.getTransactions());
         return "data-man/transactions";
     }
 
-    @RequestMapping(value = "/transactions/csv", method = RequestMethod.GET)
+    @RequestMapping(value = TRANSACTIONS_CSV_PATH, method = RequestMethod.GET)
     public void getTransactionsCSV(HttpServletResponse response) throws IOException {
         String fileName = "transactions.csv";
         String headerKey = "Content-Disposition";
@@ -39,7 +51,7 @@ public class TransactionsReservationsController {
         response.getOutputStream().print(transactionRepository.getTransactionsCSV());
     }
 
-    @RequestMapping(value = "/reservations", method = RequestMethod.GET)
+    @RequestMapping(value = RESERVATIONS_PATH, method = RequestMethod.GET)
     public String getReservations(Model model) {
         model.addAttribute("reservList", reservationRepository.getReservations());
         return "data-man/reservations";

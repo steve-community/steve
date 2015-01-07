@@ -3,7 +3,6 @@ package de.rwth.idsg.steve.repository;
 import de.rwth.idsg.steve.SteveException;
 import de.rwth.idsg.steve.repository.dto.Reservation;
 import de.rwth.idsg.steve.utils.DateTimeUtils;
-import de.rwth.idsg.steve.web.ExceptionMessage;
 import jooq.steve.db.tables.records.ReservationRecord;
 import lombok.extern.slf4j.Slf4j;
 import org.jooq.Configuration;
@@ -136,7 +135,7 @@ public class ReservationRepositoryImpl implements ReservationRepository {
                            .execute();
 
             if (count != 1) {
-                throw new SteveException(ExceptionMessage.OVERLAPPING_RESERVATION);
+                throw new SteveException("The desired reservation overlaps with another reservation");
             }
 
         } catch (DataAccessException e) {

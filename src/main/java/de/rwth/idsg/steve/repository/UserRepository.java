@@ -1,10 +1,7 @@
 package de.rwth.idsg.steve.repository;
 
-import com.google.common.base.Optional;
-import de.rwth.idsg.steve.SteveException;
-import de.rwth.idsg.steve.repository.dto.User;
 import jooq.steve.db.tables.records.UserRecord;
-import ocpp.cp._2012._06.AuthorisationData;
+import org.jooq.Result;
 
 import java.sql.Timestamp;
 import java.util.List;
@@ -14,24 +11,14 @@ import java.util.List;
  * @since 19.08.2014
  */
 public interface UserRepository {
-    List<User> getUsers();
-    void updateUser(String idTag, String parentIdTag, Timestamp expiryTimestamp, boolean blockUser) throws SteveException;
-    void addUser(String idTag, String parentIdTag, Timestamp expiryTimestamp, boolean blocked) throws SteveException;
-    void deleteUser(String idTag) throws SteveException;
+    Result<UserRecord> getUserRecords();
+    Result<UserRecord> getUserRecords(List<String> idTagList);
+    UserRecord getUserRecord(String idTag);
 
-    /**
-     * For OCPP 1.5: Helper method to read ALL user details
-     * from the DB for the operation SendLocalList.
-     *
-     */
-    List<AuthorisationData> getAuthDataOfAllUsers();
+    List<String> getUserIdTags();
+    String getParentIdtag(String idTag);
 
-    /**
-     * For OCPP 1.5: Helper method to read user details of GIVEN idTags
-     * from the DB for the operation SendLocalList.
-     *
-     */
-    List<AuthorisationData> getAuthData(List<String> idTagList);
-
-    Optional<UserRecord> getUserDetails(String idTag);
+    void addUser(String idTag, String parentIdTag, Timestamp expiryTimestamp);
+    void updateUser(String idTag, String parentIdTag, Timestamp expiryTimestamp, boolean blocked);
+    void deleteUser(String idTag);
 }

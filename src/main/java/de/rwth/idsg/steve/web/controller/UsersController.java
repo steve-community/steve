@@ -2,13 +2,13 @@ package de.rwth.idsg.steve.web.controller;
 
 import de.rwth.idsg.steve.SteveException;
 import de.rwth.idsg.steve.repository.UserRepository;
-import de.rwth.idsg.steve.web.dto.User;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeFieldType;
-import org.joda.time.LocalTime;
+import de.rwth.idsg.steve.service.UserService;
+import de.rwth.idsg.steve.utils.DateTimeUtils;
+import de.rwth.idsg.steve.web.dto.UserForm;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -22,56 +22,61 @@ import java.sql.Timestamp;
  * @since 15.08.2014
  */
 @Controller
+@RequestMapping(value = "/users")
 public class UsersController {
 
+    @Autowired private UserService userService;
     @Autowired private UserRepository userRepository;
 
-    @RequestMapping(value = "/users", method = RequestMethod.GET)
+    // -------------------------------------------------------------------------
+    // Paths
+    // -------------------------------------------------------------------------
+
+    private static final String ADD_PATH = "/add";
+    private static final String UPDATE_PATH = "/update";
+    private static final String DELETE_PATH = "/delete";
+
+    // -------------------------------------------------------------------------
+    // HTTP methods
+    // -------------------------------------------------------------------------
+
+    @RequestMapping(method = RequestMethod.GET)
     public String get(Model model) {
-        model.addAttribute("userList", userRepository.getUsers());
-        model.addAttribute("user", new User());
+        model.addAttribute("userList", userService.getUsers());
+        model.addAttribute("userAddForm", new UserForm());
+        model.addAttribute("userUpdateForm", new UserForm());
         return "data-man/users";
     }
 
-    @RequestMapping(value = "/users/add", method = RequestMethod.POST)
-    public String add(@Valid @ModelAttribute("user") User user) {
-
-//        Timestamp expiryTimestamp = null;
-//        if (!InputUtils.isNullOrEmpty(expiryDate)) {
-//            if (InputUtils.isNullOrEmpty(expiryTime)) expiryTime = "00:00";
-//            String dateTime = expiryDate + " " + expiryTime;
-//            expiryTimestamp = DateTimeUtils.convertToTimestamp(dateTime);
-
-        Timestamp expiryTimestamp = null;
-        DateTime dt = user.getExpiryDate().toDateTimeAtStartOfDay();
-
-        if (user.getExpiryTime() == null) {
-            expiryTimestamp = new Timestamp(dt.getMillis());
-        } else {
-            LocalTime l = user.getExpiryTime();
-            dt = dt.withField(DateTimeFieldType.hourOfDay(), l.getHourOfDay());
-            // TODO TODO
+    @RequestMapping(value = ADD_PATH, method = RequestMethod.POST)
+    public String add(@Valid @ModelAttribute("userAddForm") UserForm u,
+                      BindingResult result, Model model) {
+        if (result.hasErrors()) {
+            model.addAttribute("userList", userService.getUsers());
+            model.addAttribute("userUpdateForm", new UserForm());
+            return "data-man/users";
         }
 
-        //userRepository.addUser(user.getIdTag(), user.getParentIdTag(), user.getExpiryTime());
+        Timestamp expiryTimestamp = DateTimeUtils.toTimestamp(u.getExpiration().toDateTime());
+        userRepository.addUser(u.getIdTag(), u.getParentIdTag(), expiryTimestamp);
         return "redirect:/manager/users";
     }
 
-    @RequestMapping(value = "/users/update", method = RequestMethod.POST)
-    public String update(@Valid @ModelAttribute("user") User user) {
+    @RequestMapping(value = UPDATE_PATH, method = RequestMethod.POST)
+    public String update(@Valid @ModelAttribute("userUpdateForm") UserForm u,
+                         BindingResult result, Model model) {
+        if (result.hasErrors()) {
+            model.addAttribute("userList", userService.getUsers());
+            model.addAttribute("userAddForm", new UserForm());
+            return "data-man/users";
+        }
 
-//        Timestamp expiryTimestamp = null;
-//        if (!InputUtils.isNullOrEmpty(expiryDate)) {
-//            if (InputUtils.isNullOrEmpty(expiryTime)) expiryTime = "00:00";
-//            String dateTime = expiryDate + " " + expiryTime;
-//            expiryTimestamp = DateTimeUtils.convertToTimestamp(dateTime);
-//        }
-//
-//        userRepository.updateUser(idTag, parentIdTag, expiryTimestamp, blockUser);
+        Timestamp expiryTimestamp = DateTimeUtils.toTimestamp(u.getExpiration().toDateTime());
+        userRepository.updateUser(u.getIdTag(), u.getParentIdTag(), expiryTimestamp, u.getBlocked());
         return "redirect:/manager/users";
     }
 
-    @RequestMapping(value = "/users/delete", method = RequestMethod.POST)
+    @RequestMapping(value = DELETE_PATH, method = RequestMethod.POST)
     public String delete(@RequestParam String idTag) throws SteveException {
         userRepository.deleteUser(idTag);
         return "redirect:/manager/users";

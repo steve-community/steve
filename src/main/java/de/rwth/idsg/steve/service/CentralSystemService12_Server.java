@@ -4,9 +4,7 @@ import com.google.common.base.Optional;
 import de.rwth.idsg.steve.OcppConstants;
 import de.rwth.idsg.steve.OcppVersion;
 import de.rwth.idsg.steve.repository.OcppServerRepository;
-import de.rwth.idsg.steve.repository.UserRepository;
 import de.rwth.idsg.steve.utils.DateTimeUtils;
-import jooq.steve.db.tables.records.UserRecord;
 import lombok.extern.slf4j.Slf4j;
 import ocpp.cs._2010._08.*;
 import org.apache.cxf.ws.addressing.AddressingProperties;
@@ -46,7 +44,7 @@ public class CentralSystemService12_Server implements CentralSystemService {
 
     @Resource private WebServiceContext webServiceContext;
     @Autowired private OcppServerRepository ocppServerRepository;
-    @Autowired private UserRepository userRepository;
+    @Autowired private UserService userService;
     @Autowired private OcppConstants ocppConstants;
 
     public BootNotificationResponse bootNotification(BootNotificationRequest parameters, String chargeBoxIdentity) {
@@ -129,7 +127,7 @@ public class CentralSystemService12_Server implements CentralSystemService {
 
         // Get the authorization info of the user
         String idTag = parameters.getIdTag();
-        IdTagInfo idTagInfo = createIdTagInfo(idTag);
+        IdTagInfo idTagInfo = userService.getIdTagInfoV12(idTag);
 
         StartTransactionResponse response = new StartTransactionResponse().withIdTagInfo(idTagInfo);
 
@@ -161,7 +159,7 @@ public class CentralSystemService12_Server implements CentralSystemService {
 
         // Get the authorization info of the user
         if (parameters.isSetIdTag()) {
-            IdTagInfo idTagInfo = createIdTagInfo(parameters.getIdTag());
+            IdTagInfo idTagInfo = userService.getIdTagInfoV12(parameters.getIdTag());
             return new StopTransactionResponse().withIdTagInfo(idTagInfo);
         } else {
             return new StopTransactionResponse();
@@ -182,51 +180,9 @@ public class CentralSystemService12_Server implements CentralSystemService {
 
         // Get the authorization info of the user
         String idTag = parameters.getIdTag();
-        IdTagInfo idTagInfo = createIdTagInfo(idTag);
+        IdTagInfo idTagInfo = userService.getIdTagInfoV12(idTag);
 
         return new AuthorizeResponse().withIdTagInfo(idTagInfo);
-    }
-
-    // -------------------------------------------------------------------------
-    // Helpers
-    // -------------------------------------------------------------------------
-
-    private IdTagInfo createIdTagInfo(String idTag) {
-        Optional<UserRecord> recordOptional = userRepository.getUserDetails(idTag);
-        IdTagInfo idTagInfo = new IdTagInfo();
-
-        if (recordOptional.isPresent()) {
-            UserRecord record = recordOptional.get();
-
-            if (record.getIntransaction()) {
-                log.warn("The user with idTag '{}' is ALREADY in another transaction.", idTag);
-                idTagInfo.setStatus(AuthorizationStatus.CONCURRENT_TX);
-
-            } else if (record.getBlocked()) {
-                log.error("The user with idTag '{}' is BLOCKED.", idTag);
-                idTagInfo.setStatus(AuthorizationStatus.BLOCKED);
-
-            } else if (record.getExpirydate() != null && DateTimeUtils.getCurrentDateTime().after(record.getExpirydate())) {
-                log.error("The user with idTag '{}' is EXPIRED.", idTag);
-                idTagInfo.setStatus(AuthorizationStatus.EXPIRED);
-
-            } else {
-                log.debug("The user with idTag '{}' is ACCEPTED.", idTag);
-                idTagInfo.setStatus(AuthorizationStatus.ACCEPTED);
-
-                int hours = ocppConstants.getHoursToExpire();
-                idTagInfo.setExpiryDate(new DateTime().plusHours(hours));
-
-                if (record.getParentidtag() != null) {
-                    idTagInfo.setParentIdTag(record.getParentidtag());
-                }
-            }
-        } else {
-            log.error("The user with idTag '{}' is INVALID (not present in DB).", idTag);
-            idTagInfo.setStatus(AuthorizationStatus.INVALID);
-        }
-
-        return idTagInfo;
     }
 
     // -------------------------------------------------------------------------

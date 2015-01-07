@@ -20,29 +20,42 @@ import java.util.List;
  */
 @Controller
 @ResponseBody
-@RequestMapping(method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(value = "/ajax", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 public class AjaxCallController {
 
     @Autowired private ChargePointRepository chargePointRepository;
     @Autowired private TransactionRepository transactionRepository;
     @Autowired private ReservationRepository reservationRepository;
 
-    @RequestMapping(value = "/ajax/getCPDetails")
+    // -------------------------------------------------------------------------
+    // Paths
+    // -------------------------------------------------------------------------
+
+    private static final String CP_DETAILS_PATH = "/getCPDetails";
+    private static final String CONNECTOR_IDS_PATH = "/getConnectorIds";
+    private static final String TRANSACTION_IDS_PATH = "/getTransactionIds";
+    private static final String RESERVATION_IDS_PATH = "/getReservationIds";
+
+    // -------------------------------------------------------------------------
+    // HTTP methods
+    // -------------------------------------------------------------------------
+
+    @RequestMapping(value = CP_DETAILS_PATH)
     public ChargePoint getCPDetails(@RequestParam String chargeBoxId) {
         return chargePointRepository.getChargePointDetails(chargeBoxId);
     }
 
-    @RequestMapping(value = "/ajax/getConnectorIds")
+    @RequestMapping(value = CONNECTOR_IDS_PATH)
     public List<Integer> getConnectorIds(@RequestParam String chargeBoxId) {
         return chargePointRepository.getConnectorIds(chargeBoxId);
     }
 
-    @RequestMapping(value = "/ajax/getTransactionIds")
+    @RequestMapping(value = TRANSACTION_IDS_PATH)
     public List<Integer> getTransactionIds(@RequestParam String chargeBoxId) {
         return transactionRepository.getActiveTransactionIds(chargeBoxId);
     }
 
-    @RequestMapping(value = "/ajax/getReservationIds")
+    @RequestMapping(value = RESERVATION_IDS_PATH)
     public List<Integer> getReservationIds(@RequestParam String chargeBoxId) {
         return reservationRepository.getExistingReservationIds(chargeBoxId);
     }

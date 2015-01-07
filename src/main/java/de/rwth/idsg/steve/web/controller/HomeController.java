@@ -2,7 +2,6 @@ package de.rwth.idsg.steve.web.controller;
 
 import de.rwth.idsg.steve.repository.ChargePointRepository;
 import de.rwth.idsg.steve.repository.GenericRepository;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -15,26 +14,36 @@ import org.springframework.web.bind.annotation.RequestMethod;
  * 
  */
 @Controller
-@RequestMapping(method = RequestMethod.GET)
-@Slf4j
+@RequestMapping(value = "/home", method = RequestMethod.GET)
 public class HomeController {
 
     @Autowired private GenericRepository genericRepository;
     @Autowired private ChargePointRepository chargePointRepository;
 
-    @RequestMapping(value = {"", "/", "/home"})
+    // -------------------------------------------------------------------------
+    // Paths
+    // -------------------------------------------------------------------------
+
+    private static final String HEARTBEATS_PATH = "/heartbeats";
+    private static final String CONNECTOR_STATUS_PATH = "/connectorStatus";
+
+    // -------------------------------------------------------------------------
+    // HTTP methods
+    // -------------------------------------------------------------------------
+
+    @RequestMapping
     public String getHome(Model model) {
         model.addAttribute("stats", genericRepository.getStats());
         return "home";
     }
 
-    @RequestMapping(value = "/home/heartbeats")
+    @RequestMapping(value = HEARTBEATS_PATH)
     public String getHeartbeats(Model model) {
         model.addAttribute("heartbeatList", chargePointRepository.getChargePointHeartbeats());
         return "heartbeats";
     }
 
-    @RequestMapping(value = "/home/connectorStatus")
+    @RequestMapping(value = CONNECTOR_STATUS_PATH)
     public String getConnectorStatus(Model model) {
         model.addAttribute("connectorStatusList", chargePointRepository.getChargePointConnectorStatus());
         return "connectorStatus";

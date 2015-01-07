@@ -1,7 +1,7 @@
 package de.rwth.idsg.steve.web;
 
 import de.rwth.idsg.steve.OcppVersion;
-import de.rwth.idsg.steve.web.dto.common.ChargePointSelect;
+import de.rwth.idsg.steve.repository.dto.ChargePointSelect;
 import lombok.Getter;
 import lombok.Setter;
 import org.joda.time.DateTime;

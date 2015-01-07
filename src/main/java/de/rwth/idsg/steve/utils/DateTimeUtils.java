@@ -1,7 +1,5 @@
 package de.rwth.idsg.steve.utils;
 
-import de.rwth.idsg.steve.SteveException;
-import de.rwth.idsg.steve.web.ExceptionMessage;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
@@ -16,28 +14,14 @@ import java.sql.Timestamp;
 public final class DateTimeUtils {
     private DateTimeUtils() {}
 
-    private static final DateTimeFormatter INPUT_FORMATTER = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm");
+    private static final DateTimeFormatter HUMAN_FORMATTER = DateTimeFormat.forPattern("yyyy-MM-dd 'at' HH:mm");
 
     public static Timestamp getCurrentDateTime(){
         return new Timestamp(new DateTime().getMillis());
     }
 
-    public static Timestamp toTimestamp(String str) {
-        DateTime dt = toDateTime(str);
-        return new Timestamp(dt.getMillis());
-    }
-
-    /**
-     * Converts a String of pattern "yyyy-MM-dd HH:mm" to DateTime.
-     */
-    public static DateTime toDateTime(String str){
-        DateTime dt;
-        try {
-            dt = INPUT_FORMATTER.parseDateTime(str);
-        } catch (IllegalArgumentException e) {
-            throw new SteveException(ExceptionMessage.PARSING_DATETIME, e);
-        }
-        return dt;
+    public static Timestamp toTimestamp(DateTime dt) {
+        return (dt == null) ? null : new Timestamp(dt.getMillis());
     }
 
     /**
@@ -49,7 +33,7 @@ public final class DateTimeUtils {
         }
 
         long timeLong = ts.getTime();
-        return DateTimeFormat.forPattern("yyyy-MM-dd 'at' HH:mm").print(timeLong);
+        return HUMAN_FORMATTER.print(timeLong);
     }
 
     /**

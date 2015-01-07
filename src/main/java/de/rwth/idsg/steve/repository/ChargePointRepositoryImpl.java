@@ -3,6 +3,7 @@ package de.rwth.idsg.steve.repository;
 import de.rwth.idsg.steve.OcppVersion;
 import de.rwth.idsg.steve.SteveException;
 import de.rwth.idsg.steve.repository.dto.ChargePoint;
+import de.rwth.idsg.steve.repository.dto.ChargePointSelect;
 import de.rwth.idsg.steve.repository.dto.ConnectorStatus;
 import de.rwth.idsg.steve.repository.dto.Heartbeat;
 import de.rwth.idsg.steve.utils.DateTimeUtils;
@@ -22,7 +23,6 @@ import org.springframework.stereotype.Repository;
 
 import java.sql.Timestamp;
 import java.util.List;
-import java.util.Map;
 
 import static jooq.steve.db.tables.Chargebox.CHARGEBOX;
 import static jooq.steve.db.tables.Connector.CONNECTOR;
@@ -41,12 +41,12 @@ public class ChargePointRepositoryImpl implements ChargePointRepository {
     private Configuration config;
 
     @Override
-    public Map<String, String> getChargePointsV12() {
+    public List<ChargePointSelect> getChargePointsV12() {
         return this.internalGetChargePoints(OcppVersion.V_12);
     }
 
     @Override
-    public Map<String, String> getChargePointsV15() {
+    public List<ChargePointSelect> getChargePointsV15() {
         return this.internalGetChargePoints(OcppVersion.V_15);
     }
 
@@ -55,12 +55,13 @@ public class ChargePointRepositoryImpl implements ChargePointRepository {
      * FROM chargebox
      * WHERE ocppVersion = ?
      */
-    private Map<String,String> internalGetChargePoints(OcppVersion version) {
+    private List<ChargePointSelect> internalGetChargePoints(OcppVersion version) {
         return DSL.using(config)
                   .select(CHARGEBOX.CHARGEBOXID, CHARGEBOX.ENDPOINT_ADDRESS)
                   .from(CHARGEBOX)
                   .where(CHARGEBOX.OCPPVERSION.equal(version.getValue()))
-                  .fetchMap(CHARGEBOX.CHARGEBOXID, CHARGEBOX.ENDPOINT_ADDRESS);
+                  .fetch()
+                  .map(new ChargePointSelectMapper());
     }
 
     /**
@@ -211,6 +212,13 @@ public class ChargePointRepositoryImpl implements ChargePointRepository {
     // -------------------------------------------------------------------------
     // Private helpers
     // -------------------------------------------------------------------------
+
+    private class ChargePointSelectMapper implements RecordMapper<Record2<String, String>, ChargePointSelect> {
+        @Override
+        public ChargePointSelect map(Record2<String, String> record) {
+            return new ChargePointSelect(record.value1(), record.value2());
+        }
+    }
 
     private class HeartbeatMapper implements RecordMapper<Record2<String, Timestamp>, Heartbeat> {
         @Override

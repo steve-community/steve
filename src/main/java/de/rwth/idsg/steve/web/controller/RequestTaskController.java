@@ -19,19 +19,29 @@ public class RequestTaskController {
 
     @Autowired private RequestTaskStore requestTaskStore;
 
-    @RequestMapping(value = "", method = RequestMethod.GET)
+    // -------------------------------------------------------------------------
+    // Paths
+    // -------------------------------------------------------------------------
+
+    private static final String TASK_ID_PATH = "/{taskId}";
+
+    // -------------------------------------------------------------------------
+    // HTTP methods
+    // -------------------------------------------------------------------------
+
+    @RequestMapping(method = RequestMethod.GET)
     public String getOverview(Model model) {
         model.addAttribute("taskList", requestTaskStore.getOverview());
         return "tasks";
     }
 
-    @RequestMapping(value = "", method = RequestMethod.POST)
+    @RequestMapping(method = RequestMethod.POST)
     public String clearFinished(Model model) {
         requestTaskStore.clearFinished();
         return getOverview(model);
     }
 
-    @RequestMapping(value = "/{taskId}", method = RequestMethod.GET)
+    @RequestMapping(value = TASK_ID_PATH, method = RequestMethod.GET)
     public String getTaskDetails(@PathVariable Integer taskId, Model model) {
         RequestTask r = requestTaskStore.get(taskId);
         model.addAttribute("task", r);

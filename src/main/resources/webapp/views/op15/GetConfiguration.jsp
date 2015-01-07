@@ -1,4 +1,5 @@
 <%@ include file="../00-header.jsp" %>
+<%@ include file="../00-op-bind-errors.jsp" %>
 <div class="content">
 <div class="left-menu">
 <ul>
@@ -21,33 +22,21 @@
 </ul>
 </div>
 <div class="op15-content">
-<form method="POST" action="/steve/manager/operations/v1.5/GetConfiguration">
-<%@ include file="00-cp-multiple.jsp" %>
-<section><span>Parameters</span></section>
-<table class="userInput">
-<tr><td style="vertical-align:top"><input type="button" value="Select All" onClick="selectAll(document.getElementById('confKeys'))"><input type="button" value="Select None" onClick="selectNone(document.getElementById('confKeys'))">
-<div class="info"><b>Info:</b> If none selected, the charge point returns a list of <b>all</b> configuration settings.</div>
-</td>
-<td>
-<select name="confKeys" id="confKeys" size="14" multiple>
-<option value="HeartBeatInterval">HeartBeatInterval</option>
-<option value="ConnectionTimeOut">ConnectionTimeOut</option>
-<option value="ProximityContactRetries">ProximityContactRetries</option>
-<option value="ProximityLockRetries">ProximityLockRetries</option>
-<option value="ResetRetries">ResetRetries</option>
-<option value="BlinkRepeat">BlinkRepeat</option>
-<option value="LightIntensity">LightIntensity</option>
-<option value="ChargePointId">ChargePointId</option>
-<option value="MeterValueSampleInterval">MeterValueSampleInterval</option>
-<option value="ClockAlignedDataInterval">ClockAlignedDataInterval</option>
-<option value="MeterValuesSampledData">MeterValuesSampledData</option>
-<option value="MeterValuesAlignedData">MeterValuesAlignedData</option>
-<option value="StopTxnSampledData">StopTxnSampledData</option>
-<option value="StopTxnAlignedData">StopTxnAlignedData</option>
-</select>
-</td></tr>
-</table>
-<div class="submit-button"><input type="submit" value="Perform"></div>
-</form>
+<form:form action="/steve/manager/operations/v1.5/GetConfiguration" modelAttribute="params">
+    <section><span>Charge Points with OCPP v1.5</span></section>
+    <%@ include file="../00-cp-multiple.jsp" %>
+    <section><span>Parameters</span></section>
+    <table class="userInput">
+    <tr><td style="vertical-align:top"><input type="button" value="Select All" onClick="selectAll(document.getElementById('confKeyList'))"><input type="button" value="Select None" onClick="selectNone(document.getElementById('confKeyList'))">
+    <div class="info"><b>Info:</b> If none selected, the charge point returns a list of <b>all</b> configuration settings.</div>
+    </td>
+    <td>
+        <form:select path="confKeyList" multiple="true" size="14" >
+            <form:options items="${confKeys}" />
+        </form:select>
+    </td></tr>
+    </table>
+    <div class="submit-button"><input type="submit" value="Perform"></div>
+</form:form>
 </div></div>
 <%@ include file="../00-footer.jsp" %>

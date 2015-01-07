@@ -1,4 +1,5 @@
 <%@ include file="../00-header.jsp" %>
+<%@ include file="../00-op-bind-errors.jsp" %>
 <div class="content">
 <div class="left-menu">
 <ul>
@@ -21,14 +22,20 @@
 </ul>
 </div>
 <div class="op15-content">
-<form method="POST" action="/steve/manager/operations/v1.5/Reset">
-<%@ include file="00-cp-multiple.jsp" %>
-<section><span>Parameters</span></section>
-<table class="userInput">
-<tr><td>Reset Type:</td><td><input type="radio" name="resetType" value="Hard" required> Hard</td></tr>
-<tr><td></td><td><input type="radio" name="resetType" value="Soft"> Soft</td></tr>
-</table>
-<div class="submit-button"><input type="submit" value="Perform"></div>
-</form>
+<form:form action="/steve/manager/operations/v1.5/Reset" modelAttribute="params">
+    <section><span>Charge Points with OCPP v1.5</span></section>
+    <%@ include file="../00-cp-multiple.jsp" %>
+    <section><span>Parameters</span></section>
+    <table class="userInput">
+    <tr><td>Reset Type:</td>
+        <td>
+            <form:select path="resetType">
+                <form:options items="${resetType}" />
+            </form:select>
+        </td>
+    </tr>
+    </table>
+    <div class="submit-button"><input type="submit" value="Perform"></div>
+</form:form>
 </div></div>
 <%@ include file="../00-footer.jsp" %>

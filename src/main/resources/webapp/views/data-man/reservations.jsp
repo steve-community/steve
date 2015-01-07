@@ -1,4 +1,3 @@
-<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ include file="../00-header.jsp" %>
 <div class="content">
 <section><span>Existing Reservations</span></section>

@@ -1,4 +1,5 @@
 <%@ include file="../00-header.jsp" %>
+<%@ include file="../00-op-bind-errors.jsp" %>
 <div class="content">
 <div class="left-menu">
 <ul>
@@ -14,10 +15,11 @@
 </ul>
 </div>
 <div class="op-content">
-<form method="POST" action="/steve/manager/operations/v1.2/ClearCache">
-<%@ include file="00-cp-multiple.jsp" %>
-<section><span>Parameters</span></section>
-<center><i>No parameters required.</i></center><div class="submit-button"><input type="submit" value="Perform"></div>
-</form>
+<form:form action="/steve/manager/operations/v1.2/ClearCache" modelAttribute="params">
+    <section><span>Charge Points with OCPP v1.2</span></section>
+    <%@ include file="../00-cp-multiple.jsp" %>
+    <section><span>Parameters</span></section>
+    <center><i>No parameters required.</i></center><div class="submit-button"><input type="submit" value="Perform"></div>
+</form:form>
 </div></div>
 <%@ include file="../00-footer.jsp" %>

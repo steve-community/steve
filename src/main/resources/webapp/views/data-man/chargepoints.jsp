@@ -1,6 +1,3 @@
-<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
-<%@ taglib uri="http://www.springframework.org/tags" prefix="spring" %>
-<%@ taglib uri="http://www.springframework.org/tags/form" prefix="form" %>
 <%@ include file="../00-header.jsp" %>
 <script type="text/javascript">
 <%@ include file="../../static/js/snippets/getCPDetails.js" %>
@@ -8,16 +5,6 @@
 <spring:hasBindErrors name="chargeBoxAddForm">
     <div class="error">
         Error while trying to add a charge point:
-        <ul>
-            <c:forEach var="error" items="${errors.allErrors}">
-                <li>${error.defaultMessage}</li>
-            </c:forEach>
-        </ul>
-    </div>
-</spring:hasBindErrors>
-<spring:hasBindErrors name="chargeBoxDeleteForm">
-    <div class="error">
-        Error while trying to delete a charge point:
         <ul>
             <c:forEach var="error" items="${errors.allErrors}">
                 <li>${error.defaultMessage}</li>
@@ -60,17 +47,21 @@
 	</div>
 	<div id="delete">
 		<div class="warning"><b>Warning:</b> Deleting a charge point causes losing all related information including transactions, reservations, connector status and connector meter values.</div>
-        <form:form action="/steve/manager/chargepoints/delete" modelAttribute="chargeBoxDeleteForm">
-			<table class="userInput">
-				<tr><td>ChargeBox ID:</td><td>
-                    <form:select path="chargeBoxId">
+        <form method="POST" action="/steve/manager/chargepoints/delete">
+            <table class="userInput">
+                <tr><td>ChargeBox ID:</td><td>
+                    <select name="chargeBoxId" required>
                         <option selected="selected" disabled="disabled" style="display:none;">Choose...</option>
-                        <form:options items="${cpList}" />
-                    </form:select>
-				</td></tr>
-				<tr><td></td><td id="add_space"><input type="submit" value="Delete"></td></tr>
-			</table>
-        </form:form>
+                        <%-- Start --%>
+                        <c:forEach items="${cpList}" var="cp">
+                            <option value="${cp}">${cp}</option>
+                        </c:forEach>
+                        <%-- End --%>
+                    </select>
+                </td></tr>
+                <tr><td></td><td id="add_space"><input type="submit" value="Delete"></td></tr>
+            </table>
+        </form>
 	</div>
 </div></div>
 <%@ include file="../00-footer.jsp" %>

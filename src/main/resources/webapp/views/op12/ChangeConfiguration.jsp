@@ -1,4 +1,5 @@
 <%@ include file="../00-header.jsp" %>
+<%@ include file="../00-op-bind-errors.jsp" %>
 <div class="content">
 <div class="left-menu">
 <ul>
@@ -14,30 +15,22 @@
 </ul>
 </div>
 <div class="op-content">
-<form method="POST" action="/steve/manager/operations/v1.2/ChangeConfiguration">
-<%@ include file="00-cp-multiple.jsp" %>
-<section><span>Parameters</span></section>
-<table class="userInput">
-<tr>
-<td>Configuration Key:</td>
-<td>
-<select name="confKey" required>
-<option selected="selected" disabled="disabled" style="display:none;">Choose...</option>
-<option value="HeartBeatInterval">HeartBeatInterval (in seconds)</option>
-<option value="ConnectionTimeOut">ConnectionTimeOut (in seconds)</option>
-<option value="ProximityContactRetries">ProximityContactRetries (in times)</option>
-<option value="ProximityLockRetries">ProximityLockRetries (in times)</option>
-<option value="ResetRetries">ResetRetries (in times)</option>
-<option value="BlinkRepeat">BlinkRepeat (in times)</option>
-<option value="LightIntensity">LightIntensity (in %)</option>
-<option value="ChargePointId">ChargePointId (string)</option>
-<option value="MeterValueSampleInterval">MeterValueSampleInterval (in seconds)</option>
-</select>
-</td>
-</tr>
-<tr><td>Value:</td><td><input type="text" name="value" required></td></tr>
-</table>
-<div class="submit-button"><input type="submit" value="Perform"></div>
-</form>
+<form:form action="/steve/manager/operations/v1.2/ChangeConfiguration" modelAttribute="params">
+    <section><span>Charge Points with OCPP v1.2</span></section>
+    <%@ include file="../00-cp-multiple.jsp" %>
+    <section><span>Parameters</span></section>
+    <table class="userInput">
+    <tr>
+    <td>Configuration Key:</td>
+    <td>
+        <form:select path="confKey">
+            <form:options items="${confKey}" itemLabel="text" />
+        </form:select>
+    </td>
+    </tr>
+    <tr><td>Value:</td><td><form:input path="value" /></td></tr>
+    </table>
+    <div class="submit-button"><input type="submit" value="Perform"></div>
+</form:form>
 </div></div>
 <%@ include file="../00-footer.jsp" %>

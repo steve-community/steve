@@ -1,4 +1,5 @@
 <%@ include file="../00-header.jsp" %>
+<%@ include file="../00-op-bind-errors.jsp" %>
 <div class="content">
 <div class="left-menu">
 <ul>
@@ -21,15 +22,16 @@
 </ul>
 </div>
 <div class="op15-content">
-<form method="POST" action="/steve/manager/operations/v1.5/DataTransfer">
-<%@ include file="00-cp-multiple.jsp" %>
-<section><span>Parameters</span></section>
-<table class="userInput">
-<tr><td>Vendor ID (String):</td><td><input type="text" name="vendorId" required></td></tr>
-<tr><td>Message ID (String):</td><td><input type="text" name="messageId" placeholder="optional"></td></tr>
-<tr><td>Data (Text):</td><td><input type="text" name="data" placeholder="optional"></td></tr>
-</table>
-<div class="submit-button"><input type="submit" value="Perform"></div>
-</form>
+<form:form action="/steve/manager/operations/v1.5/DataTransfer" modelAttribute="params">
+    <section><span>Charge Points with OCPP v1.5</span></section>
+    <%@ include file="../00-cp-multiple.jsp" %>
+    <section><span>Parameters</span></section>
+    <table class="userInput">
+    <tr><td>Vendor ID (String):</td><td><form:input path="vendorId" /></td></tr>
+    <tr><td>Message ID (String):</td><td><form:input path="messageId" placeholder="optional" /></td></tr>
+    <tr><td>Data (Text):</td><td><form:input path="data" placeholder="optional" /></td></tr>
+    </table>
+    <div class="submit-button"><input type="submit" value="Perform"></div>
+</form:form>
 </div></div>
 <%@ include file="../00-footer.jsp" %>

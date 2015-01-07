@@ -10,21 +10,21 @@
 </head>
 <body>
 <div class="main">
-<div class="top-banner"><div class="container"><a href="${pageContext.request.contextPath}"><img src="/steve/static/images/logo2.png" height="80"></a></div></div>
+<div class="top-banner"><div class="container"><a href="/steve/manager/home"><img src="/steve/static/images/logo2.png" height="80"></a></div></div>
 <div class="top-menu"></div>
 <div class="main-wrapper">
-    <%-- Display after failed login attempt --%>
-    <c:if test="${param.error == 'true'}">
+    <c:if test="${param.error != null}">
         <div class="error"><b>Error:</b> Your name or password is incorrect.</div>
     </c:if>
     <div class="content">
         <section><span>Sign In</span></section>
-        <form method="POST" action="j_security_check">
-        <table class="userInput">
-            <tr><td>Name:</td><td><input type="text" name="j_username" required /></td></tr>
-            <tr><td>Password:</td><td><input type="password" name="j_password" required /></td></tr>
-            <tr><td></td><td id="add_space"><input type="submit" value="Sign In"></td></tr>
-        </table>
+        <form method="POST" action="/steve/manager/signin">
+            <table class="userInput">
+                <tr><td>Name:</td><td><input type="text" name="username" id="username" required /></td></tr>
+                <tr><td>Password:</td><td><input type="password" name="password" id="password" required /></td></tr>
+                <tr><td></td><td id="add_space"><input type="submit" value="Sign In"></td></tr>
+            </table>
+            <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
         </form>
     </div>
 </div>

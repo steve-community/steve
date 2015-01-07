@@ -1,4 +1,5 @@
 <%@ include file="../00-header.jsp" %>
+<%@ include file="../00-op-bind-errors.jsp" %>
 <div class="content">
 <div class="left-menu">
 <ul>
@@ -21,15 +22,21 @@
 </ul>
 </div>
 <div class="op15-content">
-<form method="POST" action="/steve/manager/operations/v1.5/ChangeAvailability">
-<%@ include file="00-cp-multiple.jsp" %>
-<section><span>Parameters</span></section>
-<table class="userInput">
-<tr><td>Connector ID (integer):</td><td><input type="number" min="0" name="connectorId" placeholder="if empty, 0 = charge point as a whole" required></td></tr>
-<tr><td>Availability Type:</td><td><input type="radio" name="availType" value="Inoperative" required> Inoperative</td></tr>
-<tr><td></td><td><input type="radio" name="availType" value="Operative"> Operative</td></tr>
-</table>
-<div class="submit-button"><input type="submit" value="Perform"></div>
-</form>
+<form:form action="/steve/manager/operations/v1.5/ChangeAvailability" modelAttribute="params">
+    <section><span>Charge Points with OCPP v1.5</span></section>
+    <%@ include file="../00-cp-multiple.jsp" %>
+    <section><span>Parameters</span></section>
+    <table class="userInput">
+    <tr><td>Connector ID (integer):</td><td><form:input path="connectorId" placeholder="if empty, 0 = charge point as a whole" /></td></tr>
+    <tr>
+        <td>Availability Type:</td>
+        <td><form:select path="availType">
+            <form:options items="${availType}" />
+        </form:select>
+        </td>
+    </tr>
+    </table>
+    <div class="submit-button"><input type="submit" value="Perform"></div>
+</form:form>
 </div></div>
 <%@ include file="../00-footer.jsp" %>

@@ -1,11 +1,29 @@
-<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ include file="../00-header.jsp" %>
 <script type="text/javascript">
-$(document).ready(function() {
-<%@ include file="../../static/js/snippets/datepicker-future.js" %>
-<%@ include file="../../static/js/snippets/populateUpdate.js" %>
-});
+    $(document).ready(function() {
+        <%@ include file="../../static/js/snippets/populateUpdate.js" %>
+    });
 </script>
+<spring:hasBindErrors name="userAddForm">
+    <div class="error">
+        Error while trying to add a user:
+        <ul>
+            <c:forEach var="error" items="${errors.allErrors}">
+                <li>${error.defaultMessage}</li>
+            </c:forEach>
+        </ul>
+    </div>
+</spring:hasBindErrors>
+<spring:hasBindErrors name="userUpdateForm">
+    <div class="error">
+        Error while trying to update a user:
+        <ul>
+            <c:forEach var="error" items="${errors.allErrors}">
+                <li>${error.defaultMessage}</li>
+            </c:forEach>
+        </ul>
+    </div>
+</spring:hasBindErrors>
 <div class="content">
 <section><span>Registered Users</span></section>
 <table class="res" id="usersTable">
@@ -29,65 +47,62 @@ $(document).ready(function() {
 </div>
 <div class="right-content">
 	<div id="add">
-		<form method="POST" action="/steve/manager/users/add">
+        <form:form action="/steve/manager/users/add" modelAttribute="userAddForm">
 			<table class="userInput">
-				<tr><td>User ID Tag (string):</td><td><input type="text" name="idTag" required></td></tr>
+                <tr><td>User ID Tag (string):</td><td><form:input path="idTag"/></td></tr>
 				<tr><td>Parent ID Tag:</td>
 					<td>
-						<select name="parentIdTag">
-						<option value="" selected="selected">-- Empty --</option>
-						<%-- Start --%>
-						<c:forEach items="${userList}" var="user">
-						<option value="${user.idTag}">${user.idTag}</option>
-						</c:forEach>
-						<%-- End --%>
-						</select>
+                        <form:select path="parentIdTag">
+                            <option value="EMPTY-OPTION" selected="selected">-- Empty --</option>
+                            <c:forEach items="${userList}" var="user">
+                                <option value="${user.idTag}">${user.idTag}</option>
+                            </c:forEach>
+                        </form:select>
 					</td></tr>
-				<tr><td>Expiry Date/Time (ex: 2011-12-21 at 11:30):</td>
+				<tr><td>Expiry Date/Time (ex: 2011-12-21 11:30):</td>
 					<td>
-						<input type="text" name="expiryDate" class="datepicker" placeholder="optional"> at 
-						<input type="text" name="expiryTime" class="timepicker" placeholder="optional">
+                        <form:input path="expiration" placeholder="optional"/>
 					</td>
 				</tr>
 				<tr><td></td><td id="add_space"><input type="submit" value="Add"></td></tr>
 			</table>
-		</form>
+		</form:form>
 	</div>
 	<div id="update">
-		<form method="POST" action="/steve/manager/users/update">
+        <form:form action="/steve/manager/users/update" modelAttribute="userUpdateForm">
 			<table class="userInput">
 				<tr><td>User ID Tag:</td><td>
-					<select name="idTag" id="idTagUpdate">
-					<option selected="selected" disabled="disabled" style="display:none;">Choose...</option>
-					<%-- Start --%>
-					<c:forEach items="${userList}" var="user">
-					<option value="${user.idTag}">${user.idTag}</option>
-					</c:forEach>
-					<%-- End --%>
-					</select>
+                    <form:select path="idTag" id="idTagUpdate">
+                        <option selected="selected" style="display:none;" disabled>Choose...</option>
+                        <c:forEach items="${userList}" var="user">
+                            <option value="${user.idTag}">${user.idTag}</option>
+                        </c:forEach>
+                    </form:select>
 				</td></tr>
 				<tr><td>Parent ID Tag:</td>
 				<td>
-					<select name="parentIdTag" id="update-pid" disabled>
-					<option value="" selected="selected">-- Empty --</option>
-					<%-- Start --%>
-					<c:forEach items="${userList}" var="user">
-					<option value="${user.idTag}">${user.idTag}</option>
-					</c:forEach>
-					<%-- End --%>
-					</select>
+                    <form:select path="parentIdTag" id="update-pid" disabled="true">
+                        <option value="EMPTY-OPTION" selected="selected">-- Empty --</option>
+                        <c:forEach items="${userList}" var="user">
+                            <option value="${user.idTag}">${user.idTag}</option>
+                        </c:forEach>
+                    </form:select>
 				</td></tr>
-				<tr><td>Expiry Date/Time (ex: 2011-12-21 at 11:30):</td>
+				<tr><td>Expiry Date/Time (ex: 2011-12-21 11:30):</td>
 					<td>
-						<input type="text" name="expiryDate" id="update-exdate" class="datepicker" disabled> at 
-						<input type="text" name="expiryTime" id="update-extime" class="timepicker" disabled>
+                        <form:input path="expiration" id="update-exdateTime" disabled="true"/>
 					</td>
 				</tr>
-				<tr><td>Block the ID Tag:</td><td><input type="radio" name="blockUser" value="false" id="update-block-false" disabled> false</td></tr>
-				<tr><td></td><td><input type="radio" name="blockUser" value="true" id="update-block-true" disabled> true</td></tr>
+				<tr><td>Block the ID Tag:</td>
+                    <td><form:radiobutton path="blocked" value="false" id="update-block-false" disabled="true"/> false</td>
+                </tr>
+				<tr>
+                    <td></td>
+                    <td><form:radiobutton path="blocked" value="true" id="update-block-true" disabled="true"/> true</td>
+                </tr>
 				<tr><td></td><td id="add_space"><input type="submit" value="Update" id="update-submit" disabled></td></tr>
 			</table>
-		</form>
+		</form:form>
 	</div>
 	<div id="delete">
 		<div class="warning"><b>Warning:</b> Deleting a user causes losing all related information including transactions and reservations.</div>

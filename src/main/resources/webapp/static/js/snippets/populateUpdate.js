@@ -5,15 +5,44 @@ idd.change(function(){
 	// get the row
 	var row = $("#usersTable").find(str);
 	// enable input fields
-	$("#update-pid, #update-exdate, #update-extime, #update-block-false, #update-block-true, #update-submit").prop("disabled", false);		
+	$("#update-pid, #update-exdateTime, #update-block-false, #update-block-true, #update-submit").prop("disabled", false);
 	// iterate over the row cells and populate inputs
-	$("#update-pid").val(row.find("td:eq(1)").html());
+    var parentIdCell = row.find("td:eq(1)").html();
+    if (parentIdCell == "") {
+        $("#update-pid").val("EMPTY-OPTION");
+    } else {
+        $("#update-pid").val(parentIdCell);
+    }
 	var dateTime = row.find("td:eq(2)").html().split(' at ');
-	$("#update-exdate").val(dateTime[0]);
-	$("#update-extime").val(dateTime[1]);		
+	$("#update-exdateTime").val(dehumanizeDate(dateTime[0]) + ' ' + dateTime[1]);
 	if (row.find("td:eq(4)").html() == "false") {
 		$("#update-block-false").prop("checked", true);
 	} else {
 		$("#update-block-true").prop("checked", true);
 	}
 });
+
+function dehumanizeDate(str) {
+    var now = new Date();
+    var day = now.getDate();
+    var month = now.getMonth() + 1; // because internal representation of months is 0...11
+    var year = now.getFullYear();
+
+    if (str == 'Yesterday') {
+        return format(day - 1, month, year);
+    } else if (str == 'Today') {
+        return format(day, month, year);
+    } else if (str == 'Tomorrow') {
+        return format(day + 1, month, year);
+    } else {
+        return str;
+    }
+}
+
+function format(day, month, year) {
+    return year + "-" + addLeadingZero(month) + "-" + addLeadingZero(day);
+}
+
+function addLeadingZero(num) {
+    return num < 10 ? '0' + num : num;
+}

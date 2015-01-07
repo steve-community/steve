@@ -1,8 +1,9 @@
 <%@ include file="../00-header.jsp" %>
+<%@ include file="../00-op-bind-errors.jsp" %>
 <script type="text/javascript">
-$(document).ready(function() {
-<%@ include file="../../static/js/snippets/getConnectorIdsZeroAllowed.js" %>
-});
+    $(document).ready(function() {
+        <%@ include file="../../static/js/snippets/getConnectorIdsZeroAllowed.js" %>
+    });
 </script>
 <div class="content">
 <div class="left-menu">
@@ -19,27 +20,23 @@ $(document).ready(function() {
 </ul>
 </div>
 <div class="op-content">
-<form method="POST" action="/steve/manager/operations/v1.2/RemoteStartTransaction">
-<%@ include file="00-cp-single.jsp" %>
-<section><span>Parameters</span></section>
-<table class="userInput">
-<tr><td>Connector ID:</td>
-	<td><select name="connectorId" id="connectorId" required disabled></select></td>
-</tr>
-<tr><td>User ID Tag:</td>
-	<td>
-		<select name="idTag" required>
-		<option selected="selected" disabled="disabled" style="display:none;">Choose...</option>
-		<%-- Start --%>
-		<c:forEach items="${userList}" var="user">
-		<option value="${user.idTag}">${user.idTag}</option>
-		</c:forEach>
-		<%-- End --%>
-		</select>
-	</td>
-</tr>
-</table>
-<div class="submit-button"><input type="submit" value="Perform"></div>
-</form>
+<form:form action="/steve/manager/operations/v1.2/RemoteStartTransaction" modelAttribute="params">
+    <section><span>Charge Points with OCPP v1.2</span></section>
+    <%@ include file="../00-cp-single.jsp" %>
+    <section><span>Parameters</span></section>
+    <table class="userInput">
+    <tr><td>Connector ID:</td>
+        <td><form:select path="connectorId" disabled="true"/></td>
+    </tr>
+    <tr><td>User ID Tag:</td>
+        <td>
+            <form:select path="idTag">
+                <form:options items="${idTagList}" />
+            </form:select>
+        </td>
+    </tr>
+    </table>
+    <div class="submit-button"><input type="submit" value="Perform"></div>
+</form:form>
 </div></div>
 <%@ include file="../00-footer.jsp" %>

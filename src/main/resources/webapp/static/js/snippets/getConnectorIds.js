@@ -1,4 +1,4 @@
-$("#cp_items").change(function() {
+$("#chargePointSelectList").change(function() {
 	var cp = $(this).val().toString().split(';')[0];
 	$.getJSON("/steve/manager/ajax/getConnectorIds?chargeBoxId=" + cp, function(data) {
 		var options = "";

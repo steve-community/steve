@@ -26,16 +26,6 @@
     </properties>
 
     <build>
-        <!--<resources>-->
-            <!--<resource>-->
-                <!--<targetPath>/webapp</targetPath>-->
-                <!--<directory>src/main/webapp</directory>-->
-            <!--</resource>-->
-            <!--<resource>-->
-                <!--<directory>src/main/resources</directory>-->
-            <!--</resource>-->
-        <!--</resources>-->
-
         <plugins>
             <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -45,32 +35,6 @@
                     <target>${java.version}</target>
                 </configuration>
             </plugin>
-
-            <!-- Build the JAR with dependencies -->
-            <!--<plugin>-->
-                <!--<groupId>org.apache.maven.plugins</groupId>-->
-                <!--<artifactId>maven-assembly-plugin</artifactId>-->
-                <!--<version>2.5.2</version>-->
-                <!--<configuration>-->
-                    <!--<descriptorRefs>-->
-                        <!--<descriptorRef>jar-with-dependencies</descriptorRef>-->
-                    <!--</descriptorRefs>-->
-                    <!--<archive>-->
-                        <!--<manifest>-->
-                            <!--<mainClass>de.rwth.idsg.steve.JettyServer</mainClass>-->
-                        <!--</manifest>-->
-                    <!--</archive>-->
-                <!--</configuration>-->
-                <!--<executions>-->
-                    <!--<execution>-->
-                        <!--<id>make-assembly</id> &lt;!&ndash; this is used for inheritance merges &ndash;&gt;-->
-                        <!--<phase>package</phase> &lt;!&ndash; bind to the packaging phase &ndash;&gt;-->
-                        <!--<goals>-->
-                            <!--<goal>single</goal>-->
-                        <!--</goals>-->
-                    <!--</execution>-->
-                <!--</executions>-->
-            <!--</plugin>-->
 
             <!-- Help: http://stackoverflow.com/questions/6831954 -->
             <plugin>
@@ -204,8 +168,8 @@
                     </dependency>
                 </dependencies>
 
-                <!-- http://www.jooq.org/doc/3.4/manual/code-generation/codegen-configuration/
-                     http://www.jooq.org/doc/3.4/manual/code-generation/codegen-advanced/ -->
+                <!-- http://www.jooq.org/doc/3.5/manual/code-generation/codegen-configuration/
+                     http://www.jooq.org/doc/3.5/manual/code-generation/codegen-advanced/ -->
                 <configuration>
                     <jdbc>
                         <driver>com.mysql.jdbc.Driver</driver>

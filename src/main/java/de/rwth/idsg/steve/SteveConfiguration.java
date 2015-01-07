@@ -58,4 +58,12 @@ public final class SteveConfiguration {
         public static final boolean JOOQ_EXEC_LOGGING = false;
     }
 
+    /**
+     * Credentials for Web interface access
+     */
+    public static final class Auth {
+        public static final String USERNAME = "admin";
+        public static final String PASSWORD = "1234";
+    }
+
 }

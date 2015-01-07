@@ -16,7 +16,7 @@ Requirements & Configuration
 
 2. SteVe comes with MySQL [dump files](resources/db/) that contain the database structures for all tables with no data. These should be imported *in the right order* in your MySQL database before deployment of SteVe.  
 
-3. Before using SteVe, the default database configuration (*username*, *password* and *url*) has to be changed in [pom.xml](pom.xml#L176-179) and [SteveConfiguration.java](src/main/java/de/rwth/idsg/steve/SteveConfiguration.java#L53-L55).
+3. Before using SteVe, the default database configuration (*username*, *password* and *url*) has to be changed in [pom.xml](pom.xml#L176-178) and [SteveConfiguration.java](src/main/java/de/rwth/idsg/steve/SteveConfiguration.java#L53-L55).
 
 4. Change the Web interface credentials in [SteveConfiguration.java](src/main/java/de/rwth/idsg/steve/SteveConfiguration.java#L65-L66)
 
@@ -38,7 +38,6 @@ Start the application:
 Access the Web interface:
 
 ```http://localhost:8080/steve/manager``` 
-
 
 Screenshots
 -----

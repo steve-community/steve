@@ -3,6 +3,7 @@ package de.rwth.idsg.steve;
 
 import de.rwth.idsg.steve.config.BeanConfiguration;
 import de.rwth.idsg.steve.config.OcppConfiguration;
+import de.rwth.idsg.steve.config.SecurityConfiguration;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.jetty.rewrite.handler.RedirectPatternRule;
 import org.eclipse.jetty.rewrite.handler.RewriteHandler;
@@ -14,6 +15,7 @@ import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.server.SslConnectionFactory;
 import org.eclipse.jetty.server.handler.HandlerCollection;
+import org.eclipse.jetty.servlet.FilterHolder;
 import org.eclipse.jetty.servlet.ServletHolder;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.eclipse.jetty.util.thread.QueuedThreadPool;
@@ -23,9 +25,12 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.web.context.ContextLoaderListener;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
+import org.springframework.web.filter.DelegatingFilterProxy;
 import org.springframework.web.servlet.DispatcherServlet;
 
+import javax.servlet.DispatcherType;
 import java.io.IOException;
+import java.util.EnumSet;
 
 /**
  * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
@@ -67,6 +72,7 @@ public class JettyServer {
         httpConfig.setResponseHeaderSize(8192);
         httpConfig.setSendServerVersion(false);
         httpConfig.setSendDateHeader(false);
+        httpConfig.setSendXPoweredBy(false);
 
         // Extra options
         server.setDumpAfterStart(false);
@@ -115,33 +121,42 @@ public class JettyServer {
         handlerCollection.setHandlers(
                 new Handler[] {
                         getRedirectHandler(),
-                        getJettyContext(getSpringContext())
+                        getSteveContext(getSpringContext())
         });
 
         server.setHandler(handlerCollection);
     }
 
-    private WebAppContext getJettyContext(WebApplicationContext springContext) throws IOException {
-        WebAppContext jettyContext = new WebAppContext();
-        jettyContext.setContextPath(SteveConfiguration.Jetty.CONTEXT_PATH);
-        jettyContext.setResourceBase(new ClassPathResource("webapp").getURI().toString());
+    public static WebApplicationContext getSpringContext() {
+        AnnotationConfigWebApplicationContext ctx = new AnnotationConfigWebApplicationContext();
+        ctx.register(BeanConfiguration.class);
+        ctx.register(OcppConfiguration.class);
+        ctx.register(SecurityConfiguration.class);
+        return ctx;
+    }
+
+    private WebAppContext getSteveContext(WebApplicationContext springContext) throws IOException {
+        WebAppContext ctx = new WebAppContext();
+        ctx.setContextPath(SteveConfiguration.Jetty.CONTEXT_PATH);
+        ctx.setResourceBase(new ClassPathResource("webapp").getURI().toString());
 
         // Disable directory listings if no index.html is found.
-        jettyContext.setInitParameter("org.eclipse.jetty.servlet.Default.dirAllowed", "false");
+        ctx.setInitParameter("org.eclipse.jetty.servlet.Default.dirAllowed", "false");
 
         ServletHolder web = new ServletHolder("spring-dispatcher", new DispatcherServlet(springContext));
         ServletHolder cxf = new ServletHolder("cxf", JettyServlets.getApacheCXF());
 
-        jettyContext.addEventListener(new ContextLoaderListener(springContext));
-        jettyContext.addServlet(web, SteveConfiguration.SPRING_WEB_MAPPING);
-        jettyContext.addServlet(cxf, SteveConfiguration.CXF_MAPPING);
-        return jettyContext;
-    }
+        ctx.addEventListener(new ContextLoaderListener(springContext));
+        ctx.addServlet(web, SteveConfiguration.SPRING_WEB_MAPPING);
+        ctx.addServlet(cxf, SteveConfiguration.CXF_MAPPING);
 
-    private WebApplicationContext getSpringContext() {
-        AnnotationConfigWebApplicationContext ctx = new AnnotationConfigWebApplicationContext();
-        ctx.register(BeanConfiguration.class);
-        ctx.register(OcppConfiguration.class);
+        // Register Spring's filter chain for security. The name is not arbitrary, but is as expected by Spring.
+        ctx.addFilter(
+                new FilterHolder(new DelegatingFilterProxy("springSecurityFilterChain")),
+                SteveConfiguration.SPRING_WEB_MAPPING,
+                EnumSet.allOf(DispatcherType.class)
+        );
+
         return ctx;
     }
 
@@ -151,11 +166,13 @@ public class JettyServer {
         rewrite.setRewritePathInfo(true);
         rewrite.setOriginalPathAttribute("requestedPath");
 
-        RedirectPatternRule baseToHome = new RedirectPatternRule();
-        baseToHome.setPattern("");
-        baseToHome.setLocation("/steve/manager/home");
-
-        rewrite.addRule(baseToHome);
+        String[] redirectArray = {"", "/steve", "/steve/manager"};
+        for (String redirect : redirectArray) {
+            RedirectPatternRule rule = new RedirectPatternRule();
+            rule.setPattern(redirect);
+            rule.setLocation("/steve/manager/home");
+            rewrite.addRule(rule);
+        }
         return rewrite;
     }
 

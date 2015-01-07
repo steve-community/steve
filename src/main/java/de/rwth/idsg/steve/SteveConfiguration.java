@@ -26,7 +26,7 @@ public final class SteveConfiguration {
         // Just to be backwards compatible with previous versions of Steve,
         // since there might be already configured chargepoints expecting the older path.
         // Otherwise, might as well be "/".
-        public static final String CONTEXT_PATH = "/steve/";
+        public static final String CONTEXT_PATH = "/steve";
 
         public static final String SERVER_HOST = "localhost";
         public static final int SERVER_PORT = 8080;
@@ -55,7 +55,7 @@ public final class SteveConfiguration {
         public static final String PASSWORD = "come47on";
 
         public static final SQLDialect JOOQ_DIALECT = SQLDialect.MYSQL;
-        public static final boolean JOOQ_EXEC_LOGGING = true;
+        public static final boolean JOOQ_EXEC_LOGGING = false;
     }
 
 }

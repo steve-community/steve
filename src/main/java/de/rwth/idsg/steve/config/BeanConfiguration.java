@@ -11,9 +11,11 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.Ordered;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
+import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 import org.springframework.web.servlet.view.JstlView;
 import org.springframework.web.servlet.view.UrlBasedViewResolver;
@@ -92,8 +94,8 @@ public class BeanConfiguration extends WebMvcConfigurerAdapter {
      */
     @Override
     public void addResourceHandlers(final ResourceHandlerRegistry registry) {
-        registry.addResourceHandler("static/**").addResourceLocations("static/");
-        registry.addResourceHandler("views/**").addResourceLocations("views/");
+        registry.addResourceHandler("/static/**").addResourceLocations("static/");
+        registry.addResourceHandler("/views/**").addResourceLocations("views/");
     }
 
     /**
@@ -102,6 +104,12 @@ public class BeanConfiguration extends WebMvcConfigurerAdapter {
     @Override
     public void configureMessageConverters(final List<HttpMessageConverter<?>> converters) {
         converters.add(new GsonHttpMessageConverter());
+    }
+
+    @Override
+    public void addViewControllers(ViewControllerRegistry registry) {
+        registry.addViewController("/signin").setViewName("signin");
+        registry.setOrder(Ordered.HIGHEST_PRECEDENCE);
     }
 
 }

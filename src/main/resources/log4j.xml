@@ -22,8 +22,9 @@
     <category name="org.apache.cxf"><level value="INFO"/></category>
     <category name="org.eclipse.jetty"><level value="INFO"/></category>
     <category name="com.zaxxer"><level value="INFO"/></category>
-    <category name="org.springframework"><level value="DEWBUG"/></category>
-    <category name="org.springframework.web.servlet"><level value="DEBUG"/></category>
+    <category name="org.springframework"><level value="INFO"/></category>
+    <category name="org.springframework.security"><level value="INFO"/></category>
+    <category name="org.springframework.web.servlet"><level value="INFO"/></category>
 
     <!-- Root category -->
     <root>

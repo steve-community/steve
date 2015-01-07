@@ -19,9 +19,10 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <jooq.version>3.5.0</jooq.version>
         <cxf.version>3.0.3</cxf.version>
-        <spring.version>4.1.2.RELEASE</spring.version>
+        <spring.version>4.1.4.RELEASE</spring.version>
+        <spring.security.version>3.2.5.RELEASE</spring.security.version>
         <mysql.jdbc.version>5.1.34</mysql.jdbc.version>
-        <jetty.version>9.2.5.v20141112</jetty.version>
+        <jetty.version>9.2.6.v20141205</jetty.version>
     </properties>
 
     <build>
@@ -276,6 +277,19 @@
             <artifactId>spring-webmvc</artifactId>
             <version>${spring.version}</version>
         </dependency>
+
+        <!-- Spring Security -->
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-web</artifactId>
+            <version>${spring.security.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-config</artifactId>
+            <version>${spring.security.version}</version>
+        </dependency>
+
         <dependency>
             <groupId>joda-time</groupId>
             <artifactId>joda-time</artifactId>

@@ -1,3 +1,5 @@
+UPDATE `stevedb`.`dbVersion` SET `version` = '0.6.8';
+
 DROP PROCEDURE `stevedb`.`getStats`;
 
 DELIMITER ;;

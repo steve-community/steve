@@ -23,6 +23,7 @@ public class ReserveNowParams extends SingleChargePointSelect {
     @Min(value = 0, message = "Connector ID must be at least {value}")
     private Integer connectorId;
 
+    @NotNull(message = "Expiry Date/Time is required")
     @Future(message = "Expiry Date/Time must be in future")
     private LocalDateTime expiry;
 

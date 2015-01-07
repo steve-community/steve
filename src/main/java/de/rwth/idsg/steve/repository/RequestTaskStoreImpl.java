@@ -10,8 +10,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.SortedSet;
-import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -23,7 +21,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 @Repository
 public class RequestTaskStoreImpl implements RequestTaskStore {
 
-    private AtomicInteger atomicInteger = new AtomicInteger(0);
+    private final AtomicInteger atomicInteger = new AtomicInteger(0);
     private final ConcurrentHashMap<Integer, RequestTask> lookupTable = new ConcurrentHashMap<>();
 
     @Override

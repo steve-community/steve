@@ -19,8 +19,8 @@ import java.io.PrintWriter;
 @Controller
 public class LogController {
 
-    private File logDir = new File(System.getProperty("user.home"), "logs");
-    private File logFile = new File(logDir, "steve.log");
+    private final File logDir = new File(System.getProperty("user.home"), "logs");
+    private final File logFile = new File(logDir, "steve.log");
 
     @RequestMapping(value = "/log", method = RequestMethod.GET)
     public void log(HttpServletResponse response) {

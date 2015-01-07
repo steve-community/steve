@@ -22,7 +22,7 @@ public interface OcppServerRepository {
      * 2. If the chargebox not registered => no chargeboxes to update => updated/returned row count = 0
      *
      */
-    boolean updateChargebox(String endpoint_address, OcppVersion ocppVersion, String vendor, String model,
+    boolean updateChargebox(String endpointAddress, OcppVersion ocppVersion, String vendor, String model,
                             String pointSerial, String boxSerial, String fwVersion, String iccid, String imsi,
                             String meterType, String meterSerial, String chargeBoxIdentity, Timestamp now);
 

@@ -1,9 +1,7 @@
 package de.rwth.idsg.steve.web.controller;
 
-import de.rwth.idsg.steve.SteveException;
 import de.rwth.idsg.steve.repository.UserRepository;
 import de.rwth.idsg.steve.service.UserService;
-import de.rwth.idsg.steve.utils.DateTimeUtils;
 import de.rwth.idsg.steve.web.dto.UserForm;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -16,6 +14,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.validation.Valid;
 import java.sql.Timestamp;
+
+import static de.rwth.idsg.steve.utils.DateTimeUtils.toTimestamp;
 
 /**
  * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
@@ -57,7 +57,7 @@ public class UsersController {
             return "data-man/users";
         }
 
-        Timestamp expiryTimestamp = DateTimeUtils.toTimestamp(u.getExpiration().toDateTime());
+        Timestamp expiryTimestamp = toTimestamp(u.getExpiration());
         userRepository.addUser(u.getIdTag(), u.getParentIdTag(), expiryTimestamp);
         return "redirect:/manager/users";
     }
@@ -71,13 +71,13 @@ public class UsersController {
             return "data-man/users";
         }
 
-        Timestamp expiryTimestamp = DateTimeUtils.toTimestamp(u.getExpiration().toDateTime());
+        Timestamp expiryTimestamp = toTimestamp(u.getExpiration());
         userRepository.updateUser(u.getIdTag(), u.getParentIdTag(), expiryTimestamp, u.getBlocked());
         return "redirect:/manager/users";
     }
 
     @RequestMapping(value = DELETE_PATH, method = RequestMethod.POST)
-    public String delete(@RequestParam String idTag) throws SteveException {
+    public String delete(@RequestParam String idTag) {
         userRepository.deleteUser(idTag);
         return "redirect:/manager/users";
     }

@@ -1,6 +1,5 @@
 package de.rwth.idsg.steve.repository;
 
-import de.rwth.idsg.steve.SteveException;
 import de.rwth.idsg.steve.repository.dto.Reservation;
 
 import java.sql.Timestamp;
@@ -21,5 +20,5 @@ public interface ReservationRepository {
     int bookReservation(String idTag, String chargeBoxId,
                         Timestamp startTimestamp, Timestamp expiryTimestamp);
 
-    void cancelReservation(int reservation_pk) throws SteveException;
+    void cancelReservation(int reservationId);
 }

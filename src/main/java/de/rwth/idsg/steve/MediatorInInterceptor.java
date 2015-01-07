@@ -34,7 +34,7 @@ import java.util.List;
 @Slf4j
 public class MediatorInInterceptor extends AbstractPhaseInterceptor<SoapMessage> {
 
-    private XMLInputFactory xmlInputFactory;
+    private final XMLInputFactory xmlInputFactory;
 
     public MediatorInInterceptor() {
         super(Phase.POST_STREAM);

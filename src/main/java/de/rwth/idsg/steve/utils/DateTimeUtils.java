@@ -1,6 +1,7 @@
 package de.rwth.idsg.steve.utils;
 
 import org.joda.time.DateTime;
+import org.joda.time.LocalDateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
@@ -16,18 +17,22 @@ public final class DateTimeUtils {
 
     private static final DateTimeFormatter HUMAN_FORMATTER = DateTimeFormat.forPattern("yyyy-MM-dd 'at' HH:mm");
 
-    public static Timestamp getCurrentDateTime(){
+    public static Timestamp getCurrentTimestamp(){
         return new Timestamp(new DateTime().getMillis());
     }
 
-    public static Timestamp toTimestamp(DateTime dt) {
-        return (dt == null) ? null : new Timestamp(dt.getMillis());
+    public static Timestamp toTimestamp(LocalDateTime ldt) {
+        return (ldt == null) ? null : new Timestamp(ldt.toDateTime().getMillis());
+    }
+
+    public static DateTime toDateTime(LocalDateTime ldt) {
+        return (ldt == null) ? null : ldt.toDateTime();
     }
 
     /**
      * Converts a Timestamp to a String of the pattern "yyyy-MM-dd 'at' HH:mm".
      */
-    public static String toString(Timestamp ts){
+    private static String toString(Timestamp ts){
         if (ts == null) {
             return "";
         }

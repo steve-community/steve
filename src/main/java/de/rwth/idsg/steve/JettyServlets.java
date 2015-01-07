@@ -16,7 +16,8 @@ import java.util.List;
  * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
  * @since 12.12.2014
  */
-public class JettyServlets {
+public final class JettyServlets {
+    private JettyServlets() {}
 
     public static Servlet getApacheCXF() {
         LogUtils.setLoggerClass(Slf4jLogger.class);

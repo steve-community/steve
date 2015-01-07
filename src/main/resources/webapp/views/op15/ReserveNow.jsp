@@ -37,7 +37,7 @@
         </tr>
         <tr><td>Expiry Date/Time (ex: 2011-12-21 11:30):</td>
             <td>
-                <form:input path="expiry" placeholder="optional"/>
+                <form:input path="expiry" />
             </td>
         </tr>
         <tr><td>User ID Tag:</td>

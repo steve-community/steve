@@ -49,7 +49,7 @@ public class JettyServer {
     /**
      * A fully configured Jetty Server instance
      */
-    public JettyServer() throws IOException {
+    JettyServer() throws IOException {
 
         // === jetty.xml ===
         // Setup Threadpool
@@ -127,7 +127,7 @@ public class JettyServer {
         server.setHandler(handlerCollection);
     }
 
-    public static WebApplicationContext getSpringContext() {
+    private WebApplicationContext getSpringContext() {
         AnnotationConfigWebApplicationContext ctx = new AnnotationConfigWebApplicationContext();
         ctx.register(BeanConfiguration.class);
         ctx.register(OcppConfiguration.class);

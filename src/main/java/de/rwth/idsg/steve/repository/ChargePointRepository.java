@@ -1,10 +1,9 @@
 package de.rwth.idsg.steve.repository;
 
-import de.rwth.idsg.steve.SteveException;
 import de.rwth.idsg.steve.repository.dto.ChargePoint;
+import de.rwth.idsg.steve.repository.dto.ChargePointSelect;
 import de.rwth.idsg.steve.repository.dto.ConnectorStatus;
 import de.rwth.idsg.steve.repository.dto.Heartbeat;
-import de.rwth.idsg.steve.repository.dto.ChargePointSelect;
 
 import java.util.List;
 
@@ -19,7 +18,7 @@ public interface ChargePointRepository {
     ChargePoint getChargePointDetails(String chargeBoxId);
     List<Heartbeat> getChargePointHeartbeats();
     List<ConnectorStatus> getChargePointConnectorStatus();
-    void addChargePoint(String chargeBoxId) throws SteveException;
-    void deleteChargePoint(String chargeBoxId) throws SteveException;
+    void addChargePoint(String chargeBoxId);
+    void deleteChargePoint(String chargeBoxId);
     List<Integer> getConnectorIds(String chargeBoxId);
 }

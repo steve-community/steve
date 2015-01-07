@@ -66,13 +66,13 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
      * WHERE chargeBoxId = ?
      */
     @Override
-    public boolean updateChargebox(String endpoint_address, OcppVersion ocppVersion, String vendor, String model,
+    public boolean updateChargebox(String endpointAddress, OcppVersion ocppVersion, String vendor, String model,
                                    String pointSerial, String boxSerial, String fwVersion, String iccid, String imsi,
                                    String meterType, String meterSerial, String chargeBoxIdentity, Timestamp now) {
 
         int count = DSL.using(config)
                        .update(CHARGEBOX)
-                       .set(CHARGEBOX.ENDPOINT_ADDRESS, endpoint_address)
+                       .set(CHARGEBOX.ENDPOINT_ADDRESS, endpointAddress)
                        .set(CHARGEBOX.OCPPVERSION, ocppVersion.getValue())
                        .set(CHARGEBOX.CHARGEPOINTVENDOR, vendor)
                        .set(CHARGEBOX.CHARGEPOINTMODEL, model)
@@ -109,7 +109,7 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
             DSL.using(config)
                .update(CHARGEBOX)
                .set(CHARGEBOX.FWUPDATESTATUS, firmwareStatus)
-               .set(CHARGEBOX.FWUPDATETIMESTAMP, DateTimeUtils.getCurrentDateTime())
+               .set(CHARGEBOX.FWUPDATETIMESTAMP, DateTimeUtils.getCurrentTimestamp())
                .where(CHARGEBOX.CHARGEBOXID.equal(chargeBoxIdentity))
                .execute();
         } catch (DataAccessException e) {
@@ -128,7 +128,7 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
             DSL.using(config)
                .update(CHARGEBOX)
                .set(CHARGEBOX.DIAGNOSTICSSTATUS, status)
-               .set(CHARGEBOX.DIAGNOSTICSTIMESTAMP, DateTimeUtils.getCurrentDateTime())
+               .set(CHARGEBOX.DIAGNOSTICSTIMESTAMP, DateTimeUtils.getCurrentTimestamp())
                .where(CHARGEBOX.CHARGEBOXID.equal(chargeBoxIdentity))
                .execute();
         } catch (DataAccessException e) {

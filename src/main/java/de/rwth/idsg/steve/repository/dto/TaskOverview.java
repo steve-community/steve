@@ -1,5 +1,6 @@
 package de.rwth.idsg.steve.repository.dto;
 
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.experimental.Builder;
 import org.joda.time.DateTime;
@@ -9,6 +10,7 @@ import org.joda.time.DateTime;
  * @since 29.12.2014
  */
 @Getter
+@EqualsAndHashCode
 @Builder
 public class TaskOverview implements Comparable<TaskOverview> {
     private int taskId, responseCount, requestCount;

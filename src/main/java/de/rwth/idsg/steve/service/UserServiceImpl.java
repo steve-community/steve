@@ -3,7 +3,6 @@ package de.rwth.idsg.steve.service;
 import de.rwth.idsg.steve.OcppConstants;
 import de.rwth.idsg.steve.repository.UserRepository;
 import de.rwth.idsg.steve.repository.dto.User;
-import de.rwth.idsg.steve.utils.DateTimeUtils;
 import jooq.steve.db.tables.records.UserRecord;
 import lombok.extern.slf4j.Slf4j;
 import ocpp.cp._2012._06.AuthorisationData;
@@ -15,6 +14,9 @@ import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
 import java.util.List;
+
+import static de.rwth.idsg.steve.utils.DateTimeUtils.getCurrentTimestamp;
+import static de.rwth.idsg.steve.utils.DateTimeUtils.humanize;
 
 /**
  * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
@@ -62,7 +64,7 @@ public class UserServiceImpl implements UserService {
                 log.error("The user with idTag '{}' is BLOCKED.", idTag);
                 idTagInfo.setStatus(AuthorizationStatus.BLOCKED);
 
-            } else if (record.getExpirydate() != null && DateTimeUtils.getCurrentDateTime().after(record.getExpirydate())) {
+            } else if (record.getExpirydate() != null && getCurrentTimestamp().after(record.getExpirydate())) {
                 log.error("The user with idTag '{}' is EXPIRED.", idTag);
                 idTagInfo.setStatus(AuthorizationStatus.EXPIRED);
 
@@ -95,7 +97,7 @@ public class UserServiceImpl implements UserService {
                 log.error("The user with idTag '{}' is BLOCKED.", idTag);
                 idTagInfo.setStatus(ocpp.cs._2012._06.AuthorizationStatus.BLOCKED);
 
-            } else if (record.getExpirydate() != null && DateTimeUtils.getCurrentDateTime().after(record.getExpirydate())) {
+            } else if (record.getExpirydate() != null && getCurrentTimestamp().after(record.getExpirydate())) {
                 log.error("The user with idTag '{}' is EXPIRED.", idTag);
                 idTagInfo.setStatus(ocpp.cs._2012._06.AuthorizationStatus.EXPIRED);
 
@@ -121,7 +123,7 @@ public class UserServiceImpl implements UserService {
             return User.builder()
                     .idTag(r.getIdtag())
                     .parentIdTag(r.getParentidtag())
-                    .expiryDate(DateTimeUtils.humanize(r.getExpirydate()))
+                    .expiryDate(humanize(r.getExpirydate()))
                     .inTransaction(r.getIntransaction())
                     .blocked(r.getBlocked())
                     .build();
@@ -129,9 +131,9 @@ public class UserServiceImpl implements UserService {
     }
 
     private class AuthorisationDataMapper implements RecordMapper<UserRecord, AuthorisationData> {
-        DateTime nowDt = new DateTime();
-        DateTime cacheExpiry = nowDt.plus(ocppConstants.getHoursToExpire());
-        Timestamp now = new Timestamp(nowDt.getMillis());
+        final DateTime nowDt = new DateTime();
+        final DateTime cacheExpiry = nowDt.plus(ocppConstants.getHoursToExpire());
+        final Timestamp now = new Timestamp(nowDt.getMillis());
 
         @Override
         public AuthorisationData map(UserRecord record) {

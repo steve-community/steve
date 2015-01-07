@@ -99,7 +99,7 @@ public class CentralSystemService12_Server implements CentralSystemService {
         String status = parameters.getStatus().value();
         String errorCode = parameters.getErrorCode().value();
         ocppServerRepository.insertConnectorStatus12(chargeBoxIdentity, connectorId, status,
-                                                      DateTimeUtils.getCurrentDateTime(), errorCode);
+                                                      DateTimeUtils.getCurrentTimestamp(), errorCode);
         return new StatusNotificationResponse();
     }
 

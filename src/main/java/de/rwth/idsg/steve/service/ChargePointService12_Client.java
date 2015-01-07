@@ -31,6 +31,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+import static de.rwth.idsg.steve.utils.DateTimeUtils.toDateTime;
+
 /**
  * Client implementation of OCPP V1.2.
  * 
@@ -85,8 +87,8 @@ public class ChargePointService12_Client {
                 .withLocation(params.getLocation())
                 .withRetries(params.getRetries())
                 .withRetryInterval(params.getRetryInterval())
-                .withStartTime(params.getStart().toDateTime())
-                .withStopTime(params.getStop().toDateTime());
+                .withStartTime(toDateTime(params.getStart()))
+                .withStopTime(toDateTime(params.getStop()));
     }
 
     private RemoteStartTransactionRequest prepareRemoteStartTransaction(RemoteStartTransactionParams params) {
@@ -113,7 +115,7 @@ public class ChargePointService12_Client {
     private UpdateFirmwareRequest prepareUpdateFirmware(UpdateFirmwareParams params) {
         return new UpdateFirmwareRequest()
                 .withLocation(params.getLocation())
-                .withRetrieveDate(params.getRetrieve().toDateTime())
+                .withRetrieveDate(toDateTime(params.getRetrieve()))
                 .withRetries(params.getRetries())
                 .withRetryInterval(params.getRetryInterval());
     }

@@ -1,7 +1,6 @@
 package de.rwth.idsg.steve.repository.dto;
 
 import lombok.Getter;
-import lombok.ToString;
 import lombok.experimental.Builder;
 
 /**
@@ -9,7 +8,6 @@ import lombok.experimental.Builder;
  * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
  *
  */
-@ToString
 @Getter
 @Builder
 public final class Statistics {

@@ -294,6 +294,7 @@ public class Ocpp15Controller {
                                  BindingResult result, Model model) {
         if (result.hasErrors()) {
             setChargePointList(model);
+            setUserIdTagList(model);
             return PREFIX + RESERVE_PATH;
         }
         return REDIRECT_TASKS_PATH + client.reserveNow(params);

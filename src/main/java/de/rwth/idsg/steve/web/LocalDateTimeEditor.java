@@ -13,7 +13,7 @@ import java.beans.PropertyEditorSupport;
  */
 public class LocalDateTimeEditor extends PropertyEditorSupport {
 
-    private static DateTimeFormatter dateFormatter = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm");
+    private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm");
 
     @Override
     public String getAsText() {
@@ -21,7 +21,7 @@ public class LocalDateTimeEditor extends PropertyEditorSupport {
         if (value == null) {
             return null;
         } else {
-            return dateFormatter.print((LocalDateTime) value);
+            return DATE_TIME_FORMATTER.print((LocalDateTime) value);
         }
     }
 
@@ -30,7 +30,7 @@ public class LocalDateTimeEditor extends PropertyEditorSupport {
         if (Strings.isNullOrEmpty(text)) {
             setValue(null);
         } else {
-            setValue(dateFormatter.parseLocalDateTime(text));
+            setValue(DATE_TIME_FORMATTER.parseLocalDateTime(text));
         }
     }
 }

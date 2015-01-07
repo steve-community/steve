@@ -17,7 +17,10 @@ public class ChargePointSelectEditor extends PropertyEditorSupport {
 
             // chargePointItem[0] : chargebox id
             // chargePointItem[1] : endpoint (IP) address
-            ChargePointSelect cps = new ChargePointSelect(chargePointItem[0], chargePointItem[1]);
+            ChargePointSelect cps = ChargePointSelect.builder()
+                    .chargeBoxId(chargePointItem[0])
+                    .endpointAddress(chargePointItem[1])
+                    .build();
 
             setValue(cps);
         }

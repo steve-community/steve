@@ -19,7 +19,7 @@ public class ChangeAvailabilityParams extends MultipleChargePointSelect {
     private Integer connectorId;
 
     @NotNull(message = "Availability Type is required")
-    @Setter protected AvailabilityType availType;
+    @Setter private AvailabilityType availType;
 
     /**
      * if empty, 0 = charge point as a whole

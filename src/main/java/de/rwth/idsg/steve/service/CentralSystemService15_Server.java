@@ -104,7 +104,7 @@ public class CentralSystemService15_Server implements CentralSystemService {
         if (parameters.isSetTimestamp()) {
             timestamp = new Timestamp(parameters.getTimestamp().getMillis());
         } else {
-            timestamp = DateTimeUtils.getCurrentDateTime();
+            timestamp = DateTimeUtils.getCurrentTimestamp();
         }
         String vendorId = parameters.getVendorId();
         String vendorErrorCode = parameters.getVendorErrorCode();

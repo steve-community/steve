@@ -162,7 +162,7 @@ public class ChargePointRepositoryImpl implements ChargePointRepository {
      * INSERT IGNORE INTO chargebox (chargeBoxId) VALUES (?)
      */
     @Override
-    public void addChargePoint(String chargeBoxId) throws SteveException {
+    public void addChargePoint(String chargeBoxId) {
         try {
             int count = DSL.using(config)
                            .insertInto(CHARGEBOX,
@@ -184,7 +184,7 @@ public class ChargePointRepositoryImpl implements ChargePointRepository {
      * WHERE chargeBoxId = ?
      */
     @Override
-    public void deleteChargePoint(String chargeBoxId) throws SteveException {
+    public void deleteChargePoint(String chargeBoxId) {
         try {
             DSL.using(config)
                .delete(CHARGEBOX)

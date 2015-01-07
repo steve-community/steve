@@ -1,6 +1,5 @@
 package de.rwth.idsg.steve.web.controller;
 
-import de.rwth.idsg.steve.SteveException;
 import de.rwth.idsg.steve.repository.ChargePointRepository;
 import de.rwth.idsg.steve.web.dto.ChargeBoxForm;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,7 +44,7 @@ public class ChargePointsController {
 
     @RequestMapping(value = ADD_PATH, method = RequestMethod.POST)
     public String add(@Valid @ModelAttribute("chargeBoxAddForm") ChargeBoxForm chargeBoxForm,
-                      BindingResult result, Model model) throws SteveException {
+                      BindingResult result, Model model) {
         if (result.hasErrors()) {
             model.addAttribute("cpList", chargePointRepository.getChargeBoxIds());
             return "data-man/chargepoints";
@@ -56,7 +55,7 @@ public class ChargePointsController {
     }
 
     @RequestMapping(value = DELETE_PATH, method = RequestMethod.POST)
-    public String delete(@RequestParam String chargeBoxId) throws SteveException {
+    public String delete(@RequestParam String chargeBoxId) {
         chargePointRepository.deleteChargePoint(chargeBoxId);
         return "redirect:/manager/chargepoints";
     }

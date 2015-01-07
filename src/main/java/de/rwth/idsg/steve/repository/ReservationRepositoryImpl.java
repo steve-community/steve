@@ -87,7 +87,7 @@ public class ReservationRepositoryImpl implements ReservationRepository {
      * WHERE reservation_pk = ?
      */
     @Override
-    public void cancelReservation(int reservationId) throws SteveException {
+    public void cancelReservation(int reservationId) {
         try {
             DSL.using(config)
                .delete(RESERVATION)

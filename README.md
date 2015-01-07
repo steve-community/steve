@@ -29,15 +29,15 @@ How to use?
 
 Compile and build an archive ready to run:
 
-```mvn package```
+    mvn package
  
 Start the application:
 
-```java -jar steve-***.jar``` 
+    java -jar steve-***.jar
 
 Access the Web interface:
 
-```http://localhost:8080/steve/manager``` 
+    http://localhost:8080/steve/manager
 
 Screenshots
 -----

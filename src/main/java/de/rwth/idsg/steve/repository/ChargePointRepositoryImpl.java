@@ -216,7 +216,10 @@ public class ChargePointRepositoryImpl implements ChargePointRepository {
     private class ChargePointSelectMapper implements RecordMapper<Record2<String, String>, ChargePointSelect> {
         @Override
         public ChargePointSelect map(Record2<String, String> record) {
-            return new ChargePointSelect(record.value1(), record.value2());
+            return ChargePointSelect.builder()
+                    .chargeBoxId(record.value1())
+                    .endpointAddress(record.value2())
+                    .build();
         }
     }
 

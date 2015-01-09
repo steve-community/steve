@@ -16,6 +16,7 @@ public interface UserRepository {
     UserRecord getUserRecord(String idTag);
 
     List<String> getUserIdTags();
+    List<String> getActiveUserIdTags();
     String getParentIdtag(String idTag);
 
     void addUser(String idTag, String parentIdTag, Timestamp expiryTimestamp);

@@ -18,7 +18,7 @@ import javax.validation.constraints.NotNull;
 public class UserForm {
 
     @NotEmpty(message = "User ID Tag is required")
-    @IdTag(message = "User ID Tag can only contain upper or lower case letters, numbers and dot, dash, underscore symbols")
+    @IdTag
     private String idTag;
 
     // Is a FK in DB table. No validation needed. Operation will fail if DB constraint fails.

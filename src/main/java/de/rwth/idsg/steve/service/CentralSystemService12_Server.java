@@ -1,6 +1,5 @@
 package de.rwth.idsg.steve.service;
 
-import com.google.common.base.Optional;
 import de.rwth.idsg.steve.OcppConstants;
 import de.rwth.idsg.steve.OcppVersion;
 import de.rwth.idsg.steve.repository.OcppServerRepository;
@@ -99,7 +98,7 @@ public class CentralSystemService12_Server implements CentralSystemService {
         String status = parameters.getStatus().value();
         String errorCode = parameters.getErrorCode().value();
         ocppServerRepository.insertConnectorStatus12(chargeBoxIdentity, connectorId, status,
-                                                      DateTimeUtils.getCurrentTimestamp(), errorCode);
+                                                     DateTimeUtils.getCurrentTimestamp(), errorCode);
         return new StatusNotificationResponse();
     }
 
@@ -136,15 +135,10 @@ public class CentralSystemService12_Server implements CentralSystemService {
             Timestamp startTimestamp = new Timestamp(parameters.getTimestamp().getMillis());
             String startMeterValue = Integer.toString(parameters.getMeterStart());
 
-            Optional<Integer> transactionId = ocppServerRepository.insertTransaction12(chargeBoxIdentity,
-                                                                                        connectorId,
-                                                                                        idTag,
-                                                                                        startTimestamp,
-                                                                                        startMeterValue);
+            Integer transactionId = ocppServerRepository.insertTransaction12(chargeBoxIdentity,connectorId, idTag,
+                                                                             startTimestamp, startMeterValue);
 
-            if (transactionId.isPresent()) {
-                response.setTransactionId(transactionId.get());
-            }
+            response.setTransactionId(transactionId);
         }
         return response;
     }

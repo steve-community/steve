@@ -59,8 +59,8 @@ public class Ocpp12Controller {
         model.addAttribute("cpList", chargePointRepository.getChargePointsV12());
     }
 
-    private void setUserIdTagList(Model model) {
-        model.addAttribute("idTagList", userRepository.getUserIdTags());
+    private void setActiveUserIdTagList(Model model) {
+        model.addAttribute("idTagList", userRepository.getActiveUserIdTags());
     }
 
     // -------------------------------------------------------------------------
@@ -103,7 +103,7 @@ public class Ocpp12Controller {
     @RequestMapping(value = REMOTE_START_TX_PATH, method = RequestMethod.GET)
     public String getRemoteStartTx(Model model) {
         setChargePointList(model);
-        setUserIdTagList(model);
+        setActiveUserIdTagList(model);
         model.addAttribute("params", new RemoteStartTransactionParams());
         return PREFIX + REMOTE_START_TX_PATH;
     }
@@ -185,7 +185,7 @@ public class Ocpp12Controller {
                                     BindingResult result, Model model) {
         if (result.hasErrors()) {
             setChargePointList(model);
-            setUserIdTagList(model);
+            setActiveUserIdTagList(model);
             return PREFIX + REMOTE_START_TX_PATH;
         }
         return REDIRECT_TASKS_PATH + client.remoteStartTransaction(params);

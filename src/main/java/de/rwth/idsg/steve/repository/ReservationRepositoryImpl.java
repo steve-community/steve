@@ -76,7 +76,8 @@ public class ReservationRepositoryImpl implements ReservationRepository {
                                        RESERVATION.STARTDATETIME, RESERVATION.EXPIRYDATETIME)
                                .values(idTag, chargeBoxId, startTimestamp, expiryTimestamp)
                                .returning(RESERVATION.RESERVATION_PK)
-                               .execute();
+                               .fetchOne()
+                               .getReservationPk();
 
         log.info("A new reservation '{}' is booked.", reservationId);
         return reservationId;

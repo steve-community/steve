@@ -316,7 +316,7 @@ ul.navigation ul li a {
 .warning { color: #9F6000; background-color: #FEEFB3; }
 .error {
     color: #D8000C;
-    background-color: #FFBABA;
+    background-color: #fdd0d0;
     position: relative;
     width: 1000px;
     border: 1px solid #fe9393;

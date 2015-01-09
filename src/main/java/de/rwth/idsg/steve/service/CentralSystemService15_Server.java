@@ -1,6 +1,5 @@
 package de.rwth.idsg.steve.service;
 
-import com.google.common.base.Optional;
 import de.rwth.idsg.steve.OcppConstants;
 import de.rwth.idsg.steve.OcppVersion;
 import de.rwth.idsg.steve.repository.OcppServerRepository;
@@ -150,12 +149,11 @@ public class CentralSystemService15_Server implements CentralSystemService {
             Timestamp startTimestamp = new Timestamp(parameters.getTimestamp().getMillis());
 
             String startMeterValue = Integer.toString(parameters.getMeterStart());
-            Optional<Integer> transactionId = ocppServerRepository.insertTransaction15(
-                    chargeBoxIdentity, connectorId, idTag, startTimestamp, startMeterValue, reservationId);
+            Integer transactionId = ocppServerRepository.insertTransaction15(chargeBoxIdentity, connectorId, idTag,
+                                                                             startTimestamp, startMeterValue,
+                                                                             reservationId);
 
-            if (transactionId.isPresent()) {
-                response.setTransactionId(transactionId.get());
-            }
+            response.setTransactionId(transactionId);
         }
         return response;
     }

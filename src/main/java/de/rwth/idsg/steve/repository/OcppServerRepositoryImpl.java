@@ -1,6 +1,5 @@
 package de.rwth.idsg.steve.repository;
 
-import com.google.common.base.Optional;
 import de.rwth.idsg.steve.OcppVersion;
 import de.rwth.idsg.steve.utils.DateTimeUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -13,11 +12,8 @@ import ocpp.cs._2012._06.ValueFormat;
 import org.jooq.BatchBindStep;
 import org.jooq.Configuration;
 import org.jooq.DSLContext;
-import org.jooq.Field;
-import org.jooq.TableLike;
 import org.jooq.TransactionalCallable;
 import org.jooq.TransactionalRunnable;
-import org.jooq.exception.DataAccessException;
 import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -105,16 +101,12 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
      */
     @Override
     public void updateChargeboxFirmwareStatus(String chargeBoxIdentity, String firmwareStatus) {
-        try {
-            DSL.using(config)
-               .update(CHARGEBOX)
-               .set(CHARGEBOX.FWUPDATESTATUS, firmwareStatus)
-               .set(CHARGEBOX.FWUPDATETIMESTAMP, DateTimeUtils.getCurrentTimestamp())
-               .where(CHARGEBOX.CHARGEBOXID.equal(chargeBoxIdentity))
-               .execute();
-        } catch (DataAccessException e) {
-            log.error("Execution of updateChargeboxFirmwareStatus for chargebox '{}' FAILED.", chargeBoxIdentity, e);
-        }
+        DSL.using(config)
+           .update(CHARGEBOX)
+           .set(CHARGEBOX.FWUPDATESTATUS, firmwareStatus)
+           .set(CHARGEBOX.FWUPDATETIMESTAMP, DateTimeUtils.getCurrentTimestamp())
+           .where(CHARGEBOX.CHARGEBOXID.equal(chargeBoxIdentity))
+           .execute();
     }
 
     /**
@@ -124,16 +116,12 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
      */
     @Override
     public void updateChargeboxDiagnosticsStatus(String chargeBoxIdentity, String status) {
-        try {
-            DSL.using(config)
-               .update(CHARGEBOX)
-               .set(CHARGEBOX.DIAGNOSTICSSTATUS, status)
-               .set(CHARGEBOX.DIAGNOSTICSTIMESTAMP, DateTimeUtils.getCurrentTimestamp())
-               .where(CHARGEBOX.CHARGEBOXID.equal(chargeBoxIdentity))
-               .execute();
-        } catch (DataAccessException e) {
-            log.error("Execution of updateChargeboxDiagnosticsStatus for chargebox '{}' FAILED.", chargeBoxIdentity, e);
-        }
+        DSL.using(config)
+           .update(CHARGEBOX)
+           .set(CHARGEBOX.DIAGNOSTICSSTATUS, status)
+           .set(CHARGEBOX.DIAGNOSTICSTIMESTAMP, DateTimeUtils.getCurrentTimestamp())
+           .where(CHARGEBOX.CHARGEBOXID.equal(chargeBoxIdentity))
+           .execute();
     }
 
     /**
@@ -143,15 +131,11 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
      */
     @Override
     public void updateChargeboxHeartbeat(String chargeBoxIdentity, Timestamp ts) {
-        try {
-            DSL.using(config)
-               .update(CHARGEBOX)
-               .set(CHARGEBOX.LASTHEARTBEATTIMESTAMP, ts)
-               .where(CHARGEBOX.CHARGEBOXID.equal(chargeBoxIdentity))
-               .execute();
-        } catch (DataAccessException e) {
-            log.error("Execution of updateChargeboxHeartbeat for chargebox '{}' FAILED.", chargeBoxIdentity);
-        }
+        DSL.using(config)
+           .update(CHARGEBOX)
+           .set(CHARGEBOX.LASTHEARTBEATTIMESTAMP, ts)
+           .where(CHARGEBOX.CHARGEBOXID.equal(chargeBoxIdentity))
+           .execute();
     }
 
     @Override
@@ -167,239 +151,193 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
                                         final String errorCode, final String errorInfo,
                                         final String vendorId, final String vendorErrorCode) {
 
-        try {
-            DSL.using(config).transaction(new TransactionalRunnable() {
-                @Override
-                public void run(Configuration configuration) throws Exception {
-                    DSLContext ctx = DSL.using(configuration);
+        DSL.using(config).transaction(new TransactionalRunnable() {
+            @Override
+            public void run(Configuration configuration) throws Exception {
+                DSLContext ctx = DSL.using(configuration);
 
-                    // -------------------------------------------------------------------------
-                    // Step 1: For the first boot of the chargebox, insert its connectors in DB.
-                    //         For next boots, IGNORE
-                    // -------------------------------------------------------------------------
+                // -------------------------------------------------------------------------
+                // Step 1: For the first boot of the chargebox, insert its connectors in DB.
+                //         For next boots, IGNORE
+                // -------------------------------------------------------------------------
 
-                    /**
-                     * INSERT IGNORE INTO connector (chargeBoxId, connectorId) VALUES (?,?)
-                     */
-                    int count = ctx.insertInto(CONNECTOR,
-                                        CONNECTOR.CHARGEBOXID, CONNECTOR.CONNECTORID)
-                                    .values(chargeBoxIdentity, connectorId)
-                                    .onDuplicateKeyIgnore() // Important detail
-                                    .execute();
+                /**
+                 * INSERT IGNORE INTO connector (chargeBoxId, connectorId) VALUES (?,?)
+                 */
+                int count = ctx.insertInto(CONNECTOR,
+                                    CONNECTOR.CHARGEBOXID, CONNECTOR.CONNECTORID)
+                               .values(chargeBoxIdentity, connectorId)
+                               .onDuplicateKeyIgnore() // Important detail
+                               .execute();
 
-                    if (count >= 1) {
-                        log.info("The connector {}/{} is NEW, and inserted into DB.", chargeBoxIdentity, connectorId);
-                    } else {
-                        log.debug("The connector {}/{} is ALREADY known to DB.", chargeBoxIdentity, connectorId);
-                    }
-
-                    // -------------------------------------------------------------------------
-                    // Step 2: We store a log of connector statuses
-                    // -------------------------------------------------------------------------
-
-                    /**
-                     * INSERT INTO connector_status
-                     *  (connector_pk,
-                     *  statusTimestamp,
-                     *  status,
-                     *  errorCode,
-                     *  errorInfo,
-                     *  vendorId,
-                     *  vendorErrorCode)
-                     * SELECT connector_pk , ? , ? , ? , ? , ? , ?
-                     * FROM connector
-                     * WHERE chargeBoxId = ? AND connectorId = ?
-                     */
-
-                    // Prepare for inner select
-                    Field<Integer> t1_pk = CONNECTOR.CONNECTOR_PK.as("t1_pk");
-                    TableLike<?> t1 = DSL.select(t1_pk)
-                                         .from(CONNECTOR)
-                                         .where(CONNECTOR.CHARGEBOXID.equal(chargeBoxIdentity))
-                                         .and(CONNECTOR.CONNECTORID.equal(connectorId))
-                                         .asTable("t1");
-
-                    ctx.insertInto(CONNECTOR_STATUS)
-                       .set(CONNECTOR_STATUS.CONNECTOR_PK, t1.field(t1_pk))
-                       .set(CONNECTOR_STATUS.STATUSTIMESTAMP, timestamp)
-                       .set(CONNECTOR_STATUS.STATUS, status)
-                       .set(CONNECTOR_STATUS.ERRORCODE, errorCode)
-                       .set(CONNECTOR_STATUS.ERRORINFO, errorInfo)
-                       .set(CONNECTOR_STATUS.VENDORID, vendorId)
-                       .set(CONNECTOR_STATUS.VENDORERRORCODE, vendorErrorCode)
-                       .execute();
-
-                    log.debug("Stored a new connector status for {}/{}.", chargeBoxIdentity, connectorId);
+                if (count >= 1) {
+                    log.info("The connector {}/{} is NEW, and inserted into DB.", chargeBoxIdentity, connectorId);
+                } else {
+                    log.debug("The connector {}/{} is ALREADY known to DB.", chargeBoxIdentity, connectorId);
                 }
-            });
-        } catch (Exception e) {
-            log.error("Execution of insertConnectorStatus for chargebox '{}' and connectorId '{}' FAILED. Transaction rolled back.",
-                    chargeBoxIdentity, connectorId, e);
-        }
+
+                // -------------------------------------------------------------------------
+                // Step 2: We store a log of connector statuses
+                // -------------------------------------------------------------------------
+
+                /**
+                 * INSERT INTO connector_status
+                 *  (connector_pk,
+                 *  statusTimestamp,
+                 *  status,
+                 *  errorCode,
+                 *  errorInfo,
+                 *  vendorId,
+                 *  vendorErrorCode)
+                 * VALUES
+                 * ((SELECT connector_pk FROM connector WHERE chargeBoxId = ? AND connectorId = ?) , ? , ? , ? , ? , ? , ?)
+                 */
+                ctx.insertInto(CONNECTOR_STATUS)
+                   .set(CONNECTOR_STATUS.CONNECTOR_PK, DSL.select(CONNECTOR.CONNECTOR_PK)
+                                                          .from(CONNECTOR)
+                                                          .where(CONNECTOR.CHARGEBOXID.equal(chargeBoxIdentity))
+                                                          .and(CONNECTOR.CONNECTORID.equal(connectorId))
+                   )
+                   .set(CONNECTOR_STATUS.STATUSTIMESTAMP, timestamp)
+                   .set(CONNECTOR_STATUS.STATUS, status)
+                   .set(CONNECTOR_STATUS.ERRORCODE, errorCode)
+                   .set(CONNECTOR_STATUS.ERRORINFO, errorInfo)
+                   .set(CONNECTOR_STATUS.VENDORID, vendorId)
+                   .set(CONNECTOR_STATUS.VENDORERRORCODE, vendorErrorCode)
+                   .execute();
+
+                log.debug("Stored a new connector status for {}/{}.", chargeBoxIdentity, connectorId);
+            }
+        });
     }
 
     @Override
     public void insertMeterValues12(final String chargeBoxIdentity, final int connectorId,
                                     final List<ocpp.cs._2010._08.MeterValue> list) {
-        try {
-            DSL.using(config).transaction(new TransactionalRunnable() {
-                @Override
-                public void run(Configuration configuration) throws Exception {
-                    DSLContext ctx = DSL.using(configuration);
-                    int connectorPk = getConnectorPkFromConnector(ctx, chargeBoxIdentity, connectorId);
-                    batchInsertMeterValues12(ctx, list, connectorPk);
-                }
-            });
-        } catch (Exception e) {
-            log.error("Execution of insertMeterValues12 for chargebox '{}' and connectorId '{}' FAILED. Transaction rolled back.",
-                    chargeBoxIdentity,  connectorId, e);
-        }
+
+        DSL.using(config).transaction(new TransactionalRunnable() {
+            @Override
+            public void run(Configuration configuration) throws Exception {
+                DSLContext ctx = DSL.using(configuration);
+                int connectorPk = getConnectorPkFromConnector(ctx, chargeBoxIdentity, connectorId);
+                batchInsertMeterValues12(ctx, list, connectorPk);
+            }
+        });
     }
 
     @Override
     public void insertMeterValues15(final String chargeBoxIdentity, final int connectorId,
                                     final List<ocpp.cs._2012._06.MeterValue> list, final Integer transactionId) {
-        try {
-            DSL.using(config).transaction(new TransactionalRunnable() {
-                @Override
-                public void run(Configuration configuration) throws Exception {
-                    DSLContext ctx = DSL.using(configuration);
-                    int connectorPk = getConnectorPkFromConnector(ctx, chargeBoxIdentity, connectorId);
-                    batchInsertMeterValues15(ctx, list, connectorPk, transactionId);
-                }
-            });
-        } catch (Exception e) {
-            log.error("Execution of insertMeterValues15 for chargebox '{}', connectorId '{}' and transactionId '{}' FAILED. Transaction rolled back.",
-                    chargeBoxIdentity, connectorId, transactionId, e);
-        }
+
+        DSL.using(config).transaction(new TransactionalRunnable() {
+            @Override
+            public void run(Configuration configuration) throws Exception {
+                DSLContext ctx = DSL.using(configuration);
+                int connectorPk = getConnectorPkFromConnector(ctx, chargeBoxIdentity, connectorId);
+                batchInsertMeterValues15(ctx, list, connectorPk, transactionId);
+            }
+        });
     }
 
     @Override
     public void insertMeterValuesOfTransaction(String chargeBoxIdentity, final int transactionId, final List<MeterValue> list) {
-        try {
-            DSL.using(config).transaction(new TransactionalRunnable() {
-                @Override
-                public void run(Configuration configuration) throws Exception {
-                    DSLContext ctx = DSL.using(configuration);
 
-                    // First, get connector primary key from transaction table
-                    int connectorPk = ctx.select(TRANSACTION.CONNECTOR_PK)
-                                         .from(TRANSACTION)
-                                         .where(TRANSACTION.TRANSACTION_PK.equal(transactionId))
-                                         .fetchOne()
-                                         .value1();
+        DSL.using(config).transaction(new TransactionalRunnable() {
+            @Override
+            public void run(Configuration configuration) throws Exception {
+                DSLContext ctx = DSL.using(configuration);
 
-                    batchInsertMeterValues15(ctx, list, connectorPk, transactionId);
-                }
-            });
-        } catch (Exception e) {
-            log.error("Execution of insertMeterValuesOfTransaction for chargebox '{}' and transactionId '{}' FAILED. Transaction rolled back.",
-                    chargeBoxIdentity, transactionId, e);
-        }
+                // First, get connector primary key from transaction table
+                int connectorPk = ctx.select(TRANSACTION.CONNECTOR_PK)
+                                     .from(TRANSACTION)
+                                     .where(TRANSACTION.TRANSACTION_PK.equal(transactionId))
+                                     .fetchOne()
+                                     .value1();
+
+                batchInsertMeterValues15(ctx, list, connectorPk, transactionId);
+            }
+        });
     }
 
     @Override
-    public Optional<Integer> insertTransaction12(String chargeBoxIdentity, int connectorId, String idTag,
-                                                 Timestamp startTimestamp, String startMeterValue) {
+    public Integer insertTransaction12(String chargeBoxIdentity, int connectorId, String idTag,
+                                       Timestamp startTimestamp, String startMeterValue) {
         // Delegate
         return this.insertTransaction15(chargeBoxIdentity, connectorId, idTag, startTimestamp, startMeterValue, null);
     }
 
     @Override
-    public Optional<Integer> insertTransaction15(final String chargeBoxIdentity, final int connectorId, final String idTag,
-                                                 final Timestamp startTimestamp, final String startMeterValue,
-                                                 final Integer reservationId) {
-        try {
-            int transactionId = DSL.using(config).transactionResult(new TransactionalCallable<Integer>() {
-                @Override
-                public Integer run(Configuration configuration) throws Exception {
-                    DSLContext ctx = DSL.using(configuration);
+    public Integer insertTransaction15(final String chargeBoxIdentity, final int connectorId, final String idTag,
+                                       final Timestamp startTimestamp, final String startMeterValue,
+                                       final Integer reservationId) {
 
-                    // -------------------------------------------------------------------------
-                    // Step 1: Insert transaction
-                    // -------------------------------------------------------------------------
+        return DSL.using(config).transactionResult(new TransactionalCallable<Integer>() {
+            @Override
+            public Integer run(Configuration configuration) throws Exception {
+                DSLContext ctx = DSL.using(configuration);
 
-                    int internalTransactionId;
+                // -------------------------------------------------------------------------
+                // Step 1: Insert transaction
+                // -------------------------------------------------------------------------
 
+                /**
+                 * INSERT INTO transaction
+                 * (connector_pk, idTag, startTimestamp, startValue)
+                 * VALUES
+                 * ((SELECT connector_pk FROM connector WHERE chargeBoxId = ? AND connectorId = ?) , ? , ? , ?)
+                 */
+                int transactionId = ctx.insertInto(TRANSACTION)
+                                       .set(CONNECTOR_STATUS.CONNECTOR_PK, DSL.select(CONNECTOR.CONNECTOR_PK)
+                                                                              .from(CONNECTOR)
+                                                                              .where(CONNECTOR.CHARGEBOXID.equal(chargeBoxIdentity))
+                                                                              .and(CONNECTOR.CONNECTORID.equal(connectorId))
+                                       )
+                                       .set(TRANSACTION.IDTAG, idTag)
+                                       .set(TRANSACTION.STARTTIMESTAMP, startTimestamp)
+                                       .set(TRANSACTION.STARTVALUE, startMeterValue)
+                                       .returning(TRANSACTION.TRANSACTION_PK)
+                                       .fetchOne()
+                                       .getTransactionPk();
+
+                // -------------------------------------------------------------------------
+                // Step 2 for OCPP 1.5: A startTransaction may be related to a reservation
+                // -------------------------------------------------------------------------
+
+                if (reservationId != null) {
                     /**
-                     * INSERT INTO transaction (connector_pk, idTag, startTimestamp, startValue)
-                     * SELECT connector_pk , ? , ? , ?
-                     * FROM connector
-                     * WHERE chargeBoxId = ? AND connectorId = ?
+                     * DELETE FROM reservation
+                     * WHERE reservation_pk = ?
                      */
-                    try {
-                        // Prepare for inner select
-                        Field<Integer> t1_pk = CONNECTOR.CONNECTOR_PK.as("t1_pk");
-                        TableLike<?> t1 = DSL.select(t1_pk)
-                                             .from(CONNECTOR)
-                                             .where(CONNECTOR.CHARGEBOXID.equal(chargeBoxIdentity))
-                                             .and(CONNECTOR.CONNECTORID.equal(connectorId))
-                                             .asTable("t1");
-
-                        internalTransactionId = ctx.insertInto(TRANSACTION)
-                                                   .set(CONNECTOR_STATUS.CONNECTOR_PK, t1.field(t1_pk))
-                                                   .set(TRANSACTION.IDTAG, idTag)
-                                                   .set(TRANSACTION.STARTTIMESTAMP, startTimestamp)
-                                                   .set(TRANSACTION.STARTVALUE, startMeterValue)
-                                                   .returning(TRANSACTION.TRANSACTION_PK)
-                                                   .execute();
-
-                    } catch (DataAccessException e) {
-                        log.error("Execution of insertTransaction for chargebox '{}' and connectorId '{}' FAILED. " +
-                                "Transaction is being rolled back.", chargeBoxIdentity, connectorId, e);
-                        throw e;
-                    }
-
-                    // -------------------------------------------------------------------------
-                    // Step 2 for OCPP 1.5: A startTransaction may be related to a reservation
-                    // -------------------------------------------------------------------------
-
-                    if (reservationId != null) {
-
-                        /**
-                         * DELETE FROM reservation
-                         * WHERE reservation_pk = ?
-                         */
-                        try {
-                            DSL.using(config)
-                               .delete(RESERVATION)
-                               .where(RESERVATION.RESERVATION_PK.equal(reservationId))
-                               .execute();
-                        } catch (DataAccessException e) {
-                            log.error("Deletion of reservationId '{}' FAILED. " +
-                                    "Transaction is being rolled back.", reservationId, e);
-                            throw e;
-                        }
-                    }
-                    return internalTransactionId;
+                    DSL.using(config)
+                       .delete(RESERVATION)
+                       .where(RESERVATION.RESERVATION_PK.equal(reservationId))
+                       .execute();
                 }
-            });
 
-            return Optional.of(transactionId);
-        } catch (Exception e) {
-            return Optional.absent();
-        }
+                return transactionId;
+            }
+        });
     }
 
     /**
      * UPDATE transaction
      * SET stopTimestamp = ?, stopValue = ?
      * WHERE transaction_pk = ?
+     * AND stopTimestamp IS NULL
+     * AND stopVALUE IS NULL
      *
      * After update, a DB trigger sets the user.inTransaction field to 0
      */
     @Override
     public void updateTransaction(int transactionId, Timestamp stopTimestamp, String stopMeterValue) {
-        try {
-            DSL.using(config)
-               .update(TRANSACTION)
-               .set(TRANSACTION.STOPTIMESTAMP, stopTimestamp)
-               .set(TRANSACTION.STOPVALUE, stopMeterValue)
-               .where(TRANSACTION.TRANSACTION_PK.equal(transactionId))
-               .execute();
-        } catch (DataAccessException e) {
-            log.error("Execution of updateTransaction for transactionId '{}' FAILED.", transactionId, e);
-        }
+        DSL.using(config)
+           .update(TRANSACTION)
+           .set(TRANSACTION.STOPTIMESTAMP, stopTimestamp)
+           .set(TRANSACTION.STOPVALUE, stopMeterValue)
+           .where(TRANSACTION.TRANSACTION_PK.equal(transactionId))
+                .and(TRANSACTION.STOPTIMESTAMP.isNull())
+                .and(TRANSACTION.STOPVALUE.isNull())
+           .execute();
     }
 
     // -------------------------------------------------------------------------

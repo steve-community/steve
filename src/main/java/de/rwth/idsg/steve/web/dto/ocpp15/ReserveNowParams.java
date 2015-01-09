@@ -28,7 +28,7 @@ public class ReserveNowParams extends SingleChargePointSelect {
     private LocalDateTime expiry;
 
     @NotBlank(message = "User ID Tag is required.")
-    @IdTag(message = "User ID Tag can only contain upper or lower case letters, numbers and dot, dash, underscore symbols")
+    @IdTag
     private String idTag;
 
 }

@@ -6,15 +6,22 @@ idd.change(function(){
 	var row = $("#usersTable").find(str);
 	// enable input fields
 	$("#update-pid, #update-exdateTime, #update-block-false, #update-block-true, #update-submit").prop("disabled", false);
-	// iterate over the row cells and populate inputs
+
     var parentIdCell = row.find("td:eq(1)").html();
     if (parentIdCell == "") {
         $("#update-pid").val("EMPTY-OPTION");
     } else {
         $("#update-pid").val(parentIdCell);
     }
-	var dateTime = row.find("td:eq(2)").html().split(' at ');
-	$("#update-exdateTime").val(dehumanizeDate(dateTime[0]) + ' ' + dateTime[1]);
+
+	var expiryRow = row.find("td:eq(2)").html();
+    if (expiryRow == "") {
+        $("#update-exdateTime").val("");
+    } else {
+        var dateTime = expiryRow.split(' at ');
+        $("#update-exdateTime").val(dehumanizeDate(dateTime[0]) + ' ' + dateTime[1]);
+    }
+
 	if (row.find("td:eq(4)").html() == "false") {
 		$("#update-block-false").prop("checked", true);
 	} else {

@@ -1,6 +1,5 @@
 package de.rwth.idsg.steve.repository;
 
-import com.google.common.base.Optional;
 import de.rwth.idsg.steve.OcppVersion;
 
 import java.sql.Timestamp;
@@ -43,12 +42,12 @@ public interface OcppServerRepository {
     void insertMeterValuesOfTransaction(String chargeBoxIdentity, int transactionId,
                                         List<ocpp.cs._2012._06.MeterValue> list);
 
-    Optional<Integer> insertTransaction12(String chargeBoxIdentity, int connectorId, String idTag,
-                                          Timestamp startTimestamp, String startMeterValue);
+    Integer insertTransaction12(String chargeBoxIdentity, int connectorId, String idTag,
+                                Timestamp startTimestamp, String startMeterValue);
 
-    Optional<Integer> insertTransaction15(String chargeBoxIdentity, int connectorId, String idTag,
-                                          Timestamp startTimestamp, String startMeterValue,
-                                          Integer reservationId);
+    Integer insertTransaction15(String chargeBoxIdentity, int connectorId, String idTag,
+                                Timestamp startTimestamp, String startMeterValue,
+                                Integer reservationId);
 
     void updateTransaction(int transactionId, Timestamp stopTimestamp, String stopMeterValue);
 }

@@ -14,7 +14,7 @@
 <div class="top-menu"></div>
 <div class="main-wrapper">
     <c:if test="${param.error != null}">
-        <div class="error"><b>Error:</b> Your name or password is incorrect.</div>
+        <div class="error">Your name or password is incorrect.</div>
     </c:if>
     <div class="content">
         <section><span>Sign In</span></section>

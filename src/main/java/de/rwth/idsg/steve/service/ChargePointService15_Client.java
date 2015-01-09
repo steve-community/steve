@@ -382,21 +382,21 @@ public class ChargePointService15_Client {
     }
 
     public int reserveNow(ReserveNowParams params) {
+        List<ChargePointSelect> chargePointSelectList = params.getChargePointSelectList();
+        ChargePointSelect c = chargePointSelectList.get(0);
+        String chargeBoxId = c.getChargeBoxId();
+
         // Insert into DB
         Timestamp startTimestamp = new Timestamp(new DateTime().getMillis());
         Timestamp expiryTimestamp = new Timestamp(params.getExpiry().toDateTime().getMillis());
-        int reservationId = reservationRepository.bookReservation(params.getIdTag(), params.getIdTag(),
+        int reservationId = reservationRepository.bookReservation(params.getIdTag(), chargeBoxId,
                                                                   startTimestamp, expiryTimestamp);
 
         ReserveNowRequest req = this.prepareReserveNow(params, reservationId);
-        List<ChargePointSelect> chargePointSelectList = params.getChargePointSelectList();
         RequestTask requestTask = new RequestTask(OcppVersion.V_15, "Reserve Now", chargePointSelectList);
-
-        ChargePointSelect c = chargePointSelectList.get(0);
-
-        String chargeBoxId = c.getChargeBoxId();
         ReserveNowResponseHandler handler = new ReserveNowResponseHandler(requestTask, chargeBoxId,
                                                                           reservationRepository, reservationId);
+
         create(c.getEndpointAddress()).reserveNowAsync(req, chargeBoxId, handler);
 
         return requestTaskStore.add(requestTask);

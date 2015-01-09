@@ -71,8 +71,25 @@ public class UserRepositoryImpl implements UserRepository {
     @Override
     public List<String> getUserIdTags() {
         return DSL.using(config)
+                .select(USER.IDTAG)
+                .from(USER)
+                .fetch(USER.IDTAG);
+    }
+
+    /**
+     * SELECT idTag FROM user
+     * WHERE inTransaction = false
+     * AND blocked = false
+     * AND (expiryDate IS NULL OR expiryDate > current_timestamp())
+     */
+    @Override
+    public List<String> getActiveUserIdTags() {
+        return DSL.using(config)
                   .select(USER.IDTAG)
                   .from(USER)
+                  .where(USER.INTRANSACTION.isFalse())
+                    .and(USER.BLOCKED.isFalse())
+                    .and(USER.EXPIRYDATE.isNull().or(USER.EXPIRYDATE.greaterThan(DSL.currentTimestamp())))
                   .fetch(USER.IDTAG);
     }
 

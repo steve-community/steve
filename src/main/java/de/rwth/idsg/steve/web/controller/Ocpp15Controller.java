@@ -72,8 +72,8 @@ public class Ocpp15Controller {
         model.addAttribute("cpList", chargePointRepository.getChargePointsV15());
     }
 
-    private void setUserIdTagList(Model model) {
-        model.addAttribute("idTagList", userRepository.getUserIdTags());
+    private void setActiveUserIdTagList(Model model) {
+        model.addAttribute("idTagList", userRepository.getActiveUserIdTags());
     }
 
     // -------------------------------------------------------------------------
@@ -116,7 +116,7 @@ public class Ocpp15Controller {
     @RequestMapping(value = REMOTE_START_TX_PATH, method = RequestMethod.GET)
     public String getRemoteStartTx(Model model) {
         setChargePointList(model);
-        setUserIdTagList(model);
+        setActiveUserIdTagList(model);
         model.addAttribute("params", new RemoteStartTransactionParams());
         return PREFIX + REMOTE_START_TX_PATH;
     }
@@ -152,7 +152,7 @@ public class Ocpp15Controller {
     @RequestMapping(value = RESERVE_PATH, method = RequestMethod.GET)
     public String getReserveNow(Model model) {
         setChargePointList(model);
-        setUserIdTagList(model);
+        setActiveUserIdTagList(model);
         model.addAttribute("params", new ReserveNowParams());
         return PREFIX + RESERVE_PATH;
     }
@@ -189,7 +189,7 @@ public class Ocpp15Controller {
     @RequestMapping(value = SEND_LIST_PATH, method = RequestMethod.GET)
     public String getSendList(Model model) {
         setChargePointList(model);
-        setUserIdTagList(model);
+        model.addAttribute("idTagList", userRepository.getUserIdTags());
         model.addAttribute("params", new SendLocalListParams());
         return PREFIX + SEND_LIST_PATH;
     }
@@ -243,7 +243,7 @@ public class Ocpp15Controller {
                                     BindingResult result, Model model) {
         if (result.hasErrors()) {
             setChargePointList(model);
-            setUserIdTagList(model);
+            setActiveUserIdTagList(model);
             return PREFIX + REMOTE_START_TX_PATH;
         }
         return REDIRECT_TASKS_PATH + client.remoteStartTransaction(params);
@@ -294,7 +294,7 @@ public class Ocpp15Controller {
                                  BindingResult result, Model model) {
         if (result.hasErrors()) {
             setChargePointList(model);
-            setUserIdTagList(model);
+            setActiveUserIdTagList(model);
             return PREFIX + RESERVE_PATH;
         }
         return REDIRECT_TASKS_PATH + client.reserveNow(params);
@@ -346,7 +346,7 @@ public class Ocpp15Controller {
                                BindingResult result, Model model) {
         if (result.hasErrors()) {
             setChargePointList(model);
-            setUserIdTagList(model);
+            model.addAttribute("idTagList", userRepository.getUserIdTags());
             return PREFIX + SEND_LIST_PATH;
         }
         return REDIRECT_TASKS_PATH + client.sendLocalList(params);

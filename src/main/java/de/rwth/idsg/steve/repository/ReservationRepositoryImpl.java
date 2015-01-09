@@ -33,14 +33,29 @@ public class ReservationRepositoryImpl implements ReservationRepository {
     /**
      * SELECT *
      * FROM reservation
-     * WHERE expiryDatetime >= NOW()
      * ORDER BY expiryDatetime
      */
     @Override
-    public List<Reservation> getReservations() {
+    public List<Reservation> getAllReservations() {
+        return DSL.using(config)
+                .selectFrom(RESERVATION)
+                .orderBy(RESERVATION.EXPIRYDATETIME)
+                .fetch()
+                .map(new ReservationMapper());
+    }
+
+    /**
+     * SELECT *
+     * FROM reservation
+     * WHERE expiryDatetime > CURRENT_TIMESTAMP AND status = ?
+     * ORDER BY expiryDatetime
+     */
+    @Override
+    public List<Reservation> getActiveReservations() {
         return DSL.using(config)
                   .selectFrom(RESERVATION)
-                  .where(RESERVATION.EXPIRYDATETIME.greaterOrEqual(DSL.currentTimestamp()))
+                  .where(RESERVATION.EXPIRYDATETIME.greaterThan(DSL.currentTimestamp()))
+                        .and(RESERVATION.STATUS.equal(Status.ACCEPTED.name()))
                   .orderBy(RESERVATION.EXPIRYDATETIME)
                   .fetch()
                   .map(new ReservationMapper());
@@ -49,37 +64,41 @@ public class ReservationRepositoryImpl implements ReservationRepository {
     /**
      * SELECT reservation_pk
      * FROM reservation
-     * WHERE chargeBoxId = ? AND expiryDatetime >= NOW()
+     * WHERE chargeBoxId = ?
+     * AND expiryDatetime > CURRENT_TIMESTAMP AND status = ?
      */
     @Override
-    public List<Integer> getExistingReservationIds(String chargeBoxId) {
+    public List<Integer> getActiveReservationIds(String chargeBoxId) {
         return DSL.using(config)
                   .select(RESERVATION.RESERVATION_PK)
                   .from(RESERVATION)
                   .where(RESERVATION.CHARGEBOXID.equal(chargeBoxId))
-                    .and(RESERVATION.EXPIRYDATETIME.greaterOrEqual(DSL.currentTimestamp()))
+                        .and(RESERVATION.EXPIRYDATETIME.greaterThan(DSL.currentTimestamp()))
+                        .and(RESERVATION.STATUS.equal(Status.ACCEPTED.name()))
                   .fetch(RESERVATION.RESERVATION_PK);
     }
 
     /**
-     * INSERT INTO reservation (idTag, chargeBoxId, startDatetime, expiryDatetime) VALUES (?,?,?,?)
+     * INSERT INTO reservation (idTag, chargeBoxId, startDatetime, expiryDatetime, status) VALUES (?,?,?,?,?)
      */
     @Override
-    public int bookReservation(String idTag, String chargeBoxId,
-                               Timestamp startTimestamp, Timestamp expiryTimestamp) {
+    public int insert(String idTag, String chargeBoxId, Timestamp startTimestamp, Timestamp expiryTimestamp) {
         // Check overlapping
         //isOverlapping(startTimestamp, expiryTimestamp, chargeBoxId);
 
         int reservationId = DSL.using(config)
                                .insertInto(RESERVATION,
                                        RESERVATION.IDTAG, RESERVATION.CHARGEBOXID,
-                                       RESERVATION.STARTDATETIME, RESERVATION.EXPIRYDATETIME)
-                               .values(idTag, chargeBoxId, startTimestamp, expiryTimestamp)
+                                       RESERVATION.STARTDATETIME, RESERVATION.EXPIRYDATETIME,
+                                       RESERVATION.STATUS)
+                               .values(idTag, chargeBoxId,
+                                       startTimestamp, expiryTimestamp,
+                                       Status.WAITING.name())
                                .returning(RESERVATION.RESERVATION_PK)
                                .fetchOne()
                                .getReservationPk();
 
-        log.info("A new reservation '{}' is booked.", reservationId);
+        log.debug("A new reservation '{}' is inserted.", reservationId);
         return reservationId;
     }
 
@@ -88,14 +107,55 @@ public class ReservationRepositoryImpl implements ReservationRepository {
      * WHERE reservation_pk = ?
      */
     @Override
-    public void cancelReservation(int reservationId) {
+    public void delete(int reservationId) {
+        DSL.using(config)
+           .delete(RESERVATION)
+           .where(RESERVATION.RESERVATION_PK.equal(reservationId))
+           .execute();
+
+        log.debug("The reservation '{}' is deleted.", reservationId);
+    }
+
+    @Override
+    public void accepted(int reservationId) {
+        internalUpdateReservation(reservationId, Status.ACCEPTED);
+    }
+
+    @Override
+    public void cancelled(int reservationId) {
+        internalUpdateReservation(reservationId, Status.CANCELLED);
+    }
+
+    /**
+     * UPDATE reservation
+     * SET status = ?,
+     * SET transaction_pk = ?
+     * WHERE reservation_pk = ?
+     */
+    @Override
+    public void used(int reservationId, int transactionId) {
+        DSL.using(config)
+           .update(RESERVATION)
+           .set(RESERVATION.STATUS, Status.USED.name())
+           .set(RESERVATION.TRANSACTION_PK, transactionId)
+           .where(RESERVATION.RESERVATION_PK.equal(reservationId))
+           .execute();
+    }
+
+    /**
+     * UPDATE reservation
+     * SET status = ?
+     * WHERE reservation_pk = ?
+     */
+    private void internalUpdateReservation(int reservationId, Status status) {
         try {
             DSL.using(config)
-               .delete(RESERVATION)
+               .update(RESERVATION)
+               .set(RESERVATION.STATUS, status.name())
                .where(RESERVATION.RESERVATION_PK.equal(reservationId))
                .execute();
         } catch (DataAccessException e) {
-            throw new SteveException("Deletion of reservationId '" + reservationId + "' FAILED.", e);
+            log.error("Updating of reservationId '{}' to status '{}' FAILED.", reservationId, status, e);
         }
     }
 
@@ -108,11 +168,29 @@ public class ReservationRepositoryImpl implements ReservationRepository {
         public Reservation map(ReservationRecord r) {
             return Reservation.builder()
                     .id(r.getReservationPk())
+                    .transactionId(r.getTransactionPk())
                     .idTag(r.getIdtag())
                     .chargeBoxId(r.getChargeboxid())
                     .startDatetime(DateTimeUtils.humanize(r.getStartdatetime()))
                     .expiryDatetime(DateTimeUtils.humanize(r.getExpirydatetime()))
+                    .status(r.getStatus())
                     .build();
+        }
+    }
+
+    /**
+     * To be used in the DB table "reservation" for the column "status".
+     */
+    private enum Status {
+
+        WAITING,    // Waiting for charge point to respond to a reservation request
+        ACCEPTED,   // Charge point accepted. The only status for active, usable reservations (if expiryDatetime is in future)
+        USED,       // Reservation used by the user for a transaction
+        CANCELLED;  // Reservation cancelled by the user
+
+        @Override
+        public String toString() {
+            return this.name();
         }
     }
 

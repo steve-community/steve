@@ -28,16 +28,18 @@ public class ReserveNowResponseHandler implements AsyncHandler<ReserveNowRespons
             ReservationStatus status = res.get().getStatus();
             requestTask.addNewResponse(chargeBoxId, status.value());
 
-            if (!ReservationStatus.ACCEPTED.equals(status)) {
-                cancelReservation();
+            if (ReservationStatus.ACCEPTED.equals(status)) {
+                reservationRepository.accepted(reservationId);
+            } else {
+                delete();
             }
         } catch (InterruptedException | CancellationException | ExecutionException e) {
             requestTask.addNewError(chargeBoxId, e);
-            cancelReservation();
+            delete();
         }
     }
 
-    private void cancelReservation() {
-        reservationRepository.cancelReservation(reservationId);
+    private void delete() {
+        reservationRepository.delete(reservationId);
     }
 }

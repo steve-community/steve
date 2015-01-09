@@ -27,7 +27,7 @@
                         <ul>
                             <li><a href="/steve/manager/chargepoints">CHARGE POINTS</a></li>
                             <li><a href="/steve/manager/users">USERS</a></li>
-                            <li><a href="/steve/manager/reservations">RESERVATIONS</a></li>
+                            <li><a href="/steve/manager/reservations/active">RESERVATIONS</a></li>
                             <li><a href="/steve/manager/transactions">TRANSACTIONS</a></li>
                         </ul>
                     </li>

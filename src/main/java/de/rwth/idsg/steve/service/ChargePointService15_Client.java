@@ -389,8 +389,8 @@ public class ChargePointService15_Client {
         // Insert into DB
         Timestamp startTimestamp = new Timestamp(new DateTime().getMillis());
         Timestamp expiryTimestamp = new Timestamp(params.getExpiry().toDateTime().getMillis());
-        int reservationId = reservationRepository.bookReservation(params.getIdTag(), chargeBoxId,
-                                                                  startTimestamp, expiryTimestamp);
+        int reservationId = reservationRepository.insert(params.getIdTag(), chargeBoxId,
+                                                         startTimestamp, expiryTimestamp);
 
         ReserveNowRequest req = this.prepareReserveNow(params, reservationId);
         RequestTask requestTask = new RequestTask(OcppVersion.V_15, "Reserve Now", chargePointSelectList);

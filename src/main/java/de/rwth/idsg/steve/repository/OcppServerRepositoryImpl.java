@@ -26,7 +26,6 @@ import static jooq.steve.db.tables.Chargebox.CHARGEBOX;
 import static jooq.steve.db.tables.Connector.CONNECTOR;
 import static jooq.steve.db.tables.ConnectorMetervalue.CONNECTOR_METERVALUE;
 import static jooq.steve.db.tables.ConnectorStatus.CONNECTOR_STATUS;
-import static jooq.steve.db.tables.Reservation.RESERVATION;
 import static jooq.steve.db.tables.Transaction.TRANSACTION;
 
 /**
@@ -44,6 +43,8 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
     @Autowired
     @Qualifier("jooqConfig")
     private Configuration config;
+
+    @Autowired private ReservationRepository reservationRepository;
 
     /**
      * UPDATE chargebox
@@ -304,14 +305,7 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
                 // -------------------------------------------------------------------------
 
                 if (reservationId != null) {
-                    /**
-                     * DELETE FROM reservation
-                     * WHERE reservation_pk = ?
-                     */
-                    DSL.using(config)
-                       .delete(RESERVATION)
-                       .where(RESERVATION.RESERVATION_PK.equal(reservationId))
-                       .execute();
+                    reservationRepository.used(reservationId, transactionId);
                 }
 
                 return transactionId;

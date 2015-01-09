@@ -12,5 +12,6 @@ import lombok.experimental.Builder;
 @Builder
 public final class Reservation {
     private final int id;
-    private final String idTag, chargeBoxId, startDatetime, expiryDatetime;
+    private final Integer transactionId;
+    private final String idTag, chargeBoxId, startDatetime, expiryDatetime, status;
 }

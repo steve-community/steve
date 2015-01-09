@@ -29,7 +29,7 @@ public class CancelReservationResponseHandler implements AsyncHandler<CancelRese
             requestTask.addNewResponse(chargeBoxId, status.value());
 
             if (CancelReservationStatus.ACCEPTED.equals(status)) {
-                reservationRepository.cancelReservation(reservationId);
+                reservationRepository.cancelled(reservationId);
             }
         } catch (InterruptedException | CancellationException | ExecutionException e) {
             requestTask.addNewError(chargeBoxId, e);

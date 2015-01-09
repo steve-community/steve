@@ -9,8 +9,8 @@
 		Number of<br>Users
 		<span class="base formatNumber">${stats.numUsers}</span>
 	</a>
-	<a class="tileRow1" href="/steve/manager/reservations">
-		Number of<br>Existing Reservations
+	<a class="tileRow1" href="/steve/manager/reservations/active">
+		Number of<br>Active Reservations
 		<span class="base formatNumber">${stats.numReservations}</span>
 	</a>
 	<a class="tileRow1" href="/steve/manager/transactions">

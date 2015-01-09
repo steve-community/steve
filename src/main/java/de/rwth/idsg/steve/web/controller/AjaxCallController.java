@@ -57,7 +57,7 @@ public class AjaxCallController {
 
     @RequestMapping(value = RESERVATION_IDS_PATH)
     public List<Integer> getReservationIds(@RequestParam String chargeBoxId) {
-        return reservationRepository.getExistingReservationIds(chargeBoxId);
+        return reservationRepository.getActiveReservationIds(chargeBoxId);
     }
 
 }

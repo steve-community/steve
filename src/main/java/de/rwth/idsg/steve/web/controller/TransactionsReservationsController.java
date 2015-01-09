@@ -29,7 +29,8 @@ public class TransactionsReservationsController {
 
     private static final String TRANSACTIONS_PATH = "/transactions";
     private static final String TRANSACTIONS_CSV_PATH = "/transactions/csv";
-    private static final String RESERVATIONS_PATH = "/reservations";
+    private static final String ACTIVE_RESERVATIONS_PATH = "/reservations/active";
+    private static final String ALL_RESERVATIONS_PATH = "/reservations/all";
 
     // -------------------------------------------------------------------------
     // HTTP methods
@@ -51,9 +52,16 @@ public class TransactionsReservationsController {
         response.getOutputStream().print(transactionRepository.getTransactionsCSV());
     }
 
-    @RequestMapping(value = RESERVATIONS_PATH, method = RequestMethod.GET)
-    public String getReservations(Model model) {
-        model.addAttribute("reservList", reservationRepository.getReservations());
+    @RequestMapping(value = ACTIVE_RESERVATIONS_PATH, method = RequestMethod.GET)
+    public String getActiveReservations(Model model) {
+        model.addAttribute("showActive", true);
+        model.addAttribute("reservList", reservationRepository.getActiveReservations());
+        return "data-man/reservations";
+    }
+
+    @RequestMapping(value = ALL_RESERVATIONS_PATH, method = RequestMethod.GET)
+    public String getAllReservations(Model model) {
+        model.addAttribute("reservList", reservationRepository.getAllReservations());
         return "data-man/reservations";
     }
 

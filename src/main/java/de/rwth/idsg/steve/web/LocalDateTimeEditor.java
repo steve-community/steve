@@ -1,6 +1,6 @@
 package de.rwth.idsg.steve.web;
 
-import com.google.common.base.Strings;
+import de.rwth.idsg.steve.utils.StringUtils;
 import org.joda.time.LocalDateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
@@ -27,7 +27,7 @@ public class LocalDateTimeEditor extends PropertyEditorSupport {
 
     @Override
     public void setAsText(String text) {
-        if (Strings.isNullOrEmpty(text)) {
+        if (StringUtils.isNullOrEmpty(text)) {
             setValue(null);
         } else {
             setValue(DATE_TIME_FORMATTER.parseLocalDateTime(text));

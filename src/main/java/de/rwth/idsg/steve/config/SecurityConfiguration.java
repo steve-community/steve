@@ -35,7 +35,6 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         final String prefix = "/manager/";
-
         http
             .authorizeRequests()
                 .antMatchers(prefix + "**").hasRole("ADMIN")

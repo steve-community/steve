@@ -40,6 +40,8 @@ public class Ocpp15Controller {
     @Autowired private UserRepository userRepository;
     @Autowired private ChargePointService15_Client client;
 
+    private static final String PARAMS = "params";
+
     // -------------------------------------------------------------------------
     // Paths
     // -------------------------------------------------------------------------
@@ -76,6 +78,14 @@ public class Ocpp15Controller {
         model.addAttribute("idTagList", userRepository.getActiveUserIdTags());
     }
 
+    private void setAllUserIdTagList(Model model) {
+        model.addAttribute("idTagList", userRepository.getUserIdTags());
+    }
+
+    private void setConfKeys(Model model) {
+        model.addAttribute("confKeys", ConfigurationKeyEnum.values());
+    }
+
     // -------------------------------------------------------------------------
     // Http methods (GET)
     // -------------------------------------------------------------------------
@@ -88,28 +98,28 @@ public class Ocpp15Controller {
     @RequestMapping(value = CHANGE_AVAIL_PATH, method = RequestMethod.GET)
     public String getChangeAvail(Model model) {
         setChargePointList(model);
-        model.addAttribute("params", new ChangeAvailabilityParams());
+        model.addAttribute(PARAMS, new ChangeAvailabilityParams());
         return PREFIX + CHANGE_AVAIL_PATH;
     }
 
     @RequestMapping(value = CHANGE_CONF_PATH, method = RequestMethod.GET)
     public String getChangeConf(Model model) {
         setChargePointList(model);
-        model.addAttribute("params", new ChangeConfigurationParams());
+        model.addAttribute(PARAMS, new ChangeConfigurationParams());
         return PREFIX + CHANGE_CONF_PATH;
     }
 
     @RequestMapping(value = CLEAR_CACHE_PATH, method = RequestMethod.GET)
     public String getClearCache(Model model) {
         setChargePointList(model);
-        model.addAttribute("params", new MultipleChargePointSelect());
+        model.addAttribute(PARAMS, new MultipleChargePointSelect());
         return PREFIX + CLEAR_CACHE_PATH;
     }
 
     @RequestMapping(value = GET_DIAG_PATH, method = RequestMethod.GET)
     public String getGetDiag(Model model) {
         setChargePointList(model);
-        model.addAttribute("params", new GetDiagnosticsParams());
+        model.addAttribute(PARAMS, new GetDiagnosticsParams());
         return PREFIX + GET_DIAG_PATH;
     }
 
@@ -117,35 +127,35 @@ public class Ocpp15Controller {
     public String getRemoteStartTx(Model model) {
         setChargePointList(model);
         setActiveUserIdTagList(model);
-        model.addAttribute("params", new RemoteStartTransactionParams());
+        model.addAttribute(PARAMS, new RemoteStartTransactionParams());
         return PREFIX + REMOTE_START_TX_PATH;
     }
 
     @RequestMapping(value = REMOTE_STOP_TX_PATH, method = RequestMethod.GET)
     public String getRemoteStopTx(Model model) {
         setChargePointList(model);
-        model.addAttribute("params", new RemoteStopTransactionParams());
+        model.addAttribute(PARAMS, new RemoteStopTransactionParams());
         return PREFIX + REMOTE_STOP_TX_PATH;
     }
 
     @RequestMapping(value = RESET_PATH, method = RequestMethod.GET)
     public String getReset(Model model) {
         setChargePointList(model);
-        model.addAttribute("params", new ResetParams());
+        model.addAttribute(PARAMS, new ResetParams());
         return PREFIX + RESET_PATH;
     }
 
     @RequestMapping(value = UNLOCK_CON_PATH, method = RequestMethod.GET)
     public String getUnlockCon(Model model) {
         setChargePointList(model);
-        model.addAttribute("params", new UnlockConnectorParams());
+        model.addAttribute(PARAMS, new UnlockConnectorParams());
         return PREFIX + UNLOCK_CON_PATH;
     }
 
     @RequestMapping(value = UPDATE_FIRM_PATH, method = RequestMethod.GET)
     public String getUpdateFirm(Model model) {
         setChargePointList(model);
-        model.addAttribute("params", new UpdateFirmwareParams());
+        model.addAttribute(PARAMS, new UpdateFirmwareParams());
         return PREFIX + UPDATE_FIRM_PATH;
     }
 
@@ -153,44 +163,44 @@ public class Ocpp15Controller {
     public String getReserveNow(Model model) {
         setChargePointList(model);
         setActiveUserIdTagList(model);
-        model.addAttribute("params", new ReserveNowParams());
+        model.addAttribute(PARAMS, new ReserveNowParams());
         return PREFIX + RESERVE_PATH;
     }
 
     @RequestMapping(value = CANCEL_RESERV_PATH, method = RequestMethod.GET)
     public String getCancelReserv(Model model) {
         setChargePointList(model);
-        model.addAttribute("params", new CancelReservationParams());
+        model.addAttribute(PARAMS, new CancelReservationParams());
         return PREFIX + CANCEL_RESERV_PATH;
     }
 
     @RequestMapping(value = DATA_TRANSFER_PATH, method = RequestMethod.GET)
     public String getDataTransfer(Model model) {
         setChargePointList(model);
-        model.addAttribute("params", new DataTransferParams());
+        model.addAttribute(PARAMS, new DataTransferParams());
         return PREFIX + DATA_TRANSFER_PATH;
     }
 
     @RequestMapping(value = GET_CONF_PATH, method = RequestMethod.GET)
     public String getGetConf(Model model) {
         setChargePointList(model);
-        model.addAttribute("params", new GetConfigurationParams());
-        model.addAttribute("confKeys", ConfigurationKeyEnum.values());
+        setConfKeys(model);
+        model.addAttribute(PARAMS, new GetConfigurationParams());
         return PREFIX + GET_CONF_PATH;
     }
 
     @RequestMapping(value = GET_LIST_VERSION_PATH, method = RequestMethod.GET)
     public String getListVersion(Model model) {
         setChargePointList(model);
-        model.addAttribute("params", new MultipleChargePointSelect());
+        model.addAttribute(PARAMS, new MultipleChargePointSelect());
         return PREFIX + GET_LIST_VERSION_PATH;
     }
 
     @RequestMapping(value = SEND_LIST_PATH, method = RequestMethod.GET)
     public String getSendList(Model model) {
         setChargePointList(model);
-        model.addAttribute("idTagList", userRepository.getUserIdTags());
-        model.addAttribute("params", new SendLocalListParams());
+        setAllUserIdTagList(model);
+        model.addAttribute(PARAMS, new SendLocalListParams());
         return PREFIX + SEND_LIST_PATH;
     }
 
@@ -199,7 +209,7 @@ public class Ocpp15Controller {
     // -------------------------------------------------------------------------
 
     @RequestMapping(value = CHANGE_AVAIL_PATH, method = RequestMethod.POST)
-    public String postChangeAvail(@Valid @ModelAttribute("params") ChangeAvailabilityParams params,
+    public String postChangeAvail(@Valid @ModelAttribute(PARAMS) ChangeAvailabilityParams params,
                                   BindingResult result, Model model) {
         if (result.hasErrors()) {
             setChargePointList(model);
@@ -209,7 +219,7 @@ public class Ocpp15Controller {
     }
 
     @RequestMapping(value = CHANGE_CONF_PATH, method = RequestMethod.POST)
-    public String postChangeConf(@Valid @ModelAttribute("params") ChangeConfigurationParams params,
+    public String postChangeConf(@Valid @ModelAttribute(PARAMS) ChangeConfigurationParams params,
                                  BindingResult result, Model model) {
         if (result.hasErrors()) {
             setChargePointList(model);
@@ -219,7 +229,7 @@ public class Ocpp15Controller {
     }
 
     @RequestMapping(value = CLEAR_CACHE_PATH, method = RequestMethod.POST)
-    public String postClearCache(@Valid @ModelAttribute("params") MultipleChargePointSelect params,
+    public String postClearCache(@Valid @ModelAttribute(PARAMS) MultipleChargePointSelect params,
                                  BindingResult result, Model model) {
         if (result.hasErrors()) {
             setChargePointList(model);
@@ -229,7 +239,7 @@ public class Ocpp15Controller {
     }
 
     @RequestMapping(value = GET_DIAG_PATH, method = RequestMethod.POST)
-    public String postGetDiag(@Valid @ModelAttribute("params") GetDiagnosticsParams params,
+    public String postGetDiag(@Valid @ModelAttribute(PARAMS) GetDiagnosticsParams params,
                               BindingResult result, Model model) {
         if (result.hasErrors()) {
             setChargePointList(model);
@@ -239,7 +249,7 @@ public class Ocpp15Controller {
     }
 
     @RequestMapping(value = REMOTE_START_TX_PATH, method = RequestMethod.POST)
-    public String postRemoteStartTx(@Valid @ModelAttribute("params") RemoteStartTransactionParams params,
+    public String postRemoteStartTx(@Valid @ModelAttribute(PARAMS) RemoteStartTransactionParams params,
                                     BindingResult result, Model model) {
         if (result.hasErrors()) {
             setChargePointList(model);
@@ -250,7 +260,7 @@ public class Ocpp15Controller {
     }
 
     @RequestMapping(value = REMOTE_STOP_TX_PATH, method = RequestMethod.POST)
-    public String postRemoteStopTx(@Valid @ModelAttribute("params") RemoteStopTransactionParams params,
+    public String postRemoteStopTx(@Valid @ModelAttribute(PARAMS) RemoteStopTransactionParams params,
                                    BindingResult result, Model model) {
         if (result.hasErrors()) {
             setChargePointList(model);
@@ -260,7 +270,7 @@ public class Ocpp15Controller {
     }
 
     @RequestMapping(value = RESET_PATH, method = RequestMethod.POST)
-    public String postReset(@Valid @ModelAttribute("params") ResetParams params,
+    public String postReset(@Valid @ModelAttribute(PARAMS) ResetParams params,
                             BindingResult result, Model model) {
         if (result.hasErrors()) {
             setChargePointList(model);
@@ -270,7 +280,7 @@ public class Ocpp15Controller {
     }
 
     @RequestMapping(value = UNLOCK_CON_PATH, method = RequestMethod.POST)
-    public String postUnlockCon(@Valid @ModelAttribute("params") UnlockConnectorParams params,
+    public String postUnlockCon(@Valid @ModelAttribute(PARAMS) UnlockConnectorParams params,
                                 BindingResult result, Model model) {
         if (result.hasErrors()) {
             setChargePointList(model);
@@ -280,7 +290,7 @@ public class Ocpp15Controller {
     }
 
     @RequestMapping(value = UPDATE_FIRM_PATH, method = RequestMethod.POST)
-    public String postUpdateFirm(@Valid @ModelAttribute("params") UpdateFirmwareParams params,
+    public String postUpdateFirm(@Valid @ModelAttribute(PARAMS) UpdateFirmwareParams params,
                                  BindingResult result, Model model) {
         if (result.hasErrors()) {
             setChargePointList(model);
@@ -290,7 +300,7 @@ public class Ocpp15Controller {
     }
 
     @RequestMapping(value = RESERVE_PATH, method = RequestMethod.POST)
-    public String postReserveNow(@Valid @ModelAttribute("params") ReserveNowParams params,
+    public String postReserveNow(@Valid @ModelAttribute(PARAMS) ReserveNowParams params,
                                  BindingResult result, Model model) {
         if (result.hasErrors()) {
             setChargePointList(model);
@@ -301,7 +311,7 @@ public class Ocpp15Controller {
     }
 
     @RequestMapping(value = CANCEL_RESERV_PATH, method = RequestMethod.POST)
-    public String postCancelReserv(@Valid @ModelAttribute("params") CancelReservationParams params,
+    public String postCancelReserv(@Valid @ModelAttribute(PARAMS) CancelReservationParams params,
                                    BindingResult result, Model model) {
         if (result.hasErrors()) {
             setChargePointList(model);
@@ -311,7 +321,7 @@ public class Ocpp15Controller {
     }
 
     @RequestMapping(value = DATA_TRANSFER_PATH, method = RequestMethod.POST)
-    public String postDataTransfer(@Valid @ModelAttribute("params") DataTransferParams params,
+    public String postDataTransfer(@Valid @ModelAttribute(PARAMS) DataTransferParams params,
                                    BindingResult result, Model model) {
         if (result.hasErrors()) {
             setChargePointList(model);
@@ -321,18 +331,18 @@ public class Ocpp15Controller {
     }
 
     @RequestMapping(value = GET_CONF_PATH, method = RequestMethod.POST)
-    public String postGetConf(@Valid @ModelAttribute("params") GetConfigurationParams params,
+    public String postGetConf(@Valid @ModelAttribute(PARAMS) GetConfigurationParams params,
                               BindingResult result, Model model) {
         if (result.hasErrors()) {
             setChargePointList(model);
-            model.addAttribute("confKeys", ConfigurationKeyEnum.values());
+            setConfKeys(model);
             return PREFIX + GET_CONF_PATH;
         }
         return REDIRECT_TASKS_PATH + client.getConfiguration(params);
     }
 
     @RequestMapping(value = GET_LIST_VERSION_PATH, method = RequestMethod.POST)
-    public String postListVersion(@Valid @ModelAttribute("params") MultipleChargePointSelect params,
+    public String postListVersion(@Valid @ModelAttribute(PARAMS) MultipleChargePointSelect params,
                                   BindingResult result, Model model) {
         if (result.hasErrors()) {
             setChargePointList(model);
@@ -342,11 +352,11 @@ public class Ocpp15Controller {
     }
 
     @RequestMapping(value = SEND_LIST_PATH, method = RequestMethod.POST)
-    public String postSendList(@Valid @ModelAttribute("params") SendLocalListParams params,
+    public String postSendList(@Valid @ModelAttribute(PARAMS) SendLocalListParams params,
                                BindingResult result, Model model) {
         if (result.hasErrors()) {
             setChargePointList(model);
-            model.addAttribute("idTagList", userRepository.getUserIdTags());
+            setAllUserIdTagList(model);
             return PREFIX + SEND_LIST_PATH;
         }
         return REDIRECT_TASKS_PATH + client.sendLocalList(params);

@@ -47,7 +47,7 @@
 	</div>
 	<div id="delete">
 		<div class="warning"><b>Warning:</b> Deleting a charge point causes losing all related information including transactions, reservations, connector status and connector meter values.</div>
-        <form method="POST" action="/steve/manager/chargepoints/delete">
+        <form:form action="/steve/manager/chargepoints/delete">
             <table class="userInput">
                 <tr><td>ChargeBox ID:</td><td>
                     <select name="chargeBoxId" required>
@@ -61,7 +61,7 @@
                 </td></tr>
                 <tr><td></td><td id="add_space"><input type="submit" value="Delete"></td></tr>
             </table>
-        </form>
+        </form:form>
 	</div>
 </div></div>
 <%@ include file="../00-footer.jsp" %>

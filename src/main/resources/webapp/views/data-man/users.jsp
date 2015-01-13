@@ -106,7 +106,7 @@
 	</div>
 	<div id="delete">
 		<div class="warning"><b>Warning:</b> Deleting a user causes losing all related information including transactions and reservations.</div>
-		<form method="POST" action="/steve/manager/users/delete">
+		<form:form action="/steve/manager/users/delete">
 			<table class="userInput">
 				<tr><td>User ID Tag:</td><td>
 					<select name="idTag" required>
@@ -120,7 +120,7 @@
 				</td></tr>
 				<tr><td></td><td id="add_space"><input type="submit" value="Delete"></td></tr>
 			</table>
-		</form>
+		</form:form>
 	</div>
 </div>
 </div>

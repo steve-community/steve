@@ -15,6 +15,10 @@
     </developers>
 
     <properties>
+        <db.url>jdbc:mysql://localhost:3306/stevedb</db.url>
+        <db.user>root</db.user>
+        <db.password>come47on</db.password>
+        <!--  -->
         <java.version>1.7</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <jooq.version>3.5.1</jooq.version>
@@ -135,6 +139,32 @@
             </plugin>
 
             <plugin>
+                <groupId>org.flywaydb</groupId>
+                <artifactId>flyway-maven-plugin</artifactId>
+                <version>3.1</version>
+
+                <!-- Must be in the same phase as Jooq -->
+                <executions>
+                    <execution>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>migrate</goal>
+                        </goals>
+                    </execution>
+                </executions>
+
+                <configuration>
+                    <driver>com.mysql.jdbc.Driver</driver>
+                    <url>${db.url}</url>
+                    <user>${db.user}</user>
+                    <password>${db.password}</password>
+                    <locations>
+                        <location>filesystem:src/main/resources/db/migration</location>
+                    </locations>
+                </configuration>
+            </plugin>
+
+            <plugin>
                 <!-- Specify the maven code generator plugin -->
                 <groupId>org.jooq</groupId>
                 <artifactId>jooq-codegen-maven</artifactId>
@@ -143,6 +173,7 @@
                 <!-- The plugin should hook into the generate goal -->
                 <executions>
                     <execution>
+                        <phase>generate-sources</phase>
                         <goals>
                             <goal>generate</goal>
                         </goals>
@@ -173,9 +204,9 @@
                 <configuration>
                     <jdbc>
                         <driver>com.mysql.jdbc.Driver</driver>
-                        <url>jdbc:mysql://localhost:3306/stevedb</url>
-                        <user>root</user>
-                        <password>come47on</password>
+                        <url>${db.url}</url>
+                        <user>${db.user}</user>
+                        <password>${db.password}</password>
                     </jdbc>
 
                     <generator>
@@ -203,7 +234,6 @@
                     </generator>
                 </configuration>
             </plugin>
-
         </plugins>
     </build>
 

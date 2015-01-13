@@ -12,17 +12,15 @@ SteVe is considered as an open platform to implement, test and evaluate novel id
 Requirements & Configuration
 -----
 
-1. You need Maven, MySQL and JDK 7.
+1. You need Maven, MySQL and JDK 7. 
 
-2. SteVe comes with MySQL [dump files](resources/db/) that contain the database structures for all tables with no data. These should be imported *in the right order* in your MySQL database before deployment of SteVe.  
+2. Before using SteVe, the default database configuration (*username*, *password* and *url*) has to be changed in [pom.xml](pom.xml#L18-20) and [SteveConfiguration.java](src/main/java/de/rwth/idsg/steve/SteveConfiguration.java#L53-L55).
 
-3. Before using SteVe, the default database configuration (*username*, *password* and *url*) has to be changed in [pom.xml](pom.xml#L176-178) and [SteveConfiguration.java](src/main/java/de/rwth/idsg/steve/SteveConfiguration.java#L53-L55).
+3. Web interface credentials are defined in [SteveConfiguration.java](src/main/java/de/rwth/idsg/steve/SteveConfiguration.java#L65-L66). Change them if you wish.
 
-4. Change the Web interface credentials in [SteveConfiguration.java](src/main/java/de/rwth/idsg/steve/SteveConfiguration.java#L65-L66)
+4. The HTTP URL of the OCPP service is **http://**`your-server-ip:port`**/steve/services/CentralSystemService**. The charge points must be configured to communicate with this address. Depending on the OCPP version of the charge point, SteVe will automatically route messages to the version-specific implementation.
 
-5. The HTTP URL of the OCPP service is **http://**`your-server-ip:port`**/steve/services/CentralSystemService**. The charge points must be configured to communicate with this address. Depending on the OCPP version of the charge point, SteVe will automatically route messages to the version-specific implementation.
-
-6. Optional: To access the application via HTTPS, ...
+5. Optional: To access the application via HTTPS, ...
 
 How to use?
 -----

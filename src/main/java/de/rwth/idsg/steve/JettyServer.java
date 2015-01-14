@@ -1,6 +1,5 @@
 package de.rwth.idsg.steve;
 
-
 import de.rwth.idsg.steve.config.BeanConfiguration;
 import de.rwth.idsg.steve.config.OcppConfiguration;
 import de.rwth.idsg.steve.config.SecurityConfiguration;
@@ -31,6 +30,7 @@ import org.springframework.web.servlet.DispatcherServlet;
 import javax.servlet.DispatcherType;
 import java.io.IOException;
 import java.util.EnumSet;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
@@ -41,21 +41,22 @@ public class JettyServer {
 
     private Server server;
 
-    public static void main(String[] args) throws IOException {
-        JettyServer jettyServer = new JettyServer();
-        jettyServer.start();
-    }
+    private static final int MIN_THREADS = 4;
+    private static final int MAX_THREADS = 50;
+
+    private static final long STOP_TIMEOUT = TimeUnit.SECONDS.toMillis(5);
+    private static final long IDLE_TIMEOUT = TimeUnit.MINUTES.toMillis(1);
 
     /**
      * A fully configured Jetty Server instance
      */
-    JettyServer() throws IOException {
+    public JettyServer() throws IOException {
 
         // === jetty.xml ===
         // Setup Threadpool
         QueuedThreadPool threadPool = new QueuedThreadPool();
-        threadPool.setMinThreads(SteveConfiguration.Jetty.MIN_THREADS);
-        threadPool.setMaxThreads(SteveConfiguration.Jetty.MAX_THREADS);
+        threadPool.setMinThreads(MIN_THREADS);
+        threadPool.setMaxThreads(MAX_THREADS);
 
         // Server
         server = new Server(threadPool);
@@ -78,13 +79,13 @@ public class JettyServer {
         server.setDumpAfterStart(false);
         server.setDumpBeforeStop(false);
         server.setStopAtShutdown(true);
-        server.setStopTimeout(SteveConfiguration.Jetty.STOP_TIMEOUT);
+        server.setStopTimeout(STOP_TIMEOUT);
 
         // === jetty-http.xml ===
         ServerConnector http = new ServerConnector(server, new HttpConnectionFactory(httpConfig));
         http.setHost(SteveConfiguration.Jetty.SERVER_HOST);
         http.setPort(SteveConfiguration.Jetty.SERVER_PORT);
-        http.setIdleTimeout(SteveConfiguration.Jetty.IDLE_TIMEOUT);
+        http.setIdleTimeout(IDLE_TIMEOUT);
         server.addConnector(http);
 
         if (SteveConfiguration.Jetty.SSL_ENABLED) {
@@ -113,7 +114,7 @@ public class JettyServer {
                     new HttpConnectionFactory(httpsConfig));
             https.setPort(SteveConfiguration.Jetty.SSL_SERVER_PORT);
             https.setHost(SteveConfiguration.Jetty.SERVER_HOST);
-            https.setIdleTimeout(SteveConfiguration.Jetty.IDLE_TIMEOUT);
+            https.setIdleTimeout(IDLE_TIMEOUT);
             server.addConnector(https);
         }
 
@@ -137,7 +138,7 @@ public class JettyServer {
 
     private WebAppContext getSteveContext(WebApplicationContext springContext) throws IOException {
         WebAppContext ctx = new WebAppContext();
-        ctx.setContextPath(SteveConfiguration.Jetty.CONTEXT_PATH);
+        ctx.setContextPath(SteveConfiguration.CONTEXT_PATH);
         ctx.setResourceBase(new ClassPathResource("webapp").getURI().toString());
 
         // Disable directory listings if no index.html is found.
@@ -179,7 +180,7 @@ public class JettyServer {
     /**
      * Starts the Jetty Server instance
      */
-    private void start() {
+    public void start() {
         try {
             server.start();
             server.join();
@@ -193,7 +194,7 @@ public class JettyServer {
     /**
      * Stops the Jetty Server instance
      */
-    private void stop() {
+    public void stop() {
         new Thread() {
             @Override
             public void run() {

@@ -15,10 +15,6 @@
     </developers>
 
     <properties>
-        <db.url>jdbc:mysql://localhost:3306/stevedb</db.url>
-        <db.user>root</db.user>
-        <db.password>come47on</db.password>
-        <!--  -->
         <java.version>1.7</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <jooq.version>3.5.1</jooq.version>
@@ -27,9 +23,31 @@
         <spring.security.version>3.2.5.RELEASE</spring.security.version>
         <mysql.jdbc.version>5.1.34</mysql.jdbc.version>
         <jetty.version>9.2.6.v20141205</jetty.version>
+
+        <!-- Read from main.properties -->
+        <stevedb.url>${db.url}</stevedb.url>
+        <stevedb.user>${db.user}</stevedb.user>
+        <stevedb.password>${db.password}</stevedb.password>
     </properties>
 
     <build>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+                <includes>
+                    <include>main.properties</include>
+                </includes>
+            </resource>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>false</filtering>
+                <excludes>
+                    <exclude>main.properties</exclude>
+                </excludes>
+            </resource>
+        </resources>
+
         <plugins>
             <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -38,6 +56,24 @@
                     <source>${java.version}</source>
                     <target>${java.version}</target>
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>properties-maven-plugin</artifactId>
+                <version>1.0-alpha-2</version>
+                <executions>
+                    <execution>
+                        <phase>initialize</phase>
+                        <goals>
+                            <goal>read-project-properties</goal>
+                        </goals>
+                        <configuration>
+                            <files>
+                                <file>src/main/resources/main.properties</file>
+                            </files>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
 
             <!-- Help: http://stackoverflow.com/questions/6831954 -->
@@ -56,7 +92,7 @@
                             <createDependencyReducedPom>false</createDependencyReducedPom>
                             <transformers>
                                 <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                                    <mainClass>de.rwth.idsg.steve.JettyServer</mainClass>
+                                    <mainClass>de.rwth.idsg.steve.Application</mainClass>
                                 </transformer>
                                 <transformer implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
                                     <resource>META-INF/spring.schemas</resource>
@@ -80,25 +116,24 @@
                 </executions>
             </plugin>
 
-            <!-- Pre-compiles JSPs. With pre-compiled JSPs it is not necessary to shade the jar
-            so the taglibs can be found when the JSPs are compiled at run time. -->
-            <!--<plugin>-->
-                <!--<groupId>org.eclipse.jetty</groupId>-->
-                <!--<artifactId>jetty-jspc-maven-plugin</artifactId>-->
-                <!--<version>${jetty.version}</version>-->
-                <!--<executions>-->
-                    <!--<execution>-->
-                        <!--<phase>compile</phase>-->
-                        <!--<id>jspc</id>-->
-                        <!--<goals>-->
-                            <!--<goal>jspc</goal>-->
-                        <!--</goals>-->
-                        <!--<configuration>-->
-                            <!--<webAppSourceDirectory>${basedir}/src/main/resources/webapp</webAppSourceDirectory>-->
-                        <!--</configuration>-->
-                    <!--</execution>-->
-                <!--</executions>-->
-            <!--</plugin>-->
+            <!-- Pre-compiles JSPs -->
+            <plugin>
+                <groupId>org.eclipse.jetty</groupId>
+                <artifactId>jetty-jspc-maven-plugin</artifactId>
+                <version>${jetty.version}</version>
+                <executions>
+                    <execution>
+                        <phase>compile</phase>
+                        <id>jspc</id>
+                        <goals>
+                            <goal>jspc</goal>
+                        </goals>
+                        <configuration>
+                            <webAppSourceDirectory>${basedir}/src/main/resources/webapp</webAppSourceDirectory>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
 
             <plugin>
                 <groupId>org.apache.cxf</groupId>
@@ -155,9 +190,9 @@
 
                 <configuration>
                     <driver>com.mysql.jdbc.Driver</driver>
-                    <url>${db.url}</url>
-                    <user>${db.user}</user>
-                    <password>${db.password}</password>
+                    <url>${stevedb.url}</url>
+                    <user>${stevedb.user}</user>
+                    <password>${stevedb.password}</password>
                     <locations>
                         <location>filesystem:src/main/resources/db/migration</location>
                     </locations>
@@ -204,9 +239,9 @@
                 <configuration>
                     <jdbc>
                         <driver>com.mysql.jdbc.Driver</driver>
-                        <url>${db.url}</url>
-                        <user>${db.user}</user>
-                        <password>${db.password}</password>
+                        <url>${stevedb.url}</url>
+                        <user>${stevedb.user}</user>
+                        <password>${stevedb.password}</password>
                     </jdbc>
 
                     <generator>
@@ -261,13 +296,13 @@
             <artifactId>gson</artifactId>
             <version>2.3.1</version>
         </dependency>
+
+        <!-- Spring -->
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-webmvc</artifactId>
             <version>${spring.version}</version>
         </dependency>
-
-        <!-- Spring Security -->
         <dependency>
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-web</artifactId>
@@ -288,7 +323,7 @@
             <groupId>javax.servlet</groupId>
             <artifactId>jstl</artifactId>
             <version>1.2</version>
-            <scope>runtime</scope>
+            <scope>provided</scope>
         </dependency>
 
         <!-- Logging -->

@@ -12,16 +12,15 @@ SteVe is considered as an open platform to implement, test and evaluate novel id
 Requirements & Configuration
 -----
 
-1. You need Maven, MySQL and JDK 7. 
+1. You need JDK 7, Maven and MySQL.
 
-2. Before using SteVe, the default database configuration (*username*, *password* and *url*) has to be changed in [pom.xml](pom.xml#L18-20) and [SteveConfiguration.java](src/main/java/de/rwth/idsg/steve/SteveConfiguration.java#L53-L55).
+2. The HTTP URL of the OCPP service is **http://**`your-server-ip:port`**/steve/services/CentralSystemService**. The charge points must be configured to communicate with this address. Depending on the OCPP version of the charge point, SteVe will automatically route messages to the version-specific implementation.
 
-3. Web interface credentials are defined in [SteveConfiguration.java](src/main/java/de/rwth/idsg/steve/SteveConfiguration.java#L65-L66). Change them if you wish.
-
-4. The HTTP URL of the OCPP service is **http://**`your-server-ip:port`**/steve/services/CentralSystemService**. The charge points must be configured to communicate with this address. Depending on the OCPP version of the charge point, SteVe will automatically route messages to the version-specific implementation.
-
-5. Optional: To access the application via HTTPS, ...
-
+3. Configuration is defined in [main.properties](src/main/resources/main.properties):
+  - You _must_ change [database configuration](src/main/resources/main.properties#L3-L5)
+  - You _can_ change [web interface credentials](src/main/resources/main.properties#L9-L10)
+  - Optional: To access the application via HTTPS, ...
+  
 How to use?
 -----
 

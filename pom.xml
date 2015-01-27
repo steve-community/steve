@@ -22,12 +22,7 @@
         <spring.version>4.1.4.RELEASE</spring.version>
         <spring.security.version>3.2.5.RELEASE</spring.security.version>
         <mysql.jdbc.version>5.1.34</mysql.jdbc.version>
-        <jetty.version>9.2.6.v20141205</jetty.version>
-
-        <!-- Read from main.properties -->
-        <stevedb.url>${db.url}</stevedb.url>
-        <stevedb.user>${db.user}</stevedb.user>
-        <stevedb.password>${db.password}</stevedb.password>
+        <jetty.version>9.2.7.v20150116</jetty.version>
     </properties>
 
     <build>
@@ -57,6 +52,8 @@
                     <target>${java.version}</target>
                 </configuration>
             </plugin>
+
+            <!-- Read from main.properties the DB configuration -->
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>properties-maven-plugin</artifactId>
@@ -190,9 +187,9 @@
 
                 <configuration>
                     <driver>com.mysql.jdbc.Driver</driver>
-                    <url>${stevedb.url}</url>
-                    <user>${stevedb.user}</user>
-                    <password>${stevedb.password}</password>
+                    <url>${db.url}</url>
+                    <user>${db.user}</user>
+                    <password>${db.password}</password>
                     <locations>
                         <location>filesystem:src/main/resources/db/migration</location>
                     </locations>
@@ -239,9 +236,9 @@
                 <configuration>
                     <jdbc>
                         <driver>com.mysql.jdbc.Driver</driver>
-                        <url>${stevedb.url}</url>
-                        <user>${stevedb.user}</user>
-                        <password>${stevedb.password}</password>
+                        <url>${db.url}</url>
+                        <user>${db.user}</user>
+                        <password>${db.password}</password>
                     </jdbc>
 
                     <generator>

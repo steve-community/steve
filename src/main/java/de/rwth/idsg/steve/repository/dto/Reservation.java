@@ -1,7 +1,7 @@
 package de.rwth.idsg.steve.repository.dto;
 
+import lombok.Builder;
 import lombok.Getter;
-import lombok.experimental.Builder;
 
 /**
  *
@@ -11,7 +11,7 @@ import lombok.experimental.Builder;
 @Getter
 @Builder
 public final class Reservation {
-    private final int id;
-    private final Integer transactionId;
-    private final String idTag, chargeBoxId, startDatetime, expiryDatetime, status;
+    private int id;
+    private Integer transactionId;
+    private String idTag, chargeBoxId, startDatetime, expiryDatetime, status;
 }

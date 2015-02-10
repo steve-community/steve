@@ -1,7 +1,7 @@
 package de.rwth.idsg.steve.repository.dto;
 
+import lombok.Builder;
 import lombok.Getter;
-import lombok.experimental.Builder;
 
 /**
  *
@@ -11,6 +11,6 @@ import lombok.experimental.Builder;
 @Getter
 @Builder
 public final class ConnectorStatus {
-    private final String chargeBoxId, timeStamp, status, errorCode;
-    private final int connectorId;
+    private String chargeBoxId, timeStamp, status, errorCode;
+    private int connectorId;
 }

@@ -1,7 +1,7 @@
 package de.rwth.idsg.steve.repository.dto;
 
+import lombok.Builder;
 import lombok.Getter;
-import lombok.experimental.Builder;
 
 /**
  * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
@@ -10,5 +10,5 @@ import lombok.experimental.Builder;
 @Getter
 @Builder
 public class ChargePointSelect {
-    private final String chargeBoxId, endpointAddress;
+    private String chargeBoxId, endpointAddress;
 }

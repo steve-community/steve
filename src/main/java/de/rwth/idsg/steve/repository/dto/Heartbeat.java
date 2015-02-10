@@ -1,7 +1,7 @@
 package de.rwth.idsg.steve.repository.dto;
 
+import lombok.Builder;
 import lombok.Getter;
-import lombok.experimental.Builder;
 
 /**
  *
@@ -11,5 +11,5 @@ import lombok.experimental.Builder;
 @Getter
 @Builder
 public final class Heartbeat {
-    private final String chargeBoxId, lastTimestamp;
+    private String chargeBoxId, lastTimestamp;
 }

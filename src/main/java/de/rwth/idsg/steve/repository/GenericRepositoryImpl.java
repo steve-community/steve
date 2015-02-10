@@ -15,8 +15,8 @@ import org.springframework.stereotype.Repository;
 import java.sql.Timestamp;
 
 import static jooq.steve.db.tables.SchemaVersion.SCHEMA_VERSION;
-import static org.jooq.impl.DSL.select;
 import static org.jooq.impl.DSL.max;
+import static org.jooq.impl.DSL.select;
 
 /**
  * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>

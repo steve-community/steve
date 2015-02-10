@@ -1,8 +1,8 @@
 package de.rwth.idsg.steve.repository.dto;
 
+import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import lombok.experimental.Builder;
 import org.joda.time.DateTime;
 
 /**

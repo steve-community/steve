@@ -1,7 +1,7 @@
 package de.rwth.idsg.steve.repository.dto;
 
+import lombok.Builder;
 import lombok.Getter;
-import lombok.experimental.Builder;
 
 /**
  *
@@ -11,7 +11,7 @@ import lombok.experimental.Builder;
 @Getter
 @Builder
 public final class ChargePoint {
-    private final String chargeBoxId, endpointAddress, ocppVersion, chargePointVendor, chargePointModel,
+    private String chargeBoxId, endpointAddress, ocppVersion, chargePointVendor, chargePointModel,
             chargePointSerialNumber, chargeBoxSerialNumber, firewireVersion, firewireUpdateStatus,
             firewireUpdateTimestamp, iccid, imsi, meterType, meterSerialNumber, diagnosticsStatus,
             diagnosticsTimestamp, lastHeartbeatTimestamp;

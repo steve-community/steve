@@ -1,7 +1,7 @@
 package de.rwth.idsg.steve.repository.dto;
 
+import lombok.Builder;
 import lombok.Getter;
-import lombok.experimental.Builder;
 
 /**
  *
@@ -11,6 +11,6 @@ import lombok.experimental.Builder;
 @Getter
 @Builder
 public final class User {
-    private final String idTag, parentIdTag, expiryDate;
-    private final boolean inTransaction, blocked;
+    private String idTag, parentIdTag, expiryDate;
+    private boolean inTransaction, blocked;
 }

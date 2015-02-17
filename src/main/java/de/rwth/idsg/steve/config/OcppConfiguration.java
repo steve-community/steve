@@ -1,6 +1,7 @@
 package de.rwth.idsg.steve.config;
 
 import de.rwth.idsg.steve.MediatorInInterceptor;
+import de.rwth.idsg.steve.MessageIdInterceptor;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.apache.cxf.jaxws.JaxWsServerFactoryBean;
 import org.apache.cxf.ws.addressing.WSAddressingFeature;
@@ -24,8 +25,12 @@ public class OcppConfiguration {
     @Autowired private ocpp.cs._2010._08.CentralSystemService ocpp12Server;
     @Autowired private ocpp.cs._2012._06.CentralSystemService ocpp15Server;
 
+    private MessageIdInterceptor messageIdInterceptor;
+
     @PostConstruct
     public void init() {
+        messageIdInterceptor = new MessageIdInterceptor();
+
         createRouterService();
         createOcpp12Service();
         createOcpp15Service();
@@ -66,6 +71,7 @@ public class OcppConfiguration {
         JaxWsServerFactoryBean f = new JaxWsServerFactoryBean();
         f.setServiceBean(ocpp12Server);
         f.setAddress("/CentralSystemServiceOCPP12");
+        f.getInInterceptors().add(messageIdInterceptor);
         f.create();
     }
 
@@ -73,6 +79,7 @@ public class OcppConfiguration {
         JaxWsServerFactoryBean f = new JaxWsServerFactoryBean();
         f.setServiceBean(ocpp15Server);
         f.setAddress("/CentralSystemServiceOCPP15");
+        f.getInInterceptors().add(messageIdInterceptor);
         f.create();
     }
 }

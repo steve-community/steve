@@ -25,15 +25,13 @@ public class OcppConfiguration {
     @Autowired private ocpp.cs._2010._08.CentralSystemService ocpp12Server;
     @Autowired private ocpp.cs._2012._06.CentralSystemService ocpp15Server;
 
-    private MessageIdInterceptor messageIdInterceptor;
-
     @PostConstruct
     public void init() {
-        messageIdInterceptor = new MessageIdInterceptor();
+        MessageIdInterceptor midi = new MessageIdInterceptor();
 
         createRouterService();
-        createOcpp12Service();
-        createOcpp15Service();
+        createOcpp12Service(midi);
+        createOcpp15Service(midi);
     }
 
     @Bean
@@ -67,19 +65,19 @@ public class OcppConfiguration {
         f.create();
     }
 
-    private void createOcpp12Service() {
+    private void createOcpp12Service(MessageIdInterceptor midi) {
         JaxWsServerFactoryBean f = new JaxWsServerFactoryBean();
         f.setServiceBean(ocpp12Server);
         f.setAddress("/CentralSystemServiceOCPP12");
-        f.getInInterceptors().add(messageIdInterceptor);
+        f.getInInterceptors().add(midi);
         f.create();
     }
 
-    private void createOcpp15Service() {
+    private void createOcpp15Service(MessageIdInterceptor midi) {
         JaxWsServerFactoryBean f = new JaxWsServerFactoryBean();
         f.setServiceBean(ocpp15Server);
         f.setAddress("/CentralSystemServiceOCPP15");
-        f.getInInterceptors().add(messageIdInterceptor);
+        f.getInInterceptors().add(midi);
         f.create();
     }
 }

@@ -81,7 +81,7 @@ select {
   	-webkit-border-radius: 0;
 }
 select option { font-size: 12px; }
-input[type="text"], input[type="number"], input[type="password"]{
+input[type="text"], input[type="number"], input[type="password"], input[type="text"].dateTimePicker{
 	appearance: none;
 	-webkit-appearance: none;
 	margin: 1px 0 1px 0;
@@ -91,9 +91,6 @@ input[type="text"], input[type="number"], input[type="password"]{
  	width: 350px;
 	font-size: 12px;
 }
-
-input[type="text"].datepicker { width: 161px; }
-input[type="text"].timepicker { width: 161px; }
 
 input[type="button"] {
 	margin: 0 0 5px 5px;

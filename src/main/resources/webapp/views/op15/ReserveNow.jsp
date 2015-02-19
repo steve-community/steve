@@ -3,6 +3,7 @@
 <script type="text/javascript">
     $(document).ready(function() {
         <%@ include file="../../static/js/snippets/getConnectorIdsZeroAllowed.js" %>
+        <%@ include file="../../static/js/snippets/dateTimePicker-future.js" %>
     });
 </script>
 <div class="content">
@@ -35,9 +36,9 @@
         <tr><td>Connector ID:</td>
             <td><form:select path="connectorId" disabled="true" /></td>
         </tr>
-        <tr><td>Expiry Date/Time (ex: 2011-12-21 11:30):</td>
+        <tr><td>Expiry Date/Time:</td>
             <td>
-                <form:input path="expiry" />
+                <form:input path="expiry" cssClass="dateTimePicker" />
             </td>
         </tr>
         <tr><td>User ID Tag:</td>

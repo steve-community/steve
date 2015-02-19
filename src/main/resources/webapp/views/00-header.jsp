@@ -8,7 +8,11 @@
     <link rel="icon" href="/steve/static/images/favicon.ico" type="image/x-icon" />
     <link rel="shortcut icon" href="/steve/static/images/favicon.ico" type="image/x-icon" />
     <link rel="stylesheet" type="text/css" href="/steve/static/css/style.css">
+    <link rel="stylesheet" type="text/css" href="/steve/static/css/jquery-ui.min.css">
+    <link rel="stylesheet" type="text/css" href="/steve/static/css/jquery-ui-timepicker-addon.min.css">
     <script type="text/javascript" src="/steve/static/js/jquery-2.0.3.min.js" ></script>
+    <script type="text/javascript" src="/steve/static/js/jquery-ui.min.js" ></script>
+    <script type="text/javascript" src="/steve/static/js/jquery-ui-timepicker-addon.min.js" ></script>
     <script type="text/javascript" src="/steve/static/js/script.js" ></script>
     <title>SteVe - Steckdosenverwaltung</title>
 </head>

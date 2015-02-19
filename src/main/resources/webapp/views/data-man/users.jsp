@@ -2,6 +2,7 @@
 <script type="text/javascript">
     $(document).ready(function() {
         <%@ include file="../../static/js/snippets/populateUpdate.js" %>
+        <%@ include file="../../static/js/snippets/dateTimePicker-future.js" %>
     });
 </script>
 <spring:hasBindErrors name="userAddForm">
@@ -59,9 +60,9 @@
                             </c:forEach>
                         </form:select>
 					</td></tr>
-				<tr><td>Expiry Date/Time (ex: 2011-12-21 11:30):</td>
+				<tr><td>Expiry Date/Time:</td>
 					<td>
-                        <form:input path="expiration" placeholder="optional"/>
+                        <form:input path="expiration" placeholder="optional" cssClass="dateTimePicker"/>
 					</td>
 				</tr>
 				<tr><td></td><td id="add_space"><input type="submit" value="Add"></td></tr>
@@ -88,9 +89,9 @@
                         </c:forEach>
                     </form:select>
 				</td></tr>
-				<tr><td>Expiry Date/Time (ex: 2011-12-21 11:30):</td>
+				<tr><td>Expiry Date/Time:</td>
 					<td>
-                        <form:input path="expiration" id="update-exdateTime" disabled="true"/>
+                        <form:input path="expiration" id="update-exdateTime" disabled="true" cssClass="dateTimePicker"/>
 					</td>
 				</tr>
 				<tr><td>Block the ID Tag:</td>

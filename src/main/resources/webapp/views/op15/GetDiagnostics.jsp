@@ -1,5 +1,10 @@
 <%@ include file="../00-header.jsp" %>
 <%@ include file="../00-op-bind-errors.jsp" %>
+<script type="text/javascript">
+    $(document).ready(function() {
+        <%@ include file="../../static/js/snippets/dateTimePicker-past.js" %>
+    });
+</script>
 <div class="content">
 <div class="left-menu">
 <ul>
@@ -30,14 +35,14 @@
         <tr><td>Location (directory URI):</td><td><form:input path="location" /></td></tr>
         <tr><td>Retries (integer):</td><td><form:input path="retries" placeholder="optional" /></td></tr>
         <tr><td>Retry Interval (integer):</td><td><form:input path="retryInterval" placeholder="optional" /></td></tr>
-        <tr><td>Start Date/Time (ex: 2011-12-21 11:30):</td>
+        <tr><td>Start Date/Time:</td>
             <td>
-                <form:input path="start" placeholder="optional"/>
+                <form:input path="start" placeholder="optional" cssClass="dateTimePicker"/>
             </td>
         </tr>
-        <tr><td>Stop Date/Time (ex: 2011-12-21 11:30):</td>
+        <tr><td>Stop Date/Time:</td>
             <td>
-                <form:input path="stop" placeholder="optional"/>
+                <form:input path="stop" placeholder="optional" cssClass="dateTimePicker"/>
             </td>
         </tr>
     </table>

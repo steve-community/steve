@@ -38,16 +38,16 @@ Access the Web interface:
 
 Screenshots
 -----
-1. [Home](https://raw.github.com/RWTH-i5-IDSG/steve/master/resources/screenshots/home.png)
-2. [Heartbeats](https://raw.github.com/RWTH-i5-IDSG/steve/master/resources/screenshots/heartbeats.png)
-3. [Connector Status](https://raw.github.com/RWTH-i5-IDSG/steve/master/resources/screenshots/connector-status.png)
-4. [Data Management - Reservations](https://raw.github.com/RWTH-i5-IDSG/steve/master/resources/screenshots/reservations.png)
-5. [Data Management - Charge Points](https://raw.github.com/RWTH-i5-IDSG/steve/master/resources/screenshots/chargepoints.png)
-6. [Data Management - Users](https://raw.github.com/RWTH-i5-IDSG/steve/master/resources/screenshots/users.png)
-7. [Data Management - Transactions](https://raw.github.com/RWTH-i5-IDSG/steve/master/resources/screenshots/transactions.png)
-8. [Operations - OCPP v1.2](https://raw.github.com/RWTH-i5-IDSG/steve/master/resources/screenshots/ocpp12.png)
-9. [Operations - OCPP v1.5](https://raw.github.com/RWTH-i5-IDSG/steve/master/resources/screenshots/ocpp15.png)
-10. [Settings](https://raw.github.com/RWTH-i5-IDSG/steve/master/resources/screenshots/settings.png)
+1. [Home](website/screenshots/home.png)
+2. [Heartbeats](website/screenshots/heartbeats.png)
+3. [Connector Status](website/screenshots/connector-status.png)
+4. [Data Management - Reservations](website/screenshots/reservations.png)
+5. [Data Management - Charge Points](website/screenshots/chargepoints.png)
+6. [Data Management - Users](website/screenshots/users.png)
+7. [Data Management - Transactions](website/screenshots/transactions.png)
+8. [Operations - OCPP v1.2](website/screenshots/ocpp12.png)
+9. [Operations - OCPP v1.5](website/screenshots/ocpp15.png)
+10. [Settings](website/screenshots/settings.png)
 
 Change log
 -----

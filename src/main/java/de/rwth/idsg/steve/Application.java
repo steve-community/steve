@@ -41,10 +41,16 @@ public class Application {
         Auth.PASSWORD   = prop.getProperty("auth.password");
 
         Jetty.SERVER_HOST           = prop.getProperty("server.host");
-        Jetty.SERVER_PORT           = Integer.valueOf(prop.getProperty("server.port"));
-        Jetty.SSL_ENABLED           = Boolean.valueOf(prop.getProperty("ssl.enabled"));
-        Jetty.SSL_SERVER_PORT       = Integer.valueOf(prop.getProperty("ssl.server.port"));
+        Jetty.HTTP_ENABLED          = Boolean.valueOf(prop.getProperty("http.enabled"));
+        Jetty.HTTP_PORT             = Integer.valueOf(prop.getProperty("http.port"));
+        Jetty.HTTPS_ENABLED         = Boolean.valueOf(prop.getProperty("https.enabled"));
+        Jetty.HTTPS_PORT            = Integer.valueOf(prop.getProperty("https.port"));
         Jetty.KEY_STORE_PATH        = prop.getProperty("keystore.path");
         Jetty.KEY_STORE_PASSWORD    = prop.getProperty("keystore.password");
+
+        if (!(Jetty.HTTP_ENABLED || Jetty.HTTPS_ENABLED)) {
+            throw new IllegalArgumentException(
+                    "HTTP and HTTPS are both disabled. Well, how do you want to access the server, then?");
+        }
     }
 }

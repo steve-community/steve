@@ -27,11 +27,14 @@ public final class SteveConfiguration {
      */
     public static final class Jetty {
         public static String SERVER_HOST;
-        public static int SERVER_PORT;
 
-        // SSL
-        public static boolean SSL_ENABLED;
-        public static int SSL_SERVER_PORT;
+        // HTTP
+        public static boolean HTTP_ENABLED;
+        public static int HTTP_PORT;
+
+        // HTTPS
+        public static boolean HTTPS_ENABLED;
+        public static int HTTPS_PORT;
         public static String KEY_STORE_PATH;
         public static String KEY_STORE_PASSWORD;
     }

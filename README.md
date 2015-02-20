@@ -19,7 +19,7 @@ Requirements & Configuration
 3. Configuration is defined in [main.properties](src/main/resources/main.properties):
   - You _must_ change [database configuration](src/main/resources/main.properties#L3-L5)
   - You _can_ change [web interface credentials](src/main/resources/main.properties#L9-L10)
-  - Optional: To access the application via HTTPS, ...
+  - You _can_ access the application via HTTPS, by [enabling it and setting the keystore properties](src/main/resources/main.properties#L23-L26)
   
 How to use?
 -----

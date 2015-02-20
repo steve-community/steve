@@ -8,16 +8,15 @@ import org.joda.time.format.DateTimeFormatter;
 import java.sql.Timestamp;
 
 /**
- *
  * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
- * 
  */
 public final class DateTimeUtils {
     private DateTimeUtils() {}
 
     private static final DateTimeFormatter HUMAN_FORMATTER = DateTimeFormat.forPattern("yyyy-MM-dd 'at' HH:mm");
+    private static final DateTimeFormatter TIME_FORMATTER = DateTimeFormat.forPattern("HH:mm");
 
-    public static Timestamp getCurrentTimestamp(){
+    public static Timestamp getCurrentTimestamp() {
         return new Timestamp(new DateTime().getMillis());
     }
 
@@ -30,61 +29,32 @@ public final class DateTimeUtils {
     }
 
     /**
-     * Converts a Timestamp to a String of the pattern "yyyy-MM-dd 'at' HH:mm".
-     */
-    private static String toString(Timestamp ts){
-        if (ts == null) {
-            return "";
-        }
-
-        long timeLong = ts.getTime();
-        return HUMAN_FORMATTER.print(timeLong);
-    }
-
-    /**
      * Print the date/time nicer, if it's from today, yesterday or tomorrow.
      */
-    public static String humanize(Timestamp ts){
-        if (ts == null) {
-            return "";
-        }
+    public static String humanize(Timestamp ts) {
+        if (ts == null) return "";
 
         DateTime input = new DateTime(ts);
-        DateTime now = new DateTime();
-
-        String result;
 
         // Equalize time fields before comparing date fields
         DateTime inputAtMidnight = input.withTimeAtStartOfDay();
-        DateTime todayAtMidnight = now.withTimeAtStartOfDay();
+        DateTime todayAtMidnight = new DateTime().withTimeAtStartOfDay();
 
         // Is it today?
         if (inputAtMidnight.equals(todayAtMidnight)) {
-            result = "Today at " + DateTimeFormat.forPattern("HH:mm").print(input);
-
-//			PeriodFormatter pf = new PeriodFormatterBuilder()
-//					.printZeroNever()
-//					.appendHours().appendSuffix(" hour ", " hours ")
-//					.appendMinutes().appendSuffix(" minute ", " minutes ")
-//					.toFormatter();
-//			
-//			String elapsed = pf.print(new Period(input, now));			
-//			if (elapsed.length() == 0) elapsed = "Less than a minute ";			
-//			result.append(elapsed).append(" ago");				
+            return "Today at " + TIME_FORMATTER.print(input);
 
         // Is it yesterday?
         } else if (inputAtMidnight.equals(todayAtMidnight.minusDays(1))) {
-            result = "Yesterday at " + DateTimeFormat.forPattern("HH:mm").print(input);
+            return "Yesterday at " + TIME_FORMATTER.print(input);
 
         // Is it tomorrow?
         } else if (inputAtMidnight.equals(todayAtMidnight.plusDays(1))) {
-            result = "Tomorrow at " + DateTimeFormat.forPattern("HH:mm").print(input);
+            return "Tomorrow at " + TIME_FORMATTER.print(input);
 
         // So long ago OR in the future...
         } else {
-            result = toString(ts);
+            return HUMAN_FORMATTER.print(input);
         }
-
-        return result;
     }
 }

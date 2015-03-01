@@ -1,7 +1,3 @@
-## Disclaimer: This branch is for migrating to latest versions of dependencies plus Jetty, Jooq, Spring MVC and Hibernate Validator. The aim is to refactor in order to improve the overall design. Everything is experimental, unfinished, subject to change and break. Don't use it. When done, it will be merged with the master branch. So... Really, don't use it.
-
----
-
 ![SteVe](src/main/resources/webapp/static/images/logo.png)
 =====
 

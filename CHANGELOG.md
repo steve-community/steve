@@ -1,3 +1,13 @@
+## 1.0.2
+Complete rewrite of the backend:
+
+ - Using Spring, Hibernate Validator and JOOQ with the embedded Jetty server now. Doing database migrations with Flyway.
+ - Printing form validation errors on the Web page.
+ - Switched to async OCPP calls. "Tasks" menu to track the call results.
+ - Transactions can be exported as CSV.
+ - Better reservation modeling and handling.
+ - Date and time picker for Web frontend.
+ 
 ## 1.0.1
  - Fix: Start and stop date/time values for Get Diagnostics must be in the past. Frontend allows to do that now.
  - New: Backend validates input date/time variables for Get Diagnostics.

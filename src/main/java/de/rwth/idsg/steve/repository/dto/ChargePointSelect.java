@@ -9,6 +9,6 @@ import lombok.Getter;
  */
 @Getter
 @Builder
-public class ChargePointSelect {
-    private String chargeBoxId, endpointAddress;
+public final class ChargePointSelect {
+    private final String chargeBoxId, endpointAddress;
 }

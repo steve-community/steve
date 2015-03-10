@@ -11,7 +11,7 @@ import lombok.Getter;
 @Getter
 @Builder
 public final class Reservation {
-    private int id;
-    private Integer transactionId;
-    private String idTag, chargeBoxId, startDatetime, expiryDatetime, status;
+    private final int id;
+    private final Integer transactionId;
+    private final String idTag, chargeBoxId, startDatetime, expiryDatetime, status;
 }

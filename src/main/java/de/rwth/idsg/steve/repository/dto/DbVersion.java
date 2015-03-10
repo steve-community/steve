@@ -10,5 +10,5 @@ import lombok.Getter;
 @Getter
 @Builder
 public final class DbVersion {
-    private String version, updateTimestamp;
+    private final String version, updateTimestamp;
 }

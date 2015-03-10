@@ -11,6 +11,6 @@ import lombok.Getter;
 @Getter
 @Builder
 public final class User {
-    private String idTag, parentIdTag, expiryDate;
-    private boolean inTransaction, blocked;
+    private final String idTag, parentIdTag, expiryDate;
+    private final boolean inTransaction, blocked;
 }

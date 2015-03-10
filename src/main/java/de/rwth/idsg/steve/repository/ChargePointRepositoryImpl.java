@@ -54,12 +54,14 @@ public class ChargePointRepositoryImpl implements ChargePointRepository {
      * SELECT chargeBoxId, endpoint_address
      * FROM chargebox
      * WHERE ocppVersion = ?
+     * AND endpoint_address IS NOT NULL
      */
     private List<ChargePointSelect> internalGetChargePoints(OcppVersion version) {
         return DSL.using(config)
                   .select(CHARGEBOX.CHARGEBOXID, CHARGEBOX.ENDPOINT_ADDRESS)
                   .from(CHARGEBOX)
                   .where(CHARGEBOX.OCPPVERSION.equal(version.getValue()))
+                  .and(CHARGEBOX.ENDPOINT_ADDRESS.isNotNull())
                   .fetch()
                   .map(new ChargePointSelectMapper());
     }

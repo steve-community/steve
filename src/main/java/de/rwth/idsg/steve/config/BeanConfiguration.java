@@ -4,6 +4,8 @@ import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import de.rwth.idsg.steve.SteveConfiguration;
 import de.rwth.idsg.steve.web.GsonHttpMessageConverter;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 import org.jooq.SQLDialect;
 import org.jooq.conf.Settings;
 import org.jooq.impl.DataSourceConnectionProvider;
@@ -58,6 +60,10 @@ public class BeanConfiguration extends WebMvcConfigurerAdapter {
     @Bean
     @Qualifier("jooqConfig")
     public org.jooq.Configuration jooqConfig() {
+
+        // Disable the Jooq logo in logs
+        // https://github.com/jOOQ/jOOQ/issues/4019
+        Logger.getLogger(org.jooq.Constants.class).setLevel(Level.WARN);
 
         initDataSource();
 

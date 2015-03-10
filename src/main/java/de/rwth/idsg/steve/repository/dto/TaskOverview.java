@@ -12,9 +12,9 @@ import org.joda.time.DateTime;
 @Getter
 @EqualsAndHashCode
 @Builder
-public class TaskOverview implements Comparable<TaskOverview> {
-    private int taskId, responseCount, requestCount;
-    private DateTime start, end;
+public final class TaskOverview implements Comparable<TaskOverview> {
+    private final int taskId, responseCount, requestCount;
+    private final DateTime start, end;
 
     /**
      * We want the tasks to be printed in descending order.

@@ -26,7 +26,7 @@ public class RequestTaskStoreImpl implements RequestTaskStore {
 
     @Override
     public List<TaskOverview> getOverview() {
-        List<TaskOverview> list = new ArrayList<>();
+        List<TaskOverview> list = new ArrayList<>(lookupTable.size());
         for (Map.Entry<Integer, RequestTask> entry : lookupTable.entrySet()) {
             RequestTask r = entry.getValue();
             list.add(

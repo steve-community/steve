@@ -11,7 +11,7 @@ import lombok.Getter;
 @Getter
 @Builder
 public final class ChargePoint {
-    private String chargeBoxId, endpointAddress, ocppVersion, chargePointVendor, chargePointModel,
+    private final String chargeBoxId, endpointAddress, ocppVersion, chargePointVendor, chargePointModel,
             chargePointSerialNumber, chargeBoxSerialNumber, firewireVersion, firewireUpdateStatus,
             firewireUpdateTimestamp, iccid, imsi, meterType, meterSerialNumber, diagnosticsStatus,
             diagnosticsTimestamp, lastHeartbeatTimestamp;

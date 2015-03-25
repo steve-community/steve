@@ -157,25 +157,8 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
             public void run(Configuration configuration) throws Exception {
                 DSLContext ctx = DSL.using(configuration);
 
-                // -------------------------------------------------------------------------
-                // Step 1: For the first boot of the chargebox, insert its connectors in DB.
-                //         For next boots, IGNORE
-                // -------------------------------------------------------------------------
-
-                /**
-                 * INSERT IGNORE INTO connector (chargeBoxId, connectorId) VALUES (?,?)
-                 */
-                int count = ctx.insertInto(CONNECTOR,
-                                    CONNECTOR.CHARGEBOXID, CONNECTOR.CONNECTORID)
-                               .values(chargeBoxIdentity, connectorId)
-                               .onDuplicateKeyIgnore() // Important detail
-                               .execute();
-
-                if (count >= 1) {
-                    log.info("The connector {}/{} is NEW, and inserted into DB.", chargeBoxIdentity, connectorId);
-                } else {
-                    log.debug("The connector {}/{} is ALREADY known to DB.", chargeBoxIdentity, connectorId);
-                }
+                // Step 1
+                insertIgnoreConnector(ctx, chargeBoxIdentity, connectorId);
 
                 // -------------------------------------------------------------------------
                 // Step 2: We store a log of connector statuses
@@ -220,6 +203,8 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
             @Override
             public void run(Configuration configuration) throws Exception {
                 DSLContext ctx = DSL.using(configuration);
+
+                insertIgnoreConnector(ctx, chargeBoxIdentity, connectorId);
                 int connectorPk = getConnectorPkFromConnector(ctx, chargeBoxIdentity, connectorId);
                 batchInsertMeterValues12(ctx, list, connectorPk);
             }
@@ -234,6 +219,8 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
             @Override
             public void run(Configuration configuration) throws Exception {
                 DSLContext ctx = DSL.using(configuration);
+
+                insertIgnoreConnector(ctx, chargeBoxIdentity, connectorId);
                 int connectorPk = getConnectorPkFromConnector(ctx, chargeBoxIdentity, connectorId);
                 batchInsertMeterValues15(ctx, list, connectorPk, transactionId);
             }
@@ -276,6 +263,8 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
             @Override
             public Integer run(Configuration configuration) throws Exception {
                 DSLContext ctx = DSL.using(configuration);
+
+                insertIgnoreConnector(ctx, chargeBoxIdentity, connectorId);
 
                 // -------------------------------------------------------------------------
                 // Step 1: Insert transaction
@@ -337,6 +326,23 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
     // -------------------------------------------------------------------------
     // Helpers
     // -------------------------------------------------------------------------
+
+    /**
+     * If the connector information was not received before, insert it. Otherwise, ignore.
+     *
+     * INSERT IGNORE INTO connector (chargeBoxId, connectorId) VALUES (?,?)
+     */
+    private void insertIgnoreConnector(DSLContext ctx, String chargeBoxIdentity, int connectorId) {
+        int count = ctx.insertInto(CONNECTOR,
+                            CONNECTOR.CHARGEBOXID, CONNECTOR.CONNECTORID)
+                       .values(chargeBoxIdentity, connectorId)
+                       .onDuplicateKeyIgnore() // Important detail
+                       .execute();
+
+        if (count == 1) {
+            log.info("The connector {}/{} is NEW, and inserted into DB.", chargeBoxIdentity, connectorId);
+        }
+    }
 
     /**
      * SELECT connector_pk

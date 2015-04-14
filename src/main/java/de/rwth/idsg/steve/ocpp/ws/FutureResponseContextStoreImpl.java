@@ -45,11 +45,11 @@ public class FutureResponseContextStoreImpl implements FutureResponseContextStor
 
     @Override
     public FutureResponseContext get(String chargeBoxId, String messageId) {
-        Map<String, FutureResponseContext> map = lookupTable.remove(chargeBoxId);
+        Map<String, FutureResponseContext> map = lookupTable.get(chargeBoxId);
         if (map == null) {
             throw new SteveException("chargeBoxId '" + chargeBoxId + "' is not in store");
         } else {
-            return map.get(messageId);
+            return map.remove(messageId);
         }
     }
 }

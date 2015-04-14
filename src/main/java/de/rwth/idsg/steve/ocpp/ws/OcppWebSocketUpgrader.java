@@ -1,0 +1,85 @@
+package de.rwth.idsg.steve.ocpp.ws;
+
+import de.rwth.idsg.steve.ocpp.ws.ocpp12.Ocpp12WebSocketEndpoint;
+import de.rwth.idsg.steve.ocpp.ws.ocpp15.Ocpp15WebSocketEndpoint;
+import de.rwth.idsg.steve.repository.ChargePointRepository;
+import org.eclipse.jetty.websocket.api.WebSocketPolicy;
+import org.eclipse.jetty.websocket.server.WebSocketServerFactory;
+import org.springframework.http.server.ServerHttpRequest;
+import org.springframework.http.server.ServerHttpResponse;
+import org.springframework.web.socket.WebSocketExtension;
+import org.springframework.web.socket.WebSocketHandler;
+import org.springframework.web.socket.server.HandshakeFailureException;
+import org.springframework.web.socket.server.jetty.JettyRequestUpgradeStrategy;
+
+import java.security.Principal;
+import java.util.List;
+import java.util.Map;
+
+/**
+ * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
+ * @since 13.03.2015
+ */
+public class OcppWebSocketUpgrader extends JettyRequestUpgradeStrategy {
+    private final Ocpp12WebSocketEndpoint ocpp12WebSocketEndpoint;
+    private final Ocpp15WebSocketEndpoint ocpp15WebSocketEndpoint;
+    private final ChargePointRepository chargePointRepository;
+
+    private final static String PROTOCOL_OCPP12 = "ocpp1.2";
+    private final static String PROTOCOL_OCPP15 = "ocpp1.5";
+
+    public OcppWebSocketUpgrader(WebSocketPolicy policy,
+                                 Ocpp12WebSocketEndpoint ocpp12WebSocketEndpoint,
+                                 Ocpp15WebSocketEndpoint ocpp15WebSocketEndpoint,
+                                 ChargePointRepository chargePointRepository) {
+
+        super(new WebSocketServerFactory(policy));
+        this.ocpp12WebSocketEndpoint = ocpp12WebSocketEndpoint;
+        this.ocpp15WebSocketEndpoint = ocpp15WebSocketEndpoint;
+        this.chargePointRepository = chargePointRepository;
+    }
+
+    @Override
+    public void upgrade(ServerHttpRequest request, ServerHttpResponse response,
+                        String selectedProtocol, List<WebSocketExtension> selectedExtensions, Principal user,
+                        WebSocketHandler wsHandler, Map<String, Object> attributes) throws HandshakeFailureException {
+
+        // -------------------------------------------------------------------------
+        // 1. Check the chargeBoxId
+        // -------------------------------------------------------------------------
+
+        String chargeBoxId = getLastBitFromUrl(request.getURI().getPath());
+        if (chargePointRepository.isRegistered(chargeBoxId)) {
+            attributes.put(AbstractWebSocketEndpoint.CHARGEBOX_ID_KEY, chargeBoxId);
+        } else {
+            throw new HandshakeFailureException("ChargeBoxId '" + chargeBoxId +"' is not registered");
+        }
+
+        // -------------------------------------------------------------------------
+        // 2. Route according to the selected protocol
+        // -------------------------------------------------------------------------
+
+        AbstractWebSocketEndpoint webSocketHandler;
+        if (selectedProtocol == null) {
+            throw new HandshakeFailureException("No protocol (OCPP version) is specified.");
+
+        } else if (PROTOCOL_OCPP12.equals(selectedProtocol)) {
+            webSocketHandler = ocpp12WebSocketEndpoint;
+
+        } else if (PROTOCOL_OCPP15.equals(selectedProtocol)) {
+            webSocketHandler = ocpp15WebSocketEndpoint;
+
+        } else {
+            throw new HandshakeFailureException("Requested protocol '" + selectedProtocol + "' is not supported");
+        }
+
+        super.upgrade(request, response, selectedProtocol, selectedExtensions, user, webSocketHandler, attributes);
+    }
+
+    /**
+     * Taken from: http://stackoverflow.com/a/4050276
+     */
+    private static String getLastBitFromUrl(final String url) {
+        return url.replaceFirst(".*/([^/?]+).*", "$1");
+    }
+}

@@ -1,5 +1,6 @@
 package de.rwth.idsg.steve.ocpp.ws;
 
+import de.rwth.idsg.steve.ocpp.OcppVersion;
 import de.rwth.idsg.steve.ocpp.ws.ocpp12.Ocpp12WebSocketEndpoint;
 import de.rwth.idsg.steve.ocpp.ws.ocpp15.Ocpp15WebSocketEndpoint;
 import de.rwth.idsg.steve.repository.ChargePointRepository;
@@ -24,9 +25,6 @@ public class OcppWebSocketUpgrader extends JettyRequestUpgradeStrategy {
     private final Ocpp12WebSocketEndpoint ocpp12WebSocketEndpoint;
     private final Ocpp15WebSocketEndpoint ocpp15WebSocketEndpoint;
     private final ChargePointRepository chargePointRepository;
-
-    private final static String PROTOCOL_OCPP12 = "ocpp1.2";
-    private final static String PROTOCOL_OCPP15 = "ocpp1.5";
 
     public OcppWebSocketUpgrader(WebSocketPolicy policy,
                                  Ocpp12WebSocketEndpoint ocpp12WebSocketEndpoint,
@@ -63,10 +61,10 @@ public class OcppWebSocketUpgrader extends JettyRequestUpgradeStrategy {
         if (selectedProtocol == null) {
             throw new HandshakeFailureException("No protocol (OCPP version) is specified.");
 
-        } else if (PROTOCOL_OCPP12.equals(selectedProtocol)) {
+        } else if (OcppVersion.V_12.getValue().equals(selectedProtocol)) {
             webSocketHandler = ocpp12WebSocketEndpoint;
 
-        } else if (PROTOCOL_OCPP15.equals(selectedProtocol)) {
+        } else if (OcppVersion.V_15.getValue().equals(selectedProtocol)) {
             webSocketHandler = ocpp15WebSocketEndpoint;
 
         } else {

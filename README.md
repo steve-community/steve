@@ -58,8 +58,3 @@ Screenshots
 Change log
 -----
 See the [CHANGELOG](CHANGELOG.md)
-
-To-Do List
------
-1. Hubject/OICP integration
-2. Pagination for data tables

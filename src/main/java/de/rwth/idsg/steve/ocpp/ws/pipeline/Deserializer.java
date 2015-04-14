@@ -52,17 +52,17 @@ public class Deserializer implements Stage {
 
             MessageType messageType = MessageType.fromTypeNr(messageTypeNr);
             switch (messageType) {
-                        case CALL:
-                            handleCall(context, messageId, parser);
-                            break;
+                case CALL:
+                    handleCall(context, messageId, parser);
+                    break;
 
-                        case CALL_RESULT:
-                            handleResult(context, messageId, parser);
-                            break;
+                case CALL_RESULT:
+                    handleResult(context, messageId, parser);
+                    break;
 
-                        case CALL_ERROR:
-                            handleError(context, messageId, parser);
-                            break;
+                case CALL_ERROR:
+                    handleError(context, messageId, parser);
+                    break;
             }
         } catch (IOException e) {
             throw new SteveException("Deserialization of incoming string failed: " + context.getIncomingString(), e);

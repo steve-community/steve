@@ -1,17 +1,27 @@
 ![SteVe](src/main/resources/webapp/static/images/logo.png)
 =====
 
-SteVe was developed at the RWTH Aachen University and means Steckdosenverwaltung, namely socket administration in German. The aim of SteVe is to support the deployment and popularity of electric mobility, so it is easy to install and to use. SteVe provides basic functions for the administration of charge points, user data, and RFID cards for user authentication. It supports Open Charge Point Protocol (OCPP) 1.5 and 1.2 and was tested successfully in operation.
+SteVe was developed at the RWTH Aachen University and means Steckdosenverwaltung, namely socket administration in German. The aim of SteVe is to support the deployment and popularity of electric mobility, so it is easy to install and to use. SteVe provides basic functions for the administration of charge points, user data, and RFID cards for user authentication and was tested successfully in operation.
 
 SteVe is considered as an open platform to implement, test and evaluate novel ideas for electric mobility, like authentication protocols, reservation mechanisms for charge points, and business models for electric mobility. SteVe is distributed under GPL and is free to use. If you are going to deploy SteVe we are happy to see the logo on a charge point.
+
+Supported OCPP protocols
+-----
+
+* OCPP1.2S
+* OCPP1.5S
+* OCPP1.2J
+* OCPP1.5J
 
 Requirements & Configuration
 -----
 
 1. You need JDK 7, Maven and MySQL.
 
-2. The HTTP URL of the OCPP service is **http://**`your-server-ip:port`**/steve/services/CentralSystemService**. The charge points must be configured to communicate with this address. Depending on the OCPP version of the charge point, SteVe will automatically route messages to the version-specific implementation.
-
+2. The charge points must be configured to communicate with following addresses. Depending on the OCPP version of the charge point, SteVe will automatically route messages to the version-specific implementation.
+  - SOAP: `http://<your-server-ip>:<port>/steve/services/CentralSystemService`
+  - WebSocket/JSON: `http://<your-server-ip>:<port>/steve/websocket/CentralSystemService/<chargeBoxId>`
+   
 3. Configuration is defined in [main.properties](src/main/resources/main.properties):
   - You _must_ change [database configuration](src/main/resources/main.properties#L3-L5)
   - You _can_ change [web interface credentials](src/main/resources/main.properties#L9-L10)

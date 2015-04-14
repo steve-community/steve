@@ -1,30 +1,21 @@
 package de.rwth.idsg.steve.handler.ocpp12;
 
+import de.rwth.idsg.steve.handler.AbstractOcppResponseHandler;
 import de.rwth.idsg.steve.web.RequestTask;
-import lombok.RequiredArgsConstructor;
 import ocpp.cp._2010._08.ChangeConfigurationResponse;
-
-import javax.xml.ws.AsyncHandler;
-import javax.xml.ws.Response;
-import java.util.concurrent.CancellationException;
-import java.util.concurrent.ExecutionException;
 
 /**
  * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
  * @since 30.12.2014
  */
-@RequiredArgsConstructor
-public class ChangeConfigurationResponseHandler implements AsyncHandler<ChangeConfigurationResponse> {
-    private final RequestTask requestTask;
-    private final String chargeBoxId;
+public class ChangeConfigurationResponseHandler extends AbstractOcppResponseHandler<ChangeConfigurationResponse> {
+
+    public ChangeConfigurationResponseHandler(RequestTask requestTask, String chargeBoxId) {
+        super(requestTask, chargeBoxId);
+    }
 
     @Override
-    public void handleResponse(Response<ChangeConfigurationResponse> res) {
-        try {
-            requestTask.addNewResponse(chargeBoxId, res.get().getStatus().value());
-
-        } catch (InterruptedException | CancellationException | ExecutionException e) {
-            requestTask.addNewError(chargeBoxId, e);
-        }
+    public void handleResult(ChangeConfigurationResponse response) {
+        requestTask.addNewResponse(chargeBoxId, response.getStatus().value());
     }
 }

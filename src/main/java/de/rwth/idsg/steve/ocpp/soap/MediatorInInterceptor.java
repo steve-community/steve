@@ -1,4 +1,4 @@
-package de.rwth.idsg.steve;
+package de.rwth.idsg.steve.ocpp.soap;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.cxf.Bus;

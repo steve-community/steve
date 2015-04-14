@@ -1,7 +1,7 @@
 package de.rwth.idsg.steve.config;
 
-import de.rwth.idsg.steve.MediatorInInterceptor;
-import de.rwth.idsg.steve.MessageIdInterceptor;
+import de.rwth.idsg.steve.ocpp.soap.MediatorInInterceptor;
+import de.rwth.idsg.steve.ocpp.soap.MessageIdInterceptor;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.apache.cxf.jaxws.JaxWsServerFactoryBean;
 import org.apache.cxf.ws.addressing.WSAddressingFeature;

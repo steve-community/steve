@@ -3,11 +3,11 @@
 	<tr>
 		<td style="vertical-align:top">Select one:</td>
 		<td>
-			<select name="chargePointSelectList" id="chargePointSelectList" size="5" required>
-			<c:forEach items="${cpList}" var="cp">
-			<option value="${cp.chargeBoxId};${cp.endpointAddress}">${cp.chargeBoxId} &#8212; ${cp.endpointAddress}</option>
-			</c:forEach>
-			</select>
+			<form:select path="chargePointSelectList" size="5" multiple="false">
+				<c:forEach items="${cpList}" var="cp">
+					<form:option value="${cp.ocppTransport};${cp.chargeBoxId};${cp.endpointAddress}" label="${cp.chargeBoxId}"/>
+				</c:forEach>
+			</form:select>
 		</td>
 	</tr>
 </table>

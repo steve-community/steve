@@ -5,11 +5,11 @@
             <input type="button" value="Select All" onClick="selectAll(document.getElementById('chargePointSelectList'))"><input type="button" value="Select None" onClick="selectNone(document.getElementById('chargePointSelectList'))">
         </td>
 		<td>
-			<select name="chargePointSelectList" id="chargePointSelectList" size="5" multiple required>
-			<c:forEach items="${cpList}" var="cp">
-			<option value="${cp.chargeBoxId};${cp.endpointAddress}">${cp.chargeBoxId} &#8212; ${cp.endpointAddress}</option>
-			</c:forEach>
-			</select>
+			<form:select path="chargePointSelectList" size="5" multiple="true">
+				<c:forEach items="${cpList}" var="cp">
+					<form:option value="${cp.ocppTransport};${cp.chargeBoxId};${cp.endpointAddress}" label="${cp.chargeBoxId}"/>
+				</c:forEach>
+			</form:select>
 		</td>
 	</tr>
 </table>

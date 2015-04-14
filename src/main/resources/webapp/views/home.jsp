@@ -17,6 +17,19 @@
 		Number of<br>Active Transactions
 		<span class="base formatNumber">${stats.numTransactions}</span>
 	</a>
+	<a class="tileRow2" href="/steve/manager/home/ocppJsonStatus">
+		Number of<br>Connected JSON Charge Points
+		<span class="baseTable">
+			<span class="baseRow">
+				<span class="baseCell">OCPP 1.2 :</span>
+				<span class="baseCell formatNumber">${stats.numOcpp12JSessions}</span>
+			</span>
+			<span class="baseRow">
+				<span class="baseCell">OCPP 1.5 :</span>
+				<span class="baseCell formatNumber">${stats.numOcpp15JSessions}</span>
+			</span>
+		</span>
+	</a>
 	<a class="tileRow2" href="/steve/manager/home/heartbeats">
 		Received Heartbeats
 		<span class="baseTable">

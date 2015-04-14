@@ -17,8 +17,6 @@ public abstract class AbstractOcppResponseHandler<T> implements OcppResponseHand
     protected final RequestTask requestTask;
     protected final String chargeBoxId;
 
-    private boolean exceptionHandled = false;
-
     @Override
     public void handleResponse(Response<T> res) {
         try {

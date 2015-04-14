@@ -20,7 +20,7 @@ Requirements & Configuration
 
 2. The charge points must be configured to communicate with following addresses. Depending on the OCPP version of the charge point, SteVe will automatically route messages to the version-specific implementation.
   - SOAP: `http://<your-server-ip>:<port>/steve/services/CentralSystemService`
-  - WebSocket/JSON: `http://<your-server-ip>:<port>/steve/websocket/CentralSystemService/<chargeBoxId>`
+  - WebSocket/JSON: `ws://<your-server-ip>:<port>/steve/websocket/CentralSystemService/<chargeBoxId>`
    
 3. Configuration is defined in [main.properties](src/main/resources/main.properties):
   - You _must_ change [database configuration](src/main/resources/main.properties#L3-L5)

@@ -1,7 +1,8 @@
-package de.rwth.idsg.steve.repository.dto;
+package de.rwth.idsg.steve.web.dto;
 
 import lombok.Builder;
 import lombok.Getter;
+import lombok.Setter;
 
 /**
  *
@@ -17,4 +18,7 @@ public final class Statistics {
     heartbeatToday, heartbeatYesterday, heartbeatEarlier,
     // Number of available, occupied, faulted and unavailable chargebox connectors
     connAvailable, connOccupied, connFaulted, connUnavailable;
+
+    // Number of open sessions (connections) to WebSocket/JSON chargeboxes
+    @Setter private int numOcpp12JSessions, numOcpp15JSessions;
 }

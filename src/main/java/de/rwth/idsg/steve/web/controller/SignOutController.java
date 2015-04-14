@@ -15,6 +15,7 @@ import javax.servlet.http.HttpServletResponse;
  * @since 15.08.2014
  */
 @Controller
+@RequestMapping(value = "/manager")
 public class SignOutController {
 
     @RequestMapping(value = "/signout", method = RequestMethod.GET)

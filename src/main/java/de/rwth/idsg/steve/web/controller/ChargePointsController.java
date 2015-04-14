@@ -19,7 +19,7 @@ import javax.validation.Valid;
  *
  */
 @Controller
-@RequestMapping(value = "/chargepoints")
+@RequestMapping(value = "/manager/chargepoints")
 public class ChargePointsController {
 
     @Autowired private ChargePointRepository chargePointRepository;

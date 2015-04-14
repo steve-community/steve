@@ -1,7 +1,8 @@
 package de.rwth.idsg.steve.service;
 
-import de.rwth.idsg.steve.OcppVersion;
 import de.rwth.idsg.steve.handler.ocpp15.*;
+import de.rwth.idsg.steve.ocpp.OcppVersion;
+import de.rwth.idsg.steve.ocpp.soap.ChargePointService15_SoapInvoker;
 import de.rwth.idsg.steve.repository.RequestTaskStore;
 import de.rwth.idsg.steve.repository.ReservationRepository;
 import de.rwth.idsg.steve.repository.UserRepository;
@@ -24,10 +25,8 @@ import de.rwth.idsg.steve.web.dto.ocpp15.ResetParams;
 import de.rwth.idsg.steve.web.dto.ocpp15.SendLocalListParams;
 import lombok.extern.slf4j.Slf4j;
 import ocpp.cp._2012._06.*;
-import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
@@ -37,36 +36,21 @@ import java.util.List;
 import static de.rwth.idsg.steve.utils.DateTimeUtils.toDateTime;
 
 /**
- * Client implementation of OCPP V1.5.
- * 
- * This class has methods to create request payloads, and methods to send these to charge points from dynamically created clients.
- * Since there are multiple charge points and their endpoint addresses vary, the clients need to be created dynamically.
+ * Transport-level agnostic client implementation of OCPP V1.5
+ * which builds the request payloads and delegates to an invoker.
  * 
  * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
- * 
  */
 @Slf4j
 @Service
 public class ChargePointService15_Client {
+    private static final OcppVersion VERSION = OcppVersion.V_15;
 
     @Autowired private UserRepository userRepository;
     @Autowired private UserService userService;
     @Autowired private ReservationRepository reservationRepository;
     @Autowired private RequestTaskStore requestTaskStore;
-
-    @Autowired
-    @Qualifier("ocpp15")
-    private JaxWsProxyFactoryBean factory;
-
-    private static final Object LOCK = new Object();
-
-    private ChargePointService create(String endpointAddress) {
-        // Should concurrency really be a concern?
-        synchronized (LOCK) {
-            factory.setAddress(endpointAddress);
-            return (ChargePointService) factory.create();
-        }
-    }
+    @Autowired private ChargePointService15_Dispatcher dispatcher;
 
     // -------------------------------------------------------------------------
     // Create Request Payloads
@@ -198,140 +182,120 @@ public class ChargePointService15_Client {
     public int changeAvailability(ChangeAvailabilityParams params) {
         ChangeAvailabilityRequest req = this.prepareChangeAvailability(params);
         List<ChargePointSelect> chargePointSelectList = params.getChargePointSelectList();
-        RequestTask requestTask = new RequestTask(OcppVersion.V_15, "Change Availability", chargePointSelectList);
+        RequestTask requestTask = new RequestTask(VERSION, "Change Availability", chargePointSelectList);
 
         for (ChargePointSelect c : chargePointSelectList) {
-            String chargeBoxId = c.getChargeBoxId();
-            ChangeAvailabilityResponseHandler handler = new ChangeAvailabilityResponseHandler(requestTask, chargeBoxId);
-            create(c.getEndpointAddress()).changeAvailabilityAsync(req, chargeBoxId, handler);
+            ChangeAvailabilityResponseHandler handler = new ChangeAvailabilityResponseHandler(requestTask, c.getChargeBoxId());
+            dispatcher.changeAvailability(c, req, handler);
         }
-
         return requestTaskStore.add(requestTask);
     }
 
     public int changeConfiguration(ChangeConfigurationParams params) {
         ChangeConfigurationRequest req = this.prepareChangeConfiguration(params);
         List<ChargePointSelect> chargePointSelectList = params.getChargePointSelectList();
-        RequestTask requestTask = new RequestTask(OcppVersion.V_15, "Change Configuration", chargePointSelectList);
+        RequestTask requestTask = new RequestTask(VERSION, "Change Configuration", chargePointSelectList);
 
         for (ChargePointSelect c : chargePointSelectList) {
-            String chargeBoxId = c.getChargeBoxId();
-            ChangeConfigurationResponseHandler handler = new ChangeConfigurationResponseHandler(requestTask, chargeBoxId);
-            create(c.getEndpointAddress()).changeConfigurationAsync(req, chargeBoxId, handler);
+            ChangeConfigurationResponseHandler handler = new ChangeConfigurationResponseHandler(requestTask, c.getChargeBoxId());
+            dispatcher.changeConfiguration(c, req, handler);
         }
-
         return requestTaskStore.add(requestTask);
     }
 
     public int clearCache(MultipleChargePointSelect params) {
         ClearCacheRequest req = this.prepareClearCache();
         List<ChargePointSelect> chargePointSelectList = params.getChargePointSelectList();
-        RequestTask requestTask = new RequestTask(OcppVersion.V_15, "Clear Cache", chargePointSelectList);
+        RequestTask requestTask = new RequestTask(VERSION, "Clear Cache", chargePointSelectList);
 
         for (ChargePointSelect c : chargePointSelectList) {
-            String chargeBoxId = c.getChargeBoxId();
-            ClearCacheResponseHandler handler = new ClearCacheResponseHandler(requestTask, chargeBoxId);
-            create(c.getEndpointAddress()).clearCacheAsync(req, chargeBoxId, handler);
+            ClearCacheResponseHandler handler = new ClearCacheResponseHandler(requestTask, c.getChargeBoxId());
+            dispatcher.clearCache(c, req, handler);
         }
-
         return requestTaskStore.add(requestTask);
     }
 
     public int getDiagnostics(GetDiagnosticsParams params) {
         GetDiagnosticsRequest req = this.prepareGetDiagnostics(params);
         List<ChargePointSelect> chargePointSelectList = params.getChargePointSelectList();
-        RequestTask requestTask = new RequestTask(OcppVersion.V_15, "Get Diagnostics", chargePointSelectList);
+        RequestTask requestTask = new RequestTask(VERSION, "Get Diagnostics", chargePointSelectList);
 
         for (ChargePointSelect c : chargePointSelectList) {
-            String chargeBoxId = c.getChargeBoxId();
-            GetDiagnosticsResponseHandler handler = new GetDiagnosticsResponseHandler(requestTask, chargeBoxId);
-            create(c.getEndpointAddress()).getDiagnosticsAsync(req, chargeBoxId, handler);
+            GetDiagnosticsResponseHandler handler = new GetDiagnosticsResponseHandler(requestTask, c.getChargeBoxId());
+            dispatcher.getDiagnostics(c, req, handler);
         }
-
         return requestTaskStore.add(requestTask);
     }
 
     public int reset(ResetParams params) {
         ResetRequest req = this.prepareReset(params);
         List<ChargePointSelect> chargePointSelectList = params.getChargePointSelectList();
-        RequestTask requestTask = new RequestTask(OcppVersion.V_15, "Reset", chargePointSelectList);
+        RequestTask requestTask = new RequestTask(VERSION, "Reset", chargePointSelectList);
 
         for (ChargePointSelect c : chargePointSelectList) {
-            String chargeBoxId = c.getChargeBoxId();
-            ResetResponseHandler handler = new ResetResponseHandler(requestTask, chargeBoxId);
-            create(c.getEndpointAddress()).resetAsync(req, chargeBoxId, handler);
+            ResetResponseHandler handler = new ResetResponseHandler(requestTask, c.getChargeBoxId());
+            dispatcher.reset(c, req, handler);
         }
-
         return requestTaskStore.add(requestTask);
     }
 
     public int updateFirmware(UpdateFirmwareParams params) {
         UpdateFirmwareRequest req = this.prepareUpdateFirmware(params);
         List<ChargePointSelect> chargePointSelectList = params.getChargePointSelectList();
-        RequestTask requestTask = new RequestTask(OcppVersion.V_15, "Update Firmware", chargePointSelectList);
+        RequestTask requestTask = new RequestTask(VERSION, "Update Firmware", chargePointSelectList);
 
         for (ChargePointSelect c : chargePointSelectList) {
-            String chargeBoxId = c.getChargeBoxId();
-            UpdateFirmwareResponseHandler handler = new UpdateFirmwareResponseHandler(requestTask, chargeBoxId);
-            create(c.getEndpointAddress()).updateFirmwareAsync(req, chargeBoxId, handler);
+            UpdateFirmwareResponseHandler handler = new UpdateFirmwareResponseHandler(requestTask, c.getChargeBoxId());
+            dispatcher.updateFirmware(c, req, handler);
         }
-
         return requestTaskStore.add(requestTask);
     }
 
     public int dataTransfer(DataTransferParams params) {
         DataTransferRequest req = this.prepareDataTransfer(params);
         List<ChargePointSelect> chargePointSelectList = params.getChargePointSelectList();
-        RequestTask requestTask = new RequestTask(OcppVersion.V_15, "Data Transfer", chargePointSelectList);
+        RequestTask requestTask = new RequestTask(VERSION, "Data Transfer", chargePointSelectList);
 
         for (ChargePointSelect c : chargePointSelectList) {
-            String chargeBoxId = c.getChargeBoxId();
-            DataTransferResponseHandler handler = new DataTransferResponseHandler(requestTask, chargeBoxId);
-            create(c.getEndpointAddress()).dataTransferAsync(req, chargeBoxId, handler);
+            DataTransferResponseHandler handler = new DataTransferResponseHandler(requestTask, c.getChargeBoxId());
+            dispatcher.dataTransfer(c, req, handler);
         }
-
         return requestTaskStore.add(requestTask);
     }
 
     public int getConfiguration(GetConfigurationParams params) {
         GetConfigurationRequest req = this.prepareGetConfiguration(params);
         List<ChargePointSelect> chargePointSelectList = params.getChargePointSelectList();
-        RequestTask requestTask = new RequestTask(OcppVersion.V_15, "Get Configuration", chargePointSelectList);
+        RequestTask requestTask = new RequestTask(VERSION, "Get Configuration", chargePointSelectList);
 
         for (ChargePointSelect c : chargePointSelectList) {
-            String chargeBoxId = c.getChargeBoxId();
-            GetConfigurationResponseHandler handler = new GetConfigurationResponseHandler(requestTask, chargeBoxId);
-            create(c.getEndpointAddress()).getConfigurationAsync(req, chargeBoxId, handler);
+            GetConfigurationResponseHandler handler = new GetConfigurationResponseHandler(requestTask, c.getChargeBoxId());
+            dispatcher.getConfiguration(c, req, handler);
         }
-
         return requestTaskStore.add(requestTask);
     }
 
     public int getLocalListVersion(MultipleChargePointSelect params) {
         GetLocalListVersionRequest req = this.prepareGetLocalListVersion();
         List<ChargePointSelect> chargePointSelectList = params.getChargePointSelectList();
-        RequestTask requestTask = new RequestTask(OcppVersion.V_15, "Get Local List Version", chargePointSelectList);
+        RequestTask requestTask = new RequestTask(VERSION, "Get Local List Version", chargePointSelectList);
 
         for (ChargePointSelect c : chargePointSelectList) {
-            String chargeBoxId = c.getChargeBoxId();
-            GetLocalListVersionResponseHandler handler = new GetLocalListVersionResponseHandler(requestTask, chargeBoxId);
-            create(c.getEndpointAddress()).getLocalListVersionAsync(req, chargeBoxId, handler);
+            GetLocalListVersionResponseHandler handler = new GetLocalListVersionResponseHandler(requestTask, c.getChargeBoxId());
+            dispatcher.getLocalListVersion(c, req, handler);
         }
-
         return requestTaskStore.add(requestTask);
     }
 
     public int sendLocalList(SendLocalListParams params) {
         SendLocalListRequest req = this.prepareSendLocalList(params);
         List<ChargePointSelect> chargePointSelectList = params.getChargePointSelectList();
-        RequestTask requestTask = new RequestTask(OcppVersion.V_15, "Send Local List", chargePointSelectList);
+        RequestTask requestTask = new RequestTask(VERSION, "Send Local List", chargePointSelectList);
 
         for (ChargePointSelect c : chargePointSelectList) {
-            String chargeBoxId = c.getChargeBoxId();
-            SendLocalListResponseHandler handler = new SendLocalListResponseHandler(requestTask, chargeBoxId);
-            create(c.getEndpointAddress()).sendLocalListAsync(req, chargeBoxId, handler);
+            SendLocalListResponseHandler handler = new SendLocalListResponseHandler(requestTask, c.getChargeBoxId());
+            dispatcher.sendLocalList(c, req, handler);
         }
-
         return requestTaskStore.add(requestTask);
     }
 
@@ -342,42 +306,33 @@ public class ChargePointService15_Client {
     public int remoteStartTransaction(RemoteStartTransactionParams params) {
         RemoteStartTransactionRequest req = this.prepareRemoteStartTransaction(params);
         List<ChargePointSelect> chargePointSelectList = params.getChargePointSelectList();
-        RequestTask requestTask = new RequestTask(OcppVersion.V_15, "Remote Start Transaction", chargePointSelectList);
+        RequestTask requestTask = new RequestTask(VERSION, "Remote Start Transaction", chargePointSelectList);
 
         ChargePointSelect c = chargePointSelectList.get(0);
-
-        String chargeBoxId = c.getChargeBoxId();
-        RemoteStartTransactionResponseHandler handler = new RemoteStartTransactionResponseHandler(requestTask, chargeBoxId);
-        create(c.getEndpointAddress()).remoteStartTransactionAsync(req, chargeBoxId, handler);
-
+        RemoteStartTransactionResponseHandler handler = new RemoteStartTransactionResponseHandler(requestTask, c.getChargeBoxId());
+        dispatcher.remoteStartTransaction(c, req, handler);
         return requestTaskStore.add(requestTask);
     }
 
     public int remoteStopTransaction(RemoteStopTransactionParams params) {
         RemoteStopTransactionRequest req = this.prepareRemoteStopTransaction(params);
         List<ChargePointSelect> chargePointSelectList = params.getChargePointSelectList();
-        RequestTask requestTask = new RequestTask(OcppVersion.V_15, "Remote Stop Transaction", chargePointSelectList);
+        RequestTask requestTask = new RequestTask(VERSION, "Remote Stop Transaction", chargePointSelectList);
 
         ChargePointSelect c = chargePointSelectList.get(0);
-
-        String chargeBoxId = c.getChargeBoxId();
-        RemoteStopTransactionResponseHandler handler = new RemoteStopTransactionResponseHandler(requestTask, chargeBoxId);
-        create(c.getEndpointAddress()).remoteStopTransactionAsync(req, chargeBoxId, handler);
-
+        RemoteStopTransactionResponseHandler handler = new RemoteStopTransactionResponseHandler(requestTask, c.getChargeBoxId());
+        dispatcher.remoteStopTransaction(c, req, handler);
         return requestTaskStore.add(requestTask);
     }
 
     public int unlockConnector(UnlockConnectorParams params) {
         UnlockConnectorRequest req = this.prepareUnlockConnector(params);
         List<ChargePointSelect> chargePointSelectList = params.getChargePointSelectList();
-        RequestTask requestTask = new RequestTask(OcppVersion.V_15, "Unlock Connector", chargePointSelectList);
+        RequestTask requestTask = new RequestTask(VERSION, "Unlock Connector", chargePointSelectList);
 
         ChargePointSelect c = chargePointSelectList.get(0);
-
-        String chargeBoxId = c.getChargeBoxId();
-        UnlockConnectorResponseHandler handler = new UnlockConnectorResponseHandler(requestTask, chargeBoxId);
-        create(c.getEndpointAddress()).unlockConnectorAsync(req, chargeBoxId, handler);
-
+        UnlockConnectorResponseHandler handler = new UnlockConnectorResponseHandler(requestTask, c.getChargeBoxId());
+        dispatcher.unlockConnector(c, req, handler);
         return requestTaskStore.add(requestTask);
     }
 
@@ -393,27 +348,22 @@ public class ChargePointService15_Client {
                                                          startTimestamp, expiryTimestamp);
 
         ReserveNowRequest req = this.prepareReserveNow(params, reservationId);
-        RequestTask requestTask = new RequestTask(OcppVersion.V_15, "Reserve Now", chargePointSelectList);
+        RequestTask requestTask = new RequestTask(VERSION, "Reserve Now", chargePointSelectList);
         ReserveNowResponseHandler handler = new ReserveNowResponseHandler(requestTask, chargeBoxId,
-                                                                          reservationRepository, reservationId);
-
-        create(c.getEndpointAddress()).reserveNowAsync(req, chargeBoxId, handler);
-
+                reservationRepository, reservationId);
+        dispatcher.reserveNow(c, req, handler);
         return requestTaskStore.add(requestTask);
     }
 
     public int cancelReservation(CancelReservationParams params) {
         CancelReservationRequest req = this.prepareCancelReservation(params);
         List<ChargePointSelect> chargePointSelectList = params.getChargePointSelectList();
-        RequestTask requestTask = new RequestTask(OcppVersion.V_15, "Cancel Reservation", chargePointSelectList);
+        RequestTask requestTask = new RequestTask(VERSION, "Cancel Reservation", chargePointSelectList);
 
         ChargePointSelect c = chargePointSelectList.get(0);
-
-        String chargeBoxId = c.getChargeBoxId();
-        CancelReservationResponseHandler handler = new CancelReservationResponseHandler(requestTask, chargeBoxId,
-                                                                                        reservationRepository, params.getReservationId());
-        create(c.getEndpointAddress()).cancelReservationAsync(req, chargeBoxId, handler);
-
+        CancelReservationResponseHandler handler = new CancelReservationResponseHandler(requestTask, c.getChargeBoxId(),
+                reservationRepository, params.getReservationId());
+        dispatcher.cancelReservation(c, req, handler);
         return requestTaskStore.add(requestTask);
     }
 }

@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
  * @since 29.12.2014
  */
 @Controller
-@RequestMapping(value = "/operations/tasks")
+@RequestMapping(value = "/manager/operations/tasks")
 public class RequestTaskController {
 
     @Autowired private RequestTaskStore requestTaskStore;

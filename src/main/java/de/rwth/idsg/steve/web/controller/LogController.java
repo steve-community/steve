@@ -17,6 +17,7 @@ import java.io.PrintWriter;
  */
 @Slf4j
 @Controller
+@RequestMapping(value = "/manager")
 public class LogController {
 
     private final File logDir = new File(System.getProperty("user.home"), "logs");

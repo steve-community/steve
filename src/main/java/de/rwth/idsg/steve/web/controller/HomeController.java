@@ -2,6 +2,7 @@ package de.rwth.idsg.steve.web.controller;
 
 import de.rwth.idsg.steve.repository.ChargePointRepository;
 import de.rwth.idsg.steve.repository.GenericRepository;
+import de.rwth.idsg.steve.service.ChargePointHelperService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -14,11 +15,11 @@ import org.springframework.web.bind.annotation.RequestMethod;
  * 
  */
 @Controller
-@RequestMapping(value = "/home", method = RequestMethod.GET)
+@RequestMapping(value = "/manager/home", method = RequestMethod.GET)
 public class HomeController {
 
-    @Autowired private GenericRepository genericRepository;
     @Autowired private ChargePointRepository chargePointRepository;
+    @Autowired private ChargePointHelperService chargePointHelperService;
 
     // -------------------------------------------------------------------------
     // Paths
@@ -26,6 +27,7 @@ public class HomeController {
 
     private static final String HEARTBEATS_PATH = "/heartbeats";
     private static final String CONNECTOR_STATUS_PATH = "/connectorStatus";
+    private static final String OCPP_JSON_STATUS = "/ocppJsonStatus";
 
     // -------------------------------------------------------------------------
     // HTTP methods
@@ -33,7 +35,7 @@ public class HomeController {
 
     @RequestMapping
     public String getHome(Model model) {
-        model.addAttribute("stats", genericRepository.getStats());
+        model.addAttribute("stats", chargePointHelperService.getStats());
         return "home";
     }
 
@@ -47,5 +49,11 @@ public class HomeController {
     public String getConnectorStatus(Model model) {
         model.addAttribute("connectorStatusList", chargePointRepository.getChargePointConnectorStatus());
         return "connectorStatus";
+    }
+
+    @RequestMapping(value = OCPP_JSON_STATUS)
+    public String getOcppJsonStatus(Model model) {
+        model.addAttribute("ocppJsonStatusList", chargePointHelperService.getOcppJsonStatus());
+        return "ocppJsonStatus";
     }
 }

@@ -1,6 +1,6 @@
 package de.rwth.idsg.steve.service;
 
-import de.rwth.idsg.steve.OcppConstants;
+import de.rwth.idsg.steve.ocpp.OcppConstants;
 import de.rwth.idsg.steve.repository.UserRepository;
 import de.rwth.idsg.steve.repository.dto.User;
 import jooq.steve.db.tables.records.UserRecord;

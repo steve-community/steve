@@ -1,7 +1,7 @@
 package de.rwth.idsg.steve.web.controller;
 
-import de.rwth.idsg.steve.repository.ChargePointRepository;
 import de.rwth.idsg.steve.repository.UserRepository;
+import de.rwth.idsg.steve.service.ChargePointHelperService;
 import de.rwth.idsg.steve.service.ChargePointService12_Client;
 import de.rwth.idsg.steve.web.dto.common.GetDiagnosticsParams;
 import de.rwth.idsg.steve.web.dto.common.MultipleChargePointSelect;
@@ -27,10 +27,10 @@ import javax.validation.Valid;
  * @since 15.08.2014
  */
 @Controller
-@RequestMapping(value = "/operations/v1.2")
+@RequestMapping(value = "/manager/operations/v1.2")
 public class Ocpp12Controller {
 
-    @Autowired private ChargePointRepository chargePointRepository;
+    @Autowired private ChargePointHelperService chargePointHelperService;
     @Autowired private UserRepository userRepository;
     @Autowired private ChargePointService12_Client client;
 
@@ -58,7 +58,7 @@ public class Ocpp12Controller {
     // -------------------------------------------------------------------------
 
     private void setChargePointList(Model model) {
-        model.addAttribute("cpList", chargePointRepository.getChargePointsV12());
+        model.addAttribute("cpList", chargePointHelperService.getChargePointsV12());
     }
 
     private void setActiveUserIdTagList(Model model) {

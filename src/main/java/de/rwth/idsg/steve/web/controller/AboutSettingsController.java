@@ -1,6 +1,6 @@
 package de.rwth.idsg.steve.web.controller;
 
-import de.rwth.idsg.steve.OcppConstants;
+import de.rwth.idsg.steve.ocpp.OcppConstants;
 import de.rwth.idsg.steve.SteveConfiguration;
 import de.rwth.idsg.steve.repository.GenericRepository;
 import de.rwth.idsg.steve.web.dto.SettingsForm;
@@ -21,6 +21,7 @@ import javax.validation.Valid;
  * 
  */
 @Controller
+@RequestMapping(value = "/manager")
 public class AboutSettingsController {
 
     @Autowired private GenericRepository genericRepository;

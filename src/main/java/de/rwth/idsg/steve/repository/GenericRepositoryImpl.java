@@ -1,7 +1,7 @@
 package de.rwth.idsg.steve.repository;
 
 import de.rwth.idsg.steve.repository.dto.DbVersion;
-import de.rwth.idsg.steve.repository.dto.Statistics;
+import de.rwth.idsg.steve.web.dto.Statistics;
 import de.rwth.idsg.steve.utils.DateTimeUtils;
 import jooq.steve.db.routines.Getstats;
 import lombok.extern.slf4j.Slf4j;

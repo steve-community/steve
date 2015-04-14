@@ -1,6 +1,6 @@
 package de.rwth.idsg.steve.web;
 
-import de.rwth.idsg.steve.OcppVersion;
+import de.rwth.idsg.steve.ocpp.OcppVersion;
 import de.rwth.idsg.steve.repository.dto.ChargePointSelect;
 import lombok.Getter;
 import lombok.Setter;
@@ -55,7 +55,7 @@ public class RequestTask {
     }
 
     public void addNewError(String chargeBoxId, Exception exception) {
-        resultMap.get(chargeBoxId).setError(exception);
+        resultMap.get(chargeBoxId).setErrorMessage(exception.getMessage());
         if (resultSize == (errorCount.incrementAndGet() + responseCount.get())) {
             endTimestamp = new DateTime();
         }
@@ -69,6 +69,6 @@ public class RequestTask {
     @Setter
     public class RequestResult {
         private String response;
-        private Exception error;
+        private String errorMessage;
     }
 }

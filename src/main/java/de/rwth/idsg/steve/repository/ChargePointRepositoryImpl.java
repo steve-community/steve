@@ -1,13 +1,15 @@
 package de.rwth.idsg.steve.repository;
 
-import de.rwth.idsg.steve.OcppVersion;
 import de.rwth.idsg.steve.SteveException;
+import de.rwth.idsg.steve.ocpp.OcppProtocol;
+import de.rwth.idsg.steve.ocpp.OcppTransport;
 import de.rwth.idsg.steve.repository.dto.ChargePoint;
 import de.rwth.idsg.steve.repository.dto.ChargePointSelect;
 import de.rwth.idsg.steve.repository.dto.ConnectorStatus;
 import de.rwth.idsg.steve.repository.dto.Heartbeat;
 import de.rwth.idsg.steve.utils.DateTimeUtils;
 import jooq.steve.db.tables.records.ChargeboxRecord;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jooq.Configuration;
 import org.jooq.Field;
@@ -41,13 +43,15 @@ public class ChargePointRepositoryImpl implements ChargePointRepository {
     private Configuration config;
 
     @Override
-    public List<ChargePointSelect> getChargePointsV12() {
-        return this.internalGetChargePoints(OcppVersion.V_12);
-    }
+    public boolean isRegistered(String chargeBoxId) {
+        int r = DSL.using(config)
+                   .selectOne()
+                   .from(CHARGEBOX)
+                   .where(CHARGEBOX.CHARGEBOXID.eq(chargeBoxId))
+                   .fetchOne()
+                   .value1();
 
-    @Override
-    public List<ChargePointSelect> getChargePointsV15() {
-        return this.internalGetChargePoints(OcppVersion.V_15);
+        return (r == 1);
     }
 
     /**
@@ -56,14 +60,15 @@ public class ChargePointRepositoryImpl implements ChargePointRepository {
      * WHERE ocppVersion = ?
      * AND endpoint_address IS NOT NULL
      */
-    private List<ChargePointSelect> internalGetChargePoints(OcppVersion version) {
+    @Override
+    public List<ChargePointSelect> getChargePointSelect(OcppProtocol protocol) {
         return DSL.using(config)
                   .select(CHARGEBOX.CHARGEBOXID, CHARGEBOX.ENDPOINT_ADDRESS)
                   .from(CHARGEBOX)
-                  .where(CHARGEBOX.OCPPVERSION.equal(version.getValue()))
+                  .where(CHARGEBOX.OCPPPROTOCOL.equal(protocol.getCompositeValue()))
                   .and(CHARGEBOX.ENDPOINT_ADDRESS.isNotNull())
                   .fetch()
-                  .map(new ChargePointSelectMapper());
+                  .map(new ChargePointSelectMapper(protocol.getTransport()));
     }
 
     /**
@@ -94,7 +99,7 @@ public class ChargePointRepositoryImpl implements ChargePointRepository {
         return ChargePoint.builder()
                 .chargeBoxId(r.getChargeboxid())
                 .endpointAddress(r.getEndpointAddress())
-                .ocppVersion(r.getOcppversion())
+                .ocppProtocol(r.getOcppprotocol())
                 .chargePointVendor(r.getChargepointvendor())
                 .chargePointModel(r.getChargepointmodel())
                 .chargePointSerialNumber(r.getChargepointserialnumber())
@@ -215,13 +220,13 @@ public class ChargePointRepositoryImpl implements ChargePointRepository {
     // Private helpers
     // -------------------------------------------------------------------------
 
+    @RequiredArgsConstructor
     private class ChargePointSelectMapper implements RecordMapper<Record2<String, String>, ChargePointSelect> {
+        private final OcppTransport transport;
+
         @Override
         public ChargePointSelect map(Record2<String, String> record) {
-            return ChargePointSelect.builder()
-                    .chargeBoxId(record.value1())
-                    .endpointAddress(record.value2())
-                    .build();
+            return new ChargePointSelect(transport, record.value1(), record.value2());
         }
     }
 

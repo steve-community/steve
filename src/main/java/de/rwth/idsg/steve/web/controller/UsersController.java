@@ -22,7 +22,7 @@ import static de.rwth.idsg.steve.utils.DateTimeUtils.toTimestamp;
  * @since 15.08.2014
  */
 @Controller
-@RequestMapping(value = "/users")
+@RequestMapping(value = "/manager/users")
 public class UsersController {
 
     @Autowired private UserService userService;

@@ -1,7 +1,7 @@
 package de.rwth.idsg.steve.repository;
 
 import de.rwth.idsg.steve.repository.dto.DbVersion;
-import de.rwth.idsg.steve.repository.dto.Statistics;
+import de.rwth.idsg.steve.web.dto.Statistics;
 
 /**
  * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>

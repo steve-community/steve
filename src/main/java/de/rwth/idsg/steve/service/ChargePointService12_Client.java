@@ -1,6 +1,5 @@
 package de.rwth.idsg.steve.service;
 
-import de.rwth.idsg.steve.OcppVersion;
 import de.rwth.idsg.steve.handler.ocpp12.ChangeAvailabilityResponseHandler;
 import de.rwth.idsg.steve.handler.ocpp12.ChangeConfigurationResponseHandler;
 import de.rwth.idsg.steve.handler.ocpp12.ClearCacheResponseHandler;
@@ -10,6 +9,7 @@ import de.rwth.idsg.steve.handler.ocpp12.RemoteStopTransactionResponseHandler;
 import de.rwth.idsg.steve.handler.ocpp12.ResetResponseHandler;
 import de.rwth.idsg.steve.handler.ocpp12.UnlockConnectorResponseHandler;
 import de.rwth.idsg.steve.handler.ocpp12.UpdateFirmwareResponseHandler;
+import de.rwth.idsg.steve.ocpp.OcppVersion;
 import de.rwth.idsg.steve.repository.RequestTaskStore;
 import de.rwth.idsg.steve.repository.dto.ChargePointSelect;
 import de.rwth.idsg.steve.web.RequestTask;
@@ -23,10 +23,16 @@ import de.rwth.idsg.steve.web.dto.ocpp12.ChangeAvailabilityParams;
 import de.rwth.idsg.steve.web.dto.ocpp12.ChangeConfigurationParams;
 import de.rwth.idsg.steve.web.dto.ocpp12.ResetParams;
 import lombok.extern.slf4j.Slf4j;
-import ocpp.cp._2010._08.*;
-import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
+import ocpp.cp._2010._08.ChangeAvailabilityRequest;
+import ocpp.cp._2010._08.ChangeConfigurationRequest;
+import ocpp.cp._2010._08.ClearCacheRequest;
+import ocpp.cp._2010._08.GetDiagnosticsRequest;
+import ocpp.cp._2010._08.RemoteStartTransactionRequest;
+import ocpp.cp._2010._08.RemoteStopTransactionRequest;
+import ocpp.cp._2010._08.ResetRequest;
+import ocpp.cp._2010._08.UnlockConnectorRequest;
+import ocpp.cp._2010._08.UpdateFirmwareRequest;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -34,33 +40,18 @@ import java.util.List;
 import static de.rwth.idsg.steve.utils.DateTimeUtils.toDateTime;
 
 /**
- * Client implementation of OCPP V1.2.
- * 
- * This class has methods to send request to charge points from dynamically created clients.
- * Since there are multiple charge points and their endpoint addresses vary, the clients need to be created dynamically.
+ * Transport-level agnostic client implementation of OCPP V1.2
+ * which builds the request payloads and delegates to dispatcher.
  * 
  * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
- * 
  */
 @Slf4j
 @Service
 public class ChargePointService12_Client {
-
-    @Autowired
-    @Qualifier("ocpp12")
-    private JaxWsProxyFactoryBean factory;
+    private static final OcppVersion VERSION = OcppVersion.V_12;
 
     @Autowired private RequestTaskStore requestTaskStore;
-
-    private static final Object LOCK = new Object();
-
-    private ChargePointService create(String endpointAddress) {
-        // Should concurrency really be a concern?
-        synchronized (LOCK) {
-            factory.setAddress(endpointAddress);
-            return (ChargePointService) factory.create();
-        }
-    }
+    @Autowired private ChargePointService12_Dispatcher dispatcher;
 
     // -------------------------------------------------------------------------
     // Create Request Payloads
@@ -127,84 +118,72 @@ public class ChargePointService12_Client {
     public int changeAvailability(ChangeAvailabilityParams params) {
         ChangeAvailabilityRequest req = this.prepareChangeAvailability(params);
         List<ChargePointSelect> chargePointSelectList = params.getChargePointSelectList();
-        RequestTask requestTask = new RequestTask(OcppVersion.V_12, "Change Availability", chargePointSelectList);
+        RequestTask requestTask = new RequestTask(VERSION, "Change Availability", chargePointSelectList);
 
         for (ChargePointSelect c : chargePointSelectList) {
-            String chargeBoxId = c.getChargeBoxId();
-            ChangeAvailabilityResponseHandler handler = new ChangeAvailabilityResponseHandler(requestTask, chargeBoxId);
-            create(c.getEndpointAddress()).changeAvailabilityAsync(req, chargeBoxId, handler);
+            ChangeAvailabilityResponseHandler handler = new ChangeAvailabilityResponseHandler(requestTask, c.getChargeBoxId());
+            dispatcher.changeAvailability(c, req, handler);
         }
-
         return requestTaskStore.add(requestTask);
     }
 
     public int changeConfiguration(ChangeConfigurationParams params) {
         ChangeConfigurationRequest req = this.prepareChangeConfiguration(params);
         List<ChargePointSelect> chargePointSelectList = params.getChargePointSelectList();
-        RequestTask requestTask = new RequestTask(OcppVersion.V_12, "Change Configuration", chargePointSelectList);
+        RequestTask requestTask = new RequestTask(VERSION, "Change Configuration", chargePointSelectList);
 
         for (ChargePointSelect c : chargePointSelectList) {
-            String chargeBoxId = c.getChargeBoxId();
-            ChangeConfigurationResponseHandler handler = new ChangeConfigurationResponseHandler(requestTask, chargeBoxId);
-            create(c.getEndpointAddress()).changeConfigurationAsync(req, chargeBoxId, handler);
+            ChangeConfigurationResponseHandler handler = new ChangeConfigurationResponseHandler(requestTask, c.getChargeBoxId());
+            dispatcher.changeConfiguration(c, req, handler);
         }
-
         return requestTaskStore.add(requestTask);
     }
 
     public int clearCache(MultipleChargePointSelect params) {
         ClearCacheRequest req = this.prepareClearCache();
         List<ChargePointSelect> chargePointSelectList = params.getChargePointSelectList();
-        RequestTask requestTask = new RequestTask(OcppVersion.V_12, "Clear Cache", chargePointSelectList);
+        RequestTask requestTask = new RequestTask(VERSION, "Clear Cache", chargePointSelectList);
 
         for (ChargePointSelect c : chargePointSelectList) {
-            String chargeBoxId = c.getChargeBoxId();
-            ClearCacheResponseHandler handler = new ClearCacheResponseHandler(requestTask, chargeBoxId);
-            create(c.getEndpointAddress()).clearCacheAsync(req, chargeBoxId, handler);
+            ClearCacheResponseHandler handler = new ClearCacheResponseHandler(requestTask, c.getChargeBoxId());
+            dispatcher.clearCache(c, req, handler);
         }
-
         return requestTaskStore.add(requestTask);
     }
 
     public int getDiagnostics(GetDiagnosticsParams params) {
         GetDiagnosticsRequest req = this.prepareGetDiagnostics(params);
         List<ChargePointSelect> chargePointSelectList = params.getChargePointSelectList();
-        RequestTask requestTask = new RequestTask(OcppVersion.V_12, "Get Diagnostics", chargePointSelectList);
+        RequestTask requestTask = new RequestTask(VERSION, "Get Diagnostics", chargePointSelectList);
 
         for (ChargePointSelect c : chargePointSelectList) {
-            String chargeBoxId = c.getChargeBoxId();
-            GetDiagnosticsResponseHandler handler = new GetDiagnosticsResponseHandler(requestTask, chargeBoxId);
-            create(c.getEndpointAddress()).getDiagnosticsAsync(req, chargeBoxId, handler);
+            GetDiagnosticsResponseHandler handler = new GetDiagnosticsResponseHandler(requestTask, c.getChargeBoxId());
+            dispatcher.getDiagnostics(c, req, handler);
         }
-
         return requestTaskStore.add(requestTask);
     }
 
     public int reset(ResetParams params) {
         ResetRequest req = this.prepareReset(params);
         List<ChargePointSelect> chargePointSelectList = params.getChargePointSelectList();
-        RequestTask requestTask = new RequestTask(OcppVersion.V_12, "Reset", chargePointSelectList);
+        RequestTask requestTask = new RequestTask(VERSION, "Reset", chargePointSelectList);
 
         for (ChargePointSelect c : chargePointSelectList) {
-            String chargeBoxId = c.getChargeBoxId();
-            ResetResponseHandler handler = new ResetResponseHandler(requestTask, chargeBoxId);
-            create(c.getEndpointAddress()).resetAsync(req, chargeBoxId, handler);
+            ResetResponseHandler handler = new ResetResponseHandler(requestTask, c.getChargeBoxId());
+            dispatcher.reset(c, req, handler);
         }
-
         return requestTaskStore.add(requestTask);
     }
 
     public int updateFirmware(UpdateFirmwareParams params) {
         UpdateFirmwareRequest req = this.prepareUpdateFirmware(params);
         List<ChargePointSelect> chargePointSelectList = params.getChargePointSelectList();
-        RequestTask requestTask = new RequestTask(OcppVersion.V_12, "Update Firmware", chargePointSelectList);
+        RequestTask requestTask = new RequestTask(VERSION, "Update Firmware", chargePointSelectList);
 
         for (ChargePointSelect c : chargePointSelectList) {
-            String chargeBoxId = c.getChargeBoxId();
-            UpdateFirmwareResponseHandler handler = new UpdateFirmwareResponseHandler(requestTask, chargeBoxId);
-            create(c.getEndpointAddress()).updateFirmwareAsync(req, chargeBoxId, handler);
+            UpdateFirmwareResponseHandler handler = new UpdateFirmwareResponseHandler(requestTask, c.getChargeBoxId());
+            dispatcher.updateFirmware(c, req, handler);
         }
-
         return requestTaskStore.add(requestTask);
     }
 
@@ -215,42 +194,33 @@ public class ChargePointService12_Client {
     public int remoteStartTransaction(RemoteStartTransactionParams params) {
         RemoteStartTransactionRequest req = this.prepareRemoteStartTransaction(params);
         List<ChargePointSelect> chargePointSelectList = params.getChargePointSelectList();
-        RequestTask requestTask = new RequestTask(OcppVersion.V_12, "Remote Start Transaction", chargePointSelectList);
+        RequestTask requestTask = new RequestTask(VERSION, "Remote Start Transaction", chargePointSelectList);
 
         ChargePointSelect c = chargePointSelectList.get(0);
-
-        String chargeBoxId = c.getChargeBoxId();
-        RemoteStartTransactionResponseHandler handler = new RemoteStartTransactionResponseHandler(requestTask, chargeBoxId);
-        create(c.getEndpointAddress()).remoteStartTransactionAsync(req, chargeBoxId, handler);
-
+        RemoteStartTransactionResponseHandler handler = new RemoteStartTransactionResponseHandler(requestTask, c.getChargeBoxId());
+        dispatcher.remoteStartTransaction(c, req, handler);
         return requestTaskStore.add(requestTask);
     }
 
     public int remoteStopTransaction(RemoteStopTransactionParams params) {
         RemoteStopTransactionRequest req = this.prepareRemoteStopTransaction(params);
         List<ChargePointSelect> chargePointSelectList = params.getChargePointSelectList();
-        RequestTask requestTask = new RequestTask(OcppVersion.V_12, "Remote Stop Transaction", chargePointSelectList);
+        RequestTask requestTask = new RequestTask(VERSION, "Remote Stop Transaction", chargePointSelectList);
 
         ChargePointSelect c = chargePointSelectList.get(0);
-
-        String chargeBoxId = c.getChargeBoxId();
-        RemoteStopTransactionResponseHandler handler = new RemoteStopTransactionResponseHandler(requestTask, chargeBoxId);
-        create(c.getEndpointAddress()).remoteStopTransactionAsync(req, chargeBoxId, handler);
-
+        RemoteStopTransactionResponseHandler handler = new RemoteStopTransactionResponseHandler(requestTask, c.getChargeBoxId());
+        dispatcher.remoteStopTransaction(c, req, handler);
         return requestTaskStore.add(requestTask);
     }
 
     public int unlockConnector(UnlockConnectorParams params) {
         UnlockConnectorRequest req = this.prepareUnlockConnector(params);
         List<ChargePointSelect> chargePointSelectList = params.getChargePointSelectList();
-        RequestTask requestTask = new RequestTask(OcppVersion.V_12, "Unlock Connector", chargePointSelectList);
+        RequestTask requestTask = new RequestTask(VERSION, "Unlock Connector", chargePointSelectList);
 
         ChargePointSelect c = chargePointSelectList.get(0);
-
-        String chargeBoxId = c.getChargeBoxId();
-        UnlockConnectorResponseHandler handler = new UnlockConnectorResponseHandler(requestTask, chargeBoxId);
-        create(c.getEndpointAddress()).unlockConnectorAsync(req, chargeBoxId, handler);
-
+        UnlockConnectorResponseHandler handler = new UnlockConnectorResponseHandler(requestTask, c.getChargeBoxId());
+        dispatcher.unlockConnector(c, req, handler);
         return requestTaskStore.add(requestTask);
     }
 }

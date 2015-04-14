@@ -20,7 +20,7 @@ import java.util.List;
  */
 @Controller
 @ResponseBody
-@RequestMapping(value = "/ajax", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(value = "/manager/ajax", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 public class AjaxCallController {
 
     @Autowired private ChargePointRepository chargePointRepository;

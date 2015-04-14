@@ -18,6 +18,7 @@ import java.io.IOException;
  * @since 15.08.2014
  */
 @Controller
+@RequestMapping(value = "/manager")
 public class TransactionsReservationsController {
 
     @Autowired private TransactionRepository transactionRepository;

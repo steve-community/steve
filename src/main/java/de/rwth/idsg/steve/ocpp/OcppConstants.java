@@ -1,4 +1,4 @@
-package de.rwth.idsg.steve;
+package de.rwth.idsg.steve.ocpp;
 
 import lombok.Getter;
 import lombok.Setter;

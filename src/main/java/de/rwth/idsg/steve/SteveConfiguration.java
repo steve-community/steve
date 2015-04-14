@@ -7,8 +7,10 @@ package de.rwth.idsg.steve;
 public final class SteveConfiguration {
     private SteveConfiguration() {}
 
-    // Mapping of Http requests that Spring Web MVC will handle
-    public static final String SPRING_WEB_MAPPING = "/manager/*";
+    // Root mapping for Spring
+    public static final String SPRING_MAPPING = "/";
+    // Web frontend
+    public static final String SPRING_MANAGER_MAPPING = "/manager/*";
     // Mapping for CXF SOAP services
     public static final String CXF_MAPPING = "/services/*";
     // Just to be backwards compatible with previous versions of Steve,

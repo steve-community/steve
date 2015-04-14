@@ -1,9 +1,10 @@
 package de.rwth.idsg.steve.config;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import de.rwth.idsg.steve.SteveConfiguration;
-import de.rwth.idsg.steve.web.GsonHttpMessageConverter;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.jooq.SQLDialect;
@@ -16,6 +17,8 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;
 import org.springframework.http.converter.HttpMessageConverter;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
@@ -25,6 +28,8 @@ import org.springframework.web.servlet.view.UrlBasedViewResolver;
 
 import javax.annotation.PreDestroy;
 import java.util.List;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
 
 /**
  * Configuration and beans of Spring Framework.
@@ -34,6 +39,7 @@ import java.util.List;
  */
 @Configuration
 @EnableWebMvc
+@EnableScheduling
 @ComponentScan("de.rwth.idsg.steve")
 public class BeanConfiguration extends WebMvcConfigurerAdapter {
 
@@ -74,6 +80,11 @@ public class BeanConfiguration extends WebMvcConfigurerAdapter {
                 .set(new Settings().withExecuteLogging(false));
     }
 
+    @Bean
+    public ScheduledExecutorService scheduledExecutorService() {
+        return new ScheduledThreadPoolExecutor(5);
+    }
+
     @PreDestroy
     public void shutDown() {
         if (dataSource != null) dataSource.shutdown();
@@ -106,16 +117,20 @@ public class BeanConfiguration extends WebMvcConfigurerAdapter {
     }
 
     /**
-     * GsonHttpMessageConverter is needed to return plain JSON objects to AJAX calls.
+     * MappingJackson2HttpMessageConverter is needed to return plain JSON objects to AJAX calls.
      */
     @Override
     public void configureMessageConverters(final List<HttpMessageConverter<?>> converters) {
-        converters.add(new GsonHttpMessageConverter());
+        final ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+
+        final MappingJackson2HttpMessageConverter converter = new MappingJackson2HttpMessageConverter(objectMapper);
+        converters.add(converter);
     }
 
     @Override
     public void addViewControllers(ViewControllerRegistry registry) {
-        registry.addViewController("/signin").setViewName("signin");
+        registry.addViewController("/manager/signin").setViewName("signin");
         registry.setOrder(Ordered.HIGHEST_PRECEDENCE);
     }
 

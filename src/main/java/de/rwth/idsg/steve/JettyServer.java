@@ -1,8 +1,5 @@
 package de.rwth.idsg.steve;
 
-import de.rwth.idsg.steve.config.BeanConfiguration;
-import de.rwth.idsg.steve.config.OcppConfiguration;
-import de.rwth.idsg.steve.config.SecurityConfiguration;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.jetty.rewrite.handler.RedirectPatternRule;
 import org.eclipse.jetty.rewrite.handler.RewriteHandler;
@@ -14,22 +11,11 @@ import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.server.SslConnectionFactory;
 import org.eclipse.jetty.server.handler.HandlerCollection;
-import org.eclipse.jetty.servlet.FilterHolder;
-import org.eclipse.jetty.servlet.ServletHolder;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.eclipse.jetty.util.thread.QueuedThreadPool;
 import org.eclipse.jetty.util.thread.ScheduledExecutorScheduler;
-import org.eclipse.jetty.webapp.WebAppContext;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.web.context.ContextLoaderListener;
-import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
-import org.springframework.web.filter.DelegatingFilterProxy;
-import org.springframework.web.servlet.DispatcherServlet;
 
-import javax.servlet.DispatcherType;
 import java.io.IOException;
-import java.util.EnumSet;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -89,14 +75,8 @@ public class JettyServer {
             server.addConnector(httpsConnector(httpConfig));
         }
 
-        HandlerCollection handlerCollection = new HandlerCollection();
-        handlerCollection.setHandlers(
-                new Handler[] {
-                        getRedirectHandler(),
-                        getSteveContext(getSpringContext())
-        });
-
-        server.setHandler(handlerCollection);
+        SteveAppContext steveAppContext = new SteveAppContext();
+        server.setHandler(steveAppContext.getHandlers());
     }
 
     private ServerConnector httpConnector(HttpConfiguration httpConfig) {
@@ -136,55 +116,6 @@ public class JettyServer {
         https.setPort(SteveConfiguration.Jetty.HTTPS_PORT);
         https.setIdleTimeout(IDLE_TIMEOUT);
         return https;
-    }
-
-    private WebApplicationContext getSpringContext() {
-        AnnotationConfigWebApplicationContext ctx = new AnnotationConfigWebApplicationContext();
-        ctx.register(BeanConfiguration.class);
-        ctx.register(OcppConfiguration.class);
-        ctx.register(SecurityConfiguration.class);
-        return ctx;
-    }
-
-    private WebAppContext getSteveContext(WebApplicationContext springContext) throws IOException {
-        WebAppContext ctx = new WebAppContext();
-        ctx.setContextPath(SteveConfiguration.CONTEXT_PATH);
-        ctx.setResourceBase(new ClassPathResource("webapp").getURI().toString());
-
-        // Disable directory listings if no index.html is found.
-        ctx.setInitParameter("org.eclipse.jetty.servlet.Default.dirAllowed", "false");
-
-        ServletHolder web = new ServletHolder("spring-dispatcher", new DispatcherServlet(springContext));
-        ServletHolder cxf = new ServletHolder("cxf", JettyServlets.getApacheCXF());
-
-        ctx.addEventListener(new ContextLoaderListener(springContext));
-        ctx.addServlet(web, SteveConfiguration.SPRING_WEB_MAPPING);
-        ctx.addServlet(cxf, SteveConfiguration.CXF_MAPPING);
-
-        // Register Spring's filter chain for security. The name is not arbitrary, but is as expected by Spring.
-        ctx.addFilter(
-                new FilterHolder(new DelegatingFilterProxy("springSecurityFilterChain")),
-                SteveConfiguration.SPRING_WEB_MAPPING,
-                EnumSet.allOf(DispatcherType.class)
-        );
-
-        return ctx;
-    }
-
-    private Handler getRedirectHandler() {
-        RewriteHandler rewrite = new RewriteHandler();
-        rewrite.setRewriteRequestURI(true);
-        rewrite.setRewritePathInfo(true);
-        rewrite.setOriginalPathAttribute("requestedPath");
-
-        String[] redirectArray = {"", "/steve", "/steve/manager"};
-        for (String redirect : redirectArray) {
-            RedirectPatternRule rule = new RedirectPatternRule();
-            rule.setPattern(redirect);
-            rule.setLocation("/steve/manager/home");
-            rewrite.addRule(rule);
-        }
-        return rewrite;
     }
 
     /**

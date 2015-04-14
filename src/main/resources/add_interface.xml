@@ -1,0 +1,158 @@
+<jaxws:bindings xmlns:jaxws="http://java.sun.com/xml/ns/jaxws"
+                xmlns:xs="http://www.w3.org/2001/XMLSchema"
+                xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
+                xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+                xmlns:inheritance="http://jaxb2-commons.dev.java.net/basic/inheritance"
+                jaxb:extensionBindingPrefixes="inheritance">
+
+    <!-- ============================ -->
+    <!-- Central System is the server -->
+    <!-- ============================ -->
+
+    <!-- OCPP 1.5 -->
+    <jaxws:bindings wsdlLocation="wsdl/ocpp_centralsystemservice_1.5_final.wsdl">
+        <jaxws:bindings node="wsdl:definitions/wsdl:types/xs:schema">
+            <jaxb:bindings multiple="true"
+                           node="xs:complexType[
+                @name='BootNotificationRequest' or
+                @name='FirmwareStatusNotificationRequest' or
+                @name='StatusNotificationRequest' or
+                @name='MeterValuesRequest' or
+                @name='DiagnosticsStatusNotificationRequest' or
+                @name='StartTransactionRequest' or
+                @name='StopTransactionRequest' or
+                @name='HeartbeatRequest' or
+                @name='AuthorizeRequest' or
+                @name='DataTransferRequest']">
+                <inheritance:implements>de.rwth.idsg.steve.ocpp.RequestType</inheritance:implements>
+            </jaxb:bindings>
+            <jaxb:bindings multiple="true"
+                           node="xs:complexType[
+                @name='BootNotificationResponse' or
+                @name='FirmwareStatusNotificationResponse' or
+                @name='StatusNotificationResponse' or
+                @name='MeterValuesResponse' or
+                @name='DiagnosticsStatusNotificationResponse' or
+                @name='StartTransactionResponse' or
+                @name='StopTransactionResponse' or
+                @name='HeartbeatResponse' or
+                @name='AuthorizeResponse' or
+                @name='DataTransferResponse']">
+                <inheritance:implements>de.rwth.idsg.steve.ocpp.ResponseType</inheritance:implements>
+            </jaxb:bindings>
+        </jaxws:bindings>
+    </jaxws:bindings>
+
+    <!-- OCPP 1.2 -->
+    <jaxws:bindings wsdlLocation="wsdl/centralsystemservice_0.wsdl">
+        <jaxws:bindings node="wsdl:definitions/wsdl:types/xs:schema">
+            <jaxb:bindings multiple="true"
+                           node="xs:complexType[
+                @name='AuthorizeRequest' or
+                @name='StartTransactionRequest' or
+                @name='StopTransactionRequest' or
+                @name='HeartbeatRequest' or
+                @name='MeterValuesRequest' or
+                @name='BootNotificationRequest' or
+                @name='StatusNotificationRequest' or
+                @name='FirmwareStatusNotificationRequest' or
+                @name='DiagnosticsStatusNotificationRequest']">
+                <inheritance:implements>de.rwth.idsg.steve.ocpp.RequestType</inheritance:implements>
+            </jaxb:bindings>
+            <jaxb:bindings multiple="true"
+                           node="xs:complexType[
+                @name='AuthorizeResponse' or
+                @name='StartTransactionResponse' or
+                @name='StopTransactionResponse' or
+                @name='HeartbeatResponse' or
+                @name='MeterValuesResponse' or
+                @name='BootNotificationResponse' or
+                @name='StatusNotificationResponse' or
+                @name='FirmwareStatusNotificationResponse' or
+                @name='DiagnosticsStatusNotificationResponse']">
+                <inheritance:implements>de.rwth.idsg.steve.ocpp.ResponseType</inheritance:implements>
+            </jaxb:bindings>
+        </jaxws:bindings>
+    </jaxws:bindings>
+
+    <!-- ========================== -->
+    <!-- Charge Point is the server -->
+    <!-- ========================== -->
+
+    <!-- OCPP 1.2 -->
+    <jaxws:bindings wsdlLocation="wsdl/chargepointservice.wsdl">
+        <jaxws:bindings node="wsdl:definitions/wsdl:types/xs:schema">
+            <jaxb:bindings multiple="true"
+                           node="xs:complexType[
+                @name='UnlockConnectorRequest' or
+                @name='ResetRequest' or
+                @name='ChangeAvailabilityRequest' or
+                @name='GetDiagnosticsRequest' or
+                @name='ClearCacheRequest' or
+                @name='UpdateFirmwareRequest' or
+                @name='ChangeConfigurationRequest' or
+                @name='RemoteStartTransactionRequest' or
+                @name='RemoteStopTransactionRequest']">
+                <inheritance:implements>de.rwth.idsg.steve.ocpp.RequestType</inheritance:implements>
+            </jaxb:bindings>
+            <jaxb:bindings multiple="true"
+                           node="xs:complexType[
+                @name='UnlockConnectorResponse' or
+                @name='ResetResponse' or
+                @name='ChangeAvailabilityResponse' or
+                @name='GetDiagnosticsResponse' or
+                @name='ClearCacheResponse' or
+                @name='UpdateFirmwareResponse' or
+                @name='ChangeConfigurationResponse' or
+                @name='RemoteStartTransactionResponse' or
+                @name='RemoteStopTransactionResponse']">
+                <inheritance:implements>de.rwth.idsg.steve.ocpp.ResponseType</inheritance:implements>
+            </jaxb:bindings>
+        </jaxws:bindings>
+    </jaxws:bindings>
+
+    <!-- OCPP 1.5 -->
+    <jaxws:bindings wsdlLocation="wsdl/ocpp_chargepointservice_1.5_final.wsdl">
+        <jaxws:bindings node="wsdl:definitions/wsdl:types/xs:schema">
+            <jaxb:bindings multiple="true"
+                           node="xs:complexType[
+                @name='UnlockConnectorRequest' or
+                @name='ResetRequest' or
+                @name='ChangeAvailabilityRequest' or
+                @name='GetDiagnosticsRequest' or
+                @name='ClearCacheRequest' or
+                @name='UpdateFirmwareRequest' or
+                @name='ChangeConfigurationRequest' or
+                @name='RemoteStartTransactionRequest' or
+                @name='RemoteStopTransactionRequest' or
+                @name='CancelReservationRequest' or
+                @name='DataTransferRequest' or
+                @name='GetConfigurationRequest' or
+                @name='GetLocalListVersionRequest' or
+                @name='ReserveNowRequest' or
+                @name='SendLocalListRequest']">
+                <inheritance:implements>de.rwth.idsg.steve.ocpp.RequestType</inheritance:implements>
+            </jaxb:bindings>
+            <jaxb:bindings multiple="true"
+                           node="xs:complexType[
+                @name='UnlockConnectorResponse' or
+                @name='ResetResponse' or
+                @name='ChangeAvailabilityResponse' or
+                @name='GetDiagnosticsResponse' or
+                @name='ClearCacheResponse' or
+                @name='UpdateFirmwareResponse' or
+                @name='ChangeConfigurationResponse' or
+                @name='RemoteStartTransactionResponse' or
+                @name='RemoteStopTransactionResponse' or
+                @name='CancelReservationResponse' or
+                @name='DataTransferResponse' or
+                @name='GetConfigurationResponse' or
+                @name='GetLocalListVersionResponse' or
+                @name='ReserveNowResponse' or
+                @name='SendLocalListResponse']">
+                <inheritance:implements>de.rwth.idsg.steve.ocpp.ResponseType</inheritance:implements>
+            </jaxb:bindings>
+        </jaxws:bindings>
+    </jaxws:bindings>
+
+</jaxws:bindings>

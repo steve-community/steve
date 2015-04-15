@@ -1,5 +1,5 @@
 $("#chargePointSelectList").change(function() {
-	var cp = $(this).val().toString().split(';')[0];
+	var cp = $(this).find("option:selected").text();
 	$.getJSON("/steve/manager/ajax/getConnectorIds?chargeBoxId=" + cp, function(data) {
 		var options = "";
 		$.each(data, function() {

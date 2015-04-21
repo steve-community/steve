@@ -58,10 +58,10 @@ public abstract class AbstractWebSocketEndpoint implements WebSocketHandler {
     }
 
     private void handleTextMessage(WebSocketSession session, TextMessage webSocketMessage) throws Exception {
-        log.debug("[id={}] Received text message: {}", session.getId(), webSocketMessage);
+        String incomingString = webSocketMessage.getPayload();
+        log.debug("[id={}] Received text message: {}", session.getId(), incomingString);
 
         String chargeBoxId = getChargeBoxId(session);
-        String incomingString = webSocketMessage.getPayload();
 
         CommunicationContext context = new CommunicationContext();
         context.setSession(session);

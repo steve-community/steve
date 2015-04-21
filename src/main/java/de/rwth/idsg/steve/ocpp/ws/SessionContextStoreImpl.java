@@ -2,6 +2,7 @@ package de.rwth.idsg.steve.ocpp.ws;
 
 import com.google.common.collect.ImmutableMap;
 import de.rwth.idsg.steve.ocpp.ws.data.SessionContext;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.socket.WebSocketSession;
 
 import java.util.Collections;
@@ -13,6 +14,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
  * @since 17.03.2015
  */
+@Slf4j
 public class SessionContextStoreImpl implements SessionContextStore {
 
     private final ConcurrentHashMap<String, SessionContext> lookupTable = new ConcurrentHashMap<>();
@@ -25,7 +27,11 @@ public class SessionContextStoreImpl implements SessionContextStore {
     @Override
     public void remove(String chargeBoxId) {
         SessionContext pair = lookupTable.remove(chargeBoxId);
-        pair.getPingSchedule().cancel(true);
+        if (pair == null) {
+            log.debug("No session context to remove for chargeBoxId '{}'", chargeBoxId);
+        } else {
+            pair.getPingSchedule().cancel(true);
+        }
     }
 
     @Override

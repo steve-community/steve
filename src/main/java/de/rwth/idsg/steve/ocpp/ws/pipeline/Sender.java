@@ -19,7 +19,10 @@ public class Sender implements Stage {
 
     @Override
     public void process(CommunicationContext context) {
-        TextMessage out = new TextMessage(context.getOutgoingString());
+        String outgoingString = context.getOutgoingString();
+        TextMessage out = new TextMessage(outgoingString);
+        log.debug("Sending message: {}", outgoingString);
+
         try {
             context.getSession().sendMessage(out);
         } catch (IOException e) {

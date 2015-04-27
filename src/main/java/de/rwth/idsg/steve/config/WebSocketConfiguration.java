@@ -1,13 +1,17 @@
 package de.rwth.idsg.steve.config;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.databind.AnnotationIntrospector;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.introspect.JacksonAnnotationIntrospector;
 import com.fasterxml.jackson.module.jaxb.JaxbAnnotationIntrospector;
 import de.rwth.idsg.steve.ocpp.OcppVersion;
-import de.rwth.idsg.steve.ocpp.ws.ocpp12.Ocpp12WebSocketEndpoint;
-import de.rwth.idsg.steve.repository.ChargePointRepository;
 import de.rwth.idsg.steve.ocpp.ws.OcppWebSocketUpgrader;
+import de.rwth.idsg.steve.ocpp.ws.ocpp12.Ocpp12WebSocketEndpoint;
+import de.rwth.idsg.steve.ocpp.ws.ocpp12.Ocpp12JacksonModule;
+import de.rwth.idsg.steve.ocpp.ws.ocpp15.Ocpp15JacksonModule;
 import de.rwth.idsg.steve.ocpp.ws.ocpp15.Ocpp15WebSocketEndpoint;
+import de.rwth.idsg.steve.repository.ChargePointRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.jetty.websocket.api.WebSocketBehavior;
 import org.eclipse.jetty.websocket.api.WebSocketPolicy;
@@ -66,9 +70,17 @@ public class WebSocketConfiguration implements WebSocketConfigurer {
     @Bean
     public ObjectMapper objectMapper() {
         ObjectMapper mapper = new ObjectMapper();
-        mapper.setAnnotationIntrospector(new JaxbAnnotationIntrospector(mapper.getTypeFactory()));
         mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
 
+        mapper.registerModule(new Ocpp12JacksonModule());
+        mapper.registerModule(new Ocpp15JacksonModule());
+
+        mapper.setAnnotationIntrospector(
+                AnnotationIntrospector.pair(
+                        new JacksonAnnotationIntrospector(),
+                        new JaxbAnnotationIntrospector(mapper.getTypeFactory())
+                )
+        );
         return mapper;
     }
 }

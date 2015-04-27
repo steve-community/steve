@@ -1,5 +1,6 @@
 package de.rwth.idsg.steve.config;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.module.jaxb.JaxbAnnotationIntrospector;
 import de.rwth.idsg.steve.ocpp.OcppVersion;
@@ -66,6 +67,8 @@ public class WebSocketConfiguration implements WebSocketConfigurer {
     public ObjectMapper objectMapper() {
         ObjectMapper mapper = new ObjectMapper();
         mapper.setAnnotationIntrospector(new JaxbAnnotationIntrospector(mapper.getTypeFactory()));
+        mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+
         return mapper;
     }
 }

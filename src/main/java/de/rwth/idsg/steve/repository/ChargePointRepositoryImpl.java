@@ -44,14 +44,14 @@ public class ChargePointRepositoryImpl implements ChargePointRepository {
 
     @Override
     public boolean isRegistered(String chargeBoxId) {
-        int r = DSL.using(config)
-                   .selectOne()
-                   .from(CHARGEBOX)
-                   .where(CHARGEBOX.CHARGEBOXID.eq(chargeBoxId))
-                   .fetchOne()
-                   .value1();
+        Integer r = DSL.using(config)
+                       .selectOne()
+                       .from(CHARGEBOX)
+                       .where(CHARGEBOX.CHARGEBOXID.eq(chargeBoxId))
+                       .fetchOne()
+                       .value1();
 
-        return (r == 1);
+        return (r != null) && (r == 1);
     }
 
     /**

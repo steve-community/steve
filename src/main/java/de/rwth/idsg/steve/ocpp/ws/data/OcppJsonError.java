@@ -40,4 +40,19 @@ public class OcppJsonError extends OcppJsonResponse {
 
         return b.toString();
     }
+
+    /**
+     * Let's be defensive and prevent problems due to errorDetails
+     * that can be longer than what is expected/allowed on the receiving end.
+     *
+     * It actually happened with a charge point which responded with the message
+     * "ERROR: dropped too large packet" and the connection was closed.
+     */
+    public String toStringErrorDetails() {
+        if (errorDetails.length() > 50) {
+            return errorDetails.substring(0, 50) + "...";
+        } else {
+            return errorDetails;
+        }
+    }
 }

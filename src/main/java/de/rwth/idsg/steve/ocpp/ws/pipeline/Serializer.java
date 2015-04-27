@@ -117,7 +117,7 @@ public class Serializer implements Stage {
         // If there are no error details you should fill in an empty object {}, missing or null is not allowed
         JsonNode detailsNode;
         if (error.isSetDetails()) {
-            detailsNode = mapper.getNodeFactory().textNode(error.getErrorDetails());
+            detailsNode = mapper.getNodeFactory().textNode(error.toStringErrorDetails());
         } else {
             detailsNode = mapper.createObjectNode();
         }

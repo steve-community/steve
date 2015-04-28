@@ -49,8 +49,8 @@ public class OcppJsonError extends OcppJsonResponse {
      * "ERROR: dropped too large packet" and the connection was closed.
      */
     public String toStringErrorDetails() {
-        if (errorDetails.length() > 50) {
-            return errorDetails.substring(0, 50) + "...";
+        if (errorDetails.length() > 100) {
+            return errorDetails.substring(0, 100) + "...";
         } else {
             return errorDetails;
         }

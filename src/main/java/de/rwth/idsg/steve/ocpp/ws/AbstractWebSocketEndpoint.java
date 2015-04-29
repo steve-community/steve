@@ -18,6 +18,7 @@ import org.springframework.web.socket.WebSocketMessage;
 import org.springframework.web.socket.WebSocketSession;
 
 import java.sql.Timestamp;
+import java.util.Deque;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ScheduledExecutorService;
@@ -91,10 +92,8 @@ public abstract class AbstractWebSocketEndpoint implements WebSocketHandler {
                 WebSocketConfiguration.PING_INTERVAL,
                 TimeUnit.MINUTES);
 
-        SessionContext context = new SessionContext(session, pingSchedule, new DateTime());
-
         String chargeBoxId = getChargeBoxId(session);
-        sessionContextStore.add(chargeBoxId, context);
+        sessionContextStore.add(chargeBoxId, session, pingSchedule);
         futureResponseContextStore.addChargeBox(chargeBoxId);
     }
 
@@ -103,8 +102,14 @@ public abstract class AbstractWebSocketEndpoint implements WebSocketHandler {
         log.warn("[id={}] Connection was closed, status: {}", session.getId(), closeStatus);
 
         String chargeBoxId = getChargeBoxId(session);
-        sessionContextStore.remove(chargeBoxId);
-        futureResponseContextStore.removeChargeBox(chargeBoxId);
+        sessionContextStore.remove(chargeBoxId, session);
+
+        // If there are no remaining connections to this chargeBox,
+        // we can then stop waiting for responses to previously sent requests.
+        // TODO: Use session/connection-specific store instead of the global one?
+        if (sessionContextStore.getNumberOfConnections(chargeBoxId) == 0) {
+            futureResponseContextStore.removeChargeBox(chargeBoxId);
+        }
     }
 
     @Override
@@ -130,11 +135,11 @@ public abstract class AbstractWebSocketEndpoint implements WebSocketHandler {
         return sessionContextStore.getChargeBoxIdList();
     }
 
-    public int getSize() {
-        return sessionContextStore.getSize();
+    public int getNumberOfChargeBoxes() {
+        return sessionContextStore.getNumberOfChargeBoxes();
     }
 
-    public Map<String, SessionContext> getACopy() {
+    public Map<String, Deque<SessionContext>> getACopy() {
         return sessionContextStore.getACopy();
     }
 

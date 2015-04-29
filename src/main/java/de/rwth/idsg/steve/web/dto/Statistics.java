@@ -19,6 +19,6 @@ public final class Statistics {
     // Number of available, occupied, faulted and unavailable chargebox connectors
     connAvailable, connOccupied, connFaulted, connUnavailable;
 
-    // Number of open sessions (connections) to WebSocket/JSON chargeboxes
-    @Setter private int numOcpp12JSessions, numOcpp15JSessions;
+    // Number of connected WebSocket/JSON chargeboxes
+    @Setter private int numOcpp12JChargeBoxes, numOcpp15JChargeBoxes;
 }

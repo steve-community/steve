@@ -17,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Deque;
 import java.util.List;
 import java.util.Map;
 
@@ -39,15 +40,15 @@ public class ChargePointHelperServiceImpl implements ChargePointHelperService {
     @Override
     public Statistics getStats() {
         Statistics stats = genericRepository.getStats();
-        stats.setNumOcpp12JSessions(ocpp12WebSocketEndpoint.getSize());
-        stats.setNumOcpp15JSessions(ocpp15WebSocketEndpoint.getSize());
+        stats.setNumOcpp12JChargeBoxes(ocpp12WebSocketEndpoint.getNumberOfChargeBoxes());
+        stats.setNumOcpp15JChargeBoxes(ocpp15WebSocketEndpoint.getNumberOfChargeBoxes());
         return stats;
     }
 
     @Override
     public List<OcppJsonStatus> getOcppJsonStatus() {
-        Map<String, SessionContext> ocpp12Map = ocpp12WebSocketEndpoint.getACopy();
-        Map<String, SessionContext> ocpp15Map = ocpp15WebSocketEndpoint.getACopy();
+        Map<String, Deque<SessionContext>> ocpp12Map = ocpp12WebSocketEndpoint.getACopy();
+        Map<String, Deque<SessionContext>> ocpp15Map = ocpp15WebSocketEndpoint.getACopy();
 
         DateTime now = new DateTime();
         List<OcppJsonStatus> returnList = new ArrayList<>();
@@ -81,20 +82,25 @@ public class ChargePointHelperServiceImpl implements ChargePointHelperService {
     // Helpers
     // -------------------------------------------------------------------------
 
-    private void appendList(Map<String, SessionContext> map, List<OcppJsonStatus> returnList,
+    private void appendList(Map<String, Deque<SessionContext>> map, List<OcppJsonStatus> returnList,
                             DateTime now, OcppVersion version) {
-        for (Map.Entry<String, SessionContext> entry : map.entrySet()) {
-            SessionContext ctx = entry.getValue();
-            DateTime openSince = ctx.getOpenSince();
 
-            OcppJsonStatus status = OcppJsonStatus.builder()
-                    .chargeBoxId(entry.getKey())
-                    .connectedSince(DateTimeUtils.humanize(openSince))
-                    .connectionDuration(DateTimeUtils.timeElapsed(openSince, now))
-                    .version(version)
-                    .build();
+        for (Map.Entry<String, Deque<SessionContext>> entry : map.entrySet()) {
+            String chargeBoxId = entry.getKey();
+            Deque<SessionContext> endpointDeque = entry.getValue();
 
-            returnList.add(status);
+            for (SessionContext ctx : endpointDeque) {
+                DateTime openSince = ctx.getOpenSince();
+
+                OcppJsonStatus status = OcppJsonStatus.builder()
+                        .chargeBoxId(chargeBoxId)
+                        .connectedSince(DateTimeUtils.humanize(openSince))
+                        .connectionDuration(DateTimeUtils.timeElapsed(openSince, now))
+                        .version(version)
+                        .build();
+
+                returnList.add(status);
+            }
         }
     }
 }

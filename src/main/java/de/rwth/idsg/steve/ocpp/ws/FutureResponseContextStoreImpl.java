@@ -5,6 +5,8 @@ import de.rwth.idsg.steve.ocpp.ws.data.FutureResponseContext;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayDeque;
+import java.util.Deque;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -23,8 +25,11 @@ public class FutureResponseContextStoreImpl implements FutureResponseContextStor
 
     @Override
     public void addChargeBox(String chargeBoxId) {
-        log.debug("Creating new store for chargeBoxId '{}'", chargeBoxId);
-        lookupTable.put(chargeBoxId, new ConcurrentHashMap<String, FutureResponseContext>());
+        Map<String, FutureResponseContext> contextMap = lookupTable.get(chargeBoxId);
+        if (contextMap == null) {
+            log.debug("Creating new store for chargeBoxId '{}'", chargeBoxId);
+            lookupTable.put(chargeBoxId, new ConcurrentHashMap<String, FutureResponseContext>());
+        }
     }
 
     @Override

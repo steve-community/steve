@@ -22,11 +22,11 @@
 		<span class="baseTable">
 			<span class="baseRow">
 				<span class="baseCell">OCPP 1.2 :</span>
-				<span class="baseCell formatNumber">${stats.numOcpp12JSessions}</span>
+				<span class="baseCell formatNumber">${stats.numOcpp12JChargeBoxes}</span>
 			</span>
 			<span class="baseRow">
 				<span class="baseCell">OCPP 1.5 :</span>
-				<span class="baseCell formatNumber">${stats.numOcpp15JSessions}</span>
+				<span class="baseCell formatNumber">${stats.numOcpp15JChargeBoxes}</span>
 			</span>
 		</span>
 	</a>

@@ -18,7 +18,7 @@ public class AlwaysLastStrategy implements WsSessionSelectStrategy {
     }
 
     @Override
-    public WebSocketSession getSession(Deque<SessionContext> sessionContexts, String chargeBoxId) {
+    public WebSocketSession getSession(Deque<SessionContext> sessionContexts) {
         return sessionContexts.getLast().getSession();
     }
 }

@@ -18,7 +18,7 @@ public class RoundRobinStrategy implements WsSessionSelectStrategy {
     }
 
     @Override
-    public WebSocketSession getSession(Deque<SessionContext> sessionContexts, String chargeBoxId) {
+    public WebSocketSession getSession(Deque<SessionContext> sessionContexts) {
         // Remove the first item, and add at the end
         SessionContext s = sessionContexts.removeFirst();
         sessionContexts.addLast(s);

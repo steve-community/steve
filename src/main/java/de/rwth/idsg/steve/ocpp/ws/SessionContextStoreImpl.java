@@ -105,7 +105,7 @@ public class SessionContextStoreImpl implements SessionContextStore {
     public WebSocketSession getSession(String chargeBoxId) {
         Deque<SessionContext> endpointDeque = lookupTable.get(chargeBoxId);
         try {
-            return wsSessionSelectStrategy.getSession(endpointDeque, chargeBoxId);
+            return wsSessionSelectStrategy.getSession(endpointDeque);
         } catch (NoSuchElementException e) {
             throw new SteveException("No session context for chargeBoxId '" + chargeBoxId + "'", e);
         }

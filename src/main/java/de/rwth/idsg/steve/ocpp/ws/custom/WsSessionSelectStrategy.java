@@ -14,5 +14,5 @@ import java.util.Deque;
  * @since 30.04.2015
  */
 public interface WsSessionSelectStrategy {
-    WebSocketSession getSession(Deque<SessionContext> sessionContexts, String chargeBoxId);
+    WebSocketSession getSession(Deque<SessionContext> sessionContexts);
 }

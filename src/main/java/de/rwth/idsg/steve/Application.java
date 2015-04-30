@@ -1,5 +1,7 @@
 package de.rwth.idsg.steve;
 
+import de.rwth.idsg.steve.ocpp.ws.custom.WsSessionSelectStrategyEnum;
+
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -47,6 +49,8 @@ public class Application {
         Jetty.HTTPS_PORT            = Integer.valueOf(prop.getProperty("https.port"));
         Jetty.KEY_STORE_PATH        = prop.getProperty("keystore.path");
         Jetty.KEY_STORE_PASSWORD    = prop.getProperty("keystore.password");
+
+        Ocpp.WS_SESSION_SELECT_STRATEGY = WsSessionSelectStrategyEnum.fromName(prop.getProperty("ws.session.select.strategy"));
 
         if (!(Jetty.HTTP_ENABLED || Jetty.HTTPS_ENABLED)) {
             throw new IllegalArgumentException(

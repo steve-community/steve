@@ -27,6 +27,7 @@ public class Ocpp12WebSocketEndpoint extends AbstractWebSocketEndpoint {
 
     @PostConstruct
     public void init() {
+        super.init();
         pipeline = new IncomingPipeline(mapper, futureResponseContextStore,
                                         typeStore, handler,
                                         serializer, sender);

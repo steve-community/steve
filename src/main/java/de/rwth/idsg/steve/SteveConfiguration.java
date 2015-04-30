@@ -1,5 +1,7 @@
 package de.rwth.idsg.steve;
 
+import de.rwth.idsg.steve.ocpp.ws.custom.WsSessionSelectStrategyEnum;
+
 /**
  * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
  * @since 19.08.2014
@@ -56,6 +58,13 @@ public final class SteveConfiguration {
     public static final class Auth {
         public static String USERNAME;
         public static String PASSWORD;
+    }
+
+    /**
+     * OCPP-related configuration
+     */
+    public static final class Ocpp {
+        public static WsSessionSelectStrategyEnum WS_SESSION_SELECT_STRATEGY;
     }
 
 }

@@ -45,6 +45,7 @@ public class FutureResponseContextStoreImpl implements FutureResponseContextStor
             throw new SteveException("chargeBoxId '" + chargeBoxId + "' is not in store");
         } else {
             map.put(messageId, context);
+            log.debug("Store size for chargeBoxId '{}': {}", chargeBoxId, map.size());
         }
     }
 
@@ -54,7 +55,9 @@ public class FutureResponseContextStoreImpl implements FutureResponseContextStor
         if (map == null) {
             throw new SteveException("chargeBoxId '" + chargeBoxId + "' is not in store");
         } else {
-            return map.remove(messageId);
+            FutureResponseContext context = map.remove(messageId);
+            log.debug("Store size for chargeBoxId '{}': {}", chargeBoxId, map.size());
+            return context;
         }
     }
 }

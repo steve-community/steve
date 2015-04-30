@@ -2,6 +2,7 @@ package de.rwth.idsg.steve.ocpp.ws;
 
 import com.google.common.collect.ImmutableMap;
 import de.rwth.idsg.steve.SteveException;
+import de.rwth.idsg.steve.ocpp.ws.custom.WsSessionSelectStrategy;
 import de.rwth.idsg.steve.ocpp.ws.data.SessionContext;
 import lombok.extern.slf4j.Slf4j;
 import org.joda.time.DateTime;
@@ -13,16 +14,10 @@ import java.util.Deque;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ScheduledFuture;
 
 /**
- * We want to support multiple connections to a charge point.
- *
- * For sending messages we need a mechanism to select one WebSocketSession.
- * This is done in a round robin fashion. See {@link #getSession(String)}.
- *
  * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
  * @since 17.03.2015
  */
@@ -34,6 +29,12 @@ public class SessionContextStoreImpl implements SessionContextStore {
      * Value (Deque<SessionContext>) = WebSocket session contexts
      */
     private final ConcurrentHashMap<String, Deque<SessionContext>> lookupTable = new ConcurrentHashMap<>();
+
+    private final WsSessionSelectStrategy wsSessionSelectStrategy;
+
+    public SessionContextStoreImpl(WsSessionSelectStrategy wsSessionSelectStrategy) {
+        this.wsSessionSelectStrategy = wsSessionSelectStrategy;
+    }
 
     @Override
     public void add(String chargeBoxId, WebSocketSession session, ScheduledFuture pingSchedule) {
@@ -104,11 +105,7 @@ public class SessionContextStoreImpl implements SessionContextStore {
     public WebSocketSession getSession(String chargeBoxId) {
         Deque<SessionContext> endpointDeque = lookupTable.get(chargeBoxId);
         try {
-            // Remove the first item, and add at the end
-            SessionContext s = endpointDeque.removeFirst();
-            endpointDeque.addLast(s);
-            return s.getSession();
-
+            return wsSessionSelectStrategy.getSession(endpointDeque, chargeBoxId);
         } catch (NoSuchElementException e) {
             throw new SteveException("No session context for chargeBoxId '" + chargeBoxId + "'", e);
         }

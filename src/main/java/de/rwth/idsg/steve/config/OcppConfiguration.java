@@ -1,7 +1,11 @@
 package de.rwth.idsg.steve.config;
 
+import de.rwth.idsg.steve.SteveConfiguration;
 import de.rwth.idsg.steve.ocpp.soap.MediatorInInterceptor;
 import de.rwth.idsg.steve.ocpp.soap.MessageIdInterceptor;
+import de.rwth.idsg.steve.ocpp.ws.custom.AlwaysLastStrategy;
+import de.rwth.idsg.steve.ocpp.ws.custom.RoundRobinStrategy;
+import de.rwth.idsg.steve.ocpp.ws.custom.WsSessionSelectStrategy;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.apache.cxf.jaxws.JaxWsServerFactoryBean;
 import org.apache.cxf.ws.addressing.WSAddressingFeature;
@@ -32,6 +36,18 @@ public class OcppConfiguration {
         createRouterService();
         createOcpp12Service(midi);
         createOcpp15Service(midi);
+    }
+
+    @Bean
+    public WsSessionSelectStrategy sessionSelectStrategy() {
+        switch (SteveConfiguration.Ocpp.WS_SESSION_SELECT_STRATEGY) {
+            case ALWAYS_LAST:
+                return new AlwaysLastStrategy();
+            case ROUND_ROBIN:
+                return new RoundRobinStrategy();
+            default:
+                throw new RuntimeException("Could not find a valid WsSessionSelectStrategy");
+        }
     }
 
     @Bean

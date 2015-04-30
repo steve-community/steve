@@ -1,6 +1,7 @@
 package de.rwth.idsg.steve.ocpp.ws;
 
 import de.rwth.idsg.steve.config.WebSocketConfiguration;
+import de.rwth.idsg.steve.ocpp.ws.custom.WsSessionSelectStrategy;
 import de.rwth.idsg.steve.ocpp.ws.data.CommunicationContext;
 import de.rwth.idsg.steve.ocpp.ws.data.SessionContext;
 import de.rwth.idsg.steve.ocpp.ws.pipeline.Pipeline;
@@ -17,6 +18,7 @@ import org.springframework.web.socket.WebSocketHandler;
 import org.springframework.web.socket.WebSocketMessage;
 import org.springframework.web.socket.WebSocketSession;
 
+import javax.annotation.PostConstruct;
 import java.sql.Timestamp;
 import java.util.Deque;
 import java.util.List;
@@ -35,12 +37,16 @@ public abstract class AbstractWebSocketEndpoint implements WebSocketHandler {
     @Autowired private ScheduledExecutorService service;
     @Autowired private OcppServerRepository ocppServerRepository;
     @Autowired private FutureResponseContextStore futureResponseContextStore;
+    @Autowired private WsSessionSelectStrategy wsSessionSelectStrategy;
 
     public static final String CHARGEBOX_ID_KEY = "CHARGEBOX_ID_KEY";
 
     protected Pipeline pipeline;
+    private SessionContextStoreImpl sessionContextStore;
 
-    private final SessionContextStoreImpl sessionContextStore = new SessionContextStoreImpl();
+    public void init() {
+        sessionContextStore = new SessionContextStoreImpl(wsSessionSelectStrategy);
+    }
 
     @Override
     public void handleMessage(WebSocketSession session, WebSocketMessage<?> message) throws Exception {

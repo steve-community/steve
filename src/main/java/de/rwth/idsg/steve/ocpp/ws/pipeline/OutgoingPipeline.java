@@ -34,7 +34,7 @@ public class OutgoingPipeline implements Pipeline {
         }
 
         // All went well, and the call is sent. Store the response context for later lookup.
-        futureResponseContextStore.add(context.getChargeBoxId(),
+        futureResponseContextStore.add(context.getSession(),
                                        context.getOutgoingMessage().getMessageId(),
                                        context.getFutureResponseContext());
     }

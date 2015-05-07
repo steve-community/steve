@@ -96,12 +96,6 @@ public class SessionContextStoreImpl implements SessionContextStore {
     }
 
     @Override
-    public int getNumberOfConnections(String chargeBoxId) {
-        Deque<SessionContext> endpointDeque = lookupTable.get(chargeBoxId);
-        return (endpointDeque == null) ? 0 : endpointDeque.size();
-    }
-
-    @Override
     public WebSocketSession getSession(String chargeBoxId) {
         Deque<SessionContext> endpointDeque = lookupTable.get(chargeBoxId);
         try {

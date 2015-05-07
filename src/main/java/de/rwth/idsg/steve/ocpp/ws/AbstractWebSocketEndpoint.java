@@ -18,7 +18,6 @@ import org.springframework.web.socket.WebSocketHandler;
 import org.springframework.web.socket.WebSocketMessage;
 import org.springframework.web.socket.WebSocketSession;
 
-import javax.annotation.PostConstruct;
 import java.sql.Timestamp;
 import java.util.Deque;
 import java.util.List;
@@ -100,7 +99,7 @@ public abstract class AbstractWebSocketEndpoint implements WebSocketHandler {
 
         String chargeBoxId = getChargeBoxId(session);
         sessionContextStore.add(chargeBoxId, session, pingSchedule);
-        futureResponseContextStore.addChargeBox(chargeBoxId);
+        futureResponseContextStore.addSession(session);
     }
 
     @Override
@@ -109,13 +108,7 @@ public abstract class AbstractWebSocketEndpoint implements WebSocketHandler {
 
         String chargeBoxId = getChargeBoxId(session);
         sessionContextStore.remove(chargeBoxId, session);
-
-        // If there are no remaining connections to this chargeBox,
-        // we can then stop waiting for responses to previously sent requests.
-        // TODO: Use session/connection-specific store instead of the global one?
-        if (sessionContextStore.getNumberOfConnections(chargeBoxId) == 0) {
-            futureResponseContextStore.removeChargeBox(chargeBoxId);
-        }
+        futureResponseContextStore.removeSession(session);
     }
 
     @Override

@@ -18,6 +18,5 @@ public interface SessionContextStore {
     List<String> getChargeBoxIdList();
     Map<String, Deque<SessionContext>> getACopy();
     int getNumberOfChargeBoxes();
-    int getNumberOfConnections(String chargeBoxId);
     WebSocketSession getSession(String chargeBoxId);
 }

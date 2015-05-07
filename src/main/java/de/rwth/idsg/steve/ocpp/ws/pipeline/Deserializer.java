@@ -119,7 +119,7 @@ public class Deserializer implements Stage {
      * There is no mechanism in OCPP to report back such erroneous messages.
      */
     private void handleResult(CommunicationContext context, String messageId, JsonParser parser) {
-        FutureResponseContext responseContext = futureResponseContextStore.get(context.getChargeBoxId(), messageId);
+        FutureResponseContext responseContext = futureResponseContextStore.get(context.getSession(), messageId);
         if (responseContext == null) {
             throw new SteveException("A result message was received as response to a not-sent call. The message was: "
                     + context.getIncomingString());
@@ -147,7 +147,7 @@ public class Deserializer implements Stage {
      * There is no mechanism in OCPP to report back such erroneous messages.
      */
     private void handleError(CommunicationContext context, String messageId, JsonParser parser) {
-        FutureResponseContext responseContext = futureResponseContextStore.get(context.getChargeBoxId(), messageId);
+        FutureResponseContext responseContext = futureResponseContextStore.get(context.getSession(), messageId);
         if (responseContext == null) {
             throw new SteveException("An error message was received as response to a not-sent call. The message was: "
                     + context.getIncomingString());

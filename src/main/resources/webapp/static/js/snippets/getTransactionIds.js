@@ -1,6 +1,6 @@
 $("#chargePointSelectList").change(function() {
 	var cp = $(this).find("option:selected").text();
-	$.getJSON("/steve/manager/ajax/getTransactionIds?chargeBoxId=" + cp, function(data) {
+	$.getJSON("/steve/manager/ajax/" + cp + "/transactionIds", function(data) {
 		var options = "";
 		$.each(data, function() {
 			options += "<option value='" + this + "'>" + this + "</option>";

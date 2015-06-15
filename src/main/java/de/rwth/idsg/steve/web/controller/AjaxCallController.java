@@ -7,9 +7,9 @@ import de.rwth.idsg.steve.repository.dto.ChargePoint;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.List;
@@ -20,7 +20,10 @@ import java.util.List;
  */
 @Controller
 @ResponseBody
-@RequestMapping(value = "/manager/ajax", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(
+        value = "/manager/ajax/{chargeBoxId}",
+        method = RequestMethod.GET,
+        produces = MediaType.APPLICATION_JSON_VALUE)
 public class AjaxCallController {
 
     @Autowired private ChargePointRepository chargePointRepository;
@@ -31,32 +34,32 @@ public class AjaxCallController {
     // Paths
     // -------------------------------------------------------------------------
 
-    private static final String CP_DETAILS_PATH = "/getCPDetails";
-    private static final String CONNECTOR_IDS_PATH = "/getConnectorIds";
-    private static final String TRANSACTION_IDS_PATH = "/getTransactionIds";
-    private static final String RESERVATION_IDS_PATH = "/getReservationIds";
+    private static final String DETAILS_PATH = "/details";
+    private static final String CONNECTOR_IDS_PATH = "/connectorIds";
+    private static final String TRANSACTION_IDS_PATH = "/transactionIds";
+    private static final String RESERVATION_IDS_PATH = "/reservationIds";
 
     // -------------------------------------------------------------------------
     // HTTP methods
     // -------------------------------------------------------------------------
 
-    @RequestMapping(value = CP_DETAILS_PATH)
-    public ChargePoint getCPDetails(@RequestParam String chargeBoxId) {
+    @RequestMapping(value = DETAILS_PATH)
+    public ChargePoint getDetails(@PathVariable("chargeBoxId") String chargeBoxId) {
         return chargePointRepository.getChargePointDetails(chargeBoxId);
     }
 
     @RequestMapping(value = CONNECTOR_IDS_PATH)
-    public List<Integer> getConnectorIds(@RequestParam String chargeBoxId) {
+    public List<Integer> getConnectorIds(@PathVariable("chargeBoxId") String chargeBoxId) {
         return chargePointRepository.getConnectorIds(chargeBoxId);
     }
 
     @RequestMapping(value = TRANSACTION_IDS_PATH)
-    public List<Integer> getTransactionIds(@RequestParam String chargeBoxId) {
+    public List<Integer> getTransactionIds(@PathVariable("chargeBoxId") String chargeBoxId) {
         return transactionRepository.getActiveTransactionIds(chargeBoxId);
     }
 
     @RequestMapping(value = RESERVATION_IDS_PATH)
-    public List<Integer> getReservationIds(@RequestParam String chargeBoxId) {
+    public List<Integer> getReservationIds(@PathVariable("chargeBoxId") String chargeBoxId) {
         return reservationRepository.getActiveReservationIds(chargeBoxId);
     }
 

@@ -3,20 +3,19 @@ package de.rwth.idsg.steve.ocpp.soap;
 import de.rwth.idsg.steve.ocpp.OcppProtocol;
 import de.rwth.idsg.steve.repository.OcppServerRepository;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.cxf.binding.soap.SoapMessage;
-import org.apache.cxf.headers.Header;
 import org.apache.cxf.interceptor.Fault;
+import org.apache.cxf.message.Message;
+import org.apache.cxf.message.MessageContentsList;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
+import org.apache.cxf.service.model.MessageInfo;
+import org.apache.cxf.service.model.MessagePartInfo;
 import org.apache.cxf.ws.addressing.AddressingProperties;
 import org.apache.cxf.ws.addressing.ContextUtils;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
 import org.jooq.exception.DataAccessException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.w3c.dom.Element;
-
-import java.util.List;
 
 import static org.apache.cxf.ws.addressing.JAXWSAConstants.ADDRESSING_PROPERTIES_INBOUND;
 
@@ -31,18 +30,18 @@ import static org.apache.cxf.ws.addressing.JAXWSAConstants.ADDRESSING_PROPERTIES
  */
 @Slf4j
 @Component("FromAddressInterceptor")
-public class FromAddressInterceptor extends AbstractPhaseInterceptor<SoapMessage> {
+public class FromAddressInterceptor extends AbstractPhaseInterceptor<Message> {
 
     @Autowired private OcppServerRepository ocppServerRepository;
 
-    private static final String CHARGEBOX_ID_HEADER = "chargeBoxIdentity";
+    private static final String CHARGEBOX_ID_HEADER = "ChargeBoxIdentity";
 
     public FromAddressInterceptor() {
-        super(Phase.POST_PROTOCOL);
+        super(Phase.PRE_INVOKE);
     }
 
     @Override
-    public void handleMessage(SoapMessage message) throws Fault {
+    public void handleMessage(Message message) throws Fault {
         String chargeBoxId = getChargeBoxId(message);
         String endpointAddress = getEndpointAddress(message);
 
@@ -56,18 +55,18 @@ public class FromAddressInterceptor extends AbstractPhaseInterceptor<SoapMessage
         }
     }
 
-    private String getChargeBoxId(SoapMessage message) {
-        List<Header> headers = message.getHeaders();
-        for (Header h : headers) {
-            if (CHARGEBOX_ID_HEADER.equals(h.getName().getLocalPart())) {
-                Element he = (Element) h.getObject();
-                return he.getFirstChild().getTextContent();
+    private String getChargeBoxId(Message message) {
+        MessageInfo mi = (MessageInfo) message.get("org.apache.cxf.service.model.MessageInfo");
+        for (MessagePartInfo mpi : mi.getMessageParts()) {
+            if (CHARGEBOX_ID_HEADER.equals(mpi.getName().getLocalPart())) {
+                MessageContentsList lst = MessageContentsList.getContentsList(message);
+                return (String) lst.get(mi.getMessagePart(mpi.getName()));
             }
         }
         return null;
     }
 
-    private String getEndpointAddress(SoapMessage message) {
+    private String getEndpointAddress(Message message) {
         AddressingProperties addressProp = (AddressingProperties) message.get(ADDRESSING_PROPERTIES_INBOUND);
         if (addressProp == null) {
             return null;

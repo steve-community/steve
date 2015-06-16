@@ -1,20 +1,14 @@
 package de.rwth.idsg.steve.ocpp.soap;
 
 import lombok.extern.slf4j.Slf4j;
-import org.apache.cxf.binding.soap.SoapHeader;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
+import org.apache.cxf.ws.addressing.AddressingProperties;
+import org.apache.cxf.ws.addressing.ContextUtils;
 
-import java.util.ArrayList;
-import java.util.UUID;
-
-import static org.apache.cxf.headers.Header.Direction.DIRECTION_IN;
-import static org.apache.cxf.headers.Header.HEADER_LIST;
-import static org.apache.cxf.ws.addressing.Names.*;
+import static org.apache.cxf.ws.addressing.JAXWSAConstants.ADDRESSING_PROPERTIES_INBOUND;
 
 /**
  * There are some implementations of SOAP/WS-A, which leave the required MessageID element out.
@@ -32,36 +26,24 @@ import static org.apache.cxf.ws.addressing.Names.*;
 public class MessageIdInterceptor extends AbstractPhaseInterceptor<Message> {
 
     public MessageIdInterceptor() {
-        super(Phase.PRE_PROTOCOL);
+        super(Phase.PRE_LOGICAL);
+        addBefore(org.apache.cxf.ws.addressing.impl.MAPAggregatorImpl.class.getName());
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public void handleMessage(Message message) throws Fault {
-        ArrayList<SoapHeader> headerList = (ArrayList<SoapHeader>) message.get(HEADER_LIST);
+        AddressingProperties addressProp = (AddressingProperties) message.get(ADDRESSING_PROPERTIES_INBOUND);
 
-        if (!isMessageIdSet(headerList)) {
+        // Ws-Addressing is not used in the message. Early exit
+        if (addressProp == null) {
+            return;
+        }
+
+        if (addressProp.getMessageID() == null) {
             log.debug("The required MessageID element is missing! Adding one to the incoming message");
-
-            Element headerElement = (Element) headerList.get(0).getObject();
-            Document doc = headerElement.getOwnerDocument();
-
-            Element messageIdElement = doc.createElementNS(WSA_NAMESPACE_NAME, WSA_MESSAGEID_QNAME.getLocalPart());
-            messageIdElement.appendChild(doc.createTextNode("uuid:" + UUID.randomUUID().toString()));
-
-            SoapHeader messageIdHeader = new SoapHeader(WSA_MESSAGEID_QNAME, messageIdElement);
-            messageIdHeader.setDirection(DIRECTION_IN);
-
-            headerList.add(messageIdHeader);
+            addressProp.setMessageID(ContextUtils.getAttributedURI(ContextUtils.generateUUID()));
         }
     }
 
-    private boolean isMessageIdSet(ArrayList<SoapHeader> headerList) {
-        for (SoapHeader header : headerList) {
-            if (WSA_MESSAGEID_NAME.equals(header.getName().getLocalPart())) {
-                return true;
-            }
-        }
-        return false;
-    }
 }

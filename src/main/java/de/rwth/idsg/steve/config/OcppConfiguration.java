@@ -6,7 +6,6 @@ import de.rwth.idsg.steve.ocpp.soap.MessageIdInterceptor;
 import de.rwth.idsg.steve.ocpp.ws.custom.AlwaysLastStrategy;
 import de.rwth.idsg.steve.ocpp.ws.custom.RoundRobinStrategy;
 import de.rwth.idsg.steve.ocpp.ws.custom.WsSessionSelectStrategy;
-import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.apache.cxf.jaxws.JaxWsServerFactoryBean;
@@ -37,7 +36,7 @@ public class OcppConfiguration {
 
     @Autowired
     @Qualifier("FromAddressInterceptor")
-    private PhaseInterceptor<SoapMessage> fromAddressInterceptor;
+    private PhaseInterceptor<Message> fromAddressInterceptor;
 
     @PostConstruct
     public void init() {

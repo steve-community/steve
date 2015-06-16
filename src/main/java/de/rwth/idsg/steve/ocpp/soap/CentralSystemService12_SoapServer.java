@@ -23,7 +23,7 @@ import java.util.concurrent.Future;
  */
 @Slf4j
 @Service
-@Addressing(enabled = true, required = true)
+@Addressing(enabled = true, required = false)
 @BindingType(value = SOAPBinding.SOAP12HTTP_BINDING)
 @WebService(
         serviceName = "CentralSystemService",

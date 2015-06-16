@@ -48,8 +48,7 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
 
     /**
      * UPDATE chargebox
-     * SET endpoint_address = ?,
-     *     ocppProtocol = ?,
+     * SET ocppProtocol = ?,
      *     chargePointVendor = ?,
      *     chargePointModel = ?,
      *     chargePointSerialNumber = ?,
@@ -63,13 +62,12 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
      * WHERE chargeBoxId = ?
      */
     @Override
-    public boolean updateChargebox(String endpointAddress, OcppProtocol protocol, String vendor, String model,
+    public boolean updateChargebox(OcppProtocol protocol, String vendor, String model,
                                    String pointSerial, String boxSerial, String fwVersion, String iccid, String imsi,
                                    String meterType, String meterSerial, String chargeBoxIdentity, Timestamp now) {
 
         int count = DSL.using(config)
                        .update(CHARGEBOX)
-                       .set(CHARGEBOX.ENDPOINT_ADDRESS, endpointAddress)
                        .set(CHARGEBOX.OCPPPROTOCOL, protocol.getCompositeValue())
                        .set(CHARGEBOX.CHARGEPOINTVENDOR, vendor)
                        .set(CHARGEBOX.CHARGEPOINTMODEL, model)
@@ -93,6 +91,15 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
             log.error("The chargebox '{}' is NOT registered and its boot NOT acknowledged.", chargeBoxIdentity);
         }
         return isRegistered;
+    }
+
+    @Override
+    public void updateEndpointAddress(String chargeBoxIdentity, String endpointAddress) {
+        DSL.using(config)
+           .update(CHARGEBOX)
+           .set(CHARGEBOX.ENDPOINT_ADDRESS, endpointAddress)
+           .where(CHARGEBOX.CHARGEBOXID.equal(chargeBoxIdentity))
+           .execute();
     }
 
     /**

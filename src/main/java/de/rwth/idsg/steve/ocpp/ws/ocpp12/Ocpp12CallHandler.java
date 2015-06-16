@@ -40,7 +40,7 @@ public class Ocpp12CallHandler extends AbstractCallHandler {
         ResponseType r = null;
 
         if (params instanceof BootNotificationRequest) {
-            r = service.bootNotification((BootNotificationRequest) params, chargeBoxId, OcppProtocol.V_12_JSON, null);
+            r = service.bootNotification((BootNotificationRequest) params, chargeBoxId, OcppProtocol.V_12_JSON);
 
         } else if (params instanceof FirmwareStatusNotificationRequest) {
             r = service.firmwareStatusNotification((FirmwareStatusNotificationRequest) params, chargeBoxId);

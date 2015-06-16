@@ -4,18 +4,13 @@ import de.rwth.idsg.steve.ocpp.OcppProtocol;
 import de.rwth.idsg.steve.service.CentralSystemService12_Service;
 import lombok.extern.slf4j.Slf4j;
 import ocpp.cs._2010._08.*;
-import org.apache.cxf.ws.addressing.AddressingProperties;
-import org.apache.cxf.ws.addressing.JAXWSAConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Resource;
 import javax.jws.WebService;
 import javax.xml.ws.AsyncHandler;
 import javax.xml.ws.BindingType;
 import javax.xml.ws.Response;
-import javax.xml.ws.WebServiceContext;
-import javax.xml.ws.handler.MessageContext;
 import javax.xml.ws.soap.Addressing;
 import javax.xml.ws.soap.SOAPBinding;
 import java.util.concurrent.Future;
@@ -37,17 +32,10 @@ import java.util.concurrent.Future;
         endpointInterface = "ocpp.cs._2010._08.CentralSystemService")
 public class CentralSystemService12_SoapServer implements CentralSystemService {
 
-    @Resource private WebServiceContext webServiceContext;
     @Autowired private CentralSystemService12_Service service;
 
     public BootNotificationResponse bootNotification(BootNotificationRequest parameters, String chargeBoxIdentity) {
-
-        // Get the Address value from WS-A Header
-        MessageContext messageContext = webServiceContext.getMessageContext();
-        AddressingProperties addressProp = (AddressingProperties) messageContext.get(JAXWSAConstants.ADDRESSING_PROPERTIES_INBOUND);
-        String endpointAddress = addressProp.getFrom().getAddress().getValue();
-
-        return service.bootNotification(parameters, chargeBoxIdentity, OcppProtocol.V_12_SOAP, endpointAddress);
+        return service.bootNotification(parameters, chargeBoxIdentity, OcppProtocol.V_12_SOAP);
     }
 
     public FirmwareStatusNotificationResponse firmwareStatusNotification(FirmwareStatusNotificationRequest parameters,

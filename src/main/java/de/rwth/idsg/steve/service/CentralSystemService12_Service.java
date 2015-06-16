@@ -27,13 +27,12 @@ public class CentralSystemService12_Service {
     @Autowired private OcppConstants ocppConstants;
 
     public BootNotificationResponse bootNotification(BootNotificationRequest parameters, String chargeBoxIdentity,
-                                                     OcppProtocol ocppProtocol, String endpointAddress) {
+                                                     OcppProtocol ocppProtocol) {
         log.debug("Executing bootNotification for {}", chargeBoxIdentity);
 
         DateTime now = new DateTime();
 
-        boolean isRegistered = ocppServerRepository.updateChargebox(endpointAddress,
-                                                                    ocppProtocol,
+        boolean isRegistered = ocppServerRepository.updateChargebox(ocppProtocol,
                                                                     parameters.getChargePointVendor(),
                                                                     parameters.getChargePointModel(),
                                                                     parameters.getChargePointSerialNumber(),

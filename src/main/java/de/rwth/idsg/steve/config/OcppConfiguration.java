@@ -6,8 +6,12 @@ import de.rwth.idsg.steve.ocpp.soap.MessageIdInterceptor;
 import de.rwth.idsg.steve.ocpp.ws.custom.AlwaysLastStrategy;
 import de.rwth.idsg.steve.ocpp.ws.custom.RoundRobinStrategy;
 import de.rwth.idsg.steve.ocpp.ws.custom.WsSessionSelectStrategy;
+import org.apache.cxf.binding.soap.SoapMessage;
+import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.apache.cxf.jaxws.JaxWsServerFactoryBean;
+import org.apache.cxf.message.Message;
+import org.apache.cxf.phase.PhaseInterceptor;
 import org.apache.cxf.ws.addressing.WSAddressingFeature;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -16,6 +20,8 @@ import org.springframework.context.annotation.Configuration;
 
 import javax.annotation.PostConstruct;
 import javax.xml.ws.soap.SOAPBinding;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Configuration and beans related to OCPP clients/services.
@@ -29,13 +35,19 @@ public class OcppConfiguration {
     @Autowired private ocpp.cs._2010._08.CentralSystemService ocpp12Server;
     @Autowired private ocpp.cs._2012._06.CentralSystemService ocpp15Server;
 
+    @Autowired
+    @Qualifier("FromAddressInterceptor")
+    private PhaseInterceptor<SoapMessage> fromAddressInterceptor;
+
     @PostConstruct
     public void init() {
-        MessageIdInterceptor midi = new MessageIdInterceptor();
+        List<Interceptor<? extends Message>> interceptors = new ArrayList<>();
+        interceptors.add(new MessageIdInterceptor());
+        interceptors.add(fromAddressInterceptor);
 
         createRouterService();
-        createOcpp12Service(midi);
-        createOcpp15Service(midi);
+        createOcpp12Service(interceptors);
+        createOcpp15Service(interceptors);
     }
 
     @Bean
@@ -81,19 +93,19 @@ public class OcppConfiguration {
         f.create();
     }
 
-    private void createOcpp12Service(MessageIdInterceptor midi) {
+    private void createOcpp12Service(List<Interceptor<? extends Message>> interceptors) {
         JaxWsServerFactoryBean f = new JaxWsServerFactoryBean();
         f.setServiceBean(ocpp12Server);
         f.setAddress("/CentralSystemServiceOCPP12");
-        f.getInInterceptors().add(midi);
+        f.getInInterceptors().addAll(interceptors);
         f.create();
     }
 
-    private void createOcpp15Service(MessageIdInterceptor midi) {
+    private void createOcpp15Service(List<Interceptor<? extends Message>> interceptors) {
         JaxWsServerFactoryBean f = new JaxWsServerFactoryBean();
         f.setServiceBean(ocpp15Server);
         f.setAddress("/CentralSystemServiceOCPP15");
-        f.getInInterceptors().add(midi);
+        f.getInInterceptors().addAll(interceptors);
         f.create();
     }
 }

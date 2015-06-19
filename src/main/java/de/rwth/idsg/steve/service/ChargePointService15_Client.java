@@ -2,7 +2,6 @@ package de.rwth.idsg.steve.service;
 
 import de.rwth.idsg.steve.handler.ocpp15.*;
 import de.rwth.idsg.steve.ocpp.OcppVersion;
-import de.rwth.idsg.steve.ocpp.soap.ChargePointService15_SoapInvoker;
 import de.rwth.idsg.steve.repository.RequestTaskStore;
 import de.rwth.idsg.steve.repository.ReservationRepository;
 import de.rwth.idsg.steve.repository.UserRepository;

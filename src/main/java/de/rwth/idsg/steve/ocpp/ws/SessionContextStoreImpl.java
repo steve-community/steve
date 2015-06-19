@@ -42,13 +42,13 @@ public class SessionContextStoreImpl implements SessionContextStore {
 
         Deque<SessionContext> endpointDeque = lookupTable.get(chargeBoxId);
         if (endpointDeque == null) {
-            endpointDeque = new ArrayDeque<>();
-            endpointDeque.add(context);
-            lookupTable.put(chargeBoxId, endpointDeque);
-
-        } else {
-            endpointDeque.addLast(context); // Adding at the end
+            final Deque<SessionContext> emptyDeque = new ArrayDeque<>();
+            endpointDeque = lookupTable.putIfAbsent(chargeBoxId, emptyDeque);
+            if (endpointDeque == null) {
+                endpointDeque = emptyDeque;
+            }
         }
+        endpointDeque.addLast(context); // Adding at the end
         log.debug("A new SessionContext is stored for chargeBoxId '{}'. Store size: {}",
                 chargeBoxId, endpointDeque.size());
     }

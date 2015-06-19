@@ -53,7 +53,7 @@ public abstract class AbstractWebSocketEndpoint implements WebSocketHandler {
             handleTextMessage(session, (TextMessage) message);
 
         } else if (message instanceof PongMessage) {
-            handlePongMessage(session, (PongMessage) message);
+            handlePongMessage(session);
 
         } else if (message instanceof BinaryMessage) {
             session.close(CloseStatus.NOT_ACCEPTABLE.withReason("Binary messages not supported"));
@@ -77,7 +77,7 @@ public abstract class AbstractWebSocketEndpoint implements WebSocketHandler {
         pipeline.run(context);
     }
 
-    private void handlePongMessage(WebSocketSession session, PongMessage message) {
+    private void handlePongMessage(WebSocketSession session) {
         log.debug("[id={}] Received pong message", session.getId());
 
         // TODO: Not sure about the following. Should update DB? Should call directly repo?

@@ -7,7 +7,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
-import static de.rwth.idsg.steve.SteveConfiguration.*;
+import static de.rwth.idsg.steve.SteveConfiguration.Auth;
+import static de.rwth.idsg.steve.SteveConfiguration.DB;
+import static de.rwth.idsg.steve.SteveConfiguration.Jetty;
+import static de.rwth.idsg.steve.SteveConfiguration.Ocpp;
+import static de.rwth.idsg.steve.SteveConfiguration.STEVE_VERSION;
 
 /**
  * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
@@ -43,10 +47,10 @@ public class Application {
         Auth.PASSWORD   = prop.getProperty("auth.password");
 
         Jetty.SERVER_HOST           = prop.getProperty("server.host");
-        Jetty.HTTP_ENABLED          = Boolean.valueOf(prop.getProperty("http.enabled"));
-        Jetty.HTTP_PORT             = Integer.valueOf(prop.getProperty("http.port"));
-        Jetty.HTTPS_ENABLED         = Boolean.valueOf(prop.getProperty("https.enabled"));
-        Jetty.HTTPS_PORT            = Integer.valueOf(prop.getProperty("https.port"));
+        Jetty.HTTP_ENABLED          = Boolean.parseBoolean(prop.getProperty("http.enabled"));
+        Jetty.HTTP_PORT             = Integer.parseInt(prop.getProperty("http.port"));
+        Jetty.HTTPS_ENABLED         = Boolean.parseBoolean(prop.getProperty("https.enabled"));
+        Jetty.HTTPS_PORT            = Integer.parseInt(prop.getProperty("https.port"));
         Jetty.KEY_STORE_PATH        = prop.getProperty("keystore.path");
         Jetty.KEY_STORE_PASSWORD    = prop.getProperty("keystore.password");
 

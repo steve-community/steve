@@ -8,8 +8,11 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import javax.servlet.http.HttpServletResponse;
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import java.nio.charset.StandardCharsets;
 
 /**
  * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
@@ -25,7 +28,8 @@ public class LogController {
 
     @RequestMapping(value = "/log", method = RequestMethod.GET)
     public void log(HttpServletResponse response) {
-        try (BufferedReader bufferedReader = new BufferedReader(new FileReader(logFile));
+        try (InputStreamReader ist = new InputStreamReader(new FileInputStream(logFile), StandardCharsets.UTF_8);
+             BufferedReader bufferedReader = new BufferedReader(ist);
              PrintWriter writer = response.getWriter()) {
 
             response.setContentType("text/plain");
@@ -33,7 +37,7 @@ public class LogController {
             while ((sCurrentLine = bufferedReader.readLine()) != null) {
                 writer.println(sCurrentLine);
             }
-        } catch (Exception e) {
+        } catch (IOException e) {
             log.error("Exception happened", e);
         }
     }

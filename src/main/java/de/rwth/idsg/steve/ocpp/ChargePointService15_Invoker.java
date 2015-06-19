@@ -2,7 +2,6 @@ package de.rwth.idsg.steve.ocpp;
 
 import de.rwth.idsg.steve.handler.OcppResponseHandler;
 import de.rwth.idsg.steve.repository.dto.ChargePointSelect;
-import de.rwth.idsg.steve.web.RequestTask;
 import ocpp.cp._2012._06.*;
 
 /**

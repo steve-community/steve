@@ -6,8 +6,6 @@ import com.fasterxml.jackson.databind.module.SimpleModule;
 import de.rwth.idsg.steve.ocpp.ws.custom.EnumMixin;
 import de.rwth.idsg.steve.ocpp.ws.custom.MeterValue15Mixin;
 import ocpp.cp._2012._06.*;
-import ocpp.cp._2012._06.AuthorizationStatus;
-import ocpp.cp._2012._06.DataTransferStatus;
 import ocpp.cs._2012._06.*;
 
 /**
@@ -25,13 +23,13 @@ public class Ocpp15JacksonModule extends SimpleModule {
         sc.setMixInAnnotations(MeterValue.class, MeterValue15Mixin.class);
 
         // Enums from CP
-        sc.setMixInAnnotations(AuthorizationStatus.class, EnumMixin.class);
+        sc.setMixInAnnotations(ocpp.cp._2012._06.AuthorizationStatus.class, EnumMixin.class);
         sc.setMixInAnnotations(AvailabilityStatus.class, EnumMixin.class);
         sc.setMixInAnnotations(AvailabilityType.class, EnumMixin.class);
         sc.setMixInAnnotations(CancelReservationStatus.class, EnumMixin.class);
         sc.setMixInAnnotations(ClearCacheStatus.class, EnumMixin.class);
         sc.setMixInAnnotations(ConfigurationStatus.class, EnumMixin.class);
-        sc.setMixInAnnotations(DataTransferStatus.class, EnumMixin.class);
+        sc.setMixInAnnotations(ocpp.cp._2012._06.DataTransferStatus.class, EnumMixin.class);
         sc.setMixInAnnotations(RemoteStartStopStatus.class, EnumMixin.class);
         sc.setMixInAnnotations(ReservationStatus.class, EnumMixin.class);
         sc.setMixInAnnotations(ResetStatus.class, EnumMixin.class);

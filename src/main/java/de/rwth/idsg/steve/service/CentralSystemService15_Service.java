@@ -47,7 +47,7 @@ public class CentralSystemService15_Service {
                                                                     chargeBoxIdentity,
                                                                     new Timestamp(now.getMillis()));
 
-        RegistrationStatus status = (isRegistered) ? RegistrationStatus.ACCEPTED : RegistrationStatus.REJECTED;
+        RegistrationStatus status = isRegistered ? RegistrationStatus.ACCEPTED : RegistrationStatus.REJECTED;
 
         return new BootNotificationResponse()
                 .withStatus(status)

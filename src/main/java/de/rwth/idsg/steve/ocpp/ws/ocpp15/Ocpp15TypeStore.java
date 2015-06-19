@@ -58,7 +58,7 @@ public class Ocpp15TypeStore extends AbstractTypeStore {
                 new ActionResponsePair("RemoteStopTransaction", RemoteStopTransactionResponse.class));
         actionResponseMap.put(CancelReservationRequest.class,
                 new ActionResponsePair("CancelReservation", CancelReservationResponse.class));
-        actionResponseMap.put(ocpp.cp._2012._06.DataTransferRequest.class,
+        actionResponseMap.put(DataTransferRequest.class,
                 new ActionResponsePair("DataTransfer", DataTransferResponse.class));
         actionResponseMap.put(GetConfigurationRequest.class,
                 new ActionResponsePair("GetConfiguration", GetConfigurationResponse.class));

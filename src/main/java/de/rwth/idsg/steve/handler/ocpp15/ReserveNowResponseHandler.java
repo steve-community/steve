@@ -1,8 +1,6 @@
 package de.rwth.idsg.steve.handler.ocpp15;
 
 import de.rwth.idsg.steve.handler.AbstractOcppResponseHandler;
-import de.rwth.idsg.steve.handler.OcppResponseHandler;
-import de.rwth.idsg.steve.ocpp.ws.data.OcppJsonError;
 import de.rwth.idsg.steve.repository.ReservationRepository;
 import de.rwth.idsg.steve.web.RequestTask;
 import ocpp.cp._2012._06.ReservationStatus;

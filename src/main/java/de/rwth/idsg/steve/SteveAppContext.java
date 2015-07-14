@@ -4,7 +4,6 @@ import de.rwth.idsg.steve.config.BeanConfiguration;
 import de.rwth.idsg.steve.config.OcppConfiguration;
 import de.rwth.idsg.steve.config.SecurityConfiguration;
 import de.rwth.idsg.steve.config.WebSocketConfiguration;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.common.logging.LogUtils;
@@ -19,8 +18,6 @@ import org.eclipse.jetty.server.handler.HandlerCollection;
 import org.eclipse.jetty.servlet.FilterHolder;
 import org.eclipse.jetty.servlet.ServletHolder;
 import org.eclipse.jetty.webapp.WebAppContext;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.web.context.ContextLoaderListener;
 import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
@@ -38,16 +35,11 @@ import java.util.List;
  * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
  * @since 07.04.2015
  */
-@Slf4j
 public class SteveAppContext {
 
     private AnnotationConfigWebApplicationContext springContext;
 
     public SteveAppContext() {
-
-        DateTimeZone.setDefault(DateTimeZone.UTC);
-        log.info("Date/time zone of the application is set to UTC. Current date/time: {}", new DateTime());
-
         springContext = new AnnotationConfigWebApplicationContext();
         springContext.register(BeanConfiguration.class);
         springContext.register(OcppConfiguration.class);

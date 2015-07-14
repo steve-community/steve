@@ -1,6 +1,9 @@
 package de.rwth.idsg.steve;
 
 import de.rwth.idsg.steve.ocpp.ws.custom.WsSessionSelectStrategyEnum;
+import lombok.extern.slf4j.Slf4j;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -17,9 +20,17 @@ import static de.rwth.idsg.steve.SteveConfiguration.STEVE_VERSION;
  * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
  * @since 14.01.2015
  */
+@Slf4j
 public class Application {
 
     public static void main(String[] args) throws IOException {
+
+        // For Hibernate validator
+        System.setProperty("org.jboss.logging.provider", "slf4j");
+
+        DateTimeZone.setDefault(DateTimeZone.UTC);
+        log.info("Date/time zone of the application is set to UTC. Current date/time: {}", new DateTime());
+
         loadProperties();
 
         JettyServer jettyServer = new JettyServer();

@@ -1,6 +1,8 @@
 package de.rwth.idsg.steve;
 
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.jetty.http.HttpVersion;
+import org.eclipse.jetty.http.HttpScheme;
 import org.eclipse.jetty.server.HttpConfiguration;
 import org.eclipse.jetty.server.HttpConnectionFactory;
 import org.eclipse.jetty.server.SecureRequestCustomizer;
@@ -48,7 +50,7 @@ public class JettyServer {
 
         // HTTP Configuration
         HttpConfiguration httpConfig = new HttpConfiguration();
-        httpConfig.setSecureScheme("https");
+        httpConfig.setSecureScheme(HttpScheme.HTTPS.asString());
         httpConfig.setSecurePort(SteveConfiguration.Jetty.HTTPS_PORT);
         httpConfig.setOutputBufferSize(32768);
         httpConfig.setRequestHeaderSize(8192);
@@ -106,7 +108,7 @@ public class JettyServer {
 
         // SSL Connector
         ServerConnector https = new ServerConnector(server,
-                new SslConnectionFactory(sslContextFactory, "http/1.1"),
+                new SslConnectionFactory(sslContextFactory, HttpVersion.HTTP_1_1.asString()),
                 new HttpConnectionFactory(httpsConfig));
         https.setHost(SteveConfiguration.Jetty.SERVER_HOST);
         https.setPort(SteveConfiguration.Jetty.HTTPS_PORT);

@@ -15,6 +15,7 @@ import org.eclipse.jetty.rewrite.handler.RedirectPatternRule;
 import org.eclipse.jetty.rewrite.handler.RewriteHandler;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.handler.HandlerCollection;
+import org.eclipse.jetty.server.handler.HandlerList;
 import org.eclipse.jetty.servlet.FilterHolder;
 import org.eclipse.jetty.servlet.ServletHolder;
 import org.eclipse.jetty.webapp.WebAppContext;
@@ -48,13 +49,13 @@ public class SteveAppContext {
     }
 
     public HandlerCollection getHandlers() throws IOException {
-        HandlerCollection handlerCollection = new HandlerCollection();
-        handlerCollection.setHandlers(
+        HandlerList handlerList = new HandlerList();
+        handlerList.setHandlers(
                 new Handler[]{
                         getRedirectHandler(),
                         getWebApp()
                 });
-        return handlerCollection;
+        return handlerList;
     }
 
     private WebAppContext getWebApp() throws IOException {
@@ -102,11 +103,11 @@ public class SteveAppContext {
         RewriteHandler rewrite = new RewriteHandler();
         rewrite.setRewriteRequestURI(true);
         rewrite.setRewritePathInfo(true);
-        rewrite.setOriginalPathAttribute("requestedPath");
 
         String[] redirectArray = {"", "/steve", "/steve/manager"};
         for (String redirect : redirectArray) {
             RedirectPatternRule rule = new RedirectPatternRule();
+            rule.setTerminating(true);
             rule.setPattern(redirect);
             rule.setLocation("/steve/manager/home");
             rewrite.addRule(rule);

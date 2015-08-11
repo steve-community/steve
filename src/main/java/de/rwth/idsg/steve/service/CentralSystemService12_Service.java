@@ -99,23 +99,17 @@ public class CentralSystemService12_Service {
     public StartTransactionResponse startTransaction(StartTransactionRequest parameters, String chargeBoxIdentity) {
         log.debug("Executing startTransaction for {}", chargeBoxIdentity);
 
-        // Get the authorization info of the user
         String idTag = parameters.getIdTag();
-        IdTagInfo idTagInfo = userService.getIdTagInfoV12(idTag);
+        int connectorId = parameters.getConnectorId();
+        Timestamp startTimestamp = new Timestamp(parameters.getTimestamp().getMillis());
+        String startMeterValue = Integer.toString(parameters.getMeterStart());
 
-        StartTransactionResponse response = new StartTransactionResponse().withIdTagInfo(idTagInfo);
+        Integer transactionId = ocppServerRepository.insertTransaction12(chargeBoxIdentity, connectorId, idTag,
+                                                                         startTimestamp, startMeterValue);
 
-        if (AuthorizationStatus.ACCEPTED.equals(idTagInfo.getStatus())) {
-            int connectorId = parameters.getConnectorId();
-            Timestamp startTimestamp = new Timestamp(parameters.getTimestamp().getMillis());
-            String startMeterValue = Integer.toString(parameters.getMeterStart());
-
-            Integer transactionId = ocppServerRepository.insertTransaction12(chargeBoxIdentity,connectorId, idTag,
-                                                                             startTimestamp, startMeterValue);
-
-            response.setTransactionId(transactionId);
-        }
-        return response;
+        return new StartTransactionResponse()
+                .withIdTagInfo(userService.getIdTagInfoV12(idTag))
+                .withTransactionId(transactionId);
     }
 
     public StopTransactionResponse stopTransaction(StopTransactionRequest parameters, String chargeBoxIdentity) {

@@ -1,6 +1,7 @@
 package de.rwth.idsg.steve.config;
 
 import de.rwth.idsg.steve.SteveConfiguration;
+import de.rwth.idsg.steve.ocpp.OcppVersion;
 import de.rwth.idsg.steve.ocpp.soap.MediatorInInterceptor;
 import de.rwth.idsg.steve.ocpp.soap.MessageIdInterceptor;
 import de.rwth.idsg.steve.ocpp.ws.custom.AlwaysLastStrategy;
@@ -20,7 +21,9 @@ import org.springframework.context.annotation.Configuration;
 import javax.annotation.PostConstruct;
 import javax.xml.ws.soap.SOAPBinding;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Configuration and beans related to OCPP clients/services.
@@ -68,6 +71,7 @@ public class OcppConfiguration {
         f.setBindingId(SOAPBinding.SOAP12HTTP_BINDING);
         f.getFeatures().add(new WSAddressingFeature());
         f.setServiceClass(ocpp.cp._2010._08.ChargePointService.class);
+        f.setProperties(ocppMap(OcppVersion.V_12));
         return f;
     }
 
@@ -78,6 +82,7 @@ public class OcppConfiguration {
         f.setBindingId(SOAPBinding.SOAP12HTTP_BINDING);
         f.getFeatures().add(new WSAddressingFeature());
         f.setServiceClass(ocpp.cp._2012._06.ChargePointService.class);
+        f.setProperties(ocppMap(OcppVersion.V_15));
         return f;
     }
 
@@ -106,5 +111,33 @@ public class OcppConfiguration {
         f.setAddress("/CentralSystemServiceOCPP15");
         f.getInInterceptors().addAll(interceptors);
         f.create();
+    }
+
+    /**
+     * There might be charging stations who expect predefined namespace prefixes,
+     * and don't want to play with the default namespace/prefix handling of our beloved CXF.
+     *
+     * Therefore, we customize namespace prefixes in client requests.
+     * Same approach can also be used to modify service responses.
+     */
+    private Map<String, Object> ocppMap(OcppVersion ocppVersion) {
+        Map<String, String> nameSpaceMap = new HashMap<>();
+        nameSpaceMap.put("soapenv", "http://www.w3.org/2003/05/soap-envelope");
+        nameSpaceMap.put("wsa", "http://www.w3.org/2005/08/addressing");
+
+        switch (ocppVersion) {
+            case V_12:
+                nameSpaceMap.put("ns1", "urn://Ocpp/Cp/2010/08/");
+                break;
+
+            case V_15:
+                nameSpaceMap.put("ns1", "urn://Ocpp/Cp/2012/06/");
+                break;
+        }
+
+        Map<String, Object> map = new HashMap<>();
+        map.put("soap.env.ns.map", nameSpaceMap);
+        map.put("disable.outputstream.optimization", true);
+        return map;
     }
 }

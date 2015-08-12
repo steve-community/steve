@@ -4,6 +4,8 @@ import de.rwth.idsg.steve.SteveConfiguration;
 import de.rwth.idsg.steve.ocpp.OcppConstants;
 import de.rwth.idsg.steve.repository.GenericRepository;
 import de.rwth.idsg.steve.web.dto.SettingsForm;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -44,6 +46,8 @@ public class AboutSettingsController {
         model.addAttribute("version", SteveConfiguration.STEVE_VERSION);
         model.addAttribute("db", genericRepository.getDBVersion());
         model.addAttribute("logFile", logController.getLogFilePath());
+        model.addAttribute("systemTime", new DateTime());
+        model.addAttribute("systemTimeZone", DateTimeZone.getDefault());
         return "about";
     }
 

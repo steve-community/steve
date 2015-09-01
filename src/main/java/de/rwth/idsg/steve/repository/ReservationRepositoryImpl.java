@@ -4,9 +4,9 @@ import de.rwth.idsg.steve.SteveException;
 import de.rwth.idsg.steve.repository.dto.Reservation;
 import de.rwth.idsg.steve.utils.DateTimeUtils;
 import de.rwth.idsg.steve.web.dto.ReservationQueryForm;
-import jooq.steve.db.tables.records.ReservationRecord;
 import lombok.extern.slf4j.Slf4j;
 import org.jooq.Configuration;
+import org.jooq.Record7;
 import org.jooq.RecordMapper;
 import org.jooq.SelectQuery;
 import org.jooq.exception.DataAccessException;
@@ -38,7 +38,15 @@ public class ReservationRepositoryImpl implements ReservationRepository {
     public List<Reservation> getReservations(ReservationQueryForm form) {
         SelectQuery selectQuery = DSL.using(config).selectQuery();
         selectQuery.addFrom(RESERVATION);
-        selectQuery.addSelect(RESERVATION.fields());
+        selectQuery.addSelect(
+                RESERVATION.RESERVATION_PK,
+                RESERVATION.TRANSACTION_PK,
+                RESERVATION.IDTAG,
+                RESERVATION.CHARGEBOXID,
+                RESERVATION.STARTDATETIME,
+                RESERVATION.EXPIRYDATETIME,
+                RESERVATION.STATUS
+        );
 
         if (form.isChargeBoxIdSet()) {
             selectQuery.addConditions(RESERVATION.CHARGEBOXID.eq(form.getChargeBoxId()));
@@ -162,18 +170,19 @@ public class ReservationRepositoryImpl implements ReservationRepository {
     // Private helpers
     // -------------------------------------------------------------------------
 
-    private class ReservationMapper implements RecordMapper<ReservationRecord, Reservation> {
+    private class ReservationMapper implements
+            RecordMapper<Record7<Integer, Integer, String, String, Timestamp, Timestamp, String>, Reservation> {
         @Override
-        public Reservation map(ReservationRecord r) {
+        public Reservation map(Record7<Integer, Integer, String, String, Timestamp, Timestamp, String> r) {
             return Reservation.builder()
-                    .id(r.getReservationPk())
-                    .transactionId(r.getTransactionPk())
-                    .idTag(r.getIdtag())
-                    .chargeBoxId(r.getChargeboxid())
-                    .startDatetime(DateTimeUtils.humanize(r.getStartdatetime()))
-                    .expiryDatetime(DateTimeUtils.humanize(r.getExpirydatetime()))
-                    .status(r.getStatus())
-                    .build();
+                              .id(r.value1())
+                              .transactionId(r.value2())
+                              .idTag(r.value3())
+                              .chargeBoxId(r.value4())
+                              .startDatetime(DateTimeUtils.humanize(r.value5()))
+                              .expiryDatetime(DateTimeUtils.humanize(r.value6()))
+                              .status(r.value7())
+                              .build();
         }
     }
 

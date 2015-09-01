@@ -55,7 +55,7 @@ public class Serializer implements Stage {
             mapper.writeValue(sw, str);
             context.setOutgoingString(sw.toString());
         } catch (IOException e) {
-            throw new SteveException("The outgoing message could not be serialized");
+            throw new SteveException("The outgoing message could not be serialized", e);
         }
     }
 
@@ -90,6 +90,7 @@ public class Serializer implements Stage {
         try {
             payloadNode = mapper.valueToTree(result.getPayload());
         } catch (IllegalArgumentException e) {
+            log.error("Exception occurred", e);
             return handleError(ErrorFactory.payloadSerializeError(result.getMessageId(), e.getMessage()));
         }
 

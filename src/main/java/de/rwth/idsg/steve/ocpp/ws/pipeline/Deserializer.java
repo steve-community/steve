@@ -102,6 +102,7 @@ public class Deserializer implements Stage {
             JsonNode requestPayload = parser.readValueAsTree();
             req = mapper.treeToValue(requestPayload, clazz);
         } catch (IOException e) {
+            log.error("Exception occurred", e);
             context.setOutgoingMessage(ErrorFactory.payloadDeserializeError(messageId, e.getMessage()));
             return;
         }

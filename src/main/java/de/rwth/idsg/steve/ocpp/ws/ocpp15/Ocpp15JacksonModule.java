@@ -20,7 +20,7 @@ public class Ocpp15JacksonModule extends SimpleModule {
 
     @Override
     public void setupModule(Module.SetupContext sc) {
-        sc.setMixInAnnotations(MeterValue.class, MeterValue15Mixin.class);
+        sc.setMixInAnnotations(MeterValuesRequest.class, MeterValue15Mixin.class);
 
         // Enums from CP
         sc.setMixInAnnotations(ocpp.cp._2012._06.AuthorizationStatus.class, EnumMixin.class);

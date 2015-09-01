@@ -3,10 +3,12 @@ package de.rwth.idsg.steve.repository;
 import de.rwth.idsg.steve.SteveException;
 import de.rwth.idsg.steve.repository.dto.Reservation;
 import de.rwth.idsg.steve.utils.DateTimeUtils;
+import de.rwth.idsg.steve.web.dto.ReservationQueryForm;
 import jooq.steve.db.tables.records.ReservationRecord;
 import lombok.extern.slf4j.Slf4j;
 import org.jooq.Configuration;
 import org.jooq.RecordMapper;
+import org.jooq.SelectQuery;
 import org.jooq.exception.DataAccessException;
 import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +18,7 @@ import org.springframework.stereotype.Repository;
 import java.sql.Timestamp;
 import java.util.List;
 
+import static de.rwth.idsg.steve.utils.DateTimeUtils.toTimestamp;
 import static jooq.steve.db.tables.Reservation.RESERVATION;
 
 /**
@@ -30,35 +33,31 @@ public class ReservationRepositoryImpl implements ReservationRepository {
     @Qualifier("jooqConfig")
     private Configuration config;
 
-    /**
-     * SELECT *
-     * FROM reservation
-     * ORDER BY expiryDatetime
-     */
     @Override
-    public List<Reservation> getAllReservations() {
-        return DSL.using(config)
-                .selectFrom(RESERVATION)
-                .orderBy(RESERVATION.EXPIRYDATETIME)
-                .fetch()
-                .map(new ReservationMapper());
-    }
+    @SuppressWarnings("unchecked")
+    public List<Reservation> getReservations(ReservationQueryForm form) {
+        SelectQuery selectQuery = DSL.using(config).selectQuery();
+        selectQuery.addFrom(RESERVATION);
+        selectQuery.addSelect(RESERVATION.fields());
 
-    /**
-     * SELECT *
-     * FROM reservation
-     * WHERE expiryDatetime > CURRENT_TIMESTAMP AND status = ?
-     * ORDER BY expiryDatetime
-     */
-    @Override
-    public List<Reservation> getActiveReservations() {
-        return DSL.using(config)
-                  .selectFrom(RESERVATION)
-                  .where(RESERVATION.EXPIRYDATETIME.greaterThan(DSL.currentTimestamp()))
-                        .and(RESERVATION.STATUS.equal(Status.ACCEPTED.name()))
-                  .orderBy(RESERVATION.EXPIRYDATETIME)
-                  .fetch()
-                  .map(new ReservationMapper());
+        if (form.isChargeBoxIdSet()) {
+            selectQuery.addConditions(RESERVATION.CHARGEBOXID.eq(form.getChargeBoxId()));
+        }
+
+        if (form.isUserIdSet()) {
+            selectQuery.addConditions(RESERVATION.IDTAG.eq(form.getUserId()));
+        }
+
+        if (form.isStatusSet()) {
+            selectQuery.addConditions(RESERVATION.STATUS.eq(form.getStatus().name()));
+        }
+
+        processType(selectQuery, form);
+
+        // Default order
+        selectQuery.addOrderBy(RESERVATION.EXPIRYDATETIME.asc());
+
+        return selectQuery.fetch().map(new ReservationMapper());
     }
 
     /**
@@ -74,7 +73,7 @@ public class ReservationRepositoryImpl implements ReservationRepository {
                   .from(RESERVATION)
                   .where(RESERVATION.CHARGEBOXID.equal(chargeBoxId))
                         .and(RESERVATION.EXPIRYDATETIME.greaterThan(DSL.currentTimestamp()))
-                        .and(RESERVATION.STATUS.equal(Status.ACCEPTED.name()))
+                        .and(RESERVATION.STATUS.equal(ReservationStatus.ACCEPTED.name()))
                   .fetch(RESERVATION.RESERVATION_PK);
     }
 
@@ -93,7 +92,7 @@ public class ReservationRepositoryImpl implements ReservationRepository {
                                        RESERVATION.STATUS)
                                .values(idTag, chargeBoxId,
                                        startTimestamp, expiryTimestamp,
-                                       Status.WAITING.name())
+                                       ReservationStatus.WAITING.name())
                                .returning(RESERVATION.RESERVATION_PK)
                                .fetchOne()
                                .getReservationPk();
@@ -118,12 +117,12 @@ public class ReservationRepositoryImpl implements ReservationRepository {
 
     @Override
     public void accepted(int reservationId) {
-        internalUpdateReservation(reservationId, Status.ACCEPTED);
+        internalUpdateReservation(reservationId, ReservationStatus.ACCEPTED);
     }
 
     @Override
     public void cancelled(int reservationId) {
-        internalUpdateReservation(reservationId, Status.CANCELLED);
+        internalUpdateReservation(reservationId, ReservationStatus.CANCELLED);
     }
 
     /**
@@ -136,7 +135,7 @@ public class ReservationRepositoryImpl implements ReservationRepository {
     public void used(int reservationId, int transactionId) {
         DSL.using(config)
            .update(RESERVATION)
-           .set(RESERVATION.STATUS, Status.USED.name())
+           .set(RESERVATION.STATUS, ReservationStatus.USED.name())
            .set(RESERVATION.TRANSACTION_PK, transactionId)
            .where(RESERVATION.RESERVATION_PK.equal(reservationId))
            .execute();
@@ -147,7 +146,7 @@ public class ReservationRepositoryImpl implements ReservationRepository {
      * SET status = ?
      * WHERE reservation_pk = ?
      */
-    private void internalUpdateReservation(int reservationId, Status status) {
+    private void internalUpdateReservation(int reservationId, ReservationStatus status) {
         try {
             DSL.using(config)
                .update(RESERVATION)
@@ -178,19 +177,18 @@ public class ReservationRepositoryImpl implements ReservationRepository {
         }
     }
 
-    /**
-     * To be used in the DB table "reservation" for the column "status".
-     */
-    private enum Status {
+    private void processType(SelectQuery selectQuery, ReservationQueryForm form) {
+        switch (form.getPeriodType()) {
+            case ACTIVE:
+                selectQuery.addConditions(RESERVATION.EXPIRYDATETIME.greaterThan(DSL.currentTimestamp()));
+                break;
 
-        WAITING,    // Waiting for charge point to respond to a reservation request
-        ACCEPTED,   // Charge point accepted. The only status for active, usable reservations (if expiryDatetime is in future)
-        USED,       // Reservation used by the user for a transaction
-        CANCELLED;  // Reservation cancelled by the user
-
-        @Override
-        public String toString() {
-            return this.name();
+            case FROM_TO:
+                selectQuery.addConditions(
+                        RESERVATION.STARTDATETIME.greaterOrEqual(toTimestamp(form.getFrom())),
+                        RESERVATION.EXPIRYDATETIME.lessOrEqual(toTimestamp(form.getTo()))
+                );
+                break;
         }
     }
 

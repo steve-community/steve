@@ -1,6 +1,7 @@
 package de.rwth.idsg.steve.repository;
 
 import de.rwth.idsg.steve.repository.dto.Reservation;
+import de.rwth.idsg.steve.web.dto.ReservationQueryForm;
 
 import java.sql.Timestamp;
 import java.util.List;
@@ -10,8 +11,7 @@ import java.util.List;
  * @since 19.08.2014
  */
 public interface ReservationRepository {
-    List<Reservation> getAllReservations();
-    List<Reservation> getActiveReservations();
+    List<Reservation> getReservations(ReservationQueryForm form);
 
     List<Integer> getActiveReservationIds(String chargeBoxId);
 

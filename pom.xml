@@ -41,6 +41,9 @@
                 <filtering>false</filtering>
                 <excludes>
                     <exclude>main.properties</exclude>
+                    <exclude>db/**</exclude>
+                    <exclude>wsdl/**</exclude>
+                    <exclude>wsdl-binding/**</exclude>
                 </excludes>
             </resource>
         </resources>
@@ -164,9 +167,9 @@
                     <wsdlRoot>${basedir}/src/main/resources/wsdl</wsdlRoot>
                     <defaultOptions>
                         <bindingFiles>
-                            <bindingFile>${basedir}/src/main/resources/ocpp_binding.xml</bindingFile>
-                            <bindingFile>${basedir}/src/main/resources/async_binding.xml</bindingFile>
-                            <bindingFile>${basedir}/src/main/resources/add_interface.xml</bindingFile>
+                            <bindingFile>${basedir}/src/main/resources/wsdl-binding/ocpp_binding.xml</bindingFile>
+                            <bindingFile>${basedir}/src/main/resources/wsdl-binding/async_binding.xml</bindingFile>
+                            <bindingFile>${basedir}/src/main/resources/wsdl-binding/add_interface.xml</bindingFile>
                         </bindingFiles>
                         <extraargs>
                             <extraarg>-xjc-Xfluent-api</extraarg>

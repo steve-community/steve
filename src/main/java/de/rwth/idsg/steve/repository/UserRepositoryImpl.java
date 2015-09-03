@@ -128,7 +128,7 @@ public class UserRepositoryImpl implements UserRepository {
      * SELECT idTag FROM user
      * WHERE inTransaction = false
      * AND blocked = false
-     * AND (expiryDate IS NULL OR expiryDate > current_timestamp())
+     * AND (expiryDate IS NULL OR expiryDate > utc_timestamp)
      */
     @Override
     public List<String> getActiveUserIdTags() {

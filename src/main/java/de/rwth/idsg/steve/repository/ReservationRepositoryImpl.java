@@ -73,7 +73,7 @@ public class ReservationRepositoryImpl implements ReservationRepository {
      * SELECT reservation_pk
      * FROM reservation
      * WHERE chargeBoxId = ?
-     * AND expiryDatetime > CURRENT_TIMESTAMP AND status = ?
+     * AND expiryDatetime > utc_timestamp AND status = ?
      */
     @Override
     public List<Integer> getActiveReservationIds(String chargeBoxId) {

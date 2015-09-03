@@ -76,7 +76,7 @@ public class TransactionRepositoryImpl implements TransactionRepository {
         processType(selectQuery, form);
 
         // Default order
-        selectQuery.addOrderBy(TRANSACTION.TRANSACTION_PK.asc());
+        selectQuery.addOrderBy(TRANSACTION.TRANSACTION_PK.desc());
 
         return selectQuery.fetch();
     }

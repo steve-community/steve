@@ -1,6 +1,5 @@
 package de.rwth.idsg.steve.service;
 
-import de.rwth.idsg.steve.repository.dto.User;
 import ocpp.cp._2012._06.AuthorisationData;
 
 import java.util.List;
@@ -10,7 +9,6 @@ import java.util.List;
  * @since 03.01.2015
  */
 public interface UserService {
-    List<User> getUsers();
     ocpp.cs._2010._08.IdTagInfo getIdTagInfoV12(String idTag);
     ocpp.cs._2012._06.IdTagInfo getIdTagInfoV15(String idTag);
 

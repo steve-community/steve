@@ -26,7 +26,56 @@
     </div>
 </spring:hasBindErrors>
 <div class="content">
-<section><span>Registered Users</span></section>
+    <form:form action="/steve/manager/users/query" method="get" modelAttribute="params">
+        <section><span>Query Parameters</span></section>
+        <table class="userInput">
+            <tr>
+                <td>User ID:</td>
+                <td><form:select path="userId">
+                        <option value="" selected>All</option>
+                        <form:options items="${idTagList}"/>
+                    </form:select>
+                </td>
+            </tr>
+            <tr>
+                <td>Parent ID:</td>
+                <td><form:select path="parentId">
+                        <option value="" selected>All</option>
+                        <form:options items="${parentIdTagList}"/>
+                    </form:select>
+                </td>
+            </tr>
+            <tr>
+                <td>Expried?:</td>
+                <td><form:select path="expired">
+                        <form:options items="${expired}" itemLabel="value"/>
+                    </form:select>
+                </td>
+            </tr>
+            <tr>
+                <td>In Transaction?:</td>
+                <td><form:select path="inTransaction">
+                    <form:options items="${inTransaction}" itemLabel="value"/>
+                </form:select>
+                </td>
+            </tr>
+            <tr>
+                <td>Blocked?:</td>
+                <td><form:select path="blocked">
+                    <form:options items="${blocked}" itemLabel="value"/>
+                </form:select>
+                </td>
+            </tr>
+            <tr>
+                <td></td>
+                <td id="add_space">
+                    <input type="submit" value="Get">
+                </td>
+            </tr>
+        </table>
+    </form:form>
+    <br>
+<section><span>Users</span></section>
 <table class="res" id="usersTable">
 	<thead><tr><th>User ID Tag</th><th>Parent ID Tag</th><th>Expiry Date/Time</th><th>In Transaction?</th><th>Blocked?</th></tr></thead>
 	<tbody>

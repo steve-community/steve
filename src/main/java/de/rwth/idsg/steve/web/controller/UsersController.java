@@ -3,6 +3,7 @@ package de.rwth.idsg.steve.web.controller;
 import de.rwth.idsg.steve.repository.UserRepository;
 import de.rwth.idsg.steve.service.UserService;
 import de.rwth.idsg.steve.web.dto.UserForm;
+import de.rwth.idsg.steve.web.dto.UserQueryForm;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -28,9 +29,13 @@ public class UsersController {
     @Autowired private UserService userService;
     @Autowired private UserRepository userRepository;
 
+    private static final String PARAMS = "params";
+
     // -------------------------------------------------------------------------
     // Paths
     // -------------------------------------------------------------------------
+
+    private static final String USERS_QUERY_PATH = "/query";
 
     private static final String ADD_PATH = "/add";
     private static final String UPDATE_PATH = "/update";
@@ -42,9 +47,13 @@ public class UsersController {
 
     @RequestMapping(method = RequestMethod.GET)
     public String get(Model model) {
-        model.addAttribute("userList", userService.getUsers());
-        model.addAttribute("userAddForm", new UserForm());
-        model.addAttribute("userUpdateForm", new UserForm());
+        initGetList(model, new UserQueryForm());
+        return "data-man/users";
+    }
+
+    @RequestMapping(value = USERS_QUERY_PATH, method = RequestMethod.GET)
+    public String getQuery(@ModelAttribute(PARAMS) UserQueryForm params, Model model) {
+        initGetList(model, params);
         return "data-man/users";
     }
 
@@ -52,7 +61,7 @@ public class UsersController {
     public String add(@Valid @ModelAttribute("userAddForm") UserForm u,
                       BindingResult result, Model model) {
         if (result.hasErrors()) {
-            model.addAttribute("userList", userService.getUsers());
+            initList(model, new UserQueryForm());
             model.addAttribute("userUpdateForm", new UserForm());
             return "data-man/users";
         }
@@ -66,7 +75,7 @@ public class UsersController {
     public String update(@Valid @ModelAttribute("userUpdateForm") UserForm u,
                          BindingResult result, Model model) {
         if (result.hasErrors()) {
-            model.addAttribute("userList", userService.getUsers());
+            initList(model, new UserQueryForm());
             model.addAttribute("userAddForm", new UserForm());
             return "data-man/users";
         }
@@ -80,5 +89,18 @@ public class UsersController {
     public String delete(@RequestParam String idTag) {
         userRepository.deleteUser(idTag);
         return "redirect:/manager/users";
+    }
+
+    private void initGetList(Model model, UserQueryForm params) {
+        initList(model, params);
+        model.addAttribute("userAddForm", new UserForm());
+        model.addAttribute("userUpdateForm", new UserForm());
+    }
+
+    private void initList(Model model, UserQueryForm params) {
+        model.addAttribute(PARAMS, params);
+        model.addAttribute("idTagList", userRepository.getUserIdTags());
+        model.addAttribute("parentIdTagList", userRepository.getParentIdTags());
+        model.addAttribute("userList", userRepository.getUsers(params));
     }
 }

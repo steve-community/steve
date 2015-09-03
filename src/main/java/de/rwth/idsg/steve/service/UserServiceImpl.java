@@ -2,7 +2,6 @@ package de.rwth.idsg.steve.service;
 
 import de.rwth.idsg.steve.ocpp.OcppConstants;
 import de.rwth.idsg.steve.repository.UserRepository;
-import de.rwth.idsg.steve.repository.dto.User;
 import jooq.steve.db.tables.records.UserRecord;
 import lombok.extern.slf4j.Slf4j;
 import ocpp.cp._2012._06.AuthorisationData;
@@ -16,7 +15,6 @@ import java.sql.Timestamp;
 import java.util.List;
 
 import static de.rwth.idsg.steve.utils.DateTimeUtils.getCurrentTimestamp;
-import static de.rwth.idsg.steve.utils.DateTimeUtils.humanize;
 
 /**
  * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
@@ -28,12 +26,6 @@ public class UserServiceImpl implements UserService {
 
     @Autowired private OcppConstants ocppConstants;
     @Autowired private UserRepository userRepository;
-
-    @Override
-    public List<User> getUsers() {
-        return userRepository.getUserRecords()
-                             .map(new UserMapper());
-    }
 
     @Override
     public List<AuthorisationData> getAuthDataOfAllUsers() {
@@ -116,19 +108,6 @@ public class UserServiceImpl implements UserService {
     // -------------------------------------------------------------------------
     // Private helpers
     // -------------------------------------------------------------------------
-
-    private class UserMapper implements RecordMapper<UserRecord, User> {
-        @Override
-        public User map(UserRecord r) {
-            return User.builder()
-                    .idTag(r.getIdtag())
-                    .parentIdTag(r.getParentidtag())
-                    .expiryDate(humanize(r.getExpirydate()))
-                    .inTransaction(r.getIntransaction())
-                    .blocked(r.getBlocked())
-                    .build();
-        }
-    }
 
     private class AuthorisationDataMapper implements RecordMapper<UserRecord, AuthorisationData> {
         final DateTime nowDt = new DateTime();

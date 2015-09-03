@@ -1,10 +1,17 @@
 package de.rwth.idsg.steve.repository;
 
 import de.rwth.idsg.steve.SteveException;
+import de.rwth.idsg.steve.repository.dto.User;
+import de.rwth.idsg.steve.utils.CustomDSL;
+import de.rwth.idsg.steve.web.dto.UserQueryForm;
 import jooq.steve.db.tables.records.UserRecord;
 import lombok.extern.slf4j.Slf4j;
 import org.jooq.Configuration;
+import org.jooq.Record5;
+import org.jooq.RecordMapper;
 import org.jooq.Result;
+import org.jooq.SelectQuery;
+import org.jooq.TableField;
 import org.jooq.exception.DataAccessException;
 import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +21,7 @@ import org.springframework.stereotype.Repository;
 import java.sql.Timestamp;
 import java.util.List;
 
+import static de.rwth.idsg.steve.utils.DateTimeUtils.humanize;
 import static jooq.steve.db.tables.User.USER;
 
 /**
@@ -27,6 +35,46 @@ public class UserRepositoryImpl implements UserRepository {
     @Autowired
     @Qualifier("jooqConfig")
     private Configuration config;
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public List<User> getUsers(UserQueryForm form) {
+        SelectQuery selectQuery = DSL.using(config).selectQuery();
+        selectQuery.addFrom(USER);
+        selectQuery.addSelect(
+                USER.IDTAG,
+                USER.PARENTIDTAG,
+                USER.EXPIRYDATE,
+                USER.INTRANSACTION,
+                USER.BLOCKED
+        );
+
+        if (form.isUserIdSet()) {
+            selectQuery.addConditions(USER.IDTAG.eq(form.getUserId()));
+        }
+
+        if (form.isParentIdSet()) {
+            selectQuery.addConditions(USER.PARENTIDTAG.eq(form.getParentId()));
+        }
+
+        switch (form.getExpired()) {
+            case TRUE:
+                selectQuery.addConditions(USER.EXPIRYDATE.lessOrEqual(CustomDSL.utcTimestamp()));
+                break;
+
+            case ALL:
+            case FALSE:
+                selectQuery.addConditions(
+                        USER.EXPIRYDATE.isNull().or(USER.EXPIRYDATE.greaterThan(CustomDSL.utcTimestamp()))
+                );
+                break;
+        }
+
+        processBooleanType(selectQuery, USER.INTRANSACTION, form.getInTransaction());
+        processBooleanType(selectQuery, USER.BLOCKED, form.getBlocked());
+
+        return selectQuery.fetch().map(new UserMapper());
+    }
 
     /**
      * SELECT *
@@ -91,6 +139,20 @@ public class UserRepositoryImpl implements UserRepository {
                     .and(USER.BLOCKED.isFalse())
                     .and(USER.EXPIRYDATE.isNull().or(USER.EXPIRYDATE.greaterThan(DSL.currentTimestamp())))
                   .fetch(USER.IDTAG);
+    }
+
+    /**
+     * SELECT DISTINCT parentIdTag
+     * FROM user
+     * WHERE parentIdTag IS NOT NULL
+     */
+    @Override
+    public List<String> getParentIdTags() {
+        return DSL.using(config)
+                  .selectDistinct(USER.PARENTIDTAG)
+                  .from(USER)
+                  .where(USER.PARENTIDTAG.isNotNull())
+                  .fetch(USER.PARENTIDTAG);
     }
 
     /**
@@ -162,6 +224,31 @@ public class UserRepositoryImpl implements UserRepository {
                .execute();
         } catch (DataAccessException e) {
             throw new SteveException("Execution of deleteUser for idTag '" + idTag + "' FAILED.", e);
+        }
+    }
+
+    private void processBooleanType(SelectQuery selectQuery,
+                                    TableField<UserRecord, Boolean> field,
+                                    UserQueryForm.BooleanType type) {
+        switch (type) {
+            case ALL:
+                break;
+
+            default:
+                selectQuery.addConditions(field.eq(type.getBoolValue()));
+        }
+    }
+
+    private class UserMapper implements RecordMapper<Record5<String, String, Timestamp, Boolean, Boolean>, User> {
+        @Override
+        public User map(Record5<String, String, Timestamp, Boolean, Boolean> r) {
+            return User.builder()
+                       .idTag(r.value1())
+                       .parentIdTag(r.value2())
+                       .expiryDate(humanize(r.value3()))
+                       .inTransaction(r.value4())
+                       .blocked(r.value5())
+                       .build();
         }
     }
 }

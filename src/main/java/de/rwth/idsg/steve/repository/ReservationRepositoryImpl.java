@@ -2,6 +2,7 @@ package de.rwth.idsg.steve.repository;
 
 import de.rwth.idsg.steve.SteveException;
 import de.rwth.idsg.steve.repository.dto.Reservation;
+import de.rwth.idsg.steve.utils.CustomDSL;
 import de.rwth.idsg.steve.utils.DateTimeUtils;
 import de.rwth.idsg.steve.web.dto.ReservationQueryForm;
 import lombok.extern.slf4j.Slf4j;
@@ -80,7 +81,7 @@ public class ReservationRepositoryImpl implements ReservationRepository {
                   .select(RESERVATION.RESERVATION_PK)
                   .from(RESERVATION)
                   .where(RESERVATION.CHARGEBOXID.equal(chargeBoxId))
-                        .and(RESERVATION.EXPIRYDATETIME.greaterThan(DSL.currentTimestamp()))
+                        .and(RESERVATION.EXPIRYDATETIME.greaterThan(CustomDSL.utcTimestamp()))
                         .and(RESERVATION.STATUS.equal(ReservationStatus.ACCEPTED.name()))
                   .fetch(RESERVATION.RESERVATION_PK);
     }
@@ -189,7 +190,7 @@ public class ReservationRepositoryImpl implements ReservationRepository {
     private void processType(SelectQuery selectQuery, ReservationQueryForm form) {
         switch (form.getPeriodType()) {
             case ACTIVE:
-                selectQuery.addConditions(RESERVATION.EXPIRYDATETIME.greaterThan(DSL.currentTimestamp()));
+                selectQuery.addConditions(RESERVATION.EXPIRYDATETIME.greaterThan(CustomDSL.utcTimestamp()));
                 break;
 
             case FROM_TO:

@@ -9,6 +9,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
+import java.util.TimeZone;
 
 import static de.rwth.idsg.steve.SteveConfiguration.Auth;
 import static de.rwth.idsg.steve.SteveConfiguration.DB;
@@ -28,6 +29,7 @@ public class Application {
         // For Hibernate validator
         System.setProperty("org.jboss.logging.provider", "slf4j");
 
+        TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
         DateTimeZone.setDefault(DateTimeZone.UTC);
         log.info("Date/time zone of the application is set to UTC. Current date/time: {}", new DateTime());
 

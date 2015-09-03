@@ -137,7 +137,7 @@ public class UserRepositoryImpl implements UserRepository {
                   .from(USER)
                   .where(USER.INTRANSACTION.isFalse())
                     .and(USER.BLOCKED.isFalse())
-                    .and(USER.EXPIRYDATE.isNull().or(USER.EXPIRYDATE.greaterThan(DSL.currentTimestamp())))
+                    .and(USER.EXPIRYDATE.isNull().or(USER.EXPIRYDATE.greaterThan(CustomDSL.utcTimestamp())))
                   .fetch(USER.IDTAG);
     }
 

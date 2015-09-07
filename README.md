@@ -22,11 +22,11 @@ Requirements & Configuration
   - SOAP: `http://<your-server-ip>:<port>/steve/services/CentralSystemService`
   - WebSocket/JSON: `ws://<your-server-ip>:<port>/steve/websocket/CentralSystemService/<chargeBoxId>`
    
-3. Configuration is defined in [main.properties](src/main/resources/main.properties):
-  - You _must_ change [database configuration](src/main/resources/main.properties#L3-L5)
-  - You _must_ change [the host](src/main/resources/main.properties#L14) to the correct IP address of your server
-  - You _must_ change [web interface credentials](src/main/resources/main.properties#L9-L10)
-  - You _can_ access the application via HTTPS, by [enabling it and setting the keystore properties](src/main/resources/main.properties#L23-L26)
+3. Configuration is defined in [main.properties](src/main/resources/config/prod/main.properties):
+  - You _must_ change [database configuration](src/main/resources/config/prod/main.properties#L3-L5)
+  - You _must_ change [the host](src/main/resources/config/prod/main.properties#L14) to the correct IP address of your server
+  - You _must_ change [web interface credentials](src/main/resources/config/prod/main.properties#L9-L10)
+  - You _can_ access the application via HTTPS, by [enabling it and setting the keystore properties](src/main/resources/config/prod/main.properties#L23-L26
   
 How to use?
 -----

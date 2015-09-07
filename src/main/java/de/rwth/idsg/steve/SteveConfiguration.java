@@ -50,6 +50,7 @@ public final class SteveConfiguration {
         public static String URL;
         public static String USERNAME;
         public static String PASSWORD;
+        public static boolean SQL_LOGGING;
     }
 
     /**

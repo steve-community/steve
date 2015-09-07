@@ -6,10 +6,6 @@
     </Properties>
 
     <Appenders>
-        <Console name="CONSOLE" target="SYSTEM_OUT">
-            <PatternLayout pattern="${logPattern}"/>
-        </Console>
-
         <RollingRandomAccessFile name="FILE"
                                  fileName="${sys:user.home}/logs/steve.log"
                                  filePattern="${sys:user.home}/logs/steve-%d{yyyy-MM-dd}-%i.log.gz"
@@ -22,21 +18,14 @@
             </Policies>
             <DefaultRolloverStrategy max="20"/>
         </RollingRandomAccessFile>
-
     </Appenders>
+
     <Loggers>
         <!-- Disable the Jooq logo in logs -->
         <!-- https://github.com/jOOQ/jOOQ/issues/4019 -->
         <AsyncLogger name="org.jooq.Constants" level="WARN"/>
 
-        <AsyncLogger name="org.apache.cxf" level="INFO"/>
-        <AsyncLogger name="org.eclipse.jetty" level="INFO"/>
-        <AsyncLogger name="com.zaxxer.hikari" level="INFO"/>
-        <AsyncLogger name="org.springframework" level="INFO"/>
-        <AsyncLogger name="org.springframework.security" level="INFO"/>
-        <AsyncLogger name="org.springframework.web.servlet" level="INFO"/>
-
-        <AsyncRoot level="DEBUG">
+        <AsyncRoot level="INFO">
             <AppenderRef ref="FILE"/>
         </AsyncRoot>
     </Loggers>

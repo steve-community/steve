@@ -70,7 +70,7 @@ public class BeanConfiguration extends WebMvcConfigurerAdapter {
         return new DefaultConfiguration()
                 .set(SQLDialect.MYSQL)
                 .set(new DataSourceConnectionProvider(dataSource))
-                .set(new Settings().withExecuteLogging(false));
+                .set(new Settings().withExecuteLogging(SteveConfiguration.DB.SQL_LOGGING));
     }
 
     @Bean

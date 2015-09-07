@@ -27,20 +27,35 @@
         <jackson.version>2.5.4</jackson.version>
     </properties>
 
+    <profiles>
+        <profile>
+            <id>prod</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <properties>
+                <envName>prod</envName>
+            </properties>
+        </profile>
+        <profile>
+            <id>dev</id>
+            <properties>
+                <envName>dev</envName>
+            </properties>
+        </profile>
+    </profiles>
+
     <build>
         <resources>
             <resource>
-                <directory>src/main/resources</directory>
+                <directory>src/main/resources/config/${envName}</directory>
                 <filtering>true</filtering>
-                <includes>
-                    <include>main.properties</include>
-                </includes>
             </resource>
             <resource>
                 <directory>src/main/resources</directory>
                 <filtering>false</filtering>
                 <excludes>
-                    <exclude>main.properties</exclude>
+                    <exclude>config/**</exclude>
                     <exclude>db/**</exclude>
                     <exclude>wsdl/**</exclude>
                     <exclude>wsdl-binding/**</exclude>
@@ -92,7 +107,7 @@
                         </goals>
                         <configuration>
                             <files>
-                                <file>src/main/resources/main.properties</file>
+                                <file>src/main/resources/config/${envName}/main.properties</file>
                             </files>
                         </configuration>
                     </execution>

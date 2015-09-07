@@ -52,9 +52,10 @@ public class Application {
 
         STEVE_VERSION = prop.getProperty("steve.version");
 
-        DB.URL      = prop.getProperty("db.url");
-        DB.USERNAME = prop.getProperty("db.user");
-        DB.PASSWORD = prop.getProperty("db.password");
+        DB.URL          = prop.getProperty("db.url");
+        DB.USERNAME     = prop.getProperty("db.user");
+        DB.PASSWORD     = prop.getProperty("db.password");
+        DB.SQL_LOGGING  = Boolean.parseBoolean(prop.getProperty("db.sql.logging"));
 
         Auth.USERNAME   = prop.getProperty("auth.user");
         Auth.PASSWORD   = prop.getProperty("auth.password");

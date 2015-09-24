@@ -102,15 +102,15 @@ public class TransactionRepositoryImpl implements TransactionRepository {
         @Override
         public Transaction map(Record8<Integer, String, Integer, String, Timestamp, String, Timestamp, String> r) {
             return Transaction.builder()
-                    .id(r.value1())
-                    .chargeBoxId(r.value2())
-                    .connectorId(r.value3())
-                    .idTag(r.value4())
-                    .startTimestamp(DateTimeUtils.humanize(r.value5()))
-                    .startValue(r.value6())
-                    .stopTimestamp(DateTimeUtils.humanize(r.value7()))
-                    .stopValue(r.value8())
-                    .build();
+                              .id(r.value1())
+                              .chargeBoxId(r.value2())
+                              .connectorId(r.value3())
+                              .idTag(r.value4())
+                              .startTimestamp(DateTimeUtils.humanize(r.value5()))
+                              .startValue(r.value6())
+                              .stopTimestamp(DateTimeUtils.humanize(r.value7()))
+                              .stopValue(r.value8())
+                              .build();
         }
     }
 

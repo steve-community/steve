@@ -131,18 +131,6 @@ public class ReservationRepositoryImpl implements ReservationRepository {
            .execute();
     }
 
-    private void internalUpdateReservation(int reservationId, ReservationStatus status) {
-        try {
-            DSL.using(config)
-               .update(RESERVATION)
-               .set(RESERVATION.STATUS, status.name())
-               .where(RESERVATION.RESERVATION_PK.equal(reservationId))
-               .execute();
-        } catch (DataAccessException e) {
-            log.error("Updating of reservationId '{}' to status '{}' FAILED.", reservationId, status, e);
-        }
-    }
-
     // -------------------------------------------------------------------------
     // Private helpers
     // -------------------------------------------------------------------------
@@ -160,6 +148,18 @@ public class ReservationRepositoryImpl implements ReservationRepository {
                               .expiryDatetime(DateTimeUtils.humanize(r.value6()))
                               .status(r.value7())
                               .build();
+        }
+    }
+
+    private void internalUpdateReservation(int reservationId, ReservationStatus status) {
+        try {
+            DSL.using(config)
+               .update(RESERVATION)
+               .set(RESERVATION.STATUS, status.name())
+               .where(RESERVATION.RESERVATION_PK.equal(reservationId))
+               .execute();
+        } catch (DataAccessException e) {
+            log.error("Updating of reservationId '{}' to status '{}' FAILED.", reservationId, status, e);
         }
     }
 

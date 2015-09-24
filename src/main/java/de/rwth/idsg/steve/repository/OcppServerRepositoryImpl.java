@@ -193,7 +193,8 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
     }
 
     @Override
-    public void insertMeterValuesOfTransaction(String chargeBoxIdentity, final int transactionId, final List<MeterValue> list) {
+    public void insertMeterValuesOfTransaction(String chargeBoxIdentity, final int transactionId,
+                                               final List<MeterValue> list) {
 
         DSL.using(config).transaction(new TransactionalRunnable() {
             @Override

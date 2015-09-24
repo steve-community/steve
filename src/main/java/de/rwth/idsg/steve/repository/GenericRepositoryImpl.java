@@ -38,33 +38,33 @@ public class GenericRepositoryImpl implements GenericRepository {
         gs.execute(config);
 
         return Statistics.builder()
-                .numChargeBoxes(gs.getNumchargeboxes())
-                .numUsers(gs.getNumusers())
-                .numReservations(gs.getNumreservs())
-                .numTransactions(gs.getNumtranses())
-                .heartbeatToday(gs.getHeartbeattoday())
-                .heartbeatYesterday(gs.getHeartbeatyester())
-                .heartbeatEarlier(gs.getHeartbeatearl())
-                .connAvailable(gs.getConnavail())
-                .connOccupied(gs.getConnocc())
-                .connFaulted(gs.getConnfault())
-                .connUnavailable(gs.getConnunavail())
-                .build();
+                         .numChargeBoxes(gs.getNumchargeboxes())
+                         .numUsers(gs.getNumusers())
+                         .numReservations(gs.getNumreservs())
+                         .numTransactions(gs.getNumtranses())
+                         .heartbeatToday(gs.getHeartbeattoday())
+                         .heartbeatYesterday(gs.getHeartbeatyester())
+                         .heartbeatEarlier(gs.getHeartbeatearl())
+                         .connAvailable(gs.getConnavail())
+                         .connOccupied(gs.getConnocc())
+                         .connFaulted(gs.getConnfault())
+                         .connUnavailable(gs.getConnunavail())
+                         .build();
     }
 
     @Override
     public DbVersion getDBVersion() {
         Record2<String, Timestamp> record = DSL.using(config)
-                                    .select(SCHEMA_VERSION.VERSION, SCHEMA_VERSION.INSTALLED_ON)
-                                    .from(SCHEMA_VERSION)
-                                    .where(SCHEMA_VERSION.VERSION_RANK.eq(
-                                                    select(max(SCHEMA_VERSION.VERSION_RANK)).from(SCHEMA_VERSION)))
-                                    .fetchOne();
+                                               .select(SCHEMA_VERSION.VERSION, SCHEMA_VERSION.INSTALLED_ON)
+                                               .from(SCHEMA_VERSION)
+                                               .where(SCHEMA_VERSION.VERSION_RANK.eq(
+                                                       select(max(SCHEMA_VERSION.VERSION_RANK)).from(SCHEMA_VERSION)))
+                                               .fetchOne();
 
         String ts = DateTimeUtils.humanize(record.value2());
         return DbVersion.builder()
-                .version(record.value1())
-                .updateTimestamp(ts)
-                .build();
+                        .version(record.value1())
+                        .updateTimestamp(ts)
+                        .build();
     }
 }

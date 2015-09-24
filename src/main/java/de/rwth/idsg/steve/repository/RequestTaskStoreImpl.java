@@ -31,12 +31,12 @@ public class RequestTaskStoreImpl implements RequestTaskStore {
             RequestTask r = entry.getValue();
             list.add(
                     TaskOverview.builder()
-                            .taskId(entry.getKey())
-                            .start(r.getStartTimestamp())
-                            .end(r.getEndTimestamp())
-                            .responseCount(r.getResponseCount().get())
-                            .requestCount(r.getResultMap().size())
-                            .build()
+                                .taskId(entry.getKey())
+                                .start(r.getStartTimestamp())
+                                .end(r.getEndTimestamp())
+                                .responseCount(r.getResponseCount().get())
+                                .requestCount(r.getResultMap().size())
+                                .build()
             );
         }
         Collections.sort(list);

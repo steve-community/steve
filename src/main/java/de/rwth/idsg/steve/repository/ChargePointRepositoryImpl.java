@@ -82,24 +82,24 @@ public class ChargePointRepositoryImpl implements ChargePointRepository {
 
         // TODO: Sweet baby jesus. Is there a better way?
         return ChargePoint.builder()
-                .chargeBoxId(r.getChargeboxid())
-                .endpointAddress(r.getEndpointAddress())
-                .ocppProtocol(r.getOcppprotocol())
-                .chargePointVendor(r.getChargepointvendor())
-                .chargePointModel(r.getChargepointmodel())
-                .chargePointSerialNumber(r.getChargepointserialnumber())
-                .chargeBoxSerialNumber(r.getChargeboxserialnumber())
-                .firewireVersion(r.getFwversion())
-                .firewireUpdateStatus(r.getFwupdatestatus())
-                .firewireUpdateTimestamp(DateTimeUtils.humanize(r.getFwupdatetimestamp()))
-                .iccid(r.getIccid())
-                .imsi(r.getImsi())
-                .meterType(r.getMetertype())
-                .meterSerialNumber(r.getMeterserialnumber())
-                .diagnosticsStatus(r.getDiagnosticsstatus())
-                .diagnosticsTimestamp(DateTimeUtils.humanize(r.getDiagnosticstimestamp()))
-                .lastHeartbeatTimestamp(DateTimeUtils.humanize(r.getLastheartbeattimestamp()))
-                .build();
+                          .chargeBoxId(r.getChargeboxid())
+                          .endpointAddress(r.getEndpointAddress())
+                          .ocppProtocol(r.getOcppprotocol())
+                          .chargePointVendor(r.getChargepointvendor())
+                          .chargePointModel(r.getChargepointmodel())
+                          .chargePointSerialNumber(r.getChargepointserialnumber())
+                          .chargeBoxSerialNumber(r.getChargeboxserialnumber())
+                          .firewireVersion(r.getFwversion())
+                          .firewireUpdateStatus(r.getFwupdatestatus())
+                          .firewireUpdateTimestamp(DateTimeUtils.humanize(r.getFwupdatetimestamp()))
+                          .iccid(r.getIccid())
+                          .imsi(r.getImsi())
+                          .meterType(r.getMetertype())
+                          .meterSerialNumber(r.getMeterserialnumber())
+                          .diagnosticsStatus(r.getDiagnosticsstatus())
+                          .diagnosticsTimestamp(DateTimeUtils.humanize(r.getDiagnosticstimestamp()))
+                          .lastHeartbeatTimestamp(DateTimeUtils.humanize(r.getLastheartbeattimestamp()))
+                          .build();
     }
 
     @Override
@@ -193,9 +193,9 @@ public class ChargePointRepositoryImpl implements ChargePointRepository {
         @Override
         public Heartbeat map(Record2<String, Timestamp> r) {
             return Heartbeat.builder()
-                    .chargeBoxId(r.value1())
-                    .lastTimestamp(DateTimeUtils.humanize(r.value2()))
-                    .build();
+                            .chargeBoxId(r.value1())
+                            .lastTimestamp(DateTimeUtils.humanize(r.value2()))
+                            .build();
         }
     }
 
@@ -204,12 +204,12 @@ public class ChargePointRepositoryImpl implements ChargePointRepository {
         @Override
         public ConnectorStatus map(Record5<String, Integer, Timestamp, String, String> r) {
             return ConnectorStatus.builder()
-                    .chargeBoxId(r.value1())
-                    .connectorId(r.value2())
-                    .timeStamp(DateTimeUtils.humanize(r.value3()))
-                    .status(r.value4())
-                    .errorCode(r.value5())
-                    .build();
+                                  .chargeBoxId(r.value1())
+                                  .connectorId(r.value2())
+                                  .timeStamp(DateTimeUtils.humanize(r.value3()))
+                                  .status(r.value4())
+                                  .errorCode(r.value5())
+                                  .build();
         }
     }
 }

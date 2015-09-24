@@ -81,13 +81,6 @@ public class TransactionRepositoryImpl implements TransactionRepository {
         return selectQuery.fetch();
     }
 
-    /**
-     * SELECT transaction.transaction_pk FROM transaction
-     * JOIN connector
-     *      ON transaction.connector_pk = connector.connector_pk
-     *      AND chargeBoxId = ?
-     * WHERE stopTimestamp IS NULL
-     */
     @Override
     public List<Integer> getActiveTransactionIds(String chargeBoxId) {
         return DSL.using(config)

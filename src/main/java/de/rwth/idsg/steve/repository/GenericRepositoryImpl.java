@@ -30,9 +30,6 @@ public class GenericRepositoryImpl implements GenericRepository {
     @Qualifier("jooqConfig")
     private Configuration config;
 
-    /**
-     * {CALL getStats(?,?,?,?,?,?,?,?,?,?,?)}
-     */
     @Override
     public Statistics getStats() {
 
@@ -55,11 +52,6 @@ public class GenericRepositoryImpl implements GenericRepository {
                 .build();
     }
 
-    /**
-     * SELECT version, installed_on
-     * FROM schema_version
-     * WHERE version_rank = (SELECT MAX(version_rank) FROM schema_version)
-     */
     @Override
     public DbVersion getDBVersion() {
         Record2<String, Timestamp> record = DSL.using(config)

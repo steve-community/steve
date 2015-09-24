@@ -46,21 +46,6 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
 
     @Autowired private ReservationRepository reservationRepository;
 
-    /**
-     * UPDATE chargebox
-     * SET ocppProtocol = ?,
-     *     chargePointVendor = ?,
-     *     chargePointModel = ?,
-     *     chargePointSerialNumber = ?,
-     *     chargeBoxSerialNumber = ?,
-     *     fwVersion = ?,
-     *     iccid = ?,
-     *     imsi = ?,
-     *     meterType = ?,
-     *     meterSerialNumber = ?,
-     *     lastHeartbeatTimestamp = ?
-     * WHERE chargeBoxId = ?
-     */
     @Override
     public boolean updateChargebox(OcppProtocol protocol, String vendor, String model,
                                    String pointSerial, String boxSerial, String fwVersion, String iccid, String imsi,
@@ -102,11 +87,6 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
            .execute();
     }
 
-    /**
-     * UPDATE chargebox
-     * SET fwUpdateStatus = ?, fwUpdateTimestamp = ?
-     * WHERE chargeBoxId = ?
-     */
     @Override
     public void updateChargeboxFirmwareStatus(String chargeBoxIdentity, String firmwareStatus) {
         DSL.using(config)
@@ -117,11 +97,6 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
            .execute();
     }
 
-    /**
-     * UPDATE chargebox
-     * SET diagnosticsStatus = ?, diagnosticsTimestamp = ?
-     * WHERE chargeBoxId = ?
-     */
     @Override
     public void updateChargeboxDiagnosticsStatus(String chargeBoxIdentity, String status) {
         DSL.using(config)
@@ -132,11 +107,6 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
            .execute();
     }
 
-    /**
-     * UPDATE chargebox
-     * SET lastHeartbeatTimestamp = ?
-     * WHERE chargeBoxId = ?
-     */
     @Override
     public void updateChargeboxHeartbeat(String chargeBoxIdentity, Timestamp ts) {
         DSL.using(config)
@@ -171,18 +141,6 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
                 // Step 2: We store a log of connector statuses
                 // -------------------------------------------------------------------------
 
-                /**
-                 * INSERT INTO connector_status
-                 *  (connector_pk,
-                 *  statusTimestamp,
-                 *  status,
-                 *  errorCode,
-                 *  errorInfo,
-                 *  vendorId,
-                 *  vendorErrorCode)
-                 * VALUES
-                 * ((SELECT connector_pk FROM connector WHERE chargeBoxId = ? AND connectorId = ?) , ? , ? , ? , ? , ? , ?)
-                 */
                 ctx.insertInto(CONNECTOR_STATUS)
                    .set(CONNECTOR_STATUS.CONNECTOR_PK, DSL.select(CONNECTOR.CONNECTOR_PK)
                                                           .from(CONNECTOR)
@@ -277,12 +235,6 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
                 // Step 1: Insert transaction
                 // -------------------------------------------------------------------------
 
-                /**
-                 * INSERT INTO transaction
-                 * (connector_pk, idTag, startTimestamp, startValue)
-                 * VALUES
-                 * ((SELECT connector_pk FROM connector WHERE chargeBoxId = ? AND connectorId = ?) , ? , ? , ?)
-                 */
                 int transactionId = ctx.insertInto(TRANSACTION)
                                        .set(CONNECTOR_STATUS.CONNECTOR_PK, DSL.select(CONNECTOR.CONNECTOR_PK)
                                                                               .from(CONNECTOR)
@@ -310,12 +262,6 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
     }
 
     /**
-     * UPDATE transaction
-     * SET stopTimestamp = ?, stopValue = ?
-     * WHERE transaction_pk = ?
-     * AND stopTimestamp IS NULL
-     * AND stopVALUE IS NULL
-     *
      * After update, a DB trigger sets the user.inTransaction field to 0
      */
     @Override
@@ -336,8 +282,6 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
 
     /**
      * If the connector information was not received before, insert it. Otherwise, ignore.
-     *
-     * INSERT IGNORE INTO connector (chargeBoxId, connectorId) VALUES (?,?)
      */
     private void insertIgnoreConnector(DSLContext ctx, String chargeBoxIdentity, int connectorId) {
         int count = ctx.insertInto(CONNECTOR,
@@ -351,11 +295,6 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
         }
     }
 
-    /**
-     * SELECT connector_pk
-     * FROM connector
-     * WHERE chargeBoxId = ? AND connectorId = ?
-     */
     private int getConnectorPkFromConnector(DSLContext ctx, String chargeBoxIdentity, int connectorId) {
         return ctx.select(CONNECTOR.CONNECTOR_PK)
                   .from(CONNECTOR)
@@ -365,11 +304,6 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
                   .value1();
     }
 
-    /**
-     * INSERT INTO connector_metervalue
-     * (connector_pk, valueTimestamp, value)
-     * VALUES (?,?,?)
-     */
     private void batchInsertMeterValues12(DSLContext ctx, List<ocpp.cs._2010._08.MeterValue> list, int connectorPk) {
         // Init query with DUMMY values. The actual values are not important.
         BatchBindStep batchBindStep = ctx.batch(
@@ -391,11 +325,6 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
         batchBindStep.execute();
     }
 
-    /**
-     * INSERT INTO connector_metervalue
-     * (connector_pk, transaction_pk, valueTimestamp, value, readingContext, format, measurand, location, unit)
-     * VALUES (?,?,?,?,?,?,?,?,?)
-     */
     private void batchInsertMeterValues15(DSLContext ctx, List<ocpp.cs._2012._06.MeterValue> list, int connectorPk,
                                           Integer transactionId) {
         // Init query with DUMMY values. The actual values are not important.

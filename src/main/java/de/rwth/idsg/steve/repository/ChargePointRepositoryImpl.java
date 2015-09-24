@@ -54,12 +54,6 @@ public class ChargePointRepositoryImpl implements ChargePointRepository {
         return (r != null) && (r == 1);
     }
 
-    /**
-     * SELECT chargeBoxId, endpoint_address
-     * FROM chargebox
-     * WHERE ocppVersion = ?
-     * AND endpoint_address IS NOT NULL
-     */
     @Override
     public List<ChargePointSelect> getChargePointSelect(OcppProtocol protocol) {
         return DSL.using(config)
@@ -71,10 +65,6 @@ public class ChargePointRepositoryImpl implements ChargePointRepository {
                   .map(new ChargePointSelectMapper(protocol.getTransport()));
     }
 
-    /**
-     * SELECT chargeBoxId
-     * FROM chargebox
-     */
     @Override
     public List<String> getChargeBoxIds() {
         return DSL.using(config)
@@ -83,11 +73,6 @@ public class ChargePointRepositoryImpl implements ChargePointRepository {
                   .fetch(CHARGEBOX.CHARGEBOXID);
     }
 
-    /**
-     * SELECT *
-     * FROM chargebox
-     * WHERE chargeBoxId = ?
-     */
     @Override
     public ChargePoint getChargePointDetails(String chargeBoxId) {
         ChargeboxRecord r = DSL.using(config)
@@ -117,11 +102,6 @@ public class ChargePointRepositoryImpl implements ChargePointRepository {
                 .build();
     }
 
-    /**
-     * SELECT chargeBoxId, lastHeartbeatTimestamp
-     * FROM chargebox
-     * ORDER BY lastHeartbeatTimestamp DESC
-     */
     @Override
     public List<Heartbeat> getChargePointHeartbeats() {
         return DSL.using(config)
@@ -132,15 +112,6 @@ public class ChargePointRepositoryImpl implements ChargePointRepository {
                   .map(new HeartbeatMapper());
     }
 
-    /**
-     * SELECT c.chargeBoxId, c.connectorId, cs.statustimeStamp, cs.status, cs.errorCode
-     * FROM connector_status cs
-     * INNER JOIN connector c
-     *      ON cs.connector_pk = c.connector_pk
-     * INNER JOIN (SELECT connector_pk, MAX(statusTimestamp) AS Max FROM connector_status GROUP BY connector_pk) AS t1
-     *      ON cs.connector_pk = t1.connector_pk AND cs.statusTimestamp = t1.Max
-     * ORDER BY cs.statustimeStamp DESC
-     */
     @Override
     public List<ConnectorStatus> getChargePointConnectorStatus() {
         // Prepare for the inner select of the second join
@@ -165,9 +136,6 @@ public class ChargePointRepositoryImpl implements ChargePointRepository {
                   .map(new ConnectorStatusMapper());
     }
 
-    /**
-     * INSERT IGNORE INTO chargebox (chargeBoxId) VALUES (?)
-     */
     @Override
     public void addChargePoint(String chargeBoxId) {
         try {
@@ -186,10 +154,6 @@ public class ChargePointRepositoryImpl implements ChargePointRepository {
         }
     }
 
-    /**
-     * DELETE FROM chargebox
-     * WHERE chargeBoxId = ?
-     */
     @Override
     public void deleteChargePoint(String chargeBoxId) {
         try {
@@ -202,11 +166,6 @@ public class ChargePointRepositoryImpl implements ChargePointRepository {
         }
     }
 
-    /**
-     * SELECT connectorId
-     * FROM connector
-     * WHERE chargeBoxId = ?
-     */
     @Override
     public List<Integer> getConnectorIds(String chargeBoxId) {
         return DSL.using(config)

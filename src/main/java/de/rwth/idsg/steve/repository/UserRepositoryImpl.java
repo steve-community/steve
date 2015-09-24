@@ -76,10 +76,6 @@ public class UserRepositoryImpl implements UserRepository {
         return selectQuery.fetch().map(new UserMapper());
     }
 
-    /**
-     * SELECT *
-     * FROM user
-     */
     @Override
     public Result<UserRecord> getUserRecords() {
         return DSL.using(config)
@@ -87,11 +83,6 @@ public class UserRepositoryImpl implements UserRepository {
                   .fetch();
     }
 
-    /**
-     * SELECT *
-     * FROM user
-     * WHERE idTag IN (?,?,...,?)
-     */
     @Override
     public Result<UserRecord> getUserRecords(List<String> idTagList) {
         return DSL.using(config)
@@ -100,11 +91,6 @@ public class UserRepositoryImpl implements UserRepository {
                   .fetch();
     }
 
-    /**
-     * SELECT *
-     * FROM user
-     * WHERE idTag = ?
-     */
     @Override
     public UserRecord getUserRecord(String idTag) {
         return DSL.using(config)
@@ -113,9 +99,6 @@ public class UserRepositoryImpl implements UserRepository {
                   .fetchOne();
     }
 
-    /**
-     * SELECT idTag FROM user
-     */
     @Override
     public List<String> getUserIdTags() {
         return DSL.using(config)
@@ -124,12 +107,6 @@ public class UserRepositoryImpl implements UserRepository {
                 .fetch(USER.IDTAG);
     }
 
-    /**
-     * SELECT idTag FROM user
-     * WHERE inTransaction = false
-     * AND blocked = false
-     * AND (expiryDate IS NULL OR expiryDate > utc_timestamp)
-     */
     @Override
     public List<String> getActiveUserIdTags() {
         return DSL.using(config)
@@ -141,11 +118,6 @@ public class UserRepositoryImpl implements UserRepository {
                   .fetch(USER.IDTAG);
     }
 
-    /**
-     * SELECT DISTINCT parentIdTag
-     * FROM user
-     * WHERE parentIdTag IS NOT NULL
-     */
     @Override
     public List<String> getParentIdTags() {
         return DSL.using(config)
@@ -155,11 +127,6 @@ public class UserRepositoryImpl implements UserRepository {
                   .fetch(USER.PARENTIDTAG);
     }
 
-    /**
-     * SELECT parentIdTag
-     * FROM user
-     * WHERE idTag = ?
-     */
     @Override
     public String getParentIdtag(String idTag) {
         return DSL.using(config)
@@ -170,9 +137,6 @@ public class UserRepositoryImpl implements UserRepository {
                   .value1();
     }
 
-    /**
-     * INSERT IGNORE INTO user (idTag, parentIdTag, expiryDate, inTransaction, blocked) VALUES (?,?,?,?,?)
-     */
     @Override
     public void addUser(String idTag, String parentIdTag, Timestamp expiryTimestamp) {
         try {
@@ -191,11 +155,6 @@ public class UserRepositoryImpl implements UserRepository {
         }
     }
 
-    /**
-     * UPDATE user
-     * SET parentIdTag = ?, expiryDate = ?, blocked = ?
-     * WHERE idTag = ?
-     */
     @Override
     public void updateUser(String idTag, String parentIdTag, Timestamp expiryTimestamp, boolean blocked) {
         try {
@@ -211,10 +170,6 @@ public class UserRepositoryImpl implements UserRepository {
         }
     }
 
-    /**
-     * DELETE FROM user
-     * WHERE idTag = ?
-     */
     @Override
     public void deleteUser(String idTag) {
         try {

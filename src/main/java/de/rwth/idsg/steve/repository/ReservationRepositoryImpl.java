@@ -69,12 +69,6 @@ public class ReservationRepositoryImpl implements ReservationRepository {
         return selectQuery.fetch().map(new ReservationMapper());
     }
 
-    /**
-     * SELECT reservation_pk
-     * FROM reservation
-     * WHERE chargeBoxId = ?
-     * AND expiryDatetime > utc_timestamp AND status = ?
-     */
     @Override
     public List<Integer> getActiveReservationIds(String chargeBoxId) {
         return DSL.using(config)
@@ -86,9 +80,6 @@ public class ReservationRepositoryImpl implements ReservationRepository {
                   .fetch(RESERVATION.RESERVATION_PK);
     }
 
-    /**
-     * INSERT INTO reservation (idTag, chargeBoxId, startDatetime, expiryDatetime, status) VALUES (?,?,?,?,?)
-     */
     @Override
     public int insert(String idTag, String chargeBoxId, Timestamp startTimestamp, Timestamp expiryTimestamp) {
         // Check overlapping
@@ -110,10 +101,6 @@ public class ReservationRepositoryImpl implements ReservationRepository {
         return reservationId;
     }
 
-    /**
-     * DELETE FROM reservation
-     * WHERE reservation_pk = ?
-     */
     @Override
     public void delete(int reservationId) {
         DSL.using(config)
@@ -134,12 +121,6 @@ public class ReservationRepositoryImpl implements ReservationRepository {
         internalUpdateReservation(reservationId, ReservationStatus.CANCELLED);
     }
 
-    /**
-     * UPDATE reservation
-     * SET status = ?,
-     * SET transaction_pk = ?
-     * WHERE reservation_pk = ?
-     */
     @Override
     public void used(int reservationId, int transactionId) {
         DSL.using(config)
@@ -150,11 +131,6 @@ public class ReservationRepositoryImpl implements ReservationRepository {
            .execute();
     }
 
-    /**
-     * UPDATE reservation
-     * SET status = ?
-     * WHERE reservation_pk = ?
-     */
     private void internalUpdateReservation(int reservationId, ReservationStatus status) {
         try {
             DSL.using(config)
@@ -204,12 +180,6 @@ public class ReservationRepositoryImpl implements ReservationRepository {
 
     /**
      * Throws exception, if there are rows whose date/time ranges overlap with the input
-     *
-     * This WHERE clause covers all three cases:
-     *
-     * SELECT 1
-     * FROM reservation
-     * WHERE ? <= expiryDatetime AND ? >= startDatetime AND chargeBoxId = ?
      */
     private void isOverlapping(Timestamp start, Timestamp stop, String chargeBoxId) {
         try {

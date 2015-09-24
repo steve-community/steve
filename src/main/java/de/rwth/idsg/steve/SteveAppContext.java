@@ -1,9 +1,5 @@
 package de.rwth.idsg.steve;
 
-import de.rwth.idsg.steve.config.BeanConfiguration;
-import de.rwth.idsg.steve.config.OcppConfiguration;
-import de.rwth.idsg.steve.config.SecurityConfiguration;
-import de.rwth.idsg.steve.config.WebSocketConfiguration;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.common.logging.LogUtils;
@@ -42,10 +38,7 @@ public class SteveAppContext {
 
     public SteveAppContext() {
         springContext = new AnnotationConfigWebApplicationContext();
-        springContext.register(BeanConfiguration.class);
-        springContext.register(OcppConfiguration.class);
-        springContext.register(SecurityConfiguration.class);
-        springContext.register(WebSocketConfiguration.class);
+        springContext.scan("de.rwth.idsg.steve.config");
     }
 
     public HandlerCollection getHandlers() throws IOException {

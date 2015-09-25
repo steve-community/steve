@@ -129,34 +129,31 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
                                         final String errorCode, final String errorInfo,
                                         final String vendorId, final String vendorErrorCode) {
 
-        DSL.using(config).transaction(new TransactionalRunnable() {
-            @Override
-            public void run(Configuration configuration) throws Exception {
-                DSLContext ctx = DSL.using(configuration);
+        DSL.using(config).transaction(configuration -> {
+            DSLContext ctx = DSL.using(configuration);
 
-                // Step 1
-                insertIgnoreConnector(ctx, chargeBoxIdentity, connectorId);
+            // Step 1
+            insertIgnoreConnector(ctx, chargeBoxIdentity, connectorId);
 
-                // -------------------------------------------------------------------------
-                // Step 2: We store a log of connector statuses
-                // -------------------------------------------------------------------------
+            // -------------------------------------------------------------------------
+            // Step 2: We store a log of connector statuses
+            // -------------------------------------------------------------------------
 
-                ctx.insertInto(CONNECTOR_STATUS)
-                   .set(CONNECTOR_STATUS.CONNECTOR_PK, DSL.select(CONNECTOR.CONNECTOR_PK)
-                                                          .from(CONNECTOR)
-                                                          .where(CONNECTOR.CHARGEBOXID.equal(chargeBoxIdentity))
-                                                          .and(CONNECTOR.CONNECTORID.equal(connectorId))
-                   )
-                   .set(CONNECTOR_STATUS.STATUSTIMESTAMP, timestamp)
-                   .set(CONNECTOR_STATUS.STATUS, status)
-                   .set(CONNECTOR_STATUS.ERRORCODE, errorCode)
-                   .set(CONNECTOR_STATUS.ERRORINFO, errorInfo)
-                   .set(CONNECTOR_STATUS.VENDORID, vendorId)
-                   .set(CONNECTOR_STATUS.VENDORERRORCODE, vendorErrorCode)
-                   .execute();
+            ctx.insertInto(CONNECTOR_STATUS)
+               .set(CONNECTOR_STATUS.CONNECTOR_PK, DSL.select(CONNECTOR.CONNECTOR_PK)
+                                                      .from(CONNECTOR)
+                                                      .where(CONNECTOR.CHARGEBOXID.equal(chargeBoxIdentity))
+                                                      .and(CONNECTOR.CONNECTORID.equal(connectorId))
+               )
+               .set(CONNECTOR_STATUS.STATUSTIMESTAMP, timestamp)
+               .set(CONNECTOR_STATUS.STATUS, status)
+               .set(CONNECTOR_STATUS.ERRORCODE, errorCode)
+               .set(CONNECTOR_STATUS.ERRORINFO, errorInfo)
+               .set(CONNECTOR_STATUS.VENDORID, vendorId)
+               .set(CONNECTOR_STATUS.VENDORERRORCODE, vendorErrorCode)
+               .execute();
 
-                log.debug("Stored a new connector status for {}/{}.", chargeBoxIdentity, connectorId);
-            }
+            log.debug("Stored a new connector status for {}/{}.", chargeBoxIdentity, connectorId);
         });
     }
 
@@ -164,15 +161,12 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
     public void insertMeterValues12(final String chargeBoxIdentity, final int connectorId,
                                     final List<ocpp.cs._2010._08.MeterValue> list) {
 
-        DSL.using(config).transaction(new TransactionalRunnable() {
-            @Override
-            public void run(Configuration configuration) throws Exception {
-                DSLContext ctx = DSL.using(configuration);
+        DSL.using(config).transaction(configuration -> {
+            DSLContext ctx = DSL.using(configuration);
 
-                insertIgnoreConnector(ctx, chargeBoxIdentity, connectorId);
-                int connectorPk = getConnectorPkFromConnector(ctx, chargeBoxIdentity, connectorId);
-                batchInsertMeterValues12(ctx, list, connectorPk);
-            }
+            insertIgnoreConnector(ctx, chargeBoxIdentity, connectorId);
+            int connectorPk = getConnectorPkFromConnector(ctx, chargeBoxIdentity, connectorId);
+            batchInsertMeterValues12(ctx, list, connectorPk);
         });
     }
 
@@ -180,15 +174,12 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
     public void insertMeterValues15(final String chargeBoxIdentity, final int connectorId,
                                     final List<ocpp.cs._2012._06.MeterValue> list, final Integer transactionId) {
 
-        DSL.using(config).transaction(new TransactionalRunnable() {
-            @Override
-            public void run(Configuration configuration) throws Exception {
-                DSLContext ctx = DSL.using(configuration);
+        DSL.using(config).transaction(configuration -> {
+            DSLContext ctx = DSL.using(configuration);
 
-                insertIgnoreConnector(ctx, chargeBoxIdentity, connectorId);
-                int connectorPk = getConnectorPkFromConnector(ctx, chargeBoxIdentity, connectorId);
-                batchInsertMeterValues15(ctx, list, connectorPk, transactionId);
-            }
+            insertIgnoreConnector(ctx, chargeBoxIdentity, connectorId);
+            int connectorPk = getConnectorPkFromConnector(ctx, chargeBoxIdentity, connectorId);
+            batchInsertMeterValues15(ctx, list, connectorPk, transactionId);
         });
     }
 
@@ -196,20 +187,17 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
     public void insertMeterValuesOfTransaction(String chargeBoxIdentity, final int transactionId,
                                                final List<MeterValue> list) {
 
-        DSL.using(config).transaction(new TransactionalRunnable() {
-            @Override
-            public void run(Configuration configuration) throws Exception {
-                DSLContext ctx = DSL.using(configuration);
+        DSL.using(config).transaction(configuration -> {
+            DSLContext ctx = DSL.using(configuration);
 
-                // First, get connector primary key from transaction table
-                int connectorPk = ctx.select(TRANSACTION.CONNECTOR_PK)
-                                     .from(TRANSACTION)
-                                     .where(TRANSACTION.TRANSACTION_PK.equal(transactionId))
-                                     .fetchOne()
-                                     .value1();
+            // First, get connector primary key from transaction table
+            int connectorPk = ctx.select(TRANSACTION.CONNECTOR_PK)
+                                 .from(TRANSACTION)
+                                 .where(TRANSACTION.TRANSACTION_PK.equal(transactionId))
+                                 .fetchOne()
+                                 .value1();
 
-                batchInsertMeterValues15(ctx, list, connectorPk, transactionId);
-            }
+            batchInsertMeterValues15(ctx, list, connectorPk, transactionId);
         });
     }
 
@@ -225,40 +213,37 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
                                        final Timestamp startTimestamp, final String startMeterValue,
                                        final Integer reservationId) {
 
-        return DSL.using(config).transactionResult(new TransactionalCallable<Integer>() {
-            @Override
-            public Integer run(Configuration configuration) throws Exception {
-                DSLContext ctx = DSL.using(configuration);
+        return DSL.using(config).transactionResult(configuration -> {
+            DSLContext ctx = DSL.using(configuration);
 
-                insertIgnoreConnector(ctx, chargeBoxIdentity, connectorId);
+            insertIgnoreConnector(ctx, chargeBoxIdentity, connectorId);
 
-                // -------------------------------------------------------------------------
-                // Step 1: Insert transaction
-                // -------------------------------------------------------------------------
+            // -------------------------------------------------------------------------
+            // Step 1: Insert transaction
+            // -------------------------------------------------------------------------
 
-                int transactionId = ctx.insertInto(TRANSACTION)
-                                       .set(CONNECTOR_STATUS.CONNECTOR_PK, DSL.select(CONNECTOR.CONNECTOR_PK)
-                                                                              .from(CONNECTOR)
-                                                                              .where(CONNECTOR.CHARGEBOXID.equal(chargeBoxIdentity))
-                                                                              .and(CONNECTOR.CONNECTORID.equal(connectorId))
-                                       )
-                                       .set(TRANSACTION.IDTAG, idTag)
-                                       .set(TRANSACTION.STARTTIMESTAMP, startTimestamp)
-                                       .set(TRANSACTION.STARTVALUE, startMeterValue)
-                                       .returning(TRANSACTION.TRANSACTION_PK)
-                                       .fetchOne()
-                                       .getTransactionPk();
+            int transactionId = ctx.insertInto(TRANSACTION)
+                                   .set(CONNECTOR_STATUS.CONNECTOR_PK, DSL.select(CONNECTOR.CONNECTOR_PK)
+                                                                          .from(CONNECTOR)
+                                                                          .where(CONNECTOR.CHARGEBOXID.equal(chargeBoxIdentity))
+                                                                          .and(CONNECTOR.CONNECTORID.equal(connectorId))
+                                   )
+                                   .set(TRANSACTION.IDTAG, idTag)
+                                   .set(TRANSACTION.STARTTIMESTAMP, startTimestamp)
+                                   .set(TRANSACTION.STARTVALUE, startMeterValue)
+                                   .returning(TRANSACTION.TRANSACTION_PK)
+                                   .fetchOne()
+                                   .getTransactionPk();
 
-                // -------------------------------------------------------------------------
-                // Step 2 for OCPP 1.5: A startTransaction may be related to a reservation
-                // -------------------------------------------------------------------------
+            // -------------------------------------------------------------------------
+            // Step 2 for OCPP 1.5: A startTransaction may be related to a reservation
+            // -------------------------------------------------------------------------
 
-                if (reservationId != null) {
-                    reservationRepository.used(reservationId, transactionId);
-                }
-
-                return transactionId;
+            if (reservationId != null) {
+                reservationRepository.used(reservationId, transactionId);
             }
+
+            return transactionId;
         });
     }
 

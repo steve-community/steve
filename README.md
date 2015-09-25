@@ -16,7 +16,7 @@ Supported OCPP protocols
 Requirements & Configuration
 -----
 
-1. You need JDK 7, Maven and MySQL.
+1. You need JDK 8, Maven and MySQL.
 
 2. The charge points must be configured to communicate with following addresses. Depending on the OCPP version of the charge point, SteVe will automatically route messages to the version-specific implementation.
   - SOAP: `http://<your-server-ip>:<port>/steve/services/CentralSystemService`

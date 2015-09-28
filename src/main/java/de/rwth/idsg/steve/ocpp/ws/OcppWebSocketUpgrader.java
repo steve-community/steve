@@ -50,7 +50,7 @@ public class OcppWebSocketUpgrader extends JettyRequestUpgradeStrategy {
         if (chargePointRepository.isRegistered(chargeBoxId)) {
             attributes.put(AbstractWebSocketEndpoint.CHARGEBOX_ID_KEY, chargeBoxId);
         } else {
-            throw new HandshakeFailureException("ChargeBoxId '" + chargeBoxId +"' is not registered");
+            throw new HandshakeFailureException("ChargeBoxId '" + chargeBoxId + "' is not registered");
         }
 
         // -------------------------------------------------------------------------

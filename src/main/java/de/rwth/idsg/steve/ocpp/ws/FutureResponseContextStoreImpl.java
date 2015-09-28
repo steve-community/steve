@@ -29,7 +29,7 @@ public class FutureResponseContextStoreImpl implements FutureResponseContextStor
         Map<String, FutureResponseContext> contextMap = lookupTable.get(session);
         if (contextMap == null) {
             log.debug("Creating new store for sessionId '{}'", session.getId());
-            lookupTable.put(session, new ConcurrentHashMap<String, FutureResponseContext>());
+            lookupTable.put(session, new ConcurrentHashMap<>());
         }
     }
 
@@ -43,7 +43,7 @@ public class FutureResponseContextStoreImpl implements FutureResponseContextStor
     public void add(WebSocketSession session, String messageId, FutureResponseContext context) {
         Map<String, FutureResponseContext> map = lookupTable.get(session);
         if (map == null) {
-            throw new SteveException("sessionId '" + session.getId() + "' is not in store");
+            throw new SteveException("sessionId '%s' is not in store", session.getId());
         } else {
             map.put(messageId, context);
             log.debug("Store size for sessionId '{}': {}", session.getId(), map.size());
@@ -54,7 +54,7 @@ public class FutureResponseContextStoreImpl implements FutureResponseContextStor
     public FutureResponseContext get(WebSocketSession session, String messageId) {
         Map<String, FutureResponseContext> map = lookupTable.get(session);
         if (map == null) {
-            throw new SteveException("sessionId '" + session.getId() + "' is not in store");
+            throw new SteveException("sessionId '%s' is not in store", session.getId());
         } else {
             FutureResponseContext context = map.remove(messageId);
             log.debug("Store size for sessionId '{}': {}", session.getId(), map.size());

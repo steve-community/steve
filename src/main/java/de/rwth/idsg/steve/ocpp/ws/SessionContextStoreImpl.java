@@ -101,7 +101,7 @@ public class SessionContextStoreImpl implements SessionContextStore {
         try {
             return wsSessionSelectStrategy.getSession(endpointDeque);
         } catch (NoSuchElementException e) {
-            throw new SteveException("No session context for chargeBoxId '" + chargeBoxId + "'", e);
+            throw new SteveException("No session context for chargeBoxId '%s'", chargeBoxId, e);
         }
     }
 

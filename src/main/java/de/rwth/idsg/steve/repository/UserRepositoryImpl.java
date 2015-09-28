@@ -148,10 +148,10 @@ public class UserRepositoryImpl implements UserRepository {
                            .execute();
 
             if (count == 0) {
-                throw new SteveException("A user with idTag '" + idTag + "' already exists.");
+                throw new SteveException("A user with idTag '%s' already exists.", idTag);
             }
         } catch (DataAccessException e) {
-            throw new SteveException("Execution of addUser for idTag '" + idTag + "' FAILED.", e);
+            throw new SteveException("Execution of addUser for idTag '%s' FAILED.", idTag, e);
         }
     }
 
@@ -166,7 +166,7 @@ public class UserRepositoryImpl implements UserRepository {
                .where(USER.IDTAG.equal(idTag))
                .execute();
         } catch (DataAccessException e) {
-            throw new SteveException("Execution of updateUser for idTag '" + idTag + "' FAILED.", e);
+            throw new SteveException("Execution of updateUser for idTag '%s' FAILED.", idTag, e);
         }
     }
 
@@ -178,7 +178,7 @@ public class UserRepositoryImpl implements UserRepository {
                .where(USER.IDTAG.equal(idTag))
                .execute();
         } catch (DataAccessException e) {
-            throw new SteveException("Execution of deleteUser for idTag '" + idTag + "' FAILED.", e);
+            throw new SteveException("Execution of deleteUser for idTag '%s' FAILED.", idTag, e);
         }
     }
 

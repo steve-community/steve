@@ -65,7 +65,7 @@ public class Deserializer implements Stage {
                     break;
             }
         } catch (IOException e) {
-            throw new SteveException("Deserialization of incoming string failed: " + context.getIncomingString(), e);
+            throw new SteveException("Deserialization of incoming string failed: %s", context.getIncomingString(), e);
         }
     }
 
@@ -122,8 +122,10 @@ public class Deserializer implements Stage {
     private void handleResult(CommunicationContext context, String messageId, JsonParser parser) {
         FutureResponseContext responseContext = futureResponseContextStore.get(context.getSession(), messageId);
         if (responseContext == null) {
-            throw new SteveException("A result message was received as response to a not-sent call. The message was: "
-                    + context.getIncomingString());
+            throw new SteveException(
+                    "A result message was received as response to a not-sent call. The message was: %s",
+                    context.getIncomingString()
+            );
         }
 
         ResponseType res;
@@ -150,8 +152,10 @@ public class Deserializer implements Stage {
     private void handleError(CommunicationContext context, String messageId, JsonParser parser) {
         FutureResponseContext responseContext = futureResponseContextStore.get(context.getSession(), messageId);
         if (responseContext == null) {
-            throw new SteveException("An error message was received as response to a not-sent call. The message was: "
-                    + context.getIncomingString());
+            throw new SteveException(
+                    "An error message was received as response to a not-sent call. The message was: %s",
+                    context.getIncomingString()
+            );
         }
 
         ErrorCode code;

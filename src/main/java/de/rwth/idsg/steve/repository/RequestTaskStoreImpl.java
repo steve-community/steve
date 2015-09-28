@@ -44,7 +44,7 @@ public class RequestTaskStoreImpl implements RequestTaskStore {
     public RequestTask get(Integer taskId) {
         RequestTask r = lookupTable.get(taskId);
         if (r == null) {
-            throw new SteveException(String.format("There is no task with taskId '%s'", taskId));
+            throw new SteveException("There is no task with taskId '%s'", taskId);
         } else {
             return r;
         }

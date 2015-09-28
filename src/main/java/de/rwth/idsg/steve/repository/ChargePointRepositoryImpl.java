@@ -147,10 +147,10 @@ public class ChargePointRepositoryImpl implements ChargePointRepository {
                            .execute();
 
             if (count == 0) {
-                throw new SteveException("A charge point with chargeBoxId '" + chargeBoxId +"' already exists.");
+                throw new SteveException("A charge point with chargeBoxId '%s' already exists.", chargeBoxId);
             }
         } catch (DataAccessException e) {
-            throw new SteveException("The charge point with chargeBoxId '" + chargeBoxId + "' could NOT be added.", e);
+            throw new SteveException("The charge point with chargeBoxId '%s' could NOT be added.", chargeBoxId, e);
         }
     }
 
@@ -162,7 +162,7 @@ public class ChargePointRepositoryImpl implements ChargePointRepository {
                .where(CHARGEBOX.CHARGEBOXID.equal(chargeBoxId))
                .execute();
         } catch (DataAccessException e) {
-            throw new SteveException("The charge point with chargeBoxId '" + chargeBoxId + "' could NOT be deleted.", e);
+            throw new SteveException("The charge point with chargeBoxId '%s' could NOT be deleted.", chargeBoxId, e);
         }
     }
 

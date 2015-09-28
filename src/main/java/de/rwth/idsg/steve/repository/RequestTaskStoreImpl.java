@@ -6,12 +6,10 @@ import de.rwth.idsg.steve.web.RequestTask;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 /**
  * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
@@ -26,21 +24,20 @@ public class RequestTaskStoreImpl implements RequestTaskStore {
 
     @Override
     public List<TaskOverview> getOverview() {
-        List<TaskOverview> list = new ArrayList<>(lookupTable.size());
-        for (Map.Entry<Integer, RequestTask> entry : lookupTable.entrySet()) {
-            RequestTask r = entry.getValue();
-            list.add(
-                    TaskOverview.builder()
-                                .taskId(entry.getKey())
-                                .start(r.getStartTimestamp())
-                                .end(r.getEndTimestamp())
-                                .responseCount(r.getResponseCount().get())
-                                .requestCount(r.getResultMap().size())
-                                .build()
-            );
-        }
-        Collections.sort(list);
-        return list;
+        return lookupTable.entrySet()
+                          .stream()
+                          .map(entry -> {
+                              RequestTask r = entry.getValue();
+                              return TaskOverview.builder()
+                                                 .taskId(entry.getKey())
+                                                 .start(r.getStartTimestamp())
+                                                 .end(r.getEndTimestamp())
+                                                 .responseCount(r.getResponseCount().get())
+                                                 .requestCount(r.getResultMap().size())
+                                                 .build();
+                          })
+                          .sorted()
+                          .collect(Collectors.toList());
     }
 
     @Override
@@ -62,10 +59,9 @@ public class RequestTaskStoreImpl implements RequestTaskStore {
 
     @Override
     public void clearFinished() {
-        for (Map.Entry<Integer, RequestTask> entry : lookupTable.entrySet()) {
-            if (entry.getValue().isFinished()) {
-                lookupTable.remove(entry.getKey());
-            }
-        }
+        lookupTable.entrySet()
+                   .stream()
+                   .filter(entry -> entry.getValue().isFinished())
+                   .forEach(entry -> lookupTable.remove(entry.getKey()));
     }
 }

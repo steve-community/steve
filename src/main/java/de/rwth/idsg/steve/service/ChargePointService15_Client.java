@@ -31,6 +31,7 @@ import org.springframework.stereotype.Service;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static de.rwth.idsg.steve.utils.DateTimeUtils.toDateTime;
 
@@ -120,11 +121,11 @@ public class ChargePointService15_Client {
     }
 
     private GetConfigurationRequest prepareGetConfiguration(GetConfigurationParams params) {
-        List<ConfigurationKeyEnum> enumList = params.getConfKeyList();
-        List<String> stringList = new ArrayList<>(enumList.size());
-        for (ConfigurationKeyEnum e : enumList) {
-            stringList.add(e.value());
-        }
+        List<String> stringList = params.getConfKeyList()
+                                        .stream()
+                                        .map(ConfigurationKeyEnum::value)
+                                        .collect(Collectors.toList());
+
         return new GetConfigurationRequest().withKey(stringList);
     }
 

@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Transport-level agnostic OCPP 1.5 server service which contains the actual business logic.
@@ -146,10 +147,11 @@ public class CentralSystemService15_Service {
          * Saved the world again with this micro-optimization.
          */
         if (parameters.isSetTransactionData()) {
-            List<MeterValue> combinedList = new ArrayList<>();
-            for (TransactionData data : parameters.getTransactionData()) {
-                combinedList.addAll(data.getValues());
-            }
+            List<MeterValue> combinedList = parameters.getTransactionData()
+                                                      .stream()
+                                                      .flatMap(data -> data.getValues().stream())
+                                                      .collect(Collectors.toList());
+
             ocppServerRepository.insertMeterValuesOfTransaction(chargeBoxIdentity, transactionId, combinedList);
         }
 

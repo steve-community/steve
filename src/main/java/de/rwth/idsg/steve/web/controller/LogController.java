@@ -6,13 +6,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import javax.servlet.http.HttpServletResponse;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 /**
  * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
@@ -23,26 +22,23 @@ import java.nio.charset.StandardCharsets;
 @RequestMapping(value = "/manager")
 public class LogController {
 
-    private final File logDir = new File(System.getProperty("user.home"), "logs");
-    private final File logFile = new File(logDir, "steve.log");
+    private final Path logPath = Paths.get(System.getProperty("user.home"), "logs", "steve.log");
 
     @RequestMapping(value = "/log", method = RequestMethod.GET)
     public void log(HttpServletResponse response) {
-        try (InputStreamReader ist = new InputStreamReader(new FileInputStream(logFile), StandardCharsets.UTF_8);
-             BufferedReader bufferedReader = new BufferedReader(ist);
-             PrintWriter writer = response.getWriter()) {
 
+        try (PrintWriter writer = response.getWriter()) {
             response.setContentType("text/plain");
-            String sCurrentLine;
-            while ((sCurrentLine = bufferedReader.readLine()) != null) {
-                writer.println(sCurrentLine);
-            }
+
+            Files.lines(logPath, StandardCharsets.UTF_8)
+                 .forEach(writer::println);
+
         } catch (IOException e) {
             log.error("Exception happened", e);
         }
     }
 
     public String getLogFilePath() {
-        return logFile.getAbsolutePath();
+        return logPath.toAbsolutePath().toString();
     }
 }

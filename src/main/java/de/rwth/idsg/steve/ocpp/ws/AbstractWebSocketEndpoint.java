@@ -18,7 +18,6 @@ import org.springframework.web.socket.WebSocketHandler;
 import org.springframework.web.socket.WebSocketMessage;
 import org.springframework.web.socket.WebSocketSession;
 
-import java.sql.Timestamp;
 import java.util.Deque;
 import java.util.List;
 import java.util.Map;
@@ -81,8 +80,7 @@ public abstract class AbstractWebSocketEndpoint implements WebSocketHandler {
         log.debug("[id={}] Received pong message", session.getId());
 
         // TODO: Not sure about the following. Should update DB? Should call directly repo?
-        DateTime now = new DateTime();
-        ocppServerRepository.updateChargeboxHeartbeat(getChargeBoxId(session), new Timestamp(now.getMillis()));
+        ocppServerRepository.updateChargeboxHeartbeat(getChargeBoxId(session), DateTime.now());
     }
 
     @Override

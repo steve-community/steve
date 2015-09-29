@@ -3,15 +3,12 @@ package de.rwth.idsg.steve.service;
 import de.rwth.idsg.steve.ocpp.OcppConstants;
 import de.rwth.idsg.steve.ocpp.OcppProtocol;
 import de.rwth.idsg.steve.repository.OcppServerRepository;
-import de.rwth.idsg.steve.utils.DateTimeUtils;
 import lombok.extern.slf4j.Slf4j;
 import ocpp.cs._2012._06.*;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.sql.Timestamp;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -46,7 +43,7 @@ public class CentralSystemService15_Service {
                                                                     parameters.getMeterType(),
                                                                     parameters.getMeterSerialNumber(),
                                                                     chargeBoxIdentity,
-                                                                    new Timestamp(now.getMillis()));
+                                                                    now);
 
         RegistrationStatus status = isRegistered ? RegistrationStatus.ACCEPTED : RegistrationStatus.REJECTED;
 
@@ -75,12 +72,7 @@ public class CentralSystemService15_Service {
 
         // Optional fields
         String errorInfo = parameters.getInfo();
-        Timestamp timestamp;
-        if (parameters.isSetTimestamp()) {
-            timestamp = new Timestamp(parameters.getTimestamp().getMillis());
-        } else {
-            timestamp = DateTimeUtils.getCurrentTimestamp();
-        }
+        DateTime timestamp = parameters.isSetTimestamp() ? parameters.getTimestamp() : DateTime.now();
         String vendorId = parameters.getVendorId();
         String vendorErrorCode = parameters.getVendorErrorCode();
 
@@ -116,7 +108,7 @@ public class CentralSystemService15_Service {
         String idTag = parameters.getIdTag();
         int connectorId = parameters.getConnectorId();
         Integer reservationId = parameters.getReservationId();
-        Timestamp startTimestamp = new Timestamp(parameters.getTimestamp().getMillis());
+        DateTime startTimestamp = parameters.getTimestamp();
         String startMeterValue = Integer.toString(parameters.getMeterStart());
 
         Integer transactionId = ocppServerRepository.insertTransaction15(chargeBoxIdentity, connectorId, idTag,
@@ -133,7 +125,7 @@ public class CentralSystemService15_Service {
 
         // Get parameters and update transaction in DB
         int transactionId = parameters.getTransactionId();
-        Timestamp stopTimestamp = new Timestamp(parameters.getTimestamp().getMillis());
+        DateTime stopTimestamp = parameters.getTimestamp();
         String stopMeterValue = Integer.toString(parameters.getMeterStop());
         ocppServerRepository.updateTransaction(transactionId, stopTimestamp, stopMeterValue);
 
@@ -168,7 +160,7 @@ public class CentralSystemService15_Service {
         log.debug("Executing heartbeat for {}", chargeBoxIdentity);
 
         DateTime now = new DateTime();
-        ocppServerRepository.updateChargeboxHeartbeat(chargeBoxIdentity, new Timestamp(now.getMillis()));
+        ocppServerRepository.updateChargeboxHeartbeat(chargeBoxIdentity, now);
 
         return new HeartbeatResponse().withCurrentTime(now);
     }

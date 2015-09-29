@@ -3,14 +3,11 @@ package de.rwth.idsg.steve.service;
 import de.rwth.idsg.steve.ocpp.OcppConstants;
 import de.rwth.idsg.steve.ocpp.OcppProtocol;
 import de.rwth.idsg.steve.repository.OcppServerRepository;
-import de.rwth.idsg.steve.utils.DateTimeUtils;
 import lombok.extern.slf4j.Slf4j;
 import ocpp.cs._2010._08.*;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.sql.Timestamp;
 
 /**
  * Transport-level agnostic OCPP 1.2 server service which contains the actual business logic.
@@ -43,7 +40,7 @@ public class CentralSystemService12_Service {
                                                                     parameters.getMeterType(),
                                                                     parameters.getMeterSerialNumber(),
                                                                     chargeBoxIdentity,
-                                                                    new Timestamp(now.getMillis()));
+                                                                    now);
 
         if (isRegistered) {
             return new BootNotificationResponse()
@@ -73,7 +70,7 @@ public class CentralSystemService12_Service {
         String status = parameters.getStatus().value();
         String errorCode = parameters.getErrorCode().value();
         ocppServerRepository.insertConnectorStatus12(chargeBoxIdentity, connectorId, status,
-                                                     DateTimeUtils.getCurrentTimestamp(), errorCode);
+                                                     DateTime.now(), errorCode);
         return new StatusNotificationResponse();
     }
 
@@ -101,7 +98,7 @@ public class CentralSystemService12_Service {
 
         String idTag = parameters.getIdTag();
         int connectorId = parameters.getConnectorId();
-        Timestamp startTimestamp = new Timestamp(parameters.getTimestamp().getMillis());
+        DateTime startTimestamp = parameters.getTimestamp();
         String startMeterValue = Integer.toString(parameters.getMeterStart());
 
         Integer transactionId = ocppServerRepository.insertTransaction12(chargeBoxIdentity, connectorId, idTag,
@@ -116,7 +113,7 @@ public class CentralSystemService12_Service {
         log.debug("Executing stopTransaction for {}", chargeBoxIdentity);
 
         int transactionId = parameters.getTransactionId();
-        Timestamp stopTimestamp = new Timestamp(parameters.getTimestamp().getMillis());
+        DateTime stopTimestamp = parameters.getTimestamp();
         String stopMeterValue = Integer.toString(parameters.getMeterStop());
         ocppServerRepository.updateTransaction(transactionId, stopTimestamp, stopMeterValue);
 
@@ -133,7 +130,7 @@ public class CentralSystemService12_Service {
         log.debug("Executing heartbeat for {}", chargeBoxIdentity);
 
         DateTime now = new DateTime();
-        ocppServerRepository.updateChargeboxHeartbeat(chargeBoxIdentity, new Timestamp(now.getMillis()));
+        ocppServerRepository.updateChargeboxHeartbeat(chargeBoxIdentity, now);
 
         return new HeartbeatResponse().withCurrentTime(now);
     }

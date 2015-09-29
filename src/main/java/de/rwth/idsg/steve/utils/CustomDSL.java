@@ -1,9 +1,8 @@
 package de.rwth.idsg.steve.utils;
 
+import org.joda.time.DateTime;
 import org.jooq.Field;
-import org.jooq.impl.SQLDataType;
-
-import java.sql.Timestamp;
+import org.jooq.impl.DSL;
 
 import static org.jooq.impl.DSL.field;
 
@@ -14,7 +13,15 @@ import static org.jooq.impl.DSL.field;
 public final class CustomDSL {
     private CustomDSL() {}
 
-    public static Field<Timestamp> utcTimestamp() {
-        return field("{utc_timestamp}", SQLDataType.TIMESTAMP);
+    public static Field<DateTime> utcTimestamp() {
+        return field("{utc_timestamp}", DateTime.class);
+    }
+
+    public static Field<DateTime> date(DateTime dt) {
+        return date(DSL.val(dt, DateTime.class));
+    }
+
+    public static Field<DateTime> date(Field<DateTime> dt) {
+        return field("date({0})", DateTime.class, dt);
     }
 }

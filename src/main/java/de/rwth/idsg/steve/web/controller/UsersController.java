@@ -4,6 +4,7 @@ import de.rwth.idsg.steve.repository.UserRepository;
 import de.rwth.idsg.steve.service.UserService;
 import de.rwth.idsg.steve.web.dto.UserForm;
 import de.rwth.idsg.steve.web.dto.UserQueryForm;
+import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -14,9 +15,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.validation.Valid;
-import java.sql.Timestamp;
 
-import static de.rwth.idsg.steve.utils.DateTimeUtils.toTimestamp;
+import static de.rwth.idsg.steve.utils.DateTimeUtils.toDateTime;
 
 /**
  * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
@@ -66,7 +66,7 @@ public class UsersController {
             return "data-man/users";
         }
 
-        Timestamp expiryTimestamp = toTimestamp(u.getExpiration());
+        DateTime expiryTimestamp = toDateTime(u.getExpiration());
         userRepository.addUser(u.getIdTag(), u.getParentIdTag(), expiryTimestamp);
         return "redirect:/manager/users";
     }
@@ -80,7 +80,7 @@ public class UsersController {
             return "data-man/users";
         }
 
-        Timestamp expiryTimestamp = toTimestamp(u.getExpiration());
+        DateTime expiryTimestamp = toDateTime(u.getExpiration());
         userRepository.updateUser(u.getIdTag(), u.getParentIdTag(), expiryTimestamp, u.getBlocked());
         return "redirect:/manager/users";
     }

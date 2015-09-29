@@ -315,12 +315,27 @@
                             <inputSchema>stevedb</inputSchema>
                             <unsignedTypes>false</unsignedTypes>
 
+                            <customTypes>
+                                <customType>
+                                    <name>org.joda.time.DateTime</name>
+                                    <converter>de.rwth.idsg.steve.utils.DateTimeConverter</converter>
+                                </customType>
+                            </customTypes>
+
                             <!-- Associate data type rewrites with database columns -->
                             <forcedTypes>
                                 <forcedType>
                                     <name>BOOLEAN</name>
                                     <!-- https://groups.google.com/forum/#!topic/jooq-user/cpcf_Vk8Vd0 -->
                                     <types>(?i:TINYINT(\s*\(\d+\))?(\s*UNSIGNED)?)</types>
+                                </forcedType>
+                                <forcedType>
+                                    <name>org.joda.time.DateTime</name>
+                                    <types>.*TIMESTAMP.*</types>
+                                </forcedType>
+                                <forcedType>
+                                    <name>org.joda.time.DateTime</name>
+                                    <types>.*DATETIME.*</types>
                                 </forcedType>
                             </forcedTypes>
                         </database>

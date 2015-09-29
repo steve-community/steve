@@ -6,6 +6,7 @@ import de.rwth.idsg.steve.utils.CustomDSL;
 import de.rwth.idsg.steve.web.dto.UserQueryForm;
 import jooq.steve.db.tables.records.UserRecord;
 import lombok.extern.slf4j.Slf4j;
+import org.joda.time.DateTime;
 import org.jooq.Configuration;
 import org.jooq.Record5;
 import org.jooq.RecordMapper;
@@ -18,7 +19,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Repository;
 
-import java.sql.Timestamp;
 import java.util.List;
 
 import static de.rwth.idsg.steve.utils.DateTimeUtils.humanize;
@@ -138,7 +138,7 @@ public class UserRepositoryImpl implements UserRepository {
     }
 
     @Override
-    public void addUser(String idTag, String parentIdTag, Timestamp expiryTimestamp) {
+    public void addUser(String idTag, String parentIdTag, DateTime expiryTimestamp) {
         try {
             int count = DSL.using(config)
                            .insertInto(USER,
@@ -156,7 +156,7 @@ public class UserRepositoryImpl implements UserRepository {
     }
 
     @Override
-    public void updateUser(String idTag, String parentIdTag, Timestamp expiryTimestamp, boolean blocked) {
+    public void updateUser(String idTag, String parentIdTag, DateTime expiryTimestamp, boolean blocked) {
         try {
             DSL.using(config)
                .update(USER)
@@ -194,9 +194,9 @@ public class UserRepositoryImpl implements UserRepository {
         }
     }
 
-    private class UserMapper implements RecordMapper<Record5<String, String, Timestamp, Boolean, Boolean>, User> {
+    private class UserMapper implements RecordMapper<Record5<String, String, DateTime, Boolean, Boolean>, User> {
         @Override
-        public User map(Record5<String, String, Timestamp, Boolean, Boolean> r) {
+        public User map(Record5<String, String, DateTime, Boolean, Boolean> r) {
             return User.builder()
                        .idTag(r.value1())
                        .parentIdTag(r.value2())

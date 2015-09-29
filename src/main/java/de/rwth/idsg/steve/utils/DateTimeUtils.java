@@ -27,26 +27,18 @@ public final class DateTimeUtils {
             .appendSeconds().appendSuffix(" second", " seconds")
             .toFormatter();
 
-    public static Timestamp getCurrentTimestamp() {
-        return new Timestamp(new DateTime().getMillis());
-    }
-
-    public static Timestamp toTimestamp(LocalDateTime ldt) {
-        return (ldt == null) ? null : new Timestamp(ldt.toDateTime().getMillis());
-    }
-
     public static DateTime toDateTime(LocalDateTime ldt) {
         return (ldt == null) ? null : ldt.toDateTime();
-    }
-
-    public static String humanize(Timestamp ts) {
-        return (ts == null) ? "" : humanize(new DateTime(ts));
     }
 
     /**
      * Print the date/time nicer, if it's from today, yesterday or tomorrow.
      */
     public static String humanize(DateTime dt) {
+        if (dt == null) {
+            return "";
+        }
+
         // Equalize time fields before comparing date fields
         DateTime inputAtMidnight = dt.withTimeAtStartOfDay();
         DateTime todayAtMidnight = new DateTime().withTimeAtStartOfDay();

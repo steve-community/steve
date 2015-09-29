@@ -3,9 +3,9 @@ package de.rwth.idsg.steve.repository;
 import de.rwth.idsg.steve.repository.dto.User;
 import de.rwth.idsg.steve.web.dto.UserQueryForm;
 import jooq.steve.db.tables.records.UserRecord;
+import org.joda.time.DateTime;
 import org.jooq.Result;
 
-import java.sql.Timestamp;
 import java.util.List;
 
 /**
@@ -25,7 +25,7 @@ public interface UserRepository {
     List<String> getParentIdTags();
     String getParentIdtag(String idTag);
 
-    void addUser(String idTag, String parentIdTag, Timestamp expiryTimestamp);
-    void updateUser(String idTag, String parentIdTag, Timestamp expiryTimestamp, boolean blocked);
+    void addUser(String idTag, String parentIdTag, DateTime expiryTimestamp);
+    void updateUser(String idTag, String parentIdTag, DateTime expiryTimestamp, boolean blocked);
     void deleteUser(String idTag);
 }

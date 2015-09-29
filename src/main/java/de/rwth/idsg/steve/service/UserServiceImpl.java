@@ -11,10 +11,7 @@ import org.jooq.RecordMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.sql.Timestamp;
 import java.util.List;
-
-import static de.rwth.idsg.steve.utils.DateTimeUtils.getCurrentTimestamp;
 
 /**
  * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
@@ -56,7 +53,7 @@ public class UserServiceImpl implements UserService {
                 log.error("The user with idTag '{}' is BLOCKED.", idTag);
                 idTagInfo.setStatus(AuthorizationStatus.BLOCKED);
 
-            } else if (record.getExpirydate() != null && getCurrentTimestamp().after(record.getExpirydate())) {
+            } else if (record.getExpirydate() != null && DateTime.now().isAfter(record.getExpirydate())) {
                 log.error("The user with idTag '{}' is EXPIRED.", idTag);
                 idTagInfo.setStatus(AuthorizationStatus.EXPIRED);
 
@@ -89,7 +86,7 @@ public class UserServiceImpl implements UserService {
                 log.error("The user with idTag '{}' is BLOCKED.", idTag);
                 idTagInfo.setStatus(ocpp.cs._2012._06.AuthorizationStatus.BLOCKED);
 
-            } else if (record.getExpirydate() != null && getCurrentTimestamp().after(record.getExpirydate())) {
+            } else if (record.getExpirydate() != null && DateTime.now().isAfter(record.getExpirydate())) {
                 log.error("The user with idTag '{}' is EXPIRED.", idTag);
                 idTagInfo.setStatus(ocpp.cs._2012._06.AuthorizationStatus.EXPIRED);
 
@@ -112,14 +109,13 @@ public class UserServiceImpl implements UserService {
     private class AuthorisationDataMapper implements RecordMapper<UserRecord, AuthorisationData> {
         final DateTime nowDt = new DateTime();
         final DateTime cacheExpiry = nowDt.plus(ocppConstants.getHoursToExpire());
-        final Timestamp now = new Timestamp(nowDt.getMillis());
 
         @Override
         public AuthorisationData map(UserRecord record) {
 
             String idTag = record.getIdtag();
             String parentIdTag = record.getParentidtag();
-            Timestamp expiryDate = record.getExpirydate();
+            DateTime expiryDate = record.getExpirydate();
 
             // Create IdTagInfo of an idTag
             ocpp.cp._2012._06.IdTagInfo idTagInfo = new ocpp.cp._2012._06.IdTagInfo();
@@ -131,7 +127,7 @@ public class UserServiceImpl implements UserService {
             } else if (record.getBlocked()) {
                 authStatus = ocpp.cp._2012._06.AuthorizationStatus.BLOCKED;
 
-            } else if (expiryDate != null && now.after(expiryDate)) {
+            } else if (expiryDate != null && nowDt.isAfter(expiryDate)) {
                 authStatus = ocpp.cp._2012._06.AuthorizationStatus.EXPIRED;
 
             } else {

@@ -1,10 +1,11 @@
 package de.rwth.idsg.steve.repository;
 
 import de.rwth.idsg.steve.repository.dto.Transaction;
+import de.rwth.idsg.steve.utils.CustomDSL;
 import de.rwth.idsg.steve.utils.DateTimeUtils;
 import de.rwth.idsg.steve.web.dto.TransactionQueryForm;
 import lombok.extern.slf4j.Slf4j;
-import org.joda.time.LocalDateTime;
+import org.joda.time.DateTime;
 import org.jooq.Configuration;
 import org.jooq.Record8;
 import org.jooq.RecordMapper;
@@ -15,14 +16,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Repository;
 
-import java.sql.Timestamp;
 import java.util.List;
 
-import static de.rwth.idsg.steve.utils.DateTimeUtils.getCurrentTimestamp;
-import static de.rwth.idsg.steve.utils.DateTimeUtils.toTimestamp;
+import static de.rwth.idsg.steve.utils.CustomDSL.date;
 import static jooq.steve.db.tables.Connector.CONNECTOR;
 import static jooq.steve.db.tables.Transaction.TRANSACTION;
-import static org.jooq.impl.DSL.date;
 
 /**
  * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
@@ -47,7 +45,7 @@ public class TransactionRepositoryImpl implements TransactionRepository {
     }
 
     @SuppressWarnings("unchecked")
-    private Result<Record8<Integer, String, Integer, String, Timestamp, String, Timestamp, String>> internalGetTransactions(TransactionQueryForm form) {
+    private Result<Record8<Integer, String, Integer, String, DateTime, String, DateTime, String>> internalGetTransactions(TransactionQueryForm form) {
         SelectQuery selectQuery = DSL.using(config).selectQuery();
         selectQuery.addFrom(TRANSACTION);
         selectQuery.addJoin(CONNECTOR, TRANSACTION.CONNECTOR_PK.eq(CONNECTOR.CONNECTOR_PK));
@@ -98,9 +96,9 @@ public class TransactionRepositoryImpl implements TransactionRepository {
     // -------------------------------------------------------------------------
 
     private class TransactionMapper implements
-            RecordMapper<Record8<Integer, String, Integer, String, Timestamp, String, Timestamp, String>, Transaction> {
+            RecordMapper<Record8<Integer, String, Integer, String, DateTime, String, DateTime, String>, Transaction> {
         @Override
-        public Transaction map(Record8<Integer, String, Integer, String, Timestamp, String, Timestamp, String> r) {
+        public Transaction map(Record8<Integer, String, Integer, String, DateTime, String, DateTime, String> r) {
             return Transaction.builder()
                               .id(r.value1())
                               .chargeBoxId(r.value2())
@@ -118,17 +116,18 @@ public class TransactionRepositoryImpl implements TransactionRepository {
         switch (form.getPeriodType()) {
             case TODAY:
                 selectQuery.addConditions(
-                        date(TRANSACTION.STARTTIMESTAMP).eq(date(getCurrentTimestamp()))
+                        date(TRANSACTION.STARTTIMESTAMP).eq(date(CustomDSL.utcTimestamp()))
                 );
                 break;
 
             case LAST_10:
             case LAST_30:
             case LAST_90:
+                DateTime now = DateTime.now();
                 selectQuery.addConditions(
                         date(TRANSACTION.STARTTIMESTAMP).between(
-                                date(toTimestamp(new LocalDateTime().minusDays(form.getPeriodType().getInterval()))),
-                                date(toTimestamp(new LocalDateTime()))
+                                date(now.minusDays(form.getPeriodType().getInterval())),
+                                date(now)
                         )
                 );
                 break;
@@ -138,7 +137,7 @@ public class TransactionRepositoryImpl implements TransactionRepository {
 
             case FROM_TO:
                 selectQuery.addConditions(
-                        TRANSACTION.STARTTIMESTAMP.between(toTimestamp(form.getFrom()), toTimestamp(form.getTo()))
+                        TRANSACTION.STARTTIMESTAMP.between(form.getFrom().toDateTime(), form.getTo().toDateTime())
                 );
                 break;
         }

@@ -6,6 +6,7 @@ import de.rwth.idsg.steve.utils.CustomDSL;
 import de.rwth.idsg.steve.utils.DateTimeUtils;
 import de.rwth.idsg.steve.web.dto.ReservationQueryForm;
 import lombok.extern.slf4j.Slf4j;
+import org.joda.time.DateTime;
 import org.jooq.Configuration;
 import org.jooq.Record7;
 import org.jooq.RecordMapper;
@@ -16,10 +17,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Repository;
 
-import java.sql.Timestamp;
 import java.util.List;
 
-import static de.rwth.idsg.steve.utils.DateTimeUtils.toTimestamp;
 import static jooq.steve.db.tables.Reservation.RESERVATION;
 
 /**
@@ -81,7 +80,7 @@ public class ReservationRepositoryImpl implements ReservationRepository {
     }
 
     @Override
-    public int insert(String idTag, String chargeBoxId, Timestamp startTimestamp, Timestamp expiryTimestamp) {
+    public int insert(String idTag, String chargeBoxId, DateTime startTimestamp, DateTime expiryTimestamp) {
         // Check overlapping
         //isOverlapping(startTimestamp, expiryTimestamp, chargeBoxId);
 
@@ -136,9 +135,9 @@ public class ReservationRepositoryImpl implements ReservationRepository {
     // -------------------------------------------------------------------------
 
     private class ReservationMapper implements
-            RecordMapper<Record7<Integer, Integer, String, String, Timestamp, Timestamp, String>, Reservation> {
+            RecordMapper<Record7<Integer, Integer, String, String, DateTime, DateTime, String>, Reservation> {
         @Override
-        public Reservation map(Record7<Integer, Integer, String, String, Timestamp, Timestamp, String> r) {
+        public Reservation map(Record7<Integer, Integer, String, String, DateTime, DateTime, String> r) {
             return Reservation.builder()
                               .id(r.value1())
                               .transactionId(r.value2())
@@ -171,8 +170,8 @@ public class ReservationRepositoryImpl implements ReservationRepository {
 
             case FROM_TO:
                 selectQuery.addConditions(
-                        RESERVATION.STARTDATETIME.greaterOrEqual(toTimestamp(form.getFrom())),
-                        RESERVATION.EXPIRYDATETIME.lessOrEqual(toTimestamp(form.getTo()))
+                        RESERVATION.STARTDATETIME.greaterOrEqual(form.getFrom().toDateTime()),
+                        RESERVATION.EXPIRYDATETIME.lessOrEqual(form.getTo().toDateTime())
                 );
                 break;
         }
@@ -181,7 +180,7 @@ public class ReservationRepositoryImpl implements ReservationRepository {
     /**
      * Throws exception, if there are rows whose date/time ranges overlap with the input
      */
-    private void isOverlapping(Timestamp start, Timestamp stop, String chargeBoxId) {
+    private void isOverlapping(DateTime start, DateTime stop, String chargeBoxId) {
         try {
             int count = DSL.using(config)
                            .selectOne()

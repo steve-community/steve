@@ -1,7 +1,7 @@
 package de.rwth.idsg.steve.repository;
 
 import de.rwth.idsg.steve.ocpp.OcppProtocol;
-import de.rwth.idsg.steve.utils.DateTimeUtils;
+import de.rwth.idsg.steve.utils.CustomDSL;
 import lombok.extern.slf4j.Slf4j;
 import ocpp.cs._2012._06.Location;
 import ocpp.cs._2012._06.Measurand;
@@ -9,17 +9,15 @@ import ocpp.cs._2012._06.MeterValue;
 import ocpp.cs._2012._06.ReadingContext;
 import ocpp.cs._2012._06.UnitOfMeasure;
 import ocpp.cs._2012._06.ValueFormat;
+import org.joda.time.DateTime;
 import org.jooq.BatchBindStep;
 import org.jooq.Configuration;
 import org.jooq.DSLContext;
-import org.jooq.TransactionalCallable;
-import org.jooq.TransactionalRunnable;
 import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Repository;
 
-import java.sql.Timestamp;
 import java.util.List;
 
 import static jooq.steve.db.tables.Chargebox.CHARGEBOX;
@@ -49,7 +47,7 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
     @Override
     public boolean updateChargebox(OcppProtocol protocol, String vendor, String model,
                                    String pointSerial, String boxSerial, String fwVersion, String iccid, String imsi,
-                                   String meterType, String meterSerial, String chargeBoxIdentity, Timestamp now) {
+                                   String meterType, String meterSerial, String chargeBoxIdentity, DateTime now) {
 
         int count = DSL.using(config)
                        .update(CHARGEBOX)
@@ -92,7 +90,7 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
         DSL.using(config)
            .update(CHARGEBOX)
            .set(CHARGEBOX.FWUPDATESTATUS, firmwareStatus)
-           .set(CHARGEBOX.FWUPDATETIMESTAMP, DateTimeUtils.getCurrentTimestamp())
+           .set(CHARGEBOX.FWUPDATETIMESTAMP, CustomDSL.utcTimestamp())
            .where(CHARGEBOX.CHARGEBOXID.equal(chargeBoxIdentity))
            .execute();
     }
@@ -102,13 +100,13 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
         DSL.using(config)
            .update(CHARGEBOX)
            .set(CHARGEBOX.DIAGNOSTICSSTATUS, status)
-           .set(CHARGEBOX.DIAGNOSTICSTIMESTAMP, DateTimeUtils.getCurrentTimestamp())
+           .set(CHARGEBOX.DIAGNOSTICSTIMESTAMP, CustomDSL.utcTimestamp())
            .where(CHARGEBOX.CHARGEBOXID.equal(chargeBoxIdentity))
            .execute();
     }
 
     @Override
-    public void updateChargeboxHeartbeat(String chargeBoxIdentity, Timestamp ts) {
+    public void updateChargeboxHeartbeat(String chargeBoxIdentity, DateTime ts) {
         DSL.using(config)
            .update(CHARGEBOX)
            .set(CHARGEBOX.LASTHEARTBEATTIMESTAMP, ts)
@@ -117,7 +115,7 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
     }
 
     @Override
-    public void insertConnectorStatus12(String chargeBoxIdentity, int connectorId, String status, Timestamp timestamp,
+    public void insertConnectorStatus12(String chargeBoxIdentity, int connectorId, String status, DateTime timestamp,
                                         String errorCode) {
         // Delegate
         this.insertConnectorStatus15(chargeBoxIdentity, connectorId, status, timestamp, errorCode, null, null, null);
@@ -125,7 +123,7 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
 
     @Override
     public void insertConnectorStatus15(final String chargeBoxIdentity, final int connectorId, final String status,
-                                        final Timestamp timestamp,
+                                        final DateTime timestamp,
                                         final String errorCode, final String errorInfo,
                                         final String vendorId, final String vendorErrorCode) {
 
@@ -203,14 +201,14 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
 
     @Override
     public Integer insertTransaction12(String chargeBoxIdentity, int connectorId, String idTag,
-                                       Timestamp startTimestamp, String startMeterValue) {
+                                       DateTime startTimestamp, String startMeterValue) {
         // Delegate
         return this.insertTransaction15(chargeBoxIdentity, connectorId, idTag, startTimestamp, startMeterValue, null);
     }
 
     @Override
     public Integer insertTransaction15(final String chargeBoxIdentity, final int connectorId, final String idTag,
-                                       final Timestamp startTimestamp, final String startMeterValue,
+                                       final DateTime startTimestamp, final String startMeterValue,
                                        final Integer reservationId) {
 
         return DSL.using(config).transactionResult(configuration -> {
@@ -251,7 +249,7 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
      * After update, a DB trigger sets the user.inTransaction field to 0
      */
     @Override
-    public void updateTransaction(int transactionId, Timestamp stopTimestamp, String stopMeterValue) {
+    public void updateTransaction(int transactionId, DateTime stopTimestamp, String stopMeterValue) {
         DSL.using(config)
            .update(TRANSACTION)
            .set(TRANSACTION.STOPTIMESTAMP, stopTimestamp)
@@ -302,7 +300,7 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
 
         // OCPP 1.2 allows multiple "values" elements
         for (ocpp.cs._2010._08.MeterValue valuesElement : list) {
-            Timestamp ts = new Timestamp(valuesElement.getTimestamp().getMillis());
+            DateTime ts = valuesElement.getTimestamp();
             String value = String.valueOf(valuesElement.getValue());
 
             batchBindStep.bind(connectorPk, ts, value);
@@ -330,7 +328,7 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
 
         // OCPP 1.5 allows multiple "values" elements
         for (MeterValue valuesElement : list) {
-            Timestamp timestamp = new Timestamp(valuesElement.getTimestamp().getMillis());
+            DateTime timestamp = valuesElement.getTimestamp();
 
             // OCPP 1.5 allows multiple "value" elements under each "values" element.
             List<MeterValue.Value> valueList = valuesElement.getValue();

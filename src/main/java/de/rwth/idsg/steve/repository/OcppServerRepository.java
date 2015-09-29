@@ -1,8 +1,8 @@
 package de.rwth.idsg.steve.repository;
 
 import de.rwth.idsg.steve.ocpp.OcppProtocol;
+import org.joda.time.DateTime;
 
-import java.sql.Timestamp;
 import java.util.List;
 
 /**
@@ -23,16 +23,16 @@ public interface OcppServerRepository {
      */
     boolean updateChargebox(OcppProtocol ocppProtocol, String vendor, String model,
                             String pointSerial, String boxSerial, String fwVersion, String iccid, String imsi,
-                            String meterType, String meterSerial, String chargeBoxIdentity, Timestamp now);
+                            String meterType, String meterSerial, String chargeBoxIdentity, DateTime now);
 
     void updateEndpointAddress(String chargeBoxIdentity, String endpointAddress);
     void updateChargeboxFirmwareStatus(String chargeBoxIdentity, String firmwareStatus);
     void updateChargeboxDiagnosticsStatus(String chargeBoxIdentity, String status);
-    void updateChargeboxHeartbeat(String chargeBoxIdentity, Timestamp ts);
+    void updateChargeboxHeartbeat(String chargeBoxIdentity, DateTime ts);
 
-    void insertConnectorStatus12(String chargeBoxIdentity, int connectorId, String status, Timestamp timestamp,
+    void insertConnectorStatus12(String chargeBoxIdentity, int connectorId, String status, DateTime timestamp,
                                  String errorCode);
-    void insertConnectorStatus15(String chargeBoxIdentity, int connectorId, String status, Timestamp timestamp,
+    void insertConnectorStatus15(String chargeBoxIdentity, int connectorId, String status, DateTime timestamp,
                                  String errorCode, String errorInfo,
                                  String vendorId, String vendorErrorCode);
 
@@ -44,11 +44,11 @@ public interface OcppServerRepository {
                                         List<ocpp.cs._2012._06.MeterValue> list);
 
     Integer insertTransaction12(String chargeBoxIdentity, int connectorId, String idTag,
-                                Timestamp startTimestamp, String startMeterValue);
+                                DateTime startTimestamp, String startMeterValue);
 
     Integer insertTransaction15(String chargeBoxIdentity, int connectorId, String idTag,
-                                Timestamp startTimestamp, String startMeterValue,
+                                DateTime startTimestamp, String startMeterValue,
                                 Integer reservationId);
 
-    void updateTransaction(int transactionId, Timestamp stopTimestamp, String stopMeterValue);
+    void updateTransaction(int transactionId, DateTime stopTimestamp, String stopMeterValue);
 }

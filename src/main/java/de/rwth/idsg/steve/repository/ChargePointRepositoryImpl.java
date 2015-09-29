@@ -11,6 +11,7 @@ import de.rwth.idsg.steve.utils.DateTimeUtils;
 import jooq.steve.db.tables.records.ChargeboxRecord;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.joda.time.DateTime;
 import org.jooq.Configuration;
 import org.jooq.Field;
 import org.jooq.Record2;
@@ -23,7 +24,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Repository;
 
-import java.sql.Timestamp;
 import java.util.List;
 
 import static jooq.steve.db.tables.Chargebox.CHARGEBOX;
@@ -116,7 +116,7 @@ public class ChargePointRepositoryImpl implements ChargePointRepository {
     public List<ConnectorStatus> getChargePointConnectorStatus() {
         // Prepare for the inner select of the second join
         Field<Integer> t1_pk = CONNECTOR_STATUS.CONNECTOR_PK.as("t1_pk");
-        Field<Timestamp> t1_max = DSL.max(CONNECTOR_STATUS.STATUSTIMESTAMP).as("t1_max");
+        Field<DateTime> t1_max = DSL.max(CONNECTOR_STATUS.STATUSTIMESTAMP).as("t1_max");
         TableLike<?> t1 = DSL.select(t1_pk, t1_max)
                              .from(CONNECTOR_STATUS)
                              .groupBy(CONNECTOR_STATUS.CONNECTOR_PK)
@@ -189,9 +189,9 @@ public class ChargePointRepositoryImpl implements ChargePointRepository {
         }
     }
 
-    private class HeartbeatMapper implements RecordMapper<Record2<String, Timestamp>, Heartbeat> {
+    private class HeartbeatMapper implements RecordMapper<Record2<String, DateTime>, Heartbeat> {
         @Override
-        public Heartbeat map(Record2<String, Timestamp> r) {
+        public Heartbeat map(Record2<String, DateTime> r) {
             return Heartbeat.builder()
                             .chargeBoxId(r.value1())
                             .lastTimestamp(DateTimeUtils.humanize(r.value2()))
@@ -200,9 +200,9 @@ public class ChargePointRepositoryImpl implements ChargePointRepository {
     }
 
     private class ConnectorStatusMapper implements
-            RecordMapper<Record5<String, Integer, Timestamp, String, String>, ConnectorStatus> {
+            RecordMapper<Record5<String, Integer, DateTime, String, String>, ConnectorStatus> {
         @Override
-        public ConnectorStatus map(Record5<String, Integer, Timestamp, String, String> r) {
+        public ConnectorStatus map(Record5<String, Integer, DateTime, String, String> r) {
             return ConnectorStatus.builder()
                                   .chargeBoxId(r.value1())
                                   .connectorId(r.value2())

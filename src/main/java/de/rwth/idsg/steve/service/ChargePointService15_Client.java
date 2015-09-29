@@ -28,7 +28,6 @@ import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -342,8 +341,8 @@ public class ChargePointService15_Client {
         String chargeBoxId = c.getChargeBoxId();
 
         // Insert into DB
-        Timestamp startTimestamp = new Timestamp(new DateTime().getMillis());
-        Timestamp expiryTimestamp = new Timestamp(params.getExpiry().toDateTime().getMillis());
+        DateTime startTimestamp = DateTime.now();
+        DateTime expiryTimestamp = params.getExpiry().toDateTime();
         int reservationId = reservationRepository.insert(params.getIdTag(), chargeBoxId,
                                                          startTimestamp, expiryTimestamp);
 

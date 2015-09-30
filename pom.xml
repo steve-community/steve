@@ -533,8 +533,8 @@
         </dependency>
         <dependency>
             <groupId>com.zaxxer</groupId>
-            <artifactId>HikariCP-java6</artifactId>
-            <version>2.3.9</version>
+            <artifactId>HikariCP</artifactId>
+            <version>2.4.1</version>
         </dependency>
 
         <!-- Test -->

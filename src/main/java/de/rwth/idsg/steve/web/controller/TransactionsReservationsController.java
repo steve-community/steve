@@ -18,8 +18,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * One controller for transactions and reservations pages
@@ -77,8 +75,7 @@ public class TransactionsReservationsController {
             String headerValue = String.format("attachment; filename=\"%s\"", fileName);
             response.setContentType("text/csv");
             response.setHeader(headerKey, headerValue);
-            response.getOutputStream().print(transactionRepository.getTransactionsCSV(params));
-            response.getOutputStream().flush();
+            transactionRepository.writeTransactionsCSV(params, response.getWriter());
             return null;
 
         } else {

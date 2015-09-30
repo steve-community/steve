@@ -4,7 +4,6 @@ import de.rwth.idsg.steve.repository.dto.Transaction;
 import de.rwth.idsg.steve.utils.CustomDSL;
 import de.rwth.idsg.steve.utils.DateTimeUtils;
 import de.rwth.idsg.steve.web.dto.TransactionQueryForm;
-import lombok.extern.slf4j.Slf4j;
 import org.joda.time.DateTime;
 import org.jooq.Configuration;
 import org.jooq.Record8;
@@ -16,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Repository;
 
+import java.io.Writer;
 import java.util.List;
 
 import static de.rwth.idsg.steve.utils.CustomDSL.date;
@@ -26,7 +26,6 @@ import static jooq.steve.db.tables.Transaction.TRANSACTION;
  * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
  * @since 14.08.2014
  */
-@Slf4j
 @Repository
 public class TransactionRepositoryImpl implements TransactionRepository {
 
@@ -40,8 +39,8 @@ public class TransactionRepositoryImpl implements TransactionRepository {
     }
 
     @Override
-    public String getTransactionsCSV(TransactionQueryForm form) {
-        return internalGetTransactions(form).formatCSV();
+    public void writeTransactionsCSV(TransactionQueryForm form, Writer writer) {
+        internalGetTransactions(form).formatCSV(writer);
     }
 
     @SuppressWarnings("unchecked")

@@ -331,11 +331,7 @@
                                 </forcedType>
                                 <forcedType>
                                     <name>org.joda.time.DateTime</name>
-                                    <types>.*TIMESTAMP.*</types>
-                                </forcedType>
-                                <forcedType>
-                                    <name>org.joda.time.DateTime</name>
-                                    <types>.*DATETIME.*</types>
+                                    <types>.*(TIMESTAMP|DATETIME).*</types>
                                 </forcedType>
                             </forcedTypes>
                         </database>

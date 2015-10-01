@@ -80,7 +80,7 @@ public class BeanConfiguration extends WebMvcConfigurerAdapter {
 
     @PreDestroy
     public void shutDown() {
-        if (dataSource != null) dataSource.shutdown();
+        if (dataSource != null) dataSource.close();
     }
 
     // -------------------------------------------------------------------------

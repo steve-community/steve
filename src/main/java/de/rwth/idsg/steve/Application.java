@@ -1,14 +1,12 @@
 package de.rwth.idsg.steve;
 
 import de.rwth.idsg.steve.ocpp.ws.custom.WsSessionSelectStrategyEnum;
+import de.rwth.idsg.steve.utils.PropertiesFileLoader;
 import lombok.extern.slf4j.Slf4j;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
-import java.util.Properties;
 import java.util.TimeZone;
 
 import static de.rwth.idsg.steve.SteveConfiguration.Auth;
@@ -40,35 +38,27 @@ public class Application {
     }
 
     private static void loadProperties() throws IOException {
-        final String fileName = "main.properties";
-        Properties prop = new Properties();
+        PropertiesFileLoader prop = new PropertiesFileLoader("main.properties");
 
-        InputStream is = Application.class.getClassLoader().getResourceAsStream(fileName);
-        if (is == null) {
-            throw new FileNotFoundException("Property file '" + fileName + "' is not found in classpath");
-        } else {
-            prop.load(is);
-        }
+        STEVE_VERSION = prop.getString("steve.version");
 
-        STEVE_VERSION = prop.getProperty("steve.version");
+        DB.URL          = prop.getString("db.url");
+        DB.USERNAME     = prop.getString("db.user");
+        DB.PASSWORD     = prop.getString("db.password");
+        DB.SQL_LOGGING  = prop.getBoolean("db.sql.logging");
 
-        DB.URL          = prop.getProperty("db.url");
-        DB.USERNAME     = prop.getProperty("db.user");
-        DB.PASSWORD     = prop.getProperty("db.password");
-        DB.SQL_LOGGING  = Boolean.parseBoolean(prop.getProperty("db.sql.logging"));
+        Auth.USERNAME   = prop.getString("auth.user");
+        Auth.PASSWORD   = prop.getString("auth.password");
 
-        Auth.USERNAME   = prop.getProperty("auth.user");
-        Auth.PASSWORD   = prop.getProperty("auth.password");
+        Jetty.SERVER_HOST           = prop.getString("server.host");
+        Jetty.HTTP_ENABLED          = prop.getBoolean("http.enabled");
+        Jetty.HTTP_PORT             = prop.getInt("http.port");
+        Jetty.HTTPS_ENABLED         = prop.getBoolean("https.enabled");
+        Jetty.HTTPS_PORT            = prop.getInt("https.port");
+        Jetty.KEY_STORE_PATH        = prop.getString("keystore.path");
+        Jetty.KEY_STORE_PASSWORD    = prop.getString("keystore.password");
 
-        Jetty.SERVER_HOST           = prop.getProperty("server.host");
-        Jetty.HTTP_ENABLED          = Boolean.parseBoolean(prop.getProperty("http.enabled"));
-        Jetty.HTTP_PORT             = Integer.parseInt(prop.getProperty("http.port"));
-        Jetty.HTTPS_ENABLED         = Boolean.parseBoolean(prop.getProperty("https.enabled"));
-        Jetty.HTTPS_PORT            = Integer.parseInt(prop.getProperty("https.port"));
-        Jetty.KEY_STORE_PATH        = prop.getProperty("keystore.path");
-        Jetty.KEY_STORE_PASSWORD    = prop.getProperty("keystore.password");
-
-        Ocpp.WS_SESSION_SELECT_STRATEGY = WsSessionSelectStrategyEnum.fromName(prop.getProperty("ws.session.select.strategy"));
+        Ocpp.WS_SESSION_SELECT_STRATEGY = WsSessionSelectStrategyEnum.fromName(prop.getString("ws.session.select.strategy"));
 
         if (!(Jetty.HTTP_ENABLED || Jetty.HTTPS_ENABLED)) {
             throw new IllegalArgumentException(

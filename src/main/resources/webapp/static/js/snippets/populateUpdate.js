@@ -27,6 +27,9 @@ idd.change(function(){
 	} else {
 		$("#update-block-true").prop("checked", true);
 	}
+
+    var note = row.find("td:eq(5)").html();
+    $("#update-note").val(note);
 });
 
 function dehumanizeDate(str) {

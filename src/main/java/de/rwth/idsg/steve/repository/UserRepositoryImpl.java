@@ -3,12 +3,13 @@ package de.rwth.idsg.steve.repository;
 import de.rwth.idsg.steve.SteveException;
 import de.rwth.idsg.steve.repository.dto.User;
 import de.rwth.idsg.steve.utils.CustomDSL;
+import de.rwth.idsg.steve.web.dto.UserForm;
 import de.rwth.idsg.steve.web.dto.UserQueryForm;
 import jooq.steve.db.tables.records.UserRecord;
 import lombok.extern.slf4j.Slf4j;
 import org.joda.time.DateTime;
 import org.jooq.Configuration;
-import org.jooq.Record5;
+import org.jooq.Record6;
 import org.jooq.RecordMapper;
 import org.jooq.Result;
 import org.jooq.SelectQuery;
@@ -22,6 +23,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 import static de.rwth.idsg.steve.utils.DateTimeUtils.humanize;
+import static de.rwth.idsg.steve.utils.DateTimeUtils.toDateTime;
 import static jooq.steve.db.tables.User.USER;
 
 /**
@@ -46,7 +48,8 @@ public class UserRepositoryImpl implements UserRepository {
                 USER.PARENTIDTAG,
                 USER.EXPIRYDATE,
                 USER.INTRANSACTION,
-                USER.BLOCKED
+                USER.BLOCKED,
+                USER.NOTE
         );
 
         if (form.isUserIdSet()) {
@@ -138,35 +141,42 @@ public class UserRepositoryImpl implements UserRepository {
     }
 
     @Override
-    public void addUser(String idTag, String parentIdTag, DateTime expiryTimestamp) {
+    public void addUser(UserForm u) {
         try {
             int count = DSL.using(config)
                            .insertInto(USER,
-                                   USER.IDTAG, USER.PARENTIDTAG, USER.EXPIRYDATE, USER.INTRANSACTION, USER.BLOCKED)
-                           .values(idTag, parentIdTag, expiryTimestamp, false, false)
+                                   USER.IDTAG,
+                                   USER.PARENTIDTAG,
+                                   USER.EXPIRYDATE,
+                                   USER.NOTE,
+                                   USER.INTRANSACTION,
+                                   USER.BLOCKED)
+                           .values(u.getIdTag(), u.getParentIdTag(), toDateTime(u.getExpiration()), u.getNote(),
+                                   false, false)
                            .onDuplicateKeyIgnore() // Important detail
                            .execute();
 
             if (count == 0) {
-                throw new SteveException("A user with idTag '%s' already exists.", idTag);
+                throw new SteveException("A user with idTag '%s' already exists.", u.getIdTag());
             }
         } catch (DataAccessException e) {
-            throw new SteveException("Execution of addUser for idTag '%s' FAILED.", idTag, e);
+            throw new SteveException("Execution of addUser for idTag '%s' FAILED.", u.getIdTag(), e);
         }
     }
 
     @Override
-    public void updateUser(String idTag, String parentIdTag, DateTime expiryTimestamp, boolean blocked) {
+    public void updateUser(UserForm u) {
         try {
             DSL.using(config)
                .update(USER)
-               .set(USER.PARENTIDTAG, parentIdTag)
-               .set(USER.EXPIRYDATE, expiryTimestamp)
-               .set(USER.BLOCKED, blocked)
-               .where(USER.IDTAG.equal(idTag))
+               .set(USER.PARENTIDTAG, u.getParentIdTag())
+               .set(USER.EXPIRYDATE, toDateTime(u.getExpiration()))
+               .set(USER.NOTE, u.getNote())
+               .set(USER.BLOCKED, u.getBlocked())
+               .where(USER.IDTAG.equal(u.getIdTag()))
                .execute();
         } catch (DataAccessException e) {
-            throw new SteveException("Execution of updateUser for idTag '%s' FAILED.", idTag, e);
+            throw new SteveException("Execution of updateUser for idTag '%s' FAILED.", u.getIdTag(), e);
         }
     }
 
@@ -194,15 +204,16 @@ public class UserRepositoryImpl implements UserRepository {
         }
     }
 
-    private class UserMapper implements RecordMapper<Record5<String, String, DateTime, Boolean, Boolean>, User> {
+    private class UserMapper implements RecordMapper<Record6<String, String, DateTime, Boolean, Boolean, String>, User> {
         @Override
-        public User map(Record5<String, String, DateTime, Boolean, Boolean> r) {
+        public User map(Record6<String, String, DateTime, Boolean, Boolean, String> r) {
             return User.builder()
                        .idTag(r.value1())
                        .parentIdTag(r.value2())
                        .expiryDate(humanize(r.value3()))
                        .inTransaction(r.value4())
                        .blocked(r.value5())
+                       .note(r.value6())
                        .build();
         }
     }

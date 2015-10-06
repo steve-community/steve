@@ -50,7 +50,7 @@ public class ChargePointsController {
             return "data-man/chargepoints";
         }
 
-        chargePointRepository.addChargePoint(chargeBoxForm.getChargeBoxId());
+        chargePointRepository.addChargePoint(chargeBoxForm);
         return "redirect:/manager/chargepoints";
     }
 

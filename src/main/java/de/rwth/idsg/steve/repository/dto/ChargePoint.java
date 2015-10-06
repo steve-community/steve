@@ -14,5 +14,5 @@ public final class ChargePoint {
     private final String chargeBoxId, endpointAddress, ocppProtocol, chargePointVendor, chargePointModel,
             chargePointSerialNumber, chargeBoxSerialNumber, firewireVersion, firewireUpdateStatus,
             firewireUpdateTimestamp, iccid, imsi, meterType, meterSerialNumber, diagnosticsStatus,
-            diagnosticsTimestamp, lastHeartbeatTimestamp;
+            diagnosticsTimestamp, lastHeartbeatTimestamp, note;
 }

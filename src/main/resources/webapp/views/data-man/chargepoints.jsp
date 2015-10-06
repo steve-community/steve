@@ -41,6 +41,7 @@
         <form:form action="/steve/manager/chargepoints/add" modelAttribute="chargeBoxAddForm">
 			<table class="userInput">
 				<tr><td>ChargeBox ID (string):</td><td><form:input path="chargeBoxId"/></td></tr>
+                <tr><td>Note:</td><td><form:input path="note"/></td></tr>
 				<tr><td></td><td id="add_space"><input type="submit" value="Add"></td></tr>
 			</table>
         </form:form>

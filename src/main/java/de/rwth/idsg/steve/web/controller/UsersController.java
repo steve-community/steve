@@ -66,8 +66,7 @@ public class UsersController {
             return "data-man/users";
         }
 
-        DateTime expiryTimestamp = toDateTime(u.getExpiration());
-        userRepository.addUser(u.getIdTag(), u.getParentIdTag(), expiryTimestamp);
+        userRepository.addUser(u);
         return "redirect:/manager/users";
     }
 
@@ -80,8 +79,7 @@ public class UsersController {
             return "data-man/users";
         }
 
-        DateTime expiryTimestamp = toDateTime(u.getExpiration());
-        userRepository.updateUser(u.getIdTag(), u.getParentIdTag(), expiryTimestamp, u.getBlocked());
+        userRepository.updateUser(u);
         return "redirect:/manager/users";
     }
 

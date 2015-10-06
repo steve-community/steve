@@ -5,6 +5,7 @@ import de.rwth.idsg.steve.repository.dto.ChargePoint;
 import de.rwth.idsg.steve.repository.dto.ChargePointSelect;
 import de.rwth.idsg.steve.repository.dto.ConnectorStatus;
 import de.rwth.idsg.steve.repository.dto.Heartbeat;
+import de.rwth.idsg.steve.web.dto.ChargeBoxForm;
 
 import java.util.List;
 
@@ -19,7 +20,7 @@ public interface ChargePointRepository {
     ChargePoint getChargePointDetails(String chargeBoxId);
     List<Heartbeat> getChargePointHeartbeats();
     List<ConnectorStatus> getChargePointConnectorStatus();
-    void addChargePoint(String chargeBoxId);
+    void addChargePoint(ChargeBoxForm form);
     void deleteChargePoint(String chargeBoxId);
     List<Integer> getConnectorIds(String chargeBoxId);
 }

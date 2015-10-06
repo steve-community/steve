@@ -77,11 +77,11 @@
     <br>
 <section><span>Users</span></section>
 <table class="res" id="usersTable">
-	<thead><tr><th>User ID Tag</th><th>Parent ID Tag</th><th>Expiry Date/Time</th><th>In Transaction?</th><th>Blocked?</th></tr></thead>
+	<thead><tr><th>User ID Tag</th><th>Parent ID Tag</th><th>Expiry Date/Time</th><th>In Transaction?</th><th>Blocked?</th><th>Note</th></tr></thead>
 	<tbody>
 	<%-- Start --%>
 	<c:forEach items="${userList}" var="user">
-	<tr id="${user.idTag}"><td>${user.idTag}</td><td>${user.parentIdTag}</td><td>${user.expiryDate}</td><td>${user.inTransaction}</td><td>${user.blocked}</td></tr>
+	<tr id="${user.idTag}"><td>${user.idTag}</td><td>${user.parentIdTag}</td><td>${user.expiryDate}</td><td>${user.inTransaction}</td><td>${user.blocked}</td><td>${user.note}</td></tr>
 	</c:forEach>
 	<%-- End --%>
 </tbody>
@@ -114,6 +114,11 @@
                         <form:input path="expiration" placeholder="optional" cssClass="dateTimePicker"/>
 					</td>
 				</tr>
+                <tr><td>Note:</td>
+                    <td>
+                        <form:input path="note" placeholder="optional" />
+                    </td>
+                </tr>
 				<tr><td></td><td id="add_space"><input type="submit" value="Add"></td></tr>
 			</table>
 		</form:form>
@@ -149,6 +154,11 @@
 				<tr>
                     <td></td>
                     <td><form:radiobutton path="blocked" value="true" id="update-block-true" disabled="true"/> true</td>
+                </tr>
+                <tr><td>Note:</td>
+                    <td>
+                        <form:input path="note" id="update-note" placeholder="optional" />
+                    </td>
                 </tr>
 				<tr><td></td><td id="add_space"><input type="submit" value="Update" id="update-submit" disabled></td></tr>
 			</table>

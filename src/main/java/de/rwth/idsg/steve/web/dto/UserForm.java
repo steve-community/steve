@@ -1,5 +1,6 @@
 package de.rwth.idsg.steve.web.dto;
 
+import de.rwth.idsg.steve.web.dto.common.AbstractNoteForm;
 import de.rwth.idsg.steve.web.validation.IdTag;
 import lombok.Getter;
 import lombok.Setter;
@@ -15,7 +16,7 @@ import javax.validation.constraints.NotNull;
  */
 @Getter
 @Setter
-public class UserForm {
+public class UserForm extends AbstractNoteForm {
 
     @NotEmpty(message = "User ID Tag is required")
     @IdTag

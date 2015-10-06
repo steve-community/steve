@@ -8,6 +8,7 @@ import de.rwth.idsg.steve.repository.dto.ChargePointSelect;
 import de.rwth.idsg.steve.repository.dto.ConnectorStatus;
 import de.rwth.idsg.steve.repository.dto.Heartbeat;
 import de.rwth.idsg.steve.utils.DateTimeUtils;
+import de.rwth.idsg.steve.web.dto.ChargeBoxForm;
 import jooq.steve.db.tables.records.ChargeboxRecord;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -99,6 +100,7 @@ public class ChargePointRepositoryImpl implements ChargePointRepository {
                           .diagnosticsStatus(r.getDiagnosticsstatus())
                           .diagnosticsTimestamp(DateTimeUtils.humanize(r.getDiagnosticstimestamp()))
                           .lastHeartbeatTimestamp(DateTimeUtils.humanize(r.getLastheartbeattimestamp()))
+                          .note(r.getNote())
                           .build();
     }
 
@@ -137,20 +139,20 @@ public class ChargePointRepositoryImpl implements ChargePointRepository {
     }
 
     @Override
-    public void addChargePoint(String chargeBoxId) {
+    public void addChargePoint(ChargeBoxForm form) {
         try {
             int count = DSL.using(config)
                            .insertInto(CHARGEBOX,
-                                   CHARGEBOX.CHARGEBOXID)
-                           .values(chargeBoxId)
+                                   CHARGEBOX.CHARGEBOXID, CHARGEBOX.NOTE)
+                           .values(form.getChargeBoxId(), form.getNote())
                            .onDuplicateKeyIgnore() // Important detail
                            .execute();
 
             if (count == 0) {
-                throw new SteveException("A charge point with chargeBoxId '%s' already exists.", chargeBoxId);
+                throw new SteveException("A charge point with chargeBoxId '%s' already exists.", form.getChargeBoxId());
             }
         } catch (DataAccessException e) {
-            throw new SteveException("The charge point with chargeBoxId '%s' could NOT be added.", chargeBoxId, e);
+            throw new SteveException("The charge point with chargeBoxId '%s' could NOT be added.", form.getChargeBoxId(), e);
         }
     }
 

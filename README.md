@@ -28,6 +28,13 @@ Requirements & Configuration
   - You _must_ change [web interface credentials](src/main/resources/config/prod/main.properties#L9-L10)
   - You _can_ access the application via HTTPS, by [enabling it and setting the keystore properties](src/main/resources/config/prod/main.properties#L23-L26)
   
+* the following PRIVILEGES are required:
+```
+GRANT ALL PRIVILEGES ON stevedb.* TO 'steve'@'localhost' IDENTIFIED BY 'password';
+GRANT SELECT ON mysql.proc TO 'steve'@'localhost' IDENTIFIED BY 'password';
+GRANT SUPER ON *.* TO 'steve'@'localhost' IDENTIFIED BY 'password';
+```
+
 How to use?
 -----
 

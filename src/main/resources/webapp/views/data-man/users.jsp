@@ -157,7 +157,7 @@
                 </tr>
                 <tr><td>Note:</td>
                     <td>
-                        <form:input path="note" id="update-note" placeholder="optional" />
+                        <form:input path="note" id="update-note" placeholder="optional" disabled="true"/>
                     </td>
                 </tr>
 				<tr><td></td><td id="add_space"><input type="submit" value="Update" id="update-submit" disabled></td></tr>

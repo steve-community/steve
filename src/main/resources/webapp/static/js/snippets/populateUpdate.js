@@ -5,7 +5,7 @@ idd.change(function(){
 	// get the row
 	var row = $("#usersTable").find(str);
 	// enable input fields
-	$("#update-pid, #update-exdateTime, #update-block-false, #update-block-true, #update-submit").prop("disabled", false);
+	$("#update-pid, #update-exdateTime, #update-block-false, #update-block-true, #update-note, #update-submit").prop("disabled", false);
 
     var parentIdCell = row.find("td:eq(1)").html();
     if (parentIdCell == "") {

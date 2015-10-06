@@ -75,7 +75,7 @@ public class ChargePointRepositoryImpl implements ChargePointRepository {
     }
 
     @Override
-    public ChargePoint getChargePointDetails(String chargeBoxId) {
+    public ChargePoint getDetails(String chargeBoxId) {
         ChargeboxRecord r = DSL.using(config)
                                .selectFrom(CHARGEBOX)
                                .where(CHARGEBOX.CHARGEBOXID.equal(chargeBoxId))
@@ -105,6 +105,19 @@ public class ChargePointRepositoryImpl implements ChargePointRepository {
     }
 
     @Override
+    public ChargePoint getDetailsForUpdate(String chargeBoxId) {
+        String note = DSL.using(config)
+                         .select(CHARGEBOX.NOTE)
+                         .from(CHARGEBOX)
+                         .where(CHARGEBOX.CHARGEBOXID.equal(chargeBoxId))
+                         .fetchOne(CHARGEBOX.NOTE);
+
+        return ChargePoint.builder()
+                          .note(note)
+                          .build();
+    }
+
+    @Override
     public List<Heartbeat> getChargePointHeartbeats() {
         return DSL.using(config)
                   .select(CHARGEBOX.CHARGEBOXID, CHARGEBOX.LASTHEARTBEATTIMESTAMP)
@@ -129,13 +142,22 @@ public class ChargePointRepositoryImpl implements ChargePointRepository {
                           CONNECTOR_STATUS.STATUSTIMESTAMP, CONNECTOR_STATUS.STATUS, CONNECTOR_STATUS.ERRORCODE)
                   .from(CONNECTOR_STATUS)
                   .join(CONNECTOR)
-                    .onKey()
+                  .onKey()
                   .join(t1)
-                    .on(CONNECTOR_STATUS.CONNECTOR_PK.equal(t1.field(t1_pk)))
-                    .and(CONNECTOR_STATUS.STATUSTIMESTAMP.equal(t1.field(t1_max)))
+                  .on(CONNECTOR_STATUS.CONNECTOR_PK.equal(t1.field(t1_pk)))
+                  .and(CONNECTOR_STATUS.STATUSTIMESTAMP.equal(t1.field(t1_max)))
                   .orderBy(CONNECTOR_STATUS.STATUSTIMESTAMP.desc())
                   .fetch()
                   .map(new ConnectorStatusMapper());
+    }
+
+    @Override
+    public List<Integer> getConnectorIds(String chargeBoxId) {
+        return DSL.using(config)
+                  .select(CONNECTOR.CONNECTORID)
+                  .from(CONNECTOR)
+                  .where(CONNECTOR.CHARGEBOXID.equal(chargeBoxId))
+                  .fetch(CONNECTOR.CONNECTORID);
     }
 
     @Override
@@ -157,6 +179,19 @@ public class ChargePointRepositoryImpl implements ChargePointRepository {
     }
 
     @Override
+    public void updateChargePoint(ChargeBoxForm form) {
+        try {
+            DSL.using(config)
+               .update(CHARGEBOX)
+               .set(CHARGEBOX.NOTE, form.getNote())
+               .where(CHARGEBOX.CHARGEBOXID.equal(form.getChargeBoxId()))
+               .execute();
+        } catch (DataAccessException e) {
+            throw new SteveException("The charge point with chargeBoxId '%s' could NOT be updated.", form.getChargeBoxId(), e);
+        }
+    }
+
+    @Override
     public void deleteChargePoint(String chargeBoxId) {
         try {
             DSL.using(config)
@@ -166,15 +201,6 @@ public class ChargePointRepositoryImpl implements ChargePointRepository {
         } catch (DataAccessException e) {
             throw new SteveException("The charge point with chargeBoxId '%s' could NOT be deleted.", chargeBoxId, e);
         }
-    }
-
-    @Override
-    public List<Integer> getConnectorIds(String chargeBoxId) {
-        return DSL.using(config)
-                  .select(CONNECTOR.CONNECTORID)
-                  .from(CONNECTOR)
-                  .where(CONNECTOR.CHARGEBOXID.equal(chargeBoxId))
-                  .fetch(CONNECTOR.CONNECTORID);
     }
 
     // -------------------------------------------------------------------------

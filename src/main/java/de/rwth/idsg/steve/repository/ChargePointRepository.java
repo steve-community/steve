@@ -17,10 +17,13 @@ public interface ChargePointRepository {
     boolean isRegistered(String chargeBoxId);
     List<ChargePointSelect> getChargePointSelect(OcppProtocol protocol);
     List<String> getChargeBoxIds();
-    ChargePoint getChargePointDetails(String chargeBoxId);
+    ChargePoint getDetails(String chargeBoxId);
+    ChargePoint getDetailsForUpdate(String chargeBoxId);
     List<Heartbeat> getChargePointHeartbeats();
     List<ConnectorStatus> getChargePointConnectorStatus();
-    void addChargePoint(ChargeBoxForm form);
-    void deleteChargePoint(String chargeBoxId);
     List<Integer> getConnectorIds(String chargeBoxId);
+
+    void addChargePoint(ChargeBoxForm form);
+    void updateChargePoint(ChargeBoxForm form);
+    void deleteChargePoint(String chargeBoxId);
 }

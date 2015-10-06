@@ -29,6 +29,7 @@ public class ChargePointsController {
     // -------------------------------------------------------------------------
 
     private static final String ADD_PATH = "/add";
+    private static final String UPDATE_PATH = "/update";
     private static final String DELETE_PATH = "/delete";
 
     // -------------------------------------------------------------------------
@@ -39,6 +40,7 @@ public class ChargePointsController {
     public String getAbout(Model model) {
         model.addAttribute("cpList", chargePointRepository.getChargeBoxIds());
         model.addAttribute("chargeBoxAddForm", new ChargeBoxForm());
+        model.addAttribute("chargeBoxUpdateForm", new ChargeBoxForm());
         return "data-man/chargepoints";
     }
 
@@ -51,6 +53,18 @@ public class ChargePointsController {
         }
 
         chargePointRepository.addChargePoint(chargeBoxForm);
+        return "redirect:/manager/chargepoints";
+    }
+
+    @RequestMapping(value = UPDATE_PATH, method = RequestMethod.POST)
+    public String update(@Valid @ModelAttribute("chargeBoxUpdateForm") ChargeBoxForm chargeBoxForm,
+                         BindingResult result, Model model) {
+        if (result.hasErrors()) {
+            model.addAttribute("cpList", chargePointRepository.getChargeBoxIds());
+            return "data-man/chargepoints";
+        }
+
+        chargePointRepository.updateChargePoint(chargeBoxForm);
         return "redirect:/manager/chargepoints";
     }
 

@@ -42,7 +42,13 @@ public class Application {
 
         STEVE_VERSION = prop.getString("steve.version");
 
-        DB.URL          = prop.getString("db.url");
+        DB.URL = new StringBuilder("jdbc:mysql://").append(prop.getString("db.ip"))
+                                                   .append(":")
+                                                   .append(prop.getInt("db.port"))
+                                                   .append("/")
+                                                   .append(prop.getString("db.schema"))
+                                                   .toString();
+
         DB.USERNAME     = prop.getString("db.user");
         DB.PASSWORD     = prop.getString("db.password");
         DB.SQL_LOGGING  = prop.getBoolean("db.sql.logging");

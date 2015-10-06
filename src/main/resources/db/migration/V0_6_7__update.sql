@@ -1,8 +1,8 @@
-ALTER TABLE `stevedb`.`dbVersion` CHANGE COLUMN `upateTimestamp` `updateTimestamp` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP  ;
+ALTER TABLE `dbVersion` CHANGE COLUMN `upateTimestamp` `updateTimestamp` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP  ;
 
-UPDATE `stevedb`.`dbVersion` SET `version` = '0.6.7';
+UPDATE `dbVersion` SET `version` = '0.6.7';
 
-ALTER TABLE `stevedb`.`chargebox` ADD COLUMN `lastHeartbeatTimestamp` TIMESTAMP NULL DEFAULT NULL  AFTER `diagnosticsTimestamp` ;
+ALTER TABLE `chargebox` ADD COLUMN `lastHeartbeatTimestamp` TIMESTAMP NULL DEFAULT NULL  AFTER `diagnosticsTimestamp` ;
 
 DROP EVENT IF EXISTS expire_reservations;
 DELIMITER ;;
@@ -14,7 +14,7 @@ DELETE FROM reservation WHERE reservation.expiryDatetime <= NOW();
 END ;;
 
 DELIMITER ;;
-CREATE DEFINER=`root`@`localhost` PROCEDURE `getStats`(
+CREATE PROCEDURE `getStats`(
 		OUT numChargeBoxes INT, 
 		OUT numUsers INT, 
 		OUT numReservs INT, 

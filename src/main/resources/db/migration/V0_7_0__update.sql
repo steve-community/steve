@@ -1,23 +1,23 @@
-UPDATE `stevedb`.`dbVersion` SET `version` = '0.7.0';
+UPDATE `dbVersion` SET `version` = '0.7.0';
 
-DROP EVENT IF EXISTS `stevedb`.`expire_reservations`;
+DROP EVENT IF EXISTS `expire_reservations`;
 
-DROP TABLE `stevedb`.`reservation_expired`;
+DROP TABLE `reservation_expired`;
 
-ALTER TABLE `stevedb`.`reservation`
+ALTER TABLE `reservation`
 ADD COLUMN `status` VARCHAR(15) NOT NULL AFTER `expiryDatetime`,
 ADD COLUMN `transaction_pk` INT(10) UNSIGNED DEFAULT NULL AFTER `reservation_pk`,
 ADD UNIQUE INDEX `transaction_pk_UNIQUE` (`transaction_pk` ASC),
 ADD CONSTRAINT `FK_transaction_pk_r`
   FOREIGN KEY (`transaction_pk`)
-  REFERENCES `stevedb`.`transaction` (`transaction_pk`)
+  REFERENCES `transaction` (`transaction_pk`)
   ON DELETE NO ACTION
   ON UPDATE NO ACTION;
 
-DROP PROCEDURE `stevedb`.`getStats`;
+DROP PROCEDURE `getStats`;
 
 DELIMITER ;;
-CREATE DEFINER=`root`@`localhost` PROCEDURE `stevedb`.`getStats`(
+CREATE PROCEDURE `getStats`(
 		OUT numChargeBoxes INT,
 		OUT numUsers INT,
 		OUT numReservs INT,

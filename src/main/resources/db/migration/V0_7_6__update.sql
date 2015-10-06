@@ -1,5 +1,5 @@
-ALTER TABLE `stevedb`.`user`
+ALTER TABLE `user`
 ADD COLUMN `note` TEXT NULL COMMENT '' AFTER `blocked`;
 
-ALTER TABLE `stevedb`.`chargebox`
+ALTER TABLE `chargebox`
 ADD COLUMN `note` TEXT NULL COMMENT '' AFTER `lastHeartbeatTimestamp`;

@@ -1,1 +1,1 @@
-DROP TABLE `stevedb`.`dbVersion`;
+DROP TABLE `dbVersion`;

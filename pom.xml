@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>de.rwth.idsg</groupId>
     <artifactId>steve</artifactId>
-    <version>1.3.0</version>
+    <version>2.0.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <developers>
@@ -253,9 +253,12 @@
 
                 <configuration>
                     <driver>com.mysql.jdbc.Driver</driver>
-                    <url>${db.url}</url>
+                    <url>jdbc:mysql://${db.ip}:${db.port}/</url>
                     <user>${db.user}</user>
                     <password>${db.password}</password>
+                    <schemas>
+                        <schema>${db.schema}</schema>
+                    </schemas>
                     <locations>
                         <location>filesystem:src/main/resources/db/migration</location>
                     </locations>
@@ -302,7 +305,7 @@
                 <configuration>
                     <jdbc>
                         <driver>com.mysql.jdbc.Driver</driver>
-                        <url>${db.url}</url>
+                        <url>jdbc:mysql://${db.ip}:${db.port}/</url>
                         <user>${db.user}</user>
                         <password>${db.password}</password>
                     </jdbc>
@@ -312,7 +315,7 @@
                             <name>org.jooq.util.mysql.MySQLDatabase</name>
                             <includes>.*</includes>
                             <excludes/>
-                            <inputSchema>stevedb</inputSchema>
+                            <inputSchema>${db.schema}</inputSchema>
                             <unsignedTypes>false</unsignedTypes>
 
                             <customTypes>

@@ -1,9 +1,9 @@
-UPDATE `stevedb`.`dbVersion` SET `version` = '0.6.8';
+UPDATE `dbVersion` SET `version` = '0.6.8';
 
-DROP PROCEDURE `stevedb`.`getStats`;
+DROP PROCEDURE `getStats`;
 
 DELIMITER ;;
-CREATE DEFINER=`root`@`localhost` PROCEDURE `stevedb`.`getStats`(
+CREATE PROCEDURE `getStats`(
 		OUT numChargeBoxes INT,
 		OUT numUsers INT,
 		OUT numReservs INT,

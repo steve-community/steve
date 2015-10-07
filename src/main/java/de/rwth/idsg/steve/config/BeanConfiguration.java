@@ -49,14 +49,17 @@ public class BeanConfiguration extends WebMvcConfigurerAdapter {
     private void initDataSource() {
 
         HikariConfig config = new HikariConfig();
-        config.setJdbcUrl(SteveConfiguration.DB.URL);
-        config.setUsername(SteveConfiguration.DB.USERNAME);
-        config.setPassword(SteveConfiguration.DB.PASSWORD);
         config.setDataSourceClassName("com.mysql.jdbc.jdbc2.optional.MysqlDataSource");
+
+        config.addDataSourceProperty("serverName", SteveConfiguration.DB.IP);
+        config.addDataSourceProperty("port", SteveConfiguration.DB.PORT);
+        config.addDataSourceProperty("databaseName", SteveConfiguration.DB.SCHEMA);
+        config.addDataSourceProperty("user", SteveConfiguration.DB.USERNAME);
+        config.addDataSourceProperty("password", SteveConfiguration.DB.PASSWORD);
+
         config.addDataSourceProperty("cachePrepStmts", "true");
         config.addDataSourceProperty("prepStmtCacheSize", "250");
         config.addDataSourceProperty("prepStmtCacheSqlLimit", "2048");
-        config.addDataSourceProperty("useServerPrepStmts", "true");
 
         dataSource = new HikariDataSource(config);
     }

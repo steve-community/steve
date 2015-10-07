@@ -47,7 +47,9 @@ public final class SteveConfiguration {
      * Database configuration
      */
     public static final class DB {
-        public static String URL;
+        public static String IP;
+        public static int PORT;
+        public static String SCHEMA;
         public static String USERNAME;
         public static String PASSWORD;
         public static boolean SQL_LOGGING;

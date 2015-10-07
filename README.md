@@ -66,4 +66,4 @@ Screenshots
 
 Are you having issues?
 -----
-See the [FAQ](FAQ.md)
+See the [FAQ](https://github.com/RWTH-i5-IDSG/steve/wiki/FAQ)

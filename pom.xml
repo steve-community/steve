@@ -32,6 +32,9 @@
         <jetty.version>9.2.12.v20150709</jetty.version>
         <lombok.version>1.16.4</lombok.version>
         <jackson.version>2.5.4</jackson.version>
+
+        <!-- In Mysql: schema == database (http://dev.mysql.com/doc/refman/5.6/en/glossary.html#glos_schema) -->
+        <jdbcUrl>jdbc:mysql://${db.ip}:${db.port}/${db.schema}</jdbcUrl>
     </properties>
 
     <profiles>
@@ -253,7 +256,7 @@
 
                 <configuration>
                     <driver>com.mysql.jdbc.Driver</driver>
-                    <url>jdbc:mysql://${db.ip}:${db.port}/</url>
+                    <url>${jdbcUrl}</url>
                     <user>${db.user}</user>
                     <password>${db.password}</password>
                     <schemas>
@@ -305,7 +308,7 @@
                 <configuration>
                     <jdbc>
                         <driver>com.mysql.jdbc.Driver</driver>
-                        <url>jdbc:mysql://${db.ip}:${db.port}/</url>
+                        <url>${jdbcUrl}</url>
                         <user>${db.user}</user>
                         <password>${db.password}</password>
                     </jdbc>

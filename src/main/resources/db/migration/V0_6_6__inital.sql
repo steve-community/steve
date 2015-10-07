@@ -81,11 +81,7 @@ CREATE TABLE `dbVersion` (
 -- Dumping data for table `dbVersion`
 --
 
-LOCK TABLES `dbVersion` WRITE;
-/*!40000 ALTER TABLE `dbVersion` DISABLE KEYS */;
 INSERT INTO `dbVersion` (`version`) VALUES ('0.6.6');
-/*!40000 ALTER TABLE `dbVersion` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `transaction`

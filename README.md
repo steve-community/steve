@@ -64,6 +64,6 @@ Screenshots
 9. [Operations - OCPP v1.5](website/screenshots/ocpp15.png)
 10. [Settings](website/screenshots/settings.png)
 
-Change log
+Are you having issues?
 -----
-See the [CHANGELOG](CHANGELOG.md)
+See the [FAQ](FAQ.md)

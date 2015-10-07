@@ -1,3 +1,5 @@
+### We manage the development using [Github releases](https://github.com/RWTH-i5-IDSG/steve/releases). This file is obsolete, won't be updated anymore.
+
 ## 1.0.2
 Complete rewrite of the backend:
 

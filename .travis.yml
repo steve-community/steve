@@ -8,9 +8,10 @@ cache:
 env:
         - DB=mysql
 
+before_install:
+        - sed -i.bak -e 's|https://nexus.codehaus.org/snapshots/|https://oss.sonatype.org/content/repositories/codehaus-snapshots/|g' ~/.m2/settings.xml
 
 before_script:
-        - sed -i.bak -e 's|https://nexus.codehaus.org/snapshots/|https://oss.sonatype.org/content/repositories/codehaus-snapshots/|g' ~/.m2/settings.xml
         - if [["$DB" == "mysql"]]; then mysql -uroot -e "CREATE DATABASE stevedb;" fi
         - if [["$DB" == "mysql"]]; then mysql -uroot -e "GRANT ALL PRIVILEGES ON stevedb.* TO 'steve'@'localhost' IDENTIFIED BY 'changeme';" fi
         - if [["$DB" == "mysql"]]; then mysql -uroot -e "GRANT SELECT ON mysql.proc TO 'steve'@'localhost' IDENTIFIED BY 'changeme';" fi

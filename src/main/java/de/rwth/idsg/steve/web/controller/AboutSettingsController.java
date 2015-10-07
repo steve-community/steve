@@ -46,7 +46,7 @@ public class AboutSettingsController {
         model.addAttribute("version", SteveConfiguration.STEVE_VERSION);
         model.addAttribute("db", genericRepository.getDBVersion());
         model.addAttribute("logFile", logController.getLogFilePath());
-        model.addAttribute("systemTime", new DateTime());
+        model.addAttribute("systemTime", DateTime.now());
         model.addAttribute("systemTimeZone", DateTimeZone.getDefault());
         return "about";
     }

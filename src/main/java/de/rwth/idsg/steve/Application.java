@@ -29,7 +29,7 @@ public class Application {
 
         TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
         DateTimeZone.setDefault(DateTimeZone.UTC);
-        log.info("Date/time zone of the application is set to UTC. Current date/time: {}", new DateTime());
+        log.info("Date/time zone of the application is set to UTC. Current date/time: {}", DateTime.now());
 
         loadProperties();
 

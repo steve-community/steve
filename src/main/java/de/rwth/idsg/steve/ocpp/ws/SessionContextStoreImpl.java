@@ -38,7 +38,7 @@ public class SessionContextStoreImpl implements SessionContextStore {
 
     @Override
     public void add(String chargeBoxId, WebSocketSession session, ScheduledFuture pingSchedule) {
-        SessionContext context = new SessionContext(session, pingSchedule, new DateTime());
+        SessionContext context = new SessionContext(session, pingSchedule, DateTime.now());
 
         Deque<SessionContext> endpointDeque = lookupTable.get(chargeBoxId);
         if (endpointDeque == null) {

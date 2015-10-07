@@ -50,7 +50,7 @@ public class ChargePointHelperServiceImpl implements ChargePointHelperService {
         Map<String, Deque<SessionContext>> ocpp12Map = ocpp12WebSocketEndpoint.getACopy();
         Map<String, Deque<SessionContext>> ocpp15Map = ocpp15WebSocketEndpoint.getACopy();
 
-        DateTime now = new DateTime();
+        DateTime now = DateTime.now();
         List<OcppJsonStatus> returnList = new ArrayList<>();
 
         appendList(ocpp12Map, returnList, now, OcppVersion.V_12);

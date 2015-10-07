@@ -62,7 +62,7 @@ public class UserServiceImpl implements UserService {
                 idTagInfo.setStatus(AuthorizationStatus.ACCEPTED);
 
                 int hours = ocppConstants.getHoursToExpire();
-                idTagInfo.setExpiryDate(new DateTime().plusHours(hours));
+                idTagInfo.setExpiryDate(DateTime.now().plusHours(hours));
                 idTagInfo.setParentIdTag(record.getParentidtag());
             }
         }
@@ -95,7 +95,7 @@ public class UserServiceImpl implements UserService {
                 idTagInfo.setStatus(ocpp.cs._2012._06.AuthorizationStatus.ACCEPTED);
 
                 int hours = ocppConstants.getHoursToExpire();
-                idTagInfo.setExpiryDate(new DateTime().plusHours(hours));
+                idTagInfo.setExpiryDate(DateTime.now().plusHours(hours));
                 idTagInfo.setParentIdTag(record.getParentidtag());
             }
         }
@@ -107,7 +107,7 @@ public class UserServiceImpl implements UserService {
     // -------------------------------------------------------------------------
 
     private class AuthorisationDataMapper implements RecordMapper<UserRecord, AuthorisationData> {
-        final DateTime nowDt = new DateTime();
+        final DateTime nowDt = DateTime.now();
         final DateTime cacheExpiry = nowDt.plus(ocppConstants.getHoursToExpire());
 
         @Override

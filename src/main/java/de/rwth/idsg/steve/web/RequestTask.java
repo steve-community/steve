@@ -26,7 +26,7 @@ public class RequestTask {
     private final Map<String, RequestResult> resultMap;
     private final int resultSize;
 
-    private final DateTime startTimestamp = new DateTime();
+    private final DateTime startTimestamp = DateTime.now();
     private DateTime endTimestamp;
 
     private AtomicInteger errorCount = new AtomicInteger(0);
@@ -50,14 +50,14 @@ public class RequestTask {
     public void addNewResponse(String chargeBoxId, String response) {
         resultMap.get(chargeBoxId).setResponse(response);
         if (resultSize == (errorCount.get() + responseCount.incrementAndGet())) {
-            endTimestamp = new DateTime();
+            endTimestamp = DateTime.now();
         }
     }
 
     public void addNewError(String chargeBoxId, Exception exception) {
         resultMap.get(chargeBoxId).setErrorMessage(exception.getMessage());
         if (resultSize == (errorCount.incrementAndGet() + responseCount.get())) {
-            endTimestamp = new DateTime();
+            endTimestamp = DateTime.now();
         }
     }
 

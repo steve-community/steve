@@ -41,7 +41,7 @@ public final class DateTimeUtils {
 
         // Equalize time fields before comparing date fields
         DateTime inputAtMidnight = dt.withTimeAtStartOfDay();
-        DateTime todayAtMidnight = new DateTime().withTimeAtStartOfDay();
+        DateTime todayAtMidnight = DateTime.now().withTimeAtStartOfDay();
 
         // Is it today?
         if (inputAtMidnight.equals(todayAtMidnight)) {

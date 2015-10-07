@@ -30,7 +30,7 @@ public class CentralSystemService15_Service {
                                                      OcppProtocol ocppProtocol) {
         log.debug("Executing bootNotification for {}", chargeBoxIdentity);
 
-        DateTime now = new DateTime();
+        DateTime now = DateTime.now();
 
         boolean isRegistered = ocppServerRepository.updateChargebox(ocppProtocol,
                                                                     parameters.getChargePointVendor(),
@@ -159,7 +159,7 @@ public class CentralSystemService15_Service {
     public HeartbeatResponse heartbeat(HeartbeatRequest parameters, String chargeBoxIdentity) {
         log.debug("Executing heartbeat for {}", chargeBoxIdentity);
 
-        DateTime now = new DateTime();
+        DateTime now = DateTime.now();
         ocppServerRepository.updateChargeboxHeartbeat(chargeBoxIdentity, now);
 
         return new HeartbeatResponse().withCurrentTime(now);

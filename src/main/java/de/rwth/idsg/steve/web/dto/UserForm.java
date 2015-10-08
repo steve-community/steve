@@ -32,6 +32,10 @@ public class UserForm extends AbstractNoteForm {
     private Boolean blocked = false;
 
     public void setParentIdTag(String parentIdTag) {
-        this.parentIdTag = (parentIdTag.equals("EMPTY-OPTION")) ? null : parentIdTag;
+        if (parentIdTag.equals("EMPTY-OPTION")) {
+            this.parentIdTag = null;
+        } else {
+            this.parentIdTag = parentIdTag;
+        }
     }
 }

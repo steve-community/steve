@@ -23,7 +23,6 @@ before_script:
 # start the actual build
 script: mvn package -B -V
 
-
 # coverity_scan settings
 #
 env:
@@ -36,4 +35,4 @@ addons:
                         name: "RWTH-i5-IDSG/steve"
                         description: "SteVe - Steckdosenverwaltung"
                 build_command:  "mvn package -B -V"
-                branch_pattern: coverity_scan
+                branch_pattern: master 

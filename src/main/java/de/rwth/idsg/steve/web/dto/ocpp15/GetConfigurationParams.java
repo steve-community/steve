@@ -16,7 +16,9 @@ public class GetConfigurationParams extends MultipleChargePointSelect {
     private List<ConfigurationKeyEnum> confKeyList;
 
     public List<ConfigurationKeyEnum> getConfKeyList() {
-        if (confKeyList == null) confKeyList = new ArrayList<>();
+        if (confKeyList == null) {
+            confKeyList = new ArrayList<>();
+        }
         return confKeyList;
     }
 }

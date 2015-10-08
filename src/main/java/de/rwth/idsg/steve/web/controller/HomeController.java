@@ -9,9 +9,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 /**
- * 
+ *
  * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
- * 
+ *
  */
 @Controller
 @RequestMapping(value = "/manager/home", method = RequestMethod.GET)

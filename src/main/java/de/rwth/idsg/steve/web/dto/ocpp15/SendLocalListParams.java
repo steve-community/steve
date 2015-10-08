@@ -39,12 +39,16 @@ public class SendLocalListParams extends MultipleChargePointSelect {
     }
 
     public List<String> getDeleteList() {
-        if (deleteList == null) deleteList = new ArrayList<>();
+        if (deleteList == null) {
+            deleteList = new ArrayList<>();
+        }
         return deleteList;
     }
 
     public List<String> getAddUpdateList() {
-        if (addUpdateList == null) addUpdateList = new ArrayList<>();
+        if (addUpdateList == null) {
+            addUpdateList = new ArrayList<>();
+        }
         return addUpdateList;
     }
 }

@@ -18,9 +18,8 @@ import javax.validation.Valid;
 
 /**
  * One controller for about and settings pages
- * 
+ *
  * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
- * 
  */
 @Controller
 @RequestMapping(value = "/manager")

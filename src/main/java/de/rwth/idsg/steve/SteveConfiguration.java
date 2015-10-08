@@ -7,7 +7,7 @@ import de.rwth.idsg.steve.ocpp.ws.custom.WsSessionSelectStrategyEnum;
  * @since 19.08.2014
  */
 public final class SteveConfiguration {
-    private SteveConfiguration() {}
+    private SteveConfiguration() { }
 
     // Root mapping for Spring
     public static final String SPRING_MAPPING = "/";

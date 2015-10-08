@@ -21,7 +21,7 @@ before_script:
         - mysql -uroot -e "GRANT SELECT ON mysql.proc TO 'steve'@'localhost' IDENTIFIED BY 'changeme';" -v
 
 # start the actual build
-script: mvn package -B -V
+script: mvn clean package -B -V
 
 # coverity_scan settings
 #
@@ -34,5 +34,7 @@ addons:
                 project:
                         name: "RWTH-i5-IDSG/steve"
                         description: "SteVe - Steckdosenverwaltung"
-                build_command:  "mvn package -B -V"
-                branch_pattern: master 
+                notification_email: goekay@dbis.rwth-aachen.de
+                build_command_prepend:
+                build_command:  "mvn package"
+                branch_pattern: master

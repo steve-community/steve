@@ -8,7 +8,6 @@ import de.rwth.idsg.steve.web.dto.TransactionQueryForm;
 import org.joda.time.DateTime;
 import org.jooq.Configuration;
 import org.jooq.Record8;
-import org.jooq.RecordMapper;
 import org.jooq.Result;
 import org.jooq.SelectQuery;
 import org.jooq.impl.DSL;
@@ -36,7 +35,17 @@ public class TransactionRepositoryImpl implements TransactionRepository {
 
     @Override
     public List<Transaction> getTransactions(TransactionQueryForm form) {
-        return internalGetTransactions(form).map(new TransactionMapper());
+        return internalGetTransactions(form)
+                .map(r -> Transaction.builder()
+                                     .id(r.value1())
+                                     .chargeBoxId(r.value2())
+                                     .connectorId(r.value3())
+                                     .idTag(r.value4())
+                                     .startTimestamp(DateTimeUtils.humanize(r.value5()))
+                                     .startValue(r.value6())
+                                     .stopTimestamp(DateTimeUtils.humanize(r.value7()))
+                                     .stopValue(r.value8())
+                                     .build());
     }
 
     @Override
@@ -96,23 +105,6 @@ public class TransactionRepositoryImpl implements TransactionRepository {
     // -------------------------------------------------------------------------
     // Private helpers
     // -------------------------------------------------------------------------
-
-    private class TransactionMapper implements
-            RecordMapper<Record8<Integer, String, Integer, String, DateTime, String, DateTime, String>, Transaction> {
-        @Override
-        public Transaction map(Record8<Integer, String, Integer, String, DateTime, String, DateTime, String> r) {
-            return Transaction.builder()
-                              .id(r.value1())
-                              .chargeBoxId(r.value2())
-                              .connectorId(r.value3())
-                              .idTag(r.value4())
-                              .startTimestamp(DateTimeUtils.humanize(r.value5()))
-                              .startValue(r.value6())
-                              .stopTimestamp(DateTimeUtils.humanize(r.value7()))
-                              .stopValue(r.value8())
-                              .build();
-        }
-    }
 
     private void processType(SelectQuery selectQuery, TransactionQueryForm form) {
         switch (form.getPeriodType()) {

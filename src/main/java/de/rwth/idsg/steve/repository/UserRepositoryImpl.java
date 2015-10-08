@@ -207,7 +207,7 @@ public class UserRepositoryImpl implements UserRepository {
         }
     }
 
-    private class UserMapper
+    private static class UserMapper
             implements RecordMapper<Record6<String, String, DateTime, Boolean, Boolean, String>, User> {
         @Override
         public User map(Record6<String, String, DateTime, Boolean, Boolean, String> r) {

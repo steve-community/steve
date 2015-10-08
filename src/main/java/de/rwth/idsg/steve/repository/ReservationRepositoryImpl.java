@@ -134,7 +134,7 @@ public class ReservationRepositoryImpl implements ReservationRepository {
     // Private helpers
     // -------------------------------------------------------------------------
 
-    private class ReservationMapper implements
+    private static class ReservationMapper implements
             RecordMapper<Record7<Integer, Integer, String, String, DateTime, DateTime, String>, Reservation> {
         @Override
         public Reservation map(Record7<Integer, Integer, String, String, DateTime, DateTime, String> r) {

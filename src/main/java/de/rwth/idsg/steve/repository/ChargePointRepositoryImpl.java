@@ -10,14 +10,10 @@ import de.rwth.idsg.steve.repository.dto.Heartbeat;
 import de.rwth.idsg.steve.utils.DateTimeUtils;
 import de.rwth.idsg.steve.web.dto.ChargeBoxForm;
 import jooq.steve.db.tables.records.ChargeboxRecord;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.joda.time.DateTime;
 import org.jooq.Configuration;
 import org.jooq.Field;
-import org.jooq.Record2;
-import org.jooq.Record5;
-import org.jooq.RecordMapper;
 import org.jooq.TableLike;
 import org.jooq.exception.DataAccessException;
 import org.jooq.impl.DSL;
@@ -57,13 +53,15 @@ public class ChargePointRepositoryImpl implements ChargePointRepository {
 
     @Override
     public List<ChargePointSelect> getChargePointSelect(OcppProtocol protocol) {
+        final OcppTransport transport = protocol.getTransport();
+
         return DSL.using(config)
                   .select(CHARGEBOX.CHARGEBOXID, CHARGEBOX.ENDPOINT_ADDRESS)
                   .from(CHARGEBOX)
                   .where(CHARGEBOX.OCPPPROTOCOL.equal(protocol.getCompositeValue()))
                   .and(CHARGEBOX.ENDPOINT_ADDRESS.isNotNull())
                   .fetch()
-                  .map(new ChargePointSelectMapper(protocol.getTransport()));
+                  .map(r -> new ChargePointSelect(transport, r.value1(), r.value2()));
     }
 
     @Override
@@ -124,7 +122,11 @@ public class ChargePointRepositoryImpl implements ChargePointRepository {
                   .from(CHARGEBOX)
                   .orderBy(CHARGEBOX.LASTHEARTBEATTIMESTAMP.desc())
                   .fetch()
-                  .map(new HeartbeatMapper());
+                  .map(r -> Heartbeat.builder()
+                                     .chargeBoxId(r.value1())
+                                     .lastTimestamp(DateTimeUtils.humanize(r.value2()))
+                                     .build()
+                  );
     }
 
     @Override
@@ -148,7 +150,14 @@ public class ChargePointRepositoryImpl implements ChargePointRepository {
                   .and(CONNECTOR_STATUS.STATUSTIMESTAMP.equal(t1.field(t1Max)))
                   .orderBy(CONNECTOR_STATUS.STATUSTIMESTAMP.desc())
                   .fetch()
-                  .map(new ConnectorStatusMapper());
+                  .map(r -> ConnectorStatus.builder()
+                                           .chargeBoxId(r.value1())
+                                           .connectorId(r.value2())
+                                           .timeStamp(DateTimeUtils.humanize(r.value3()))
+                                           .status(r.value4())
+                                           .errorCode(r.value5())
+                                           .build()
+                  );
     }
 
     @Override
@@ -203,44 +212,6 @@ public class ChargePointRepositoryImpl implements ChargePointRepository {
                .execute();
         } catch (DataAccessException e) {
             throw new SteveException("The charge point with chargeBoxId '%s' could NOT be deleted.", chargeBoxId, e);
-        }
-    }
-
-    // -------------------------------------------------------------------------
-    // Private helpers
-    // -------------------------------------------------------------------------
-
-    @RequiredArgsConstructor
-    private class ChargePointSelectMapper implements RecordMapper<Record2<String, String>, ChargePointSelect> {
-        private final OcppTransport transport;
-
-        @Override
-        public ChargePointSelect map(Record2<String, String> record) {
-            return new ChargePointSelect(transport, record.value1(), record.value2());
-        }
-    }
-
-    private class HeartbeatMapper implements RecordMapper<Record2<String, DateTime>, Heartbeat> {
-        @Override
-        public Heartbeat map(Record2<String, DateTime> r) {
-            return Heartbeat.builder()
-                            .chargeBoxId(r.value1())
-                            .lastTimestamp(DateTimeUtils.humanize(r.value2()))
-                            .build();
-        }
-    }
-
-    private class ConnectorStatusMapper implements
-            RecordMapper<Record5<String, Integer, DateTime, String, String>, ConnectorStatus> {
-        @Override
-        public ConnectorStatus map(Record5<String, Integer, DateTime, String, String> r) {
-            return ConnectorStatus.builder()
-                                  .chargeBoxId(r.value1())
-                                  .connectorId(r.value2())
-                                  .timeStamp(DateTimeUtils.humanize(r.value3()))
-                                  .status(r.value4())
-                                  .errorCode(r.value5())
-                                  .build();
         }
     }
 }

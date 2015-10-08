@@ -1,6 +1,20 @@
 package de.rwth.idsg.steve.service;
 
-import de.rwth.idsg.steve.handler.ocpp15.*;
+import de.rwth.idsg.steve.handler.ocpp15.CancelReservationResponseHandler;
+import de.rwth.idsg.steve.handler.ocpp15.ChangeAvailabilityResponseHandler;
+import de.rwth.idsg.steve.handler.ocpp15.ChangeConfigurationResponseHandler;
+import de.rwth.idsg.steve.handler.ocpp15.ClearCacheResponseHandler;
+import de.rwth.idsg.steve.handler.ocpp15.DataTransferResponseHandler;
+import de.rwth.idsg.steve.handler.ocpp15.GetConfigurationResponseHandler;
+import de.rwth.idsg.steve.handler.ocpp15.GetDiagnosticsResponseHandler;
+import de.rwth.idsg.steve.handler.ocpp15.GetLocalListVersionResponseHandler;
+import de.rwth.idsg.steve.handler.ocpp15.RemoteStartTransactionResponseHandler;
+import de.rwth.idsg.steve.handler.ocpp15.RemoteStopTransactionResponseHandler;
+import de.rwth.idsg.steve.handler.ocpp15.ReserveNowResponseHandler;
+import de.rwth.idsg.steve.handler.ocpp15.ResetResponseHandler;
+import de.rwth.idsg.steve.handler.ocpp15.SendLocalListResponseHandler;
+import de.rwth.idsg.steve.handler.ocpp15.UnlockConnectorResponseHandler;
+import de.rwth.idsg.steve.handler.ocpp15.UpdateFirmwareResponseHandler;
 import de.rwth.idsg.steve.ocpp.OcppVersion;
 import de.rwth.idsg.steve.repository.RequestTaskStore;
 import de.rwth.idsg.steve.repository.ReservationRepository;
@@ -23,7 +37,23 @@ import de.rwth.idsg.steve.web.dto.ocpp15.ReserveNowParams;
 import de.rwth.idsg.steve.web.dto.ocpp15.ResetParams;
 import de.rwth.idsg.steve.web.dto.ocpp15.SendLocalListParams;
 import lombok.extern.slf4j.Slf4j;
-import ocpp.cp._2012._06.*;
+import ocpp.cp._2012._06.AuthorisationData;
+import ocpp.cp._2012._06.CancelReservationRequest;
+import ocpp.cp._2012._06.ChangeAvailabilityRequest;
+import ocpp.cp._2012._06.ChangeConfigurationRequest;
+import ocpp.cp._2012._06.ClearCacheRequest;
+import ocpp.cp._2012._06.DataTransferRequest;
+import ocpp.cp._2012._06.GetConfigurationRequest;
+import ocpp.cp._2012._06.GetDiagnosticsRequest;
+import ocpp.cp._2012._06.GetLocalListVersionRequest;
+import ocpp.cp._2012._06.RemoteStartTransactionRequest;
+import ocpp.cp._2012._06.RemoteStopTransactionRequest;
+import ocpp.cp._2012._06.ReserveNowRequest;
+import ocpp.cp._2012._06.ResetRequest;
+import ocpp.cp._2012._06.SendLocalListRequest;
+import ocpp.cp._2012._06.UnlockConnectorRequest;
+import ocpp.cp._2012._06.UpdateFirmwareRequest;
+import ocpp.cp._2012._06.UpdateType;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -37,7 +67,7 @@ import static de.rwth.idsg.steve.utils.DateTimeUtils.toDateTime;
 /**
  * Transport-level agnostic client implementation of OCPP V1.5
  * which builds the request payloads and delegates to an invoker.
- * 
+ *
  * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
  */
 @Slf4j
@@ -184,7 +214,8 @@ public class ChargePointService15_Client {
         RequestTask requestTask = new RequestTask(VERSION, "Change Availability", chargePointSelectList);
 
         for (ChargePointSelect c : chargePointSelectList) {
-            ChangeAvailabilityResponseHandler handler = new ChangeAvailabilityResponseHandler(requestTask, c.getChargeBoxId());
+            ChangeAvailabilityResponseHandler handler =
+                    new ChangeAvailabilityResponseHandler(requestTask, c.getChargeBoxId());
             dispatcher.changeAvailability(c, req, handler);
         }
         return requestTaskStore.add(requestTask);
@@ -196,7 +227,8 @@ public class ChargePointService15_Client {
         RequestTask requestTask = new RequestTask(VERSION, "Change Configuration", chargePointSelectList);
 
         for (ChargePointSelect c : chargePointSelectList) {
-            ChangeConfigurationResponseHandler handler = new ChangeConfigurationResponseHandler(requestTask, c.getChargeBoxId());
+            ChangeConfigurationResponseHandler handler =
+                    new ChangeConfigurationResponseHandler(requestTask, c.getChargeBoxId());
             dispatcher.changeConfiguration(c, req, handler);
         }
         return requestTaskStore.add(requestTask);
@@ -220,7 +252,8 @@ public class ChargePointService15_Client {
         RequestTask requestTask = new RequestTask(VERSION, "Get Diagnostics", chargePointSelectList);
 
         for (ChargePointSelect c : chargePointSelectList) {
-            GetDiagnosticsResponseHandler handler = new GetDiagnosticsResponseHandler(requestTask, c.getChargeBoxId());
+            GetDiagnosticsResponseHandler handler =
+                    new GetDiagnosticsResponseHandler(requestTask, c.getChargeBoxId());
             dispatcher.getDiagnostics(c, req, handler);
         }
         return requestTaskStore.add(requestTask);
@@ -268,7 +301,8 @@ public class ChargePointService15_Client {
         RequestTask requestTask = new RequestTask(VERSION, "Get Configuration", chargePointSelectList);
 
         for (ChargePointSelect c : chargePointSelectList) {
-            GetConfigurationResponseHandler handler = new GetConfigurationResponseHandler(requestTask, c.getChargeBoxId());
+            GetConfigurationResponseHandler handler =
+                    new GetConfigurationResponseHandler(requestTask, c.getChargeBoxId());
             dispatcher.getConfiguration(c, req, handler);
         }
         return requestTaskStore.add(requestTask);
@@ -280,7 +314,8 @@ public class ChargePointService15_Client {
         RequestTask requestTask = new RequestTask(VERSION, "Get Local List Version", chargePointSelectList);
 
         for (ChargePointSelect c : chargePointSelectList) {
-            GetLocalListVersionResponseHandler handler = new GetLocalListVersionResponseHandler(requestTask, c.getChargeBoxId());
+            GetLocalListVersionResponseHandler handler =
+                    new GetLocalListVersionResponseHandler(requestTask, c.getChargeBoxId());
             dispatcher.getLocalListVersion(c, req, handler);
         }
         return requestTaskStore.add(requestTask);
@@ -308,7 +343,8 @@ public class ChargePointService15_Client {
         RequestTask requestTask = new RequestTask(VERSION, "Remote Start Transaction", chargePointSelectList);
 
         ChargePointSelect c = chargePointSelectList.get(0);
-        RemoteStartTransactionResponseHandler handler = new RemoteStartTransactionResponseHandler(requestTask, c.getChargeBoxId());
+        RemoteStartTransactionResponseHandler handler =
+                new RemoteStartTransactionResponseHandler(requestTask, c.getChargeBoxId());
         dispatcher.remoteStartTransaction(c, req, handler);
         return requestTaskStore.add(requestTask);
     }
@@ -319,7 +355,8 @@ public class ChargePointService15_Client {
         RequestTask requestTask = new RequestTask(VERSION, "Remote Stop Transaction", chargePointSelectList);
 
         ChargePointSelect c = chargePointSelectList.get(0);
-        RemoteStopTransactionResponseHandler handler = new RemoteStopTransactionResponseHandler(requestTask, c.getChargeBoxId());
+        RemoteStopTransactionResponseHandler handler =
+                new RemoteStopTransactionResponseHandler(requestTask, c.getChargeBoxId());
         dispatcher.remoteStopTransaction(c, req, handler);
         return requestTaskStore.add(requestTask);
     }
@@ -360,8 +397,9 @@ public class ChargePointService15_Client {
         RequestTask requestTask = new RequestTask(VERSION, "Cancel Reservation", chargePointSelectList);
 
         ChargePointSelect c = chargePointSelectList.get(0);
-        CancelReservationResponseHandler handler = new CancelReservationResponseHandler(requestTask, c.getChargeBoxId(),
-                reservationRepository, params.getReservationId());
+        CancelReservationResponseHandler handler =
+                new CancelReservationResponseHandler(requestTask, c.getChargeBoxId(),
+                        reservationRepository, params.getReservationId());
         dispatcher.cancelReservation(c, req, handler);
         return requestTaskStore.add(requestTask);
     }

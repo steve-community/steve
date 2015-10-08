@@ -11,7 +11,7 @@ import de.rwth.idsg.steve.ocpp.ws.data.OcppJsonError;
  * @since 17.03.2015
  */
 public final class ErrorFactory {
-    private ErrorFactory() {}
+    private ErrorFactory() { }
 
     public static OcppJsonError genericDeserializeError(String messageId, String details) {
         return setFields(messageId, ErrorCode.GenericError,

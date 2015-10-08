@@ -11,7 +11,7 @@ import static org.jooq.impl.DSL.field;
  * @since 03.09.2015
  */
 public final class CustomDSL {
-    private CustomDSL() {}
+    private CustomDSL() { }
 
     public static Field<DateTime> utcTimestamp() {
         return field("{utc_timestamp}", DateTime.class);

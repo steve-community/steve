@@ -71,6 +71,9 @@ public class UserRepositoryImpl implements UserRepository {
                         USER.EXPIRYDATE.isNull().or(USER.EXPIRYDATE.greaterThan(CustomDSL.utcTimestamp()))
                 );
                 break;
+
+            default:
+                throw new SteveException("Unknown enum type");
         }
 
         processBooleanType(selectQuery, USER.INTRANSACTION, form.getInTransaction());
@@ -204,7 +207,8 @@ public class UserRepositoryImpl implements UserRepository {
         }
     }
 
-    private class UserMapper implements RecordMapper<Record6<String, String, DateTime, Boolean, Boolean, String>, User> {
+    private class UserMapper
+            implements RecordMapper<Record6<String, String, DateTime, Boolean, Boolean, String>, User> {
         @Override
         public User map(Record6<String, String, DateTime, Boolean, Boolean, String> r) {
             return User.builder()

@@ -38,12 +38,12 @@ public class WebSocketConfiguration implements WebSocketConfigurer {
     @Autowired private Ocpp15WebSocketEndpoint ocpp15WebSocketEndpoint;
     @Autowired private ChargePointRepository chargePointRepository;
 
-    public final static long IDLE_TIMEOUT = TimeUnit.HOURS.toMillis(2);
-    public final static long PING_INTERVAL = 15; // in minutes
-    private final static int MAX_MSG_SIZE = 8388608; // 8 MB for max message size
+    public static final long IDLE_TIMEOUT = TimeUnit.HOURS.toMillis(2);
+    public static final long PING_INTERVAL = 15; // in minutes
+    private static final int MAX_MSG_SIZE = 8388608; // 8 MB for max message size
 
     // The order affects the choice
-    private final static String[] PROTOCOLS = {
+    private static final String[] PROTOCOLS = {
             OcppVersion.V_15.getValue(),
             OcppVersion.V_12.getValue()
     };

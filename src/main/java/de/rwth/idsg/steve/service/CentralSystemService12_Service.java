@@ -4,7 +4,26 @@ import de.rwth.idsg.steve.ocpp.OcppConstants;
 import de.rwth.idsg.steve.ocpp.OcppProtocol;
 import de.rwth.idsg.steve.repository.OcppServerRepository;
 import lombok.extern.slf4j.Slf4j;
-import ocpp.cs._2010._08.*;
+import ocpp.cs._2010._08.AuthorizeRequest;
+import ocpp.cs._2010._08.AuthorizeResponse;
+import ocpp.cs._2010._08.BootNotificationRequest;
+import ocpp.cs._2010._08.BootNotificationResponse;
+import ocpp.cs._2010._08.DiagnosticsStatusNotificationRequest;
+import ocpp.cs._2010._08.DiagnosticsStatusNotificationResponse;
+import ocpp.cs._2010._08.FirmwareStatusNotificationRequest;
+import ocpp.cs._2010._08.FirmwareStatusNotificationResponse;
+import ocpp.cs._2010._08.HeartbeatRequest;
+import ocpp.cs._2010._08.HeartbeatResponse;
+import ocpp.cs._2010._08.IdTagInfo;
+import ocpp.cs._2010._08.MeterValuesRequest;
+import ocpp.cs._2010._08.MeterValuesResponse;
+import ocpp.cs._2010._08.RegistrationStatus;
+import ocpp.cs._2010._08.StartTransactionRequest;
+import ocpp.cs._2010._08.StartTransactionResponse;
+import ocpp.cs._2010._08.StatusNotificationRequest;
+import ocpp.cs._2010._08.StatusNotificationResponse;
+import ocpp.cs._2010._08.StopTransactionRequest;
+import ocpp.cs._2010._08.StopTransactionResponse;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -54,8 +73,8 @@ public class CentralSystemService12_Service {
         }
     }
 
-    public FirmwareStatusNotificationResponse firmwareStatusNotification(FirmwareStatusNotificationRequest parameters,
-                                                                         String chargeBoxIdentity) {
+    public FirmwareStatusNotificationResponse firmwareStatusNotification(
+            FirmwareStatusNotificationRequest parameters, String chargeBoxIdentity) {
         log.debug("Executing firmwareStatusNotification for {}", chargeBoxIdentity);
 
         String status = parameters.getStatus().value();
@@ -63,7 +82,8 @@ public class CentralSystemService12_Service {
         return new FirmwareStatusNotificationResponse();
     }
 
-    public StatusNotificationResponse statusNotification(StatusNotificationRequest parameters, String chargeBoxIdentity) {
+    public StatusNotificationResponse statusNotification(
+            StatusNotificationRequest parameters, String chargeBoxIdentity) {
         log.debug("Executing statusNotification for {}", chargeBoxIdentity);
 
         int connectorId = parameters.getConnectorId();
@@ -84,8 +104,8 @@ public class CentralSystemService12_Service {
         return new MeterValuesResponse();
     }
 
-    public DiagnosticsStatusNotificationResponse diagnosticsStatusNotification(DiagnosticsStatusNotificationRequest parameters,
-                                                                               String chargeBoxIdentity) {
+    public DiagnosticsStatusNotificationResponse diagnosticsStatusNotification(
+            DiagnosticsStatusNotificationRequest parameters, String chargeBoxIdentity) {
         log.debug("Executing diagnosticsStatusNotification for {}", chargeBoxIdentity);
 
         String status = parameters.getStatus().value();

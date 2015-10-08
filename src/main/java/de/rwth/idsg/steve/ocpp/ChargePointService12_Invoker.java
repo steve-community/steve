@@ -2,7 +2,24 @@ package de.rwth.idsg.steve.ocpp;
 
 import de.rwth.idsg.steve.handler.OcppResponseHandler;
 import de.rwth.idsg.steve.repository.dto.ChargePointSelect;
-import ocpp.cp._2010._08.*;
+import ocpp.cp._2010._08.ChangeAvailabilityRequest;
+import ocpp.cp._2010._08.ChangeAvailabilityResponse;
+import ocpp.cp._2010._08.ChangeConfigurationRequest;
+import ocpp.cp._2010._08.ChangeConfigurationResponse;
+import ocpp.cp._2010._08.ClearCacheRequest;
+import ocpp.cp._2010._08.ClearCacheResponse;
+import ocpp.cp._2010._08.GetDiagnosticsRequest;
+import ocpp.cp._2010._08.GetDiagnosticsResponse;
+import ocpp.cp._2010._08.RemoteStartTransactionRequest;
+import ocpp.cp._2010._08.RemoteStartTransactionResponse;
+import ocpp.cp._2010._08.RemoteStopTransactionRequest;
+import ocpp.cp._2010._08.RemoteStopTransactionResponse;
+import ocpp.cp._2010._08.ResetRequest;
+import ocpp.cp._2010._08.ResetResponse;
+import ocpp.cp._2010._08.UnlockConnectorRequest;
+import ocpp.cp._2010._08.UnlockConnectorResponse;
+import ocpp.cp._2010._08.UpdateFirmwareRequest;
+import ocpp.cp._2010._08.UpdateFirmwareResponse;
 
 /**
  * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>

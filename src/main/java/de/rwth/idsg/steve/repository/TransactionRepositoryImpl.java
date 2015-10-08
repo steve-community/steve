@@ -1,5 +1,6 @@
 package de.rwth.idsg.steve.repository;
 
+import de.rwth.idsg.steve.SteveException;
 import de.rwth.idsg.steve.repository.dto.Transaction;
 import de.rwth.idsg.steve.utils.CustomDSL;
 import de.rwth.idsg.steve.utils.DateTimeUtils;
@@ -44,7 +45,9 @@ public class TransactionRepositoryImpl implements TransactionRepository {
     }
 
     @SuppressWarnings("unchecked")
-    private Result<Record8<Integer, String, Integer, String, DateTime, String, DateTime, String>> internalGetTransactions(TransactionQueryForm form) {
+    private Result<Record8<Integer, String, Integer, String, DateTime, String, DateTime, String>>
+    internalGetTransactions(TransactionQueryForm form) {
+
         SelectQuery selectQuery = DSL.using(config).selectQuery();
         selectQuery.addFrom(TRANSACTION);
         selectQuery.addJoin(CONNECTOR, TRANSACTION.CONNECTOR_PK.eq(CONNECTOR.CONNECTOR_PK));
@@ -139,6 +142,9 @@ public class TransactionRepositoryImpl implements TransactionRepository {
                         TRANSACTION.STARTTIMESTAMP.between(form.getFrom().toDateTime(), form.getTo().toDateTime())
                 );
                 break;
+
+            default:
+                throw new SteveException("Unknown enum type");
         }
     }
 }

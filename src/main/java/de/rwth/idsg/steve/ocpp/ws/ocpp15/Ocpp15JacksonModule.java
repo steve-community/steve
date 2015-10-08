@@ -5,8 +5,29 @@ import com.fasterxml.jackson.databind.Module;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import de.rwth.idsg.steve.ocpp.ws.custom.EnumMixin;
 import de.rwth.idsg.steve.ocpp.ws.custom.MeterValue15Mixin;
-import ocpp.cp._2012._06.*;
-import ocpp.cs._2012._06.*;
+import ocpp.cp._2012._06.AvailabilityStatus;
+import ocpp.cp._2012._06.AvailabilityType;
+import ocpp.cp._2012._06.CancelReservationStatus;
+import ocpp.cp._2012._06.ClearCacheStatus;
+import ocpp.cp._2012._06.ConfigurationStatus;
+import ocpp.cp._2012._06.RemoteStartStopStatus;
+import ocpp.cp._2012._06.ReservationStatus;
+import ocpp.cp._2012._06.ResetStatus;
+import ocpp.cp._2012._06.ResetType;
+import ocpp.cp._2012._06.UnlockStatus;
+import ocpp.cp._2012._06.UpdateStatus;
+import ocpp.cp._2012._06.UpdateType;
+import ocpp.cs._2012._06.ChargePointErrorCode;
+import ocpp.cs._2012._06.ChargePointStatus;
+import ocpp.cs._2012._06.DiagnosticsStatus;
+import ocpp.cs._2012._06.FirmwareStatus;
+import ocpp.cs._2012._06.Location;
+import ocpp.cs._2012._06.Measurand;
+import ocpp.cs._2012._06.MeterValuesRequest;
+import ocpp.cs._2012._06.ReadingContext;
+import ocpp.cs._2012._06.RegistrationStatus;
+import ocpp.cs._2012._06.UnitOfMeasure;
+import ocpp.cs._2012._06.ValueFormat;
 
 /**
  * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
@@ -15,7 +36,7 @@ import ocpp.cs._2012._06.*;
 public class Ocpp15JacksonModule extends SimpleModule {
 
     public Ocpp15JacksonModule() {
-        super("Ocpp15JacksonModule", new Version(0, 0 ,1, null, "de.rwth.idsg", "steve"));
+        super("Ocpp15JacksonModule", new Version(0, 0 , 1, null, "de.rwth.idsg", "steve"));
     }
 
     @Override

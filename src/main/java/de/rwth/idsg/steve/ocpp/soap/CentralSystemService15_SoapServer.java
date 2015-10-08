@@ -3,7 +3,27 @@ package de.rwth.idsg.steve.ocpp.soap;
 import de.rwth.idsg.steve.ocpp.OcppProtocol;
 import de.rwth.idsg.steve.service.CentralSystemService15_Service;
 import lombok.extern.slf4j.Slf4j;
-import ocpp.cs._2012._06.*;
+import ocpp.cs._2012._06.AuthorizeRequest;
+import ocpp.cs._2012._06.AuthorizeResponse;
+import ocpp.cs._2012._06.BootNotificationRequest;
+import ocpp.cs._2012._06.BootNotificationResponse;
+import ocpp.cs._2012._06.CentralSystemService;
+import ocpp.cs._2012._06.DataTransferRequest;
+import ocpp.cs._2012._06.DataTransferResponse;
+import ocpp.cs._2012._06.DiagnosticsStatusNotificationRequest;
+import ocpp.cs._2012._06.DiagnosticsStatusNotificationResponse;
+import ocpp.cs._2012._06.FirmwareStatusNotificationRequest;
+import ocpp.cs._2012._06.FirmwareStatusNotificationResponse;
+import ocpp.cs._2012._06.HeartbeatRequest;
+import ocpp.cs._2012._06.HeartbeatResponse;
+import ocpp.cs._2012._06.MeterValuesRequest;
+import ocpp.cs._2012._06.MeterValuesResponse;
+import ocpp.cs._2012._06.StartTransactionRequest;
+import ocpp.cs._2012._06.StartTransactionResponse;
+import ocpp.cs._2012._06.StatusNotificationRequest;
+import ocpp.cs._2012._06.StatusNotificationResponse;
+import ocpp.cs._2012._06.StopTransactionRequest;
+import ocpp.cs._2012._06.StopTransactionResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -17,9 +37,9 @@ import java.util.concurrent.Future;
 
 /**
  * Service implementation of OCPP V1.5
- * 
+ *
  * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
- *  
+ *
  */
 @Slf4j
 @Service
@@ -38,12 +58,13 @@ public class CentralSystemService15_SoapServer implements CentralSystemService {
         return service.bootNotification(parameters, chargeBoxIdentity, OcppProtocol.V_15_SOAP);
     }
 
-    public FirmwareStatusNotificationResponse firmwareStatusNotification(FirmwareStatusNotificationRequest parameters,
-                                                                         String chargeBoxIdentity) {
+    public FirmwareStatusNotificationResponse firmwareStatusNotification(
+            FirmwareStatusNotificationRequest parameters, String chargeBoxIdentity) {
         return service.firmwareStatusNotification(parameters, chargeBoxIdentity);
     }
 
-    public StatusNotificationResponse statusNotification(StatusNotificationRequest parameters, String chargeBoxIdentity) {
+    public StatusNotificationResponse statusNotification(
+            StatusNotificationRequest parameters, String chargeBoxIdentity) {
         return service.statusNotification(parameters, chargeBoxIdentity);
     }
 
@@ -51,8 +72,8 @@ public class CentralSystemService15_SoapServer implements CentralSystemService {
         return service.meterValues(parameters, chargeBoxIdentity);
     }
 
-    public DiagnosticsStatusNotificationResponse diagnosticsStatusNotification(DiagnosticsStatusNotificationRequest parameters,
-                                                                               String chargeBoxIdentity) {
+    public DiagnosticsStatusNotificationResponse diagnosticsStatusNotification(
+            DiagnosticsStatusNotificationRequest parameters, String chargeBoxIdentity) {
         return service.diagnosticsStatusNotification(parameters, chargeBoxIdentity);
     }
 
@@ -86,37 +107,45 @@ public class CentralSystemService15_SoapServer implements CentralSystemService {
     }
 
     @Override
-    public Future<?> heartbeatAsync(HeartbeatRequest parameters, String chargeBoxIdentity, AsyncHandler<HeartbeatResponse> asyncHandler) {
+    public Future<?> heartbeatAsync(HeartbeatRequest parameters, String chargeBoxIdentity,
+                                    AsyncHandler<HeartbeatResponse> asyncHandler) {
         return null;
     }
 
     @Override
-    public Response<StartTransactionResponse> startTransactionAsync(StartTransactionRequest parameters, String chargeBoxIdentity) {
+    public Response<StartTransactionResponse> startTransactionAsync(StartTransactionRequest parameters,
+                                                                    String chargeBoxIdentity) {
         return null;
     }
 
     @Override
-    public Future<?> startTransactionAsync(StartTransactionRequest parameters, String chargeBoxIdentity, AsyncHandler<StartTransactionResponse> asyncHandler) {
+    public Future<?> startTransactionAsync(StartTransactionRequest parameters, String chargeBoxIdentity,
+                                           AsyncHandler<StartTransactionResponse> asyncHandler) {
         return null;
     }
 
     @Override
-    public Response<StopTransactionResponse> stopTransactionAsync(StopTransactionRequest parameters, String chargeBoxIdentity) {
+    public Response<StopTransactionResponse> stopTransactionAsync(StopTransactionRequest parameters,
+                                                                  String chargeBoxIdentity) {
         return null;
     }
 
     @Override
-    public Future<?> stopTransactionAsync(StopTransactionRequest parameters, String chargeBoxIdentity, AsyncHandler<StopTransactionResponse> asyncHandler) {
+    public Future<?> stopTransactionAsync(StopTransactionRequest parameters, String chargeBoxIdentity,
+                                          AsyncHandler<StopTransactionResponse> asyncHandler) {
         return null;
     }
 
     @Override
-    public Response<DiagnosticsStatusNotificationResponse> diagnosticsStatusNotificationAsync(DiagnosticsStatusNotificationRequest parameters, String chargeBoxIdentity) {
+    public Response<DiagnosticsStatusNotificationResponse> diagnosticsStatusNotificationAsync(
+            DiagnosticsStatusNotificationRequest parameters, String chargeBoxIdentity) {
         return null;
     }
 
     @Override
-    public Future<?> diagnosticsStatusNotificationAsync(DiagnosticsStatusNotificationRequest parameters, String chargeBoxIdentity, AsyncHandler<DiagnosticsStatusNotificationResponse> asyncHandler) {
+    public Future<?> diagnosticsStatusNotificationAsync(
+            DiagnosticsStatusNotificationRequest parameters, String chargeBoxIdentity,
+            AsyncHandler<DiagnosticsStatusNotificationResponse> asyncHandler) {
         return null;
     }
 
@@ -126,17 +155,20 @@ public class CentralSystemService15_SoapServer implements CentralSystemService {
     }
 
     @Override
-    public Future<?> authorizeAsync(AuthorizeRequest parameters, String chargeBoxIdentity, AsyncHandler<AuthorizeResponse> asyncHandler) {
+    public Future<?> authorizeAsync(AuthorizeRequest parameters, String chargeBoxIdentity,
+                                    AsyncHandler<AuthorizeResponse> asyncHandler) {
         return null;
     }
 
     @Override
-    public Response<BootNotificationResponse> bootNotificationAsync(BootNotificationRequest parameters, String chargeBoxIdentity) {
+    public Response<BootNotificationResponse> bootNotificationAsync(BootNotificationRequest parameters,
+                                                                    String chargeBoxIdentity) {
         return null;
     }
 
     @Override
-    public Future<?> bootNotificationAsync(BootNotificationRequest parameters, String chargeBoxIdentity, AsyncHandler<BootNotificationResponse> asyncHandler) {
+    public Future<?> bootNotificationAsync(BootNotificationRequest parameters, String chargeBoxIdentity,
+                                           AsyncHandler<BootNotificationResponse> asyncHandler) {
         return null;
     }
 
@@ -146,17 +178,21 @@ public class CentralSystemService15_SoapServer implements CentralSystemService {
     }
 
     @Override
-    public Future<?> meterValuesAsync(MeterValuesRequest parameters, String chargeBoxIdentity, AsyncHandler<MeterValuesResponse> asyncHandler) {
+    public Future<?> meterValuesAsync(MeterValuesRequest parameters, String chargeBoxIdentity,
+                                      AsyncHandler<MeterValuesResponse> asyncHandler) {
         return null;
     }
 
     @Override
-    public Response<FirmwareStatusNotificationResponse> firmwareStatusNotificationAsync(FirmwareStatusNotificationRequest parameters, String chargeBoxIdentity) {
+    public Response<FirmwareStatusNotificationResponse> firmwareStatusNotificationAsync(
+            FirmwareStatusNotificationRequest parameters, String chargeBoxIdentity) {
         return null;
     }
 
     @Override
-    public Future<?> firmwareStatusNotificationAsync(FirmwareStatusNotificationRequest parameters, String chargeBoxIdentity, AsyncHandler<FirmwareStatusNotificationResponse> asyncHandler) {
+    public Future<?> firmwareStatusNotificationAsync(FirmwareStatusNotificationRequest parameters,
+                                                     String chargeBoxIdentity,
+                                                     AsyncHandler<FirmwareStatusNotificationResponse> asyncHandler) {
         return null;
     }
 
@@ -166,17 +202,20 @@ public class CentralSystemService15_SoapServer implements CentralSystemService {
     }
 
     @Override
-    public Future<?> dataTransferAsync(DataTransferRequest parameters, String chargeBoxIdentity, AsyncHandler<DataTransferResponse> asyncHandler) {
+    public Future<?> dataTransferAsync(DataTransferRequest parameters, String chargeBoxIdentity,
+                                       AsyncHandler<DataTransferResponse> asyncHandler) {
         return null;
     }
 
     @Override
-    public Response<StatusNotificationResponse> statusNotificationAsync(StatusNotificationRequest parameters, String chargeBoxIdentity) {
+    public Response<StatusNotificationResponse> statusNotificationAsync(StatusNotificationRequest parameters,
+                                                                        String chargeBoxIdentity) {
         return null;
     }
 
     @Override
-    public Future<?> statusNotificationAsync(StatusNotificationRequest parameters, String chargeBoxIdentity, AsyncHandler<StatusNotificationResponse> asyncHandler) {
+    public Future<?> statusNotificationAsync(StatusNotificationRequest parameters, String chargeBoxIdentity,
+                                             AsyncHandler<StatusNotificationResponse> asyncHandler) {
         return null;
     }
 }

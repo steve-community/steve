@@ -130,9 +130,9 @@ public class ChargePointRepositoryImpl implements ChargePointRepository {
     @Override
     public List<ConnectorStatus> getChargePointConnectorStatus() {
         // Prepare for the inner select of the second join
-        Field<Integer> t1_pk = CONNECTOR_STATUS.CONNECTOR_PK.as("t1_pk");
-        Field<DateTime> t1_max = DSL.max(CONNECTOR_STATUS.STATUSTIMESTAMP).as("t1_max");
-        TableLike<?> t1 = DSL.select(t1_pk, t1_max)
+        Field<Integer> t1Pk = CONNECTOR_STATUS.CONNECTOR_PK.as("t1_pk");
+        Field<DateTime> t1Max = DSL.max(CONNECTOR_STATUS.STATUSTIMESTAMP).as("t1_max");
+        TableLike<?> t1 = DSL.select(t1Pk, t1Max)
                              .from(CONNECTOR_STATUS)
                              .groupBy(CONNECTOR_STATUS.CONNECTOR_PK)
                              .asTable("t1");
@@ -144,8 +144,8 @@ public class ChargePointRepositoryImpl implements ChargePointRepository {
                   .join(CONNECTOR)
                   .onKey()
                   .join(t1)
-                  .on(CONNECTOR_STATUS.CONNECTOR_PK.equal(t1.field(t1_pk)))
-                  .and(CONNECTOR_STATUS.STATUSTIMESTAMP.equal(t1.field(t1_max)))
+                  .on(CONNECTOR_STATUS.CONNECTOR_PK.equal(t1.field(t1Pk)))
+                  .and(CONNECTOR_STATUS.STATUSTIMESTAMP.equal(t1.field(t1Max)))
                   .orderBy(CONNECTOR_STATUS.STATUSTIMESTAMP.desc())
                   .fetch()
                   .map(new ConnectorStatusMapper());
@@ -171,10 +171,12 @@ public class ChargePointRepositoryImpl implements ChargePointRepository {
                            .execute();
 
             if (count == 0) {
-                throw new SteveException("A charge point with chargeBoxId '%s' already exists.", form.getChargeBoxId());
+                throw new SteveException("A charge point with chargeBoxId '%s' already exists.",
+                        form.getChargeBoxId());
             }
         } catch (DataAccessException e) {
-            throw new SteveException("The charge point with chargeBoxId '%s' could NOT be added.", form.getChargeBoxId(), e);
+            throw new SteveException("The charge point with chargeBoxId '%s' could NOT be added.",
+                    form.getChargeBoxId(), e);
         }
     }
 
@@ -187,7 +189,8 @@ public class ChargePointRepositoryImpl implements ChargePointRepository {
                .where(CHARGEBOX.CHARGEBOXID.equal(form.getChargeBoxId()))
                .execute();
         } catch (DataAccessException e) {
-            throw new SteveException("The charge point with chargeBoxId '%s' could NOT be updated.", form.getChargeBoxId(), e);
+            throw new SteveException("The charge point with chargeBoxId '%s' could NOT be updated.",
+                    form.getChargeBoxId(), e);
         }
     }
 

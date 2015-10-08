@@ -1,8 +1,8 @@
 package de.rwth.idsg.steve;
 
 import lombok.extern.slf4j.Slf4j;
-import org.eclipse.jetty.http.HttpVersion;
 import org.eclipse.jetty.http.HttpScheme;
+import org.eclipse.jetty.http.HttpVersion;
 import org.eclipse.jetty.server.HttpConfiguration;
 import org.eclipse.jetty.server.HttpConnectionFactory;
 import org.eclipse.jetty.server.SecureRequestCustomizer;

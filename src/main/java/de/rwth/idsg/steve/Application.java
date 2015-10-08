@@ -60,7 +60,8 @@ public class Application {
         Jetty.KEY_STORE_PATH        = prop.getString("keystore.path");
         Jetty.KEY_STORE_PASSWORD    = prop.getString("keystore.password");
 
-        Ocpp.WS_SESSION_SELECT_STRATEGY = WsSessionSelectStrategyEnum.fromName(prop.getString("ws.session.select.strategy"));
+        Ocpp.WS_SESSION_SELECT_STRATEGY =
+                WsSessionSelectStrategyEnum.fromName(prop.getString("ws.session.select.strategy"));
 
         if (!(Jetty.HTTP_ENABLED || Jetty.HTTPS_ENABLED)) {
             throw new IllegalArgumentException(

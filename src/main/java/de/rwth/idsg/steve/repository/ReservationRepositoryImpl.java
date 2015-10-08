@@ -174,6 +174,9 @@ public class ReservationRepositoryImpl implements ReservationRepository {
                         RESERVATION.EXPIRYDATETIME.lessOrEqual(form.getTo().toDateTime())
                 );
                 break;
+
+            default:
+                throw new SteveException("Unknown enum type");
         }
     }
 

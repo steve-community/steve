@@ -87,7 +87,7 @@ public class MeterValue15Deserializer extends JsonDeserializer<List<MeterValue>>
             return;
         }
 
-        log.warn("Received an invalid 'MeterValues' message from a charging station with a broken implementation, " +
-                 "but still can process it. Please contact the manufacturer/vendor to report the bug.");
+        log.warn("Received an invalid 'MeterValues' message from a charging station with a broken implementation, "
+                + "but still can process it. Please contact the manufacturer/vendor to report the bug.");
     }
 }

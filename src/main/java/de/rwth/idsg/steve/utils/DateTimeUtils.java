@@ -8,13 +8,11 @@ import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.PeriodFormatter;
 import org.joda.time.format.PeriodFormatterBuilder;
 
-import java.sql.Timestamp;
-
 /**
  * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
  */
 public final class DateTimeUtils {
-    private DateTimeUtils() {}
+    private DateTimeUtils() { }
 
     private static final DateTimeFormatter HUMAN_FORMATTER = DateTimeFormat.forPattern("yyyy-MM-dd 'at' HH:mm");
     private static final DateTimeFormatter TIME_FORMATTER = DateTimeFormat.forPattern("HH:mm");
@@ -28,7 +26,11 @@ public final class DateTimeUtils {
             .toFormatter();
 
     public static DateTime toDateTime(LocalDateTime ldt) {
-        return (ldt == null) ? null : ldt.toDateTime();
+        if (ldt == null) {
+            return null;
+        } else {
+            return ldt.toDateTime();
+        }
     }
 
     /**

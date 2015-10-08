@@ -29,7 +29,7 @@ import java.util.List;
 
 /**
  * Taken from http://cxf.apache.org/docs/service-routing.web and modified.
- * 
+ *
  */
 @Slf4j
 public class MediatorInInterceptor extends AbstractPhaseInterceptor<SoapMessage> {
@@ -45,7 +45,7 @@ public class MediatorInInterceptor extends AbstractPhaseInterceptor<SoapMessage>
     public final void handleMessage(SoapMessage message) {
         String schemaNamespace = "";
         InterceptorChain chain = message.getInterceptorChain();
- 
+
         // Scan the incoming message for its schema namespace
         try {
             // Create a buffered stream so that we get back the original stream after scanning
@@ -53,11 +53,11 @@ public class MediatorInInterceptor extends AbstractPhaseInterceptor<SoapMessage>
             BufferedInputStream bis = new BufferedInputStream(is);
             bis.mark(bis.available());
             message.setContent(InputStream.class, bis);
- 
-            String encoding = (String)message.get(Message.ENCODING);
+
+            String encoding = (String) message.get(Message.ENCODING);
             XMLStreamReader reader = xmlInputFactory.createXMLStreamReader(bis, encoding);
             DepthXMLStreamReader xmlReader = new DepthXMLStreamReader(reader);
- 
+
             if (xmlReader.nextTag() == XMLStreamConstants.START_ELEMENT) {
                 String ns = xmlReader.getNamespaceURI();
                 SoapVersion soapVersion = SoapVersionFactory.getInstance().getSoapVersion(ns);
@@ -65,10 +65,10 @@ public class MediatorInInterceptor extends AbstractPhaseInterceptor<SoapMessage>
                 StaxUtils.toNextTag(xmlReader, soapVersion.getBody());
                 // Past body
                 xmlReader.nextTag();
-            } 
-            schemaNamespace = xmlReader.getName().getNamespaceURI(); 
+            }
+            schemaNamespace = xmlReader.getName().getNamespaceURI();
             bis.reset();
-            
+
         } catch (IOException | XMLStreamException ex) {
             log.error("Exception happened", ex);
         }
@@ -77,8 +77,8 @@ public class MediatorInInterceptor extends AbstractPhaseInterceptor<SoapMessage>
         Bus bus = CXFBusFactory.getDefaultBus();
         ServerRegistry serverRegistry = bus.getExtension(ServerRegistry.class);
         List<Server> servers = serverRegistry.getServers();
- 
-        // If the incoming message has a namespace containing "2012/06/", 
+
+        // If the incoming message has a namespace containing "2012/06/",
         // we redirect the message to the new version of OCPP service
         Server targetServer = null;
         for (Server server : servers) {
@@ -94,7 +94,7 @@ public class MediatorInInterceptor extends AbstractPhaseInterceptor<SoapMessage>
                 break;
             }
         }
- 
+
         // Redirect the request
         if (targetServer != null) {
             MessageObserver mo = targetServer.getDestination().getMessageObserver();
@@ -102,6 +102,6 @@ public class MediatorInInterceptor extends AbstractPhaseInterceptor<SoapMessage>
         }
 
         // Now the response has been put in the message, abort the chain
-        chain.abort();	
+        chain.abort();
     }
 }

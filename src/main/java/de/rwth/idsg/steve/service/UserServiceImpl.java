@@ -107,8 +107,8 @@ public class UserServiceImpl implements UserService {
     // -------------------------------------------------------------------------
 
     private class AuthorisationDataMapper implements RecordMapper<UserRecord, AuthorisationData> {
-        final DateTime nowDt = DateTime.now();
-        final DateTime cacheExpiry = nowDt.plus(ocppConstants.getHoursToExpire());
+        private final DateTime nowDt = DateTime.now();
+        private final DateTime cacheExpiry = nowDt.plus(ocppConstants.getHoursToExpire());
 
         @Override
         public AuthorisationData map(UserRecord record) {

@@ -25,7 +25,7 @@ import ocpp.cs._2010._08.RegistrationStatus;
 public class Ocpp12JacksonModule extends SimpleModule {
 
     public Ocpp12JacksonModule() {
-        super("Ocpp12JacksonModule", new Version(0, 0 ,1, null, "de.rwth.idsg", "steve"));
+        super("Ocpp12JacksonModule", new Version(0, 0, 1, null, "de.rwth.idsg", "steve"));
     }
 
     @Override

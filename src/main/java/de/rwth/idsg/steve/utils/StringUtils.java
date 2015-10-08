@@ -5,7 +5,7 @@ package de.rwth.idsg.steve.utils;
  * @since 12.01.2015
  */
 public final class StringUtils {
-    private StringUtils() {}
+    private StringUtils() { }
 
     public static boolean isNullOrEmpty(String str) {
         return str == null || str.length() == 0;

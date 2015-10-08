@@ -63,6 +63,9 @@ public class Deserializer implements Stage {
                 case CALL_ERROR:
                     handleError(context, messageId, parser);
                     break;
+
+                default:
+                    throw new SteveException("Unknown enum type");
             }
         } catch (IOException e) {
             throw new SteveException("Deserialization of incoming string failed: %s", context.getIncomingString(), e);

@@ -30,9 +30,9 @@ import static jooq.steve.db.tables.Transaction.TRANSACTION;
  * This class has methods for database access that are used by the OCPP service.
  *
  * http://www.jooq.org/doc/3.4/manual/sql-execution/transaction-management/
- * 
+ *
  * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
- *  
+ *
  */
 @Slf4j
 @Repository
@@ -221,10 +221,11 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
             // -------------------------------------------------------------------------
 
             int transactionId = ctx.insertInto(TRANSACTION)
-                                   .set(CONNECTOR_STATUS.CONNECTOR_PK, DSL.select(CONNECTOR.CONNECTOR_PK)
-                                                                          .from(CONNECTOR)
-                                                                          .where(CONNECTOR.CHARGEBOXID.equal(chargeBoxIdentity))
-                                                                          .and(CONNECTOR.CONNECTORID.equal(connectorId))
+                                   .set(CONNECTOR_STATUS.CONNECTOR_PK,
+                                           DSL.select(CONNECTOR.CONNECTOR_PK)
+                                              .from(CONNECTOR)
+                                              .where(CONNECTOR.CHARGEBOXID.equal(chargeBoxIdentity))
+                                              .and(CONNECTOR.CONNECTORID.equal(connectorId))
                                    )
                                    .set(TRANSACTION.IDTAG, idTag)
                                    .set(TRANSACTION.STARTTIMESTAMP, startTimestamp)

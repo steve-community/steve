@@ -9,9 +9,9 @@ import java.util.concurrent.TimeUnit;
 /**
  * This class holds the values that are relevant to OCPP
  * and used by the application.
- * 
+ *
  * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
- *  
+ *
  */
 @Component
 public class OcppConstants {

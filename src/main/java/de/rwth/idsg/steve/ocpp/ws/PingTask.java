@@ -17,13 +17,13 @@ import java.nio.ByteBuffer;
 public class PingTask implements Runnable {
     private final WebSocketSession session;
 
-    private static final PingMessage pingMessage = new PingMessage(ByteBuffer.wrap("ping".getBytes()));
+    private static final PingMessage PING_MESSAGE = new PingMessage(ByteBuffer.wrap("ping".getBytes()));
 
     @Override
     public void run() {
         log.info("[id={}] Sending ping message", session.getId());
         try {
-            session.sendMessage(pingMessage);
+            session.sendMessage(PING_MESSAGE);
         } catch (IOException e) {
             log.error("[id={}] Ping failed", session.getId());
             // TODO: Do something about this

@@ -6,7 +6,16 @@ import de.rwth.idsg.steve.ocpp.ResponseType;
 import de.rwth.idsg.steve.ocpp.ws.pipeline.AbstractCallHandler;
 import de.rwth.idsg.steve.service.CentralSystemService15_Service;
 import lombok.extern.slf4j.Slf4j;
-import ocpp.cs._2012._06.*;
+import ocpp.cs._2012._06.AuthorizeRequest;
+import ocpp.cs._2012._06.BootNotificationRequest;
+import ocpp.cs._2012._06.DataTransferRequest;
+import ocpp.cs._2012._06.DiagnosticsStatusNotificationRequest;
+import ocpp.cs._2012._06.FirmwareStatusNotificationRequest;
+import ocpp.cs._2012._06.HeartbeatRequest;
+import ocpp.cs._2012._06.MeterValuesRequest;
+import ocpp.cs._2012._06.StartTransactionRequest;
+import ocpp.cs._2012._06.StatusNotificationRequest;
+import ocpp.cs._2012._06.StopTransactionRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

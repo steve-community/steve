@@ -34,7 +34,7 @@ public class Serializer implements Stage {
     public void process(CommunicationContext context) {
         OcppJsonMessage message = context.getOutgoingMessage();
 
-        ArrayNode str = null;
+        ArrayNode str;
         MessageType messageType = message.getMessageType();
         switch (messageType) {
             case CALL:
@@ -48,6 +48,9 @@ public class Serializer implements Stage {
             case CALL_ERROR:
                 str = handleError((OcppJsonError) message);
                 break;
+
+            default:
+                throw new SteveException("Unknown enum type");
         }
 
         try {

@@ -2,7 +2,36 @@ package de.rwth.idsg.steve.ocpp;
 
 import de.rwth.idsg.steve.handler.OcppResponseHandler;
 import de.rwth.idsg.steve.repository.dto.ChargePointSelect;
-import ocpp.cp._2012._06.*;
+import ocpp.cp._2012._06.CancelReservationRequest;
+import ocpp.cp._2012._06.CancelReservationResponse;
+import ocpp.cp._2012._06.ChangeAvailabilityRequest;
+import ocpp.cp._2012._06.ChangeAvailabilityResponse;
+import ocpp.cp._2012._06.ChangeConfigurationRequest;
+import ocpp.cp._2012._06.ChangeConfigurationResponse;
+import ocpp.cp._2012._06.ClearCacheRequest;
+import ocpp.cp._2012._06.ClearCacheResponse;
+import ocpp.cp._2012._06.DataTransferRequest;
+import ocpp.cp._2012._06.DataTransferResponse;
+import ocpp.cp._2012._06.GetConfigurationRequest;
+import ocpp.cp._2012._06.GetConfigurationResponse;
+import ocpp.cp._2012._06.GetDiagnosticsRequest;
+import ocpp.cp._2012._06.GetDiagnosticsResponse;
+import ocpp.cp._2012._06.GetLocalListVersionRequest;
+import ocpp.cp._2012._06.GetLocalListVersionResponse;
+import ocpp.cp._2012._06.RemoteStartTransactionRequest;
+import ocpp.cp._2012._06.RemoteStartTransactionResponse;
+import ocpp.cp._2012._06.RemoteStopTransactionRequest;
+import ocpp.cp._2012._06.RemoteStopTransactionResponse;
+import ocpp.cp._2012._06.ReserveNowRequest;
+import ocpp.cp._2012._06.ReserveNowResponse;
+import ocpp.cp._2012._06.ResetRequest;
+import ocpp.cp._2012._06.ResetResponse;
+import ocpp.cp._2012._06.SendLocalListRequest;
+import ocpp.cp._2012._06.SendLocalListResponse;
+import ocpp.cp._2012._06.UnlockConnectorRequest;
+import ocpp.cp._2012._06.UnlockConnectorResponse;
+import ocpp.cp._2012._06.UpdateFirmwareRequest;
+import ocpp.cp._2012._06.UpdateFirmwareResponse;
 
 /**
  * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>

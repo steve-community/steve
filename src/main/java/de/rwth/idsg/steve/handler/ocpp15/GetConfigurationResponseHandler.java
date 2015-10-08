@@ -15,13 +15,13 @@ import java.util.List;
 public class GetConfigurationResponseHandler extends AbstractOcppResponseHandler<GetConfigurationResponse> {
 
     private static final String FORMAT =
-            "<b>Known keys:</b>" +
-            "<br>" +
-            "%s" +
-            "<br>" +
-            "<b>Unknown keys:</b>" +
-            "<br>" +
-            "%s";
+            "<b>Known keys:</b>"
+                    + "<br>"
+                    + "%s"
+                    + "<br>"
+                    + "<b>Unknown keys:</b>"
+                    + "<br>"
+                    + "%s";
 
     private static final Joiner JOINER = Joiner.on(",");
 

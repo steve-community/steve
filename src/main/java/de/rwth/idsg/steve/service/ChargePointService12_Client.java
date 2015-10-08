@@ -42,7 +42,7 @@ import static de.rwth.idsg.steve.utils.DateTimeUtils.toDateTime;
 /**
  * Transport-level agnostic client implementation of OCPP V1.2
  * which builds the request payloads and delegates to dispatcher.
- * 
+ *
  * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
  */
 @Slf4j
@@ -93,7 +93,7 @@ public class ChargePointService12_Client {
                 .withTransactionId(params.getTransactionId());
     }
 
-    private ResetRequest prepareReset(ResetParams params){
+    private ResetRequest prepareReset(ResetParams params) {
         return new ResetRequest()
                 .withType(params.getResetType());
     }
@@ -121,7 +121,8 @@ public class ChargePointService12_Client {
         RequestTask requestTask = new RequestTask(VERSION, "Change Availability", chargePointSelectList);
 
         for (ChargePointSelect c : chargePointSelectList) {
-            ChangeAvailabilityResponseHandler handler = new ChangeAvailabilityResponseHandler(requestTask, c.getChargeBoxId());
+            ChangeAvailabilityResponseHandler handler =
+                    new ChangeAvailabilityResponseHandler(requestTask, c.getChargeBoxId());
             dispatcher.changeAvailability(c, req, handler);
         }
         return requestTaskStore.add(requestTask);
@@ -133,7 +134,8 @@ public class ChargePointService12_Client {
         RequestTask requestTask = new RequestTask(VERSION, "Change Configuration", chargePointSelectList);
 
         for (ChargePointSelect c : chargePointSelectList) {
-            ChangeConfigurationResponseHandler handler = new ChangeConfigurationResponseHandler(requestTask, c.getChargeBoxId());
+            ChangeConfigurationResponseHandler handler =
+                    new ChangeConfigurationResponseHandler(requestTask, c.getChargeBoxId());
             dispatcher.changeConfiguration(c, req, handler);
         }
         return requestTaskStore.add(requestTask);
@@ -197,7 +199,8 @@ public class ChargePointService12_Client {
         RequestTask requestTask = new RequestTask(VERSION, "Remote Start Transaction", chargePointSelectList);
 
         ChargePointSelect c = chargePointSelectList.get(0);
-        RemoteStartTransactionResponseHandler handler = new RemoteStartTransactionResponseHandler(requestTask, c.getChargeBoxId());
+        RemoteStartTransactionResponseHandler handler =
+                new RemoteStartTransactionResponseHandler(requestTask, c.getChargeBoxId());
         dispatcher.remoteStartTransaction(c, req, handler);
         return requestTaskStore.add(requestTask);
     }
@@ -208,7 +211,8 @@ public class ChargePointService12_Client {
         RequestTask requestTask = new RequestTask(VERSION, "Remote Stop Transaction", chargePointSelectList);
 
         ChargePointSelect c = chargePointSelectList.get(0);
-        RemoteStopTransactionResponseHandler handler = new RemoteStopTransactionResponseHandler(requestTask, c.getChargeBoxId());
+        RemoteStopTransactionResponseHandler handler =
+                new RemoteStopTransactionResponseHandler(requestTask, c.getChargeBoxId());
         dispatcher.remoteStopTransaction(c, req, handler);
         return requestTaskStore.add(requestTask);
     }

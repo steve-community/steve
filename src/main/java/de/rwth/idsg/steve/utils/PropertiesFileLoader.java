@@ -16,13 +16,13 @@ public class PropertiesFileLoader {
     private Properties prop;
 
     public PropertiesFileLoader(String fileName) throws IOException {
-        InputStream is = this.getClass().getClassLoader().getResourceAsStream(fileName);
-        if (is == null) {
-            throw new FileNotFoundException("Property file '" + fileName + "' is not found in classpath");
+        try (InputStream is = this.getClass().getClassLoader().getResourceAsStream(fileName)) {
+            if (is == null) {
+                throw new FileNotFoundException("Property file '" + fileName + "' is not found in classpath");
+            }
+            prop = new Properties();
+            prop.load(is);
         }
-
-        prop = new Properties();
-        prop.load(is);
     }
 
     public String getString(String key) {

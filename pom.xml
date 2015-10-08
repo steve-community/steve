@@ -64,12 +64,9 @@
             <resource>
                 <directory>src/main/resources</directory>
                 <filtering>false</filtering>
-                <excludes>
-                    <exclude>config/**</exclude>
-                    <exclude>db/**</exclude>
-                    <exclude>wsdl/**</exclude>
-                    <exclude>wsdl-binding/**</exclude>
-                </excludes>
+                <includes>
+                    <include>webapp/**</include>
+                </includes>
             </resource>
         </resources>
 
@@ -82,6 +79,8 @@
                     <target>${java.version}</target>
                 </configuration>
             </plugin>
+
+            <!-- Static analysis and check style -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-pmd-plugin</artifactId>
@@ -102,6 +101,14 @@
                         </goals>
                     </execution>
                 </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-checkstyle-plugin</artifactId>
+                <version>2.16</version>
+                <configuration>
+                    <configLocation>${basedir}/src/main/resources/checkstyle.xml</configLocation>
+                </configuration>
             </plugin>
 
             <!-- Read from main.properties the DB configuration -->

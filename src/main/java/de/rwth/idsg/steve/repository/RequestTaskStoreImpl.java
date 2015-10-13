@@ -2,7 +2,7 @@ package de.rwth.idsg.steve.repository;
 
 import de.rwth.idsg.steve.SteveException;
 import de.rwth.idsg.steve.repository.dto.TaskOverview;
-import de.rwth.idsg.steve.web.RequestTask;
+import de.rwth.idsg.steve.web.dto.RequestTask;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 

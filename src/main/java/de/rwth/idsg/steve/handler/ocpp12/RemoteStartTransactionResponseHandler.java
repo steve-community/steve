@@ -1,7 +1,7 @@
 package de.rwth.idsg.steve.handler.ocpp12;
 
 import de.rwth.idsg.steve.handler.AbstractOcppResponseHandler;
-import de.rwth.idsg.steve.web.RequestTask;
+import de.rwth.idsg.steve.web.dto.RequestTask;
 import ocpp.cp._2010._08.RemoteStartTransactionResponse;
 
 /**

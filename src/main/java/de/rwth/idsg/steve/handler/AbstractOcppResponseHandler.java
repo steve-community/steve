@@ -1,7 +1,7 @@
 package de.rwth.idsg.steve.handler;
 
 import de.rwth.idsg.steve.ocpp.ws.data.OcppJsonError;
-import de.rwth.idsg.steve.web.RequestTask;
+import de.rwth.idsg.steve.web.dto.RequestTask;
 import lombok.RequiredArgsConstructor;
 
 import javax.xml.ws.Response;
@@ -39,7 +39,7 @@ public abstract class AbstractOcppResponseHandler<T> implements OcppResponseHand
     /**
      * Even though we have an error, this object is still a valid response from charge point
      * and RequestTask should treat it as such.
-     * {@link de.rwth.idsg.steve.web.RequestTask#addNewError(java.lang.String, java.lang.Exception)}
+     * {@link RequestTask#addNewError(java.lang.String, java.lang.Exception)}
      * should be used when the request could not be delivered and there is a Java exception.
      */
     @Override

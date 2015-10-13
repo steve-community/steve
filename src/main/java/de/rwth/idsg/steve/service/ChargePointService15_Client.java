@@ -20,7 +20,7 @@ import de.rwth.idsg.steve.repository.RequestTaskStore;
 import de.rwth.idsg.steve.repository.ReservationRepository;
 import de.rwth.idsg.steve.repository.UserRepository;
 import de.rwth.idsg.steve.repository.dto.ChargePointSelect;
-import de.rwth.idsg.steve.web.RequestTask;
+import de.rwth.idsg.steve.web.dto.RequestTask;
 import de.rwth.idsg.steve.web.dto.common.GetDiagnosticsParams;
 import de.rwth.idsg.steve.web.dto.common.MultipleChargePointSelect;
 import de.rwth.idsg.steve.web.dto.common.RemoteStartTransactionParams;

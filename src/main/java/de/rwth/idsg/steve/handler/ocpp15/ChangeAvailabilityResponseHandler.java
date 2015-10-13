@@ -1,7 +1,7 @@
 package de.rwth.idsg.steve.handler.ocpp15;
 
 import de.rwth.idsg.steve.handler.AbstractOcppResponseHandler;
-import de.rwth.idsg.steve.web.RequestTask;
+import de.rwth.idsg.steve.web.dto.RequestTask;
 import ocpp.cp._2012._06.ChangeAvailabilityResponse;
 
 /**

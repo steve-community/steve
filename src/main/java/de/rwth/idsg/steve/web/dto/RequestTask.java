@@ -1,9 +1,8 @@
-package de.rwth.idsg.steve.web;
+package de.rwth.idsg.steve.web.dto;
 
 import de.rwth.idsg.steve.ocpp.OcppVersion;
 import de.rwth.idsg.steve.repository.dto.ChargePointSelect;
 import lombok.Getter;
-import lombok.Setter;
 import org.joda.time.DateTime;
 
 import java.util.HashMap;
@@ -59,16 +58,5 @@ public class RequestTask {
         if (resultSize == (errorCount.incrementAndGet() + responseCount.get())) {
             endTimestamp = DateTime.now();
         }
-    }
-
-    // -------------------------------------------------------------------------
-    // Helper class
-    // -------------------------------------------------------------------------
-
-    @Getter
-    @Setter
-    public class RequestResult {
-        private String response;
-        private String errorMessage;
     }
 }

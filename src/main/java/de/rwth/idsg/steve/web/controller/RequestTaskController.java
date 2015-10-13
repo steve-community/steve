@@ -1,7 +1,7 @@
 package de.rwth.idsg.steve.web.controller;
 
 import de.rwth.idsg.steve.repository.RequestTaskStore;
-import de.rwth.idsg.steve.web.RequestTask;
+import de.rwth.idsg.steve.web.dto.RequestTask;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;

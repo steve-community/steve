@@ -12,7 +12,7 @@ import de.rwth.idsg.steve.handler.ocpp12.UpdateFirmwareResponseHandler;
 import de.rwth.idsg.steve.ocpp.OcppVersion;
 import de.rwth.idsg.steve.repository.RequestTaskStore;
 import de.rwth.idsg.steve.repository.dto.ChargePointSelect;
-import de.rwth.idsg.steve.web.RequestTask;
+import de.rwth.idsg.steve.web.dto.RequestTask;
 import de.rwth.idsg.steve.web.dto.common.GetDiagnosticsParams;
 import de.rwth.idsg.steve.web.dto.common.MultipleChargePointSelect;
 import de.rwth.idsg.steve.web.dto.common.RemoteStartTransactionParams;

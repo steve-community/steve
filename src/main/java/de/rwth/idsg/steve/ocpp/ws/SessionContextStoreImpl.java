@@ -61,21 +61,30 @@ public class SessionContextStoreImpl implements SessionContextStore {
             return;
         }
 
+        // Prevent "java.util.ConcurrentModificationException: null"
+        // Reason: Cannot modify the set (remove the item) we are iterating
+        // Solution: Iterate the set, find the item, remove the item after the for-loop
+        //
+        SessionContext toRemove = null;
         for (SessionContext context : endpointDeque) {
-            if (context.getSession() == session) {
-                // 1. Cancel the ping task
-                context.getPingSchedule().cancel(true);
-                // 2. Delete from collection
-                if (endpointDeque.remove(context)) {
-                    log.debug("A SessionContext is removed for chargeBoxId '{}'. Store size: {}",
-                            chargeBoxId, endpointDeque.size());
-                }
-                // 3. Delete empty collection from lookup table in order to correctly calculate
-                // the number of connected chargeboxes with getNumberOfChargeBoxes()
-                if (endpointDeque.size() == 0) {
-                    lookupTable.remove(chargeBoxId);
-                }
-                return;
+            if (context.getSession().getId().equals(session.getId())) {
+                toRemove = context;
+                break;
+            }
+        }
+
+        if (toRemove != null) {
+            // 1. Cancel the ping task
+            toRemove.getPingSchedule().cancel(true);
+            // 2. Delete from collection
+            if (endpointDeque.remove(toRemove)) {
+                log.debug("A SessionContext is removed for chargeBoxId '{}'. Store size: {}",
+                        chargeBoxId, endpointDeque.size());
+            }
+            // 3. Delete empty collection from lookup table in order to correctly calculate
+            // the number of connected chargeboxes with getNumberOfChargeBoxes()
+            if (endpointDeque.size() == 0) {
+                lookupTable.remove(chargeBoxId);
             }
         }
     }

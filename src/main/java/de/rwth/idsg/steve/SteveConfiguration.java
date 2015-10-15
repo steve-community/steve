@@ -25,6 +25,7 @@ public final class SteveConfiguration {
     // -------------------------------------------------------------------------
 
     public static String STEVE_VERSION;
+    public static String PROFILE;
 
     /**
      * Jetty configuration

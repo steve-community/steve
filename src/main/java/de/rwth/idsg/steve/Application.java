@@ -13,6 +13,7 @@ import static de.rwth.idsg.steve.SteveConfiguration.Auth;
 import static de.rwth.idsg.steve.SteveConfiguration.DB;
 import static de.rwth.idsg.steve.SteveConfiguration.Jetty;
 import static de.rwth.idsg.steve.SteveConfiguration.Ocpp;
+import static de.rwth.idsg.steve.SteveConfiguration.PROFILE;
 import static de.rwth.idsg.steve.SteveConfiguration.STEVE_VERSION;
 
 /**
@@ -33,6 +34,8 @@ public class Application {
 
         loadProperties();
 
+        log.info("Loaded the properties. Starting with the '{}' profile", PROFILE);
+
         JettyServer jettyServer = new JettyServer();
         jettyServer.start();
     }
@@ -41,6 +44,7 @@ public class Application {
         PropertiesFileLoader prop = new PropertiesFileLoader("main.properties");
 
         STEVE_VERSION = prop.getString("steve.version");
+        PROFILE       = prop.getString("profile");
 
         DB.IP           = prop.getString("db.ip");
         DB.PORT         = prop.getInt("db.port");

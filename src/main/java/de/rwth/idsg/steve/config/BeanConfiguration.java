@@ -2,6 +2,7 @@ package de.rwth.idsg.steve.config;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.mysql.jdbc.jdbc2.optional.MysqlDataSource;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import de.rwth.idsg.steve.SteveConfiguration;
@@ -49,7 +50,7 @@ public class BeanConfiguration extends WebMvcConfigurerAdapter {
     private void initDataSource() {
 
         HikariConfig config = new HikariConfig();
-        config.setDataSourceClassName("com.mysql.jdbc.jdbc2.optional.MysqlDataSource");
+        config.setDataSourceClassName(MysqlDataSource.class.getName());
 
         config.addDataSourceProperty("serverName", SteveConfiguration.DB.IP);
         config.addDataSourceProperty("port", SteveConfiguration.DB.PORT);

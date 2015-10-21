@@ -23,7 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Configuration and beans related to OCPP clients/services.
+ * Configuration and beans related to OCPP.
  *
  * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
  * @since 18.11.2014
@@ -59,26 +59,6 @@ public class OcppConfiguration {
             default:
                 throw new RuntimeException("Could not find a valid WsSessionSelectStrategy");
         }
-    }
-
-    @Bean
-    @Qualifier("ocpp12")
-    public JaxWsProxyFactoryBean ocpp12ClientFactory() {
-        JaxWsProxyFactoryBean f = new JaxWsProxyFactoryBean();
-        f.setBindingId(SOAPBinding.SOAP12HTTP_BINDING);
-        f.getFeatures().add(new WSAddressingFeature());
-        f.setServiceClass(ocpp.cp._2010._08.ChargePointService.class);
-        return f;
-    }
-
-    @Bean
-    @Qualifier("ocpp15")
-    public JaxWsProxyFactoryBean ocpp15ClientFactory() {
-        JaxWsProxyFactoryBean f = new JaxWsProxyFactoryBean();
-        f.setBindingId(SOAPBinding.SOAP12HTTP_BINDING);
-        f.getFeatures().add(new WSAddressingFeature());
-        f.setServiceClass(ocpp.cp._2012._06.ChargePointService.class);
-        return f;
     }
 
     /**

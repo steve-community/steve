@@ -22,9 +22,7 @@ import ocpp.cp._2010._08.UnlockConnectorRequest;
 import ocpp.cp._2010._08.UnlockConnectorResponse;
 import ocpp.cp._2010._08.UpdateFirmwareRequest;
 import ocpp.cp._2010._08.UpdateFirmwareResponse;
-import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 /**
@@ -37,18 +35,10 @@ import org.springframework.stereotype.Service;
 @Service
 public class ChargePointService12_SoapInvoker implements ChargePointService12_Invoker {
 
-    @Autowired
-    @Qualifier("ocpp12")
-    private JaxWsProxyFactoryBean factory;
-
-    private static final Object LOCK = new Object();
+    @Autowired private ClientProvider clientProvider;
 
     private ChargePointService create(String endpointAddress) {
-        // Should concurrency really be a concern?
-        synchronized (LOCK) {
-            factory.setAddress(endpointAddress);
-            return (ChargePointService) factory.create();
-        }
+        return clientProvider.getForOcpp12(endpointAddress);
     }
 
     @Override

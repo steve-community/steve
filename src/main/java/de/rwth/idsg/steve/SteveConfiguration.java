@@ -19,6 +19,8 @@ public final class SteveConfiguration {
     // since there might be already configured chargepoints expecting the older path.
     // Otherwise, might as well be "/".
     public static final String CONTEXT_PATH = "/steve";
+    // Dummy service path
+    public static final String ROUTER_ENDPOINT_PATH = "/CentralSystemService";
 
     // -------------------------------------------------------------------------
     // main.properties

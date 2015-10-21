@@ -87,7 +87,7 @@ public class OcppConfiguration {
     private void createRouterService() {
         JaxWsServerFactoryBean f = new JaxWsServerFactoryBean();
         f.setServiceBean(ocpp12Server);
-        f.setAddress("/CentralSystemService");
+        f.setAddress(SteveConfiguration.ROUTER_ENDPOINT_PATH);
         f.getInInterceptors().add(new MediatorInInterceptor());
         f.create();
     }

@@ -1,5 +1,6 @@
 package de.rwth.idsg.steve.ocpp.soap;
 
+import de.rwth.idsg.steve.SteveConfiguration;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.cxf.Bus;
 import org.apache.cxf.binding.soap.SoapMessage;
@@ -13,6 +14,7 @@ import org.apache.cxf.interceptor.StaxInInterceptor;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
+import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.staxutils.DepthXMLStreamReader;
 import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.transport.MessageObserver;
@@ -24,17 +26,20 @@ import javax.xml.stream.XMLStreamReader;
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 
 /**
- * Taken from http://cxf.apache.org/docs/service-routing.web and modified.
+ * Taken from http://cxf.apache.org/docs/service-routing.html and modified.
  *
  */
 @Slf4j
 public class MediatorInInterceptor extends AbstractPhaseInterceptor<SoapMessage> {
 
     private final XMLInputFactory xmlInputFactory;
+    private Map<String, Server> actualServers = null;
 
     public MediatorInInterceptor() {
         super(Phase.POST_STREAM);
@@ -73,27 +78,13 @@ public class MediatorInInterceptor extends AbstractPhaseInterceptor<SoapMessage>
             log.error("Exception happened", ex);
         }
 
-        // Look up for all available endpoints registered on the bus
-        Bus bus = CXFBusFactory.getDefaultBus();
-        ServerRegistry serverRegistry = bus.getExtension(ServerRegistry.class);
-        List<Server> servers = serverRegistry.getServers();
-
-        // If the incoming message has a namespace containing "2012/06/",
-        // we redirect the message to the new version of OCPP service
-        Server targetServer = null;
-        for (Server server : servers) {
-            targetServer = server;
-            String address = server.getEndpoint().getEndpointInfo().getAddress();
-            if (schemaNamespace.endsWith("2012/06/")) {
-                if (address.endsWith("OCPP15")) {
-                    log.info("Routing the message to CentralSystemServiceOCPP15...");
-                    break;
-                }
-            } else if (address.endsWith("OCPP12")) {
-                log.info("Routing the message to CentralSystemServiceOCPP12...");
-                break;
-            }
+        // Init the lookup, when the first message ever arrives
+        if (actualServers == null) {
+            initServerLookupMap();
         }
+
+        // We redirect the message to the actual OCPP service
+        Server targetServer = actualServers.get(schemaNamespace);
 
         // Redirect the request
         if (targetServer != null) {
@@ -103,5 +94,32 @@ public class MediatorInInterceptor extends AbstractPhaseInterceptor<SoapMessage>
 
         // Now the response has been put in the message, abort the chain
         chain.abort();
+    }
+
+    /**
+     * Iterate over the registered servers and build a map consisting of (namespace, server) pairs
+     * for later lookup, so we can redirect to the version-specific implementation
+     * according to the namespace of the incoming message.
+     */
+    public void initServerLookupMap() {
+        actualServers = new HashMap<>(2);
+
+        // Look up for all available endpoints registered on the bus
+        Bus bus = CXFBusFactory.getDefaultBus();
+        ServerRegistry serverRegistry = bus.getExtension(ServerRegistry.class);
+        List<Server> temp = serverRegistry.getServers();
+
+        for (Server server : temp) {
+            EndpointInfo info = server.getEndpoint().getEndpointInfo();
+            String address = info.getAddress();
+
+            // exclude the 'dummy' routing server
+            if (SteveConfiguration.ROUTER_ENDPOINT_PATH.equals(address)) {
+                continue;
+            }
+
+            String serverNamespace = info.getName().getNamespaceURI();
+            actualServers.put(serverNamespace, server);
+        }
     }
 }

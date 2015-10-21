@@ -6,7 +6,6 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.binding.soap.SoapVersion;
 import org.apache.cxf.binding.soap.SoapVersionFactory;
-import org.apache.cxf.bus.CXFBusFactory;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.endpoint.ServerRegistry;
 import org.apache.cxf.interceptor.InterceptorChain;
@@ -38,13 +37,12 @@ import java.util.Map;
 @Slf4j
 public class MediatorInInterceptor extends AbstractPhaseInterceptor<SoapMessage> {
 
-    private final XMLInputFactory xmlInputFactory;
-    private Map<String, Server> actualServers = null;
+    private final XMLInputFactory xmlInputFactory = XMLInputFactory.newInstance();
+    private final Map<String, Server> actualServers = new HashMap<>(2);
 
     public MediatorInInterceptor() {
         super(Phase.POST_STREAM);
         super.addBefore(StaxInInterceptor.class.getName());
-        xmlInputFactory = XMLInputFactory.newInstance();
     }
 
     public final void handleMessage(SoapMessage message) {
@@ -79,8 +77,8 @@ public class MediatorInInterceptor extends AbstractPhaseInterceptor<SoapMessage>
         }
 
         // Init the lookup, when the first message ever arrives
-        if (actualServers == null) {
-            initServerLookupMap();
+        if (actualServers.isEmpty()) {
+            initServerLookupMap(message);
         }
 
         // We redirect the message to the actual OCPP service
@@ -97,18 +95,20 @@ public class MediatorInInterceptor extends AbstractPhaseInterceptor<SoapMessage>
     }
 
     /**
-     * Iterate over the registered servers and build a map consisting of (namespace, server) pairs
-     * for later lookup, so we can redirect to the version-specific implementation
-     * according to the namespace of the incoming message.
+     * Iterate over all available servers registered on the bus and build a map
+     * consisting of (namespace, server) pairs for later lookup, so we can
+     * redirect to the version-specific implementation according to the namespace
+     * of the incoming message.
      */
-    public void initServerLookupMap() {
-        actualServers = new HashMap<>(2);
+    public void initServerLookupMap(SoapMessage message) {
+        Bus bus = message.getExchange().getBus();
 
-        // Look up for all available endpoints registered on the bus
-        Bus bus = CXFBusFactory.getDefaultBus();
         ServerRegistry serverRegistry = bus.getExtension(ServerRegistry.class);
-        List<Server> temp = serverRegistry.getServers();
+        if (serverRegistry == null) {
+            return;
+        }
 
+        List<Server> temp = serverRegistry.getServers();
         for (Server server : temp) {
             EndpointInfo info = server.getEndpoint().getEndpointInfo();
             String address = info.getAddress();

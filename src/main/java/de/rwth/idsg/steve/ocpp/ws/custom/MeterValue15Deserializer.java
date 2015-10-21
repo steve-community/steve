@@ -32,6 +32,9 @@ public class MeterValue15Deserializer extends JsonDeserializer<List<MeterValue>>
 
         ObjectMapper mapper = (ObjectMapper) jp.getCodec();
         JsonNode node = mapper.readTree(jp);
+        if (node == null) {
+            return Collections.emptyList();
+        }
         return parseListMeterValue(mapper, node);
     }
 

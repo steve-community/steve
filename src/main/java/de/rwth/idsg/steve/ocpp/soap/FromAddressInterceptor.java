@@ -56,13 +56,18 @@ public class FromAddressInterceptor extends AbstractPhaseInterceptor<Message> {
     }
 
     private String getChargeBoxId(Message message) {
+        MessageContentsList lst = MessageContentsList.getContentsList(message);
+        if (lst == null) {
+            return null;
+        }
+
         MessageInfo mi = (MessageInfo) message.get("org.apache.cxf.service.model.MessageInfo");
         for (MessagePartInfo mpi : mi.getMessageParts()) {
             if (CHARGEBOX_ID_HEADER.equals(mpi.getName().getLocalPart())) {
-                MessageContentsList lst = MessageContentsList.getContentsList(message);
-                return (String) lst.get(mi.getMessagePart(mpi.getName()));
+                return (String) lst.get(mpi);
             }
         }
+
         return null;
     }
 

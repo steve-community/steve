@@ -31,7 +31,6 @@ public class MessageIdInterceptor extends AbstractPhaseInterceptor<Message> {
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public void handleMessage(Message message) throws Fault {
         AddressingProperties addressProp = (AddressingProperties) message.get(ADDRESSING_PROPERTIES_INBOUND);
 

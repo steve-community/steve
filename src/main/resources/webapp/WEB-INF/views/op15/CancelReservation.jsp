@@ -2,8 +2,7 @@
 <%@ include file="../00-op-bind-errors.jsp" %>
 <script type="text/javascript">
     $(document).ready(function() {
-        <%@ include file="../../static/js/snippets/getConnectorIdsZeroAllowed.js" %>
-        <%@ include file="../../static/js/snippets/dateTimePicker-future.js" %>
+        <%@ include file="../snippets/getReservationIds.js" %>
     });
 </script>
 <div class="content">
@@ -19,8 +18,8 @@
 	<li><a href="/steve/manager/operations/v1.5/UnlockConnector">Unlock Connector</a></li>
 	<li><a href="/steve/manager/operations/v1.5/UpdateFirmware">Update Firmware</a></li>
 	<hr>
-	<li><a class="highlight" href="/steve/manager/operations/v1.5/ReserveNow">Reserve Now</a></li>
-	<li><a href="/steve/manager/operations/v1.5/CancelReservation">Cancel Reservation</a></li>
+	<li><a href="/steve/manager/operations/v1.5/ReserveNow">Reserve Now</a></li>
+	<li><a class="highlight" href="/steve/manager/operations/v1.5/CancelReservation">Cancel Reservation</a></li>
 	<li><a href="/steve/manager/operations/v1.5/DataTransfer">Data Transfer</a></li>
 	<li><a href="/steve/manager/operations/v1.5/GetConfiguration">Get Configuration</a></li>
 	<li><a href="/steve/manager/operations/v1.5/GetLocalListVersion">Get Local List Version</a></li>
@@ -28,25 +27,12 @@
 </ul>
 </div>
 <div class="op15-content">
-<form:form action="/steve/manager/operations/v1.5/ReserveNow" modelAttribute="params">
+<form:form action="/steve/manager/operations/v1.5/CancelReservation" modelAttribute="params">
     <section><span>Charge Points with OCPP v1.5</span></section>
     <%@ include file="../00-cp-single.jsp" %>
     <section><span>Parameters</span></section>
     <table class="userInput">
-        <tr><td>Connector ID:</td>
-            <td><form:select path="connectorId" disabled="true" /></td>
-        </tr>
-        <tr><td>Expiry Date/Time:</td>
-            <td>
-                <form:input path="expiry" cssClass="dateTimePicker" />
-            </td>
-        </tr>
-        <tr><td>User ID Tag:</td>
-        <td>
-            <form:select path="idTag">
-                <form:options items="${idTagList}" />
-            </form:select>
-        </td></tr>
+    <tr><td>ID of the Existing Reservation:</td><td><form:select path="reservationId" disabled="true" /></td></tr>
     </table>
     <div class="submit-button"><input type="submit" value="Perform"></div>
 </form:form>

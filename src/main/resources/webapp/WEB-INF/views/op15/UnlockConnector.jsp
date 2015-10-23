@@ -2,7 +2,7 @@
 <%@ include file="../00-op-bind-errors.jsp" %>
 <script type="text/javascript">
     $(document).ready(function() {
-        <%@ include file="../../static/js/snippets/dateTimePicker-future.js" %>
+        <%@ include file="../snippets/getConnectorIds.js" %>
     });
 </script>
 <div class="content">
@@ -15,8 +15,8 @@
 	<li><a href="/steve/manager/operations/v1.5/RemoteStartTransaction">Remote Start Transaction</a></li>
 	<li><a href="/steve/manager/operations/v1.5/RemoteStopTransaction">Remote Stop Transaction</a></li>
 	<li><a href="/steve/manager/operations/v1.5/Reset">Reset</a></li>
-	<li><a href="/steve/manager/operations/v1.5/UnlockConnector">Unlock Connector</a></li>
-	<li><a class="highlight" href="/steve/manager/operations/v1.5/UpdateFirmware">Update Firmware</a></li>
+	<li><a class="highlight" href="/steve/manager/operations/v1.5/UnlockConnector">Unlock Connector</a></li>
+	<li><a href="/steve/manager/operations/v1.5/UpdateFirmware">Update Firmware</a></li>
 	<hr>
 	<li><a href="/steve/manager/operations/v1.5/ReserveNow">Reserve Now</a></li>
 	<li><a href="/steve/manager/operations/v1.5/CancelReservation">Cancel Reservation</a></li>
@@ -27,19 +27,14 @@
 </ul>
 </div>
 <div class="op15-content">
-<form:form action="/steve/manager/operations/v1.5/UpdateFirmware" modelAttribute="params">
+<form:form action="/steve/manager/operations/v1.5/UnlockConnector" modelAttribute="params">
     <section><span>Charge Points with OCPP v1.5</span></section>
-    <%@ include file="../00-cp-multiple.jsp" %>
+    <%@ include file="../00-cp-single.jsp" %>
     <section><span>Parameters</span></section>
     <table class="userInput">
-        <tr><td>Location (directory URI):</td><td><form:input path="location" /></td></tr>
-        <tr><td>Retries (integer):</td><td><form:input path="retries" placeholder="optional" /></td></tr>
-        <tr><td>Retry Interval (integer):</td><td><form:input path="retryInterval" placeholder="optional" /></td></tr>
-        <tr><td>Retrieve Date/Time:</td>
-            <td>
-                <form:input path="retrieve" placeholder="optional" cssClass="dateTimePicker"/>
-            </td>
-        </tr>
+    <tr><td>Connector ID:</td>
+        <td><form:select path="connectorId" disabled="true"/></td>
+    </tr>
     </table>
     <div class="submit-button"><input type="submit" value="Perform"></div>
 </form:form>

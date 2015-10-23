@@ -23,6 +23,10 @@
         <AsyncLogger name="org.springframework.security" level="INFO"/>
         <AsyncLogger name="org.springframework.web.servlet" level="INFO"/>
 
+        <AsyncLogger name="org.apache.jasper" level="WARN"/>
+        <AsyncLogger name="org.apache.tomcat.util" level="WARN"/>
+        <AsyncLogger name="jndi" level="WARN"/>
+
         <AsyncRoot level="DEBUG">
             <AppenderRef ref="CONSOLE"/>
         </AsyncRoot>

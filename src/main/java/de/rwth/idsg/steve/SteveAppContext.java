@@ -7,6 +7,11 @@ import org.apache.cxf.common.logging.Slf4jLogger;
 import org.apache.cxf.feature.Feature;
 import org.apache.cxf.feature.LoggingFeature;
 import org.apache.cxf.transport.servlet.CXFServlet;
+import org.apache.tomcat.InstanceManager;
+import org.apache.tomcat.SimpleInstanceManager;
+import org.eclipse.jetty.annotations.ServletContainerInitializersStarter;
+import org.eclipse.jetty.apache.jsp.JettyJasperInitializer;
+import org.eclipse.jetty.plus.annotation.ContainerInitializer;
 import org.eclipse.jetty.rewrite.handler.RedirectPatternRule;
 import org.eclipse.jetty.rewrite.handler.RewriteHandler;
 import org.eclipse.jetty.server.Handler;
@@ -73,6 +78,7 @@ public class SteveAppContext {
                 EnumSet.allOf(DispatcherType.class)
         );
 
+        initJSP(ctx);
         return ctx;
     }
 
@@ -106,5 +112,30 @@ public class SteveAppContext {
             rewrite.addRule(rule);
         }
         return rewrite;
+    }
+
+    // -------------------------------------------------------------------------
+    // JSP stuff
+    //
+    // Help by:
+    //
+    // https://github.com/jetty-project/embedded-jetty-jsp
+    // https://github.com/jasonish/jetty-springmvc-jsp-template
+    // http://examples.javacodegeeks.com/enterprise-java/jetty/jetty-jsp-example
+    // -------------------------------------------------------------------------
+
+    private void initJSP(WebAppContext ctx) throws IOException {
+        ctx.setAttribute("org.eclipse.jetty.containerInitializers", jspInitializers());
+        ctx.setAttribute(InstanceManager.class.getName(), new SimpleInstanceManager());
+        ctx.addBean(new ServletContainerInitializersStarter(ctx), true);
+    }
+
+    /**
+     * Ensure the JSP engine is initialized correctly
+     */
+    private List<ContainerInitializer> jspInitializers() {
+        List<ContainerInitializer> initializers = new ArrayList<>();
+        initializers.add(new ContainerInitializer(new JettyJasperInitializer(), null));
+        return initializers;
     }
 }

@@ -2,8 +2,8 @@
 <%@ include file="../00-op-bind-errors.jsp" %>
 <script type="text/javascript">
 	$(document).ready(function() {
-		<%@ include file="../../static/js/snippets/dateTimePicker.js" %>
-		<%@ include file="../../static/js/snippets/periodTypeSelect.js" %>
+		<%@ include file="../snippets/dateTimePicker.js" %>
+		<%@ include file="../snippets/periodTypeSelect.js" %>
 	});
 </script>
 <div class="content">

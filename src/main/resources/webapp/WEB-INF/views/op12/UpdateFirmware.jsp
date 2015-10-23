@@ -2,7 +2,7 @@
 <%@ include file="../00-op-bind-errors.jsp" %>
 <script type="text/javascript">
     $(document).ready(function() {
-        <%@ include file="../../static/js/snippets/dateTimePicker-future.js" %>
+        <%@ include file="../snippets/dateTimePicker-future.js" %>
     });
 </script>
 <div class="content">

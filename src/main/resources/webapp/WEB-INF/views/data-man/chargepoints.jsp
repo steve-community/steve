@@ -1,8 +1,8 @@
 <%@ include file="../00-header.jsp" %>
 <script type="text/javascript">
     $(document).ready(function() {
-        <%@ include file="../../static/js/snippets/getCPDetails.js" %>
-        <%@ include file="../../static/js/snippets/getCPNote.js" %>
+        <%@ include file="../snippets/getCPDetails.js" %>
+        <%@ include file="../snippets/getCPNote.js" %>
     });
 </script>
 <spring:hasBindErrors name="chargeBoxAddForm">

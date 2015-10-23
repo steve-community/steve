@@ -1,8 +1,8 @@
 <%@ include file="../00-header.jsp" %>
 <script type="text/javascript">
     $(document).ready(function() {
-        <%@ include file="../../static/js/snippets/populateUpdate.js" %>
-        <%@ include file="../../static/js/snippets/dateTimePicker-future.js" %>
+        <%@ include file="../snippets/populateUpdate.js" %>
+        <%@ include file="../snippets/dateTimePicker-future.js" %>
     });
 </script>
 <spring:hasBindErrors name="userAddForm">

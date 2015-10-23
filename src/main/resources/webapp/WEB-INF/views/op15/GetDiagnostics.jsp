@@ -2,7 +2,7 @@
 <%@ include file="../00-op-bind-errors.jsp" %>
 <script type="text/javascript">
     $(document).ready(function() {
-        <%@ include file="../../static/js/snippets/sendLocalList.js" %>
+        <%@ include file="../snippets/dateTimePicker-past.js" %>
     });
 </script>
 <div class="content">
@@ -11,7 +11,7 @@
 	<li><a href="/steve/manager/operations/v1.5/ChangeAvailability">Change Availability</a></li>
 	<li><a href="/steve/manager/operations/v1.5/ChangeConfiguration">Change Configuration</a></li>
 	<li><a href="/steve/manager/operations/v1.5/ClearCache">Clear Cache</a></li>
-	<li><a href="/steve/manager/operations/v1.5/GetDiagnostics">Get Diagnostics</a></li>
+	<li><a class="highlight" href="/steve/manager/operations/v1.5/GetDiagnostics">Get Diagnostics</a></li>
 	<li><a href="/steve/manager/operations/v1.5/RemoteStartTransaction">Remote Start Transaction</a></li>
 	<li><a href="/steve/manager/operations/v1.5/RemoteStopTransaction">Remote Stop Transaction</a></li>
 	<li><a href="/steve/manager/operations/v1.5/Reset">Reset</a></li>
@@ -23,36 +23,26 @@
 	<li><a href="/steve/manager/operations/v1.5/DataTransfer">Data Transfer</a></li>
 	<li><a href="/steve/manager/operations/v1.5/GetConfiguration">Get Configuration</a></li>
 	<li><a href="/steve/manager/operations/v1.5/GetLocalListVersion">Get Local List Version</a></li>
-	<li><a class="highlight" href="/steve/manager/operations/v1.5/SendLocalList">Send Local List</a></li>
+	<li><a href="/steve/manager/operations/v1.5/SendLocalList">Send Local List</a></li>
 </ul>
 </div>
 <div class="op15-content">
-<form:form action="/steve/manager/operations/v1.5/SendLocalList" modelAttribute="params">
+<form:form action="/steve/manager/operations/v1.5/GetDiagnostics" modelAttribute="params">
     <section><span>Charge Points with OCPP v1.5</span></section>
     <%@ include file="../00-cp-multiple.jsp" %>
     <section><span>Parameters</span></section>
-    <table class="userInput sll">
-    <tr><td>Hash (String):</td><td><i>Optional, omitted for now</i></td></tr>
-    <tr><td>List Version (integer):</td><td><form:input path="listVersion"/></td></tr>
-    <tr><td>Update Type:</td>
-        <td>
-            <form:select path="updateType">
-                <form:options items="${updateType}" />
-            </form:select>
-        </td>
-    </tr>
-    <tr><td>Add/Update List:</td>
-        <td>
-            <form:select path="addUpdateList" disabled="true" multiple="true">
-                <form:options items="${idTagList}" />
-            </form:select>
-        </td>
-    </tr>
-        <tr><td>Delete List:</td>
+    <table class="userInput">
+        <tr><td>Location (directory URI):</td><td><form:input path="location" /></td></tr>
+        <tr><td>Retries (integer):</td><td><form:input path="retries" placeholder="optional" /></td></tr>
+        <tr><td>Retry Interval (integer):</td><td><form:input path="retryInterval" placeholder="optional" /></td></tr>
+        <tr><td>Start Date/Time:</td>
             <td>
-                <form:select path="deleteList" disabled="true" multiple="true">
-                    <form:options items="${idTagList}" />
-                </form:select>
+                <form:input path="start" placeholder="optional" cssClass="dateTimePicker"/>
+            </td>
+        </tr>
+        <tr><td>Stop Date/Time:</td>
+            <td>
+                <form:input path="stop" placeholder="optional" cssClass="dateTimePicker"/>
             </td>
         </tr>
     </table>

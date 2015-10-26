@@ -40,8 +40,8 @@ Requirements & Configuration
  
 5. Log File Configuration is defined in [log4j2.xml](src/main/resources/config/prod/log4j2.xml):
   - You _can_ change the [log directory](src/main/resources/config/prod/log4j2.xml#L10). 
-  The default Location is `$HOME/logs/steve.log`. A more suitable location might be `/var/log/steve/steve.log` (remember to set directory permissions accordingly)
-  - You _can_ change the [log level](src/main/resources/config/prod/log4j2.xml#L28)
+  The default location is `$HOME/logs/steve.log`. A more suitable location might be `/var/log/steve/steve.log` (remember to set directory permissions accordingly)
+  - You _can_ change the [log level](src/main/resources/config/prod/log4j2.xml#L32)
 
 How to use?
 -----

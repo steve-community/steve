@@ -10,16 +10,16 @@ SteVe was developed at the RWTH Aachen University and means Steckdosenverwaltung
 
 SteVe is considered as an open platform to implement, test and evaluate novel ideas for electric mobility, like authentication protocols, reservation mechanisms for charge points, and business models for electric mobility. SteVe is distributed under [GPL](LICENSE.txt) and is free to use. If you are going to deploy SteVe we are happy to see the [logo](website/logo/managed-by-steve.pdf) on a charge point.
 
-### Charging Station Support
+### Charge Point Support
 
-Electric charging stations using the following OCPP versions are supported:
+Electric charge points using the following OCPP versions are supported:
 
 * OCPP1.2S
 * OCPP1.5S
 * OCPP1.2J
 * OCPP1.5J
 
-We have successfully tested SteVe with charging stations manufactured by EBG and Mennekes. If your charging station also works well with SteVe, please let us know! We will update the list.
+We have successfully tested SteVe with charge points manufactured by EBG and Mennekes. If your charge point also works well with SteVe, please let us know! We will update the list.
 
 ### System Requirements
 
@@ -84,16 +84,16 @@ After SteVe has successfully started, you can access the web interface using the
 
     http://<your-server-ip>:<port>/steve/manager
 
-### Add a charging point
+### Add a charge point
 
-1. In order for SteVe to accept messages from a charging point, the charge charging point must first be registered. To add a charging point to SteVe select *Data Management* >> *Charge Points* >> *Add*. Enter the ChargeBox ID configured in the Charging Station and confirm.
+1. In order for SteVe to accept messages from a charge point, the charge point must first be registered. To add a charge point to SteVe select *Data Management* >> *Charge Points* >> *Add*. Enter the ChargeBox ID configured in the charge point and confirm.
 
 2. The charge points must be configured to communicate with following addresses. Depending on the OCPP version of the charge point, SteVe will automatically route messages to the version-specific implementation.
     - SOAP: `http://<your-server-ip>:<port>/steve/services/CentralSystemService`
     - WebSocket/JSON: `ws://<your-server-ip>:<port>/steve/websocket/CentralSystemService/<chargeBoxId>`
 
 
-As soon as a Heartbeat is received you should see the Status of the Charging Station in the SteVe Dashboard.
+As soon as a heartbeat is received, you should see the status of the charge point in the SteVe Dashboard.
  
 *Have fun!*
 

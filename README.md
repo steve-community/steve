@@ -12,24 +12,24 @@ SteVe is considered as an open platform to implement, test and evaluate novel id
 
 ### Charging Station Support
 
-Electric Charging Stations supporting the following OCPP versions are supported:
+Electric charging stations using the following OCPP versions are supported:
 
 * OCPP1.2S
 * OCPP1.5S
 * OCPP1.2J
 * OCPP1.5J
 
-We have successfully tested SteVe with Charging Stations manufractured by EBG and Mennekes. 
+We have successfully tested SteVe with charging stations manufactured by EBG and Mennekes. If your charging station also works well with SteVe, please let us know! We will update the list.
 
 ### System Requirements
 
 SteVe requires 
 * JDK 8 (both Oracle JDK and OpenJDK are supported)
 * Maven 
-* MySQL database (MariaDB works aswell) 
+* MySQL database (MariaDB works as well)
 to build and run. 
 
-SteVe is designed to run standalone, a java servlet container / web server (e.g. Apache Tomcat), is NOT required.
+SteVe is designed to run standalone, a java servlet container / web server (e.g. Apache Tomcat), is **not** required.
 
 # Configuration and Installation
 
@@ -64,7 +64,7 @@ SteVe is designed to run standalone, a java servlet container / web server (e.g.
 
 4. Build SteVe:
 
-    To compile SteVe simply use Maven. A runnable `jar` file containing the application and configuration will be created in the subdirectory `steve/`.
+    To compile SteVe simply use Maven. A runnable `jar` file containing the application and configuration will be created in the subdirectory `steve/target`.
 
     ```
     # mvn package
@@ -80,17 +80,18 @@ SteVe is designed to run standalone, a java servlet container / web server (e.g.
 
 # First Steps
 
-After SteVe is succefully started you can access the SteVe web interface using the configured credentials under:
+After SteVe has successfully started, you can access the web interface using the configured credentials under:
 
-    http://<your-server-ip>:8080/steve/manager
+    http://<your-server-ip>:<port>/steve/manager
 
 ### Add a charging point
 
-The charge points must be configured to communicate with following addresses. Depending on the OCPP version of the charge point, SteVe will automatically route messages to the version-specific implementation.
-  - SOAP: `http://<your-server-ip>:8080/steve/services/CentralSystemService`
-  - WebSocket/JSON: `ws://<your-server-ip>:8080/steve/websocket/CentralSystemService/<chargeBoxId>`
+1. In order for SteVe to accept messages from a charging point, the charge charging point must first be registered. To add a charging point to SteVe select *Data Management* >> *Charge Points* >> *Add*. Enter the ChargeBox ID configured in the Charging Station and confirm.
 
-To add a charging point to SteVe select *Data Management* >> *Charge Points* >> *Add*. Enter the ChargeBox ID configured in the Charging Station and confirm. 
+2. The charge points must be configured to communicate with following addresses. Depending on the OCPP version of the charge point, SteVe will automatically route messages to the version-specific implementation.
+    - SOAP: `http://<your-server-ip>:<port>/steve/services/CentralSystemService`
+    - WebSocket/JSON: `ws://<your-server-ip>:<port>/steve/websocket/CentralSystemService/<chargeBoxId>`
+
 
 As soon as a Heartbeat is received you should see the Status of the Charging Station in the SteVe Dashboard.
  

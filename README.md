@@ -83,6 +83,8 @@ SteVe is designed to run standalone, a java servlet container / web server (e.g.
 After SteVe has successfully started, you can access the web interface using the configured credentials under:
 
     http://<your-server-ip>:<port>/steve/manager
+    
+The default port number is 8080.
 
 ### Add a charge point
 

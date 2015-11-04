@@ -36,6 +36,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.function.Consumer;
 
 import static de.rwth.idsg.steve.utils.DateTimeUtils.toDateTime;
 
@@ -117,76 +118,75 @@ public class ChargePointService12_Client {
 
     public int changeAvailability(ChangeAvailabilityParams params) {
         ChangeAvailabilityRequest req = this.prepareChangeAvailability(params);
-        List<ChargePointSelect> chargePointSelectList = params.getChargePointSelectList();
-        RequestTask requestTask = new RequestTask(VERSION, req, chargePointSelectList);
+        List<ChargePointSelect> list = params.getChargePointSelectList();
+        RequestTask task = new RequestTask(VERSION, req, list);
 
-        for (ChargePointSelect c : chargePointSelectList) {
-            ChangeAvailabilityResponseHandler handler =
-                    new ChangeAvailabilityResponseHandler(requestTask, c.getChargeBoxId());
-            dispatcher.changeAvailability(c, req, handler);
-        }
-        return requestTaskStore.add(requestTask);
+        execute(list,
+                c -> dispatcher.changeAvailability(c, req, new ChangeAvailabilityResponseHandler(task, c.getChargeBoxId())));
+
+        return requestTaskStore.add(task);
     }
 
     public int changeConfiguration(ChangeConfigurationParams params) {
         ChangeConfigurationRequest req = this.prepareChangeConfiguration(params);
-        List<ChargePointSelect> chargePointSelectList = params.getChargePointSelectList();
-        RequestTask requestTask = new RequestTask(VERSION, req, chargePointSelectList);
+        List<ChargePointSelect> list = params.getChargePointSelectList();
+        RequestTask task = new RequestTask(VERSION, req, list);
 
-        for (ChargePointSelect c : chargePointSelectList) {
-            ChangeConfigurationResponseHandler handler =
-                    new ChangeConfigurationResponseHandler(requestTask, c.getChargeBoxId());
-            dispatcher.changeConfiguration(c, req, handler);
-        }
-        return requestTaskStore.add(requestTask);
+        execute(list,
+                c -> dispatcher.changeConfiguration(c, req, new ChangeConfigurationResponseHandler(task, c.getChargeBoxId())));
+
+        return requestTaskStore.add(task);
     }
 
     public int clearCache(MultipleChargePointSelect params) {
         ClearCacheRequest req = this.prepareClearCache();
-        List<ChargePointSelect> chargePointSelectList = params.getChargePointSelectList();
-        RequestTask requestTask = new RequestTask(VERSION, req, chargePointSelectList);
+        List<ChargePointSelect> list = params.getChargePointSelectList();
+        RequestTask task = new RequestTask(VERSION, req, list);
 
-        for (ChargePointSelect c : chargePointSelectList) {
-            ClearCacheResponseHandler handler = new ClearCacheResponseHandler(requestTask, c.getChargeBoxId());
-            dispatcher.clearCache(c, req, handler);
-        }
-        return requestTaskStore.add(requestTask);
+        execute(list,
+                c -> dispatcher.clearCache(c, req, new ClearCacheResponseHandler(task, c.getChargeBoxId())));
+
+        return requestTaskStore.add(task);
     }
 
     public int getDiagnostics(GetDiagnosticsParams params) {
         GetDiagnosticsRequest req = this.prepareGetDiagnostics(params);
-        List<ChargePointSelect> chargePointSelectList = params.getChargePointSelectList();
-        RequestTask requestTask = new RequestTask(VERSION, req, chargePointSelectList);
+        List<ChargePointSelect> list = params.getChargePointSelectList();
+        RequestTask task = new RequestTask(VERSION, req, list);
 
-        for (ChargePointSelect c : chargePointSelectList) {
-            GetDiagnosticsResponseHandler handler = new GetDiagnosticsResponseHandler(requestTask, c.getChargeBoxId());
-            dispatcher.getDiagnostics(c, req, handler);
-        }
-        return requestTaskStore.add(requestTask);
+        execute(list,
+                c -> dispatcher.getDiagnostics(c, req, new GetDiagnosticsResponseHandler(task, c.getChargeBoxId())));
+
+        return requestTaskStore.add(task);
     }
 
     public int reset(ResetParams params) {
         ResetRequest req = this.prepareReset(params);
-        List<ChargePointSelect> chargePointSelectList = params.getChargePointSelectList();
-        RequestTask requestTask = new RequestTask(VERSION, req, chargePointSelectList);
+        List<ChargePointSelect> list = params.getChargePointSelectList();
+        RequestTask task = new RequestTask(VERSION, req, list);
 
-        for (ChargePointSelect c : chargePointSelectList) {
-            ResetResponseHandler handler = new ResetResponseHandler(requestTask, c.getChargeBoxId());
-            dispatcher.reset(c, req, handler);
-        }
-        return requestTaskStore.add(requestTask);
+        execute(list,
+                c -> dispatcher.reset(c, req, new ResetResponseHandler(task, c.getChargeBoxId())));
+
+        return requestTaskStore.add(task);
     }
 
     public int updateFirmware(UpdateFirmwareParams params) {
         UpdateFirmwareRequest req = this.prepareUpdateFirmware(params);
-        List<ChargePointSelect> chargePointSelectList = params.getChargePointSelectList();
-        RequestTask requestTask = new RequestTask(VERSION, req, chargePointSelectList);
+        List<ChargePointSelect> list = params.getChargePointSelectList();
+        RequestTask task = new RequestTask(VERSION, req, list);
 
-        for (ChargePointSelect c : chargePointSelectList) {
-            UpdateFirmwareResponseHandler handler = new UpdateFirmwareResponseHandler(requestTask, c.getChargeBoxId());
-            dispatcher.updateFirmware(c, req, handler);
-        }
-        return requestTaskStore.add(requestTask);
+        execute(list,
+                c -> dispatcher.updateFirmware(c, req, new UpdateFirmwareResponseHandler(task, c.getChargeBoxId())));
+
+        return requestTaskStore.add(task);
+    }
+
+    /**
+     * Executes the requests
+     */
+    private void execute(List<ChargePointSelect> list, Consumer<ChargePointSelect> consumer) {
+        list.stream().forEach(consumer);
     }
 
     // -------------------------------------------------------------------------
@@ -195,36 +195,37 @@ public class ChargePointService12_Client {
 
     public int remoteStartTransaction(RemoteStartTransactionParams params) {
         RemoteStartTransactionRequest req = this.prepareRemoteStartTransaction(params);
-        List<ChargePointSelect> chargePointSelectList = params.getChargePointSelectList();
-        RequestTask requestTask = new RequestTask(VERSION, req, chargePointSelectList);
+        List<ChargePointSelect> list = params.getChargePointSelectList();
+        RequestTask task = new RequestTask(VERSION, req, list);
 
-        ChargePointSelect c = chargePointSelectList.get(0);
-        RemoteStartTransactionResponseHandler handler =
-                new RemoteStartTransactionResponseHandler(requestTask, c.getChargeBoxId());
+        ChargePointSelect c = list.get(0);
+        RemoteStartTransactionResponseHandler handler = new RemoteStartTransactionResponseHandler(task, c.getChargeBoxId());
         dispatcher.remoteStartTransaction(c, req, handler);
-        return requestTaskStore.add(requestTask);
+
+        return requestTaskStore.add(task);
     }
 
     public int remoteStopTransaction(RemoteStopTransactionParams params) {
         RemoteStopTransactionRequest req = this.prepareRemoteStopTransaction(params);
-        List<ChargePointSelect> chargePointSelectList = params.getChargePointSelectList();
-        RequestTask requestTask = new RequestTask(VERSION, req, chargePointSelectList);
+        List<ChargePointSelect> list = params.getChargePointSelectList();
+        RequestTask task = new RequestTask(VERSION, req, list);
 
-        ChargePointSelect c = chargePointSelectList.get(0);
-        RemoteStopTransactionResponseHandler handler =
-                new RemoteStopTransactionResponseHandler(requestTask, c.getChargeBoxId());
+        ChargePointSelect c = list.get(0);
+        RemoteStopTransactionResponseHandler handler = new RemoteStopTransactionResponseHandler(task, c.getChargeBoxId());
         dispatcher.remoteStopTransaction(c, req, handler);
-        return requestTaskStore.add(requestTask);
+
+        return requestTaskStore.add(task);
     }
 
     public int unlockConnector(UnlockConnectorParams params) {
         UnlockConnectorRequest req = this.prepareUnlockConnector(params);
-        List<ChargePointSelect> chargePointSelectList = params.getChargePointSelectList();
-        RequestTask requestTask = new RequestTask(VERSION, req, chargePointSelectList);
+        List<ChargePointSelect> list = params.getChargePointSelectList();
+        RequestTask task = new RequestTask(VERSION, req, list);
 
-        ChargePointSelect c = chargePointSelectList.get(0);
-        UnlockConnectorResponseHandler handler = new UnlockConnectorResponseHandler(requestTask, c.getChargeBoxId());
+        ChargePointSelect c = list.get(0);
+        UnlockConnectorResponseHandler handler = new UnlockConnectorResponseHandler(task, c.getChargeBoxId());
         dispatcher.unlockConnector(c, req, handler);
-        return requestTaskStore.add(requestTask);
+
+        return requestTaskStore.add(task);
     }
 }

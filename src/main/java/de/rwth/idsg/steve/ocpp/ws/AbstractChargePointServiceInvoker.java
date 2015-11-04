@@ -9,6 +9,8 @@ import de.rwth.idsg.steve.ocpp.ws.data.FutureResponseContext;
 import de.rwth.idsg.steve.ocpp.ws.data.OcppJsonCall;
 import de.rwth.idsg.steve.ocpp.ws.pipeline.OutgoingPipeline;
 import lombok.Setter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.UUID;
@@ -18,13 +20,30 @@ import java.util.UUID;
  * @since 20.03.2015
  */
 public abstract class AbstractChargePointServiceInvoker {
+    private final Logger log = LoggerFactory.getLogger(getClass());
 
     @Autowired private OutgoingPipeline outgoingPipeline;
 
     @Setter private TypeStore typeStore;
     @Setter private AbstractWebSocketEndpoint endpoint;
 
+    /**
+     * Just a wrapper to make try-catch block and exception handling stand out
+     */
     public void runPipeline(String chargeBoxId, RequestType request, OcppResponseHandler handler) {
+        try {
+            run(chargeBoxId, request, handler);
+        } catch (Exception e) {
+            log.error("Exception occurred", e);
+            // Outgoing call failed due to technical problems. Pass the exception to handler to inform the user
+            handler.handleException(e);
+        }
+    }
+
+    /**
+     * Actual processing
+     */
+    private void run(String chargeBoxId, RequestType request, OcppResponseHandler handler) {
         String messageId = UUID.randomUUID().toString();
         ActionResponsePair pair = typeStore.findActionResponse(request);
         if (pair == null) {

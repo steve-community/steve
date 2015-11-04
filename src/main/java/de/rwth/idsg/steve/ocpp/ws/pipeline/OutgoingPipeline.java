@@ -22,16 +22,8 @@ public class OutgoingPipeline implements Pipeline {
 
     @Override
     public void run(CommunicationContext context) {
-        try {
-            serializer.process(context);
-            sender.process(context);
-
-        } catch (Exception e) {
-            log.error("Exception occurred", e);
-            // Outgoing call failed due to technical problems. Pass the exception to handler to inform the user.
-            context.getFutureResponseContext().getHandler().handleException(e);
-            return;
-        }
+        serializer.process(context);
+        sender.process(context);
 
         // All went well, and the call is sent. Store the response context for later lookup.
         futureResponseContextStore.add(context.getSession(),

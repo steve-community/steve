@@ -1,6 +1,5 @@
 package de.rwth.idsg.steve.config;
 
-import de.rwth.idsg.steve.SteveConfiguration;
 import de.rwth.idsg.steve.ocpp.soap.MediatorInInterceptor;
 import de.rwth.idsg.steve.ocpp.soap.MessageIdInterceptor;
 import de.rwth.idsg.steve.ocpp.ws.custom.AlwaysLastStrategy;
@@ -9,7 +8,6 @@ import de.rwth.idsg.steve.ocpp.ws.custom.WsSessionSelectStrategy;
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.logging.Slf4jLogger;
-import org.apache.cxf.feature.Feature;
 import org.apache.cxf.feature.LoggingFeature;
 import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.jaxws.JaxWsServerFactoryBean;
@@ -22,8 +20,12 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.ImportResource;
 
 import javax.annotation.PostConstruct;
-import java.util.ArrayList;
 import java.util.List;
+
+import static de.rwth.idsg.steve.SteveConfiguration.Ocpp.WS_SESSION_SELECT_STRATEGY;
+import static de.rwth.idsg.steve.SteveConfiguration.ROUTER_ENDPOINT_PATH;
+import static java.util.Arrays.asList;
+import static java.util.Collections.singletonList;
 
 /**
  * Configuration and beans related to OCPP.
@@ -49,20 +51,22 @@ public class OcppConfiguration {
 
     @PostConstruct
     public void init() {
-        configureBus();
+        // Log incoming/outgoing messages
+        bus.getFeatures().add(new LoggingFeature());
 
-        List<Interceptor<? extends Message>> interceptors = new ArrayList<>();
-        interceptors.add(new MessageIdInterceptor());
-        interceptors.add(fromAddressInterceptor);
+        List<Interceptor<? extends Message>> route = singletonList(new MediatorInInterceptor());
+        List<Interceptor<? extends Message>> interceptors = asList(new MessageIdInterceptor(), fromAddressInterceptor);
 
-        createRouterService();
-        createOcpp12Service(interceptors);
-        createOcpp15Service(interceptors);
+        // Just a dummy service to route incoming messages to the appropriate service version
+        createOcppService(ocpp12Server, ROUTER_ENDPOINT_PATH, route);
+
+        createOcppService(ocpp12Server, "/CentralSystemServiceOCPP12", interceptors);
+        createOcppService(ocpp15Server, "/CentralSystemServiceOCPP15", interceptors);
     }
 
     @Bean
     public WsSessionSelectStrategy sessionSelectStrategy() {
-        switch (SteveConfiguration.Ocpp.WS_SESSION_SELECT_STRATEGY) {
+        switch (WS_SESSION_SELECT_STRATEGY) {
             case ALWAYS_LAST:
                 return new AlwaysLastStrategy();
             case ROUND_ROBIN:
@@ -72,38 +76,12 @@ public class OcppConfiguration {
         }
     }
 
-    private void configureBus() {
-        List<Feature> list = new ArrayList<>();
-        list.add(new LoggingFeature()); // Log incoming/outgoing messages
-        bus.setFeatures(list);
-    }
-
-    /**
-     * Just a dummy service to route incoming messages to the appropriate service version.
-     */
-    private void createRouterService() {
+    private void createOcppService(Object serviceBean, String address,
+                                   List<Interceptor<? extends Message>> interceptors) {
         JaxWsServerFactoryBean f = new JaxWsServerFactoryBean();
         f.setBus(bus);
-        f.setServiceBean(ocpp12Server);
-        f.setAddress(SteveConfiguration.ROUTER_ENDPOINT_PATH);
-        f.getInInterceptors().add(new MediatorInInterceptor());
-        f.create();
-    }
-
-    private void createOcpp12Service(List<Interceptor<? extends Message>> interceptors) {
-        JaxWsServerFactoryBean f = new JaxWsServerFactoryBean();
-        f.setBus(bus);
-        f.setServiceBean(ocpp12Server);
-        f.setAddress("/CentralSystemServiceOCPP12");
-        f.getInInterceptors().addAll(interceptors);
-        f.create();
-    }
-
-    private void createOcpp15Service(List<Interceptor<? extends Message>> interceptors) {
-        JaxWsServerFactoryBean f = new JaxWsServerFactoryBean();
-        f.setBus(bus);
-        f.setServiceBean(ocpp15Server);
-        f.setAddress("/CentralSystemServiceOCPP15");
+        f.setServiceBean(serviceBean);
+        f.setAddress(address);
         f.getInInterceptors().addAll(interceptors);
         f.create();
     }

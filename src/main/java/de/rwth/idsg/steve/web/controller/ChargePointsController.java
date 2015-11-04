@@ -38,7 +38,7 @@ public class ChargePointsController {
 
     @RequestMapping(method = RequestMethod.GET)
     public String getAbout(Model model) {
-        model.addAttribute("cpList", chargePointRepository.getChargeBoxIds());
+        addList(model);
         model.addAttribute("chargeBoxAddForm", new ChargeBoxForm());
         model.addAttribute("chargeBoxUpdateForm", new ChargeBoxForm());
         return "data-man/chargepoints";
@@ -48,7 +48,8 @@ public class ChargePointsController {
     public String add(@Valid @ModelAttribute("chargeBoxAddForm") ChargeBoxForm chargeBoxForm,
                       BindingResult result, Model model) {
         if (result.hasErrors()) {
-            model.addAttribute("cpList", chargePointRepository.getChargeBoxIds());
+            addList(model);
+            model.addAttribute("chargeBoxUpdateForm", new ChargeBoxForm());
             return "data-man/chargepoints";
         }
 
@@ -60,7 +61,8 @@ public class ChargePointsController {
     public String update(@Valid @ModelAttribute("chargeBoxUpdateForm") ChargeBoxForm chargeBoxForm,
                          BindingResult result, Model model) {
         if (result.hasErrors()) {
-            model.addAttribute("cpList", chargePointRepository.getChargeBoxIds());
+            addList(model);
+            model.addAttribute("chargeBoxAddForm", new ChargeBoxForm());
             return "data-man/chargepoints";
         }
 
@@ -72,5 +74,9 @@ public class ChargePointsController {
     public String delete(@RequestParam String chargeBoxId) {
         chargePointRepository.deleteChargePoint(chargeBoxId);
         return "redirect:/manager/chargepoints";
+    }
+
+    private void addList(Model model) {
+        model.addAttribute("cpList", chargePointRepository.getChargeBoxIds());
     }
 }

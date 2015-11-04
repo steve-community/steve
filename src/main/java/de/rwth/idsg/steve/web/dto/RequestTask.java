@@ -1,7 +1,9 @@
 package de.rwth.idsg.steve.web.dto;
 
 import de.rwth.idsg.steve.ocpp.OcppVersion;
+import de.rwth.idsg.steve.ocpp.RequestType;
 import de.rwth.idsg.steve.repository.dto.ChargePointSelect;
+import de.rwth.idsg.steve.utils.StringUtils;
 import lombok.Getter;
 import org.joda.time.DateTime;
 
@@ -31,8 +33,8 @@ public class RequestTask {
     private AtomicInteger errorCount = new AtomicInteger(0);
     private AtomicInteger responseCount = new AtomicInteger(0);
 
-    public RequestTask(OcppVersion ocppVersion, String operationName, List<ChargePointSelect> chargePointSelectList) {
-        this.operationName = operationName;
+    public RequestTask(OcppVersion ocppVersion, RequestType requestType, List<ChargePointSelect> chargePointSelectList) {
+        this.operationName = StringUtils.getOperationName(requestType);
         this.ocppVersion = ocppVersion;
         this.resultSize = chargePointSelectList.size();
 

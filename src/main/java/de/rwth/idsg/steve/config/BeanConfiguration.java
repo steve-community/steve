@@ -2,10 +2,12 @@ package de.rwth.idsg.steve.config;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.mysql.jdbc.jdbc2.optional.MysqlDataSource;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import de.rwth.idsg.steve.SteveConfiguration;
+import lombok.extern.slf4j.Slf4j;
 import org.jooq.SQLDialect;
 import org.jooq.conf.Settings;
 import org.jooq.impl.DataSourceConnectionProvider;
@@ -26,8 +28,11 @@ import org.springframework.web.servlet.view.InternalResourceViewResolver;
 
 import javax.annotation.PreDestroy;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Configuration and beans of Spring Framework.
@@ -35,6 +40,7 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
  * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
  * @since 15.08.2014
  */
+@Slf4j
 @Configuration
 @EnableWebMvc
 @EnableScheduling
@@ -42,6 +48,7 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 public class BeanConfiguration extends WebMvcConfigurerAdapter {
 
     private HikariDataSource dataSource;
+    private ScheduledThreadPoolExecutor executor;
 
     /**
      * https://github.com/brettwooldridge/HikariCP/wiki/MySQL-Configuration
@@ -78,13 +85,37 @@ public class BeanConfiguration extends WebMvcConfigurerAdapter {
 
     @Bean
     public ScheduledExecutorService scheduledExecutorService() {
-        return new ScheduledThreadPoolExecutor(5);
+        ThreadFactory threadFactory = new ThreadFactoryBuilder().setNameFormat("SteVe-Executor-%d")
+                                                                .build();
+
+        executor = new ScheduledThreadPoolExecutor(5, threadFactory);
+        return executor;
     }
 
     @PreDestroy
     public void shutDown() {
         if (dataSource != null) {
             dataSource.close();
+        }
+
+        if (executor != null) {
+            gracefulShutDown(executor);
+        }
+    }
+
+    private void gracefulShutDown(ExecutorService executor) {
+        try {
+            executor.shutdown();
+            executor.awaitTermination(30, TimeUnit.SECONDS);
+
+        } catch (InterruptedException e) {
+            log.error("Termination interrupted", e);
+
+        } finally {
+            if (!executor.isTerminated()) {
+                log.warn("Killing non-finished tasks");
+            }
+            executor.shutdownNow();
         }
     }
 

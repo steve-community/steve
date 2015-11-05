@@ -75,7 +75,7 @@ SteVe is designed to run standalone, a java servlet container / web server (e.g.
     To start the application run (please do not run SteVe as root):
 
     ```
-    # java -jar target/steve-*.jar
+    # java -jar target/steve-X.X.X.jar
     ```
 
 # First Steps

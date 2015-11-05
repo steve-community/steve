@@ -60,6 +60,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -76,6 +77,7 @@ import static de.rwth.idsg.steve.utils.DateTimeUtils.toDateTime;
 public class ChargePointService15_Client {
     private static final OcppVersion VERSION = OcppVersion.V_15;
 
+    @Autowired private ScheduledExecutorService executorService;
     @Autowired private UserRepository userRepository;
     @Autowired private UserService userService;
     @Autowired private ReservationRepository reservationRepository;
@@ -323,7 +325,7 @@ public class ChargePointService15_Client {
      * Executes the requests
      */
     private void execute(List<ChargePointSelect> list, Consumer<ChargePointSelect> consumer) {
-        list.stream().forEach(consumer);
+        executorService.execute(() -> list.stream().forEach(consumer));
     }
 
     // -------------------------------------------------------------------------
@@ -334,10 +336,10 @@ public class ChargePointService15_Client {
         RemoteStartTransactionRequest req = this.prepareRemoteStartTransaction(params);
         List<ChargePointSelect> list = params.getChargePointSelectList();
         RequestTask task = new RequestTask(VERSION, req, list);
-
         ChargePointSelect c = list.get(0);
-        RemoteStartTransactionResponseHandler handler = new RemoteStartTransactionResponseHandler(task, c.getChargeBoxId());
-        dispatcher.remoteStartTransaction(c, req, handler);
+
+        execute(() -> dispatcher.remoteStartTransaction(c, req,
+                new RemoteStartTransactionResponseHandler(task, c.getChargeBoxId())));
 
         return requestTaskStore.add(task);
     }
@@ -346,10 +348,10 @@ public class ChargePointService15_Client {
         RemoteStopTransactionRequest req = this.prepareRemoteStopTransaction(params);
         List<ChargePointSelect> list = params.getChargePointSelectList();
         RequestTask task = new RequestTask(VERSION, req, list);
-
         ChargePointSelect c = list.get(0);
-        RemoteStopTransactionResponseHandler handler = new RemoteStopTransactionResponseHandler(task, c.getChargeBoxId());
-        dispatcher.remoteStopTransaction(c, req, handler);
+
+        execute(() -> dispatcher.remoteStopTransaction(c, req,
+                new RemoteStopTransactionResponseHandler(task, c.getChargeBoxId())));
 
         return requestTaskStore.add(task);
     }
@@ -358,10 +360,10 @@ public class ChargePointService15_Client {
         UnlockConnectorRequest req = this.prepareUnlockConnector(params);
         List<ChargePointSelect> list = params.getChargePointSelectList();
         RequestTask task = new RequestTask(VERSION, req, list);
-
         ChargePointSelect c = list.get(0);
-        UnlockConnectorResponseHandler handler = new UnlockConnectorResponseHandler(task, c.getChargeBoxId());
-        dispatcher.unlockConnector(c, req, handler);
+
+        execute(() -> dispatcher.unlockConnector(c, req,
+                new UnlockConnectorResponseHandler(task, c.getChargeBoxId())));
 
         return requestTaskStore.add(task);
     }
@@ -379,9 +381,10 @@ public class ChargePointService15_Client {
 
         ReserveNowRequest req = this.prepareReserveNow(params, reservationId);
         RequestTask task = new RequestTask(VERSION, req, list);
-        ReserveNowResponseHandler handler = new ReserveNowResponseHandler(task, chargeBoxId,
-                reservationRepository, reservationId);
-        dispatcher.reserveNow(c, req, handler);
+
+        execute(() -> dispatcher.reserveNow(c, req,
+                new ReserveNowResponseHandler(task, chargeBoxId,
+                        reservationRepository, reservationId)));
 
         return requestTaskStore.add(task);
     }
@@ -390,13 +393,19 @@ public class ChargePointService15_Client {
         CancelReservationRequest req = this.prepareCancelReservation(params);
         List<ChargePointSelect> list = params.getChargePointSelectList();
         RequestTask task = new RequestTask(VERSION, req, list);
-
         ChargePointSelect c = list.get(0);
-        CancelReservationResponseHandler handler =
+
+        execute(() -> dispatcher.cancelReservation(c, req,
                 new CancelReservationResponseHandler(task, c.getChargeBoxId(),
-                        reservationRepository, params.getReservationId());
-        dispatcher.cancelReservation(c, req, handler);
-        
+                        reservationRepository, params.getReservationId())));
+
         return requestTaskStore.add(task);
+    }
+
+    /**
+     * Executes the requests for single charge point invocation
+     */
+    private void execute(Runnable r) {
+        executorService.execute(r);
     }
 }

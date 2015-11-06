@@ -3,6 +3,8 @@ package de.rwth.idsg.steve;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.jetty.http.HttpScheme;
 import org.eclipse.jetty.http.HttpVersion;
+import org.eclipse.jetty.server.ConnectionFactory;
+import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.HttpConfiguration;
 import org.eclipse.jetty.server.HttpConnectionFactory;
 import org.eclipse.jetty.server.SecureRequestCustomizer;
@@ -13,6 +15,11 @@ import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.eclipse.jetty.util.thread.QueuedThreadPool;
 import org.eclipse.jetty.util.thread.ScheduledExecutorScheduler;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -135,5 +142,43 @@ public class JettyServer {
 
     public boolean isStarted() {
         return server != null && server.isStarted();
+    }
+
+    public List<String> getConnectorPathList() {
+        if (server == null) {
+            return Collections.emptyList();
+        }
+
+        Connector[] connectors = server.getConnectors();
+        List<String> list = new ArrayList<>(connectors.length);
+        for (Connector c : connectors) {
+            list.add(getConnectorPath((ServerConnector) c));
+        }
+        return list;
+    }
+
+    private String getConnectorPath(ServerConnector sc) {
+        String prefix = "http";
+        String host = sc.getHost();
+        int port = sc.getPort();
+
+        ConnectionFactory cf = sc.getDefaultConnectionFactory();
+        if (cf instanceof SslConnectionFactory) {
+            prefix = "https";
+        }
+
+        if (host == null || host.equals("0.0.0.0")) {
+            try {
+                host = InetAddress.getLocalHost().getHostAddress();
+            } catch (UnknownHostException e) {
+                // Well, we failed to read from system, fall back to main.properties.
+                // Better than nothing
+                host = SteveConfiguration.Jetty.SERVER_HOST;
+            }
+        }
+
+        String layout = "%s://%s:%d" + SteveConfiguration.CONTEXT_PATH;
+
+        return String.format(layout, prefix, host, port);
     }
 }

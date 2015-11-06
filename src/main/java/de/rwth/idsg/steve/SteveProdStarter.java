@@ -19,7 +19,7 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 public class SteveProdStarter implements ApplicationStarter {
 
-    private static final String HINT = "Hint: You can stop the application by pressing CTRL+C" + System.lineSeparator();
+    private static final String HINT = "Hint: You can stop the application by pressing CTRL+C" + sep();
     private static final String REFER = "Please refer to the log file for details";
 
     private JettyServer jettyServer;
@@ -63,29 +63,29 @@ public class SteveProdStarter implements ApplicationStarter {
     private void starting() {
         String msg = "Log file: "
                 + new LogFileRetriever().getLogFilePathOrErrorMessage()
-                + System.lineSeparator()
+                + sep()
                 + "Starting";
 
-        System.out.print(msg);
+        print(msg);
         startPrintingDots();
     }
 
     private void started() {
         stopPrintingDots();
-        String msg = " Done!" + System.lineSeparator() + HINT;
-        System.out.println(msg);
+        String msg = " Done!" + sep() + HINT;
+        println(msg);
         printURLs();
     }
 
     private void startedWithErrors() {
-        String msg = " Done, but there were some errors! " + REFER + System.lineSeparator() + HINT;
-        System.out.println(msg);
+        String msg = " Done, but there were some errors! " + REFER + sep() + HINT;
+        println(msg);
         printURLs();
     }
 
     private void failed() {
-        String msg = " FAILED!" + System.lineSeparator() + REFER;
-        System.out.println(msg);
+        String msg = " FAILED!" + sep() + REFER;
+        println(msg);
     }
 
     private void printURLs() {
@@ -106,7 +106,7 @@ public class SteveProdStarter implements ApplicationStarter {
 
     private void printList(Iterator<String> it, boolean replaceHttp, String title, String elementPostfix) {
         StringBuilder sb  = new StringBuilder(title)
-                .append(System.lineSeparator());
+                .append(sep());
 
         if (it.hasNext()) {
             sb.append("- ")
@@ -114,14 +114,14 @@ public class SteveProdStarter implements ApplicationStarter {
               .append(elementPostfix);
 
             while (it.hasNext()) {
-                sb.append(System.lineSeparator())
+                sb.append(sep())
                   .append("- ")
                   .append(getElementPrefix(it.next(), replaceHttp))
                   .append(elementPostfix);
             }
         }
 
-        System.out.println(sb.toString());
+        println(sb.toString());
     }
 
     private String getElementPrefix(String str, boolean replaceHttp) {
@@ -130,6 +130,18 @@ public class SteveProdStarter implements ApplicationStarter {
         } else {
             return str;
         }
+    }
+
+    private static String sep() {
+        return System.lineSeparator();
+    }
+
+    private static void println(String s) {
+        System.out.println(s);
+    }
+
+    private static void print(String s) {
+        System.out.print(s);
     }
 
     // -------------------------------------------------------------------------
@@ -141,7 +153,7 @@ public class SteveProdStarter implements ApplicationStarter {
             public void run() {
                 try {
                     while (!isInterrupted()) {
-                        System.out.print(".");
+                        print(".");
                         TimeUnit.MILLISECONDS.sleep(600);
                     }
                 } catch (InterruptedException e) {

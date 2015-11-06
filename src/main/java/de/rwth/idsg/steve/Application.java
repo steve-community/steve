@@ -23,7 +23,7 @@ import static de.rwth.idsg.steve.SteveConfiguration.STEVE_VERSION;
 @Slf4j
 public class Application {
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws Exception {
 
         // For Hibernate validator
         System.setProperty("org.jboss.logging.provider", "slf4j");
@@ -36,15 +36,18 @@ public class Application {
 
         log.info("Loaded the properties. Starting with the '{}' profile", PROFILE);
 
-        JettyServer jettyServer = new JettyServer();
-        jettyServer.start();
+        if (PROFILE.isProd()) {
+            new SteveProdStarter().start();
+        } else {
+            new SteveDevStarter().start();
+        }
     }
 
     private static void loadProperties() throws IOException {
         PropertiesFileLoader prop = new PropertiesFileLoader("main.properties");
 
         STEVE_VERSION = prop.getString("steve.version");
-        PROFILE       = prop.getString("profile");
+        PROFILE       = ApplicationProfile.fromName(prop.getString("profile"));
 
         DB.IP           = prop.getString("db.ip");
         DB.PORT         = prop.getInt("db.port");

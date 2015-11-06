@@ -13,7 +13,6 @@ import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.eclipse.jetty.util.thread.QueuedThreadPool;
 import org.eclipse.jetty.util.thread.ScheduledExecutorScheduler;
 
-import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -34,7 +33,7 @@ public class JettyServer {
     /**
      * A fully configured Jetty Server instance
      */
-    public JettyServer() throws IOException {
+    public void prepare() throws Exception {
 
         // === jetty.xml ===
         // Setup Threadpool
@@ -119,30 +118,22 @@ public class JettyServer {
     /**
      * Starts the Jetty Server instance
      */
-    public void start() {
-        try {
+    public void start() throws Exception {
+        if (server != null) {
             server.start();
-            server.join();
-        } catch (InterruptedException ie) {
-            log.error("Exception happened", ie);
-        } catch (Exception e) {
-            log.error("Failed to start Jetty server.", e);
         }
     }
 
     /**
-     * Stops the Jetty Server instance
+     * Join the server thread with the current thread
      */
-    public void stop() {
-        new Thread() {
-            @Override
-            public void run() {
-                try {
-                    server.stop();
-                } catch (Exception e) {
-                    log.error("Failed to stop Jetty server.", e);
-                }
-            }
-        }.start();
+    public void join() throws Exception {
+        if (server != null) {
+            server.join();
+        }
+    }
+
+    public boolean isStarted() {
+        return server != null && server.isStarted();
     }
 }

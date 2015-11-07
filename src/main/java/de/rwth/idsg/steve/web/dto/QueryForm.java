@@ -23,7 +23,7 @@ public abstract class QueryForm {
     private LocalDateTime from;
     private LocalDateTime to;
 
-    @AssertTrue(message = "'From' must be after 'To'")
+    @AssertTrue(message = "'To' must be after 'From'")
     public boolean isFromToValid() {
         return !isFromToSet() || to.isAfter(from);
     }

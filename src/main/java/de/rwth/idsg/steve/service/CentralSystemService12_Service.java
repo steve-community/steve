@@ -1,8 +1,8 @@
 package de.rwth.idsg.steve.service;
 
-import de.rwth.idsg.steve.ocpp.OcppConstants;
 import de.rwth.idsg.steve.ocpp.OcppProtocol;
 import de.rwth.idsg.steve.repository.OcppServerRepository;
+import de.rwth.idsg.steve.repository.SettingsRepository;
 import lombok.extern.slf4j.Slf4j;
 import ocpp.cs._2010._08.AuthorizeRequest;
 import ocpp.cs._2010._08.AuthorizeResponse;
@@ -40,7 +40,7 @@ public class CentralSystemService12_Service {
 
     @Autowired private OcppServerRepository ocppServerRepository;
     @Autowired private UserService userService;
-    @Autowired private OcppConstants ocppConstants;
+    @Autowired private SettingsRepository settingsRepository;
 
     public BootNotificationResponse bootNotification(BootNotificationRequest parameters, String chargeBoxIdentity,
                                                      OcppProtocol ocppProtocol) {
@@ -65,7 +65,7 @@ public class CentralSystemService12_Service {
             return new BootNotificationResponse()
                     .withStatus(RegistrationStatus.ACCEPTED)
                     .withCurrentTime(now)
-                    .withHeartbeatInterval(ocppConstants.getHeartbeatIntervalInSeconds());
+                    .withHeartbeatInterval(settingsRepository.getHeartbeatIntervalInSeconds());
 
         } else {
             return new BootNotificationResponse()

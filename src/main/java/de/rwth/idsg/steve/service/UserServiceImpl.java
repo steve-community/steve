@@ -1,6 +1,6 @@
 package de.rwth.idsg.steve.service;
 
-import de.rwth.idsg.steve.ocpp.OcppConstants;
+import de.rwth.idsg.steve.repository.SettingsRepository;
 import de.rwth.idsg.steve.repository.UserRepository;
 import jooq.steve.db.tables.records.UserRecord;
 import lombok.extern.slf4j.Slf4j;
@@ -21,19 +21,23 @@ import java.util.List;
 @Service
 public class UserServiceImpl implements UserService {
 
-    @Autowired private OcppConstants ocppConstants;
+    @Autowired private SettingsRepository settingsRepository;
     @Autowired private UserRepository userRepository;
 
     @Override
     public List<AuthorisationData> getAuthDataOfAllUsers() {
+        int hoursToExpire = settingsRepository.getHoursToExpire();
+
         return userRepository.getUserRecords()
-                             .map(new AuthorisationDataMapper());
+                             .map(new AuthorisationDataMapper(hoursToExpire));
     }
 
     @Override
     public List<AuthorisationData> getAuthData(List<String> idTagList) {
+        int hoursToExpire = settingsRepository.getHoursToExpire();
+
         return userRepository.getUserRecords(idTagList)
-                             .map(new AuthorisationDataMapper());
+                             .map(new AuthorisationDataMapper(hoursToExpire));
     }
 
     @Override
@@ -61,7 +65,7 @@ public class UserServiceImpl implements UserService {
                 log.debug("The user with idTag '{}' is ACCEPTED.", idTag);
                 idTagInfo.setStatus(AuthorizationStatus.ACCEPTED);
 
-                int hours = ocppConstants.getHoursToExpire();
+                int hours = settingsRepository.getHoursToExpire();
                 idTagInfo.setExpiryDate(DateTime.now().plusHours(hours));
                 idTagInfo.setParentIdTag(record.getParentidtag());
             }
@@ -94,7 +98,7 @@ public class UserServiceImpl implements UserService {
                 log.debug("The user with idTag '{}' is ACCEPTED.", idTag);
                 idTagInfo.setStatus(ocpp.cs._2012._06.AuthorizationStatus.ACCEPTED);
 
-                int hours = ocppConstants.getHoursToExpire();
+                int hours = settingsRepository.getHoursToExpire();
                 idTagInfo.setExpiryDate(DateTime.now().plusHours(hours));
                 idTagInfo.setParentIdTag(record.getParentidtag());
             }
@@ -107,8 +111,13 @@ public class UserServiceImpl implements UserService {
     // -------------------------------------------------------------------------
 
     private class AuthorisationDataMapper implements RecordMapper<UserRecord, AuthorisationData> {
-        private final DateTime nowDt = DateTime.now();
-        private final DateTime cacheExpiry = nowDt.plus(ocppConstants.getHoursToExpire());
+        private final DateTime nowDt;
+        private final DateTime cacheExpiry;
+
+        AuthorisationDataMapper(int hoursToExpire) {
+            this.nowDt = DateTime.now();
+            this.cacheExpiry = nowDt.plus(hoursToExpire);
+        }
 
         @Override
         public AuthorisationData map(UserRecord record) {

@@ -1,8 +1,9 @@
 package de.rwth.idsg.steve.web.controller;
 
 import de.rwth.idsg.steve.SteveConfiguration;
-import de.rwth.idsg.steve.ocpp.OcppConstants;
 import de.rwth.idsg.steve.repository.GenericRepository;
+import de.rwth.idsg.steve.repository.SettingsRepository;
+import de.rwth.idsg.steve.repository.dto.Settings;
 import de.rwth.idsg.steve.web.dto.SettingsForm;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -27,7 +28,7 @@ public class AboutSettingsController {
 
     @Autowired private GenericRepository genericRepository;
     @Autowired private LogController logController;
-    @Autowired private OcppConstants ocppConstants;
+    @Autowired private SettingsRepository settingsRepository;
 
     // -------------------------------------------------------------------------
     // Paths
@@ -52,12 +53,10 @@ public class AboutSettingsController {
 
     @RequestMapping(value = SETTINGS_PATH, method = RequestMethod.GET)
     public String getSettings(Model model) {
-        int heartbeat = ocppConstants.getHeartbeatIntervalInMinutes();
-        int expiration = ocppConstants.getHoursToExpire();
+        Settings s = settingsRepository.get();
 
-        model.addAttribute("currentHeartbeat", heartbeat);
-        model.addAttribute("currentExpiration", expiration);
-        model.addAttribute("settingsForm", new SettingsForm(heartbeat, expiration));
+        model.addAttribute("settings", s);
+        model.addAttribute("settingsForm", new SettingsForm(s.getHeartbeatIntervalInMinutes(), s.getHoursToExpire()));
         return "settings";
     }
 
@@ -65,13 +64,11 @@ public class AboutSettingsController {
     public String postSettings(@Valid @ModelAttribute("settingsForm") SettingsForm settingsForm,
                                BindingResult result, Model model) {
         if (result.hasErrors()) {
-            model.addAttribute("currentHeartbeat", ocppConstants.getHeartbeatIntervalInMinutes());
-            model.addAttribute("currentExpiration", ocppConstants.getHoursToExpire());
+            model.addAttribute("settings", settingsRepository.get());
             return "settings";
         }
 
-        ocppConstants.setHeartbeatIntervalInMinutes(settingsForm.getHeartbeat());
-        ocppConstants.setHoursToExpire(settingsForm.getExpiration());
+        settingsRepository.update(settingsForm);
         return "redirect:/manager/settings";
     }
 }

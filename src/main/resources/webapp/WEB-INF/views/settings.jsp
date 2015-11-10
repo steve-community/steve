@@ -15,11 +15,11 @@
 <tr><td>Heartbeat Interval:</td><td>
     <form:input path="heartbeat"/>
 </td></tr>
-<tr><td><i>The time interval in <b>minutes</b> for how often a charge point <br> should request the current time from SteVe.</i></td><td>(Current value: ${currentHeartbeat})</td></tr>
+<tr><td><i>The time interval in <b>minutes</b> for how often a charge point <br> should request the current time from SteVe.</i></td><td>(Current value: ${settings.heartbeatIntervalInMinutes})</td></tr>
 <tr><td>Expiration:</td><td>
     <form:input path="expiration"/>
 </td></tr>
-<tr><td><i>The amount of time in <b>hours</b> for how long a charge point <br> should store the authorization info of an idTag in its local white list.</i></td><td>(Current value: ${currentExpiration})</td></tr>
+<tr><td><i>The amount of time in <b>hours</b> for how long a charge point <br> should store the authorization info of an idTag in its local white list.</i></td><td>(Current value: ${settings.hoursToExpire})</td></tr>
 <tr><td></td><td id="add_space"><input type="submit" value="Change"></td></tr>
 </table>
 </form:form>

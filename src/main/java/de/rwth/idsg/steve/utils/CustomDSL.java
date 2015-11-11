@@ -14,7 +14,7 @@ public final class CustomDSL {
     private CustomDSL() { }
 
     public static Field<DateTime> utcTimestamp() {
-        return field("{utc_timestamp}", DateTime.class);
+        return field("{utc_timestamp(6)}", DateTime.class);
     }
 
     public static Field<DateTime> date(DateTime dt) {

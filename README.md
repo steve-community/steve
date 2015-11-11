@@ -26,7 +26,8 @@ We have successfully tested SteVe with charge points manufactured by EBG and Men
 SteVe requires 
 * JDK 8 (both Oracle JDK and OpenJDK are supported)
 * Maven 
-* MySQL database (MariaDB works as well)
+* At least MySQL 5.6.4 (MariaDB works as well) as database
+
 to build and run. 
 
 SteVe is designed to run standalone, a java servlet container / web server (e.g. Apache Tomcat), is **not** required.

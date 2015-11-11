@@ -20,7 +20,7 @@ before_script:
         - mysql -uroot -e "GRANT ALL PRIVILEGES ON stevedb.* TO 'steve'@'localhost' IDENTIFIED BY 'changeme';" -v
         - mysql -uroot -e "GRANT SELECT ON mysql.proc TO 'steve'@'localhost' IDENTIFIED BY 'changeme';" -v
         # grant super privilege required by MariaDB running with log-bin
-        - mysql -uroot -e "GRANT SUPER ON *.* TO 'steve'@'localhost' IDENTIFIED BY 'changeme';
+        - mysql -uroot -e "GRANT SUPER ON *.* TO 'steve'@'localhost' IDENTIFIED BY 'changeme';" -v
 
 # start the actual build
 script: mvn clean package -B -V

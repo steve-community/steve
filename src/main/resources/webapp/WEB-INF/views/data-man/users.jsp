@@ -46,7 +46,7 @@
                 </td>
             </tr>
             <tr>
-                <td>Expried?:</td>
+                <td>Expired?:</td>
                 <td><form:select path="expired">
                         <form:options items="${expired}" itemLabel="value"/>
                     </form:select>

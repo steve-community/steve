@@ -22,4 +22,26 @@ public enum OcppProtocol {
     public String getCompositeValue() {
         return version.getValue() + transport.getValue();
     }
+
+    public static OcppProtocol fromCompositeValue(String v) {
+
+        // If we, in future, decide to use values
+        // containing more than one character for OcppTransport,
+        // this will break.
+        //
+        int splitIndex = v.length() - 1;
+
+        String version = v.substring(0, splitIndex);
+        String transport = String.valueOf(v.charAt(splitIndex));
+
+        OcppVersion ov = OcppVersion.fromValue(version);
+        OcppTransport ot = OcppTransport.fromValue(transport);
+
+        for (OcppProtocol c: OcppProtocol.values()) {
+            if (c.getVersion() == ov && c.getTransport() == ot) {
+                return c;
+            }
+        }
+        throw new IllegalArgumentException(v);
+    }
 }

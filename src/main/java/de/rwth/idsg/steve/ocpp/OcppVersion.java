@@ -16,4 +16,13 @@ public enum OcppVersion {
     V_15("ocpp1.5");
 
     private final String value;
+
+    public static OcppVersion fromValue(String v) {
+        for (OcppVersion c: OcppVersion.values()) {
+            if (c.getValue().equals(v)) {
+                return c;
+            }
+        }
+        throw new IllegalArgumentException(v);
+    }
 }

@@ -27,12 +27,12 @@ CHANGE COLUMN `chargePointSerialNumber` `charge_point_serial_number` VARCHAR(255
 CHANGE COLUMN `chargeBoxSerialNumber` `charge_box_serial_number` VARCHAR(255) NULL DEFAULT NULL,
 CHANGE COLUMN `fwVersion` `fw_version` VARCHAR(255) NULL DEFAULT NULL,
 CHANGE COLUMN `fwUpdateStatus` `fw_update_status` VARCHAR(255) NULL DEFAULT NULL,
-CHANGE COLUMN `fwUpdateTimestamp` `fw_update_timestamp` TIMESTAMP NULL DEFAULT NULL,
+CHANGE COLUMN `fwUpdateTimestamp` `fw_update_timestamp` TIMESTAMP(6) NULL DEFAULT NULL,
 CHANGE COLUMN `meterType` `meter_type` VARCHAR(255) NULL DEFAULT NULL,
 CHANGE COLUMN `meterSerialNumber` `meter_serial_number` VARCHAR(255) NULL DEFAULT NULL,
 CHANGE COLUMN `diagnosticsStatus` `diagnostics_status` VARCHAR(255) NULL DEFAULT NULL,
-CHANGE COLUMN `diagnosticsTimestamp` `diagnostics_timestamp` TIMESTAMP NULL DEFAULT NULL,
-CHANGE COLUMN `lastHeartbeatTimestamp` `last_heartbeat_timestamp` TIMESTAMP NULL DEFAULT NULL;
+CHANGE COLUMN `diagnosticsTimestamp` `diagnostics_timestamp` TIMESTAMP(6) NULL DEFAULT NULL,
+CHANGE COLUMN `lastHeartbeatTimestamp` `last_heartbeat_timestamp` TIMESTAMP(6) NULL DEFAULT NULL;
 
 --
 -- table connector
@@ -49,7 +49,7 @@ CHANGE COLUMN `connectorId` `connector_id` INT(11) NOT NULL;
 RENAME TABLE `connector_metervalue` TO `connector_meter_value`;
 
 ALTER TABLE `connector_meter_value`
-CHANGE COLUMN `valueTimestamp` `value_timestamp` TIMESTAMP NULL DEFAULT NULL,
+CHANGE COLUMN `valueTimestamp` `value_timestamp` TIMESTAMP(6) NULL DEFAULT NULL,
 CHANGE COLUMN `readingContext` `reading_context` VARCHAR(255) NULL DEFAULT NULL;
 
 --
@@ -57,7 +57,7 @@ CHANGE COLUMN `readingContext` `reading_context` VARCHAR(255) NULL DEFAULT NULL;
 --
 
 ALTER TABLE `connector_status`
-CHANGE COLUMN `statusTimestamp` `status_timestamp` TIMESTAMP NULL DEFAULT NULL,
+CHANGE COLUMN `statusTimestamp` `status_timestamp` TIMESTAMP(6) NULL DEFAULT NULL,
 CHANGE COLUMN `errorCode` `error_code` VARCHAR(255) NULL DEFAULT NULL,
 CHANGE COLUMN `errorInfo` `error_info` VARCHAR(255) NULL DEFAULT NULL,
 CHANGE COLUMN `vendorId` `vendor_id` VARCHAR(255) NULL DEFAULT NULL,
@@ -88,9 +88,9 @@ CHANGE COLUMN `hoursToExpire` `hours_to_expire` INT(11) NULL DEFAULT NULL;
 
 ALTER TABLE `transaction`
 CHANGE COLUMN `idTag` `id_tag` VARCHAR(255) NOT NULL,
-CHANGE COLUMN `startTimestamp` `start_timestamp` TIMESTAMP NULL DEFAULT NULL,
+CHANGE COLUMN `startTimestamp` `start_timestamp` TIMESTAMP(6) NULL DEFAULT NULL,
 CHANGE COLUMN `startValue` `start_value` VARCHAR(255) NULL DEFAULT NULL,
-CHANGE COLUMN `stopTimestamp` `stop_timestamp` TIMESTAMP NULL DEFAULT NULL,
+CHANGE COLUMN `stopTimestamp` `stop_timestamp` TIMESTAMP(6) NULL DEFAULT NULL,
 CHANGE COLUMN `stopValue` `stop_value` VARCHAR(255) NULL DEFAULT NULL;
 
 --
@@ -100,7 +100,7 @@ CHANGE COLUMN `stopValue` `stop_value` VARCHAR(255) NULL DEFAULT NULL;
 ALTER TABLE `user`
 CHANGE COLUMN `idTag` `id_tag` VARCHAR(255) NOT NULL,
 CHANGE COLUMN `parentIdTag` `parent_id_tag` VARCHAR(255) NULL DEFAULT NULL,
-CHANGE COLUMN `expiryDate` `expiry_date` TIMESTAMP NULL DEFAULT NULL,
+CHANGE COLUMN `expiryDate` `expiry_date` TIMESTAMP(6) NULL DEFAULT NULL,
 CHANGE COLUMN `inTransaction` `in_transaction` TINYINT(1) UNSIGNED NOT NULL;
 
 -- -------------------------------------------------------------------------

@@ -41,19 +41,19 @@ public class ReservationRepositoryImpl implements ReservationRepository {
         selectQuery.addSelect(
                 RESERVATION.RESERVATION_PK,
                 RESERVATION.TRANSACTION_PK,
-                RESERVATION.IDTAG,
-                RESERVATION.CHARGEBOXID,
-                RESERVATION.STARTDATETIME,
-                RESERVATION.EXPIRYDATETIME,
+                RESERVATION.ID_TAG,
+                RESERVATION.CHARGE_BOX_ID,
+                RESERVATION.START_DATETIME,
+                RESERVATION.EXPIRY_DATETIME,
                 RESERVATION.STATUS
         );
 
         if (form.isChargeBoxIdSet()) {
-            selectQuery.addConditions(RESERVATION.CHARGEBOXID.eq(form.getChargeBoxId()));
+            selectQuery.addConditions(RESERVATION.CHARGE_BOX_ID.eq(form.getChargeBoxId()));
         }
 
         if (form.isUserIdSet()) {
-            selectQuery.addConditions(RESERVATION.IDTAG.eq(form.getUserId()));
+            selectQuery.addConditions(RESERVATION.ID_TAG.eq(form.getUserId()));
         }
 
         if (form.isStatusSet()) {
@@ -63,7 +63,7 @@ public class ReservationRepositoryImpl implements ReservationRepository {
         processType(selectQuery, form);
 
         // Default order
-        selectQuery.addOrderBy(RESERVATION.EXPIRYDATETIME.asc());
+        selectQuery.addOrderBy(RESERVATION.EXPIRY_DATETIME.asc());
 
         return selectQuery.fetch().map(new ReservationMapper());
     }
@@ -73,8 +73,8 @@ public class ReservationRepositoryImpl implements ReservationRepository {
         return DSL.using(config)
                   .select(RESERVATION.RESERVATION_PK)
                   .from(RESERVATION)
-                  .where(RESERVATION.CHARGEBOXID.equal(chargeBoxId))
-                        .and(RESERVATION.EXPIRYDATETIME.greaterThan(CustomDSL.utcTimestamp()))
+                  .where(RESERVATION.CHARGE_BOX_ID.equal(chargeBoxId))
+                        .and(RESERVATION.EXPIRY_DATETIME.greaterThan(CustomDSL.utcTimestamp()))
                         .and(RESERVATION.STATUS.equal(ReservationStatus.ACCEPTED.name()))
                   .fetch(RESERVATION.RESERVATION_PK);
     }
@@ -86,8 +86,8 @@ public class ReservationRepositoryImpl implements ReservationRepository {
 
         int reservationId = DSL.using(config)
                                .insertInto(RESERVATION,
-                                       RESERVATION.IDTAG, RESERVATION.CHARGEBOXID,
-                                       RESERVATION.STARTDATETIME, RESERVATION.EXPIRYDATETIME,
+                                       RESERVATION.ID_TAG, RESERVATION.CHARGE_BOX_ID,
+                                       RESERVATION.START_DATETIME, RESERVATION.EXPIRY_DATETIME,
                                        RESERVATION.STATUS)
                                .values(idTag, chargeBoxId,
                                        startTimestamp, expiryTimestamp,
@@ -165,13 +165,13 @@ public class ReservationRepositoryImpl implements ReservationRepository {
     private void processType(SelectQuery selectQuery, ReservationQueryForm form) {
         switch (form.getPeriodType()) {
             case ACTIVE:
-                selectQuery.addConditions(RESERVATION.EXPIRYDATETIME.greaterThan(CustomDSL.utcTimestamp()));
+                selectQuery.addConditions(RESERVATION.EXPIRY_DATETIME.greaterThan(CustomDSL.utcTimestamp()));
                 break;
 
             case FROM_TO:
                 selectQuery.addConditions(
-                        RESERVATION.STARTDATETIME.greaterOrEqual(form.getFrom().toDateTime()),
-                        RESERVATION.EXPIRYDATETIME.lessOrEqual(form.getTo().toDateTime())
+                        RESERVATION.START_DATETIME.greaterOrEqual(form.getFrom().toDateTime()),
+                        RESERVATION.EXPIRY_DATETIME.lessOrEqual(form.getTo().toDateTime())
                 );
                 break;
 
@@ -188,9 +188,9 @@ public class ReservationRepositoryImpl implements ReservationRepository {
             int count = DSL.using(config)
                            .selectOne()
                            .from(RESERVATION)
-                           .where(RESERVATION.EXPIRYDATETIME.greaterOrEqual(start))
-                             .and(RESERVATION.STARTDATETIME.lessOrEqual(stop))
-                             .and(RESERVATION.CHARGEBOXID.equal(chargeBoxId))
+                           .where(RESERVATION.EXPIRY_DATETIME.greaterOrEqual(start))
+                             .and(RESERVATION.START_DATETIME.lessOrEqual(stop))
+                             .and(RESERVATION.CHARGE_BOX_ID.equal(chargeBoxId))
                            .execute();
 
             if (count != 1) {

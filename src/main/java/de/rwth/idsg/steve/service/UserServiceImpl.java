@@ -49,7 +49,7 @@ public class UserServiceImpl implements UserService {
             log.error("The user with idTag '{}' is INVALID (not present in DB).", idTag);
             idTagInfo.setStatus(AuthorizationStatus.INVALID);
         } else {
-            if (record.getIntransaction()) {
+            if (record.getInTransaction()) {
                 log.warn("The user with idTag '{}' is ALREADY in another transaction.", idTag);
                 idTagInfo.setStatus(AuthorizationStatus.CONCURRENT_TX);
 
@@ -57,7 +57,7 @@ public class UserServiceImpl implements UserService {
                 log.error("The user with idTag '{}' is BLOCKED.", idTag);
                 idTagInfo.setStatus(AuthorizationStatus.BLOCKED);
 
-            } else if (record.getExpirydate() != null && DateTime.now().isAfter(record.getExpirydate())) {
+            } else if (record.getExpiryDate() != null && DateTime.now().isAfter(record.getExpiryDate())) {
                 log.error("The user with idTag '{}' is EXPIRED.", idTag);
                 idTagInfo.setStatus(AuthorizationStatus.EXPIRED);
 
@@ -67,7 +67,7 @@ public class UserServiceImpl implements UserService {
 
                 int hours = settingsRepository.getHoursToExpire();
                 idTagInfo.setExpiryDate(DateTime.now().plusHours(hours));
-                idTagInfo.setParentIdTag(record.getParentidtag());
+                idTagInfo.setParentIdTag(record.getParentIdTag());
             }
         }
         return idTagInfo;
@@ -82,7 +82,7 @@ public class UserServiceImpl implements UserService {
             log.error("The user with idTag '{}' is INVALID (not present in DB).", idTag);
             idTagInfo.setStatus(ocpp.cs._2012._06.AuthorizationStatus.INVALID);
         } else {
-            if (record.getIntransaction()) {
+            if (record.getInTransaction()) {
                 log.warn("The user with idTag '{}' is ALREADY in another transaction.", idTag);
                 idTagInfo.setStatus(ocpp.cs._2012._06.AuthorizationStatus.CONCURRENT_TX);
 
@@ -90,7 +90,7 @@ public class UserServiceImpl implements UserService {
                 log.error("The user with idTag '{}' is BLOCKED.", idTag);
                 idTagInfo.setStatus(ocpp.cs._2012._06.AuthorizationStatus.BLOCKED);
 
-            } else if (record.getExpirydate() != null && DateTime.now().isAfter(record.getExpirydate())) {
+            } else if (record.getExpiryDate() != null && DateTime.now().isAfter(record.getExpiryDate())) {
                 log.error("The user with idTag '{}' is EXPIRED.", idTag);
                 idTagInfo.setStatus(ocpp.cs._2012._06.AuthorizationStatus.EXPIRED);
 
@@ -100,7 +100,7 @@ public class UserServiceImpl implements UserService {
 
                 int hours = settingsRepository.getHoursToExpire();
                 idTagInfo.setExpiryDate(DateTime.now().plusHours(hours));
-                idTagInfo.setParentIdTag(record.getParentidtag());
+                idTagInfo.setParentIdTag(record.getParentIdTag());
             }
         }
         return idTagInfo;
@@ -122,15 +122,15 @@ public class UserServiceImpl implements UserService {
         @Override
         public AuthorisationData map(UserRecord record) {
 
-            String idTag = record.getIdtag();
-            String parentIdTag = record.getParentidtag();
-            DateTime expiryDate = record.getExpirydate();
+            String idTag = record.getIdTag();
+            String parentIdTag = record.getParentIdTag();
+            DateTime expiryDate = record.getExpiryDate();
 
             // Create IdTagInfo of an idTag
             ocpp.cp._2012._06.IdTagInfo idTagInfo = new ocpp.cp._2012._06.IdTagInfo();
             ocpp.cp._2012._06.AuthorizationStatus authStatus;
 
-            if (record.getIntransaction()) {
+            if (record.getInTransaction()) {
                 authStatus = ocpp.cp._2012._06.AuthorizationStatus.CONCURRENT_TX;
 
             } else if (record.getBlocked()) {

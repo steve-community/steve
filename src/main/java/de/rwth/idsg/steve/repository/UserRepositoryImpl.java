@@ -44,31 +44,31 @@ public class UserRepositoryImpl implements UserRepository {
         SelectQuery selectQuery = DSL.using(config).selectQuery();
         selectQuery.addFrom(USER);
         selectQuery.addSelect(
-                USER.IDTAG,
-                USER.PARENTIDTAG,
-                USER.EXPIRYDATE,
-                USER.INTRANSACTION,
+                USER.ID_TAG,
+                USER.PARENT_ID_TAG,
+                USER.EXPIRY_DATE,
+                USER.IN_TRANSACTION,
                 USER.BLOCKED,
                 USER.NOTE
         );
 
         if (form.isUserIdSet()) {
-            selectQuery.addConditions(USER.IDTAG.eq(form.getUserId()));
+            selectQuery.addConditions(USER.ID_TAG.eq(form.getUserId()));
         }
 
         if (form.isParentIdSet()) {
-            selectQuery.addConditions(USER.PARENTIDTAG.eq(form.getParentId()));
+            selectQuery.addConditions(USER.PARENT_ID_TAG.eq(form.getParentId()));
         }
 
         switch (form.getExpired()) {
             case TRUE:
-                selectQuery.addConditions(USER.EXPIRYDATE.lessOrEqual(CustomDSL.utcTimestamp()));
+                selectQuery.addConditions(USER.EXPIRY_DATE.lessOrEqual(CustomDSL.utcTimestamp()));
                 break;
 
             case ALL:
             case FALSE:
                 selectQuery.addConditions(
-                        USER.EXPIRYDATE.isNull().or(USER.EXPIRYDATE.greaterThan(CustomDSL.utcTimestamp()))
+                        USER.EXPIRY_DATE.isNull().or(USER.EXPIRY_DATE.greaterThan(CustomDSL.utcTimestamp()))
                 );
                 break;
 
@@ -76,7 +76,7 @@ public class UserRepositoryImpl implements UserRepository {
                 throw new SteveException("Unknown enum type");
         }
 
-        processBooleanType(selectQuery, USER.INTRANSACTION, form.getInTransaction());
+        processBooleanType(selectQuery, USER.IN_TRANSACTION, form.getInTransaction());
         processBooleanType(selectQuery, USER.BLOCKED, form.getBlocked());
 
         return selectQuery.fetch().map(new UserMapper());
@@ -93,7 +93,7 @@ public class UserRepositoryImpl implements UserRepository {
     public Result<UserRecord> getUserRecords(List<String> idTagList) {
         return DSL.using(config)
                   .selectFrom(USER)
-                  .where(USER.IDTAG.in(idTagList))
+                  .where(USER.ID_TAG.in(idTagList))
                   .fetch();
     }
 
@@ -101,44 +101,44 @@ public class UserRepositoryImpl implements UserRepository {
     public UserRecord getUserRecord(String idTag) {
         return DSL.using(config)
                   .selectFrom(USER)
-                  .where(USER.IDTAG.equal(idTag))
+                  .where(USER.ID_TAG.equal(idTag))
                   .fetchOne();
     }
 
     @Override
     public List<String> getUserIdTags() {
         return DSL.using(config)
-                .select(USER.IDTAG)
+                .select(USER.ID_TAG)
                 .from(USER)
-                .fetch(USER.IDTAG);
+                .fetch(USER.ID_TAG);
     }
 
     @Override
     public List<String> getActiveUserIdTags() {
         return DSL.using(config)
-                  .select(USER.IDTAG)
+                  .select(USER.ID_TAG)
                   .from(USER)
-                  .where(USER.INTRANSACTION.isFalse())
+                  .where(USER.IN_TRANSACTION.isFalse())
                     .and(USER.BLOCKED.isFalse())
-                    .and(USER.EXPIRYDATE.isNull().or(USER.EXPIRYDATE.greaterThan(CustomDSL.utcTimestamp())))
-                  .fetch(USER.IDTAG);
+                    .and(USER.EXPIRY_DATE.isNull().or(USER.EXPIRY_DATE.greaterThan(CustomDSL.utcTimestamp())))
+                  .fetch(USER.ID_TAG);
     }
 
     @Override
     public List<String> getParentIdTags() {
         return DSL.using(config)
-                  .selectDistinct(USER.PARENTIDTAG)
+                  .selectDistinct(USER.PARENT_ID_TAG)
                   .from(USER)
-                  .where(USER.PARENTIDTAG.isNotNull())
-                  .fetch(USER.PARENTIDTAG);
+                  .where(USER.PARENT_ID_TAG.isNotNull())
+                  .fetch(USER.PARENT_ID_TAG);
     }
 
     @Override
     public String getParentIdtag(String idTag) {
         return DSL.using(config)
-                  .select(USER.PARENTIDTAG)
+                  .select(USER.PARENT_ID_TAG)
                   .from(USER)
-                  .where(USER.IDTAG.eq(idTag))
+                  .where(USER.ID_TAG.eq(idTag))
                   .fetchOne()
                   .value1();
     }
@@ -148,11 +148,11 @@ public class UserRepositoryImpl implements UserRepository {
         try {
             int count = DSL.using(config)
                            .insertInto(USER,
-                                   USER.IDTAG,
-                                   USER.PARENTIDTAG,
-                                   USER.EXPIRYDATE,
+                                   USER.ID_TAG,
+                                   USER.PARENT_ID_TAG,
+                                   USER.EXPIRY_DATE,
                                    USER.NOTE,
-                                   USER.INTRANSACTION,
+                                   USER.IN_TRANSACTION,
                                    USER.BLOCKED)
                            .values(u.getIdTag(), u.getParentIdTag(), toDateTime(u.getExpiration()), u.getNote(),
                                    false, false)
@@ -172,11 +172,11 @@ public class UserRepositoryImpl implements UserRepository {
         try {
             DSL.using(config)
                .update(USER)
-               .set(USER.PARENTIDTAG, u.getParentIdTag())
-               .set(USER.EXPIRYDATE, toDateTime(u.getExpiration()))
+               .set(USER.PARENT_ID_TAG, u.getParentIdTag())
+               .set(USER.EXPIRY_DATE, toDateTime(u.getExpiration()))
                .set(USER.NOTE, u.getNote())
                .set(USER.BLOCKED, u.getBlocked())
-               .where(USER.IDTAG.equal(u.getIdTag()))
+               .where(USER.ID_TAG.equal(u.getIdTag()))
                .execute();
         } catch (DataAccessException e) {
             throw new SteveException("Execution of updateUser for idTag '%s' FAILED.", u.getIdTag(), e);
@@ -188,7 +188,7 @@ public class UserRepositoryImpl implements UserRepository {
         try {
             DSL.using(config)
                .delete(USER)
-               .where(USER.IDTAG.equal(idTag))
+               .where(USER.ID_TAG.equal(idTag))
                .execute();
         } catch (DataAccessException e) {
             throw new SteveException("Execution of deleteUser for idTag '%s' FAILED.", idTag, e);

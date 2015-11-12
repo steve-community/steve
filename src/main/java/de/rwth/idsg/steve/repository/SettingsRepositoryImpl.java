@@ -34,19 +34,19 @@ public class SettingsRepositoryImpl implements SettingsRepository {
         SettingsRecord r = getInternal();
 
         return Settings.builder()
-                       .hoursToExpire(r.getHourstoexpire())
-                       .heartbeatIntervalInMinutes(toMin(r.getHeartbeatintervalinseconds()))
+                       .hoursToExpire(r.getHoursToExpire())
+                       .heartbeatIntervalInMinutes(toMin(r.getHeartbeatIntervalInSeconds()))
                        .build();
     }
 
     @Override
     public int getHeartbeatIntervalInSeconds() {
-        return getInternal().getHeartbeatintervalinseconds();
+        return getInternal().getHeartbeatIntervalInSeconds();
     }
 
     @Override
     public int getHoursToExpire() {
-        return getInternal().getHourstoexpire();
+        return getInternal().getHoursToExpire();
     }
 
     @Override
@@ -54,9 +54,9 @@ public class SettingsRepositoryImpl implements SettingsRepository {
         try {
             DSL.using(config)
                .update(SETTINGS)
-               .set(SETTINGS.HEARTBEATINTERVALINSECONDS, toSec(form.getHeartbeat()))
-               .set(SETTINGS.HOURSTOEXPIRE, form.getExpiration())
-               .where(SETTINGS.APPID.eq(APP_ID))
+               .set(SETTINGS.HEARTBEAT_INTERVAL_IN_SECONDS, toSec(form.getHeartbeat()))
+               .set(SETTINGS.HOURS_TO_EXPIRE, form.getExpiration())
+               .where(SETTINGS.APP_ID.eq(APP_ID))
                .execute();
         } catch (DataAccessException e) {
             throw new SteveException("FAILED to save the settings", e);
@@ -66,7 +66,7 @@ public class SettingsRepositoryImpl implements SettingsRepository {
     private SettingsRecord getInternal() {
         return DSL.using(config)
                   .selectFrom(SETTINGS)
-                  .where(SETTINGS.APPID.eq(APP_ID))
+                  .where(SETTINGS.APP_ID.eq(APP_ID))
                   .fetchOne();
     }
 

@@ -62,24 +62,24 @@ public class TransactionRepositoryImpl implements TransactionRepository {
         selectQuery.addJoin(CONNECTOR, TRANSACTION.CONNECTOR_PK.eq(CONNECTOR.CONNECTOR_PK));
         selectQuery.addSelect(
                 TRANSACTION.TRANSACTION_PK,
-                CONNECTOR.CHARGEBOXID,
-                CONNECTOR.CONNECTORID,
-                TRANSACTION.IDTAG,
-                TRANSACTION.STARTTIMESTAMP,
-                TRANSACTION.STARTVALUE,
-                TRANSACTION.STOPTIMESTAMP,
-                TRANSACTION.STOPVALUE);
+                CONNECTOR.CHARGE_BOX_ID,
+                CONNECTOR.CONNECTOR_ID,
+                TRANSACTION.ID_TAG,
+                TRANSACTION.START_TIMESTAMP,
+                TRANSACTION.START_VALUE,
+                TRANSACTION.STOP_TIMESTAMP,
+                TRANSACTION.STOP_VALUE);
 
         if (form.isChargeBoxIdSet()) {
-            selectQuery.addConditions(CONNECTOR.CHARGEBOXID.eq(form.getChargeBoxId()));
+            selectQuery.addConditions(CONNECTOR.CHARGE_BOX_ID.eq(form.getChargeBoxId()));
         }
 
         if (form.isUserIdSet()) {
-            selectQuery.addConditions(TRANSACTION.IDTAG.eq(form.getUserId()));
+            selectQuery.addConditions(TRANSACTION.ID_TAG.eq(form.getUserId()));
         }
 
         if (form.getType() == TransactionQueryForm.QueryType.ACTIVE) {
-            selectQuery.addConditions(TRANSACTION.STOPTIMESTAMP.isNull());
+            selectQuery.addConditions(TRANSACTION.STOP_TIMESTAMP.isNull());
         }
 
         processType(selectQuery, form);
@@ -97,8 +97,8 @@ public class TransactionRepositoryImpl implements TransactionRepository {
                   .from(TRANSACTION)
                   .join(CONNECTOR)
                     .on(TRANSACTION.CONNECTOR_PK.equal(CONNECTOR.CONNECTOR_PK))
-                    .and(CONNECTOR.CHARGEBOXID.equal(chargeBoxId))
-                  .where(TRANSACTION.STOPTIMESTAMP.isNull())
+                    .and(CONNECTOR.CHARGE_BOX_ID.equal(chargeBoxId))
+                  .where(TRANSACTION.STOP_TIMESTAMP.isNull())
                   .fetch(TRANSACTION.TRANSACTION_PK);
     }
 
@@ -110,7 +110,7 @@ public class TransactionRepositoryImpl implements TransactionRepository {
         switch (form.getPeriodType()) {
             case TODAY:
                 selectQuery.addConditions(
-                        date(TRANSACTION.STARTTIMESTAMP).eq(date(CustomDSL.utcTimestamp()))
+                        date(TRANSACTION.START_TIMESTAMP).eq(date(CustomDSL.utcTimestamp()))
                 );
                 break;
 
@@ -119,7 +119,7 @@ public class TransactionRepositoryImpl implements TransactionRepository {
             case LAST_90:
                 DateTime now = DateTime.now();
                 selectQuery.addConditions(
-                        date(TRANSACTION.STARTTIMESTAMP).between(
+                        date(TRANSACTION.START_TIMESTAMP).between(
                                 date(now.minusDays(form.getPeriodType().getInterval())),
                                 date(now)
                         )
@@ -131,7 +131,7 @@ public class TransactionRepositoryImpl implements TransactionRepository {
 
             case FROM_TO:
                 selectQuery.addConditions(
-                        TRANSACTION.STARTTIMESTAMP.between(form.getFrom().toDateTime(), form.getTo().toDateTime())
+                        TRANSACTION.START_TIMESTAMP.between(form.getFrom().toDateTime(), form.getTo().toDateTime())
                 );
                 break;
 

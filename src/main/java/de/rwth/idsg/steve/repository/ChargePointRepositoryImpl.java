@@ -9,7 +9,7 @@ import de.rwth.idsg.steve.repository.dto.ConnectorStatus;
 import de.rwth.idsg.steve.repository.dto.Heartbeat;
 import de.rwth.idsg.steve.utils.DateTimeUtils;
 import de.rwth.idsg.steve.web.dto.ChargeBoxForm;
-import jooq.steve.db.tables.records.ChargeboxRecord;
+import jooq.steve.db.tables.records.ChargeBoxRecord;
 import lombok.extern.slf4j.Slf4j;
 import org.joda.time.DateTime;
 import org.jooq.Configuration;
@@ -23,7 +23,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-import static jooq.steve.db.tables.Chargebox.CHARGEBOX;
+import static jooq.steve.db.tables.ChargeBox.CHARGE_BOX;
 import static jooq.steve.db.tables.Connector.CONNECTOR;
 import static jooq.steve.db.tables.ConnectorStatus.CONNECTOR_STATUS;
 
@@ -43,8 +43,8 @@ public class ChargePointRepositoryImpl implements ChargePointRepository {
     public boolean isRegistered(String chargeBoxId) {
         Integer r = DSL.using(config)
                        .selectOne()
-                       .from(CHARGEBOX)
-                       .where(CHARGEBOX.CHARGEBOXID.eq(chargeBoxId))
+                       .from(CHARGE_BOX)
+                       .where(CHARGE_BOX.CHARGE_BOX_ID.eq(chargeBoxId))
                        .fetchOne()
                        .value1();
 
@@ -56,10 +56,10 @@ public class ChargePointRepositoryImpl implements ChargePointRepository {
         final OcppTransport transport = protocol.getTransport();
 
         return DSL.using(config)
-                  .select(CHARGEBOX.CHARGEBOXID, CHARGEBOX.ENDPOINT_ADDRESS)
-                  .from(CHARGEBOX)
-                  .where(CHARGEBOX.OCPPPROTOCOL.equal(protocol.getCompositeValue()))
-                  .and(CHARGEBOX.ENDPOINT_ADDRESS.isNotNull())
+                  .select(CHARGE_BOX.CHARGE_BOX_ID, CHARGE_BOX.ENDPOINT_ADDRESS)
+                  .from(CHARGE_BOX)
+                  .where(CHARGE_BOX.OCPP_PROTOCOL.equal(protocol.getCompositeValue()))
+                  .and(CHARGE_BOX.ENDPOINT_ADDRESS.isNotNull())
                   .fetch()
                   .map(r -> new ChargePointSelect(transport, r.value1(), r.value2()));
     }
@@ -67,37 +67,37 @@ public class ChargePointRepositoryImpl implements ChargePointRepository {
     @Override
     public List<String> getChargeBoxIds() {
         return DSL.using(config)
-                  .select(CHARGEBOX.CHARGEBOXID)
-                  .from(CHARGEBOX)
-                  .fetch(CHARGEBOX.CHARGEBOXID);
+                  .select(CHARGE_BOX.CHARGE_BOX_ID)
+                  .from(CHARGE_BOX)
+                  .fetch(CHARGE_BOX.CHARGE_BOX_ID);
     }
 
     @Override
     public ChargePoint getDetails(String chargeBoxId) {
-        ChargeboxRecord r = DSL.using(config)
-                               .selectFrom(CHARGEBOX)
-                               .where(CHARGEBOX.CHARGEBOXID.equal(chargeBoxId))
+        ChargeBoxRecord r = DSL.using(config)
+                               .selectFrom(CHARGE_BOX)
+                               .where(CHARGE_BOX.CHARGE_BOX_ID.equal(chargeBoxId))
                                .fetchOne();
 
         // TODO: Sweet baby jesus. Is there a better way?
         return ChargePoint.builder()
-                          .chargeBoxId(r.getChargeboxid())
+                          .chargeBoxId(r.getChargeBoxId())
                           .endpointAddress(r.getEndpointAddress())
-                          .ocppProtocol(r.getOcppprotocol())
-                          .chargePointVendor(r.getChargepointvendor())
-                          .chargePointModel(r.getChargepointmodel())
-                          .chargePointSerialNumber(r.getChargepointserialnumber())
-                          .chargeBoxSerialNumber(r.getChargeboxserialnumber())
-                          .firewireVersion(r.getFwversion())
-                          .firewireUpdateStatus(r.getFwupdatestatus())
-                          .firewireUpdateTimestamp(DateTimeUtils.humanize(r.getFwupdatetimestamp()))
+                          .ocppProtocol(r.getOcppProtocol())
+                          .chargePointVendor(r.getChargePointVendor())
+                          .chargePointModel(r.getChargePointModel())
+                          .chargePointSerialNumber(r.getChargePointSerialNumber())
+                          .chargeBoxSerialNumber(r.getChargeBoxSerialNumber())
+                          .firewireVersion(r.getFwVersion())
+                          .firewireUpdateStatus(r.getFwUpdateStatus())
+                          .firewireUpdateTimestamp(DateTimeUtils.humanize(r.getFwUpdateTimestamp()))
                           .iccid(r.getIccid())
                           .imsi(r.getImsi())
-                          .meterType(r.getMetertype())
-                          .meterSerialNumber(r.getMeterserialnumber())
-                          .diagnosticsStatus(r.getDiagnosticsstatus())
-                          .diagnosticsTimestamp(DateTimeUtils.humanize(r.getDiagnosticstimestamp()))
-                          .lastHeartbeatTimestamp(DateTimeUtils.humanize(r.getLastheartbeattimestamp()))
+                          .meterType(r.getMeterType())
+                          .meterSerialNumber(r.getMeterSerialNumber())
+                          .diagnosticsStatus(r.getDiagnosticsStatus())
+                          .diagnosticsTimestamp(DateTimeUtils.humanize(r.getDiagnosticsTimestamp()))
+                          .lastHeartbeatTimestamp(DateTimeUtils.humanize(r.getLastHeartbeatTimestamp()))
                           .note(r.getNote())
                           .build();
     }
@@ -105,10 +105,10 @@ public class ChargePointRepositoryImpl implements ChargePointRepository {
     @Override
     public ChargePoint getDetailsForUpdate(String chargeBoxId) {
         String note = DSL.using(config)
-                         .select(CHARGEBOX.NOTE)
-                         .from(CHARGEBOX)
-                         .where(CHARGEBOX.CHARGEBOXID.equal(chargeBoxId))
-                         .fetchOne(CHARGEBOX.NOTE);
+                         .select(CHARGE_BOX.NOTE)
+                         .from(CHARGE_BOX)
+                         .where(CHARGE_BOX.CHARGE_BOX_ID.equal(chargeBoxId))
+                         .fetchOne(CHARGE_BOX.NOTE);
 
         return ChargePoint.builder()
                           .note(note)
@@ -118,9 +118,9 @@ public class ChargePointRepositoryImpl implements ChargePointRepository {
     @Override
     public List<Heartbeat> getChargePointHeartbeats() {
         return DSL.using(config)
-                  .select(CHARGEBOX.CHARGEBOXID, CHARGEBOX.LASTHEARTBEATTIMESTAMP)
-                  .from(CHARGEBOX)
-                  .orderBy(CHARGEBOX.LASTHEARTBEATTIMESTAMP.desc())
+                  .select(CHARGE_BOX.CHARGE_BOX_ID, CHARGE_BOX.LAST_HEARTBEAT_TIMESTAMP)
+                  .from(CHARGE_BOX)
+                  .orderBy(CHARGE_BOX.LAST_HEARTBEAT_TIMESTAMP.desc())
                   .fetch()
                   .map(r -> Heartbeat.builder()
                                      .chargeBoxId(r.value1())
@@ -133,22 +133,22 @@ public class ChargePointRepositoryImpl implements ChargePointRepository {
     public List<ConnectorStatus> getChargePointConnectorStatus() {
         // Prepare for the inner select of the second join
         Field<Integer> t1Pk = CONNECTOR_STATUS.CONNECTOR_PK.as("t1_pk");
-        Field<DateTime> t1Max = DSL.max(CONNECTOR_STATUS.STATUSTIMESTAMP).as("t1_max");
+        Field<DateTime> t1Max = DSL.max(CONNECTOR_STATUS.STATUS_TIMESTAMP).as("t1_max");
         TableLike<?> t1 = DSL.select(t1Pk, t1Max)
                              .from(CONNECTOR_STATUS)
                              .groupBy(CONNECTOR_STATUS.CONNECTOR_PK)
                              .asTable("t1");
 
         return DSL.using(config)
-                  .select(CONNECTOR.CHARGEBOXID, CONNECTOR.CONNECTORID,
-                          CONNECTOR_STATUS.STATUSTIMESTAMP, CONNECTOR_STATUS.STATUS, CONNECTOR_STATUS.ERRORCODE)
+                  .select(CONNECTOR.CHARGE_BOX_ID, CONNECTOR.CONNECTOR_ID,
+                          CONNECTOR_STATUS.STATUS_TIMESTAMP, CONNECTOR_STATUS.STATUS, CONNECTOR_STATUS.ERROR_CODE)
                   .from(CONNECTOR_STATUS)
                   .join(CONNECTOR)
                   .onKey()
                   .join(t1)
                   .on(CONNECTOR_STATUS.CONNECTOR_PK.equal(t1.field(t1Pk)))
-                  .and(CONNECTOR_STATUS.STATUSTIMESTAMP.equal(t1.field(t1Max)))
-                  .orderBy(CONNECTOR_STATUS.STATUSTIMESTAMP.desc())
+                  .and(CONNECTOR_STATUS.STATUS_TIMESTAMP.equal(t1.field(t1Max)))
+                  .orderBy(CONNECTOR_STATUS.STATUS_TIMESTAMP.desc())
                   .fetch()
                   .map(r -> ConnectorStatus.builder()
                                            .chargeBoxId(r.value1())
@@ -163,18 +163,18 @@ public class ChargePointRepositoryImpl implements ChargePointRepository {
     @Override
     public List<Integer> getConnectorIds(String chargeBoxId) {
         return DSL.using(config)
-                  .select(CONNECTOR.CONNECTORID)
+                  .select(CONNECTOR.CONNECTOR_ID)
                   .from(CONNECTOR)
-                  .where(CONNECTOR.CHARGEBOXID.equal(chargeBoxId))
-                  .fetch(CONNECTOR.CONNECTORID);
+                  .where(CONNECTOR.CHARGE_BOX_ID.equal(chargeBoxId))
+                  .fetch(CONNECTOR.CONNECTOR_ID);
     }
 
     @Override
     public void addChargePoint(ChargeBoxForm form) {
         try {
             int count = DSL.using(config)
-                           .insertInto(CHARGEBOX,
-                                   CHARGEBOX.CHARGEBOXID, CHARGEBOX.NOTE)
+                           .insertInto(CHARGE_BOX,
+                                   CHARGE_BOX.CHARGE_BOX_ID, CHARGE_BOX.NOTE)
                            .values(form.getChargeBoxId(), form.getNote())
                            .onDuplicateKeyIgnore() // Important detail
                            .execute();
@@ -193,9 +193,9 @@ public class ChargePointRepositoryImpl implements ChargePointRepository {
     public void updateChargePoint(ChargeBoxForm form) {
         try {
             DSL.using(config)
-               .update(CHARGEBOX)
-               .set(CHARGEBOX.NOTE, form.getNote())
-               .where(CHARGEBOX.CHARGEBOXID.equal(form.getChargeBoxId()))
+               .update(CHARGE_BOX)
+               .set(CHARGE_BOX.NOTE, form.getNote())
+               .where(CHARGE_BOX.CHARGE_BOX_ID.equal(form.getChargeBoxId()))
                .execute();
         } catch (DataAccessException e) {
             throw new SteveException("The charge point with chargeBoxId '%s' could NOT be updated.",
@@ -207,8 +207,8 @@ public class ChargePointRepositoryImpl implements ChargePointRepository {
     public void deleteChargePoint(String chargeBoxId) {
         try {
             DSL.using(config)
-               .delete(CHARGEBOX)
-               .where(CHARGEBOX.CHARGEBOXID.equal(chargeBoxId))
+               .delete(CHARGE_BOX)
+               .where(CHARGE_BOX.CHARGE_BOX_ID.equal(chargeBoxId))
                .execute();
         } catch (DataAccessException e) {
             throw new SteveException("The charge point with chargeBoxId '%s' could NOT be deleted.", chargeBoxId, e);

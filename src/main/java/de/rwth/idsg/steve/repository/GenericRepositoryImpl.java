@@ -3,7 +3,7 @@ package de.rwth.idsg.steve.repository;
 import de.rwth.idsg.steve.repository.dto.DbVersion;
 import de.rwth.idsg.steve.utils.DateTimeUtils;
 import de.rwth.idsg.steve.web.dto.Statistics;
-import jooq.steve.db.routines.Getstats;
+import jooq.steve.db.routines.GetStats;
 import lombok.extern.slf4j.Slf4j;
 import org.joda.time.DateTime;
 import org.jooq.Configuration;
@@ -33,21 +33,21 @@ public class GenericRepositoryImpl implements GenericRepository {
     public Statistics getStats() {
 
         // getStats is the stored procedure in our MySQL DB
-        Getstats gs = new Getstats();
+        GetStats gs = new GetStats();
         gs.execute(config);
 
         return Statistics.builder()
-                         .numChargeBoxes(gs.getNumchargeboxes())
-                         .numUsers(gs.getNumusers())
-                         .numReservations(gs.getNumreservs())
-                         .numTransactions(gs.getNumtranses())
-                         .heartbeatToday(gs.getHeartbeattoday())
-                         .heartbeatYesterday(gs.getHeartbeatyester())
-                         .heartbeatEarlier(gs.getHeartbeatearl())
-                         .connAvailable(gs.getConnavail())
-                         .connOccupied(gs.getConnocc())
-                         .connFaulted(gs.getConnfault())
-                         .connUnavailable(gs.getConnunavail())
+                         .numChargeBoxes(gs.getNumChargeBoxes())
+                         .numUsers(gs.getNumUsers())
+                         .numReservations(gs.getNumReservations())
+                         .numTransactions(gs.getNumTransactions())
+                         .heartbeatToday(gs.getHeartbeatsToday())
+                         .heartbeatYesterday(gs.getHeartbeatsYesterday())
+                         .heartbeatEarlier(gs.getHeartbeatsEarlier())
+                         .connAvailable(gs.getConnectorsAvailable())
+                         .connOccupied(gs.getConnectorsOccupied())
+                         .connFaulted(gs.getConnectorsFaulted())
+                         .connUnavailable(gs.getConnectorsUnavailable())
                          .build();
     }
 

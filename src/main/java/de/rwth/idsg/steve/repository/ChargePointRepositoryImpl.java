@@ -14,6 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.joda.time.DateTime;
 import org.jooq.Configuration;
 import org.jooq.Field;
+import org.jooq.Record1;
 import org.jooq.TableLike;
 import org.jooq.exception.DataAccessException;
 import org.jooq.impl.DSL;
@@ -41,14 +42,13 @@ public class ChargePointRepositoryImpl implements ChargePointRepository {
 
     @Override
     public boolean isRegistered(String chargeBoxId) {
-        Integer r = DSL.using(config)
-                       .selectOne()
-                       .from(CHARGE_BOX)
-                       .where(CHARGE_BOX.CHARGE_BOX_ID.eq(chargeBoxId))
-                       .fetchOne()
-                       .value1();
+        Record1<Integer> r = DSL.using(config)
+                                .selectOne()
+                                .from(CHARGE_BOX)
+                                .where(CHARGE_BOX.CHARGE_BOX_ID.eq(chargeBoxId))
+                                .fetchOne();
 
-        return (r != null) && (r == 1);
+        return (r != null) && (r.value1() == 1);
     }
 
     @Override

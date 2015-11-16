@@ -217,6 +217,7 @@
                             <extraarg>-xjc-Xfluent-api</extraarg>
                             <extraarg>-xjc-Xinheritance</extraarg>
                             <extraarg>-xjc-Xannotate</extraarg>
+                            <extraarg>-xjc-XtoString</extraarg>
                             <extraarg>-verbose</extraarg>
                             <extraarg>-exsh</extraarg>
                             <extraarg>true</extraarg>
@@ -383,6 +384,11 @@
 
     <dependencies>
 
+        <dependency>
+            <groupId>org.jvnet.jaxb2_commons</groupId>
+            <artifactId>jaxb2-basics-runtime</artifactId>
+            <version>0.9.0</version>
+        </dependency>
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>

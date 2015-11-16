@@ -6,6 +6,7 @@ import de.rwth.idsg.steve.ocpp.ws.custom.AlwaysLastStrategy;
 import de.rwth.idsg.steve.ocpp.ws.custom.RoundRobinStrategy;
 import de.rwth.idsg.steve.ocpp.ws.custom.WsSessionSelectStrategy;
 import org.apache.cxf.Bus;
+import org.apache.cxf.bus.spring.SpringBus;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.logging.Slf4jLogger;
 import org.apache.cxf.feature.LoggingFeature;
@@ -17,7 +18,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.ImportResource;
 
 import javax.annotation.PostConstruct;
 import java.util.List;
@@ -34,14 +34,12 @@ import static java.util.Collections.singletonList;
  * @since 18.11.2014
  */
 @Configuration
-@ImportResource({"classpath:META-INF/cxf/cxf.xml"})
 public class OcppConfiguration {
 
     static {
         LogUtils.setLoggerClass(Slf4jLogger.class);
     }
 
-    @Autowired private Bus bus;
     @Autowired private ocpp.cs._2010._08.CentralSystemService ocpp12Server;
     @Autowired private ocpp.cs._2012._06.CentralSystemService ocpp15Server;
 
@@ -51,9 +49,6 @@ public class OcppConfiguration {
 
     @PostConstruct
     public void init() {
-        // Log incoming/outgoing messages
-        bus.getFeatures().add(new LoggingFeature());
-
         List<Interceptor<? extends Message>> route = singletonList(new MediatorInInterceptor());
         List<Interceptor<? extends Message>> interceptors = asList(new MessageIdInterceptor(), fromAddressInterceptor);
 
@@ -62,6 +57,19 @@ public class OcppConfiguration {
 
         createOcppService(ocpp12Server, "/CentralSystemServiceOCPP12", interceptors);
         createOcppService(ocpp15Server, "/CentralSystemServiceOCPP15", interceptors);
+    }
+
+    /**
+     * Help by: http://stackoverflow.com/a/31988136
+     *
+     * logFeature.initialize(springBus) is not needed, because during the init of bus it will call f.initialize(this)
+     * in {@link org.apache.cxf.bus.extension.ExtensionManagerBus#initializeFeatures()} anyway
+     */
+    @Bean(name = Bus.DEFAULT_BUS_ID, destroyMethod = "shutdown")
+    public SpringBus springBus() {
+        SpringBus bus = new SpringBus();
+        bus.getFeatures().add(new LoggingFeature()); // Log incoming/outgoing messages
+        return bus;
     }
 
     @Bean
@@ -79,7 +87,7 @@ public class OcppConfiguration {
     private void createOcppService(Object serviceBean, String address,
                                    List<Interceptor<? extends Message>> interceptors) {
         JaxWsServerFactoryBean f = new JaxWsServerFactoryBean();
-        f.setBus(bus);
+        f.setBus(springBus());
         f.setServiceBean(serviceBean);
         f.setAddress(address);
         f.getInInterceptors().addAll(interceptors);

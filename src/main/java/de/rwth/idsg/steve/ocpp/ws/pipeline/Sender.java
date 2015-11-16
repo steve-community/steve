@@ -6,6 +6,7 @@ import de.rwth.idsg.steve.ocpp.ws.data.OcppJsonCall;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.TextMessage;
+import org.springframework.web.socket.WebSocketSession;
 
 import java.io.IOException;
 
@@ -20,11 +21,14 @@ public class Sender implements Stage {
     @Override
     public void process(CommunicationContext context) {
         String outgoingString = context.getOutgoingString();
-        TextMessage out = new TextMessage(outgoingString);
-        log.debug("Sending message: {}", outgoingString);
+        String chargeBoxId = context.getChargeBoxId();
+        WebSocketSession session = context.getSession();
 
+        log.info("[chargeBoxId={}, sessionId={}] Sending message: {}", chargeBoxId, session.getId(), outgoingString);
+
+        TextMessage out = new TextMessage(outgoingString);
         try {
-            context.getSession().sendMessage(out);
+            session.sendMessage(out);
         } catch (IOException e) {
 
             // Do NOT swallow exceptions for outgoing CALLs. For others just log.

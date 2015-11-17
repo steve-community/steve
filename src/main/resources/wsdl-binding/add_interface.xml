@@ -2,8 +2,9 @@
                 xmlns:xs="http://www.w3.org/2001/XMLSchema"
                 xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
                 xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+                xmlns:annox="http://annox.dev.java.net"
                 xmlns:inheritance="http://jaxb2-commons.dev.java.net/basic/inheritance"
-                jaxb:extensionBindingPrefixes="inheritance">
+                jaxb:extensionBindingPrefixes="inheritance annox">
 
     <!-- ============================ -->
     <!-- Central System is the server -->
@@ -12,6 +13,11 @@
     <!-- OCPP 1.5 -->
     <jaxws:bindings wsdlLocation="wsdl/ocpp_centralsystemservice_1.5_final.wsdl">
         <jaxws:bindings node="wsdl:definitions/wsdl:types/xs:schema">
+
+            <jaxb:bindings node="//xs:complexType">
+                <annox:annotateClass>@lombok.ToString</annox:annotateClass>
+            </jaxb:bindings>
+
             <jaxb:bindings multiple="true"
                            node="xs:complexType[
                 @name='BootNotificationRequest' or
@@ -46,6 +52,11 @@
     <!-- OCPP 1.2 -->
     <jaxws:bindings wsdlLocation="wsdl/centralsystemservice_0.wsdl">
         <jaxws:bindings node="wsdl:definitions/wsdl:types/xs:schema">
+
+            <jaxb:bindings node="//xs:complexType">
+                <annox:annotateClass>@lombok.ToString</annox:annotateClass>
+            </jaxb:bindings>
+
             <jaxb:bindings multiple="true"
                            node="xs:complexType[
                 @name='AuthorizeRequest' or
@@ -82,6 +93,11 @@
     <!-- OCPP 1.2 -->
     <jaxws:bindings wsdlLocation="wsdl/chargepointservice.wsdl">
         <jaxws:bindings node="wsdl:definitions/wsdl:types/xs:schema">
+
+            <jaxb:bindings node="//xs:complexType">
+                <annox:annotateClass>@lombok.ToString</annox:annotateClass>
+            </jaxb:bindings>
+
             <jaxb:bindings multiple="true"
                            node="xs:complexType[
                 @name='UnlockConnectorRequest' or
@@ -114,6 +130,11 @@
     <!-- OCPP 1.5 -->
     <jaxws:bindings wsdlLocation="wsdl/ocpp_chargepointservice_1.5_final.wsdl">
         <jaxws:bindings node="wsdl:definitions/wsdl:types/xs:schema">
+
+            <jaxb:bindings node="//xs:complexType">
+                <annox:annotateClass>@lombok.ToString</annox:annotateClass>
+            </jaxb:bindings>
+
             <jaxb:bindings multiple="true"
                            node="xs:complexType[
                 @name='UnlockConnectorRequest' or

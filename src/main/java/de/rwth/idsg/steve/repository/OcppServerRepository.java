@@ -1,6 +1,8 @@
 package de.rwth.idsg.steve.repository;
 
-import de.rwth.idsg.steve.ocpp.OcppProtocol;
+import de.rwth.idsg.steve.repository.dto.InsertConnectorStatusParams;
+import de.rwth.idsg.steve.repository.dto.InsertTransactionParams;
+import de.rwth.idsg.steve.repository.dto.UpdateChargeboxParams;
 import org.joda.time.DateTime;
 
 import java.util.List;
@@ -21,20 +23,14 @@ public interface OcppServerRepository {
      * 2. If the chargebox not registered => no chargeboxes to update => updated/returned row count = 0
      *
      */
-    boolean updateChargebox(OcppProtocol ocppProtocol, String vendor, String model,
-                            String pointSerial, String boxSerial, String fwVersion, String iccid, String imsi,
-                            String meterType, String meterSerial, String chargeBoxIdentity, DateTime now);
+    boolean updateChargebox(UpdateChargeboxParams params);
 
     void updateEndpointAddress(String chargeBoxIdentity, String endpointAddress);
     void updateChargeboxFirmwareStatus(String chargeBoxIdentity, String firmwareStatus);
     void updateChargeboxDiagnosticsStatus(String chargeBoxIdentity, String status);
     void updateChargeboxHeartbeat(String chargeBoxIdentity, DateTime ts);
 
-    void insertConnectorStatus12(String chargeBoxIdentity, int connectorId, String status, DateTime timestamp,
-                                 String errorCode);
-    void insertConnectorStatus15(String chargeBoxIdentity, int connectorId, String status, DateTime timestamp,
-                                 String errorCode, String errorInfo,
-                                 String vendorId, String vendorErrorCode);
+    void insertConnectorStatus(InsertConnectorStatusParams params);
 
     void insertMeterValues12(String chargeBoxIdentity, int connectorId,
                              List<ocpp.cs._2010._08.MeterValue> list);
@@ -43,12 +39,7 @@ public interface OcppServerRepository {
     void insertMeterValuesOfTransaction(String chargeBoxIdentity, int transactionId,
                                         List<ocpp.cs._2012._06.MeterValue> list);
 
-    Integer insertTransaction12(String chargeBoxIdentity, int connectorId, String idTag,
-                                DateTime startTimestamp, String startMeterValue);
-
-    Integer insertTransaction15(String chargeBoxIdentity, int connectorId, String idTag,
-                                DateTime startTimestamp, String startMeterValue,
-                                Integer reservationId);
+    Integer insertTransaction(InsertTransactionParams params);
 
     void updateTransaction(int transactionId, DateTime stopTimestamp, String stopMeterValue);
 }

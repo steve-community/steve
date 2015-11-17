@@ -3,6 +3,9 @@ package de.rwth.idsg.steve.service;
 import de.rwth.idsg.steve.ocpp.OcppProtocol;
 import de.rwth.idsg.steve.repository.OcppServerRepository;
 import de.rwth.idsg.steve.repository.SettingsRepository;
+import de.rwth.idsg.steve.repository.dto.InsertConnectorStatusParams;
+import de.rwth.idsg.steve.repository.dto.InsertTransactionParams;
+import de.rwth.idsg.steve.repository.dto.UpdateChargeboxParams;
 import lombok.extern.slf4j.Slf4j;
 import ocpp.cs._2010._08.AuthorizeRequest;
 import ocpp.cs._2010._08.AuthorizeResponse;
@@ -48,18 +51,23 @@ public class CentralSystemService12_Service {
 
         DateTime now = DateTime.now();
 
-        boolean isRegistered = ocppServerRepository.updateChargebox(ocppProtocol,
-                                                                    parameters.getChargePointVendor(),
-                                                                    parameters.getChargePointModel(),
-                                                                    parameters.getChargePointSerialNumber(),
-                                                                    parameters.getChargeBoxSerialNumber(),
-                                                                    parameters.getFirmwareVersion(),
-                                                                    parameters.getIccid(),
-                                                                    parameters.getImsi(),
-                                                                    parameters.getMeterType(),
-                                                                    parameters.getMeterSerialNumber(),
-                                                                    chargeBoxIdentity,
-                                                                    now);
+        UpdateChargeboxParams params =
+                UpdateChargeboxParams.builder()
+                                     .ocppProtocol(ocppProtocol)
+                                     .vendor(parameters.getChargePointVendor())
+                                     .model(parameters.getChargePointModel())
+                                     .pointSerial(parameters.getChargePointSerialNumber())
+                                     .boxSerial(parameters.getChargeBoxSerialNumber())
+                                     .fwVersion(parameters.getFirmwareVersion())
+                                     .iccid(parameters.getIccid())
+                                     .imsi(parameters.getImsi())
+                                     .meterType(parameters.getMeterType())
+                                     .meterSerial(parameters.getMeterSerialNumber())
+                                     .chargeBoxId(chargeBoxIdentity)
+                                     .heartbeatTimestamp(now)
+                                     .build();
+
+        boolean isRegistered = ocppServerRepository.updateChargebox(params);
 
         if (isRegistered) {
             return new BootNotificationResponse()
@@ -86,11 +94,16 @@ public class CentralSystemService12_Service {
             StatusNotificationRequest parameters, String chargeBoxIdentity) {
         log.debug("Executing statusNotification for {}", chargeBoxIdentity);
 
-        int connectorId = parameters.getConnectorId();
-        String status = parameters.getStatus().value();
-        String errorCode = parameters.getErrorCode().value();
-        ocppServerRepository.insertConnectorStatus12(chargeBoxIdentity, connectorId, status,
-                                                     DateTime.now(), errorCode);
+        InsertConnectorStatusParams params =
+                InsertConnectorStatusParams.builder()
+                                           .chargeBoxId(chargeBoxIdentity)
+                                           .connectorId(parameters.getConnectorId())
+                                           .status(parameters.getStatus().value())
+                                           .errorCode(parameters.getErrorCode().value())
+                                           .timestamp(DateTime.now())
+                                           .build();
+
+        ocppServerRepository.insertConnectorStatus(params);
         return new StatusNotificationResponse();
     }
 
@@ -116,16 +129,19 @@ public class CentralSystemService12_Service {
     public StartTransactionResponse startTransaction(StartTransactionRequest parameters, String chargeBoxIdentity) {
         log.debug("Executing startTransaction for {}", chargeBoxIdentity);
 
-        String idTag = parameters.getIdTag();
-        int connectorId = parameters.getConnectorId();
-        DateTime startTimestamp = parameters.getTimestamp();
-        String startMeterValue = Integer.toString(parameters.getMeterStart());
+        InsertTransactionParams params =
+                InsertTransactionParams.builder()
+                                       .chargeBoxId(chargeBoxIdentity)
+                                       .connectorId(parameters.getConnectorId())
+                                       .idTag(parameters.getIdTag())
+                                       .startTimestamp(parameters.getTimestamp())
+                                       .startMeterValue(Integer.toString(parameters.getMeterStart()))
+                                       .build();
 
-        Integer transactionId = ocppServerRepository.insertTransaction12(chargeBoxIdentity, connectorId, idTag,
-                                                                         startTimestamp, startMeterValue);
+        Integer transactionId = ocppServerRepository.insertTransaction(params);
 
         return new StartTransactionResponse()
-                .withIdTagInfo(userService.getIdTagInfoV12(idTag))
+                .withIdTagInfo(userService.getIdTagInfoV12(parameters.getIdTag()))
                 .withTransactionId(transactionId);
     }
 

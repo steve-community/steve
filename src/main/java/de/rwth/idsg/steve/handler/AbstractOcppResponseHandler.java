@@ -6,8 +6,6 @@ import lombok.RequiredArgsConstructor;
 
 import javax.xml.ws.Response;
 import java.util.ArrayList;
-import java.util.concurrent.CancellationException;
-import java.util.concurrent.ExecutionException;
 
 /**
  * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
@@ -34,7 +32,8 @@ public abstract class AbstractOcppResponseHandler<T> implements OcppResponseHand
         try {
             handleResult(res.get());
             success(res.get());
-        } catch (InterruptedException | CancellationException | ExecutionException e) {
+
+        } catch (Exception e) {
             handleException(e);
             failed(e.getMessage());
         }

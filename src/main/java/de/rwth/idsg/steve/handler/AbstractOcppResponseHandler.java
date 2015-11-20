@@ -5,6 +5,7 @@ import de.rwth.idsg.steve.web.dto.RequestTask;
 import lombok.RequiredArgsConstructor;
 
 import javax.xml.ws.Response;
+import java.util.ArrayList;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 
@@ -17,14 +18,31 @@ public abstract class AbstractOcppResponseHandler<T> implements OcppResponseHand
     protected final RequestTask requestTask;
     protected final String chargeBoxId;
 
+    // The default initial capacity is 10. We probably won't need that much.
+    private ArrayList<OcppCallback<T>> callbackList = new ArrayList<>(2);
+
+    public void addCallback(OcppCallback<T> cb) {
+        callbackList.add(cb);
+    }
+
+    // -------------------------------------------------------------------------
+    // AsyncHandler
+    // -------------------------------------------------------------------------
+
     @Override
     public void handleResponse(Response<T> res) {
         try {
             handleResult(res.get());
+            success(res.get());
         } catch (InterruptedException | CancellationException | ExecutionException e) {
             handleException(e);
+            failed(e.getMessage());
         }
     }
+
+    // -------------------------------------------------------------------------
+    // OcppResponseHandler
+    // -------------------------------------------------------------------------
 
     @Override
     public void handleResult(T response) {
@@ -45,5 +63,24 @@ public abstract class AbstractOcppResponseHandler<T> implements OcppResponseHand
     @Override
     public void handleError(OcppJsonError error) {
         requestTask.addNewResponse(chargeBoxId, error.toString());
+
+        // But, as far as the callbacks are concerned, this is still a failure.
+        failed(error.getErrorDescription());
+    }
+
+    // -------------------------------------------------------------------------
+    // Private helpers
+    // -------------------------------------------------------------------------
+
+    private void success(T response) {
+        for (OcppCallback<T> c : callbackList) {
+            c.success(response);
+        }
+    }
+
+    private void failed(String errorMessage) {
+        for (OcppCallback<T> c : callbackList) {
+            c.failed(errorMessage);
+        }
     }
 }

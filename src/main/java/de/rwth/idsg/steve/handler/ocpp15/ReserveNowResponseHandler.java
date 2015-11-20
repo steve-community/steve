@@ -6,10 +6,6 @@ import de.rwth.idsg.steve.web.dto.RequestTask;
 import ocpp.cp._2012._06.ReservationStatus;
 import ocpp.cp._2012._06.ReserveNowResponse;
 
-import javax.xml.ws.Response;
-import java.util.concurrent.CancellationException;
-import java.util.concurrent.ExecutionException;
-
 /**
  * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
  * @since 03.01.2015
@@ -26,16 +22,6 @@ public class ReserveNowResponseHandler extends AbstractOcppResponseHandler<Reser
     }
 
     @Override
-    public void handleResponse(Response<ReserveNowResponse> res) {
-        try {
-            handleResult(res.get());
-        } catch (InterruptedException | CancellationException | ExecutionException e) {
-            requestTask.addNewError(chargeBoxId, e);
-            delete();
-        }
-    }
-
-    @Override
     public void handleResult(ReserveNowResponse response) {
         ReservationStatus status = response.getStatus();
         requestTask.addNewResponse(chargeBoxId, status.value());
@@ -45,6 +31,12 @@ public class ReserveNowResponseHandler extends AbstractOcppResponseHandler<Reser
         } else {
             delete();
         }
+    }
+
+    @Override
+    public void handleException(Exception e) {
+        super.handleException(e);
+        delete();
     }
 
     private void delete() {

@@ -3,6 +3,8 @@ package de.rwth.idsg.steve.handler;
 import de.rwth.idsg.steve.ocpp.ws.data.OcppJsonError;
 import de.rwth.idsg.steve.web.dto.RequestTask;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.xml.ws.Response;
 import java.util.ArrayList;
@@ -15,6 +17,8 @@ import java.util.ArrayList;
 public abstract class AbstractOcppResponseHandler<T> implements OcppResponseHandler<T> {
     protected final RequestTask requestTask;
     protected final String chargeBoxId;
+
+    private final Logger log = LoggerFactory.getLogger(getClass());
 
     // The default initial capacity is 10. We probably won't need that much.
     private ArrayList<OcppCallback<T>> callbackList = new ArrayList<>(2);
@@ -68,18 +72,31 @@ public abstract class AbstractOcppResponseHandler<T> implements OcppResponseHand
     }
 
     // -------------------------------------------------------------------------
-    // Private helpers
+    // OcppCallback helpers
+    //
+    // OcppCallback exceptions should be handled silently, that is they should
+    // not take the ongoing process/thread or system down. With this, we just
+    // log the exception and allow the application to continue with the next
+    // callback in line.
     // -------------------------------------------------------------------------
 
     private void success(T response) {
         for (OcppCallback<T> c : callbackList) {
-            c.success(response);
+            try {
+                c.success(response);
+            } catch (Exception e) {
+                log.error("Exception occurred in OcppCallback", e);
+            }
         }
     }
 
     private void failed(String errorMessage) {
         for (OcppCallback<T> c : callbackList) {
-            c.failed(errorMessage);
+            try {
+                c.failed(errorMessage);
+            } catch (Exception e) {
+                log.error("Exception occurred in OcppCallback", e);
+            }
         }
     }
 }

@@ -2,7 +2,7 @@ package de.rwth.idsg.steve.handler.ocpp15;
 
 import de.rwth.idsg.steve.handler.AbstractOcppResponseHandler;
 import de.rwth.idsg.steve.repository.ReservationRepository;
-import de.rwth.idsg.steve.web.dto.RequestTask;
+import de.rwth.idsg.steve.web.dto.task.RequestTask;
 import ocpp.cp._2012._06.CancelReservationResponse;
 import ocpp.cp._2012._06.CancelReservationStatus;
 

@@ -2,7 +2,7 @@ package de.rwth.idsg.steve.repository;
 
 import de.rwth.idsg.steve.SteveException;
 import de.rwth.idsg.steve.repository.dto.TaskOverview;
-import de.rwth.idsg.steve.web.dto.RequestTask;
+import de.rwth.idsg.steve.web.dto.task.RequestTask;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 
@@ -30,6 +30,7 @@ public class RequestTaskStoreImpl implements RequestTaskStore {
                               RequestTask r = entry.getValue();
                               return TaskOverview.builder()
                                                  .taskId(entry.getKey())
+                                                 .origin(r.getOrigin())
                                                  .start(r.getStartTimestamp())
                                                  .end(r.getEndTimestamp())
                                                  .responseCount(r.getResponseCount().get())

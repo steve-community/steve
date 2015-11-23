@@ -13,6 +13,7 @@
         <table id='details' class='cpd'>
             <thead><tr><th>Task Details</th><th></th></tr></thead>
             <tr><td>Operation name</td><td>${task.ocppVersion.value} / ${task.operationName}</td></tr>
+            <tr><td>Origin</td><td>${task.origin} (${task.caller})</td></tr>
             <tr><td>Start timestamp</td><td>${task.startTimestamp}</td></tr>
             <tr><td>End timestamp</td><td>${task.endTimestamp}</td></tr>
             <tr><td># of charge point requests</td><td>${task.resultMap.size()}</td></tr>

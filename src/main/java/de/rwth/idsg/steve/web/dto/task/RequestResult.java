@@ -1,4 +1,4 @@
-package de.rwth.idsg.steve.web.dto;
+package de.rwth.idsg.steve.web.dto.task;
 
 import lombok.Getter;
 import lombok.Setter;

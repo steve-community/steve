@@ -7,10 +7,11 @@
         <input type="submit" value="Delete Finished"/>
     </form:form>
     <table class="res">
-        <thead><tr><th>Task ID</th><th>Start Timestamp</th><th>End Timestamp</th><th>Responses / Requests</th></tr></thead>
+        <thead><tr><th>Task ID</th><th>Origin</th><th>Start Timestamp</th><th>End Timestamp</th><th>Responses / Requests</th></tr></thead>
         <tbody>
         <c:forEach items="${taskList}" var="task">
             <tr><td><a href="/steve/manager/operations/tasks/${task.taskId}">${task.taskId}</a></td>
+                <td>${task.origin}</td>
                 <td>${task.start}</td>
                 <td>${task.end}</td>
                 <td>${task.responseCount} / ${task.requestCount}</td>

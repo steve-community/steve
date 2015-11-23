@@ -1,4 +1,4 @@
-package de.rwth.idsg.steve.web.dto;
+package de.rwth.idsg.steve.web.dto.task;
 
 import de.rwth.idsg.steve.ocpp.OcppVersion;
 import de.rwth.idsg.steve.ocpp.RequestType;
@@ -24,6 +24,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class RequestTask {
     private final OcppVersion ocppVersion;
     private final String operationName;
+    private final RequestTaskOrigin origin;
+    private final String caller;
 
     private final Map<String, RequestResult> resultMap;
     private final int resultSize;
@@ -38,9 +40,20 @@ public class RequestTask {
     private final Object lockObject = new Object();
 
     public RequestTask(OcppVersion ocppVersion, RequestType requestType, List<ChargePointSelect> cpsList) {
+        this(ocppVersion, requestType, cpsList, RequestTaskOrigin.INTERNAL, "SteVe");
+    }
+
+    /**
+     * Do not expose the constructor, make it package-private
+     */
+    RequestTask(OcppVersion ocppVersion, RequestType requestType, List<ChargePointSelect> cpsList,
+                RequestTaskOrigin origin, String caller) {
+
         this.operationName = StringUtils.getOperationName(requestType);
         this.ocppVersion = ocppVersion;
         this.resultSize = cpsList.size();
+        this.origin = origin;
+        this.caller = caller;
 
         resultMap = new HashMap<>(resultSize);
         for (ChargePointSelect cps : cpsList) {

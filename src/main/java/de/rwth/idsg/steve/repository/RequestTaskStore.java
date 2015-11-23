@@ -1,7 +1,7 @@
 package de.rwth.idsg.steve.repository;
 
 import de.rwth.idsg.steve.repository.dto.TaskOverview;
-import de.rwth.idsg.steve.web.dto.RequestTask;
+import de.rwth.idsg.steve.web.dto.task.RequestTask;
 
 import java.util.List;
 

@@ -1,7 +1,7 @@
 package de.rwth.idsg.steve.handler;
 
 import de.rwth.idsg.steve.ocpp.ws.data.OcppJsonError;
-import de.rwth.idsg.steve.web.dto.RequestTask;
+import de.rwth.idsg.steve.web.dto.task.RequestTask;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

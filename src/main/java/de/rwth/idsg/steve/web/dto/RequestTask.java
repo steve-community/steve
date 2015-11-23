@@ -4,6 +4,7 @@ import de.rwth.idsg.steve.ocpp.OcppVersion;
 import de.rwth.idsg.steve.ocpp.RequestType;
 import de.rwth.idsg.steve.repository.dto.ChargePointSelect;
 import de.rwth.idsg.steve.utils.StringUtils;
+import lombok.AccessLevel;
 import lombok.Getter;
 import org.joda.time.DateTime;
 
@@ -33,13 +34,16 @@ public class RequestTask {
     private AtomicInteger errorCount = new AtomicInteger(0);
     private AtomicInteger responseCount = new AtomicInteger(0);
 
-    public RequestTask(OcppVersion ocppVersion, RequestType requestType, List<ChargePointSelect> chargePointSelectList) {
+    @Getter(AccessLevel.NONE) // disable getter generation
+    private final Object lockObject = new Object();
+
+    public RequestTask(OcppVersion ocppVersion, RequestType requestType, List<ChargePointSelect> cpsList) {
         this.operationName = StringUtils.getOperationName(requestType);
         this.ocppVersion = ocppVersion;
-        this.resultSize = chargePointSelectList.size();
+        this.resultSize = cpsList.size();
 
         resultMap = new HashMap<>(resultSize);
-        for (ChargePointSelect cps : chargePointSelectList) {
+        for (ChargePointSelect cps : cpsList) {
             resultMap.put(cps.getChargeBoxId(), new RequestResult());
         }
     }
@@ -50,15 +54,21 @@ public class RequestTask {
 
     public void addNewResponse(String chargeBoxId, String response) {
         resultMap.get(chargeBoxId).setResponse(response);
-        if (resultSize == (errorCount.get() + responseCount.incrementAndGet())) {
-            endTimestamp = DateTime.now();
+
+        synchronized (lockObject) {
+            if (resultSize == (errorCount.get() + responseCount.incrementAndGet())) {
+                endTimestamp = DateTime.now();
+            }
         }
     }
 
     public void addNewError(String chargeBoxId, Exception exception) {
         resultMap.get(chargeBoxId).setErrorMessage(exception.getMessage());
-        if (resultSize == (errorCount.incrementAndGet() + responseCount.get())) {
-            endTimestamp = DateTime.now();
+
+        synchronized (lockObject) {
+            if (resultSize == (errorCount.incrementAndGet() + responseCount.get())) {
+                endTimestamp = DateTime.now();
+            }
         }
     }
 }

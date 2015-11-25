@@ -61,11 +61,13 @@ public class UserRepositoryImpl implements UserRepository {
         }
 
         switch (form.getExpired()) {
+            case ALL:
+                break;
+
             case TRUE:
                 selectQuery.addConditions(USER.EXPIRY_DATE.lessOrEqual(CustomDSL.utcTimestamp()));
                 break;
 
-            case ALL:
             case FALSE:
                 selectQuery.addConditions(
                         USER.EXPIRY_DATE.isNull().or(USER.EXPIRY_DATE.greaterThan(CustomDSL.utcTimestamp()))

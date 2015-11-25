@@ -1,20 +1,23 @@
 package de.rwth.idsg.steve.repository;
 
+import com.google.common.base.Optional;
 import de.rwth.idsg.steve.SteveException;
 import de.rwth.idsg.steve.ocpp.OcppProtocol;
 import de.rwth.idsg.steve.ocpp.OcppTransport;
 import de.rwth.idsg.steve.repository.dto.ChargePoint;
 import de.rwth.idsg.steve.repository.dto.ChargePointSelect;
 import de.rwth.idsg.steve.repository.dto.ConnectorStatus;
-import de.rwth.idsg.steve.repository.dto.Heartbeat;
 import de.rwth.idsg.steve.utils.DateTimeUtils;
 import de.rwth.idsg.steve.web.dto.ChargeBoxForm;
+import jooq.steve.db.tables.records.AddressRecord;
 import jooq.steve.db.tables.records.ChargeBoxRecord;
 import lombok.extern.slf4j.Slf4j;
 import org.joda.time.DateTime;
 import org.jooq.Configuration;
+import org.jooq.DSLContext;
 import org.jooq.Field;
 import org.jooq.Record1;
+import org.jooq.SelectConditionStep;
 import org.jooq.TableLike;
 import org.jooq.exception.DataAccessException;
 import org.jooq.impl.DSL;
@@ -24,6 +27,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
+import static jooq.steve.db.tables.Address.ADDRESS;
 import static jooq.steve.db.tables.ChargeBox.CHARGE_BOX;
 import static jooq.steve.db.tables.Connector.CONNECTOR;
 import static jooq.steve.db.tables.ConnectorStatus.CONNECTOR_STATUS;
@@ -39,6 +43,8 @@ public class ChargePointRepositoryImpl implements ChargePointRepository {
     @Autowired
     @Qualifier("jooqConfig")
     private Configuration config;
+
+    @Autowired private AddressRepository addressRepository;
 
     @Override
     public boolean isRegistered(String chargeBoxId) {
@@ -73,60 +79,46 @@ public class ChargePointRepositoryImpl implements ChargePointRepository {
     }
 
     @Override
-    public ChargePoint getDetails(String chargeBoxId) {
-        ChargeBoxRecord r = DSL.using(config)
-                               .selectFrom(CHARGE_BOX)
-                               .where(CHARGE_BOX.CHARGE_BOX_ID.equal(chargeBoxId))
-                               .fetchOne();
-
-        // TODO: Sweet baby jesus. Is there a better way?
-        return ChargePoint.builder()
-                          .chargeBoxId(r.getChargeBoxId())
-                          .endpointAddress(r.getEndpointAddress())
-                          .ocppProtocol(r.getOcppProtocol())
-                          .chargePointVendor(r.getChargePointVendor())
-                          .chargePointModel(r.getChargePointModel())
-                          .chargePointSerialNumber(r.getChargePointSerialNumber())
-                          .chargeBoxSerialNumber(r.getChargeBoxSerialNumber())
-                          .firewireVersion(r.getFwVersion())
-                          .firewireUpdateStatus(r.getFwUpdateStatus())
-                          .firewireUpdateTimestamp(DateTimeUtils.humanize(r.getFwUpdateTimestamp()))
-                          .iccid(r.getIccid())
-                          .imsi(r.getImsi())
-                          .meterType(r.getMeterType())
-                          .meterSerialNumber(r.getMeterSerialNumber())
-                          .diagnosticsStatus(r.getDiagnosticsStatus())
-                          .diagnosticsTimestamp(DateTimeUtils.humanize(r.getDiagnosticsTimestamp()))
-                          .lastHeartbeatTimestamp(DateTimeUtils.humanize(r.getLastHeartbeatTimestamp()))
-                          .note(r.getNote())
-                          .build();
-    }
-
-    @Override
-    public ChargePoint getDetailsForUpdate(String chargeBoxId) {
-        String note = DSL.using(config)
-                         .select(CHARGE_BOX.NOTE)
-                         .from(CHARGE_BOX)
-                         .where(CHARGE_BOX.CHARGE_BOX_ID.equal(chargeBoxId))
-                         .fetchOne(CHARGE_BOX.NOTE);
-
-        return ChargePoint.builder()
-                          .note(note)
-                          .build();
-    }
-
-    @Override
-    public List<Heartbeat> getChargePointHeartbeats() {
+    public List<ChargePoint.Overview> getOverview() {
         return DSL.using(config)
-                  .select(CHARGE_BOX.CHARGE_BOX_ID, CHARGE_BOX.LAST_HEARTBEAT_TIMESTAMP)
+                  .select(CHARGE_BOX.CHARGE_BOX_ID, CHARGE_BOX.DESCRIPTION,
+                          CHARGE_BOX.OCPP_PROTOCOL, CHARGE_BOX.LAST_HEARTBEAT_TIMESTAMP)
                   .from(CHARGE_BOX)
-                  .orderBy(CHARGE_BOX.LAST_HEARTBEAT_TIMESTAMP.desc())
                   .fetch()
-                  .map(r -> Heartbeat.builder()
-                                     .chargeBoxId(r.value1())
-                                     .lastTimestamp(DateTimeUtils.humanize(r.value2()))
-                                     .build()
+                  .map(r -> ChargePoint.Overview.builder()
+                                                .chargeBoxId(r.value1())
+                                                .description(r.value2())
+                                                .ocppProtocol(r.value3())
+                                                .lastHeartbeatTimestamp(DateTimeUtils.humanize(r.value4())).build()
                   );
+    }
+
+    @Override
+    public ChargePoint.Details getDetails(String chargeBoxId) {
+        DSLContext ctx = DSL.using(config);
+
+        ChargeBoxRecord cbr = ctx.selectFrom(CHARGE_BOX)
+                                 .where(CHARGE_BOX.CHARGE_BOX_ID.equal(chargeBoxId))
+                                 .fetchOne();
+
+        if (cbr == null) {
+            throw new SteveException("There is no charge point with chargeBoxId '%s'", chargeBoxId);
+        }
+
+        cbr.detach();
+
+        AddressRecord ar = null;
+        if (cbr.getAddressId() != null) {
+            ar = ctx.selectFrom(ADDRESS)
+                    .where(ADDRESS.ADDRESS_ID.equal(cbr.getAddressId()))
+                    .fetchOne();
+        }
+
+        if (ar != null) {
+            ar.detach();
+        }
+
+        return new ChargePoint.Details(cbr, ar);
     }
 
     @Override
@@ -171,47 +163,100 @@ public class ChargePointRepositoryImpl implements ChargePointRepository {
 
     @Override
     public void addChargePoint(ChargeBoxForm form) {
-        try {
-            int count = DSL.using(config)
-                           .insertInto(CHARGE_BOX,
-                                   CHARGE_BOX.CHARGE_BOX_ID, CHARGE_BOX.NOTE)
-                           .values(form.getChargeBoxId(), form.getNote())
-                           .onDuplicateKeyIgnore() // Important detail
-                           .execute();
+        DSL.using(config).transaction(configuration -> {
+            DSLContext ctx = DSL.using(configuration);
+            try {
+                Integer addressId = addressRepository.insert(ctx, form.getAddress());
+                addChargePointInternal(ctx, form, addressId);
 
-            if (count == 0) {
-                throw new SteveException("A charge point with chargeBoxId '%s' already exists.",
-                        form.getChargeBoxId());
+            } catch (DataAccessException e) {
+                throw new SteveException("The charge point with chargeBoxId '%s' could NOT be added.",
+                        form.getChargeBoxId(), e);
             }
-        } catch (DataAccessException e) {
-            throw new SteveException("The charge point with chargeBoxId '%s' could NOT be added.",
-                    form.getChargeBoxId(), e);
-        }
+        });
     }
 
     @Override
     public void updateChargePoint(ChargeBoxForm form) {
-        try {
-            DSL.using(config)
-               .update(CHARGE_BOX)
-               .set(CHARGE_BOX.NOTE, form.getNote())
-               .where(CHARGE_BOX.CHARGE_BOX_ID.equal(form.getChargeBoxId()))
-               .execute();
-        } catch (DataAccessException e) {
-            throw new SteveException("The charge point with chargeBoxId '%s' could NOT be updated.",
-                    form.getChargeBoxId(), e);
-        }
+        DSL.using(config).transaction(configuration -> {
+            DSLContext ctx = DSL.using(configuration);
+            try {
+
+                // Backwards compatibility is a PITA. Existing installations did not have address fields,
+                // so we must act accordingly, i.e. try update and if it fails insert
+                //
+                Optional<Integer> optional = addressRepository.update(ctx, selectAddressId(form.getChargeBoxId()), form.getAddress());
+                Integer addressId = null;
+                if (optional.isPresent()) {
+                    addressId = optional.get();
+                } else {
+                    addressId = addressRepository.insert(ctx, form.getAddress());
+                }
+
+                updateChargePointInternal(ctx, form, addressId);
+
+            } catch (DataAccessException e) {
+                throw new SteveException("The charge point with chargeBoxId '%s' could NOT be added.",
+                        form.getChargeBoxId(), e);
+            }
+        });
     }
 
     @Override
     public void deleteChargePoint(String chargeBoxId) {
-        try {
-            DSL.using(config)
-               .delete(CHARGE_BOX)
-               .where(CHARGE_BOX.CHARGE_BOX_ID.equal(chargeBoxId))
-               .execute();
-        } catch (DataAccessException e) {
-            throw new SteveException("The charge point with chargeBoxId '%s' could NOT be deleted.", chargeBoxId, e);
+        DSL.using(config).transaction(configuration -> {
+            DSLContext ctx = DSL.using(configuration);
+            try {
+                addressRepository.delete(ctx, selectAddressId(chargeBoxId));
+                deleteChargePointInternal(ctx, chargeBoxId);
+
+            } catch (DataAccessException e) {
+                throw new SteveException("The charge point with chargeBoxId '%s' could NOT be deleted.",
+                        chargeBoxId, e);
+            }
+        });
+    }
+
+    // -------------------------------------------------------------------------
+    // Helpers
+    // -------------------------------------------------------------------------
+
+    private SelectConditionStep<Record1<Integer>> selectAddressId(String chargeBoxId) {
+        return DSL.select(CHARGE_BOX.ADDRESS_ID)
+                  .from(CHARGE_BOX)
+                  .where(CHARGE_BOX.CHARGE_BOX_ID.eq(chargeBoxId));
+    }
+
+    private void addChargePointInternal(DSLContext ctx, ChargeBoxForm form, Integer addressId) {
+        int count = ctx.insertInto(CHARGE_BOX)
+                       .set(CHARGE_BOX.CHARGE_BOX_ID, form.getChargeBoxId())
+                       .set(CHARGE_BOX.DESCRIPTION, form.getDescription())
+                       .set(CHARGE_BOX.LOCATION_LATITUDE, form.getLocationLatitude())
+                       .set(CHARGE_BOX.LOCATION_LONGITUDE, form.getLocationLongitude())
+                       .set(CHARGE_BOX.NOTE, form.getNote())
+                       .set(CHARGE_BOX.ADDRESS_ID, addressId)
+                       .onDuplicateKeyIgnore() // Important detail
+                       .execute();
+
+        if (count == 0) {
+            throw new SteveException("A charge point with chargeBoxId '%s' already exists.", form.getChargeBoxId());
         }
+    }
+
+    private void updateChargePointInternal(DSLContext ctx, ChargeBoxForm form, Integer addressId) {
+        ctx.update(CHARGE_BOX)
+           .set(CHARGE_BOX.DESCRIPTION, form.getDescription())
+           .set(CHARGE_BOX.LOCATION_LATITUDE, form.getLocationLatitude())
+           .set(CHARGE_BOX.LOCATION_LONGITUDE, form.getLocationLongitude())
+           .set(CHARGE_BOX.NOTE, form.getNote())
+           .set(CHARGE_BOX.ADDRESS_ID, addressId)
+           .where(CHARGE_BOX.CHARGE_BOX_ID.equal(form.getChargeBoxId()))
+           .execute();
+    }
+
+    private void deleteChargePointInternal(DSLContext ctx, String chargeBoxId) {
+        ctx.delete(CHARGE_BOX)
+           .where(CHARGE_BOX.CHARGE_BOX_ID.equal(chargeBoxId))
+           .execute();
     }
 }

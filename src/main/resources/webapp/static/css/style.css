@@ -22,8 +22,14 @@ section {
 section span { color:#5c5c5c; background:#fff; padding-right:10px; font-family:DroidSerif; font-size: 14px; font-weight: normal;}
 ul hr { color: #CCC; background: #CCC; 	height: 1px; border: 0;}
 table { width: 100%;}
-table.userInput td:first-child { 
-	text-align: right; 
+table.action td:last-child {
+	border-left: 1px solid #CCC;
+}
+table.userInput th:first-child {
+	text-align: right;
+}
+table.userInput td:first-child {
+	text-align: right;
 	width: 45%;
 	padding: 3px;
 }
@@ -84,7 +90,7 @@ select option { font-size: 12px; }
 input[type="text"], input[type="number"], input[type="password"], input[type="text"].dateTimePicker{
 	appearance: none;
 	-webkit-appearance: none;
-	margin: 1px 0 1px 0;
+	margin: 1px 3px 1px 0;
 	padding: 3px;
 	border: 1px solid #CCC;
 	border-radius: 0;
@@ -128,7 +134,7 @@ input[type="button"]:active, input[type="submit"]:active {
 	top:1px;
 }
 input[type="submit"] {
-	width: 100px;
+	min-width: 100px;
 	font-size: 12px;
 	background: #577377;
 	background: -webkit-gradient(linear, left top, left bottom, from(#aec0c9), to(#4c5e67));

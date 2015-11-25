@@ -24,7 +24,6 @@ public class HomeController {
     // Paths
     // -------------------------------------------------------------------------
 
-    private static final String HEARTBEATS_PATH = "/heartbeats";
     private static final String CONNECTOR_STATUS_PATH = "/connectorStatus";
     private static final String OCPP_JSON_STATUS = "/ocppJsonStatus";
 
@@ -36,12 +35,6 @@ public class HomeController {
     public String getHome(Model model) {
         model.addAttribute("stats", chargePointHelperService.getStats());
         return "home";
-    }
-
-    @RequestMapping(value = HEARTBEATS_PATH)
-    public String getHeartbeats(Model model) {
-        model.addAttribute("heartbeatList", chargePointRepository.getChargePointHeartbeats());
-        return "heartbeats";
     }
 
     @RequestMapping(value = CONNECTOR_STATUS_PATH)

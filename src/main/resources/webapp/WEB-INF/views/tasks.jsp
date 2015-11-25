@@ -6,6 +6,7 @@
     <form:form action="/steve/manager/operations/tasks">
         <input type="submit" value="Delete Finished"/>
     </form:form>
+    <br>
     <table class="res">
         <thead><tr><th>Task ID</th><th>Origin</th><th>Start Timestamp</th><th>End Timestamp</th><th>Responses / Requests</th></tr></thead>
         <tbody>

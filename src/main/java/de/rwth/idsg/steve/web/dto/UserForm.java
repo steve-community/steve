@@ -5,6 +5,7 @@ import de.rwth.idsg.steve.web.validation.IdTag;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.validator.constraints.NotEmpty;
+import org.joda.time.LocalDate;
 import org.joda.time.LocalDateTime;
 
 import javax.validation.constraints.Future;
@@ -30,6 +31,14 @@ public class UserForm extends AbstractNoteForm {
 
     @NotNull(message = "Should the user be blocked or not?")
     private Boolean blocked = false;
+
+    private String firstName;
+    private String lastName;
+    private LocalDate birthDay;
+    private String sex;
+    private String phone;
+    private String eMail;
+    private Address address;
 
     public void setParentIdTag(String parentIdTag) {
         if (parentIdTag.equals("EMPTY-OPTION")) {

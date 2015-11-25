@@ -30,7 +30,7 @@
 			</span>
 		</span>
 	</a>
-	<a class="tileRow2" href="/steve/manager/home/heartbeats">
+	<a class="tileRow2" href="/steve/manager/chargepoints">
 		Received Heartbeats
 		<span class="baseTable">
 			<span class="baseRow">

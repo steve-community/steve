@@ -34,8 +34,6 @@ public class AjaxCallController {
     // Paths
     // -------------------------------------------------------------------------
 
-    private static final String DETAILS_PATH            = "/details";
-    private static final String DETAILS_FOR_UPDATE_PATH = "/detailsForUpdate";
     private static final String CONNECTOR_IDS_PATH      = "/connectorIds";
     private static final String TRANSACTION_IDS_PATH    = "/transactionIds";
     private static final String RESERVATION_IDS_PATH    = "/reservationIds";
@@ -43,16 +41,6 @@ public class AjaxCallController {
     // -------------------------------------------------------------------------
     // HTTP methods
     // -------------------------------------------------------------------------
-
-    @RequestMapping(value = DETAILS_PATH)
-    public ChargePoint getDetails(@PathVariable("chargeBoxId") String chargeBoxId) {
-        return chargePointRepository.getDetails(chargeBoxId);
-    }
-
-    @RequestMapping(value = DETAILS_FOR_UPDATE_PATH)
-    public ChargePoint getDetailsForUpdate(@PathVariable("chargeBoxId") String chargeBoxId) {
-        return chargePointRepository.getDetailsForUpdate(chargeBoxId);
-    }
 
     @RequestMapping(value = CONNECTOR_IDS_PATH)
     public List<Integer> getConnectorIds(@PathVariable("chargeBoxId") String chargeBoxId) {

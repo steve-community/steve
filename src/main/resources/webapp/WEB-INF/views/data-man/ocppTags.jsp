@@ -1,12 +1,12 @@
 <%@ include file="../00-header.jsp" %>
 <div class="content"><div>
-    <form:form action="/steve/manager/ocppTags/query" method="get" modelAttribute="params">
         <section><span>
         Ocpp Tag Overview
         <a class="tooltip" href="#"><img src="/steve/static/images/info.png" style="vertical-align:middle">
             <span>Deleting an Ocpp tag causes losing all related information including transactions and reservations.</span>
         </a>
         </span></section>
+    <form:form action="/steve/manager/ocppTags/query" method="get" modelAttribute="params">
         <table class="userInput">
             <tr>
                 <td>ID Tag:</td>

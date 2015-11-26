@@ -12,6 +12,9 @@ import org.hibernate.validator.constraints.NotBlank;
 @Setter
 public class Address {
 
+    // Internal database id
+    private Integer addressPk;
+
     @NotBlank(message = "Street and house number is not set")
     private String streetAndHouseNumber;
 

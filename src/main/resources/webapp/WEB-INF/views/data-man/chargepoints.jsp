@@ -6,12 +6,46 @@
             <span>Deleting a charge point causes losing all related information including transactions, reservations, connector status and connector meter values.</span>
         </a>
     </span></section>
-    <form:form action="/steve/manager/chargepoints/add" method="get">
-        <input type="submit" value="Add">
+    <form:form action="/steve/manager/chargepoints/query" method="get" modelAttribute="params">
+        <table class="userInput">
+            <tr>
+                <td>Ocpp Version:</td>
+                <td><form:select path="ocppVersion">
+                    <option value="" selected>All</option>
+                    <form:options items="${ocppVersion}" itemLabel="value"/>
+                </form:select>
+                </td>
+            </tr>
+            <tr>
+                <td>Heartbeat Period:</td>
+                <td><form:select path="heartbeatPeriod">
+                        <form:options items="${heartbeatPeriod}" itemLabel="value"/>
+                    </form:select>
+                </td>
+            </tr>
+            <tr>
+                <td></td>
+                <td id="add_space">
+                    <input type="submit" value="Get">
+                </td>
+            </tr>
+        </table>
     </form:form>
     <br>
     <table class="res action">
-        <thead><tr><th>ChargeBox ID</th><th>Description</th><th>OCPP Protocol</th><th>Last Heartbeat</th><th></th></tr></thead>
+        <thead>
+            <tr>
+                <th>ChargeBox ID</th>
+                <th>Description</th>
+                <th>OCPP Protocol</th>
+                <th>Last Heartbeat</th>
+                <th>
+                    <form:form action="/steve/manager/chargepoints/add" method="get">
+                        <input type="submit" value="Add New">
+                    </form:form>
+                </th>
+            </tr>
+        </thead>
         <tbody>
         <c:forEach items="${cpList}" var="cp">
             <tr><td><a href="/steve/manager/chargepoints/details/${cp.chargeBoxId}">${cp.chargeBoxId}</a></td>

@@ -2,8 +2,9 @@ package de.rwth.idsg.steve.web.controller;
 
 import de.rwth.idsg.steve.repository.ChargePointRepository;
 import de.rwth.idsg.steve.repository.dto.ChargePoint;
-import de.rwth.idsg.steve.web.dto.Address;
+import de.rwth.idsg.steve.utils.ControllerHelper;
 import de.rwth.idsg.steve.web.dto.ChargeBoxForm;
+import de.rwth.idsg.steve.web.dto.ChargePointQueryForm;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -26,9 +27,13 @@ public class ChargePointsController {
 
     @Autowired private ChargePointRepository chargePointRepository;
 
+    private static final String PARAMS = "params";
+
     // -------------------------------------------------------------------------
     // Paths
     // -------------------------------------------------------------------------
+
+    private static final String QUERY_PATH = "/query";
 
     private static final String DETAILS_PATH = "/details/{chargeBoxId}";
     private static final String DELETE_PATH = "/delete/{chargeBoxId}";
@@ -41,8 +46,19 @@ public class ChargePointsController {
 
     @RequestMapping(method = RequestMethod.GET)
     public String getOverview(Model model) {
-        model.addAttribute("cpList", chargePointRepository.getOverview());
+        initList(model, new ChargePointQueryForm());
         return "data-man/chargepoints";
+    }
+
+    @RequestMapping(value = QUERY_PATH, method = RequestMethod.GET)
+    public String getQuery(@ModelAttribute(PARAMS) ChargePointQueryForm params, Model model) {
+        initList(model, params);
+        return "data-man/chargepoints";
+    }
+
+    private void initList(Model model, ChargePointQueryForm params) {
+        model.addAttribute(PARAMS, params);
+        model.addAttribute("cpList", chargePointRepository.getOverview(params));
     }
 
     @RequestMapping(value = DETAILS_PATH, method = RequestMethod.GET)
@@ -56,14 +72,7 @@ public class ChargePointsController {
         form.setLocationLatitude(cp.getChargeBox().getLocationLatitude());
         form.setLocationLongitude(cp.getChargeBox().getLocationLongitude());
 
-        Address address = new Address();
-        if (cp.getAddress() != null) {
-            address.setStreetAndHouseNumber(cp.getAddress().getStreetAndHouseNumber());
-            address.setZipCode(cp.getAddress().getZipCode());
-            address.setCity(cp.getAddress().getCity());
-            address.setCountry(cp.getAddress().getCountry());
-        }
-        form.setAddress(address);
+        form.setAddress(ControllerHelper.recordToDto(cp.getAddress()));
 
         model.addAttribute("chargeBoxUpdateForm", form);
         model.addAttribute("cp", cp);

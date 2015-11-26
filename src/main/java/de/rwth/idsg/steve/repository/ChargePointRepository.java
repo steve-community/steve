@@ -5,6 +5,7 @@ import de.rwth.idsg.steve.repository.dto.ChargePoint;
 import de.rwth.idsg.steve.repository.dto.ChargePointSelect;
 import de.rwth.idsg.steve.repository.dto.ConnectorStatus;
 import de.rwth.idsg.steve.web.dto.ChargeBoxForm;
+import de.rwth.idsg.steve.web.dto.ChargePointQueryForm;
 
 import java.util.List;
 
@@ -16,7 +17,8 @@ public interface ChargePointRepository {
     boolean isRegistered(String chargeBoxId);
     List<ChargePointSelect> getChargePointSelect(OcppProtocol protocol);
     List<String> getChargeBoxIds();
-    List<ChargePoint.Overview> getOverview();
+
+    List<ChargePoint.Overview> getOverview(ChargePointQueryForm form);
     ChargePoint.Details getDetails(String chargeBoxId);
 
     List<ConnectorStatus> getChargePointConnectorStatus();

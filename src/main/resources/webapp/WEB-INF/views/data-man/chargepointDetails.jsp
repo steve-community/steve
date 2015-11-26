@@ -48,6 +48,7 @@
                 </tbody>
             </table>
 
+            <form:hidden path="address.addressPk" readonly="true"/>
             <table class="userInput">
                 <thead><tr><th>Address</th><th></th></thead>
                 <tr><td>Street and House Number:</td><td><form:input path="address.streetAndHouseNumber"/></td></tr>

@@ -1,6 +1,5 @@
 package de.rwth.idsg.steve.repository;
 
-import com.google.common.base.Optional;
 import de.rwth.idsg.steve.SteveException;
 import de.rwth.idsg.steve.ocpp.OcppProtocol;
 import de.rwth.idsg.steve.ocpp.OcppTransport;
@@ -8,7 +7,9 @@ import de.rwth.idsg.steve.repository.dto.ChargePoint;
 import de.rwth.idsg.steve.repository.dto.ChargePointSelect;
 import de.rwth.idsg.steve.repository.dto.ConnectorStatus;
 import de.rwth.idsg.steve.utils.DateTimeUtils;
+import de.rwth.idsg.steve.web.dto.Address;
 import de.rwth.idsg.steve.web.dto.ChargeBoxForm;
+import de.rwth.idsg.steve.web.dto.ChargePointQueryForm;
 import jooq.steve.db.tables.records.AddressRecord;
 import jooq.steve.db.tables.records.ChargeBoxRecord;
 import lombok.extern.slf4j.Slf4j;
@@ -17,7 +18,10 @@ import org.jooq.Configuration;
 import org.jooq.DSLContext;
 import org.jooq.Field;
 import org.jooq.Record1;
+import org.jooq.Record4;
+import org.jooq.Result;
 import org.jooq.SelectConditionStep;
+import org.jooq.SelectQuery;
 import org.jooq.TableLike;
 import org.jooq.exception.DataAccessException;
 import org.jooq.impl.DSL;
@@ -27,6 +31,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
+import static de.rwth.idsg.steve.utils.CustomDSL.date;
 import static jooq.steve.db.tables.Address.ADDRESS;
 import static jooq.steve.db.tables.ChargeBox.CHARGE_BOX;
 import static jooq.steve.db.tables.Connector.CONNECTOR;
@@ -79,18 +84,62 @@ public class ChargePointRepositoryImpl implements ChargePointRepository {
     }
 
     @Override
-    public List<ChargePoint.Overview> getOverview() {
-        return DSL.using(config)
-                  .select(CHARGE_BOX.CHARGE_BOX_ID, CHARGE_BOX.DESCRIPTION,
-                          CHARGE_BOX.OCPP_PROTOCOL, CHARGE_BOX.LAST_HEARTBEAT_TIMESTAMP)
-                  .from(CHARGE_BOX)
-                  .fetch()
+    public List<ChargePoint.Overview> getOverview(ChargePointQueryForm form) {
+        return getOverviewInternal(form)
                   .map(r -> ChargePoint.Overview.builder()
                                                 .chargeBoxId(r.value1())
                                                 .description(r.value2())
                                                 .ocppProtocol(r.value3())
-                                                .lastHeartbeatTimestamp(DateTimeUtils.humanize(r.value4())).build()
+                                                .lastHeartbeatTimestamp(DateTimeUtils.humanize(r.value4()))
+                                                .build()
                   );
+    }
+
+    @SuppressWarnings("unchecked")
+    private Result<Record4<String, String, String, DateTime>> getOverviewInternal(ChargePointQueryForm form) {
+        SelectQuery selectQuery = DSL.using(config).selectQuery();
+        selectQuery.addFrom(CHARGE_BOX);
+        selectQuery.addSelect(
+                CHARGE_BOX.CHARGE_BOX_ID,
+                CHARGE_BOX.DESCRIPTION,
+                CHARGE_BOX.OCPP_PROTOCOL,
+                CHARGE_BOX.LAST_HEARTBEAT_TIMESTAMP
+        );
+
+        if (form.isSetOcppVersion()) {
+            selectQuery.addConditions(CHARGE_BOX.OCPP_PROTOCOL.like(form.getOcppVersion().getValue() + "%"));
+        }
+
+        switch (form.getHeartbeatPeriod()) {
+            case ALL:
+                break;
+
+            case TODAY:
+                selectQuery.addConditions(
+                        date(CHARGE_BOX.LAST_HEARTBEAT_TIMESTAMP).eq(date(DateTime.now()))
+                );
+                break;
+
+            case YESTERDAY:
+                selectQuery.addConditions(
+                        date(CHARGE_BOX.LAST_HEARTBEAT_TIMESTAMP).eq(date(DateTime.now().minusDays(1)))
+                );
+                break;
+
+            case EARLIER:
+                selectQuery.addConditions(
+                        date(CHARGE_BOX.LAST_HEARTBEAT_TIMESTAMP).lessThan(date(DateTime.now().minusDays(1)))
+                );
+                break;
+
+            default:
+                throw new SteveException("Unknown enum type");
+        }
+
+        // Default order
+        selectQuery.addOrderBy(CHARGE_BOX.CHARGE_BOX_PK.asc());
+
+        return selectQuery.fetch();
     }
 
     @Override
@@ -108,9 +157,9 @@ public class ChargePointRepositoryImpl implements ChargePointRepository {
         cbr.detach();
 
         AddressRecord ar = null;
-        if (cbr.getAddressId() != null) {
+        if (cbr.getAddressPk() != null) {
             ar = ctx.selectFrom(ADDRESS)
-                    .where(ADDRESS.ADDRESS_ID.equal(cbr.getAddressId()))
+                    .where(ADDRESS.ADDRESS_PK.equal(cbr.getAddressPk()))
                     .fetchOne();
         }
 
@@ -181,18 +230,8 @@ public class ChargePointRepositoryImpl implements ChargePointRepository {
         DSL.using(config).transaction(configuration -> {
             DSLContext ctx = DSL.using(configuration);
             try {
-
-                // Backwards compatibility is a PITA. Existing installations did not have address fields,
-                // so we must act accordingly, i.e. try update and if it fails insert
-                //
-                Optional<Integer> optional = addressRepository.update(ctx, selectAddressId(form.getChargeBoxId()), form.getAddress());
-                Integer addressId = null;
-                if (optional.isPresent()) {
-                    addressId = optional.get();
-                } else {
-                    addressId = addressRepository.insert(ctx, form.getAddress());
-                }
-
+                Address address = form.getAddress();
+                Integer addressId = addressRepository.updateOrInsert(ctx, address);
                 updateChargePointInternal(ctx, form, addressId);
 
             } catch (DataAccessException e) {
@@ -222,19 +261,19 @@ public class ChargePointRepositoryImpl implements ChargePointRepository {
     // -------------------------------------------------------------------------
 
     private SelectConditionStep<Record1<Integer>> selectAddressId(String chargeBoxId) {
-        return DSL.select(CHARGE_BOX.ADDRESS_ID)
+        return DSL.select(CHARGE_BOX.ADDRESS_PK)
                   .from(CHARGE_BOX)
                   .where(CHARGE_BOX.CHARGE_BOX_ID.eq(chargeBoxId));
     }
 
-    private void addChargePointInternal(DSLContext ctx, ChargeBoxForm form, Integer addressId) {
+    private void addChargePointInternal(DSLContext ctx, ChargeBoxForm form, Integer addressPk) {
         int count = ctx.insertInto(CHARGE_BOX)
                        .set(CHARGE_BOX.CHARGE_BOX_ID, form.getChargeBoxId())
                        .set(CHARGE_BOX.DESCRIPTION, form.getDescription())
                        .set(CHARGE_BOX.LOCATION_LATITUDE, form.getLocationLatitude())
                        .set(CHARGE_BOX.LOCATION_LONGITUDE, form.getLocationLongitude())
                        .set(CHARGE_BOX.NOTE, form.getNote())
-                       .set(CHARGE_BOX.ADDRESS_ID, addressId)
+                       .set(CHARGE_BOX.ADDRESS_PK, addressPk)
                        .onDuplicateKeyIgnore() // Important detail
                        .execute();
 
@@ -243,13 +282,13 @@ public class ChargePointRepositoryImpl implements ChargePointRepository {
         }
     }
 
-    private void updateChargePointInternal(DSLContext ctx, ChargeBoxForm form, Integer addressId) {
+    private void updateChargePointInternal(DSLContext ctx, ChargeBoxForm form, Integer addressPk) {
         ctx.update(CHARGE_BOX)
            .set(CHARGE_BOX.DESCRIPTION, form.getDescription())
            .set(CHARGE_BOX.LOCATION_LATITUDE, form.getLocationLatitude())
            .set(CHARGE_BOX.LOCATION_LONGITUDE, form.getLocationLongitude())
            .set(CHARGE_BOX.NOTE, form.getNote())
-           .set(CHARGE_BOX.ADDRESS_ID, addressId)
+           .set(CHARGE_BOX.ADDRESS_PK, addressPk)
            .where(CHARGE_BOX.CHARGE_BOX_ID.equal(form.getChargeBoxId()))
            .execute();
     }

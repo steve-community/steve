@@ -7,8 +7,8 @@
 	});
 </script>
 <div class="content">
+<section><span>Reservations</span></section>
 	<form:form action="/steve/manager/reservations/query" method="get" modelAttribute="params">
-		<section><span>Query Parameters</span></section>
 		<table class="userInput">
 			<tr>
 				<td>ChargeBox ID:</td>
@@ -58,7 +58,7 @@
 		</table>
 	</form:form>
 	<br>
-<section><span>Reservations</span></section>
+
 <table class="res">
 	<thead><tr><th>Reservation ID</th><th>Transaction ID</th><th>User ID Tag</th><th>ChargeBox ID</th><th>Start Date/Time</th><th>Expiry Date/Time</th><th>Status</th></tr></thead>
 	<tbody>

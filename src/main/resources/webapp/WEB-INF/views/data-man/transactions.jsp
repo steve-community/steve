@@ -7,8 +7,14 @@
     });
 </script>
 <div class="content">
+<section><span>
+Transactions
+<a class="tooltip" href="#"><img src="/steve/static/images/info.png" style="vertical-align:middle">
+<span>If stop date/time and stop value are empty, this means that a transaction is still active
+(i.e. it has started but not stopped yet or the charging station did not inform SteVe about the stopped transaction yet).</span>
+</a>
+</span></section>
     <form:form action="/steve/manager/transactions/query" method="get" modelAttribute="params">
-        <section><span>Query Parameters</span></section>
         <table class="userInput">
             <tr>
                 <td>ChargeBox ID:</td>
@@ -61,13 +67,7 @@
         </table>
     </form:form>
     <br>
-<section><span>
-Transactions 
-<a class="tooltip" href="#"><img src="/steve/static/images/info.png" style="vertical-align:middle">
-<span>If stop date/time and stop value are empty, this means that a transaction is still active
-(i.e. it has started but not stopped yet or the charging station did not inform SteVe about the stopped transaction yet).</span>
-</a>
-</span></section>
+
     <table class="res">
         <thead><tr><th>Transaction ID</th><th>ChargeBox ID</th><th>Connector ID</th><th>User ID Tag</th><th>Start Date/Time</th><th>Start Value</th><th>Stop Date/Time</th><th>Stop Value</th></tr></thead>
         <tbody>

@@ -1,6 +1,5 @@
 package de.rwth.idsg.steve.web.dto;
 
-import de.rwth.idsg.steve.utils.StringUtils;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -33,10 +32,10 @@ public abstract class QueryForm {
     }
 
     public boolean isChargeBoxIdSet() {
-        return !StringUtils.isNullOrEmpty(chargeBoxId);
+        return chargeBoxId != null;
     }
 
     public boolean isUserIdSet() {
-        return !StringUtils.isNullOrEmpty(userId);
+        return userId != null;
     }
 }

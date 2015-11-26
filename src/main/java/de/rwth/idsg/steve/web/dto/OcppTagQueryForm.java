@@ -1,6 +1,5 @@
 package de.rwth.idsg.steve.web.dto;
 
-import de.rwth.idsg.steve.utils.StringUtils;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -30,11 +29,11 @@ public class OcppTagQueryForm {
     }
 
     public boolean isIdTagSet() {
-        return !StringUtils.isNullOrEmpty(idTag);
+        return idTag != null;
     }
 
     public boolean isParentIdTagSet() {
-        return !StringUtils.isNullOrEmpty(parentIdTag);
+        return parentIdTag != null;
     }
 
     @RequiredArgsConstructor

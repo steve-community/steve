@@ -1,7 +1,5 @@
 package de.rwth.idsg.steve.web.dto;
 
-import de.rwth.idsg.steve.utils.StringUtils;
-import de.rwth.idsg.steve.web.dto.common.AbstractNoteForm;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.validator.constraints.NotBlank;
@@ -17,7 +15,7 @@ import java.math.BigDecimal;
  */
 @Getter
 @Setter
-public class ChargeBoxForm extends AbstractNoteForm {
+public class ChargeBoxForm {
 
     @NotBlank(message = "ChargeBox ID is required")
     @Pattern(regexp = "\\S+", message = "ChargeBox ID cannot contain any whitespace")
@@ -33,8 +31,5 @@ public class ChargeBoxForm extends AbstractNoteForm {
     private BigDecimal locationLongitude;
 
     private String description;
-
-    public void setDescription(String description) {
-        this.description = (StringUtils.isNullOrEmpty(description)) ? null : description.trim();
-    }
+    private String note;
 }

@@ -1,7 +1,6 @@
 package de.rwth.idsg.steve.web.dto;
 
 import de.rwth.idsg.steve.utils.ControllerHelper;
-import de.rwth.idsg.steve.web.dto.common.AbstractNoteForm;
 import de.rwth.idsg.steve.web.validation.IdTag;
 import lombok.Getter;
 import lombok.Setter;
@@ -17,7 +16,7 @@ import javax.validation.constraints.NotNull;
  */
 @Getter
 @Setter
-public class OcppTagForm extends AbstractNoteForm {
+public class OcppTagForm {
 
     @NotEmpty(message = "ID Tag is required")
     @IdTag
@@ -31,6 +30,8 @@ public class OcppTagForm extends AbstractNoteForm {
 
     @NotNull(message = "Should this ID Tag be blocked or not?")
     private Boolean blocked = false;
+
+    private String note;
 
     /**
      * Is used when sending the POJO to JSP

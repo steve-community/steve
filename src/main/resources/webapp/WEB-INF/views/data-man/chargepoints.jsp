@@ -9,6 +9,10 @@
     <form:form action="/steve/manager/chargepoints/query" method="get" modelAttribute="params">
         <table class="userInput">
             <tr>
+                <td>Description:</td>
+                <td><form:input path="description"/></td>
+            </tr>
+            <tr>
                 <td>Ocpp Version:</td>
                 <td><form:select path="ocppVersion">
                     <option value="" selected>All</option>

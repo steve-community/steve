@@ -32,6 +32,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 import static de.rwth.idsg.steve.utils.CustomDSL.date;
+import static de.rwth.idsg.steve.utils.CustomDSL.includes;
 import static jooq.steve.db.tables.Address.ADDRESS;
 import static jooq.steve.db.tables.ChargeBox.CHARGE_BOX;
 import static jooq.steve.db.tables.Connector.CONNECTOR;
@@ -107,7 +108,13 @@ public class ChargePointRepositoryImpl implements ChargePointRepository {
         );
 
         if (form.isSetOcppVersion()) {
-            selectQuery.addConditions(CHARGE_BOX.OCPP_PROTOCOL.like(form.getOcppVersion().getValue() + "%"));
+
+            // http://dev.mysql.com/doc/refman/5.7/en/pattern-matching.html
+            selectQuery.addConditions(CHARGE_BOX.OCPP_PROTOCOL.like(form.getOcppVersion().getValue() + "_"));
+        }
+
+        if (form.isSetDescription()) {
+            selectQuery.addConditions(includes(CHARGE_BOX.DESCRIPTION, form.getDescription()));
         }
 
         switch (form.getHeartbeatPeriod()) {

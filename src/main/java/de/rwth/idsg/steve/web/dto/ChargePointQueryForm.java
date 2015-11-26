@@ -13,6 +13,7 @@ import lombok.Setter;
 @Setter
 public class ChargePointQueryForm {
 
+    private String description;
     private OcppVersion ocppVersion;
     private QueryPeriodType heartbeatPeriod;
 
@@ -25,6 +26,10 @@ public class ChargePointQueryForm {
 
     public boolean isSetOcppVersion() {
         return ocppVersion != null;
+    }
+
+    public boolean isSetDescription() {
+        return description != null;
     }
 
     @RequiredArgsConstructor

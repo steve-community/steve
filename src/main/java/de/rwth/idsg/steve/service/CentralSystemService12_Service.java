@@ -42,7 +42,7 @@ import org.springframework.stereotype.Service;
 public class CentralSystemService12_Service {
 
     @Autowired private OcppServerRepository ocppServerRepository;
-    @Autowired private UserService userService;
+    @Autowired private OcppTagService ocppTagService;
     @Autowired private SettingsRepository settingsRepository;
 
     public BootNotificationResponse bootNotification(BootNotificationRequest parameters, String chargeBoxIdentity,
@@ -141,7 +141,7 @@ public class CentralSystemService12_Service {
         Integer transactionId = ocppServerRepository.insertTransaction(params);
 
         return new StartTransactionResponse()
-                .withIdTagInfo(userService.getIdTagInfoV12(parameters.getIdTag()))
+                .withIdTagInfo(ocppTagService.getIdTagInfoV12(parameters.getIdTag()))
                 .withTransactionId(transactionId);
     }
 
@@ -155,7 +155,7 @@ public class CentralSystemService12_Service {
 
         // Get the authorization info of the user
         if (parameters.isSetIdTag()) {
-            IdTagInfo idTagInfo = userService.getIdTagInfoV12(parameters.getIdTag());
+            IdTagInfo idTagInfo = ocppTagService.getIdTagInfoV12(parameters.getIdTag());
             return new StopTransactionResponse().withIdTagInfo(idTagInfo);
         } else {
             return new StopTransactionResponse();
@@ -176,7 +176,7 @@ public class CentralSystemService12_Service {
 
         // Get the authorization info of the user
         String idTag = parameters.getIdTag();
-        IdTagInfo idTagInfo = userService.getIdTagInfoV12(idTag);
+        IdTagInfo idTagInfo = ocppTagService.getIdTagInfoV12(idTag);
 
         return new AuthorizeResponse().withIdTagInfo(idTagInfo);
     }

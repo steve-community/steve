@@ -18,7 +18,7 @@ import de.rwth.idsg.steve.handler.ocpp15.UpdateFirmwareResponseHandler;
 import de.rwth.idsg.steve.ocpp.OcppVersion;
 import de.rwth.idsg.steve.repository.RequestTaskStore;
 import de.rwth.idsg.steve.repository.ReservationRepository;
-import de.rwth.idsg.steve.repository.UserRepository;
+import de.rwth.idsg.steve.repository.OcppTagRepository;
 import de.rwth.idsg.steve.repository.dto.ChargePointSelect;
 import de.rwth.idsg.steve.web.dto.task.RequestTask;
 import de.rwth.idsg.steve.web.dto.common.GetDiagnosticsParams;
@@ -78,8 +78,8 @@ public class ChargePointService15_Client {
     private static final OcppVersion VERSION = OcppVersion.V_15;
 
     @Autowired private ScheduledExecutorService executorService;
-    @Autowired private UserRepository userRepository;
-    @Autowired private UserService userService;
+    @Autowired private OcppTagRepository userRepository;
+    @Autowired private OcppTagService ocppTagService;
     @Autowired private ReservationRepository reservationRepository;
     @Autowired private RequestTaskStore requestTaskStore;
     @Autowired private ChargePointService15_Dispatcher dispatcher;
@@ -176,7 +176,7 @@ public class ChargePointService15_Client {
             }
 
             // Step 2: For the idTags to be added or updated, insert them with their IdTagInfos
-            auths.addAll(userService.getAuthData(params.getAddUpdateList()));
+            auths.addAll(ocppTagService.getAuthData(params.getAddUpdateList()));
 
             return new SendLocalListRequest()
                     .withListVersion(params.getListVersion())
@@ -188,7 +188,7 @@ public class ChargePointService15_Client {
             return new SendLocalListRequest()
                     .withListVersion(params.getListVersion())
                     .withUpdateType(UpdateType.FULL)
-                    .withLocalAuthorisationList(userService.getAuthDataOfAllUsers());
+                    .withLocalAuthorisationList(ocppTagService.getAuthDataOfAllTags());
         }
     }
 

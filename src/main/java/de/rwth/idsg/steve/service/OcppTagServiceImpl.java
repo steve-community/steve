@@ -1,8 +1,8 @@
 package de.rwth.idsg.steve.service;
 
+import de.rwth.idsg.steve.repository.OcppTagRepository;
 import de.rwth.idsg.steve.repository.SettingsRepository;
-import de.rwth.idsg.steve.repository.UserRepository;
-import jooq.steve.db.tables.records.UserRecord;
+import jooq.steve.db.tables.records.OcppTagRecord;
 import lombok.extern.slf4j.Slf4j;
 import ocpp.cp._2012._06.AuthorisationData;
 import ocpp.cs._2010._08.AuthorizationStatus;
@@ -19,30 +19,30 @@ import java.util.List;
  */
 @Slf4j
 @Service
-public class UserServiceImpl implements UserService {
+public class OcppTagServiceImpl implements OcppTagService {
 
     @Autowired private SettingsRepository settingsRepository;
-    @Autowired private UserRepository userRepository;
+    @Autowired private OcppTagRepository ocppTagRepository;
 
     @Override
-    public List<AuthorisationData> getAuthDataOfAllUsers() {
+    public List<AuthorisationData> getAuthDataOfAllTags() {
         int hoursToExpire = settingsRepository.getHoursToExpire();
 
-        return userRepository.getUserRecords()
-                             .map(new AuthorisationDataMapper(hoursToExpire));
+        return ocppTagRepository.getRecords()
+                                .map(new AuthorisationDataMapper(hoursToExpire));
     }
 
     @Override
     public List<AuthorisationData> getAuthData(List<String> idTagList) {
         int hoursToExpire = settingsRepository.getHoursToExpire();
 
-        return userRepository.getUserRecords(idTagList)
-                             .map(new AuthorisationDataMapper(hoursToExpire));
+        return ocppTagRepository.getRecords(idTagList)
+                                .map(new AuthorisationDataMapper(hoursToExpire));
     }
 
     @Override
     public ocpp.cs._2010._08.IdTagInfo getIdTagInfoV12(String idTag) {
-        UserRecord record = userRepository.getUserRecord(idTag);
+        OcppTagRecord record = ocppTagRepository.getRecord(idTag);
         ocpp.cs._2010._08.IdTagInfo idTagInfo = new ocpp.cs._2010._08.IdTagInfo();
 
         if (record == null) {
@@ -75,7 +75,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public ocpp.cs._2012._06.IdTagInfo getIdTagInfoV15(String idTag) {
-        UserRecord record = userRepository.getUserRecord(idTag);
+        OcppTagRecord record = ocppTagRepository.getRecord(idTag);
         ocpp.cs._2012._06.IdTagInfo idTagInfo = new ocpp.cs._2012._06.IdTagInfo();
 
         if (record == null) {
@@ -110,7 +110,7 @@ public class UserServiceImpl implements UserService {
     // Private helpers
     // -------------------------------------------------------------------------
 
-    private class AuthorisationDataMapper implements RecordMapper<UserRecord, AuthorisationData> {
+    private class AuthorisationDataMapper implements RecordMapper<OcppTagRecord, AuthorisationData> {
         private final DateTime nowDt;
         private final DateTime cacheExpiry;
 
@@ -120,7 +120,7 @@ public class UserServiceImpl implements UserService {
         }
 
         @Override
-        public AuthorisationData map(UserRecord record) {
+        public AuthorisationData map(OcppTagRecord record) {
 
             String idTag = record.getIdTag();
             String parentIdTag = record.getParentIdTag();

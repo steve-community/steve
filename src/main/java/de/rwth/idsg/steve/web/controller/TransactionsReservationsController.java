@@ -4,7 +4,7 @@ import de.rwth.idsg.steve.repository.ChargePointRepository;
 import de.rwth.idsg.steve.repository.ReservationRepository;
 import de.rwth.idsg.steve.repository.ReservationStatus;
 import de.rwth.idsg.steve.repository.TransactionRepository;
-import de.rwth.idsg.steve.repository.UserRepository;
+import de.rwth.idsg.steve.repository.OcppTagRepository;
 import de.rwth.idsg.steve.web.dto.ReservationQueryForm;
 import de.rwth.idsg.steve.web.dto.TransactionQueryForm;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,7 +32,7 @@ public class TransactionsReservationsController {
     @Autowired private TransactionRepository transactionRepository;
     @Autowired private ReservationRepository reservationRepository;
     @Autowired private ChargePointRepository chargePointRepository;
-    @Autowired private UserRepository userRepository;
+    @Autowired private OcppTagRepository ocppTagRepository;
 
     private static final String PARAMS = "params";
 
@@ -110,7 +110,7 @@ public class TransactionsReservationsController {
 
     private void initList(Model model) {
         model.addAttribute("cpList", chargePointRepository.getChargeBoxIds());
-        model.addAttribute("idTagList", userRepository.getUserIdTags());
+        model.addAttribute("idTagList", ocppTagRepository.getIdTags());
     }
 
     private void initResList(Model model) {

@@ -11,10 +11,10 @@ import lombok.Setter;
  */
 @Getter
 @Setter
-public class UserQueryForm {
+public class OcppTagQueryForm {
 
-    private String userId;
-    private String parentId;
+    private String idTag;
+    private String parentIdTag;
 
     private BooleanType expired;
     private BooleanType inTransaction;
@@ -23,18 +23,18 @@ public class UserQueryForm {
     /**
      * Init with sensible default values
      */
-    public UserQueryForm() {
+    public OcppTagQueryForm() {
         expired = BooleanType.FALSE;
         blocked = BooleanType.FALSE;
         inTransaction = BooleanType.ALL;
     }
 
-    public boolean isUserIdSet() {
-        return !StringUtils.isNullOrEmpty(userId);
+    public boolean isIdTagSet() {
+        return !StringUtils.isNullOrEmpty(idTag);
     }
 
-    public boolean isParentIdSet() {
-        return !StringUtils.isNullOrEmpty(parentId);
+    public boolean isParentIdTagSet() {
+        return !StringUtils.isNullOrEmpty(parentIdTag);
     }
 
     @RequiredArgsConstructor

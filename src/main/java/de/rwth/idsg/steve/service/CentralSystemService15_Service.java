@@ -48,7 +48,7 @@ import java.util.stream.Collectors;
 public class CentralSystemService15_Service {
 
     @Autowired private OcppServerRepository ocppServerRepository;
-    @Autowired private UserService userService;
+    @Autowired private OcppTagService ocppTagService;
     @Autowired private SettingsRepository settingsRepository;
 
     public BootNotificationResponse bootNotification(BootNotificationRequest parameters, String chargeBoxIdentity,
@@ -152,7 +152,7 @@ public class CentralSystemService15_Service {
         Integer transactionId = ocppServerRepository.insertTransaction(params);
 
         return new StartTransactionResponse()
-                .withIdTagInfo(userService.getIdTagInfoV15(parameters.getIdTag()))
+                .withIdTagInfo(ocppTagService.getIdTagInfoV15(parameters.getIdTag()))
                 .withTransactionId(transactionId);
     }
 
@@ -186,7 +186,7 @@ public class CentralSystemService15_Service {
 
         // Get the authorization info of the user
         if (parameters.isSetIdTag()) {
-            IdTagInfo idTagInfo = userService.getIdTagInfoV15(parameters.getIdTag());
+            IdTagInfo idTagInfo = ocppTagService.getIdTagInfoV15(parameters.getIdTag());
             return new StopTransactionResponse().withIdTagInfo(idTagInfo);
         } else {
             return new StopTransactionResponse();
@@ -207,7 +207,7 @@ public class CentralSystemService15_Service {
 
         // Get the authorization info of the user
         String idTag = parameters.getIdTag();
-        IdTagInfo idTagInfo = userService.getIdTagInfoV15(idTag);
+        IdTagInfo idTagInfo = ocppTagService.getIdTagInfoV15(idTag);
 
         return new AuthorizeResponse().withIdTagInfo(idTagInfo);
     }

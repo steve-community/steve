@@ -1,6 +1,6 @@
 package de.rwth.idsg.steve.web.controller;
 
-import de.rwth.idsg.steve.repository.UserRepository;
+import de.rwth.idsg.steve.repository.OcppTagRepository;
 import de.rwth.idsg.steve.service.ChargePointHelperService;
 import de.rwth.idsg.steve.service.ChargePointService12_Client;
 import de.rwth.idsg.steve.web.dto.common.GetDiagnosticsParams;
@@ -31,7 +31,7 @@ import javax.validation.Valid;
 public class Ocpp12Controller {
 
     @Autowired private ChargePointHelperService chargePointHelperService;
-    @Autowired private UserRepository userRepository;
+    @Autowired private OcppTagRepository ocppTagRepository;
     @Autowired private ChargePointService12_Client client;
 
     private static final String PARAMS = "params";
@@ -62,7 +62,7 @@ public class Ocpp12Controller {
     }
 
     private void setActiveUserIdTagList(Model model) {
-        model.addAttribute("idTagList", userRepository.getActiveUserIdTags());
+        model.addAttribute("idTagList", ocppTagRepository.getActiveIdTags());
     }
 
     // -------------------------------------------------------------------------

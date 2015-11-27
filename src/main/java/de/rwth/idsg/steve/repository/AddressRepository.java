@@ -10,8 +10,6 @@ import org.jooq.SelectConditionStep;
  * @since 24.11.2015
  */
 public interface AddressRepository {
-    Integer insert(DSLContext ctx, Address address);
-    void update(DSLContext ctx, Address address);
     Integer updateOrInsert(DSLContext ctx, Address address);
     void delete(DSLContext ctx, SelectConditionStep<Record1<Integer>> addressPkSelect);
 }

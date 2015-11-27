@@ -3,7 +3,6 @@ package de.rwth.idsg.steve.repository;
 import com.google.common.base.Optional;
 import de.rwth.idsg.steve.SteveException;
 import de.rwth.idsg.steve.repository.dto.User;
-import de.rwth.idsg.steve.web.dto.Address;
 import de.rwth.idsg.steve.web.dto.UserForm;
 import de.rwth.idsg.steve.web.dto.UserQueryForm;
 import jooq.steve.db.tables.records.AddressRecord;
@@ -52,9 +51,9 @@ public class UserRepositoryImpl implements UserRepository {
                                          .userPk(r.value1())
                                          .ocppTagPk(r.value2())
                                          .ocppIdTag(r.value3())
-                                         .name(r.value3() + " " + r.value4())
-                                         .phone(r.value5())
-                                         .email(r.value6())
+                                         .name(r.value4() + " " + r.value5())
+                                         .phone(r.value6())
+                                         .email(r.value7())
                                          .build()
                   );
     }
@@ -120,11 +119,11 @@ public class UserRepositoryImpl implements UserRepository {
         DSL.using(config).transaction(configuration -> {
             DSLContext ctx = DSL.using(configuration);
             try {
-                Integer addressId = addressRepository.insert(ctx, form.getAddress());
+                Integer addressId = addressRepository.updateOrInsert(ctx, form.getAddress());
                 addInternal(ctx, form, addressId);
 
             } catch (DataAccessException e) {
-                throw new SteveException("Failed to add the customer", e);
+                throw new SteveException("Failed to add the user", e);
             }
         });
     }
@@ -134,12 +133,11 @@ public class UserRepositoryImpl implements UserRepository {
         DSL.using(config).transaction(configuration -> {
             DSLContext ctx = DSL.using(configuration);
             try {
-                Address address = form.getAddress();
-                Integer addressId = addressRepository.updateOrInsert(ctx, address);
+                Integer addressId = addressRepository.updateOrInsert(ctx, form.getAddress());
                 updateInternal(ctx, form, addressId);
 
             } catch (DataAccessException e) {
-                throw new SteveException("Failed to add the customer", e);
+                throw new SteveException("Failed to update the user", e);
             }
         });
     }
@@ -153,7 +151,7 @@ public class UserRepositoryImpl implements UserRepository {
                 deleteInternal(ctx, userPk);
 
             } catch (DataAccessException e) {
-                throw new SteveException("Failed to delete the customer", e);
+                throw new SteveException("Failed to delete the user", e);
             }
         });
     }
@@ -228,7 +226,7 @@ public class UserRepositoryImpl implements UserRepository {
                        .execute();
 
         if (count != 1) {
-            throw new SteveException("Failed to insert the customer");
+            throw new SteveException("Failed to insert the user");
         }
     }
 

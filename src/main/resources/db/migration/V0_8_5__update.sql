@@ -1,9 +1,9 @@
 CREATE TABLE address (
   address_pk INT NOT NULL AUTO_INCREMENT,
-  street_and_house_number varchar(1000) NOT NULL,
-  zip_code varchar(255) NOT NULL,
-  city varchar(255) NOT NULL,
-  country varchar(255) NOT NULL,
+  street_and_house_number varchar(1000),
+  zip_code varchar(255),
+  city varchar(255),
+  country varchar(255),
   PRIMARY KEY (address_pk)
 );
 

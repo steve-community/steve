@@ -33,7 +33,6 @@ public class UserForm {
     @Email(message = "Not a valid e-mail address")
     private String eMail;
 
-    @Valid
     private Address address;
 
 }

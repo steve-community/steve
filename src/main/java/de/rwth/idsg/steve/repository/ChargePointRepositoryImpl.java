@@ -7,7 +7,6 @@ import de.rwth.idsg.steve.repository.dto.ChargePoint;
 import de.rwth.idsg.steve.repository.dto.ChargePointSelect;
 import de.rwth.idsg.steve.repository.dto.ConnectorStatus;
 import de.rwth.idsg.steve.utils.DateTimeUtils;
-import de.rwth.idsg.steve.web.dto.Address;
 import de.rwth.idsg.steve.web.dto.ChargePointForm;
 import de.rwth.idsg.steve.web.dto.ChargePointQueryForm;
 import jooq.steve.db.tables.records.AddressRecord;
@@ -224,11 +223,11 @@ public class ChargePointRepositoryImpl implements ChargePointRepository {
         DSL.using(config).transaction(configuration -> {
             DSLContext ctx = DSL.using(configuration);
             try {
-                Integer addressId = addressRepository.insert(ctx, form.getAddress());
+                Integer addressId = addressRepository.updateOrInsert(ctx, form.getAddress());
                 addChargePointInternal(ctx, form, addressId);
 
             } catch (DataAccessException e) {
-                throw new SteveException("The charge point with chargeBoxId '%s' could NOT be added.",
+                throw new SteveException("Failed to add the charge point with chargeBoxId '%s'",
                         form.getChargeBoxId(), e);
             }
         });
@@ -239,12 +238,11 @@ public class ChargePointRepositoryImpl implements ChargePointRepository {
         DSL.using(config).transaction(configuration -> {
             DSLContext ctx = DSL.using(configuration);
             try {
-                Address address = form.getAddress();
-                Integer addressId = addressRepository.updateOrInsert(ctx, address);
+                Integer addressId = addressRepository.updateOrInsert(ctx, form.getAddress());
                 updateChargePointInternal(ctx, form, addressId);
 
             } catch (DataAccessException e) {
-                throw new SteveException("The charge point with chargeBoxId '%s' could NOT be added.",
+                throw new SteveException("Failed to update the charge point with chargeBoxId '%s'",
                         form.getChargeBoxId(), e);
             }
         });
@@ -259,7 +257,7 @@ public class ChargePointRepositoryImpl implements ChargePointRepository {
                 deleteChargePointInternal(ctx, chargeBoxPk);
 
             } catch (DataAccessException e) {
-                throw new SteveException("The charge point could NOT be deleted.", e);
+                throw new SteveException("Failed to delete the charge point", e);
             }
         });
     }

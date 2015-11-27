@@ -62,7 +62,9 @@ public class RequestTask {
     }
 
     public boolean isFinished() {
-        return endTimestamp != null;
+        synchronized (lockObject) {
+            return endTimestamp != null;
+        }
     }
 
     public void addNewResponse(String chargeBoxId, String response) {

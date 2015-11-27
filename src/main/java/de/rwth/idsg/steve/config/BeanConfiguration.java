@@ -68,6 +68,10 @@ public class BeanConfiguration extends WebMvcConfigurerAdapter {
         config.addDataSourceProperty("prepStmtCacheSize", "250");
         config.addDataSourceProperty("prepStmtCacheSqlLimit", "2048");
 
+        // we must explicitly set the encoding, otherwise data is not handled properly!
+        config.addDataSourceProperty("encoding", "utf8");
+        config.addDataSourceProperty("useUnicode", "true");
+
         dataSource = new HikariDataSource(config);
     }
 

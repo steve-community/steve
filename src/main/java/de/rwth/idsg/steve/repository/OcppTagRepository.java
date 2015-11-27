@@ -13,11 +13,12 @@ import java.util.List;
  * @since 19.08.2014
  */
 public interface OcppTagRepository {
-    List<OcppTag> getTags(OcppTagQueryForm form);
+    List<OcppTag.Overview> getOverview(OcppTagQueryForm form);
 
     Result<OcppTagRecord> getRecords();
     Result<OcppTagRecord> getRecords(List<String> idTagList);
     OcppTagRecord getRecord(String idTag);
+    OcppTagRecord getRecord(int ocppTagPk);
 
     List<String> getIdTags();
     List<String> getActiveIdTags();
@@ -27,5 +28,5 @@ public interface OcppTagRepository {
 
     void addOcppTag(OcppTagForm form);
     void updateOcppTag(OcppTagForm form);
-    void deleteOcppTag(String idTag);
+    void deleteOcppTag(int ocppTagPk);
 }

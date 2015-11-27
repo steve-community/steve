@@ -17,6 +17,9 @@ import javax.validation.constraints.NotNull;
 @Setter
 public class OcppTagForm {
 
+    // Internal database id
+    private Integer ocppTagPk;
+
     @NotEmpty(message = "ID Tag is required")
     @IdTag
     private String idTag;

@@ -52,12 +52,12 @@
         </thead>
         <tbody>
         <c:forEach items="${cpList}" var="cp">
-            <tr><td><a href="/steve/manager/chargepoints/details/${cp.chargeBoxId}">${cp.chargeBoxId}</a></td>
+            <tr><td><a href="/steve/manager/chargepoints/details/${cp.chargeBoxPk}">${cp.chargeBoxId}</a></td>
                 <td>${cp.description}</td>
                 <td>${cp.ocppProtocol}</td>
                 <td>${cp.lastHeartbeatTimestamp}</td>
                 <td>
-                    <form:form action="/steve/manager/chargepoints/delete/${cp.chargeBoxId}">
+                    <form:form action="/steve/manager/chargepoints/delete/${cp.chargeBoxPk}">
                         <input type="submit" value="Delete">
                     </form:form>
                 </td>

@@ -8,7 +8,7 @@ import de.rwth.idsg.steve.repository.dto.ChargePointSelect;
 import de.rwth.idsg.steve.repository.dto.ConnectorStatus;
 import de.rwth.idsg.steve.utils.DateTimeUtils;
 import de.rwth.idsg.steve.web.dto.Address;
-import de.rwth.idsg.steve.web.dto.ChargeBoxForm;
+import de.rwth.idsg.steve.web.dto.ChargePointForm;
 import de.rwth.idsg.steve.web.dto.ChargePointQueryForm;
 import jooq.steve.db.tables.records.AddressRecord;
 import jooq.steve.db.tables.records.ChargeBoxRecord;
@@ -18,7 +18,7 @@ import org.jooq.Configuration;
 import org.jooq.DSLContext;
 import org.jooq.Field;
 import org.jooq.Record1;
-import org.jooq.Record4;
+import org.jooq.Record5;
 import org.jooq.Result;
 import org.jooq.SelectConditionStep;
 import org.jooq.SelectQuery;
@@ -87,20 +87,22 @@ public class ChargePointRepositoryImpl implements ChargePointRepository {
     @Override
     public List<ChargePoint.Overview> getOverview(ChargePointQueryForm form) {
         return getOverviewInternal(form)
-                  .map(r -> ChargePoint.Overview.builder()
-                                                .chargeBoxId(r.value1())
-                                                .description(r.value2())
-                                                .ocppProtocol(r.value3())
-                                                .lastHeartbeatTimestamp(DateTimeUtils.humanize(r.value4()))
-                                                .build()
-                  );
+                .map(r -> ChargePoint.Overview.builder()
+                                              .chargeBoxPk(r.value1())
+                                              .chargeBoxId(r.value2())
+                                              .description(r.value3())
+                                              .ocppProtocol(r.value4())
+                                              .lastHeartbeatTimestamp(DateTimeUtils.humanize(r.value5()))
+                                              .build()
+                );
     }
 
     @SuppressWarnings("unchecked")
-    private Result<Record4<String, String, String, DateTime>> getOverviewInternal(ChargePointQueryForm form) {
+    private Result<Record5<Integer, String, String, String, DateTime>> getOverviewInternal(ChargePointQueryForm form) {
         SelectQuery selectQuery = DSL.using(config).selectQuery();
         selectQuery.addFrom(CHARGE_BOX);
         selectQuery.addSelect(
+                CHARGE_BOX.CHARGE_BOX_PK,
                 CHARGE_BOX.CHARGE_BOX_ID,
                 CHARGE_BOX.DESCRIPTION,
                 CHARGE_BOX.OCPP_PROTOCOL,
@@ -150,15 +152,15 @@ public class ChargePointRepositoryImpl implements ChargePointRepository {
     }
 
     @Override
-    public ChargePoint.Details getDetails(String chargeBoxId) {
+    public ChargePoint.Details getDetails(int chargeBoxPk) {
         DSLContext ctx = DSL.using(config);
 
         ChargeBoxRecord cbr = ctx.selectFrom(CHARGE_BOX)
-                                 .where(CHARGE_BOX.CHARGE_BOX_ID.equal(chargeBoxId))
+                                 .where(CHARGE_BOX.CHARGE_BOX_PK.equal(chargeBoxPk))
                                  .fetchOne();
 
         if (cbr == null) {
-            throw new SteveException("There is no charge point with chargeBoxId '%s'", chargeBoxId);
+            throw new SteveException("Charge point not found");
         }
 
         cbr.detach();
@@ -218,7 +220,7 @@ public class ChargePointRepositoryImpl implements ChargePointRepository {
     }
 
     @Override
-    public void addChargePoint(ChargeBoxForm form) {
+    public void addChargePoint(ChargePointForm form) {
         DSL.using(config).transaction(configuration -> {
             DSLContext ctx = DSL.using(configuration);
             try {
@@ -233,7 +235,7 @@ public class ChargePointRepositoryImpl implements ChargePointRepository {
     }
 
     @Override
-    public void updateChargePoint(ChargeBoxForm form) {
+    public void updateChargePoint(ChargePointForm form) {
         DSL.using(config).transaction(configuration -> {
             DSLContext ctx = DSL.using(configuration);
             try {
@@ -249,16 +251,15 @@ public class ChargePointRepositoryImpl implements ChargePointRepository {
     }
 
     @Override
-    public void deleteChargePoint(String chargeBoxId) {
+    public void deleteChargePoint(int chargeBoxPk) {
         DSL.using(config).transaction(configuration -> {
             DSLContext ctx = DSL.using(configuration);
             try {
-                addressRepository.delete(ctx, selectAddressId(chargeBoxId));
-                deleteChargePointInternal(ctx, chargeBoxId);
+                addressRepository.delete(ctx, selectAddressId(chargeBoxPk));
+                deleteChargePointInternal(ctx, chargeBoxPk);
 
             } catch (DataAccessException e) {
-                throw new SteveException("The charge point with chargeBoxId '%s' could NOT be deleted.",
-                        chargeBoxId, e);
+                throw new SteveException("The charge point could NOT be deleted.", e);
             }
         });
     }
@@ -267,13 +268,13 @@ public class ChargePointRepositoryImpl implements ChargePointRepository {
     // Helpers
     // -------------------------------------------------------------------------
 
-    private SelectConditionStep<Record1<Integer>> selectAddressId(String chargeBoxId) {
+    private SelectConditionStep<Record1<Integer>> selectAddressId(int chargeBoxPk) {
         return DSL.select(CHARGE_BOX.ADDRESS_PK)
                   .from(CHARGE_BOX)
-                  .where(CHARGE_BOX.CHARGE_BOX_ID.eq(chargeBoxId));
+                  .where(CHARGE_BOX.CHARGE_BOX_PK.eq(chargeBoxPk));
     }
 
-    private void addChargePointInternal(DSLContext ctx, ChargeBoxForm form, Integer addressPk) {
+    private void addChargePointInternal(DSLContext ctx, ChargePointForm form, Integer addressPk) {
         int count = ctx.insertInto(CHARGE_BOX)
                        .set(CHARGE_BOX.CHARGE_BOX_ID, form.getChargeBoxId())
                        .set(CHARGE_BOX.DESCRIPTION, form.getDescription())
@@ -289,20 +290,20 @@ public class ChargePointRepositoryImpl implements ChargePointRepository {
         }
     }
 
-    private void updateChargePointInternal(DSLContext ctx, ChargeBoxForm form, Integer addressPk) {
+    private void updateChargePointInternal(DSLContext ctx, ChargePointForm form, Integer addressPk) {
         ctx.update(CHARGE_BOX)
            .set(CHARGE_BOX.DESCRIPTION, form.getDescription())
            .set(CHARGE_BOX.LOCATION_LATITUDE, form.getLocationLatitude())
            .set(CHARGE_BOX.LOCATION_LONGITUDE, form.getLocationLongitude())
            .set(CHARGE_BOX.NOTE, form.getNote())
            .set(CHARGE_BOX.ADDRESS_PK, addressPk)
-           .where(CHARGE_BOX.CHARGE_BOX_ID.equal(form.getChargeBoxId()))
+           .where(CHARGE_BOX.CHARGE_BOX_PK.equal(form.getChargeBoxPk()))
            .execute();
     }
 
-    private void deleteChargePointInternal(DSLContext ctx, String chargeBoxId) {
+    private void deleteChargePointInternal(DSLContext ctx, int chargeBoxPk) {
         ctx.delete(CHARGE_BOX)
-           .where(CHARGE_BOX.CHARGE_BOX_ID.equal(chargeBoxId))
+           .where(CHARGE_BOX.CHARGE_BOX_PK.equal(chargeBoxPk))
            .execute();
     }
 }

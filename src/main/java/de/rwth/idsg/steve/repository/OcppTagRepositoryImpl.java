@@ -1,15 +1,17 @@
 package de.rwth.idsg.steve.repository;
 
 import de.rwth.idsg.steve.SteveException;
-import de.rwth.idsg.steve.repository.dto.OcppTag;
+import de.rwth.idsg.steve.repository.dto.OcppTag.Overview;
 import de.rwth.idsg.steve.utils.CustomDSL;
 import de.rwth.idsg.steve.web.dto.OcppTagForm;
 import de.rwth.idsg.steve.web.dto.OcppTagQueryForm;
+import jooq.steve.db.tables.OcppTag;
 import jooq.steve.db.tables.records.OcppTagRecord;
 import lombok.extern.slf4j.Slf4j;
 import org.joda.time.DateTime;
 import org.jooq.Configuration;
-import org.jooq.Record5;
+import org.jooq.JoinType;
+import org.jooq.Record7;
 import org.jooq.RecordMapper;
 import org.jooq.Result;
 import org.jooq.SelectQuery;
@@ -40,16 +42,23 @@ public class OcppTagRepositoryImpl implements OcppTagRepository {
 
     @Override
     @SuppressWarnings("unchecked")
-    public List<OcppTag> getTags(OcppTagQueryForm form) {
+    public List<Overview> getOverview(OcppTagQueryForm form) {
         SelectQuery selectQuery = DSL.using(config).selectQuery();
         selectQuery.addFrom(OCPP_TAG);
+
+        OcppTag parentTable = OCPP_TAG.as("parent");
+
         selectQuery.addSelect(
+                OCPP_TAG.OCPP_TAG_PK,
+                parentTable.OCPP_TAG_PK,
                 OCPP_TAG.ID_TAG,
                 OCPP_TAG.PARENT_ID_TAG,
                 OCPP_TAG.EXPIRY_DATE,
                 OCPP_TAG.IN_TRANSACTION,
                 OCPP_TAG.BLOCKED
         );
+
+        selectQuery.addJoin(parentTable, JoinType.LEFT_OUTER_JOIN, parentTable.ID_TAG.eq(OCPP_TAG.PARENT_ID_TAG));
 
         if (form.isIdTagSet()) {
             selectQuery.addConditions(OCPP_TAG.ID_TAG.eq(form.getIdTag()));
@@ -103,6 +112,14 @@ public class OcppTagRepositoryImpl implements OcppTagRepository {
         return DSL.using(config)
                   .selectFrom(OCPP_TAG)
                   .where(OCPP_TAG.ID_TAG.equal(idTag))
+                  .fetchOne();
+    }
+
+    @Override
+    public OcppTagRecord getRecord(int ocppTagPk) {
+        return DSL.using(config)
+                  .selectFrom(OCPP_TAG)
+                  .where(OCPP_TAG.OCPP_TAG_PK.equal(ocppTagPk))
                   .fetchOne();
     }
 
@@ -175,7 +192,7 @@ public class OcppTagRepositoryImpl implements OcppTagRepository {
                .set(OCPP_TAG.EXPIRY_DATE, toDateTime(u.getExpiration()))
                .set(OCPP_TAG.NOTE, u.getNote())
                .set(OCPP_TAG.BLOCKED, u.getBlocked())
-               .where(OCPP_TAG.ID_TAG.equal(u.getIdTag()))
+               .where(OCPP_TAG.OCPP_TAG_PK.equal(u.getOcppTagPk()))
                .execute();
         } catch (DataAccessException e) {
             throw new SteveException("Execution of updateOcppTag for idTag '%s' FAILED.", u.getIdTag(), e);
@@ -183,14 +200,14 @@ public class OcppTagRepositoryImpl implements OcppTagRepository {
     }
 
     @Override
-    public void deleteOcppTag(String idTag) {
+    public void deleteOcppTag(int ocppTagPk) {
         try {
             DSL.using(config)
                .delete(OCPP_TAG)
-               .where(OCPP_TAG.ID_TAG.equal(idTag))
+               .where(OCPP_TAG.OCPP_TAG_PK.equal(ocppTagPk))
                .execute();
         } catch (DataAccessException e) {
-            throw new SteveException("Execution of deleteOcppTag for idTag '%s' FAILED.", idTag, e);
+            throw new SteveException("Execution of deleteOcppTag for idTag FAILED.", e);
         }
     }
 
@@ -207,15 +224,17 @@ public class OcppTagRepositoryImpl implements OcppTagRepository {
     }
 
     private static class UserMapper
-            implements RecordMapper<Record5<String, String, DateTime, Boolean, Boolean>, OcppTag> {
+            implements RecordMapper<Record7<Integer, Integer, String, String, DateTime, Boolean, Boolean>, Overview> {
         @Override
-        public OcppTag map(Record5<String, String, DateTime, Boolean, Boolean> r) {
-            return OcppTag.builder()
-                          .idTag(r.value1())
-                          .parentIdTag(r.value2())
-                          .expiryDate(humanize(r.value3()))
-                          .inTransaction(r.value4())
-                          .blocked(r.value5())
+        public Overview map(Record7<Integer, Integer, String, String, DateTime, Boolean, Boolean> r) {
+            return Overview.builder()
+                          .ocppTagPk(r.value1())
+                          .parentOcppTagPk(r.value2())
+                          .idTag(r.value3())
+                          .parentIdTag(r.value4())
+                          .expiryDate(humanize(r.value5()))
+                          .inTransaction(r.value6())
+                          .blocked(r.value7())
                           .build();
         }
     }

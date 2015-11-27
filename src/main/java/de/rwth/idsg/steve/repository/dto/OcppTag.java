@@ -8,9 +8,13 @@ import lombok.Getter;
  * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
  *
  */
-@Getter
-@Builder
 public final class OcppTag {
-    private final String idTag, parentIdTag, expiryDate;
-    private final boolean inTransaction, blocked;
+
+    @Getter
+    @Builder
+    public static final class Overview {
+        private final Integer ocppTagPk, parentOcppTagPk;
+        private final String idTag, parentIdTag, expiryDate;
+        private final boolean inTransaction, blocked;
+    }
 }

@@ -1,5 +1,5 @@
 <%@ include file="../00-header.jsp" %>
-<spring:hasBindErrors name="chargeBoxAddForm">
+<spring:hasBindErrors name="chargePointForm">
     <div class="error">
         Error while trying to add a charge point:
         <ul>
@@ -11,7 +11,7 @@
 </spring:hasBindErrors>
 <div class="content"><div>
 <section><span>Add Charge Point</span></section>
-    <form:form action="/steve/manager/chargepoints/add" modelAttribute="chargeBoxAddForm">
+    <form:form action="/steve/manager/chargepoints/add" modelAttribute="chargePointForm">
 
         <table class="userInput">
             <thead><tr><th>OCPP</th><th></th></thead>

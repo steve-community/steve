@@ -1,5 +1,5 @@
 <%@ include file="../00-header.jsp" %>
-<spring:hasBindErrors name="chargeBoxUpdateForm">
+<spring:hasBindErrors name="chargePointForm">
     <div class="error">
         Error while trying to update a charge point:
         <ul>
@@ -16,8 +16,9 @@
             <span>Read-only fields are updated by the charge point.</span>
         </a>
     </span></section>
-        <form:form action="/steve/manager/chargepoints/update" modelAttribute="chargeBoxUpdateForm">
+        <form:form action="/steve/manager/chargepoints/update" modelAttribute="chargePointForm">
 
+            <form:hidden path="chargeBoxPk" readonly="true"/>
             <table class="userInput">
                 <thead><tr><th>OCPP</th><th></th></thead>
                 <tbody>

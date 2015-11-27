@@ -15,7 +15,10 @@ import java.math.BigDecimal;
  */
 @Getter
 @Setter
-public class ChargeBoxForm {
+public class ChargePointForm {
+
+    // Internal database id
+    private Integer chargeBoxPk;
 
     @NotBlank(message = "ChargeBox ID is required")
     @Pattern(regexp = "\\S+", message = "ChargeBox ID cannot contain any whitespace")

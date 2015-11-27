@@ -14,7 +14,7 @@ import org.jooq.DSLContext;
 import org.jooq.Field;
 import org.jooq.JoinType;
 import org.jooq.Record1;
-import org.jooq.Record6;
+import org.jooq.Record7;
 import org.jooq.Result;
 import org.jooq.SelectConditionStep;
 import org.jooq.SelectQuery;
@@ -49,8 +49,9 @@ public class UserRepositoryImpl implements UserRepository {
     public List<User.Overview> getOverview(UserQueryForm form) {
         return getOverviewInternal(form)
                   .map(r -> User.Overview.builder()
-                                         .userPk(Integer.toString(r.value1()))
-                                         .ocppIdTag(r.value2())
+                                         .userPk(r.value1())
+                                         .ocppTagPk(r.value2())
+                                         .ocppIdTag(r.value3())
                                          .name(r.value3() + " " + r.value4())
                                          .phone(r.value5())
                                          .email(r.value6())
@@ -162,12 +163,13 @@ public class UserRepositoryImpl implements UserRepository {
     // -------------------------------------------------------------------------
 
     @SuppressWarnings("unchecked")
-    private Result<Record6<Integer, String, String, String, String, String>> getOverviewInternal(UserQueryForm form) {
+    private Result<Record7<Integer, Integer, String, String, String, String, String>> getOverviewInternal(UserQueryForm form) {
         SelectQuery selectQuery = DSL.using(config).selectQuery();
         selectQuery.addFrom(USER);
         selectQuery.addJoin(OCPP_TAG, JoinType.LEFT_OUTER_JOIN, USER.OCPP_TAG_PK.eq(OCPP_TAG.OCPP_TAG_PK));
         selectQuery.addSelect(
                 USER.USER_PK,
+                USER.OCPP_TAG_PK,
                 OCPP_TAG.ID_TAG,
                 USER.FIRST_NAME,
                 USER.LAST_NAME,

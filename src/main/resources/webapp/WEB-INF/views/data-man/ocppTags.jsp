@@ -70,17 +70,17 @@
         </thead>
         <tbody>
         <c:forEach items="${ocppTagList}" var="item">
-            <tr><td><a href="/steve/manager/ocppTags/details/${item.idTag}">${item.idTag}</a></td>
+            <tr><td><a href="/steve/manager/ocppTags/details/${item.ocppTagPk}">${item.idTag}</a></td>
                 <td>
                     <c:if test="${not empty item.parentIdTag}">
-                        <a href="/steve/manager/ocppTags/details/${item.parentIdTag}">${item.parentIdTag}</a>
+                        <a href="/steve/manager/ocppTags/details/${item.parentOcppTagPk}">${item.parentIdTag}</a>
                     </c:if>
                 </td>
                 <td>${item.expiryDate}</td>
                 <td>${item.inTransaction}</td>
                 <td>${item.blocked}</td>
                 <td>
-                    <form:form action="/steve/manager/ocppTags/delete/${item.idTag}">
+                    <form:form action="/steve/manager/ocppTags/delete/${item.ocppTagPk}">
                         <input type="submit" value="Delete">
                     </form:form>
                 </td>

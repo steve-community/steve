@@ -35,8 +35,8 @@ public class OcppTagsController {
 
     private static final String QUERY_PATH = "/query";
 
-    private static final String DETAILS_PATH = "/details/{idTag}";
-    private static final String DELETE_PATH = "/delete/{idTag}";
+    private static final String DETAILS_PATH = "/details/{ocppTagPk}";
+    private static final String DELETE_PATH = "/delete/{ocppTagPk}";
     private static final String UPDATE_PATH = "/update";
     private static final String ADD_PATH = "/add";
 
@@ -59,10 +59,11 @@ public class OcppTagsController {
     }
 
     @RequestMapping(value = DETAILS_PATH, method = RequestMethod.GET)
-    public String getDetails(@PathVariable("idTag") String idTag, Model model) {
-        OcppTagRecord record = ocppTagRepository.getRecord(idTag);
+    public String getDetails(@PathVariable("ocppTagPk") int ocppTagPk, Model model) {
+        OcppTagRecord record = ocppTagRepository.getRecord(ocppTagPk);
 
         OcppTagForm form = new OcppTagForm();
+        form.setOcppTagPk(record.getOcppTagPk());
         form.setIdTag(record.getIdTag());
 
         DateTime expiryDate = record.getExpiryDate();
@@ -117,8 +118,8 @@ public class OcppTagsController {
     }
 
     @RequestMapping(value = DELETE_PATH, method = RequestMethod.POST)
-    public String delete(@PathVariable("idTag") String idTag) {
-        ocppTagRepository.deleteOcppTag(idTag);
+    public String delete(@PathVariable("ocppTagPk") int ocppTagPk) {
+        ocppTagRepository.deleteOcppTag(ocppTagPk);
         return toOverview();
     }
 
@@ -126,7 +127,7 @@ public class OcppTagsController {
         model.addAttribute(PARAMS, params);
         model.addAttribute("idTagList", ocppTagRepository.getIdTags());
         model.addAttribute("parentIdTagList", ocppTagRepository.getParentIdTags());
-        model.addAttribute("ocppTagList", ocppTagRepository.getTags(params));
+        model.addAttribute("ocppTagList", ocppTagRepository.getOverview(params));
     }
 
     private void setTags(Model model) {

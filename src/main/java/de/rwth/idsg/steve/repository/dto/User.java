@@ -15,7 +15,8 @@ public class User {
     @Getter
     @Builder
     public static final class Overview {
-        private final String userPk, ocppIdTag, name, phone, email;
+        private final Integer userPk, ocppTagPk;
+        private final String ocppIdTag, name, phone, email;
     }
 
     @Getter

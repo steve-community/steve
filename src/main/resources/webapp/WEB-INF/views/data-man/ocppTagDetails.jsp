@@ -18,6 +18,7 @@
     <section><span>Ocpp Tag Details</span></section>
     <form:form action="/steve/manager/ocppTags/update" modelAttribute="ocppTagForm">
 
+        <form:hidden path="ocppTagPk" readonly="true"/>
         <table class="userInput">
             <tr>
                 <td>ID Tag:</td>

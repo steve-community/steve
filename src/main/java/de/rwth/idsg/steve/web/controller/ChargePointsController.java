@@ -3,7 +3,7 @@ package de.rwth.idsg.steve.web.controller;
 import de.rwth.idsg.steve.repository.ChargePointRepository;
 import de.rwth.idsg.steve.repository.dto.ChargePoint;
 import de.rwth.idsg.steve.utils.ControllerHelper;
-import de.rwth.idsg.steve.web.dto.ChargeBoxForm;
+import de.rwth.idsg.steve.web.dto.ChargePointForm;
 import de.rwth.idsg.steve.web.dto.ChargePointQueryForm;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -35,8 +35,8 @@ public class ChargePointsController {
 
     private static final String QUERY_PATH = "/query";
 
-    private static final String DETAILS_PATH = "/details/{chargeBoxId}";
-    private static final String DELETE_PATH = "/delete/{chargeBoxId}";
+    private static final String DETAILS_PATH = "/details/{chargeBoxPk}";
+    private static final String DELETE_PATH = "/delete/{chargeBoxPk}";
     private static final String UPDATE_PATH = "/update";
     private static final String ADD_PATH = "/add";
 
@@ -62,10 +62,11 @@ public class ChargePointsController {
     }
 
     @RequestMapping(value = DETAILS_PATH, method = RequestMethod.GET)
-    public String getDetails(@PathVariable("chargeBoxId") String chargeBoxId, Model model) {
-        ChargePoint.Details cp = chargePointRepository.getDetails(chargeBoxId);
+    public String getDetails(@PathVariable("chargeBoxPk") int chargeBoxPk, Model model) {
+        ChargePoint.Details cp = chargePointRepository.getDetails(chargeBoxPk);
 
-        ChargeBoxForm form = new ChargeBoxForm();
+        ChargePointForm form = new ChargePointForm();
+        form.setChargeBoxPk(cp.getChargeBox().getChargeBoxPk());
         form.setChargeBoxId(cp.getChargeBox().getChargeBoxId());
         form.setNote(cp.getChargeBox().getNote());
         form.setDescription(cp.getChargeBox().getDescription());
@@ -74,42 +75,42 @@ public class ChargePointsController {
 
         form.setAddress(ControllerHelper.recordToDto(cp.getAddress()));
 
-        model.addAttribute("chargeBoxUpdateForm", form);
+        model.addAttribute("chargePointForm", form);
         model.addAttribute("cp", cp);
         return "data-man/chargepointDetails";
     }
 
     @RequestMapping(value = ADD_PATH, method = RequestMethod.GET)
     public String addGet(Model model) {
-        model.addAttribute("chargeBoxAddForm", new ChargeBoxForm());
+        model.addAttribute("chargePointForm", new ChargePointForm());
         return "data-man/chargepointAdd";
     }
 
     @RequestMapping(params = "add", value = ADD_PATH, method = RequestMethod.POST)
-    public String addPost(@Valid @ModelAttribute("chargeBoxAddForm") ChargeBoxForm chargeBoxForm,
+    public String addPost(@Valid @ModelAttribute("chargePointForm") ChargePointForm chargePointForm,
                       BindingResult result) {
         if (result.hasErrors()) {
             return "data-man/chargepointAdd";
         }
 
-        chargePointRepository.addChargePoint(chargeBoxForm);
+        chargePointRepository.addChargePoint(chargePointForm);
         return toOverview();
     }
 
     @RequestMapping(params = "update", value = UPDATE_PATH, method = RequestMethod.POST)
-    public String update(@Valid @ModelAttribute("chargeBoxUpdateForm") ChargeBoxForm chargeBoxForm,
+    public String update(@Valid @ModelAttribute("chargePointForm") ChargePointForm chargePointForm,
                          BindingResult result) {
         if (result.hasErrors()) {
             return "data-man/chargepointDetails";
         }
 
-        chargePointRepository.updateChargePoint(chargeBoxForm);
+        chargePointRepository.updateChargePoint(chargePointForm);
         return toOverview();
     }
 
     @RequestMapping(value = DELETE_PATH, method = RequestMethod.POST)
-    public String delete(@PathVariable("chargeBoxId") String chargeBoxId) {
-        chargePointRepository.deleteChargePoint(chargeBoxId);
+    public String delete(@PathVariable("chargeBoxPk") int chargeBoxPk) {
+        chargePointRepository.deleteChargePoint(chargeBoxPk);
         return toOverview();
     }
 

@@ -48,7 +48,7 @@
             <tr><td><a href="/steve/manager/users/details/${cr.userPk}">${cr.userPk}</a></td>
                 <td>
                     <c:if test="${not empty cr.ocppIdTag}">
-                        <a href="/steve/manager/ocppTags/details/${cr.ocppIdTag}">${cr.ocppIdTag}</a>
+                        <a href="/steve/manager/ocppTags/details/${cr.ocppTagPk}">${cr.ocppIdTag}</a>
                     </c:if>
                 </td>
                 <td>${cr.name}</td>

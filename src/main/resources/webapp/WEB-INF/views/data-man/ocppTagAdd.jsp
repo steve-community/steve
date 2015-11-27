@@ -31,12 +31,7 @@
             </tr>
             <tr>
                 <td>Parent ID Tag:</td>
-                <td>
-                    <form:select path="parentIdTag">
-                        <option value="-- Empty --" selected="selected">-- Empty --</option>
-                        <form:options items="${idTagList}" />
-                    </form:select>
-                </td>
+                <td><form:select path="parentIdTag" items="${idTagList}"/></td>
             </tr>
             <tr><td>Expiry Date/Time:</td><td><form:input path="expiration" cssClass="dateTimePicker"/></td></tr>
             <tr><td>Additional Note:</td><td><form:input path="note"/></td></tr>

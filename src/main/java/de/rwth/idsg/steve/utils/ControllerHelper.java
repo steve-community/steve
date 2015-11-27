@@ -3,7 +3,9 @@ package de.rwth.idsg.steve.utils;
 import de.rwth.idsg.steve.web.dto.Address;
 import jooq.steve.db.tables.records.AddressRecord;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
@@ -26,8 +28,13 @@ public final class ControllerHelper {
         return address;
     }
 
-    public static List<String> idTagEnhancer(List<String> idTagList) {
-        idTagList.add(EMPTY_OPTION);
-        return idTagList;
+    public static Map<String, String> idTagEnhancer(List<String> idTagList) {
+        Map<String, String> map = new HashMap<>(idTagList.size());
+        map.put("", EMPTY_OPTION);
+
+        for (String s : idTagList) {
+            map.put(s, s);
+        }
+        return map;
     }
 }

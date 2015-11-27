@@ -343,6 +343,10 @@
                                     <name>org.joda.time.DateTime</name>
                                     <converter>de.rwth.idsg.steve.utils.DateTimeConverter</converter>
                                 </customType>
+                                <customType>
+                                    <name>org.joda.time.LocalDate</name>
+                                    <converter>de.rwth.idsg.steve.utils.DateConverter</converter>
+                                </customType>
                             </customTypes>
 
                             <!-- Associate data type rewrites with database columns -->
@@ -355,6 +359,10 @@
                                 <forcedType>
                                     <name>org.joda.time.DateTime</name>
                                     <types>.*(TIMESTAMP|DATETIME).*</types>
+                                </forcedType>
+                                <forcedType>
+                                    <name>org.joda.time.LocalDate</name>
+                                    <types>.*(DATE).*</types>
                                 </forcedType>
                             </forcedTypes>
                         </database>

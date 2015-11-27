@@ -1,50 +1,39 @@
 package de.rwth.idsg.steve.web.dto;
 
-import de.rwth.idsg.steve.web.dto.common.AbstractNoteForm;
-import de.rwth.idsg.steve.web.validation.IdTag;
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.validator.constraints.NotEmpty;
+import org.hibernate.validator.constraints.Email;
 import org.joda.time.LocalDate;
-import org.joda.time.LocalDateTime;
 
-import javax.validation.constraints.Future;
+import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
 /**
  * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
- * @since 15.08.2014
+ * @since 25.11.2015
  */
 @Getter
 @Setter
-public class UserForm extends AbstractNoteForm {
+public class UserForm {
 
-    @NotEmpty(message = "User ID Tag is required")
-    @IdTag
-    private String idTag;
+    // Internal database id
+    private Integer userPk;
 
-    // Is a FK in DB table. No validation needed. Operation will fail if DB constraint fails.
-    private String parentIdTag;
-
-    @Future(message = "Expiry Date/Time must be in future")
-    private LocalDateTime expiration;
-
-    @NotNull(message = "Should the user be blocked or not?")
-    private Boolean blocked = false;
+    private String ocppIdTag;
 
     private String firstName;
     private String lastName;
     private LocalDate birthDay;
-    private String sex;
     private String phone;
+    private String note;
+
+    @NotNull(message = "Sex is required")
+    private UserSex sex;
+
+    @Email(message = "Not a valid e-mail address")
     private String eMail;
+
+    @Valid
     private Address address;
 
-    public void setParentIdTag(String parentIdTag) {
-        if (parentIdTag.equals("EMPTY-OPTION")) {
-            this.parentIdTag = null;
-        } else {
-            this.parentIdTag = parentIdTag;
-        }
-    }
 }

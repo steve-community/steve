@@ -355,7 +355,6 @@ a.tooltip:hover span {
 
 .tileWrapper { text-align: center; }
 .tileRow1 { width: 220px; }
-.tileRow2 { width: 303px; }
 
 .tileWrapper a:link, .tileWrapper a:visited {
 	margin: 10px;

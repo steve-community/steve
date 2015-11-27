@@ -1,13 +1,13 @@
 <%@ include file="00-header.jsp" %>
 <div class="content">
 <div class="tileWrapper">
-	<a class="tileRow1" href="/steve/manager/chargepoints">
-		Number of<br>Charge Points
-		<span class="base formatNumber">${stats.numChargeBoxes}</span>
-	</a>
 	<a class="tileRow1" href="/steve/manager/users">
 		Number of<br>Users
 		<span class="base formatNumber">${stats.numUsers}</span>
+	</a>
+	<a class="tileRow1" href="/steve/manager/ocppTags">
+		Number of<br>OCPP Tags
+		<span class="base formatNumber">${stats.numOcppTags}</span>
 	</a>
 	<a class="tileRow1" href="/steve/manager/reservations">
 		Number of<br>Active Reservations
@@ -17,8 +17,12 @@
 		Number of<br>Active Transactions
 		<span class="base formatNumber">${stats.numTransactions}</span>
 	</a>
-	<a class="tileRow2" href="/steve/manager/home/ocppJsonStatus">
-		Number of<br>Connected JSON Charge Points
+	<a class="tileRow1" href="/steve/manager/chargepoints">
+		Number of<br>Charge Points
+		<span class="base formatNumber">${stats.numChargeBoxes}</span>
+	</a>
+	<a class="tileRow1" href="/steve/manager/home/ocppJsonStatus">
+		Number of Connected<br>JSON Charge Points
 		<span class="baseTable">
 			<span class="baseRow">
 				<span class="baseCell">OCPP 1.2 :</span>
@@ -30,7 +34,7 @@
 			</span>
 		</span>
 	</a>
-	<a class="tileRow2" href="/steve/manager/chargepoints">
+	<a class="tileRow1" href="/steve/manager/chargepoints">
 		Received Heartbeats
 		<span class="baseTable">
 			<span class="baseRow">
@@ -47,7 +51,7 @@
 			</span>
 		</span>
 	</a>
-	<a class="tileRow2" href="/steve/manager/home/connectorStatus">
+	<a class="tileRow1" href="/steve/manager/home/connectorStatus">
 		Connector Status
 		<span class="baseTable">
 			<span class="baseRow">

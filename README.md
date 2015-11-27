@@ -39,7 +39,7 @@ SteVe is designed to run standalone, a java servlet container / web server (e.g.
     The following MySQL statements can be used as database initialization (adjust according to your setup):
 
     ```
-    CREATE DATABASE stevedb;
+    CREATE DATABASE stevedb CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
     GRANT ALL PRIVILEGES ON stevedb.* TO 'steve'@'localhost' IDENTIFIED BY 'changeme';
     GRANT SELECT ON mysql.proc TO 'steve'@'localhost' IDENTIFIED BY 'changeme';
     ```

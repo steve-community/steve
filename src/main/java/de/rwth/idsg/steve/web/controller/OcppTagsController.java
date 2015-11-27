@@ -5,6 +5,7 @@ import de.rwth.idsg.steve.utils.ControllerHelper;
 import de.rwth.idsg.steve.web.dto.OcppTagForm;
 import de.rwth.idsg.steve.web.dto.OcppTagQueryForm;
 import jooq.steve.db.tables.records.OcppTagRecord;
+import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -63,7 +64,12 @@ public class OcppTagsController {
 
         OcppTagForm form = new OcppTagForm();
         form.setIdTag(record.getIdTag());
-        form.setExpiration(record.getExpiryDate().toLocalDateTime());
+
+        DateTime expiryDate = record.getExpiryDate();
+        if (expiryDate != null) {
+            form.setExpiration(expiryDate.toLocalDateTime());
+        }
+
         form.setBlocked(record.getBlocked());
         form.setNote(record.getNote());
 

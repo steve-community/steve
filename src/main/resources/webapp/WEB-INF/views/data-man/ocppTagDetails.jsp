@@ -33,6 +33,7 @@
                 <td><form:select path="parentIdTag" items="${idTagList}"/></td>
             </tr>
             <tr><td>Expiry Date/Time:</td><td><form:input path="expiration" cssClass="dateTimePicker"/></td></tr>
+            <tr><td>In Transaction?:</td><td>${inTransaction}</td></tr>
             <tr><td>Block the ID Tag:</td>
                 <td><form:radiobutton path="blocked" value="false"/> false</td>
             </tr>

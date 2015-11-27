@@ -79,6 +79,7 @@ public class OcppTagsController {
         }
         form.setParentIdTag(parentIdTag);
 
+        model.addAttribute("inTransaction", record.getInTransaction());
         model.addAttribute("ocppTagForm", form);
         setTags(model);
         return "data-man/ocppTagDetails";

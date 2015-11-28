@@ -3,6 +3,7 @@ package de.rwth.idsg.steve.repository;
 import de.rwth.idsg.steve.SteveException;
 import de.rwth.idsg.steve.utils.CustomDSL;
 import de.rwth.idsg.steve.web.dto.Address;
+import jooq.steve.db.tables.records.AddressRecord;
 import lombok.extern.slf4j.Slf4j;
 import org.jooq.DSLContext;
 import org.jooq.Record1;
@@ -18,6 +19,23 @@ import static jooq.steve.db.tables.Address.ADDRESS;
 @Slf4j
 @Repository
 public class AddressRepositoryImpl implements AddressRepository {
+
+    @Override
+    public AddressRecord get(DSLContext ctx, Integer addressPk) {
+        if (addressPk == null) {
+            return null;
+        }
+
+        AddressRecord ar = ctx.selectFrom(ADDRESS)
+                              .where(ADDRESS.ADDRESS_PK.equal(addressPk))
+                              .fetchOne();
+
+        if (ar != null) {
+            ar.detach();
+        }
+
+        return ar;
+    }
 
     /**
      * The call site does not care about the database internal specifics,

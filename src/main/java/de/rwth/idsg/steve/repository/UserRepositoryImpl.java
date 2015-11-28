@@ -26,7 +26,6 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 import static de.rwth.idsg.steve.utils.CustomDSL.includes;
-import static jooq.steve.db.tables.Address.ADDRESS;
 import static jooq.steve.db.tables.OcppTag.OCPP_TAG;
 import static jooq.steve.db.tables.User.USER;
 
@@ -80,17 +79,8 @@ public class UserRepositoryImpl implements UserRepository {
         // 2. address table
         // -------------------------------------------------------------------------
 
-        AddressRecord ar = null;
-        if (ur.getAddressPk() != null) {
-            ar = ctx.selectFrom(ADDRESS)
-                    .where(ADDRESS.ADDRESS_PK.equal(ur.getAddressPk()))
-                    .fetchOne();
-        }
-
-        if (ar != null) {
-            ar.detach();
-        }
-
+        AddressRecord ar = addressRepository.get(ctx, ur.getAddressPk());
+        
         // -------------------------------------------------------------------------
         // 3. ocpp_tag table
         // -------------------------------------------------------------------------

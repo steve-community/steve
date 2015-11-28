@@ -32,7 +32,6 @@ import java.util.List;
 
 import static de.rwth.idsg.steve.utils.CustomDSL.date;
 import static de.rwth.idsg.steve.utils.CustomDSL.includes;
-import static jooq.steve.db.tables.Address.ADDRESS;
 import static jooq.steve.db.tables.ChargeBox.CHARGE_BOX;
 import static jooq.steve.db.tables.Connector.CONNECTOR;
 import static jooq.steve.db.tables.ConnectorStatus.CONNECTOR_STATUS;
@@ -164,16 +163,7 @@ public class ChargePointRepositoryImpl implements ChargePointRepository {
 
         cbr.detach();
 
-        AddressRecord ar = null;
-        if (cbr.getAddressPk() != null) {
-            ar = ctx.selectFrom(ADDRESS)
-                    .where(ADDRESS.ADDRESS_PK.equal(cbr.getAddressPk()))
-                    .fetchOne();
-        }
-
-        if (ar != null) {
-            ar.detach();
-        }
+        AddressRecord ar = addressRepository.get(ctx, cbr.getAddressPk());
 
         return new ChargePoint.Details(cbr, ar);
     }

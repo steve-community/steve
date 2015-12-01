@@ -20,7 +20,8 @@ public class Address {
     private String country;
 
     public boolean isEmpty() {
-        return streetAndHouseNumber == null
+        return addressPk == null
+                && streetAndHouseNumber == null
                 && zipCode == null
                 && city == null
                 && country == null;

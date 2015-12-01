@@ -103,11 +103,11 @@ As soon as a heartbeat is received, you should see the status of the charge poin
 Screenshots
 -----
 1. [Home](website/screenshots/home.png)
-2. [Heartbeats](website/screenshots/heartbeats.png)
-3. [Connector Status](website/screenshots/connector-status.png)
-4. [Data Management - Reservations](website/screenshots/reservations.png)
-5. [Data Management - Charge Points](website/screenshots/chargepoints.png)
-6. [Data Management - Users](website/screenshots/users.png)
+2. [Connector Status](website/screenshots/connector-status.png)
+3. [Data Management - Charge Points](website/screenshots/chargepoints.png)
+4. [Data Management - Users](website/screenshots/users.png)
+5. [Data Management - OCPP Tags](website/screenshots/ocpp-tags.png)
+6. [Data Management - Reservations](website/screenshots/reservations.png)
 7. [Data Management - Transactions](website/screenshots/transactions.png)
 8. [Operations - OCPP v1.2](website/screenshots/ocpp12.png)
 9. [Operations - OCPP v1.5](website/screenshots/ocpp15.png)

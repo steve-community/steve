@@ -46,6 +46,10 @@ table.res th {
 }
 table.res tr { border-bottom: 1px solid #CCC; }
 table.res tr:nth-child(odd){ background: #fcfaf2; }
+
+table.res tr:nth-child(even):hover {  background: #ebf4f9; }
+table.res tr:nth-child(odd):hover {  background: #ebf4f9; }
+
 table.res td {
 	padding: 5px;
 	text-align: center;

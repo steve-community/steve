@@ -136,28 +136,30 @@ input[type="button"]:active, input[type="submit"]:active {
 input[type="submit"] {
 	min-width: 100px;
 	font-size: 12px;
-	background: #577377;
-	background: -webkit-gradient(linear, left top, left bottom, from(#aec0c9), to(#4c5e67));
-	background: -moz-linear-gradient(top,  #aec0c9,  #4c5e67);
-	background:-o-linear-gradient(top, #aec0c9, #4c5e67);
-	background:-ms-linear-gradient(top, #aec0c9, #4c5e67);	
+	background: #397079;
 	color: #fff;
-	text-shadow: -1px -1px 0 rgba(0,0,0,0.4);
     cursor: pointer;
 	height: 25px;
-	border: 1px solid #a4a7a4;
+	border: 0;
 	border-radius: 3px;
 	-moz-border-radius: 3px;
 	-webkit-border-radius: 3px;
 }
 input[type="submit"]:hover {
-	background:-webkit-gradient(linear, left top, left bottom, from(#aec0c9), to(#6b7f89));
-	background:-moz-linear-gradient(top,  #aec0c9,  #6b7f89);
-	background:-o-linear-gradient(top, #aec0c9, #6b7f89);
-	background:-ms-linear-gradient(top, #aec0c9, #6b7f89);
-	background-color:#6e8b8f;
+	background:#29575f;
 }
-
+input[type="submit"].blueSubmit {
+	background:#397ac2;
+}
+input[type="submit"].blueSubmit:hover {
+	background:#1e63b0;
+}
+input[type="submit"].redSubmit {
+	background:#c14848;
+}
+input[type="submit"].redSubmit:hover {
+	background:#af3232;
+}
 #add_space { padding-top: 20px; }
 /*************** top menu navigation div ***************/
 ul.navigation {

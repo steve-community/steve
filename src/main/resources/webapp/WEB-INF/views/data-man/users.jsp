@@ -38,7 +38,7 @@
                 <th>E-Mail</th>
                 <th>
                     <form:form action="/steve/manager/users/add" method="get">
-                        <input type="submit" value="Add New">
+                        <input type="submit" class="blueSubmit" value="Add New">
                     </form:form>
                 </th>
             </tr>
@@ -56,7 +56,7 @@
                 <td>${cr.email}</td>
                 <td>
                     <form:form action="/steve/manager/users/delete/${cr.userPk}">
-                        <input type="submit" value="Delete">
+                        <input type="submit" class="redSubmit" value="Delete">
                     </form:form>
                 </td>
             </tr>

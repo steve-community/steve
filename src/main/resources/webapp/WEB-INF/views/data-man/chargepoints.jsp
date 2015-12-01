@@ -45,7 +45,7 @@
                 <th>Last Heartbeat</th>
                 <th>
                     <form:form action="/steve/manager/chargepoints/add" method="get">
-                        <input type="submit" value="Add New">
+                        <input type="submit" class="blueSubmit" value="Add New">
                     </form:form>
                 </th>
             </tr>
@@ -58,7 +58,7 @@
                 <td>${cp.lastHeartbeatTimestamp}</td>
                 <td>
                     <form:form action="/steve/manager/chargepoints/delete/${cp.chargeBoxPk}">
-                        <input type="submit" value="Delete">
+                        <input type="submit" class="redSubmit" value="Delete">
                     </form:form>
                 </td>
             </tr>

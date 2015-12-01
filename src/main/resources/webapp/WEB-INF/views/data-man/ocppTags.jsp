@@ -63,7 +63,7 @@
                 <th>Blocked?</th>
                 <th>
                     <form:form action="/steve/manager/ocppTags/add" method="get">
-                        <input type="submit" value="Add New"/>
+                        <input type="submit" class="blueSubmit" value="Add New"/>
                     </form:form>
                 </th>
             </tr>
@@ -81,7 +81,7 @@
                 <td>${item.blocked}</td>
                 <td>
                     <form:form action="/steve/manager/ocppTags/delete/${item.ocppTagPk}">
-                        <input type="submit" value="Delete">
+                        <input type="submit" class="redSubmit" value="Delete">
                     </form:form>
                 </td>
             </tr>

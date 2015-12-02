@@ -35,7 +35,7 @@
     <tr><td>Connector ID:</td>
         <td><form:select path="connectorId" disabled="true"/></td>
     </tr>
-    <tr><td>User ID Tag:</td>
+    <tr><td>OCPP ID Tag:</td>
         <td>
             <form:select path="idTag">
                 <form:options items="${idTagList}" />

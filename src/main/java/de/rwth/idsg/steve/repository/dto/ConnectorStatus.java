@@ -12,5 +12,5 @@ import lombok.Getter;
 @Builder
 public final class ConnectorStatus {
     private final String chargeBoxId, timeStamp, status, errorCode;
-    private final int connectorId;
+    private final int chargeBoxPk, connectorId;
 }

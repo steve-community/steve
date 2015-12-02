@@ -29,7 +29,7 @@ public final class ControllerHelper {
     }
 
     public static Map<String, String> idTagEnhancer(List<String> idTagList) {
-        Map<String, String> map = new HashMap<>(idTagList.size());
+        Map<String, String> map = new HashMap<>(idTagList.size() + 1);
         map.put("", EMPTY_OPTION);
 
         for (String s : idTagList) {

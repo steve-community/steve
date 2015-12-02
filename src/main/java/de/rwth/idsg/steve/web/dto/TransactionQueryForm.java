@@ -15,6 +15,9 @@ import javax.validation.constraints.NotNull;
 @Setter
 public class TransactionQueryForm extends QueryForm {
 
+    // Internal database Id
+    private Integer transactionPk;
+
     private boolean returnCSV;
 
     @NotNull(message = "Query type is required")
@@ -34,6 +37,10 @@ public class TransactionQueryForm extends QueryForm {
     @AssertTrue(message = "The values 'From' and 'To' must be both set")
     public boolean isPeriodFromToCorrect() {
         return periodType != QueryPeriodType.FROM_TO || isFromToSet();
+    }
+
+    public boolean isTransactionPkSet() {
+        return transactionPk != null;
     }
 
     // -------------------------------------------------------------------------

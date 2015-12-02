@@ -19,7 +19,7 @@
 				</td>
 			</tr>
 			<tr>
-				<td>User ID:</td>
+				<td>OCPP ID Tag:</td>
 				<td><form:select path="userId">
 					    <option value="" selected>All</option>
                         <form:options items="${idTagList}"/>
@@ -60,13 +60,33 @@
 	<br>
 
 <table class="res">
-	<thead><tr><th>Reservation ID</th><th>Transaction ID</th><th>User ID Tag</th><th>ChargeBox ID</th><th>Start Date/Time</th><th>Expiry Date/Time</th><th>Status</th></tr></thead>
+	<thead>
+		<tr>
+			<th>Reservation ID</th>
+			<th>Transaction ID</th>
+			<th>OCPP ID Tag</th>
+			<th>ChargeBox ID</th>
+			<th>Start Date/Time</th>
+			<th>Expiry Date/Time</th>
+			<th>Status</th>
+		</tr>
+	</thead>
 	<tbody>
-	<%-- Start --%>
 	<c:forEach items="${reservList}" var="res">
-	<tr><td>${res.id}</td><td>${res.transactionId}</td><td>${res.idTag}</td><td>${res.chargeBoxId}</td><td>${res.startDatetime}</td><td>${res.expiryDatetime}</td><td>${res.status}</td></tr>
+		<tr>
+			<td>${res.id}</td>
+			<td>
+				<c:if test="${not empty res.transactionId}">
+					<a href="/steve/manager/transactions/query?type=ALL&transactionPk=${res.transactionId}">${res.transactionId}</a>
+				</c:if>
+			</td>
+			<td><a href="/steve/manager/ocppTags/details/${res.ocppTagPk}">${res.ocppIdTag}</a></td>
+			<td><a href="/steve/manager/chargepoints/details/${res.chargeBoxPk}">${res.chargeBoxId}</a></td>
+			<td>${res.startDatetime}</td>
+			<td>${res.expiryDatetime}</td>
+			<td>${res.status}</td>
+		</tr>
 	</c:forEach>
-	<%-- End --%>
 	</tbody>
 </table>
 <br>

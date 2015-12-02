@@ -10,13 +10,13 @@ Connector Status
 <table class="res" id="connectorStatusTable">
 	<thead><tr><th>ChargeBox ID</th><th>Connector ID</th><th>Date/Time</th><th>Status</th><th>Error Code</th></tr></thead>
 	<tbody>
-		<c:forEach items="${connectorStatusList}" var="connectorStatus">
+		<c:forEach items="${connectorStatusList}" var="cs">
 			<tr>
-				<td>${connectorStatus.chargeBoxId}</td>
-				<td>${connectorStatus.connectorId}</td>
-				<td>${connectorStatus.timeStamp}</td>
-				<td>${connectorStatus.status}</td>
-				<td>${connectorStatus.errorCode}</td>
+				<td><a href="/steve/manager/chargepoints/details/${cs.chargeBoxPk}">${cs.chargeBoxId}</a></td>
+				<td>${cs.connectorId}</td>
+				<td>${cs.timeStamp}</td>
+				<td>${cs.status}</td>
+				<td>${cs.errorCode}</td>
 			</tr>
 		</c:forEach>
 	</tbody>

@@ -70,6 +70,10 @@ public class TransactionRepositoryImpl implements TransactionRepository {
                 TRANSACTION.STOP_TIMESTAMP,
                 TRANSACTION.STOP_VALUE);
 
+        if (form.isTransactionPkSet()) {
+            selectQuery.addConditions(TRANSACTION.TRANSACTION_PK.eq(form.getTransactionPk()));
+        }
+
         if (form.isChargeBoxIdSet()) {
             selectQuery.addConditions(CONNECTOR.CHARGE_BOX_ID.eq(form.getChargeBoxId()));
         }

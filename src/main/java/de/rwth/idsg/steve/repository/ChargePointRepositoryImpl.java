@@ -179,22 +179,29 @@ public class ChargePointRepositoryImpl implements ChargePointRepository {
                              .asTable("t1");
 
         return DSL.using(config)
-                  .select(CONNECTOR.CHARGE_BOX_ID, CONNECTOR.CONNECTOR_ID,
-                          CONNECTOR_STATUS.STATUS_TIMESTAMP, CONNECTOR_STATUS.STATUS, CONNECTOR_STATUS.ERROR_CODE)
+                  .select(CHARGE_BOX.CHARGE_BOX_PK,
+                          CONNECTOR.CHARGE_BOX_ID,
+                          CONNECTOR.CONNECTOR_ID,
+                          CONNECTOR_STATUS.STATUS_TIMESTAMP,
+                          CONNECTOR_STATUS.STATUS,
+                          CONNECTOR_STATUS.ERROR_CODE)
                   .from(CONNECTOR_STATUS)
                   .join(CONNECTOR)
-                  .onKey()
+                        .onKey()
+                  .join(CHARGE_BOX)
+                        .on(CHARGE_BOX.CHARGE_BOX_ID.eq(CONNECTOR.CHARGE_BOX_ID))
                   .join(t1)
-                  .on(CONNECTOR_STATUS.CONNECTOR_PK.equal(t1.field(t1Pk)))
-                  .and(CONNECTOR_STATUS.STATUS_TIMESTAMP.equal(t1.field(t1Max)))
+                        .on(CONNECTOR_STATUS.CONNECTOR_PK.equal(t1.field(t1Pk)))
+                        .and(CONNECTOR_STATUS.STATUS_TIMESTAMP.equal(t1.field(t1Max)))
                   .orderBy(CONNECTOR_STATUS.STATUS_TIMESTAMP.desc())
                   .fetch()
                   .map(r -> ConnectorStatus.builder()
-                                           .chargeBoxId(r.value1())
-                                           .connectorId(r.value2())
-                                           .timeStamp(DateTimeUtils.humanize(r.value3()))
-                                           .status(r.value4())
-                                           .errorCode(r.value5())
+                                           .chargeBoxPk(r.value1())
+                                           .chargeBoxId(r.value2())
+                                           .connectorId(r.value3())
+                                           .timeStamp(DateTimeUtils.humanize(r.value4()))
+                                           .status(r.value5())
+                                           .errorCode(r.value6())
                                            .build()
                   );
     }

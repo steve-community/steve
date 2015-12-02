@@ -8,7 +8,7 @@ import de.rwth.idsg.steve.web.dto.ReservationQueryForm;
 import lombok.extern.slf4j.Slf4j;
 import org.joda.time.DateTime;
 import org.jooq.Configuration;
-import org.jooq.Record7;
+import org.jooq.Record9;
 import org.jooq.RecordMapper;
 import org.jooq.SelectQuery;
 import org.jooq.exception.DataAccessException;
@@ -19,6 +19,8 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
+import static jooq.steve.db.tables.ChargeBox.CHARGE_BOX;
+import static jooq.steve.db.tables.OcppTag.OCPP_TAG;
 import static jooq.steve.db.tables.Reservation.RESERVATION;
 
 /**
@@ -38,11 +40,15 @@ public class ReservationRepositoryImpl implements ReservationRepository {
     public List<Reservation> getReservations(ReservationQueryForm form) {
         SelectQuery selectQuery = DSL.using(config).selectQuery();
         selectQuery.addFrom(RESERVATION);
+        selectQuery.addJoin(OCPP_TAG, OCPP_TAG.ID_TAG.eq(RESERVATION.ID_TAG));
+        selectQuery.addJoin(CHARGE_BOX, CHARGE_BOX.CHARGE_BOX_ID.eq(RESERVATION.CHARGE_BOX_ID));
         selectQuery.addSelect(
                 RESERVATION.RESERVATION_PK,
                 RESERVATION.TRANSACTION_PK,
-                RESERVATION.ID_TAG,
-                RESERVATION.CHARGE_BOX_ID,
+                OCPP_TAG.OCPP_TAG_PK,
+                CHARGE_BOX.CHARGE_BOX_PK,
+                OCPP_TAG.ID_TAG,
+                CHARGE_BOX.CHARGE_BOX_ID,
                 RESERVATION.START_DATETIME,
                 RESERVATION.EXPIRY_DATETIME,
                 RESERVATION.STATUS
@@ -135,17 +141,19 @@ public class ReservationRepositoryImpl implements ReservationRepository {
     // -------------------------------------------------------------------------
 
     private static class ReservationMapper implements
-            RecordMapper<Record7<Integer, Integer, String, String, DateTime, DateTime, String>, Reservation> {
+            RecordMapper<Record9<Integer, Integer, Integer, Integer, String, String, DateTime, DateTime, String>, Reservation> {
         @Override
-        public Reservation map(Record7<Integer, Integer, String, String, DateTime, DateTime, String> r) {
+        public Reservation map(Record9<Integer, Integer, Integer, Integer, String, String, DateTime, DateTime, String> r) {
             return Reservation.builder()
                               .id(r.value1())
                               .transactionId(r.value2())
-                              .idTag(r.value3())
-                              .chargeBoxId(r.value4())
-                              .startDatetime(DateTimeUtils.humanize(r.value5()))
-                              .expiryDatetime(DateTimeUtils.humanize(r.value6()))
-                              .status(r.value7())
+                              .ocppTagPk(r.value3())
+                              .chargeBoxPk(r.value4())
+                              .ocppIdTag(r.value5())
+                              .chargeBoxId(r.value6())
+                              .startDatetime(DateTimeUtils.humanize(r.value7()))
+                              .expiryDatetime(DateTimeUtils.humanize(r.value8()))
+                              .status(r.value9())
                               .build();
         }
     }

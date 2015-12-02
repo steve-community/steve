@@ -17,6 +17,10 @@ Transactions
     <form:form action="/steve/manager/transactions/query" method="get" modelAttribute="params">
         <table class="userInput">
             <tr>
+                <td>Transaction ID:</td>
+                <td><form:input path="transactionPk"/></td>
+            </tr>
+            <tr>
                 <td>ChargeBox ID:</td>
                 <td><form:select path="chargeBoxId">
                         <option value="" selected>All</option>
@@ -25,7 +29,7 @@ Transactions
                 </td>
             </tr>
             <tr>
-                <td>User ID:</td>
+                <td>OCPP ID Tag:</td>
                 <td><form:select path="userId">
                         <option value="" selected>All</option>
                         <form:options items="${idTagList}"/>
@@ -69,7 +73,7 @@ Transactions
     <br>
 
     <table class="res">
-        <thead><tr><th>Transaction ID</th><th>ChargeBox ID</th><th>Connector ID</th><th>User ID Tag</th><th>Start Date/Time</th><th>Start Value</th><th>Stop Date/Time</th><th>Stop Value</th></tr></thead>
+        <thead><tr><th>Transaction ID</th><th>ChargeBox ID</th><th>Connector ID</th><th>OCPP ID Tag</th><th>Start Date/Time</th><th>Start Value</th><th>Stop Date/Time</th><th>Stop Value</th></tr></thead>
         <tbody>
         <%-- Start --%>
         <c:forEach items="${transList}" var="ta">

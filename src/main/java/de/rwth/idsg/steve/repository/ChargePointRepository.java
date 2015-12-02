@@ -8,6 +8,7 @@ import de.rwth.idsg.steve.web.dto.ChargePointForm;
 import de.rwth.idsg.steve.web.dto.ChargePointQueryForm;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
@@ -17,6 +18,7 @@ public interface ChargePointRepository {
     boolean isRegistered(String chargeBoxId);
     List<ChargePointSelect> getChargePointSelect(OcppProtocol protocol);
     List<String> getChargeBoxIds();
+    Map<String, Integer> getChargeBoxIdPkPair(List<String> chargeBoxIdList);
 
     List<ChargePoint.Overview> getOverview(ChargePointQueryForm form);
     ChargePoint.Details getDetails(int chargeBoxPk);

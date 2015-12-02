@@ -10,11 +10,11 @@ Connection Status for JSON Charge Points
     <table class="res">
         <thead><tr><th>ChargeBox ID</th><th>OCPP Version</th><th>Connected Since</th><th>Connection Duration</th></tr></thead>
         <tbody>
-        <c:forEach items="${ocppJsonStatusList}" var="status">
-            <tr><td>${status.chargeBoxId}</td>
-                <td>${status.version.value}</td>
-                <td>${status.connectedSince}</td>
-                <td>${status.connectionDuration}</td>
+        <c:forEach items="${ocppJsonStatusList}" var="s">
+            <tr><td><a href="/steve/manager/chargepoints/details/${s.chargeBoxPk}">${s.chargeBoxId}</a></td>
+                <td>${s.version.value}</td>
+                <td>${s.connectedSince}</td>
+                <td>${s.connectionDuration}</td>
             </tr>
         </c:forEach>
         </tbody>

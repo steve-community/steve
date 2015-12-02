@@ -31,6 +31,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Map;
 
 import static de.rwth.idsg.steve.utils.CustomDSL.date;
 import static de.rwth.idsg.steve.utils.CustomDSL.includes;
@@ -82,6 +83,15 @@ public class ChargePointRepositoryImpl implements ChargePointRepository {
                   .select(CHARGE_BOX.CHARGE_BOX_ID)
                   .from(CHARGE_BOX)
                   .fetch(CHARGE_BOX.CHARGE_BOX_ID);
+    }
+
+    @Override
+    public Map<String, Integer> getChargeBoxIdPkPair(List<String> chargeBoxIdList) {
+        return DSL.using(config)
+                  .select(CHARGE_BOX.CHARGE_BOX_ID, CHARGE_BOX.CHARGE_BOX_PK)
+                  .from(CHARGE_BOX)
+                  .where(CHARGE_BOX.CHARGE_BOX_ID.in(chargeBoxIdList))
+                  .fetchMap(CHARGE_BOX.CHARGE_BOX_ID, CHARGE_BOX.CHARGE_BOX_PK);
     }
 
     @Override

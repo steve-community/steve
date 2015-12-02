@@ -11,6 +11,7 @@ import lombok.Getter;
 @Getter
 @Builder
 public final class OcppJsonStatus {
+    private final int chargeBoxPk;
     private final String chargeBoxId, connectedSince;
     private final String connectionDuration;
     private final OcppVersion version;

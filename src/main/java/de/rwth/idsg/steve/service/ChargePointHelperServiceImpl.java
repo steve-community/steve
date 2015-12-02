@@ -50,11 +50,13 @@ public class ChargePointHelperServiceImpl implements ChargePointHelperService {
         Map<String, Deque<SessionContext>> ocpp12Map = ocpp12WebSocketEndpoint.getACopy();
         Map<String, Deque<SessionContext>> ocpp15Map = ocpp15WebSocketEndpoint.getACopy();
 
+        Map<String, Integer> primaryKeyLookup = getPrimaryKeyLookup(ocpp12Map, ocpp15Map);
+
         DateTime now = DateTime.now();
         List<OcppJsonStatus> returnList = new ArrayList<>();
 
-        appendList(ocpp12Map, returnList, now, OcppVersion.V_12);
-        appendList(ocpp15Map, returnList, now, OcppVersion.V_15);
+        appendList(ocpp12Map, returnList, now, OcppVersion.V_12, primaryKeyLookup);
+        appendList(ocpp15Map, returnList, now, OcppVersion.V_15, primaryKeyLookup);
         return returnList;
     }
 
@@ -82,8 +84,17 @@ public class ChargePointHelperServiceImpl implements ChargePointHelperService {
     // Helpers
     // -------------------------------------------------------------------------
 
+    private Map<String, Integer> getPrimaryKeyLookup(Map<String, Deque<SessionContext>> ocpp12Map,
+                                                     Map<String, Deque<SessionContext>> ocpp15Map) {
+
+        ArrayList<String> idList = new ArrayList<>(ocpp12Map.keySet());
+        idList.addAll(ocpp15Map.keySet());
+
+        return chargePointRepository.getChargeBoxIdPkPair(idList);
+    }
+
     private void appendList(Map<String, Deque<SessionContext>> map, List<OcppJsonStatus> returnList,
-                            DateTime now, OcppVersion version) {
+                            DateTime now, OcppVersion version, Map<String, Integer> primaryKeyLookup) {
 
         for (Map.Entry<String, Deque<SessionContext>> entry : map.entrySet()) {
             String chargeBoxId = entry.getKey();
@@ -93,11 +104,12 @@ public class ChargePointHelperServiceImpl implements ChargePointHelperService {
                 DateTime openSince = ctx.getOpenSince();
 
                 OcppJsonStatus status = OcppJsonStatus.builder()
-                        .chargeBoxId(chargeBoxId)
-                        .connectedSince(DateTimeUtils.humanize(openSince))
-                        .connectionDuration(DateTimeUtils.timeElapsed(openSince, now))
-                        .version(version)
-                        .build();
+                                                      .chargeBoxPk(primaryKeyLookup.get(chargeBoxId))
+                                                      .chargeBoxId(chargeBoxId)
+                                                      .connectedSince(DateTimeUtils.humanize(openSince))
+                                                      .connectionDuration(DateTimeUtils.timeElapsed(openSince, now))
+                                                      .version(version)
+                                                      .build();
 
                 returnList.add(status);
             }

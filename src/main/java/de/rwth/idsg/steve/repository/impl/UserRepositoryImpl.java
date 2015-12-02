@@ -1,7 +1,9 @@
-package de.rwth.idsg.steve.repository;
+package de.rwth.idsg.steve.repository.impl;
 
 import com.google.common.base.Optional;
 import de.rwth.idsg.steve.SteveException;
+import de.rwth.idsg.steve.repository.AddressRepository;
+import de.rwth.idsg.steve.repository.UserRepository;
 import de.rwth.idsg.steve.repository.dto.User;
 import de.rwth.idsg.steve.web.dto.UserForm;
 import de.rwth.idsg.steve.web.dto.UserQueryForm;

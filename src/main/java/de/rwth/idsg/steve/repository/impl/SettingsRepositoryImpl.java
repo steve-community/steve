@@ -1,6 +1,7 @@
-package de.rwth.idsg.steve.repository;
+package de.rwth.idsg.steve.repository.impl;
 
 import de.rwth.idsg.steve.SteveException;
+import de.rwth.idsg.steve.repository.SettingsRepository;
 import de.rwth.idsg.steve.repository.dto.Settings;
 import de.rwth.idsg.steve.web.dto.SettingsForm;
 import jooq.steve.db.tables.records.SettingsRecord;

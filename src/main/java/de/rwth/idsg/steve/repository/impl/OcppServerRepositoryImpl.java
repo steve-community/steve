@@ -1,5 +1,7 @@
-package de.rwth.idsg.steve.repository;
+package de.rwth.idsg.steve.repository.impl;
 
+import de.rwth.idsg.steve.repository.OcppServerRepository;
+import de.rwth.idsg.steve.repository.ReservationRepository;
 import de.rwth.idsg.steve.repository.dto.InsertConnectorStatusParams;
 import de.rwth.idsg.steve.repository.dto.InsertTransactionParams;
 import de.rwth.idsg.steve.repository.dto.UpdateChargeboxParams;

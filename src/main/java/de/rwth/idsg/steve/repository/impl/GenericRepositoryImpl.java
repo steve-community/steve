@@ -1,5 +1,6 @@
-package de.rwth.idsg.steve.repository;
+package de.rwth.idsg.steve.repository.impl;
 
+import de.rwth.idsg.steve.repository.GenericRepository;
 import de.rwth.idsg.steve.repository.dto.DbVersion;
 import de.rwth.idsg.steve.utils.DateTimeUtils;
 import de.rwth.idsg.steve.web.dto.Statistics;

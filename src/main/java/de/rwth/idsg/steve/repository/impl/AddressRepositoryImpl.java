@@ -1,6 +1,7 @@
-package de.rwth.idsg.steve.repository;
+package de.rwth.idsg.steve.repository.impl;
 
 import de.rwth.idsg.steve.SteveException;
+import de.rwth.idsg.steve.repository.AddressRepository;
 import de.rwth.idsg.steve.utils.CustomDSL;
 import de.rwth.idsg.steve.web.dto.Address;
 import jooq.steve.db.tables.records.AddressRecord;

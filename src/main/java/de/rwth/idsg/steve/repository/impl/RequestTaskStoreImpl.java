@@ -1,6 +1,7 @@
-package de.rwth.idsg.steve.repository;
+package de.rwth.idsg.steve.repository.impl;
 
 import de.rwth.idsg.steve.SteveException;
+import de.rwth.idsg.steve.repository.RequestTaskStore;
 import de.rwth.idsg.steve.repository.dto.TaskOverview;
 import de.rwth.idsg.steve.web.dto.task.RequestTask;
 import lombok.extern.slf4j.Slf4j;

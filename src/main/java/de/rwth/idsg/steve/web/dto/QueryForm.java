@@ -17,7 +17,7 @@ import javax.validation.constraints.AssertTrue;
 public abstract class QueryForm {
 
     private String chargeBoxId;
-    private String userId;
+    private String ocppIdTag;
 
     private LocalDateTime from;
     private LocalDateTime to;
@@ -35,7 +35,7 @@ public abstract class QueryForm {
         return chargeBoxId != null;
     }
 
-    public boolean isUserIdSet() {
-        return userId != null;
+    public boolean isOcppIdTagSet() {
+        return ocppIdTag != null;
     }
 }

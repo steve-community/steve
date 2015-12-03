@@ -139,8 +139,8 @@ public class TransactionRepositoryImpl implements TransactionRepository {
             selectQuery.addConditions(CONNECTOR.CHARGE_BOX_ID.eq(form.getChargeBoxId()));
         }
 
-        if (form.isUserIdSet()) {
-            selectQuery.addConditions(TRANSACTION.ID_TAG.eq(form.getUserId()));
+        if (form.isOcppIdTagSet()) {
+            selectQuery.addConditions(TRANSACTION.ID_TAG.eq(form.getOcppIdTag()));
         }
 
         if (form.getType() == TransactionQueryForm.QueryType.ACTIVE) {

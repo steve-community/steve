@@ -30,7 +30,7 @@ Transactions
             </tr>
             <tr>
                 <td>OCPP ID Tag:</td>
-                <td><form:select path="userId">
+                <td><form:select path="ocppIdTag">
                         <option value="" selected>All</option>
                         <form:options items="${idTagList}"/>
                     </form:select>

@@ -7,7 +7,18 @@
 	});
 </script>
 <div class="content">
-<section><span>Reservations</span></section>
+	<section><span>
+		Reservations
+			<a class="tooltip" href="#"><img src="/steve/static/images/info.png" style="vertical-align:middle">
+				<span>
+				Status definitions:
+				WAITING (Waiting for charge point to respond to a reservation request),
+				ACCEPTED (Charge point accepted - The only status for active, usable reservations),
+				USED (Reservation used by the user for a transaction),
+				CANCELLED (Reservation cancelled by the user)
+				</span>
+			</a>
+	</span></section>
 	<form:form action="/steve/manager/reservations/query" method="get" modelAttribute="params">
 		<table class="userInput">
 			<tr>
@@ -20,7 +31,7 @@
 			</tr>
 			<tr>
 				<td>OCPP ID Tag:</td>
-				<td><form:select path="userId">
+				<td><form:select path="ocppIdTag">
 					    <option value="" selected>All</option>
                         <form:options items="${idTagList}"/>
                     </form:select>

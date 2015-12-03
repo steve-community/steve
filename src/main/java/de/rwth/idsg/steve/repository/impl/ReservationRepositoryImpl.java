@@ -60,8 +60,8 @@ public class ReservationRepositoryImpl implements ReservationRepository {
             selectQuery.addConditions(RESERVATION.CHARGE_BOX_ID.eq(form.getChargeBoxId()));
         }
 
-        if (form.isUserIdSet()) {
-            selectQuery.addConditions(RESERVATION.ID_TAG.eq(form.getUserId()));
+        if (form.isOcppIdTagSet()) {
+            selectQuery.addConditions(RESERVATION.ID_TAG.eq(form.getOcppIdTag()));
         }
 
         if (form.isStatusSet()) {

@@ -9,10 +9,6 @@ import de.rwth.idsg.steve.ocpp.RequestType;
 public final class StringUtils {
     private StringUtils() { }
 
-    public static boolean isNullOrEmpty(String str) {
-        return str == null || str.length() == 0;
-    }
-
     /**
      * We don't want to hard-code operation names,
      * but derive them from the actual request object.
@@ -29,7 +25,7 @@ public final class StringUtils {
         }
 
         // http://stackoverflow.com/a/4886141
-        s = s.replaceAll("(\\p{Ll})(\\p{Lu})","$1 $2");
+        s = s.replaceAll("(\\p{Ll})(\\p{Lu})", "$1 $2");
 
         return s;
     }

@@ -30,18 +30,9 @@
 
         <%@ include file="00-address.jsp" %>
 
-        <table class="userInput">
-            <thead><tr><th>Misc.</th><th></th></thead>
-            <tr><td>Description:</td><td><form:input path="description"/></td></tr>
-            <tr><td>Latitude:</td><td><form:input path="locationLatitude"/></td></tr>
-            <tr><td>Longitude:</td><td><form:input path="locationLongitude"/></td></tr>
-            <tr><td>Additional Note:</td><td><form:input path="note"/></td></tr>
-            <tr><td></td>
-                <td id="add_space">
-                    <input type="submit" name="add" value="Add">
-                    <input type="submit" name="backToOverview" value="Back to Overview">
-                </td></tr>
-        </table>
+        <c:set var="submitButtonName" value="add" />
+        <c:set var="submitButtonValue" value="Add" />
+        <%@ include file="00-cp-misc.jsp" %>
 
     </form:form>
 </div></div>

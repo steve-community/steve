@@ -6,7 +6,7 @@
 </script>
 <spring:hasBindErrors name="ocppTagForm">
     <div class="error">
-        Error while trying to add an Ocpp Tag:
+        Error while trying to add an OCPP Tag:
         <ul>
             <c:forEach var="error" items="${errors.allErrors}">
                 <li>${error.defaultMessage}</li>
@@ -15,33 +15,14 @@
     </div>
 </spring:hasBindErrors>
 <div class="content"><div>
-<section><span>Add Ocpp Tag</span></section>
+<section><span>Add OCPP Tag</span></section>
     <form:form action="/steve/manager/ocppTags/add" modelAttribute="ocppTagForm">
 
-        <table class="userInput">
-            <tbody>
-            <tr>
-                <td>ID Tag:</td>
-                <td>
-                    <form:input path="idTag"/>
-                    <a class="tooltip" href="#"><img src="/steve/static/images/info.png" style="vertical-align:middle">
-                        <span>This field is set when adding an Ocpp Tag, and cannot be changed later</span>
-                    </a>
-                </td>
-            </tr>
-            <tr>
-                <td>Parent ID Tag:</td>
-                <td><form:select path="parentIdTag" items="${idTagList}"/></td>
-            </tr>
-            <tr><td>Expiry Date/Time:</td><td><form:input path="expiration" cssClass="dateTimePicker"/></td></tr>
-            <tr><td>Additional Note:</td><td><form:input path="note"/></td></tr>
-            <tr><td></td>
-                <td id="add_space">
-                    <input type="submit" name="add" value="Add">
-                    <input type="submit" name="backToOverview" value="Back to Overview">
-                </td></tr>
-            </tbody>
-        </table>
+        <c:set var="isUpdateForm" value="false" />
+
+        <c:set var="submitButtonName" value="add" />
+        <c:set var="submitButtonValue" value="Add" />
+        <%@ include file="00-ocppTag.jsp" %>
 
     </form:form>
 </div></div>

@@ -20,7 +20,8 @@ public final class ControllerHelper {
         Address address = new Address();
         if (record != null) {
             address.setAddressPk(record.getAddressPk());
-            address.setStreetAndHouseNumber(record.getStreetAndHouseNumber());
+            address.setStreet(record.getStreet());
+            address.setHouseNumber(record.getHouseNumber());
             address.setZipCode(record.getZipCode());
             address.setCity(record.getCity());
             address.setCountry(record.getCountry());

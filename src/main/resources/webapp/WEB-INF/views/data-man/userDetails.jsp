@@ -37,13 +37,7 @@
         </table>
 
         <form:hidden path="address.addressPk" readonly="true"/>
-        <table class="userInput">
-            <thead><tr><th>Address</th><th></th></thead>
-            <tr><td>Street and House Number:</td><td><form:input path="address.streetAndHouseNumber"/></td></tr>
-            <tr><td>Zip code:</td><td><form:input path="address.zipCode"/></td></tr>
-            <tr><td>City:</td><td><form:input path="address.city"/></td></tr>
-            <tr><td>Country:</td><td><form:input path="address.country"/></td></tr>
-        </table>
+        <%@ include file="00-address.jsp" %>
 
         <table class="userInput">
             <thead><tr><th>OCPP</th><th></th></thead>

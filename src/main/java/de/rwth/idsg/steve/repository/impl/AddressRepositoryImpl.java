@@ -77,7 +77,8 @@ public class AddressRepositoryImpl implements AddressRepository {
 
     private Integer insert(DSLContext ctx, Address ad) {
         int count = ctx.insertInto(ADDRESS)
-                       .set(ADDRESS.STREET_AND_HOUSE_NUMBER, ad.getStreetAndHouseNumber())
+                       .set(ADDRESS.STREET, ad.getStreet())
+                       .set(ADDRESS.HOUSE_NUMBER, ad.getHouseNumber())
                        .set(ADDRESS.ZIP_CODE, ad.getZipCode())
                        .set(ADDRESS.CITY, ad.getCity())
                        .set(ADDRESS.COUNTRY, ad.getCountry())
@@ -94,7 +95,8 @@ public class AddressRepositoryImpl implements AddressRepository {
 
     private void update(DSLContext ctx, Address ad) {
         int count = ctx.update(ADDRESS)
-                       .set(ADDRESS.STREET_AND_HOUSE_NUMBER, ad.getStreetAndHouseNumber())
+                       .set(ADDRESS.STREET, ad.getStreet())
+                       .set(ADDRESS.HOUSE_NUMBER, ad.getHouseNumber())
                        .set(ADDRESS.ZIP_CODE, ad.getZipCode())
                        .set(ADDRESS.CITY, ad.getCity())
                        .set(ADDRESS.COUNTRY, ad.getCountry())

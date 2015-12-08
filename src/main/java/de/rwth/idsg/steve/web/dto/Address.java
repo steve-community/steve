@@ -14,14 +14,16 @@ public class Address {
     // Internal database id
     private Integer addressPk;
 
-    private String streetAndHouseNumber;
+    private String street;
+    private String houseNumber;
     private String zipCode;
     private String city;
     private String country;
 
     public boolean isEmpty() {
         return addressPk == null
-                && streetAndHouseNumber == null
+                && street == null
+                && houseNumber == null
                 && zipCode == null
                 && city == null
                 && country == null;

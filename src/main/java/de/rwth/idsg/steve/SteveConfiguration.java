@@ -34,6 +34,7 @@ public final class SteveConfiguration {
      */
     public static final class Jetty {
         public static String SERVER_HOST;
+        public static boolean GZIP_ENABLED;
 
         // HTTP
         public static boolean HTTP_ENABLED;

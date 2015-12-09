@@ -57,9 +57,9 @@ SteVe is designed to run standalone, a java servlet container / web server (e.g.
 
     The basic configuration is defined in [main.properties](src/main/resources/config/prod/main.properties):
       - You _must_ change [database configuration](src/main/resources/config/prod/main.properties#L3-L7)
-      - You _must_ change [the host](src/main/resources/config/prod/main.properties#L16) to the correct IP address of your server. Using `0.0.0.0` to bind to all Interfaces should work as well, but might have security implications
+      - You _must_ change [the host](src/main/resources/config/prod/main.properties#L16) to the correct IP address of your server
       - You _must_ change [web interface credentials](src/main/resources/config/prod/main.properties#L11-L12)
-      - You _can_ access the application via HTTPS, by [enabling it and setting the keystore properties](src/main/resources/config/prod/main.properties#L25-L28)
+      - You _can_ access the application via HTTPS, by [enabling it and setting the keystore properties](src/main/resources/config/prod/main.properties#L26-L29)
      
     For advanced configuration please see the [Configuration wiki](https://github.com/RWTH-i5-IDSG/steve/wiki/Configuration)
 

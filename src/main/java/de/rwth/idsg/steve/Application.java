@@ -60,6 +60,8 @@ public class Application {
         Auth.PASSWORD   = prop.getString("auth.password");
 
         Jetty.SERVER_HOST           = prop.getString("server.host");
+        Jetty.GZIP_ENABLED          = prop.getBoolean("server.gzip.enabled");
+
         Jetty.HTTP_ENABLED          = prop.getBoolean("http.enabled");
         Jetty.HTTP_PORT             = prop.getInt("http.port");
         Jetty.HTTPS_ENABLED         = prop.getBoolean("https.enabled");

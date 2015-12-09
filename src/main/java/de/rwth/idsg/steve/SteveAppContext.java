@@ -11,6 +11,7 @@ import org.eclipse.jetty.rewrite.handler.RewriteHandler;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.handler.HandlerCollection;
 import org.eclipse.jetty.server.handler.HandlerList;
+import org.eclipse.jetty.server.handler.gzip.GzipHandler;
 import org.eclipse.jetty.servlet.FilterHolder;
 import org.eclipse.jetty.servlet.ServletHolder;
 import org.eclipse.jetty.webapp.WebAppContext;
@@ -49,7 +50,26 @@ public class SteveAppContext {
         return handlerList;
     }
 
-    private WebAppContext getWebApp() throws IOException {
+    private Handler getWebApp() throws IOException {
+        if (SteveConfiguration.Jetty.GZIP_ENABLED) {
+            return enableGzip(initWebApp());
+        } else {
+            return initWebApp();
+        }
+    }
+
+    /**
+     * Wraps the whole web app in a gzip handler to make Jetty return compressed content
+     *
+     * http://www.eclipse.org/jetty/documentation/current/gzip-filter.html
+     */
+    private Handler enableGzip(WebAppContext ctx) {
+        GzipHandler gzipHandler = new GzipHandler();
+        gzipHandler.setHandler(ctx);
+        return gzipHandler;
+    }
+
+    private WebAppContext initWebApp() throws IOException {
         WebAppContext ctx = new WebAppContext();
         ctx.setContextPath(SteveConfiguration.CONTEXT_PATH);
         ctx.setResourceBase(new ClassPathResource("webapp").getURI().toString());

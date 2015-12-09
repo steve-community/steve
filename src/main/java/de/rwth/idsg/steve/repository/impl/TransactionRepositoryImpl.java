@@ -7,13 +7,11 @@ import de.rwth.idsg.steve.utils.CustomDSL;
 import de.rwth.idsg.steve.utils.DateTimeUtils;
 import de.rwth.idsg.steve.web.dto.TransactionQueryForm;
 import org.joda.time.DateTime;
-import org.jooq.Configuration;
+import org.jooq.DSLContext;
 import org.jooq.Record10;
 import org.jooq.Record8;
 import org.jooq.SelectQuery;
-import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Repository;
 
 import java.io.Writer;
@@ -32,9 +30,7 @@ import static jooq.steve.db.tables.Transaction.TRANSACTION;
 @Repository
 public class TransactionRepositoryImpl implements TransactionRepository {
 
-    @Autowired
-    @Qualifier("jooqConfig")
-    private Configuration config;
+    @Autowired private DSLContext ctx;
 
     @Override
     @SuppressWarnings("unchecked")
@@ -63,8 +59,7 @@ public class TransactionRepositoryImpl implements TransactionRepository {
 
     @Override
     public List<Integer> getActiveTransactionIds(String chargeBoxId) {
-        return DSL.using(config)
-                  .select(TRANSACTION.TRANSACTION_PK)
+        return ctx.select(TRANSACTION.TRANSACTION_PK)
                   .from(TRANSACTION)
                   .join(CONNECTOR)
                     .on(TRANSACTION.CONNECTOR_PK.equal(CONNECTOR.CONNECTOR_PK))
@@ -82,7 +77,7 @@ public class TransactionRepositoryImpl implements TransactionRepository {
     SelectQuery<Record8<Integer, String, Integer, String, DateTime, String, DateTime, String> >
     getInternalCSV(TransactionQueryForm form) {
 
-        SelectQuery selectQuery = DSL.using(config).selectQuery();
+        SelectQuery selectQuery = ctx.selectQuery();
         selectQuery.addFrom(TRANSACTION);
         selectQuery.addJoin(CONNECTOR, TRANSACTION.CONNECTOR_PK.eq(CONNECTOR.CONNECTOR_PK));
         selectQuery.addSelect(
@@ -108,7 +103,7 @@ public class TransactionRepositoryImpl implements TransactionRepository {
     SelectQuery<Record10<Integer, String, Integer, String, DateTime, String, DateTime, String, Integer, Integer>>
     getInternal(TransactionQueryForm form) {
 
-        SelectQuery selectQuery = DSL.using(config).selectQuery();
+        SelectQuery selectQuery = ctx.selectQuery();
         selectQuery.addFrom(TRANSACTION);
         selectQuery.addJoin(CONNECTOR, TRANSACTION.CONNECTOR_PK.eq(CONNECTOR.CONNECTOR_PK));
         selectQuery.addJoin(CHARGE_BOX, CHARGE_BOX.CHARGE_BOX_ID.eq(CONNECTOR.CHARGE_BOX_ID));

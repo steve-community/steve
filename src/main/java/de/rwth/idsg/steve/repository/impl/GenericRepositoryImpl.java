@@ -7,11 +7,9 @@ import de.rwth.idsg.steve.web.dto.Statistics;
 import jooq.steve.db.routines.GetStats;
 import lombok.extern.slf4j.Slf4j;
 import org.joda.time.DateTime;
-import org.jooq.Configuration;
+import org.jooq.DSLContext;
 import org.jooq.Record2;
-import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Repository;
 
 import static jooq.steve.db.tables.SchemaVersion.SCHEMA_VERSION;
@@ -26,16 +24,14 @@ import static org.jooq.impl.DSL.select;
 @Repository
 public class GenericRepositoryImpl implements GenericRepository {
 
-    @Autowired
-    @Qualifier("jooqConfig")
-    private Configuration config;
+    @Autowired private DSLContext ctx;
 
     @Override
     public Statistics getStats() {
 
         // getStats is the stored procedure in our MySQL DB
         GetStats gs = new GetStats();
-        gs.execute(config);
+        gs.execute(ctx.configuration());
 
         gs.detach();
 
@@ -57,8 +53,7 @@ public class GenericRepositoryImpl implements GenericRepository {
 
     @Override
     public DbVersion getDBVersion() {
-        Record2<String, DateTime> record = DSL.using(config)
-                                              .select(SCHEMA_VERSION.VERSION, SCHEMA_VERSION.INSTALLED_ON)
+        Record2<String, DateTime> record = ctx.select(SCHEMA_VERSION.VERSION, SCHEMA_VERSION.INSTALLED_ON)
                                               .from(SCHEMA_VERSION)
                                               .where(SCHEMA_VERSION.VERSION_RANK.eq(
                                                       select(max(SCHEMA_VERSION.VERSION_RANK)).from(SCHEMA_VERSION)))

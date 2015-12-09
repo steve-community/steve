@@ -15,11 +15,9 @@ import ocpp.cs._2012._06.UnitOfMeasure;
 import ocpp.cs._2012._06.ValueFormat;
 import org.joda.time.DateTime;
 import org.jooq.BatchBindStep;
-import org.jooq.Configuration;
 import org.jooq.DSLContext;
 import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -42,16 +40,12 @@ import static jooq.steve.db.tables.Transaction.TRANSACTION;
 @Repository
 public class OcppServerRepositoryImpl implements OcppServerRepository {
 
-    @Autowired
-    @Qualifier("jooqConfig")
-    private Configuration config;
-
+    @Autowired private DSLContext ctx;
     @Autowired private ReservationRepository reservationRepository;
 
     @Override
     public boolean updateChargebox(UpdateChargeboxParams p) {
-        int count = DSL.using(config)
-                       .update(CHARGE_BOX)
+        int count = ctx.update(CHARGE_BOX)
                        .set(CHARGE_BOX.OCPP_PROTOCOL, p.getOcppProtocol().getCompositeValue())
                        .set(CHARGE_BOX.CHARGE_POINT_VENDOR, p.getVendor())
                        .set(CHARGE_BOX.CHARGE_POINT_MODEL, p.getModel())
@@ -79,8 +73,7 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
 
     @Override
     public void updateEndpointAddress(String chargeBoxIdentity, String endpointAddress) {
-        DSL.using(config)
-           .update(CHARGE_BOX)
+        ctx.update(CHARGE_BOX)
            .set(CHARGE_BOX.ENDPOINT_ADDRESS, endpointAddress)
            .where(CHARGE_BOX.CHARGE_BOX_ID.equal(chargeBoxIdentity))
            .execute();
@@ -88,8 +81,7 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
 
     @Override
     public void updateChargeboxFirmwareStatus(String chargeBoxIdentity, String firmwareStatus) {
-        DSL.using(config)
-           .update(CHARGE_BOX)
+        ctx.update(CHARGE_BOX)
            .set(CHARGE_BOX.FW_UPDATE_STATUS, firmwareStatus)
            .set(CHARGE_BOX.FW_UPDATE_TIMESTAMP, CustomDSL.utcTimestamp())
            .where(CHARGE_BOX.CHARGE_BOX_ID.equal(chargeBoxIdentity))
@@ -98,8 +90,7 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
 
     @Override
     public void updateChargeboxDiagnosticsStatus(String chargeBoxIdentity, String status) {
-        DSL.using(config)
-           .update(CHARGE_BOX)
+        ctx.update(CHARGE_BOX)
            .set(CHARGE_BOX.DIAGNOSTICS_STATUS, status)
            .set(CHARGE_BOX.DIAGNOSTICS_TIMESTAMP, CustomDSL.utcTimestamp())
            .where(CHARGE_BOX.CHARGE_BOX_ID.equal(chargeBoxIdentity))
@@ -108,8 +99,7 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
 
     @Override
     public void updateChargeboxHeartbeat(String chargeBoxIdentity, DateTime ts) {
-        DSL.using(config)
-           .update(CHARGE_BOX)
+        ctx.update(CHARGE_BOX)
            .set(CHARGE_BOX.LAST_HEARTBEAT_TIMESTAMP, ts)
            .where(CHARGE_BOX.CHARGE_BOX_ID.equal(chargeBoxIdentity))
            .execute();
@@ -118,7 +108,7 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
     @Override
     public void insertConnectorStatus(InsertConnectorStatusParams p) {
 
-        DSL.using(config).transaction(configuration -> {
+        ctx.transaction(configuration -> {
             DSLContext ctx = DSL.using(configuration);
 
             // Step 1
@@ -150,7 +140,7 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
     public void insertMeterValues12(final String chargeBoxIdentity, final int connectorId,
                                     final List<ocpp.cs._2010._08.MeterValue> list) {
 
-        DSL.using(config).transaction(configuration -> {
+        ctx.transaction(configuration -> {
             DSLContext ctx = DSL.using(configuration);
 
             insertIgnoreConnector(ctx, chargeBoxIdentity, connectorId);
@@ -163,7 +153,7 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
     public void insertMeterValues15(final String chargeBoxIdentity, final int connectorId,
                                     final List<ocpp.cs._2012._06.MeterValue> list, final Integer transactionId) {
 
-        DSL.using(config).transaction(configuration -> {
+        ctx.transaction(configuration -> {
             DSLContext ctx = DSL.using(configuration);
 
             insertIgnoreConnector(ctx, chargeBoxIdentity, connectorId);
@@ -176,7 +166,7 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
     public void insertMeterValuesOfTransaction(String chargeBoxIdentity, final int transactionId,
                                                final List<MeterValue> list) {
 
-        DSL.using(config).transaction(configuration -> {
+        ctx.transaction(configuration -> {
             DSLContext ctx = DSL.using(configuration);
 
             // First, get connector primary key from transaction table
@@ -193,7 +183,7 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
     @Override
     public Integer insertTransaction(InsertTransactionParams p) {
 
-        return DSL.using(config).transactionResult(configuration -> {
+        return ctx.transactionResult(configuration -> {
             DSLContext ctx = DSL.using(configuration);
 
             insertIgnoreConnector(ctx, p.getChargeBoxId(), p.getConnectorId());
@@ -233,8 +223,7 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
      */
     @Override
     public void updateTransaction(int transactionId, DateTime stopTimestamp, String stopMeterValue) {
-        DSL.using(config)
-           .update(TRANSACTION)
+        ctx.update(TRANSACTION)
            .set(TRANSACTION.STOP_TIMESTAMP, stopTimestamp)
            .set(TRANSACTION.STOP_VALUE, stopMeterValue)
            .where(TRANSACTION.TRANSACTION_PK.equal(transactionId))

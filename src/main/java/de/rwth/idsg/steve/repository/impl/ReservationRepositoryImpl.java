@@ -9,14 +9,12 @@ import de.rwth.idsg.steve.utils.DateTimeUtils;
 import de.rwth.idsg.steve.web.dto.ReservationQueryForm;
 import lombok.extern.slf4j.Slf4j;
 import org.joda.time.DateTime;
-import org.jooq.Configuration;
+import org.jooq.DSLContext;
 import org.jooq.Record9;
 import org.jooq.RecordMapper;
 import org.jooq.SelectQuery;
 import org.jooq.exception.DataAccessException;
-import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -33,14 +31,12 @@ import static jooq.steve.db.tables.Reservation.RESERVATION;
 @Repository
 public class ReservationRepositoryImpl implements ReservationRepository {
 
-    @Autowired
-    @Qualifier("jooqConfig")
-    private Configuration config;
+    @Autowired private DSLContext ctx;
 
     @Override
     @SuppressWarnings("unchecked")
     public List<Reservation> getReservations(ReservationQueryForm form) {
-        SelectQuery selectQuery = DSL.using(config).selectQuery();
+        SelectQuery selectQuery = ctx.selectQuery();
         selectQuery.addFrom(RESERVATION);
         selectQuery.addJoin(OCPP_TAG, OCPP_TAG.ID_TAG.eq(RESERVATION.ID_TAG));
         selectQuery.addJoin(CHARGE_BOX, CHARGE_BOX.CHARGE_BOX_ID.eq(RESERVATION.CHARGE_BOX_ID));
@@ -78,8 +74,7 @@ public class ReservationRepositoryImpl implements ReservationRepository {
 
     @Override
     public List<Integer> getActiveReservationIds(String chargeBoxId) {
-        return DSL.using(config)
-                  .select(RESERVATION.RESERVATION_PK)
+        return ctx.select(RESERVATION.RESERVATION_PK)
                   .from(RESERVATION)
                   .where(RESERVATION.CHARGE_BOX_ID.equal(chargeBoxId))
                         .and(RESERVATION.EXPIRY_DATETIME.greaterThan(CustomDSL.utcTimestamp()))
@@ -92,8 +87,7 @@ public class ReservationRepositoryImpl implements ReservationRepository {
         // Check overlapping
         //isOverlapping(startTimestamp, expiryTimestamp, chargeBoxId);
 
-        int reservationId = DSL.using(config)
-                               .insertInto(RESERVATION,
+        int reservationId = ctx.insertInto(RESERVATION,
                                        RESERVATION.ID_TAG, RESERVATION.CHARGE_BOX_ID,
                                        RESERVATION.START_DATETIME, RESERVATION.EXPIRY_DATETIME,
                                        RESERVATION.STATUS)
@@ -110,8 +104,7 @@ public class ReservationRepositoryImpl implements ReservationRepository {
 
     @Override
     public void delete(int reservationId) {
-        DSL.using(config)
-           .delete(RESERVATION)
+        ctx.delete(RESERVATION)
            .where(RESERVATION.RESERVATION_PK.equal(reservationId))
            .execute();
 
@@ -130,8 +123,7 @@ public class ReservationRepositoryImpl implements ReservationRepository {
 
     @Override
     public void used(int reservationId, int transactionId) {
-        DSL.using(config)
-           .update(RESERVATION)
+        ctx.update(RESERVATION)
            .set(RESERVATION.STATUS, ReservationStatus.USED.name())
            .set(RESERVATION.TRANSACTION_PK, transactionId)
            .where(RESERVATION.RESERVATION_PK.equal(reservationId))
@@ -162,8 +154,7 @@ public class ReservationRepositoryImpl implements ReservationRepository {
 
     private void internalUpdateReservation(int reservationId, ReservationStatus status) {
         try {
-            DSL.using(config)
-               .update(RESERVATION)
+            ctx.update(RESERVATION)
                .set(RESERVATION.STATUS, status.name())
                .where(RESERVATION.RESERVATION_PK.equal(reservationId))
                .execute();
@@ -195,8 +186,7 @@ public class ReservationRepositoryImpl implements ReservationRepository {
      */
     private void isOverlapping(DateTime start, DateTime stop, String chargeBoxId) {
         try {
-            int count = DSL.using(config)
-                           .selectOne()
+            int count = ctx.selectOne()
                            .from(RESERVATION)
                            .where(RESERVATION.EXPIRY_DATETIME.greaterOrEqual(start))
                              .and(RESERVATION.START_DATETIME.lessOrEqual(stop))

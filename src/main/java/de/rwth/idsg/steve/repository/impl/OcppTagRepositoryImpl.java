@@ -10,7 +10,7 @@ import jooq.steve.db.tables.OcppTag;
 import jooq.steve.db.tables.records.OcppTagRecord;
 import lombok.extern.slf4j.Slf4j;
 import org.joda.time.DateTime;
-import org.jooq.Configuration;
+import org.jooq.DSLContext;
 import org.jooq.JoinType;
 import org.jooq.Record7;
 import org.jooq.RecordMapper;
@@ -18,9 +18,7 @@ import org.jooq.Result;
 import org.jooq.SelectQuery;
 import org.jooq.TableField;
 import org.jooq.exception.DataAccessException;
-import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -37,14 +35,12 @@ import static jooq.steve.db.tables.OcppTag.OCPP_TAG;
 @Repository
 public class OcppTagRepositoryImpl implements OcppTagRepository {
 
-    @Autowired
-    @Qualifier("jooqConfig")
-    private Configuration config;
+    @Autowired private DSLContext ctx;
 
     @Override
     @SuppressWarnings("unchecked")
     public List<Overview> getOverview(OcppTagQueryForm form) {
-        SelectQuery selectQuery = DSL.using(config).selectQuery();
+        SelectQuery selectQuery = ctx.selectQuery();
         selectQuery.addFrom(OCPP_TAG);
 
         OcppTag parentTable = OCPP_TAG.as("parent");
@@ -95,47 +91,41 @@ public class OcppTagRepositoryImpl implements OcppTagRepository {
 
     @Override
     public Result<OcppTagRecord> getRecords() {
-        return DSL.using(config)
-                  .selectFrom(OCPP_TAG)
+        return ctx.selectFrom(OCPP_TAG)
                   .fetch();
     }
 
     @Override
     public Result<OcppTagRecord> getRecords(List<String> idTagList) {
-        return DSL.using(config)
-                  .selectFrom(OCPP_TAG)
+        return ctx.selectFrom(OCPP_TAG)
                   .where(OCPP_TAG.ID_TAG.in(idTagList))
                   .fetch();
     }
 
     @Override
     public OcppTagRecord getRecord(String idTag) {
-        return DSL.using(config)
-                  .selectFrom(OCPP_TAG)
+        return ctx.selectFrom(OCPP_TAG)
                   .where(OCPP_TAG.ID_TAG.equal(idTag))
                   .fetchOne();
     }
 
     @Override
     public OcppTagRecord getRecord(int ocppTagPk) {
-        return DSL.using(config)
-                  .selectFrom(OCPP_TAG)
+        return ctx.selectFrom(OCPP_TAG)
                   .where(OCPP_TAG.OCPP_TAG_PK.equal(ocppTagPk))
                   .fetchOne();
     }
 
     @Override
     public List<String> getIdTags() {
-        return DSL.using(config)
-                .select(OCPP_TAG.ID_TAG)
-                .from(OCPP_TAG)
-                .fetch(OCPP_TAG.ID_TAG);
+        return ctx.select(OCPP_TAG.ID_TAG)
+                  .from(OCPP_TAG)
+                  .fetch(OCPP_TAG.ID_TAG);
     }
 
     @Override
     public List<String> getActiveIdTags() {
-        return DSL.using(config)
-                  .select(OCPP_TAG.ID_TAG)
+        return ctx.select(OCPP_TAG.ID_TAG)
                   .from(OCPP_TAG)
                   .where(OCPP_TAG.IN_TRANSACTION.isFalse())
                     .and(OCPP_TAG.BLOCKED.isFalse())
@@ -145,8 +135,7 @@ public class OcppTagRepositoryImpl implements OcppTagRepository {
 
     @Override
     public List<String> getParentIdTags() {
-        return DSL.using(config)
-                  .selectDistinct(OCPP_TAG.PARENT_ID_TAG)
+        return ctx.selectDistinct(OCPP_TAG.PARENT_ID_TAG)
                   .from(OCPP_TAG)
                   .where(OCPP_TAG.PARENT_ID_TAG.isNotNull())
                   .fetch(OCPP_TAG.PARENT_ID_TAG);
@@ -154,8 +143,7 @@ public class OcppTagRepositoryImpl implements OcppTagRepository {
 
     @Override
     public String getParentIdtag(String idTag) {
-        return DSL.using(config)
-                  .select(OCPP_TAG.PARENT_ID_TAG)
+        return ctx.select(OCPP_TAG.PARENT_ID_TAG)
                   .from(OCPP_TAG)
                   .where(OCPP_TAG.ID_TAG.eq(idTag))
                   .fetchOne()
@@ -165,8 +153,7 @@ public class OcppTagRepositoryImpl implements OcppTagRepository {
     @Override
     public void addOcppTag(OcppTagForm u) {
         try {
-            int count = DSL.using(config)
-                           .insertInto(OCPP_TAG)
+            int count = ctx.insertInto(OCPP_TAG)
                            .set(OCPP_TAG.ID_TAG, u.getIdTag())
                            .set(OCPP_TAG.PARENT_ID_TAG, u.getParentIdTag())
                            .set(OCPP_TAG.EXPIRY_DATE, toDateTime(u.getExpiration()))
@@ -187,8 +174,7 @@ public class OcppTagRepositoryImpl implements OcppTagRepository {
     @Override
     public void updateOcppTag(OcppTagForm u) {
         try {
-            DSL.using(config)
-               .update(OCPP_TAG)
+            ctx.update(OCPP_TAG)
                .set(OCPP_TAG.PARENT_ID_TAG, u.getParentIdTag())
                .set(OCPP_TAG.EXPIRY_DATE, toDateTime(u.getExpiration()))
                .set(OCPP_TAG.NOTE, u.getNote())
@@ -203,8 +189,7 @@ public class OcppTagRepositoryImpl implements OcppTagRepository {
     @Override
     public void deleteOcppTag(int ocppTagPk) {
         try {
-            DSL.using(config)
-               .delete(OCPP_TAG)
+            ctx.delete(OCPP_TAG)
                .where(OCPP_TAG.OCPP_TAG_PK.equal(ocppTagPk))
                .execute();
         } catch (DataAccessException e) {

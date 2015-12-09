@@ -10,7 +10,6 @@ import de.rwth.idsg.steve.web.dto.UserQueryForm;
 import jooq.steve.db.tables.records.AddressRecord;
 import jooq.steve.db.tables.records.UserRecord;
 import lombok.extern.slf4j.Slf4j;
-import org.jooq.Configuration;
 import org.jooq.DSLContext;
 import org.jooq.Field;
 import org.jooq.JoinType;
@@ -22,7 +21,6 @@ import org.jooq.SelectQuery;
 import org.jooq.exception.DataAccessException;
 import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -39,11 +37,8 @@ import static jooq.steve.db.tables.User.USER;
 @Repository
 public class UserRepositoryImpl implements UserRepository {
 
+    @Autowired private DSLContext ctx;
     @Autowired private AddressRepository addressRepository;
-
-    @Autowired
-    @Qualifier("jooqConfig")
-    private Configuration config;
 
     @Override
     public List<User.Overview> getOverview(UserQueryForm form) {
@@ -61,7 +56,6 @@ public class UserRepositoryImpl implements UserRepository {
 
     @Override
     public User.Details getDetails(int userPk) {
-        DSLContext ctx = DSL.using(config);
 
         // -------------------------------------------------------------------------
         // 1. user table
@@ -108,7 +102,7 @@ public class UserRepositoryImpl implements UserRepository {
 
     @Override
     public void add(UserForm form) {
-        DSL.using(config).transaction(configuration -> {
+        ctx.transaction(configuration -> {
             DSLContext ctx = DSL.using(configuration);
             try {
                 Integer addressId = addressRepository.updateOrInsert(ctx, form.getAddress());
@@ -122,7 +116,7 @@ public class UserRepositoryImpl implements UserRepository {
 
     @Override
     public void update(UserForm form) {
-        DSL.using(config).transaction(configuration -> {
+        ctx.transaction(configuration -> {
             DSLContext ctx = DSL.using(configuration);
             try {
                 Integer addressId = addressRepository.updateOrInsert(ctx, form.getAddress());
@@ -136,7 +130,7 @@ public class UserRepositoryImpl implements UserRepository {
 
     @Override
     public void delete(int userPk) {
-        DSL.using(config).transaction(configuration -> {
+        ctx.transaction(configuration -> {
             DSLContext ctx = DSL.using(configuration);
             try {
                 addressRepository.delete(ctx, selectAddressId(userPk));
@@ -154,7 +148,7 @@ public class UserRepositoryImpl implements UserRepository {
 
     @SuppressWarnings("unchecked")
     private Result<Record7<Integer, Integer, String, String, String, String, String>> getOverviewInternal(UserQueryForm form) {
-        SelectQuery selectQuery = DSL.using(config).selectQuery();
+        SelectQuery selectQuery = ctx.selectQuery();
         selectQuery.addFrom(USER);
         selectQuery.addJoin(OCPP_TAG, JoinType.LEFT_OUTER_JOIN, USER.OCPP_TAG_PK.eq(OCPP_TAG.OCPP_TAG_PK));
         selectQuery.addSelect(
@@ -193,15 +187,15 @@ public class UserRepositoryImpl implements UserRepository {
     }
 
     private SelectConditionStep<Record1<Integer>> selectAddressId(int userPk) {
-        return DSL.select(USER.ADDRESS_PK)
+        return ctx.select(USER.ADDRESS_PK)
                   .from(USER)
                   .where(USER.USER_PK.eq(userPk));
     }
 
     private SelectConditionStep<Record1<Integer>> selectOcppTagPk(String ocppIdTag) {
-        return DSL.select(OCPP_TAG.OCPP_TAG_PK)
-                   .from(OCPP_TAG)
-                   .where(OCPP_TAG.ID_TAG.eq(ocppIdTag));
+        return ctx.select(OCPP_TAG.OCPP_TAG_PK)
+                  .from(OCPP_TAG)
+                  .where(OCPP_TAG.ID_TAG.eq(ocppIdTag));
     }
 
     private void addInternal(DSLContext ctx, UserForm form, Integer addressPk) {

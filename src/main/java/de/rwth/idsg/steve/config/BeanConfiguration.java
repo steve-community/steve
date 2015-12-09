@@ -8,8 +8,10 @@ import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import de.rwth.idsg.steve.SteveConfiguration;
 import lombok.extern.slf4j.Slf4j;
+import org.jooq.DSLContext;
 import org.jooq.SQLDialect;
 import org.jooq.conf.Settings;
+import org.jooq.impl.DSL;
 import org.jooq.impl.DataSourceConnectionProvider;
 import org.jooq.impl.DefaultConfiguration;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -85,6 +87,23 @@ public class BeanConfiguration extends WebMvcConfigurerAdapter {
                 .set(SQLDialect.MYSQL)
                 .set(new DataSourceConnectionProvider(dataSource))
                 .set(new Settings().withExecuteLogging(SteveConfiguration.DB.SQL_LOGGING));
+    }
+
+    /**
+     * Can we re-use DSLContext as a Spring bean (singleton)? Yes, the Spring tutorial of
+     * Jooq also does it that way, but only if we do not change anything about the
+     * config after the init (which we don't do anyways) and if the ConnectionProvider
+     * does not store any shared state (we use DataSourceConnectionProvider of Jooq, so no problem).
+     *
+     * Some sources and discussion:
+     * - http://www.jooq.org/doc/3.6/manual/getting-started/tutorials/jooq-with-spring/
+     * - http://jooq-user.narkive.com/2fvuLodn/dslcontext-and-threads
+     * - https://groups.google.com/forum/#!topic/jooq-user/VK7KQcjj3Co
+     * - http://stackoverflow.com/questions/32848865/jooq-dslcontext-correct-autowiring-with-spring
+     */
+    @Bean
+    public DSLContext dslContext() {
+        return DSL.using(jooqConfig());
     }
 
     @Bean

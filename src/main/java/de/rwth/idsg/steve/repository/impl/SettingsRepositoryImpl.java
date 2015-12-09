@@ -5,11 +5,9 @@ import de.rwth.idsg.steve.repository.SettingsRepository;
 import de.rwth.idsg.steve.repository.dto.Settings;
 import de.rwth.idsg.steve.web.dto.SettingsForm;
 import jooq.steve.db.tables.records.SettingsRecord;
-import org.jooq.Configuration;
+import org.jooq.DSLContext;
 import org.jooq.exception.DataAccessException;
-import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Repository;
 
 import java.util.Base64;
@@ -26,9 +24,7 @@ public class SettingsRepositoryImpl implements SettingsRepository {
 
     private static final String APP_ID = new String(Base64.getEncoder().encode("SteckdosenVerwaltung".getBytes()));
 
-    @Autowired
-    @Qualifier("jooqConfig")
-    private Configuration config;
+    @Autowired private DSLContext ctx;
 
     @Override
     public Settings get() {
@@ -53,8 +49,7 @@ public class SettingsRepositoryImpl implements SettingsRepository {
     @Override
     public void update(SettingsForm form) {
         try {
-            DSL.using(config)
-               .update(SETTINGS)
+            ctx.update(SETTINGS)
                .set(SETTINGS.HEARTBEAT_INTERVAL_IN_SECONDS, toSec(form.getHeartbeat()))
                .set(SETTINGS.HOURS_TO_EXPIRE, form.getExpiration())
                .where(SETTINGS.APP_ID.eq(APP_ID))
@@ -65,8 +60,7 @@ public class SettingsRepositoryImpl implements SettingsRepository {
     }
 
     private SettingsRecord getInternal() {
-        return DSL.using(config)
-                  .selectFrom(SETTINGS)
+        return ctx.selectFrom(SETTINGS)
                   .where(SETTINGS.APP_ID.eq(APP_ID))
                   .fetchOne();
     }

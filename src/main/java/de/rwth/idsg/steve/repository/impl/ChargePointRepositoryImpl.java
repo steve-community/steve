@@ -15,7 +15,6 @@ import jooq.steve.db.tables.records.AddressRecord;
 import jooq.steve.db.tables.records.ChargeBoxRecord;
 import lombok.extern.slf4j.Slf4j;
 import org.joda.time.DateTime;
-import org.jooq.Configuration;
 import org.jooq.DSLContext;
 import org.jooq.Field;
 import org.jooq.Record1;
@@ -27,7 +26,6 @@ import org.jooq.TableLike;
 import org.jooq.exception.DataAccessException;
 import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -47,16 +45,12 @@ import static jooq.steve.db.tables.ConnectorStatus.CONNECTOR_STATUS;
 @Repository
 public class ChargePointRepositoryImpl implements ChargePointRepository {
 
-    @Autowired
-    @Qualifier("jooqConfig")
-    private Configuration config;
-
+    @Autowired private DSLContext ctx;
     @Autowired private AddressRepository addressRepository;
 
     @Override
     public boolean isRegistered(String chargeBoxId) {
-        Record1<Integer> r = DSL.using(config)
-                                .selectOne()
+        Record1<Integer> r = ctx.selectOne()
                                 .from(CHARGE_BOX)
                                 .where(CHARGE_BOX.CHARGE_BOX_ID.eq(chargeBoxId))
                                 .fetchOne();
@@ -68,8 +62,7 @@ public class ChargePointRepositoryImpl implements ChargePointRepository {
     public List<ChargePointSelect> getChargePointSelect(OcppProtocol protocol) {
         final OcppTransport transport = protocol.getTransport();
 
-        return DSL.using(config)
-                  .select(CHARGE_BOX.CHARGE_BOX_ID, CHARGE_BOX.ENDPOINT_ADDRESS)
+        return ctx.select(CHARGE_BOX.CHARGE_BOX_ID, CHARGE_BOX.ENDPOINT_ADDRESS)
                   .from(CHARGE_BOX)
                   .where(CHARGE_BOX.OCPP_PROTOCOL.equal(protocol.getCompositeValue()))
                   .and(CHARGE_BOX.ENDPOINT_ADDRESS.isNotNull())
@@ -79,16 +72,14 @@ public class ChargePointRepositoryImpl implements ChargePointRepository {
 
     @Override
     public List<String> getChargeBoxIds() {
-        return DSL.using(config)
-                  .select(CHARGE_BOX.CHARGE_BOX_ID)
+        return ctx.select(CHARGE_BOX.CHARGE_BOX_ID)
                   .from(CHARGE_BOX)
                   .fetch(CHARGE_BOX.CHARGE_BOX_ID);
     }
 
     @Override
     public Map<String, Integer> getChargeBoxIdPkPair(List<String> chargeBoxIdList) {
-        return DSL.using(config)
-                  .select(CHARGE_BOX.CHARGE_BOX_ID, CHARGE_BOX.CHARGE_BOX_PK)
+        return ctx.select(CHARGE_BOX.CHARGE_BOX_ID, CHARGE_BOX.CHARGE_BOX_PK)
                   .from(CHARGE_BOX)
                   .where(CHARGE_BOX.CHARGE_BOX_ID.in(chargeBoxIdList))
                   .fetchMap(CHARGE_BOX.CHARGE_BOX_ID, CHARGE_BOX.CHARGE_BOX_PK);
@@ -109,7 +100,7 @@ public class ChargePointRepositoryImpl implements ChargePointRepository {
 
     @SuppressWarnings("unchecked")
     private Result<Record5<Integer, String, String, String, DateTime>> getOverviewInternal(ChargePointQueryForm form) {
-        SelectQuery selectQuery = DSL.using(config).selectQuery();
+        SelectQuery selectQuery = ctx.selectQuery();
         selectQuery.addFrom(CHARGE_BOX);
         selectQuery.addSelect(
                 CHARGE_BOX.CHARGE_BOX_PK,
@@ -163,8 +154,6 @@ public class ChargePointRepositoryImpl implements ChargePointRepository {
 
     @Override
     public ChargePoint.Details getDetails(int chargeBoxPk) {
-        DSLContext ctx = DSL.using(config);
-
         ChargeBoxRecord cbr = ctx.selectFrom(CHARGE_BOX)
                                  .where(CHARGE_BOX.CHARGE_BOX_PK.equal(chargeBoxPk))
                                  .fetchOne();
@@ -185,13 +174,12 @@ public class ChargePointRepositoryImpl implements ChargePointRepository {
         // Prepare for the inner select of the second join
         Field<Integer> t1Pk = CONNECTOR_STATUS.CONNECTOR_PK.as("t1_pk");
         Field<DateTime> t1Max = DSL.max(CONNECTOR_STATUS.STATUS_TIMESTAMP).as("t1_max");
-        TableLike<?> t1 = DSL.select(t1Pk, t1Max)
+        TableLike<?> t1 = ctx.select(t1Pk, t1Max)
                              .from(CONNECTOR_STATUS)
                              .groupBy(CONNECTOR_STATUS.CONNECTOR_PK)
                              .asTable("t1");
 
-        return DSL.using(config)
-                  .select(CHARGE_BOX.CHARGE_BOX_PK,
+        return ctx.select(CHARGE_BOX.CHARGE_BOX_PK,
                           CONNECTOR.CHARGE_BOX_ID,
                           CONNECTOR.CONNECTOR_ID,
                           CONNECTOR_STATUS.STATUS_TIMESTAMP,
@@ -220,8 +208,7 @@ public class ChargePointRepositoryImpl implements ChargePointRepository {
 
     @Override
     public List<Integer> getConnectorIds(String chargeBoxId) {
-        return DSL.using(config)
-                  .select(CONNECTOR.CONNECTOR_ID)
+        return ctx.select(CONNECTOR.CONNECTOR_ID)
                   .from(CONNECTOR)
                   .where(CONNECTOR.CHARGE_BOX_ID.equal(chargeBoxId))
                   .fetch(CONNECTOR.CONNECTOR_ID);
@@ -229,7 +216,7 @@ public class ChargePointRepositoryImpl implements ChargePointRepository {
 
     @Override
     public void addChargePoint(ChargePointForm form) {
-        DSL.using(config).transaction(configuration -> {
+        ctx.transaction(configuration -> {
             DSLContext ctx = DSL.using(configuration);
             try {
                 Integer addressId = addressRepository.updateOrInsert(ctx, form.getAddress());
@@ -244,7 +231,7 @@ public class ChargePointRepositoryImpl implements ChargePointRepository {
 
     @Override
     public void updateChargePoint(ChargePointForm form) {
-        DSL.using(config).transaction(configuration -> {
+        ctx.transaction(configuration -> {
             DSLContext ctx = DSL.using(configuration);
             try {
                 Integer addressId = addressRepository.updateOrInsert(ctx, form.getAddress());
@@ -259,7 +246,7 @@ public class ChargePointRepositoryImpl implements ChargePointRepository {
 
     @Override
     public void deleteChargePoint(int chargeBoxPk) {
-        DSL.using(config).transaction(configuration -> {
+        ctx.transaction(configuration -> {
             DSLContext ctx = DSL.using(configuration);
             try {
                 addressRepository.delete(ctx, selectAddressId(chargeBoxPk));
@@ -276,7 +263,7 @@ public class ChargePointRepositoryImpl implements ChargePointRepository {
     // -------------------------------------------------------------------------
 
     private SelectConditionStep<Record1<Integer>> selectAddressId(int chargeBoxPk) {
-        return DSL.select(CHARGE_BOX.ADDRESS_PK)
+        return ctx.select(CHARGE_BOX.ADDRESS_PK)
                   .from(CHARGE_BOX)
                   .where(CHARGE_BOX.CHARGE_BOX_PK.eq(chargeBoxPk));
     }

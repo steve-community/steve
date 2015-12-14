@@ -126,7 +126,7 @@ public class SteveProdStarter implements ApplicationStarter {
 
     private String getElementPrefix(String str, boolean replaceHttp) {
         if (replaceHttp) {
-            return str.replace("http", "ws");
+            return str.replaceFirst("http", "ws");
         } else {
             return str;
         }

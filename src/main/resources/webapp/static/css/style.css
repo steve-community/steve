@@ -164,6 +164,16 @@ input[type="submit"].redSubmit {
 input[type="submit"].redSubmit:hover {
 	background:#af3232;
 }
+textarea {
+	margin: 1px 3px 1px 0;
+	padding: 3px;
+	border: 1px solid #CCC;
+	border-radius: 0;
+	width: 350px;
+	height: 6em; /* 6 rows */
+	font-size: 12px;
+	resize: vertical;
+}
 #add_space { padding-top: 20px; }
 /*************** top menu navigation div ***************/
 ul.navigation {

@@ -27,7 +27,7 @@
 		<td></td>
 		<td><form:radiobutton path="blocked" value="true"/> true</td>
 	</tr>
-	<tr><td>Additional Note:</td><td><form:input path="note"/></td></tr>
+	<tr><td>Additional Note:</td><td><form:textarea path="note"/></td></tr>
 	<tr><td></td>
 		<td id="add_space">
 			<input type="submit" name="${submitButtonName}" value="${submitButtonValue}">

@@ -1,77 +1,131 @@
 package de.rwth.idsg.steve;
 
 import de.rwth.idsg.steve.ocpp.ws.custom.WsSessionSelectStrategyEnum;
+import de.rwth.idsg.steve.utils.PropertiesFileLoader;
+import lombok.Builder;
+import lombok.Getter;
 
 /**
  * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
  * @since 19.08.2014
  */
+@Getter
 public final class SteveConfiguration {
-    private SteveConfiguration() { }
+    public static final SteveConfiguration CONFIG = new SteveConfiguration();
 
     // Root mapping for Spring
-    public static final String SPRING_MAPPING = "/";
+    private String springMapping = "/";
     // Web frontend
-    public static final String SPRING_MANAGER_MAPPING = "/manager/*";
+    private String springManagerMapping = "/manager/*";
     // Mapping for CXF SOAP services
-    public static final String CXF_MAPPING = "/services/*";
+    private String cxfMapping = "/services/*";
     // Just to be backwards compatible with previous versions of Steve,
     // since there might be already configured chargepoints expecting the older path.
     // Otherwise, might as well be "/".
-    public static final String CONTEXT_PATH = "/steve";
+    private String contextPath = "/steve";
     // Dummy service path
-    public static final String ROUTER_ENDPOINT_PATH = "/CentralSystemService";
+    private String routerEndpointPath = "/CentralSystemService";
 
     // -------------------------------------------------------------------------
     // main.properties
     // -------------------------------------------------------------------------
 
-    public static String STEVE_VERSION;
-    public static ApplicationProfile PROFILE;
+    private String steveVersion;
+    private ApplicationProfile profile;
+    private Ocpp ocpp;
+    private Auth auth;
+    private DB db;
+    private Jetty jetty;
 
-    /**
-     * Jetty configuration
-     */
-    public static final class Jetty {
-        public static String SERVER_HOST;
-        public static boolean GZIP_ENABLED;
+    private SteveConfiguration() {
+        PropertiesFileLoader p = new PropertiesFileLoader("main.properties");
+
+        steveVersion = p.getString("steve.version");
+        profile = ApplicationProfile.fromName(p.getString("profile"));
+
+        jetty = Jetty.builder()
+                     .serverHost(p.getString("server.host"))
+                     .gzipEnabled(p.getBoolean("server.gzip.enabled"))
+                     .httpEnabled(p.getBoolean("http.enabled"))
+                     .httpPort(p.getInt("http.port"))
+                     .httpsEnabled(p.getBoolean("https.enabled"))
+                     .httpsPort(p.getInt("https.port"))
+                     .keyStorePath(p.getString("keystore.path"))
+                     .keyStorePassword(p.getString("keystore.password"))
+                     .build();
+
+        db = DB.builder()
+               .ip(p.getString("db.ip"))
+               .port(p.getInt("db.port"))
+               .schema(p.getString("db.schema"))
+               .userName(p.getString("db.user"))
+               .password(p.getString("db.password"))
+               .sqlLogging(p.getBoolean("db.sql.logging"))
+               .build();
+
+        auth = Auth.builder()
+                   .userName(p.getString("auth.user"))
+                   .password(p.getString("auth.password"))
+                   .build();
+
+        ocpp = Ocpp.builder()
+                   .wsSessionSelectStrategy(
+                           WsSessionSelectStrategyEnum.fromName(p.getString("ws.session.select.strategy")))
+                   .build();
+
+        validate();
+    }
+
+    private void validate() {
+        if (!(jetty.httpEnabled || jetty.httpsEnabled)) {
+            throw new IllegalArgumentException(
+                    "HTTP and HTTPS are both disabled. Well, how do you want to access the server, then?");
+        }
+    }
+
+    // -------------------------------------------------------------------------
+    // Class declarations
+    // -------------------------------------------------------------------------
+
+    // Jetty configuration
+    @Builder @Getter
+    public static class Jetty {
+        private String serverHost;
+        private boolean gzipEnabled;
 
         // HTTP
-        public static boolean HTTP_ENABLED;
-        public static int HTTP_PORT;
+        private boolean httpEnabled;
+        private int httpPort;
 
         // HTTPS
-        public static boolean HTTPS_ENABLED;
-        public static int HTTPS_PORT;
-        public static String KEY_STORE_PATH;
-        public static String KEY_STORE_PASSWORD;
+        private boolean httpsEnabled;
+        private int httpsPort;
+        private String keyStorePath;
+        private String keyStorePassword;
     }
 
-    /**
-     * Database configuration
-     */
-    public static final class DB {
-        public static String IP;
-        public static int PORT;
-        public static String SCHEMA;
-        public static String USERNAME;
-        public static String PASSWORD;
-        public static boolean SQL_LOGGING;
+    // Database configuration
+    @Builder @Getter
+    public static class DB {
+        private String ip;
+        private int port;
+        private String schema;
+        private String userName;
+        private String password;
+        private boolean sqlLogging;
     }
 
-    /**
-     * Credentials for Web interface access
-     */
-    public static final class Auth {
-        public static String USERNAME;
-        public static String PASSWORD;
+    // Credentials for Web interface access
+    @Builder @Getter
+    public static class Auth {
+        private String userName;
+        private String password;
     }
 
-    /**
-     * OCPP-related configuration
-     */
-    public static final class Ocpp {
-        public static WsSessionSelectStrategyEnum WS_SESSION_SELECT_STRATEGY;
+    // OCPP-related configuration
+    @Builder @Getter
+    public static class Ocpp {
+        private WsSessionSelectStrategyEnum wsSessionSelectStrategy;
     }
 
 }

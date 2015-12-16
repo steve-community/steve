@@ -1,6 +1,5 @@
 package de.rwth.idsg.steve.web.controller;
 
-import de.rwth.idsg.steve.SteveConfiguration;
 import de.rwth.idsg.steve.repository.GenericRepository;
 import de.rwth.idsg.steve.repository.SettingsRepository;
 import de.rwth.idsg.steve.repository.dto.Settings;
@@ -16,6 +15,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import javax.validation.Valid;
+
+import static de.rwth.idsg.steve.SteveConfiguration.CONFIG;
 
 /**
  * One controller for about and settings pages
@@ -43,7 +44,7 @@ public class AboutSettingsController {
 
     @RequestMapping(value = ABOUT_PATH, method = RequestMethod.GET)
     public String getAbout(Model model) {
-        model.addAttribute("version", SteveConfiguration.STEVE_VERSION);
+        model.addAttribute("version", CONFIG.getSteveVersion());
         model.addAttribute("db", genericRepository.getDBVersion());
         model.addAttribute("logFile", logController.getLogFilePath());
         model.addAttribute("systemTime", DateTime.now());

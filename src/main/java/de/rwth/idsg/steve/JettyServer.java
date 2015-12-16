@@ -22,6 +22,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import static de.rwth.idsg.steve.SteveConfiguration.CONFIG;
+
 /**
  * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
  * @since 12.12.2014
@@ -57,7 +59,7 @@ public class JettyServer {
         // HTTP Configuration
         HttpConfiguration httpConfig = new HttpConfiguration();
         httpConfig.setSecureScheme(HttpScheme.HTTPS.asString());
-        httpConfig.setSecurePort(SteveConfiguration.Jetty.HTTPS_PORT);
+        httpConfig.setSecurePort(CONFIG.getJetty().getHttpsPort());
         httpConfig.setOutputBufferSize(32768);
         httpConfig.setRequestHeaderSize(8192);
         httpConfig.setResponseHeaderSize(8192);
@@ -71,11 +73,11 @@ public class JettyServer {
         server.setStopAtShutdown(true);
         server.setStopTimeout(STOP_TIMEOUT);
 
-        if (SteveConfiguration.Jetty.HTTP_ENABLED) {
+        if (CONFIG.getJetty().isHttpEnabled()) {
             server.addConnector(httpConnector(httpConfig));
         }
 
-        if (SteveConfiguration.Jetty.HTTPS_ENABLED) {
+        if (CONFIG.getJetty().isHttpsEnabled()) {
             server.addConnector(httpsConnector(httpConfig));
         }
 
@@ -86,8 +88,8 @@ public class JettyServer {
     private ServerConnector httpConnector(HttpConfiguration httpConfig) {
         // === jetty-http.xml ===
         ServerConnector http = new ServerConnector(server, new HttpConnectionFactory(httpConfig));
-        http.setHost(SteveConfiguration.Jetty.SERVER_HOST);
-        http.setPort(SteveConfiguration.Jetty.HTTP_PORT);
+        http.setHost(CONFIG.getJetty().getServerHost());
+        http.setPort(CONFIG.getJetty().getHttpPort());
         http.setIdleTimeout(IDLE_TIMEOUT);
         return http;
     }
@@ -96,9 +98,9 @@ public class JettyServer {
         // === jetty-https.xml ===
         // SSL Context Factory
         SslContextFactory sslContextFactory = new SslContextFactory();
-        sslContextFactory.setKeyStorePath(SteveConfiguration.Jetty.KEY_STORE_PATH);
-        sslContextFactory.setKeyStorePassword(SteveConfiguration.Jetty.KEY_STORE_PASSWORD);
-        sslContextFactory.setKeyManagerPassword(SteveConfiguration.Jetty.KEY_STORE_PASSWORD);
+        sslContextFactory.setKeyStorePath(CONFIG.getJetty().getKeyStorePath());
+        sslContextFactory.setKeyStorePassword(CONFIG.getJetty().getKeyStorePassword());
+        sslContextFactory.setKeyManagerPassword(CONFIG.getJetty().getKeyStorePassword());
         sslContextFactory.setExcludeCipherSuites(
                 "SSL_RSA_WITH_DES_CBC_SHA",
                 "SSL_DHE_RSA_WITH_DES_CBC_SHA",
@@ -116,8 +118,8 @@ public class JettyServer {
         ServerConnector https = new ServerConnector(server,
                 new SslConnectionFactory(sslContextFactory, HttpVersion.HTTP_1_1.asString()),
                 new HttpConnectionFactory(httpsConfig));
-        https.setHost(SteveConfiguration.Jetty.SERVER_HOST);
-        https.setPort(SteveConfiguration.Jetty.HTTPS_PORT);
+        https.setHost(CONFIG.getJetty().getServerHost());
+        https.setPort(CONFIG.getJetty().getHttpsPort());
         https.setIdleTimeout(IDLE_TIMEOUT);
         return https;
     }
@@ -173,11 +175,11 @@ public class JettyServer {
             } catch (UnknownHostException e) {
                 // Well, we failed to read from system, fall back to main.properties.
                 // Better than nothing
-                host = SteveConfiguration.Jetty.SERVER_HOST;
+                host = CONFIG.getJetty().getServerHost();
             }
         }
 
-        String layout = "%s://%s:%d" + SteveConfiguration.CONTEXT_PATH;
+        String layout = "%s://%s:%d" + CONFIG.getContextPath();
 
         return String.format(layout, prefix, host, port);
     }

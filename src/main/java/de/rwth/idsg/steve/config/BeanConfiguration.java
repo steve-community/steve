@@ -6,7 +6,6 @@ import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.mysql.jdbc.jdbc2.optional.MysqlDataSource;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
-import de.rwth.idsg.steve.SteveConfiguration;
 import lombok.extern.slf4j.Slf4j;
 import org.jooq.DSLContext;
 import org.jooq.SQLDialect;
@@ -36,6 +35,8 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 
+import static de.rwth.idsg.steve.SteveConfiguration.CONFIG;
+
 /**
  * Configuration and beans of Spring Framework.
  *
@@ -60,11 +61,11 @@ public class BeanConfiguration extends WebMvcConfigurerAdapter {
         HikariConfig config = new HikariConfig();
         config.setDataSourceClassName(MysqlDataSource.class.getName());
 
-        config.addDataSourceProperty("serverName", SteveConfiguration.DB.IP);
-        config.addDataSourceProperty("port", SteveConfiguration.DB.PORT);
-        config.addDataSourceProperty("databaseName", SteveConfiguration.DB.SCHEMA);
-        config.addDataSourceProperty("user", SteveConfiguration.DB.USERNAME);
-        config.addDataSourceProperty("password", SteveConfiguration.DB.PASSWORD);
+        config.addDataSourceProperty("serverName", CONFIG.getDb().getIp());
+        config.addDataSourceProperty("port", CONFIG.getDb().getPort());
+        config.addDataSourceProperty("databaseName", CONFIG.getDb().getSchema());
+        config.addDataSourceProperty("user", CONFIG.getDb().getUserName());
+        config.addDataSourceProperty("password", CONFIG.getDb().getPassword());
 
         config.addDataSourceProperty("cachePrepStmts", "true");
         config.addDataSourceProperty("prepStmtCacheSize", "250");
@@ -86,7 +87,7 @@ public class BeanConfiguration extends WebMvcConfigurerAdapter {
         return new DefaultConfiguration()
                 .set(SQLDialect.MYSQL)
                 .set(new DataSourceConnectionProvider(dataSource))
-                .set(new Settings().withExecuteLogging(SteveConfiguration.DB.SQL_LOGGING));
+                .set(new Settings().withExecuteLogging(CONFIG.getDb().isSqlLogging()));
     }
 
     /**

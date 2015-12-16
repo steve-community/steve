@@ -1,7 +1,6 @@
 package de.rwth.idsg.steve.utils;
 
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
@@ -15,13 +14,15 @@ public class PropertiesFileLoader {
 
     private Properties prop;
 
-    public PropertiesFileLoader(String fileName) throws IOException {
+    public PropertiesFileLoader(String fileName) {
         try (InputStream is = this.getClass().getClassLoader().getResourceAsStream(fileName)) {
             if (is == null) {
                 throw new FileNotFoundException("Property file '" + fileName + "' is not found in classpath");
             }
             prop = new Properties();
             prop.load(is);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
     }
 

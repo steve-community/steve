@@ -1,6 +1,5 @@
 package de.rwth.idsg.steve.ocpp.soap;
 
-import de.rwth.idsg.steve.SteveConfiguration;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.cxf.Bus;
 import org.apache.cxf.binding.soap.SoapMessage;
@@ -29,6 +28,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static de.rwth.idsg.steve.SteveConfiguration.CONFIG;
 
 /**
  * Taken from http://cxf.apache.org/docs/service-routing.html and modified.
@@ -114,7 +114,7 @@ public class MediatorInInterceptor extends AbstractPhaseInterceptor<SoapMessage>
             String address = info.getAddress();
 
             // exclude the 'dummy' routing server
-            if (SteveConfiguration.ROUTER_ENDPOINT_PATH.equals(address)) {
+            if (CONFIG.getRouterEndpointPath().equals(address)) {
                 continue;
             }
 

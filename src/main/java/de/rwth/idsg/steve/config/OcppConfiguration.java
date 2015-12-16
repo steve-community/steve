@@ -22,8 +22,7 @@ import org.springframework.context.annotation.Configuration;
 import javax.annotation.PostConstruct;
 import java.util.List;
 
-import static de.rwth.idsg.steve.SteveConfiguration.Ocpp.WS_SESSION_SELECT_STRATEGY;
-import static de.rwth.idsg.steve.SteveConfiguration.ROUTER_ENDPOINT_PATH;
+import static de.rwth.idsg.steve.SteveConfiguration.CONFIG;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 
@@ -53,7 +52,7 @@ public class OcppConfiguration {
         List<Interceptor<? extends Message>> interceptors = asList(new MessageIdInterceptor(), fromAddressInterceptor);
 
         // Just a dummy service to route incoming messages to the appropriate service version
-        createOcppService(ocpp12Server, ROUTER_ENDPOINT_PATH, route);
+        createOcppService(ocpp12Server, CONFIG.getRouterEndpointPath(), route);
 
         createOcppService(ocpp12Server, "/CentralSystemServiceOCPP12", interceptors);
         createOcppService(ocpp15Server, "/CentralSystemServiceOCPP15", interceptors);
@@ -74,7 +73,7 @@ public class OcppConfiguration {
 
     @Bean
     public WsSessionSelectStrategy sessionSelectStrategy() {
-        switch (WS_SESSION_SELECT_STRATEGY) {
+        switch (CONFIG.getOcpp().getWsSessionSelectStrategy()) {
             case ALWAYS_LAST:
                 return new AlwaysLastStrategy();
             case ROUND_ROBIN:

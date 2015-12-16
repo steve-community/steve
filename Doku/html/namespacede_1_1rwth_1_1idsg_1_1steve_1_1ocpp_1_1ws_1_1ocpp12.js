@@ -1,0 +1,8 @@
+var namespacede_1_1rwth_1_1idsg_1_1steve_1_1ocpp_1_1ws_1_1ocpp12 =
+[
+    [ "ChargePointService12_WsInvoker", "classde_1_1rwth_1_1idsg_1_1steve_1_1ocpp_1_1ws_1_1ocpp12_1_1_charge_point_service12___ws_invoker.html", "classde_1_1rwth_1_1idsg_1_1steve_1_1ocpp_1_1ws_1_1ocpp12_1_1_charge_point_service12___ws_invoker" ],
+    [ "Ocpp12CallHandler", "classde_1_1rwth_1_1idsg_1_1steve_1_1ocpp_1_1ws_1_1ocpp12_1_1_ocpp12_call_handler.html", "classde_1_1rwth_1_1idsg_1_1steve_1_1ocpp_1_1ws_1_1ocpp12_1_1_ocpp12_call_handler" ],
+    [ "Ocpp12JacksonModule", "classde_1_1rwth_1_1idsg_1_1steve_1_1ocpp_1_1ws_1_1ocpp12_1_1_ocpp12_jackson_module.html", "classde_1_1rwth_1_1idsg_1_1steve_1_1ocpp_1_1ws_1_1ocpp12_1_1_ocpp12_jackson_module" ],
+    [ "Ocpp12TypeStore", "classde_1_1rwth_1_1idsg_1_1steve_1_1ocpp_1_1ws_1_1ocpp12_1_1_ocpp12_type_store.html", "classde_1_1rwth_1_1idsg_1_1steve_1_1ocpp_1_1ws_1_1ocpp12_1_1_ocpp12_type_store" ],
+    [ "Ocpp12WebSocketEndpoint", "classde_1_1rwth_1_1idsg_1_1steve_1_1ocpp_1_1ws_1_1ocpp12_1_1_ocpp12_web_socket_endpoint.html", "classde_1_1rwth_1_1idsg_1_1steve_1_1ocpp_1_1ws_1_1ocpp12_1_1_ocpp12_web_socket_endpoint" ]
+];

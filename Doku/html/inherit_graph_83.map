@@ -1,0 +1,8 @@
+<map id="Grafische Darstellung der Klassenhierarchie" name="Grafische Darstellung der Klassenhierarchie">
+<area shape="rect" id="node1" href="$classde_1_1rwth_1_1idsg_1_1steve_1_1web_1_1dto_1_1common_1_1_single_charge_point_select.html" title="de.rwth.idsg.steve.web.dto.common.\lSingleChargePointSelect" alt="" coords="5,135,243,177"/>
+<area shape="rect" id="node2" href="$classde_1_1rwth_1_1idsg_1_1steve_1_1web_1_1dto_1_1common_1_1_remote_start_transaction_params.html" title="de.rwth.idsg.steve.web.dto.common.\lRemoteStartTransactionParams" alt="" coords="291,5,528,46"/>
+<area shape="rect" id="node3" href="$classde_1_1rwth_1_1idsg_1_1steve_1_1web_1_1dto_1_1common_1_1_remote_stop_transaction_params.html" title="de.rwth.idsg.steve.web.dto.common.\lRemoteStopTransactionParams" alt="" coords="291,70,528,111"/>
+<area shape="rect" id="node4" href="$classde_1_1rwth_1_1idsg_1_1steve_1_1web_1_1dto_1_1common_1_1_unlock_connector_params.html" title="de.rwth.idsg.steve.web.dto.common.\lUnlockConnectorParams" alt="" coords="291,135,528,177"/>
+<area shape="rect" id="node5" href="$classde_1_1rwth_1_1idsg_1_1steve_1_1web_1_1dto_1_1ocpp15_1_1_cancel_reservation_params.html" title="de.rwth.idsg.steve.web.dto.ocpp15.\lCancelReservationParams" alt="" coords="295,201,524,242"/>
+<area shape="rect" id="node6" href="$classde_1_1rwth_1_1idsg_1_1steve_1_1web_1_1dto_1_1ocpp15_1_1_reserve_now_params.html" title="de.rwth.idsg.steve.web.dto.ocpp15.\lReserveNowParams" alt="" coords="295,266,524,307"/>
+</map>

@@ -1,0 +1,106 @@
+\hypertarget{populate_update_8js}{\section{src/main/resources/webapp/static/js/snippets/populate\-Update.js-\/\-Dateireferenz}
+\label{populate_update_8js}\index{src/main/resources/webapp/static/js/snippets/populate\-Update.\-js@{src/main/resources/webapp/static/js/snippets/populate\-Update.\-js}}
+}
+\subsection*{Funktionen}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{populate_update_8js_a12cdcad071f4663ac3feb261317780ac}{idd} \hyperlink{populate_update_8js_afe74bb0e6ea5cd0ef12cd5f98d359f37}{change} (function()\{var str=\char`\"{}\#\char`\"{}+idd.\-find(\char`\"{}option\-:selected\char`\"{}).text();var row=\$(\char`\"{}\#users\-Table\char`\"{}).find(str);\$(\char`\"{}\#update-\/pid, \#update-\/exdate\-Time, \#update-\/block-\/false, \#update-\/block-\/true, \#update-\/submit\char`\"{}).prop(\char`\"{}disabled\char`\"{}, false);var parent\-Id\-Cell=row.\-find(\char`\"{}td\-:eq(1)\char`\"{}).html();if(parent\-Id\-Cell==\char`\"{}\char`\"{})\{\$(\char`\"{}\#update-\/pid\char`\"{}).val(\char`\"{}E\-M\-P\-T\-Y-\/O\-P\-T\-I\-O\-N\char`\"{});\}else\{\$(\char`\"{}\#update-\/pid\char`\"{}).val(parent\-Id\-Cell);\}var expiry\-Row=row.\-find(\char`\"{}td\-:eq(2)\char`\"{}).html();if(expiry\-Row==\char`\"{}\char`\"{})\{\$(\char`\"{}\#update-\/exdate\-Time\char`\"{}).val(\char`\"{}\char`\"{});\}else\{var date\-Time=expiry\-Row.\-split('at ');\$(\char`\"{}\#update-\/exdate\-Time\char`\"{}).val(\hyperlink{populate_update_8js_ad845aa074939f09984533169db400c94}{dehumanize\-Date}(date\-Time\mbox{[}0\mbox{]})+ ' '+date\-Time\mbox{[}1\mbox{]});\}if(row.\-find(\char`\"{}td\-:eq(4)\char`\"{}).html()==\char`\"{}false\char`\"{})\{\$(\char`\"{}\#update-\/block-\/false\char`\"{}).prop(\char`\"{}checked\char`\"{}, true);\}else\{\$(\char`\"{}\#update-\/block-\/true\char`\"{}).prop(\char`\"{}checked\char`\"{}, true);\}\})
+\item 
+function \hyperlink{populate_update_8js_ad845aa074939f09984533169db400c94}{dehumanize\-Date} (str)
+\item 
+function \hyperlink{populate_update_8js_a42c6c9e88fcc95f00b7f318a37f9ed83}{format} (day, month, year)
+\item 
+function \hyperlink{populate_update_8js_ac690a61cb1fdc396b58388be90e9eb62}{add\-Leading\-Zero} (num)
+\end{DoxyCompactItemize}
+\subsection*{Variablen}
+\begin{DoxyCompactItemize}
+\item 
+var \hyperlink{populate_update_8js_a12cdcad071f4663ac3feb261317780ac}{idd} = \$(\char`\"{}\#id\-Tag\-Update\char`\"{})
+\end{DoxyCompactItemize}
+
+
+\subsection{Dokumentation der Funktionen}
+\hypertarget{populate_update_8js_ac690a61cb1fdc396b58388be90e9eb62}{\index{populate\-Update.\-js@{populate\-Update.\-js}!add\-Leading\-Zero@{add\-Leading\-Zero}}
+\index{add\-Leading\-Zero@{add\-Leading\-Zero}!populateUpdate.js@{populate\-Update.\-js}}
+\subsubsection[{add\-Leading\-Zero}]{\setlength{\rightskip}{0pt plus 5cm}function add\-Leading\-Zero (
+\begin{DoxyParamCaption}
+\item[{}]{num}
+\end{DoxyParamCaption}
+)}}\label{populate_update_8js_ac690a61cb1fdc396b58388be90e9eb62}
+
+
+Hier ist ein Graph der zeigt, wo diese Funktion aufgerufen wird\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{populate_update_8js_ac690a61cb1fdc396b58388be90e9eb62_icgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{populate_update_8js_afe74bb0e6ea5cd0ef12cd5f98d359f37}{\index{populate\-Update.\-js@{populate\-Update.\-js}!change@{change}}
+\index{change@{change}!populateUpdate.js@{populate\-Update.\-js}}
+\subsubsection[{change}]{\setlength{\rightskip}{0pt plus 5cm}{\bf idd} change (
+\begin{DoxyParamCaption}
+\item[{function()\{var str=\char`\"{}\#\char`\"{}+idd.\-find(\char`\"{}option\-:selected\char`\"{}).text();var row=\$(\char`\"{}\#users\-Table\char`\"{}).find(str);\$(\char`\"{}\#update-\/pid, \#update-\/exdate\-Time, \#update-\/block-\/false, \#update-\/block-\/true, \#update-\/submit\char`\"{}).prop(\char`\"{}disabled\char`\"{}, false);var parent\-Id\-Cell=row.\-find(\char`\"{}td\-:eq(1)\char`\"{}).html();if(parent\-Id\-Cell==\char`\"{}\char`\"{})\{\$(\char`\"{}\#update-\/pid\char`\"{}).val(\char`\"{}E\-M\-P\-T\-Y-\/O\-P\-T\-I\-O\-N\char`\"{});\}else\{\$(\char`\"{}\#update-\/pid\char`\"{}).val(parent\-Id\-Cell);\}var expiry\-Row=row.\-find(\char`\"{}td\-:eq(2)\char`\"{}).html();if(expiry\-Row==\char`\"{}\char`\"{})\{\$(\char`\"{}\#update-\/exdate\-Time\char`\"{}).val(\char`\"{}\char`\"{});\}else\{var date\-Time=expiry\-Row.\-split('at ');\$(\char`\"{}\#update-\/exdate\-Time\char`\"{}).val({\bf dehumanize\-Date}(date\-Time\mbox{[}0\mbox{]})+ ' '+date\-Time\mbox{[}1\mbox{]});\}if(row.\-find(\char`\"{}td\-:eq(4)\char`\"{}).html()==\char`\"{}false\char`\"{})\{\$(\char`\"{}\#update-\/block-\/false\char`\"{}).prop(\char`\"{}checked\char`\"{}, true);\}else\{\$(\char`\"{}\#update-\/block-\/true\char`\"{}).prop(\char`\"{}checked\char`\"{}, true);\}\}}]{}
+\end{DoxyParamCaption}
+)}}\label{populate_update_8js_afe74bb0e6ea5cd0ef12cd5f98d359f37}
+\hypertarget{populate_update_8js_ad845aa074939f09984533169db400c94}{\index{populate\-Update.\-js@{populate\-Update.\-js}!dehumanize\-Date@{dehumanize\-Date}}
+\index{dehumanize\-Date@{dehumanize\-Date}!populateUpdate.js@{populate\-Update.\-js}}
+\subsubsection[{dehumanize\-Date}]{\setlength{\rightskip}{0pt plus 5cm}function dehumanize\-Date (
+\begin{DoxyParamCaption}
+\item[{}]{str}
+\end{DoxyParamCaption}
+)}}\label{populate_update_8js_ad845aa074939f09984533169db400c94}
+
+
+Hier ist ein Graph, der zeigt, was diese Funktion aufruft\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{populate_update_8js_ad845aa074939f09984533169db400c94_cgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{populate_update_8js_a42c6c9e88fcc95f00b7f318a37f9ed83}{\index{populate\-Update.\-js@{populate\-Update.\-js}!format@{format}}
+\index{format@{format}!populateUpdate.js@{populate\-Update.\-js}}
+\subsubsection[{format}]{\setlength{\rightskip}{0pt plus 5cm}function format (
+\begin{DoxyParamCaption}
+\item[{}]{day, }
+\item[{}]{month, }
+\item[{}]{year}
+\end{DoxyParamCaption}
+)}}\label{populate_update_8js_a42c6c9e88fcc95f00b7f318a37f9ed83}
+
+
+Hier ist ein Graph, der zeigt, was diese Funktion aufruft\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=246pt]{populate_update_8js_a42c6c9e88fcc95f00b7f318a37f9ed83_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Hier ist ein Graph der zeigt, wo diese Funktion aufgerufen wird\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=250pt]{populate_update_8js_a42c6c9e88fcc95f00b7f318a37f9ed83_icgraph}
+\end{center}
+\end{figure}
+
+
+
+
+\subsection{Variablen-\/\-Dokumentation}
+\hypertarget{populate_update_8js_a12cdcad071f4663ac3feb261317780ac}{\index{populate\-Update.\-js@{populate\-Update.\-js}!idd@{idd}}
+\index{idd@{idd}!populateUpdate.js@{populate\-Update.\-js}}
+\subsubsection[{idd}]{\setlength{\rightskip}{0pt plus 5cm}var idd = \$(\char`\"{}\#id\-Tag\-Update\char`\"{})}}\label{populate_update_8js_a12cdcad071f4663ac3feb261317780ac}

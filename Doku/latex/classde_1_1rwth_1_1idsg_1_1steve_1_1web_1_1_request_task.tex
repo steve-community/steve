@@ -1,0 +1,73 @@
+\hypertarget{classde_1_1rwth_1_1idsg_1_1steve_1_1web_1_1_request_task}{\section{de.\-rwth.\-idsg.\-steve.\-web.\-Request\-Task Klassenreferenz}
+\label{classde_1_1rwth_1_1idsg_1_1steve_1_1web_1_1_request_task}\index{de.\-rwth.\-idsg.\-steve.\-web.\-Request\-Task@{de.\-rwth.\-idsg.\-steve.\-web.\-Request\-Task}}
+}
+\subsection*{Klassen}
+\begin{DoxyCompactItemize}
+\item 
+class \hyperlink{classde_1_1rwth_1_1idsg_1_1steve_1_1web_1_1_request_task_1_1_request_result}{Request\-Result}
+\end{DoxyCompactItemize}
+\subsection*{Öffentliche Methoden}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classde_1_1rwth_1_1idsg_1_1steve_1_1web_1_1_request_task_a710e28f81649d3b8a86ad7a1fe0738c4}{Request\-Task} (\hyperlink{enumde_1_1rwth_1_1idsg_1_1steve_1_1ocpp_1_1_ocpp_version}{Ocpp\-Version} ocpp\-Version, String operation\-Name, List$<$ \hyperlink{classde_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1dto_1_1_charge_point_select}{Charge\-Point\-Select} $>$ charge\-Point\-Select\-List)
+\item 
+boolean \hyperlink{classde_1_1rwth_1_1idsg_1_1steve_1_1web_1_1_request_task_a5a1147a721995b809a79e1bea71b500b}{is\-Finished} ()
+\item 
+void \hyperlink{classde_1_1rwth_1_1idsg_1_1steve_1_1web_1_1_request_task_af48ae2706256ca8c6876ca84fddd08fe}{add\-New\-Response} (String charge\-Box\-Id, String response)
+\item 
+void \hyperlink{classde_1_1rwth_1_1idsg_1_1steve_1_1web_1_1_request_task_a5c47cb108530177908489dc000c76477}{add\-New\-Error} (String charge\-Box\-Id, Exception exception)
+\end{DoxyCompactItemize}
+
+
+\subsection{Ausführliche Beschreibung}
+Contains information about asynchronous request tasks (O\-C\-P\-P requests and responses/errors) for displaying on Web U\-I.
+
+\begin{DoxyAuthor}{Autor}
+Sevket Goekay \href{mailto:goekay@dbis.rwth-aachen.de}{\tt goekay@dbis.\-rwth-\/aachen.\-de} 
+\end{DoxyAuthor}
+\begin{DoxySince}{Seit}
+18.\-09.\-2014 
+\end{DoxySince}
+
+
+\subsection{Beschreibung der Konstruktoren und Destruktoren}
+\hypertarget{classde_1_1rwth_1_1idsg_1_1steve_1_1web_1_1_request_task_a710e28f81649d3b8a86ad7a1fe0738c4}{\index{de\-::rwth\-::idsg\-::steve\-::web\-::\-Request\-Task@{de\-::rwth\-::idsg\-::steve\-::web\-::\-Request\-Task}!Request\-Task@{Request\-Task}}
+\index{Request\-Task@{Request\-Task}!de::rwth::idsg::steve::web::RequestTask@{de\-::rwth\-::idsg\-::steve\-::web\-::\-Request\-Task}}
+\subsubsection[{Request\-Task}]{\setlength{\rightskip}{0pt plus 5cm}de.\-rwth.\-idsg.\-steve.\-web.\-Request\-Task.\-Request\-Task (
+\begin{DoxyParamCaption}
+\item[{{\bf Ocpp\-Version}}]{ocpp\-Version, }
+\item[{String}]{operation\-Name, }
+\item[{List$<$ {\bf Charge\-Point\-Select} $>$}]{charge\-Point\-Select\-List}
+\end{DoxyParamCaption}
+)}}\label{classde_1_1rwth_1_1idsg_1_1steve_1_1web_1_1_request_task_a710e28f81649d3b8a86ad7a1fe0738c4}
+
+
+\subsection{Dokumentation der Elementfunktionen}
+\hypertarget{classde_1_1rwth_1_1idsg_1_1steve_1_1web_1_1_request_task_a5c47cb108530177908489dc000c76477}{\index{de\-::rwth\-::idsg\-::steve\-::web\-::\-Request\-Task@{de\-::rwth\-::idsg\-::steve\-::web\-::\-Request\-Task}!add\-New\-Error@{add\-New\-Error}}
+\index{add\-New\-Error@{add\-New\-Error}!de::rwth::idsg::steve::web::RequestTask@{de\-::rwth\-::idsg\-::steve\-::web\-::\-Request\-Task}}
+\subsubsection[{add\-New\-Error}]{\setlength{\rightskip}{0pt plus 5cm}void de.\-rwth.\-idsg.\-steve.\-web.\-Request\-Task.\-add\-New\-Error (
+\begin{DoxyParamCaption}
+\item[{String}]{charge\-Box\-Id, }
+\item[{Exception}]{exception}
+\end{DoxyParamCaption}
+)}}\label{classde_1_1rwth_1_1idsg_1_1steve_1_1web_1_1_request_task_a5c47cb108530177908489dc000c76477}
+\hypertarget{classde_1_1rwth_1_1idsg_1_1steve_1_1web_1_1_request_task_af48ae2706256ca8c6876ca84fddd08fe}{\index{de\-::rwth\-::idsg\-::steve\-::web\-::\-Request\-Task@{de\-::rwth\-::idsg\-::steve\-::web\-::\-Request\-Task}!add\-New\-Response@{add\-New\-Response}}
+\index{add\-New\-Response@{add\-New\-Response}!de::rwth::idsg::steve::web::RequestTask@{de\-::rwth\-::idsg\-::steve\-::web\-::\-Request\-Task}}
+\subsubsection[{add\-New\-Response}]{\setlength{\rightskip}{0pt plus 5cm}void de.\-rwth.\-idsg.\-steve.\-web.\-Request\-Task.\-add\-New\-Response (
+\begin{DoxyParamCaption}
+\item[{String}]{charge\-Box\-Id, }
+\item[{String}]{response}
+\end{DoxyParamCaption}
+)}}\label{classde_1_1rwth_1_1idsg_1_1steve_1_1web_1_1_request_task_af48ae2706256ca8c6876ca84fddd08fe}
+\hypertarget{classde_1_1rwth_1_1idsg_1_1steve_1_1web_1_1_request_task_a5a1147a721995b809a79e1bea71b500b}{\index{de\-::rwth\-::idsg\-::steve\-::web\-::\-Request\-Task@{de\-::rwth\-::idsg\-::steve\-::web\-::\-Request\-Task}!is\-Finished@{is\-Finished}}
+\index{is\-Finished@{is\-Finished}!de::rwth::idsg::steve::web::RequestTask@{de\-::rwth\-::idsg\-::steve\-::web\-::\-Request\-Task}}
+\subsubsection[{is\-Finished}]{\setlength{\rightskip}{0pt plus 5cm}boolean de.\-rwth.\-idsg.\-steve.\-web.\-Request\-Task.\-is\-Finished (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{classde_1_1rwth_1_1idsg_1_1steve_1_1web_1_1_request_task_a5a1147a721995b809a79e1bea71b500b}
+
+
+Die Dokumentation für diese Klasse wurde erzeugt aufgrund der Datei\-:\begin{DoxyCompactItemize}
+\item 
+src/main/java/de/rwth/idsg/steve/web/\hyperlink{_request_task_8java}{Request\-Task.\-java}\end{DoxyCompactItemize}

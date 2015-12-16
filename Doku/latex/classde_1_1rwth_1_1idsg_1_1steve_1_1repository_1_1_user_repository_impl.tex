@@ -1,0 +1,165 @@
+\hypertarget{classde_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1_user_repository_impl}{\section{de.\-rwth.\-idsg.\-steve.\-repository.\-User\-Repository\-Impl Klassenreferenz}
+\label{classde_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1_user_repository_impl}\index{de.\-rwth.\-idsg.\-steve.\-repository.\-User\-Repository\-Impl@{de.\-rwth.\-idsg.\-steve.\-repository.\-User\-Repository\-Impl}}
+}
+
+
+Klassendiagramm für de.\-rwth.\-idsg.\-steve.\-repository.\-User\-Repository\-Impl\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=226pt]{classde_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1_user_repository_impl__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Zusammengehörigkeiten von de.\-rwth.\-idsg.\-steve.\-repository.\-User\-Repository\-Impl\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=226pt]{classde_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1_user_repository_impl__coll__graph}
+\end{center}
+\end{figure}
+\subsection*{Öffentliche Methoden}
+\begin{DoxyCompactItemize}
+\item 
+Result$<$ User\-Record $>$ \hyperlink{classde_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1_user_repository_impl_a9ffb4584eb3c0fe0623297915dfaa64f}{get\-User\-Records} ()
+\item 
+Result$<$ User\-Record $>$ \hyperlink{classde_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1_user_repository_impl_a4668bbc0ce5876b146f2fdfc14205d25}{get\-User\-Records} (List$<$ String $>$ id\-Tag\-List)
+\item 
+User\-Record \hyperlink{classde_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1_user_repository_impl_aa40e76476db8b34324da405a8deb1446}{get\-User\-Record} (String id\-Tag)
+\item 
+List$<$ String $>$ \hyperlink{classde_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1_user_repository_impl_af0b99a96857ddbd673d2839538debaa5}{get\-User\-Id\-Tags} ()
+\item 
+List$<$ String $>$ \hyperlink{classde_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1_user_repository_impl_a366e6269bc7358da823da410a3f1717a}{get\-Active\-User\-Id\-Tags} ()
+\item 
+String \hyperlink{classde_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1_user_repository_impl_a381f560eed748dbce0d015f01f0bb683}{get\-Parent\-Idtag} (String id\-Tag)
+\item 
+void \hyperlink{classde_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1_user_repository_impl_a4614a7d7f48414a1125bfc700b331a8a}{add\-User} (String id\-Tag, String parent\-Id\-Tag, Timestamp expiry\-Timestamp)
+\item 
+void \hyperlink{classde_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1_user_repository_impl_a047d9f7b2cf6ca1a34cf58004f20fb9a}{update\-User} (String id\-Tag, String parent\-Id\-Tag, Timestamp expiry\-Timestamp, boolean blocked)
+\item 
+void \hyperlink{classde_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1_user_repository_impl_a9b0b0fbd8d0ee4af8fcc830c2da80b28}{delete\-User} (String id\-Tag)
+\end{DoxyCompactItemize}
+
+
+\subsection{Ausführliche Beschreibung}
+\begin{DoxyAuthor}{Autor}
+Sevket Goekay \href{mailto:goekay@dbis.rwth-aachen.de}{\tt goekay@dbis.\-rwth-\/aachen.\-de} 
+\end{DoxyAuthor}
+\begin{DoxySince}{Seit}
+14.\-08.\-2014 
+\end{DoxySince}
+
+
+\subsection{Dokumentation der Elementfunktionen}
+\hypertarget{classde_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1_user_repository_impl_a4614a7d7f48414a1125bfc700b331a8a}{\index{de\-::rwth\-::idsg\-::steve\-::repository\-::\-User\-Repository\-Impl@{de\-::rwth\-::idsg\-::steve\-::repository\-::\-User\-Repository\-Impl}!add\-User@{add\-User}}
+\index{add\-User@{add\-User}!de::rwth::idsg::steve::repository::UserRepositoryImpl@{de\-::rwth\-::idsg\-::steve\-::repository\-::\-User\-Repository\-Impl}}
+\subsubsection[{add\-User}]{\setlength{\rightskip}{0pt plus 5cm}void de.\-rwth.\-idsg.\-steve.\-repository.\-User\-Repository\-Impl.\-add\-User (
+\begin{DoxyParamCaption}
+\item[{String}]{id\-Tag, }
+\item[{String}]{parent\-Id\-Tag, }
+\item[{Timestamp}]{expiry\-Timestamp}
+\end{DoxyParamCaption}
+)}}\label{classde_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1_user_repository_impl_a4614a7d7f48414a1125bfc700b331a8a}
+I\-N\-S\-E\-R\-T I\-G\-N\-O\-R\-E I\-N\-T\-O user (id\-Tag, parent\-Id\-Tag, expiry\-Date, in\-Transaction, blocked) V\-A\-L\-U\-E\-S (?,?,?,?,?) 
+
+Implementiert \hyperlink{interfacede_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1_user_repository_ae240763e8def875900878988e05b9bbd}{de.\-rwth.\-idsg.\-steve.\-repository.\-User\-Repository}.
+
+\hypertarget{classde_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1_user_repository_impl_a9b0b0fbd8d0ee4af8fcc830c2da80b28}{\index{de\-::rwth\-::idsg\-::steve\-::repository\-::\-User\-Repository\-Impl@{de\-::rwth\-::idsg\-::steve\-::repository\-::\-User\-Repository\-Impl}!delete\-User@{delete\-User}}
+\index{delete\-User@{delete\-User}!de::rwth::idsg::steve::repository::UserRepositoryImpl@{de\-::rwth\-::idsg\-::steve\-::repository\-::\-User\-Repository\-Impl}}
+\subsubsection[{delete\-User}]{\setlength{\rightskip}{0pt plus 5cm}void de.\-rwth.\-idsg.\-steve.\-repository.\-User\-Repository\-Impl.\-delete\-User (
+\begin{DoxyParamCaption}
+\item[{String}]{id\-Tag}
+\end{DoxyParamCaption}
+)}}\label{classde_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1_user_repository_impl_a9b0b0fbd8d0ee4af8fcc830c2da80b28}
+D\-E\-L\-E\-T\-E F\-R\-O\-M user W\-H\-E\-R\-E id\-Tag = ? 
+
+Implementiert \hyperlink{interfacede_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1_user_repository_a2c408ab628cbe46d3016bd27d34b5146}{de.\-rwth.\-idsg.\-steve.\-repository.\-User\-Repository}.
+
+\hypertarget{classde_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1_user_repository_impl_a366e6269bc7358da823da410a3f1717a}{\index{de\-::rwth\-::idsg\-::steve\-::repository\-::\-User\-Repository\-Impl@{de\-::rwth\-::idsg\-::steve\-::repository\-::\-User\-Repository\-Impl}!get\-Active\-User\-Id\-Tags@{get\-Active\-User\-Id\-Tags}}
+\index{get\-Active\-User\-Id\-Tags@{get\-Active\-User\-Id\-Tags}!de::rwth::idsg::steve::repository::UserRepositoryImpl@{de\-::rwth\-::idsg\-::steve\-::repository\-::\-User\-Repository\-Impl}}
+\subsubsection[{get\-Active\-User\-Id\-Tags}]{\setlength{\rightskip}{0pt plus 5cm}List$<$String$>$ de.\-rwth.\-idsg.\-steve.\-repository.\-User\-Repository\-Impl.\-get\-Active\-User\-Id\-Tags (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{classde_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1_user_repository_impl_a366e6269bc7358da823da410a3f1717a}
+S\-E\-L\-E\-C\-T id\-Tag F\-R\-O\-M user W\-H\-E\-R\-E in\-Transaction = false A\-N\-D blocked = false A\-N\-D (expiry\-Date I\-S N\-U\-L\-L O\-R expiry\-Date $>$ current\-\_\-timestamp()) 
+
+Implementiert \hyperlink{interfacede_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1_user_repository_ae5bb260082d21a1d2327e3afc6914871}{de.\-rwth.\-idsg.\-steve.\-repository.\-User\-Repository}.
+
+\hypertarget{classde_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1_user_repository_impl_a381f560eed748dbce0d015f01f0bb683}{\index{de\-::rwth\-::idsg\-::steve\-::repository\-::\-User\-Repository\-Impl@{de\-::rwth\-::idsg\-::steve\-::repository\-::\-User\-Repository\-Impl}!get\-Parent\-Idtag@{get\-Parent\-Idtag}}
+\index{get\-Parent\-Idtag@{get\-Parent\-Idtag}!de::rwth::idsg::steve::repository::UserRepositoryImpl@{de\-::rwth\-::idsg\-::steve\-::repository\-::\-User\-Repository\-Impl}}
+\subsubsection[{get\-Parent\-Idtag}]{\setlength{\rightskip}{0pt plus 5cm}String de.\-rwth.\-idsg.\-steve.\-repository.\-User\-Repository\-Impl.\-get\-Parent\-Idtag (
+\begin{DoxyParamCaption}
+\item[{String}]{id\-Tag}
+\end{DoxyParamCaption}
+)}}\label{classde_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1_user_repository_impl_a381f560eed748dbce0d015f01f0bb683}
+S\-E\-L\-E\-C\-T parent\-Id\-Tag F\-R\-O\-M user W\-H\-E\-R\-E id\-Tag = ? 
+
+Implementiert \hyperlink{interfacede_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1_user_repository_a099d12671889952bc4071782038f7f50}{de.\-rwth.\-idsg.\-steve.\-repository.\-User\-Repository}.
+
+\hypertarget{classde_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1_user_repository_impl_af0b99a96857ddbd673d2839538debaa5}{\index{de\-::rwth\-::idsg\-::steve\-::repository\-::\-User\-Repository\-Impl@{de\-::rwth\-::idsg\-::steve\-::repository\-::\-User\-Repository\-Impl}!get\-User\-Id\-Tags@{get\-User\-Id\-Tags}}
+\index{get\-User\-Id\-Tags@{get\-User\-Id\-Tags}!de::rwth::idsg::steve::repository::UserRepositoryImpl@{de\-::rwth\-::idsg\-::steve\-::repository\-::\-User\-Repository\-Impl}}
+\subsubsection[{get\-User\-Id\-Tags}]{\setlength{\rightskip}{0pt plus 5cm}List$<$String$>$ de.\-rwth.\-idsg.\-steve.\-repository.\-User\-Repository\-Impl.\-get\-User\-Id\-Tags (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{classde_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1_user_repository_impl_af0b99a96857ddbd673d2839538debaa5}
+S\-E\-L\-E\-C\-T id\-Tag F\-R\-O\-M user 
+
+Implementiert \hyperlink{interfacede_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1_user_repository_a5ab1f1d0020bd06c65b90e0556a6b9d8}{de.\-rwth.\-idsg.\-steve.\-repository.\-User\-Repository}.
+
+\hypertarget{classde_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1_user_repository_impl_aa40e76476db8b34324da405a8deb1446}{\index{de\-::rwth\-::idsg\-::steve\-::repository\-::\-User\-Repository\-Impl@{de\-::rwth\-::idsg\-::steve\-::repository\-::\-User\-Repository\-Impl}!get\-User\-Record@{get\-User\-Record}}
+\index{get\-User\-Record@{get\-User\-Record}!de::rwth::idsg::steve::repository::UserRepositoryImpl@{de\-::rwth\-::idsg\-::steve\-::repository\-::\-User\-Repository\-Impl}}
+\subsubsection[{get\-User\-Record}]{\setlength{\rightskip}{0pt plus 5cm}User\-Record de.\-rwth.\-idsg.\-steve.\-repository.\-User\-Repository\-Impl.\-get\-User\-Record (
+\begin{DoxyParamCaption}
+\item[{String}]{id\-Tag}
+\end{DoxyParamCaption}
+)}}\label{classde_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1_user_repository_impl_aa40e76476db8b34324da405a8deb1446}
+S\-E\-L\-E\-C\-T $\ast$ F\-R\-O\-M user W\-H\-E\-R\-E id\-Tag = ? 
+
+Implementiert \hyperlink{interfacede_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1_user_repository_aa7aa9b8dc5b518eb7085983b75552a77}{de.\-rwth.\-idsg.\-steve.\-repository.\-User\-Repository}.
+
+\hypertarget{classde_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1_user_repository_impl_a9ffb4584eb3c0fe0623297915dfaa64f}{\index{de\-::rwth\-::idsg\-::steve\-::repository\-::\-User\-Repository\-Impl@{de\-::rwth\-::idsg\-::steve\-::repository\-::\-User\-Repository\-Impl}!get\-User\-Records@{get\-User\-Records}}
+\index{get\-User\-Records@{get\-User\-Records}!de::rwth::idsg::steve::repository::UserRepositoryImpl@{de\-::rwth\-::idsg\-::steve\-::repository\-::\-User\-Repository\-Impl}}
+\subsubsection[{get\-User\-Records}]{\setlength{\rightskip}{0pt plus 5cm}Result$<$User\-Record$>$ de.\-rwth.\-idsg.\-steve.\-repository.\-User\-Repository\-Impl.\-get\-User\-Records (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{classde_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1_user_repository_impl_a9ffb4584eb3c0fe0623297915dfaa64f}
+S\-E\-L\-E\-C\-T $\ast$ F\-R\-O\-M user 
+
+Implementiert \hyperlink{interfacede_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1_user_repository_aa488f418bb73217acd65537099c9afb3}{de.\-rwth.\-idsg.\-steve.\-repository.\-User\-Repository}.
+
+\hypertarget{classde_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1_user_repository_impl_a4668bbc0ce5876b146f2fdfc14205d25}{\index{de\-::rwth\-::idsg\-::steve\-::repository\-::\-User\-Repository\-Impl@{de\-::rwth\-::idsg\-::steve\-::repository\-::\-User\-Repository\-Impl}!get\-User\-Records@{get\-User\-Records}}
+\index{get\-User\-Records@{get\-User\-Records}!de::rwth::idsg::steve::repository::UserRepositoryImpl@{de\-::rwth\-::idsg\-::steve\-::repository\-::\-User\-Repository\-Impl}}
+\subsubsection[{get\-User\-Records}]{\setlength{\rightskip}{0pt plus 5cm}Result$<$User\-Record$>$ de.\-rwth.\-idsg.\-steve.\-repository.\-User\-Repository\-Impl.\-get\-User\-Records (
+\begin{DoxyParamCaption}
+\item[{List$<$ String $>$}]{id\-Tag\-List}
+\end{DoxyParamCaption}
+)}}\label{classde_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1_user_repository_impl_a4668bbc0ce5876b146f2fdfc14205d25}
+S\-E\-L\-E\-C\-T $\ast$ F\-R\-O\-M user W\-H\-E\-R\-E id\-Tag I\-N (?,?,...,?) 
+
+Implementiert \hyperlink{interfacede_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1_user_repository_a71047692f661431be5f10c1f92ab626d}{de.\-rwth.\-idsg.\-steve.\-repository.\-User\-Repository}.
+
+\hypertarget{classde_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1_user_repository_impl_a047d9f7b2cf6ca1a34cf58004f20fb9a}{\index{de\-::rwth\-::idsg\-::steve\-::repository\-::\-User\-Repository\-Impl@{de\-::rwth\-::idsg\-::steve\-::repository\-::\-User\-Repository\-Impl}!update\-User@{update\-User}}
+\index{update\-User@{update\-User}!de::rwth::idsg::steve::repository::UserRepositoryImpl@{de\-::rwth\-::idsg\-::steve\-::repository\-::\-User\-Repository\-Impl}}
+\subsubsection[{update\-User}]{\setlength{\rightskip}{0pt plus 5cm}void de.\-rwth.\-idsg.\-steve.\-repository.\-User\-Repository\-Impl.\-update\-User (
+\begin{DoxyParamCaption}
+\item[{String}]{id\-Tag, }
+\item[{String}]{parent\-Id\-Tag, }
+\item[{Timestamp}]{expiry\-Timestamp, }
+\item[{boolean}]{blocked}
+\end{DoxyParamCaption}
+)}}\label{classde_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1_user_repository_impl_a047d9f7b2cf6ca1a34cf58004f20fb9a}
+U\-P\-D\-A\-T\-E user S\-E\-T parent\-Id\-Tag = ?, expiry\-Date = ?, blocked = ? W\-H\-E\-R\-E id\-Tag = ? 
+
+Implementiert \hyperlink{interfacede_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1_user_repository_a26412d46a0640e48dab9d1c45ce2c3c9}{de.\-rwth.\-idsg.\-steve.\-repository.\-User\-Repository}.
+
+
+
+Die Dokumentation für diese Klasse wurde erzeugt aufgrund der Datei\-:\begin{DoxyCompactItemize}
+\item 
+src/main/java/de/rwth/idsg/steve/repository/\hyperlink{_user_repository_impl_8java}{User\-Repository\-Impl.\-java}\end{DoxyCompactItemize}

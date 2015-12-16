@@ -1,0 +1,162 @@
+\hypertarget{interfacede_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1_charge_point_repository}{\section{de.\-rwth.\-idsg.\-steve.\-repository.\-Charge\-Point\-Repository Schnittstellenreferenz}
+\label{interfacede_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1_charge_point_repository}\index{de.\-rwth.\-idsg.\-steve.\-repository.\-Charge\-Point\-Repository@{de.\-rwth.\-idsg.\-steve.\-repository.\-Charge\-Point\-Repository}}
+}
+
+
+Klassendiagramm für de.\-rwth.\-idsg.\-steve.\-repository.\-Charge\-Point\-Repository\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=226pt]{interfacede_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1_charge_point_repository__inherit__graph}
+\end{center}
+\end{figure}
+\subsection*{Öffentliche Methoden}
+\begin{DoxyCompactItemize}
+\item 
+boolean \hyperlink{interfacede_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1_charge_point_repository_a4824062c6ff2dfcf9490ffb71484bb83}{is\-Registered} (String charge\-Box\-Id)
+\item 
+List$<$ \hyperlink{classde_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1dto_1_1_charge_point_select}{Charge\-Point\-Select} $>$ \hyperlink{interfacede_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1_charge_point_repository_ad8617028d70a274b51b9fe7d04feee72}{get\-Charge\-Point\-Select} (\hyperlink{enumde_1_1rwth_1_1idsg_1_1steve_1_1ocpp_1_1_ocpp_protocol}{Ocpp\-Protocol} protocol)
+\item 
+List$<$ String $>$ \hyperlink{interfacede_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1_charge_point_repository_a0f9a9d616c82118e9292f1dd0bb8fd5e}{get\-Charge\-Box\-Ids} ()
+\item 
+\hyperlink{classde_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1dto_1_1_charge_point}{Charge\-Point} \hyperlink{interfacede_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1_charge_point_repository_ad1d4fa42c668f642dc67777b91ae0d4c}{get\-Charge\-Point\-Details} (String charge\-Box\-Id)
+\item 
+List$<$ \hyperlink{classde_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1dto_1_1_heartbeat}{Heartbeat} $>$ \hyperlink{interfacede_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1_charge_point_repository_a4cd918698edd78ff3e5e02e0374f602d}{get\-Charge\-Point\-Heartbeats} ()
+\item 
+List$<$ \hyperlink{classde_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1dto_1_1_connector_status}{Connector\-Status} $>$ \hyperlink{interfacede_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1_charge_point_repository_ab1beb661ec11861ebaf2e43b003cb6d8}{get\-Charge\-Point\-Connector\-Status} ()
+\item 
+void \hyperlink{interfacede_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1_charge_point_repository_ac53c29634d138c29d7afd53805f09260}{add\-Charge\-Point} (String charge\-Box\-Id)
+\item 
+void \hyperlink{interfacede_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1_charge_point_repository_a328b7bcc93f78214de31e6deb71d3730}{delete\-Charge\-Point} (String charge\-Box\-Id)
+\item 
+List$<$ Integer $>$ \hyperlink{interfacede_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1_charge_point_repository_aed97e9bbcfd11a66f6e86bc52e51cbd5}{get\-Connector\-Ids} (String charge\-Box\-Id)
+\end{DoxyCompactItemize}
+
+
+\subsection{Ausführliche Beschreibung}
+\begin{DoxyAuthor}{Autor}
+Sevket Goekay \href{mailto:goekay@dbis.rwth-aachen.de}{\tt goekay@dbis.\-rwth-\/aachen.\-de} 
+\end{DoxyAuthor}
+\begin{DoxySince}{Seit}
+19.\-08.\-2014 
+\end{DoxySince}
+
+
+\subsection{Dokumentation der Elementfunktionen}
+\hypertarget{interfacede_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1_charge_point_repository_ac53c29634d138c29d7afd53805f09260}{\index{de\-::rwth\-::idsg\-::steve\-::repository\-::\-Charge\-Point\-Repository@{de\-::rwth\-::idsg\-::steve\-::repository\-::\-Charge\-Point\-Repository}!add\-Charge\-Point@{add\-Charge\-Point}}
+\index{add\-Charge\-Point@{add\-Charge\-Point}!de::rwth::idsg::steve::repository::ChargePointRepository@{de\-::rwth\-::idsg\-::steve\-::repository\-::\-Charge\-Point\-Repository}}
+\subsubsection[{add\-Charge\-Point}]{\setlength{\rightskip}{0pt plus 5cm}void de.\-rwth.\-idsg.\-steve.\-repository.\-Charge\-Point\-Repository.\-add\-Charge\-Point (
+\begin{DoxyParamCaption}
+\item[{String}]{charge\-Box\-Id}
+\end{DoxyParamCaption}
+)}}\label{interfacede_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1_charge_point_repository_ac53c29634d138c29d7afd53805f09260}
+
+
+Implementiert in \hyperlink{classde_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1_charge_point_repository_impl_aa7290b607df9e3d0a693e6b6ecc96523}{de.\-rwth.\-idsg.\-steve.\-repository.\-Charge\-Point\-Repository\-Impl}.
+
+\hypertarget{interfacede_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1_charge_point_repository_a328b7bcc93f78214de31e6deb71d3730}{\index{de\-::rwth\-::idsg\-::steve\-::repository\-::\-Charge\-Point\-Repository@{de\-::rwth\-::idsg\-::steve\-::repository\-::\-Charge\-Point\-Repository}!delete\-Charge\-Point@{delete\-Charge\-Point}}
+\index{delete\-Charge\-Point@{delete\-Charge\-Point}!de::rwth::idsg::steve::repository::ChargePointRepository@{de\-::rwth\-::idsg\-::steve\-::repository\-::\-Charge\-Point\-Repository}}
+\subsubsection[{delete\-Charge\-Point}]{\setlength{\rightskip}{0pt plus 5cm}void de.\-rwth.\-idsg.\-steve.\-repository.\-Charge\-Point\-Repository.\-delete\-Charge\-Point (
+\begin{DoxyParamCaption}
+\item[{String}]{charge\-Box\-Id}
+\end{DoxyParamCaption}
+)}}\label{interfacede_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1_charge_point_repository_a328b7bcc93f78214de31e6deb71d3730}
+
+
+Implementiert in \hyperlink{classde_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1_charge_point_repository_impl_a652dfb1e8b5f127b61ebf6a185287734}{de.\-rwth.\-idsg.\-steve.\-repository.\-Charge\-Point\-Repository\-Impl}.
+
+\hypertarget{interfacede_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1_charge_point_repository_a0f9a9d616c82118e9292f1dd0bb8fd5e}{\index{de\-::rwth\-::idsg\-::steve\-::repository\-::\-Charge\-Point\-Repository@{de\-::rwth\-::idsg\-::steve\-::repository\-::\-Charge\-Point\-Repository}!get\-Charge\-Box\-Ids@{get\-Charge\-Box\-Ids}}
+\index{get\-Charge\-Box\-Ids@{get\-Charge\-Box\-Ids}!de::rwth::idsg::steve::repository::ChargePointRepository@{de\-::rwth\-::idsg\-::steve\-::repository\-::\-Charge\-Point\-Repository}}
+\subsubsection[{get\-Charge\-Box\-Ids}]{\setlength{\rightskip}{0pt plus 5cm}List$<$String$>$ de.\-rwth.\-idsg.\-steve.\-repository.\-Charge\-Point\-Repository.\-get\-Charge\-Box\-Ids (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{interfacede_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1_charge_point_repository_a0f9a9d616c82118e9292f1dd0bb8fd5e}
+
+
+Implementiert in \hyperlink{classde_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1_charge_point_repository_impl_a43295c2e6430138cc08b8ce3e4fcd79b}{de.\-rwth.\-idsg.\-steve.\-repository.\-Charge\-Point\-Repository\-Impl}.
+
+\hypertarget{interfacede_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1_charge_point_repository_ab1beb661ec11861ebaf2e43b003cb6d8}{\index{de\-::rwth\-::idsg\-::steve\-::repository\-::\-Charge\-Point\-Repository@{de\-::rwth\-::idsg\-::steve\-::repository\-::\-Charge\-Point\-Repository}!get\-Charge\-Point\-Connector\-Status@{get\-Charge\-Point\-Connector\-Status}}
+\index{get\-Charge\-Point\-Connector\-Status@{get\-Charge\-Point\-Connector\-Status}!de::rwth::idsg::steve::repository::ChargePointRepository@{de\-::rwth\-::idsg\-::steve\-::repository\-::\-Charge\-Point\-Repository}}
+\subsubsection[{get\-Charge\-Point\-Connector\-Status}]{\setlength{\rightskip}{0pt plus 5cm}List$<${\bf Connector\-Status}$>$ de.\-rwth.\-idsg.\-steve.\-repository.\-Charge\-Point\-Repository.\-get\-Charge\-Point\-Connector\-Status (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{interfacede_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1_charge_point_repository_ab1beb661ec11861ebaf2e43b003cb6d8}
+
+
+Implementiert in \hyperlink{classde_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1_charge_point_repository_impl_abf311e254ff9be11ef122e5fa5629ffb}{de.\-rwth.\-idsg.\-steve.\-repository.\-Charge\-Point\-Repository\-Impl}.
+
+\hypertarget{interfacede_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1_charge_point_repository_ad1d4fa42c668f642dc67777b91ae0d4c}{\index{de\-::rwth\-::idsg\-::steve\-::repository\-::\-Charge\-Point\-Repository@{de\-::rwth\-::idsg\-::steve\-::repository\-::\-Charge\-Point\-Repository}!get\-Charge\-Point\-Details@{get\-Charge\-Point\-Details}}
+\index{get\-Charge\-Point\-Details@{get\-Charge\-Point\-Details}!de::rwth::idsg::steve::repository::ChargePointRepository@{de\-::rwth\-::idsg\-::steve\-::repository\-::\-Charge\-Point\-Repository}}
+\subsubsection[{get\-Charge\-Point\-Details}]{\setlength{\rightskip}{0pt plus 5cm}{\bf Charge\-Point} de.\-rwth.\-idsg.\-steve.\-repository.\-Charge\-Point\-Repository.\-get\-Charge\-Point\-Details (
+\begin{DoxyParamCaption}
+\item[{String}]{charge\-Box\-Id}
+\end{DoxyParamCaption}
+)}}\label{interfacede_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1_charge_point_repository_ad1d4fa42c668f642dc67777b91ae0d4c}
+
+
+Implementiert in \hyperlink{classde_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1_charge_point_repository_impl_a4d72c9981acc2118b2f45e35d72a9963}{de.\-rwth.\-idsg.\-steve.\-repository.\-Charge\-Point\-Repository\-Impl}.
+
+\hypertarget{interfacede_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1_charge_point_repository_a4cd918698edd78ff3e5e02e0374f602d}{\index{de\-::rwth\-::idsg\-::steve\-::repository\-::\-Charge\-Point\-Repository@{de\-::rwth\-::idsg\-::steve\-::repository\-::\-Charge\-Point\-Repository}!get\-Charge\-Point\-Heartbeats@{get\-Charge\-Point\-Heartbeats}}
+\index{get\-Charge\-Point\-Heartbeats@{get\-Charge\-Point\-Heartbeats}!de::rwth::idsg::steve::repository::ChargePointRepository@{de\-::rwth\-::idsg\-::steve\-::repository\-::\-Charge\-Point\-Repository}}
+\subsubsection[{get\-Charge\-Point\-Heartbeats}]{\setlength{\rightskip}{0pt plus 5cm}List$<${\bf Heartbeat}$>$ de.\-rwth.\-idsg.\-steve.\-repository.\-Charge\-Point\-Repository.\-get\-Charge\-Point\-Heartbeats (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{interfacede_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1_charge_point_repository_a4cd918698edd78ff3e5e02e0374f602d}
+
+
+Implementiert in \hyperlink{classde_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1_charge_point_repository_impl_a031dfc86d61eb01a77e1c03dc00a474d}{de.\-rwth.\-idsg.\-steve.\-repository.\-Charge\-Point\-Repository\-Impl}.
+
+\hypertarget{interfacede_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1_charge_point_repository_ad8617028d70a274b51b9fe7d04feee72}{\index{de\-::rwth\-::idsg\-::steve\-::repository\-::\-Charge\-Point\-Repository@{de\-::rwth\-::idsg\-::steve\-::repository\-::\-Charge\-Point\-Repository}!get\-Charge\-Point\-Select@{get\-Charge\-Point\-Select}}
+\index{get\-Charge\-Point\-Select@{get\-Charge\-Point\-Select}!de::rwth::idsg::steve::repository::ChargePointRepository@{de\-::rwth\-::idsg\-::steve\-::repository\-::\-Charge\-Point\-Repository}}
+\subsubsection[{get\-Charge\-Point\-Select}]{\setlength{\rightskip}{0pt plus 5cm}List$<${\bf Charge\-Point\-Select}$>$ de.\-rwth.\-idsg.\-steve.\-repository.\-Charge\-Point\-Repository.\-get\-Charge\-Point\-Select (
+\begin{DoxyParamCaption}
+\item[{{\bf Ocpp\-Protocol}}]{protocol}
+\end{DoxyParamCaption}
+)}}\label{interfacede_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1_charge_point_repository_ad8617028d70a274b51b9fe7d04feee72}
+
+
+Implementiert in \hyperlink{classde_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1_charge_point_repository_impl_a7be1506cf87a9161535c228333011c01}{de.\-rwth.\-idsg.\-steve.\-repository.\-Charge\-Point\-Repository\-Impl}.
+
+\hypertarget{interfacede_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1_charge_point_repository_aed97e9bbcfd11a66f6e86bc52e51cbd5}{\index{de\-::rwth\-::idsg\-::steve\-::repository\-::\-Charge\-Point\-Repository@{de\-::rwth\-::idsg\-::steve\-::repository\-::\-Charge\-Point\-Repository}!get\-Connector\-Ids@{get\-Connector\-Ids}}
+\index{get\-Connector\-Ids@{get\-Connector\-Ids}!de::rwth::idsg::steve::repository::ChargePointRepository@{de\-::rwth\-::idsg\-::steve\-::repository\-::\-Charge\-Point\-Repository}}
+\subsubsection[{get\-Connector\-Ids}]{\setlength{\rightskip}{0pt plus 5cm}List$<$Integer$>$ de.\-rwth.\-idsg.\-steve.\-repository.\-Charge\-Point\-Repository.\-get\-Connector\-Ids (
+\begin{DoxyParamCaption}
+\item[{String}]{charge\-Box\-Id}
+\end{DoxyParamCaption}
+)}}\label{interfacede_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1_charge_point_repository_aed97e9bbcfd11a66f6e86bc52e51cbd5}
+
+
+Implementiert in \hyperlink{classde_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1_charge_point_repository_impl_a9e222440e627fd00df86fcb4a190cb2c}{de.\-rwth.\-idsg.\-steve.\-repository.\-Charge\-Point\-Repository\-Impl}.
+
+\hypertarget{interfacede_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1_charge_point_repository_a4824062c6ff2dfcf9490ffb71484bb83}{\index{de\-::rwth\-::idsg\-::steve\-::repository\-::\-Charge\-Point\-Repository@{de\-::rwth\-::idsg\-::steve\-::repository\-::\-Charge\-Point\-Repository}!is\-Registered@{is\-Registered}}
+\index{is\-Registered@{is\-Registered}!de::rwth::idsg::steve::repository::ChargePointRepository@{de\-::rwth\-::idsg\-::steve\-::repository\-::\-Charge\-Point\-Repository}}
+\subsubsection[{is\-Registered}]{\setlength{\rightskip}{0pt plus 5cm}boolean de.\-rwth.\-idsg.\-steve.\-repository.\-Charge\-Point\-Repository.\-is\-Registered (
+\begin{DoxyParamCaption}
+\item[{String}]{charge\-Box\-Id}
+\end{DoxyParamCaption}
+)}}\label{interfacede_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1_charge_point_repository_a4824062c6ff2dfcf9490ffb71484bb83}
+
+
+Implementiert in \hyperlink{classde_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1_charge_point_repository_impl_a4ae3e76c34f39cf6e72f48d608b6d511}{de.\-rwth.\-idsg.\-steve.\-repository.\-Charge\-Point\-Repository\-Impl}.
+
+
+
+Hier ist ein Graph der zeigt, wo diese Funktion aufgerufen wird\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{interfacede_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1_charge_point_repository_a4824062c6ff2dfcf9490ffb71484bb83_icgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Die Dokumentation für diese Schnittstelle wurde erzeugt aufgrund der Datei\-:\begin{DoxyCompactItemize}
+\item 
+src/main/java/de/rwth/idsg/steve/repository/\hyperlink{_charge_point_repository_8java}{Charge\-Point\-Repository.\-java}\end{DoxyCompactItemize}

@@ -1,0 +1,66 @@
+Ste\-Ve was developed at the R\-W\-T\-H Aachen University and means Steckdosenverwaltung, namely socket administration in German. The aim of Ste\-Ve is to support the deployment and popularity of electric mobility, so it is easy to install and to use. Ste\-Ve provides basic functions for the administration of charge points, user data, and R\-F\-I\-D cards for user authentication and was tested successfully in operation.
+
+Ste\-Ve is considered as an open platform to implement, test and evaluate novel ideas for electric mobility, like authentication protocols, reservation mechanisms for charge points, and business models for electric mobility. Ste\-Ve is distributed under G\-P\-L and is free to use. If you are going to deploy Ste\-Ve we are happy to see the \href{website/logo/managed-by-steve.pdf}{\tt logo} on a charge point.
+
+\subsection*{Supported O\-C\-P\-P protocols }
+
+
+\begin{DoxyItemize}
+\item O\-C\-P\-P1.\-2\-S
+\item O\-C\-P\-P1.\-5\-S
+\item O\-C\-P\-P1.\-2\-J
+\item O\-C\-P\-P1.\-5\-J
+\end{DoxyItemize}
+
+\subsection*{Requirements \& Configuration }
+
+
+\begin{DoxyEnumerate}
+\item You need J\-D\-K 7, Maven and My\-S\-Q\-L.
+\item The charge points must be configured to communicate with following addresses. Depending on the O\-C\-P\-P version of the charge point, Ste\-Ve will automatically route messages to the version-\/specific implementation.
+\begin{DoxyItemize}
+\item S\-O\-A\-P\-: {\ttfamily \href{http://}{\tt http\-://}$<$your-\/server-\/ip$>$\-:$<$port$>$/steve/services/\-Central\-System\-Service}
+\item Web\-Socket/\-J\-S\-O\-N\-: {\ttfamily ws\-://$<$your-\/server-\/ip$>$\-:$<$port$>$/steve/websocket/\-Central\-System\-Service/$<$charge\-Box\-Id$>$}
+\end{DoxyItemize}
+\item Configuration is defined in \href{src/main/resources/main.properties}{\tt main.\-properties}\-:
+\begin{DoxyItemize}
+\item You {\itshape must} change \href{src/main/resources/main.properties#L3-L5}{\tt database configuration}
+\item You {\itshape must} change \href{src/main/resources/main.properties#L14}{\tt the host} to the correct I\-P address of your server
+\item You {\itshape can} change \href{src/main/resources/main.properties#L9-L10}{\tt web interface credentials}
+\item You {\itshape can} access the application via H\-T\-T\-P\-S, by \href{src/main/resources/main.properties#L23-L26}{\tt enabling it and setting the keystore properties}
+\end{DoxyItemize}
+\end{DoxyEnumerate}
+
+\subsection*{How to use? }
+
+Compile and build an archive ready to run\-: \begin{DoxyVerb}mvn package
+\end{DoxyVerb}
+
+
+Start the application\-: \begin{DoxyVerb}java -jar steve-***.jar
+\end{DoxyVerb}
+
+
+Access the Web interface\-: \begin{DoxyVerb}http://localhost:8080/steve/manager
+\end{DoxyVerb}
+
+
+\subsection*{Screenshots }
+
+
+\begin{DoxyEnumerate}
+\item \href{website/screenshots/home.png}{\tt Home}
+\item \href{website/screenshots/heartbeats.png}{\tt Heartbeats}
+\item \href{website/screenshots/connector-status.png}{\tt Connector Status}
+\item \href{website/screenshots/reservations.png}{\tt Data Management -\/ Reservations}
+\item \href{website/screenshots/chargepoints.png}{\tt Data Management -\/ Charge Points}
+\item \href{website/screenshots/users.png}{\tt Data Management -\/ Users}
+\item \href{website/screenshots/transactions.png}{\tt Data Management -\/ Transactions}
+\item \href{website/screenshots/ocpp12.png}{\tt Operations -\/ O\-C\-P\-P v1.\-2}
+\item \href{website/screenshots/ocpp15.png}{\tt Operations -\/ O\-C\-P\-P v1.\-5}
+\item \href{website/screenshots/settings.png}{\tt Settings}
+\end{DoxyEnumerate}
+
+\subsection*{Change log }
+
+See the C\-H\-A\-N\-G\-E\-L\-O\-G 

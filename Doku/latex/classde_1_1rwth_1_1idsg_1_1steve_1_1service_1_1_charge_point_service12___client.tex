@@ -1,0 +1,103 @@
+\hypertarget{classde_1_1rwth_1_1idsg_1_1steve_1_1service_1_1_charge_point_service12___client}{\section{de.\-rwth.\-idsg.\-steve.\-service.\-Charge\-Point\-Service12\-\_\-\-Client Klassenreferenz}
+\label{classde_1_1rwth_1_1idsg_1_1steve_1_1service_1_1_charge_point_service12___client}\index{de.\-rwth.\-idsg.\-steve.\-service.\-Charge\-Point\-Service12\-\_\-\-Client@{de.\-rwth.\-idsg.\-steve.\-service.\-Charge\-Point\-Service12\-\_\-\-Client}}
+}
+\subsection*{Öffentliche Methoden}
+\begin{DoxyCompactItemize}
+\item 
+int \hyperlink{classde_1_1rwth_1_1idsg_1_1steve_1_1service_1_1_charge_point_service12___client_a1a362db6fbdf8a34f7e057c42b4b1e58}{change\-Availability} (\hyperlink{classde_1_1rwth_1_1idsg_1_1steve_1_1web_1_1dto_1_1ocpp12_1_1_change_availability_params}{Change\-Availability\-Params} params)
+\item 
+int \hyperlink{classde_1_1rwth_1_1idsg_1_1steve_1_1service_1_1_charge_point_service12___client_a2916119c0f47f5c20943d27ff26d1d57}{change\-Configuration} (\hyperlink{classde_1_1rwth_1_1idsg_1_1steve_1_1web_1_1dto_1_1ocpp12_1_1_change_configuration_params}{Change\-Configuration\-Params} params)
+\item 
+int \hyperlink{classde_1_1rwth_1_1idsg_1_1steve_1_1service_1_1_charge_point_service12___client_a7a72a83bdc6f50bddfbb4183ccb83e54}{clear\-Cache} (\hyperlink{classde_1_1rwth_1_1idsg_1_1steve_1_1web_1_1dto_1_1common_1_1_multiple_charge_point_select}{Multiple\-Charge\-Point\-Select} params)
+\item 
+int \hyperlink{classde_1_1rwth_1_1idsg_1_1steve_1_1service_1_1_charge_point_service12___client_a61eea2363ea48a32381f15491a453b01}{get\-Diagnostics} (\hyperlink{classde_1_1rwth_1_1idsg_1_1steve_1_1web_1_1dto_1_1common_1_1_get_diagnostics_params}{Get\-Diagnostics\-Params} params)
+\item 
+int \hyperlink{classde_1_1rwth_1_1idsg_1_1steve_1_1service_1_1_charge_point_service12___client_a5a8d703d7ffea0cf86de21acc618708d}{reset} (\hyperlink{classde_1_1rwth_1_1idsg_1_1steve_1_1web_1_1dto_1_1ocpp12_1_1_reset_params}{Reset\-Params} params)
+\item 
+int \hyperlink{classde_1_1rwth_1_1idsg_1_1steve_1_1service_1_1_charge_point_service12___client_aa29c473ae9afdb6dff11b2c79577e3cc}{update\-Firmware} (\hyperlink{classde_1_1rwth_1_1idsg_1_1steve_1_1web_1_1dto_1_1common_1_1_update_firmware_params}{Update\-Firmware\-Params} params)
+\item 
+int \hyperlink{classde_1_1rwth_1_1idsg_1_1steve_1_1service_1_1_charge_point_service12___client_a699443166e440f7e34a46206fb2166ef}{remote\-Start\-Transaction} (\hyperlink{classde_1_1rwth_1_1idsg_1_1steve_1_1web_1_1dto_1_1common_1_1_remote_start_transaction_params}{Remote\-Start\-Transaction\-Params} params)
+\item 
+int \hyperlink{classde_1_1rwth_1_1idsg_1_1steve_1_1service_1_1_charge_point_service12___client_af7c5fa9d8e585e8e061feaf76569de72}{remote\-Stop\-Transaction} (\hyperlink{classde_1_1rwth_1_1idsg_1_1steve_1_1web_1_1dto_1_1common_1_1_remote_stop_transaction_params}{Remote\-Stop\-Transaction\-Params} params)
+\item 
+int \hyperlink{classde_1_1rwth_1_1idsg_1_1steve_1_1service_1_1_charge_point_service12___client_aba1458ba8f5ec1e90281eb87f795e27c}{unlock\-Connector} (\hyperlink{classde_1_1rwth_1_1idsg_1_1steve_1_1web_1_1dto_1_1common_1_1_unlock_connector_params}{Unlock\-Connector\-Params} params)
+\end{DoxyCompactItemize}
+
+
+\subsection{Ausführliche Beschreibung}
+Transport-\/level agnostic client implementation of O\-C\-P\-P V1.\-2 which builds the request payloads and delegates to dispatcher.
+
+\begin{DoxyAuthor}{Autor}
+Sevket Goekay \href{mailto:goekay@dbis.rwth-aachen.de}{\tt goekay@dbis.\-rwth-\/aachen.\-de} 
+\end{DoxyAuthor}
+
+
+\subsection{Dokumentation der Elementfunktionen}
+\hypertarget{classde_1_1rwth_1_1idsg_1_1steve_1_1service_1_1_charge_point_service12___client_a1a362db6fbdf8a34f7e057c42b4b1e58}{\index{de\-::rwth\-::idsg\-::steve\-::service\-::\-Charge\-Point\-Service12\-\_\-\-Client@{de\-::rwth\-::idsg\-::steve\-::service\-::\-Charge\-Point\-Service12\-\_\-\-Client}!change\-Availability@{change\-Availability}}
+\index{change\-Availability@{change\-Availability}!de::rwth::idsg::steve::service::ChargePointService12_Client@{de\-::rwth\-::idsg\-::steve\-::service\-::\-Charge\-Point\-Service12\-\_\-\-Client}}
+\subsubsection[{change\-Availability}]{\setlength{\rightskip}{0pt plus 5cm}int de.\-rwth.\-idsg.\-steve.\-service.\-Charge\-Point\-Service12\-\_\-\-Client.\-change\-Availability (
+\begin{DoxyParamCaption}
+\item[{{\bf Change\-Availability\-Params}}]{params}
+\end{DoxyParamCaption}
+)}}\label{classde_1_1rwth_1_1idsg_1_1steve_1_1service_1_1_charge_point_service12___client_a1a362db6fbdf8a34f7e057c42b4b1e58}
+\hypertarget{classde_1_1rwth_1_1idsg_1_1steve_1_1service_1_1_charge_point_service12___client_a2916119c0f47f5c20943d27ff26d1d57}{\index{de\-::rwth\-::idsg\-::steve\-::service\-::\-Charge\-Point\-Service12\-\_\-\-Client@{de\-::rwth\-::idsg\-::steve\-::service\-::\-Charge\-Point\-Service12\-\_\-\-Client}!change\-Configuration@{change\-Configuration}}
+\index{change\-Configuration@{change\-Configuration}!de::rwth::idsg::steve::service::ChargePointService12_Client@{de\-::rwth\-::idsg\-::steve\-::service\-::\-Charge\-Point\-Service12\-\_\-\-Client}}
+\subsubsection[{change\-Configuration}]{\setlength{\rightskip}{0pt plus 5cm}int de.\-rwth.\-idsg.\-steve.\-service.\-Charge\-Point\-Service12\-\_\-\-Client.\-change\-Configuration (
+\begin{DoxyParamCaption}
+\item[{{\bf Change\-Configuration\-Params}}]{params}
+\end{DoxyParamCaption}
+)}}\label{classde_1_1rwth_1_1idsg_1_1steve_1_1service_1_1_charge_point_service12___client_a2916119c0f47f5c20943d27ff26d1d57}
+\hypertarget{classde_1_1rwth_1_1idsg_1_1steve_1_1service_1_1_charge_point_service12___client_a7a72a83bdc6f50bddfbb4183ccb83e54}{\index{de\-::rwth\-::idsg\-::steve\-::service\-::\-Charge\-Point\-Service12\-\_\-\-Client@{de\-::rwth\-::idsg\-::steve\-::service\-::\-Charge\-Point\-Service12\-\_\-\-Client}!clear\-Cache@{clear\-Cache}}
+\index{clear\-Cache@{clear\-Cache}!de::rwth::idsg::steve::service::ChargePointService12_Client@{de\-::rwth\-::idsg\-::steve\-::service\-::\-Charge\-Point\-Service12\-\_\-\-Client}}
+\subsubsection[{clear\-Cache}]{\setlength{\rightskip}{0pt plus 5cm}int de.\-rwth.\-idsg.\-steve.\-service.\-Charge\-Point\-Service12\-\_\-\-Client.\-clear\-Cache (
+\begin{DoxyParamCaption}
+\item[{{\bf Multiple\-Charge\-Point\-Select}}]{params}
+\end{DoxyParamCaption}
+)}}\label{classde_1_1rwth_1_1idsg_1_1steve_1_1service_1_1_charge_point_service12___client_a7a72a83bdc6f50bddfbb4183ccb83e54}
+\hypertarget{classde_1_1rwth_1_1idsg_1_1steve_1_1service_1_1_charge_point_service12___client_a61eea2363ea48a32381f15491a453b01}{\index{de\-::rwth\-::idsg\-::steve\-::service\-::\-Charge\-Point\-Service12\-\_\-\-Client@{de\-::rwth\-::idsg\-::steve\-::service\-::\-Charge\-Point\-Service12\-\_\-\-Client}!get\-Diagnostics@{get\-Diagnostics}}
+\index{get\-Diagnostics@{get\-Diagnostics}!de::rwth::idsg::steve::service::ChargePointService12_Client@{de\-::rwth\-::idsg\-::steve\-::service\-::\-Charge\-Point\-Service12\-\_\-\-Client}}
+\subsubsection[{get\-Diagnostics}]{\setlength{\rightskip}{0pt plus 5cm}int de.\-rwth.\-idsg.\-steve.\-service.\-Charge\-Point\-Service12\-\_\-\-Client.\-get\-Diagnostics (
+\begin{DoxyParamCaption}
+\item[{{\bf Get\-Diagnostics\-Params}}]{params}
+\end{DoxyParamCaption}
+)}}\label{classde_1_1rwth_1_1idsg_1_1steve_1_1service_1_1_charge_point_service12___client_a61eea2363ea48a32381f15491a453b01}
+\hypertarget{classde_1_1rwth_1_1idsg_1_1steve_1_1service_1_1_charge_point_service12___client_a699443166e440f7e34a46206fb2166ef}{\index{de\-::rwth\-::idsg\-::steve\-::service\-::\-Charge\-Point\-Service12\-\_\-\-Client@{de\-::rwth\-::idsg\-::steve\-::service\-::\-Charge\-Point\-Service12\-\_\-\-Client}!remote\-Start\-Transaction@{remote\-Start\-Transaction}}
+\index{remote\-Start\-Transaction@{remote\-Start\-Transaction}!de::rwth::idsg::steve::service::ChargePointService12_Client@{de\-::rwth\-::idsg\-::steve\-::service\-::\-Charge\-Point\-Service12\-\_\-\-Client}}
+\subsubsection[{remote\-Start\-Transaction}]{\setlength{\rightskip}{0pt plus 5cm}int de.\-rwth.\-idsg.\-steve.\-service.\-Charge\-Point\-Service12\-\_\-\-Client.\-remote\-Start\-Transaction (
+\begin{DoxyParamCaption}
+\item[{{\bf Remote\-Start\-Transaction\-Params}}]{params}
+\end{DoxyParamCaption}
+)}}\label{classde_1_1rwth_1_1idsg_1_1steve_1_1service_1_1_charge_point_service12___client_a699443166e440f7e34a46206fb2166ef}
+\hypertarget{classde_1_1rwth_1_1idsg_1_1steve_1_1service_1_1_charge_point_service12___client_af7c5fa9d8e585e8e061feaf76569de72}{\index{de\-::rwth\-::idsg\-::steve\-::service\-::\-Charge\-Point\-Service12\-\_\-\-Client@{de\-::rwth\-::idsg\-::steve\-::service\-::\-Charge\-Point\-Service12\-\_\-\-Client}!remote\-Stop\-Transaction@{remote\-Stop\-Transaction}}
+\index{remote\-Stop\-Transaction@{remote\-Stop\-Transaction}!de::rwth::idsg::steve::service::ChargePointService12_Client@{de\-::rwth\-::idsg\-::steve\-::service\-::\-Charge\-Point\-Service12\-\_\-\-Client}}
+\subsubsection[{remote\-Stop\-Transaction}]{\setlength{\rightskip}{0pt plus 5cm}int de.\-rwth.\-idsg.\-steve.\-service.\-Charge\-Point\-Service12\-\_\-\-Client.\-remote\-Stop\-Transaction (
+\begin{DoxyParamCaption}
+\item[{{\bf Remote\-Stop\-Transaction\-Params}}]{params}
+\end{DoxyParamCaption}
+)}}\label{classde_1_1rwth_1_1idsg_1_1steve_1_1service_1_1_charge_point_service12___client_af7c5fa9d8e585e8e061feaf76569de72}
+\hypertarget{classde_1_1rwth_1_1idsg_1_1steve_1_1service_1_1_charge_point_service12___client_a5a8d703d7ffea0cf86de21acc618708d}{\index{de\-::rwth\-::idsg\-::steve\-::service\-::\-Charge\-Point\-Service12\-\_\-\-Client@{de\-::rwth\-::idsg\-::steve\-::service\-::\-Charge\-Point\-Service12\-\_\-\-Client}!reset@{reset}}
+\index{reset@{reset}!de::rwth::idsg::steve::service::ChargePointService12_Client@{de\-::rwth\-::idsg\-::steve\-::service\-::\-Charge\-Point\-Service12\-\_\-\-Client}}
+\subsubsection[{reset}]{\setlength{\rightskip}{0pt plus 5cm}int de.\-rwth.\-idsg.\-steve.\-service.\-Charge\-Point\-Service12\-\_\-\-Client.\-reset (
+\begin{DoxyParamCaption}
+\item[{{\bf Reset\-Params}}]{params}
+\end{DoxyParamCaption}
+)}}\label{classde_1_1rwth_1_1idsg_1_1steve_1_1service_1_1_charge_point_service12___client_a5a8d703d7ffea0cf86de21acc618708d}
+\hypertarget{classde_1_1rwth_1_1idsg_1_1steve_1_1service_1_1_charge_point_service12___client_aba1458ba8f5ec1e90281eb87f795e27c}{\index{de\-::rwth\-::idsg\-::steve\-::service\-::\-Charge\-Point\-Service12\-\_\-\-Client@{de\-::rwth\-::idsg\-::steve\-::service\-::\-Charge\-Point\-Service12\-\_\-\-Client}!unlock\-Connector@{unlock\-Connector}}
+\index{unlock\-Connector@{unlock\-Connector}!de::rwth::idsg::steve::service::ChargePointService12_Client@{de\-::rwth\-::idsg\-::steve\-::service\-::\-Charge\-Point\-Service12\-\_\-\-Client}}
+\subsubsection[{unlock\-Connector}]{\setlength{\rightskip}{0pt plus 5cm}int de.\-rwth.\-idsg.\-steve.\-service.\-Charge\-Point\-Service12\-\_\-\-Client.\-unlock\-Connector (
+\begin{DoxyParamCaption}
+\item[{{\bf Unlock\-Connector\-Params}}]{params}
+\end{DoxyParamCaption}
+)}}\label{classde_1_1rwth_1_1idsg_1_1steve_1_1service_1_1_charge_point_service12___client_aba1458ba8f5ec1e90281eb87f795e27c}
+\hypertarget{classde_1_1rwth_1_1idsg_1_1steve_1_1service_1_1_charge_point_service12___client_aa29c473ae9afdb6dff11b2c79577e3cc}{\index{de\-::rwth\-::idsg\-::steve\-::service\-::\-Charge\-Point\-Service12\-\_\-\-Client@{de\-::rwth\-::idsg\-::steve\-::service\-::\-Charge\-Point\-Service12\-\_\-\-Client}!update\-Firmware@{update\-Firmware}}
+\index{update\-Firmware@{update\-Firmware}!de::rwth::idsg::steve::service::ChargePointService12_Client@{de\-::rwth\-::idsg\-::steve\-::service\-::\-Charge\-Point\-Service12\-\_\-\-Client}}
+\subsubsection[{update\-Firmware}]{\setlength{\rightskip}{0pt plus 5cm}int de.\-rwth.\-idsg.\-steve.\-service.\-Charge\-Point\-Service12\-\_\-\-Client.\-update\-Firmware (
+\begin{DoxyParamCaption}
+\item[{{\bf Update\-Firmware\-Params}}]{params}
+\end{DoxyParamCaption}
+)}}\label{classde_1_1rwth_1_1idsg_1_1steve_1_1service_1_1_charge_point_service12___client_aa29c473ae9afdb6dff11b2c79577e3cc}
+
+
+Die Dokumentation für diese Klasse wurde erzeugt aufgrund der Datei\-:\begin{DoxyCompactItemize}
+\item 
+src/main/java/de/rwth/idsg/steve/service/\hyperlink{_charge_point_service12___client_8java}{Charge\-Point\-Service12\-\_\-\-Client.\-java}\end{DoxyCompactItemize}

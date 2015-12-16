@@ -1,0 +1,361 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=9"/>
+<meta name="generator" content="Doxygen 1.8.6"/>
+<title>SteVe: de.rwth.idsg.steve.repository.UserRepository Schnittstellenreferenz</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="resize.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+<script type="text/javascript">
+  $(document).ready(initResizable);
+  $(window).load(resizeHeight);
+</script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/search.js"></script>
+<script type="text/javascript">
+  $(document).ready(function() { searchBox.OnSelectItem(0); });
+</script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr style="height: 56px;">
+  <td id="projectlogo"><img alt="Logo" src="logo.png"/></td>
+  <td style="padding-left: 0.5em;">
+   <div id="projectname">SteVe
+   &#160;<span id="projectnumber">2.0.4</span>
+   </div>
+   <div id="projectbrief">Steckdosenverwaltung</div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- Erzeugt von Doxygen 1.8.6 -->
+<script type="text/javascript">
+var searchBox = new SearchBox("searchBox", "search",false,'Suchen');
+</script>
+  <div id="navrow1" class="tabs">
+    <ul class="tablist">
+      <li><a href="index.html"><span>Hauptseite</span></a></li>
+      <li><a href="namespaces.html"><span>Pakete</span></a></li>
+      <li class="current"><a href="annotated.html"><span>Klassen</span></a></li>
+      <li><a href="files.html"><span>Dateien</span></a></li>
+      <li>
+        <div id="MSearchBox" class="MSearchBoxInactive">
+        <span class="left">
+          <img id="MSearchSelect" src="search/mag_sel.png"
+               onmouseover="return searchBox.OnSearchSelectShow()"
+               onmouseout="return searchBox.OnSearchSelectHide()"
+               alt=""/>
+          <input type="text" id="MSearchField" value="Suchen" accesskey="S"
+               onfocus="searchBox.OnSearchFieldFocus(true)" 
+               onblur="searchBox.OnSearchFieldFocus(false)" 
+               onkeyup="searchBox.OnSearchFieldChange(event)"/>
+          </span><span class="right">
+            <a id="MSearchClose" href="javascript:searchBox.CloseResultsWindow()"><img id="MSearchCloseImg" border="0" src="search/close.png" alt=""/></a>
+          </span>
+        </div>
+      </li>
+    </ul>
+  </div>
+  <div id="navrow2" class="tabs2">
+    <ul class="tablist">
+      <li><a href="annotated.html"><span>Auflistung&#160;der&#160;Klassen</span></a></li>
+      <li><a href="classes.html"><span>Klassen-Verzeichnis</span></a></li>
+      <li><a href="inherits.html"><span>Klassenhierarchie</span></a></li>
+      <li><a href="functions.html"><span>Klassen-Elemente</span></a></li>
+    </ul>
+  </div>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
+  </div>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
+  </div>
+</div>
+<script type="text/javascript">
+$(document).ready(function(){initNavTree('interfacede_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1_user_repository.html','');});
+</script>
+<div id="doc-content">
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>Alle</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Klassen</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Namensbereiche</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Dateien</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Funktionen</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Variablen</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Aufzählungswerte</a></div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<iframe src="javascript:void(0)" frameborder="0" 
+        name="MSearchResults" id="MSearchResults">
+</iframe>
+</div>
+
+<div class="header">
+  <div class="summary">
+<a href="#pub-methods">Öffentliche Methoden</a> &#124;
+<a href="interfacede_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1_user_repository-members.html">Aufstellung aller Elemente</a>  </div>
+  <div class="headertitle">
+<div class="title">de.rwth.idsg.steve.repository.UserRepository Schnittstellenreferenz</div>  </div>
+</div><!--header-->
+<div class="contents">
+<div class="dynheader">
+Klassendiagramm für de.rwth.idsg.steve.repository.UserRepository:</div>
+<div class="dyncontent">
+<div class="center"><img src="interfacede_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1_user_repository__inherit__graph.png" border="0" usemap="#de_8rwth_8idsg_8steve_8repository_8_user_repository_inherit__map" alt="Inheritance graph"/></div>
+<map name="de_8rwth_8idsg_8steve_8repository_8_user_repository_inherit__map" id="de_8rwth_8idsg_8steve_8repository_8_user_repository_inherit__map">
+<area shape="rect" id="node2" href="classde_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1_user_repository_impl.html" title="de.rwth.idsg.steve.repository.\lUserRepositoryImpl" alt="" coords="5,97,200,138"/></map>
+<center><span class="legend">[<a target="top" href="graph_legend.html">Legende</a>]</span></center></div>
+<table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
+Öffentliche Methoden</h2></td></tr>
+<tr class="memitem:aa488f418bb73217acd65537099c9afb3"><td class="memItemLeft" align="right" valign="top">Result&lt; UserRecord &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="interfacede_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1_user_repository.html#aa488f418bb73217acd65537099c9afb3">getUserRecords</a> ()</td></tr>
+<tr class="separator:aa488f418bb73217acd65537099c9afb3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a71047692f661431be5f10c1f92ab626d"><td class="memItemLeft" align="right" valign="top">Result&lt; UserRecord &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="interfacede_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1_user_repository.html#a71047692f661431be5f10c1f92ab626d">getUserRecords</a> (List&lt; String &gt; idTagList)</td></tr>
+<tr class="separator:a71047692f661431be5f10c1f92ab626d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa7aa9b8dc5b518eb7085983b75552a77"><td class="memItemLeft" align="right" valign="top">UserRecord&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="interfacede_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1_user_repository.html#aa7aa9b8dc5b518eb7085983b75552a77">getUserRecord</a> (String idTag)</td></tr>
+<tr class="separator:aa7aa9b8dc5b518eb7085983b75552a77"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5ab1f1d0020bd06c65b90e0556a6b9d8"><td class="memItemLeft" align="right" valign="top">List&lt; String &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="interfacede_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1_user_repository.html#a5ab1f1d0020bd06c65b90e0556a6b9d8">getUserIdTags</a> ()</td></tr>
+<tr class="separator:a5ab1f1d0020bd06c65b90e0556a6b9d8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae5bb260082d21a1d2327e3afc6914871"><td class="memItemLeft" align="right" valign="top">List&lt; String &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="interfacede_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1_user_repository.html#ae5bb260082d21a1d2327e3afc6914871">getActiveUserIdTags</a> ()</td></tr>
+<tr class="separator:ae5bb260082d21a1d2327e3afc6914871"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a099d12671889952bc4071782038f7f50"><td class="memItemLeft" align="right" valign="top">String&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="interfacede_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1_user_repository.html#a099d12671889952bc4071782038f7f50">getParentIdtag</a> (String idTag)</td></tr>
+<tr class="separator:a099d12671889952bc4071782038f7f50"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae240763e8def875900878988e05b9bbd"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="interfacede_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1_user_repository.html#ae240763e8def875900878988e05b9bbd">addUser</a> (String idTag, String parentIdTag, Timestamp expiryTimestamp)</td></tr>
+<tr class="separator:ae240763e8def875900878988e05b9bbd"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a26412d46a0640e48dab9d1c45ce2c3c9"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="interfacede_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1_user_repository.html#a26412d46a0640e48dab9d1c45ce2c3c9">updateUser</a> (String idTag, String parentIdTag, Timestamp expiryTimestamp, boolean blocked)</td></tr>
+<tr class="separator:a26412d46a0640e48dab9d1c45ce2c3c9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2c408ab628cbe46d3016bd27d34b5146"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="interfacede_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1_user_repository.html#a2c408ab628cbe46d3016bd27d34b5146">deleteUser</a> (String idTag)</td></tr>
+<tr class="separator:a2c408ab628cbe46d3016bd27d34b5146"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table>
+<a name="details" id="details"></a><h2 class="groupheader">Ausführliche Beschreibung</h2>
+<div class="textblock"><dl class="section author"><dt>Autor</dt><dd>Sevket Goekay <a href="#" onclick="location.href='mai'+'lto:'+'goe'+'ka'+'y@d'+'bi'+'s.r'+'wt'+'h-a'+'ac'+'hen'+'.d'+'e'; return false;">goeka<span style="display: none;">.nosp@m.</span>y@db<span style="display: none;">.nosp@m.</span>is.rw<span style="display: none;">.nosp@m.</span>th-a<span style="display: none;">.nosp@m.</span>achen<span style="display: none;">.nosp@m.</span>.de</a> </dd></dl>
+<dl class="section since"><dt>Seit</dt><dd>19.08.2014 </dd></dl>
+</div><h2 class="groupheader">Dokumentation der Elementfunktionen</h2>
+<a class="anchor" id="ae240763e8def875900878988e05b9bbd"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void de.rwth.idsg.steve.repository.UserRepository.addUser </td>
+          <td>(</td>
+          <td class="paramtype">String&#160;</td>
+          <td class="paramname"><em>idTag</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">String&#160;</td>
+          <td class="paramname"><em>parentIdTag</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Timestamp&#160;</td>
+          <td class="paramname"><em>expiryTimestamp</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Implementiert in <a class="el" href="classde_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1_user_repository_impl.html#a4614a7d7f48414a1125bfc700b331a8a">de.rwth.idsg.steve.repository.UserRepositoryImpl</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a2c408ab628cbe46d3016bd27d34b5146"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void de.rwth.idsg.steve.repository.UserRepository.deleteUser </td>
+          <td>(</td>
+          <td class="paramtype">String&#160;</td>
+          <td class="paramname"><em>idTag</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Implementiert in <a class="el" href="classde_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1_user_repository_impl.html#a9b0b0fbd8d0ee4af8fcc830c2da80b28">de.rwth.idsg.steve.repository.UserRepositoryImpl</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="ae5bb260082d21a1d2327e3afc6914871"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">List&lt;String&gt; de.rwth.idsg.steve.repository.UserRepository.getActiveUserIdTags </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Implementiert in <a class="el" href="classde_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1_user_repository_impl.html#a366e6269bc7358da823da410a3f1717a">de.rwth.idsg.steve.repository.UserRepositoryImpl</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a099d12671889952bc4071782038f7f50"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">String de.rwth.idsg.steve.repository.UserRepository.getParentIdtag </td>
+          <td>(</td>
+          <td class="paramtype">String&#160;</td>
+          <td class="paramname"><em>idTag</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Implementiert in <a class="el" href="classde_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1_user_repository_impl.html#a381f560eed748dbce0d015f01f0bb683">de.rwth.idsg.steve.repository.UserRepositoryImpl</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a5ab1f1d0020bd06c65b90e0556a6b9d8"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">List&lt;String&gt; de.rwth.idsg.steve.repository.UserRepository.getUserIdTags </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Implementiert in <a class="el" href="classde_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1_user_repository_impl.html#af0b99a96857ddbd673d2839538debaa5">de.rwth.idsg.steve.repository.UserRepositoryImpl</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="aa7aa9b8dc5b518eb7085983b75552a77"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">UserRecord de.rwth.idsg.steve.repository.UserRepository.getUserRecord </td>
+          <td>(</td>
+          <td class="paramtype">String&#160;</td>
+          <td class="paramname"><em>idTag</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Implementiert in <a class="el" href="classde_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1_user_repository_impl.html#aa40e76476db8b34324da405a8deb1446">de.rwth.idsg.steve.repository.UserRepositoryImpl</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="aa488f418bb73217acd65537099c9afb3"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">Result&lt;UserRecord&gt; de.rwth.idsg.steve.repository.UserRepository.getUserRecords </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Implementiert in <a class="el" href="classde_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1_user_repository_impl.html#a9ffb4584eb3c0fe0623297915dfaa64f">de.rwth.idsg.steve.repository.UserRepositoryImpl</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a71047692f661431be5f10c1f92ab626d"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">Result&lt;UserRecord&gt; de.rwth.idsg.steve.repository.UserRepository.getUserRecords </td>
+          <td>(</td>
+          <td class="paramtype">List&lt; String &gt;&#160;</td>
+          <td class="paramname"><em>idTagList</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Implementiert in <a class="el" href="classde_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1_user_repository_impl.html#a4668bbc0ce5876b146f2fdfc14205d25">de.rwth.idsg.steve.repository.UserRepositoryImpl</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a26412d46a0640e48dab9d1c45ce2c3c9"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void de.rwth.idsg.steve.repository.UserRepository.updateUser </td>
+          <td>(</td>
+          <td class="paramtype">String&#160;</td>
+          <td class="paramname"><em>idTag</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">String&#160;</td>
+          <td class="paramname"><em>parentIdTag</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Timestamp&#160;</td>
+          <td class="paramname"><em>expiryTimestamp</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">boolean&#160;</td>
+          <td class="paramname"><em>blocked</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Implementiert in <a class="el" href="classde_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1_user_repository_impl.html#a047d9f7b2cf6ca1a34cf58004f20fb9a">de.rwth.idsg.steve.repository.UserRepositoryImpl</a>.</p>
+
+</div>
+</div>
+<hr/>Die Dokumentation für diese Schnittstelle wurde erzeugt aufgrund der Datei:<ul>
+<li>src/main/java/de/rwth/idsg/steve/repository/<a class="el" href="_user_repository_8java.html">UserRepository.java</a></li>
+</ul>
+</div><!-- contents -->
+</div><!-- doc-content -->
+<!-- start footer part -->
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="navelem"><a class="el" href="namespacede.html">de</a></li><li class="navelem"><a class="el" href="namespacede_1_1rwth.html">rwth</a></li><li class="navelem"><a class="el" href="namespacede_1_1rwth_1_1idsg.html">idsg</a></li><li class="navelem"><a class="el" href="namespacede_1_1rwth_1_1idsg_1_1steve.html">steve</a></li><li class="navelem"><a class="el" href="namespacede_1_1rwth_1_1idsg_1_1steve_1_1repository.html">repository</a></li><li class="navelem"><a class="el" href="interfacede_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1_user_repository.html">UserRepository</a></li>
+    <li class="footer">Erzeugt am Mit Dez 16 2015 13:57:34 für SteVe von
+    <a href="http://www.doxygen.org/index.html">
+    <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.6 </li>
+  </ul>
+</div>
+</body>
+</html>

@@ -1,0 +1,717 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=9"/>
+<meta name="generator" content="Doxygen 1.8.6"/>
+<title>SteVe: de.rwth.idsg.steve.repository.OcppServerRepository Schnittstellenreferenz</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="resize.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+<script type="text/javascript">
+  $(document).ready(initResizable);
+  $(window).load(resizeHeight);
+</script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/search.js"></script>
+<script type="text/javascript">
+  $(document).ready(function() { searchBox.OnSelectItem(0); });
+</script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr style="height: 56px;">
+  <td id="projectlogo"><img alt="Logo" src="logo.png"/></td>
+  <td style="padding-left: 0.5em;">
+   <div id="projectname">SteVe
+   &#160;<span id="projectnumber">2.0.4</span>
+   </div>
+   <div id="projectbrief">Steckdosenverwaltung</div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- Erzeugt von Doxygen 1.8.6 -->
+<script type="text/javascript">
+var searchBox = new SearchBox("searchBox", "search",false,'Suchen');
+</script>
+  <div id="navrow1" class="tabs">
+    <ul class="tablist">
+      <li><a href="index.html"><span>Hauptseite</span></a></li>
+      <li><a href="namespaces.html"><span>Pakete</span></a></li>
+      <li class="current"><a href="annotated.html"><span>Klassen</span></a></li>
+      <li><a href="files.html"><span>Dateien</span></a></li>
+      <li>
+        <div id="MSearchBox" class="MSearchBoxInactive">
+        <span class="left">
+          <img id="MSearchSelect" src="search/mag_sel.png"
+               onmouseover="return searchBox.OnSearchSelectShow()"
+               onmouseout="return searchBox.OnSearchSelectHide()"
+               alt=""/>
+          <input type="text" id="MSearchField" value="Suchen" accesskey="S"
+               onfocus="searchBox.OnSearchFieldFocus(true)" 
+               onblur="searchBox.OnSearchFieldFocus(false)" 
+               onkeyup="searchBox.OnSearchFieldChange(event)"/>
+          </span><span class="right">
+            <a id="MSearchClose" href="javascript:searchBox.CloseResultsWindow()"><img id="MSearchCloseImg" border="0" src="search/close.png" alt=""/></a>
+          </span>
+        </div>
+      </li>
+    </ul>
+  </div>
+  <div id="navrow2" class="tabs2">
+    <ul class="tablist">
+      <li><a href="annotated.html"><span>Auflistung&#160;der&#160;Klassen</span></a></li>
+      <li><a href="classes.html"><span>Klassen-Verzeichnis</span></a></li>
+      <li><a href="inherits.html"><span>Klassenhierarchie</span></a></li>
+      <li><a href="functions.html"><span>Klassen-Elemente</span></a></li>
+    </ul>
+  </div>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
+  </div>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
+  </div>
+</div>
+<script type="text/javascript">
+$(document).ready(function(){initNavTree('interfacede_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1_ocpp_server_repository.html','');});
+</script>
+<div id="doc-content">
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>Alle</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Klassen</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Namensbereiche</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Dateien</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Funktionen</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Variablen</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Aufzählungswerte</a></div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<iframe src="javascript:void(0)" frameborder="0" 
+        name="MSearchResults" id="MSearchResults">
+</iframe>
+</div>
+
+<div class="header">
+  <div class="summary">
+<a href="#pub-methods">Öffentliche Methoden</a> &#124;
+<a href="interfacede_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1_ocpp_server_repository-members.html">Aufstellung aller Elemente</a>  </div>
+  <div class="headertitle">
+<div class="title">de.rwth.idsg.steve.repository.OcppServerRepository Schnittstellenreferenz</div>  </div>
+</div><!--header-->
+<div class="contents">
+<div class="dynheader">
+Klassendiagramm für de.rwth.idsg.steve.repository.OcppServerRepository:</div>
+<div class="dyncontent">
+<div class="center"><img src="interfacede_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1_ocpp_server_repository__inherit__graph.png" border="0" usemap="#de_8rwth_8idsg_8steve_8repository_8_ocpp_server_repository_inherit__map" alt="Inheritance graph"/></div>
+<map name="de_8rwth_8idsg_8steve_8repository_8_ocpp_server_repository_inherit__map" id="de_8rwth_8idsg_8steve_8repository_8_ocpp_server_repository_inherit__map">
+<area shape="rect" id="node2" href="classde_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1_ocpp_server_repository_impl.html" title="de.rwth.idsg.steve.repository.\lOcppServerRepositoryImpl" alt="" coords="5,97,200,138"/></map>
+<center><span class="legend">[<a target="top" href="graph_legend.html">Legende</a>]</span></center></div>
+<table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
+Öffentliche Methoden</h2></td></tr>
+<tr class="memitem:aa8aa3340bec58017d0a9b18a5040ca3d"><td class="memItemLeft" align="right" valign="top">boolean&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="interfacede_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1_ocpp_server_repository.html#aa8aa3340bec58017d0a9b18a5040ca3d">updateChargebox</a> (<a class="el" href="enumde_1_1rwth_1_1idsg_1_1steve_1_1ocpp_1_1_ocpp_protocol.html">OcppProtocol</a> ocppProtocol, String vendor, String model, String pointSerial, String boxSerial, String fwVersion, String iccid, String imsi, String meterType, String meterSerial, String chargeBoxIdentity, Timestamp now)</td></tr>
+<tr class="separator:aa8aa3340bec58017d0a9b18a5040ca3d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abf41cab95009f461986a611f43e3f226"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="interfacede_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1_ocpp_server_repository.html#abf41cab95009f461986a611f43e3f226">updateEndpointAddress</a> (String chargeBoxIdentity, String endpointAddress)</td></tr>
+<tr class="separator:abf41cab95009f461986a611f43e3f226"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afbd7ab89a03cb005ab824b3ce84fbc30"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="interfacede_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1_ocpp_server_repository.html#afbd7ab89a03cb005ab824b3ce84fbc30">updateChargeboxFirmwareStatus</a> (String chargeBoxIdentity, String firmwareStatus)</td></tr>
+<tr class="separator:afbd7ab89a03cb005ab824b3ce84fbc30"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ade86b237d803f260a241497a561a96c0"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="interfacede_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1_ocpp_server_repository.html#ade86b237d803f260a241497a561a96c0">updateChargeboxDiagnosticsStatus</a> (String chargeBoxIdentity, String status)</td></tr>
+<tr class="separator:ade86b237d803f260a241497a561a96c0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad2282a0ee31ed53827d9fe2c2601e208"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="interfacede_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1_ocpp_server_repository.html#ad2282a0ee31ed53827d9fe2c2601e208">updateChargeboxHeartbeat</a> (String chargeBoxIdentity, Timestamp ts)</td></tr>
+<tr class="separator:ad2282a0ee31ed53827d9fe2c2601e208"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adb143c82a65a1fafd1084b1330cd899c"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="interfacede_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1_ocpp_server_repository.html#adb143c82a65a1fafd1084b1330cd899c">insertConnectorStatus12</a> (String chargeBoxIdentity, int connectorId, String status, Timestamp timestamp, String errorCode)</td></tr>
+<tr class="separator:adb143c82a65a1fafd1084b1330cd899c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5eed2253ddcd7b8d2b263805e96780be"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="interfacede_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1_ocpp_server_repository.html#a5eed2253ddcd7b8d2b263805e96780be">insertConnectorStatus15</a> (String chargeBoxIdentity, int connectorId, String status, Timestamp timestamp, String errorCode, String errorInfo, String vendorId, String vendorErrorCode)</td></tr>
+<tr class="separator:a5eed2253ddcd7b8d2b263805e96780be"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afb15fceb9f5da8204816ad7cbc53bedc"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="interfacede_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1_ocpp_server_repository.html#afb15fceb9f5da8204816ad7cbc53bedc">insertMeterValues12</a> (String chargeBoxIdentity, int connectorId, List&lt; ocpp.cs._2010._08.MeterValue &gt; list)</td></tr>
+<tr class="separator:afb15fceb9f5da8204816ad7cbc53bedc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abe132ff15dbaaa31a5838eeb110c6520"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="interfacede_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1_ocpp_server_repository.html#abe132ff15dbaaa31a5838eeb110c6520">insertMeterValues15</a> (String chargeBoxIdentity, int connectorId, List&lt; ocpp.cs._2012._06.MeterValue &gt; list, Integer transactionId)</td></tr>
+<tr class="separator:abe132ff15dbaaa31a5838eeb110c6520"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:add54f5d6c360d37f96b319430fa094e6"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="interfacede_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1_ocpp_server_repository.html#add54f5d6c360d37f96b319430fa094e6">insertMeterValuesOfTransaction</a> (String chargeBoxIdentity, int transactionId, List&lt; ocpp.cs._2012._06.MeterValue &gt; list)</td></tr>
+<tr class="separator:add54f5d6c360d37f96b319430fa094e6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab5cae0186fdeef7ce8a490bca552963e"><td class="memItemLeft" align="right" valign="top">Integer&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="interfacede_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1_ocpp_server_repository.html#ab5cae0186fdeef7ce8a490bca552963e">insertTransaction12</a> (String chargeBoxIdentity, int connectorId, String idTag, Timestamp startTimestamp, String startMeterValue)</td></tr>
+<tr class="separator:ab5cae0186fdeef7ce8a490bca552963e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aaa63b9ae3a0252107a34aa923991baa6"><td class="memItemLeft" align="right" valign="top">Integer&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="interfacede_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1_ocpp_server_repository.html#aaa63b9ae3a0252107a34aa923991baa6">insertTransaction15</a> (String chargeBoxIdentity, int connectorId, String idTag, Timestamp startTimestamp, String startMeterValue, Integer reservationId)</td></tr>
+<tr class="separator:aaa63b9ae3a0252107a34aa923991baa6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a251abdd153c42cb6e45eaf00b0168f92"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="interfacede_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1_ocpp_server_repository.html#a251abdd153c42cb6e45eaf00b0168f92">updateTransaction</a> (int transactionId, Timestamp stopTimestamp, String stopMeterValue)</td></tr>
+<tr class="separator:a251abdd153c42cb6e45eaf00b0168f92"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table>
+<a name="details" id="details"></a><h2 class="groupheader">Ausführliche Beschreibung</h2>
+<div class="textblock"><dl class="section author"><dt>Autor</dt><dd>Sevket Goekay <a href="#" onclick="location.href='mai'+'lto:'+'goe'+'ka'+'y@d'+'bi'+'s.r'+'wt'+'h-a'+'ac'+'hen'+'.d'+'e'; return false;">goeka<span style="display: none;">.nosp@m.</span>y@db<span style="display: none;">.nosp@m.</span>is.rw<span style="display: none;">.nosp@m.</span>th-a<span style="display: none;">.nosp@m.</span>achen<span style="display: none;">.nosp@m.</span>.de</a> </dd></dl>
+<dl class="section since"><dt>Seit</dt><dd>19.08.2014 </dd></dl>
+</div><h2 class="groupheader">Dokumentation der Elementfunktionen</h2>
+<a class="anchor" id="adb143c82a65a1fafd1084b1330cd899c"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void de.rwth.idsg.steve.repository.OcppServerRepository.insertConnectorStatus12 </td>
+          <td>(</td>
+          <td class="paramtype">String&#160;</td>
+          <td class="paramname"><em>chargeBoxIdentity</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>connectorId</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">String&#160;</td>
+          <td class="paramname"><em>status</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Timestamp&#160;</td>
+          <td class="paramname"><em>timestamp</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">String&#160;</td>
+          <td class="paramname"><em>errorCode</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Implementiert in <a class="el" href="classde_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1_ocpp_server_repository_impl.html#a624f4eb1edbe55de29f7229070e6db8d">de.rwth.idsg.steve.repository.OcppServerRepositoryImpl</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a5eed2253ddcd7b8d2b263805e96780be"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void de.rwth.idsg.steve.repository.OcppServerRepository.insertConnectorStatus15 </td>
+          <td>(</td>
+          <td class="paramtype">String&#160;</td>
+          <td class="paramname"><em>chargeBoxIdentity</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>connectorId</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">String&#160;</td>
+          <td class="paramname"><em>status</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Timestamp&#160;</td>
+          <td class="paramname"><em>timestamp</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">String&#160;</td>
+          <td class="paramname"><em>errorCode</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">String&#160;</td>
+          <td class="paramname"><em>errorInfo</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">String&#160;</td>
+          <td class="paramname"><em>vendorId</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">String&#160;</td>
+          <td class="paramname"><em>vendorErrorCode</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="afb15fceb9f5da8204816ad7cbc53bedc"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void de.rwth.idsg.steve.repository.OcppServerRepository.insertMeterValues12 </td>
+          <td>(</td>
+          <td class="paramtype">String&#160;</td>
+          <td class="paramname"><em>chargeBoxIdentity</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>connectorId</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">List&lt; ocpp.cs._2010._08.MeterValue &gt;&#160;</td>
+          <td class="paramname"><em>list</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="abe132ff15dbaaa31a5838eeb110c6520"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void de.rwth.idsg.steve.repository.OcppServerRepository.insertMeterValues15 </td>
+          <td>(</td>
+          <td class="paramtype">String&#160;</td>
+          <td class="paramname"><em>chargeBoxIdentity</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>connectorId</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">List&lt; ocpp.cs._2012._06.MeterValue &gt;&#160;</td>
+          <td class="paramname"><em>list</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Integer&#160;</td>
+          <td class="paramname"><em>transactionId</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="add54f5d6c360d37f96b319430fa094e6"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void de.rwth.idsg.steve.repository.OcppServerRepository.insertMeterValuesOfTransaction </td>
+          <td>(</td>
+          <td class="paramtype">String&#160;</td>
+          <td class="paramname"><em>chargeBoxIdentity</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>transactionId</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">List&lt; ocpp.cs._2012._06.MeterValue &gt;&#160;</td>
+          <td class="paramname"><em>list</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="ab5cae0186fdeef7ce8a490bca552963e"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">Integer de.rwth.idsg.steve.repository.OcppServerRepository.insertTransaction12 </td>
+          <td>(</td>
+          <td class="paramtype">String&#160;</td>
+          <td class="paramname"><em>chargeBoxIdentity</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>connectorId</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">String&#160;</td>
+          <td class="paramname"><em>idTag</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Timestamp&#160;</td>
+          <td class="paramname"><em>startTimestamp</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">String&#160;</td>
+          <td class="paramname"><em>startMeterValue</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Implementiert in <a class="el" href="classde_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1_ocpp_server_repository_impl.html#a6bfdaf50f0704ae9f58da71eef56c70e">de.rwth.idsg.steve.repository.OcppServerRepositoryImpl</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="aaa63b9ae3a0252107a34aa923991baa6"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">Integer de.rwth.idsg.steve.repository.OcppServerRepository.insertTransaction15 </td>
+          <td>(</td>
+          <td class="paramtype">String&#160;</td>
+          <td class="paramname"><em>chargeBoxIdentity</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>connectorId</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">String&#160;</td>
+          <td class="paramname"><em>idTag</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Timestamp&#160;</td>
+          <td class="paramname"><em>startTimestamp</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">String&#160;</td>
+          <td class="paramname"><em>startMeterValue</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Integer&#160;</td>
+          <td class="paramname"><em>reservationId</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="aa8aa3340bec58017d0a9b18a5040ca3d"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">boolean de.rwth.idsg.steve.repository.OcppServerRepository.updateChargebox </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="enumde_1_1rwth_1_1idsg_1_1steve_1_1ocpp_1_1_ocpp_protocol.html">OcppProtocol</a>&#160;</td>
+          <td class="paramname"><em>ocppProtocol</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">String&#160;</td>
+          <td class="paramname"><em>vendor</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">String&#160;</td>
+          <td class="paramname"><em>model</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">String&#160;</td>
+          <td class="paramname"><em>pointSerial</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">String&#160;</td>
+          <td class="paramname"><em>boxSerial</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">String&#160;</td>
+          <td class="paramname"><em>fwVersion</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">String&#160;</td>
+          <td class="paramname"><em>iccid</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">String&#160;</td>
+          <td class="paramname"><em>imsi</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">String&#160;</td>
+          <td class="paramname"><em>meterType</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">String&#160;</td>
+          <td class="paramname"><em>meterSerial</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">String&#160;</td>
+          <td class="paramname"><em>chargeBoxIdentity</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Timestamp&#160;</td>
+          <td class="paramname"><em>now</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>One DB call with two functions:</p>
+<ol type="1">
+<li>Update all fields with the exception of chargeBoxId, so that initially it is enough to register a chargebox with its ID in DB. During boot, the chargebox provides missing information which might be updated (for ex: firmware)</li>
+<li>If the chargebox not registered =&gt; no chargeboxes to update =&gt; updated/returned row count = 0 </li>
+</ol>
+
+<p>Implementiert in <a class="el" href="classde_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1_ocpp_server_repository_impl.html#af35a0384f08ea9f8983bbdbea9b8b51b">de.rwth.idsg.steve.repository.OcppServerRepositoryImpl</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="ade86b237d803f260a241497a561a96c0"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void de.rwth.idsg.steve.repository.OcppServerRepository.updateChargeboxDiagnosticsStatus </td>
+          <td>(</td>
+          <td class="paramtype">String&#160;</td>
+          <td class="paramname"><em>chargeBoxIdentity</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">String&#160;</td>
+          <td class="paramname"><em>status</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Implementiert in <a class="el" href="classde_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1_ocpp_server_repository_impl.html#aeec83e6dad09d54cb3b5cbf83f3f5fe0">de.rwth.idsg.steve.repository.OcppServerRepositoryImpl</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="afbd7ab89a03cb005ab824b3ce84fbc30"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void de.rwth.idsg.steve.repository.OcppServerRepository.updateChargeboxFirmwareStatus </td>
+          <td>(</td>
+          <td class="paramtype">String&#160;</td>
+          <td class="paramname"><em>chargeBoxIdentity</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">String&#160;</td>
+          <td class="paramname"><em>firmwareStatus</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Implementiert in <a class="el" href="classde_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1_ocpp_server_repository_impl.html#aa1da9ce277523f4182448b8bd15a2a5b">de.rwth.idsg.steve.repository.OcppServerRepositoryImpl</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="ad2282a0ee31ed53827d9fe2c2601e208"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void de.rwth.idsg.steve.repository.OcppServerRepository.updateChargeboxHeartbeat </td>
+          <td>(</td>
+          <td class="paramtype">String&#160;</td>
+          <td class="paramname"><em>chargeBoxIdentity</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Timestamp&#160;</td>
+          <td class="paramname"><em>ts</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Implementiert in <a class="el" href="classde_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1_ocpp_server_repository_impl.html#af08981af3fd0d3a00f3c2a723924b59b">de.rwth.idsg.steve.repository.OcppServerRepositoryImpl</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="abf41cab95009f461986a611f43e3f226"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void de.rwth.idsg.steve.repository.OcppServerRepository.updateEndpointAddress </td>
+          <td>(</td>
+          <td class="paramtype">String&#160;</td>
+          <td class="paramname"><em>chargeBoxIdentity</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">String&#160;</td>
+          <td class="paramname"><em>endpointAddress</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Implementiert in <a class="el" href="classde_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1_ocpp_server_repository_impl.html#ac240ff5c55ebd61c202edb5c0f1ffe80">de.rwth.idsg.steve.repository.OcppServerRepositoryImpl</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a251abdd153c42cb6e45eaf00b0168f92"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void de.rwth.idsg.steve.repository.OcppServerRepository.updateTransaction </td>
+          <td>(</td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>transactionId</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Timestamp&#160;</td>
+          <td class="paramname"><em>stopTimestamp</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">String&#160;</td>
+          <td class="paramname"><em>stopMeterValue</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Implementiert in <a class="el" href="classde_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1_ocpp_server_repository_impl.html#a4433f551124442bf1413599cb836503e">de.rwth.idsg.steve.repository.OcppServerRepositoryImpl</a>.</p>
+
+</div>
+</div>
+<hr/>Die Dokumentation für diese Schnittstelle wurde erzeugt aufgrund der Datei:<ul>
+<li>src/main/java/de/rwth/idsg/steve/repository/<a class="el" href="_ocpp_server_repository_8java.html">OcppServerRepository.java</a></li>
+</ul>
+</div><!-- contents -->
+</div><!-- doc-content -->
+<!-- start footer part -->
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="navelem"><a class="el" href="namespacede.html">de</a></li><li class="navelem"><a class="el" href="namespacede_1_1rwth.html">rwth</a></li><li class="navelem"><a class="el" href="namespacede_1_1rwth_1_1idsg.html">idsg</a></li><li class="navelem"><a class="el" href="namespacede_1_1rwth_1_1idsg_1_1steve.html">steve</a></li><li class="navelem"><a class="el" href="namespacede_1_1rwth_1_1idsg_1_1steve_1_1repository.html">repository</a></li><li class="navelem"><a class="el" href="interfacede_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1_ocpp_server_repository.html">OcppServerRepository</a></li>
+    <li class="footer">Erzeugt am Mit Dez 16 2015 13:57:34 für SteVe von
+    <a href="http://www.doxygen.org/index.html">
+    <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.6 </li>
+  </ul>
+</div>
+</body>
+</html>

@@ -1,0 +1,4 @@
+<map id="de.rwth.idsg.steve.ocpp.ws.ocpp12.Ocpp12WebSocketEndpoint" name="de.rwth.idsg.steve.ocpp.ws.ocpp12.Ocpp12WebSocketEndpoint">
+<area shape="rect" id="node2" href="$classde_1_1rwth_1_1idsg_1_1steve_1_1ocpp_1_1ws_1_1_abstract_web_socket_endpoint.html" title="de.rwth.idsg.steve.ocpp.ws.\lAbstractWebSocketEndpoint" alt="" coords="81,113,271,154"/>
+<area shape="rect" id="node4" href="$interfacede_1_1rwth_1_1idsg_1_1steve_1_1ocpp_1_1ws_1_1pipeline_1_1_pipeline.html" title="de.rwth.idsg.steve.ocpp.ws.pipeline.\lPipeline" alt="" coords="164,6,397,47"/>
+</map>

@@ -1,0 +1,4 @@
+<map id="de.rwth.idsg.steve.service.ChargePointService12_Client.remoteStopTransaction" name="de.rwth.idsg.steve.service.ChargePointService12_Client.remoteStopTransaction">
+<area shape="rect" id="node2" href="$classde_1_1rwth_1_1idsg_1_1steve_1_1service_1_1_charge_point_service12___dispatcher.html#a5f6866aa5df77bdde54f536f006c35be" title="de.rwth.idsg.steve.service.\lChargePointService12_Dispatcher.remote\lStopTransaction" alt="" coords="291,4,557,60"/>
+<area shape="rect" id="node3" href="$classde_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1dto_1_1_charge_point_select.html#abc2c6a1b288106f9a82dd089df66b6f7" title="de.rwth.idsg.steve.repository.dto.\lChargePointSelect.isSoap" alt="" coords="605,11,821,53"/>
+</map>

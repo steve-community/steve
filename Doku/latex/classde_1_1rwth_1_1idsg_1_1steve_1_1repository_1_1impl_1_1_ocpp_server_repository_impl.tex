@@ -1,0 +1,203 @@
+\hypertarget{classde_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1impl_1_1_ocpp_server_repository_impl}{\section{de.\-rwth.\-idsg.\-steve.\-repository.\-impl.\-Ocpp\-Server\-Repository\-Impl Klassenreferenz}
+\label{classde_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1impl_1_1_ocpp_server_repository_impl}\index{de.\-rwth.\-idsg.\-steve.\-repository.\-impl.\-Ocpp\-Server\-Repository\-Impl@{de.\-rwth.\-idsg.\-steve.\-repository.\-impl.\-Ocpp\-Server\-Repository\-Impl}}
+}
+
+
+Klassendiagramm für de.\-rwth.\-idsg.\-steve.\-repository.\-impl.\-Ocpp\-Server\-Repository\-Impl\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=246pt]{classde_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1impl_1_1_ocpp_server_repository_impl__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Zusammengehörigkeiten von de.\-rwth.\-idsg.\-steve.\-repository.\-impl.\-Ocpp\-Server\-Repository\-Impl\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=246pt]{classde_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1impl_1_1_ocpp_server_repository_impl__coll__graph}
+\end{center}
+\end{figure}
+\subsection*{Öffentliche Methoden}
+\begin{DoxyCompactItemize}
+\item 
+boolean \hyperlink{classde_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1impl_1_1_ocpp_server_repository_impl_a8a6af4bdd226d03394906cbe1ee26431}{update\-Chargebox} (\hyperlink{classde_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1dto_1_1_update_chargebox_params}{Update\-Chargebox\-Params} p)
+\item 
+void \hyperlink{classde_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1impl_1_1_ocpp_server_repository_impl_a4bab9da9bfcb1394161a9d5b50859881}{update\-Endpoint\-Address} (String charge\-Box\-Identity, String endpoint\-Address)
+\item 
+void \hyperlink{classde_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1impl_1_1_ocpp_server_repository_impl_a01bd5b6f34c5de868fd8e2f57ac18b5d}{update\-Chargebox\-Firmware\-Status} (String charge\-Box\-Identity, String firmware\-Status)
+\item 
+void \hyperlink{classde_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1impl_1_1_ocpp_server_repository_impl_ae09274da510b22df794c2e4fe168ae0b}{update\-Chargebox\-Diagnostics\-Status} (String charge\-Box\-Identity, String status)
+\item 
+void \hyperlink{classde_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1impl_1_1_ocpp_server_repository_impl_a30a2fc673e5c7c67009447de462188b2}{update\-Chargebox\-Heartbeat} (String charge\-Box\-Identity, Date\-Time ts)
+\item 
+void \hyperlink{classde_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1impl_1_1_ocpp_server_repository_impl_ad53e1987f311f7f3de83a21c41980ae5}{insert\-Connector\-Status} (\hyperlink{classde_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1dto_1_1_insert_connector_status_params}{Insert\-Connector\-Status\-Params} p)
+\item 
+void \hyperlink{classde_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1impl_1_1_ocpp_server_repository_impl_aa077567a348b5c128c27dfe868fa937b}{insert\-Meter\-Values12} (final String charge\-Box\-Identity, final int connector\-Id, final List$<$ ocpp.\-cs.\-\_\-2010.\-\_\-08.\-Meter\-Value $>$ list)
+\item 
+void \hyperlink{classde_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1impl_1_1_ocpp_server_repository_impl_a5b59717a6129594b353d8ef93818156b}{insert\-Meter\-Values15} (final String charge\-Box\-Identity, final int connector\-Id, final List$<$ ocpp.\-cs.\-\_\-2012.\-\_\-06.\-Meter\-Value $>$ list, final Integer transaction\-Id)
+\item 
+void \hyperlink{classde_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1impl_1_1_ocpp_server_repository_impl_a1f019ba19371134836f429d50f8e3531}{insert\-Meter\-Values\-Of\-Transaction} (String charge\-Box\-Identity, final int transaction\-Id, final List$<$ Meter\-Value $>$ list)
+\item 
+Integer \hyperlink{classde_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1impl_1_1_ocpp_server_repository_impl_aee738d89085b14d44096000d52625f83}{insert\-Transaction} (\hyperlink{classde_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1dto_1_1_insert_transaction_params}{Insert\-Transaction\-Params} p)
+\item 
+void \hyperlink{classde_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1impl_1_1_ocpp_server_repository_impl_a09d464e362b67cc329474a42fe7339e4}{update\-Transaction} (int transaction\-Id, Date\-Time stop\-Timestamp, String stop\-Meter\-Value)
+\end{DoxyCompactItemize}
+
+
+\subsection{Ausführliche Beschreibung}
+This class has methods for database access that are used by the O\-C\-P\-P service.
+
+\href{http://www.jooq.org/doc/3.4/manual/sql-execution/transaction-management/}{\tt http\-://www.\-jooq.\-org/doc/3.\-4/manual/sql-\/execution/transaction-\/management/}
+
+\begin{DoxyAuthor}{Autor}
+Sevket Goekay \href{mailto:goekay@dbis.rwth-aachen.de}{\tt goekay@dbis.\-rwth-\/aachen.\-de} 
+\end{DoxyAuthor}
+
+
+\subsection{Dokumentation der Elementfunktionen}
+\hypertarget{classde_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1impl_1_1_ocpp_server_repository_impl_ad53e1987f311f7f3de83a21c41980ae5}{\index{de\-::rwth\-::idsg\-::steve\-::repository\-::impl\-::\-Ocpp\-Server\-Repository\-Impl@{de\-::rwth\-::idsg\-::steve\-::repository\-::impl\-::\-Ocpp\-Server\-Repository\-Impl}!insert\-Connector\-Status@{insert\-Connector\-Status}}
+\index{insert\-Connector\-Status@{insert\-Connector\-Status}!de::rwth::idsg::steve::repository::impl::OcppServerRepositoryImpl@{de\-::rwth\-::idsg\-::steve\-::repository\-::impl\-::\-Ocpp\-Server\-Repository\-Impl}}
+\subsubsection[{insert\-Connector\-Status}]{\setlength{\rightskip}{0pt plus 5cm}void de.\-rwth.\-idsg.\-steve.\-repository.\-impl.\-Ocpp\-Server\-Repository\-Impl.\-insert\-Connector\-Status (
+\begin{DoxyParamCaption}
+\item[{{\bf Insert\-Connector\-Status\-Params}}]{p}
+\end{DoxyParamCaption}
+)}}\label{classde_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1impl_1_1_ocpp_server_repository_impl_ad53e1987f311f7f3de83a21c41980ae5}
+
+
+Implementiert \hyperlink{interfacede_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1_ocpp_server_repository_a169110fec80f4bca57c1c9ec39a8d104}{de.\-rwth.\-idsg.\-steve.\-repository.\-Ocpp\-Server\-Repository}.
+
+\hypertarget{classde_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1impl_1_1_ocpp_server_repository_impl_aa077567a348b5c128c27dfe868fa937b}{\index{de\-::rwth\-::idsg\-::steve\-::repository\-::impl\-::\-Ocpp\-Server\-Repository\-Impl@{de\-::rwth\-::idsg\-::steve\-::repository\-::impl\-::\-Ocpp\-Server\-Repository\-Impl}!insert\-Meter\-Values12@{insert\-Meter\-Values12}}
+\index{insert\-Meter\-Values12@{insert\-Meter\-Values12}!de::rwth::idsg::steve::repository::impl::OcppServerRepositoryImpl@{de\-::rwth\-::idsg\-::steve\-::repository\-::impl\-::\-Ocpp\-Server\-Repository\-Impl}}
+\subsubsection[{insert\-Meter\-Values12}]{\setlength{\rightskip}{0pt plus 5cm}void de.\-rwth.\-idsg.\-steve.\-repository.\-impl.\-Ocpp\-Server\-Repository\-Impl.\-insert\-Meter\-Values12 (
+\begin{DoxyParamCaption}
+\item[{final String}]{charge\-Box\-Identity, }
+\item[{final int}]{connector\-Id, }
+\item[{final List$<$ ocpp.\-cs.\-\_\-2010.\-\_\-08.\-Meter\-Value $>$}]{list}
+\end{DoxyParamCaption}
+)}}\label{classde_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1impl_1_1_ocpp_server_repository_impl_aa077567a348b5c128c27dfe868fa937b}
+\hypertarget{classde_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1impl_1_1_ocpp_server_repository_impl_a5b59717a6129594b353d8ef93818156b}{\index{de\-::rwth\-::idsg\-::steve\-::repository\-::impl\-::\-Ocpp\-Server\-Repository\-Impl@{de\-::rwth\-::idsg\-::steve\-::repository\-::impl\-::\-Ocpp\-Server\-Repository\-Impl}!insert\-Meter\-Values15@{insert\-Meter\-Values15}}
+\index{insert\-Meter\-Values15@{insert\-Meter\-Values15}!de::rwth::idsg::steve::repository::impl::OcppServerRepositoryImpl@{de\-::rwth\-::idsg\-::steve\-::repository\-::impl\-::\-Ocpp\-Server\-Repository\-Impl}}
+\subsubsection[{insert\-Meter\-Values15}]{\setlength{\rightskip}{0pt plus 5cm}void de.\-rwth.\-idsg.\-steve.\-repository.\-impl.\-Ocpp\-Server\-Repository\-Impl.\-insert\-Meter\-Values15 (
+\begin{DoxyParamCaption}
+\item[{final String}]{charge\-Box\-Identity, }
+\item[{final int}]{connector\-Id, }
+\item[{final List$<$ ocpp.\-cs.\-\_\-2012.\-\_\-06.\-Meter\-Value $>$}]{list, }
+\item[{final Integer}]{transaction\-Id}
+\end{DoxyParamCaption}
+)}}\label{classde_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1impl_1_1_ocpp_server_repository_impl_a5b59717a6129594b353d8ef93818156b}
+\hypertarget{classde_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1impl_1_1_ocpp_server_repository_impl_a1f019ba19371134836f429d50f8e3531}{\index{de\-::rwth\-::idsg\-::steve\-::repository\-::impl\-::\-Ocpp\-Server\-Repository\-Impl@{de\-::rwth\-::idsg\-::steve\-::repository\-::impl\-::\-Ocpp\-Server\-Repository\-Impl}!insert\-Meter\-Values\-Of\-Transaction@{insert\-Meter\-Values\-Of\-Transaction}}
+\index{insert\-Meter\-Values\-Of\-Transaction@{insert\-Meter\-Values\-Of\-Transaction}!de::rwth::idsg::steve::repository::impl::OcppServerRepositoryImpl@{de\-::rwth\-::idsg\-::steve\-::repository\-::impl\-::\-Ocpp\-Server\-Repository\-Impl}}
+\subsubsection[{insert\-Meter\-Values\-Of\-Transaction}]{\setlength{\rightskip}{0pt plus 5cm}void de.\-rwth.\-idsg.\-steve.\-repository.\-impl.\-Ocpp\-Server\-Repository\-Impl.\-insert\-Meter\-Values\-Of\-Transaction (
+\begin{DoxyParamCaption}
+\item[{String}]{charge\-Box\-Identity, }
+\item[{final int}]{transaction\-Id, }
+\item[{final List$<$ Meter\-Value $>$}]{list}
+\end{DoxyParamCaption}
+)}}\label{classde_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1impl_1_1_ocpp_server_repository_impl_a1f019ba19371134836f429d50f8e3531}
+\hypertarget{classde_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1impl_1_1_ocpp_server_repository_impl_aee738d89085b14d44096000d52625f83}{\index{de\-::rwth\-::idsg\-::steve\-::repository\-::impl\-::\-Ocpp\-Server\-Repository\-Impl@{de\-::rwth\-::idsg\-::steve\-::repository\-::impl\-::\-Ocpp\-Server\-Repository\-Impl}!insert\-Transaction@{insert\-Transaction}}
+\index{insert\-Transaction@{insert\-Transaction}!de::rwth::idsg::steve::repository::impl::OcppServerRepositoryImpl@{de\-::rwth\-::idsg\-::steve\-::repository\-::impl\-::\-Ocpp\-Server\-Repository\-Impl}}
+\subsubsection[{insert\-Transaction}]{\setlength{\rightskip}{0pt plus 5cm}Integer de.\-rwth.\-idsg.\-steve.\-repository.\-impl.\-Ocpp\-Server\-Repository\-Impl.\-insert\-Transaction (
+\begin{DoxyParamCaption}
+\item[{{\bf Insert\-Transaction\-Params}}]{p}
+\end{DoxyParamCaption}
+)}}\label{classde_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1impl_1_1_ocpp_server_repository_impl_aee738d89085b14d44096000d52625f83}
+
+
+Implementiert \hyperlink{interfacede_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1_ocpp_server_repository_a28c95d09c873505d4816c6b6a946df1b}{de.\-rwth.\-idsg.\-steve.\-repository.\-Ocpp\-Server\-Repository}.
+
+
+
+Hier ist ein Graph, der zeigt, was diese Funktion aufruft\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classde_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1impl_1_1_ocpp_server_repository_impl_aee738d89085b14d44096000d52625f83_cgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classde_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1impl_1_1_ocpp_server_repository_impl_a8a6af4bdd226d03394906cbe1ee26431}{\index{de\-::rwth\-::idsg\-::steve\-::repository\-::impl\-::\-Ocpp\-Server\-Repository\-Impl@{de\-::rwth\-::idsg\-::steve\-::repository\-::impl\-::\-Ocpp\-Server\-Repository\-Impl}!update\-Chargebox@{update\-Chargebox}}
+\index{update\-Chargebox@{update\-Chargebox}!de::rwth::idsg::steve::repository::impl::OcppServerRepositoryImpl@{de\-::rwth\-::idsg\-::steve\-::repository\-::impl\-::\-Ocpp\-Server\-Repository\-Impl}}
+\subsubsection[{update\-Chargebox}]{\setlength{\rightskip}{0pt plus 5cm}boolean de.\-rwth.\-idsg.\-steve.\-repository.\-impl.\-Ocpp\-Server\-Repository\-Impl.\-update\-Chargebox (
+\begin{DoxyParamCaption}
+\item[{{\bf Update\-Chargebox\-Params}}]{params}
+\end{DoxyParamCaption}
+)}}\label{classde_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1impl_1_1_ocpp_server_repository_impl_a8a6af4bdd226d03394906cbe1ee26431}
+One D\-B call with two functions\-:
+
+
+\begin{DoxyEnumerate}
+\item Update all fields with the exception of charge\-Box\-Id, so that initially it is enough to register a chargebox with its I\-D in D\-B. During boot, the chargebox provides missing information which might be updated (for ex\-: firmware)
+\item If the chargebox not registered =$>$ no chargeboxes to update =$>$ updated/returned row count = 0 
+\end{DoxyEnumerate}
+
+Implementiert \hyperlink{interfacede_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1_ocpp_server_repository_a48075ea356efeaab5fd480088a32e688}{de.\-rwth.\-idsg.\-steve.\-repository.\-Ocpp\-Server\-Repository}.
+
+\hypertarget{classde_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1impl_1_1_ocpp_server_repository_impl_ae09274da510b22df794c2e4fe168ae0b}{\index{de\-::rwth\-::idsg\-::steve\-::repository\-::impl\-::\-Ocpp\-Server\-Repository\-Impl@{de\-::rwth\-::idsg\-::steve\-::repository\-::impl\-::\-Ocpp\-Server\-Repository\-Impl}!update\-Chargebox\-Diagnostics\-Status@{update\-Chargebox\-Diagnostics\-Status}}
+\index{update\-Chargebox\-Diagnostics\-Status@{update\-Chargebox\-Diagnostics\-Status}!de::rwth::idsg::steve::repository::impl::OcppServerRepositoryImpl@{de\-::rwth\-::idsg\-::steve\-::repository\-::impl\-::\-Ocpp\-Server\-Repository\-Impl}}
+\subsubsection[{update\-Chargebox\-Diagnostics\-Status}]{\setlength{\rightskip}{0pt plus 5cm}void de.\-rwth.\-idsg.\-steve.\-repository.\-impl.\-Ocpp\-Server\-Repository\-Impl.\-update\-Chargebox\-Diagnostics\-Status (
+\begin{DoxyParamCaption}
+\item[{String}]{charge\-Box\-Identity, }
+\item[{String}]{status}
+\end{DoxyParamCaption}
+)}}\label{classde_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1impl_1_1_ocpp_server_repository_impl_ae09274da510b22df794c2e4fe168ae0b}
+
+
+Implementiert \hyperlink{interfacede_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1_ocpp_server_repository_ade86b237d803f260a241497a561a96c0}{de.\-rwth.\-idsg.\-steve.\-repository.\-Ocpp\-Server\-Repository}.
+
+\hypertarget{classde_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1impl_1_1_ocpp_server_repository_impl_a01bd5b6f34c5de868fd8e2f57ac18b5d}{\index{de\-::rwth\-::idsg\-::steve\-::repository\-::impl\-::\-Ocpp\-Server\-Repository\-Impl@{de\-::rwth\-::idsg\-::steve\-::repository\-::impl\-::\-Ocpp\-Server\-Repository\-Impl}!update\-Chargebox\-Firmware\-Status@{update\-Chargebox\-Firmware\-Status}}
+\index{update\-Chargebox\-Firmware\-Status@{update\-Chargebox\-Firmware\-Status}!de::rwth::idsg::steve::repository::impl::OcppServerRepositoryImpl@{de\-::rwth\-::idsg\-::steve\-::repository\-::impl\-::\-Ocpp\-Server\-Repository\-Impl}}
+\subsubsection[{update\-Chargebox\-Firmware\-Status}]{\setlength{\rightskip}{0pt plus 5cm}void de.\-rwth.\-idsg.\-steve.\-repository.\-impl.\-Ocpp\-Server\-Repository\-Impl.\-update\-Chargebox\-Firmware\-Status (
+\begin{DoxyParamCaption}
+\item[{String}]{charge\-Box\-Identity, }
+\item[{String}]{firmware\-Status}
+\end{DoxyParamCaption}
+)}}\label{classde_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1impl_1_1_ocpp_server_repository_impl_a01bd5b6f34c5de868fd8e2f57ac18b5d}
+
+
+Implementiert \hyperlink{interfacede_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1_ocpp_server_repository_afbd7ab89a03cb005ab824b3ce84fbc30}{de.\-rwth.\-idsg.\-steve.\-repository.\-Ocpp\-Server\-Repository}.
+
+\hypertarget{classde_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1impl_1_1_ocpp_server_repository_impl_a30a2fc673e5c7c67009447de462188b2}{\index{de\-::rwth\-::idsg\-::steve\-::repository\-::impl\-::\-Ocpp\-Server\-Repository\-Impl@{de\-::rwth\-::idsg\-::steve\-::repository\-::impl\-::\-Ocpp\-Server\-Repository\-Impl}!update\-Chargebox\-Heartbeat@{update\-Chargebox\-Heartbeat}}
+\index{update\-Chargebox\-Heartbeat@{update\-Chargebox\-Heartbeat}!de::rwth::idsg::steve::repository::impl::OcppServerRepositoryImpl@{de\-::rwth\-::idsg\-::steve\-::repository\-::impl\-::\-Ocpp\-Server\-Repository\-Impl}}
+\subsubsection[{update\-Chargebox\-Heartbeat}]{\setlength{\rightskip}{0pt plus 5cm}void de.\-rwth.\-idsg.\-steve.\-repository.\-impl.\-Ocpp\-Server\-Repository\-Impl.\-update\-Chargebox\-Heartbeat (
+\begin{DoxyParamCaption}
+\item[{String}]{charge\-Box\-Identity, }
+\item[{Date\-Time}]{ts}
+\end{DoxyParamCaption}
+)}}\label{classde_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1impl_1_1_ocpp_server_repository_impl_a30a2fc673e5c7c67009447de462188b2}
+
+
+Implementiert \hyperlink{interfacede_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1_ocpp_server_repository_a8454728b389fe9bd86522d8d5c6199e2}{de.\-rwth.\-idsg.\-steve.\-repository.\-Ocpp\-Server\-Repository}.
+
+\hypertarget{classde_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1impl_1_1_ocpp_server_repository_impl_a4bab9da9bfcb1394161a9d5b50859881}{\index{de\-::rwth\-::idsg\-::steve\-::repository\-::impl\-::\-Ocpp\-Server\-Repository\-Impl@{de\-::rwth\-::idsg\-::steve\-::repository\-::impl\-::\-Ocpp\-Server\-Repository\-Impl}!update\-Endpoint\-Address@{update\-Endpoint\-Address}}
+\index{update\-Endpoint\-Address@{update\-Endpoint\-Address}!de::rwth::idsg::steve::repository::impl::OcppServerRepositoryImpl@{de\-::rwth\-::idsg\-::steve\-::repository\-::impl\-::\-Ocpp\-Server\-Repository\-Impl}}
+\subsubsection[{update\-Endpoint\-Address}]{\setlength{\rightskip}{0pt plus 5cm}void de.\-rwth.\-idsg.\-steve.\-repository.\-impl.\-Ocpp\-Server\-Repository\-Impl.\-update\-Endpoint\-Address (
+\begin{DoxyParamCaption}
+\item[{String}]{charge\-Box\-Identity, }
+\item[{String}]{endpoint\-Address}
+\end{DoxyParamCaption}
+)}}\label{classde_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1impl_1_1_ocpp_server_repository_impl_a4bab9da9bfcb1394161a9d5b50859881}
+
+
+Implementiert \hyperlink{interfacede_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1_ocpp_server_repository_abf41cab95009f461986a611f43e3f226}{de.\-rwth.\-idsg.\-steve.\-repository.\-Ocpp\-Server\-Repository}.
+
+\hypertarget{classde_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1impl_1_1_ocpp_server_repository_impl_a09d464e362b67cc329474a42fe7339e4}{\index{de\-::rwth\-::idsg\-::steve\-::repository\-::impl\-::\-Ocpp\-Server\-Repository\-Impl@{de\-::rwth\-::idsg\-::steve\-::repository\-::impl\-::\-Ocpp\-Server\-Repository\-Impl}!update\-Transaction@{update\-Transaction}}
+\index{update\-Transaction@{update\-Transaction}!de::rwth::idsg::steve::repository::impl::OcppServerRepositoryImpl@{de\-::rwth\-::idsg\-::steve\-::repository\-::impl\-::\-Ocpp\-Server\-Repository\-Impl}}
+\subsubsection[{update\-Transaction}]{\setlength{\rightskip}{0pt plus 5cm}void de.\-rwth.\-idsg.\-steve.\-repository.\-impl.\-Ocpp\-Server\-Repository\-Impl.\-update\-Transaction (
+\begin{DoxyParamCaption}
+\item[{int}]{transaction\-Id, }
+\item[{Date\-Time}]{stop\-Timestamp, }
+\item[{String}]{stop\-Meter\-Value}
+\end{DoxyParamCaption}
+)}}\label{classde_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1impl_1_1_ocpp_server_repository_impl_a09d464e362b67cc329474a42fe7339e4}
+After update, a D\-B trigger sets the user.\-in\-Transaction field to 0 
+
+Implementiert \hyperlink{interfacede_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1_ocpp_server_repository_a28a5a4ade29b669cfe501e345babfa9b}{de.\-rwth.\-idsg.\-steve.\-repository.\-Ocpp\-Server\-Repository}.
+
+
+
+Die Dokumentation für diese Klasse wurde erzeugt aufgrund der Datei\-:\begin{DoxyCompactItemize}
+\item 
+src/main/java/de/rwth/idsg/steve/repository/impl/\hyperlink{_ocpp_server_repository_impl_8java}{Ocpp\-Server\-Repository\-Impl.\-java}\end{DoxyCompactItemize}

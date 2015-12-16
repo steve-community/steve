@@ -1,0 +1,936 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=9"/>
+<meta name="generator" content="Doxygen 1.8.6"/>
+<title>SteVe: de.rwth.idsg.steve.web.controller.Ocpp15Controller Klassenreferenz</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="resize.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+<script type="text/javascript">
+  $(document).ready(initResizable);
+  $(window).load(resizeHeight);
+</script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/search.js"></script>
+<script type="text/javascript">
+  $(document).ready(function() { searchBox.OnSelectItem(0); });
+</script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr style="height: 56px;">
+  <td id="projectlogo"><img alt="Logo" src="logo.png"/></td>
+  <td style="padding-left: 0.5em;">
+   <div id="projectname">SteVe
+   &#160;<span id="projectnumber">2.0.4</span>
+   </div>
+   <div id="projectbrief">Steckdosenverwaltung</div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- Erzeugt von Doxygen 1.8.6 -->
+<script type="text/javascript">
+var searchBox = new SearchBox("searchBox", "search",false,'Suchen');
+</script>
+  <div id="navrow1" class="tabs">
+    <ul class="tablist">
+      <li><a href="index.html"><span>Hauptseite</span></a></li>
+      <li><a href="namespaces.html"><span>Pakete</span></a></li>
+      <li class="current"><a href="annotated.html"><span>Klassen</span></a></li>
+      <li><a href="files.html"><span>Dateien</span></a></li>
+      <li>
+        <div id="MSearchBox" class="MSearchBoxInactive">
+        <span class="left">
+          <img id="MSearchSelect" src="search/mag_sel.png"
+               onmouseover="return searchBox.OnSearchSelectShow()"
+               onmouseout="return searchBox.OnSearchSelectHide()"
+               alt=""/>
+          <input type="text" id="MSearchField" value="Suchen" accesskey="S"
+               onfocus="searchBox.OnSearchFieldFocus(true)" 
+               onblur="searchBox.OnSearchFieldFocus(false)" 
+               onkeyup="searchBox.OnSearchFieldChange(event)"/>
+          </span><span class="right">
+            <a id="MSearchClose" href="javascript:searchBox.CloseResultsWindow()"><img id="MSearchCloseImg" border="0" src="search/close.png" alt=""/></a>
+          </span>
+        </div>
+      </li>
+    </ul>
+  </div>
+  <div id="navrow2" class="tabs2">
+    <ul class="tablist">
+      <li><a href="annotated.html"><span>Auflistung&#160;der&#160;Klassen</span></a></li>
+      <li><a href="classes.html"><span>Klassen-Verzeichnis</span></a></li>
+      <li><a href="inherits.html"><span>Klassenhierarchie</span></a></li>
+      <li><a href="functions.html"><span>Klassen-Elemente</span></a></li>
+    </ul>
+  </div>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
+  </div>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
+  </div>
+</div>
+<script type="text/javascript">
+$(document).ready(function(){initNavTree('classde_1_1rwth_1_1idsg_1_1steve_1_1web_1_1controller_1_1_ocpp15_controller.html','');});
+</script>
+<div id="doc-content">
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>Alle</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Klassen</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Namensbereiche</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Dateien</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Funktionen</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Variablen</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Aufzählungswerte</a></div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<iframe src="javascript:void(0)" frameborder="0" 
+        name="MSearchResults" id="MSearchResults">
+</iframe>
+</div>
+
+<div class="header">
+  <div class="summary">
+<a href="#pub-methods">Öffentliche Methoden</a> &#124;
+<a href="classde_1_1rwth_1_1idsg_1_1steve_1_1web_1_1controller_1_1_ocpp15_controller-members.html">Aufstellung aller Elemente</a>  </div>
+  <div class="headertitle">
+<div class="title">de.rwth.idsg.steve.web.controller.Ocpp15Controller Klassenreferenz</div>  </div>
+</div><!--header-->
+<div class="contents">
+<table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
+Öffentliche Methoden</h2></td></tr>
+<tr class="memitem:a3481986f86b5be140f826831bb3d676c"><td class="memItemLeft" align="right" valign="top">String&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classde_1_1rwth_1_1idsg_1_1steve_1_1web_1_1controller_1_1_ocpp15_controller.html#a3481986f86b5be140f826831bb3d676c">getBase</a> ()</td></tr>
+<tr class="separator:a3481986f86b5be140f826831bb3d676c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad481884cd9548303aa7c58c25cc63b4c"><td class="memItemLeft" align="right" valign="top">String&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classde_1_1rwth_1_1idsg_1_1steve_1_1web_1_1controller_1_1_ocpp15_controller.html#ad481884cd9548303aa7c58c25cc63b4c">getChangeAvail</a> (Model model)</td></tr>
+<tr class="separator:ad481884cd9548303aa7c58c25cc63b4c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a119be5f24d02c49bcb3a95b0ab405891"><td class="memItemLeft" align="right" valign="top">String&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classde_1_1rwth_1_1idsg_1_1steve_1_1web_1_1controller_1_1_ocpp15_controller.html#a119be5f24d02c49bcb3a95b0ab405891">getChangeConf</a> (Model model)</td></tr>
+<tr class="separator:a119be5f24d02c49bcb3a95b0ab405891"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad6a7442824690cff245c1754a72428f4"><td class="memItemLeft" align="right" valign="top">String&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classde_1_1rwth_1_1idsg_1_1steve_1_1web_1_1controller_1_1_ocpp15_controller.html#ad6a7442824690cff245c1754a72428f4">getClearCache</a> (Model model)</td></tr>
+<tr class="separator:ad6a7442824690cff245c1754a72428f4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a361159deccf7c0e6e219ae4e8601ccc5"><td class="memItemLeft" align="right" valign="top">String&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classde_1_1rwth_1_1idsg_1_1steve_1_1web_1_1controller_1_1_ocpp15_controller.html#a361159deccf7c0e6e219ae4e8601ccc5">getGetDiag</a> (Model model)</td></tr>
+<tr class="separator:a361159deccf7c0e6e219ae4e8601ccc5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5fb2eea1de5be3c4afce79b33fc1f581"><td class="memItemLeft" align="right" valign="top">String&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classde_1_1rwth_1_1idsg_1_1steve_1_1web_1_1controller_1_1_ocpp15_controller.html#a5fb2eea1de5be3c4afce79b33fc1f581">getRemoteStartTx</a> (Model model)</td></tr>
+<tr class="separator:a5fb2eea1de5be3c4afce79b33fc1f581"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3b350258a32396ee42446a227c215446"><td class="memItemLeft" align="right" valign="top">String&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classde_1_1rwth_1_1idsg_1_1steve_1_1web_1_1controller_1_1_ocpp15_controller.html#a3b350258a32396ee42446a227c215446">getRemoteStopTx</a> (Model model)</td></tr>
+<tr class="separator:a3b350258a32396ee42446a227c215446"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a762c40d8f5a71064fbd6e019b409ee02"><td class="memItemLeft" align="right" valign="top">String&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classde_1_1rwth_1_1idsg_1_1steve_1_1web_1_1controller_1_1_ocpp15_controller.html#a762c40d8f5a71064fbd6e019b409ee02">getReset</a> (Model model)</td></tr>
+<tr class="separator:a762c40d8f5a71064fbd6e019b409ee02"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7d438dd47d85d3c9f1dc1c8f806fdc39"><td class="memItemLeft" align="right" valign="top">String&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classde_1_1rwth_1_1idsg_1_1steve_1_1web_1_1controller_1_1_ocpp15_controller.html#a7d438dd47d85d3c9f1dc1c8f806fdc39">getUnlockCon</a> (Model model)</td></tr>
+<tr class="separator:a7d438dd47d85d3c9f1dc1c8f806fdc39"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abbd25891039a971d12dd168ff41d62d2"><td class="memItemLeft" align="right" valign="top">String&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classde_1_1rwth_1_1idsg_1_1steve_1_1web_1_1controller_1_1_ocpp15_controller.html#abbd25891039a971d12dd168ff41d62d2">getUpdateFirm</a> (Model model)</td></tr>
+<tr class="separator:abbd25891039a971d12dd168ff41d62d2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9ca5f5a51a04291f02d36cdc997f5424"><td class="memItemLeft" align="right" valign="top">String&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classde_1_1rwth_1_1idsg_1_1steve_1_1web_1_1controller_1_1_ocpp15_controller.html#a9ca5f5a51a04291f02d36cdc997f5424">getReserveNow</a> (Model model)</td></tr>
+<tr class="separator:a9ca5f5a51a04291f02d36cdc997f5424"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6f60b7bd2cc240f33cd0428e0ba22d48"><td class="memItemLeft" align="right" valign="top">String&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classde_1_1rwth_1_1idsg_1_1steve_1_1web_1_1controller_1_1_ocpp15_controller.html#a6f60b7bd2cc240f33cd0428e0ba22d48">getCancelReserv</a> (Model model)</td></tr>
+<tr class="separator:a6f60b7bd2cc240f33cd0428e0ba22d48"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6c30b64fcd1d51f7e07601d53328ae40"><td class="memItemLeft" align="right" valign="top">String&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classde_1_1rwth_1_1idsg_1_1steve_1_1web_1_1controller_1_1_ocpp15_controller.html#a6c30b64fcd1d51f7e07601d53328ae40">getDataTransfer</a> (Model model)</td></tr>
+<tr class="separator:a6c30b64fcd1d51f7e07601d53328ae40"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3082a555e44506461f53a079ea49a5d5"><td class="memItemLeft" align="right" valign="top">String&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classde_1_1rwth_1_1idsg_1_1steve_1_1web_1_1controller_1_1_ocpp15_controller.html#a3082a555e44506461f53a079ea49a5d5">getGetConf</a> (Model model)</td></tr>
+<tr class="separator:a3082a555e44506461f53a079ea49a5d5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5642b728ccf142aac65269bdf1d1252d"><td class="memItemLeft" align="right" valign="top">String&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classde_1_1rwth_1_1idsg_1_1steve_1_1web_1_1controller_1_1_ocpp15_controller.html#a5642b728ccf142aac65269bdf1d1252d">getListVersion</a> (Model model)</td></tr>
+<tr class="separator:a5642b728ccf142aac65269bdf1d1252d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a08bb9d23d18ef3d73b58bfd4d19abb5d"><td class="memItemLeft" align="right" valign="top">String&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classde_1_1rwth_1_1idsg_1_1steve_1_1web_1_1controller_1_1_ocpp15_controller.html#a08bb9d23d18ef3d73b58bfd4d19abb5d">getSendList</a> (Model model)</td></tr>
+<tr class="separator:a08bb9d23d18ef3d73b58bfd4d19abb5d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab0b8784fb93aa4060bac7b0620a5d1d1"><td class="memItemLeft" align="right" valign="top">String&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classde_1_1rwth_1_1idsg_1_1steve_1_1web_1_1controller_1_1_ocpp15_controller.html#ab0b8784fb93aa4060bac7b0620a5d1d1">postChangeAvail</a> (@Valid @ModelAttribute(PARAMS) <a class="el" href="classde_1_1rwth_1_1idsg_1_1steve_1_1web_1_1dto_1_1ocpp12_1_1_change_availability_params.html">ChangeAvailabilityParams</a> params, BindingResult result, Model model)</td></tr>
+<tr class="separator:ab0b8784fb93aa4060bac7b0620a5d1d1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af68f700ce39665d52d076a055ac0727d"><td class="memItemLeft" align="right" valign="top">String&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classde_1_1rwth_1_1idsg_1_1steve_1_1web_1_1controller_1_1_ocpp15_controller.html#af68f700ce39665d52d076a055ac0727d">postChangeConf</a> (@Valid @ModelAttribute(PARAMS) <a class="el" href="classde_1_1rwth_1_1idsg_1_1steve_1_1web_1_1dto_1_1ocpp12_1_1_change_configuration_params.html">ChangeConfigurationParams</a> params, BindingResult result, Model model)</td></tr>
+<tr class="separator:af68f700ce39665d52d076a055ac0727d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2bdf99bebd3b873418be2166b2735847"><td class="memItemLeft" align="right" valign="top">String&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classde_1_1rwth_1_1idsg_1_1steve_1_1web_1_1controller_1_1_ocpp15_controller.html#a2bdf99bebd3b873418be2166b2735847">postClearCache</a> (@Valid @ModelAttribute(PARAMS) <a class="el" href="classde_1_1rwth_1_1idsg_1_1steve_1_1web_1_1dto_1_1common_1_1_multiple_charge_point_select.html">MultipleChargePointSelect</a> params, BindingResult result, Model model)</td></tr>
+<tr class="separator:a2bdf99bebd3b873418be2166b2735847"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad0c3f0e72697bc9baca7bc6dd57275dc"><td class="memItemLeft" align="right" valign="top">String&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classde_1_1rwth_1_1idsg_1_1steve_1_1web_1_1controller_1_1_ocpp15_controller.html#ad0c3f0e72697bc9baca7bc6dd57275dc">postGetDiag</a> (@Valid @ModelAttribute(PARAMS) <a class="el" href="classde_1_1rwth_1_1idsg_1_1steve_1_1web_1_1dto_1_1common_1_1_get_diagnostics_params.html">GetDiagnosticsParams</a> params, BindingResult result, Model model)</td></tr>
+<tr class="separator:ad0c3f0e72697bc9baca7bc6dd57275dc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9b34f99c6d11adc2426100bdaa5a7dc4"><td class="memItemLeft" align="right" valign="top">String&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classde_1_1rwth_1_1idsg_1_1steve_1_1web_1_1controller_1_1_ocpp15_controller.html#a9b34f99c6d11adc2426100bdaa5a7dc4">postRemoteStartTx</a> (@Valid @ModelAttribute(PARAMS) <a class="el" href="classde_1_1rwth_1_1idsg_1_1steve_1_1web_1_1dto_1_1common_1_1_remote_start_transaction_params.html">RemoteStartTransactionParams</a> params, BindingResult result, Model model)</td></tr>
+<tr class="separator:a9b34f99c6d11adc2426100bdaa5a7dc4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa1de25b8d1bc7ec176f5101cddd9b8a7"><td class="memItemLeft" align="right" valign="top">String&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classde_1_1rwth_1_1idsg_1_1steve_1_1web_1_1controller_1_1_ocpp15_controller.html#aa1de25b8d1bc7ec176f5101cddd9b8a7">postRemoteStopTx</a> (@Valid @ModelAttribute(PARAMS) <a class="el" href="classde_1_1rwth_1_1idsg_1_1steve_1_1web_1_1dto_1_1common_1_1_remote_stop_transaction_params.html">RemoteStopTransactionParams</a> params, BindingResult result, Model model)</td></tr>
+<tr class="separator:aa1de25b8d1bc7ec176f5101cddd9b8a7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac47fd9bffaa0ee91838e94d3dde7c089"><td class="memItemLeft" align="right" valign="top">String&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classde_1_1rwth_1_1idsg_1_1steve_1_1web_1_1controller_1_1_ocpp15_controller.html#ac47fd9bffaa0ee91838e94d3dde7c089">postReset</a> (@Valid @ModelAttribute(PARAMS) <a class="el" href="classde_1_1rwth_1_1idsg_1_1steve_1_1web_1_1dto_1_1ocpp12_1_1_reset_params.html">ResetParams</a> params, BindingResult result, Model model)</td></tr>
+<tr class="separator:ac47fd9bffaa0ee91838e94d3dde7c089"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8ee35af8c62aaece684c921ac178111e"><td class="memItemLeft" align="right" valign="top">String&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classde_1_1rwth_1_1idsg_1_1steve_1_1web_1_1controller_1_1_ocpp15_controller.html#a8ee35af8c62aaece684c921ac178111e">postUnlockCon</a> (@Valid @ModelAttribute(PARAMS) <a class="el" href="classde_1_1rwth_1_1idsg_1_1steve_1_1web_1_1dto_1_1common_1_1_unlock_connector_params.html">UnlockConnectorParams</a> params, BindingResult result, Model model)</td></tr>
+<tr class="separator:a8ee35af8c62aaece684c921ac178111e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:acf67a745349c25372232d980f3bdfc4f"><td class="memItemLeft" align="right" valign="top">String&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classde_1_1rwth_1_1idsg_1_1steve_1_1web_1_1controller_1_1_ocpp15_controller.html#acf67a745349c25372232d980f3bdfc4f">postUpdateFirm</a> (@Valid @ModelAttribute(PARAMS) <a class="el" href="classde_1_1rwth_1_1idsg_1_1steve_1_1web_1_1dto_1_1common_1_1_update_firmware_params.html">UpdateFirmwareParams</a> params, BindingResult result, Model model)</td></tr>
+<tr class="separator:acf67a745349c25372232d980f3bdfc4f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a698e883adcaf3b4f165340d90ee84c2b"><td class="memItemLeft" align="right" valign="top">String&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classde_1_1rwth_1_1idsg_1_1steve_1_1web_1_1controller_1_1_ocpp15_controller.html#a698e883adcaf3b4f165340d90ee84c2b">postReserveNow</a> (@Valid @ModelAttribute(PARAMS) <a class="el" href="classde_1_1rwth_1_1idsg_1_1steve_1_1web_1_1dto_1_1ocpp15_1_1_reserve_now_params.html">ReserveNowParams</a> params, BindingResult result, Model model)</td></tr>
+<tr class="separator:a698e883adcaf3b4f165340d90ee84c2b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4808ec098a5c7a0b7e47e7c78db5403f"><td class="memItemLeft" align="right" valign="top">String&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classde_1_1rwth_1_1idsg_1_1steve_1_1web_1_1controller_1_1_ocpp15_controller.html#a4808ec098a5c7a0b7e47e7c78db5403f">postCancelReserv</a> (@Valid @ModelAttribute(PARAMS) <a class="el" href="classde_1_1rwth_1_1idsg_1_1steve_1_1web_1_1dto_1_1ocpp15_1_1_cancel_reservation_params.html">CancelReservationParams</a> params, BindingResult result, Model model)</td></tr>
+<tr class="separator:a4808ec098a5c7a0b7e47e7c78db5403f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5215a4fd19ab0b8a063f3c5f73d37a96"><td class="memItemLeft" align="right" valign="top">String&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classde_1_1rwth_1_1idsg_1_1steve_1_1web_1_1controller_1_1_ocpp15_controller.html#a5215a4fd19ab0b8a063f3c5f73d37a96">postDataTransfer</a> (@Valid @ModelAttribute(PARAMS) <a class="el" href="classde_1_1rwth_1_1idsg_1_1steve_1_1web_1_1dto_1_1ocpp15_1_1_data_transfer_params.html">DataTransferParams</a> params, BindingResult result, Model model)</td></tr>
+<tr class="separator:a5215a4fd19ab0b8a063f3c5f73d37a96"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a502ca343be380b47b41bf00ca9e99fb2"><td class="memItemLeft" align="right" valign="top">String&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classde_1_1rwth_1_1idsg_1_1steve_1_1web_1_1controller_1_1_ocpp15_controller.html#a502ca343be380b47b41bf00ca9e99fb2">postGetConf</a> (@Valid @ModelAttribute(PARAMS) <a class="el" href="classde_1_1rwth_1_1idsg_1_1steve_1_1web_1_1dto_1_1ocpp15_1_1_get_configuration_params.html">GetConfigurationParams</a> params, BindingResult result, Model model)</td></tr>
+<tr class="separator:a502ca343be380b47b41bf00ca9e99fb2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a59cf8a9a10a1906b87ca423e1c4e470e"><td class="memItemLeft" align="right" valign="top">String&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classde_1_1rwth_1_1idsg_1_1steve_1_1web_1_1controller_1_1_ocpp15_controller.html#a59cf8a9a10a1906b87ca423e1c4e470e">postListVersion</a> (@Valid @ModelAttribute(PARAMS) <a class="el" href="classde_1_1rwth_1_1idsg_1_1steve_1_1web_1_1dto_1_1common_1_1_multiple_charge_point_select.html">MultipleChargePointSelect</a> params, BindingResult result, Model model)</td></tr>
+<tr class="separator:a59cf8a9a10a1906b87ca423e1c4e470e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af537bbbcf063cb6b7e0d2aead2e80311"><td class="memItemLeft" align="right" valign="top">String&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classde_1_1rwth_1_1idsg_1_1steve_1_1web_1_1controller_1_1_ocpp15_controller.html#af537bbbcf063cb6b7e0d2aead2e80311">postSendList</a> (@Valid @ModelAttribute(PARAMS) <a class="el" href="classde_1_1rwth_1_1idsg_1_1steve_1_1web_1_1dto_1_1ocpp15_1_1_send_local_list_params.html">SendLocalListParams</a> params, BindingResult result, Model model)</td></tr>
+<tr class="separator:af537bbbcf063cb6b7e0d2aead2e80311"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table>
+<a name="details" id="details"></a><h2 class="groupheader">Ausführliche Beschreibung</h2>
+<div class="textblock"><dl class="section author"><dt>Autor</dt><dd>Sevket Goekay <a href="#" onclick="location.href='mai'+'lto:'+'goe'+'ka'+'y@d'+'bi'+'s.r'+'wt'+'h-a'+'ac'+'hen'+'.d'+'e'; return false;">goeka<span style="display: none;">.nosp@m.</span>y@db<span style="display: none;">.nosp@m.</span>is.rw<span style="display: none;">.nosp@m.</span>th-a<span style="display: none;">.nosp@m.</span>achen<span style="display: none;">.nosp@m.</span>.de</a> </dd></dl>
+<dl class="section since"><dt>Seit</dt><dd>07.11.2014 </dd></dl>
+</div><h2 class="groupheader">Dokumentation der Elementfunktionen</h2>
+<a class="anchor" id="a3481986f86b5be140f826831bb3d676c"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">String de.rwth.idsg.steve.web.controller.Ocpp15Controller.getBase </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a6f60b7bd2cc240f33cd0428e0ba22d48"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">String de.rwth.idsg.steve.web.controller.Ocpp15Controller.getCancelReserv </td>
+          <td>(</td>
+          <td class="paramtype">Model&#160;</td>
+          <td class="paramname"><em>model</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="ad481884cd9548303aa7c58c25cc63b4c"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">String de.rwth.idsg.steve.web.controller.Ocpp15Controller.getChangeAvail </td>
+          <td>(</td>
+          <td class="paramtype">Model&#160;</td>
+          <td class="paramname"><em>model</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a119be5f24d02c49bcb3a95b0ab405891"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">String de.rwth.idsg.steve.web.controller.Ocpp15Controller.getChangeConf </td>
+          <td>(</td>
+          <td class="paramtype">Model&#160;</td>
+          <td class="paramname"><em>model</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="ad6a7442824690cff245c1754a72428f4"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">String de.rwth.idsg.steve.web.controller.Ocpp15Controller.getClearCache </td>
+          <td>(</td>
+          <td class="paramtype">Model&#160;</td>
+          <td class="paramname"><em>model</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a6c30b64fcd1d51f7e07601d53328ae40"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">String de.rwth.idsg.steve.web.controller.Ocpp15Controller.getDataTransfer </td>
+          <td>(</td>
+          <td class="paramtype">Model&#160;</td>
+          <td class="paramname"><em>model</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a3082a555e44506461f53a079ea49a5d5"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">String de.rwth.idsg.steve.web.controller.Ocpp15Controller.getGetConf </td>
+          <td>(</td>
+          <td class="paramtype">Model&#160;</td>
+          <td class="paramname"><em>model</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a361159deccf7c0e6e219ae4e8601ccc5"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">String de.rwth.idsg.steve.web.controller.Ocpp15Controller.getGetDiag </td>
+          <td>(</td>
+          <td class="paramtype">Model&#160;</td>
+          <td class="paramname"><em>model</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a5642b728ccf142aac65269bdf1d1252d"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">String de.rwth.idsg.steve.web.controller.Ocpp15Controller.getListVersion </td>
+          <td>(</td>
+          <td class="paramtype">Model&#160;</td>
+          <td class="paramname"><em>model</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a5fb2eea1de5be3c4afce79b33fc1f581"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">String de.rwth.idsg.steve.web.controller.Ocpp15Controller.getRemoteStartTx </td>
+          <td>(</td>
+          <td class="paramtype">Model&#160;</td>
+          <td class="paramname"><em>model</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a3b350258a32396ee42446a227c215446"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">String de.rwth.idsg.steve.web.controller.Ocpp15Controller.getRemoteStopTx </td>
+          <td>(</td>
+          <td class="paramtype">Model&#160;</td>
+          <td class="paramname"><em>model</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a9ca5f5a51a04291f02d36cdc997f5424"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">String de.rwth.idsg.steve.web.controller.Ocpp15Controller.getReserveNow </td>
+          <td>(</td>
+          <td class="paramtype">Model&#160;</td>
+          <td class="paramname"><em>model</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a762c40d8f5a71064fbd6e019b409ee02"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">String de.rwth.idsg.steve.web.controller.Ocpp15Controller.getReset </td>
+          <td>(</td>
+          <td class="paramtype">Model&#160;</td>
+          <td class="paramname"><em>model</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a08bb9d23d18ef3d73b58bfd4d19abb5d"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">String de.rwth.idsg.steve.web.controller.Ocpp15Controller.getSendList </td>
+          <td>(</td>
+          <td class="paramtype">Model&#160;</td>
+          <td class="paramname"><em>model</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a7d438dd47d85d3c9f1dc1c8f806fdc39"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">String de.rwth.idsg.steve.web.controller.Ocpp15Controller.getUnlockCon </td>
+          <td>(</td>
+          <td class="paramtype">Model&#160;</td>
+          <td class="paramname"><em>model</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="abbd25891039a971d12dd168ff41d62d2"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">String de.rwth.idsg.steve.web.controller.Ocpp15Controller.getUpdateFirm </td>
+          <td>(</td>
+          <td class="paramtype">Model&#160;</td>
+          <td class="paramname"><em>model</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a4808ec098a5c7a0b7e47e7c78db5403f"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">String de.rwth.idsg.steve.web.controller.Ocpp15Controller.postCancelReserv </td>
+          <td>(</td>
+          <td class="paramtype">@Valid @ModelAttribute(PARAMS) <a class="el" href="classde_1_1rwth_1_1idsg_1_1steve_1_1web_1_1dto_1_1ocpp15_1_1_cancel_reservation_params.html">CancelReservationParams</a>&#160;</td>
+          <td class="paramname"><em>params</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">BindingResult&#160;</td>
+          <td class="paramname"><em>result</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Model&#160;</td>
+          <td class="paramname"><em>model</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="ab0b8784fb93aa4060bac7b0620a5d1d1"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">String de.rwth.idsg.steve.web.controller.Ocpp15Controller.postChangeAvail </td>
+          <td>(</td>
+          <td class="paramtype">@Valid @ModelAttribute(PARAMS) <a class="el" href="classde_1_1rwth_1_1idsg_1_1steve_1_1web_1_1dto_1_1ocpp12_1_1_change_availability_params.html">ChangeAvailabilityParams</a>&#160;</td>
+          <td class="paramname"><em>params</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">BindingResult&#160;</td>
+          <td class="paramname"><em>result</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Model&#160;</td>
+          <td class="paramname"><em>model</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="af68f700ce39665d52d076a055ac0727d"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">String de.rwth.idsg.steve.web.controller.Ocpp15Controller.postChangeConf </td>
+          <td>(</td>
+          <td class="paramtype">@Valid @ModelAttribute(PARAMS) <a class="el" href="classde_1_1rwth_1_1idsg_1_1steve_1_1web_1_1dto_1_1ocpp12_1_1_change_configuration_params.html">ChangeConfigurationParams</a>&#160;</td>
+          <td class="paramname"><em>params</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">BindingResult&#160;</td>
+          <td class="paramname"><em>result</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Model&#160;</td>
+          <td class="paramname"><em>model</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a2bdf99bebd3b873418be2166b2735847"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">String de.rwth.idsg.steve.web.controller.Ocpp15Controller.postClearCache </td>
+          <td>(</td>
+          <td class="paramtype">@Valid @ModelAttribute(PARAMS) <a class="el" href="classde_1_1rwth_1_1idsg_1_1steve_1_1web_1_1dto_1_1common_1_1_multiple_charge_point_select.html">MultipleChargePointSelect</a>&#160;</td>
+          <td class="paramname"><em>params</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">BindingResult&#160;</td>
+          <td class="paramname"><em>result</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Model&#160;</td>
+          <td class="paramname"><em>model</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a5215a4fd19ab0b8a063f3c5f73d37a96"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">String de.rwth.idsg.steve.web.controller.Ocpp15Controller.postDataTransfer </td>
+          <td>(</td>
+          <td class="paramtype">@Valid @ModelAttribute(PARAMS) <a class="el" href="classde_1_1rwth_1_1idsg_1_1steve_1_1web_1_1dto_1_1ocpp15_1_1_data_transfer_params.html">DataTransferParams</a>&#160;</td>
+          <td class="paramname"><em>params</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">BindingResult&#160;</td>
+          <td class="paramname"><em>result</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Model&#160;</td>
+          <td class="paramname"><em>model</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a502ca343be380b47b41bf00ca9e99fb2"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">String de.rwth.idsg.steve.web.controller.Ocpp15Controller.postGetConf </td>
+          <td>(</td>
+          <td class="paramtype">@Valid @ModelAttribute(PARAMS) <a class="el" href="classde_1_1rwth_1_1idsg_1_1steve_1_1web_1_1dto_1_1ocpp15_1_1_get_configuration_params.html">GetConfigurationParams</a>&#160;</td>
+          <td class="paramname"><em>params</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">BindingResult&#160;</td>
+          <td class="paramname"><em>result</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Model&#160;</td>
+          <td class="paramname"><em>model</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="ad0c3f0e72697bc9baca7bc6dd57275dc"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">String de.rwth.idsg.steve.web.controller.Ocpp15Controller.postGetDiag </td>
+          <td>(</td>
+          <td class="paramtype">@Valid @ModelAttribute(PARAMS) <a class="el" href="classde_1_1rwth_1_1idsg_1_1steve_1_1web_1_1dto_1_1common_1_1_get_diagnostics_params.html">GetDiagnosticsParams</a>&#160;</td>
+          <td class="paramname"><em>params</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">BindingResult&#160;</td>
+          <td class="paramname"><em>result</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Model&#160;</td>
+          <td class="paramname"><em>model</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a59cf8a9a10a1906b87ca423e1c4e470e"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">String de.rwth.idsg.steve.web.controller.Ocpp15Controller.postListVersion </td>
+          <td>(</td>
+          <td class="paramtype">@Valid @ModelAttribute(PARAMS) <a class="el" href="classde_1_1rwth_1_1idsg_1_1steve_1_1web_1_1dto_1_1common_1_1_multiple_charge_point_select.html">MultipleChargePointSelect</a>&#160;</td>
+          <td class="paramname"><em>params</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">BindingResult&#160;</td>
+          <td class="paramname"><em>result</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Model&#160;</td>
+          <td class="paramname"><em>model</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a9b34f99c6d11adc2426100bdaa5a7dc4"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">String de.rwth.idsg.steve.web.controller.Ocpp15Controller.postRemoteStartTx </td>
+          <td>(</td>
+          <td class="paramtype">@Valid @ModelAttribute(PARAMS) <a class="el" href="classde_1_1rwth_1_1idsg_1_1steve_1_1web_1_1dto_1_1common_1_1_remote_start_transaction_params.html">RemoteStartTransactionParams</a>&#160;</td>
+          <td class="paramname"><em>params</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">BindingResult&#160;</td>
+          <td class="paramname"><em>result</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Model&#160;</td>
+          <td class="paramname"><em>model</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="aa1de25b8d1bc7ec176f5101cddd9b8a7"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">String de.rwth.idsg.steve.web.controller.Ocpp15Controller.postRemoteStopTx </td>
+          <td>(</td>
+          <td class="paramtype">@Valid @ModelAttribute(PARAMS) <a class="el" href="classde_1_1rwth_1_1idsg_1_1steve_1_1web_1_1dto_1_1common_1_1_remote_stop_transaction_params.html">RemoteStopTransactionParams</a>&#160;</td>
+          <td class="paramname"><em>params</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">BindingResult&#160;</td>
+          <td class="paramname"><em>result</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Model&#160;</td>
+          <td class="paramname"><em>model</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a698e883adcaf3b4f165340d90ee84c2b"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">String de.rwth.idsg.steve.web.controller.Ocpp15Controller.postReserveNow </td>
+          <td>(</td>
+          <td class="paramtype">@Valid @ModelAttribute(PARAMS) <a class="el" href="classde_1_1rwth_1_1idsg_1_1steve_1_1web_1_1dto_1_1ocpp15_1_1_reserve_now_params.html">ReserveNowParams</a>&#160;</td>
+          <td class="paramname"><em>params</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">BindingResult&#160;</td>
+          <td class="paramname"><em>result</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Model&#160;</td>
+          <td class="paramname"><em>model</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="ac47fd9bffaa0ee91838e94d3dde7c089"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">String de.rwth.idsg.steve.web.controller.Ocpp15Controller.postReset </td>
+          <td>(</td>
+          <td class="paramtype">@Valid @ModelAttribute(PARAMS) <a class="el" href="classde_1_1rwth_1_1idsg_1_1steve_1_1web_1_1dto_1_1ocpp12_1_1_reset_params.html">ResetParams</a>&#160;</td>
+          <td class="paramname"><em>params</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">BindingResult&#160;</td>
+          <td class="paramname"><em>result</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Model&#160;</td>
+          <td class="paramname"><em>model</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="af537bbbcf063cb6b7e0d2aead2e80311"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">String de.rwth.idsg.steve.web.controller.Ocpp15Controller.postSendList </td>
+          <td>(</td>
+          <td class="paramtype">@Valid @ModelAttribute(PARAMS) <a class="el" href="classde_1_1rwth_1_1idsg_1_1steve_1_1web_1_1dto_1_1ocpp15_1_1_send_local_list_params.html">SendLocalListParams</a>&#160;</td>
+          <td class="paramname"><em>params</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">BindingResult&#160;</td>
+          <td class="paramname"><em>result</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Model&#160;</td>
+          <td class="paramname"><em>model</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a8ee35af8c62aaece684c921ac178111e"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">String de.rwth.idsg.steve.web.controller.Ocpp15Controller.postUnlockCon </td>
+          <td>(</td>
+          <td class="paramtype">@Valid @ModelAttribute(PARAMS) <a class="el" href="classde_1_1rwth_1_1idsg_1_1steve_1_1web_1_1dto_1_1common_1_1_unlock_connector_params.html">UnlockConnectorParams</a>&#160;</td>
+          <td class="paramname"><em>params</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">BindingResult&#160;</td>
+          <td class="paramname"><em>result</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Model&#160;</td>
+          <td class="paramname"><em>model</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="acf67a745349c25372232d980f3bdfc4f"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">String de.rwth.idsg.steve.web.controller.Ocpp15Controller.postUpdateFirm </td>
+          <td>(</td>
+          <td class="paramtype">@Valid @ModelAttribute(PARAMS) <a class="el" href="classde_1_1rwth_1_1idsg_1_1steve_1_1web_1_1dto_1_1common_1_1_update_firmware_params.html">UpdateFirmwareParams</a>&#160;</td>
+          <td class="paramname"><em>params</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">BindingResult&#160;</td>
+          <td class="paramname"><em>result</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Model&#160;</td>
+          <td class="paramname"><em>model</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<hr/>Die Dokumentation für diese Klasse wurde erzeugt aufgrund der Datei:<ul>
+<li>src/main/java/de/rwth/idsg/steve/web/controller/<a class="el" href="_ocpp15_controller_8java.html">Ocpp15Controller.java</a></li>
+</ul>
+</div><!-- contents -->
+</div><!-- doc-content -->
+<!-- start footer part -->
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="navelem"><a class="el" href="namespacede.html">de</a></li><li class="navelem"><a class="el" href="namespacede_1_1rwth.html">rwth</a></li><li class="navelem"><a class="el" href="namespacede_1_1rwth_1_1idsg.html">idsg</a></li><li class="navelem"><a class="el" href="namespacede_1_1rwth_1_1idsg_1_1steve.html">steve</a></li><li class="navelem"><a class="el" href="namespacede_1_1rwth_1_1idsg_1_1steve_1_1web.html">web</a></li><li class="navelem"><a class="el" href="namespacede_1_1rwth_1_1idsg_1_1steve_1_1web_1_1controller.html">controller</a></li><li class="navelem"><a class="el" href="classde_1_1rwth_1_1idsg_1_1steve_1_1web_1_1controller_1_1_ocpp15_controller.html">Ocpp15Controller</a></li>
+    <li class="footer">Erzeugt am Mit Dez 16 2015 12:01:17 für SteVe von
+    <a href="http://www.doxygen.org/index.html">
+    <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.6 </li>
+  </ul>
+</div>
+</body>
+</html>

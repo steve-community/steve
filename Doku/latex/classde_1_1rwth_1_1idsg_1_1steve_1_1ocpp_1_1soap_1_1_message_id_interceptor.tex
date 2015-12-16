@@ -1,0 +1,66 @@
+\hypertarget{classde_1_1rwth_1_1idsg_1_1steve_1_1ocpp_1_1soap_1_1_message_id_interceptor}{\section{de.\-rwth.\-idsg.\-steve.\-ocpp.\-soap.\-Message\-Id\-Interceptor Klassenreferenz}
+\label{classde_1_1rwth_1_1idsg_1_1steve_1_1ocpp_1_1soap_1_1_message_id_interceptor}\index{de.\-rwth.\-idsg.\-steve.\-ocpp.\-soap.\-Message\-Id\-Interceptor@{de.\-rwth.\-idsg.\-steve.\-ocpp.\-soap.\-Message\-Id\-Interceptor}}
+}
+
+
+Klassendiagramm für de.\-rwth.\-idsg.\-steve.\-ocpp.\-soap.\-Message\-Id\-Interceptor\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=228pt]{classde_1_1rwth_1_1idsg_1_1steve_1_1ocpp_1_1soap_1_1_message_id_interceptor__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Zusammengehörigkeiten von de.\-rwth.\-idsg.\-steve.\-ocpp.\-soap.\-Message\-Id\-Interceptor\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=228pt]{classde_1_1rwth_1_1idsg_1_1steve_1_1ocpp_1_1soap_1_1_message_id_interceptor__coll__graph}
+\end{center}
+\end{figure}
+\subsection*{Öffentliche Methoden}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classde_1_1rwth_1_1idsg_1_1steve_1_1ocpp_1_1soap_1_1_message_id_interceptor_a4bc43685cd1201e1dae0eddd18e3c518}{Message\-Id\-Interceptor} ()
+\item 
+void \hyperlink{classde_1_1rwth_1_1idsg_1_1steve_1_1ocpp_1_1soap_1_1_message_id_interceptor_aa206483d5fbc89febd0551f8537215ba}{handle\-Message} (Message message)  throws Fault 
+\end{DoxyCompactItemize}
+
+
+\subsection{Ausführliche Beschreibung}
+There are some implementations of S\-O\-A\-P/\-W\-S-\/\-A, which leave the required Message\-I\-D element out. This behaviour is incorrect! Since C\-X\-F throws an exception in absence of this element, we provide a workaround which adds this S\-O\-A\-P header to the incoming message.
+
+Further reading\-: \href{http://www.w3.org/TR/2006/REC-ws-addr-core-20060509/#formreplymsg}{\tt http\-://www.\-w3.\-org/\-T\-R/2006/\-R\-E\-C-\/ws-\/addr-\/core-\/20060509/\#formreplymsg} \href{http://comments.gmane.org/gmane.comp.apache.cxf.user/17599}{\tt http\-://comments.\-gmane.\-org/gmane.\-comp.\-apache.\-cxf.\-user/17599}
+
+\begin{DoxyAuthor}{Autor}
+Sevket Goekay \href{mailto:goekay@dbis.rwth-aachen.de}{\tt goekay@dbis.\-rwth-\/aachen.\-de} 
+\end{DoxyAuthor}
+\begin{DoxySince}{Seit}
+17.\-02.\-2015 
+\end{DoxySince}
+
+
+\subsection{Beschreibung der Konstruktoren und Destruktoren}
+\hypertarget{classde_1_1rwth_1_1idsg_1_1steve_1_1ocpp_1_1soap_1_1_message_id_interceptor_a4bc43685cd1201e1dae0eddd18e3c518}{\index{de\-::rwth\-::idsg\-::steve\-::ocpp\-::soap\-::\-Message\-Id\-Interceptor@{de\-::rwth\-::idsg\-::steve\-::ocpp\-::soap\-::\-Message\-Id\-Interceptor}!Message\-Id\-Interceptor@{Message\-Id\-Interceptor}}
+\index{Message\-Id\-Interceptor@{Message\-Id\-Interceptor}!de::rwth::idsg::steve::ocpp::soap::MessageIdInterceptor@{de\-::rwth\-::idsg\-::steve\-::ocpp\-::soap\-::\-Message\-Id\-Interceptor}}
+\subsubsection[{Message\-Id\-Interceptor}]{\setlength{\rightskip}{0pt plus 5cm}de.\-rwth.\-idsg.\-steve.\-ocpp.\-soap.\-Message\-Id\-Interceptor.\-Message\-Id\-Interceptor (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{classde_1_1rwth_1_1idsg_1_1steve_1_1ocpp_1_1soap_1_1_message_id_interceptor_a4bc43685cd1201e1dae0eddd18e3c518}
+
+
+\subsection{Dokumentation der Elementfunktionen}
+\hypertarget{classde_1_1rwth_1_1idsg_1_1steve_1_1ocpp_1_1soap_1_1_message_id_interceptor_aa206483d5fbc89febd0551f8537215ba}{\index{de\-::rwth\-::idsg\-::steve\-::ocpp\-::soap\-::\-Message\-Id\-Interceptor@{de\-::rwth\-::idsg\-::steve\-::ocpp\-::soap\-::\-Message\-Id\-Interceptor}!handle\-Message@{handle\-Message}}
+\index{handle\-Message@{handle\-Message}!de::rwth::idsg::steve::ocpp::soap::MessageIdInterceptor@{de\-::rwth\-::idsg\-::steve\-::ocpp\-::soap\-::\-Message\-Id\-Interceptor}}
+\subsubsection[{handle\-Message}]{\setlength{\rightskip}{0pt plus 5cm}void de.\-rwth.\-idsg.\-steve.\-ocpp.\-soap.\-Message\-Id\-Interceptor.\-handle\-Message (
+\begin{DoxyParamCaption}
+\item[{Message}]{message}
+\end{DoxyParamCaption}
+) throws Fault}}\label{classde_1_1rwth_1_1idsg_1_1steve_1_1ocpp_1_1soap_1_1_message_id_interceptor_aa206483d5fbc89febd0551f8537215ba}
+
+
+Die Dokumentation für diese Klasse wurde erzeugt aufgrund der Datei\-:\begin{DoxyCompactItemize}
+\item 
+src/main/java/de/rwth/idsg/steve/ocpp/soap/\hyperlink{_message_id_interceptor_8java}{Message\-Id\-Interceptor.\-java}\end{DoxyCompactItemize}

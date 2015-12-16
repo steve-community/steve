@@ -1,0 +1,4 @@
+<map id="de.rwth.idsg.steve.ocpp.ChargePointService12_Invoker" name="de.rwth.idsg.steve.ocpp.ChargePointService12_Invoker">
+<area shape="rect" id="node2" href="$classde_1_1rwth_1_1idsg_1_1steve_1_1ocpp_1_1soap_1_1_charge_point_service12___soap_invoker.html" title="de.rwth.idsg.steve.ocpp.soap.\lChargePointService12_SoapInvoker" alt="" coords="256,5,488,46"/>
+<area shape="rect" id="node3" href="$classde_1_1rwth_1_1idsg_1_1steve_1_1service_1_1_charge_point_service12___dispatcher.html" title="de.rwth.idsg.steve.service.\lChargePointService12_Dispatcher" alt="" coords="261,70,483,111"/>
+</map>

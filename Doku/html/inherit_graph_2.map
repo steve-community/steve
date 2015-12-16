@@ -1,0 +1,5 @@
+<map id="Grafische Darstellung der Klassenhierarchie" name="Grafische Darstellung der Klassenhierarchie">
+<area shape="rect" id="node1" href="$interfacede_1_1rwth_1_1idsg_1_1steve_1_1_application_starter.html" title="de.rwth.idsg.steve.Application\lStarter" alt="" coords="5,38,203,79"/>
+<area shape="rect" id="node2" href="$classde_1_1rwth_1_1idsg_1_1steve_1_1_steve_dev_starter.html" title="de.rwth.idsg.steve.Steve\lDevStarter" alt="" coords="251,5,418,46"/>
+<area shape="rect" id="node3" href="$classde_1_1rwth_1_1idsg_1_1steve_1_1_steve_prod_starter.html" title="de.rwth.idsg.steve.Steve\lProdStarter" alt="" coords="251,70,418,111"/>
+</map>

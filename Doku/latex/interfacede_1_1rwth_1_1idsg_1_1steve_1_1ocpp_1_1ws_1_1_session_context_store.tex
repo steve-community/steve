@@ -1,0 +1,114 @@
+\hypertarget{interfacede_1_1rwth_1_1idsg_1_1steve_1_1ocpp_1_1ws_1_1_session_context_store}{\section{de.\-rwth.\-idsg.\-steve.\-ocpp.\-ws.\-Session\-Context\-Store Schnittstellenreferenz}
+\label{interfacede_1_1rwth_1_1idsg_1_1steve_1_1ocpp_1_1ws_1_1_session_context_store}\index{de.\-rwth.\-idsg.\-steve.\-ocpp.\-ws.\-Session\-Context\-Store@{de.\-rwth.\-idsg.\-steve.\-ocpp.\-ws.\-Session\-Context\-Store}}
+}
+
+
+Klassendiagramm für de.\-rwth.\-idsg.\-steve.\-ocpp.\-ws.\-Session\-Context\-Store\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=220pt]{interfacede_1_1rwth_1_1idsg_1_1steve_1_1ocpp_1_1ws_1_1_session_context_store__inherit__graph}
+\end{center}
+\end{figure}
+\subsection*{Öffentliche Methoden}
+\begin{DoxyCompactItemize}
+\item 
+void \hyperlink{interfacede_1_1rwth_1_1idsg_1_1steve_1_1ocpp_1_1ws_1_1_session_context_store_a5fc98df544874791f7b3aaaa61927a3f}{add} (String charge\-Box\-Id, Web\-Socket\-Session session, Scheduled\-Future ping\-Schedule)
+\item 
+void \hyperlink{interfacede_1_1rwth_1_1idsg_1_1steve_1_1ocpp_1_1ws_1_1_session_context_store_a200efa8e3a54717238f2f8d4db639a7e}{remove} (String charge\-Box\-Id, Web\-Socket\-Session session)
+\item 
+List$<$ String $>$ \hyperlink{interfacede_1_1rwth_1_1idsg_1_1steve_1_1ocpp_1_1ws_1_1_session_context_store_a7e0fc292b639cee5b54b98872b38d36a}{get\-Charge\-Box\-Id\-List} ()
+\item 
+Map$<$ String, Deque\\*
+$<$ \hyperlink{classde_1_1rwth_1_1idsg_1_1steve_1_1ocpp_1_1ws_1_1data_1_1_session_context}{Session\-Context} $>$ $>$ \hyperlink{interfacede_1_1rwth_1_1idsg_1_1steve_1_1ocpp_1_1ws_1_1_session_context_store_a3fc7b474ca650bd8bd4a819328a4e8db}{get\-A\-Copy} ()
+\item 
+int \hyperlink{interfacede_1_1rwth_1_1idsg_1_1steve_1_1ocpp_1_1ws_1_1_session_context_store_a8522b27278a834285e0877f5ebaaf4a6}{get\-Number\-Of\-Charge\-Boxes} ()
+\item 
+Web\-Socket\-Session \hyperlink{interfacede_1_1rwth_1_1idsg_1_1steve_1_1ocpp_1_1ws_1_1_session_context_store_a25ada902cff6b071a3af673e4ce5a53d}{get\-Session} (String charge\-Box\-Id)
+\end{DoxyCompactItemize}
+
+
+\subsection{Ausführliche Beschreibung}
+\begin{DoxyAuthor}{Autor}
+Sevket Goekay \href{mailto:goekay@dbis.rwth-aachen.de}{\tt goekay@dbis.\-rwth-\/aachen.\-de} 
+\end{DoxyAuthor}
+\begin{DoxySince}{Seit}
+17.\-03.\-2015 
+\end{DoxySince}
+
+
+\subsection{Dokumentation der Elementfunktionen}
+\hypertarget{interfacede_1_1rwth_1_1idsg_1_1steve_1_1ocpp_1_1ws_1_1_session_context_store_a5fc98df544874791f7b3aaaa61927a3f}{\index{de\-::rwth\-::idsg\-::steve\-::ocpp\-::ws\-::\-Session\-Context\-Store@{de\-::rwth\-::idsg\-::steve\-::ocpp\-::ws\-::\-Session\-Context\-Store}!add@{add}}
+\index{add@{add}!de::rwth::idsg::steve::ocpp::ws::SessionContextStore@{de\-::rwth\-::idsg\-::steve\-::ocpp\-::ws\-::\-Session\-Context\-Store}}
+\subsubsection[{add}]{\setlength{\rightskip}{0pt plus 5cm}void de.\-rwth.\-idsg.\-steve.\-ocpp.\-ws.\-Session\-Context\-Store.\-add (
+\begin{DoxyParamCaption}
+\item[{String}]{charge\-Box\-Id, }
+\item[{Web\-Socket\-Session}]{session, }
+\item[{Scheduled\-Future}]{ping\-Schedule}
+\end{DoxyParamCaption}
+)}}\label{interfacede_1_1rwth_1_1idsg_1_1steve_1_1ocpp_1_1ws_1_1_session_context_store_a5fc98df544874791f7b3aaaa61927a3f}
+
+
+Implementiert in \hyperlink{classde_1_1rwth_1_1idsg_1_1steve_1_1ocpp_1_1ws_1_1_session_context_store_impl_a2225d8697d71978cac5ecf1962d76d72}{de.\-rwth.\-idsg.\-steve.\-ocpp.\-ws.\-Session\-Context\-Store\-Impl}.
+
+\hypertarget{interfacede_1_1rwth_1_1idsg_1_1steve_1_1ocpp_1_1ws_1_1_session_context_store_a3fc7b474ca650bd8bd4a819328a4e8db}{\index{de\-::rwth\-::idsg\-::steve\-::ocpp\-::ws\-::\-Session\-Context\-Store@{de\-::rwth\-::idsg\-::steve\-::ocpp\-::ws\-::\-Session\-Context\-Store}!get\-A\-Copy@{get\-A\-Copy}}
+\index{get\-A\-Copy@{get\-A\-Copy}!de::rwth::idsg::steve::ocpp::ws::SessionContextStore@{de\-::rwth\-::idsg\-::steve\-::ocpp\-::ws\-::\-Session\-Context\-Store}}
+\subsubsection[{get\-A\-Copy}]{\setlength{\rightskip}{0pt plus 5cm}Map$<$String, Deque$<${\bf Session\-Context}$>$ $>$ de.\-rwth.\-idsg.\-steve.\-ocpp.\-ws.\-Session\-Context\-Store.\-get\-A\-Copy (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{interfacede_1_1rwth_1_1idsg_1_1steve_1_1ocpp_1_1ws_1_1_session_context_store_a3fc7b474ca650bd8bd4a819328a4e8db}
+
+
+Implementiert in \hyperlink{classde_1_1rwth_1_1idsg_1_1steve_1_1ocpp_1_1ws_1_1_session_context_store_impl_ac17f07b4be357aec023b01f6298a3dc3}{de.\-rwth.\-idsg.\-steve.\-ocpp.\-ws.\-Session\-Context\-Store\-Impl}.
+
+\hypertarget{interfacede_1_1rwth_1_1idsg_1_1steve_1_1ocpp_1_1ws_1_1_session_context_store_a7e0fc292b639cee5b54b98872b38d36a}{\index{de\-::rwth\-::idsg\-::steve\-::ocpp\-::ws\-::\-Session\-Context\-Store@{de\-::rwth\-::idsg\-::steve\-::ocpp\-::ws\-::\-Session\-Context\-Store}!get\-Charge\-Box\-Id\-List@{get\-Charge\-Box\-Id\-List}}
+\index{get\-Charge\-Box\-Id\-List@{get\-Charge\-Box\-Id\-List}!de::rwth::idsg::steve::ocpp::ws::SessionContextStore@{de\-::rwth\-::idsg\-::steve\-::ocpp\-::ws\-::\-Session\-Context\-Store}}
+\subsubsection[{get\-Charge\-Box\-Id\-List}]{\setlength{\rightskip}{0pt plus 5cm}List$<$String$>$ de.\-rwth.\-idsg.\-steve.\-ocpp.\-ws.\-Session\-Context\-Store.\-get\-Charge\-Box\-Id\-List (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{interfacede_1_1rwth_1_1idsg_1_1steve_1_1ocpp_1_1ws_1_1_session_context_store_a7e0fc292b639cee5b54b98872b38d36a}
+
+
+Implementiert in \hyperlink{classde_1_1rwth_1_1idsg_1_1steve_1_1ocpp_1_1ws_1_1_session_context_store_impl_a04306c85b200069137e828a1d6db8560}{de.\-rwth.\-idsg.\-steve.\-ocpp.\-ws.\-Session\-Context\-Store\-Impl}.
+
+\hypertarget{interfacede_1_1rwth_1_1idsg_1_1steve_1_1ocpp_1_1ws_1_1_session_context_store_a8522b27278a834285e0877f5ebaaf4a6}{\index{de\-::rwth\-::idsg\-::steve\-::ocpp\-::ws\-::\-Session\-Context\-Store@{de\-::rwth\-::idsg\-::steve\-::ocpp\-::ws\-::\-Session\-Context\-Store}!get\-Number\-Of\-Charge\-Boxes@{get\-Number\-Of\-Charge\-Boxes}}
+\index{get\-Number\-Of\-Charge\-Boxes@{get\-Number\-Of\-Charge\-Boxes}!de::rwth::idsg::steve::ocpp::ws::SessionContextStore@{de\-::rwth\-::idsg\-::steve\-::ocpp\-::ws\-::\-Session\-Context\-Store}}
+\subsubsection[{get\-Number\-Of\-Charge\-Boxes}]{\setlength{\rightskip}{0pt plus 5cm}int de.\-rwth.\-idsg.\-steve.\-ocpp.\-ws.\-Session\-Context\-Store.\-get\-Number\-Of\-Charge\-Boxes (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{interfacede_1_1rwth_1_1idsg_1_1steve_1_1ocpp_1_1ws_1_1_session_context_store_a8522b27278a834285e0877f5ebaaf4a6}
+
+
+Implementiert in \hyperlink{classde_1_1rwth_1_1idsg_1_1steve_1_1ocpp_1_1ws_1_1_session_context_store_impl_ab364234851cdf7f0721154e5986f77b9}{de.\-rwth.\-idsg.\-steve.\-ocpp.\-ws.\-Session\-Context\-Store\-Impl}.
+
+\hypertarget{interfacede_1_1rwth_1_1idsg_1_1steve_1_1ocpp_1_1ws_1_1_session_context_store_a25ada902cff6b071a3af673e4ce5a53d}{\index{de\-::rwth\-::idsg\-::steve\-::ocpp\-::ws\-::\-Session\-Context\-Store@{de\-::rwth\-::idsg\-::steve\-::ocpp\-::ws\-::\-Session\-Context\-Store}!get\-Session@{get\-Session}}
+\index{get\-Session@{get\-Session}!de::rwth::idsg::steve::ocpp::ws::SessionContextStore@{de\-::rwth\-::idsg\-::steve\-::ocpp\-::ws\-::\-Session\-Context\-Store}}
+\subsubsection[{get\-Session}]{\setlength{\rightskip}{0pt plus 5cm}Web\-Socket\-Session de.\-rwth.\-idsg.\-steve.\-ocpp.\-ws.\-Session\-Context\-Store.\-get\-Session (
+\begin{DoxyParamCaption}
+\item[{String}]{charge\-Box\-Id}
+\end{DoxyParamCaption}
+)}}\label{interfacede_1_1rwth_1_1idsg_1_1steve_1_1ocpp_1_1ws_1_1_session_context_store_a25ada902cff6b071a3af673e4ce5a53d}
+
+
+Implementiert in \hyperlink{classde_1_1rwth_1_1idsg_1_1steve_1_1ocpp_1_1ws_1_1_session_context_store_impl_a81bf3419fb5de7a16bff8a6adc5546ee}{de.\-rwth.\-idsg.\-steve.\-ocpp.\-ws.\-Session\-Context\-Store\-Impl}.
+
+\hypertarget{interfacede_1_1rwth_1_1idsg_1_1steve_1_1ocpp_1_1ws_1_1_session_context_store_a200efa8e3a54717238f2f8d4db639a7e}{\index{de\-::rwth\-::idsg\-::steve\-::ocpp\-::ws\-::\-Session\-Context\-Store@{de\-::rwth\-::idsg\-::steve\-::ocpp\-::ws\-::\-Session\-Context\-Store}!remove@{remove}}
+\index{remove@{remove}!de::rwth::idsg::steve::ocpp::ws::SessionContextStore@{de\-::rwth\-::idsg\-::steve\-::ocpp\-::ws\-::\-Session\-Context\-Store}}
+\subsubsection[{remove}]{\setlength{\rightskip}{0pt plus 5cm}void de.\-rwth.\-idsg.\-steve.\-ocpp.\-ws.\-Session\-Context\-Store.\-remove (
+\begin{DoxyParamCaption}
+\item[{String}]{charge\-Box\-Id, }
+\item[{Web\-Socket\-Session}]{session}
+\end{DoxyParamCaption}
+)}}\label{interfacede_1_1rwth_1_1idsg_1_1steve_1_1ocpp_1_1ws_1_1_session_context_store_a200efa8e3a54717238f2f8d4db639a7e}
+
+
+Implementiert in \hyperlink{classde_1_1rwth_1_1idsg_1_1steve_1_1ocpp_1_1ws_1_1_session_context_store_impl_a1d7770d143641dbfccf297b03f6f23fc}{de.\-rwth.\-idsg.\-steve.\-ocpp.\-ws.\-Session\-Context\-Store\-Impl}.
+
+
+
+Die Dokumentation für diese Schnittstelle wurde erzeugt aufgrund der Datei\-:\begin{DoxyCompactItemize}
+\item 
+src/main/java/de/rwth/idsg/steve/ocpp/ws/\hyperlink{_session_context_store_8java}{Session\-Context\-Store.\-java}\end{DoxyCompactItemize}

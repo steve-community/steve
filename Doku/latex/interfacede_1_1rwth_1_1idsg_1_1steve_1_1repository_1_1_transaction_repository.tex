@@ -1,0 +1,72 @@
+\hypertarget{interfacede_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1_transaction_repository}{\section{de.\-rwth.\-idsg.\-steve.\-repository.\-Transaction\-Repository Schnittstellenreferenz}
+\label{interfacede_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1_transaction_repository}\index{de.\-rwth.\-idsg.\-steve.\-repository.\-Transaction\-Repository@{de.\-rwth.\-idsg.\-steve.\-repository.\-Transaction\-Repository}}
+}
+
+
+Klassendiagramm für de.\-rwth.\-idsg.\-steve.\-repository.\-Transaction\-Repository\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=246pt]{interfacede_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1_transaction_repository__inherit__graph}
+\end{center}
+\end{figure}
+\subsection*{Öffentliche Methoden}
+\begin{DoxyCompactItemize}
+\item 
+List$<$ \hyperlink{classde_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1dto_1_1_transaction}{Transaction} $>$ \hyperlink{interfacede_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1_transaction_repository_af2ae1a05e2d5fb1de8fe20e8802da77d}{get\-Transactions} (\hyperlink{classde_1_1rwth_1_1idsg_1_1steve_1_1web_1_1dto_1_1_transaction_query_form}{Transaction\-Query\-Form} form)
+\item 
+void \hyperlink{interfacede_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1_transaction_repository_a30ac3d2ce97caf4e5ee023de6ec9884f}{write\-Transactions\-C\-S\-V} (\hyperlink{classde_1_1rwth_1_1idsg_1_1steve_1_1web_1_1dto_1_1_transaction_query_form}{Transaction\-Query\-Form} form, Writer writer)
+\item 
+List$<$ Integer $>$ \hyperlink{interfacede_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1_transaction_repository_af2452533bc153cc48dd5a8205ed45fd1}{get\-Active\-Transaction\-Ids} (String charge\-Box\-Id)
+\end{DoxyCompactItemize}
+
+
+\subsection{Ausführliche Beschreibung}
+\begin{DoxyAuthor}{Autor}
+Sevket Goekay \href{mailto:goekay@dbis.rwth-aachen.de}{\tt goekay@dbis.\-rwth-\/aachen.\-de} 
+\end{DoxyAuthor}
+\begin{DoxySince}{Seit}
+19.\-08.\-2014 
+\end{DoxySince}
+
+
+\subsection{Dokumentation der Elementfunktionen}
+\hypertarget{interfacede_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1_transaction_repository_af2452533bc153cc48dd5a8205ed45fd1}{\index{de\-::rwth\-::idsg\-::steve\-::repository\-::\-Transaction\-Repository@{de\-::rwth\-::idsg\-::steve\-::repository\-::\-Transaction\-Repository}!get\-Active\-Transaction\-Ids@{get\-Active\-Transaction\-Ids}}
+\index{get\-Active\-Transaction\-Ids@{get\-Active\-Transaction\-Ids}!de::rwth::idsg::steve::repository::TransactionRepository@{de\-::rwth\-::idsg\-::steve\-::repository\-::\-Transaction\-Repository}}
+\subsubsection[{get\-Active\-Transaction\-Ids}]{\setlength{\rightskip}{0pt plus 5cm}List$<$Integer$>$ de.\-rwth.\-idsg.\-steve.\-repository.\-Transaction\-Repository.\-get\-Active\-Transaction\-Ids (
+\begin{DoxyParamCaption}
+\item[{String}]{charge\-Box\-Id}
+\end{DoxyParamCaption}
+)}}\label{interfacede_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1_transaction_repository_af2452533bc153cc48dd5a8205ed45fd1}
+
+
+Implementiert in \hyperlink{classde_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1impl_1_1_transaction_repository_impl_a8dfc3dfb7967756c32a3c61ab124ae50}{de.\-rwth.\-idsg.\-steve.\-repository.\-impl.\-Transaction\-Repository\-Impl}.
+
+\hypertarget{interfacede_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1_transaction_repository_af2ae1a05e2d5fb1de8fe20e8802da77d}{\index{de\-::rwth\-::idsg\-::steve\-::repository\-::\-Transaction\-Repository@{de\-::rwth\-::idsg\-::steve\-::repository\-::\-Transaction\-Repository}!get\-Transactions@{get\-Transactions}}
+\index{get\-Transactions@{get\-Transactions}!de::rwth::idsg::steve::repository::TransactionRepository@{de\-::rwth\-::idsg\-::steve\-::repository\-::\-Transaction\-Repository}}
+\subsubsection[{get\-Transactions}]{\setlength{\rightskip}{0pt plus 5cm}List$<${\bf Transaction}$>$ de.\-rwth.\-idsg.\-steve.\-repository.\-Transaction\-Repository.\-get\-Transactions (
+\begin{DoxyParamCaption}
+\item[{{\bf Transaction\-Query\-Form}}]{form}
+\end{DoxyParamCaption}
+)}}\label{interfacede_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1_transaction_repository_af2ae1a05e2d5fb1de8fe20e8802da77d}
+
+
+Implementiert in \hyperlink{classde_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1impl_1_1_transaction_repository_impl_a689201f77f62c58cea7558286010b3e3}{de.\-rwth.\-idsg.\-steve.\-repository.\-impl.\-Transaction\-Repository\-Impl}.
+
+\hypertarget{interfacede_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1_transaction_repository_a30ac3d2ce97caf4e5ee023de6ec9884f}{\index{de\-::rwth\-::idsg\-::steve\-::repository\-::\-Transaction\-Repository@{de\-::rwth\-::idsg\-::steve\-::repository\-::\-Transaction\-Repository}!write\-Transactions\-C\-S\-V@{write\-Transactions\-C\-S\-V}}
+\index{write\-Transactions\-C\-S\-V@{write\-Transactions\-C\-S\-V}!de::rwth::idsg::steve::repository::TransactionRepository@{de\-::rwth\-::idsg\-::steve\-::repository\-::\-Transaction\-Repository}}
+\subsubsection[{write\-Transactions\-C\-S\-V}]{\setlength{\rightskip}{0pt plus 5cm}void de.\-rwth.\-idsg.\-steve.\-repository.\-Transaction\-Repository.\-write\-Transactions\-C\-S\-V (
+\begin{DoxyParamCaption}
+\item[{{\bf Transaction\-Query\-Form}}]{form, }
+\item[{Writer}]{writer}
+\end{DoxyParamCaption}
+)}}\label{interfacede_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1_transaction_repository_a30ac3d2ce97caf4e5ee023de6ec9884f}
+
+
+Implementiert in \hyperlink{classde_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1impl_1_1_transaction_repository_impl_a77bd16d6db0ae7bb1ab7a29dbe604628}{de.\-rwth.\-idsg.\-steve.\-repository.\-impl.\-Transaction\-Repository\-Impl}.
+
+
+
+Die Dokumentation für diese Schnittstelle wurde erzeugt aufgrund der Datei\-:\begin{DoxyCompactItemize}
+\item 
+src/main/java/de/rwth/idsg/steve/repository/\hyperlink{_transaction_repository_8java}{Transaction\-Repository.\-java}\end{DoxyCompactItemize}

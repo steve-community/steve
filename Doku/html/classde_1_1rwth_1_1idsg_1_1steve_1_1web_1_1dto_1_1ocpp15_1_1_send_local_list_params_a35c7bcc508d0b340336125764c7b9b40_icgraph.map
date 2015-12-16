@@ -1,0 +1,4 @@
+<map id="de.rwth.idsg.steve.web.dto.ocpp15.SendLocalListParams.getDeleteList" name="de.rwth.idsg.steve.web.dto.ocpp15.SendLocalListParams.getDeleteList">
+<area shape="rect" id="node2" href="$classde_1_1rwth_1_1idsg_1_1steve_1_1web_1_1dto_1_1ocpp15_1_1_send_local_list_params.html#af7879e85d278508abf6aa14a3ee34d06" title="de.rwth.idsg.steve.web.dto.ocpp15.\lSendLocalListParams.isValidWhenDifferential" alt="" coords="286,5,575,46"/>
+<area shape="rect" id="node3" href="$classde_1_1rwth_1_1idsg_1_1steve_1_1web_1_1dto_1_1ocpp15_1_1_send_local_list_params.html#a68ba61336db30fd0933c80e197dac7c5" title="de.rwth.idsg.steve.web.dto.ocpp15.\lSendLocalListParams.isDisjoint" alt="" coords="316,70,545,111"/>
+</map>

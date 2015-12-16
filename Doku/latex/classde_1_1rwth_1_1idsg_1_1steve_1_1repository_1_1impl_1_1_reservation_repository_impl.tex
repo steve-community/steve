@@ -1,0 +1,136 @@
+\hypertarget{classde_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1impl_1_1_reservation_repository_impl}{\section{de.\-rwth.\-idsg.\-steve.\-repository.\-impl.\-Reservation\-Repository\-Impl Klassenreferenz}
+\label{classde_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1impl_1_1_reservation_repository_impl}\index{de.\-rwth.\-idsg.\-steve.\-repository.\-impl.\-Reservation\-Repository\-Impl@{de.\-rwth.\-idsg.\-steve.\-repository.\-impl.\-Reservation\-Repository\-Impl}}
+}
+
+
+Klassendiagramm für de.\-rwth.\-idsg.\-steve.\-repository.\-impl.\-Reservation\-Repository\-Impl\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=246pt]{classde_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1impl_1_1_reservation_repository_impl__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Zusammengehörigkeiten von de.\-rwth.\-idsg.\-steve.\-repository.\-impl.\-Reservation\-Repository\-Impl\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=246pt]{classde_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1impl_1_1_reservation_repository_impl__coll__graph}
+\end{center}
+\end{figure}
+\subsection*{Öffentliche Methoden}
+\begin{DoxyCompactItemize}
+\item 
+List$<$ \hyperlink{classde_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1dto_1_1_reservation}{Reservation} $>$ \hyperlink{classde_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1impl_1_1_reservation_repository_impl_a4a72a06f1abbea995dd5ca23efd2ee43}{get\-Reservations} (\hyperlink{classde_1_1rwth_1_1idsg_1_1steve_1_1web_1_1dto_1_1_reservation_query_form}{Reservation\-Query\-Form} form)
+\item 
+List$<$ Integer $>$ \hyperlink{classde_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1impl_1_1_reservation_repository_impl_ab259376eb118b54a91286a76adfc0633}{get\-Active\-Reservation\-Ids} (String charge\-Box\-Id)
+\item 
+int \hyperlink{classde_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1impl_1_1_reservation_repository_impl_a77174d7ace6a347d28950a1eb606ca19}{insert} (String id\-Tag, String charge\-Box\-Id, Date\-Time start\-Timestamp, Date\-Time expiry\-Timestamp)
+\item 
+void \hyperlink{classde_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1impl_1_1_reservation_repository_impl_acc4a8d029888cc40c9835a08fc46ff75}{delete} (int reservation\-Id)
+\item 
+void \hyperlink{classde_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1impl_1_1_reservation_repository_impl_ac31eb4a7f67b91159937e5fcfbf7e1cc}{accepted} (int reservation\-Id)
+\item 
+void \hyperlink{classde_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1impl_1_1_reservation_repository_impl_a20b354811652a05d1134f8ccfe9f84ec}{cancelled} (int reservation\-Id)
+\item 
+void \hyperlink{classde_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1impl_1_1_reservation_repository_impl_ad41ba5d5991f1c8563831c08b8e99b8f}{used} (int reservation\-Id, int transaction\-Id)
+\end{DoxyCompactItemize}
+
+
+\subsection{Ausführliche Beschreibung}
+\begin{DoxyAuthor}{Autor}
+Sevket Goekay \href{mailto:goekay@dbis.rwth-aachen.de}{\tt goekay@dbis.\-rwth-\/aachen.\-de} 
+\end{DoxyAuthor}
+\begin{DoxySince}{Seit}
+14.\-08.\-2014 
+\end{DoxySince}
+
+
+\subsection{Dokumentation der Elementfunktionen}
+\hypertarget{classde_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1impl_1_1_reservation_repository_impl_ac31eb4a7f67b91159937e5fcfbf7e1cc}{\index{de\-::rwth\-::idsg\-::steve\-::repository\-::impl\-::\-Reservation\-Repository\-Impl@{de\-::rwth\-::idsg\-::steve\-::repository\-::impl\-::\-Reservation\-Repository\-Impl}!accepted@{accepted}}
+\index{accepted@{accepted}!de::rwth::idsg::steve::repository::impl::ReservationRepositoryImpl@{de\-::rwth\-::idsg\-::steve\-::repository\-::impl\-::\-Reservation\-Repository\-Impl}}
+\subsubsection[{accepted}]{\setlength{\rightskip}{0pt plus 5cm}void de.\-rwth.\-idsg.\-steve.\-repository.\-impl.\-Reservation\-Repository\-Impl.\-accepted (
+\begin{DoxyParamCaption}
+\item[{int}]{reservation\-Id}
+\end{DoxyParamCaption}
+)}}\label{classde_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1impl_1_1_reservation_repository_impl_ac31eb4a7f67b91159937e5fcfbf7e1cc}
+
+
+Implementiert \hyperlink{interfacede_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1_reservation_repository_a839cd195bc1fa9893a32ac760b3353b0}{de.\-rwth.\-idsg.\-steve.\-repository.\-Reservation\-Repository}.
+
+\hypertarget{classde_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1impl_1_1_reservation_repository_impl_a20b354811652a05d1134f8ccfe9f84ec}{\index{de\-::rwth\-::idsg\-::steve\-::repository\-::impl\-::\-Reservation\-Repository\-Impl@{de\-::rwth\-::idsg\-::steve\-::repository\-::impl\-::\-Reservation\-Repository\-Impl}!cancelled@{cancelled}}
+\index{cancelled@{cancelled}!de::rwth::idsg::steve::repository::impl::ReservationRepositoryImpl@{de\-::rwth\-::idsg\-::steve\-::repository\-::impl\-::\-Reservation\-Repository\-Impl}}
+\subsubsection[{cancelled}]{\setlength{\rightskip}{0pt plus 5cm}void de.\-rwth.\-idsg.\-steve.\-repository.\-impl.\-Reservation\-Repository\-Impl.\-cancelled (
+\begin{DoxyParamCaption}
+\item[{int}]{reservation\-Id}
+\end{DoxyParamCaption}
+)}}\label{classde_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1impl_1_1_reservation_repository_impl_a20b354811652a05d1134f8ccfe9f84ec}
+
+
+Implementiert \hyperlink{interfacede_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1_reservation_repository_a25403a1b68112eba0b41633addfa98ca}{de.\-rwth.\-idsg.\-steve.\-repository.\-Reservation\-Repository}.
+
+\hypertarget{classde_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1impl_1_1_reservation_repository_impl_acc4a8d029888cc40c9835a08fc46ff75}{\index{de\-::rwth\-::idsg\-::steve\-::repository\-::impl\-::\-Reservation\-Repository\-Impl@{de\-::rwth\-::idsg\-::steve\-::repository\-::impl\-::\-Reservation\-Repository\-Impl}!delete@{delete}}
+\index{delete@{delete}!de::rwth::idsg::steve::repository::impl::ReservationRepositoryImpl@{de\-::rwth\-::idsg\-::steve\-::repository\-::impl\-::\-Reservation\-Repository\-Impl}}
+\subsubsection[{delete}]{\setlength{\rightskip}{0pt plus 5cm}void de.\-rwth.\-idsg.\-steve.\-repository.\-impl.\-Reservation\-Repository\-Impl.\-delete (
+\begin{DoxyParamCaption}
+\item[{int}]{reservation\-Id}
+\end{DoxyParamCaption}
+)}}\label{classde_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1impl_1_1_reservation_repository_impl_acc4a8d029888cc40c9835a08fc46ff75}
+Deletes the temporarily inserted reservation, when 1) the charging station does not accept the reservation, 2) there is a technical problem (communication failure etc.) with the charging station, 
+
+Implementiert \hyperlink{interfacede_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1_reservation_repository_a269c1973292847a6485237b4449a5f5c}{de.\-rwth.\-idsg.\-steve.\-repository.\-Reservation\-Repository}.
+
+\hypertarget{classde_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1impl_1_1_reservation_repository_impl_ab259376eb118b54a91286a76adfc0633}{\index{de\-::rwth\-::idsg\-::steve\-::repository\-::impl\-::\-Reservation\-Repository\-Impl@{de\-::rwth\-::idsg\-::steve\-::repository\-::impl\-::\-Reservation\-Repository\-Impl}!get\-Active\-Reservation\-Ids@{get\-Active\-Reservation\-Ids}}
+\index{get\-Active\-Reservation\-Ids@{get\-Active\-Reservation\-Ids}!de::rwth::idsg::steve::repository::impl::ReservationRepositoryImpl@{de\-::rwth\-::idsg\-::steve\-::repository\-::impl\-::\-Reservation\-Repository\-Impl}}
+\subsubsection[{get\-Active\-Reservation\-Ids}]{\setlength{\rightskip}{0pt plus 5cm}List$<$Integer$>$ de.\-rwth.\-idsg.\-steve.\-repository.\-impl.\-Reservation\-Repository\-Impl.\-get\-Active\-Reservation\-Ids (
+\begin{DoxyParamCaption}
+\item[{String}]{charge\-Box\-Id}
+\end{DoxyParamCaption}
+)}}\label{classde_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1impl_1_1_reservation_repository_impl_ab259376eb118b54a91286a76adfc0633}
+
+
+Implementiert \hyperlink{interfacede_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1_reservation_repository_aefb53c3222e0d5f36e3aa7ac3a91b40c}{de.\-rwth.\-idsg.\-steve.\-repository.\-Reservation\-Repository}.
+
+\hypertarget{classde_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1impl_1_1_reservation_repository_impl_a4a72a06f1abbea995dd5ca23efd2ee43}{\index{de\-::rwth\-::idsg\-::steve\-::repository\-::impl\-::\-Reservation\-Repository\-Impl@{de\-::rwth\-::idsg\-::steve\-::repository\-::impl\-::\-Reservation\-Repository\-Impl}!get\-Reservations@{get\-Reservations}}
+\index{get\-Reservations@{get\-Reservations}!de::rwth::idsg::steve::repository::impl::ReservationRepositoryImpl@{de\-::rwth\-::idsg\-::steve\-::repository\-::impl\-::\-Reservation\-Repository\-Impl}}
+\subsubsection[{get\-Reservations}]{\setlength{\rightskip}{0pt plus 5cm}List$<${\bf Reservation}$>$ de.\-rwth.\-idsg.\-steve.\-repository.\-impl.\-Reservation\-Repository\-Impl.\-get\-Reservations (
+\begin{DoxyParamCaption}
+\item[{{\bf Reservation\-Query\-Form}}]{form}
+\end{DoxyParamCaption}
+)}}\label{classde_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1impl_1_1_reservation_repository_impl_a4a72a06f1abbea995dd5ca23efd2ee43}
+
+
+Implementiert \hyperlink{interfacede_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1_reservation_repository_ab80103ca7c1c6511e6b05246e7fcfbbb}{de.\-rwth.\-idsg.\-steve.\-repository.\-Reservation\-Repository}.
+
+\hypertarget{classde_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1impl_1_1_reservation_repository_impl_a77174d7ace6a347d28950a1eb606ca19}{\index{de\-::rwth\-::idsg\-::steve\-::repository\-::impl\-::\-Reservation\-Repository\-Impl@{de\-::rwth\-::idsg\-::steve\-::repository\-::impl\-::\-Reservation\-Repository\-Impl}!insert@{insert}}
+\index{insert@{insert}!de::rwth::idsg::steve::repository::impl::ReservationRepositoryImpl@{de\-::rwth\-::idsg\-::steve\-::repository\-::impl\-::\-Reservation\-Repository\-Impl}}
+\subsubsection[{insert}]{\setlength{\rightskip}{0pt plus 5cm}int de.\-rwth.\-idsg.\-steve.\-repository.\-impl.\-Reservation\-Repository\-Impl.\-insert (
+\begin{DoxyParamCaption}
+\item[{String}]{id\-Tag, }
+\item[{String}]{charge\-Box\-Id, }
+\item[{Date\-Time}]{start\-Timestamp, }
+\item[{Date\-Time}]{expiry\-Timestamp}
+\end{DoxyParamCaption}
+)}}\label{classde_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1impl_1_1_reservation_repository_impl_a77174d7ace6a347d28950a1eb606ca19}
+Returns the id of the reservation, if the reservation is inserted. 
+
+Implementiert \hyperlink{interfacede_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1_reservation_repository_aba723f89f7144b70a16335df5c57f4ea}{de.\-rwth.\-idsg.\-steve.\-repository.\-Reservation\-Repository}.
+
+\hypertarget{classde_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1impl_1_1_reservation_repository_impl_ad41ba5d5991f1c8563831c08b8e99b8f}{\index{de\-::rwth\-::idsg\-::steve\-::repository\-::impl\-::\-Reservation\-Repository\-Impl@{de\-::rwth\-::idsg\-::steve\-::repository\-::impl\-::\-Reservation\-Repository\-Impl}!used@{used}}
+\index{used@{used}!de::rwth::idsg::steve::repository::impl::ReservationRepositoryImpl@{de\-::rwth\-::idsg\-::steve\-::repository\-::impl\-::\-Reservation\-Repository\-Impl}}
+\subsubsection[{used}]{\setlength{\rightskip}{0pt plus 5cm}void de.\-rwth.\-idsg.\-steve.\-repository.\-impl.\-Reservation\-Repository\-Impl.\-used (
+\begin{DoxyParamCaption}
+\item[{int}]{reservation\-Id, }
+\item[{int}]{transaction\-Id}
+\end{DoxyParamCaption}
+)}}\label{classde_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1impl_1_1_reservation_repository_impl_ad41ba5d5991f1c8563831c08b8e99b8f}
+
+
+Implementiert \hyperlink{interfacede_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1_reservation_repository_a0e4c6205a4b4e61d9076401a36483d4e}{de.\-rwth.\-idsg.\-steve.\-repository.\-Reservation\-Repository}.
+
+
+
+Die Dokumentation für diese Klasse wurde erzeugt aufgrund der Datei\-:\begin{DoxyCompactItemize}
+\item 
+src/main/java/de/rwth/idsg/steve/repository/impl/\hyperlink{_reservation_repository_impl_8java}{Reservation\-Repository\-Impl.\-java}\end{DoxyCompactItemize}

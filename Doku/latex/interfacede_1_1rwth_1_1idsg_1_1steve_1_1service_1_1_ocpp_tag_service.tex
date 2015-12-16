@@ -1,0 +1,84 @@
+\hypertarget{interfacede_1_1rwth_1_1idsg_1_1steve_1_1service_1_1_ocpp_tag_service}{\section{de.\-rwth.\-idsg.\-steve.\-service.\-Ocpp\-Tag\-Service Schnittstellenreferenz}
+\label{interfacede_1_1rwth_1_1idsg_1_1steve_1_1service_1_1_ocpp_tag_service}\index{de.\-rwth.\-idsg.\-steve.\-service.\-Ocpp\-Tag\-Service@{de.\-rwth.\-idsg.\-steve.\-service.\-Ocpp\-Tag\-Service}}
+}
+
+
+Klassendiagramm für de.\-rwth.\-idsg.\-steve.\-service.\-Ocpp\-Tag\-Service\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=214pt]{interfacede_1_1rwth_1_1idsg_1_1steve_1_1service_1_1_ocpp_tag_service__inherit__graph}
+\end{center}
+\end{figure}
+\subsection*{Öffentliche Methoden}
+\begin{DoxyCompactItemize}
+\item 
+ocpp.\-cs.\-\_\-2010.\-\_\-08.\-Id\-Tag\-Info \hyperlink{interfacede_1_1rwth_1_1idsg_1_1steve_1_1service_1_1_ocpp_tag_service_a77807256b6d913830669edcc46ec028f}{get\-Id\-Tag\-Info\-V12} (String id\-Tag)
+\item 
+ocpp.\-cs.\-\_\-2012.\-\_\-06.\-Id\-Tag\-Info \hyperlink{interfacede_1_1rwth_1_1idsg_1_1steve_1_1service_1_1_ocpp_tag_service_afe5afe05ed4f072302ed4ed7622dba76}{get\-Id\-Tag\-Info\-V15} (String id\-Tag)
+\item 
+List$<$ Authorisation\-Data $>$ \hyperlink{interfacede_1_1rwth_1_1idsg_1_1steve_1_1service_1_1_ocpp_tag_service_a669a739e1cbf6aeeacc4ffcb3375991b}{get\-Auth\-Data\-Of\-All\-Tags} ()
+\item 
+List$<$ Authorisation\-Data $>$ \hyperlink{interfacede_1_1rwth_1_1idsg_1_1steve_1_1service_1_1_ocpp_tag_service_a33a7a5cf778ddd247bab73e5c9f80551}{get\-Auth\-Data} (List$<$ String $>$ id\-Tag\-List)
+\end{DoxyCompactItemize}
+
+
+\subsection{Ausführliche Beschreibung}
+\begin{DoxyAuthor}{Autor}
+Sevket Goekay \href{mailto:goekay@dbis.rwth-aachen.de}{\tt goekay@dbis.\-rwth-\/aachen.\-de} 
+\end{DoxyAuthor}
+\begin{DoxySince}{Seit}
+03.\-01.\-2015 
+\end{DoxySince}
+
+
+\subsection{Dokumentation der Elementfunktionen}
+\hypertarget{interfacede_1_1rwth_1_1idsg_1_1steve_1_1service_1_1_ocpp_tag_service_a33a7a5cf778ddd247bab73e5c9f80551}{\index{de\-::rwth\-::idsg\-::steve\-::service\-::\-Ocpp\-Tag\-Service@{de\-::rwth\-::idsg\-::steve\-::service\-::\-Ocpp\-Tag\-Service}!get\-Auth\-Data@{get\-Auth\-Data}}
+\index{get\-Auth\-Data@{get\-Auth\-Data}!de::rwth::idsg::steve::service::OcppTagService@{de\-::rwth\-::idsg\-::steve\-::service\-::\-Ocpp\-Tag\-Service}}
+\subsubsection[{get\-Auth\-Data}]{\setlength{\rightskip}{0pt plus 5cm}List$<$Authorisation\-Data$>$ de.\-rwth.\-idsg.\-steve.\-service.\-Ocpp\-Tag\-Service.\-get\-Auth\-Data (
+\begin{DoxyParamCaption}
+\item[{List$<$ String $>$}]{id\-Tag\-List}
+\end{DoxyParamCaption}
+)}}\label{interfacede_1_1rwth_1_1idsg_1_1steve_1_1service_1_1_ocpp_tag_service_a33a7a5cf778ddd247bab73e5c9f80551}
+For O\-C\-P\-P 1.\-5\-: Helper method to read details of G\-I\-V\-E\-N id\-Tags from the D\-B for the operation Send\-Local\-List. 
+
+Implementiert in \hyperlink{classde_1_1rwth_1_1idsg_1_1steve_1_1service_1_1_ocpp_tag_service_impl_ae69bf506adc092e4009d870827a2d4b2}{de.\-rwth.\-idsg.\-steve.\-service.\-Ocpp\-Tag\-Service\-Impl}.
+
+\hypertarget{interfacede_1_1rwth_1_1idsg_1_1steve_1_1service_1_1_ocpp_tag_service_a669a739e1cbf6aeeacc4ffcb3375991b}{\index{de\-::rwth\-::idsg\-::steve\-::service\-::\-Ocpp\-Tag\-Service@{de\-::rwth\-::idsg\-::steve\-::service\-::\-Ocpp\-Tag\-Service}!get\-Auth\-Data\-Of\-All\-Tags@{get\-Auth\-Data\-Of\-All\-Tags}}
+\index{get\-Auth\-Data\-Of\-All\-Tags@{get\-Auth\-Data\-Of\-All\-Tags}!de::rwth::idsg::steve::service::OcppTagService@{de\-::rwth\-::idsg\-::steve\-::service\-::\-Ocpp\-Tag\-Service}}
+\subsubsection[{get\-Auth\-Data\-Of\-All\-Tags}]{\setlength{\rightskip}{0pt plus 5cm}List$<$Authorisation\-Data$>$ de.\-rwth.\-idsg.\-steve.\-service.\-Ocpp\-Tag\-Service.\-get\-Auth\-Data\-Of\-All\-Tags (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{interfacede_1_1rwth_1_1idsg_1_1steve_1_1service_1_1_ocpp_tag_service_a669a739e1cbf6aeeacc4ffcb3375991b}
+For O\-C\-P\-P 1.\-5\-: Helper method to read A\-L\-L id\-Tag details from the D\-B for the operation Send\-Local\-List. 
+
+Implementiert in \hyperlink{classde_1_1rwth_1_1idsg_1_1steve_1_1service_1_1_ocpp_tag_service_impl_a64dd6ead6ab37a9017c0484e9a7046f7}{de.\-rwth.\-idsg.\-steve.\-service.\-Ocpp\-Tag\-Service\-Impl}.
+
+\hypertarget{interfacede_1_1rwth_1_1idsg_1_1steve_1_1service_1_1_ocpp_tag_service_a77807256b6d913830669edcc46ec028f}{\index{de\-::rwth\-::idsg\-::steve\-::service\-::\-Ocpp\-Tag\-Service@{de\-::rwth\-::idsg\-::steve\-::service\-::\-Ocpp\-Tag\-Service}!get\-Id\-Tag\-Info\-V12@{get\-Id\-Tag\-Info\-V12}}
+\index{get\-Id\-Tag\-Info\-V12@{get\-Id\-Tag\-Info\-V12}!de::rwth::idsg::steve::service::OcppTagService@{de\-::rwth\-::idsg\-::steve\-::service\-::\-Ocpp\-Tag\-Service}}
+\subsubsection[{get\-Id\-Tag\-Info\-V12}]{\setlength{\rightskip}{0pt plus 5cm}ocpp.\-cs.\-\_\-2010.\-\_\-08.\-Id\-Tag\-Info de.\-rwth.\-idsg.\-steve.\-service.\-Ocpp\-Tag\-Service.\-get\-Id\-Tag\-Info\-V12 (
+\begin{DoxyParamCaption}
+\item[{String}]{id\-Tag}
+\end{DoxyParamCaption}
+)}}\label{interfacede_1_1rwth_1_1idsg_1_1steve_1_1service_1_1_ocpp_tag_service_a77807256b6d913830669edcc46ec028f}
+
+
+Implementiert in \hyperlink{classde_1_1rwth_1_1idsg_1_1steve_1_1service_1_1_ocpp_tag_service_impl_ac6bd54d80b55b59271fd42b73ff28f15}{de.\-rwth.\-idsg.\-steve.\-service.\-Ocpp\-Tag\-Service\-Impl}.
+
+\hypertarget{interfacede_1_1rwth_1_1idsg_1_1steve_1_1service_1_1_ocpp_tag_service_afe5afe05ed4f072302ed4ed7622dba76}{\index{de\-::rwth\-::idsg\-::steve\-::service\-::\-Ocpp\-Tag\-Service@{de\-::rwth\-::idsg\-::steve\-::service\-::\-Ocpp\-Tag\-Service}!get\-Id\-Tag\-Info\-V15@{get\-Id\-Tag\-Info\-V15}}
+\index{get\-Id\-Tag\-Info\-V15@{get\-Id\-Tag\-Info\-V15}!de::rwth::idsg::steve::service::OcppTagService@{de\-::rwth\-::idsg\-::steve\-::service\-::\-Ocpp\-Tag\-Service}}
+\subsubsection[{get\-Id\-Tag\-Info\-V15}]{\setlength{\rightskip}{0pt plus 5cm}ocpp.\-cs.\-\_\-2012.\-\_\-06.\-Id\-Tag\-Info de.\-rwth.\-idsg.\-steve.\-service.\-Ocpp\-Tag\-Service.\-get\-Id\-Tag\-Info\-V15 (
+\begin{DoxyParamCaption}
+\item[{String}]{id\-Tag}
+\end{DoxyParamCaption}
+)}}\label{interfacede_1_1rwth_1_1idsg_1_1steve_1_1service_1_1_ocpp_tag_service_afe5afe05ed4f072302ed4ed7622dba76}
+
+
+Implementiert in \hyperlink{classde_1_1rwth_1_1idsg_1_1steve_1_1service_1_1_ocpp_tag_service_impl_a565bb2fa82522c27f3aba660b590ccce}{de.\-rwth.\-idsg.\-steve.\-service.\-Ocpp\-Tag\-Service\-Impl}.
+
+
+
+Die Dokumentation für diese Schnittstelle wurde erzeugt aufgrund der Datei\-:\begin{DoxyCompactItemize}
+\item 
+src/main/java/de/rwth/idsg/steve/service/\hyperlink{_ocpp_tag_service_8java}{Ocpp\-Tag\-Service.\-java}\end{DoxyCompactItemize}

@@ -1,0 +1,119 @@
+
+
+\href{https://travis-ci.org/RWTH-i5-IDSG/steve}{\tt !\mbox{[}Build Status\mbox{]}(https\-://travis-\/ci.\-org/\-R\-W\-T\-H-\/i5-\/\-I\-D\-S\-G/steve.\-svg)} \href{https://scan.coverity.com/projects/rwth-i5-idsg-steve}{\tt !\mbox{[}Coverity Status\mbox{]}(https\-://scan.\-coverity.\-com/projects/6601/badge.\-svg)}
+
+\section*{Introduction}
+
+Ste\-Ve was developed at the R\-W\-T\-H Aachen University and means Steckdosenverwaltung, namely socket administration in German. The aim of Ste\-Ve is to support the deployment and popularity of electric mobility, so it is easy to install and to use. Ste\-Ve provides basic functions for the administration of charge points, user data, and R\-F\-I\-D cards for user authentication and was tested successfully in operation.
+
+Ste\-Ve is considered as an open platform to implement, test and evaluate novel ideas for electric mobility, like authentication protocols, reservation mechanisms for charge points, and business models for electric mobility. Ste\-Ve is distributed under \href{LICENSE.txt}{\tt G\-P\-L} and is free to use. If you are going to deploy Ste\-Ve we are happy to see the \href{website/logo/managed-by-steve.pdf}{\tt logo} on a charge point.
+
+\subsubsection*{Charge Point Support}
+
+Electric charge points using the following O\-C\-P\-P versions are supported\-:
+
+
+\begin{DoxyItemize}
+\item O\-C\-P\-P1.\-2\-S
+\item O\-C\-P\-P1.\-5\-S
+\item O\-C\-P\-P1.\-2\-J
+\item O\-C\-P\-P1.\-5\-J
+\end{DoxyItemize}
+
+We have successfully tested Ste\-Ve with charge points manufactured by E\-B\-G and Mennekes. If your charge point also works well with Ste\-Ve, please let us know! We will update the list.
+
+\subsubsection*{System Requirements}
+
+Ste\-Ve requires
+\begin{DoxyItemize}
+\item J\-D\-K 8 (both Oracle J\-D\-K and Open\-J\-D\-K are supported)
+\item Maven
+\item At least My\-S\-Q\-L 5.\-6.\-4 (Maria\-D\-B 10.\-0 or later works as well) as database
+\end{DoxyItemize}
+
+to build and run.
+
+Ste\-Ve is designed to run standalone, a java servlet container / web server (e.\-g. Apache Tomcat), is {\bfseries not} required.
+
+\section*{Configuration and Installation}
+
+
+\begin{DoxyEnumerate}
+\item Database preparation\-:
+
+The following My\-S\-Q\-L statements can be used as database initialization (adjust according to your setup)\-:
+
+``` C\-R\-E\-A\-T\-E D\-A\-T\-A\-B\-A\-S\-E stevedb C\-H\-A\-R\-A\-C\-T\-E\-R S\-E\-T utf8 C\-O\-L\-L\-A\-T\-E utf8\-\_\-unicode\-\_\-ci; G\-R\-A\-N\-T A\-L\-L P\-R\-I\-V\-I\-L\-E\-G\-E\-S O\-N stevedb.$\ast$ T\-O 'steve'@'localhost' I\-D\-E\-N\-T\-I\-F\-I\-E\-D B\-Y 'changeme'; G\-R\-A\-N\-T S\-E\-L\-E\-C\-T O\-N mysql.\-proc T\-O 'steve'@'localhost' I\-D\-E\-N\-T\-I\-F\-I\-E\-D B\-Y 'changeme'; ```
+\item Download and extract tarball\-:
+
+You can download and extract the Ste\-Ve releases using the following commands (replace X.\-X.\-X with the desired version number)\-: ``` wget \href{https://github.com/RWTH-i5-IDSG/steve/archive/steve-X.X.X.tar.gz}{\tt https\-://github.\-com/\-R\-W\-T\-H-\/i5-\/\-I\-D\-S\-G/steve/archive/steve-\/\-X.\-X.\-X.\-tar.\-gz} tar xzvf steve-\/\-X.\-X.\-X.\-tar.\-gz cd steve-\/\-X.\-X.\-X ```
+\item Configure Ste\-Ve {\bfseries before} building\-:
+
+The basic configuration is defined in \href{src/main/resources/config/prod/main.properties}{\tt main.\-properties}\-:
+\begin{DoxyItemize}
+\item You {\itshape must} change \href{src/main/resources/config/prod/main.properties#L3-L7}{\tt database configuration}
+\item You {\itshape must} change \href{src/main/resources/config/prod/main.properties#L16}{\tt the host} to the correct I\-P address of your server
+\item You {\itshape must} change \href{src/main/resources/config/prod/main.properties#L11-L12}{\tt web interface credentials}
+\item You {\itshape can} access the application via H\-T\-T\-P\-S, by \href{src/main/resources/config/prod/main.properties#L26-L29}{\tt enabling it and setting the keystore properties}
+\end{DoxyItemize}
+
+For advanced configuration please see the \href{https://github.com/RWTH-i5-IDSG/steve/wiki/Configuration}{\tt Configuration wiki}
+\item Build Ste\-Ve\-:
+
+To compile Ste\-Ve simply use Maven. A runnable {\ttfamily jar} file containing the application and configuration will be created in the subdirectory {\ttfamily steve/target}.
+
+``` \section*{mvn package}
+
+```
+\item Run Ste\-Ve\-:
+
+To start the application run (please do not run Ste\-Ve as root)\-:
+
+``` \section*{java -\/jar target/steve-\/\-X.\-X.\-X.\-jar}
+
+```
+\end{DoxyEnumerate}
+
+\section*{First Steps}
+
+After Ste\-Ve has successfully started, you can access the web interface using the configured credentials under\-: \begin{DoxyVerb}http://<your-server-ip>:<port>/steve/manager
+\end{DoxyVerb}
+
+
+The default port number is 8080.
+
+\subsubsection*{Add a charge point}
+
+
+\begin{DoxyEnumerate}
+\item In order for Ste\-Ve to accept messages from a charge point, the charge point must first be registered. To add a charge point to Ste\-Ve select {\itshape Data Management} $>$$>$ {\itshape Charge Points} $>$$>$ {\itshape Add}. Enter the Charge\-Box I\-D configured in the charge point and confirm.
+\item The charge points must be configured to communicate with following addresses. Depending on the O\-C\-P\-P version of the charge point, Ste\-Ve will automatically route messages to the version-\/specific implementation.
+\begin{DoxyItemize}
+\item S\-O\-A\-P\-: {\ttfamily \href{http://}{\tt http\-://}$<$your-\/server-\/ip$>$\-:$<$port$>$/steve/services/\-Central\-System\-Service}
+\item Web\-Socket/\-J\-S\-O\-N\-: {\ttfamily ws\-://$<$your-\/server-\/ip$>$\-:$<$port$>$/steve/websocket/\-Central\-System\-Service/$<$charge\-Box\-Id$>$}
+\end{DoxyItemize}
+\end{DoxyEnumerate}
+
+As soon as a heartbeat is received, you should see the status of the charge point in the Ste\-Ve Dashboard.
+
+{\itshape Have fun!}
+
+\subsection*{Screenshots }
+
+
+\begin{DoxyEnumerate}
+\item \href{website/screenshots/home.png}{\tt Home}
+\item \href{website/screenshots/connector-status.png}{\tt Connector Status}
+\item \href{website/screenshots/chargepoints.png}{\tt Data Management -\/ Charge Points}
+\item \href{website/screenshots/users.png}{\tt Data Management -\/ Users}
+\item \href{website/screenshots/ocpp-tags.png}{\tt Data Management -\/ O\-C\-P\-P Tags}
+\item \href{website/screenshots/reservations.png}{\tt Data Management -\/ Reservations}
+\item \href{website/screenshots/transactions.png}{\tt Data Management -\/ Transactions}
+\item \href{website/screenshots/ocpp12.png}{\tt Operations -\/ O\-C\-P\-P v1.\-2}
+\item \href{website/screenshots/ocpp15.png}{\tt Operations -\/ O\-C\-P\-P v1.\-5}
+\item \href{website/screenshots/settings.png}{\tt Settings}
+\end{DoxyEnumerate}
+
+\subsection*{Are you having issues? }
+
+See the \href{https://github.com/RWTH-i5-IDSG/steve/wiki/FAQ}{\tt F\-A\-Q} 

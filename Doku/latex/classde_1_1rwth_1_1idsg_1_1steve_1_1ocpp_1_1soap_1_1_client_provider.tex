@@ -1,0 +1,47 @@
+\hypertarget{classde_1_1rwth_1_1idsg_1_1steve_1_1ocpp_1_1soap_1_1_client_provider}{\section{de.\-rwth.\-idsg.\-steve.\-ocpp.\-soap.\-Client\-Provider Klassenreferenz}
+\label{classde_1_1rwth_1_1idsg_1_1steve_1_1ocpp_1_1soap_1_1_client_provider}\index{de.\-rwth.\-idsg.\-steve.\-ocpp.\-soap.\-Client\-Provider@{de.\-rwth.\-idsg.\-steve.\-ocpp.\-soap.\-Client\-Provider}}
+}
+\subsection*{Öffentliche Methoden}
+\begin{DoxyCompactItemize}
+\item 
+ocpp.\-cp.\-\_\-2010.\-\_\-08.\-Charge\-Point\-Service \hyperlink{classde_1_1rwth_1_1idsg_1_1steve_1_1ocpp_1_1soap_1_1_client_provider_a95903bb042da0bb406df12662ee63f0d}{get\-For\-Ocpp12} (String endpoint\-Address)
+\item 
+ocpp.\-cp.\-\_\-2012.\-\_\-06.\-Charge\-Point\-Service \hyperlink{classde_1_1rwth_1_1idsg_1_1steve_1_1ocpp_1_1soap_1_1_client_provider_a52b89de5492c783ede0a062c2f1bdac0}{get\-For\-Ocpp15} (String endpoint\-Address)
+\end{DoxyCompactItemize}
+
+
+\subsection{Ausführliche Beschreibung}
+T\-O\-D\-O\-: Is it expensive to create the proxies every time? Cache the proxies (endpoint\-Address, service) in a map-\/like structure maybe? Probably use one of these\-:
+
+1) \href{http://docs.guava-libraries.googlecode.com/git/javadoc/com/google/common/cache/CacheBuilder.html}{\tt http\-://docs.\-guava-\/libraries.\-googlecode.\-com/git/javadoc/com/google/common/cache/\-Cache\-Builder.\-html} 2) \href{https://github.com/ben-manes/caffeine}{\tt https\-://github.\-com/ben-\/manes/caffeine}
+
+Why not a simple hash map\-: We need an eviction mechanism. In case the endpoint address changes after a while, the older proxy is not needed.
+
+\begin{DoxyAuthor}{Autor}
+Sevket Goekay \href{mailto:goekay@dbis.rwth-aachen.de}{\tt goekay@dbis.\-rwth-\/aachen.\-de} 
+\end{DoxyAuthor}
+\begin{DoxySince}{Seit}
+21.\-10.\-2015 
+\end{DoxySince}
+
+
+\subsection{Dokumentation der Elementfunktionen}
+\hypertarget{classde_1_1rwth_1_1idsg_1_1steve_1_1ocpp_1_1soap_1_1_client_provider_a95903bb042da0bb406df12662ee63f0d}{\index{de\-::rwth\-::idsg\-::steve\-::ocpp\-::soap\-::\-Client\-Provider@{de\-::rwth\-::idsg\-::steve\-::ocpp\-::soap\-::\-Client\-Provider}!get\-For\-Ocpp12@{get\-For\-Ocpp12}}
+\index{get\-For\-Ocpp12@{get\-For\-Ocpp12}!de::rwth::idsg::steve::ocpp::soap::ClientProvider@{de\-::rwth\-::idsg\-::steve\-::ocpp\-::soap\-::\-Client\-Provider}}
+\subsubsection[{get\-For\-Ocpp12}]{\setlength{\rightskip}{0pt plus 5cm}ocpp.\-cp.\-\_\-2010.\-\_\-08.\-Charge\-Point\-Service de.\-rwth.\-idsg.\-steve.\-ocpp.\-soap.\-Client\-Provider.\-get\-For\-Ocpp12 (
+\begin{DoxyParamCaption}
+\item[{String}]{endpoint\-Address}
+\end{DoxyParamCaption}
+)}}\label{classde_1_1rwth_1_1idsg_1_1steve_1_1ocpp_1_1soap_1_1_client_provider_a95903bb042da0bb406df12662ee63f0d}
+\hypertarget{classde_1_1rwth_1_1idsg_1_1steve_1_1ocpp_1_1soap_1_1_client_provider_a52b89de5492c783ede0a062c2f1bdac0}{\index{de\-::rwth\-::idsg\-::steve\-::ocpp\-::soap\-::\-Client\-Provider@{de\-::rwth\-::idsg\-::steve\-::ocpp\-::soap\-::\-Client\-Provider}!get\-For\-Ocpp15@{get\-For\-Ocpp15}}
+\index{get\-For\-Ocpp15@{get\-For\-Ocpp15}!de::rwth::idsg::steve::ocpp::soap::ClientProvider@{de\-::rwth\-::idsg\-::steve\-::ocpp\-::soap\-::\-Client\-Provider}}
+\subsubsection[{get\-For\-Ocpp15}]{\setlength{\rightskip}{0pt plus 5cm}ocpp.\-cp.\-\_\-2012.\-\_\-06.\-Charge\-Point\-Service de.\-rwth.\-idsg.\-steve.\-ocpp.\-soap.\-Client\-Provider.\-get\-For\-Ocpp15 (
+\begin{DoxyParamCaption}
+\item[{String}]{endpoint\-Address}
+\end{DoxyParamCaption}
+)}}\label{classde_1_1rwth_1_1idsg_1_1steve_1_1ocpp_1_1soap_1_1_client_provider_a52b89de5492c783ede0a062c2f1bdac0}
+
+
+Die Dokumentation für diese Klasse wurde erzeugt aufgrund der Datei\-:\begin{DoxyCompactItemize}
+\item 
+src/main/java/de/rwth/idsg/steve/ocpp/soap/\hyperlink{_client_provider_8java}{Client\-Provider.\-java}\end{DoxyCompactItemize}

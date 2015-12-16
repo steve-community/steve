@@ -1,0 +1,64 @@
+\hypertarget{classde_1_1rwth_1_1idsg_1_1steve_1_1ocpp_1_1soap_1_1_from_address_interceptor}{\section{de.\-rwth.\-idsg.\-steve.\-ocpp.\-soap.\-From\-Address\-Interceptor Klassenreferenz}
+\label{classde_1_1rwth_1_1idsg_1_1steve_1_1ocpp_1_1soap_1_1_from_address_interceptor}\index{de.\-rwth.\-idsg.\-steve.\-ocpp.\-soap.\-From\-Address\-Interceptor@{de.\-rwth.\-idsg.\-steve.\-ocpp.\-soap.\-From\-Address\-Interceptor}}
+}
+
+
+Klassendiagramm für de.\-rwth.\-idsg.\-steve.\-ocpp.\-soap.\-From\-Address\-Interceptor\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=228pt]{classde_1_1rwth_1_1idsg_1_1steve_1_1ocpp_1_1soap_1_1_from_address_interceptor__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Zusammengehörigkeiten von de.\-rwth.\-idsg.\-steve.\-ocpp.\-soap.\-From\-Address\-Interceptor\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=228pt]{classde_1_1rwth_1_1idsg_1_1steve_1_1ocpp_1_1soap_1_1_from_address_interceptor__coll__graph}
+\end{center}
+\end{figure}
+\subsection*{Öffentliche Methoden}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classde_1_1rwth_1_1idsg_1_1steve_1_1ocpp_1_1soap_1_1_from_address_interceptor_abbbe56bdd995abd805ade64990ceaccb}{From\-Address\-Interceptor} ()
+\item 
+void \hyperlink{classde_1_1rwth_1_1idsg_1_1steve_1_1ocpp_1_1soap_1_1_from_address_interceptor_a465f27cff6ca77abe462e05d4f5c545a}{handle\-Message} (Message message)  throws Fault 
+\end{DoxyCompactItemize}
+
+
+\subsection{Ausführliche Beschreibung}
+Intercepts incoming O\-C\-P\-P messages to update the endpoint address (\char`\"{}\-From\char`\"{} field of the W\-S-\/\-A header) in D\-B. And the absence of the field is not a deal breaker anymore. But, as a side effect, the user will not be able to send commands to the charging station, since the D\-B call to list the charge points will filter it out. See \hyperlink{classde_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1impl_1_1_charge_point_repository_impl_a1d92ac9f5e6804fff149aa0d74e33834}{Charge\-Point\-Repository\-Impl\#get\-Charge\-Point\-Select(\-Ocpp\-Protocol)}.
+
+\begin{DoxyAuthor}{Autor}
+Sevket Goekay \href{mailto:goekay@dbis.rwth-aachen.de}{\tt goekay@dbis.\-rwth-\/aachen.\-de} 
+\end{DoxyAuthor}
+\begin{DoxySince}{Seit}
+15.\-06.\-2015 
+\end{DoxySince}
+
+
+\subsection{Beschreibung der Konstruktoren und Destruktoren}
+\hypertarget{classde_1_1rwth_1_1idsg_1_1steve_1_1ocpp_1_1soap_1_1_from_address_interceptor_abbbe56bdd995abd805ade64990ceaccb}{\index{de\-::rwth\-::idsg\-::steve\-::ocpp\-::soap\-::\-From\-Address\-Interceptor@{de\-::rwth\-::idsg\-::steve\-::ocpp\-::soap\-::\-From\-Address\-Interceptor}!From\-Address\-Interceptor@{From\-Address\-Interceptor}}
+\index{From\-Address\-Interceptor@{From\-Address\-Interceptor}!de::rwth::idsg::steve::ocpp::soap::FromAddressInterceptor@{de\-::rwth\-::idsg\-::steve\-::ocpp\-::soap\-::\-From\-Address\-Interceptor}}
+\subsubsection[{From\-Address\-Interceptor}]{\setlength{\rightskip}{0pt plus 5cm}de.\-rwth.\-idsg.\-steve.\-ocpp.\-soap.\-From\-Address\-Interceptor.\-From\-Address\-Interceptor (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{classde_1_1rwth_1_1idsg_1_1steve_1_1ocpp_1_1soap_1_1_from_address_interceptor_abbbe56bdd995abd805ade64990ceaccb}
+
+
+\subsection{Dokumentation der Elementfunktionen}
+\hypertarget{classde_1_1rwth_1_1idsg_1_1steve_1_1ocpp_1_1soap_1_1_from_address_interceptor_a465f27cff6ca77abe462e05d4f5c545a}{\index{de\-::rwth\-::idsg\-::steve\-::ocpp\-::soap\-::\-From\-Address\-Interceptor@{de\-::rwth\-::idsg\-::steve\-::ocpp\-::soap\-::\-From\-Address\-Interceptor}!handle\-Message@{handle\-Message}}
+\index{handle\-Message@{handle\-Message}!de::rwth::idsg::steve::ocpp::soap::FromAddressInterceptor@{de\-::rwth\-::idsg\-::steve\-::ocpp\-::soap\-::\-From\-Address\-Interceptor}}
+\subsubsection[{handle\-Message}]{\setlength{\rightskip}{0pt plus 5cm}void de.\-rwth.\-idsg.\-steve.\-ocpp.\-soap.\-From\-Address\-Interceptor.\-handle\-Message (
+\begin{DoxyParamCaption}
+\item[{Message}]{message}
+\end{DoxyParamCaption}
+) throws Fault}}\label{classde_1_1rwth_1_1idsg_1_1steve_1_1ocpp_1_1soap_1_1_from_address_interceptor_a465f27cff6ca77abe462e05d4f5c545a}
+
+
+Die Dokumentation für diese Klasse wurde erzeugt aufgrund der Datei\-:\begin{DoxyCompactItemize}
+\item 
+src/main/java/de/rwth/idsg/steve/ocpp/soap/\hyperlink{_from_address_interceptor_8java}{From\-Address\-Interceptor.\-java}\end{DoxyCompactItemize}

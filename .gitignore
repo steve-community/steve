@@ -2,3 +2,12 @@
 /.idea
 *.iml
 .DS_Store
+
+**/latex/refman.aux
+**/latex/refman.idx
+**/latex/refman.ilg
+**/latex/refman.ind
+**/latex/refman.log
+**/latex/refman.out
+**/latex/refman.toc
+

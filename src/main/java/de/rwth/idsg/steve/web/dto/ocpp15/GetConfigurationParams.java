@@ -1,9 +1,9 @@
 package de.rwth.idsg.steve.web.dto.ocpp15;
 
 import de.rwth.idsg.steve.web.dto.common.MultipleChargePointSelect;
+import lombok.Getter;
 import lombok.Setter;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -11,14 +11,12 @@ import java.util.List;
  * @since 02.01.2015
  */
 @Setter
+@Getter
 public class GetConfigurationParams extends MultipleChargePointSelect {
 
     private List<ConfigurationKeyEnum> confKeyList;
 
-    public List<ConfigurationKeyEnum> getConfKeyList() {
-        if (confKeyList == null) {
-            confKeyList = new ArrayList<>();
-        }
-        return confKeyList;
+    public boolean isSetConfKeyList() {
+        return confKeyList != null && !confKeyList.isEmpty();
     }
 }

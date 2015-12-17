@@ -153,12 +153,16 @@ public class ChargePointService15_Client {
     }
 
     private GetConfigurationRequest prepareGetConfiguration(GetConfigurationParams params) {
-        List<String> stringList = params.getConfKeyList()
-                                        .stream()
-                                        .map(ConfigurationKeyEnum::value)
-                                        .collect(Collectors.toList());
+        if (params.isSetConfKeyList()) {
+            List<String> stringList = params.getConfKeyList()
+                                            .stream()
+                                            .map(ConfigurationKeyEnum::value)
+                                            .collect(Collectors.toList());
 
-        return new GetConfigurationRequest().withKey(stringList);
+            return new GetConfigurationRequest().withKey(stringList);
+        } else {
+            return new GetConfigurationRequest();
+        }
     }
 
     private GetLocalListVersionRequest prepareGetLocalListVersion() {

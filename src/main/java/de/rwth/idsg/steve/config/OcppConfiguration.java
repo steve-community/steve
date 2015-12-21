@@ -102,6 +102,7 @@ public class OcppConfiguration {
         f.setServiceBean(ocpp12Server);
         f.setAddress("/CentralSystemServiceOCPP12");
         f.getInInterceptors().addAll(interceptors);
+        f.setProperties(ocppServiceMap(OcppVersion.V_12));
         f.create();
     }
 
@@ -110,6 +111,7 @@ public class OcppConfiguration {
         f.setServiceBean(ocpp15Server);
         f.setAddress("/CentralSystemServiceOCPP15");
         f.getInInterceptors().addAll(interceptors);
+        f.setProperties(ocppServiceMap(OcppVersion.V_15));
         f.create();
     }
 
@@ -132,6 +134,27 @@ public class OcppConfiguration {
 
             case V_15:
                 nameSpaceMap.put("ns1", "urn://Ocpp/Cp/2012/06/");
+                break;
+        }
+
+        Map<String, Object> map = new HashMap<>();
+        map.put("soap.env.ns.map", nameSpaceMap);
+        map.put("disable.outputstream.optimization", true);
+        return map;
+    }
+
+    private Map<String, Object> ocppServiceMap(OcppVersion ocppVersion) {
+        Map<String, String> nameSpaceMap = new HashMap<>();
+        nameSpaceMap.put("soapenv", "http://www.w3.org/2003/05/soap-envelope");
+        nameSpaceMap.put("wsa", "http://www.w3.org/2005/08/addressing");
+
+        switch (ocppVersion) {
+            case V_12:
+                nameSpaceMap.put("ns1", "urn://Ocpp/Cs/2010/08/");
+                break;
+
+            case V_15:
+                nameSpaceMap.put("ns1", "urn://Ocpp/Cs/2012/06/");
                 break;
         }
 

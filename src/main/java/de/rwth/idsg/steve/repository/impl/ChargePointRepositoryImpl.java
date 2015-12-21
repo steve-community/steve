@@ -215,12 +215,12 @@ public class ChargePointRepositoryImpl implements ChargePointRepository {
     }
 
     @Override
-    public void addChargePoint(ChargePointForm form) {
-        ctx.transaction(configuration -> {
+    public int addChargePoint(ChargePointForm form) {
+        return ctx.transactionResult(configuration -> {
             DSLContext ctx = DSL.using(configuration);
             try {
                 Integer addressId = addressRepository.updateOrInsert(ctx, form.getAddress());
-                addChargePointInternal(ctx, form, addressId);
+                return addChargePointInternal(ctx, form, addressId);
 
             } catch (DataAccessException e) {
                 throw new SteveException("Failed to add the charge point with chargeBoxId '%s'",
@@ -268,20 +268,17 @@ public class ChargePointRepositoryImpl implements ChargePointRepository {
                   .where(CHARGE_BOX.CHARGE_BOX_PK.eq(chargeBoxPk));
     }
 
-    private void addChargePointInternal(DSLContext ctx, ChargePointForm form, Integer addressPk) {
-        int count = ctx.insertInto(CHARGE_BOX)
-                       .set(CHARGE_BOX.CHARGE_BOX_ID, form.getChargeBoxId())
-                       .set(CHARGE_BOX.DESCRIPTION, form.getDescription())
-                       .set(CHARGE_BOX.LOCATION_LATITUDE, form.getLocationLatitude())
-                       .set(CHARGE_BOX.LOCATION_LONGITUDE, form.getLocationLongitude())
-                       .set(CHARGE_BOX.NOTE, form.getNote())
-                       .set(CHARGE_BOX.ADDRESS_PK, addressPk)
-                       .onDuplicateKeyIgnore() // Important detail
-                       .execute();
-
-        if (count == 0) {
-            throw new SteveException("A charge point with chargeBoxId '%s' already exists.", form.getChargeBoxId());
-        }
+    private int addChargePointInternal(DSLContext ctx, ChargePointForm form, Integer addressPk) {
+        return ctx.insertInto(CHARGE_BOX)
+                  .set(CHARGE_BOX.CHARGE_BOX_ID, form.getChargeBoxId())
+                  .set(CHARGE_BOX.DESCRIPTION, form.getDescription())
+                  .set(CHARGE_BOX.LOCATION_LATITUDE, form.getLocationLatitude())
+                  .set(CHARGE_BOX.LOCATION_LONGITUDE, form.getLocationLongitude())
+                  .set(CHARGE_BOX.NOTE, form.getNote())
+                  .set(CHARGE_BOX.ADDRESS_PK, addressPk)
+                  .returning(CHARGE_BOX.CHARGE_BOX_PK)
+                  .fetchOne()
+                  .getChargeBoxPk();
     }
 
     private void updateChargePointInternal(DSLContext ctx, ChargePointForm form, Integer addressPk) {

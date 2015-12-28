@@ -86,12 +86,14 @@ public class SteveAppContext {
         ctx.addServlet(web, CONFIG.getSpringMapping());
         ctx.addServlet(cxf, CONFIG.getCxfMapping());
 
-        // Register Spring's filter chain for security. The name is not arbitrary, but is as expected by Spring.
-        ctx.addFilter(
-                new FilterHolder(new DelegatingFilterProxy("springSecurityFilterChain")),
-                CONFIG.getSpringManagerMapping(),
-                EnumSet.allOf(DispatcherType.class)
-        );
+        if (CONFIG.getProfile().isProd()) {
+            // Register Spring's filter chain for security. The name is not arbitrary, but is as expected by Spring.
+            ctx.addFilter(
+                    new FilterHolder(new DelegatingFilterProxy("springSecurityFilterChain")),
+                    CONFIG.getSpringManagerMapping(),
+                    EnumSet.allOf(DispatcherType.class)
+            );
+        }
 
         initJSP(ctx);
         return ctx;

@@ -1,6 +1,8 @@
 package de.rwth.idsg.steve.config;
 
+import de.rwth.idsg.steve.SteveProdCondition;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -16,6 +18,7 @@ import static de.rwth.idsg.steve.SteveConfiguration.CONFIG;
  */
 @Configuration
 @EnableWebSecurity
+@Conditional(SteveProdCondition.class)
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     @Autowired

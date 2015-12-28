@@ -16,12 +16,14 @@ import org.eclipse.jetty.servlet.FilterHolder;
 import org.eclipse.jetty.servlet.ServletHolder;
 import org.eclipse.jetty.webapp.WebAppContext;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.security.web.context.AbstractSecurityWebApplicationInitializer;
 import org.springframework.web.context.ContextLoaderListener;
 import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
 import org.springframework.web.filter.DelegatingFilterProxy;
 import org.springframework.web.servlet.DispatcherServlet;
 
 import javax.servlet.DispatcherType;
+import javax.servlet.Filter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.EnumSet;
@@ -87,16 +89,22 @@ public class SteveAppContext {
         ctx.addServlet(cxf, CONFIG.getCxfMapping());
 
         if (CONFIG.getProfile().isProd()) {
-            // Register Spring's filter chain for security. The name is not arbitrary, but is as expected by Spring.
-            ctx.addFilter(
-                    new FilterHolder(new DelegatingFilterProxy("springSecurityFilterChain")),
-                    CONFIG.getSpringManagerMapping(),
-                    EnumSet.allOf(DispatcherType.class)
-            );
+            addSecurityFilter(ctx);
         }
 
         initJSP(ctx);
         return ctx;
+    }
+
+    private void addSecurityFilter(WebAppContext ctx) {
+        // The bean name is not arbitrary, but is as expected by Spring
+        Filter f = new DelegatingFilterProxy(AbstractSecurityWebApplicationInitializer.DEFAULT_FILTER_NAME);
+
+        ctx.addFilter(
+                new FilterHolder(f),
+                CONFIG.getSpringManagerMapping(),
+                EnumSet.allOf(DispatcherType.class)
+        );
     }
 
     private Handler getRedirectHandler() {

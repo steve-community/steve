@@ -5,5 +5,5 @@
 	<tr><td>House Number:</td><td><form:input path="address.houseNumber"/></td></tr>
 	<tr><td>Zip code:</td><td><form:input path="address.zipCode"/></td></tr>
 	<tr><td>City:</td><td><form:input path="address.city"/></td></tr>
-	<tr><td>Country:</td><td><form:input path="address.country"/></td></tr>
+	<tr><td>Country:</td><td><form:select path="address.country" items="${countryCodes}"/></td></tr>
 </table>

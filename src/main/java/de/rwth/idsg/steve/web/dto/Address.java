@@ -1,5 +1,6 @@
 package de.rwth.idsg.steve.web.dto;
 
+import com.neovisionaries.i18n.CountryCode;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -18,7 +19,7 @@ public class Address {
     private String houseNumber;
     private String zipCode;
     private String city;
-    private String country;
+    private CountryCode country;
 
     public boolean isEmpty() {
         return addressPk == null
@@ -27,5 +28,16 @@ public class Address {
                 && zipCode == null
                 && city == null
                 && country == null;
+    }
+
+    /**
+     * Otherwise, if the country field is not set, we would get a NPE.
+     */
+    public String getCountryAlpha2OrNull() {
+        if (country == null) {
+            return null;
+        } else {
+            return country.getAlpha2();
+        }
     }
 }

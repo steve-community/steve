@@ -81,7 +81,7 @@ public class AddressRepositoryImpl implements AddressRepository {
                        .set(ADDRESS.HOUSE_NUMBER, ad.getHouseNumber())
                        .set(ADDRESS.ZIP_CODE, ad.getZipCode())
                        .set(ADDRESS.CITY, ad.getCity())
-                       .set(ADDRESS.COUNTRY, ad.getCountry())
+                       .set(ADDRESS.COUNTRY, ad.getCountryAlpha2OrNull())
                        .execute();
 
         if (count != 1) {
@@ -99,7 +99,7 @@ public class AddressRepositoryImpl implements AddressRepository {
                        .set(ADDRESS.HOUSE_NUMBER, ad.getHouseNumber())
                        .set(ADDRESS.ZIP_CODE, ad.getZipCode())
                        .set(ADDRESS.CITY, ad.getCity())
-                       .set(ADDRESS.COUNTRY, ad.getCountry())
+                       .set(ADDRESS.COUNTRY, ad.getCountryAlpha2OrNull())
                        .where(ADDRESS.ADDRESS_PK.eq(ad.getAddressPk()))
                        .execute();
 

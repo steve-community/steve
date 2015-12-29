@@ -610,5 +610,13 @@
             <scope>test</scope>
         </dependency>
 
+        <!-- Codes according to ISO standards
+             https://github.com/TakahikoKawasaki/nv-i18n -->
+        <dependency>
+            <groupId>com.neovisionaries</groupId>
+            <artifactId>nv-i18n</artifactId>
+            <version>1.18</version>
+        </dependency>
+
     </dependencies>
 </project>

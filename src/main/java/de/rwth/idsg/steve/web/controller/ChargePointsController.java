@@ -77,19 +77,23 @@ public class ChargePointsController {
 
         model.addAttribute("chargePointForm", form);
         model.addAttribute("cp", cp);
+        addCountryCodes(model);
+
         return "data-man/chargepointDetails";
     }
 
     @RequestMapping(value = ADD_PATH, method = RequestMethod.GET)
     public String addGet(Model model) {
         model.addAttribute("chargePointForm", new ChargePointForm());
+        addCountryCodes(model);
         return "data-man/chargepointAdd";
     }
 
     @RequestMapping(params = "add", value = ADD_PATH, method = RequestMethod.POST)
     public String addPost(@Valid @ModelAttribute("chargePointForm") ChargePointForm chargePointForm,
-                      BindingResult result) {
+                          Model model, BindingResult result) {
         if (result.hasErrors()) {
+            addCountryCodes(model);
             return "data-man/chargepointAdd";
         }
 
@@ -99,8 +103,9 @@ public class ChargePointsController {
 
     @RequestMapping(params = "update", value = UPDATE_PATH, method = RequestMethod.POST)
     public String update(@Valid @ModelAttribute("chargePointForm") ChargePointForm chargePointForm,
-                         BindingResult result) {
+                         Model model, BindingResult result) {
         if (result.hasErrors()) {
+            addCountryCodes(model);
             return "data-man/chargepointDetails";
         }
 
@@ -112,6 +117,10 @@ public class ChargePointsController {
     public String delete(@PathVariable("chargeBoxPk") int chargeBoxPk) {
         chargePointRepository.deleteChargePoint(chargeBoxPk);
         return toOverview();
+    }
+
+    private void addCountryCodes(Model model) {
+        model.addAttribute("countryCodes", ControllerHelper.COUNTRY_DROPDOWN);
     }
 
     // -------------------------------------------------------------------------

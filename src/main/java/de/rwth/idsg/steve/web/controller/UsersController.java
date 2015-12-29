@@ -132,6 +132,7 @@ public class UsersController {
     }
 
     private void setTags(Model model) {
+        model.addAttribute("countryCodes", ControllerHelper.COUNTRY_DROPDOWN);
         model.addAttribute("idTagList", ControllerHelper.idTagEnhancer(ocppTagRepository.getIdTags()));
     }
 

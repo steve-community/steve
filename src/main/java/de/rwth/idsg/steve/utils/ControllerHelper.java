@@ -1,9 +1,12 @@
 package de.rwth.idsg.steve.utils;
 
+import com.neovisionaries.i18n.CountryCode;
 import de.rwth.idsg.steve.web.dto.Address;
 import jooq.steve.db.tables.records.AddressRecord;
 
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -16,6 +19,8 @@ public final class ControllerHelper {
 
     public static final String EMPTY_OPTION = "-- Empty --";
 
+    public static final Map<String, String> COUNTRY_DROPDOWN = populateCountryCodes();
+
     public static Address recordToDto(AddressRecord record) {
         Address address = new Address();
         if (record != null) {
@@ -24,7 +29,7 @@ public final class ControllerHelper {
             address.setHouseNumber(record.getHouseNumber());
             address.setZipCode(record.getZipCode());
             address.setCity(record.getCity());
-            address.setCountry(record.getCountry());
+            address.setCountry(CountryCode.getByCode(record.getCountry()));
         }
         return address;
     }
@@ -37,5 +42,29 @@ public final class ControllerHelper {
             map.put(s, s);
         }
         return map;
+    }
+
+    private static Map<String, String> populateCountryCodes() {
+        CountryCode[] codes = CountryCode.values();
+        Arrays.sort(codes, (o1, o2) -> o1.getName().compareTo(o2.getName()));
+
+        Map<String, String> map = new LinkedHashMap<>(codes.length + 1);
+        map.put("", EMPTY_OPTION);
+
+        for (CountryCode c : codes) {
+            if (shouldInclude(c)) {
+                map.put(c.getAlpha2(), c.getName());
+            }
+        }
+        return map;
+    }
+
+    /**
+     * There are some invalid codes like {@link CountryCode#UNDEFINED} and {@link CountryCode#EU},
+     * or some countries are listed twice {@link CountryCode#FI} - {@link CountryCode#SF} and
+     * {@link CountryCode#GB} - {@link CountryCode#UK} which are confusing. We filter these out.
+     */
+    private static boolean shouldInclude(CountryCode c) {
+        return c.getAssignment() == CountryCode.Assignment.OFFICIALLY_ASSIGNED;
     }
 }

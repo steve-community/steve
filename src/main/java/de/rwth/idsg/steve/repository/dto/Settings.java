@@ -12,9 +12,9 @@ import lombok.Getter;
 public class Settings {
 
     // Heartbeat interval in min
-    private int heartbeatIntervalInMinutes;
+    private final int heartbeatIntervalInMinutes;
 
     // Determines how many hours the idtag should be stored in the local whitelist of a chargebox
-    private int hoursToExpire;
+    private final int hoursToExpire;
 
 }

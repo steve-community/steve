@@ -45,12 +45,10 @@ public abstract class AbstractOcppResponseHandler<T> implements OcppResponseHand
 
     // -------------------------------------------------------------------------
     // OcppResponseHandler
+    //
+    // Skip the method handleResult(T response), since it should be
+    // implemented by subclasses depending on the actual response
     // -------------------------------------------------------------------------
-
-    @Override
-    public void handleResult(T response) {
-        // Must override!
-    }
 
     @Override
     public void handleException(Exception e) {

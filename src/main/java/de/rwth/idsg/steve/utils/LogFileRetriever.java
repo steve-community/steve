@@ -25,12 +25,13 @@ import java.util.Random;
  * @since 05.11.2015
  */
 @Slf4j
-public class LogFileRetriever {
+public final class LogFileRetriever {
+    public static final LogFileRetriever INSTANCE = new LogFileRetriever();
 
     private List<Path> logPathList;
     private Random random = new Random();
 
-    public LogFileRetriever() {
+    private LogFileRetriever() {
         logPathList = getActiveLogFilePaths();
     }
 

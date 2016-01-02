@@ -62,7 +62,7 @@ public class SteveProdStarter implements ApplicationStarter {
 
     private void starting() {
         String msg = "Log file: "
-                + new LogFileRetriever().getLogFilePathOrErrorMessage()
+                + LogFileRetriever.INSTANCE.getLogFilePathOrErrorMessage()
                 + sep()
                 + "Starting";
 

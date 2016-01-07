@@ -25,20 +25,20 @@ import javax.validation.Valid;
 @RequestMapping(value = "/manager/chargepoints")
 public class ChargePointsController {
 
-    @Autowired private ChargePointRepository chargePointRepository;
+    @Autowired protected ChargePointRepository chargePointRepository;
 
-    private static final String PARAMS = "params";
+    protected static final String PARAMS = "params";
 
     // -------------------------------------------------------------------------
     // Paths
     // -------------------------------------------------------------------------
 
-    private static final String QUERY_PATH = "/query";
+    protected static final String QUERY_PATH = "/query";
 
-    private static final String DETAILS_PATH = "/details/{chargeBoxPk}";
-    private static final String DELETE_PATH = "/delete/{chargeBoxPk}";
-    private static final String UPDATE_PATH = "/update";
-    private static final String ADD_PATH = "/add";
+    protected static final String DETAILS_PATH = "/details/{chargeBoxPk}";
+    protected static final String DELETE_PATH = "/delete/{chargeBoxPk}";
+    protected static final String UPDATE_PATH = "/update";
+    protected static final String ADD_PATH = "/add";
 
     // -------------------------------------------------------------------------
     // HTTP methods
@@ -119,7 +119,7 @@ public class ChargePointsController {
         return toOverview();
     }
 
-    private void addCountryCodes(Model model) {
+    protected void addCountryCodes(Model model) {
         model.addAttribute("countryCodes", ControllerHelper.COUNTRY_DROPDOWN);
     }
 
@@ -137,7 +137,7 @@ public class ChargePointsController {
         return toOverview();
     }
 
-    private String toOverview() {
+    protected String toOverview() {
         return "redirect:/manager/chargepoints";
     }
 }

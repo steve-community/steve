@@ -1,5 +1,6 @@
 package de.rwth.idsg.steve.repository.impl;
 
+import com.mysql.jdbc.exceptions.jdbc4.MySQLIntegrityConstraintViolationException;
 import de.rwth.idsg.steve.SteveException;
 import de.rwth.idsg.steve.repository.OcppTagRepository;
 import de.rwth.idsg.steve.repository.dto.OcppTag.Overview;
@@ -151,23 +152,25 @@ public class OcppTagRepositoryImpl implements OcppTagRepository {
     }
 
     @Override
-    public void addOcppTag(OcppTagForm u) {
+    public int addOcppTag(OcppTagForm u) {
         try {
-            int count = ctx.insertInto(OCPP_TAG)
-                           .set(OCPP_TAG.ID_TAG, u.getIdTag())
-                           .set(OCPP_TAG.PARENT_ID_TAG, u.getParentIdTag())
-                           .set(OCPP_TAG.EXPIRY_DATE, toDateTime(u.getExpiration()))
-                           .set(OCPP_TAG.NOTE, u.getNote())
-                           .set(OCPP_TAG.BLOCKED, false)
-                           .set(OCPP_TAG.IN_TRANSACTION, false)
-                           .onDuplicateKeyIgnore() // Important detail
-                           .execute();
+            return ctx.insertInto(OCPP_TAG)
+                      .set(OCPP_TAG.ID_TAG, u.getIdTag())
+                      .set(OCPP_TAG.PARENT_ID_TAG, u.getParentIdTag())
+                      .set(OCPP_TAG.EXPIRY_DATE, toDateTime(u.getExpiration()))
+                      .set(OCPP_TAG.NOTE, u.getNote())
+                      .set(OCPP_TAG.BLOCKED, false)
+                      .set(OCPP_TAG.IN_TRANSACTION, false)
+                      .returning(OCPP_TAG.OCPP_TAG_PK)
+                      .fetchOne()
+                      .getOcppTagPk();
 
-            if (count == 0) {
-                throw new SteveException("A user with idTag '%s' already exists.", u.getIdTag());
-            }
         } catch (DataAccessException e) {
-            throw new SteveException("Execution of addOcppTag for idTag '%s' FAILED.", u.getIdTag(), e);
+            if (e.getCause() instanceof MySQLIntegrityConstraintViolationException) {
+                throw new SteveException("A user with idTag '%s' already exists.", u.getIdTag());
+            } else {
+                throw new SteveException("Execution of addOcppTag for idTag '%s' FAILED.", u.getIdTag(), e);
+            }
         }
     }
 

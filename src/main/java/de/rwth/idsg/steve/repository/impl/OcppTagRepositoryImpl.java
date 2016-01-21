@@ -11,6 +11,7 @@ import jooq.steve.db.tables.OcppTag;
 import jooq.steve.db.tables.records.OcppTagRecord;
 import lombok.extern.slf4j.Slf4j;
 import org.joda.time.DateTime;
+import org.jooq.BatchBindStep;
 import org.jooq.DSLContext;
 import org.jooq.JoinType;
 import org.jooq.Record7;
@@ -149,6 +150,22 @@ public class OcppTagRepositoryImpl implements OcppTagRepository {
                   .where(OCPP_TAG.ID_TAG.eq(idTag))
                   .fetchOne()
                   .value1();
+    }
+
+    @Override
+    public void addOcppTagList(List<String> idTagList) {
+        BatchBindStep batch = ctx.batch(
+                ctx.insertInto(OCPP_TAG)
+                   .set(OCPP_TAG.ID_TAG, "")
+                   .set(OCPP_TAG.BLOCKED, false)
+                   .set(OCPP_TAG.IN_TRANSACTION, false)
+        );
+
+        for (String s : idTagList) {
+            batch.bind(s, false, false);
+        }
+
+        batch.execute();
     }
 
     @Override

@@ -2,6 +2,7 @@ package de.rwth.idsg.steve.web.controller;
 
 import de.rwth.idsg.steve.repository.OcppTagRepository;
 import de.rwth.idsg.steve.utils.ControllerHelper;
+import de.rwth.idsg.steve.web.dto.BatchInsertForm;
 import de.rwth.idsg.steve.web.dto.OcppTagForm;
 import de.rwth.idsg.steve.web.dto.OcppTagQueryForm;
 import jooq.steve.db.tables.records.OcppTagRecord;
@@ -40,6 +41,8 @@ public class OcppTagsController {
     private static final String UPDATE_PATH = "/update";
     private static final String ADD_PATH = "/add";
 
+    private static final String ADD_SINGLE_PATH = "/add/single";
+    private static final String ADD_BATCH_PATH = "/add/batch";
 
     // -------------------------------------------------------------------------
     // HTTP methods
@@ -90,18 +93,33 @@ public class OcppTagsController {
     public String addGet(Model model) {
         setTags(model);
         model.addAttribute("ocppTagForm", new OcppTagForm());
+        model.addAttribute("batchInsertForm", new BatchInsertForm());
         return "data-man/ocppTagAdd";
     }
 
-    @RequestMapping(params = "add", value = ADD_PATH, method = RequestMethod.POST)
-    public String addPost(@Valid @ModelAttribute("ocppTagForm") OcppTagForm ocppTagForm,
-                          BindingResult result, Model model) {
+    @RequestMapping(params = "add", value = ADD_SINGLE_PATH, method = RequestMethod.POST)
+    public String addSinglePost(@Valid @ModelAttribute("ocppTagForm") OcppTagForm ocppTagForm,
+                                BindingResult result, Model model) {
         if (result.hasErrors()) {
             setTags(model);
+            model.addAttribute("batchInsertForm", new BatchInsertForm());
             return "data-man/ocppTagAdd";
         }
 
         ocppTagRepository.addOcppTag(ocppTagForm);
+        return toOverview();
+    }
+
+    @RequestMapping(value = ADD_BATCH_PATH, method = RequestMethod.POST)
+    public String addBatchPost(@Valid @ModelAttribute("batchInsertForm") BatchInsertForm batchInsertForm,
+                               BindingResult result, Model model) {
+        if (result.hasErrors()) {
+            setTags(model);
+            model.addAttribute("ocppTagForm", new OcppTagForm());
+            return "data-man/ocppTagAdd";
+        }
+
+        ocppTagRepository.addOcppTagList(batchInsertForm.getIdTagList());
         return toOverview();
     }
 
@@ -138,7 +156,7 @@ public class OcppTagsController {
     // Back to Overview
     // -------------------------------------------------------------------------
 
-    @RequestMapping(params = "backToOverview", value = ADD_PATH, method = RequestMethod.POST)
+    @RequestMapping(params = "backToOverview", value = ADD_SINGLE_PATH, method = RequestMethod.POST)
     public String addBackToOverview() {
         return toOverview();
     }

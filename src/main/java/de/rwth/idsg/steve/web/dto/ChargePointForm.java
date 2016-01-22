@@ -1,11 +1,11 @@
 package de.rwth.idsg.steve.web.dto;
 
+import de.rwth.idsg.steve.web.validation.ChargeBoxId;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.validator.constraints.NotBlank;
 import org.hibernate.validator.constraints.Range;
 
-import javax.validation.constraints.Pattern;
 import java.math.BigDecimal;
 
 /**
@@ -20,7 +20,7 @@ public class ChargePointForm {
     private Integer chargeBoxPk;
 
     @NotBlank(message = "ChargeBox ID is required")
-    @Pattern(regexp = "\\S+", message = "ChargeBox ID cannot contain any whitespace")
+    @ChargeBoxId
     private String chargeBoxId;
     
     private Address address;

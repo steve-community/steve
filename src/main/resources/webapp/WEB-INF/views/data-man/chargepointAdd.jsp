@@ -1,4 +1,14 @@
 <%@ include file="../00-header.jsp" %>
+<spring:hasBindErrors name="batchChargePointForm">
+    <div class="error">
+        Error while trying to add charge point list:
+        <ul>
+            <c:forEach var="error" items="${errors.allErrors}">
+                <li>${error.defaultMessage}</li>
+            </c:forEach>
+        </ul>
+    </div>
+</spring:hasBindErrors>
 <spring:hasBindErrors name="chargePointForm">
     <div class="error">
         Error while trying to add a charge point:
@@ -10,8 +20,26 @@
     </div>
 </spring:hasBindErrors>
 <div class="content"><div>
-<section><span>Add Charge Point</span></section>
-    <form:form action="/steve/manager/chargepoints/add" modelAttribute="chargePointForm">
+    <section><span>
+        Add Charge Point List
+        <a class="tooltip" href="#"><img src="/steve/static/images/info.png" style="vertical-align:middle">
+            <span>Insert multiple charge points at once by entering one ID per line. This operation will leave other fields empty, which can be set later.</span>
+        </a>
+    </span></section>
+    <form:form action="/steve/manager/chargepoints/add/batch" modelAttribute="batchChargePointForm">
+        <table class="userInput">
+            <tr>
+                <td>ChargeBox IDs:</td><td><form:textarea path="idTagList"/></td></tr>
+            <tr><td></td>
+                <td id="add_space">
+                    <input type="submit" value="Add All">
+                </td>
+            </tr>
+        </table>
+    </form:form>
+
+    <section><span>Add Charge Point</span></section>
+    <form:form action="/steve/manager/chargepoints/add/single" modelAttribute="chargePointForm">
 
         <table class="userInput">
             <thead><tr><th>OCPP</th><th></th></thead>

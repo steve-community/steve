@@ -15,6 +15,7 @@ import jooq.steve.db.tables.records.AddressRecord;
 import jooq.steve.db.tables.records.ChargeBoxRecord;
 import lombok.extern.slf4j.Slf4j;
 import org.joda.time.DateTime;
+import org.jooq.BatchBindStep;
 import org.jooq.DSLContext;
 import org.jooq.Field;
 import org.jooq.Record1;
@@ -212,6 +213,20 @@ public class ChargePointRepositoryImpl implements ChargePointRepository {
                   .from(CONNECTOR)
                   .where(CONNECTOR.CHARGE_BOX_ID.equal(chargeBoxId))
                   .fetch(CONNECTOR.CONNECTOR_ID);
+    }
+
+    @Override
+    public void addChargePoint(List<String> chargeBoxIdList) {
+        BatchBindStep batch = ctx.batch(
+                ctx.insertInto(CHARGE_BOX)
+                   .set(CHARGE_BOX.CHARGE_BOX_ID, "")
+        );
+
+        for (String s : chargeBoxIdList) {
+            batch.bind(s);
+        }
+
+        batch.execute();
     }
 
     @Override

@@ -2,7 +2,7 @@ package de.rwth.idsg.steve.web.controller;
 
 import de.rwth.idsg.steve.repository.OcppTagRepository;
 import de.rwth.idsg.steve.utils.ControllerHelper;
-import de.rwth.idsg.steve.web.dto.BatchInsertForm;
+import de.rwth.idsg.steve.web.dto.OcppTagBatchInsertForm;
 import de.rwth.idsg.steve.web.dto.OcppTagForm;
 import de.rwth.idsg.steve.web.dto.OcppTagQueryForm;
 import jooq.steve.db.tables.records.OcppTagRecord;
@@ -93,7 +93,7 @@ public class OcppTagsController {
     public String addGet(Model model) {
         setTags(model);
         model.addAttribute("ocppTagForm", new OcppTagForm());
-        model.addAttribute("batchInsertForm", new BatchInsertForm());
+        model.addAttribute("batchInsertForm", new OcppTagBatchInsertForm());
         return "data-man/ocppTagAdd";
     }
 
@@ -102,7 +102,7 @@ public class OcppTagsController {
                                 BindingResult result, Model model) {
         if (result.hasErrors()) {
             setTags(model);
-            model.addAttribute("batchInsertForm", new BatchInsertForm());
+            model.addAttribute("batchInsertForm", new OcppTagBatchInsertForm());
             return "data-man/ocppTagAdd";
         }
 
@@ -111,7 +111,7 @@ public class OcppTagsController {
     }
 
     @RequestMapping(value = ADD_BATCH_PATH, method = RequestMethod.POST)
-    public String addBatchPost(@Valid @ModelAttribute("batchInsertForm") BatchInsertForm batchInsertForm,
+    public String addBatchPost(@Valid @ModelAttribute("batchInsertForm") OcppTagBatchInsertForm form,
                                BindingResult result, Model model) {
         if (result.hasErrors()) {
             setTags(model);
@@ -119,7 +119,7 @@ public class OcppTagsController {
             return "data-man/ocppTagAdd";
         }
 
-        ocppTagRepository.addOcppTagList(batchInsertForm.getIdList());
+        ocppTagRepository.addOcppTagList(form.getIdList());
         return toOverview();
     }
 

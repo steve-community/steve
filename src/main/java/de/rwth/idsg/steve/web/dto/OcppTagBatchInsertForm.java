@@ -13,7 +13,7 @@ import java.util.List;
  */
 @Getter
 @Setter
-public class BatchInsertForm {
+public class OcppTagBatchInsertForm {
 
     @IdTag
     @NotEmpty

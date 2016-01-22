@@ -112,7 +112,14 @@ public class SteveAppContext {
         rewrite.setRewriteRequestURI(true);
         rewrite.setRewritePathInfo(true);
 
-        String[] redirectArray = {"", "/steve", "/steve/manager"};
+        String[] redirectArray = {
+                "",
+                "/steve",
+                "/steve/",
+                "/steve/manager",
+                "/steve/manager/"
+        };
+
         for (String redirect : redirectArray) {
             RedirectPatternRule rule = new RedirectPatternRule();
             rule.setTerminating(true);

@@ -117,7 +117,7 @@ public class ChargePointsController {
             return "data-man/chargepointAdd";
         }
 
-        chargePointRepository.addChargePoint(form.getIdTagList());
+        chargePointRepository.addChargePoint(form.getIdList());
         return toOverview();
     }
 

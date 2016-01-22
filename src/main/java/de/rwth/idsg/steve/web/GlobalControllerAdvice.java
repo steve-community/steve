@@ -28,7 +28,7 @@ public class GlobalControllerAdvice {
         binder.registerCustomEditor(LocalDate.class, new LocalDateEditor());
         binder.registerCustomEditor(LocalDateTime.class, new LocalDateTimeEditor());
         binder.registerCustomEditor(ChargePointSelect.class, new ChargePointSelectEditor());
-        binder.registerCustomEditor(List.class, "idTagList", new BatchInsertConverter());
+        binder.registerCustomEditor(List.class, "idList", new BatchInsertConverter());
     }
 
     @ExceptionHandler(Exception.class)

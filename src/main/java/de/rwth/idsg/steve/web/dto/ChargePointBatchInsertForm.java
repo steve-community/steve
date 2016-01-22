@@ -17,5 +17,5 @@ public class ChargePointBatchInsertForm {
 
     @NotEmpty
     @ChargeBoxId
-    private List<String> idTagList;
+    private List<String> idList;
 }

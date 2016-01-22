@@ -17,5 +17,5 @@ public class BatchInsertForm {
 
     @IdTag
     @NotEmpty
-    private List<String> idTagList;
+    private List<String> idList;
 }

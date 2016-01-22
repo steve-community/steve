@@ -119,7 +119,7 @@ public class OcppTagsController {
             return "data-man/ocppTagAdd";
         }
 
-        ocppTagRepository.addOcppTagList(batchInsertForm.getIdTagList());
+        ocppTagRepository.addOcppTagList(batchInsertForm.getIdList());
         return toOverview();
     }
 

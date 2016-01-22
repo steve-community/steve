@@ -34,7 +34,7 @@
     <form:form action="/steve/manager/ocppTags/add/batch" modelAttribute="batchInsertForm">
         <table class="userInput">
             <tr>
-                <td>ID Tags:</td><td><form:textarea path="idTagList"/></td></tr>
+                <td>ID Tags:</td><td><form:textarea path="idList"/></td></tr>
             <tr><td></td>
                 <td id="add_space">
                     <input type="submit" value="Add All">

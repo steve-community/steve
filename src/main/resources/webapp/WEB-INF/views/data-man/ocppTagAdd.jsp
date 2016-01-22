@@ -2,10 +2,23 @@
 <script type="text/javascript">
     $(document).ready(function() {
         <%@ include file="../snippets/dateTimePicker-future.js" %>
+        $("#batch").click(function () {
+            $("#batchInsertForm, #ocppTagForm").slideToggle(250);
+        });
+
+        <%-- According to the error type show/hide the corresponding view --%>
+        if ($("#batchError").length) {
+            $("#batchInsertForm").show();
+            $("#ocppTagForm").hide();
+        }
+        if ($("#singleError").length) {
+            $("#batchInsertForm").hide();
+            $("#ocppTagForm").show();
+        }
     });
 </script>
 <spring:hasBindErrors name="batchInsertForm">
-    <div class="error">
+    <div class="error" id="batchError">
         Error while trying to add OCPP Tag list:
         <ul>
             <c:forEach var="error" items="${errors.allErrors}">
@@ -15,7 +28,7 @@
     </div>
 </spring:hasBindErrors>
 <spring:hasBindErrors name="ocppTagForm">
-    <div class="error">
+    <div class="error" id="singleError">
         Error while trying to add an OCPP Tag:
         <ul>
             <c:forEach var="error" items="${errors.allErrors}">
@@ -25,13 +38,14 @@
     </div>
 </spring:hasBindErrors>
 <div class="content"><div>
-<section><span>
-    Add OCPP Tag List
-    <a class="tooltip" href="#"><img src="/steve/static/images/info.png" style="vertical-align:middle">
-        <span>Insert multiple OCPP Tags at once by entering one ID Tag per line. This operation will leave other fields empty, which can be set later.</span>
-    </a>
-</span></section>
-    <form:form action="/steve/manager/ocppTags/add/batch" modelAttribute="batchInsertForm">
+
+    <section><span id="batch" style="cursor: pointer">
+        Add OCPP Tag List
+        <a class="tooltip" href="#"><img src="/steve/static/images/info.png" style="vertical-align:middle">
+            <span>Insert multiple OCPP Tags at once by entering one ID Tag per line. This operation will leave other fields empty, which can be set later.</span>
+        </a>
+    </span></section>
+    <form:form action="/steve/manager/ocppTags/add/batch" modelAttribute="batchInsertForm" style="display: none">
         <table class="userInput">
             <tr>
                 <td>ID Tags:</td><td><form:textarea path="idList"/></td></tr>
@@ -42,7 +56,8 @@
             </tr>
         </table>
     </form:form>
-<section><span id="single">Add OCPP Tag</span></section>
+
+    <section><span id="single">Add OCPP Tag</span></section>
     <form:form action="/steve/manager/ocppTags/add/single" modelAttribute="ocppTagForm">
 
         <c:set var="isUpdateForm" value="false" />

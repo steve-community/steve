@@ -1,6 +1,23 @@
 <%@ include file="../00-header.jsp" %>
+<script type="text/javascript">
+    $(document).ready(function() {
+        $("#batch").click(function () {
+            $("#batchChargePointForm, #chargePointForm").slideToggle(250);
+        });
+
+        <%-- According to the error type show/hide the corresponding view --%>
+        if ($("#batchError").length) {
+            $("#batchChargePointForm").show();
+            $("#chargePointForm").hide();
+        }
+        if ($("#singleError").length) {
+            $("#batchChargePointForm").hide();
+            $("#chargePointForm").show();
+        }
+    });
+</script>
 <spring:hasBindErrors name="batchChargePointForm">
-    <div class="error">
+    <div class="error" id="batchError">
         Error while trying to add charge point list:
         <ul>
             <c:forEach var="error" items="${errors.allErrors}">
@@ -10,7 +27,7 @@
     </div>
 </spring:hasBindErrors>
 <spring:hasBindErrors name="chargePointForm">
-    <div class="error">
+    <div class="error" id="singleError">
         Error while trying to add a charge point:
         <ul>
             <c:forEach var="error" items="${errors.allErrors}">
@@ -20,13 +37,14 @@
     </div>
 </spring:hasBindErrors>
 <div class="content"><div>
-    <section><span>
+
+    <section><span id="batch" style="cursor: pointer">
         Add Charge Point List
         <a class="tooltip" href="#"><img src="/steve/static/images/info.png" style="vertical-align:middle">
             <span>Insert multiple charge points at once by entering one ID per line. This operation will leave other fields empty, which can be set later.</span>
         </a>
     </span></section>
-    <form:form action="/steve/manager/chargepoints/add/batch" modelAttribute="batchChargePointForm">
+    <form:form action="/steve/manager/chargepoints/add/batch" modelAttribute="batchChargePointForm" style="display: none">
         <table class="userInput">
             <tr>
                 <td>ChargeBox IDs:</td><td><form:textarea path="idList"/></td></tr>

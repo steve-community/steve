@@ -16,7 +16,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
-import java.io.StringWriter;
 
 /**
  * Outgoing OcppJsonMessage --> String.
@@ -54,9 +53,8 @@ public class Serializer implements Stage {
         }
 
         try {
-            StringWriter sw = new StringWriter();
-            mapper.writeValue(sw, str);
-            context.setOutgoingString(sw.toString());
+            String result = mapper.writeValueAsString(str);
+            context.setOutgoingString(result);
         } catch (IOException e) {
             throw new SteveException("The outgoing message could not be serialized", e);
         }

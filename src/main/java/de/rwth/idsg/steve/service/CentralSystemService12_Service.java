@@ -11,6 +11,7 @@ import ocpp.cs._2010._08.AuthorizeRequest;
 import ocpp.cs._2010._08.AuthorizeResponse;
 import ocpp.cs._2010._08.BootNotificationRequest;
 import ocpp.cs._2010._08.BootNotificationResponse;
+import ocpp.cs._2010._08.ChargePointStatus;
 import ocpp.cs._2010._08.DiagnosticsStatusNotificationRequest;
 import ocpp.cs._2010._08.DiagnosticsStatusNotificationResponse;
 import ocpp.cs._2010._08.FirmwareStatusNotificationRequest;
@@ -44,6 +45,7 @@ public class CentralSystemService12_Service {
     @Autowired private OcppServerRepository ocppServerRepository;
     @Autowired private OcppTagService ocppTagService;
     @Autowired private SettingsRepository settingsRepository;
+    @Autowired private NotificationService notificationService;
 
     public BootNotificationResponse bootNotification(BootNotificationRequest parameters, String chargeBoxIdentity,
                                                      OcppProtocol ocppProtocol) {
@@ -68,6 +70,7 @@ public class CentralSystemService12_Service {
                                      .build();
 
         boolean isRegistered = ocppServerRepository.updateChargebox(params);
+        notificationService.ocppStationBooted(chargeBoxIdentity, isRegistered);
 
         if (isRegistered) {
             return new BootNotificationResponse()
@@ -104,6 +107,12 @@ public class CentralSystemService12_Service {
                                            .build();
 
         ocppServerRepository.insertConnectorStatus(params);
+
+        if (parameters.getStatus() == ChargePointStatus.FAULTED) {
+            notificationService.ocppStationStatusFailure(
+                    chargeBoxIdentity, parameters.getConnectorId(), parameters.getErrorCode().value());
+        }
+
         return new StatusNotificationResponse();
     }
 

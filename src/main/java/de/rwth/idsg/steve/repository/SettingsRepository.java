@@ -1,6 +1,6 @@
 package de.rwth.idsg.steve.repository;
 
-import de.rwth.idsg.steve.repository.dto.Settings;
+import de.rwth.idsg.steve.repository.dto.MailSettings;
 import de.rwth.idsg.steve.web.dto.SettingsForm;
 
 /**
@@ -8,7 +8,8 @@ import de.rwth.idsg.steve.web.dto.SettingsForm;
  * @since 06.11.2015
  */
 public interface SettingsRepository {
-    Settings get();
+    SettingsForm getForm();
+    MailSettings getMailSettings();
     int getHeartbeatIntervalInSeconds();
     int getHoursToExpire();
     void update(SettingsForm settingsForm);

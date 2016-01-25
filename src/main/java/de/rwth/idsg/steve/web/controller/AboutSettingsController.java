@@ -1,8 +1,9 @@
 package de.rwth.idsg.steve.web.controller;
 
+import de.rwth.idsg.steve.NotificationFeature;
 import de.rwth.idsg.steve.repository.GenericRepository;
 import de.rwth.idsg.steve.repository.SettingsRepository;
-import de.rwth.idsg.steve.repository.dto.Settings;
+import de.rwth.idsg.steve.service.MailService;
 import de.rwth.idsg.steve.web.dto.SettingsForm;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -30,6 +31,7 @@ public class AboutSettingsController {
     @Autowired private GenericRepository genericRepository;
     @Autowired private LogController logController;
     @Autowired private SettingsRepository settingsRepository;
+    @Autowired private MailService mailService;
 
     // -------------------------------------------------------------------------
     // Paths
@@ -54,22 +56,37 @@ public class AboutSettingsController {
 
     @RequestMapping(value = SETTINGS_PATH, method = RequestMethod.GET)
     public String getSettings(Model model) {
-        Settings s = settingsRepository.get();
-
-        model.addAttribute("settings", s);
-        model.addAttribute("settingsForm", new SettingsForm(s.getHeartbeatIntervalInMinutes(), s.getHoursToExpire()));
+        SettingsForm form = settingsRepository.getForm();
+        model.addAttribute("features", NotificationFeature.values());
+        model.addAttribute("settingsForm", form);
         return "settings";
     }
 
-    @RequestMapping(value = SETTINGS_PATH, method = RequestMethod.POST)
+    @RequestMapping(params = "change", value = SETTINGS_PATH, method = RequestMethod.POST)
     public String postSettings(@Valid @ModelAttribute("settingsForm") SettingsForm settingsForm,
                                BindingResult result, Model model) {
         if (result.hasErrors()) {
-            model.addAttribute("settings", settingsRepository.get());
+            model.addAttribute("features", NotificationFeature.values());
             return "settings";
         }
 
         settingsRepository.update(settingsForm);
+        mailService.loadSettingsFromDB();
+        return "redirect:/manager/settings";
+    }
+
+    @RequestMapping(params = "testMail", value = SETTINGS_PATH, method = RequestMethod.POST)
+    public String testMail(@Valid @ModelAttribute("settingsForm") SettingsForm settingsForm,
+                           BindingResult result, Model model) {
+        if (result.hasErrors()) {
+            model.addAttribute("features", NotificationFeature.values());
+            return "settings";
+        }
+
+        settingsRepository.update(settingsForm);
+        mailService.loadSettingsFromDB();
+        mailService.sendTestMail();
+
         return "redirect:/manager/settings";
     }
 }

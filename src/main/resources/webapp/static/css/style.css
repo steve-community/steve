@@ -172,6 +172,7 @@ textarea {
 	width: 350px;
 	height: 6em; /* 6 rows */
 	font-size: 12px;
+	font-family: Verdana, sans-serif;
 	resize: vertical;
 }
 #add_space { padding-top: 20px; }

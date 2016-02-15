@@ -377,6 +377,10 @@
                             </forcedTypes>
                         </database>
 
+                        <generate>
+                            <fluentSetters>true</fluentSetters>
+                        </generate>
+
                         <target>
                             <packageName>jooq.steve.db</packageName>
                             <directory>${project.build.directory}/generated-sources</directory>

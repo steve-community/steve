@@ -26,23 +26,23 @@ import javax.validation.Valid;
 @RequestMapping(value = "/manager/ocppTags")
 public class OcppTagsController {
 
-    @Autowired private OcppTagRepository ocppTagRepository;
+    @Autowired protected OcppTagRepository ocppTagRepository;
 
-    private static final String PARAMS = "params";
+    protected static final String PARAMS = "params";
 
     // -------------------------------------------------------------------------
     // Paths
     // -------------------------------------------------------------------------
 
-    private static final String QUERY_PATH = "/query";
+    protected static final String QUERY_PATH = "/query";
 
-    private static final String DETAILS_PATH = "/details/{ocppTagPk}";
-    private static final String DELETE_PATH = "/delete/{ocppTagPk}";
-    private static final String UPDATE_PATH = "/update";
-    private static final String ADD_PATH = "/add";
+    protected static final String DETAILS_PATH = "/details/{ocppTagPk}";
+    protected static final String DELETE_PATH = "/delete/{ocppTagPk}";
+    protected static final String UPDATE_PATH = "/update";
+    protected static final String ADD_PATH = "/add";
 
-    private static final String ADD_SINGLE_PATH = "/add/single";
-    private static final String ADD_BATCH_PATH = "/add/batch";
+    protected static final String ADD_SINGLE_PATH = "/add/single";
+    protected static final String ADD_BATCH_PATH = "/add/batch";
 
     // -------------------------------------------------------------------------
     // HTTP methods
@@ -148,7 +148,7 @@ public class OcppTagsController {
         model.addAttribute("ocppTagList", ocppTagRepository.getOverview(params));
     }
 
-    private void setTags(Model model) {
+    protected void setTags(Model model) {
         model.addAttribute("idTagList", ControllerHelper.idTagEnhancer(ocppTagRepository.getIdTags()));
     }
 
@@ -166,7 +166,7 @@ public class OcppTagsController {
         return toOverview();
     }
 
-    private String toOverview() {
+    protected String toOverview() {
         return "redirect:/manager/ocppTags";
     }
 }

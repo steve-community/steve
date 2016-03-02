@@ -13,7 +13,9 @@ public enum NotificationFeature {
     // Ocpp related
     //
     OcppStationBooted(" a charging station sends a boot notification"),
-    OcppStationStatusFailure(" a connector gets faulted");
+    OcppStationStatusFailure(" a connector gets faulted"),
+    OcppStationWebSocketConnected(" a JSON charging station connects"),
+    OcppStationWebSocketDisconnected(" a JSON charging station disconnects");
 
     @Getter
     private final String text;

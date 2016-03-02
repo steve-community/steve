@@ -10,6 +10,8 @@ import org.springframework.stereotype.Service;
 
 import static de.rwth.idsg.steve.NotificationFeature.OcppStationBooted;
 import static de.rwth.idsg.steve.NotificationFeature.OcppStationStatusFailure;
+import static de.rwth.idsg.steve.NotificationFeature.OcppStationWebSocketConnected;
+import static de.rwth.idsg.steve.NotificationFeature.OcppStationWebSocketDisconnected;
 import static java.lang.String.format;
 
 /**
@@ -32,6 +34,28 @@ public class NotificationServiceImpl implements NotificationService {
         String body = isRegistered ? "" : format("Charging station '%s' is NOT registered.", chargeBoxId);
 
         mailService.sendAsync(subject, addTimestamp(body));
+    }
+
+    @Override
+    public void ocppStationWebSocketConnected(String chargeBoxId) {
+        if (isDisabled(OcppStationWebSocketConnected)) {
+            return;
+        }
+
+        String subject = format("Connected to JSON charging station '%s'", chargeBoxId);
+
+        mailService.sendAsync(subject, addTimestamp(""));
+    }
+
+    @Override
+    public void ocppStationWebSocketDisconnected(String chargeBoxId) {
+        if (isDisabled(OcppStationWebSocketDisconnected)) {
+            return;
+        }
+
+        String subject = format("Disconnected from JSON charging station '%s'", chargeBoxId);
+
+        mailService.sendAsync(subject, addTimestamp(""));
     }
 
     @Override

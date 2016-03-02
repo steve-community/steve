@@ -6,5 +6,7 @@ package de.rwth.idsg.steve.service;
  */
 public interface NotificationService {
     void ocppStationBooted(String chargeBoxId, boolean isRegistered);
+    void ocppStationWebSocketConnected(String chargeBoxId);
+    void ocppStationWebSocketDisconnected(String chargeBoxId);
     void ocppStationStatusFailure(String chargeBoxId, int connectorId, String errorCode);
 }

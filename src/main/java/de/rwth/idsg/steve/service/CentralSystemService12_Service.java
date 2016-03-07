@@ -147,10 +147,11 @@ public class CentralSystemService12_Service {
                                        .startMeterValue(Integer.toString(parameters.getMeterStart()))
                                        .build();
 
+        IdTagInfo info = ocppTagService.getIdTagInfoV12(parameters.getIdTag());
         Integer transactionId = ocppServerRepository.insertTransaction(params);
 
         return new StartTransactionResponse()
-                .withIdTagInfo(ocppTagService.getIdTagInfoV12(parameters.getIdTag()))
+                .withIdTagInfo(info)
                 .withTransactionId(transactionId);
     }
 

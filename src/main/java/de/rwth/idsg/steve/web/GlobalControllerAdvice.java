@@ -13,13 +13,12 @@ import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
-import java.util.Set;
 
 /**
  * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
  * @since 15.08.2014
  */
-@ControllerAdvice
+@ControllerAdvice(basePackages = "de.rwth.idsg.steve.web")
 @Slf4j
 public class GlobalControllerAdvice {
 

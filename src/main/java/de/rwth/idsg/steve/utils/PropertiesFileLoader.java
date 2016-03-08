@@ -1,5 +1,7 @@
 package de.rwth.idsg.steve.utils;
 
+import com.google.common.base.Strings;
+
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.Properties;
@@ -26,15 +28,59 @@ public class PropertiesFileLoader {
         }
     }
 
+    // -------------------------------------------------------------------------
+    // Strict
+    // -------------------------------------------------------------------------
+
     public String getString(String key) {
-        return prop.getProperty(key);
+        String s = prop.getProperty(key);
+
+        if (s == null) {
+            throw new IllegalArgumentException("The property '" + key + "' is not found");
+        }
+
+        if (s.isEmpty()) {
+            throw new IllegalArgumentException("The property '" + key + "' has no value set");
+        }
+
+        return s;
     }
 
     public boolean getBoolean(String key) {
-        return Boolean.parseBoolean(prop.getProperty(key));
+        return Boolean.parseBoolean(getString(key));
     }
 
     public int getInt(String key) {
-        return Integer.parseInt(prop.getProperty(key));
+        return Integer.parseInt(getString(key));
+    }
+
+    // -------------------------------------------------------------------------
+    // Return null if not set
+    // -------------------------------------------------------------------------
+
+    public String getOptionalString(String key) {
+        String s = prop.getProperty(key);
+        if (Strings.isNullOrEmpty(s)) {
+            return null;
+        }
+        return s;
+    }
+
+    public Boolean getOptionalBoolean(String key) {
+        String s = getOptionalString(key);
+        if (s == null) {
+            return null;
+        } else {
+            return Boolean.parseBoolean(s);
+        }
+    }
+
+    public Integer getOptionalInt(String key) {
+        String s = getOptionalString(key);
+        if (s == null) {
+            return null;
+        } else {
+            return Integer.parseInt(s);
+        }
     }
 }

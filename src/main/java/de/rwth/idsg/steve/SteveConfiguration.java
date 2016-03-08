@@ -50,8 +50,8 @@ public final class SteveConfiguration {
                      .httpPort(p.getInt("http.port"))
                      .httpsEnabled(p.getBoolean("https.enabled"))
                      .httpsPort(p.getInt("https.port"))
-                     .keyStorePath(p.getString("keystore.path"))
-                     .keyStorePassword(p.getString("keystore.password"))
+                     .keyStorePath(p.getOptionalString("keystore.path"))
+                     .keyStorePassword(p.getOptionalString("keystore.password"))
                      .build();
 
         db = DB.builder()

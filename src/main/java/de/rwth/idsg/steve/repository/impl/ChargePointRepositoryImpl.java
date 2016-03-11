@@ -201,6 +201,7 @@ public class ChargePointRepositoryImpl implements ChargePointRepository {
                                            .chargeBoxId(r.value2())
                                            .connectorId(r.value3())
                                            .timeStamp(DateTimeUtils.humanize(r.value4()))
+                                           .statusTimestamp(r.value4())
                                            .status(r.value5())
                                            .errorCode(r.value6())
                                            .build()

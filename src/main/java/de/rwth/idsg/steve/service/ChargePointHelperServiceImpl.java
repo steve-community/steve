@@ -9,6 +9,8 @@ import de.rwth.idsg.steve.ocpp.ws.ocpp15.Ocpp15WebSocketEndpoint;
 import de.rwth.idsg.steve.repository.ChargePointRepository;
 import de.rwth.idsg.steve.repository.GenericRepository;
 import de.rwth.idsg.steve.repository.dto.ChargePointSelect;
+import de.rwth.idsg.steve.repository.dto.ConnectorStatus;
+import de.rwth.idsg.steve.utils.ConnectorStatusCountFilter;
 import de.rwth.idsg.steve.utils.DateTimeUtils;
 import de.rwth.idsg.steve.web.dto.OcppJsonStatus;
 import de.rwth.idsg.steve.web.dto.Statistics;
@@ -42,6 +44,10 @@ public class ChargePointHelperServiceImpl implements ChargePointHelperService {
         Statistics stats = genericRepository.getStats();
         stats.setNumOcpp12JChargeBoxes(ocpp12WebSocketEndpoint.getNumberOfChargeBoxes());
         stats.setNumOcpp15JChargeBoxes(ocpp15WebSocketEndpoint.getNumberOfChargeBoxes());
+
+        List<ConnectorStatus> latestList = chargePointRepository.getChargePointConnectorStatus();
+        stats.setStatusCountMap(ConnectorStatusCountFilter.getStatusCountMap(latestList));
+
         return stats;
     }
 

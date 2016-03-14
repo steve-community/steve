@@ -54,23 +54,13 @@
 	<a class="tileRow1" href="/steve/manager/home/connectorStatus">
 		Connector Status
 		<span class="baseTable">
-			<span class="baseRow">
-				<span class="baseCell">Available :</span>
-				<span class="baseCell formatNumber">${stats.connAvailable}</span>
-			</span>
-			<span class="baseRow">
-				<span class="baseCell">Occupied :</span>
-				<span class="baseCell formatNumber">${stats.connOccupied}</span>
-			</span>
-			<span class="baseRow">
-				<span class="baseCell">Faulted :</span>
-				<span class="baseCell formatNumber">${stats.connFaulted}</span>
-			</span>
-			<span class="baseRow">
-				<span class="baseCell">Unavailable :</span>
-				<span class="baseCell formatNumber">${stats.connUnavailable}</span>
-			</span>
-		</span>	
+			<c:forEach items="${stats.statusCountMap}" var="it">
+				<span class="baseRow">
+					<span class="baseCell">${it.key.value()} :</span>
+					<span class="baseCell formatNumber">${it.value}</span>
+				</span>
+			</c:forEach>
+		</span>
 	</a>
 </div></div>
 <%@ include file="00-footer.jsp" %>

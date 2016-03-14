@@ -44,10 +44,6 @@ public class GenericRepositoryImpl implements GenericRepository {
                          .heartbeatToday(gs.getHeartbeatsToday())
                          .heartbeatYesterday(gs.getHeartbeatsYesterday())
                          .heartbeatEarlier(gs.getHeartbeatsEarlier())
-                         .connAvailable(gs.getConnectorsAvailable())
-                         .connOccupied(gs.getConnectorsOccupied())
-                         .connFaulted(gs.getConnectorsFaulted())
-                         .connUnavailable(gs.getConnectorsUnavailable())
                          .build();
     }
 

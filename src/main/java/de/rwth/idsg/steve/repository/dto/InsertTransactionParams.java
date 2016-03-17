@@ -17,6 +17,8 @@ public class InsertTransactionParams {
     private final DateTime startTimestamp;
     private final String startMeterValue;
 
+    private final TransactionStatusUpdate statusUpdate = TransactionStatusUpdate.AfterStart;
+
     // Only in OCPP1.5
     private final Integer reservationId;
 

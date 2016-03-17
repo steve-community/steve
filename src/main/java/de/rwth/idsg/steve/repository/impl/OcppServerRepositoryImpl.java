@@ -4,7 +4,9 @@ import de.rwth.idsg.steve.repository.OcppServerRepository;
 import de.rwth.idsg.steve.repository.ReservationRepository;
 import de.rwth.idsg.steve.repository.dto.InsertConnectorStatusParams;
 import de.rwth.idsg.steve.repository.dto.InsertTransactionParams;
+import de.rwth.idsg.steve.repository.dto.TransactionStatusUpdate;
 import de.rwth.idsg.steve.repository.dto.UpdateChargeboxParams;
+import de.rwth.idsg.steve.repository.dto.UpdateTransactionParams;
 import de.rwth.idsg.steve.utils.CustomDSL;
 import lombok.extern.slf4j.Slf4j;
 import ocpp.cs._2012._06.Location;
@@ -16,6 +18,8 @@ import ocpp.cs._2012._06.ValueFormat;
 import org.joda.time.DateTime;
 import org.jooq.BatchBindStep;
 import org.jooq.DSLContext;
+import org.jooq.Record1;
+import org.jooq.SelectConditionStep;
 import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -188,17 +192,18 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
 
             insertIgnoreConnector(ctx, p.getChargeBoxId(), p.getConnectorId());
 
+            SelectConditionStep<Record1<Integer>> connectorPkQuery =
+                    DSL.select(CONNECTOR.CONNECTOR_PK)
+                       .from(CONNECTOR)
+                       .where(CONNECTOR.CHARGE_BOX_ID.equal(p.getChargeBoxId()))
+                       .and(CONNECTOR.CONNECTOR_ID.equal(p.getConnectorId()));
+
             // -------------------------------------------------------------------------
             // Step 1: Insert transaction
             // -------------------------------------------------------------------------
 
             int transactionId = ctx.insertInto(TRANSACTION)
-                                   .set(CONNECTOR_STATUS.CONNECTOR_PK,
-                                           DSL.select(CONNECTOR.CONNECTOR_PK)
-                                              .from(CONNECTOR)
-                                              .where(CONNECTOR.CHARGE_BOX_ID.equal(p.getChargeBoxId()))
-                                              .and(CONNECTOR.CONNECTOR_ID.equal(p.getConnectorId()))
-                                   )
+                                   .set(CONNECTOR_STATUS.CONNECTOR_PK, connectorPkQuery)
                                    .set(TRANSACTION.ID_TAG, p.getIdTag())
                                    .set(TRANSACTION.START_TIMESTAMP, p.getStartTimestamp())
                                    .set(TRANSACTION.START_VALUE, p.getStartMeterValue())
@@ -214,27 +219,68 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
                 reservationRepository.used(p.getReservationId(), transactionId);
             }
 
+            // -------------------------------------------------------------------------
+            // Step 3: Set connector status to "Occupied"
+            // -------------------------------------------------------------------------
+
+            insertConnectorStatus(connectorPkQuery, p.getStartTimestamp(), p.getStatusUpdate());
+
             return transactionId;
         });
     }
 
-    /**
-     * After update, a DB trigger sets the user.inTransaction field to 0
-     */
     @Override
-    public void updateTransaction(int transactionId, DateTime stopTimestamp, String stopMeterValue) {
+    public void updateTransaction(UpdateTransactionParams p) {
+
+        // -------------------------------------------------------------------------
+        // Step 1: Update transaction table
+        //
+        // After update, a DB trigger sets the user.inTransaction field to 0
+        // -------------------------------------------------------------------------
+
         ctx.update(TRANSACTION)
-           .set(TRANSACTION.STOP_TIMESTAMP, stopTimestamp)
-           .set(TRANSACTION.STOP_VALUE, stopMeterValue)
-           .where(TRANSACTION.TRANSACTION_PK.equal(transactionId))
-                .and(TRANSACTION.STOP_TIMESTAMP.isNull())
-                .and(TRANSACTION.STOP_VALUE.isNull())
+           .set(TRANSACTION.STOP_TIMESTAMP, p.getStopTimestamp())
+           .set(TRANSACTION.STOP_VALUE, p.getStopMeterValue())
+           .where(TRANSACTION.TRANSACTION_PK.equal(p.getTransactionId()))
+           .and(TRANSACTION.STOP_TIMESTAMP.isNull())
+           .and(TRANSACTION.STOP_VALUE.isNull())
            .execute();
+
+        // -------------------------------------------------------------------------
+        // Step 2: Set connector status back to "Available" again
+        // -------------------------------------------------------------------------
+
+        SelectConditionStep<Record1<Integer>> connectorPkQuery =
+                DSL.select(TRANSACTION.CONNECTOR_PK)
+                   .from(TRANSACTION)
+                   .where(TRANSACTION.TRANSACTION_PK.equal(p.getTransactionId()));
+
+        insertConnectorStatus(connectorPkQuery, p.getStopTimestamp(), p.getStatusUpdate());
     }
 
     // -------------------------------------------------------------------------
     // Helpers
     // -------------------------------------------------------------------------
+
+    /**
+     * After a transaction start/stop event, a charging station _might_ send a connector status notification, but it is
+     * not required. With this, we make sure that the status is updated accordingly. Since we use the timestamp of the
+     * transaction data, we do not necessarily insert a "most recent" status.
+     *
+     * If the station sends a notification, we will have a more recent timestamp, and therefore the status of the
+     * notification will be used as current. Or, if this transaction data was sent to us for a failed push from the past
+     * and we have a "more recent" status, it will still be the current status.
+     */
+    private void insertConnectorStatus(SelectConditionStep<Record1<Integer>> connectorPkQuery,
+                                       DateTime timestamp,
+                                       TransactionStatusUpdate statusUpdate) {
+        ctx.insertInto(CONNECTOR_STATUS)
+           .set(CONNECTOR_STATUS.CONNECTOR_PK, connectorPkQuery)
+           .set(CONNECTOR_STATUS.STATUS_TIMESTAMP, timestamp)
+           .set(CONNECTOR_STATUS.STATUS, statusUpdate.getStatus())
+           .set(CONNECTOR_STATUS.ERROR_CODE, statusUpdate.getErrorCode())
+           .execute();
+    }
 
     /**
      * If the connector information was not received before, insert it. Otherwise, ignore.

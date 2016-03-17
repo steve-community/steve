@@ -6,6 +6,7 @@ import de.rwth.idsg.steve.repository.SettingsRepository;
 import de.rwth.idsg.steve.repository.dto.InsertConnectorStatusParams;
 import de.rwth.idsg.steve.repository.dto.InsertTransactionParams;
 import de.rwth.idsg.steve.repository.dto.UpdateChargeboxParams;
+import de.rwth.idsg.steve.repository.dto.UpdateTransactionParams;
 import lombok.extern.slf4j.Slf4j;
 import ocpp.cs._2012._06.AuthorizeRequest;
 import ocpp.cs._2012._06.AuthorizeResponse;
@@ -169,11 +170,17 @@ public class CentralSystemService15_Service {
     public StopTransactionResponse stopTransaction(StopTransactionRequest parameters, String chargeBoxIdentity) {
         log.debug("Executing stopTransaction for {}", chargeBoxIdentity);
 
-        // Get parameters and update transaction in DB
         int transactionId = parameters.getTransactionId();
-        DateTime stopTimestamp = parameters.getTimestamp();
-        String stopMeterValue = Integer.toString(parameters.getMeterStop());
-        ocppServerRepository.updateTransaction(transactionId, stopTimestamp, stopMeterValue);
+
+        UpdateTransactionParams params =
+                UpdateTransactionParams.builder()
+                                       .chargeBoxId(chargeBoxIdentity)
+                                       .transactionId(transactionId)
+                                       .stopTimestamp(parameters.getTimestamp())
+                                       .stopMeterValue(Integer.toString(parameters.getMeterStop()))
+                                       .build();
+
+        ocppServerRepository.updateTransaction(params);
 
         /**
          * If TransactionData is included:

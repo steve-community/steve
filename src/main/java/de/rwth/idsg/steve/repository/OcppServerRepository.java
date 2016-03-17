@@ -3,6 +3,7 @@ package de.rwth.idsg.steve.repository;
 import de.rwth.idsg.steve.repository.dto.InsertConnectorStatusParams;
 import de.rwth.idsg.steve.repository.dto.InsertTransactionParams;
 import de.rwth.idsg.steve.repository.dto.UpdateChargeboxParams;
+import de.rwth.idsg.steve.repository.dto.UpdateTransactionParams;
 import org.joda.time.DateTime;
 
 import java.util.List;
@@ -41,5 +42,5 @@ public interface OcppServerRepository {
 
     Integer insertTransaction(InsertTransactionParams params);
 
-    void updateTransaction(int transactionId, DateTime stopTimestamp, String stopMeterValue);
+    void updateTransaction(UpdateTransactionParams params);
 }

@@ -34,7 +34,7 @@
         <findbugs-maven-plugin.version>3.0.3</findbugs-maven-plugin.version>
         <flyway-maven-plugin.version>3.2.1</flyway-maven-plugin.version><!-- 4.0 fails at migrating old flyway table -->
         <guava.version>19.0</guava.version>
-        <hibernate-validator.version>5.1.3.Final</hibernate-validator.version>
+        <hibernate-validator.version>5.1.3.Final</hibernate-validator.version><!-- 5.2.4.Final not working -->
         <HikariCP.version>2.4.5</HikariCP.version>
         <jackson.version>2.7.3</jackson.version>
         <javax.mail.version>1.5.5</javax.mail.version>
@@ -57,7 +57,7 @@
         <properties-maven-plugin.version>1.0.0</properties-maven-plugin.version>
         <slf4j.version>1.7.19</slf4j.version>
         <spring.security.version>4.0.4.RELEASE</spring.security.version>
-        <spring.version>4.2.2.RELEASE</spring.version>
+        <spring.version>4.2.5.RELEASE</spring.version>
 
     </properties>
 

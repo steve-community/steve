@@ -77,6 +77,7 @@
 			<th>Transaction ID</th>
 			<th>OCPP ID Tag</th>
 			<th>ChargeBox ID</th>
+			<th>Connector ID</th>
 			<th>Start Date/Time</th>
 			<th>Expiry Date/Time</th>
 			<th>Status</th>
@@ -93,6 +94,7 @@
 			</td>
 			<td><a href="/steve/manager/ocppTags/details/${res.ocppTagPk}">${res.ocppIdTag}</a></td>
 			<td><a href="/steve/manager/chargepoints/details/${res.chargeBoxPk}">${res.chargeBoxId}</a></td>
+			<td>${res.connectorId}</td>
 			<td>${res.startDatetime}</td>
 			<td>${res.expiryDatetime}</td>
 			<td>${res.status}</td>

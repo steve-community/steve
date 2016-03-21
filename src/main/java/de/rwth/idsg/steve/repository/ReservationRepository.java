@@ -1,5 +1,6 @@
 package de.rwth.idsg.steve.repository;
 
+import de.rwth.idsg.steve.repository.dto.InsertReservationParams;
 import de.rwth.idsg.steve.repository.dto.Reservation;
 import de.rwth.idsg.steve.web.dto.ReservationQueryForm;
 import org.joda.time.DateTime;
@@ -18,7 +19,7 @@ public interface ReservationRepository {
     /**
      * Returns the id of the reservation, if the reservation is inserted.
      */
-    int insert(String idTag, String chargeBoxId, DateTime startTimestamp, DateTime expiryTimestamp);
+    int insert(InsertReservationParams params);
 
     /**
      * Deletes the temporarily inserted reservation, when

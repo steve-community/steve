@@ -16,11 +16,11 @@ import de.rwth.idsg.steve.handler.ocpp15.SendLocalListResponseHandler;
 import de.rwth.idsg.steve.handler.ocpp15.UnlockConnectorResponseHandler;
 import de.rwth.idsg.steve.handler.ocpp15.UpdateFirmwareResponseHandler;
 import de.rwth.idsg.steve.ocpp.OcppVersion;
+import de.rwth.idsg.steve.repository.OcppTagRepository;
 import de.rwth.idsg.steve.repository.RequestTaskStore;
 import de.rwth.idsg.steve.repository.ReservationRepository;
-import de.rwth.idsg.steve.repository.OcppTagRepository;
 import de.rwth.idsg.steve.repository.dto.ChargePointSelect;
-import de.rwth.idsg.steve.web.dto.task.RequestTask;
+import de.rwth.idsg.steve.repository.dto.InsertReservationParams;
 import de.rwth.idsg.steve.web.dto.common.GetDiagnosticsParams;
 import de.rwth.idsg.steve.web.dto.common.MultipleChargePointSelect;
 import de.rwth.idsg.steve.web.dto.common.RemoteStartTransactionParams;
@@ -36,6 +36,7 @@ import de.rwth.idsg.steve.web.dto.ocpp15.GetConfigurationParams;
 import de.rwth.idsg.steve.web.dto.ocpp15.ReserveNowParams;
 import de.rwth.idsg.steve.web.dto.ocpp15.ResetParams;
 import de.rwth.idsg.steve.web.dto.ocpp15.SendLocalListParams;
+import de.rwth.idsg.steve.web.dto.task.RequestTask;
 import lombok.extern.slf4j.Slf4j;
 import ocpp.cp._2012._06.AuthorisationData;
 import ocpp.cp._2012._06.CancelReservationRequest;
@@ -377,11 +378,15 @@ public class ChargePointService15_Client {
         ChargePointSelect c = list.get(0);
         String chargeBoxId = c.getChargeBoxId();
 
-        // Insert into DB
-        DateTime startTimestamp = DateTime.now();
-        DateTime expiryTimestamp = params.getExpiry().toDateTime();
-        int reservationId = reservationRepository.insert(params.getIdTag(), chargeBoxId,
-                                                         startTimestamp, expiryTimestamp);
+        InsertReservationParams res = InsertReservationParams.builder()
+                                                             .idTag(params.getIdTag())
+                                                             .chargeBoxId(chargeBoxId)
+                                                             .connectorId(params.getConnectorId())
+                                                             .startTimestamp(DateTime.now())
+                                                             .expiryTimestamp(params.getExpiry().toDateTime())
+                                                             .build();
+
+        int reservationId = reservationRepository.insert(res);
 
         ReserveNowRequest req = this.prepareReserveNow(params, reservationId);
         RequestTask task = new RequestTask(VERSION, req, list);

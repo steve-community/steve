@@ -23,6 +23,7 @@ public abstract class AbstractOcppResponseHandler<T> implements OcppResponseHand
     // The default initial capacity is 10. We probably won't need that much.
     private ArrayList<OcppCallback<T>> callbackList = new ArrayList<>(2);
 
+    @Override
     public void addCallback(OcppCallback<T> cb) {
         callbackList.add(cb);
     }

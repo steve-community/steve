@@ -11,6 +11,7 @@ import javax.xml.ws.AsyncHandler;
  * @since 21.03.2015
  */
 public interface OcppResponseHandler<T> extends AsyncHandler<T> {
+    void addCallback(OcppCallback<T> cb);
     void handleResult(T response);
     void handleError(OcppJsonError error);
     void handleException(Exception e);

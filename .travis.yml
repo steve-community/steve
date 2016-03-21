@@ -3,7 +3,7 @@ language: java
 jdk: oraclejdk8
 cache:
         directories:
-        - $HOME/.m2/repository
+                - $HOME/.m2
 
 services: mysql
 
@@ -23,7 +23,12 @@ before_script:
         - mysql -uroot -e "GRANT SUPER ON *.* TO 'steve'@'localhost' IDENTIFIED BY 'changeme';" -v
 
 # start the actual build
-script: mvn clean package -B -V
+script: 
+        - mvn clean package -B -V
+        - java -jar target/steve-*.jar &
+        - sleep 20
+        - elinks -dump -no-references http://localhost:8080/steve/manager/signin
+
 
 # coverity_scan settings
 #
@@ -41,3 +46,6 @@ addons:
                 build_command_prepend:
                 build_command:  "mvn package"
                 branch_pattern: master
+        apt:
+                packages:
+                        - elinks

@@ -1,6 +1,7 @@
 package de.rwth.idsg.steve.utils;
 
 import com.google.common.base.Strings;
+import lombok.extern.log4j.Log4j2;
 
 import java.io.FileNotFoundException;
 import java.io.InputStream;
@@ -12,6 +13,7 @@ import java.util.Properties;
  * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
  * @since 01.10.2015
  */
+@Log4j2
 public class PropertiesFileLoader {
 
     private Properties prop;
@@ -43,7 +45,12 @@ public class PropertiesFileLoader {
             throw new IllegalArgumentException("The property '" + key + "' has no value set");
         }
 
-        return s;
+        String trimmed = s.trim();
+        if (!trimmed.equals(s)) {
+            log.warn("The property '{}' has leading or trailing spaces which were removed!", key);
+        }
+
+        return trimmed;
     }
 
     public boolean getBoolean(String key) {

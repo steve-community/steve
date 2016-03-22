@@ -3,9 +3,6 @@ package de.rwth.idsg.steve.web.dto.ocpp12;
 import de.rwth.idsg.steve.web.dto.common.AbstractChangeConfigurationParams;
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.validator.constraints.NotBlank;
-
-import javax.validation.constraints.Pattern;
 
 /**
  * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
@@ -16,10 +13,6 @@ import javax.validation.constraints.Pattern;
 public class ChangeConfigurationParams extends AbstractChangeConfigurationParams {
 
     private ConfigurationKeyEnum confKey;
-
-    @NotBlank(message = "Value is required")
-    @Pattern(regexp = "\\S+", message = "Value cannot contain any whitespace")
-    private String value;
 
     @Override
     protected String getPredefinedKey() {

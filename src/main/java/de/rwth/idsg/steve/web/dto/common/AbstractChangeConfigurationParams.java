@@ -5,9 +5,11 @@ import de.rwth.idsg.steve.SteveException;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
+import org.hibernate.validator.constraints.NotBlank;
 
 import javax.validation.constraints.AssertTrue;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
 
 /**
  * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
@@ -21,6 +23,10 @@ public abstract class AbstractChangeConfigurationParams extends MultipleChargePo
 
     @NotNull(message = "Key type is required")
     private ConfigurationKeyType keyType = ConfigurationKeyType.PREDEFINED;
+
+    @NotBlank(message = "Value is required")
+    @Pattern(regexp = "\\S+", message = "Value cannot contain any whitespace")
+    private String value;
 
     @AssertTrue(message = "Custom Configuration Key cannot be left blank")
     public boolean isValidCustom() {

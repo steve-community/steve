@@ -57,7 +57,7 @@ public class AjaxCallController {
 
     @RequestMapping(value = CONNECTOR_IDS_PATH)
     public String getConnectorIds(@PathVariable("chargeBoxId") String chargeBoxId) {
-        return serializeArray(chargePointRepository.getConnectorIds(chargeBoxId));
+        return serializeArray(chargePointRepository.getNonZeroConnectorIds(chargeBoxId));
     }
 
     @RequestMapping(value = TRANSACTION_IDS_PATH)

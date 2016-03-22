@@ -209,10 +209,11 @@ public class ChargePointRepositoryImpl implements ChargePointRepository {
     }
 
     @Override
-    public List<Integer> getConnectorIds(String chargeBoxId) {
+    public List<Integer> getNonZeroConnectorIds(String chargeBoxId) {
         return ctx.select(CONNECTOR.CONNECTOR_ID)
                   .from(CONNECTOR)
                   .where(CONNECTOR.CHARGE_BOX_ID.equal(chargeBoxId))
+                  .and(CONNECTOR.CONNECTOR_ID.notEqual(0))
                   .fetch(CONNECTOR.CONNECTOR_ID);
     }
 

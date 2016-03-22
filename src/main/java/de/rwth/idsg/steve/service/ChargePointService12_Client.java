@@ -68,7 +68,7 @@ public class ChargePointService12_Client {
 
     private ChangeConfigurationRequest prepareChangeConfiguration(ChangeConfigurationParams params) {
         return new ChangeConfigurationRequest()
-                .withKey(params.getConfKey().value())
+                .withKey(params.getKey())
                 .withValue(params.getValue());
     }
 

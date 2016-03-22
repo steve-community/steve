@@ -1,11 +1,10 @@
 package de.rwth.idsg.steve.web.dto.ocpp15;
 
-import de.rwth.idsg.steve.web.dto.common.MultipleChargePointSelect;
+import de.rwth.idsg.steve.web.dto.common.AbstractChangeConfigurationParams;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.validator.constraints.NotBlank;
 
-import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 
 /**
@@ -14,12 +13,16 @@ import javax.validation.constraints.Pattern;
  */
 @Getter
 @Setter
-public class ChangeConfigurationParams extends MultipleChargePointSelect {
+public class ChangeConfigurationParams extends AbstractChangeConfigurationParams {
 
-    @NotNull(message = "Configuration key is required")
     private ConfigurationKeyEnum confKey;
 
     @NotBlank(message = "Value is required")
     @Pattern(regexp = "\\S+", message = "Value cannot contain any whitespace")
     private String value;
+
+    @Override
+    protected String getPredefinedKey() {
+        return confKey.value();
+    }
 }

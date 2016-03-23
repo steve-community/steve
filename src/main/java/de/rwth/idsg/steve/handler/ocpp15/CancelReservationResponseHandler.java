@@ -3,6 +3,7 @@ package de.rwth.idsg.steve.handler.ocpp15;
 import de.rwth.idsg.steve.handler.AbstractOcppResponseHandler;
 import de.rwth.idsg.steve.repository.ReservationRepository;
 import de.rwth.idsg.steve.web.dto.task.RequestTask;
+import ocpp.cp._2012._06.CancelReservationRequest;
 import ocpp.cp._2012._06.CancelReservationResponse;
 import ocpp.cp._2012._06.CancelReservationStatus;
 
@@ -10,15 +11,15 @@ import ocpp.cp._2012._06.CancelReservationStatus;
  * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
  * @since 03.01.2015
  */
-public class CancelReservationResponseHandler extends AbstractOcppResponseHandler<CancelReservationResponse> {
-    private final ReservationRepository reservationRepository;
-    private final int reservationId;
+public class CancelReservationResponseHandler
+        extends AbstractOcppResponseHandler<CancelReservationRequest, CancelReservationResponse> {
 
-    public CancelReservationResponseHandler(RequestTask requestTask, String chargeBoxId,
-                                            ReservationRepository reservationRepository, int reservationId) {
-        super(requestTask, chargeBoxId);
+    private final ReservationRepository reservationRepository;
+
+    public CancelReservationResponseHandler(CancelReservationRequest req, RequestTask task, String chargeBoxId,
+                                            ReservationRepository reservationRepository) {
+        super(req, task, chargeBoxId);
         this.reservationRepository = reservationRepository;
-        this.reservationId = reservationId;
     }
 
     @Override
@@ -27,7 +28,7 @@ public class CancelReservationResponseHandler extends AbstractOcppResponseHandle
         requestTask.addNewResponse(chargeBoxId, status.value());
 
         if (CancelReservationStatus.ACCEPTED.equals(status)) {
-            reservationRepository.cancelled(reservationId);
+            reservationRepository.cancelled(request.getReservationId());
         }
     }
 }

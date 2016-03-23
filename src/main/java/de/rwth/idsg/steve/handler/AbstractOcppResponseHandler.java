@@ -1,5 +1,7 @@
 package de.rwth.idsg.steve.handler;
 
+import de.rwth.idsg.steve.ocpp.RequestType;
+import de.rwth.idsg.steve.ocpp.ResponseType;
 import de.rwth.idsg.steve.ocpp.ws.data.OcppJsonError;
 import de.rwth.idsg.steve.web.dto.task.RequestTask;
 import lombok.RequiredArgsConstructor;
@@ -14,7 +16,10 @@ import java.util.ArrayList;
  * @since 21.03.2015
  */
 @RequiredArgsConstructor
-public abstract class AbstractOcppResponseHandler<T> implements OcppResponseHandler<T> {
+public abstract class AbstractOcppResponseHandler<S extends RequestType, T extends ResponseType>
+        implements OcppResponseHandler<T> {
+
+    protected final S request;
     protected final RequestTask requestTask;
     protected final String chargeBoxId;
 

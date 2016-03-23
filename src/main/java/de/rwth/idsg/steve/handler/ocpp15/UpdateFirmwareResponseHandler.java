@@ -2,16 +2,18 @@ package de.rwth.idsg.steve.handler.ocpp15;
 
 import de.rwth.idsg.steve.handler.AbstractOcppResponseHandler;
 import de.rwth.idsg.steve.web.dto.task.RequestTask;
+import ocpp.cp._2012._06.UpdateFirmwareRequest;
 import ocpp.cp._2012._06.UpdateFirmwareResponse;
 
 /**
  * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
  * @since 30.12.2014
  */
-public class UpdateFirmwareResponseHandler extends AbstractOcppResponseHandler<UpdateFirmwareResponse> {
+public class UpdateFirmwareResponseHandler
+        extends AbstractOcppResponseHandler<UpdateFirmwareRequest, UpdateFirmwareResponse> {
 
-    public UpdateFirmwareResponseHandler(RequestTask requestTask, String chargeBoxId) {
-        super(requestTask, chargeBoxId);
+    public UpdateFirmwareResponseHandler(UpdateFirmwareRequest req, RequestTask task, String chargeBoxId) {
+        super(req, task, chargeBoxId);
     }
 
     @Override

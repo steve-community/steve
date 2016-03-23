@@ -2,16 +2,18 @@ package de.rwth.idsg.steve.handler.ocpp15;
 
 import de.rwth.idsg.steve.handler.AbstractOcppResponseHandler;
 import de.rwth.idsg.steve.web.dto.task.RequestTask;
+import ocpp.cp._2012._06.SendLocalListRequest;
 import ocpp.cp._2012._06.SendLocalListResponse;
 
 /**
  * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
  * @since 03.01.2015
  */
-public class SendLocalListResponseHandler extends AbstractOcppResponseHandler<SendLocalListResponse> {
+public class SendLocalListResponseHandler
+        extends AbstractOcppResponseHandler<SendLocalListRequest, SendLocalListResponse> {
 
-    public SendLocalListResponseHandler(RequestTask requestTask, String chargeBoxId) {
-        super(requestTask, chargeBoxId);
+    public SendLocalListResponseHandler(SendLocalListRequest req, RequestTask task, String chargeBoxId) {
+        super(req, task, chargeBoxId);
     }
 
     @Override

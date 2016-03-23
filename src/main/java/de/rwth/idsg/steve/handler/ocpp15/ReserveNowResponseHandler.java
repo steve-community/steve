@@ -4,21 +4,21 @@ import de.rwth.idsg.steve.handler.AbstractOcppResponseHandler;
 import de.rwth.idsg.steve.repository.ReservationRepository;
 import de.rwth.idsg.steve.web.dto.task.RequestTask;
 import ocpp.cp._2012._06.ReservationStatus;
+import ocpp.cp._2012._06.ReserveNowRequest;
 import ocpp.cp._2012._06.ReserveNowResponse;
 
 /**
  * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
  * @since 03.01.2015
  */
-public class ReserveNowResponseHandler extends AbstractOcppResponseHandler<ReserveNowResponse> {
-    private final ReservationRepository reservationRepository;
-    private final int reservationId;
+public class ReserveNowResponseHandler extends AbstractOcppResponseHandler<ReserveNowRequest, ReserveNowResponse> {
 
-    public ReserveNowResponseHandler(RequestTask requestTask, String chargeBoxId,
-                                     ReservationRepository reservationRepository, int reservationId) {
-        super(requestTask, chargeBoxId);
+    private final ReservationRepository reservationRepository;
+
+    public ReserveNowResponseHandler(ReserveNowRequest req, RequestTask task, String chargeBoxId,
+                                     ReservationRepository reservationRepository) {
+        super(req, task, chargeBoxId);
         this.reservationRepository = reservationRepository;
-        this.reservationId = reservationId;
     }
 
     @Override
@@ -27,7 +27,7 @@ public class ReserveNowResponseHandler extends AbstractOcppResponseHandler<Reser
         requestTask.addNewResponse(chargeBoxId, status.value());
 
         if (ReservationStatus.ACCEPTED.equals(status)) {
-            reservationRepository.accepted(reservationId);
+            reservationRepository.accepted(request.getReservationId());
         } else {
             delete();
         }
@@ -40,6 +40,6 @@ public class ReserveNowResponseHandler extends AbstractOcppResponseHandler<Reser
     }
 
     private void delete() {
-        reservationRepository.delete(reservationId);
+        reservationRepository.delete(request.getReservationId());
     }
 }

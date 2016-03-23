@@ -3,6 +3,7 @@ package de.rwth.idsg.steve.handler.ocpp15;
 import com.google.common.base.Joiner;
 import de.rwth.idsg.steve.handler.AbstractOcppResponseHandler;
 import de.rwth.idsg.steve.web.dto.task.RequestTask;
+import ocpp.cp._2012._06.GetConfigurationRequest;
 import ocpp.cp._2012._06.GetConfigurationResponse;
 import ocpp.cp._2012._06.KeyValue;
 
@@ -12,7 +13,8 @@ import java.util.List;
  * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
  * @since 03.01.2015
  */
-public class GetConfigurationResponseHandler extends AbstractOcppResponseHandler<GetConfigurationResponse> {
+public class GetConfigurationResponseHandler
+        extends AbstractOcppResponseHandler<GetConfigurationRequest, GetConfigurationResponse> {
 
     private static final String FORMAT =
             "<b>Known keys:</b>"
@@ -25,8 +27,8 @@ public class GetConfigurationResponseHandler extends AbstractOcppResponseHandler
 
     private static final Joiner JOINER = Joiner.on(",");
 
-    public GetConfigurationResponseHandler(RequestTask requestTask, String chargeBoxId) {
-        super(requestTask, chargeBoxId);
+    public GetConfigurationResponseHandler(GetConfigurationRequest req, RequestTask task, String chargeBoxId) {
+        super(req, task, chargeBoxId);
     }
 
     @Override

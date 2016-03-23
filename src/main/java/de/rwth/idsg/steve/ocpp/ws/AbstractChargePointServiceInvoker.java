@@ -30,9 +30,9 @@ public abstract class AbstractChargePointServiceInvoker {
     /**
      * Just a wrapper to make try-catch block and exception handling stand out
      */
-    public void runPipeline(String chargeBoxId, RequestType request, OcppResponseHandler handler) {
+    public void runPipeline(String chargeBoxId, OcppResponseHandler handler) {
         try {
-            run(chargeBoxId, request, handler);
+            run(chargeBoxId, handler);
         } catch (Exception e) {
             log.error("Exception occurred", e);
             // Outgoing call failed due to technical problems. Pass the exception to handler to inform the user
@@ -43,7 +43,9 @@ public abstract class AbstractChargePointServiceInvoker {
     /**
      * Actual processing
      */
-    private void run(String chargeBoxId, RequestType request, OcppResponseHandler handler) {
+    private void run(String chargeBoxId, OcppResponseHandler handler) {
+        RequestType request = handler.getRequest();
+
         String messageId = UUID.randomUUID().toString();
         ActionResponsePair pair = typeStore.findActionResponse(request);
         if (pair == null) {

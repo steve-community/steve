@@ -12,7 +12,6 @@ import de.rwth.idsg.steve.handler.ocpp12.UpdateFirmwareResponseHandler;
 import de.rwth.idsg.steve.ocpp.OcppVersion;
 import de.rwth.idsg.steve.repository.RequestTaskStore;
 import de.rwth.idsg.steve.repository.dto.ChargePointSelect;
-import de.rwth.idsg.steve.web.dto.task.RequestTask;
 import de.rwth.idsg.steve.web.dto.common.GetDiagnosticsParams;
 import de.rwth.idsg.steve.web.dto.common.MultipleChargePointSelect;
 import de.rwth.idsg.steve.web.dto.common.RemoteStartTransactionParams;
@@ -22,6 +21,7 @@ import de.rwth.idsg.steve.web.dto.common.UpdateFirmwareParams;
 import de.rwth.idsg.steve.web.dto.ocpp12.ChangeAvailabilityParams;
 import de.rwth.idsg.steve.web.dto.ocpp12.ChangeConfigurationParams;
 import de.rwth.idsg.steve.web.dto.ocpp12.ResetParams;
+import de.rwth.idsg.steve.web.dto.task.RequestTask;
 import lombok.extern.slf4j.Slf4j;
 import ocpp.cp._2010._08.ChangeAvailabilityRequest;
 import ocpp.cp._2010._08.ChangeConfigurationRequest;
@@ -124,7 +124,8 @@ public class ChargePointService12_Client {
         RequestTask task = new RequestTask(VERSION, req, list);
 
         execute(list,
-                c -> dispatcher.changeAvailability(c, req, new ChangeAvailabilityResponseHandler(req, task, c.getChargeBoxId())));
+                c -> dispatcher.changeAvailability(
+                        c, new ChangeAvailabilityResponseHandler(req, task, c.getChargeBoxId())));
 
         return requestTaskStore.add(task);
     }
@@ -135,7 +136,8 @@ public class ChargePointService12_Client {
         RequestTask task = new RequestTask(VERSION, req, list);
 
         execute(list,
-                c -> dispatcher.changeConfiguration(c, req, new ChangeConfigurationResponseHandler(req, task, c.getChargeBoxId())));
+                c -> dispatcher.changeConfiguration(
+                        c, new ChangeConfigurationResponseHandler(req, task, c.getChargeBoxId())));
 
         return requestTaskStore.add(task);
     }
@@ -146,7 +148,8 @@ public class ChargePointService12_Client {
         RequestTask task = new RequestTask(VERSION, req, list);
 
         execute(list,
-                c -> dispatcher.clearCache(c, req, new ClearCacheResponseHandler(req, task, c.getChargeBoxId())));
+                c -> dispatcher.clearCache(
+                        c, new ClearCacheResponseHandler(req, task, c.getChargeBoxId())));
 
         return requestTaskStore.add(task);
     }
@@ -157,7 +160,8 @@ public class ChargePointService12_Client {
         RequestTask task = new RequestTask(VERSION, req, list);
 
         execute(list,
-                c -> dispatcher.getDiagnostics(c, req, new GetDiagnosticsResponseHandler(req, task, c.getChargeBoxId())));
+                c -> dispatcher.getDiagnostics(
+                        c, new GetDiagnosticsResponseHandler(req, task, c.getChargeBoxId())));
 
         return requestTaskStore.add(task);
     }
@@ -168,7 +172,8 @@ public class ChargePointService12_Client {
         RequestTask task = new RequestTask(VERSION, req, list);
 
         execute(list,
-                c -> dispatcher.reset(c, req, new ResetResponseHandler(req, task, c.getChargeBoxId())));
+                c -> dispatcher.reset(
+                        c, new ResetResponseHandler(req, task, c.getChargeBoxId())));
 
         return requestTaskStore.add(task);
     }
@@ -179,7 +184,8 @@ public class ChargePointService12_Client {
         RequestTask task = new RequestTask(VERSION, req, list);
 
         execute(list,
-                c -> dispatcher.updateFirmware(c, req, new UpdateFirmwareResponseHandler(req, task, c.getChargeBoxId())));
+                c -> dispatcher.updateFirmware(
+                        c, new UpdateFirmwareResponseHandler(req, task, c.getChargeBoxId())));
 
         return requestTaskStore.add(task);
     }
@@ -201,8 +207,8 @@ public class ChargePointService12_Client {
         RequestTask task = new RequestTask(VERSION, req, list);
         ChargePointSelect c = list.get(0);
 
-        execute(() -> dispatcher.remoteStartTransaction(c, req,
-                new RemoteStartTransactionResponseHandler(req, task, c.getChargeBoxId())));
+        execute(() -> dispatcher.remoteStartTransaction(
+                c, new RemoteStartTransactionResponseHandler(req, task, c.getChargeBoxId())));
 
         return requestTaskStore.add(task);
     }
@@ -213,8 +219,8 @@ public class ChargePointService12_Client {
         RequestTask task = new RequestTask(VERSION, req, list);
         ChargePointSelect c = list.get(0);
 
-        execute(() -> dispatcher.remoteStopTransaction(c, req,
-                new RemoteStopTransactionResponseHandler(req, task, c.getChargeBoxId())));
+        execute(() -> dispatcher.remoteStopTransaction(
+                c, new RemoteStopTransactionResponseHandler(req, task, c.getChargeBoxId())));
 
         return requestTaskStore.add(task);
     }
@@ -225,8 +231,8 @@ public class ChargePointService12_Client {
         RequestTask task = new RequestTask(VERSION, req, list);
         ChargePointSelect c = list.get(0);
 
-        execute(() -> dispatcher.unlockConnector(c, req,
-                new UnlockConnectorResponseHandler(req, task, c.getChargeBoxId())));
+        execute(() -> dispatcher.unlockConnector(
+                c, new UnlockConnectorResponseHandler(req, task, c.getChargeBoxId())));
 
         return requestTaskStore.add(task);
     }

@@ -39,48 +39,50 @@ import ocpp.cp._2012._06.UpdateFirmwareResponse;
  */
 public interface ChargePointService15_Invoker {
 
-    void reset(ChargePointSelect cp, ResetRequest request,
-               OcppResponseHandler<ResetResponse> handler);
+    void reset(ChargePointSelect cp,
+               OcppResponseHandler<ResetRequest, ResetResponse> handler);
 
-    void clearCache(ChargePointSelect cp, ClearCacheRequest request,
-                    OcppResponseHandler<ClearCacheResponse> handler);
+    void clearCache(ChargePointSelect cp,
+                    OcppResponseHandler<ClearCacheRequest, ClearCacheResponse> handler);
 
-    void dataTransfer(ChargePointSelect cp, DataTransferRequest request,
-                      OcppResponseHandler<DataTransferResponse> handler);
+    void dataTransfer(ChargePointSelect cp,
+                      OcppResponseHandler<DataTransferRequest, DataTransferResponse> handler);
 
-    void updateFirmware(ChargePointSelect cp, UpdateFirmwareRequest request,
-                        OcppResponseHandler<UpdateFirmwareResponse> handler);
+    void updateFirmware(ChargePointSelect cp,
+                        OcppResponseHandler<UpdateFirmwareRequest, UpdateFirmwareResponse> handler);
 
-    void getDiagnostics(ChargePointSelect cp, GetDiagnosticsRequest request,
-                        OcppResponseHandler<GetDiagnosticsResponse> handler);
+    void getDiagnostics(ChargePointSelect cp,
+                        OcppResponseHandler<GetDiagnosticsRequest, GetDiagnosticsResponse> handler);
 
-    void unlockConnector(ChargePointSelect cp, UnlockConnectorRequest request,
-                         OcppResponseHandler<UnlockConnectorResponse> handler);
+    void unlockConnector(ChargePointSelect cp,
+                         OcppResponseHandler<UnlockConnectorRequest, UnlockConnectorResponse> handler);
 
-    void getConfiguration(ChargePointSelect cp, GetConfigurationRequest request,
-                          OcppResponseHandler<GetConfigurationResponse> handler);
+    void getConfiguration(ChargePointSelect cp,
+                          OcppResponseHandler<GetConfigurationRequest, GetConfigurationResponse> handler);
 
-    void changeConfiguration(ChargePointSelect cp, ChangeConfigurationRequest request,
-                             OcppResponseHandler<ChangeConfigurationResponse> handler);
+    void changeConfiguration(ChargePointSelect cp,
+                             OcppResponseHandler<ChangeConfigurationRequest, ChangeConfigurationResponse> handler);
 
-    void changeAvailability(ChargePointSelect cp, ChangeAvailabilityRequest request,
-                            OcppResponseHandler<ChangeAvailabilityResponse> handler);
+    void changeAvailability(ChargePointSelect cp,
+                            OcppResponseHandler<ChangeAvailabilityRequest, ChangeAvailabilityResponse> handler);
 
-    void getLocalListVersion(ChargePointSelect cp, GetLocalListVersionRequest request,
-                             OcppResponseHandler<GetLocalListVersionResponse> handler);
+    void getLocalListVersion(ChargePointSelect cp,
+                             OcppResponseHandler<GetLocalListVersionRequest, GetLocalListVersionResponse> handler);
 
-    void sendLocalList(ChargePointSelect cp, SendLocalListRequest request,
-                       OcppResponseHandler<SendLocalListResponse> handler);
+    void sendLocalList(ChargePointSelect cp,
+                       OcppResponseHandler<SendLocalListRequest, SendLocalListResponse> handler);
 
-    void remoteStartTransaction(ChargePointSelect cp, RemoteStartTransactionRequest request,
-                                OcppResponseHandler<RemoteStartTransactionResponse> handler);
+    void remoteStartTransaction(ChargePointSelect cp,
+                                OcppResponseHandler<RemoteStartTransactionRequest,
+                                                    RemoteStartTransactionResponse> handler);
 
-    void remoteStopTransaction(ChargePointSelect cp, RemoteStopTransactionRequest request,
-                               OcppResponseHandler<RemoteStopTransactionResponse> handler);
+    void remoteStopTransaction(ChargePointSelect cp,
+                               OcppResponseHandler<RemoteStopTransactionRequest,
+                                                   RemoteStopTransactionResponse> handler);
 
-    void reserveNow(ChargePointSelect cp, ReserveNowRequest request,
-                    OcppResponseHandler<ReserveNowResponse> handler);
+    void reserveNow(ChargePointSelect cp,
+                    OcppResponseHandler<ReserveNowRequest, ReserveNowResponse> handler);
 
-    void cancelReservation(ChargePointSelect cp, CancelReservationRequest request,
-                           OcppResponseHandler<CancelReservationResponse> handler);
+    void cancelReservation(ChargePointSelect cp,
+                           OcppResponseHandler<CancelReservationRequest, CancelReservationResponse> handler);
 }

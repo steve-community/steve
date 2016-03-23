@@ -49,152 +49,157 @@ public class ChargePointService15_Dispatcher implements ChargePointService15_Inv
     @Autowired private ChargePointService15_WsInvoker wsInvoker;
 
     @Override
-    public void reset(ChargePointSelect cp, ResetRequest request,
-                      OcppResponseHandler<ResetResponse> handler) {
+    public void reset(ChargePointSelect cp,
+                      OcppResponseHandler<ResetRequest, ResetResponse> handler) {
         if (cp.isSoap()) {
-            soapInvoker.reset(cp, request, handler);
+            soapInvoker.reset(cp, handler);
         } else {
-            wsInvoker.runPipeline(cp.getChargeBoxId(), request, handler);
+            wsInvoker.runPipeline(cp.getChargeBoxId(), handler);
         }
     }
 
     @Override
-    public void clearCache(ChargePointSelect cp, ClearCacheRequest request,
-                           OcppResponseHandler<ClearCacheResponse> handler) {
+    public void clearCache(ChargePointSelect cp,
+                           OcppResponseHandler<ClearCacheRequest, ClearCacheResponse> handler) {
         if (cp.isSoap()) {
-            soapInvoker.clearCache(cp, request, handler);
+            soapInvoker.clearCache(cp, handler);
         } else {
-            wsInvoker.runPipeline(cp.getChargeBoxId(), request, handler);
+            wsInvoker.runPipeline(cp.getChargeBoxId(), handler);
         }
     }
 
     @Override
-    public void dataTransfer(ChargePointSelect cp, DataTransferRequest request,
-                             OcppResponseHandler<DataTransferResponse> handler) {
+    public void dataTransfer(ChargePointSelect cp,
+                             OcppResponseHandler<DataTransferRequest, DataTransferResponse> handler) {
         if (cp.isSoap()) {
-            soapInvoker.dataTransfer(cp, request, handler);
+            soapInvoker.dataTransfer(cp, handler);
         } else {
-            wsInvoker.runPipeline(cp.getChargeBoxId(), request, handler);
+            wsInvoker.runPipeline(cp.getChargeBoxId(), handler);
         }
     }
 
     @Override
-    public void updateFirmware(ChargePointSelect cp, UpdateFirmwareRequest request,
-                               OcppResponseHandler<UpdateFirmwareResponse> handler) {
+    public void updateFirmware(ChargePointSelect cp,
+                               OcppResponseHandler<UpdateFirmwareRequest, UpdateFirmwareResponse> handler) {
         if (cp.isSoap()) {
-            soapInvoker.updateFirmware(cp, request, handler);
+            soapInvoker.updateFirmware(cp, handler);
         } else {
-            wsInvoker.runPipeline(cp.getChargeBoxId(), request, handler);
+            wsInvoker.runPipeline(cp.getChargeBoxId(), handler);
         }
     }
 
     @Override
-    public void getDiagnostics(ChargePointSelect cp, GetDiagnosticsRequest request,
-                               OcppResponseHandler<GetDiagnosticsResponse> handler) {
+    public void getDiagnostics(ChargePointSelect cp,
+                               OcppResponseHandler<GetDiagnosticsRequest, GetDiagnosticsResponse> handler) {
         if (cp.isSoap()) {
-            soapInvoker.getDiagnostics(cp, request, handler);
+            soapInvoker.getDiagnostics(cp, handler);
         } else {
-            wsInvoker.runPipeline(cp.getChargeBoxId(), request, handler);
+            wsInvoker.runPipeline(cp.getChargeBoxId(), handler);
         }
     }
 
     @Override
-    public void unlockConnector(ChargePointSelect cp, UnlockConnectorRequest request,
-                                OcppResponseHandler<UnlockConnectorResponse> handler) {
+    public void unlockConnector(ChargePointSelect cp,
+                                OcppResponseHandler<UnlockConnectorRequest, UnlockConnectorResponse> handler) {
         if (cp.isSoap()) {
-            soapInvoker.unlockConnector(cp, request, handler);
+            soapInvoker.unlockConnector(cp, handler);
         } else {
-            wsInvoker.runPipeline(cp.getChargeBoxId(), request, handler);
+            wsInvoker.runPipeline(cp.getChargeBoxId(), handler);
         }
     }
 
     @Override
-    public void getConfiguration(ChargePointSelect cp, GetConfigurationRequest request,
-                                 OcppResponseHandler<GetConfigurationResponse> handler) {
+    public void getConfiguration(ChargePointSelect cp,
+                                 OcppResponseHandler<GetConfigurationRequest, GetConfigurationResponse> handler) {
         if (cp.isSoap()) {
-            soapInvoker.getConfiguration(cp, request, handler);
+            soapInvoker.getConfiguration(cp, handler);
         } else {
-            wsInvoker.runPipeline(cp.getChargeBoxId(), request, handler);
+            wsInvoker.runPipeline(cp.getChargeBoxId(), handler);
         }
     }
 
     @Override
-    public void changeConfiguration(ChargePointSelect cp, ChangeConfigurationRequest request,
-                                    OcppResponseHandler<ChangeConfigurationResponse> handler) {
+    public void changeConfiguration(ChargePointSelect cp,
+                                    OcppResponseHandler<ChangeConfigurationRequest,
+                                                        ChangeConfigurationResponse> handler) {
         if (cp.isSoap()) {
-            soapInvoker.changeConfiguration(cp, request, handler);
+            soapInvoker.changeConfiguration(cp, handler);
         } else {
-            wsInvoker.runPipeline(cp.getChargeBoxId(), request, handler);
+            wsInvoker.runPipeline(cp.getChargeBoxId(), handler);
         }
     }
 
     @Override
-    public void changeAvailability(ChargePointSelect cp, ChangeAvailabilityRequest request,
-                                   OcppResponseHandler<ChangeAvailabilityResponse> handler) {
+    public void changeAvailability(ChargePointSelect cp,
+                                   OcppResponseHandler<ChangeAvailabilityRequest,
+                                                       ChangeAvailabilityResponse> handler) {
         if (cp.isSoap()) {
-            soapInvoker.changeAvailability(cp, request, handler);
+            soapInvoker.changeAvailability(cp, handler);
         } else {
-            wsInvoker.runPipeline(cp.getChargeBoxId(), request, handler);
+            wsInvoker.runPipeline(cp.getChargeBoxId(), handler);
         }
     }
 
     @Override
-    public void getLocalListVersion(ChargePointSelect cp, GetLocalListVersionRequest request,
-                                    OcppResponseHandler<GetLocalListVersionResponse> handler) {
+    public void getLocalListVersion(ChargePointSelect cp,
+                                    OcppResponseHandler<GetLocalListVersionRequest,
+                                                        GetLocalListVersionResponse> handler) {
         if (cp.isSoap()) {
-            soapInvoker.getLocalListVersion(cp, request, handler);
+            soapInvoker.getLocalListVersion(cp, handler);
         } else {
-            wsInvoker.runPipeline(cp.getChargeBoxId(), request, handler);
+            wsInvoker.runPipeline(cp.getChargeBoxId(), handler);
         }
     }
 
     @Override
-    public void sendLocalList(ChargePointSelect cp, SendLocalListRequest request,
-                              OcppResponseHandler<SendLocalListResponse> handler) {
+    public void sendLocalList(ChargePointSelect cp,
+                              OcppResponseHandler<SendLocalListRequest, SendLocalListResponse> handler) {
         if (cp.isSoap()) {
-            soapInvoker.sendLocalList(cp, request, handler);
+            soapInvoker.sendLocalList(cp, handler);
         } else {
-            wsInvoker.runPipeline(cp.getChargeBoxId(), request, handler);
+            wsInvoker.runPipeline(cp.getChargeBoxId(), handler);
         }
     }
 
     @Override
-    public void remoteStartTransaction(ChargePointSelect cp, RemoteStartTransactionRequest request,
-                                       OcppResponseHandler<RemoteStartTransactionResponse> handler) {
+    public void remoteStartTransaction(ChargePointSelect cp,
+                                       OcppResponseHandler<RemoteStartTransactionRequest,
+                                                           RemoteStartTransactionResponse> handler) {
         if (cp.isSoap()) {
-            soapInvoker.remoteStartTransaction(cp, request, handler);
+            soapInvoker.remoteStartTransaction(cp, handler);
         } else {
-            wsInvoker.runPipeline(cp.getChargeBoxId(), request, handler);
+            wsInvoker.runPipeline(cp.getChargeBoxId(), handler);
         }
     }
 
     @Override
-    public void remoteStopTransaction(ChargePointSelect cp, RemoteStopTransactionRequest request,
-                                      OcppResponseHandler<RemoteStopTransactionResponse> handler) {
+    public void remoteStopTransaction(ChargePointSelect cp,
+                                      OcppResponseHandler<RemoteStopTransactionRequest,
+                                                          RemoteStopTransactionResponse> handler) {
         if (cp.isSoap()) {
-            soapInvoker.remoteStopTransaction(cp, request, handler);
+            soapInvoker.remoteStopTransaction(cp, handler);
         } else {
-            wsInvoker.runPipeline(cp.getChargeBoxId(), request, handler);
+            wsInvoker.runPipeline(cp.getChargeBoxId(), handler);
         }
     }
 
     @Override
-    public void reserveNow(ChargePointSelect cp, ReserveNowRequest request,
-                           OcppResponseHandler<ReserveNowResponse> handler) {
+    public void reserveNow(ChargePointSelect cp,
+                           OcppResponseHandler<ReserveNowRequest, ReserveNowResponse> handler) {
         if (cp.isSoap()) {
-            soapInvoker.reserveNow(cp, request, handler);
+            soapInvoker.reserveNow(cp, handler);
         } else {
-            wsInvoker.runPipeline(cp.getChargeBoxId(), request, handler);
+            wsInvoker.runPipeline(cp.getChargeBoxId(), handler);
         }
     }
 
     @Override
-    public void cancelReservation(ChargePointSelect cp, CancelReservationRequest request,
-                                  OcppResponseHandler<CancelReservationResponse> handler) {
+    public void cancelReservation(ChargePointSelect cp,
+                                  OcppResponseHandler<CancelReservationRequest, CancelReservationResponse> handler) {
         if (cp.isSoap()) {
-            soapInvoker.cancelReservation(cp, request, handler);
+            soapInvoker.cancelReservation(cp, handler);
         } else {
-            wsInvoker.runPipeline(cp.getChargeBoxId(), request, handler);
+            wsInvoker.runPipeline(cp.getChargeBoxId(), handler);
         }
     }
 }

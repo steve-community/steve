@@ -12,8 +12,8 @@ import ocpp.cp._2012._06.SendLocalListResponse;
 public class SendLocalListResponseHandler
         extends AbstractOcppResponseHandler<SendLocalListRequest, SendLocalListResponse> {
 
-    public SendLocalListResponseHandler(SendLocalListRequest req, RequestTask task, String chargeBoxId) {
-        super(req, task, chargeBoxId);
+    public SendLocalListResponseHandler(RequestTask<SendLocalListRequest> task, String chargeBoxId) {
+        super(task, chargeBoxId);
     }
 
     @Override

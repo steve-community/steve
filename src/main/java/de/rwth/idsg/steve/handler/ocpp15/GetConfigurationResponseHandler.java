@@ -27,8 +27,8 @@ public class GetConfigurationResponseHandler
 
     private static final Joiner JOINER = Joiner.on(",");
 
-    public GetConfigurationResponseHandler(GetConfigurationRequest req, RequestTask task, String chargeBoxId) {
-        super(req, task, chargeBoxId);
+    public GetConfigurationResponseHandler(RequestTask<GetConfigurationRequest> task, String chargeBoxId) {
+        super(task, chargeBoxId);
     }
 
     @Override

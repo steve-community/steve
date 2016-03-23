@@ -12,8 +12,8 @@ import ocpp.cp._2010._08.RemoteStartTransactionResponse;
 public class RemoteStartTransactionResponseHandler
         extends AbstractOcppResponseHandler<RemoteStartTransactionRequest, RemoteStartTransactionResponse> {
 
-    public RemoteStartTransactionResponseHandler(RemoteStartTransactionRequest req, RequestTask task, String chargeBoxId) {
-        super(req, task, chargeBoxId);
+    public RemoteStartTransactionResponseHandler(RequestTask<RemoteStartTransactionRequest> task, String chargeBoxId) {
+        super(task, chargeBoxId);
     }
 
     @Override

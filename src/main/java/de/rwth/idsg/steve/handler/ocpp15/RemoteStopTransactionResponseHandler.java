@@ -12,8 +12,8 @@ import ocpp.cp._2012._06.RemoteStopTransactionResponse;
 public class RemoteStopTransactionResponseHandler
         extends AbstractOcppResponseHandler<RemoteStopTransactionRequest, RemoteStopTransactionResponse> {
 
-    public RemoteStopTransactionResponseHandler(RemoteStopTransactionRequest req, RequestTask task, String chargeBoxId) {
-        super(req, task, chargeBoxId);
+    public RemoteStopTransactionResponseHandler(RequestTask<RemoteStopTransactionRequest> task, String chargeBoxId) {
+        super(task, chargeBoxId);
     }
 
     @Override

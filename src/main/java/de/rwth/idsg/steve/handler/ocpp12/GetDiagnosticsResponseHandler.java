@@ -12,8 +12,8 @@ import ocpp.cp._2010._08.GetDiagnosticsResponse;
 public class GetDiagnosticsResponseHandler
         extends AbstractOcppResponseHandler<GetDiagnosticsRequest, GetDiagnosticsResponse> {
 
-    public GetDiagnosticsResponseHandler(GetDiagnosticsRequest req, RequestTask task, String chargeBoxId) {
-        super(req, task, chargeBoxId);
+    public GetDiagnosticsResponseHandler(RequestTask<GetDiagnosticsRequest> task, String chargeBoxId) {
+        super(task, chargeBoxId);
     }
 
     @Override

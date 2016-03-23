@@ -4,7 +4,6 @@ import de.rwth.idsg.steve.ocpp.RequestType;
 import de.rwth.idsg.steve.ocpp.ResponseType;
 import de.rwth.idsg.steve.ocpp.ws.data.OcppJsonError;
 import de.rwth.idsg.steve.web.dto.task.RequestTask;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,8 +19,7 @@ import java.util.ArrayList;
 public abstract class AbstractOcppResponseHandler<S extends RequestType, T extends ResponseType>
         implements OcppResponseHandler<S, T> {
 
-    @Getter protected final S request;
-    protected final RequestTask requestTask;
+    protected final RequestTask<S> requestTask;
     protected final String chargeBoxId;
 
     private final Logger log = LoggerFactory.getLogger(getClass());
@@ -32,6 +30,11 @@ public abstract class AbstractOcppResponseHandler<S extends RequestType, T exten
     @Override
     public void addCallback(OcppCallback<T> cb) {
         callbackList.add(cb);
+    }
+
+    @Override
+    public S getRequest() {
+        return requestTask.getRequest();
     }
 
     // -------------------------------------------------------------------------

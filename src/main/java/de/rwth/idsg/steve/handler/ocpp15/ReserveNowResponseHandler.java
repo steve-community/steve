@@ -15,9 +15,9 @@ public class ReserveNowResponseHandler extends AbstractOcppResponseHandler<Reser
 
     private final ReservationRepository reservationRepository;
 
-    public ReserveNowResponseHandler(ReserveNowRequest req, RequestTask task, String chargeBoxId,
+    public ReserveNowResponseHandler(RequestTask<ReserveNowRequest> task, String chargeBoxId,
                                      ReservationRepository reservationRepository) {
-        super(req, task, chargeBoxId);
+        super(task, chargeBoxId);
         this.reservationRepository = reservationRepository;
     }
 
@@ -27,7 +27,7 @@ public class ReserveNowResponseHandler extends AbstractOcppResponseHandler<Reser
         requestTask.addNewResponse(chargeBoxId, status.value());
 
         if (ReservationStatus.ACCEPTED.equals(status)) {
-            reservationRepository.accepted(request.getReservationId());
+            reservationRepository.accepted(getRequest().getReservationId());
         } else {
             delete();
         }
@@ -40,6 +40,6 @@ public class ReserveNowResponseHandler extends AbstractOcppResponseHandler<Reser
     }
 
     private void delete() {
-        reservationRepository.delete(request.getReservationId());
+        reservationRepository.delete(getRequest().getReservationId());
     }
 }

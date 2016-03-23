@@ -12,8 +12,8 @@ import ocpp.cp._2012._06.UpdateFirmwareResponse;
 public class UpdateFirmwareResponseHandler
         extends AbstractOcppResponseHandler<UpdateFirmwareRequest, UpdateFirmwareResponse> {
 
-    public UpdateFirmwareResponseHandler(UpdateFirmwareRequest req, RequestTask task, String chargeBoxId) {
-        super(req, task, chargeBoxId);
+    public UpdateFirmwareResponseHandler(RequestTask<UpdateFirmwareRequest> task, String chargeBoxId) {
+        super(task, chargeBoxId);
     }
 
     @Override

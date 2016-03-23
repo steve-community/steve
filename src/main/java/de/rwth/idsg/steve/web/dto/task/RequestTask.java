@@ -21,11 +21,12 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @since 18.09.2014
  */
 @Getter
-public class RequestTask {
+public class RequestTask<S extends RequestType> {
     private final OcppVersion ocppVersion;
     private final String operationName;
     private final RequestTaskOrigin origin;
     private final String caller;
+    private final S request;
 
     private final Map<String, RequestResult> resultMap;
     private final int resultSize;
@@ -39,14 +40,14 @@ public class RequestTask {
     @Getter(AccessLevel.NONE) // disable getter generation
     private final Object lockObject = new Object();
 
-    public RequestTask(OcppVersion ocppVersion, RequestType requestType, List<ChargePointSelect> cpsList) {
+    public RequestTask(OcppVersion ocppVersion, S requestType, List<ChargePointSelect> cpsList) {
         this(ocppVersion, requestType, cpsList, RequestTaskOrigin.INTERNAL, "SteVe");
     }
 
     /**
      * Do not expose the constructor, make it package-private
      */
-    RequestTask(OcppVersion ocppVersion, RequestType requestType, List<ChargePointSelect> cpsList,
+    RequestTask(OcppVersion ocppVersion, S requestType, List<ChargePointSelect> cpsList,
                 RequestTaskOrigin origin, String caller) {
 
         this.operationName = StringUtils.getOperationName(requestType);
@@ -54,6 +55,7 @@ public class RequestTask {
         this.resultSize = cpsList.size();
         this.origin = origin;
         this.caller = caller;
+        this.request = requestType;
 
         resultMap = new HashMap<>(resultSize);
         for (ChargePointSelect cps : cpsList) {

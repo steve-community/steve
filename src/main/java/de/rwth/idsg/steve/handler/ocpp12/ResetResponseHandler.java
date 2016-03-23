@@ -11,8 +11,8 @@ import ocpp.cp._2010._08.ResetResponse;
  */
 public class ResetResponseHandler extends AbstractOcppResponseHandler<ResetRequest, ResetResponse> {
 
-    public ResetResponseHandler(ResetRequest req, RequestTask task, String chargeBoxId) {
-        super(req, task, chargeBoxId);
+    public ResetResponseHandler(RequestTask<ResetRequest> task, String chargeBoxId) {
+        super(task, chargeBoxId);
     }
 
     @Override

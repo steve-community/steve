@@ -12,8 +12,8 @@ import ocpp.cp._2012._06.DataTransferResponse;
 public class DataTransferResponseHandler
         extends AbstractOcppResponseHandler<DataTransferRequest, DataTransferResponse> {
 
-    public DataTransferResponseHandler(DataTransferRequest req, RequestTask task, String chargeBoxId) {
-        super(req, task, chargeBoxId);
+    public DataTransferResponseHandler(RequestTask<DataTransferRequest> task, String chargeBoxId) {
+        super(task, chargeBoxId);
     }
 
     @Override

@@ -12,8 +12,8 @@ import ocpp.cp._2010._08.UnlockConnectorResponse;
 public class UnlockConnectorResponseHandler
         extends AbstractOcppResponseHandler<UnlockConnectorRequest, UnlockConnectorResponse> {
 
-    public UnlockConnectorResponseHandler(UnlockConnectorRequest req, RequestTask task, String chargeBoxId) {
-        super(req, task, chargeBoxId);
+    public UnlockConnectorResponseHandler(RequestTask<UnlockConnectorRequest> task, String chargeBoxId) {
+        super(task, chargeBoxId);
     }
 
     @Override

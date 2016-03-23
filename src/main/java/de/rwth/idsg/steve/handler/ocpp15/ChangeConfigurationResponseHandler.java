@@ -12,8 +12,8 @@ import ocpp.cp._2012._06.ChangeConfigurationResponse;
 public class ChangeConfigurationResponseHandler
         extends AbstractOcppResponseHandler<ChangeConfigurationRequest, ChangeConfigurationResponse> {
 
-    public ChangeConfigurationResponseHandler(ChangeConfigurationRequest req, RequestTask task, String chargeBoxId) {
-        super(req, task, chargeBoxId);
+    public ChangeConfigurationResponseHandler(RequestTask<ChangeConfigurationRequest> task, String chargeBoxId) {
+        super(task, chargeBoxId);
     }
 
     @Override

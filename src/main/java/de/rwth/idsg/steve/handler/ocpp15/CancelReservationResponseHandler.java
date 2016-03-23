@@ -16,9 +16,9 @@ public class CancelReservationResponseHandler
 
     private final ReservationRepository reservationRepository;
 
-    public CancelReservationResponseHandler(CancelReservationRequest req, RequestTask task, String chargeBoxId,
+    public CancelReservationResponseHandler(RequestTask<CancelReservationRequest> task, String chargeBoxId,
                                             ReservationRepository reservationRepository) {
-        super(req, task, chargeBoxId);
+        super(task, chargeBoxId);
         this.reservationRepository = reservationRepository;
     }
 
@@ -28,7 +28,7 @@ public class CancelReservationResponseHandler
         requestTask.addNewResponse(chargeBoxId, status.value());
 
         if (CancelReservationStatus.ACCEPTED.equals(status)) {
-            reservationRepository.cancelled(request.getReservationId());
+            reservationRepository.cancelled(getRequest().getReservationId());
         }
     }
 }

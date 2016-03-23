@@ -12,8 +12,8 @@ import ocpp.cp._2012._06.ChangeAvailabilityResponse;
 public class ChangeAvailabilityResponseHandler
         extends AbstractOcppResponseHandler<ChangeAvailabilityRequest, ChangeAvailabilityResponse> {
 
-    public ChangeAvailabilityResponseHandler(ChangeAvailabilityRequest req, RequestTask task, String chargeBoxId) {
-        super(req, task, chargeBoxId);
+    public ChangeAvailabilityResponseHandler(RequestTask<ChangeAvailabilityRequest> task, String chargeBoxId) {
+        super(task, chargeBoxId);
     }
 
     @Override

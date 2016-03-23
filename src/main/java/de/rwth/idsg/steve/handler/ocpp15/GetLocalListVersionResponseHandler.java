@@ -12,8 +12,8 @@ import ocpp.cp._2012._06.GetLocalListVersionResponse;
 public class GetLocalListVersionResponseHandler
         extends AbstractOcppResponseHandler<GetLocalListVersionRequest, GetLocalListVersionResponse> {
 
-    public GetLocalListVersionResponseHandler(GetLocalListVersionRequest req, RequestTask task, String chargeBoxId) {
-        super(req, task, chargeBoxId);
+    public GetLocalListVersionResponseHandler(RequestTask<GetLocalListVersionRequest> task, String chargeBoxId) {
+        super(task, chargeBoxId);
     }
 
     @Override

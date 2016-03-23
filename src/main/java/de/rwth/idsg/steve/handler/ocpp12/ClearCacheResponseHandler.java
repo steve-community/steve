@@ -11,8 +11,8 @@ import ocpp.cp._2010._08.ClearCacheResponse;
  */
 public class ClearCacheResponseHandler extends AbstractOcppResponseHandler<ClearCacheRequest, ClearCacheResponse> {
 
-    public ClearCacheResponseHandler(ClearCacheRequest req, RequestTask task, String chargeBoxId) {
-        super(req, task, chargeBoxId);
+    public ClearCacheResponseHandler(RequestTask<ClearCacheRequest> task, String chargeBoxId) {
+        super(task, chargeBoxId);
     }
 
     @Override

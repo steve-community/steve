@@ -11,9 +11,9 @@ import java.util.List;
  * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
  * @since 23.11.2015
  */
-public class ExternalRequestTask extends RequestTask {
+public class ExternalRequestTask<S extends RequestType> extends RequestTask<S> {
 
-    ExternalRequestTask(OcppVersion ocppVersion, RequestType requestType,
+    ExternalRequestTask(OcppVersion ocppVersion, S requestType,
                         List<ChargePointSelect> cpsList, String partnerName) {
         super(ocppVersion, requestType, cpsList, RequestTaskOrigin.EXTERNAL, partnerName);
     }
@@ -22,40 +22,37 @@ public class ExternalRequestTask extends RequestTask {
     // Custom builder
     // -------------------------------------------------------------------------
 
-    public static ExternalRequestTaskBuilder builder() {
-        return new ExternalRequestTaskBuilder();
+    public static <S extends RequestType> ExternalRequestTaskBuilder<S> builder(S request) {
+        return new ExternalRequestTaskBuilder<>(request);
     }
 
-    public static class ExternalRequestTaskBuilder {
+    public static class ExternalRequestTaskBuilder<S extends RequestType> {
         private OcppVersion ocppVersion;
-        private RequestType requestType;
+        private S request;
         private List<ChargePointSelect> cpsList;
         private String partnerName;
 
-        ExternalRequestTaskBuilder() { }
+        ExternalRequestTaskBuilder(S request) {
+            this.request = request;
+        }
 
-        public ExternalRequestTask.ExternalRequestTaskBuilder ocppVersion(OcppVersion ocppVersion) {
+        public ExternalRequestTask.ExternalRequestTaskBuilder<S> ocppVersion(OcppVersion ocppVersion) {
             this.ocppVersion = ocppVersion;
             return this;
         }
 
-        public ExternalRequestTask.ExternalRequestTaskBuilder request(RequestType requestType) {
-            this.requestType = requestType;
-            return this;
-        }
-
-        public ExternalRequestTask.ExternalRequestTaskBuilder chargePoint(ChargePointSelect cps) {
+        public ExternalRequestTask.ExternalRequestTaskBuilder<S> chargePoint(ChargePointSelect cps) {
             this.cpsList = Collections.singletonList(cps);
             return this;
         }
 
-        public ExternalRequestTask.ExternalRequestTaskBuilder partnerName(String partnerName) {
+        public ExternalRequestTaskBuilder<S> partnerName(String partnerName) {
             this.partnerName = partnerName;
             return this;
         }
 
-        public ExternalRequestTask build() {
-            return new ExternalRequestTask(ocppVersion, requestType, cpsList, partnerName);
+        public ExternalRequestTask<S> build() {
+            return new ExternalRequestTask<>(ocppVersion, request, cpsList, partnerName);
         }
     }
 

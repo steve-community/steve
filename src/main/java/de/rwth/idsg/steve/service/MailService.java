@@ -38,7 +38,7 @@ public class MailService {
     private Session session;
 
     @PostConstruct
-    public void loadSettingsFromDB() {
+    public synchronized void loadSettingsFromDB() {
         settings = settingsRepository.getMailSettings();
         session = createSession();
     }

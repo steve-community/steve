@@ -5,7 +5,6 @@ import lombok.Setter;
 import org.hibernate.validator.constraints.Email;
 import org.joda.time.LocalDate;
 
-import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
 /**

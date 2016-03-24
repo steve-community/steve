@@ -4,7 +4,6 @@ import com.google.common.base.Strings;
 import de.rwth.idsg.steve.SteveException;
 import de.rwth.idsg.steve.repository.SettingsRepository;
 import de.rwth.idsg.steve.repository.dto.MailSettings;
-import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -32,15 +31,23 @@ public class MailService {
     @Autowired private SettingsRepository settingsRepository;
     @Autowired private ScheduledExecutorService executorService;
 
-    @Getter
-    private MailSettings settings;
+    private static final Object LOCK = new Object();
 
+    private MailSettings settings;
     private Session session;
 
     @PostConstruct
-    public synchronized void loadSettingsFromDB() {
-        settings = settingsRepository.getMailSettings();
-        session = createSession();
+    public void loadSettingsFromDB() {
+        synchronized (LOCK) {
+            settings = settingsRepository.getMailSettings();
+            session = createSession(settings);
+        }
+    }
+
+    public MailSettings getSettings() {
+        synchronized (LOCK) {
+            return this.settings;
+        }
     }
 
     public void sendTestMail() {
@@ -62,6 +69,8 @@ public class MailService {
     }
 
     public void send(String subject, String body) throws MessagingException {
+        MailSettings settings = getSettings();
+
         Message mail = new MimeMessage(session);
         mail.setSubject("[SteVe] " + subject);
         mail.setContent(body, "text/plain");
@@ -84,7 +93,7 @@ public class MailService {
     // Private helpers
     // -------------------------------------------------------------------------
 
-    private Session createSession() {
+    private static Session createSession(MailSettings settings) {
         Properties props = new Properties();
         String protocol = settings.getProtocol();
 
@@ -104,14 +113,14 @@ public class MailService {
 
         if (isUserSet && isPassSet) {
             props.setProperty("mail." + protocol + ".auth", "" + true);
-            return Session.getInstance(props, getAuth());
+            return Session.getInstance(props, getAuth(settings));
 
         } else {
             return Session.getInstance(props);
         }
     }
 
-    private Authenticator getAuth() {
+    private static Authenticator getAuth(MailSettings settings) {
         return new Authenticator() {
             @Override
             protected PasswordAuthentication getPasswordAuthentication() {
@@ -119,5 +128,4 @@ public class MailService {
             }
         };
     }
-
 }

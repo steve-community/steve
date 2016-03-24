@@ -13,6 +13,7 @@ import org.jooq.exception.DataAccessException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.Collection;
 import java.util.Collections;
@@ -30,7 +31,12 @@ import static jooq.steve.db.tables.Settings.SETTINGS;
 @Repository
 public class SettingsRepositoryImpl implements SettingsRepository {
 
-    private static final String APP_ID = new String(Base64.getEncoder().encode("SteckdosenVerwaltung".getBytes()));
+    // Totally unnecessary to specify charset here. We just do it to make findbugs plugin happy.
+    //
+    private static final String APP_ID = new String(
+            Base64.getEncoder().encode("SteckdosenVerwaltung".getBytes(StandardCharsets.UTF_8)),
+            StandardCharsets.UTF_8
+    );
 
     private static final Splitter SPLITTER = Splitter.on(",").trimResults().omitEmptyStrings();
     private static final Joiner JOINER = Joiner.on(",").skipNulls();

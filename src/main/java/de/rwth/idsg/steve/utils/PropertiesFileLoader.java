@@ -71,7 +71,9 @@ public class PropertiesFileLoader {
     public Boolean getOptionalBoolean(String key) {
         String s = getOptionalString(key);
         if (s == null) {
-            return null;
+            // In this special case, to make findbugs happy, we don't return null.
+            // Reason: http://findbugs.sourceforge.net/bugDescriptions.html#NP_BOOLEAN_RETURN_NULL
+            return false;
         } else {
             return Boolean.parseBoolean(s);
         }

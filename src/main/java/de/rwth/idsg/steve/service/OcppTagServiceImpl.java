@@ -110,7 +110,7 @@ public class OcppTagServiceImpl implements OcppTagService {
     // Private helpers
     // -------------------------------------------------------------------------
 
-    private class AuthorisationDataMapper implements RecordMapper<OcppTagRecord, AuthorisationData> {
+    private static class AuthorisationDataMapper implements RecordMapper<OcppTagRecord, AuthorisationData> {
         private final DateTime nowDt;
         private final DateTime cacheExpiry;
 

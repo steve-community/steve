@@ -6,6 +6,11 @@
     <version>2.0.5</version>
     <packaging>jar</packaging>
 
+    <organization>
+        <name>RWTH I5 IDSG</name>
+        <url>http://dbis.rwth-aachen.de/cms/teaching/IDSG</url>
+    </organization>
+
     <developers>
         <developer>
             <name>Sevket Goekay</name>

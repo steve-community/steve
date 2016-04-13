@@ -36,7 +36,7 @@ public class Ocpp12CallHandler extends AbstractCallHandler {
      * TODO: Not the most elegant solution. Could use command pattern leveraging polymorphism
      */
     @Override
-    public ResponseType dispatch(RequestType params, String chargeBoxId) {
+    protected ResponseType dispatch(RequestType params, String chargeBoxId) {
         ResponseType r = null;
 
         if (params instanceof BootNotificationRequest) {

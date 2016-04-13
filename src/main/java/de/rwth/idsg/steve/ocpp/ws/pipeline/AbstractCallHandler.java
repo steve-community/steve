@@ -36,5 +36,5 @@ public abstract class AbstractCallHandler implements Stage {
         context.setOutgoingMessage(result);
     }
 
-    public abstract ResponseType dispatch(RequestType params, String chargeBoxId);
+    protected abstract ResponseType dispatch(RequestType params, String chargeBoxId);
 }

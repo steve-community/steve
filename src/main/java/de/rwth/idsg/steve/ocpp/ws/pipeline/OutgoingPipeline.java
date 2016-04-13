@@ -6,6 +6,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.Arrays;
+import java.util.List;
+
 /**
  * For outgoing CALLs, triggered by the user.
  *
@@ -16,18 +19,22 @@ import org.springframework.stereotype.Component;
 @Slf4j
 public class OutgoingPipeline implements Pipeline {
 
-    @Autowired private FutureResponseContextStore futureResponseContextStore;
-    @Autowired private Serializer serializer;
-    @Autowired private Sender sender;
+    private final List<Stage> stages;
+
+    @Autowired
+    public OutgoingPipeline(Serializer serializer, Sender sender, FutureResponseContextStore store) {
+        // Order is important => Sequential execution of stages
+        stages = Arrays.asList(
+                serializer,
+                sender,
+                new OutgoingContextStoreStage(store)
+        );
+    }
 
     @Override
     public void run(CommunicationContext context) {
-        serializer.process(context);
-        sender.process(context);
-
-        // All went well, and the call is sent. Store the response context for later lookup.
-        futureResponseContextStore.add(context.getSession(),
-                                       context.getOutgoingMessage().getMessageId(),
-                                       context.getFutureResponseContext());
+        for (Stage stage : stages) {
+            stage.process(context);
+        }
     }
 }

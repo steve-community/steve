@@ -65,6 +65,6 @@ public abstract class AbstractChargePointServiceInvoker {
         context.setFutureResponseContext(frc);
         context.setSession(endpoint.getSession(chargeBoxId));
 
-        callPipeline.run(context);
+        callPipeline.process(context);
     }
 }

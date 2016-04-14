@@ -75,7 +75,7 @@ public abstract class AbstractWebSocketEndpoint implements WebSocketHandler {
         context.setChargeBoxId(chargeBoxId);
         context.setIncomingString(incomingString);
 
-        pipeline.run(context);
+        pipeline.process(context);
     }
 
     private void handlePongMessage(WebSocketSession session) {

@@ -17,7 +17,7 @@ import lombok.extern.slf4j.Slf4j;
  * @since 23.03.2015
  */
 @Slf4j
-public class IncomingPipeline implements Pipeline {
+public class IncomingPipeline extends AbstractPipeline {
     private final Deserializer deserializer;
     private final AbstractCallHandler handler;
     private final Serializer serializer;
@@ -34,7 +34,7 @@ public class IncomingPipeline implements Pipeline {
 
     @Override
     @SuppressWarnings("unchecked")
-    public void run(CommunicationContext context) {
+    public void process(CommunicationContext context) {
         deserializer.process(context);
 
         // When the incoming could not be deserialized

@@ -3,6 +3,7 @@ package de.rwth.idsg.steve.ocpp.ws.ocpp12;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.rwth.idsg.steve.ocpp.ws.AbstractWebSocketEndpoint;
 import de.rwth.idsg.steve.ocpp.ws.FutureResponseContextStore;
+import de.rwth.idsg.steve.ocpp.ws.pipeline.Deserializer;
 import de.rwth.idsg.steve.ocpp.ws.pipeline.IncomingPipeline;
 import de.rwth.idsg.steve.ocpp.ws.pipeline.OutgoingPipeline;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,9 +27,8 @@ public class Ocpp12WebSocketEndpoint extends AbstractWebSocketEndpoint {
 
     @PostConstruct
     public void init() {
-        super.init();
-        pipeline = new IncomingPipeline(mapper, futureResponseContextStore,
-                                        typeStore, handler,
-                                        outgoingPipeline);
+        Deserializer deserializer = new Deserializer(mapper, futureResponseContextStore, typeStore);
+        IncomingPipeline pipeline = new IncomingPipeline(deserializer, handler, outgoingPipeline);
+        super.init(pipeline);
     }
 }

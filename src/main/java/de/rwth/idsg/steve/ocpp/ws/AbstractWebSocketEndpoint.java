@@ -41,10 +41,11 @@ public abstract class AbstractWebSocketEndpoint implements WebSocketHandler {
 
     public static final String CHARGEBOX_ID_KEY = "CHARGEBOX_ID_KEY";
 
-    protected Pipeline pipeline;
+    private Pipeline pipeline;
     private SessionContextStoreImpl sessionContextStore;
 
-    public void init() {
+    public void init(Pipeline pipeline) {
+        this.pipeline = pipeline;
         sessionContextStore = new SessionContextStoreImpl(wsSessionSelectStrategy);
     }
 

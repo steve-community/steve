@@ -7,11 +7,11 @@ import de.rwth.idsg.steve.ocpp.ws.data.CommunicationContext;
  * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
  * @since 13.04.2016
  */
-class CallStoreStage implements Stage {
+class OutgoingCallStoreStage implements Stage {
 
     private final FutureResponseContextStore store;
 
-    CallStoreStage(FutureResponseContextStore store) {
+    OutgoingCallStoreStage(FutureResponseContextStore store) {
         this.store = store;
     }
 

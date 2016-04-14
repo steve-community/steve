@@ -13,14 +13,14 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @Slf4j
-public class CallPipeline extends AbstractPipeline {
+public class OutgoingCallPipeline extends AbstractPipeline {
 
     @Autowired
-    public CallPipeline(OutgoingPipeline outgoingPipeline, FutureResponseContextStore store) {
+    public OutgoingCallPipeline(OutgoingPipeline outgoingPipeline, FutureResponseContextStore store) {
         // Order is important => Sequential execution of stages
         addStages(
                 outgoingPipeline,
-                new CallStoreStage(store)
+                new OutgoingCallStoreStage(store)
         );
     }
 }

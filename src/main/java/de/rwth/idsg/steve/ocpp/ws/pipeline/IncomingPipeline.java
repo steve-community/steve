@@ -20,16 +20,14 @@ import lombok.extern.slf4j.Slf4j;
 public class IncomingPipeline extends AbstractPipeline {
     private final Deserializer deserializer;
     private final AbstractCallHandler handler;
-    private final Serializer serializer;
-    private final Sender sender;
+    private final OutgoingPipeline outgoingPipeline;
 
     public IncomingPipeline(ObjectMapper mapper, FutureResponseContextStore futureResponseContextStore,
                             TypeStore typeStore, AbstractCallHandler handler,
-                            Serializer serializer, Sender sender) {
+                            OutgoingPipeline outgoingPipeline) {
         this.deserializer = new Deserializer(mapper, futureResponseContextStore, typeStore);
         this.handler = handler;
-        this.serializer = serializer;
-        this.sender = sender;
+        this.outgoingPipeline = outgoingPipeline;
     }
 
     @Override
@@ -39,7 +37,7 @@ public class IncomingPipeline extends AbstractPipeline {
 
         // When the incoming could not be deserialized
         if (context.isSetOutgoingError()) {
-            doSend(context);
+            outgoingPipeline.process(context);
             return;
         }
 
@@ -47,7 +45,7 @@ public class IncomingPipeline extends AbstractPipeline {
 
         if (msg instanceof OcppJsonCall) {
             handler.process(context);
-            doSend(context);
+            outgoingPipeline.process(context);
 
         } else if (msg instanceof OcppJsonResult) {
             OcppJsonResult result = (OcppJsonResult) msg;
@@ -59,8 +57,4 @@ public class IncomingPipeline extends AbstractPipeline {
         }
     }
 
-    private void doSend(CommunicationContext context) {
-        serializer.process(context);
-        sender.process(context);
-    }
 }

@@ -16,11 +16,10 @@ import org.springframework.stereotype.Component;
 public class CallPipeline extends AbstractPipeline {
 
     @Autowired
-    public CallPipeline(Serializer serializer, Sender sender, FutureResponseContextStore store) {
+    public CallPipeline(OutgoingPipeline outgoingPipeline, FutureResponseContextStore store) {
         // Order is important => Sequential execution of stages
         addStages(
-                serializer,
-                sender,
+                outgoingPipeline,
                 new CallStoreStage(store)
         );
     }

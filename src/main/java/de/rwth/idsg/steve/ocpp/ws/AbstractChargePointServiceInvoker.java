@@ -7,7 +7,7 @@ import de.rwth.idsg.steve.ocpp.ws.data.ActionResponsePair;
 import de.rwth.idsg.steve.ocpp.ws.data.CommunicationContext;
 import de.rwth.idsg.steve.ocpp.ws.data.FutureResponseContext;
 import de.rwth.idsg.steve.ocpp.ws.data.OcppJsonCall;
-import de.rwth.idsg.steve.ocpp.ws.pipeline.OutgoingPipeline;
+import de.rwth.idsg.steve.ocpp.ws.pipeline.CallPipeline;
 import lombok.Setter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,7 +22,7 @@ import java.util.UUID;
 public abstract class AbstractChargePointServiceInvoker {
     private final Logger log = LoggerFactory.getLogger(getClass());
 
-    @Autowired private OutgoingPipeline outgoingPipeline;
+    @Autowired private CallPipeline callPipeline;
 
     @Setter private TypeStore typeStore;
     @Setter private AbstractWebSocketEndpoint endpoint;
@@ -65,6 +65,6 @@ public abstract class AbstractChargePointServiceInvoker {
         context.setFutureResponseContext(frc);
         context.setSession(endpoint.getSession(chargeBoxId));
 
-        outgoingPipeline.run(context);
+        callPipeline.run(context);
     }
 }

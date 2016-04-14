@@ -17,17 +17,17 @@ import java.util.List;
  */
 @Component
 @Slf4j
-public class OutgoingPipeline implements Pipeline {
+public class CallPipeline implements Pipeline {
 
     private final List<Stage> stages;
 
     @Autowired
-    public OutgoingPipeline(Serializer serializer, Sender sender, FutureResponseContextStore store) {
+    public CallPipeline(Serializer serializer, Sender sender, FutureResponseContextStore store) {
         // Order is important => Sequential execution of stages
         stages = Arrays.asList(
                 serializer,
                 sender,
-                new OutgoingContextStoreStage(store)
+                new CallStoreStage(store)
         );
     }
 

@@ -4,6 +4,7 @@ import de.rwth.idsg.steve.NotificationFeature;
 import de.rwth.idsg.steve.repository.GenericRepository;
 import de.rwth.idsg.steve.repository.SettingsRepository;
 import de.rwth.idsg.steve.service.MailService;
+import de.rwth.idsg.steve.service.ReleaseCheckService;
 import de.rwth.idsg.steve.web.dto.SettingsForm;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -32,6 +33,7 @@ public class AboutSettingsController {
     @Autowired private LogController logController;
     @Autowired private SettingsRepository settingsRepository;
     @Autowired private MailService mailService;
+    @Autowired private ReleaseCheckService releaseCheckService;
 
     // -------------------------------------------------------------------------
     // Paths
@@ -51,6 +53,7 @@ public class AboutSettingsController {
         model.addAttribute("logFile", logController.getLogFilePath());
         model.addAttribute("systemTime", DateTime.now());
         model.addAttribute("systemTimeZone", DateTimeZone.getDefault());
+        model.addAttribute("releaseReport", releaseCheckService.check());
         return "about";
     }
 

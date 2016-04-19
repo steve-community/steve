@@ -12,7 +12,6 @@ import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
-import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
@@ -24,7 +23,6 @@ import java.util.Collections;
  * @since 19.04.2016
  */
 @Slf4j
-@Service
 public class GithubReleaseCheckService implements ReleaseCheckService {
 
     /**

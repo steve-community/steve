@@ -4,6 +4,10 @@ import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.mysql.jdbc.jdbc2.optional.MysqlDataSource;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
+import de.rwth.idsg.steve.service.DummyReleaseCheckService;
+import de.rwth.idsg.steve.service.GithubReleaseCheckService;
+import de.rwth.idsg.steve.service.ReleaseCheckService;
+import de.rwth.idsg.steve.utils.InternetChecker;
 import lombok.extern.slf4j.Slf4j;
 import org.jooq.DSLContext;
 import org.jooq.SQLDialect;
@@ -109,6 +113,21 @@ public class BeanConfiguration extends WebMvcConfigurerAdapter {
 
         executor = new ScheduledThreadPoolExecutor(5, threadFactory);
         return executor;
+    }
+
+    /**
+     * There might be instances deployed in a local/closed network with no internet connection. In such situations,
+     * it is unnecessary to try to access Github every time, even though the request will time out and result
+     * report will be correct (that there is no new version). With DummyReleaseCheckService we bypass the intermediate
+     * steps and return a "no new version" report immediately.
+     */
+    @Bean
+    public ReleaseCheckService releaseCheckService() {
+        if (InternetChecker.isInternetAvailable()) {
+            return new GithubReleaseCheckService();
+        } else {
+            return new DummyReleaseCheckService();
+        }
     }
 
     @PreDestroy

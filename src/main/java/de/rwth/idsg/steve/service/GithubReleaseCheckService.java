@@ -16,6 +16,7 @@ import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
 import javax.annotation.PostConstruct;
+import java.io.File;
 import java.util.Collections;
 
 /**
@@ -35,7 +36,7 @@ public class GithubReleaseCheckService implements ReleaseCheckService {
 
     private static final String TAG_NAME_PREFIX = "steve-";
 
-    private static final String FILE_SEPARATOR = System.getProperty("file.separator");
+    private static final String FILE_SEPARATOR = File.separator;
 
     private RestTemplate restTemplate;
 

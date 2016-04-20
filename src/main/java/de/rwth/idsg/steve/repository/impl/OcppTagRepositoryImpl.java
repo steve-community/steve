@@ -11,7 +11,6 @@ import jooq.steve.db.tables.OcppTag;
 import jooq.steve.db.tables.records.OcppTagRecord;
 import lombok.extern.slf4j.Slf4j;
 import org.joda.time.DateTime;
-import org.jooq.BatchBindStep;
 import org.jooq.DSLContext;
 import org.jooq.JoinType;
 import org.jooq.Record7;
@@ -24,6 +23,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static de.rwth.idsg.steve.utils.DateTimeUtils.humanize;
 import static de.rwth.idsg.steve.utils.DateTimeUtils.toDateTime;
@@ -154,18 +154,14 @@ public class OcppTagRepositoryImpl implements OcppTagRepository {
 
     @Override
     public void addOcppTagList(List<String> idTagList) {
-        BatchBindStep batch = ctx.batch(
-                ctx.insertInto(OCPP_TAG)
-                   .set(OCPP_TAG.ID_TAG, "")
-                   .set(OCPP_TAG.BLOCKED, false)
-                   .set(OCPP_TAG.IN_TRANSACTION, false)
-        );
+        List<OcppTagRecord> batch = idTagList.stream()
+                                             .map(s -> ctx.newRecord(OCPP_TAG)
+                                                          .setIdTag(s)
+                                                          .setBlocked(false)
+                                                          .setInTransaction(false))
+                                             .collect(Collectors.toList());
 
-        for (String s : idTagList) {
-            batch.bind(s, false, false);
-        }
-
-        batch.execute();
+        ctx.batchInsert(batch).execute();
     }
 
     @Override

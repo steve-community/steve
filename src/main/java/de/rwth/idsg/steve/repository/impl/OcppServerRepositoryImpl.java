@@ -8,15 +8,10 @@ import de.rwth.idsg.steve.repository.dto.TransactionStatusUpdate;
 import de.rwth.idsg.steve.repository.dto.UpdateChargeboxParams;
 import de.rwth.idsg.steve.repository.dto.UpdateTransactionParams;
 import de.rwth.idsg.steve.utils.CustomDSL;
+import jooq.steve.db.tables.records.ConnectorMeterValueRecord;
 import lombok.extern.slf4j.Slf4j;
-import ocpp.cs._2012._06.Location;
-import ocpp.cs._2012._06.Measurand;
 import ocpp.cs._2012._06.MeterValue;
-import ocpp.cs._2012._06.ReadingContext;
-import ocpp.cs._2012._06.UnitOfMeasure;
-import ocpp.cs._2012._06.ValueFormat;
 import org.joda.time.DateTime;
-import org.jooq.BatchBindStep;
 import org.jooq.DSLContext;
 import org.jooq.Record1;
 import org.jooq.SelectConditionStep;
@@ -25,6 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static jooq.steve.db.tables.ChargeBox.CHARGE_BOX;
 import static jooq.steve.db.tables.Connector.CONNECTOR;
@@ -307,69 +303,36 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
     }
 
     private void batchInsertMeterValues12(DSLContext ctx, List<ocpp.cs._2010._08.MeterValue> list, int connectorPk) {
-        // Init query with DUMMY values. The actual values are not important.
-        BatchBindStep batchBindStep = ctx.batch(
-                ctx.insertInto(CONNECTOR_METER_VALUE,
-                        CONNECTOR_METER_VALUE.CONNECTOR_PK,
-                        CONNECTOR_METER_VALUE.VALUE_TIMESTAMP,
-                        CONNECTOR_METER_VALUE.VALUE)
-                   .values(0, null, null)
-        );
+        List<ConnectorMeterValueRecord> batch =
+                list.stream()
+                    .map(s -> ctx.newRecord(CONNECTOR_METER_VALUE)
+                                 .setConnectorPk(connectorPk)
+                                 .setValueTimestamp(s.getTimestamp())
+                                 .setValue(String.valueOf(s.getValue())))
+                    .collect(Collectors.toList());
 
-        // OCPP 1.2 allows multiple "values" elements
-        for (ocpp.cs._2010._08.MeterValue valuesElement : list) {
-            DateTime ts = valuesElement.getTimestamp();
-            String value = String.valueOf(valuesElement.getValue());
-
-            batchBindStep.bind(connectorPk, ts, value);
-        }
-
-        batchBindStep.execute();
+        ctx.batchInsert(batch).execute();
     }
 
     private void batchInsertMeterValues15(DSLContext ctx, List<ocpp.cs._2012._06.MeterValue> list, int connectorPk,
                                           Integer transactionId) {
-        // Init query with DUMMY values. The actual values are not important.
-        BatchBindStep batchBindStep = ctx.batch(
-                ctx.insertInto(CONNECTOR_METER_VALUE,
-                        CONNECTOR_METER_VALUE.CONNECTOR_PK,
-                        CONNECTOR_METER_VALUE.TRANSACTION_PK,
-                        CONNECTOR_METER_VALUE.VALUE_TIMESTAMP,
-                        CONNECTOR_METER_VALUE.VALUE,
-                        CONNECTOR_METER_VALUE.READING_CONTEXT,
-                        CONNECTOR_METER_VALUE.FORMAT,
-                        CONNECTOR_METER_VALUE.MEASURAND,
-                        CONNECTOR_METER_VALUE.LOCATION,
-                        CONNECTOR_METER_VALUE.UNIT)
-                   .values(0, null, null, null, null, null, null, null, null)
-        );
+        List<ConnectorMeterValueRecord> batch =
+                list.stream()
+                    .flatMap(t -> t.getValue()
+                                   .stream()
+                                   .map(k -> ctx.newRecord(CONNECTOR_METER_VALUE)
+                                                .setConnectorPk(connectorPk)
+                                                .setTransactionPk(transactionId)
+                                                .setValueTimestamp(t.getTimestamp())
+                                                .setValue(k.getValue())
+                                                // The following are optional fields!
+                                                .setReadingContext(k.isSetContext() ? k.getContext().value() : null)
+                                                .setFormat(k.isSetFormat() ? k.getFormat().value() : null)
+                                                .setMeasurand(k.isSetMeasurand() ? k.getMeasurand().value() : null)
+                                                .setLocation(k.isSetLocation() ? k.getLocation().value() : null)
+                                                .setUnit(k.isSetUnit() ? k.getUnit().value() : null)))
+                    .collect(Collectors.toList());
 
-        // OCPP 1.5 allows multiple "values" elements
-        for (MeterValue valuesElement : list) {
-            DateTime timestamp = valuesElement.getTimestamp();
-
-            // OCPP 1.5 allows multiple "value" elements under each "values" element.
-            List<MeterValue.Value> valueList = valuesElement.getValue();
-            for (MeterValue.Value valueElement : valueList) {
-
-                ReadingContext context = valueElement.getContext();
-                ValueFormat format = valueElement.getFormat();
-                Measurand measurand = valueElement.getMeasurand();
-                Location location = valueElement.getLocation();
-                UnitOfMeasure unit = valueElement.getUnit();
-
-                // OCPP 1.5 allows for each "value" element to have optional attributes
-                String contextValue     = (context == null)   ? null : context.value();
-                String formatValue      = (format == null)    ? null : format.value();
-                String measurandValue   = (measurand == null) ? null : measurand.value();
-                String locationValue    = (location == null)  ? null : location.value();
-                String unitValue        = (unit == null)      ? null : unit.value();
-
-                batchBindStep.bind(connectorPk, transactionId, timestamp, valueElement.getValue(),
-                                   contextValue, formatValue, measurandValue, locationValue, unitValue);
-            }
-        }
-
-        batchBindStep.execute();
+        ctx.batchInsert(batch).execute();
     }
 }

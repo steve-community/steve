@@ -15,7 +15,6 @@ import jooq.steve.db.tables.records.AddressRecord;
 import jooq.steve.db.tables.records.ChargeBoxRecord;
 import lombok.extern.slf4j.Slf4j;
 import org.joda.time.DateTime;
-import org.jooq.BatchBindStep;
 import org.jooq.DSLContext;
 import org.jooq.Field;
 import org.jooq.Record1;
@@ -31,6 +30,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import static de.rwth.idsg.steve.utils.CustomDSL.date;
 import static de.rwth.idsg.steve.utils.CustomDSL.includes;
@@ -219,16 +219,11 @@ public class ChargePointRepositoryImpl implements ChargePointRepository {
 
     @Override
     public void addChargePoint(List<String> chargeBoxIdList) {
-        BatchBindStep batch = ctx.batch(
-                ctx.insertInto(CHARGE_BOX)
-                   .set(CHARGE_BOX.CHARGE_BOX_ID, "")
-        );
+        List<ChargeBoxRecord> batch = chargeBoxIdList.stream()
+                                                     .map(s -> ctx.newRecord(CHARGE_BOX).setChargeBoxId(s))
+                                                     .collect(Collectors.toList());
 
-        for (String s : chargeBoxIdList) {
-            batch.bind(s);
-        }
-
-        batch.execute();
+        ctx.batchInsert(batch).execute();
     }
 
     @Override

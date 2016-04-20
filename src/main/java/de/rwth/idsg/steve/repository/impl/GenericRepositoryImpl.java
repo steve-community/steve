@@ -33,8 +33,6 @@ public class GenericRepositoryImpl implements GenericRepository {
         GetStats gs = new GetStats();
         gs.execute(ctx.configuration());
 
-        gs.detach();
-
         return Statistics.builder()
                          .numChargeBoxes(gs.getNumChargeBoxes())
                          .numOcppTags(gs.getNumOcppTags())

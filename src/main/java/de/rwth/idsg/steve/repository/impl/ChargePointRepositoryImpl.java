@@ -163,8 +163,6 @@ public class ChargePointRepositoryImpl implements ChargePointRepository {
             throw new SteveException("Charge point not found");
         }
 
-        cbr.detach();
-
         AddressRecord ar = addressRepository.get(ctx, cbr.getAddressPk());
 
         return new ChargePoint.Details(cbr, ar);

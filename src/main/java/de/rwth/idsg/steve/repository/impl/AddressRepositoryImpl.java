@@ -27,15 +27,9 @@ public class AddressRepositoryImpl implements AddressRepository {
             return null;
         }
 
-        AddressRecord ar = ctx.selectFrom(ADDRESS)
-                              .where(ADDRESS.ADDRESS_PK.equal(addressPk))
-                              .fetchOne();
-
-        if (ar != null) {
-            ar.detach();
-        }
-
-        return ar;
+        return ctx.selectFrom(ADDRESS)
+                  .where(ADDRESS.ADDRESS_PK.equal(addressPk))
+                  .fetchOne();
     }
 
     /**

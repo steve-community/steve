@@ -69,8 +69,6 @@ public class UserRepositoryImpl implements UserRepository {
             throw new SteveException("There is no user with id '%s'", userPk);
         }
 
-        ur.detach();
-
         // -------------------------------------------------------------------------
         // 2. address table
         // -------------------------------------------------------------------------

@@ -82,11 +82,20 @@ public class BeanConfiguration extends WebMvcConfigurerAdapter {
     public org.jooq.Configuration jooqConfig() {
         initDataSource();
 
+        Settings settings = new Settings()
+                // Normally, the records are "attached" to the Configuration that created (i.e. fetch/insert) them.
+                // This means that they hold an internal reference to the same database connection that was used.
+                // The idea behind this is to make CRUD easier for potential subsequent store/refresh/delete
+                // operations. We do not use or need that.
+                .withAttachRecords(false)
+                // To log or not to log the sql queries, that is the question
+                .withExecuteLogging(CONFIG.getDb().isSqlLogging());
+
         // Configuration for JOOQ
         return new DefaultConfiguration()
                 .set(SQLDialect.MYSQL)
                 .set(new DataSourceConnectionProvider(dataSource))
-                .set(new Settings().withExecuteLogging(CONFIG.getDb().isSqlLogging()));
+                .set(settings);
     }
 
     /**

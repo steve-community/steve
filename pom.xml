@@ -70,7 +70,8 @@
                 <directory>src/main/resources</directory>
                 <filtering>false</filtering>
                 <includes>
-                    <include>webapp/**</include>
+                    <include>webapp/static/**</include>
+                    <include>webapp/WEB-INF/web.xml</include>
                 </includes>
             </resource>
         </resources>
@@ -197,25 +198,25 @@
             </plugin>
 
             <!-- Pre-compiles JSPs -->
-            <!--<plugin>-->
-                <!--<groupId>org.eclipse.jetty</groupId>-->
-                <!--<artifactId>jetty-jspc-maven-plugin</artifactId>-->
-                <!--<version>${jetty.version}</version>-->
-                <!--<executions>-->
-                    <!--<execution>-->
-                        <!--<phase>compile</phase>-->
-                        <!--<id>jspc</id>-->
-                        <!--<goals>-->
-                            <!--<goal>jspc</goal>-->
-                        <!--</goals>-->
-                        <!--<configuration>-->
-                            <!--<webAppSourceDirectory>${basedir}/src/main/resources/webapp</webAppSourceDirectory>-->
-                            <!--<webXml>${basedir}/src/main/resources/webapp/WEB-INF/web.xml</webXml>-->
-                            <!--<webXmlFragment>${basedir}/target/classes/webapp/WEB-INF/web.xml-frag</webXmlFragment>-->
-                        <!--</configuration>-->
-                    <!--</execution>-->
-                <!--</executions>-->
-            <!--</plugin>-->
+            <plugin>
+                <groupId>org.eclipse.jetty</groupId>
+                <artifactId>jetty-jspc-maven-plugin</artifactId>
+                <version>${jetty.version}</version>
+                <executions>
+                    <execution>
+                        <phase>compile</phase>
+                        <id>jspc</id>
+                        <goals>
+                            <goal>jspc</goal>
+                        </goals>
+                        <configuration>
+                            <webAppSourceDirectory>${basedir}/src/main/resources/webapp</webAppSourceDirectory>
+                            <webXml>${basedir}/src/main/resources/webapp/WEB-INF/web.xml</webXml>
+                            <webXmlFragment>${basedir}/target/classes/webapp/WEB-INF/web.xml-frag</webXmlFragment>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
 
             <plugin>
                 <groupId>org.apache.cxf</groupId>

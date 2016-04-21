@@ -4,7 +4,7 @@
 		<td>ID Tag:</td>
 		<td>
 			<form:input path="idTag" readonly="${isUpdateForm}"/>
-			<a class="tooltip" href="#"><img src="/steve/static/images/info.png" style="vertical-align:middle">
+			<a class="tooltip" href="#"><img src="${ctxPath}/static/images/info.png" style="vertical-align:middle">
 				<span>This field is set when adding an OCPP Tag, and cannot be changed later</span>
 			</a>
 		</td>

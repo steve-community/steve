@@ -41,11 +41,11 @@
 
     <section><span id="batch" style="cursor: pointer">
         Add OCPP Tag List
-        <a class="tooltip" href="#"><img src="/steve/static/images/info.png" style="vertical-align:middle">
+        <a class="tooltip" href="#"><img src="${ctxPath}/static/images/info.png" style="vertical-align:middle">
             <span>Insert multiple OCPP Tags at once by entering one ID Tag per line. This operation will leave other fields empty, which can be set later.</span>
         </a>
     </span></section>
-    <form:form action="/steve/manager/ocppTags/add/batch" modelAttribute="batchInsertForm" style="display: none">
+    <form:form action="${ctxPath}/manager/ocppTags/add/batch" modelAttribute="batchInsertForm" style="display: none">
         <table class="userInput">
             <tr>
                 <td>ID Tags:</td><td><form:textarea path="idList"/></td></tr>
@@ -58,7 +58,7 @@
     </form:form>
 
     <section><span id="single">Add OCPP Tag</span></section>
-    <form:form action="/steve/manager/ocppTags/add/single" modelAttribute="ocppTagForm">
+    <form:form action="${ctxPath}/manager/ocppTags/add/single" modelAttribute="ocppTagForm">
 
         <c:set var="isUpdateForm" value="false" />
 

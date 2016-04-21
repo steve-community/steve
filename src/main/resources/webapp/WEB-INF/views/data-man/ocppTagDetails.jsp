@@ -16,7 +16,7 @@
 </spring:hasBindErrors>
 <div class="content"><div>
     <section><span>OCPP Tag Details</span></section>
-    <form:form action="/steve/manager/ocppTags/update" modelAttribute="ocppTagForm">
+    <form:form action="${ctxPath}/manager/ocppTags/update" modelAttribute="ocppTagForm">
 
         <form:hidden path="ocppTagPk" readonly="true"/>
 

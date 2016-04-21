@@ -19,10 +19,6 @@ public final class SteveConfiguration {
     private String springManagerMapping = "/manager/*";
     // Mapping for CXF SOAP services
     private String cxfMapping = "/services/*";
-    // Just to be backwards compatible with previous versions of Steve,
-    // since there might be already configured chargepoints expecting the older path.
-    // Otherwise, might as well be "/".
-    private String contextPath = "/steve";
     // Dummy service path
     private String routerEndpointPath = "/CentralSystemService";
 
@@ -30,6 +26,7 @@ public final class SteveConfiguration {
     // main.properties
     // -------------------------------------------------------------------------
 
+    private String contextPath;
     private String steveVersion;
     private ApplicationProfile profile;
     private Ocpp ocpp;
@@ -40,6 +37,7 @@ public final class SteveConfiguration {
     private SteveConfiguration() {
         PropertiesFileLoader p = new PropertiesFileLoader("main.properties");
 
+        contextPath = sanitizeContextPath(p.getOptionalString("context.path"));
         steveVersion = p.getString("steve.version");
         profile = ApplicationProfile.fromName(p.getString("profile"));
 
@@ -74,6 +72,18 @@ public final class SteveConfiguration {
                    .build();
 
         validate();
+    }
+
+    private String sanitizeContextPath(String s) {
+        if (s == null || "/".equals(s)) {
+            return "";
+
+        } else if (s.startsWith("/")) {
+            return s;
+
+        } else {
+            return "/" + s;
+        }
     }
 
     private void validate() {

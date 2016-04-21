@@ -12,11 +12,11 @@
 <div class="content"><div>
     <section><span>
         Charge Point Details
-        <a class="tooltip" href="#"><img src="/steve/static/images/info.png" style="vertical-align:middle">
+        <a class="tooltip" href="#"><img src="${ctxPath}/static/images/info.png" style="vertical-align:middle">
             <span>Read-only fields are updated by the charge point.</span>
         </a>
     </span></section>
-        <form:form action="/steve/manager/chargepoints/update" modelAttribute="chargePointForm">
+        <form:form action="${ctxPath}/manager/chargepoints/update" modelAttribute="chargePointForm">
 
             <form:hidden path="chargeBoxPk" readonly="true"/>
             <table class="userInput">
@@ -26,7 +26,7 @@
                         <td>ChargeBox ID:</td>
                         <td>
                             <form:input path="chargeBoxId" readonly="true" />
-                            <a class="tooltip" href="#"><img src="/steve/static/images/info.png" style="vertical-align:middle">
+                            <a class="tooltip" href="#"><img src="${ctxPath}/static/images/info.png" style="vertical-align:middle">
                                 <span>This field is set when adding a charge point, and cannot be changed later</span>
                             </a>
                         </td>

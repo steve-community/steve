@@ -1,7 +1,7 @@
 <%@ include file="../00-header.jsp" %>
 <div class="content"><div>
     <section><span>User Overview</span></section>
-    <form:form action="/steve/manager/users/query" method="get" modelAttribute="params">
+    <form:form action="${ctxPath}/manager/users/query" method="get" modelAttribute="params">
         <table class="userInput">
             <tr>
                 <td>User ID:</td>
@@ -37,7 +37,7 @@
                 <th>Phone</th>
                 <th>E-Mail</th>
                 <th>
-                    <form:form action="/steve/manager/users/add" method="get">
+                    <form:form action="${ctxPath}/manager/users/add" method="get">
                         <input type="submit" class="blueSubmit" value="Add New">
                     </form:form>
                 </th>
@@ -45,17 +45,17 @@
         </thead>
         <tbody>
         <c:forEach items="${userList}" var="cr">
-            <tr><td><a href="/steve/manager/users/details/${cr.userPk}">${cr.userPk}</a></td>
+            <tr><td><a href="${ctxPath}/manager/users/details/${cr.userPk}">${cr.userPk}</a></td>
                 <td>
                     <c:if test="${not empty cr.ocppIdTag}">
-                        <a href="/steve/manager/ocppTags/details/${cr.ocppTagPk}">${cr.ocppIdTag}</a>
+                        <a href="${ctxPath}/manager/ocppTags/details/${cr.ocppTagPk}">${cr.ocppIdTag}</a>
                     </c:if>
                 </td>
                 <td>${cr.name}</td>
                 <td>${cr.phone}</td>
                 <td>${cr.email}</td>
                 <td>
-                    <form:form action="/steve/manager/users/delete/${cr.userPk}">
+                    <form:form action="${ctxPath}/manager/users/delete/${cr.userPk}">
                         <input type="submit" class="redSubmit" value="Delete">
                     </form:form>
                 </td>

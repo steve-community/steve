@@ -9,7 +9,7 @@
 <div class="content">
 	<section><span>
 		Reservations
-			<a class="tooltip" href="#"><img src="/steve/static/images/info.png" style="vertical-align:middle">
+			<a class="tooltip" href="#"><img src="${ctxPath}/static/images/info.png" style="vertical-align:middle">
 				<span>
 				Status definitions:
 				WAITING (Waiting for charge point to respond to a reservation request),
@@ -19,7 +19,7 @@
 				</span>
 			</a>
 	</span></section>
-	<form:form action="/steve/manager/reservations/query" method="get" modelAttribute="params">
+	<form:form action="${ctxPath}/manager/reservations/query" method="get" modelAttribute="params">
 		<table class="userInput">
 			<tr>
 				<td>ChargeBox ID:</td>
@@ -89,11 +89,11 @@
 			<td>${res.id}</td>
 			<td>
 				<c:if test="${not empty res.transactionId}">
-					<a href="/steve/manager/transactions/query?type=ALL&transactionPk=${res.transactionId}">${res.transactionId}</a>
+					<a href="${ctxPath}/manager/transactions/query?type=ALL&transactionPk=${res.transactionId}">${res.transactionId}</a>
 				</c:if>
 			</td>
-			<td><a href="/steve/manager/ocppTags/details/${res.ocppTagPk}">${res.ocppIdTag}</a></td>
-			<td><a href="/steve/manager/chargepoints/details/${res.chargeBoxPk}">${res.chargeBoxId}</a></td>
+			<td><a href="${ctxPath}/manager/ocppTags/details/${res.ocppTagPk}">${res.ocppIdTag}</a></td>
+			<td><a href="${ctxPath}/manager/chargepoints/details/${res.chargeBoxPk}">${res.chargeBoxId}</a></td>
 			<td>${res.connectorId}</td>
 			<td>${res.startDatetime}</td>
 			<td>${res.expiryDatetime}</td>

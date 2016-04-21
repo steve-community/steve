@@ -40,11 +40,11 @@
 
     <section><span id="batch" style="cursor: pointer">
         Add Charge Point List
-        <a class="tooltip" href="#"><img src="/steve/static/images/info.png" style="vertical-align:middle">
+        <a class="tooltip" href="#"><img src="${ctxPath}/static/images/info.png" style="vertical-align:middle">
             <span>Insert multiple charge points at once by entering one ID per line. This operation will leave other fields empty, which can be set later.</span>
         </a>
     </span></section>
-    <form:form action="/steve/manager/chargepoints/add/batch" modelAttribute="batchChargePointForm" style="display: none">
+    <form:form action="${ctxPath}/manager/chargepoints/add/batch" modelAttribute="batchChargePointForm" style="display: none">
         <table class="userInput">
             <tr>
                 <td>ChargeBox IDs:</td><td><form:textarea path="idList"/></td></tr>
@@ -57,7 +57,7 @@
     </form:form>
 
     <section><span>Add Charge Point</span></section>
-    <form:form action="/steve/manager/chargepoints/add/single" modelAttribute="chargePointForm">
+    <form:form action="${ctxPath}/manager/chargepoints/add/single" modelAttribute="chargePointForm">
 
         <table class="userInput">
             <thead><tr><th>OCPP</th><th></th></thead>
@@ -66,7 +66,7 @@
                     <td>ChargeBox ID:</td>
                     <td>
                         <form:input path="chargeBoxId"/>
-                        <a class="tooltip" href="#"><img src="/steve/static/images/info.png" style="vertical-align:middle">
+                        <a class="tooltip" href="#"><img src="${ctxPath}/static/images/info.png" style="vertical-align:middle">
                             <span>This field is set when adding a charge point, and cannot be changed later</span>
                         </a>
                     </td>

@@ -16,7 +16,7 @@
 </spring:hasBindErrors>
 <div class="content"><div>
     <section><span>User Details</span></section>
-    <form:form action="/steve/manager/users/update" modelAttribute="userForm">
+    <form:form action="${ctxPath}/manager/users/update" modelAttribute="userForm">
 
         <form:hidden path="userPk" readonly="true"/>
         <%@ include file="00-user-profile.jsp" %>

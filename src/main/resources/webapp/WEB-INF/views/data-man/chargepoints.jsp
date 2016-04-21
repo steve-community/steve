@@ -2,11 +2,11 @@
 <div class="content"><div>
     <section><span>
         Charge Point Overview
-        <a class="tooltip" href="#"><img src="/steve/static/images/info.png" style="vertical-align:middle">
+        <a class="tooltip" href="#"><img src="${ctxPath}/static/images/info.png" style="vertical-align:middle">
             <span>Deleting a charge point causes losing all related information including transactions, reservations, connector status and connector meter values.</span>
         </a>
     </span></section>
-    <form:form action="/steve/manager/chargepoints/query" method="get" modelAttribute="params">
+    <form:form action="${ctxPath}/manager/chargepoints/query" method="get" modelAttribute="params">
         <table class="userInput">
             <tr>
                 <td>Description:</td>
@@ -44,7 +44,7 @@
                 <th>OCPP Protocol</th>
                 <th>Last Heartbeat</th>
                 <th>
-                    <form:form action="/steve/manager/chargepoints/add" method="get">
+                    <form:form action="${ctxPath}/manager/chargepoints/add" method="get">
                         <input type="submit" class="blueSubmit" value="Add New">
                     </form:form>
                 </th>
@@ -52,12 +52,12 @@
         </thead>
         <tbody>
         <c:forEach items="${cpList}" var="cp">
-            <tr><td><a href="/steve/manager/chargepoints/details/${cp.chargeBoxPk}">${cp.chargeBoxId}</a></td>
+            <tr><td><a href="${ctxPath}/manager/chargepoints/details/${cp.chargeBoxPk}">${cp.chargeBoxId}</a></td>
                 <td>${cp.description}</td>
                 <td>${cp.ocppProtocol}</td>
                 <td>${cp.lastHeartbeatTimestamp}</td>
                 <td>
-                    <form:form action="/steve/manager/chargepoints/delete/${cp.chargeBoxPk}">
+                    <form:form action="${ctxPath}/manager/chargepoints/delete/${cp.chargeBoxPk}">
                         <input type="submit" class="redSubmit" value="Delete">
                     </form:form>
                 </td>

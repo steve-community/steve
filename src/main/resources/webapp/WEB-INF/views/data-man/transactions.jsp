@@ -9,12 +9,12 @@
 <div class="content">
 <section><span>
 Transactions
-<a class="tooltip" href="#"><img src="/steve/static/images/info.png" style="vertical-align:middle">
+<a class="tooltip" href="#"><img src="${ctxPath}/static/images/info.png" style="vertical-align:middle">
 <span>If stop date/time and stop value are empty, this means that a transaction is still active
 (i.e. it has started but not stopped yet or the charging station did not inform SteVe about the stopped transaction yet).</span>
 </a>
 </span></section>
-    <form:form action="/steve/manager/transactions/query" method="get" modelAttribute="params">
+    <form:form action="${ctxPath}/manager/transactions/query" method="get" modelAttribute="params">
         <table class="userInput">
             <tr>
                 <td>Transaction ID:</td>
@@ -89,9 +89,9 @@ Transactions
         <c:forEach items="${transList}" var="ta">
             <tr>
                 <td>${ta.id}</td>
-                <td><a href="/steve/manager/chargepoints/details/${ta.chargeBoxPk}">${ta.chargeBoxId}</a></td>
+                <td><a href="${ctxPath}/manager/chargepoints/details/${ta.chargeBoxPk}">${ta.chargeBoxId}</a></td>
                 <td>${ta.connectorId}</td>
-                <td><a href="/steve/manager/ocppTags/details/${ta.ocppTagPk}">${ta.ocppIdTag}</a></td>
+                <td><a href="${ctxPath}/manager/ocppTags/details/${ta.ocppTagPk}">${ta.ocppIdTag}</a></td>
                 <td>${ta.startTimestamp}</td>
                 <td>${ta.startValue}</td>
                 <td>${ta.stopTimestamp}</td>

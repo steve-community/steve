@@ -93,7 +93,7 @@ public class SteveProdStarter implements ApplicationStarter {
 
         printList(list.iterator(), false,
                 "Access the web interface using:",
-                "/manager");
+                "/manager/home");
 
         printList(list.iterator(), false,
                 "SOAP endpoint for OCPP:",

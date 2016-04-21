@@ -2,7 +2,7 @@
 <div class="content"><div>
 <section><span>
 Connector Status
-	<a class="tooltip" href="#"><img src="/steve/static/images/info.png" style="vertical-align:middle">
+	<a class="tooltip" href="#"><img src="${ctxPath}/static/images/info.png" style="vertical-align:middle">
 		<span>Last status information and corresponding date/time of connectors received from charging stations.
 			The OCPP term 'connector' refers to the charging socket of a station.</span>
 	</a>
@@ -12,7 +12,7 @@ Connector Status
 	<tbody>
 		<c:forEach items="${connectorStatusList}" var="cs">
 			<tr>
-				<td><a href="/steve/manager/chargepoints/details/${cs.chargeBoxPk}">${cs.chargeBoxId}</a></td>
+				<td><a href="${ctxPath}/manager/chargepoints/details/${cs.chargeBoxPk}">${cs.chargeBoxId}</a></td>
 				<td>${cs.connectorId}</td>
 				<td>${cs.timeStamp}</td>
 				<td>${cs.status}</td>

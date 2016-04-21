@@ -9,7 +9,7 @@
     </div>
 </spring:hasBindErrors>
 <div class="content">
-<form:form action="/steve/manager/settings" modelAttribute="settingsForm">
+<form:form action="${ctxPath}/manager/settings" modelAttribute="settingsForm">
 
     <section><span>OCPP Settings</span></section>
     <table class="userInputFullPage">
@@ -27,7 +27,7 @@
 
     <section><span>
         Mail Notification Setting
-        <a class="tooltip" href="#"><img src="/steve/static/images/info.png" style="vertical-align:middle">
+        <a class="tooltip" href="#"><img src="${ctxPath}/static/images/info.png" style="vertical-align:middle">
             <span>Specify the recipients of the notifications by entering one e-mail address per line</span>
         </a>
     </span></section>

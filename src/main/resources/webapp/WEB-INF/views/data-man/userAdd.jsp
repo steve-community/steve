@@ -16,7 +16,7 @@
 </spring:hasBindErrors>
 <div class="content"><div>
 <section><span>Add User</span></section>
-    <form:form action="/steve/manager/users/add" modelAttribute="userForm">
+    <form:form action="${ctxPath}/manager/users/add" modelAttribute="userForm">
 
         <%@ include file="00-user-profile.jsp" %>
 

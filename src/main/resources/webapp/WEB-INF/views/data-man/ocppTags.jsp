@@ -2,11 +2,11 @@
 <div class="content"><div>
         <section><span>
         OCPP Tag Overview
-        <a class="tooltip" href="#"><img src="/steve/static/images/info.png" style="vertical-align:middle">
+        <a class="tooltip" href="#"><img src="${ctxPath}/static/images/info.png" style="vertical-align:middle">
             <span>Deleting an OCPP tag causes losing all related information including transactions and reservations.</span>
         </a>
         </span></section>
-    <form:form action="/steve/manager/ocppTags/query" method="get" modelAttribute="params">
+    <form:form action="${ctxPath}/manager/ocppTags/query" method="get" modelAttribute="params">
         <table class="userInput">
             <tr>
                 <td>ID Tag:</td>
@@ -62,7 +62,7 @@
                 <th>In Transaction?</th>
                 <th>Blocked?</th>
                 <th>
-                    <form:form action="/steve/manager/ocppTags/add" method="get">
+                    <form:form action="${ctxPath}/manager/ocppTags/add" method="get">
                         <input type="submit" class="blueSubmit" value="Add New"/>
                     </form:form>
                 </th>
@@ -70,17 +70,17 @@
         </thead>
         <tbody>
         <c:forEach items="${ocppTagList}" var="item">
-            <tr><td><a href="/steve/manager/ocppTags/details/${item.ocppTagPk}">${item.idTag}</a></td>
+            <tr><td><a href="${ctxPath}/manager/ocppTags/details/${item.ocppTagPk}">${item.idTag}</a></td>
                 <td>
                     <c:if test="${not empty item.parentIdTag}">
-                        <a href="/steve/manager/ocppTags/details/${item.parentOcppTagPk}">${item.parentIdTag}</a>
+                        <a href="${ctxPath}/manager/ocppTags/details/${item.parentOcppTagPk}">${item.parentIdTag}</a>
                     </c:if>
                 </td>
                 <td>${item.expiryDate}</td>
                 <td>${item.inTransaction}</td>
                 <td>${item.blocked}</td>
                 <td>
-                    <form:form action="/steve/manager/ocppTags/delete/${item.ocppTagPk}">
+                    <form:form action="${ctxPath}/manager/ocppTags/delete/${item.ocppTagPk}">
                         <input type="submit" class="redSubmit" value="Delete">
                     </form:form>
                 </td>

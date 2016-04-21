@@ -113,19 +113,21 @@ public class SteveAppContext {
         rewrite.setRewriteRequestURI(true);
         rewrite.setRewritePathInfo(true);
 
+        String root = CONFIG.getContextPath();
+
         String[] redirectArray = {
                 "",
-                "/steve",
-                "/steve/",
-                "/steve/manager",
-                "/steve/manager/"
+//                root + "",
+//                root + "/",
+//                root + "/manager",
+//                root + "/manager/"
         };
 
         for (String redirect : redirectArray) {
             RedirectPatternRule rule = new RedirectPatternRule();
             rule.setTerminating(true);
             rule.setPattern(redirect);
-            rule.setLocation("/steve/manager/home");
+            rule.setLocation(root + "/manager/home");
             rewrite.addRule(rule);
         }
         return rewrite;
@@ -159,7 +161,7 @@ public class SteveAppContext {
      */
     private File getScratchDir() throws IOException {
         File tempDir = new File(System.getProperty("java.io.tmpdir"));
-        File scratchDir = new File(tempDir.toString(), "embedded-jetty-jsp");
+        File scratchDir = new File(tempDir.toString(), "steve-jetty-jsp");
 
         if (!scratchDir.exists()) {
             if (!scratchDir.mkdirs()) {

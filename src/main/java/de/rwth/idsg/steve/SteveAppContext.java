@@ -27,6 +27,7 @@ import javax.servlet.Filter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.EnumSet;
+import java.util.HashSet;
 import java.util.List;
 
 import static de.rwth.idsg.steve.SteveConfiguration.CONFIG;
@@ -112,22 +113,30 @@ public class SteveAppContext {
         rewrite.setRewriteRequestURI(true);
         rewrite.setRewritePathInfo(true);
 
-        String root = CONFIG.getContextPath();
-
-        String[] redirectArray = {
-                "",
-//                root + "",
-//                root + "/",
-        };
-
-        for (String redirect : redirectArray) {
+        for (String redirect : getRedirectSet()) {
             RedirectPatternRule rule = new RedirectPatternRule();
             rule.setTerminating(true);
             rule.setPattern(redirect);
-            rule.setLocation(root + "/manager/home");
+            rule.setLocation(CONFIG.getContextPath() + "/manager/home");
             rewrite.addRule(rule);
         }
         return rewrite;
+    }
+
+    private HashSet<String> getRedirectSet() {
+        String path = CONFIG.getContextPath();
+
+        HashSet<String> redirectSet = new HashSet<>(3);
+        redirectSet.add("");
+        redirectSet.add(path + "");
+
+        // Otherwise (if path = ""), we would already be at root of the server ("/")
+        // and using the redirection below would cause an infinite loop.
+        if (!"".equals(path)) {
+            redirectSet.add(path + "/");
+        }
+
+        return redirectSet;
     }
 
     // -------------------------------------------------------------------------

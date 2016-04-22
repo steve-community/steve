@@ -18,7 +18,7 @@ import java.util.List;
  *
  */
 @Controller
-@RequestMapping(value = "/manager/home", method = RequestMethod.GET)
+@RequestMapping(value = "/manager", method = RequestMethod.GET)
 public class HomeController {
 
     @Autowired private ChargePointRepository chargePointRepository;
@@ -28,14 +28,16 @@ public class HomeController {
     // Paths
     // -------------------------------------------------------------------------
 
-    private static final String CONNECTOR_STATUS_PATH = "/connectorStatus";
-    private static final String OCPP_JSON_STATUS = "/ocppJsonStatus";
+    private static final String HOME_PREFIX = "/home";
+
+    private static final String CONNECTOR_STATUS_PATH = HOME_PREFIX + "/connectorStatus";
+    private static final String OCPP_JSON_STATUS = HOME_PREFIX + "/ocppJsonStatus";
 
     // -------------------------------------------------------------------------
     // HTTP methods
     // -------------------------------------------------------------------------
 
-    @RequestMapping
+    @RequestMapping(value = {"", HOME_PREFIX})
     public String getHome(Model model) {
         model.addAttribute("stats", chargePointHelperService.getStats());
         return "home";

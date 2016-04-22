@@ -118,8 +118,6 @@ public class SteveAppContext {
                 "",
 //                root + "",
 //                root + "/",
-//                root + "/manager",
-//                root + "/manager/"
         };
 
         for (String redirect : redirectArray) {

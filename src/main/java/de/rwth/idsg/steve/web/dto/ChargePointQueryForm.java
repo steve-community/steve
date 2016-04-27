@@ -13,6 +13,7 @@ import lombok.Setter;
 @Setter
 public class ChargePointQueryForm {
 
+    private String chargeBoxId;
     private String description;
     private OcppVersion ocppVersion;
     private QueryPeriodType heartbeatPeriod;
@@ -30,6 +31,10 @@ public class ChargePointQueryForm {
 
     public boolean isSetDescription() {
         return description != null;
+    }
+
+    public boolean isSetChargeBoxId() {
+        return chargeBoxId != null;
     }
 
     @RequiredArgsConstructor

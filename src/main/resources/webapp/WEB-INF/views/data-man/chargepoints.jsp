@@ -9,6 +9,10 @@
     <form:form action="${ctxPath}/manager/chargepoints/query" method="get" modelAttribute="params">
         <table class="userInput">
             <tr>
+                <td>ChargeBox ID:</td>
+                <td><form:input path="chargeBoxId"/></td>
+            </tr>
+            <tr>
                 <td>Description:</td>
                 <td><form:input path="description"/></td>
             </tr>

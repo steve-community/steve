@@ -79,6 +79,10 @@ public class TransactionRepositoryImpl implements TransactionRepository {
         Record10<Integer, String, Integer, String, DateTime, String, DateTime, String, Integer, Integer>
                 transaction = getInternal(form).fetchOne();
 
+        if (transaction == null) {
+            throw new SteveException("There is no transaction with id '%s'", transactionPk);
+        }
+
         DateTime startTimestamp = transaction.value5();
         DateTime stopTimestamp = transaction.value7();
         String stopValue = transaction.value8();

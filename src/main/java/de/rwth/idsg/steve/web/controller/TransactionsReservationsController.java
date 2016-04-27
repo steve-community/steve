@@ -12,6 +12,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
@@ -41,6 +42,7 @@ public class TransactionsReservationsController {
     // -------------------------------------------------------------------------
 
     private static final String TRANSACTIONS_PATH = "/transactions";
+    private static final String TRANSACTIONS_DETAILS_PATH = "/transactions/details/{transactionPk}";
     private static final String TRANSACTIONS_QUERY_PATH = "/transactions/query";
     private static final String RESERVATIONS_PATH = "/reservations";
     private static final String RESERVATIONS_QUERY_PATH = "/reservations/query";
@@ -57,6 +59,12 @@ public class TransactionsReservationsController {
         model.addAttribute("transList", transactionRepository.getTransactions(params));
         model.addAttribute(PARAMS, params);
         return "data-man/transactions";
+    }
+
+    @RequestMapping(value = TRANSACTIONS_DETAILS_PATH)
+    public String getTransactionDetails(@PathVariable("transactionPk") int transactionPk, Model model) {
+        model.addAttribute("details", transactionRepository.getDetails(transactionPk));
+        return "data-man/transactionDetails";
     }
 
     @RequestMapping(value = TRANSACTIONS_QUERY_PATH)

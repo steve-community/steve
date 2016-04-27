@@ -88,7 +88,7 @@ Transactions
         <tbody>
         <c:forEach items="${transList}" var="ta">
             <tr>
-                <td>${ta.id}</td>
+                <td><a href="${ctxPath}/manager/transactions/details/${ta.id}">${ta.id}</a></td>
                 <td><a href="${ctxPath}/manager/chargepoints/details/${ta.chargeBoxPk}">${ta.chargeBoxId}</a></td>
                 <td>${ta.connectorId}</td>
                 <td><a href="${ctxPath}/manager/ocppTags/details/${ta.ocppTagPk}">${ta.ocppIdTag}</a></td>

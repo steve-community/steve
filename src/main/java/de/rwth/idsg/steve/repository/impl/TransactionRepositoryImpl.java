@@ -11,6 +11,7 @@ import jooq.steve.db.tables.records.ConnectorMeterValueRecord;
 import org.joda.time.DateTime;
 import org.jooq.Condition;
 import org.jooq.DSLContext;
+import org.jooq.Field;
 import org.jooq.Record10;
 import org.jooq.Record8;
 import org.jooq.RecordMapper;
@@ -136,9 +137,11 @@ public class TransactionRepositoryImpl implements TransactionRepository {
         // We are only interested in the first arriving entry.
         // -------------------------------------------------------------------------
 
+        Field<DateTime> dateTimeField = DSL.min(t1.field(2, DateTime.class)).as("min");
+
         List<TransactionDetails.MeterValues> values =
                 ctx.select(
-                        DSL.min(t1.field(2, DateTime.class)),
+                        dateTimeField,
                         t1.field(3, String.class),
                         t1.field(4, String.class),
                         t1.field(5, String.class),
@@ -153,6 +156,7 @@ public class TransactionRepositoryImpl implements TransactionRepository {
                            t1.field(6),
                            t1.field(7),
                            t1.field(8))
+                   .orderBy(dateTimeField)
                    .fetch()
                    .map(r -> TransactionDetails.MeterValues.builder()
                                                            .valueTimestamp(r.value1())

@@ -3,7 +3,9 @@ package de.rwth.idsg.steve.utils;
 import com.google.common.base.Strings;
 import lombok.extern.slf4j.Slf4j;
 
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
@@ -18,15 +20,21 @@ public class PropertiesFileLoader {
 
     private Properties prop;
 
-    public PropertiesFileLoader(String fileName) {
-        try (InputStream is = this.getClass().getClassLoader().getResourceAsStream(fileName)) {
-            if (is == null) {
-                throw new FileNotFoundException("Property file '" + fileName + "' is not found in classpath");
-            }
-            prop = new Properties();
-            prop.load(is);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+    /**
+     * The name parameter acts as
+     * 1) the file name to load from classpath, and
+     * 2) the system property which can be set to load from file system.
+     */
+    public PropertiesFileLoader(String name) {
+        String systemFileName = System.getProperty(name);
+
+        if (systemFileName == null) {
+            log.info("Hint: The Java system property '{}' can be set to point to an external properties file, " +
+                    "which will be prioritized over the bundled one", name);
+            loadFromClasspath(name);
+
+        } else {
+            loadFromSystem(systemFileName);
         }
     }
 
@@ -91,6 +99,28 @@ public class PropertiesFileLoader {
     // -------------------------------------------------------------------------
     // Private helpers
     // -------------------------------------------------------------------------
+
+    private void loadFromSystem(String systemFileName) {
+        try (FileInputStream inputStream = new FileInputStream(systemFileName)) {
+            prop = new Properties();
+            prop.load(inputStream);
+            log.info("Loaded properties from {}", systemFileName);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private void loadFromClasspath(String fileName) {
+        try (InputStream is = this.getClass().getClassLoader().getResourceAsStream(fileName)) {
+            if (is == null) {
+                throw new FileNotFoundException("Property file '" + fileName + "' is not found in classpath");
+            }
+            prop = new Properties();
+            prop.load(is);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
 
     private static String trim(String key, String value) {
         String trimmed = value.trim();

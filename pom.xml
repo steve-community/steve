@@ -277,7 +277,7 @@
             <plugin>
                 <groupId>org.flywaydb</groupId>
                 <artifactId>flyway-maven-plugin</artifactId>
-                <version>3.2.1</version>
+                <version>4.0</version>
 
                 <!-- Must be in the same phase as Jooq -->
                 <executions>
@@ -290,6 +290,12 @@
                 </executions>
 
                 <configuration>
+                    <!-- we need this because of extensions. they have a higher version number
+                         namespace reserved (e.g. 8.x.x). new migrations in core version should
+                         be executed in the extended version as well -->
+                    <outOfOrder>true</outOfOrder>
+                    
+                    <cleanDisabled>true</cleanDisabled>
                     <driver>com.mysql.jdbc.Driver</driver>
                     <url>${jdbcUrl}</url>
                     <user>${db.user}</user>

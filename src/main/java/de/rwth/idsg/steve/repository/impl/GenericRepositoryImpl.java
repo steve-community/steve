@@ -49,8 +49,8 @@ public class GenericRepositoryImpl implements GenericRepository {
     public DbVersion getDBVersion() {
         Record2<String, DateTime> record = ctx.select(SCHEMA_VERSION.VERSION, SCHEMA_VERSION.INSTALLED_ON)
                                               .from(SCHEMA_VERSION)
-                                              .where(SCHEMA_VERSION.VERSION_RANK.eq(
-                                                      select(max(SCHEMA_VERSION.VERSION_RANK)).from(SCHEMA_VERSION)))
+                                              .where(SCHEMA_VERSION.INSTALLED_RANK.eq(
+                                                      select(max(SCHEMA_VERSION.INSTALLED_RANK)).from(SCHEMA_VERSION)))
                                               .fetchOne();
 
         String ts = DateTimeUtils.humanize(record.value2());

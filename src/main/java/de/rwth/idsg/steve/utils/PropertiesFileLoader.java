@@ -26,15 +26,15 @@ public class PropertiesFileLoader {
      * 2) the system property which can be set to load from file system.
      */
     public PropertiesFileLoader(String name) {
-        String systemFileName = System.getProperty(name);
+        String externalFileName = System.getProperty(name);
 
-        if (systemFileName == null) {
+        if (externalFileName == null) {
             log.info("Hint: The Java system property '{}' can be set to point to an external properties file, " +
                     "which will be prioritized over the bundled one", name);
             loadFromClasspath(name);
 
         } else {
-            loadFromSystem(systemFileName);
+            loadFromSystem(externalFileName);
         }
     }
 
@@ -100,11 +100,11 @@ public class PropertiesFileLoader {
     // Private helpers
     // -------------------------------------------------------------------------
 
-    private void loadFromSystem(String systemFileName) {
-        try (FileInputStream inputStream = new FileInputStream(systemFileName)) {
+    private void loadFromSystem(String fileName) {
+        try (FileInputStream inputStream = new FileInputStream(fileName)) {
             prop = new Properties();
             prop.load(inputStream);
-            log.info("Loaded properties from {}", systemFileName);
+            log.info("Loaded properties from {}", fileName);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

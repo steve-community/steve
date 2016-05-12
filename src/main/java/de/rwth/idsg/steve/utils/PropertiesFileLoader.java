@@ -1,5 +1,6 @@
 package de.rwth.idsg.steve.utils;
 
+import com.google.common.base.Splitter;
 import com.google.common.base.Strings;
 import lombok.extern.slf4j.Slf4j;
 
@@ -7,6 +8,8 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Collections;
+import java.util.List;
 import java.util.Properties;
 
 /**
@@ -74,6 +77,18 @@ public class PropertiesFileLoader {
             return null;
         }
         return trim(key, s);
+    }
+
+    public List<String> getStringList(String key) {
+        String s = prop.getProperty(key);
+        if (Strings.isNullOrEmpty(s)) {
+            return Collections.emptyList();
+        }
+
+        return Splitter.on(",")
+                       .trimResults()
+                       .omitEmptyStrings()
+                       .splitToList(s);
     }
 
     public Boolean getOptionalBoolean(String key) {

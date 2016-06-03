@@ -1,15 +1,7 @@
 sudo: false
 language: java
 jdk: oraclejdk8
-cache:
-        directories:
-                - $HOME/.m2
-
 services: mysql
-
-before_install:
-        # workaround, see https://github.com/travis-ci/travis-ci/issues/4629
-        - sed -i.bak -e 's|https://nexus.codehaus.org/snapshots/|https://oss.sonatype.org/content/repositories/codehaus-snapshots/|g' ~/.m2/settings.xml
 
 # install dependencies
 install: mvn dependency:go-offline -B -V
@@ -24,10 +16,11 @@ before_script:
 
 # start the actual build
 script: 
-        - mvn clean package -B -V
-        - java -jar target/steve-*.jar &
+        - mvn -Dmaven.javadoc.skip=true clean package -B -V
+        - java -Djava.net.preferIPv4Stack=true -jar target/steve-*.jar &
         - sleep 20
         - elinks -dump -no-references http://localhost:8080/steve/manager/signin
+        - killall java
 
 
 # coverity_scan settings
@@ -37,7 +30,7 @@ env:
         - secure: "e2ou0BHMu9fd2daC9pXhjvkZ3CP3XTaYWSIehM4JDWxnVAn1jJayiQOpWoNKeD+RJV24ND1I2WvjQGqu6HVV+CkVZ8kHVCvb7fQHbM4P8UKaMFts8KR1gIiAYc7ja+C/jLnXVTofrhUTinOdhFs1lTONhGa4g/+nWq/6KXXP52/WKsKPgNKOvOzhlJf2QTprOkQVr4tIhUd3K9lf6qORkOIwpcfmQpFfccbHPzoIxGpke+a0Q5+H5/o3gNhOe7w31wBaX90OzfYRA5WyjfbDmI2tjkELQuvitR/DePRK0sLfRKfdfBRD/20pEbG2NzjHCBWQx8CYhDClAuH/sJc3M95qLMCiuNEAcpWzccAMB+At9uMiQfzqNdqTUYPZYQwBQgsPqffG2DyWg6u7eNZu3z0QjLHDxqqOWJa6Hggx9V5nqNNBl0wbrkMjwbWirbtg3yS0i9OLTd8oK64+sYtXPJlBw4Qr+gZplSj/hv6NbcpMKrvOK/BAP+G087m2cVvMpDE9IP7Lo6YXIo5ilSbr4KKs01omvGr1k4eJR2/+esyqanPFuFzhHMRcG0qc0zM+gWlkm/9ID16gMnRQOZTA7UGEeiRpGhVyz87/khg6ajiE2NTxKc1EuHrk18qNulRBc+LjeLLMcS11zTiV6PJ6QkZGheS3+xVp/Nn8DrCC3lE="
 
 addons:
-        mariadb: "10.0"
+        mariadb: "10.1"
         coverity_scan:
                 project:
                         name: "RWTH-i5-IDSG/steve"
@@ -49,3 +42,7 @@ addons:
         apt:
                 packages:
                         - elinks
+
+cache:
+        directories:
+                - $HOME/.m2

@@ -16,6 +16,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.annotation.PostConstruct;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.util.List;
 
 /**
@@ -56,18 +58,24 @@ public class AjaxCallController {
     // -------------------------------------------------------------------------
 
     @RequestMapping(value = CONNECTOR_IDS_PATH)
-    public String getConnectorIds(@PathVariable("chargeBoxId") String chargeBoxId) {
-        return serializeArray(chargePointRepository.getNonZeroConnectorIds(chargeBoxId));
+    public void getConnectorIds(@PathVariable("chargeBoxId") String chargeBoxId,
+                                HttpServletResponse response) throws IOException {
+        String s = serializeArray(chargePointRepository.getNonZeroConnectorIds(chargeBoxId));
+        writeOutput(response, s);
     }
 
     @RequestMapping(value = TRANSACTION_IDS_PATH)
-    public String getTransactionIds(@PathVariable("chargeBoxId") String chargeBoxId) {
-        return serializeArray(transactionRepository.getActiveTransactionIds(chargeBoxId));
+    public void getTransactionIds(@PathVariable("chargeBoxId") String chargeBoxId,
+                                  HttpServletResponse response) throws IOException {
+        String s = serializeArray(transactionRepository.getActiveTransactionIds(chargeBoxId));
+        writeOutput(response, s);
     }
 
     @RequestMapping(value = RESERVATION_IDS_PATH)
-    public String getReservationIds(@PathVariable("chargeBoxId") String chargeBoxId) {
-        return serializeArray(reservationRepository.getActiveReservationIds(chargeBoxId));
+    public void getReservationIds(@PathVariable("chargeBoxId") String chargeBoxId,
+                                  HttpServletResponse response) throws IOException {
+        String s = serializeArray(reservationRepository.getActiveReservationIds(chargeBoxId));
+        writeOutput(response, s);
     }
 
     private String serializeArray(List<?> list) {
@@ -78,6 +86,18 @@ public class AjaxCallController {
             log.error("Error occurred during serialization of response. Returning empty array instead!", e);
             return "[]";
         }
+    }
+
+    /**
+     * We want to handle this JSON conversion locally, and do not want to register an application-wide
+     * HttpMessageConverter just for this little class. Otherwise, it might have unwanted side effects due to
+     * different serialization/deserialization needs of different APIs.
+     *
+     * That's why we are directly accessing the low-level HttpServletResponse and manually writing to output.
+     */
+    private void writeOutput(HttpServletResponse response, String str) throws IOException {
+        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+        response.getWriter().write(str);
     }
 
 }

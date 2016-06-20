@@ -1,6 +1,6 @@
 package de.rwth.idsg.steve.ocpp.ws.data;
 
-import de.rwth.idsg.steve.handler.OcppResponseHandler;
+import de.rwth.idsg.steve.handler.OcppJsonResponseHandler;
 import de.rwth.idsg.steve.ocpp.ResponseType;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -14,6 +14,6 @@ import lombok.Setter;
 @Setter
 @RequiredArgsConstructor
 public class FutureResponseContext {
-    private final OcppResponseHandler handler;
+    private final OcppJsonResponseHandler handler;
     private final Class<? extends ResponseType> responseClass;
 }

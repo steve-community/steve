@@ -27,6 +27,23 @@ public abstract class AbstractOcppResponseHandler<S extends RequestType, T exten
     // The default initial capacity is 10. We probably won't need that much.
     private ArrayList<OcppCallback<T>> callbackList = new ArrayList<>(2);
 
+    // -------------------------------------------------------------------------
+    // AsyncHandler
+    // -------------------------------------------------------------------------
+
+    @Override
+    public void handleResponse(Response<T> res) {
+        try {
+            processResponse(res.get());
+        } catch (Exception e) {
+            processException(e);
+        }
+    }
+
+    // -------------------------------------------------------------------------
+    // OcppResponseHandler
+    // -------------------------------------------------------------------------
+
     @Override
     public void addCallback(OcppCallback<T> cb) {
         callbackList.add(cb);
@@ -37,32 +54,21 @@ public abstract class AbstractOcppResponseHandler<S extends RequestType, T exten
         return requestTask.getRequest();
     }
 
-    // -------------------------------------------------------------------------
-    // AsyncHandler
-    // -------------------------------------------------------------------------
-
     @Override
-    public void handleResponse(Response<T> res) {
-        try {
-            handleResult(res.get());
-            success(res.get());
-
-        } catch (Exception e) {
-            handleException(e);
-            failed(e.getMessage());
-        }
-    }
-
-    // -------------------------------------------------------------------------
-    // OcppResponseHandler
-    //
-    // Skip the method handleResult(T response), since it should be
-    // implemented by subclasses depending on the actual response
-    // -------------------------------------------------------------------------
+    public abstract void handleResult(T response);
 
     @Override
     public void handleException(Exception e) {
-        requestTask.addNewError(chargeBoxId, e);
+        processException(e);
+    }
+
+    // -------------------------------------------------------------------------
+    // WsOcppResponseHandler
+    // -------------------------------------------------------------------------
+
+    @Override
+    public void handleResponse(T response) {
+        processResponse(response);
     }
 
     /**
@@ -73,10 +79,12 @@ public abstract class AbstractOcppResponseHandler<S extends RequestType, T exten
      */
     @Override
     public void handleError(OcppJsonError error) {
-        requestTask.addNewResponse(chargeBoxId, error.toString());
-
-        // But, as far as the callbacks are concerned, this is still a failure.
-        failed(error.getErrorDescription());
+        try {
+            requestTask.addNewResponse(chargeBoxId, error.toString());
+        } finally {
+            // But, as far as the callbacks are concerned, this is still a failure.
+            failed(error.getErrorDescription());
+        }
     }
 
     // -------------------------------------------------------------------------
@@ -87,6 +95,22 @@ public abstract class AbstractOcppResponseHandler<S extends RequestType, T exten
     // log the exception and allow the application to continue with the next
     // callback in line.
     // -------------------------------------------------------------------------
+
+    private void processResponse(T response) {
+        try {
+            handleResult(response);
+        } finally {
+            success(response);
+        }
+    }
+
+    private void processException(Exception e) {
+        try {
+            requestTask.addNewError(chargeBoxId, e);
+        } finally {
+            failed(e.getMessage());
+        }
+    }
 
     private void success(T response) {
         for (OcppCallback<T> c : callbackList) {

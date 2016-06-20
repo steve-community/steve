@@ -40,7 +40,7 @@ public class IncomingPipeline extends AbstractPipeline {
 
         } else if (msg instanceof OcppJsonResult) {
             OcppJsonResult result = (OcppJsonResult) msg;
-            context.getHandler().handleResult(result.getPayload());
+            context.getHandler().handleResponse(result.getPayload());
 
         } else if (msg instanceof OcppJsonError) {
             OcppJsonError result = (OcppJsonError) msg;

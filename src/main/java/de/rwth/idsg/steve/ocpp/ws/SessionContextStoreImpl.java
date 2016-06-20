@@ -1,5 +1,6 @@
 package de.rwth.idsg.steve.ocpp.ws;
 
+import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableMap;
 import de.rwth.idsg.steve.SteveException;
 import de.rwth.idsg.steve.ocpp.ws.custom.WsSessionSelectStrategy;
@@ -106,8 +107,15 @@ public class SessionContextStoreImpl implements SessionContextStore {
 
     @Override
     public WebSocketSession getSession(String chargeBoxId) {
-        Deque<SessionContext> endpointDeque = lookupTable.get(chargeBoxId);
+        if (Strings.isNullOrEmpty(chargeBoxId)) {
+            throw new SteveException("Invalid chargeBoxId (null or empty)");
+        }
+
         try {
+            Deque<SessionContext> endpointDeque = lookupTable.get(chargeBoxId);
+            if (endpointDeque == null) {
+                throw new NoSuchElementException();
+            }
             return wsSessionSelectStrategy.getSession(endpointDeque);
         } catch (NoSuchElementException e) {
             throw new SteveException("No session context for chargeBoxId '%s'", chargeBoxId, e);

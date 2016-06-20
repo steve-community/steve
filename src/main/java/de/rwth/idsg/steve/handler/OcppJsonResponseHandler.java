@@ -9,5 +9,6 @@ import de.rwth.idsg.steve.ocpp.ws.data.OcppJsonError;
  */
 public interface OcppJsonResponseHandler<T extends ResponseType> {
     void handleResponse(T response);
+    void handleException(Exception e);
     void handleError(OcppJsonError error);
 }

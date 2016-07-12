@@ -18,5 +18,4 @@ public interface OcppResponseHandler<S extends RequestType, T extends ResponseTy
     S getRequest();
 
     void handleResult(T response);
-    void handleException(Exception e);
 }

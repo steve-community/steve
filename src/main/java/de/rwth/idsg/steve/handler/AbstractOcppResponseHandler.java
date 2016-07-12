@@ -57,18 +57,18 @@ public abstract class AbstractOcppResponseHandler<S extends RequestType, T exten
     @Override
     public abstract void handleResult(T response);
 
-    @Override
-    public void handleException(Exception e) {
-        processException(e);
-    }
-
     // -------------------------------------------------------------------------
-    // WsOcppResponseHandler
+    // OcppJsonResponseHandler
     // -------------------------------------------------------------------------
 
     @Override
     public void handleResponse(T response) {
         processResponse(response);
+    }
+
+    @Override
+    public void handleException(Exception e) {
+        processException(e);
     }
 
     /**

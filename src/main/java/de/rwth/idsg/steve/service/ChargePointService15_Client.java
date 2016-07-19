@@ -340,7 +340,7 @@ public class ChargePointService15_Client {
      * Executes the requests
      */
     private void execute(List<ChargePointSelect> list, Consumer<ChargePointSelect> consumer) {
-        executorService.execute(() -> list.stream().forEach(consumer));
+        executorService.execute(() -> list.forEach(consumer));
     }
 
     // -------------------------------------------------------------------------

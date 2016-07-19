@@ -14,9 +14,10 @@ import org.apache.cxf.service.model.MessagePartInfo;
 import org.apache.cxf.ws.addressing.AddressingProperties;
 import org.apache.cxf.ws.addressing.ContextUtils;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
-import org.jooq.exception.DataAccessException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.util.concurrent.ScheduledExecutorService;
 
 import static org.apache.cxf.ws.addressing.JAXWSAConstants.ADDRESSING_PROPERTIES_INBOUND;
 
@@ -34,6 +35,7 @@ import static org.apache.cxf.ws.addressing.JAXWSAConstants.ADDRESSING_PROPERTIES
 public class FromAddressInterceptor extends AbstractPhaseInterceptor<Message> {
 
     @Autowired private OcppServerRepository ocppServerRepository;
+    @Autowired private ScheduledExecutorService executorService;
 
     private static final String CHARGEBOX_ID_HEADER = "ChargeBoxIdentity";
 
@@ -43,16 +45,19 @@ public class FromAddressInterceptor extends AbstractPhaseInterceptor<Message> {
 
     @Override
     public void handleMessage(Message message) throws Fault {
-        String chargeBoxId = getChargeBoxId(message);
-        String endpointAddress = getEndpointAddress(message);
+        executorService.execute(() -> handleMessageInternal(message));
+    }
 
-        if (chargeBoxId != null && endpointAddress != null) {
-            try {
+    private void handleMessageInternal(Message message) {
+        try {
+            String chargeBoxId = getChargeBoxId(message);
+            String endpointAddress = getEndpointAddress(message);
+
+            if (chargeBoxId != null && endpointAddress != null) {
                 ocppServerRepository.updateEndpointAddress(chargeBoxId, endpointAddress);
-            } catch (DataAccessException e) {
-                // Fail silently, allow subsequent processes to finish
-                log.error("Exception occurred", e);
             }
+        } catch (Exception e) {
+            log.error("Exception occurred", e);
         }
     }
 

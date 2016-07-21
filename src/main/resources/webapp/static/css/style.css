@@ -426,3 +426,7 @@ span.formatNumber {
 	color: #a36b83;
 	font-weight: bold;
 }
+table.res th.sorting-asc, table.res th.sorting-desc {
+	background: #CCC;
+	border-radius: 5px 5px 0 0;
+}

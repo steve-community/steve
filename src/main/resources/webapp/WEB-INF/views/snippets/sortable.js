@@ -1,6 +1,8 @@
 var table = $(".res").stupidtable({
-    "date": function (a) {
-        return (parseInt(a) || 0);
+    "date": function (a, b) {
+        var aDate = (parseInt(a) || 0);
+        var bDate = (parseInt(b) || 0);
+        return aDate - bDate;
     }
 });
 

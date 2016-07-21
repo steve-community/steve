@@ -94,6 +94,7 @@ public class ChargePointRepositoryImpl implements ChargePointRepository {
                                               .chargeBoxId(r.value2())
                                               .description(r.value3())
                                               .ocppProtocol(r.value4())
+                                              .lastHeartbeatTimestampDT(r.value5())
                                               .lastHeartbeatTimestamp(DateTimeUtils.humanize(r.value5()))
                                               .build()
                 );

@@ -234,6 +234,7 @@ public class OcppTagRepositoryImpl implements OcppTagRepository {
                           .parentOcppTagPk(r.value2())
                           .idTag(r.value3())
                           .parentIdTag(r.value4())
+                          .expiryDateDT(r.value5())
                           .expiryDate(humanize(r.value5()))
                           .inTransaction(r.value6())
                           .blocked(r.value7())

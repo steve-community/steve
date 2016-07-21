@@ -4,6 +4,7 @@
 	$(document).ready(function() {
 		<%@ include file="../snippets/dateTimePicker.js" %>
 		<%@ include file="../snippets/periodTypeSelect.js" %>
+		<%@ include file="../snippets/sortable.js" %>
 	});
 </script>
 <div class="content">
@@ -73,14 +74,14 @@
 <table class="res">
 	<thead>
 		<tr>
-			<th>Reservation ID</th>
-			<th>Transaction ID</th>
-			<th>OCPP ID Tag</th>
-			<th>ChargeBox ID</th>
-			<th>Connector ID</th>
-			<th>Start Date/Time</th>
-			<th>Expiry Date/Time</th>
-			<th>Status</th>
+			<th data-sort="int">Reservation ID</th>
+			<th data-sort="int">Transaction ID</th>
+			<th data-sort="string">OCPP ID Tag</th>
+			<th data-sort="string">ChargeBox ID</th>
+			<th data-sort="int">Connector ID</th>
+			<th data-sort="date">Start Date/Time</th>
+			<th data-sort="date">Expiry Date/Time</th>
+			<th data-sort="string">Status</th>
 		</tr>
 	</thead>
 	<tbody>
@@ -95,8 +96,8 @@
 			<td><a href="${ctxPath}/manager/ocppTags/details/${res.ocppTagPk}">${res.ocppIdTag}</a></td>
 			<td><a href="${ctxPath}/manager/chargepoints/details/${res.chargeBoxPk}">${res.chargeBoxId}</a></td>
 			<td>${res.connectorId}</td>
-			<td>${res.startDatetime}</td>
-			<td>${res.expiryDatetime}</td>
+			<td data-sort-value="${res.startDatetimeDT.millis}">${res.startDatetime}</td>
+			<td data-sort-value="${res.expiryDatetimeDT.millis}">${res.expiryDatetime}</td>
 			<td>${res.status}</td>
 		</tr>
 	</c:forEach>

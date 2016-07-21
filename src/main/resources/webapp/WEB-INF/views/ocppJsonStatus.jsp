@@ -1,4 +1,9 @@
 <%@ include file="00-header.jsp" %>
+<script type="text/javascript">
+    $(document).ready(function() {
+        <%@ include file="snippets/sortable.js" %>
+    });
+</script>
 <div class="content"><div>
 <section><span>
 Connection Status for JSON Charge Points
@@ -8,12 +13,19 @@ Connection Status for JSON Charge Points
         </a>
 </span></section>
     <table class="res">
-        <thead><tr><th>ChargeBox ID</th><th>OCPP Version</th><th>Connected Since</th><th>Connection Duration</th></tr></thead>
+        <thead>
+            <tr>
+                <th data-sort="string">ChargeBox ID</th>
+                <th data-sort="string">OCPP Version</th>
+                <th data-sort="date">Connected Since</th>
+                <th data-sort="string">Connection Duration</th>
+            </tr>
+        </thead>
         <tbody>
         <c:forEach items="${ocppJsonStatusList}" var="s">
             <tr><td><a href="${ctxPath}/manager/chargepoints/details/${s.chargeBoxPk}">${s.chargeBoxId}</a></td>
                 <td>${s.version.value}</td>
-                <td>${s.connectedSince}</td>
+                <td data-sort-value="${s.connectedSinceDT.millis}">${s.connectedSince}</td>
                 <td>${s.connectionDuration}</td>
             </tr>
         </c:forEach>

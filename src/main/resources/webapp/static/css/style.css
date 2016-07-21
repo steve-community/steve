@@ -44,6 +44,9 @@ table.res th {
 	background: #fff;
 	border-bottom: double #CCC;
 }
+table.res th[data-sort] {
+	cursor:pointer;
+}
 table.res tr { border-bottom: 1px solid #CCC; }
 table.res tr:nth-child(odd){ background: #fcfaf2; }
 

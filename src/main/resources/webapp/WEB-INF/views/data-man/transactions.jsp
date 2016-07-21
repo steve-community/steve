@@ -4,6 +4,7 @@
     $(document).ready(function() {
         <%@ include file="../snippets/dateTimePicker-past.js" %>
         <%@ include file="../snippets/periodTypeSelect.js" %>
+        <%@ include file="../snippets/sortable.js" %>
     });
 </script>
 <div class="content">
@@ -75,14 +76,14 @@ Transactions
     <table class="res">
         <thead>
             <tr>
-                <th>Transaction ID</th>
-                <th>ChargeBox ID</th>
-                <th>Connector ID</th>
-                <th>OCPP ID Tag</th>
-                <th>Start Date/Time</th>
-                <th>Start Value</th>
-                <th>Stop Date/Time</th>
-                <th>Stop Value</th>
+                <th data-sort="int">Transaction ID</th>
+                <th data-sort="string">ChargeBox ID</th>
+                <th data-sort="int">Connector ID</th>
+                <th data-sort="string">OCPP ID Tag</th>
+                <th data-sort="date">Start Date/Time</th>
+                <th data-sort="int">Start Value</th>
+                <th data-sort="date">Stop Date/Time</th>
+                <th data-sort="int">Stop Value</th>
             </tr>
         </thead>
         <tbody>
@@ -92,9 +93,9 @@ Transactions
                 <td><a href="${ctxPath}/manager/chargepoints/details/${ta.chargeBoxPk}">${ta.chargeBoxId}</a></td>
                 <td>${ta.connectorId}</td>
                 <td><a href="${ctxPath}/manager/ocppTags/details/${ta.ocppTagPk}">${ta.ocppIdTag}</a></td>
-                <td>${ta.startTimestamp}</td>
+                <td data-sort-value="${ta.startTimestampDT.millis}">${ta.startTimestamp}</td>
                 <td>${ta.startValue}</td>
-                <td>${ta.stopTimestamp}</td>
+                <td data-sort-value="${ta.stopTimestampDT.millis}">${ta.stopTimestamp}</td>
                 <td>${ta.stopValue}</td>
             </tr>
         </c:forEach>

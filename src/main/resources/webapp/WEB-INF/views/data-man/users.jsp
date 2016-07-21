@@ -1,4 +1,9 @@
 <%@ include file="../00-header.jsp" %>
+<script type="text/javascript">
+    $(document).ready(function() {
+        <%@ include file="../snippets/sortable.js" %>
+    });
+</script>
 <div class="content"><div>
     <section><span>User Overview</span></section>
     <form:form action="${ctxPath}/manager/users/query" method="get" modelAttribute="params">
@@ -31,11 +36,11 @@
     <table class="res action">
         <thead>
             <tr>
-                <th>User ID</th>
-                <th>Ocpp ID Tag</th>
-                <th>Name</th>
-                <th>Phone</th>
-                <th>E-Mail</th>
+                <th data-sort="int">User ID</th>
+                <th data-sort="string">Ocpp ID Tag</th>
+                <th data-sort="string">Name</th>
+                <th data-sort="string">Phone</th>
+                <th data-sort="string">E-Mail</th>
                 <th>
                     <form:form action="${ctxPath}/manager/users/add" method="get">
                         <input type="submit" class="blueSubmit" value="Add New">

@@ -1,4 +1,9 @@
 <%@ include file="00-header.jsp" %>
+<script type="text/javascript">
+	$(document).ready(function() {
+		<%@ include file="snippets/sortable.js" %>
+	});
+</script>
 <div class="content"><div>
 <section><span>
 Connector Status
@@ -8,13 +13,21 @@ Connector Status
 	</a>
 </span></section>
 <table class="res" id="connectorStatusTable">
-	<thead><tr><th>ChargeBox ID</th><th>Connector ID</th><th>Date/Time</th><th>Status</th><th>Error Code</th></tr></thead>
+	<thead>
+		<tr>
+			<th data-sort="string">ChargeBox ID</th>
+			<th data-sort="int">Connector ID</th>
+			<th data-sort="date">Date/Time</th>
+			<th data-sort="string">Status</th>
+			<th data-sort="string">Error Code</th>
+		</tr>
+	</thead>
 	<tbody>
 		<c:forEach items="${connectorStatusList}" var="cs">
 			<tr>
 				<td><a href="${ctxPath}/manager/chargepoints/details/${cs.chargeBoxPk}">${cs.chargeBoxId}</a></td>
 				<td>${cs.connectorId}</td>
-				<td>${cs.timeStamp}</td>
+				<td data-sort-value="${cs.statusTimestamp.millis}">${cs.timeStamp}</td>
 				<td>${cs.status}</td>
 				<td>${cs.errorCode}</td>
 			</tr>

@@ -112,6 +112,7 @@ public class ChargePointHelperServiceImpl implements ChargePointHelperService {
                 OcppJsonStatus status = OcppJsonStatus.builder()
                                                       .chargeBoxPk(primaryKeyLookup.get(chargeBoxId))
                                                       .chargeBoxId(chargeBoxId)
+                                                      .connectedSinceDT(openSince)
                                                       .connectedSince(DateTimeUtils.humanize(openSince))
                                                       .connectionDuration(DateTimeUtils.timeElapsed(openSince, now))
                                                       .version(version)

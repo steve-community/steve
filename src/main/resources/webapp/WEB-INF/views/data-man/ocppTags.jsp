@@ -1,4 +1,9 @@
 <%@ include file="../00-header.jsp" %>
+<script type="text/javascript">
+    $(document).ready(function() {
+        <%@ include file="../snippets/sortable.js" %>
+    });
+</script>
 <div class="content"><div>
         <section><span>
         OCPP Tag Overview
@@ -56,11 +61,11 @@
     <br>
     <table class="res action">
         <thead>
-            <tr><th>ID Tag</th>
-                <th>Parent ID Tag</th>
-                <th>Expiry Date/Time</th>
-                <th>In Transaction?</th>
-                <th>Blocked?</th>
+            <tr><th data-sort="string">ID Tag</th>
+                <th data-sort="string">Parent ID Tag</th>
+                <th data-sort="date">Expiry Date/Time</th>
+                <th data-sort="string">In Transaction?</th>
+                <th data-sort="string">Blocked?</th>
                 <th>
                     <form:form action="${ctxPath}/manager/ocppTags/add" method="get">
                         <input type="submit" class="blueSubmit" value="Add New"/>
@@ -76,7 +81,7 @@
                         <a href="${ctxPath}/manager/ocppTags/details/${item.parentOcppTagPk}">${item.parentIdTag}</a>
                     </c:if>
                 </td>
-                <td>${item.expiryDate}</td>
+                <td data-sort-value="${item.expiryDateDT.millis}">${item.expiryDate}</td>
                 <td>${item.inTransaction}</td>
                 <td>${item.blocked}</td>
                 <td>

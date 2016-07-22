@@ -131,7 +131,7 @@ public abstract class AbstractWebSocketEndpoint implements WebSocketHandler {
     // Helpers
     // -------------------------------------------------------------------------
 
-    private String getChargeBoxId(WebSocketSession session) {
+    protected String getChargeBoxId(WebSocketSession session) {
         return (String) session.getAttributes().get(CHARGEBOX_ID_KEY);
     }
 

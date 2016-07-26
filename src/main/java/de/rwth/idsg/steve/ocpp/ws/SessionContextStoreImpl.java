@@ -91,6 +91,16 @@ public class SessionContextStoreImpl implements SessionContextStore {
     }
 
     @Override
+    public int getSize(String chargeBoxId) {
+        Deque<SessionContext> endpointDeque = lookupTable.get(chargeBoxId);
+        if (endpointDeque == null) {
+            return 0;
+        } else {
+            return endpointDeque.size();
+        }
+    }
+
+    @Override
     public List<String> getChargeBoxIdList() {
         return Collections.list(lookupTable.keys());
     }

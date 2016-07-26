@@ -99,10 +99,17 @@ public abstract class AbstractWebSocketEndpoint implements WebSocketHandler {
                 TimeUnit.MINUTES);
 
         String chargeBoxId = getChargeBoxId(session);
+
+        int sizeBeforeAdd = sessionContextStore.getSize(chargeBoxId);
+
         sessionContextStore.add(chargeBoxId, session, pingSchedule);
         futureResponseContextStore.addSession(session);
 
-        notificationService.ocppStationWebSocketConnected(chargeBoxId);
+        // Take into account that there might be multiple connections to a charging station.
+        // Send notification only for the change 0 -> 1.
+        if (sizeBeforeAdd == 0) {
+            notificationService.ocppStationWebSocketConnected(chargeBoxId);
+        }
     }
 
     @Override
@@ -113,7 +120,13 @@ public abstract class AbstractWebSocketEndpoint implements WebSocketHandler {
         sessionContextStore.remove(chargeBoxId, session);
         futureResponseContextStore.removeSession(session);
 
-        notificationService.ocppStationWebSocketDisconnected(chargeBoxId);
+        int sizeAfterRemove = sessionContextStore.getSize(chargeBoxId);
+
+        // Take into account that there might be multiple connections to a charging station.
+        // Send notification only for the change 1 -> 0.
+        if (sizeAfterRemove == 0) {
+            notificationService.ocppStationWebSocketDisconnected(chargeBoxId);
+        }
     }
 
     @Override

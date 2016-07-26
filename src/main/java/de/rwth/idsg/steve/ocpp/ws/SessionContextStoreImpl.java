@@ -41,15 +41,9 @@ public class SessionContextStoreImpl implements SessionContextStore {
     public void add(String chargeBoxId, WebSocketSession session, ScheduledFuture pingSchedule) {
         SessionContext context = new SessionContext(session, pingSchedule, DateTime.now());
 
-        Deque<SessionContext> endpointDeque = lookupTable.get(chargeBoxId);
-        if (endpointDeque == null) {
-            final Deque<SessionContext> emptyDeque = new ArrayDeque<>();
-            endpointDeque = lookupTable.putIfAbsent(chargeBoxId, emptyDeque);
-            if (endpointDeque == null) {
-                endpointDeque = emptyDeque;
-            }
-        }
+        Deque<SessionContext> endpointDeque = lookupTable.computeIfAbsent(chargeBoxId, str -> new ArrayDeque<>());
         endpointDeque.addLast(context); // Adding at the end
+
         log.debug("A new SessionContext is stored for chargeBoxId '{}'. Store size: {}",
                 chargeBoxId, endpointDeque.size());
     }

@@ -49,6 +49,8 @@ public abstract class AbstractWebSocketEndpoint implements WebSocketHandler {
     private final List<Consumer<String>> connectedCallbackList = new ArrayList<>();
     private final List<Consumer<String>> disconnectedCallbackList = new ArrayList<>();
 
+    private final Object sessionContextLock = new Object();
+
     public void init(Pipeline pipeline) {
         this.pipeline = pipeline;
         sessionContextStore = new SessionContextStoreImpl(wsSessionSelectStrategy);
@@ -108,10 +110,14 @@ public abstract class AbstractWebSocketEndpoint implements WebSocketHandler {
 
         String chargeBoxId = getChargeBoxId(session);
 
-        int sizeBeforeAdd = sessionContextStore.getSize(chargeBoxId);
-
-        sessionContextStore.add(chargeBoxId, session, pingSchedule);
         futureResponseContextStore.addSession(session);
+
+        int sizeBeforeAdd;
+
+        synchronized (sessionContextLock) {
+            sizeBeforeAdd = sessionContextStore.getSize(chargeBoxId);
+            sessionContextStore.add(chargeBoxId, session, pingSchedule);
+        }
 
         // Take into account that there might be multiple connections to a charging station.
         // Send notification only for the change 0 -> 1.
@@ -125,10 +131,15 @@ public abstract class AbstractWebSocketEndpoint implements WebSocketHandler {
         log.warn("[id={}] Connection was closed, status: {}", session.getId(), closeStatus);
 
         String chargeBoxId = getChargeBoxId(session);
-        sessionContextStore.remove(chargeBoxId, session);
+
         futureResponseContextStore.removeSession(session);
 
-        int sizeAfterRemove = sessionContextStore.getSize(chargeBoxId);
+        int sizeAfterRemove;
+
+        synchronized (sessionContextLock) {
+            sessionContextStore.remove(chargeBoxId, session);
+            sizeAfterRemove = sessionContextStore.getSize(chargeBoxId);
+        }
 
         // Take into account that there might be multiple connections to a charging station.
         // Send notification only for the change 1 -> 0.

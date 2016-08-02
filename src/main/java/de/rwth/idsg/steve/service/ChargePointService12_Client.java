@@ -60,23 +60,23 @@ public class ChargePointService12_Client {
     // Create Request Payloads
     // -------------------------------------------------------------------------
 
-    private ChangeAvailabilityRequest prepareChangeAvailability(ChangeAvailabilityParams params) {
+    private static ChangeAvailabilityRequest prepareChangeAvailability(ChangeAvailabilityParams params) {
         return new ChangeAvailabilityRequest()
                 .withConnectorId(params.getConnectorId())
                 .withType(params.getAvailType());
     }
 
-    private ChangeConfigurationRequest prepareChangeConfiguration(ChangeConfigurationParams params) {
+    private static ChangeConfigurationRequest prepareChangeConfiguration(ChangeConfigurationParams params) {
         return new ChangeConfigurationRequest()
                 .withKey(params.getKey())
                 .withValue(params.getValue());
     }
 
-    private ClearCacheRequest prepareClearCache() {
+    private static ClearCacheRequest prepareClearCache() {
         return new ClearCacheRequest();
     }
 
-    private GetDiagnosticsRequest prepareGetDiagnostics(GetDiagnosticsParams params) {
+    private static GetDiagnosticsRequest prepareGetDiagnostics(GetDiagnosticsParams params) {
         return new GetDiagnosticsRequest()
                 .withLocation(params.getLocation())
                 .withRetries(params.getRetries())
@@ -85,28 +85,28 @@ public class ChargePointService12_Client {
                 .withStopTime(toDateTime(params.getStop()));
     }
 
-    private RemoteStartTransactionRequest prepareRemoteStartTransaction(RemoteStartTransactionParams params) {
+    private static RemoteStartTransactionRequest prepareRemoteStartTransaction(RemoteStartTransactionParams params) {
         return new RemoteStartTransactionRequest()
                 .withIdTag(params.getIdTag())
                 .withConnectorId(params.getConnectorId());
     }
 
-    private RemoteStopTransactionRequest prepareRemoteStopTransaction(RemoteStopTransactionParams params) {
+    private static RemoteStopTransactionRequest prepareRemoteStopTransaction(RemoteStopTransactionParams params) {
         return new RemoteStopTransactionRequest()
                 .withTransactionId(params.getTransactionId());
     }
 
-    private ResetRequest prepareReset(ResetParams params) {
+    private static ResetRequest prepareReset(ResetParams params) {
         return new ResetRequest()
                 .withType(params.getResetType());
     }
 
-    private UnlockConnectorRequest prepareUnlockConnector(UnlockConnectorParams params) {
+    private static UnlockConnectorRequest prepareUnlockConnector(UnlockConnectorParams params) {
         return new UnlockConnectorRequest()
                 .withConnectorId(params.getConnectorId());
     }
 
-    private UpdateFirmwareRequest prepareUpdateFirmware(UpdateFirmwareParams params) {
+    private static UpdateFirmwareRequest prepareUpdateFirmware(UpdateFirmwareParams params) {
         return new UpdateFirmwareRequest()
                 .withLocation(params.getLocation())
                 .withRetrieveDate(toDateTime(params.getRetrieve()))
@@ -119,7 +119,7 @@ public class ChargePointService12_Client {
     // -------------------------------------------------------------------------
 
     public int changeAvailability(ChangeAvailabilityParams params) {
-        ChangeAvailabilityRequest req = this.prepareChangeAvailability(params);
+        ChangeAvailabilityRequest req = prepareChangeAvailability(params);
         List<ChargePointSelect> list = params.getChargePointSelectList();
         RequestTask<ChangeAvailabilityRequest> task = new RequestTask<>(VERSION, req, list);
 
@@ -131,7 +131,7 @@ public class ChargePointService12_Client {
     }
 
     public int changeConfiguration(ChangeConfigurationParams params) {
-        ChangeConfigurationRequest req = this.prepareChangeConfiguration(params);
+        ChangeConfigurationRequest req = prepareChangeConfiguration(params);
         List<ChargePointSelect> list = params.getChargePointSelectList();
         RequestTask<ChangeConfigurationRequest> task = new RequestTask<>(VERSION, req, list);
 
@@ -143,7 +143,7 @@ public class ChargePointService12_Client {
     }
 
     public int clearCache(MultipleChargePointSelect params) {
-        ClearCacheRequest req = this.prepareClearCache();
+        ClearCacheRequest req = prepareClearCache();
         List<ChargePointSelect> list = params.getChargePointSelectList();
         RequestTask<ClearCacheRequest> task = new RequestTask<>(VERSION, req, list);
 
@@ -155,7 +155,7 @@ public class ChargePointService12_Client {
     }
 
     public int getDiagnostics(GetDiagnosticsParams params) {
-        GetDiagnosticsRequest req = this.prepareGetDiagnostics(params);
+        GetDiagnosticsRequest req = prepareGetDiagnostics(params);
         List<ChargePointSelect> list = params.getChargePointSelectList();
         RequestTask<GetDiagnosticsRequest> task = new RequestTask<>(VERSION, req, list);
 
@@ -167,7 +167,7 @@ public class ChargePointService12_Client {
     }
 
     public int reset(ResetParams params) {
-        ResetRequest req = this.prepareReset(params);
+        ResetRequest req = prepareReset(params);
         List<ChargePointSelect> list = params.getChargePointSelectList();
         RequestTask<ResetRequest> task = new RequestTask<>(VERSION, req, list);
 
@@ -179,7 +179,7 @@ public class ChargePointService12_Client {
     }
 
     public int updateFirmware(UpdateFirmwareParams params) {
-        UpdateFirmwareRequest req = this.prepareUpdateFirmware(params);
+        UpdateFirmwareRequest req = prepareUpdateFirmware(params);
         List<ChargePointSelect> list = params.getChargePointSelectList();
         RequestTask<UpdateFirmwareRequest> task = new RequestTask<>(VERSION, req, list);
 
@@ -202,7 +202,7 @@ public class ChargePointService12_Client {
     // -------------------------------------------------------------------------
 
     public int remoteStartTransaction(RemoteStartTransactionParams params) {
-        RemoteStartTransactionRequest req = this.prepareRemoteStartTransaction(params);
+        RemoteStartTransactionRequest req = prepareRemoteStartTransaction(params);
         List<ChargePointSelect> list = params.getChargePointSelectList();
         RequestTask<RemoteStartTransactionRequest> task = new RequestTask<>(VERSION, req, list);
         ChargePointSelect c = list.get(0);
@@ -214,7 +214,7 @@ public class ChargePointService12_Client {
     }
 
     public int remoteStopTransaction(RemoteStopTransactionParams params) {
-        RemoteStopTransactionRequest req = this.prepareRemoteStopTransaction(params);
+        RemoteStopTransactionRequest req = prepareRemoteStopTransaction(params);
         List<ChargePointSelect> list = params.getChargePointSelectList();
         RequestTask<RemoteStopTransactionRequest> task = new RequestTask<>(VERSION, req, list);
         ChargePointSelect c = list.get(0);
@@ -226,7 +226,7 @@ public class ChargePointService12_Client {
     }
 
     public int unlockConnector(UnlockConnectorParams params) {
-        UnlockConnectorRequest req = this.prepareUnlockConnector(params);
+        UnlockConnectorRequest req = prepareUnlockConnector(params);
         List<ChargePointSelect> list = params.getChargePointSelectList();
         RequestTask<UnlockConnectorRequest> task = new RequestTask<>(VERSION, req, list);
         ChargePointSelect c = list.get(0);

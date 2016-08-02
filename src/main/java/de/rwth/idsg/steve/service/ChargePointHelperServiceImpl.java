@@ -99,8 +99,8 @@ public class ChargePointHelperServiceImpl implements ChargePointHelperService {
         return chargePointRepository.getChargeBoxIdPkPair(idList);
     }
 
-    private void appendList(Map<String, Deque<SessionContext>> map, List<OcppJsonStatus> returnList,
-                            DateTime now, OcppVersion version, Map<String, Integer> primaryKeyLookup) {
+    private static void appendList(Map<String, Deque<SessionContext>> map, List<OcppJsonStatus> returnList,
+                                   DateTime now, OcppVersion version, Map<String, Integer> primaryKeyLookup) {
 
         for (Map.Entry<String, Deque<SessionContext>> entry : map.entrySet()) {
             String chargeBoxId = entry.getKey();

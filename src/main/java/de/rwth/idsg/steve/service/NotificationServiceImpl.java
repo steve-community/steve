@@ -84,7 +84,7 @@ public class NotificationServiceImpl implements NotificationService {
         return !isEnabled;
     }
 
-    private String addTimestamp(String body) {
+    private static String addTimestamp(String body) {
         String eventTs = "Timestamp of the event: " + DateTime.now().toString();
         String newLine = "\r\n\r\n";
 

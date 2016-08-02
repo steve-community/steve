@@ -25,9 +25,6 @@ public class SteveProdStarter implements ApplicationStarter {
     private JettyServer jettyServer;
     private Thread dotThread;
 
-    /**
-     * TODO: Is this flow correct? Not sure about the error handling. Do the branches cover all situations?
-     */
     @Override
     public void start() throws Exception {
 

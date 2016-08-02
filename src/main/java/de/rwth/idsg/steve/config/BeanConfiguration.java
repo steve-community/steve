@@ -15,7 +15,6 @@ import org.jooq.conf.Settings;
 import org.jooq.impl.DSL;
 import org.jooq.impl.DataSourceConnectionProvider;
 import org.jooq.impl.DefaultConfiguration;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -79,32 +78,6 @@ public class BeanConfiguration extends WebMvcConfigurerAdapter {
         dataSource = new HikariDataSource(config);
     }
 
-    @Bean
-    @Qualifier("jooqConfig")
-    public org.jooq.Configuration jooqConfig() {
-        initDataSource();
-
-        Settings settings = new Settings()
-                // Normally, the records are "attached" to the Configuration that created (i.e. fetch/insert) them.
-                // This means that they hold an internal reference to the same database connection that was used.
-                // The idea behind this is to make CRUD easier for potential subsequent store/refresh/delete
-                // operations. We do not use or need that.
-                .withAttachRecords(false)
-                // To log or not to log the sql queries, that is the question
-                .withExecuteLogging(CONFIG.getDb().isSqlLogging());
-
-        // Configuration for JOOQ
-        return new DefaultConfiguration()
-                .set(SQLDialect.MYSQL)
-                .set(new DataSourceConnectionProvider(dataSource))
-                .set(settings);
-    }
-
-    @Bean
-    public Validator validator() {
-        return new LocalValidatorFactoryBean();
-    }
-
     /**
      * Can we re-use DSLContext as a Spring bean (singleton)? Yes, the Spring tutorial of
      * Jooq also does it that way, but only if we do not change anything about the
@@ -119,7 +92,24 @@ public class BeanConfiguration extends WebMvcConfigurerAdapter {
      */
     @Bean
     public DSLContext dslContext() {
-        return DSL.using(jooqConfig());
+        initDataSource();
+
+        Settings settings = new Settings()
+                // Normally, the records are "attached" to the Configuration that created (i.e. fetch/insert) them.
+                // This means that they hold an internal reference to the same database connection that was used.
+                // The idea behind this is to make CRUD easier for potential subsequent store/refresh/delete
+                // operations. We do not use or need that.
+                .withAttachRecords(false)
+                // To log or not to log the sql queries, that is the question
+                .withExecuteLogging(CONFIG.getDb().isSqlLogging());
+
+        // Configuration for JOOQ
+        org.jooq.Configuration conf = new DefaultConfiguration()
+                .set(SQLDialect.MYSQL)
+                .set(new DataSourceConnectionProvider(dataSource))
+                .set(settings);
+
+        return DSL.using(conf);
     }
 
     @Bean
@@ -129,6 +119,11 @@ public class BeanConfiguration extends WebMvcConfigurerAdapter {
 
         executor = new ScheduledThreadPoolExecutor(5, threadFactory);
         return executor;
+    }
+
+    @Bean
+    public Validator validator() {
+        return new LocalValidatorFactoryBean();
     }
 
     /**

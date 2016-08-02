@@ -42,8 +42,8 @@ public class WebSocketConfiguration implements WebSocketConfigurer {
     @Autowired private ChargePointRepository chargePointRepository;
 
     public static final long IDLE_TIMEOUT = TimeUnit.HOURS.toMillis(2);
-    public static final long PING_INTERVAL = 15; // in minutes
-    private static final int MAX_MSG_SIZE = 8388608; // 8 MB for max message size
+    public static final long PING_INTERVAL = TimeUnit.MINUTES.toMinutes(15);
+    private static final int MAX_MSG_SIZE = 8_388_608; // 8 MB for max message size
 
     // The order affects the choice
     private static final String[] PROTOCOLS = {
@@ -90,7 +90,7 @@ public class WebSocketConfiguration implements WebSocketConfigurer {
     // -------------------------------------------------------------------------
     // We don't need no SockJS fallback. But, nevertheless, Spring initializes
     // a scheduler for it, to be used in the implementation
-    // AbstractWebSocketHandlerRegistration.withSockJS()}. We don't call
+    // AbstractWebSocketHandlerRegistration.withSockJS(). We don't call
     // WebSocketHandlerRegistry.withSockJS() above to add SockJS support,
     // so the scheduler is useless.
     //

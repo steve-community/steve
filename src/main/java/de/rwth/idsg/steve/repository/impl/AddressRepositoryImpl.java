@@ -11,6 +11,8 @@ import org.jooq.Record1;
 import org.jooq.SelectConditionStep;
 import org.springframework.stereotype.Repository;
 
+import javax.annotation.Nullable;
+
 import static jooq.steve.db.tables.Address.ADDRESS;
 
 /**
@@ -22,6 +24,7 @@ import static jooq.steve.db.tables.Address.ADDRESS;
 public class AddressRepositoryImpl implements AddressRepository {
 
     @Override
+    @Nullable
     public AddressRecord get(DSLContext ctx, Integer addressPk) {
         if (addressPk == null) {
             return null;
@@ -45,6 +48,7 @@ public class AddressRepositoryImpl implements AddressRepository {
      *
      */
     @Override
+    @Nullable
     public Integer updateOrInsert(DSLContext ctx, Address address) {
         if (address.isEmpty()) {
             return null;

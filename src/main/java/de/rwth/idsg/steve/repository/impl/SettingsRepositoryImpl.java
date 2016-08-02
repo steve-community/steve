@@ -13,6 +13,7 @@ import org.jooq.exception.DataAccessException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import javax.annotation.Nullable;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.Collection;
@@ -136,6 +137,7 @@ public class SettingsRepositoryImpl implements SettingsRepository {
         return (int) TimeUnit.MINUTES.toSeconds(minutes);
     }
 
+    @Nullable
     private String join(Collection<?> col) {
         if (col == null || col.isEmpty()) {
             return null;

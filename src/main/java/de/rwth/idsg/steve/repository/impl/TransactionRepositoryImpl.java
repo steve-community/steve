@@ -177,7 +177,7 @@ public class TransactionRepositoryImpl implements TransactionRepository {
 
     @SuppressWarnings("unchecked")
     private
-    SelectQuery<Record8<Integer, String, Integer, String, DateTime, String, DateTime, String> >
+    SelectQuery<Record8<Integer, String, Integer, String, DateTime, String, DateTime, String>>
     getInternalCSV(TransactionQueryForm form) {
 
         SelectQuery selectQuery = ctx.selectQuery();

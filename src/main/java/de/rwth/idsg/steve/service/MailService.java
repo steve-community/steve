@@ -46,10 +46,10 @@ public class MailService {
         writeLock.lock();
         try {
             settings = settingsRepository.getMailSettings();
-            session = createSession(settings);
         } finally {
             writeLock.unlock();
         }
+        session = createSession(getSettings());
     }
 
     public MailSettings getSettings() {

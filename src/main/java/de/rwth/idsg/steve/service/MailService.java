@@ -19,6 +19,9 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 import java.util.Properties;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
  * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
@@ -31,22 +34,30 @@ public class MailService {
     @Autowired private SettingsRepository settingsRepository;
     @Autowired private ScheduledExecutorService executorService;
 
-    private static final Object LOCK = new Object();
+    private final ReadWriteLock readWriteLock = new ReentrantReadWriteLock();
+    private final Lock readLock = readWriteLock.readLock();
+    private final Lock writeLock = readWriteLock.writeLock();
 
     private MailSettings settings;
     private Session session;
 
     @PostConstruct
     public void loadSettingsFromDB() {
-        synchronized (LOCK) {
+        writeLock.lock();
+        try {
             settings = settingsRepository.getMailSettings();
             session = createSession(settings);
+        } finally {
+            writeLock.unlock();
         }
     }
 
     public MailSettings getSettings() {
-        synchronized (LOCK) {
+        readLock.lock();
+        try {
             return this.settings;
+        } finally {
+            readLock.unlock();
         }
     }
 

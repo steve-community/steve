@@ -19,7 +19,7 @@ script:
         - mvn -Dmaven.javadoc.skip=true clean package -B -V
         - java -Djava.net.preferIPv4Stack=true -jar target/steve-*.jar &
         - sleep 30
-        - grep -C 20 -e "Exception:|[[:space:]]at" ~/logs/steve.log || exit 0 && exit 255
+        - grep -C 50 -e "Exception: " ~/logs/steve.log && exit 255
         - elinks -dump -no-references http://localhost:8080/steve/manager/signin
         - killall java
 

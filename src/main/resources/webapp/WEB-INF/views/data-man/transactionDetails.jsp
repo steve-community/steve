@@ -1,4 +1,9 @@
 <%@ include file="../00-header.jsp" %>
+<script type="text/javascript">
+    $(document).ready(function() {
+        <%@ include file="../snippets/sortable.js" %>
+    });
+</script>
 <div class="content"><div>
     <center>
         <table id="details" class="cpd">
@@ -18,8 +23,8 @@
     <table class="res">
         <thead>
         <tr>
-            <th>Value Timestamp</th>
-            <th>Value</th>
+            <th data-sort="date">Value Timestamp</th>
+            <th data-sort="int">Value</th>
             <th>Reading Context</th>
             <th>Format</th>
             <th>Measurand</th>
@@ -30,7 +35,7 @@
         <tbody>
         <c:forEach items="${details.values}" var="v">
             <tr>
-                <td>${v.valueTimestamp}</td>
+                <td data-sort-value="${v.valueTimestamp.millis}">${v.valueTimestamp}</td>
                 <td>${v.value}</td>
                 <td>${v.readingContext}</td>
                 <td>${v.format}</td>

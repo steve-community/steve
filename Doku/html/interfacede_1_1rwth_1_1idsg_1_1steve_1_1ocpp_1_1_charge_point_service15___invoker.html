@@ -1,0 +1,686 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=9"/>
+<meta name="generator" content="Doxygen 1.8.6"/>
+<title>SteVe: de.rwth.idsg.steve.ocpp.ChargePointService15_Invoker Schnittstellenreferenz</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="resize.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+<script type="text/javascript">
+  $(document).ready(initResizable);
+  $(window).load(resizeHeight);
+</script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/search.js"></script>
+<script type="text/javascript">
+  $(document).ready(function() { searchBox.OnSelectItem(0); });
+</script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr style="height: 56px;">
+  <td id="projectlogo"><img alt="Logo" src="logo.png"/></td>
+  <td style="padding-left: 0.5em;">
+   <div id="projectname">SteVe
+   &#160;<span id="projectnumber">2.0.4</span>
+   </div>
+   <div id="projectbrief">Steckdosenverwaltung</div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- Erzeugt von Doxygen 1.8.6 -->
+<script type="text/javascript">
+var searchBox = new SearchBox("searchBox", "search",false,'Suchen');
+</script>
+  <div id="navrow1" class="tabs">
+    <ul class="tablist">
+      <li><a href="index.html"><span>Hauptseite</span></a></li>
+      <li><a href="namespaces.html"><span>Pakete</span></a></li>
+      <li class="current"><a href="annotated.html"><span>Klassen</span></a></li>
+      <li><a href="files.html"><span>Dateien</span></a></li>
+      <li>
+        <div id="MSearchBox" class="MSearchBoxInactive">
+        <span class="left">
+          <img id="MSearchSelect" src="search/mag_sel.png"
+               onmouseover="return searchBox.OnSearchSelectShow()"
+               onmouseout="return searchBox.OnSearchSelectHide()"
+               alt=""/>
+          <input type="text" id="MSearchField" value="Suchen" accesskey="S"
+               onfocus="searchBox.OnSearchFieldFocus(true)" 
+               onblur="searchBox.OnSearchFieldFocus(false)" 
+               onkeyup="searchBox.OnSearchFieldChange(event)"/>
+          </span><span class="right">
+            <a id="MSearchClose" href="javascript:searchBox.CloseResultsWindow()"><img id="MSearchCloseImg" border="0" src="search/close.png" alt=""/></a>
+          </span>
+        </div>
+      </li>
+    </ul>
+  </div>
+  <div id="navrow2" class="tabs2">
+    <ul class="tablist">
+      <li><a href="annotated.html"><span>Auflistung&#160;der&#160;Klassen</span></a></li>
+      <li><a href="classes.html"><span>Klassen-Verzeichnis</span></a></li>
+      <li><a href="inherits.html"><span>Klassenhierarchie</span></a></li>
+      <li><a href="functions.html"><span>Klassen-Elemente</span></a></li>
+    </ul>
+  </div>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
+  </div>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
+  </div>
+</div>
+<script type="text/javascript">
+$(document).ready(function(){initNavTree('interfacede_1_1rwth_1_1idsg_1_1steve_1_1ocpp_1_1_charge_point_service15___invoker.html','');});
+</script>
+<div id="doc-content">
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>Alle</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Klassen</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Namensbereiche</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Dateien</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Funktionen</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Variablen</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Aufzählungswerte</a></div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<iframe src="javascript:void(0)" frameborder="0" 
+        name="MSearchResults" id="MSearchResults">
+</iframe>
+</div>
+
+<div class="header">
+  <div class="summary">
+<a href="#pub-methods">Öffentliche Methoden</a> &#124;
+<a href="interfacede_1_1rwth_1_1idsg_1_1steve_1_1ocpp_1_1_charge_point_service15___invoker-members.html">Aufstellung aller Elemente</a>  </div>
+  <div class="headertitle">
+<div class="title">de.rwth.idsg.steve.ocpp.ChargePointService15_Invoker Schnittstellenreferenz</div>  </div>
+</div><!--header-->
+<div class="contents">
+<div class="dynheader">
+Klassendiagramm für de.rwth.idsg.steve.ocpp.ChargePointService15_Invoker:</div>
+<div class="dyncontent">
+<div class="center"><img src="interfacede_1_1rwth_1_1idsg_1_1steve_1_1ocpp_1_1_charge_point_service15___invoker__inherit__graph.png" border="0" usemap="#de_8rwth_8idsg_8steve_8ocpp_8_charge_point_service15___invoker_inherit__map" alt="Inheritance graph"/></div>
+<map name="de_8rwth_8idsg_8steve_8ocpp_8_charge_point_service15___invoker_inherit__map" id="de_8rwth_8idsg_8steve_8ocpp_8_charge_point_service15___invoker_inherit__map">
+<area shape="rect" id="node2" href="classde_1_1rwth_1_1idsg_1_1steve_1_1ocpp_1_1soap_1_1_charge_point_service15___soap_invoker.html" title="de.rwth.idsg.steve.ocpp.soap.\lChargePointService15_SoapInvoker" alt="" coords="256,5,488,46"/><area shape="rect" id="node3" href="classde_1_1rwth_1_1idsg_1_1steve_1_1service_1_1_charge_point_service15___dispatcher.html" title="de.rwth.idsg.steve.service.\lChargePointService15_Dispatcher" alt="" coords="261,70,483,111"/></map>
+<center><span class="legend">[<a target="top" href="graph_legend.html">Legende</a>]</span></center></div>
+<table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
+Öffentliche Methoden</h2></td></tr>
+<tr class="memitem:a5bdbb14ab00a0b6e1dc886d3102bf8a4"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="interfacede_1_1rwth_1_1idsg_1_1steve_1_1ocpp_1_1_charge_point_service15___invoker.html#a5bdbb14ab00a0b6e1dc886d3102bf8a4">reset</a> (<a class="el" href="classde_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1dto_1_1_charge_point_select.html">ChargePointSelect</a> <a class="el" href="get_transaction_ids_8js.html#a02fb69feb56940fd46d72ea6a60e511f">cp</a>, ResetRequest request, OcppResponseHandler&lt; ResetResponse &gt; handler)</td></tr>
+<tr class="separator:a5bdbb14ab00a0b6e1dc886d3102bf8a4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a17e530c1cb0011e7bab9202ab14af3e3"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="interfacede_1_1rwth_1_1idsg_1_1steve_1_1ocpp_1_1_charge_point_service15___invoker.html#a17e530c1cb0011e7bab9202ab14af3e3">clearCache</a> (<a class="el" href="classde_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1dto_1_1_charge_point_select.html">ChargePointSelect</a> <a class="el" href="get_transaction_ids_8js.html#a02fb69feb56940fd46d72ea6a60e511f">cp</a>, ClearCacheRequest request, OcppResponseHandler&lt; ClearCacheResponse &gt; handler)</td></tr>
+<tr class="separator:a17e530c1cb0011e7bab9202ab14af3e3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a31960beedbe91dda756ff55448488571"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="interfacede_1_1rwth_1_1idsg_1_1steve_1_1ocpp_1_1_charge_point_service15___invoker.html#a31960beedbe91dda756ff55448488571">dataTransfer</a> (<a class="el" href="classde_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1dto_1_1_charge_point_select.html">ChargePointSelect</a> <a class="el" href="get_transaction_ids_8js.html#a02fb69feb56940fd46d72ea6a60e511f">cp</a>, DataTransferRequest request, OcppResponseHandler&lt; DataTransferResponse &gt; handler)</td></tr>
+<tr class="separator:a31960beedbe91dda756ff55448488571"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0d6e07d5926073b463a3453dfa8f2a5b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="interfacede_1_1rwth_1_1idsg_1_1steve_1_1ocpp_1_1_charge_point_service15___invoker.html#a0d6e07d5926073b463a3453dfa8f2a5b">updateFirmware</a> (<a class="el" href="classde_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1dto_1_1_charge_point_select.html">ChargePointSelect</a> <a class="el" href="get_transaction_ids_8js.html#a02fb69feb56940fd46d72ea6a60e511f">cp</a>, UpdateFirmwareRequest request, OcppResponseHandler&lt; UpdateFirmwareResponse &gt; handler)</td></tr>
+<tr class="separator:a0d6e07d5926073b463a3453dfa8f2a5b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afdb853e250b6930a583b4729cfcf5a6d"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="interfacede_1_1rwth_1_1idsg_1_1steve_1_1ocpp_1_1_charge_point_service15___invoker.html#afdb853e250b6930a583b4729cfcf5a6d">getDiagnostics</a> (<a class="el" href="classde_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1dto_1_1_charge_point_select.html">ChargePointSelect</a> <a class="el" href="get_transaction_ids_8js.html#a02fb69feb56940fd46d72ea6a60e511f">cp</a>, GetDiagnosticsRequest request, OcppResponseHandler&lt; GetDiagnosticsResponse &gt; handler)</td></tr>
+<tr class="separator:afdb853e250b6930a583b4729cfcf5a6d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6f71f961bb8b2d2eb726f01abe1df11e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="interfacede_1_1rwth_1_1idsg_1_1steve_1_1ocpp_1_1_charge_point_service15___invoker.html#a6f71f961bb8b2d2eb726f01abe1df11e">unlockConnector</a> (<a class="el" href="classde_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1dto_1_1_charge_point_select.html">ChargePointSelect</a> <a class="el" href="get_transaction_ids_8js.html#a02fb69feb56940fd46d72ea6a60e511f">cp</a>, UnlockConnectorRequest request, OcppResponseHandler&lt; UnlockConnectorResponse &gt; handler)</td></tr>
+<tr class="separator:a6f71f961bb8b2d2eb726f01abe1df11e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac3933a5c48685fec0e8f430d8166e399"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="interfacede_1_1rwth_1_1idsg_1_1steve_1_1ocpp_1_1_charge_point_service15___invoker.html#ac3933a5c48685fec0e8f430d8166e399">getConfiguration</a> (<a class="el" href="classde_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1dto_1_1_charge_point_select.html">ChargePointSelect</a> <a class="el" href="get_transaction_ids_8js.html#a02fb69feb56940fd46d72ea6a60e511f">cp</a>, GetConfigurationRequest request, OcppResponseHandler&lt; GetConfigurationResponse &gt; handler)</td></tr>
+<tr class="separator:ac3933a5c48685fec0e8f430d8166e399"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:acdb5b5a3e719113e9a14b04d534acc81"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="interfacede_1_1rwth_1_1idsg_1_1steve_1_1ocpp_1_1_charge_point_service15___invoker.html#acdb5b5a3e719113e9a14b04d534acc81">changeConfiguration</a> (<a class="el" href="classde_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1dto_1_1_charge_point_select.html">ChargePointSelect</a> <a class="el" href="get_transaction_ids_8js.html#a02fb69feb56940fd46d72ea6a60e511f">cp</a>, ChangeConfigurationRequest request, OcppResponseHandler&lt; ChangeConfigurationResponse &gt; handler)</td></tr>
+<tr class="separator:acdb5b5a3e719113e9a14b04d534acc81"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a046a7c3b2026eacaf54bcaf4c9c3bb64"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="interfacede_1_1rwth_1_1idsg_1_1steve_1_1ocpp_1_1_charge_point_service15___invoker.html#a046a7c3b2026eacaf54bcaf4c9c3bb64">changeAvailability</a> (<a class="el" href="classde_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1dto_1_1_charge_point_select.html">ChargePointSelect</a> <a class="el" href="get_transaction_ids_8js.html#a02fb69feb56940fd46d72ea6a60e511f">cp</a>, ChangeAvailabilityRequest request, OcppResponseHandler&lt; ChangeAvailabilityResponse &gt; handler)</td></tr>
+<tr class="separator:a046a7c3b2026eacaf54bcaf4c9c3bb64"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4f3567acd778d0e38c9e2ef4a91fae36"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="interfacede_1_1rwth_1_1idsg_1_1steve_1_1ocpp_1_1_charge_point_service15___invoker.html#a4f3567acd778d0e38c9e2ef4a91fae36">getLocalListVersion</a> (<a class="el" href="classde_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1dto_1_1_charge_point_select.html">ChargePointSelect</a> <a class="el" href="get_transaction_ids_8js.html#a02fb69feb56940fd46d72ea6a60e511f">cp</a>, GetLocalListVersionRequest request, OcppResponseHandler&lt; GetLocalListVersionResponse &gt; handler)</td></tr>
+<tr class="separator:a4f3567acd778d0e38c9e2ef4a91fae36"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a59c7b1a466080caac288d850743286aa"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="interfacede_1_1rwth_1_1idsg_1_1steve_1_1ocpp_1_1_charge_point_service15___invoker.html#a59c7b1a466080caac288d850743286aa">sendLocalList</a> (<a class="el" href="classde_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1dto_1_1_charge_point_select.html">ChargePointSelect</a> <a class="el" href="get_transaction_ids_8js.html#a02fb69feb56940fd46d72ea6a60e511f">cp</a>, SendLocalListRequest request, OcppResponseHandler&lt; SendLocalListResponse &gt; handler)</td></tr>
+<tr class="separator:a59c7b1a466080caac288d850743286aa"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab70a0f730ee43fe4123291d211e31271"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="interfacede_1_1rwth_1_1idsg_1_1steve_1_1ocpp_1_1_charge_point_service15___invoker.html#ab70a0f730ee43fe4123291d211e31271">remoteStartTransaction</a> (<a class="el" href="classde_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1dto_1_1_charge_point_select.html">ChargePointSelect</a> <a class="el" href="get_transaction_ids_8js.html#a02fb69feb56940fd46d72ea6a60e511f">cp</a>, RemoteStartTransactionRequest request, OcppResponseHandler&lt; RemoteStartTransactionResponse &gt; handler)</td></tr>
+<tr class="separator:ab70a0f730ee43fe4123291d211e31271"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a50d840b72b8705214b4c5d9e235be133"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="interfacede_1_1rwth_1_1idsg_1_1steve_1_1ocpp_1_1_charge_point_service15___invoker.html#a50d840b72b8705214b4c5d9e235be133">remoteStopTransaction</a> (<a class="el" href="classde_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1dto_1_1_charge_point_select.html">ChargePointSelect</a> <a class="el" href="get_transaction_ids_8js.html#a02fb69feb56940fd46d72ea6a60e511f">cp</a>, RemoteStopTransactionRequest request, OcppResponseHandler&lt; RemoteStopTransactionResponse &gt; handler)</td></tr>
+<tr class="separator:a50d840b72b8705214b4c5d9e235be133"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad550c0db63a3276b7103a6344bd18c22"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="interfacede_1_1rwth_1_1idsg_1_1steve_1_1ocpp_1_1_charge_point_service15___invoker.html#ad550c0db63a3276b7103a6344bd18c22">reserveNow</a> (<a class="el" href="classde_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1dto_1_1_charge_point_select.html">ChargePointSelect</a> <a class="el" href="get_transaction_ids_8js.html#a02fb69feb56940fd46d72ea6a60e511f">cp</a>, ReserveNowRequest request, OcppResponseHandler&lt; ReserveNowResponse &gt; handler)</td></tr>
+<tr class="separator:ad550c0db63a3276b7103a6344bd18c22"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab430420546dd1a3147d04b619ef088e9"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="interfacede_1_1rwth_1_1idsg_1_1steve_1_1ocpp_1_1_charge_point_service15___invoker.html#ab430420546dd1a3147d04b619ef088e9">cancelReservation</a> (<a class="el" href="classde_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1dto_1_1_charge_point_select.html">ChargePointSelect</a> <a class="el" href="get_transaction_ids_8js.html#a02fb69feb56940fd46d72ea6a60e511f">cp</a>, CancelReservationRequest request, OcppResponseHandler&lt; CancelReservationResponse &gt; handler)</td></tr>
+<tr class="separator:ab430420546dd1a3147d04b619ef088e9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table>
+<a name="details" id="details"></a><h2 class="groupheader">Ausführliche Beschreibung</h2>
+<div class="textblock"><dl class="section author"><dt>Autor</dt><dd>Sevket Goekay <a href="#" onclick="location.href='mai'+'lto:'+'goe'+'ka'+'y@d'+'bi'+'s.r'+'wt'+'h-a'+'ac'+'hen'+'.d'+'e'; return false;">goeka<span style="display: none;">.nosp@m.</span>y@db<span style="display: none;">.nosp@m.</span>is.rw<span style="display: none;">.nosp@m.</span>th-a<span style="display: none;">.nosp@m.</span>achen<span style="display: none;">.nosp@m.</span>.de</a> </dd></dl>
+<dl class="section since"><dt>Seit</dt><dd>20.03.2015 </dd></dl>
+</div><h2 class="groupheader">Dokumentation der Elementfunktionen</h2>
+<a class="anchor" id="ab430420546dd1a3147d04b619ef088e9"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void de.rwth.idsg.steve.ocpp.ChargePointService15_Invoker.cancelReservation </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classde_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1dto_1_1_charge_point_select.html">ChargePointSelect</a>&#160;</td>
+          <td class="paramname"><em>cp</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">CancelReservationRequest&#160;</td>
+          <td class="paramname"><em>request</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">OcppResponseHandler&lt; CancelReservationResponse &gt;&#160;</td>
+          <td class="paramname"><em>handler</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Implementiert in <a class="el" href="classde_1_1rwth_1_1idsg_1_1steve_1_1service_1_1_charge_point_service15___dispatcher.html#a95e09e473419ae5ea15cffbcc6ff0701">de.rwth.idsg.steve.service.ChargePointService15_Dispatcher</a> und <a class="el" href="classde_1_1rwth_1_1idsg_1_1steve_1_1ocpp_1_1soap_1_1_charge_point_service15___soap_invoker.html#abea544028d13891f5f5d369ad04bb87d">de.rwth.idsg.steve.ocpp.soap.ChargePointService15_SoapInvoker</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a046a7c3b2026eacaf54bcaf4c9c3bb64"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void de.rwth.idsg.steve.ocpp.ChargePointService15_Invoker.changeAvailability </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classde_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1dto_1_1_charge_point_select.html">ChargePointSelect</a>&#160;</td>
+          <td class="paramname"><em>cp</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">ChangeAvailabilityRequest&#160;</td>
+          <td class="paramname"><em>request</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">OcppResponseHandler&lt; ChangeAvailabilityResponse &gt;&#160;</td>
+          <td class="paramname"><em>handler</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Implementiert in <a class="el" href="classde_1_1rwth_1_1idsg_1_1steve_1_1service_1_1_charge_point_service15___dispatcher.html#a757761c6cecec3d0b4119015055fe761">de.rwth.idsg.steve.service.ChargePointService15_Dispatcher</a> und <a class="el" href="classde_1_1rwth_1_1idsg_1_1steve_1_1ocpp_1_1soap_1_1_charge_point_service15___soap_invoker.html#a8e5d3a5c9a04e9774cbf8b9bf3d81e6f">de.rwth.idsg.steve.ocpp.soap.ChargePointService15_SoapInvoker</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="acdb5b5a3e719113e9a14b04d534acc81"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void de.rwth.idsg.steve.ocpp.ChargePointService15_Invoker.changeConfiguration </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classde_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1dto_1_1_charge_point_select.html">ChargePointSelect</a>&#160;</td>
+          <td class="paramname"><em>cp</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">ChangeConfigurationRequest&#160;</td>
+          <td class="paramname"><em>request</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">OcppResponseHandler&lt; ChangeConfigurationResponse &gt;&#160;</td>
+          <td class="paramname"><em>handler</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Implementiert in <a class="el" href="classde_1_1rwth_1_1idsg_1_1steve_1_1service_1_1_charge_point_service15___dispatcher.html#a143b2a7621bfe7b82f6916e1aa1d5430">de.rwth.idsg.steve.service.ChargePointService15_Dispatcher</a> und <a class="el" href="classde_1_1rwth_1_1idsg_1_1steve_1_1ocpp_1_1soap_1_1_charge_point_service15___soap_invoker.html#a1da6ac781c9faf40e5f16d26d72fb0bf">de.rwth.idsg.steve.ocpp.soap.ChargePointService15_SoapInvoker</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a17e530c1cb0011e7bab9202ab14af3e3"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void de.rwth.idsg.steve.ocpp.ChargePointService15_Invoker.clearCache </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classde_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1dto_1_1_charge_point_select.html">ChargePointSelect</a>&#160;</td>
+          <td class="paramname"><em>cp</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">ClearCacheRequest&#160;</td>
+          <td class="paramname"><em>request</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">OcppResponseHandler&lt; ClearCacheResponse &gt;&#160;</td>
+          <td class="paramname"><em>handler</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Implementiert in <a class="el" href="classde_1_1rwth_1_1idsg_1_1steve_1_1ocpp_1_1soap_1_1_charge_point_service15___soap_invoker.html#a810f623187b415dede06a93b0300b7b2">de.rwth.idsg.steve.ocpp.soap.ChargePointService15_SoapInvoker</a> und <a class="el" href="classde_1_1rwth_1_1idsg_1_1steve_1_1service_1_1_charge_point_service15___dispatcher.html#a6f155c069d902889e2ba5aa90f7281c4">de.rwth.idsg.steve.service.ChargePointService15_Dispatcher</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a31960beedbe91dda756ff55448488571"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void de.rwth.idsg.steve.ocpp.ChargePointService15_Invoker.dataTransfer </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classde_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1dto_1_1_charge_point_select.html">ChargePointSelect</a>&#160;</td>
+          <td class="paramname"><em>cp</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">DataTransferRequest&#160;</td>
+          <td class="paramname"><em>request</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">OcppResponseHandler&lt; DataTransferResponse &gt;&#160;</td>
+          <td class="paramname"><em>handler</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Implementiert in <a class="el" href="classde_1_1rwth_1_1idsg_1_1steve_1_1ocpp_1_1soap_1_1_charge_point_service15___soap_invoker.html#ac25055c0195980560db70b8c720dfe5d">de.rwth.idsg.steve.ocpp.soap.ChargePointService15_SoapInvoker</a> und <a class="el" href="classde_1_1rwth_1_1idsg_1_1steve_1_1service_1_1_charge_point_service15___dispatcher.html#abc0c4a75b164066cc8be0b2e8681a8b7">de.rwth.idsg.steve.service.ChargePointService15_Dispatcher</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="ac3933a5c48685fec0e8f430d8166e399"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void de.rwth.idsg.steve.ocpp.ChargePointService15_Invoker.getConfiguration </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classde_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1dto_1_1_charge_point_select.html">ChargePointSelect</a>&#160;</td>
+          <td class="paramname"><em>cp</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">GetConfigurationRequest&#160;</td>
+          <td class="paramname"><em>request</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">OcppResponseHandler&lt; GetConfigurationResponse &gt;&#160;</td>
+          <td class="paramname"><em>handler</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Implementiert in <a class="el" href="classde_1_1rwth_1_1idsg_1_1steve_1_1service_1_1_charge_point_service15___dispatcher.html#acf2f05efe0d11ae4a694396ff6311524">de.rwth.idsg.steve.service.ChargePointService15_Dispatcher</a> und <a class="el" href="classde_1_1rwth_1_1idsg_1_1steve_1_1ocpp_1_1soap_1_1_charge_point_service15___soap_invoker.html#a006d420e0756623c68c01eb75fc32e8c">de.rwth.idsg.steve.ocpp.soap.ChargePointService15_SoapInvoker</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="afdb853e250b6930a583b4729cfcf5a6d"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void de.rwth.idsg.steve.ocpp.ChargePointService15_Invoker.getDiagnostics </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classde_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1dto_1_1_charge_point_select.html">ChargePointSelect</a>&#160;</td>
+          <td class="paramname"><em>cp</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">GetDiagnosticsRequest&#160;</td>
+          <td class="paramname"><em>request</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">OcppResponseHandler&lt; GetDiagnosticsResponse &gt;&#160;</td>
+          <td class="paramname"><em>handler</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Implementiert in <a class="el" href="classde_1_1rwth_1_1idsg_1_1steve_1_1service_1_1_charge_point_service15___dispatcher.html#a33ff8d7a94169e8083f45980b22a4c4b">de.rwth.idsg.steve.service.ChargePointService15_Dispatcher</a> und <a class="el" href="classde_1_1rwth_1_1idsg_1_1steve_1_1ocpp_1_1soap_1_1_charge_point_service15___soap_invoker.html#a1aec8e9f6af94d96ac08ec99fb11a0b8">de.rwth.idsg.steve.ocpp.soap.ChargePointService15_SoapInvoker</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a4f3567acd778d0e38c9e2ef4a91fae36"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void de.rwth.idsg.steve.ocpp.ChargePointService15_Invoker.getLocalListVersion </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classde_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1dto_1_1_charge_point_select.html">ChargePointSelect</a>&#160;</td>
+          <td class="paramname"><em>cp</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">GetLocalListVersionRequest&#160;</td>
+          <td class="paramname"><em>request</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">OcppResponseHandler&lt; GetLocalListVersionResponse &gt;&#160;</td>
+          <td class="paramname"><em>handler</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Implementiert in <a class="el" href="classde_1_1rwth_1_1idsg_1_1steve_1_1service_1_1_charge_point_service15___dispatcher.html#a2da40d949bc9f0c53681e4e2ac62d2b3">de.rwth.idsg.steve.service.ChargePointService15_Dispatcher</a> und <a class="el" href="classde_1_1rwth_1_1idsg_1_1steve_1_1ocpp_1_1soap_1_1_charge_point_service15___soap_invoker.html#a73f9493312a541bc4d7ecb667eee2e11">de.rwth.idsg.steve.ocpp.soap.ChargePointService15_SoapInvoker</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="ab70a0f730ee43fe4123291d211e31271"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void de.rwth.idsg.steve.ocpp.ChargePointService15_Invoker.remoteStartTransaction </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classde_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1dto_1_1_charge_point_select.html">ChargePointSelect</a>&#160;</td>
+          <td class="paramname"><em>cp</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">RemoteStartTransactionRequest&#160;</td>
+          <td class="paramname"><em>request</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">OcppResponseHandler&lt; RemoteStartTransactionResponse &gt;&#160;</td>
+          <td class="paramname"><em>handler</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Implementiert in <a class="el" href="classde_1_1rwth_1_1idsg_1_1steve_1_1service_1_1_charge_point_service15___dispatcher.html#a5667bf41f0a6c3e677322377b16dc0a0">de.rwth.idsg.steve.service.ChargePointService15_Dispatcher</a> und <a class="el" href="classde_1_1rwth_1_1idsg_1_1steve_1_1ocpp_1_1soap_1_1_charge_point_service15___soap_invoker.html#a4f30d3d25a5c89d5a9303c055f1449f7">de.rwth.idsg.steve.ocpp.soap.ChargePointService15_SoapInvoker</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a50d840b72b8705214b4c5d9e235be133"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void de.rwth.idsg.steve.ocpp.ChargePointService15_Invoker.remoteStopTransaction </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classde_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1dto_1_1_charge_point_select.html">ChargePointSelect</a>&#160;</td>
+          <td class="paramname"><em>cp</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">RemoteStopTransactionRequest&#160;</td>
+          <td class="paramname"><em>request</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">OcppResponseHandler&lt; RemoteStopTransactionResponse &gt;&#160;</td>
+          <td class="paramname"><em>handler</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Implementiert in <a class="el" href="classde_1_1rwth_1_1idsg_1_1steve_1_1service_1_1_charge_point_service15___dispatcher.html#a200f857a13ee5fdea3d81fd0634e6dd2">de.rwth.idsg.steve.service.ChargePointService15_Dispatcher</a> und <a class="el" href="classde_1_1rwth_1_1idsg_1_1steve_1_1ocpp_1_1soap_1_1_charge_point_service15___soap_invoker.html#a8d6b588fb8f2c3bf21daebb80913c15c">de.rwth.idsg.steve.ocpp.soap.ChargePointService15_SoapInvoker</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="ad550c0db63a3276b7103a6344bd18c22"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void de.rwth.idsg.steve.ocpp.ChargePointService15_Invoker.reserveNow </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classde_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1dto_1_1_charge_point_select.html">ChargePointSelect</a>&#160;</td>
+          <td class="paramname"><em>cp</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">ReserveNowRequest&#160;</td>
+          <td class="paramname"><em>request</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">OcppResponseHandler&lt; ReserveNowResponse &gt;&#160;</td>
+          <td class="paramname"><em>handler</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Implementiert in <a class="el" href="classde_1_1rwth_1_1idsg_1_1steve_1_1service_1_1_charge_point_service15___dispatcher.html#a3dc3e949c70d5148b1543bf4fed11579">de.rwth.idsg.steve.service.ChargePointService15_Dispatcher</a> und <a class="el" href="classde_1_1rwth_1_1idsg_1_1steve_1_1ocpp_1_1soap_1_1_charge_point_service15___soap_invoker.html#a83963dacc9043e8c184b72efd59c87f5">de.rwth.idsg.steve.ocpp.soap.ChargePointService15_SoapInvoker</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a5bdbb14ab00a0b6e1dc886d3102bf8a4"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void de.rwth.idsg.steve.ocpp.ChargePointService15_Invoker.reset </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classde_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1dto_1_1_charge_point_select.html">ChargePointSelect</a>&#160;</td>
+          <td class="paramname"><em>cp</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">ResetRequest&#160;</td>
+          <td class="paramname"><em>request</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">OcppResponseHandler&lt; ResetResponse &gt;&#160;</td>
+          <td class="paramname"><em>handler</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Implementiert in <a class="el" href="classde_1_1rwth_1_1idsg_1_1steve_1_1ocpp_1_1soap_1_1_charge_point_service15___soap_invoker.html#a097800abebdd804ea6b9eda05cbe4c57">de.rwth.idsg.steve.ocpp.soap.ChargePointService15_SoapInvoker</a> und <a class="el" href="classde_1_1rwth_1_1idsg_1_1steve_1_1service_1_1_charge_point_service15___dispatcher.html#a56e95a56a8ba0f08b114a5f4e28570b4">de.rwth.idsg.steve.service.ChargePointService15_Dispatcher</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a59c7b1a466080caac288d850743286aa"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void de.rwth.idsg.steve.ocpp.ChargePointService15_Invoker.sendLocalList </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classde_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1dto_1_1_charge_point_select.html">ChargePointSelect</a>&#160;</td>
+          <td class="paramname"><em>cp</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">SendLocalListRequest&#160;</td>
+          <td class="paramname"><em>request</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">OcppResponseHandler&lt; SendLocalListResponse &gt;&#160;</td>
+          <td class="paramname"><em>handler</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Implementiert in <a class="el" href="classde_1_1rwth_1_1idsg_1_1steve_1_1service_1_1_charge_point_service15___dispatcher.html#a63e988e2f5e0779491444a1c4e828ad9">de.rwth.idsg.steve.service.ChargePointService15_Dispatcher</a> und <a class="el" href="classde_1_1rwth_1_1idsg_1_1steve_1_1ocpp_1_1soap_1_1_charge_point_service15___soap_invoker.html#af9ff2655ec703253c6f3cfe632c51d95">de.rwth.idsg.steve.ocpp.soap.ChargePointService15_SoapInvoker</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a6f71f961bb8b2d2eb726f01abe1df11e"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void de.rwth.idsg.steve.ocpp.ChargePointService15_Invoker.unlockConnector </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classde_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1dto_1_1_charge_point_select.html">ChargePointSelect</a>&#160;</td>
+          <td class="paramname"><em>cp</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">UnlockConnectorRequest&#160;</td>
+          <td class="paramname"><em>request</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">OcppResponseHandler&lt; UnlockConnectorResponse &gt;&#160;</td>
+          <td class="paramname"><em>handler</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Implementiert in <a class="el" href="classde_1_1rwth_1_1idsg_1_1steve_1_1service_1_1_charge_point_service15___dispatcher.html#afba4670249205e193bd7e2f069d9d405">de.rwth.idsg.steve.service.ChargePointService15_Dispatcher</a> und <a class="el" href="classde_1_1rwth_1_1idsg_1_1steve_1_1ocpp_1_1soap_1_1_charge_point_service15___soap_invoker.html#af29c600b4f55e5ab8538181528b97aa3">de.rwth.idsg.steve.ocpp.soap.ChargePointService15_SoapInvoker</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a0d6e07d5926073b463a3453dfa8f2a5b"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void de.rwth.idsg.steve.ocpp.ChargePointService15_Invoker.updateFirmware </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classde_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1dto_1_1_charge_point_select.html">ChargePointSelect</a>&#160;</td>
+          <td class="paramname"><em>cp</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">UpdateFirmwareRequest&#160;</td>
+          <td class="paramname"><em>request</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">OcppResponseHandler&lt; UpdateFirmwareResponse &gt;&#160;</td>
+          <td class="paramname"><em>handler</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Implementiert in <a class="el" href="classde_1_1rwth_1_1idsg_1_1steve_1_1ocpp_1_1soap_1_1_charge_point_service15___soap_invoker.html#a7a80cacd445a2d5da5c26cad7cfc0741">de.rwth.idsg.steve.ocpp.soap.ChargePointService15_SoapInvoker</a> und <a class="el" href="classde_1_1rwth_1_1idsg_1_1steve_1_1service_1_1_charge_point_service15___dispatcher.html#a795a1aa4bb5733b36d280862e910d5fd">de.rwth.idsg.steve.service.ChargePointService15_Dispatcher</a>.</p>
+
+</div>
+</div>
+<hr/>Die Dokumentation für diese Schnittstelle wurde erzeugt aufgrund der Datei:<ul>
+<li>src/main/java/de/rwth/idsg/steve/ocpp/<a class="el" href="_charge_point_service15___invoker_8java.html">ChargePointService15_Invoker.java</a></li>
+</ul>
+</div><!-- contents -->
+</div><!-- doc-content -->
+<!-- start footer part -->
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="navelem"><a class="el" href="namespacede.html">de</a></li><li class="navelem"><a class="el" href="namespacede_1_1rwth.html">rwth</a></li><li class="navelem"><a class="el" href="namespacede_1_1rwth_1_1idsg.html">idsg</a></li><li class="navelem"><a class="el" href="namespacede_1_1rwth_1_1idsg_1_1steve.html">steve</a></li><li class="navelem"><a class="el" href="namespacede_1_1rwth_1_1idsg_1_1steve_1_1ocpp.html">ocpp</a></li><li class="navelem"><a class="el" href="interfacede_1_1rwth_1_1idsg_1_1steve_1_1ocpp_1_1_charge_point_service15___invoker.html">ChargePointService15_Invoker</a></li>
+    <li class="footer">Erzeugt am Mit Dez 16 2015 13:57:34 für SteVe von
+    <a href="http://www.doxygen.org/index.html">
+    <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.6 </li>
+  </ul>
+</div>
+</body>
+</html>

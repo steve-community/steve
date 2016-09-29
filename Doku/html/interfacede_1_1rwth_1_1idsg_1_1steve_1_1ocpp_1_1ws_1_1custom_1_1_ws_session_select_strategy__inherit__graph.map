@@ -1,0 +1,4 @@
+<map id="de.rwth.idsg.steve.ocpp.ws.custom.WsSessionSelectStrategy" name="de.rwth.idsg.steve.ocpp.ws.custom.WsSessionSelectStrategy">
+<area shape="rect" id="node2" href="$classde_1_1rwth_1_1idsg_1_1steve_1_1ocpp_1_1ws_1_1custom_1_1_always_last_strategy.html" title="de.rwth.idsg.steve.ocpp.ws.custom.\lAlwaysLastStrategy" alt="" coords="289,5,522,46"/>
+<area shape="rect" id="node3" href="$classde_1_1rwth_1_1idsg_1_1steve_1_1ocpp_1_1ws_1_1custom_1_1_round_robin_strategy.html" title="de.rwth.idsg.steve.ocpp.ws.custom.\lRoundRobinStrategy" alt="" coords="289,70,522,111"/>
+</map>

@@ -1,0 +1,4 @@
+<map id="de.rwth.idsg.steve.utils.DateTimeUtils.getCurrentTimestamp" name="de.rwth.idsg.steve.utils.DateTimeUtils.getCurrentTimestamp">
+<area shape="rect" id="node2" href="$classde_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1_ocpp_server_repository_impl.html#aa1da9ce277523f4182448b8bd15a2a5b" title="de.rwth.idsg.steve.repository.\lOcppServerRepositoryImpl.updateChargebox\lFirmwareStatus" alt="" coords="291,5,576,61"/>
+<area shape="rect" id="node3" href="$classde_1_1rwth_1_1idsg_1_1steve_1_1repository_1_1_ocpp_server_repository_impl.html#aeec83e6dad09d54cb3b5cbf83f3f5fe0" title="de.rwth.idsg.steve.repository.\lOcppServerRepositoryImpl.updateChargebox\lDiagnosticsStatus" alt="" coords="291,85,576,141"/>
+</map>

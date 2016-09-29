@@ -1,0 +1,168 @@
+\hypertarget{classde_1_1rwth_1_1idsg_1_1steve_1_1ocpp_1_1ws_1_1_abstract_web_socket_endpoint}{\section{de.\-rwth.\-idsg.\-steve.\-ocpp.\-ws.\-Abstract\-Web\-Socket\-Endpoint Klassenreferenz}
+\label{classde_1_1rwth_1_1idsg_1_1steve_1_1ocpp_1_1ws_1_1_abstract_web_socket_endpoint}\index{de.\-rwth.\-idsg.\-steve.\-ocpp.\-ws.\-Abstract\-Web\-Socket\-Endpoint@{de.\-rwth.\-idsg.\-steve.\-ocpp.\-ws.\-Abstract\-Web\-Socket\-Endpoint}}
+}
+
+
+Klassendiagramm für de.\-rwth.\-idsg.\-steve.\-ocpp.\-ws.\-Abstract\-Web\-Socket\-Endpoint\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classde_1_1rwth_1_1idsg_1_1steve_1_1ocpp_1_1ws_1_1_abstract_web_socket_endpoint__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Zusammengehörigkeiten von de.\-rwth.\-idsg.\-steve.\-ocpp.\-ws.\-Abstract\-Web\-Socket\-Endpoint\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classde_1_1rwth_1_1idsg_1_1steve_1_1ocpp_1_1ws_1_1_abstract_web_socket_endpoint__coll__graph}
+\end{center}
+\end{figure}
+\subsection*{Öffentliche Methoden}
+\begin{DoxyCompactItemize}
+\item 
+void \hyperlink{classde_1_1rwth_1_1idsg_1_1steve_1_1ocpp_1_1ws_1_1_abstract_web_socket_endpoint_aef8362bd31120ca281b31b0e929b57d0}{init} ()
+\item 
+void \hyperlink{classde_1_1rwth_1_1idsg_1_1steve_1_1ocpp_1_1ws_1_1_abstract_web_socket_endpoint_af08f9d5fea93c492fa8a6e97f8131ccd}{handle\-Message} (Web\-Socket\-Session session, Web\-Socket\-Message$<$?$>$ message)  throws Exception 
+\item 
+void \hyperlink{classde_1_1rwth_1_1idsg_1_1steve_1_1ocpp_1_1ws_1_1_abstract_web_socket_endpoint_adc20166385a1af5646716aa0f6414f85}{after\-Connection\-Established} (Web\-Socket\-Session session)  throws Exception 
+\item 
+void \hyperlink{classde_1_1rwth_1_1idsg_1_1steve_1_1ocpp_1_1ws_1_1_abstract_web_socket_endpoint_aef2d9df6496b49e2981c3253760b2d69}{after\-Connection\-Closed} (Web\-Socket\-Session session, Close\-Status close\-Status)  throws Exception 
+\item 
+void \hyperlink{classde_1_1rwth_1_1idsg_1_1steve_1_1ocpp_1_1ws_1_1_abstract_web_socket_endpoint_a80a5c510b03fa4ce60c6642b9ad2c47d}{handle\-Transport\-Error} (Web\-Socket\-Session session, Throwable throwable)  throws Exception 
+\item 
+boolean \hyperlink{classde_1_1rwth_1_1idsg_1_1steve_1_1ocpp_1_1ws_1_1_abstract_web_socket_endpoint_ababd333016df11a6eb243cf87c27e329}{supports\-Partial\-Messages} ()
+\item 
+List$<$ String $>$ \hyperlink{classde_1_1rwth_1_1idsg_1_1steve_1_1ocpp_1_1ws_1_1_abstract_web_socket_endpoint_a8368ec501a410320c3725880bf79829e}{get\-Charge\-Box\-Id\-List} ()
+\item 
+int \hyperlink{classde_1_1rwth_1_1idsg_1_1steve_1_1ocpp_1_1ws_1_1_abstract_web_socket_endpoint_a863df404cd75c4804d6366076bef8b0a}{get\-Number\-Of\-Charge\-Boxes} ()
+\item 
+Map$<$ String, Deque\\*
+$<$ \hyperlink{classde_1_1rwth_1_1idsg_1_1steve_1_1ocpp_1_1ws_1_1data_1_1_session_context}{Session\-Context} $>$ $>$ \hyperlink{classde_1_1rwth_1_1idsg_1_1steve_1_1ocpp_1_1ws_1_1_abstract_web_socket_endpoint_aef16fcbbf0c31be46115c81fc0738837}{get\-A\-Copy} ()
+\item 
+Web\-Socket\-Session \hyperlink{classde_1_1rwth_1_1idsg_1_1steve_1_1ocpp_1_1ws_1_1_abstract_web_socket_endpoint_afa20f380a780758a21d3bfa495987dfd}{get\-Session} (String charge\-Box\-Id)
+\end{DoxyCompactItemize}
+\subsection*{Statische öffentliche Attribute}
+\begin{DoxyCompactItemize}
+\item 
+static final String \hyperlink{classde_1_1rwth_1_1idsg_1_1steve_1_1ocpp_1_1ws_1_1_abstract_web_socket_endpoint_a4ebea42decdb880f9f3a8a33e73cf4e7}{C\-H\-A\-R\-G\-E\-B\-O\-X\-\_\-\-I\-D\-\_\-\-K\-E\-Y} = \char`\"{}C\-H\-A\-R\-G\-E\-B\-O\-X\-\_\-\-I\-D\-\_\-\-K\-E\-Y\char`\"{}
+\end{DoxyCompactItemize}
+\subsection*{Geschützte Attribute}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{interfacede_1_1rwth_1_1idsg_1_1steve_1_1ocpp_1_1ws_1_1pipeline_1_1_pipeline}{Pipeline} \hyperlink{classde_1_1rwth_1_1idsg_1_1steve_1_1ocpp_1_1ws_1_1_abstract_web_socket_endpoint_ad702702e9550fea4384b0b0e8dbf05ff}{pipeline}
+\end{DoxyCompactItemize}
+
+
+\subsection{Ausführliche Beschreibung}
+\begin{DoxyAuthor}{Autor}
+Sevket Goekay \href{mailto:goekay@dbis.rwth-aachen.de}{\tt goekay@dbis.\-rwth-\/aachen.\-de} 
+\end{DoxyAuthor}
+\begin{DoxySince}{Seit}
+17.\-03.\-2015 
+\end{DoxySince}
+
+
+\subsection{Dokumentation der Elementfunktionen}
+\hypertarget{classde_1_1rwth_1_1idsg_1_1steve_1_1ocpp_1_1ws_1_1_abstract_web_socket_endpoint_aef2d9df6496b49e2981c3253760b2d69}{\index{de\-::rwth\-::idsg\-::steve\-::ocpp\-::ws\-::\-Abstract\-Web\-Socket\-Endpoint@{de\-::rwth\-::idsg\-::steve\-::ocpp\-::ws\-::\-Abstract\-Web\-Socket\-Endpoint}!after\-Connection\-Closed@{after\-Connection\-Closed}}
+\index{after\-Connection\-Closed@{after\-Connection\-Closed}!de::rwth::idsg::steve::ocpp::ws::AbstractWebSocketEndpoint@{de\-::rwth\-::idsg\-::steve\-::ocpp\-::ws\-::\-Abstract\-Web\-Socket\-Endpoint}}
+\subsubsection[{after\-Connection\-Closed}]{\setlength{\rightskip}{0pt plus 5cm}void de.\-rwth.\-idsg.\-steve.\-ocpp.\-ws.\-Abstract\-Web\-Socket\-Endpoint.\-after\-Connection\-Closed (
+\begin{DoxyParamCaption}
+\item[{Web\-Socket\-Session}]{session, }
+\item[{Close\-Status}]{close\-Status}
+\end{DoxyParamCaption}
+) throws Exception}}\label{classde_1_1rwth_1_1idsg_1_1steve_1_1ocpp_1_1ws_1_1_abstract_web_socket_endpoint_aef2d9df6496b49e2981c3253760b2d69}
+\hypertarget{classde_1_1rwth_1_1idsg_1_1steve_1_1ocpp_1_1ws_1_1_abstract_web_socket_endpoint_adc20166385a1af5646716aa0f6414f85}{\index{de\-::rwth\-::idsg\-::steve\-::ocpp\-::ws\-::\-Abstract\-Web\-Socket\-Endpoint@{de\-::rwth\-::idsg\-::steve\-::ocpp\-::ws\-::\-Abstract\-Web\-Socket\-Endpoint}!after\-Connection\-Established@{after\-Connection\-Established}}
+\index{after\-Connection\-Established@{after\-Connection\-Established}!de::rwth::idsg::steve::ocpp::ws::AbstractWebSocketEndpoint@{de\-::rwth\-::idsg\-::steve\-::ocpp\-::ws\-::\-Abstract\-Web\-Socket\-Endpoint}}
+\subsubsection[{after\-Connection\-Established}]{\setlength{\rightskip}{0pt plus 5cm}void de.\-rwth.\-idsg.\-steve.\-ocpp.\-ws.\-Abstract\-Web\-Socket\-Endpoint.\-after\-Connection\-Established (
+\begin{DoxyParamCaption}
+\item[{Web\-Socket\-Session}]{session}
+\end{DoxyParamCaption}
+) throws Exception}}\label{classde_1_1rwth_1_1idsg_1_1steve_1_1ocpp_1_1ws_1_1_abstract_web_socket_endpoint_adc20166385a1af5646716aa0f6414f85}
+\hypertarget{classde_1_1rwth_1_1idsg_1_1steve_1_1ocpp_1_1ws_1_1_abstract_web_socket_endpoint_aef16fcbbf0c31be46115c81fc0738837}{\index{de\-::rwth\-::idsg\-::steve\-::ocpp\-::ws\-::\-Abstract\-Web\-Socket\-Endpoint@{de\-::rwth\-::idsg\-::steve\-::ocpp\-::ws\-::\-Abstract\-Web\-Socket\-Endpoint}!get\-A\-Copy@{get\-A\-Copy}}
+\index{get\-A\-Copy@{get\-A\-Copy}!de::rwth::idsg::steve::ocpp::ws::AbstractWebSocketEndpoint@{de\-::rwth\-::idsg\-::steve\-::ocpp\-::ws\-::\-Abstract\-Web\-Socket\-Endpoint}}
+\subsubsection[{get\-A\-Copy}]{\setlength{\rightskip}{0pt plus 5cm}Map$<$String, Deque$<${\bf Session\-Context}$>$ $>$ de.\-rwth.\-idsg.\-steve.\-ocpp.\-ws.\-Abstract\-Web\-Socket\-Endpoint.\-get\-A\-Copy (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{classde_1_1rwth_1_1idsg_1_1steve_1_1ocpp_1_1ws_1_1_abstract_web_socket_endpoint_aef16fcbbf0c31be46115c81fc0738837}
+\hypertarget{classde_1_1rwth_1_1idsg_1_1steve_1_1ocpp_1_1ws_1_1_abstract_web_socket_endpoint_a8368ec501a410320c3725880bf79829e}{\index{de\-::rwth\-::idsg\-::steve\-::ocpp\-::ws\-::\-Abstract\-Web\-Socket\-Endpoint@{de\-::rwth\-::idsg\-::steve\-::ocpp\-::ws\-::\-Abstract\-Web\-Socket\-Endpoint}!get\-Charge\-Box\-Id\-List@{get\-Charge\-Box\-Id\-List}}
+\index{get\-Charge\-Box\-Id\-List@{get\-Charge\-Box\-Id\-List}!de::rwth::idsg::steve::ocpp::ws::AbstractWebSocketEndpoint@{de\-::rwth\-::idsg\-::steve\-::ocpp\-::ws\-::\-Abstract\-Web\-Socket\-Endpoint}}
+\subsubsection[{get\-Charge\-Box\-Id\-List}]{\setlength{\rightskip}{0pt plus 5cm}List$<$String$>$ de.\-rwth.\-idsg.\-steve.\-ocpp.\-ws.\-Abstract\-Web\-Socket\-Endpoint.\-get\-Charge\-Box\-Id\-List (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{classde_1_1rwth_1_1idsg_1_1steve_1_1ocpp_1_1ws_1_1_abstract_web_socket_endpoint_a8368ec501a410320c3725880bf79829e}
+
+
+Hier ist ein Graph der zeigt, wo diese Funktion aufgerufen wird\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classde_1_1rwth_1_1idsg_1_1steve_1_1ocpp_1_1ws_1_1_abstract_web_socket_endpoint_a8368ec501a410320c3725880bf79829e_icgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classde_1_1rwth_1_1idsg_1_1steve_1_1ocpp_1_1ws_1_1_abstract_web_socket_endpoint_a863df404cd75c4804d6366076bef8b0a}{\index{de\-::rwth\-::idsg\-::steve\-::ocpp\-::ws\-::\-Abstract\-Web\-Socket\-Endpoint@{de\-::rwth\-::idsg\-::steve\-::ocpp\-::ws\-::\-Abstract\-Web\-Socket\-Endpoint}!get\-Number\-Of\-Charge\-Boxes@{get\-Number\-Of\-Charge\-Boxes}}
+\index{get\-Number\-Of\-Charge\-Boxes@{get\-Number\-Of\-Charge\-Boxes}!de::rwth::idsg::steve::ocpp::ws::AbstractWebSocketEndpoint@{de\-::rwth\-::idsg\-::steve\-::ocpp\-::ws\-::\-Abstract\-Web\-Socket\-Endpoint}}
+\subsubsection[{get\-Number\-Of\-Charge\-Boxes}]{\setlength{\rightskip}{0pt plus 5cm}int de.\-rwth.\-idsg.\-steve.\-ocpp.\-ws.\-Abstract\-Web\-Socket\-Endpoint.\-get\-Number\-Of\-Charge\-Boxes (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{classde_1_1rwth_1_1idsg_1_1steve_1_1ocpp_1_1ws_1_1_abstract_web_socket_endpoint_a863df404cd75c4804d6366076bef8b0a}
+\hypertarget{classde_1_1rwth_1_1idsg_1_1steve_1_1ocpp_1_1ws_1_1_abstract_web_socket_endpoint_afa20f380a780758a21d3bfa495987dfd}{\index{de\-::rwth\-::idsg\-::steve\-::ocpp\-::ws\-::\-Abstract\-Web\-Socket\-Endpoint@{de\-::rwth\-::idsg\-::steve\-::ocpp\-::ws\-::\-Abstract\-Web\-Socket\-Endpoint}!get\-Session@{get\-Session}}
+\index{get\-Session@{get\-Session}!de::rwth::idsg::steve::ocpp::ws::AbstractWebSocketEndpoint@{de\-::rwth\-::idsg\-::steve\-::ocpp\-::ws\-::\-Abstract\-Web\-Socket\-Endpoint}}
+\subsubsection[{get\-Session}]{\setlength{\rightskip}{0pt plus 5cm}Web\-Socket\-Session de.\-rwth.\-idsg.\-steve.\-ocpp.\-ws.\-Abstract\-Web\-Socket\-Endpoint.\-get\-Session (
+\begin{DoxyParamCaption}
+\item[{String}]{charge\-Box\-Id}
+\end{DoxyParamCaption}
+)}}\label{classde_1_1rwth_1_1idsg_1_1steve_1_1ocpp_1_1ws_1_1_abstract_web_socket_endpoint_afa20f380a780758a21d3bfa495987dfd}
+\hypertarget{classde_1_1rwth_1_1idsg_1_1steve_1_1ocpp_1_1ws_1_1_abstract_web_socket_endpoint_af08f9d5fea93c492fa8a6e97f8131ccd}{\index{de\-::rwth\-::idsg\-::steve\-::ocpp\-::ws\-::\-Abstract\-Web\-Socket\-Endpoint@{de\-::rwth\-::idsg\-::steve\-::ocpp\-::ws\-::\-Abstract\-Web\-Socket\-Endpoint}!handle\-Message@{handle\-Message}}
+\index{handle\-Message@{handle\-Message}!de::rwth::idsg::steve::ocpp::ws::AbstractWebSocketEndpoint@{de\-::rwth\-::idsg\-::steve\-::ocpp\-::ws\-::\-Abstract\-Web\-Socket\-Endpoint}}
+\subsubsection[{handle\-Message}]{\setlength{\rightskip}{0pt plus 5cm}void de.\-rwth.\-idsg.\-steve.\-ocpp.\-ws.\-Abstract\-Web\-Socket\-Endpoint.\-handle\-Message (
+\begin{DoxyParamCaption}
+\item[{Web\-Socket\-Session}]{session, }
+\item[{Web\-Socket\-Message$<$?$>$}]{message}
+\end{DoxyParamCaption}
+) throws Exception}}\label{classde_1_1rwth_1_1idsg_1_1steve_1_1ocpp_1_1ws_1_1_abstract_web_socket_endpoint_af08f9d5fea93c492fa8a6e97f8131ccd}
+\hypertarget{classde_1_1rwth_1_1idsg_1_1steve_1_1ocpp_1_1ws_1_1_abstract_web_socket_endpoint_a80a5c510b03fa4ce60c6642b9ad2c47d}{\index{de\-::rwth\-::idsg\-::steve\-::ocpp\-::ws\-::\-Abstract\-Web\-Socket\-Endpoint@{de\-::rwth\-::idsg\-::steve\-::ocpp\-::ws\-::\-Abstract\-Web\-Socket\-Endpoint}!handle\-Transport\-Error@{handle\-Transport\-Error}}
+\index{handle\-Transport\-Error@{handle\-Transport\-Error}!de::rwth::idsg::steve::ocpp::ws::AbstractWebSocketEndpoint@{de\-::rwth\-::idsg\-::steve\-::ocpp\-::ws\-::\-Abstract\-Web\-Socket\-Endpoint}}
+\subsubsection[{handle\-Transport\-Error}]{\setlength{\rightskip}{0pt plus 5cm}void de.\-rwth.\-idsg.\-steve.\-ocpp.\-ws.\-Abstract\-Web\-Socket\-Endpoint.\-handle\-Transport\-Error (
+\begin{DoxyParamCaption}
+\item[{Web\-Socket\-Session}]{session, }
+\item[{Throwable}]{throwable}
+\end{DoxyParamCaption}
+) throws Exception}}\label{classde_1_1rwth_1_1idsg_1_1steve_1_1ocpp_1_1ws_1_1_abstract_web_socket_endpoint_a80a5c510b03fa4ce60c6642b9ad2c47d}
+\hypertarget{classde_1_1rwth_1_1idsg_1_1steve_1_1ocpp_1_1ws_1_1_abstract_web_socket_endpoint_aef8362bd31120ca281b31b0e929b57d0}{\index{de\-::rwth\-::idsg\-::steve\-::ocpp\-::ws\-::\-Abstract\-Web\-Socket\-Endpoint@{de\-::rwth\-::idsg\-::steve\-::ocpp\-::ws\-::\-Abstract\-Web\-Socket\-Endpoint}!init@{init}}
+\index{init@{init}!de::rwth::idsg::steve::ocpp::ws::AbstractWebSocketEndpoint@{de\-::rwth\-::idsg\-::steve\-::ocpp\-::ws\-::\-Abstract\-Web\-Socket\-Endpoint}}
+\subsubsection[{init}]{\setlength{\rightskip}{0pt plus 5cm}void de.\-rwth.\-idsg.\-steve.\-ocpp.\-ws.\-Abstract\-Web\-Socket\-Endpoint.\-init (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{classde_1_1rwth_1_1idsg_1_1steve_1_1ocpp_1_1ws_1_1_abstract_web_socket_endpoint_aef8362bd31120ca281b31b0e929b57d0}
+\hypertarget{classde_1_1rwth_1_1idsg_1_1steve_1_1ocpp_1_1ws_1_1_abstract_web_socket_endpoint_ababd333016df11a6eb243cf87c27e329}{\index{de\-::rwth\-::idsg\-::steve\-::ocpp\-::ws\-::\-Abstract\-Web\-Socket\-Endpoint@{de\-::rwth\-::idsg\-::steve\-::ocpp\-::ws\-::\-Abstract\-Web\-Socket\-Endpoint}!supports\-Partial\-Messages@{supports\-Partial\-Messages}}
+\index{supports\-Partial\-Messages@{supports\-Partial\-Messages}!de::rwth::idsg::steve::ocpp::ws::AbstractWebSocketEndpoint@{de\-::rwth\-::idsg\-::steve\-::ocpp\-::ws\-::\-Abstract\-Web\-Socket\-Endpoint}}
+\subsubsection[{supports\-Partial\-Messages}]{\setlength{\rightskip}{0pt plus 5cm}boolean de.\-rwth.\-idsg.\-steve.\-ocpp.\-ws.\-Abstract\-Web\-Socket\-Endpoint.\-supports\-Partial\-Messages (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{classde_1_1rwth_1_1idsg_1_1steve_1_1ocpp_1_1ws_1_1_abstract_web_socket_endpoint_ababd333016df11a6eb243cf87c27e329}
+
+
+\subsection{Dokumentation der Datenelemente}
+\hypertarget{classde_1_1rwth_1_1idsg_1_1steve_1_1ocpp_1_1ws_1_1_abstract_web_socket_endpoint_a4ebea42decdb880f9f3a8a33e73cf4e7}{\index{de\-::rwth\-::idsg\-::steve\-::ocpp\-::ws\-::\-Abstract\-Web\-Socket\-Endpoint@{de\-::rwth\-::idsg\-::steve\-::ocpp\-::ws\-::\-Abstract\-Web\-Socket\-Endpoint}!C\-H\-A\-R\-G\-E\-B\-O\-X\-\_\-\-I\-D\-\_\-\-K\-E\-Y@{C\-H\-A\-R\-G\-E\-B\-O\-X\-\_\-\-I\-D\-\_\-\-K\-E\-Y}}
+\index{C\-H\-A\-R\-G\-E\-B\-O\-X\-\_\-\-I\-D\-\_\-\-K\-E\-Y@{C\-H\-A\-R\-G\-E\-B\-O\-X\-\_\-\-I\-D\-\_\-\-K\-E\-Y}!de::rwth::idsg::steve::ocpp::ws::AbstractWebSocketEndpoint@{de\-::rwth\-::idsg\-::steve\-::ocpp\-::ws\-::\-Abstract\-Web\-Socket\-Endpoint}}
+\subsubsection[{C\-H\-A\-R\-G\-E\-B\-O\-X\-\_\-\-I\-D\-\_\-\-K\-E\-Y}]{\setlength{\rightskip}{0pt plus 5cm}final String de.\-rwth.\-idsg.\-steve.\-ocpp.\-ws.\-Abstract\-Web\-Socket\-Endpoint.\-C\-H\-A\-R\-G\-E\-B\-O\-X\-\_\-\-I\-D\-\_\-\-K\-E\-Y = \char`\"{}C\-H\-A\-R\-G\-E\-B\-O\-X\-\_\-\-I\-D\-\_\-\-K\-E\-Y\char`\"{}\hspace{0.3cm}{\ttfamily [static]}}}\label{classde_1_1rwth_1_1idsg_1_1steve_1_1ocpp_1_1ws_1_1_abstract_web_socket_endpoint_a4ebea42decdb880f9f3a8a33e73cf4e7}
+\hypertarget{classde_1_1rwth_1_1idsg_1_1steve_1_1ocpp_1_1ws_1_1_abstract_web_socket_endpoint_ad702702e9550fea4384b0b0e8dbf05ff}{\index{de\-::rwth\-::idsg\-::steve\-::ocpp\-::ws\-::\-Abstract\-Web\-Socket\-Endpoint@{de\-::rwth\-::idsg\-::steve\-::ocpp\-::ws\-::\-Abstract\-Web\-Socket\-Endpoint}!pipeline@{pipeline}}
+\index{pipeline@{pipeline}!de::rwth::idsg::steve::ocpp::ws::AbstractWebSocketEndpoint@{de\-::rwth\-::idsg\-::steve\-::ocpp\-::ws\-::\-Abstract\-Web\-Socket\-Endpoint}}
+\subsubsection[{pipeline}]{\setlength{\rightskip}{0pt plus 5cm}{\bf Pipeline} de.\-rwth.\-idsg.\-steve.\-ocpp.\-ws.\-Abstract\-Web\-Socket\-Endpoint.\-pipeline\hspace{0.3cm}{\ttfamily [protected]}}}\label{classde_1_1rwth_1_1idsg_1_1steve_1_1ocpp_1_1ws_1_1_abstract_web_socket_endpoint_ad702702e9550fea4384b0b0e8dbf05ff}
+
+
+Die Dokumentation für diese Klasse wurde erzeugt aufgrund der Datei\-:\begin{DoxyCompactItemize}
+\item 
+src/main/java/de/rwth/idsg/steve/ocpp/ws/\hyperlink{_abstract_web_socket_endpoint_8java}{Abstract\-Web\-Socket\-Endpoint.\-java}\end{DoxyCompactItemize}

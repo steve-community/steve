@@ -1,0 +1,968 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=9"/>
+<meta name="generator" content="Doxygen 1.8.6"/>
+<title>SteVe: de.rwth.idsg.steve.ocpp.soap.CentralSystemService12_SoapServer Klassenreferenz</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="resize.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+<script type="text/javascript">
+  $(document).ready(initResizable);
+  $(window).load(resizeHeight);
+</script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/search.js"></script>
+<script type="text/javascript">
+  $(document).ready(function() { searchBox.OnSelectItem(0); });
+</script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr style="height: 56px;">
+  <td id="projectlogo"><img alt="Logo" src="logo.png"/></td>
+  <td style="padding-left: 0.5em;">
+   <div id="projectname">SteVe
+   &#160;<span id="projectnumber">2.0.4</span>
+   </div>
+   <div id="projectbrief">Steckdosenverwaltung</div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- Erzeugt von Doxygen 1.8.6 -->
+<script type="text/javascript">
+var searchBox = new SearchBox("searchBox", "search",false,'Suchen');
+</script>
+  <div id="navrow1" class="tabs">
+    <ul class="tablist">
+      <li><a href="index.html"><span>Hauptseite</span></a></li>
+      <li><a href="namespaces.html"><span>Pakete</span></a></li>
+      <li class="current"><a href="annotated.html"><span>Klassen</span></a></li>
+      <li><a href="files.html"><span>Dateien</span></a></li>
+      <li>
+        <div id="MSearchBox" class="MSearchBoxInactive">
+        <span class="left">
+          <img id="MSearchSelect" src="search/mag_sel.png"
+               onmouseover="return searchBox.OnSearchSelectShow()"
+               onmouseout="return searchBox.OnSearchSelectHide()"
+               alt=""/>
+          <input type="text" id="MSearchField" value="Suchen" accesskey="S"
+               onfocus="searchBox.OnSearchFieldFocus(true)" 
+               onblur="searchBox.OnSearchFieldFocus(false)" 
+               onkeyup="searchBox.OnSearchFieldChange(event)"/>
+          </span><span class="right">
+            <a id="MSearchClose" href="javascript:searchBox.CloseResultsWindow()"><img id="MSearchCloseImg" border="0" src="search/close.png" alt=""/></a>
+          </span>
+        </div>
+      </li>
+    </ul>
+  </div>
+  <div id="navrow2" class="tabs2">
+    <ul class="tablist">
+      <li><a href="annotated.html"><span>Auflistung&#160;der&#160;Klassen</span></a></li>
+      <li><a href="classes.html"><span>Klassen-Verzeichnis</span></a></li>
+      <li><a href="inherits.html"><span>Klassenhierarchie</span></a></li>
+      <li><a href="functions.html"><span>Klassen-Elemente</span></a></li>
+    </ul>
+  </div>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
+  </div>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
+  </div>
+</div>
+<script type="text/javascript">
+$(document).ready(function(){initNavTree('classde_1_1rwth_1_1idsg_1_1steve_1_1ocpp_1_1soap_1_1_central_system_service12___soap_server.html','');});
+</script>
+<div id="doc-content">
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>Alle</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Klassen</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Namensbereiche</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Dateien</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Funktionen</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Variablen</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Aufzählungswerte</a></div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<iframe src="javascript:void(0)" frameborder="0" 
+        name="MSearchResults" id="MSearchResults">
+</iframe>
+</div>
+
+<div class="header">
+  <div class="summary">
+<a href="#pub-methods">Öffentliche Methoden</a> &#124;
+<a href="classde_1_1rwth_1_1idsg_1_1steve_1_1ocpp_1_1soap_1_1_central_system_service12___soap_server-members.html">Aufstellung aller Elemente</a>  </div>
+  <div class="headertitle">
+<div class="title">de.rwth.idsg.steve.ocpp.soap.CentralSystemService12_SoapServer Klassenreferenz</div>  </div>
+</div><!--header-->
+<div class="contents">
+<div class="dynheader">
+Klassendiagramm für de.rwth.idsg.steve.ocpp.soap.CentralSystemService12_SoapServer:</div>
+<div class="dyncontent">
+<div class="center"><img src="classde_1_1rwth_1_1idsg_1_1steve_1_1ocpp_1_1soap_1_1_central_system_service12___soap_server__inherit__graph.png" border="0" usemap="#de_8rwth_8idsg_8steve_8ocpp_8soap_8_central_system_service12___soap_server_inherit__map" alt="Inheritance graph"/></div>
+<map name="de_8rwth_8idsg_8steve_8ocpp_8soap_8_central_system_service12___soap_server_inherit__map" id="de_8rwth_8idsg_8steve_8ocpp_8soap_8_central_system_service12___soap_server_inherit__map">
+</map>
+<center><span class="legend">[<a target="top" href="graph_legend.html">Legende</a>]</span></center></div>
+<div class="dynheader">
+Zusammengehörigkeiten von de.rwth.idsg.steve.ocpp.soap.CentralSystemService12_SoapServer:</div>
+<div class="dyncontent">
+<div class="center"><img src="classde_1_1rwth_1_1idsg_1_1steve_1_1ocpp_1_1soap_1_1_central_system_service12___soap_server__coll__graph.png" border="0" usemap="#de_8rwth_8idsg_8steve_8ocpp_8soap_8_central_system_service12___soap_server_coll__map" alt="Collaboration graph"/></div>
+<map name="de_8rwth_8idsg_8steve_8ocpp_8soap_8_central_system_service12___soap_server_coll__map" id="de_8rwth_8idsg_8steve_8ocpp_8soap_8_central_system_service12___soap_server_coll__map">
+</map>
+<center><span class="legend">[<a target="top" href="graph_legend.html">Legende</a>]</span></center></div>
+<table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
+Öffentliche Methoden</h2></td></tr>
+<tr class="memitem:a8868c4202a11c5e037e027cf888d9a6d"><td class="memItemLeft" align="right" valign="top">BootNotificationResponse&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classde_1_1rwth_1_1idsg_1_1steve_1_1ocpp_1_1soap_1_1_central_system_service12___soap_server.html#a8868c4202a11c5e037e027cf888d9a6d">bootNotification</a> (BootNotificationRequest parameters, String chargeBoxIdentity)</td></tr>
+<tr class="separator:a8868c4202a11c5e037e027cf888d9a6d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af25e1106361138e2aac99d5d17d7e34d"><td class="memItemLeft" align="right" valign="top">FirmwareStatusNotificationResponse&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classde_1_1rwth_1_1idsg_1_1steve_1_1ocpp_1_1soap_1_1_central_system_service12___soap_server.html#af25e1106361138e2aac99d5d17d7e34d">firmwareStatusNotification</a> (FirmwareStatusNotificationRequest parameters, String chargeBoxIdentity)</td></tr>
+<tr class="separator:af25e1106361138e2aac99d5d17d7e34d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1aa28896be7a93171ac1ce02f9102de3"><td class="memItemLeft" align="right" valign="top">StatusNotificationResponse&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classde_1_1rwth_1_1idsg_1_1steve_1_1ocpp_1_1soap_1_1_central_system_service12___soap_server.html#a1aa28896be7a93171ac1ce02f9102de3">statusNotification</a> (StatusNotificationRequest parameters, String chargeBoxIdentity)</td></tr>
+<tr class="separator:a1aa28896be7a93171ac1ce02f9102de3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a79ee3a7402a8600396c3c3756a66d93b"><td class="memItemLeft" align="right" valign="top">MeterValuesResponse&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classde_1_1rwth_1_1idsg_1_1steve_1_1ocpp_1_1soap_1_1_central_system_service12___soap_server.html#a79ee3a7402a8600396c3c3756a66d93b">meterValues</a> (MeterValuesRequest parameters, String chargeBoxIdentity)</td></tr>
+<tr class="separator:a79ee3a7402a8600396c3c3756a66d93b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4ea6f4e5412ba378a9ff8c13a74fc789"><td class="memItemLeft" align="right" valign="top">DiagnosticsStatusNotificationResponse&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classde_1_1rwth_1_1idsg_1_1steve_1_1ocpp_1_1soap_1_1_central_system_service12___soap_server.html#a4ea6f4e5412ba378a9ff8c13a74fc789">diagnosticsStatusNotification</a> (DiagnosticsStatusNotificationRequest parameters, String chargeBoxIdentity)</td></tr>
+<tr class="separator:a4ea6f4e5412ba378a9ff8c13a74fc789"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aaab901ffdf38c2b084ab9e0f6fd9981b"><td class="memItemLeft" align="right" valign="top">StartTransactionResponse&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classde_1_1rwth_1_1idsg_1_1steve_1_1ocpp_1_1soap_1_1_central_system_service12___soap_server.html#aaab901ffdf38c2b084ab9e0f6fd9981b">startTransaction</a> (StartTransactionRequest parameters, String chargeBoxIdentity)</td></tr>
+<tr class="separator:aaab901ffdf38c2b084ab9e0f6fd9981b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5530dbecf1921ebae73c136a59f630d3"><td class="memItemLeft" align="right" valign="top">StopTransactionResponse&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classde_1_1rwth_1_1idsg_1_1steve_1_1ocpp_1_1soap_1_1_central_system_service12___soap_server.html#a5530dbecf1921ebae73c136a59f630d3">stopTransaction</a> (StopTransactionRequest parameters, String chargeBoxIdentity)</td></tr>
+<tr class="separator:a5530dbecf1921ebae73c136a59f630d3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2217bc63cfc14a6f413aac32f5776a2e"><td class="memItemLeft" align="right" valign="top">HeartbeatResponse&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classde_1_1rwth_1_1idsg_1_1steve_1_1ocpp_1_1soap_1_1_central_system_service12___soap_server.html#a2217bc63cfc14a6f413aac32f5776a2e">heartbeat</a> (HeartbeatRequest parameters, String chargeBoxIdentity)</td></tr>
+<tr class="separator:a2217bc63cfc14a6f413aac32f5776a2e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4df12c49aa3af8096172315620f75d17"><td class="memItemLeft" align="right" valign="top">AuthorizeResponse&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classde_1_1rwth_1_1idsg_1_1steve_1_1ocpp_1_1soap_1_1_central_system_service12___soap_server.html#a4df12c49aa3af8096172315620f75d17">authorize</a> (AuthorizeRequest parameters, String chargeBoxIdentity)</td></tr>
+<tr class="separator:a4df12c49aa3af8096172315620f75d17"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a70ee4ea3b6704da5b35edb7d310dc70f"><td class="memItemLeft" align="right" valign="top">Response<br class="typebreak"/>
+&lt; BootNotificationResponse &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classde_1_1rwth_1_1idsg_1_1steve_1_1ocpp_1_1soap_1_1_central_system_service12___soap_server.html#a70ee4ea3b6704da5b35edb7d310dc70f">bootNotificationAsync</a> (BootNotificationRequest parameters, String chargeBoxIdentity)</td></tr>
+<tr class="separator:a70ee4ea3b6704da5b35edb7d310dc70f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a46d588eca89e181d557753e0f094f059"><td class="memItemLeft" align="right" valign="top">Future&lt;?&gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classde_1_1rwth_1_1idsg_1_1steve_1_1ocpp_1_1soap_1_1_central_system_service12___soap_server.html#a46d588eca89e181d557753e0f094f059">bootNotificationAsync</a> (BootNotificationRequest parameters, String chargeBoxIdentity, AsyncHandler&lt; BootNotificationResponse &gt; asyncHandler)</td></tr>
+<tr class="separator:a46d588eca89e181d557753e0f094f059"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3530a1724bea19fe12907ea213d66edb"><td class="memItemLeft" align="right" valign="top">Response<br class="typebreak"/>
+&lt; FirmwareStatusNotificationResponse &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classde_1_1rwth_1_1idsg_1_1steve_1_1ocpp_1_1soap_1_1_central_system_service12___soap_server.html#a3530a1724bea19fe12907ea213d66edb">firmwareStatusNotificationAsync</a> (FirmwareStatusNotificationRequest parameters, String chargeBoxIdentity)</td></tr>
+<tr class="separator:a3530a1724bea19fe12907ea213d66edb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac9af19a6af32c1ad99659c70672c4d09"><td class="memItemLeft" align="right" valign="top">Future&lt;?&gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classde_1_1rwth_1_1idsg_1_1steve_1_1ocpp_1_1soap_1_1_central_system_service12___soap_server.html#ac9af19a6af32c1ad99659c70672c4d09">firmwareStatusNotificationAsync</a> (FirmwareStatusNotificationRequest parameters, String chargeBoxIdentity, AsyncHandler&lt; FirmwareStatusNotificationResponse &gt; asyncHandler)</td></tr>
+<tr class="separator:ac9af19a6af32c1ad99659c70672c4d09"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a22b5641bef20c6319cf69341d5ae3582"><td class="memItemLeft" align="right" valign="top">Response&lt; MeterValuesResponse &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classde_1_1rwth_1_1idsg_1_1steve_1_1ocpp_1_1soap_1_1_central_system_service12___soap_server.html#a22b5641bef20c6319cf69341d5ae3582">meterValuesAsync</a> (MeterValuesRequest parameters, String chargeBoxIdentity)</td></tr>
+<tr class="separator:a22b5641bef20c6319cf69341d5ae3582"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aca250a53f1df0c625da15b473d19676c"><td class="memItemLeft" align="right" valign="top">Future&lt;?&gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classde_1_1rwth_1_1idsg_1_1steve_1_1ocpp_1_1soap_1_1_central_system_service12___soap_server.html#aca250a53f1df0c625da15b473d19676c">meterValuesAsync</a> (MeterValuesRequest parameters, String chargeBoxIdentity, AsyncHandler&lt; MeterValuesResponse &gt; asyncHandler)</td></tr>
+<tr class="separator:aca250a53f1df0c625da15b473d19676c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5d47f30fcaa8cc3d4bf01401979204ab"><td class="memItemLeft" align="right" valign="top">Response<br class="typebreak"/>
+&lt; DiagnosticsStatusNotificationResponse &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classde_1_1rwth_1_1idsg_1_1steve_1_1ocpp_1_1soap_1_1_central_system_service12___soap_server.html#a5d47f30fcaa8cc3d4bf01401979204ab">diagnosticsStatusNotificationAsync</a> (DiagnosticsStatusNotificationRequest parameters, String chargeBoxIdentity)</td></tr>
+<tr class="separator:a5d47f30fcaa8cc3d4bf01401979204ab"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa0eab89a8d855dfead2864e84405eb81"><td class="memItemLeft" align="right" valign="top">Future&lt;?&gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classde_1_1rwth_1_1idsg_1_1steve_1_1ocpp_1_1soap_1_1_central_system_service12___soap_server.html#aa0eab89a8d855dfead2864e84405eb81">diagnosticsStatusNotificationAsync</a> (DiagnosticsStatusNotificationRequest parameters, String chargeBoxIdentity, AsyncHandler&lt; DiagnosticsStatusNotificationResponse &gt; asyncHandler)</td></tr>
+<tr class="separator:aa0eab89a8d855dfead2864e84405eb81"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2b6c990a4cb7b6721e5d2ea894f4d080"><td class="memItemLeft" align="right" valign="top">Response<br class="typebreak"/>
+&lt; StatusNotificationResponse &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classde_1_1rwth_1_1idsg_1_1steve_1_1ocpp_1_1soap_1_1_central_system_service12___soap_server.html#a2b6c990a4cb7b6721e5d2ea894f4d080">statusNotificationAsync</a> (StatusNotificationRequest parameters, String chargeBoxIdentity)</td></tr>
+<tr class="separator:a2b6c990a4cb7b6721e5d2ea894f4d080"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2fd311dcc151cea8dc5ef73b47467f0c"><td class="memItemLeft" align="right" valign="top">Future&lt;?&gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classde_1_1rwth_1_1idsg_1_1steve_1_1ocpp_1_1soap_1_1_central_system_service12___soap_server.html#a2fd311dcc151cea8dc5ef73b47467f0c">statusNotificationAsync</a> (StatusNotificationRequest parameters, String chargeBoxIdentity, AsyncHandler&lt; StatusNotificationResponse &gt; asyncHandler)</td></tr>
+<tr class="separator:a2fd311dcc151cea8dc5ef73b47467f0c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a47c89e5c2a769646d99add8a00884970"><td class="memItemLeft" align="right" valign="top">Response&lt; StopTransactionResponse &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classde_1_1rwth_1_1idsg_1_1steve_1_1ocpp_1_1soap_1_1_central_system_service12___soap_server.html#a47c89e5c2a769646d99add8a00884970">stopTransactionAsync</a> (StopTransactionRequest parameters, String chargeBoxIdentity)</td></tr>
+<tr class="separator:a47c89e5c2a769646d99add8a00884970"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ade5a75436a3231a5524333716f73c999"><td class="memItemLeft" align="right" valign="top">Future&lt;?&gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classde_1_1rwth_1_1idsg_1_1steve_1_1ocpp_1_1soap_1_1_central_system_service12___soap_server.html#ade5a75436a3231a5524333716f73c999">stopTransactionAsync</a> (StopTransactionRequest parameters, String chargeBoxIdentity, AsyncHandler&lt; StopTransactionResponse &gt; asyncHandler)</td></tr>
+<tr class="separator:ade5a75436a3231a5524333716f73c999"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0624d94fff1c8dfbb12965a161948fb3"><td class="memItemLeft" align="right" valign="top">Response&lt; AuthorizeResponse &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classde_1_1rwth_1_1idsg_1_1steve_1_1ocpp_1_1soap_1_1_central_system_service12___soap_server.html#a0624d94fff1c8dfbb12965a161948fb3">authorizeAsync</a> (AuthorizeRequest parameters, String chargeBoxIdentity)</td></tr>
+<tr class="separator:a0624d94fff1c8dfbb12965a161948fb3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab40e495892f28bfb2d868cbf11334cde"><td class="memItemLeft" align="right" valign="top">Future&lt;?&gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classde_1_1rwth_1_1idsg_1_1steve_1_1ocpp_1_1soap_1_1_central_system_service12___soap_server.html#ab40e495892f28bfb2d868cbf11334cde">authorizeAsync</a> (AuthorizeRequest parameters, String chargeBoxIdentity, AsyncHandler&lt; AuthorizeResponse &gt; asyncHandler)</td></tr>
+<tr class="separator:ab40e495892f28bfb2d868cbf11334cde"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a68df4beb1a70c0ea13fbd2e98d80c8ee"><td class="memItemLeft" align="right" valign="top">Response&lt; HeartbeatResponse &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classde_1_1rwth_1_1idsg_1_1steve_1_1ocpp_1_1soap_1_1_central_system_service12___soap_server.html#a68df4beb1a70c0ea13fbd2e98d80c8ee">heartbeatAsync</a> (HeartbeatRequest parameters, String chargeBoxIdentity)</td></tr>
+<tr class="separator:a68df4beb1a70c0ea13fbd2e98d80c8ee"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a086f65ee11764ca7121cfe4788eb272e"><td class="memItemLeft" align="right" valign="top">Future&lt;?&gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classde_1_1rwth_1_1idsg_1_1steve_1_1ocpp_1_1soap_1_1_central_system_service12___soap_server.html#a086f65ee11764ca7121cfe4788eb272e">heartbeatAsync</a> (HeartbeatRequest parameters, String chargeBoxIdentity, AsyncHandler&lt; HeartbeatResponse &gt; asyncHandler)</td></tr>
+<tr class="separator:a086f65ee11764ca7121cfe4788eb272e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a87b19e1909995e8814c53dd6d57e7183"><td class="memItemLeft" align="right" valign="top">Response<br class="typebreak"/>
+&lt; StartTransactionResponse &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classde_1_1rwth_1_1idsg_1_1steve_1_1ocpp_1_1soap_1_1_central_system_service12___soap_server.html#a87b19e1909995e8814c53dd6d57e7183">startTransactionAsync</a> (StartTransactionRequest parameters, String chargeBoxIdentity)</td></tr>
+<tr class="separator:a87b19e1909995e8814c53dd6d57e7183"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4e29c666020ebd620183f014ed48a3f8"><td class="memItemLeft" align="right" valign="top">Future&lt;?&gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classde_1_1rwth_1_1idsg_1_1steve_1_1ocpp_1_1soap_1_1_central_system_service12___soap_server.html#a4e29c666020ebd620183f014ed48a3f8">startTransactionAsync</a> (StartTransactionRequest parameters, String chargeBoxIdentity, AsyncHandler&lt; StartTransactionResponse &gt; asyncHandler)</td></tr>
+<tr class="separator:a4e29c666020ebd620183f014ed48a3f8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table>
+<a name="details" id="details"></a><h2 class="groupheader">Ausführliche Beschreibung</h2>
+<div class="textblock"><p>Service implementation of OCPP V1.2</p>
+<dl class="section author"><dt>Autor</dt><dd>Sevket Goekay <a href="#" onclick="location.href='mai'+'lto:'+'goe'+'ka'+'y@d'+'bi'+'s.r'+'wt'+'h-a'+'ac'+'hen'+'.d'+'e'; return false;">goeka<span style="display: none;">.nosp@m.</span>y@db<span style="display: none;">.nosp@m.</span>is.rw<span style="display: none;">.nosp@m.</span>th-a<span style="display: none;">.nosp@m.</span>achen<span style="display: none;">.nosp@m.</span>.de</a> </dd></dl>
+</div><h2 class="groupheader">Dokumentation der Elementfunktionen</h2>
+<a class="anchor" id="a4df12c49aa3af8096172315620f75d17"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">AuthorizeResponse de.rwth.idsg.steve.ocpp.soap.CentralSystemService12_SoapServer.authorize </td>
+          <td>(</td>
+          <td class="paramtype">AuthorizeRequest&#160;</td>
+          <td class="paramname"><em>parameters</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">String&#160;</td>
+          <td class="paramname"><em>chargeBoxIdentity</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a0624d94fff1c8dfbb12965a161948fb3"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">Response&lt;AuthorizeResponse&gt; de.rwth.idsg.steve.ocpp.soap.CentralSystemService12_SoapServer.authorizeAsync </td>
+          <td>(</td>
+          <td class="paramtype">AuthorizeRequest&#160;</td>
+          <td class="paramname"><em>parameters</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">String&#160;</td>
+          <td class="paramname"><em>chargeBoxIdentity</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="ab40e495892f28bfb2d868cbf11334cde"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">Future&lt;?&gt; de.rwth.idsg.steve.ocpp.soap.CentralSystemService12_SoapServer.authorizeAsync </td>
+          <td>(</td>
+          <td class="paramtype">AuthorizeRequest&#160;</td>
+          <td class="paramname"><em>parameters</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">String&#160;</td>
+          <td class="paramname"><em>chargeBoxIdentity</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">AsyncHandler&lt; AuthorizeResponse &gt;&#160;</td>
+          <td class="paramname"><em>asyncHandler</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a8868c4202a11c5e037e027cf888d9a6d"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">BootNotificationResponse de.rwth.idsg.steve.ocpp.soap.CentralSystemService12_SoapServer.bootNotification </td>
+          <td>(</td>
+          <td class="paramtype">BootNotificationRequest&#160;</td>
+          <td class="paramname"><em>parameters</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">String&#160;</td>
+          <td class="paramname"><em>chargeBoxIdentity</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a70ee4ea3b6704da5b35edb7d310dc70f"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">Response&lt;BootNotificationResponse&gt; de.rwth.idsg.steve.ocpp.soap.CentralSystemService12_SoapServer.bootNotificationAsync </td>
+          <td>(</td>
+          <td class="paramtype">BootNotificationRequest&#160;</td>
+          <td class="paramname"><em>parameters</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">String&#160;</td>
+          <td class="paramname"><em>chargeBoxIdentity</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a46d588eca89e181d557753e0f094f059"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">Future&lt;?&gt; de.rwth.idsg.steve.ocpp.soap.CentralSystemService12_SoapServer.bootNotificationAsync </td>
+          <td>(</td>
+          <td class="paramtype">BootNotificationRequest&#160;</td>
+          <td class="paramname"><em>parameters</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">String&#160;</td>
+          <td class="paramname"><em>chargeBoxIdentity</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">AsyncHandler&lt; BootNotificationResponse &gt;&#160;</td>
+          <td class="paramname"><em>asyncHandler</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a4ea6f4e5412ba378a9ff8c13a74fc789"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">DiagnosticsStatusNotificationResponse de.rwth.idsg.steve.ocpp.soap.CentralSystemService12_SoapServer.diagnosticsStatusNotification </td>
+          <td>(</td>
+          <td class="paramtype">DiagnosticsStatusNotificationRequest&#160;</td>
+          <td class="paramname"><em>parameters</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">String&#160;</td>
+          <td class="paramname"><em>chargeBoxIdentity</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a5d47f30fcaa8cc3d4bf01401979204ab"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">Response&lt;DiagnosticsStatusNotificationResponse&gt; de.rwth.idsg.steve.ocpp.soap.CentralSystemService12_SoapServer.diagnosticsStatusNotificationAsync </td>
+          <td>(</td>
+          <td class="paramtype">DiagnosticsStatusNotificationRequest&#160;</td>
+          <td class="paramname"><em>parameters</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">String&#160;</td>
+          <td class="paramname"><em>chargeBoxIdentity</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="aa0eab89a8d855dfead2864e84405eb81"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">Future&lt;?&gt; de.rwth.idsg.steve.ocpp.soap.CentralSystemService12_SoapServer.diagnosticsStatusNotificationAsync </td>
+          <td>(</td>
+          <td class="paramtype">DiagnosticsStatusNotificationRequest&#160;</td>
+          <td class="paramname"><em>parameters</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">String&#160;</td>
+          <td class="paramname"><em>chargeBoxIdentity</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">AsyncHandler&lt; DiagnosticsStatusNotificationResponse &gt;&#160;</td>
+          <td class="paramname"><em>asyncHandler</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="af25e1106361138e2aac99d5d17d7e34d"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">FirmwareStatusNotificationResponse de.rwth.idsg.steve.ocpp.soap.CentralSystemService12_SoapServer.firmwareStatusNotification </td>
+          <td>(</td>
+          <td class="paramtype">FirmwareStatusNotificationRequest&#160;</td>
+          <td class="paramname"><em>parameters</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">String&#160;</td>
+          <td class="paramname"><em>chargeBoxIdentity</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a3530a1724bea19fe12907ea213d66edb"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">Response&lt;FirmwareStatusNotificationResponse&gt; de.rwth.idsg.steve.ocpp.soap.CentralSystemService12_SoapServer.firmwareStatusNotificationAsync </td>
+          <td>(</td>
+          <td class="paramtype">FirmwareStatusNotificationRequest&#160;</td>
+          <td class="paramname"><em>parameters</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">String&#160;</td>
+          <td class="paramname"><em>chargeBoxIdentity</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="ac9af19a6af32c1ad99659c70672c4d09"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">Future&lt;?&gt; de.rwth.idsg.steve.ocpp.soap.CentralSystemService12_SoapServer.firmwareStatusNotificationAsync </td>
+          <td>(</td>
+          <td class="paramtype">FirmwareStatusNotificationRequest&#160;</td>
+          <td class="paramname"><em>parameters</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">String&#160;</td>
+          <td class="paramname"><em>chargeBoxIdentity</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">AsyncHandler&lt; FirmwareStatusNotificationResponse &gt;&#160;</td>
+          <td class="paramname"><em>asyncHandler</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a2217bc63cfc14a6f413aac32f5776a2e"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">HeartbeatResponse de.rwth.idsg.steve.ocpp.soap.CentralSystemService12_SoapServer.heartbeat </td>
+          <td>(</td>
+          <td class="paramtype">HeartbeatRequest&#160;</td>
+          <td class="paramname"><em>parameters</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">String&#160;</td>
+          <td class="paramname"><em>chargeBoxIdentity</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a68df4beb1a70c0ea13fbd2e98d80c8ee"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">Response&lt;HeartbeatResponse&gt; de.rwth.idsg.steve.ocpp.soap.CentralSystemService12_SoapServer.heartbeatAsync </td>
+          <td>(</td>
+          <td class="paramtype">HeartbeatRequest&#160;</td>
+          <td class="paramname"><em>parameters</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">String&#160;</td>
+          <td class="paramname"><em>chargeBoxIdentity</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a086f65ee11764ca7121cfe4788eb272e"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">Future&lt;?&gt; de.rwth.idsg.steve.ocpp.soap.CentralSystemService12_SoapServer.heartbeatAsync </td>
+          <td>(</td>
+          <td class="paramtype">HeartbeatRequest&#160;</td>
+          <td class="paramname"><em>parameters</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">String&#160;</td>
+          <td class="paramname"><em>chargeBoxIdentity</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">AsyncHandler&lt; HeartbeatResponse &gt;&#160;</td>
+          <td class="paramname"><em>asyncHandler</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a79ee3a7402a8600396c3c3756a66d93b"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">MeterValuesResponse de.rwth.idsg.steve.ocpp.soap.CentralSystemService12_SoapServer.meterValues </td>
+          <td>(</td>
+          <td class="paramtype">MeterValuesRequest&#160;</td>
+          <td class="paramname"><em>parameters</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">String&#160;</td>
+          <td class="paramname"><em>chargeBoxIdentity</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a22b5641bef20c6319cf69341d5ae3582"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">Response&lt;MeterValuesResponse&gt; de.rwth.idsg.steve.ocpp.soap.CentralSystemService12_SoapServer.meterValuesAsync </td>
+          <td>(</td>
+          <td class="paramtype">MeterValuesRequest&#160;</td>
+          <td class="paramname"><em>parameters</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">String&#160;</td>
+          <td class="paramname"><em>chargeBoxIdentity</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="aca250a53f1df0c625da15b473d19676c"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">Future&lt;?&gt; de.rwth.idsg.steve.ocpp.soap.CentralSystemService12_SoapServer.meterValuesAsync </td>
+          <td>(</td>
+          <td class="paramtype">MeterValuesRequest&#160;</td>
+          <td class="paramname"><em>parameters</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">String&#160;</td>
+          <td class="paramname"><em>chargeBoxIdentity</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">AsyncHandler&lt; MeterValuesResponse &gt;&#160;</td>
+          <td class="paramname"><em>asyncHandler</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="aaab901ffdf38c2b084ab9e0f6fd9981b"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">StartTransactionResponse de.rwth.idsg.steve.ocpp.soap.CentralSystemService12_SoapServer.startTransaction </td>
+          <td>(</td>
+          <td class="paramtype">StartTransactionRequest&#160;</td>
+          <td class="paramname"><em>parameters</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">String&#160;</td>
+          <td class="paramname"><em>chargeBoxIdentity</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a87b19e1909995e8814c53dd6d57e7183"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">Response&lt;StartTransactionResponse&gt; de.rwth.idsg.steve.ocpp.soap.CentralSystemService12_SoapServer.startTransactionAsync </td>
+          <td>(</td>
+          <td class="paramtype">StartTransactionRequest&#160;</td>
+          <td class="paramname"><em>parameters</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">String&#160;</td>
+          <td class="paramname"><em>chargeBoxIdentity</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a4e29c666020ebd620183f014ed48a3f8"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">Future&lt;?&gt; de.rwth.idsg.steve.ocpp.soap.CentralSystemService12_SoapServer.startTransactionAsync </td>
+          <td>(</td>
+          <td class="paramtype">StartTransactionRequest&#160;</td>
+          <td class="paramname"><em>parameters</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">String&#160;</td>
+          <td class="paramname"><em>chargeBoxIdentity</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">AsyncHandler&lt; StartTransactionResponse &gt;&#160;</td>
+          <td class="paramname"><em>asyncHandler</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a1aa28896be7a93171ac1ce02f9102de3"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">StatusNotificationResponse de.rwth.idsg.steve.ocpp.soap.CentralSystemService12_SoapServer.statusNotification </td>
+          <td>(</td>
+          <td class="paramtype">StatusNotificationRequest&#160;</td>
+          <td class="paramname"><em>parameters</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">String&#160;</td>
+          <td class="paramname"><em>chargeBoxIdentity</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a2b6c990a4cb7b6721e5d2ea894f4d080"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">Response&lt;StatusNotificationResponse&gt; de.rwth.idsg.steve.ocpp.soap.CentralSystemService12_SoapServer.statusNotificationAsync </td>
+          <td>(</td>
+          <td class="paramtype">StatusNotificationRequest&#160;</td>
+          <td class="paramname"><em>parameters</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">String&#160;</td>
+          <td class="paramname"><em>chargeBoxIdentity</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a2fd311dcc151cea8dc5ef73b47467f0c"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">Future&lt;?&gt; de.rwth.idsg.steve.ocpp.soap.CentralSystemService12_SoapServer.statusNotificationAsync </td>
+          <td>(</td>
+          <td class="paramtype">StatusNotificationRequest&#160;</td>
+          <td class="paramname"><em>parameters</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">String&#160;</td>
+          <td class="paramname"><em>chargeBoxIdentity</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">AsyncHandler&lt; StatusNotificationResponse &gt;&#160;</td>
+          <td class="paramname"><em>asyncHandler</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a5530dbecf1921ebae73c136a59f630d3"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">StopTransactionResponse de.rwth.idsg.steve.ocpp.soap.CentralSystemService12_SoapServer.stopTransaction </td>
+          <td>(</td>
+          <td class="paramtype">StopTransactionRequest&#160;</td>
+          <td class="paramname"><em>parameters</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">String&#160;</td>
+          <td class="paramname"><em>chargeBoxIdentity</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a47c89e5c2a769646d99add8a00884970"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">Response&lt;StopTransactionResponse&gt; de.rwth.idsg.steve.ocpp.soap.CentralSystemService12_SoapServer.stopTransactionAsync </td>
+          <td>(</td>
+          <td class="paramtype">StopTransactionRequest&#160;</td>
+          <td class="paramname"><em>parameters</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">String&#160;</td>
+          <td class="paramname"><em>chargeBoxIdentity</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="ade5a75436a3231a5524333716f73c999"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">Future&lt;?&gt; de.rwth.idsg.steve.ocpp.soap.CentralSystemService12_SoapServer.stopTransactionAsync </td>
+          <td>(</td>
+          <td class="paramtype">StopTransactionRequest&#160;</td>
+          <td class="paramname"><em>parameters</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">String&#160;</td>
+          <td class="paramname"><em>chargeBoxIdentity</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">AsyncHandler&lt; StopTransactionResponse &gt;&#160;</td>
+          <td class="paramname"><em>asyncHandler</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<hr/>Die Dokumentation für diese Klasse wurde erzeugt aufgrund der Datei:<ul>
+<li>src/main/java/de/rwth/idsg/steve/ocpp/soap/<a class="el" href="_central_system_service12___soap_server_8java.html">CentralSystemService12_SoapServer.java</a></li>
+</ul>
+</div><!-- contents -->
+</div><!-- doc-content -->
+<!-- start footer part -->
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="navelem"><a class="el" href="namespacede.html">de</a></li><li class="navelem"><a class="el" href="namespacede_1_1rwth.html">rwth</a></li><li class="navelem"><a class="el" href="namespacede_1_1rwth_1_1idsg.html">idsg</a></li><li class="navelem"><a class="el" href="namespacede_1_1rwth_1_1idsg_1_1steve.html">steve</a></li><li class="navelem"><a class="el" href="namespacede_1_1rwth_1_1idsg_1_1steve_1_1ocpp.html">ocpp</a></li><li class="navelem"><a class="el" href="namespacede_1_1rwth_1_1idsg_1_1steve_1_1ocpp_1_1soap.html">soap</a></li><li class="navelem"><a class="el" href="classde_1_1rwth_1_1idsg_1_1steve_1_1ocpp_1_1soap_1_1_central_system_service12___soap_server.html">CentralSystemService12_SoapServer</a></li>
+    <li class="footer">Erzeugt am Mit Dez 16 2015 13:57:34 für SteVe von
+    <a href="http://www.doxygen.org/index.html">
+    <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.6 </li>
+  </ul>
+</div>
+</body>
+</html>

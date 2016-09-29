@@ -1,0 +1,5 @@
+var classde_1_1rwth_1_1idsg_1_1steve_1_1handler_1_1ocpp15_1_1_remote_stop_transaction_response_handler =
+[
+    [ "RemoteStopTransactionResponseHandler", "classde_1_1rwth_1_1idsg_1_1steve_1_1handler_1_1ocpp15_1_1_remote_stop_transaction_response_handler.html#ac78c46640785bb7bd852f8776916a8f1", null ],
+    [ "handleResult", "classde_1_1rwth_1_1idsg_1_1steve_1_1handler_1_1ocpp15_1_1_remote_stop_transaction_response_handler.html#afac37de0c2dbb7757ae36ea2b59380ed", null ]
+];

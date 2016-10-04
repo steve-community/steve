@@ -5,10 +5,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.github.zafarkhaja.semver.Version;
 import de.rwth.idsg.steve.SteveConfiguration;
+import de.rwth.idsg.steve.web.dto.LatestReleaseResponse;
 import de.rwth.idsg.steve.web.dto.ReleaseReport;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
@@ -112,22 +110,5 @@ public class GithubReleaseCheckService implements ReleaseCheckService {
      */
     private static boolean isWindows() {
         return FILE_SEPARATOR.equals("\\");
-    }
-
-    /**
-     * Does not contain all the fields in the actual response, but only the ones that we are interested in.
-     *
-     * API doc: https://developer.github.com/v3/repos/releases/#get-the-latest-release
-     */
-    @Getter
-    @Setter
-    @ToString
-    private static class LatestReleaseResponse {
-        private String tagName;
-        private String name;
-
-        private String htmlUrl;
-        private String tarballUrl;
-        private String zipballUrl;
     }
 }

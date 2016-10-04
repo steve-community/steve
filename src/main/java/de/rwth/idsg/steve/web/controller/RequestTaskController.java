@@ -42,7 +42,7 @@ public class RequestTaskController {
     }
 
     @RequestMapping(value = TASK_ID_PATH, method = RequestMethod.GET)
-    public String getTaskDetails(@PathVariable Integer taskId, Model model) {
+    public String getTaskDetails(@PathVariable("taskId") Integer taskId, Model model) {
         RequestTask r = requestTaskStore.get(taskId);
         model.addAttribute("task", r);
         return "taskResult";

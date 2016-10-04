@@ -15,7 +15,7 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString
-public class LatestReleaseResponse {
+public class ReleaseResponse {
     private String tagName;
     private String name;
 

@@ -5,8 +5,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.github.zafarkhaja.semver.Version;
 import de.rwth.idsg.steve.SteveConfiguration;
-import de.rwth.idsg.steve.web.dto.LatestReleaseResponse;
 import de.rwth.idsg.steve.web.dto.ReleaseReport;
+import de.rwth.idsg.steve.web.dto.ReleaseResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
@@ -55,7 +55,7 @@ public class GithubReleaseCheckService implements ReleaseCheckService {
     @Override
     public ReleaseReport check() {
         try {
-            LatestReleaseResponse response = restTemplate.getForObject(API_URL, LatestReleaseResponse.class);
+            ReleaseResponse response = restTemplate.getForObject(API_URL, ReleaseResponse.class);
             return getReport(response);
 
         } catch (RestClientException e) {
@@ -69,7 +69,7 @@ public class GithubReleaseCheckService implements ReleaseCheckService {
     // Private helpers
     // -------------------------------------------------------------------------
 
-    private static ReleaseReport getReport(LatestReleaseResponse response) {
+    private static ReleaseReport getReport(ReleaseResponse response) {
         String githubVersion = extractVersion(response);
 
         Version build = Version.valueOf(SteveConfiguration.CONFIG.getSteveVersion());
@@ -85,7 +85,7 @@ public class GithubReleaseCheckService implements ReleaseCheckService {
         return ur;
     }
 
-    private static String decideDownloadUrl(LatestReleaseResponse response) {
+    private static String decideDownloadUrl(ReleaseResponse response) {
         if (isWindows()) {
             return response.getZipballUrl();
         } else {
@@ -93,7 +93,7 @@ public class GithubReleaseCheckService implements ReleaseCheckService {
         }
     }
 
-    private static String extractVersion(LatestReleaseResponse response) {
+    private static String extractVersion(ReleaseResponse response) {
         return response.getTagName().replaceFirst(TAG_NAME_PREFIX, "");
     }
 

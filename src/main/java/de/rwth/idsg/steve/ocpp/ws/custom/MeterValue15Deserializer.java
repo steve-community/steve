@@ -60,19 +60,18 @@ public class MeterValue15Deserializer extends JsonDeserializer<List<MeterValue>>
         MeterValue meterValue = new MeterValue();
         List<MeterValue.Value> list = meterValue.getValue();
 
-        parseValue(mapper, list, node.path("value"), true);
-        parseValue(mapper, list, node.path("values"), false);
+        parseValue(mapper, list, node.path("value"));
+        parseValue(mapper, list, node.path("values"));
         parseDateTime(meterValue, node.path("timestamp"));
 
         return meterValue;
     }
 
     // List<MeterValue.Value>
-    private void parseValue(ObjectMapper mapper, List<MeterValue.Value> list, JsonNode listNode, boolean isCorrect)
+    private void parseValue(ObjectMapper mapper, List<MeterValue.Value> list, JsonNode listNode)
             throws JsonProcessingException {
 
         if (!listNode.isMissingNode()) {
-            logBroken(isCorrect);
             for (JsonNode node : listNode) {
                 list.add(mapper.treeToValue(node, MeterValue.Value.class));
             }
@@ -83,14 +82,5 @@ public class MeterValue15Deserializer extends JsonDeserializer<List<MeterValue>>
         if (!node.isMissingNode()) {
             meterValue.setTimestamp(new DateTime(node.asText()));
         }
-    }
-
-    private void logBroken(boolean isCorrect) {
-        if (isCorrect) {
-            return;
-        }
-
-        log.warn("Received an invalid 'MeterValues' message from a charging station with a broken implementation, "
-                + "but still can process it. Please contact the manufacturer/vendor to report the bug.");
     }
 }

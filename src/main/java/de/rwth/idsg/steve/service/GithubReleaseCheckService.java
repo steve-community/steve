@@ -46,7 +46,7 @@ public class GithubReleaseCheckService implements ReleaseCheckService {
 
         ObjectMapper mapper = new ObjectMapper();
         mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
-        mapper.setPropertyNamingStrategy(new PropertyNamingStrategy.LowerCaseWithUnderscoresStrategy());
+        mapper.setPropertyNamingStrategy(new PropertyNamingStrategy.SnakeCaseStrategy());
 
         restTemplate = new RestTemplate(Collections.singletonList(new MappingJackson2HttpMessageConverter(mapper)));
         restTemplate.setRequestFactory(factory);

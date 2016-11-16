@@ -1,10 +1,11 @@
 package de.rwth.idsg.steve.repository.dto;
 
-import com.google.common.base.Optional;
 import jooq.steve.db.tables.records.AddressRecord;
 import jooq.steve.db.tables.records.UserRecord;
 import lombok.Builder;
 import lombok.Getter;
+
+import java.util.Optional;
 
 /**
  * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>

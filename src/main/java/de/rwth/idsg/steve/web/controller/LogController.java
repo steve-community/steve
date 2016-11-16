@@ -1,6 +1,5 @@
 package de.rwth.idsg.steve.web.controller;
 
-import com.google.common.base.Optional;
 import de.rwth.idsg.steve.utils.LogFileRetriever;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
@@ -13,6 +12,7 @@ import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Optional;
 
 /**
  * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>

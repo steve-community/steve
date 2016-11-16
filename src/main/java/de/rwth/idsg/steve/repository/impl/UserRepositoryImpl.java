@@ -1,6 +1,5 @@
 package de.rwth.idsg.steve.repository.impl;
 
-import com.google.common.base.Optional;
 import de.rwth.idsg.steve.SteveException;
 import de.rwth.idsg.steve.repository.AddressRepository;
 import de.rwth.idsg.steve.repository.UserRepository;
@@ -24,6 +23,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 import static de.rwth.idsg.steve.utils.CustomDSL.includes;
 import static jooq.steve.db.tables.OcppTag.OCPP_TAG;
@@ -43,15 +43,15 @@ public class UserRepositoryImpl implements UserRepository {
     @Override
     public List<User.Overview> getOverview(UserQueryForm form) {
         return getOverviewInternal(form)
-                  .map(r -> User.Overview.builder()
-                                         .userPk(r.value1())
-                                         .ocppTagPk(r.value2())
-                                         .ocppIdTag(r.value3())
-                                         .name(r.value4() + " " + r.value5())
-                                         .phone(r.value6())
-                                         .email(r.value7())
-                                         .build()
-                  );
+                .map(r -> User.Overview.builder()
+                                       .userPk(r.value1())
+                                       .ocppTagPk(r.value2())
+                                       .ocppIdTag(r.value3())
+                                       .name(r.value4() + " " + r.value5())
+                                       .phone(r.value6())
+                                       .email(r.value7())
+                                       .build()
+                );
     }
 
     @Override
@@ -74,7 +74,7 @@ public class UserRepositoryImpl implements UserRepository {
         // -------------------------------------------------------------------------
 
         AddressRecord ar = addressRepository.get(ctx, ur.getAddressPk());
-        
+
         // -------------------------------------------------------------------------
         // 3. ocpp_tag table
         // -------------------------------------------------------------------------
@@ -94,7 +94,7 @@ public class UserRepositoryImpl implements UserRepository {
         return User.Details.builder()
                            .userRecord(ur)
                            .address(ar)
-                           .ocppIdTag(Optional.fromNullable(ocppIdTag))
+                           .ocppIdTag(Optional.ofNullable(ocppIdTag))
                            .build();
     }
 

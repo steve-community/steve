@@ -100,7 +100,7 @@ public class MediatorInInterceptor extends AbstractPhaseInterceptor<SoapMessage>
      * redirect to the version-specific implementation according to the namespace
      * of the incoming message.
      */
-    public void initServerLookupMap(SoapMessage message) {
+    private void initServerLookupMap(SoapMessage message) {
         Bus bus = message.getExchange().getBus();
 
         ServerRegistry serverRegistry = bus.getExtension(ServerRegistry.class);

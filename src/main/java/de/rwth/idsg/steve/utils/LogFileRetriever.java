@@ -1,6 +1,5 @@
 package de.rwth.idsg.steve.utils;
 
-import com.google.common.base.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.core.Appender;
@@ -18,6 +17,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Random;
 
 /**
@@ -44,7 +44,7 @@ public final class LogFileRetriever {
         } else {
             p = rollTheDice();
         }
-        return Optional.fromNullable(p);
+        return Optional.ofNullable(p);
     }
 
     public String getLogFilePathOrErrorMessage() {

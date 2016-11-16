@@ -1,7 +1,5 @@
 package de.rwth.idsg.steve.web.controller;
 
-
-import com.google.common.base.Optional;
 import de.rwth.idsg.steve.repository.OcppTagRepository;
 import de.rwth.idsg.steve.repository.UserRepository;
 import de.rwth.idsg.steve.repository.dto.User;
@@ -19,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import javax.validation.Valid;
+import java.util.Optional;
 
 /**
  * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>

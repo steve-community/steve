@@ -1,7 +1,8 @@
 package de.rwth.idsg.steve.config;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
-import com.mysql.jdbc.jdbc2.optional.MysqlDataSource;
+import com.mysql.cj.core.conf.PropertyDefinitions;
+import com.mysql.cj.jdbc.MysqlDataSource;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import de.rwth.idsg.steve.service.DummyReleaseCheckService;
@@ -57,25 +58,25 @@ public class BeanConfiguration extends WebMvcConfigurerAdapter {
      * https://github.com/brettwooldridge/HikariCP/wiki/MySQL-Configuration
      */
     private void initDataSource() {
+        MysqlDataSource ds = new MysqlDataSource();
 
-        HikariConfig config = new HikariConfig();
-        config.setDataSourceClassName(MysqlDataSource.class.getName());
+        // set standard params
+        ds.setServerName(CONFIG.getDb().getIp());
+        ds.setPort(CONFIG.getDb().getPort());
+        ds.setDatabaseName(CONFIG.getDb().getSchema());
+        ds.setUser(CONFIG.getDb().getUserName());
+        ds.setPassword(CONFIG.getDb().getPassword());
 
-        config.addDataSourceProperty("serverName", CONFIG.getDb().getIp());
-        config.addDataSourceProperty("port", CONFIG.getDb().getPort());
-        config.addDataSourceProperty("databaseName", CONFIG.getDb().getSchema());
-        config.addDataSourceProperty("user", CONFIG.getDb().getUserName());
-        config.addDataSourceProperty("password", CONFIG.getDb().getPassword());
+        // set non-standard params
+        ds.getModifiableProperty(PropertyDefinitions.PNAME_cachePrepStmts).setValue(true);
+        ds.getModifiableProperty(PropertyDefinitions.PNAME_prepStmtCacheSize).setValue(250);
+        ds.getModifiableProperty(PropertyDefinitions.PNAME_prepStmtCacheSqlLimit).setValue(2048);
+        ds.getModifiableProperty(PropertyDefinitions.PNAME_characterEncoding).setValue("utf8");
 
-        config.addDataSourceProperty("cachePrepStmts", "true");
-        config.addDataSourceProperty("prepStmtCacheSize", "250");
-        config.addDataSourceProperty("prepStmtCacheSqlLimit", "2048");
+        HikariConfig hc = new HikariConfig();
+        hc.setDataSource(ds);
 
-        // we must explicitly set the encoding, otherwise data is not handled properly!
-        config.addDataSourceProperty("encoding", "utf8");
-        config.addDataSourceProperty("useUnicode", "true");
-
-        dataSource = new HikariDataSource(config);
+        dataSource = new HikariDataSource(hc);
     }
 
     /**

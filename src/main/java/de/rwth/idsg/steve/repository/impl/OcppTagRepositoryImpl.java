@@ -1,6 +1,5 @@
 package de.rwth.idsg.steve.repository.impl;
 
-import com.mysql.jdbc.exceptions.jdbc4.MySQLIntegrityConstraintViolationException;
 import de.rwth.idsg.steve.SteveException;
 import de.rwth.idsg.steve.repository.OcppTagRepository;
 import de.rwth.idsg.steve.repository.dto.OcppTag.Overview;
@@ -22,6 +21,7 @@ import org.jooq.exception.DataAccessException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -179,7 +179,7 @@ public class OcppTagRepositoryImpl implements OcppTagRepository {
                       .getOcppTagPk();
 
         } catch (DataAccessException e) {
-            if (e.getCause() instanceof MySQLIntegrityConstraintViolationException) {
+            if (e.getCause() instanceof SQLIntegrityConstraintViolationException) {
                 throw new SteveException("A user with idTag '%s' already exists.", u.getIdTag());
             } else {
                 throw new SteveException("Execution of addOcppTag for idTag '%s' FAILED.", u.getIdTag(), e);

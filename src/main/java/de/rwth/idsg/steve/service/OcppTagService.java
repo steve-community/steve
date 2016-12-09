@@ -1,5 +1,6 @@
 package de.rwth.idsg.steve.service;
 
+import de.rwth.idsg.steve.service.dto.InvalidOcppTag;
 import ocpp.cp._2012._06.AuthorisationData;
 
 import java.util.List;
@@ -25,4 +26,6 @@ public interface OcppTagService {
      *
      */
     List<AuthorisationData> getAuthData(List<String> idTagList);
+
+    List<InvalidOcppTag> getInvalidOcppTags();
 }

@@ -1,7 +1,10 @@
 package de.rwth.idsg.steve.service;
 
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 import de.rwth.idsg.steve.repository.OcppTagRepository;
 import de.rwth.idsg.steve.repository.SettingsRepository;
+import de.rwth.idsg.steve.service.dto.InvalidOcppTag;
 import jooq.steve.db.tables.records.OcppTagRecord;
 import lombok.extern.slf4j.Slf4j;
 import ocpp.cp._2012._06.AuthorisationData;
@@ -11,7 +14,9 @@ import org.jooq.RecordMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
@@ -23,6 +28,10 @@ public class OcppTagServiceImpl implements OcppTagService {
 
     @Autowired private SettingsRepository settingsRepository;
     @Autowired private OcppTagRepository ocppTagRepository;
+
+    private final Cache<String, InvalidOcppTag> invalidOcppTagCache = CacheBuilder.newBuilder()
+                                                                                  .maximumSize(1_000)
+                                                                                  .build();
 
     @Override
     public List<AuthorisationData> getAuthDataOfAllTags() {
@@ -41,6 +50,15 @@ public class OcppTagServiceImpl implements OcppTagService {
     }
 
     @Override
+    public List<InvalidOcppTag> getInvalidOcppTags() {
+        return invalidOcppTagCache.asMap()
+                                  .values()
+                                  .stream()
+                                  .sorted(Comparator.comparingInt(InvalidOcppTag::getNumberOfAttempts).reversed())
+                                  .collect(Collectors.toList());
+    }
+
+    @Override
     public ocpp.cs._2010._08.IdTagInfo getIdTagInfoV12(String idTag) {
         OcppTagRecord record = ocppTagRepository.getRecord(idTag);
         ocpp.cs._2010._08.IdTagInfo idTagInfo = new ocpp.cs._2010._08.IdTagInfo();
@@ -48,6 +66,7 @@ public class OcppTagServiceImpl implements OcppTagService {
         if (record == null) {
             log.error("The user with idTag '{}' is INVALID (not present in DB).", idTag);
             idTagInfo.setStatus(AuthorizationStatus.INVALID);
+            processInvalid(idTag);
         } else {
             if (record.getBlocked()) {
                 log.error("The user with idTag '{}' is BLOCKED.", idTag);
@@ -81,6 +100,7 @@ public class OcppTagServiceImpl implements OcppTagService {
         if (record == null) {
             log.error("The user with idTag '{}' is INVALID (not present in DB).", idTag);
             idTagInfo.setStatus(ocpp.cs._2012._06.AuthorizationStatus.INVALID);
+            processInvalid(idTag);
         } else {
             if (record.getBlocked()) {
                 log.error("The user with idTag '{}' is BLOCKED.", idTag);
@@ -109,6 +129,17 @@ public class OcppTagServiceImpl implements OcppTagService {
     // -------------------------------------------------------------------------
     // Private helpers
     // -------------------------------------------------------------------------
+
+    private void processInvalid(String idTag) {
+        synchronized (invalidOcppTagCache) {
+            InvalidOcppTag value = invalidOcppTagCache.getIfPresent(idTag);
+            if (value == null) {
+                invalidOcppTagCache.put(idTag, new InvalidOcppTag(idTag));
+            } else {
+                value.updateStats();
+            }
+        }
+    }
 
     private static class AuthorisationDataMapper implements RecordMapper<OcppTagRecord, AuthorisationData> {
         private final DateTime nowDt;

@@ -1,6 +1,7 @@
 package de.rwth.idsg.steve.web.controller;
 
 import de.rwth.idsg.steve.repository.OcppTagRepository;
+import de.rwth.idsg.steve.service.OcppTagService;
 import de.rwth.idsg.steve.utils.ControllerHelper;
 import de.rwth.idsg.steve.web.dto.OcppTagBatchInsertForm;
 import de.rwth.idsg.steve.web.dto.OcppTagForm;
@@ -27,6 +28,7 @@ import javax.validation.Valid;
 public class OcppTagsController {
 
     @Autowired protected OcppTagRepository ocppTagRepository;
+    @Autowired protected OcppTagService ocppTagService;
 
     protected static final String PARAMS = "params";
 
@@ -146,6 +148,7 @@ public class OcppTagsController {
         model.addAttribute("idTagList", ocppTagRepository.getIdTags());
         model.addAttribute("parentIdTagList", ocppTagRepository.getParentIdTags());
         model.addAttribute("ocppTagList", ocppTagRepository.getOverview(params));
+        model.addAttribute("invalidTagList", ocppTagService.getInvalidOcppTags());
     }
 
     protected void setTags(Model model) {

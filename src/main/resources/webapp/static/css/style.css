@@ -179,6 +179,7 @@ textarea {
 	resize: vertical;
 }
 #add_space { padding-top: 20px; }
+.add-margin-bottom { margin-bottom: 20px; }
 /*************** top menu navigation div ***************/
 ul.navigation {
 	color: #ccc;

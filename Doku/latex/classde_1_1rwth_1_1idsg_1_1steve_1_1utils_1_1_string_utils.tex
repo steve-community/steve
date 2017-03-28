@@ -1,0 +1,38 @@
+\hypertarget{classde_1_1rwth_1_1idsg_1_1steve_1_1utils_1_1_string_utils}{\section{de.\-rwth.\-idsg.\-steve.\-utils.\-String\-Utils Klassenreferenz}
+\label{classde_1_1rwth_1_1idsg_1_1steve_1_1utils_1_1_string_utils}\index{de.\-rwth.\-idsg.\-steve.\-utils.\-String\-Utils@{de.\-rwth.\-idsg.\-steve.\-utils.\-String\-Utils}}
+}
+\subsection*{Öffentliche, statische Methoden}
+\begin{DoxyCompactItemize}
+\item 
+static String \hyperlink{classde_1_1rwth_1_1idsg_1_1steve_1_1utils_1_1_string_utils_a0e8661744844e8e1d42735d7ad8aad72}{get\-Operation\-Name} (\hyperlink{interfacede_1_1rwth_1_1idsg_1_1steve_1_1ocpp_1_1_request_type}{Request\-Type} request\-Type)
+\end{DoxyCompactItemize}
+
+
+\subsection{Ausführliche Beschreibung}
+\begin{DoxyAuthor}{Autor}
+Sevket Goekay \href{mailto:goekay@dbis.rwth-aachen.de}{\tt goekay@dbis.\-rwth-\/aachen.\-de} 
+\end{DoxyAuthor}
+\begin{DoxySince}{Seit}
+12.\-01.\-2015 
+\end{DoxySince}
+
+
+\subsection{Dokumentation der Elementfunktionen}
+\hypertarget{classde_1_1rwth_1_1idsg_1_1steve_1_1utils_1_1_string_utils_a0e8661744844e8e1d42735d7ad8aad72}{\index{de\-::rwth\-::idsg\-::steve\-::utils\-::\-String\-Utils@{de\-::rwth\-::idsg\-::steve\-::utils\-::\-String\-Utils}!get\-Operation\-Name@{get\-Operation\-Name}}
+\index{get\-Operation\-Name@{get\-Operation\-Name}!de::rwth::idsg::steve::utils::StringUtils@{de\-::rwth\-::idsg\-::steve\-::utils\-::\-String\-Utils}}
+\subsubsection[{get\-Operation\-Name}]{\setlength{\rightskip}{0pt plus 5cm}static String de.\-rwth.\-idsg.\-steve.\-utils.\-String\-Utils.\-get\-Operation\-Name (
+\begin{DoxyParamCaption}
+\item[{{\bf Request\-Type}}]{request\-Type}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [static]}}}\label{classde_1_1rwth_1_1idsg_1_1steve_1_1utils_1_1_string_utils_a0e8661744844e8e1d42735d7ad8aad72}
+We don't want to hard-\/code operation names, but derive them from the actual request object.
+
+Example for \char`\"{}\-Change\-Availability\-Request\char`\"{}\-:
+\begin{DoxyItemize}
+\item Remove \char`\"{}\-Request\char`\"{} at the end -\/$>$ \char`\"{}\-Change\-Availability\char`\"{}
+\item Insert space -\/$>$ \char`\"{}\-Change Availability\char`\"{} 
+\end{DoxyItemize}
+
+Die Dokumentation für diese Klasse wurde erzeugt aufgrund der Datei\-:\begin{DoxyCompactItemize}
+\item 
+src/main/java/de/rwth/idsg/steve/utils/\hyperlink{_string_utils_8java}{String\-Utils.\-java}\end{DoxyCompactItemize}

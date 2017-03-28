@@ -1,0 +1,47 @@
+\hypertarget{interfacede_1_1rwth_1_1idsg_1_1steve_1_1ocpp_1_1ws_1_1custom_1_1_ws_session_select_strategy}{\section{de.\-rwth.\-idsg.\-steve.\-ocpp.\-ws.\-custom.\-Ws\-Session\-Select\-Strategy Schnittstellenreferenz}
+\label{interfacede_1_1rwth_1_1idsg_1_1steve_1_1ocpp_1_1ws_1_1custom_1_1_ws_session_select_strategy}\index{de.\-rwth.\-idsg.\-steve.\-ocpp.\-ws.\-custom.\-Ws\-Session\-Select\-Strategy@{de.\-rwth.\-idsg.\-steve.\-ocpp.\-ws.\-custom.\-Ws\-Session\-Select\-Strategy}}
+}
+
+
+Klassendiagramm für de.\-rwth.\-idsg.\-steve.\-ocpp.\-ws.\-custom.\-Ws\-Session\-Select\-Strategy\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{interfacede_1_1rwth_1_1idsg_1_1steve_1_1ocpp_1_1ws_1_1custom_1_1_ws_session_select_strategy__inherit__graph}
+\end{center}
+\end{figure}
+\subsection*{Öffentliche Methoden}
+\begin{DoxyCompactItemize}
+\item 
+Web\-Socket\-Session \hyperlink{interfacede_1_1rwth_1_1idsg_1_1steve_1_1ocpp_1_1ws_1_1custom_1_1_ws_session_select_strategy_afa31adf3cbb93de10d689d04e03bdbe0}{get\-Session} (Deque$<$ \hyperlink{classde_1_1rwth_1_1idsg_1_1steve_1_1ocpp_1_1ws_1_1data_1_1_session_context}{Session\-Context} $>$ session\-Contexts)
+\end{DoxyCompactItemize}
+
+
+\subsection{Ausführliche Beschreibung}
+We want to support multiple connections to a charge point. For sending messages we need a mechanism to select one Web\-Socket\-Session. Implementations of this interface should use different mechanisms to realize that.
+
+\begin{DoxyAuthor}{Autor}
+Sevket Goekay \href{mailto:goekay@dbis.rwth-aachen.de}{\tt goekay@dbis.\-rwth-\/aachen.\-de} 
+\end{DoxyAuthor}
+\begin{DoxySince}{Seit}
+30.\-04.\-2015 
+\end{DoxySince}
+
+
+\subsection{Dokumentation der Elementfunktionen}
+\hypertarget{interfacede_1_1rwth_1_1idsg_1_1steve_1_1ocpp_1_1ws_1_1custom_1_1_ws_session_select_strategy_afa31adf3cbb93de10d689d04e03bdbe0}{\index{de\-::rwth\-::idsg\-::steve\-::ocpp\-::ws\-::custom\-::\-Ws\-Session\-Select\-Strategy@{de\-::rwth\-::idsg\-::steve\-::ocpp\-::ws\-::custom\-::\-Ws\-Session\-Select\-Strategy}!get\-Session@{get\-Session}}
+\index{get\-Session@{get\-Session}!de::rwth::idsg::steve::ocpp::ws::custom::WsSessionSelectStrategy@{de\-::rwth\-::idsg\-::steve\-::ocpp\-::ws\-::custom\-::\-Ws\-Session\-Select\-Strategy}}
+\subsubsection[{get\-Session}]{\setlength{\rightskip}{0pt plus 5cm}Web\-Socket\-Session de.\-rwth.\-idsg.\-steve.\-ocpp.\-ws.\-custom.\-Ws\-Session\-Select\-Strategy.\-get\-Session (
+\begin{DoxyParamCaption}
+\item[{Deque$<$ {\bf Session\-Context} $>$}]{session\-Contexts}
+\end{DoxyParamCaption}
+)}}\label{interfacede_1_1rwth_1_1idsg_1_1steve_1_1ocpp_1_1ws_1_1custom_1_1_ws_session_select_strategy_afa31adf3cbb93de10d689d04e03bdbe0}
+
+
+Implementiert in \hyperlink{classde_1_1rwth_1_1idsg_1_1steve_1_1ocpp_1_1ws_1_1custom_1_1_always_last_strategy_aa23874b4d4865de6d801d72c42aa5d50}{de.\-rwth.\-idsg.\-steve.\-ocpp.\-ws.\-custom.\-Always\-Last\-Strategy} und \hyperlink{classde_1_1rwth_1_1idsg_1_1steve_1_1ocpp_1_1ws_1_1custom_1_1_round_robin_strategy_a2e125a5287efe42409ac5611ce484807}{de.\-rwth.\-idsg.\-steve.\-ocpp.\-ws.\-custom.\-Round\-Robin\-Strategy}.
+
+
+
+Die Dokumentation für diese Schnittstelle wurde erzeugt aufgrund der Datei\-:\begin{DoxyCompactItemize}
+\item 
+src/main/java/de/rwth/idsg/steve/ocpp/ws/custom/\hyperlink{_ws_session_select_strategy_8java}{Ws\-Session\-Select\-Strategy.\-java}\end{DoxyCompactItemize}

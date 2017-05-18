@@ -72,6 +72,7 @@ public class BeanConfiguration extends WebMvcConfigurerAdapter {
         ds.getModifiableProperty(PropertyDefinitions.PNAME_prepStmtCacheSize).setValue(250);
         ds.getModifiableProperty(PropertyDefinitions.PNAME_prepStmtCacheSqlLimit).setValue(2048);
         ds.getModifiableProperty(PropertyDefinitions.PNAME_characterEncoding).setValue("utf8");
+        ds.getModifiableProperty(PropertyDefinitions.PNAME_serverTimezone).setValue("UTC");
 
         HikariConfig hc = new HikariConfig();
         hc.setDataSource(ds);

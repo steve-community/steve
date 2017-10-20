@@ -129,7 +129,7 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
                .set(CONNECTOR_STATUS.ERROR_CODE, p.getErrorCode())
                .set(CONNECTOR_STATUS.ERROR_INFO, p.getErrorInfo())
                .set(CONNECTOR_STATUS.VENDOR_ID, p.getVendorId())
-               .set(CONNECTOR_STATUS.VENDOR_ERROR_CODE, p.getErrorCode())
+               .set(CONNECTOR_STATUS.VENDOR_ERROR_CODE, p.getVendorErrorCode())
                .execute();
 
             log.debug("Stored a new connector status for {}/{}.", p.getChargeBoxId(), p.getConnectorId());

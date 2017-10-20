@@ -5,7 +5,6 @@ import de.rwth.idsg.steve.ocpp.ws.ocpp12.Ocpp12WebSocketEndpoint;
 import de.rwth.idsg.steve.ocpp.ws.ocpp15.Ocpp15WebSocketEndpoint;
 import de.rwth.idsg.steve.repository.ChargePointRepository;
 import org.eclipse.jetty.websocket.api.WebSocketPolicy;
-import org.eclipse.jetty.websocket.server.WebSocketServerFactory;
 import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.http.server.ServerHttpResponse;
 import org.springframework.web.socket.WebSocketExtension;
@@ -31,7 +30,7 @@ public class OcppWebSocketUpgrader extends JettyRequestUpgradeStrategy {
                                  Ocpp15WebSocketEndpoint ocpp15WebSocketEndpoint,
                                  ChargePointRepository chargePointRepository) {
 
-        super(new WebSocketServerFactory(policy));
+        super(policy);
         this.ocpp12WebSocketEndpoint = ocpp12WebSocketEndpoint;
         this.ocpp15WebSocketEndpoint = ocpp15WebSocketEndpoint;
         this.chargePointRepository = chargePointRepository;

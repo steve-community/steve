@@ -12,6 +12,7 @@ import de.rwth.idsg.steve.ocpp.ws.ocpp12.Ocpp12WebSocketEndpoint;
 import de.rwth.idsg.steve.ocpp.ws.ocpp15.Ocpp15JacksonModule;
 import de.rwth.idsg.steve.ocpp.ws.ocpp15.Ocpp15WebSocketEndpoint;
 import de.rwth.idsg.steve.repository.ChargePointRepository;
+import de.rwth.idsg.steve.service.NotificationService;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.jetty.websocket.api.WebSocketBehavior;
 import org.eclipse.jetty.websocket.api.WebSocketPolicy;
@@ -40,6 +41,7 @@ public class WebSocketConfiguration implements WebSocketConfigurer {
     @Autowired private Ocpp12WebSocketEndpoint ocpp12WebSocketEndpoint;
     @Autowired private Ocpp15WebSocketEndpoint ocpp15WebSocketEndpoint;
     @Autowired private ChargePointRepository chargePointRepository;
+    @Autowired private NotificationService notificationService;
 
     public static final long IDLE_TIMEOUT = TimeUnit.HOURS.toMillis(2);
     public static final long PING_INTERVAL = TimeUnit.MINUTES.toMinutes(15);
@@ -59,7 +61,7 @@ public class WebSocketConfiguration implements WebSocketConfigurer {
         policy.setIdleTimeout(IDLE_TIMEOUT);
 
         OcppWebSocketUpgrader upgradeStrategy = new OcppWebSocketUpgrader(
-                policy, ocpp12WebSocketEndpoint, ocpp15WebSocketEndpoint, chargePointRepository);
+                policy, ocpp12WebSocketEndpoint, ocpp15WebSocketEndpoint, chargePointRepository, notificationService);
 
         DefaultHandshakeHandler handler = new DefaultHandshakeHandler(upgradeStrategy);
         handler.setSupportedProtocols(PROTOCOLS);

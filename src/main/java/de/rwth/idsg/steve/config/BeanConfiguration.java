@@ -25,7 +25,7 @@ import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.view.InternalResourceViewResolver;
 
 import javax.annotation.PreDestroy;
@@ -49,7 +49,7 @@ import static de.rwth.idsg.steve.SteveConfiguration.CONFIG;
 @EnableWebMvc
 @EnableScheduling
 @ComponentScan("de.rwth.idsg.steve")
-public class BeanConfiguration extends WebMvcConfigurerAdapter {
+public class BeanConfiguration implements WebMvcConfigurer {
 
     private HikariDataSource dataSource;
     private ScheduledThreadPoolExecutor executor;

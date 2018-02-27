@@ -138,15 +138,13 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
 
     @Override
     public void insertMeterValues12(final String chargeBoxIdentity, final int connectorId,
-                                    final List<ocpp.cs._2010._08.MeterValue> list) {
+                                    final List<ocpp.cs._2010._08.MeterValue> ocpp12List) {
 
-        ctx.transaction(configuration -> {
-            DSLContext ctx = DSL.using(configuration);
+        List<MeterValue> ocpp15List = ocpp12List.stream()
+                                                .map(OcppServerRepositoryImpl::toOcpp15)
+                                                .collect(Collectors.toList());
 
-            insertIgnoreConnector(ctx, chargeBoxIdentity, connectorId);
-            int connectorPk = getConnectorPkFromConnector(ctx, chargeBoxIdentity, connectorId);
-            batchInsertMeterValues12(ctx, list, connectorPk);
-        });
+        insertMeterValues15(chargeBoxIdentity, connectorId, ocpp15List, null);
     }
 
     @Override
@@ -302,18 +300,6 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
                   .value1();
     }
 
-    private void batchInsertMeterValues12(DSLContext ctx, List<ocpp.cs._2010._08.MeterValue> list, int connectorPk) {
-        List<ConnectorMeterValueRecord> batch =
-                list.stream()
-                    .map(s -> ctx.newRecord(CONNECTOR_METER_VALUE)
-                                 .setConnectorPk(connectorPk)
-                                 .setValueTimestamp(s.getTimestamp())
-                                 .setValue(String.valueOf(s.getValue())))
-                    .collect(Collectors.toList());
-
-        ctx.batchInsert(batch).execute();
-    }
-
     private void batchInsertMeterValues15(DSLContext ctx, List<ocpp.cs._2012._06.MeterValue> list, int connectorPk,
                                           Integer transactionId) {
         List<ConnectorMeterValueRecord> batch =
@@ -334,5 +320,15 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
                     .collect(Collectors.toList());
 
         ctx.batchInsert(batch).execute();
+    }
+
+    private static ocpp.cs._2012._06.MeterValue toOcpp15(ocpp.cs._2010._08.MeterValue input) {
+        MeterValue.Value val = new MeterValue.Value();
+        val.setValue(Integer.toString(input.getValue()));
+
+        MeterValue output = new MeterValue();
+        output.setTimestamp(input.getTimestamp());
+        output.getValue().add(val);
+        return output;
     }
 }

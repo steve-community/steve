@@ -33,14 +33,10 @@ public interface OcppServerRepository {
 
     void insertConnectorStatus(InsertConnectorStatusParams params);
 
-    void insertMeterValues12(String chargeBoxIdentity, int connectorId,
-                             List<ocpp.cs._2010._08.MeterValue> list);
-    void insertMeterValues15(String chargeBoxIdentity, int connectorId,
-                             List<ocpp.cs._2012._06.MeterValue> list, Integer transactionId);
-    void insertMeterValuesOfTransaction(String chargeBoxIdentity, int transactionId,
-                                        List<ocpp.cs._2012._06.MeterValue> list);
+    void insertMeterValues12(String chargeBoxIdentity, List<ocpp.cs._2010._08.MeterValue> list, int connectorId);
+    void insertMeterValues15(String chargeBoxIdentity, List<ocpp.cs._2012._06.MeterValue> list, int connectorId, Integer transactionId);
+    void insertMeterValuesOfTransaction(String chargeBoxIdentity, List<ocpp.cs._2012._06.MeterValue> list, int transactionId);
 
     Integer insertTransaction(InsertTransactionParams params);
-
     void updateTransaction(UpdateTransactionParams params);
 }

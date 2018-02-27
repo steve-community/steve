@@ -120,9 +120,8 @@ public class CentralSystemService12_Service {
     public MeterValuesResponse meterValues(MeterValuesRequest parameters, String chargeBoxIdentity) {
         log.debug("Executing meterValues for {}", chargeBoxIdentity);
 
-        int connectorId = parameters.getConnectorId();
         if (parameters.isSetValues()) {
-            ocppServerRepository.insertMeterValues12(chargeBoxIdentity, connectorId, parameters.getValues());
+            ocppServerRepository.insertMeterValues12(chargeBoxIdentity, parameters.getValues(), parameters.getConnectorId());
         }
         return new MeterValuesResponse();
     }

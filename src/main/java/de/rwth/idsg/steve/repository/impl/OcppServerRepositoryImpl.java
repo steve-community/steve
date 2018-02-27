@@ -137,20 +137,19 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
     }
 
     @Override
-    public void insertMeterValues12(final String chargeBoxIdentity, final int connectorId,
-                                    final List<ocpp.cs._2010._08.MeterValue> ocpp12List) {
+    public void insertMeterValues12(String chargeBoxIdentity, List<ocpp.cs._2010._08.MeterValue> list, int connectorId) {
+        // ocpp 1.2 -> ocpp 1.5
+        List<MeterValue> ocpp15List =
+                list.stream()
+                    .map(e -> new MeterValue().withTimestamp(e.getTimestamp())
+                                              .withValue(new MeterValue.Value().withValue(Integer.toString(e.getValue()))))
+                    .collect(Collectors.toList());
 
-        List<MeterValue> ocpp15List = ocpp12List.stream()
-                                                .map(OcppServerRepositoryImpl::toOcpp15)
-                                                .collect(Collectors.toList());
-
-        insertMeterValues15(chargeBoxIdentity, connectorId, ocpp15List, null);
+        insertMeterValues15(chargeBoxIdentity, ocpp15List, connectorId, null);
     }
 
     @Override
-    public void insertMeterValues15(final String chargeBoxIdentity, final int connectorId,
-                                    final List<ocpp.cs._2012._06.MeterValue> list, final Integer transactionId) {
-
+    public void insertMeterValues15(String chargeBoxIdentity, List<ocpp.cs._2012._06.MeterValue> list, int connectorId, Integer transactionId) {
         ctx.transaction(configuration -> {
             DSLContext ctx = DSL.using(configuration);
 
@@ -161,9 +160,7 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
     }
 
     @Override
-    public void insertMeterValuesOfTransaction(String chargeBoxIdentity, final int transactionId,
-                                               final List<MeterValue> list) {
-
+    public void insertMeterValuesOfTransaction(String chargeBoxIdentity, List<MeterValue> list, int transactionId) {
         ctx.transaction(configuration -> {
             DSLContext ctx = DSL.using(configuration);
 
@@ -320,15 +317,5 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
                     .collect(Collectors.toList());
 
         ctx.batchInsert(batch).execute();
-    }
-
-    private static ocpp.cs._2012._06.MeterValue toOcpp15(ocpp.cs._2010._08.MeterValue input) {
-        MeterValue.Value val = new MeterValue.Value();
-        val.setValue(Integer.toString(input.getValue()));
-
-        MeterValue output = new MeterValue();
-        output.setTimestamp(input.getTimestamp());
-        output.getValue().add(val);
-        return output;
     }
 }

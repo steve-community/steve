@@ -102,7 +102,7 @@ public class WebSocketConfiguration implements WebSocketConfigurer {
 
     @Bean
     public HandlerMapping webSocketHandlerMapping() {
-        ServletWebSocketHandlerRegistry registry = new ServletWebSocketHandlerRegistry(null);
+        ServletWebSocketHandlerRegistry registry = new ServletWebSocketHandlerRegistry();
         registerWebSocketHandlers(registry);
         return registry.getHandlerMapping();
     }

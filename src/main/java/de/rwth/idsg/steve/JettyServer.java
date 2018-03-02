@@ -17,10 +17,11 @@ import org.eclipse.jetty.util.thread.ScheduledExecutorScheduler;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import static de.rwth.idsg.steve.SteveConfiguration.CONFIG;
 
@@ -151,15 +152,14 @@ public class JettyServer {
             return Collections.emptyList();
         }
 
-        Connector[] connectors = server.getConnectors();
-        List<String> list = new ArrayList<>(connectors.length);
-        for (Connector c : connectors) {
-            list.add(getConnectorPath((ServerConnector) c));
-        }
-        return list;
+        return Arrays.stream(server.getConnectors())
+                     .map(JettyServer::getConnectorPath)
+                     .collect(Collectors.toList());
     }
 
-    private String getConnectorPath(ServerConnector sc) {
+    private static String getConnectorPath(Connector c) {
+        ServerConnector sc = (ServerConnector) c;
+
         String prefix = "http";
         String host = sc.getHost();
         int port = sc.getPort();

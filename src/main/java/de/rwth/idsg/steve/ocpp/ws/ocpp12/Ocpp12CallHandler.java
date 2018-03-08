@@ -3,8 +3,8 @@ package de.rwth.idsg.steve.ocpp.ws.ocpp12;
 import de.rwth.idsg.steve.ocpp.OcppProtocol;
 import de.rwth.idsg.steve.ocpp.RequestType;
 import de.rwth.idsg.steve.ocpp.ResponseType;
+import de.rwth.idsg.steve.ocpp.soap.CentralSystemService12_SoapServer;
 import de.rwth.idsg.steve.ocpp.ws.pipeline.AbstractCallHandler;
-import de.rwth.idsg.steve.service.CentralSystemService12_Service;
 import lombok.extern.slf4j.Slf4j;
 import ocpp.cs._2010._08.AuthorizeRequest;
 import ocpp.cs._2010._08.BootNotificationRequest;
@@ -28,7 +28,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class Ocpp12CallHandler extends AbstractCallHandler {
 
-    @Autowired private CentralSystemService12_Service service;
+    @Autowired private CentralSystemService12_SoapServer server;
 
     /**
      * Wrapper around actual service functions
@@ -40,31 +40,31 @@ public class Ocpp12CallHandler extends AbstractCallHandler {
         ResponseType r = null;
 
         if (params instanceof BootNotificationRequest) {
-            r = service.bootNotification((BootNotificationRequest) params, chargeBoxId, OcppProtocol.V_12_JSON);
+            r = server.bootNotificationWithTransport((BootNotificationRequest) params, chargeBoxId, OcppProtocol.V_12_JSON);
 
         } else if (params instanceof FirmwareStatusNotificationRequest) {
-            r = service.firmwareStatusNotification((FirmwareStatusNotificationRequest) params, chargeBoxId);
+            r = server.firmwareStatusNotification((FirmwareStatusNotificationRequest) params, chargeBoxId);
 
         } else if (params instanceof StatusNotificationRequest) {
-            r = service.statusNotification((StatusNotificationRequest) params, chargeBoxId);
+            r = server.statusNotification((StatusNotificationRequest) params, chargeBoxId);
 
         } else if (params instanceof MeterValuesRequest) {
-            r = service.meterValues((MeterValuesRequest) params, chargeBoxId);
+            r = server.meterValues((MeterValuesRequest) params, chargeBoxId);
 
         } else if (params instanceof DiagnosticsStatusNotificationRequest) {
-            r = service.diagnosticsStatusNotification((DiagnosticsStatusNotificationRequest) params, chargeBoxId);
+            r = server.diagnosticsStatusNotification((DiagnosticsStatusNotificationRequest) params, chargeBoxId);
 
         } else if (params instanceof StartTransactionRequest) {
-            r = service.startTransaction((StartTransactionRequest) params, chargeBoxId);
+            r = server.startTransaction((StartTransactionRequest) params, chargeBoxId);
 
         } else if (params instanceof StopTransactionRequest) {
-            r = service.stopTransaction((StopTransactionRequest) params, chargeBoxId);
+            r = server.stopTransaction((StopTransactionRequest) params, chargeBoxId);
 
         } else if (params instanceof HeartbeatRequest) {
-            r = service.heartbeat((HeartbeatRequest) params, chargeBoxId);
+            r = server.heartbeat((HeartbeatRequest) params, chargeBoxId);
 
         } else if (params instanceof AuthorizeRequest) {
-            r = service.authorize((AuthorizeRequest) params, chargeBoxId);
+            r = server.authorize((AuthorizeRequest) params, chargeBoxId);
         }
 
         return r;

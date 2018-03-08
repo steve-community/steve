@@ -1,7 +1,9 @@
 package de.rwth.idsg.steve.ocpp.soap;
 
 import de.rwth.idsg.steve.ocpp.OcppProtocol;
-import de.rwth.idsg.steve.service.CentralSystemService12_Service;
+import de.rwth.idsg.steve.ocpp.OcppTransport;
+import de.rwth.idsg.steve.ocpp.OcppVersion;
+import de.rwth.idsg.steve.service.CentralSystemService15_Service;
 import lombok.extern.slf4j.Slf4j;
 import ocpp.cs._2010._08.AuthorizeRequest;
 import ocpp.cs._2010._08.AuthorizeResponse;
@@ -33,6 +35,8 @@ import javax.xml.ws.soap.Addressing;
 import javax.xml.ws.soap.SOAPBinding;
 import java.util.concurrent.Future;
 
+import static de.rwth.idsg.steve.ocpp.converter.Server12to15Impl.SINGLETON;
+
 /**
  * Service implementation of OCPP V1.2
  *
@@ -50,45 +54,66 @@ import java.util.concurrent.Future;
         endpointInterface = "ocpp.cs._2010._08.CentralSystemService")
 public class CentralSystemService12_SoapServer implements CentralSystemService {
 
-    @Autowired private CentralSystemService12_Service service;
+    @Autowired private CentralSystemService15_Service service;
+
+    public BootNotificationResponse bootNotificationWithTransport(BootNotificationRequest parameters,
+                                                                  String chargeBoxIdentity, OcppProtocol protocol) {
+        if (protocol.getVersion() != OcppVersion.V_12) {
+            throw new IllegalArgumentException("Unexpected OCPP version: " + protocol.getVersion());
+        }
+        return SINGLETON.convertResponse(
+                service.bootNotification(SINGLETON.convertRequest(parameters), chargeBoxIdentity, protocol));
+    }
+
 
     public BootNotificationResponse bootNotification(BootNotificationRequest parameters, String chargeBoxIdentity) {
-        return service.bootNotification(parameters, chargeBoxIdentity, OcppProtocol.V_12_SOAP);
+        return this.bootNotificationWithTransport(parameters, chargeBoxIdentity, OcppProtocol.V_12_SOAP);
     }
 
     public FirmwareStatusNotificationResponse firmwareStatusNotification(FirmwareStatusNotificationRequest parameters,
                                                                          String chargeBoxIdentity) {
-        return service.firmwareStatusNotification(parameters, chargeBoxIdentity);
+        return SINGLETON.convertResponse(
+                service.firmwareStatusNotification(SINGLETON.convertRequest(parameters), chargeBoxIdentity));
+
     }
 
     public StatusNotificationResponse statusNotification(
             StatusNotificationRequest parameters, String chargeBoxIdentity) {
-        return service.statusNotification(parameters, chargeBoxIdentity);
+        return SINGLETON.convertResponse(
+                service.statusNotification(SINGLETON.convertRequest(parameters), chargeBoxIdentity));
+
     }
 
     public MeterValuesResponse meterValues(MeterValuesRequest parameters, String chargeBoxIdentity) {
-        return service.meterValues(parameters, chargeBoxIdentity);
+        return SINGLETON.convertResponse(
+                service.meterValues(SINGLETON.convertRequest(parameters), chargeBoxIdentity));
+
     }
 
     public DiagnosticsStatusNotificationResponse diagnosticsStatusNotification(
             DiagnosticsStatusNotificationRequest parameters, String chargeBoxIdentity) {
-        return service.diagnosticsStatusNotification(parameters, chargeBoxIdentity);
+        return SINGLETON.convertResponse(
+                service.diagnosticsStatusNotification(SINGLETON.convertRequest(parameters), chargeBoxIdentity));
     }
 
     public StartTransactionResponse startTransaction(StartTransactionRequest parameters, String chargeBoxIdentity) {
-        return service.startTransaction(parameters, chargeBoxIdentity);
+        return SINGLETON.convertResponse(
+                service.startTransaction(SINGLETON.convertRequest(parameters), chargeBoxIdentity));
     }
 
     public StopTransactionResponse stopTransaction(StopTransactionRequest parameters, String chargeBoxIdentity) {
-        return service.stopTransaction(parameters, chargeBoxIdentity);
+        return SINGLETON.convertResponse(
+                service.stopTransaction(SINGLETON.convertRequest(parameters), chargeBoxIdentity));
     }
 
     public HeartbeatResponse heartbeat(HeartbeatRequest parameters, String chargeBoxIdentity) {
-        return service.heartbeat(parameters, chargeBoxIdentity);
+        return SINGLETON.convertResponse(
+                service.heartbeat(SINGLETON.convertRequest(parameters), chargeBoxIdentity));
     }
 
     public AuthorizeResponse authorize(AuthorizeRequest parameters, String chargeBoxIdentity) {
-        return service.authorize(parameters, chargeBoxIdentity);
+        return SINGLETON.convertResponse(
+                service.authorize(SINGLETON.convertRequest(parameters), chargeBoxIdentity));
     }
 
     // -------------------------------------------------------------------------

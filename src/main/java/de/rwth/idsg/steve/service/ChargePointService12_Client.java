@@ -45,9 +45,6 @@ import java.util.function.Consumer;
 import static de.rwth.idsg.steve.utils.DateTimeUtils.toDateTime;
 
 /**
- * Transport-level agnostic client implementation of OCPP V1.2
- * which builds the request payloads and delegates to dispatcher.
- *
  * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
  */
 @Slf4j

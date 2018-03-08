@@ -34,7 +34,6 @@ import ocpp.cp._2012._06.UnlockConnectorRequest;
 import ocpp.cp._2012._06.UnlockConnectorResponse;
 import ocpp.cp._2012._06.UpdateFirmwareRequest;
 import ocpp.cp._2012._06.UpdateFirmwareResponse;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 /**
@@ -47,10 +46,8 @@ import org.springframework.stereotype.Service;
 @Service
 public class ChargePointService15_SoapInvoker implements ChargePointService15_Invoker {
 
-    @Autowired private ClientProvider clientProvider;
-
-    private ChargePointService create(String endpointAddress) {
-        return clientProvider.getForOcpp15(endpointAddress);
+    private static ChargePointService create(String endpointAddress) {
+        return ClientProvider.getForOcpp15(endpointAddress);
     }
 
     @Override

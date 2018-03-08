@@ -65,7 +65,6 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import static de.rwth.idsg.steve.utils.DateTimeUtils.toDateTime;
@@ -223,7 +222,9 @@ public class ChargePointService15_Client {
         List<ChargePointSelect> list = params.getChargePointSelectList();
         RequestTask<ChangeAvailabilityRequest> task = new RequestTask<>(VERSION, req, list);
 
-        execute(list, c -> getInvoker(c).changeAvailability(c, new ChangeAvailabilityResponseHandler(task, c.getChargeBoxId())));
+        BackgroundService.with(executorService)
+                         .forEach(list)
+                         .execute(c -> getInvoker(c).changeAvailability(c, new ChangeAvailabilityResponseHandler(task, c.getChargeBoxId())));
 
         return requestTaskStore.add(task);
     }
@@ -233,7 +234,9 @@ public class ChargePointService15_Client {
         List<ChargePointSelect> list = params.getChargePointSelectList();
         RequestTask<ChangeConfigurationRequest> task = new RequestTask<>(VERSION, req, list);
 
-        execute(list, c -> getInvoker(c).changeConfiguration(c, new ChangeConfigurationResponseHandler(task, c.getChargeBoxId())));
+        BackgroundService.with(executorService)
+                         .forEach(list)
+                         .execute(c -> getInvoker(c).changeConfiguration(c, new ChangeConfigurationResponseHandler(task, c.getChargeBoxId())));
 
         return requestTaskStore.add(task);
     }
@@ -243,7 +246,9 @@ public class ChargePointService15_Client {
         List<ChargePointSelect> list = params.getChargePointSelectList();
         RequestTask<ClearCacheRequest> task = new RequestTask<>(VERSION, req, list);
 
-        execute(list, c -> getInvoker(c).clearCache(c, new ClearCacheResponseHandler(task, c.getChargeBoxId())));
+        BackgroundService.with(executorService)
+                         .forEach(list)
+                         .execute(c -> getInvoker(c).clearCache(c, new ClearCacheResponseHandler(task, c.getChargeBoxId())));
 
         return requestTaskStore.add(task);
     }
@@ -253,7 +258,9 @@ public class ChargePointService15_Client {
         List<ChargePointSelect> list = params.getChargePointSelectList();
         RequestTask<GetDiagnosticsRequest> task = new RequestTask<>(VERSION, req, list);
 
-        execute(list, c -> getInvoker(c).getDiagnostics(c, new GetDiagnosticsResponseHandler(task, c.getChargeBoxId())));
+        BackgroundService.with(executorService)
+                         .forEach(list)
+                         .execute(c -> getInvoker(c).getDiagnostics(c, new GetDiagnosticsResponseHandler(task, c.getChargeBoxId())));
 
         return requestTaskStore.add(task);
     }
@@ -263,7 +270,9 @@ public class ChargePointService15_Client {
         List<ChargePointSelect> list = params.getChargePointSelectList();
         RequestTask<ResetRequest> task = new RequestTask<>(VERSION, req, list);
 
-        execute(list, c -> getInvoker(c).reset(c, new ResetResponseHandler(task, c.getChargeBoxId())));
+        BackgroundService.with(executorService)
+                         .forEach(list)
+                         .execute(c -> getInvoker(c).reset(c, new ResetResponseHandler(task, c.getChargeBoxId())));
 
         return requestTaskStore.add(task);
     }
@@ -273,7 +282,9 @@ public class ChargePointService15_Client {
         List<ChargePointSelect> list = params.getChargePointSelectList();
         RequestTask<UpdateFirmwareRequest> task = new RequestTask<>(VERSION, req, list);
 
-        execute(list, c -> getInvoker(c).updateFirmware(c, new UpdateFirmwareResponseHandler(task, c.getChargeBoxId())));
+        BackgroundService.with(executorService)
+                         .forEach(list)
+                         .execute(c -> getInvoker(c).updateFirmware(c, new UpdateFirmwareResponseHandler(task, c.getChargeBoxId())));
 
         return requestTaskStore.add(task);
     }
@@ -283,7 +294,9 @@ public class ChargePointService15_Client {
         List<ChargePointSelect> list = params.getChargePointSelectList();
         RequestTask<DataTransferRequest> task = new RequestTask<>(VERSION, req, list);
 
-        execute(list, c -> getInvoker(c).dataTransfer(c, new DataTransferResponseHandler(task, c.getChargeBoxId())));
+        BackgroundService.with(executorService)
+                         .forEach(list)
+                         .execute(c -> getInvoker(c).dataTransfer(c, new DataTransferResponseHandler(task, c.getChargeBoxId())));
 
         return requestTaskStore.add(task);
     }
@@ -293,7 +306,9 @@ public class ChargePointService15_Client {
         List<ChargePointSelect> list = params.getChargePointSelectList();
         RequestTask<GetConfigurationRequest> task = new RequestTask<>(VERSION, req, list);
 
-        execute(list, c -> getInvoker(c).getConfiguration(c, new GetConfigurationResponseHandler(task, c.getChargeBoxId())));
+        BackgroundService.with(executorService)
+                         .forEach(list)
+                         .execute(c -> getInvoker(c).getConfiguration(c, new GetConfigurationResponseHandler(task, c.getChargeBoxId())));
 
         return requestTaskStore.add(task);
     }
@@ -303,7 +318,9 @@ public class ChargePointService15_Client {
         List<ChargePointSelect> list = params.getChargePointSelectList();
         RequestTask<GetLocalListVersionRequest> task = new RequestTask<>(VERSION, req, list);
 
-        execute(list, c -> getInvoker(c).getLocalListVersion(c, new GetLocalListVersionResponseHandler(task, c.getChargeBoxId())));
+        BackgroundService.with(executorService)
+                         .forEach(list)
+                         .execute(c -> getInvoker(c).getLocalListVersion(c, new GetLocalListVersionResponseHandler(task, c.getChargeBoxId())));
 
         return requestTaskStore.add(task);
     }
@@ -313,16 +330,11 @@ public class ChargePointService15_Client {
         List<ChargePointSelect> list = params.getChargePointSelectList();
         RequestTask<SendLocalListRequest> task = new RequestTask<>(VERSION, req, list);
 
-        execute(list, c -> getInvoker(c).sendLocalList(c, new SendLocalListResponseHandler(task, c.getChargeBoxId())));
+        BackgroundService.with(executorService)
+                         .forEach(list)
+                         .execute(c -> getInvoker(c).sendLocalList(c, new SendLocalListResponseHandler(task, c.getChargeBoxId())));
 
         return requestTaskStore.add(task);
-    }
-
-    /**
-     * Executes the requests
-     */
-    private void execute(List<ChargePointSelect> list, Consumer<ChargePointSelect> consumer) {
-        executorService.execute(() -> list.forEach(consumer));
     }
 
     // -------------------------------------------------------------------------
@@ -333,9 +345,10 @@ public class ChargePointService15_Client {
         RemoteStartTransactionRequest req = prepareRemoteStartTransaction(params);
         List<ChargePointSelect> list = params.getChargePointSelectList();
         RequestTask<RemoteStartTransactionRequest> task = new RequestTask<>(VERSION, req, list);
-        ChargePointSelect c = list.get(0);
 
-        execute(() -> getInvoker(c).remoteStartTransaction(c, new RemoteStartTransactionResponseHandler(task, c.getChargeBoxId())));
+        BackgroundService.with(executorService)
+                         .forFirst(list)
+                         .execute(c -> getInvoker(c).remoteStartTransaction(c, new RemoteStartTransactionResponseHandler(task, c.getChargeBoxId())));
 
         return requestTaskStore.add(task);
     }
@@ -344,9 +357,10 @@ public class ChargePointService15_Client {
         RemoteStopTransactionRequest req = prepareRemoteStopTransaction(params);
         List<ChargePointSelect> list = params.getChargePointSelectList();
         RequestTask<RemoteStopTransactionRequest> task = new RequestTask<>(VERSION, req, list);
-        ChargePointSelect c = list.get(0);
 
-        execute(() -> getInvoker(c).remoteStopTransaction(c, new RemoteStopTransactionResponseHandler(task, c.getChargeBoxId())));
+        BackgroundService.with(executorService)
+                         .forFirst(list)
+                         .execute(c -> getInvoker(c).remoteStopTransaction(c, new RemoteStopTransactionResponseHandler(task, c.getChargeBoxId())));
 
         return requestTaskStore.add(task);
     }
@@ -355,32 +369,31 @@ public class ChargePointService15_Client {
         UnlockConnectorRequest req = prepareUnlockConnector(params);
         List<ChargePointSelect> list = params.getChargePointSelectList();
         RequestTask<UnlockConnectorRequest> task = new RequestTask<>(VERSION, req, list);
-        ChargePointSelect c = list.get(0);
 
-        execute(() -> getInvoker(c).unlockConnector(c, new UnlockConnectorResponseHandler(task, c.getChargeBoxId())));
+        BackgroundService.with(executorService)
+                         .forFirst(list)
+                         .execute(c -> getInvoker(c).unlockConnector(c, new UnlockConnectorResponseHandler(task, c.getChargeBoxId())));
 
         return requestTaskStore.add(task);
     }
 
     public int reserveNow(ReserveNowParams params) {
         List<ChargePointSelect> list = params.getChargePointSelectList();
-        ChargePointSelect c = list.get(0);
-        String chargeBoxId = c.getChargeBoxId();
-
         InsertReservationParams res = InsertReservationParams.builder()
                                                              .idTag(params.getIdTag())
-                                                             .chargeBoxId(chargeBoxId)
+                                                             .chargeBoxId(list.get(0).getChargeBoxId())
                                                              .connectorId(params.getConnectorId())
                                                              .startTimestamp(DateTime.now())
                                                              .expiryTimestamp(params.getExpiry().toDateTime())
                                                              .build();
 
         int reservationId = reservationRepository.insert(res);
-
         ReserveNowRequest req = this.prepareReserveNow(params, reservationId);
         RequestTask<ReserveNowRequest> task = new RequestTask<>(VERSION, req, list);
 
-        execute(() -> getInvoker(c).reserveNow(c, new ReserveNowResponseHandler(task, chargeBoxId, reservationRepository)));
+        BackgroundService.with(executorService)
+                         .forFirst(list)
+                         .execute(c -> getInvoker(c).reserveNow(c, new ReserveNowResponseHandler(task, c.getChargeBoxId(), reservationRepository)));
 
         return requestTaskStore.add(task);
     }
@@ -389,18 +402,12 @@ public class ChargePointService15_Client {
         CancelReservationRequest req = prepareCancelReservation(params);
         List<ChargePointSelect> list = params.getChargePointSelectList();
         RequestTask<CancelReservationRequest> task = new RequestTask<>(VERSION, req, list);
-        ChargePointSelect c = list.get(0);
 
-        execute(() -> getInvoker(c).cancelReservation(c, new CancelReservationResponseHandler(task, c.getChargeBoxId(), reservationRepository)));
+        BackgroundService.with(executorService)
+                         .forFirst(list)
+                         .execute(c -> getInvoker(c).cancelReservation(c, new CancelReservationResponseHandler(task, c.getChargeBoxId(), reservationRepository)));
 
         return requestTaskStore.add(task);
-    }
-
-    /**
-     * Executes the requests for single charge point invocation
-     */
-    private void execute(Runnable r) {
-        executorService.execute(r);
     }
 
     private ChargePointService15_Invoker getInvoker(ChargePointSelect cp) {

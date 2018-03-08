@@ -15,17 +15,18 @@ import de.rwth.idsg.steve.ocpp.soap.ChargePointService12_SoapInvoker;
 import de.rwth.idsg.steve.ocpp.ws.ocpp12.ChargePointService12_WsInvoker;
 import de.rwth.idsg.steve.repository.RequestTaskStore;
 import de.rwth.idsg.steve.repository.dto.ChargePointSelect;
+import de.rwth.idsg.steve.web.dto.common.ChangeAvailabilityParams;
+import de.rwth.idsg.steve.web.dto.common.ChangeConfigurationParams;
 import de.rwth.idsg.steve.web.dto.common.GetDiagnosticsParams;
 import de.rwth.idsg.steve.web.dto.common.MultipleChargePointSelect;
 import de.rwth.idsg.steve.web.dto.common.RemoteStartTransactionParams;
 import de.rwth.idsg.steve.web.dto.common.RemoteStopTransactionParams;
+import de.rwth.idsg.steve.web.dto.common.ResetParams;
 import de.rwth.idsg.steve.web.dto.common.UnlockConnectorParams;
 import de.rwth.idsg.steve.web.dto.common.UpdateFirmwareParams;
-import de.rwth.idsg.steve.web.dto.ocpp12.ChangeAvailabilityParams;
-import de.rwth.idsg.steve.web.dto.ocpp12.ChangeConfigurationParams;
-import de.rwth.idsg.steve.web.dto.ocpp12.ResetParams;
 import de.rwth.idsg.steve.web.dto.task.RequestTask;
 import lombok.extern.slf4j.Slf4j;
+import ocpp.cp._2010._08.AvailabilityType;
 import ocpp.cp._2010._08.ChangeAvailabilityRequest;
 import ocpp.cp._2010._08.ChangeConfigurationRequest;
 import ocpp.cp._2010._08.ClearCacheRequest;
@@ -33,6 +34,7 @@ import ocpp.cp._2010._08.GetDiagnosticsRequest;
 import ocpp.cp._2010._08.RemoteStartTransactionRequest;
 import ocpp.cp._2010._08.RemoteStopTransactionRequest;
 import ocpp.cp._2010._08.ResetRequest;
+import ocpp.cp._2010._08.ResetType;
 import ocpp.cp._2010._08.UnlockConnectorRequest;
 import ocpp.cp._2010._08.UpdateFirmwareRequest;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -64,7 +66,7 @@ public class ChargePointService12_Client {
     private static ChangeAvailabilityRequest prepareChangeAvailability(ChangeAvailabilityParams params) {
         return new ChangeAvailabilityRequest()
                 .withConnectorId(params.getConnectorId())
-                .withType(params.getAvailType());
+                .withType(AvailabilityType.fromValue(params.getAvailType().value()));
     }
 
     private static ChangeConfigurationRequest prepareChangeConfiguration(ChangeConfigurationParams params) {
@@ -99,7 +101,7 @@ public class ChargePointService12_Client {
 
     private static ResetRequest prepareReset(ResetParams params) {
         return new ResetRequest()
-                .withType(params.getResetType());
+                .withType(ResetType.fromValue(params.getResetType().value()));
     }
 
     private static UnlockConnectorRequest prepareUnlockConnector(UnlockConnectorParams params) {

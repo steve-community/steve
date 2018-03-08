@@ -14,7 +14,7 @@ import java.util.List;
 @Getter
 public class GetConfigurationParams extends MultipleChargePointSelect {
 
-    private List<ConfigurationKeyEnum> confKeyList;
+    private List<String> confKeyList;
 
     public boolean isSetConfKeyList() {
         return confKeyList != null && !confKeyList.isEmpty();

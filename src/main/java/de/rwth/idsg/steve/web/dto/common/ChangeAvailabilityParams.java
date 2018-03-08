@@ -1,16 +1,14 @@
-package de.rwth.idsg.steve.web.dto.ocpp15;
+package de.rwth.idsg.steve.web.dto.common;
 
-import de.rwth.idsg.steve.web.dto.common.MultipleChargePointSelect;
 import lombok.Getter;
 import lombok.Setter;
-import ocpp.cp._2012._06.AvailabilityType;
 
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 
 /**
  * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
- * @since 15.08.2014
+ * @since 08.03.2018
  */
 @Getter
 public class ChangeAvailabilityParams extends MultipleChargePointSelect {

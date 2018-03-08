@@ -24,24 +24,24 @@ import de.rwth.idsg.steve.repository.RequestTaskStore;
 import de.rwth.idsg.steve.repository.ReservationRepository;
 import de.rwth.idsg.steve.repository.dto.ChargePointSelect;
 import de.rwth.idsg.steve.repository.dto.InsertReservationParams;
+import de.rwth.idsg.steve.web.dto.common.ChangeAvailabilityParams;
+import de.rwth.idsg.steve.web.dto.common.ChangeConfigurationParams;
 import de.rwth.idsg.steve.web.dto.common.GetDiagnosticsParams;
 import de.rwth.idsg.steve.web.dto.common.MultipleChargePointSelect;
 import de.rwth.idsg.steve.web.dto.common.RemoteStartTransactionParams;
 import de.rwth.idsg.steve.web.dto.common.RemoteStopTransactionParams;
+import de.rwth.idsg.steve.web.dto.common.ResetParams;
 import de.rwth.idsg.steve.web.dto.common.UnlockConnectorParams;
 import de.rwth.idsg.steve.web.dto.common.UpdateFirmwareParams;
 import de.rwth.idsg.steve.web.dto.ocpp15.CancelReservationParams;
-import de.rwth.idsg.steve.web.dto.ocpp15.ChangeAvailabilityParams;
-import de.rwth.idsg.steve.web.dto.ocpp15.ChangeConfigurationParams;
-import de.rwth.idsg.steve.web.dto.ocpp15.ConfigurationKeyEnum;
 import de.rwth.idsg.steve.web.dto.ocpp15.DataTransferParams;
 import de.rwth.idsg.steve.web.dto.ocpp15.GetConfigurationParams;
 import de.rwth.idsg.steve.web.dto.ocpp15.ReserveNowParams;
-import de.rwth.idsg.steve.web.dto.ocpp15.ResetParams;
 import de.rwth.idsg.steve.web.dto.ocpp15.SendLocalListParams;
 import de.rwth.idsg.steve.web.dto.task.RequestTask;
 import lombok.extern.slf4j.Slf4j;
 import ocpp.cp._2012._06.AuthorisationData;
+import ocpp.cp._2012._06.AvailabilityType;
 import ocpp.cp._2012._06.CancelReservationRequest;
 import ocpp.cp._2012._06.ChangeAvailabilityRequest;
 import ocpp.cp._2012._06.ChangeConfigurationRequest;
@@ -54,6 +54,7 @@ import ocpp.cp._2012._06.RemoteStartTransactionRequest;
 import ocpp.cp._2012._06.RemoteStopTransactionRequest;
 import ocpp.cp._2012._06.ReserveNowRequest;
 import ocpp.cp._2012._06.ResetRequest;
+import ocpp.cp._2012._06.ResetType;
 import ocpp.cp._2012._06.SendLocalListRequest;
 import ocpp.cp._2012._06.UnlockConnectorRequest;
 import ocpp.cp._2012._06.UpdateFirmwareRequest;
@@ -65,7 +66,6 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.stream.Collectors;
 
 import static de.rwth.idsg.steve.utils.DateTimeUtils.toDateTime;
 
@@ -93,7 +93,7 @@ public class ChargePointService15_Client {
     private static ChangeAvailabilityRequest prepareChangeAvailability(ChangeAvailabilityParams params) {
         return new ChangeAvailabilityRequest()
                 .withConnectorId(params.getConnectorId())
-                .withType(params.getAvailType());
+                .withType(AvailabilityType.fromValue(params.getAvailType().value()));
     }
 
     private static ChangeConfigurationRequest prepareChangeConfiguration(ChangeConfigurationParams params) {
@@ -128,7 +128,7 @@ public class ChargePointService15_Client {
 
     private static ResetRequest prepareReset(ResetParams params) {
         return new ResetRequest()
-                .withType(params.getResetType());
+                .withType(ResetType.fromValue(params.getResetType().value()));
     }
 
     private static UnlockConnectorRequest prepareUnlockConnector(UnlockConnectorParams params) {
@@ -156,12 +156,7 @@ public class ChargePointService15_Client {
 
     private static GetConfigurationRequest prepareGetConfiguration(GetConfigurationParams params) {
         if (params.isSetConfKeyList()) {
-            List<String> stringList = params.getConfKeyList()
-                                            .stream()
-                                            .map(ConfigurationKeyEnum::value)
-                                            .collect(Collectors.toList());
-
-            return new GetConfigurationRequest().withKey(stringList);
+            return new GetConfigurationRequest().withKey(params.getConfKeyList());
         } else {
             return new GetConfigurationRequest();
         }

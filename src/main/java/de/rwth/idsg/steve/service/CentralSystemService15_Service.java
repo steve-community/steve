@@ -129,8 +129,8 @@ public class CentralSystemService15_Service {
         log.debug("Executing meterValues for {}", chargeBoxIdentity);
 
         if (parameters.isSetValues()) {
-            ocppServerRepository.insertMeterValues15(chargeBoxIdentity, parameters.getValues(),
-                                                     parameters.getConnectorId(), parameters.getTransactionId());
+            ocppServerRepository.insertMeterValues(chargeBoxIdentity, parameters.getValues(),
+                                                   parameters.getConnectorId(), parameters.getTransactionId());
         }
         return new MeterValuesResponse();
     }
@@ -196,7 +196,7 @@ public class CentralSystemService15_Service {
                                                       .flatMap(data -> data.getValues().stream())
                                                       .collect(Collectors.toList());
 
-            ocppServerRepository.insertMeterValuesOfTransaction(chargeBoxIdentity, combinedList, transactionId);
+            ocppServerRepository.insertMeterValues(chargeBoxIdentity, combinedList, transactionId);
         }
 
         // Get the authorization info of the user

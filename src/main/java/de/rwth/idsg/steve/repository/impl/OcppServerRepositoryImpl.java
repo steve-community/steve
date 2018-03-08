@@ -137,19 +137,7 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
     }
 
     @Override
-    public void insertMeterValues12(String chargeBoxIdentity, List<ocpp.cs._2010._08.MeterValue> list, int connectorId) {
-        // ocpp 1.2 -> ocpp 1.5
-        List<MeterValue> ocpp15List =
-                list.stream()
-                    .map(e -> new MeterValue().withTimestamp(e.getTimestamp())
-                                              .withValue(new MeterValue.Value().withValue(Integer.toString(e.getValue()))))
-                    .collect(Collectors.toList());
-
-        insertMeterValues15(chargeBoxIdentity, ocpp15List, connectorId, null);
-    }
-
-    @Override
-    public void insertMeterValues15(String chargeBoxIdentity, List<ocpp.cs._2012._06.MeterValue> list, int connectorId, Integer transactionId) {
+    public void insertMeterValues(String chargeBoxIdentity, List<MeterValue> list, int connectorId, Integer transactionId) {
         ctx.transaction(configuration -> {
             DSLContext ctx = DSL.using(configuration);
 
@@ -160,7 +148,7 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
     }
 
     @Override
-    public void insertMeterValuesOfTransaction(String chargeBoxIdentity, List<MeterValue> list, int transactionId) {
+    public void insertMeterValues(String chargeBoxIdentity, List<MeterValue> list, int transactionId) {
         ctx.transaction(configuration -> {
             DSLContext ctx = DSL.using(configuration);
 

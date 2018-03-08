@@ -8,6 +8,7 @@ import de.rwth.idsg.steve.ocpp.ws.data.CommunicationContext;
 import de.rwth.idsg.steve.ocpp.ws.data.FutureResponseContext;
 import de.rwth.idsg.steve.ocpp.ws.data.OcppJsonCall;
 import de.rwth.idsg.steve.ocpp.ws.pipeline.OutgoingCallPipeline;
+import de.rwth.idsg.steve.repository.dto.ChargePointSelect;
 import lombok.Setter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,6 +27,10 @@ public abstract class AbstractChargePointServiceInvoker {
 
     @Setter private TypeStore typeStore;
     @Setter private AbstractWebSocketEndpoint endpoint;
+
+    public void runPipeline(ChargePointSelect cps, OcppResponseHandler handler) {
+        runPipeline(cps.getChargeBoxId(), handler);
+    }
 
     /**
      * Just a wrapper to make try-catch block and exception handling stand out

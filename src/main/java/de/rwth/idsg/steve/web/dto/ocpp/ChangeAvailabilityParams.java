@@ -1,4 +1,4 @@
-package de.rwth.idsg.steve.web.dto.common;
+package de.rwth.idsg.steve.web.dto.ocpp;
 
 import lombok.Getter;
 import lombok.Setter;

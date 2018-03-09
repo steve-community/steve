@@ -1,6 +1,6 @@
-package de.rwth.idsg.steve.web.dto.ocpp15;
+package de.rwth.idsg.steve.web.dto.ocpp;
 
-import de.rwth.idsg.steve.web.dto.common.SingleChargePointSelect;
+import de.rwth.idsg.steve.web.dto.ocpp.SingleChargePointSelect;
 import lombok.Getter;
 import lombok.Setter;
 

@@ -1,16 +1,16 @@
-package de.rwth.idsg.steve.web.dto.common;
+package de.rwth.idsg.steve.web.dto.ocpp;
 
 /**
  * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
  * @since 08.03.2018
  */
-public enum ResetType {
-    HARD("Hard"),
-    SOFT("Soft");
+public enum AvailabilityType {
+    INOPERATIVE("Inoperative"),
+    OPERATIVE("Operative");
 
     private final String value;
 
-    ResetType(String v) {
+    AvailabilityType(String v) {
         value = v;
     }
 
@@ -18,8 +18,8 @@ public enum ResetType {
         return value;
     }
 
-    public static ResetType fromValue(String v) {
-        for (ResetType c : ResetType.values()) {
+    public static AvailabilityType fromValue(String v) {
+        for (AvailabilityType c : AvailabilityType.values()) {
             if (c.value.equals(v)) {
                 return c;
             }

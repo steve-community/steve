@@ -1,6 +1,6 @@
-package de.rwth.idsg.steve.web.dto.ocpp15;
+package de.rwth.idsg.steve.web.dto.ocpp;
 
-import de.rwth.idsg.steve.web.dto.common.MultipleChargePointSelect;
+import de.rwth.idsg.steve.web.dto.ocpp.MultipleChargePointSelect;
 import lombok.Getter;
 import lombok.Setter;
 import ocpp.cp._2012._06.UpdateType;
@@ -33,7 +33,7 @@ public class SendLocalListParams extends MultipleChargePointSelect {
         return UpdateType.FULL.equals(updateType) || !getDeleteList().isEmpty() || !getAddUpdateList().isEmpty();
     }
 
-    @AssertTrue(message = "The Add/Update and Delete lists should have no elements in common")
+    @AssertTrue(message = "The Add/Update and Delete lists should have no elements in ocpp")
     public boolean isDisjoint() {
         return Collections.disjoint(getDeleteList(), getAddUpdateList());
     }

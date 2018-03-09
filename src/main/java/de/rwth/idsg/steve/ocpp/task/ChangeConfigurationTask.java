@@ -19,17 +19,7 @@ public class ChangeConfigurationTask extends CommunicationTask<ChangeConfigurati
 
     @Override
     public OcppCallback<String> defaultCallback() {
-        return new OcppCallback<String>() {
-            @Override
-            public void success(String chargeBoxId, String response) {
-                addNewResponse(chargeBoxId, response);
-            }
-
-            @Override
-            public void failed(String chargeBoxId, String errorMessage) {
-                addNewError(chargeBoxId, errorMessage);
-            }
-        };
+        return new StringOcppCallback();
     }
 
     @Override

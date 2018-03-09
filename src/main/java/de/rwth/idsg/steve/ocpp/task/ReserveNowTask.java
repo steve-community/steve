@@ -6,6 +6,7 @@ import de.rwth.idsg.steve.ocpp.OcppVersion;
 import de.rwth.idsg.steve.ocpp.RequestType;
 import de.rwth.idsg.steve.ocpp.ResponseType;
 import de.rwth.idsg.steve.ocpp.task.dto.EnhancedReserveNowParams;
+import de.rwth.idsg.steve.ocpp.ws.data.OcppJsonError;
 import de.rwth.idsg.steve.repository.ReservationRepository;
 import ocpp.cp._2012._06.ReservationStatus;
 import ocpp.cp._2012._06.ReserveNowRequest;
@@ -43,8 +44,14 @@ public class ReserveNowTask extends CommunicationTask<EnhancedReserveNowParams, 
             }
 
             @Override
-            public void failed(String chargeBoxId, String errorMessage) {
-                addNewError(chargeBoxId, errorMessage);
+            public void success(String chargeBoxId, OcppJsonError error) {
+                addNewError(chargeBoxId, error.toString());
+                delete();
+            }
+
+            @Override
+            public void failed(String chargeBoxId, Exception e) {
+                addNewError(chargeBoxId, e.getMessage());
                 delete();
             }
         };

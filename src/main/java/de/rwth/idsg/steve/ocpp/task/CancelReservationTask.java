@@ -29,7 +29,7 @@ public class CancelReservationTask extends CommunicationTask<CancelReservationPa
 
     @Override
     public OcppCallback<CancelReservationStatus> defaultCallback() {
-        return new OcppCallback<CancelReservationStatus>() {
+        return new DefaultOcppCallback<CancelReservationStatus>() {
             @Override
             public void success(String chargeBoxId, CancelReservationStatus status) {
                 addNewResponse(chargeBoxId, status.value());
@@ -37,11 +37,6 @@ public class CancelReservationTask extends CommunicationTask<CancelReservationPa
                 if (CancelReservationStatus.ACCEPTED.equals(status)) {
                     reservationRepository.cancelled(params.getReservationId());
                 }
-            }
-
-            @Override
-            public void failed(String chargeBoxId, String errorMessage) {
-                addNewError(chargeBoxId, errorMessage);
             }
         };
     }

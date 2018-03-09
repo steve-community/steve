@@ -1,9 +1,7 @@
 package de.rwth.idsg.steve.ocpp;
 
 import de.rwth.idsg.steve.handler.OcppCallback;
-import de.rwth.idsg.steve.ocpp.OcppVersion;
-import de.rwth.idsg.steve.ocpp.RequestType;
-import de.rwth.idsg.steve.ocpp.ResponseType;
+import de.rwth.idsg.steve.ocpp.ws.data.OcppJsonError;
 import de.rwth.idsg.steve.repository.dto.ChargePointSelect;
 import de.rwth.idsg.steve.web.dto.ocpp.ChargePointSelection;
 import de.rwth.idsg.steve.web.dto.task.RequestResult;
@@ -128,6 +126,22 @@ public abstract class CommunicationTask<S extends ChargePointSelection, RESPONSE
         }
     }
 
+    public RequestType createRequest() {
+        switch (ocppVersion) {
+            case V_12: return getOcpp12Request();
+            case V_15: return getOcpp15Request();
+            default: throw new RuntimeException("Request type not found");
+        }
+    }
+
+    public <T extends ResponseType> AsyncHandler<T> createHandler(String chargeBoxId) {
+        switch (ocppVersion) {
+            case V_12: return getOcpp12Handler(chargeBoxId);
+            case V_15: return getOcpp15Handler(chargeBoxId);
+            default: throw new RuntimeException("ResponseType handler not found");
+        }
+    }
+
     public abstract OcppCallback<RESPONSE> defaultCallback();
 
     public abstract <T extends RequestType> T getOcpp12Request();
@@ -137,4 +151,31 @@ public abstract class CommunicationTask<S extends ChargePointSelection, RESPONSE
     public abstract <T extends ResponseType> AsyncHandler<T> getOcpp12Handler(String chargeBoxId);
 
     public abstract <T extends ResponseType> AsyncHandler<T> getOcpp15Handler(String chargeBoxId);
+
+    // -------------------------------------------------------------------------
+    // Classes
+    // -------------------------------------------------------------------------
+
+    public abstract class DefaultOcppCallback<RESPONSE> implements OcppCallback<RESPONSE> {
+
+        public abstract void success(String chargeBoxId, RESPONSE response);
+
+        @Override
+        public void success(String chargeBoxId, OcppJsonError error) {
+            addNewResponse(chargeBoxId, error.toString());
+        }
+
+        @Override
+        public void failed(String chargeBoxId, Exception e) {
+            addNewError(chargeBoxId, e.getMessage());
+        }
+    }
+
+    public class StringOcppCallback extends DefaultOcppCallback<String> {
+
+        @Override
+        public void success(String chargeBoxId, String response) {
+            addNewResponse(chargeBoxId, response);
+        }
+    }
 }

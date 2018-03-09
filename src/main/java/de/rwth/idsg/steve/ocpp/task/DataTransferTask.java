@@ -6,8 +6,8 @@ import de.rwth.idsg.steve.ocpp.OcppVersion;
 import de.rwth.idsg.steve.ocpp.RequestType;
 import de.rwth.idsg.steve.ocpp.ResponseType;
 import de.rwth.idsg.steve.web.dto.ocpp.DataTransferParams;
-import ocpp.cs._2012._06.DataTransferResponse;
 import ocpp.cs._2012._06.DataTransferRequest;
+import ocpp.cs._2012._06.DataTransferResponse;
 
 import javax.xml.ws.AsyncHandler;
 
@@ -23,7 +23,7 @@ public class DataTransferTask extends CommunicationTask<DataTransferParams, Data
 
     @Override
     public OcppCallback<DataTransferResponse> defaultCallback() {
-        return new OcppCallback<DataTransferResponse>() {
+        return new DefaultOcppCallback<DataTransferResponse>() {
             @Override
             public void success(String chargeBoxId, DataTransferResponse response) {
                 StringBuilder builder = new StringBuilder(response.getStatus().value());
@@ -31,11 +31,6 @@ public class DataTransferTask extends CommunicationTask<DataTransferParams, Data
                     builder.append(" / Data: ").append(response.getData());
                 }
                 addNewResponse(chargeBoxId, builder.toString());
-            }
-
-            @Override
-            public void failed(String chargeBoxId, String errorMessage) {
-                addNewError(chargeBoxId, errorMessage);
             }
         };
     }

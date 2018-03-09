@@ -10,7 +10,6 @@ import de.rwth.idsg.steve.web.dto.ocpp.SendLocalListParams;
 import ocpp.cp._2012._06.AuthorisationData;
 import ocpp.cp._2012._06.SendLocalListRequest;
 import ocpp.cp._2012._06.SendLocalListResponse;
-import ocpp.cp._2012._06.UpdateStatus;
 import ocpp.cp._2012._06.UpdateType;
 
 import javax.xml.ws.AsyncHandler;
@@ -21,7 +20,7 @@ import java.util.List;
  * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
  * @since 09.03.2018
  */
-public class SendLocalListTask extends CommunicationTask<SendLocalListParams, UpdateStatus> {
+public class SendLocalListTask extends CommunicationTask<SendLocalListParams, String> {
 
     private final OcppTagService ocppTagService;
 
@@ -32,18 +31,8 @@ public class SendLocalListTask extends CommunicationTask<SendLocalListParams, Up
     }
 
     @Override
-    public OcppCallback<UpdateStatus> defaultCallback() {
-        return new OcppCallback<UpdateStatus>() {
-            @Override
-            public void success(String chargeBoxId, UpdateStatus status) {
-                addNewResponse(chargeBoxId, status.value());
-            }
-
-            @Override
-            public void failed(String chargeBoxId, String errorMessage) {
-                addNewError(chargeBoxId, errorMessage);
-            }
-        };
+    public OcppCallback<String> defaultCallback() {
+        return new StringOcppCallback();
     }
 
     @Deprecated
@@ -90,7 +79,7 @@ public class SendLocalListTask extends CommunicationTask<SendLocalListParams, Up
     public AsyncHandler<SendLocalListResponse> getOcpp15Handler(String chargeBoxId) {
         return res -> {
             try {
-                success(chargeBoxId, res.get().getStatus());
+                success(chargeBoxId, res.get().getStatus().value());
             } catch (Exception e) {
                 failed(chargeBoxId, e);
             }

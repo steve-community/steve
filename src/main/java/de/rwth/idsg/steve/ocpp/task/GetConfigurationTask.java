@@ -37,7 +37,7 @@ public class GetConfigurationTask extends CommunicationTask<GetConfigurationPara
 
     @Override
     public OcppCallback<GetConfigurationResponse> defaultCallback() {
-        return new OcppCallback<GetConfigurationResponse>() {
+        return new DefaultOcppCallback<GetConfigurationResponse>() {
             @Override
             public void success(String chargeBoxId, GetConfigurationResponse response) {
                 String str = String.format(
@@ -47,11 +47,6 @@ public class GetConfigurationTask extends CommunicationTask<GetConfigurationPara
                 );
 
                 addNewResponse(chargeBoxId, str);
-            }
-
-            @Override
-            public void failed(String chargeBoxId, String errorMessage) {
-                addNewError(chargeBoxId, errorMessage);
             }
         };
     }

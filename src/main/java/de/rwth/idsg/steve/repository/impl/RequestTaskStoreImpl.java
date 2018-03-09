@@ -1,9 +1,9 @@
 package de.rwth.idsg.steve.repository.impl;
 
 import de.rwth.idsg.steve.SteveException;
+import de.rwth.idsg.steve.ocpp.CommunicationTask;
 import de.rwth.idsg.steve.repository.RequestTaskStore;
 import de.rwth.idsg.steve.repository.dto.TaskOverview;
-import de.rwth.idsg.steve.web.dto.task.RequestTask;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 
@@ -21,14 +21,14 @@ import java.util.stream.Collectors;
 public class RequestTaskStoreImpl implements RequestTaskStore {
 
     private final AtomicInteger atomicInteger = new AtomicInteger(0);
-    private final ConcurrentHashMap<Integer, RequestTask> lookupTable = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<Integer, CommunicationTask> lookupTable = new ConcurrentHashMap<>();
 
     @Override
     public List<TaskOverview> getOverview() {
         return lookupTable.entrySet()
                           .stream()
                           .map(entry -> {
-                              RequestTask r = entry.getValue();
+                              CommunicationTask r = entry.getValue();
                               return TaskOverview.builder()
                                                  .taskId(entry.getKey())
                                                  .origin(r.getOrigin())
@@ -43,8 +43,8 @@ public class RequestTaskStoreImpl implements RequestTaskStore {
     }
 
     @Override
-    public RequestTask get(Integer taskId) {
-        RequestTask r = lookupTable.get(taskId);
+    public CommunicationTask get(Integer taskId) {
+        CommunicationTask r = lookupTable.get(taskId);
         if (r == null) {
             throw new SteveException("There is no task with taskId '%s'", taskId);
         } else {
@@ -53,7 +53,7 @@ public class RequestTaskStoreImpl implements RequestTaskStore {
     }
 
     @Override
-    public Integer add(RequestTask task) {
+    public Integer add(CommunicationTask task) {
         int taskId = atomicInteger.incrementAndGet();
         lookupTable.put(taskId, task);
         return taskId;

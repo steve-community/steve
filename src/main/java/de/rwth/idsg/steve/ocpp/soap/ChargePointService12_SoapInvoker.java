@@ -1,27 +1,17 @@
 package de.rwth.idsg.steve.ocpp.soap;
 
-import de.rwth.idsg.steve.handler.OcppResponseHandler;
 import de.rwth.idsg.steve.ocpp.ChargePointService12_Invoker;
+import de.rwth.idsg.steve.ocpp.task.ChangeAvailabilityTask;
+import de.rwth.idsg.steve.ocpp.task.ChangeConfigurationTask;
+import de.rwth.idsg.steve.ocpp.task.ClearCacheTask;
+import de.rwth.idsg.steve.ocpp.task.GetDiagnosticsTask;
+import de.rwth.idsg.steve.ocpp.task.RemoteStartTransactionTask;
+import de.rwth.idsg.steve.ocpp.task.RemoteStopTransactionTask;
+import de.rwth.idsg.steve.ocpp.task.ResetTask;
+import de.rwth.idsg.steve.ocpp.task.UnlockConnectorTask;
+import de.rwth.idsg.steve.ocpp.task.UpdateFirmwareTask;
 import de.rwth.idsg.steve.repository.dto.ChargePointSelect;
-import ocpp.cp._2010._08.ChangeAvailabilityRequest;
-import ocpp.cp._2010._08.ChangeAvailabilityResponse;
-import ocpp.cp._2010._08.ChangeConfigurationRequest;
-import ocpp.cp._2010._08.ChangeConfigurationResponse;
 import ocpp.cp._2010._08.ChargePointService;
-import ocpp.cp._2010._08.ClearCacheRequest;
-import ocpp.cp._2010._08.ClearCacheResponse;
-import ocpp.cp._2010._08.GetDiagnosticsRequest;
-import ocpp.cp._2010._08.GetDiagnosticsResponse;
-import ocpp.cp._2010._08.RemoteStartTransactionRequest;
-import ocpp.cp._2010._08.RemoteStartTransactionResponse;
-import ocpp.cp._2010._08.RemoteStopTransactionRequest;
-import ocpp.cp._2010._08.RemoteStopTransactionResponse;
-import ocpp.cp._2010._08.ResetRequest;
-import ocpp.cp._2010._08.ResetResponse;
-import ocpp.cp._2010._08.UnlockConnectorRequest;
-import ocpp.cp._2010._08.UnlockConnectorResponse;
-import ocpp.cp._2010._08.UpdateFirmwareRequest;
-import ocpp.cp._2010._08.UpdateFirmwareResponse;
 import org.springframework.stereotype.Service;
 
 /**
@@ -39,60 +29,57 @@ public class ChargePointService12_SoapInvoker implements ChargePointService12_In
     }
 
     @Override
-    public void reset(ChargePointSelect cp,
-                      OcppResponseHandler<ResetRequest, ResetResponse> handler) {
-        create(cp.getEndpointAddress()).resetAsync(handler.getRequest(), cp.getChargeBoxId(), handler);
+    public void reset(ChargePointSelect cp, ResetTask task) {
+        create(cp.getEndpointAddress()).resetAsync(
+                task.getOcpp12Request(), cp.getChargeBoxId(), task.getOcpp12Handler(cp.getChargeBoxId()));
     }
 
     @Override
-    public void clearCache(ChargePointSelect cp,
-                           OcppResponseHandler<ClearCacheRequest, ClearCacheResponse> handler) {
-        create(cp.getEndpointAddress()).clearCacheAsync(handler.getRequest(), cp.getChargeBoxId(), handler);
+    public void clearCache(ChargePointSelect cp, ClearCacheTask task) {
+        create(cp.getEndpointAddress()).clearCacheAsync(
+                task.getOcpp12Request(), cp.getChargeBoxId(), task.getOcpp12Handler(cp.getChargeBoxId()));
     }
 
     @Override
-    public void getDiagnostics(ChargePointSelect cp,
-                               OcppResponseHandler<GetDiagnosticsRequest, GetDiagnosticsResponse> handler) {
-        create(cp.getEndpointAddress()).getDiagnosticsAsync(handler.getRequest(), cp.getChargeBoxId(), handler);
+    public void getDiagnostics(ChargePointSelect cp, GetDiagnosticsTask task) {
+        create(cp.getEndpointAddress()).getDiagnosticsAsync(
+                task.getOcpp12Request(), cp.getChargeBoxId(), task.getOcpp12Handler(cp.getChargeBoxId()));
     }
 
     @Override
-    public void updateFirmware(ChargePointSelect cp,
-                               OcppResponseHandler<UpdateFirmwareRequest, UpdateFirmwareResponse> handler) {
-        create(cp.getEndpointAddress()).updateFirmwareAsync(handler.getRequest(), cp.getChargeBoxId(), handler);
+    public void updateFirmware(ChargePointSelect cp, UpdateFirmwareTask task) {
+        create(cp.getEndpointAddress()).updateFirmwareAsync(
+                task.getOcpp12Request(), cp.getChargeBoxId(), task.getOcpp12Handler(cp.getChargeBoxId()));
     }
 
     @Override
-    public void unlockConnector(ChargePointSelect cp,
-                                OcppResponseHandler<UnlockConnectorRequest, UnlockConnectorResponse> handler) {
-        create(cp.getEndpointAddress()).unlockConnectorAsync(handler.getRequest(), cp.getChargeBoxId(), handler);
+    public void unlockConnector(ChargePointSelect cp, UnlockConnectorTask task) {
+        create(cp.getEndpointAddress()).unlockConnectorAsync(
+                task.getOcpp12Request(), cp.getChargeBoxId(), task.getOcpp12Handler(cp.getChargeBoxId()));
     }
 
     @Override
-    public void changeAvailability(ChargePointSelect cp,
-                                   OcppResponseHandler<ChangeAvailabilityRequest,
-                                                       ChangeAvailabilityResponse> handler) {
-        create(cp.getEndpointAddress()).changeAvailabilityAsync(handler.getRequest(), cp.getChargeBoxId(), handler);
+    public void changeAvailability(ChargePointSelect cp, ChangeAvailabilityTask task) {
+        create(cp.getEndpointAddress()).changeAvailabilityAsync(
+                task.getOcpp12Request(), cp.getChargeBoxId(), task.getOcpp12Handler(cp.getChargeBoxId()));
     }
 
     @Override
-    public void changeConfiguration(ChargePointSelect cp,
-                                    OcppResponseHandler<ChangeConfigurationRequest,
-                                                        ChangeConfigurationResponse> handler) {
-        create(cp.getEndpointAddress()).changeConfigurationAsync(handler.getRequest(), cp.getChargeBoxId(), handler);
+    public void changeConfiguration(ChargePointSelect cp, ChangeConfigurationTask task) {
+        create(cp.getEndpointAddress()).changeConfigurationAsync(
+                task.getOcpp12Request(), cp.getChargeBoxId(), task.getOcpp12Handler(cp.getChargeBoxId()));
     }
 
     @Override
-    public void remoteStartTransaction(ChargePointSelect cp,
-                                       OcppResponseHandler<RemoteStartTransactionRequest,
-                                                           RemoteStartTransactionResponse> handler) {
-        create(cp.getEndpointAddress()).remoteStartTransactionAsync(handler.getRequest(), cp.getChargeBoxId(), handler);
+    public void remoteStartTransaction(ChargePointSelect cp, RemoteStartTransactionTask task) {
+        create(cp.getEndpointAddress()).remoteStartTransactionAsync(
+                task.getOcpp12Request(), cp.getChargeBoxId(), task.getOcpp12Handler(cp.getChargeBoxId()));
     }
 
     @Override
-    public void remoteStopTransaction(ChargePointSelect cp,
-                                      OcppResponseHandler<RemoteStopTransactionRequest,
-                                                          RemoteStopTransactionResponse> handler) {
-        create(cp.getEndpointAddress()).remoteStopTransactionAsync(handler.getRequest(), cp.getChargeBoxId(), handler);
+    public void remoteStopTransaction(ChargePointSelect cp, RemoteStopTransactionTask task) {
+        create(cp.getEndpointAddress()).remoteStopTransactionAsync(
+                task.getOcpp12Request(), cp.getChargeBoxId(), task.getOcpp12Handler(cp.getChargeBoxId()));
     }
+
 }

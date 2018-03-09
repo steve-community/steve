@@ -1,13 +1,13 @@
 package de.rwth.idsg.steve.ocpp.task;
 
-import de.rwth.idsg.steve.handler.OcppCallback;
 import de.rwth.idsg.steve.ocpp.CommunicationTask;
+import de.rwth.idsg.steve.ocpp.OcppCallback;
 import de.rwth.idsg.steve.ocpp.OcppVersion;
 import de.rwth.idsg.steve.ocpp.RequestType;
 import de.rwth.idsg.steve.ocpp.ResponseType;
 import de.rwth.idsg.steve.web.dto.ocpp.DataTransferParams;
-import ocpp.cs._2012._06.DataTransferRequest;
-import ocpp.cs._2012._06.DataTransferResponse;
+import ocpp.cp._2012._06.DataTransferRequest;
+import ocpp.cp._2012._06.DataTransferResponse;
 
 import javax.xml.ws.AsyncHandler;
 
@@ -41,6 +41,9 @@ public class DataTransferTask extends CommunicationTask<DataTransferParams, Data
         throw new RuntimeException("Not supported");
     }
 
+    /**
+     * Dummy implementation. It must be vendor-specific.
+     */
     @Override
     public DataTransferRequest getOcpp15Request() {
         return new DataTransferRequest()

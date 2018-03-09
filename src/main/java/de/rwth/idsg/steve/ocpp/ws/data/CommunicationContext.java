@@ -1,6 +1,6 @@
 package de.rwth.idsg.steve.ocpp.ws.data;
 
-import de.rwth.idsg.steve.handler.OcppJsonResponseHandler;
+import de.rwth.idsg.steve.ocpp.CommunicationTask;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.web.socket.WebSocketSession;
@@ -23,7 +23,7 @@ public class CommunicationContext {
     private OcppJsonMessage incomingMessage;
     private OcppJsonMessage outgoingMessage;
 
-    private OcppJsonResponseHandler handler;
+    private CommunicationTask task;
     private FutureResponseContext futureResponseContext;
 
     public boolean isSetOutgoingError() {

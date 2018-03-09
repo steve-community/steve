@@ -1,7 +1,7 @@
 package de.rwth.idsg.steve.ocpp.ws;
 
 import de.rwth.idsg.steve.SteveException;
-import de.rwth.idsg.steve.handler.OcppResponseHandler;
+import de.rwth.idsg.steve.ocpp.CommunicationTask;
 import de.rwth.idsg.steve.ocpp.RequestType;
 import de.rwth.idsg.steve.ocpp.ws.data.ActionResponsePair;
 import de.rwth.idsg.steve.ocpp.ws.data.CommunicationContext;
@@ -28,28 +28,28 @@ public abstract class AbstractChargePointServiceInvoker {
     @Setter private TypeStore typeStore;
     @Setter private AbstractWebSocketEndpoint endpoint;
 
-    public void runPipeline(ChargePointSelect cps, OcppResponseHandler handler) {
-        runPipeline(cps.getChargeBoxId(), handler);
+    public void runPipeline(ChargePointSelect cps, CommunicationTask task) {
+        runPipeline(cps.getChargeBoxId(), task);
     }
 
     /**
      * Just a wrapper to make try-catch block and exception handling stand out
      */
-    public void runPipeline(String chargeBoxId, OcppResponseHandler handler) {
+    public void runPipeline(String chargeBoxId, CommunicationTask task) {
         try {
-            run(chargeBoxId, handler);
+            run(chargeBoxId, task);
         } catch (Exception e) {
             log.error("Exception occurred", e);
             // Outgoing call failed due to technical problems. Pass the exception to handler to inform the user
-            handler.handleException(e);
+            task.defaultCallback().failed(chargeBoxId, e);
         }
     }
 
     /**
      * Actual processing
      */
-    private void run(String chargeBoxId, OcppResponseHandler handler) {
-        RequestType request = handler.getRequest();
+    private void run(String chargeBoxId, CommunicationTask task) {
+        RequestType request = task.getRequest();
 
         String messageId = UUID.randomUUID().toString();
         ActionResponsePair pair = typeStore.findActionResponse(request);
@@ -62,7 +62,7 @@ public abstract class AbstractChargePointServiceInvoker {
         call.setPayload(request);
         call.setAction(pair.getAction());
 
-        FutureResponseContext frc = new FutureResponseContext(handler, pair.getResponseClass());
+        FutureResponseContext frc = new FutureResponseContext(task, pair.getResponseClass());
 
         CommunicationContext context = new CommunicationContext();
         context.setChargeBoxId(chargeBoxId);

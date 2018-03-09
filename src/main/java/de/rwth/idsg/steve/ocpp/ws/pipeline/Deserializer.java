@@ -145,7 +145,7 @@ public class Deserializer implements Stage {
         result.setPayload(res);
 
         context.setIncomingMessage(result);
-        context.setHandler(responseContext.getHandler());
+        context.setTask(responseContext.getTask());
     }
 
     /**
@@ -193,6 +193,6 @@ public class Deserializer implements Stage {
         error.setErrorDetails(details);
 
         context.setIncomingMessage(error);
-        context.setHandler(responseContext.getHandler());
+        context.setTask(responseContext.getTask());
     }
 }

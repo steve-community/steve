@@ -1,25 +1,15 @@
 package de.rwth.idsg.steve.ocpp;
 
-import de.rwth.idsg.steve.handler.OcppResponseHandler;
+import de.rwth.idsg.steve.ocpp.task.ChangeAvailabilityTask;
+import de.rwth.idsg.steve.ocpp.task.ChangeConfigurationTask;
+import de.rwth.idsg.steve.ocpp.task.ClearCacheTask;
+import de.rwth.idsg.steve.ocpp.task.GetDiagnosticsTask;
+import de.rwth.idsg.steve.ocpp.task.RemoteStartTransactionTask;
+import de.rwth.idsg.steve.ocpp.task.RemoteStopTransactionTask;
+import de.rwth.idsg.steve.ocpp.task.ResetTask;
+import de.rwth.idsg.steve.ocpp.task.UnlockConnectorTask;
+import de.rwth.idsg.steve.ocpp.task.UpdateFirmwareTask;
 import de.rwth.idsg.steve.repository.dto.ChargePointSelect;
-import ocpp.cp._2010._08.ChangeAvailabilityRequest;
-import ocpp.cp._2010._08.ChangeAvailabilityResponse;
-import ocpp.cp._2010._08.ChangeConfigurationRequest;
-import ocpp.cp._2010._08.ChangeConfigurationResponse;
-import ocpp.cp._2010._08.ClearCacheRequest;
-import ocpp.cp._2010._08.ClearCacheResponse;
-import ocpp.cp._2010._08.GetDiagnosticsRequest;
-import ocpp.cp._2010._08.GetDiagnosticsResponse;
-import ocpp.cp._2010._08.RemoteStartTransactionRequest;
-import ocpp.cp._2010._08.RemoteStartTransactionResponse;
-import ocpp.cp._2010._08.RemoteStopTransactionRequest;
-import ocpp.cp._2010._08.RemoteStopTransactionResponse;
-import ocpp.cp._2010._08.ResetRequest;
-import ocpp.cp._2010._08.ResetResponse;
-import ocpp.cp._2010._08.UnlockConnectorRequest;
-import ocpp.cp._2010._08.UnlockConnectorResponse;
-import ocpp.cp._2010._08.UpdateFirmwareRequest;
-import ocpp.cp._2010._08.UpdateFirmwareResponse;
 
 /**
  * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
@@ -27,32 +17,21 @@ import ocpp.cp._2010._08.UpdateFirmwareResponse;
  */
 public interface ChargePointService12_Invoker {
 
-    void reset(ChargePointSelect cp,
-               OcppResponseHandler<ResetRequest, ResetResponse> handler);
+    void reset(ChargePointSelect cp, ResetTask task);
 
-    void clearCache(ChargePointSelect cp,
-                    OcppResponseHandler<ClearCacheRequest, ClearCacheResponse> handler);
+    void clearCache(ChargePointSelect cp, ClearCacheTask task);
 
-    void getDiagnostics(ChargePointSelect cp,
-                        OcppResponseHandler<GetDiagnosticsRequest, GetDiagnosticsResponse> handler);
+    void getDiagnostics(ChargePointSelect cp, GetDiagnosticsTask task);
 
-    void updateFirmware(ChargePointSelect cp,
-                        OcppResponseHandler<UpdateFirmwareRequest, UpdateFirmwareResponse> handler);
+    void updateFirmware(ChargePointSelect cp, UpdateFirmwareTask task);
 
-    void unlockConnector(ChargePointSelect cp,
-                         OcppResponseHandler<UnlockConnectorRequest, UnlockConnectorResponse> handler);
+    void unlockConnector(ChargePointSelect cp, UnlockConnectorTask task);
 
-    void changeAvailability(ChargePointSelect cp,
-                            OcppResponseHandler<ChangeAvailabilityRequest, ChangeAvailabilityResponse> handler);
+    void changeAvailability(ChargePointSelect cp, ChangeAvailabilityTask task);
 
-    void changeConfiguration(ChargePointSelect cp,
-                             OcppResponseHandler<ChangeConfigurationRequest, ChangeConfigurationResponse> handler);
+    void changeConfiguration(ChargePointSelect cp, ChangeConfigurationTask task);
 
-    void remoteStartTransaction(ChargePointSelect cp,
-                                OcppResponseHandler<RemoteStartTransactionRequest,
-                                                    RemoteStartTransactionResponse> handler);
+    void remoteStartTransaction(ChargePointSelect cp, RemoteStartTransactionTask task);
 
-    void remoteStopTransaction(ChargePointSelect cp,
-                               OcppResponseHandler<RemoteStopTransactionRequest,
-                                                   RemoteStopTransactionResponse> handler);
+    void remoteStopTransaction(ChargePointSelect cp, RemoteStopTransactionTask task);
 }

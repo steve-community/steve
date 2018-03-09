@@ -1,9 +1,9 @@
 package de.rwth.idsg.steve.ocpp.task;
 
-import de.rwth.idsg.steve.handler.OcppCallback;
+import de.rwth.idsg.steve.ocpp.OcppCallback;
 import de.rwth.idsg.steve.ocpp.CommunicationTask;
 import de.rwth.idsg.steve.ocpp.OcppVersion;
-import de.rwth.idsg.steve.web.dto.ocpp.ResetParams;
+import de.rwth.idsg.steve.web.dto.ocpp.MultipleChargePointSelect;
 
 import javax.xml.ws.AsyncHandler;
 
@@ -11,9 +11,9 @@ import javax.xml.ws.AsyncHandler;
  * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
  * @since 09.03.2018
  */
-public class ResetResponseTask extends CommunicationTask<ResetParams, String> {
+public class ClearCacheTask extends CommunicationTask<MultipleChargePointSelect, String> {
 
-    public ResetResponseTask(OcppVersion ocppVersion, ResetParams params) {
+    public ClearCacheTask(OcppVersion ocppVersion, MultipleChargePointSelect params) {
         super(ocppVersion, params);
     }
 
@@ -23,19 +23,17 @@ public class ResetResponseTask extends CommunicationTask<ResetParams, String> {
     }
 
     @Override
-    public ocpp.cp._2010._08.ResetRequest getOcpp12Request() {
-        return new ocpp.cp._2010._08.ResetRequest()
-                .withType(ocpp.cp._2010._08.ResetType.fromValue(params.getResetType().value()));
+    public ocpp.cp._2010._08.ClearCacheRequest getOcpp12Request() {
+        return new ocpp.cp._2010._08.ClearCacheRequest();
     }
 
     @Override
-    public ocpp.cp._2012._06.ResetRequest getOcpp15Request() {
-        return new ocpp.cp._2012._06.ResetRequest()
-                .withType(ocpp.cp._2012._06.ResetType.fromValue(params.getResetType().value()));
+    public ocpp.cp._2012._06.ClearCacheRequest getOcpp15Request() {
+        return new ocpp.cp._2012._06.ClearCacheRequest();
     }
 
     @Override
-    public AsyncHandler<ocpp.cp._2010._08.ResetResponse> getOcpp12Handler(String chargeBoxId) {
+    public AsyncHandler<ocpp.cp._2010._08.ClearCacheResponse> getOcpp12Handler(String chargeBoxId) {
         return res -> {
             try {
                 success(chargeBoxId, res.get().getStatus().value());
@@ -46,7 +44,7 @@ public class ResetResponseTask extends CommunicationTask<ResetParams, String> {
     }
 
     @Override
-    public AsyncHandler<ocpp.cp._2012._06.ResetResponse> getOcpp15Handler(String chargeBoxId) {
+    public AsyncHandler<ocpp.cp._2012._06.ClearCacheResponse> getOcpp15Handler(String chargeBoxId) {
         return res -> {
             try {
                 success(chargeBoxId, res.get().getStatus().value());

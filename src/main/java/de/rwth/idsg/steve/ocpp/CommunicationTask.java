@@ -1,8 +1,8 @@
 package de.rwth.idsg.steve.ocpp;
 
-import de.rwth.idsg.steve.handler.OcppCallback;
 import de.rwth.idsg.steve.ocpp.ws.data.OcppJsonError;
 import de.rwth.idsg.steve.repository.dto.ChargePointSelect;
+import de.rwth.idsg.steve.utils.StringUtils;
 import de.rwth.idsg.steve.web.dto.ocpp.ChargePointSelection;
 import de.rwth.idsg.steve.web.dto.task.RequestResult;
 import de.rwth.idsg.steve.web.dto.task.RequestTaskOrigin;
@@ -61,7 +61,6 @@ public abstract class CommunicationTask<S extends ChargePointSelection, RESPONSE
     CommunicationTask(OcppVersion ocppVersion, S params, RequestTaskOrigin origin, String caller) {
         List<ChargePointSelect> cpsList = params.getChargePointSelectList();
 
-        this.operationName = ""; // TODO replace this: StringUtils.getOperationName(requestType);
         this.ocppVersion = ocppVersion;
         this.resultSize = cpsList.size();
         this.origin = origin;
@@ -74,6 +73,9 @@ public abstract class CommunicationTask<S extends ChargePointSelection, RESPONSE
         }
 
         callbackList.add(defaultCallback());
+
+        // FIXME: dirty, because creating a request only to parse its class name
+        operationName = StringUtils.getOperationName(getRequest());
     }
 
     public void addCallback(OcppCallback<RESPONSE> cb) {
@@ -126,7 +128,7 @@ public abstract class CommunicationTask<S extends ChargePointSelection, RESPONSE
         }
     }
 
-    public RequestType createRequest() {
+    public RequestType getRequest() {
         switch (ocppVersion) {
             case V_12: return getOcpp12Request();
             case V_15: return getOcpp15Request();
@@ -134,7 +136,7 @@ public abstract class CommunicationTask<S extends ChargePointSelection, RESPONSE
         }
     }
 
-    public <T extends ResponseType> AsyncHandler<T> createHandler(String chargeBoxId) {
+    public <T extends ResponseType> AsyncHandler<T> getHandler(String chargeBoxId) {
         switch (ocppVersion) {
             case V_12: return getOcpp12Handler(chargeBoxId);
             case V_15: return getOcpp15Handler(chargeBoxId);

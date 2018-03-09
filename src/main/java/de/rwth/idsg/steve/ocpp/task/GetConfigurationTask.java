@@ -1,7 +1,7 @@
 package de.rwth.idsg.steve.ocpp.task;
 
 import com.google.common.base.Joiner;
-import de.rwth.idsg.steve.handler.OcppCallback;
+import de.rwth.idsg.steve.ocpp.OcppCallback;
 import de.rwth.idsg.steve.ocpp.CommunicationTask;
 import de.rwth.idsg.steve.ocpp.OcppVersion;
 import de.rwth.idsg.steve.ocpp.RequestType;

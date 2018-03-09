@@ -1,73 +1,51 @@
 package de.rwth.idsg.steve.service;
 
-import de.rwth.idsg.steve.handler.ocpp15.CancelReservationResponseHandler;
-import de.rwth.idsg.steve.handler.ocpp15.ChangeAvailabilityResponseHandler;
-import de.rwth.idsg.steve.handler.ocpp15.ChangeConfigurationResponseHandler;
-import de.rwth.idsg.steve.handler.ocpp15.ClearCacheResponseHandler;
-import de.rwth.idsg.steve.handler.ocpp15.DataTransferResponseHandler;
-import de.rwth.idsg.steve.handler.ocpp15.GetConfigurationResponseHandler;
-import de.rwth.idsg.steve.handler.ocpp15.GetDiagnosticsResponseHandler;
-import de.rwth.idsg.steve.handler.ocpp15.GetLocalListVersionResponseHandler;
-import de.rwth.idsg.steve.handler.ocpp15.RemoteStartTransactionResponseHandler;
-import de.rwth.idsg.steve.handler.ocpp15.RemoteStopTransactionResponseHandler;
-import de.rwth.idsg.steve.handler.ocpp15.ReserveNowResponseHandler;
-import de.rwth.idsg.steve.handler.ocpp15.ResetResponseHandler;
-import de.rwth.idsg.steve.handler.ocpp15.SendLocalListResponseHandler;
-import de.rwth.idsg.steve.handler.ocpp15.UnlockConnectorResponseHandler;
-import de.rwth.idsg.steve.handler.ocpp15.UpdateFirmwareResponseHandler;
 import de.rwth.idsg.steve.ocpp.ChargePointService15_Invoker;
 import de.rwth.idsg.steve.ocpp.OcppVersion;
 import de.rwth.idsg.steve.ocpp.soap.ChargePointService15_SoapInvoker;
+import de.rwth.idsg.steve.ocpp.task.CancelReservationTask;
+import de.rwth.idsg.steve.ocpp.task.ChangeAvailabilityTask;
+import de.rwth.idsg.steve.ocpp.task.ChangeConfigurationTask;
+import de.rwth.idsg.steve.ocpp.task.ClearCacheTask;
+import de.rwth.idsg.steve.ocpp.task.DataTransferTask;
+import de.rwth.idsg.steve.ocpp.task.GetConfigurationTask;
+import de.rwth.idsg.steve.ocpp.task.GetDiagnosticsTask;
+import de.rwth.idsg.steve.ocpp.task.GetLocalListVersionTask;
+import de.rwth.idsg.steve.ocpp.task.RemoteStartTransactionTask;
+import de.rwth.idsg.steve.ocpp.task.RemoteStopTransactionTask;
+import de.rwth.idsg.steve.ocpp.task.ReserveNowTask;
+import de.rwth.idsg.steve.ocpp.task.ResetTask;
+import de.rwth.idsg.steve.ocpp.task.SendLocalListTask;
+import de.rwth.idsg.steve.ocpp.task.UnlockConnectorTask;
+import de.rwth.idsg.steve.ocpp.task.UpdateFirmwareTask;
+import de.rwth.idsg.steve.ocpp.task.dto.EnhancedReserveNowParams;
 import de.rwth.idsg.steve.ocpp.ws.ocpp15.ChargePointService15_WsInvoker;
 import de.rwth.idsg.steve.repository.OcppTagRepository;
 import de.rwth.idsg.steve.repository.RequestTaskStore;
 import de.rwth.idsg.steve.repository.ReservationRepository;
 import de.rwth.idsg.steve.repository.dto.ChargePointSelect;
 import de.rwth.idsg.steve.repository.dto.InsertReservationParams;
+import de.rwth.idsg.steve.web.dto.ocpp.CancelReservationParams;
 import de.rwth.idsg.steve.web.dto.ocpp.ChangeAvailabilityParams;
 import de.rwth.idsg.steve.web.dto.ocpp.ChangeConfigurationParams;
+import de.rwth.idsg.steve.web.dto.ocpp.DataTransferParams;
+import de.rwth.idsg.steve.web.dto.ocpp.GetConfigurationParams;
 import de.rwth.idsg.steve.web.dto.ocpp.GetDiagnosticsParams;
 import de.rwth.idsg.steve.web.dto.ocpp.MultipleChargePointSelect;
 import de.rwth.idsg.steve.web.dto.ocpp.RemoteStartTransactionParams;
 import de.rwth.idsg.steve.web.dto.ocpp.RemoteStopTransactionParams;
+import de.rwth.idsg.steve.web.dto.ocpp.ReserveNowParams;
 import de.rwth.idsg.steve.web.dto.ocpp.ResetParams;
+import de.rwth.idsg.steve.web.dto.ocpp.SendLocalListParams;
 import de.rwth.idsg.steve.web.dto.ocpp.UnlockConnectorParams;
 import de.rwth.idsg.steve.web.dto.ocpp.UpdateFirmwareParams;
-import de.rwth.idsg.steve.web.dto.ocpp.CancelReservationParams;
-import de.rwth.idsg.steve.web.dto.ocpp.DataTransferParams;
-import de.rwth.idsg.steve.web.dto.ocpp.GetConfigurationParams;
-import de.rwth.idsg.steve.web.dto.ocpp.ReserveNowParams;
-import de.rwth.idsg.steve.web.dto.ocpp.SendLocalListParams;
-import de.rwth.idsg.steve.web.dto.task.RequestTask;
 import lombok.extern.slf4j.Slf4j;
-import ocpp.cp._2012._06.AuthorisationData;
-import ocpp.cp._2012._06.AvailabilityType;
-import ocpp.cp._2012._06.CancelReservationRequest;
-import ocpp.cp._2012._06.ChangeAvailabilityRequest;
-import ocpp.cp._2012._06.ChangeConfigurationRequest;
-import ocpp.cp._2012._06.ClearCacheRequest;
-import ocpp.cp._2012._06.DataTransferRequest;
-import ocpp.cp._2012._06.GetConfigurationRequest;
-import ocpp.cp._2012._06.GetDiagnosticsRequest;
-import ocpp.cp._2012._06.GetLocalListVersionRequest;
-import ocpp.cp._2012._06.RemoteStartTransactionRequest;
-import ocpp.cp._2012._06.RemoteStopTransactionRequest;
-import ocpp.cp._2012._06.ReserveNowRequest;
-import ocpp.cp._2012._06.ResetRequest;
-import ocpp.cp._2012._06.ResetType;
-import ocpp.cp._2012._06.SendLocalListRequest;
-import ocpp.cp._2012._06.UnlockConnectorRequest;
-import ocpp.cp._2012._06.UpdateFirmwareRequest;
-import ocpp.cp._2012._06.UpdateType;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ScheduledExecutorService;
-
-import static de.rwth.idsg.steve.utils.DateTimeUtils.toDateTime;
 
 /**
  * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
@@ -87,247 +65,105 @@ public class ChargePointService15_Client {
     @Autowired private ChargePointService15_WsInvoker wsInvoker;
 
     // -------------------------------------------------------------------------
-    // Create Request Payloads
-    // -------------------------------------------------------------------------
-
-    private static ChangeAvailabilityRequest prepareChangeAvailability(ChangeAvailabilityParams params) {
-        return new ChangeAvailabilityRequest()
-                .withConnectorId(params.getConnectorId())
-                .withType(AvailabilityType.fromValue(params.getAvailType().value()));
-    }
-
-    private static ChangeConfigurationRequest prepareChangeConfiguration(ChangeConfigurationParams params) {
-        return new ChangeConfigurationRequest()
-                .withKey(params.getKey())
-                .withValue(params.getValue());
-    }
-
-    private static ClearCacheRequest prepareClearCache() {
-        return new ClearCacheRequest();
-    }
-
-    private static GetDiagnosticsRequest prepareGetDiagnostics(GetDiagnosticsParams params) {
-        return new GetDiagnosticsRequest()
-                .withLocation(params.getLocation())
-                .withRetries(params.getRetries())
-                .withRetryInterval(params.getRetryInterval())
-                .withStartTime(toDateTime(params.getStart()))
-                .withStopTime(toDateTime(params.getStop()));
-    }
-
-    private static RemoteStartTransactionRequest prepareRemoteStartTransaction(RemoteStartTransactionParams params) {
-        return new RemoteStartTransactionRequest()
-                .withIdTag(params.getIdTag())
-                .withConnectorId(params.getConnectorId());
-    }
-
-    private static RemoteStopTransactionRequest prepareRemoteStopTransaction(RemoteStopTransactionParams params) {
-        return new RemoteStopTransactionRequest()
-                .withTransactionId(params.getTransactionId());
-    }
-
-    private static ResetRequest prepareReset(ResetParams params) {
-        return new ResetRequest()
-                .withType(ResetType.fromValue(params.getResetType().value()));
-    }
-
-    private static UnlockConnectorRequest prepareUnlockConnector(UnlockConnectorParams params) {
-        return new UnlockConnectorRequest()
-                .withConnectorId(params.getConnectorId());
-    }
-
-    private static UpdateFirmwareRequest prepareUpdateFirmware(UpdateFirmwareParams params) {
-        return new UpdateFirmwareRequest()
-                .withLocation(params.getLocation())
-                .withRetrieveDate(toDateTime(params.getRetrieve()))
-                .withRetries(params.getRetries())
-                .withRetryInterval(params.getRetryInterval());
-    }
-
-    /**
-     * Dummy implementation. It must be vendor-specific.
-     */
-    private static DataTransferRequest prepareDataTransfer(DataTransferParams params) {
-        return new DataTransferRequest()
-                .withVendorId(params.getVendorId())
-                .withMessageId(params.getMessageId())
-                .withData(params.getData());
-    }
-
-    private static GetConfigurationRequest prepareGetConfiguration(GetConfigurationParams params) {
-        if (params.isSetConfKeyList()) {
-            return new GetConfigurationRequest().withKey(params.getConfKeyList());
-        } else {
-            return new GetConfigurationRequest();
-        }
-    }
-
-    private static GetLocalListVersionRequest prepareGetLocalListVersion() {
-        return new GetLocalListVersionRequest();
-    }
-
-    private SendLocalListRequest prepareSendLocalList(SendLocalListParams params) {
-        // DIFFERENTIAL update
-        if (UpdateType.DIFFERENTIAL.equals(params.getUpdateType())) {
-            List<AuthorisationData> auths = new ArrayList<>();
-
-            // Step 1: For the idTags to be deleted, insert only the idTag
-            for (String idTag : params.getDeleteList()) {
-                auths.add(new AuthorisationData().withIdTag(idTag));
-            }
-
-            // Step 2: For the idTags to be added or updated, insert them with their IdTagInfos
-            auths.addAll(ocppTagService.getAuthData(params.getAddUpdateList()));
-
-            return new SendLocalListRequest()
-                    .withListVersion(params.getListVersion())
-                    .withUpdateType(UpdateType.DIFFERENTIAL)
-                    .withLocalAuthorisationList(auths);
-
-        // FULL update
-        } else {
-            return new SendLocalListRequest()
-                    .withListVersion(params.getListVersion())
-                    .withUpdateType(UpdateType.FULL)
-                    .withLocalAuthorisationList(ocppTagService.getAuthDataOfAllTags());
-        }
-    }
-
-    private ReserveNowRequest prepareReserveNow(ReserveNowParams params, int reservationId) {
-        String idTag = params.getIdTag();
-        return new ReserveNowRequest()
-                .withConnectorId(params.getConnectorId())
-                .withReservationId(reservationId)
-                .withExpiryDate(params.getExpiry().toDateTime())
-                .withIdTag(idTag)
-                .withParentIdTag(userRepository.getParentIdtag(idTag));
-    }
-
-    private static CancelReservationRequest prepareCancelReservation(CancelReservationParams params) {
-        return new CancelReservationRequest()
-                .withReservationId(params.getReservationId());
-    }
-
-    // -------------------------------------------------------------------------
     // Multiple Execution
     // -------------------------------------------------------------------------
 
     public int changeAvailability(ChangeAvailabilityParams params) {
-        ChangeAvailabilityRequest req = prepareChangeAvailability(params);
-        List<ChargePointSelect> list = params.getChargePointSelectList();
-        RequestTask<ChangeAvailabilityRequest> task = new RequestTask<>(VERSION, req, list);
+        ChangeAvailabilityTask task = new ChangeAvailabilityTask(VERSION, params);
 
         BackgroundService.with(executorService)
-                         .forEach(list)
-                         .execute(c -> getInvoker(c).changeAvailability(c, new ChangeAvailabilityResponseHandler(task, c.getChargeBoxId())));
+                         .forEach(task.getParams().getChargePointSelectList())
+                         .execute(c -> getInvoker(c).changeAvailability(c, task));
 
         return requestTaskStore.add(task);
     }
 
     public int changeConfiguration(ChangeConfigurationParams params) {
-        ChangeConfigurationRequest req = prepareChangeConfiguration(params);
-        List<ChargePointSelect> list = params.getChargePointSelectList();
-        RequestTask<ChangeConfigurationRequest> task = new RequestTask<>(VERSION, req, list);
+        ChangeConfigurationTask task = new ChangeConfigurationTask(VERSION, params);
 
         BackgroundService.with(executorService)
-                         .forEach(list)
-                         .execute(c -> getInvoker(c).changeConfiguration(c, new ChangeConfigurationResponseHandler(task, c.getChargeBoxId())));
+                         .forEach(task.getParams().getChargePointSelectList())
+                         .execute(c -> getInvoker(c).changeConfiguration(c, task));
 
         return requestTaskStore.add(task);
     }
 
     public int clearCache(MultipleChargePointSelect params) {
-        ClearCacheRequest req = prepareClearCache();
-        List<ChargePointSelect> list = params.getChargePointSelectList();
-        RequestTask<ClearCacheRequest> task = new RequestTask<>(VERSION, req, list);
+        ClearCacheTask task = new ClearCacheTask(VERSION, params);
 
         BackgroundService.with(executorService)
-                         .forEach(list)
-                         .execute(c -> getInvoker(c).clearCache(c, new ClearCacheResponseHandler(task, c.getChargeBoxId())));
+                         .forEach(task.getParams().getChargePointSelectList())
+                         .execute(c -> getInvoker(c).clearCache(c, task));
 
         return requestTaskStore.add(task);
     }
 
     public int getDiagnostics(GetDiagnosticsParams params) {
-        GetDiagnosticsRequest req = prepareGetDiagnostics(params);
-        List<ChargePointSelect> list = params.getChargePointSelectList();
-        RequestTask<GetDiagnosticsRequest> task = new RequestTask<>(VERSION, req, list);
+        GetDiagnosticsTask task = new GetDiagnosticsTask(VERSION, params);
 
         BackgroundService.with(executorService)
-                         .forEach(list)
-                         .execute(c -> getInvoker(c).getDiagnostics(c, new GetDiagnosticsResponseHandler(task, c.getChargeBoxId())));
+                         .forEach(task.getParams().getChargePointSelectList())
+                         .execute(c -> getInvoker(c).getDiagnostics(c, task));
 
         return requestTaskStore.add(task);
     }
 
     public int reset(ResetParams params) {
-        ResetRequest req = prepareReset(params);
-        List<ChargePointSelect> list = params.getChargePointSelectList();
-        RequestTask<ResetRequest> task = new RequestTask<>(VERSION, req, list);
+        ResetTask task = new ResetTask(VERSION, params);
 
         BackgroundService.with(executorService)
-                         .forEach(list)
-                         .execute(c -> getInvoker(c).reset(c, new ResetResponseHandler(task, c.getChargeBoxId())));
+                         .forEach(task.getParams().getChargePointSelectList())
+                         .execute(c -> getInvoker(c).reset(c, task));
 
         return requestTaskStore.add(task);
     }
 
     public int updateFirmware(UpdateFirmwareParams params) {
-        UpdateFirmwareRequest req = prepareUpdateFirmware(params);
-        List<ChargePointSelect> list = params.getChargePointSelectList();
-        RequestTask<UpdateFirmwareRequest> task = new RequestTask<>(VERSION, req, list);
+        UpdateFirmwareTask task = new UpdateFirmwareTask(VERSION, params);
 
         BackgroundService.with(executorService)
-                         .forEach(list)
-                         .execute(c -> getInvoker(c).updateFirmware(c, new UpdateFirmwareResponseHandler(task, c.getChargeBoxId())));
+                         .forEach(task.getParams().getChargePointSelectList())
+                         .execute(c -> getInvoker(c).updateFirmware(c, task));
 
         return requestTaskStore.add(task);
     }
 
     public int dataTransfer(DataTransferParams params) {
-        DataTransferRequest req = prepareDataTransfer(params);
-        List<ChargePointSelect> list = params.getChargePointSelectList();
-        RequestTask<DataTransferRequest> task = new RequestTask<>(VERSION, req, list);
+        DataTransferTask task = new DataTransferTask(VERSION, params);
 
         BackgroundService.with(executorService)
-                         .forEach(list)
-                         .execute(c -> getInvoker(c).dataTransfer(c, new DataTransferResponseHandler(task, c.getChargeBoxId())));
+                         .forEach(task.getParams().getChargePointSelectList())
+                         .execute(c -> getInvoker(c).dataTransfer(c, task));
 
         return requestTaskStore.add(task);
     }
 
     public int getConfiguration(GetConfigurationParams params) {
-        GetConfigurationRequest req = prepareGetConfiguration(params);
-        List<ChargePointSelect> list = params.getChargePointSelectList();
-        RequestTask<GetConfigurationRequest> task = new RequestTask<>(VERSION, req, list);
+        GetConfigurationTask task = new GetConfigurationTask(VERSION, params);
 
         BackgroundService.with(executorService)
-                         .forEach(list)
-                         .execute(c -> getInvoker(c).getConfiguration(c, new GetConfigurationResponseHandler(task, c.getChargeBoxId())));
+                         .forEach(task.getParams().getChargePointSelectList())
+                         .execute(c -> getInvoker(c).getConfiguration(c, task));
 
         return requestTaskStore.add(task);
     }
 
     public int getLocalListVersion(MultipleChargePointSelect params) {
-        GetLocalListVersionRequest req = prepareGetLocalListVersion();
-        List<ChargePointSelect> list = params.getChargePointSelectList();
-        RequestTask<GetLocalListVersionRequest> task = new RequestTask<>(VERSION, req, list);
+        GetLocalListVersionTask task = new GetLocalListVersionTask(VERSION, params);
 
         BackgroundService.with(executorService)
-                         .forEach(list)
-                         .execute(c -> getInvoker(c).getLocalListVersion(c, new GetLocalListVersionResponseHandler(task, c.getChargeBoxId())));
+                         .forEach(task.getParams().getChargePointSelectList())
+                         .execute(c -> getInvoker(c).getLocalListVersion(c, task));
 
         return requestTaskStore.add(task);
     }
 
     public int sendLocalList(SendLocalListParams params) {
-        SendLocalListRequest req = prepareSendLocalList(params);
-        List<ChargePointSelect> list = params.getChargePointSelectList();
-        RequestTask<SendLocalListRequest> task = new RequestTask<>(VERSION, req, list);
+        SendLocalListTask task = new SendLocalListTask(VERSION, params, ocppTagService);
 
         BackgroundService.with(executorService)
-                         .forEach(list)
-                         .execute(c -> getInvoker(c).sendLocalList(c, new SendLocalListResponseHandler(task, c.getChargeBoxId())));
+                         .forEach(task.getParams().getChargePointSelectList())
+                         .execute(c -> getInvoker(c).sendLocalList(c, task));
 
         return requestTaskStore.add(task);
     }
@@ -337,37 +173,31 @@ public class ChargePointService15_Client {
     // -------------------------------------------------------------------------
 
     public int remoteStartTransaction(RemoteStartTransactionParams params) {
-        RemoteStartTransactionRequest req = prepareRemoteStartTransaction(params);
-        List<ChargePointSelect> list = params.getChargePointSelectList();
-        RequestTask<RemoteStartTransactionRequest> task = new RequestTask<>(VERSION, req, list);
+        RemoteStartTransactionTask task = new RemoteStartTransactionTask(VERSION, params);
 
         BackgroundService.with(executorService)
-                         .forFirst(list)
-                         .execute(c -> getInvoker(c).remoteStartTransaction(c, new RemoteStartTransactionResponseHandler(task, c.getChargeBoxId())));
+                         .forFirst(task.getParams().getChargePointSelectList())
+                         .execute(c -> getInvoker(c).remoteStartTransaction(c, task));
 
         return requestTaskStore.add(task);
     }
 
     public int remoteStopTransaction(RemoteStopTransactionParams params) {
-        RemoteStopTransactionRequest req = prepareRemoteStopTransaction(params);
-        List<ChargePointSelect> list = params.getChargePointSelectList();
-        RequestTask<RemoteStopTransactionRequest> task = new RequestTask<>(VERSION, req, list);
+        RemoteStopTransactionTask task = new RemoteStopTransactionTask(VERSION, params);
 
         BackgroundService.with(executorService)
-                         .forFirst(list)
-                         .execute(c -> getInvoker(c).remoteStopTransaction(c, new RemoteStopTransactionResponseHandler(task, c.getChargeBoxId())));
+                         .forFirst(task.getParams().getChargePointSelectList())
+                         .execute(c -> getInvoker(c).remoteStopTransaction(c, task));
 
         return requestTaskStore.add(task);
     }
 
     public int unlockConnector(UnlockConnectorParams params) {
-        UnlockConnectorRequest req = prepareUnlockConnector(params);
-        List<ChargePointSelect> list = params.getChargePointSelectList();
-        RequestTask<UnlockConnectorRequest> task = new RequestTask<>(VERSION, req, list);
+        UnlockConnectorTask task = new UnlockConnectorTask(VERSION, params);
 
         BackgroundService.with(executorService)
-                         .forFirst(list)
-                         .execute(c -> getInvoker(c).unlockConnector(c, new UnlockConnectorResponseHandler(task, c.getChargeBoxId())));
+                         .forFirst(task.getParams().getChargePointSelectList())
+                         .execute(c -> getInvoker(c).unlockConnector(c, task));
 
         return requestTaskStore.add(task);
     }
@@ -383,24 +213,24 @@ public class ChargePointService15_Client {
                                                              .build();
 
         int reservationId = reservationRepository.insert(res);
-        ReserveNowRequest req = this.prepareReserveNow(params, reservationId);
-        RequestTask<ReserveNowRequest> task = new RequestTask<>(VERSION, req, list);
+        String parentIdTag = userRepository.getParentIdtag(params.getIdTag());
+
+        EnhancedReserveNowParams enhancedParams = new EnhancedReserveNowParams(params, reservationId, parentIdTag);
+        ReserveNowTask task = new ReserveNowTask(VERSION, enhancedParams, reservationRepository);
 
         BackgroundService.with(executorService)
-                         .forFirst(list)
-                         .execute(c -> getInvoker(c).reserveNow(c, new ReserveNowResponseHandler(task, c.getChargeBoxId(), reservationRepository)));
+                         .forFirst(task.getParams().getChargePointSelectList())
+                         .execute(c -> getInvoker(c).reserveNow(c, task));
 
         return requestTaskStore.add(task);
     }
 
     public int cancelReservation(CancelReservationParams params) {
-        CancelReservationRequest req = prepareCancelReservation(params);
-        List<ChargePointSelect> list = params.getChargePointSelectList();
-        RequestTask<CancelReservationRequest> task = new RequestTask<>(VERSION, req, list);
+        CancelReservationTask task = new CancelReservationTask(VERSION, params, reservationRepository);
 
         BackgroundService.with(executorService)
-                         .forFirst(list)
-                         .execute(c -> getInvoker(c).cancelReservation(c, new CancelReservationResponseHandler(task, c.getChargeBoxId(), reservationRepository)));
+                         .forFirst(task.getParams().getChargePointSelectList())
+                         .execute(c -> getInvoker(c).cancelReservation(c, task));
 
         return requestTaskStore.add(task);
     }

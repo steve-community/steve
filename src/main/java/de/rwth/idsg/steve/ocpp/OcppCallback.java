@@ -1,6 +1,5 @@
-package de.rwth.idsg.steve.handler;
+package de.rwth.idsg.steve.ocpp;
 
-import de.rwth.idsg.steve.ocpp.CommunicationTask;
 import de.rwth.idsg.steve.ocpp.ws.data.OcppJsonError;
 
 /**

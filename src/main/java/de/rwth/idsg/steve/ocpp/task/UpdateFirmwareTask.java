@@ -1,6 +1,6 @@
 package de.rwth.idsg.steve.ocpp.task;
 
-import de.rwth.idsg.steve.handler.OcppCallback;
+import de.rwth.idsg.steve.ocpp.OcppCallback;
 import de.rwth.idsg.steve.ocpp.CommunicationTask;
 import de.rwth.idsg.steve.ocpp.OcppVersion;
 import de.rwth.idsg.steve.web.dto.ocpp.UpdateFirmwareParams;

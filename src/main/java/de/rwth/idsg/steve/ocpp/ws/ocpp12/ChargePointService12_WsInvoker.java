@@ -1,27 +1,17 @@
 package de.rwth.idsg.steve.ocpp.ws.ocpp12;
 
-import de.rwth.idsg.steve.handler.OcppResponseHandler;
 import de.rwth.idsg.steve.ocpp.ChargePointService12_Invoker;
+import de.rwth.idsg.steve.ocpp.task.ChangeAvailabilityTask;
+import de.rwth.idsg.steve.ocpp.task.ChangeConfigurationTask;
+import de.rwth.idsg.steve.ocpp.task.ClearCacheTask;
+import de.rwth.idsg.steve.ocpp.task.GetDiagnosticsTask;
+import de.rwth.idsg.steve.ocpp.task.RemoteStartTransactionTask;
+import de.rwth.idsg.steve.ocpp.task.RemoteStopTransactionTask;
+import de.rwth.idsg.steve.ocpp.task.ResetTask;
+import de.rwth.idsg.steve.ocpp.task.UnlockConnectorTask;
+import de.rwth.idsg.steve.ocpp.task.UpdateFirmwareTask;
 import de.rwth.idsg.steve.ocpp.ws.AbstractChargePointServiceInvoker;
 import de.rwth.idsg.steve.repository.dto.ChargePointSelect;
-import ocpp.cp._2010._08.ChangeAvailabilityRequest;
-import ocpp.cp._2010._08.ChangeAvailabilityResponse;
-import ocpp.cp._2010._08.ChangeConfigurationRequest;
-import ocpp.cp._2010._08.ChangeConfigurationResponse;
-import ocpp.cp._2010._08.ClearCacheRequest;
-import ocpp.cp._2010._08.ClearCacheResponse;
-import ocpp.cp._2010._08.GetDiagnosticsRequest;
-import ocpp.cp._2010._08.GetDiagnosticsResponse;
-import ocpp.cp._2010._08.RemoteStartTransactionRequest;
-import ocpp.cp._2010._08.RemoteStartTransactionResponse;
-import ocpp.cp._2010._08.RemoteStopTransactionRequest;
-import ocpp.cp._2010._08.RemoteStopTransactionResponse;
-import ocpp.cp._2010._08.ResetRequest;
-import ocpp.cp._2010._08.ResetResponse;
-import ocpp.cp._2010._08.UnlockConnectorRequest;
-import ocpp.cp._2010._08.UnlockConnectorResponse;
-import ocpp.cp._2010._08.UpdateFirmwareRequest;
-import ocpp.cp._2010._08.UpdateFirmwareResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -46,54 +36,47 @@ public class ChargePointService12_WsInvoker
     }
 
     @Override
-    public void reset(ChargePointSelect cp, OcppResponseHandler<ResetRequest, ResetResponse> handler) {
-        runPipeline(cp, handler);
+    public void reset(ChargePointSelect cp, ResetTask task) {
+        runPipeline(cp, task);
     }
 
     @Override
-    public void clearCache(ChargePointSelect cp, OcppResponseHandler<ClearCacheRequest, ClearCacheResponse> handler) {
-        runPipeline(cp, handler);
+    public void clearCache(ChargePointSelect cp, ClearCacheTask task) {
+        runPipeline(cp, task);
     }
 
     @Override
-    public void getDiagnostics(ChargePointSelect cp,
-                               OcppResponseHandler<GetDiagnosticsRequest, GetDiagnosticsResponse> handler) {
-        runPipeline(cp, handler);
+    public void getDiagnostics(ChargePointSelect cp, GetDiagnosticsTask task) {
+        runPipeline(cp, task);
     }
 
     @Override
-    public void updateFirmware(ChargePointSelect cp,
-                               OcppResponseHandler<UpdateFirmwareRequest, UpdateFirmwareResponse> handler) {
-        runPipeline(cp, handler);
+    public void updateFirmware(ChargePointSelect cp, UpdateFirmwareTask task) {
+        runPipeline(cp, task);
     }
 
     @Override
-    public void unlockConnector(ChargePointSelect cp,
-                                OcppResponseHandler<UnlockConnectorRequest, UnlockConnectorResponse> handler) {
-        runPipeline(cp, handler);
+    public void unlockConnector(ChargePointSelect cp, UnlockConnectorTask task) {
+        runPipeline(cp, task);
     }
 
     @Override
-    public void changeAvailability(ChargePointSelect cp,
-                                   OcppResponseHandler<ChangeAvailabilityRequest, ChangeAvailabilityResponse> handler) {
-        runPipeline(cp, handler);
+    public void changeAvailability(ChargePointSelect cp, ChangeAvailabilityTask task) {
+        runPipeline(cp, task);
     }
 
     @Override
-    public void changeConfiguration(ChargePointSelect cp,
-                                    OcppResponseHandler<ChangeConfigurationRequest, ChangeConfigurationResponse> handler) {
-        runPipeline(cp, handler);
+    public void changeConfiguration(ChargePointSelect cp, ChangeConfigurationTask task) {
+        runPipeline(cp, task);
     }
 
     @Override
-    public void remoteStartTransaction(ChargePointSelect cp,
-                                       OcppResponseHandler<RemoteStartTransactionRequest, RemoteStartTransactionResponse> handler) {
-        runPipeline(cp, handler);
+    public void remoteStartTransaction(ChargePointSelect cp, RemoteStartTransactionTask task) {
+        runPipeline(cp, task);
     }
 
     @Override
-    public void remoteStopTransaction(ChargePointSelect cp,
-                                      OcppResponseHandler<RemoteStopTransactionRequest, RemoteStopTransactionResponse> handler) {
-        runPipeline(cp, handler);
+    public void remoteStopTransaction(ChargePointSelect cp, RemoteStopTransactionTask task) {
+        runPipeline(cp, task);
     }
 }

@@ -45,6 +45,7 @@ public class ReserveNowTask extends CommunicationTask<EnhancedReserveNowParams, 
             @Override
             public void failed(String chargeBoxId, String errorMessage) {
                 addNewError(chargeBoxId, errorMessage);
+                delete();
             }
         };
     }
@@ -57,12 +58,12 @@ public class ReserveNowTask extends CommunicationTask<EnhancedReserveNowParams, 
 
     @Override
     public ReserveNowRequest getOcpp15Request() {
-
         return new ReserveNowRequest()
                 .withConnectorId(params.getReserveNowParams().getConnectorId())
                 .withExpiryDate(params.getReserveNowParams().getExpiry().toDateTime())
                 .withIdTag(params.getReserveNowParams().getIdTag())
-                .withReservationId(params.getReservationId());
+                .withReservationId(params.getReservationId())
+                .withParentIdTag(params.getParentIdTag());
     }
 
     @Deprecated

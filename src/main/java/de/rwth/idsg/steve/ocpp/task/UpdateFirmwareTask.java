@@ -7,6 +7,8 @@ import de.rwth.idsg.steve.web.dto.ocpp.UpdateFirmwareParams;
 
 import javax.xml.ws.AsyncHandler;
 
+import static de.rwth.idsg.steve.utils.DateTimeUtils.toDateTime;
+
 /**
  * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
  * @since 09.03.2018
@@ -36,18 +38,18 @@ public class UpdateFirmwareTask extends CommunicationTask<UpdateFirmwareParams, 
     public ocpp.cp._2010._08.UpdateFirmwareRequest getOcpp12Request() {
         return new ocpp.cp._2010._08.UpdateFirmwareRequest()
                 .withLocation(params.getLocation())
+                .withRetrieveDate(toDateTime(params.getRetrieve()))
                 .withRetries(params.getRetries())
-                .withRetryInterval(params.getRetryInterval())
-                .withRetrieveDate(params.getRetrieve().toDateTime());
+                .withRetryInterval(params.getRetryInterval());
     }
 
     @Override
     public ocpp.cp._2012._06.UpdateFirmwareRequest getOcpp15Request() {
         return new ocpp.cp._2012._06.UpdateFirmwareRequest()
                 .withLocation(params.getLocation())
+                .withRetrieveDate(toDateTime(params.getRetrieve()))
                 .withRetries(params.getRetries())
-                .withRetryInterval(params.getRetryInterval())
-                .withRetrieveDate(params.getRetrieve().toDateTime());
+                .withRetryInterval(params.getRetryInterval());
     }
 
     @Override

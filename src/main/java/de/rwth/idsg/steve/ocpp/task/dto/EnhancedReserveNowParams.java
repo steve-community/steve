@@ -17,6 +17,7 @@ import java.util.List;
 public class EnhancedReserveNowParams implements ChargePointSelection {
     private final ReserveNowParams reserveNowParams;
     private final int reservationId;
+    private final String parentIdTag;
 
     @Override
     public List<ChargePointSelect> getChargePointSelectList() {

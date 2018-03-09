@@ -34,6 +34,7 @@ public class GetLocalListVersionTask extends CommunicationTask<MultipleChargePoi
         };
     }
 
+    @Deprecated
     @Override
     public <T extends RequestType> T getOcpp12Request() {
         throw new RuntimeException("Not supported");
@@ -44,6 +45,7 @@ public class GetLocalListVersionTask extends CommunicationTask<MultipleChargePoi
         return new ocpp.cp._2012._06.GetLocalListVersionRequest();
     }
 
+    @Deprecated
     @Override
     public <T extends ResponseType> AsyncHandler<T> getOcpp12Handler(String chargeBoxId) {
         throw new RuntimeException("Not supported");

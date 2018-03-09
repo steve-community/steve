@@ -40,6 +40,7 @@ public class DataTransferTask extends CommunicationTask<DataTransferParams, Data
         };
     }
 
+    @Deprecated
     @Override
     public <T extends RequestType> T getOcpp12Request() {
         throw new RuntimeException("Not supported");
@@ -53,6 +54,7 @@ public class DataTransferTask extends CommunicationTask<DataTransferParams, Data
                 .withVendorId(params.getVendorId());
     }
 
+    @Deprecated
     @Override
     public <T extends ResponseType> AsyncHandler<T> getOcpp12Handler(String chargeBoxId) {
         throw new RuntimeException("Not supported");

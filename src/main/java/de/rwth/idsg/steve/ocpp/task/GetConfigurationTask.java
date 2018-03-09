@@ -56,6 +56,7 @@ public class GetConfigurationTask extends CommunicationTask<GetConfigurationPara
         };
     }
 
+    @Deprecated
     @Override
     public <T extends RequestType> T getOcpp12Request() {
         throw new RuntimeException("Not supported");
@@ -63,10 +64,14 @@ public class GetConfigurationTask extends CommunicationTask<GetConfigurationPara
 
     @Override
     public GetConfigurationRequest getOcpp15Request() {
-        return new GetConfigurationRequest()
-                .withKey(params.getConfKeyList());
+        if (params.isSetConfKeyList()) {
+            return new GetConfigurationRequest().withKey(params.getConfKeyList());
+        } else {
+            return new GetConfigurationRequest();
+        }
     }
 
+    @Deprecated
     @Override
     public <T extends ResponseType> AsyncHandler<T> getOcpp12Handler(String chargeBoxId) {
         throw new RuntimeException("Not supported");
@@ -83,7 +88,7 @@ public class GetConfigurationTask extends CommunicationTask<GetConfigurationPara
         };
     }
 
-    private String toStringConfList(List<KeyValue> confList) {
+    private static String toStringConfList(List<KeyValue> confList) {
         StringBuilder sb = new StringBuilder();
 
         for (KeyValue keyValue : confList) {
@@ -101,7 +106,7 @@ public class GetConfigurationTask extends CommunicationTask<GetConfigurationPara
         return sb.toString();
     }
 
-    private String toStringUnknownList(List<String> unknownList) {
+    private static String toStringUnknownList(List<String> unknownList) {
         return JOINER.join(unknownList);
     }
  }

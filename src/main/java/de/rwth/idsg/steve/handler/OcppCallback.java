@@ -8,6 +8,12 @@ package de.rwth.idsg.steve.handler;
  * @since 20.11.2015
  */
 public interface OcppCallback<T> {
-    void success(T response);
-    void failed(String errorMessage);
+
+    void success(String chargeBoxId, T response);
+
+    void failed(String chargeBoxId, String errorMessage);
+
+    default void failed(String chargeBoxId, Exception e) {
+        failed(chargeBoxId, e.getMessage());
+    }
 }

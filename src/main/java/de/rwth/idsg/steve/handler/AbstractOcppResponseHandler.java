@@ -115,7 +115,7 @@ public abstract class AbstractOcppResponseHandler<S extends RequestType, T exten
     private void success(T response) {
         for (OcppCallback<T> c : callbackList) {
             try {
-                c.success(response);
+                c.success(chargeBoxId, response);
             } catch (Exception e) {
                 log.error("Exception occurred in OcppCallback", e);
             }
@@ -125,7 +125,7 @@ public abstract class AbstractOcppResponseHandler<S extends RequestType, T exten
     private void failed(String errorMessage) {
         for (OcppCallback<T> c : callbackList) {
             try {
-                c.failed(errorMessage);
+                c.failed(chargeBoxId, errorMessage);
             } catch (Exception e) {
                 log.error("Exception occurred in OcppCallback", e);
             }

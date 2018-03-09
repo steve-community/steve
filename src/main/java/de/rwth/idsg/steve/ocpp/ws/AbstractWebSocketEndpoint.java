@@ -81,9 +81,7 @@ public abstract class AbstractWebSocketEndpoint implements WebSocketHandler {
 
         log.info("[chargeBoxId={}, sessionId={}] Received message: {}", chargeBoxId, session.getId(), incomingString);
 
-        CommunicationContext context = new CommunicationContext();
-        context.setSession(session);
-        context.setChargeBoxId(chargeBoxId);
+        CommunicationContext context = new CommunicationContext(session, chargeBoxId);
         context.setIncomingString(incomingString);
 
         pipeline.process(context);

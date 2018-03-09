@@ -64,11 +64,9 @@ public abstract class AbstractChargePointServiceInvoker {
 
         FutureResponseContext frc = new FutureResponseContext(task, pair.getResponseClass());
 
-        CommunicationContext context = new CommunicationContext();
-        context.setChargeBoxId(chargeBoxId);
+        CommunicationContext context = new CommunicationContext(endpoint.getSession(chargeBoxId), chargeBoxId);
         context.setOutgoingMessage(call);
         context.setFutureResponseContext(frc);
-        context.setSession(endpoint.getSession(chargeBoxId));
 
         outgoingCallPipeline.process(context);
     }

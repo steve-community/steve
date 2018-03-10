@@ -21,6 +21,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
+import java.util.function.Consumer;
 
 /**
  * Incoming String --> OcppJsonMessage
@@ -30,7 +31,8 @@ import java.io.IOException;
  */
 @Slf4j
 @RequiredArgsConstructor
-public class Deserializer implements Stage {
+public class Deserializer implements Consumer<CommunicationContext> {
+
     private final ObjectMapper mapper;
     private final FutureResponseContextStore futureResponseContextStore;
     private final TypeStore typeStore;
@@ -40,7 +42,7 @@ public class Deserializer implements Stage {
      * and build, if any, a corresponding error message.
      */
     @Override
-    public void process(CommunicationContext context) {
+    public void accept(CommunicationContext context) {
         try (JsonParser parser = mapper.getFactory().createParser(context.getIncomingString())) {
             parser.nextToken(); // set cursor to '['
 

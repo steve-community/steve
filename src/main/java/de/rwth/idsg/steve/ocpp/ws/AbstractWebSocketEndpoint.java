@@ -4,7 +4,7 @@ import de.rwth.idsg.steve.config.WebSocketConfiguration;
 import de.rwth.idsg.steve.ocpp.ws.custom.WsSessionSelectStrategy;
 import de.rwth.idsg.steve.ocpp.ws.data.CommunicationContext;
 import de.rwth.idsg.steve.ocpp.ws.data.SessionContext;
-import de.rwth.idsg.steve.ocpp.ws.pipeline.Pipeline;
+import de.rwth.idsg.steve.ocpp.ws.pipeline.IncomingPipeline;
 import de.rwth.idsg.steve.repository.OcppServerRepository;
 import de.rwth.idsg.steve.service.NotificationService;
 import org.joda.time.DateTime;
@@ -43,7 +43,7 @@ public abstract class AbstractWebSocketEndpoint implements WebSocketHandler {
 
     public static final String CHARGEBOX_ID_KEY = "CHARGEBOX_ID_KEY";
 
-    private Pipeline pipeline;
+    private IncomingPipeline pipeline;
     private SessionContextStoreImpl sessionContextStore;
 
     private final List<Consumer<String>> connectedCallbackList = new ArrayList<>();
@@ -51,7 +51,7 @@ public abstract class AbstractWebSocketEndpoint implements WebSocketHandler {
 
     private final Object sessionContextLock = new Object();
 
-    public void init(Pipeline pipeline) {
+    public void init(IncomingPipeline pipeline) {
         this.pipeline = pipeline;
         sessionContextStore = new SessionContextStoreImpl(wsSessionSelectStrategy);
 
@@ -84,7 +84,7 @@ public abstract class AbstractWebSocketEndpoint implements WebSocketHandler {
         CommunicationContext context = new CommunicationContext(session, chargeBoxId);
         context.setIncomingString(incomingString);
 
-        pipeline.process(context);
+        pipeline.accept(context);
     }
 
     private void handlePongMessage(WebSocketSession session) {

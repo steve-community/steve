@@ -1,9 +1,12 @@
 package de.rwth.idsg.steve.ocpp.ws.pipeline;
 
 import de.rwth.idsg.steve.ocpp.ws.FutureResponseContextStore;
+import de.rwth.idsg.steve.ocpp.ws.data.CommunicationContext;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.util.function.Consumer;
 
 /**
  * For outgoing CALLs, triggered by the user.
@@ -13,14 +16,33 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @Slf4j
-public class OutgoingCallPipeline extends AbstractPipeline {
+public class OutgoingCallPipeline implements Consumer<CommunicationContext> {
+
+    private final Consumer<CommunicationContext> chainedConsumers;
 
     @Autowired
-    public OutgoingCallPipeline(OutgoingPipeline outgoingPipeline, FutureResponseContextStore store) {
-        // Order is important => Sequential execution of stages
-        addStages(
-                outgoingPipeline,
-                new OutgoingCallStoreStage(store)
-        );
+    public OutgoingCallPipeline(Serializer serializer, Sender sender, FutureResponseContextStore store) {
+        chainedConsumers = OutgoingCallPipeline.start(serializer)
+                                               .andThen(sender)
+                                               .andThen(createStore(store));
     }
+
+    @Override
+    public void accept(CommunicationContext ctx) {
+        chainedConsumers.accept(ctx);
+    }
+
+    private static Consumer<CommunicationContext> createStore(FutureResponseContextStore store) {
+        return context -> {
+            // All went well, and the call is sent. Store the response context for later lookup.
+            store.add(context.getSession(),
+                      context.getOutgoingMessage().getMessageId(),
+                      context.getFutureResponseContext());
+        };
+    }
+
+    private static Consumer<CommunicationContext> start(Consumer<CommunicationContext> starter) {
+        return starter;
+    }
+
 }

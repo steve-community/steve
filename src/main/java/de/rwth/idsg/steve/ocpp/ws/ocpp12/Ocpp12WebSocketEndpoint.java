@@ -10,7 +10,8 @@ import de.rwth.idsg.steve.ocpp.ws.FutureResponseContextStore;
 import de.rwth.idsg.steve.ocpp.ws.pipeline.AbstractCallHandler;
 import de.rwth.idsg.steve.ocpp.ws.pipeline.Deserializer;
 import de.rwth.idsg.steve.ocpp.ws.pipeline.IncomingPipeline;
-import de.rwth.idsg.steve.ocpp.ws.pipeline.OutgoingPipeline;
+import de.rwth.idsg.steve.ocpp.ws.pipeline.Sender;
+import de.rwth.idsg.steve.ocpp.ws.pipeline.Serializer;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import ocpp.cs._2010._08.AuthorizeRequest;
@@ -36,14 +37,15 @@ public class Ocpp12WebSocketEndpoint extends AbstractWebSocketEndpoint {
 
     @Autowired private CentralSystemService12_SoapServer server;
 
-    @Autowired private OutgoingPipeline outgoingPipeline;
+    @Autowired private Serializer serializer;
+    @Autowired private Sender sender;
     @Autowired private ObjectMapper mapper;
     @Autowired private FutureResponseContextStore futureResponseContextStore;
 
     @PostConstruct
     public void init() {
         Deserializer deserializer = new Deserializer(mapper, futureResponseContextStore, Ocpp12TypeStore.INSTANCE);
-        IncomingPipeline pipeline = new IncomingPipeline(deserializer, new Ocpp12CallHandler(server), outgoingPipeline);
+        IncomingPipeline pipeline = new IncomingPipeline(deserializer, new Ocpp12CallHandler(server), serializer, sender);
         super.init(pipeline);
     }
 

@@ -64,6 +64,6 @@ public abstract class AbstractChargePointServiceInvoker {
         context.setOutgoingMessage(call);
         context.setFutureResponseContext(frc);
 
-        outgoingCallPipeline.process(context);
+        outgoingCallPipeline.accept(context);
     }
 }

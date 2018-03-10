@@ -8,6 +8,8 @@ import de.rwth.idsg.steve.ocpp.ws.data.OcppJsonResult;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.function.Consumer;
+
 /**
  * For all incoming message types.
  *
@@ -16,26 +18,30 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 @RequiredArgsConstructor
-public class IncomingPipeline extends AbstractPipeline {
+public class IncomingPipeline implements Consumer<CommunicationContext> {
+
     private final Deserializer deserializer;
     private final AbstractCallHandler handler;
-    private final OutgoingPipeline outgoingPipeline;
+    private final Serializer serializer;
+    private final Sender sender;
 
     @Override
-    public void process(CommunicationContext context) {
-        deserializer.process(context);
+    public void accept(CommunicationContext context) {
+        deserializer.accept(context);
 
         // When the incoming could not be deserialized
         if (context.isSetOutgoingError()) {
-            outgoingPipeline.process(context);
+            serializer.accept(context);
+            sender.accept(context);
             return;
         }
 
         OcppJsonMessage msg = context.getIncomingMessage();
 
         if (msg instanceof OcppJsonCall) {
-            handler.process(context);
-            outgoingPipeline.process(context);
+            handler.accept(context);
+            serializer.accept(context);
+            sender.accept(context);
 
         } else if (msg instanceof OcppJsonResult) {
             context.getResultHandler()

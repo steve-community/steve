@@ -9,7 +9,8 @@ import de.rwth.idsg.steve.ocpp.ws.FutureResponseContextStore;
 import de.rwth.idsg.steve.ocpp.ws.pipeline.AbstractCallHandler;
 import de.rwth.idsg.steve.ocpp.ws.pipeline.Deserializer;
 import de.rwth.idsg.steve.ocpp.ws.pipeline.IncomingPipeline;
-import de.rwth.idsg.steve.ocpp.ws.pipeline.OutgoingPipeline;
+import de.rwth.idsg.steve.ocpp.ws.pipeline.Sender;
+import de.rwth.idsg.steve.ocpp.ws.pipeline.Serializer;
 import de.rwth.idsg.steve.service.CentralSystemService15_Service;
 import lombok.RequiredArgsConstructor;
 import ocpp.cs._2012._06.AuthorizeRequest;
@@ -36,14 +37,15 @@ public class Ocpp15WebSocketEndpoint extends AbstractWebSocketEndpoint {
 
     @Autowired private CentralSystemService15_Service service;
 
-    @Autowired private OutgoingPipeline outgoingPipeline;
+    @Autowired private Serializer serializer;
+    @Autowired private Sender sender;
     @Autowired private ObjectMapper mapper;
     @Autowired private FutureResponseContextStore futureResponseContextStore;
 
     @PostConstruct
     public void init() {
         Deserializer deserializer = new Deserializer(mapper, futureResponseContextStore, Ocpp15TypeStore.INSTANCE);
-        IncomingPipeline pipeline = new IncomingPipeline(deserializer, new Ocpp15CallHandler(service), outgoingPipeline);
+        IncomingPipeline pipeline = new IncomingPipeline(deserializer, new Ocpp15CallHandler(service), serializer, sender);
         super.init(pipeline);
     }
 

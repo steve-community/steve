@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.util.function.Consumer;
 
 /**
  * Outgoing OcppJsonMessage --> String.
@@ -25,12 +26,12 @@ import java.io.IOException;
  */
 @Slf4j
 @Component
-public class Serializer implements Stage {
+public class Serializer implements Consumer<CommunicationContext> {
 
     @Autowired private ObjectMapper mapper;
 
     @Override
-    public void process(CommunicationContext context) {
+    public void accept(CommunicationContext context) {
         OcppJsonMessage message = context.getOutgoingMessage();
 
         ArrayNode str;

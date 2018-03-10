@@ -9,6 +9,7 @@ import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 
 import java.io.IOException;
+import java.util.function.Consumer;
 
 /**
  * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
@@ -16,10 +17,10 @@ import java.io.IOException;
  */
 @Slf4j
 @Component
-public class Sender implements Stage {
+public class Sender implements Consumer<CommunicationContext> {
 
     @Override
-    public void process(CommunicationContext context) {
+    public void accept(CommunicationContext context) {
         String outgoingString = context.getOutgoingString();
         String chargeBoxId = context.getChargeBoxId();
         WebSocketSession session = context.getSession();

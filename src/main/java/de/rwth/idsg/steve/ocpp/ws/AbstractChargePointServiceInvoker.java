@@ -9,10 +9,9 @@ import de.rwth.idsg.steve.ocpp.ws.data.FutureResponseContext;
 import de.rwth.idsg.steve.ocpp.ws.data.OcppJsonCall;
 import de.rwth.idsg.steve.ocpp.ws.pipeline.OutgoingCallPipeline;
 import de.rwth.idsg.steve.repository.dto.ChargePointSelect;
-import lombok.Setter;
+import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.UUID;
 
@@ -20,22 +19,19 @@ import java.util.UUID;
  * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
  * @since 20.03.2015
  */
+@RequiredArgsConstructor
 public abstract class AbstractChargePointServiceInvoker {
     private final Logger log = LoggerFactory.getLogger(getClass());
 
-    @Autowired private OutgoingCallPipeline outgoingCallPipeline;
-
-    @Setter private TypeStore typeStore;
-    @Setter private AbstractWebSocketEndpoint endpoint;
-
-    public void runPipeline(ChargePointSelect cps, CommunicationTask task) {
-        runPipeline(cps.getChargeBoxId(), task);
-    }
+    private final OutgoingCallPipeline outgoingCallPipeline;
+    private final AbstractWebSocketEndpoint endpoint;
+    private final TypeStore typeStore;
 
     /**
      * Just a wrapper to make try-catch block and exception handling stand out
      */
-    public void runPipeline(String chargeBoxId, CommunicationTask task) {
+    public void runPipeline(ChargePointSelect cps, CommunicationTask task) {
+        String chargeBoxId = cps.getChargeBoxId();
         try {
             run(chargeBoxId, task);
         } catch (Exception e) {

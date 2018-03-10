@@ -1,7 +1,7 @@
 package de.rwth.idsg.steve.ocpp.task;
 
-import de.rwth.idsg.steve.ocpp.OcppCallback;
 import de.rwth.idsg.steve.ocpp.CommunicationTask;
+import de.rwth.idsg.steve.ocpp.OcppCallback;
 import de.rwth.idsg.steve.ocpp.OcppVersion;
 import de.rwth.idsg.steve.ocpp.RequestType;
 import de.rwth.idsg.steve.ocpp.ResponseType;
@@ -22,27 +22,18 @@ import java.util.List;
  */
 public class SendLocalListTask extends CommunicationTask<SendLocalListParams, String> {
 
-    private final OcppTagService ocppTagService;
+    private final SendLocalListRequest request;
 
-    public SendLocalListTask(OcppVersion ocppVersion, SendLocalListParams params,
-                             OcppTagService ocppTagService) {
+    public SendLocalListTask(OcppVersion ocppVersion, SendLocalListParams params, OcppTagService ocppTagService) {
         super(ocppVersion, params);
-        this.ocppTagService = ocppTagService;
+        this.request = create(ocppTagService);
     }
 
-    @Override
-    public OcppCallback<String> defaultCallback() {
-        return new StringOcppCallback();
-    }
-
-    @Deprecated
-    @Override
-    public <T extends RequestType> T getOcpp12Request() {
-        throw new RuntimeException("Not supported");
-    }
-
-    @Override
-    public SendLocalListRequest getOcpp15Request() {
+    /**
+     * Since creating this request requires some costly database calls, it would be better to do it only once and
+     * not for every execution (when sending to multiple charging stations).
+     */
+    private SendLocalListRequest create(OcppTagService ocppTagService) {
         // DIFFERENTIAL update
         if (UpdateType.DIFFERENTIAL.equals(params.getUpdateType())) {
             List<AuthorisationData> auths = new ArrayList<>();
@@ -60,13 +51,29 @@ public class SendLocalListTask extends CommunicationTask<SendLocalListParams, St
                     .withUpdateType(UpdateType.DIFFERENTIAL)
                     .withLocalAuthorisationList(auths);
 
-            // FULL update
+        // FULL update
         } else {
             return new SendLocalListRequest()
                     .withListVersion(params.getListVersion())
                     .withUpdateType(UpdateType.FULL)
                     .withLocalAuthorisationList(ocppTagService.getAuthDataOfAllTags());
         }
+    }
+
+    @Override
+    public OcppCallback<String> defaultCallback() {
+        return new StringOcppCallback();
+    }
+
+    @Deprecated
+    @Override
+    public <T extends RequestType> T getOcpp12Request() {
+        throw new RuntimeException("Not supported");
+    }
+
+    @Override
+    public SendLocalListRequest getOcpp15Request() {
+        return request;
     }
 
     @Deprecated

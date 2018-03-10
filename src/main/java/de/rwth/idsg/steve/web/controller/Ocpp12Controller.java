@@ -14,6 +14,7 @@ import de.rwth.idsg.steve.web.dto.ocpp.ResetParams;
 import de.rwth.idsg.steve.web.dto.ocpp.UnlockConnectorParams;
 import de.rwth.idsg.steve.web.dto.ocpp.UpdateFirmwareParams;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -33,7 +34,10 @@ public class Ocpp12Controller {
 
     @Autowired private ChargePointHelperService chargePointHelperService;
     @Autowired private OcppTagRepository ocppTagRepository;
-    @Autowired private ChargePointService12_Client client;
+
+    @Autowired
+    @Qualifier("ChargePointService12_Client")
+    private ChargePointService12_Client client;
 
     private static final String PARAMS = "params";
 

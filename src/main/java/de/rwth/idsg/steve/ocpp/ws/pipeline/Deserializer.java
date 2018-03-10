@@ -5,6 +5,7 @@ import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.rwth.idsg.steve.SteveException;
+import de.rwth.idsg.steve.ocpp.JsonObjectMapper;
 import de.rwth.idsg.steve.ocpp.RequestType;
 import de.rwth.idsg.steve.ocpp.ResponseType;
 import de.rwth.idsg.steve.ocpp.ws.ErrorFactory;
@@ -33,7 +34,8 @@ import java.util.function.Consumer;
 @RequiredArgsConstructor
 public class Deserializer implements Consumer<CommunicationContext> {
 
-    private final ObjectMapper mapper;
+    private final ObjectMapper mapper = JsonObjectMapper.INSTANCE.getMapper();
+
     private final FutureResponseContextStore futureResponseContextStore;
     private final TypeStore typeStore;
 

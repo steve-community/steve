@@ -1,6 +1,5 @@
 package de.rwth.idsg.steve.ocpp.ws.ocpp15;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import de.rwth.idsg.steve.ocpp.OcppProtocol;
 import de.rwth.idsg.steve.ocpp.RequestType;
 import de.rwth.idsg.steve.ocpp.ResponseType;
@@ -39,12 +38,11 @@ public class Ocpp15WebSocketEndpoint extends AbstractWebSocketEndpoint {
 
     @Autowired private Serializer serializer;
     @Autowired private Sender sender;
-    @Autowired private ObjectMapper mapper;
     @Autowired private FutureResponseContextStore futureResponseContextStore;
 
     @PostConstruct
     public void init() {
-        Deserializer deserializer = new Deserializer(mapper, futureResponseContextStore, Ocpp15TypeStore.INSTANCE);
+        Deserializer deserializer = new Deserializer(futureResponseContextStore, Ocpp15TypeStore.INSTANCE);
         IncomingPipeline pipeline = new IncomingPipeline(deserializer, new Ocpp15CallHandler(service), serializer, sender);
         super.init(pipeline);
     }

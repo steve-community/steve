@@ -21,10 +21,10 @@ public class OutgoingCallPipeline implements Consumer<CommunicationContext> {
     private final Consumer<CommunicationContext> chainedConsumers;
 
     @Autowired
-    public OutgoingCallPipeline(Serializer serializer, Sender sender, FutureResponseContextStore store) {
-        chainedConsumers = OutgoingCallPipeline.start(serializer)
-                                               .andThen(sender)
-                                               .andThen(createStore(store));
+    public OutgoingCallPipeline(FutureResponseContextStore store) {
+        chainedConsumers = OutgoingCallPipeline.start(Serializer.INSTANCE)
+                                               .andThen(Sender.INSTANCE)
+                                               .andThen(saveInStore(store));
     }
 
     @Override
@@ -32,7 +32,7 @@ public class OutgoingCallPipeline implements Consumer<CommunicationContext> {
         chainedConsumers.accept(ctx);
     }
 
-    private static Consumer<CommunicationContext> createStore(FutureResponseContextStore store) {
+    private static Consumer<CommunicationContext> saveInStore(FutureResponseContextStore store) {
         return context -> {
             // All went well, and the call is sent. Store the response context for later lookup.
             store.add(context.getSession(),

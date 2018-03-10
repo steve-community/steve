@@ -20,10 +20,11 @@ import java.util.function.Consumer;
 @RequiredArgsConstructor
 public class IncomingPipeline implements Consumer<CommunicationContext> {
 
+    private final Serializer serializer = Serializer.INSTANCE;
+    private final Sender sender = Sender.INSTANCE;
+
     private final Deserializer deserializer;
     private final AbstractCallHandler handler;
-    private final Serializer serializer;
-    private final Sender sender;
 
     @Override
     public void accept(CommunicationContext context) {

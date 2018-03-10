@@ -13,7 +13,6 @@ import de.rwth.idsg.steve.ocpp.ws.data.OcppJsonError;
 import de.rwth.idsg.steve.ocpp.ws.data.OcppJsonMessage;
 import de.rwth.idsg.steve.ocpp.ws.data.OcppJsonResult;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.util.function.Consumer;
@@ -21,12 +20,14 @@ import java.util.function.Consumer;
 /**
  * Outgoing OcppJsonMessage --> String.
  *
+ * This class should remain stateless.
+ *
  * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
  * @since 17.03.2015
  */
 @Slf4j
-@Component
-public class Serializer implements Consumer<CommunicationContext> {
+public enum Serializer implements Consumer<CommunicationContext> {
+    INSTANCE;
 
     private final ObjectMapper mapper = JsonObjectMapper.INSTANCE.getMapper();
 

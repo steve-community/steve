@@ -4,7 +4,6 @@ import de.rwth.idsg.steve.SteveException;
 import de.rwth.idsg.steve.ocpp.ws.data.CommunicationContext;
 import de.rwth.idsg.steve.ocpp.ws.data.OcppJsonCall;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 
@@ -12,12 +11,14 @@ import java.io.IOException;
 import java.util.function.Consumer;
 
 /**
+ * This class should remain stateless.
+ *
  * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
  * @since 12.03.2015
  */
 @Slf4j
-@Component
-public class Sender implements Consumer<CommunicationContext> {
+public enum Sender implements Consumer<CommunicationContext> {
+    INSTANCE;
 
     @Override
     public void accept(CommunicationContext context) {

@@ -4,12 +4,14 @@ import de.rwth.idsg.steve.ocpp.ws.data.ActionResponsePair;
 import de.rwth.idsg.steve.ocpp.ws.ocpp12.Ocpp12TypeStore;
 import de.rwth.idsg.steve.ocpp.ws.ocpp15.Ocpp15TypeStore;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 
 /**
  * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
  * @since 10.03.2018
  */
+@Ignore
 public class TypeStoreTest {
 
     @Test

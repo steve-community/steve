@@ -43,7 +43,7 @@ public class JettyServer {
     /**
      * A fully configured Jetty Server instance
      */
-    public void prepare() throws Exception {
+    private void prepare() {
 
         // === jetty.xml ===
         // Setup Threadpool
@@ -129,6 +129,8 @@ public class JettyServer {
      * Starts the Jetty Server instance
      */
     public void start() throws Exception {
+        prepare();
+
         if (server != null) {
             server.start();
         }
@@ -140,6 +142,12 @@ public class JettyServer {
     public void join() throws Exception {
         if (server != null) {
             server.join();
+        }
+    }
+
+    public void stop() throws Exception {
+        if (server != null) {
+            server.stop();
         }
     }
 

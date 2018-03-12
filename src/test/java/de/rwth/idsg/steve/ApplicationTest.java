@@ -8,14 +8,11 @@ import ocpp.cs._2010._08.BootNotificationRequest;
 import ocpp.cs._2010._08.BootNotificationResponse;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.apache.cxf.ws.addressing.WSAddressingFeature;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
 
 import javax.xml.ws.soap.SOAPBinding;
-import java.util.TimeZone;
 import java.util.UUID;
 
 import static de.rwth.idsg.steve.SteveConfiguration.CONFIG;
@@ -68,22 +65,10 @@ public class ApplicationTest {
         Assert.assertEquals(ocpp.cs._2012._06.AuthorizationStatus.INVALID, auth15.getIdTagInfo().getStatus());
     }
 
-    private JettyServer startApp() throws Exception {
-        // For Hibernate validator
-        System.setProperty("org.jboss.logging.provider", "slf4j");
-
-        TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
-        DateTimeZone.setDefault(DateTimeZone.UTC);
-        log.info("Date/time zone of the application is set to UTC. Current date/time: {}", DateTime.now());
-
-        SteveConfiguration sc = CONFIG;
-
-        log.info("Loaded the properties. Starting with the '{}' profile", sc.getProfile());
-
-        JettyServer jettyServer = new JettyServer();
-        jettyServer.prepare();
-        jettyServer.start();
-        return jettyServer;
+    private Application startApp() throws Exception {
+        Application app = new Application();
+        app.start();
+        return app;
     }
 
     private static String getRandomString() {

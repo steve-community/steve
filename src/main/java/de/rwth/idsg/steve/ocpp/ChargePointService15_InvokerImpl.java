@@ -17,8 +17,8 @@ import de.rwth.idsg.steve.ocpp.task.SendLocalListTask;
 import de.rwth.idsg.steve.ocpp.task.UnlockConnectorTask;
 import de.rwth.idsg.steve.ocpp.task.UpdateFirmwareTask;
 import de.rwth.idsg.steve.ocpp.ws.AbstractChargePointServiceInvoker;
-import de.rwth.idsg.steve.ocpp.ws.ocpp12.Ocpp12TypeStore;
-import de.rwth.idsg.steve.ocpp.ws.ocpp12.Ocpp12WebSocketEndpoint;
+import de.rwth.idsg.steve.ocpp.ws.ocpp15.Ocpp15TypeStore;
+import de.rwth.idsg.steve.ocpp.ws.ocpp15.Ocpp15WebSocketEndpoint;
 import de.rwth.idsg.steve.ocpp.ws.pipeline.OutgoingCallPipeline;
 import de.rwth.idsg.steve.repository.dto.ChargePointSelect;
 import ocpp.cp._2012._06.ChargePointService;
@@ -35,8 +35,8 @@ public class ChargePointService15_InvokerImpl
         implements ChargePointService15_Invoker {
 
     @Autowired
-    public ChargePointService15_InvokerImpl(OutgoingCallPipeline pipeline, Ocpp12WebSocketEndpoint endpoint) {
-        super(pipeline, endpoint, Ocpp12TypeStore.INSTANCE);
+    public ChargePointService15_InvokerImpl(OutgoingCallPipeline pipeline, Ocpp15WebSocketEndpoint endpoint) {
+        super(pipeline, endpoint, Ocpp15TypeStore.INSTANCE);
     }
 
     @Override

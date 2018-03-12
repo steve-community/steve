@@ -44,7 +44,7 @@ public class Ocpp15WebSocketEndpoint extends AbstractWebSocketEndpoint {
     }
 
     @Override
-    protected OcppVersion getVersion() {
+    public OcppVersion getVersion() {
         return OcppVersion.V_15;
     }
 

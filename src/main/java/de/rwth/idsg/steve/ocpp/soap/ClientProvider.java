@@ -22,21 +22,7 @@ public final class ClientProvider {
 
     private ClientProvider() { }
 
-    public static ocpp.cp._2010._08.ChargePointService getForOcpp12(String endpointAddress) {
-        JaxWsProxyFactoryBean f = getBean(endpointAddress);
-
-        f.setServiceClass(ocpp.cp._2010._08.ChargePointService.class);
-        return (ocpp.cp._2010._08.ChargePointService) f.create();
-    }
-
-    public static ocpp.cp._2012._06.ChargePointService getForOcpp15(String endpointAddress) {
-        JaxWsProxyFactoryBean f = getBean(endpointAddress);
-
-        f.setServiceClass(ocpp.cp._2012._06.ChargePointService.class);
-        return (ocpp.cp._2012._06.ChargePointService) f.create();
-    }
-
-    private static JaxWsProxyFactoryBean getBean(String endpointAddress) {
+    public static JaxWsProxyFactoryBean getBean(String endpointAddress) {
         JaxWsProxyFactoryBean f = new JaxWsProxyFactoryBean();
         f.setBindingId(SOAPBinding.SOAP12HTTP_BINDING);
         f.getFeatures().add(new WSAddressingFeature());

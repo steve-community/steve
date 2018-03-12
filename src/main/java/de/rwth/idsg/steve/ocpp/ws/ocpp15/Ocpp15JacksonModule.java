@@ -22,6 +22,8 @@ public class Ocpp15JacksonModule extends SimpleModule {
 
     @Override
     public void setupModule(Module.SetupContext sc) {
+        super.setupModule(sc);
+
         sc.setMixInAnnotations(MeterValuesRequest.class, MeterValue15Mixin.class);
 
         EnumProcessor.apply(

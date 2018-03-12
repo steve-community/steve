@@ -19,6 +19,8 @@ public class Ocpp12JacksonModule extends SimpleModule {
 
     @Override
     public void setupModule(SetupContext sc) {
+        super.setupModule(sc);
+
         EnumProcessor.apply(
                 Arrays.asList("ocpp.cp._2010._08", "ocpp.cs._2010._08"),
                 clazz -> sc.setMixInAnnotations(clazz, EnumMixin.class)

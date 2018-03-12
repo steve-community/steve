@@ -1,4 +1,4 @@
-package de.rwth.idsg.steve.ocpp;
+package de.rwth.idsg.steve.ocpp.ws;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.AnnotationIntrospector;

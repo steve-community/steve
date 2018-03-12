@@ -1,4 +1,4 @@
-package de.rwth.idsg.steve.ocpp.task.dto;
+package de.rwth.idsg.steve.service.dto;
 
 import de.rwth.idsg.steve.repository.dto.ChargePointSelect;
 import de.rwth.idsg.steve.web.dto.ocpp.ChargePointSelection;

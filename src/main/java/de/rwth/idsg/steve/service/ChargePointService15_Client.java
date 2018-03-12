@@ -10,7 +10,7 @@ import de.rwth.idsg.steve.ocpp.task.GetConfigurationTask;
 import de.rwth.idsg.steve.ocpp.task.GetLocalListVersionTask;
 import de.rwth.idsg.steve.ocpp.task.ReserveNowTask;
 import de.rwth.idsg.steve.ocpp.task.SendLocalListTask;
-import de.rwth.idsg.steve.ocpp.task.dto.EnhancedReserveNowParams;
+import de.rwth.idsg.steve.service.dto.EnhancedReserveNowParams;
 import de.rwth.idsg.steve.repository.OcppTagRepository;
 import de.rwth.idsg.steve.repository.ReservationRepository;
 import de.rwth.idsg.steve.repository.dto.ChargePointSelect;

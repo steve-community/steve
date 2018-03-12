@@ -5,7 +5,7 @@ import de.rwth.idsg.steve.ocpp.CommunicationTask;
 import de.rwth.idsg.steve.ocpp.OcppVersion;
 import de.rwth.idsg.steve.ocpp.RequestType;
 import de.rwth.idsg.steve.ocpp.ResponseType;
-import de.rwth.idsg.steve.ocpp.task.dto.EnhancedReserveNowParams;
+import de.rwth.idsg.steve.service.dto.EnhancedReserveNowParams;
 import de.rwth.idsg.steve.ocpp.ws.data.OcppJsonError;
 import de.rwth.idsg.steve.repository.ReservationRepository;
 import ocpp.cp._2012._06.ReservationStatus;

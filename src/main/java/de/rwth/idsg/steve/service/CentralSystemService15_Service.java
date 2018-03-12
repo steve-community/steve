@@ -228,7 +228,9 @@ public class CentralSystemService15_Service {
         return new AuthorizeResponse().withIdTagInfo(idTagInfo);
     }
 
-    // Dummy implementation. This is new in OCPP 1.5. It must be vendor-specific.
+    /**
+     * Dummy implementation. This is new in OCPP 1.5. It must be vendor-specific.
+     */
     public DataTransferResponse dataTransfer(DataTransferRequest parameters, String chargeBoxIdentity) {
         log.debug("Executing dataTransfer for {}", chargeBoxIdentity);
 
@@ -240,6 +242,8 @@ public class CentralSystemService15_Service {
             log.info("[Data Transfer] Data: {}", parameters.getData());
         }
 
+        // OCPP requires a status to be set. Since this is a dummy impl, set it to "Accepted".
+        // https://github.com/RWTH-i5-IDSG/steve/pull/36
         return new DataTransferResponse().withStatus(DataTransferStatus.ACCEPTED);
     }
 }

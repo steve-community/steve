@@ -15,6 +15,7 @@ import ocpp.cs._2012._06.BootNotificationResponse;
 import ocpp.cs._2012._06.ChargePointStatus;
 import ocpp.cs._2012._06.DataTransferRequest;
 import ocpp.cs._2012._06.DataTransferResponse;
+import ocpp.cs._2012._06.DataTransferStatus;
 import ocpp.cs._2012._06.DiagnosticsStatusNotificationRequest;
 import ocpp.cs._2012._06.DiagnosticsStatusNotificationResponse;
 import ocpp.cs._2012._06.FirmwareStatusNotificationRequest;
@@ -239,6 +240,6 @@ public class CentralSystemService15_Service {
             log.info("[Data Transfer] Data: {}", parameters.getData());
         }
 
-        return new DataTransferResponse();
+        return new DataTransferResponse().withStatus(DataTransferStatus.ACCEPTED);
     }
 }

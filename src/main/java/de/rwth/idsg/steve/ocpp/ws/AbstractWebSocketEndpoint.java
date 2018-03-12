@@ -1,6 +1,7 @@
 package de.rwth.idsg.steve.ocpp.ws;
 
 import de.rwth.idsg.steve.config.WebSocketConfiguration;
+import de.rwth.idsg.steve.ocpp.OcppVersion;
 import de.rwth.idsg.steve.ocpp.ws.custom.WsSessionSelectStrategy;
 import de.rwth.idsg.steve.ocpp.ws.data.CommunicationContext;
 import de.rwth.idsg.steve.ocpp.ws.data.SessionContext;
@@ -50,6 +51,8 @@ public abstract class AbstractWebSocketEndpoint implements WebSocketHandler {
     private final List<Consumer<String>> disconnectedCallbackList = new ArrayList<>();
 
     private final Object sessionContextLock = new Object();
+
+    public abstract OcppVersion getVersion();
 
     public void init(IncomingPipeline pipeline) {
         this.pipeline = pipeline;

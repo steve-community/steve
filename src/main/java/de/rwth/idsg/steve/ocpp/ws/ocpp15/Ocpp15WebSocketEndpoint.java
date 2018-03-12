@@ -1,6 +1,7 @@
 package de.rwth.idsg.steve.ocpp.ws.ocpp15;
 
 import de.rwth.idsg.steve.ocpp.OcppProtocol;
+import de.rwth.idsg.steve.ocpp.OcppVersion;
 import de.rwth.idsg.steve.ocpp.RequestType;
 import de.rwth.idsg.steve.ocpp.ResponseType;
 import de.rwth.idsg.steve.ocpp.ws.AbstractWebSocketEndpoint;
@@ -40,6 +41,11 @@ public class Ocpp15WebSocketEndpoint extends AbstractWebSocketEndpoint {
         Deserializer deserializer = new Deserializer(futureResponseContextStore, Ocpp15TypeStore.INSTANCE);
         IncomingPipeline pipeline = new IncomingPipeline(deserializer, new Ocpp15CallHandler(service));
         super.init(pipeline);
+    }
+
+    @Override
+    protected OcppVersion getVersion() {
+        return OcppVersion.V_15;
     }
 
     @RequiredArgsConstructor

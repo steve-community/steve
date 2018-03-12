@@ -1,6 +1,7 @@
 package de.rwth.idsg.steve.config;
 
-import de.rwth.idsg.steve.ocpp.OcppVersion;
+import com.google.common.collect.Lists;
+import de.rwth.idsg.steve.ocpp.ws.AbstractWebSocketEndpoint;
 import de.rwth.idsg.steve.ocpp.ws.OcppWebSocketUpgrader;
 import de.rwth.idsg.steve.ocpp.ws.ocpp12.Ocpp12WebSocketEndpoint;
 import de.rwth.idsg.steve.ocpp.ws.ocpp15.Ocpp15WebSocketEndpoint;
@@ -20,6 +21,7 @@ import org.springframework.web.socket.config.annotation.WebSocketConfigurer;
 import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry;
 import org.springframework.web.socket.server.support.DefaultHandshakeHandler;
 
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -31,20 +33,15 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 public class WebSocketConfiguration implements WebSocketConfigurer {
 
-    @Autowired private Ocpp12WebSocketEndpoint ocpp12WebSocketEndpoint;
-    @Autowired private Ocpp15WebSocketEndpoint ocpp15WebSocketEndpoint;
     @Autowired private ChargePointRepository chargePointRepository;
     @Autowired private NotificationService notificationService;
 
-    public static final long IDLE_TIMEOUT = TimeUnit.HOURS.toMillis(2);
-    public static final long PING_INTERVAL = TimeUnit.MINUTES.toMinutes(15);
-    private static final int MAX_MSG_SIZE = 8_388_608; // 8 MB for max message size
+    @Autowired private Ocpp12WebSocketEndpoint ocpp12WebSocketEndpoint;
+    @Autowired private Ocpp15WebSocketEndpoint ocpp15WebSocketEndpoint;
 
-    // The order affects the choice
-    private static final String[] PROTOCOLS = {
-            OcppVersion.V_15.getValue(),
-            OcppVersion.V_12.getValue()
-    };
+    public static final long PING_INTERVAL = TimeUnit.MINUTES.toMinutes(15);
+    private static final long IDLE_TIMEOUT = TimeUnit.HOURS.toMillis(2);
+    private static final int MAX_MSG_SIZE = 8_388_608; // 8 MB for max message size
 
     @Override
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
@@ -53,16 +50,26 @@ public class WebSocketConfiguration implements WebSocketConfigurer {
         policy.setMaxTextMessageSize(MAX_MSG_SIZE);
         policy.setIdleTimeout(IDLE_TIMEOUT);
 
-        OcppWebSocketUpgrader upgradeStrategy = new OcppWebSocketUpgrader(
-                policy, ocpp12WebSocketEndpoint, ocpp15WebSocketEndpoint, chargePointRepository, notificationService);
+        List<AbstractWebSocketEndpoint> endpoints = getEndpoints();
+        String[] protocols = endpoints.stream().map(e -> e.getVersion().getValue()).toArray(String[]::new);
+
+        OcppWebSocketUpgrader upgradeStrategy = new OcppWebSocketUpgrader(policy, endpoints, chargePointRepository, notificationService);
 
         DefaultHandshakeHandler handler = new DefaultHandshakeHandler(upgradeStrategy);
-        handler.setSupportedProtocols(PROTOCOLS);
+        handler.setSupportedProtocols(protocols);
 
-        registry.addHandler(ocpp12WebSocketEndpoint, "/websocket/CentralSystemService/*")
-                .addHandler(ocpp15WebSocketEndpoint, "/websocket/CentralSystemService/*")
-                .setHandshakeHandler(handler)
-                .setAllowedOrigins("*");
+        for (AbstractWebSocketEndpoint endpoint : endpoints) {
+            registry.addHandler(endpoint, "/websocket/CentralSystemService/*")
+                    .setHandshakeHandler(handler)
+                    .setAllowedOrigins("*");
+        }
+    }
+
+    /**
+     * The order affects the choice!
+     */
+    private List<AbstractWebSocketEndpoint> getEndpoints() {
+        return Lists.newArrayList(ocpp15WebSocketEndpoint, ocpp12WebSocketEndpoint);
     }
 
     // -------------------------------------------------------------------------

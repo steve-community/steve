@@ -84,7 +84,11 @@ public enum Server15to16Impl implements Server15to16 {
         return new StatusNotificationRequest()
                 .withConnectorId(request.getConnectorId())
                 .withStatus(status)
-                .withErrorCode(errorCode);
+                .withErrorCode(errorCode)
+                .withInfo(request.getInfo())
+                .withTimestamp(request.getTimestamp())
+                .withVendorErrorCode(request.getVendorErrorCode())
+                .withVendorId(request.getVendorId());
     }
 
     @Override
@@ -114,7 +118,8 @@ public enum Server15to16Impl implements Server15to16 {
                 .withConnectorId(request.getConnectorId())
                 .withIdTag(request.getIdTag())
                 .withMeterStart(request.getMeterStart())
-                .withTimestamp(request.getTimestamp());
+                .withTimestamp(request.getTimestamp())
+                .withReservationId(request.getReservationId());
     }
 
     /**

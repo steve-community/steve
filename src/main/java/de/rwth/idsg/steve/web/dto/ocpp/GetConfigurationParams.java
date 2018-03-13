@@ -1,6 +1,5 @@
 package de.rwth.idsg.steve.web.dto.ocpp;
 
-import de.rwth.idsg.steve.web.dto.ocpp.MultipleChargePointSelect;
 import lombok.Getter;
 import lombok.Setter;
 

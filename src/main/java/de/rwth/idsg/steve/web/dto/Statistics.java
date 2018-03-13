@@ -21,7 +21,7 @@ public final class Statistics {
     heartbeatToday, heartbeatYesterday, heartbeatEarlier;
 
     // Number of connected WebSocket/JSON chargeboxes
-    @Setter private int numOcpp12JChargeBoxes, numOcpp15JChargeBoxes;
+    @Setter private int numOcpp12JChargeBoxes, numOcpp15JChargeBoxes, numOcpp16JChargeBoxes;
 
     // Count of connectors based on their status
     @Setter private Map<ChargePointStatus, Integer> statusCountMap;

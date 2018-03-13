@@ -9,4 +9,8 @@
         <enableAsyncMapping>true</enableAsyncMapping>
     </bindings>
 
+    <bindings wsdlLocation="wsdl/OCPP_ChargePointService_1.6.wsdl" node="wsdl:definitions">
+        <enableAsyncMapping>true</enableAsyncMapping>
+    </bindings>
+
 </bindings>

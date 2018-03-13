@@ -73,9 +73,7 @@ public abstract class CommunicationTask<S extends ChargePointSelection, RESPONSE
         }
 
         callbackList.add(defaultCallback());
-
-        // FIXME: dirty, because creating a request only to parse its class name
-        operationName = StringUtils.getOperationName(getRequest());
+        operationName = StringUtils.getOperationName(this);
     }
 
     public void addCallback(OcppCallback<RESPONSE> cb) {

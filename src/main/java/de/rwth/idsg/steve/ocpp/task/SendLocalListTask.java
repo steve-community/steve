@@ -20,14 +20,11 @@ import java.util.stream.Collectors;
  */
 public class SendLocalListTask extends CommunicationTask<SendLocalListParams, String> {
 
-    private final Object requestLock = new Object();
-    private final OcppTagService ocppTagService;
-
-    private ocpp.cp._2015._10.SendLocalListRequest cachedOcpp16Request;
+    private final ocpp.cp._2015._10.SendLocalListRequest request;
 
     public SendLocalListTask(OcppVersion ocppVersion, SendLocalListParams params, OcppTagService ocppTagService) {
         super(ocppVersion, params);
-        this.ocppTagService = ocppTagService;
+        this.request = createOcpp16Request(ocppTagService);
     }
 
     @Override
@@ -43,7 +40,7 @@ public class SendLocalListTask extends CommunicationTask<SendLocalListParams, St
 
     @Override
     public ocpp.cp._2012._06.SendLocalListRequest getOcpp15Request() {
-        ocpp.cp._2015._10.SendLocalListRequest ocpp16Request = createOcpp16Request();
+        ocpp.cp._2015._10.SendLocalListRequest ocpp16Request = getOcpp16Request();
 
         return new ocpp.cp._2012._06.SendLocalListRequest()
                 .withListVersion(ocpp16Request.getListVersion())
@@ -53,12 +50,7 @@ public class SendLocalListTask extends CommunicationTask<SendLocalListParams, St
 
     @Override
     public ocpp.cp._2015._10.SendLocalListRequest getOcpp16Request() {
-        synchronized (requestLock) {
-            if (cachedOcpp16Request == null) {
-                cachedOcpp16Request = createOcpp16Request();
-            }
-            return cachedOcpp16Request;
-        }
+        return request;
     }
 
     @Deprecated
@@ -93,7 +85,7 @@ public class SendLocalListTask extends CommunicationTask<SendLocalListParams, St
     // Helpers
     // -------------------------------------------------------------------------
 
-    private ocpp.cp._2015._10.SendLocalListRequest createOcpp16Request() {
+    private ocpp.cp._2015._10.SendLocalListRequest createOcpp16Request(OcppTagService ocppTagService) {
         // DIFFERENTIAL update
         if (params.getUpdateType() == SendLocalListUpdateType.DIFFERENTIAL) {
             List<ocpp.cp._2015._10.AuthorizationData> auths = new ArrayList<>();

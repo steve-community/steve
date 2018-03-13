@@ -4,7 +4,7 @@ import de.rwth.idsg.steve.repository.dto.InsertConnectorStatusParams;
 import de.rwth.idsg.steve.repository.dto.InsertTransactionParams;
 import de.rwth.idsg.steve.repository.dto.UpdateChargeboxParams;
 import de.rwth.idsg.steve.repository.dto.UpdateTransactionParams;
-import ocpp.cs._2012._06.MeterValue;
+import ocpp.cs._2015._10.MeterValue;
 import org.joda.time.DateTime;
 
 import java.util.List;

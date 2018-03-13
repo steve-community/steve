@@ -10,7 +10,7 @@ import de.rwth.idsg.steve.repository.dto.UpdateTransactionParams;
 import de.rwth.idsg.steve.utils.CustomDSL;
 import jooq.steve.db.tables.records.ConnectorMeterValueRecord;
 import lombok.extern.slf4j.Slf4j;
-import ocpp.cs._2012._06.MeterValue;
+import ocpp.cs._2015._10.MeterValue;
 import org.joda.time.DateTime;
 import org.jooq.DSLContext;
 import org.jooq.Record1;
@@ -143,7 +143,7 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
 
             insertIgnoreConnector(ctx, chargeBoxIdentity, connectorId);
             int connectorPk = getConnectorPkFromConnector(ctx, chargeBoxIdentity, connectorId);
-            batchInsertMeterValues15(ctx, list, connectorPk, transactionId);
+            batchInsertMeterValues(ctx, list, connectorPk, transactionId);
         });
     }
 
@@ -159,13 +159,12 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
                                  .fetchOne()
                                  .value1();
 
-            batchInsertMeterValues15(ctx, list, connectorPk, transactionId);
+            batchInsertMeterValues(ctx, list, connectorPk, transactionId);
         });
     }
 
     @Override
     public Integer insertTransaction(InsertTransactionParams p) {
-
         return ctx.transactionResult(configuration -> {
             DSLContext ctx = DSL.using(configuration);
 
@@ -220,6 +219,7 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
         ctx.update(TRANSACTION)
            .set(TRANSACTION.STOP_TIMESTAMP, p.getStopTimestamp())
            .set(TRANSACTION.STOP_VALUE, p.getStopMeterValue())
+           .set(TRANSACTION.STOP_REASON, p.getStopReason())
            .where(TRANSACTION.TRANSACTION_PK.equal(p.getTransactionId()))
            .and(TRANSACTION.STOP_TIMESTAMP.isNull())
            .and(TRANSACTION.STOP_VALUE.isNull())
@@ -285,11 +285,10 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
                   .value1();
     }
 
-    private void batchInsertMeterValues15(DSLContext ctx, List<ocpp.cs._2012._06.MeterValue> list, int connectorPk,
-                                          Integer transactionId) {
+    private void batchInsertMeterValues(DSLContext ctx, List<MeterValue> list, int connectorPk, Integer transactionId) {
         List<ConnectorMeterValueRecord> batch =
                 list.stream()
-                    .flatMap(t -> t.getValue()
+                    .flatMap(t -> t.getSampledValue()
                                    .stream()
                                    .map(k -> ctx.newRecord(CONNECTOR_METER_VALUE)
                                                 .setConnectorPk(connectorPk)
@@ -301,7 +300,8 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
                                                 .setFormat(k.isSetFormat() ? k.getFormat().value() : null)
                                                 .setMeasurand(k.isSetMeasurand() ? k.getMeasurand().value() : null)
                                                 .setLocation(k.isSetLocation() ? k.getLocation().value() : null)
-                                                .setUnit(k.isSetUnit() ? k.getUnit().value() : null)))
+                                                .setUnit(k.isSetUnit() ? k.getUnit().value() : null)
+                                                .setPhase(k.isSetPhase() ? k.getPhase().value() : null)))
                     .collect(Collectors.toList());
 
         ctx.batchInsert(batch).execute();

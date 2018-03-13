@@ -2,6 +2,7 @@ package de.rwth.idsg.steve.service;
 
 import de.rwth.idsg.steve.service.dto.InvalidOcppTag;
 import ocpp.cp._2012._06.AuthorisationData;
+import ocpp.cs._2015._10.IdTagInfo;
 
 import java.util.List;
 
@@ -11,7 +12,7 @@ import java.util.List;
  */
 public interface OcppTagService {
 
-    ocpp.cs._2012._06.IdTagInfo getIdTagInfoV15(String idTag);
+    IdTagInfo getIdTagInfo(String idTag);
 
     /**
      * For OCPP 1.5: Helper method to read ALL idTag details

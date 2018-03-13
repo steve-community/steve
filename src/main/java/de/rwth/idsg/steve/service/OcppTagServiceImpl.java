@@ -8,6 +8,8 @@ import de.rwth.idsg.steve.service.dto.InvalidOcppTag;
 import jooq.steve.db.tables.records.OcppTagRecord;
 import lombok.extern.slf4j.Slf4j;
 import ocpp.cp._2012._06.AuthorisationData;
+import ocpp.cs._2015._10.AuthorizationStatus;
+import ocpp.cs._2015._10.IdTagInfo;
 import org.joda.time.DateTime;
 import org.jooq.RecordMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -58,18 +60,18 @@ public class OcppTagServiceImpl implements OcppTagService {
     }
 
     @Override
-    public ocpp.cs._2012._06.IdTagInfo getIdTagInfoV15(String idTag) {
+    public IdTagInfo getIdTagInfo(String idTag) {
         OcppTagRecord record = ocppTagRepository.getRecord(idTag);
-        ocpp.cs._2012._06.IdTagInfo idTagInfo = new ocpp.cs._2012._06.IdTagInfo();
+        IdTagInfo idTagInfo = new IdTagInfo();
 
         if (record == null) {
             log.error("The user with idTag '{}' is INVALID (not present in DB).", idTag);
-            idTagInfo.setStatus(ocpp.cs._2012._06.AuthorizationStatus.INVALID);
+            idTagInfo.setStatus(AuthorizationStatus.INVALID);
             processInvalid(idTag);
         } else {
             if (record.getBlocked()) {
                 log.error("The user with idTag '{}' is BLOCKED.", idTag);
-                idTagInfo.setStatus(ocpp.cs._2012._06.AuthorizationStatus.BLOCKED);
+                idTagInfo.setStatus(AuthorizationStatus.BLOCKED);
 
 //            } else if (record.getInTransaction()) {
 //                log.warn("The user with idTag '{}' is ALREADY in another transaction.", idTag);
@@ -77,11 +79,11 @@ public class OcppTagServiceImpl implements OcppTagService {
 
             } else if (record.getExpiryDate() != null && DateTime.now().isAfter(record.getExpiryDate())) {
                 log.error("The user with idTag '{}' is EXPIRED.", idTag);
-                idTagInfo.setStatus(ocpp.cs._2012._06.AuthorizationStatus.EXPIRED);
+                idTagInfo.setStatus(AuthorizationStatus.EXPIRED);
 
             } else {
                 log.debug("The user with idTag '{}' is ACCEPTED.", idTag);
-                idTagInfo.setStatus(ocpp.cs._2012._06.AuthorizationStatus.ACCEPTED);
+                idTagInfo.setStatus(AuthorizationStatus.ACCEPTED);
 
                 int hours = settingsRepository.getHoursToExpire();
                 idTagInfo.setExpiryDate(DateTime.now().plusHours(hours));

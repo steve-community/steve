@@ -1,7 +1,9 @@
 package de.rwth.idsg.steve.ocpp.soap;
 
 import de.rwth.idsg.steve.ocpp.OcppProtocol;
-import de.rwth.idsg.steve.service.CentralSystemService15_Service;
+import de.rwth.idsg.steve.ocpp.OcppVersion;
+import de.rwth.idsg.steve.repository.SettingsRepository;
+import de.rwth.idsg.steve.service.CentralSystemService16_Service;
 import lombok.extern.slf4j.Slf4j;
 import ocpp.cs._2012._06.AuthorizeRequest;
 import ocpp.cs._2012._06.AuthorizeResponse;
@@ -52,49 +54,59 @@ import java.util.concurrent.Future;
         endpointInterface = "ocpp.cs._2012._06.CentralSystemService")
 public class CentralSystemService15_SoapServer implements CentralSystemService {
 
-    @Autowired private CentralSystemService15_Service service;
+    @Autowired private CentralSystemService16_Service service;
+    @Autowired private SettingsRepository settingsRepository;
+
+    public BootNotificationResponse bootNotificationWithTransport(BootNotificationRequest params,
+                                                                  String chargeBoxIdentity, OcppProtocol protocol) {
+        if (protocol.getVersion() != OcppVersion.V_15) {
+            throw new IllegalArgumentException("Unexpected OCPP version: " + protocol.getVersion());
+        }
+        // set heartbeatInterval in response, this is removed in 1.6
+        return null; // TODO convert
+    }
 
     public BootNotificationResponse bootNotification(BootNotificationRequest parameters, String chargeBoxIdentity) {
-        return service.bootNotification(parameters, chargeBoxIdentity, OcppProtocol.V_15_SOAP);
+        return this.bootNotificationWithTransport(parameters, chargeBoxIdentity, OcppProtocol.V_15_SOAP);
     }
 
     public FirmwareStatusNotificationResponse firmwareStatusNotification(
             FirmwareStatusNotificationRequest parameters, String chargeBoxIdentity) {
-        return service.firmwareStatusNotification(parameters, chargeBoxIdentity);
+        return null; // TODO convert
     }
 
     public StatusNotificationResponse statusNotification(
             StatusNotificationRequest parameters, String chargeBoxIdentity) {
-        return service.statusNotification(parameters, chargeBoxIdentity);
+        return null; // TODO convert
     }
 
     public MeterValuesResponse meterValues(MeterValuesRequest parameters, String chargeBoxIdentity) {
-        return service.meterValues(parameters, chargeBoxIdentity);
+        return null; // TODO convert
     }
 
     public DiagnosticsStatusNotificationResponse diagnosticsStatusNotification(
             DiagnosticsStatusNotificationRequest parameters, String chargeBoxIdentity) {
-        return service.diagnosticsStatusNotification(parameters, chargeBoxIdentity);
+        return null; // TODO convert
     }
 
     public StartTransactionResponse startTransaction(StartTransactionRequest parameters, String chargeBoxIdentity) {
-        return service.startTransaction(parameters, chargeBoxIdentity);
+        return null; // TODO convert
     }
 
     public StopTransactionResponse stopTransaction(StopTransactionRequest parameters, String chargeBoxIdentity) {
-        return service.stopTransaction(parameters, chargeBoxIdentity);
+        return null; // TODO convert
     }
 
     public HeartbeatResponse heartbeat(HeartbeatRequest parameters, String chargeBoxIdentity) {
-        return service.heartbeat(parameters, chargeBoxIdentity);
+        return null; // TODO convert
     }
 
     public AuthorizeResponse authorize(AuthorizeRequest parameters, String chargeBoxIdentity) {
-        return service.authorize(parameters, chargeBoxIdentity);
+        return null; // TODO convert
     }
 
     public DataTransferResponse dataTransfer(DataTransferRequest parameters, String chargeBoxIdentity) {
-        return service.dataTransfer(parameters, chargeBoxIdentity);
+        return null; // TODO convert
     }
 
     // -------------------------------------------------------------------------

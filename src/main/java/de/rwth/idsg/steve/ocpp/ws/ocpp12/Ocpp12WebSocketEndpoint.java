@@ -55,7 +55,7 @@ public class Ocpp12WebSocketEndpoint extends AbstractWebSocketEndpoint {
 
         @Override
         protected ResponseType dispatch(RequestType params, String chargeBoxId) {
-            ResponseType r = null;
+            ResponseType r;
 
             if (params instanceof BootNotificationRequest) {
                 r = server.bootNotificationWithTransport((BootNotificationRequest) params, chargeBoxId, OcppProtocol.V_12_JSON);
@@ -83,6 +83,8 @@ public class Ocpp12WebSocketEndpoint extends AbstractWebSocketEndpoint {
 
             } else if (params instanceof AuthorizeRequest) {
                 r = server.authorize((AuthorizeRequest) params, chargeBoxId);
+            } else {
+                throw new IllegalArgumentException("Unexpected RequestType, dispatch method not found");
             }
 
             return r;

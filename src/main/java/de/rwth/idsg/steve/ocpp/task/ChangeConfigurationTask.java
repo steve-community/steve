@@ -1,7 +1,7 @@
 package de.rwth.idsg.steve.ocpp.task;
 
-import de.rwth.idsg.steve.ocpp.OcppCallback;
 import de.rwth.idsg.steve.ocpp.CommunicationTask;
+import de.rwth.idsg.steve.ocpp.OcppCallback;
 import de.rwth.idsg.steve.ocpp.OcppVersion;
 import de.rwth.idsg.steve.web.dto.ocpp.ChangeConfigurationParams;
 
@@ -37,6 +37,13 @@ public class ChangeConfigurationTask extends CommunicationTask<ChangeConfigurati
     }
 
     @Override
+    public ocpp.cp._2015._10.ChangeConfigurationRequest getOcpp16Request() {
+        return new ocpp.cp._2015._10.ChangeConfigurationRequest()
+                .withKey(params.getConfKey())
+                .withValue(params.getValue());
+    }
+
+    @Override
     public AsyncHandler<ocpp.cp._2010._08.ChangeConfigurationResponse> getOcpp12Handler(String chargeBoxId) {
         return res -> {
             try {
@@ -49,6 +56,17 @@ public class ChangeConfigurationTask extends CommunicationTask<ChangeConfigurati
 
     @Override
     public AsyncHandler<ocpp.cp._2012._06.ChangeConfigurationResponse> getOcpp15Handler(String chargeBoxId) {
+        return res -> {
+            try {
+                success(chargeBoxId, res.get().getStatus().value());
+            } catch (Exception e) {
+                failed(chargeBoxId, e);
+            }
+        };
+    }
+
+    @Override
+    public AsyncHandler<ocpp.cp._2015._10.ChangeConfigurationResponse> getOcpp16Handler(String chargeBoxId) {
         return res -> {
             try {
                 success(chargeBoxId, res.get().getStatus().value());

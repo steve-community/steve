@@ -1,7 +1,7 @@
 package de.rwth.idsg.steve.ocpp.task;
 
-import de.rwth.idsg.steve.ocpp.OcppCallback;
 import de.rwth.idsg.steve.ocpp.CommunicationTask;
+import de.rwth.idsg.steve.ocpp.OcppCallback;
 import de.rwth.idsg.steve.ocpp.OcppVersion;
 import de.rwth.idsg.steve.web.dto.ocpp.UnlockConnectorParams;
 
@@ -35,6 +35,12 @@ public class UnlockConnectorTask extends CommunicationTask<UnlockConnectorParams
     }
 
     @Override
+    public ocpp.cp._2015._10.UnlockConnectorRequest getOcpp16Request() {
+        return new ocpp.cp._2015._10.UnlockConnectorRequest()
+                .withConnectorId(params.getConnectorId());
+    }
+
+    @Override
     public AsyncHandler<ocpp.cp._2010._08.UnlockConnectorResponse> getOcpp12Handler(String chargeBoxId) {
         return res -> {
             try {
@@ -47,6 +53,17 @@ public class UnlockConnectorTask extends CommunicationTask<UnlockConnectorParams
 
     @Override
     public AsyncHandler<ocpp.cp._2012._06.UnlockConnectorResponse> getOcpp15Handler(String chargeBoxId) {
+        return res -> {
+            try {
+                success(chargeBoxId, res.get().getStatus().value());
+            } catch (Exception e) {
+                failed(chargeBoxId, e);
+            }
+        };
+    }
+
+    @Override
+    public AsyncHandler<ocpp.cp._2015._10.UnlockConnectorResponse> getOcpp16Handler(String chargeBoxId) {
         return res -> {
             try {
                 success(chargeBoxId, res.get().getStatus().value());

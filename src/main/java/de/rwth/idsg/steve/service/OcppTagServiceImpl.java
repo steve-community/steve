@@ -7,7 +7,7 @@ import de.rwth.idsg.steve.repository.SettingsRepository;
 import de.rwth.idsg.steve.service.dto.InvalidOcppTag;
 import jooq.steve.db.tables.records.OcppTagRecord;
 import lombok.extern.slf4j.Slf4j;
-import ocpp.cp._2012._06.AuthorisationData;
+import ocpp.cp._2015._10.AuthorizationData;
 import ocpp.cs._2015._10.AuthorizationStatus;
 import ocpp.cs._2015._10.IdTagInfo;
 import org.joda.time.DateTime;
@@ -35,7 +35,7 @@ public class OcppTagServiceImpl implements OcppTagService {
                                                                                   .build();
 
     @Override
-    public List<AuthorisationData> getAuthDataOfAllTags() {
+    public List<AuthorizationData> getAuthDataOfAllTags() {
         int hoursToExpire = settingsRepository.getHoursToExpire();
 
         return ocppTagRepository.getRecords()
@@ -43,7 +43,7 @@ public class OcppTagServiceImpl implements OcppTagService {
     }
 
     @Override
-    public List<AuthorisationData> getAuthData(List<String> idTagList) {
+    public List<AuthorizationData> getAuthData(List<String> idTagList) {
         int hoursToExpire = settingsRepository.getHoursToExpire();
 
         return ocppTagRepository.getRecords(idTagList)
@@ -108,7 +108,7 @@ public class OcppTagServiceImpl implements OcppTagService {
         }
     }
 
-    private static class AuthorisationDataMapper implements RecordMapper<OcppTagRecord, AuthorisationData> {
+    private static class AuthorisationDataMapper implements RecordMapper<OcppTagRecord, AuthorizationData> {
         private final DateTime nowDt;
         private final DateTime cacheExpiry;
 
@@ -118,34 +118,34 @@ public class OcppTagServiceImpl implements OcppTagService {
         }
 
         @Override
-        public AuthorisationData map(OcppTagRecord record) {
+        public AuthorizationData map(OcppTagRecord record) {
 
             String idTag = record.getIdTag();
             String parentIdTag = record.getParentIdTag();
             DateTime expiryDate = record.getExpiryDate();
 
             // Create IdTagInfo of an idTag
-            ocpp.cp._2012._06.IdTagInfo idTagInfo = new ocpp.cp._2012._06.IdTagInfo();
-            ocpp.cp._2012._06.AuthorizationStatus authStatus;
+            ocpp.cp._2015._10.IdTagInfo idTagInfo = new ocpp.cp._2015._10.IdTagInfo();
+            ocpp.cp._2015._10.AuthorizationStatus authStatus;
 
             if (record.getInTransaction()) {
-                authStatus = ocpp.cp._2012._06.AuthorizationStatus.CONCURRENT_TX;
+                authStatus = ocpp.cp._2015._10.AuthorizationStatus.CONCURRENT_TX;
 
             } else if (record.getBlocked()) {
-                authStatus = ocpp.cp._2012._06.AuthorizationStatus.BLOCKED;
+                authStatus = ocpp.cp._2015._10.AuthorizationStatus.BLOCKED;
 
             } else if (expiryDate != null && nowDt.isAfter(expiryDate)) {
-                authStatus = ocpp.cp._2012._06.AuthorizationStatus.EXPIRED;
+                authStatus = ocpp.cp._2015._10.AuthorizationStatus.EXPIRED;
 
             } else {
-                authStatus = ocpp.cp._2012._06.AuthorizationStatus.ACCEPTED;
+                authStatus = ocpp.cp._2015._10.AuthorizationStatus.ACCEPTED;
                 // When accepted, set the additional fields
                 idTagInfo.setExpiryDate(cacheExpiry);
                 idTagInfo.setParentIdTag(parentIdTag);
             }
             idTagInfo.setStatus(authStatus);
 
-            return new AuthorisationData().withIdTag(idTag).withIdTagInfo(idTagInfo);
+            return new AuthorizationData().withIdTag(idTag).withIdTagInfo(idTagInfo);
         }
     }
 

@@ -6,7 +6,8 @@ import de.rwth.idsg.steve.ocpp.OcppVersion;
 import de.rwth.idsg.steve.ocpp.RequestType;
 import de.rwth.idsg.steve.ocpp.ResponseType;
 import de.rwth.idsg.steve.web.dto.ocpp.DataTransferParams;
-import ocpp.cp._2012._06.DataTransferRequest;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import ocpp.cp._2012._06.DataTransferResponse;
 
 import javax.xml.ws.AsyncHandler;
@@ -15,20 +16,23 @@ import javax.xml.ws.AsyncHandler;
  * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
  * @since 09.03.2018
  */
-public class DataTransferTask extends CommunicationTask<DataTransferParams, DataTransferResponse> {
+public class DataTransferTask extends CommunicationTask<DataTransferParams, DataTransferTask.ResponseWrapper> {
 
     public DataTransferTask(OcppVersion ocppVersion, DataTransferParams params) {
         super(ocppVersion, params);
     }
 
     @Override
-    public OcppCallback<DataTransferResponse> defaultCallback() {
-        return new DefaultOcppCallback<DataTransferResponse>() {
+    public OcppCallback<ResponseWrapper> defaultCallback() {
+        return new DefaultOcppCallback<ResponseWrapper>() {
             @Override
-            public void success(String chargeBoxId, DataTransferResponse response) {
-                StringBuilder builder = new StringBuilder(response.getStatus().value());
-                if (response.isSetData()) {
-                    builder.append(" / Data: ").append(response.getData());
+            public void success(String chargeBoxId, ResponseWrapper response) {
+                String status = response.getStatus();
+                String data = response.getData();
+
+                StringBuilder builder = new StringBuilder(status);
+                if (data != null) {
+                    builder.append(" / Data: ").append(data);
                 }
                 addNewResponse(chargeBoxId, builder.toString());
             }
@@ -45,8 +49,19 @@ public class DataTransferTask extends CommunicationTask<DataTransferParams, Data
      * Dummy implementation. It must be vendor-specific.
      */
     @Override
-    public DataTransferRequest getOcpp15Request() {
-        return new DataTransferRequest()
+    public ocpp.cp._2012._06.DataTransferRequest getOcpp15Request() {
+        return new ocpp.cp._2012._06.DataTransferRequest()
+                .withData(params.getData())
+                .withMessageId(params.getMessageId())
+                .withVendorId(params.getVendorId());
+    }
+
+    /**
+     * Dummy implementation. It must be vendor-specific.
+     */
+    @Override
+    public ocpp.cp._2015._10.DataTransferRequest getOcpp16Request() {
+        return new ocpp.cp._2015._10.DataTransferRequest()
                 .withData(params.getData())
                 .withMessageId(params.getMessageId())
                 .withVendorId(params.getVendorId());
@@ -59,13 +74,33 @@ public class DataTransferTask extends CommunicationTask<DataTransferParams, Data
     }
 
     @Override
-    public AsyncHandler<DataTransferResponse> getOcpp15Handler(String chargeBoxId) {
+    public AsyncHandler<ocpp.cp._2012._06.DataTransferResponse> getOcpp15Handler(String chargeBoxId) {
         return res -> {
             try {
-                success(chargeBoxId, res.get());
+                DataTransferResponse response = res.get();
+                success(chargeBoxId, new ResponseWrapper(response.getStatus().value(), response.getData()));
             } catch (Exception e) {
                 failed(chargeBoxId, e);
             }
         };
     }
- }
+
+    @Override
+    public AsyncHandler<ocpp.cp._2015._10.DataTransferResponse> getOcpp16Handler(String chargeBoxId) {
+        return res -> {
+            try {
+                ocpp.cp._2015._10.DataTransferResponse response = res.get();
+                success(chargeBoxId, new ResponseWrapper(response.getStatus().value(), response.getData()));
+            } catch (Exception e) {
+                failed(chargeBoxId, e);
+            }
+        };
+    }
+
+    @Getter
+    @RequiredArgsConstructor
+    public static class ResponseWrapper {
+        private final String status;
+        private final String data;
+    }
+}

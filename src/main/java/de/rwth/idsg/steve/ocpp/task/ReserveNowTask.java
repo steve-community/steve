@@ -1,16 +1,13 @@
 package de.rwth.idsg.steve.ocpp.task;
 
-import de.rwth.idsg.steve.ocpp.OcppCallback;
 import de.rwth.idsg.steve.ocpp.CommunicationTask;
+import de.rwth.idsg.steve.ocpp.OcppCallback;
 import de.rwth.idsg.steve.ocpp.OcppVersion;
 import de.rwth.idsg.steve.ocpp.RequestType;
 import de.rwth.idsg.steve.ocpp.ResponseType;
-import de.rwth.idsg.steve.service.dto.EnhancedReserveNowParams;
 import de.rwth.idsg.steve.ocpp.ws.data.OcppJsonError;
 import de.rwth.idsg.steve.repository.ReservationRepository;
-import ocpp.cp._2012._06.ReservationStatus;
-import ocpp.cp._2012._06.ReserveNowRequest;
-import ocpp.cp._2012._06.ReserveNowResponse;
+import de.rwth.idsg.steve.service.dto.EnhancedReserveNowParams;
 
 import javax.xml.ws.AsyncHandler;
 
@@ -18,7 +15,7 @@ import javax.xml.ws.AsyncHandler;
  * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
  * @since 09.03.2018
  */
-public class ReserveNowTask extends CommunicationTask<EnhancedReserveNowParams, ReserveNowResponse> {
+public class ReserveNowTask extends CommunicationTask<EnhancedReserveNowParams, String> {
 
     private final ReservationRepository reservationRepository;
 
@@ -29,14 +26,13 @@ public class ReserveNowTask extends CommunicationTask<EnhancedReserveNowParams, 
     }
 
     @Override
-    public OcppCallback<ReserveNowResponse> defaultCallback() {
-        return new OcppCallback<ReserveNowResponse>() {
+    public OcppCallback<String> defaultCallback() {
+        return new OcppCallback<String>() {
             @Override
-            public void success(String chargeBoxId, ReserveNowResponse response) {
-                ReservationStatus status = response.getStatus();
-                addNewResponse(chargeBoxId, status.value());
+            public void success(String chargeBoxId, String responseStatus) {
+                addNewResponse(chargeBoxId, responseStatus);
 
-                if (ReservationStatus.ACCEPTED.equals(status)) {
+                if ("Accepted".equalsIgnoreCase(responseStatus)) {
                     reservationRepository.accepted(params.getReservationId());
                 } else {
                     delete();
@@ -64,8 +60,18 @@ public class ReserveNowTask extends CommunicationTask<EnhancedReserveNowParams, 
     }
 
     @Override
-    public ReserveNowRequest getOcpp15Request() {
-        return new ReserveNowRequest()
+    public ocpp.cp._2012._06.ReserveNowRequest getOcpp15Request() {
+        return new ocpp.cp._2012._06.ReserveNowRequest()
+                .withConnectorId(params.getReserveNowParams().getConnectorId())
+                .withExpiryDate(params.getReserveNowParams().getExpiry().toDateTime())
+                .withIdTag(params.getReserveNowParams().getIdTag())
+                .withReservationId(params.getReservationId())
+                .withParentIdTag(params.getParentIdTag());
+    }
+
+    @Override
+    public ocpp.cp._2015._10.ReserveNowRequest getOcpp16Request() {
+        return new ocpp.cp._2015._10.ReserveNowRequest()
                 .withConnectorId(params.getReserveNowParams().getConnectorId())
                 .withExpiryDate(params.getReserveNowParams().getExpiry().toDateTime())
                 .withIdTag(params.getReserveNowParams().getIdTag())
@@ -80,10 +86,21 @@ public class ReserveNowTask extends CommunicationTask<EnhancedReserveNowParams, 
     }
 
     @Override
-    public AsyncHandler<ReserveNowResponse> getOcpp15Handler(String chargeBoxId) {
+    public AsyncHandler<ocpp.cp._2012._06.ReserveNowResponse> getOcpp15Handler(String chargeBoxId) {
         return res -> {
             try {
-                success(chargeBoxId, res.get());
+                success(chargeBoxId, res.get().getStatus().value());
+            } catch (Exception e) {
+                failed(chargeBoxId, e);
+            }
+        };
+    }
+
+    @Override
+    public AsyncHandler<ocpp.cp._2015._10.ReserveNowResponse> getOcpp16Handler(String chargeBoxId) {
+        return res -> {
+            try {
+                success(chargeBoxId, res.get().getStatus().value());
             } catch (Exception e) {
                 failed(chargeBoxId, e);
             }

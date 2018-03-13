@@ -14,6 +14,7 @@ import ocpp.cs._2012._06.RegistrationStatus;
 import ocpp.cs._2012._06.StartTransactionResponse;
 import ocpp.cs._2012._06.StatusNotificationResponse;
 import ocpp.cs._2012._06.StopTransactionResponse;
+import ocpp.cs._2012._06.TransactionData;
 import ocpp.cs._2015._10.AuthorizeRequest;
 import ocpp.cs._2015._10.BootNotificationRequest;
 import ocpp.cs._2015._10.ChargePointErrorCode;
@@ -65,70 +66,32 @@ public enum Server15to16Impl implements Server15to16 {
     }
 
     @Override
-    public FirmwareStatusNotificationRequest convertRequest(ocpp.cs._2012._06.FirmwareStatusNotificationRequest request) {
+    public FirmwareStatusNotificationRequest convertRequest(
+            ocpp.cs._2012._06.FirmwareStatusNotificationRequest request) {
         return new FirmwareStatusNotificationRequest()
                 .withStatus(FirmwareStatus.fromValue(request.getStatus().value()));
     }
 
+    /**
+     * New logic: Connector with Id 0 can only be AVAILABLE, UNAVAILABLE and FAULTED. But we do not handle this, since
+     * this semantic change does not require a custom mapping.
+     */
     @Override
     public StatusNotificationRequest convertRequest(ocpp.cs._2012._06.StatusNotificationRequest request) {
-
-        //TODO: OCCUPIED was replaced with several more specific values. For now it will be replaced with "CHARGING",
-        // but something else might make more sense at this place
-
-        ChargePointStatus status;
-        if (request.getStatus().equals(ocpp.cs._2012._06.ChargePointStatus.OCCUPIED)) {
-            status = ChargePointStatus.CHARGING;
-        } else {
-            status = ChargePointStatus.fromValue(request.getErrorCode().value());
-        }
-
-        ChargePointErrorCode errorCode16;
-        ocpp.cs._2012._06.ChargePointErrorCode errorCode15 = request.getErrorCode();
-
-
-        // TODO: make sure this doesn't collide with logic implementation
-        // New logic: Connector with Id 0 can only be AVAILABLE, UNAVAILABLE and FAULTED
-
-        if(request.getConnectorId() == 0
-                && (request.getStatus().equals(ocpp.cs._2012._06.ChargePointStatus.OCCUPIED)
-                || request.getStatus().equals(ocpp.cs._2012._06.ChargePointStatus.RESERVED))) {
-            status = ChargePointStatus.UNAVAILABLE;
-        }
-
-        // Mapping required: Enum values in both directions don't necessarily match.
-        // Update: According to the 1.6 specification, MODE_3_ERROR was simply renamed to EV_COMMUNICATION_ERROR
-        if (errorCode15.equals(ocpp.cs._2012._06.ChargePointErrorCode.MODE_3_ERROR)) {
-            errorCode16 = ChargePointErrorCode.EV_COMMUNICATION_ERROR;
-        } else {
-            errorCode16 = ChargePointErrorCode.fromValue(request.getErrorCode().value());
-        }
+        ChargePointStatus status = customMapStatus(request.getStatus());
+        ChargePointErrorCode errorCode = customMapErrorCode(request.getErrorCode());
 
         return new StatusNotificationRequest()
                 .withConnectorId(request.getConnectorId())
                 .withStatus(status)
-                .withErrorCode(errorCode16);
+                .withErrorCode(errorCode);
     }
 
     @Override
     public MeterValuesRequest convertRequest(ocpp.cs._2012._06.MeterValuesRequest request) {
-        //nested lists, therefore not that readable
         List<MeterValue> values16 = request.getValues()
                                            .stream()
-                                           .map(e -> new MeterValue()
-                                                   .withTimestamp(e.getTimestamp())
-                                                   .withSampledValue(e.getValue().stream()
-                                                                      .map(f -> new SampledValue()
-                                                                                      .withContext(ReadingContext.fromValue(f.getContext().value()))
-                                                                                      .withFormat(ValueFormat.fromValue(f.getFormat().value()))
-                                                                                      .withLocation(Location.fromValue(f.getLocation().value()))
-                                                                                      .withMeasurand(Measurand.fromValue(f.getMeasurand().value()))
-                                                                                      .withUnit(UnitOfMeasure.fromValue(f.getUnit().value()))
-                                                                                      .withValue(f.getValue())
-                                                                      )
-                                                                      .collect(Collectors.toList())
-                                                   )
-                                           )
+                                           .map(Server15to16Impl::toOcpp16MeterValue)
                                            .collect(Collectors.toList());
 
         return new MeterValuesRequest()
@@ -138,7 +101,8 @@ public enum Server15to16Impl implements Server15to16 {
     }
 
     @Override
-    public DiagnosticsStatusNotificationRequest convertRequest(ocpp.cs._2012._06.DiagnosticsStatusNotificationRequest request) {
+    public DiagnosticsStatusNotificationRequest convertRequest(
+            ocpp.cs._2012._06.DiagnosticsStatusNotificationRequest request) {
         DiagnosticsStatus status = DiagnosticsStatus.fromValue(request.getStatus().value());
         return new DiagnosticsStatusNotificationRequest()
                 .withStatus(status);
@@ -153,14 +117,17 @@ public enum Server15to16Impl implements Server15to16 {
                 .withTimestamp(request.getTimestamp());
     }
 
+    /**
+     * Reason was introduced with 1.6 and is optional (no mapping needed)
+     */
     @Override
     public StopTransactionRequest convertRequest(ocpp.cs._2012._06.StopTransactionRequest request) {
         return new StopTransactionRequest()
                 .withIdTag(request.getIdTag())
-//                .withReason(Reason.OTHER)     // Reason was introduced with 1.6 and is optional (no mapping needed)
                 .withMeterStop(request.getMeterStop())
                 .withTimestamp(request.getTimestamp())
-                .withTransactionId(request.getTransactionId());
+                .withTransactionId(request.getTransactionId())
+                .withTransactionData(toOcpp15TransactionData(request.getTransactionData()));
     }
 
     @Override
@@ -211,7 +178,8 @@ public enum Server15to16Impl implements Server15to16 {
     }
 
     @Override
-    public DiagnosticsStatusNotificationResponse convertResponse(ocpp.cs._2015._10.DiagnosticsStatusNotificationResponse response) {
+    public DiagnosticsStatusNotificationResponse convertResponse(
+            ocpp.cs._2015._10.DiagnosticsStatusNotificationResponse response) {
         return new DiagnosticsStatusNotificationResponse();
     }
 
@@ -248,6 +216,34 @@ public enum Server15to16Impl implements Server15to16 {
     }
 
     // -------------------------------------------------------------------------
+    // Custom mapping, for situations where a unique mapping does not exists
+    // -------------------------------------------------------------------------
+
+    /**
+     * OCCUPIED was replaced with several more specific values. For now it will be replaced with "CHARGING",
+     * but something else might make more sense at this place
+     */
+    private static ChargePointStatus customMapStatus(ocpp.cs._2012._06.ChargePointStatus status) {
+        if (status.equals(ocpp.cs._2012._06.ChargePointStatus.OCCUPIED)) {
+            return ChargePointStatus.CHARGING;
+        } else {
+            return ChargePointStatus.fromValue(status.value());
+        }
+    }
+
+    /**
+     * Mapping required: Enum values in both directions don't necessarily match.
+     * Update: According to the 1.6 specification, MODE_3_ERROR was simply renamed to EV_COMMUNICATION_ERROR
+     */
+    private static ChargePointErrorCode customMapErrorCode(ocpp.cs._2012._06.ChargePointErrorCode errorCode15) {
+        if (errorCode15.equals(ocpp.cs._2012._06.ChargePointErrorCode.MODE_3_ERROR)) {
+            return ChargePointErrorCode.EV_COMMUNICATION_ERROR;
+        } else {
+            return ChargePointErrorCode.fromValue(errorCode15.value());
+        }
+    }
+
+    // -------------------------------------------------------------------------
     // Helpers
     // -------------------------------------------------------------------------
 
@@ -258,4 +254,34 @@ public enum Server15to16Impl implements Server15to16 {
                 .withStatus(AuthorizationStatus.fromValue(info16.getStatus().value()));
     }
 
+    private static SampledValue toOcpp16SampledValue(ocpp.cs._2012._06.MeterValue.Value f) {
+        return new SampledValue()
+                .withContext(f.isSetContext() ? ReadingContext.fromValue(f.getContext().value()) : null)
+                .withFormat(f.isSetFormat() ? ValueFormat.fromValue(f.getFormat().value()) : null)
+                .withLocation(f.isSetLocation() ? Location.fromValue(f.getLocation().value()) : null)
+                .withMeasurand(f.isSetMeasurand() ? Measurand.fromValue(f.getMeasurand().value()) : null)
+                .withUnit(f.isSetUnit() ? UnitOfMeasure.fromValue(f.getUnit().value()) : null)
+                .withValue(f.getValue());
+    }
+
+    private static List<SampledValue> toOcpp16SampledValueList(List<ocpp.cs._2012._06.MeterValue.Value> vals) {
+        return vals.stream()
+                   .map(Server15to16Impl::toOcpp16SampledValue)
+                   .collect(Collectors.toList());
+    }
+
+    private static MeterValue toOcpp16MeterValue(ocpp.cs._2012._06.MeterValue e) {
+        return new MeterValue().withTimestamp(e.getTimestamp())
+                               .withSampledValue(toOcpp16SampledValueList(e.getValue()));
+    }
+
+    private static List<MeterValue> toOcpp15TransactionData(List<TransactionData> transactionData) {
+        List<ocpp.cs._2012._06.MeterValue> combinedList = transactionData.stream()
+                                                                         .flatMap(data -> data.getValues().stream())
+                                                                         .collect(Collectors.toList());
+
+        return combinedList.stream()
+                           .map(Server15to16Impl::toOcpp16MeterValue)
+                           .collect(Collectors.toList());
+    }
 }

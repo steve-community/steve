@@ -3,7 +3,6 @@ package de.rwth.idsg.steve.web.dto;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
-import ocpp.cs._2012._06.ChargePointStatus;
 
 import java.util.Map;
 
@@ -24,5 +23,5 @@ public final class Statistics {
     @Setter private int numOcpp12JChargeBoxes, numOcpp15JChargeBoxes, numOcpp16JChargeBoxes;
 
     // Count of connectors based on their status
-    @Setter private Map<ChargePointStatus, Integer> statusCountMap;
+    @Setter private Map<String, Integer> statusCountMap;
 }

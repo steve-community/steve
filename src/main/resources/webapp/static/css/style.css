@@ -410,7 +410,7 @@ span.baseCell {
 	display: table-cell; 
 }
 span.baseCell:first-child {
-	width:50%;  
+	width:62%;
 	text-align: right; 
 }
 span.baseCell:nth-child(2) {

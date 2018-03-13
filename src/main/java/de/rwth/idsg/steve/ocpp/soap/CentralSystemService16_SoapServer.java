@@ -1,6 +1,7 @@
 package de.rwth.idsg.steve.ocpp.soap;
 
 import de.rwth.idsg.steve.ocpp.OcppProtocol;
+import de.rwth.idsg.steve.ocpp.OcppVersion;
 import de.rwth.idsg.steve.service.CentralSystemService16_Service;
 import lombok.extern.slf4j.Slf4j;
 import ocpp.cs._2015._10.AuthorizeRequest;
@@ -52,9 +53,17 @@ public class CentralSystemService16_SoapServer implements CentralSystemService {
 
     @Autowired private CentralSystemService16_Service service;
 
+    public BootNotificationResponse bootNotificationWithTransport(BootNotificationRequest parameters,
+                                                                  String chargeBoxIdentity, OcppProtocol protocol) {
+        if (protocol.getVersion() != OcppVersion.V_16) {
+            throw new IllegalArgumentException("Unexpected OCPP version: " + protocol.getVersion());
+        }
+        return service.bootNotification(parameters, chargeBoxIdentity, protocol);
+    }
+
     @Override
     public BootNotificationResponse bootNotification(BootNotificationRequest parameters, String chargeBoxIdentity) {
-        return service.bootNotification(parameters, chargeBoxIdentity, OcppProtocol.V_16_SOAP);
+        return this.bootNotificationWithTransport(parameters, chargeBoxIdentity, OcppProtocol.V_16_SOAP);
     }
 
     @Override

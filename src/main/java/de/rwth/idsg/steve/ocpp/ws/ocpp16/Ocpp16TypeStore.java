@@ -1,38 +1,43 @@
-package de.rwth.idsg.steve.ocpp.ws.ocpp15;
+package de.rwth.idsg.steve.ocpp.ws.ocpp16;
 
 import de.rwth.idsg.steve.ocpp.RequestType;
 import de.rwth.idsg.steve.ocpp.ws.TypeStore;
 import de.rwth.idsg.steve.ocpp.ws.data.ActionResponsePair;
-import ocpp.cp._2012._06.CancelReservationResponse;
-import ocpp.cp._2012._06.ChangeAvailabilityResponse;
-import ocpp.cp._2012._06.ChangeConfigurationResponse;
-import ocpp.cp._2012._06.ClearCacheResponse;
-import ocpp.cp._2012._06.DataTransferResponse;
-import ocpp.cp._2012._06.GetConfigurationResponse;
-import ocpp.cp._2012._06.GetDiagnosticsResponse;
-import ocpp.cp._2012._06.GetLocalListVersionResponse;
-import ocpp.cp._2012._06.RemoteStartTransactionResponse;
-import ocpp.cp._2012._06.RemoteStopTransactionResponse;
-import ocpp.cp._2012._06.ReserveNowResponse;
-import ocpp.cp._2012._06.ResetResponse;
-import ocpp.cp._2012._06.SendLocalListResponse;
-import ocpp.cp._2012._06.UnlockConnectorResponse;
-import ocpp.cp._2012._06.UpdateFirmwareResponse;
-import ocpp.cs._2012._06.AuthorizeRequest;
-import ocpp.cs._2012._06.BootNotificationRequest;
-import ocpp.cs._2012._06.DiagnosticsStatusNotificationRequest;
-import ocpp.cs._2012._06.FirmwareStatusNotificationRequest;
-import ocpp.cs._2012._06.HeartbeatRequest;
-import ocpp.cs._2012._06.MeterValuesRequest;
-import ocpp.cs._2012._06.StartTransactionRequest;
-import ocpp.cs._2012._06.StatusNotificationRequest;
-import ocpp.cs._2012._06.StopTransactionRequest;
+import ocpp.cp._2015._10.CancelReservationResponse;
+import ocpp.cp._2015._10.ChangeAvailabilityResponse;
+import ocpp.cp._2015._10.ChangeConfigurationResponse;
+import ocpp.cp._2015._10.ClearCacheResponse;
+import ocpp.cp._2015._10.ClearChargingProfileResponse;
+import ocpp.cp._2015._10.DataTransferResponse;
+import ocpp.cp._2015._10.GetCompositeScheduleResponse;
+import ocpp.cp._2015._10.GetConfigurationResponse;
+import ocpp.cp._2015._10.GetDiagnosticsResponse;
+import ocpp.cp._2015._10.GetLocalListVersionResponse;
+import ocpp.cp._2015._10.RemoteStartTransactionResponse;
+import ocpp.cp._2015._10.RemoteStopTransactionResponse;
+import ocpp.cp._2015._10.ReserveNowResponse;
+import ocpp.cp._2015._10.ResetResponse;
+import ocpp.cp._2015._10.SendLocalListResponse;
+import ocpp.cp._2015._10.SetChargingProfileResponse;
+import ocpp.cp._2015._10.TriggerMessageResponse;
+import ocpp.cp._2015._10.UnlockConnectorResponse;
+import ocpp.cp._2015._10.UpdateFirmwareResponse;
+import ocpp.cs._2015._10.AuthorizeRequest;
+import ocpp.cs._2015._10.BootNotificationRequest;
+import ocpp.cs._2015._10.DataTransferRequest;
+import ocpp.cs._2015._10.DiagnosticsStatusNotificationRequest;
+import ocpp.cs._2015._10.FirmwareStatusNotificationRequest;
+import ocpp.cs._2015._10.HeartbeatRequest;
+import ocpp.cs._2015._10.MeterValuesRequest;
+import ocpp.cs._2015._10.StartTransactionRequest;
+import ocpp.cs._2015._10.StatusNotificationRequest;
+import ocpp.cs._2015._10.StopTransactionRequest;
 
 /**
  * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
- * @since 15.03.2015
+ * @since 13.03.2018
  */
-public enum Ocpp15TypeStore implements TypeStore {
+public enum Ocpp16TypeStore implements TypeStore {
     INSTANCE;
 
     @Override
@@ -57,7 +62,7 @@ public enum Ocpp15TypeStore implements TypeStore {
             case "Authorize":
                 return AuthorizeRequest.class;
             case "DataTransfer":
-                return ocpp.cs._2012._06.DataTransferRequest.class;
+                return DataTransferRequest.class;
             default:
                 return null;
         }
@@ -98,9 +103,18 @@ public enum Ocpp15TypeStore implements TypeStore {
                 return new ActionResponsePair("ReserveNow", ReserveNowResponse.class);
             case "SendLocalListRequest":
                 return new ActionResponsePair("SendLocalList", SendLocalListResponse.class);
+
+            // new in ocpp 1.6
+            case "ClearChargingProfileRequest":
+                return new ActionResponsePair("ClearChargingProfile", ClearChargingProfileResponse.class);
+            case "GetCompositeScheduleRequest":
+                return new ActionResponsePair("GetCompositeSchedule", GetCompositeScheduleResponse.class);
+            case "SetChargingProfileRequest":
+                return new ActionResponsePair("SetChargingProfile", SetChargingProfileResponse.class);
+            case "TriggerMessageRequest":
+                return new ActionResponsePair("TriggerMessage", TriggerMessageResponse.class);
             default:
                 return null;
         }
     }
-
 }

@@ -37,7 +37,7 @@
         <tr><td>Retry Interval (integer):</td><td><form:input path="retryInterval" placeholder="optional" /></td></tr>
         <tr><td>Retrieve Date/Time:</td>
             <td>
-                <form:input path="retrieve" placeholder="optional" cssClass="dateTimePicker"/>
+                <form:input path="retrieve" cssClass="dateTimePicker"/>
             </td>
         </tr>
     </table>

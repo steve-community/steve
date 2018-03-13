@@ -2,6 +2,9 @@ package de.rwth.idsg.steve.ocpp.soap;
 
 import de.rwth.idsg.steve.ocpp.OcppProtocol;
 import de.rwth.idsg.steve.ocpp.OcppVersion;
+import de.rwth.idsg.steve.ocpp.converter.Convert;
+import de.rwth.idsg.steve.ocpp.converter.Server12to15Impl;
+import de.rwth.idsg.steve.ocpp.converter.Server15to16Impl;
 import de.rwth.idsg.steve.service.CentralSystemService16_Service;
 import lombok.extern.slf4j.Slf4j;
 import ocpp.cs._2010._08.AuthorizeRequest;
@@ -38,7 +41,6 @@ import java.util.concurrent.Future;
  * Service implementation of OCPP V1.2
  *
  * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
- *
  */
 @Slf4j
 @Service
@@ -59,11 +61,12 @@ public class CentralSystemService12_SoapServer implements CentralSystemService {
             throw new IllegalArgumentException("Unexpected OCPP version: " + protocol.getVersion());
         }
 
-        return null; // TODO convert 1.5 -> 1.6
-//        return Convert.start(parameters, SINGLETON::convertRequest)
-//                      .andThen(req -> service.bootNotification(req, chargeBoxIdentity, protocol))
-//                      .andThen(SINGLETON::convertResponse)
-//                      .apply(parameters);
+        return Convert.start(parameters, Server12to15Impl.SINGLETON::convertRequest)
+                      .andThen(Server15to16Impl.SINGLETON::convertRequest)
+                      .andThen(req -> service.bootNotification(req, chargeBoxIdentity, protocol))
+                      .andThen(Server15to16Impl.SINGLETON::convertResponse)
+                      .andThen(Server12to15Impl.SINGLETON::convertResponse)
+                      .apply(parameters);
     }
 
     public BootNotificationResponse bootNotification(BootNotificationRequest parameters, String chargeBoxIdentity) {
@@ -72,70 +75,78 @@ public class CentralSystemService12_SoapServer implements CentralSystemService {
 
     public FirmwareStatusNotificationResponse firmwareStatusNotification(FirmwareStatusNotificationRequest parameters,
                                                                          String chargeBoxIdentity) {
-        return null; // TODO convert 1.5 -> 1.6
-//        return Convert.start(parameters, SINGLETON::convertRequest)
-//                      .andThen(req -> service.firmwareStatusNotification(req, chargeBoxIdentity))
-//                      .andThen(SINGLETON::convertResponse)
-//                      .apply(parameters);
+        return Convert.start(parameters, Server12to15Impl.SINGLETON::convertRequest)
+                      .andThen(Server15to16Impl.SINGLETON::convertRequest)
+                      .andThen(req -> service.firmwareStatusNotification(req, chargeBoxIdentity))
+                      .andThen(Server15to16Impl.SINGLETON::convertResponse)
+                      .andThen(Server12to15Impl.SINGLETON::convertResponse)
+                      .apply(parameters);
 
     }
 
     public StatusNotificationResponse statusNotification(
             StatusNotificationRequest parameters, String chargeBoxIdentity) {
-        return null; // TODO convert 1.5 -> 1.6
-//        return Convert.start(parameters, SINGLETON::convertRequest)
-//                      .andThen(req -> service.statusNotification(req, chargeBoxIdentity))
-//                      .andThen(SINGLETON::convertResponse)
-//                      .apply(parameters);
+        return Convert.start(parameters, Server12to15Impl.SINGLETON::convertRequest)
+                      .andThen(Server15to16Impl.SINGLETON::convertRequest)
+                      .andThen(req -> service.statusNotification(req, chargeBoxIdentity))
+                      .andThen(Server15to16Impl.SINGLETON::convertResponse)
+                      .andThen(Server12to15Impl.SINGLETON::convertResponse)
+                      .apply(parameters);
     }
 
     public MeterValuesResponse meterValues(MeterValuesRequest parameters, String chargeBoxIdentity) {
-        return null; // TODO convert 1.5 -> 1.6
-//        return Convert.start(parameters, SINGLETON::convertRequest)
-//                      .andThen(req -> service.meterValues(req, chargeBoxIdentity))
-//                      .andThen(SINGLETON::convertResponse)
-//                      .apply(parameters);
+        return Convert.start(parameters, Server12to15Impl.SINGLETON::convertRequest)
+                      .andThen(Server15to16Impl.SINGLETON::convertRequest)
+                      .andThen(req -> service.meterValues(req, chargeBoxIdentity))
+                      .andThen(Server15to16Impl.SINGLETON::convertResponse)
+                      .andThen(Server12to15Impl.SINGLETON::convertResponse)
+                      .apply(parameters);
     }
 
     public DiagnosticsStatusNotificationResponse diagnosticsStatusNotification(
             DiagnosticsStatusNotificationRequest parameters, String chargeBoxIdentity) {
-        return null; // TODO convert 1.5 -> 1.6
-//        return Convert.start(parameters, SINGLETON::convertRequest)
-//                      .andThen(req -> service.diagnosticsStatusNotification(req, chargeBoxIdentity))
-//                      .andThen(SINGLETON::convertResponse)
-//                      .apply(parameters);
+        return Convert.start(parameters, Server12to15Impl.SINGLETON::convertRequest)
+                      .andThen(Server15to16Impl.SINGLETON::convertRequest)
+                      .andThen(req -> service.diagnosticsStatusNotification(req, chargeBoxIdentity))
+                      .andThen(Server15to16Impl.SINGLETON::convertResponse)
+                      .andThen(Server12to15Impl.SINGLETON::convertResponse)
+                      .apply(parameters);
     }
 
     public StartTransactionResponse startTransaction(StartTransactionRequest parameters, String chargeBoxIdentity) {
-        return null; // TODO convert 1.5 -> 1.6
-//        return Convert.start(parameters, SINGLETON::convertRequest)
-//                      .andThen(req -> service.startTransaction(req, chargeBoxIdentity))
-//                      .andThen(SINGLETON::convertResponse)
-//                      .apply(parameters);
+        return Convert.start(parameters, Server12to15Impl.SINGLETON::convertRequest)
+                      .andThen(Server15to16Impl.SINGLETON::convertRequest)
+                      .andThen(req -> service.startTransaction(req, chargeBoxIdentity))
+                      .andThen(Server15to16Impl.SINGLETON::convertResponse)
+                      .andThen(Server12to15Impl.SINGLETON::convertResponse)
+                      .apply(parameters);
     }
 
     public StopTransactionResponse stopTransaction(StopTransactionRequest parameters, String chargeBoxIdentity) {
-        return null; // TODO convert 1.5 -> 1.6
-//        return Convert.start(parameters, SINGLETON::convertRequest)
-//                      .andThen(req -> service.stopTransaction(req, chargeBoxIdentity))
-//                      .andThen(SINGLETON::convertResponse)
-//                      .apply(parameters);
+        return Convert.start(parameters, Server12to15Impl.SINGLETON::convertRequest)
+                      .andThen(Server15to16Impl.SINGLETON::convertRequest)
+                      .andThen(req -> service.stopTransaction(req, chargeBoxIdentity))
+                      .andThen(Server15to16Impl.SINGLETON::convertResponse)
+                      .andThen(Server12to15Impl.SINGLETON::convertResponse)
+                      .apply(parameters);
     }
 
     public HeartbeatResponse heartbeat(HeartbeatRequest parameters, String chargeBoxIdentity) {
-        return null; // TODO convert 1.5 -> 1.6
-//        return Convert.start(parameters, SINGLETON::convertRequest)
-//                      .andThen(req -> service.heartbeat(req, chargeBoxIdentity))
-//                      .andThen(SINGLETON::convertResponse)
-//                      .apply(parameters);
+        return Convert.start(parameters, Server12to15Impl.SINGLETON::convertRequest)
+                      .andThen(Server15to16Impl.SINGLETON::convertRequest)
+                      .andThen(req -> service.heartbeat(req, chargeBoxIdentity))
+                      .andThen(Server15to16Impl.SINGLETON::convertResponse)
+                      .andThen(Server12to15Impl.SINGLETON::convertResponse)
+                      .apply(parameters);
     }
 
     public AuthorizeResponse authorize(AuthorizeRequest parameters, String chargeBoxIdentity) {
-        return null; // TODO convert 1.5 -> 1.6
-//        return Convert.start(parameters, SINGLETON::convertRequest)
-//                      .andThen(req -> service.authorize(req, chargeBoxIdentity))
-//                      .andThen(SINGLETON::convertResponse)
-//                      .apply(parameters);
+        return Convert.start(parameters, Server12to15Impl.SINGLETON::convertRequest)
+                      .andThen(Server15to16Impl.SINGLETON::convertRequest)
+                      .andThen(req -> service.authorize(req, chargeBoxIdentity))
+                      .andThen(Server15to16Impl.SINGLETON::convertResponse)
+                      .andThen(Server12to15Impl.SINGLETON::convertResponse)
+                      .apply(parameters);
     }
 
     // -------------------------------------------------------------------------

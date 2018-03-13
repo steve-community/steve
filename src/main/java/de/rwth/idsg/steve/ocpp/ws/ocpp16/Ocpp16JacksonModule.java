@@ -4,8 +4,6 @@ import com.fasterxml.jackson.core.Version;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import de.rwth.idsg.steve.ocpp.ws.custom.EnumMixin;
 import de.rwth.idsg.steve.ocpp.ws.custom.EnumProcessor;
-import de.rwth.idsg.steve.ocpp.ws.custom.MeterValue15Mixin;
-import ocpp.cs._2012._06.MeterValuesRequest;
 
 import java.util.Arrays;
 
@@ -22,8 +20,6 @@ public class Ocpp16JacksonModule extends SimpleModule {
     @Override
     public void setupModule(SetupContext sc) {
         super.setupModule(sc);
-
-        sc.setMixInAnnotations(MeterValuesRequest.class, MeterValue15Mixin.class);
 
         EnumProcessor.apply(
                 Arrays.asList("ocpp.cp._2015._10", "ocpp.cs._2015._10"),

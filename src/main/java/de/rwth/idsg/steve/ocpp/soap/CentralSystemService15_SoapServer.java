@@ -55,14 +55,12 @@ import java.util.concurrent.Future;
 public class CentralSystemService15_SoapServer implements CentralSystemService {
 
     @Autowired private CentralSystemService16_Service service;
-    @Autowired private SettingsRepository settingsRepository;
 
     public BootNotificationResponse bootNotificationWithTransport(BootNotificationRequest params,
                                                                   String chargeBoxIdentity, OcppProtocol protocol) {
         if (protocol.getVersion() != OcppVersion.V_15) {
             throw new IllegalArgumentException("Unexpected OCPP version: " + protocol.getVersion());
         }
-        // set heartbeatInterval in response, this is removed in 1.6
         return null; // TODO convert
     }
 

@@ -2,6 +2,7 @@ package de.rwth.idsg.steve.service;
 
 import de.rwth.idsg.steve.ocpp.OcppProtocol;
 import de.rwth.idsg.steve.repository.OcppServerRepository;
+import de.rwth.idsg.steve.repository.SettingsRepository;
 import de.rwth.idsg.steve.repository.dto.InsertConnectorStatusParams;
 import de.rwth.idsg.steve.repository.dto.InsertTransactionParams;
 import de.rwth.idsg.steve.repository.dto.UpdateChargeboxParams;
@@ -44,6 +45,7 @@ import org.springframework.stereotype.Service;
 public class CentralSystemService16_Service {
 
     @Autowired private OcppServerRepository ocppServerRepository;
+    @Autowired private SettingsRepository settingsRepository;
     @Autowired private OcppTagService ocppTagService;
     @Autowired private NotificationService notificationService;
 
@@ -76,7 +78,8 @@ public class CentralSystemService16_Service {
 
         return new BootNotificationResponse()
                 .withStatus(status)
-                .withCurrentTime(now);
+                .withCurrentTime(now)
+                .withInterval(settingsRepository.getHeartbeatIntervalInSeconds());
     }
 
     public FirmwareStatusNotificationResponse firmwareStatusNotification(

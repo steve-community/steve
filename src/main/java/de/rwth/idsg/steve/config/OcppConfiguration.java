@@ -41,6 +41,7 @@ public class OcppConfiguration {
 
     @Autowired private ocpp.cs._2010._08.CentralSystemService ocpp12Server;
     @Autowired private ocpp.cs._2012._06.CentralSystemService ocpp15Server;
+    @Autowired private ocpp.cs._2015._10.CentralSystemService ocpp16Server;
 
     @Autowired
     @Qualifier("FromAddressInterceptor")
@@ -56,6 +57,7 @@ public class OcppConfiguration {
 
         createOcppService(ocpp12Server, "/CentralSystemServiceOCPP12", interceptors);
         createOcppService(ocpp15Server, "/CentralSystemServiceOCPP15", interceptors);
+        createOcppService(ocpp16Server, "/CentralSystemServiceOCPP16", interceptors);
     }
 
     /**

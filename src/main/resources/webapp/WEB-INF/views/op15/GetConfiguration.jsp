@@ -32,7 +32,7 @@
     </td>
     <td>
         <form:select path="confKeyList" multiple="true" size="14" >
-            <form:options items="${ocpp15ConfKeys}" />
+            <form:options items="${confKeys}" />
         </form:select>
     </td></tr>
     </table>

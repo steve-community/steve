@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import de.rwth.idsg.steve.SteveException;
-import de.rwth.idsg.steve.ocpp.ws.JsonObjectMapper;
 import de.rwth.idsg.steve.ocpp.ws.ErrorFactory;
 import de.rwth.idsg.steve.ocpp.ws.data.CommunicationContext;
 import de.rwth.idsg.steve.ocpp.ws.data.MessageType;
@@ -13,26 +12,25 @@ import de.rwth.idsg.steve.ocpp.ws.data.OcppJsonError;
 import de.rwth.idsg.steve.ocpp.ws.data.OcppJsonMessage;
 import de.rwth.idsg.steve.ocpp.ws.data.OcppJsonResult;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.io.IOException;
-import java.util.function.Consumer;
 
 /**
  * Outgoing OcppJsonMessage --> String.
- *
- * This class should remain stateless.
  *
  * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
  * @since 17.03.2015
  */
 @Slf4j
-public enum Serializer implements Consumer<CommunicationContext> {
-    INSTANCE;
+@Component
+public class Serializer implements Stage {
 
-    private final ObjectMapper mapper = JsonObjectMapper.INSTANCE.getMapper();
+    @Autowired private ObjectMapper mapper;
 
     @Override
-    public void accept(CommunicationContext context) {
+    public void process(CommunicationContext context) {
         OcppJsonMessage message = context.getOutgoingMessage();
 
         ArrayNode str;

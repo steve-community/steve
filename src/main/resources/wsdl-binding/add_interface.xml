@@ -10,6 +10,45 @@
     <!-- Central System is the server -->
     <!-- ============================ -->
 
+	<!-- OCPP 1.6 -->
+    <jaxws:bindings wsdlLocation="wsdl/OCPP_CentralSystemService_1.6.wsdl">
+        <jaxws:bindings node="wsdl:definitions/wsdl:types/xs:schema">
+
+            <jaxb:bindings node="//xs:complexType">
+                <annox:annotateClass>@lombok.ToString</annox:annotateClass>
+            </jaxb:bindings>
+
+            <jaxb:bindings multiple="true"
+                           node="xs:complexType[
+                @name='BootNotificationRequest' or
+                @name='FirmwareStatusNotificationRequest' or
+                @name='StatusNotificationRequest' or
+                @name='MeterValuesRequest' or
+                @name='DiagnosticsStatusNotificationRequest' or
+                @name='StartTransactionRequest' or
+                @name='StopTransactionRequest' or
+                @name='HeartbeatRequest' or
+                @name='AuthorizeRequest' or
+                @name='DataTransferRequest']">
+                <inheritance:implements>de.rwth.idsg.steve.ocpp.RequestType</inheritance:implements>
+            </jaxb:bindings>
+            <jaxb:bindings multiple="true"
+                           node="xs:complexType[
+                @name='BootNotificationResponse' or
+                @name='FirmwareStatusNotificationResponse' or
+                @name='StatusNotificationResponse' or
+                @name='MeterValuesResponse' or
+                @name='DiagnosticsStatusNotificationResponse' or
+                @name='StartTransactionResponse' or
+                @name='StopTransactionResponse' or
+                @name='HeartbeatResponse' or
+                @name='AuthorizeResponse' or
+                @name='DataTransferResponse']">
+                <inheritance:implements>de.rwth.idsg.steve.ocpp.ResponseType</inheritance:implements>
+            </jaxb:bindings>
+        </jaxws:bindings>
+    </jaxws:bindings>
+	
     <!-- OCPP 1.5 -->
     <jaxws:bindings wsdlLocation="wsdl/ocpp_centralsystemservice_1.5_final.wsdl">
         <jaxws:bindings node="wsdl:definitions/wsdl:types/xs:schema">
@@ -170,6 +209,63 @@
                 @name='GetConfigurationResponse' or
                 @name='GetLocalListVersionResponse' or
                 @name='ReserveNowResponse' or
+                @name='SendLocalListResponse']">
+                <inheritance:implements>de.rwth.idsg.steve.ocpp.ResponseType</inheritance:implements>
+            </jaxb:bindings>
+        </jaxws:bindings>
+    </jaxws:bindings>
+	
+	<!-- OCPP 1.6 -->
+    <jaxws:bindings wsdlLocation="wsdl/OCPP_ChargePointService_1.6.wsdl">
+        <jaxws:bindings node="wsdl:definitions/wsdl:types/xs:schema">
+
+            <jaxb:bindings node="//xs:complexType">
+                <annox:annotateClass>@lombok.ToString</annox:annotateClass>
+            </jaxb:bindings>
+
+            <jaxb:bindings multiple="true"
+                           node="xs:complexType[
+                @name='UnlockConnectorRequest' or
+                @name='ResetRequest' or
+                @name='ChangeAvailabilityRequest' or
+                @name='GetDiagnosticsRequest' or
+                @name='ClearCacheRequest' or
+                @name='UpdateFirmwareRequest' or
+                @name='ChangeConfigurationRequest' or
+                @name='RemoteStartTransactionRequest' or
+                @name='RemoteStopTransactionRequest' or
+                @name='CancelReservationRequest' or
+                @name='DataTransferRequest' or
+                @name='GetConfigurationRequest' or
+                @name='GetLocalListVersionRequest' or
+                @name='ReserveNowRequest' or
+				@name='ClearChargingProfileRequest' or
+				@name='GetCompositeScheduleRequest' or
+				@name='SetChargingProfileRequest' or
+				@name='TriggerMessageRequest' or
+                @name='SendLocalListRequest']">
+                <inheritance:implements>de.rwth.idsg.steve.ocpp.RequestType</inheritance:implements>
+            </jaxb:bindings>
+            <jaxb:bindings multiple="true"
+                           node="xs:complexType[
+                @name='UnlockConnectorResponse' or
+                @name='ResetResponse' or
+                @name='ChangeAvailabilityResponse' or
+                @name='GetDiagnosticsResponse' or
+                @name='ClearCacheResponse' or
+                @name='UpdateFirmwareResponse' or
+                @name='ChangeConfigurationResponse' or
+                @name='RemoteStartTransactionResponse' or
+                @name='RemoteStopTransactionResponse' or
+                @name='CancelReservationResponse' or
+                @name='DataTransferResponse' or
+                @name='GetConfigurationResponse' or
+                @name='GetLocalListVersionResponse' or
+                @name='ReserveNowResponse' or
+				@name='ClearChargingProfileResponse' or
+				@name='GetCompositeScheduleResponse' or
+				@name='SetChargingProfileResponse' or
+				@name='TriggerMessageResponse' or
                 @name='SendLocalListResponse']">
                 <inheritance:implements>de.rwth.idsg.steve.ocpp.ResponseType</inheritance:implements>
             </jaxb:bindings>

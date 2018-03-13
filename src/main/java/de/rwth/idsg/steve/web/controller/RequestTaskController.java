@@ -1,6 +1,5 @@
 package de.rwth.idsg.steve.web.controller;
 
-import de.rwth.idsg.steve.ocpp.CommunicationTask;
 import de.rwth.idsg.steve.repository.RequestTaskStore;
 import de.rwth.idsg.steve.web.dto.task.RequestTask;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,7 +43,7 @@ public class RequestTaskController {
 
     @RequestMapping(value = TASK_ID_PATH, method = RequestMethod.GET)
     public String getTaskDetails(@PathVariable("taskId") Integer taskId, Model model) {
-        CommunicationTask r = requestTaskStore.get(taskId);
+        RequestTask r = requestTaskStore.get(taskId);
         model.addAttribute("task", r);
         return "taskResult";
     }

@@ -5,7 +5,6 @@ import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.rwth.idsg.steve.SteveException;
-import de.rwth.idsg.steve.ocpp.ws.JsonObjectMapper;
 import de.rwth.idsg.steve.ocpp.RequestType;
 import de.rwth.idsg.steve.ocpp.ResponseType;
 import de.rwth.idsg.steve.ocpp.ws.ErrorFactory;
@@ -22,7 +21,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
-import java.util.function.Consumer;
 
 /**
  * Incoming String --> OcppJsonMessage
@@ -32,10 +30,8 @@ import java.util.function.Consumer;
  */
 @Slf4j
 @RequiredArgsConstructor
-public class Deserializer implements Consumer<CommunicationContext> {
-
-    private final ObjectMapper mapper = JsonObjectMapper.INSTANCE.getMapper();
-
+public class Deserializer implements Stage {
+    private final ObjectMapper mapper;
     private final FutureResponseContextStore futureResponseContextStore;
     private final TypeStore typeStore;
 
@@ -44,7 +40,7 @@ public class Deserializer implements Consumer<CommunicationContext> {
      * and build, if any, a corresponding error message.
      */
     @Override
-    public void accept(CommunicationContext context) {
+    public void process(CommunicationContext context) {
         try (JsonParser parser = mapper.getFactory().createParser(context.getIncomingString())) {
             parser.nextToken(); // set cursor to '['
 
@@ -149,7 +145,7 @@ public class Deserializer implements Consumer<CommunicationContext> {
         result.setPayload(res);
 
         context.setIncomingMessage(result);
-        context.createResultHandler(responseContext.getTask());
+        context.setHandler(responseContext.getHandler());
     }
 
     /**
@@ -197,6 +193,6 @@ public class Deserializer implements Consumer<CommunicationContext> {
         error.setErrorDetails(details);
 
         context.setIncomingMessage(error);
-        context.createErrorHandler(responseContext.getTask());
+        context.setHandler(responseContext.getHandler());
     }
 }

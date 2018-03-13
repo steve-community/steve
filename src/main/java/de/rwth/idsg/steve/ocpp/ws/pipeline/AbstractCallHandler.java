@@ -9,17 +9,15 @@ import de.rwth.idsg.steve.ocpp.ws.data.OcppJsonResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.function.Consumer;
-
 /**
  * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
  * @since 17.03.2015
  */
-public abstract class AbstractCallHandler implements Consumer<CommunicationContext> {
+public abstract class AbstractCallHandler implements Stage {
     private final Logger log = LoggerFactory.getLogger(getClass());
 
     @Override
-    public void accept(CommunicationContext context) {
+    public void process(CommunicationContext context) {
         OcppJsonCall call = (OcppJsonCall) context.getIncomingMessage();
         String messageId = call.getMessageId();
 

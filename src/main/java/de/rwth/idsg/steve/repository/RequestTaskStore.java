@@ -1,6 +1,5 @@
 package de.rwth.idsg.steve.repository;
 
-import de.rwth.idsg.steve.ocpp.CommunicationTask;
 import de.rwth.idsg.steve.repository.dto.TaskOverview;
 import de.rwth.idsg.steve.web.dto.task.RequestTask;
 
@@ -12,7 +11,7 @@ import java.util.List;
  */
 public interface RequestTaskStore {
     List<TaskOverview> getOverview();
-    CommunicationTask get(Integer taskId);
-    Integer add(CommunicationTask task);
+    RequestTask get(Integer taskId);
+    Integer add(RequestTask task);
     void clearFinished();
 }

@@ -45,7 +45,7 @@ public class SteveAppContext {
         springContext.scan("de.rwth.idsg.steve.config");
     }
 
-    public HandlerCollection getHandlers() {
+    public HandlerCollection getHandlers() throws IOException {
         HandlerList handlerList = new HandlerList();
         handlerList.setHandlers(
                 new Handler[]{
@@ -55,7 +55,7 @@ public class SteveAppContext {
         return handlerList;
     }
 
-    private Handler getWebApp() {
+    private Handler getWebApp() throws IOException {
         if (CONFIG.getJetty().isGzipEnabled()) {
             return enableGzip(initWebApp());
         } else {
@@ -74,10 +74,10 @@ public class SteveAppContext {
         return gzipHandler;
     }
 
-    private WebAppContext initWebApp() {
+    private WebAppContext initWebApp() throws IOException {
         WebAppContext ctx = new WebAppContext();
         ctx.setContextPath(CONFIG.getContextPath());
-        ctx.setResourceBase(getWebAppURIAsString());
+        ctx.setResourceBase(new ClassPathResource("webapp").getURI().toString());
 
         // Disable directory listings if no index.html is found.
         ctx.setInitParameter("org.eclipse.jetty.servlet.Default.dirAllowed", "false");
@@ -139,14 +139,6 @@ public class SteveAppContext {
         return redirectSet;
     }
 
-    private static String getWebAppURIAsString() {
-        try {
-            return new ClassPathResource("webapp").getURI().toString();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
     // -------------------------------------------------------------------------
     // JSP stuff
     //
@@ -157,7 +149,7 @@ public class SteveAppContext {
     // http://examples.javacodegeeks.com/enterprise-java/jetty/jetty-jsp-example
     // -------------------------------------------------------------------------
 
-    private void initJSP(WebAppContext ctx) {
+    private void initJSP(WebAppContext ctx) throws IOException {
         ctx.setAttribute("org.eclipse.jetty.containerInitializers", jspInitializers());
         ctx.setAttribute(InstanceManager.class.getName(), new SimpleInstanceManager());
         ctx.addBean(new ServletContainerInitializersStarter(ctx), true);

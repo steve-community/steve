@@ -1,5 +1,9 @@
 package de.rwth.idsg.steve.ocpp.ws;
 
+import de.rwth.idsg.steve.ocpp.OcppVersion;
+import de.rwth.idsg.steve.ocpp.ws.ocpp12.Ocpp12WebSocketEndpoint;
+import de.rwth.idsg.steve.ocpp.ws.ocpp15.Ocpp15WebSocketEndpoint;
+import de.rwth.idsg.steve.ocpp.ws.ocpp16.Ocpp16WebSocketEndpoint;
 import de.rwth.idsg.steve.repository.ChargePointRepository;
 import de.rwth.idsg.steve.service.NotificationService;
 import org.eclipse.jetty.websocket.api.WebSocketPolicy;
@@ -10,7 +14,6 @@ import org.springframework.web.socket.WebSocketHandler;
 import org.springframework.web.socket.server.HandshakeFailureException;
 import org.springframework.web.socket.server.jetty.JettyRequestUpgradeStrategy;
 
-import javax.annotation.Nullable;
 import java.security.Principal;
 import java.util.List;
 import java.util.Map;
@@ -21,14 +24,23 @@ import java.util.Map;
  */
 public class OcppWebSocketUpgrader extends JettyRequestUpgradeStrategy {
 
-    private final List<AbstractWebSocketEndpoint> endpoints;
+    private final Ocpp12WebSocketEndpoint ocpp12WebSocketEndpoint;
+    private final Ocpp15WebSocketEndpoint ocpp15WebSocketEndpoint;
+    private final Ocpp16WebSocketEndpoint ocpp16WebSocketEndpoint;
     private final ChargePointRepository chargePointRepository;
     private final NotificationService notificationService;
 
-    public OcppWebSocketUpgrader(WebSocketPolicy policy, List<AbstractWebSocketEndpoint> endpoints,
-                                 ChargePointRepository chargePointRepository, NotificationService notificationService) {
+    public OcppWebSocketUpgrader(WebSocketPolicy policy,
+                                 Ocpp12WebSocketEndpoint ocpp12WebSocketEndpoint,
+                                 Ocpp15WebSocketEndpoint ocpp15WebSocketEndpoint,
+                                 Ocpp16WebSocketEndpoint ocpp16WebSocketEndpoint,
+                                 ChargePointRepository chargePointRepository,
+                                 NotificationService notificationService) {
+
         super(policy);
-        this.endpoints = endpoints;
+        this.ocpp12WebSocketEndpoint = ocpp12WebSocketEndpoint;
+        this.ocpp15WebSocketEndpoint = ocpp15WebSocketEndpoint;
+        this.ocpp16WebSocketEndpoint = ocpp16WebSocketEndpoint;
         this.chargePointRepository = chargePointRepository;
         this.notificationService = notificationService;
     }
@@ -57,27 +69,24 @@ public class OcppWebSocketUpgrader extends JettyRequestUpgradeStrategy {
         // 2. Route according to the selected protocol
         // -------------------------------------------------------------------------
 
+        AbstractWebSocketEndpoint webSocketHandler;
         if (selectedProtocol == null) {
             throw new HandshakeFailureException("No protocol (OCPP version) is specified.");
-        }
 
-        AbstractWebSocketEndpoint endpoint = findEndpoint(selectedProtocol);
+        } else if (OcppVersion.V_12.getValue().equals(selectedProtocol)) {
+            webSocketHandler = ocpp12WebSocketEndpoint;
 
-        if (endpoint == null) {
+        } else if (OcppVersion.V_15.getValue().equals(selectedProtocol)) {
+            webSocketHandler = ocpp15WebSocketEndpoint;
+            
+        } else if (OcppVersion.V_16.getValue().equals(selectedProtocol)) {
+        webSocketHandler = ocpp16WebSocketEndpoint;
+
+        } else {
             throw new HandshakeFailureException("Requested protocol '" + selectedProtocol + "' is not supported");
         }
 
-        super.upgrade(request, response, selectedProtocol, selectedExtensions, user, endpoint, attributes);
-    }
-
-    @Nullable
-    private AbstractWebSocketEndpoint findEndpoint(String selectedProtocol) {
-        for (AbstractWebSocketEndpoint endpoint : endpoints) {
-            if (endpoint.getVersion().getValue().equals(selectedProtocol)) {
-                return endpoint;
-            }
-        }
-        return null;
+        super.upgrade(request, response, selectedProtocol, selectedExtensions, user, webSocketHandler, attributes);
     }
 
     /**

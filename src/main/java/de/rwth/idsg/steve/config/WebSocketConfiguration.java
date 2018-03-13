@@ -1,10 +1,18 @@
 package de.rwth.idsg.steve.config;
 
-import com.google.common.collect.Lists;
-import de.rwth.idsg.steve.ocpp.ws.AbstractWebSocketEndpoint;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.databind.AnnotationIntrospector;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.introspect.JacksonAnnotationIntrospector;
+import com.fasterxml.jackson.module.jaxb.JaxbAnnotationIntrospector;
+import de.rwth.idsg.steve.ocpp.OcppVersion;
 import de.rwth.idsg.steve.ocpp.ws.OcppWebSocketUpgrader;
+import de.rwth.idsg.steve.ocpp.ws.ocpp12.Ocpp12JacksonModule;
 import de.rwth.idsg.steve.ocpp.ws.ocpp12.Ocpp12WebSocketEndpoint;
+import de.rwth.idsg.steve.ocpp.ws.ocpp15.Ocpp15JacksonModule;
 import de.rwth.idsg.steve.ocpp.ws.ocpp15.Ocpp15WebSocketEndpoint;
+import de.rwth.idsg.steve.ocpp.ws.ocpp16.Ocpp16JacksonModule;
+import de.rwth.idsg.steve.ocpp.ws.ocpp16.Ocpp16WebSocketEndpoint;
 import de.rwth.idsg.steve.repository.ChargePointRepository;
 import de.rwth.idsg.steve.service.NotificationService;
 import lombok.extern.slf4j.Slf4j;
@@ -21,7 +29,6 @@ import org.springframework.web.socket.config.annotation.WebSocketConfigurer;
 import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry;
 import org.springframework.web.socket.server.support.DefaultHandshakeHandler;
 
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -33,15 +40,22 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 public class WebSocketConfiguration implements WebSocketConfigurer {
 
+    @Autowired private Ocpp12WebSocketEndpoint ocpp12WebSocketEndpoint;
+    @Autowired private Ocpp15WebSocketEndpoint ocpp15WebSocketEndpoint;
+    @Autowired private Ocpp16WebSocketEndpoint ocpp16WebSocketEndpoint;
     @Autowired private ChargePointRepository chargePointRepository;
     @Autowired private NotificationService notificationService;
 
-    @Autowired private Ocpp12WebSocketEndpoint ocpp12WebSocketEndpoint;
-    @Autowired private Ocpp15WebSocketEndpoint ocpp15WebSocketEndpoint;
-
+    public static final long IDLE_TIMEOUT = TimeUnit.HOURS.toMillis(2);
     public static final long PING_INTERVAL = TimeUnit.MINUTES.toMinutes(15);
-    private static final long IDLE_TIMEOUT = TimeUnit.HOURS.toMillis(2);
     private static final int MAX_MSG_SIZE = 8_388_608; // 8 MB for max message size
+
+    // The order affects the choice
+    private static final String[] PROTOCOLS = {
+            OcppVersion.V_16.getValue(),
+            OcppVersion.V_15.getValue(),
+            OcppVersion.V_12.getValue()
+    };
 
     @Override
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
@@ -50,26 +64,35 @@ public class WebSocketConfiguration implements WebSocketConfigurer {
         policy.setMaxTextMessageSize(MAX_MSG_SIZE);
         policy.setIdleTimeout(IDLE_TIMEOUT);
 
-        List<AbstractWebSocketEndpoint> endpoints = getEndpoints();
-        String[] protocols = endpoints.stream().map(e -> e.getVersion().getValue()).toArray(String[]::new);
-
-        OcppWebSocketUpgrader upgradeStrategy = new OcppWebSocketUpgrader(policy, endpoints, chargePointRepository, notificationService);
+        OcppWebSocketUpgrader upgradeStrategy = new OcppWebSocketUpgrader(
+                policy, ocpp12WebSocketEndpoint, ocpp15WebSocketEndpoint, ocpp16WebSocketEndpoint, chargePointRepository, notificationService);
 
         DefaultHandshakeHandler handler = new DefaultHandshakeHandler(upgradeStrategy);
-        handler.setSupportedProtocols(protocols);
+        handler.setSupportedProtocols(PROTOCOLS);
 
-        for (AbstractWebSocketEndpoint endpoint : endpoints) {
-            registry.addHandler(endpoint, "/websocket/CentralSystemService/*")
-                    .setHandshakeHandler(handler)
-                    .setAllowedOrigins("*");
-        }
+        registry.addHandler(ocpp12WebSocketEndpoint, "/websocket/CentralSystemService/*")
+                .addHandler(ocpp15WebSocketEndpoint, "/websocket/CentralSystemService/*")
+                .addHandler(ocpp16WebSocketEndpoint, "/websocket/CentralSystemService/*")
+                .setHandshakeHandler(handler)
+                .setAllowedOrigins("*");
     }
 
-    /**
-     * The order affects the choice!
-     */
-    private List<AbstractWebSocketEndpoint> getEndpoints() {
-        return Lists.newArrayList(ocpp15WebSocketEndpoint, ocpp12WebSocketEndpoint);
+    @Bean
+    public ObjectMapper objectMapper() {
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+
+        mapper.registerModule(new Ocpp12JacksonModule());
+        mapper.registerModule(new Ocpp15JacksonModule());
+        mapper.registerModule(new Ocpp16JacksonModule());
+
+        mapper.setAnnotationIntrospector(
+                AnnotationIntrospector.pair(
+                        new JacksonAnnotationIntrospector(),
+                        new JaxbAnnotationIntrospector(mapper.getTypeFactory())
+                )
+        );
+        return mapper;
     }
 
     // -------------------------------------------------------------------------
@@ -85,7 +108,7 @@ public class WebSocketConfiguration implements WebSocketConfigurer {
 
     @Bean
     public HandlerMapping webSocketHandlerMapping() {
-        ServletWebSocketHandlerRegistry registry = new ServletWebSocketHandlerRegistry();
+        ServletWebSocketHandlerRegistry registry = new ServletWebSocketHandlerRegistry(null);
         registerWebSocketHandlers(registry);
         return registry.getHandlerMapping();
     }

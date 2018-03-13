@@ -2,6 +2,7 @@ package de.rwth.idsg.steve.ocpp.soap;
 
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.apache.cxf.ws.addressing.WSAddressingFeature;
+import org.springframework.stereotype.Service;
 
 import javax.xml.ws.soap.SOAPBinding;
 
@@ -18,11 +19,31 @@ import javax.xml.ws.soap.SOAPBinding;
  * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
  * @since 21.10.2015
  */
-public final class ClientProvider {
+@Service
+public class ClientProvider {
 
-    private ClientProvider() { }
+    public ocpp.cp._2010._08.ChargePointService getForOcpp12(String endpointAddress) {
+        JaxWsProxyFactoryBean f = getBean(endpointAddress);
 
-    public static JaxWsProxyFactoryBean getBean(String endpointAddress) {
+        f.setServiceClass(ocpp.cp._2010._08.ChargePointService.class);
+        return (ocpp.cp._2010._08.ChargePointService) f.create();
+    }
+
+    public ocpp.cp._2012._06.ChargePointService getForOcpp15(String endpointAddress) {
+        JaxWsProxyFactoryBean f = getBean(endpointAddress);
+
+        f.setServiceClass(ocpp.cp._2012._06.ChargePointService.class);
+        return (ocpp.cp._2012._06.ChargePointService) f.create();
+    }
+    
+    public ocpp.cp._2015._10.ChargePointService getForOcpp16(String endpointAddress) {
+        JaxWsProxyFactoryBean f = getBean(endpointAddress);
+
+        f.setServiceClass(ocpp.cp._2015._10.ChargePointService.class);
+        return (ocpp.cp._2015._10.ChargePointService) f.create();
+    }
+
+    private JaxWsProxyFactoryBean getBean(String endpointAddress) {
         JaxWsProxyFactoryBean f = new JaxWsProxyFactoryBean();
         f.setBindingId(SOAPBinding.SOAP12HTTP_BINDING);
         f.getFeatures().add(new WSAddressingFeature());

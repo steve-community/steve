@@ -8,34 +8,11 @@ import de.rwth.idsg.steve.repository.dto.InsertTransactionParams;
 import de.rwth.idsg.steve.repository.dto.UpdateChargeboxParams;
 import de.rwth.idsg.steve.repository.dto.UpdateTransactionParams;
 import lombok.extern.slf4j.Slf4j;
-import ocpp.cs._2012._06.AuthorizeRequest;
-import ocpp.cs._2012._06.AuthorizeResponse;
-import ocpp.cs._2012._06.BootNotificationRequest;
-import ocpp.cs._2012._06.BootNotificationResponse;
-import ocpp.cs._2012._06.ChargePointStatus;
-import ocpp.cs._2012._06.DataTransferRequest;
-import ocpp.cs._2012._06.DataTransferResponse;
-import ocpp.cs._2012._06.DataTransferStatus;
-import ocpp.cs._2012._06.DiagnosticsStatusNotificationRequest;
-import ocpp.cs._2012._06.DiagnosticsStatusNotificationResponse;
-import ocpp.cs._2012._06.FirmwareStatusNotificationRequest;
-import ocpp.cs._2012._06.FirmwareStatusNotificationResponse;
-import ocpp.cs._2012._06.HeartbeatRequest;
-import ocpp.cs._2012._06.HeartbeatResponse;
-import ocpp.cs._2012._06.IdTagInfo;
-import ocpp.cs._2012._06.MeterValue;
-import ocpp.cs._2012._06.MeterValuesRequest;
-import ocpp.cs._2012._06.MeterValuesResponse;
-import ocpp.cs._2012._06.RegistrationStatus;
-import ocpp.cs._2012._06.StartTransactionRequest;
-import ocpp.cs._2012._06.StartTransactionResponse;
-import ocpp.cs._2012._06.StatusNotificationRequest;
-import ocpp.cs._2012._06.StatusNotificationResponse;
-import ocpp.cs._2012._06.StopTransactionRequest;
-import ocpp.cs._2012._06.StopTransactionResponse;
+import ocpp.cs._2012._06.*;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import ocpp.cs._2012._06.DataTransferStatus;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -129,9 +106,11 @@ public class CentralSystemService15_Service {
     public MeterValuesResponse meterValues(MeterValuesRequest parameters, String chargeBoxIdentity) {
         log.debug("Executing meterValues for {}", chargeBoxIdentity);
 
+        int connectorId = parameters.getConnectorId();
+        Integer transactionId = parameters.getTransactionId();
         if (parameters.isSetValues()) {
-            ocppServerRepository.insertMeterValues(chargeBoxIdentity, parameters.getValues(),
-                                                   parameters.getConnectorId(), parameters.getTransactionId());
+            ocppServerRepository.insertMeterValues15(chargeBoxIdentity, connectorId,
+                                                     parameters.getValues(), transactionId);
         }
         return new MeterValuesResponse();
     }
@@ -197,7 +176,7 @@ public class CentralSystemService15_Service {
                                                       .flatMap(data -> data.getValues().stream())
                                                       .collect(Collectors.toList());
 
-            ocppServerRepository.insertMeterValues(chargeBoxIdentity, combinedList, transactionId);
+            ocppServerRepository.insertMeterValuesOfTransaction(chargeBoxIdentity, transactionId, combinedList);
         }
 
         // Get the authorization info of the user
@@ -228,9 +207,7 @@ public class CentralSystemService15_Service {
         return new AuthorizeResponse().withIdTagInfo(idTagInfo);
     }
 
-    /**
-     * Dummy implementation. This is new in OCPP 1.5. It must be vendor-specific.
-     */
+    // Dummy implementation. This is new in OCPP 1.5. It must be vendor-specific.
     public DataTransferResponse dataTransfer(DataTransferRequest parameters, String chargeBoxIdentity) {
         log.debug("Executing dataTransfer for {}", chargeBoxIdentity);
 
@@ -241,9 +218,7 @@ public class CentralSystemService15_Service {
         if (parameters.isSetData()) {
             log.info("[Data Transfer] Data: {}", parameters.getData());
         }
-
-        // OCPP requires a status to be set. Since this is a dummy impl, set it to "Accepted".
-        // https://github.com/RWTH-i5-IDSG/steve/pull/36
+        //Temporary fix for OccurenceConstraintViolation will always return ACCEPTED
         return new DataTransferResponse().withStatus(DataTransferStatus.ACCEPTED);
     }
 }

@@ -1,10 +1,7 @@
 package de.rwth.idsg.steve.ocpp.soap;
 
 import de.rwth.idsg.steve.ocpp.OcppProtocol;
-import de.rwth.idsg.steve.ocpp.OcppTransport;
-import de.rwth.idsg.steve.ocpp.OcppVersion;
-import de.rwth.idsg.steve.ocpp.converter.Convert;
-import de.rwth.idsg.steve.service.CentralSystemService15_Service;
+import de.rwth.idsg.steve.service.CentralSystemService12_Service;
 import lombok.extern.slf4j.Slf4j;
 import ocpp.cs._2010._08.AuthorizeRequest;
 import ocpp.cs._2010._08.AuthorizeResponse;
@@ -36,8 +33,6 @@ import javax.xml.ws.soap.Addressing;
 import javax.xml.ws.soap.SOAPBinding;
 import java.util.concurrent.Future;
 
-import static de.rwth.idsg.steve.ocpp.converter.Server12to15Impl.SINGLETON;
-
 /**
  * Service implementation of OCPP V1.2
  *
@@ -55,82 +50,45 @@ import static de.rwth.idsg.steve.ocpp.converter.Server12to15Impl.SINGLETON;
         endpointInterface = "ocpp.cs._2010._08.CentralSystemService")
 public class CentralSystemService12_SoapServer implements CentralSystemService {
 
-    @Autowired private CentralSystemService15_Service service;
-
-    public BootNotificationResponse bootNotificationWithTransport(BootNotificationRequest parameters,
-                                                                  String chargeBoxIdentity, OcppProtocol protocol) {
-        if (protocol.getVersion() != OcppVersion.V_12) {
-            throw new IllegalArgumentException("Unexpected OCPP version: " + protocol.getVersion());
-        }
-
-        return Convert.start(parameters, SINGLETON::convertRequest)
-                      .andThen(req -> service.bootNotification(req, chargeBoxIdentity, protocol))
-                      .andThen(SINGLETON::convertResponse)
-                      .apply(parameters);
-    }
+    @Autowired private CentralSystemService12_Service service;
 
     public BootNotificationResponse bootNotification(BootNotificationRequest parameters, String chargeBoxIdentity) {
-        return this.bootNotificationWithTransport(parameters, chargeBoxIdentity, OcppProtocol.V_12_SOAP);
+        return service.bootNotification(parameters, chargeBoxIdentity, OcppProtocol.V_12_SOAP);
     }
 
     public FirmwareStatusNotificationResponse firmwareStatusNotification(FirmwareStatusNotificationRequest parameters,
                                                                          String chargeBoxIdentity) {
-        return Convert.start(parameters, SINGLETON::convertRequest)
-                      .andThen(req -> service.firmwareStatusNotification(req, chargeBoxIdentity))
-                      .andThen(SINGLETON::convertResponse)
-                      .apply(parameters);
-
+        return service.firmwareStatusNotification(parameters, chargeBoxIdentity);
     }
 
     public StatusNotificationResponse statusNotification(
             StatusNotificationRequest parameters, String chargeBoxIdentity) {
-        return Convert.start(parameters, SINGLETON::convertRequest)
-                      .andThen(req -> service.statusNotification(req, chargeBoxIdentity))
-                      .andThen(SINGLETON::convertResponse)
-                      .apply(parameters);
+        return service.statusNotification(parameters, chargeBoxIdentity);
     }
 
     public MeterValuesResponse meterValues(MeterValuesRequest parameters, String chargeBoxIdentity) {
-        return Convert.start(parameters, SINGLETON::convertRequest)
-                      .andThen(req -> service.meterValues(req, chargeBoxIdentity))
-                      .andThen(SINGLETON::convertResponse)
-                      .apply(parameters);
+        return service.meterValues(parameters, chargeBoxIdentity);
     }
 
     public DiagnosticsStatusNotificationResponse diagnosticsStatusNotification(
             DiagnosticsStatusNotificationRequest parameters, String chargeBoxIdentity) {
-        return Convert.start(parameters, SINGLETON::convertRequest)
-                      .andThen(req -> service.diagnosticsStatusNotification(req, chargeBoxIdentity))
-                      .andThen(SINGLETON::convertResponse)
-                      .apply(parameters);
+        return service.diagnosticsStatusNotification(parameters, chargeBoxIdentity);
     }
 
     public StartTransactionResponse startTransaction(StartTransactionRequest parameters, String chargeBoxIdentity) {
-        return Convert.start(parameters, SINGLETON::convertRequest)
-                      .andThen(req -> service.startTransaction(req, chargeBoxIdentity))
-                      .andThen(SINGLETON::convertResponse)
-                      .apply(parameters);
+        return service.startTransaction(parameters, chargeBoxIdentity);
     }
 
     public StopTransactionResponse stopTransaction(StopTransactionRequest parameters, String chargeBoxIdentity) {
-        return Convert.start(parameters, SINGLETON::convertRequest)
-                      .andThen(req -> service.stopTransaction(req, chargeBoxIdentity))
-                      .andThen(SINGLETON::convertResponse)
-                      .apply(parameters);
+        return service.stopTransaction(parameters, chargeBoxIdentity);
     }
 
     public HeartbeatResponse heartbeat(HeartbeatRequest parameters, String chargeBoxIdentity) {
-        return Convert.start(parameters, SINGLETON::convertRequest)
-                      .andThen(req -> service.heartbeat(req, chargeBoxIdentity))
-                      .andThen(SINGLETON::convertResponse)
-                      .apply(parameters);
+        return service.heartbeat(parameters, chargeBoxIdentity);
     }
 
     public AuthorizeResponse authorize(AuthorizeRequest parameters, String chargeBoxIdentity) {
-        return Convert.start(parameters, SINGLETON::convertRequest)
-                      .andThen(req -> service.authorize(req, chargeBoxIdentity))
-                      .andThen(SINGLETON::convertResponse)
-                      .apply(parameters);
+        return service.authorize(parameters, chargeBoxIdentity);
     }
 
     // -------------------------------------------------------------------------

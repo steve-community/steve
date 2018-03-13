@@ -11,6 +11,7 @@ import de.rwth.idsg.steve.utils.CustomDSL;
 import jooq.steve.db.tables.records.ConnectorMeterValueRecord;
 import lombok.extern.slf4j.Slf4j;
 import ocpp.cs._2012._06.MeterValue;
+import ocpp.cs._2015._10.SampledValue;
 import org.joda.time.DateTime;
 import org.jooq.DSLContext;
 import org.jooq.Record1;
@@ -137,7 +138,22 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
     }
 
     @Override
-    public void insertMeterValues(String chargeBoxIdentity, List<MeterValue> list, int connectorId, Integer transactionId) {
+    public void insertMeterValues12(final String chargeBoxIdentity, final int connectorId,
+                                    final List<ocpp.cs._2010._08.MeterValue> list) {
+
+        ctx.transaction(configuration -> {
+            DSLContext ctx = DSL.using(configuration);
+
+            insertIgnoreConnector(ctx, chargeBoxIdentity, connectorId);
+            int connectorPk = getConnectorPkFromConnector(ctx, chargeBoxIdentity, connectorId);
+            batchInsertMeterValues12(ctx, list, connectorPk);
+        });
+    }
+
+    @Override
+    public void insertMeterValues15(final String chargeBoxIdentity, final int connectorId,
+                                    final List<ocpp.cs._2012._06.MeterValue> list, final Integer transactionId) {
+
         ctx.transaction(configuration -> {
             DSLContext ctx = DSL.using(configuration);
 
@@ -146,9 +162,24 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
             batchInsertMeterValues15(ctx, list, connectorPk, transactionId);
         });
     }
+    
+    @Override
+    public void insertMeterValues16(final String chargeBoxIdentity, final int connectorId,
+                                    final List<ocpp.cs._2015._10.MeterValue> list, final Integer transactionId) {
+
+        ctx.transaction(configuration -> {
+            DSLContext ctx = DSL.using(configuration);
+
+            insertIgnoreConnector(ctx, chargeBoxIdentity, connectorId);
+            int connectorPk = getConnectorPkFromConnector(ctx, chargeBoxIdentity, connectorId);
+            batchInsertMeterValues16(ctx, list, connectorPk, transactionId);
+        });
+    }
 
     @Override
-    public void insertMeterValues(String chargeBoxIdentity, List<MeterValue> list, int transactionId) {
+    public void insertMeterValuesOfTransaction(String chargeBoxIdentity, final int transactionId,
+                                               final List<MeterValue> list) {
+
         ctx.transaction(configuration -> {
             DSLContext ctx = DSL.using(configuration);
 
@@ -160,6 +191,24 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
                                  .value1();
 
             batchInsertMeterValues15(ctx, list, connectorPk, transactionId);
+        });
+    }
+    
+    @Override
+    public void insertMeterValuesOfTransaction16(String chargeBoxIdentity, final int transactionId,
+                                               final List<ocpp.cs._2015._10.MeterValue> list) {
+
+        ctx.transaction(configuration -> {
+            DSLContext ctx = DSL.using(configuration);
+
+            // First, get connector primary key from transaction table
+            int connectorPk = ctx.select(TRANSACTION.CONNECTOR_PK)
+                                 .from(TRANSACTION)
+                                 .where(TRANSACTION.TRANSACTION_PK.equal(transactionId))
+                                 .fetchOne()
+                                 .value1();
+
+            batchInsertMeterValues16(ctx, list, connectorPk, transactionId);
         });
     }
 
@@ -285,11 +334,45 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
                   .value1();
     }
 
+    private void batchInsertMeterValues12(DSLContext ctx, List<ocpp.cs._2010._08.MeterValue> list, int connectorPk) {
+        List<ConnectorMeterValueRecord> batch =
+                list.stream()
+                    .map(s -> ctx.newRecord(CONNECTOR_METER_VALUE)
+                                 .setConnectorPk(connectorPk)
+                                 .setValueTimestamp(s.getTimestamp())
+                                 .setValue(String.valueOf(s.getValue())))
+                    .collect(Collectors.toList());
+
+        ctx.batchInsert(batch).execute();
+    }
+
     private void batchInsertMeterValues15(DSLContext ctx, List<ocpp.cs._2012._06.MeterValue> list, int connectorPk,
                                           Integer transactionId) {
         List<ConnectorMeterValueRecord> batch =
                 list.stream()
                     .flatMap(t -> t.getValue()
+                                   .stream()
+                                   .map(k -> ctx.newRecord(CONNECTOR_METER_VALUE)
+                                                .setConnectorPk(connectorPk)
+                                                .setTransactionPk(transactionId)
+                                                .setValueTimestamp(t.getTimestamp())
+                                                .setValue(k.getValue())
+                                                // The following are optional fields!
+                                                .setReadingContext(k.isSetContext() ? k.getContext().value() : null)
+                                                .setFormat(k.isSetFormat() ? k.getFormat().value() : null)
+                                                .setMeasurand(k.isSetMeasurand() ? k.getMeasurand().value() : null)
+                                                .setLocation(k.isSetLocation() ? k.getLocation().value() : null)
+                                                .setUnit(k.isSetUnit() ? k.getUnit().value() : null)))
+                    .collect(Collectors.toList());
+
+        ctx.batchInsert(batch).execute();
+    }
+    
+    private void batchInsertMeterValues16(DSLContext ctx, List<ocpp.cs._2015._10.MeterValue> list, int connectorPk,
+                                          Integer transactionId) {
+        List<ConnectorMeterValueRecord> batch =
+                list.stream()
+                    .flatMap(t -> t.getSampledValue()
                                    .stream()
                                    .map(k -> ctx.newRecord(CONNECTOR_METER_VALUE)
                                                 .setConnectorPk(connectorPk)

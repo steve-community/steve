@@ -1,11 +1,10 @@
 package de.rwth.idsg.steve.ocpp.ws;
 
 import de.rwth.idsg.steve.config.WebSocketConfiguration;
-import de.rwth.idsg.steve.ocpp.OcppVersion;
 import de.rwth.idsg.steve.ocpp.ws.custom.WsSessionSelectStrategy;
 import de.rwth.idsg.steve.ocpp.ws.data.CommunicationContext;
 import de.rwth.idsg.steve.ocpp.ws.data.SessionContext;
-import de.rwth.idsg.steve.ocpp.ws.pipeline.IncomingPipeline;
+import de.rwth.idsg.steve.ocpp.ws.pipeline.Pipeline;
 import de.rwth.idsg.steve.repository.OcppServerRepository;
 import de.rwth.idsg.steve.service.NotificationService;
 import org.joda.time.DateTime;
@@ -44,7 +43,7 @@ public abstract class AbstractWebSocketEndpoint implements WebSocketHandler {
 
     public static final String CHARGEBOX_ID_KEY = "CHARGEBOX_ID_KEY";
 
-    private IncomingPipeline pipeline;
+    private Pipeline pipeline;
     private SessionContextStoreImpl sessionContextStore;
 
     private final List<Consumer<String>> connectedCallbackList = new ArrayList<>();
@@ -52,9 +51,7 @@ public abstract class AbstractWebSocketEndpoint implements WebSocketHandler {
 
     private final Object sessionContextLock = new Object();
 
-    public abstract OcppVersion getVersion();
-
-    public void init(IncomingPipeline pipeline) {
+    public void init(Pipeline pipeline) {
         this.pipeline = pipeline;
         sessionContextStore = new SessionContextStoreImpl(wsSessionSelectStrategy);
 
@@ -84,10 +81,12 @@ public abstract class AbstractWebSocketEndpoint implements WebSocketHandler {
 
         log.info("[chargeBoxId={}, sessionId={}] Received message: {}", chargeBoxId, session.getId(), incomingString);
 
-        CommunicationContext context = new CommunicationContext(session, chargeBoxId);
+        CommunicationContext context = new CommunicationContext();
+        context.setSession(session);
+        context.setChargeBoxId(chargeBoxId);
         context.setIncomingString(incomingString);
 
-        pipeline.accept(context);
+        pipeline.process(context);
     }
 
     private void handlePongMessage(WebSocketSession session) {

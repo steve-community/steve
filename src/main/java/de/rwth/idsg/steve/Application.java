@@ -11,52 +11,25 @@ import java.util.TimeZone;
  * @since 14.01.2015
  */
 @Slf4j
-public class Application implements ApplicationStarter, AutoCloseable {
+public class Application {
 
-    private final ApplicationStarter delegate;
+    public static void main(String[] args) throws Exception {
 
-    public Application() {
         // For Hibernate validator
         System.setProperty("org.jboss.logging.provider", "slf4j");
 
-        TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
-        DateTimeZone.setDefault(DateTimeZone.UTC);
-        log.info("Date/time zone of the application is set to UTC. Current date/time: {}", DateTime.now());
+        TimeZone.setDefault(TimeZone.getTimeZone("Europe/Amsterdam"));
+        DateTimeZone.setDefault(DateTimeZone.getDefault());
+        log.info("Date/time zone of the application is set to Europe/Amsterdam. Current date/time: {}", DateTime.now());
 
         SteveConfiguration sc = SteveConfiguration.CONFIG;
 
         log.info("Loaded the properties. Starting with the '{}' profile", sc.getProfile());
 
         if (sc.getProfile().isProd()) {
-            delegate = new SteveProdStarter();
+            new SteveProdStarter().start();
         } else {
-            delegate = new SteveDevStarter();
+            new SteveDevStarter().start();
         }
-    }
-
-    public static void main(String[] args) throws Exception {
-        Application app = new Application();
-        app.start();
-        app.join();
-    }
-
-    @Override
-    public void start() throws Exception {
-        delegate.start();
-    }
-
-    @Override
-    public void join() throws Exception {
-        delegate.join();
-    }
-
-    @Override
-    public void stop() throws Exception {
-        delegate.stop();
-    }
-
-    @Override
-    public void close() throws Exception {
-        stop();
     }
 }

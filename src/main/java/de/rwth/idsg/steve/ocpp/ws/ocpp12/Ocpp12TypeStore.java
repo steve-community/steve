@@ -1,18 +1,27 @@
 package de.rwth.idsg.steve.ocpp.ws.ocpp12;
 
-import de.rwth.idsg.steve.ocpp.RequestType;
-import de.rwth.idsg.steve.ocpp.ws.TypeStore;
+import de.rwth.idsg.steve.ocpp.ws.AbstractTypeStore;
 import de.rwth.idsg.steve.ocpp.ws.data.ActionResponsePair;
+import ocpp.cp._2010._08.ChangeAvailabilityRequest;
 import ocpp.cp._2010._08.ChangeAvailabilityResponse;
+import ocpp.cp._2010._08.ChangeConfigurationRequest;
 import ocpp.cp._2010._08.ChangeConfigurationResponse;
+import ocpp.cp._2010._08.ClearCacheRequest;
 import ocpp.cp._2010._08.ClearCacheResponse;
+import ocpp.cp._2010._08.GetDiagnosticsRequest;
 import ocpp.cp._2010._08.GetDiagnosticsResponse;
+import ocpp.cp._2010._08.RemoteStartTransactionRequest;
 import ocpp.cp._2010._08.RemoteStartTransactionResponse;
+import ocpp.cp._2010._08.RemoteStopTransactionRequest;
 import ocpp.cp._2010._08.RemoteStopTransactionResponse;
+import ocpp.cp._2010._08.ResetRequest;
 import ocpp.cp._2010._08.ResetResponse;
+import ocpp.cp._2010._08.UnlockConnectorRequest;
 import ocpp.cp._2010._08.UnlockConnectorResponse;
+import ocpp.cp._2010._08.UpdateFirmwareRequest;
 import ocpp.cp._2010._08.UpdateFirmwareResponse;
 import ocpp.cs._2010._08.AuthorizeRequest;
+import ocpp.cs._2010._08.BootNotificationRequest;
 import ocpp.cs._2010._08.DiagnosticsStatusNotificationRequest;
 import ocpp.cs._2010._08.FirmwareStatusNotificationRequest;
 import ocpp.cs._2010._08.HeartbeatRequest;
@@ -22,60 +31,46 @@ import ocpp.cs._2010._08.StatusNotificationRequest;
 import ocpp.cs._2010._08.StopTransactionRequest;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
+
 /**
  * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
  * @since 17.03.2015
  */
-public enum Ocpp12TypeStore implements TypeStore {
-    INSTANCE;
+@Component
+public class Ocpp12TypeStore extends AbstractTypeStore {
 
-    @Override
-    public Class<? extends RequestType> findRequestClass(String action) {
-        switch (action) {
-            case "FirmwareStatusNotification":
-                return FirmwareStatusNotificationRequest.class;
-            case "StatusNotification":
-                return StatusNotificationRequest.class;
-            case "MeterValues":
-                return MeterValuesRequest.class;
-            case "DiagnosticsStatusNotification":
-                return DiagnosticsStatusNotificationRequest.class;
-            case "StartTransaction":
-                return StartTransactionRequest.class;
-            case "StopTransaction":
-                return StopTransactionRequest.class;
-            case "Heartbeat":
-                return HeartbeatRequest.class;
-            case "Authorize":
-                return AuthorizeRequest.class;
-            default:
-                return null;
-        }
-    }
+    @PostConstruct
+    public void init() {
+        // For incoming requests
+        requestMap.put("BootNotification", BootNotificationRequest.class);
+        requestMap.put("FirmwareStatusNotification", FirmwareStatusNotificationRequest.class);
+        requestMap.put("StatusNotification", StatusNotificationRequest.class);
+        requestMap.put("MeterValues", MeterValuesRequest.class);
+        requestMap.put("DiagnosticsStatusNotification", DiagnosticsStatusNotificationRequest.class);
+        requestMap.put("StartTransaction", StartTransactionRequest.class);
+        requestMap.put("StopTransaction", StopTransactionRequest.class);
+        requestMap.put("Heartbeat", HeartbeatRequest.class);
+        requestMap.put("Authorize", AuthorizeRequest.class);
 
-    @Override
-    public <T extends RequestType> ActionResponsePair findActionResponse(T requestPayload) {
-        switch (requestPayload.getClass().getSimpleName()) {
-            case "UnlockConnectorRequest":
-                return new ActionResponsePair("UnlockConnector", UnlockConnectorResponse.class);
-            case "ResetRequest":
-                return new ActionResponsePair("Reset", ResetResponse.class);
-            case "ChangeAvailabilityRequest":
-                return new ActionResponsePair("ChangeAvailability", ChangeAvailabilityResponse.class);
-            case "GetDiagnosticsRequest":
-                return new ActionResponsePair("GetDiagnostics", GetDiagnosticsResponse.class);
-            case "ClearCacheRequest":
-                return new ActionResponsePair("ClearCache", ClearCacheResponse.class);
-            case "UpdateFirmwareRequest":
-                return new ActionResponsePair("UpdateFirmware", UpdateFirmwareResponse.class);
-            case "ChangeConfigurationRequest":
-                return new ActionResponsePair("ChangeConfiguration", ChangeConfigurationResponse.class);
-            case "RemoteStartTransactionRequest":
-                return new ActionResponsePair("RemoteStartTransaction", RemoteStartTransactionResponse.class);
-            case "RemoteStopTransactionRequest":
-                return new ActionResponsePair("RemoteStopTransaction", RemoteStopTransactionResponse.class);
-            default:
-                return null;
-        }
+        // For outgoing requests
+        actionResponseMap.put(UnlockConnectorRequest.class,
+                new ActionResponsePair("UnlockConnector", UnlockConnectorResponse.class));
+        actionResponseMap.put(ResetRequest.class,
+                new ActionResponsePair("Reset", ResetResponse.class));
+        actionResponseMap.put(ChangeAvailabilityRequest.class,
+                new ActionResponsePair("ChangeAvailability", ChangeAvailabilityResponse.class));
+        actionResponseMap.put(GetDiagnosticsRequest.class,
+                new ActionResponsePair("GetDiagnostics", GetDiagnosticsResponse.class));
+        actionResponseMap.put(ClearCacheRequest.class,
+                new ActionResponsePair("ClearCache", ClearCacheResponse.class));
+        actionResponseMap.put(UpdateFirmwareRequest.class,
+                new ActionResponsePair("UpdateFirmware", UpdateFirmwareResponse.class));
+        actionResponseMap.put(ChangeConfigurationRequest.class,
+                new ActionResponsePair("ChangeConfiguration", ChangeConfigurationResponse.class));
+        actionResponseMap.put(RemoteStartTransactionRequest.class,
+                new ActionResponsePair("RemoteStartTransaction", RemoteStartTransactionResponse.class));
+        actionResponseMap.put(RemoteStopTransactionRequest.class,
+                new ActionResponsePair("RemoteStopTransaction", RemoteStopTransactionResponse.class));
     }
 }

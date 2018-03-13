@@ -5,7 +5,6 @@ import de.rwth.idsg.steve.web.dto.Address;
 import jooq.steve.db.tables.records.AddressRecord;
 
 import java.util.Arrays;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -47,7 +46,7 @@ public final class ControllerHelper {
 
     private static Map<String, String> populateCountryCodes() {
         CountryCode[] codes = CountryCode.values();
-        Arrays.sort(codes, Comparator.comparing(CountryCode::getName));
+        Arrays.sort(codes, (o1, o2) -> o1.getName().compareTo(o2.getName()));
 
         Map<String, String> map = new LinkedHashMap<>(codes.length + 1);
         map.put("", EMPTY_OPTION);

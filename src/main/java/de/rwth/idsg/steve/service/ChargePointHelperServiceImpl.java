@@ -6,6 +6,7 @@ import de.rwth.idsg.steve.ocpp.OcppVersion;
 import de.rwth.idsg.steve.ocpp.ws.data.SessionContext;
 import de.rwth.idsg.steve.ocpp.ws.ocpp12.Ocpp12WebSocketEndpoint;
 import de.rwth.idsg.steve.ocpp.ws.ocpp15.Ocpp15WebSocketEndpoint;
+import de.rwth.idsg.steve.ocpp.ws.ocpp16.Ocpp16WebSocketEndpoint;
 import de.rwth.idsg.steve.repository.ChargePointRepository;
 import de.rwth.idsg.steve.repository.GenericRepository;
 import de.rwth.idsg.steve.repository.dto.ChargePointSelect;
@@ -38,12 +39,14 @@ public class ChargePointHelperServiceImpl implements ChargePointHelperService {
     // For WebSocket-based charge points, the active sessions are stored in memory
     @Autowired private Ocpp12WebSocketEndpoint ocpp12WebSocketEndpoint;
     @Autowired private Ocpp15WebSocketEndpoint ocpp15WebSocketEndpoint;
+    @Autowired private Ocpp16WebSocketEndpoint ocpp16WebSocketEndpoint;
 
     @Override
     public Statistics getStats() {
         Statistics stats = genericRepository.getStats();
         stats.setNumOcpp12JChargeBoxes(ocpp12WebSocketEndpoint.getNumberOfChargeBoxes());
         stats.setNumOcpp15JChargeBoxes(ocpp15WebSocketEndpoint.getNumberOfChargeBoxes());
+        stats.setNumOcpp16JChargeBoxes(ocpp16WebSocketEndpoint.getNumberOfChargeBoxes());
 
         List<ConnectorStatus> latestList = chargePointRepository.getChargePointConnectorStatus();
         stats.setStatusCountMap(ConnectorStatusCountFilter.getStatusCountMap(latestList));
@@ -55,14 +58,16 @@ public class ChargePointHelperServiceImpl implements ChargePointHelperService {
     public List<OcppJsonStatus> getOcppJsonStatus() {
         Map<String, Deque<SessionContext>> ocpp12Map = ocpp12WebSocketEndpoint.getACopy();
         Map<String, Deque<SessionContext>> ocpp15Map = ocpp15WebSocketEndpoint.getACopy();
+        Map<String, Deque<SessionContext>> ocpp16Map = ocpp16WebSocketEndpoint.getACopy();
 
-        Map<String, Integer> primaryKeyLookup = getPrimaryKeyLookup(ocpp12Map, ocpp15Map);
+        Map<String, Integer> primaryKeyLookup = getPrimaryKeyLookup(ocpp12Map, ocpp15Map, ocpp16Map);
 
         DateTime now = DateTime.now();
         List<OcppJsonStatus> returnList = new ArrayList<>();
 
         appendList(ocpp12Map, returnList, now, OcppVersion.V_12, primaryKeyLookup);
         appendList(ocpp15Map, returnList, now, OcppVersion.V_15, primaryKeyLookup);
+        appendList(ocpp16Map, returnList, now, OcppVersion.V_16, primaryKeyLookup);
         return returnList;
     }
 
@@ -85,16 +90,28 @@ public class ChargePointHelperServiceImpl implements ChargePointHelperService {
         }
         return returnList;
     }
+    
+    @Override
+    public List<ChargePointSelect> getChargePointsV16() {
+        List<ChargePointSelect> returnList = chargePointRepository.getChargePointSelect(OcppProtocol.V_16_SOAP);
+
+        for (String chargeBoxId : ocpp16WebSocketEndpoint.getChargeBoxIdList()) {
+            returnList.add(new ChargePointSelect(OcppTransport.JSON, chargeBoxId));
+        }
+        return returnList;
+    }
 
     // -------------------------------------------------------------------------
     // Helpers
     // -------------------------------------------------------------------------
 
     private Map<String, Integer> getPrimaryKeyLookup(Map<String, Deque<SessionContext>> ocpp12Map,
-                                                     Map<String, Deque<SessionContext>> ocpp15Map) {
+                                                     Map<String, Deque<SessionContext>> ocpp15Map,
+                                                     Map<String, Deque<SessionContext>> ocpp16Map) {
 
         ArrayList<String> idList = new ArrayList<>(ocpp12Map.keySet());
         idList.addAll(ocpp15Map.keySet());
+        idList.addAll(ocpp16Map.keySet());
 
         return chargePointRepository.getChargeBoxIdPkPair(idList);
     }

@@ -8,8 +8,6 @@ import de.rwth.idsg.steve.ocpp.ws.data.OcppJsonResult;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-import java.util.function.Consumer;
-
 /**
  * For all incoming message types.
  *
@@ -18,39 +16,35 @@ import java.util.function.Consumer;
  */
 @Slf4j
 @RequiredArgsConstructor
-public class IncomingPipeline implements Consumer<CommunicationContext> {
-
-    private final Serializer serializer = Serializer.INSTANCE;
-    private final Sender sender = Sender.INSTANCE;
-
+public class IncomingPipeline extends AbstractPipeline {
     private final Deserializer deserializer;
     private final AbstractCallHandler handler;
+    private final OutgoingPipeline outgoingPipeline;
 
     @Override
-    public void accept(CommunicationContext context) {
-        deserializer.accept(context);
+    @SuppressWarnings("unchecked")
+    public void process(CommunicationContext context) {
+        deserializer.process(context);
 
         // When the incoming could not be deserialized
         if (context.isSetOutgoingError()) {
-            serializer.accept(context);
-            sender.accept(context);
+            outgoingPipeline.process(context);
             return;
         }
 
         OcppJsonMessage msg = context.getIncomingMessage();
 
         if (msg instanceof OcppJsonCall) {
-            handler.accept(context);
-            serializer.accept(context);
-            sender.accept(context);
+            handler.process(context);
+            outgoingPipeline.process(context);
 
         } else if (msg instanceof OcppJsonResult) {
-            context.getResultHandler()
-                   .accept((OcppJsonResult) msg);
+            OcppJsonResult result = (OcppJsonResult) msg;
+            context.getHandler().handleResponse(result.getPayload());
 
         } else if (msg instanceof OcppJsonError) {
-            context.getErrorHandler()
-                   .accept((OcppJsonError) msg);
+            OcppJsonError result = (OcppJsonError) msg;
+            context.getHandler().handleError(result);
         }
     }
 

@@ -91,9 +91,12 @@ public class MailService {
             mail.addRecipient(Message.RecipientType.TO, new InternetAddress(rep));
         }
 
-        try (Transport transport = session.getTransport()) {
+        Transport transport = session.getTransport();
+        try {
             transport.connect();
             transport.sendMessage(mail, mail.getAllRecipients());
+        } finally {
+            transport.close();
         }
     }
 

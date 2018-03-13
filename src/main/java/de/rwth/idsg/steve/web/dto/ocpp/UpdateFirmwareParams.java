@@ -28,5 +28,6 @@ public class UpdateFirmwareParams extends MultipleChargePointSelect {
     private Integer retryInterval;
 
     @Future(message = "Retrieve Date/Time must be in future")
+    @NotNull(message = "Retrieve Date/Time is required")
     private LocalDateTime retrieve;
 }

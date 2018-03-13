@@ -72,16 +72,34 @@ public enum Server15to16Impl implements Server15to16 {
 
     @Override
     public StatusNotificationRequest convertRequest(ocpp.cs._2012._06.StatusNotificationRequest request) {
-        ChargePointStatus status = ChargePointStatus.fromValue(request.getStatus().value());
+
+        //TODO: OCCUPIED was replaced with several more specific values. For now it will be replaced with "CHARGING",
+        // but something else might make more sense at this place
+
+        ChargePointStatus status;
+        if (request.getStatus().equals(ocpp.cs._2012._06.ChargePointStatus.OCCUPIED)) {
+            status = ChargePointStatus.CHARGING;
+        } else {
+            status = ChargePointStatus.fromValue(request.getErrorCode().value());
+        }
 
         ChargePointErrorCode errorCode16;
         ocpp.cs._2012._06.ChargePointErrorCode errorCode15 = request.getErrorCode();
 
 
+        // TODO: make sure this doesn't collide with logic implementation
+        // New logic: Connector with Id 0 can only be AVAILABLE, UNAVAILABLE and FAULTED
+
+        if(request.getConnectorId() == 0
+                && (request.getStatus().equals(ocpp.cs._2012._06.ChargePointStatus.OCCUPIED)
+                || request.getStatus().equals(ocpp.cs._2012._06.ChargePointStatus.RESERVED))) {
+            status = ChargePointStatus.UNAVAILABLE;
+        }
+
         // Mapping required: Enum values in both directions don't necessarily match.
-        // TODO: Make sure that no information is lost (by e.g. creating InsertConnectorStatusParams earlier in the pipeline)
+        // Update: According to the 1.6 specification, MODE_3_ERROR was simply renamed to EV_COMMUNICATION_ERROR
         if (errorCode15.equals(ocpp.cs._2012._06.ChargePointErrorCode.MODE_3_ERROR)) {
-            errorCode16 = ChargePointErrorCode.OTHER_ERROR;
+            errorCode16 = ChargePointErrorCode.EV_COMMUNICATION_ERROR;
         } else {
             errorCode16 = ChargePointErrorCode.fromValue(request.getErrorCode().value());
         }

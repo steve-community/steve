@@ -15,7 +15,7 @@ import java.util.TreeMap;
  */
 public final class ConnectorStatusCountFilter {
 
-    private static final Set<String> allStatusValues = allStatusValues();
+    private static final Set<String> ALL_STATUS_VALUES = allStatusValues();
 
     private ConnectorStatusCountFilter() { }
 
@@ -39,7 +39,7 @@ public final class ConnectorStatusCountFilter {
         }
 
         if (printZero) {
-            allStatusValues.forEach(s -> map.putIfAbsent(s, 0));
+            ALL_STATUS_VALUES.forEach(s -> map.putIfAbsent(s, 0));
         }
 
         return map;

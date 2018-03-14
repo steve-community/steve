@@ -51,8 +51,6 @@ public class CentralSystemService16_Service {
 
     public BootNotificationResponse bootNotification(BootNotificationRequest parameters, String chargeBoxIdentity,
                                                      OcppProtocol ocppProtocol) {
-        log.debug("Executing bootNotification for {}", chargeBoxIdentity);
-
         DateTime now = DateTime.now();
 
         UpdateChargeboxParams params =
@@ -84,8 +82,6 @@ public class CentralSystemService16_Service {
 
     public FirmwareStatusNotificationResponse firmwareStatusNotification(
             FirmwareStatusNotificationRequest parameters, String chargeBoxIdentity) {
-        log.debug("Executing firmwareStatusNotification for {}", chargeBoxIdentity);
-
         String status = parameters.getStatus().value();
         ocppServerRepository.updateChargeboxFirmwareStatus(chargeBoxIdentity, status);
         return new FirmwareStatusNotificationResponse();
@@ -93,8 +89,6 @@ public class CentralSystemService16_Service {
 
     public StatusNotificationResponse statusNotification(
             StatusNotificationRequest parameters, String chargeBoxIdentity) {
-        log.debug("Executing statusNotification for {}", chargeBoxIdentity);
-
         // Optional field
         DateTime timestamp = parameters.isSetTimestamp() ? parameters.getTimestamp() : DateTime.now();
 
@@ -121,8 +115,6 @@ public class CentralSystemService16_Service {
     }
 
     public MeterValuesResponse meterValues(MeterValuesRequest parameters, String chargeBoxIdentity) {
-        log.debug("Executing meterValues for {}", chargeBoxIdentity);
-
         if (parameters.isSetMeterValue()) {
             ocppServerRepository.insertMeterValues(chargeBoxIdentity, parameters.getMeterValue(),
                                                    parameters.getConnectorId(), parameters.getTransactionId());
@@ -132,16 +124,12 @@ public class CentralSystemService16_Service {
 
     public DiagnosticsStatusNotificationResponse diagnosticsStatusNotification(
             DiagnosticsStatusNotificationRequest parameters, String chargeBoxIdentity) {
-        log.debug("Executing diagnosticsStatusNotification for {}", chargeBoxIdentity);
-
         String status = parameters.getStatus().value();
         ocppServerRepository.updateChargeboxDiagnosticsStatus(chargeBoxIdentity, status);
         return new DiagnosticsStatusNotificationResponse();
     }
 
     public StartTransactionResponse startTransaction(StartTransactionRequest parameters, String chargeBoxIdentity) {
-        log.debug("Executing startTransaction for {}", chargeBoxIdentity);
-
         InsertTransactionParams params =
                 InsertTransactionParams.builder()
                                        .chargeBoxId(chargeBoxIdentity)
@@ -161,8 +149,6 @@ public class CentralSystemService16_Service {
     }
 
     public StopTransactionResponse stopTransaction(StopTransactionRequest parameters, String chargeBoxIdentity) {
-        log.debug("Executing stopTransaction for {}", chargeBoxIdentity);
-
         int transactionId = parameters.getTransactionId();
         String stopReason = parameters.isSetReason() ? parameters.getReason().value() : null;
 
@@ -191,8 +177,6 @@ public class CentralSystemService16_Service {
     }
 
     public HeartbeatResponse heartbeat(HeartbeatRequest parameters, String chargeBoxIdentity) {
-        log.debug("Executing heartbeat for {}", chargeBoxIdentity);
-
         DateTime now = DateTime.now();
         ocppServerRepository.updateChargeboxHeartbeat(chargeBoxIdentity, now);
 
@@ -200,8 +184,6 @@ public class CentralSystemService16_Service {
     }
 
     public AuthorizeResponse authorize(AuthorizeRequest parameters, String chargeBoxIdentity) {
-        log.debug("Executing authorize for {}", chargeBoxIdentity);
-
         // Get the authorization info of the user
         String idTag = parameters.getIdTag();
         IdTagInfo idTagInfo = ocppTagService.getIdTagInfo(idTag);
@@ -213,8 +195,6 @@ public class CentralSystemService16_Service {
      * Dummy implementation. This is new in OCPP 1.5. It must be vendor-specific.
      */
     public DataTransferResponse dataTransfer(DataTransferRequest parameters, String chargeBoxIdentity) {
-        log.debug("Executing dataTransfer for {}", chargeBoxIdentity);
-
         log.info("[Data Transfer] Charge point: {}, Vendor Id: {}", chargeBoxIdentity, parameters.getVendorId());
         if (parameters.isSetMessageId()) {
             log.info("[Data Transfer] Message Id: {}", parameters.getMessageId());

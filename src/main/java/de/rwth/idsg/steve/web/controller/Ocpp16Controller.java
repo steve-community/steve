@@ -193,7 +193,7 @@ public class Ocpp16Controller
         setChargePointList(model);
         setConfKeys(model);
         model.addAttribute(PARAMS, new GetConfigurationParams());
-        model.addAttribute("ocpp16ConfKeys", ConfigurationKeyEnum.OCPP_15_MAP);
+        model.addAttribute("ocpp16ConfKeys", ConfigurationKeyEnum.OCPP_16_MAP);
         return PREFIX + GET_CONF_PATH;
     }
 

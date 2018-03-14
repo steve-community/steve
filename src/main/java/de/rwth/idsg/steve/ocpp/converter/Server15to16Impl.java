@@ -253,6 +253,9 @@ public enum Server15to16Impl implements Server15to16 {
     // -------------------------------------------------------------------------
 
     private static IdTagInfo toOcpp15IdTagInfo(ocpp.cs._2015._10.IdTagInfo info16) {
+        if (info16 == null) {
+            return null;
+        }
         return new IdTagInfo()
                 .withExpiryDate(info16.getExpiryDate())
                 .withParentIdTag(info16.getParentIdTag())

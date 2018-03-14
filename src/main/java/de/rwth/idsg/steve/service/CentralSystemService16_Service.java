@@ -152,8 +152,8 @@ public class CentralSystemService16_Service {
                                        .reservationId(parameters.getReservationId())
                                        .build();
 
-        IdTagInfo info = ocppTagService.getIdTagInfo(parameters.getIdTag());
         Integer transactionId = ocppServerRepository.insertTransaction(params);
+        IdTagInfo info = ocppTagService.getIdTagInfo(parameters.getIdTag());
 
         return new StartTransactionResponse()
                 .withIdTagInfo(info)

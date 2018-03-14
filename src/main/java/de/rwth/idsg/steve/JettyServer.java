@@ -17,10 +17,11 @@ import org.eclipse.jetty.util.thread.ScheduledExecutorScheduler;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import static de.rwth.idsg.steve.SteveConfiguration.CONFIG;
 
@@ -42,7 +43,7 @@ public class JettyServer {
     /**
      * A fully configured Jetty Server instance
      */
-    public void prepare() throws Exception {
+    private void prepare() {
 
         // === jetty.xml ===
         // Setup Threadpool
@@ -128,6 +129,8 @@ public class JettyServer {
      * Starts the Jetty Server instance
      */
     public void start() throws Exception {
+        prepare();
+
         if (server != null) {
             server.start();
         }
@@ -142,6 +145,12 @@ public class JettyServer {
         }
     }
 
+    public void stop() throws Exception {
+        if (server != null) {
+            server.stop();
+        }
+    }
+
     public boolean isStarted() {
         return server != null && server.isStarted();
     }
@@ -151,15 +160,14 @@ public class JettyServer {
             return Collections.emptyList();
         }
 
-        Connector[] connectors = server.getConnectors();
-        List<String> list = new ArrayList<>(connectors.length);
-        for (Connector c : connectors) {
-            list.add(getConnectorPath((ServerConnector) c));
-        }
-        return list;
+        return Arrays.stream(server.getConnectors())
+                     .map(JettyServer::getConnectorPath)
+                     .collect(Collectors.toList());
     }
 
-    private String getConnectorPath(ServerConnector sc) {
+    private static String getConnectorPath(Connector c) {
+        ServerConnector sc = (ServerConnector) c;
+
         String prefix = "http";
         String host = sc.getHost();
         int port = sc.getPort();

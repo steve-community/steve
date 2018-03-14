@@ -3,16 +3,18 @@ package de.rwth.idsg.steve.web.controller;
 import de.rwth.idsg.steve.repository.OcppTagRepository;
 import de.rwth.idsg.steve.service.ChargePointHelperService;
 import de.rwth.idsg.steve.service.ChargePointService12_Client;
-import de.rwth.idsg.steve.web.dto.common.GetDiagnosticsParams;
-import de.rwth.idsg.steve.web.dto.common.MultipleChargePointSelect;
-import de.rwth.idsg.steve.web.dto.common.RemoteStartTransactionParams;
-import de.rwth.idsg.steve.web.dto.common.RemoteStopTransactionParams;
-import de.rwth.idsg.steve.web.dto.common.UnlockConnectorParams;
-import de.rwth.idsg.steve.web.dto.common.UpdateFirmwareParams;
-import de.rwth.idsg.steve.web.dto.ocpp12.ChangeAvailabilityParams;
-import de.rwth.idsg.steve.web.dto.ocpp12.ChangeConfigurationParams;
-import de.rwth.idsg.steve.web.dto.ocpp12.ResetParams;
+import de.rwth.idsg.steve.web.dto.ocpp.ChangeAvailabilityParams;
+import de.rwth.idsg.steve.web.dto.ocpp.ChangeConfigurationParams;
+import de.rwth.idsg.steve.web.dto.ocpp.ConfigurationKeyEnum;
+import de.rwth.idsg.steve.web.dto.ocpp.GetDiagnosticsParams;
+import de.rwth.idsg.steve.web.dto.ocpp.MultipleChargePointSelect;
+import de.rwth.idsg.steve.web.dto.ocpp.RemoteStartTransactionParams;
+import de.rwth.idsg.steve.web.dto.ocpp.RemoteStopTransactionParams;
+import de.rwth.idsg.steve.web.dto.ocpp.ResetParams;
+import de.rwth.idsg.steve.web.dto.ocpp.UnlockConnectorParams;
+import de.rwth.idsg.steve.web.dto.ocpp.UpdateFirmwareParams;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -32,7 +34,10 @@ public class Ocpp12Controller {
 
     @Autowired private ChargePointHelperService chargePointHelperService;
     @Autowired private OcppTagRepository ocppTagRepository;
-    @Autowired private ChargePointService12_Client client;
+
+    @Autowired
+    @Qualifier("ChargePointService12_Client")
+    private ChargePointService12_Client client;
 
     private static final String PARAMS = "params";
 
@@ -85,6 +90,7 @@ public class Ocpp12Controller {
     public String getChangeConf(Model model) {
         setChargePointList(model);
         model.addAttribute(PARAMS, new ChangeConfigurationParams());
+        model.addAttribute("ocpp12ConfKeys", ConfigurationKeyEnum.OCPP_12_MAP);
         return PREFIX + CHANGE_CONF_PATH;
     }
 

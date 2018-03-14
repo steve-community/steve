@@ -2,7 +2,6 @@ package de.rwth.idsg.steve;
 
 import de.rwth.idsg.steve.utils.LogFileRetriever;
 import lombok.extern.slf4j.Slf4j;
-import org.joda.time.DateTime;
 
 import java.util.Iterator;
 import java.util.List;
@@ -23,17 +22,18 @@ public class SteveProdStarter implements ApplicationStarter {
     private static final String HINT = "Hint: You can stop the application by pressing CTRL+C" + sep();
     private static final String REFER = "Please refer to the log file for details";
 
-    private JettyServer jettyServer;
+    private final JettyServer jettyServer;
     private Thread dotThread;
+
+    SteveProdStarter() {
+        this.jettyServer = new JettyServer();
+    }
 
     @Override
     public void start() throws Exception {
-
         starting();
-        jettyServer = new JettyServer();
 
         try {
-            jettyServer.prepare();
             jettyServer.start();
             started();
 
@@ -50,8 +50,16 @@ public class SteveProdStarter implements ApplicationStarter {
                 throw e;
             }
         }
+    }
 
+    @Override
+    public void join() throws Exception {
         jettyServer.join();
+    }
+
+    @Override
+    public void stop() throws Exception {
+        jettyServer.stop();
     }
 
     // -------------------------------------------------------------------------

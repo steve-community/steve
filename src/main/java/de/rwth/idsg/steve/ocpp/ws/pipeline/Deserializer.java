@@ -5,6 +5,7 @@ import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.rwth.idsg.steve.SteveException;
+import de.rwth.idsg.steve.ocpp.ws.JsonObjectMapper;
 import de.rwth.idsg.steve.ocpp.RequestType;
 import de.rwth.idsg.steve.ocpp.ResponseType;
 import de.rwth.idsg.steve.ocpp.ws.ErrorFactory;
@@ -21,6 +22,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
+import java.util.function.Consumer;
 
 /**
  * Incoming String --> OcppJsonMessage
@@ -30,8 +32,10 @@ import java.io.IOException;
  */
 @Slf4j
 @RequiredArgsConstructor
-public class Deserializer implements Stage {
-    private final ObjectMapper mapper;
+public class Deserializer implements Consumer<CommunicationContext> {
+
+    private final ObjectMapper mapper = JsonObjectMapper.INSTANCE.getMapper();
+
     private final FutureResponseContextStore futureResponseContextStore;
     private final TypeStore typeStore;
 
@@ -40,7 +44,7 @@ public class Deserializer implements Stage {
      * and build, if any, a corresponding error message.
      */
     @Override
-    public void process(CommunicationContext context) {
+    public void accept(CommunicationContext context) {
         try (JsonParser parser = mapper.getFactory().createParser(context.getIncomingString())) {
             parser.nextToken(); // set cursor to '['
 
@@ -145,7 +149,7 @@ public class Deserializer implements Stage {
         result.setPayload(res);
 
         context.setIncomingMessage(result);
-        context.setHandler(responseContext.getHandler());
+        context.createResultHandler(responseContext.getTask());
     }
 
     /**
@@ -193,6 +197,6 @@ public class Deserializer implements Stage {
         error.setErrorDetails(details);
 
         context.setIncomingMessage(error);
-        context.setHandler(responseContext.getHandler());
+        context.createErrorHandler(responseContext.getTask());
     }
 }

@@ -818,7 +818,7 @@ This document is made available under the Creative Commons Attribution-NoDerivat
 	<wsdl:service name="CentralSystemService">
 		<wsdl:documentation>The Central System Service for the Open Charge Point Protocol</wsdl:documentation>
 		<wsdl:port name="CentralSystemServiceSoap12" binding="tns:CentralSystemServiceSoap">
-			<soap12:address location="http://localhost:8080/steve/services/CentralSystemServiceOCPP16"/>
+			<soap12:address location="http://localhost/Ocpp/CentralSystemService/"/>
 		</wsdl:port>
 	</wsdl:service>
 

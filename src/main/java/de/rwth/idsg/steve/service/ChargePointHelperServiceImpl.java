@@ -3,6 +3,7 @@ package de.rwth.idsg.steve.service;
 import de.rwth.idsg.steve.ocpp.OcppProtocol;
 import de.rwth.idsg.steve.ocpp.OcppTransport;
 import de.rwth.idsg.steve.ocpp.OcppVersion;
+import de.rwth.idsg.steve.ocpp.ws.AbstractWebSocketEndpoint;
 import de.rwth.idsg.steve.ocpp.ws.data.SessionContext;
 import de.rwth.idsg.steve.ocpp.ws.ocpp12.Ocpp12WebSocketEndpoint;
 import de.rwth.idsg.steve.ocpp.ws.ocpp15.Ocpp15WebSocketEndpoint;
@@ -20,9 +21,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Deque;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
@@ -60,7 +65,8 @@ public class ChargePointHelperServiceImpl implements ChargePointHelperService {
         Map<String, Deque<SessionContext>> ocpp15Map = ocpp15WebSocketEndpoint.getACopy();
         Map<String, Deque<SessionContext>> ocpp16Map = ocpp16WebSocketEndpoint.getACopy();
 
-        Map<String, Integer> primaryKeyLookup = getPrimaryKeyLookup(ocpp12Map, ocpp15Map, ocpp16Map);
+        List<String> idList = extractIds(Arrays.asList(ocpp12Map, ocpp15Map, ocpp16Map));
+        Map<String, Integer> primaryKeyLookup = chargePointRepository.getChargeBoxIdPkPair(idList);
 
         DateTime now = DateTime.now();
         List<OcppJsonStatus> returnList = new ArrayList<>();
@@ -73,47 +79,36 @@ public class ChargePointHelperServiceImpl implements ChargePointHelperService {
 
     @Override
     public List<ChargePointSelect> getChargePointsV12() {
-        List<ChargePointSelect> returnList = chargePointRepository.getChargePointSelect(OcppProtocol.V_12_SOAP);
-
-        for (String chargeBoxId : ocpp12WebSocketEndpoint.getChargeBoxIdList()) {
-            returnList.add(new ChargePointSelect(OcppTransport.JSON, chargeBoxId));
-        }
-        return returnList;
+        return getChargePoints(OcppProtocol.V_12_SOAP, ocpp12WebSocketEndpoint);
     }
 
     @Override
     public List<ChargePointSelect> getChargePointsV15() {
-        List<ChargePointSelect> returnList = chargePointRepository.getChargePointSelect(OcppProtocol.V_15_SOAP);
-
-        for (String chargeBoxId : ocpp15WebSocketEndpoint.getChargeBoxIdList()) {
-            returnList.add(new ChargePointSelect(OcppTransport.JSON, chargeBoxId));
-        }
-        return returnList;
+        return getChargePoints(OcppProtocol.V_15_SOAP, ocpp15WebSocketEndpoint);
     }
-    
+
     @Override
     public List<ChargePointSelect> getChargePointsV16() {
-        List<ChargePointSelect> returnList = chargePointRepository.getChargePointSelect(OcppProtocol.V_16_SOAP);
-
-        for (String chargeBoxId : ocpp16WebSocketEndpoint.getChargeBoxIdList()) {
-            returnList.add(new ChargePointSelect(OcppTransport.JSON, chargeBoxId));
-        }
-        return returnList;
+        return getChargePoints(OcppProtocol.V_16_SOAP, ocpp16WebSocketEndpoint);
     }
 
     // -------------------------------------------------------------------------
     // Helpers
     // -------------------------------------------------------------------------
 
-    private Map<String, Integer> getPrimaryKeyLookup(Map<String, Deque<SessionContext>> ocpp12Map,
-                                                     Map<String, Deque<SessionContext>> ocpp15Map,
-                                                     Map<String, Deque<SessionContext>> ocpp16Map) {
+    private List<ChargePointSelect> getChargePoints(OcppProtocol forSoap, AbstractWebSocketEndpoint jsonEndpoint) {
+        List<ChargePointSelect> returnList = chargePointRepository.getChargePointSelect(forSoap);
+        for (String chargeBoxId : jsonEndpoint.getChargeBoxIdList()) {
+            returnList.add(new ChargePointSelect(OcppTransport.JSON, chargeBoxId));
+        }
+        return returnList;
+    }
 
-        ArrayList<String> idList = new ArrayList<>(ocpp12Map.keySet());
-        idList.addAll(ocpp15Map.keySet());
-        idList.addAll(ocpp16Map.keySet());
-
-        return chargePointRepository.getChargeBoxIdPkPair(idList);
+    private static List<String> extractIds(List<Map<String, Deque<SessionContext>>> ocppMaps) {
+        return ocppMaps.stream()
+                       .map(Map::keySet)
+                       .flatMap(Collection::stream)
+                       .collect(Collectors.toList());
     }
 
     private static void appendList(Map<String, Deque<SessionContext>> map, List<OcppJsonStatus> returnList,

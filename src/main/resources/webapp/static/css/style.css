@@ -278,12 +278,6 @@ ul.navigation ul li a {
 	padding: 0 0 0 12px;
 	border-left: 1px solid #CCC;
 }
-.op16-content {
-	min-height: 600px;
-	margin: 0 0 0 180px;
-	padding: 0 0 0 12px;
-	border-left: 1px solid #CCC;
-}
 .main { height: auto; min-height: 100%; }
 .main-wrapper {
 	padding-bottom: 70px;
@@ -416,7 +410,7 @@ span.baseCell {
 	display: table-cell; 
 }
 span.baseCell:first-child {
-	width:50%;  
+	width:62%;
 	text-align: right; 
 }
 span.baseCell:nth-child(2) {

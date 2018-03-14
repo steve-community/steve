@@ -3,22 +3,23 @@ package de.rwth.idsg.steve.web.controller;
 import de.rwth.idsg.steve.repository.OcppTagRepository;
 import de.rwth.idsg.steve.service.ChargePointHelperService;
 import de.rwth.idsg.steve.service.ChargePointService15_Client;
-import de.rwth.idsg.steve.web.dto.common.GetDiagnosticsParams;
-import de.rwth.idsg.steve.web.dto.common.MultipleChargePointSelect;
-import de.rwth.idsg.steve.web.dto.common.RemoteStartTransactionParams;
-import de.rwth.idsg.steve.web.dto.common.RemoteStopTransactionParams;
-import de.rwth.idsg.steve.web.dto.common.UnlockConnectorParams;
-import de.rwth.idsg.steve.web.dto.common.UpdateFirmwareParams;
-import de.rwth.idsg.steve.web.dto.ocpp15.CancelReservationParams;
-import de.rwth.idsg.steve.web.dto.ocpp15.ChangeAvailabilityParams;
-import de.rwth.idsg.steve.web.dto.ocpp15.ChangeConfigurationParams;
-import de.rwth.idsg.steve.web.dto.ocpp15.ConfigurationKeyEnum;
-import de.rwth.idsg.steve.web.dto.ocpp15.DataTransferParams;
-import de.rwth.idsg.steve.web.dto.ocpp15.GetConfigurationParams;
-import de.rwth.idsg.steve.web.dto.ocpp15.ReserveNowParams;
-import de.rwth.idsg.steve.web.dto.ocpp15.ResetParams;
-import de.rwth.idsg.steve.web.dto.ocpp15.SendLocalListParams;
+import de.rwth.idsg.steve.web.dto.ocpp.CancelReservationParams;
+import de.rwth.idsg.steve.web.dto.ocpp.ChangeAvailabilityParams;
+import de.rwth.idsg.steve.web.dto.ocpp.ChangeConfigurationParams;
+import de.rwth.idsg.steve.web.dto.ocpp.ConfigurationKeyEnum;
+import de.rwth.idsg.steve.web.dto.ocpp.DataTransferParams;
+import de.rwth.idsg.steve.web.dto.ocpp.GetConfigurationParams;
+import de.rwth.idsg.steve.web.dto.ocpp.GetDiagnosticsParams;
+import de.rwth.idsg.steve.web.dto.ocpp.MultipleChargePointSelect;
+import de.rwth.idsg.steve.web.dto.ocpp.RemoteStartTransactionParams;
+import de.rwth.idsg.steve.web.dto.ocpp.RemoteStopTransactionParams;
+import de.rwth.idsg.steve.web.dto.ocpp.ReserveNowParams;
+import de.rwth.idsg.steve.web.dto.ocpp.ResetParams;
+import de.rwth.idsg.steve.web.dto.ocpp.SendLocalListParams;
+import de.rwth.idsg.steve.web.dto.ocpp.UnlockConnectorParams;
+import de.rwth.idsg.steve.web.dto.ocpp.UpdateFirmwareParams;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -38,7 +39,10 @@ public class Ocpp15Controller {
 
     @Autowired private ChargePointHelperService chargePointHelperService;
     @Autowired private OcppTagRepository ocppTagRepository;
-    @Autowired private ChargePointService15_Client client;
+
+    @Autowired
+    @Qualifier("ChargePointService15_Client")
+    private ChargePointService15_Client client;
 
     private static final String PARAMS = "params";
 
@@ -106,6 +110,7 @@ public class Ocpp15Controller {
     public String getChangeConf(Model model) {
         setChargePointList(model);
         model.addAttribute(PARAMS, new ChangeConfigurationParams());
+        model.addAttribute("ocpp15ConfKeys", ConfigurationKeyEnum.OCPP_15_MAP);
         return PREFIX + CHANGE_CONF_PATH;
     }
 
@@ -186,6 +191,7 @@ public class Ocpp15Controller {
         setChargePointList(model);
         setConfKeys(model);
         model.addAttribute(PARAMS, new GetConfigurationParams());
+        model.addAttribute("ocpp15ConfKeys", ConfigurationKeyEnum.OCPP_15_MAP);
         return PREFIX + GET_CONF_PATH;
     }
 

@@ -69,9 +69,8 @@ public final class LogFileRetriever {
      * Clearly, the only sane solution is rolling the dice.
      * Easter egg mode: On
      */
-    private Path rollTheDice()
-    {
-        log.trace("Rolling the dice..."); //Probably will lose all my money...
+    private Path rollTheDice() {
+        log.trace("Rolling the dice...");
         int index = random.nextInt(logPathList.size());
         return logPathList.get(index);
     }

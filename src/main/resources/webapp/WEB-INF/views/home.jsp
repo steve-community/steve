@@ -60,7 +60,7 @@
 		<span class="baseTable">
 			<c:forEach items="${stats.statusCountMap}" var="it">
 				<span class="baseRow">
-					<span class="baseCell">${it.key.value()} :</span>
+					<span class="baseCell">${it.key} :</span>
 					<span class="baseCell formatNumber">${it.value}</span>
 				</span>
 			</c:forEach>

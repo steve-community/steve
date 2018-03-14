@@ -10,7 +10,7 @@ import lombok.RequiredArgsConstructor;
  */
 @Getter
 @RequiredArgsConstructor
-public class ActionResponsePair {
+public final class ActionResponsePair {
     private final String action;
     private final Class<? extends ResponseType> responseClass;
 }

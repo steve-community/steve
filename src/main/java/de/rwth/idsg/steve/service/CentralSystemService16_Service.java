@@ -1,10 +1,4 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package de.rwth.idsg.steve.service;
-
 
 import de.rwth.idsg.steve.ocpp.OcppProtocol;
 import de.rwth.idsg.steve.repository.OcppServerRepository;
@@ -14,26 +8,45 @@ import de.rwth.idsg.steve.repository.dto.InsertTransactionParams;
 import de.rwth.idsg.steve.repository.dto.UpdateChargeboxParams;
 import de.rwth.idsg.steve.repository.dto.UpdateTransactionParams;
 import lombok.extern.slf4j.Slf4j;
-import ocpp.cs._2015._10.*;
+import ocpp.cs._2015._10.AuthorizeRequest;
+import ocpp.cs._2015._10.AuthorizeResponse;
+import ocpp.cs._2015._10.BootNotificationRequest;
+import ocpp.cs._2015._10.BootNotificationResponse;
+import ocpp.cs._2015._10.ChargePointStatus;
+import ocpp.cs._2015._10.DataTransferRequest;
+import ocpp.cs._2015._10.DataTransferResponse;
+import ocpp.cs._2015._10.DataTransferStatus;
+import ocpp.cs._2015._10.DiagnosticsStatusNotificationRequest;
+import ocpp.cs._2015._10.DiagnosticsStatusNotificationResponse;
+import ocpp.cs._2015._10.FirmwareStatusNotificationRequest;
+import ocpp.cs._2015._10.FirmwareStatusNotificationResponse;
+import ocpp.cs._2015._10.HeartbeatRequest;
+import ocpp.cs._2015._10.HeartbeatResponse;
+import ocpp.cs._2015._10.IdTagInfo;
+import ocpp.cs._2015._10.MeterValuesRequest;
+import ocpp.cs._2015._10.MeterValuesResponse;
+import ocpp.cs._2015._10.RegistrationStatus;
+import ocpp.cs._2015._10.StartTransactionRequest;
+import ocpp.cs._2015._10.StartTransactionResponse;
+import ocpp.cs._2015._10.StatusNotificationRequest;
+import ocpp.cs._2015._10.StatusNotificationResponse;
+import ocpp.cs._2015._10.StopTransactionRequest;
+import ocpp.cs._2015._10.StopTransactionResponse;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
 /**
- *
- * @author david
+ * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
+ * @since 13.03.2018
  */
-
 @Slf4j
 @Service
-public class CentralSystemService16_Service 
-{
+public class CentralSystemService16_Service {
+
     @Autowired private OcppServerRepository ocppServerRepository;
-    @Autowired private OcppTagService ocppTagService;
     @Autowired private SettingsRepository settingsRepository;
+    @Autowired private OcppTagService ocppTagService;
     @Autowired private NotificationService notificationService;
 
     public BootNotificationResponse bootNotification(BootNotificationRequest parameters, String chargeBoxIdentity,
@@ -110,11 +123,9 @@ public class CentralSystemService16_Service
     public MeterValuesResponse meterValues(MeterValuesRequest parameters, String chargeBoxIdentity) {
         log.debug("Executing meterValues for {}", chargeBoxIdentity);
 
-        int connectorId = parameters.getConnectorId();
-        Integer transactionId = parameters.getTransactionId();
         if (parameters.isSetMeterValue()) {
-            ocppServerRepository.insertMeterValues16(chargeBoxIdentity, connectorId,
-                                                     parameters.getMeterValue(), transactionId);
+            ocppServerRepository.insertMeterValues(chargeBoxIdentity, parameters.getMeterValue(),
+                                                   parameters.getConnectorId(), parameters.getTransactionId());
         }
         return new MeterValuesResponse();
     }
@@ -141,7 +152,7 @@ public class CentralSystemService16_Service
                                        .reservationId(parameters.getReservationId())
                                        .build();
 
-        IdTagInfo info = ocppTagService.getIdTagInfoV16(parameters.getIdTag());
+        IdTagInfo info = ocppTagService.getIdTagInfo(parameters.getIdTag());
         Integer transactionId = ocppServerRepository.insertTransaction(params);
 
         return new StartTransactionResponse()
@@ -153,6 +164,7 @@ public class CentralSystemService16_Service
         log.debug("Executing stopTransaction for {}", chargeBoxIdentity);
 
         int transactionId = parameters.getTransactionId();
+        String stopReason = parameters.isSetReason() ? parameters.getReason().value() : null;
 
         UpdateTransactionParams params =
                 UpdateTransactionParams.builder()
@@ -160,32 +172,18 @@ public class CentralSystemService16_Service
                                        .transactionId(transactionId)
                                        .stopTimestamp(parameters.getTimestamp())
                                        .stopMeterValue(Integer.toString(parameters.getMeterStop()))
+                                       .stopReason(stopReason)
                                        .build();
 
         ocppServerRepository.updateTransaction(params);
 
-        /**
-         * If TransactionData is included:
-         *
-         * Aggregate MeterValues from multiple TransactionData in one big, happy list. TransactionData is just
-         * a container for MeterValues without any additional data/semantics anyway. This enables us to write
-         * into DB in one repository call (query), rather than multiple calls as it was before
-         * (for each TransactionData)
-         *
-         * Saved the world again with this micro-optimization.
-         */
         if (parameters.isSetTransactionData()) {
-            List<MeterValue> combinedList = parameters.getTransactionData();
-            combinedList.stream()
-                    .flatMap(data2 -> data2.getSampledValue().stream())
-                    .collect(Collectors.toList());
-            
-            ocppServerRepository.insertMeterValuesOfTransaction16(chargeBoxIdentity, transactionId, combinedList);
+            ocppServerRepository.insertMeterValues(chargeBoxIdentity, parameters.getTransactionData(), transactionId);
         }
 
         // Get the authorization info of the user
         if (parameters.isSetIdTag()) {
-            IdTagInfo idTagInfo = ocppTagService.getIdTagInfoV16(parameters.getIdTag());
+            IdTagInfo idTagInfo = ocppTagService.getIdTagInfo(parameters.getIdTag());
             return new StopTransactionResponse().withIdTagInfo(idTagInfo);
         } else {
             return new StopTransactionResponse();
@@ -206,12 +204,14 @@ public class CentralSystemService16_Service
 
         // Get the authorization info of the user
         String idTag = parameters.getIdTag();
-        IdTagInfo idTagInfo = ocppTagService.getIdTagInfoV16(idTag);
+        IdTagInfo idTagInfo = ocppTagService.getIdTagInfo(idTag);
 
         return new AuthorizeResponse().withIdTagInfo(idTagInfo);
     }
 
-    // Dummy implementation. This is new in OCPP 1.5. It must be vendor-specific.
+    /**
+     * Dummy implementation. This is new in OCPP 1.5. It must be vendor-specific.
+     */
     public DataTransferResponse dataTransfer(DataTransferRequest parameters, String chargeBoxIdentity) {
         log.debug("Executing dataTransfer for {}", chargeBoxIdentity);
 
@@ -222,7 +222,9 @@ public class CentralSystemService16_Service
         if (parameters.isSetData()) {
             log.info("[Data Transfer] Data: {}", parameters.getData());
         }
-        //Temporary fix for OccurenceConstraintViolation will always return ACCEPTED
+
+        // OCPP requires a status to be set. Since this is a dummy impl, set it to "Accepted".
+        // https://github.com/RWTH-i5-IDSG/steve/pull/36
         return new DataTransferResponse().withStatus(DataTransferStatus.ACCEPTED);
     }
 }

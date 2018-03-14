@@ -132,7 +132,7 @@ public enum Server15to16Impl implements Server15to16 {
                 .withMeterStop(request.getMeterStop())
                 .withTimestamp(request.getTimestamp())
                 .withTransactionId(request.getTransactionId())
-                .withTransactionData(toOcpp15TransactionData(request.getTransactionData()));
+                .withTransactionData(toOcpp16TransactionData(request.getTransactionData()));
     }
 
     @Override
@@ -191,14 +191,14 @@ public enum Server15to16Impl implements Server15to16 {
     @Override
     public StartTransactionResponse convertResponse(ocpp.cs._2015._10.StartTransactionResponse response) {
         return new StartTransactionResponse()
-                .withIdTagInfo(convertIdTagInfo16to15(response.getIdTagInfo()))
+                .withIdTagInfo(toOcpp15IdTagInfo(response.getIdTagInfo()))
                 .withTransactionId(response.getTransactionId());
     }
 
     @Override
     public StopTransactionResponse convertResponse(ocpp.cs._2015._10.StopTransactionResponse response) {
         return new StopTransactionResponse()
-                .withIdTagInfo(convertIdTagInfo16to15(response.getIdTagInfo()));
+                .withIdTagInfo(toOcpp15IdTagInfo(response.getIdTagInfo()));
     }
 
     @Override
@@ -210,7 +210,7 @@ public enum Server15to16Impl implements Server15to16 {
     @Override
     public AuthorizeResponse convertResponse(ocpp.cs._2015._10.AuthorizeResponse response) {
         return new AuthorizeResponse()
-                .withIdTagInfo(convertIdTagInfo16to15(response.getIdTagInfo()));
+                .withIdTagInfo(toOcpp15IdTagInfo(response.getIdTagInfo()));
     }
 
     @Override
@@ -252,7 +252,7 @@ public enum Server15to16Impl implements Server15to16 {
     // Helpers
     // -------------------------------------------------------------------------
 
-    private static IdTagInfo convertIdTagInfo16to15(ocpp.cs._2015._10.IdTagInfo info16) {
+    private static IdTagInfo toOcpp15IdTagInfo(ocpp.cs._2015._10.IdTagInfo info16) {
         return new IdTagInfo()
                 .withExpiryDate(info16.getExpiryDate())
                 .withParentIdTag(info16.getParentIdTag())
@@ -280,7 +280,7 @@ public enum Server15to16Impl implements Server15to16 {
                                .withSampledValue(toOcpp16SampledValueList(e.getValue()));
     }
 
-    private static List<MeterValue> toOcpp15TransactionData(List<TransactionData> transactionData) {
+    private static List<MeterValue> toOcpp16TransactionData(List<TransactionData> transactionData) {
         List<ocpp.cs._2012._06.MeterValue> combinedList = transactionData.stream()
                                                                          .flatMap(data -> data.getValues().stream())
                                                                          .collect(Collectors.toList());

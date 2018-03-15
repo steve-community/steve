@@ -22,21 +22,6 @@
 </ul>
 </div>
 <div class="op15-content">
-<form:form action="${ctxPath}/manager/operations/v1.5/ChangeAvailability" modelAttribute="params">
-    <section><span>Charge Points with OCPP v1.5</span></section>
-    <%@ include file="../00-cp-multiple.jsp" %>
-    <section><span>Parameters</span></section>
-    <table class="userInput">
-    <tr><td>Connector ID (integer):</td><td><form:input path="connectorId" placeholder="if empty, 0 = charge point as a whole" /></td></tr>
-    <tr>
-        <td>Availability Type:</td>
-        <td><form:select path="availType">
-            <form:options items="${availType}" />
-        </form:select>
-        </td>
-    </tr>
-    </table>
-    <div class="submit-button"><input type="submit" value="Perform"></div>
-</form:form>
+    <%@ include file="../op-forms/ChangeAvailabilityForm.jsp" %>
 </div></div>
 <%@ include file="../00-footer.jsp" %>

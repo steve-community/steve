@@ -20,14 +20,6 @@
 </ul>
 </div>
 <div class="op-content">
-<form:form action="${ctxPath}/manager/operations/v1.2/RemoteStopTransaction" modelAttribute="params">
-    <section><span>Charge Points with OCPP v1.2</span></section>
-    <%@ include file="../00-cp-single.jsp" %>
-    <section><span>Parameters</span></section>
-    <table class="userInput">
-    <tr><td>ID of the Active Transaction:</td><td><form:select path="transactionId" disabled="true" /></td></tr>
-    </table>
-    <div class="submit-button"><input type="submit" value="Perform"></div>
-</form:form>
+	<%@ include file="../op-forms/RemoteStopTransactionForm.jsp" %>
 </div></div>
 <%@ include file="../00-footer.jsp" %>

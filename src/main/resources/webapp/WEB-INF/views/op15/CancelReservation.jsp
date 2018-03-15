@@ -27,14 +27,6 @@
 </ul>
 </div>
 <div class="op15-content">
-<form:form action="${ctxPath}/manager/operations/v1.5/CancelReservation" modelAttribute="params">
-    <section><span>Charge Points with OCPP v1.5</span></section>
-    <%@ include file="../00-cp-single.jsp" %>
-    <section><span>Parameters</span></section>
-    <table class="userInput">
-    <tr><td>ID of the Existing Reservation:</td><td><form:select path="reservationId" disabled="true" /></td></tr>
-    </table>
-    <div class="submit-button"><input type="submit" value="Perform"></div>
-</form:form>
+	<%@ include file="../op-forms/CancelReservationForm.jsp" %>
 </div></div>
 <%@ include file="../00-footer.jsp" %>

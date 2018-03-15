@@ -68,6 +68,7 @@ public class Ocpp12Controller {
 
     protected void setChargePointList(Model model) {
         model.addAttribute("cpList", chargePointHelperService.getChargePointsV12());
+        model.addAttribute("opVersion", "v1.2");
     }
 
     protected Map<String, String> getConfigurationKeys() {

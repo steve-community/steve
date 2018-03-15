@@ -60,6 +60,7 @@ public class Ocpp15Controller extends Ocpp12Controller {
     @Override
     protected void setChargePointList(Model model) {
         model.addAttribute("cpList", chargePointHelperService.getChargePointsV15());
+        model.addAttribute("opVersion", "v1.5");
     }
 
     @Override

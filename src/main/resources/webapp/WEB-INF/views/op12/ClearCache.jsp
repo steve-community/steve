@@ -15,11 +15,6 @@
 </ul>
 </div>
 <div class="op-content">
-<form:form action="${ctxPath}/manager/operations/v1.2/ClearCache" modelAttribute="params">
-    <section><span>Charge Points with OCPP v1.2</span></section>
-    <%@ include file="../00-cp-multiple.jsp" %>
-    <section><span>Parameters</span></section>
-    <center><i>No parameters required.</i></center><div class="submit-button"><input type="submit" value="Perform"></div>
-</form:form>
+	<%@ include file="../op-forms/ClearCacheForm.jsp" %>
 </div></div>
 <%@ include file="../00-footer.jsp" %>

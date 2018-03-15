@@ -22,16 +22,6 @@
 </ul>
 </div>
 <div class="op15-content">
-<form:form action="${ctxPath}/manager/operations/v1.5/DataTransfer" modelAttribute="params">
-    <section><span>Charge Points with OCPP v1.5</span></section>
-    <%@ include file="../00-cp-multiple.jsp" %>
-    <section><span>Parameters</span></section>
-    <table class="userInput">
-    <tr><td>Vendor ID (String):</td><td><form:input path="vendorId" /></td></tr>
-    <tr><td>Message ID (String):</td><td><form:input path="messageId" placeholder="optional" /></td></tr>
-    <tr><td>Data (Text):</td><td><form:input path="data" placeholder="optional" /></td></tr>
-    </table>
-    <div class="submit-button"><input type="submit" value="Perform"></div>
-</form:form>
+	<%@ include file="../op-forms/DataTransferForm.jsp" %>
 </div></div>
 <%@ include file="../00-footer.jsp" %>

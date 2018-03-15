@@ -43,7 +43,7 @@
             <td>Configuration Key:</td>
             <td>
                 <form:select path="confKey">
-                    <form:options items="${ocpp15ConfKeys}"/>
+                    <form:options items="${ocppConfKeys}"/>
                 </form:select>
             </td>
         </tr>

@@ -33,14 +33,14 @@ import java.util.Map;
 @RequestMapping(value = "/manager/operations/v1.2")
 public class Ocpp12Controller {
 
-    @Autowired private ChargePointHelperService chargePointHelperService;
-    @Autowired private OcppTagRepository ocppTagRepository;
+    @Autowired protected ChargePointHelperService chargePointHelperService;
+    @Autowired protected OcppTagRepository ocppTagRepository;
 
     @Autowired
     @Qualifier("ChargePointService12_Client")
-    private ChargePointService12_Client client;
+    private ChargePointService12_Client client12;
 
-    private static final String PARAMS = "params";
+    protected static final String PARAMS = "params";
 
     // -------------------------------------------------------------------------
     // Paths
@@ -56,22 +56,18 @@ public class Ocpp12Controller {
     private static final String UNLOCK_CON_PATH = "/UnlockConnector";
     private static final String UPDATE_FIRM_PATH = "/UpdateFirmware";
 
-    private static final String REDIRECT_TASKS_PATH = "redirect:/manager/operations/tasks/";
+    protected static final String REDIRECT_TASKS_PATH = "redirect:/manager/operations/tasks/";
 
     // -------------------------------------------------------------------------
     // Helpers
     // -------------------------------------------------------------------------
 
-    protected ChargePointService12_Client getClient() {
-        return client;
+    protected ChargePointService12_Client getClient12() {
+        return client12;
     }
 
     protected void setChargePointList(Model model) {
         model.addAttribute("cpList", chargePointHelperService.getChargePointsV12());
-    }
-
-    protected void setActiveUserIdTagList(Model model) {
-        model.addAttribute("idTagList", ocppTagRepository.getActiveIdTags());
     }
 
     protected Map<String, String> getConfigurationKeys() {
@@ -84,6 +80,10 @@ public class Ocpp12Controller {
 
     protected String getPrefix() {
         return "op12";
+    }
+
+    protected void setActiveUserIdTagList(Model model) {
+        model.addAttribute("idTagList", ocppTagRepository.getActiveIdTags());
     }
 
     // -------------------------------------------------------------------------
@@ -171,7 +171,7 @@ public class Ocpp12Controller {
             setChargePointList(model);
             return getPrefix() + CHANGE_AVAIL_PATH;
         }
-        return REDIRECT_TASKS_PATH + client.changeAvailability(params);
+        return REDIRECT_TASKS_PATH + getClient12().changeAvailability(params);
     }
 
     @RequestMapping(value = CHANGE_CONF_PATH, method = RequestMethod.POST)
@@ -181,7 +181,7 @@ public class Ocpp12Controller {
             setChargePointList(model);
             return getPrefix() + CHANGE_CONF_PATH;
         }
-        return REDIRECT_TASKS_PATH + getClient().changeConfiguration(params);
+        return REDIRECT_TASKS_PATH + getClient12().changeConfiguration(params);
     }
 
     @RequestMapping(value = CLEAR_CACHE_PATH, method = RequestMethod.POST)
@@ -191,7 +191,7 @@ public class Ocpp12Controller {
             setChargePointList(model);
             return getPrefix() + CLEAR_CACHE_PATH;
         }
-        return REDIRECT_TASKS_PATH + getClient().clearCache(params);
+        return REDIRECT_TASKS_PATH + getClient12().clearCache(params);
     }
 
     @RequestMapping(value = GET_DIAG_PATH, method = RequestMethod.POST)
@@ -201,7 +201,7 @@ public class Ocpp12Controller {
             setChargePointList(model);
             return getPrefix() + GET_DIAG_PATH;
         }
-        return REDIRECT_TASKS_PATH + getClient().getDiagnostics(params);
+        return REDIRECT_TASKS_PATH + getClient12().getDiagnostics(params);
     }
 
     @RequestMapping(value = REMOTE_START_TX_PATH, method = RequestMethod.POST)
@@ -212,7 +212,7 @@ public class Ocpp12Controller {
             setActiveUserIdTagList(model);
             return getPrefix() + REMOTE_START_TX_PATH;
         }
-        return REDIRECT_TASKS_PATH + getClient().remoteStartTransaction(params);
+        return REDIRECT_TASKS_PATH + getClient12().remoteStartTransaction(params);
     }
 
     @RequestMapping(value = REMOTE_STOP_TX_PATH, method = RequestMethod.POST)
@@ -222,7 +222,7 @@ public class Ocpp12Controller {
             setChargePointList(model);
             return getPrefix() + REMOTE_STOP_TX_PATH;
         }
-        return REDIRECT_TASKS_PATH + getClient().remoteStopTransaction(params);
+        return REDIRECT_TASKS_PATH + getClient12().remoteStopTransaction(params);
     }
 
     @RequestMapping(value = RESET_PATH, method = RequestMethod.POST)
@@ -232,7 +232,7 @@ public class Ocpp12Controller {
             setChargePointList(model);
             return getPrefix() + RESET_PATH;
         }
-        return REDIRECT_TASKS_PATH + getClient().reset(params);
+        return REDIRECT_TASKS_PATH + getClient12().reset(params);
     }
 
     @RequestMapping(value = UNLOCK_CON_PATH, method = RequestMethod.POST)
@@ -242,7 +242,7 @@ public class Ocpp12Controller {
             setChargePointList(model);
             return getPrefix() + UNLOCK_CON_PATH;
         }
-        return REDIRECT_TASKS_PATH + getClient().unlockConnector(params);
+        return REDIRECT_TASKS_PATH + getClient12().unlockConnector(params);
     }
 
     @RequestMapping(value = UPDATE_FIRM_PATH, method = RequestMethod.POST)
@@ -252,6 +252,6 @@ public class Ocpp12Controller {
             setChargePointList(model);
             return getPrefix() + UPDATE_FIRM_PATH;
         }
-        return REDIRECT_TASKS_PATH + getClient().updateFirmware(params);
+        return REDIRECT_TASKS_PATH + getClient12().updateFirmware(params);
     }
 }

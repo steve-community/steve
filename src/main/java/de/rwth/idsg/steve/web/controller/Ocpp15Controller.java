@@ -58,7 +58,7 @@ public class Ocpp15Controller extends Ocpp12Controller {
     }
 
     @Override
-    protected void setChargePointList(Model model) {
+    protected void setCommonAttributes(Model model) {
         model.addAttribute("cpList", chargePointHelperService.getChargePointsV15());
         model.addAttribute("opVersion", "v1.5");
     }
@@ -88,7 +88,7 @@ public class Ocpp15Controller extends Ocpp12Controller {
 
     @RequestMapping(value = RESERVE_PATH, method = RequestMethod.GET)
     public String getReserveNow(Model model) {
-        setChargePointList(model);
+        setCommonAttributes(model);
         setActiveUserIdTagList(model);
         model.addAttribute(PARAMS, new ReserveNowParams());
         return getPrefix() + RESERVE_PATH;
@@ -96,21 +96,21 @@ public class Ocpp15Controller extends Ocpp12Controller {
 
     @RequestMapping(value = CANCEL_RESERV_PATH, method = RequestMethod.GET)
     public String getCancelReserv(Model model) {
-        setChargePointList(model);
+        setCommonAttributes(model);
         model.addAttribute(PARAMS, new CancelReservationParams());
         return getPrefix() + CANCEL_RESERV_PATH;
     }
 
     @RequestMapping(value = DATA_TRANSFER_PATH, method = RequestMethod.GET)
     public String getDataTransfer(Model model) {
-        setChargePointList(model);
+        setCommonAttributes(model);
         model.addAttribute(PARAMS, new DataTransferParams());
         return getPrefix() + DATA_TRANSFER_PATH;
     }
 
     @RequestMapping(value = GET_CONF_PATH, method = RequestMethod.GET)
     public String getGetConf(Model model) {
-        setChargePointList(model);
+        setCommonAttributes(model);
         model.addAttribute(PARAMS, new GetConfigurationParams());
         model.addAttribute("ocppConfKeys", getConfigurationKeys());
         return getPrefix() + GET_CONF_PATH;
@@ -118,14 +118,14 @@ public class Ocpp15Controller extends Ocpp12Controller {
 
     @RequestMapping(value = GET_LIST_VERSION_PATH, method = RequestMethod.GET)
     public String getListVersion(Model model) {
-        setChargePointList(model);
+        setCommonAttributes(model);
         model.addAttribute(PARAMS, new MultipleChargePointSelect());
         return getPrefix() + GET_LIST_VERSION_PATH;
     }
 
     @RequestMapping(value = SEND_LIST_PATH, method = RequestMethod.GET)
     public String getSendList(Model model) {
-        setChargePointList(model);
+        setCommonAttributes(model);
         setAllUserIdTagList(model);
         model.addAttribute(PARAMS, new SendLocalListParams());
         return getPrefix() + SEND_LIST_PATH;
@@ -139,7 +139,7 @@ public class Ocpp15Controller extends Ocpp12Controller {
     public String postReserveNow(@Valid @ModelAttribute(PARAMS) ReserveNowParams params,
                                  BindingResult result, Model model) {
         if (result.hasErrors()) {
-            setChargePointList(model);
+            setCommonAttributes(model);
             setActiveUserIdTagList(model);
             return getPrefix() + RESERVE_PATH;
         }
@@ -150,7 +150,7 @@ public class Ocpp15Controller extends Ocpp12Controller {
     public String postCancelReserv(@Valid @ModelAttribute(PARAMS) CancelReservationParams params,
                                    BindingResult result, Model model) {
         if (result.hasErrors()) {
-            setChargePointList(model);
+            setCommonAttributes(model);
             return getPrefix() + CANCEL_RESERV_PATH;
         }
         return REDIRECT_TASKS_PATH + getClient15().cancelReservation(params);
@@ -160,7 +160,7 @@ public class Ocpp15Controller extends Ocpp12Controller {
     public String postDataTransfer(@Valid @ModelAttribute(PARAMS) DataTransferParams params,
                                    BindingResult result, Model model) {
         if (result.hasErrors()) {
-            setChargePointList(model);
+            setCommonAttributes(model);
             return getPrefix() + DATA_TRANSFER_PATH;
         }
         return REDIRECT_TASKS_PATH + getClient15().dataTransfer(params);
@@ -170,7 +170,7 @@ public class Ocpp15Controller extends Ocpp12Controller {
     public String postGetConf(@Valid @ModelAttribute(PARAMS) GetConfigurationParams params,
                               BindingResult result, Model model) {
         if (result.hasErrors()) {
-            setChargePointList(model);
+            setCommonAttributes(model);
             model.addAttribute("ocppConfKeys", getConfigurationKeys());
             return getPrefix() + GET_CONF_PATH;
         }
@@ -181,7 +181,7 @@ public class Ocpp15Controller extends Ocpp12Controller {
     public String postListVersion(@Valid @ModelAttribute(PARAMS) MultipleChargePointSelect params,
                                   BindingResult result, Model model) {
         if (result.hasErrors()) {
-            setChargePointList(model);
+            setCommonAttributes(model);
             return getPrefix() + GET_LIST_VERSION_PATH;
         }
         return REDIRECT_TASKS_PATH + getClient15().getLocalListVersion(params);
@@ -191,7 +191,7 @@ public class Ocpp15Controller extends Ocpp12Controller {
     public String postSendList(@Valid @ModelAttribute(PARAMS) SendLocalListParams params,
                                BindingResult result, Model model) {
         if (result.hasErrors()) {
-            setChargePointList(model);
+            setCommonAttributes(model);
             setAllUserIdTagList(model);
             return getPrefix() + SEND_LIST_PATH;
         }

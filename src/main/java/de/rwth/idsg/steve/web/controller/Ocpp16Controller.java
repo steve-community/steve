@@ -3,14 +3,20 @@ package de.rwth.idsg.steve.web.controller;
 import de.rwth.idsg.steve.service.ChargePointService12_Client;
 import de.rwth.idsg.steve.service.ChargePointService15_Client;
 import de.rwth.idsg.steve.service.ChargePointService16_Client;
+import de.rwth.idsg.steve.web.dto.ocpp.ChangeConfigurationParams;
 import de.rwth.idsg.steve.web.dto.ocpp.ConfigurationKeyEnum;
+import de.rwth.idsg.steve.web.dto.ocpp.GetConfigurationParams;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
+import javax.validation.Valid;
+import java.util.Collections;
 import java.util.Map;
 
 /**
@@ -58,10 +64,15 @@ public class Ocpp16Controller extends Ocpp15Controller {
         model.addAttribute("opVersion", "v1.6");
     }
 
+    /**
+     * Starting with OCPP 1.6 the configuration keys can be read-only or read-write. This method was returning all
+     * read-write keys, which was the case with older OCPP versions. So, it does not meet the needs anymore and should
+     * not be used.
+     */
+    @Deprecated
     @Override
     protected Map<String, String> getConfigurationKeys() {
-        // TODO: will fix/change this later.
-        return ConfigurationKeyEnum.OCPP_15_MAP;
+        return Collections.emptyMap();
     }
 
     @Override
@@ -75,7 +86,38 @@ public class Ocpp16Controller extends Ocpp15Controller {
     }
 
     // -------------------------------------------------------------------------
-    // Http methods (GET)
+    // Old Http methods with changed logic
+    // -------------------------------------------------------------------------
+
+    @RequestMapping(value = GET_CONF_PATH, method = RequestMethod.GET)
+    public String getGetConf(Model model) {
+        setCommonAttributes(model);
+        model.addAttribute(PARAMS, new GetConfigurationParams());
+        model.addAttribute("ocppConfKeys", ConfigurationKeyEnum.OCPP_16_MAP_R);
+        return getPrefix() + GET_CONF_PATH;
+    }
+
+    @RequestMapping(value = CHANGE_CONF_PATH, method = RequestMethod.GET)
+    public String getChangeConf(Model model) {
+        setCommonAttributes(model);
+        model.addAttribute(PARAMS, new ChangeConfigurationParams());
+        model.addAttribute("ocppConfKeys", ConfigurationKeyEnum.OCPP_16_MAP_RW);
+        return getPrefix() + CHANGE_CONF_PATH;
+    }
+
+    @RequestMapping(value = GET_CONF_PATH, method = RequestMethod.POST)
+    public String postGetConf(@Valid @ModelAttribute(PARAMS) GetConfigurationParams params,
+                              BindingResult result, Model model) {
+        if (result.hasErrors()) {
+            setCommonAttributes(model);
+            model.addAttribute("ocppConfKeys", ConfigurationKeyEnum.OCPP_16_MAP_R);
+            return getPrefix() + GET_CONF_PATH;
+        }
+        return REDIRECT_TASKS_PATH + getClient15().getConfiguration(params);
+    }
+
+    // -------------------------------------------------------------------------
+    // New Http methods (GET)
     // -------------------------------------------------------------------------
 
     @RequestMapping(value = GET_COMPOSITE_PATH, method = RequestMethod.GET)

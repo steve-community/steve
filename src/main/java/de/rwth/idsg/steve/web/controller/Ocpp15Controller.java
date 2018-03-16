@@ -40,7 +40,7 @@ public class Ocpp15Controller extends Ocpp12Controller {
     private static final String RESERVE_PATH = "/ReserveNow";
     private static final String CANCEL_RESERV_PATH = "/CancelReservation";
     private static final String DATA_TRANSFER_PATH = "/DataTransfer";
-    private static final String GET_CONF_PATH = "/GetConfiguration";
+    protected static final String GET_CONF_PATH = "/GetConfiguration";
     private static final String GET_LIST_VERSION_PATH = "/GetLocalListVersion";
     private static final String SEND_LIST_PATH = "/SendLocalList";
 

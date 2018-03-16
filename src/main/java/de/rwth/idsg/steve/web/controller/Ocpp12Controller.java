@@ -47,7 +47,7 @@ public class Ocpp12Controller {
     // -------------------------------------------------------------------------
 
     private static final String CHANGE_AVAIL_PATH = "/ChangeAvailability";
-    private static final String CHANGE_CONF_PATH = "/ChangeConfiguration";
+    protected static final String CHANGE_CONF_PATH = "/ChangeConfiguration";
     private static final String CLEAR_CACHE_PATH = "/ClearCache";
     private static final String GET_DIAG_PATH = "/GetDiagnostics";
     private static final String REMOTE_START_TX_PATH = "/RemoteStartTransaction";

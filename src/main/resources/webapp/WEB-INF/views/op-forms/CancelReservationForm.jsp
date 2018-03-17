@@ -4,6 +4,6 @@
     <section><span>Parameters</span></section>
     <table class="userInput">
         <tr><td>ID of the Existing Reservation:</td><td><form:select path="reservationId" disabled="true" /></td></tr>
+        <tr><td></td><td><div class="submit-button"><input type="submit" value="Perform"></div></td></tr>
     </table>
-    <div class="submit-button"><input type="submit" value="Perform"></div>
 </form:form>

@@ -11,6 +11,6 @@
                 <form:input path="retrieve" cssClass="dateTimePicker"/>
             </td>
         </tr>
+        <tr><td></td><td><div class="submit-button"><input type="submit" value="Perform"></div></td></tr>
     </table>
-    <div class="submit-button"><input type="submit" value="Perform"></div>
 </form:form>

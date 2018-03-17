@@ -31,6 +31,7 @@
             <th>Measurand</th>
             <th>Location</th>
             <th>Unit</th>
+            <th>Phase</th>
         </tr>
         </thead>
         <tbody>
@@ -43,6 +44,7 @@
                 <td>${v.measurand}</td>
                 <td>${v.location}</td>
                 <td>${v.unit}</td>
+                <td>${v.phase}</td>
             </tr>
         </c:forEach>
         </tbody>

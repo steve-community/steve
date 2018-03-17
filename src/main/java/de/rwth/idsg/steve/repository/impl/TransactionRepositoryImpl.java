@@ -147,7 +147,8 @@ public class TransactionRepositoryImpl implements TransactionRepository {
                         t1.field(5, String.class),
                         t1.field(6, String.class),
                         t1.field(7, String.class),
-                        t1.field(8, String.class))
+                        t1.field(8, String.class),
+                        t1.field(9, String.class))
                    .from(t1)
                    .groupBy(
                            t1.field(3),
@@ -155,7 +156,8 @@ public class TransactionRepositoryImpl implements TransactionRepository {
                            t1.field(5),
                            t1.field(6),
                            t1.field(7),
-                           t1.field(8))
+                           t1.field(8),
+                           t1.field(9))
                    .orderBy(dateTimeField)
                    .fetch()
                    .map(r -> TransactionDetails.MeterValues.builder()
@@ -166,6 +168,7 @@ public class TransactionRepositoryImpl implements TransactionRepository {
                                                            .measurand(r.value5())
                                                            .location(r.value6())
                                                            .unit(r.value7())
+                                                           .phase(r.value8())
                                                            .build());
 
         return new TransactionDetails(new TransactionMapper().map(transaction), values);

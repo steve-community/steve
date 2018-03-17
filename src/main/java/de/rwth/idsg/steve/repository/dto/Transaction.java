@@ -16,4 +16,7 @@ public final class Transaction {
     private final String chargeBoxId, ocppIdTag, startTimestamp, startValue, stopTimestamp, stopValue;
     private final DateTime startTimestampDT;
     private final DateTime stopTimestampDT;
+
+    // new in OCPP 1.6
+    private final String stopReason;
 }

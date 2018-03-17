@@ -84,6 +84,7 @@ Transactions
                 <th data-sort="int">Start Value</th>
                 <th data-sort="date">Stop Date/Time</th>
                 <th data-sort="int">Stop Value</th>
+                <th data-sort="string">Stop Reason</th>
             </tr>
         </thead>
         <tbody>
@@ -97,6 +98,7 @@ Transactions
                 <td>${ta.startValue}</td>
                 <td data-sort-value="${ta.stopTimestampDT.millis}">${ta.stopTimestamp}</td>
                 <td>${ta.stopValue}</td>
+                <td>${ta.stopReason}</td>
             </tr>
         </c:forEach>
         </tbody>

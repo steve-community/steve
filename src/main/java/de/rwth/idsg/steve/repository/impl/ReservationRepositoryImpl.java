@@ -137,7 +137,7 @@ public class ReservationRepositoryImpl implements ReservationRepository {
     }
 
     @Override
-    public void used(int reservationId, int transactionId) {
+    public void used(DSLContext ctx, int reservationId, int transactionId) {
         ctx.update(RESERVATION)
            .set(RESERVATION.STATUS, ReservationStatus.USED.name())
            .set(RESERVATION.TRANSACTION_PK, transactionId)

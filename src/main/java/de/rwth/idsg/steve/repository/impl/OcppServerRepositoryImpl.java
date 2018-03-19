@@ -172,7 +172,7 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
             insertIgnoreConnector(ctx, p.getChargeBoxId(), p.getConnectorId());
 
             // it is important to insert idTag before transaction, since the transaction table references it
-            boolean unknownTagInserted = insertIgnoreIdTag(p);
+            boolean unknownTagInserted = insertIgnoreIdTag(ctx, p);
 
             SelectConditionStep<Record1<Integer>> connectorPkQuery =
                     DSL.select(CONNECTOR.CONNECTOR_PK)
@@ -290,7 +290,7 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
      * is online, it sends a StartTransactionRequest with this idTag. If we do not insert this idTag, the transaction
      * details will not be inserted into DB and we will lose valuable information.
      */
-    private boolean insertIgnoreIdTag(InsertTransactionParams p) {
+    private boolean insertIgnoreIdTag(DSLContext ctx, InsertTransactionParams p) {
         String note = "This unknown idTag was used in a transaction that started @ " + p.getStartTimestamp()
                 + ". It was reported @ " + DateTime.now() + ".";
 

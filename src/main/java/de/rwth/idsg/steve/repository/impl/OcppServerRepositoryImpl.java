@@ -108,7 +108,6 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
 
     @Override
     public void insertConnectorStatus(InsertConnectorStatusParams p) {
-
         ctx.transaction(configuration -> {
             DSLContext ctx = DSL.using(configuration);
 
@@ -194,7 +193,8 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
                                    .getTransactionPk();
 
             if (unknownTagInserted) {
-                log.warn("The transaction '{}' contains an unknown idTag '{}' which was inserted into DB as to prevent information loss and has been blocked", transactionId, p.getIdTag());
+                log.warn("The transaction '{}' contains an unknown idTag '{}' which was inserted into DB "
+                        + "to prevent information loss and has been blocked", transactionId, p.getIdTag());
             }
 
             // -------------------------------------------------------------------------

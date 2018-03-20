@@ -148,7 +148,7 @@ public class OcppTagsController {
         model.addAttribute("idTagList", ocppTagRepository.getIdTags());
         model.addAttribute("parentIdTagList", ocppTagRepository.getParentIdTags());
         model.addAttribute("ocppTagList", ocppTagRepository.getOverview(params));
-        model.addAttribute("invalidTagList", ocppTagService.getInvalidOcppTags());
+        model.addAttribute("unknownList", ocppTagService.getUnknownOcppTags());
     }
 
     protected void setTags(Model model) {

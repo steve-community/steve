@@ -6,18 +6,18 @@ import org.joda.time.DateTime;
 
 /**
  * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
- * @since 09.12.2016
+ * @since 20.03.2018
  */
 @ToString
 @Getter
-public class InvalidOcppTag {
+public class UnidentifiedIncomingObject {
 
-    private final String idTag;
+    private final String key;
     private int numberOfAttempts = 0;
     private DateTime lastAttemptTimestamp;
 
-    public InvalidOcppTag(String idTag) {
-        this.idTag = idTag;
+    public UnidentifiedIncomingObject(String key) {
+        this.key = key;
         updateStats();
     }
 

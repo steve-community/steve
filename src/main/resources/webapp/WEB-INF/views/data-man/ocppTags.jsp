@@ -2,20 +2,20 @@
 <script type="text/javascript">
     $(document).ready(function () {
         <%@ include file="../snippets/sortable.js" %>
-        $("#invalid").click(function () {
-            $("#invalidTable, #overview").slideToggle(250);
+        $("#unknown").click(function () {
+            $("#unknownTable, #overview").slideToggle(250);
         });
     });
 </script>
 <div class="content">
     <div>
-    <section><span id="invalid" style="cursor: pointer">
-    Invalid Tags
+    <section><span id="unknown" style="cursor: pointer">
+    Unknown Tags
     <a class="tooltip" href="#"><img src="${ctxPath}/static/images/info.png" style="vertical-align:middle">
         <span>A list of RFID tags that were used in authorization attempts but were not present in database.</span>
     </a>
     </span></section>
-    <div id="invalidTable" style="display: none">
+    <div id="unknownTable" style="display: none">
         <table class="res add-margin-bottom">
             <thead>
             <tr>
@@ -25,9 +25,9 @@
             </tr>
             </thead>
             <tbody>
-            <c:forEach items="${invalidTagList}" var="item">
+            <c:forEach items="${unknownList}" var="item">
                 <tr>
-                    <td>${item.idTag}</td>
+                    <td>${item.key}</td>
                     <td>${item.numberOfAttempts}</td>
                     <td data-sort-value="${item.lastAttemptTimestamp.millis}">${item.lastAttemptTimestamp}</td>
                 </tr>

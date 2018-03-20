@@ -48,6 +48,7 @@ public class CentralSystemService16_Service {
     @Autowired private SettingsRepository settingsRepository;
     @Autowired private OcppTagService ocppTagService;
     @Autowired private NotificationService notificationService;
+    @Autowired private ChargePointHelperService chargePointHelperService;
 
     public BootNotificationResponse bootNotification(BootNotificationRequest parameters, String chargeBoxIdentity,
                                                      OcppProtocol ocppProtocol) {
@@ -72,7 +73,13 @@ public class CentralSystemService16_Service {
         boolean isRegistered = ocppServerRepository.updateChargebox(params);
         notificationService.ocppStationBooted(chargeBoxIdentity, isRegistered);
 
-        RegistrationStatus status = isRegistered ? RegistrationStatus.ACCEPTED : RegistrationStatus.REJECTED;
+        RegistrationStatus status;
+        if (isRegistered) {
+            status = RegistrationStatus.ACCEPTED;
+        } else {
+            status = RegistrationStatus.REJECTED;
+            chargePointHelperService.rememberNewUnknown(chargeBoxIdentity);
+        }
 
         return new BootNotificationResponse()
                 .withStatus(status)

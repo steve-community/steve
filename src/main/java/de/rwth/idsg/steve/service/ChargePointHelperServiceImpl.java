@@ -12,6 +12,7 @@ import de.rwth.idsg.steve.repository.ChargePointRepository;
 import de.rwth.idsg.steve.repository.GenericRepository;
 import de.rwth.idsg.steve.repository.dto.ChargePointSelect;
 import de.rwth.idsg.steve.repository.dto.ConnectorStatus;
+import de.rwth.idsg.steve.service.dto.UnidentifiedIncomingObject;
 import de.rwth.idsg.steve.utils.ConnectorStatusCountFilter;
 import de.rwth.idsg.steve.utils.DateTimeUtils;
 import de.rwth.idsg.steve.web.dto.OcppJsonStatus;
@@ -27,7 +28,6 @@ import java.util.Deque;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
@@ -45,6 +45,8 @@ public class ChargePointHelperServiceImpl implements ChargePointHelperService {
     @Autowired private Ocpp12WebSocketEndpoint ocpp12WebSocketEndpoint;
     @Autowired private Ocpp15WebSocketEndpoint ocpp15WebSocketEndpoint;
     @Autowired private Ocpp16WebSocketEndpoint ocpp16WebSocketEndpoint;
+
+    private final UnidentifiedIncomingObjectService unknownChargePointService = new UnidentifiedIncomingObjectService(100);
 
     @Override
     public Statistics getStats() {
@@ -90,6 +92,16 @@ public class ChargePointHelperServiceImpl implements ChargePointHelperService {
     @Override
     public List<ChargePointSelect> getChargePointsV16() {
         return getChargePoints(OcppProtocol.V_16_SOAP, ocpp16WebSocketEndpoint);
+    }
+
+    @Override
+    public void rememberNewUnknown(String chargeBoxId) {
+        unknownChargePointService.processNewUnidentified(chargeBoxId);
+    }
+
+    @Override
+    public List<UnidentifiedIncomingObject> getUnknownChargePoints() {
+        return unknownChargePointService.getObjects();
     }
 
     // -------------------------------------------------------------------------

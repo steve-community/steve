@@ -1,6 +1,6 @@
 package de.rwth.idsg.steve.service;
 
-import de.rwth.idsg.steve.service.dto.InvalidOcppTag;
+import de.rwth.idsg.steve.service.dto.UnidentifiedIncomingObject;
 import ocpp.cp._2015._10.AuthorizationData;
 import ocpp.cs._2015._10.IdTagInfo;
 
@@ -18,5 +18,5 @@ public interface OcppTagService {
 
     List<AuthorizationData> getAuthData(List<String> idTagList);
 
-    List<InvalidOcppTag> getInvalidOcppTags();
+    List<UnidentifiedIncomingObject> getUnknownOcppTags();
 }

@@ -1,6 +1,7 @@
 package de.rwth.idsg.steve.service;
 
 import de.rwth.idsg.steve.repository.dto.ChargePointSelect;
+import de.rwth.idsg.steve.service.dto.UnidentifiedIncomingObject;
 import de.rwth.idsg.steve.web.dto.OcppJsonStatus;
 import de.rwth.idsg.steve.web.dto.Statistics;
 
@@ -16,4 +17,7 @@ public interface ChargePointHelperService {
     List<ChargePointSelect> getChargePointsV12();
     List<ChargePointSelect> getChargePointsV15();
     List<ChargePointSelect> getChargePointsV16();
+
+    void rememberNewUnknown(String chargeBoxId);
+    List<UnidentifiedIncomingObject> getUnknownChargePoints();
 }

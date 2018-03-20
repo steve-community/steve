@@ -7,6 +7,7 @@ import de.rwth.idsg.steve.ocpp.ws.ocpp12.Ocpp12WebSocketEndpoint;
 import de.rwth.idsg.steve.ocpp.ws.ocpp15.Ocpp15WebSocketEndpoint;
 import de.rwth.idsg.steve.ocpp.ws.ocpp16.Ocpp16WebSocketEndpoint;
 import de.rwth.idsg.steve.repository.ChargePointRepository;
+import de.rwth.idsg.steve.service.ChargePointHelperService;
 import de.rwth.idsg.steve.service.NotificationService;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.jetty.websocket.api.WebSocketBehavior;
@@ -36,6 +37,7 @@ public class WebSocketConfiguration implements WebSocketConfigurer {
 
     @Autowired private ChargePointRepository chargePointRepository;
     @Autowired private NotificationService notificationService;
+    @Autowired private ChargePointHelperService chargePointHelperService;
 
     @Autowired private Ocpp12WebSocketEndpoint ocpp12WebSocketEndpoint;
     @Autowired private Ocpp15WebSocketEndpoint ocpp15WebSocketEndpoint;
@@ -55,7 +57,8 @@ public class WebSocketConfiguration implements WebSocketConfigurer {
         List<AbstractWebSocketEndpoint> endpoints = getEndpoints();
         String[] protocols = endpoints.stream().map(e -> e.getVersion().getValue()).toArray(String[]::new);
 
-        OcppWebSocketUpgrader upgradeStrategy = new OcppWebSocketUpgrader(policy, endpoints, chargePointRepository, notificationService);
+        OcppWebSocketUpgrader upgradeStrategy = new OcppWebSocketUpgrader(
+                policy, endpoints, chargePointRepository, notificationService, chargePointHelperService);
 
         DefaultHandshakeHandler handler = new DefaultHandshakeHandler(upgradeStrategy);
         handler.setSupportedProtocols(protocols);

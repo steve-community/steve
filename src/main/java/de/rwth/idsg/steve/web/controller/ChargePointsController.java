@@ -2,6 +2,7 @@ package de.rwth.idsg.steve.web.controller;
 
 import de.rwth.idsg.steve.repository.ChargePointRepository;
 import de.rwth.idsg.steve.repository.dto.ChargePoint;
+import de.rwth.idsg.steve.service.ChargePointHelperService;
 import de.rwth.idsg.steve.utils.ControllerHelper;
 import de.rwth.idsg.steve.web.dto.ChargePointBatchInsertForm;
 import de.rwth.idsg.steve.web.dto.ChargePointForm;
@@ -27,6 +28,7 @@ import javax.validation.Valid;
 public class ChargePointsController {
 
     @Autowired protected ChargePointRepository chargePointRepository;
+    @Autowired protected ChargePointHelperService chargePointHelperService;
 
     protected static final String PARAMS = "params";
 
@@ -64,6 +66,7 @@ public class ChargePointsController {
     private void initList(Model model, ChargePointQueryForm params) {
         model.addAttribute(PARAMS, params);
         model.addAttribute("cpList", chargePointRepository.getOverview(params));
+        model.addAttribute("unknownList", chargePointHelperService.getUnknownChargePoints());
     }
 
     @RequestMapping(value = DETAILS_PATH, method = RequestMethod.GET)

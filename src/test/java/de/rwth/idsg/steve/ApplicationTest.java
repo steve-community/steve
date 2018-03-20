@@ -6,9 +6,11 @@ import ocpp.cs._2010._08.AuthorizeRequest;
 import ocpp.cs._2010._08.AuthorizeResponse;
 import ocpp.cs._2010._08.BootNotificationRequest;
 import ocpp.cs._2010._08.BootNotificationResponse;
+import ocpp.cs._2012._06.CentralSystemService;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.apache.cxf.ws.addressing.WSAddressingFeature;
 import org.junit.Assert;
+import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -27,48 +29,71 @@ public class ApplicationTest {
 
     private static final String path = getPath();
 
-    /**
-     * Tests that the SOAP code paths are working.
-     */
-    @Test
-    public void testSoapPipeline() throws Exception {
-        startApp();
+    @BeforeClass
+    public static void init() throws Exception {
+        Application app = new Application();
+        app.start();
+    }
 
-        BootNotificationResponse boot12 = getForOcpp12().bootNotification(
+    @Test
+    public void testOcpp12() {
+        ocpp.cs._2010._08.CentralSystemService client = getForOcpp12();
+
+        BootNotificationResponse boot = client.bootNotification(
                 new BootNotificationRequest()
                         .withChargePointVendor(getRandomString())
                         .withChargePointModel(getRandomString()),
                 getRandomString());
-        Assert.assertNotNull(boot12);
-        Assert.assertEquals(ocpp.cs._2010._08.RegistrationStatus.REJECTED, boot12.getStatus());
+        Assert.assertNotNull(boot);
+        Assert.assertEquals(ocpp.cs._2010._08.RegistrationStatus.REJECTED, boot.getStatus());
 
-        ocpp.cs._2012._06.BootNotificationResponse boot15 = getForOcpp15().bootNotification(
+        AuthorizeResponse auth = client.authorize(
+                new AuthorizeRequest()
+                        .withIdTag(getRandomString()),
+                getRandomString());
+        Assert.assertNotNull(auth);
+        Assert.assertEquals(AuthorizationStatus.INVALID, auth.getIdTagInfo().getStatus());
+    }
+
+    @Test
+    public void testOcpp15() {
+        CentralSystemService client = getForOcpp15();
+
+        ocpp.cs._2012._06.BootNotificationResponse boot = client.bootNotification(
                 new ocpp.cs._2012._06.BootNotificationRequest()
                         .withChargePointVendor(getRandomString())
                         .withChargePointModel(getRandomString()),
                 getRandomString());
-        Assert.assertNotNull(boot15);
-        Assert.assertEquals(ocpp.cs._2012._06.RegistrationStatus.REJECTED, boot15.getStatus());
+        Assert.assertNotNull(boot);
+        Assert.assertEquals(ocpp.cs._2012._06.RegistrationStatus.REJECTED, boot.getStatus());
 
-        AuthorizeResponse auth12 = getForOcpp12().authorize(
-                new AuthorizeRequest()
-                        .withIdTag(getRandomString()),
-                getRandomString());
-        Assert.assertNotNull(auth12);
-        Assert.assertEquals(AuthorizationStatus.INVALID, auth12.getIdTagInfo().getStatus());
-
-        ocpp.cs._2012._06.AuthorizeResponse auth15 = getForOcpp15().authorize(
+        ocpp.cs._2012._06.AuthorizeResponse auth = client.authorize(
                 new ocpp.cs._2012._06.AuthorizeRequest()
                         .withIdTag(getRandomString()),
                 getRandomString());
-        Assert.assertNotNull(auth15);
-        Assert.assertEquals(ocpp.cs._2012._06.AuthorizationStatus.INVALID, auth15.getIdTagInfo().getStatus());
+        Assert.assertNotNull(auth);
+        Assert.assertEquals(ocpp.cs._2012._06.AuthorizationStatus.INVALID, auth.getIdTagInfo().getStatus());
     }
 
-    private Application startApp() throws Exception {
-        Application app = new Application();
-        app.start();
-        return app;
+
+    @Test
+    public void testOcpp16() {
+        ocpp.cs._2015._10.CentralSystemService client = getForOcpp16();
+
+        ocpp.cs._2015._10.BootNotificationResponse boot = client.bootNotification(
+                new ocpp.cs._2015._10.BootNotificationRequest()
+                        .withChargePointVendor(getRandomString())
+                        .withChargePointModel(getRandomString()),
+                getRandomString());
+        Assert.assertNotNull(boot);
+        Assert.assertEquals(ocpp.cs._2015._10.RegistrationStatus.REJECTED, boot.getStatus());
+
+        ocpp.cs._2015._10.AuthorizeResponse auth = client.authorize(
+                new ocpp.cs._2015._10.AuthorizeRequest()
+                        .withIdTag(getRandomString()),
+                getRandomString());
+        Assert.assertNotNull(auth);
+        Assert.assertEquals(ocpp.cs._2015._10.AuthorizationStatus.INVALID, auth.getIdTagInfo().getStatus());
     }
 
     private static String getRandomString() {
@@ -91,6 +116,12 @@ public class ApplicationTest {
         } else {
             throw new RuntimeException();
         }
+    }
+
+    private static ocpp.cs._2015._10.CentralSystemService getForOcpp16() {
+        JaxWsProxyFactoryBean f = getBean(path);
+        f.setServiceClass(ocpp.cs._2015._10.CentralSystemService.class);
+        return (ocpp.cs._2015._10.CentralSystemService) f.create();
     }
 
     private static ocpp.cs._2012._06.CentralSystemService getForOcpp15() {

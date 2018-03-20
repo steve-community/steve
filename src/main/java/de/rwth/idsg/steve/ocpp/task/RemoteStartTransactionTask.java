@@ -1,7 +1,7 @@
 package de.rwth.idsg.steve.ocpp.task;
 
-import de.rwth.idsg.steve.ocpp.OcppCallback;
 import de.rwth.idsg.steve.ocpp.CommunicationTask;
+import de.rwth.idsg.steve.ocpp.OcppCallback;
 import de.rwth.idsg.steve.ocpp.OcppVersion;
 import de.rwth.idsg.steve.web.dto.ocpp.RemoteStartTransactionParams;
 
@@ -36,6 +36,16 @@ public class RemoteStartTransactionTask extends CommunicationTask<RemoteStartTra
                 .withConnectorId(params.getConnectorId());
     }
 
+    /**
+     * TODO: RemoteStartTransactionRequest.chargingProfile not implemented
+     */
+    @Override
+    public ocpp.cp._2015._10.RemoteStartTransactionRequest getOcpp16Request() {
+        return new ocpp.cp._2015._10.RemoteStartTransactionRequest()
+                .withIdTag(params.getIdTag())
+                .withConnectorId(params.getConnectorId());
+    }
+
     @Override
     public AsyncHandler<ocpp.cp._2010._08.RemoteStartTransactionResponse> getOcpp12Handler(String chargeBoxId) {
         return res -> {
@@ -49,6 +59,18 @@ public class RemoteStartTransactionTask extends CommunicationTask<RemoteStartTra
 
     @Override
     public AsyncHandler<ocpp.cp._2012._06.RemoteStartTransactionResponse> getOcpp15Handler(String chargeBoxId) {
+        return res -> {
+            try {
+                success(chargeBoxId, res.get().getStatus().value());
+            } catch (Exception e) {
+                failed(chargeBoxId, e);
+            }
+        };
+    }
+
+
+    @Override
+    public AsyncHandler<ocpp.cp._2015._10.RemoteStartTransactionResponse> getOcpp16Handler(String chargeBoxId) {
         return res -> {
             try {
                 success(chargeBoxId, res.get().getStatus().value());

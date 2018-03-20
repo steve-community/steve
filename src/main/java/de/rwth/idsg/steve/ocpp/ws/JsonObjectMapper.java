@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.introspect.JacksonAnnotationIntrospector;
 import com.fasterxml.jackson.module.jaxb.JaxbAnnotationIntrospector;
 import de.rwth.idsg.steve.ocpp.ws.ocpp12.Ocpp12JacksonModule;
 import de.rwth.idsg.steve.ocpp.ws.ocpp15.Ocpp15JacksonModule;
+import de.rwth.idsg.steve.ocpp.ws.ocpp16.Ocpp16JacksonModule;
 
 /**
  * Because ObjectMapper can and should be reused, if config does not change after init.
@@ -25,6 +26,7 @@ public enum JsonObjectMapper {
 
         mapper.registerModule(new Ocpp12JacksonModule());
         mapper.registerModule(new Ocpp15JacksonModule());
+        mapper.registerModule(new Ocpp16JacksonModule());
 
         mapper.setAnnotationIntrospector(
                 AnnotationIntrospector.pair(

@@ -73,11 +73,12 @@ public enum Server12to15Impl implements Server12to15 {
 
     @Override
     public MeterValuesRequest convertRequest(ocpp.cs._2010._08.MeterValuesRequest request) {
-        List<MeterValue> values15 = request.getValues()
-                                           .stream()
-                                           .map(e -> new MeterValue().withTimestamp(e.getTimestamp())
-                                                                              .withValue(new MeterValue.Value().withValue(Integer.toString(e.getValue()))))
-                                           .collect(Collectors.toList());
+        List<MeterValue> values15 =
+                request.getValues()
+                       .stream()
+                       .map(e -> new MeterValue().withTimestamp(e.getTimestamp())
+                                                 .withValue(new MeterValue.Value().withValue(Integer.toString(e.getValue()))))
+                       .collect(Collectors.toList());
 
         return new MeterValuesRequest()
                 .withConnectorId(request.getConnectorId())
@@ -99,7 +100,6 @@ public enum Server12to15Impl implements Server12to15 {
                 .withMeterStart(request.getMeterStart())
                 .withTimestamp(request.getTimestamp());
     }
-
 
     @Override
     public StopTransactionRequest convertRequest(ocpp.cs._2010._08.StopTransactionRequest request) {
@@ -156,14 +156,14 @@ public enum Server12to15Impl implements Server12to15 {
     @Override
     public StartTransactionResponse convertResponse(ocpp.cs._2012._06.StartTransactionResponse response) {
         return new StartTransactionResponse()
-                .withIdTagInfo(convertIdTagInfo15to12(response.getIdTagInfo()))
+                .withIdTagInfo(toOcpp12TagInfo(response.getIdTagInfo()))
                 .withTransactionId(response.getTransactionId());
     }
 
     @Override
     public StopTransactionResponse convertResponse(ocpp.cs._2012._06.StopTransactionResponse response) {
         return new StopTransactionResponse()
-                .withIdTagInfo(convertIdTagInfo15to12(response.getIdTagInfo()));
+                .withIdTagInfo(toOcpp12TagInfo(response.getIdTagInfo()));
     }
 
     @Override
@@ -175,14 +175,17 @@ public enum Server12to15Impl implements Server12to15 {
     @Override
     public AuthorizeResponse convertResponse(ocpp.cs._2012._06.AuthorizeResponse response) {
         return new AuthorizeResponse()
-                .withIdTagInfo(convertIdTagInfo15to12(response.getIdTagInfo()));
+                .withIdTagInfo(toOcpp12TagInfo(response.getIdTagInfo()));
     }
 
     // -------------------------------------------------------------------------
     // Helpers
     // -------------------------------------------------------------------------
 
-    private static IdTagInfo convertIdTagInfo15to12(ocpp.cs._2012._06.IdTagInfo info15) {
+    private static IdTagInfo toOcpp12TagInfo(ocpp.cs._2012._06.IdTagInfo info15) {
+        if (info15 == null) {
+            return null;
+        }
         return new IdTagInfo()
                 .withExpiryDate(info15.getExpiryDate())
                 .withParentIdTag(info15.getParentIdTag())

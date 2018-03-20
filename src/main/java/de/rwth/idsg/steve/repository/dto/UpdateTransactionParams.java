@@ -15,6 +15,7 @@ public class UpdateTransactionParams {
     private final int transactionId;
     private final DateTime stopTimestamp;
     private final String stopMeterValue;
+    private final String stopReason;
 
     private final TransactionStatusUpdate statusUpdate = TransactionStatusUpdate.AfterStop;
 }

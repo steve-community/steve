@@ -32,6 +32,10 @@
 				<span class="baseCell">OCPP 1.5 :</span>
 				<span class="baseCell formatNumber">${stats.numOcpp15JChargeBoxes}</span>
 			</span>
+			<span class="baseRow">
+				<span class="baseCell">OCPP 1.6 :</span>
+				<span class="baseCell formatNumber">${stats.numOcpp16JChargeBoxes}</span>
+			</span>
 		</span>
 	</a>
 	<a class="tileRow1" href="${ctxPath}/manager/chargepoints">
@@ -56,7 +60,7 @@
 		<span class="baseTable">
 			<c:forEach items="${stats.statusCountMap}" var="it">
 				<span class="baseRow">
-					<span class="baseCell">${it.key.value()} :</span>
+					<span class="baseCell">${it.key} :</span>
 					<span class="baseCell formatNumber">${it.value}</span>
 				</span>
 			</c:forEach>

@@ -1,7 +1,7 @@
 package de.rwth.idsg.steve.ocpp.task;
 
-import de.rwth.idsg.steve.ocpp.OcppCallback;
 import de.rwth.idsg.steve.ocpp.CommunicationTask;
+import de.rwth.idsg.steve.ocpp.OcppCallback;
 import de.rwth.idsg.steve.ocpp.OcppVersion;
 import de.rwth.idsg.steve.web.dto.ocpp.GetDiagnosticsParams;
 
@@ -45,6 +45,16 @@ public class GetDiagnosticsTask extends CommunicationTask<GetDiagnosticsParams, 
     }
 
     @Override
+    public ocpp.cp._2015._10.GetDiagnosticsRequest getOcpp16Request() {
+        return new ocpp.cp._2015._10.GetDiagnosticsRequest()
+                .withLocation(params.getLocation())
+                .withRetries(params.getRetries())
+                .withRetryInterval(params.getRetryInterval())
+                .withStartTime(toDateTime(params.getStart()))
+                .withStopTime(toDateTime(params.getStop()));
+    }
+
+    @Override
     public AsyncHandler<ocpp.cp._2010._08.GetDiagnosticsResponse> getOcpp12Handler(String chargeBoxId) {
         return res -> {
             try {
@@ -65,4 +75,15 @@ public class GetDiagnosticsTask extends CommunicationTask<GetDiagnosticsParams, 
             }
         };
     }
- }
+
+    @Override
+    public AsyncHandler<ocpp.cp._2015._10.GetDiagnosticsResponse> getOcpp16Handler(String chargeBoxId) {
+        return res -> {
+            try {
+                success(chargeBoxId, res.get().getFileName());
+            } catch (Exception e) {
+                failed(chargeBoxId, e);
+            }
+        };
+    }
+}

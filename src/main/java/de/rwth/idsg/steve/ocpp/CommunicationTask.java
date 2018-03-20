@@ -73,9 +73,7 @@ public abstract class CommunicationTask<S extends ChargePointSelection, RESPONSE
         }
 
         callbackList.add(defaultCallback());
-
-        // FIXME: dirty, because creating a request only to parse its class name
-        operationName = StringUtils.getOperationName(getRequest());
+        operationName = StringUtils.getOperationName(this);
     }
 
     public void addCallback(OcppCallback<RESPONSE> cb) {
@@ -132,6 +130,7 @@ public abstract class CommunicationTask<S extends ChargePointSelection, RESPONSE
         switch (ocppVersion) {
             case V_12: return getOcpp12Request();
             case V_15: return getOcpp15Request();
+            case V_16: return getOcpp16Request();
             default: throw new RuntimeException("Request type not found");
         }
     }
@@ -140,6 +139,7 @@ public abstract class CommunicationTask<S extends ChargePointSelection, RESPONSE
         switch (ocppVersion) {
             case V_12: return getOcpp12Handler(chargeBoxId);
             case V_15: return getOcpp15Handler(chargeBoxId);
+            case V_16: return getOcpp16Handler(chargeBoxId);
             default: throw new RuntimeException("ResponseType handler not found");
         }
     }
@@ -150,9 +150,13 @@ public abstract class CommunicationTask<S extends ChargePointSelection, RESPONSE
 
     public abstract <T extends RequestType> T getOcpp15Request();
 
+    public abstract <T extends RequestType> T getOcpp16Request();
+
     public abstract <T extends ResponseType> AsyncHandler<T> getOcpp12Handler(String chargeBoxId);
 
     public abstract <T extends ResponseType> AsyncHandler<T> getOcpp15Handler(String chargeBoxId);
+
+    public abstract <T extends ResponseType> AsyncHandler<T> getOcpp16Handler(String chargeBoxId);
 
     // -------------------------------------------------------------------------
     // Classes

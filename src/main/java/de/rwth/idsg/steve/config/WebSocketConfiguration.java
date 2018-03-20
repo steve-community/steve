@@ -5,6 +5,7 @@ import de.rwth.idsg.steve.ocpp.ws.AbstractWebSocketEndpoint;
 import de.rwth.idsg.steve.ocpp.ws.OcppWebSocketUpgrader;
 import de.rwth.idsg.steve.ocpp.ws.ocpp12.Ocpp12WebSocketEndpoint;
 import de.rwth.idsg.steve.ocpp.ws.ocpp15.Ocpp15WebSocketEndpoint;
+import de.rwth.idsg.steve.ocpp.ws.ocpp16.Ocpp16WebSocketEndpoint;
 import de.rwth.idsg.steve.repository.ChargePointRepository;
 import de.rwth.idsg.steve.service.NotificationService;
 import lombok.extern.slf4j.Slf4j;
@@ -38,6 +39,7 @@ public class WebSocketConfiguration implements WebSocketConfigurer {
 
     @Autowired private Ocpp12WebSocketEndpoint ocpp12WebSocketEndpoint;
     @Autowired private Ocpp15WebSocketEndpoint ocpp15WebSocketEndpoint;
+    @Autowired private Ocpp16WebSocketEndpoint ocpp16WebSocketEndpoint;
 
     public static final long PING_INTERVAL = TimeUnit.MINUTES.toMinutes(15);
     private static final long IDLE_TIMEOUT = TimeUnit.HOURS.toMillis(2);
@@ -69,7 +71,7 @@ public class WebSocketConfiguration implements WebSocketConfigurer {
      * The order affects the choice!
      */
     private List<AbstractWebSocketEndpoint> getEndpoints() {
-        return Lists.newArrayList(ocpp15WebSocketEndpoint, ocpp12WebSocketEndpoint);
+        return Lists.newArrayList(ocpp16WebSocketEndpoint, ocpp15WebSocketEndpoint, ocpp12WebSocketEndpoint);
     }
 
     // -------------------------------------------------------------------------

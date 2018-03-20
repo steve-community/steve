@@ -10,7 +10,7 @@ import de.rwth.idsg.steve.repository.dto.UpdateTransactionParams;
 import de.rwth.idsg.steve.utils.CustomDSL;
 import jooq.steve.db.tables.records.ConnectorMeterValueRecord;
 import lombok.extern.slf4j.Slf4j;
-import ocpp.cs._2012._06.MeterValue;
+import ocpp.cs._2015._10.MeterValue;
 import org.joda.time.DateTime;
 import org.jooq.DSLContext;
 import org.jooq.Record1;
@@ -26,6 +26,7 @@ import static jooq.steve.db.tables.ChargeBox.CHARGE_BOX;
 import static jooq.steve.db.tables.Connector.CONNECTOR;
 import static jooq.steve.db.tables.ConnectorMeterValue.CONNECTOR_METER_VALUE;
 import static jooq.steve.db.tables.ConnectorStatus.CONNECTOR_STATUS;
+import static jooq.steve.db.tables.OcppTag.OCPP_TAG;
 import static jooq.steve.db.tables.Transaction.TRANSACTION;
 
 /**
@@ -107,7 +108,6 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
 
     @Override
     public void insertConnectorStatus(InsertConnectorStatusParams p) {
-
         ctx.transaction(configuration -> {
             DSLContext ctx = DSL.using(configuration);
 
@@ -143,7 +143,7 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
 
             insertIgnoreConnector(ctx, chargeBoxIdentity, connectorId);
             int connectorPk = getConnectorPkFromConnector(ctx, chargeBoxIdentity, connectorId);
-            batchInsertMeterValues15(ctx, list, connectorPk, transactionId);
+            batchInsertMeterValues(ctx, list, connectorPk, transactionId);
         });
     }
 
@@ -159,17 +159,19 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
                                  .fetchOne()
                                  .value1();
 
-            batchInsertMeterValues15(ctx, list, connectorPk, transactionId);
+            batchInsertMeterValues(ctx, list, connectorPk, transactionId);
         });
     }
 
     @Override
     public Integer insertTransaction(InsertTransactionParams p) {
-
         return ctx.transactionResult(configuration -> {
             DSLContext ctx = DSL.using(configuration);
 
             insertIgnoreConnector(ctx, p.getChargeBoxId(), p.getConnectorId());
+
+            // it is important to insert idTag before transaction, since the transaction table references it
+            boolean unknownTagInserted = insertIgnoreIdTag(ctx, p);
 
             SelectConditionStep<Record1<Integer>> connectorPkQuery =
                     DSL.select(CONNECTOR.CONNECTOR_PK)
@@ -190,19 +192,24 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
                                    .fetchOne()
                                    .getTransactionPk();
 
+            if (unknownTagInserted) {
+                log.warn("The transaction '{}' contains an unknown idTag '{}' which was inserted into DB "
+                        + "to prevent information loss and has been blocked", transactionId, p.getIdTag());
+            }
+
             // -------------------------------------------------------------------------
             // Step 2 for OCPP 1.5: A startTransaction may be related to a reservation
             // -------------------------------------------------------------------------
 
             if (p.isSetReservationId()) {
-                reservationRepository.used(p.getReservationId(), transactionId);
+                reservationRepository.used(ctx, p.getReservationId(), transactionId);
             }
 
             // -------------------------------------------------------------------------
             // Step 3: Set connector status to "Occupied"
             // -------------------------------------------------------------------------
 
-            insertConnectorStatus(connectorPkQuery, p.getStartTimestamp(), p.getStatusUpdate());
+            insertConnectorStatus(ctx, connectorPkQuery, p.getStartTimestamp(), p.getStatusUpdate());
 
             return transactionId;
         });
@@ -220,6 +227,7 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
         ctx.update(TRANSACTION)
            .set(TRANSACTION.STOP_TIMESTAMP, p.getStopTimestamp())
            .set(TRANSACTION.STOP_VALUE, p.getStopMeterValue())
+           .set(TRANSACTION.STOP_REASON, p.getStopReason())
            .where(TRANSACTION.TRANSACTION_PK.equal(p.getTransactionId()))
            .and(TRANSACTION.STOP_TIMESTAMP.isNull())
            .and(TRANSACTION.STOP_VALUE.isNull())
@@ -234,7 +242,7 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
                    .from(TRANSACTION)
                    .where(TRANSACTION.TRANSACTION_PK.equal(p.getTransactionId()));
 
-        insertConnectorStatus(connectorPkQuery, p.getStopTimestamp(), p.getStatusUpdate());
+        insertConnectorStatus(ctx, connectorPkQuery, p.getStopTimestamp(), p.getStatusUpdate());
     }
 
     // -------------------------------------------------------------------------
@@ -250,7 +258,8 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
      * notification will be used as current. Or, if this transaction data was sent to us for a failed push from the past
      * and we have a "more recent" status, it will still be the current status.
      */
-    private void insertConnectorStatus(SelectConditionStep<Record1<Integer>> connectorPkQuery,
+    private void insertConnectorStatus(DSLContext ctx,
+                                       SelectConditionStep<Record1<Integer>> connectorPkQuery,
                                        DateTime timestamp,
                                        TransactionStatusUpdate statusUpdate) {
         ctx.insertInto(CONNECTOR_STATUS)
@@ -276,6 +285,25 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
         }
     }
 
+    /**
+     * Use case: An offline charging station decides to allow an unknown idTag to start a transaction. Later, when it
+     * is online, it sends a StartTransactionRequest with this idTag. If we do not insert this idTag, the transaction
+     * details will not be inserted into DB and we will lose valuable information.
+     */
+    private boolean insertIgnoreIdTag(DSLContext ctx, InsertTransactionParams p) {
+        String note = "This unknown idTag was used in a transaction that started @ " + p.getStartTimestamp()
+                + ". It was reported @ " + DateTime.now() + ".";
+
+        int count = ctx.insertInto(OCPP_TAG)
+                       .set(OCPP_TAG.ID_TAG, p.getIdTag())
+                       .set(OCPP_TAG.NOTE, note)
+                       .set(OCPP_TAG.BLOCKED, true)
+                       .onDuplicateKeyIgnore() // Important detail
+                       .execute();
+
+        return count == 1;
+    }
+
     private int getConnectorPkFromConnector(DSLContext ctx, String chargeBoxIdentity, int connectorId) {
         return ctx.select(CONNECTOR.CONNECTOR_PK)
                   .from(CONNECTOR)
@@ -285,11 +313,10 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
                   .value1();
     }
 
-    private void batchInsertMeterValues15(DSLContext ctx, List<ocpp.cs._2012._06.MeterValue> list, int connectorPk,
-                                          Integer transactionId) {
+    private void batchInsertMeterValues(DSLContext ctx, List<MeterValue> list, int connectorPk, Integer transactionId) {
         List<ConnectorMeterValueRecord> batch =
                 list.stream()
-                    .flatMap(t -> t.getValue()
+                    .flatMap(t -> t.getSampledValue()
                                    .stream()
                                    .map(k -> ctx.newRecord(CONNECTOR_METER_VALUE)
                                                 .setConnectorPk(connectorPk)
@@ -301,7 +328,8 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
                                                 .setFormat(k.isSetFormat() ? k.getFormat().value() : null)
                                                 .setMeasurand(k.isSetMeasurand() ? k.getMeasurand().value() : null)
                                                 .setLocation(k.isSetLocation() ? k.getLocation().value() : null)
-                                                .setUnit(k.isSetUnit() ? k.getUnit().value() : null)))
+                                                .setUnit(k.isSetUnit() ? k.getUnit().value() : null)
+                                                .setPhase(k.isSetPhase() ? k.getPhase().value() : null)))
                     .collect(Collectors.toList());
 
         ctx.batchInsert(batch).execute();

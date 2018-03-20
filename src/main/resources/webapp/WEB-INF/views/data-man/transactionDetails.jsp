@@ -16,6 +16,7 @@
             <tr><td>Start Value</td><td>${details.transaction.startValue}</td></tr>
             <tr><td>Stop Date/Time</td><td>${details.transaction.stopTimestamp}</td></tr>
             <tr><td>Stop Value</td><td>${details.transaction.stopValue}</td></tr>
+            <tr><td>Stop Reason</td><td>${details.transaction.stopReason}</td></tr>
         </table>
     </center>
     <br>
@@ -30,6 +31,7 @@
             <th>Measurand</th>
             <th>Location</th>
             <th>Unit</th>
+            <th>Phase</th>
         </tr>
         </thead>
         <tbody>
@@ -42,6 +44,7 @@
                 <td>${v.measurand}</td>
                 <td>${v.location}</td>
                 <td>${v.unit}</td>
+                <td>${v.phase}</td>
             </tr>
         </c:forEach>
         </tbody>

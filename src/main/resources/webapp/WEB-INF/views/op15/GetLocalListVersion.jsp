@@ -3,30 +3,25 @@
 <div class="content">
 <div class="left-menu">
 <ul>
-	<li><a href="${ctxPath}/manager/operations/v1.5/ChangeAvailability">Change Availability</a></li>
-	<li><a href="${ctxPath}/manager/operations/v1.5/ChangeConfiguration">Change Configuration</a></li>
-	<li><a href="${ctxPath}/manager/operations/v1.5/ClearCache">Clear Cache</a></li>
-	<li><a href="${ctxPath}/manager/operations/v1.5/GetDiagnostics">Get Diagnostics</a></li>
-	<li><a href="${ctxPath}/manager/operations/v1.5/RemoteStartTransaction">Remote Start Transaction</a></li>
-	<li><a href="${ctxPath}/manager/operations/v1.5/RemoteStopTransaction">Remote Stop Transaction</a></li>
-	<li><a href="${ctxPath}/manager/operations/v1.5/Reset">Reset</a></li>
-	<li><a href="${ctxPath}/manager/operations/v1.5/UnlockConnector">Unlock Connector</a></li>
-	<li><a href="${ctxPath}/manager/operations/v1.5/UpdateFirmware">Update Firmware</a></li>
+	<li><a href="${ctxPath}/manager/operations/${opVersion}/ChangeAvailability">Change Availability</a></li>
+	<li><a href="${ctxPath}/manager/operations/${opVersion}/ChangeConfiguration">Change Configuration</a></li>
+	<li><a href="${ctxPath}/manager/operations/${opVersion}/ClearCache">Clear Cache</a></li>
+	<li><a href="${ctxPath}/manager/operations/${opVersion}/GetDiagnostics">Get Diagnostics</a></li>
+	<li><a href="${ctxPath}/manager/operations/${opVersion}/RemoteStartTransaction">Remote Start Transaction</a></li>
+	<li><a href="${ctxPath}/manager/operations/${opVersion}/RemoteStopTransaction">Remote Stop Transaction</a></li>
+	<li><a href="${ctxPath}/manager/operations/${opVersion}/Reset">Reset</a></li>
+	<li><a href="${ctxPath}/manager/operations/${opVersion}/UnlockConnector">Unlock Connector</a></li>
+	<li><a href="${ctxPath}/manager/operations/${opVersion}/UpdateFirmware">Update Firmware</a></li>
 	<hr>
-	<li><a href="${ctxPath}/manager/operations/v1.5/ReserveNow">Reserve Now</a></li>
-	<li><a href="${ctxPath}/manager/operations/v1.5/CancelReservation">Cancel Reservation</a></li>
-	<li><a href="${ctxPath}/manager/operations/v1.5/DataTransfer">Data Transfer</a></li>
-	<li><a href="${ctxPath}/manager/operations/v1.5/GetConfiguration">Get Configuration</a></li>
-	<li><a class="highlight" href="${ctxPath}/manager/operations/v1.5/GetLocalListVersion">Get Local List Version</a></li>
-	<li><a href="${ctxPath}/manager/operations/v1.5/SendLocalList">Send Local List</a></li>
+	<li><a href="${ctxPath}/manager/operations/${opVersion}/ReserveNow">Reserve Now</a></li>
+	<li><a href="${ctxPath}/manager/operations/${opVersion}/CancelReservation">Cancel Reservation</a></li>
+	<li><a href="${ctxPath}/manager/operations/${opVersion}/DataTransfer">Data Transfer</a></li>
+	<li><a href="${ctxPath}/manager/operations/${opVersion}/GetConfiguration">Get Configuration</a></li>
+	<li><a class="highlight" href="${ctxPath}/manager/operations/${opVersion}/GetLocalListVersion">Get Local List Version</a></li>
+	<li><a href="${ctxPath}/manager/operations/${opVersion}/SendLocalList">Send Local List</a></li>
 </ul>
 </div>
 <div class="op15-content">
-<form:form action="${ctxPath}/manager/operations/v1.5/GetLocalListVersion" modelAttribute="params">
-    <section><span>Charge Points with OCPP v1.5</span></section>
-    <%@ include file="../00-cp-multiple.jsp" %>
-    <section><span>Parameters</span></section>
-    <center><i>No parameters required.</i></center><div class="submit-button"><input type="submit" value="Perform"></div>
-</form:form>
+	<%@ include file="../op-forms/GetLocalListForm.jsp" %>
 </div></div>
 <%@ include file="../00-footer.jsp" %>

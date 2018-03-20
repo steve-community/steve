@@ -84,6 +84,8 @@ public enum Ocpp15TypeStore implements TypeStore {
                 return new ActionResponsePair("RemoteStartTransaction", RemoteStartTransactionResponse.class);
             case "RemoteStopTransactionRequest":
                 return new ActionResponsePair("RemoteStopTransaction", RemoteStopTransactionResponse.class);
+
+            // new in ocpp 1.5
             case "CancelReservationRequest":
                 return new ActionResponsePair("CancelReservation", CancelReservationResponse.class);
             case "DataTransferRequest":

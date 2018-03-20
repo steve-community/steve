@@ -22,5 +22,8 @@ public class TransactionDetails {
     public static class MeterValues {
         private final DateTime valueTimestamp;
         private final String value, readingContext, format, measurand, location, unit;
+
+        // New in OCPP 1.6
+        private final String phase;
     }
 }

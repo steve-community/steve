@@ -25,6 +25,9 @@ table { width: 100%;}
 table.action td:last-child {
 	border-left: 1px solid #CCC;
 }
+table.action th:last-child {
+	border-left: 1px solid #CCC;
+}
 table.userInput th:first-child {
 	text-align: right;
 }
@@ -232,7 +235,7 @@ ul.navigation ul li a {
 /*************** fin ***************/
 .left-menu {
 	float: left;
-	width: 180px;
+	width: 230px;
 	height: 100%;
 	margin: 0;
 	padding: 0; 
@@ -268,13 +271,19 @@ ul.navigation ul li a {
 }
 .op-content {
 	min-height: 350px;
-	margin: 0 0 0 180px;
+	margin: 0 0 0 230px;
 	padding: 0 0 0 12px;
 	border-left: 1px solid #CCC;
 }
 .op15-content {
 	min-height: 470px;
-	margin: 0 0 0 180px;
+	margin: 0 0 0 230px;
+	padding: 0 0 0 12px;
+	border-left: 1px solid #CCC;
+}
+.op16-content {
+	min-height: 650px;
+	margin: 0 0 0 230px;
 	padding: 0 0 0 12px;
 	border-left: 1px solid #CCC;
 }
@@ -295,14 +304,14 @@ ul.navigation ul li a {
 	background: #000;
 }
 .container {
-	width: 1000px;
+	width: 80%;
 	margin-right: auto;
 	margin-left: auto;
 	*zoom: 1;
 }
 .content {
 	position: relative;
-	width: 1000px;
+	width: 80%;
 	border: 1px solid #CCC;
 	border-radius: 4px;
 	background: #fff;
@@ -311,19 +320,17 @@ ul.navigation ul li a {
 /* 	overflow: auto; so the size of the wrapper is always the size of the longest content */
 }
 .submit-button {
-	position: absolute;
-    bottom: 12px;
-    right: 354px;
+	margin-top: 20px;
 }
 .footer {
-	width: 1024px;
+	width: 80%;
 	border-left: 1px solid #CCC;
 	border-top: 1px solid #CCC;
 	border-right: 1px solid #CCC;
 	border-top-left-radius: 4px;
 	border-top-right-radius: 4px;
 	position: relative;
-	padding-top: 10px;
+	padding: 12px;
 	margin-top: -70px;
 	margin-right: auto;
 	margin-left: auto;
@@ -332,7 +339,7 @@ ul.navigation ul li a {
 	background: #fff;
 }
 .footer a { margin-right: 10px; }
-.right-content { margin: 0 0 0 180px; border-left: 1px solid #CCC; padding-left:12px; }
+.right-content { margin: 0 0 0 230px; border-left: 1px solid #CCC; padding-left:12px; }
 .right-content div { display:none; }
 .right-content div:first-child { display:block; }
 .info, .warning, .error { text-align: left; border: 1px solid; margin-bottom: 10px; padding:15px 30px 15px 30px; }
@@ -342,7 +349,7 @@ ul.navigation ul li a {
     color: #D8000C;
     background-color: #fdd0d0;
     position: relative;
-    width: 1000px;
+    width: 80%;
     border: 1px solid #fe9393;
     border-radius: 4px;
     margin: 12px auto;
@@ -410,7 +417,7 @@ span.baseCell {
 	display: table-cell; 
 }
 span.baseCell:first-child {
-	width:50%;  
+	width:62%;
 	text-align: right; 
 }
 span.baseCell:nth-child(2) {

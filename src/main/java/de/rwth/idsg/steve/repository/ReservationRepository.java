@@ -3,6 +3,7 @@ package de.rwth.idsg.steve.repository;
 import de.rwth.idsg.steve.repository.dto.InsertReservationParams;
 import de.rwth.idsg.steve.repository.dto.Reservation;
 import de.rwth.idsg.steve.web.dto.ReservationQueryForm;
+import org.jooq.DSLContext;
 
 import java.util.List;
 
@@ -29,5 +30,5 @@ public interface ReservationRepository {
 
     void accepted(int reservationId);
     void cancelled(int reservationId);
-    void used(int reservationId, int transactionId);
+    void used(DSLContext ctx, int reservationId, int transactionId);
 }

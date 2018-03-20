@@ -1,7 +1,7 @@
 package de.rwth.idsg.steve.ocpp.task;
 
-import de.rwth.idsg.steve.ocpp.OcppCallback;
 import de.rwth.idsg.steve.ocpp.CommunicationTask;
+import de.rwth.idsg.steve.ocpp.OcppCallback;
 import de.rwth.idsg.steve.ocpp.OcppVersion;
 import de.rwth.idsg.steve.web.dto.ocpp.UpdateFirmwareParams;
 
@@ -43,6 +43,15 @@ public class UpdateFirmwareTask extends CommunicationTask<UpdateFirmwareParams, 
     }
 
     @Override
+    public ocpp.cp._2015._10.UpdateFirmwareRequest getOcpp16Request() {
+        return new ocpp.cp._2015._10.UpdateFirmwareRequest()
+                .withLocation(params.getLocation())
+                .withRetrieveDate(toDateTime(params.getRetrieve()))
+                .withRetries(params.getRetries())
+                .withRetryInterval(params.getRetryInterval());
+    }
+
+    @Override
     public AsyncHandler<ocpp.cp._2010._08.UpdateFirmwareResponse> getOcpp12Handler(String chargeBoxId) {
         return res -> {
             try {
@@ -63,4 +72,16 @@ public class UpdateFirmwareTask extends CommunicationTask<UpdateFirmwareParams, 
             }
         };
     }
+
+    @Override
+    public AsyncHandler<ocpp.cp._2015._10.UpdateFirmwareResponse> getOcpp16Handler(String chargeBoxId) {
+        return res -> {
+            try {
+                success(chargeBoxId, "OK");
+            } catch (Exception e) {
+                failed(chargeBoxId, e);
+            }
+        };
+    }
+
 }

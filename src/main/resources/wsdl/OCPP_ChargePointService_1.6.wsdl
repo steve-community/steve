@@ -1,0 +1,1265 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+OCPP Charge Point service description
+Version 1.6 FINAL
+
+Copyright © 2010 – 2015 Open Charge Alliance. All rights reserved.
+
+This document is made available under the Creative Commons Attribution-NoDerivatives 4.0 International Public License
+(https://creativecommons.org/licenses/by-nd/4.0/legalcode).
+-->
+
+<wsdl:definitions xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+				 xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/"
+				 xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/"
+				 xmlns:s="http://www.w3.org/2001/XMLSchema"
+				 xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/"
+				 xmlns:http="http://schemas.xmlsoap.org/wsdl/http/"
+				 xmlns:tns="urn://Ocpp/Cp/2015/10/"
+			   targetNamespace="urn://Ocpp/Cp/2015/10/"
+			   xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+         xmlns:wsaw="http://www.w3.org/2006/05/addressing/wsdl"
+	       xmlns:wsa="http://www.w3.org/2005/08/addressing"
+	       xmlns:wsp="http://schemas.xmlsoap.org/ws/2004/09/policy"
+	       xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd">
+
+  <wsp:Policy wsu:Id="ServicePolicy">
+    <wsp:ExactlyOne>
+      <wsp:All>
+        <wsaw:UsingAddressing />
+      </wsp:All>
+    </wsp:ExactlyOne>
+  </wsp:Policy>
+  
+  <wsdl:types>
+    <s:schema elementFormDefault="qualified" targetNamespace="urn://Ocpp/Cp/2015/10/">
+
+      <!-- Begin of types shared with CentralSystemService -->
+      <s:simpleType name="IdToken">
+        <s:annotation>
+          <s:documentation>Type of string defining identification token, e.g. RFID or credit card number. To be treated as case insensitive.</s:documentation>
+        </s:annotation>
+        <s:restriction base="s:string">
+          <s:maxLength value="20"/>
+        </s:restriction>
+      </s:simpleType>
+
+      <s:simpleType name="DecimalOne">
+        <s:annotation>
+          <s:documentation>Decimal with one digit fraction</s:documentation>
+        </s:annotation>
+        <s:restriction base="s:decimal">
+          <s:fractionDigits value="1" />
+        </s:restriction>
+      </s:simpleType>	  
+	  
+      <s:simpleType name="CiString20Type">
+        <s:annotation>
+          <s:documentation>String of maximum 20 printable characters. To be treated as case insensitive.</s:documentation>
+        </s:annotation>
+        <s:restriction base="s:string">
+          <s:maxLength value="20"/>
+        </s:restriction>
+      </s:simpleType>
+
+      <s:simpleType name="CiString25Type">
+        <s:annotation>
+          <s:documentation>String of maximum 25 printable characters. To be treated as case insensitive.</s:documentation>
+        </s:annotation>
+        <s:restriction base="s:string">
+          <s:maxLength value="25"/>
+        </s:restriction>
+      </s:simpleType>
+
+      <s:simpleType name="CiString50Type">
+        <s:annotation>
+          <s:documentation>String of maximum 50 printable characters. To be treated as case insensitive.</s:documentation>
+        </s:annotation>
+        <s:restriction base="s:string">
+          <s:maxLength value="50"/>
+        </s:restriction>
+      </s:simpleType>
+
+      <s:simpleType name="CiString255Type">
+        <s:annotation>
+          <s:documentation>String of maximum 255 printable characters. To be treated as case insensitive.</s:documentation>
+        </s:annotation>
+        <s:restriction base="s:string">
+          <s:maxLength value="255"/>
+        </s:restriction>
+      </s:simpleType>
+
+      <s:simpleType name="CiString500Type">
+        <s:annotation>
+          <s:documentation>String of maximum 500 printable characters. To be treated as case insensitive.</s:documentation>
+        </s:annotation>
+        <s:restriction base="s:string">
+          <s:maxLength value="500"/>
+        </s:restriction>
+      </s:simpleType>
+
+      <s:simpleType name="AuthorizationStatus">
+        <s:annotation>
+          <s:documentation>Defines the authorization-status-value</s:documentation>
+        </s:annotation>
+        <s:restriction base="s:string">
+          <s:enumeration value="Accepted"/>
+          <s:enumeration value="Blocked"/>
+          <s:enumeration value="Expired"/>
+          <s:enumeration value="Invalid"/>
+          <s:enumeration value="ConcurrentTx"/>
+        </s:restriction>
+      </s:simpleType>
+
+      <s:complexType name="IdTagInfo">
+        <s:sequence>
+          <s:element name="status" type="tns:AuthorizationStatus" minOccurs="1" maxOccurs="1"/>
+          <s:element name="expiryDate" type="s:dateTime" minOccurs="0" maxOccurs="1"/>
+          <s:element name="parentIdTag" type="tns:IdToken" minOccurs="0" maxOccurs="1"/>
+        </s:sequence>
+      </s:complexType>
+      <!-- End of types shared with CentralSystemService -->
+
+      <s:simpleType name="UnlockStatus">
+        <s:annotation>
+          <s:documentation>Defines the unlock-status-value</s:documentation>
+        </s:annotation>
+        <s:restriction base="s:string">
+          <s:enumeration value="Unlocked" />
+          <s:enumeration value="UnlockFailed" />
+          <s:enumeration value="NotSupported" />
+        </s:restriction>
+      </s:simpleType>
+
+      <s:complexType name="UnlockConnectorRequest">
+        <s:annotation>
+          <s:documentation>Defines the UnlockConnector.req PDU</s:documentation>
+        </s:annotation>
+        <s:sequence>
+          <s:element name="connectorId" type="s:int" minOccurs="1" maxOccurs="1" />
+        </s:sequence>
+      </s:complexType>
+
+      <s:complexType name="UnlockConnectorResponse">
+        <s:annotation>
+          <s:documentation>Defines the UnlockConnector.conf PDU</s:documentation>
+        </s:annotation>
+        <s:sequence>
+          <s:element name="status" type="tns:UnlockStatus" minOccurs="1" maxOccurs="1" />
+        </s:sequence>
+      </s:complexType>
+
+      <s:simpleType name="ResetType">
+        <s:annotation>
+          <s:documentation>Defines the reset-type-value</s:documentation>
+        </s:annotation>
+        <s:restriction base="s:string">
+          <s:enumeration value="Hard" />
+          <s:enumeration value="Soft" />
+        </s:restriction>
+      </s:simpleType>
+
+      <s:complexType name="ResetRequest">
+        <s:annotation>
+          <s:documentation>Defines the Reset.req PDU</s:documentation>
+        </s:annotation>
+        <s:sequence>
+          <s:element name="type" type="tns:ResetType" minOccurs="1" maxOccurs="1" />
+        </s:sequence>
+      </s:complexType>
+
+      <s:simpleType name="ResetStatus">
+        <s:annotation>
+          <s:documentation>Defines the reset-status-value</s:documentation>
+        </s:annotation>
+        <s:restriction base="s:string">
+          <s:enumeration value="Accepted" />
+          <s:enumeration value="Rejected" />
+        </s:restriction>
+      </s:simpleType>
+
+      <s:complexType name="ResetResponse">
+        <s:sequence>
+          <s:element name="status" type="tns:ResetStatus" minOccurs="1" maxOccurs="1" />
+        </s:sequence>
+      </s:complexType>
+
+      <s:simpleType name="AvailabilityType">
+        <s:annotation>
+          <s:documentation>Defines the availability-type-value</s:documentation>
+        </s:annotation>
+        <s:restriction base="s:string">
+          <s:enumeration value="Inoperative" />
+          <s:enumeration value="Operative" />
+        </s:restriction>
+      </s:simpleType>
+      
+      <s:complexType name="ChangeAvailabilityRequest">
+        <s:annotation>
+          <s:documentation>Defines the ChangeAvailability.req PDU</s:documentation>
+        </s:annotation>
+        <s:sequence>
+          <s:element name="connectorId" type="s:int" minOccurs="1" maxOccurs="1" />
+          <s:element name="type" type="tns:AvailabilityType" minOccurs="1" maxOccurs="1" />
+        </s:sequence>
+      </s:complexType>
+
+      <s:simpleType name="AvailabilityStatus">
+        <s:annotation>
+          <s:documentation>Defines the availability-status-value</s:documentation>
+        </s:annotation>
+        <s:restriction base="s:string">
+          <s:enumeration value="Accepted" />
+          <s:enumeration value="Rejected" />
+          <s:enumeration value="Scheduled" />
+        </s:restriction>
+      </s:simpleType>
+
+      <s:complexType name="ChangeAvailabilityResponse">
+        <s:annotation>
+          <s:documentation>Defines the ChangeAvailability.conf PDU</s:documentation>
+        </s:annotation>
+        <s:sequence>
+          <s:element name="status" type="tns:AvailabilityStatus" minOccurs="1" maxOccurs="1" />
+        </s:sequence>
+      </s:complexType>
+
+      <s:complexType name="GetDiagnosticsRequest">
+        <s:annotation>
+          <s:documentation>Defines the GetDiagnostics.req PDU</s:documentation>
+        </s:annotation>
+        <s:sequence>
+          <s:element name="location" type="s:anyURI" minOccurs="1" maxOccurs="1" />
+          <s:element name="startTime" type="s:dateTime" minOccurs="0" maxOccurs="1" />
+          <s:element name="stopTime" type="s:dateTime" minOccurs="0" maxOccurs="1" />
+          <s:element name="retries" type="s:int" minOccurs="0" maxOccurs="1" />
+          <s:element name="retryInterval" type="s:int" minOccurs="0" maxOccurs="1" />
+        </s:sequence>
+      </s:complexType>
+
+      <s:complexType name="GetDiagnosticsResponse">
+        <s:annotation>
+          <s:documentation>Defines the GetDiagnostics.conf PDU</s:documentation>
+        </s:annotation>
+        <s:sequence>
+          <s:element name="fileName" type="tns:CiString255Type" minOccurs="0" maxOccurs="1" />
+        </s:sequence>
+      </s:complexType>
+
+      <s:complexType name="ClearCacheRequest">
+        <s:annotation>
+          <s:documentation>Defines the ClearCache.req PDU</s:documentation>
+        </s:annotation>
+      </s:complexType>
+
+      <s:simpleType name="ClearCacheStatus">
+        <s:annotation>
+          <s:documentation>Defines the clear-cache-status-value</s:documentation>
+        </s:annotation>
+        <s:restriction base="s:string">
+          <s:enumeration value="Accepted" />
+          <s:enumeration value="Rejected" />
+        </s:restriction>
+      </s:simpleType>
+      
+      <s:complexType name="ClearCacheResponse">
+        <s:annotation>
+          <s:documentation>Defines the ClearCache.conf PDU</s:documentation>
+        </s:annotation>
+        <s:sequence>
+          <s:element name="status" type="tns:ClearCacheStatus" minOccurs="1" maxOccurs="1" />
+        </s:sequence>
+      </s:complexType>
+
+      <s:simpleType name="ChargingProfilePurposeType">
+        <s:annotation>
+          <s:documentation>Defines the charging-profile-purpose-type-value</s:documentation>
+        </s:annotation>
+        <s:restriction base="s:string">
+          <s:enumeration value="ChargePointMaxProfile" />
+          <s:enumeration value="TxDefaultProfile" />
+          <s:enumeration value="TxProfile" />
+        </s:restriction>
+      </s:simpleType>
+
+      <s:complexType name="ClearChargingProfileRequest">
+        <s:annotation>
+          <s:documentation>Defines the ClearChargingProfile.req PDU</s:documentation>
+        </s:annotation>
+        <s:sequence>
+          <s:element name="id" type="s:int" minOccurs="0" maxOccurs="1" />
+          <s:element name="connectorId" type="s:int" minOccurs="0" maxOccurs="1" />
+          <s:element name="chargingProfilePurpose" type="tns:ChargingProfilePurposeType" minOccurs="0" maxOccurs="1" />
+          <s:element name="stackLevel" type="s:int" minOccurs="0" maxOccurs="1" />
+        </s:sequence>
+      </s:complexType>
+
+      <s:simpleType name="ClearChargingProfileStatus">
+        <s:annotation>
+          <s:documentation>Defines the clear-charging-profile-status-value</s:documentation>
+        </s:annotation>
+        <s:restriction base="s:string">
+          <s:enumeration value="Accepted" />
+          <s:enumeration value="Unknown" />
+        </s:restriction>
+      </s:simpleType>
+	  
+	  <s:complexType name="ClearChargingProfileResponse">
+        <s:annotation>
+          <s:documentation>Defines the ClearChargingProfile.conf PDU</s:documentation>
+        </s:annotation>
+        <s:sequence>
+          <s:element name="status" type="tns:ClearChargingProfileStatus" minOccurs="1" maxOccurs="1" />
+        </s:sequence>
+      </s:complexType>
+
+      <s:complexType name="UpdateFirmwareRequest">
+        <s:annotation>
+          <s:documentation>Defines the UpdateFirmware.req PDU</s:documentation>
+        </s:annotation>
+        <s:sequence>
+          <s:element name="retrieveDate" type="s:dateTime" minOccurs="1" maxOccurs="1" />
+          <s:element name="location" type="s:anyURI" minOccurs="1" maxOccurs="1" />
+          <s:element name="retries" type="s:int" minOccurs="0" maxOccurs="1" />
+          <s:element name="retryInterval" type="s:int" minOccurs="0" maxOccurs="1" />
+        </s:sequence>
+      </s:complexType>
+
+      <s:complexType name="UpdateFirmwareResponse">
+        <s:annotation>
+          <s:documentation>Defines the UpdateFirmware.conf PDU</s:documentation>
+        </s:annotation>
+      </s:complexType>
+
+      <s:complexType name="ChangeConfigurationRequest">
+        <s:annotation>
+          <s:documentation>Defines the ChangeConfiguration.req PDU</s:documentation>
+        </s:annotation>
+        <s:sequence>
+          <s:element name="key" type="tns:CiString50Type" minOccurs="1" maxOccurs="1" />
+          <s:element name="value" type="tns:CiString500Type" minOccurs="1" maxOccurs="1" />
+        </s:sequence>
+      </s:complexType>
+
+      <s:simpleType name="ConfigurationStatus">
+        <s:annotation>
+          <s:documentation>Defines the configuration-status-value</s:documentation>
+        </s:annotation>
+        <s:restriction base="s:string">
+          <s:enumeration value="Accepted" />
+          <s:enumeration value="NotSupported" />
+          <s:enumeration value="RebootRequired" />
+          <s:enumeration value="Rejected" />
+        </s:restriction>
+      </s:simpleType>
+      
+      <s:complexType name="ChangeConfigurationResponse">
+        <s:annotation>
+          <s:documentation>Defines the ChangeConfiguration.conf PDU</s:documentation>
+        </s:annotation>
+        <s:sequence>
+          <s:element name="status" type="tns:ConfigurationStatus" minOccurs="1" maxOccurs="1" />
+        </s:sequence>
+      </s:complexType>
+
+      <s:complexType name="RemoteStartTransactionRequest">
+        <s:annotation>
+          <s:documentation>Defines the RemoteStartTransaction.req PDU</s:documentation>
+        </s:annotation>
+        <s:sequence>
+          <s:element name="connectorId" type="s:int" minOccurs="0" maxOccurs="1" />
+          <s:element name="idTag" type="tns:IdToken" minOccurs="1" maxOccurs="1" />
+          <s:element name="chargingProfile" type="tns:ChargingProfile" minOccurs="0" maxOccurs="1" />
+        </s:sequence>
+      </s:complexType>
+
+      <s:simpleType name="RemoteStartStopStatus">
+        <s:annotation>
+          <s:documentation>Defines the remote-start-stop-status-value</s:documentation>
+        </s:annotation>
+        <s:restriction base="s:string">
+          <s:enumeration value="Accepted" />
+          <s:enumeration value="Rejected" />
+        </s:restriction>
+      </s:simpleType>
+      
+      <s:complexType name="RemoteStartTransactionResponse">
+        <s:annotation>
+          <s:documentation>Defines the RemoteStartTransaction.conf PDU</s:documentation>
+        </s:annotation>
+        <s:sequence>
+          <s:element name="status" type="tns:RemoteStartStopStatus" minOccurs="1" maxOccurs="1" />
+        </s:sequence>
+      </s:complexType>
+
+      <s:complexType name="RemoteStopTransactionRequest">
+        <s:annotation>
+          <s:documentation>Defines the RemoteStopTransaction.req PDU</s:documentation>
+        </s:annotation>
+        <s:sequence>
+          <s:element name="transactionId" type="s:int" minOccurs="1" maxOccurs="1" />
+        </s:sequence>
+      </s:complexType>
+
+      <s:complexType name="RemoteStopTransactionResponse">
+        <s:annotation>
+          <s:documentation>Defines the RemoteStopTransaction.conf PDU</s:documentation>
+        </s:annotation>
+        <s:sequence>
+          <s:element name="status" type="tns:RemoteStartStopStatus" minOccurs="1" maxOccurs="1" />
+        </s:sequence>
+      </s:complexType>
+
+      <s:complexType name="CancelReservationRequest">
+        <s:annotation>
+          <s:documentation>Defines the CancelReservation.req PDU</s:documentation>
+        </s:annotation>
+        <s:sequence>
+          <s:element name="reservationId" type="s:int" minOccurs="1" maxOccurs="1" />
+        </s:sequence>
+      </s:complexType>
+
+      <s:simpleType name="CancelReservationStatus">
+        <s:restriction base="s:string">
+          <s:enumeration value="Accepted"/>
+          <s:enumeration value="Rejected"/>
+        </s:restriction>
+      </s:simpleType>
+
+      <s:complexType name="CancelReservationResponse">
+        <s:annotation>
+          <s:documentation>Defines the CancelReservation.conf PDU</s:documentation>
+        </s:annotation>
+        <s:sequence>
+          <s:element name="status" type="tns:CancelReservationStatus" minOccurs="1" maxOccurs="1" />
+        </s:sequence>
+      </s:complexType>
+
+      <s:complexType name="DataTransferRequest">
+        <s:annotation>
+          <s:documentation>Defines the DataTransfer.req PDU</s:documentation>
+        </s:annotation>
+        <s:sequence>
+          <s:element name="vendorId" type="tns:CiString255Type" minOccurs="1" maxOccurs="1" />
+          <s:element name="messageId" type="tns:CiString50Type" minOccurs="0" maxOccurs="1" />
+          <s:element name="data" type="s:string" minOccurs="0" maxOccurs="1" />
+        </s:sequence>
+      </s:complexType>
+
+      <s:simpleType name="DataTransferStatus">
+        <s:annotation>
+          <s:documentation>Defines the status returned in DataTransfer.conf</s:documentation>
+        </s:annotation>
+        <s:restriction base="s:string">
+          <s:enumeration value="Accepted" />
+          <s:enumeration value="Rejected" />
+          <s:enumeration value="UnknownMessageId" />
+          <s:enumeration value="UnknownVendorId" />
+        </s:restriction>
+      </s:simpleType>
+
+      <s:complexType name="DataTransferResponse">
+        <s:annotation>
+          <s:documentation>Defines the DataTransfer.conf PDU</s:documentation>
+        </s:annotation>
+        <s:sequence>
+          <s:element name="status" type="tns:DataTransferStatus" minOccurs="1" maxOccurs="1" />
+          <s:element name="data" type="s:string" minOccurs="0" maxOccurs="1" />
+        </s:sequence>
+      </s:complexType>
+
+      <s:complexType name="GetConfigurationRequest">
+        <s:annotation>
+          <s:documentation>Defines the GetConfiguration.req PDU</s:documentation>
+        </s:annotation>
+        <s:sequence>
+          <s:element name="key" type="tns:CiString50Type" minOccurs="0" maxOccurs="unbounded" />
+        </s:sequence>
+      </s:complexType>
+
+      <s:complexType name="KeyValue">
+        <s:annotation>
+          <s:documentation>Key-Value pairs returned by GetConfiguration.conf PDU</s:documentation>
+        </s:annotation>
+        <s:sequence>
+          <s:element name="key" type="tns:CiString50Type" minOccurs="1" maxOccurs="1" />
+          <s:element name="readonly" type="s:boolean" minOccurs="1" maxOccurs="1" />
+          <s:element name="value" type="tns:CiString500Type" minOccurs="0" maxOccurs="1" />
+        </s:sequence>
+      </s:complexType>
+
+      <s:complexType name="GetConfigurationResponse">
+        <s:annotation>
+          <s:documentation>Defines the GetConfiguration.req PDU</s:documentation>
+        </s:annotation>
+        <s:sequence>
+          <s:element name="configurationKey" type="tns:KeyValue" minOccurs="0" maxOccurs="unbounded" />
+          <s:element name="unknownKey" type="tns:CiString50Type" minOccurs="0" maxOccurs="unbounded" />
+        </s:sequence>
+      </s:complexType>
+
+      <s:complexType name="GetLocalListVersionRequest">
+        <s:annotation>
+          <s:documentation>Defines the GetLocalListVersion.req PDU</s:documentation>
+        </s:annotation>
+      </s:complexType>
+
+      <s:complexType name="GetLocalListVersionResponse">
+        <s:annotation>
+          <s:documentation>Defines the GetLocalListVersion.conf PDU</s:documentation>
+        </s:annotation>
+        <s:sequence>
+          <s:element name="listVersion" type="s:int" minOccurs="1" maxOccurs="1" />
+        </s:sequence>
+      </s:complexType>
+
+	  <s:simpleType name="ChargingRateUnitType">
+        <s:restriction base="s:string">
+          <s:enumeration value="W"/>
+          <s:enumeration value="A"/>
+        </s:restriction>
+      </s:simpleType>
+
+	  <s:complexType name="ChargingSchedulePeriod">
+        <s:sequence>
+          <s:element name="startPeriod" type="s:int" minOccurs="1" maxOccurs="1" />
+          <s:element name="limit" type="tns:DecimalOne" minOccurs="1" maxOccurs="1" />
+          <s:element name="numberPhases" type="s:int" minOccurs="0" maxOccurs="1" />
+        </s:sequence>
+      </s:complexType>
+
+	  <s:complexType name="ChargingSchedule">
+        <s:sequence>
+          <s:element name="duration" type="s:int" minOccurs="0" maxOccurs="1" />
+          <s:element name="startSchedule" type="s:dateTime" minOccurs="0" maxOccurs="1"/>
+          <s:element name="chargingRateUnit" type="tns:ChargingRateUnitType" minOccurs="1" maxOccurs="1"/>
+          <s:element name="chargingSchedulePeriod" type="tns:ChargingSchedulePeriod" minOccurs="1" maxOccurs="unbounded"/>
+          <s:element name="minChargingRate" type="tns:DecimalOne" minOccurs="0" maxOccurs="1" />
+        </s:sequence>
+      </s:complexType>
+
+      <s:complexType name="GetCompositeScheduleRequest">
+        <s:annotation>
+          <s:documentation>Defines the GetCompositeSchedule.req PDU</s:documentation>
+        </s:annotation>
+        <s:sequence>
+          <s:element name="connectorId" type="s:int" minOccurs="1" maxOccurs="1" />
+          <s:element name="duration" type="s:int" minOccurs="1" maxOccurs="1" />
+          <s:element name="chargingRateUnit" type="tns:ChargingRateUnitType" minOccurs="0" maxOccurs="1"/>
+        </s:sequence>
+      </s:complexType>
+
+	  <s:simpleType name="GetCompositeScheduleStatus">
+        <s:restriction base="s:string">
+          <s:enumeration value="Accepted"/>
+          <s:enumeration value="Rejected"/>
+        </s:restriction>
+      </s:simpleType>
+
+      <s:complexType name="GetCompositeScheduleResponse">
+        <s:annotation>
+          <s:documentation>Defines the GetCompositeSchedule.conf PDU</s:documentation>
+        </s:annotation>
+        <s:sequence>
+          <s:element name="status" type="tns:GetCompositeScheduleStatus" minOccurs="1" maxOccurs="1" />
+          <s:element name="connectorId" type="s:int" minOccurs="0" maxOccurs="1" />
+          <s:element name="scheduleStart" type="s:dateTime" minOccurs="0" maxOccurs="1" />
+          <s:element name="chargingSchedule" type="tns:ChargingSchedule" minOccurs="0" maxOccurs="1"/>
+        </s:sequence>
+      </s:complexType>
+
+      <s:complexType name="ReserveNowRequest">
+        <s:annotation>
+          <s:documentation>Defines the ReserveNow.req PDU</s:documentation>
+        </s:annotation>
+        <s:sequence>
+          <s:element name="connectorId" type="s:int" minOccurs="1" maxOccurs="1" />
+          <s:element name="expiryDate" type="s:dateTime" minOccurs="1" maxOccurs="1" />
+          <s:element name="idTag" type="tns:IdToken" minOccurs="1" maxOccurs="1" />
+          <s:element name="parentIdTag" type="tns:IdToken" minOccurs="0" maxOccurs="1" />
+          <s:element name="reservationId" type="s:int" minOccurs="1" maxOccurs="1" />
+        </s:sequence>
+      </s:complexType>
+
+      <s:simpleType name="ReservationStatus">
+        <s:restriction base="s:string">
+          <s:enumeration value="Accepted"/>
+          <s:enumeration value="Faulted"/>
+          <s:enumeration value="Occupied"/>
+          <s:enumeration value="Rejected"/>
+          <s:enumeration value="Unavailable"/>
+        </s:restriction>
+      </s:simpleType>
+      
+      <s:complexType name="ReserveNowResponse">
+        <s:annotation>
+          <s:documentation>Defines the ReserveNow.conf PDU</s:documentation>
+        </s:annotation>
+        <s:sequence>
+          <s:element name="status" type="tns:ReservationStatus" minOccurs="1" maxOccurs="1" />
+        </s:sequence>
+      </s:complexType>
+
+      <s:complexType name="AuthorizationData">
+        <s:sequence>
+          <s:element name="idTag" type="tns:IdToken" minOccurs="1" maxOccurs="1"/>
+          <s:element name="idTagInfo" type="tns:IdTagInfo" minOccurs="0" maxOccurs="1"/>
+        </s:sequence>
+      </s:complexType>
+      
+      <s:simpleType name="UpdateType">
+        <s:restriction base="s:string">
+          <s:enumeration value="Differential"/>
+          <s:enumeration value="Full"/>
+        </s:restriction>
+      </s:simpleType>
+
+      <s:complexType name="SendLocalListRequest">
+        <s:annotation>
+          <s:documentation>Defines the SendLocalList.req PDU</s:documentation>
+        </s:annotation>
+        <s:sequence>
+          <s:element name="listVersion" type="s:int" minOccurs="1" maxOccurs="1" />
+          <s:element name="localAuthorizationList" type="tns:AuthorizationData" minOccurs="0" maxOccurs="unbounded" />
+          <s:element name="updateType" type="tns:UpdateType" minOccurs="1" maxOccurs="1" />
+        </s:sequence>
+      </s:complexType>
+
+      <s:simpleType name="UpdateStatus">
+        <s:restriction base="s:string">
+          <s:enumeration value="Accepted"/>
+          <s:enumeration value="Failed"/>
+          <s:enumeration value="NotSupported"/>
+          <s:enumeration value="VersionMismatch"/>
+        </s:restriction>
+      </s:simpleType>
+
+      <s:complexType name="SendLocalListResponse">
+        <s:annotation>
+          <s:documentation>Defines the SendLocalList.conf PDU</s:documentation>
+        </s:annotation>
+        <s:sequence>
+          <s:element name="status" type="tns:UpdateStatus" minOccurs="1" maxOccurs="1" />
+        </s:sequence>
+      </s:complexType>
+
+      <s:simpleType name="ChargingProfileKindType">
+        <s:restriction base="s:string">
+          <s:enumeration value="Absolute"/>
+          <s:enumeration value="Recurring"/>
+          <s:enumeration value="Relative"/>
+        </s:restriction>
+      </s:simpleType>
+
+      <s:simpleType name="RecurrencyKindType">
+        <s:restriction base="s:string">
+          <s:enumeration value="Daily"/>
+          <s:enumeration value="Weekly"/>
+        </s:restriction>
+      </s:simpleType>
+	  
+	  <s:complexType name="ChargingProfile">
+        <s:sequence>
+          <s:element name="chargingProfileId" type="s:int" minOccurs="1" maxOccurs="1" />
+          <s:element name="transactionId" type="s:int" minOccurs="0" maxOccurs="1" />
+          <s:element name="stackLevel" type="s:int" minOccurs="1" maxOccurs="1" />
+          <s:element name="chargingProfilePurpose" type="tns:ChargingProfilePurposeType" minOccurs="1" maxOccurs="1"/>
+          <s:element name="chargingProfileKind" type="tns:ChargingProfileKindType" minOccurs="1" maxOccurs="1"/>
+          <s:element name="recurrencyKind" type="tns:RecurrencyKindType" minOccurs="0" maxOccurs="1"/>
+          <s:element name="validFrom" type="s:dateTime" minOccurs="0" maxOccurs="1"/>
+          <s:element name="validTo" type="s:dateTime" minOccurs="0" maxOccurs="1"/>
+          <s:element name="chargingSchedule" type="tns:ChargingSchedule" minOccurs="1" maxOccurs="1"/>
+        </s:sequence>
+      </s:complexType>
+	  
+      <s:complexType name="SetChargingProfileRequest">
+        <s:annotation>
+          <s:documentation>Defines the SetChargingProfile.req PDU</s:documentation>
+        </s:annotation>
+        <s:sequence>
+          <s:element name="connectorId" type="s:int" minOccurs="1" maxOccurs="1" />
+          <s:element name="csChargingProfiles" type="tns:ChargingProfile" minOccurs="1" maxOccurs="1" />
+        </s:sequence>
+      </s:complexType>
+
+  	  <s:simpleType name="ChargingProfileStatus">
+        <s:restriction base="s:string">
+          <s:enumeration value="Accepted"/>
+          <s:enumeration value="Rejected"/>
+          <s:enumeration value="NotSupported"/>
+        </s:restriction>
+      </s:simpleType>
+
+      <s:complexType name="SetChargingProfileResponse">
+        <s:annotation>
+          <s:documentation>Defines the SetChargingProfile.conf PDU</s:documentation>
+        </s:annotation>
+        <s:sequence>
+          <s:element name="status" type="tns:ChargingProfileStatus" minOccurs="1" maxOccurs="1" />
+        </s:sequence>
+      </s:complexType>
+
+	  <s:simpleType name="MessageTrigger">
+        <s:restriction base="s:string">
+          <s:enumeration value="BootNotification"/>
+          <s:enumeration value="DiagnosticsStatusNotification"/>
+          <s:enumeration value="FirmwareStatusNotification"/>
+          <s:enumeration value="Heartbeat"/>
+          <s:enumeration value="MeterValues"/>
+          <s:enumeration value="StatusNotification"/>
+        </s:restriction>
+      </s:simpleType>
+
+	  <s:complexType name="TriggerMessageRequest">
+        <s:annotation>
+          <s:documentation>Defines the TriggerMessage.req PDU</s:documentation>
+        </s:annotation>
+        <s:sequence>
+          <s:element name="requestedMessage" type="tns:MessageTrigger" minOccurs="1" maxOccurs="1" />
+          <s:element name="connectorId" type="s:int" minOccurs="0" maxOccurs="1" />
+        </s:sequence>
+      </s:complexType>
+
+	  <s:simpleType name="TriggerMessageStatus">
+        <s:restriction base="s:string">
+          <s:enumeration value="Accepted"/>
+          <s:enumeration value="Rejected"/>
+          <s:enumeration value="NotImplemented"/>
+        </s:restriction>
+      </s:simpleType>
+	  
+      <s:complexType name="TriggerMessageResponse">
+        <s:annotation>
+          <s:documentation>Defines the TriggerMessage.conf PDU</s:documentation>
+        </s:annotation>
+        <s:sequence>
+          <s:element name="status" type="tns:TriggerMessageStatus" minOccurs="1" maxOccurs="1" />
+        </s:sequence>
+      </s:complexType>
+
+	  
+      <s:element name="chargeBoxIdentity" type="s:string" />
+      <s:element name="cancelReservationRequest" type="tns:CancelReservationRequest" />
+      <s:element name="cancelReservationResponse" type="tns:CancelReservationResponse" />
+      <s:element name="changeAvailabilityRequest" type="tns:ChangeAvailabilityRequest" />
+      <s:element name="changeAvailabilityResponse" type="tns:ChangeAvailabilityResponse" />
+      <s:element name="changeConfigurationRequest" type="tns:ChangeConfigurationRequest" />
+      <s:element name="changeConfigurationResponse" type="tns:ChangeConfigurationResponse" />
+      <s:element name="clearCacheRequest" type="tns:ClearCacheRequest" />
+      <s:element name="clearCacheResponse" type="tns:ClearCacheResponse" />
+      <s:element name="clearChargingProfileRequest" type="tns:ClearChargingProfileRequest" />
+      <s:element name="clearChargingProfileResponse" type="tns:ClearChargingProfileResponse" />
+      <s:element name="dataTransferRequest" type="tns:DataTransferRequest" />
+      <s:element name="dataTransferResponse" type="tns:DataTransferResponse" />
+      <s:element name="getCompositeScheduleRequest" type="tns:GetCompositeScheduleRequest" />
+      <s:element name="getCompositeScheduleResponse" type="tns:GetCompositeScheduleResponse" />
+      <s:element name="getConfigurationRequest" type="tns:GetConfigurationRequest" />
+      <s:element name="getConfigurationResponse" type="tns:GetConfigurationResponse" />
+      <s:element name="getDiagnosticsRequest" type="tns:GetDiagnosticsRequest" />
+      <s:element name="getDiagnosticsResponse" type="tns:GetDiagnosticsResponse" />
+      <s:element name="getLocalListVersionRequest" type="tns:GetLocalListVersionRequest" />
+      <s:element name="getLocalListVersionResponse" type="tns:GetLocalListVersionResponse" />
+      <s:element name="remoteStartTransactionRequest" type="tns:RemoteStartTransactionRequest" />
+      <s:element name="remoteStartTransactionResponse" type="tns:RemoteStartTransactionResponse" />
+      <s:element name="remoteStopTransactionRequest" type="tns:RemoteStopTransactionRequest" />
+      <s:element name="remoteStopTransactionResponse" type="tns:RemoteStopTransactionResponse" />
+      <s:element name="reserveNowRequest" type="tns:ReserveNowRequest" />
+      <s:element name="reserveNowResponse" type="tns:ReserveNowResponse" />
+      <s:element name="resetRequest" type="tns:ResetRequest" />
+      <s:element name="resetResponse" type="tns:ResetResponse" />
+      <s:element name="sendLocalListRequest" type="tns:SendLocalListRequest" />
+      <s:element name="sendLocalListResponse" type="tns:SendLocalListResponse" />
+      <s:element name="setChargingProfileRequest" type="tns:SetChargingProfileRequest" />
+      <s:element name="setChargingProfileResponse" type="tns:SetChargingProfileResponse" />
+      <s:element name="triggerMessageRequest" type="tns:TriggerMessageRequest" />
+      <s:element name="triggerMessageResponse" type="tns:TriggerMessageResponse" />
+      <s:element name="unlockConnectorRequest" type="tns:UnlockConnectorRequest" />
+      <s:element name="unlockConnectorResponse" type="tns:UnlockConnectorResponse" />
+      <s:element name="updateFirmwareRequest" type="tns:UpdateFirmwareRequest" />
+      <s:element name="updateFirmwareResponse" type="tns:UpdateFirmwareResponse" />
+    </s:schema>
+  </wsdl:types>
+
+  
+  <wsdl:message name="Header">
+    <wsdl:part name="ChargeBoxIdentity" element="tns:chargeBoxIdentity" />
+  </wsdl:message>
+
+  <wsdl:message name="CancelReservationInput">
+    <wsdl:part name="parameters" element="tns:cancelReservationRequest" />
+  </wsdl:message>
+  
+  <wsdl:message name="CancelReservationOutput">
+    <wsdl:part name="parameters" element="tns:cancelReservationResponse" />
+  </wsdl:message>
+
+  <wsdl:message name="ChangeAvailabilityInput">
+    <wsdl:part name="parameters" element="tns:changeAvailabilityRequest" />
+  </wsdl:message>
+
+  <wsdl:message name="ChangeAvailabilityOutput">
+    <wsdl:part name="parameters" element="tns:changeAvailabilityResponse" />
+  </wsdl:message>
+
+  <wsdl:message name="ChangeConfigurationInput">
+    <wsdl:part name="parameters" element="tns:changeConfigurationRequest" />
+  </wsdl:message>
+
+  <wsdl:message name="ChangeConfigurationOutput">
+    <wsdl:part name="parameters" element="tns:changeConfigurationResponse" />
+  </wsdl:message>
+
+  <wsdl:message name="ClearCacheInput">
+    <wsdl:part name="parameters" element="tns:clearCacheRequest" />
+  </wsdl:message>
+
+  <wsdl:message name="ClearCacheOutput">
+    <wsdl:part name="parameters" element="tns:clearCacheResponse" />
+  </wsdl:message>
+
+  <wsdl:message name="ClearChargingProfileInput">
+    <wsdl:part name="parameters" element="tns:clearChargingProfileRequest" />
+  </wsdl:message>
+
+  <wsdl:message name="ClearChargingProfileOutput">
+    <wsdl:part name="parameters" element="tns:clearChargingProfileResponse" />
+  </wsdl:message>
+
+  <wsdl:message name="DataTransferInput">
+    <wsdl:part name="parameters" element="tns:dataTransferRequest" />
+  </wsdl:message>
+
+  <wsdl:message name="DataTransferOutput">
+    <wsdl:part name="parameters" element="tns:dataTransferResponse" />
+  </wsdl:message>
+
+  <wsdl:message name="GetDiagnosticsInput">
+    <wsdl:part name="parameters" element="tns:getDiagnosticsRequest" />
+  </wsdl:message>
+
+  <wsdl:message name="GetConfigurationInput">
+    <wsdl:part name="parameters" element="tns:getConfigurationRequest" />
+  </wsdl:message>
+
+  <wsdl:message name="GetConfigurationOutput">
+    <wsdl:part name="parameters" element="tns:getConfigurationResponse" />
+  </wsdl:message>
+
+  <wsdl:message name="GetDiagnosticsOutput">
+    <wsdl:part name="parameters" element="tns:getDiagnosticsResponse" />
+  </wsdl:message>
+
+  <wsdl:message name="GetLocalListVersionInput">
+    <wsdl:part name="parameters" element="tns:getLocalListVersionRequest" />
+  </wsdl:message>
+
+  <wsdl:message name="GetLocalListVersionOutput">
+    <wsdl:part name="parameters" element="tns:getLocalListVersionResponse" />
+  </wsdl:message>
+
+  <wsdl:message name="RemoteStartTransactionInput">
+    <wsdl:part name="parameters" element="tns:remoteStartTransactionRequest" />
+  </wsdl:message>
+
+  <wsdl:message name="RemoteStartTransactionOutput">
+    <wsdl:part name="parameters" element="tns:remoteStartTransactionResponse" />
+  </wsdl:message>
+
+  <wsdl:message name="RemoteStopTransactionInput">
+    <wsdl:part name="parameters" element="tns:remoteStopTransactionRequest" />
+  </wsdl:message>
+
+  <wsdl:message name="RemoteStopTransactionOutput">
+    <wsdl:part name="parameters" element="tns:remoteStopTransactionResponse" />
+  </wsdl:message>
+
+  <wsdl:message name="GetCompositeScheduleInput">
+    <wsdl:part name="parameters" element="tns:getCompositeScheduleRequest" />
+  </wsdl:message>
+
+  <wsdl:message name="GetCompositeScheduleOutput">
+    <wsdl:part name="parameters" element="tns:getCompositeScheduleResponse" />
+  </wsdl:message>
+
+  <wsdl:message name="ReserveNowInput">
+    <wsdl:part name="parameters" element="tns:reserveNowRequest" />
+  </wsdl:message>
+
+  <wsdl:message name="ReserveNowOutput">
+    <wsdl:part name="parameters" element="tns:reserveNowResponse" />
+  </wsdl:message>
+
+  <wsdl:message name="ResetInput">
+    <wsdl:part name="parameters" element="tns:resetRequest" />
+  </wsdl:message>
+
+  <wsdl:message name="ResetOutput">
+    <wsdl:part name="parameters" element="tns:resetResponse" />
+  </wsdl:message>
+
+  <wsdl:message name="SendLocalListInput">
+    <wsdl:part name="parameters" element="tns:sendLocalListRequest" />
+  </wsdl:message>
+
+  <wsdl:message name="SendLocalListOutput">
+    <wsdl:part name="parameters" element="tns:sendLocalListResponse" />
+  </wsdl:message>
+
+  <wsdl:message name="SetChargingProfileInput">
+    <wsdl:part name="parameters" element="tns:setChargingProfileRequest" />
+  </wsdl:message>
+
+  <wsdl:message name="SetChargingProfileOutput">
+    <wsdl:part name="parameters" element="tns:setChargingProfileResponse" />
+  </wsdl:message>
+
+  <wsdl:message name="TriggerMessageInput">
+    <wsdl:part name="parameters" element="tns:triggerMessageRequest" />
+  </wsdl:message>
+
+  <wsdl:message name="TriggerMessageOutput">
+    <wsdl:part name="parameters" element="tns:triggerMessageResponse" />
+  </wsdl:message>
+
+  <wsdl:message name="UnlockConnectorInput">
+    <wsdl:part name="parameters" element="tns:unlockConnectorRequest" />
+  </wsdl:message>
+
+  <wsdl:message name="UnlockConnectorOutput">
+    <wsdl:part name="parameters" element="tns:unlockConnectorResponse" />
+  </wsdl:message>
+
+  <wsdl:message name="UpdateFirmwareInput">
+    <wsdl:part name="parameters" element="tns:updateFirmwareRequest" />
+  </wsdl:message>
+
+  <wsdl:message name="UpdateFirmwareOutput">
+    <wsdl:part name="parameters" element="tns:updateFirmwareResponse" />
+  </wsdl:message>
+
+
+  <wsdl:portType name="ChargePointService">
+
+    <wsdl:operation name="CancelReservation">
+      <wsdl:input message="tns:CancelReservationInput" wsaw:Action="/CancelReservation" />
+      <wsdl:output message="tns:CancelReservationOutput" wsaw:Action="/CancelReservationResponse" />
+    </wsdl:operation>
+
+	<wsdl:operation name="ChangeAvailability">
+      <wsdl:input message="tns:ChangeAvailabilityInput" wsaw:Action="/ChangeAvailability" />
+      <wsdl:output message="tns:ChangeAvailabilityOutput" wsaw:Action="/ChangeAvailabilityResponse" />
+    </wsdl:operation>
+
+    <wsdl:operation name="ChangeConfiguration">
+      <wsdl:input message="tns:ChangeConfigurationInput" wsaw:Action="/ChangeConfiguration" />
+      <wsdl:output message="tns:ChangeConfigurationOutput" wsaw:Action="/ChangeConfigurationResponse" />
+    </wsdl:operation>
+
+	<wsdl:operation name="ClearCache">
+      <wsdl:input message="tns:ClearCacheInput" wsaw:Action="/ClearCache" />
+      <wsdl:output message="tns:ClearCacheOutput" wsaw:Action="/ClearCacheResponse" />
+    </wsdl:operation>
+
+	<wsdl:operation name="ClearChargingProfile">
+      <wsdl:input message="tns:ClearChargingProfileInput" wsaw:Action="/ClearChargingProfile" />
+      <wsdl:output message="tns:ClearChargingProfileOutput" wsaw:Action="/ClearChargingProfileResponse" />
+    </wsdl:operation>
+
+    <wsdl:operation name="DataTransfer">
+      <wsdl:input message="tns:DataTransferInput" wsaw:Action="/DataTransfer" />
+      <wsdl:output message="tns:DataTransferOutput" wsaw:Action="/DataTransferResponse" />
+    </wsdl:operation>
+
+    <wsdl:operation name="GetConfiguration">
+      <wsdl:input message="tns:GetConfigurationInput" wsaw:Action="/GetConfiguration" />
+      <wsdl:output message="tns:GetConfigurationOutput" wsaw:Action="/GetConfigurationResponse" />
+    </wsdl:operation>
+
+    <wsdl:operation name="GetDiagnostics">
+      <wsdl:input message="tns:GetDiagnosticsInput" wsaw:Action="/GetDiagnostics" />
+      <wsdl:output message="tns:GetDiagnosticsOutput" wsaw:Action="/GetDiagnosticsResponse" />
+    </wsdl:operation>
+
+    <wsdl:operation name="GetLocalListVersion">
+      <wsdl:input message="tns:GetLocalListVersionInput" wsaw:Action="/GetLocalListVersion" />
+      <wsdl:output message="tns:GetLocalListVersionOutput" wsaw:Action="/GetLocalListVersionResponse" />
+    </wsdl:operation>
+	
+    <wsdl:operation name="RemoteStartTransaction">
+      <wsdl:input message="tns:RemoteStartTransactionInput" wsaw:Action="/RemoteStartTransaction" />
+      <wsdl:output message="tns:RemoteStartTransactionOutput" wsaw:Action="/RemoteStartTransactionResponse" />
+    </wsdl:operation>
+
+    <wsdl:operation name="RemoteStopTransaction">
+      <wsdl:input message="tns:RemoteStopTransactionInput" wsaw:Action="/RemoteStopTransaction" />
+      <wsdl:output message="tns:RemoteStopTransactionOutput" wsaw:Action="/RemoteStopTransactionResponse" />
+    </wsdl:operation>
+
+    <wsdl:operation name="GetCompositeSchedule">
+      <wsdl:input message="tns:GetCompositeScheduleInput" wsaw:Action="/GetCompositeSchedule" />
+      <wsdl:output message="tns:GetCompositeScheduleOutput" wsaw:Action="/GetCompositeScheduleResponse" />
+    </wsdl:operation>
+
+    <wsdl:operation name="ReserveNow">
+      <wsdl:input message="tns:ReserveNowInput" wsaw:Action="/ReserveNow" />
+      <wsdl:output message="tns:ReserveNowOutput" wsaw:Action="/ReserveNowResponse" />
+    </wsdl:operation>
+	
+    <wsdl:operation name="Reset">
+      <wsdl:input message="tns:ResetInput" wsaw:Action="/Reset" />
+      <wsdl:output message="tns:ResetOutput" wsaw:Action="/ResetResponse" />
+    </wsdl:operation>
+
+    <wsdl:operation name="SendLocalList">
+      <wsdl:input message="tns:SendLocalListInput" wsaw:Action="/SendLocalList" />
+      <wsdl:output message="tns:SendLocalListOutput" wsaw:Action="/SendLocalListResponse" />
+    </wsdl:operation>
+
+    <wsdl:operation name="SetChargingProfile">
+      <wsdl:input message="tns:SetChargingProfileInput" wsaw:Action="/SetChargingProfile" />
+      <wsdl:output message="tns:SetChargingProfileOutput" wsaw:Action="/SetChargingProfileResponse" />
+    </wsdl:operation>
+
+    <wsdl:operation name="TriggerMessage">
+      <wsdl:input message="tns:TriggerMessageInput" wsaw:Action="/TriggerMessage" />
+      <wsdl:output message="tns:TriggerMessageOutput" wsaw:Action="/TriggerMessageResponse" />
+    </wsdl:operation>
+
+	<wsdl:operation name="UnlockConnector">
+      <wsdl:input message="tns:UnlockConnectorInput" wsaw:Action="/UnlockConnector" />
+      <wsdl:output message="tns:UnlockConnectorOutput" wsaw:Action="/UnlockConnectorResponse" />
+    </wsdl:operation>
+	
+	<wsdl:operation name="UpdateFirmware">
+      <wsdl:input message="tns:UpdateFirmwareInput" wsaw:Action="/UpdateFirmware" />
+      <wsdl:output message="tns:UpdateFirmwareOutput" wsaw:Action="/UpdateFirmwareResponse" />
+    </wsdl:operation>
+	
+  </wsdl:portType>
+
+
+  <wsdl:binding name="ChargePointServiceSoap" type="tns:ChargePointService">
+
+    <wsp:PolicyReference URI="#ServicePolicy" />
+    <soap12:binding transport="http://schemas.xmlsoap.org/soap/http" />
+
+	<wsdl:operation name="CancelReservation">
+      <soap12:operation soapAction="/CancelReservation" style="document" />
+      <wsdl:input>
+        <soap12:header use="literal" message="tns:Header" part="ChargeBoxIdentity"/>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+
+    <wsdl:operation name="ChangeAvailability">
+      <soap12:operation soapAction="/ChangeAvailability" style="document" />
+      <wsdl:input>
+        <soap12:header use="literal" message="tns:Header" part="ChargeBoxIdentity"/>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+         <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+
+	<wsdl:operation name="ChangeConfiguration">
+      <soap12:operation soapAction="/ChangeConfiguration" style="document" />
+      <wsdl:input>
+        <soap12:header use="literal" message="tns:Header" part="ChargeBoxIdentity"/>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+
+	<wsdl:operation name="ClearCache">
+      <soap12:operation soapAction="/ClearCache" style="document" />
+      <wsdl:input>
+        <soap12:header use="literal" message="tns:Header" part="ChargeBoxIdentity"/>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+
+	<wsdl:operation name="ClearChargingProfile">
+      <soap12:operation soapAction="/ClearChargingProfile" style="document" />
+      <wsdl:input>
+        <soap12:header use="literal" message="tns:Header" part="ChargeBoxIdentity"/>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+
+	<wsdl:operation name="DataTransfer">
+      <soap12:operation soapAction="/DataTransfer" style="document" />
+      <wsdl:input>
+        <soap12:header use="literal" message="tns:Header" part="ChargeBoxIdentity"/>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+
+	<wsdl:operation name="GetConfiguration">
+      <soap12:operation soapAction="/GetConfiguration" style="document" />
+      <wsdl:input>
+        <soap12:header use="literal" message="tns:Header" part="ChargeBoxIdentity"/>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+
+    <wsdl:operation name="GetDiagnostics">
+      <soap12:operation soapAction="/GetDiagnostics" style="document" />
+      <wsdl:input>
+        <soap12:header use="literal" message="tns:Header" part="ChargeBoxIdentity"/>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+
+    <wsdl:operation name="GetLocalListVersion">
+      <soap12:operation soapAction="/GetLocalListVersion" style="document" />
+      <wsdl:input>
+        <soap12:header use="literal" message="tns:Header" part="ChargeBoxIdentity"/>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+
+	<wsdl:operation name="RemoteStartTransaction">
+      <soap12:operation soapAction="/RemoteStartTransaction" style="document" />
+      <wsdl:input>
+        <soap12:header use="literal" message="tns:Header" part="ChargeBoxIdentity"/>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+
+    <wsdl:operation name="RemoteStopTransaction">
+      <soap12:operation soapAction="/RemoteStopTransaction" style="document" />
+      <wsdl:input>
+        <soap12:header use="literal" message="tns:Header" part="ChargeBoxIdentity"/>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+
+    <wsdl:operation name="GetCompositeSchedule">
+      <soap12:operation soapAction="/GetCompositeSchedule" style="document" />
+      <wsdl:input>
+        <soap12:header use="literal" message="tns:Header" part="ChargeBoxIdentity"/>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+
+    <wsdl:operation name="ReserveNow">
+      <soap12:operation soapAction="/ReserveNow" style="document" />
+      <wsdl:input>
+        <soap12:header use="literal" message="tns:Header" part="ChargeBoxIdentity"/>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+
+	<wsdl:operation name="Reset">
+      <soap12:operation soapAction="/Reset" style="document" />
+      <wsdl:input>
+        <soap12:header use="literal" message="tns:Header" part="ChargeBoxIdentity"/>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+
+    <wsdl:operation name="SendLocalList">
+      <soap12:operation soapAction="/SendLocalList" style="document" />
+      <wsdl:input>
+        <soap12:header use="literal" message="tns:Header" part="ChargeBoxIdentity"/>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+
+    <wsdl:operation name="SetChargingProfile">
+      <soap12:operation soapAction="/SetChargingProfile" style="document" />
+      <wsdl:input>
+        <soap12:header use="literal" message="tns:Header" part="ChargeBoxIdentity"/>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+
+    <wsdl:operation name="TriggerMessage">
+      <soap12:operation soapAction="/TriggerMessage" style="document" />
+      <wsdl:input>
+        <soap12:header use="literal" message="tns:Header" part="ChargeBoxIdentity"/>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+
+	<wsdl:operation name="UnlockConnector">
+      <soap12:operation soapAction="/UnlockConnector" style="document" />
+      <wsdl:input>
+        <soap12:header use="literal" message="tns:Header" part="ChargeBoxIdentity"/>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+ 
+    <wsdl:operation name="UpdateFirmware">
+      <soap12:operation soapAction="/UpdateFirmware" style="document" />
+      <wsdl:input>
+        <soap12:header use="literal" message="tns:Header" part="ChargeBoxIdentity"/>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+
+  </wsdl:binding>
+  
+
+  <!-- The OCPP ChargePoint service -->
+  <wsdl:service name="ChargePointService">
+    <wsdl:documentation>The ChargePoint Service for the Open Charge Point Protocol</wsdl:documentation>
+    <wsdl:port name="ChargePointServiceSoap12" binding="tns:ChargePointServiceSoap">
+      <soap12:address location="http://localhost/Ocpp/ChargePointService/" />
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

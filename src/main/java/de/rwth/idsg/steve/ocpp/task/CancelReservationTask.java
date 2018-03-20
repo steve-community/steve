@@ -9,7 +9,6 @@ import de.rwth.idsg.steve.repository.ReservationRepository;
 import de.rwth.idsg.steve.web.dto.ocpp.CancelReservationParams;
 import ocpp.cp._2012._06.CancelReservationRequest;
 import ocpp.cp._2012._06.CancelReservationResponse;
-import ocpp.cp._2012._06.CancelReservationStatus;
 
 import javax.xml.ws.AsyncHandler;
 
@@ -17,7 +16,7 @@ import javax.xml.ws.AsyncHandler;
  * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
  * @since 09.03.2018
  */
-public class CancelReservationTask extends CommunicationTask<CancelReservationParams, CancelReservationStatus> {
+public class CancelReservationTask extends CommunicationTask<CancelReservationParams, String> {
 
     private final ReservationRepository reservationRepository;
 
@@ -28,13 +27,13 @@ public class CancelReservationTask extends CommunicationTask<CancelReservationPa
     }
 
     @Override
-    public OcppCallback<CancelReservationStatus> defaultCallback() {
-        return new DefaultOcppCallback<CancelReservationStatus>() {
+    public OcppCallback<String> defaultCallback() {
+        return new DefaultOcppCallback<String>() {
             @Override
-            public void success(String chargeBoxId, CancelReservationStatus status) {
-                addNewResponse(chargeBoxId, status.value());
+            public void success(String chargeBoxId, String statusValue) {
+                addNewResponse(chargeBoxId, statusValue);
 
-                if (CancelReservationStatus.ACCEPTED.equals(status)) {
+                if ("Accepted".equalsIgnoreCase(statusValue)) {
                     reservationRepository.cancelled(params.getReservationId());
                 }
             }
@@ -53,6 +52,12 @@ public class CancelReservationTask extends CommunicationTask<CancelReservationPa
                 .withReservationId(params.getReservationId());
     }
 
+    @Override
+    public ocpp.cp._2015._10.CancelReservationRequest getOcpp16Request() {
+        return new ocpp.cp._2015._10.CancelReservationRequest()
+                .withReservationId(params.getReservationId());
+    }
+
     @Deprecated
     @Override
     public <T extends ResponseType> AsyncHandler<T> getOcpp12Handler(String chargeBoxId) {
@@ -63,7 +68,18 @@ public class CancelReservationTask extends CommunicationTask<CancelReservationPa
     public AsyncHandler<CancelReservationResponse> getOcpp15Handler(String chargeBoxId) {
         return res -> {
             try {
-                success(chargeBoxId, res.get().getStatus());
+                success(chargeBoxId, res.get().getStatus().value());
+            } catch (Exception e) {
+                failed(chargeBoxId, e);
+            }
+        };
+    }
+
+    @Override
+    public AsyncHandler<ocpp.cp._2015._10.CancelReservationResponse> getOcpp16Handler(String chargeBoxId) {
+        return res -> {
+            try {
+                success(chargeBoxId, res.get().getStatus().value());
             } catch (Exception e) {
                 failed(chargeBoxId, e);
             }

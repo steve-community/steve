@@ -12,8 +12,8 @@ import org.joda.time.DateTime;
 import org.jooq.Condition;
 import org.jooq.DSLContext;
 import org.jooq.Field;
-import org.jooq.Record10;
-import org.jooq.Record8;
+import org.jooq.Record11;
+import org.jooq.Record9;
 import org.jooq.RecordMapper;
 import org.jooq.SelectQuery;
 import org.jooq.Table;
@@ -77,7 +77,7 @@ public class TransactionRepositoryImpl implements TransactionRepository {
         form.setType(TransactionQueryForm.QueryType.ALL);
         form.setPeriodType(TransactionQueryForm.QueryPeriodType.ALL);
 
-        Record10<Integer, String, Integer, String, DateTime, String, DateTime, String, Integer, Integer>
+        Record11<Integer, String, Integer, String, DateTime, String, DateTime, String, String, Integer, Integer>
                 transaction = getInternal(form).fetchOne();
 
         if (transaction == null) {
@@ -147,7 +147,8 @@ public class TransactionRepositoryImpl implements TransactionRepository {
                         t1.field(5, String.class),
                         t1.field(6, String.class),
                         t1.field(7, String.class),
-                        t1.field(8, String.class))
+                        t1.field(8, String.class),
+                        t1.field(9, String.class))
                    .from(t1)
                    .groupBy(
                            t1.field(3),
@@ -155,7 +156,8 @@ public class TransactionRepositoryImpl implements TransactionRepository {
                            t1.field(5),
                            t1.field(6),
                            t1.field(7),
-                           t1.field(8))
+                           t1.field(8),
+                           t1.field(9))
                    .orderBy(dateTimeField)
                    .fetch()
                    .map(r -> TransactionDetails.MeterValues.builder()
@@ -166,6 +168,7 @@ public class TransactionRepositoryImpl implements TransactionRepository {
                                                            .measurand(r.value5())
                                                            .location(r.value6())
                                                            .unit(r.value7())
+                                                           .phase(r.value8())
                                                            .build());
 
         return new TransactionDetails(new TransactionMapper().map(transaction), values);
@@ -177,7 +180,7 @@ public class TransactionRepositoryImpl implements TransactionRepository {
 
     @SuppressWarnings("unchecked")
     private
-    SelectQuery<Record8<Integer, String, Integer, String, DateTime, String, DateTime, String>>
+    SelectQuery<Record9<Integer, String, Integer, String, DateTime, String, DateTime, String, String>>
     getInternalCSV(TransactionQueryForm form) {
 
         SelectQuery selectQuery = ctx.selectQuery();
@@ -191,7 +194,8 @@ public class TransactionRepositoryImpl implements TransactionRepository {
                 TRANSACTION.START_TIMESTAMP,
                 TRANSACTION.START_VALUE,
                 TRANSACTION.STOP_TIMESTAMP,
-                TRANSACTION.STOP_VALUE
+                TRANSACTION.STOP_VALUE,
+                TRANSACTION.STOP_REASON
         );
 
         return addConditions(selectQuery, form);
@@ -203,7 +207,7 @@ public class TransactionRepositoryImpl implements TransactionRepository {
      */
     @SuppressWarnings("unchecked")
     private
-    SelectQuery<Record10<Integer, String, Integer, String, DateTime, String, DateTime, String, Integer, Integer>>
+    SelectQuery<Record11<Integer, String, Integer, String, DateTime, String, DateTime, String, String, Integer, Integer>>
     getInternal(TransactionQueryForm form) {
 
         SelectQuery selectQuery = ctx.selectQuery();
@@ -220,6 +224,7 @@ public class TransactionRepositoryImpl implements TransactionRepository {
                 TRANSACTION.START_VALUE,
                 TRANSACTION.STOP_TIMESTAMP,
                 TRANSACTION.STOP_VALUE,
+                TRANSACTION.STOP_REASON,
                 CHARGE_BOX.CHARGE_BOX_PK,
                 OCPP_TAG.OCPP_TAG_PK
         );
@@ -288,11 +293,11 @@ public class TransactionRepositoryImpl implements TransactionRepository {
     }
 
     private static class TransactionMapper
-            implements RecordMapper<Record10<Integer, String, Integer, String, DateTime, String, DateTime,
-                                             String, Integer, Integer>, Transaction> {
+            implements RecordMapper<Record11<Integer, String, Integer, String, DateTime, String, DateTime,
+                                             String, String, Integer, Integer>, Transaction> {
         @Override
-        public Transaction map(Record10<Integer, String, Integer, String, DateTime, String, DateTime,
-                                        String, Integer, Integer> r) {
+        public Transaction map(Record11<Integer, String, Integer, String, DateTime, String, DateTime,
+                                        String, String, Integer, Integer> r) {
             return Transaction.builder()
                               .id(r.value1())
                               .chargeBoxId(r.value2())
@@ -304,8 +309,9 @@ public class TransactionRepositoryImpl implements TransactionRepository {
                               .stopTimestampDT(r.value7())
                               .stopTimestamp(DateTimeUtils.humanize(r.value7()))
                               .stopValue(r.value8())
-                              .chargeBoxPk(r.value9())
-                              .ocppTagPk(r.value10())
+                              .stopReason(r.value9())
+                              .chargeBoxPk(r.value10())
+                              .ocppTagPk(r.value11())
                               .build();
         }
     }

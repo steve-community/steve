@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import javax.validation.Valid;
+import java.util.Map;
 
 /**
  * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
@@ -32,21 +33,21 @@ import javax.validation.Valid;
 @RequestMapping(value = "/manager/operations/v1.2")
 public class Ocpp12Controller {
 
-    @Autowired private ChargePointHelperService chargePointHelperService;
-    @Autowired private OcppTagRepository ocppTagRepository;
+    @Autowired protected ChargePointHelperService chargePointHelperService;
+    @Autowired protected OcppTagRepository ocppTagRepository;
 
     @Autowired
     @Qualifier("ChargePointService12_Client")
-    private ChargePointService12_Client client;
+    private ChargePointService12_Client client12;
 
-    private static final String PARAMS = "params";
+    protected static final String PARAMS = "params";
 
     // -------------------------------------------------------------------------
     // Paths
     // -------------------------------------------------------------------------
 
     private static final String CHANGE_AVAIL_PATH = "/ChangeAvailability";
-    private static final String CHANGE_CONF_PATH = "/ChangeConfiguration";
+    protected static final String CHANGE_CONF_PATH = "/ChangeConfiguration";
     private static final String CLEAR_CACHE_PATH = "/ClearCache";
     private static final String GET_DIAG_PATH = "/GetDiagnostics";
     private static final String REMOTE_START_TX_PATH = "/RemoteStartTransaction";
@@ -55,18 +56,34 @@ public class Ocpp12Controller {
     private static final String UNLOCK_CON_PATH = "/UnlockConnector";
     private static final String UPDATE_FIRM_PATH = "/UpdateFirmware";
 
-    private static final String PREFIX = "op12";
-    private static final String REDIRECT_TASKS_PATH = "redirect:/manager/operations/tasks/";
+    protected static final String REDIRECT_TASKS_PATH = "redirect:/manager/operations/tasks/";
 
     // -------------------------------------------------------------------------
     // Helpers
     // -------------------------------------------------------------------------
 
-    private void setChargePointList(Model model) {
-        model.addAttribute("cpList", chargePointHelperService.getChargePointsV12());
+    protected ChargePointService12_Client getClient12() {
+        return client12;
     }
 
-    private void setActiveUserIdTagList(Model model) {
+    protected void setCommonAttributes(Model model) {
+        model.addAttribute("cpList", chargePointHelperService.getChargePointsV12());
+        model.addAttribute("opVersion", "v1.2");
+    }
+
+    protected Map<String, String> getConfigurationKeys() {
+        return ConfigurationKeyEnum.OCPP_12_MAP;
+    }
+
+    protected String getRedirectPath() {
+        return "redirect:/manager/operations/v1.2/ChangeAvailability";
+    }
+
+    protected String getPrefix() {
+        return "op12";
+    }
+
+    protected void setActiveUserIdTagList(Model model) {
         model.addAttribute("idTagList", ocppTagRepository.getActiveIdTags());
     }
 
@@ -76,72 +93,72 @@ public class Ocpp12Controller {
 
     @RequestMapping(method = RequestMethod.GET)
     public String getBase() {
-        return "redirect:/manager/operations/v1.2/ChangeAvailability";
+        return getRedirectPath();
     }
 
     @RequestMapping(value = CHANGE_AVAIL_PATH, method = RequestMethod.GET)
     public String getChangeAvail(Model model) {
-        setChargePointList(model);
+        setCommonAttributes(model);
         model.addAttribute(PARAMS, new ChangeAvailabilityParams());
-        return PREFIX + CHANGE_AVAIL_PATH;
+        return getPrefix() + CHANGE_AVAIL_PATH;
     }
 
     @RequestMapping(value = CHANGE_CONF_PATH, method = RequestMethod.GET)
     public String getChangeConf(Model model) {
-        setChargePointList(model);
+        setCommonAttributes(model);
         model.addAttribute(PARAMS, new ChangeConfigurationParams());
-        model.addAttribute("ocpp12ConfKeys", ConfigurationKeyEnum.OCPP_12_MAP);
-        return PREFIX + CHANGE_CONF_PATH;
+        model.addAttribute("ocppConfKeys", getConfigurationKeys());
+        return getPrefix() + CHANGE_CONF_PATH;
     }
 
     @RequestMapping(value = CLEAR_CACHE_PATH, method = RequestMethod.GET)
     public String getClearCache(Model model) {
-        setChargePointList(model);
+        setCommonAttributes(model);
         model.addAttribute(PARAMS, new MultipleChargePointSelect());
-        return PREFIX + CLEAR_CACHE_PATH;
+        return getPrefix() + CLEAR_CACHE_PATH;
     }
 
     @RequestMapping(value = GET_DIAG_PATH, method = RequestMethod.GET)
     public String getGetDiag(Model model) {
-        setChargePointList(model);
+        setCommonAttributes(model);
         model.addAttribute(PARAMS, new GetDiagnosticsParams());
-        return PREFIX + GET_DIAG_PATH;
+        return getPrefix() + GET_DIAG_PATH;
     }
 
     @RequestMapping(value = REMOTE_START_TX_PATH, method = RequestMethod.GET)
     public String getRemoteStartTx(Model model) {
-        setChargePointList(model);
+        setCommonAttributes(model);
         setActiveUserIdTagList(model);
         model.addAttribute(PARAMS, new RemoteStartTransactionParams());
-        return PREFIX + REMOTE_START_TX_PATH;
+        return getPrefix() + REMOTE_START_TX_PATH;
     }
 
     @RequestMapping(value = REMOTE_STOP_TX_PATH, method = RequestMethod.GET)
     public String getRemoteStopTx(Model model) {
-        setChargePointList(model);
+        setCommonAttributes(model);
         model.addAttribute(PARAMS, new RemoteStopTransactionParams());
-        return PREFIX + REMOTE_STOP_TX_PATH;
+        return getPrefix() + REMOTE_STOP_TX_PATH;
     }
 
     @RequestMapping(value = RESET_PATH, method = RequestMethod.GET)
     public String getReset(Model model) {
-        setChargePointList(model);
+        setCommonAttributes(model);
         model.addAttribute(PARAMS, new ResetParams());
-        return PREFIX + RESET_PATH;
+        return getPrefix() + RESET_PATH;
     }
 
     @RequestMapping(value = UNLOCK_CON_PATH, method = RequestMethod.GET)
     public String getUnlockCon(Model model) {
-        setChargePointList(model);
+        setCommonAttributes(model);
         model.addAttribute(PARAMS, new UnlockConnectorParams());
-        return PREFIX + UNLOCK_CON_PATH;
+        return getPrefix() + UNLOCK_CON_PATH;
     }
 
     @RequestMapping(value = UPDATE_FIRM_PATH, method = RequestMethod.GET)
     public String getUpdateFirm(Model model) {
-        setChargePointList(model);
+        setCommonAttributes(model);
         model.addAttribute(PARAMS, new UpdateFirmwareParams());
-        return PREFIX + UPDATE_FIRM_PATH;
+        return getPrefix() + UPDATE_FIRM_PATH;
     }
 
     // -------------------------------------------------------------------------
@@ -152,90 +169,90 @@ public class Ocpp12Controller {
     public String postChangeAvail(@Valid @ModelAttribute(PARAMS) ChangeAvailabilityParams params,
                                   BindingResult result, Model model) {
         if (result.hasErrors()) {
-            setChargePointList(model);
-            return PREFIX + CHANGE_AVAIL_PATH;
+            setCommonAttributes(model);
+            return getPrefix() + CHANGE_AVAIL_PATH;
         }
-        return REDIRECT_TASKS_PATH + client.changeAvailability(params);
+        return REDIRECT_TASKS_PATH + getClient12().changeAvailability(params);
     }
 
     @RequestMapping(value = CHANGE_CONF_PATH, method = RequestMethod.POST)
     public String postChangeConf(@Valid @ModelAttribute(PARAMS) ChangeConfigurationParams params,
                                  BindingResult result, Model model) {
         if (result.hasErrors()) {
-            setChargePointList(model);
-            return PREFIX + CHANGE_CONF_PATH;
+            setCommonAttributes(model);
+            return getPrefix() + CHANGE_CONF_PATH;
         }
-        return REDIRECT_TASKS_PATH + client.changeConfiguration(params);
+        return REDIRECT_TASKS_PATH + getClient12().changeConfiguration(params);
     }
 
     @RequestMapping(value = CLEAR_CACHE_PATH, method = RequestMethod.POST)
     public String postClearCache(@Valid @ModelAttribute(PARAMS) MultipleChargePointSelect params,
                                  BindingResult result, Model model) {
         if (result.hasErrors()) {
-            setChargePointList(model);
-            return PREFIX + CLEAR_CACHE_PATH;
+            setCommonAttributes(model);
+            return getPrefix() + CLEAR_CACHE_PATH;
         }
-        return REDIRECT_TASKS_PATH + client.clearCache(params);
+        return REDIRECT_TASKS_PATH + getClient12().clearCache(params);
     }
 
     @RequestMapping(value = GET_DIAG_PATH, method = RequestMethod.POST)
     public String postGetDiag(@Valid @ModelAttribute(PARAMS) GetDiagnosticsParams params,
                               BindingResult result, Model model) {
         if (result.hasErrors()) {
-            setChargePointList(model);
-            return PREFIX + GET_DIAG_PATH;
+            setCommonAttributes(model);
+            return getPrefix() + GET_DIAG_PATH;
         }
-        return REDIRECT_TASKS_PATH + client.getDiagnostics(params);
+        return REDIRECT_TASKS_PATH + getClient12().getDiagnostics(params);
     }
 
     @RequestMapping(value = REMOTE_START_TX_PATH, method = RequestMethod.POST)
     public String postRemoteStartTx(@Valid @ModelAttribute(PARAMS) RemoteStartTransactionParams params,
                                     BindingResult result, Model model) {
         if (result.hasErrors()) {
-            setChargePointList(model);
+            setCommonAttributes(model);
             setActiveUserIdTagList(model);
-            return PREFIX + REMOTE_START_TX_PATH;
+            return getPrefix() + REMOTE_START_TX_PATH;
         }
-        return REDIRECT_TASKS_PATH + client.remoteStartTransaction(params);
+        return REDIRECT_TASKS_PATH + getClient12().remoteStartTransaction(params);
     }
 
     @RequestMapping(value = REMOTE_STOP_TX_PATH, method = RequestMethod.POST)
     public String postRemoteStopTx(@Valid @ModelAttribute(PARAMS) RemoteStopTransactionParams params,
                                    BindingResult result, Model model) {
         if (result.hasErrors()) {
-            setChargePointList(model);
-            return PREFIX + REMOTE_STOP_TX_PATH;
+            setCommonAttributes(model);
+            return getPrefix() + REMOTE_STOP_TX_PATH;
         }
-        return REDIRECT_TASKS_PATH + client.remoteStopTransaction(params);
+        return REDIRECT_TASKS_PATH + getClient12().remoteStopTransaction(params);
     }
 
     @RequestMapping(value = RESET_PATH, method = RequestMethod.POST)
     public String postReset(@Valid @ModelAttribute(PARAMS) ResetParams params,
                             BindingResult result, Model model) {
         if (result.hasErrors()) {
-            setChargePointList(model);
-            return PREFIX + RESET_PATH;
+            setCommonAttributes(model);
+            return getPrefix() + RESET_PATH;
         }
-        return REDIRECT_TASKS_PATH + client.reset(params);
+        return REDIRECT_TASKS_PATH + getClient12().reset(params);
     }
 
     @RequestMapping(value = UNLOCK_CON_PATH, method = RequestMethod.POST)
     public String postUnlockCon(@Valid @ModelAttribute(PARAMS) UnlockConnectorParams params,
                                 BindingResult result, Model model) {
         if (result.hasErrors()) {
-            setChargePointList(model);
-            return PREFIX + UNLOCK_CON_PATH;
+            setCommonAttributes(model);
+            return getPrefix() + UNLOCK_CON_PATH;
         }
-        return REDIRECT_TASKS_PATH + client.unlockConnector(params);
+        return REDIRECT_TASKS_PATH + getClient12().unlockConnector(params);
     }
 
     @RequestMapping(value = UPDATE_FIRM_PATH, method = RequestMethod.POST)
     public String postUpdateFirm(@Valid @ModelAttribute(PARAMS) UpdateFirmwareParams params,
                                  BindingResult result, Model model) {
         if (result.hasErrors()) {
-            setChargePointList(model);
-            return PREFIX + UPDATE_FIRM_PATH;
+            setCommonAttributes(model);
+            return getPrefix() + UPDATE_FIRM_PATH;
         }
-        return REDIRECT_TASKS_PATH + client.updateFirmware(params);
+        return REDIRECT_TASKS_PATH + getClient12().updateFirmware(params);
     }
 }

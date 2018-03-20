@@ -25,6 +25,9 @@ table { width: 100%;}
 table.action td:last-child {
 	border-left: 1px solid #CCC;
 }
+table.action th:last-child {
+	border-left: 1px solid #CCC;
+}
 table.userInput th:first-child {
 	text-align: right;
 }

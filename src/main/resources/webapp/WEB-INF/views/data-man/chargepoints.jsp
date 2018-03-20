@@ -45,7 +45,7 @@
         </table>
     </form:form>
     <br>
-    <table class="res">
+    <table class="res action">
         <thead>
             <tr>
                 <th data-sort="string">ChargeBox ID</th>

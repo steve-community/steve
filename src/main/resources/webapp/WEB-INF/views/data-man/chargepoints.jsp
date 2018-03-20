@@ -7,7 +7,7 @@
         });
     });
 </script>
-<div class="content"><div>
+<div class="content">
     <div>
     <section><span id="unknown" style="cursor: pointer">
     Unknown Charge Points

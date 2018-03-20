@@ -1,12 +1,12 @@
 package de.rwth.idsg.steve.web.dto.ocpp;
 
 import lombok.Getter;
+
 /**
- *
- * @author david
+ * @author David Rerimassie <david@rerimassie.nl>
+ * @since 20.03.2018
  */
-public enum TriggerMessageEnum
-{
+public enum TriggerMessageEnum {
     BOOT_NOTIFICATION("BootNotification"),
     DIAGNOSTICS_STATUS_NOTIFICATION("DiagnosticsStatusNotification"),
     FIRMWARE_STATUS_NOTIFICATION("FirmwareStatusNotification"),
@@ -17,23 +17,18 @@ public enum TriggerMessageEnum
     private final String value;
     @Getter private final String text;
 
-    private TriggerMessageEnum(String value)
-    {
+    TriggerMessageEnum(String value) {
         this.value = value;
         this.text = String.format("%s", value);
     }
 
-    public String value()
-    {
+    public String value() {
         return value;
     }
 
-    public static TriggerMessageEnum fromValue(String v)
-    {
-        for (TriggerMessageEnum c: TriggerMessageEnum.values())
-        {
-            if (c.value.equals(v))
-            {
+    public static TriggerMessageEnum fromValue(String v) {
+        for (TriggerMessageEnum c: TriggerMessageEnum.values()) {
+            if (c.value.equals(v)) {
                 return c;
             }
         }

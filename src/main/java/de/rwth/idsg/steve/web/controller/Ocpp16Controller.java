@@ -154,7 +154,7 @@ public class Ocpp16Controller extends Ocpp15Controller {
 
     @RequestMapping(value = TRIGGER_MESSAGE_PATH, method = RequestMethod.POST)
     public String postTriggerMessage(@Valid @ModelAttribute(PARAMS) TriggerMessageParams params,
-                                 BindingResult result, Model model) {
+                                     BindingResult result, Model model) {
         if (result.hasErrors()) {
             setCommonAttributes(model);
             setTriggerMessages(model);

@@ -34,18 +34,20 @@ public class ChargePointService16_Client extends ChargePointService15_Client {
         return invoker16;
     }
 
-    protected ChargePointService16_Invoker getOcpp16Invoker() { return invoker16; }
+    protected ChargePointService16_Invoker getOcpp16Invoker() {
+        return invoker16;
+    }
 
     // -------------------------------------------------------------------------
-    // Single Execution - since OCPP 1.6
+    // Multiple Execution - since OCPP 1.6
     // -------------------------------------------------------------------------
 
     public int triggerMessage(TriggerMessageParams params) {
         TriggerMessageTask task = new TriggerMessageTask(getVersion(), params);
 
         BackgroundService.with(executorService)
-                .forFirst(task.getParams().getChargePointSelectList())
-                .execute(c -> getOcpp16Invoker().triggerMessage(c, task));
+                         .forEach(task.getParams().getChargePointSelectList())
+                         .execute(c -> getOcpp16Invoker().triggerMessage(c, task));
 
         return requestTaskStore.add(task);
     }

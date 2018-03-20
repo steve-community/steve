@@ -14,6 +14,7 @@ public class TriggerMessageTask extends CommunicationTask<TriggerMessageParams, 
     public TriggerMessageTask(OcppVersion ocppVersion, TriggerMessageParams params) {
         super(ocppVersion, params);
     }
+
     @Override
     public OcppCallback<String> defaultCallback() {
         return new StringOcppCallback();
@@ -25,6 +26,7 @@ public class TriggerMessageTask extends CommunicationTask<TriggerMessageParams, 
         throw new RuntimeException("Not supported");
     }
 
+    @Deprecated
     @Override
     public <T extends RequestType> T getOcpp15Request() {
         throw new RuntimeException("Not supported");
@@ -43,6 +45,7 @@ public class TriggerMessageTask extends CommunicationTask<TriggerMessageParams, 
         throw new RuntimeException("Not supported");
     }
 
+    @Deprecated
     @Override
     public <T extends ResponseType> AsyncHandler<T> getOcpp15Handler(String chargeBoxId) {
         throw new RuntimeException("Not supported");
@@ -52,7 +55,7 @@ public class TriggerMessageTask extends CommunicationTask<TriggerMessageParams, 
     public AsyncHandler<ocpp.cp._2015._10.TriggerMessageResponse> getOcpp16Handler(String chargeBoxId) {
         return res -> {
             try {
-                success(chargeBoxId, String.valueOf(res.get().getStatus()));
+                success(chargeBoxId, String.valueOf(res.get().getStatus().value()));
             } catch (Exception e) {
                 failed(chargeBoxId, e);
             }

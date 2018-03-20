@@ -27,6 +27,6 @@
         </ul>
     </div>
     <div class="op16-content">
-        <%@ include file="../op-forms/TriggerMessage.jsp" %>
+        <%@ include file="../op-forms/TriggerMessageForm.jsp" %>
     </div></div>
 <%@ include file="../00-footer.jsp" %>

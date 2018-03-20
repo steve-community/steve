@@ -1,7 +1,12 @@
 package de.rwth.idsg.steve.ocpp.task;
 
-import de.rwth.idsg.steve.ocpp.*;
+import de.rwth.idsg.steve.ocpp.CommunicationTask;
+import de.rwth.idsg.steve.ocpp.OcppCallback;
+import de.rwth.idsg.steve.ocpp.OcppVersion;
+import de.rwth.idsg.steve.ocpp.RequestType;
+import de.rwth.idsg.steve.ocpp.ResponseType;
 import de.rwth.idsg.steve.web.dto.ocpp.TriggerMessageParams;
+import ocpp.cp._2015._10.MessageTrigger;
 
 import javax.xml.ws.AsyncHandler;
 
@@ -36,7 +41,7 @@ public class TriggerMessageTask extends CommunicationTask<TriggerMessageParams, 
     public ocpp.cp._2015._10.TriggerMessageRequest getOcpp16Request() {
         return new ocpp.cp._2015._10.TriggerMessageRequest()
                 .withConnectorId(params.getConnectorId())
-                .withRequestedMessage(params.getTriggerMessage());
+                .withRequestedMessage(MessageTrigger.fromValue(params.getTriggerMessage().value()));
     }
 
     @Deprecated
@@ -55,7 +60,7 @@ public class TriggerMessageTask extends CommunicationTask<TriggerMessageParams, 
     public AsyncHandler<ocpp.cp._2015._10.TriggerMessageResponse> getOcpp16Handler(String chargeBoxId) {
         return res -> {
             try {
-                success(chargeBoxId, String.valueOf(res.get().getStatus().value()));
+                success(chargeBoxId, res.get().getStatus().value());
             } catch (Exception e) {
                 failed(chargeBoxId, e);
             }

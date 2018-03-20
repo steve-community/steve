@@ -20,10 +20,10 @@
             <li><a href="${ctxPath}/manager/operations/${opVersion}/GetLocalListVersion">Get Local List Version</a></li>
             <li><a href="${ctxPath}/manager/operations/${opVersion}/SendLocalList">Send Local List</a></li>
             <hr>
+            <li><a href="${ctxPath}/manager/operations/${opVersion}/TriggerMessage">Trigger Message</a></li>
             <li><a href="${ctxPath}/manager/operations/${opVersion}/GetCompositeSchedule">Get Composite Schedule</a></li>
             <li><a class="highlight" href="${ctxPath}/manager/operations/${opVersion}/ClearChargingProfile">Clear Charging Profile</a></li>
             <li><a href="${ctxPath}/manager/operations/${opVersion}/SetChargingProfile">Set Charging Profile</a></li>
-            <li><a href="${ctxPath}/manager/operations/${opVersion}/TriggerMessage">Trigger Message</a></li>
         </ul>
     </div>
     <div class="op16-content">

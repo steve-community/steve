@@ -1,13 +1,17 @@
 <%@ include file="00-header.jsp" %>
 <div class="content">
 <div class="tileWrapper">
-	<a class="tileRow1" href="${ctxPath}/manager/users">
-		Number of<br>Users
-		<span class="base formatNumber">${stats.numUsers}</span>
+	<a class="tileRow1" href="${ctxPath}/manager/chargepoints">
+		Number of<br>Charge Points
+		<span class="base formatNumber">${stats.numChargeBoxes}</span>
 	</a>
 	<a class="tileRow1" href="${ctxPath}/manager/ocppTags">
 		Number of<br>OCPP Tags
 		<span class="base formatNumber">${stats.numOcppTags}</span>
+	</a>
+	<a class="tileRow1" href="${ctxPath}/manager/users">
+		Number of<br>Users
+		<span class="base formatNumber">${stats.numUsers}</span>
 	</a>
 	<a class="tileRow1" href="${ctxPath}/manager/reservations">
 		Number of<br>Active Reservations
@@ -16,10 +20,6 @@
 	<a class="tileRow1" href="${ctxPath}/manager/transactions">
 		Number of<br>Active Transactions
 		<span class="base formatNumber">${stats.numTransactions}</span>
-	</a>
-	<a class="tileRow1" href="${ctxPath}/manager/chargepoints">
-		Number of<br>Charge Points
-		<span class="base formatNumber">${stats.numChargeBoxes}</span>
 	</a>
 	<a class="tileRow1" href="${ctxPath}/manager/home/ocppJsonStatus">
 		Number of Connected<br>JSON Charge Points

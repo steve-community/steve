@@ -65,12 +65,15 @@ public enum ConfigurationKeyEnum {
     LocalAuthListEnabled("LocalAuthListEnabled", "boolean", RW, newHashSet(V_16)),
     LocalAuthListMaxLength("LocalAuthListMaxLength", "integer", R, newHashSet(V_16)),
     SendLocalListMaxLength("SendLocalListMaxLength", "integer", R, newHashSet(V_16)),
-    ReserveConnectorZeroSupported("ReserveConnectorZeroSupported", "boolean", R, newHashSet(V_16)),
-    ChargeProfileMaxStackLevel("ChargeProfileMaxStackLevel", "integer", R, newHashSet(V_16)),
-    ChargingScheduleAllowedChargingRateUnit("ChargingScheduleAllowedChargingRateUnit", "comma seperated list", R, newHashSet(V_16)),
-    ChargingScheduleMaxPeriods("ChargingScheduleMaxPeriods", "integer", R, newHashSet(V_16)),
-    ConnectorSwitch3to1PhaseSupported("ConnectorSwitch3to1PhaseSupported", "boolean", R, newHashSet(V_16)),
-    MaxChargingProfilesInstalled("MaxChargingProfilesInstalled", "integer", R, newHashSet(V_16));
+    ReserveConnectorZeroSupported("ReserveConnectorZeroSupported", "boolean", R, newHashSet(V_16));
+
+    // These are new in Ocpp 1.6, but Steve does not support Smart Charging profile yet.
+    //
+    // ChargeProfileMaxStackLevel("ChargeProfileMaxStackLevel", "integer", R, newHashSet(V_16)),
+    // ChargingScheduleAllowedChargingRateUnit("ChargingScheduleAllowedChargingRateUnit", "comma seperated list", R, newHashSet(V_16)),
+    // ChargingScheduleMaxPeriods("ChargingScheduleMaxPeriods", "integer", R, newHashSet(V_16)),
+    // ConnectorSwitch3to1PhaseSupported("ConnectorSwitch3to1PhaseSupported", "boolean", R, newHashSet(V_16)),
+    // MaxChargingProfilesInstalled("MaxChargingProfilesInstalled", "integer", R, newHashSet(V_16));
 
     private final String value;
     private final String text;

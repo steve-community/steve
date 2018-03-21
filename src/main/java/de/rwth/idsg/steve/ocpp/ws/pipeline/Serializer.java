@@ -3,9 +3,10 @@ package de.rwth.idsg.steve.ocpp.ws.pipeline;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import de.rwth.idsg.steve.SteveException;
-import de.rwth.idsg.steve.ocpp.ws.JsonObjectMapper;
 import de.rwth.idsg.steve.ocpp.ws.ErrorFactory;
+import de.rwth.idsg.steve.ocpp.ws.JsonObjectMapper;
 import de.rwth.idsg.steve.ocpp.ws.data.CommunicationContext;
 import de.rwth.idsg.steve.ocpp.ws.data.MessageType;
 import de.rwth.idsg.steve.ocpp.ws.data.OcppJsonCall;
@@ -116,14 +117,12 @@ public enum Serializer implements Consumer<CommunicationContext> {
             description = "";
         }
 
-        // From soec:
+        // From spec:
         // ErrorDetails - This JSON object describes error details in an undefined way.
         // If there are no error details you should fill in an empty object {}, missing or null is not allowed
-        JsonNode detailsNode;
+        ObjectNode detailsNode = mapper.createObjectNode();
         if (error.isSetDetails()) {
-            detailsNode = mapper.getNodeFactory().textNode(error.toStringErrorDetails());
-        } else {
-            detailsNode = mapper.createObjectNode();
+            detailsNode.set("errorMsg", mapper.getNodeFactory().textNode(error.toStringErrorDetails()));
         }
 
         return mapper.createArrayNode()

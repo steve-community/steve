@@ -1,15 +1,15 @@
 package de.rwth.idsg.steve.ocpp.ws.pipeline;
 
 import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonToken;
+import com.fasterxml.jackson.core.TreeNode;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.rwth.idsg.steve.SteveException;
-import de.rwth.idsg.steve.ocpp.ws.JsonObjectMapper;
 import de.rwth.idsg.steve.ocpp.RequestType;
 import de.rwth.idsg.steve.ocpp.ResponseType;
 import de.rwth.idsg.steve.ocpp.ws.ErrorFactory;
 import de.rwth.idsg.steve.ocpp.ws.FutureResponseContextStore;
+import de.rwth.idsg.steve.ocpp.ws.JsonObjectMapper;
 import de.rwth.idsg.steve.ocpp.ws.TypeStore;
 import de.rwth.idsg.steve.ocpp.ws.data.CommunicationContext;
 import de.rwth.idsg.steve.ocpp.ws.data.ErrorCode;
@@ -181,10 +181,16 @@ public class Deserializer implements Consumer<CommunicationContext> {
                 desc = null;
             }
 
-            // From soec:
+            // From spec:
             // ErrorDetails - This JSON object describes error details in an undefined way.
             // If there are no error details you should fill in an empty object {}, missing or null is not allowed
-            details = (parser.nextToken() == JsonToken.START_OBJECT) ? null : parser.getText();
+            parser.nextToken();
+            TreeNode detailsNode = parser.readValueAsTree();
+            if (detailsNode.size() == 0) {
+                details = null; // empty object
+            } else {
+                details = mapper.writeValueAsString(detailsNode);
+            }
 
         } catch (IOException e) {
             throw new SteveException("Deserialization of incoming error message failed", e);
@@ -199,4 +205,5 @@ public class Deserializer implements Consumer<CommunicationContext> {
         context.setIncomingMessage(error);
         context.createErrorHandler(responseContext.getTask());
     }
+
 }

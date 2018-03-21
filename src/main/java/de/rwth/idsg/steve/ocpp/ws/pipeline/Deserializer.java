@@ -167,7 +167,7 @@ public class Deserializer implements Consumer<CommunicationContext> {
 
         ErrorCode code;
         String desc;
-        String details;
+        String details = null;
         try {
             parser.nextToken();
             code = ErrorCode.fromValue(parser.getText());
@@ -186,9 +186,7 @@ public class Deserializer implements Consumer<CommunicationContext> {
             // If there are no error details you should fill in an empty object {}, missing or null is not allowed
             parser.nextToken();
             TreeNode detailsNode = parser.readValueAsTree();
-            if (detailsNode.size() == 0) {
-                details = null; // empty object
-            } else {
+            if (detailsNode != null && detailsNode.size() != 0) {
                 details = mapper.writeValueAsString(detailsNode);
             }
 

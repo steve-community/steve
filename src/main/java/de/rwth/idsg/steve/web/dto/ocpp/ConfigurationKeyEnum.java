@@ -19,7 +19,7 @@ import static de.rwth.idsg.steve.web.dto.ocpp.ConfigurationKeyReadWriteEnum.RW;
  */
 public enum ConfigurationKeyEnum {
     // From Ocpp 1.2
-    HeartBeatInterval("HeartBeatInterval", "in seconds", RW, newHashSet(V_12, V_15, V_16)),
+    HeartBeatInterval("HeartBeatInterval", "in seconds", RW, newHashSet(V_12, V_15)),
     ConnectionTimeOut("ConnectionTimeOut", "in seconds", RW, newHashSet(V_12, V_15, V_16)),
     ProximityContactRetries("ProximityContactRetries", "in times", RW, newHashSet(V_12, V_15, V_16)),
     ProximityLockRetries("ProximityLockRetries", "in times", RW, newHashSet(V_12, V_15, V_16)),
@@ -37,6 +37,7 @@ public enum ConfigurationKeyEnum {
     StopTxnAlignedData("StopTxnAlignedData", "comma seperated list", RW, newHashSet(V_15, V_16)),
 
     // New in Ocpp 1.6
+    HeartbeatInterval("HeartbeatInterval", "in seconds", RW, newHashSet(V_16)),
     AllowOfflineTxForUnknownId("AllowOfflineTxForUnknownId", "boolean", RW, newHashSet(V_16)),
     AuthorizationCacheEnabled("AuthorizationCacheEnabled", "boolean", RW, newHashSet(V_16)),
     // AuthorizeRemoteTxRequests Read or Read-Write is up to Charge Point implementation so set to RW for now

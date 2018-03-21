@@ -18,7 +18,11 @@ import static de.rwth.idsg.steve.web.dto.ocpp.ConfigurationKeyReadWriteEnum.RW;
  * @since 02.01.2015
  */
 public enum ConfigurationKeyEnum {
-    // From Ocpp 1.2
+
+    // -------------------------------------------------------------------------
+    // From OCPP 1.2
+    // -------------------------------------------------------------------------
+
     HeartBeatInterval("HeartBeatInterval", "in seconds", RW, newHashSet(V_12, V_15)),
     ConnectionTimeOut("ConnectionTimeOut", "in seconds", RW, newHashSet(V_12, V_15, V_16)),
     ProximityContactRetries("ProximityContactRetries", "in times", RW, newHashSet(V_12, V_15, V_16)),
@@ -29,14 +33,20 @@ public enum ConfigurationKeyEnum {
     ChargePointId("ChargePointId", "string", RW, newHashSet(V_12, V_15, V_16)),
     MeterValueSampleInterval("MeterValueSampleInterval", "in seconds", RW, newHashSet(V_12, V_15, V_16)),
 
-    // New in Ocpp 1.5
+    // -------------------------------------------------------------------------
+    // New in OCPP 1.5
+    // -------------------------------------------------------------------------
+
     ClockAlignedDataInterval("ClockAlignedDataInterval", "in seconds", RW, newHashSet(V_15, V_16)),
     MeterValuesSampledData("MeterValuesSampledData", "comma seperated list", RW, newHashSet(V_15, V_16)),
     MeterValuesAlignedData("MeterValuesAlignedData", "comma seperated list", RW, newHashSet(V_15, V_16)),
     StopTxnSampledData("StopTxnSampledData", "comma seperated list", RW, newHashSet(V_15, V_16)),
     StopTxnAlignedData("StopTxnAlignedData", "comma seperated list", RW, newHashSet(V_15, V_16)),
 
-    // New in Ocpp 1.6
+    // -------------------------------------------------------------------------
+    // New in OCPP 1.6
+    // -------------------------------------------------------------------------
+
     HeartbeatInterval("HeartbeatInterval", "in seconds", RW, newHashSet(V_16)),
     AllowOfflineTxForUnknownId("AllowOfflineTxForUnknownId", "boolean", RW, newHashSet(V_16)),
     AuthorizationCacheEnabled("AuthorizationCacheEnabled", "boolean", RW, newHashSet(V_16)),
@@ -67,8 +77,10 @@ public enum ConfigurationKeyEnum {
     SendLocalListMaxLength("SendLocalListMaxLength", "integer", R, newHashSet(V_16)),
     ReserveConnectorZeroSupported("ReserveConnectorZeroSupported", "boolean", R, newHashSet(V_16));
 
-    // These are new in Ocpp 1.6, but Steve does not support Smart Charging profile yet.
-    //
+    // -------------------------------------------------------------------------
+    // New in OCPP 1.6, but Steve does not support Smart Charging profile yet.
+    // -------------------------------------------------------------------------
+
     // ChargeProfileMaxStackLevel("ChargeProfileMaxStackLevel", "integer", R, newHashSet(V_16)),
     // ChargingScheduleAllowedChargingRateUnit("ChargingScheduleAllowedChargingRateUnit", "comma seperated list", R, newHashSet(V_16)),
     // ChargingScheduleMaxPeriods("ChargingScheduleMaxPeriods", "integer", R, newHashSet(V_16)),

@@ -6,6 +6,7 @@ package de.rwth.idsg.steve;
  */
 public enum ApplicationProfile {
     DEV,
+    TEST,
     PROD;
 
     public static ApplicationProfile fromName(String v) {

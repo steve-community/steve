@@ -6,12 +6,13 @@ import ocpp.cs._2010._08.AuthorizeRequest;
 import ocpp.cs._2010._08.AuthorizeResponse;
 import ocpp.cs._2010._08.BootNotificationRequest;
 import ocpp.cs._2010._08.BootNotificationResponse;
+import ocpp.cs._2010._08.RegistrationStatus;
 import ocpp.cs._2012._06.CentralSystemService;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.apache.cxf.ws.addressing.WSAddressingFeature;
+import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import javax.xml.ws.soap.SOAPBinding;
@@ -23,16 +24,27 @@ import static de.rwth.idsg.steve.SteveConfiguration.CONFIG;
  * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
  * @since 10.03.2018
  */
-@Ignore
 @Slf4j
 public class ApplicationTest {
 
+    private static final String REGISTERED_CHARGE_BOX_ID = __DatabasePreparer__.getRegisteredChargeBoxId();
+    private static final String REGISTERED_OCPP_TAG =  __DatabasePreparer__.getRegisteredOcppTag();
     private static final String path = getPath();
+
+    private static Application app;
 
     @BeforeClass
     public static void init() throws Exception {
-        Application app = new Application();
+        __DatabasePreparer__.prepare();
+
+        app = new Application();
         app.start();
+    }
+
+    @AfterClass
+    public static void destroy() throws Exception {
+        app.stop();
+        __DatabasePreparer__.cleanUp();
     }
 
     @Test
@@ -43,16 +55,16 @@ public class ApplicationTest {
                 new BootNotificationRequest()
                         .withChargePointVendor(getRandomString())
                         .withChargePointModel(getRandomString()),
-                getRandomString());
+                REGISTERED_CHARGE_BOX_ID);
         Assert.assertNotNull(boot);
-        Assert.assertEquals(ocpp.cs._2010._08.RegistrationStatus.REJECTED, boot.getStatus());
+        Assert.assertEquals(RegistrationStatus.ACCEPTED, boot.getStatus());
 
         AuthorizeResponse auth = client.authorize(
                 new AuthorizeRequest()
-                        .withIdTag(getRandomString()),
-                getRandomString());
+                        .withIdTag(REGISTERED_OCPP_TAG),
+                REGISTERED_CHARGE_BOX_ID);
         Assert.assertNotNull(auth);
-        Assert.assertEquals(AuthorizationStatus.INVALID, auth.getIdTagInfo().getStatus());
+        Assert.assertEquals(AuthorizationStatus.ACCEPTED, auth.getIdTagInfo().getStatus());
     }
 
     @Test
@@ -63,16 +75,16 @@ public class ApplicationTest {
                 new ocpp.cs._2012._06.BootNotificationRequest()
                         .withChargePointVendor(getRandomString())
                         .withChargePointModel(getRandomString()),
-                getRandomString());
+                REGISTERED_CHARGE_BOX_ID);
         Assert.assertNotNull(boot);
-        Assert.assertEquals(ocpp.cs._2012._06.RegistrationStatus.REJECTED, boot.getStatus());
+        Assert.assertEquals(ocpp.cs._2012._06.RegistrationStatus.ACCEPTED, boot.getStatus());
 
         ocpp.cs._2012._06.AuthorizeResponse auth = client.authorize(
                 new ocpp.cs._2012._06.AuthorizeRequest()
-                        .withIdTag(getRandomString()),
-                getRandomString());
+                        .withIdTag(REGISTERED_OCPP_TAG),
+                REGISTERED_CHARGE_BOX_ID);
         Assert.assertNotNull(auth);
-        Assert.assertEquals(ocpp.cs._2012._06.AuthorizationStatus.INVALID, auth.getIdTagInfo().getStatus());
+        Assert.assertEquals(ocpp.cs._2012._06.AuthorizationStatus.ACCEPTED, auth.getIdTagInfo().getStatus());
     }
 
 

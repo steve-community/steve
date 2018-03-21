@@ -51,12 +51,21 @@
             </activation>
             <properties>
                 <envName>prod</envName>
+                <skipTests>true</skipTests>
             </properties>
         </profile>
         <profile>
             <id>dev</id>
             <properties>
                 <envName>dev</envName>
+                <skipTests>true</skipTests>
+            </properties>
+        </profile>
+        <profile>
+            <id>test</id>
+            <properties>
+                <envName>test</envName>
+                <skipTests>false</skipTests>
             </properties>
         </profile>
     </profiles>

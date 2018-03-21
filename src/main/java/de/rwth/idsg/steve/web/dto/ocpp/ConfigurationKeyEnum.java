@@ -37,7 +37,7 @@ public enum ConfigurationKeyEnum {
     StopTxnAlignedData("StopTxnAlignedData", "comma seperated list", RW, newHashSet(V_15, V_16)),
 
     // New in Ocpp 1.6
-    HeartbeatInterval("HeartBeatInterval", "in seconds", RW, newHashSet(V_16)),
+    HeartbeatInterval("HeartbeatInterval", "in seconds", RW, newHashSet(V_16)),
     AllowOfflineTxForUnknownId("AllowOfflineTxForUnknownId", "boolean", RW, newHashSet(V_16)),
     AuthorizationCacheEnabled("AuthorizationCacheEnabled", "boolean", RW, newHashSet(V_16)),
     // AuthorizeRemoteTxRequests Read or Read-Write is up to Charge Point implementation so set to RW for now

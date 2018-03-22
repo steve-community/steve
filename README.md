@@ -21,9 +21,11 @@ Electric charge points using the following OCPP versions are supported:
 * OCPP1.6S <sup>[1]</sup>
 * OCPP1.6J <sup>[1]</sup>
 
-We have successfully tested SteVe with charge points manufactured by EBG and Mennekes. If your charge point also works well with SteVe, please let us know! We will update the list.
-
 [1]: All profiles with the exception of "Smart Charging" are implemented: Core, Firmware Management, Local Auth List Management, Reservation and Remote Trigger profiles
+
+For Charging Station compatibility please check:
+https://github.com/RWTH-i5-IDSG/steve/wiki/Charging-Station-Compatibility 
+The list was just recently started and is therefore not exhaustive.
 
 ### System Requirements
 

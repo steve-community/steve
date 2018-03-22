@@ -17,7 +17,6 @@ before_script:
 # start the actual build
 script: 
         - mvn -Dmaven.javadoc.skip=true clean package -Ptest -B -V
-        - mvn -Dmaven.javadoc.skip=true test -Ptest -B -V
         - java -Djava.net.preferIPv4Stack=true -jar target/steve-*.jar &
         - sleep 30
         - 'grep -C 50 -e "Exception: " ~/logs/steve.log && exit 255 || true'

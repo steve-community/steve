@@ -202,7 +202,7 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
             // -------------------------------------------------------------------------
 
             if (p.isSetReservationId()) {
-                reservationRepository.used(ctx, p.getReservationId(), transactionId);
+                reservationRepository.used(ctx, connectorPkQuery, p.getIdTag(), p.getReservationId(), transactionId);
             }
 
             // -------------------------------------------------------------------------

@@ -14,6 +14,7 @@ import org.jooq.DSLContext;
 import org.jooq.Record1;
 import org.jooq.Record10;
 import org.jooq.RecordMapper;
+import org.jooq.Select;
 import org.jooq.SelectConditionStep;
 import org.jooq.SelectQuery;
 import org.jooq.exception.DataAccessException;
@@ -137,12 +138,21 @@ public class ReservationRepositoryImpl implements ReservationRepository {
     }
 
     @Override
-    public void used(DSLContext ctx, int reservationId, int transactionId) {
-        ctx.update(RESERVATION)
-           .set(RESERVATION.STATUS, ReservationStatus.USED.name())
-           .set(RESERVATION.TRANSACTION_PK, transactionId)
-           .where(RESERVATION.RESERVATION_PK.equal(reservationId))
-           .execute();
+    public void used(DSLContext ctx, Select<Record1<Integer>> connectorPkSelect, String ocppIdTag,
+                     int reservationId, int transactionId) {
+        int count = ctx.update(RESERVATION)
+                       .set(RESERVATION.STATUS, ReservationStatus.USED.name())
+                       .set(RESERVATION.TRANSACTION_PK, transactionId)
+                       .where(RESERVATION.RESERVATION_PK.equal(reservationId))
+                       .and(RESERVATION.ID_TAG.equal(ocppIdTag))
+                       .and(RESERVATION.CONNECTOR_PK.equal(connectorPkSelect))
+                       .and(RESERVATION.STATUS.eq(ReservationStatus.ACCEPTED.name()))
+                       .execute();
+
+        if (count != 1) {
+            log.warn("Could not mark the reservation '{}' as used: Problems occurred due to sent reservation id, " +
+                    "charge box connector, user id tag or the reservation was used already.", reservationId);
+        }
     }
 
     // -------------------------------------------------------------------------

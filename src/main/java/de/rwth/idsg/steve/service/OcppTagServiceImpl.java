@@ -4,6 +4,8 @@ import de.rwth.idsg.steve.repository.OcppTagRepository;
 import de.rwth.idsg.steve.repository.SettingsRepository;
 import de.rwth.idsg.steve.service.dto.UnidentifiedIncomingObject;
 import jooq.steve.db.tables.records.OcppTagRecord;
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import ocpp.cp._2015._10.AuthorizationData;
 import ocpp.cs._2015._10.AuthorizationStatus;
@@ -30,18 +32,14 @@ public class OcppTagServiceImpl implements OcppTagService {
 
     @Override
     public List<AuthorizationData> getAuthDataOfAllTags() {
-        int hoursToExpire = settingsRepository.getHoursToExpire();
-
         return ocppTagRepository.getRecords()
-                                .map(new AuthorisationDataMapper(hoursToExpire));
+                                .map(new AuthorisationDataMapper());
     }
 
     @Override
     public List<AuthorizationData> getAuthData(List<String> idTagList) {
-        int hoursToExpire = settingsRepository.getHoursToExpire();
-
         return ocppTagRepository.getRecords(idTagList)
-                                .map(new AuthorisationDataMapper(hoursToExpire));
+                                .map(new AuthorisationDataMapper());
     }
 
     @Override
@@ -59,6 +57,10 @@ public class OcppTagServiceImpl implements OcppTagService {
             idTagInfo.setStatus(AuthorizationStatus.INVALID);
             invalidOcppTagService.processNewUnidentified(idTag);
         } else {
+
+            DateTime expiryDate = record.getExpiryDate();
+            boolean isExpiryDateSet = expiryDate != null;
+
             if (record.getBlocked()) {
                 log.error("The user with idTag '{}' is BLOCKED.", idTag);
                 idTagInfo.setStatus(AuthorizationStatus.BLOCKED);
@@ -67,7 +69,7 @@ public class OcppTagServiceImpl implements OcppTagService {
 //                log.warn("The user with idTag '{}' is ALREADY in another transaction.", idTag);
 //                idTagInfo.setStatus(ocpp.cs._2012._06.AuthorizationStatus.CONCURRENT_TX);
 
-            } else if (record.getExpiryDate() != null && DateTime.now().isAfter(record.getExpiryDate())) {
+            } else if (isExpiryDateSet && DateTime.now().isAfter(record.getExpiryDate())) {
                 log.error("The user with idTag '{}' is EXPIRED.", idTag);
                 idTagInfo.setStatus(AuthorizationStatus.EXPIRED);
 
@@ -75,8 +77,10 @@ public class OcppTagServiceImpl implements OcppTagService {
                 log.debug("The user with idTag '{}' is ACCEPTED.", idTag);
                 idTagInfo.setStatus(AuthorizationStatus.ACCEPTED);
 
-                int hours = settingsRepository.getHoursToExpire();
-                idTagInfo.setExpiryDate(DateTime.now().plusHours(hours));
+                // If the database contains an actual expiry, use it. Otherwise, calculate an expiry for cached info
+                DateTime expiry = isExpiryDateSet ? expiryDate : DateTime.now().plusHours(settingsRepository.getHoursToExpire());
+
+                idTagInfo.setExpiryDate(expiry);
                 idTagInfo.setParentIdTag(record.getParentIdTag());
             }
         }
@@ -87,18 +91,13 @@ public class OcppTagServiceImpl implements OcppTagService {
     // Private helpers
     // -------------------------------------------------------------------------
 
+    @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
     private static class AuthorisationDataMapper implements RecordMapper<OcppTagRecord, AuthorizationData> {
-        private final DateTime nowDt;
-        private final DateTime cacheExpiry;
 
-        AuthorisationDataMapper(int hoursToExpire) {
-            this.nowDt = DateTime.now();
-            this.cacheExpiry = nowDt.plus(hoursToExpire);
-        }
+        private final DateTime nowDt = DateTime.now();
 
         @Override
         public AuthorizationData map(OcppTagRecord record) {
-
             String idTag = record.getIdTag();
             String parentIdTag = record.getParentIdTag();
             DateTime expiryDate = record.getExpiryDate();
@@ -119,7 +118,7 @@ public class OcppTagServiceImpl implements OcppTagService {
             } else {
                 authStatus = ocpp.cp._2015._10.AuthorizationStatus.ACCEPTED;
                 // When accepted, set the additional fields
-                idTagInfo.setExpiryDate(cacheExpiry);
+                idTagInfo.setExpiryDate(expiryDate);
                 idTagInfo.setParentIdTag(parentIdTag);
             }
             idTagInfo.setStatus(authStatus);

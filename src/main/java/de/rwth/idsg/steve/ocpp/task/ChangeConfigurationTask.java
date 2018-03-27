@@ -25,21 +25,21 @@ public class ChangeConfigurationTask extends CommunicationTask<ChangeConfigurati
     @Override
     public ocpp.cp._2010._08.ChangeConfigurationRequest getOcpp12Request() {
         return new ocpp.cp._2010._08.ChangeConfigurationRequest()
-                .withKey(params.getConfKey())
+                .withKey(params.getKey())
                 .withValue(params.getValue());
     }
 
     @Override
     public ocpp.cp._2012._06.ChangeConfigurationRequest getOcpp15Request() {
         return new ocpp.cp._2012._06.ChangeConfigurationRequest()
-                .withKey(params.getConfKey())
+                .withKey(params.getKey())
                 .withValue(params.getValue());
     }
 
     @Override
     public ocpp.cp._2015._10.ChangeConfigurationRequest getOcpp16Request() {
         return new ocpp.cp._2015._10.ChangeConfigurationRequest()
-                .withKey(params.getConfKey())
+                .withKey(params.getKey())
                 .withValue(params.getValue());
     }
 

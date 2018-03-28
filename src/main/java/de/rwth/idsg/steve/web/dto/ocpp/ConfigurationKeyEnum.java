@@ -15,6 +15,7 @@ import static de.rwth.idsg.steve.web.dto.ocpp.ConfigurationKeyReadWriteEnum.RW;
 
 /**
  * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
+ * @author David Rerimassie <david@rerimassie.nl>
  * @since 02.01.2015
  */
 public enum ConfigurationKeyEnum {
@@ -25,12 +26,12 @@ public enum ConfigurationKeyEnum {
 
     HeartBeatInterval("HeartBeatInterval", "in seconds", RW, newHashSet(V_12, V_15)),
     ConnectionTimeOut("ConnectionTimeOut", "in seconds", RW, newHashSet(V_12, V_15, V_16)),
-    ProximityContactRetries("ProximityContactRetries", "in times", RW, newHashSet(V_12, V_15, V_16)),
-    ProximityLockRetries("ProximityLockRetries", "in times", RW, newHashSet(V_12, V_15, V_16)),
+    ProximityContactRetries("ProximityContactRetries", "in times", RW, newHashSet(V_12, V_15)),
+    ProximityLockRetries("ProximityLockRetries", "in times", RW, newHashSet(V_12, V_15)),
     ResetRetries("ResetRetries", "in times", RW, newHashSet(V_12, V_15, V_16)),
     BlinkRepeat("BlinkRepeat", "in times", RW, newHashSet(V_12, V_15, V_16)),
     LightIntensity("LightIntensity", "in %", RW, newHashSet(V_12, V_15, V_16)),
-    ChargePointId("ChargePointId", "string", RW, newHashSet(V_12, V_15, V_16)),
+    ChargePointId("ChargePointId", "string", RW, newHashSet(V_12, V_15)),
     MeterValueSampleInterval("MeterValueSampleInterval", "in seconds", RW, newHashSet(V_12, V_15, V_16)),
 
     // -------------------------------------------------------------------------

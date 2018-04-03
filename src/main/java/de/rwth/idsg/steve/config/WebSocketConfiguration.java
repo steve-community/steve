@@ -13,12 +13,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.eclipse.jetty.websocket.api.WebSocketBehavior;
 import org.eclipse.jetty.websocket.api.WebSocketPolicy;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
-import org.springframework.web.servlet.HandlerMapping;
 import org.springframework.web.socket.config.annotation.EnableWebSocket;
-import org.springframework.web.socket.config.annotation.ServletWebSocketHandlerRegistry;
 import org.springframework.web.socket.config.annotation.WebSocketConfigurer;
 import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry;
 import org.springframework.web.socket.server.support.DefaultHandshakeHandler;
@@ -75,28 +71,5 @@ public class WebSocketConfiguration implements WebSocketConfigurer {
      */
     private List<AbstractWebSocketEndpoint> getEndpoints() {
         return Lists.newArrayList(ocpp16WebSocketEndpoint, ocpp15WebSocketEndpoint, ocpp12WebSocketEndpoint);
-    }
-
-    // -------------------------------------------------------------------------
-    // We don't need no SockJS fallback. But, nevertheless, Spring initializes
-    // a scheduler for it, to be used in the implementation
-    // AbstractWebSocketHandlerRegistration.withSockJS(). We don't call
-    // WebSocketHandlerRegistry.withSockJS() above to add SockJS support,
-    // so the scheduler is useless.
-    //
-    // Hereby, we override the default beans provided by
-    // org.springframework.web.socket.config.annotation.WebSocketConfigurationSupport
-    // -------------------------------------------------------------------------
-
-    @Bean
-    public HandlerMapping webSocketHandlerMapping() {
-        ServletWebSocketHandlerRegistry registry = new ServletWebSocketHandlerRegistry();
-        registerWebSocketHandlers(registry);
-        return registry.getHandlerMapping();
-    }
-
-    @Bean
-    public ThreadPoolTaskScheduler defaultSockJsTaskScheduler() {
-        return null;
     }
 }

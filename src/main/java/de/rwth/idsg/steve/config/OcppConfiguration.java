@@ -1,5 +1,6 @@
 package de.rwth.idsg.steve.config;
 
+import de.rwth.idsg.steve.ocpp.soap.LoggingFeatureProxy;
 import de.rwth.idsg.steve.ocpp.soap.MediatorInInterceptor;
 import de.rwth.idsg.steve.ocpp.soap.MessageIdInterceptor;
 import de.rwth.idsg.steve.ocpp.ws.custom.AlwaysLastStrategy;
@@ -9,7 +10,7 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.bus.spring.SpringBus;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.logging.Slf4jLogger;
-import org.apache.cxf.feature.LoggingFeature;
+import org.apache.cxf.feature.Feature;
 import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.jaxws.JaxWsServerFactoryBean;
 import org.apache.cxf.message.Message;
@@ -20,6 +21,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import javax.annotation.PostConstruct;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import static de.rwth.idsg.steve.SteveConfiguration.CONFIG;
@@ -53,24 +56,18 @@ public class OcppConfiguration {
         List<Interceptor<? extends Message>> interceptors = asList(new MessageIdInterceptor(), fromAddressInterceptor);
 
         // Just a dummy service to route incoming messages to the appropriate service version
-        createOcppService(ocpp12Server, CONFIG.getRouterEndpointPath(), route);
+        createOcppService(ocpp12Server, CONFIG.getRouterEndpointPath(), route, Collections.emptyList());
 
-        createOcppService(ocpp12Server, "/CentralSystemServiceOCPP12", interceptors);
-        createOcppService(ocpp15Server, "/CentralSystemServiceOCPP15", interceptors);
-        createOcppService(ocpp16Server, "/CentralSystemServiceOCPP16", interceptors);
+        Collection<Feature> logging = Collections.singletonList(LoggingFeatureProxy.INSTANCE.get());
+
+        createOcppService(ocpp12Server, "/CentralSystemServiceOCPP12", interceptors, logging);
+        createOcppService(ocpp15Server, "/CentralSystemServiceOCPP15", interceptors, logging);
+        createOcppService(ocpp16Server, "/CentralSystemServiceOCPP16", interceptors, logging);
     }
 
-    /**
-     * Help by: http://stackoverflow.com/a/31988136
-     *
-     * logFeature.initialize(springBus) is not needed, because during the init of bus it will call f.initialize(this)
-     * in {@link org.apache.cxf.bus.extension.ExtensionManagerBus#initializeFeatures()} anyway
-     */
     @Bean(name = Bus.DEFAULT_BUS_ID, destroyMethod = "shutdown")
     public SpringBus springBus() {
-        SpringBus bus = new SpringBus();
-        bus.getFeatures().add(new LoggingFeature()); // Log incoming/outgoing messages
-        return bus;
+        return new SpringBus();
     }
 
     @Bean
@@ -86,11 +83,13 @@ public class OcppConfiguration {
     }
 
     private void createOcppService(Object serviceBean, String address,
-                                   List<Interceptor<? extends Message>> interceptors) {
+                                   List<Interceptor<? extends Message>> interceptors,
+                                   Collection<? extends Feature> features) {
         JaxWsServerFactoryBean f = new JaxWsServerFactoryBean();
         f.setBus(springBus());
         f.setServiceBean(serviceBean);
         f.setAddress(address);
+        f.getFeatures().addAll(features);
         f.getInInterceptors().addAll(interceptors);
         f.create();
     }

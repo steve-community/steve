@@ -25,6 +25,7 @@ public final class ClientProvider {
     public static JaxWsProxyFactoryBean getBean(String endpointAddress) {
         JaxWsProxyFactoryBean f = new JaxWsProxyFactoryBean();
         f.setBindingId(SOAPBinding.SOAP12HTTP_BINDING);
+        f.getFeatures().add(LoggingFeatureProxy.INSTANCE.get());
         f.getFeatures().add(new WSAddressingFeature());
         f.setAddress(endpointAddress);
         return f;

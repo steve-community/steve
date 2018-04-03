@@ -2,9 +2,9 @@ package de.rwth.idsg.steve.web.dto;
 
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.validator.constraints.Email;
 import org.joda.time.LocalDate;
 
+import javax.validation.constraints.Email;
 import javax.validation.constraints.NotNull;
 
 /**

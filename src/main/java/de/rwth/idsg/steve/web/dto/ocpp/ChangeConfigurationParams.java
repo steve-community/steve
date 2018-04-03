@@ -5,9 +5,9 @@ import de.rwth.idsg.steve.SteveException;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
-import org.hibernate.validator.constraints.NotBlank;
 
 import javax.validation.constraints.AssertTrue;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 
@@ -27,7 +27,7 @@ public class ChangeConfigurationParams extends MultipleChargePointSelect {
     private ConfigurationKeyType keyType = ConfigurationKeyType.PREDEFINED;
 
     @NotBlank(message = "Value is required")
-    @Pattern(regexp = "\\S+", message = "Value cannot contain any whitespace")  
+    @Pattern(regexp = "\\S+", message = "Value cannot contain any whitespace")
     private String value;
 
     @AssertTrue(message = "Custom Configuration Key cannot be left blank")
@@ -71,7 +71,7 @@ public class ChangeConfigurationParams extends MultipleChargePointSelect {
         @Getter private final String value;
 
         public static ConfigurationKeyType fromValue(String v) {
-            for (ConfigurationKeyType c: ConfigurationKeyType.values()) {
+            for (ConfigurationKeyType c : ConfigurationKeyType.values()) {
                 if (c.value.equals(v)) {
                     return c;
                 }

@@ -3,8 +3,8 @@ package de.rwth.idsg.steve.web.dto;
 import de.rwth.idsg.steve.web.validation.ChargeBoxId;
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.validator.constraints.NotEmpty;
 
+import javax.validation.constraints.NotEmpty;
 import java.util.List;
 
 /**

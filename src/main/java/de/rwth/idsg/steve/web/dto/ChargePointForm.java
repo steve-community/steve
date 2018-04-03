@@ -3,9 +3,9 @@ package de.rwth.idsg.steve.web.dto;
 import de.rwth.idsg.steve.web.validation.ChargeBoxId;
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.validator.constraints.NotBlank;
 import org.hibernate.validator.constraints.Range;
 
+import javax.validation.constraints.NotBlank;
 import java.math.BigDecimal;
 
 /**

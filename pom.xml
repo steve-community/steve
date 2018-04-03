@@ -30,14 +30,14 @@
         <java.version>1.8</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-        <jooq.version>3.10.1</jooq.version>
-        <cxf.version>3.2.0</cxf.version>
-        <spring.version>5.0.0.RELEASE</spring.version>
-        <spring.security.version>4.2.3.RELEASE</spring.security.version>
+        <jooq.version>3.10.6</jooq.version>
+        <cxf.version>3.2.4</cxf.version>
+        <spring.version>5.0.4.RELEASE</spring.version>
+        <spring.security.version>5.0.3.RELEASE</spring.security.version>
         <mysql.jdbc.version>8.0.8-dmr</mysql.jdbc.version>
-        <jetty.version>9.4.7.v20170914</jetty.version>
-        <lombok.version>1.16.18</lombok.version>
-        <jackson.version>2.9.2</jackson.version>
+        <jetty.version>9.4.9.v20180320</jetty.version>
+        <lombok.version>1.16.20</lombok.version>
+        <jackson.version>2.9.5</jackson.version>
 
         <!-- In Mysql: schema == database (http://dev.mysql.com/doc/refman/5.6/en/glossary.html#glos_schema) -->
         <jdbcUrl>jdbc:mysql://${db.ip}:${db.port}/${db.schema}?useSSL=true&amp;serverTimezone=UTC</jdbcUrl>
@@ -245,7 +245,7 @@
                             <extraarg>-xjc-Xfluent-api</extraarg>
                             <extraarg>-xjc-Xinheritance</extraarg>
                             <extraarg>-xjc-Xannotate</extraarg>
-                            <extraarg>-verbose</extraarg>
+                            <!--<extraarg>-verbose</extraarg>-->
                             <extraarg>-exsh</extraarg>
                             <extraarg>true</extraarg>
                         </extraargs>
@@ -417,7 +417,7 @@
             <dependency>
                 <groupId>org.apache.logging.log4j</groupId>
                 <artifactId>log4j-bom</artifactId>
-                <version>2.9.1</version>
+                <version>2.11.0</version>
                 <scope>import</scope>
                 <type>pom</type>
             </dependency>
@@ -429,7 +429,7 @@
         <dependency>
             <groupId>com.sun.mail</groupId>
             <artifactId>javax.mail</artifactId>
-            <version>1.6.0</version>
+            <version>1.6.1</version>
         </dependency>
         <dependency>
             <groupId>org.projectlombok</groupId>
@@ -443,9 +443,9 @@
             <version>2.9.9</version>
         </dependency>
         <dependency>
-            <groupId>org.hibernate</groupId>
+            <groupId>org.hibernate.validator</groupId>
             <artifactId>hibernate-validator</artifactId>
-            <version>6.0.3.Final</version>
+            <version>6.0.9.Final</version>
         </dependency>
         <dependency>
             <groupId>com.google.guava</groupId>
@@ -533,7 +533,7 @@
         <dependency>
             <groupId>com.lmax</groupId>
             <artifactId>disruptor</artifactId>
-            <version>3.3.7</version>
+            <version>3.4.1</version>
         </dependency>
 
         <!-- CXF -->
@@ -630,7 +630,7 @@
         <dependency>
             <groupId>com.zaxxer</groupId>
             <artifactId>HikariCP</artifactId>
-            <version>2.7.2</version>
+            <version>2.7.8</version>
         </dependency>
         <dependency>
             <groupId>org.jooq</groupId>

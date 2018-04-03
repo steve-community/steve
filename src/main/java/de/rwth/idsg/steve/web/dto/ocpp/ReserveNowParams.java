@@ -3,11 +3,11 @@ package de.rwth.idsg.steve.web.dto.ocpp;
 import de.rwth.idsg.steve.web.validation.IdTag;
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.validator.constraints.NotBlank;
 import org.joda.time.LocalDateTime;
 
 import javax.validation.constraints.Future;
 import javax.validation.constraints.Min;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 /**

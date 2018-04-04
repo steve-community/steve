@@ -1,7 +1,8 @@
 package de.rwth.idsg.steve.utils;
 
-import java.net.InetSocketAddress;
-import java.net.Socket;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
 
@@ -14,16 +15,14 @@ import java.util.List;
 public final class InternetChecker {
     private InternetChecker() { }
 
-    private static final int PORT = 80;
-
     private static final int CONNECT_TIMEOUT = 5_000;
 
     private static final List<String> HOST_LIST = Arrays.asList(
-            "github.com",
-            "google.com",
-            "facebook.com",
-            "amazon.com",
-            "apple.com"
+            "https://github.com",
+            "https://www.wikipedia.org",
+            "https://www.google.com",
+            "https://www.apple.com",
+            "https://www.facebook.com"
     );
 
     /**
@@ -41,12 +40,21 @@ public final class InternetChecker {
         return false;
     }
 
-    private static boolean isHostAvailable(String host) {
-        try (Socket socket = new Socket()) {
-            socket.connect(new InetSocketAddress(host, PORT), CONNECT_TIMEOUT);
-            if (socket.isConnected()) {
-                return true;
+    private static boolean isHostAvailable(String str) {
+        try {
+            URL url = new URL(str);
+            HttpURLConnection con = (HttpURLConnection) url.openConnection();
+            try {
+                con.setConnectTimeout(CONNECT_TIMEOUT);
+                con.connect();
+                if (con.getResponseCode() == 200) {
+                    return true;
+                }
+            } finally {
+                con.disconnect();
             }
+        } catch (MalformedURLException e) {
+            throw new RuntimeException(e);
         } catch (Exception e) {
             // No-op
         }

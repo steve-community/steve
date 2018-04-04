@@ -1,5 +1,7 @@
 package de.rwth.idsg.steve.utils;
 
+import de.rwth.idsg.steve.SteveConfiguration;
+
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -18,12 +20,17 @@ public final class InternetChecker {
     private static final int CONNECT_TIMEOUT = 5_000;
 
     private static final List<String> HOST_LIST = Arrays.asList(
+            "https://treibhaus.informatik.rwth-aachen.de/heartbeat/",
             "https://github.com",
             "https://www.wikipedia.org",
             "https://www.google.com",
             "https://www.apple.com",
             "https://www.facebook.com"
     );
+
+    static {
+        System.setProperty("http.agent", "SteVe/" + SteveConfiguration.CONFIG.getSteveVersion());
+    }
 
     /**
      * We try every item in the list to compensate for the possibility that one of hosts might be down. If all these
@@ -44,10 +51,11 @@ public final class InternetChecker {
         try {
             URL url = new URL(str);
             HttpURLConnection con = (HttpURLConnection) url.openConnection();
+            con.setRequestProperty("Connection", "close");  // otherwise, default setting is "keep-alive"
             try {
                 con.setConnectTimeout(CONNECT_TIMEOUT);
                 con.connect();
-                if (con.getResponseCode() == 200) {
+                if (con.getResponseCode() == HttpURLConnection.HTTP_OK) {
                     return true;
                 }
             } finally {

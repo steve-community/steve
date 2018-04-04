@@ -32,17 +32,17 @@ import static de.rwth.idsg.steve.SteveConfiguration.CONFIG;
 
 /**
  * Taken from http://cxf.apache.org/docs/service-routing.html and modified.
- *
  */
 @Slf4j
 public class MediatorInInterceptor extends AbstractPhaseInterceptor<SoapMessage> {
 
     private final XMLInputFactory xmlInputFactory = XMLInputFactory.newInstance();
-    private final Map<String, Server> actualServers = new HashMap<>(2);
+    private final Map<String, Server> actualServers;
 
-    public MediatorInInterceptor() {
+    public MediatorInInterceptor(Bus bus) {
         super(Phase.POST_STREAM);
         super.addBefore(StaxInInterceptor.class.getName());
+        actualServers = initServerLookupMap(bus);
     }
 
     public final void handleMessage(SoapMessage message) {
@@ -76,11 +76,6 @@ public class MediatorInInterceptor extends AbstractPhaseInterceptor<SoapMessage>
             log.error("Exception happened", ex);
         }
 
-        // Init the lookup, when the first message ever arrives
-        if (actualServers.isEmpty()) {
-            initServerLookupMap(message);
-        }
-
         // We redirect the message to the actual OCPP service
         Server targetServer = actualServers.get(schemaNamespace);
 
@@ -100,15 +95,20 @@ public class MediatorInInterceptor extends AbstractPhaseInterceptor<SoapMessage>
      * redirect to the version-specific implementation according to the namespace
      * of the incoming message.
      */
-    private void initServerLookupMap(SoapMessage message) {
-        Bus bus = message.getExchange().getBus();
+    private static Map<String, Server> initServerLookupMap(Bus bus) {
+        String exceptionMsg = "The services are not created and/or registered to the bus yet.";
 
         ServerRegistry serverRegistry = bus.getExtension(ServerRegistry.class);
         if (serverRegistry == null) {
-            return;
+            throw new RuntimeException(exceptionMsg);
         }
 
         List<Server> temp = serverRegistry.getServers();
+        if (temp.isEmpty()) {
+            throw new RuntimeException(exceptionMsg);
+        }
+
+        Map<String, Server> actualServers = new HashMap<>(temp.size() - 1);
         for (Server server : temp) {
             EndpointInfo info = server.getEndpoint().getEndpointInfo();
             String address = info.getAddress();
@@ -121,5 +121,6 @@ public class MediatorInInterceptor extends AbstractPhaseInterceptor<SoapMessage>
             String serverNamespace = info.getName().getNamespaceURI();
             actualServers.put(serverNamespace, server);
         }
+        return actualServers;
     }
 }

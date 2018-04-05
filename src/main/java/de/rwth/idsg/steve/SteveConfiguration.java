@@ -21,6 +21,8 @@ public enum SteveConfiguration {
     private String cxfMapping = "/services/*";
     // Dummy service path
     private String routerEndpointPath = "/CentralSystemService";
+    // Time zone for the application and database connections
+    private String timeZoneId = "UTC";  // or ZoneId.systemDefault().getId();
 
     // -------------------------------------------------------------------------
     // main.properties

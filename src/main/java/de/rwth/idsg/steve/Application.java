@@ -19,13 +19,12 @@ public class Application implements ApplicationStarter, AutoCloseable {
         // For Hibernate validator
         System.setProperty("org.jboss.logging.provider", "slf4j");
 
-        TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
-        DateTimeZone.setDefault(DateTimeZone.UTC);
-        log.info("Date/time zone of the application is set to UTC. Current date/time: {}", DateTime.now());
-
         SteveConfiguration sc = SteveConfiguration.CONFIG;
-
         log.info("Loaded the properties. Starting with the '{}' profile", sc.getProfile());
+
+        TimeZone.setDefault(TimeZone.getTimeZone(sc.getTimeZoneId()));
+        DateTimeZone.setDefault(DateTimeZone.forID(sc.getTimeZoneId()));
+        log.info("Date/time zone of the application is set to {}. Current date/time: {}", sc.getTimeZoneId(), DateTime.now());
 
         if (sc.getProfile().isProd()) {
             delegate = new SteveProdStarter();

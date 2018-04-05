@@ -72,7 +72,7 @@ public class BeanConfiguration implements WebMvcConfigurer {
         ds.getModifiableProperty(PropertyDefinitions.PNAME_prepStmtCacheSize).setValue(250);
         ds.getModifiableProperty(PropertyDefinitions.PNAME_prepStmtCacheSqlLimit).setValue(2048);
         ds.getModifiableProperty(PropertyDefinitions.PNAME_characterEncoding).setValue("utf8");
-        ds.getModifiableProperty(PropertyDefinitions.PNAME_serverTimezone).setValue("UTC");
+        ds.getModifiableProperty(PropertyDefinitions.PNAME_serverTimezone).setValue(CONFIG.getTimeZoneId());
 
         HikariConfig hc = new HikariConfig();
         hc.setDataSource(ds);
@@ -136,11 +136,7 @@ public class BeanConfiguration implements WebMvcConfigurer {
      */
     @Bean
     public ReleaseCheckService releaseCheckService() {
-        if (InternetChecker.isInternetAvailable()) {
-            return new GithubReleaseCheckService();
-        } else {
-            return new DummyReleaseCheckService();
-        }
+        return new DummyReleaseCheckService();
     }
 
     @PreDestroy

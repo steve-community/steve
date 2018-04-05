@@ -10,8 +10,8 @@ import lombok.Getter;
  * @since 19.08.2014
  */
 @Getter
-public final class SteveConfiguration {
-    public static final SteveConfiguration CONFIG = new SteveConfiguration();
+public enum SteveConfiguration {
+    CONFIG;
 
     // Root mapping for Spring
     private String springMapping = "/";
@@ -34,7 +34,7 @@ public final class SteveConfiguration {
     private DB db;
     private Jetty jetty;
 
-    private SteveConfiguration() {
+    SteveConfiguration() {
         PropertiesFileLoader p = new PropertiesFileLoader("main.properties");
 
         contextPath = sanitizeContextPath(p.getOptionalString("context.path"));

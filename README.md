@@ -42,7 +42,8 @@ SteVe is designed to run standalone, a java servlet container / web server (e.g.
 
 1. Database preparation:
 
-    The following MySQL statements can be used as database initialization (adjust according to your setup):
+    Make sure MySQL is reachable via TCP (e.g., remove `skip-networking` from `my.cnf`).
+    The following MySQL statements can be used as database initialization (adjust database name and credentials according to your setup):
 
     ```
     CREATE DATABASE stevedb CHARACTER SET utf8 COLLATE utf8_unicode_ci;

@@ -69,6 +69,7 @@ public enum SteveConfiguration {
                    .build();
 
         ocpp = Ocpp.builder()
+                   .autoRegisterUnknownStations(p.getOptionalBoolean("auto.register.unknown.stations"))
                    .wsSessionSelectStrategy(
                            WsSessionSelectStrategyEnum.fromName(p.getString("ws.session.select.strategy")))
                    .build();
@@ -137,6 +138,7 @@ public enum SteveConfiguration {
     // OCPP-related configuration
     @Builder @Getter
     public static class Ocpp {
+        private boolean autoRegisterUnknownStations;
         private WsSessionSelectStrategyEnum wsSessionSelectStrategy;
     }
 

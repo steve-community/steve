@@ -28,10 +28,12 @@ import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import static de.rwth.idsg.steve.SteveConfiguration.CONFIG;
 import static de.rwth.idsg.steve.utils.CustomDSL.date;
 import static de.rwth.idsg.steve.utils.CustomDSL.includes;
 import static jooq.steve.db.tables.ChargeBox.CHARGE_BOX;
@@ -49,14 +51,29 @@ public class ChargePointRepositoryImpl implements ChargePointRepository {
     @Autowired private DSLContext ctx;
     @Autowired private AddressRepository addressRepository;
 
+    private final boolean autoRegisterUnknownStations = CONFIG.getOcpp().isAutoRegisterUnknownStations();
+
     @Override
     public boolean isRegistered(String chargeBoxId) {
-        Record1<Integer> r = ctx.selectOne()
-                                .from(CHARGE_BOX)
-                                .where(CHARGE_BOX.CHARGE_BOX_ID.eq(chargeBoxId))
-                                .fetchOne();
+        // 1. exit if already registered
+        if (isRegisteredInternal(chargeBoxId)) {
+            return true;
+        }
 
-        return (r != null) && (r.value1() == 1);
+        // 2. ok, this chargeBoxId is unknown. exit if auto-register is disabled
+        if (!autoRegisterUnknownStations) {
+            return false;
+        }
+
+        // 3. chargeBoxId is unknown and auto-register is enabled. insert chargeBoxId
+        try {
+            addChargePoint(Collections.singletonList(chargeBoxId));
+            log.warn("Auto-registered unknown chargebox '{}'", chargeBoxId);
+            return true;
+        } catch (Exception e) {
+            log.error("Failed to auto-register unknown chargebox '" + chargeBoxId + "'", e);
+            return false;
+        }
     }
 
     @Override
@@ -276,6 +293,14 @@ public class ChargePointRepositoryImpl implements ChargePointRepository {
     // -------------------------------------------------------------------------
     // Helpers
     // -------------------------------------------------------------------------
+
+    private boolean isRegisteredInternal(String chargeBoxId) {
+        Record1<Integer> r = ctx.selectOne()
+                                .from(CHARGE_BOX)
+                                .where(CHARGE_BOX.CHARGE_BOX_ID.eq(chargeBoxId))
+                                .fetchOne();
+        return (r != null) && (r.value1() == 1);
+    }
 
     private SelectConditionStep<Record1<Integer>> selectAddressId(int chargeBoxPk) {
         return ctx.select(CHARGE_BOX.ADDRESS_PK)

@@ -45,31 +45,21 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
     @Autowired private ReservationRepository reservationRepository;
 
     @Override
-    public boolean updateChargebox(UpdateChargeboxParams p) {
-        int count = ctx.update(CHARGE_BOX)
-                       .set(CHARGE_BOX.OCPP_PROTOCOL, p.getOcppProtocol().getCompositeValue())
-                       .set(CHARGE_BOX.CHARGE_POINT_VENDOR, p.getVendor())
-                       .set(CHARGE_BOX.CHARGE_POINT_MODEL, p.getModel())
-                       .set(CHARGE_BOX.CHARGE_POINT_SERIAL_NUMBER, p.getPointSerial())
-                       .set(CHARGE_BOX.CHARGE_BOX_SERIAL_NUMBER, p.getBoxSerial())
-                       .set(CHARGE_BOX.FW_VERSION, p.getFwVersion())
-                       .set(CHARGE_BOX.ICCID, p.getIccid())
-                       .set(CHARGE_BOX.IMSI, p.getImsi())
-                       .set(CHARGE_BOX.METER_TYPE, p.getMeterType())
-                       .set(CHARGE_BOX.METER_SERIAL_NUMBER, p.getMeterSerial())
-                       .set(CHARGE_BOX.LAST_HEARTBEAT_TIMESTAMP, p.getHeartbeatTimestamp())
-                       .where(CHARGE_BOX.CHARGE_BOX_ID.equal(p.getChargeBoxId()))
-                       .execute();
-
-        boolean isRegistered = false;
-
-        if (count == 1) {
-            log.info("The chargebox '{}' is registered and its boot acknowledged.", p.getChargeBoxId());
-            isRegistered = true;
-        } else {
-            log.error("The chargebox '{}' is NOT registered and its boot NOT acknowledged.", p.getChargeBoxId());
-        }
-        return isRegistered;
+    public void updateChargebox(UpdateChargeboxParams p) {
+        ctx.update(CHARGE_BOX)
+           .set(CHARGE_BOX.OCPP_PROTOCOL, p.getOcppProtocol().getCompositeValue())
+           .set(CHARGE_BOX.CHARGE_POINT_VENDOR, p.getVendor())
+           .set(CHARGE_BOX.CHARGE_POINT_MODEL, p.getModel())
+           .set(CHARGE_BOX.CHARGE_POINT_SERIAL_NUMBER, p.getPointSerial())
+           .set(CHARGE_BOX.CHARGE_BOX_SERIAL_NUMBER, p.getBoxSerial())
+           .set(CHARGE_BOX.FW_VERSION, p.getFwVersion())
+           .set(CHARGE_BOX.ICCID, p.getIccid())
+           .set(CHARGE_BOX.IMSI, p.getImsi())
+           .set(CHARGE_BOX.METER_TYPE, p.getMeterType())
+           .set(CHARGE_BOX.METER_SERIAL_NUMBER, p.getMeterSerial())
+           .set(CHARGE_BOX.LAST_HEARTBEAT_TIMESTAMP, p.getHeartbeatTimestamp())
+           .where(CHARGE_BOX.CHARGE_BOX_ID.equal(p.getChargeBoxId()))
+           .execute();
     }
 
     @Override

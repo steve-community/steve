@@ -15,18 +15,7 @@ import java.util.List;
  */
 public interface OcppServerRepository {
 
-    /**
-     * One DB call with two functions:
-     *
-     * 1. Update all fields with the exception of chargeBoxId, so that initially it is enough to register
-     * a chargebox with its ID in DB. During boot, the chargebox provides missing information which might
-     * be updated (for ex: firmware)
-     *
-     * 2. If the chargebox not registered => no chargeboxes to update => updated/returned row count = 0
-     *
-     */
-    boolean updateChargebox(UpdateChargeboxParams params);
-
+    void updateChargebox(UpdateChargeboxParams params);
     void updateEndpointAddress(String chargeBoxIdentity, String endpointAddress);
     void updateChargeboxFirmwareStatus(String chargeBoxIdentity, String firmwareStatus);
     void updateChargeboxDiagnosticsStatus(String chargeBoxIdentity, String status);

@@ -91,7 +91,7 @@ public class PropertiesFileLoader {
                        .splitToList(s);
     }
 
-    public Boolean getOptionalBoolean(String key) {
+    public boolean getOptionalBoolean(String key) {
         String s = getOptionalString(key);
         if (s == null) {
             // In this special case, to make findbugs happy, we don't return null.

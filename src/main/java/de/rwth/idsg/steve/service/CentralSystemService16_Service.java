@@ -1,6 +1,7 @@
 package de.rwth.idsg.steve.service;
 
 import de.rwth.idsg.steve.ocpp.OcppProtocol;
+import de.rwth.idsg.steve.repository.ChargePointRepository;
 import de.rwth.idsg.steve.repository.OcppServerRepository;
 import de.rwth.idsg.steve.repository.SettingsRepository;
 import de.rwth.idsg.steve.repository.dto.InsertConnectorStatusParams;
@@ -44,45 +45,47 @@ import org.springframework.stereotype.Service;
 @Service
 public class CentralSystemService16_Service {
 
+    @Autowired private ChargePointRepository chargePointRepository;
     @Autowired private OcppServerRepository ocppServerRepository;
     @Autowired private SettingsRepository settingsRepository;
+
     @Autowired private OcppTagService ocppTagService;
     @Autowired private NotificationService notificationService;
     @Autowired private ChargePointHelperService chargePointHelperService;
 
     public BootNotificationResponse bootNotification(BootNotificationRequest parameters, String chargeBoxIdentity,
                                                      OcppProtocol ocppProtocol) {
+
+        boolean isRegistered = chargePointRepository.isRegistered(chargeBoxIdentity);
+        notificationService.ocppStationBooted(chargeBoxIdentity, isRegistered);
         DateTime now = DateTime.now();
 
-        UpdateChargeboxParams params =
-                UpdateChargeboxParams.builder()
-                                     .ocppProtocol(ocppProtocol)
-                                     .vendor(parameters.getChargePointVendor())
-                                     .model(parameters.getChargePointModel())
-                                     .pointSerial(parameters.getChargePointSerialNumber())
-                                     .boxSerial(parameters.getChargeBoxSerialNumber())
-                                     .fwVersion(parameters.getFirmwareVersion())
-                                     .iccid(parameters.getIccid())
-                                     .imsi(parameters.getImsi())
-                                     .meterType(parameters.getMeterType())
-                                     .meterSerial(parameters.getMeterSerialNumber())
-                                     .chargeBoxId(chargeBoxIdentity)
-                                     .heartbeatTimestamp(now)
-                                     .build();
-
-        boolean isRegistered = ocppServerRepository.updateChargebox(params);
-        notificationService.ocppStationBooted(chargeBoxIdentity, isRegistered);
-
-        RegistrationStatus status;
         if (isRegistered) {
-            status = RegistrationStatus.ACCEPTED;
+            log.info("The chargebox '{}' is registered and its boot acknowledged.", chargeBoxIdentity);
+            UpdateChargeboxParams params =
+                    UpdateChargeboxParams.builder()
+                                         .ocppProtocol(ocppProtocol)
+                                         .vendor(parameters.getChargePointVendor())
+                                         .model(parameters.getChargePointModel())
+                                         .pointSerial(parameters.getChargePointSerialNumber())
+                                         .boxSerial(parameters.getChargeBoxSerialNumber())
+                                         .fwVersion(parameters.getFirmwareVersion())
+                                         .iccid(parameters.getIccid())
+                                         .imsi(parameters.getImsi())
+                                         .meterType(parameters.getMeterType())
+                                         .meterSerial(parameters.getMeterSerialNumber())
+                                         .chargeBoxId(chargeBoxIdentity)
+                                         .heartbeatTimestamp(now)
+                                         .build();
+
+            ocppServerRepository.updateChargebox(params);
         } else {
-            status = RegistrationStatus.REJECTED;
+            log.error("The chargebox '{}' is NOT registered and its boot NOT acknowledged.", chargeBoxIdentity);
             chargePointHelperService.rememberNewUnknown(chargeBoxIdentity);
         }
 
         return new BootNotificationResponse()
-                .withStatus(status)
+                .withStatus(isRegistered ? RegistrationStatus.ACCEPTED : RegistrationStatus.REJECTED)
                 .withCurrentTime(now)
                 .withInterval(settingsRepository.getHeartbeatIntervalInSeconds());
     }

@@ -48,10 +48,15 @@ import static jooq.steve.db.tables.ConnectorStatus.CONNECTOR_STATUS;
 @Repository
 public class ChargePointRepositoryImpl implements ChargePointRepository {
 
-    @Autowired private DSLContext ctx;
-    @Autowired private AddressRepository addressRepository;
-
     private final boolean autoRegisterUnknownStations = CONFIG.getOcpp().isAutoRegisterUnknownStations();
+    private final DSLContext ctx;
+    private final AddressRepository addressRepository;
+
+    @Autowired
+    public ChargePointRepositoryImpl(DSLContext ctx, AddressRepository addressRepository) {
+        this.ctx = ctx;
+        this.addressRepository = addressRepository;
+    }
 
     @Override
     public boolean isRegistered(String chargeBoxId) {

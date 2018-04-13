@@ -37,7 +37,12 @@ import static jooq.steve.db.tables.Reservation.RESERVATION;
 @Repository
 public class ReservationRepositoryImpl implements ReservationRepository {
 
-    @Autowired private DSLContext ctx;
+    private final DSLContext ctx;
+
+    @Autowired
+    public ReservationRepositoryImpl(DSLContext ctx) {
+        this.ctx = ctx;
+    }
 
     @Override
     @SuppressWarnings("unchecked")

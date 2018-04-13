@@ -8,17 +8,16 @@ import ocpp.cs._2010._08.BootNotificationRequest;
 import ocpp.cs._2010._08.BootNotificationResponse;
 import ocpp.cs._2010._08.RegistrationStatus;
 import ocpp.cs._2012._06.CentralSystemService;
-import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
-import org.apache.cxf.ws.addressing.WSAddressingFeature;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import javax.xml.ws.soap.SOAPBinding;
-import java.util.UUID;
-
-import static de.rwth.idsg.steve.SteveConfiguration.CONFIG;
+import static de.rwth.idsg.steve.Utils.getForOcpp12;
+import static de.rwth.idsg.steve.Utils.getForOcpp15;
+import static de.rwth.idsg.steve.Utils.getForOcpp16;
+import static de.rwth.idsg.steve.Utils.getPath;
+import static de.rwth.idsg.steve.Utils.getRandomString;
 
 /**
  * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
@@ -49,7 +48,7 @@ public class ApplicationTest {
 
     @Test
     public void testOcpp12() {
-        ocpp.cs._2010._08.CentralSystemService client = getForOcpp12();
+        ocpp.cs._2010._08.CentralSystemService client = getForOcpp12(path);
 
         BootNotificationResponse boot = client.bootNotification(
                 new BootNotificationRequest()
@@ -69,7 +68,7 @@ public class ApplicationTest {
 
     @Test
     public void testOcpp15() {
-        CentralSystemService client = getForOcpp15();
+        CentralSystemService client = getForOcpp15(path);
 
         ocpp.cs._2012._06.BootNotificationResponse boot = client.bootNotification(
                 new ocpp.cs._2012._06.BootNotificationRequest()
@@ -87,10 +86,9 @@ public class ApplicationTest {
         Assert.assertEquals(ocpp.cs._2012._06.AuthorizationStatus.ACCEPTED, auth.getIdTagInfo().getStatus());
     }
 
-
     @Test
     public void testOcpp16() {
-        ocpp.cs._2015._10.CentralSystemService client = getForOcpp16();
+        ocpp.cs._2015._10.CentralSystemService client = getForOcpp16(path);
 
         ocpp.cs._2015._10.BootNotificationResponse boot = client.bootNotification(
                 new ocpp.cs._2015._10.BootNotificationRequest()
@@ -108,51 +106,4 @@ public class ApplicationTest {
         Assert.assertEquals(ocpp.cs._2015._10.AuthorizationStatus.INVALID, auth.getIdTagInfo().getStatus());
     }
 
-    private static String getRandomString() {
-        return UUID.randomUUID().toString();
-    }
-
-    private static String getPath() {
-        if (CONFIG.getJetty().isHttpEnabled()) {
-            return "http://"
-                    + CONFIG.getJetty().getServerHost() + ":"
-                    + CONFIG.getJetty().getHttpPort()
-                    + CONFIG.getContextPath() + "/services"
-                    + CONFIG.getRouterEndpointPath();
-        } else if (CONFIG.getJetty().isHttpsEnabled()) {
-            return "https://"
-                    + CONFIG.getJetty().getServerHost() + ":"
-                    + CONFIG.getJetty().getHttpsPort()
-                    + CONFIG.getContextPath() + "/services"
-                    + CONFIG.getRouterEndpointPath();
-        } else {
-            throw new RuntimeException();
-        }
-    }
-
-    private static ocpp.cs._2015._10.CentralSystemService getForOcpp16() {
-        JaxWsProxyFactoryBean f = getBean(path);
-        f.setServiceClass(ocpp.cs._2015._10.CentralSystemService.class);
-        return (ocpp.cs._2015._10.CentralSystemService) f.create();
-    }
-
-    private static ocpp.cs._2012._06.CentralSystemService getForOcpp15() {
-        JaxWsProxyFactoryBean f = getBean(path);
-        f.setServiceClass(ocpp.cs._2012._06.CentralSystemService.class);
-        return (ocpp.cs._2012._06.CentralSystemService) f.create();
-    }
-
-    private static ocpp.cs._2010._08.CentralSystemService getForOcpp12() {
-        JaxWsProxyFactoryBean f = getBean(path);
-        f.setServiceClass(ocpp.cs._2010._08.CentralSystemService.class);
-        return (ocpp.cs._2010._08.CentralSystemService) f.create();
-    }
-
-    private static JaxWsProxyFactoryBean getBean(String endpointAddress) {
-        JaxWsProxyFactoryBean f = new JaxWsProxyFactoryBean();
-        f.setBindingId(SOAPBinding.SOAP12HTTP_BINDING);
-        f.getFeatures().add(new WSAddressingFeature());
-        f.setAddress(endpointAddress);
-        return f;
-    }
 }

@@ -1,6 +1,7 @@
 package de.rwth.idsg.steve;
 
 import de.rwth.idsg.steve.ocpp.OcppVersion;
+import lombok.extern.slf4j.Slf4j;
 import ocpp.cs._2015._10.AuthorizationStatus;
 import ocpp.cs._2015._10.AuthorizeRequest;
 import ocpp.cs._2015._10.AuthorizeResponse;
@@ -12,12 +13,13 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import java.util.UUID;
+import static de.rwth.idsg.steve.Utils.getRandomString;
 
 /**
  * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
  * @since 21.03.2018
  */
+@Slf4j
 public class ApplicationJsonTest {
 
     private static final String PATH = "ws://localhost:8080/steve/websocket/CentralSystemService/";
@@ -64,10 +66,6 @@ public class ApplicationJsonTest {
         );
 
         chargePoint.processAndClose();
-    }
-
-    private static String getRandomString() {
-        return UUID.randomUUID().toString();
     }
 
 }

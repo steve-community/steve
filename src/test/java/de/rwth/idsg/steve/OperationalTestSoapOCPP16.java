@@ -103,6 +103,30 @@ public class OperationalTestSoapOCPP16 {
     }
 
     @Test
+    public void testRegisteredIdTag() {
+        CentralSystemService client = getForOcpp16(path);
+
+        AuthorizeResponse auth = client.authorize(
+                new AuthorizeRequest().withIdTag(REGISTERED_OCPP_TAG),
+                REGISTERED_CHARGE_BOX_ID);
+
+        Assert.assertNotNull(auth);
+        Assert.assertEquals(AuthorizationStatus.ACCEPTED, auth.getIdTagInfo().getStatus());
+    }
+
+    @Test
+    public void testUnregisteredIdTag() {
+        CentralSystemService client = getForOcpp16(path);
+
+        AuthorizeResponse auth = client.authorize(
+                new AuthorizeRequest().withIdTag(getRandomString()),
+                REGISTERED_CHARGE_BOX_ID);
+
+        Assert.assertNotNull(auth);
+        Assert.assertEquals(AuthorizationStatus.INVALID, auth.getIdTagInfo().getStatus());
+    }
+
+    @Test
     public void testStatusNotification() {
         CentralSystemService client = getForOcpp16(path);
 

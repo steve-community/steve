@@ -399,7 +399,7 @@ public class OperationalTestSoapOCPP16 {
             Assert.assertEquals(stopValue, Integer.parseInt(t.getStopValue()));
 
             if (transactionData != null) {
-                checkTransactionData(transactionData, transactionID);
+                checkMeterValues(transactionData, transactionID);
             }
         }
 
@@ -437,10 +437,6 @@ public class OperationalTestSoapOCPP16 {
             );
             Assert.assertNotNull(statusBoot);
         }
-    }
-
-    private void checkTransactionData(List<MeterValue> transactionData, int transactionID) {
-        checkMeterValues(transactionData, transactionID);
     }
 
     private void checkMeterValues(List<MeterValue> meterValues, int transactionPk) {

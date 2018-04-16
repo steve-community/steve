@@ -2,9 +2,9 @@ package de.rwth.idsg.steve.config;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.mysql.cj.core.conf.PropertyDefinitions;
-import com.mysql.cj.jdbc.MysqlDataSource;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
+import de.rwth.idsg.steve.SteveConfiguration;
 import de.rwth.idsg.steve.service.DummyReleaseCheckService;
 import de.rwth.idsg.steve.service.GithubReleaseCheckService;
 import de.rwth.idsg.steve.service.ReleaseCheckService;
@@ -58,24 +58,23 @@ public class BeanConfiguration implements WebMvcConfigurer {
      * https://github.com/brettwooldridge/HikariCP/wiki/MySQL-Configuration
      */
     private void initDataSource() {
-        MysqlDataSource ds = new MysqlDataSource();
-
-        // set standard params
-        ds.setServerName(CONFIG.getDb().getIp());
-        ds.setPort(CONFIG.getDb().getPort());
-        ds.setDatabaseName(CONFIG.getDb().getSchema());
-        ds.setUser(CONFIG.getDb().getUserName());
-        ds.setPassword(CONFIG.getDb().getPassword());
-
-        // set non-standard params
-        ds.getModifiableProperty(PropertyDefinitions.PNAME_cachePrepStmts).setValue(true);
-        ds.getModifiableProperty(PropertyDefinitions.PNAME_prepStmtCacheSize).setValue(250);
-        ds.getModifiableProperty(PropertyDefinitions.PNAME_prepStmtCacheSqlLimit).setValue(2048);
-        ds.getModifiableProperty(PropertyDefinitions.PNAME_characterEncoding).setValue("utf8");
-        ds.getModifiableProperty(PropertyDefinitions.PNAME_serverTimezone).setValue(CONFIG.getTimeZoneId());
+        SteveConfiguration.DB dbConfig = CONFIG.getDb();
 
         HikariConfig hc = new HikariConfig();
-        hc.setDataSource(ds);
+
+        // set standard params
+        hc.setJdbcUrl("jdbc:mysql://" + dbConfig.getIp() + ":" + dbConfig.getPort() + "/" + dbConfig.getSchema());
+        hc.setUsername(dbConfig.getUserName());
+        hc.setPassword(dbConfig.getPassword());
+
+        // set non-standard params
+        hc.addDataSourceProperty(PropertyDefinitions.PNAME_cachePrepStmts, true);
+        hc.addDataSourceProperty(PropertyDefinitions.PNAME_useServerPrepStmts, true);
+        hc.addDataSourceProperty(PropertyDefinitions.PNAME_prepStmtCacheSize, 250);
+        hc.addDataSourceProperty(PropertyDefinitions.PNAME_prepStmtCacheSqlLimit, 2048);
+        hc.addDataSourceProperty(PropertyDefinitions.PNAME_characterEncoding, "utf8");
+        hc.addDataSourceProperty(PropertyDefinitions.PNAME_serverTimezone, CONFIG.getTimeZoneId());
+        hc.addDataSourceProperty(PropertyDefinitions.PNAME_useSSL, true);
 
         dataSource = new HikariDataSource(hc);
     }

@@ -1,0 +1,3 @@
+DROP TRIGGER IF EXISTS `transaction_AINS`;
+
+DROP TRIGGER IF EXISTS `transaction_AUPD`;

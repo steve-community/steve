@@ -1,5 +1,6 @@
 package de.rwth.idsg.steve.repository.impl;
 
+import de.rwth.idsg.steve.SteveException;
 import de.rwth.idsg.steve.repository.OcppServerRepository;
 import de.rwth.idsg.steve.repository.ReservationRepository;
 import de.rwth.idsg.steve.repository.dto.InsertConnectorStatusParams;
@@ -43,12 +44,6 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
 
     @Autowired private DSLContext ctx;
     @Autowired private ReservationRepository reservationRepository;
-
-    // true story: while testing with abusive-charge-point, from time to time, we get MySql exceptions with
-    // "Deadlock found when trying to get lock; try restarting transaction" when processing startTransaction and/or
-    // stopTransaction messages.
-    // TODO: this is an initial dirty solution/workaround. look into the cause of the problem.
-    private final Object TRANSACTION_LOCK = new Object();
 
     @Override
     public void updateChargebox(UpdateChargeboxParams p) {
@@ -161,10 +156,6 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
 
     @Override
     public Integer insertTransaction(InsertTransactionParams p) {
-        insertIgnoreConnector(ctx, p.getChargeBoxId(), p.getConnectorId());
-
-        // it is important to insert idTag before transaction, since the transaction table references it
-        boolean unknownTagInserted = insertIgnoreIdTag(ctx, p);
 
         SelectConditionStep<Record1<Integer>> connectorPkQuery =
                 DSL.select(CONNECTOR.CONNECTOR_PK)
@@ -173,20 +164,30 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
                    .and(CONNECTOR.CONNECTOR_ID.equal(p.getConnectorId()));
 
         // -------------------------------------------------------------------------
-        // Step 1: Insert transaction
+        // Step 1: Insert connector and idTag, if they are new to us
         // -------------------------------------------------------------------------
 
-        int transactionId;
+        insertIgnoreConnector(ctx, p.getChargeBoxId(), p.getConnectorId());
 
-        synchronized (TRANSACTION_LOCK) {
-            transactionId = ctx.insertInto(TRANSACTION)
-                               .set(TRANSACTION.CONNECTOR_PK, connectorPkQuery)
-                               .set(TRANSACTION.ID_TAG, p.getIdTag())
-                               .set(TRANSACTION.START_TIMESTAMP, p.getStartTimestamp())
-                               .set(TRANSACTION.START_VALUE, p.getStartMeterValue())
-                               .returning(TRANSACTION.TRANSACTION_PK)
-                               .fetchOne()
-                               .getTransactionPk();
+        // it is important to insert idTag before transaction, since the transaction table references it
+        boolean unknownTagInserted = insertIgnoreIdTag(ctx, p);
+
+        // -------------------------------------------------------------------------
+        // Step 2: Insert transaction
+        // -------------------------------------------------------------------------
+
+        Integer transactionId = ctx.insertInto(TRANSACTION)
+                                   .set(TRANSACTION.CONNECTOR_PK, connectorPkQuery)
+                                   .set(TRANSACTION.ID_TAG, p.getIdTag())
+                                   .set(TRANSACTION.START_TIMESTAMP, p.getStartTimestamp())
+                                   .set(TRANSACTION.START_VALUE, p.getStartMeterValue())
+                                   .returning(TRANSACTION.TRANSACTION_PK)
+                                   .fetchOne()
+                                   .getTransactionPk();
+
+        // Actually unnecessary, because JOOQ will throw an exception, if something goes wrong
+        if (transactionId == null) {
+            throw new SteveException("Failed to INSERT transaction into database");
         }
 
         if (unknownTagInserted) {
@@ -195,7 +196,20 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
         }
 
         // -------------------------------------------------------------------------
-        // Step 2 for OCPP 1.5: A startTransaction may be related to a reservation
+        // Step 3: Update OCPP tag (in_transaction=true)
+        // -------------------------------------------------------------------------
+
+        int count = ctx.update(OCPP_TAG)
+                       .set(OCPP_TAG.IN_TRANSACTION, true)
+                       .where(OCPP_TAG.ID_TAG.eq(p.getIdTag()))
+                       .execute();
+
+        if (count == 0) {
+            log.warn("Failed to set in_transaction=true of OCPP tag of STARTED transaction {}", transactionId);
+        }
+
+        // -------------------------------------------------------------------------
+        // Step 4 for OCPP >= 1.5: A startTransaction may be related to a reservation
         // -------------------------------------------------------------------------
 
         if (p.isSetReservationId()) {
@@ -203,7 +217,7 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
         }
 
         // -------------------------------------------------------------------------
-        // Step 3: Set connector status to "Occupied"
+        // Step 5: Set connector status to "Occupied"
         // -------------------------------------------------------------------------
 
         insertConnectorStatus(ctx, connectorPkQuery, p.getStartTimestamp(), p.getStatusUpdate());
@@ -216,23 +230,40 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
 
         // -------------------------------------------------------------------------
         // Step 1: Update transaction table
-        //
-        // After update, a DB trigger sets the user.inTransaction field to 0
         // -------------------------------------------------------------------------
 
-        synchronized (TRANSACTION_LOCK) {
-            ctx.update(TRANSACTION)
-               .set(TRANSACTION.STOP_TIMESTAMP, p.getStopTimestamp())
-               .set(TRANSACTION.STOP_VALUE, p.getStopMeterValue())
-               .set(TRANSACTION.STOP_REASON, p.getStopReason())
-               .where(TRANSACTION.TRANSACTION_PK.equal(p.getTransactionId()))
-               .and(TRANSACTION.STOP_TIMESTAMP.isNull())
-               .and(TRANSACTION.STOP_VALUE.isNull())
-               .execute();
+        int transactionUpdateCount = ctx.update(TRANSACTION)
+                                        .set(TRANSACTION.STOP_TIMESTAMP, p.getStopTimestamp())
+                                        .set(TRANSACTION.STOP_VALUE, p.getStopMeterValue())
+                                        .set(TRANSACTION.STOP_REASON, p.getStopReason())
+                                        .where(TRANSACTION.TRANSACTION_PK.equal(p.getTransactionId()))
+                                        .execute();
+
+        // Actually unnecessary, because JOOQ will throw an exception, if something goes wrong
+        if (transactionUpdateCount == 0) {
+            throw new SteveException("Failed to UPDATE transaction in database");
         }
 
         // -------------------------------------------------------------------------
-        // Step 2: Set connector status back to "Available" again
+        // Step 2: Update OCPP tag (in_transaction=false)
+        // -------------------------------------------------------------------------
+
+        SelectConditionStep<Record1<String>> idTagSelect =
+                DSL.select(TRANSACTION.ID_TAG)
+                   .from(TRANSACTION)
+                   .where(TRANSACTION.TRANSACTION_PK.equal(p.getTransactionId()));
+
+        int ocppTagUpdateCount = ctx.update(OCPP_TAG)
+                                    .set(OCPP_TAG.IN_TRANSACTION, false)
+                                    .where(OCPP_TAG.ID_TAG.eq(idTagSelect))
+                                    .execute();
+
+        if (ocppTagUpdateCount == 0) {
+            log.warn("Failed to set in_transaction=false of OCPP tag of STOPPED transaction {}", p.getTransactionId());
+        }
+
+        // -------------------------------------------------------------------------
+        // Step 3: Set connector status back to "Available" again
         // -------------------------------------------------------------------------
 
         SelectConditionStep<Record1<Integer>> connectorPkQuery =

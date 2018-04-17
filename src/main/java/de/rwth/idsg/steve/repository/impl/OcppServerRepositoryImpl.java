@@ -44,6 +44,12 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
     @Autowired private DSLContext ctx;
     @Autowired private ReservationRepository reservationRepository;
 
+    // true story: while testing with abusive-charge-point, from time to time, we get MySql exceptions with
+    // "Deadlock found when trying to get lock; try restarting transaction" when processing startTransaction and/or
+    // stopTransaction messages.
+    // TODO: this is an initial dirty solution/workaround. look into the cause of the problem.
+    private final Object TRANSACTION_LOCK = new Object();
+
     @Override
     public void updateChargebox(UpdateChargeboxParams p) {
         ctx.update(CHARGE_BOX)
@@ -170,14 +176,18 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
         // Step 1: Insert transaction
         // -------------------------------------------------------------------------
 
-        int transactionId = ctx.insertInto(TRANSACTION)
-                               .set(CONNECTOR_STATUS.CONNECTOR_PK, connectorPkQuery)
+        int transactionId;
+
+        synchronized (TRANSACTION_LOCK) {
+            transactionId = ctx.insertInto(TRANSACTION)
+                               .set(TRANSACTION.CONNECTOR_PK, connectorPkQuery)
                                .set(TRANSACTION.ID_TAG, p.getIdTag())
                                .set(TRANSACTION.START_TIMESTAMP, p.getStartTimestamp())
                                .set(TRANSACTION.START_VALUE, p.getStartMeterValue())
                                .returning(TRANSACTION.TRANSACTION_PK)
                                .fetchOne()
                                .getTransactionPk();
+        }
 
         if (unknownTagInserted) {
             log.warn("The transaction '{}' contains an unknown idTag '{}' which was inserted into DB "
@@ -210,14 +220,16 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
         // After update, a DB trigger sets the user.inTransaction field to 0
         // -------------------------------------------------------------------------
 
-        ctx.update(TRANSACTION)
-           .set(TRANSACTION.STOP_TIMESTAMP, p.getStopTimestamp())
-           .set(TRANSACTION.STOP_VALUE, p.getStopMeterValue())
-           .set(TRANSACTION.STOP_REASON, p.getStopReason())
-           .where(TRANSACTION.TRANSACTION_PK.equal(p.getTransactionId()))
-           .and(TRANSACTION.STOP_TIMESTAMP.isNull())
-           .and(TRANSACTION.STOP_VALUE.isNull())
-           .execute();
+        synchronized (TRANSACTION_LOCK) {
+            ctx.update(TRANSACTION)
+               .set(TRANSACTION.STOP_TIMESTAMP, p.getStopTimestamp())
+               .set(TRANSACTION.STOP_VALUE, p.getStopMeterValue())
+               .set(TRANSACTION.STOP_REASON, p.getStopReason())
+               .where(TRANSACTION.TRANSACTION_PK.equal(p.getTransactionId()))
+               .and(TRANSACTION.STOP_TIMESTAMP.isNull())
+               .and(TRANSACTION.STOP_VALUE.isNull())
+               .execute();
+        }
 
         // -------------------------------------------------------------------------
         // Step 2: Set connector status back to "Available" again

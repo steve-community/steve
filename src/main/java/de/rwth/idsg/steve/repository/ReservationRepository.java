@@ -3,7 +3,6 @@ package de.rwth.idsg.steve.repository;
 import de.rwth.idsg.steve.repository.dto.InsertReservationParams;
 import de.rwth.idsg.steve.repository.dto.Reservation;
 import de.rwth.idsg.steve.web.dto.ReservationQueryForm;
-import org.jooq.DSLContext;
 import org.jooq.Record1;
 import org.jooq.Select;
 
@@ -32,6 +31,5 @@ public interface ReservationRepository {
 
     void accepted(int reservationId);
     void cancelled(int reservationId);
-    void used(DSLContext ctx, Select<Record1<Integer>> connectorPkSelect, String ocppIdTag,
-              int reservationId, int transactionId);
+    void used(Select<Record1<Integer>> connectorPkSelect, String ocppIdTag, int reservationId, int transactionId);
 }

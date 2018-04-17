@@ -143,8 +143,7 @@ public class ReservationRepositoryImpl implements ReservationRepository {
     }
 
     @Override
-    public void used(DSLContext ctx, Select<Record1<Integer>> connectorPkSelect, String ocppIdTag,
-                     int reservationId, int transactionId) {
+    public void used(Select<Record1<Integer>> connectorPkSelect, String ocppIdTag, int reservationId, int transactionId) {
         int count = ctx.update(RESERVATION)
                        .set(RESERVATION.STATUS, ReservationStatus.USED.name())
                        .set(RESERVATION.TRANSACTION_PK, transactionId)

@@ -155,54 +155,50 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
 
     @Override
     public Integer insertTransaction(InsertTransactionParams p) {
-        return ctx.transactionResult(configuration -> {
-            DSLContext ctx = DSL.using(configuration);
+        insertIgnoreConnector(ctx, p.getChargeBoxId(), p.getConnectorId());
 
-            insertIgnoreConnector(ctx, p.getChargeBoxId(), p.getConnectorId());
+        // it is important to insert idTag before transaction, since the transaction table references it
+        boolean unknownTagInserted = insertIgnoreIdTag(ctx, p);
 
-            // it is important to insert idTag before transaction, since the transaction table references it
-            boolean unknownTagInserted = insertIgnoreIdTag(ctx, p);
+        SelectConditionStep<Record1<Integer>> connectorPkQuery =
+                DSL.select(CONNECTOR.CONNECTOR_PK)
+                   .from(CONNECTOR)
+                   .where(CONNECTOR.CHARGE_BOX_ID.equal(p.getChargeBoxId()))
+                   .and(CONNECTOR.CONNECTOR_ID.equal(p.getConnectorId()));
 
-            SelectConditionStep<Record1<Integer>> connectorPkQuery =
-                    DSL.select(CONNECTOR.CONNECTOR_PK)
-                       .from(CONNECTOR)
-                       .where(CONNECTOR.CHARGE_BOX_ID.equal(p.getChargeBoxId()))
-                       .and(CONNECTOR.CONNECTOR_ID.equal(p.getConnectorId()));
+        // -------------------------------------------------------------------------
+        // Step 1: Insert transaction
+        // -------------------------------------------------------------------------
 
-            // -------------------------------------------------------------------------
-            // Step 1: Insert transaction
-            // -------------------------------------------------------------------------
+        int transactionId = ctx.insertInto(TRANSACTION)
+                               .set(CONNECTOR_STATUS.CONNECTOR_PK, connectorPkQuery)
+                               .set(TRANSACTION.ID_TAG, p.getIdTag())
+                               .set(TRANSACTION.START_TIMESTAMP, p.getStartTimestamp())
+                               .set(TRANSACTION.START_VALUE, p.getStartMeterValue())
+                               .returning(TRANSACTION.TRANSACTION_PK)
+                               .fetchOne()
+                               .getTransactionPk();
 
-            int transactionId = ctx.insertInto(TRANSACTION)
-                                   .set(CONNECTOR_STATUS.CONNECTOR_PK, connectorPkQuery)
-                                   .set(TRANSACTION.ID_TAG, p.getIdTag())
-                                   .set(TRANSACTION.START_TIMESTAMP, p.getStartTimestamp())
-                                   .set(TRANSACTION.START_VALUE, p.getStartMeterValue())
-                                   .returning(TRANSACTION.TRANSACTION_PK)
-                                   .fetchOne()
-                                   .getTransactionPk();
+        if (unknownTagInserted) {
+            log.warn("The transaction '{}' contains an unknown idTag '{}' which was inserted into DB "
+                    + "to prevent information loss and has been blocked", transactionId, p.getIdTag());
+        }
 
-            if (unknownTagInserted) {
-                log.warn("The transaction '{}' contains an unknown idTag '{}' which was inserted into DB "
-                        + "to prevent information loss and has been blocked", transactionId, p.getIdTag());
-            }
+        // -------------------------------------------------------------------------
+        // Step 2 for OCPP 1.5: A startTransaction may be related to a reservation
+        // -------------------------------------------------------------------------
 
-            // -------------------------------------------------------------------------
-            // Step 2 for OCPP 1.5: A startTransaction may be related to a reservation
-            // -------------------------------------------------------------------------
+        if (p.isSetReservationId()) {
+            reservationRepository.used(connectorPkQuery, p.getIdTag(), p.getReservationId(), transactionId);
+        }
 
-            if (p.isSetReservationId()) {
-                reservationRepository.used(ctx, connectorPkQuery, p.getIdTag(), p.getReservationId(), transactionId);
-            }
+        // -------------------------------------------------------------------------
+        // Step 3: Set connector status to "Occupied"
+        // -------------------------------------------------------------------------
 
-            // -------------------------------------------------------------------------
-            // Step 3: Set connector status to "Occupied"
-            // -------------------------------------------------------------------------
+        insertConnectorStatus(ctx, connectorPkQuery, p.getStartTimestamp(), p.getStatusUpdate());
 
-            insertConnectorStatus(ctx, connectorPkQuery, p.getStartTimestamp(), p.getStatusUpdate());
-
-            return transactionId;
-        });
+        return transactionId;
     }
 
     @Override

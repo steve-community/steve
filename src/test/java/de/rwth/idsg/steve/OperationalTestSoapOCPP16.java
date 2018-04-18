@@ -127,6 +127,36 @@ public class OperationalTestSoapOCPP16 {
     }
 
     @Test
+    public void testInTransactionStatusOfIdTag() {
+        CentralSystemService client = getForOcpp16(path);
+
+        StartTransactionResponse start = client.startTransaction(
+                new StartTransactionRequest()
+                        .withConnectorId(2)
+                        .withIdTag(REGISTERED_OCPP_TAG)
+                        .withTimestamp(DateTime.now())
+                        .withMeterStart(0),
+                REGISTERED_CHARGE_BOX_ID
+        );
+
+        Assert.assertNotNull(start);
+        Assert.assertTrue(start.getTransactionId() > 0);
+        Assert.assertTrue(__DatabasePreparer__.getOcppTagRecord(REGISTERED_OCPP_TAG).getInTransaction());
+
+        StopTransactionResponse stop = client.stopTransaction(
+                new StopTransactionRequest()
+                        .withTransactionId(start.getTransactionId())
+                        .withTimestamp(DateTime.now())
+                        .withIdTag(REGISTERED_OCPP_TAG)
+                        .withMeterStop(30),
+                REGISTERED_CHARGE_BOX_ID
+        );
+
+        Assert.assertNotNull(stop);
+        Assert.assertFalse(__DatabasePreparer__.getOcppTagRecord(REGISTERED_OCPP_TAG).getInTransaction());
+    }
+
+    @Test
     public void testStatusNotification() {
         CentralSystemService client = getForOcpp16(path);
 

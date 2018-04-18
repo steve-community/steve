@@ -10,6 +10,7 @@ import de.rwth.idsg.steve.repository.dto.Transaction;
 import de.rwth.idsg.steve.repository.dto.TransactionDetails;
 import de.rwth.idsg.steve.repository.impl.AddressRepositoryImpl;
 import de.rwth.idsg.steve.repository.impl.ChargePointRepositoryImpl;
+import de.rwth.idsg.steve.repository.impl.OcppTagRepositoryImpl;
 import de.rwth.idsg.steve.repository.impl.ReservationRepositoryImpl;
 import de.rwth.idsg.steve.repository.impl.TransactionRepositoryImpl;
 import de.rwth.idsg.steve.web.dto.ReservationQueryForm;
@@ -17,6 +18,7 @@ import de.rwth.idsg.steve.web.dto.TransactionQueryForm;
 import jooq.steve.db.DefaultCatalog;
 import jooq.steve.db.tables.SchemaVersion;
 import jooq.steve.db.tables.Settings;
+import jooq.steve.db.tables.records.OcppTagRecord;
 import jooq.steve.db.tables.records.TransactionRecord;
 import org.joda.time.DateTime;
 import org.jooq.DSLContext;
@@ -104,6 +106,11 @@ public class __DatabasePreparer__ {
     public static TransactionDetails getDetails(int transactionPk) {
         TransactionRepositoryImpl impl = new TransactionRepositoryImpl(dslContext);
         return impl.getDetails(transactionPk);
+    }
+
+    public static OcppTagRecord getOcppTagRecord(String idTag) {
+        OcppTagRepositoryImpl impl = new OcppTagRepositoryImpl(dslContext);
+        return impl.getRecord(idTag);
     }
 
     public static ChargePoint.Details getCBDetails(String chargeboxID) {

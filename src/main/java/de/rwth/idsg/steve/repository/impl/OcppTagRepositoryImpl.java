@@ -37,7 +37,12 @@ import static jooq.steve.db.tables.OcppTag.OCPP_TAG;
 @Repository
 public class OcppTagRepositoryImpl implements OcppTagRepository {
 
-    @Autowired private DSLContext ctx;
+    private final DSLContext ctx;
+
+    @Autowired
+    public OcppTagRepositoryImpl(DSLContext ctx) {
+        this.ctx = ctx;
+    }
 
     @Override
     @SuppressWarnings("unchecked")

@@ -1,4 +1,4 @@
-package de.rwth.idsg.steve;
+package de.rwth.idsg.steve.utils;
 
 import com.google.common.collect.Sets;
 import de.rwth.idsg.steve.config.BeanConfiguration;

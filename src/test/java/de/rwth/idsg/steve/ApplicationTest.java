@@ -1,5 +1,6 @@
 package de.rwth.idsg.steve;
 
+import de.rwth.idsg.steve.utils.__DatabasePreparer__;
 import lombok.extern.slf4j.Slf4j;
 import ocpp.cs._2010._08.AuthorizationStatus;
 import ocpp.cs._2010._08.AuthorizeRequest;
@@ -13,11 +14,11 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import static de.rwth.idsg.steve.Utils.getForOcpp12;
-import static de.rwth.idsg.steve.Utils.getForOcpp15;
-import static de.rwth.idsg.steve.Utils.getForOcpp16;
-import static de.rwth.idsg.steve.Utils.getPath;
-import static de.rwth.idsg.steve.Utils.getRandomString;
+import static de.rwth.idsg.steve.utils.Helpers.getForOcpp12;
+import static de.rwth.idsg.steve.utils.Helpers.getForOcpp15;
+import static de.rwth.idsg.steve.utils.Helpers.getForOcpp16;
+import static de.rwth.idsg.steve.utils.Helpers.getPath;
+import static de.rwth.idsg.steve.utils.Helpers.getRandomString;
 
 /**
  * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>

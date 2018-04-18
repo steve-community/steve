@@ -1,9 +1,10 @@
-package de.rwth.idsg.steve;
+package de.rwth.idsg.steve.utils;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.TreeNode;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import de.rwth.idsg.steve.SteveException;
 import de.rwth.idsg.steve.ocpp.OcppVersion;
 import de.rwth.idsg.steve.ocpp.RequestType;
 import de.rwth.idsg.steve.ocpp.ResponseType;
@@ -54,7 +55,7 @@ public class OcppJsonChargePoint {
     private CountDownLatch receivedResponsesSignal;
     private Session session;
 
-    OcppJsonChargePoint(OcppVersion version, String chargeBoxId, String pathPrefix) {
+    public OcppJsonChargePoint(OcppVersion version, String chargeBoxId, String pathPrefix) {
         this.version = version;
         this.chargeBoxId = chargeBoxId;
         this.connectionPath = pathPrefix + chargeBoxId;

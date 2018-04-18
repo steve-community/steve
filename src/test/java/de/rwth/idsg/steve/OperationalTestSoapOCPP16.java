@@ -6,6 +6,7 @@ import de.rwth.idsg.steve.repository.dto.ConnectorStatus;
 import de.rwth.idsg.steve.repository.dto.Reservation;
 import de.rwth.idsg.steve.repository.dto.Transaction;
 import de.rwth.idsg.steve.repository.dto.TransactionDetails;
+import de.rwth.idsg.steve.utils.__DatabasePreparer__;
 import jooq.steve.db.tables.records.TransactionRecord;
 import lombok.extern.slf4j.Slf4j;
 import ocpp.cs._2015._10.AuthorizationStatus;
@@ -40,9 +41,9 @@ import org.junit.Test;
 import java.util.Arrays;
 import java.util.List;
 
-import static de.rwth.idsg.steve.Utils.getForOcpp16;
-import static de.rwth.idsg.steve.Utils.getPath;
-import static de.rwth.idsg.steve.Utils.getRandomString;
+import static de.rwth.idsg.steve.utils.Helpers.getForOcpp16;
+import static de.rwth.idsg.steve.utils.Helpers.getPath;
+import static de.rwth.idsg.steve.utils.Helpers.getRandomString;
 
 /**
  * @author Andreas Heuvels <andreas.heuvels@rwth-aachen.de>

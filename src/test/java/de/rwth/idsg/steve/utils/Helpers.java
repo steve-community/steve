@@ -1,4 +1,4 @@
-package de.rwth.idsg.steve;
+package de.rwth.idsg.steve.utils;
 
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.apache.cxf.ws.addressing.WSAddressingFeature;
@@ -12,7 +12,7 @@ import static de.rwth.idsg.steve.SteveConfiguration.CONFIG;
  * @author Andreas Heuvels <andreas.heuvels@rwth-aachen.de>
  * @since 06.04.18
  */
-public class Utils {
+public class Helpers {
 
     public static String getRandomString() {
         return UUID.randomUUID().toString();

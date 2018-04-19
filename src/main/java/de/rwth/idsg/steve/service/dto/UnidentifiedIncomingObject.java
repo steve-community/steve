@@ -18,10 +18,9 @@ public class UnidentifiedIncomingObject {
 
     public UnidentifiedIncomingObject(String key) {
         this.key = key;
-        updateStats();
     }
 
-    public void updateStats() {
+    public synchronized void updateStats() {
         numberOfAttempts++;
         lastAttemptTimestamp = DateTime.now();
     }

@@ -3,9 +3,11 @@ package de.rwth.idsg.steve.service;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import de.rwth.idsg.steve.service.dto.UnidentifiedIncomingObject;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.Comparator;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
 /**
@@ -14,6 +16,7 @@ import java.util.stream.Collectors;
  * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
  * @since 20.03.2018
  */
+@Slf4j
 public class UnidentifiedIncomingObjectService {
 
     private final Cache<String, UnidentifiedIncomingObject> objectsHolder;
@@ -33,13 +36,11 @@ public class UnidentifiedIncomingObjectService {
     }
 
     public void processNewUnidentified(String key) {
-        synchronized (objectsHolder) {
-            UnidentifiedIncomingObject value = objectsHolder.getIfPresent(key);
-            if (value == null) {
-                objectsHolder.put(key, new UnidentifiedIncomingObject(key));
-            } else {
-                value.updateStats();
-            }
+        try {
+            objectsHolder.get(key, () -> new UnidentifiedIncomingObject(key))
+                         .updateStats();
+        } catch (ExecutionException e) {
+            log.error("Error occurred", e);
         }
     }
 }

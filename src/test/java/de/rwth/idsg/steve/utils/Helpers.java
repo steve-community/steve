@@ -4,6 +4,8 @@ import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.apache.cxf.ws.addressing.WSAddressingFeature;
 
 import javax.xml.ws.soap.SOAPBinding;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 import static de.rwth.idsg.steve.SteveConfiguration.CONFIG;
@@ -16,6 +18,14 @@ public class Helpers {
 
     public static String getRandomString() {
         return UUID.randomUUID().toString();
+    }
+
+    public static List<String> getRandomStrings(int size) {
+        List<String> list = new ArrayList<>(size);
+        for (int i = 0; i < size; i++) {
+            list.add(getRandomString());
+        }
+        return list;
     }
 
     public static String getPath() {

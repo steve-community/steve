@@ -42,9 +42,17 @@ import static de.rwth.idsg.steve.utils.Helpers.getRandomStrings;
  */
 public class StressTestSoapOCPP16 {
 
+    // higher values -> more stress
+    //
     private static final int THREAD_COUNT = 50;
     private static final int REPEAT_COUNT_PER_THREAD = 50;
 
+    // lower values -> more stress
+    //
+    // reason: these only specify the size of the values "bag" from which a test picks a value randomly. if there is
+    // less values to pick from, it is more likely that tests will use the same value at the same time. this produces
+    // more overhead for steve (especially db) when multiple threads "fight" for inserting/updating a db row/cell.
+    //
     private static final int ID_TAG_COUNT = 50;
     private static final int CHARGE_BOX_COUNT = 100;
     private static final int CONNECTOR_COUNT_PER_CHARGE_BOX = 25;

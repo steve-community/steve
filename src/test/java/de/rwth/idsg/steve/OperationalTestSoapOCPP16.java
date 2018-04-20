@@ -60,6 +60,8 @@ public class OperationalTestSoapOCPP16 {
 
     @BeforeClass
     public static void initClass() throws Exception {
+        Assert.assertEquals(ApplicationProfile.TEST, SteveConfiguration.CONFIG.getProfile());
+
         app = new Application();
         app.start();
     }

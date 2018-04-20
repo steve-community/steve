@@ -83,6 +83,8 @@ public class OperationalTestSoapOCPP16 {
 
     @Test
     public void testUnregisteredCP() {
+        Assert.assertFalse(SteveConfiguration.CONFIG.getOcpp().isAutoRegisterUnknownStations());
+
         CentralSystemService client = getForOcpp16(path);
 
         BootNotificationResponse boot = client.bootNotification(

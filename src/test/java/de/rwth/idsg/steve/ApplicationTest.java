@@ -14,6 +14,8 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import javax.xml.ws.soap.SOAPFaultException;
+
 import static de.rwth.idsg.steve.utils.Helpers.getForOcpp12;
 import static de.rwth.idsg.steve.utils.Helpers.getForOcpp15;
 import static de.rwth.idsg.steve.utils.Helpers.getForOcpp16;
@@ -88,7 +90,10 @@ public class ApplicationTest {
         Assert.assertEquals(ocpp.cs._2012._06.AuthorizationStatus.ACCEPTED, auth.getIdTagInfo().getStatus());
     }
 
-    @Test
+    /**
+     * SOAPFaultException because we are sending an AuthorizeRequest from an random/unknown station.
+     */
+    @Test(expected = SOAPFaultException.class)
     public void testOcpp16() {
         ocpp.cs._2015._10.CentralSystemService client = getForOcpp16(path);
 

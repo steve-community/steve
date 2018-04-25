@@ -1,7 +1,7 @@
 package de.rwth.idsg.steve;
 
 import de.rwth.idsg.steve.ocpp.OcppProtocol;
-import de.rwth.idsg.steve.ocpp.soap.FromAddressInterceptor;
+import de.rwth.idsg.steve.ocpp.soap.MessageHeaderInterceptor;
 import de.rwth.idsg.steve.ocpp.ws.OcppWebSocketUpgrader;
 import de.rwth.idsg.steve.repository.ReservationStatus;
 import de.rwth.idsg.steve.repository.dto.ChargePoint;
@@ -104,7 +104,7 @@ public class OperationalTestSoapOCPP16 {
 
     /**
      * Reason: We started to check registration status by intercepting every SOAP message other than BootNotification
-     * in {@link FromAddressInterceptor} and throw exception if station is not registered and auto-register is
+     * in {@link MessageHeaderInterceptor} and throw exception if station is not registered and auto-register is
      * disabled (and therefore early-exit the processing pipeline of the message).
      *
      * In case of BootNotification, the expected behaviour is to set RegistrationStatus.REJECTED in response, as done

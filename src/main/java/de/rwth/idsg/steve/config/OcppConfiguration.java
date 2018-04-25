@@ -47,12 +47,12 @@ public class OcppConfiguration {
     @Autowired private ocpp.cs._2015._10.CentralSystemService ocpp16Server;
 
     @Autowired
-    @Qualifier("FromAddressInterceptor")
-    private PhaseInterceptor<Message> fromAddressInterceptor;
+    @Qualifier("MessageHeaderInterceptor")
+    private PhaseInterceptor<Message> messageHeaderInterceptor;
 
     @PostConstruct
     public void init() {
-        List<Interceptor<? extends Message>> interceptors = asList(new MessageIdInterceptor(), fromAddressInterceptor);
+        List<Interceptor<? extends Message>> interceptors = asList(new MessageIdInterceptor(), messageHeaderInterceptor);
         List<Feature> logging = singletonList(LoggingFeatureProxy.INSTANCE.get());
 
         createOcppService(ocpp12Server, "/CentralSystemServiceOCPP12", interceptors, logging);

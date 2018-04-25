@@ -37,8 +37,8 @@ import static org.apache.cxf.ws.addressing.JAXWSAConstants.ADDRESSING_PROPERTIES
  * @since 15.06.2015
  */
 @Slf4j
-@Component("FromAddressInterceptor")
-public class FromAddressInterceptor extends AbstractPhaseInterceptor<Message> {
+@Component("MessageHeaderInterceptor")
+public class MessageHeaderInterceptor extends AbstractPhaseInterceptor<Message> {
 
     @Autowired private OcppServerRepository ocppServerRepository;
     @Autowired private ChargePointRepository chargePointRepository;
@@ -47,7 +47,7 @@ public class FromAddressInterceptor extends AbstractPhaseInterceptor<Message> {
     private static final String BOOT_OPERATION_NAME = "BootNotification";
     private static final String CHARGEBOX_ID_HEADER = "ChargeBoxIdentity";
 
-    public FromAddressInterceptor() {
+    public MessageHeaderInterceptor() {
         super(Phase.PRE_INVOKE);
     }
 

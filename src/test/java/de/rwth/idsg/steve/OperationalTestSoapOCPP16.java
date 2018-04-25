@@ -1,11 +1,15 @@
 package de.rwth.idsg.steve;
 
+import de.rwth.idsg.steve.ocpp.OcppProtocol;
+import de.rwth.idsg.steve.ocpp.soap.FromAddressInterceptor;
+import de.rwth.idsg.steve.ocpp.ws.OcppWebSocketUpgrader;
 import de.rwth.idsg.steve.repository.ReservationStatus;
 import de.rwth.idsg.steve.repository.dto.ChargePoint;
 import de.rwth.idsg.steve.repository.dto.ConnectorStatus;
 import de.rwth.idsg.steve.repository.dto.Reservation;
 import de.rwth.idsg.steve.repository.dto.Transaction;
 import de.rwth.idsg.steve.repository.dto.TransactionDetails;
+import de.rwth.idsg.steve.service.CentralSystemService16_Service;
 import de.rwth.idsg.steve.utils.__DatabasePreparer__;
 import jooq.steve.db.tables.records.TransactionRecord;
 import lombok.extern.slf4j.Slf4j;
@@ -38,6 +42,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import javax.xml.ws.soap.SOAPFaultException;
 import java.util.Arrays;
 import java.util.List;
 
@@ -95,6 +100,28 @@ public class OperationalTestSoapOCPP16 {
 
         Assert.assertNotNull(boot);
         Assert.assertNotEquals(RegistrationStatus.ACCEPTED, boot.getStatus());
+    }
+
+    /**
+     * Reason: We started to check registration status by intercepting every SOAP message other than BootNotification
+     * in {@link FromAddressInterceptor} and throw exception if station is not registered and auto-register is
+     * disabled (and therefore early-exit the processing pipeline of the message).
+     *
+     * In case of BootNotification, the expected behaviour is to set RegistrationStatus.REJECTED in response, as done
+     * by {@link CentralSystemService16_Service#bootNotification(BootNotificationRequest, String, OcppProtocol)}.
+     * Therefore, no exception. This case is tested by {@link OperationalTestSoapOCPP16#testUnregisteredCP()} already.
+     *
+     * WS/JSON stations cannot connect at all if they are not registered, as ensured by {@link OcppWebSocketUpgrader}.
+     */
+    @Test(expected = SOAPFaultException.class)
+    public void testUnregisteredCPWithInterceptor() {
+        Assert.assertFalse(SteveConfiguration.CONFIG.getOcpp().isAutoRegisterUnknownStations());
+
+        CentralSystemService client = getForOcpp16(path);
+
+        client.authorize(
+                new AuthorizeRequest().withIdTag(REGISTERED_OCPP_TAG),
+                getRandomString());
     }
 
     @Test

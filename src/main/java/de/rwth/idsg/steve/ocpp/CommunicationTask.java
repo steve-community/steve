@@ -4,8 +4,6 @@ import de.rwth.idsg.steve.ocpp.ws.data.OcppJsonError;
 import de.rwth.idsg.steve.repository.dto.ChargePointSelect;
 import de.rwth.idsg.steve.utils.StringUtils;
 import de.rwth.idsg.steve.web.dto.ocpp.ChargePointSelection;
-import de.rwth.idsg.steve.web.dto.task.RequestResult;
-import de.rwth.idsg.steve.web.dto.task.RequestTaskOrigin;
 import lombok.AccessLevel;
 import lombok.Getter;
 import org.joda.time.DateTime;
@@ -32,7 +30,7 @@ public abstract class CommunicationTask<S extends ChargePointSelection, RESPONSE
 
     private final OcppVersion ocppVersion;
     private final String operationName;
-    private final RequestTaskOrigin origin;
+    private final TaskOrigin origin;
     private final String caller;
     protected final S params;
 
@@ -52,13 +50,13 @@ public abstract class CommunicationTask<S extends ChargePointSelection, RESPONSE
     private ArrayList<OcppCallback<RESPONSE>> callbackList = new ArrayList<>(2);
 
     public CommunicationTask(OcppVersion ocppVersion, S params) {
-        this(ocppVersion, params, RequestTaskOrigin.INTERNAL, "SteVe");
+        this(ocppVersion, params, TaskOrigin.INTERNAL, "SteVe");
     }
 
     /**
      * Do not expose the constructor, make it package-private
      */
-    CommunicationTask(OcppVersion ocppVersion, S params, RequestTaskOrigin origin, String caller) {
+    CommunicationTask(OcppVersion ocppVersion, S params, TaskOrigin origin, String caller) {
         List<ChargePointSelect> cpsList = params.getChargePointSelectList();
 
         this.ocppVersion = ocppVersion;

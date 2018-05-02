@@ -1,4 +1,4 @@
-package de.rwth.idsg.steve.web.dto.task;
+package de.rwth.idsg.steve.ocpp;
 
 import lombok.RequiredArgsConstructor;
 
@@ -7,7 +7,7 @@ import lombok.RequiredArgsConstructor;
  * @since 23.11.2015
  */
 @RequiredArgsConstructor
-public enum RequestTaskOrigin {
+public enum TaskOrigin {
 
     // When the action was triggered by SteVe internally (e.g. by the admin/user)
     INTERNAL,

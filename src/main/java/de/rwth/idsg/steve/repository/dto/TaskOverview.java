@@ -1,6 +1,6 @@
 package de.rwth.idsg.steve.repository.dto;
 
-import de.rwth.idsg.steve.web.dto.task.RequestTaskOrigin;
+import de.rwth.idsg.steve.ocpp.TaskOrigin;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -16,7 +16,7 @@ import org.joda.time.DateTime;
 public final class TaskOverview implements Comparable<TaskOverview> {
     private final int taskId, responseCount, requestCount;
     private final DateTime start, end;
-    private final RequestTaskOrigin origin;
+    private final TaskOrigin origin;
 
     /**
      * We want the tasks to be printed in descending order.

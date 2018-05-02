@@ -68,7 +68,7 @@ public class ChargePointService15_Client extends ChargePointService12_Client {
                          .forEach(task.getParams().getChargePointSelectList())
                          .execute(c -> getOcpp15Invoker().dataTransfer(c, task));
 
-        return requestTaskStore.add(task);
+        return taskStore.add(task);
     }
 
     public int getConfiguration(GetConfigurationParams params) {
@@ -78,7 +78,7 @@ public class ChargePointService15_Client extends ChargePointService12_Client {
                          .forEach(task.getParams().getChargePointSelectList())
                          .execute(c -> getOcpp15Invoker().getConfiguration(c, task));
 
-        return requestTaskStore.add(task);
+        return taskStore.add(task);
     }
 
     public int getLocalListVersion(MultipleChargePointSelect params) {
@@ -88,7 +88,7 @@ public class ChargePointService15_Client extends ChargePointService12_Client {
                          .forEach(task.getParams().getChargePointSelectList())
                          .execute(c -> getOcpp15Invoker().getLocalListVersion(c, task));
 
-        return requestTaskStore.add(task);
+        return taskStore.add(task);
     }
 
     public int sendLocalList(SendLocalListParams params) {
@@ -98,7 +98,7 @@ public class ChargePointService15_Client extends ChargePointService12_Client {
                          .forEach(task.getParams().getChargePointSelectList())
                          .execute(c -> getOcpp15Invoker().sendLocalList(c, task));
 
-        return requestTaskStore.add(task);
+        return taskStore.add(task);
     }
 
 
@@ -126,7 +126,7 @@ public class ChargePointService15_Client extends ChargePointService12_Client {
                          .forFirst(task.getParams().getChargePointSelectList())
                          .execute(c -> getOcpp15Invoker().reserveNow(c, task));
 
-        return requestTaskStore.add(task);
+        return taskStore.add(task);
     }
 
     public int cancelReservation(CancelReservationParams params) {
@@ -136,7 +136,7 @@ public class ChargePointService15_Client extends ChargePointService12_Client {
                          .forFirst(task.getParams().getChargePointSelectList())
                          .execute(c -> getOcpp15Invoker().cancelReservation(c, task));
 
-        return requestTaskStore.add(task);
+        return taskStore.add(task);
     }
 
 

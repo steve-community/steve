@@ -2,7 +2,7 @@ package de.rwth.idsg.steve.repository.impl;
 
 import de.rwth.idsg.steve.SteveException;
 import de.rwth.idsg.steve.ocpp.CommunicationTask;
-import de.rwth.idsg.steve.repository.RequestTaskStore;
+import de.rwth.idsg.steve.repository.TaskStore;
 import de.rwth.idsg.steve.repository.dto.TaskOverview;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
  */
 @Slf4j
 @Repository
-public class RequestTaskStoreImpl implements RequestTaskStore {
+public class TaskStoreImpl implements TaskStore {
 
     private final AtomicInteger atomicInteger = new AtomicInteger(0);
     private final ConcurrentHashMap<Integer, CommunicationTask> lookupTable = new ConcurrentHashMap<>();

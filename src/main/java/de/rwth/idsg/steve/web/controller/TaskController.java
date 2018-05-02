@@ -1,8 +1,7 @@
 package de.rwth.idsg.steve.web.controller;
 
 import de.rwth.idsg.steve.ocpp.CommunicationTask;
-import de.rwth.idsg.steve.repository.RequestTaskStore;
-import de.rwth.idsg.steve.web.dto.task.RequestTask;
+import de.rwth.idsg.steve.repository.TaskStore;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -16,9 +15,9 @@ import org.springframework.web.bind.annotation.RequestMethod;
  */
 @Controller
 @RequestMapping(value = "/manager/operations/tasks")
-public class RequestTaskController {
+public class TaskController {
 
-    @Autowired private RequestTaskStore requestTaskStore;
+    @Autowired private TaskStore taskStore;
 
     // -------------------------------------------------------------------------
     // Paths
@@ -32,19 +31,19 @@ public class RequestTaskController {
 
     @RequestMapping(method = RequestMethod.GET)
     public String getOverview(Model model) {
-        model.addAttribute("taskList", requestTaskStore.getOverview());
+        model.addAttribute("taskList", taskStore.getOverview());
         return "tasks";
     }
 
     @RequestMapping(method = RequestMethod.POST)
     public String clearFinished(Model model) {
-        requestTaskStore.clearFinished();
+        taskStore.clearFinished();
         return getOverview(model);
     }
 
     @RequestMapping(value = TASK_ID_PATH, method = RequestMethod.GET)
     public String getTaskDetails(@PathVariable("taskId") Integer taskId, Model model) {
-        CommunicationTask r = requestTaskStore.get(taskId);
+        CommunicationTask r = taskStore.get(taskId);
         model.addAttribute("task", r);
         return "taskResult";
     }

@@ -12,7 +12,7 @@ import de.rwth.idsg.steve.ocpp.task.RemoteStopTransactionTask;
 import de.rwth.idsg.steve.ocpp.task.ResetTask;
 import de.rwth.idsg.steve.ocpp.task.UnlockConnectorTask;
 import de.rwth.idsg.steve.ocpp.task.UpdateFirmwareTask;
-import de.rwth.idsg.steve.repository.RequestTaskStore;
+import de.rwth.idsg.steve.repository.TaskStore;
 import de.rwth.idsg.steve.web.dto.ocpp.ChangeAvailabilityParams;
 import de.rwth.idsg.steve.web.dto.ocpp.ChangeConfigurationParams;
 import de.rwth.idsg.steve.web.dto.ocpp.GetDiagnosticsParams;
@@ -38,7 +38,7 @@ import java.util.concurrent.ScheduledExecutorService;
 public class ChargePointService12_Client {
 
     @Autowired protected ScheduledExecutorService executorService;
-    @Autowired protected RequestTaskStore requestTaskStore;
+    @Autowired protected TaskStore taskStore;
 
     @Autowired private ChargePointService12_InvokerImpl invoker12;
 
@@ -61,7 +61,7 @@ public class ChargePointService12_Client {
                          .forEach(task.getParams().getChargePointSelectList())
                          .execute(c -> getOcpp12Invoker().changeAvailability(c, task));
 
-        return requestTaskStore.add(task);
+        return taskStore.add(task);
     }
 
     public int changeConfiguration(ChangeConfigurationParams params) {
@@ -71,7 +71,7 @@ public class ChargePointService12_Client {
                          .forEach(task.getParams().getChargePointSelectList())
                          .execute(c -> getOcpp12Invoker().changeConfiguration(c, task));
 
-        return requestTaskStore.add(task);
+        return taskStore.add(task);
     }
 
     public int clearCache(MultipleChargePointSelect params) {
@@ -81,7 +81,7 @@ public class ChargePointService12_Client {
                          .forEach(task.getParams().getChargePointSelectList())
                          .execute(c -> getOcpp12Invoker().clearCache(c, task));
 
-        return requestTaskStore.add(task);
+        return taskStore.add(task);
     }
 
     public int getDiagnostics(GetDiagnosticsParams params) {
@@ -91,7 +91,7 @@ public class ChargePointService12_Client {
                          .forEach(task.getParams().getChargePointSelectList())
                          .execute(c -> getOcpp12Invoker().getDiagnostics(c, task));
 
-        return requestTaskStore.add(task);
+        return taskStore.add(task);
     }
 
     public int reset(ResetParams params) {
@@ -101,7 +101,7 @@ public class ChargePointService12_Client {
                          .forEach(task.getParams().getChargePointSelectList())
                          .execute(c -> getOcpp12Invoker().reset(c, task));
 
-        return requestTaskStore.add(task);
+        return taskStore.add(task);
     }
 
     public int updateFirmware(UpdateFirmwareParams params) {
@@ -111,7 +111,7 @@ public class ChargePointService12_Client {
                          .forEach(task.getParams().getChargePointSelectList())
                          .execute(c -> getOcpp12Invoker().updateFirmware(c, task));
 
-        return requestTaskStore.add(task);
+        return taskStore.add(task);
     }
 
     // -------------------------------------------------------------------------
@@ -125,7 +125,7 @@ public class ChargePointService12_Client {
                          .forFirst(task.getParams().getChargePointSelectList())
                          .execute(c -> getOcpp12Invoker().remoteStartTransaction(c, task));
 
-        return requestTaskStore.add(task);
+        return taskStore.add(task);
     }
 
     public int remoteStopTransaction(RemoteStopTransactionParams params) {
@@ -135,7 +135,7 @@ public class ChargePointService12_Client {
                          .forFirst(task.getParams().getChargePointSelectList())
                          .execute(c -> getOcpp12Invoker().remoteStopTransaction(c, task));
 
-        return requestTaskStore.add(task);
+        return taskStore.add(task);
     }
 
     public int unlockConnector(UnlockConnectorParams params) {
@@ -145,7 +145,7 @@ public class ChargePointService12_Client {
                          .forFirst(task.getParams().getChargePointSelectList())
                          .execute(c -> getOcpp12Invoker().unlockConnector(c, task));
 
-        return requestTaskStore.add(task);
+        return taskStore.add(task);
     }
 
 }

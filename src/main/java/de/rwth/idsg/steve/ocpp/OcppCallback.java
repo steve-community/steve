@@ -15,7 +15,7 @@ public interface OcppCallback<T> {
 
     /**
      * Relevant to WebSocket/JSON transport: Even though we have an error, this object is still a valid response from
-     * charge point and RequestTask should treat it as such. {@link CommunicationTask#addNewError(String, String)}
+     * charge point and the implementation should treat it as such. {@link CommunicationTask#addNewError(String, String)}
      * should be used when the request could not be delivered and there is a Java exception.
      */
     void success(String chargeBoxId, OcppJsonError error);

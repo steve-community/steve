@@ -268,7 +268,7 @@ public enum Server15to16Impl implements Server15to16 {
                 .withFormat(f.isSetFormat() ? ValueFormat.fromValue(f.getFormat().value()) : null)
                 .withLocation(f.isSetLocation() ? Location.fromValue(f.getLocation().value()) : null)
                 .withMeasurand(f.isSetMeasurand() ? Measurand.fromValue(f.getMeasurand().value()) : null)
-                .withUnit(f.isSetUnit() ? UnitOfMeasure.fromValue(f.getUnit().value()) : null)
+                .withUnit(f.isSetUnit() ? UnitOfMeasure.fromValue(f.getUnit().value().replaceAll("^Volt$","V").replaceAll("^Amp$","A")) : null)
                 .withValue(f.getValue());
     }
 

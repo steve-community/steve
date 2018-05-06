@@ -248,6 +248,22 @@ public enum Server15to16Impl implements Server15to16 {
         }
     }
 
+    /**
+     * AMP and VOLT are shortened to A and V, respectively.
+     *
+     * https://github.com/RWTH-i5-IDSG/steve/issues/59
+     */
+    private static UnitOfMeasure convertUnit(ocpp.cs._2012._06.UnitOfMeasure unit) {
+        switch (unit) {
+            case AMP:
+                return UnitOfMeasure.A;
+            case VOLT:
+                return UnitOfMeasure.V;
+            default:
+                return UnitOfMeasure.fromValue(unit.value());
+        }
+    }
+
     // -------------------------------------------------------------------------
     // Helpers
     // -------------------------------------------------------------------------
@@ -268,7 +284,7 @@ public enum Server15to16Impl implements Server15to16 {
                 .withFormat(f.isSetFormat() ? ValueFormat.fromValue(f.getFormat().value()) : null)
                 .withLocation(f.isSetLocation() ? Location.fromValue(f.getLocation().value()) : null)
                 .withMeasurand(f.isSetMeasurand() ? Measurand.fromValue(f.getMeasurand().value()) : null)
-                .withUnit(f.isSetUnit() ? UnitOfMeasure.fromValue(f.getUnit().value()) : null)
+                .withUnit(f.isSetUnit() ? convertUnit(f.getUnit()) : null)
                 .withValue(f.getValue());
     }
 

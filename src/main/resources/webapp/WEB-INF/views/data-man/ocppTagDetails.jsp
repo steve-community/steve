@@ -16,6 +16,27 @@
 </spring:hasBindErrors>
 <div class="content"><div>
     <section><span>OCPP Tag Details</span></section>
+
+    <table class="userInput">
+        <thead><tr><th>See Operations</th><th></th></thead>
+        <tbody>
+        <tr>
+            <td>Transactions:</td>
+            <td>
+                <a href="${ctxPath}/manager/transactions/query?ocppIdTag=${ocppTagForm.idTag}&amp;type=ACTIVE">ACTIVE</a>
+                /
+                <a href="${ctxPath}/manager/transactions/query?ocppIdTag=${ocppTagForm.idTag}&amp;type=ALL">ALL</a>
+            </td>
+        </tr>
+        <tr>
+            <td>Reservations:</td>
+            <td>
+                <a href="${ctxPath}/manager/reservations/query?ocppIdTag=${ocppTagForm.idTag}&amp;periodType=ACTIVE">ACTIVE</a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
     <form:form action="${ctxPath}/manager/ocppTags/update" modelAttribute="ocppTagForm">
 
         <form:hidden path="ocppTagPk" readonly="true"/>

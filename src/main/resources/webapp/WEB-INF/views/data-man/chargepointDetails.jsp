@@ -16,6 +16,27 @@
             <span>Read-only fields are updated by the charge point.</span>
         </a>
     </span></section>
+
+        <table class="userInput">
+            <thead><tr><th>See Operations</th><th></th></thead>
+            <tbody>
+            <tr>
+                <td>Transactions:</td>
+                <td>
+                    <a href="${ctxPath}/manager/transactions/query?chargeBoxId=${chargePointForm.chargeBoxId}&amp;type=ACTIVE">ACTIVE</a>
+                     /
+                    <a href="${ctxPath}/manager/transactions/query?chargeBoxId=${chargePointForm.chargeBoxId}&amp;type=ALL">ALL</a>
+                </td>
+            </tr>
+            <tr>
+                <td>Reservations:</td>
+                <td>
+                    <a href="${ctxPath}/manager/reservations/query?chargeBoxId=${chargePointForm.chargeBoxId}&amp;periodType=ACTIVE">ACTIVE</a>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+
         <form:form action="${ctxPath}/manager/chargepoints/update" modelAttribute="chargePointForm">
 
             <form:hidden path="chargeBoxPk" readonly="true"/>

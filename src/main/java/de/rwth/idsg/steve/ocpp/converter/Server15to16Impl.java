@@ -302,12 +302,9 @@ public enum Server15to16Impl implements Server15to16 {
     }
 
     private static List<MeterValue> toOcpp16TransactionData(List<TransactionData> transactionData) {
-        List<ocpp.cs._2012._06.MeterValue> combinedList = transactionData.stream()
-                                                                         .flatMap(data -> data.getValues().stream())
-                                                                         .collect(Collectors.toList());
-
-        return combinedList.stream()
-                           .map(Server15to16Impl::toOcpp16MeterValue)
-                           .collect(Collectors.toList());
+        return transactionData.stream()
+                              .flatMap(data -> data.getValues().stream())
+                              .map(Server15to16Impl::toOcpp16MeterValue)
+                              .collect(Collectors.toList());
     }
 }

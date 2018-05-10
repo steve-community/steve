@@ -82,7 +82,7 @@ public abstract class AbstractWebSocketEndpoint implements WebSocketHandler {
         String incomingString = webSocketMessage.getPayload();
         String chargeBoxId = getChargeBoxId(session);
 
-        log.info("[chargeBoxId={}, sessionId={}] Received message: {}", chargeBoxId, session.getId(), incomingString);
+        WebSocketLogger.receivedText(chargeBoxId, session, incomingString);
 
         CommunicationContext context = new CommunicationContext(session, chargeBoxId);
         context.setIncomingString(incomingString);
@@ -91,7 +91,7 @@ public abstract class AbstractWebSocketEndpoint implements WebSocketHandler {
     }
 
     private void handlePongMessage(WebSocketSession session) {
-        log.debug("[id={}] Received pong message", session.getId());
+        WebSocketLogger.receivedPong(getChargeBoxId(session), session);
 
         // TODO: Not sure about the following. Should update DB? Should call directly repo?
         ocppServerRepository.updateChargeboxHeartbeat(getChargeBoxId(session), DateTime.now());
@@ -99,7 +99,9 @@ public abstract class AbstractWebSocketEndpoint implements WebSocketHandler {
 
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
-        log.info("New connection established: {}", session);
+        String chargeBoxId = getChargeBoxId(session);
+
+        WebSocketLogger.connected(chargeBoxId, session);
 
         // Just to keep the connection alive, such that the servers do not close
         // the connection because of a idle timeout, we ping-pong at fixed intervals.
@@ -108,8 +110,6 @@ public abstract class AbstractWebSocketEndpoint implements WebSocketHandler {
                 WebSocketConfiguration.PING_INTERVAL,
                 WebSocketConfiguration.PING_INTERVAL,
                 TimeUnit.MINUTES);
-
-        String chargeBoxId = getChargeBoxId(session);
 
         futureResponseContextStore.addSession(session);
 
@@ -129,9 +129,9 @@ public abstract class AbstractWebSocketEndpoint implements WebSocketHandler {
 
     @Override
     public void afterConnectionClosed(WebSocketSession session, CloseStatus closeStatus) throws Exception {
-        log.warn("[id={}] Connection was closed, status: {}", session.getId(), closeStatus);
-
         String chargeBoxId = getChargeBoxId(session);
+
+        WebSocketLogger.closed(chargeBoxId, session, closeStatus);
 
         futureResponseContextStore.removeSession(session);
 

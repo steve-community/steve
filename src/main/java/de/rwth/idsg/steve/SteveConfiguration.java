@@ -14,27 +14,27 @@ public enum SteveConfiguration {
     CONFIG;
 
     // Root mapping for Spring
-    private String springMapping = "/";
+    private final String springMapping = "/";
     // Web frontend
-    private String springManagerMapping = "/manager/*";
+    private final String springManagerMapping = "/manager/*";
     // Mapping for CXF SOAP services
-    private String cxfMapping = "/services/*";
+    private final String cxfMapping = "/services/*";
     // Dummy service path
-    private String routerEndpointPath = "/CentralSystemService";
+    private final String routerEndpointPath = "/CentralSystemService";
     // Time zone for the application and database connections
-    private String timeZoneId = "UTC";  // or ZoneId.systemDefault().getId();
+    private final String timeZoneId = "UTC";  // or ZoneId.systemDefault().getId();
 
     // -------------------------------------------------------------------------
     // main.properties
     // -------------------------------------------------------------------------
 
-    private String contextPath;
-    private String steveVersion;
-    private ApplicationProfile profile;
-    private Ocpp ocpp;
-    private Auth auth;
-    private DB db;
-    private Jetty jetty;
+    private final String contextPath;
+    private final String steveVersion;
+    private final ApplicationProfile profile;
+    private final Ocpp ocpp;
+    private final Auth auth;
+    private final DB db;
+    private final Jetty jetty;
 
     SteveConfiguration() {
         PropertiesFileLoader p = new PropertiesFileLoader("main.properties");
@@ -103,43 +103,43 @@ public enum SteveConfiguration {
     // Jetty configuration
     @Builder @Getter
     public static class Jetty {
-        private String serverHost;
-        private boolean gzipEnabled;
+        private final String serverHost;
+        private final boolean gzipEnabled;
 
         // HTTP
-        private boolean httpEnabled;
-        private int httpPort;
+        private final boolean httpEnabled;
+        private final int httpPort;
 
         // HTTPS
-        private boolean httpsEnabled;
-        private int httpsPort;
-        private String keyStorePath;
-        private String keyStorePassword;
+        private final boolean httpsEnabled;
+        private final int httpsPort;
+        private final String keyStorePath;
+        private final String keyStorePassword;
     }
 
     // Database configuration
     @Builder @Getter
     public static class DB {
-        private String ip;
-        private int port;
-        private String schema;
-        private String userName;
-        private String password;
-        private boolean sqlLogging;
+        private final String ip;
+        private final int port;
+        private final String schema;
+        private final String userName;
+        private final String password;
+        private final boolean sqlLogging;
     }
 
     // Credentials for Web interface access
     @Builder @Getter
     public static class Auth {
-        private String userName;
-        private String password;
+        private final String userName;
+        private final String password;
     }
 
     // OCPP-related configuration
     @Builder @Getter
     public static class Ocpp {
-        private boolean autoRegisterUnknownStations;
-        private WsSessionSelectStrategyEnum wsSessionSelectStrategy;
+        private final boolean autoRegisterUnknownStations;
+        private final WsSessionSelectStrategyEnum wsSessionSelectStrategy;
     }
 
 }

@@ -1,7 +1,7 @@
 package de.rwth.idsg.steve.ocpp.ws;
 
-import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.util.concurrent.Striped;
 import de.rwth.idsg.steve.SteveException;
 import de.rwth.idsg.steve.ocpp.ws.custom.WsSessionSelectStrategy;
 import de.rwth.idsg.steve.ocpp.ws.data.SessionContext;
@@ -17,6 +17,7 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.locks.Lock;
 
 /**
  * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
@@ -31,6 +32,8 @@ public class SessionContextStoreImpl implements SessionContextStore {
      */
     private final ConcurrentHashMap<String, Deque<SessionContext>> lookupTable = new ConcurrentHashMap<>();
 
+    private final Striped<Lock> locks = Striped.lock(16);
+
     private final WsSessionSelectStrategy wsSessionSelectStrategy;
 
     public SessionContextStoreImpl(WsSessionSelectStrategy wsSessionSelectStrategy) {
@@ -39,48 +42,77 @@ public class SessionContextStoreImpl implements SessionContextStore {
 
     @Override
     public void add(String chargeBoxId, WebSocketSession session, ScheduledFuture pingSchedule) {
-        SessionContext context = new SessionContext(session, pingSchedule, DateTime.now());
+        Lock l = locks.get(chargeBoxId);
+        l.lock();
+        try {
+            SessionContext context = new SessionContext(session, pingSchedule, DateTime.now());
 
-        Deque<SessionContext> endpointDeque = lookupTable.computeIfAbsent(chargeBoxId, str -> new ArrayDeque<>());
-        endpointDeque.addLast(context); // Adding at the end
+            Deque<SessionContext> endpointDeque = lookupTable.computeIfAbsent(chargeBoxId, str -> new ArrayDeque<>());
+            endpointDeque.addLast(context); // Adding at the end
 
-        log.debug("A new SessionContext is stored for chargeBoxId '{}'. Store size: {}",
-                chargeBoxId, endpointDeque.size());
+            log.debug("A new SessionContext is stored for chargeBoxId '{}'. Store size: {}",
+                    chargeBoxId, endpointDeque.size());
+        } finally {
+            l.unlock();
+        }
     }
 
     @Override
     public void remove(String chargeBoxId, WebSocketSession session) {
-        Deque<SessionContext> endpointDeque = lookupTable.get(chargeBoxId);
-        if (endpointDeque == null) {
-            log.debug("No session context to remove for chargeBoxId '{}'", chargeBoxId);
-            return;
-        }
+        Lock l = locks.get(chargeBoxId);
+        l.lock();
+        try {
+            Deque<SessionContext> endpointDeque = lookupTable.get(chargeBoxId);
+            if (endpointDeque == null) {
+                log.debug("No session context to remove for chargeBoxId '{}'", chargeBoxId);
+                return;
+            }
 
-        // Prevent "java.util.ConcurrentModificationException: null"
-        // Reason: Cannot modify the set (remove the item) we are iterating
-        // Solution: Iterate the set, find the item, remove the item after the for-loop
-        //
-        SessionContext toRemove = null;
-        for (SessionContext context : endpointDeque) {
-            if (context.getSession().getId().equals(session.getId())) {
-                toRemove = context;
-                break;
+            // Prevent "java.util.ConcurrentModificationException: null"
+            // Reason: Cannot modify the set (remove the item) we are iterating
+            // Solution: Iterate the set, find the item, remove the item after the for-loop
+            //
+            SessionContext toRemove = null;
+            for (SessionContext context : endpointDeque) {
+                if (context.getSession().getId().equals(session.getId())) {
+                    toRemove = context;
+                    break;
+                }
             }
-        }
 
-        if (toRemove != null) {
-            // 1. Cancel the ping task
-            toRemove.getPingSchedule().cancel(true);
-            // 2. Delete from collection
-            if (endpointDeque.remove(toRemove)) {
-                log.debug("A SessionContext is removed for chargeBoxId '{}'. Store size: {}",
-                        chargeBoxId, endpointDeque.size());
+            if (toRemove != null) {
+                // 1. Cancel the ping task
+                toRemove.getPingSchedule().cancel(true);
+                // 2. Delete from collection
+                if (endpointDeque.remove(toRemove)) {
+                    log.debug("A SessionContext is removed for chargeBoxId '{}'. Store size: {}",
+                            chargeBoxId, endpointDeque.size());
+                }
+                // 3. Delete empty collection from lookup table in order to correctly calculate
+                // the number of connected chargeboxes with getNumberOfChargeBoxes()
+                if (endpointDeque.size() == 0) {
+                    lookupTable.remove(chargeBoxId);
+                }
             }
-            // 3. Delete empty collection from lookup table in order to correctly calculate
-            // the number of connected chargeboxes with getNumberOfChargeBoxes()
-            if (endpointDeque.size() == 0) {
-                lookupTable.remove(chargeBoxId);
+        } finally {
+            l.unlock();
+        }
+    }
+
+    @Override
+    public WebSocketSession getSession(String chargeBoxId) {
+        Lock l = locks.get(chargeBoxId);
+        l.lock();
+        try {
+            Deque<SessionContext> endpointDeque = lookupTable.get(chargeBoxId);
+            if (endpointDeque == null) {
+                throw new NoSuchElementException();
             }
+            return wsSessionSelectStrategy.getSession(endpointDeque);
+        } catch (NoSuchElementException e) {
+            throw new SteveException("No session context for chargeBoxId '%s'", chargeBoxId, e);
+        } finally {
+            l.unlock();
         }
     }
 
@@ -95,6 +127,11 @@ public class SessionContextStoreImpl implements SessionContextStore {
     }
 
     @Override
+    public int getNumberOfChargeBoxes() {
+        return lookupTable.size();
+    }
+
+    @Override
     public List<String> getChargeBoxIdList() {
         return Collections.list(lookupTable.keys());
     }
@@ -103,27 +140,4 @@ public class SessionContextStoreImpl implements SessionContextStore {
     public Map<String, Deque<SessionContext>> getACopy() {
         return ImmutableMap.copyOf(lookupTable);
     }
-
-    @Override
-    public int getNumberOfChargeBoxes() {
-        return lookupTable.size();
-    }
-
-    @Override
-    public WebSocketSession getSession(String chargeBoxId) {
-        if (Strings.isNullOrEmpty(chargeBoxId)) {
-            throw new SteveException("Invalid chargeBoxId (null or empty)");
-        }
-
-        try {
-            Deque<SessionContext> endpointDeque = lookupTable.get(chargeBoxId);
-            if (endpointDeque == null) {
-                throw new NoSuchElementException();
-            }
-            return wsSessionSelectStrategy.getSession(endpointDeque);
-        } catch (NoSuchElementException e) {
-            throw new SteveException("No session context for chargeBoxId '%s'", chargeBoxId, e);
-        }
-    }
-
 }

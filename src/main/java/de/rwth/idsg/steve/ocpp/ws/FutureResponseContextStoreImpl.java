@@ -26,11 +26,10 @@ public class FutureResponseContextStoreImpl implements FutureResponseContextStor
 
     @Override
     public void addSession(WebSocketSession session) {
-        Map<String, FutureResponseContext> contextMap = lookupTable.get(session);
-        if (contextMap == null) {
-            log.debug("Creating new store for sessionId '{}'", session.getId());
-            lookupTable.put(session, new ConcurrentHashMap<>());
-        }
+        lookupTable.computeIfAbsent(session, webSocketSession -> {
+            log.debug("Creating new store for sessionId '{}'", webSocketSession.getId());
+            return new ConcurrentHashMap<>();
+        });
     }
 
     @Override

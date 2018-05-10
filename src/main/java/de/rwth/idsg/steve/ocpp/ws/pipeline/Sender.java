@@ -1,6 +1,7 @@
 package de.rwth.idsg.steve.ocpp.ws.pipeline;
 
 import de.rwth.idsg.steve.SteveException;
+import de.rwth.idsg.steve.ocpp.ws.WebSocketLogger;
 import de.rwth.idsg.steve.ocpp.ws.data.CommunicationContext;
 import de.rwth.idsg.steve.ocpp.ws.data.OcppJsonCall;
 import lombok.extern.slf4j.Slf4j;
@@ -26,7 +27,7 @@ public enum Sender implements Consumer<CommunicationContext> {
         String chargeBoxId = context.getChargeBoxId();
         WebSocketSession session = context.getSession();
 
-        log.info("[chargeBoxId={}, sessionId={}] Sending message: {}", chargeBoxId, session.getId(), outgoingString);
+        WebSocketLogger.sending(chargeBoxId, session, outgoingString);
 
         TextMessage out = new TextMessage(outgoingString);
         try {

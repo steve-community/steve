@@ -15,9 +15,9 @@ import java.util.concurrent.ScheduledFuture;
 public interface SessionContextStore {
     void add(String chargeBoxId, WebSocketSession session, ScheduledFuture pingSchedule);
     void remove(String chargeBoxId, WebSocketSession session);
+    WebSocketSession getSession(String chargeBoxId);
     int getSize(String chargeBoxId);
+    int getNumberOfChargeBoxes();
     List<String> getChargeBoxIdList();
     Map<String, Deque<SessionContext>> getACopy();
-    int getNumberOfChargeBoxes();
-    WebSocketSession getSession(String chargeBoxId);
 }

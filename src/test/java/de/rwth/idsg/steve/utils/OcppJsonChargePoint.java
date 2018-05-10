@@ -34,7 +34,6 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
 /**
@@ -129,7 +128,7 @@ public class OcppJsonChargePoint {
         responseContextMap.put(messageId, resCtx);
     }
 
-    public void processAndClose() {
+    public void process() {
         Collection<ResponseContext> values = responseContextMap.values();
         receivedResponsesSignal = new CountDownLatch(values.size());
 
@@ -142,21 +141,35 @@ public class OcppJsonChargePoint {
             }
         }
 
+        // wait for all responses to arrive and be processed
         try {
-            // wait for all responses to arrive and be processed
-            receivedResponsesSignal.await(15, TimeUnit.SECONDS);
+            receivedResponsesSignal.await();
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
 
+        // we processed everything in the map, clear it such that the map is empty for the next process call
+        responseContextMap.clear();
+    }
+
+    public void close() {
+        try {
             // "enqueue" a graceful close
             session.close(StatusCode.NORMAL, "Finished");
 
             // wait for close to happen
-            closeHappenedSignal.await(15, TimeUnit.SECONDS);
+            closeHappenedSignal.await();
 
             // well, stop the client
             client.stop();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public void processAndClose() {
+        process();
+        close();
     }
 
     // -------------------------------------------------------------------------

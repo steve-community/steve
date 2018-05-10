@@ -29,21 +29,39 @@ public class Helpers {
     }
 
     public static String getPath() {
+        String prefix;
+        int port;
+
         if (CONFIG.getJetty().isHttpEnabled()) {
-            return "http://"
-                    + CONFIG.getJetty().getServerHost() + ":"
-                    + CONFIG.getJetty().getHttpPort()
-                    + CONFIG.getContextPath() + "/services"
-                    + CONFIG.getRouterEndpointPath();
+            prefix = "http://";
+            port = CONFIG.getJetty().getHttpPort();
         } else if (CONFIG.getJetty().isHttpsEnabled()) {
-            return "https://"
-                    + CONFIG.getJetty().getServerHost() + ":"
-                    + CONFIG.getJetty().getHttpsPort()
-                    + CONFIG.getContextPath() + "/services"
-                    + CONFIG.getRouterEndpointPath();
+            prefix = "https://";
+            port = CONFIG.getJetty().getHttpsPort();
         } else {
             throw new RuntimeException();
         }
+
+        return prefix + CONFIG.getJetty().getServerHost() + ":" + port
+                + CONFIG.getContextPath() + "/services" + CONFIG.getRouterEndpointPath();
+    }
+
+    public static String getJsonPath() {
+        String prefix;
+        int port;
+
+        if (CONFIG.getJetty().isHttpEnabled()) {
+            prefix = "ws://";
+            port = CONFIG.getJetty().getHttpPort();
+        } else if (CONFIG.getJetty().isHttpsEnabled()) {
+            prefix = "wss://";
+            port = CONFIG.getJetty().getHttpsPort();
+        } else {
+            throw new RuntimeException();
+        }
+
+        return prefix + CONFIG.getJetty().getServerHost() + ":" + port
+                + CONFIG.getContextPath() + "/websocket/CentralSystemService/";
     }
 
     public static ocpp.cs._2015._10.CentralSystemService getForOcpp16(String path) {

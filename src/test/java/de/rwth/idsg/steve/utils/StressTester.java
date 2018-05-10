@@ -20,15 +20,17 @@ public class StressTester {
         this.executorService = Executors.newCachedThreadPool();
     }
 
-    public void test(Runnable action) throws InterruptedException {
+    public void test(StressTester.Runnable runnable) throws InterruptedException {
         final CountDownLatch doneSignal = new CountDownLatch(threadCount);
 
         for (int i = 0; i < threadCount; i++) {
             executorService.execute(() -> {
                 try {
+                    runnable.beforeRepeat();
                     for (int j = 0; j < perThreadRepeatCount; j++) {
-                        action.run();
+                        runnable.toRepeat();
                     }
+                    runnable.afterRepeat();
                 } finally {
                     doneSignal.countDown();
                 }
@@ -40,5 +42,11 @@ public class StressTester {
 
     public void shutDown() {
         executorService.shutdown();
+    }
+
+    public interface Runnable {
+        void beforeRepeat();
+        void toRepeat();
+        void afterRepeat();
     }
 }

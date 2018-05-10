@@ -1,12 +1,13 @@
 package de.rwth.idsg.steve;
 
+import de.rwth.idsg.steve.ocpp.OcppVersion;
+import de.rwth.idsg.steve.utils.OcppJsonChargePoint;
 import de.rwth.idsg.steve.utils.StressTester;
 import ocpp.cs._2015._10.AuthorizationStatus;
 import ocpp.cs._2015._10.AuthorizeRequest;
 import ocpp.cs._2015._10.AuthorizeResponse;
 import ocpp.cs._2015._10.BootNotificationRequest;
 import ocpp.cs._2015._10.BootNotificationResponse;
-import ocpp.cs._2015._10.CentralSystemService;
 import ocpp.cs._2015._10.ChargePointErrorCode;
 import ocpp.cs._2015._10.ChargePointStatus;
 import ocpp.cs._2015._10.HeartbeatRequest;
@@ -25,22 +26,23 @@ import org.junit.Assert;
 
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.concurrent.atomic.AtomicInteger;
 
-import static de.rwth.idsg.steve.utils.Helpers.getForOcpp16;
-import static de.rwth.idsg.steve.utils.Helpers.getPath;
+import static de.rwth.idsg.steve.utils.Helpers.getJsonPath;
 import static de.rwth.idsg.steve.utils.Helpers.getRandomString;
 import static de.rwth.idsg.steve.utils.Helpers.getRandomStrings;
 
 /**
  * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
- * @since 18.04.2018
+ * @since 09.05.2018
  */
-public class StressTestSoapOCPP16 extends StressTest {
+public class StressTestJsonOCPP16 extends StressTest {
 
-    private static final String path = getPath();
+    private static final String PATH = getJsonPath();
+    private static final OcppVersion VERSION = OcppVersion.V_16;
 
     public static void main(String[] args) throws Exception {
-        new StressTestSoapOCPP16().attack();
+        new StressTestJsonOCPP16().attack();
     }
 
     protected void attackInternal() throws Exception {
@@ -49,115 +51,133 @@ public class StressTestSoapOCPP16 extends StressTest {
 
         StressTester.Runnable runnable = new StressTester.Runnable() {
 
-            private final ThreadLocal<String> threadLocalChargeBoxId = new ThreadLocal<>();
+            private final ThreadLocal<OcppJsonChargePoint> threadLocalChargePoint = new ThreadLocal<>();
 
             @Override
             public void beforeRepeat() {
-                CentralSystemService client = getForOcpp16(path);
                 ThreadLocalRandom localRandom = ThreadLocalRandom.current();
 
-                threadLocalChargeBoxId.set(chargeBoxIds.get(localRandom.nextInt(chargeBoxIds.size())));
+                String chargeBoxId = chargeBoxIds.get(localRandom.nextInt(chargeBoxIds.size()));
+                threadLocalChargePoint.set(new OcppJsonChargePoint(VERSION, chargeBoxId, PATH));
 
-                String chargeBoxId = threadLocalChargeBoxId.get();
+                OcppJsonChargePoint chargePoint = threadLocalChargePoint.get();
+                chargePoint.start();
 
-                // to insert threadLocalChargeBoxId into db
-                BootNotificationResponse boot = client.bootNotification(
+                chargePoint.prepare(
                         new BootNotificationRequest()
                                 .withChargePointVendor(getRandomString())
                                 .withChargePointModel(getRandomString()),
-                        chargeBoxId);
-                Assert.assertEquals(RegistrationStatus.ACCEPTED, boot.getStatus());
+                        BootNotificationResponse.class,
+                        bootResponse ->  Assert.assertEquals(RegistrationStatus.ACCEPTED, bootResponse.getStatus()),
+                        error -> Assert.fail()
+                );
             }
 
             @Override
             public void toRepeat() {
-                CentralSystemService client = getForOcpp16(path);
                 ThreadLocalRandom localRandom = ThreadLocalRandom.current();
 
-                String chargeBoxId = threadLocalChargeBoxId.get();
+                OcppJsonChargePoint chargePoint = threadLocalChargePoint.get();
 
                 String idTag = idTags.get(localRandom.nextInt(idTags.size()));
                 int connectorId = localRandom.nextInt(1, CONNECTOR_COUNT_PER_CHARGE_BOX + 1);
                 int transactionStart = localRandom.nextInt(0, Integer.MAX_VALUE);
                 int transactionStop = localRandom.nextInt(transactionStart + 1, Integer.MAX_VALUE);
 
-                HeartbeatResponse heartbeat = client.heartbeat(
-                        new HeartbeatRequest(),
-                        chargeBoxId
+                chargePoint.prepare(
+                        new HeartbeatRequest(), HeartbeatResponse.class,
+                        Assert::assertNotNull,
+                        error -> Assert.fail()
                 );
-                Assert.assertNotNull(heartbeat);
 
                 for (int i = 0; i <= CONNECTOR_COUNT_PER_CHARGE_BOX; i++) {
-                    StatusNotificationResponse status = client.statusNotification(
+                    chargePoint.prepare(
                             new StatusNotificationRequest()
                                     .withErrorCode(ChargePointErrorCode.NO_ERROR)
                                     .withStatus(ChargePointStatus.AVAILABLE)
                                     .withConnectorId(i)
                                     .withTimestamp(DateTime.now()),
-                            chargeBoxId
+                            StatusNotificationResponse.class,
+                            Assert::assertNotNull,
+                            error -> Assert.fail()
                     );
-                    Assert.assertNotNull(status);
                 }
 
-                AuthorizeResponse auth = client.authorize(
+                chargePoint.prepare(
                         new AuthorizeRequest().withIdTag(idTag),
-                        chargeBoxId
+                        AuthorizeResponse.class,
+                        response -> Assert.assertNotEquals(AuthorizationStatus.ACCEPTED, response.getIdTagInfo().getStatus()),
+                        error -> Assert.fail()
                 );
-                Assert.assertNotEquals(AuthorizationStatus.ACCEPTED, auth.getIdTagInfo().getStatus());
 
-                StartTransactionResponse start = client.startTransaction(
+                final AtomicInteger transactionId = new AtomicInteger(-1);
+
+                chargePoint.prepare(
                         new StartTransactionRequest()
                                 .withConnectorId(connectorId)
                                 .withIdTag(idTag)
                                 .withTimestamp(DateTime.now())
                                 .withMeterStart(transactionStart),
-                        chargeBoxId
+                        StartTransactionResponse.class,
+                        response -> {
+                            Assert.assertNotNull(response);
+                            transactionId.set(response.getTransactionId());
+                        },
+                        error -> Assert.fail()
                 );
-                Assert.assertNotNull(start);
 
-                StatusNotificationResponse statusStart = client.statusNotification(
+                // wait for StartTransactionResponse to arrive, since we need the transactionId from now on
+                chargePoint.process();
+
+                chargePoint.prepare(
                         new StatusNotificationRequest()
                                 .withErrorCode(ChargePointErrorCode.NO_ERROR)
                                 .withStatus(ChargePointStatus.CHARGING)
                                 .withConnectorId(connectorId)
                                 .withTimestamp(DateTime.now()),
-                        chargeBoxId
+                        StatusNotificationResponse.class,
+                        Assert::assertNotNull,
+                        error -> Assert.fail()
                 );
-                Assert.assertNotNull(statusStart);
 
-                MeterValuesResponse meter = client.meterValues(
+                chargePoint.prepare(
                         new MeterValuesRequest()
                                 .withConnectorId(connectorId)
-                                .withTransactionId(start.getTransactionId())
+                                .withTransactionId(transactionId.get())
                                 .withMeterValue(getMeterValues(transactionStart, transactionStop)),
-                        chargeBoxId
+                        MeterValuesResponse.class,
+                        Assert::assertNotNull,
+                        error -> Assert.fail()
                 );
-                Assert.assertNotNull(meter);
 
-                StopTransactionResponse stop = client.stopTransaction(
+                chargePoint.prepare(
                         new StopTransactionRequest()
-                                .withTransactionId(start.getTransactionId())
+                                .withTransactionId(transactionId.get())
                                 .withTimestamp(DateTime.now())
                                 .withIdTag(idTag)
                                 .withMeterStop(transactionStop),
-                        chargeBoxId
+                        StopTransactionResponse.class,
+                        Assert::assertNotNull,
+                        error -> Assert.fail()
                 );
-                Assert.assertNotNull(stop);
 
-                StatusNotificationResponse statusStop = client.statusNotification(
+                chargePoint.prepare(
                         new StatusNotificationRequest()
                                 .withErrorCode(ChargePointErrorCode.NO_ERROR)
                                 .withStatus(ChargePointStatus.AVAILABLE)
                                 .withConnectorId(connectorId)
                                 .withTimestamp(DateTime.now()),
-                        chargeBoxId
+                        StatusNotificationResponse.class,
+                        Assert::assertNotNull,
+                        error -> Assert.fail()
                 );
-                Assert.assertNotNull(statusStop);
+
+                chargePoint.process();
             }
 
             @Override
             public void afterRepeat() {
-
+                threadLocalChargePoint.get().close();
             }
         };
 

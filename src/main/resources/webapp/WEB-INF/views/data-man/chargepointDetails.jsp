@@ -37,8 +37,8 @@
                     <tr><td>Charge Point Model:</td><td>${cp.chargeBox.chargePointModel}</td></tr>
                     <tr><td>Charge Point Serial Number:</td><td>${cp.chargeBox.chargePointSerialNumber}</td></tr>
                     <tr><td>Charge Box Serial Number:</td><td>${cp.chargeBox.chargePointSerialNumber}</td></tr>
-                    <tr><td>Firewire Version:</td><td>${cp.chargeBox.fwVersion}</td></tr>
-                    <tr><td>Firewire Update Timestamp:</td><td>${cp.chargeBox.fwUpdateTimestamp}</td></tr>
+                    <tr><td>Firmware Version:</td><td>${cp.chargeBox.fwVersion}</td></tr>
+                    <tr><td>Firmware Update Timestamp:</td><td>${cp.chargeBox.fwUpdateTimestamp}</td></tr>
                     <tr><td>Iccid:</td><td>${cp.chargeBox.iccid}</td></tr>
                     <tr><td>Imsi:</td><td>${cp.chargeBox.imsi}</td></tr>
                     <tr><td>Meter Type:</td><td>${cp.chargeBox.meterType}</td></tr>

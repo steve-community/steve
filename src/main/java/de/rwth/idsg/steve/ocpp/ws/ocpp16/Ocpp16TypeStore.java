@@ -11,6 +11,9 @@ public final class Ocpp16TypeStore extends AbstractTypeStore {
     public static final Ocpp16TypeStore INSTANCE = new Ocpp16TypeStore();
 
     private Ocpp16TypeStore() {
-        super("ocpp.cs._2015._10", "ocpp.cp._2015._10");
+        super(
+                ocpp.cs._2015._10.ObjectFactory.class.getPackage().getName(),
+                ocpp.cp._2015._10.ObjectFactory.class.getPackage().getName()
+        );
     }
 }

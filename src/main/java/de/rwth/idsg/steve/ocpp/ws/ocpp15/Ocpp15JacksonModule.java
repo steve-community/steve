@@ -27,7 +27,10 @@ public class Ocpp15JacksonModule extends SimpleModule {
         sc.setMixInAnnotations(MeterValuesRequest.class, MeterValue15Mixin.class);
 
         EnumProcessor.apply(
-                Arrays.asList("ocpp.cp._2012._06", "ocpp.cs._2012._06"),
+                Arrays.asList(
+                        ocpp.cs._2012._06.ObjectFactory.class.getPackage().getName(),
+                        ocpp.cp._2012._06.ObjectFactory.class.getPackage().getName()
+                ),
                 clazz -> sc.setMixInAnnotations(clazz, EnumMixin.class)
         );
     }

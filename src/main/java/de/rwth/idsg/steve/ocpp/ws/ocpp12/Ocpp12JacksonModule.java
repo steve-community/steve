@@ -22,7 +22,10 @@ public class Ocpp12JacksonModule extends SimpleModule {
         super.setupModule(sc);
 
         EnumProcessor.apply(
-                Arrays.asList("ocpp.cp._2010._08", "ocpp.cs._2010._08"),
+                Arrays.asList(
+                        ocpp.cs._2010._08.ObjectFactory.class.getPackage().getName(),
+                        ocpp.cp._2010._08.ObjectFactory.class.getPackage().getName()
+                ),
                 clazz -> sc.setMixInAnnotations(clazz, EnumMixin.class)
         );
     }

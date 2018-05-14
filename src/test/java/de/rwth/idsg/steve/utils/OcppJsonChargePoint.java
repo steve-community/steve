@@ -28,7 +28,7 @@ import org.eclipse.jetty.websocket.client.WebSocketClient;
 
 import java.io.IOException;
 import java.net.URI;
-import java.util.Collection;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -129,7 +129,10 @@ public class OcppJsonChargePoint {
     }
 
     public void process() {
-        Collection<ResponseContext> values = responseContextMap.values();
+        // copy the values in a new list to be iterated over, because otherwise we get a ConcurrentModificationException,
+        // since the onMessage(..) uses the same responseContextMap to remove an item while looping over its items here.
+        ArrayList<ResponseContext> values = new ArrayList<>(responseContextMap.values());
+
         receivedResponsesSignal = new CountDownLatch(values.size());
 
         // send all messages
@@ -147,9 +150,6 @@ public class OcppJsonChargePoint {
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
-
-        // we processed everything in the map, clear it such that the map is empty for the next process call
-        responseContextMap.clear();
     }
 
     public void close() {

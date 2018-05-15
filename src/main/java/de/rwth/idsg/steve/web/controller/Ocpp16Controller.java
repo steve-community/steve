@@ -121,6 +121,17 @@ public class Ocpp16Controller extends Ocpp15Controller {
         }
         return REDIRECT_TASKS_PATH + getClient15().getConfiguration(params);
     }
+    
+    @RequestMapping(value = CHANGE_CONF_PATH, method = RequestMethod.POST)
+    public String postChangeConf(@Valid @ModelAttribute(PARAMS) ChangeConfigurationParams params,
+                              BindingResult result, Model model) {
+        if (result.hasErrors()) {
+            setCommonAttributes(model);
+            model.addAttribute("ocppConfKeys", ConfigurationKeyEnum.OCPP_16_MAP_RW);
+            return getPrefix() + CHANGE_CONF_PATH;
+        }
+        return REDIRECT_TASKS_PATH + getClient15().changeConfiguration(params);
+    }
 
     // -------------------------------------------------------------------------
     // New Http methods (GET)

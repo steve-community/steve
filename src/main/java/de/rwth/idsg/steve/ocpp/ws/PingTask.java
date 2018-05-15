@@ -17,17 +17,18 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 @Slf4j
 @RequiredArgsConstructor
 public class PingTask implements Runnable {
+    private final String chargeBoxId;
     private final WebSocketSession session;
 
     private static final PingMessage PING_MESSAGE = new PingMessage(ByteBuffer.wrap("ping".getBytes(UTF_8)));
 
     @Override
     public void run() {
-        log.info("[id={}] Sending ping message", session.getId());
+        WebSocketLogger.sendingPing(chargeBoxId, session);
         try {
             session.sendMessage(PING_MESSAGE);
         } catch (IOException e) {
-            log.error("[id={}] Ping failed", session.getId());
+            WebSocketLogger.pingError(chargeBoxId, session, e);
             // TODO: Do something about this
         }
     }

@@ -9,8 +9,6 @@ import de.rwth.idsg.steve.ocpp.ws.pipeline.IncomingPipeline;
 import de.rwth.idsg.steve.repository.OcppServerRepository;
 import de.rwth.idsg.steve.service.NotificationService;
 import org.joda.time.DateTime;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.socket.BinaryMessage;
 import org.springframework.web.socket.CloseStatus;
@@ -34,7 +32,6 @@ import java.util.function.Consumer;
  * @since 17.03.2015
  */
 public abstract class AbstractWebSocketEndpoint implements WebSocketHandler {
-    private final Logger log = LoggerFactory.getLogger(getClass());
 
     @Autowired private ScheduledExecutorService service;
     @Autowired private OcppServerRepository ocppServerRepository;
@@ -92,8 +89,6 @@ public abstract class AbstractWebSocketEndpoint implements WebSocketHandler {
 
     private void handlePongMessage(WebSocketSession session) {
         WebSocketLogger.receivedPong(getChargeBoxId(session), session);
-
-        // TODO: Not sure about the following. Should update DB? Should call directly repo?
         ocppServerRepository.updateChargeboxHeartbeat(getChargeBoxId(session), DateTime.now());
     }
 
@@ -106,7 +101,7 @@ public abstract class AbstractWebSocketEndpoint implements WebSocketHandler {
         // Just to keep the connection alive, such that the servers do not close
         // the connection because of a idle timeout, we ping-pong at fixed intervals.
         ScheduledFuture pingSchedule = service.scheduleAtFixedRate(
-                new PingTask(session),
+                new PingTask(chargeBoxId, session),
                 WebSocketConfiguration.PING_INTERVAL,
                 WebSocketConfiguration.PING_INTERVAL,
                 TimeUnit.MINUTES);
@@ -151,8 +146,7 @@ public abstract class AbstractWebSocketEndpoint implements WebSocketHandler {
 
     @Override
     public void handleTransportError(WebSocketSession session, Throwable throwable) throws Exception {
-        log.error("Oops", throwable);
-        // TODO: Do something about this
+        WebSocketLogger.transportError(getChargeBoxId(session), session, throwable);
     }
 
     @Override

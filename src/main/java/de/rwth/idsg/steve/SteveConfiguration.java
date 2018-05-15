@@ -1,5 +1,6 @@
 package de.rwth.idsg.steve;
 
+import de.rwth.idsg.steve.ocpp.ws.custom.WsSessionSelectStrategy;
 import de.rwth.idsg.steve.ocpp.ws.custom.WsSessionSelectStrategyEnum;
 import de.rwth.idsg.steve.utils.PropertiesFileLoader;
 import lombok.Builder;
@@ -139,7 +140,7 @@ public enum SteveConfiguration {
     @Builder @Getter
     public static class Ocpp {
         private final boolean autoRegisterUnknownStations;
-        private final WsSessionSelectStrategyEnum wsSessionSelectStrategy;
+        private final WsSessionSelectStrategy wsSessionSelectStrategy;
     }
 
 }

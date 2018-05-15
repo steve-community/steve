@@ -37,7 +37,7 @@ public enum WsSessionSelectStrategyEnum implements WsSessionSelectStrategy {
         }
     };
 
-    public static WsSessionSelectStrategyEnum fromName(String v) {
+    public static WsSessionSelectStrategy fromName(String v) {
         for (WsSessionSelectStrategyEnum s: WsSessionSelectStrategyEnum.values()) {
             if (s.name().equals(v)) {
                 return s;

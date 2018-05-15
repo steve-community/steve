@@ -1,5 +1,6 @@
 package de.rwth.idsg.steve.ocpp.ws;
 
+import com.google.common.base.Strings;
 import de.rwth.idsg.steve.config.WebSocketConfiguration;
 import de.rwth.idsg.steve.ocpp.OcppVersion;
 import de.rwth.idsg.steve.ocpp.ws.data.CommunicationContext;
@@ -74,6 +75,12 @@ public abstract class AbstractWebSocketEndpoint implements WebSocketHandler {
     private void handleTextMessage(WebSocketSession session, TextMessage webSocketMessage) throws Exception {
         String incomingString = webSocketMessage.getPayload();
         String chargeBoxId = getChargeBoxId(session);
+
+        // https://github.com/RWTH-i5-IDSG/steve/issues/66
+        if (Strings.isNullOrEmpty(incomingString)) {
+            WebSocketLogger.receivedEmptyText(chargeBoxId, session);
+            return;
+        }
 
         WebSocketLogger.receivedText(chargeBoxId, session, incomingString);
 

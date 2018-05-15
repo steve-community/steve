@@ -37,6 +37,10 @@ public final class WebSocketLogger {
         log.info("[chargeBoxId={}, sessionId={}] Received: {}", chargeBoxId, session.getId(), msg);
     }
 
+    public static void receivedEmptyText(String chargeBoxId, WebSocketSession session) {
+        log.warn("[chargeBoxId={}, sessionId={}] Received empty text message. Will pretend this never happened.", chargeBoxId, session.getId());
+    }
+
     public static void pingError(String chargeBoxId, WebSocketSession session, Throwable t) {
         if (log.isErrorEnabled()) {
             log.error("[chargeBoxId=" + chargeBoxId + ", sessionId=" + session.getId() + "] Ping error", t);

@@ -3,9 +3,6 @@ package de.rwth.idsg.steve.config;
 import de.rwth.idsg.steve.ocpp.soap.LoggingFeatureProxy;
 import de.rwth.idsg.steve.ocpp.soap.MediatorInInterceptor;
 import de.rwth.idsg.steve.ocpp.soap.MessageIdInterceptor;
-import de.rwth.idsg.steve.ocpp.ws.custom.AlwaysLastStrategy;
-import de.rwth.idsg.steve.ocpp.ws.custom.RoundRobinStrategy;
-import de.rwth.idsg.steve.ocpp.ws.custom.WsSessionSelectStrategy;
 import org.apache.cxf.Bus;
 import org.apache.cxf.bus.spring.SpringBus;
 import org.apache.cxf.common.logging.LogUtils;
@@ -69,18 +66,6 @@ public class OcppConfiguration {
     @Bean(name = Bus.DEFAULT_BUS_ID, destroyMethod = "shutdown")
     public SpringBus springBus() {
         return new SpringBus();
-    }
-
-    @Bean
-    public WsSessionSelectStrategy sessionSelectStrategy() {
-        switch (CONFIG.getOcpp().getWsSessionSelectStrategy()) {
-            case ALWAYS_LAST:
-                return new AlwaysLastStrategy();
-            case ROUND_ROBIN:
-                return new RoundRobinStrategy();
-            default:
-                throw new RuntimeException("Could not find a valid WsSessionSelectStrategy");
-        }
     }
 
     private void createOcppService(Object serviceBean, String address,

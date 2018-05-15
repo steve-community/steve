@@ -2,7 +2,6 @@ package de.rwth.idsg.steve.ocpp.ws;
 
 import de.rwth.idsg.steve.config.WebSocketConfiguration;
 import de.rwth.idsg.steve.ocpp.OcppVersion;
-import de.rwth.idsg.steve.ocpp.ws.custom.WsSessionSelectStrategy;
 import de.rwth.idsg.steve.ocpp.ws.data.CommunicationContext;
 import de.rwth.idsg.steve.ocpp.ws.data.SessionContext;
 import de.rwth.idsg.steve.ocpp.ws.pipeline.IncomingPipeline;
@@ -36,24 +35,21 @@ public abstract class AbstractWebSocketEndpoint implements WebSocketHandler {
     @Autowired private ScheduledExecutorService service;
     @Autowired private OcppServerRepository ocppServerRepository;
     @Autowired private FutureResponseContextStore futureResponseContextStore;
-    @Autowired private WsSessionSelectStrategy wsSessionSelectStrategy;
     @Autowired private NotificationService notificationService;
 
     public static final String CHARGEBOX_ID_KEY = "CHARGEBOX_ID_KEY";
 
-    private IncomingPipeline pipeline;
-    private SessionContextStoreImpl sessionContextStore;
-
+    private final SessionContextStoreImpl sessionContextStore = new SessionContextStoreImpl();
     private final List<Consumer<String>> connectedCallbackList = new ArrayList<>();
     private final List<Consumer<String>> disconnectedCallbackList = new ArrayList<>();
-
     private final Object sessionContextLock = new Object();
+
+    private IncomingPipeline pipeline;
 
     public abstract OcppVersion getVersion();
 
     public void init(IncomingPipeline pipeline) {
         this.pipeline = pipeline;
-        sessionContextStore = new SessionContextStoreImpl(wsSessionSelectStrategy);
 
         connectedCallbackList.add((chargeBoxId) -> notificationService.ocppStationWebSocketConnected(chargeBoxId));
         disconnectedCallbackList.add((chargeBoxId) -> notificationService.ocppStationWebSocketDisconnected(chargeBoxId));

@@ -19,6 +19,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.locks.Lock;
 
+import static de.rwth.idsg.steve.SteveConfiguration.CONFIG;
+
 /**
  * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
  * @since 17.03.2015
@@ -34,11 +36,7 @@ public class SessionContextStoreImpl implements SessionContextStore {
 
     private final Striped<Lock> locks = Striped.lock(16);
 
-    private final WsSessionSelectStrategy wsSessionSelectStrategy;
-
-    public SessionContextStoreImpl(WsSessionSelectStrategy wsSessionSelectStrategy) {
-        this.wsSessionSelectStrategy = wsSessionSelectStrategy;
-    }
+    private final WsSessionSelectStrategy wsSessionSelectStrategy = CONFIG.getOcpp().getWsSessionSelectStrategy();
 
     @Override
     public void add(String chargeBoxId, WebSocketSession session, ScheduledFuture pingSchedule) {

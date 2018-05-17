@@ -31,6 +31,7 @@ public enum SteveConfiguration {
 
     private final String contextPath;
     private final String steveVersion;
+    private final String gitDescribe;
     private final ApplicationProfile profile;
     private final Ocpp ocpp;
     private final Auth auth;
@@ -42,6 +43,7 @@ public enum SteveConfiguration {
 
         contextPath = sanitizeContextPath(p.getOptionalString("context.path"));
         steveVersion = p.getString("steve.version");
+        gitDescribe = useFallbackIfNotSet(p.getOptionalString("git.describe"), null);
         profile = ApplicationProfile.fromName(p.getString("profile"));
 
         jetty = Jetty.builder()
@@ -76,6 +78,26 @@ public enum SteveConfiguration {
                    .build();
 
         validate();
+    }
+
+    public String getSteveCompositeVersion() {
+        if (gitDescribe == null) {
+            return steveVersion;
+        } else {
+            return steveVersion + "-g" + gitDescribe;
+        }
+    }
+
+    private static String useFallbackIfNotSet(String value, String fallback) {
+        if (value == null) {
+            // if the property is optional, value will be null
+            return fallback;
+        } else if (value.startsWith("${")) {
+            // property value variables start with "${" (if maven is not used, the value will not be set)
+            return fallback;
+        } else {
+            return value;
+        }
     }
 
     private String sanitizeContextPath(String s) {

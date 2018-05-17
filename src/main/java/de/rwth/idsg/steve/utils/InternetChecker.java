@@ -29,7 +29,7 @@ public final class InternetChecker {
     );
 
     static {
-        System.setProperty("http.agent", "SteVe/" + SteveConfiguration.CONFIG.getSteveVersion());
+        System.setProperty("http.agent", "SteVe/" + SteveConfiguration.CONFIG.getSteveCompositeVersion());
     }
 
     /**

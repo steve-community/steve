@@ -120,6 +120,11 @@ Screenshots
 9. [Operations - OCPP v1.5](website/screenshots/ocpp15.png)
 10. [Settings](website/screenshots/settings.png)
 
+
+GDPR
+-----
+If you are in the EU and offer vehicle charging to other people using SteVe, keep in mind that you have to comply to the General Data Protection Regulation (GDPR) as SteVe processes charging transactions, which can be considered personal data.
+
 Are you having issues?
 -----
 See the [FAQ](https://github.com/RWTH-i5-IDSG/steve/wiki/FAQ)

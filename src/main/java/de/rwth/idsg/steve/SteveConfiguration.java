@@ -5,6 +5,8 @@ import de.rwth.idsg.steve.ocpp.ws.custom.WsSessionSelectStrategyEnum;
 import de.rwth.idsg.steve.utils.PropertiesFileLoader;
 import lombok.Builder;
 import lombok.Getter;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 /**
  * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
@@ -66,9 +68,12 @@ public enum SteveConfiguration {
                .sqlLogging(p.getBoolean("db.sql.logging"))
                .build();
 
+        PasswordEncoder encoder = new BCryptPasswordEncoder();
+
         auth = Auth.builder()
+                   .passwordEncoder(encoder)
                    .userName(p.getString("auth.user"))
-                   .password(p.getString("auth.password"))
+                   .encodedPassword(encoder.encode(p.getString("auth.password")))
                    .build();
 
         ocpp = Ocpp.builder()
@@ -154,8 +159,9 @@ public enum SteveConfiguration {
     // Credentials for Web interface access
     @Builder @Getter
     public static class Auth {
+        private final PasswordEncoder passwordEncoder;
         private final String userName;
-        private final String password;
+        private final String encodedPassword;
     }
 
     // OCPP-related configuration

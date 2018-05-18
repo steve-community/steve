@@ -27,8 +27,6 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     /**
      * Password encoding changed with spring-security 5.0.0. We either have to use a prefix before the password to
      * indicate which actual encoder {@link DelegatingPasswordEncoder} should use [1, 2] or specify the encoder as we do.
-     * {@link NoOpPasswordEncoder} is deprecated because it is not secure since it is not a one way hash function and
-     * uses plain text matching, but is good enough for our simple user management and login authorization case.
      *
      * [1] https://spring.io/blog/2017/11/01/spring-security-5-0-0-rc1-released#password-storage-format
      * [2] {@link PasswordEncoderFactories#createDelegatingPasswordEncoder()}
@@ -36,9 +34,9 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     @Autowired
     public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
         auth.inMemoryAuthentication()
-            .passwordEncoder(NoOpPasswordEncoder.getInstance())
+            .passwordEncoder(CONFIG.getAuth().getPasswordEncoder())
             .withUser(CONFIG.getAuth().getUserName())
-            .password(CONFIG.getAuth().getPassword())
+            .password(CONFIG.getAuth().getEncodedPassword())
             .roles("ADMIN");
     }
 

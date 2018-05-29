@@ -56,7 +56,6 @@ public class OcppTagsController {
         return "data-man/ocppTags";
     }
 
-
     @RequestMapping(value = QUERY_PATH, method = RequestMethod.GET)
     public String getQuery(@ModelAttribute(PARAMS) OcppTagQueryForm params, Model model) {
         initList(model, params);

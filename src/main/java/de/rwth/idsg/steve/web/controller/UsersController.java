@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import javax.validation.Valid;
-import java.util.Optional;
 
 /**
  * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
@@ -78,15 +77,7 @@ public class UsersController {
         form.setEMail(details.getUserRecord().getEMail());
         form.setNote(details.getUserRecord().getNote());
         form.setAddress(ControllerHelper.recordToDto(details.getAddress()));
-
-        String ocppIdTag;
-        Optional<String> optional = details.getOcppIdTag();
-        if (optional.isPresent()) {
-            ocppIdTag = optional.get();
-        } else {
-            ocppIdTag = ControllerHelper.EMPTY_OPTION;
-        }
-        form.setOcppIdTag(ocppIdTag);
+        form.setOcppIdTag(details.getOcppIdTag().orElse(ControllerHelper.EMPTY_OPTION));
 
         model.addAttribute("userForm", form);
         setTags(model);

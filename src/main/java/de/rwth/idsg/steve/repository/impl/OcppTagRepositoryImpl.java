@@ -77,12 +77,12 @@ public class OcppTagRepositoryImpl implements OcppTagRepository {
                 break;
 
             case TRUE:
-                selectQuery.addConditions(OCPP_TAG.EXPIRY_DATE.lessOrEqual(CustomDSL.utcTimestamp()));
+                selectQuery.addConditions(OCPP_TAG.EXPIRY_DATE.lessOrEqual(DateTime.now()));
                 break;
 
             case FALSE:
                 selectQuery.addConditions(
-                        OCPP_TAG.EXPIRY_DATE.isNull().or(OCPP_TAG.EXPIRY_DATE.greaterThan(CustomDSL.utcTimestamp()))
+                        OCPP_TAG.EXPIRY_DATE.isNull().or(OCPP_TAG.EXPIRY_DATE.greaterThan(DateTime.now()))
                 );
                 break;
 
@@ -136,7 +136,7 @@ public class OcppTagRepositoryImpl implements OcppTagRepository {
                   .from(OCPP_TAG)
                   .where(OCPP_TAG.IN_TRANSACTION.isFalse())
                     .and(OCPP_TAG.BLOCKED.isFalse())
-                    .and(OCPP_TAG.EXPIRY_DATE.isNull().or(OCPP_TAG.EXPIRY_DATE.greaterThan(CustomDSL.utcTimestamp())))
+                    .and(OCPP_TAG.EXPIRY_DATE.isNull().or(OCPP_TAG.EXPIRY_DATE.greaterThan(DateTime.now())))
                   .fetch(OCPP_TAG.ID_TAG);
     }
 

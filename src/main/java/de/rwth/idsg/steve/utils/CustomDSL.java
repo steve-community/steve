@@ -1,5 +1,6 @@
 package de.rwth.idsg.steve.utils;
 
+import de.rwth.idsg.steve.SteveConfiguration;
 import org.joda.time.DateTime;
 import org.jooq.Condition;
 import org.jooq.Field;
@@ -15,6 +16,10 @@ public final class CustomDSL {
     private CustomDSL() {
     }
 
+    /**
+     * @deprecated because it does not consider changes of {@link SteveConfiguration#timeZoneId}.
+     */
+    @Deprecated
     public static Field<DateTime> utcTimestamp() {
         return field("{utc_timestamp(6)}", DateTime.class);
     }

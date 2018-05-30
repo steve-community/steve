@@ -8,7 +8,6 @@ import de.rwth.idsg.steve.repository.dto.InsertTransactionParams;
 import de.rwth.idsg.steve.repository.dto.TransactionStatusUpdate;
 import de.rwth.idsg.steve.repository.dto.UpdateChargeboxParams;
 import de.rwth.idsg.steve.repository.dto.UpdateTransactionParams;
-import de.rwth.idsg.steve.utils.CustomDSL;
 import jooq.steve.db.tables.records.ConnectorMeterValueRecord;
 import lombok.extern.slf4j.Slf4j;
 import ocpp.cs._2015._10.MeterValue;
@@ -75,7 +74,7 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
     public void updateChargeboxFirmwareStatus(String chargeBoxIdentity, String firmwareStatus) {
         ctx.update(CHARGE_BOX)
            .set(CHARGE_BOX.FW_UPDATE_STATUS, firmwareStatus)
-           .set(CHARGE_BOX.FW_UPDATE_TIMESTAMP, CustomDSL.utcTimestamp())
+           .set(CHARGE_BOX.FW_UPDATE_TIMESTAMP, DateTime.now())
            .where(CHARGE_BOX.CHARGE_BOX_ID.equal(chargeBoxIdentity))
            .execute();
     }
@@ -84,7 +83,7 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
     public void updateChargeboxDiagnosticsStatus(String chargeBoxIdentity, String status) {
         ctx.update(CHARGE_BOX)
            .set(CHARGE_BOX.DIAGNOSTICS_STATUS, status)
-           .set(CHARGE_BOX.DIAGNOSTICS_TIMESTAMP, CustomDSL.utcTimestamp())
+           .set(CHARGE_BOX.DIAGNOSTICS_TIMESTAMP, DateTime.now())
            .where(CHARGE_BOX.CHARGE_BOX_ID.equal(chargeBoxIdentity))
            .execute();
     }

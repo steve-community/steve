@@ -4,7 +4,6 @@ import de.rwth.idsg.steve.SteveException;
 import de.rwth.idsg.steve.repository.TransactionRepository;
 import de.rwth.idsg.steve.repository.dto.Transaction;
 import de.rwth.idsg.steve.repository.dto.TransactionDetails;
-import de.rwth.idsg.steve.utils.CustomDSL;
 import de.rwth.idsg.steve.utils.DateTimeUtils;
 import de.rwth.idsg.steve.web.dto.TransactionQueryForm;
 import jooq.steve.db.tables.records.ConnectorMeterValueRecord;
@@ -267,7 +266,7 @@ public class TransactionRepositoryImpl implements TransactionRepository {
         switch (form.getPeriodType()) {
             case TODAY:
                 selectQuery.addConditions(
-                        date(TRANSACTION.START_TIMESTAMP).eq(date(CustomDSL.utcTimestamp()))
+                        date(TRANSACTION.START_TIMESTAMP).eq(date(DateTime.now()))
                 );
                 break;
 

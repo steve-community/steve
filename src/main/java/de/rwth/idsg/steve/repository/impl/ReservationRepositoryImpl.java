@@ -5,7 +5,6 @@ import de.rwth.idsg.steve.repository.ReservationRepository;
 import de.rwth.idsg.steve.repository.ReservationStatus;
 import de.rwth.idsg.steve.repository.dto.InsertReservationParams;
 import de.rwth.idsg.steve.repository.dto.Reservation;
-import de.rwth.idsg.steve.utils.CustomDSL;
 import de.rwth.idsg.steve.utils.DateTimeUtils;
 import de.rwth.idsg.steve.web.dto.ReservationQueryForm;
 import lombok.extern.slf4j.Slf4j;
@@ -93,7 +92,7 @@ public class ReservationRepositoryImpl implements ReservationRepository {
                   .where(RESERVATION.CONNECTOR_PK.in(DSL.select(CONNECTOR.CONNECTOR_PK)
                                                         .from(CONNECTOR)
                                                         .where(CONNECTOR.CHARGE_BOX_ID.equal(chargeBoxId))))
-                  .and(RESERVATION.EXPIRY_DATETIME.greaterThan(CustomDSL.utcTimestamp()))
+                  .and(RESERVATION.EXPIRY_DATETIME.greaterThan(DateTime.now()))
                   .and(RESERVATION.STATUS.equal(ReservationStatus.ACCEPTED.name()))
                   .fetch(RESERVATION.RESERVATION_PK);
     }
@@ -200,7 +199,7 @@ public class ReservationRepositoryImpl implements ReservationRepository {
     private void processType(SelectQuery selectQuery, ReservationQueryForm form) {
         switch (form.getPeriodType()) {
             case ACTIVE:
-                selectQuery.addConditions(RESERVATION.EXPIRY_DATETIME.greaterThan(CustomDSL.utcTimestamp()));
+                selectQuery.addConditions(RESERVATION.EXPIRY_DATETIME.greaterThan(DateTime.now()));
                 break;
 
             case FROM_TO:

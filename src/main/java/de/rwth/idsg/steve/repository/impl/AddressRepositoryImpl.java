@@ -2,13 +2,13 @@ package de.rwth.idsg.steve.repository.impl;
 
 import de.rwth.idsg.steve.SteveException;
 import de.rwth.idsg.steve.repository.AddressRepository;
-import de.rwth.idsg.steve.utils.CustomDSL;
 import de.rwth.idsg.steve.web.dto.Address;
 import jooq.steve.db.tables.records.AddressRecord;
 import lombok.extern.slf4j.Slf4j;
 import org.jooq.DSLContext;
 import org.jooq.Record1;
 import org.jooq.SelectConditionStep;
+import org.jooq.exception.DataAccessException;
 import org.springframework.stereotype.Repository;
 
 import javax.annotation.Nullable;
@@ -74,21 +74,19 @@ public class AddressRepositoryImpl implements AddressRepository {
     // -------------------------------------------------------------------------
 
     private Integer insert(DSLContext ctx, Address ad) {
-        int count = ctx.insertInto(ADDRESS)
-                       .set(ADDRESS.STREET, ad.getStreet())
-                       .set(ADDRESS.HOUSE_NUMBER, ad.getHouseNumber())
-                       .set(ADDRESS.ZIP_CODE, ad.getZipCode())
-                       .set(ADDRESS.CITY, ad.getCity())
-                       .set(ADDRESS.COUNTRY, ad.getCountryAlpha2OrNull())
-                       .execute();
-
-        if (count != 1) {
+        try {
+            return ctx.insertInto(ADDRESS)
+                      .set(ADDRESS.STREET, ad.getStreet())
+                      .set(ADDRESS.HOUSE_NUMBER, ad.getHouseNumber())
+                      .set(ADDRESS.ZIP_CODE, ad.getZipCode())
+                      .set(ADDRESS.CITY, ad.getCity())
+                      .set(ADDRESS.COUNTRY, ad.getCountryAlpha2OrNull())
+                      .returning(ADDRESS.ADDRESS_PK)
+                      .fetchOne()
+                      .getAddressPk();
+        } catch (DataAccessException e) {
             throw new SteveException("Failed to insert the address");
         }
-
-        return ctx.select(CustomDSL.lastInsertId())
-                  .fetchOne()
-                  .value1();
     }
 
     private void update(DSLContext ctx, Address ad) {

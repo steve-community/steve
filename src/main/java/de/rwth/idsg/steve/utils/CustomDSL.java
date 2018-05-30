@@ -33,13 +33,6 @@ public final class CustomDSL {
     }
 
     /**
-     * http://dev.mysql.com/doc/refman/5.6/en/information-functions.html#function_last-insert-id
-     */
-    public static Field<Integer> lastInsertId() {
-        return field("last_insert_id()", Integer.class);
-    }
-
-    /**
      * http://dev.mysql.com/doc/refman/5.7/en/pattern-matching.html
      *
      * It's not as advanced as fuzzy full-text search, but still better than nothing. DB will look

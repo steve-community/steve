@@ -1,6 +1,5 @@
 package de.rwth.idsg.steve.utils;
 
-import org.joda.time.DateTimeZone;
 import org.joda.time.LocalDate;
 import org.jooq.Converter;
 
@@ -17,7 +16,7 @@ public class DateConverter implements Converter<Date, LocalDate> {
         if (sqlDate == null) {
             return null;
         } else {
-            return new LocalDate(sqlDate.getTime(), DateTimeZone.UTC);
+            return new LocalDate(sqlDate.getTime());
         }
     }
 
@@ -26,7 +25,7 @@ public class DateConverter implements Converter<Date, LocalDate> {
         if (jodaDate == null) {
             return null;
         } else {
-            return new Date(jodaDate.toDateTimeAtStartOfDay(DateTimeZone.UTC).getMillis());
+            return new Date(jodaDate.toDateTimeAtStartOfDay().getMillis());
         }
     }
 

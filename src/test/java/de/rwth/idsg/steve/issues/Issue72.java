@@ -1,0 +1,99 @@
+package de.rwth.idsg.steve.issues;
+
+import de.rwth.idsg.steve.StressTest;
+import de.rwth.idsg.steve.utils.Helpers;
+import de.rwth.idsg.steve.utils.StressTester;
+import de.rwth.idsg.steve.utils.__DatabasePreparer__;
+import ocpp.cs._2015._10.BootNotificationRequest;
+import ocpp.cs._2015._10.BootNotificationResponse;
+import ocpp.cs._2015._10.CentralSystemService;
+import ocpp.cs._2015._10.RegistrationStatus;
+import ocpp.cs._2015._10.StartTransactionRequest;
+import ocpp.cs._2015._10.StartTransactionResponse;
+import ocpp.cs._2015._10.StopTransactionRequest;
+import ocpp.cs._2015._10.StopTransactionResponse;
+import org.joda.time.DateTime;
+import org.junit.Assert;
+
+import static de.rwth.idsg.steve.utils.Helpers.getForOcpp16;
+import static de.rwth.idsg.steve.utils.Helpers.getPath;
+import static de.rwth.idsg.steve.utils.Helpers.getRandomString;
+
+/**
+ * https://github.com/RWTH-i5-IDSG/steve/issues/72
+ *
+ * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
+ * @since 27.06.2018
+ */
+public class Issue72 extends StressTest {
+
+    private static final String path = getPath();
+
+    public static void main(String[] args) throws Exception {
+        new Issue72().attack();
+    }
+
+    protected void attackInternal() throws Exception {
+        String idTag = __DatabasePreparer__.getRegisteredOcppTag();
+        String chargeBoxId = Helpers.getRandomString();
+
+        DateTime startDateTime = DateTime.now();
+        DateTime stopDateTime = startDateTime.plusHours(5);
+
+        int connectorId = 2;
+
+        int meterStart = 444;
+        int meterStop = 99999;
+
+        BootNotificationResponse boot = getForOcpp16(path).bootNotification(
+                new BootNotificationRequest()
+                        .withChargePointVendor(getRandomString())
+                        .withChargePointModel(getRandomString()),
+                chargeBoxId);
+        Assert.assertEquals(RegistrationStatus.ACCEPTED, boot.getStatus());
+
+        StartTransactionResponse start = getForOcpp16(path).startTransaction(
+                new StartTransactionRequest()
+                        .withConnectorId(connectorId)
+                        .withIdTag(idTag)
+                        .withTimestamp(startDateTime)
+                        .withMeterStart(meterStart),
+                chargeBoxId
+        );
+        Assert.assertNotNull(start);
+
+        int transactionId = start.getTransactionId();
+
+        StressTester.Runnable runnable = new StressTester.Runnable() {
+
+            private final ThreadLocal<CentralSystemService> threadLocalClient = new ThreadLocal<>();
+
+            @Override
+            public void beforeRepeat() {
+                threadLocalClient.set(getForOcpp16(path));
+            }
+
+            @Override
+            public void toRepeat() {
+                StopTransactionResponse stop = threadLocalClient.get().stopTransaction(
+                        new StopTransactionRequest()
+                                .withTransactionId(transactionId)
+                                .withTimestamp(stopDateTime)
+                                .withIdTag(idTag)
+                                .withMeterStop(meterStop),
+                        chargeBoxId
+                );
+                Assert.assertNotNull(stop);
+            }
+
+            @Override
+            public void afterRepeat() {
+
+            }
+        };
+
+        StressTester tester = new StressTester(THREAD_COUNT, REPEAT_COUNT_PER_THREAD);
+        tester.test(runnable);
+        tester.shutDown();
+    }
+}

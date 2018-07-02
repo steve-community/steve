@@ -151,7 +151,7 @@ public class CentralSystemService16_Service {
                                        .build();
 
         Integer transactionId = ocppServerRepository.insertTransaction(params);
-        IdTagInfo info = ocppTagService.getIdTagInfo(parameters.getIdTag());
+        IdTagInfo info = ocppTagService.getIdTagInfo(parameters.getIdTag(), chargeBoxIdentity);
 
         return new StartTransactionResponse()
                 .withIdTagInfo(info)
@@ -179,7 +179,7 @@ public class CentralSystemService16_Service {
 
         // Get the authorization info of the user
         if (parameters.isSetIdTag()) {
-            IdTagInfo idTagInfo = ocppTagService.getIdTagInfo(parameters.getIdTag());
+            IdTagInfo idTagInfo = ocppTagService.getIdTagInfo(parameters.getIdTag(), chargeBoxIdentity);
             return new StopTransactionResponse().withIdTagInfo(idTagInfo);
         } else {
             return new StopTransactionResponse();
@@ -196,7 +196,7 @@ public class CentralSystemService16_Service {
     public AuthorizeResponse authorize(AuthorizeRequest parameters, String chargeBoxIdentity) {
         // Get the authorization info of the user
         String idTag = parameters.getIdTag();
-        IdTagInfo idTagInfo = ocppTagService.getIdTagInfo(idTag);
+        IdTagInfo idTagInfo = ocppTagService.getIdTagInfo(idTag, chargeBoxIdentity);
 
         return new AuthorizeResponse().withIdTagInfo(idTagInfo);
     }

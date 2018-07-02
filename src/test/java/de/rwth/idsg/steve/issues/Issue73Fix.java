@@ -1,0 +1,104 @@
+package de.rwth.idsg.steve.issues;
+
+import com.google.common.collect.Lists;
+import de.rwth.idsg.steve.Application;
+import de.rwth.idsg.steve.ApplicationProfile;
+import de.rwth.idsg.steve.SteveConfiguration;
+import de.rwth.idsg.steve.utils.__DatabasePreparer__;
+import ocpp.cs._2015._10.AuthorizationStatus;
+import ocpp.cs._2015._10.AuthorizeRequest;
+import ocpp.cs._2015._10.AuthorizeResponse;
+import ocpp.cs._2015._10.BootNotificationRequest;
+import ocpp.cs._2015._10.BootNotificationResponse;
+import ocpp.cs._2015._10.CentralSystemService;
+import ocpp.cs._2015._10.RegistrationStatus;
+import ocpp.cs._2015._10.StartTransactionRequest;
+import ocpp.cs._2015._10.StartTransactionResponse;
+import org.joda.time.DateTime;
+import org.junit.Assert;
+
+import java.util.List;
+
+import static de.rwth.idsg.steve.utils.Helpers.getForOcpp16;
+import static de.rwth.idsg.steve.utils.Helpers.getPath;
+import static de.rwth.idsg.steve.utils.Helpers.getRandomString;
+
+/**
+ * https://github.com/RWTH-i5-IDSG/steve/issues/73
+ *
+ * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
+ * @since 02.07.2018
+ */
+public class Issue73Fix {
+
+    private static final String REGISTERED_OCPP_TAG = __DatabasePreparer__.getRegisteredOcppTag();
+    private static final String path = getPath();
+
+    public static void main(String[] args) throws Exception {
+        Assert.assertEquals(ApplicationProfile.TEST, SteveConfiguration.CONFIG.getProfile());
+        Assert.assertTrue(SteveConfiguration.CONFIG.getOcpp().isAutoRegisterUnknownStations());
+
+        __DatabasePreparer__.prepare();
+
+        Application app = new Application();
+        try {
+            app.start();
+            test();
+        } finally {
+            try {
+                app.stop();
+            } finally {
+                __DatabasePreparer__.cleanUp();
+            }
+        }
+    }
+
+    private static void test() {
+        ocpp.cs._2015._10.CentralSystemService client = getForOcpp16(path);
+
+        String chargeBox1 = getRandomString();
+        String chargeBox2 = getRandomString();
+
+        sendBoot(client, Lists.newArrayList(chargeBox1, chargeBox2));
+
+        sendAuth(client, chargeBox1, AuthorizationStatus.ACCEPTED);
+
+        sendStartTx(client, chargeBox1);
+
+        sendAuth(client, chargeBox1, AuthorizationStatus.ACCEPTED);
+
+        sendAuth(client, chargeBox2, AuthorizationStatus.CONCURRENT_TX);
+    }
+
+    private static void sendBoot(CentralSystemService client, List<String> chargeBoxIdList) {
+        for (String chargeBoxId : chargeBoxIdList) {
+            BootNotificationResponse boot = client.bootNotification(
+                    new BootNotificationRequest()
+                            .withChargePointVendor(getRandomString())
+                            .withChargePointModel(getRandomString()),
+                    chargeBoxId);
+            Assert.assertNotNull(boot);
+            Assert.assertEquals(RegistrationStatus.ACCEPTED, boot.getStatus());
+        }
+    }
+
+    private static void sendAuth(CentralSystemService client, String chargeBoxId, AuthorizationStatus expected) {
+        AuthorizeResponse auth = client.authorize(new AuthorizeRequest().withIdTag(REGISTERED_OCPP_TAG), chargeBoxId);
+        Assert.assertNotNull(auth);
+        Assert.assertEquals(expected, auth.getIdTagInfo().getStatus());
+    }
+
+    private static void sendStartTx(CentralSystemService client, String chargeBoxId) {
+        StartTransactionResponse start = client.startTransaction(
+                new StartTransactionRequest()
+                        .withConnectorId(2)
+                        .withIdTag(REGISTERED_OCPP_TAG)
+                        .withTimestamp(DateTime.now())
+                        .withMeterStart(0),
+                chargeBoxId
+        );
+        Assert.assertNotNull(start);
+        Assert.assertTrue(start.getTransactionId() > 0);
+        Assert.assertTrue(__DatabasePreparer__.getOcppTagRecord(REGISTERED_OCPP_TAG).getInTransaction());
+    }
+}

@@ -178,6 +178,21 @@ public class TransactionRepositoryImpl implements TransactionRepository {
         return new TransactionDetails(new TransactionMapper().map(transaction), values);
     }
 
+    /**
+     * See documentation of {@link TransactionRepository#getChargeBoxIdsOfActiveTransactions(String)}
+     */
+    @Override
+    public List<String> getChargeBoxIdsOfActiveTransactions(String ocppIdTag) {
+        return ctx.select(CONNECTOR.CHARGE_BOX_ID)
+                  .from(CONNECTOR)
+                  .join(TRANSACTION)
+                    .on(TRANSACTION.CONNECTOR_PK.equal(CONNECTOR.CONNECTOR_PK))
+                  .where(TRANSACTION.ID_TAG.eq(ocppIdTag))
+                    .and(TRANSACTION.STOP_VALUE.isNull())
+                    .and(TRANSACTION.STOP_TIMESTAMP.isNull())
+                  .fetch(CONNECTOR.CHARGE_BOX_ID);
+    }
+
     // -------------------------------------------------------------------------
     // Private helpers
     // -------------------------------------------------------------------------

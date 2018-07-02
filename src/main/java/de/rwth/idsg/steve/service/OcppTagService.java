@@ -12,7 +12,7 @@ import java.util.List;
  */
 public interface OcppTagService {
 
-    IdTagInfo getIdTagInfo(String idTag);
+    IdTagInfo getIdTagInfo(String idTag, String askingChargeBoxId);
 
     List<AuthorizationData> getAuthDataOfAllTags();
 

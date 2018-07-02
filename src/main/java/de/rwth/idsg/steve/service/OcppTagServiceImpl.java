@@ -53,32 +53,17 @@ public class OcppTagServiceImpl implements OcppTagService {
     @Override
     public IdTagInfo getIdTagInfo(String idTag, String askingChargeBoxId) {
         OcppTagRecord record = ocppTagRepository.getRecord(idTag);
-        AuthorizationStatus status = decideStatus(record, askingChargeBoxId);
+        AuthorizationStatus status = decideStatus(record, idTag, askingChargeBoxId);
 
         switch (status) {
             case INVALID:
-                log.error("The user with idTag '{}' is INVALID (not present in DB).", idTag);
                 invalidOcppTagService.processNewUnidentified(idTag);
                 return new IdTagInfo().withStatus(status);
 
             case BLOCKED:
-                log.error("The user with idTag '{}' is BLOCKED.", idTag);
-                return new IdTagInfo().withStatus(status)
-                                      .withParentIdTag(record.getParentIdTag());
-
             case EXPIRED:
-                log.error("The user with idTag '{}' is EXPIRED.", idTag);
-                return new IdTagInfo().withStatus(status)
-                                      .withParentIdTag(record.getParentIdTag());
-
             case CONCURRENT_TX:
-                log.warn("The user with idTag '{}' is ALREADY in another transaction.", idTag);
-                return new IdTagInfo().withStatus(status)
-                                      .withParentIdTag(record.getParentIdTag())
-                                      .withExpiryDate(getExpiryDateOrDefault(record));
-
             case ACCEPTED:
-                log.debug("The user with idTag '{}' is ACCEPTED.", record.getIdTag());
                 return new IdTagInfo().withStatus(status)
                                       .withParentIdTag(record.getParentIdTag())
                                       .withExpiryDate(getExpiryDateOrDefault(record));
@@ -91,30 +76,6 @@ public class OcppTagServiceImpl implements OcppTagService {
     // Private helpers
     // -------------------------------------------------------------------------
 
-    private AuthorizationStatus decideStatus(OcppTagRecord record, String askingChargeBoxId) {
-        if (record == null) {
-            return AuthorizationStatus.INVALID;
-        }
-
-        if (record.getBlocked()) {
-            return AuthorizationStatus.BLOCKED;
-        }
-
-        if (isExpired(record)) {
-            return AuthorizationStatus.EXPIRED;
-        }
-
-        // https://github.com/RWTH-i5-IDSG/steve/issues/73
-        if (record.getInTransaction()) {
-            List<String> txChargeBoxIds = transactionRepository.getChargeBoxIdsOfActiveTransactions(record.getIdTag());
-            if (!txChargeBoxIds.contains(askingChargeBoxId)) {
-                return AuthorizationStatus.CONCURRENT_TX;
-            }
-        }
-
-        return AuthorizationStatus.ACCEPTED;
-    }
-
     /**
      * If the database contains an actual expiry, use it. Otherwise, calculate an expiry for cached info
      */
@@ -126,9 +87,54 @@ public class OcppTagServiceImpl implements OcppTagService {
         }
     }
 
+    private AuthorizationStatus decideStatus(OcppTagRecord record, String idTag, String askingChargeBoxId) {
+        if (record == null) {
+            log.error("The user with idTag '{}' is INVALID (not present in DB).", idTag);
+            return AuthorizationStatus.INVALID;
+        }
+
+        if (record.getBlocked()) {
+            log.error("The user with idTag '{}' is BLOCKED.", idTag);
+            return AuthorizationStatus.BLOCKED;
+        }
+
+        if (isExpired(record)) {
+            log.error("The user with idTag '{}' is EXPIRED.", idTag);
+            return AuthorizationStatus.EXPIRED;
+        }
+
+        // https://github.com/RWTH-i5-IDSG/steve/issues/73
+        if (record.getInTransaction()) {
+            List<String> txChargeBoxIds = transactionRepository.getChargeBoxIdsOfActiveTransactions(idTag);
+            if (!txChargeBoxIds.contains(askingChargeBoxId)) {
+                log.warn("The user with idTag '{}' is ALREADY in another transaction.", idTag);
+                return AuthorizationStatus.CONCURRENT_TX;
+            }
+        }
+
+        log.debug("The user with idTag '{}' is ACCEPTED.", record.getIdTag());
+        return AuthorizationStatus.ACCEPTED;
+    }
+
+    private static ocpp.cp._2015._10.AuthorizationStatus decideStatus(OcppTagRecord record, DateTime now) {
+        if (record.getBlocked()) {
+            return ocpp.cp._2015._10.AuthorizationStatus.BLOCKED;
+        } else if (isExpired(record, now)) {
+            return ocpp.cp._2015._10.AuthorizationStatus.EXPIRED;
+        } else if (record.getInTransaction()) {
+            return ocpp.cp._2015._10.AuthorizationStatus.CONCURRENT_TX;
+        } else {
+            return ocpp.cp._2015._10.AuthorizationStatus.ACCEPTED;
+        }
+    }
+
     private static boolean isExpired(OcppTagRecord record) {
+        return isExpired(record, DateTime.now());
+    }
+
+    private static boolean isExpired(OcppTagRecord record, DateTime now) {
         DateTime expiry = record.getExpiryDate();
-        return expiry != null && DateTime.now().isAfter(expiry);
+        return expiry != null && now.isAfter(expiry);
     }
 
     @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
@@ -138,30 +144,13 @@ public class OcppTagServiceImpl implements OcppTagService {
 
         @Override
         public AuthorizationData map(OcppTagRecord record) {
-            DateTime expiryDate = record.getExpiryDate();
-
-            ocpp.cp._2015._10.IdTagInfo idTagInfo;
-
-            if (record.getBlocked()) {
-                idTagInfo = new ocpp.cp._2015._10.IdTagInfo().withStatus(ocpp.cp._2015._10.AuthorizationStatus.BLOCKED)
-                                                             .withParentIdTag(record.getParentIdTag());
-
-            } else if (expiryDate != null && nowDt.isAfter(expiryDate)) {
-                idTagInfo = new ocpp.cp._2015._10.IdTagInfo().withStatus(ocpp.cp._2015._10.AuthorizationStatus.EXPIRED)
-                                                             .withParentIdTag(record.getParentIdTag());
-
-            } else if (record.getInTransaction()) {
-                idTagInfo = new ocpp.cp._2015._10.IdTagInfo().withStatus(ocpp.cp._2015._10.AuthorizationStatus.CONCURRENT_TX)
-                                                             .withParentIdTag(record.getParentIdTag())
-                                                             .withExpiryDate(expiryDate);
-            } else {
-                idTagInfo = new ocpp.cp._2015._10.IdTagInfo().withStatus(ocpp.cp._2015._10.AuthorizationStatus.ACCEPTED)
-                                                             .withParentIdTag(record.getParentIdTag())
-                                                             .withExpiryDate(expiryDate);
-            }
-
-            return new AuthorizationData().withIdTag(record.getIdTag()).withIdTagInfo(idTagInfo);
+            return new AuthorizationData().withIdTag(record.getIdTag())
+                                          .withIdTagInfo(
+                                                  new ocpp.cp._2015._10.IdTagInfo()
+                                                          .withStatus(decideStatus(record, nowDt))
+                                                          .withParentIdTag(record.getParentIdTag())
+                                                          .withExpiryDate(record.getExpiryDate())
+                                          );
         }
     }
-
 }

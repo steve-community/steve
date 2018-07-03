@@ -248,62 +248,6 @@
             </plugin>
 
             <plugin>
-                <groupId>org.apache.cxf</groupId>
-                <artifactId>cxf-codegen-plugin</artifactId>
-                <version>${cxf.version}</version>
-                <configuration>
-                    <sourceRoot>${project.build.directory}/generated-sources</sourceRoot>
-                    <wsdlRoot>${basedir}/src/main/resources/wsdl</wsdlRoot>
-                    <defaultOptions>
-                        <bindingFiles>
-                            <bindingFile>${basedir}/src/main/resources/wsdl-binding/ocpp_binding.xml</bindingFile>
-                            <bindingFile>${basedir}/src/main/resources/wsdl-binding/async_binding.xml</bindingFile>
-                            <bindingFile>${basedir}/src/main/resources/wsdl-binding/add_interface.xml</bindingFile>
-                        </bindingFiles>
-                        <extraargs>
-                            <extraarg>-xjc-Xfluent-api</extraarg>
-                            <extraarg>-xjc-Xinheritance</extraarg>
-                            <extraarg>-xjc-Xannotate</extraarg>
-                            <!--<extraarg>-verbose</extraarg>-->
-                            <extraarg>-exsh</extraarg>
-                            <extraarg>true</extraarg>
-                        </extraargs>
-                    </defaultOptions>
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>generate-sources</id>
-                        <phase>generate-sources</phase>
-                        <goals>
-                            <goal>wsdl2java</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <dependencies>
-                    <dependency>
-                        <groupId>org.projectlombok</groupId>
-                        <artifactId>lombok</artifactId>
-                        <version>${lombok.version}</version>
-                    </dependency>
-                    <dependency>
-                        <groupId>org.jvnet.jaxb2_commons</groupId>
-                        <artifactId>jaxb2-basics-annotate</artifactId>
-                        <version>1.0.1</version>
-                    </dependency>
-                    <dependency>
-                        <groupId>org.jvnet.jaxb2_commons</groupId>
-                        <artifactId>jaxb2-fluent-api</artifactId>
-                        <version>3.0</version>
-                    </dependency>
-                    <dependency>
-                        <groupId>org.jvnet.jaxb2_commons</groupId>
-                        <artifactId>jaxb2-basics</artifactId>
-                        <version>0.9.0</version>
-                    </dependency>
-                </dependencies>
-            </plugin>
-
-            <plugin>
                 <groupId>org.flywaydb</groupId>
                 <artifactId>flyway-maven-plugin</artifactId>
                 <version>5.1.1</version>
@@ -432,6 +376,18 @@
         </plugins>
     </build>
 
+    <repositories>
+        <repository>
+            <id>central</id>
+            <url>https://repo1.maven.org/maven2</url>
+        </repository>
+        <repository>
+            <id>TreibhausNexus</id>
+            <name>RWTH IDSG Nexus Repository</name>
+            <url>https://treibhaus.informatik.rwth-aachen.de/nexus/repository/maven-public/</url>
+        </repository>
+    </repositories>
+
     <dependencyManagement>
         <dependencies>
             <dependency>
@@ -452,6 +408,12 @@
     </dependencyManagement>
 
     <dependencies>
+
+        <dependency>
+            <groupId>de.rwth.idsg</groupId>
+            <artifactId>ocpp-jaxb</artifactId>
+            <version>0.0.1</version>
+        </dependency>
 
         <dependency>
             <groupId>com.sun.mail</groupId>

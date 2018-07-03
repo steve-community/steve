@@ -1,10 +1,10 @@
 package de.rwth.idsg.steve.ocpp.task;
 
+import de.rwth.idsg.ocpp.jaxb.RequestType;
+import de.rwth.idsg.ocpp.jaxb.ResponseType;
 import de.rwth.idsg.steve.ocpp.CommunicationTask;
 import de.rwth.idsg.steve.ocpp.OcppCallback;
 import de.rwth.idsg.steve.ocpp.OcppVersion;
-import de.rwth.idsg.steve.ocpp.RequestType;
-import de.rwth.idsg.steve.ocpp.ResponseType;
 import de.rwth.idsg.steve.service.OcppTagService;
 import de.rwth.idsg.steve.web.dto.ocpp.SendLocalListParams;
 import de.rwth.idsg.steve.web.dto.ocpp.SendLocalListUpdateType;
@@ -103,7 +103,7 @@ public class SendLocalListTask extends CommunicationTask<SendLocalListParams, St
                     .withUpdateType(ocpp.cp._2015._10.UpdateType.DIFFERENTIAL)
                     .withLocalAuthorizationList(auths);
 
-        // FULL update
+            // FULL update
         } else {
             return new ocpp.cp._2015._10.SendLocalListRequest()
                     .withListVersion(params.getListVersion())
@@ -112,7 +112,8 @@ public class SendLocalListTask extends CommunicationTask<SendLocalListParams, St
         }
     }
 
-    private static List<ocpp.cp._2012._06.AuthorisationData> toOcpp15(List<ocpp.cp._2015._10.AuthorizationData> ocpp16) {
+    private static List<ocpp.cp._2012._06.AuthorisationData> toOcpp15(
+            List<ocpp.cp._2015._10.AuthorizationData> ocpp16) {
         return ocpp16.stream()
                      .map(k -> new ocpp.cp._2012._06.AuthorisationData().withIdTag(k.getIdTag())
                                                                         .withIdTagInfo(toOcpp15(k.getIdTagInfo())))

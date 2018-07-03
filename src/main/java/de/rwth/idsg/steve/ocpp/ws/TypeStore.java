@@ -1,6 +1,6 @@
 package de.rwth.idsg.steve.ocpp.ws;
 
-import de.rwth.idsg.steve.ocpp.RequestType;
+import de.rwth.idsg.ocpp.jaxb.RequestType;
 import de.rwth.idsg.steve.ocpp.ws.data.ActionResponsePair;
 
 /**

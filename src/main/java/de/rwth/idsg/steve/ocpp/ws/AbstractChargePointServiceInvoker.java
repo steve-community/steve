@@ -2,7 +2,7 @@ package de.rwth.idsg.steve.ocpp.ws;
 
 import de.rwth.idsg.steve.SteveException;
 import de.rwth.idsg.steve.ocpp.CommunicationTask;
-import de.rwth.idsg.steve.ocpp.RequestType;
+import de.rwth.idsg.ocpp.jaxb.RequestType;
 import de.rwth.idsg.steve.ocpp.ws.data.ActionResponsePair;
 import de.rwth.idsg.steve.ocpp.ws.data.CommunicationContext;
 import de.rwth.idsg.steve.ocpp.ws.data.FutureResponseContext;

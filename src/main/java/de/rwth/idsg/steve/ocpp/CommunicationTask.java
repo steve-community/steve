@@ -1,5 +1,7 @@
 package de.rwth.idsg.steve.ocpp;
 
+import de.rwth.idsg.ocpp.jaxb.RequestType;
+import de.rwth.idsg.ocpp.jaxb.ResponseType;
 import de.rwth.idsg.steve.ocpp.ws.data.OcppJsonError;
 import de.rwth.idsg.steve.repository.dto.ChargePointSelect;
 import de.rwth.idsg.steve.utils.StringUtils;

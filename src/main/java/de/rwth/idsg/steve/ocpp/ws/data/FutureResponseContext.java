@@ -1,7 +1,7 @@
 package de.rwth.idsg.steve.ocpp.ws.data;
 
 import de.rwth.idsg.steve.ocpp.CommunicationTask;
-import de.rwth.idsg.steve.ocpp.ResponseType;
+import de.rwth.idsg.ocpp.jaxb.ResponseType;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;

@@ -1,7 +1,7 @@
 package de.rwth.idsg.steve.ocpp.ws.pipeline;
 
-import de.rwth.idsg.steve.ocpp.RequestType;
-import de.rwth.idsg.steve.ocpp.ResponseType;
+import de.rwth.idsg.ocpp.jaxb.RequestType;
+import de.rwth.idsg.ocpp.jaxb.ResponseType;
 import de.rwth.idsg.steve.ocpp.ws.ErrorFactory;
 import de.rwth.idsg.steve.ocpp.ws.data.CommunicationContext;
 import de.rwth.idsg.steve.ocpp.ws.data.OcppJsonCall;

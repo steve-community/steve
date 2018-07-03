@@ -3,8 +3,8 @@ package de.rwth.idsg.steve.ocpp.ws;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.reflect.ClassPath;
-import de.rwth.idsg.steve.ocpp.RequestType;
-import de.rwth.idsg.steve.ocpp.ResponseType;
+import de.rwth.idsg.ocpp.jaxb.RequestType;
+import de.rwth.idsg.ocpp.jaxb.ResponseType;
 import de.rwth.idsg.steve.ocpp.ws.data.ActionResponsePair;
 
 import java.io.IOException;

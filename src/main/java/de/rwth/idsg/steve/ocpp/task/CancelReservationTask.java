@@ -1,10 +1,10 @@
 package de.rwth.idsg.steve.ocpp.task;
 
+import de.rwth.idsg.ocpp.jaxb.RequestType;
+import de.rwth.idsg.ocpp.jaxb.ResponseType;
 import de.rwth.idsg.steve.ocpp.CommunicationTask;
 import de.rwth.idsg.steve.ocpp.OcppCallback;
 import de.rwth.idsg.steve.ocpp.OcppVersion;
-import de.rwth.idsg.ocpp.jaxb.RequestType;
-import de.rwth.idsg.ocpp.jaxb.ResponseType;
 import de.rwth.idsg.steve.repository.ReservationRepository;
 import de.rwth.idsg.steve.web.dto.ocpp.CancelReservationParams;
 import ocpp.cp._2012._06.CancelReservationRequest;

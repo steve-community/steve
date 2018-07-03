@@ -1,7 +1,7 @@
 package de.rwth.idsg.steve.utils;
 
-import de.rwth.idsg.steve.ocpp.CommunicationTask;
 import de.rwth.idsg.ocpp.jaxb.RequestType;
+import de.rwth.idsg.steve.ocpp.CommunicationTask;
 
 /**
  * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>

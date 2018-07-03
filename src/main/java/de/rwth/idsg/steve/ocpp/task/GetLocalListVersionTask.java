@@ -1,10 +1,10 @@
 package de.rwth.idsg.steve.ocpp.task;
 
+import de.rwth.idsg.ocpp.jaxb.RequestType;
+import de.rwth.idsg.ocpp.jaxb.ResponseType;
 import de.rwth.idsg.steve.ocpp.CommunicationTask;
 import de.rwth.idsg.steve.ocpp.OcppCallback;
 import de.rwth.idsg.steve.ocpp.OcppVersion;
-import de.rwth.idsg.ocpp.jaxb.RequestType;
-import de.rwth.idsg.ocpp.jaxb.ResponseType;
 import de.rwth.idsg.steve.web.dto.ocpp.MultipleChargePointSelect;
 
 import javax.xml.ws.AsyncHandler;

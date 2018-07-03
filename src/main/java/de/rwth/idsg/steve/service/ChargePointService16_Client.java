@@ -1,6 +1,10 @@
 package de.rwth.idsg.steve.service;
 
-import de.rwth.idsg.steve.ocpp.*;
+import de.rwth.idsg.steve.ocpp.ChargePointService12_Invoker;
+import de.rwth.idsg.steve.ocpp.ChargePointService15_Invoker;
+import de.rwth.idsg.steve.ocpp.ChargePointService16_Invoker;
+import de.rwth.idsg.steve.ocpp.ChargePointService16_InvokerImpl;
+import de.rwth.idsg.steve.ocpp.OcppVersion;
 import de.rwth.idsg.steve.ocpp.task.TriggerMessageTask;
 import de.rwth.idsg.steve.web.dto.ocpp.TriggerMessageParams;
 import lombok.extern.slf4j.Slf4j;

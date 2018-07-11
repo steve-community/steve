@@ -1,6 +1,5 @@
 package de.rwth.idsg.steve.ocpp.ws;
 
-import de.rwth.idsg.steve.repository.ChargePointRepository;
 import de.rwth.idsg.steve.service.ChargePointHelperService;
 import de.rwth.idsg.steve.service.NotificationService;
 import org.eclipse.jetty.websocket.api.WebSocketPolicy;
@@ -23,16 +22,14 @@ import java.util.Map;
 public class OcppWebSocketUpgrader extends JettyRequestUpgradeStrategy {
 
     private final List<AbstractWebSocketEndpoint> endpoints;
-    private final ChargePointRepository chargePointRepository;
     private final NotificationService notificationService;
     private final ChargePointHelperService chargePointHelperService;
 
     public OcppWebSocketUpgrader(WebSocketPolicy policy, List<AbstractWebSocketEndpoint> endpoints,
-                                 ChargePointRepository chargePointRepository, NotificationService notificationService,
+                                 NotificationService notificationService,
                                  ChargePointHelperService chargePointHelperService) {
         super(policy);
         this.endpoints = endpoints;
-        this.chargePointRepository = chargePointRepository;
         this.notificationService = notificationService;
         this.chargePointHelperService = chargePointHelperService;
     }
@@ -47,11 +44,9 @@ public class OcppWebSocketUpgrader extends JettyRequestUpgradeStrategy {
         // -------------------------------------------------------------------------
 
         String chargeBoxId = getLastBitFromUrl(request.getURI().getPath());
-        if (chargePointRepository.isRegistered(chargeBoxId)) {
+        if (chargePointHelperService.isRegistered(chargeBoxId)) {
             attributes.put(AbstractWebSocketEndpoint.CHARGEBOX_ID_KEY, chargeBoxId);
         } else {
-            chargePointHelperService.rememberNewUnknown(chargeBoxId);
-
             // send only if the station is not registered, because otherwise, after the connection it will send a boot
             // notification message and we handle the notifications for these normal cases in service classes already.
             notificationService.ocppStationBooted(chargeBoxId, false);

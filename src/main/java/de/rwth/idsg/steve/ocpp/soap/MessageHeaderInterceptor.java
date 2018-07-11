@@ -1,9 +1,9 @@
 package de.rwth.idsg.steve.ocpp.soap;
 
 import de.rwth.idsg.steve.ocpp.OcppProtocol;
-import de.rwth.idsg.steve.repository.ChargePointRepository;
 import de.rwth.idsg.steve.repository.OcppServerRepository;
 import de.rwth.idsg.steve.repository.impl.ChargePointRepositoryImpl;
+import de.rwth.idsg.steve.service.ChargePointHelperService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.cxf.binding.soap.Soap12;
 import org.apache.cxf.binding.soap.SoapFault;
@@ -41,7 +41,7 @@ import static org.apache.cxf.ws.addressing.JAXWSAConstants.ADDRESSING_PROPERTIES
 public class MessageHeaderInterceptor extends AbstractPhaseInterceptor<Message> {
 
     @Autowired private OcppServerRepository ocppServerRepository;
-    @Autowired private ChargePointRepository chargePointRepository;
+    @Autowired private ChargePointHelperService chargePointHelperService;
     @Autowired private ScheduledExecutorService executorService;
 
     private static final String BOOT_OPERATION_NAME = "BootNotification";
@@ -62,7 +62,7 @@ public class MessageHeaderInterceptor extends AbstractPhaseInterceptor<Message> 
         QName opName = message.getExchange().getBindingOperationInfo().getOperationInfo().getName();
 
         if (!BOOT_OPERATION_NAME.equals(opName.getLocalPart())) {
-            if (!chargePointRepository.isRegistered(chargeBoxId)) {
+            if (!chargePointHelperService.isRegistered(chargeBoxId)) {
                 throw createAuthFault(opName);
             }
         }

@@ -13,9 +13,7 @@ import java.util.List;
 public interface OcppTagService {
 
     IdTagInfo getIdTagInfo(String idTag, String askingChargeBoxId);
-
     List<AuthorizationData> getAuthDataOfAllTags();
-
     List<AuthorizationData> getAuthData(List<String> idTagList);
 
     List<UnidentifiedIncomingObject> getUnknownOcppTags();

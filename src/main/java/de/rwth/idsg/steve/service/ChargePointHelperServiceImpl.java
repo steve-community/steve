@@ -1,5 +1,6 @@
 package de.rwth.idsg.steve.service;
 
+import com.google.common.util.concurrent.Striped;
 import de.rwth.idsg.steve.ocpp.OcppProtocol;
 import de.rwth.idsg.steve.ocpp.OcppTransport;
 import de.rwth.idsg.steve.ocpp.OcppVersion;
@@ -17,6 +18,7 @@ import de.rwth.idsg.steve.utils.ConnectorStatusCountFilter;
 import de.rwth.idsg.steve.utils.DateTimeUtils;
 import de.rwth.idsg.steve.web.dto.OcppJsonStatus;
 import de.rwth.idsg.steve.web.dto.Statistics;
+import lombok.extern.slf4j.Slf4j;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -24,17 +26,25 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Deque;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.locks.Lock;
 import java.util.stream.Collectors;
+
+import static de.rwth.idsg.steve.SteveConfiguration.CONFIG;
 
 /**
  * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
  * @since 24.03.2015
  */
+@Slf4j
 @Service
 public class ChargePointHelperServiceImpl implements ChargePointHelperService {
+
+    private final boolean autoRegisterUnknownStations = CONFIG.getOcpp().isAutoRegisterUnknownStations();
+    private final Striped<Lock> isRegisteredLocks = Striped.lock(16);
 
     @Autowired private GenericRepository genericRepository;
 
@@ -47,6 +57,21 @@ public class ChargePointHelperServiceImpl implements ChargePointHelperService {
     @Autowired private Ocpp16WebSocketEndpoint ocpp16WebSocketEndpoint;
 
     private final UnidentifiedIncomingObjectService unknownChargePointService = new UnidentifiedIncomingObjectService(100);
+
+    @Override
+    public boolean isRegistered(String chargeBoxId) {
+        Lock l = isRegisteredLocks.get(chargeBoxId);
+        l.lock();
+        try {
+            boolean isRegistered = isRegisteredInternal(chargeBoxId);
+            if (!isRegistered) {
+                unknownChargePointService.processNewUnidentified(chargeBoxId);
+            }
+            return isRegistered;
+        } finally {
+            l.unlock();
+        }
+    }
 
     @Override
     public Statistics getStats() {
@@ -95,11 +120,6 @@ public class ChargePointHelperServiceImpl implements ChargePointHelperService {
     }
 
     @Override
-    public void rememberNewUnknown(String chargeBoxId) {
-        unknownChargePointService.processNewUnidentified(chargeBoxId);
-    }
-
-    @Override
     public List<UnidentifiedIncomingObject> getUnknownChargePoints() {
         return unknownChargePointService.getObjects();
     }
@@ -117,6 +137,28 @@ public class ChargePointHelperServiceImpl implements ChargePointHelperService {
     // -------------------------------------------------------------------------
     // Helpers
     // -------------------------------------------------------------------------
+
+    private boolean isRegisteredInternal(String chargeBoxId) {
+        // 1. exit if already registered
+        if (chargePointRepository.isRegistered(chargeBoxId)) {
+            return true;
+        }
+
+        // 2. ok, this chargeBoxId is unknown. exit if auto-register is disabled
+        if (!autoRegisterUnknownStations) {
+            return false;
+        }
+
+        // 3. chargeBoxId is unknown and auto-register is enabled. insert chargeBoxId
+        try {
+            chargePointRepository.addChargePointList(Collections.singletonList(chargeBoxId));
+            log.warn("Auto-registered unknown chargebox '{}'", chargeBoxId);
+            return true;
+        } catch (Exception e) {
+            log.error("Failed to auto-register unknown chargebox '" + chargeBoxId + "'", e);
+            return false;
+        }
+    }
 
     private List<ChargePointSelect> getChargePoints(OcppProtocol forSoap, AbstractWebSocketEndpoint jsonEndpoint) {
         List<ChargePointSelect> returnList = chargePointRepository.getChargePointSelect(forSoap);

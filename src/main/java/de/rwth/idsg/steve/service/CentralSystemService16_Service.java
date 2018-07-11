@@ -45,7 +45,6 @@ import org.springframework.stereotype.Service;
 @Service
 public class CentralSystemService16_Service {
 
-    @Autowired private ChargePointRepository chargePointRepository;
     @Autowired private OcppServerRepository ocppServerRepository;
     @Autowired private SettingsRepository settingsRepository;
 
@@ -56,7 +55,7 @@ public class CentralSystemService16_Service {
     public BootNotificationResponse bootNotification(BootNotificationRequest parameters, String chargeBoxIdentity,
                                                      OcppProtocol ocppProtocol) {
 
-        boolean isRegistered = chargePointRepository.isRegistered(chargeBoxIdentity);
+        boolean isRegistered = chargePointHelperService.isRegistered(chargeBoxIdentity);
         notificationService.ocppStationBooted(chargeBoxIdentity, isRegistered);
         DateTime now = DateTime.now();
 
@@ -81,7 +80,6 @@ public class CentralSystemService16_Service {
             ocppServerRepository.updateChargebox(params);
         } else {
             log.error("The chargebox '{}' is NOT registered and its boot NOT acknowledged.", chargeBoxIdentity);
-            chargePointHelperService.rememberNewUnknown(chargeBoxIdentity);
         }
 
         return new BootNotificationResponse()

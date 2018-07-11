@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import javax.validation.Valid;
+import java.util.Collections;
 
 /**
  * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
@@ -47,6 +48,7 @@ public class OcppTagsController {
     protected static final String ADD_BATCH_PATH = "/add/batch";
 
     protected static final String UNKNOWN_REMOVE_PATH = "/unknown/remove/{idTag}";
+    protected static final String UNKNOWN_ADD_PATH = "/unknown/add/{idTag}";
 
     // -------------------------------------------------------------------------
     // HTTP methods
@@ -143,6 +145,13 @@ public class OcppTagsController {
     @RequestMapping(value = DELETE_PATH, method = RequestMethod.POST)
     public String delete(@PathVariable("ocppTagPk") int ocppTagPk) {
         ocppTagRepository.deleteOcppTag(ocppTagPk);
+        return toOverview();
+    }
+
+    @RequestMapping(value = UNKNOWN_ADD_PATH, method = RequestMethod.POST)
+    public String addUnknownIdTag(@PathVariable("idTag") String idTag) {
+        ocppTagRepository.addOcppTagList(Collections.singletonList(idTag));
+        ocppTagService.removeUnknown(idTag);
         return toOverview();
     }
 

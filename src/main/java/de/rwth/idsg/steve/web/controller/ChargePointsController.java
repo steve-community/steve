@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import javax.validation.Valid;
+import java.util.Collections;
 
 /**
  *
@@ -47,6 +48,7 @@ public class ChargePointsController {
     protected static final String ADD_BATCH_PATH = "/add/batch";
 
     protected static final String UNKNOWN_REMOVE_PATH = "/unknown/remove/{chargeBoxId}";
+    protected static final String UNKNOWN_ADD_PATH = "/unknown/add/{chargeBoxId}";
 
     // -------------------------------------------------------------------------
     // HTTP methods
@@ -142,6 +144,13 @@ public class ChargePointsController {
     @RequestMapping(value = DELETE_PATH, method = RequestMethod.POST)
     public String delete(@PathVariable("chargeBoxPk") int chargeBoxPk) {
         chargePointRepository.deleteChargePoint(chargeBoxPk);
+        return toOverview();
+    }
+
+    @RequestMapping(value = UNKNOWN_ADD_PATH, method = RequestMethod.POST)
+    public String addUnknownChargeBoxId(@PathVariable("chargeBoxId") String chargeBoxId) {
+        chargePointRepository.addChargePointList(Collections.singletonList(chargeBoxId));
+        chargePointHelperService.removeUnknown(chargeBoxId);
         return toOverview();
     }
 

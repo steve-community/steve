@@ -23,6 +23,7 @@
                 <th data-sort="int"># of Attempts</th>
                 <th data-sort="date">Last Attempt</th>
                 <th></th>
+                <th></th>
             </tr>
             </thead>
             <tbody>
@@ -31,6 +32,11 @@
                     <td>${item.key}</td>
                     <td>${item.numberOfAttempts}</td>
                     <td data-sort-value="${item.lastAttemptTimestamp.millis}">${item.lastAttemptTimestamp}</td>
+                    <td class="inlineWrapper">
+                        <form:form action="${ctxPath}/manager/ocppTags/unknown/add/${item.key}" method="post">
+                            <input type="submit" class="blueSubmit" value="Add"/>
+                        </form:form>
+                    </td>
                     <td>
                         <form:form action="${ctxPath}/manager/ocppTags/unknown/remove/${item.key}" method="post">
                             <input type="submit" class="redSubmit" value="Forget"/>

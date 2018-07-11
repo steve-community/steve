@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import javax.validation.Valid;
 import java.util.Collections;
+import java.util.List;
 
 /**
  *
@@ -110,8 +111,7 @@ public class ChargePointsController {
             return "data-man/chargepointAdd";
         }
 
-        chargePointRepository.addChargePoint(chargePointForm);
-        chargePointHelperService.removeUnknown(chargePointForm.getChargeBoxId());
+        add(chargePointForm);
         return toOverview();
     }
 
@@ -124,8 +124,7 @@ public class ChargePointsController {
             return "data-man/chargepointAdd";
         }
 
-        chargePointRepository.addChargePointList(form.getIdList());
-        chargePointHelperService.removeUnknown(form.getIdList());
+        add(form.getIdList());
         return toOverview();
     }
 
@@ -149,8 +148,7 @@ public class ChargePointsController {
 
     @RequestMapping(value = UNKNOWN_ADD_PATH, method = RequestMethod.POST)
     public String addUnknownChargeBoxId(@PathVariable("chargeBoxId") String chargeBoxId) {
-        chargePointRepository.addChargePointList(Collections.singletonList(chargeBoxId));
-        chargePointHelperService.removeUnknown(chargeBoxId);
+        add(Collections.singletonList(chargeBoxId));
         return toOverview();
     }
 
@@ -180,5 +178,19 @@ public class ChargePointsController {
 
     protected String toOverview() {
         return "redirect:/manager/chargepoints";
+    }
+
+    // -------------------------------------------------------------------------
+    // Helpers
+    // -------------------------------------------------------------------------
+
+    private void add(ChargePointForm form) {
+        chargePointRepository.addChargePoint(form);
+        chargePointHelperService.removeUnknown(form.getChargeBoxId());
+    }
+
+    private void add(List<String> idList) {
+        chargePointRepository.addChargePointList(idList);
+        chargePointHelperService.removeUnknown(idList);
     }
 }

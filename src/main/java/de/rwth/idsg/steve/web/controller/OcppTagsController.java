@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import javax.validation.Valid;
 import java.util.Collections;
+import java.util.List;
 
 /**
  * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
@@ -111,8 +112,7 @@ public class OcppTagsController {
             return "data-man/ocppTagAdd";
         }
 
-        ocppTagRepository.addOcppTag(ocppTagForm);
-        ocppTagService.removeUnknown(ocppTagForm.getIdTag());
+        add(ocppTagForm);
         return toOverview();
     }
 
@@ -125,8 +125,7 @@ public class OcppTagsController {
             return "data-man/ocppTagAdd";
         }
 
-        ocppTagRepository.addOcppTagList(form.getIdList());
-        ocppTagService.removeUnknown(form.getIdList());
+        add(form.getIdList());
         return toOverview();
     }
 
@@ -150,8 +149,7 @@ public class OcppTagsController {
 
     @RequestMapping(value = UNKNOWN_ADD_PATH, method = RequestMethod.POST)
     public String addUnknownIdTag(@PathVariable("idTag") String idTag) {
-        ocppTagRepository.addOcppTagList(Collections.singletonList(idTag));
-        ocppTagService.removeUnknown(idTag);
+        add(Collections.singletonList(idTag));
         return toOverview();
     }
 
@@ -190,4 +188,19 @@ public class OcppTagsController {
     protected String toOverview() {
         return "redirect:/manager/ocppTags";
     }
+
+    // -------------------------------------------------------------------------
+    // Helpers
+    // -------------------------------------------------------------------------
+
+    private void add(OcppTagForm form) {
+        ocppTagRepository.addOcppTag(form);
+        ocppTagService.removeUnknown(form.getIdTag());
+    }
+
+    private void add(List<String> idTagList) {
+        ocppTagRepository.addOcppTagList(idTagList);
+        ocppTagService.removeUnknown(idTagList);
+    }
+
 }

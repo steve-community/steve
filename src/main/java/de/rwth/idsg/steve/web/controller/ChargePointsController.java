@@ -46,6 +46,7 @@ public class ChargePointsController {
     protected static final String ADD_SINGLE_PATH = "/add/single";
     protected static final String ADD_BATCH_PATH = "/add/batch";
 
+    protected static final String UNKNOWN_REMOVE_PATH = "/unknown/remove/{chargeBoxId}";
 
     // -------------------------------------------------------------------------
     // HTTP methods
@@ -141,6 +142,12 @@ public class ChargePointsController {
     @RequestMapping(value = DELETE_PATH, method = RequestMethod.POST)
     public String delete(@PathVariable("chargeBoxPk") int chargeBoxPk) {
         chargePointRepository.deleteChargePoint(chargeBoxPk);
+        return toOverview();
+    }
+
+    @RequestMapping(value = UNKNOWN_REMOVE_PATH, method = RequestMethod.POST)
+    public String removeUnknownChargeBoxId(@PathVariable("chargeBoxId") String chargeBoxId) {
+        chargePointHelperService.removeUnknown(chargeBoxId);
         return toOverview();
     }
 

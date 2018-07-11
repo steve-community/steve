@@ -46,6 +46,8 @@ public class OcppTagsController {
     protected static final String ADD_SINGLE_PATH = "/add/single";
     protected static final String ADD_BATCH_PATH = "/add/batch";
 
+    protected static final String UNKNOWN_REMOVE_PATH = "/unknown/remove/{idTag}";
+
     // -------------------------------------------------------------------------
     // HTTP methods
     // -------------------------------------------------------------------------
@@ -141,6 +143,12 @@ public class OcppTagsController {
     @RequestMapping(value = DELETE_PATH, method = RequestMethod.POST)
     public String delete(@PathVariable("ocppTagPk") int ocppTagPk) {
         ocppTagRepository.deleteOcppTag(ocppTagPk);
+        return toOverview();
+    }
+
+    @RequestMapping(value = UNKNOWN_REMOVE_PATH, method = RequestMethod.POST)
+    public String removeUnknownIdTag(@PathVariable("idTag") String idTag) {
+        ocppTagService.removeUnknown(idTag);
         return toOverview();
     }
 

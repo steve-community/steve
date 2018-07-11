@@ -22,6 +22,7 @@
                 <th data-sort="string">ID Tag</th>
                 <th data-sort="int"># of Attempts</th>
                 <th data-sort="date">Last Attempt</th>
+                <th></th>
             </tr>
             </thead>
             <tbody>
@@ -30,6 +31,11 @@
                     <td>${item.key}</td>
                     <td>${item.numberOfAttempts}</td>
                     <td data-sort-value="${item.lastAttemptTimestamp.millis}">${item.lastAttemptTimestamp}</td>
+                    <td>
+                        <form:form action="${ctxPath}/manager/ocppTags/unknown/remove/${item.key}" method="post">
+                            <input type="submit" class="redSubmit" value="Forget"/>
+                        </form:form>
+                    </td>
                 </tr>
             </c:forEach>
             </tbody>

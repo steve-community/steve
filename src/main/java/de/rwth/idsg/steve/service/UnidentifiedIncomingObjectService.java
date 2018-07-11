@@ -19,6 +19,8 @@ import java.util.stream.Collectors;
 @Slf4j
 public class UnidentifiedIncomingObjectService {
 
+    private final Object changeLock = new Object();
+
     private final Cache<String, UnidentifiedIncomingObject> objectsHolder;
 
     public UnidentifiedIncomingObjectService(int maxSize) {
@@ -36,11 +38,33 @@ public class UnidentifiedIncomingObjectService {
     }
 
     public void processNewUnidentified(String key) {
-        try {
-            objectsHolder.get(key, () -> new UnidentifiedIncomingObject(key))
-                         .updateStats();
-        } catch (ExecutionException e) {
-            log.error("Error occurred", e);
+        synchronized (changeLock) {
+            try {
+                objectsHolder.get(key, () -> new UnidentifiedIncomingObject(key))
+                             .updateStats();
+            } catch (ExecutionException e) {
+                log.error("Error occurred", e);
+            }
+        }
+    }
+
+    public void remove(String key) {
+        synchronized (changeLock) {
+            try {
+                objectsHolder.invalidate(key);
+            } catch (Exception e) {
+                log.error("Error occurred", e);
+            }
+        }
+    }
+
+    public void removeAll(Iterable<String> keys) {
+        synchronized (changeLock) {
+            try {
+                objectsHolder.invalidateAll(keys);
+            } catch (Exception e) {
+                log.error("Error occurred", e);
+            }
         }
     }
 }

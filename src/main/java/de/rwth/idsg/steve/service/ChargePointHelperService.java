@@ -20,4 +20,6 @@ public interface ChargePointHelperService {
 
     void rememberNewUnknown(String chargeBoxId);
     List<UnidentifiedIncomingObject> getUnknownChargePoints();
+    void removeUnknown(String chargeBoxId);
+    void removeUnknown(List<String> chargeBoxIdList);
 }

@@ -108,6 +108,7 @@ public class OcppTagsController {
         }
 
         ocppTagRepository.addOcppTag(ocppTagForm);
+        ocppTagService.removeUnknown(ocppTagForm.getIdTag());
         return toOverview();
     }
 
@@ -121,6 +122,7 @@ public class OcppTagsController {
         }
 
         ocppTagRepository.addOcppTagList(form.getIdList());
+        ocppTagService.removeUnknown(form.getIdList());
         return toOverview();
     }
 

@@ -51,6 +51,16 @@ public class OcppTagServiceImpl implements OcppTagService {
     }
 
     @Override
+    public void removeUnknown(String idTag) {
+        invalidOcppTagService.remove(idTag);
+    }
+
+    @Override
+    public void removeUnknown(List<String> idTagList) {
+        invalidOcppTagService.removeAll(idTagList);
+    }
+
+    @Override
     public IdTagInfo getIdTagInfo(String idTag, String askingChargeBoxId) {
         OcppTagRecord record = ocppTagRepository.getRecord(idTag);
         AuthorizationStatus status = decideStatus(record, idTag, askingChargeBoxId);

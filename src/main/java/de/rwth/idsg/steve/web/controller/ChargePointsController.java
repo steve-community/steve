@@ -108,6 +108,7 @@ public class ChargePointsController {
         }
 
         chargePointRepository.addChargePoint(chargePointForm);
+        chargePointHelperService.removeUnknown(chargePointForm.getChargeBoxId());
         return toOverview();
     }
 
@@ -121,6 +122,7 @@ public class ChargePointsController {
         }
 
         chargePointRepository.addChargePointList(form.getIdList());
+        chargePointHelperService.removeUnknown(form.getIdList());
         return toOverview();
     }
 

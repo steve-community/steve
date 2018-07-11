@@ -79,7 +79,7 @@ public class ChargePointRepositoryImpl implements ChargePointRepository {
 
             // 3. chargeBoxId is unknown and auto-register is enabled. insert chargeBoxId
             try {
-                addChargePoint(Collections.singletonList(chargeBoxId));
+                addChargePointList(Collections.singletonList(chargeBoxId));
                 log.warn("Auto-registered unknown chargebox '{}'", chargeBoxId);
                 return true;
             } catch (Exception e) {
@@ -253,7 +253,7 @@ public class ChargePointRepositoryImpl implements ChargePointRepository {
     }
 
     @Override
-    public void addChargePoint(List<String> chargeBoxIdList) {
+    public void addChargePointList(List<String> chargeBoxIdList) {
         List<ChargeBoxRecord> batch = chargeBoxIdList.stream()
                                                      .map(s -> ctx.newRecord(CHARGE_BOX).setChargeBoxId(s))
                                                      .collect(Collectors.toList());

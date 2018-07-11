@@ -26,7 +26,7 @@ public interface ChargePointRepository {
     List<ConnectorStatus> getChargePointConnectorStatus();
     List<Integer> getNonZeroConnectorIds(String chargeBoxId);
 
-    void addChargePoint(List<String> chargeBoxIdList);
+    void addChargePointList(List<String> chargeBoxIdList);
     int addChargePoint(ChargePointForm form);
     void updateChargePoint(ChargePointForm form);
     void deleteChargePoint(int chargeBoxPk);

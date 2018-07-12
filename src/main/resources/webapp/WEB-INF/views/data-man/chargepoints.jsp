@@ -23,7 +23,6 @@
                 <th data-sort="int"># of Attempts</th>
                 <th data-sort="date">Last Attempt</th>
                 <th></th>
-                <th></th>
             </tr>
             </thead>
             <tbody>
@@ -33,12 +32,11 @@
                     <td>${item.numberOfAttempts}</td>
                     <td data-sort-value="${item.lastAttemptTimestamp.millis}">${item.lastAttemptTimestamp}</td>
                     <td>
-                        <form:form action="${ctxPath}/manager/chargepoints/unknown/add/${item.key}" method="post">
+                        <form:form cssClass="inline" action="${ctxPath}/manager/chargepoints/unknown/add/${item.key}" method="post">
                             <input type="submit" class="blueSubmit" value="Add"/>
                         </form:form>
-                    </td>
-                    <td>
-                        <form:form action="${ctxPath}/manager/chargepoints/unknown/remove/${item.key}" method="post">
+                        &nbsp;
+                        <form:form cssClass="inline" action="${ctxPath}/manager/chargepoints/unknown/remove/${item.key}" method="post">
                             <input type="submit" class="redSubmit" value="Forget"/>
                         </form:form>
                     </td>

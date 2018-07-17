@@ -71,6 +71,10 @@
                         </a>
                     </td>
                 </tr>
+                <tr>
+                    <td>Insert connector status after start/stop transaction:</td>
+                    <td><form:checkbox path="insertConnectorStatusAfterTransactionMsg"/></td>
+                </tr>
             </tbody>
         </table>
 

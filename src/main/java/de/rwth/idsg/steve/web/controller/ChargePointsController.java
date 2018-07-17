@@ -85,6 +85,7 @@ public class ChargePointsController {
         form.setLocationLatitude(cp.getChargeBox().getLocationLatitude());
         form.setLocationLongitude(cp.getChargeBox().getLocationLongitude());
         form.setInsertConnectorStatusAfterTransactionMsg(cp.getChargeBox().getInsertConnectorStatusAfterTransactionMsg());
+        form.setAdminAddress(cp.getChargeBox().getAdminAddress());
 
         form.setAddress(ControllerHelper.recordToDto(cp.getAddress()));
 

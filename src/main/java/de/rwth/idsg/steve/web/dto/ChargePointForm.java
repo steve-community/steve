@@ -4,6 +4,7 @@ import de.rwth.idsg.steve.web.validation.ChargeBoxId;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.validator.constraints.Range;
+import org.hibernate.validator.constraints.URL;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -37,4 +38,7 @@ public class ChargePointForm {
 
     private String description;
     private String note;
+
+    @URL(message = "Admin address must be a valid URL")
+    private String adminAddress;
 }

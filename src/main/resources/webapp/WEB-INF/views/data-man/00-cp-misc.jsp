@@ -2,6 +2,15 @@
 <table class="userInput">
 	<thead><tr><th>Misc.</th><th></th></thead>
 	<tr><td>Description:</td><td><form:input path="description"/></td></tr>
+	<tr>
+		<td>Admin Address:</td>
+		<td>
+			<form:input path="adminAddress"/>
+			<c:if test="${not empty cp.chargeBox.adminAddress}">
+				<a target="_blank" href="${cp.chargeBox.adminAddress}">Go</a>
+			</c:if>
+		</td>
+	</tr>
 	<tr><td>Latitude:</td><td><form:input path="locationLatitude"/></td></tr>
 	<tr><td>Longitude:</td><td><form:input path="locationLongitude"/></td></tr>
 

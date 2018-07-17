@@ -296,6 +296,7 @@ public class ChargePointRepositoryImpl implements ChargePointRepository {
                   .set(CHARGE_BOX.LOCATION_LONGITUDE, form.getLocationLongitude())
                   .set(CHARGE_BOX.INSERT_CONNECTOR_STATUS_AFTER_TRANSACTION_MSG, form.getInsertConnectorStatusAfterTransactionMsg())
                   .set(CHARGE_BOX.NOTE, form.getNote())
+                  .set(CHARGE_BOX.ADMIN_ADDRESS, form.getAdminAddress())
                   .set(CHARGE_BOX.ADDRESS_PK, addressPk)
                   .returning(CHARGE_BOX.CHARGE_BOX_PK)
                   .fetchOne()
@@ -309,6 +310,7 @@ public class ChargePointRepositoryImpl implements ChargePointRepository {
            .set(CHARGE_BOX.LOCATION_LONGITUDE, form.getLocationLongitude())
            .set(CHARGE_BOX.INSERT_CONNECTOR_STATUS_AFTER_TRANSACTION_MSG, form.getInsertConnectorStatusAfterTransactionMsg())
            .set(CHARGE_BOX.NOTE, form.getNote())
+           .set(CHARGE_BOX.ADMIN_ADDRESS, form.getAdminAddress())
            .set(CHARGE_BOX.ADDRESS_PK, addressPk)
            .where(CHARGE_BOX.CHARGE_BOX_PK.equal(form.getChargeBoxPk()))
            .execute();

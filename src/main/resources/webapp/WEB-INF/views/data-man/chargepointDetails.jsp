@@ -67,6 +67,7 @@
                     <tr><td>Diagnostics Status:</td><td>${cp.chargeBox.diagnosticsStatus}</td></tr>
                     <tr><td>Diagnostics Timestamp:</td><td>${cp.chargeBox.diagnosticsTimestamp}</td></tr>
                     <tr><td>Last Hearbeat Timestamp:</td><td>${cp.chargeBox.lastHeartbeatTimestamp}</td></tr>
+                    <tr><td>Insert connector status after start/stop transaction:</td><td><form:checkbox path="insertConnectorStatusAfterTransactionMsg"/></td></tr>
                 </tbody>
             </table>
 

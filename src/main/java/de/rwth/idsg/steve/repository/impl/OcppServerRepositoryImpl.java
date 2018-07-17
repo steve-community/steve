@@ -216,10 +216,12 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
         }
 
         // -------------------------------------------------------------------------
-        // Step 5: Set connector status to "Occupied"
+        // Step 5: Set connector status
         // -------------------------------------------------------------------------
 
-        insertConnectorStatus(ctx, connectorPkQuery, p.getStartTimestamp(), p.getStatusUpdate());
+        if (shouldInsertConnectorStatusAfterTransactionMsg(p.getChargeBoxId())) {
+            insertConnectorStatus(ctx, connectorPkQuery, p.getStartTimestamp(), p.getStatusUpdate());
+        }
 
         return transactionId;
     }
@@ -262,15 +264,17 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
         }
 
         // -------------------------------------------------------------------------
-        // Step 3: Set connector status back to "Available" again
+        // Step 3: Set connector status back
         // -------------------------------------------------------------------------
 
-        SelectConditionStep<Record1<Integer>> connectorPkQuery =
-                DSL.select(TRANSACTION.CONNECTOR_PK)
-                   .from(TRANSACTION)
-                   .where(TRANSACTION.TRANSACTION_PK.equal(p.getTransactionId()));
+        if (shouldInsertConnectorStatusAfterTransactionMsg(p.getChargeBoxId())) {
+            SelectConditionStep<Record1<Integer>> connectorPkQuery =
+                    DSL.select(TRANSACTION.CONNECTOR_PK)
+                       .from(TRANSACTION)
+                       .where(TRANSACTION.TRANSACTION_PK.equal(p.getTransactionId()));
 
-        insertConnectorStatus(ctx, connectorPkQuery, p.getStopTimestamp(), p.getStatusUpdate());
+            insertConnectorStatus(ctx, connectorPkQuery, p.getStopTimestamp(), p.getStatusUpdate());
+        }
     }
 
     // -------------------------------------------------------------------------
@@ -332,11 +336,21 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
         return count == 1;
     }
 
+    private boolean shouldInsertConnectorStatusAfterTransactionMsg(String chargeBoxId) {
+        Record1<Integer> r = ctx.selectOne()
+                                .from(CHARGE_BOX)
+                                .where(CHARGE_BOX.CHARGE_BOX_ID.eq(chargeBoxId))
+                                .and(CHARGE_BOX.INSERT_CONNECTOR_STATUS_AFTER_TRANSACTION_MSG.isTrue())
+                                .fetchOne();
+
+        return (r != null) && (r.value1() == 1);
+    }
+
     private int getConnectorPkFromConnector(DSLContext ctx, String chargeBoxIdentity, int connectorId) {
         return ctx.select(CONNECTOR.CONNECTOR_PK)
                   .from(CONNECTOR)
-                  .where(CONNECTOR.CHARGE_BOX_ID.equal(chargeBoxIdentity)
-                    .and(CONNECTOR.CONNECTOR_ID.equal(connectorId)))
+                  .where(CONNECTOR.CHARGE_BOX_ID.equal(chargeBoxIdentity))
+                  .and(CONNECTOR.CONNECTOR_ID.equal(connectorId))
                   .fetchOne()
                   .value1();
     }

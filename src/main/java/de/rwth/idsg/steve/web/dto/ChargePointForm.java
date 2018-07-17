@@ -6,6 +6,7 @@ import lombok.Setter;
 import org.hibernate.validator.constraints.Range;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
 
 /**
@@ -22,7 +23,10 @@ public class ChargePointForm {
     @NotBlank(message = "ChargeBox ID is required")
     @ChargeBoxId
     private String chargeBoxId;
-    
+
+    @NotNull
+    private Boolean insertConnectorStatusAfterTransactionMsg;
+
     private Address address;
 
     @Range(min = -90, max = 90, message = "Latitude must be between {min} and {max}")

@@ -228,7 +228,9 @@ public class ChargePointRepositoryImpl implements ChargePointRepository {
     @Override
     public void addChargePointList(List<String> chargeBoxIdList) {
         List<ChargeBoxRecord> batch = chargeBoxIdList.stream()
-                                                     .map(s -> ctx.newRecord(CHARGE_BOX).setChargeBoxId(s))
+                                                     .map(s -> ctx.newRecord(CHARGE_BOX)
+                                                                  .setChargeBoxId(s)
+                                                                  .setInsertConnectorStatusAfterTransactionMsg(false))
                                                      .collect(Collectors.toList());
 
         ctx.batchInsert(batch).execute();

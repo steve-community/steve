@@ -67,7 +67,16 @@
                     <tr><td>Diagnostics Status:</td><td>${cp.chargeBox.diagnosticsStatus}</td></tr>
                     <tr><td>Diagnostics Timestamp:</td><td>${cp.chargeBox.diagnosticsTimestamp}</td></tr>
                     <tr><td>Last Hearbeat Timestamp:</td><td>${cp.chargeBox.lastHeartbeatTimestamp}</td></tr>
-                    <tr><td>Insert connector status after start/stop transaction:</td><td><form:checkbox path="insertConnectorStatusAfterTransactionMsg"/></td></tr>
+                    <tr>
+                        <td>Insert connector status after start/stop transaction:
+                        </td>
+                        <td>
+                            <form:checkbox path="insertConnectorStatusAfterTransactionMsg"/>
+                            <a class="tooltip" href="#"><img src="${ctxPath}/static/images/info.png" style="vertical-align:middle">
+                                <span>After a transaction start/stop message, a charging station might send a connector status notification, but it is not required. If this is enabled, SteVe will update the connector status no matter what.</span>
+                            </a>
+                        </td>
+                    </tr>
                 </tbody>
             </table>
 

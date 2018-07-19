@@ -193,7 +193,7 @@ public class ChargePointRepositoryImpl implements ChargePointRepository {
         Field<DateTime> t2Ts = CONNECTOR_STATUS.STATUS_TIMESTAMP.as("t2_ts");
         Field<String> t2Status = CONNECTOR_STATUS.STATUS.as("t2_status");
         Field<String> t2Error = CONNECTOR_STATUS.ERROR_CODE.as("t2_error");
-        Table<?> t2 = ctx.select(t2Pk, t2Ts, t2Status, t2Error)
+        Table<?> t2 = ctx.selectDistinct(t2Pk, t2Ts, t2Status, t2Error)
                          .from(CONNECTOR_STATUS)
                          .join(t1)
                             .on(CONNECTOR_STATUS.CONNECTOR_PK.equal(t1.field(t1Pk)))

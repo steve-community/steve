@@ -1,5 +1,6 @@
 package de.rwth.idsg.steve.repository.impl;
 
+import com.google.common.util.concurrent.Striped;
 import de.rwth.idsg.steve.SteveException;
 import de.rwth.idsg.steve.repository.OcppServerRepository;
 import de.rwth.idsg.steve.repository.ReservationRepository;
@@ -9,6 +10,8 @@ import de.rwth.idsg.steve.repository.dto.TransactionStatusUpdate;
 import de.rwth.idsg.steve.repository.dto.UpdateChargeboxParams;
 import de.rwth.idsg.steve.repository.dto.UpdateTransactionParams;
 import jooq.steve.db.tables.records.ConnectorMeterValueRecord;
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import ocpp.cs._2015._10.MeterValue;
 import org.joda.time.DateTime;
@@ -20,6 +23,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.concurrent.locks.Lock;
 import java.util.stream.Collectors;
 
 import static jooq.steve.db.tables.ChargeBox.CHARGE_BOX;
@@ -43,6 +47,8 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
 
     @Autowired private DSLContext ctx;
     @Autowired private ReservationRepository reservationRepository;
+
+    private final Striped<Lock> transactionTableLocks = Striped.lock(16);
 
     @Override
     public void updateChargebox(UpdateChargeboxParams p) {
@@ -172,21 +178,14 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
         boolean unknownTagInserted = insertIgnoreIdTag(ctx, p);
 
         // -------------------------------------------------------------------------
-        // Step 2: Insert transaction
+        // Step 2: Insert transaction if it does not exist already
         // -------------------------------------------------------------------------
 
-        Integer transactionId = ctx.insertInto(TRANSACTION)
-                                   .set(TRANSACTION.CONNECTOR_PK, connectorPkQuery)
-                                   .set(TRANSACTION.ID_TAG, p.getIdTag())
-                                   .set(TRANSACTION.START_TIMESTAMP, p.getStartTimestamp())
-                                   .set(TRANSACTION.START_VALUE, p.getStartMeterValue())
-                                   .returning(TRANSACTION.TRANSACTION_PK)
-                                   .fetchOne()
-                                   .getTransactionPk();
+        TransactionDataHolder data = insertIgnoreTransaction(p, connectorPkQuery);
+        Integer transactionId = data.transactionId;
 
-        // Actually unnecessary, because JOOQ will throw an exception, if something goes wrong
-        if (transactionId == null) {
-            throw new SteveException("Failed to INSERT transaction into database");
+        if (data.existsAlready) {
+            return transactionId;
         }
 
         if (unknownTagInserted) {
@@ -280,6 +279,54 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
     // -------------------------------------------------------------------------
     // Helpers
     // -------------------------------------------------------------------------
+
+    @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
+    private static final class TransactionDataHolder {
+        final boolean existsAlready;
+        final Integer transactionId;
+    }
+
+    /**
+     * Use case: If the station sends identical StartTransaction messages multiple times (e.g. due to connection
+     * problems the response of StartTransaction could not be delivered and station tries again later), we do not want
+     * to insert this into database multiple times.
+     */
+    private TransactionDataHolder insertIgnoreTransaction(InsertTransactionParams p,
+                                                          SelectConditionStep<Record1<Integer>> connectorPkQuery) {
+        Lock l = transactionTableLocks.get(p.getChargeBoxId());
+        l.lock();
+        try {
+            Record1<Integer> r = ctx.select(TRANSACTION.TRANSACTION_PK)
+                                    .from(TRANSACTION)
+                                    .where(TRANSACTION.CONNECTOR_PK.eq(connectorPkQuery))
+                                    .and(TRANSACTION.ID_TAG.eq(p.getIdTag()))
+                                    .and(TRANSACTION.START_TIMESTAMP.eq(p.getStartTimestamp()))
+                                    .and(TRANSACTION.START_VALUE.eq(p.getStartMeterValue()))
+                                    .fetchOne();
+
+            if (r != null) {
+                return new TransactionDataHolder(true, r.value1());
+            }
+
+            Integer transactionId = ctx.insertInto(TRANSACTION)
+                                       .set(TRANSACTION.CONNECTOR_PK, connectorPkQuery)
+                                       .set(TRANSACTION.ID_TAG, p.getIdTag())
+                                       .set(TRANSACTION.START_TIMESTAMP, p.getStartTimestamp())
+                                       .set(TRANSACTION.START_VALUE, p.getStartMeterValue())
+                                       .returning(TRANSACTION.TRANSACTION_PK)
+                                       .fetchOne()
+                                       .getTransactionPk();
+
+            // Actually unnecessary, because JOOQ will throw an exception, if something goes wrong
+            if (transactionId == null) {
+                throw new SteveException("Failed to INSERT transaction into database");
+            }
+
+            return new TransactionDataHolder(false, transactionId);
+        } finally {
+            l.unlock();
+        }
+    }
 
     /**
      * After a transaction start/stop event, a charging station _might_ send a connector status notification, but it is

@@ -22,7 +22,7 @@ import org.jooq.Record5;
 import org.jooq.Result;
 import org.jooq.SelectConditionStep;
 import org.jooq.SelectQuery;
-import org.jooq.TableLike;
+import org.jooq.Table;
 import org.jooq.exception.DataAccessException;
 import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -180,29 +180,39 @@ public class ChargePointRepositoryImpl implements ChargePointRepository {
 
     @Override
     public List<ConnectorStatus> getChargePointConnectorStatus() {
-        // Prepare for the inner select of the second join
+        // find out the latest timestamp for each connector
         Field<Integer> t1Pk = CONNECTOR_STATUS.CONNECTOR_PK.as("t1_pk");
-        Field<DateTime> t1Max = DSL.max(CONNECTOR_STATUS.STATUS_TIMESTAMP).as("t1_max");
-        TableLike<?> t1 = ctx.select(t1Pk, t1Max)
-                             .from(CONNECTOR_STATUS)
-                             .groupBy(CONNECTOR_STATUS.CONNECTOR_PK)
-                             .asTable("t1");
+        Field<DateTime> t1TsMax = DSL.max(CONNECTOR_STATUS.STATUS_TIMESTAMP).as("t1_ts_max");
+        Table<?> t1 = ctx.select(t1Pk, t1TsMax)
+                         .from(CONNECTOR_STATUS)
+                         .groupBy(CONNECTOR_STATUS.CONNECTOR_PK)
+                         .asTable("t1");
 
-        return ctx.select(CHARGE_BOX.CHARGE_BOX_PK,
-                          CONNECTOR.CHARGE_BOX_ID,
-                          CONNECTOR.CONNECTOR_ID,
-                          CONNECTOR_STATUS.STATUS_TIMESTAMP,
-                          CONNECTOR_STATUS.STATUS,
-                          CONNECTOR_STATUS.ERROR_CODE)
-                  .from(CONNECTOR_STATUS)
+        // get the status table with latest timestamps only
+        Field<Integer> t2Pk = CONNECTOR_STATUS.CONNECTOR_PK.as("t2_pk");
+        Field<DateTime> t2Ts = CONNECTOR_STATUS.STATUS_TIMESTAMP.as("t2_ts");
+        Field<String> t2Status = CONNECTOR_STATUS.STATUS.as("t2_status");
+        Field<String> t2Error = CONNECTOR_STATUS.ERROR_CODE.as("t2_error");
+        Table<?> t2 = ctx.select(t2Pk, t2Ts, t2Status, t2Error)
+                         .from(CONNECTOR_STATUS)
+                         .join(t1)
+                            .on(CONNECTOR_STATUS.CONNECTOR_PK.equal(t1.field(t1Pk)))
+                            .and(CONNECTOR_STATUS.STATUS_TIMESTAMP.equal(t1.field(t1TsMax)))
+                         .asTable("t2");
+
+        return ctx.select(
+                        CHARGE_BOX.CHARGE_BOX_PK,
+                        CONNECTOR.CHARGE_BOX_ID,
+                        CONNECTOR.CONNECTOR_ID,
+                        t2.field(t2Ts),
+                        t2.field(t2Status),
+                        t2.field(t2Error))
+                  .from(t2)
                   .join(CONNECTOR)
-                        .onKey()
+                        .on(CONNECTOR.CONNECTOR_PK.eq(t2.field(t2Pk)))
                   .join(CHARGE_BOX)
                         .on(CHARGE_BOX.CHARGE_BOX_ID.eq(CONNECTOR.CHARGE_BOX_ID))
-                  .join(t1)
-                        .on(CONNECTOR_STATUS.CONNECTOR_PK.equal(t1.field(t1Pk)))
-                        .and(CONNECTOR_STATUS.STATUS_TIMESTAMP.equal(t1.field(t1Max)))
-                  .orderBy(CONNECTOR_STATUS.STATUS_TIMESTAMP.desc())
+                  .orderBy(t2.field(t2Ts).desc())
                   .fetch()
                   .map(r -> ConnectorStatus.builder()
                                            .chargeBoxPk(r.value1())

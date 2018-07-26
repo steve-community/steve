@@ -7,9 +7,16 @@ import de.rwth.idsg.steve.utils.StressTester;
 import de.rwth.idsg.steve.utils.__DatabasePreparer__;
 import ocpp.cs._2015._10.BootNotificationRequest;
 import ocpp.cs._2015._10.BootNotificationResponse;
+import ocpp.cs._2015._10.CentralSystemService;
+import ocpp.cs._2015._10.Measurand;
+import ocpp.cs._2015._10.MeterValue;
+import ocpp.cs._2015._10.MeterValuesRequest;
+import ocpp.cs._2015._10.MeterValuesResponse;
 import ocpp.cs._2015._10.RegistrationStatus;
+import ocpp.cs._2015._10.SampledValue;
 import ocpp.cs._2015._10.StartTransactionRequest;
 import ocpp.cs._2015._10.StartTransactionResponse;
+import ocpp.cs._2015._10.UnitOfMeasure;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.client.methods.RequestBuilder;
@@ -81,12 +88,32 @@ public class Issue72LowLevelSoap extends StressTest {
 
         StressTester.Runnable runnable = new StressTester.Runnable() {
 
+            private final ThreadLocal<CentralSystemService> threadLocalClient = new ThreadLocal<>();
+
             @Override
             public void beforeRepeat() {
+                threadLocalClient.set(getForOcpp16(path));
             }
 
             @Override
             public void toRepeat() {
+
+                MeterValuesResponse mvr = threadLocalClient.get().meterValues(
+                        new MeterValuesRequest()
+                                .withConnectorId(connectorId)
+                                .withTransactionId(transactionId)
+                                .withMeterValue(
+                                        new MeterValue()
+                                                .withTimestamp(stopDateTime)
+                                                .withSampledValue(
+                                                        new SampledValue()
+                                                                .withMeasurand(Measurand.ENERGY_ACTIVE_IMPORT_REGISTER)
+                                                                .withValue("555")
+                                                                .withUnit(UnitOfMeasure.WH))),
+                        chargeBoxId
+                );
+                Assert.assertNotNull(mvr);
+
                 try {
                     httpClient.execute(req, httpResponse -> {
                         if (httpResponse.getStatusLine().getStatusCode() != HttpStatus.SC_OK) {
@@ -122,7 +149,7 @@ public class Issue72LowLevelSoap extends StressTest {
                 "<ReplyTo xmlns=\"http://www.w3.org/2005/08/addressing\"><Address>http://www.w3.org/2005/08/addressing/anonymous</Address>" +
                 "</ReplyTo><chargeBoxIdentity xmlns=\"urn://Ocpp/Cs/2015/10/\">" + chargeBoxId + "</chargeBoxIdentity>" +
                 "</soap:Header>" +
-                "<soap:Body><stopTransactionRequest xmlns=\"urn://Ocpp/Cs/2015/10/\"><transactionId>" + transactionId + " </transactionId>" +
+                "<soap:Body><stopTransactionRequest xmlns=\"urn://Ocpp/Cs/2015/10/\"><transactionId>" + transactionId + "</transactionId>" +
                 "<idTag>" + idTag + "</idTag>" +
                 "<timestamp>" + stop + "</timestamp>" +
                 "<meterStop>" + meterStop + "</meterStop>" +

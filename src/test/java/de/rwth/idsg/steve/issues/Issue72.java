@@ -7,11 +7,16 @@ import de.rwth.idsg.steve.utils.__DatabasePreparer__;
 import ocpp.cs._2015._10.BootNotificationRequest;
 import ocpp.cs._2015._10.BootNotificationResponse;
 import ocpp.cs._2015._10.CentralSystemService;
+import ocpp.cs._2015._10.MeterValue;
+import ocpp.cs._2015._10.MeterValuesRequest;
+import ocpp.cs._2015._10.MeterValuesResponse;
 import ocpp.cs._2015._10.RegistrationStatus;
+import ocpp.cs._2015._10.SampledValue;
 import ocpp.cs._2015._10.StartTransactionRequest;
 import ocpp.cs._2015._10.StartTransactionResponse;
 import ocpp.cs._2015._10.StopTransactionRequest;
 import ocpp.cs._2015._10.StopTransactionResponse;
+import ocpp.cs._2015._10.UnitOfMeasure;
 import org.joda.time.DateTime;
 import org.junit.Assert;
 
@@ -75,6 +80,21 @@ public class Issue72 extends StressTest {
 
             @Override
             public void toRepeat() {
+                MeterValuesResponse mvr = threadLocalClient.get().meterValues(
+                        new MeterValuesRequest()
+                                .withConnectorId(connectorId)
+                                .withTransactionId(transactionId)
+                                .withMeterValue(
+                                        new MeterValue()
+                                                .withTimestamp(stopDateTime)
+                                                .withSampledValue(
+                                                        new SampledValue()
+                                                                .withValue("555")
+                                                                .withUnit(UnitOfMeasure.WH))),
+                        chargeBoxId
+                );
+                Assert.assertNotNull(mvr);
+
                 StopTransactionResponse stop = threadLocalClient.get().stopTransaction(
                         new StopTransactionRequest()
                                 .withTransactionId(transactionId)

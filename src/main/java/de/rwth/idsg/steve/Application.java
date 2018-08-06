@@ -26,10 +26,16 @@ public class Application implements ApplicationStarter, AutoCloseable {
         DateTimeZone.setDefault(DateTimeZone.forID(sc.getTimeZoneId()));
         log.info("Date/time zone of the application is set to {}. Current date/time: {}", sc.getTimeZoneId(), DateTime.now());
 
-        if (sc.getProfile().isProd()) {
-            delegate = new SteveProdStarter();
-        } else {
-            delegate = new SteveDevStarter();
+        switch (sc.getProfile()) {
+            case DEV:
+                delegate = new SteveDevStarter();
+                break;
+            case TEST:
+            case PROD:
+                delegate = new SteveProdStarter();
+                break;
+            default:
+                throw new RuntimeException("Unexpected profile");
         }
     }
 

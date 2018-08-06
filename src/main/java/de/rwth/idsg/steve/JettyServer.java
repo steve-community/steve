@@ -1,5 +1,6 @@
 package de.rwth.idsg.steve;
 
+import de.rwth.idsg.steve.web.dto.EndpointInfo;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.jetty.http.HttpScheme;
 import org.eclipse.jetty.http.HttpVersion;
@@ -133,6 +134,7 @@ public class JettyServer {
 
         if (server != null) {
             server.start();
+            populateEndpointInfo();
         }
     }
 
@@ -155,7 +157,17 @@ public class JettyServer {
         return server != null && server.isStarted();
     }
 
-    public List<String> getConnectorPathList() {
+    public void populateEndpointInfo() {
+        List<String> list = getConnectorPathList();
+
+        EndpointInfo info = EndpointInfo.INSTANCE;
+
+        info.getWebInterface().setData(buildList(list, false));
+        info.getOcppSoap().setData(buildList(list, false));
+        info.getOcppWebSocket().setData(buildList(list, true));
+    }
+
+    private List<String> getConnectorPathList() {
         if (server == null) {
             return Collections.emptyList();
         }
@@ -190,5 +202,19 @@ public class JettyServer {
         String layout = "%s://%s:%d" + CONFIG.getContextPath();
 
         return String.format(layout, prefix, host, port);
+    }
+
+    private List<String> buildList(List<String> list, boolean replaceHttp) {
+        return list.stream()
+                   .map(s -> getElementPrefix(s, replaceHttp))
+                   .collect(Collectors.toList());
+    }
+
+    private String getElementPrefix(String str, boolean replaceHttp) {
+        if (replaceHttp) {
+            return str.replaceFirst("http", "ws");
+        } else {
+            return str;
+        }
     }
 }

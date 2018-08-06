@@ -1,10 +1,10 @@
 package de.rwth.idsg.steve;
 
 import de.rwth.idsg.steve.utils.LogFileRetriever;
+import de.rwth.idsg.steve.web.dto.EndpointInfo;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.Iterator;
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -95,47 +95,31 @@ public class SteveProdStarter implements ApplicationStarter {
     }
 
     private void printURLs() {
-        List<String> list = jettyServer.getConnectorPathList();
+        EndpointInfo info = EndpointInfo.INSTANCE;
 
-        printList(list.iterator(), false,
-                "Access the web interface using:",
-                "/manager/home");
-
-        printList(list.iterator(), false,
-                "SOAP endpoint for OCPP:",
-                "/services/CentralSystemService");
-
-        printList(list.iterator(), true,
-                "WebSocket/JSON endpoint for OCPP:",
-                "/websocket/CentralSystemService/<chargeBoxId>");
+        printInfo(info.getWebInterface());
+        printInfo(info.getOcppSoap());
+        printInfo(info.getOcppWebSocket());
     }
 
-    private void printList(Iterator<String> it, boolean replaceHttp, String title, String elementPostfix) {
-        StringBuilder sb  = new StringBuilder(title)
+    private void printInfo(EndpointInfo.ItemsWithInfo itemsWithInfo) {
+        StringBuilder sb  = new StringBuilder(itemsWithInfo.getInfo())
                 .append(sep());
+
+        Iterator<String> it = itemsWithInfo.getData().iterator();
 
         if (it.hasNext()) {
             sb.append("- ")
-              .append(getElementPrefix(it.next(), replaceHttp))
-              .append(elementPostfix);
+              .append(it.next());
 
             while (it.hasNext()) {
                 sb.append(sep())
                   .append("- ")
-                  .append(getElementPrefix(it.next(), replaceHttp))
-                  .append(elementPostfix);
+                  .append(it.next());
             }
         }
 
         println(sb.toString());
-    }
-
-    private String getElementPrefix(String str, boolean replaceHttp) {
-        if (replaceHttp) {
-            return str.replaceFirst("http", "ws");
-        } else {
-            return str;
-        }
     }
 
     private static String sep() {

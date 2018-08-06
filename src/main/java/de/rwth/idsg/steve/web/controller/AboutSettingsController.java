@@ -5,6 +5,7 @@ import de.rwth.idsg.steve.repository.GenericRepository;
 import de.rwth.idsg.steve.repository.SettingsRepository;
 import de.rwth.idsg.steve.service.MailService;
 import de.rwth.idsg.steve.service.ReleaseCheckService;
+import de.rwth.idsg.steve.web.dto.EndpointInfo;
 import de.rwth.idsg.steve.web.dto.SettingsForm;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -54,6 +55,7 @@ public class AboutSettingsController {
         model.addAttribute("systemTime", DateTime.now());
         model.addAttribute("systemTimeZone", DateTimeZone.getDefault());
         model.addAttribute("releaseReport", releaseCheckService.check());
+        model.addAttribute("endpointInfo", EndpointInfo.INSTANCE);
         return "about";
     }
 

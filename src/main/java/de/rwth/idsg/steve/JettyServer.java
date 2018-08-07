@@ -4,7 +4,6 @@ import de.rwth.idsg.steve.web.dto.EndpointInfo;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.jetty.http.HttpScheme;
 import org.eclipse.jetty.http.HttpVersion;
-import org.eclipse.jetty.server.ConnectionFactory;
 import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.HttpConfiguration;
 import org.eclipse.jetty.server.HttpConnectionFactory;
@@ -16,11 +15,17 @@ import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.eclipse.jetty.util.thread.QueuedThreadPool;
 import org.eclipse.jetty.util.thread.ScheduledExecutorScheduler;
 
+import java.net.DatagramSocket;
 import java.net.InetAddress;
-import java.net.UnknownHostException;
+import java.net.InetSocketAddress;
+import java.net.Socket;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -174,34 +179,33 @@ public class JettyServer {
 
         return Arrays.stream(server.getConnectors())
                      .map(JettyServer::getConnectorPath)
+                     .flatMap(Collection::stream)
                      .collect(Collectors.toList());
     }
 
-    private static String getConnectorPath(Connector c) {
+    private static List<String> getConnectorPath(Connector c) {
         ServerConnector sc = (ServerConnector) c;
 
-        String prefix = "http";
-        String host = sc.getHost();
-        int port = sc.getPort();
-
-        ConnectionFactory cf = sc.getDefaultConnectionFactory();
-        if (cf instanceof SslConnectionFactory) {
+        final String prefix;
+        if (sc.getDefaultConnectionFactory() instanceof SslConnectionFactory) {
             prefix = "https";
+        } else {
+            prefix = "http";
         }
 
+        Set<String> ips = new HashSet<>();
+        String host = sc.getHost();
         if (host == null || host.equals("0.0.0.0")) {
-            try {
-                host = InetAddress.getLocalHost().getHostAddress();
-            } catch (UnknownHostException e) {
-                // Well, we failed to read from system, fall back to main.properties.
-                // Better than nothing
-                host = CONFIG.getJetty().getServerHost();
-            }
+            ips.addAll(getPossibleIpAddresses());
+        } else {
+            ips.add(host);
         }
 
         String layout = "%s://%s:%d" + CONFIG.getContextPath();
 
-        return String.format(layout, prefix, host, port);
+        return ips.stream()
+                  .map(k -> String.format(layout, prefix, k, sc.getPort()))
+                  .collect(Collectors.toList());
     }
 
     private List<String> buildList(List<String> list, boolean replaceHttp) {
@@ -216,5 +220,45 @@ public class JettyServer {
         } else {
             return str;
         }
+    }
+
+    /**
+     * Uses different APIs to find out the IP of this machine.
+     */
+    private static List<String> getPossibleIpAddresses() {
+        final String host = "treibhaus.informatik.rwth-aachen.de";
+        final List<String> ips = new ArrayList<>();
+
+        try {
+            ips.add(InetAddress.getLocalHost().getHostAddress());
+        } catch (Exception e) {
+            // fail silently
+        }
+
+        try {
+            Socket socket = new Socket();
+            socket.connect(new InetSocketAddress(host, 80));
+            ips.add(socket.getLocalAddress().getHostAddress());
+        } catch (Exception e) {
+            // fail silently
+        }
+
+        // https://stackoverflow.com/a/38342964
+        try (DatagramSocket socket = new DatagramSocket()) {
+            socket.connect(InetAddress.getByName("8.8.8.8"), 10002);
+            ips.add(socket.getLocalAddress().getHostAddress());
+        } catch (Exception e) {
+            // fail silently
+        }
+
+        ips.removeIf("0.0.0.0"::equals);
+
+        if (ips.isEmpty()) {
+            // Well, we failed to read from system, fall back to main.properties.
+            // Better than nothing
+            ips.add(CONFIG.getJetty().getServerHost());
+        }
+
+        return ips;
     }
 }

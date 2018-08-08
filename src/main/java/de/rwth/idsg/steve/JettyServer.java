@@ -16,13 +16,16 @@ import org.eclipse.jetty.util.thread.QueuedThreadPool;
 import org.eclipse.jetty.util.thread.ScheduledExecutorScheduler;
 
 import java.net.DatagramSocket;
+import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
+import java.net.NetworkInterface;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -247,6 +250,22 @@ public class JettyServer {
         try (DatagramSocket socket = new DatagramSocket()) {
             socket.connect(InetAddress.getByName("8.8.8.8"), 10002);
             ips.add(socket.getLocalAddress().getHostAddress());
+        } catch (Exception e) {
+            // fail silently
+        }
+
+        // https://stackoverflow.com/a/20418809
+        try {
+            for (Enumeration<NetworkInterface> ifaces = NetworkInterface.getNetworkInterfaces(); ifaces.hasMoreElements();) {
+                NetworkInterface iface = ifaces.nextElement();
+                for (Enumeration<InetAddress> inetAddrs = iface.getInetAddresses(); inetAddrs.hasMoreElements();) {
+                    InetAddress inetAddr = inetAddrs.nextElement();
+                    if (!inetAddr.isLoopbackAddress() && (inetAddr instanceof Inet4Address)) {
+                        ips.add(inetAddr.getHostAddress());
+                    }
+                }
+            }
+
         } catch (Exception e) {
             // fail silently
         }

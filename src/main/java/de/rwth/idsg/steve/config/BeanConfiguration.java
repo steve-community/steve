@@ -1,7 +1,7 @@
 package de.rwth.idsg.steve.config;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
-import com.mysql.cj.core.conf.PropertyDefinitions;
+import com.mysql.cj.conf.PropertyDefinitions;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import de.rwth.idsg.steve.SteveConfiguration;

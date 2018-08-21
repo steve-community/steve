@@ -22,6 +22,7 @@ import jooq.steve.db.tables.records.OcppTagRecord;
 import jooq.steve.db.tables.records.TransactionRecord;
 import org.joda.time.DateTime;
 import org.jooq.DSLContext;
+import org.jooq.Schema;
 import org.jooq.Table;
 import org.jooq.impl.DSL;
 
@@ -30,6 +31,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 import static jooq.steve.db.tables.ChargeBox.CHARGE_BOX;
 import static jooq.steve.db.tables.OcppTag.OCPP_TAG;
@@ -127,15 +129,24 @@ public class __DatabasePreparer__ {
     private static void truncateTables(DSLContext ctx) {
         Set<Table<?>> skipList = Sets.newHashSet(SchemaVersion.SCHEMA_VERSION, Settings.SETTINGS);
         ctx.transaction(configuration -> {
+            Schema schema = DefaultCatalog.DEFAULT_CATALOG.getSchemas()
+                                                          .stream()
+                                                          .filter(s -> SCHEMA_TO_TRUNCATE.equals(s.getName()))
+                                                          .findFirst()
+                                                          .orElseThrow(() -> new RuntimeException("Could not find schema"));
+
+            List<Table<?>> tables = schema.getTables()
+                                          .stream()
+                                          .filter(t -> !skipList.contains(t))
+                                          .collect(Collectors.toList());
+
+            if (tables.isEmpty()) {
+                throw new RuntimeException("Could not find tables to truncate");
+            }
+
             DSLContext internalCtx = DSL.using(configuration);
             internalCtx.execute("SET FOREIGN_KEY_CHECKS=0");
-            DefaultCatalog.DEFAULT_CATALOG.getSchemas()
-                                          .stream()
-                                          .filter(schema -> SCHEMA_TO_TRUNCATE.equals(schema.getName()))
-                                          .forEach(schema -> schema.getTables()
-                                                                   .stream()
-                                                                   .filter(t -> !skipList.contains(t))
-                                                                   .forEach(t -> internalCtx.truncate(t).execute()));
+            tables.forEach(t -> internalCtx.truncate(t).execute());
             internalCtx.execute("SET FOREIGN_KEY_CHECKS=1");
         });
     }

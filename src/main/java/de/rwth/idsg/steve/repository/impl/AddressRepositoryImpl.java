@@ -11,7 +11,7 @@ import org.jooq.SelectConditionStep;
 import org.jooq.exception.DataAccessException;
 import org.springframework.stereotype.Repository;
 
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 import static jooq.steve.db.tables.Address.ADDRESS;
 

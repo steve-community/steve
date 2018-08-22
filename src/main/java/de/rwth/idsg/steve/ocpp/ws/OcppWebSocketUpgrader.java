@@ -10,7 +10,7 @@ import org.springframework.web.socket.WebSocketHandler;
 import org.springframework.web.socket.server.HandshakeFailureException;
 import org.springframework.web.socket.server.jetty.JettyRequestUpgradeStrategy;
 
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 import java.security.Principal;
 import java.util.List;
 import java.util.Map;

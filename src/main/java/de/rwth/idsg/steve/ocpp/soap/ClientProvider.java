@@ -30,4 +30,11 @@ public final class ClientProvider {
         f.setAddress(endpointAddress);
         return f;
     }
+
+    public static <T> T createClient(Class<T> clazz, String endpointAddress) {
+        JaxWsProxyFactoryBean bean = getBean(endpointAddress);
+        bean.setServiceClass(clazz);
+
+        return clazz.cast(bean.create());
+    }
 }

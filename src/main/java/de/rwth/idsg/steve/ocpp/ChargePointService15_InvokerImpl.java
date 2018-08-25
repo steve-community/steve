@@ -22,7 +22,6 @@ import de.rwth.idsg.steve.ocpp.ws.ocpp15.Ocpp15WebSocketEndpoint;
 import de.rwth.idsg.steve.ocpp.ws.pipeline.OutgoingCallPipeline;
 import de.rwth.idsg.steve.repository.dto.ChargePointSelect;
 import ocpp.cp._2012._06.ChargePointService;
-import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -177,8 +176,6 @@ public class ChargePointService15_InvokerImpl
     }
 
     private static ChargePointService create(ChargePointSelect cp) {
-        JaxWsProxyFactoryBean f = ClientProvider.getBean(cp.getEndpointAddress());
-        f.setServiceClass(ChargePointService.class);
-        return (ChargePointService) f.create();
+        return ClientProvider.createClient(ChargePointService.class, cp.getEndpointAddress());
     }
 }

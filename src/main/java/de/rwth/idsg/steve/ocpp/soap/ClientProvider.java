@@ -1,9 +1,18 @@
 package de.rwth.idsg.steve.ocpp.soap;
 
+import org.apache.cxf.configuration.jsse.TLSClientParameters;
+import org.apache.cxf.endpoint.Client;
+import org.apache.cxf.frontend.ClientProxy;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
+import org.apache.cxf.transport.http.HTTPConduit;
 import org.apache.cxf.ws.addressing.WSAddressingFeature;
+import org.eclipse.jetty.util.ssl.SslContextFactory;
+import org.jetbrains.annotations.Nullable;
 
+import javax.net.ssl.SSLSocketFactory;
 import javax.xml.ws.soap.SOAPBinding;
+
+import static de.rwth.idsg.steve.SteveConfiguration.CONFIG;
 
 /**
  * TODO: Is it expensive to create the proxies every time?
@@ -20,9 +29,34 @@ import javax.xml.ws.soap.SOAPBinding;
  */
 public final class ClientProvider {
 
+    @Nullable private static TLSClientParameters tlsClientParams;
+
+    static {
+        if (shouldInitSSL()) {
+            tlsClientParams = new TLSClientParameters();
+            tlsClientParams.setSSLSocketFactory(setupSSL());
+        } else {
+            tlsClientParams = null;
+        }
+    }
+
     private ClientProvider() { }
 
-    public static JaxWsProxyFactoryBean getBean(String endpointAddress) {
+    public static <T> T createClient(Class<T> clazz, String endpointAddress) {
+        JaxWsProxyFactoryBean bean = getBean(endpointAddress);
+        bean.setServiceClass(clazz);
+        T clientObject = clazz.cast(bean.create());
+
+        if (tlsClientParams != null) {
+            Client client = ClientProxy.getClient(clientObject);
+            HTTPConduit http = (HTTPConduit) client.getConduit();
+            http.setTlsClientParameters(tlsClientParams);
+        }
+
+        return clientObject;
+    }
+
+    private static JaxWsProxyFactoryBean getBean(String endpointAddress) {
         JaxWsProxyFactoryBean f = new JaxWsProxyFactoryBean();
         f.setBindingId(SOAPBinding.SOAP12HTTP_BINDING);
         f.getFeatures().add(LoggingFeatureProxy.INSTANCE.get());
@@ -31,10 +65,20 @@ public final class ClientProvider {
         return f;
     }
 
-    public static <T> T createClient(Class<T> clazz, String endpointAddress) {
-        JaxWsProxyFactoryBean bean = getBean(endpointAddress);
-        bean.setServiceClass(clazz);
+    private static boolean shouldInitSSL() {
+        return CONFIG.getJetty().getKeyStorePath() != null && CONFIG.getJetty().getKeyStorePassword() != null;
+    }
 
-        return clazz.cast(bean.create());
+    private static SSLSocketFactory setupSSL() {
+        SslContextFactory ssl = new SslContextFactory(CONFIG.getJetty().getKeyStorePath());
+        ssl.setKeyStorePassword(CONFIG.getJetty().getKeyStorePassword());
+        ssl.setKeyManagerPassword(CONFIG.getJetty().getKeyStorePassword());
+        try {
+            ssl.start();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+        return ssl.getSslContext().getSocketFactory();
     }
 }

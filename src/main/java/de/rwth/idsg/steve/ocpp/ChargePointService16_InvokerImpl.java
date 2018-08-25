@@ -20,7 +20,7 @@ import de.rwth.idsg.steve.ocpp.task.SetChargingProfileTask;
 import de.rwth.idsg.steve.ocpp.task.TriggerMessageTask;
 import de.rwth.idsg.steve.ocpp.task.UnlockConnectorTask;
 import de.rwth.idsg.steve.ocpp.task.UpdateFirmwareTask;
-import de.rwth.idsg.steve.ocpp.ws.AbstractChargePointServiceInvoker;
+import de.rwth.idsg.steve.ocpp.ws.ChargePointServiceInvoker;
 import de.rwth.idsg.steve.ocpp.ws.ocpp16.Ocpp16TypeStore;
 import de.rwth.idsg.steve.ocpp.ws.ocpp16.Ocpp16WebSocketEndpoint;
 import de.rwth.idsg.steve.ocpp.ws.pipeline.OutgoingCallPipeline;
@@ -34,14 +34,15 @@ import org.springframework.stereotype.Service;
  * @since 13.03.2018
  */
 @Service
-public class ChargePointService16_InvokerImpl
-        extends AbstractChargePointServiceInvoker
-        implements ChargePointService16_Invoker {
+public class ChargePointService16_InvokerImpl implements ChargePointService16_Invoker {
 
-    @Autowired private ClientProvider clientProvider;
+    private final ChargePointServiceInvoker wsHelper;
+    private final ClientProvider soapHelper;
 
-    public ChargePointService16_InvokerImpl(OutgoingCallPipeline pipeline, Ocpp16WebSocketEndpoint endpoint) {
-        super(pipeline, endpoint, Ocpp16TypeStore.INSTANCE);
+    @Autowired
+    public ChargePointService16_InvokerImpl(OutgoingCallPipeline pipeline, Ocpp16WebSocketEndpoint endpoint, ClientProvider clientProvider) {
+        this.wsHelper = new ChargePointServiceInvoker(pipeline, endpoint, Ocpp16TypeStore.INSTANCE);
+        this.soapHelper = clientProvider;
     }
 
     @Override
@@ -207,7 +208,11 @@ public class ChargePointService16_InvokerImpl
         }
     }
 
+    private void runPipeline(ChargePointSelect cp, CommunicationTask task) {
+        wsHelper.runPipeline(cp, task);
+    }
+
     private ChargePointService create(ChargePointSelect cp) {
-        return clientProvider.createClient(ChargePointService.class, cp.getEndpointAddress());
+        return soapHelper.createClient(ChargePointService.class, cp.getEndpointAddress());
     }
 }

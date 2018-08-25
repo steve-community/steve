@@ -20,7 +20,7 @@ import java.util.UUID;
  * @since 20.03.2015
  */
 @RequiredArgsConstructor
-public abstract class AbstractChargePointServiceInvoker {
+public class ChargePointServiceInvoker {
     private final Logger log = LoggerFactory.getLogger(getClass());
 
     private final OutgoingCallPipeline outgoingCallPipeline;

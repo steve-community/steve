@@ -16,7 +16,7 @@ import de.rwth.idsg.steve.ocpp.task.ResetTask;
 import de.rwth.idsg.steve.ocpp.task.SendLocalListTask;
 import de.rwth.idsg.steve.ocpp.task.UnlockConnectorTask;
 import de.rwth.idsg.steve.ocpp.task.UpdateFirmwareTask;
-import de.rwth.idsg.steve.ocpp.ws.AbstractChargePointServiceInvoker;
+import de.rwth.idsg.steve.ocpp.ws.ChargePointServiceInvoker;
 import de.rwth.idsg.steve.ocpp.ws.ocpp15.Ocpp15TypeStore;
 import de.rwth.idsg.steve.ocpp.ws.ocpp15.Ocpp15WebSocketEndpoint;
 import de.rwth.idsg.steve.ocpp.ws.pipeline.OutgoingCallPipeline;
@@ -30,15 +30,15 @@ import org.springframework.stereotype.Service;
  * @since 10.03.2018
  */
 @Service
-public class ChargePointService15_InvokerImpl
-        extends AbstractChargePointServiceInvoker
-        implements ChargePointService15_Invoker {
+public class ChargePointService15_InvokerImpl implements ChargePointService15_Invoker {
 
-    @Autowired private ClientProvider clientProvider;
+    private final ChargePointServiceInvoker wsHelper;
+    private final ClientProvider soapHelper;
 
     @Autowired
-    public ChargePointService15_InvokerImpl(OutgoingCallPipeline pipeline, Ocpp15WebSocketEndpoint endpoint) {
-        super(pipeline, endpoint, Ocpp15TypeStore.INSTANCE);
+    public ChargePointService15_InvokerImpl(OutgoingCallPipeline pipeline, Ocpp15WebSocketEndpoint endpoint, ClientProvider clientProvider) {
+        this.wsHelper = new ChargePointServiceInvoker(pipeline, endpoint, Ocpp15TypeStore.INSTANCE);
+        this.soapHelper = clientProvider;
     }
 
     @Override
@@ -177,7 +177,11 @@ public class ChargePointService15_InvokerImpl
         }
     }
 
+    private void runPipeline(ChargePointSelect cp, CommunicationTask task) {
+        wsHelper.runPipeline(cp, task);
+    }
+
     private ChargePointService create(ChargePointSelect cp) {
-        return clientProvider.createClient(ChargePointService.class, cp.getEndpointAddress());
+        return soapHelper.createClient(ChargePointService.class, cp.getEndpointAddress());
     }
 }

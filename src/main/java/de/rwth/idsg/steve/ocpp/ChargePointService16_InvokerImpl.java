@@ -26,6 +26,7 @@ import de.rwth.idsg.steve.ocpp.ws.ocpp16.Ocpp16WebSocketEndpoint;
 import de.rwth.idsg.steve.ocpp.ws.pipeline.OutgoingCallPipeline;
 import de.rwth.idsg.steve.repository.dto.ChargePointSelect;
 import ocpp.cp._2015._10.ChargePointService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 /**
@@ -36,6 +37,8 @@ import org.springframework.stereotype.Service;
 public class ChargePointService16_InvokerImpl
         extends AbstractChargePointServiceInvoker
         implements ChargePointService16_Invoker {
+
+    @Autowired private ClientProvider clientProvider;
 
     public ChargePointService16_InvokerImpl(OutgoingCallPipeline pipeline, Ocpp16WebSocketEndpoint endpoint) {
         super(pipeline, endpoint, Ocpp16TypeStore.INSTANCE);
@@ -204,7 +207,7 @@ public class ChargePointService16_InvokerImpl
         }
     }
 
-    private static ChargePointService create(ChargePointSelect cp) {
-        return ClientProvider.createClient(ChargePointService.class, cp.getEndpointAddress());
+    private ChargePointService create(ChargePointSelect cp) {
+        return clientProvider.createClient(ChargePointService.class, cp.getEndpointAddress());
     }
 }

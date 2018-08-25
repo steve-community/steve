@@ -28,6 +28,8 @@ public class ChargePointService12_InvokerImpl
         extends AbstractChargePointServiceInvoker
         implements ChargePointService12_Invoker {
 
+    @Autowired private ClientProvider clientProvider;
+
     @Autowired
     public ChargePointService12_InvokerImpl(OutgoingCallPipeline pipeline, Ocpp12WebSocketEndpoint endpoint) {
         super(pipeline, endpoint, Ocpp12TypeStore.INSTANCE);
@@ -114,7 +116,7 @@ public class ChargePointService12_InvokerImpl
         }
     }
 
-    private static ChargePointService create(ChargePointSelect cp) {
-        return ClientProvider.createClient(ChargePointService.class, cp.getEndpointAddress());
+    private ChargePointService create(ChargePointSelect cp) {
+        return clientProvider.createClient(ChargePointService.class, cp.getEndpointAddress());
     }
 }

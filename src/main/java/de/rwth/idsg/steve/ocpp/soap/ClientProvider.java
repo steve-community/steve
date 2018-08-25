@@ -8,7 +8,9 @@ import org.apache.cxf.transport.http.HTTPConduit;
 import org.apache.cxf.ws.addressing.WSAddressingFeature;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.jetbrains.annotations.Nullable;
+import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
 import javax.net.ssl.SSLSocketFactory;
 import javax.xml.ws.soap.SOAPBinding;
 
@@ -27,11 +29,13 @@ import static de.rwth.idsg.steve.SteveConfiguration.CONFIG;
  * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
  * @since 21.10.2015
  */
-public final class ClientProvider {
+@Component
+public class ClientProvider {
 
-    @Nullable private static TLSClientParameters tlsClientParams;
+    @Nullable private TLSClientParameters tlsClientParams;
 
-    static {
+    @PostConstruct
+    private void init() {
         if (shouldInitSSL()) {
             tlsClientParams = new TLSClientParameters();
             tlsClientParams.setSSLSocketFactory(setupSSL());
@@ -40,9 +44,7 @@ public final class ClientProvider {
         }
     }
 
-    private ClientProvider() { }
-
-    public static <T> T createClient(Class<T> clazz, String endpointAddress) {
+    public <T> T createClient(Class<T> clazz, String endpointAddress) {
         JaxWsProxyFactoryBean bean = getBean(endpointAddress);
         bean.setServiceClass(clazz);
         T clientObject = clazz.cast(bean.create());

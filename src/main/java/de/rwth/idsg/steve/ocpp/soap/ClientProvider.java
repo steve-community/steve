@@ -1,16 +1,18 @@
 package de.rwth.idsg.steve.ocpp.soap;
 
+import com.oneandone.compositejks.KeyStoreLoader;
+import com.oneandone.compositejks.SslContextUtils;
 import org.apache.cxf.configuration.jsse.TLSClientParameters;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.frontend.ClientProxy;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.apache.cxf.transport.http.HTTPConduit;
 import org.apache.cxf.ws.addressing.WSAddressingFeature;
-import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
+import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocketFactory;
 import javax.xml.ws.soap.SOAPBinding;
 
@@ -72,15 +74,17 @@ public class ClientProvider {
     }
 
     private static SSLSocketFactory setupSSL() {
-        SslContextFactory ssl = new SslContextFactory(CONFIG.getJetty().getKeyStorePath());
-        ssl.setKeyStorePassword(CONFIG.getJetty().getKeyStorePassword());
-        ssl.setKeyManagerPassword(CONFIG.getJetty().getKeyStorePassword());
+        SSLContext ssl;
         try {
-            ssl.start();
+            ssl = SslContextUtils.buildMergedWithSystem(
+                    KeyStoreLoader.fromStream(
+                            CONFIG.getJetty().getKeyStorePath(),
+                            CONFIG.getJetty().getKeyStorePassword().toCharArray()
+                    )
+            );
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-
-        return ssl.getSslContext().getSocketFactory();
+        return ssl.getSocketFactory();
     }
 }

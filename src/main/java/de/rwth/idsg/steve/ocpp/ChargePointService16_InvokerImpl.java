@@ -1,6 +1,7 @@
 package de.rwth.idsg.steve.ocpp;
 
 import de.rwth.idsg.steve.ocpp.soap.ClientProvider;
+import de.rwth.idsg.steve.ocpp.soap.ClientProviderWithCache;
 import de.rwth.idsg.steve.ocpp.task.CancelReservationTask;
 import de.rwth.idsg.steve.ocpp.task.ChangeAvailabilityTask;
 import de.rwth.idsg.steve.ocpp.task.ChangeConfigurationTask;
@@ -37,12 +38,12 @@ import org.springframework.stereotype.Service;
 public class ChargePointService16_InvokerImpl implements ChargePointService16_Invoker {
 
     private final ChargePointServiceInvoker wsHelper;
-    private final ClientProvider soapHelper;
+    private final ClientProviderWithCache<ChargePointService> soapHelper;
 
     @Autowired
     public ChargePointService16_InvokerImpl(OutgoingCallPipeline pipeline, Ocpp16WebSocketEndpoint endpoint, ClientProvider clientProvider) {
         this.wsHelper = new ChargePointServiceInvoker(pipeline, endpoint, Ocpp16TypeStore.INSTANCE);
-        this.soapHelper = clientProvider;
+        this.soapHelper = new ClientProviderWithCache<>(clientProvider);
     }
 
     @Override

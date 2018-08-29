@@ -20,12 +20,15 @@ import java.util.stream.Collectors;
  * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
  * @since 29.08.2018
  */
-public final class SslContextBuilder implements KeyStoreStep, KeyManagerAlgorithmStep, ProtocolStep, SslContextStep {
+public final class SslContextBuilder implements
+        KeyStoreStep, KeyManagerAlgorithmStep, KeyManagerPasswordStep, ProtocolStep, SslContextStep {
 
-    private char[] passwordAsCharArray;
+    private char[] keyStorePassword;
+    private KeyStore keyStore;
+
     private String socketProtocol;
     private String keyManagerAlgorithm;
-    private KeyStore keyStore;
+    private char[] keyManagerPassword; // because it is possible that KeyManagerFactory pwd != KeyStore pwd
 
     private SslContextBuilder() { }
 
@@ -35,21 +38,33 @@ public final class SslContextBuilder implements KeyStoreStep, KeyManagerAlgorith
 
     @Override
     public ProtocolStep keyStoreFromStream(InputStream stream, String password) throws IOException, GeneralSecurityException {
-        passwordAsCharArray = (password == null) ? null : password.toCharArray();
+        keyStorePassword = (password == null) ? null : password.toCharArray();
         keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
-        keyStore.load(stream, passwordAsCharArray);
-        return this;
-    }
-
-    @Override
-    public SslContextStep usingAlgorithm(String keyManagerAlgorithm) {
-        this.keyManagerAlgorithm = (keyManagerAlgorithm == null) ? KeyManagerFactory.getDefaultAlgorithm() : keyManagerAlgorithm;
+        keyStore.load(stream, keyStorePassword);
         return this;
     }
 
     @Override
     public KeyManagerAlgorithmStep usingProtocol(String socketProtocol) {
         this.socketProtocol = socketProtocol;
+        return this;
+    }
+
+    /**
+     * @param keyManagerAlgorithm The algorithm for the custom key store. Defaults to system one, if null.
+     */
+    @Override
+    public KeyManagerPasswordStep usingAlgorithm(String keyManagerAlgorithm) {
+        this.keyManagerAlgorithm = (keyManagerAlgorithm == null) ? KeyManagerFactory.getDefaultAlgorithm() : keyManagerAlgorithm;
+        return this;
+    }
+
+    /**
+     * @param keyManagerPwd The password to init {@link KeyManagerFactory}. Defaults to KeyStore password, if null.
+     */
+    @Override
+    public SslContextStep usingKeyManagerPassword(String keyManagerPwd) {
+        this.keyManagerPassword = (keyManagerPwd == null) ? keyStorePassword : keyManagerPwd.toCharArray();
         return this;
     }
 
@@ -60,7 +75,7 @@ public final class SslContextBuilder implements KeyStoreStep, KeyManagerAlgorith
         KeyManager[] keyManagers = {
                 new CompositeX509KeyManager(
                         union(
-                                getSystemKeyManagers(keyManagerAlgorithm, keyStore, passwordAsCharArray),
+                                getSystemKeyManagers(keyManagerAlgorithm, keyStore, keyManagerPassword),
                                 getSystemKeyManagers(defaultAlgorithm, null, null)
                         )
                 )
@@ -106,4 +121,3 @@ public final class SslContextBuilder implements KeyStoreStep, KeyManagerAlgorith
         return newList;
     }
 }
-

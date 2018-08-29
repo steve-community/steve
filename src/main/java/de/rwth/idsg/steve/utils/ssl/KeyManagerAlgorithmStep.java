@@ -9,13 +9,13 @@ public interface KeyManagerAlgorithmStep {
     /**
      * @param keyManagerAlgorithm The algorithm for the custom key store. Defaults to system one, if null.
      */
-    SslContextStep usingAlgorithm(String keyManagerAlgorithm);
+    KeyManagerPasswordStep usingAlgorithm(String keyManagerAlgorithm);
 
-    default SslContextStep usingDefaultAlgorithm() {
+    default KeyManagerPasswordStep usingDefaultAlgorithm() {
         return usingAlgorithm(null);
     }
 
-    default SslContextStep usingSunX509() {
+    default KeyManagerPasswordStep usingSunX509() {
         return usingAlgorithm("SunX509");
     }
 }

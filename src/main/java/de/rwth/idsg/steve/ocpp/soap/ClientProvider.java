@@ -72,6 +72,7 @@ public class ClientProvider {
                                    .keyStoreFromFile(keyStorePath, keyStorePwd)
                                    .usingTLS()
                                    .usingDefaultAlgorithm()
+                                   .usingKeyManagerPasswordFromKeyStore()
                                    .buildMergedWithSystem();
         } catch (Exception e) {
             throw new RuntimeException(e);

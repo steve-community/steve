@@ -654,11 +654,5 @@
             <version>1.23</version>
         </dependency>
 
-        <dependency>
-            <groupId>com.oneandone</groupId>
-            <artifactId>composite-jks</artifactId>
-            <version>1.0</version>
-        </dependency>
-
     </dependencies>
 </project>

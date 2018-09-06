@@ -23,8 +23,8 @@
             <form:input path="expiration"/>
         </td></tr>
         <tr><td><i>
-            The amount of time in <b>hours</b> for how long a charge point <br> should cache the authorization info of an
-            idTag in its local white list, if an expiry date is not explicitly set. The value 0 disables this functionality (i.e. no expiry date will be set).
+            The amount of time in <b>hours</b> for how long a charge point should cache <br> the authorization info of an
+            idTag in its local white list, if an expiry date is not explicitly set. <br>The value 0 disables this functionality (i.e. no expiry date will be set).
         </i></td><td></td></tr>
     </table>
 

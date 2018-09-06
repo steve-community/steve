@@ -12,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import ocpp.cp._2015._10.AuthorizationData;
 import ocpp.cs._2015._10.AuthorizationStatus;
 import ocpp.cs._2015._10.IdTagInfo;
+import org.jetbrains.annotations.Nullable;
 import org.joda.time.DateTime;
 import org.jooq.RecordMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -89,11 +90,19 @@ public class OcppTagServiceImpl implements OcppTagService {
     /**
      * If the database contains an actual expiry, use it. Otherwise, calculate an expiry for cached info
      */
+    @Nullable
     private DateTime getExpiryDateOrDefault(OcppTagRecord record) {
         if (record.getExpiryDate() != null) {
             return record.getExpiryDate();
+        }
+
+        int hoursToExpire = settingsRepository.getHoursToExpire();
+
+        // From web page: The value 0 disables this functionality (i.e. no expiry date will be set).
+        if (hoursToExpire == 0) {
+            return null;
         } else {
-            return DateTime.now().plusHours(settingsRepository.getHoursToExpire());
+            return DateTime.now().plusHours(hoursToExpire);
         }
     }
 

@@ -16,11 +16,16 @@
         <tr><td>Heartbeat Interval:</td><td>
             <form:input path="heartbeat"/>
         </td></tr>
-        <tr><td><i>The time interval in <b>minutes</b> for how often a charge point <br> should request the current time from SteVe.</i></td><td></td></tr>
+        <tr><td><i>
+            The time interval in <b>minutes</b> for how often a charge point <br> should request the current time from SteVe.
+        </i></td><td></td></tr>
         <tr><td>Expiration:</td><td>
             <form:input path="expiration"/>
         </td></tr>
-        <tr><td><i>The amount of time in <b>hours</b> for how long a charge point <br> should store the authorization info of an idTag in its local white list.</i></td><td></td></tr>
+        <tr><td><i>
+            The amount of time in <b>hours</b> for how long a charge point <br> should cache the authorization info of an
+            idTag in its local white list, if an expiry date is not explicitly set. The value 0 disables this functionality (i.e. no expiry date will be set).
+        </i></td><td></td></tr>
     </table>
 
     <br>

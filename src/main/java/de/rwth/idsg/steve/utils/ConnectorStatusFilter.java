@@ -2,7 +2,6 @@ package de.rwth.idsg.steve.utils;
 
 import de.rwth.idsg.steve.repository.dto.ConnectorStatus;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -37,27 +36,20 @@ public final class ConnectorStatusFilter {
      * Logic walk-through:
      *
      * For each station
+     * 0) group ConnectorStatus items around charge box ids, since input is a flat list (mixed bag with all charge
+     *    box ids and connectors)
      * 1) find the latest ConnectorStatus of connector id 0 (actually there can only be at most one)
      * 2) find the latest ConnectorStatus within the connectors ids > 0
      * 3) compare the two, which timestamp is more recent: 0 or others?
      * 4) depending on the previous step, build the list to return
      */
     private static List<ConnectorStatus> processAndFilterList(List<ConnectorStatus> initialList, Strategy strategy) {
-
-        // input is a flat list (mixed bag with all charge box ids and connectors)
-        // group ConnectorStatus items around charge box ids
-        Map<String, List<ConnectorStatus>> statusMap =
-                initialList.stream()
-                           .collect(Collectors.groupingBy(ConnectorStatus::getChargeBoxId));
-
-        // in worst case returnList has the same size as initial size
-        List<ConnectorStatus> returnList = new ArrayList<>(initialList.size());
-
-        for (Map.Entry<String, List<ConnectorStatus>> entry : statusMap.entrySet()) {
-            List<ConnectorStatus> tmp = processForOneStation(entry.getValue(), strategy);
-            returnList.addAll(tmp);
-        }
-        return returnList;
+        return initialList.stream()
+                          .collect(Collectors.groupingBy(ConnectorStatus::getChargeBoxId))
+                          .values()
+                          .stream()
+                          .flatMap(val -> processForOneStation(val, strategy).stream())
+                          .collect(Collectors.toList());
     }
 
     private static List<ConnectorStatus> processForOneStation(List<ConnectorStatus> statsList, Strategy strategy) {

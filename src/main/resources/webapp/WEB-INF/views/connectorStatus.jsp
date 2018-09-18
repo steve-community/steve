@@ -12,6 +12,27 @@ Connector Status
 			The OCPP term 'connector' refers to the charging socket of a station.</span>
 	</a>
 </span></section>
+
+<form:form action="${ctxPath}/manager/home/connectorStatus/query" method="get" modelAttribute="params">
+	<table class="userInput">
+		<tr>
+			<td>ChargeBox ID:</td>
+			<td><form:select path="chargeBoxId">
+				<option value="" selected>All</option>
+				<form:options items="${cpList}"/>
+			</form:select>
+			</td>
+		</tr>
+		<tr>
+			<td></td>
+			<td id="add_space">
+				<input type="submit" value="Get">
+			</td>
+		</tr>
+	</table>
+</form:form>
+<br>
+
 <table class="res" id="connectorStatusTable">
 	<thead>
 		<tr>

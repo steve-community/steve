@@ -11,10 +11,12 @@ import de.rwth.idsg.steve.repository.dto.ConnectorStatus;
 import de.rwth.idsg.steve.utils.DateTimeUtils;
 import de.rwth.idsg.steve.web.dto.ChargePointForm;
 import de.rwth.idsg.steve.web.dto.ChargePointQueryForm;
+import de.rwth.idsg.steve.web.dto.ConnectorStatusForm;
 import jooq.steve.db.tables.records.AddressRecord;
 import jooq.steve.db.tables.records.ChargeBoxRecord;
 import lombok.extern.slf4j.Slf4j;
 import org.joda.time.DateTime;
+import org.jooq.Condition;
 import org.jooq.DSLContext;
 import org.jooq.Field;
 import org.jooq.Record1;
@@ -179,7 +181,7 @@ public class ChargePointRepositoryImpl implements ChargePointRepository {
     }
 
     @Override
-    public List<ConnectorStatus> getChargePointConnectorStatus() {
+    public List<ConnectorStatus> getChargePointConnectorStatus(ConnectorStatusForm form) {
         // find out the latest timestamp for each connector
         Field<Integer> t1Pk = CONNECTOR_STATUS.CONNECTOR_PK.as("t1_pk");
         Field<DateTime> t1TsMax = DSL.max(CONNECTOR_STATUS.STATUS_TIMESTAMP).as("t1_ts_max");
@@ -200,6 +202,13 @@ public class ChargePointRepositoryImpl implements ChargePointRepository {
                             .and(CONNECTOR_STATUS.STATUS_TIMESTAMP.equal(t1.field(t1TsMax)))
                          .asTable("t2");
 
+        Condition chargeBoxCondition;
+        if (form == null || form.getChargeBoxId() == null) {
+            chargeBoxCondition = DSL.noCondition();
+        } else {
+            chargeBoxCondition = CHARGE_BOX.CHARGE_BOX_ID.eq(form.getChargeBoxId());
+        }
+
         return ctx.select(
                         CHARGE_BOX.CHARGE_BOX_PK,
                         CONNECTOR.CHARGE_BOX_ID,
@@ -212,6 +221,7 @@ public class ChargePointRepositoryImpl implements ChargePointRepository {
                         .on(CONNECTOR.CONNECTOR_PK.eq(t2.field(t2Pk)))
                   .join(CHARGE_BOX)
                         .on(CHARGE_BOX.CHARGE_BOX_ID.eq(CONNECTOR.CHARGE_BOX_ID))
+                  .where(chargeBoxCondition)
                   .orderBy(t2.field(t2Ts).desc())
                   .fetch()
                   .map(r -> ConnectorStatus.builder()

@@ -6,6 +6,8 @@ import de.rwth.idsg.steve.repository.dto.ChargePointSelect;
 import de.rwth.idsg.steve.repository.dto.ConnectorStatus;
 import de.rwth.idsg.steve.web.dto.ChargePointForm;
 import de.rwth.idsg.steve.web.dto.ChargePointQueryForm;
+import de.rwth.idsg.steve.web.dto.ConnectorStatusForm;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.Map;
@@ -23,7 +25,12 @@ public interface ChargePointRepository {
     List<ChargePoint.Overview> getOverview(ChargePointQueryForm form);
     ChargePoint.Details getDetails(int chargeBoxPk);
 
-    List<ConnectorStatus> getChargePointConnectorStatus();
+    default List<ConnectorStatus> getChargePointConnectorStatus() {
+        return getChargePointConnectorStatus(null);
+    }
+
+    List<ConnectorStatus> getChargePointConnectorStatus(@Nullable ConnectorStatusForm form);
+
     List<Integer> getNonZeroConnectorIds(String chargeBoxId);
 
     void addChargePointList(List<String> chargeBoxIdList);

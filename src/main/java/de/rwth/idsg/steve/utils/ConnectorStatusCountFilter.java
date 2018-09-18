@@ -2,12 +2,13 @@ package de.rwth.idsg.steve.utils;
 
 import de.rwth.idsg.steve.repository.dto.ConnectorStatus;
 
+import java.util.Comparator;
 import java.util.EnumSet;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.TreeSet;
 
 /**
  * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
@@ -15,7 +16,7 @@ import java.util.TreeMap;
  */
 public final class ConnectorStatusCountFilter {
 
-    private static final Set<String> ALL_STATUS_VALUES = allStatusValues();
+    public static final Set<String> ALL_STATUS_VALUES = allStatusValues();
 
     private ConnectorStatusCountFilter() { }
 
@@ -46,10 +47,13 @@ public final class ConnectorStatusCountFilter {
     }
 
     private static Set<String> allStatusValues() {
-        HashSet<String> set = new HashSet<>();
+        // to have a predictable sorting on the web page
+        TreeSet<String> set = new TreeSet<>(Comparator.naturalOrder());
+
         EnumSet.allOf(ocpp.cs._2010._08.ChargePointStatus.class).forEach(k -> set.add(k.value()));
         EnumSet.allOf(ocpp.cs._2012._06.ChargePointStatus.class).forEach(k -> set.add(k.value()));
         EnumSet.allOf(ocpp.cs._2015._10.ChargePointStatus.class).forEach(k -> set.add(k.value()));
+
         return set;
     }
 

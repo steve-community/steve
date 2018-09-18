@@ -24,6 +24,14 @@ Connector Status
 			</td>
 		</tr>
 		<tr>
+			<td>Status:</td>
+			<td><form:select path="status">
+				<option value="" selected>All</option>
+				<form:options items="${statusValues}"/>
+			</form:select>
+			</td>
+		</tr>
+		<tr>
 			<td></td>
 			<td id="add_space">
 				<input type="submit" value="Get">

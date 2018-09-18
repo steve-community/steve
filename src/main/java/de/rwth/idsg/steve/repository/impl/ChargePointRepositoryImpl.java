@@ -202,11 +202,18 @@ public class ChargePointRepositoryImpl implements ChargePointRepository {
                             .and(CONNECTOR_STATUS.STATUS_TIMESTAMP.equal(t1.field(t1TsMax)))
                          .asTable("t2");
 
-        Condition chargeBoxCondition;
+        final Condition chargeBoxCondition;
         if (form == null || form.getChargeBoxId() == null) {
             chargeBoxCondition = DSL.noCondition();
         } else {
             chargeBoxCondition = CHARGE_BOX.CHARGE_BOX_ID.eq(form.getChargeBoxId());
+        }
+
+        final Condition statusCondition;
+        if (form == null || form.getStatus() == null) {
+            statusCondition = DSL.noCondition();
+        } else {
+            statusCondition = t2.field(t2Status).eq(form.getStatus());
         }
 
         return ctx.select(
@@ -221,7 +228,7 @@ public class ChargePointRepositoryImpl implements ChargePointRepository {
                         .on(CONNECTOR.CONNECTOR_PK.eq(t2.field(t2Pk)))
                   .join(CHARGE_BOX)
                         .on(CHARGE_BOX.CHARGE_BOX_ID.eq(CONNECTOR.CHARGE_BOX_ID))
-                  .where(chargeBoxCondition)
+                  .where(chargeBoxCondition, statusCondition)
                   .orderBy(t2.field(t2Ts).desc())
                   .fetch()
                   .map(r -> ConnectorStatus.builder()

@@ -11,4 +11,5 @@ import lombok.Setter;
 @Setter
 public class ConnectorStatusForm {
     private String chargeBoxId;
+    private String status;
 }

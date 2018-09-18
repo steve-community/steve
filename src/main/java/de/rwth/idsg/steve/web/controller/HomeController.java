@@ -3,6 +3,7 @@ package de.rwth.idsg.steve.web.controller;
 import de.rwth.idsg.steve.repository.ChargePointRepository;
 import de.rwth.idsg.steve.repository.dto.ConnectorStatus;
 import de.rwth.idsg.steve.service.ChargePointHelperService;
+import de.rwth.idsg.steve.utils.ConnectorStatusCountFilter;
 import de.rwth.idsg.steve.utils.ConnectorStatusFilter;
 import de.rwth.idsg.steve.web.dto.ConnectorStatusForm;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,6 +57,7 @@ public class HomeController {
     @RequestMapping(value = CONNECTOR_STATUS_QUERY_PATH)
     public String getConnectorStatusQuery(@ModelAttribute(PARAMS) ConnectorStatusForm params, Model model) {
         model.addAttribute("cpList", chargePointRepository.getChargeBoxIds());
+        model.addAttribute("statusValues", ConnectorStatusCountFilter.ALL_STATUS_VALUES);
         model.addAttribute(PARAMS, params);
 
         List<ConnectorStatus> latestList = chargePointRepository.getChargePointConnectorStatus(params);

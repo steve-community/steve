@@ -18,7 +18,7 @@
     </span></section>
 
         <table class="userInput">
-            <thead><tr><th>See Operations</th><th></th></thead>
+            <thead><tr><th>Related Data Pages</th><th></th></thead>
             <tbody>
             <tr>
                 <td>Transactions:</td>
@@ -32,6 +32,12 @@
                 <td>Reservations:</td>
                 <td>
                     <a href="${ctxPath}/manager/reservations/query?chargeBoxId=${chargePointForm.chargeBoxId}&amp;periodType=ACTIVE">ACTIVE</a>
+                </td>
+            </tr>
+            <tr>
+                <td>Connector Status:</td>
+                <td>
+                    <a href="${ctxPath}/manager/home/connectorStatus/query?chargeBoxId=${chargePointForm.chargeBoxId}">ALL</a>
                 </td>
             </tr>
             </tbody>

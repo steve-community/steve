@@ -1,12 +1,17 @@
 package de.rwth.idsg.steve.utils;
 
+import de.rwth.idsg.steve.SteveException;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.joda.time.LocalDateTime;
 import org.joda.time.Period;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.PeriodFormatter;
 import org.joda.time.format.PeriodFormatterBuilder;
+import org.jooq.DSLContext;
+
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
@@ -65,5 +70,22 @@ public final class DateTimeUtils {
 
     public static String timeElapsed(DateTime from, DateTime to) {
         return PERIOD_FORMATTER.print(new Period(from, to));
+    }
+
+    public static void checkJavaAndMySQLOffsets(DSLContext ctx) {
+        long sql = CustomDSL.selectOffsetFromUtcInSeconds(ctx);
+        long java = DateTimeUtils.getOffsetFromUtcInSeconds();
+
+        if (sql != java) {
+            throw new SteveException("MySQL and Java are not using the same time zone. " +
+                    "Java offset in seconds (%s) != MySQL offset in seconds (%s)", java, sql);
+        }
+    }
+
+    private static long getOffsetFromUtcInSeconds() {
+        DateTimeZone timeZone = DateTimeZone.getDefault();
+        DateTime now = DateTime.now();
+        long offsetInMilliseconds = timeZone.getOffset(now.getMillis());
+        return TimeUnit.MILLISECONDS.toSeconds(offsetInMilliseconds);
     }
 }

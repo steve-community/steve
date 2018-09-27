@@ -30,7 +30,7 @@ The list was just recently started and is therefore not exhaustive.
 ### System Requirements
 
 SteVe requires 
-* JDK 8 (both Oracle JDK and OpenJDK are supported)
+* JDK 11 (both Oracle JDK and OpenJDK are supported)
 * Maven 
 * At least MySQL 5.6.4 (MariaDB 10.0 or later works as well) as database
 

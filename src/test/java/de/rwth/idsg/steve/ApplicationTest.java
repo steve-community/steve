@@ -14,7 +14,7 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import javax.xml.ws.soap.SOAPFaultException;
+import javax.xml.ws.WebServiceException;
 
 import static de.rwth.idsg.steve.utils.Helpers.getForOcpp12;
 import static de.rwth.idsg.steve.utils.Helpers.getForOcpp15;
@@ -91,9 +91,9 @@ public class ApplicationTest {
     }
 
     /**
-     * SOAPFaultException because we are sending an AuthorizeRequest from an random/unknown station.
+     * WebServiceException because we are sending an AuthorizeRequest from a random/unknown station.
      */
-    @Test(expected = SOAPFaultException.class)
+    @Test(expected = WebServiceException.class)
     public void testOcpp16() {
         ocpp.cs._2015._10.CentralSystemService client = getForOcpp16(path);
 

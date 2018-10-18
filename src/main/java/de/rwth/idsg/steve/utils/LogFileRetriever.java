@@ -9,6 +9,7 @@ import org.apache.logging.log4j.core.appender.MemoryMappedFileAppender;
 import org.apache.logging.log4j.core.appender.RandomAccessFileAppender;
 import org.apache.logging.log4j.core.appender.RollingFileAppender;
 import org.apache.logging.log4j.core.appender.RollingRandomAccessFileAppender;
+import org.apache.logging.log4j.core.config.Configuration;
 import org.apache.logging.log4j.core.impl.Log4jContextFactory;
 import org.apache.logging.log4j.core.selector.ContextSelector;
 import org.apache.logging.log4j.spi.LoggerContextFactory;
@@ -81,18 +82,17 @@ public final class LogFileRetriever {
      * by iterating over appenders.
      */
     private List<Path> getActiveLogFilePaths() {
-        LoggerContextFactory factory = LogManager.getFactory();
-        ContextSelector selector = ((Log4jContextFactory) factory).getSelector();
+        LoggerContext context = (LoggerContext) LogManager.getContext(false);
+        Configuration config = context.getConfiguration();
 
         List<Path> fileNameList = new ArrayList<>();
-        for (LoggerContext ctx : selector.getLoggerContexts()) {
-            for (Appender appender : ctx.getConfiguration().getAppenders().values()) {
-                String fileName = extractFileName(appender);
-                if (fileName != null) {
-                    fileNameList.add(Paths.get(fileName));
-                }
+        for (Appender appender : config.getAppenders().values()) {
+            String fileName = extractFileName(appender);
+            if (fileName != null) {
+                fileNameList.add(Paths.get(fileName));
             }
         }
+
         return fileNameList;
     }
 

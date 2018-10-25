@@ -10,29 +10,25 @@ import org.apache.logging.log4j.core.appender.RandomAccessFileAppender;
 import org.apache.logging.log4j.core.appender.RollingFileAppender;
 import org.apache.logging.log4j.core.appender.RollingRandomAccessFileAppender;
 import org.apache.logging.log4j.core.config.Configuration;
-import org.apache.logging.log4j.core.impl.Log4jContextFactory;
-import org.apache.logging.log4j.core.selector.ContextSelector;
-import org.apache.logging.log4j.spi.LoggerContextFactory;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 
 /**
  * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
  * @since 05.11.2015
  */
 @Slf4j
-public final class LogFileRetriever {
-    public static final LogFileRetriever INSTANCE = new LogFileRetriever();
+public enum LogFileRetriever {
+    INSTANCE;
 
-    private List<Path> logPathList;
-    private Random random = new Random();
+    private final List<Path> logPathList;
 
-    private LogFileRetriever() {
+    LogFileRetriever() {
         logPathList = getActiveLogFilePaths();
     }
 
@@ -72,7 +68,7 @@ public final class LogFileRetriever {
      */
     private Path rollTheDice() {
         log.trace("Rolling the dice...");
-        int index = random.nextInt(logPathList.size());
+        int index = ThreadLocalRandom.current().nextInt(logPathList.size());
         return logPathList.get(index);
     }
 

@@ -1,8 +1,6 @@
 package de.rwth.idsg.steve.ocpp.task;
 
-import de.rwth.idsg.ocpp.jaxb.RequestType;
-import de.rwth.idsg.ocpp.jaxb.ResponseType;
-import de.rwth.idsg.steve.ocpp.CommunicationTask;
+import de.rwth.idsg.steve.ocpp.Ocpp15AndAboveTask;
 import de.rwth.idsg.steve.ocpp.OcppCallback;
 import de.rwth.idsg.steve.ocpp.OcppVersion;
 import de.rwth.idsg.steve.service.OcppTagService;
@@ -18,7 +16,7 @@ import java.util.stream.Collectors;
  * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
  * @since 09.03.2018
  */
-public class SendLocalListTask extends CommunicationTask<SendLocalListParams, String> {
+public class SendLocalListTask extends Ocpp15AndAboveTask<SendLocalListParams, String> {
 
     private final ocpp.cp._2015._10.SendLocalListRequest request;
 
@@ -30,12 +28,6 @@ public class SendLocalListTask extends CommunicationTask<SendLocalListParams, St
     @Override
     public OcppCallback<String> defaultCallback() {
         return new StringOcppCallback();
-    }
-
-    @Deprecated
-    @Override
-    public <T extends RequestType> T getOcpp12Request() {
-        throw new RuntimeException("Not supported");
     }
 
     @Override
@@ -51,12 +43,6 @@ public class SendLocalListTask extends CommunicationTask<SendLocalListParams, St
     @Override
     public ocpp.cp._2015._10.SendLocalListRequest getOcpp16Request() {
         return request;
-    }
-
-    @Deprecated
-    @Override
-    public <T extends ResponseType> AsyncHandler<T> getOcpp12Handler(String chargeBoxId) {
-        throw new RuntimeException("Not supported");
     }
 
     @Override

@@ -1,8 +1,6 @@
 package de.rwth.idsg.steve.ocpp.task;
 
-import de.rwth.idsg.ocpp.jaxb.RequestType;
-import de.rwth.idsg.ocpp.jaxb.ResponseType;
-import de.rwth.idsg.steve.ocpp.CommunicationTask;
+import de.rwth.idsg.steve.ocpp.Ocpp15AndAboveTask;
 import de.rwth.idsg.steve.ocpp.OcppCallback;
 import de.rwth.idsg.steve.ocpp.OcppVersion;
 import de.rwth.idsg.steve.repository.ReservationRepository;
@@ -16,7 +14,7 @@ import javax.xml.ws.AsyncHandler;
  * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
  * @since 09.03.2018
  */
-public class CancelReservationTask extends CommunicationTask<CancelReservationParams, String> {
+public class CancelReservationTask extends Ocpp15AndAboveTask<CancelReservationParams, String> {
 
     private final ReservationRepository reservationRepository;
 
@@ -40,12 +38,6 @@ public class CancelReservationTask extends CommunicationTask<CancelReservationPa
         };
     }
 
-    @Deprecated
-    @Override
-    public <T extends RequestType> T getOcpp12Request() {
-        throw new RuntimeException("Not supported");
-    }
-
     @Override
     public CancelReservationRequest getOcpp15Request() {
         return new CancelReservationRequest()
@@ -56,12 +48,6 @@ public class CancelReservationTask extends CommunicationTask<CancelReservationPa
     public ocpp.cp._2015._10.CancelReservationRequest getOcpp16Request() {
         return new ocpp.cp._2015._10.CancelReservationRequest()
                 .withReservationId(params.getReservationId());
-    }
-
-    @Deprecated
-    @Override
-    public <T extends ResponseType> AsyncHandler<T> getOcpp12Handler(String chargeBoxId) {
-        throw new RuntimeException("Not supported");
     }
 
     @Override

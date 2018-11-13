@@ -6,6 +6,7 @@ import de.rwth.idsg.steve.ocpp.ChargePointService16_Invoker;
 import de.rwth.idsg.steve.ocpp.ChargePointService16_InvokerImpl;
 import de.rwth.idsg.steve.ocpp.OcppVersion;
 import de.rwth.idsg.steve.ocpp.task.ClearChargingProfileTask;
+import de.rwth.idsg.steve.ocpp.task.GetCompositeScheduleTask;
 import de.rwth.idsg.steve.ocpp.task.SetChargingProfileTask;
 import de.rwth.idsg.steve.ocpp.task.TriggerMessageTask;
 import de.rwth.idsg.steve.repository.ChargingProfileRepository;
@@ -13,6 +14,7 @@ import de.rwth.idsg.steve.repository.dto.ChargePointSelect;
 import de.rwth.idsg.steve.repository.dto.ChargingProfile;
 import de.rwth.idsg.steve.service.dto.EnhancedSetChargingProfileParams;
 import de.rwth.idsg.steve.web.dto.ocpp.ClearChargingProfileParams;
+import de.rwth.idsg.steve.web.dto.ocpp.GetCompositeScheduleParams;
 import de.rwth.idsg.steve.web.dto.ocpp.SetChargingProfileParams;
 import de.rwth.idsg.steve.web.dto.ocpp.TriggerMessageParams;
 import lombok.extern.slf4j.Slf4j;
@@ -89,5 +91,16 @@ public class ChargePointService16_Client extends ChargePointService15_Client {
                          .execute(c -> getOcpp16Invoker().clearChargingProfile(c, task));
 
         return taskStore.add(task);
+    }
+
+    public int getCompositeSchedule(GetCompositeScheduleParams params) {
+        GetCompositeScheduleTask task = new GetCompositeScheduleTask(getVersion(), params);
+
+        BackgroundService.with(executorService)
+                         .forFirst(task.getParams().getChargePointSelectList())
+                         .execute(c -> getOcpp16Invoker().getCompositeSchedule(c, task));
+
+        return taskStore.add(task);
+
     }
 }

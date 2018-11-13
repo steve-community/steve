@@ -8,6 +8,7 @@ import de.rwth.idsg.steve.web.dto.ocpp.ChangeConfigurationParams;
 import de.rwth.idsg.steve.web.dto.ocpp.ClearChargingProfileParams;
 import de.rwth.idsg.steve.web.dto.ocpp.ConfigurationKeyEnum;
 import de.rwth.idsg.steve.web.dto.ocpp.ConfigurationKeyReadWriteEnum;
+import de.rwth.idsg.steve.web.dto.ocpp.GetCompositeScheduleParams;
 import de.rwth.idsg.steve.web.dto.ocpp.GetConfigurationParams;
 import de.rwth.idsg.steve.web.dto.ocpp.SetChargingProfileParams;
 import de.rwth.idsg.steve.web.dto.ocpp.TriggerMessageParams;
@@ -132,8 +133,9 @@ public class Ocpp16Controller extends Ocpp15Controller {
     // -------------------------------------------------------------------------
 
     @RequestMapping(value = GET_COMPOSITE_PATH, method = RequestMethod.GET)
-    public String getCompositeSchedule(Model model) {
+    public String getGetCompositeSchedule(Model model) {
         setCommonAttributes(model);
+        model.addAttribute(PARAMS, new GetCompositeScheduleParams());
         return getPrefix() + GET_COMPOSITE_PATH;
     }
 
@@ -141,7 +143,7 @@ public class Ocpp16Controller extends Ocpp15Controller {
     public String getClearChargingProfile(Model model) {
         setCommonAttributes(model);
         model.addAttribute("profileList", chargingProfileRepository.getBasicInfo());
-        model.addAttribute("params", new ClearChargingProfileParams());
+        model.addAttribute(PARAMS, new ClearChargingProfileParams());
         return getPrefix() + CLEAR_CHARGING_PATH;
     }
 
@@ -149,7 +151,7 @@ public class Ocpp16Controller extends Ocpp15Controller {
     public String getSetChargingProfile(Model model) {
         setCommonAttributes(model);
         model.addAttribute("profileList", chargingProfileRepository.getBasicInfo());
-        model.addAttribute("params", new SetChargingProfileParams());
+        model.addAttribute(PARAMS, new SetChargingProfileParams());
         return getPrefix() + SET_CHARGING_PATH;
     }
 
@@ -179,7 +181,7 @@ public class Ocpp16Controller extends Ocpp15Controller {
                                          BindingResult result, Model model) {
         if (result.hasErrors()) {
             setCommonAttributes(model);
-            return getPrefix() + TRIGGER_MESSAGE_PATH;
+            return getPrefix() + SET_CHARGING_PATH;
         }
         return REDIRECT_TASKS_PATH + getClient16().setChargingProfile(params);
     }
@@ -189,8 +191,18 @@ public class Ocpp16Controller extends Ocpp15Controller {
                                            BindingResult result, Model model) {
         if (result.hasErrors()) {
             setCommonAttributes(model);
-            return getPrefix() + TRIGGER_MESSAGE_PATH;
+            return getPrefix() + CLEAR_CHARGING_PATH;
         }
         return REDIRECT_TASKS_PATH + getClient16().clearChargingProfile(params);
+    }
+
+    @RequestMapping(value = GET_COMPOSITE_PATH, method = RequestMethod.POST)
+    public String postGetCompositeSchedule(@Valid @ModelAttribute(PARAMS) GetCompositeScheduleParams params,
+                                           BindingResult result, Model model) {
+        if (result.hasErrors()) {
+            setCommonAttributes(model);
+            return getPrefix() + GET_COMPOSITE_PATH;
+        }
+        return REDIRECT_TASKS_PATH + getClient16().getCompositeSchedule(params);
     }
 }

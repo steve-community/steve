@@ -25,6 +25,7 @@ import javax.validation.constraints.NotNull;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static de.rwth.idsg.steve.utils.CustomDSL.includes;
 import static jooq.steve.db.Tables.CHARGING_PROFILE;
 import static jooq.steve.db.Tables.CHARGING_SCHEDULE_PERIOD;
 import static jooq.steve.db.Tables.CONNECTOR;
@@ -79,10 +80,7 @@ public class ChargingProfileRepositoryImpl implements ChargingProfileRepository 
         // Connector select
         // -------------------------------------------------------------------------
 
-        Condition connectorIdCondition = DSL.trueCondition();
-        if (connectorId != null) {
-            connectorIdCondition.and(CONNECTOR.CONNECTOR_ID.eq(connectorId));
-        }
+        Condition connectorIdCondition = (connectorId == null) ? DSL.trueCondition() : CONNECTOR.CONNECTOR_ID.eq(connectorId);
 
         SelectConditionStep<Record1<Integer>> connectorPkSelect = ctx.select(CONNECTOR.CONNECTOR_PK)
                                                                      .from(CONNECTOR)
@@ -93,26 +91,21 @@ public class ChargingProfileRepositoryImpl implements ChargingProfileRepository 
         // Profile select
         // -------------------------------------------------------------------------
 
-        Condition profilePkCondition = DSL.trueCondition();
+        Condition profilePkCondition;
 
-        if (purpose != null || stackLevel != null) {
+        if (purpose == null && stackLevel == null) {
+            profilePkCondition = DSL.trueCondition();
+        } else {
+            Condition purposeCondition = (purpose == null) ?  DSL.trueCondition() : CHARGING_PROFILE.CHARGING_PROFILE_PURPOSE.eq(purpose.value());
 
-            Condition purposeCondition = DSL.trueCondition();
-            if (purpose != null) {
-                purposeCondition.and(CHARGING_PROFILE.CHARGING_PROFILE_PURPOSE.eq(purpose.value()));
-            }
-
-            Condition stackLevelCondition = DSL.trueCondition();
-            if (stackLevel != null) {
-                stackLevelCondition.and(CHARGING_PROFILE.STACK_LEVEL.eq(stackLevel));
-            }
+            Condition stackLevelCondition = (stackLevel == null) ? DSL.trueCondition() : CHARGING_PROFILE.STACK_LEVEL.eq(stackLevel);
 
             SelectConditionStep<Record1<Integer>> profilePkSelect = ctx.select(CHARGING_PROFILE.CHARGING_PROFILE_PK)
                                                                        .from(CHARGING_PROFILE)
                                                                        .where(purposeCondition)
                                                                        .and(stackLevelCondition);
 
-            profilePkCondition.and(CONNECTOR_CHARGING_PROFILE.CHARGING_PROFILE_PK.in(profilePkSelect));
+            profilePkCondition = CONNECTOR_CHARGING_PROFILE.CHARGING_PROFILE_PK.in(profilePkSelect);
         }
 
         // -------------------------------------------------------------------------
@@ -139,7 +132,38 @@ public class ChargingProfileRepositoryImpl implements ChargingProfileRepository 
 
     @Override
     public List<ChargingProfile.Overview> getOverview(ChargingProfileQueryForm form) {
+        Condition conditions = DSL.trueCondition();
+
+        if (form.getStackLevel() != null) {
+            conditions = conditions.and(CHARGING_PROFILE.STACK_LEVEL.eq(form.getStackLevel()));
+        }
+
+        if (form.getDescription() != null) {
+            conditions = conditions.and(includes(CHARGING_PROFILE.DESCRIPTION, form.getDescription()));
+        }
+
+        if (form.getProfilePurpose() != null) {
+            conditions = conditions.and(CHARGING_PROFILE.CHARGING_PROFILE_PURPOSE.eq(form.getProfilePurpose().value()));
+        }
+
+        if (form.getProfileKind() != null) {
+            conditions = conditions.and(CHARGING_PROFILE.CHARGING_PROFILE_KIND.eq(form.getProfileKind().value()));
+        }
+
+        if (form.getRecurrencyKind() != null) {
+            conditions = conditions.and(CHARGING_PROFILE.RECURRENCY_KIND.eq(form.getRecurrencyKind().value()));
+        }
+
+        if (form.getValidFrom() != null) {
+            conditions = conditions.and(CHARGING_PROFILE.VALID_FROM.greaterOrEqual(form.getValidFrom().toDateTime()));
+        }
+
+        if (form.getValidTo() != null) {
+            conditions = conditions.and(CHARGING_PROFILE.VALID_TO.lessOrEqual(form.getValidTo().toDateTime()));
+        }
+
         return ctx.selectFrom(CHARGING_PROFILE)
+                  .where(conditions)
                   .fetch()
                   .map(r -> ChargingProfile.Overview.builder()
                                                     .chargingProfilePk(r.getChargingProfilePk())

@@ -2,10 +2,56 @@
 <script type="text/javascript">
     $(document).ready(function () {
         <%@ include file="../snippets/sortable.js" %>
+        <%@ include file="../snippets/dateTimePicker-future.js" %>
     });
 </script>
 <div class="content">
     <div id="overview">
+        <form:form action="${ctxPath}/manager/chargingProfiles/query" method="get" modelAttribute="params">
+            <table class="userInput">
+                <tr>
+                    <td>Stack Level (integer):</td>
+                    <td><form:input path="stackLevel"/></td>
+                </tr>
+                <tr>
+                    <td>Description:</td>
+                    <td><form:input path="description"/></td>
+                </tr>
+                <tr>
+                    <td>Profile Purpose:</td>
+                    <td><form:select path="profilePurpose">
+                        <option value="" selected>-- Empty --</option>
+                        <form:options items="${profilePurpose}"/>
+                    </form:select>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Profile Kind:</td>
+                    <td><form:select path="profileKind">
+                        <option value="" selected>-- Empty --</option>
+                        <form:options items="${profileKind}"/>
+                    </form:select>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Recurrency Kind:</td>
+                    <td><form:select path="recurrencyKind">
+                        <option value="" selected>-- Empty --</option>
+                        <form:options items="${recurrencyKind}"/>
+                    </form:select>
+                    </td>
+                </tr>
+                <tr><td>Valid From:</td><td><form:input path="validFrom" class="dateTimePicker"/></td></tr>
+                <tr><td>Valid To:</td><td><form:input path="validTo" class="dateTimePicker"/></td></tr>
+                <tr>
+                    <td></td>
+                    <td id="add_space">
+                        <input type="submit" value="Get">
+                    </td>
+                </tr>
+            </table>
+        </form:form>
+        <br>
         <table class="res action">
             <thead>
             <tr>

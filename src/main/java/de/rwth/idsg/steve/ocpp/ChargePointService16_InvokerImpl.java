@@ -2,25 +2,7 @@ package de.rwth.idsg.steve.ocpp;
 
 import de.rwth.idsg.steve.ocpp.soap.ClientProvider;
 import de.rwth.idsg.steve.ocpp.soap.ClientProviderWithCache;
-import de.rwth.idsg.steve.ocpp.task.CancelReservationTask;
-import de.rwth.idsg.steve.ocpp.task.ChangeAvailabilityTask;
-import de.rwth.idsg.steve.ocpp.task.ChangeConfigurationTask;
-import de.rwth.idsg.steve.ocpp.task.ClearCacheTask;
-import de.rwth.idsg.steve.ocpp.task.ClearChargingProfileTask;
-import de.rwth.idsg.steve.ocpp.task.DataTransferTask;
-import de.rwth.idsg.steve.ocpp.task.GetCompositeScheduleTask;
-import de.rwth.idsg.steve.ocpp.task.GetConfigurationTask;
-import de.rwth.idsg.steve.ocpp.task.GetDiagnosticsTask;
-import de.rwth.idsg.steve.ocpp.task.GetLocalListVersionTask;
-import de.rwth.idsg.steve.ocpp.task.RemoteStartTransactionTask;
-import de.rwth.idsg.steve.ocpp.task.RemoteStopTransactionTask;
-import de.rwth.idsg.steve.ocpp.task.ReserveNowTask;
-import de.rwth.idsg.steve.ocpp.task.ResetTask;
-import de.rwth.idsg.steve.ocpp.task.SendLocalListTask;
-import de.rwth.idsg.steve.ocpp.task.SetChargingProfileTask;
-import de.rwth.idsg.steve.ocpp.task.TriggerMessageTask;
-import de.rwth.idsg.steve.ocpp.task.UnlockConnectorTask;
-import de.rwth.idsg.steve.ocpp.task.UpdateFirmwareTask;
+import de.rwth.idsg.steve.ocpp.task.*;
 import de.rwth.idsg.steve.ocpp.ws.ChargePointServiceInvoker;
 import de.rwth.idsg.steve.ocpp.ws.ocpp16.Ocpp16TypeStore;
 import de.rwth.idsg.steve.ocpp.ws.ocpp16.Ocpp16WebSocketEndpoint;
@@ -48,14 +30,20 @@ public class ChargePointService16_InvokerImpl implements ChargePointService16_In
 
     @Override
     public void clearChargingProfile(ChargePointSelect cp, ClearChargingProfileTask task) {
-        // TODO
-        throw new RuntimeException("Not implemented");
+        if (cp.isSoap()) {
+            create(cp).clearChargingProfileAsync(task.getOcpp16Request(), cp.getChargeBoxId(), task.getOcpp16Handler(cp.getChargeBoxId()));
+        } else {
+            runPipeline(cp, task);
+        }
     }
 
     @Override
     public void setChargingProfile(ChargePointSelect cp, SetChargingProfileTask task) {
-        // TODO
-        throw new RuntimeException("Not implemented");
+        if (cp.isSoap()) {
+            create(cp).setChargingProfileAsync(task.getOcpp16Request(), cp.getChargeBoxId(), task.getOcpp16Handler(cp.getChargeBoxId()));
+        } else {
+            runPipeline(cp, task);
+        }
     }
 
     @Override

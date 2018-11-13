@@ -38,6 +38,14 @@ public final class DateTimeUtils {
         }
     }
 
+    public static LocalDateTime toLocalDateTime(DateTime dt) {
+        if (dt == null) {
+            return null;
+        } else {
+            return dt.toLocalDateTime();
+        }
+    }
+
     /**
      * Print the date/time nicer, if it's from today, yesterday or tomorrow.
      */

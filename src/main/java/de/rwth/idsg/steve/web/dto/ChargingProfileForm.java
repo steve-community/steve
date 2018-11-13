@@ -45,16 +45,14 @@ public class ChargingProfileForm {
 
     private RecurrencyKindType recurrencyKind;
 
-    @Future(message = "Valid From must be in future")
     private LocalDateTime validFrom;
 
-    @Future(message = "Valid From must be in future")
+    @Future(message = "Valid To must be in future")
     private LocalDateTime validTo;
 
     @Positive
     private Integer durationInSeconds;
 
-    @Future(message = "Start schedule must be in future")
     private LocalDateTime startSchedule;
 
     @NotNull

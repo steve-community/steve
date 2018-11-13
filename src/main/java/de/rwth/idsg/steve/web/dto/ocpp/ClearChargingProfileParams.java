@@ -41,13 +41,4 @@ public class ClearChargingProfileParams extends MultipleChargePointSelect {
         return true;
     }
 
-    @AssertTrue(message = "When filtering by other parameters, one of the (connectorId, chargingProfilePurpose, stackLevel) must be set")
-    public boolean isValidWhenFilterByOtherParameters() {
-        if (filterType == ClearChargingProfileFilterType.OtherParameters
-                && connectorId == null && chargingProfilePurpose == null && stackLevel == null) {
-            return false;
-        }
-        return true;
-    }
-
 }

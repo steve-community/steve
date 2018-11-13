@@ -14,6 +14,7 @@ import org.joda.time.LocalDateTime;
 @Getter
 @Setter
 public class ChargingProfileQueryForm {
+    private Integer chargingProfilePk;
     private Integer stackLevel;
     private String description;
     private ChargingProfilePurposeType profilePurpose;

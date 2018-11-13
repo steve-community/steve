@@ -134,6 +134,10 @@ public class ChargingProfileRepositoryImpl implements ChargingProfileRepository 
     public List<ChargingProfile.Overview> getOverview(ChargingProfileQueryForm form) {
         Condition conditions = DSL.trueCondition();
 
+        if (form.getChargingProfilePk() != null) {
+            conditions = conditions.and(CHARGING_PROFILE.CHARGING_PROFILE_PK.eq(form.getChargingProfilePk()));
+        }
+
         if (form.getStackLevel() != null) {
             conditions = conditions.and(CHARGING_PROFILE.STACK_LEVEL.eq(form.getStackLevel()));
         }

@@ -10,6 +10,10 @@
         <form:form action="${ctxPath}/manager/chargingProfiles/query" method="get" modelAttribute="params">
             <table class="userInput">
                 <tr>
+                    <td>Charging Profile ID (integer):</td>
+                    <td><form:input path="chargingProfilePk"/></td>
+                </tr>
+                <tr>
                     <td>Stack Level (integer):</td>
                     <td><form:input path="stackLevel"/></td>
                 </tr>

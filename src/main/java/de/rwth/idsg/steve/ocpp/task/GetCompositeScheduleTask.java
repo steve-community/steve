@@ -22,8 +22,8 @@ public class GetCompositeScheduleTask extends Ocpp16AndAboveTask<GetCompositeSch
 
     @Override
     public OcppCallback<String> defaultCallback() {
-        // TODO
-        return null;
+        // TODO: print schedule Details
+        return new StringOcppCallback();
     }
 
     @Override
@@ -36,7 +36,13 @@ public class GetCompositeScheduleTask extends Ocpp16AndAboveTask<GetCompositeSch
 
     @Override
     public AsyncHandler<GetCompositeScheduleResponse> getOcpp16Handler(String chargeBoxId) {
-        // TODO
-        return null;
+        return res -> {
+            try {
+                // TODO: print schedule Details
+                success(chargeBoxId, res.get().getStatus().value());
+            } catch (Exception e) {
+                failed(chargeBoxId, e);
+            }
+        };
     }
 }

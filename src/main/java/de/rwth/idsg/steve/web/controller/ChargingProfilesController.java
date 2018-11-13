@@ -21,8 +21,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import javax.validation.Valid;
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Map;
+import java.util.UUID;
 
 /**
  * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
@@ -131,21 +133,18 @@ public class ChargingProfilesController {
         form.setChargingRateUnit(ChargingRateUnitType.fromValue(profile.getChargingRateUnit()));
         form.setMinChargingRate(profile.getMinChargingRate());
 
-        List<ChargingProfileForm.SchedulePeriod> formPeriods =
-                periods.stream()
-                       .map(k -> {
-                           ChargingProfileForm.SchedulePeriod p = new ChargingProfileForm.SchedulePeriod();
-                           p.setStartPeriodInSeconds(k.getStartPeriodInSeconds());
-                           p.setPowerLimitInAmperes(k.getPowerLimitInAmperes());
-                           p.setNumberPhases(k.getNumberPhases());
-                           return p;
-                       })
-                       .collect(Collectors.toList());
+        Map<String, ChargingProfileForm.SchedulePeriod> periodMap = new LinkedHashMap<>();
+        for (ChargingSchedulePeriodRecord rec : periods) {
+            ChargingProfileForm.SchedulePeriod p = new ChargingProfileForm.SchedulePeriod();
+            p.setStartPeriodInSeconds(rec.getStartPeriodInSeconds());
+            p.setPowerLimitInAmperes(rec.getPowerLimitInAmperes());
+            p.setNumberPhases(rec.getNumberPhases());
 
-        form.setSchedulePeriods(formPeriods);
+            periodMap.put(UUID.randomUUID().toString(), p);
+        }
+        form.setSchedulePeriodMap(periodMap);
 
         model.addAttribute("form", form);
-
         return "data-man/chargingProfileDetails";
     }
 

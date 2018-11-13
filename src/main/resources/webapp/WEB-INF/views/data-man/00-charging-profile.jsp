@@ -38,10 +38,38 @@
     <tr><td>Min Charging Rate (decimal, multiple of 0.1):</td><td><form:input path="minChargingRate"/></td></tr>
 
     <tr><td>Additional Note:</td><td><form:textarea path="note"/></td></tr>
+</table>
+<br><br>
+<section><span>Schedule Periods</span></section>
+<table class="res" id="periodsTable">
+    <thead>
+    <tr>
+        <th>Start Period (in sec)</th>
+        <th>Power Limit (in amperes)</th>
+        <th>Number Phases</th>
+        <th>
+            <input type="button" id="addRow" value="Add">
+        </th>
+    </tr>
+    </thead>
+    <tbody>
+    <c:forEach items="${form.schedulePeriodMap}" var="schedulePeriodMap" varStatus="status">
+        <tr id="${schedulePeriodMap.key}">
+            <td><form:input path="schedulePeriodMap[${schedulePeriodMap.key}].startPeriodInSeconds"/></td>
+            <td><form:input path="schedulePeriodMap[${schedulePeriodMap.key}].powerLimitInAmperes"/></td>
+            <td><form:input path="schedulePeriodMap[${schedulePeriodMap.key}].numberPhases" placeholder="if empty, 3 will be assumed"/></td>
+            <td><input type="button" class="removeRow" value="Delete"></td>
+        </tr>
+    </c:forEach>
+    </tbody>
+</table>
 
-    <tr><td></td>
+<table class="userInput">
+    <tr>
+        <td></td>
         <td id="add_space">
             <input type="submit" name="${submitButtonName}" value="${submitButtonValue}">
             <input type="submit" name="backToOverview" value="Back to Overview">
-        </td></tr>
+        </td>
+    </tr>
 </table>

@@ -8,6 +8,7 @@ import ocpp.cp._2015._10.ChargingRateUnitType;
 import ocpp.cp._2015._10.RecurrencyKindType;
 import org.joda.time.LocalDateTime;
 
+import javax.validation.Valid;
 import javax.validation.constraints.AssertTrue;
 import javax.validation.constraints.Future;
 import javax.validation.constraints.NotEmpty;
@@ -15,7 +16,8 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
 import java.math.BigDecimal;
-import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 /**
  * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
@@ -60,8 +62,9 @@ public class ChargingProfileForm {
 
     private BigDecimal minChargingRate;
 
-//    @NotEmpty
-    private List<SchedulePeriod> schedulePeriods;
+    @NotEmpty
+    @Valid
+    private Map<String, SchedulePeriod> schedulePeriodMap;
 
     @AssertTrue(message = "Valid To must be after Valid From")
     public boolean isFromToValid() {
@@ -100,12 +103,22 @@ public class ChargingProfileForm {
     @Setter
     public static class SchedulePeriod {
 
-        @NotNull
+        private static final int defaultNumberPhases = 3;
+
+        @NotNull(message = "Start Period has to be set")
         private Integer startPeriodInSeconds; // from the startSchedule
 
-        @NotNull
+        @NotNull(message = "Power Limit has to be set")
         private BigDecimal powerLimitInAmperes;
 
         private Integer numberPhases;
+
+        public Integer getNumberPhases() {
+            return Objects.requireNonNullElse(numberPhases, defaultNumberPhases);
+        }
+
+        public void setNumberPhases(Integer numberPhases) {
+            this.numberPhases = Objects.requireNonNullElse(numberPhases, defaultNumberPhases);
+        }
     }
 }

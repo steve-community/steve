@@ -293,11 +293,12 @@ public class ChargingProfileRepositoryImpl implements ChargingProfileRepository 
     }
 
     private static void insertPeriods(DSLContext ctx, ChargingProfileForm form) {
-        if (CollectionUtils.isEmpty(form.getSchedulePeriods())) {
+        if (CollectionUtils.isEmpty(form.getSchedulePeriodMap())) {
             return;
         }
 
-        List<ChargingSchedulePeriodRecord> r = form.getSchedulePeriods()
+        List<ChargingSchedulePeriodRecord> r = form.getSchedulePeriodMap()
+                                                   .values()
                                                    .stream()
                                                    .map(k -> ctx.newRecord(CHARGING_SCHEDULE_PERIOD)
                                                                 .setChargingProfilePk(form.getChargingProfilePk())

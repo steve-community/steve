@@ -2,6 +2,7 @@
 <script type="text/javascript">
     $(document).ready(function () {
         <%@ include file="../snippets/dateTimePicker-future.js" %>
+        <%@ include file="../snippets/schedulePeriodsTable.js" %>
     });
 </script>
 <spring:hasBindErrors name="form">

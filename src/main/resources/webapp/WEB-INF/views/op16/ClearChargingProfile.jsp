@@ -1,5 +1,10 @@
 <%@ include file="../00-header.jsp" %>
 <%@ include file="../00-op-bind-errors.jsp" %>
+<script type="text/javascript">
+    $(document).ready(function() {
+        <%@ include file="../snippets/clearChargingProfile.js" %>
+    });
+</script>
 <div class="content">
     <div class="left-menu">
         <ul>

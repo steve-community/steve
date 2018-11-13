@@ -4,7 +4,9 @@ import de.rwth.idsg.steve.ocpp.Ocpp16AndAboveTask;
 import de.rwth.idsg.steve.ocpp.OcppCallback;
 import de.rwth.idsg.steve.ocpp.OcppVersion;
 import de.rwth.idsg.steve.repository.ChargingProfileRepository;
+import de.rwth.idsg.steve.web.dto.ocpp.ClearChargingProfileFilterType;
 import de.rwth.idsg.steve.web.dto.ocpp.ClearChargingProfileParams;
+import lombok.extern.slf4j.Slf4j;
 import ocpp.cp._2015._10.ClearChargingProfileRequest;
 
 import javax.xml.ws.AsyncHandler;
@@ -13,6 +15,7 @@ import javax.xml.ws.AsyncHandler;
  * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
  * @since 13.03.2018
  */
+@Slf4j
 public class ClearChargingProfileTask extends Ocpp16AndAboveTask<ClearChargingProfileParams, String> {
 
     private final ChargingProfileRepository chargingProfileRepository;
@@ -32,12 +35,16 @@ public class ClearChargingProfileTask extends Ocpp16AndAboveTask<ClearChargingPr
                 addNewResponse(chargeBoxId, statusValue);
 
                 if ("Accepted".equalsIgnoreCase(statusValue)) {
-                    Integer chargingProfilePk = params.getChargingProfilePk();
-                    if (chargingProfilePk == null) {
-                        chargingProfileRepository.clearProfile(chargeBoxId,
-                                params.getConnectorId(), params.getChargingProfilePurpose(), params.getStackLevel());
-                    } else {
-                        chargingProfileRepository.clearProfile(chargingProfilePk, chargeBoxId);
+                    switch (params.getFilterType()) {
+                        case ChargingProfileId:
+                            chargingProfileRepository.clearProfile(params.getChargingProfilePk(), chargeBoxId);
+                            break;
+                        case OtherParameters:
+                            chargingProfileRepository.clearProfile(chargeBoxId,
+                                    params.getConnectorId(), params.getChargingProfilePurpose(), params.getStackLevel());
+                            break;
+                        default:
+                            log.warn("Unexpected {} enum value", ClearChargingProfileFilterType.class.getSimpleName());
                     }
                 }
             }

@@ -6,6 +6,7 @@ import ocpp.cp._2015._10.ChargingProfilePurposeType;
 
 import javax.validation.constraints.AssertTrue;
 import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 
 /**
@@ -15,6 +16,9 @@ import javax.validation.constraints.Positive;
 @Getter
 @Setter
 public class ClearChargingProfileParams extends MultipleChargePointSelect {
+
+    @NotNull(message = "Filter Type is required")
+    private ClearChargingProfileFilterType filterType = ClearChargingProfileFilterType.ChargingProfileId;
 
     @Positive
     private Integer chargingProfilePk;
@@ -28,22 +32,21 @@ public class ClearChargingProfileParams extends MultipleChargePointSelect {
 
     private Integer stackLevel;
 
-    /**
-     * According to spec it's either chargingProfilePk or a combination of (connectorId, chargingProfilePurpose,
-     * stackLevel).
-     */
-    @AssertTrue(message = "According to spec, either the chargingProfileId or a combination of (connectorId, chargingProfilePurpose, stackLevel) has to be set")
-    public boolean isValid() {
-        // if chargingProfilePk is set, others must be null.
-        if (chargingProfilePk != null && connectorId != null && chargingProfilePurpose != null && stackLevel != null) {
+    @AssertTrue(message = "When filtering by id, charging profile id must be set")
+    public boolean isValidWhenFilterById() {
+        if (filterType == ClearChargingProfileFilterType.ChargingProfileId
+                && chargingProfilePk == null) {
             return false;
         }
+        return true;
+    }
 
-        // if chargingProfilePk is not set, one of the others must be set.
-        if (chargingProfilePk == null && connectorId == null && chargingProfilePurpose == null && stackLevel == null) {
+    @AssertTrue(message = "When filtering by other parameters, one of the (connectorId, chargingProfilePurpose, stackLevel) must be set")
+    public boolean isValidWhenFilterByOtherParameters() {
+        if (filterType == ClearChargingProfileFilterType.OtherParameters
+                && connectorId == null && chargingProfilePurpose == null && stackLevel == null) {
             return false;
         }
-
         return true;
     }
 

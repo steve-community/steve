@@ -1,8 +1,15 @@
-<form:form action="${ctxPath}/manager/operations/${opVersion}/SetChargingProfile" modelAttribute="params">
+<form:form action="${ctxPath}/manager/operations/${opVersion}/ClearChargingProfile" modelAttribute="params">
     <section><span>Charge Points with OCPP ${opVersion}</span></section>
     <%@ include file="../00-cp-multiple.jsp" %>
     <section><span>Parameters</span></section>
     <table class="userInput">
+        <tr>
+            <td>Filter Type:</td>
+            <td><form:select path="filterType">
+                <form:options items="${filterType}"/>
+            </form:select>
+            </td>
+        </tr>
         <tr>
             <td>Charging Profile ID:</td>
             <td><form:select path="chargingProfilePk">

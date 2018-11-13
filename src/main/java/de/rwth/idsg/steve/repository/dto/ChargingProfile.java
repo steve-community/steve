@@ -22,7 +22,11 @@ public class ChargingProfile {
         private final String description;
 
         public String getItemDescription() {
-            return chargingProfilePk + " ("  + description + ")";
+            if (description == null) {
+                return Integer.toString(chargingProfilePk);
+            } else {
+                return chargingProfilePk + " ("  + description + ")";
+            }
         }
     }
 

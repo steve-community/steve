@@ -281,12 +281,12 @@ public class ChargingProfileRepositoryImpl implements ChargingProfileRepository 
     }
 
     private void checkProfileUsage(int chargingProfilePk) {
-        List<Record1<String>> r = ctx.select(CONNECTOR.CHARGE_BOX_ID)
-                                     .from(CONNECTOR_CHARGING_PROFILE)
-                                     .join(CONNECTOR)
-                                     .on(CONNECTOR.CONNECTOR_PK.eq(CONNECTOR_CHARGING_PROFILE.CONNECTOR_PK))
-                                     .where(CONNECTOR_CHARGING_PROFILE.CHARGING_PROFILE_PK.eq(chargingProfilePk))
-                                     .fetch();
+        List<String> r = ctx.select(CONNECTOR.CHARGE_BOX_ID)
+                            .from(CONNECTOR_CHARGING_PROFILE)
+                            .join(CONNECTOR)
+                            .on(CONNECTOR.CONNECTOR_PK.eq(CONNECTOR_CHARGING_PROFILE.CONNECTOR_PK))
+                            .where(CONNECTOR_CHARGING_PROFILE.CHARGING_PROFILE_PK.eq(chargingProfilePk))
+                            .fetch(CONNECTOR.CHARGE_BOX_ID);
         if (!r.isEmpty()) {
             throw new SteveException("Cannot modify this charging profile, since the following stations are still using it: %s", r);
         }

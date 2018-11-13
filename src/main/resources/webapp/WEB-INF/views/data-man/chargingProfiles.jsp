@@ -6,6 +6,7 @@
     });
 </script>
 <div class="content">
+    <section><span>Charging Profile Overview</span></section>
     <div id="overview">
         <form:form action="${ctxPath}/manager/chargingProfiles/query" method="get" modelAttribute="params">
             <table class="userInput">

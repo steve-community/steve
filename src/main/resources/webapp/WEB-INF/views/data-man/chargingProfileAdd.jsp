@@ -1,7 +1,7 @@
 <%@ include file="../00-header.jsp" %>
 <script type="text/javascript">
     $(document).ready(function () {
-        <%@ include file="../snippets/dateTimePicker-future.js" %>
+        <%@ include file="../snippets/dateTimePicker.js" %>
         <%@ include file="../snippets/schedulePeriodsTable.js" %>
     });
 </script>

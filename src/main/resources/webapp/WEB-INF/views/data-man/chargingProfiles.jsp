@@ -2,7 +2,7 @@
 <script type="text/javascript">
     $(document).ready(function () {
         <%@ include file="../snippets/sortable.js" %>
-        <%@ include file="../snippets/dateTimePicker-future.js" %>
+        <%@ include file="../snippets/dateTimePicker.js" %>
     });
 </script>
 <div class="content">

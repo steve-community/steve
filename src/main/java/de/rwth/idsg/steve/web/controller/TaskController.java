@@ -77,6 +77,6 @@ public class TaskController {
         GetCompositeScheduleResponse response = result.getDetails();
         model.addAttribute("chargeBoxId", chargeBoxId);
         model.addAttribute("response", response);
-        return "op16/GetCompositeScheduleResponse.jsp";
+        return "op16/GetCompositeScheduleResponse";
     }
 }

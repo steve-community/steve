@@ -1,7 +1,11 @@
 package de.rwth.idsg.steve.web.controller;
 
+import de.rwth.idsg.steve.SteveException;
 import de.rwth.idsg.steve.ocpp.CommunicationTask;
+import de.rwth.idsg.steve.ocpp.RequestResult;
+import de.rwth.idsg.steve.ocpp.task.GetCompositeScheduleTask;
 import de.rwth.idsg.steve.repository.TaskStore;
+import ocpp.cp._2015._10.GetCompositeScheduleResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -24,6 +28,7 @@ public class TaskController {
     // -------------------------------------------------------------------------
 
     private static final String TASK_ID_PATH = "/{taskId}";
+    private static final String TASK_DETAILS_PATH = TASK_ID_PATH + "/details/{chargeBoxId}";
 
     // -------------------------------------------------------------------------
     // HTTP methods
@@ -44,7 +49,34 @@ public class TaskController {
     @RequestMapping(value = TASK_ID_PATH, method = RequestMethod.GET)
     public String getTaskDetails(@PathVariable("taskId") Integer taskId, Model model) {
         CommunicationTask r = taskStore.get(taskId);
+        model.addAttribute("taskId", taskId);
         model.addAttribute("task", r);
         return "taskResult";
+    }
+
+    @RequestMapping(value = TASK_DETAILS_PATH, method = RequestMethod.GET)
+    public String getDetailsForChargeBox(@PathVariable("taskId") Integer taskId,
+                                         @PathVariable("chargeBoxId") String chargeBoxId,
+                                         Model model) {
+
+        CommunicationTask r = taskStore.get(taskId);
+
+        // at the moment only for GetCompositeScheduleTask
+        if (r instanceof GetCompositeScheduleTask) {
+            return processForGetCompositeScheduleTask((GetCompositeScheduleTask) r, chargeBoxId, model);
+        } else {
+            throw new SteveException("Task not found");
+        }
+    }
+
+    private String processForGetCompositeScheduleTask(GetCompositeScheduleTask k, String chargeBoxId, Model model) {
+        RequestResult result = k.getResultMap().get(chargeBoxId);
+        if (result == null) {
+            throw new SteveException("Result not found");
+        }
+        GetCompositeScheduleResponse response = result.getDetails();
+        model.addAttribute("chargeBoxId", chargeBoxId);
+        model.addAttribute("response", response);
+        return "op16/GetCompositeScheduleResponse.jsp";
     }
 }

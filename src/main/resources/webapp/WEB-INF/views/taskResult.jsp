@@ -27,8 +27,18 @@
         <thead><tr><th>ChargeBox ID</th><th>Response</th><th>Error</th></tr></thead>
         <tbody>
         <c:forEach items="${task.resultMap}" var="result">
-            <tr><td>${result.key}</td>
-                <td>${result.value.response}</td>
+            <tr>
+                <td>${result.key}</td>
+                <td>
+                    <c:choose>
+                        <c:when test="${result.value.details == null}">
+                            ${result.value.response}
+                        </c:when>
+                        <c:otherwise>
+                            ${result.value.response} (<a href="${ctxPath}/manager/operations/tasks/${taskId}/details/${result.key}">Details</a>)
+                        </c:otherwise>
+                    </c:choose>
+                </td>
                 <td>${result.value.errorMessage}</td>
             </tr>
         </c:forEach>

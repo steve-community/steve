@@ -3,7 +3,8 @@
     <div>
         <center>
             <table id='details' class='cpd'>
-                <thead><tr><th>GetCompositeScheduleResponse from ${chargeBoxId}</th><th></th></tr></thead>
+                <thead><tr><th>GetCompositeScheduleResponse</th><th></th></tr></thead>
+                <tr><td>ChargeBox ID:</td><td>${chargeBoxId}</td></tr>
                 <tr><td>Connector ID:</td><td>${response.connectorId}</td></tr>
                 <tr><td>Schedule Start:</td><td>${response.scheduleStart}</td></tr>
                 <tr><td>Duration (in seconds):</td><td>${response.chargingSchedule.duration}</td></tr>

@@ -97,7 +97,7 @@ public class ChargePointService16_Client extends ChargePointService15_Client {
         GetCompositeScheduleTask task = new GetCompositeScheduleTask(getVersion(), params);
 
         BackgroundService.with(executorService)
-                         .forFirst(task.getParams().getChargePointSelectList())
+                         .forEach(task.getParams().getChargePointSelectList())
                          .execute(c -> getOcpp16Invoker().getCompositeSchedule(c, task));
 
         return taskStore.add(task);

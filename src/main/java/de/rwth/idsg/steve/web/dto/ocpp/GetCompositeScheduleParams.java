@@ -14,7 +14,7 @@ import javax.validation.constraints.Positive;
  */
 @Getter
 @Setter
-public class GetCompositeScheduleParams extends SingleChargePointSelect {
+public class GetCompositeScheduleParams extends MultipleChargePointSelect {
 
     @NotNull
     @Min(value = 0, message = "Connector ID must be at least {value}")

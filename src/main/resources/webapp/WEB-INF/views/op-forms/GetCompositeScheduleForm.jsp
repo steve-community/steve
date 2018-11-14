@@ -1,6 +1,6 @@
 <form:form action="${ctxPath}/manager/operations/${opVersion}/GetCompositeSchedule" modelAttribute="params">
     <section><span>Charge Points with OCPP ${opVersion}</span></section>
-    <%@ include file="../00-cp-single.jsp" %>
+    <%@ include file="../00-cp-multiple.jsp" %>
     <section><span>Parameters</span></section>
     <table class="userInput">
         <tr>

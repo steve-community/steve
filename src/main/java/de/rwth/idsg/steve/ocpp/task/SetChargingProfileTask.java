@@ -43,7 +43,7 @@ public class SetChargingProfileTask extends Ocpp16AndAboveTask<EnhancedSetChargi
 
                 if ("Accepted".equalsIgnoreCase(statusValue)) {
                     int chargingProfilePk = params.getDetails().getProfile().getChargingProfilePk();
-                    int connectorId = params.getConnectorId();
+                    int connectorId = params.getDelegate().getConnectorId();
                     chargingProfileRepository.setProfile(chargingProfilePk, chargeBoxId, connectorId);
                 }
             }
@@ -84,7 +84,7 @@ public class SetChargingProfileTask extends Ocpp16AndAboveTask<EnhancedSetChargi
                 .withChargingSchedule(schedule);
 
         return new SetChargingProfileRequest()
-                .withConnectorId(params.getConnectorId())
+                .withConnectorId(params.getDelegate().getConnectorId())
                 .withCsChargingProfiles(ocppProfile);
     }
 

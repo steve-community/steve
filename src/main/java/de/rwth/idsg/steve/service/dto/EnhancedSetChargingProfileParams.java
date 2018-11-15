@@ -3,6 +3,7 @@ package de.rwth.idsg.steve.service.dto;
 import de.rwth.idsg.steve.repository.dto.ChargePointSelect;
 import de.rwth.idsg.steve.repository.dto.ChargingProfile;
 import de.rwth.idsg.steve.web.dto.ocpp.ChargePointSelection;
+import de.rwth.idsg.steve.web.dto.ocpp.SetChargingProfileParams;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
@@ -16,12 +17,11 @@ import java.util.List;
 @RequiredArgsConstructor
 public class EnhancedSetChargingProfileParams implements ChargePointSelection {
 
-    private final List<ChargePointSelect> chargePointSelects;
+    private final SetChargingProfileParams delegate;
     private final ChargingProfile.Details details;
-    private final int connectorId;
 
     @Override
     public List<ChargePointSelect> getChargePointSelectList() {
-        return chargePointSelects;
+        return delegate.getChargePointSelectList();
     }
 }

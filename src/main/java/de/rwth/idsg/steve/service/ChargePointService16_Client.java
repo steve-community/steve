@@ -72,13 +72,12 @@ public class ChargePointService16_Client extends ChargePointService15_Client {
     }
 
     public int setChargingProfile(SetChargingProfileParams params) {
-        List<ChargePointSelect> chargePoints = params.getChargePointSelectList();
         ChargingProfile.Details details = chargingProfileRepository.getDetails(params.getChargingProfilePk());
 
-        EnhancedSetChargingProfileParams enhancedParams = new EnhancedSetChargingProfileParams(chargePoints, details, params.getConnectorId());
-        SetChargingProfileTask task = new SetChargingProfileTask(getVersion(), enhancedParams, chargingProfileRepository);
-
         checkAdditionalConstraints(params, details);
+
+        EnhancedSetChargingProfileParams enhancedParams = new EnhancedSetChargingProfileParams(params, details);
+        SetChargingProfileTask task = new SetChargingProfileTask(getVersion(), enhancedParams, chargingProfileRepository);
 
         BackgroundService.with(executorService)
                          .forEach(task.getParams().getChargePointSelectList())

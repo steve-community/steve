@@ -1,5 +1,6 @@
 package de.rwth.idsg.steve.service;
 
+import de.rwth.idsg.steve.SteveException;
 import de.rwth.idsg.steve.ocpp.ChargePointService12_Invoker;
 import de.rwth.idsg.steve.ocpp.ChargePointService15_Invoker;
 import de.rwth.idsg.steve.ocpp.ChargePointService16_Invoker;
@@ -18,6 +19,7 @@ import de.rwth.idsg.steve.web.dto.ocpp.GetCompositeScheduleParams;
 import de.rwth.idsg.steve.web.dto.ocpp.SetChargingProfileParams;
 import de.rwth.idsg.steve.web.dto.ocpp.TriggerMessageParams;
 import lombok.extern.slf4j.Slf4j;
+import ocpp.cp._2015._10.ChargingProfilePurposeType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -76,6 +78,8 @@ public class ChargePointService16_Client extends ChargePointService15_Client {
         EnhancedSetChargingProfileParams enhancedParams = new EnhancedSetChargingProfileParams(chargePoints, details, params.getConnectorId());
         SetChargingProfileTask task = new SetChargingProfileTask(getVersion(), enhancedParams, chargingProfileRepository);
 
+        checkAdditionalConstraints(params, details);
+
         BackgroundService.with(executorService)
                          .forEach(task.getParams().getChargePointSelectList())
                          .execute(c -> getOcpp16Invoker().setChargingProfile(c, task));
@@ -101,6 +105,25 @@ public class ChargePointService16_Client extends ChargePointService15_Client {
                          .execute(c -> getOcpp16Invoker().getCompositeSchedule(c, task));
 
         return taskStore.add(task);
+    }
+
+    /**
+     * Do some additional checks defined by OCPP spec, which cannot be captured with javax.validation
+     */
+    private static void checkAdditionalConstraints(SetChargingProfileParams params, ChargingProfile.Details details) {
+        ChargingProfilePurposeType purpose = ChargingProfilePurposeType.fromValue(details.getProfile().getChargingProfilePurpose());
+
+        if (ChargingProfilePurposeType.CHARGE_POINT_MAX_PROFILE == purpose
+                && params.getConnectorId() != null
+                && params.getConnectorId() != 0) {
+            throw new SteveException("ChargePointMaxProfile can only be set at Charge Point ConnectorId 0");
+        }
+
+        if (ChargingProfilePurposeType.TX_PROFILE == purpose
+                && params.getConnectorId() != null
+                && params.getConnectorId() < 1) {
+            throw new SteveException("TxProfile should only be set at Charge Point ConnectorId > 0");
+        }
 
     }
 }

@@ -1,5 +1,6 @@
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
 <table class="userInput">
+    <thead><tr><th>Details</th><th></th></thead>
     <tr><td>Description:</td><td><form:input path="description"/></td></tr>
     <tr><td>Stack Level (integer):</td><td><form:input path="stackLevel"/></td></tr>
     <tr><td>Charging Profile Purpose:</td>

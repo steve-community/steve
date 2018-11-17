@@ -18,6 +18,19 @@
 <div class="content">
     <div>
         <section><span>Charging Profile Details</span></section>
+
+        <table class="userInput">
+            <thead><tr><th>Related Data Pages</th><th></th></thead>
+            <tbody>
+            <tr>
+                <td>Stations using this profile:</td>
+                <td>
+                    <a href="${ctxPath}/manager/chargingProfiles/assignments?chargingProfilePk=${form.chargingProfilePk}">ALL</a>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+
         <form:form action="${ctxPath}/manager/chargingProfiles/update" modelAttribute="form">
 
             <form:hidden path="chargingProfilePk" readonly="true"/>

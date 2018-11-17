@@ -1,6 +1,8 @@
 package de.rwth.idsg.steve.repository;
 
 import de.rwth.idsg.steve.repository.dto.ChargingProfile;
+import de.rwth.idsg.steve.repository.dto.ChargingProfileAssignment;
+import de.rwth.idsg.steve.web.dto.ChargingProfileAssignmentQueryForm;
 import de.rwth.idsg.steve.web.dto.ChargingProfileForm;
 import de.rwth.idsg.steve.web.dto.ChargingProfileQueryForm;
 import ocpp.cp._2015._10.ChargingProfilePurposeType;
@@ -31,6 +33,8 @@ public interface ChargingProfileRepository {
     // -------------------------------------------------------------------------
     // CRUD stuff
     // -------------------------------------------------------------------------
+
+    List<ChargingProfileAssignment> getAssignments(ChargingProfileAssignmentQueryForm query);
 
     List<ChargingProfile.BasicInfo> getBasicInfo();
 

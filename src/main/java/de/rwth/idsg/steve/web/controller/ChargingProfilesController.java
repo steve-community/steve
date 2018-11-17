@@ -1,8 +1,10 @@
 package de.rwth.idsg.steve.web.controller;
 
+import de.rwth.idsg.steve.repository.ChargePointRepository;
 import de.rwth.idsg.steve.repository.ChargingProfileRepository;
 import de.rwth.idsg.steve.repository.dto.ChargingProfile;
 import de.rwth.idsg.steve.utils.DateTimeUtils;
+import de.rwth.idsg.steve.web.dto.ChargingProfileAssignmentQueryForm;
 import de.rwth.idsg.steve.web.dto.ChargingProfileForm;
 import de.rwth.idsg.steve.web.dto.ChargingProfileQueryForm;
 import jooq.steve.db.tables.records.ChargingProfileRecord;
@@ -34,6 +36,7 @@ import java.util.UUID;
 @RequestMapping(value = "/manager/chargingProfiles")
 public class ChargingProfilesController {
 
+    @Autowired private ChargePointRepository chargePointRepository;
     @Autowired private ChargingProfileRepository repository;
 
     private static final String PARAMS = "params";
@@ -48,6 +51,8 @@ public class ChargingProfilesController {
     private static final String DELETE_PATH = "/delete/{chargingProfilePk}";
     private static final String UPDATE_PATH = "/update";
     private static final String ADD_PATH = "/add";
+
+    private static final String ASSIGNMENTS_PATH = "/assignments";
 
     // -------------------------------------------------------------------------
     // HTTP methods
@@ -146,6 +151,15 @@ public class ChargingProfilesController {
 
         model.addAttribute("form", form);
         return "data-man/chargingProfileDetails";
+    }
+
+    @RequestMapping(value = ASSIGNMENTS_PATH, method = RequestMethod.GET)
+    public String getAssignments(@ModelAttribute(PARAMS) ChargingProfileAssignmentQueryForm form, Model model) {
+        model.addAttribute(PARAMS, form);
+        model.addAttribute("profileList", repository.getBasicInfo());
+        model.addAttribute("cpList", chargePointRepository.getChargeBoxIds());
+        model.addAttribute("assignments", repository.getAssignments(form));
+        return "data-man/chargingProfileAssignments";
     }
 
     private void initList(ChargingProfileQueryForm queryForm, Model model) {

@@ -3,7 +3,9 @@ package de.rwth.idsg.steve.repository.impl;
 import de.rwth.idsg.steve.SteveException;
 import de.rwth.idsg.steve.repository.ChargingProfileRepository;
 import de.rwth.idsg.steve.repository.dto.ChargingProfile;
+import de.rwth.idsg.steve.repository.dto.ChargingProfileAssignment;
 import de.rwth.idsg.steve.utils.DateTimeUtils;
+import de.rwth.idsg.steve.web.dto.ChargingProfileAssignmentQueryForm;
 import de.rwth.idsg.steve.web.dto.ChargingProfileForm;
 import de.rwth.idsg.steve.web.dto.ChargingProfileQueryForm;
 import jooq.steve.db.tables.records.ChargingProfileRecord;
@@ -30,6 +32,7 @@ import static jooq.steve.db.Tables.CHARGING_PROFILE;
 import static jooq.steve.db.Tables.CHARGING_SCHEDULE_PERIOD;
 import static jooq.steve.db.Tables.CONNECTOR;
 import static jooq.steve.db.Tables.CONNECTOR_CHARGING_PROFILE;
+import static jooq.steve.db.tables.ChargeBox.CHARGE_BOX;
 
 /**
  * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
@@ -121,6 +124,51 @@ public class ChargingProfileRepositoryImpl implements ChargingProfileRepository 
     // -------------------------------------------------------------------------
     // CRUD stuff
     // -------------------------------------------------------------------------
+
+    @Override
+    public List<ChargingProfileAssignment> getAssignments(ChargingProfileAssignmentQueryForm query) {
+        Condition conditions = DSL.trueCondition();
+
+        if (query.getChargeBoxId() != null) {
+            conditions = conditions.and(CHARGE_BOX.CHARGE_BOX_ID.eq(query.getChargeBoxId()));
+        }
+
+        if (query.getChargingProfilePk() != null) {
+            conditions = conditions.and(CHARGING_PROFILE.CHARGING_PROFILE_PK.eq(query.getChargingProfilePk()));
+        }
+
+        if (query.getChargingProfileDescription() != null) {
+            conditions = conditions.and(includes(CHARGING_PROFILE.DESCRIPTION, query.getChargingProfileDescription()));
+        }
+
+        return ctx.select(
+                        CHARGE_BOX.CHARGE_BOX_PK,
+                        CHARGE_BOX.CHARGE_BOX_ID,
+                        CONNECTOR.CONNECTOR_ID,
+                        CONNECTOR_CHARGING_PROFILE.CHARGING_PROFILE_PK,
+                        CHARGING_PROFILE.DESCRIPTION)
+                  .from(CONNECTOR_CHARGING_PROFILE)
+                  .join(CONNECTOR)
+                    .on(CONNECTOR.CONNECTOR_PK.eq(CONNECTOR_CHARGING_PROFILE.CONNECTOR_PK))
+                  .join(CHARGING_PROFILE)
+                    .on(CHARGING_PROFILE.CHARGING_PROFILE_PK.eq(CONNECTOR_CHARGING_PROFILE.CHARGING_PROFILE_PK))
+                  .join(CHARGE_BOX)
+                    .on(CHARGE_BOX.CHARGE_BOX_ID.eq(CONNECTOR.CHARGE_BOX_ID))
+                  .where(conditions)
+                  .orderBy(
+                          CHARGE_BOX.CHARGE_BOX_ID,
+                          CONNECTOR.CONNECTOR_ID,
+                          CONNECTOR_CHARGING_PROFILE.CHARGING_PROFILE_PK)
+                  .fetch()
+                  .map(k -> ChargingProfileAssignment.builder()
+                                                     .chargeBoxPk(k.value1())
+                                                     .chargeBoxId(k.value2())
+                                                     .connectorId(k.value3())
+                                                     .chargingProfilePk(k.value4())
+                                                     .chargingProfileDescription(k.value5())
+                                                     .build()
+                  );
+    }
 
     @Override
     public List<ChargingProfile.BasicInfo> getBasicInfo() {

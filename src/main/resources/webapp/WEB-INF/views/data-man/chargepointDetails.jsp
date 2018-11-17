@@ -40,6 +40,12 @@
                     <a href="${ctxPath}/manager/home/connectorStatus/query?chargeBoxId=${chargePointForm.chargeBoxId}">ALL</a>
                 </td>
             </tr>
+            <tr>
+                <td>Charging Profiles:</td>
+                <td>
+                    <a href="${ctxPath}/manager/chargingProfiles/assignments?chargeBoxId=${chargePointForm.chargeBoxId}">ALL</a>
+                </td>
+            </tr>
             </tbody>
         </table>
 

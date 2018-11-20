@@ -18,14 +18,11 @@ Electric charge points using the following OCPP versions are supported:
 * OCPP1.2J
 * OCPP1.5S
 * OCPP1.5J
-* OCPP1.6S <sup>[1]</sup>
-* OCPP1.6J <sup>[1]</sup>
-
-[1]: All profiles with the exception of "Smart Charging" are implemented: Core, Firmware Management, Local Auth List Management, Reservation and Remote Trigger profiles
+* OCPP1.6S
+* OCPP1.6J
 
 For Charging Station compatibility please check:
-https://github.com/RWTH-i5-IDSG/steve/wiki/Charging-Station-Compatibility 
-The list was just recently started and is therefore not exhaustive.
+https://github.com/RWTH-i5-IDSG/steve/wiki/Charging-Station-Compatibility
 
 ### System Requirements
 

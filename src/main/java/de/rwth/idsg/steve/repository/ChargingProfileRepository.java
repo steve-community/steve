@@ -6,9 +6,9 @@ import de.rwth.idsg.steve.web.dto.ChargingProfileAssignmentQueryForm;
 import de.rwth.idsg.steve.web.dto.ChargingProfileForm;
 import de.rwth.idsg.steve.web.dto.ChargingProfileQueryForm;
 import ocpp.cp._2015._10.ChargingProfilePurposeType;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nullable;
-import javax.validation.constraints.NotNull;
 import java.util.List;
 
 /**

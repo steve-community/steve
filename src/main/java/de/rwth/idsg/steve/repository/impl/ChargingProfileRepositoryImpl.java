@@ -12,6 +12,8 @@ import jooq.steve.db.tables.records.ChargingProfileRecord;
 import jooq.steve.db.tables.records.ChargingSchedulePeriodRecord;
 import lombok.extern.slf4j.Slf4j;
 import ocpp.cp._2015._10.ChargingProfilePurposeType;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.jooq.Condition;
 import org.jooq.DSLContext;
 import org.jooq.Record1;
@@ -22,8 +24,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.CollectionUtils;
 
-import javax.annotation.Nullable;
-import javax.validation.constraints.NotNull;
 import java.util.List;
 import java.util.stream.Collectors;
 

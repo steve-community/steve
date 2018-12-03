@@ -9,6 +9,7 @@ import de.rwth.idsg.steve.ocpp.ws.ocpp12.Ocpp12JacksonModule;
 import de.rwth.idsg.steve.ocpp.ws.ocpp15.Ocpp15JacksonModule;
 import de.rwth.idsg.steve.ocpp.ws.ocpp16.Ocpp16JacksonModule;
 
+import static com.fasterxml.jackson.core.JsonGenerator.Feature.WRITE_BIGDECIMAL_AS_PLAIN;
 import static com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_NULL_FOR_PRIMITIVES;
 
 /**
@@ -34,6 +35,8 @@ public enum JsonObjectMapper {
         // response with a transactionId, but an error message. if we do not fail early, it will fail at the database
         // level which we want to prevent.
         mapper.configure(FAIL_ON_NULL_FOR_PRIMITIVES, true);
+
+        mapper.configure(WRITE_BIGDECIMAL_AS_PLAIN, true);
 
         mapper.registerModule(new Ocpp12JacksonModule());
         mapper.registerModule(new Ocpp15JacksonModule());

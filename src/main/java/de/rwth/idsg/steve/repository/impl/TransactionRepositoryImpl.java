@@ -100,8 +100,29 @@ public class TransactionRepositoryImpl implements TransactionRepository {
 
         Condition timestampCondition;
         if (stopTimestamp == null && stopValue == null) {
-            // active transaction
-            timestampCondition = CONNECTOR_METER_VALUE.VALUE_TIMESTAMP.greaterOrEqual(startTimestamp);
+
+            // handle "zombie" transaction, for which we did not receive any StopTransaction. if we do not handle it,
+            // meter values for all subsequent transactions at this chargebox and connector will be falsely attributed
+            // to this zombie transaction.
+            //
+            // "what is the start time of the first subsequent transaction at the same chargebox and connector?"
+            DateTime startOfNext = ctx.select(TRANSACTION.START_TIMESTAMP)
+                                      .from(TRANSACTION)
+                                      .join(CONNECTOR)
+                                        .on(TRANSACTION.CONNECTOR_PK.equal(CONNECTOR.CONNECTOR_PK))
+                                      .where(CONNECTOR.CHARGE_BOX_ID.equal(chargeBoxId))
+                                        .and(CONNECTOR.CONNECTOR_ID.equal(connectorId))
+                                        .and(TRANSACTION.START_TIMESTAMP.greaterThan(startTimestamp))
+                                      .orderBy(TRANSACTION.START_TIMESTAMP)
+                                      .limit(1)
+                                      .fetchOne(TRANSACTION.START_TIMESTAMP);
+
+            if (startOfNext == null) {
+                // the last active transaction
+                timestampCondition = CONNECTOR_METER_VALUE.VALUE_TIMESTAMP.greaterOrEqual(startTimestamp);
+            } else {
+                timestampCondition = CONNECTOR_METER_VALUE.VALUE_TIMESTAMP.between(startTimestamp, startOfNext);
+            }
         } else {
             // finished transaction
             timestampCondition = CONNECTOR_METER_VALUE.VALUE_TIMESTAMP.between(startTimestamp, stopTimestamp);

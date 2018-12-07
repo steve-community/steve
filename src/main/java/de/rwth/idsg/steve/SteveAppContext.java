@@ -79,6 +79,9 @@ public class SteveAppContext {
         ctx.setContextPath(CONFIG.getContextPath());
         ctx.setResourceBase(getWebAppURIAsString());
 
+        // if during startup an exception happens, do not swallow it, throw it
+        ctx.setThrowUnavailableOnStartupException(true);
+
         // Disable directory listings if no index.html is found.
         ctx.setInitParameter("org.eclipse.jetty.servlet.Default.dirAllowed", "false");
 

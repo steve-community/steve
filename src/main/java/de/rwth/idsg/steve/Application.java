@@ -40,9 +40,16 @@ public class Application implements ApplicationStarter, AutoCloseable {
     }
 
     public static void main(String[] args) throws Exception {
-        Application app = new Application();
-        app.start();
-        app.join();
+        Application app = null;
+        try {
+            app = new Application();
+            app.start();
+            app.join();
+        } catch (Exception e) {
+            if (app != null) {
+                app.stop();
+            }
+        }
     }
 
     @Override

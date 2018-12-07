@@ -8,6 +8,7 @@ import de.rwth.idsg.steve.SteveConfiguration;
 import de.rwth.idsg.steve.service.DummyReleaseCheckService;
 import de.rwth.idsg.steve.service.GithubReleaseCheckService;
 import de.rwth.idsg.steve.service.ReleaseCheckService;
+import de.rwth.idsg.steve.utils.DateTimeUtils;
 import de.rwth.idsg.steve.utils.InternetChecker;
 import lombok.extern.slf4j.Slf4j;
 import org.jooq.DSLContext;
@@ -19,6 +20,8 @@ import org.jooq.impl.DefaultConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.event.ContextRefreshedEvent;
+import org.springframework.context.event.EventListener;
 import org.springframework.core.Ordered;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
@@ -140,6 +143,11 @@ public class BeanConfiguration implements WebMvcConfigurer {
         } else {
             return new DummyReleaseCheckService();
         }
+    }
+
+    @EventListener
+    public void afterStart(ContextRefreshedEvent event) {
+        DateTimeUtils.checkJavaAndMySQLOffsets(dslContext());
     }
 
     @PreDestroy

@@ -101,6 +101,8 @@ public class TransactionRepositoryImpl implements TransactionRepository {
         Condition timestampCondition;
         if (stopTimestamp == null && stopValue == null) {
 
+            // https://github.com/RWTH-i5-IDSG/steve/issues/97
+            //
             // handle "zombie" transaction, for which we did not receive any StopTransaction. if we do not handle it,
             // meter values for all subsequent transactions at this chargebox and connector will be falsely attributed
             // to this zombie transaction.

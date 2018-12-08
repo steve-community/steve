@@ -357,9 +357,13 @@
                                     <types>(?i:TINYINT(\s*\(\d+\))?(\s*UNSIGNED)?)</types>
                                 </forcedType>
                                 <forcedType>
+                                    <name>BOOLEAN</name>
+                                    <expression>.*\.IN_TRANSACTION</expression>
+                                </forcedType>
+                                <forcedType>
                                     <userType>org.joda.time.DateTime</userType>
                                     <converter>de.rwth.idsg.steve.utils.DateTimeConverter</converter>
-                                    <types>.*(TIMESTAMP|DATETIME).*</types>
+                                    <types>(TIMESTAMP|DATETIME)</types>
                                 </forcedType>
                                 <forcedType>
                                     <userType>org.joda.time.LocalDate</userType>

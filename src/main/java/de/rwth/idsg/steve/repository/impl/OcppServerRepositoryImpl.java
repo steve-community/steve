@@ -194,20 +194,7 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
         }
 
         // -------------------------------------------------------------------------
-        // Step 3: Update OCPP tag (in_transaction=true)
-        // -------------------------------------------------------------------------
-
-        int count = ctx.update(OCPP_TAG)
-                       .set(OCPP_TAG.IN_TRANSACTION, true)
-                       .where(OCPP_TAG.ID_TAG.eq(p.getIdTag()))
-                       .execute();
-
-        if (count == 0) {
-            log.warn("Failed to set in_transaction=true of OCPP tag of STARTED transaction {}", transactionId);
-        }
-
-        // -------------------------------------------------------------------------
-        // Step 4 for OCPP >= 1.5: A startTransaction may be related to a reservation
+        // Step 3 for OCPP >= 1.5: A startTransaction may be related to a reservation
         // -------------------------------------------------------------------------
 
         if (p.isSetReservationId()) {
@@ -215,7 +202,7 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
         }
 
         // -------------------------------------------------------------------------
-        // Step 5: Set connector status
+        // Step 4: Set connector status
         // -------------------------------------------------------------------------
 
         if (shouldInsertConnectorStatusAfterTransactionMsg(p.getChargeBoxId())) {
@@ -245,25 +232,7 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
         }
 
         // -------------------------------------------------------------------------
-        // Step 2: Update OCPP tag (in_transaction=false)
-        // -------------------------------------------------------------------------
-
-        SelectConditionStep<Record1<String>> idTagSelect =
-                DSL.select(TRANSACTION.ID_TAG)
-                   .from(TRANSACTION)
-                   .where(TRANSACTION.TRANSACTION_PK.equal(p.getTransactionId()));
-
-        int ocppTagUpdateCount = ctx.update(OCPP_TAG)
-                                    .set(OCPP_TAG.IN_TRANSACTION, false)
-                                    .where(OCPP_TAG.ID_TAG.eq(idTagSelect))
-                                    .execute();
-
-        if (ocppTagUpdateCount == 0) {
-            log.warn("Failed to set in_transaction=false of OCPP tag of STOPPED transaction {}", p.getTransactionId());
-        }
-
-        // -------------------------------------------------------------------------
-        // Step 3: Set connector status back
+        // Step 2: Set connector status back
         // -------------------------------------------------------------------------
 
         if (shouldInsertConnectorStatusAfterTransactionMsg(p.getChargeBoxId())) {

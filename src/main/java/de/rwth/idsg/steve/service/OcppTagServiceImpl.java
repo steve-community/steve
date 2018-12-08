@@ -5,7 +5,7 @@ import de.rwth.idsg.steve.repository.OcppTagRepository;
 import de.rwth.idsg.steve.repository.SettingsRepository;
 import de.rwth.idsg.steve.repository.TransactionRepository;
 import de.rwth.idsg.steve.service.dto.UnidentifiedIncomingObject;
-import jooq.steve.db.tables.records.OcppTagRecord;
+import jooq.steve.db.tables.records.OcppTagActivityRecord;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -63,7 +63,7 @@ public class OcppTagServiceImpl implements OcppTagService {
 
     @Override
     public IdTagInfo getIdTagInfo(String idTag, String askingChargeBoxId) {
-        OcppTagRecord record = ocppTagRepository.getRecord(idTag);
+        OcppTagActivityRecord record = ocppTagRepository.getRecord(idTag);
         AuthorizationStatus status = decideStatus(record, idTag, askingChargeBoxId);
 
         switch (status) {
@@ -91,7 +91,7 @@ public class OcppTagServiceImpl implements OcppTagService {
      * If the database contains an actual expiry, use it. Otherwise, calculate an expiry for cached info
      */
     @Nullable
-    private DateTime getExpiryDateOrDefault(OcppTagRecord record) {
+    private DateTime getExpiryDateOrDefault(OcppTagActivityRecord record) {
         if (record.getExpiryDate() != null) {
             return record.getExpiryDate();
         }
@@ -106,7 +106,7 @@ public class OcppTagServiceImpl implements OcppTagService {
         }
     }
 
-    private AuthorizationStatus decideStatus(OcppTagRecord record, String idTag, String askingChargeBoxId) {
+    private AuthorizationStatus decideStatus(OcppTagActivityRecord record, String idTag, String askingChargeBoxId) {
         if (record == null) {
             log.error("The user with idTag '{}' is INVALID (not present in DB).", idTag);
             return AuthorizationStatus.INVALID;
@@ -135,7 +135,7 @@ public class OcppTagServiceImpl implements OcppTagService {
         return AuthorizationStatus.ACCEPTED;
     }
 
-    private static ocpp.cp._2015._10.AuthorizationStatus decideStatus(OcppTagRecord record, DateTime now) {
+    private static ocpp.cp._2015._10.AuthorizationStatus decideStatus(OcppTagActivityRecord record, DateTime now) {
         if (record.getBlocked()) {
             return ocpp.cp._2015._10.AuthorizationStatus.BLOCKED;
         } else if (isExpired(record, now)) {
@@ -147,22 +147,22 @@ public class OcppTagServiceImpl implements OcppTagService {
         }
     }
 
-    private static boolean isExpired(OcppTagRecord record) {
+    private static boolean isExpired(OcppTagActivityRecord record) {
         return isExpired(record, DateTime.now());
     }
 
-    private static boolean isExpired(OcppTagRecord record, DateTime now) {
+    private static boolean isExpired(OcppTagActivityRecord record, DateTime now) {
         DateTime expiry = record.getExpiryDate();
         return expiry != null && now.isAfter(expiry);
     }
 
     @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-    private static class AuthorisationDataMapper implements RecordMapper<OcppTagRecord, AuthorizationData> {
+    private static class AuthorisationDataMapper implements RecordMapper<OcppTagActivityRecord, AuthorizationData> {
 
         private final DateTime nowDt = DateTime.now();
 
         @Override
-        public AuthorizationData map(OcppTagRecord record) {
+        public AuthorizationData map(OcppTagActivityRecord record) {
             return new AuthorizationData().withIdTag(record.getIdTag())
                                           .withIdTagInfo(
                                                   new ocpp.cp._2015._10.IdTagInfo()

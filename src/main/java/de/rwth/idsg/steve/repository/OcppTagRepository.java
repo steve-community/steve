@@ -3,7 +3,7 @@ package de.rwth.idsg.steve.repository;
 import de.rwth.idsg.steve.repository.dto.OcppTag;
 import de.rwth.idsg.steve.web.dto.OcppTagForm;
 import de.rwth.idsg.steve.web.dto.OcppTagQueryForm;
-import jooq.steve.db.tables.records.OcppTagRecord;
+import jooq.steve.db.tables.records.OcppTagActivityRecord;
 import org.jooq.Result;
 
 import java.util.List;
@@ -15,10 +15,11 @@ import java.util.List;
 public interface OcppTagRepository {
     List<OcppTag.Overview> getOverview(OcppTagQueryForm form);
 
-    Result<OcppTagRecord> getRecords();
-    Result<OcppTagRecord> getRecords(List<String> idTagList);
-    OcppTagRecord getRecord(String idTag);
-    OcppTagRecord getRecord(int ocppTagPk);
+    Result<OcppTagActivityRecord> getRecords();
+    Result<OcppTagActivityRecord> getRecords(List<String> idTagList);
+
+    OcppTagActivityRecord getRecord(String idTag);
+    OcppTagActivityRecord getRecord(int ocppTagPk);
 
     List<String> getIdTags();
     List<String> getActiveIdTags();

@@ -6,7 +6,7 @@ import de.rwth.idsg.steve.utils.ControllerHelper;
 import de.rwth.idsg.steve.web.dto.OcppTagBatchInsertForm;
 import de.rwth.idsg.steve.web.dto.OcppTagForm;
 import de.rwth.idsg.steve.web.dto.OcppTagQueryForm;
-import jooq.steve.db.tables.records.OcppTagRecord;
+import jooq.steve.db.tables.records.OcppTagActivityRecord;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -69,7 +69,7 @@ public class OcppTagsController {
 
     @RequestMapping(value = DETAILS_PATH, method = RequestMethod.GET)
     public String getDetails(@PathVariable("ocppTagPk") int ocppTagPk, Model model) {
-        OcppTagRecord record = ocppTagRepository.getRecord(ocppTagPk);
+        OcppTagActivityRecord record = ocppTagRepository.getRecord(ocppTagPk);
 
         OcppTagForm form = new OcppTagForm();
         form.setOcppTagPk(record.getOcppTagPk());

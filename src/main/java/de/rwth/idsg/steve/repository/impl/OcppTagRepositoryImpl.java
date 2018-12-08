@@ -5,7 +5,8 @@ import de.rwth.idsg.steve.repository.OcppTagRepository;
 import de.rwth.idsg.steve.repository.dto.OcppTag.Overview;
 import de.rwth.idsg.steve.web.dto.OcppTagForm;
 import de.rwth.idsg.steve.web.dto.OcppTagQueryForm;
-import jooq.steve.db.tables.OcppTag;
+import jooq.steve.db.tables.OcppTagActivity;
+import jooq.steve.db.tables.records.OcppTagActivityRecord;
 import jooq.steve.db.tables.records.OcppTagRecord;
 import lombok.extern.slf4j.Slf4j;
 import org.joda.time.DateTime;
@@ -27,6 +28,7 @@ import java.util.stream.Collectors;
 import static de.rwth.idsg.steve.utils.DateTimeUtils.humanize;
 import static de.rwth.idsg.steve.utils.DateTimeUtils.toDateTime;
 import static jooq.steve.db.tables.OcppTag.OCPP_TAG;
+import static jooq.steve.db.tables.OcppTagActivity.OCPP_TAG_ACTIVITY;
 
 /**
  * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
@@ -47,28 +49,28 @@ public class OcppTagRepositoryImpl implements OcppTagRepository {
     @SuppressWarnings("unchecked")
     public List<Overview> getOverview(OcppTagQueryForm form) {
         SelectQuery selectQuery = ctx.selectQuery();
-        selectQuery.addFrom(OCPP_TAG);
+        selectQuery.addFrom(OCPP_TAG_ACTIVITY);
 
-        OcppTag parentTable = OCPP_TAG.as("parent");
+        OcppTagActivity parentTable = OCPP_TAG_ACTIVITY.as("parent");
 
         selectQuery.addSelect(
-                OCPP_TAG.OCPP_TAG_PK,
+                OCPP_TAG_ACTIVITY.OCPP_TAG_PK,
                 parentTable.OCPP_TAG_PK,
-                OCPP_TAG.ID_TAG,
-                OCPP_TAG.PARENT_ID_TAG,
-                OCPP_TAG.EXPIRY_DATE,
-                OCPP_TAG.IN_TRANSACTION,
-                OCPP_TAG.BLOCKED
+                OCPP_TAG_ACTIVITY.ID_TAG,
+                OCPP_TAG_ACTIVITY.PARENT_ID_TAG,
+                OCPP_TAG_ACTIVITY.EXPIRY_DATE,
+                OCPP_TAG_ACTIVITY.IN_TRANSACTION,
+                OCPP_TAG_ACTIVITY.BLOCKED
         );
 
-        selectQuery.addJoin(parentTable, JoinType.LEFT_OUTER_JOIN, parentTable.ID_TAG.eq(OCPP_TAG.PARENT_ID_TAG));
+        selectQuery.addJoin(parentTable, JoinType.LEFT_OUTER_JOIN, parentTable.ID_TAG.eq(OCPP_TAG_ACTIVITY.PARENT_ID_TAG));
 
         if (form.isIdTagSet()) {
-            selectQuery.addConditions(OCPP_TAG.ID_TAG.eq(form.getIdTag()));
+            selectQuery.addConditions(OCPP_TAG_ACTIVITY.ID_TAG.eq(form.getIdTag()));
         }
 
         if (form.isParentIdTagSet()) {
-            selectQuery.addConditions(OCPP_TAG.PARENT_ID_TAG.eq(form.getParentIdTag()));
+            selectQuery.addConditions(OCPP_TAG_ACTIVITY.PARENT_ID_TAG.eq(form.getParentIdTag()));
         }
 
         switch (form.getExpired()) {
@@ -76,12 +78,12 @@ public class OcppTagRepositoryImpl implements OcppTagRepository {
                 break;
 
             case TRUE:
-                selectQuery.addConditions(OCPP_TAG.EXPIRY_DATE.lessOrEqual(DateTime.now()));
+                selectQuery.addConditions(OCPP_TAG_ACTIVITY.EXPIRY_DATE.lessOrEqual(DateTime.now()));
                 break;
 
             case FALSE:
                 selectQuery.addConditions(
-                        OCPP_TAG.EXPIRY_DATE.isNull().or(OCPP_TAG.EXPIRY_DATE.greaterThan(DateTime.now()))
+                        OCPP_TAG_ACTIVITY.EXPIRY_DATE.isNull().or(OCPP_TAG_ACTIVITY.EXPIRY_DATE.greaterThan(DateTime.now()))
                 );
                 break;
 
@@ -89,36 +91,36 @@ public class OcppTagRepositoryImpl implements OcppTagRepository {
                 throw new SteveException("Unknown enum type");
         }
 
-        processBooleanType(selectQuery, OCPP_TAG.IN_TRANSACTION, form.getInTransaction());
-        processBooleanType(selectQuery, OCPP_TAG.BLOCKED, form.getBlocked());
+        processBooleanType(selectQuery, OCPP_TAG_ACTIVITY.IN_TRANSACTION, form.getInTransaction());
+        processBooleanType(selectQuery, OCPP_TAG_ACTIVITY.BLOCKED, form.getBlocked());
 
         return selectQuery.fetch().map(new UserMapper());
     }
 
     @Override
-    public Result<OcppTagRecord> getRecords() {
-        return ctx.selectFrom(OCPP_TAG)
+    public Result<OcppTagActivityRecord> getRecords() {
+        return ctx.selectFrom(OCPP_TAG_ACTIVITY)
                   .fetch();
     }
 
     @Override
-    public Result<OcppTagRecord> getRecords(List<String> idTagList) {
-        return ctx.selectFrom(OCPP_TAG)
+    public Result<OcppTagActivityRecord> getRecords(List<String> idTagList) {
+        return ctx.selectFrom(OCPP_TAG_ACTIVITY)
                   .where(OCPP_TAG.ID_TAG.in(idTagList))
                   .fetch();
     }
 
     @Override
-    public OcppTagRecord getRecord(String idTag) {
-        return ctx.selectFrom(OCPP_TAG)
-                  .where(OCPP_TAG.ID_TAG.equal(idTag))
+    public OcppTagActivityRecord getRecord(String idTag) {
+        return ctx.selectFrom(OCPP_TAG_ACTIVITY)
+                  .where(OCPP_TAG_ACTIVITY.ID_TAG.equal(idTag))
                   .fetchOne();
     }
 
     @Override
-    public OcppTagRecord getRecord(int ocppTagPk) {
-        return ctx.selectFrom(OCPP_TAG)
-                  .where(OCPP_TAG.OCPP_TAG_PK.equal(ocppTagPk))
+    public OcppTagActivityRecord getRecord(int ocppTagPk) {
+        return ctx.selectFrom(OCPP_TAG_ACTIVITY)
+                  .where(OCPP_TAG_ACTIVITY.OCPP_TAG_PK.equal(ocppTagPk))
                   .fetchOne();
     }
 
@@ -131,12 +133,12 @@ public class OcppTagRepositoryImpl implements OcppTagRepository {
 
     @Override
     public List<String> getActiveIdTags() {
-        return ctx.select(OCPP_TAG.ID_TAG)
-                  .from(OCPP_TAG)
-                  .where(OCPP_TAG.IN_TRANSACTION.isFalse())
-                    .and(OCPP_TAG.BLOCKED.isFalse())
-                    .and(OCPP_TAG.EXPIRY_DATE.isNull().or(OCPP_TAG.EXPIRY_DATE.greaterThan(DateTime.now())))
-                  .fetch(OCPP_TAG.ID_TAG);
+        return ctx.select(OCPP_TAG_ACTIVITY.ID_TAG)
+                  .from(OCPP_TAG_ACTIVITY)
+                  .where(OCPP_TAG_ACTIVITY.IN_TRANSACTION.isFalse())
+                    .and(OCPP_TAG_ACTIVITY.BLOCKED.isFalse())
+                    .and(OCPP_TAG_ACTIVITY.EXPIRY_DATE.isNull().or(OCPP_TAG_ACTIVITY.EXPIRY_DATE.greaterThan(DateTime.now())))
+                  .fetch(OCPP_TAG_ACTIVITY.ID_TAG);
     }
 
     @Override
@@ -161,8 +163,7 @@ public class OcppTagRepositoryImpl implements OcppTagRepository {
         List<OcppTagRecord> batch = idTagList.stream()
                                              .map(s -> ctx.newRecord(OCPP_TAG)
                                                           .setIdTag(s)
-                                                          .setBlocked(false)
-                                                          .setInTransaction(false))
+                                                          .setBlocked(false))
                                              .collect(Collectors.toList());
 
         ctx.batchInsert(batch).execute();
@@ -177,7 +178,6 @@ public class OcppTagRepositoryImpl implements OcppTagRepository {
                       .set(OCPP_TAG.EXPIRY_DATE, toDateTime(u.getExpiration()))
                       .set(OCPP_TAG.NOTE, u.getNote())
                       .set(OCPP_TAG.BLOCKED, false)
-                      .set(OCPP_TAG.IN_TRANSACTION, false)
                       .returning(OCPP_TAG.OCPP_TAG_PK)
                       .fetchOne()
                       .getOcppTagPk();
@@ -218,7 +218,7 @@ public class OcppTagRepositoryImpl implements OcppTagRepository {
     }
 
     private void processBooleanType(SelectQuery selectQuery,
-                                    TableField<OcppTagRecord, Boolean> field,
+                                    TableField<OcppTagActivityRecord, Boolean> field,
                                     OcppTagQueryForm.BooleanType type) {
         switch (type) {
             case ALL:

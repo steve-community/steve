@@ -29,7 +29,7 @@ https://github.com/RWTH-i5-IDSG/steve/wiki/Charging-Station-Compatibility
 SteVe requires 
 * JDK 11 (both Oracle JDK and OpenJDK are supported)
 * Maven 
-* At least MySQL 5.6.4 (MariaDB 10.0 or later works as well) as database
+* At least MySQL 5.7.7 (MariaDB 10.2.1 or later works as well) as database
 
 to build and run. 
 

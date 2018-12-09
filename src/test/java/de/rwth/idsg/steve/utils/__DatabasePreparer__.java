@@ -131,7 +131,8 @@ public class __DatabasePreparer__ {
         Set<Table<?>> skipList = Sets.newHashSet(
                 SchemaVersion.SCHEMA_VERSION,
                 Settings.SETTINGS,
-                OcppTagActivity.OCPP_TAG_ACTIVITY // only a view
+                OcppTagActivity.OCPP_TAG_ACTIVITY, // only a view
+                TRANSACTION // only a view
         );
 
         ctx.transaction(configuration -> {

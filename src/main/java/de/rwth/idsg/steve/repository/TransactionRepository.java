@@ -15,7 +15,11 @@ public interface TransactionRepository {
     List<Transaction> getTransactions(TransactionQueryForm form);
     void writeTransactionsCSV(TransactionQueryForm form, Writer writer);
     List<Integer> getActiveTransactionIds(String chargeBoxId);
-    TransactionDetails getDetails(int transactionPk);
+    TransactionDetails getDetails(int transactionPk, boolean firstArrivingMeterValueIfMultiple);
+
+    default TransactionDetails getDetails(int transactionPk) {
+        return getDetails(transactionPk, true);
+    }
 
     /**
      * Why plural: A transaction in the db remains 'active' (stop value and stop timestamp are null) until a

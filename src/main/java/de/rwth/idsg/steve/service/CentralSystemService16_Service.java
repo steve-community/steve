@@ -8,6 +8,7 @@ import de.rwth.idsg.steve.repository.dto.InsertConnectorStatusParams;
 import de.rwth.idsg.steve.repository.dto.InsertTransactionParams;
 import de.rwth.idsg.steve.repository.dto.UpdateChargeboxParams;
 import de.rwth.idsg.steve.repository.dto.UpdateTransactionParams;
+import jooq.steve.db.enums.TransactionStopEventActor;
 import lombok.extern.slf4j.Slf4j;
 import ocpp.cs._2015._10.AuthorizeRequest;
 import ocpp.cs._2015._10.AuthorizeResponse;
@@ -146,6 +147,7 @@ public class CentralSystemService16_Service {
                                        .startTimestamp(parameters.getTimestamp())
                                        .startMeterValue(Integer.toString(parameters.getMeterStart()))
                                        .reservationId(parameters.getReservationId())
+                                       .eventTimestamp(DateTime.now())
                                        .build();
 
         Integer transactionId = ocppServerRepository.insertTransaction(params);
@@ -167,6 +169,8 @@ public class CentralSystemService16_Service {
                                        .stopTimestamp(parameters.getTimestamp())
                                        .stopMeterValue(Integer.toString(parameters.getMeterStop()))
                                        .stopReason(stopReason)
+                                       .eventTimestamp(DateTime.now())
+                                       .eventActor(TransactionStopEventActor.station)
                                        .build();
 
         ocppServerRepository.updateTransaction(params);

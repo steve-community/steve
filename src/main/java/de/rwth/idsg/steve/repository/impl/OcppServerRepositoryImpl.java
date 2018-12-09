@@ -31,7 +31,8 @@ import static jooq.steve.db.tables.Connector.CONNECTOR;
 import static jooq.steve.db.tables.ConnectorMeterValue.CONNECTOR_METER_VALUE;
 import static jooq.steve.db.tables.ConnectorStatus.CONNECTOR_STATUS;
 import static jooq.steve.db.tables.OcppTag.OCPP_TAG;
-import static jooq.steve.db.tables.Transaction.TRANSACTION;
+import static jooq.steve.db.tables.TransactionStart.TRANSACTION_START;
+import static jooq.steve.db.tables.TransactionStop.TRANSACTION_STOP;
 
 /**
  * This class has methods for database access that are used by the OCPP service.
@@ -149,9 +150,9 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
             DSLContext ctx = DSL.using(configuration);
 
             // First, get connector primary key from transaction table
-            int connectorPk = ctx.select(TRANSACTION.CONNECTOR_PK)
-                                 .from(TRANSACTION)
-                                 .where(TRANSACTION.TRANSACTION_PK.equal(transactionId))
+            int connectorPk = ctx.select(TRANSACTION_START.CONNECTOR_PK)
+                                 .from(TRANSACTION_START)
+                                 .where(TRANSACTION_START.TRANSACTION_PK.equal(transactionId))
                                  .fetchOne()
                                  .value1();
 
@@ -216,14 +217,16 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
     public void updateTransaction(UpdateTransactionParams p) {
 
         // -------------------------------------------------------------------------
-        // Step 1: Update transaction table
+        // Step 1: insert transaction stop data
         // -------------------------------------------------------------------------
 
-        int transactionUpdateCount = ctx.update(TRANSACTION)
-                                        .set(TRANSACTION.STOP_TIMESTAMP, p.getStopTimestamp())
-                                        .set(TRANSACTION.STOP_VALUE, p.getStopMeterValue())
-                                        .set(TRANSACTION.STOP_REASON, p.getStopReason())
-                                        .where(TRANSACTION.TRANSACTION_PK.equal(p.getTransactionId()))
+        int transactionUpdateCount = ctx.insertInto(TRANSACTION_STOP)
+                                        .set(TRANSACTION_STOP.TRANSACTION_PK, p.getTransactionId())
+                                        .set(TRANSACTION_STOP.EVENT_TIMESTAMP, p.getEventTimestamp())
+                                        .set(TRANSACTION_STOP.EVENT_ACTOR, p.getEventActor())
+                                        .set(TRANSACTION_STOP.STOP_TIMESTAMP, p.getStopTimestamp())
+                                        .set(TRANSACTION_STOP.STOP_VALUE, p.getStopMeterValue())
+                                        .set(TRANSACTION_STOP.STOP_REASON, p.getStopReason())
                                         .execute();
 
         // Actually unnecessary, because JOOQ will throw an exception, if something goes wrong
@@ -237,9 +240,9 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
 
         if (shouldInsertConnectorStatusAfterTransactionMsg(p.getChargeBoxId())) {
             SelectConditionStep<Record1<Integer>> connectorPkQuery =
-                    DSL.select(TRANSACTION.CONNECTOR_PK)
-                       .from(TRANSACTION)
-                       .where(TRANSACTION.TRANSACTION_PK.equal(p.getTransactionId()));
+                    DSL.select(TRANSACTION_START.CONNECTOR_PK)
+                       .from(TRANSACTION_START)
+                       .where(TRANSACTION_START.TRANSACTION_PK.equal(p.getTransactionId()));
 
             insertConnectorStatus(ctx, connectorPkQuery, p.getStopTimestamp(), p.getStatusUpdate());
         }
@@ -265,24 +268,25 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
         Lock l = transactionTableLocks.get(p.getChargeBoxId());
         l.lock();
         try {
-            Record1<Integer> r = ctx.select(TRANSACTION.TRANSACTION_PK)
-                                    .from(TRANSACTION)
-                                    .where(TRANSACTION.CONNECTOR_PK.eq(connectorPkQuery))
-                                    .and(TRANSACTION.ID_TAG.eq(p.getIdTag()))
-                                    .and(TRANSACTION.START_TIMESTAMP.eq(p.getStartTimestamp()))
-                                    .and(TRANSACTION.START_VALUE.eq(p.getStartMeterValue()))
+            Record1<Integer> r = ctx.select(TRANSACTION_START.TRANSACTION_PK)
+                                    .from(TRANSACTION_START)
+                                    .where(TRANSACTION_START.CONNECTOR_PK.eq(connectorPkQuery))
+                                    .and(TRANSACTION_START.ID_TAG.eq(p.getIdTag()))
+                                    .and(TRANSACTION_START.START_TIMESTAMP.eq(p.getStartTimestamp()))
+                                    .and(TRANSACTION_START.START_VALUE.eq(p.getStartMeterValue()))
                                     .fetchOne();
 
             if (r != null) {
                 return new TransactionDataHolder(true, r.value1());
             }
 
-            Integer transactionId = ctx.insertInto(TRANSACTION)
-                                       .set(TRANSACTION.CONNECTOR_PK, connectorPkQuery)
-                                       .set(TRANSACTION.ID_TAG, p.getIdTag())
-                                       .set(TRANSACTION.START_TIMESTAMP, p.getStartTimestamp())
-                                       .set(TRANSACTION.START_VALUE, p.getStartMeterValue())
-                                       .returning(TRANSACTION.TRANSACTION_PK)
+            Integer transactionId = ctx.insertInto(TRANSACTION_START)
+                                       .set(TRANSACTION_START.EVENT_TIMESTAMP, p.getEventTimestamp())
+                                       .set(TRANSACTION_START.CONNECTOR_PK, connectorPkQuery)
+                                       .set(TRANSACTION_START.ID_TAG, p.getIdTag())
+                                       .set(TRANSACTION_START.START_TIMESTAMP, p.getStartTimestamp())
+                                       .set(TRANSACTION_START.START_VALUE, p.getStartMeterValue())
+                                       .returning(TRANSACTION_START.TRANSACTION_PK)
                                        .fetchOne()
                                        .getTransactionPk();
 

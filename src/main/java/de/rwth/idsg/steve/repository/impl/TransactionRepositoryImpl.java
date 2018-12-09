@@ -7,6 +7,7 @@ import de.rwth.idsg.steve.repository.dto.TransactionDetails;
 import de.rwth.idsg.steve.utils.DateTimeUtils;
 import de.rwth.idsg.steve.web.dto.TransactionQueryForm;
 import jooq.steve.db.tables.records.ConnectorMeterValueRecord;
+import jooq.steve.db.tables.records.TransactionRecord;
 import org.joda.time.DateTime;
 import org.jooq.Condition;
 import org.jooq.DSLContext;
@@ -70,7 +71,7 @@ public class TransactionRepositoryImpl implements TransactionRepository {
     }
 
     @Override
-    public TransactionDetails getDetails(int transactionPk) {
+    public TransactionDetails getDetails(int transactionPk, boolean firstArrivingMeterValueIfMultiple) {
 
         // -------------------------------------------------------------------------
         // Step 1: Collect general data about transaction
@@ -99,6 +100,8 @@ public class TransactionRepositoryImpl implements TransactionRepository {
         // -------------------------------------------------------------------------
 
         Condition timestampCondition;
+        TransactionRecord nextTx = null;
+
         if (stopTimestamp == null && stopValue == null) {
 
             // https://github.com/RWTH-i5-IDSG/steve/issues/97
@@ -107,23 +110,22 @@ public class TransactionRepositoryImpl implements TransactionRepository {
             // meter values for all subsequent transactions at this chargebox and connector will be falsely attributed
             // to this zombie transaction.
             //
-            // "what is the start time of the first subsequent transaction at the same chargebox and connector?"
-            DateTime startOfNext = ctx.select(TRANSACTION.START_TIMESTAMP)
-                                      .from(TRANSACTION)
-                                      .join(CONNECTOR)
-                                        .on(TRANSACTION.CONNECTOR_PK.equal(CONNECTOR.CONNECTOR_PK))
-                                      .where(CONNECTOR.CHARGE_BOX_ID.equal(chargeBoxId))
-                                        .and(CONNECTOR.CONNECTOR_ID.equal(connectorId))
-                                        .and(TRANSACTION.START_TIMESTAMP.greaterThan(startTimestamp))
-                                      .orderBy(TRANSACTION.START_TIMESTAMP)
-                                      .limit(1)
-                                      .fetchOne(TRANSACTION.START_TIMESTAMP);
+            // "what is the subsequent transaction at the same chargebox and connector?"
+            nextTx = ctx.selectFrom(TRANSACTION)
+                        .where(TRANSACTION.CONNECTOR_PK.eq(ctx.select(CONNECTOR.CONNECTOR_PK)
+                                                              .from(CONNECTOR)
+                                                              .where(CONNECTOR.CHARGE_BOX_ID.equal(chargeBoxId))
+                                                              .and(CONNECTOR.CONNECTOR_ID.equal(connectorId))))
+                        .and(TRANSACTION.START_TIMESTAMP.greaterThan(startTimestamp))
+                        .orderBy(TRANSACTION.START_TIMESTAMP)
+                        .limit(1)
+                        .fetchOne();
 
-            if (startOfNext == null) {
+            if (nextTx == null) {
                 // the last active transaction
                 timestampCondition = CONNECTOR_METER_VALUE.VALUE_TIMESTAMP.greaterOrEqual(startTimestamp);
             } else {
-                timestampCondition = CONNECTOR_METER_VALUE.VALUE_TIMESTAMP.between(startTimestamp, startOfNext);
+                timestampCondition = CONNECTOR_METER_VALUE.VALUE_TIMESTAMP.between(startTimestamp, nextTx.getStartTimestamp());
             }
         } else {
             // finished transaction
@@ -161,10 +163,15 @@ public class TransactionRepositoryImpl implements TransactionRepository {
         // every 15 min) regardless of the fact that connector's meter value did not
         // change (e.g. vehicle is fully charged, but cable is still connected). This
         // yields multiple entries in db with the same value but different timestamp.
-        // We are only interested in the first arriving entry.
+        // We are only interested in the first (or last) arriving entry.
         // -------------------------------------------------------------------------
 
-        Field<DateTime> dateTimeField = DSL.min(t1.field(2, DateTime.class)).as("min");
+        Field<DateTime> dateTimeField;
+        if (firstArrivingMeterValueIfMultiple) {
+            dateTimeField = DSL.min(t1.field(2, DateTime.class)).as("min");
+        } else {
+            dateTimeField = DSL.max(t1.field(2, DateTime.class)).as("max");
+        }
 
         List<TransactionDetails.MeterValues> values =
                 ctx.select(
@@ -198,7 +205,7 @@ public class TransactionRepositoryImpl implements TransactionRepository {
                                                            .phase(r.value8())
                                                            .build());
 
-        return new TransactionDetails(new TransactionMapper().map(transaction), values);
+        return new TransactionDetails(new TransactionMapper().map(transaction), values, nextTx);
     }
 
     /**

@@ -1,8 +1,10 @@
 package de.rwth.idsg.steve.repository.dto;
 
+import jooq.steve.db.tables.records.TransactionRecord;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import org.jetbrains.annotations.Nullable;
 import org.joda.time.DateTime;
 
 import java.util.List;
@@ -16,6 +18,13 @@ import java.util.List;
 public class TransactionDetails {
     private final Transaction transaction;
     private final List<MeterValues> values;
+
+    /**
+     * Subsequent transaction (to the transaction that we give details about),
+     * that is at the same chargebox and connector
+     */
+    @Nullable
+    private final TransactionRecord nextTransactionRecord;
 
     @Getter
     @Builder

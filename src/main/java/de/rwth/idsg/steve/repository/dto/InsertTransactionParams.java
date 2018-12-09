@@ -22,6 +22,9 @@ public class InsertTransactionParams {
     // Only in OCPP1.5
     private final Integer reservationId;
 
+    // this came after splitting transaction table into two tables (start and stop)
+    private final DateTime eventTimestamp;
+
     public boolean isSetReservationId() {
         return reservationId != null;
     }

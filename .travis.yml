@@ -1,7 +1,7 @@
 sudo: false
 language: java
 jdk: openjdk11
-services: mysql
+# services: mysql
 
 # install dependencies
 install: mvn dependency:go-offline -B -V

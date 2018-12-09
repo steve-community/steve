@@ -1,7 +1,9 @@
 package de.rwth.idsg.steve.repository.dto;
 
+import jooq.steve.db.enums.TransactionStopEventActor;
 import lombok.Builder;
 import lombok.Getter;
+import org.jetbrains.annotations.Nullable;
 import org.joda.time.DateTime;
 
 /**
@@ -13,10 +15,12 @@ import org.joda.time.DateTime;
 @Builder
 public final class Transaction {
     private final int id, connectorId, chargeBoxPk, ocppTagPk;
-    private final String chargeBoxId, ocppIdTag, startTimestamp, startValue, stopTimestamp, stopValue;
+    private final String chargeBoxId, ocppIdTag, startTimestamp, startValue;
     private final DateTime startTimestampDT;
-    private final DateTime stopTimestampDT;
 
-    // new in OCPP 1.6
-    private final String stopReason;
+    @Nullable private final String stopTimestamp;
+    @Nullable private final String stopValue;
+    @Nullable private final String stopReason; // new in OCPP 1.6
+    @Nullable private final DateTime stopTimestampDT;
+    @Nullable private final TransactionStopEventActor stopEventActor;
 }

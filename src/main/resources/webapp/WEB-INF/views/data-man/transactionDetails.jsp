@@ -17,6 +17,7 @@
             <tr><td>Stop Date/Time</td><td>${details.transaction.stopTimestamp}</td></tr>
             <tr><td>Stop Value</td><td>${details.transaction.stopValue}</td></tr>
             <tr><td>Stop Reason</td><td>${details.transaction.stopReason}</td></tr>
+            <tr><td>Stop Event Actor</td><td>${details.transaction.stopEventActor}</td></tr>
         </table>
     </center>
     <br>

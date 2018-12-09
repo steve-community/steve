@@ -6,13 +6,14 @@ import de.rwth.idsg.steve.repository.dto.Transaction;
 import de.rwth.idsg.steve.repository.dto.TransactionDetails;
 import de.rwth.idsg.steve.utils.DateTimeUtils;
 import de.rwth.idsg.steve.web.dto.TransactionQueryForm;
+import jooq.steve.db.enums.TransactionStopEventActor;
 import jooq.steve.db.tables.records.ConnectorMeterValueRecord;
 import jooq.steve.db.tables.records.TransactionStartRecord;
 import org.joda.time.DateTime;
 import org.jooq.Condition;
 import org.jooq.DSLContext;
 import org.jooq.Field;
-import org.jooq.Record11;
+import org.jooq.Record12;
 import org.jooq.Record9;
 import org.jooq.RecordMapper;
 import org.jooq.SelectQuery;
@@ -83,7 +84,7 @@ public class TransactionRepositoryImpl implements TransactionRepository {
         form.setType(TransactionQueryForm.QueryType.ALL);
         form.setPeriodType(TransactionQueryForm.QueryPeriodType.ALL);
 
-        Record11<Integer, String, Integer, String, DateTime, String, DateTime, String, String, Integer, Integer>
+        Record12<Integer, String, Integer, String, DateTime, String, DateTime, String, String, Integer, Integer, TransactionStopEventActor>
                 transaction = getInternal(form).fetchOne();
 
         if (transaction == null) {
@@ -257,7 +258,7 @@ public class TransactionRepositoryImpl implements TransactionRepository {
      */
     @SuppressWarnings("unchecked")
     private
-    SelectQuery<Record11<Integer, String, Integer, String, DateTime, String, DateTime, String, String, Integer, Integer>>
+    SelectQuery<Record12<Integer, String, Integer, String, DateTime, String, DateTime, String, String, Integer, Integer, TransactionStopEventActor>>
     getInternal(TransactionQueryForm form) {
 
         SelectQuery selectQuery = ctx.selectQuery();
@@ -276,7 +277,8 @@ public class TransactionRepositoryImpl implements TransactionRepository {
                 TRANSACTION.STOP_VALUE,
                 TRANSACTION.STOP_REASON,
                 CHARGE_BOX.CHARGE_BOX_PK,
-                OCPP_TAG.OCPP_TAG_PK
+                OCPP_TAG.OCPP_TAG_PK,
+                TRANSACTION.STOP_EVENT_ACTOR
         );
 
         return addConditions(selectQuery, form);
@@ -342,12 +344,9 @@ public class TransactionRepositoryImpl implements TransactionRepository {
         }
     }
 
-    private static class TransactionMapper
-            implements RecordMapper<Record11<Integer, String, Integer, String, DateTime, String, DateTime,
-                                             String, String, Integer, Integer>, Transaction> {
+    private static class TransactionMapper implements RecordMapper<Record12<Integer, String, Integer, String, DateTime, String, DateTime, String, String, Integer, Integer, TransactionStopEventActor>, Transaction> {
         @Override
-        public Transaction map(Record11<Integer, String, Integer, String, DateTime, String, DateTime,
-                                        String, String, Integer, Integer> r) {
+        public Transaction map(Record12<Integer, String, Integer, String, DateTime, String, DateTime, String, String, Integer, Integer, TransactionStopEventActor> r) {
             return Transaction.builder()
                               .id(r.value1())
                               .chargeBoxId(r.value2())
@@ -362,6 +361,7 @@ public class TransactionRepositoryImpl implements TransactionRepository {
                               .stopReason(r.value9())
                               .chargeBoxPk(r.value10())
                               .ocppTagPk(r.value11())
+                              .stopEventActor(r.value12())
                               .build();
         }
     }

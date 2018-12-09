@@ -7,7 +7,7 @@ import de.rwth.idsg.steve.repository.dto.TransactionDetails;
 import de.rwth.idsg.steve.utils.DateTimeUtils;
 import de.rwth.idsg.steve.web.dto.TransactionQueryForm;
 import jooq.steve.db.tables.records.ConnectorMeterValueRecord;
-import jooq.steve.db.tables.records.TransactionRecord;
+import jooq.steve.db.tables.records.TransactionStartRecord;
 import org.joda.time.DateTime;
 import org.jooq.Condition;
 import org.jooq.DSLContext;
@@ -30,6 +30,7 @@ import static jooq.steve.db.tables.Connector.CONNECTOR;
 import static jooq.steve.db.tables.ConnectorMeterValue.CONNECTOR_METER_VALUE;
 import static jooq.steve.db.tables.OcppTag.OCPP_TAG;
 import static jooq.steve.db.tables.Transaction.TRANSACTION;
+import static jooq.steve.db.tables.TransactionStart.TRANSACTION_START;
 
 /**
  * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
@@ -100,7 +101,7 @@ public class TransactionRepositoryImpl implements TransactionRepository {
         // -------------------------------------------------------------------------
 
         Condition timestampCondition;
-        TransactionRecord nextTx = null;
+        TransactionStartRecord nextTx = null;
 
         if (stopTimestamp == null && stopValue == null) {
 
@@ -111,13 +112,13 @@ public class TransactionRepositoryImpl implements TransactionRepository {
             // to this zombie transaction.
             //
             // "what is the subsequent transaction at the same chargebox and connector?"
-            nextTx = ctx.selectFrom(TRANSACTION)
-                        .where(TRANSACTION.CONNECTOR_PK.eq(ctx.select(CONNECTOR.CONNECTOR_PK)
-                                                              .from(CONNECTOR)
-                                                              .where(CONNECTOR.CHARGE_BOX_ID.equal(chargeBoxId))
-                                                              .and(CONNECTOR.CONNECTOR_ID.equal(connectorId))))
-                        .and(TRANSACTION.START_TIMESTAMP.greaterThan(startTimestamp))
-                        .orderBy(TRANSACTION.START_TIMESTAMP)
+            nextTx = ctx.selectFrom(TRANSACTION_START)
+                        .where(TRANSACTION_START.CONNECTOR_PK.eq(ctx.select(CONNECTOR.CONNECTOR_PK)
+                                                                    .from(CONNECTOR)
+                                                                    .where(CONNECTOR.CHARGE_BOX_ID.equal(chargeBoxId))
+                                                                    .and(CONNECTOR.CONNECTOR_ID.equal(connectorId))))
+                        .and(TRANSACTION_START.START_TIMESTAMP.greaterThan(startTimestamp))
+                        .orderBy(TRANSACTION_START.START_TIMESTAMP)
                         .limit(1)
                         .fetchOne();
 

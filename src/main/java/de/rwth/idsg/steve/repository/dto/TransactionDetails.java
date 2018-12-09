@@ -1,6 +1,6 @@
 package de.rwth.idsg.steve.repository.dto;
 
-import jooq.steve.db.tables.records.TransactionRecord;
+import jooq.steve.db.tables.records.TransactionStartRecord;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -20,11 +20,11 @@ public class TransactionDetails {
     private final List<MeterValues> values;
 
     /**
-     * Subsequent transaction (to the transaction that we give details about),
+     * Subsequent transaction's start event (to the transaction that we give details about),
      * that is at the same chargebox and connector
      */
     @Nullable
-    private final TransactionRecord nextTransactionRecord;
+    private final TransactionStartRecord nextTransactionStart;
 
     @Getter
     @Builder

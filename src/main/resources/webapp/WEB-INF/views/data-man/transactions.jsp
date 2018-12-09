@@ -73,7 +73,7 @@ Transactions
     </form:form>
     <br>
 
-    <table class="res">
+    <table class="res action">
         <thead>
             <tr>
                 <th data-sort="int">Transaction ID</th>
@@ -85,6 +85,7 @@ Transactions
                 <th data-sort="date">Stop Date/Time</th>
                 <th data-sort="int">Stop Value</th>
                 <th data-sort="string">Stop Reason</th>
+                <th></th>
             </tr>
         </thead>
         <tbody>
@@ -99,6 +100,13 @@ Transactions
                 <td data-sort-value="${ta.stopTimestampDT.millis}">${ta.stopTimestamp}</td>
                 <td>${ta.stopValue}</td>
                 <td>${ta.stopReason}</td>
+                <td>
+                    <c:if test="${empty ta.stopValue}">
+                        <form:form action="${ctxPath}/manager/transactions/terminate/${ta.id}">
+                            <input type="submit" class="redSubmit smallSubmit" title="Terminate this active transaction" value="X">
+                        </form:form>
+                    </c:if>
+                </td>
             </tr>
         </c:forEach>
         </tbody>

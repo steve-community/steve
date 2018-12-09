@@ -170,6 +170,9 @@ input[type="submit"].redSubmit {
 input[type="submit"].redSubmit:hover {
 	background:#af3232;
 }
+input[type="submit"].smallSubmit {
+	min-width:30px;
+}
 textarea {
 	margin: 1px 3px 1px 0;
 	padding: 3px;

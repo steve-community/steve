@@ -16,9 +16,10 @@ import de.rwth.idsg.steve.repository.impl.TransactionRepositoryImpl;
 import de.rwth.idsg.steve.web.dto.ReservationQueryForm;
 import de.rwth.idsg.steve.web.dto.TransactionQueryForm;
 import jooq.steve.db.DefaultCatalog;
+import jooq.steve.db.tables.OcppTagActivity;
 import jooq.steve.db.tables.SchemaVersion;
 import jooq.steve.db.tables.Settings;
-import jooq.steve.db.tables.records.OcppTagRecord;
+import jooq.steve.db.tables.records.OcppTagActivityRecord;
 import jooq.steve.db.tables.records.TransactionRecord;
 import org.joda.time.DateTime;
 import org.jooq.DSLContext;
@@ -110,7 +111,7 @@ public class __DatabasePreparer__ {
         return impl.getDetails(transactionPk);
     }
 
-    public static OcppTagRecord getOcppTagRecord(String idTag) {
+    public static OcppTagActivityRecord getOcppTagRecord(String idTag) {
         OcppTagRepositoryImpl impl = new OcppTagRepositoryImpl(dslContext);
         return impl.getRecord(idTag);
     }
@@ -127,7 +128,12 @@ public class __DatabasePreparer__ {
     }
 
     private static void truncateTables(DSLContext ctx) {
-        Set<Table<?>> skipList = Sets.newHashSet(SchemaVersion.SCHEMA_VERSION, Settings.SETTINGS);
+        Set<Table<?>> skipList = Sets.newHashSet(
+                SchemaVersion.SCHEMA_VERSION,
+                Settings.SETTINGS,
+                OcppTagActivity.OCPP_TAG_ACTIVITY // only a view
+        );
+
         ctx.transaction(configuration -> {
             Schema schema = DefaultCatalog.DEFAULT_CATALOG.getSchemas()
                                                           .stream()
@@ -161,7 +167,6 @@ public class __DatabasePreparer__ {
         ctx.insertInto(OCPP_TAG)
            .set(OCPP_TAG.ID_TAG, getRegisteredOcppTag())
            .set(OCPP_TAG.BLOCKED, false)
-           .set(OCPP_TAG.IN_TRANSACTION, false)
            .execute();
     }
 }

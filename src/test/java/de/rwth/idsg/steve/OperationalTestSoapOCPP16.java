@@ -42,7 +42,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import javax.xml.ws.soap.SOAPFaultException;
+import javax.xml.ws.WebServiceException;
 import java.util.Arrays;
 import java.util.List;
 
@@ -113,7 +113,7 @@ public class OperationalTestSoapOCPP16 {
      *
      * WS/JSON stations cannot connect at all if they are not registered, as ensured by {@link OcppWebSocketUpgrader}.
      */
-    @Test(expected = SOAPFaultException.class)
+    @Test(expected = WebServiceException.class)
     public void testUnregisteredCPWithInterceptor() {
         Assert.assertFalse(SteveConfiguration.CONFIG.getOcpp().isAutoRegisterUnknownStations());
 

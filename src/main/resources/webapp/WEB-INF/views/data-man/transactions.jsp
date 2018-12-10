@@ -102,8 +102,8 @@ Transactions
                 <td>${ta.stopReason}</td>
                 <td>
                     <c:if test="${empty ta.stopValue}">
-                        <form:form action="${ctxPath}/manager/transactions/terminate/${ta.id}">
-                            <input type="submit" class="redSubmit smallSubmit" title="Terminate this active transaction" value="X">
+                        <form:form action="${ctxPath}/manager/transactions/stop/${ta.id}">
+                            <input type="submit" class="redSubmit" title="Manually stop this active transaction" value="Stop">
                         </form:form>
                     </c:if>
                 </td>

@@ -22,18 +22,18 @@ import java.util.List;
  * @since 09.12.2018
  */
 @Service
-public class TransactionTerminationService {
+public class TransactionStopService {
 
     @Autowired private TransactionRepository transactionRepository;
     @Autowired private OcppServerRepository ocppServerRepository;
 
-    public void terminate(List<Integer> transactionPkList) {
+    public void stop(List<Integer> transactionPkList) {
         transactionPkList.stream()
                          .sorted(Ordering.natural())
-                         .forEach(this::terminate);
+                         .forEach(this::stop);
     }
 
-    public void terminate(Integer transactionPk) {
+    public void stop(Integer transactionPk) {
         TransactionDetails thisTxDetails = transactionRepository.getDetails(transactionPk, false);
         Transaction thisTx = thisTxDetails.getTransaction();
 
@@ -111,7 +111,7 @@ public class TransactionTerminationService {
 
         TransactionDetails.MeterValues v =
                 values.stream()
-                      .filter(TransactionTerminationService::isEnergyUnit)
+                      .filter(TransactionStopService::isEnergyUnit)
                       .findFirst()
                       // the station has not the habit of setting additional info like energy units. just return the
                       // first meter value, which theoretically can be any measurement of any component and of any unit

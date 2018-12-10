@@ -14,7 +14,7 @@ CREATE TABLE transaction_stop (
   transaction_pk INT(10) UNSIGNED NOT NULL,
   event_timestamp TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
   event_actor ENUM('station', 'manual'),
-  stop_timestamp TIMESTAMP(6) NOT NULL,
+  stop_timestamp TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
   stop_value VARCHAR(255) NOT NULL,
   stop_reason VARCHAR(255),
   PRIMARY KEY(transaction_pk, event_timestamp)
@@ -51,7 +51,7 @@ CREATE OR REPLACE VIEW `transaction` AS
     SELECT s1.*
     FROM transaction_stop s1
     WHERE s1.event_timestamp = (SELECT MAX(event_timestamp) FROM transaction_stop s2 WHERE s1.transaction_pk = s2.transaction_pk)
-    GROUP BY s1.transaction_pk) tx2
+    GROUP BY s1.transaction_pk, s1.event_timestamp) tx2
   ON tx1.transaction_pk = tx2.transaction_pk;
 
 COMMIT;

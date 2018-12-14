@@ -162,8 +162,7 @@ public class OcppTagRepositoryImpl implements OcppTagRepository {
     public void addOcppTagList(List<String> idTagList) {
         List<OcppTagRecord> batch = idTagList.stream()
                                              .map(s -> ctx.newRecord(OCPP_TAG)
-                                                          .setIdTag(s)
-                                                          .setBlocked(false))
+                                                          .setIdTag(s))
                                              .collect(Collectors.toList());
 
         ctx.batchInsert(batch).execute();
@@ -176,8 +175,8 @@ public class OcppTagRepositoryImpl implements OcppTagRepository {
                       .set(OCPP_TAG.ID_TAG, u.getIdTag())
                       .set(OCPP_TAG.PARENT_ID_TAG, u.getParentIdTag())
                       .set(OCPP_TAG.EXPIRY_DATE, toDateTime(u.getExpiration()))
+                      .set(OCPP_TAG.MAX_ACTIVE_TRANSACTION_COUNT, u.getMaxActiveTransactionCount())
                       .set(OCPP_TAG.NOTE, u.getNote())
-                      .set(OCPP_TAG.BLOCKED, false)
                       .returning(OCPP_TAG.OCPP_TAG_PK)
                       .fetchOne()
                       .getOcppTagPk();
@@ -197,8 +196,8 @@ public class OcppTagRepositoryImpl implements OcppTagRepository {
             ctx.update(OCPP_TAG)
                .set(OCPP_TAG.PARENT_ID_TAG, u.getParentIdTag())
                .set(OCPP_TAG.EXPIRY_DATE, toDateTime(u.getExpiration()))
+               .set(OCPP_TAG.MAX_ACTIVE_TRANSACTION_COUNT, u.getMaxActiveTransactionCount())
                .set(OCPP_TAG.NOTE, u.getNote())
-               .set(OCPP_TAG.BLOCKED, u.getBlocked())
                .where(OCPP_TAG.OCPP_TAG_PK.equal(u.getOcppTagPk()))
                .execute();
         } catch (DataAccessException e) {

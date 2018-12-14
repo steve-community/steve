@@ -7,7 +7,6 @@ import org.joda.time.LocalDateTime;
 
 import javax.validation.constraints.Future;
 import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
 
 /**
  * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
@@ -30,8 +29,18 @@ public class OcppTagForm {
     @Future(message = "Expiry Date/Time must be in future")
     private LocalDateTime expiration;
 
-    @NotNull(message = "Should this ID Tag be blocked or not?")
-    private Boolean blocked = false;
+    private Integer maxActiveTransactionCount;
 
     private String note;
+
+    /**
+     * As specified in V0_9_9__update.sql default value is 1.
+     */
+    public Integer getMaxActiveTransactionCount() {
+        if (maxActiveTransactionCount == null) {
+            return 1;
+        } else {
+            return maxActiveTransactionCount;
+        }
+    }
 }

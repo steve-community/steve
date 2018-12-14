@@ -80,7 +80,7 @@ public class OcppTagsController {
             form.setExpiration(expiryDate.toLocalDateTime());
         }
 
-        form.setBlocked(record.getBlocked());
+        form.setMaxActiveTransactionCount(record.getMaxActiveTransactionCount());
         form.setNote(record.getNote());
 
         String parentIdTag = record.getParentIdTag();
@@ -89,7 +89,7 @@ public class OcppTagsController {
         }
         form.setParentIdTag(parentIdTag);
 
-        model.addAttribute("inTransaction", record.getInTransaction());
+        model.addAttribute("activeTransactionCount", record.getActiveTransactionCount());
         model.addAttribute("ocppTagForm", form);
         setTags(model);
         return "data-man/ocppTagDetails";

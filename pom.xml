@@ -358,7 +358,7 @@
                                 </forcedType>
                                 <forcedType>
                                     <name>BOOLEAN</name>
-                                    <expression>.*\.IN_TRANSACTION</expression>
+                                    <expression>(IN_TRANSACTION|BLOCKED)</expression>
                                 </forcedType>
                                 <forcedType>
                                     <userType>org.joda.time.DateTime</userType>

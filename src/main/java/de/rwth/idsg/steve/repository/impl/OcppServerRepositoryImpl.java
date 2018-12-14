@@ -349,7 +349,7 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
         int count = ctx.insertInto(OCPP_TAG)
                        .set(OCPP_TAG.ID_TAG, p.getIdTag())
                        .set(OCPP_TAG.NOTE, note)
-                       .set(OCPP_TAG.BLOCKED, true)
+                       .set(OCPP_TAG.MAX_ACTIVE_TRANSACTION_COUNT, 0)
                        .onDuplicateKeyIgnore() // Important detail
                        .execute();
 

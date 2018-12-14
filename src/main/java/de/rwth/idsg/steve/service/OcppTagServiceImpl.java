@@ -112,21 +112,21 @@ public class OcppTagServiceImpl implements OcppTagService {
             return AuthorizationStatus.INVALID;
         }
 
-        if (record.getBlocked()) {
+        if (isBlocked(record)) {
             log.error("The user with idTag '{}' is BLOCKED.", idTag);
             return AuthorizationStatus.BLOCKED;
         }
 
-        if (isExpired(record)) {
+        if (isExpired(record, DateTime.now())) {
             log.error("The user with idTag '{}' is EXPIRED.", idTag);
             return AuthorizationStatus.EXPIRED;
         }
 
         // https://github.com/RWTH-i5-IDSG/steve/issues/73
-        if (record.getInTransaction()) {
+        if (reachedLimitOfActiveTransactions(record)) {
             List<String> txChargeBoxIds = transactionRepository.getChargeBoxIdsOfActiveTransactions(idTag);
             if (!txChargeBoxIds.contains(askingChargeBoxId)) {
-                log.warn("The user with idTag '{}' is ALREADY in another transaction.", idTag);
+                log.warn("The user with idTag '{}' is ALREADY in another transaction(s).", idTag);
                 return AuthorizationStatus.CONCURRENT_TX;
             }
         }
@@ -136,24 +136,40 @@ public class OcppTagServiceImpl implements OcppTagService {
     }
 
     private static ocpp.cp._2015._10.AuthorizationStatus decideStatus(OcppTagActivityRecord record, DateTime now) {
-        if (record.getBlocked()) {
+        if (isBlocked(record)) {
             return ocpp.cp._2015._10.AuthorizationStatus.BLOCKED;
         } else if (isExpired(record, now)) {
             return ocpp.cp._2015._10.AuthorizationStatus.EXPIRED;
-        } else if (record.getInTransaction()) {
+        } else if (reachedLimitOfActiveTransactions(record)) {
             return ocpp.cp._2015._10.AuthorizationStatus.CONCURRENT_TX;
         } else {
             return ocpp.cp._2015._10.AuthorizationStatus.ACCEPTED;
         }
     }
 
-    private static boolean isExpired(OcppTagActivityRecord record) {
-        return isExpired(record, DateTime.now());
-    }
-
     private static boolean isExpired(OcppTagActivityRecord record, DateTime now) {
         DateTime expiry = record.getExpiryDate();
         return expiry != null && now.isAfter(expiry);
+    }
+
+    private static boolean isBlocked(OcppTagActivityRecord record) {
+        return getToggle(record) == ConcurrencyToggle.Blocked;
+    }
+
+    private static boolean reachedLimitOfActiveTransactions(OcppTagActivityRecord record) {
+        ConcurrencyToggle toggle = getToggle(record);
+        switch (toggle) {
+            case Blocked:
+                return true; // for completeness
+            case AllowAll:
+                return false;
+            case AllowAsSpecified:
+                int max = record.getMaxActiveTransactionCount();
+                long active = record.getActiveTransactionCount();
+                return active >= max;
+            default:
+                throw new RuntimeException("Unexpected ConcurrencyToggle");
+        }
     }
 
     @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
@@ -170,6 +186,21 @@ public class OcppTagServiceImpl implements OcppTagService {
                                                           .withParentIdTag(record.getParentIdTag())
                                                           .withExpiryDate(record.getExpiryDate())
                                           );
+        }
+    }
+
+    private enum ConcurrencyToggle {
+        Blocked, AllowAll, AllowAsSpecified
+    }
+
+    private static ConcurrencyToggle getToggle(OcppTagActivityRecord r) {
+        int max = r.getMaxActiveTransactionCount();
+        if (max == 0) {
+            return ConcurrencyToggle.Blocked;
+        } else if (max < 0) {
+            return ConcurrencyToggle.AllowAll;
+        } else {
+            return ConcurrencyToggle.AllowAsSpecified;
         }
     }
 }

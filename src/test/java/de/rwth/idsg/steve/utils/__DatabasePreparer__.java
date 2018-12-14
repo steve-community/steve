@@ -167,7 +167,6 @@ public class __DatabasePreparer__ {
     private static void insertOcppIdTag(DSLContext ctx) {
         ctx.insertInto(OCPP_TAG)
            .set(OCPP_TAG.ID_TAG, getRegisteredOcppTag())
-           .set(OCPP_TAG.BLOCKED, false)
            .execute();
     }
 }

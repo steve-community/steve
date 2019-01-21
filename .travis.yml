@@ -24,22 +24,8 @@ script:
         - killall java
 
 
-# coverity_scan settings
-#
-env:
-        global:
-        - secure: "e2ou0BHMu9fd2daC9pXhjvkZ3CP3XTaYWSIehM4JDWxnVAn1jJayiQOpWoNKeD+RJV24ND1I2WvjQGqu6HVV+CkVZ8kHVCvb7fQHbM4P8UKaMFts8KR1gIiAYc7ja+C/jLnXVTofrhUTinOdhFs1lTONhGa4g/+nWq/6KXXP52/WKsKPgNKOvOzhlJf2QTprOkQVr4tIhUd3K9lf6qORkOIwpcfmQpFfccbHPzoIxGpke+a0Q5+H5/o3gNhOe7w31wBaX90OzfYRA5WyjfbDmI2tjkELQuvitR/DePRK0sLfRKfdfBRD/20pEbG2NzjHCBWQx8CYhDClAuH/sJc3M95qLMCiuNEAcpWzccAMB+At9uMiQfzqNdqTUYPZYQwBQgsPqffG2DyWg6u7eNZu3z0QjLHDxqqOWJa6Hggx9V5nqNNBl0wbrkMjwbWirbtg3yS0i9OLTd8oK64+sYtXPJlBw4Qr+gZplSj/hv6NbcpMKrvOK/BAP+G087m2cVvMpDE9IP7Lo6YXIo5ilSbr4KKs01omvGr1k4eJR2/+esyqanPFuFzhHMRcG0qc0zM+gWlkm/9ID16gMnRQOZTA7UGEeiRpGhVyz87/khg6ajiE2NTxKc1EuHrk18qNulRBc+LjeLLMcS11zTiV6PJ6QkZGheS3+xVp/Nn8DrCC3lE="
-
 addons:
         mariadb: "10.2"
-        coverity_scan:
-                project:
-                        name: "RWTH-i5-IDSG/steve"
-                        description: "SteVe - Steckdosenverwaltung"
-                notification_email: goekay@dbis.rwth-aachen.de
-                build_command_prepend:
-                build_command:  "mvn package"
-                branch_pattern: master
         apt:
                 packages:
                         - elinks

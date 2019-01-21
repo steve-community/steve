@@ -1,7 +1,6 @@
 ![SteVe](src/main/resources/webapp/static/images/logo.png) 
 
 [![Build Status](https://travis-ci.org/RWTH-i5-IDSG/steve.svg)](https://travis-ci.org/RWTH-i5-IDSG/steve)
-[![Coverity Status](https://scan.coverity.com/projects/6601/badge.svg)](https://scan.coverity.com/projects/rwth-i5-idsg-steve)
 
 
 # Introduction

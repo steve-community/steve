@@ -5,6 +5,8 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
+import javax.validation.constraints.AssertTrue;
+
 /**
  * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
  * @since 31.08.2015
@@ -26,6 +28,11 @@ public class ReservationQueryForm extends QueryForm {
 
     public boolean isStatusSet() {
         return status != null;
+    }
+
+    @AssertTrue(message = "The values 'From' and 'To' must be both set")
+    public boolean isPeriodFromToCorrect() {
+        return periodType != QueryPeriodType.FROM_TO || isFromToSet();
     }
 
     // -------------------------------------------------------------------------

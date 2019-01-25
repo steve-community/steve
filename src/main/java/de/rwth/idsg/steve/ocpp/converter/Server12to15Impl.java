@@ -63,12 +63,10 @@ public enum Server12to15Impl implements Server12to15 {
 
     @Override
     public StatusNotificationRequest convertRequest(ocpp.cs._2010._08.StatusNotificationRequest request) {
-        ChargePointStatus status = ChargePointStatus.fromValue(request.getStatus().value());
-        ChargePointErrorCode errorCode = ChargePointErrorCode.fromValue(request.getErrorCode().value());
         return new StatusNotificationRequest()
                 .withConnectorId(request.getConnectorId())
-                .withStatus(status)
-                .withErrorCode(errorCode);
+                .withStatus(ChargePointStatus.fromValue(request.getStatus().value()))
+                .withErrorCode(ChargePointErrorCode.fromValue(request.getErrorCode().value()));
     }
 
     @Override
@@ -87,9 +85,8 @@ public enum Server12to15Impl implements Server12to15 {
 
     @Override
     public DiagnosticsStatusNotificationRequest convertRequest(ocpp.cs._2010._08.DiagnosticsStatusNotificationRequest request) {
-        DiagnosticsStatus status = DiagnosticsStatus.fromValue(request.getStatus().value());
         return new DiagnosticsStatusNotificationRequest()
-                .withStatus(status);
+                .withStatus(DiagnosticsStatus.fromValue(request.getStatus().value()));
     }
 
     @Override

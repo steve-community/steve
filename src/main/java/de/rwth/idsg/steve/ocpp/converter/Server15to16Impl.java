@@ -78,13 +78,10 @@ public enum Server15to16Impl implements Server15to16 {
      */
     @Override
     public StatusNotificationRequest convertRequest(ocpp.cs._2012._06.StatusNotificationRequest request) {
-        ChargePointStatus status = customMapStatus(request.getStatus());
-        ChargePointErrorCode errorCode = customMapErrorCode(request.getErrorCode());
-
         return new StatusNotificationRequest()
                 .withConnectorId(request.getConnectorId())
-                .withStatus(status)
-                .withErrorCode(errorCode)
+                .withStatus(customMapStatus(request.getStatus()))
+                .withErrorCode(customMapErrorCode(request.getErrorCode()))
                 .withInfo(request.getInfo())
                 .withTimestamp(request.getTimestamp())
                 .withVendorErrorCode(request.getVendorErrorCode())
@@ -107,9 +104,8 @@ public enum Server15to16Impl implements Server15to16 {
     @Override
     public DiagnosticsStatusNotificationRequest convertRequest(
             ocpp.cs._2012._06.DiagnosticsStatusNotificationRequest request) {
-        DiagnosticsStatus status = DiagnosticsStatus.fromValue(request.getStatus().value());
         return new DiagnosticsStatusNotificationRequest()
-                .withStatus(status);
+                .withStatus(DiagnosticsStatus.fromValue(request.getStatus().value()));
     }
 
     @Override

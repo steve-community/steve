@@ -4,6 +4,7 @@ import com.google.common.base.Joiner;
 import de.rwth.idsg.steve.ocpp.Ocpp15AndAboveTask;
 import de.rwth.idsg.steve.ocpp.OcppCallback;
 import de.rwth.idsg.steve.ocpp.OcppVersion;
+import de.rwth.idsg.steve.ocpp.RequestResult;
 import de.rwth.idsg.steve.web.dto.ocpp.GetConfigurationParams;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -20,16 +21,7 @@ import java.util.stream.Collectors;
  */
 public class GetConfigurationTask extends Ocpp15AndAboveTask<GetConfigurationParams, GetConfigurationTask.ResponseWrapper> {
 
-    private static final String FORMAT =
-            "<b>Known keys:</b>"
-                    + "<br>"
-                    + "%s"
-                    + "<br>"
-                    + "<b>Unknown keys:</b>"
-                    + "<br>"
-                    + "%s";
-
-    private static final Joiner JOINER = Joiner.on(",");
+    private static final Joiner JOINER = Joiner.on(", ");
 
     public GetConfigurationTask(OcppVersion ocppVersion, GetConfigurationParams params) {
         super(ocppVersion, params);
@@ -40,13 +32,10 @@ public class GetConfigurationTask extends Ocpp15AndAboveTask<GetConfigurationPar
         return new DefaultOcppCallback<ResponseWrapper>() {
             @Override
             public void success(String chargeBoxId, ResponseWrapper response) {
-                String str = String.format(
-                        FORMAT,
-                        toStringConfList(response.getConfigurationKey()),
-                        toStringUnknownList(response.getUnknownKey())
-                );
+                addNewResponse(chargeBoxId, "OK");
 
-                addNewResponse(chargeBoxId, str);
+                RequestResult result = getResultMap().get(chargeBoxId);
+                result.setDetails(response);
             }
         };
     }
@@ -104,33 +93,15 @@ public class GetConfigurationTask extends Ocpp15AndAboveTask<GetConfigurationPar
         };
     }
 
-    private static String toStringConfList(List<KeyValue> confList) {
-        StringBuilder sb = new StringBuilder();
-
-        for (KeyValue keyValue : confList) {
-            sb.append(keyValue.getKey())
-              .append(": ")
-              .append(keyValue.getValue());
-
-            if (keyValue.isReadonly()) {
-                sb.append(" (read-only)");
-            }
-
-            sb.append("<br>");
-        }
-
-        return sb.toString();
-    }
-
-    private static String toStringUnknownList(List<String> unknownList) {
-        return JOINER.join(unknownList);
-    }
-
     @Getter
-    @RequiredArgsConstructor
     public static class ResponseWrapper {
-        private final List<KeyValue> configurationKey;
-        private final List<String> unknownKey;
+        private final List<KeyValue> configurationKeys;
+        private final String unknownKeys;
+
+        private ResponseWrapper(List<KeyValue> configurationKeys, List<String> unknownKeys) {
+            this.configurationKeys = configurationKeys;
+            this.unknownKeys = JOINER.join(unknownKeys);
+        }
     }
 
     @Getter

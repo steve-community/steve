@@ -4,6 +4,7 @@ import de.rwth.idsg.steve.SteveException;
 import de.rwth.idsg.steve.ocpp.CommunicationTask;
 import de.rwth.idsg.steve.ocpp.RequestResult;
 import de.rwth.idsg.steve.ocpp.task.GetCompositeScheduleTask;
+import de.rwth.idsg.steve.ocpp.task.GetConfigurationTask;
 import de.rwth.idsg.steve.repository.TaskStore;
 import ocpp.cp._2015._10.GetCompositeScheduleResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -61,22 +62,38 @@ public class TaskController {
 
         CommunicationTask r = taskStore.get(taskId);
 
-        // at the moment only for GetCompositeScheduleTask
         if (r instanceof GetCompositeScheduleTask) {
             return processForGetCompositeScheduleTask((GetCompositeScheduleTask) r, chargeBoxId, model);
+        } else if (r instanceof GetConfigurationTask) {
+            return processForGetConfigurationTask((GetConfigurationTask) r, chargeBoxId, model);
         } else {
             throw new SteveException("Task not found");
         }
     }
 
     private String processForGetCompositeScheduleTask(GetCompositeScheduleTask k, String chargeBoxId, Model model) {
-        RequestResult result = k.getResultMap().get(chargeBoxId);
-        if (result == null) {
-            throw new SteveException("Result not found");
-        }
+        RequestResult result = extractResult(k, chargeBoxId);
         GetCompositeScheduleResponse response = result.getDetails();
+
         model.addAttribute("chargeBoxId", chargeBoxId);
         model.addAttribute("response", response);
         return "op16/GetCompositeScheduleResponse";
+    }
+
+    private String processForGetConfigurationTask(GetConfigurationTask k, String chargeBoxId, Model model) {
+        RequestResult result = extractResult(k, chargeBoxId);
+        GetConfigurationTask.ResponseWrapper response = result.getDetails();
+
+        model.addAttribute("chargeBoxId", chargeBoxId);
+        model.addAttribute("response", response);
+        return "GetConfigurationResponse";
+    }
+
+    private static RequestResult extractResult(CommunicationTask<?, ?> task, String chargeBoxId) {
+        RequestResult result = task.getResultMap().get(chargeBoxId);
+        if (result == null) {
+            throw new SteveException("Result not found");
+        }
+        return result;
     }
 }

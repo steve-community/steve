@@ -106,7 +106,7 @@ public class GetConfigurationTask extends Ocpp15AndAboveTask<GetConfigurationPar
 
     @Getter
     @RequiredArgsConstructor
-    private static class KeyValue {
+    public static class KeyValue {
         private final String key;
         private final String value;
         private final boolean readonly;

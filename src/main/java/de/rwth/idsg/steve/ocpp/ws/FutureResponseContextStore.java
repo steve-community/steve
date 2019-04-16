@@ -1,6 +1,7 @@
 package de.rwth.idsg.steve.ocpp.ws;
 
 import de.rwth.idsg.steve.ocpp.ws.data.FutureResponseContext;
+import org.jetbrains.annotations.Nullable;
 import org.springframework.web.socket.WebSocketSession;
 
 /**
@@ -11,5 +12,5 @@ public interface FutureResponseContextStore {
     void addSession(WebSocketSession session);
     void removeSession(WebSocketSession session);
     void add(WebSocketSession session, String messageId, FutureResponseContext context);
-    FutureResponseContext get(WebSocketSession session, String messageId);
+    @Nullable FutureResponseContext get(WebSocketSession session, String messageId);
 }

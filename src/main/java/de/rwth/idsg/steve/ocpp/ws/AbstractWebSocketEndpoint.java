@@ -31,7 +31,7 @@ import java.util.function.Consumer;
  * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
  * @since 17.03.2015
  */
-public abstract class AbstractWebSocketEndpoint implements WebSocketHandler {
+public abstract class AbstractWebSocketEndpoint extends ConcurrentWebSocketHandler {
 
     @Autowired private ScheduledExecutorService service;
     @Autowired private OcppServerRepository ocppServerRepository;
@@ -57,7 +57,7 @@ public abstract class AbstractWebSocketEndpoint implements WebSocketHandler {
     }
 
     @Override
-    public void handleMessage(WebSocketSession session, WebSocketMessage<?> message) throws Exception {
+    public void onMessage(WebSocketSession session, WebSocketMessage<?> message) throws Exception {
         if (message instanceof TextMessage) {
             handleTextMessage(session, (TextMessage) message);
 
@@ -96,7 +96,7 @@ public abstract class AbstractWebSocketEndpoint implements WebSocketHandler {
     }
 
     @Override
-    public void afterConnectionEstablished(WebSocketSession session) throws Exception {
+    public void onOpen(WebSocketSession session) throws Exception {
         String chargeBoxId = getChargeBoxId(session);
 
         WebSocketLogger.connected(chargeBoxId, session);
@@ -126,7 +126,7 @@ public abstract class AbstractWebSocketEndpoint implements WebSocketHandler {
     }
 
     @Override
-    public void afterConnectionClosed(WebSocketSession session, CloseStatus closeStatus) throws Exception {
+    public void onClose(WebSocketSession session, CloseStatus closeStatus) throws Exception {
         String chargeBoxId = getChargeBoxId(session);
 
         WebSocketLogger.closed(chargeBoxId, session, closeStatus);
@@ -148,7 +148,7 @@ public abstract class AbstractWebSocketEndpoint implements WebSocketHandler {
     }
 
     @Override
-    public void handleTransportError(WebSocketSession session, Throwable throwable) throws Exception {
+    public void onError(WebSocketSession session, Throwable throwable) throws Exception {
         WebSocketLogger.transportError(getChargeBoxId(session), session, throwable);
     }
 

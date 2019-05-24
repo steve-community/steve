@@ -1,7 +1,7 @@
 package de.rwth.idsg.steve.config;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
-import com.mysql.cj.conf.PropertyDefinitions;
+import com.mysql.cj.conf.PropertyKey;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import de.rwth.idsg.steve.SteveConfiguration;
@@ -71,13 +71,13 @@ public class BeanConfiguration implements WebMvcConfigurer {
         hc.setPassword(dbConfig.getPassword());
 
         // set non-standard params
-        hc.addDataSourceProperty(PropertyDefinitions.PNAME_cachePrepStmts, true);
-        hc.addDataSourceProperty(PropertyDefinitions.PNAME_useServerPrepStmts, true);
-        hc.addDataSourceProperty(PropertyDefinitions.PNAME_prepStmtCacheSize, 250);
-        hc.addDataSourceProperty(PropertyDefinitions.PNAME_prepStmtCacheSqlLimit, 2048);
-        hc.addDataSourceProperty(PropertyDefinitions.PNAME_characterEncoding, "utf8");
-        hc.addDataSourceProperty(PropertyDefinitions.PNAME_serverTimezone, CONFIG.getTimeZoneId());
-        hc.addDataSourceProperty(PropertyDefinitions.PNAME_useSSL, true);
+        hc.addDataSourceProperty(PropertyKey.cachePrepStmts.getKeyName(), true);
+        hc.addDataSourceProperty(PropertyKey.useServerPrepStmts.getKeyName(), true);
+        hc.addDataSourceProperty(PropertyKey.prepStmtCacheSize.getKeyName(), 250);
+        hc.addDataSourceProperty(PropertyKey.prepStmtCacheSqlLimit.getKeyName(), 2048);
+        hc.addDataSourceProperty(PropertyKey.characterEncoding.getKeyName(), "utf8");
+        hc.addDataSourceProperty(PropertyKey.serverTimezone.getKeyName(), CONFIG.getTimeZoneId());
+        hc.addDataSourceProperty(PropertyKey.useSSL.getKeyName(), true);
 
         dataSource = new HikariDataSource(hc);
     }

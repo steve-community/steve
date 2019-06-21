@@ -28,6 +28,7 @@ import javax.validation.constraints.AssertTrue;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
+import java.util.Objects;
 
 /**
  * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
@@ -44,7 +45,8 @@ public class ChangeConfigurationParams extends MultipleChargePointSelect {
     @NotNull(message = "Key type is required")
     private ConfigurationKeyType keyType = ConfigurationKeyType.PREDEFINED;
 
-    @NotBlank(message = "Value is required")
+    // Disabled @NotBlank after https://github.com/RWTH-i5-IDSG/steve/issues/148
+    // @NotBlank(message = "Value is required")
     @Pattern(regexp = "\\S+", message = "Value cannot contain any whitespace")
     private String value;
 
@@ -75,6 +77,15 @@ public class ChangeConfigurationParams extends MultipleChargePointSelect {
 
         // This should not happen
         throw new SteveException("Cannot determine key (KeyType in illegal state)");
+    }
+
+    /**
+     * Because we want to permit empty values
+     *
+     * https://github.com/RWTH-i5-IDSG/steve/issues/148
+     */
+    public String getValue() {
+        return Objects.requireNonNullElse(value, "");
     }
 
     // -------------------------------------------------------------------------

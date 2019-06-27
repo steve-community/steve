@@ -30,6 +30,8 @@ import static de.rwth.idsg.steve.NotificationFeature.OcppStationBooted;
 import static de.rwth.idsg.steve.NotificationFeature.OcppStationStatusFailure;
 import static de.rwth.idsg.steve.NotificationFeature.OcppStationWebSocketConnected;
 import static de.rwth.idsg.steve.NotificationFeature.OcppStationWebSocketDisconnected;
+import static de.rwth.idsg.steve.NotificationFeature.OcppTransactionStarted;
+import static de.rwth.idsg.steve.NotificationFeature.OcppTransactionEnded;
 import static java.lang.String.format;
 
 /**
@@ -86,6 +88,28 @@ public class NotificationServiceImpl implements NotificationService {
         String body = format("Status Error Code: '%s'", errorCode);
 
         mailService.sendAsync(subject, addTimestamp(body));
+    }
+
+    @Override
+    public void ocppTransactionStarted(String chargeBoxId, int transactionId, int connectorId) {
+        if (isDisabled(OcppTransactionStarted)) {
+            return;
+        }
+
+        String subject = format("Transaction '%s' has started on charging station '%s' on connector '%s'", transactionId, chargeBoxId, connectorId);
+
+        mailService.sendAsync(subject, addTimestamp(""));
+    }
+
+    @Override
+    public void ocppTransactionEnded(String chargeBoxId, int transactionId) {
+       if (isDisabled(OcppTransactionEnded)) {
+            return;
+        }
+
+        String subject = format("Transaction '%s' has ended on charging station '%s'", transactionId, chargeBoxId);
+
+        mailService.sendAsync(subject, addTimestamp(""));
     }
 
     // -------------------------------------------------------------------------

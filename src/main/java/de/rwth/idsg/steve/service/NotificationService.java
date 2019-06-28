@@ -27,4 +27,7 @@ public interface NotificationService {
     void ocppStationWebSocketConnected(String chargeBoxId);
     void ocppStationWebSocketDisconnected(String chargeBoxId);
     void ocppStationStatusFailure(String chargeBoxId, int connectorId, String errorCode);
+    void ocppTransactionStarted(String chargeBoxId, int transactionId, int connectorId);
+    void ocppTransactionEnded(String chargeBoxId, int transactionId);
+
 }

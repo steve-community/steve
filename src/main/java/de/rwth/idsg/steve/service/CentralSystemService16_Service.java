@@ -171,6 +171,8 @@ public class CentralSystemService16_Service {
         Integer transactionId = ocppServerRepository.insertTransaction(params);
         IdTagInfo info = ocppTagService.getIdTagInfo(parameters.getIdTag(), chargeBoxIdentity);
 
+        notificationService.ocppTransactionStarted(chargeBoxIdentity, transactionId.intValue(), parameters.getConnectorId());
+
         return new StartTransactionResponse()
                 .withIdTagInfo(info)
                 .withTransactionId(transactionId);
@@ -196,6 +198,8 @@ public class CentralSystemService16_Service {
         if (parameters.isSetTransactionData()) {
             ocppServerRepository.insertMeterValues(chargeBoxIdentity, parameters.getTransactionData(), transactionId);
         }
+
+        notificationService.ocppTransactionEnded(chargeBoxIdentity, transactionId);
 
         // Get the authorization info of the user
         if (parameters.isSetIdTag()) {

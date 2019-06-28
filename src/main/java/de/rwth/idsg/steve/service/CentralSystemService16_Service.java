@@ -168,10 +168,10 @@ public class CentralSystemService16_Service {
                                        .eventTimestamp(DateTime.now())
                                        .build();
 
-        Integer transactionId = ocppServerRepository.insertTransaction(params);
+        int transactionId = ocppServerRepository.insertTransaction(params);
         IdTagInfo info = ocppTagService.getIdTagInfo(parameters.getIdTag(), chargeBoxIdentity);
 
-        notificationService.ocppTransactionStarted(chargeBoxIdentity, transactionId.intValue(), parameters.getConnectorId());
+        notificationService.ocppTransactionStarted(chargeBoxIdentity, transactionId, parameters.getConnectorId());
 
         return new StartTransactionResponse()
                 .withIdTagInfo(info)

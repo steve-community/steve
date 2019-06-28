@@ -179,7 +179,7 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
     }
 
     @Override
-    public Integer insertTransaction(InsertTransactionParams p) {
+    public int insertTransaction(InsertTransactionParams p) {
 
         SelectConditionStep<Record1<Integer>> connectorPkQuery =
                 DSL.select(CONNECTOR.CONNECTOR_PK)
@@ -201,7 +201,7 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
         // -------------------------------------------------------------------------
 
         TransactionDataHolder data = insertIgnoreTransaction(p, connectorPkQuery);
-        Integer transactionId = data.transactionId;
+        int transactionId = data.transactionId;
 
         if (data.existsAlready) {
             return transactionId;
@@ -273,7 +273,7 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
     @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
     private static final class TransactionDataHolder {
         final boolean existsAlready;
-        final Integer transactionId;
+        final int transactionId;
     }
 
     /**

@@ -254,22 +254,23 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
         // Step 1: insert transaction stop data
         // -------------------------------------------------------------------------
 
-        int transactionUpdateCount = ctx.insertInto(TRANSACTION_STOP)
-                                        .set(TRANSACTION_STOP.TRANSACTION_PK, p.getTransactionId())
-                                        .set(TRANSACTION_STOP.EVENT_TIMESTAMP, p.getEventTimestamp())
-                                        .set(TRANSACTION_STOP.EVENT_ACTOR, p.getEventActor())
-                                        .set(TRANSACTION_STOP.STOP_TIMESTAMP, p.getStopTimestamp())
-                                        .set(TRANSACTION_STOP.STOP_VALUE, p.getStopMeterValue())
-                                        .set(TRANSACTION_STOP.STOP_REASON, p.getStopReason())
-                                        .execute();
-
-        // Actually unnecessary, because JOOQ will throw an exception, if something goes wrong
-        if (transactionUpdateCount == 0) {
-            throw new SteveException("Failed to UPDATE transaction in database");
+        // JOOQ will throw an exception, if something goes wrong
+        try {
+            ctx.insertInto(TRANSACTION_STOP)
+               .set(TRANSACTION_STOP.TRANSACTION_PK, p.getTransactionId())
+               .set(TRANSACTION_STOP.EVENT_TIMESTAMP, p.getEventTimestamp())
+               .set(TRANSACTION_STOP.EVENT_ACTOR, p.getEventActor())
+               .set(TRANSACTION_STOP.STOP_TIMESTAMP, p.getStopTimestamp())
+               .set(TRANSACTION_STOP.STOP_VALUE, p.getStopMeterValue())
+               .set(TRANSACTION_STOP.STOP_REASON, p.getStopReason())
+               .execute();
+        } catch (Exception e) {
+            log.error("Exception occurred", e);
         }
 
         // -------------------------------------------------------------------------
-        // Step 2: Set connector status back
+        // Step 2: Set connector status back. We do this even in cases where step 1
+        // fails. It probably and hopefully makes sense.
         // -------------------------------------------------------------------------
 
         if (shouldInsertConnectorStatusAfterTransactionMsg(p.getChargeBoxId())) {
@@ -348,12 +349,16 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
                                        SelectConditionStep<Record1<Integer>> connectorPkQuery,
                                        DateTime timestamp,
                                        TransactionStatusUpdate statusUpdate) {
-        ctx.insertInto(CONNECTOR_STATUS)
-           .set(CONNECTOR_STATUS.CONNECTOR_PK, connectorPkQuery)
-           .set(CONNECTOR_STATUS.STATUS_TIMESTAMP, timestamp)
-           .set(CONNECTOR_STATUS.STATUS, statusUpdate.getStatus())
-           .set(CONNECTOR_STATUS.ERROR_CODE, statusUpdate.getErrorCode())
-           .execute();
+        try {
+            ctx.insertInto(CONNECTOR_STATUS)
+               .set(CONNECTOR_STATUS.CONNECTOR_PK, connectorPkQuery)
+               .set(CONNECTOR_STATUS.STATUS_TIMESTAMP, timestamp)
+               .set(CONNECTOR_STATUS.STATUS, statusUpdate.getStatus())
+               .set(CONNECTOR_STATUS.ERROR_CODE, statusUpdate.getErrorCode())
+               .execute();
+        } catch (Exception e) {
+            log.error("Exception occurred", e);
+        }
     }
 
     /**

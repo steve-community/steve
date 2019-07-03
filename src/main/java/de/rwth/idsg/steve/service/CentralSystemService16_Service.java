@@ -172,7 +172,12 @@ public class CentralSystemService16_Service {
                                        .build();
 
         int transactionId = ocppServerRepository.insertTransaction(params);
-        IdTagInfo info = ocppTagService.getIdTagInfo(parameters.getIdTag(), chargeBoxIdentity, () -> null);
+
+        IdTagInfo info = ocppTagService.getIdTagInfo(
+                parameters.getIdTag(),
+                chargeBoxIdentity,
+                () -> new IdTagInfo().withStatus(AuthorizationStatus.INVALID) // IdTagInfo is required
+        );
 
         notificationService.ocppTransactionStarted(chargeBoxIdentity, transactionId, parameters.getConnectorId());
 

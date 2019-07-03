@@ -19,7 +19,6 @@
 package de.rwth.idsg.steve.service;
 
 import de.rwth.idsg.steve.ocpp.OcppProtocol;
-import de.rwth.idsg.steve.repository.ChargePointRepository;
 import de.rwth.idsg.steve.repository.OcppServerRepository;
 import de.rwth.idsg.steve.repository.SettingsRepository;
 import de.rwth.idsg.steve.repository.dto.InsertConnectorStatusParams;
@@ -28,6 +27,7 @@ import de.rwth.idsg.steve.repository.dto.UpdateChargeboxParams;
 import de.rwth.idsg.steve.repository.dto.UpdateTransactionParams;
 import jooq.steve.db.enums.TransactionStopEventActor;
 import lombok.extern.slf4j.Slf4j;
+import ocpp.cs._2015._10.AuthorizationStatus;
 import ocpp.cs._2015._10.AuthorizeRequest;
 import ocpp.cs._2015._10.AuthorizeResponse;
 import ocpp.cs._2015._10.BootNotificationRequest;
@@ -169,7 +169,7 @@ public class CentralSystemService16_Service {
                                        .build();
 
         int transactionId = ocppServerRepository.insertTransaction(params);
-        IdTagInfo info = ocppTagService.getIdTagInfo(parameters.getIdTag(), chargeBoxIdentity);
+        IdTagInfo info = ocppTagService.getIdTagInfo(parameters.getIdTag(), chargeBoxIdentity, () -> null);
 
         notificationService.ocppTransactionStarted(chargeBoxIdentity, transactionId, parameters.getConnectorId());
 
@@ -202,12 +202,9 @@ public class CentralSystemService16_Service {
         notificationService.ocppTransactionEnded(chargeBoxIdentity, transactionId);
 
         // Get the authorization info of the user
-        if (parameters.isSetIdTag()) {
-            IdTagInfo idTagInfo = ocppTagService.getIdTagInfo(parameters.getIdTag(), chargeBoxIdentity);
-            return new StopTransactionResponse().withIdTagInfo(idTagInfo);
-        } else {
-            return new StopTransactionResponse();
-        }
+        IdTagInfo idTagInfo = ocppTagService.getIdTagInfo(parameters.getIdTag(), chargeBoxIdentity, () -> null);
+
+        return new StopTransactionResponse().withIdTagInfo(idTagInfo);
     }
 
     public HeartbeatResponse heartbeat(HeartbeatRequest parameters, String chargeBoxIdentity) {
@@ -219,8 +216,11 @@ public class CentralSystemService16_Service {
 
     public AuthorizeResponse authorize(AuthorizeRequest parameters, String chargeBoxIdentity) {
         // Get the authorization info of the user
-        String idTag = parameters.getIdTag();
-        IdTagInfo idTagInfo = ocppTagService.getIdTagInfo(idTag, chargeBoxIdentity);
+        IdTagInfo idTagInfo = ocppTagService.getIdTagInfo(
+                parameters.getIdTag(),
+                chargeBoxIdentity,
+                () -> new IdTagInfo().withStatus(AuthorizationStatus.INVALID)
+        );
 
         return new AuthorizeResponse().withIdTagInfo(idTagInfo);
     }

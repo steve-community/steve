@@ -21,8 +21,10 @@ package de.rwth.idsg.steve.service;
 import de.rwth.idsg.steve.service.dto.UnidentifiedIncomingObject;
 import ocpp.cp._2015._10.AuthorizationData;
 import ocpp.cs._2015._10.IdTagInfo;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
+import java.util.function.Supplier;
 
 /**
  * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
@@ -30,7 +32,9 @@ import java.util.List;
  */
 public interface OcppTagService {
 
-    IdTagInfo getIdTagInfo(String idTag, String askingChargeBoxId);
+    @Nullable IdTagInfo getIdTagInfo(@Nullable String idTag, String askingChargeBoxId);
+    @Nullable IdTagInfo getIdTagInfo(@Nullable String idTag, String askingChargeBoxId, Supplier<IdTagInfo> supplierWhenException);
+
     List<AuthorizationData> getAuthDataOfAllTags();
     List<AuthorizationData> getAuthData(List<String> idTagList);
 

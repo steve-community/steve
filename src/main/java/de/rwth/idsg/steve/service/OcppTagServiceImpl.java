@@ -18,6 +18,7 @@
  */
 package de.rwth.idsg.steve.service;
 
+import com.google.common.base.Strings;
 import de.rwth.idsg.steve.SteveException;
 import de.rwth.idsg.steve.repository.OcppTagRepository;
 import de.rwth.idsg.steve.repository.SettingsRepository;
@@ -37,6 +38,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.function.Supplier;
 
 /**
  * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
@@ -80,7 +82,12 @@ public class OcppTagServiceImpl implements OcppTagService {
     }
 
     @Override
-    public IdTagInfo getIdTagInfo(String idTag, String askingChargeBoxId) {
+    @Nullable
+    public IdTagInfo getIdTagInfo(@Nullable String idTag, String askingChargeBoxId) {
+        if (Strings.isNullOrEmpty(idTag)) {
+            return null;
+        }
+
         OcppTagActivityRecord record = ocppTagRepository.getRecord(idTag);
         AuthorizationStatus status = decideStatus(record, idTag, askingChargeBoxId);
 
@@ -98,6 +105,18 @@ public class OcppTagServiceImpl implements OcppTagService {
                                       .withExpiryDate(getExpiryDateOrDefault(record));
             default:
                 throw new SteveException("Unexpected AuthorizationStatus");
+        }
+    }
+
+    @Override
+    @Nullable
+    public IdTagInfo getIdTagInfo(@Nullable String idTag, String askingChargeBoxId,
+                                  Supplier<IdTagInfo> supplierWhenException) {
+        try {
+            return getIdTagInfo(idTag, askingChargeBoxId);
+        } catch (Exception e) {
+            log.error("Exception occurred", e);
+            return supplierWhenException.get();
         }
     }
 

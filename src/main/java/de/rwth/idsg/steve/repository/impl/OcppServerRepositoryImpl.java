@@ -153,28 +153,44 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
 
     @Override
     public void insertMeterValues(String chargeBoxIdentity, List<MeterValue> list, int connectorId, Integer transactionId) {
-        ctx.transaction(configuration -> {
-            DSLContext ctx = DSL.using(configuration);
+        if (list == null || list.isEmpty()) {
+            return;
+        }
 
-            insertIgnoreConnector(ctx, chargeBoxIdentity, connectorId);
-            int connectorPk = getConnectorPkFromConnector(ctx, chargeBoxIdentity, connectorId);
-            batchInsertMeterValues(ctx, list, connectorPk, transactionId);
+        ctx.transaction(configuration -> {
+            try {
+                DSLContext ctx = DSL.using(configuration);
+
+                insertIgnoreConnector(ctx, chargeBoxIdentity, connectorId);
+                int connectorPk = getConnectorPkFromConnector(ctx, chargeBoxIdentity, connectorId);
+                batchInsertMeterValues(ctx, list, connectorPk, transactionId);
+            } catch (Exception e) {
+                log.error("Exception occurred", e);
+            }
         });
     }
 
     @Override
     public void insertMeterValues(String chargeBoxIdentity, List<MeterValue> list, int transactionId) {
+        if (list == null || list.isEmpty()) {
+            return;
+        }
+
         ctx.transaction(configuration -> {
-            DSLContext ctx = DSL.using(configuration);
+            try {
+                DSLContext ctx = DSL.using(configuration);
 
-            // First, get connector primary key from transaction table
-            int connectorPk = ctx.select(TRANSACTION_START.CONNECTOR_PK)
-                                 .from(TRANSACTION_START)
-                                 .where(TRANSACTION_START.TRANSACTION_PK.equal(transactionId))
-                                 .fetchOne()
-                                 .value1();
+                // First, get connector primary key from transaction table
+                int connectorPk = ctx.select(TRANSACTION_START.CONNECTOR_PK)
+                                     .from(TRANSACTION_START)
+                                     .where(TRANSACTION_START.TRANSACTION_PK.equal(transactionId))
+                                     .fetchOne()
+                                     .value1();
 
-            batchInsertMeterValues(ctx, list, connectorPk, transactionId);
+                batchInsertMeterValues(ctx, list, connectorPk, transactionId);
+            } catch (Exception e) {
+                log.error("Exception occurred", e);
+            }
         });
     }
 

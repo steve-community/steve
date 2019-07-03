@@ -142,10 +142,13 @@ public class CentralSystemService16_Service {
     }
 
     public MeterValuesResponse meterValues(MeterValuesRequest parameters, String chargeBoxIdentity) {
-        if (parameters.isSetMeterValue()) {
-            ocppServerRepository.insertMeterValues(chargeBoxIdentity, parameters.getMeterValue(),
-                                                   parameters.getConnectorId(), parameters.getTransactionId());
-        }
+        ocppServerRepository.insertMeterValues(
+                chargeBoxIdentity,
+                parameters.getMeterValue(),
+                parameters.getConnectorId(),
+                parameters.getTransactionId()
+        );
+
         return new MeterValuesResponse();
     }
 
@@ -195,9 +198,7 @@ public class CentralSystemService16_Service {
 
         ocppServerRepository.updateTransaction(params);
 
-        if (parameters.isSetTransactionData()) {
-            ocppServerRepository.insertMeterValues(chargeBoxIdentity, parameters.getTransactionData(), transactionId);
-        }
+        ocppServerRepository.insertMeterValues(chargeBoxIdentity, parameters.getTransactionData(), transactionId);
 
         notificationService.ocppTransactionEnded(chargeBoxIdentity, transactionId);
 

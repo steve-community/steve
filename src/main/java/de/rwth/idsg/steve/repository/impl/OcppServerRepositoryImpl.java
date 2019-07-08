@@ -18,6 +18,7 @@
  */
 package de.rwth.idsg.steve.repository.impl;
 
+import com.google.common.base.Throwables;
 import com.google.common.util.concurrent.Striped;
 import de.rwth.idsg.steve.SteveException;
 import de.rwth.idsg.steve.repository.OcppServerRepository;
@@ -27,6 +28,8 @@ import de.rwth.idsg.steve.repository.dto.InsertTransactionParams;
 import de.rwth.idsg.steve.repository.dto.TransactionStatusUpdate;
 import de.rwth.idsg.steve.repository.dto.UpdateChargeboxParams;
 import de.rwth.idsg.steve.repository.dto.UpdateTransactionParams;
+import jooq.steve.db.enums.TransactionStopEventActor;
+import jooq.steve.db.enums.TransactionStopFailedEventActor;
 import jooq.steve.db.tables.records.ConnectorMeterValueRecord;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -51,6 +54,7 @@ import static jooq.steve.db.tables.ConnectorStatus.CONNECTOR_STATUS;
 import static jooq.steve.db.tables.OcppTag.OCPP_TAG;
 import static jooq.steve.db.tables.TransactionStart.TRANSACTION_START;
 import static jooq.steve.db.tables.TransactionStop.TRANSACTION_STOP;
+import static jooq.steve.db.tables.TransactionStopFailed.TRANSACTION_STOP_FAILED;
 
 /**
  * This class has methods for database access that are used by the OCPP service.
@@ -266,6 +270,7 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
                .execute();
         } catch (Exception e) {
             log.error("Exception occurred", e);
+            tryInsertingFailed(p, e);
         }
 
         // -------------------------------------------------------------------------
@@ -434,5 +439,32 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
                     .collect(Collectors.toList());
 
         ctx.batchInsert(batch).execute();
+    }
+
+    private void tryInsertingFailed(UpdateTransactionParams p, Exception e) {
+        try {
+            ctx.insertInto(TRANSACTION_STOP_FAILED)
+               .set(TRANSACTION_STOP_FAILED.TRANSACTION_PK, p.getTransactionId())
+               .set(TRANSACTION_STOP_FAILED.EVENT_TIMESTAMP, p.getEventTimestamp())
+               .set(TRANSACTION_STOP_FAILED.EVENT_ACTOR, mapActor(p.getEventActor()))
+               .set(TRANSACTION_STOP_FAILED.STOP_TIMESTAMP, p.getStopTimestamp())
+               .set(TRANSACTION_STOP_FAILED.STOP_VALUE, p.getStopMeterValue())
+               .set(TRANSACTION_STOP_FAILED.STOP_REASON, p.getStopReason())
+               .set(TRANSACTION_STOP_FAILED.FAIL_REASON, Throwables.getStackTraceAsString(e))
+               .execute();
+        } catch (Exception ex) {
+            // This is where we give up and just log
+            log.error("Exception occurred", e);
+        }
+    }
+
+    private static TransactionStopFailedEventActor mapActor(TransactionStopEventActor a) {
+        for (TransactionStopFailedEventActor b : TransactionStopFailedEventActor.values()) {
+            if (b.getLiteral().equalsIgnoreCase(a.getLiteral())) {
+                return b;
+            }
+        }
+        // if unknown, do not throw exceptions. just insert manual.
+        return TransactionStopFailedEventActor.manual;
     }
 }

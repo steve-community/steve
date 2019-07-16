@@ -42,6 +42,7 @@ import org.jooq.SelectConditionStep;
 import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
+import org.springframework.util.CollectionUtils;
 
 import java.util.List;
 import java.util.concurrent.locks.Lock;
@@ -157,7 +158,7 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
 
     @Override
     public void insertMeterValues(String chargeBoxIdentity, List<MeterValue> list, int connectorId, Integer transactionId) {
-        if (list == null || list.isEmpty()) {
+        if (CollectionUtils.isEmpty(list)) {
             return;
         }
 
@@ -176,7 +177,7 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
 
     @Override
     public void insertMeterValues(String chargeBoxIdentity, List<MeterValue> list, int transactionId) {
-        if (list == null || list.isEmpty()) {
+        if (CollectionUtils.isEmpty(list)) {
             return;
         }
 

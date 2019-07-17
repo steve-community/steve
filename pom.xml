@@ -41,6 +41,9 @@
         <lombok.version>1.18.6</lombok.version>
         <jackson.version>2.9.9</jackson.version>
 
+        <!-- patch for CVE-2019-12814. TODO: remove this later with a regular jackson version update -->
+        <jackson.databind.version>2.9.9.1</jackson.databind.version>
+
         <!-- In Mysql: schema == database (http://dev.mysql.com/doc/refman/5.6/en/glossary.html#glos_schema) -->
         <jdbcUrl>jdbc:mysql://${db.ip}:${db.port}/${db.schema}?useSSL=true&amp;serverTimezone=UTC</jdbcUrl>
     </properties>
@@ -509,7 +512,7 @@
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
-            <version>${jackson.version}</version>
+            <version>${jackson.databind.version}</version>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.module</groupId>

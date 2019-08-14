@@ -1,0 +1,34 @@
+version: "3.7"
+
+volumes:
+  db-data:
+    external: false
+
+services:
+
+  testdb:
+    env_file: .env
+    image: mariadb
+    ports:
+      - 3306:3306
+    environment:
+      MYSQL_ROOT_PASSWORD: changeme
+
+  adminer:
+    image: adminer
+    ports:
+      - 8080:8080
+
+  app:
+    build: .
+    env_file: .env
+    command: ["./startup.sh"]
+    links: 
+      - "testdb:mariadb"
+    volumes:
+      - .:/code
+    ports:
+      - "8180:8180"
+      - "8443:8443"
+    depends_on:
+      - testdb

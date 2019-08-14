@@ -60,6 +60,13 @@
             </properties>
         </profile>
         <profile>
+            <id>docker</id>
+            <properties>
+                <envName>docker</envName>
+                <skipTests>true</skipTests>
+            </properties>
+        </profile>
+        <profile>
             <id>dev</id>
             <properties>
                 <envName>dev</envName>

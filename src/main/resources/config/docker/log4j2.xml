@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="WARN">
+
+    <Properties>
+        <Property name="logPattern">[%-5p] %d %c (%t) - %m%n</Property>
+    </Properties>
+
+    <Appenders>
+        <Console name="CONSOLE" target="SYSTEM_OUT">
+            <PatternLayout pattern="${logPattern}"/>
+        </Console>
+    </Appenders>
+
+    <Loggers>
+        <!-- Disable the Jooq logo in logs -->
+        <!-- https://github.com/jOOQ/jOOQ/issues/4019 -->
+        <AsyncLogger name="org.jooq.Constants" level="WARN"/>
+
+        <AsyncLogger name="org.apache.cxf" level="INFO"/>
+        <AsyncLogger name="org.eclipse.jetty" level="INFO"/>
+        <AsyncLogger name="com.zaxxer.hikari" level="INFO"/>
+        <AsyncLogger name="org.springframework" level="INFO"/>
+        <AsyncLogger name="org.springframework.security" level="INFO"/>
+        <AsyncLogger name="org.springframework.web.servlet" level="INFO"/>
+
+        <AsyncLogger name="org.apache.jasper" level="WARN"/>
+        <AsyncLogger name="org.apache.tomcat.util" level="WARN"/>
+        <AsyncLogger name="jndi" level="WARN"/>
+
+        <AsyncRoot level="DEBUG">
+            <AppenderRef ref="CONSOLE"/>
+        </AsyncRoot>
+    </Loggers>
+</Configuration>

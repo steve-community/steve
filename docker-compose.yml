@@ -8,16 +8,11 @@ services:
 
   testdb:
     env_file: .env
-    image: mariadb
+    image: mariadb:10.4.7
     ports:
       - 3306:3306
     environment:
       MYSQL_ROOT_PASSWORD: changeme
-
-  adminer:
-    image: adminer
-    ports:
-      - 8080:8080
 
   app:
     build: .

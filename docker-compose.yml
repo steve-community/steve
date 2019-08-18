@@ -6,7 +6,7 @@ volumes:
 
 services:
 
-  testdb:
+  db:
     image: mariadb:10.4
     ports:
       - 3306:3306
@@ -18,14 +18,12 @@ services:
 
   app:
     build: .
-    env_file: .env
-    command: ["./startup.sh"]
-    links: 
-      - "testdb:mariadb"
+    links:
+      - "db:mariadb"
     volumes:
       - .:/code
     ports:
       - "8180:8180"
       - "8443:8443"
     depends_on:
-      - testdb
+      - db

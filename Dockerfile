@@ -21,7 +21,9 @@ VOLUME ["/code"]
 # Copy the application's code
 COPY . /code
 
-# Wait for the db to startup 
+# Wait for the db to startup(via dockerize), then 
+# Build and run steve, requires a db to be available on port 3306
+CMD dockerize -wait tcp://db:3306 -timeout 60s && \
+	mvn clean package -Pdocker -Djdk.tls.client.protocols="TLSv1,TLSv1.1,TLSv1.2" && \
+	java -jar target/steve.jar
 
-# Build and run steve
-CMD ["./startup.sh"]

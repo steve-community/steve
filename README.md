@@ -118,6 +118,13 @@ Screenshots
 9. [Operations - OCPP v1.5](website/screenshots/ocpp15.png)
 10. [Settings](website/screenshots/settings.png)
 
+Docker
+------
+If you prefer to start this project via docker, this can be done as follows:
+`docker-compose up -d `
+You can the open a browser at:
+[docker](http://localhost:8180)
+
 
 GDPR
 -----

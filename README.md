@@ -84,6 +84,12 @@ SteVe is designed to run standalone, a java servlet container / web server (e.g.
     # java -jar target/steve.jar
     ```
 
+# Docker
+
+If you prefer to build and start this project via docker (you can skip the steps 1 and 3, 4, 5 above), this can be done as follows: `docker-compose up -d `
+
+The web interface will be accessible at: `http://localhost:8180`
+
 # First Steps
 
 After SteVe has successfully started, you can access the web interface using the configured credentials under:
@@ -117,16 +123,6 @@ Screenshots
 8. [Operations - OCPP v1.2](website/screenshots/ocpp12.png)
 9. [Operations - OCPP v1.5](website/screenshots/ocpp15.png)
 10. [Settings](website/screenshots/settings.png)
-
-Docker
-------
-If you prefer to start this project via docker, this can be done as follows:
-
-`docker-compose up -d `
-
-The web interface will be accessible at:
-
-`http://localhost:8180`
 
 GDPR
 -----

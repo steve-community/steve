@@ -121,10 +121,12 @@ Screenshots
 Docker
 ------
 If you prefer to start this project via docker, this can be done as follows:
-`docker-compose up -d `
-You can the open a browser at:
-[docker](http://localhost:8180)
 
+`docker-compose up -d `
+
+The web interface will be accessible at:
+
+`http://localhost:8180`
 
 GDPR
 -----

@@ -38,7 +38,7 @@
         <spring.security.version>5.1.5.RELEASE</spring.security.version>
         <mysql.jdbc.version>8.0.16</mysql.jdbc.version>
         <jetty.version>9.4.19.v20190610</jetty.version>
-        <lombok.version>1.18.6</lombok.version>
+        <lombok.version>1.18.8</lombok.version>
         <jackson.version>2.9.9</jackson.version>
 
         <!-- patch for CVEs. TODO: remove this later with a regular jackson version update -->

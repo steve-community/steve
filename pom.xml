@@ -39,7 +39,7 @@
         <mysql.jdbc.version>8.0.16</mysql.jdbc.version>
         <jetty.version>9.4.19.v20190610</jetty.version>
         <lombok.version>1.18.8</lombok.version>
-        <jackson.version>2.9.9</jackson.version>
+        <jackson.version>2.10.0.pr1</jackson.version>
 
         <!-- patch for CVEs. TODO: remove this later with a regular jackson version update -->
         <jackson.databind.version>2.9.9.2</jackson.databind.version>

@@ -66,11 +66,22 @@ public enum SteveConfiguration {
         gitDescribe = useFallbackIfNotSet(p.getOptionalString("git.describe"), null);
         profile = ApplicationProfile.fromName(p.getString("profile"));
 
+        // Enabled deployment on Heroku by checking for environment variable PORT
+        String serverHost = null;
+        int port;
+        String portEnvVar = System.getenv("PORT");
+        if (portEnvVar != null) {
+            port = Integer.parseInt(portEnvVar);
+        } else {
+            port = p.getInt("http.port");
+            serverHost = p.getString("server.host");
+        }
+
         jetty = Jetty.builder()
-                     .serverHost(p.getString("server.host"))
+                     .serverHost(serverHost)
                      .gzipEnabled(p.getBoolean("server.gzip.enabled"))
                      .httpEnabled(p.getBoolean("http.enabled"))
-                     .httpPort(p.getInt("http.port"))
+                     .httpPort(port)
                      .httpsEnabled(p.getBoolean("https.enabled"))
                      .httpsPort(p.getInt("https.port"))
                      .keyStorePath(p.getOptionalString("keystore.path"))

@@ -21,6 +21,7 @@ package de.rwth.idsg.steve.utils;
 import com.google.common.base.Splitter;
 import com.google.common.base.Strings;
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -74,6 +75,7 @@ public class PropertiesFileLoader {
             throw new IllegalArgumentException("The property '" + key + "' has no value set");
         }
 
+        s = resolveIfSystemEnv(s);
         return trim(key, s);
     }
 
@@ -94,6 +96,7 @@ public class PropertiesFileLoader {
         if (Strings.isNullOrEmpty(s)) {
             return null;
         }
+        s = resolveIfSystemEnv(s);
         return trim(key, s);
     }
 
@@ -102,7 +105,7 @@ public class PropertiesFileLoader {
         if (Strings.isNullOrEmpty(s)) {
             return Collections.emptyList();
         }
-
+        s = resolveIfSystemEnv(s);
         return Splitter.on(",")
                        .trimResults()
                        .omitEmptyStrings()
@@ -153,6 +156,17 @@ public class PropertiesFileLoader {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    /**
+     * If the first character of the value of the property is a dollar sign, we deduce that this property points to a
+     * system environment variable and look it up.
+     */
+    private static String resolveIfSystemEnv(@NotNull String value) {
+        if ("$".equals(String.valueOf(value.charAt(0)))) {
+            return System.getenv(value.substring(1));
+        }
+        return value;
     }
 
     private static String trim(String key, String value) {

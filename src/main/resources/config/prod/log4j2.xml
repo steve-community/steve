@@ -18,6 +18,9 @@
             </Policies>
             <DefaultRolloverStrategy max="20"/>
         </RollingRandomAccessFile>
+        <Console name="STDOUT" target="SYSTEM_OUT">
+            <PatternLayout pattern="${logPattern}"/>
+        </Console>
     </Appenders>
 
     <Loggers>
@@ -31,6 +34,7 @@
 
         <AsyncRoot level="INFO">
             <AppenderRef ref="FILE"/>
+            <AppenderRef ref="STDOUT"/>
         </AsyncRoot>
     </Loggers>
 </Configuration>

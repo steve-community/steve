@@ -34,7 +34,7 @@
 
         <jooq.version>3.12.1</jooq.version>
         <cxf.version>3.3.3</cxf.version>
-        <spring.version>5.1.9.RELEASE</spring.version>
+        <spring.version>5.2.0.RELEASE</spring.version>
         <spring.security.version>5.1.6.RELEASE</spring.security.version>
         <mysql.jdbc.version>8.0.17</mysql.jdbc.version>
         <jetty.version>9.4.19.v20190610</jetty.version>

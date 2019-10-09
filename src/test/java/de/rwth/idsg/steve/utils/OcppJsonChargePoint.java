@@ -35,10 +35,12 @@ import de.rwth.idsg.steve.ocpp.ws.data.OcppJsonError;
 import de.rwth.idsg.steve.ocpp.ws.data.OcppJsonResponse;
 import de.rwth.idsg.steve.ocpp.ws.data.OcppJsonResult;
 import de.rwth.idsg.steve.ocpp.ws.pipeline.Serializer;
+import lombok.extern.slf4j.Slf4j;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.StatusCode;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketClose;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketConnect;
+import org.eclipse.jetty.websocket.api.annotations.OnWebSocketError;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
 import org.eclipse.jetty.websocket.api.annotations.WebSocket;
 import org.eclipse.jetty.websocket.client.ClientUpgradeRequest;
@@ -58,6 +60,7 @@ import java.util.function.Consumer;
  * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
  * @since 21.03.2018
  */
+@Slf4j
 @WebSocket
 public class OcppJsonChargePoint {
 
@@ -93,6 +96,11 @@ public class OcppJsonChargePoint {
         this.closeHappenedSignal.countDown();
     }
 
+    @OnWebSocketError
+    public void onError(Session session, Throwable throwable) {
+        log.error("Exception", throwable);
+    }
+
     @OnWebSocketMessage
     public void onMessage(Session session, String msg) {
         try {
@@ -105,7 +113,7 @@ public class OcppJsonChargePoint {
                 ctx.errorHandler.accept((OcppJsonError) response);
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("Exception", e);
         } finally {
             if (receivedResponsesSignal != null) {
                 receivedResponsesSignal.countDown();
@@ -123,7 +131,7 @@ public class OcppJsonChargePoint {
             Future<Session> connect = client.connect(this, new URI(connectionPath), request);
             connect.get(); // block until session is created
         } catch (Throwable t) {
-            t.printStackTrace();
+            log.error("Exception", t);
         }
     }
 
@@ -158,7 +166,7 @@ public class OcppJsonChargePoint {
             try {
                 session.getRemote().sendString(ctx.outgoingMessage);
             } catch (IOException e) {
-                e.printStackTrace();
+                log.error("Exception", e);
             }
         }
 

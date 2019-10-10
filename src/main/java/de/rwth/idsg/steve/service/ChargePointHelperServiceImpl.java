@@ -37,6 +37,7 @@ import de.rwth.idsg.steve.utils.DateTimeUtils;
 import de.rwth.idsg.steve.web.dto.OcppJsonStatus;
 import de.rwth.idsg.steve.web.dto.Statistics;
 import lombok.extern.slf4j.Slf4j;
+import ocpp.cs._2015._10.RegistrationStatus;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -48,6 +49,7 @@ import java.util.Collections;
 import java.util.Deque;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.locks.Lock;
 import java.util.stream.Collectors;
 
@@ -77,15 +79,15 @@ public class ChargePointHelperServiceImpl implements ChargePointHelperService {
     private final UnidentifiedIncomingObjectService unknownChargePointService = new UnidentifiedIncomingObjectService(100);
 
     @Override
-    public boolean isRegistered(String chargeBoxId) {
+    public RegistrationStatus getRegistrationStatus(String chargeBoxId) {
         Lock l = isRegisteredLocks.get(chargeBoxId);
         l.lock();
         try {
-            boolean isRegistered = isRegisteredInternal(chargeBoxId);
-            if (!isRegistered) {
+            RegistrationStatus status = getRegistrationStatusInternal(chargeBoxId);
+            if (RegistrationStatus.REJECTED == status) {
                 unknownChargePointService.processNewUnidentified(chargeBoxId);
             }
-            return isRegistered;
+            return status;
         } finally {
             l.unlock();
         }
@@ -156,25 +158,32 @@ public class ChargePointHelperServiceImpl implements ChargePointHelperService {
     // Helpers
     // -------------------------------------------------------------------------
 
-    private boolean isRegisteredInternal(String chargeBoxId) {
+    private RegistrationStatus getRegistrationStatusInternal(String chargeBoxId) {
         // 1. exit if already registered
-        if (chargePointRepository.isRegistered(chargeBoxId)) {
-            return true;
+        Optional<String> status = chargePointRepository.getRegistrationStatus(chargeBoxId);
+        if (status.isPresent()) {
+            try {
+                return RegistrationStatus.fromValue(status.get());
+            } catch (Exception e) {
+                // in cases where the database entry (string) is altered, and therefore cannot be converted to enum
+                log.error("Exception happened", e);
+                return RegistrationStatus.REJECTED;
+            }
         }
 
         // 2. ok, this chargeBoxId is unknown. exit if auto-register is disabled
         if (!autoRegisterUnknownStations) {
-            return false;
+            return RegistrationStatus.REJECTED;
         }
 
         // 3. chargeBoxId is unknown and auto-register is enabled. insert chargeBoxId
         try {
             chargePointRepository.addChargePointList(Collections.singletonList(chargeBoxId));
             log.warn("Auto-registered unknown chargebox '{}'", chargeBoxId);
-            return true;
+            return RegistrationStatus.ACCEPTED; // default db value is accepted
         } catch (Exception e) {
             log.error("Failed to auto-register unknown chargebox '" + chargeBoxId + "'", e);
-            return false;
+            return RegistrationStatus.REJECTED;
         }
     }
 

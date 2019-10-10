@@ -20,7 +20,9 @@ package de.rwth.idsg.steve.ocpp.ws;
 
 import de.rwth.idsg.steve.service.ChargePointHelperService;
 import de.rwth.idsg.steve.service.NotificationService;
+import ocpp.cs._2015._10.RegistrationStatus;
 import org.eclipse.jetty.websocket.api.WebSocketPolicy;
+import org.jetbrains.annotations.Nullable;
 import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.http.server.ServerHttpResponse;
 import org.springframework.web.socket.WebSocketExtension;
@@ -28,7 +30,6 @@ import org.springframework.web.socket.WebSocketHandler;
 import org.springframework.web.socket.server.HandshakeFailureException;
 import org.springframework.web.socket.server.jetty.JettyRequestUpgradeStrategy;
 
-import org.jetbrains.annotations.Nullable;
 import java.security.Principal;
 import java.util.List;
 import java.util.Map;
@@ -62,12 +63,13 @@ public class OcppWebSocketUpgrader extends JettyRequestUpgradeStrategy {
         // -------------------------------------------------------------------------
 
         String chargeBoxId = getLastBitFromUrl(request.getURI().getPath());
-        if (chargePointHelperService.isRegistered(chargeBoxId)) {
+        RegistrationStatus status = chargePointHelperService.getRegistrationStatus(chargeBoxId);
+        if (status == RegistrationStatus.ACCEPTED) {
             attributes.put(AbstractWebSocketEndpoint.CHARGEBOX_ID_KEY, chargeBoxId);
         } else {
             // send only if the station is not registered, because otherwise, after the connection it will send a boot
             // notification message and we handle the notifications for these normal cases in service classes already.
-            notificationService.ocppStationBooted(chargeBoxId, false);
+            notificationService.ocppStationBooted(chargeBoxId, status.value());
 
             throw new HandshakeFailureException("ChargeBoxId '" + chargeBoxId + "' is not registered");
         }

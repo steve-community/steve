@@ -29,13 +29,14 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
  * @since 19.08.2014
  */
 public interface ChargePointRepository {
-    boolean isRegistered(String chargeBoxId);
+    Optional<String> getRegistrationStatus(String chargeBoxId);
     List<ChargePointSelect> getChargePointSelect(OcppProtocol protocol);
     List<String> getChargeBoxIds();
     Map<String, Integer> getChargeBoxIdPkPair(List<String> chargeBoxIdList);

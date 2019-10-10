@@ -74,12 +74,14 @@ public class CentralSystemService16_Service {
     public BootNotificationResponse bootNotification(BootNotificationRequest parameters, String chargeBoxIdentity,
                                                      OcppProtocol ocppProtocol) {
 
-        boolean isRegistered = chargePointHelperService.isRegistered(chargeBoxIdentity);
-        notificationService.ocppStationBooted(chargeBoxIdentity, isRegistered);
+        RegistrationStatus status = chargePointHelperService.getRegistrationStatus(chargeBoxIdentity);
+        notificationService.ocppStationBooted(chargeBoxIdentity, status.value());
         DateTime now = DateTime.now();
 
-        if (isRegistered) {
-            log.info("The chargebox '{}' is registered and its boot acknowledged.", chargeBoxIdentity);
+        if (status == RegistrationStatus.REJECTED) {
+            log.error("The chargebox '{}' is NOT registered and its boot NOT acknowledged.", chargeBoxIdentity);
+        } else {
+            log.info("The boot of the chargebox '{}' with registration status '{}' is acknowledged.", chargeBoxIdentity, status);
             UpdateChargeboxParams params =
                     UpdateChargeboxParams.builder()
                                          .ocppProtocol(ocppProtocol)
@@ -97,12 +99,10 @@ public class CentralSystemService16_Service {
                                          .build();
 
             ocppServerRepository.updateChargebox(params);
-        } else {
-            log.error("The chargebox '{}' is NOT registered and its boot NOT acknowledged.", chargeBoxIdentity);
         }
 
         return new BootNotificationResponse()
-                .withStatus(isRegistered ? RegistrationStatus.ACCEPTED : RegistrationStatus.REJECTED)
+                .withStatus(status)
                 .withCurrentTime(now)
                 .withInterval(settingsRepository.getHeartbeatIntervalInSeconds());
     }

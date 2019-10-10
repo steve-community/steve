@@ -50,6 +50,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static de.rwth.idsg.steve.utils.CustomDSL.date;
@@ -76,12 +77,13 @@ public class ChargePointRepositoryImpl implements ChargePointRepository {
     }
 
     @Override
-    public boolean isRegistered(String chargeBoxId) {
-        Record1<Integer> r = ctx.selectOne()
-                                .from(CHARGE_BOX)
-                                .where(CHARGE_BOX.CHARGE_BOX_ID.eq(chargeBoxId))
-                                .fetchOne();
-        return (r != null) && (r.value1() == 1);
+    public Optional<String> getRegistrationStatus(String chargeBoxId) {
+        String status = ctx.select(CHARGE_BOX.REGISTRATION_STATUS)
+                           .from(CHARGE_BOX)
+                           .where(CHARGE_BOX.CHARGE_BOX_ID.eq(chargeBoxId))
+                           .fetchOne(CHARGE_BOX.REGISTRATION_STATUS);
+
+        return Optional.ofNullable(status);
     }
 
     @Override

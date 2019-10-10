@@ -45,13 +45,13 @@ public class NotificationServiceImpl implements NotificationService {
     @Autowired private MailService mailService;
 
     @Override
-    public void ocppStationBooted(String chargeBoxId, boolean isRegistered) {
+    public void ocppStationBooted(String chargeBoxId, String registrationStatus) {
         if (isDisabled(OcppStationBooted)) {
             return;
         }
 
         String subject = format("Received boot notification from '%s'", chargeBoxId);
-        String body = isRegistered ? "" : format("Charging station '%s' is NOT registered.", chargeBoxId);
+        String body = format("Charging station '%s' has registration status '%s'.", chargeBoxId, registrationStatus);
 
         mailService.sendAsync(subject, addTimestamp(body));
     }

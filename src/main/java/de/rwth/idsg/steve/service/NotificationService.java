@@ -23,7 +23,7 @@ package de.rwth.idsg.steve.service;
  * @since 22.01.2016
  */
 public interface NotificationService {
-    void ocppStationBooted(String chargeBoxId, boolean isRegistered);
+    void ocppStationBooted(String chargeBoxId, String registrationStatus);
     void ocppStationWebSocketConnected(String chargeBoxId);
     void ocppStationWebSocketDisconnected(String chargeBoxId);
     void ocppStationStatusFailure(String chargeBoxId, int connectorId, String errorCode);

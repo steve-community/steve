@@ -18,6 +18,7 @@
  */
 package de.rwth.idsg.steve.web.controller;
 
+import de.rwth.idsg.steve.ocpp.OcppProtocol;
 import de.rwth.idsg.steve.repository.ChargePointRepository;
 import de.rwth.idsg.steve.repository.dto.ChargePoint;
 import de.rwth.idsg.steve.service.ChargePointHelperService;
@@ -25,6 +26,7 @@ import de.rwth.idsg.steve.utils.ControllerHelper;
 import de.rwth.idsg.steve.web.dto.ChargePointBatchInsertForm;
 import de.rwth.idsg.steve.web.dto.ChargePointForm;
 import de.rwth.idsg.steve.web.dto.ChargePointQueryForm;
+import jooq.steve.db.tables.records.ChargeBoxRecord;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -35,8 +37,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import javax.validation.Valid;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  *
@@ -104,14 +108,40 @@ public class ChargePointsController {
         form.setLocationLongitude(cp.getChargeBox().getLocationLongitude());
         form.setInsertConnectorStatusAfterTransactionMsg(cp.getChargeBox().getInsertConnectorStatusAfterTransactionMsg());
         form.setAdminAddress(cp.getChargeBox().getAdminAddress());
+        form.setRegistrationStatus(cp.getChargeBox().getRegistrationStatus());
 
         form.setAddress(ControllerHelper.recordToDto(cp.getAddress()));
 
         model.addAttribute("chargePointForm", form);
         model.addAttribute("cp", cp);
+        model.addAttribute("registrationStatusList", getRegistrationStatusList(cp.getChargeBox()));
         addCountryCodes(model);
 
         return "data-man/chargepointDetails";
+    }
+
+    private List<String> getRegistrationStatusList(ChargeBoxRecord chargeBoxRecord) {
+        String ocppProtocol = chargeBoxRecord.getOcppProtocol();
+        String registrationStatusFromDB = chargeBoxRecord.getRegistrationStatus();
+
+        if (ocppProtocol == null) {
+            return Collections.singletonList(registrationStatusFromDB);
+        }
+
+        OcppProtocol protocol = OcppProtocol.fromCompositeValue(ocppProtocol);
+        switch (protocol.getVersion()) {
+            case V_12:
+            case V_15:
+                return Arrays.stream(ocpp.cs._2012._06.RegistrationStatus.values())
+                             .map(ocpp.cs._2012._06.RegistrationStatus::value)
+                             .collect(Collectors.toList());
+            case V_16:
+                return Arrays.stream(ocpp.cs._2015._10.RegistrationStatus.values())
+                             .map(ocpp.cs._2015._10.RegistrationStatus::value)
+                             .collect(Collectors.toList());
+            default:
+                throw new IllegalArgumentException("Unknown OCPP version: " + protocol.getVersion());
+        }
     }
 
     @RequestMapping(value = ADD_PATH, method = RequestMethod.GET)

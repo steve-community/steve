@@ -37,7 +37,7 @@ import java.util.Optional;
  */
 public interface ChargePointRepository {
     Optional<String> getRegistrationStatus(String chargeBoxId);
-    List<ChargePointSelect> getChargePointSelect(OcppProtocol protocol);
+    List<ChargePointSelect> getChargePointSelect(OcppProtocol protocol, List<String> inStatusFilter);
     List<String> getChargeBoxIds();
     Map<String, Integer> getChargeBoxIdPkPair(List<String> chargeBoxIdList);
 

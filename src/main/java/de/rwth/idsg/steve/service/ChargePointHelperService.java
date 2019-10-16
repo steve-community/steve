@@ -18,12 +18,14 @@
  */
 package de.rwth.idsg.steve.service;
 
+import de.rwth.idsg.steve.ocpp.OcppVersion;
 import de.rwth.idsg.steve.repository.dto.ChargePointSelect;
 import de.rwth.idsg.steve.service.dto.UnidentifiedIncomingObject;
 import de.rwth.idsg.steve.web.dto.OcppJsonStatus;
 import de.rwth.idsg.steve.web.dto.Statistics;
 import ocpp.cs._2015._10.RegistrationStatus;
 
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -34,12 +36,18 @@ public interface ChargePointHelperService {
     RegistrationStatus getRegistrationStatus(String chargeBoxId);
 
     Statistics getStats();
+
     List<OcppJsonStatus> getOcppJsonStatus();
-    List<ChargePointSelect> getChargePointsV12();
-    List<ChargePointSelect> getChargePointsV15();
-    List<ChargePointSelect> getChargePointsV16();
+
+    List<ChargePointSelect> getChargePoints(OcppVersion version, List<RegistrationStatus> inStatusFilter);
+
+    default List<ChargePointSelect> getChargePoints(OcppVersion version) {
+        return getChargePoints(version, Collections.singletonList(RegistrationStatus.ACCEPTED));
+    }
 
     List<UnidentifiedIncomingObject> getUnknownChargePoints();
+
     void removeUnknown(String chargeBoxId);
+
     void removeUnknown(List<String> chargeBoxIdList);
 }

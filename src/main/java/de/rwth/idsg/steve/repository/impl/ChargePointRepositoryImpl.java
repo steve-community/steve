@@ -20,7 +20,6 @@ package de.rwth.idsg.steve.repository.impl;
 
 import de.rwth.idsg.steve.SteveException;
 import de.rwth.idsg.steve.ocpp.OcppProtocol;
-import de.rwth.idsg.steve.ocpp.OcppTransport;
 import de.rwth.idsg.steve.repository.AddressRepository;
 import de.rwth.idsg.steve.repository.ChargePointRepository;
 import de.rwth.idsg.steve.repository.dto.ChargePoint;
@@ -87,15 +86,14 @@ public class ChargePointRepositoryImpl implements ChargePointRepository {
     }
 
     @Override
-    public List<ChargePointSelect> getChargePointSelect(OcppProtocol protocol) {
-        final OcppTransport transport = protocol.getTransport();
-
+    public List<ChargePointSelect> getChargePointSelect(OcppProtocol protocol, List<String> inStatusFilter) {
         return ctx.select(CHARGE_BOX.CHARGE_BOX_ID, CHARGE_BOX.ENDPOINT_ADDRESS)
                   .from(CHARGE_BOX)
                   .where(CHARGE_BOX.OCPP_PROTOCOL.equal(protocol.getCompositeValue()))
                   .and(CHARGE_BOX.ENDPOINT_ADDRESS.isNotNull())
+                  .and(CHARGE_BOX.REGISTRATION_STATUS.in(inStatusFilter))
                   .fetch()
-                  .map(r -> new ChargePointSelect(transport, r.value1(), r.value2()));
+                  .map(r -> new ChargePointSelect(protocol.getTransport(), r.value1(), r.value2()));
     }
 
     @Override

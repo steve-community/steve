@@ -38,6 +38,7 @@ import de.rwth.idsg.steve.web.dto.OcppJsonStatus;
 import de.rwth.idsg.steve.web.dto.Statistics;
 import lombok.extern.slf4j.Slf4j;
 import ocpp.cs._2015._10.RegistrationStatus;
+import org.jetbrains.annotations.Nullable;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -125,18 +126,17 @@ public class ChargePointHelperServiceImpl implements ChargePointHelperService {
     }
 
     @Override
-    public List<ChargePointSelect> getChargePointsV12() {
-        return getChargePoints(OcppProtocol.V_12_SOAP, ocpp12WebSocketEndpoint);
-    }
-
-    @Override
-    public List<ChargePointSelect> getChargePointsV15() {
-        return getChargePoints(OcppProtocol.V_15_SOAP, ocpp15WebSocketEndpoint);
-    }
-
-    @Override
-    public List<ChargePointSelect> getChargePointsV16() {
-        return getChargePoints(OcppProtocol.V_16_SOAP, ocpp16WebSocketEndpoint);
+    public List<ChargePointSelect> getChargePoints(OcppVersion version, List<RegistrationStatus> inStatusFilter) {
+        switch (version) {
+            case V_12:
+                return getChargePoints(OcppProtocol.V_12_SOAP, inStatusFilter, ocpp12WebSocketEndpoint);
+            case V_15:
+                return getChargePoints(OcppProtocol.V_15_SOAP, inStatusFilter, ocpp15WebSocketEndpoint);
+            case V_16:
+                return getChargePoints(OcppProtocol.V_16_SOAP, inStatusFilter, ocpp16WebSocketEndpoint);
+            default:
+                throw new IllegalArgumentException("Unknown OCPP version: " + version);
+        }
     }
 
     @Override
@@ -187,8 +187,13 @@ public class ChargePointHelperServiceImpl implements ChargePointHelperService {
         }
     }
 
-    private List<ChargePointSelect> getChargePoints(OcppProtocol forSoap, AbstractWebSocketEndpoint jsonEndpoint) {
-        List<ChargePointSelect> returnList = chargePointRepository.getChargePointSelect(forSoap);
+    private List<ChargePointSelect> getChargePoints(OcppProtocol protocol, List<RegistrationStatus> inStatusFilter,
+                                                    AbstractWebSocketEndpoint jsonEndpoint) {
+        List<String> statusFilter = inStatusFilter.stream()
+                                                  .map(RegistrationStatus::value)
+                                                  .collect(Collectors.toList());
+
+        List<ChargePointSelect> returnList = chargePointRepository.getChargePointSelect(protocol, statusFilter);
         for (String chargeBoxId : jsonEndpoint.getChargeBoxIdList()) {
             returnList.add(new ChargePointSelect(OcppTransport.JSON, chargeBoxId));
         }

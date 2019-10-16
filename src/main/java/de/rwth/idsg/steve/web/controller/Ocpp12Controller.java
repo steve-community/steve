@@ -18,6 +18,7 @@
  */
 package de.rwth.idsg.steve.web.controller;
 
+import de.rwth.idsg.steve.ocpp.OcppVersion;
 import de.rwth.idsg.steve.repository.OcppTagRepository;
 import de.rwth.idsg.steve.service.ChargePointHelperService;
 import de.rwth.idsg.steve.service.ChargePointService12_Client;
@@ -87,8 +88,12 @@ public class Ocpp12Controller {
         return client12;
     }
 
+    protected void setCommonAttributesForTx(Model model) {
+        setCommonAttributes(model);
+    }
+
     protected void setCommonAttributes(Model model) {
-        model.addAttribute("cpList", chargePointHelperService.getChargePointsV12());
+        model.addAttribute("cpList", chargePointHelperService.getChargePoints(OcppVersion.V_12));
         model.addAttribute("opVersion", "v1.2");
     }
 
@@ -149,7 +154,7 @@ public class Ocpp12Controller {
 
     @RequestMapping(value = REMOTE_START_TX_PATH, method = RequestMethod.GET)
     public String getRemoteStartTx(Model model) {
-        setCommonAttributes(model);
+        setCommonAttributesForTx(model);
         setActiveUserIdTagList(model);
         model.addAttribute(PARAMS, new RemoteStartTransactionParams());
         return getPrefix() + REMOTE_START_TX_PATH;
@@ -157,7 +162,7 @@ public class Ocpp12Controller {
 
     @RequestMapping(value = REMOTE_STOP_TX_PATH, method = RequestMethod.GET)
     public String getRemoteStopTx(Model model) {
-        setCommonAttributes(model);
+        setCommonAttributesForTx(model);
         model.addAttribute(PARAMS, new RemoteStopTransactionParams());
         return getPrefix() + REMOTE_STOP_TX_PATH;
     }
@@ -232,7 +237,7 @@ public class Ocpp12Controller {
     public String postRemoteStartTx(@Valid @ModelAttribute(PARAMS) RemoteStartTransactionParams params,
                                     BindingResult result, Model model) {
         if (result.hasErrors()) {
-            setCommonAttributes(model);
+            setCommonAttributesForTx(model);
             setActiveUserIdTagList(model);
             return getPrefix() + REMOTE_START_TX_PATH;
         }
@@ -243,7 +248,7 @@ public class Ocpp12Controller {
     public String postRemoteStopTx(@Valid @ModelAttribute(PARAMS) RemoteStopTransactionParams params,
                                    BindingResult result, Model model) {
         if (result.hasErrors()) {
-            setCommonAttributes(model);
+            setCommonAttributesForTx(model);
             return getPrefix() + REMOTE_STOP_TX_PATH;
         }
         return REDIRECT_TASKS_PATH + getClient12().remoteStopTransaction(params);

@@ -124,7 +124,7 @@ public class OcppTagRepositoryImpl implements OcppTagRepository {
     @Override
     public Result<OcppTagActivityRecord> getRecords(List<String> idTagList) {
         return ctx.selectFrom(OCPP_TAG_ACTIVITY)
-                  .where(OCPP_TAG.ID_TAG.in(idTagList))
+                  .where(OCPP_TAG_ACTIVITY.ID_TAG.in(idTagList))
                   .fetch();
     }
 

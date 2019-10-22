@@ -76,6 +76,7 @@ import static de.rwth.idsg.steve.utils.Helpers.getRandomString;
 public class OperationalTestSoapOCPP16 {
 
     private static final String REGISTERED_CHARGE_BOX_ID = __DatabasePreparer__.getRegisteredChargeBoxId();
+    private static final String REGISTERED_CHARGE_BOX_ID_2 = __DatabasePreparer__.getRegisteredChargeBoxId2();
     private static final String REGISTERED_OCPP_TAG = __DatabasePreparer__.getRegisteredOcppTag();
     private static final String path = getPath();
     private static final int numConnectors = 5;
@@ -204,6 +205,36 @@ public class OperationalTestSoapOCPP16 {
 
         Assert.assertNotNull(stop);
         Assert.assertFalse(__DatabasePreparer__.getOcppTagRecord(REGISTERED_OCPP_TAG).getInTransaction());
+    }
+
+    /**
+     * https://github.com/RWTH-i5-IDSG/steve/issues/217
+     */
+    @Test
+    public void testMaxActiveTransactionCount() {
+        CentralSystemService client = getForOcpp16(path);
+
+        AuthorizeResponse auth1 = client.authorize(
+                new AuthorizeRequest().withIdTag(REGISTERED_OCPP_TAG),
+                REGISTERED_CHARGE_BOX_ID);
+
+        Assert.assertEquals(AuthorizationStatus.ACCEPTED, auth1.getIdTagInfo().getStatus());
+
+        StartTransactionResponse start = client.startTransaction(
+                new StartTransactionRequest()
+                        .withConnectorId(2)
+                        .withIdTag(REGISTERED_OCPP_TAG)
+                        .withTimestamp(DateTime.now())
+                        .withMeterStart(0),
+                REGISTERED_CHARGE_BOX_ID
+        );
+        Assert.assertTrue(start.getTransactionId() > 0);
+
+        AuthorizeResponse auth2 = client.authorize(
+                new AuthorizeRequest().withIdTag(REGISTERED_OCPP_TAG),
+                REGISTERED_CHARGE_BOX_ID_2);
+
+        Assert.assertEquals(AuthorizationStatus.CONCURRENT_TX, auth2.getIdTagInfo().getStatus());
     }
 
     @Test

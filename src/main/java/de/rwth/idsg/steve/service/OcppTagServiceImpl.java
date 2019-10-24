@@ -22,7 +22,6 @@ import com.google.common.base.Strings;
 import de.rwth.idsg.steve.SteveException;
 import de.rwth.idsg.steve.repository.OcppTagRepository;
 import de.rwth.idsg.steve.repository.SettingsRepository;
-import de.rwth.idsg.steve.repository.TransactionRepository;
 import de.rwth.idsg.steve.service.dto.UnidentifiedIncomingObject;
 import jooq.steve.db.tables.records.OcppTagActivityRecord;
 import lombok.AccessLevel;
@@ -50,7 +49,6 @@ public class OcppTagServiceImpl implements OcppTagService {
 
     @Autowired private SettingsRepository settingsRepository;
     @Autowired private OcppTagRepository ocppTagRepository;
-    @Autowired private TransactionRepository transactionRepository;
 
     private final UnidentifiedIncomingObjectService invalidOcppTagService = new UnidentifiedIncomingObjectService(1000);
 

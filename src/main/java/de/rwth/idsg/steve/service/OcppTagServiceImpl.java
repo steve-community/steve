@@ -22,7 +22,6 @@ import com.google.common.base.Strings;
 import de.rwth.idsg.steve.SteveException;
 import de.rwth.idsg.steve.repository.OcppTagRepository;
 import de.rwth.idsg.steve.repository.SettingsRepository;
-import de.rwth.idsg.steve.repository.TransactionRepository;
 import de.rwth.idsg.steve.service.dto.UnidentifiedIncomingObject;
 import jooq.steve.db.tables.records.OcppTagActivityRecord;
 import lombok.AccessLevel;
@@ -50,7 +49,6 @@ public class OcppTagServiceImpl implements OcppTagService {
 
     @Autowired private SettingsRepository settingsRepository;
     @Autowired private OcppTagRepository ocppTagRepository;
-    @Autowired private TransactionRepository transactionRepository;
 
     private final UnidentifiedIncomingObjectService invalidOcppTagService = new UnidentifiedIncomingObjectService(1000);
 
@@ -83,13 +81,13 @@ public class OcppTagServiceImpl implements OcppTagService {
 
     @Override
     @Nullable
-    public IdTagInfo getIdTagInfo(@Nullable String idTag, String askingChargeBoxId) {
+    public IdTagInfo getIdTagInfo(@Nullable String idTag, boolean isStartTransactionReqContext) {
         if (Strings.isNullOrEmpty(idTag)) {
             return null;
         }
 
         OcppTagActivityRecord record = ocppTagRepository.getRecord(idTag);
-        AuthorizationStatus status = decideStatus(record, idTag, askingChargeBoxId);
+        AuthorizationStatus status = decideStatus(record, idTag, isStartTransactionReqContext);
 
         switch (status) {
             case INVALID:
@@ -110,10 +108,10 @@ public class OcppTagServiceImpl implements OcppTagService {
 
     @Override
     @Nullable
-    public IdTagInfo getIdTagInfo(@Nullable String idTag, String askingChargeBoxId,
+    public IdTagInfo getIdTagInfo(@Nullable String idTag, boolean isStartTransactionReqContext,
                                   Supplier<IdTagInfo> supplierWhenException) {
         try {
-            return getIdTagInfo(idTag, askingChargeBoxId);
+            return getIdTagInfo(idTag, isStartTransactionReqContext);
         } catch (Exception e) {
             log.error("Exception occurred", e);
             return supplierWhenException.get();
@@ -143,7 +141,7 @@ public class OcppTagServiceImpl implements OcppTagService {
         }
     }
 
-    private AuthorizationStatus decideStatus(OcppTagActivityRecord record, String idTag, String askingChargeBoxId) {
+    private AuthorizationStatus decideStatus(OcppTagActivityRecord record, String idTag, boolean isStartTransactionReqContext) {
         if (record == null) {
             log.error("The user with idTag '{}' is INVALID (not present in DB).", idTag);
             return AuthorizationStatus.INVALID;
@@ -159,26 +157,26 @@ public class OcppTagServiceImpl implements OcppTagService {
             return AuthorizationStatus.EXPIRED;
         }
 
-        // https://github.com/RWTH-i5-IDSG/steve/issues/73
-        if (reachedLimitOfActiveTransactions(record)) {
-            List<String> txChargeBoxIds = transactionRepository.getChargeBoxIdsOfActiveTransactions(idTag);
-            if (!txChargeBoxIds.contains(askingChargeBoxId)) {
-                log.warn("The user with idTag '{}' is ALREADY in another transaction(s).", idTag);
-                return AuthorizationStatus.CONCURRENT_TX;
-            }
+        // https://github.com/RWTH-i5-IDSG/steve/issues/219
+        if (isStartTransactionReqContext && reachedLimitOfActiveTransactions(record)) {
+            log.warn("The user with idTag '{}' is ALREADY in another transaction(s).", idTag);
+            return AuthorizationStatus.CONCURRENT_TX;
         }
 
         log.debug("The user with idTag '{}' is ACCEPTED.", record.getIdTag());
         return AuthorizationStatus.ACCEPTED;
     }
 
-    private static ocpp.cp._2015._10.AuthorizationStatus decideStatus(OcppTagActivityRecord record, DateTime now) {
+    /**
+     * ConcurrentTx is only valid for StartTransactionRequest
+     */
+    private static ocpp.cp._2015._10.AuthorizationStatus decideStatusForAuthData(OcppTagActivityRecord record, DateTime now) {
         if (isBlocked(record)) {
             return ocpp.cp._2015._10.AuthorizationStatus.BLOCKED;
         } else if (isExpired(record, now)) {
             return ocpp.cp._2015._10.AuthorizationStatus.EXPIRED;
-        } else if (reachedLimitOfActiveTransactions(record)) {
-            return ocpp.cp._2015._10.AuthorizationStatus.CONCURRENT_TX;
+//        } else if (reachedLimitOfActiveTransactions(record)) {
+//            return ocpp.cp._2015._10.AuthorizationStatus.CONCURRENT_TX;
         } else {
             return ocpp.cp._2015._10.AuthorizationStatus.ACCEPTED;
         }
@@ -219,7 +217,7 @@ public class OcppTagServiceImpl implements OcppTagService {
             return new AuthorizationData().withIdTag(record.getIdTag())
                                           .withIdTagInfo(
                                                   new ocpp.cp._2015._10.IdTagInfo()
-                                                          .withStatus(decideStatus(record, nowDt))
+                                                          .withStatus(decideStatusForAuthData(record, nowDt))
                                                           .withParentIdTag(record.getParentIdTag())
                                                           .withExpiryDate(record.getExpiryDate())
                                           );

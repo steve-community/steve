@@ -160,6 +160,13 @@ public class CentralSystemService16_Service {
     }
 
     public StartTransactionResponse startTransaction(StartTransactionRequest parameters, String chargeBoxIdentity) {
+        // Get the authorization info of the user, before making tx changes (will affectAuthorizationStatus)
+        IdTagInfo info = ocppTagService.getIdTagInfo(
+                parameters.getIdTag(),
+                true,
+                () -> new IdTagInfo().withStatus(AuthorizationStatus.INVALID) // IdTagInfo is required
+        );
+
         InsertTransactionParams params =
                 InsertTransactionParams.builder()
                                        .chargeBoxId(chargeBoxIdentity)
@@ -173,12 +180,6 @@ public class CentralSystemService16_Service {
 
         int transactionId = ocppServerRepository.insertTransaction(params);
 
-        IdTagInfo info = ocppTagService.getIdTagInfo(
-                parameters.getIdTag(),
-                chargeBoxIdentity,
-                () -> new IdTagInfo().withStatus(AuthorizationStatus.INVALID) // IdTagInfo is required
-        );
-
         notificationService.ocppTransactionStarted(chargeBoxIdentity, transactionId, parameters.getConnectorId());
 
         return new StartTransactionResponse()
@@ -189,6 +190,13 @@ public class CentralSystemService16_Service {
     public StopTransactionResponse stopTransaction(StopTransactionRequest parameters, String chargeBoxIdentity) {
         int transactionId = parameters.getTransactionId();
         String stopReason = parameters.isSetReason() ? parameters.getReason().value() : null;
+
+        // Get the authorization info of the user, before making tx changes (will affectAuthorizationStatus)
+        IdTagInfo idTagInfo = ocppTagService.getIdTagInfo(
+                parameters.getIdTag(),
+                false,
+                () -> null
+        );
 
         UpdateTransactionParams params =
                 UpdateTransactionParams.builder()
@@ -207,9 +215,6 @@ public class CentralSystemService16_Service {
 
         notificationService.ocppTransactionEnded(chargeBoxIdentity, transactionId);
 
-        // Get the authorization info of the user
-        IdTagInfo idTagInfo = ocppTagService.getIdTagInfo(parameters.getIdTag(), chargeBoxIdentity, () -> null);
-
         return new StopTransactionResponse().withIdTagInfo(idTagInfo);
     }
 
@@ -224,7 +229,7 @@ public class CentralSystemService16_Service {
         // Get the authorization info of the user
         IdTagInfo idTagInfo = ocppTagService.getIdTagInfo(
                 parameters.getIdTag(),
-                chargeBoxIdentity,
+                false,
                 () -> new IdTagInfo().withStatus(AuthorizationStatus.INVALID)
         );
 

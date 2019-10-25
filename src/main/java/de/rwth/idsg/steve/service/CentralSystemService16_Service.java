@@ -56,6 +56,8 @@ import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 /**
  * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
  * @since 13.03.2018
@@ -74,12 +76,16 @@ public class CentralSystemService16_Service {
     public BootNotificationResponse bootNotification(BootNotificationRequest parameters, String chargeBoxIdentity,
                                                      OcppProtocol ocppProtocol) {
 
-        boolean isRegistered = chargePointHelperService.isRegistered(chargeBoxIdentity);
-        notificationService.ocppStationBooted(chargeBoxIdentity, isRegistered);
+        Optional<RegistrationStatus> status = chargePointHelperService.getRegistrationStatus(chargeBoxIdentity);
+        notificationService.ocppStationBooted(chargeBoxIdentity, status);
         DateTime now = DateTime.now();
 
-        if (isRegistered) {
-            log.info("The chargebox '{}' is registered and its boot acknowledged.", chargeBoxIdentity);
+        if (status.isEmpty()) {
+            // Applies only to stations not in db (regardless of the registration_status field from db)
+            log.error("The chargebox '{}' is NOT in database.", chargeBoxIdentity);
+        } else {
+            // Applies to all stations in db (even with registration_status Rejected)
+            log.info("The boot of the chargebox '{}' with registration status '{}' is acknowledged.", chargeBoxIdentity, status);
             UpdateChargeboxParams params =
                     UpdateChargeboxParams.builder()
                                          .ocppProtocol(ocppProtocol)
@@ -97,12 +103,10 @@ public class CentralSystemService16_Service {
                                          .build();
 
             ocppServerRepository.updateChargebox(params);
-        } else {
-            log.error("The chargebox '{}' is NOT registered and its boot NOT acknowledged.", chargeBoxIdentity);
         }
 
         return new BootNotificationResponse()
-                .withStatus(isRegistered ? RegistrationStatus.ACCEPTED : RegistrationStatus.REJECTED)
+                .withStatus(status.orElse(RegistrationStatus.REJECTED))
                 .withCurrentTime(now)
                 .withInterval(settingsRepository.getHeartbeatIntervalInSeconds());
     }

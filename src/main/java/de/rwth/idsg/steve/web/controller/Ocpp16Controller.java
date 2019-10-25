@@ -18,6 +18,7 @@
  */
 package de.rwth.idsg.steve.web.controller;
 
+import de.rwth.idsg.steve.ocpp.OcppVersion;
 import de.rwth.idsg.steve.repository.ChargingProfileRepository;
 import de.rwth.idsg.steve.service.ChargePointService12_Client;
 import de.rwth.idsg.steve.service.ChargePointService15_Client;
@@ -30,6 +31,7 @@ import de.rwth.idsg.steve.web.dto.ocpp.GetCompositeScheduleParams;
 import de.rwth.idsg.steve.web.dto.ocpp.GetConfigurationParams;
 import de.rwth.idsg.steve.web.dto.ocpp.SetChargingProfileParams;
 import de.rwth.idsg.steve.web.dto.ocpp.TriggerMessageParams;
+import ocpp.cs._2015._10.RegistrationStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
@@ -40,7 +42,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import javax.validation.Valid;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
 import static de.rwth.idsg.steve.web.dto.ocpp.ConfigurationKeyReadWriteEnum.R;
@@ -88,8 +92,22 @@ public class Ocpp16Controller extends Ocpp15Controller {
     }
 
     @Override
+    protected void setCommonAttributesForTx(Model model) {
+        model.addAttribute("cpList", chargePointHelperService.getChargePoints(OcppVersion.V_16));
+        model.addAttribute("opVersion", "v1.6");
+    }
+
+    /**
+     * From OCPP 1.6 spec: "While in pending state, the following Central
+     * System initiated messages are not allowed: RemoteStartTransaction.req
+     * and RemoteStopTransaction.req"
+     *
+     * Conversely, it means all other operations are allowed for pending state.
+     */
+    @Override
     protected void setCommonAttributes(Model model) {
-        model.addAttribute("cpList", chargePointHelperService.getChargePointsV16());
+        List<RegistrationStatus> inStatusFilter = Arrays.asList(RegistrationStatus.ACCEPTED, RegistrationStatus.PENDING);
+        model.addAttribute("cpList", chargePointHelperService.getChargePoints(OcppVersion.V_16, inStatusFilter));
         model.addAttribute("opVersion", "v1.6");
     }
 

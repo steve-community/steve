@@ -33,6 +33,7 @@ import org.springframework.web.socket.server.jetty.JettyRequestUpgradeStrategy;
 import java.security.Principal;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
@@ -63,15 +64,15 @@ public class OcppWebSocketUpgrader extends JettyRequestUpgradeStrategy {
         // -------------------------------------------------------------------------
 
         String chargeBoxId = getLastBitFromUrl(request.getURI().getPath());
-        RegistrationStatus status = chargePointHelperService.getRegistrationStatus(chargeBoxId);
-        if (status == RegistrationStatus.ACCEPTED) {
+        Optional<RegistrationStatus> status = chargePointHelperService.getRegistrationStatus(chargeBoxId);
+
+        // Allow connections, if station is in db (registration_status field from db does not matter)
+        boolean allowConnection = status.isPresent();
+
+        if (allowConnection) {
             attributes.put(AbstractWebSocketEndpoint.CHARGEBOX_ID_KEY, chargeBoxId);
         } else {
-            // send only if the station is not registered, because otherwise, after the connection it will send a boot
-            // notification message and we handle the notifications for these normal cases in service classes already.
-            notificationService.ocppStationBooted(chargeBoxId, status.value());
-
-            throw new HandshakeFailureException("ChargeBoxId '" + chargeBoxId + "' is not registered");
+            throw new HandshakeFailureException("ChargeBoxId '" + chargeBoxId + "' is not recognized.");
         }
 
         // -------------------------------------------------------------------------

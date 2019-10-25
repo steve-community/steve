@@ -22,9 +22,12 @@ import com.google.common.base.Strings;
 import de.rwth.idsg.steve.NotificationFeature;
 import de.rwth.idsg.steve.repository.dto.MailSettings;
 import lombok.extern.slf4j.Slf4j;
+import ocpp.cs._2015._10.RegistrationStatus;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.Optional;
 
 import static de.rwth.idsg.steve.NotificationFeature.OcppStationBooted;
 import static de.rwth.idsg.steve.NotificationFeature.OcppStationStatusFailure;
@@ -45,13 +48,18 @@ public class NotificationServiceImpl implements NotificationService {
     @Autowired private MailService mailService;
 
     @Override
-    public void ocppStationBooted(String chargeBoxId, String registrationStatus) {
+    public void ocppStationBooted(String chargeBoxId, Optional<RegistrationStatus> status) {
         if (isDisabled(OcppStationBooted)) {
             return;
         }
 
         String subject = format("Received boot notification from '%s'", chargeBoxId);
-        String body = format("Charging station '%s' has registration status '%s'.", chargeBoxId, registrationStatus);
+        String body;
+        if (status.isPresent()) {
+            body = format("Charging station '%s' is in database and has registration status '%s'.", chargeBoxId, status.get().value());
+        } else {
+            body = format("Charging station '%s' is NOT in database", chargeBoxId);
+        }
 
         mailService.sendAsync(subject, addTimestamp(body));
     }

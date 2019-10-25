@@ -40,6 +40,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.xml.namespace.QName;
+import java.util.Optional;
 import java.util.concurrent.ScheduledExecutorService;
 
 import static org.apache.cxf.ws.addressing.JAXWSAConstants.ADDRESSING_PROPERTIES_INBOUND;
@@ -81,7 +82,9 @@ public class MessageHeaderInterceptor extends AbstractPhaseInterceptor<Message> 
         QName opName = message.getExchange().getBindingOperationInfo().getOperationInfo().getName();
 
         if (!BOOT_OPERATION_NAME.equals(opName.getLocalPart())) {
-            if (RegistrationStatus.REJECTED == chargePointHelperService.getRegistrationStatus(chargeBoxId)) {
+            Optional<RegistrationStatus> status = chargePointHelperService.getRegistrationStatus(chargeBoxId);
+            boolean allow = status.isPresent() && status.get() != RegistrationStatus.REJECTED;
+            if (!allow) {
                 throw createAuthFault(opName);
             }
         }

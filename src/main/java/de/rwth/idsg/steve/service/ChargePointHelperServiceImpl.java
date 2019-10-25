@@ -38,7 +38,6 @@ import de.rwth.idsg.steve.web.dto.OcppJsonStatus;
 import de.rwth.idsg.steve.web.dto.Statistics;
 import lombok.extern.slf4j.Slf4j;
 import ocpp.cs._2015._10.RegistrationStatus;
-import org.jetbrains.annotations.Nullable;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -80,12 +79,12 @@ public class ChargePointHelperServiceImpl implements ChargePointHelperService {
     private final UnidentifiedIncomingObjectService unknownChargePointService = new UnidentifiedIncomingObjectService(100);
 
     @Override
-    public RegistrationStatus getRegistrationStatus(String chargeBoxId) {
+    public Optional<RegistrationStatus> getRegistrationStatus(String chargeBoxId) {
         Lock l = isRegisteredLocks.get(chargeBoxId);
         l.lock();
         try {
-            RegistrationStatus status = getRegistrationStatusInternal(chargeBoxId);
-            if (RegistrationStatus.REJECTED == status) {
+            Optional<RegistrationStatus> status = getRegistrationStatusInternal(chargeBoxId);
+            if (status.isEmpty()) {
                 unknownChargePointService.processNewUnidentified(chargeBoxId);
             }
             return status;
@@ -158,32 +157,32 @@ public class ChargePointHelperServiceImpl implements ChargePointHelperService {
     // Helpers
     // -------------------------------------------------------------------------
 
-    private RegistrationStatus getRegistrationStatusInternal(String chargeBoxId) {
+    private Optional<RegistrationStatus> getRegistrationStatusInternal(String chargeBoxId) {
         // 1. exit if already registered
         Optional<String> status = chargePointRepository.getRegistrationStatus(chargeBoxId);
         if (status.isPresent()) {
             try {
-                return RegistrationStatus.fromValue(status.get());
+                return Optional.ofNullable(RegistrationStatus.fromValue(status.get()));
             } catch (Exception e) {
                 // in cases where the database entry (string) is altered, and therefore cannot be converted to enum
                 log.error("Exception happened", e);
-                return RegistrationStatus.REJECTED;
+                return Optional.empty();
             }
         }
 
         // 2. ok, this chargeBoxId is unknown. exit if auto-register is disabled
         if (!autoRegisterUnknownStations) {
-            return RegistrationStatus.REJECTED;
+            return Optional.empty();
         }
 
         // 3. chargeBoxId is unknown and auto-register is enabled. insert chargeBoxId
         try {
             chargePointRepository.addChargePointList(Collections.singletonList(chargeBoxId));
             log.warn("Auto-registered unknown chargebox '{}'", chargeBoxId);
-            return RegistrationStatus.ACCEPTED; // default db value is accepted
+            return Optional.of(RegistrationStatus.ACCEPTED); // default db value is accepted
         } catch (Exception e) {
             log.error("Failed to auto-register unknown chargebox '" + chargeBoxId + "'", e);
-            return RegistrationStatus.REJECTED;
+            return Optional.empty();
         }
     }
 

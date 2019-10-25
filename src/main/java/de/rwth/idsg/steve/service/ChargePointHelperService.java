@@ -27,13 +27,14 @@ import ocpp.cs._2015._10.RegistrationStatus;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
  * @since 24.03.2015
  */
 public interface ChargePointHelperService {
-    RegistrationStatus getRegistrationStatus(String chargeBoxId);
+    Optional<RegistrationStatus> getRegistrationStatus(String chargeBoxId);
 
     Statistics getStats();
 

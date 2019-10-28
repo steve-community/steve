@@ -33,7 +33,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
         <jooq.version>3.12.2</jooq.version>
-        <cxf.version>3.3.3</cxf.version>
+        <cxf.version>3.3.4</cxf.version>
         <spring.version>5.2.0.RELEASE</spring.version>
         <spring.security.version>5.2.0.RELEASE</spring.security.version>
         <mysql.jdbc.version>8.0.18</mysql.jdbc.version>

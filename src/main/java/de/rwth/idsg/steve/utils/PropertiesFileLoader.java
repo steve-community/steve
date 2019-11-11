@@ -158,13 +158,19 @@ public class PropertiesFileLoader {
     /**
      * If the first character of the value of the property is a dollar sign, we deduce that this property points to a
      * system environment variable and look it up.
+     *
+     * However, if the resolved value is null, we do not use it and fallback to the initial value. This might be the
+     * case for example with passwords, which use arbitrary characters and start with a dollar sign.
      */
     private static String resolveIfSystemEnv(String value) {
         if (value == null) {
             return null;
         }
         if ("$".equals(String.valueOf(value.charAt(0)))) {
-            return System.getenv(value.substring(1));
+            String sysEnvValue = System.getenv(value.substring(1));
+            if (sysEnvValue != null) {
+                return sysEnvValue;
+            }
         }
         return value;
     }

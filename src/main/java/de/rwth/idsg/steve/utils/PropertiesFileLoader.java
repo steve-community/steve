@@ -66,16 +66,13 @@ public class PropertiesFileLoader {
 
     public String getString(String key) {
         String s = prop.getProperty(key);
-
-        if (s == null) {
-            throw new IllegalArgumentException("The property '" + key + "' is not found");
-        }
-
-        if (s.isEmpty()) {
-            throw new IllegalArgumentException("The property '" + key + "' has no value set");
-        }
+        // initial property value might be null/empty
+        checkForNullAndEmpty(key,s);
 
         s = resolveIfSystemEnv(s);
+        // check again, system env value might be null/empty
+        checkForNullAndEmpty(key,s);
+
         return trim(key, s);
     }
 
@@ -162,7 +159,10 @@ public class PropertiesFileLoader {
      * If the first character of the value of the property is a dollar sign, we deduce that this property points to a
      * system environment variable and look it up.
      */
-    private static String resolveIfSystemEnv(@NotNull String value) {
+    private static String resolveIfSystemEnv(String value) {
+        if (value == null) {
+            return null;
+        }
         if ("$".equals(String.valueOf(value.charAt(0)))) {
             return System.getenv(value.substring(1));
         }
@@ -170,10 +170,22 @@ public class PropertiesFileLoader {
     }
 
     private static String trim(String key, String value) {
+        if (value == null) {
+            return null;
+        }
         String trimmed = value.trim();
         if (!trimmed.equals(value)) {
             log.warn("The property '{}' has leading or trailing spaces which were removed!", key);
         }
         return trimmed;
+    }
+
+    private static void checkForNullAndEmpty(String key, String value) {
+        if (value == null) {
+            throw new IllegalArgumentException("The property '" + key + "' is not found");
+        }
+        if (value.isEmpty()) {
+            throw new IllegalArgumentException("The property '" + key + "' has no value set");
+        }
     }
 }

@@ -90,6 +90,14 @@ If you prefer to build and start this project via docker (you can skip the steps
 
 The web interface will be accessible at: `http://localhost:8180`
 
+# Ubuntu
+
+You'll find a tutorial how to prepare Ubuntu for SteVe here: https://github.com/RWTH-i5-IDSG/steve/wiki/Prepare-Ubuntu-VM-for-SteVe
+
+# AWS
+
+You'll find a tutorial how to setup SteVe in AWS using Lightsail here: https://github.com/RWTH-i5-IDSG/steve/wiki/Create-SteVe-Instance-in-AWS-Lightsail
+
 # First Steps
 
 After SteVe has successfully started, you can access the web interface using the configured credentials under:

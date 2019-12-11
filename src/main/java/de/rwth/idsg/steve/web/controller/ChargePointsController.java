@@ -236,6 +236,8 @@ public class ChargePointsController {
     private void setCommonAttributesForSingleAdd(Model model) {
         addCountryCodes(model);
         model.addAttribute("batchChargePointForm", new ChargePointBatchInsertForm());
+        // we don't know the protocol yet. but, a list with only "accepted" and "rejected" is a good starting point.
+        model.addAttribute("registrationStatusList", upToOcpp15RegistrationStatusList);
     }
 
     private void add(ChargePointForm form) {

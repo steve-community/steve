@@ -101,6 +101,9 @@
                         </a>
                     </td>
                 </tr>
+                <tr><td>Registration status:</td><td>
+                    <form:select path="registrationStatus" items="${registrationStatusList}"/>
+                </td></tr>
             </tbody>
         </table>
 

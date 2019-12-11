@@ -148,8 +148,7 @@ public class ChargePointsController {
     @RequestMapping(value = ADD_PATH, method = RequestMethod.GET)
     public String addGet(Model model) {
         model.addAttribute("chargePointForm", new ChargePointForm());
-        model.addAttribute("batchChargePointForm", new ChargePointBatchInsertForm());
-        addCountryCodes(model);
+        setCommonAttributesForSingleAdd(model);
         return "data-man/chargepointAdd";
     }
 
@@ -157,8 +156,7 @@ public class ChargePointsController {
     public String addSinglePost(@Valid @ModelAttribute("chargePointForm") ChargePointForm chargePointForm,
                                 BindingResult result, Model model) {
         if (result.hasErrors()) {
-            addCountryCodes(model);
-            model.addAttribute("batchChargePointForm", new ChargePointBatchInsertForm());
+            setCommonAttributesForSingleAdd(model);
             return "data-man/chargepointAdd";
         }
 
@@ -234,6 +232,11 @@ public class ChargePointsController {
     // -------------------------------------------------------------------------
     // Helpers
     // -------------------------------------------------------------------------
+
+    private void setCommonAttributesForSingleAdd(Model model) {
+        addCountryCodes(model);
+        model.addAttribute("batchChargePointForm", new ChargePointBatchInsertForm());
+    }
 
     private void add(ChargePointForm form) {
         chargePointRepository.addChargePoint(form);

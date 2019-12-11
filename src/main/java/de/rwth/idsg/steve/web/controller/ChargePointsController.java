@@ -129,14 +129,11 @@ public class ChargePointsController {
     }
 
     private List<String> getRegistrationStatusList(ChargeBoxRecord chargeBoxRecord) {
-        String ocppProtocol = chargeBoxRecord.getOcppProtocol();
-        String registrationStatusFromDB = chargeBoxRecord.getRegistrationStatus();
-
-        if (ocppProtocol == null) {
-            return Collections.singletonList(registrationStatusFromDB);
+        if (chargeBoxRecord.getOcppProtocol() == null) {
+            return upToOcpp15RegistrationStatusList;
         }
 
-        OcppProtocol protocol = OcppProtocol.fromCompositeValue(ocppProtocol);
+        OcppProtocol protocol = OcppProtocol.fromCompositeValue(chargeBoxRecord.getOcppProtocol());
         switch (protocol.getVersion()) {
             case V_12:
             case V_15:

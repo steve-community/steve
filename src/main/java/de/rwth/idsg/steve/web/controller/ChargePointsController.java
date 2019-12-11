@@ -56,6 +56,14 @@ public class ChargePointsController {
 
     protected static final String PARAMS = "params";
 
+    private static final List<String> upToOcpp15RegistrationStatusList = Arrays.stream(ocpp.cs._2012._06.RegistrationStatus.values())
+                                                                               .map(ocpp.cs._2012._06.RegistrationStatus::value)
+                                                                               .collect(Collectors.toList());
+
+    private static final List<String> ocpp16RegistrationStatusList = Arrays.stream(ocpp.cs._2015._10.RegistrationStatus.values())
+                                                                           .map(ocpp.cs._2015._10.RegistrationStatus::value)
+                                                                           .collect(Collectors.toList());
+
     // -------------------------------------------------------------------------
     // Paths
     // -------------------------------------------------------------------------
@@ -132,13 +140,9 @@ public class ChargePointsController {
         switch (protocol.getVersion()) {
             case V_12:
             case V_15:
-                return Arrays.stream(ocpp.cs._2012._06.RegistrationStatus.values())
-                             .map(ocpp.cs._2012._06.RegistrationStatus::value)
-                             .collect(Collectors.toList());
+                return upToOcpp15RegistrationStatusList;
             case V_16:
-                return Arrays.stream(ocpp.cs._2015._10.RegistrationStatus.values())
-                             .map(ocpp.cs._2015._10.RegistrationStatus::value)
-                             .collect(Collectors.toList());
+                return ocpp16RegistrationStatusList;
             default:
                 throw new IllegalArgumentException("Unknown OCPP version: " + protocol.getVersion());
         }

@@ -18,6 +18,7 @@
  */
 package de.rwth.idsg.steve.service;
 
+import com.google.common.base.Strings;
 import com.google.common.collect.Ordering;
 import de.rwth.idsg.steve.repository.OcppServerRepository;
 import de.rwth.idsg.steve.repository.TransactionRepository;
@@ -28,6 +29,7 @@ import jooq.steve.db.enums.TransactionStopEventActor;
 import jooq.steve.db.tables.records.TransactionStartRecord;
 import lombok.Builder;
 import ocpp.cs._2012._06.UnitOfMeasure;
+import org.jetbrains.annotations.Nullable;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -77,15 +79,12 @@ public class TransactionStopService {
         TransactionStartRecord nextTx = thisTxDetails.getNextTransactionStart();
         List<TransactionDetails.MeterValues> intermediateValues = thisTxDetails.getValues();
 
-        boolean valuesExist = !intermediateValues.isEmpty();
-        boolean nextTxExists = nextTx != null;
-
         // -------------------------------------------------------------------------
         // 1. intermediate meter values have priority (most accurate data)
         // -------------------------------------------------------------------------
 
-        if (valuesExist) {
-            TransactionDetails.MeterValues last = findLastMeterValue(intermediateValues);
+        TransactionDetails.MeterValues last = findLastMeterValue(intermediateValues);
+        if (last != null) {
             return TerminationValues.builder()
                                     .stopValue(floatingStringToIntString(last.getValue()))
                                     .stopTimestamp(last.getValueTimestamp())
@@ -93,10 +92,10 @@ public class TransactionStopService {
         }
 
         // -------------------------------------------------------------------------
-        // 2. meter values do not exist, use data of next tx
+        // 2. a latest energy meter value does not exist, use data of next tx
         // -------------------------------------------------------------------------
 
-        if (nextTxExists) {
+        if (nextTx != null) {
             // some charging stations do not reset the meter value counter after each transaction and
             // continue counting. in such cases, use the value of subsequent transaction's start value
             if (Integer.parseInt(nextTx.getStartValue()) > Integer.parseInt(thisTx.getStartValue())) {
@@ -123,18 +122,18 @@ public class TransactionStopService {
                                 .build();
     }
 
+    @Nullable
     private static TransactionDetails.MeterValues findLastMeterValue(List<TransactionDetails.MeterValues> values) {
-        // sort by DESCENDING timestamps and process
-        values.sort(Comparator.comparing(TransactionDetails.MeterValues::getValueTimestamp).reversed());
-
         TransactionDetails.MeterValues v =
                 values.stream()
-                      .filter(TransactionStopService::isEnergyUnit)
-                      .findFirst()
-                      // the station has not the habit of setting additional info like energy units. just return the
-                      // first meter value, which theoretically can be any measurement of any component and of any unit
-                      // that the station decided to send us. let's pray that it is an energy value.
-                      .orElseGet(() -> values.get(0));
+                      .filter(TransactionStopService::isEnergyValue)
+                      .max(Comparator.comparing(TransactionDetails.MeterValues::getValueTimestamp))
+                      .orElse(null);
+
+        // if the list of values is empty, we fall to this case, as well.
+        if (v == null) {
+            return null;
+        }
 
         // convert kWh to Wh
         if (UnitOfMeasure.K_WH.value().equals(v.getUnit())) {
@@ -159,8 +158,18 @@ public class TransactionStopService {
         return Integer.toString((int) Math.ceil(Double.parseDouble(s)));
     }
 
-    private static boolean isEnergyUnit(TransactionDetails.MeterValues v) {
-        return UnitOfMeasure.WH.value().equals(v.getUnit()) || UnitOfMeasure.K_WH.value().equals(v.getUnit());
+    private static boolean isEnergyValue(TransactionDetails.MeterValues v) {
+        // should not happen, but check it to be safe.
+        // https://github.com/RWTH-i5-IDSG/steve/issues/249
+        if (Strings.isNullOrEmpty(v.getValue())) {
+            return false;
+        }
+
+        if (v.getUnit() == null) {
+            return v.getMeasurand() == null || v.getMeasurand().startsWith("Energy.Active.Import");
+        } else {
+            return UnitOfMeasure.WH.value().equals(v.getUnit()) || UnitOfMeasure.K_WH.value().equals(v.getUnit());
+        }
     }
 
     @Builder

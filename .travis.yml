@@ -5,7 +5,7 @@ jdk: openjdk11
 # services: mysql
 
 # install dependencies
-install: mvn dependency:go-offline -B -V
+install: mvn dependency:go-offline -s .travis-maven-settings.xml -B -V
 
 before_script:
         # initalize empty database and privileges 
@@ -17,7 +17,7 @@ before_script:
 
 # start the actual build
 script: 
-        - mvn -Dmaven.javadoc.skip=true clean package -Ptest -B -V
+        - mvn -s .travis-maven-settings.xml -Dmaven.javadoc.skip=true clean package -Ptest -B -V
         - java -Djava.net.preferIPv4Stack=true -jar target/steve.jar &
         - sleep 30
         - 'grep -C 50 -e "Exception: " ~/logs/steve.log && exit 255 || true'

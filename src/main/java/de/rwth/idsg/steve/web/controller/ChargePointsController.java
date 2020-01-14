@@ -78,8 +78,11 @@ public class ChargePointsController {
     protected static final String ADD_SINGLE_PATH = "/add/single";
     protected static final String ADD_BATCH_PATH = "/add/batch";
 
-    protected static final String UNKNOWN_REMOVE_PATH = "/unknown/remove/{chargeBoxId}";
-    protected static final String UNKNOWN_ADD_PATH = "/unknown/add/{chargeBoxId}";
+    // We need the slash at the end to support chargeBoxIds with dots etc. in them
+    // Issue: https://github.com/RWTH-i5-IDSG/steve/issues/270
+    // Solution: https://stackoverflow.com/a/18378817
+    protected static final String UNKNOWN_REMOVE_PATH = "/unknown/remove/{chargeBoxId}/";
+    protected static final String UNKNOWN_ADD_PATH = "/unknown/add/{chargeBoxId}/";
 
     // -------------------------------------------------------------------------
     // HTTP methods

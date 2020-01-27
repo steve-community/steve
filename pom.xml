@@ -288,7 +288,7 @@
             <plugin>
                 <groupId>org.flywaydb</groupId>
                 <artifactId>flyway-maven-plugin</artifactId>
-                <version>6.1.4</version>
+                <version>6.2.0</version>
 
                 <!-- Must be in the same phase as Jooq -->
                 <executions>

@@ -426,9 +426,8 @@
             <url>https://repo1.maven.org/maven2</url>
         </repository>
         <repository>
-            <id>TreibhausNexus</id>
-            <name>RWTH IDSG Nexus Repository</name>
-            <url>https://treibhaus.informatik.rwth-aachen.de/nexus/repository/maven-public/</url>
+            <id>JitPack</id>
+            <url>https://jitpack.io</url>
         </repository>
     </repositories>
 
@@ -454,7 +453,7 @@
     <dependencies>
 
         <dependency>
-            <groupId>de.rwth.idsg</groupId>
+            <groupId>com.github.RWTH-i5-IDSG</groupId>
             <artifactId>ocpp-jaxb</artifactId>
             <version>0.0.1</version>
         </dependency>

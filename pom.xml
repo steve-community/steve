@@ -426,8 +426,8 @@
             <url>https://repo1.maven.org/maven2</url>
         </repository>
         <repository>
-            <id>JitPack</id>
-            <url>https://jitpack.io</url>
+            <id>github</id>
+            <url>https://maven.pkg.github.com/rwth-i5-idsg/ocpp-jaxb</url>
         </repository>
     </repositories>
 
@@ -453,7 +453,7 @@
     <dependencies>
 
         <dependency>
-            <groupId>com.github.RWTH-i5-IDSG</groupId>
+            <groupId>de.rwth.idsg</groupId>
             <artifactId>ocpp-jaxb</artifactId>
             <version>0.0.1</version>
         </dependency>

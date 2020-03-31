@@ -106,7 +106,7 @@
                     <properties>
                         <owner>${project.organization.name}</owner>
                         <year>${project.inceptionYear}</year>
-                        <currentYear>2019</currentYear>
+                        <currentYear>2020</currentYear>
                     </properties>
                     <excludes>
                         <exclude>**/*.txt</exclude>

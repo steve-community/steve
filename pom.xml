@@ -451,7 +451,11 @@
     </dependencyManagement>
 
     <dependencies>
-
+        <dependency>
+            <groupId>com.github.goekay</groupId>
+            <artifactId>CompositeJKS</artifactId>
+            <version>2.0</version>
+        </dependency>
         <dependency>
             <groupId>com.github.RWTH-i5-IDSG</groupId>
             <artifactId>ocpp-jaxb</artifactId>

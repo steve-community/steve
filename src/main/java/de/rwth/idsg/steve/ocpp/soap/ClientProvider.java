@@ -18,7 +18,7 @@
  */
 package de.rwth.idsg.steve.ocpp.soap;
 
-import de.rwth.idsg.steve.utils.ssl.SslContextBuilder;
+import com.oneandone.compositejks.SslContextBuilder;
 import org.apache.cxf.configuration.jsse.TLSClientParameters;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.frontend.ClientProxy;

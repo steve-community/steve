@@ -52,11 +52,11 @@
                     <td>${item.numberOfAttempts}</td>
                     <td data-sort-value="${item.lastAttemptTimestamp.millis}">${item.lastAttemptTimestamp}</td>
                     <td class="inlineWrapper">
-                        <form:form cssClass="inline" action="${ctxPath}/manager/ocppTags/unknown/add/${item.key}" method="post">
+                        <form:form cssClass="inline" action="${ctxPath}/manager/ocppTags/unknown/add/${item.key}/" method="post">
                             <input type="submit" class="blueSubmit" value="Add"/>
                         </form:form>
                         &nbsp;
-                        <form:form cssClass="inline" action="${ctxPath}/manager/ocppTags/unknown/remove/${item.key}" method="post">
+                        <form:form cssClass="inline" action="${ctxPath}/manager/ocppTags/unknown/remove/${item.key}/" method="post">
                             <input type="submit" class="redSubmit" value="Forget"/>
                         </form:form>
                     </td>

@@ -47,7 +47,7 @@ public class TaskController {
     // -------------------------------------------------------------------------
 
     private static final String TASK_ID_PATH = "/{taskId}";
-    private static final String TASK_DETAILS_PATH = TASK_ID_PATH + "/details/{chargeBoxId}";
+    private static final String TASK_DETAILS_PATH = TASK_ID_PATH + "/details/{chargeBoxId}/";
 
     // -------------------------------------------------------------------------
     // HTTP methods

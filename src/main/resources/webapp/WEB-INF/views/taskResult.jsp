@@ -55,7 +55,7 @@
                             ${result.value.response}
                         </c:when>
                         <c:otherwise>
-                            ${result.value.response} (<a href="${ctxPath}/manager/operations/tasks/${taskId}/details/${result.key}">Details</a>)
+                            ${result.value.response} (<a href="${ctxPath}/manager/operations/tasks/${taskId}/details/${result.key}/">Details</a>)
                         </c:otherwise>
                     </c:choose>
                 </td>

@@ -66,8 +66,8 @@ public class OcppTagsController {
     protected static final String ADD_SINGLE_PATH = "/add/single";
     protected static final String ADD_BATCH_PATH = "/add/batch";
 
-    protected static final String UNKNOWN_REMOVE_PATH = "/unknown/remove/{idTag}";
-    protected static final String UNKNOWN_ADD_PATH = "/unknown/add/{idTag}";
+    protected static final String UNKNOWN_REMOVE_PATH = "/unknown/remove/{idTag}/";
+    protected static final String UNKNOWN_ADD_PATH = "/unknown/add/{idTag}/";
 
     // -------------------------------------------------------------------------
     // HTTP methods

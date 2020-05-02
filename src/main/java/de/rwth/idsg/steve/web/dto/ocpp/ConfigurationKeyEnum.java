@@ -57,10 +57,10 @@ public enum ConfigurationKeyEnum {
     // -------------------------------------------------------------------------
 
     ClockAlignedDataInterval("ClockAlignedDataInterval", "in seconds", RW, newHashSet(V_15, V_16)),
-    MeterValuesSampledData("MeterValuesSampledData", "comma seperated list", RW, newHashSet(V_15, V_16)),
-    MeterValuesAlignedData("MeterValuesAlignedData", "comma seperated list", RW, newHashSet(V_15, V_16)),
-    StopTxnSampledData("StopTxnSampledData", "comma seperated list", RW, newHashSet(V_15, V_16)),
-    StopTxnAlignedData("StopTxnAlignedData", "comma seperated list", RW, newHashSet(V_15, V_16)),
+    MeterValuesSampledData("MeterValuesSampledData", "comma separated list", RW, newHashSet(V_15, V_16)),
+    MeterValuesAlignedData("MeterValuesAlignedData", "comma separated list", RW, newHashSet(V_15, V_16)),
+    StopTxnSampledData("StopTxnSampledData", "comma separated list", RW, newHashSet(V_15, V_16)),
+    StopTxnAlignedData("StopTxnAlignedData", "comma separated list", RW, newHashSet(V_15, V_16)),
 
     // -------------------------------------------------------------------------
     // New in OCPP 1.6
@@ -71,7 +71,7 @@ public enum ConfigurationKeyEnum {
     AuthorizationCacheEnabled("AuthorizationCacheEnabled", "boolean", RW, newHashSet(V_16)),
     // AuthorizeRemoteTxRequests Read or Read-Write is up to Charge Point implementation so set to RW for now
     AuthorizeRemoteTxRequests("AuthorizeRemoteTxRequests", "boolean", RW, newHashSet(V_16)),
-    ConnectorPhaseRotation("ConnectorPhaseRotation", "comma seperated list", RW, newHashSet(V_16)),
+    ConnectorPhaseRotation("ConnectorPhaseRotation", "comma separated list", RW, newHashSet(V_16)),
     ConnectorPhaseRotationMaxLength("ConnectorPhaseRotationMaxLength", "integer", R, newHashSet(V_16)),
     GetConfigurationMaxKeys("GetConfigurationMaxKeys", "integer", R, newHashSet(V_16)),
     LocalAuthorizeOffline("LocalAuthorizeOffline", "boolean", RW, newHashSet(V_16)),
@@ -85,7 +85,7 @@ public enum ConfigurationKeyEnum {
     StopTransactionOnInvalidId("StopTransactionOnInvalidId", "boolean", RW, newHashSet(V_16)),
     StopTxnAlignedDataMaxLength("StopTxnAlignedDataMaxLength", "integer", R, newHashSet(V_16)),
     StopTxnSampledDataMaxLength("StopTxnSampledDataMaxLength", "integer", R, newHashSet(V_16)),
-    SupportedFeatureProfiles("SupportedFeatureProfiles", "comma seperated list", R, newHashSet(V_16)),
+    SupportedFeatureProfiles("SupportedFeatureProfiles", "comma separated list", R, newHashSet(V_16)),
     SupportedFeatureProfilesMaxLength("SupportedFeatureProfilesMaxLength", "integer", R, newHashSet(V_16)),
     TransactionMessageAttempts("TransactionMessageAttempts", "in times", RW, newHashSet(V_16)),
     TransactionMessageRetryInterval("TransactionMessageRetryInterval", "in seconds", RW, newHashSet(V_16)),
@@ -95,14 +95,14 @@ public enum ConfigurationKeyEnum {
     LocalAuthListMaxLength("LocalAuthListMaxLength", "integer", R, newHashSet(V_16)),
     SendLocalListMaxLength("SendLocalListMaxLength", "integer", R, newHashSet(V_16)),
     ReserveConnectorZeroSupported("ReserveConnectorZeroSupported", "boolean", R, newHashSet(V_16)),
-    SupportedFileTransferProtocols("SupportedFileTransferProtocols", "comma seperated list", R, newHashSet(V_16)),
+    SupportedFileTransferProtocols("SupportedFileTransferProtocols", "comma separated list", R, newHashSet(V_16)),
 
     // -------------------------------------------------------------------------
     // New in OCPP 1.6 for Smart Charging profile
     // -------------------------------------------------------------------------
 
      ChargeProfileMaxStackLevel("ChargeProfileMaxStackLevel", "integer", R, newHashSet(V_16)),
-     ChargingScheduleAllowedChargingRateUnit("ChargingScheduleAllowedChargingRateUnit", "comma seperated list", R, newHashSet(V_16)),
+     ChargingScheduleAllowedChargingRateUnit("ChargingScheduleAllowedChargingRateUnit", "comma separated list", R, newHashSet(V_16)),
      ChargingScheduleMaxPeriods("ChargingScheduleMaxPeriods", "integer", R, newHashSet(V_16)),
      ConnectorSwitch3to1PhaseSupported("ConnectorSwitch3to1PhaseSupported", "boolean", R, newHashSet(V_16)),
      MaxChargingProfilesInstalled("MaxChargingProfilesInstalled", "integer", R, newHashSet(V_16));

@@ -95,6 +95,7 @@ public enum ConfigurationKeyEnum {
     LocalAuthListMaxLength("LocalAuthListMaxLength", "integer", R, newHashSet(V_16)),
     SendLocalListMaxLength("SendLocalListMaxLength", "integer", R, newHashSet(V_16)),
     ReserveConnectorZeroSupported("ReserveConnectorZeroSupported", "boolean", R, newHashSet(V_16)),
+    SupportedFileTransferProtocols("SupportedFileTransferProtocols", "comma seperated list", R, newHashSet(V_16)),
 
     // -------------------------------------------------------------------------
     // New in OCPP 1.6 for Smart Charging profile

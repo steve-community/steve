@@ -42,70 +42,70 @@ public enum ConfigurationKeyEnum {
     // From OCPP 1.2
     // -------------------------------------------------------------------------
 
-    HeartBeatInterval("HeartBeatInterval", "in seconds", RW, newHashSet(V_12, V_15)),
-    ConnectionTimeOut("ConnectionTimeOut", "in seconds", RW, newHashSet(V_12, V_15, V_16)),
-    ProximityContactRetries("ProximityContactRetries", "in times", RW, newHashSet(V_12, V_15)),
-    ProximityLockRetries("ProximityLockRetries", "in times", RW, newHashSet(V_12, V_15)),
-    ResetRetries("ResetRetries", "in times", RW, newHashSet(V_12, V_15, V_16)),
-    BlinkRepeat("BlinkRepeat", "in times", RW, newHashSet(V_12, V_15, V_16)),
-    LightIntensity("LightIntensity", "in %", RW, newHashSet(V_12, V_15, V_16)),
-    ChargePointId("ChargePointId", "string", RW, newHashSet(V_12, V_15)),
-    MeterValueSampleInterval("MeterValueSampleInterval", "in seconds", RW, newHashSet(V_12, V_15, V_16)),
+    HeartBeatInterval("in seconds", RW, newHashSet(V_12, V_15)),
+    ConnectionTimeOut("in seconds", RW, newHashSet(V_12, V_15, V_16)),
+    ProximityContactRetries("in times", RW, newHashSet(V_12, V_15)),
+    ProximityLockRetries("in times", RW, newHashSet(V_12, V_15)),
+    ResetRetries("in times", RW, newHashSet(V_12, V_15, V_16)),
+    BlinkRepeat("in times", RW, newHashSet(V_12, V_15, V_16)),
+    LightIntensity("in %", RW, newHashSet(V_12, V_15, V_16)),
+    ChargePointId("string", RW, newHashSet(V_12, V_15)),
+    MeterValueSampleInterval("in seconds", RW, newHashSet(V_12, V_15, V_16)),
 
     // -------------------------------------------------------------------------
     // New in OCPP 1.5
     // -------------------------------------------------------------------------
 
-    ClockAlignedDataInterval("ClockAlignedDataInterval", "in seconds", RW, newHashSet(V_15, V_16)),
-    MeterValuesSampledData("MeterValuesSampledData", "comma separated list", RW, newHashSet(V_15, V_16)),
-    MeterValuesAlignedData("MeterValuesAlignedData", "comma separated list", RW, newHashSet(V_15, V_16)),
-    StopTxnSampledData("StopTxnSampledData", "comma separated list", RW, newHashSet(V_15, V_16)),
-    StopTxnAlignedData("StopTxnAlignedData", "comma separated list", RW, newHashSet(V_15, V_16)),
+    ClockAlignedDataInterval("in seconds", RW, newHashSet(V_15, V_16)),
+    MeterValuesSampledData("comma separated list", RW, newHashSet(V_15, V_16)),
+    MeterValuesAlignedData("comma separated list", RW, newHashSet(V_15, V_16)),
+    StopTxnSampledData("comma separated list", RW, newHashSet(V_15, V_16)),
+    StopTxnAlignedData("comma separated list", RW, newHashSet(V_15, V_16)),
 
     // -------------------------------------------------------------------------
     // New in OCPP 1.6
     // -------------------------------------------------------------------------
 
-    HeartbeatInterval("HeartbeatInterval", "in seconds", RW, newHashSet(V_16)),
-    AllowOfflineTxForUnknownId("AllowOfflineTxForUnknownId", "boolean", RW, newHashSet(V_16)),
-    AuthorizationCacheEnabled("AuthorizationCacheEnabled", "boolean", RW, newHashSet(V_16)),
+    HeartbeatInterval("in seconds", RW, newHashSet(V_16)),
+    AllowOfflineTxForUnknownId("boolean", RW, newHashSet(V_16)),
+    AuthorizationCacheEnabled("boolean", RW, newHashSet(V_16)),
     // AuthorizeRemoteTxRequests Read or Read-Write is up to Charge Point implementation so set to RW for now
-    AuthorizeRemoteTxRequests("AuthorizeRemoteTxRequests", "boolean", RW, newHashSet(V_16)),
-    ConnectorPhaseRotation("ConnectorPhaseRotation", "comma separated list", RW, newHashSet(V_16)),
-    ConnectorPhaseRotationMaxLength("ConnectorPhaseRotationMaxLength", "integer", R, newHashSet(V_16)),
-    GetConfigurationMaxKeys("GetConfigurationMaxKeys", "integer", R, newHashSet(V_16)),
-    LocalAuthorizeOffline("LocalAuthorizeOffline", "boolean", RW, newHashSet(V_16)),
-    LocalPreAuthorize("LocalPreAuthorize", "boolean", RW, newHashSet(V_16)),
-    MaxEnergyOnInvalidId("MaxEnergyOnInvalidId", "in Wh", RW, newHashSet(V_16)),
-    MeterValuesAlignedDataMaxLength("MeterValuesAlignedDataMaxLength", "integer", R, newHashSet(V_16)),
-    MeterValuesSampledDataMaxLength("MeterValuesSampledDataMaxLength", "integer", R, newHashSet(V_16)),
-    MinimumStatusDuration("MinimumStatusDuration", "in seconds", RW, newHashSet(V_16)),
-    NumberOfConnectors("NumberOfConnectors", "integer", R, newHashSet(V_16)),
-    StopTransactionOnEVSideDisconnect("StopTransactionOnEVSideDisconnect", "boolean", RW, newHashSet(V_16)),
-    StopTransactionOnInvalidId("StopTransactionOnInvalidId", "boolean", RW, newHashSet(V_16)),
-    StopTxnAlignedDataMaxLength("StopTxnAlignedDataMaxLength", "integer", R, newHashSet(V_16)),
-    StopTxnSampledDataMaxLength("StopTxnSampledDataMaxLength", "integer", R, newHashSet(V_16)),
-    SupportedFeatureProfiles("SupportedFeatureProfiles", "comma separated list", R, newHashSet(V_16)),
-    SupportedFeatureProfilesMaxLength("SupportedFeatureProfilesMaxLength", "integer", R, newHashSet(V_16)),
-    TransactionMessageAttempts("TransactionMessageAttempts", "in times", RW, newHashSet(V_16)),
-    TransactionMessageRetryInterval("TransactionMessageRetryInterval", "in seconds", RW, newHashSet(V_16)),
-    UnlockConnectorOnEVSideDisconnect("UnlockConnectorOnEVSideDisconnect", "boolean", RW, newHashSet(V_16)),
-    WebSocketPingInterval("WebSocketPingInterval", "in seconds", RW, newHashSet(V_16)),
-    LocalAuthListEnabled("LocalAuthListEnabled", "boolean", RW, newHashSet(V_16)),
-    LocalAuthListMaxLength("LocalAuthListMaxLength", "integer", R, newHashSet(V_16)),
-    SendLocalListMaxLength("SendLocalListMaxLength", "integer", R, newHashSet(V_16)),
-    ReserveConnectorZeroSupported("ReserveConnectorZeroSupported", "boolean", R, newHashSet(V_16)),
-    SupportedFileTransferProtocols("SupportedFileTransferProtocols", "comma separated list", R, newHashSet(V_16)),
+    AuthorizeRemoteTxRequests("boolean", RW, newHashSet(V_16)),
+    ConnectorPhaseRotation("comma separated list", RW, newHashSet(V_16)),
+    ConnectorPhaseRotationMaxLength("integer", R, newHashSet(V_16)),
+    GetConfigurationMaxKeys("integer", R, newHashSet(V_16)),
+    LocalAuthorizeOffline("boolean", RW, newHashSet(V_16)),
+    LocalPreAuthorize("boolean", RW, newHashSet(V_16)),
+    MaxEnergyOnInvalidId("in Wh", RW, newHashSet(V_16)),
+    MeterValuesAlignedDataMaxLength("integer", R, newHashSet(V_16)),
+    MeterValuesSampledDataMaxLength("integer", R, newHashSet(V_16)),
+    MinimumStatusDuration("in seconds", RW, newHashSet(V_16)),
+    NumberOfConnectors("integer", R, newHashSet(V_16)),
+    StopTransactionOnEVSideDisconnect("boolean", RW, newHashSet(V_16)),
+    StopTransactionOnInvalidId("boolean", RW, newHashSet(V_16)),
+    StopTxnAlignedDataMaxLength("integer", R, newHashSet(V_16)),
+    StopTxnSampledDataMaxLength("integer", R, newHashSet(V_16)),
+    SupportedFeatureProfiles("comma separated list", R, newHashSet(V_16)),
+    SupportedFeatureProfilesMaxLength("integer", R, newHashSet(V_16)),
+    TransactionMessageAttempts("in times", RW, newHashSet(V_16)),
+    TransactionMessageRetryInterval("in seconds", RW, newHashSet(V_16)),
+    UnlockConnectorOnEVSideDisconnect("boolean", RW, newHashSet(V_16)),
+    WebSocketPingInterval("in seconds", RW, newHashSet(V_16)),
+    LocalAuthListEnabled("boolean", RW, newHashSet(V_16)),
+    LocalAuthListMaxLength("integer", R, newHashSet(V_16)),
+    SendLocalListMaxLength("integer", R, newHashSet(V_16)),
+    ReserveConnectorZeroSupported("boolean", R, newHashSet(V_16)),
+    SupportedFileTransferProtocols("comma separated list", R, newHashSet(V_16)),
 
     // -------------------------------------------------------------------------
     // New in OCPP 1.6 for Smart Charging profile
     // -------------------------------------------------------------------------
 
-     ChargeProfileMaxStackLevel("ChargeProfileMaxStackLevel", "integer", R, newHashSet(V_16)),
-     ChargingScheduleAllowedChargingRateUnit("ChargingScheduleAllowedChargingRateUnit", "comma separated list", R, newHashSet(V_16)),
-     ChargingScheduleMaxPeriods("ChargingScheduleMaxPeriods", "integer", R, newHashSet(V_16)),
-     ConnectorSwitch3to1PhaseSupported("ConnectorSwitch3to1PhaseSupported", "boolean", R, newHashSet(V_16)),
-     MaxChargingProfilesInstalled("MaxChargingProfilesInstalled", "integer", R, newHashSet(V_16));
+    ChargeProfileMaxStackLevel("integer", R, newHashSet(V_16)),
+    ChargingScheduleAllowedChargingRateUnit("comma separated list", R, newHashSet(V_16)),
+    ChargingScheduleMaxPeriods("integer", R, newHashSet(V_16)),
+    ConnectorSwitch3to1PhaseSupported("boolean", R, newHashSet(V_16)),
+    MaxChargingProfilesInstalled("integer", R, newHashSet(V_16));
 
     private final String value;
     private final String text;
@@ -119,9 +119,10 @@ public enum ConfigurationKeyEnum {
     public static final Map<String, String> OCPP_16_MAP_R = asMap(OcppVersion.V_16, R);
     public static final Map<String, String> OCPP_16_MAP_RW = asMap(OcppVersion.V_16, RW);
 
-    ConfigurationKeyEnum(String value, String comment, ConfigurationKeyReadWriteEnum rw, Set<OcppVersion> versions) {
-        this.value = value;
-        this.text = String.format("%s (%s)", value, comment);
+
+    ConfigurationKeyEnum(String valueType, ConfigurationKeyReadWriteEnum rw, Set<OcppVersion> versions) {
+        this.value = this.name();
+        this.text = String.format("%s (%s)", value, valueType);
         this.rw = rw;
         this.versions = versions;
     }

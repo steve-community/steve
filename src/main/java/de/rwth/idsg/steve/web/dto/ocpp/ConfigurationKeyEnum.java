@@ -19,10 +19,9 @@
 package de.rwth.idsg.steve.web.dto.ocpp;
 
 import de.rwth.idsg.steve.ocpp.OcppVersion;
-
-import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 
 import static com.google.common.collect.Sets.newHashSet;
 import static de.rwth.idsg.steve.ocpp.OcppVersion.V_12;
@@ -141,7 +140,7 @@ public enum ConfigurationKeyEnum {
     }
 
     private static Map<String, String> asMap(OcppVersion version, ConfigurationKeyReadWriteEnum rw) {
-        Map<String, String> map = new LinkedHashMap<>();
+        Map<String, String> map = new TreeMap<>();
         for (ConfigurationKeyEnum c : ConfigurationKeyEnum.values()) {
             if (c.versions.contains(version) && c.rw == rw) {
                 map.put(c.value, c.text);

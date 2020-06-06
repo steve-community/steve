@@ -28,7 +28,7 @@ https://github.com/RWTH-i5-IDSG/steve/wiki/Charging-Station-Compatibility
 SteVe requires 
 * JDK 11 (both Oracle JDK and OpenJDK are supported)
 * Maven 
-* At least MySQL 5.7.7 (MariaDB 10.2.1 or later works as well) as database (**Note: MySQL 8.x is not supported yet**)
+* At least MySQL 5.7.7 (MariaDB 10.2.1 or later works as well) as database
 
 to build and run. 
 
@@ -38,17 +38,30 @@ SteVe is designed to run standalone, a java servlet container / web server (e.g.
 
 1. Database preparation:
 
-    Make sure MySQL is reachable via TCP (e.g., remove `skip-networking` from `my.cnf`).
-    The following MySQL statements can be used as database initialization (adjust database name and credentials according to your setup):
-
-    ```
-    CREATE DATABASE stevedb CHARACTER SET utf8 COLLATE utf8_unicode_ci;
-    GRANT ALL PRIVILEGES ON stevedb.* TO 'steve'@'localhost' IDENTIFIED BY 'changeme';
-    GRANT SELECT ON mysql.proc TO 'steve'@'localhost' IDENTIFIED BY 'changeme';
-    ```
-    
     **Important**: Make sure that the time zone of the MySQL server is the same as [the time zone of SteVe](src/main/java/de/rwth/idsg/steve/SteveConfiguration.java#L46). Since `UTC` is strongly recommended by OCPP, it is the default in SteVe and you should set it in MySQL, accordingly.
 
+    Make sure MySQL is reachable via TCP (e.g., remove `skip-networking` from `my.cnf`).
+    The following MySQL statements can be used as database initialization (adjust database name and credentials according to your setup).
+    
+    * For MySQL 5.7:
+        ```
+        CREATE DATABASE stevedb CHARACTER SET utf8 COLLATE utf8_unicode_ci;
+        GRANT ALL PRIVILEGES ON stevedb.* TO 'steve'@'localhost' IDENTIFIED BY 'changeme';
+        GRANT SELECT ON mysql.proc TO 'steve'@'localhost' IDENTIFIED BY 'changeme';
+        ```
+    
+    * For MySQL 8:
+        ```
+        CREATE DATABASE stevedb CHARACTER SET utf8 COLLATE utf8_unicode_ci;
+        CREATE USER 'steve'@'localhost' IDENTIFIED BY 'changeme';
+        GRANT ALL PRIVILEGES ON stevedb.* TO 'steve'@'localhost';
+        GRANT SUPER ON *.* TO 'steve'@'localhost';
+        ```
+        Note: The statement `GRANT SUPER [...]` is only necessary to execute some of the previous migration files and is only needed for the initial database setup. Afterwards, you can remove this privilage by executing 
+        ```
+        REVOKE SUPER ON *.* FROM 'steve'@'localhost';
+        ```
+        
 2. Download and extract tarball:
 
     You can download and extract the SteVe releases using the following commands (replace X.X.X with the desired version number):

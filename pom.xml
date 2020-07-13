@@ -36,7 +36,7 @@
         <cxf.version>3.3.7</cxf.version>
         <spring.version>5.2.7.RELEASE</spring.version>
         <spring.security.version>5.3.3.RELEASE</spring.security.version>
-        <mysql.jdbc.version>8.0.20</mysql.jdbc.version>
+        <mysql.jdbc.version>8.0.21</mysql.jdbc.version>
         <jetty.version>9.4.19.v20190610</jetty.version>
         <lombok.version>1.18.12</lombok.version>
         <jackson.version>2.11.1</jackson.version>

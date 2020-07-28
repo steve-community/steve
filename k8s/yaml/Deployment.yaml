@@ -26,6 +26,8 @@ spec:
           value: ""
         - name: DB_PASSWORD
           value: ""
+        - name: DB_DATABASE
+          value: ""
         - name: ADMIN_USERNAME
           value: ""
         - name: ADMIN_PASSWORD

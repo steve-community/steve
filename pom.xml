@@ -39,7 +39,7 @@
         <mysql.jdbc.version>8.0.21</mysql.jdbc.version>
         <jetty.version>9.4.19.v20190610</jetty.version>
         <lombok.version>1.18.12</lombok.version>
-        <jackson.version>2.11.1</jackson.version>
+        <jackson.version>2.11.2</jackson.version>
 
         <!-- In Mysql: schema == database (http://dev.mysql.com/doc/refman/5.6/en/glossary.html#glos_schema) -->
         <jdbcUrl>jdbc:mysql://${db.ip}:${db.port}/${db.schema}?useSSL=true&amp;serverTimezone=UTC</jdbcUrl>

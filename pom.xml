@@ -64,6 +64,13 @@
             </properties>
         </profile>
         <profile>
+            <id>kubernetes</id>
+            <properties>
+                <envName>kubernetes</envName>
+                <skipTests>true</skipTests>
+            </properties>
+        </profile>
+        <profile>
             <id>dev</id>
             <properties>
                 <envName>dev</envName>

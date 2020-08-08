@@ -1,0 +1,34 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: steve-deployment
+  namespace: steve
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: steve-deployment
+  template:
+    metadata:
+      labels:
+        app: steve-deployment
+    spec:
+      containers:
+      - name: steve
+        image: "### YOUR BUILT IMAGE HERE ###"
+        imagePullPolicy: Always
+        env:
+        - name: DB_HOST
+          value: ""
+        - name: DB_PORT
+          value: ""
+        - name: DB_USERNAME
+          value: ""
+        - name: DB_PASSWORD
+          value: ""
+        - name: DB_DATABASE
+          value: ""
+        - name: ADMIN_USERNAME
+          value: ""
+        - name: ADMIN_PASSWORD
+          value: ""

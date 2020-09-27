@@ -141,7 +141,7 @@ The default port number is 8080.
 
 2. The charge points must be configured to communicate with following addresses. Depending on the OCPP version of the charge point, SteVe will automatically route messages to the version-specific implementation.
     - SOAP: `http://<your-server-ip>:<port>/steve/services/CentralSystemService`
-    - WebSocket/JSON: `ws://<your-server-ip>:<port>/steve/websocket/CentralSystemService/<chargeBoxId>`
+    - WebSocket/JSON: `ws://<your-server-ip>:<port>/steve/websocket/CentralSystemService`
 
 
 As soon as a heartbeat is received, you should see the status of the charge point in the SteVe Dashboard.

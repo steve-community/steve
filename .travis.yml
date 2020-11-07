@@ -1,10 +1,6 @@
 sudo: false
 language: java
 dist: xenial
-jdk:
-  - openjdk11
-  - openjdk13
-  - openjdk15
 
 # install dependencies
 install: mvn dependency:go-offline -s .travis-maven-settings.xml -B -V
@@ -28,9 +24,14 @@ script:
 
 jobs:
   include:
-    - services:
-        - mysql
-    - addons:
+    - jdk: openjdk11
+      services: mysql
+    - jdk: openjdk13
+      services: mysql
+    - jdk: openjdk15
+      services: mysql
+    - jdk: openjdk11
+      addons:
         mariadb: "10.3"
   allow_failures:
     - addons:

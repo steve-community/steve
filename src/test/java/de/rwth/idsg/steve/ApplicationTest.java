@@ -64,7 +64,9 @@ public class ApplicationTest {
 
     @AfterClass
     public static void destroy() throws Exception {
-        app.stop();
+        if (app != null) {
+            app.stop();
+        }
         __DatabasePreparer__.cleanUp();
     }
 

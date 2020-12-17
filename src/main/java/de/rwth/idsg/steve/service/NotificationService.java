@@ -20,7 +20,9 @@ package de.rwth.idsg.steve.service;
 
 import com.google.common.base.Strings;
 import de.rwth.idsg.steve.NotificationFeature;
+import de.rwth.idsg.steve.repository.dto.InsertTransactionParams;
 import de.rwth.idsg.steve.repository.dto.MailSettings;
+import de.rwth.idsg.steve.repository.dto.UpdateTransactionParams;
 import lombok.extern.slf4j.Slf4j;
 import ocpp.cs._2015._10.RegistrationStatus;
 import org.joda.time.DateTime;
@@ -94,29 +96,56 @@ public class NotificationService {
         mailService.sendAsync(subject, addTimestamp(body));
     }
 
-    public void ocppTransactionStarted(String chargeBoxId, int transactionId, int connectorId) {
+    public void ocppTransactionStarted(int transactionId, InsertTransactionParams params) {
         if (isDisabled(OcppTransactionStarted)) {
             return;
         }
 
-        String subject = format("Transaction '%s' has started on charging station '%s' on connector '%s'", transactionId, chargeBoxId, connectorId);
+        String subject = format("Transaction '%s' has started on charging station '%s' on connector '%s'", transactionId, params.getChargeBoxId(), params.getConnectorId());
 
-        mailService.sendAsync(subject, addTimestamp(""));
+        mailService.sendAsync(subject, addTimestamp(createContent(params)));
     }
 
-    public void ocppTransactionEnded(String chargeBoxId, int transactionId) {
+    public void ocppTransactionEnded(UpdateTransactionParams params) {
        if (isDisabled(OcppTransactionEnded)) {
             return;
         }
 
-        String subject = format("Transaction '%s' has ended on charging station '%s'", transactionId, chargeBoxId);
+        String subject = format("Transaction '%s' has ended on charging station '%s'", params.getTransactionId(), params.getChargeBoxId());
 
-        mailService.sendAsync(subject, addTimestamp(""));
+        mailService.sendAsync(subject, addTimestamp(createContent(params)));
     }
 
     // -------------------------------------------------------------------------
     // Private helpers
     // -------------------------------------------------------------------------
+
+
+    private static String createContent(InsertTransactionParams params) {
+        StringBuilder sb = new StringBuilder("Details:").append(System.lineSeparator())
+            .append("- chargeBoxId: ").append(params.getChargeBoxId()).append(System.lineSeparator())
+            .append("- connectorId: ").append(params.getConnectorId()).append(System.lineSeparator())
+            .append("- idTag: ").append(params.getIdTag()).append(System.lineSeparator())
+            .append("- startTimestamp: ").append(params.getStartTimestamp()).append(System.lineSeparator())
+            .append("- startMeterValue: ").append(params.getStartMeterValue());
+
+        if (params.isSetReservationId()) {
+            sb.append(System.lineSeparator()).append("- reservationId: ").append(params.getReservationId());
+        }
+
+        return sb.toString();
+    }
+
+    private static String createContent(UpdateTransactionParams params) {
+        return new StringBuilder("Details:").append(System.lineSeparator())
+            .append("- chargeBoxId: ").append(params.getChargeBoxId()).append(System.lineSeparator())
+            .append("- transactionId: ").append(params.getTransactionId()).append(System.lineSeparator())
+            .append("- stopTimestamp: ").append(params.getStopTimestamp()).append(System.lineSeparator())
+            .append("- stopMeterValue: ").append(params.getStopMeterValue()).append(System.lineSeparator())
+            .append("- stopReason: ").append(params.getStopReason())
+            .toString();
+    }
+
 
     private boolean isDisabled(NotificationFeature f) {
         MailSettings settings = mailService.getSettings();
@@ -130,7 +159,7 @@ public class NotificationService {
 
     private static String addTimestamp(String body) {
         String eventTs = "Timestamp of the event: " + DateTime.now().toString();
-        String newLine = "\r\n\r\n";
+        String newLine = System.lineSeparator() + System.lineSeparator();
 
         if (Strings.isNullOrEmpty(body)) {
             return eventTs;

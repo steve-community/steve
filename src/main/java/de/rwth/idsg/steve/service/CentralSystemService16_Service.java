@@ -184,7 +184,7 @@ public class CentralSystemService16_Service {
 
         int transactionId = ocppServerRepository.insertTransaction(params);
 
-        notificationService.ocppTransactionStarted(chargeBoxIdentity, transactionId, parameters.getConnectorId());
+        notificationService.ocppTransactionStarted(transactionId, params);
 
         return new StartTransactionResponse()
                 .withIdTagInfo(info)
@@ -217,7 +217,7 @@ public class CentralSystemService16_Service {
 
         ocppServerRepository.insertMeterValues(chargeBoxIdentity, parameters.getTransactionData(), transactionId);
 
-        notificationService.ocppTransactionEnded(chargeBoxIdentity, transactionId);
+        notificationService.ocppTransactionEnded(params);
 
         return new StopTransactionResponse().withIdTagInfo(idTagInfo);
     }

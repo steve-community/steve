@@ -18,6 +18,10 @@ WORKDIR /code
 
 VOLUME ["/code"]
 
+# Copy pom.xml and resolve project dependencies
+COPY pom.xml /code/pom.xml
+RUN mvn -B dependency:resolve-plugins dependency:resolve
+
 # Copy the application's code
 COPY . /code
 
@@ -26,4 +30,3 @@ COPY . /code
 CMD dockerize -wait tcp://mariadb:3306 -timeout 60s && \
 	mvn clean package -Pdocker -Djdk.tls.client.protocols="TLSv1,TLSv1.1,TLSv1.2" && \
 	java -jar target/steve.jar
-

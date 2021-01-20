@@ -33,9 +33,9 @@ jobs:
     - jdk: openjdk11
       addons:
         mariadb: "10.3"
-  allow_failures:
-    - addons:
-        mariadb: "10.3"
+        apt:
+          packages:
+            - elinks
 
 addons:
   apt:

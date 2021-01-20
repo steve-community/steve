@@ -37,7 +37,7 @@
         <spring.version>5.3.2</spring.version>
         <spring.security.version>5.4.2</spring.security.version>
         <mysql.jdbc.version>8.0.22</mysql.jdbc.version>
-        <jetty.version>9.4.35.v20201120</jetty.version>
+        <jetty.version>9.4.36.v20210114</jetty.version>
         <lombok.version>1.18.16</lombok.version>
         <jackson.version>2.12.0</jackson.version>
 

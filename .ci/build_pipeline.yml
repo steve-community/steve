@@ -2,7 +2,7 @@ trigger:
   - master
 
 pool:
-  vmImage: 'ubuntu-latest'
+  vmImage: 'ubuntu-20.04'
 
 steps:
 
@@ -12,7 +12,7 @@ steps:
   - task: Maven@3
     inputs:
       mavenPomFile: 'pom.xml'
-      goals: 'clean deploy -Drevision=1-SNAPSHOT flatten:flatten'
+      goals: 'clean install -Drevision=1-SNAPSHOT flatten:flatten'
       publishJUnitResults: false
       javaHomeOption: 'JDKVersion'
       jdkVersionOption: '1.11'

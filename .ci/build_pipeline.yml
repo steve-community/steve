@@ -1,0 +1,22 @@
+trigger:
+  - master
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+steps:
+
+  - task: MavenAuthenticate@0
+    inputs:
+      mavenServiceConnections: 'Parkl Public, Parkl Releases, parkl_snapshots'
+  - task: Maven@3
+    inputs:
+      mavenPomFile: 'pom.xml'
+      goals: 'clean deploy -Drevision=1-SNAPSHOT flatten:flatten'
+      publishJUnitResults: false
+      javaHomeOption: 'JDKVersion'
+      jdkVersionOption: '1.11'
+      mavenVersionOption: 'Default'
+      mavenAuthenticateFeed: false
+      effectivePomSkip: false
+      sonarQubeRunAnalysis: false

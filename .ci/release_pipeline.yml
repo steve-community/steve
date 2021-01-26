@@ -1,0 +1,57 @@
+variables:
+  major: 1
+  minor: 0
+  master: $[eq(variables['Build.SourceBranch'], 'refs/heads/master')]
+
+pr: none
+
+trigger:
+  branches:
+    exclude:
+      - '*'
+
+pool:
+  vmImage: 'ubuntu-20.04'
+
+stages:
+  - stage:
+    displayName: Build Version Number
+    jobs:
+      - job: Build_Version_Number_Master
+        condition: eq(variables.master, true)
+        variables:
+          patch: $[counter(variables['minor'], 0)]
+        steps:
+          - bash: |
+              echo "##vso[build.updatebuildnumber]$(major).$(minor).$(patch)"
+            name: SetBuildName
+  - stage:
+    displayName: Build SteVe Pluggable
+    jobs:
+      - job: Build
+        displayName:
+        steps:
+          - task: MavenAuthenticate@0
+            inputs:
+              mavenServiceConnections: 'Parkl Public, Parkl Releases, parkl_snapshots'
+          - task: Maven@3
+            inputs:
+              mavenPomFile: 'pom.xml'
+              goals: 'clean deploy flatten:flatten -Drevision=$(Build.BuildNumber) -DskipTests=true'
+              publishJUnitResults: false
+              javaHomeOption: 'JDKVersion'
+              jdkVersionOption: '1.11'
+              mavenVersionOption: 'Default'
+              mavenAuthenticateFeed: false
+              effectivePomSkip: false
+              sonarQubeRunAnalysis: false
+          - task: GitHubRelease@1
+            condition: eq(variables.master, true)
+            inputs:
+              gitHubConnection: 'parklci'
+              repositoryName: '$(Build.Repository.Name)'
+              action: 'create'
+              target: '$(Build.SourceVersion)'
+              tagSource: 'userSpecifiedTag'
+              tag: '$(Build.BuildNumber)'
+              addChangeLog: false

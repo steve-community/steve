@@ -25,6 +25,8 @@ import java.util.List;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
+import static ocpp.cs._2015._10.AuthorizationStatus.*;
+
 /**
  * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
  * @since 03.01.2015
@@ -33,10 +35,13 @@ import java.util.stream.Collectors;
 @Service
 public class OcppTagServiceImpl implements OcppTagService {
 
-	@Autowired private SettingsService settingsService;
-	@Autowired private OcppIdTagService tagService;
-    @Autowired private TransactionService transactionService;
-   @Autowired
+    @Autowired
+    private SettingsService settingsService;
+    @Autowired
+    private OcppIdTagService tagService;
+    @Autowired
+    private TransactionService transactionService;
+    @Autowired
     private EmobilityServiceProviderFacade proxyServerFacade;
     @Autowired
     private OcppSpecialConfiguration config;
@@ -44,14 +49,14 @@ public class OcppTagServiceImpl implements OcppTagService {
     private final UnidentifiedIncomingObjectService invalidOcppTagService = new UnidentifiedIncomingObjectService(1000);
 
     public List<AuthorizationData> getAuthDataOfAllTags() {
-        AuthorisationDataMapper mapper=new AuthorisationDataMapper();
+        AuthorisationDataMapper mapper = new AuthorisationDataMapper();
 
         return tagService.getRecords().stream()
                 .map(mapper::map).collect(Collectors.toList());
     }
 
     public List<AuthorizationData> getAuthData(List<String> idTagList) {
-        AuthorisationDataMapper mapper=new AuthorisationDataMapper();
+        AuthorisationDataMapper mapper = new AuthorisationDataMapper();
 
         return tagService.getRecords(idTagList).stream()
                 .map(mapper::map).collect(Collectors.toList());
@@ -82,7 +87,6 @@ public class OcppTagServiceImpl implements OcppTagService {
             case INVALID:
                 invalidOcppTagService.processNewUnidentified(idTag);
                 return new IdTagInfo().withStatus(status);
-
             case BLOCKED:
             case EXPIRED:
             case CONCURRENT_TX:
@@ -98,17 +102,12 @@ public class OcppTagServiceImpl implements OcppTagService {
     @Nullable
     public IdTagInfo getIdTagInfo(@Nullable String idTag, boolean isStartTransactionReqContext, String askingChargeBoxId, Supplier<IdTagInfo> supplierWhenException) {
         try {
-            return getIdTagInfo(idTag, isStartTransactionReqContext,askingChargeBoxId);
+            return getIdTagInfo(idTag, isStartTransactionReqContext, askingChargeBoxId);
         } catch (Exception e) {
             log.error("Exception occurred", e);
             return supplierWhenException.get();
         }
     }
-
-
-    // -------------------------------------------------------------------------
-    // Private helpers
-    // -------------------------------------------------------------------------
 
     /**
      * If the database contains an actual expiry, use it. Otherwise, calculate an expiry for cached info
@@ -132,41 +131,34 @@ public class OcppTagServiceImpl implements OcppTagService {
     private AuthorizationStatus decideStatus(OcppTag record, String idTag, boolean isStartTransactionReqContext, String askingChargeBoxId) {
         if (config.isIdTagMax10Characters(askingChargeBoxId) || config.isUsingIntegratedTag(askingChargeBoxId)) {
             log.info("Checking in local db only...");
-
-
-
             if (record == null) {
                 log.error("The user with idTag '{}' is INVALID (not present in DB).", idTag);
-                return AuthorizationStatus.INVALID;
+                return INVALID;
             }
-
             if (isBlocked(record)) {
                 log.error("The user with idTag '{}' is BLOCKED.", idTag);
-                return AuthorizationStatus.BLOCKED;
+                return BLOCKED;
             }
-
             if (isExpired(record, DateTime.now())) {
                 log.error("The user with idTag '{}' is EXPIRED.", idTag);
-                return AuthorizationStatus.EXPIRED;
+                return EXPIRED;
             }
-         }else {
+        } else {
             if (!proxyServerFacade.checkRfidTag(idTag, askingChargeBoxId)) {
                 log.error("The user with idTag '{}' is INVALID (validation failed on Parkl backend).", idTag);
-                return AuthorizationStatus.INVALID;
+                return INVALID;
             }
         }
-
         // https://github.com/RWTH-i5-IDSG/steve/issues/219
         if (isStartTransactionReqContext) {
             long active = transactionService.getActiveTransactionCountByIdTag(record.getIdTag());
             if (reachedLimitOfActiveTransactions(record, active)) {
                 log.warn("The user with idTag '{}' is ALREADY in another transaction(s).", idTag);
-                return AuthorizationStatus.CONCURRENT_TX;
+                return CONCURRENT_TX;
             }
         }
-
         log.debug("The user with idTag '{}' is ACCEPTED.", record.getIdTag());
-        return AuthorizationStatus.ACCEPTED;
+        return ACCEPTED;
     }
 
     /**
@@ -177,8 +169,6 @@ public class OcppTagServiceImpl implements OcppTagService {
             return ocpp.cp._2015._10.AuthorizationStatus.BLOCKED;
         } else if (isExpired(record, now)) {
             return ocpp.cp._2015._10.AuthorizationStatus.EXPIRED;
-//        } else if (reachedLimitOfActiveTransactions(record)) {
-//            return ocpp.cp._2015._10.AuthorizationStatus.CONCURRENT_TX;
         } else {
             return ocpp.cp._2015._10.AuthorizationStatus.ACCEPTED;
         }

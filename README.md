@@ -45,7 +45,7 @@ SteVe requires
 
 to build and run. 
 
-SteVe Pluggable is intended to run in a servlet container or in an embedded web application, however currently only Apache Tomcat is supported. This mainly because of the websocket server and JSP compiler provided by Tomcat. We plan to change the JSP frontend to React and use a Tomcat-independent websocket server implementation in the near future, making the library completely container independent.
+SteVe Pluggable is intended to run in any servlet container or in embedded web application, however currently only Apache Tomcat is supported. This mainly because of the websocket server and JSP compiler provided by Tomcat. We plan to change the JSP frontend to React and use a Tomcat-independent websocket server implementation in the near future, making the library completely container independent.
 
 # Configuration and Installation
 

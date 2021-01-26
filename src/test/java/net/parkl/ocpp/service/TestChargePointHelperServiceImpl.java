@@ -1,5 +1,6 @@
 package net.parkl.ocpp.service;
 
+import de.rwth.idsg.steve.ocpp.OcppProtocol;
 import de.rwth.idsg.steve.ocpp.OcppVersion;
 import de.rwth.idsg.steve.repository.dto.ChargePointSelect;
 import de.rwth.idsg.steve.repository.dto.ConnectorStatus;
@@ -14,9 +15,8 @@ import ocpp.cs._2015._10.RegistrationStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class TestChargePointHelperServiceImpl implements ChargePointHelperService {
@@ -49,12 +49,13 @@ public class TestChargePointHelperServiceImpl implements ChargePointHelperServic
 
 	@Override
 	public List<ChargePointSelect> getChargePoints(OcppVersion version) {
-		return null;
+		return chargePointService.getChargePointSelect(OcppProtocol.V_16_SOAP, Collections.singletonList(RegistrationStatus.ACCEPTED.name()));
 	}
 
 	@Override
 	public List<ChargePointSelect> getChargePoints(OcppVersion version, List<RegistrationStatus> inStatusFilter) {
-		return null;
+		return chargePointService.getChargePointSelect(OcppProtocol.V_16_SOAP,inStatusFilter.stream().map(Enum::name)
+				.collect(Collectors.toList()));
 	}
 
 	/*@Override

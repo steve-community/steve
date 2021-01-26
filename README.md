@@ -111,35 +111,6 @@ SteVe Pluggable is intended to run in any servlet container or in embedded web a
     # java -jar target/steve.jar
     ```
 
-# Docker
-
-If you prefer to build and start this project via docker (you can skip the steps 1 and 3, 4, 5 above), this can be done as follows: `docker-compose up -d `
-
-The web interface will be accessible at: `http://localhost:8180`
-
-# Kubernetes
-
-First build your image, and push it to a registry your K8S cluster can access. Make sure the build args in the docker build command are set with the same database configuration that the main deployment will use.
-
-`docker build --build-arg DB_HOST= --build-arg DB_PORT= --build-arg DB_USERNAME= --build-arg DB_PASSWORD= --build-arg DB_DATABASE=  -f k8s/docker/Dockerfile -t <IMAGE_NAME> .`
-
-`docker push <IMAGE_NAME>`
-
-
-Then go to `k8s/yaml/Deployment.yaml` and change `### YOUR BUILT IMAGE HERE ###` to your image tag, and fill in the environment variables with the same database connection that you used at build time.
-
-After this, create the namespace using `kubectl create ns steve` and apply your yaml with `kubectl apply -f k8s/yaml/Deployment.yaml` followed by `kubectl apply -f k8s/yaml/Service.yaml`
-
-
-To access this publicaly, you'll also have to setup an ingress using something like nginx or traefik. 
-
-# Ubuntu
-
-You'll find a tutorial how to prepare Ubuntu for SteVe here: https://github.com/RWTH-i5-IDSG/steve/wiki/Prepare-Ubuntu-VM-for-SteVe
-
-# AWS
-
-You'll find a tutorial how to setup SteVe in AWS using Lightsail here: https://github.com/RWTH-i5-IDSG/steve/wiki/Create-SteVe-Instance-in-AWS-Lightsail
 
 # First Steps
 

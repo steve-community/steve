@@ -8,76 +8,78 @@ import net.parkl.ocpp.entities.TransactionStart;
 
 
 /**
- * Homlokzati interface a Parkl szerver és az OCPP szerver közötti kommunikációra.
+ * Facade interface between the e-mobility service provider (ESP) backend and the SteVe Pluggable library.<br>
+ * This interface publishes methods to handle incoming events from the ESP backend.<br>
+ * @see net.parkl.ocpp.module.esp.EmobilityServiceProvider
  * @author andor
  *
  */
 public interface EmobilityServiceProviderFacade {
 
 	/**
-	 * Megkísérel elindítani egy töltési folyamatot az OCPP szerveren
-	 * @param request Töltési kérelem
-	 * @return Töltés indítás eredménye
+	 * Tries to start a charging process on the OCPP server (SteVe Pluggable)
+	 * @param request Charging start request (from the ESP backend)
+	 * @return Charging start result
 	 */
 	ESPChargingStartResult startCharging(ESPChargingStartRequest request);
 
 	/**
-	 * Lekéri egy töltési folyamat státuszát az OCPP szervertől
-	 * @param externalChargeId Töltés azonosítója az OCPP szerveren
-	 * @return Státusz lekérés eredménye
+	 * Requests the status of a charging process
+	 * @param externalChargeId The ID of the charging process on the OCPP server (SteVe Pluggable)
+	 * @return Status result
 	 */
 	ESPChargingStatusResult getStatus(String externalChargeId);
 
 	/**
-	 * Megkísérel leállítani egy töltési folyamatot az OCPP szerveren
+	 * Tries to stop a charging process on the OCPP server (SteVe Pluggable)
 	 * @param req Töltés leállítási kérelem
 	 * @return Töltés leállítás eredménye
 	 */
 	ESPChargingResult stopCharging(ESPChargingUserStopRequest req);
 
 	/**
-	 * Lekéri egy töltő (ChargeBox) beállításait magától a töltőtől
-	 * @param chargeBoxId Töltő az OCPP szerveren egyedi azonosítója
-	 * @return Beállítások listája
+	 * Queries the configuration settings of a charge box from the charge box itself
+	 * @param chargeBoxId Charge box ID on the OCPP server (SteVe Pluggable)
+	 * @return List of active configuration settings for the charge box
 	 */
 	List<ESPChargeBoxConfiguration> getChargeBoxConfiguration(String chargeBoxId);
 	
 	/**
-	 * Átállítja egy töltő (ChargeBox) egy megadott beállítását magán a töltőn
-	 * @param chargeBoxId Töltő az OCPP szerveren egyedi azonosítója
-	 * @param key Átállítandó kulcs
-	 * @param value Új érték
-	 * @return Beállítások listája a mentés után
+	 * Sets a configuration setting on the charge box itself
+	 * @param chargeBoxId Charge box ID on the OCPP server
+	 * @param key The key to set
+	 * @param value New value
+	 * @return List of active configuration settings for the charge box
 	 */
 	List<ESPChargeBoxConfiguration> changeChargeBoxConfiguration(String chargeBoxId,String key, String value);
 
 	/**
-	 * OCPP szerver oldalon beregisztrál egy új töltőt (ChargeBox)
-	 * @param chargeBoxId Töltő az OCPP szerveren egyedi azonosítója
+	 * Registers a new charge box on the OCPP server (SteVe Pluggable)
+	 * @param chargeBoxId Unique charge box ID on the OCPP server
 	 */
 	void registerChargeBox(String chargeBoxId);
 	/**
-	 * OCPP szerver oldalon töröl egy regisztrált töltőt (ChargeBox)
-	 * @param chargeBoxId Töltő az OCPP szerveren egyedi azonosítója
+	 * Unregisters an existing charge box from the OCPP server (SteVe Pluggable)
+	 * @param chargeBoxId Charge box ID on the OCPP server
 	 */
 	void unregisterChargeBox(String chargeBoxId);
 	/**
-	 * OCPP szerver oldalon beállítja egy töltőfej (Connector) elérhetőségét
-	 * @param chargeBoxId Töltő az OCPP szerveren egyedi azonosítója
-	 * @param chargerId Töltőfej azonosító
-	 * @param available Igaz, ha elérhető
+	 * Sets the availability of a connector (a single charger head) on the OCPP server
+	 * @param chargeBoxId Charge box ID on the OCPP server
+	 * @param chargerId Connector ID
+	 * @param available True if available
 	 */
 	void changeAvailability(String chargeBoxId,String chargerId,boolean available);
 	/**
-	 * Kioldja a kábelt a megadott töltőfejen (ChargeBox+Connector) 
-	 * @param chargeBoxId Töltő az OCPP szerveren egyedi azonosítója
-	 * @param chargerId Töltőfej azonosító
+	 * Unlocks the connector cable on the specified connector (ChargeBox+Connector)
+	 * @param chargeBoxId Charge box ID on the OCPP server
+	 * @param chargerId Connector ID
 	 */
 	void unlockConnector(String chargeBoxId,String chargerId);
 	/**
-	 * Újraindít egy töltőt (ChargeBox)
-	 * @param chargeBoxId Töltő az OCPP szerveren egyedi azonosítója
-	 * @param soft Igaz, ha soft reset, hamis, ha hard reset
+	 * Resets a charge box
+	 * @param chargeBoxId Charge box ID on the OCPP server
+	 * @param soft True for soft reset, false for hard reset
 	 */
 	void resetChargeBox(String chargeBoxId,boolean soft);
 	
@@ -85,10 +87,10 @@ public interface EmobilityServiceProviderFacade {
 	void stopChargingExternal(OcppChargingProcess process, String reason);
 
 	/**
-	 * Aszinkron módon updateli egy töltési folyamat fogyasztási adatait a Parkl szerver felé
-	 * @param process Töltési folyamat az OCPP szerveren
-	 * @param startValue Mérőállás a tranzakció kezdetén
-	 * @param stopValue Mérőállás a tranzakció végén
+	 * Updates consumption data of a charging process asynchronously towards the ESP backend (after the charging has stopped)
+	 * @param process Charging process on the OCPP server
+	 * @param startValue Transaction start value
+	 * @param stopValue Transaction stop value
 	 */
 	void updateConsumption(OcppChargingProcess process, String startValue, String stopValue);
 	

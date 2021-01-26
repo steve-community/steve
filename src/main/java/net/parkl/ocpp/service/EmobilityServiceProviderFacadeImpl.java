@@ -42,7 +42,7 @@ import java.util.concurrent.Callable;
 ;
 
 /**
- * Homlokzati osztály a Parkl szerver és az OCPP proxy szerver közötti kommunikációhoz.
+ * Facade component between the e-mobility service provider (ESP) backend and the SteVe Pluggable library.<br>
  * @author andor
  *
  */

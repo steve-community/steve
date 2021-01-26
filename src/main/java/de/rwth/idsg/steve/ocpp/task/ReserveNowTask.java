@@ -22,8 +22,8 @@ import de.rwth.idsg.steve.ocpp.Ocpp15AndAboveTask;
 import de.rwth.idsg.steve.ocpp.OcppCallback;
 import de.rwth.idsg.steve.ocpp.OcppVersion;
 import de.rwth.idsg.steve.ocpp.ws.data.OcppJsonError;
-import de.rwth.idsg.steve.repository.ReservationRepository;
 import de.rwth.idsg.steve.service.dto.EnhancedReserveNowParams;
+import net.parkl.ocpp.service.cs.ReservationService;
 
 import javax.xml.ws.AsyncHandler;
 
@@ -33,12 +33,12 @@ import javax.xml.ws.AsyncHandler;
  */
 public class ReserveNowTask extends Ocpp15AndAboveTask<EnhancedReserveNowParams, String> {
 
-    private final ReservationRepository reservationRepository;
+    private final ReservationService reservationService;
 
     public ReserveNowTask(OcppVersion ocppVersion, EnhancedReserveNowParams params,
-                          ReservationRepository reservationRepository) {
+                          ReservationService reservationService) {
         super(ocppVersion, params);
-        this.reservationRepository = reservationRepository;
+        this.reservationService = reservationService;
     }
 
     @Override
@@ -49,7 +49,7 @@ public class ReserveNowTask extends Ocpp15AndAboveTask<EnhancedReserveNowParams,
                 addNewResponse(chargeBoxId, responseStatus);
 
                 if ("Accepted".equalsIgnoreCase(responseStatus)) {
-                    reservationRepository.accepted(params.getReservationId());
+                    reservationService.accepted(params.getReservationId());
                 } else {
                     delete();
                 }
@@ -112,7 +112,7 @@ public class ReserveNowTask extends Ocpp15AndAboveTask<EnhancedReserveNowParams,
     }
 
     private void delete() {
-        reservationRepository.delete(params.getReservationId());
+        reservationService.delete(params.getReservationId());
     }
 
 }

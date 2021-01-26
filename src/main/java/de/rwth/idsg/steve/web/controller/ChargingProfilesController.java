@@ -18,15 +18,16 @@
  */
 package de.rwth.idsg.steve.web.controller;
 
-import de.rwth.idsg.steve.repository.ChargePointRepository;
-import de.rwth.idsg.steve.repository.ChargingProfileRepository;
+import de.rwth.idsg.steve.utils.DateTimeConverter;
+import net.parkl.ocpp.entities.ChargingSchedulePeriod;
+import net.parkl.ocpp.entities.OcppChargingProfile;
+import net.parkl.ocpp.service.cs.ChargePointService;
+import net.parkl.ocpp.service.cs.ChargingProfileService;
 import de.rwth.idsg.steve.repository.dto.ChargingProfile;
 import de.rwth.idsg.steve.utils.DateTimeUtils;
 import de.rwth.idsg.steve.web.dto.ChargingProfileAssignmentQueryForm;
 import de.rwth.idsg.steve.web.dto.ChargingProfileForm;
 import de.rwth.idsg.steve.web.dto.ChargingProfileQueryForm;
-import jooq.steve.db.tables.records.ChargingProfileRecord;
-import jooq.steve.db.tables.records.ChargingSchedulePeriodRecord;
 import ocpp.cp._2015._10.ChargingProfileKindType;
 import ocpp.cp._2015._10.ChargingProfilePurposeType;
 import ocpp.cp._2015._10.ChargingRateUnitType;
@@ -54,8 +55,8 @@ import java.util.UUID;
 @RequestMapping(value = "/manager/chargingProfiles")
 public class ChargingProfilesController {
 
-    @Autowired private ChargePointRepository chargePointRepository;
-    @Autowired private ChargingProfileRepository repository;
+    @Autowired private ChargePointService chargePointRepository;
+    @Autowired private ChargingProfileService repository;
 
     private static final String PARAMS = "params";
 
@@ -138,8 +139,8 @@ public class ChargingProfilesController {
     public String getDetails(@PathVariable("chargingProfilePk") int chargingProfilePk, Model model) {
         ChargingProfile.Details details = repository.getDetails(chargingProfilePk);
 
-        ChargingProfileRecord profile = details.getProfile();
-        List<ChargingSchedulePeriodRecord> periods = details.getPeriods();
+        OcppChargingProfile profile = details.getProfile();
+        List<ChargingSchedulePeriod> periods = details.getPeriods();
 
         ChargingProfileForm form = new ChargingProfileForm();
         form.setChargingProfilePk(profile.getChargingProfilePk());
@@ -149,15 +150,22 @@ public class ChargingProfilesController {
         form.setChargingProfilePurpose(ChargingProfilePurposeType.fromValue(profile.getChargingProfilePurpose()));
         form.setChargingProfileKind(ChargingProfileKindType.fromValue(profile.getChargingProfileKind()));
         form.setRecurrencyKind(profile.getRecurrencyKind() == null ? null : RecurrencyKindType.fromValue(profile.getRecurrencyKind()));
-        form.setValidFrom(DateTimeUtils.toLocalDateTime(profile.getValidFrom()));
-        form.setValidTo(DateTimeUtils.toLocalDateTime(profile.getValidTo()));
+
+        if (profile.getValidFrom()!=null) {
+            form.setValidFrom(DateTimeUtils.toLocalDateTime(DateTimeConverter.from(profile.getValidFrom())));
+        }
+        if (profile.getValidTo()!=null) {
+            form.setValidTo(DateTimeUtils.toLocalDateTime(DateTimeConverter.from(profile.getValidTo())));
+        }
         form.setDurationInSeconds(profile.getDurationInSeconds());
-        form.setStartSchedule(DateTimeUtils.toLocalDateTime(profile.getStartSchedule()));
+        if (profile.getStartSchedule()!=null) {
+            form.setStartSchedule(DateTimeUtils.toLocalDateTime(DateTimeConverter.from(profile.getStartSchedule())));
+        }
         form.setChargingRateUnit(ChargingRateUnitType.fromValue(profile.getChargingRateUnit()));
         form.setMinChargingRate(profile.getMinChargingRate());
 
         Map<String, ChargingProfileForm.SchedulePeriod> periodMap = new LinkedHashMap<>();
-        for (ChargingSchedulePeriodRecord rec : periods) {
+        for (ChargingSchedulePeriod rec : periods) {
             ChargingProfileForm.SchedulePeriod p = new ChargingProfileForm.SchedulePeriod();
             p.setStartPeriodInSeconds(rec.getStartPeriodInSeconds());
             p.setPowerLimitInAmperes(rec.getPowerLimitInAmperes());

@@ -21,8 +21,8 @@ package de.rwth.idsg.steve.ocpp.task;
 import de.rwth.idsg.steve.ocpp.Ocpp15AndAboveTask;
 import de.rwth.idsg.steve.ocpp.OcppCallback;
 import de.rwth.idsg.steve.ocpp.OcppVersion;
-import de.rwth.idsg.steve.repository.ReservationRepository;
 import de.rwth.idsg.steve.web.dto.ocpp.CancelReservationParams;
+import net.parkl.ocpp.service.cs.ReservationService;
 import ocpp.cp._2012._06.CancelReservationRequest;
 import ocpp.cp._2012._06.CancelReservationResponse;
 
@@ -34,12 +34,12 @@ import javax.xml.ws.AsyncHandler;
  */
 public class CancelReservationTask extends Ocpp15AndAboveTask<CancelReservationParams, String> {
 
-    private final ReservationRepository reservationRepository;
+    private final ReservationService reservationService;
 
     public CancelReservationTask(OcppVersion ocppVersion, CancelReservationParams params,
-                                 ReservationRepository reservationRepository) {
+                                 ReservationService reservationService) {
         super(ocppVersion, params);
-        this.reservationRepository = reservationRepository;
+        this.reservationService = reservationService;
     }
 
     @Override
@@ -50,7 +50,7 @@ public class CancelReservationTask extends Ocpp15AndAboveTask<CancelReservationP
                 addNewResponse(chargeBoxId, statusValue);
 
                 if ("Accepted".equalsIgnoreCase(statusValue)) {
-                    reservationRepository.cancelled(params.getReservationId());
+                    reservationService.cancelled(params.getReservationId());
                 }
             }
         };

@@ -1,30 +1,13 @@
-/*
- * SteVe - SteckdosenVerwaltung - https://github.com/RWTH-i5-IDSG/steve
- * Copyright (C) 2013-2020 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
- * All Rights Reserved.
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
- */
 package de.rwth.idsg.steve.web.controller;
 
-import de.rwth.idsg.steve.repository.OcppTagRepository;
 import de.rwth.idsg.steve.service.OcppTagService;
 import de.rwth.idsg.steve.utils.ControllerHelper;
 import de.rwth.idsg.steve.web.dto.OcppTagBatchInsertForm;
 import de.rwth.idsg.steve.web.dto.OcppTagForm;
 import de.rwth.idsg.steve.web.dto.OcppTagQueryForm;
-import jooq.steve.db.tables.records.OcppTagActivityRecord;
+
+import net.parkl.ocpp.service.cs.OcppIdTagService;
+import net.parkl.ocpp.service.cs.TransactionService;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -39,6 +22,7 @@ import javax.validation.Valid;
 import java.util.Collections;
 import java.util.List;
 
+import net.parkl.ocpp.entities.OcppTag;
 /**
  * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
  * @since 26.11.2015
@@ -47,8 +31,10 @@ import java.util.List;
 @RequestMapping(value = "/manager/ocppTags")
 public class OcppTagsController {
 
-    @Autowired protected OcppTagRepository ocppTagRepository;
+    @Autowired protected OcppIdTagService tagService;
     @Autowired protected OcppTagService ocppTagService;
+
+    @Autowired protected TransactionService transactionService;
 
     protected static final String PARAMS = "params";
 
@@ -87,13 +73,16 @@ public class OcppTagsController {
 
     @RequestMapping(value = DETAILS_PATH, method = RequestMethod.GET)
     public String getDetails(@PathVariable("ocppTagPk") int ocppTagPk, Model model) {
-        OcppTagActivityRecord record = ocppTagRepository.getRecord(ocppTagPk);
+        OcppTag record = tagService.getRecord(ocppTagPk);
 
         OcppTagForm form = new OcppTagForm();
         form.setOcppTagPk(record.getOcppTagPk());
         form.setIdTag(record.getIdTag());
 
-        DateTime expiryDate = record.getExpiryDate();
+        DateTime expiryDate = null;
+        if (record.getExpiryDate()!=null) {
+        	expiryDate=new DateTime(record.getExpiryDate());
+        }
         if (expiryDate != null) {
             form.setExpiration(expiryDate.toLocalDateTime());
         }
@@ -107,7 +96,7 @@ public class OcppTagsController {
         }
         form.setParentIdTag(parentIdTag);
 
-        model.addAttribute("activeTransactionCount", record.getActiveTransactionCount());
+        model.addAttribute("activeTransactionCount", transactionService.getActiveTransactionCountByIdTag(record.getIdTag()));
         model.addAttribute("ocppTagForm", form);
         setTags(model);
         return "data-man/ocppTagDetails";
@@ -155,13 +144,13 @@ public class OcppTagsController {
             return "data-man/ocppTagDetails";
         }
 
-        ocppTagRepository.updateOcppTag(ocppTagForm);
+        tagService.updateOcppTag(ocppTagForm);
         return toOverview();
     }
 
     @RequestMapping(value = DELETE_PATH, method = RequestMethod.POST)
     public String delete(@PathVariable("ocppTagPk") int ocppTagPk) {
-        ocppTagRepository.deleteOcppTag(ocppTagPk);
+        tagService.deleteOcppTag(ocppTagPk);
         return toOverview();
     }
 
@@ -179,14 +168,14 @@ public class OcppTagsController {
 
     private void initList(Model model, OcppTagQueryForm params) {
         model.addAttribute(PARAMS, params);
-        model.addAttribute("idTagList", ocppTagRepository.getIdTags());
-        model.addAttribute("parentIdTagList", ocppTagRepository.getParentIdTags());
-        model.addAttribute("ocppTagList", ocppTagRepository.getOverview(params));
+        model.addAttribute("idTagList", tagService.getIdTags());
+        model.addAttribute("parentIdTagList", tagService.getParentIdTags());
+        model.addAttribute("ocppTagList", tagService.getOverview(params));
         model.addAttribute("unknownList", ocppTagService.getUnknownOcppTags());
     }
 
     protected void setTags(Model model) {
-        model.addAttribute("idTagList", ControllerHelper.idTagEnhancer(ocppTagRepository.getIdTags()));
+        model.addAttribute("idTagList", ControllerHelper.idTagEnhancer(tagService.getIdTags()));
     }
 
     // -------------------------------------------------------------------------
@@ -212,12 +201,12 @@ public class OcppTagsController {
     // -------------------------------------------------------------------------
 
     private void add(OcppTagForm form) {
-        ocppTagRepository.addOcppTag(form);
+        tagService.addOcppTag(form);
         ocppTagService.removeUnknown(form.getIdTag());
     }
 
     private void add(List<String> idTagList) {
-        ocppTagRepository.addOcppTagList(idTagList);
+        tagService.addOcppTagList(idTagList);
         ocppTagService.removeUnknown(idTagList);
     }
 

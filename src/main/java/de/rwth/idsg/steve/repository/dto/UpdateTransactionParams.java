@@ -18,9 +18,10 @@
  */
 package de.rwth.idsg.steve.repository.dto;
 
-import jooq.steve.db.enums.TransactionStopEventActor;
+
 import lombok.Builder;
 import lombok.Getter;
+import net.parkl.ocpp.entities.TransactionStopEventActor;
 import org.joda.time.DateTime;
 
 /**

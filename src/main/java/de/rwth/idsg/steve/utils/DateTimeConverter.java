@@ -19,18 +19,17 @@
 package de.rwth.idsg.steve.utils;
 
 import org.joda.time.DateTime;
-import org.jooq.Converter;
 
 import java.sql.Timestamp;
+import java.util.Date;
 
 /**
  * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
  * @since 29.09.2015
  */
-public class DateTimeConverter implements Converter<Timestamp, DateTime> {
+public class DateTimeConverter  {
 
-    @Override
-    public DateTime from(Timestamp timestamp) {
+    public static DateTime from(Timestamp timestamp) {
         if (timestamp == null) {
             return null;
         } else {
@@ -38,8 +37,15 @@ public class DateTimeConverter implements Converter<Timestamp, DateTime> {
         }
     }
 
-    @Override
-    public Timestamp to(DateTime dateTime) {
+    public static DateTime from(Date date) {
+        if (date == null) {
+            return null;
+        } else {
+            return new DateTime(date);
+        }
+    }
+
+    public static Timestamp to(DateTime dateTime) {
         if (dateTime == null) {
             return null;
         } else {
@@ -47,13 +53,11 @@ public class DateTimeConverter implements Converter<Timestamp, DateTime> {
         }
     }
 
-    @Override
-    public Class<Timestamp> fromType() {
-        return Timestamp.class;
-    }
-
-    @Override
-    public Class<DateTime> toType() {
-        return DateTime.class;
+    public static Date toDate(DateTime dateTime) {
+        if (dateTime == null) {
+            return null;
+        } else {
+            return new Date(dateTime.getMillis());
+        }
     }
 }

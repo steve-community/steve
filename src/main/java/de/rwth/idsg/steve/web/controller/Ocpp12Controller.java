@@ -1,25 +1,6 @@
-/*
- * SteVe - SteckdosenVerwaltung - https://github.com/RWTH-i5-IDSG/steve
- * Copyright (C) 2013-2020 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
- * All Rights Reserved.
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
- */
 package de.rwth.idsg.steve.web.controller;
 
 import de.rwth.idsg.steve.ocpp.OcppVersion;
-import de.rwth.idsg.steve.repository.OcppTagRepository;
 import de.rwth.idsg.steve.service.ChargePointHelperService;
 import de.rwth.idsg.steve.service.ChargePointService12_Client;
 import de.rwth.idsg.steve.web.dto.ocpp.ChangeAvailabilityParams;
@@ -33,6 +14,8 @@ import de.rwth.idsg.steve.web.dto.ocpp.RemoteStopTransactionParams;
 import de.rwth.idsg.steve.web.dto.ocpp.ResetParams;
 import de.rwth.idsg.steve.web.dto.ocpp.UnlockConnectorParams;
 import de.rwth.idsg.steve.web.dto.ocpp.UpdateFirmwareParams;
+import net.parkl.ocpp.service.cs.OcppIdTagService;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
@@ -56,7 +39,7 @@ import static de.rwth.idsg.steve.web.dto.ocpp.ConfigurationKeyReadWriteEnum.RW;
 public class Ocpp12Controller {
 
     @Autowired protected ChargePointHelperService chargePointHelperService;
-    @Autowired protected OcppTagRepository ocppTagRepository;
+    @Autowired protected OcppIdTagService tagService;
 
     @Autowired
     @Qualifier("ChargePointService12_Client")
@@ -111,7 +94,7 @@ public class Ocpp12Controller {
     }
 
     protected void setActiveUserIdTagList(Model model) {
-        model.addAttribute("idTagList", ocppTagRepository.getActiveIdTags());
+        model.addAttribute("idTagList", tagService.getActiveIdTags());
     }
 
     // -------------------------------------------------------------------------

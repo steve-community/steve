@@ -31,6 +31,10 @@ import org.apache.cxf.phase.Phase;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.staxutils.DepthXMLStreamReader;
 import org.apache.cxf.staxutils.StaxUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import de.rwth.idsg.steve.SteveConfiguration;
 
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
@@ -42,7 +46,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static de.rwth.idsg.steve.SteveConfiguration.CONFIG;
 
 /**
  * Taken from http://cxf.apache.org/docs/service-routing.html and modified.
@@ -124,7 +127,7 @@ public class MediatorInInterceptor extends AbstractPhaseInterceptor<SoapMessage>
             String address = info.getAddress();
 
             // exclude the 'dummy' routing server
-            if (CONFIG.getRouterEndpointPath().equals(address)) {
+            if (SteveConfiguration.getRouterEndpointPath().equals(address)) {
                 continue;
             }
 

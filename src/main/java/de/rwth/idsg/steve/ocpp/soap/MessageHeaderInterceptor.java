@@ -19,11 +19,12 @@
 package de.rwth.idsg.steve.ocpp.soap;
 
 import de.rwth.idsg.steve.ocpp.OcppProtocol;
-import de.rwth.idsg.steve.repository.OcppServerRepository;
-import de.rwth.idsg.steve.repository.impl.ChargePointRepositoryImpl;
 import de.rwth.idsg.steve.service.ChargePointHelperService;
 import lombok.extern.slf4j.Slf4j;
 import ocpp.cs._2015._10.RegistrationStatus;
+
+import net.parkl.ocpp.service.cs.OcppServerService;
+
 import org.apache.cxf.binding.soap.Soap12;
 import org.apache.cxf.binding.soap.SoapFault;
 import org.apache.cxf.interceptor.Fault;
@@ -60,7 +61,7 @@ import static org.apache.cxf.ws.addressing.JAXWSAConstants.ADDRESSING_PROPERTIES
 @Component("MessageHeaderInterceptor")
 public class MessageHeaderInterceptor extends AbstractPhaseInterceptor<Message> {
 
-    @Autowired private OcppServerRepository ocppServerRepository;
+    @Autowired private OcppServerService ocppServerService;
     @Autowired private ChargePointHelperService chargePointHelperService;
     @Autowired private ScheduledExecutorService executorService;
 
@@ -97,7 +98,7 @@ public class MessageHeaderInterceptor extends AbstractPhaseInterceptor<Message> 
             try {
                 String endpointAddress = getEndpointAddress(message);
                 if (endpointAddress != null) {
-                    ocppServerRepository.updateEndpointAddress(chargeBoxId, endpointAddress);
+                    ocppServerService.updateEndpointAddress(chargeBoxId, endpointAddress);
                 }
             } catch (Exception e) {
                 log.error("Exception occurred", e);

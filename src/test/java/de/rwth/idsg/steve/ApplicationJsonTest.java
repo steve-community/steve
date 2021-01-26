@@ -20,8 +20,8 @@ package de.rwth.idsg.steve;
 
 import de.rwth.idsg.steve.ocpp.OcppVersion;
 import de.rwth.idsg.steve.utils.OcppJsonChargePoint;
-import de.rwth.idsg.steve.utils.__DatabasePreparer__;
 import lombok.extern.slf4j.Slf4j;
+import net.parkl.server.TestApplication;
 import ocpp.cs._2015._10.AuthorizationStatus;
 import ocpp.cs._2015._10.AuthorizeRequest;
 import ocpp.cs._2015._10.AuthorizeResponse;
@@ -32,6 +32,8 @@ import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.springframework.boot.SpringApplication;
+import org.springframework.context.ConfigurableApplicationContext;
 
 import static de.rwth.idsg.steve.utils.Helpers.getRandomString;
 
@@ -45,31 +47,38 @@ public class ApplicationJsonTest {
     private static final String PATH = "ws://localhost:8080/steve/websocket/CentralSystemService/";
     private static final OcppVersion VERSION = OcppVersion.V_16;
 
-    private static final String REGISTERED_CHARGE_BOX_ID = __DatabasePreparer__.getRegisteredChargeBoxId();
-    private static final String REGISTERED_OCPP_TAG =  __DatabasePreparer__.getRegisteredOcppTag();
+   // private static final String REGISTERED_CHARGE_BOX_ID = __DatabasePreparer__.getRegisteredChargeBoxId();
+   // private static final String REGISTERED_OCPP_TAG =  __DatabasePreparer__.getRegisteredOcppTag();
 
-    private static Application app;
+    private static ConfigurableApplicationContext app;
+
+    private static String registeredChargeBoxId;
+    private static String registeredOcppTag;
 
     @BeforeClass
     public static void init() throws Exception {
-        Assert.assertEquals(ApplicationProfile.TEST, SteveConfiguration.CONFIG.getProfile());
-        __DatabasePreparer__.prepare();
+       // Assert.assertEquals(ApplicationProfile.TEST, SteveConfiguration.CONFIG.getProfile());
+       // __DatabasePreparer__.prepare();
 
-        app = new Application();
-        app.start();
+        //app = new TestApplication();
+        app = SpringApplication.run(TestApplication.class);
+
+        //app.start();
+
+        app.getBean(JpaDatabasePreparer.class).prepare();
+        registeredChargeBoxId = app.getBean(JpaDatabasePreparer.class).getRegisteredChargeBoxId();
+        registeredOcppTag = app.getBean(JpaDatabasePreparer.class).getRegisteredOcppTag();
     }
 
     @AfterClass
     public static void destroy() throws Exception {
-        if (app != null) {
-            app.stop();
-        }
-        __DatabasePreparer__.cleanUp();
+        app.close();
+        //__DatabasePreparer__.cleanUp();
     }
 
     @Test
     public void testOcpp16() {
-        OcppJsonChargePoint chargePoint = new OcppJsonChargePoint(VERSION, REGISTERED_CHARGE_BOX_ID, PATH);
+        OcppJsonChargePoint chargePoint = new OcppJsonChargePoint(VERSION, registeredChargeBoxId, PATH);
         chargePoint.start();
 
         BootNotificationRequest boot = new BootNotificationRequest()
@@ -81,7 +90,7 @@ public class ApplicationJsonTest {
                 error -> Assert.fail()
         );
 
-        AuthorizeRequest auth = new AuthorizeRequest().withIdTag(REGISTERED_OCPP_TAG);
+        AuthorizeRequest auth = new AuthorizeRequest().withIdTag(registeredOcppTag);
 
         chargePoint.prepare(auth, AuthorizeResponse.class,
                 authResponse -> Assert.assertEquals(AuthorizationStatus.ACCEPTED, authResponse.getIdTagInfo().getStatus()),

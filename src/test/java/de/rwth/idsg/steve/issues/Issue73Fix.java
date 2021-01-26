@@ -19,10 +19,9 @@
 package de.rwth.idsg.steve.issues;
 
 import com.google.common.collect.Lists;
-import de.rwth.idsg.steve.Application;
 import de.rwth.idsg.steve.ApplicationProfile;
+import de.rwth.idsg.steve.JpaDatabasePreparer;
 import de.rwth.idsg.steve.SteveConfiguration;
-import de.rwth.idsg.steve.utils.__DatabasePreparer__;
 import ocpp.cs._2015._10.AuthorizationStatus;
 import ocpp.cs._2015._10.AuthorizeRequest;
 import ocpp.cs._2015._10.AuthorizeResponse;
@@ -34,6 +33,8 @@ import ocpp.cs._2015._10.StartTransactionRequest;
 import ocpp.cs._2015._10.StartTransactionResponse;
 import org.joda.time.DateTime;
 import org.junit.Assert;
+import org.springframework.boot.SpringApplication;
+import org.springframework.context.ConfigurableApplicationContext;
 
 import java.util.List;
 
@@ -49,16 +50,23 @@ import static de.rwth.idsg.steve.utils.Helpers.getRandomString;
  */
 public class Issue73Fix {
 
-    private static final String REGISTERED_OCPP_TAG = __DatabasePreparer__.getRegisteredOcppTag();
+   // private static final String REGISTERED_OCPP_TAG = __DatabasePreparer__.getRegisteredOcppTag();
     private static final String path = getPath();
+    private static ConfigurableApplicationContext app;
+    private static String registeredOcppTag;
 
     public static void main(String[] args) throws Exception {
-        Assert.assertEquals(ApplicationProfile.TEST, SteveConfiguration.CONFIG.getProfile());
-        Assert.assertTrue(SteveConfiguration.CONFIG.getOcpp().isAutoRegisterUnknownStations());
+        //Assert.assertEquals(ApplicationProfile.TEST, SteveConfiguration.CONFIG.getProfile());
+        //Assert.assertTrue(SteveConfiguration.CONFIG.getOcpp().isAutoRegisterUnknownStations());
 
-        __DatabasePreparer__.prepare();
+        //__DatabasePreparer__.prepare();
 
-        Application app = new Application();
+        app = SpringApplication.run(net.parkl.server.TestApplication.class);
+        //app.start();
+
+        app.getBean(JpaDatabasePreparer.class).prepare();
+        registeredOcppTag = app.getBean(JpaDatabasePreparer.class).getRegisteredOcppTag();
+
         try {
             app.start();
             test();
@@ -66,7 +74,7 @@ public class Issue73Fix {
             try {
                 app.stop();
             } finally {
-                __DatabasePreparer__.cleanUp();
+                //__DatabasePreparer__.cleanUp();
             }
         }
     }
@@ -101,7 +109,7 @@ public class Issue73Fix {
     }
 
     private static void sendAuth(CentralSystemService client, String chargeBoxId, AuthorizationStatus expected) {
-        AuthorizeResponse auth = client.authorize(new AuthorizeRequest().withIdTag(REGISTERED_OCPP_TAG), chargeBoxId);
+        AuthorizeResponse auth = client.authorize(new AuthorizeRequest().withIdTag(registeredOcppTag), chargeBoxId);
         Assert.assertNotNull(auth);
         Assert.assertEquals(expected, auth.getIdTagInfo().getStatus());
     }
@@ -110,13 +118,13 @@ public class Issue73Fix {
         StartTransactionResponse start = client.startTransaction(
                 new StartTransactionRequest()
                         .withConnectorId(2)
-                        .withIdTag(REGISTERED_OCPP_TAG)
+                        .withIdTag(registeredOcppTag)
                         .withTimestamp(DateTime.now())
                         .withMeterStart(0),
                 chargeBoxId
         );
         Assert.assertNotNull(start);
         Assert.assertTrue(start.getTransactionId() > 0);
-        Assert.assertTrue(__DatabasePreparer__.getOcppTagRecord(REGISTERED_OCPP_TAG).getInTransaction());
+        //Assert.assertTrue(__DatabasePreparer__.getOcppTagRecord(registeredOcppTag).getInTransaction());
     }
 }

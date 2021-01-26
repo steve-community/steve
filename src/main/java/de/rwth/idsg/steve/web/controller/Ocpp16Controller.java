@@ -19,7 +19,6 @@
 package de.rwth.idsg.steve.web.controller;
 
 import de.rwth.idsg.steve.ocpp.OcppVersion;
-import de.rwth.idsg.steve.repository.ChargingProfileRepository;
 import de.rwth.idsg.steve.service.ChargePointService12_Client;
 import de.rwth.idsg.steve.service.ChargePointService15_Client;
 import de.rwth.idsg.steve.service.ChargePointService16_Client;
@@ -31,6 +30,7 @@ import de.rwth.idsg.steve.web.dto.ocpp.GetCompositeScheduleParams;
 import de.rwth.idsg.steve.web.dto.ocpp.GetConfigurationParams;
 import de.rwth.idsg.steve.web.dto.ocpp.SetChargingProfileParams;
 import de.rwth.idsg.steve.web.dto.ocpp.TriggerMessageParams;
+import net.parkl.ocpp.service.cs.ChargingProfileService;
 import ocpp.cs._2015._10.RegistrationStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -62,7 +62,7 @@ public class Ocpp16Controller extends Ocpp15Controller {
     @Qualifier("ChargePointService16_Client")
     private ChargePointService16_Client client16;
 
-    @Autowired private ChargingProfileRepository chargingProfileRepository;
+    @Autowired private ChargingProfileService chargingProfileService;
 
     // -------------------------------------------------------------------------
     // Paths
@@ -178,7 +178,7 @@ public class Ocpp16Controller extends Ocpp15Controller {
     @RequestMapping(value = CLEAR_CHARGING_PATH, method = RequestMethod.GET)
     public String getClearChargingProfile(Model model) {
         setCommonAttributes(model);
-        model.addAttribute("profileList", chargingProfileRepository.getBasicInfo());
+        model.addAttribute("profileList", chargingProfileService.getBasicInfo());
         model.addAttribute(PARAMS, new ClearChargingProfileParams());
         return getPrefix() + CLEAR_CHARGING_PATH;
     }
@@ -186,7 +186,7 @@ public class Ocpp16Controller extends Ocpp15Controller {
     @RequestMapping(value = SET_CHARGING_PATH, method = RequestMethod.GET)
     public String getSetChargingProfile(Model model) {
         setCommonAttributes(model);
-        model.addAttribute("profileList", chargingProfileRepository.getBasicInfo());
+        model.addAttribute("profileList", chargingProfileService.getBasicInfo());
         model.addAttribute(PARAMS, new SetChargingProfileParams());
         return getPrefix() + SET_CHARGING_PATH;
     }

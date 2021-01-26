@@ -1,24 +1,5 @@
-/*
- * SteVe - SteckdosenVerwaltung - https://github.com/RWTH-i5-IDSG/steve
- * Copyright (C) 2013-2020 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
- * All Rights Reserved.
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
- */
 package de.rwth.idsg.steve.web.dto;
 
-import lombok.Getter;
 
 import java.util.Collections;
 import java.util.List;
@@ -28,15 +9,18 @@ import java.util.stream.Collectors;
  * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
  * @since 06.08.2018
  */
-@Getter
-public enum EndpointInfo {
-    INSTANCE;
+public class EndpointInfo implements IEndpointInfo{
+   private static final EndpointInfo INSTANCE=new EndpointInfo();
 
-    private final ItemsWithInfo webInterface = new ItemsWithInfo("Access the web interface using", "/manager/home");
-    private final ItemsWithInfo ocppSoap = new ItemsWithInfo("SOAP endpoint for OCPP", "/services/CentralSystemService");
-    private final ItemsWithInfo ocppWebSocket = new ItemsWithInfo("WebSocket/JSON endpoint for OCPP", "/websocket/CentralSystemService/(chargeBoxId)");
+   public static EndpointInfo getInstance() {
+   		return INSTANCE;
+   }
 
-    @Getter
+    private final ItemsWithInfo webInterface = new ItemsWithInfo("Access the web interface using", "/ocpp/manager/home");
+    private final ItemsWithInfo ocppSoap = new ItemsWithInfo("SOAP endpoint for OCPP", "/ocpp/services/CentralSystemService");
+    private final ItemsWithInfo ocppWebSocket = new ItemsWithInfo("WebSocket/JSON endpoint for OCPP", "/ocpp/websocket/CentralSystemService/(chargeBoxId)");
+
+
     public static class ItemsWithInfo {
         private final String info;
         private final String dataElementPostFix;
@@ -53,5 +37,32 @@ public enum EndpointInfo {
                             .map(s -> s + dataElementPostFix)
                             .collect(Collectors.toList());
         }
+
+		public String getInfo() {
+			return info;
+		}
+
+		public String getDataElementPostFix() {
+			return dataElementPostFix;
+		}
+
+		public List<String> getData() {
+			return data;
+		}
     }
+
+
+	public ItemsWithInfo getWebInterface() {
+		return webInterface;
+	}
+
+
+	public ItemsWithInfo getOcppSoap() {
+		return ocppSoap;
+	}
+
+
+	public ItemsWithInfo getOcppWebSocket() {
+		return ocppWebSocket;
+	}
 }

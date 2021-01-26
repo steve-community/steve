@@ -27,7 +27,7 @@ import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.PeriodFormatter;
 import org.joda.time.format.PeriodFormatterBuilder;
-import org.jooq.DSLContext;
+
 
 import java.util.concurrent.TimeUnit;
 
@@ -98,15 +98,7 @@ public final class DateTimeUtils {
         return PERIOD_FORMATTER.print(new Period(from, to));
     }
 
-    public static void checkJavaAndMySQLOffsets(DSLContext ctx) {
-        long sql = CustomDSL.selectOffsetFromUtcInSeconds(ctx);
-        long java = DateTimeUtils.getOffsetFromUtcInSeconds();
 
-        if (sql != java) {
-            throw new SteveException("MySQL and Java are not using the same time zone. " +
-                    "Java offset in seconds (%s) != MySQL offset in seconds (%s)", java, sql);
-        }
-    }
 
     private static long getOffsetFromUtcInSeconds() {
         DateTimeZone timeZone = DateTimeZone.getDefault();

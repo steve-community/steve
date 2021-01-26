@@ -18,11 +18,11 @@
  */
 package de.rwth.idsg.steve;
 
-import de.rwth.idsg.steve.utils.__DatabasePreparer__;
 import ocpp.cs._2015._10.MeterValue;
 import ocpp.cs._2015._10.SampledValue;
 import org.joda.time.DateTime;
-import org.junit.Assert;
+import org.springframework.boot.SpringApplication;
+import org.springframework.context.ConfigurableApplicationContext;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -49,13 +49,16 @@ public abstract class StressTest {
     protected static final int CHARGE_BOX_COUNT = THREAD_COUNT;
     protected static final int CONNECTOR_COUNT_PER_CHARGE_BOX = 25;
 
+    protected JpaDatabasePreparer databasePreparer;
+
     protected void attack() throws Exception {
-        Assert.assertEquals(ApplicationProfile.TEST, SteveConfiguration.CONFIG.getProfile());
-        Assert.assertTrue(SteveConfiguration.CONFIG.getOcpp().isAutoRegisterUnknownStations());
+       // Assert.assertEquals(ApplicationProfile.TEST, SteveConfiguration.CONFIG.getProfile());
+       // Assert.assertTrue(SteveConfiguration.CONFIG.getOcpp().isAutoRegisterUnknownStations());
 
-        __DatabasePreparer__.prepare();
+        //__DatabasePreparer__.prepare();
 
-        Application app = new Application();
+        ConfigurableApplicationContext app = SpringApplication.run(net.parkl.server.TestApplication.class);
+        databasePreparer = app.getBean(JpaDatabasePreparer.class);
         try {
             app.start();
             attackInternal();
@@ -63,7 +66,7 @@ public abstract class StressTest {
             try {
                 app.stop();
             } finally {
-                __DatabasePreparer__.cleanUp();
+                //__DatabasePreparer__.cleanUp();
             }
         }
     }

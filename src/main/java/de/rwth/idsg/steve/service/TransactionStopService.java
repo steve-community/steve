@@ -20,14 +20,15 @@ package de.rwth.idsg.steve.service;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.Ordering;
-import de.rwth.idsg.steve.repository.OcppServerRepository;
-import de.rwth.idsg.steve.repository.TransactionRepository;
 import de.rwth.idsg.steve.repository.dto.Transaction;
 import de.rwth.idsg.steve.repository.dto.TransactionDetails;
 import de.rwth.idsg.steve.repository.dto.UpdateTransactionParams;
-import jooq.steve.db.enums.TransactionStopEventActor;
-import jooq.steve.db.tables.records.TransactionStartRecord;
+import de.rwth.idsg.steve.utils.DateTimeConverter;
 import lombok.Builder;
+import net.parkl.ocpp.entities.TransactionStart;
+import net.parkl.ocpp.entities.TransactionStopEventActor;
+import net.parkl.ocpp.service.cs.OcppServerService;
+import net.parkl.ocpp.service.cs.TransactionService;
 import ocpp.cs._2012._06.UnitOfMeasure;
 import org.jetbrains.annotations.Nullable;
 import org.joda.time.DateTime;
@@ -44,8 +45,8 @@ import java.util.List;
 @Service
 public class TransactionStopService {
 
-    @Autowired private TransactionRepository transactionRepository;
-    @Autowired private OcppServerRepository ocppServerRepository;
+    @Autowired private TransactionService transactionService;
+    @Autowired private OcppServerService ocppServerService;
 
     public void stop(List<Integer> transactionPkList) {
         transactionPkList.stream()
@@ -54,7 +55,7 @@ public class TransactionStopService {
     }
 
     public void stop(Integer transactionPk) {
-        TransactionDetails thisTxDetails = transactionRepository.getDetails(transactionPk, false);
+        TransactionDetails thisTxDetails = transactionService.getDetails(transactionPk, false);
         Transaction thisTx = thisTxDetails.getTransaction();
 
         // early exit, if transaction is already stopped
@@ -64,7 +65,7 @@ public class TransactionStopService {
 
         TerminationValues values = findNeededValues(thisTxDetails);
 
-        ocppServerRepository.updateTransaction(UpdateTransactionParams.builder()
+        ocppServerService.updateTransaction(UpdateTransactionParams.builder()
                                                                       .transactionId(thisTx.getId())
                                                                       .chargeBoxId(thisTx.getChargeBoxId())
                                                                       .stopMeterValue(values.stopValue)
@@ -76,7 +77,7 @@ public class TransactionStopService {
 
     private static TerminationValues findNeededValues(TransactionDetails thisTxDetails) {
         Transaction thisTx = thisTxDetails.getTransaction();
-        TransactionStartRecord nextTx = thisTxDetails.getNextTransactionStart();
+        TransactionStart nextTx = thisTxDetails.getNextTransactionStart();
         List<TransactionDetails.MeterValues> intermediateValues = thisTxDetails.getValues();
 
         // -------------------------------------------------------------------------
@@ -101,13 +102,13 @@ public class TransactionStopService {
             if (Integer.parseInt(nextTx.getStartValue()) > Integer.parseInt(thisTx.getStartValue())) {
                 return TerminationValues.builder()
                                         .stopValue(nextTx.getStartValue())
-                                        .stopTimestamp(nextTx.getStartTimestamp())
+                                        .stopTimestamp(DateTimeConverter.from(nextTx.getStartTimestamp()))
                                         .build();
             } else {
                 // this mix of strategies might be really confusing
                 return TerminationValues.builder()
                                         .stopValue(thisTx.getStartValue())
-                                        .stopTimestamp(nextTx.getStartTimestamp())
+                                        .stopTimestamp(DateTimeConverter.from(nextTx.getStartTimestamp()))
                                         .build();
             }
         }

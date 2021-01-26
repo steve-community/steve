@@ -18,10 +18,11 @@
  */
 package de.rwth.idsg.steve.repository.dto;
 
-import jooq.steve.db.tables.records.TransactionStartRecord;
+
 import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import net.parkl.ocpp.entities.TransactionStart;
 import org.jetbrains.annotations.Nullable;
 import org.joda.time.DateTime;
 
@@ -42,7 +43,7 @@ public class TransactionDetails {
      * that is at the same chargebox and connector
      */
     @Nullable
-    private final TransactionStartRecord nextTransactionStart;
+    private final TransactionStart nextTransactionStart;
 
     @Getter
     @Builder

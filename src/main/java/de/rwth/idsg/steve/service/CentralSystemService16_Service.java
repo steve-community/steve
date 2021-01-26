@@ -19,15 +19,20 @@
 package de.rwth.idsg.steve.service;
 
 import de.rwth.idsg.steve.ocpp.OcppProtocol;
-import de.rwth.idsg.steve.repository.OcppServerRepository;
-import de.rwth.idsg.steve.repository.SettingsRepository;
+
 import de.rwth.idsg.steve.repository.dto.InsertConnectorStatusParams;
 import de.rwth.idsg.steve.repository.dto.InsertTransactionParams;
 import de.rwth.idsg.steve.repository.dto.UpdateChargeboxParams;
 import de.rwth.idsg.steve.repository.dto.UpdateTransactionParams;
-import jooq.steve.db.enums.TransactionStopEventActor;
+
 import lombok.extern.slf4j.Slf4j;
+import net.parkl.ocpp.entities.TransactionStopEventActor;
 import ocpp.cs._2015._10.AuthorizationStatus;
+
+import net.parkl.ocpp.entities.OcppChargingProcess;
+import net.parkl.ocpp.service.OcppProxyService;
+import net.parkl.ocpp.service.cs.OcppServerService;
+import net.parkl.ocpp.service.cs.SettingsService;
 import ocpp.cs._2015._10.AuthorizeRequest;
 import ocpp.cs._2015._10.AuthorizeResponse;
 import ocpp.cs._2015._10.BootNotificationRequest;
@@ -66,12 +71,15 @@ import java.util.Optional;
 @Service
 public class CentralSystemService16_Service {
 
-    @Autowired private OcppServerRepository ocppServerRepository;
-    @Autowired private SettingsRepository settingsRepository;
+    @Autowired private OcppServerService ocppServerService;
+    @Autowired private SettingsService settingsService;
 
     @Autowired private OcppTagService ocppTagService;
     @Autowired private NotificationService notificationService;
     @Autowired private ChargePointHelperService chargePointHelperService;
+    
+    @Autowired
+    private OcppProxyService proxyService;
 
     public BootNotificationResponse bootNotification(BootNotificationRequest parameters, String chargeBoxIdentity,
                                                      OcppProtocol ocppProtocol) {
@@ -102,19 +110,19 @@ public class CentralSystemService16_Service {
                                          .heartbeatTimestamp(now)
                                          .build();
 
-            ocppServerRepository.updateChargebox(params);
+            ocppServerService.updateChargebox(params);
         }
 
         return new BootNotificationResponse()
                 .withStatus(status.orElse(RegistrationStatus.REJECTED))
                 .withCurrentTime(now)
-                .withInterval(settingsRepository.getHeartbeatIntervalInSeconds());
+                .withInterval(settingsService.getHeartbeatIntervalInSeconds());
     }
 
     public FirmwareStatusNotificationResponse firmwareStatusNotification(
             FirmwareStatusNotificationRequest parameters, String chargeBoxIdentity) {
         String status = parameters.getStatus().value();
-        ocppServerRepository.updateChargeboxFirmwareStatus(chargeBoxIdentity, status);
+        ocppServerService.updateChargeboxFirmwareStatus(chargeBoxIdentity, status);
         return new FirmwareStatusNotificationResponse();
     }
 
@@ -135,7 +143,7 @@ public class CentralSystemService16_Service {
                                            .vendorErrorCode(parameters.getVendorErrorCode())
                                            .build();
 
-        ocppServerRepository.insertConnectorStatus(params);
+        ocppServerService.insertConnectorStatus(params);
 
         if (parameters.getStatus() == ChargePointStatus.FAULTED) {
             notificationService.ocppStationStatusFailure(
@@ -146,20 +154,17 @@ public class CentralSystemService16_Service {
     }
 
     public MeterValuesResponse meterValues(MeterValuesRequest parameters, String chargeBoxIdentity) {
-        ocppServerRepository.insertMeterValues(
-                chargeBoxIdentity,
-                parameters.getMeterValue(),
-                parameters.getConnectorId(),
-                parameters.getTransactionId()
-        );
-
+        if (parameters.isSetMeterValue() && parameters.getTransactionId()!=null) {
+        	ocppServerService.insertMeterValues(chargeBoxIdentity, parameters.getMeterValue(),
+                                                   parameters.getConnectorId(), parameters.getTransactionId());
+        }
         return new MeterValuesResponse();
     }
 
     public DiagnosticsStatusNotificationResponse diagnosticsStatusNotification(
             DiagnosticsStatusNotificationRequest parameters, String chargeBoxIdentity) {
         String status = parameters.getStatus().value();
-        ocppServerRepository.updateChargeboxDiagnosticsStatus(chargeBoxIdentity, status);
+        ocppServerService.updateChargeboxDiagnosticsStatus(chargeBoxIdentity, status);
         return new DiagnosticsStatusNotificationResponse();
     }
 
@@ -182,8 +187,17 @@ public class CentralSystemService16_Service {
                                        .eventTimestamp(DateTime.now())
                                        .build();
 
-        int transactionId = ocppServerRepository.insertTransaction(params);
-
+        if (proxyService.isWaitingForChargingProcess(params.getChargeBoxId())) {
+        	OcppChargingProcess cp=proxyService.checkForChargingProcessWithoutTransaction(params.getChargeBoxId(), params.getConnectorId());
+            if (cp==null) {
+            	log.error("Charging process not found without transaction: {}/{}", params.getChargeBoxId(), params.getConnectorId());
+            	throw new IllegalStateException("Charging process not found without transaction: "+ params.getConnectorId());
+            }	
+        }
+        
+      
+        int transactionId = ocppServerService.insertTransaction(params);
+        
         notificationService.ocppTransactionStarted(chargeBoxIdentity, transactionId, parameters.getConnectorId());
 
         return new StartTransactionResponse()
@@ -213,9 +227,10 @@ public class CentralSystemService16_Service {
                                        .eventActor(TransactionStopEventActor.station)
                                        .build();
 
-        ocppServerRepository.updateTransaction(params);
+        ocppServerService.updateTransaction(params);
 
-        ocppServerRepository.insertMeterValues(chargeBoxIdentity, parameters.getTransactionData(), transactionId);
+        ocppServerService.insertMeterValues(chargeBoxIdentity, parameters.getTransactionData(), transactionId);
+
 
         notificationService.ocppTransactionEnded(chargeBoxIdentity, transactionId);
 
@@ -224,7 +239,7 @@ public class CentralSystemService16_Service {
 
     public HeartbeatResponse heartbeat(HeartbeatRequest parameters, String chargeBoxIdentity) {
         DateTime now = DateTime.now();
-        ocppServerRepository.updateChargeboxHeartbeat(chargeBoxIdentity, now);
+        ocppServerService.updateChargeboxHeartbeat(chargeBoxIdentity, now);
 
         return new HeartbeatResponse().withCurrentTime(now);
     }

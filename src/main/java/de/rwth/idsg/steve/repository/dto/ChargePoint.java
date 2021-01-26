@@ -18,12 +18,13 @@
  */
 package de.rwth.idsg.steve.repository.dto;
 
-import jooq.steve.db.tables.records.AddressRecord;
-import jooq.steve.db.tables.records.ChargeBoxRecord;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import net.parkl.ocpp.entities.OcppAddress;
 import org.joda.time.DateTime;
+
+import net.parkl.ocpp.entities.OcppChargeBox;
 
 /**
  *
@@ -43,8 +44,8 @@ public final class ChargePoint {
     @Getter
     @RequiredArgsConstructor
     public static final class Details {
-        private final ChargeBoxRecord chargeBox;
-        private final AddressRecord address;
+        private final OcppChargeBox chargeBox;
+        private final OcppAddress address;
     }
 
 }

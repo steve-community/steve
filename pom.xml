@@ -1,5 +1,5 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>de.rwth.idsg</groupId>
     <artifactId>steve</artifactId>
@@ -32,17 +32,20 @@
         <java.version>11</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-        <jooq.version>3.12.4</jooq.version>
-        <cxf.version>3.4.0</cxf.version>
-        <spring.version>5.3.1</spring.version>
-        <spring.security.version>5.4.1</spring.security.version>
-        <mysql.jdbc.version>8.0.22</mysql.jdbc.version>
-        <jetty.version>9.4.34.v20201102</jetty.version>
-        <lombok.version>1.18.16</lombok.version>
-        <jackson.version>2.11.3</jackson.version>
+        <cxf.version>3.3.6</cxf.version>
+        <spring.boot.version>2.3.4.RELEASE</spring.boot.version>
 
-        <!-- In Mysql: schema == database (http://dev.mysql.com/doc/refman/5.6/en/glossary.html#glos_schema) -->
-        <jdbcUrl>jdbc:mysql://${db.ip}:${db.port}/${db.schema}?useSSL=true&amp;serverTimezone=UTC</jdbcUrl>
+        <spring.security.version>5.3.2.RELEASE</spring.security.version>
+        <mysql.jdbc.version>8.0.20</mysql.jdbc.version>
+        <lombok.version>1.18.12</lombok.version>
+        <jackson.version>2.11.0</jackson.version>
+        <awaitility.version>4.0.2</awaitility.version>
+
+        <javaee.web.api.version>8.0</javaee.web.api.version>
+
+        <tomcat.version>9.0.35</tomcat.version>
+        <hibernate.validator.version>6.1.5.Final</hibernate.validator.version>
+
     </properties>
 
     <profiles>
@@ -53,20 +56,6 @@
             </activation>
             <properties>
                 <envName>prod</envName>
-                <skipTests>true</skipTests>
-            </properties>
-        </profile>
-        <profile>
-            <id>docker</id>
-            <properties>
-                <envName>docker</envName>
-                <skipTests>true</skipTests>
-            </properties>
-        </profile>
-        <profile>
-            <id>kubernetes</id>
-            <properties>
-                <envName>kubernetes</envName>
                 <skipTests>true</skipTests>
             </properties>
         </profile>
@@ -88,20 +77,7 @@
 
     <build>
         <finalName>${project.artifactId}</finalName>
-        <resources>
-            <resource>
-                <directory>src/main/resources/config/${envName}</directory>
-                <filtering>true</filtering>
-            </resource>
-            <resource>
-                <directory>src/main/resources</directory>
-                <filtering>false</filtering>
-                <includes>
-                    <include>webapp/static/**</include>
-                    <include>webapp/WEB-INF/web.xml</include>
-                </includes>
-            </resource>
-        </resources>
+
 
         <plugins>
             <plugin>
@@ -140,26 +116,7 @@
                 </executions>
             </plugin>
 
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-enforcer-plugin</artifactId>
-                <version>3.0.0-M3</version>
-                <executions>
-                    <execution>
-                        <id>enforce-java</id>
-                        <goals>
-                            <goal>enforce</goal>
-                        </goals>
-                        <configuration>
-                            <rules>
-                                <requireJavaVersion>
-                                    <version>[11,)</version>
-                                </requireJavaVersion>
-                            </rules>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
+
             <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.8.1</version>
@@ -169,261 +126,7 @@
                 </configuration>
             </plugin>
 
-            <!-- Static analysis and check style -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-pmd-plugin</artifactId>
-                <version>3.13.0</version>
-            </plugin>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>findbugs-maven-plugin</artifactId>
-                <version>3.0.5</version>
-                <configuration>
-                    <failOnError>false</failOnError>
-                    <onlyAnalyze>de.rwth.idsg.steve.-</onlyAnalyze>
-                </configuration>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>check</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-checkstyle-plugin</artifactId>
-                <version>3.1.1</version>
-                <configuration>
-                    <configLocation>${basedir}/src/main/resources/checkstyle.xml</configLocation>
-                </configuration>
-            </plugin>
 
-            <plugin>
-                <groupId>pl.project13.maven</groupId>
-                <artifactId>git-commit-id-plugin</artifactId>
-                <version>4.0.3</version>
-                <executions>
-                    <execution>
-                        <phase>initialize</phase>
-                        <goals>
-                            <goal>revision</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <failOnNoGitDirectory>false</failOnNoGitDirectory>
-                    <failOnUnableToExtractRepoInfo>false</failOnUnableToExtractRepoInfo>
-                </configuration>
-            </plugin>
-
-            <!-- Read from main.properties the DB configuration -->
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>properties-maven-plugin</artifactId>
-                <version>1.0.0</version>
-                <executions>
-                    <execution>
-                        <phase>initialize</phase>
-                        <goals>
-                            <goal>read-project-properties</goal>
-                        </goals>
-                        <configuration>
-                            <files>
-                                <file>src/main/resources/config/${envName}/main.properties</file>
-                            </files>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-dependency-plugin</artifactId>
-                <version>3.1.1</version>
-                <executions>
-                    <execution>
-                        <id>copy-dependencies</id>
-                        <phase>prepare-package</phase>
-                        <goals>
-                            <goal>copy-dependencies</goal>
-                        </goals>
-                        <configuration>
-                            <outputDirectory>${project.build.directory}/libs</outputDirectory>
-                            <includeScope>runtime</includeScope>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
-                <version>3.2.0</version>
-                <configuration>
-                    <archive>
-                        <manifest>
-                            <addClasspath>true</addClasspath>
-                            <classpathPrefix>libs/</classpathPrefix>
-                            <mainClass>de.rwth.idsg.steve.Application</mainClass>
-                        </manifest>
-                    </archive>
-                </configuration>
-            </plugin>
-
-            <!-- Pre-compiles JSPs -->
-            <plugin>
-                <groupId>org.eclipse.jetty</groupId>
-                <artifactId>jetty-jspc-maven-plugin</artifactId>
-                <version>${jetty.version}</version>
-                <executions>
-                    <execution>
-                        <phase>compile</phase>
-                        <id>jspc</id>
-                        <goals>
-                            <goal>jspc</goal>
-                        </goals>
-                        <configuration>
-                            <webAppSourceDirectory>${basedir}/src/main/resources/webapp</webAppSourceDirectory>
-                            <webXml>${basedir}/src/main/resources/webapp/WEB-INF/web.xml</webXml>
-                            <webXmlFragment>${basedir}/target/classes/webapp/WEB-INF/web.xml-frag</webXmlFragment>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-
-            <plugin>
-                <groupId>org.flywaydb</groupId>
-                <artifactId>flyway-maven-plugin</artifactId>
-                <version>7.2.0</version>
-
-                <!-- Must be in the same phase as Jooq -->
-                <executions>
-                    <execution>
-                        <phase>generate-sources</phase>
-                        <goals>
-                            <goal>migrate</goal>
-                        </goals>
-                    </execution>
-                </executions>
-
-                <configuration>
-                    <!-- https://github.com/RWTH-i5-IDSG/steve/issues/157 -->
-                    <initSql>SET default_storage_engine=InnoDB;</initSql>
-                    <!-- we need this because of extensions. they have a higher version number
-                         namespace reserved (e.g. 8.x.x). new migrations in core version should
-                         be executed in the extended version as well -->
-                    <outOfOrder>true</outOfOrder>
-
-                    <!-- Because maven produces this warning after upgrading from 4.2.0 to 5.1.0:
-                         [WARNING] Could not find schema history table `stevedb`.`flyway_schema_history`, but found
-                         `stevedb`.`schema_version` instead. You are seeing this message because Flyway changed its
-                         default for flyway.table in version 5.0.0 to flyway_schema_history and you are still relying
-                         on the old default (schema_version). Set flyway.table=schema_version in your configuration to
-                         fix this. This fallback mechanism will be removed in Flyway 6.0.0. -->
-                    <table>schema_version</table>
-
-                    <cleanDisabled>true</cleanDisabled>
-                    <driver>com.mysql.cj.jdbc.Driver</driver>
-                    <url>${jdbcUrl}</url>
-                    <user>${db.user}</user>
-                    <password>${db.password}</password>
-                    <schemas>
-                        <schema>${db.schema}</schema>
-                    </schemas>
-                    <locations>
-                        <location>filesystem:src/main/resources/db/migration</location>
-                    </locations>
-                </configuration>
-            </plugin>
-
-            <plugin>
-                <!-- Specify the maven code generator plugin -->
-                <groupId>org.jooq</groupId>
-                <artifactId>jooq-codegen-maven</artifactId>
-                <version>${jooq.version}</version>
-
-                <!-- The plugin should hook into the generate goal -->
-                <executions>
-                    <execution>
-                        <phase>generate-sources</phase>
-                        <goals>
-                            <goal>generate</goal>
-                        </goals>
-                    </execution>
-                </executions>
-
-                <!-- Manage the plugin's dependency -->
-                <dependencies>
-                    <dependency>
-                        <groupId>org.jooq</groupId>
-                        <artifactId>jooq-meta</artifactId>
-                        <version>${jooq.version}</version>
-                    </dependency>
-                    <dependency>
-                        <groupId>org.jooq</groupId>
-                        <artifactId>jooq-codegen</artifactId>
-                        <version>${jooq.version}</version>
-                    </dependency>
-                    <dependency>
-                        <groupId>mysql</groupId>
-                        <artifactId>mysql-connector-java</artifactId>
-                        <version>${mysql.jdbc.version}</version>
-                    </dependency>
-                </dependencies>
-
-                <!-- http://www.jooq.org/doc/3.5/manual/code-generation/codegen-configuration/
-                     http://www.jooq.org/doc/3.5/manual/code-generation/codegen-advanced/ -->
-                <configuration>
-                    <jdbc>
-                        <driver>com.mysql.cj.jdbc.Driver</driver>
-                        <url>${jdbcUrl}</url>
-                        <user>${db.user}</user>
-                        <password>${db.password}</password>
-                    </jdbc>
-
-                    <generator>
-                        <database>
-                            <name>org.jooq.meta.mysql.MySQLDatabase</name>
-                            <includes>.*</includes>
-                            <excludes/>
-                            <inputSchema>${db.schema}</inputSchema>
-                            <unsignedTypes>false</unsignedTypes>
-
-                            <forcedTypes>
-                                <forcedType>
-                                    <name>BOOLEAN</name>
-                                    <!-- https://groups.google.com/forum/#!topic/jooq-user/cpcf_Vk8Vd0 -->
-                                    <types>(?i:TINYINT(\s*\(\d+\))?(\s*UNSIGNED)?)</types>
-                                </forcedType>
-                                <forcedType>
-                                    <name>BOOLEAN</name>
-                                    <expression>(IN_TRANSACTION|BLOCKED)</expression>
-                                </forcedType>
-                                <forcedType>
-                                    <userType>org.joda.time.DateTime</userType>
-                                    <converter>de.rwth.idsg.steve.utils.DateTimeConverter</converter>
-                                    <types>(TIMESTAMP|DATETIME)</types>
-                                </forcedType>
-                                <forcedType>
-                                    <userType>org.joda.time.LocalDate</userType>
-                                    <converter>de.rwth.idsg.steve.utils.DateConverter</converter>
-                                    <expression>.*\.BIRTH_DAY</expression>
-                                    <types>.*(DATE).*</types>
-                                </forcedType>
-                            </forcedTypes>
-                        </database>
-                        <generate>
-                            <fluentSetters>true</fluentSetters>
-                        </generate>
-
-                        <target>
-                            <packageName>jooq.steve.db</packageName>
-                            <directory>${project.build.directory}/generated-sources</directory>
-                        </target>
-                    </generator>
-                </configuration>
-            </plugin>
         </plugins>
     </build>
 
@@ -441,12 +144,13 @@
     <dependencyManagement>
         <dependencies>
             <dependency>
-                <groupId>org.springframework</groupId>
-                <artifactId>spring-framework-bom</artifactId>
-                <version>${spring.version}</version>
-                <scope>import</scope>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-dependencies</artifactId>
+                <version>${spring.boot.version}</version>
                 <type>pom</type>
+                <scope>import</scope>
             </dependency>
+
             <dependency>
                 <groupId>org.apache.logging.log4j</groupId>
                 <artifactId>log4j-bom</artifactId>
@@ -458,6 +162,23 @@
     </dependencyManagement>
 
     <dependencies>
+
+
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-entitymanager</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-jpa</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+
+
         <dependency>
             <groupId>com.github.goekay</groupId>
             <artifactId>CompositeJKS</artifactId>
@@ -516,7 +237,7 @@
         <dependency>
             <groupId>org.hibernate.validator</groupId>
             <artifactId>hibernate-validator</artifactId>
-            <version>6.1.6.Final</version>
+            <version>${hibernate.validator.version}</version>
         </dependency>
         <dependency>
             <groupId>com.google.guava</groupId>
@@ -540,63 +261,30 @@
         </dependency>
 
         <!-- Spring -->
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-webmvc</artifactId>
-            <exclusions>
-                <!-- http://docs.spring.io/spring/docs/current/spring-framework-reference/html/overview.html#overview-not-using-commons-logging -->
-                <exclusion>
-                    <groupId>commons-logging</groupId>
-                    <artifactId>commons-logging</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.springframework</groupId>
-                    <artifactId>spring-jcl</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
+
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-websocket</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.springframework.security</groupId>
-            <artifactId>spring-security-web</artifactId>
-            <version>${spring.security.version}</version>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-security</artifactId>
         </dependency>
-        <dependency>
-            <groupId>org.springframework.security</groupId>
-            <artifactId>spring-security-config</artifactId>
-            <version>${spring.security.version}</version>
-        </dependency>
+
 
         <!-- Logging -->
         <dependency>
-            <groupId>org.apache.logging.log4j</groupId>
-            <artifactId>log4j-core</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.logging.log4j</groupId>
-            <artifactId>log4j-api</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.logging.log4j</groupId>
-            <artifactId>log4j-slf4j-impl</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.logging.log4j</groupId>
-            <artifactId>log4j-web</artifactId>
-            <scope>runtime</scope>
-        </dependency>
-        <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
-            <version>1.7.30</version>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>jcl-over-slf4j</artifactId>
-            <version>1.7.30</version>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
         </dependency>
         <dependency>
             <groupId>com.lmax</groupId>
@@ -626,42 +314,35 @@
             <version>${cxf.version}</version>
         </dependency>
 
-        <!-- Jetty related dependencies -->
         <dependency>
-            <groupId>org.eclipse.jetty</groupId>
-            <artifactId>jetty-server</artifactId>
-            <version>${jetty.version}</version>
+            <groupId>org.awaitility</groupId>
+            <artifactId>awaitility</artifactId>
+            <version>${awaitility.version}</version>
         </dependency>
+
         <dependency>
-            <groupId>org.eclipse.jetty</groupId>
-            <artifactId>jetty-webapp</artifactId>
-            <version>${jetty.version}</version>
+            <groupId>javax</groupId>
+            <artifactId>javaee-web-api</artifactId>
+            <version>${javaee.web.api.version}</version>
+            <scope>provided</scope>
         </dependency>
+
+
+        <!-- Tomcat -->
         <dependency>
-            <groupId>org.eclipse.jetty</groupId>
-            <artifactId>jetty-annotations</artifactId>
-            <version>${jetty.version}</version>
+            <groupId>org.apache.tomcat</groupId>
+            <artifactId>tomcat-websocket</artifactId>
+            <version>${tomcat.version}</version>
+            <scope>provided</scope>
         </dependency>
+
         <dependency>
-            <groupId>org.eclipse.jetty</groupId>
-            <artifactId>apache-jsp</artifactId>
-            <version>${jetty.version}</version>
+            <groupId>org.apache.tomcat</groupId>
+            <artifactId>tomcat-catalina</artifactId>
+            <version>${tomcat.version}</version>
+            <scope>provided</scope>
         </dependency>
-        <dependency>
-            <groupId>org.eclipse.jetty</groupId>
-            <artifactId>apache-jstl</artifactId>
-            <version>${jetty.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.eclipse.jetty</groupId>
-            <artifactId>jetty-rewrite</artifactId>
-            <version>${jetty.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.eclipse.jetty.websocket</groupId>
-            <artifactId>websocket-server</artifactId>
-            <version>${jetty.version}</version>
-        </dependency>
+
 
         <!-- DB -->
         <dependency>
@@ -669,16 +350,7 @@
             <artifactId>mysql-connector-java</artifactId>
             <version>${mysql.jdbc.version}</version>
         </dependency>
-        <dependency>
-            <groupId>com.zaxxer</groupId>
-            <artifactId>HikariCP</artifactId>
-            <version>3.4.5</version>
-        </dependency>
-        <dependency>
-            <groupId>org.jooq</groupId>
-            <artifactId>jooq</artifactId>
-            <version>${jooq.version}</version>
-        </dependency>
+
 
         <!-- Test -->
         <dependency>
@@ -689,9 +361,30 @@
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>4.13.1</version>
+            <version>4.13</version>
             <scope>test</scope>
         </dependency>
+
+
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/javax.el/javax.el-api -->
+        <dependency>
+            <groupId>javax.el</groupId>
+            <artifactId>javax.el-api</artifactId>
+            <version>3.0.1-b06</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/org.glassfish/javax.el -->
+        <dependency>
+            <groupId>org.glassfish</groupId>
+            <artifactId>javax.el</artifactId>
+            <version>3.0.1-b11</version>
+        </dependency>
+
+
 
         <!-- https://github.com/zafarkhaja/jsemver -->
         <dependency>

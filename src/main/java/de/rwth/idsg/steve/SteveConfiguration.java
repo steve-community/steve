@@ -1,21 +1,3 @@
-/*
- * SteVe - SteckdosenVerwaltung - https://github.com/RWTH-i5-IDSG/steve
- * Copyright (C) 2013-2020 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
- * All Rights Reserved.
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
- */
 package de.rwth.idsg.steve;
 
 import de.rwth.idsg.steve.ocpp.ws.custom.WsSessionSelectStrategy;
@@ -26,22 +8,32 @@ import lombok.Getter;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import java.beans.ConstructorProperties;
+
+import javax.annotation.PostConstruct;
+
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+
 /**
+ * SteVe configuration component modified for plugins
  * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
+ * @author Andor Toth
  * @since 19.08.2014
  */
-@Getter
-public enum SteveConfiguration {
-    CONFIG;
+@Component
+public class SteveConfiguration {
+    //CONFIG;
 
     // Root mapping for Spring
-    private final String springMapping = "/";
+    //private final String springMapping = "/";
     // Web frontend
-    private final String springManagerMapping = "/manager/*";
+    //private final String springManagerMapping = "/ocpp/manager/*";
     // Mapping for CXF SOAP services
-    private final String cxfMapping = "/services/*";
+    //private final String cxfMapping = "/ocpp/services/*";
     // Dummy service path
-    private final String routerEndpointPath = "/CentralSystemService";
+    private static final String routerEndpointPath = "/CentralSystemService";
     // Time zone for the application and database connections
     private final String timeZoneId = "UTC";  // or ZoneId.systemDefault().getId();
 
@@ -49,67 +41,37 @@ public enum SteveConfiguration {
     // main.properties
     // -------------------------------------------------------------------------
 
-    private final String contextPath;
-    private final String steveVersion;
-    private final String gitDescribe;
-    private final ApplicationProfile profile;
-    private final Ocpp ocpp;
-    private final Auth auth;
-    private final DB db;
-    private final Jetty jetty;
+    private Ocpp ocpp;
 
-    SteveConfiguration() {
-        PropertiesFileLoader p = new PropertiesFileLoader("main.properties");
+    @Value("${ocpp.ws.session.select.strategy:ALWAYS_LAST}")
+    private String wsSessionSelectStrategy;
 
-        contextPath = sanitizeContextPath(p.getOptionalString("context.path"));
-        steveVersion = p.getString("steve.version");
-        gitDescribe = useFallbackIfNotSet(p.getOptionalString("git.describe"), null);
-        profile = ApplicationProfile.fromName(p.getString("profile"));
+    @Value("${auto.register.unknown.stations:false}")
+    private boolean autoRegisterUnknownStations;
 
-        jetty = Jetty.builder()
-                     .serverHost(p.getString("server.host"))
-                     .gzipEnabled(p.getBoolean("server.gzip.enabled"))
-                     .httpEnabled(p.getBoolean("http.enabled"))
-                     .httpPort(p.getInt("http.port"))
-                     .httpsEnabled(p.getBoolean("https.enabled"))
-                     .httpsPort(p.getInt("https.port"))
-                     .keyStorePath(p.getOptionalString("keystore.path"))
-                     .keyStorePassword(p.getOptionalString("keystore.password"))
-                     .build();
+    @Value("${keystore.path:}")
+    @Getter
+    private String keystorePath;
 
-        db = DB.builder()
-               .ip(p.getString("db.ip"))
-               .port(p.getInt("db.port"))
-               .schema(p.getString("db.schema"))
-               .userName(p.getString("db.user"))
-               .password(p.getString("db.password"))
-               .sqlLogging(p.getBoolean("db.sql.logging"))
-               .build();
+    @Value("${keystore.password:}")
+    @Getter
+    private String keystorePassword;
 
-        PasswordEncoder encoder = new BCryptPasswordEncoder();
+    @PostConstruct
+    public void init() {
 
-        auth = Auth.builder()
-                   .passwordEncoder(encoder)
-                   .userName(p.getString("auth.user"))
-                   .encodedPassword(encoder.encode(p.getString("auth.password")))
-                   .build();
+
 
         ocpp = Ocpp.builder()
-                   .autoRegisterUnknownStations(p.getOptionalBoolean("auto.register.unknown.stations"))
-                   .wsSessionSelectStrategy(
-                           WsSessionSelectStrategyEnum.fromName(p.getString("ws.session.select.strategy")))
-                   .build();
+                .autoRegisterUnknownStations(autoRegisterUnknownStations)
+                .wsSessionSelectStrategy(
+                        WsSessionSelectStrategyEnum.fromName(wsSessionSelectStrategy))
+                .build();
 
-        validate();
+
     }
 
-    public String getSteveCompositeVersion() {
-        if (gitDescribe == null) {
-            return steveVersion;
-        } else {
-            return steveVersion + "-g" + gitDescribe;
-        }
-    }
+
 
     private static String useFallbackIfNotSet(String value, String fallback) {
         if (value == null) {
@@ -135,58 +97,31 @@ public enum SteveConfiguration {
         }
     }
 
-    private void validate() {
-        if (!(jetty.httpEnabled || jetty.httpsEnabled)) {
-            throw new IllegalArgumentException(
-                    "HTTP and HTTPS are both disabled. Well, how do you want to access the server, then?");
-        }
-    }
-
-    // -------------------------------------------------------------------------
-    // Class declarations
-    // -------------------------------------------------------------------------
-
-    // Jetty configuration
-    @Builder @Getter
-    public static class Jetty {
-        private final String serverHost;
-        private final boolean gzipEnabled;
-
-        // HTTP
-        private final boolean httpEnabled;
-        private final int httpPort;
-
-        // HTTPS
-        private final boolean httpsEnabled;
-        private final int httpsPort;
-        private final String keyStorePath;
-        private final String keyStorePassword;
-    }
-
-    // Database configuration
-    @Builder @Getter
-    public static class DB {
-        private final String ip;
-        private final int port;
-        private final String schema;
-        private final String userName;
-        private final String password;
-        private final boolean sqlLogging;
-    }
-
-    // Credentials for Web interface access
-    @Builder @Getter
-    public static class Auth {
-        private final PasswordEncoder passwordEncoder;
-        private final String userName;
-        private final String encodedPassword;
-    }
 
     // OCPP-related configuration
-    @Builder @Getter
+    @Builder
+    @Getter
     public static class Ocpp {
         private final boolean autoRegisterUnknownStations;
         private final WsSessionSelectStrategy wsSessionSelectStrategy;
+
+
     }
 
+    public Ocpp getOcpp() {
+        return ocpp;
+    }
+
+
+    public static String getRouterEndpointPath() {
+        return routerEndpointPath;
+    }
+
+    public WsSessionSelectStrategy getWsSessionSelectStrategy() {
+        return getOcpp().getWsSessionSelectStrategy();
+    }
+
+    public boolean isAutoRegisterUnknownStations() {
+        return getOcpp().isAutoRegisterUnknownStations();
+    }
 }

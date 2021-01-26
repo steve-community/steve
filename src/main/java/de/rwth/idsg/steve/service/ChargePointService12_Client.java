@@ -53,7 +53,7 @@ import java.util.concurrent.ScheduledExecutorService;
 @Slf4j
 @Service
 @Qualifier("ChargePointService12_Client")
-public class ChargePointService12_Client {
+public class ChargePointService12_Client implements IChargePointService12_Client {
 
     @Autowired protected ScheduledExecutorService executorService;
     @Autowired protected TaskStore taskStore;

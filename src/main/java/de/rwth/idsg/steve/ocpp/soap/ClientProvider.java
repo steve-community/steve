@@ -19,6 +19,7 @@
 package de.rwth.idsg.steve.ocpp.soap;
 
 import com.oneandone.compositejks.SslContextBuilder;
+import de.rwth.idsg.steve.SteveConfiguration;
 import org.apache.cxf.configuration.jsse.TLSClientParameters;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.frontend.ClientProxy;
@@ -26,14 +27,14 @@ import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.apache.cxf.transport.http.HTTPConduit;
 import org.apache.cxf.ws.addressing.WSAddressingFeature;
 import org.jetbrains.annotations.Nullable;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
 import javax.annotation.PostConstruct;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocketFactory;
 import javax.xml.ws.soap.SOAPBinding;
-
-import static de.rwth.idsg.steve.SteveConfiguration.CONFIG;
 
 /**
  * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
@@ -43,6 +44,9 @@ import static de.rwth.idsg.steve.SteveConfiguration.CONFIG;
 public class ClientProvider {
 
     @Nullable private TLSClientParameters tlsClientParams;
+
+    @Autowired
+    private SteveConfiguration config;
 
     @PostConstruct
     private void init() {
@@ -77,15 +81,15 @@ public class ClientProvider {
         return f;
     }
 
-    private static boolean shouldInitSSL() {
-        return CONFIG.getJetty().getKeyStorePath() != null && CONFIG.getJetty().getKeyStorePassword() != null;
+    private boolean shouldInitSSL() {
+        return !StringUtils.isEmpty(config.getKeystorePath()) && !StringUtils.isEmpty(config.getKeystorePassword());
     }
 
-    private static SSLSocketFactory setupSSL() {
+    private SSLSocketFactory setupSSL() {
         SSLContext ssl;
         try {
-            String keyStorePath = CONFIG.getJetty().getKeyStorePath();
-            String keyStorePwd = CONFIG.getJetty().getKeyStorePassword();
+            String keyStorePath = config.getKeystorePath();
+            String keyStorePwd = config.getKeystorePassword();
             ssl = SslContextBuilder.builder()
                                    .keyStoreFromFile(keyStorePath, keyStorePwd)
                                    .usingTLS()

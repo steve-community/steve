@@ -18,11 +18,11 @@
  */
 package de.rwth.idsg.steve.repository.dto;
 
-import jooq.steve.db.tables.records.ChargingProfileRecord;
-import jooq.steve.db.tables.records.ChargingSchedulePeriodRecord;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import net.parkl.ocpp.entities.ChargingSchedulePeriod;
+import net.parkl.ocpp.entities.OcppChargingProfile;
 import org.joda.time.DateTime;
 
 import java.util.List;
@@ -60,7 +60,7 @@ public class ChargingProfile {
     @Getter
     @RequiredArgsConstructor
     public static final class Details {
-        private final ChargingProfileRecord profile;
-        private final List<ChargingSchedulePeriodRecord> periods;
+        private final OcppChargingProfile profile;
+        private final List<ChargingSchedulePeriod> periods;
     }
 }

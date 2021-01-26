@@ -19,12 +19,15 @@
 package de.rwth.idsg.steve.ocpp.ws;
 
 import com.google.common.base.Strings;
-import de.rwth.idsg.steve.config.WebSocketConfiguration;
+
+import de.rwth.idsg.steve.SteveConfiguration;
+import de.rwth.idsg.steve.config.WebSocketConfigurationConstants;
 import de.rwth.idsg.steve.ocpp.OcppVersion;
 import de.rwth.idsg.steve.ocpp.ws.data.CommunicationContext;
 import de.rwth.idsg.steve.ocpp.ws.data.SessionContext;
 import de.rwth.idsg.steve.ocpp.ws.pipeline.IncomingPipeline;
-import de.rwth.idsg.steve.repository.OcppServerRepository;
+import net.parkl.ocpp.service.cs.OcppServerService;
+
 import de.rwth.idsg.steve.service.NotificationService;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,6 +47,8 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
+import javax.annotation.PostConstruct;
+
 /**
  * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
  * @since 17.03.2015
@@ -51,13 +56,16 @@ import java.util.function.Consumer;
 public abstract class AbstractWebSocketEndpoint extends ConcurrentWebSocketHandler {
 
     @Autowired private ScheduledExecutorService service;
-    @Autowired private OcppServerRepository ocppServerRepository;
+    @Autowired private OcppServerService ocppServerService;
     @Autowired private FutureResponseContextStore futureResponseContextStore;
     @Autowired private NotificationService notificationService;
+    
+    @Autowired
+    private SteveConfiguration config;
 
     public static final String CHARGEBOX_ID_KEY = "CHARGEBOX_ID_KEY";
 
-    private final SessionContextStore sessionContextStore = new SessionContextStore();
+    private SessionContextStore sessionContextStore;
     private final List<Consumer<String>> connectedCallbackList = new ArrayList<>();
     private final List<Consumer<String>> disconnectedCallbackList = new ArrayList<>();
     private final Object sessionContextLock = new Object();
@@ -65,6 +73,11 @@ public abstract class AbstractWebSocketEndpoint extends ConcurrentWebSocketHandl
     private IncomingPipeline pipeline;
 
     public abstract OcppVersion getVersion();
+    
+    @PostConstruct
+    public void setup() {
+    	sessionContextStore = new SessionContextStore(config);
+    }
 
     public void init(IncomingPipeline pipeline) {
         this.pipeline = pipeline;
@@ -109,7 +122,7 @@ public abstract class AbstractWebSocketEndpoint extends ConcurrentWebSocketHandl
 
     private void handlePongMessage(WebSocketSession session) {
         WebSocketLogger.receivedPong(getChargeBoxId(session), session);
-        ocppServerRepository.updateChargeboxHeartbeat(getChargeBoxId(session), DateTime.now());
+        ocppServerService.updateChargeboxHeartbeat(getChargeBoxId(session), DateTime.now());
     }
 
     @Override
@@ -122,8 +135,8 @@ public abstract class AbstractWebSocketEndpoint extends ConcurrentWebSocketHandl
         // the connection because of a idle timeout, we ping-pong at fixed intervals.
         ScheduledFuture pingSchedule = service.scheduleAtFixedRate(
                 new PingTask(chargeBoxId, session),
-                WebSocketConfiguration.PING_INTERVAL,
-                WebSocketConfiguration.PING_INTERVAL,
+                WebSocketConfigurationConstants.PING_INTERVAL,
+                WebSocketConfigurationConstants.PING_INTERVAL,
                 TimeUnit.MINUTES);
 
         futureResponseContextStore.addSession(session);

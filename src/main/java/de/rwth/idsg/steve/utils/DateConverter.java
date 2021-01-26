@@ -19,7 +19,6 @@
 package de.rwth.idsg.steve.utils;
 
 import org.joda.time.LocalDate;
-import org.jooq.Converter;
 
 import java.sql.Date;
 
@@ -27,10 +26,17 @@ import java.sql.Date;
  * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
  * @since 25.11.2015
  */
-public class DateConverter implements Converter<Date, LocalDate> {
+public class DateConverter {
+    public static LocalDate from(java.util.Date date) {
+        if (date == null) {
+            return null;
+        } else {
+            return new LocalDate(date.getTime());
+        }
+    }
 
-    @Override
-    public LocalDate from(Date sqlDate) {
+
+    public static LocalDate from(Date sqlDate) {
         if (sqlDate == null) {
             return null;
         } else {
@@ -38,8 +44,7 @@ public class DateConverter implements Converter<Date, LocalDate> {
         }
     }
 
-    @Override
-    public Date to(LocalDate jodaDate) {
+    public static Date to(LocalDate jodaDate) {
         if (jodaDate == null) {
             return null;
         } else {
@@ -47,13 +52,5 @@ public class DateConverter implements Converter<Date, LocalDate> {
         }
     }
 
-    @Override
-    public Class<Date> fromType() {
-        return Date.class;
-    }
 
-    @Override
-    public Class<LocalDate> toType() {
-        return LocalDate.class;
-    }
 }

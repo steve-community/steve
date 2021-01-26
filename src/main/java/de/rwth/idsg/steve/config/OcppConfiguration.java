@@ -18,6 +18,7 @@
  */
 package de.rwth.idsg.steve.config;
 
+import de.rwth.idsg.steve.SteveConfiguration;
 import de.rwth.idsg.steve.ocpp.soap.LoggingFeatureProxy;
 import de.rwth.idsg.steve.ocpp.soap.MediatorInInterceptor;
 import de.rwth.idsg.steve.ocpp.soap.MessageIdInterceptor;
@@ -40,7 +41,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import static de.rwth.idsg.steve.SteveConfiguration.CONFIG;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 
@@ -78,7 +78,7 @@ public class OcppConfiguration {
         // one to be created, since in MediatorInInterceptor we go over created/registered services and build a map.
         //
         List<Interceptor<? extends Message>> mediator = singletonList(new MediatorInInterceptor(springBus()));
-        createOcppService(ocpp12Server, CONFIG.getRouterEndpointPath(), mediator, Collections.emptyList());
+        createOcppService(ocpp12Server, SteveConfiguration.getRouterEndpointPath(), mediator, Collections.emptyList());
     }
 
     @Bean(name = Bus.DEFAULT_BUS_ID, destroyMethod = "shutdown")

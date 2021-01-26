@@ -18,8 +18,8 @@
  */
 package de.rwth.idsg.steve;
 
-import de.rwth.idsg.steve.utils.__DatabasePreparer__;
 import lombok.extern.slf4j.Slf4j;
+import net.parkl.server.TestApplication;
 import ocpp.cs._2010._08.AuthorizationStatus;
 import ocpp.cs._2010._08.AuthorizeRequest;
 import ocpp.cs._2010._08.AuthorizeResponse;
@@ -31,6 +31,8 @@ import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.springframework.boot.SpringApplication;
+import org.springframework.context.ConfigurableApplicationContext;
 
 import javax.xml.ws.WebServiceException;
 
@@ -47,27 +49,32 @@ import static de.rwth.idsg.steve.utils.Helpers.getRandomString;
 @Slf4j
 public class ApplicationTest {
 
-    private static final String REGISTERED_CHARGE_BOX_ID = __DatabasePreparer__.getRegisteredChargeBoxId();
-    private static final String REGISTERED_OCPP_TAG =  __DatabasePreparer__.getRegisteredOcppTag();
+    //private static final String REGISTERED_CHARGE_BOX_ID = __DatabasePreparer__.getRegisteredChargeBoxId();
+    //private static final String REGISTERED_OCPP_TAG =  __DatabasePreparer__.getRegisteredOcppTag();
     private static final String path = getPath();
 
-    private static Application app;
+    private static ConfigurableApplicationContext app;
+
+    private static String registeredChargeBoxId;
+    private static String registeredOcppTag;
 
     @BeforeClass
     public static void init() throws Exception {
-        Assert.assertEquals(ApplicationProfile.TEST, SteveConfiguration.CONFIG.getProfile());
-        __DatabasePreparer__.prepare();
+       // Assert.assertEquals(ApplicationProfile.TEST, SteveConfiguration.CONFIG.getProfile());
+       // __DatabasePreparer__.prepare();
 
-        app = new Application();
-        app.start();
+        app = SpringApplication.run(TestApplication.class);
+        //app.start();
+
+        app.getBean(JpaDatabasePreparer.class).prepare();
+        registeredChargeBoxId = app.getBean(JpaDatabasePreparer.class).getRegisteredChargeBoxId();
+        registeredOcppTag = app.getBean(JpaDatabasePreparer.class).getRegisteredOcppTag();
     }
 
     @AfterClass
     public static void destroy() throws Exception {
-        if (app != null) {
-            app.stop();
-        }
-        __DatabasePreparer__.cleanUp();
+        app.close();
+       // __DatabasePreparer__.cleanUp();
     }
 
     @Test
@@ -78,14 +85,14 @@ public class ApplicationTest {
                 new BootNotificationRequest()
                         .withChargePointVendor(getRandomString())
                         .withChargePointModel(getRandomString()),
-                REGISTERED_CHARGE_BOX_ID);
+                registeredChargeBoxId);
         Assert.assertNotNull(boot);
         Assert.assertEquals(RegistrationStatus.ACCEPTED, boot.getStatus());
 
         AuthorizeResponse auth = client.authorize(
                 new AuthorizeRequest()
-                        .withIdTag(REGISTERED_OCPP_TAG),
-                REGISTERED_CHARGE_BOX_ID);
+                        .withIdTag(registeredOcppTag),
+                registeredChargeBoxId);
         Assert.assertNotNull(auth);
         Assert.assertEquals(AuthorizationStatus.ACCEPTED, auth.getIdTagInfo().getStatus());
     }
@@ -98,14 +105,14 @@ public class ApplicationTest {
                 new ocpp.cs._2012._06.BootNotificationRequest()
                         .withChargePointVendor(getRandomString())
                         .withChargePointModel(getRandomString()),
-                REGISTERED_CHARGE_BOX_ID);
+                registeredChargeBoxId);
         Assert.assertNotNull(boot);
         Assert.assertEquals(ocpp.cs._2012._06.RegistrationStatus.ACCEPTED, boot.getStatus());
 
         ocpp.cs._2012._06.AuthorizeResponse auth = client.authorize(
                 new ocpp.cs._2012._06.AuthorizeRequest()
-                        .withIdTag(REGISTERED_OCPP_TAG),
-                REGISTERED_CHARGE_BOX_ID);
+                        .withIdTag(registeredOcppTag),
+                registeredChargeBoxId);
         Assert.assertNotNull(auth);
         Assert.assertEquals(ocpp.cs._2012._06.AuthorizationStatus.ACCEPTED, auth.getIdTagInfo().getStatus());
     }

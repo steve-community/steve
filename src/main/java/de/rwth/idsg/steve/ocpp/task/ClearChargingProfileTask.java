@@ -21,7 +21,7 @@ package de.rwth.idsg.steve.ocpp.task;
 import de.rwth.idsg.steve.ocpp.Ocpp16AndAboveTask;
 import de.rwth.idsg.steve.ocpp.OcppCallback;
 import de.rwth.idsg.steve.ocpp.OcppVersion;
-import de.rwth.idsg.steve.repository.ChargingProfileRepository;
+import net.parkl.ocpp.service.cs.ChargingProfileService;
 import de.rwth.idsg.steve.web.dto.ocpp.ClearChargingProfileFilterType;
 import de.rwth.idsg.steve.web.dto.ocpp.ClearChargingProfileParams;
 import lombok.extern.slf4j.Slf4j;
@@ -36,11 +36,11 @@ import javax.xml.ws.AsyncHandler;
 @Slf4j
 public class ClearChargingProfileTask extends Ocpp16AndAboveTask<ClearChargingProfileParams, String> {
 
-    private final ChargingProfileRepository chargingProfileRepository;
+    private final ChargingProfileService chargingProfileRepository;
 
     public ClearChargingProfileTask(OcppVersion ocppVersion,
                                     ClearChargingProfileParams params,
-                                    ChargingProfileRepository chargingProfileRepository) {
+                                    ChargingProfileService chargingProfileRepository) {
         super(ocppVersion, params);
         this.chargingProfileRepository = chargingProfileRepository;
     }

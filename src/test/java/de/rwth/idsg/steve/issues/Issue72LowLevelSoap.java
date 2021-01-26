@@ -22,7 +22,6 @@ import com.google.common.net.MediaType;
 import de.rwth.idsg.steve.StressTest;
 import de.rwth.idsg.steve.utils.Helpers;
 import de.rwth.idsg.steve.utils.StressTester;
-import de.rwth.idsg.steve.utils.__DatabasePreparer__;
 import ocpp.cs._2015._10.BootNotificationRequest;
 import ocpp.cs._2015._10.BootNotificationResponse;
 import ocpp.cs._2015._10.CentralSystemService;
@@ -64,7 +63,7 @@ public class Issue72LowLevelSoap extends StressTest {
     }
 
     protected void attackInternal() throws Exception {
-        String idTag = __DatabasePreparer__.getRegisteredOcppTag();
+        String idTag = databasePreparer.getRegisteredOcppTag();
         String chargeBoxId = Helpers.getRandomString();
 
         DateTime startDateTime = DateTime.parse("2018-06-27T01:10:10Z");

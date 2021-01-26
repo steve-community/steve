@@ -28,8 +28,7 @@ import de.rwth.idsg.steve.ocpp.task.ClearChargingProfileTask;
 import de.rwth.idsg.steve.ocpp.task.GetCompositeScheduleTask;
 import de.rwth.idsg.steve.ocpp.task.SetChargingProfileTask;
 import de.rwth.idsg.steve.ocpp.task.TriggerMessageTask;
-import de.rwth.idsg.steve.repository.ChargingProfileRepository;
-import de.rwth.idsg.steve.repository.dto.ChargePointSelect;
+
 import de.rwth.idsg.steve.repository.dto.ChargingProfile;
 import de.rwth.idsg.steve.service.dto.EnhancedSetChargingProfileParams;
 import de.rwth.idsg.steve.web.dto.ocpp.ClearChargingProfileParams;
@@ -37,12 +36,11 @@ import de.rwth.idsg.steve.web.dto.ocpp.GetCompositeScheduleParams;
 import de.rwth.idsg.steve.web.dto.ocpp.SetChargingProfileParams;
 import de.rwth.idsg.steve.web.dto.ocpp.TriggerMessageParams;
 import lombok.extern.slf4j.Slf4j;
+import net.parkl.ocpp.service.cs.ChargingProfileService;
 import ocpp.cp._2015._10.ChargingProfilePurposeType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 /**
  * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
@@ -51,10 +49,10 @@ import java.util.List;
 @Slf4j
 @Service
 @Qualifier("ChargePointService16_Client")
-public class ChargePointService16_Client extends ChargePointService15_Client {
+public class ChargePointService16_Client extends ChargePointService15_Client implements IChargePointService16_Client {
 
     @Autowired private ChargePointService16_InvokerImpl invoker16;
-    @Autowired private ChargingProfileRepository chargingProfileRepository;
+    @Autowired private ChargingProfileService chargingProfileService;
 
     @Override
     protected OcppVersion getVersion() {
@@ -90,12 +88,12 @@ public class ChargePointService16_Client extends ChargePointService15_Client {
     }
 
     public int setChargingProfile(SetChargingProfileParams params) {
-        ChargingProfile.Details details = chargingProfileRepository.getDetails(params.getChargingProfilePk());
+        ChargingProfile.Details details = chargingProfileService.getDetails(params.getChargingProfilePk());
 
         checkAdditionalConstraints(params, details);
 
         EnhancedSetChargingProfileParams enhancedParams = new EnhancedSetChargingProfileParams(params, details);
-        SetChargingProfileTask task = new SetChargingProfileTask(getVersion(), enhancedParams, chargingProfileRepository);
+        SetChargingProfileTask task = new SetChargingProfileTask(getVersion(), enhancedParams, chargingProfileService);
 
         BackgroundService.with(executorService)
                          .forEach(task.getParams().getChargePointSelectList())
@@ -105,7 +103,7 @@ public class ChargePointService16_Client extends ChargePointService15_Client {
     }
 
     public int clearChargingProfile(ClearChargingProfileParams params) {
-        ClearChargingProfileTask task = new ClearChargingProfileTask(getVersion(), params, chargingProfileRepository);
+        ClearChargingProfileTask task = new ClearChargingProfileTask(getVersion(), params, chargingProfileService);
 
         BackgroundService.with(executorService)
                          .forEach(task.getParams().getChargePointSelectList())

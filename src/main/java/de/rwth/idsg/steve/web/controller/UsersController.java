@@ -1,30 +1,9 @@
-/*
- * SteVe - SteckdosenVerwaltung - https://github.com/RWTH-i5-IDSG/steve
- * Copyright (C) 2013-2020 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
- * All Rights Reserved.
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
- */
 package de.rwth.idsg.steve.web.controller;
 
-import de.rwth.idsg.steve.repository.OcppTagRepository;
-import de.rwth.idsg.steve.repository.UserRepository;
-import de.rwth.idsg.steve.repository.dto.User;
-import de.rwth.idsg.steve.utils.ControllerHelper;
-import de.rwth.idsg.steve.web.dto.UserForm;
-import de.rwth.idsg.steve.web.dto.UserQueryForm;
-import de.rwth.idsg.steve.web.dto.UserSex;
+
+import javax.validation.Valid;
+
+import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -34,7 +13,13 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
-import javax.validation.Valid;
+import de.rwth.idsg.steve.repository.dto.User;
+import de.rwth.idsg.steve.utils.ControllerHelper;
+import de.rwth.idsg.steve.web.dto.UserForm;
+import de.rwth.idsg.steve.web.dto.UserQueryForm;
+import de.rwth.idsg.steve.web.dto.UserSex;
+import net.parkl.ocpp.service.cs.OcppIdTagService;
+import net.parkl.ocpp.service.cs.UserService;
 
 /**
  * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
@@ -44,8 +29,8 @@ import javax.validation.Valid;
 @RequestMapping(value = "/manager/users")
 public class UsersController {
 
-    @Autowired private OcppTagRepository ocppTagRepository;
-    @Autowired private UserRepository userRepository;
+    @Autowired private OcppIdTagService ocppTagService;
+    @Autowired private UserService userService;
 
     private static final String PARAMS = "params";
 
@@ -78,21 +63,23 @@ public class UsersController {
 
     private void initList(Model model, UserQueryForm params) {
         model.addAttribute(PARAMS, params);
-        model.addAttribute("userList", userRepository.getOverview(params));
+        model.addAttribute("userList", userService.getOverview(params));
     }
 
     @RequestMapping(value = DETAILS_PATH, method = RequestMethod.GET)
     public String getDetails(@PathVariable("userPk") int userPk, Model model) {
-        User.Details details = userRepository.getDetails(userPk);
+        User.Details details = userService.getDetails(userPk);
 
         UserForm form = new UserForm();
         form.setUserPk(details.getUserRecord().getUserPk());
         form.setFirstName(details.getUserRecord().getFirstName());
         form.setLastName(details.getUserRecord().getLastName());
-        form.setBirthDay(details.getUserRecord().getBirthDay());
+        if (details.getUserRecord().getBirthDay()!=null) {
+        	form.setBirthDay(new DateTime(details.getUserRecord().getBirthDay()).toLocalDate());
+        }
         form.setPhone(details.getUserRecord().getPhone());
         form.setSex(UserSex.fromDatabaseValue(details.getUserRecord().getSex()));
-        form.setEMail(details.getUserRecord().getEMail());
+        form.setEMail(details.getUserRecord().getEmail());
         form.setNote(details.getUserRecord().getNote());
         form.setAddress(ControllerHelper.recordToDto(details.getAddress()));
         form.setOcppIdTag(details.getOcppIdTag().orElse(ControllerHelper.EMPTY_OPTION));
@@ -117,7 +104,7 @@ public class UsersController {
             return "data-man/userAdd";
         }
 
-        userRepository.add(userForm);
+        userService.add(userForm);
         return toOverview();
     }
 
@@ -129,19 +116,19 @@ public class UsersController {
             return "data-man/userDetails";
         }
 
-        userRepository.update(userForm);
+        userService.update(userForm);
         return toOverview();
     }
 
     @RequestMapping(value = DELETE_PATH, method = RequestMethod.POST)
     public String delete(@PathVariable("userPk") int userPk) {
-        userRepository.delete(userPk);
+        userService.delete(userPk);
         return toOverview();
     }
 
     private void setTags(Model model) {
         model.addAttribute("countryCodes", ControllerHelper.COUNTRY_DROPDOWN);
-        model.addAttribute("idTagList", ControllerHelper.idTagEnhancer(ocppTagRepository.getIdTags()));
+        model.addAttribute("idTagList", ControllerHelper.idTagEnhancer(ocppTagService.getIdTags()));
     }
 
     // -------------------------------------------------------------------------

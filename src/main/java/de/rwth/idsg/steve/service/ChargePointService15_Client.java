@@ -28,8 +28,6 @@ import de.rwth.idsg.steve.ocpp.task.GetConfigurationTask;
 import de.rwth.idsg.steve.ocpp.task.GetLocalListVersionTask;
 import de.rwth.idsg.steve.ocpp.task.ReserveNowTask;
 import de.rwth.idsg.steve.ocpp.task.SendLocalListTask;
-import de.rwth.idsg.steve.repository.OcppTagRepository;
-import de.rwth.idsg.steve.repository.ReservationRepository;
 import de.rwth.idsg.steve.repository.dto.ChargePointSelect;
 import de.rwth.idsg.steve.repository.dto.InsertReservationParams;
 import de.rwth.idsg.steve.service.dto.EnhancedReserveNowParams;
@@ -40,6 +38,8 @@ import de.rwth.idsg.steve.web.dto.ocpp.MultipleChargePointSelect;
 import de.rwth.idsg.steve.web.dto.ocpp.ReserveNowParams;
 import de.rwth.idsg.steve.web.dto.ocpp.SendLocalListParams;
 import lombok.extern.slf4j.Slf4j;
+import net.parkl.ocpp.service.cs.OcppIdTagService;
+import net.parkl.ocpp.service.cs.ReservationService;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -50,14 +50,13 @@ import java.util.List;
 /**
  * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
  */
-@Slf4j
 @Service
 @Qualifier("ChargePointService15_Client")
-public class ChargePointService15_Client extends ChargePointService12_Client {
+public class ChargePointService15_Client extends ChargePointService12_Client implements IChargePointService15_Client {
 
-    @Autowired protected OcppTagRepository userRepository;
+	@Autowired private OcppIdTagService userService;
     @Autowired protected OcppTagService ocppTagService;
-    @Autowired protected ReservationRepository reservationRepository;
+    @Autowired protected ReservationService reservationService;
 
     @Autowired private ChargePointService15_InvokerImpl invoker15;
 
@@ -134,11 +133,11 @@ public class ChargePointService15_Client extends ChargePointService12_Client {
                                                              .expiryTimestamp(params.getExpiry().toDateTime())
                                                              .build();
 
-        int reservationId = reservationRepository.insert(res);
-        String parentIdTag = userRepository.getParentIdtag(params.getIdTag());
+        int reservationId = reservationService.insert(res);
+        String parentIdTag = userService.getParentIdtag(params.getIdTag());
 
         EnhancedReserveNowParams enhancedParams = new EnhancedReserveNowParams(params, reservationId, parentIdTag);
-        ReserveNowTask task = new ReserveNowTask(getVersion(), enhancedParams, reservationRepository);
+        ReserveNowTask task = new ReserveNowTask(getVersion(), enhancedParams, reservationService);
 
         BackgroundService.with(executorService)
                          .forFirst(task.getParams().getChargePointSelectList())
@@ -148,7 +147,7 @@ public class ChargePointService15_Client extends ChargePointService12_Client {
     }
 
     public int cancelReservation(CancelReservationParams params) {
-        CancelReservationTask task = new CancelReservationTask(getVersion(), params, reservationRepository);
+        CancelReservationTask task = new CancelReservationTask(getVersion(), params, reservationService);
 
         BackgroundService.with(executorService)
                          .forFirst(task.getParams().getChargePointSelectList())

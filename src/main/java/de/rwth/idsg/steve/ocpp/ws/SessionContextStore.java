@@ -20,6 +20,7 @@ package de.rwth.idsg.steve.ocpp.ws;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.util.concurrent.Striped;
+import de.rwth.idsg.steve.SteveConfiguration;
 import de.rwth.idsg.steve.SteveException;
 import de.rwth.idsg.steve.ocpp.ws.custom.WsSessionSelectStrategy;
 import de.rwth.idsg.steve.ocpp.ws.data.SessionContext;
@@ -37,7 +38,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.locks.Lock;
 
-import static de.rwth.idsg.steve.SteveConfiguration.CONFIG;
 
 /**
  * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
@@ -54,7 +54,14 @@ public class SessionContextStore {
 
     private final Striped<Lock> locks = Striped.lock(16);
 
-    private final WsSessionSelectStrategy wsSessionSelectStrategy = CONFIG.getOcpp().getWsSessionSelectStrategy();
+    private SteveConfiguration config;
+
+    //private final WsSessionSelectStrategy wsSessionSelectStrategy = CONFIG.getOcpp().getWsSessionSelectStrategy();
+
+    public SessionContextStore(SteveConfiguration config) {
+        this.config=config;
+    }
+
 
     public void add(String chargeBoxId, WebSocketSession session, ScheduledFuture pingSchedule) {
         Lock l = locks.get(chargeBoxId);
@@ -121,7 +128,7 @@ public class SessionContextStore {
             if (endpointDeque == null) {
                 throw new NoSuchElementException();
             }
-            return wsSessionSelectStrategy.getSession(endpointDeque);
+            return config.getWsSessionSelectStrategy().getSession(endpointDeque);
         } catch (NoSuchElementException e) {
             throw new SteveException("No session context for chargeBoxId '%s'", chargeBoxId, e);
         } finally {

@@ -1,29 +1,9 @@
-/*
- * SteVe - SteckdosenVerwaltung - https://github.com/RWTH-i5-IDSG/steve
- * Copyright (C) 2013-2020 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
- * All Rights Reserved.
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
- */
 package de.rwth.idsg.steve.web.controller;
 
 import de.rwth.idsg.steve.NotificationFeature;
-import de.rwth.idsg.steve.repository.GenericRepository;
-import de.rwth.idsg.steve.repository.SettingsRepository;
+
+import de.rwth.idsg.steve.service.EndpointService;
 import de.rwth.idsg.steve.service.MailService;
-import de.rwth.idsg.steve.service.ReleaseCheckService;
-import de.rwth.idsg.steve.web.dto.EndpointInfo;
 import de.rwth.idsg.steve.web.dto.SettingsForm;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -37,7 +17,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import javax.validation.Valid;
 
-import static de.rwth.idsg.steve.SteveConfiguration.CONFIG;
+import net.parkl.ocpp.service.cs.SettingsService;
 
 /**
  * One controller for about and settings pages
@@ -48,11 +28,12 @@ import static de.rwth.idsg.steve.SteveConfiguration.CONFIG;
 @RequestMapping(value = "/manager")
 public class AboutSettingsController {
 
-    @Autowired private GenericRepository genericRepository;
+    //@Autowired private GenericRepository genericRepository;
     @Autowired private LogController logController;
-    @Autowired private SettingsRepository settingsRepository;
+    @Autowired private SettingsService settingsService;
     @Autowired private MailService mailService;
-    @Autowired private ReleaseCheckService releaseCheckService;
+    @Autowired private EndpointService endpointService;
+    //@Autowired private ReleaseCheckService releaseCheckService;
 
     // -------------------------------------------------------------------------
     // Paths
@@ -67,19 +48,19 @@ public class AboutSettingsController {
 
     @RequestMapping(value = ABOUT_PATH, method = RequestMethod.GET)
     public String getAbout(Model model) {
-        model.addAttribute("version", CONFIG.getSteveVersion());
-        model.addAttribute("db", genericRepository.getDBVersion());
+        model.addAttribute("version", "1.11.0");
+        //model.addAttribute("db", genericRepository.getDBVersion());
         model.addAttribute("logFile", logController.getLogFilePath());
         model.addAttribute("systemTime", DateTime.now());
         model.addAttribute("systemTimeZone", DateTimeZone.getDefault());
-        model.addAttribute("releaseReport", releaseCheckService.check());
-        model.addAttribute("endpointInfo", EndpointInfo.INSTANCE);
+        //model.addAttribute("releaseReport", releaseCheckService.check());
+        model.addAttribute("endpointInfo", endpointService.getEndpointInfo());
         return "about";
     }
 
     @RequestMapping(value = SETTINGS_PATH, method = RequestMethod.GET)
     public String getSettings(Model model) {
-        SettingsForm form = settingsRepository.getForm();
+        SettingsForm form = settingsService.getForm();
         model.addAttribute("features", NotificationFeature.values());
         model.addAttribute("settingsForm", form);
         return "settings";
@@ -93,7 +74,7 @@ public class AboutSettingsController {
             return "settings";
         }
 
-        settingsRepository.update(settingsForm);
+        settingsService.update(settingsForm);
         mailService.loadSettingsFromDB();
         return "redirect:/manager/settings";
     }
@@ -106,7 +87,7 @@ public class AboutSettingsController {
             return "settings";
         }
 
-        settingsRepository.update(settingsForm);
+        settingsService.update(settingsForm);
         mailService.loadSettingsFromDB();
         mailService.sendTestMail();
 

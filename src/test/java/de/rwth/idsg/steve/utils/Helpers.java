@@ -18,6 +18,7 @@
  */
 package de.rwth.idsg.steve.utils;
 
+import de.rwth.idsg.steve.SteveConfiguration;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.apache.cxf.ws.addressing.WSAddressingFeature;
 
@@ -26,7 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import static de.rwth.idsg.steve.SteveConfiguration.CONFIG;
+
 
 /**
  * @author Andreas Heuvels <andreas.heuvels@rwth-aachen.de>
@@ -38,6 +39,11 @@ public class Helpers {
         return UUID.randomUUID().toString();
     }
 
+    private static final String HTTP_PREFIX = "http://";
+    private static final String HTTP_HOST = "localhost";
+    private static final int HTTP_PORT = 8080;
+    private static final String HTTP_CONTEXT_PATH="";
+
     public static List<String> getRandomStrings(int size) {
         List<String> list = new ArrayList<>(size);
         for (int i = 0; i < size; i++) {
@@ -47,10 +53,8 @@ public class Helpers {
     }
 
     public static String getPath() {
-        String prefix;
-        int port;
 
-        if (CONFIG.getJetty().isHttpEnabled()) {
+       /* if (CONFIG.getJetty().isHttpEnabled()) {
             prefix = "http://";
             port = CONFIG.getJetty().getHttpPort();
         } else if (CONFIG.getJetty().isHttpsEnabled()) {
@@ -58,14 +62,14 @@ public class Helpers {
             port = CONFIG.getJetty().getHttpsPort();
         } else {
             throw new RuntimeException();
-        }
+        }*/
 
-        return prefix + CONFIG.getJetty().getServerHost() + ":" + port
-                + CONFIG.getContextPath() + "/services" + CONFIG.getRouterEndpointPath();
+        return HTTP_PREFIX + HTTP_HOST + ":" + HTTP_PORT
+                + HTTP_CONTEXT_PATH + "/services" + SteveConfiguration.getRouterEndpointPath();
     }
 
     public static String getJsonPath() {
-        String prefix;
+        /*String prefix;
         int port;
 
         if (CONFIG.getJetty().isHttpEnabled()) {
@@ -76,10 +80,10 @@ public class Helpers {
             port = CONFIG.getJetty().getHttpsPort();
         } else {
             throw new RuntimeException();
-        }
+        }*/
 
-        return prefix + CONFIG.getJetty().getServerHost() + ":" + port
-                + CONFIG.getContextPath() + "/websocket/CentralSystemService/";
+        return HTTP_PREFIX + HTTP_HOST + ":" + HTTP_PORT
+                + HTTP_CONTEXT_PATH + "/websocket/CentralSystemService/";
     }
 
     public static ocpp.cs._2015._10.CentralSystemService getForOcpp16(String path) {

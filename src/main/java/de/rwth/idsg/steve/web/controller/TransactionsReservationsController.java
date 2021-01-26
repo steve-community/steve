@@ -18,11 +18,7 @@
  */
 package de.rwth.idsg.steve.web.controller;
 
-import de.rwth.idsg.steve.repository.ChargePointRepository;
-import de.rwth.idsg.steve.repository.OcppTagRepository;
-import de.rwth.idsg.steve.repository.ReservationRepository;
 import de.rwth.idsg.steve.repository.ReservationStatus;
-import de.rwth.idsg.steve.repository.TransactionRepository;
 import de.rwth.idsg.steve.service.TransactionStopService;
 import de.rwth.idsg.steve.web.dto.ReservationQueryForm;
 import de.rwth.idsg.steve.web.dto.TransactionQueryForm;
@@ -39,6 +35,12 @@ import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.io.IOException;
 
+import net.parkl.ocpp.service.cs.ChargePointService;
+import net.parkl.ocpp.service.cs.OcppIdTagService;
+import net.parkl.ocpp.service.cs.ReservationService;
+import net.parkl.ocpp.service.cs.TransactionService;
+
+
 /**
  * One controller for transactions and reservations pages
  *
@@ -49,10 +51,10 @@ import java.io.IOException;
 @RequestMapping(value = "/manager", method = RequestMethod.GET)
 public class TransactionsReservationsController {
 
-    @Autowired private TransactionRepository transactionRepository;
-    @Autowired private ReservationRepository reservationRepository;
-    @Autowired private ChargePointRepository chargePointRepository;
-    @Autowired private OcppTagRepository ocppTagRepository;
+    @Autowired private TransactionService transactionService;
+    @Autowired private ReservationService reservationService;
+    @Autowired private ChargePointService chargePointService;
+    @Autowired private OcppIdTagService ocppTagService;
     @Autowired private TransactionStopService transactionStopService;
 
     private static final String PARAMS = "params";
@@ -77,7 +79,7 @@ public class TransactionsReservationsController {
         TransactionQueryForm params = new TransactionQueryForm();
         initList(model);
 
-        model.addAttribute("transList", transactionRepository.getTransactions(params));
+        model.addAttribute("transList", transactionService.getTransactions(params));
         model.addAttribute(PARAMS, params);
         return "data-man/transactions";
     }
@@ -90,7 +92,7 @@ public class TransactionsReservationsController {
 
     @RequestMapping(value = TRANSACTIONS_DETAILS_PATH)
     public String getTransactionDetails(@PathVariable("transactionPk") int transactionPk, Model model) {
-        model.addAttribute("details", transactionRepository.getDetails(transactionPk));
+        model.addAttribute("details", transactionService.getDetails(transactionPk));
         return "data-man/transactionDetails";
     }
 
@@ -110,11 +112,11 @@ public class TransactionsReservationsController {
             String headerValue = String.format("attachment; filename=\"%s\"", fileName);
             response.setContentType("text/csv");
             response.setHeader(headerKey, headerValue);
-            transactionRepository.writeTransactionsCSV(params, response.getWriter());
+            transactionService.writeTransactionsCSV(params, response.getWriter());
             return null;
 
         } else {
-            model.addAttribute("transList", transactionRepository.getTransactions(params));
+            model.addAttribute("transList", transactionService.getTransactions(params));
             initList(model);
             model.addAttribute(PARAMS, params);
             return "data-man/transactions";
@@ -126,7 +128,7 @@ public class TransactionsReservationsController {
         ReservationQueryForm params = new ReservationQueryForm();
         initResList(model);
 
-        model.addAttribute("reservList", reservationRepository.getReservations(params));
+        model.addAttribute("reservList", reservationService.getReservations(params));
         model.addAttribute(PARAMS, params);
         return "data-man/reservations";
     }
@@ -135,7 +137,7 @@ public class TransactionsReservationsController {
     public String getReservationsQuery(@Valid @ModelAttribute(PARAMS) ReservationQueryForm params,
                                       BindingResult result, Model model) throws IOException {
         if (!result.hasErrors()) {
-            model.addAttribute("reservList", reservationRepository.getReservations(params));
+            model.addAttribute("reservList", reservationService.getReservations(params));
         }
 
         initResList(model);
@@ -144,8 +146,8 @@ public class TransactionsReservationsController {
     }
 
     private void initList(Model model) {
-        model.addAttribute("cpList", chargePointRepository.getChargeBoxIds());
-        model.addAttribute("idTagList", ocppTagRepository.getIdTags());
+        model.addAttribute("cpList", chargePointService.getChargeBoxIds());
+        model.addAttribute("idTagList", ocppTagService.getIdTags());
     }
 
     private void initResList(Model model) {

@@ -36,16 +36,9 @@ import de.rwth.idsg.steve.ocpp.ws.data.OcppJsonResponse;
 import de.rwth.idsg.steve.ocpp.ws.data.OcppJsonResult;
 import de.rwth.idsg.steve.ocpp.ws.pipeline.Serializer;
 import lombok.extern.slf4j.Slf4j;
-import org.eclipse.jetty.websocket.api.Session;
-import org.eclipse.jetty.websocket.api.StatusCode;
-import org.eclipse.jetty.websocket.api.annotations.OnWebSocketClose;
-import org.eclipse.jetty.websocket.api.annotations.OnWebSocketConnect;
-import org.eclipse.jetty.websocket.api.annotations.OnWebSocketError;
-import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
-import org.eclipse.jetty.websocket.api.annotations.WebSocket;
-import org.eclipse.jetty.websocket.client.ClientUpgradeRequest;
-import org.eclipse.jetty.websocket.client.WebSocketClient;
+import org.springframework.web.socket.client.WebSocketClient;
 
+import javax.websocket.Session;
 import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
@@ -61,7 +54,7 @@ import java.util.function.Consumer;
  * @since 21.03.2018
  */
 @Slf4j
-@WebSocket
+//@WebSocket
 public class OcppJsonChargePoint {
 
     private final OcppVersion version;
@@ -69,7 +62,7 @@ public class OcppJsonChargePoint {
     private final String connectionPath;
     private final Map<String, ResponseContext> responseContextMap;
     private final ResponseDeserializer deserializer;
-    private final WebSocketClient client;
+   // private final WebSocketClient client;
     private final CountDownLatch closeHappenedSignal;
 
     private CountDownLatch receivedResponsesSignal;
@@ -81,27 +74,27 @@ public class OcppJsonChargePoint {
         this.connectionPath = pathPrefix + chargeBoxId;
         this.responseContextMap = new LinkedHashMap<>(); // because we want to keep the insertion order of test cases
         this.deserializer = new ResponseDeserializer();
-        this.client = new WebSocketClient();
+      //  this.client = new WebSocketClient();
         this.closeHappenedSignal = new CountDownLatch(1);
     }
 
-    @OnWebSocketConnect
+    //@OnWebSocketConnect
     public void onConnect(Session session) {
         this.session = session;
     }
 
-    @OnWebSocketClose
+    //@OnWebSocketClose
     public void onClose(Session session, int statusCode, String reason) {
         this.session = null;
         this.closeHappenedSignal.countDown();
     }
 
-    @OnWebSocketError
+    //@OnWebSocketError
     public void onError(Session session, Throwable throwable) {
         log.error("Exception", throwable);
     }
 
-    @OnWebSocketMessage
+    //@OnWebSocketMessage
     public void onMessage(Session session, String msg) {
         try {
             OcppJsonResponse response = deserializer.extractResponse(msg);
@@ -122,7 +115,7 @@ public class OcppJsonChargePoint {
     }
 
     public void start() {
-        try {
+        /*try {
             ClientUpgradeRequest request = new ClientUpgradeRequest();
             request.setSubProtocols(version.getValue());
 
@@ -132,7 +125,7 @@ public class OcppJsonChargePoint {
             connect.get(); // block until session is created
         } catch (Throwable t) {
             log.error("Exception", t);
-        }
+        }*/
     }
 
     public <T extends ResponseType> void prepare(RequestType request, Class<T> responseClass,
@@ -162,13 +155,13 @@ public class OcppJsonChargePoint {
         receivedResponsesSignal = new CountDownLatch(values.size());
 
         // send all messages
-        for (ResponseContext ctx : values) {
+       /* for (ResponseContext ctx : values) {
             try {
-                session.getRemote().sendString(ctx.outgoingMessage);
+               session.getRemote().sendString(ctx.outgoingMessage);
             } catch (IOException e) {
                 log.error("Exception", e);
             }
-        }
+        }*/
 
         // wait for all responses to arrive and be processed
         try {
@@ -179,7 +172,7 @@ public class OcppJsonChargePoint {
     }
 
     public void close() {
-        try {
+       /* try {
             // "enqueue" a graceful close
             session.close(StatusCode.NORMAL, "Finished");
 
@@ -190,7 +183,7 @@ public class OcppJsonChargePoint {
             client.stop();
         } catch (Exception e) {
             throw new RuntimeException(e);
-        }
+        }*/
     }
 
     public void processAndClose() {

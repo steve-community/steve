@@ -1,30 +1,15 @@
-/*
- * SteVe - SteckdosenVerwaltung - https://github.com/RWTH-i5-IDSG/steve
- * Copyright (C) 2013-2020 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
- * All Rights Reserved.
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
- */
 package de.rwth.idsg.steve.web.controller;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import de.rwth.idsg.steve.repository.ChargePointRepository;
-import de.rwth.idsg.steve.repository.ReservationRepository;
-import de.rwth.idsg.steve.repository.TransactionRepository;
-import lombok.extern.slf4j.Slf4j;
+
+import net.parkl.ocpp.service.cs.ChargePointService;
+import net.parkl.ocpp.service.cs.ReservationService;
+import net.parkl.ocpp.service.cs.TransactionService;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
@@ -42,7 +27,6 @@ import java.util.List;
  * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
  * @since 15.08.2014
  */
-@Slf4j
 @Controller
 @ResponseBody
 @RequestMapping(
@@ -50,10 +34,11 @@ import java.util.List;
         method = RequestMethod.GET,
         produces = MediaType.APPLICATION_JSON_VALUE)
 public class AjaxCallController {
+	private static final Logger log=LoggerFactory.getLogger(AjaxCallController.class);
 
-    @Autowired private ChargePointRepository chargePointRepository;
-    @Autowired private TransactionRepository transactionRepository;
-    @Autowired private ReservationRepository reservationRepository;
+    @Autowired private ChargePointService chargePointService;
+    @Autowired private TransactionService transactionService;
+    @Autowired private ReservationService reservationService;
 
     private ObjectMapper objectMapper;
 
@@ -78,21 +63,21 @@ public class AjaxCallController {
     @RequestMapping(value = CONNECTOR_IDS_PATH)
     public void getConnectorIds(@PathVariable("chargeBoxId") String chargeBoxId,
                                 HttpServletResponse response) throws IOException {
-        String s = serializeArray(chargePointRepository.getNonZeroConnectorIds(chargeBoxId));
+        String s = serializeArray(chargePointService.getNonZeroConnectorIds(chargeBoxId));
         writeOutput(response, s);
     }
 
     @RequestMapping(value = TRANSACTION_IDS_PATH)
     public void getTransactionIds(@PathVariable("chargeBoxId") String chargeBoxId,
                                   HttpServletResponse response) throws IOException {
-        String s = serializeArray(transactionRepository.getActiveTransactionIds(chargeBoxId));
+        String s = serializeArray(transactionService.getActiveTransactionIds(chargeBoxId));
         writeOutput(response, s);
     }
 
     @RequestMapping(value = RESERVATION_IDS_PATH)
     public void getReservationIds(@PathVariable("chargeBoxId") String chargeBoxId,
                                   HttpServletResponse response) throws IOException {
-        String s = serializeArray(reservationRepository.getActiveReservationIds(chargeBoxId));
+        String s = serializeArray(reservationService.getActiveReservationIds(chargeBoxId));
         writeOutput(response, s);
     }
 

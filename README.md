@@ -53,14 +53,14 @@ SteVe Pluggable is intended to run in any servlet container or in embedded web a
 1. Install library
 
     Edit your web application project's pom.xml file to include **Steve Pluggable**:
-        ```
-        <dependency>
+    ```
+    <dependency>
             <groupId>net.parkl.ocpp</groupId>
             <artifactId>steve-pluggable</artifactId>
             <version>1.0.2</version>
-        </dependency>
-        ```
-
+    </dependency>
+    ```
+    
         
 2. Configure Spring Boot:
 

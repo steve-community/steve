@@ -1,13 +1,28 @@
 ![SteVe](src/main/resources/webapp/static/images/logo.png) 
 
-[![Build Status](https://travis-ci.org/RWTH-i5-IDSG/steve.svg?branch=master)](https://travis-ci.org/RWTH-i5-IDSG/steve)
-
 
 # Introduction
 
 SteVe was developed at the RWTH Aachen University and means Steckdosenverwaltung, namely socket administration in German. The aim of SteVe is to support the deployment and popularity of electric mobility, so it is easy to install and to use. SteVe provides basic functions for the administration of charge points, user data, and RFID cards for user authentication and was tested successfully in operation.
 
-SteVe is considered as an open platform to implement, test and evaluate novel ideas for electric mobility, like authentication protocols, reservation mechanisms for charge points, and business models for electric mobility. SteVe is distributed under [GPL](LICENSE.txt) and is free to use. If you are going to deploy SteVe we are happy to see the [logo](website/logo/managed-by-steve.pdf) on a charge point.
+SteVe is considered as an open platform to implement, test and evaluate novel ideas for electric mobility, like authentication protocols, reservation mechanisms for charge points, and business models for electric mobility. SteVe is distributed under [GPL](LICENSE.txt) and is free to use.
+
+### Modifications by Parkl: SteVe Pluggable library
+
+SteVe originally was developed as a deployable web application. We wanted to provide a simple, installable, platform-independent library that provides interfaces for the SteVe functionality and meets the following requirements:
+
+* the library can be installed using Maven, as a single JAR file
+* the library should use Spring Boot
+* the library should be decoupled from any database server (such as MySQL) using an abstraction for the data access layer (Spring Data JPA)
+* the library should publish interfaces for an e-mobility service provider to send and receive events to/from an e-mobility service provider (ESP) backend
+
+In order to achieve the above goals, the following technical changes have been made:
+* migration from Spring to Spring Boot
+* migration from JOGL to Spring Data JPA
+* removing MySQL dependent functionality
+* migration from Jetty websockets to Apache Tomcat websockets
+* introduction of the EmobilityServiceProvider and EmobilityServiceProviderFacade interfaces to communicate with an ESP backend
+
 
 ### Charge Point Support
 
@@ -20,19 +35,17 @@ Electric charge points using the following OCPP versions are supported:
 * OCPP1.6S
 * OCPP1.6J
 
-For Charging Station compatibility please check:
-https://github.com/RWTH-i5-IDSG/steve/wiki/Charging-Station-Compatibility
 
 ### System Requirements
 
 SteVe requires 
 * JDK 11 (both Oracle JDK and OpenJDK are supported)
 * Maven 
-* At least MySQL 5.7.7 (MariaDB 10.2.1 or later works as well) as database
+* Any JPA compatible database server
 
 to build and run. 
 
-SteVe is designed to run standalone, a java servlet container / web server (e.g. Apache Tomcat), is **not** required.
+SteVe Pluggable is intended to run in any servlet container or in embedded web application, however currently only Apache Tomcat is supported. This mainly because of the websocket server and JSP compiler provided by Tomcat. We plan to change the JSP frontend to React and use a Tomcat-independent websocket server implementation in the near future, making the library completely container independent.
 
 # Configuration and Installation
 

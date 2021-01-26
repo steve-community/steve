@@ -118,7 +118,37 @@
             <id>JitPack</id>
             <url>https://jitpack.io</url>
         </repository>
+        <repository>
+            <id>nexus</id>
+            <name>Parkl Nexus</name>
+            <url>https://dev.parkl.net/nexus/repository/parkl-public/</url>
+        </repository>
+        <repository>
+            <id>JCenter</id>
+            <name>JCenter</name>
+            <url>https://jcenter.bintray.com/</url>
+        </repository>
     </repositories>
+
+    <distributionManagement>
+        <snapshotRepository>
+            <id>parkl_snapshots</id>
+            <name>Parkl Snapshots</name>
+            <url>https://dev.parkl.net/nexus/repository/parkl-snapshots/</url>
+        </snapshotRepository>
+        <repository>
+            <id>parkl_releases</id>
+            <name>Parkl Releases</name>
+            <url>https://dev.parkl.net/nexus/repository/parkl-releases/</url>
+        </repository>
+    </distributionManagement>
+
+    <pluginRepositories>
+        <pluginRepository>
+            <id>nexus</id>
+            <url>https://dev.parkl.net/nexus/repository/parkl-public/</url>
+        </pluginRepository>
+    </pluginRepositories>
 
     <dependencyManagement>
         <dependencies>
@@ -362,7 +392,6 @@
             <artifactId>javax.el</artifactId>
             <version>3.0.1-b11</version>
         </dependency>
-
 
 
         <!-- https://github.com/zafarkhaja/jsemver -->

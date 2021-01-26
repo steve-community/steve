@@ -1,4 +1,5 @@
 ![SteVe](src/main/resources/webapp/static/images/logo.png) 
+![Parkl](src/main/resources/webapp/static/images/parkl_logo.png) 
 
 
 # Introduction

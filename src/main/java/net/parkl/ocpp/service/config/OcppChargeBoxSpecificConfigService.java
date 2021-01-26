@@ -6,7 +6,6 @@ import java.util.List;
 
 public interface OcppChargeBoxSpecificConfigService  {
     OcppChargeBoxSpecificConfig findByChargeBoxIdAndKey(String chargeBoxId, String key);
-    List<OcppChargeBoxSpecificConfig> findByChargeBoxId(String chargeBoxId);
 
     long countByKey(String key);
 

@@ -11,19 +11,13 @@ import java.util.List;
 
 @Service
 @Slf4j
-public class OcppChargeBoxSpecificConfigServiceImpl
-        implements OcppChargeBoxSpecificConfigService {
+public class OcppChargeBoxSpecificConfigServiceImpl implements OcppChargeBoxSpecificConfigService {
     @Autowired
     private OcppChargeBoxSpecificConfigRepository chargeBoxConfigRepository;
 
     @Override
     public OcppChargeBoxSpecificConfig findByChargeBoxIdAndKey(String chargeBoxId, String key) {
         return chargeBoxConfigRepository.findByChargeBoxIdAndConfigKey(chargeBoxId, key);
-    }
-
-    @Override
-    public List<OcppChargeBoxSpecificConfig> findByChargeBoxId(String chargeBoxId) {
-        return chargeBoxConfigRepository.findByChargeBoxIdOrderByConfigKeyAsc(chargeBoxId);
     }
 
     @Override

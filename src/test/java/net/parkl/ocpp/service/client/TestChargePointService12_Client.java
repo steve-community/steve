@@ -1,11 +1,5 @@
 package net.parkl.ocpp.service.client;
 
-import java.util.concurrent.ScheduledExecutorService;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.stereotype.Service;
-
 import de.rwth.idsg.steve.ocpp.ChargePointService12_Invoker;
 import de.rwth.idsg.steve.ocpp.OcppVersion;
 import de.rwth.idsg.steve.ocpp.task.ChangeAvailabilityTask;
@@ -29,13 +23,18 @@ import de.rwth.idsg.steve.web.dto.ocpp.RemoteStopTransactionParams;
 import de.rwth.idsg.steve.web.dto.ocpp.ResetParams;
 import de.rwth.idsg.steve.web.dto.ocpp.UnlockConnectorParams;
 import de.rwth.idsg.steve.web.dto.ocpp.UpdateFirmwareParams;
-import net.parkl.ocpp.service.invoker.TestChargePointServiceInvokerImpl;
+import net.parkl.ocpp.service.invoker.TestChargePoint;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Service;
+
+import java.util.concurrent.ScheduledExecutorService;
 
 @Service
 @Qualifier("ChargePointService12_Client")
 public class TestChargePointService12_Client implements IChargePointService12_Client {
 	@Autowired
-	protected TestChargePointServiceInvokerImpl invoker;
+	protected TestChargePoint invoker;
 	
 	@Autowired protected ScheduledExecutorService executorService;
     @Autowired protected TaskStore taskStore;

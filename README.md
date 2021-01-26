@@ -18,7 +18,7 @@ SteVe originally was developed as a deployable web application. We wanted to pro
 * the library should be decoupled from any database server (such as MySQL) using an abstraction for the data access layer (Spring Data JPA)
 * the library should publish interfaces for an e-mobility service provider to send and receive events to/from a backend
 
-In order to achieve the above goals, the following techical changes have been made:
+In order to achieve the above goals, the following technical changes have been made:
 * migration from Spring to Spring Boot
 * migration from JOGL to Spring Data JPA
 * removing MySQL dependent functionality

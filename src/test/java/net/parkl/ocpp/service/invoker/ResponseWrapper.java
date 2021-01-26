@@ -1,14 +1,11 @@
 package net.parkl.ocpp.service.invoker;
 
-import java.util.Map;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
-
 import javax.xml.ws.Response;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 public class ResponseWrapper<T> implements Response<T>{
-	private T element;
+	private final T element;
 	
 	public ResponseWrapper(T e) {
 		this.element=e;
@@ -20,12 +17,12 @@ public class ResponseWrapper<T> implements Response<T>{
 	}
 
 	@Override
-	public T get() throws InterruptedException, ExecutionException {
+	public T get() {
 		return element;
 	}
 
 	@Override
-	public T get(long timeout, TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
+	public T get(long timeout, TimeUnit unit) {
 		return element;
 	}
 
@@ -41,7 +38,6 @@ public class ResponseWrapper<T> implements Response<T>{
 
 	@Override
 	public Map<String, Object> getContext() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 

@@ -7,7 +7,7 @@ import net.parkl.ocpp.module.esp.model.ESPRfidChargingStartRequest;
 import org.springframework.stereotype.Component;
 
 @Component
-public class TestEmobilityServiceProviderImpl implements EmobilityServiceProvider {
+public class TestEmobilityServiceProvider implements EmobilityServiceProvider {
     @Override
     public void stopChargingExternal(ESPChargingStopRequest req) {
 

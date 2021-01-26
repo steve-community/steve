@@ -2,7 +2,6 @@ package net.parkl.ocpp.service;
 
 import de.rwth.idsg.steve.ocpp.OcppProtocol;
 import net.parkl.ocpp.module.esp.model.ESPChargingConsumptionRequest;
-import net.parkl.ocpp.service.config.OcppSpecialConfiguration;
 import net.parkl.ocpp.service.config.OcppChargeBoxSpecificConfigKeys;
 import net.parkl.ocpp.service.config.OcppChargeBoxSpecificConfigService;
 import net.parkl.ocpp.service.config.OcppServiceTestConfig;
@@ -23,10 +22,6 @@ public class OcppConsumptionTest implements OcppConsumptionListener {
     private EmobilityServiceProviderFacade facade;
     @Autowired
     private OcppTestHelper helper;
-
-    @Autowired
-    private OcppSpecialConfiguration config;
-
     @Autowired
     private OcppChargeBoxSpecificConfigService chargeBoxConfigService;
 

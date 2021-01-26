@@ -66,6 +66,6 @@ public class OcppTestHelper {
 		ESPChargingUserStopRequest req2=ESPChargingUserStopRequest.builder().externalChargeId(result.getExternalChargingProcessId()).build();
 		ESPChargingResult res2 = facade.stopCharging(req2);
 		Assert.assertNotNull(res2);
-		Assert.assertTrue(res2.getStoppedWithoutTransaction()==null||res2.getStoppedWithoutTransaction()==false);
+		Assert.assertTrue(res2.getStoppedWithoutTransaction()==null|| !res2.getStoppedWithoutTransaction());
 	}
 }

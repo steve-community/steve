@@ -15,17 +15,18 @@ import ocpp.cs._2015._10.RegistrationStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
-public class TestChargePointHelperServiceImpl implements ChargePointHelperService {
+public class TestChargePointHelperService implements ChargePointHelperService {
 	 // SOAP-based charge points are stored in DB with an endpoint address
     @Autowired private ChargePointService chargePointService;
     @Autowired private GenericService genericService;
     
-    
-
 	@Override
 	public Optional<RegistrationStatus> getRegistrationStatus(String chargeBoxId) {
 		return Optional.empty();

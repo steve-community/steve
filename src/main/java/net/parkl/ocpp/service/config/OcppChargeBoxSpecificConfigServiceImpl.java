@@ -21,6 +21,11 @@ public class OcppChargeBoxSpecificConfigServiceImpl implements OcppChargeBoxSpec
     }
 
     @Override
+    public List<OcppChargeBoxSpecificConfig> findByChargeBoxId(String chargeBoxId) {
+        return chargeBoxConfigRepository.findByChargeBoxIdOrderByConfigKeyAsc(chargeBoxId);
+    }
+
+    @Override
     public long countByKey(String key) {
         return chargeBoxConfigRepository.countByConfigKey(key);
     }

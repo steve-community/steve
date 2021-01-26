@@ -78,7 +78,7 @@ SteVe Pluggable is intended to run in any servlet container or in embedded web a
     spring.jpa.hibernate.ddl-auto=update
     ```
     
-    OCPP specific configuration
+3. OCPP specific configuration
     ```
     # When the WebSocket/Json charge point opens more than one WebSocket connection,
     # we need a mechanism/strategy to select one of them for outgoing requests.
@@ -87,7 +87,7 @@ SteVe Pluggable is intended to run in any servlet container or in embedded web a
     ocpp.ws.session.select.strategy=ALWAYS_LAST
     ```
     
-    OCPP server admin frontend authentication configuration (password supplied in BCrypt hash):
+4. OCPP server admin frontend authentication configuration (password supplied in BCrypt hash):
     ```
     ocpp.auth.user=admin
     ocpp.auth.password=$BCRYPT_HASH$

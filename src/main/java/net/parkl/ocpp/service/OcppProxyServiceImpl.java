@@ -8,6 +8,7 @@ import java.util.concurrent.Callable;
 
 import net.parkl.ocpp.repositories.TransactionStartRepository;
 import net.parkl.ocpp.service.config.OcppSpecialConfiguration;
+import net.parkl.ocpp.util.AsyncWaiter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +22,7 @@ import net.parkl.ocpp.entities.TransactionStart;
 import net.parkl.ocpp.repositories.ConnectorMeterValueRepository;
 import net.parkl.ocpp.repositories.ConnectorRepository;
 import net.parkl.ocpp.repositories.OcppChargingProcessRepository;
-import net.parkl.stevep.util.AsyncWaiter;
+
 
 @Service
 public class OcppProxyServiceImpl implements OcppProxyService {

@@ -26,7 +26,8 @@ import net.parkl.ocpp.service.config.OcppSpecialConfiguration;
 import net.parkl.ocpp.service.cs.ChargePointService;
 import net.parkl.ocpp.service.cs.OcppIdTagService;
 import net.parkl.ocpp.service.cs.TransactionService;
-import net.parkl.stevep.util.AsyncWaiter;
+
+import net.parkl.ocpp.util.AsyncWaiter;
 import ocpp.cp._2012._06.AvailabilityStatus;
 import ocpp.cp._2012._06.RemoteStartStopStatus;
 import ocpp.cs._2015._10.RegistrationStatus;

@@ -15,4 +15,6 @@ public class ESPChargingStartRequest {
     private Float limitKwh;
     private Integer limitMin;
 
+    private String rfidTag;
+
 }

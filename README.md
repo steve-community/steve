@@ -9,7 +9,7 @@ SteVe was developed at the RWTH Aachen University and means Steckdosenverwaltung
 
 SteVe is considered as an open platform to implement, test and evaluate novel ideas for electric mobility, like authentication protocols, reservation mechanisms for charge points, and business models for electric mobility. SteVe is distributed under [GPL](LICENSE.txt) and is free to use.
 
-### Modifications made by Parkl
+### Modifications by Parkl
 
 SteVe originally was developed as a deployable web application. We wanted to provide a simple, installable, platform-independent library that provides interfaces for the SteVe functionality and meets the following requirements:
 
@@ -17,6 +17,13 @@ SteVe originally was developed as a deployable web application. We wanted to pro
 * the library should use Spring Boot
 * the library should be decoupled from any database server (such as MySQL) using an abstraction for the data access layer (Spring Data JPA)
 * the library should publish interfaces for an e-mobility service provider to send and receive events to/from a backend
+
+In order to achieve the above goals, the following techical changes have been made:
+* migration from Spring to Spring Boot
+* migration from JOGL to Spring Data JPA
+* removing MySQL dependent functionality
+* migration from Jetty websockets to Apache Tomcat websockets
+* introduction of the EmobilityServiceProvider and EmobilityServiceProviderFacade interfaces to communicate with an ESP backend
 
 
 ### Charge Point Support

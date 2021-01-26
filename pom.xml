@@ -47,7 +47,7 @@
 
         <tomcat.version>9.0.35</tomcat.version>
         <hibernate.validator.version>6.1.5.Final</hibernate.validator.version>
-
+        <maven-deploy-plugin.version>2.8.1</maven-deploy-plugin.version>
     </properties>
 
     <profiles>
@@ -91,6 +91,20 @@
                 </configuration>
             </plugin>
 
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-deploy-plugin</artifactId>
+                <version>${maven-deploy-plugin.version}</version>
+                <executions>
+                    <execution>
+                        <id>default-deploy</id>
+                        <phase>deploy</phase>
+                        <goals>
+                            <goal>deploy</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
 
         </plugins>
     </build>

@@ -64,12 +64,35 @@ SteVe Pluggable is intended to run in any servlet container or in embedded web a
         
 2. Configure Spring Boot:
 
-    You can download and extract the SteVe releases using the following commands (replace X.X.X with the desired version number):
+    An application that uses **SteVe Pluggable** should be configured in the standard Spring boot manner.
+    An example datasource configuration that uses environment variables:
     ```
-    wget https://github.com/RWTH-i5-IDSG/steve/archive/steve-X.X.X.tar.gz
-    tar xzvf steve-X.X.X.tar.gz
-    cd steve-X.X.X
+    spring.datasource.username=${db.ocpp.user}
+    spring.datasource.password=${db.ocpp.password}
+    spring.datasource.url=jdbc:mysql://${db.ocpp.host}/${db.ocpp.name}?useUnicode=true&characterEncoding=UTF-8&serverTimezone=CET
+    spring.datasource.driver-class-name=com.mysql.jdbc.Driver
+    spring.jpa.hibernate.naming.physical-strategy=org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+    spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.MySQL5InnoDBDialect
+    spring.jpa.open-in-view=false
+    spring.jpa.generate-ddl=true
+    spring.jpa.hibernate.ddl-auto=update
     ```
+    
+    OCPP specific configuration
+    ```
+    # When the WebSocket/Json charge point opens more than one WebSocket connection,
+    # we need a mechanism/strategy to select one of them for outgoing requests.
+    # For allowed values see de.rwth.idsg.steve.ocpp.ws.custom.WsSessionSelectStrategyEnum.
+    #
+    ocpp.ws.session.select.strategy=ALWAYS_LAST
+    ```
+    
+    OCPP server admin frontend authentication configuration (password supplied in BCrypt hash):
+    ```
+    ocpp.auth.user=admin
+    ocpp.auth.password=$BCRYPT_HASH$
+    ```
+    
 
 3. Configure SteVe **before** building:
 

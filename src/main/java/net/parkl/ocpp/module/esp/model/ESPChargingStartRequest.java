@@ -13,5 +13,6 @@ public class ESPChargingStartRequest {
     private String chargerId;
     private String licensePlate;
     private Float limitKwh;
+    private Integer limitMin;
 
 }

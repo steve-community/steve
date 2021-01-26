@@ -6,6 +6,8 @@ import java.util.UUID;
 import java.util.concurrent.Callable;
 
 
+import net.parkl.ocpp.repositories.TransactionStartRepository;
+import net.parkl.ocpp.service.config.OcppSpecialConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +22,6 @@ import net.parkl.ocpp.repositories.ConnectorMeterValueRepository;
 import net.parkl.ocpp.repositories.ConnectorRepository;
 import net.parkl.ocpp.repositories.OcppChargingProcessRepository;
 import net.parkl.stevep.util.AsyncWaiter;
-import org.springframework.util.StringUtils;
 
 @Service
 public class OcppProxyServiceImpl implements OcppProxyService {
@@ -35,7 +36,10 @@ public class OcppProxyServiceImpl implements OcppProxyService {
 	private ConnectorMeterValueRepository connectorMeterValueRepo;
 	
 	@Autowired
-	private OcppProxyConfiguration proxyConfig;
+	private OcppSpecialConfiguration specialConfig;
+
+	@Autowired
+	private TransactionStartRepository transactionStartRepository;
 	
 	public OcppChargingProcess findOpenChargingProcessWithoutTransaction(String chargeBoxId, int connectorId) {
 		Connector c = connectorRepo.findByChargeBoxIdAndConnectorId(chargeBoxId, connectorId);
@@ -53,7 +57,7 @@ public class OcppProxyServiceImpl implements OcppProxyService {
 	}
  	@Override
 	@Transactional
-	public OcppChargingProcess createChargingProcess(String chargeBoxId, int connectorId, String idTag, String licensePlate, Float limitKwh) {
+	public OcppChargingProcess createChargingProcess(String chargeBoxId, int connectorId, String idTag, String licensePlate, Float limitKwh, Integer limitMinute) {
 		Connector c = connectorRepo.findByChargeBoxIdAndConnectorId(chargeBoxId, connectorId);
 		if (c==null) {
 			throw new IllegalStateException("Invalid charge box id/connector id: "+chargeBoxId+"/"+connectorId);
@@ -71,6 +75,7 @@ public class OcppProxyServiceImpl implements OcppProxyService {
 		p.setLicensePlate(licensePlate);
 		p.setOcppTag(idTag);
 		p.setLimitKwh(limitKwh);
+		p.setLimitMinute(limitMinute);
 		return chargingProcessRepo.save(p);
 	}
 
@@ -95,7 +100,7 @@ public class OcppProxyServiceImpl implements OcppProxyService {
 
 	@Override
 	public List<ConnectorMeterValue> getConnectorMeterValueByTransactionAndMeasurand(TransactionStart transaction, String measurand) {
-		return connectorMeterValueRepo.findByTransactionAndMeasurandOrderByValueTimestampDesc(transaction,measurand);
+		return connectorMeterValueRepo.findByTransactionAndMeasurandAndPhaseIsNullOrderByValueTimestampDesc(transaction,measurand);
 	}
 
 	@Override
@@ -115,7 +120,7 @@ public class OcppProxyServiceImpl implements OcppProxyService {
 	@Override
 	public ConnectorMeterValue getLastConnectorMeterValueByTransactionAndMeasurand(TransactionStart transaction,
                                                                                    String measurand) {
-		List<ConnectorMeterValue> list = connectorMeterValueRepo.findByTransactionAndMeasurandOrderByValueTimestampDesc(transaction, measurand);
+		List<ConnectorMeterValue> list = connectorMeterValueRepo.findByTransactionAndMeasurandAndPhaseIsNullOrderByValueTimestampDesc(transaction, measurand);
 		if (list.isEmpty()) {
 			return null;
 		}
@@ -157,22 +162,32 @@ public class OcppProxyServiceImpl implements OcppProxyService {
 	}
 	@Override
 	public boolean isWaitingForChargingProcess(String chargeBoxId) {
-		String ids=proxyConfig.getWaitingForChargingProcessChargeBoxIds();
-		if (StringUtils.isEmpty(ids)) {
-			return false;
-		}
-		String[] split = ids.split(",");
-		for (String id:split) {
-			if (id.equals(chargeBoxId)) {
-				return true;
-			}
-		}
-		return false;
+	return specialConfig.isWaitingForChargingProcessEnabled(chargeBoxId);
+
 	}
 	
 	@Override
-	public List<OcppChargingProcess> findOpenChargingProcessesWithLimit() {
+	public List<OcppChargingProcess> findOpenChargingProcessesWithLimitKwh() {
 		return chargingProcessRepo.findAllByTransactionIsNotNullAndLimitKwhIsNotNullAndEndDateIsNull();
 	}
 	
+@Override
+	public List<OcppChargingProcess> findOpenChargingProcessesWithLimitMinute() {
+		return chargingProcessRepo.findAllByTransactionIsNotNullAndLimitMinuteIsNotNullAndEndDateIsNull();
+	}
+
+  @Override
+    public OcppChargingProcess findOpenProcessForRfidTag(String rfidTag, int connectorId, String chargeBoxId) {
+        Connector connector = connectorRepo.findByChargeBoxIdAndConnectorId(chargeBoxId, connectorId);
+        if (connector == null) {
+            throw new IllegalStateException("Invalid charge box id/connector id: " + chargeBoxId + "/" + connectorId);
+        }
+        return chargingProcessRepo.findByOcppTagAndConnectorAndEndDateIsNull(rfidTag, connector);
+    }
+
+    @Override
+    public OcppChargingProcess findByTransactionId(int transactionId) {
+        TransactionStart transaction = transactionStartRepository.findById(transactionId).orElseThrow(() -> new IllegalStateException("Invalid transaction id"));
+        return chargingProcessRepo.findByTransaction(transaction);
+    }
 }

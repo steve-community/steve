@@ -14,6 +14,7 @@ import de.rwth.idsg.steve.web.dto.Address;
 import de.rwth.idsg.steve.web.dto.ChargePointForm;
 import de.rwth.idsg.steve.web.dto.OcppTagForm;
 import de.rwth.idsg.steve.web.dto.ocpp.*;
+import lombok.extern.slf4j.Slf4j;
 import net.parkl.ocpp.module.esp.ESPErrorCodes;
 import net.parkl.ocpp.module.esp.EmobilityServiceProvider;
 import net.parkl.ocpp.module.esp.model.*;
@@ -21,6 +22,7 @@ import net.parkl.ocpp.entities.*;
 import net.parkl.ocpp.repositories.ConnectorRepository;
 import net.parkl.ocpp.repositories.ConnectorStatusRepository;
 import net.parkl.ocpp.repositories.OcppChargeBoxRepository;
+import net.parkl.ocpp.service.config.OcppSpecialConfiguration;
 import net.parkl.ocpp.service.cs.ChargePointService;
 import net.parkl.ocpp.service.cs.OcppIdTagService;
 import net.parkl.ocpp.service.cs.TransactionService;
@@ -28,8 +30,6 @@ import net.parkl.stevep.util.AsyncWaiter;
 import ocpp.cp._2012._06.AvailabilityStatus;
 import ocpp.cp._2012._06.RemoteStartStopStatus;
 import ocpp.cs._2015._10.RegistrationStatus;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
@@ -46,9 +46,9 @@ import java.util.concurrent.Callable;
  *
  */
 @Component
+@Slf4j
 public class EmobilityServiceProviderFacadeImpl implements EmobilityServiceProviderFacade {
 
-	private static final Logger LOGGER=LoggerFactory.getLogger(EmobilityServiceProviderFacadeImpl.class);
 	
 	private static final long WAIT_MS = 100;
 
@@ -82,7 +82,7 @@ public class EmobilityServiceProviderFacadeImpl implements EmobilityServiceProvi
 	private TransactionService transactionService;
 	   
 	@Autowired
-	private OcppProxyConfiguration config;
+	private OcppSpecialConfiguration config;
 	
 	@Autowired
 	private EmobilityServiceProvider emobilityServiceProvider;
@@ -98,14 +98,14 @@ public class EmobilityServiceProviderFacadeImpl implements EmobilityServiceProvi
 	
 
 	public ESPChargingStartResult startCharging(ESPChargingStartRequest req) {
-		LOGGER.info("Starting charging: {}-{} (licensePlate={})...",req.getChargeBoxId(),req.getChargerId(),req.getLicensePlate());
+		log.info("Starting charging: {}-{} (licensePlate={})...",req.getChargeBoxId(),req.getChargerId(),req.getLicensePlate());
 		if (StringUtils.isEmpty(req.getChargeBoxId())) {
-			LOGGER.error("Charger box id not specified");
+			log.error("Charger box id not specified");
 			return ESPChargingStartResult.builder().errorCode(ESPErrorCodes.ERROR_CODE_INVALID_CHARGER_ID).build();
 
 		}
 		if (StringUtils.isEmpty(req.getChargerId())) {
-			LOGGER.error("Charger id not specified");
+			log.error("Charger id not specified");
 			return ESPChargingStartResult.builder().errorCode(ESPErrorCodes.ERROR_CODE_INVALID_CHARGER_ID).build();
 
 		}
@@ -114,7 +114,7 @@ public class EmobilityServiceProviderFacadeImpl implements EmobilityServiceProvi
 		
 		OcppChargeBox chargeBox = chargeBoxRepo.findByChargeBoxId(id.getChargeBoxId());
 		if (chargeBox==null) {
-			LOGGER.error("Invalid charge box id: {}",id.getChargeBoxId());
+			log.error("Invalid charge box id: {}",id.getChargeBoxId());
 			return ESPChargingStartResult.builder().errorCode(ESPErrorCodes.ERROR_CODE_INVALID_CHARGER_ID).build();
 
 		}
@@ -122,26 +122,26 @@ public class EmobilityServiceProviderFacadeImpl implements EmobilityServiceProvi
 		
 		ChargePointSelect c=getChargePoint(chargeBox.getChargeBoxId(),chargeBox.getOcppProtocol());
 		if (c==null) {
-			LOGGER.error("Invalid charge point id: {}",id.getChargeBoxId());
+			log.error("Invalid charge point id: {}",id.getChargeBoxId());
 			return ESPChargingStartResult.builder().errorCode(ESPErrorCodes.ERROR_CODE_INVALID_CHARGER_ID).build();
 
 		}
 		
 		OcppChargingProcess existing = proxyService.findOpenChargingProcessWithoutTransaction(id.getChargeBoxId(), id.getConnectorId());
 		if (existing!=null) {
-			LOGGER.error("Charging process open: {}",existing.getOcppChargingProcessId());
+			log.error("Charging process open: {}",existing.getOcppChargingProcessId());
 			return ESPChargingStartResult.builder().errorCode(ESPErrorCodes.ERROR_CODE_CHARGER_OCCUPIED).build();
 		}
 		
 		String idTag = getAvailableIntegrationIdTag(chargeBox);
 		if (idTag==null) {
-			LOGGER.error("No ID tag not found");
+			log.error("No ID tag not found");
 			return ESPChargingStartResult.builder().errorCode(ESPErrorCodes.ERROR_CODE_CHARGER_ERROR).build();
 		}
 		
 		OcppTag tag = idTagService.getRecord(idTag);
 		if (tag==null) {
-			LOGGER.error("ID tag not found: {}",idTag);
+			log.error("ID tag not found: {}",idTag);
 			return ESPChargingStartResult.builder().errorCode(ESPErrorCodes.ERROR_CODE_CHARGER_ERROR).build();
 		}
 		
@@ -157,27 +157,28 @@ public class EmobilityServiceProviderFacadeImpl implements EmobilityServiceProvi
 		if (result!=null) {
     		if (result.getResponse()!=null) {
     			if (result.getResponse().equals(RemoteStartStopStatus.ACCEPTED.value())) {
-    				LOGGER.info("Proxy transaction accepted: {}",id.getChargeBoxId());
-    				OcppChargingProcess process = proxyService.createChargingProcess(id.getChargeBoxId(), id.getConnectorId(), idTag, req.getLicensePlate(), req.getLimitKwh());
-    				LOGGER.info("Charging process created: {}", process.getOcppChargingProcessId());
+    				log.info("Proxy transaction accepted: {}",id.getChargeBoxId());
+    				OcppChargingProcess process = proxyService.createChargingProcess(id.getChargeBoxId(), id.getConnectorId(),
+							idTag, req.getLicensePlate(), req.getLimitKwh(), req.getLimitMin());
+    				log.info("Charging process created: {}", process.getOcppChargingProcessId());
 					return ESPChargingStartResult.builder().externalChargingProcessId(String.valueOf(process.getOcppChargingProcessId())).build();
 
     				
     			} else {
-    				LOGGER.info("Proxy transaction rejected: {}",id.getChargeBoxId());
+    				log.info("Proxy transaction rejected: {}",id.getChargeBoxId());
 					return ESPChargingStartResult.builder().errorCode(ESPErrorCodes.ERROR_CODE_CHARGER_ERROR).build();
     			}
     		} else if (result.getErrorMessage()!=null) {
-    			LOGGER.info("Proxy transaction error ({}): {}",result.getErrorMessage(),id.getChargeBoxId());
+    			log.info("Proxy transaction error ({}): {}",result.getErrorMessage(),id.getChargeBoxId());
 				return ESPChargingStartResult.builder().errorCode(ESPErrorCodes.ERROR_CODE_CHARGER_ERROR).build();
 
     		} else {
-    			LOGGER.info("Proxy start transaction unknown error: {}",id.getChargeBoxId());
+    			log.info("Proxy start transaction unknown error: {}",id.getChargeBoxId());
 				return ESPChargingStartResult.builder().errorCode(ESPErrorCodes.ERROR_CODE_CHARGER_ERROR).build();
 
     		}
     	} else {
-    		LOGGER.info("Proxy start transaction timeout: {}",id.getChargeBoxId());
+    		log.info("Proxy start transaction timeout: {}",id.getChargeBoxId());
 			return ESPChargingStartResult.builder().errorCode(ESPErrorCodes.ERROR_CODE_CHARGER_OFFLINE).build();
 
     	}
@@ -199,11 +200,11 @@ public class EmobilityServiceProviderFacadeImpl implements EmobilityServiceProvi
 		List<String> tags = getIntegrationIdTags();
 		for (String tag:tags) {
 			if (!idTagsUsed.contains(tag.toLowerCase())) {
-				LOGGER.info("Available id tag found: {}",tag);
+				log.info("Available id tag found: {}",tag);
 				return tag;
 			}
 		}
-		LOGGER.error("No available id tag found");
+		log.error("No available id tag found");
 		return null;
 	}
 
@@ -235,7 +236,7 @@ public class EmobilityServiceProviderFacadeImpl implements EmobilityServiceProvi
 	}
 	
 	public ESPChargingResult stopCharging(ESPChargingUserStopRequest req) {
-		LOGGER.info("Stopping charging: {}...",req.getExternalChargeId());
+		log.info("Stopping charging: {}...",req.getExternalChargeId());
 		return doStopCharging(req.getExternalChargeId());
 
 	}
@@ -243,7 +244,7 @@ public class EmobilityServiceProviderFacadeImpl implements EmobilityServiceProvi
 	private ESPChargingResult doStopCharging(String ocppChargingProcessId) {
 		OcppChargingProcess p= proxyService.findOcppChargingProcess(ocppChargingProcessId);
 		if (p==null) {
-			LOGGER.info("Invalid charge id: {}",ocppChargingProcessId);
+			log.info("Invalid charge id: {}",ocppChargingProcessId);
 			return ESPChargingResult.builder().errorCode(ESPErrorCodes.ERROR_CODE_INVALID_EXTERNAL_CHARGE_ID).build();
 
 		}
@@ -255,7 +256,7 @@ public class EmobilityServiceProviderFacadeImpl implements EmobilityServiceProvi
 					orElseThrow(() -> new IllegalStateException("Invalid transaction id: "+p.getTransaction().getTransactionPk()));
 
 			if (transaction.getStopTimestamp()!=null) {
-				LOGGER.info("Charging already stopped: {}", ocppChargingProcessId);
+				log.info("Charging already stopped: {}", ocppChargingProcessId);
 				ESPChargingData data = ESPChargingData.builder().startValue(consumptionHelper.getStartValue(transaction)).
 						stopValue(consumptionHelper.getStopValue(transaction)).totalPower(consumptionHelper.getTotalPower(transaction)).
 						start(p.getStartDate()).end(p.getEndDate()).build();
@@ -268,13 +269,13 @@ public class EmobilityServiceProviderFacadeImpl implements EmobilityServiceProvi
 		if (p.getTransaction()!=null) {
 			chargeBox = chargeBoxRepo.findByChargeBoxId(p.getTransaction().getConnector().getChargeBoxId());
 			if (chargeBox==null) {
-				LOGGER.error("Invalid charge box id: {}",p.getTransaction().getConnector().getChargeBoxId());
+				log.error("Invalid charge box id: {}",p.getTransaction().getConnector().getChargeBoxId());
 				return ESPChargingResult.builder().errorCode(ESPErrorCodes.ERROR_CODE_INVALID_CHARGER_ID).build();
 			}
 
 			c = getChargePoint(chargeBox.getChargeBoxId(),chargeBox.getOcppProtocol());
 			if (c==null) {
-				LOGGER.error("Invalid charge point id: {}",p.getTransaction().getConnector().getChargeBoxId());
+				log.error("Invalid charge point id: {}",p.getTransaction().getConnector().getChargeBoxId());
 				return ESPChargingResult.builder().errorCode(ESPErrorCodes.ERROR_CODE_CHARGER_ERROR).build();
 			}
 		}
@@ -284,7 +285,7 @@ public class EmobilityServiceProviderFacadeImpl implements EmobilityServiceProvi
 
 
 		if (p2.getTransaction()!=null) {
-			LOGGER.info("Stopping charging transaction: {}...",p2.getTransaction().getTransactionPk());
+			log.info("Stopping charging transaction: {}...",p2.getTransaction().getTransactionPk());
 
 			RemoteStopTransactionParams params=new RemoteStopTransactionParams();
 			params.setChargePointSelectList(Arrays.asList(c));
@@ -298,7 +299,7 @@ public class EmobilityServiceProviderFacadeImpl implements EmobilityServiceProvi
 
 		} else {
 			//nem lett elindítva töltési tranzakció
-			LOGGER.info("Stopping charging without transaction: {}...",p2.getOcppChargingProcessId());
+			log.info("Stopping charging without transaction: {}...",p2.getOcppChargingProcessId());
 			OcppChargingProcess process=proxyService.stopChargingProcess(p2.getOcppChargingProcessId());
 
 			ESPChargingData data = ESPChargingData.builder().start(process.getStartDate()).end(process.getEndDate()).build();
@@ -316,7 +317,7 @@ public class EmobilityServiceProviderFacadeImpl implements EmobilityServiceProvi
 		if (result!=null) {
 			if (result.getResponse()!=null) {
 				if (result.getResponse().equals(RemoteStartStopStatus.ACCEPTED.value())) {
-					LOGGER.info("Proxy transaction stop accepted: {}",transactionId);
+					log.info("Proxy transaction stop accepted: {}",transactionId);
 					OcppChargingProcess process=proxyService.stopChargingProcess(externalChargeId);
 					return ESPChargingResult.builder().stoppedWithoutTransaction(false).build();
 					
@@ -343,21 +344,21 @@ public class EmobilityServiceProviderFacadeImpl implements EmobilityServiceProvi
 					res.getChargingData().setStartValue(OcppConsumptionHelper.getStartValue(t));
 					res.getChargingData().setStopValue(OcppConsumptionHelper.getStopValue(t));*/
 				} else {
-					LOGGER.info("Proxy transaction stop rejected: {}",transactionId);
+					log.info("Proxy transaction stop rejected: {}",transactionId);
 					proxyService.stopRequestCancelled(externalChargeId);
 					return ESPChargingResult.builder().errorCode(ESPErrorCodes.ERROR_CODE_CHARGER_ERROR).build();
 				}
 			} else if (result.getErrorMessage()!=null) {
-				LOGGER.info("Proxy transaction error ({}): {}",result.getErrorMessage(),transactionId);
+				log.info("Proxy transaction error ({}): {}",result.getErrorMessage(),transactionId);
 				proxyService.stopRequestCancelled(externalChargeId);
 				return ESPChargingResult.builder().errorCode(ESPErrorCodes.ERROR_CODE_CHARGER_ERROR).build();
 			} else {
-				LOGGER.info("Proxy stop transaction unknown error: {}",transactionId);
+				log.info("Proxy stop transaction unknown error: {}",transactionId);
 				proxyService.stopRequestCancelled(externalChargeId);
 				return ESPChargingResult.builder().errorCode(ESPErrorCodes.ERROR_CODE_CHARGER_ERROR).build();
 			}
 		} else {
-			LOGGER.error("No response arrived from charger for stop transaction: {}",transactionId);
+			log.error("No response arrived from charger for stop transaction: {}",transactionId);
 			proxyService.stopRequestCancelled(externalChargeId);
 			return ESPChargingResult.builder().errorCode(ESPErrorCodes.ERROR_CODE_CHARGER_OFFLINE).build();
 		}
@@ -479,11 +480,11 @@ public class EmobilityServiceProviderFacadeImpl implements EmobilityServiceProvi
 	}
 
 	public ESPChargingStatusResult getStatus(String externalChargeId) {
-		LOGGER.info("Status request: {}...",externalChargeId);
+		log.info("Status request: {}...",externalChargeId);
 		
 		OcppChargingProcess p= proxyService.findOcppChargingProcess(externalChargeId);
 		if (p==null) {
-			LOGGER.info("Invalid charge id: {}",externalChargeId);
+			log.info("Invalid charge id: {}",externalChargeId);
 			return ESPChargingStatusResult.builder().errorCode(ESPErrorCodes.ERROR_CODE_INVALID_EXTERNAL_CHARGE_ID).build();
 
 		}
@@ -495,7 +496,7 @@ public class EmobilityServiceProviderFacadeImpl implements EmobilityServiceProvi
 					orElseThrow(() -> new IllegalStateException("Invalid transaction id: "+p.getTransaction().getTransactionPk()));
 
 			if (transaction.getStopTimestamp()!=null) {
-				LOGGER.info("Charging already stopped: {}", externalChargeId);
+				log.info("Charging already stopped: {}", externalChargeId);
 				return ESPChargingStatusResult.builder().errorCode(ESPErrorCodes.ERROR_CODE_CHARGING_ALREADY_STOPPED).build();
 			}
 		}
@@ -550,17 +551,17 @@ public class EmobilityServiceProviderFacadeImpl implements EmobilityServiceProvi
 	
 	@Override
 	public List<ESPChargeBoxConfiguration> getChargeBoxConfiguration(String chargeBoxId) {
-		LOGGER.info("Configuration request: {}...",chargeBoxId);
+		log.info("Configuration request: {}...",chargeBoxId);
 		ChargePointSelect c=null;
 		OcppChargeBox chargeBox = chargeBoxRepo.findByChargeBoxId(chargeBoxId);
 		if (chargeBox==null) {
-			LOGGER.error("Invalid charge box id: {}",chargeBoxId);
+			log.error("Invalid charge box id: {}",chargeBoxId);
 			throw new IllegalArgumentException("Invalid charge box ID: "+chargeBoxId);
 		}
 		
 		c = getChargePoint(chargeBox.getChargeBoxId(),chargeBox.getOcppProtocol());
 		if (c==null) {
-			LOGGER.error("Invalid charge point id: {}",chargeBoxId);
+			log.error("Invalid charge point id: {}",chargeBoxId);
 			throw new IllegalArgumentException("Invalid charge box ID: "+chargeBoxId);
 
 		}
@@ -596,12 +597,12 @@ public class EmobilityServiceProviderFacadeImpl implements EmobilityServiceProvi
 			} else if (result.getErrorMessage()!=null) {
 				throw new IllegalStateException(result.getErrorMessage());
 			} else {
-				LOGGER.info("Get configuration unknown error: {}",chargeBoxId);
+				log.info("Get configuration unknown error: {}",chargeBoxId);
 				throw new IllegalStateException("Unknown error: "+chargeBoxId);
 				
 			}
 		} else {
-			LOGGER.info("Get configuration no response error: {}",chargeBoxId);
+			log.info("Get configuration no response error: {}",chargeBoxId);
 			throw new IllegalStateException("No response from charge box: "+chargeBoxId);
 		}
 	}
@@ -611,34 +612,34 @@ public class EmobilityServiceProviderFacadeImpl implements EmobilityServiceProvi
 		if (result!=null) {
 			if (result.getResponse()!=null) {
 				if (result.getResponse().equals(AvailabilityStatus.ACCEPTED.value())) {
-    				LOGGER.info("{} accepted: {}",type, chargeBoxId);
+    				log.info("{} accepted: {}",type, chargeBoxId);
     				
     			} else {
-    				LOGGER.info("{} rejected: {}",type, chargeBoxId);
+    				log.info("{} rejected: {}",type, chargeBoxId);
     				throw new IllegalStateException(type+" rejected: "+chargeBoxId);
     			}
 			} else if (result.getErrorMessage()!=null) {
 				throw new IllegalStateException(result.getErrorMessage());
 			} else {
-				LOGGER.info("{} unknown error: {}",type, chargeBoxId);
+				log.info("{} unknown error: {}",type, chargeBoxId);
 				throw new IllegalStateException("Unknown error: "+chargeBoxId);
 				
 			}
 		} else {
-			LOGGER.info("{} no response error: {}",type, chargeBoxId);
+			log.info("{} no response error: {}",type, chargeBoxId);
 			throw new IllegalStateException("No response from charge box: "+chargeBoxId);
 		}
 	}
 
 
 	private List<ESPChargeBoxConfiguration> parseConfList(String response) {
-		LOGGER.info("Parsing configuration: {}...",response);
+		log.info("Parsing configuration: {}...",response);
 		List<ESPChargeBoxConfiguration> ret=new ArrayList<>();
 		String[] split = response.split("<br>");
 		for (String line:split) {
-			LOGGER.info("Parsing config line: {}...",line);
+			log.info("Parsing config line: {}...",line);
 			if (line.startsWith("<b>Unknown keys")) {
-				LOGGER.info("Unknown keys reached, exiting...");
+				log.info("Unknown keys reached, exiting...");
 				break;
 			}
 			if (!StringUtils.isEmpty(line.trim())&&!line.startsWith("<b>Known keys")) {
@@ -651,7 +652,7 @@ public class EmobilityServiceProviderFacadeImpl implements EmobilityServiceProvi
 				
 				ESPChargeBoxConfiguration c= ESPChargeBoxConfiguration.builder().
 						key(keyVal[0].trim()).value(keyVal[1].trim()).readOnly(readOnly).build();
-				LOGGER.info("Configuration parsed: {}={} (read-only={})",c.getKey(),c.getValue(),c.isReadOnly());
+				log.info("Configuration parsed: {}={} (read-only={})",c.getKey(),c.getValue(),c.isReadOnly());
 				ret.add(c);
 			}
 		}
@@ -661,17 +662,17 @@ public class EmobilityServiceProviderFacadeImpl implements EmobilityServiceProvi
 	@Override
 	public List<ESPChargeBoxConfiguration> changeChargeBoxConfiguration(String chargeBoxId, String key,
 			String value) {
-		LOGGER.info("Configuration change request for {}: {}={}...",chargeBoxId,key,value);
+		log.info("Configuration change request for {}: {}={}...",chargeBoxId,key,value);
 		ChargePointSelect c=null;
 		OcppChargeBox chargeBox = chargeBoxRepo.findByChargeBoxId(chargeBoxId);
 		if (chargeBox==null) {
-			LOGGER.error("Invalid charge box id: {}",chargeBoxId);
+			log.error("Invalid charge box id: {}",chargeBoxId);
 			throw new IllegalArgumentException("Invalid charge box ID: "+chargeBoxId);
 		}
 		
 		c = getChargePoint(chargeBox.getChargeBoxId(),chargeBox.getOcppProtocol());
 		if (c==null) {
-			LOGGER.error("Invalid charge point id: {}",chargeBoxId);
+			log.error("Invalid charge point id: {}",chargeBoxId);
 			throw new IllegalArgumentException("Invalid charge box ID: "+chargeBoxId);
 
 		}
@@ -691,11 +692,11 @@ public class EmobilityServiceProviderFacadeImpl implements EmobilityServiceProvi
 
 	@Override
 	public void registerChargeBox(String chargeBoxId) {
-		LOGGER.info("Register charge box request: {}...",chargeBoxId);
+		log.info("Register charge box request: {}...",chargeBoxId);
 		
 		OcppChargeBox chargeBox = chargeBoxRepo.findByChargeBoxId(chargeBoxId);
 		if (chargeBox!=null) {
-			LOGGER.error("Charge box already exists: {}",chargeBoxId);
+			log.error("Charge box already exists: {}",chargeBoxId);
 			throw new IllegalArgumentException("Charge box already exists: "+chargeBoxId);
 		}
 		
@@ -708,11 +709,11 @@ public class EmobilityServiceProviderFacadeImpl implements EmobilityServiceProvi
 
 	@Override
 	public void unregisterChargeBox(String chargeBoxId) {
-		LOGGER.info("Unregister charge box request: {}...",chargeBoxId);
+		log.info("Unregister charge box request: {}...",chargeBoxId);
 		
 		OcppChargeBox chargeBox = chargeBoxRepo.findByChargeBoxId(chargeBoxId);
 		if (chargeBox==null) {
-			LOGGER.error("Invalid charge box id: {}",chargeBoxId);
+			log.error("Invalid charge box id: {}",chargeBoxId);
 			throw new IllegalArgumentException("Invalid charge box ID: "+chargeBoxId);
 		}
 		
@@ -721,17 +722,17 @@ public class EmobilityServiceProviderFacadeImpl implements EmobilityServiceProvi
 
 	@Override
 	public void changeAvailability(String chargeBoxId, String chargerId,boolean available) {
-		LOGGER.info("Availability change request for {}-{}: {}...",chargeBoxId,chargerId,available);
+		log.info("Availability change request for {}-{}: {}...",chargeBoxId,chargerId,available);
 		ChargePointSelect c=null;
 		OcppChargeBox chargeBox = chargeBoxRepo.findByChargeBoxId(chargeBoxId);
 		if (chargeBox==null) {
-			LOGGER.error("Invalid charge box id: {}",chargeBoxId);
+			log.error("Invalid charge box id: {}",chargeBoxId);
 			throw new IllegalArgumentException("Invalid charge box ID: "+chargeBoxId);
 		}
 		
 		c = getChargePoint(chargeBox.getChargeBoxId(),chargeBox.getOcppProtocol());
 		if (c==null) {
-			LOGGER.error("Invalid charge point id: {}",chargeBoxId);
+			log.error("Invalid charge point id: {}",chargeBoxId);
 			throw new IllegalArgumentException("Invalid charge box ID: "+chargeBoxId);
 
 		}
@@ -768,17 +769,17 @@ public class EmobilityServiceProviderFacadeImpl implements EmobilityServiceProvi
 
 	@Override
 	public void unlockConnector(String chargeBoxId, String chargerId) {
-		LOGGER.info("Unlock connector request for {}-{}...",chargeBoxId,chargerId);
+		log.info("Unlock connector request for {}-{}...",chargeBoxId,chargerId);
 		ChargePointSelect c=null;
 		OcppChargeBox chargeBox = chargeBoxRepo.findByChargeBoxId(chargeBoxId);
 		if (chargeBox==null) {
-			LOGGER.error("Invalid charge box id: {}",chargeBoxId);
+			log.error("Invalid charge box id: {}",chargeBoxId);
 			throw new IllegalArgumentException("Invalid charge box ID: "+chargeBoxId);
 		}
 		
 		c = getChargePoint(chargeBox.getChargeBoxId(),chargeBox.getOcppProtocol());
 		if (c==null) {
-			LOGGER.error("Invalid charge point id: {}",chargeBoxId);
+			log.error("Invalid charge point id: {}",chargeBoxId);
 			throw new IllegalArgumentException("Invalid charge box ID: "+chargeBoxId);
 
 		}
@@ -812,17 +813,17 @@ public class EmobilityServiceProviderFacadeImpl implements EmobilityServiceProvi
 
 	@Override
 	public void resetChargeBox(String chargeBoxId, boolean soft) {
-		LOGGER.info("Reset request for {} (soft={}}...",chargeBoxId,soft);
+		log.info("Reset request for {} (soft={}}...",chargeBoxId,soft);
 		ChargePointSelect c=null;
 		OcppChargeBox chargeBox = chargeBoxRepo.findByChargeBoxId(chargeBoxId);
 		if (chargeBox==null) {
-			LOGGER.error("Invalid charge box id: {}",chargeBoxId);
+			log.error("Invalid charge box id: {}",chargeBoxId);
 			throw new IllegalArgumentException("Invalid charge box ID: "+chargeBoxId);
 		}
 		
 		c = getChargePoint(chargeBox.getChargeBoxId(),chargeBox.getOcppProtocol());
 		if (c==null) {
-			LOGGER.error("Invalid charge point id: {}",chargeBoxId);
+			log.error("Invalid charge point id: {}",chargeBoxId);
 			throw new IllegalArgumentException("Invalid charge box ID: "+chargeBoxId);
 
 		}
@@ -854,72 +855,7 @@ public class EmobilityServiceProviderFacadeImpl implements EmobilityServiceProvi
 		}
 	}
 
-	@Override
-	public void configureIdTag(String chargeBoxId) {
-		LOGGER.info("ID tag configuration request: {}...",chargeBoxId);
-		
-		ChargePointSelect c=null;
-		OcppChargeBox chargeBox = chargeBoxRepo.findByChargeBoxId(chargeBoxId);
-		if (chargeBox==null) {
-			LOGGER.error("Invalid charge box id: {}",chargeBoxId);
-			throw new IllegalArgumentException("Invalid charge box ID: "+chargeBoxId);
-		}
-		
-		if (chargeBox.getOcppProtocol()==null) {
-			LOGGER.error("OCPP protocol not defined for: {}",chargeBoxId);
-			throw new IllegalArgumentException("OCPP protocol not defined for: "+chargeBoxId);
-		}
-		
-		c = getChargePoint(chargeBox.getChargeBoxId(),chargeBox.getOcppProtocol());
-		if (c==null) {
-			LOGGER.error("Invalid charge point id: {}",chargeBoxId);
-			throw new IllegalArgumentException("Invalid charge box ID: "+chargeBoxId);
 
-		}
-		
-		List<String> idTags = getIntegrationIdTags();
-		for (String idTag:idTags) {
-			OcppTag tag = idTagService.getRecord(idTag);
-			if (tag==null) {
-				OcppTag parentTag = idTagService.getRecord(config.getIntegrationParentIdTag());
-				if (parentTag==null) {
-					LOGGER.info("Creating parent ID tag: {}...",config.getIntegrationParentIdTag());
-					OcppTagForm parent=new OcppTagForm();
-					parent.setIdTag(config.getIntegrationParentIdTag());
-					idTagService.addOcppTag(parent);
-				}
-				
-				LOGGER.info("Creating ID tag: {}...",idTag);
-				
-				OcppTagForm iTag=new OcppTagForm();
-				iTag.setIdTag(idTag);
-				iTag.setParentIdTag(config.getIntegrationParentIdTag());
-				idTagService.addOcppTag(iTag);
-			}
-		}
-		
-		MultipleChargePointSelect params=new MultipleChargePointSelect();
-		params.setChargePointSelectList(Arrays.asList(c));
-		int taskId=sendGetLocalListVersion(params, chargeBox.getOcppProtocol());
-		
-		RequestResult result = waitForResult(chargeBoxId, taskId);
-		int version = processGetLocalListResult(chargeBoxId, result);
-		LOGGER.info("Sending local list: version={}...",version+1);
-		
-		SendLocalListParams params2=new SendLocalListParams();
-		params2.setChargePointSelectList(Arrays.asList(c));
-		
-		List<String> updateList=new ArrayList<>();
-		updateList.add(config.getIntegrationParentIdTag());
-		updateList.addAll(idTags);
-		params2.setAddUpdateList(updateList);
-		params2.setUpdateType(SendLocalListUpdateType.DIFFERENTIAL);
-		params2.setListVersion(version+1);
-		
-		taskId=sendLocalList(params2, chargeBox.getOcppProtocol());
-		result = waitForResult(chargeBoxId, taskId);
-		processGenericResult("Send local list", chargeBoxId, result);
-	}
 	
 	private List<String> getIntegrationIdTags() {
 		List<String> list=new ArrayList<>();
@@ -932,30 +868,13 @@ public class EmobilityServiceProviderFacadeImpl implements EmobilityServiceProvi
  		return list;
 	}
 
-	private int processGetLocalListResult(String chargeBoxId,
-			RequestResult result) {
-		if (result!=null) {
-			if (result.getResponse()!=null) {
-				return Integer.parseInt(result.getResponse());
-			} else if (result.getErrorMessage()!=null) {
-				throw new IllegalStateException(result.getErrorMessage());
-			} else {
-				LOGGER.info("Get local list unknown error: {}",chargeBoxId);
-				throw new IllegalStateException("Get local list error: "+chargeBoxId);
-				
-			}
-		} else {
-			LOGGER.info("Get local list no response error: {}",chargeBoxId);
-			throw new IllegalStateException("No response from charge box: "+chargeBoxId);
-		}
-	}
 
 	@Override
 	public void stopChargingExternal(OcppChargingProcess process, String reason) {
 		if (process==null) {
 			throw new IllegalArgumentException("OcppChargingProcess was null");
 		}
-		LOGGER.info("Stopping charging process from OCPP proxy: {}...",process.getOcppChargingProcessId());
+		log.info("Stopping charging process from OCPP proxy: {}...",process.getOcppChargingProcessId());
 
 		Transaction transaction = transactionService.findTransaction(process.getTransaction().getTransactionPk()).
 				orElseThrow(() -> new IllegalStateException("Invalid transaction id: "+process.getTransaction().getTransactionPk()));
@@ -985,7 +904,7 @@ public class EmobilityServiceProviderFacadeImpl implements EmobilityServiceProvi
 		if (process==null) {
 			throw new IllegalArgumentException("OcppChargingProcess was null");
 		}
-		LOGGER.info("Updating charging process consumption from OCPP proxy: {}...",process.getOcppChargingProcessId());
+		log.info("Updating charging process consumption from OCPP proxy: {}...",process.getOcppChargingProcessId());
 
 		Transaction transaction = transactionService.findTransaction(process.getTransaction().getTransactionPk()).
 				orElseThrow(() -> new IllegalStateException("Invalid transaction id: "+process.getTransaction().getTransactionPk()));
@@ -1023,7 +942,7 @@ public class EmobilityServiceProviderFacadeImpl implements EmobilityServiceProvi
 
 	@Override
 	public ESPChargerStatusResult getChargerStatuses() {
-		LOGGER.info("Querying all connector statuses...");
+		log.info("Querying all connector statuses...");
 		List<Connector> connectors = connectorRepo.findAllByOrderByConnectorPkAsc();
 		ESPChargerStatusResult ret=ESPChargerStatusResult.builder().status(new ArrayList<>()).build();
 
@@ -1082,8 +1001,8 @@ public class EmobilityServiceProviderFacadeImpl implements EmobilityServiceProvi
 
 
 	@Override
-	public void stopChargingWithLimit(String chargingProcessId) {
-		LOGGER.info("Stopping charging process with limit: {}...", chargingProcessId);
+	public void stopChargingWithLimit(String chargingProcessId, float totalPower) {
+		log.info("Stopping charging process with limit: {}...", chargingProcessId);
 		try {
 			ESPChargingResult res = doStopCharging(chargingProcessId);
 			if (res.getErrorCode()==null) {
@@ -1092,11 +1011,13 @@ public class EmobilityServiceProviderFacadeImpl implements EmobilityServiceProvi
 				Transaction transaction = transactionService.findTransaction(process.getTransaction().getTransactionPk()).
 						orElseThrow(() -> new IllegalStateException("Invalid transaction id: "+process.getTransaction().getTransactionPk()));
 
-				LOGGER.info("Successully stopped charging process with limit, notifying Parkl server: {}...",process.getOcppChargingProcessId());
+				log.info("Successully stopped charging process with limit, notifying Parkl server: {}...",process.getOcppChargingProcessId());
+                float consumption = consumptionHelper.getTotalPower(transaction);
+
 				ESPChargingData data = ESPChargingData.builder().
 						start(process.getStartDate()).
 						end(process.getEndDate()).
-						totalPower(consumptionHelper.getTotalPower(transaction)).
+						totalPower(consumption == 0f ? totalPower : consumption).
 						startValue(consumptionHelper.getStartValue(transaction)).
 						stopValue(consumptionHelper.getStartValue(transaction)).build();
 				ESPChargingStopRequest req = ESPChargingStopRequest.builder().
@@ -1106,10 +1027,77 @@ public class EmobilityServiceProviderFacadeImpl implements EmobilityServiceProvi
 
 				emobilityServiceProvider.stopChargingExternal(req);
 			} else {
-				LOGGER.error("Failed to stop charging with limit {}: {}",res.getErrorCode(),chargingProcessId);
+				log.error("Failed to stop charging with limit {}: {}",res.getErrorCode(),chargingProcessId);
 			}
 		} catch (Exception ex) {
-			LOGGER.error("Failed to stop charging with limit: "+chargingProcessId,ex);
+			log.error("Failed to stop charging with limit: "+chargingProcessId,ex);
 		}
 	}
+
+
+	@Override
+    public void stopChargingWithPreparingTimeout(String chargingProcessId) {
+        log.info("Stopping charging process with preparing limit: {}...", chargingProcessId);
+        try {
+            ESPChargingResult res = doStopCharging(chargingProcessId);
+            if (res.getErrorCode() == null) {
+                OcppChargingProcess process = proxyService.findOcppChargingProcess(chargingProcessId);
+
+				Transaction transaction = transactionService.findTransaction(process.getTransaction().getTransactionPk()).
+						orElseThrow(() -> new IllegalStateException("Invalid transaction id: "+process.getTransaction().getTransactionPk()));
+
+				log.info("Successully stopped charging process wiht timeout, notifying Parkl server: {}...", process.getOcppChargingProcessId());
+				ESPChargingData data = ESPChargingData.builder().
+						start(process.getStartDate()).
+						end(process.getEndDate()).
+						totalPower(consumptionHelper.getTotalPower(transaction)).
+						startValue(consumptionHelper.getStartValue(transaction)).
+						stopValue(consumptionHelper.getStartValue(transaction)).
+						build();
+				ESPChargingStopRequest req = ESPChargingStopRequest.builder().
+						chargingData(data).
+						eventCode(OcppConstants.REASON_VEHICLE_NOT_CONNECTED).
+						build();
+
+                emobilityServiceProvider.stopChargingExternal(req);
+            } else {
+                log.error("Failed to stop charging with timeout {}: {}", res.getErrorCode(), chargingProcessId);
+            }
+        } catch (Exception ex) {
+            log.error("Failed to stop charging with timeout: " + chargingProcessId, ex);
+        }
+    }
+
+    @Override
+    public void sendHeartBeatOfflineAlert(String chargeBoxId) {
+        log.info("Sending heart beat offline alert, chargeBoxId: {}", chargeBoxId);
+        try {
+            emobilityServiceProvider.sendHeartBeatOfflineAlert(chargeBoxId);
+        } catch (Exception ex) {
+            log.error("Failed to end heart beat offline alert, chargeBoxId:{} ", chargeBoxId, ex);
+        }
+    }
+
+    @Override
+    public void notifyParklAboutRfidStart(ESPRfidChargingStartRequest startRequest) {
+        log.info("Notify Parkl about RFID start, RFID = {}, charger = {}/{}",
+                startRequest.getRfidTag(), startRequest.getChargeBoxId(), startRequest.getConnectorId());
+        try {
+            emobilityServiceProvider.notifyAboutRfidStart(startRequest);
+        } catch (Exception ex) {
+            log.error("Failed to notify about RFID start, RFID = {}, charger = {}/{}",
+                    startRequest.getRfidTag(), startRequest.getChargeBoxId(), startRequest.getConnectorId(), ex);
+        }
+    }
+
+    @Override
+    public boolean checkRfidTag(String rfidTag, String chargeBoxId) {
+        log.info("Check RFID tag validity on Parkl backend, RFID = {}", rfidTag);
+        try {
+            return emobilityServiceProvider.checkRfidTag(rfidTag, chargeBoxId);
+        } catch (Exception ex) {
+            log.error("Failed to check RFID tag validity on backend, RFID = {}", rfidTag, ex);
+            return false;
+        }
+    }
 }

@@ -22,7 +22,7 @@ public interface ConnectorMeterValueRepository extends CrudRepository<ConnectorM
 
 	List<ConnectorMeterValue> findByTransactionOrderByValueTimestampDesc(TransactionStart transaction);
 
-	List<ConnectorMeterValue> findByTransactionAndMeasurandAndPhaseIsNullOrderByValueTimestampDesc(Transaction transaction, String measurand);
+	List<ConnectorMeterValue> findByTransactionAndMeasurandAndPhaseIsNullOrderByValueTimestampDesc(TransactionStart transaction, String measurand);
 
 List<ConnectorMeterValue> findByTransactionAndMeasurandOrderByValueTimestampDesc(TransactionStart transaction, String measurand);
 

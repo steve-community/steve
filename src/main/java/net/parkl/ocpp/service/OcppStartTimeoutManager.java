@@ -1,83 +1,81 @@
 package net.parkl.ocpp.service;
 
-import java.util.List;
-
-
+import net.parkl.ocpp.entities.OcppChargingProcess;
+import net.parkl.ocpp.service.config.OcppSpecialConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import net.parkl.ocpp.entities.OcppChargingProcess;
-import org.springframework.util.StringUtils;
+import java.util.List;
 
 @Component
 public class OcppStartTimeoutManager {
-	private static final Logger LOGGER=LoggerFactory.getLogger(OcppStartTimeoutManager.class);
-	
-	@Autowired
-	private OcppProxyConfiguration config;
-	@Autowired
-	private OcppProxyService proxyService;
-	
-	@Autowired
-	private EmobilityServiceProviderFacade facade;
-	
+    private static final Logger LOGGER = LoggerFactory.getLogger(OcppStartTimeoutManager.class);
 
-	
+    private final OcppSpecialConfiguration config;
+    private final OcppProxyService proxyService;
 
-	@Scheduled(fixedRate=10000)
-	public void checkForStartTimeout() {
-		
-		if (!config.isStartTimeoutEnabled()) {
-			return;
-		}
-		LOGGER.debug("Checking start timeout...");
-		
-		List<OcppChargingProcess> processes=proxyService.findOpenChargingProcessesWithoutTransaction();
-		for (OcppChargingProcess cp:processes) {
-			if (isStartTimeoutEnabledForChargeBox(cp.getConnector().getChargeBoxId())) {
-				LOGGER.info("Checking for timeout of process: {}...",cp.getOcppChargingProcessId());
-				
-				try {
-					checkForProcessStartTimeout(cp);	
-				} catch (Exception ex) {
-					LOGGER.error("Failed to process start timeout: "+cp.getOcppChargingProcessId(),ex);
-				}
-			}
-			
-		}
-		
-	}
-	
-	
-	private void checkForProcessStartTimeout(OcppChargingProcess cp) throws Exception {
-		if (cp.getStartDate().getTime()+config.getStartTimeoutSecs()*1000<System.currentTimeMillis()) {
-			LOGGER.info("Charging process start timeout: {}",cp.getOcppChargingProcessId());
-			
-			
-			LOGGER.info("Charging process stopped on timeout, connector reset: {}-{}",
-					cp.getConnector().getChargeBoxId(),cp.getConnector().getConnectorId());
-			facade.changeAvailability(cp.getConnector().getChargeBoxId(), String.valueOf(cp.getConnector().getConnectorId()), false);
-			Thread.sleep(1000);
-			facade.changeAvailability(cp.getConnector().getChargeBoxId(), String.valueOf(cp.getConnector().getConnectorId()), true);
-			
-		}
-	}
+    private final EmobilityServiceProviderFacade facade;
+
+    public OcppStartTimeoutManager(OcppSpecialConfiguration config, OcppProxyService proxyService, EmobilityServiceProviderFacade facade) {
+        this.config = config;
+        this.proxyService = proxyService;
+        this.facade = facade;
+    }
+
+    @Scheduled(fixedRate = 10000)
+    public void checkForStartTimeout() {
+
+        if (!config.isStartTimeoutEnabledForAny() && !config.isPreparingTimeoutEnabledForAny()) {
+            return;
+        }
+        LOGGER.debug("Checking start timeout...");
+
+        List<OcppChargingProcess> processes = proxyService.findOpenChargingProcessesWithoutTransaction();
+        for (OcppChargingProcess cp : processes) {
+            if (config.isStartTimeoutEnabled(cp.getConnector().getChargeBoxId())) {
+                LOGGER.info("Checking for timeout of process: {}...", cp.getOcppChargingProcessId());
+                try {
+                    checkForProcessStartTimeout(cp);
+                } catch (Exception ex) {
+                    LOGGER.error("Failed to process start timeout: " + cp.getOcppChargingProcessId(), ex);
+                }
+            }else if (config.isPreparingTimeoutEnabled(cp.getConnector().getChargeBoxId())){
+                LOGGER.info("Checking for preparing timeout of process: {}...", cp.getOcppChargingProcessId());
+                try {
+                    checkForProcessPreparingTimeout(cp);
+                } catch (Exception ex) {
+                    LOGGER.error("Failed to process start timeout: " + cp.getOcppChargingProcessId(), ex);
+                }
+            }
+        }
+    }
+
+    private void checkForProcessStartTimeout(OcppChargingProcess cp) throws Exception {
+        if (cp.getStartDate().getTime() + config.getStartTimeoutSecs(cp.getConnector().getChargeBoxId()) * 1000 < System.currentTimeMillis()) {
+            LOGGER.info("Charging process start timeout: {}", cp.getOcppChargingProcessId());
+            LOGGER.info("Charging process stopped on timeout, connector reset: {}-{}",
+                    cp.getConnector().getChargeBoxId(), cp.getConnector().getConnectorId());
+            changerAvailability(cp);
+        }
+    }
+
+    private void checkForProcessPreparingTimeout(OcppChargingProcess chargingProcess) throws InterruptedException {
+        if (chargingProcess.getStartDate().getTime() + config.getPreparingTimeoutSecs(chargingProcess.getConnector().getChargeBoxId()) * 1000 < System.currentTimeMillis()) {
+            LOGGER.info("Charging process preparing timeout: {}", chargingProcess.getOcppChargingProcessId());
+            LOGGER.info("Charging process stopped on timeout, connector reset: {}-{}",
+                    chargingProcess.getConnector().getChargeBoxId(), chargingProcess.getConnector().getConnectorId());
+            facade.stopChargingWithPreparingTimeout(chargingProcess.getOcppChargingProcessId());
+        }
+    }
+
+    private void changerAvailability(OcppChargingProcess cp) throws InterruptedException {
+        facade.changeAvailability(cp.getConnector().getChargeBoxId(), String.valueOf(cp.getConnector().getConnectorId()), false);
+        Thread.sleep(1000);
+        facade.changeAvailability(cp.getConnector().getChargeBoxId(), String.valueOf(cp.getConnector().getConnectorId()), true);
+    }
 
 
-	private boolean isStartTimeoutEnabledForChargeBox(String chargeBoxId) {
-		String ids=config.getStartTimeoutChargeBoxIds();
-		if (StringUtils.isEmpty(ids)) {
-			return false;
-		}
-		String[] split = ids.split(",");
-		for (String id:split) {
-			if (id.equals(chargeBoxId)) {
-				return true;
-			}
-		}
-		return false;
-	}
+
 }

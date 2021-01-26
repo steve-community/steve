@@ -27,6 +27,8 @@ import de.rwth.idsg.steve.repository.dto.UpdateTransactionParams;
 
 import lombok.extern.slf4j.Slf4j;
 import net.parkl.ocpp.entities.TransactionStopEventActor;
+import net.parkl.ocpp.module.esp.model.ESPRfidChargingStartRequest;
+import net.parkl.ocpp.service.EmobilityServiceProviderFacade;
 import ocpp.cs._2015._10.AuthorizationStatus;
 
 import net.parkl.ocpp.entities.OcppChargingProcess;
@@ -80,6 +82,8 @@ public class CentralSystemService16_Service {
     
     @Autowired
     private OcppProxyService proxyService;
+    @Autowired
+    private EmobilityServiceProviderFacade proxyServerFacade;
 
     public BootNotificationResponse bootNotification(BootNotificationRequest parameters, String chargeBoxIdentity,
                                                      OcppProtocol ocppProtocol) {
@@ -170,11 +174,11 @@ public class CentralSystemService16_Service {
 
     public StartTransactionResponse startTransaction(StartTransactionRequest parameters, String chargeBoxIdentity) {
         // Get the authorization info of the user, before making tx changes (will affectAuthorizationStatus)
-        IdTagInfo info = ocppTagService.getIdTagInfo(
+        /*IdTagInfo info = ocppTagService.getIdTagInfo(
                 parameters.getIdTag(),
                 true,
                 () -> new IdTagInfo().withStatus(AuthorizationStatus.INVALID) // IdTagInfo is required
-        );
+        );*/
 
         InsertTransactionParams params =
                 InsertTransactionParams.builder()
@@ -195,10 +199,36 @@ public class CentralSystemService16_Service {
             }	
         }
         
-      
-        int transactionId = ocppServerService.insertTransaction(params);
-        
+        Integer transactionId;
+
+        if (proxyService
+                .findOpenProcessForRfidTag(parameters.getIdTag(), parameters.getConnectorId(), chargeBoxIdentity) == null) {
+            log.info("No running ocpp charging process found for RFID tag: {} on charger: {}/{}",
+                    parameters.getIdTag(), chargeBoxIdentity, parameters.getConnectorId());
+
+            proxyService.createChargingProcess(chargeBoxIdentity, parameters.getConnectorId(), parameters.getIdTag(), null, null, null);
+
+            transactionId = ocppServerService.insertTransaction(params);
+
+            ESPRfidChargingStartRequest startRequest = new ESPRfidChargingStartRequest();
+            startRequest.setRfidTag(parameters.getIdTag());
+            startRequest.setConnectorId(parameters.getConnectorId());
+            startRequest.setChargeBoxId(chargeBoxIdentity);
+            OcppChargingProcess ocppChargingProcess = proxyService.findByTransactionId(transactionId);
+            if (ocppChargingProcess != null) {
+                startRequest.setExternalChargingProcessId(ocppChargingProcess.getOcppChargingProcessId());
+            }
+            proxyServerFacade.notifyParklAboutRfidStart(startRequest);
+           
+
+        }else{
+            transactionId = ocppServerService.insertTransaction(params);
+        }
+
         notificationService.ocppTransactionStarted(chargeBoxIdentity, transactionId, parameters.getConnectorId());
+
+        IdTagInfo info = new IdTagInfo();
+        info.setStatus(AuthorizationStatus.ACCEPTED);
 
         return new StartTransactionResponse()
                 .withIdTagInfo(info)
@@ -212,7 +242,7 @@ public class CentralSystemService16_Service {
         // Get the authorization info of the user, before making tx changes (will affectAuthorizationStatus)
         IdTagInfo idTagInfo = ocppTagService.getIdTagInfo(
                 parameters.getIdTag(),
-                false,
+                false, chargeBoxIdentity,
                 () -> null
         );
 
@@ -248,7 +278,7 @@ public class CentralSystemService16_Service {
         // Get the authorization info of the user
         IdTagInfo idTagInfo = ocppTagService.getIdTagInfo(
                 parameters.getIdTag(),
-                false,
+                false, chargeBoxIdentity,
                 () -> new IdTagInfo().withStatus(AuthorizationStatus.INVALID)
         );
 

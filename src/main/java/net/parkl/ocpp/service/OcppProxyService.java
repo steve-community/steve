@@ -9,7 +9,7 @@ import net.parkl.ocpp.entities.TransactionStart;
 public interface OcppProxyService {
 	OcppChargingProcess findOpenChargingProcessWithoutTransaction(String chargeBoxId, int connectorId);
 	OcppChargingProcess findOpenChargingProcess(String chargeBoxId, int connectorId);
-	OcppChargingProcess createChargingProcess(String chargeBoxId,int connectorId,String idTag, String licensePlate, Float limitKwh);
+	OcppChargingProcess createChargingProcess(String chargeBoxId,int connectorId,String idTag, String licensePlate, Float limitKwh, Integer limitMin);
 
 	OcppChargingProcess findOcppChargingProcess(String processId);
 
@@ -25,6 +25,9 @@ public interface OcppProxyService {
 	OcppChargingProcess checkForChargingProcessWithoutTransaction(String chargeBoxId, int connectorId);
 	boolean isWaitingForChargingProcess(String chargeBoxId);
 
-	List<OcppChargingProcess> findOpenChargingProcessesWithLimit();
+	List<OcppChargingProcess> findOpenChargingProcessesWithLimitKwh();
+	List<OcppChargingProcess> findOpenChargingProcessesWithLimitMinute();
 
+	OcppChargingProcess findOpenProcessForRfidTag(String rfidTag, int connectorId, String chargeBoxId);
+	OcppChargingProcess findByTransactionId(int transactionId);
 }

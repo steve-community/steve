@@ -1,21 +1,18 @@
 package net.parkl.ocpp.service;
 
-import java.math.BigDecimal;
-import java.util.Date;
-
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
-
+import net.parkl.ocpp.entities.Connector;
 import net.parkl.ocpp.entities.Transaction;
+import net.parkl.ocpp.repositories.TransactionRepository;
+import net.parkl.ocpp.service.config.OcppSpecialConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import net.parkl.ocpp.entities.Connector;
-import net.parkl.ocpp.entities.TransactionStart;
-import net.parkl.ocpp.repositories.TransactionRepository;
-import org.springframework.util.StringUtils;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import java.math.BigDecimal;
+import java.util.Date;
 
 
 @Component
@@ -23,7 +20,7 @@ public class OcppConsumptionHelper {
 	private static final Logger LOGGER=LoggerFactory.getLogger(OcppConsumptionHelper.class);
 	
 	@Autowired
-	private OcppProxyConfiguration config;
+	private OcppSpecialConfiguration config;
 	
 	@Autowired
 	private TransactionRepository transactionRepo;
@@ -95,17 +92,8 @@ public class OcppConsumptionHelper {
 	}
 
 	private boolean isTransactionPartialForChargeBox(String chargeBoxId) {
-		String ids=config.getTransactionPartialChargeBoxIds();
-		if (StringUtils.isEmpty(ids)) {
-			return false;
-		}
-		String[] split = ids.split(",");
-		for (String id:split) {
-			if (id.equals(chargeBoxId)) {
-				return true;
-			}
-		}
-		return false;
+		return config.isTransactionPartialEnabled(chargeBoxId);
+
 	}
 
 

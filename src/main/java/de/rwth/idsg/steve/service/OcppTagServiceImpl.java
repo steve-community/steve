@@ -8,6 +8,8 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.parkl.ocpp.entities.OcppTag;
+import net.parkl.ocpp.service.EmobilityServiceProviderFacade;
+import net.parkl.ocpp.service.config.OcppSpecialConfiguration;
 import net.parkl.ocpp.service.cs.OcppIdTagService;
 import net.parkl.ocpp.service.cs.SettingsService;
 import net.parkl.ocpp.service.cs.TransactionService;
@@ -34,6 +36,10 @@ public class OcppTagServiceImpl implements OcppTagService {
 	@Autowired private SettingsService settingsService;
 	@Autowired private OcppIdTagService tagService;
     @Autowired private TransactionService transactionService;
+   @Autowired
+    private EmobilityServiceProviderFacade proxyServerFacade;
+    @Autowired
+    private OcppSpecialConfiguration config;
 
     private final UnidentifiedIncomingObjectService invalidOcppTagService = new UnidentifiedIncomingObjectService(1000);
 
@@ -64,13 +70,13 @@ public class OcppTagServiceImpl implements OcppTagService {
     }
 
     @Nullable
-    public IdTagInfo getIdTagInfo(@Nullable String idTag, boolean isStartTransactionReqContext) {
+    public IdTagInfo getIdTagInfo(@Nullable String idTag, boolean isStartTransactionReqContext, String askingChargeBoxId) {
         if (Strings.isNullOrEmpty(idTag)) {
             return null;
         }
 
         OcppTag record = tagService.getRecord(idTag);
-        AuthorizationStatus status = decideStatus(record, idTag, isStartTransactionReqContext);
+        AuthorizationStatus status = decideStatus(record, idTag, isStartTransactionReqContext, askingChargeBoxId);
 
         switch (status) {
             case INVALID:
@@ -90,9 +96,9 @@ public class OcppTagServiceImpl implements OcppTagService {
     }
 
     @Nullable
-    public IdTagInfo getIdTagInfo(@Nullable String idTag, boolean isStartTransactionReqContext, Supplier<IdTagInfo> supplierWhenException) {
+    public IdTagInfo getIdTagInfo(@Nullable String idTag, boolean isStartTransactionReqContext, String askingChargeBoxId, Supplier<IdTagInfo> supplierWhenException) {
         try {
-            return getIdTagInfo(idTag, isStartTransactionReqContext);
+            return getIdTagInfo(idTag, isStartTransactionReqContext,askingChargeBoxId);
         } catch (Exception e) {
             log.error("Exception occurred", e);
             return supplierWhenException.get();
@@ -123,20 +129,31 @@ public class OcppTagServiceImpl implements OcppTagService {
         }
     }
 
-    private AuthorizationStatus decideStatus(OcppTag record, String idTag, boolean isStartTransactionReqContext) {
-        if (record == null) {
-            log.error("The user with idTag '{}' is INVALID (not present in DB).", idTag);
-            return AuthorizationStatus.INVALID;
-        }
+    private AuthorizationStatus decideStatus(OcppTag record, String idTag, boolean isStartTransactionReqContext, String askingChargeBoxId) {
+        if (config.isIdTagMax10Characters(askingChargeBoxId) || config.isUsingIntegratedTag(askingChargeBoxId)) {
+            log.info("Checking in local db only...");
 
-        if (isBlocked(record)) {
-            log.error("The user with idTag '{}' is BLOCKED.", idTag);
-            return AuthorizationStatus.BLOCKED;
-        }
 
-        if (isExpired(record, DateTime.now())) {
-            log.error("The user with idTag '{}' is EXPIRED.", idTag);
-            return AuthorizationStatus.EXPIRED;
+
+            if (record == null) {
+                log.error("The user with idTag '{}' is INVALID (not present in DB).", idTag);
+                return AuthorizationStatus.INVALID;
+            }
+
+            if (isBlocked(record)) {
+                log.error("The user with idTag '{}' is BLOCKED.", idTag);
+                return AuthorizationStatus.BLOCKED;
+            }
+
+            if (isExpired(record, DateTime.now())) {
+                log.error("The user with idTag '{}' is EXPIRED.", idTag);
+                return AuthorizationStatus.EXPIRED;
+            }
+         }else {
+            if (!proxyServerFacade.checkRfidTag(idTag, askingChargeBoxId)) {
+                log.error("The user with idTag '{}' is INVALID (validation failed on Parkl backend).", idTag);
+                return AuthorizationStatus.INVALID;
+            }
         }
 
         // https://github.com/RWTH-i5-IDSG/steve/issues/219

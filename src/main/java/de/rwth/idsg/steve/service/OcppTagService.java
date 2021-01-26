@@ -33,8 +33,8 @@ import java.util.function.Supplier;
 public interface OcppTagService {
 
     //IdTagInfo getIdTagInfo(String idTag, String askingChargeBoxId);
-    IdTagInfo getIdTagInfo(String idTag, boolean isStartTransactionReqContext);
-    IdTagInfo getIdTagInfo(String idTag, boolean isStartTransactionReqContext, Supplier<IdTagInfo> supplierWhenException);
+    IdTagInfo getIdTagInfo(String idTag, boolean isStartTransactionReqContext,String askingChargeBoxId);
+    IdTagInfo getIdTagInfo(String idTag, boolean isStartTransactionReqContext,String askingChargeBoxId, Supplier<IdTagInfo> supplierWhenException);
     List<AuthorizationData> getAuthDataOfAllTags();
     List<AuthorizationData> getAuthData(List<String> idTagList);
 

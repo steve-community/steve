@@ -81,8 +81,7 @@ public interface EmobilityServiceProviderFacade {
 	 */
 	void resetChargeBox(String chargeBoxId,boolean soft);
 	
-	void configureIdTag(String chargeBoxId);
-
+	
 	void stopChargingExternal(OcppChargingProcess process, String reason);
 
 	/**
@@ -104,5 +103,13 @@ public interface EmobilityServiceProviderFacade {
 
 	PowerValue getPowerValue(TransactionStart transaction);
 
-	void stopChargingWithLimit(String chargingProcessId);
+        void stopChargingWithLimit(String chargingProcessId, float totalPower);
+
+	void stopChargingWithPreparingTimeout(String chargingProcessId);
+
+	void sendHeartBeatOfflineAlert(String chargeBoxId);
+
+	void notifyParklAboutRfidStart(ESPRfidChargingStartRequest startRequest);
+
+	boolean checkRfidTag(String rfidTag, String chargeBoxId);
 }

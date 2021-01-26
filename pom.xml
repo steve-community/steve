@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>de.rwth.idsg</groupId>
     <artifactId>steve</artifactId>
-    <version>3.4.3</version>
+    <version>${revision}</version>
     <packaging>jar</packaging>
 
     <organization>
@@ -29,6 +29,8 @@
     </licenses>
 
     <properties>
+        <revision>0-SNAPSHOT</revision> <!-- default version when no revision property is passed -->
+
         <java.version>11</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 

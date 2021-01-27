@@ -1,7 +1,7 @@
 package net.parkl.ocpp.service.config;
 
 import lombok.extern.slf4j.Slf4j;
-import net.parkl.ocpp.entities.OcppChargeBoxSpecificConfig;
+import net.parkl.ocpp.entities.AdvancedChargeBoxConfig;
 import net.parkl.ocpp.repositories.AdvancedChargeBoxConfigRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -16,7 +16,7 @@ public class AdvancedChargeBoxConfigService {
     @Autowired
     private AdvancedChargeBoxConfigRepository repository;
 
-    public OcppChargeBoxSpecificConfig findByChargeBoxIdAndKey(String chargeBoxId, String key) {
+    public AdvancedChargeBoxConfig findByChargeBoxIdAndKey(String chargeBoxId, String key) {
         return repository.findByChargeBoxIdAndConfigKey(chargeBoxId, key);
     }
 
@@ -31,9 +31,9 @@ public class AdvancedChargeBoxConfigService {
 
     public void saveConfigValue(String chargeBoxId, String key, String value) {
         log.info("Saving configuration value {} for {}: {}...", key, chargeBoxId, value);
-        OcppChargeBoxSpecificConfig configKey = repository.findByChargeBoxIdAndConfigKey(chargeBoxId, key);
+        AdvancedChargeBoxConfig configKey = repository.findByChargeBoxIdAndConfigKey(chargeBoxId, key);
         if (configKey == null) {
-            configKey = new OcppChargeBoxSpecificConfig();
+            configKey = new AdvancedChargeBoxConfig();
             configKey.setChargeBoxId(chargeBoxId);
             configKey.setConfigKey(key);
         }
@@ -41,7 +41,7 @@ public class AdvancedChargeBoxConfigService {
         repository.save(configKey);
     }
 
-    public List<OcppChargeBoxSpecificConfig> getAll() {
+    public List<AdvancedChargeBoxConfig> getAll() {
         return repository.getAll();
     }
 

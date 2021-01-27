@@ -1,34 +1,25 @@
 package net.parkl.ocpp.repositories;
 
-import net.parkl.ocpp.entities.OcppChargeBoxSpecificConfig;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.domain.Specification;
-import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import net.parkl.ocpp.entities.AdvancedChargeBoxConfig;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 
 import java.util.List;
 
-public interface AdvancedChargeBoxConfigRepository extends CrudRepository<OcppChargeBoxSpecificConfig, Integer>,
-		JpaSpecificationExecutor<OcppChargeBoxSpecificConfig> {
+public interface AdvancedChargeBoxConfigRepository extends CrudRepository<AdvancedChargeBoxConfig, Integer>{
 
-	List<OcppChargeBoxSpecificConfig> findByChargeBoxIdOrderByConfigKeyAsc(String chargeBoxId);
-
-	OcppChargeBoxSpecificConfig findByChargeBoxIdAndConfigKey(String chargeBoxId, String key);
+	AdvancedChargeBoxConfig findByChargeBoxIdAndConfigKey(String chargeBoxId, String key);
 
 	long countByConfigKey(String key);
 
 	@Modifying
-	int deleteByConfigKey(String key);
+	void deleteByConfigKey(String key);
 
-	Page<OcppChargeBoxSpecificConfig> findAll(Specification<OcppChargeBoxSpecificConfig> spec, Pageable pageable);
+	@Query("SELECT OBJECT(config) FROM AdvancedChargeBoxConfig AS config")
+	List<AdvancedChargeBoxConfig> getAll();
 
-	@Query("SELECT OBJECT(c) FROM OcppChargeBoxSpecificConfig AS c")
-	List<OcppChargeBoxSpecificConfig> getAll();
-
-	@Query("SELECT c.chargeBoxId FROM OcppChargeBoxSpecificConfig AS c GROUP BY c.chargeBoxId")
+	@Query("SELECT config.chargeBoxId FROM AdvancedChargeBoxConfig AS config GROUP BY config.chargeBoxId")
 	List<String> getChargeBoxIds();
 
 	@Modifying

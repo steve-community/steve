@@ -1,6 +1,6 @@
 package net.parkl.ocpp.service.config;
 
-import net.parkl.ocpp.entities.OcppChargeBoxSpecificConfig;
+import net.parkl.ocpp.entities.AdvancedChargeBoxConfig;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,7 +29,7 @@ public class AdvancedChargeBoxConfigServiceTest {
         service.saveConfigValue(testChargeBoxId1, "key1", "value");
         service.saveConfigValue(testChargeBoxId2, "key2", "value");
         service.saveConfigValue(testChargeBoxId1, "key3", "value");
-        List<OcppChargeBoxSpecificConfig> configList = service.getAll();
+        List<AdvancedChargeBoxConfig> configList = service.getAll();
         List<String> chargeBoxIdList = service.getChargeBoxIds();
 
         assertEquals(3, configList.size());

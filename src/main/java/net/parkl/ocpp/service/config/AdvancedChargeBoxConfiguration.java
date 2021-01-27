@@ -1,6 +1,6 @@
 package net.parkl.ocpp.service.config;
 
-import net.parkl.ocpp.entities.OcppChargeBoxSpecificConfig;
+import net.parkl.ocpp.entities.AdvancedChargeBoxConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -25,7 +25,7 @@ public class AdvancedChargeBoxConfiguration {
 
 
     private boolean getConfigValueAsBool(String chargeBoxId, String key, boolean defaultValue) {
-        OcppChargeBoxSpecificConfig config = chargeBoxConfigService.findByChargeBoxIdAndKey(chargeBoxId, key);
+        AdvancedChargeBoxConfig config = chargeBoxConfigService.findByChargeBoxIdAndKey(chargeBoxId, key);
         if (config==null) {
             return defaultValue;
         }
@@ -33,7 +33,7 @@ public class AdvancedChargeBoxConfiguration {
     }
 
     private int getConfigValueAsInt(String chargeBoxId, String key, int defaultValue) {
-        OcppChargeBoxSpecificConfig config = chargeBoxConfigService.findByChargeBoxIdAndKey(chargeBoxId, key);
+        AdvancedChargeBoxConfig config = chargeBoxConfigService.findByChargeBoxIdAndKey(chargeBoxId, key);
         if (config==null) {
             return defaultValue;
         }

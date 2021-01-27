@@ -7,20 +7,19 @@ import javax.persistence.*;
 import java.math.BigDecimal;
 
 @Entity
-@Table(name = "charging_schedule_period", uniqueConstraints=
-    @UniqueConstraint(name="UQ_charging_schedule_period",columnNames={"charging_profile_pk", "start_period_in_seconds"})
-)
+@Table(name = "charging_schedule_period", uniqueConstraints =
+@UniqueConstraint(name = "UQ_charging_schedule_period", columnNames = {"charging_profile_pk", "start_period_in_seconds"}))
 @Getter
 @Setter
 public class ChargingSchedulePeriod {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name="charging_schedule_period_pk")
+    @Column(name = "charging_schedule_period_pk")
     private int chargingSchedulePeriodPk;
 
-    @ManyToOne(fetch=FetchType.LAZY)
-    @JoinColumn(name="charging_profile_pk", referencedColumnName = "charging_profile_pk", nullable=false,
-        foreignKey = @ForeignKey(name = "FK_connector_charging_profile_charging_profile_pk"))
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "charging_profile_pk", referencedColumnName = "charging_profile_pk", nullable = false,
+            foreignKey = @ForeignKey(name = "FK_connector_charging_profile_charging_profile_pk"))
     private OcppChargingProfile chargingProfile;
 
     @Column(name = "start_period_in_seconds", nullable = false)

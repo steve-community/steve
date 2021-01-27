@@ -13,11 +13,10 @@ import java.io.Serializable;
 @Setter
 @EqualsAndHashCode
 public class ConnectorChargingProfileId implements Serializable {
-    @Column(name="connector_pk")
+    @Column(name = "connector_pk")
     private int connectorPk;
 
-    @Column(name="charging_profile_pk")
+    @Column(name = "charging_profile_pk")
     private int chargingProfilePk;
-
 
 }

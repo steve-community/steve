@@ -6,9 +6,8 @@ import lombok.Setter;
 import javax.persistence.*;
 
 @Entity
-@Table(name = "ocpp_connector_charging_profile", uniqueConstraints=
-    @UniqueConstraint(name="UQ_connector_charging_profile",columnNames={"connector_pk", "charging_profile_pk"})
-)
+@Table(name = "ocpp_connector_charging_profile", uniqueConstraints =
+@UniqueConstraint(name = "UQ_connector_charging_profile", columnNames = {"connector_pk", "charging_profile_pk"}))
 @Getter
 @Setter
 public class ConnectorChargingProfile {

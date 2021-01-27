@@ -16,10 +16,10 @@ import java.util.Date;
 @Setter
 @EqualsAndHashCode
 public class TransactionStopId implements Serializable {
-    @Column(name="transaction_pk")
+    @Column(name = "transaction_pk")
     private int transactionPk;
 
-    @Column(name="event_timestamp", nullable = false)
+    @Column(name = "event_timestamp", nullable = false)
     @Temporal(TemporalType.TIMESTAMP)
     private Date eventTimestamp;
 }

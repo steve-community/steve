@@ -26,13 +26,10 @@ public class User {
 	
 	@Column(name="first_name",length=255,nullable=true)
 	private String firstName;
-
-
 	
 	@Column(name="last_name",length=255,nullable=true)
 	private String lastName;
 
-	
 	@Column(name="birth_day",nullable=true)
 	@Temporal(TemporalType.DATE)
 	private Date birthDay;
@@ -49,6 +46,5 @@ public class User {
 	@Column(name="note",nullable=true)
 	@Lob
 	private String note;
-
 
 }

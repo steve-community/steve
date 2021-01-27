@@ -16,7 +16,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class OcppTestHelper {
 	@Autowired
-	private EmobilityServiceProviderFacade facade;
+	private OcppMiddleware facade;
 	@Autowired
 	private OcppServerService serverService;
 	@Autowired

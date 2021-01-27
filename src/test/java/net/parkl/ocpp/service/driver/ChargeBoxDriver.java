@@ -4,20 +4,20 @@ import de.rwth.idsg.steve.ocpp.OcppProtocol;
 import de.rwth.idsg.steve.repository.dto.InsertConnectorStatusParams;
 import de.rwth.idsg.steve.repository.dto.UpdateChargeboxParams;
 import lombok.NoArgsConstructor;
-import net.parkl.ocpp.service.EmobilityServiceProviderFacade;
+import net.parkl.ocpp.service.OcppMiddleware;
 import net.parkl.ocpp.service.cs.OcppServerService;
 import org.joda.time.DateTime;
 
 @NoArgsConstructor
 public class ChargeBoxDriver {
-    private EmobilityServiceProviderFacade facade;
+    private OcppMiddleware facade;
     private OcppServerService serverService;
 
     private String name;
     private OcppProtocol protocol;
     private int connectors;
 
-    public static ChargeBoxDriver createChargeBoxDriver(EmobilityServiceProviderFacade facade, OcppServerService serverService) {
+    public static ChargeBoxDriver createChargeBoxDriver(OcppMiddleware facade, OcppServerService serverService) {
         ChargeBoxDriver driver = new ChargeBoxDriver();
         driver.facade = facade;
         driver.serverService = serverService;

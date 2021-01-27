@@ -16,9 +16,9 @@ public class OcppStartTimeoutManager {
     private final AdvancedChargeBoxConfiguration config;
     private final OcppProxyService proxyService;
 
-    private final EmobilityServiceProviderFacade facade;
+    private final OcppMiddleware facade;
 
-    public OcppStartTimeoutManager(AdvancedChargeBoxConfiguration config, OcppProxyService proxyService, EmobilityServiceProviderFacade facade) {
+    public OcppStartTimeoutManager(AdvancedChargeBoxConfiguration config, OcppProxyService proxyService, OcppMiddleware facade) {
         this.config = config;
         this.proxyService = proxyService;
         this.facade = facade;

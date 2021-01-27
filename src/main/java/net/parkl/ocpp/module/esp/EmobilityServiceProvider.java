@@ -3,11 +3,12 @@ package net.parkl.ocpp.module.esp;
 import net.parkl.ocpp.module.esp.model.ESPChargingConsumptionRequest;
 import net.parkl.ocpp.module.esp.model.ESPChargingStopRequest;
 import net.parkl.ocpp.module.esp.model.ESPRfidChargingStartRequest;
+import net.parkl.ocpp.service.OcppMiddleware;
 
 /**
  * Interface for the communication with an e-mobility service provider, initiated by the SteVe Pluggable library (outgoing events).<br>
  * Implementors are free to use any communication protocols to any e-mobility service provider (ESP) backends.
- * @see net.parkl.ocpp.service.EmobilityServiceProviderFacade
+ * @see OcppMiddleware
  */
 public interface EmobilityServiceProvider {
     /**

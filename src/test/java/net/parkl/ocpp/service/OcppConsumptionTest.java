@@ -19,7 +19,7 @@ import org.springframework.test.context.web.WebAppConfiguration;
 @WebAppConfiguration
 public class OcppConsumptionTest implements OcppConsumptionListener {
     @Autowired
-    private EmobilityServiceProviderFacade facade;
+    private OcppMiddleware facade;
     @Autowired
     private OcppTestHelper helper;
     @Autowired

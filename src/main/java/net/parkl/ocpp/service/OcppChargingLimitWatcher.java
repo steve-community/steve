@@ -18,7 +18,7 @@ public class OcppChargingLimitWatcher {
     @Autowired
     private OcppProxyService proxyService;
     @Autowired
-    private EmobilityServiceProviderFacade facade;
+    private OcppMiddleware facade;
 
     @Autowired
     private TaskExecutor taskExecutor;

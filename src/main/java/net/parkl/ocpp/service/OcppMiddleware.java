@@ -8,13 +8,13 @@ import java.util.List;
 
 
 /**
- * Facade interface between the e-mobility service provider (ESP) backend and the SteVe Pluggable library.<br>
+ * Middleware interface between the e-mobility service provider (ESP) backend and the SteVe Pluggable library.<br>
  * This interface publishes methods to handle incoming events from the ESP backend.<br>
  * @see net.parkl.ocpp.module.esp.EmobilityServiceProvider
  * @author andor
  *
  */
-public interface EmobilityServiceProviderFacade {
+public interface OcppMiddleware {
 
 	/**
 	 * Tries to start a charging process on the OCPP server (SteVe Pluggable)

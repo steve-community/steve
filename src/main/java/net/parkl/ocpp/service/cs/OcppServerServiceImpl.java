@@ -9,10 +9,8 @@ import net.parkl.ocpp.entities.*;
 import net.parkl.ocpp.repositories.*;
 import net.parkl.ocpp.service.OcppConstants;
 import net.parkl.ocpp.service.OcppErrorTranslator;
-import net.parkl.ocpp.service.EmobilityServiceProviderFacade;
+import net.parkl.ocpp.service.OcppMiddleware;
 import org.joda.time.DateTime;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.task.TaskExecutor;
@@ -60,7 +58,7 @@ public class OcppServerServiceImpl implements OcppServerService {
 	private TaskExecutor executor;
 	
 	@Autowired
-	private EmobilityServiceProviderFacade proxyFacade;
+	private OcppMiddleware proxyFacade;
 	@Autowired
 	private OcppErrorTranslator errorTranslator;
 

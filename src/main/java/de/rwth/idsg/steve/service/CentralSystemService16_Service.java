@@ -26,7 +26,7 @@ import de.rwth.idsg.steve.repository.dto.UpdateTransactionParams;
 import lombok.extern.slf4j.Slf4j;
 import net.parkl.ocpp.entities.OcppChargingProcess;
 import net.parkl.ocpp.module.esp.model.ESPRfidChargingStartRequest;
-import net.parkl.ocpp.service.EmobilityServiceProviderFacade;
+import net.parkl.ocpp.service.OcppMiddleware;
 import net.parkl.ocpp.service.OcppProxyService;
 import net.parkl.ocpp.service.cs.OcppServerService;
 import net.parkl.ocpp.service.cs.SettingsService;
@@ -62,7 +62,7 @@ public class CentralSystemService16_Service {
     @Autowired
     private OcppProxyService proxyService;
     @Autowired
-    private EmobilityServiceProviderFacade proxyServerFacade;
+    private OcppMiddleware proxyServerFacade;
 
     public BootNotificationResponse bootNotification(BootNotificationRequest parameters, String chargeBoxIdentity,
                                                      OcppProtocol ocppProtocol) {

@@ -46,13 +46,13 @@ import static ocpp.cp._2012._06.RemoteStartStopStatus.ACCEPTED;
 ;
 
 /**
- * Facade component between the e-mobility service provider (ESP) backend and the SteVe Pluggable library.<br>
+ * Middleware component between the e-mobility service provider (ESP) backend and the SteVe Pluggable library.<br>
  *
  * @author andor
  */
 @Component
 @Slf4j
-public class EmobilityServiceProviderFacadeImpl implements EmobilityServiceProviderFacade {
+public class OcppMiddlewareImpl implements OcppMiddleware {
 
 
     private static final long WAIT_MS = 100;

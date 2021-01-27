@@ -31,13 +31,10 @@ import java.util.function.Supplier;
  * @since 03.01.2015
  */
 public interface OcppTagService {
-
-    //IdTagInfo getIdTagInfo(String idTag, String askingChargeBoxId);
     IdTagInfo getIdTagInfo(String idTag, boolean isStartTransactionReqContext,String askingChargeBoxId);
     IdTagInfo getIdTagInfo(String idTag, boolean isStartTransactionReqContext,String askingChargeBoxId, Supplier<IdTagInfo> supplierWhenException);
     List<AuthorizationData> getAuthDataOfAllTags();
     List<AuthorizationData> getAuthData(List<String> idTagList);
-
     List<UnidentifiedIncomingObject> getUnknownOcppTags();
     void removeUnknown(String idTag);
     void removeUnknown(List<String> idTagList);

@@ -6,6 +6,8 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 
+import static java.util.Collections.emptyList;
+
 /**
  * OCPP szerver külső konfigurációs komponens
  *
@@ -16,7 +18,7 @@ public class AdvancedChargeBoxConfiguration {
 
     @Autowired
     private AdvancedChargeBoxConfigService chargeBoxConfigService;
-    @Autowired
+    @Autowired(required = false)
     private IntegratedIdTagProvider idTagProvider;
 
     private boolean getConfigValueAsBool(String chargeBoxId, String key, boolean defaultValue) {
@@ -56,14 +58,9 @@ public class AdvancedChargeBoxConfiguration {
         return getConfigValueAsBool(chargeBoxId, AdvancedChargeBoxConfigKeys.KEY_TRANSACTION_PARTIAL_ENABLED, false);
     }
 
-    /**
-     * Töltés indításkor megvárja-e a tranzakció létrehozáskor az {@link net.parkl.ocpp.entities.OcppChargingProcess} rekord létrejöttét.<br>
-     * Olyan töltőknél érdemes bekapcsolni, amelyek túl gyorsan reagálnak StartTransaction üzenettel a RemoteStartTransactionre (pl. Elinta 20ms)
-     */
     public boolean isWaitingForChargingProcessEnabled(String chargeBoxId) {
         return getConfigValueAsBool(chargeBoxId, AdvancedChargeBoxConfigKeys.KEY_WAITING_FOR_CHARGING_PROCESS_ENABLED, false);
     }
-
 
     public boolean isStartTimeoutEnabledForAny() {
         return chargeBoxConfigService.countByKey(AdvancedChargeBoxConfigKeys.KEY_START_TIMEOUT_ENABLED) > 0;
@@ -82,7 +79,7 @@ public class AdvancedChargeBoxConfiguration {
     }
 
     public List<String> getIntegrationIdTags() {
-        return idTagProvider.integratedTags();
+        return idTagProvider == null ? emptyList() : idTagProvider.integratedTags();
     }
 
     public boolean checkReservationId(String chargeBoxId) {

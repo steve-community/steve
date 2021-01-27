@@ -202,7 +202,7 @@ public class EmobilityServiceProviderFacadeImpl implements EmobilityServiceProvi
             }
         }
 
-        List<String> tags = getIntegrationIdTags();
+        List<String> tags = config.getIntegrationIdTags();
         for (String tag : tags) {
             if (!idTagsUsed.contains(tag.toLowerCase())) {
                 log.info("Available id tag found: {}", tag);
@@ -848,18 +848,6 @@ public class EmobilityServiceProviderFacadeImpl implements EmobilityServiceProvi
             default:
                 throw new IllegalStateException("OCPP protocol not supported: " + ocppProtocol);
         }
-    }
-
-
-    private List<String> getIntegrationIdTags() {
-        List<String> list = new ArrayList<>();
-        String[] split = config.getIntegrationIdTags().split(",");
-        for (String s : split) {
-            if (s.trim().length() > 0) {
-                list.add(s.trim());
-            }
-        }
-        return list;
     }
 
 

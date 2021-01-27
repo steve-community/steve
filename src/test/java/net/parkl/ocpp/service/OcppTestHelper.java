@@ -8,6 +8,7 @@ import net.parkl.ocpp.module.esp.model.ESPChargingStartRequest;
 import net.parkl.ocpp.module.esp.model.ESPChargingStartResult;
 import net.parkl.ocpp.module.esp.model.ESPChargingUserStopRequest;
 import net.parkl.ocpp.service.cs.ChargePointService;
+import net.parkl.ocpp.service.cs.ConnectorService;
 import org.joda.time.DateTime;
 import org.junit.Assert;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +20,8 @@ public class OcppTestHelper {
 	private OcppMiddleware facade;
 	@Autowired
 	private ChargePointService chargePointService;
+	@Autowired
+	private ConnectorService connectorService;
 	@Autowired
 	private OcppTestFixture fixture;
 	
@@ -39,7 +42,7 @@ public class OcppTestHelper {
 				.connectorId(i)
 				.status("Available")
 				.build();
-			chargePointService.insertConnectorStatus(p2);
+			connectorService.insertConnectorStatus(p2);
 		}
 	}
 

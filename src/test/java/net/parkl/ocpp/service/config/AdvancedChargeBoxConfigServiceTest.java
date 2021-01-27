@@ -36,7 +36,7 @@ public class AdvancedChargeBoxConfigServiceTest {
         assertEquals(2, chargeBoxIdList.size());
         assertTrue(chargeBoxIdList.stream().anyMatch(id -> id.equals("chargebox.1")));
 
-        int idToDelete = configList.stream().findFirst().orElseThrow().getOcppChargeBoxConfigId();
+        int idToDelete = configList.stream().findFirst().orElseThrow()es.getOcppChargeBoxConfigId();
         service.delete(idToDelete);
 
         configList = service.getAll();

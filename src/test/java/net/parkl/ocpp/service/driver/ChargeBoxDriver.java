@@ -5,21 +5,26 @@ import de.rwth.idsg.steve.repository.dto.InsertConnectorStatusParams;
 import de.rwth.idsg.steve.repository.dto.UpdateChargeboxParams;
 import lombok.NoArgsConstructor;
 import net.parkl.ocpp.service.OcppMiddleware;
+import net.parkl.ocpp.service.cs.ChargePointService;
+import net.parkl.ocpp.service.cs.ConnectorService;
 import org.joda.time.DateTime;
 
 @NoArgsConstructor
 public class ChargeBoxDriver {
     private OcppMiddleware facade;
-    private OcppServerService serverService;
+    private ChargePointService chargePointService;
+    private ConnectorService connectorService;
 
     private String name;
     private OcppProtocol protocol;
     private int connectors;
 
-    public static ChargeBoxDriver createChargeBoxDriver(OcppMiddleware facade, OcppServerService serverService) {
+    public static ChargeBoxDriver createChargeBoxDriver(OcppMiddleware facade, ChargePointService chargePointService,
+                                                        ConnectorService connectorService) {
         ChargeBoxDriver driver = new ChargeBoxDriver();
         driver.facade = facade;
-        driver.serverService = serverService;
+        driver.chargePointService = chargePointService;
+        driver.connectorService = connectorService;
         return driver;
     }
 
@@ -31,8 +36,8 @@ public class ChargeBoxDriver {
                 .ocppProtocol(protocol)
                 .heartbeatTimestamp(new DateTime())
                 .build();
-        serverService.updateChargebox(params);
-        serverService.updateEndpointAddress(name, "http://localhost:8081/ocpp-charger/ws");
+        chargePointService.updateChargebox(params);
+        chargePointService.updateEndpointAddress(name, "http://localhost:8081/ocpp-charger/ws");
 
         for (int i = 1; i <= connectors; i++) {
             InsertConnectorStatusParams p2 = InsertConnectorStatusParams.builder()
@@ -40,7 +45,7 @@ public class ChargeBoxDriver {
                     .connectorId(i)
                     .status("Available")
                     .build();
-            serverService.insertConnectorStatus(p2);
+            connectorService.insertConnectorStatus(p2);
         }
     }
 

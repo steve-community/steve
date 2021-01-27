@@ -74,7 +74,7 @@ public class WebSocketConfiguration implements WebSocketConfigurer {
         handler.setSupportedProtocols(protocols);
 
         for (AbstractWebSocketEndpoint endpoint : endpoints) {
-            registry.addHandler(endpoint, pluggableWebModule.getWebRoot()+"/websocket/CentralSystemService/*")
+            registry.addHandler(endpoint, WebEnvironment.getContextRoot()+"/websocket/CentralSystemService/*")
                     .setHandshakeHandler(handler)
                     .setAllowedOrigins("*");
         }

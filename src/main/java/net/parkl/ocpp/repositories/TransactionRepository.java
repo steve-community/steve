@@ -24,12 +24,12 @@ public interface TransactionRepository extends CrudRepository<Transaction, Integ
 	List<Transaction> findActiveByChargeBox(String chargeBoxId);
 
 
-	@Query("SELECT t.ocppTag, COUNT(t.ocppTag) FROM Transaction AS t WHERE t.stopTimestamp IS NULL\n" +
-			"      AND t.stopValue IS NULL\n" +
+	@Query("SELECT t.ocppTag, COUNT(t.ocppTag) FROM Transaction AS t WHERE t.stopTimestamp IS NULL " +
+			"      AND t.stopValue IS NULL " +
 			"      GROUP BY t.ocppTag")
 	List<Object[]> findIdTagsInTransaction();
 
-	@Query("SELECT COUNT(t.ocppTag) FROM Transaction AS t WHERE t.stopTimestamp IS NULL\n" +
+	@Query("SELECT COUNT(t.ocppTag) FROM Transaction AS t WHERE t.stopTimestamp IS NULL " +
 			"      AND t.stopValue IS NULL AND t.ocppTag=?1")
 	long countActiveTransactionsByIdTag(String idTag);
 }

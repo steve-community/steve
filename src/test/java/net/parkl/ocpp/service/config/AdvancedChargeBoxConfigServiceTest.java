@@ -16,10 +16,10 @@ import static org.junit.Assert.assertTrue;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = OcppServiceTestConfig.class)
 @WebAppConfiguration
-public class OcppChargeBoxSpecificConfigServiceTest {
+public class AdvancedChargeBoxConfigServiceTest {
 
     @Autowired
-    private OcppChargeBoxSpecificConfigService service;
+    private AdvancedChargeBoxConfigService service;
 
     @Test
     public void testAddAndDeleteSpecificConfig() {

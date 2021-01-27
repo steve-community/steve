@@ -2,8 +2,8 @@ package net.parkl.ocpp.service;
 
 import de.rwth.idsg.steve.ocpp.OcppProtocol;
 import net.parkl.ocpp.module.esp.model.ESPChargingConsumptionRequest;
-import net.parkl.ocpp.service.config.OcppChargeBoxSpecificConfigKeys;
-import net.parkl.ocpp.service.config.OcppChargeBoxSpecificConfigService;
+import net.parkl.ocpp.service.config.AdvancedChargeBoxConfigKeys;
+import net.parkl.ocpp.service.config.AdvancedChargeBoxConfigService;
 import net.parkl.ocpp.service.config.OcppServiceTestConfig;
 import net.parkl.ocpp.util.AsyncWaiter;
 import org.junit.Assert;
@@ -23,7 +23,7 @@ public class OcppConsumptionTest implements OcppConsumptionListener {
     @Autowired
     private OcppTestHelper helper;
     @Autowired
-    private OcppChargeBoxSpecificConfigService chargeBoxConfigService;
+    private AdvancedChargeBoxConfigService chargeBoxConfigService;
 
 
     private ESPChargingConsumptionRequest lastConsumption;
@@ -33,7 +33,7 @@ public class OcppConsumptionTest implements OcppConsumptionListener {
         this.lastConsumption = null;
         facade.registerConsumptionListener(this);
 
-        chargeBoxConfigService.deleteByKey(OcppChargeBoxSpecificConfigKeys.KEY_TRANSACTION_PARTIAL_ENABLED);
+        chargeBoxConfigService.deleteByKey(AdvancedChargeBoxConfigKeys.KEY_TRANSACTION_PARTIAL_ENABLED);
 
         helper.createChargeBox("test1", OcppProtocol.V_16_SOAP, 2);
 
@@ -55,8 +55,8 @@ public class OcppConsumptionTest implements OcppConsumptionListener {
         this.lastConsumption = null;
         facade.registerConsumptionListener(this);
 
-        chargeBoxConfigService.deleteByKey(OcppChargeBoxSpecificConfigKeys.KEY_TRANSACTION_PARTIAL_ENABLED);
-        chargeBoxConfigService.saveConfigValue("test2", OcppChargeBoxSpecificConfigKeys.KEY_TRANSACTION_PARTIAL_ENABLED,
+        chargeBoxConfigService.deleteByKey(AdvancedChargeBoxConfigKeys.KEY_TRANSACTION_PARTIAL_ENABLED);
+        chargeBoxConfigService.saveConfigValue("test2", AdvancedChargeBoxConfigKeys.KEY_TRANSACTION_PARTIAL_ENABLED,
                 "true");
 
 

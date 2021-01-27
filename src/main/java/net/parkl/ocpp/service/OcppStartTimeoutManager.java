@@ -1,7 +1,7 @@
 package net.parkl.ocpp.service;
 
 import net.parkl.ocpp.entities.OcppChargingProcess;
-import net.parkl.ocpp.service.config.OcppSpecialConfiguration;
+import net.parkl.ocpp.service.config.AdvancedChargeBoxConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -13,12 +13,12 @@ import java.util.List;
 public class OcppStartTimeoutManager {
     private static final Logger LOGGER = LoggerFactory.getLogger(OcppStartTimeoutManager.class);
 
-    private final OcppSpecialConfiguration config;
+    private final AdvancedChargeBoxConfiguration config;
     private final OcppProxyService proxyService;
 
     private final EmobilityServiceProviderFacade facade;
 
-    public OcppStartTimeoutManager(OcppSpecialConfiguration config, OcppProxyService proxyService, EmobilityServiceProviderFacade facade) {
+    public OcppStartTimeoutManager(AdvancedChargeBoxConfiguration config, OcppProxyService proxyService, EmobilityServiceProviderFacade facade) {
         this.config = config;
         this.proxyService = proxyService;
         this.facade = facade;

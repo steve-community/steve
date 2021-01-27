@@ -11,7 +11,7 @@ import org.springframework.data.repository.CrudRepository;
 
 import java.util.List;
 
-public interface OcppChargeBoxSpecificConfigRepository extends CrudRepository<OcppChargeBoxSpecificConfig, Integer>,
+public interface AdvancedChargeBoxConfigRepository extends CrudRepository<OcppChargeBoxSpecificConfig, Integer>,
 		JpaSpecificationExecutor<OcppChargeBoxSpecificConfig> {
 
 	List<OcppChargeBoxSpecificConfig> findByChargeBoxIdOrderByConfigKeyAsc(String chargeBoxId);

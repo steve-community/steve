@@ -1,20 +1,5 @@
 package net.parkl.ocpp.service;
 
-import java.util.Date;
-import java.util.List;
-import java.util.UUID;
-import java.util.concurrent.Callable;
-
-
-import net.parkl.ocpp.repositories.TransactionStartRepository;
-import net.parkl.ocpp.service.config.OcppSpecialConfiguration;
-import net.parkl.ocpp.util.AsyncWaiter;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import net.parkl.ocpp.entities.Connector;
 import net.parkl.ocpp.entities.ConnectorMeterValue;
 import net.parkl.ocpp.entities.OcppChargingProcess;
@@ -22,6 +7,19 @@ import net.parkl.ocpp.entities.TransactionStart;
 import net.parkl.ocpp.repositories.ConnectorMeterValueRepository;
 import net.parkl.ocpp.repositories.ConnectorRepository;
 import net.parkl.ocpp.repositories.OcppChargingProcessRepository;
+import net.parkl.ocpp.repositories.TransactionStartRepository;
+import net.parkl.ocpp.service.config.AdvancedChargeBoxConfiguration;
+import net.parkl.ocpp.util.AsyncWaiter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Date;
+import java.util.List;
+import java.util.UUID;
+import java.util.concurrent.Callable;
 
 
 @Service
@@ -37,7 +35,7 @@ public class OcppProxyServiceImpl implements OcppProxyService {
 	private ConnectorMeterValueRepository connectorMeterValueRepo;
 	
 	@Autowired
-	private OcppSpecialConfiguration specialConfig;
+	private AdvancedChargeBoxConfiguration specialConfig;
 
 	@Autowired
 	private TransactionStartRepository transactionStartRepository;

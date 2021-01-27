@@ -9,7 +9,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.parkl.ocpp.entities.OcppTag;
 import net.parkl.ocpp.service.EmobilityServiceProviderFacade;
-import net.parkl.ocpp.service.config.OcppSpecialConfiguration;
+import net.parkl.ocpp.service.config.AdvancedChargeBoxConfiguration;
 import net.parkl.ocpp.service.cs.OcppIdTagService;
 import net.parkl.ocpp.service.cs.SettingsService;
 import net.parkl.ocpp.service.cs.TransactionService;
@@ -44,7 +44,7 @@ public class OcppTagServiceImpl implements OcppTagService {
     @Autowired
     private EmobilityServiceProviderFacade proxyServerFacade;
     @Autowired
-    private OcppSpecialConfiguration config;
+    private AdvancedChargeBoxConfiguration config;
 
     private final UnidentifiedIncomingObjectService invalidOcppTagService = new UnidentifiedIncomingObjectService(1000);
 

@@ -20,7 +20,7 @@ import net.parkl.ocpp.module.esp.model.*;
 import net.parkl.ocpp.repositories.ConnectorRepository;
 import net.parkl.ocpp.repositories.ConnectorStatusRepository;
 import net.parkl.ocpp.repositories.OcppChargeBoxRepository;
-import net.parkl.ocpp.service.config.OcppSpecialConfiguration;
+import net.parkl.ocpp.service.config.AdvancedChargeBoxConfiguration;
 import net.parkl.ocpp.service.cs.ChargePointService;
 import net.parkl.ocpp.service.cs.OcppIdTagService;
 import net.parkl.ocpp.service.cs.TransactionService;
@@ -85,7 +85,7 @@ public class EmobilityServiceProviderFacadeImpl implements EmobilityServiceProvi
     @Autowired
     private TransactionService transactionService;
     @Autowired
-    private OcppSpecialConfiguration config;
+    private AdvancedChargeBoxConfiguration config;
     @Autowired
     private EmobilityServiceProvider emobilityServiceProvider;
     @Autowired

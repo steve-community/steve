@@ -11,10 +11,10 @@ import org.springframework.stereotype.Component;
  * @author andor
  */
 @Component
-public class OcppSpecialConfiguration {
+public class AdvancedChargeBoxConfiguration {
 
     @Autowired
-    private OcppChargeBoxSpecificConfigService chargeBoxConfigService;
+    private AdvancedChargeBoxConfigService chargeBoxConfigService;
 
     /**
      * Felhasználható Parkl ID tagek
@@ -45,14 +45,14 @@ public class OcppSpecialConfiguration {
      */
     public boolean isStartTimeoutEnabled(String chargeBoxId) {
 
-        return getConfigValueAsBool(chargeBoxId, OcppChargeBoxSpecificConfigKeys.KEY_START_TIMEOUT_ENABLED, false);
+        return getConfigValueAsBool(chargeBoxId, AdvancedChargeBoxConfigKeys.KEY_START_TIMEOUT_ENABLED, false);
     }
 
     /**
      * @return Töltés indítás utáni timeout másodpercben
      */
     public int getStartTimeoutSecs(String chargeBoxId) {
-        return getConfigValueAsInt(chargeBoxId, OcppChargeBoxSpecificConfigKeys.KEY_START_TIMEOUT_SECS, 60);
+        return getConfigValueAsInt(chargeBoxId, AdvancedChargeBoxConfigKeys.KEY_START_TIMEOUT_SECS, 60);
     }
 
 
@@ -61,13 +61,13 @@ public class OcppSpecialConfiguration {
      * pl Ecotap töltő
      */
     public boolean isPreparingTimeoutEnabled(String chargeBoxId) {
-        return getConfigValueAsBool(chargeBoxId, OcppChargeBoxSpecificConfigKeys.KEY_PREPARING_TIMEOUT_ENABLED, false);
+        return getConfigValueAsBool(chargeBoxId, AdvancedChargeBoxConfigKeys.KEY_PREPARING_TIMEOUT_ENABLED, false);
     }
     /**
      * @return Töltés indítás utáni preparing timeout másodpercben
      */
     public int getPreparingTimeoutSecs(String chargeBoxId) {
-        return getConfigValueAsInt(chargeBoxId, OcppChargeBoxSpecificConfigKeys.KEY_PREPARING_TIMEOUT_SECS, 60);
+        return getConfigValueAsInt(chargeBoxId, AdvancedChargeBoxConfigKeys.KEY_PREPARING_TIMEOUT_SECS, 60);
     }
 
 
@@ -76,7 +76,7 @@ public class OcppSpecialConfiguration {
      * (a mérőóra nem küld abszolút állást, pl. Schneider)
      */
     public boolean isTransactionPartialEnabled(String chargeBoxId) {
-        return getConfigValueAsBool(chargeBoxId, OcppChargeBoxSpecificConfigKeys.KEY_TRANSACTION_PARTIAL_ENABLED, false);
+        return getConfigValueAsBool(chargeBoxId, AdvancedChargeBoxConfigKeys.KEY_TRANSACTION_PARTIAL_ENABLED, false);
     }
 
     /**
@@ -84,23 +84,23 @@ public class OcppSpecialConfiguration {
      * Olyan töltőknél érdemes bekapcsolni, amelyek túl gyorsan reagálnak StartTransaction üzenettel a RemoteStartTransactionre (pl. Elinta 20ms)
      */
     public boolean isWaitingForChargingProcessEnabled(String chargeBoxId) {
-        return getConfigValueAsBool(chargeBoxId, OcppChargeBoxSpecificConfigKeys.KEY_WAITING_FOR_CHARGING_PROCESS_ENABLED, false);
+        return getConfigValueAsBool(chargeBoxId, AdvancedChargeBoxConfigKeys.KEY_WAITING_FOR_CHARGING_PROCESS_ENABLED, false);
     }
 
 
     public boolean isStartTimeoutEnabledForAny() {
-        return chargeBoxConfigService.countByKey(OcppChargeBoxSpecificConfigKeys.KEY_START_TIMEOUT_ENABLED)>0;
+        return chargeBoxConfigService.countByKey(AdvancedChargeBoxConfigKeys.KEY_START_TIMEOUT_ENABLED)>0;
     }
 
     public boolean isPreparingTimeoutEnabledForAny() {
-        return chargeBoxConfigService.countByKey(OcppChargeBoxSpecificConfigKeys.KEY_PREPARING_TIMEOUT_ENABLED)>0;
+        return chargeBoxConfigService.countByKey(AdvancedChargeBoxConfigKeys.KEY_PREPARING_TIMEOUT_ENABLED)>0;
     }
 
     public boolean isUsingIntegratedTag(String chargeBoxId) {
-        return getConfigValueAsBool(chargeBoxId, OcppChargeBoxSpecificConfigKeys.KEY_USING_INTEGRATED_IDTAG, false);
+        return getConfigValueAsBool(chargeBoxId, AdvancedChargeBoxConfigKeys.KEY_USING_INTEGRATED_IDTAG, false);
     }
     public boolean isIdTagMax10Characters(String chargeBoxId) {
-        return getConfigValueAsBool(chargeBoxId, OcppChargeBoxSpecificConfigKeys.KEY_IDTAG_MAX10, false);
+        return getConfigValueAsBool(chargeBoxId, AdvancedChargeBoxConfigKeys.KEY_IDTAG_MAX10, false);
     }
 
 
@@ -118,6 +118,6 @@ public class OcppSpecialConfiguration {
      * @return
      */
     public boolean checkReservationId(String chargeBoxId) {
-        return getConfigValueAsBool(chargeBoxId, OcppChargeBoxSpecificConfigKeys.KEY_CHECK_RESERVATION, false);
+        return getConfigValueAsBool(chargeBoxId, AdvancedChargeBoxConfigKeys.KEY_CHECK_RESERVATION, false);
     }
 }

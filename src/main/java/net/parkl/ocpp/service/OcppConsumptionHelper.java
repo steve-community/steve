@@ -3,7 +3,7 @@ package net.parkl.ocpp.service;
 import net.parkl.ocpp.entities.Connector;
 import net.parkl.ocpp.entities.Transaction;
 import net.parkl.ocpp.repositories.TransactionRepository;
-import net.parkl.ocpp.service.config.OcppSpecialConfiguration;
+import net.parkl.ocpp.service.config.AdvancedChargeBoxConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +20,7 @@ public class OcppConsumptionHelper {
 	private static final Logger LOGGER=LoggerFactory.getLogger(OcppConsumptionHelper.class);
 	
 	@Autowired
-	private OcppSpecialConfiguration config;
+	private AdvancedChargeBoxConfiguration config;
 	
 	@Autowired
 	private TransactionRepository transactionRepo;

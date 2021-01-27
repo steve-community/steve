@@ -1,16 +1,11 @@
 package net.parkl.ocpp.service.driver;
 
-import net.parkl.ocpp.service.config.OcppServiceTestConfig;
-import org.junit.runner.RunWith;
+import net.parkl.ocpp.service.IntegrationTestBase;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.context.web.WebAppConfiguration;
+import org.springframework.stereotype.Component;
 
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = OcppServiceTestConfig.class)
-@WebAppConfiguration
-public class DriverTestBase {
+@Component
+public class DriverTestBase extends IntegrationTestBase {
 
     @Autowired
     protected DriverFactory driverFactory;

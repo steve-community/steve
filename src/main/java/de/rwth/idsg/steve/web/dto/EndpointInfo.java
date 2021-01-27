@@ -1,6 +1,8 @@
 package de.rwth.idsg.steve.web.dto;
 
 
+import de.rwth.idsg.steve.config.WebEnvironment;
+
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -16,9 +18,9 @@ public class EndpointInfo implements IEndpointInfo{
    		return INSTANCE;
    }
 
-    private final ItemsWithInfo webInterface = new ItemsWithInfo("Access the web interface using", "/ocpp/manager/home");
-    private final ItemsWithInfo ocppSoap = new ItemsWithInfo("SOAP endpoint for OCPP", "/ocpp/services/CentralSystemService");
-    private final ItemsWithInfo ocppWebSocket = new ItemsWithInfo("WebSocket/JSON endpoint for OCPP", "/ocpp/websocket/CentralSystemService/(chargeBoxId)");
+    private final ItemsWithInfo webInterface = new ItemsWithInfo("Access the web interface using", WebEnvironment.getContextRoot()+"/manager/home");
+    private final ItemsWithInfo ocppSoap = new ItemsWithInfo("SOAP endpoint for OCPP", WebEnvironment.getContextRoot()+"/services/CentralSystemService");
+    private final ItemsWithInfo ocppWebSocket = new ItemsWithInfo("WebSocket/JSON endpoint for OCPP", WebEnvironment.getContextRoot()+"/websocket/CentralSystemService/(chargeBoxId)");
 
 
     public static class ItemsWithInfo {

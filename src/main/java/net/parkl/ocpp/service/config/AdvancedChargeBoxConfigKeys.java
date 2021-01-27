@@ -1,5 +1,7 @@
 package net.parkl.ocpp.service.config;
 
+import net.parkl.ocpp.entities.OcppChargingProcess;
+
 public class AdvancedChargeBoxConfigKeys {
     /**
      * Start timeout enabled for availability change
@@ -26,23 +28,22 @@ public class AdvancedChargeBoxConfigKeys {
      */
     public static final String KEY_TRANSACTION_PARTIAL_ENABLED = "transaction.partial.enabled";
     /**
-     * Waiting for {@link net.parkl.ocpp.entities.OcppChargingProcess} at RemoteStarTransaction
+     * Waiting for {@link OcppChargingProcess} at RemoteStarTransaction
      */
     public static final String KEY_WAITING_FOR_CHARGING_PROCESS_ENABLED = "waiting.for.charging.process.enabled";
 
     /**
-     *
-     * Eredeti parkl tagek hasznalata ahol nem lehet konfigolni a kulcsokat. pl regi mennekes
+     * Using id tags from {@link IntegratedIdTagProvider}
      */
     public static final String KEY_USING_INTEGRATED_IDTAG = "integrated.idtag";
 
     /**
-     * Roviditett id tag hasznalata, pl DBT toltok
+     * Using id tag first 10 character
      */
     public static final String KEY_IDTAG_MAX10 = "idtag.max10";
 
     /**
-     * Olyan toltokhoz amik kuldik a reservation id-t meg 0-kent es ne dobjunk ra exceptiont
+     * Check reservation on StartTransaction
      */
     public static final String KEY_CHECK_RESERVATION = "check.reservation";
 

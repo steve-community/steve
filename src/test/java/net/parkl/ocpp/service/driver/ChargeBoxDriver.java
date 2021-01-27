@@ -11,7 +11,7 @@ import org.joda.time.DateTime;
 
 @NoArgsConstructor
 public class ChargeBoxDriver {
-    private OcppMiddleware facade;
+    private OcppMiddleware ocppMiddleware;
     private ChargePointService chargePointService;
     private ConnectorService connectorService;
 
@@ -22,14 +22,14 @@ public class ChargeBoxDriver {
     public static ChargeBoxDriver createChargeBoxDriver(OcppMiddleware facade, ChargePointService chargePointService,
                                                         ConnectorService connectorService) {
         ChargeBoxDriver driver = new ChargeBoxDriver();
-        driver.facade = facade;
+        driver.ocppMiddleware = facade;
         driver.chargePointService = chargePointService;
         driver.connectorService = connectorService;
         return driver;
     }
 
     public void createChargeBox() {
-        facade.registerChargeBox(name);
+        ocppMiddleware.registerChargeBox(name);
 
         UpdateChargeboxParams params = UpdateChargeboxParams.builder()
                 .chargeBoxId(name)

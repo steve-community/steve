@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class DriverFactory {
+
     @Autowired
     private OcppMiddleware ocppMiddleware;
     @Autowired
@@ -17,5 +18,9 @@ public class DriverFactory {
 
     public ChargeBoxDriver createChargeBoxDriver() {
         return ChargeBoxDriver.createChargeBoxDriver(ocppMiddleware, chargePointService, connectorService);
+    }
+
+    public ChargingDriver createChargingDriver() {
+        return ChargingDriver.createChargingDriver(ocppMiddleware);
     }
 }

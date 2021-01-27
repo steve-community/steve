@@ -1,10 +1,10 @@
 package net.parkl.ocpp.service;
 
-import java.util.List;
-
-import net.parkl.ocpp.module.esp.model.*;
 import net.parkl.ocpp.entities.OcppChargingProcess;
 import net.parkl.ocpp.entities.TransactionStart;
+import net.parkl.ocpp.module.esp.model.*;
+
+import java.util.List;
 
 
 /**
@@ -111,7 +111,7 @@ public interface EmobilityServiceProviderFacade {
 
 	void sendHeartBeatOfflineAlert(String chargeBoxId);
 
-	void notifyParklAboutRfidStart(ESPRfidChargingStartRequest startRequest);
+	void notifyAboutRfidStart(ESPRfidChargingStartRequest startRequest);
 
 	boolean checkRfidTag(String rfidTag, String chargeBoxId);
 }

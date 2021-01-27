@@ -25,7 +25,6 @@ import de.rwth.idsg.steve.repository.dto.UpdateChargeboxParams;
 import de.rwth.idsg.steve.repository.dto.UpdateTransactionParams;
 import lombok.extern.slf4j.Slf4j;
 import net.parkl.ocpp.entities.OcppChargingProcess;
-import net.parkl.ocpp.entities.TransactionStopEventActor;
 import net.parkl.ocpp.module.esp.model.ESPRfidChargingStartRequest;
 import net.parkl.ocpp.service.EmobilityServiceProviderFacade;
 import net.parkl.ocpp.service.OcppProxyService;
@@ -38,8 +37,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 
-import static net.parkl.ocpp.entities.TransactionStopEventActor.*;
-import static ocpp.cs._2015._10.AuthorizationStatus.*;
+import static net.parkl.ocpp.entities.TransactionStopEventActor.station;
+import static ocpp.cs._2015._10.AuthorizationStatus.INVALID;
 import static ocpp.cs._2015._10.DataTransferStatus.ACCEPTED;
 
 /**
@@ -196,7 +195,7 @@ public class CentralSystemService16_Service {
             if (ocppChargingProcess != null) {
                 startRequest.setExternalChargingProcessId(ocppChargingProcess.getOcppChargingProcessId());
             }
-            proxyServerFacade.notifyParklAboutRfidStart(startRequest);
+            proxyServerFacade.notifyAboutRfidStart(startRequest);
         } else {
             transactionId = ocppServerService.insertTransaction(params);
         }

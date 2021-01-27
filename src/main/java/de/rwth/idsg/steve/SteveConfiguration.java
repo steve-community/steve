@@ -1,5 +1,6 @@
 package de.rwth.idsg.steve;
 
+import de.rwth.idsg.steve.config.WebEnvironment;
 import de.rwth.idsg.steve.ocpp.ws.custom.WsSessionSelectStrategy;
 import de.rwth.idsg.steve.ocpp.ws.custom.WsSessionSelectStrategyEnum;
 import de.rwth.idsg.steve.utils.PropertiesFileLoader;
@@ -33,7 +34,7 @@ public class SteveConfiguration {
     // Mapping for CXF SOAP services
     //private final String cxfMapping = "/ocpp/services/*";
     // Dummy service path
-    private static final String routerEndpointPath = "/CentralSystemService";
+    private static final String routerEndpointPath = WebEnvironment.getContextRoot()+"/CentralSystemService";
     // Time zone for the application and database connections
     private final String timeZoneId = "UTC";  // or ZoneId.systemDefault().getId();
 

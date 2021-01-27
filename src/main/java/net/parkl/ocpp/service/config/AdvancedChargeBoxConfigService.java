@@ -47,7 +47,7 @@ public class AdvancedChargeBoxConfigService {
 
     public void delete(int id) {
         log.info("Deleting configuration values by id: {}...", id);
-        repository.deleteByOcppChargeBoxConfigId(id);
+        repository.deleteById(id);
     }
 
     public List<String> getChargeBoxIds() {

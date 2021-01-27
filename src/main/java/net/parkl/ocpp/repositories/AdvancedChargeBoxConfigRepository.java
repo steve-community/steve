@@ -21,7 +21,4 @@ public interface AdvancedChargeBoxConfigRepository extends CrudRepository<Advanc
 
 	@Query("SELECT config.chargeBoxId FROM AdvancedChargeBoxConfig AS config GROUP BY config.chargeBoxId")
 	List<String> getChargeBoxIds();
-
-	@Modifying
-	void deleteByOcppChargeBoxConfigId(int id);
 }

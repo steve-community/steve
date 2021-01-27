@@ -9,6 +9,8 @@ import java.util.List;
 
 public interface AdvancedChargeBoxConfigRepository extends CrudRepository<AdvancedChargeBoxConfig, Integer>{
 
+	List<AdvancedChargeBoxConfig> findByChargeBoxIdOrderByConfigKeyAsc(String chargeBoxId);
+
 	AdvancedChargeBoxConfig findByChargeBoxIdAndConfigKey(String chargeBoxId, String key);
 
 	long countByConfigKey(String key);

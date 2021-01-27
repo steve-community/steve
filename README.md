@@ -78,6 +78,12 @@ SteVe Pluggable is intended to run in any servlet container or in embedded web a
     spring.jpa.hibernate.ddl-auto=update
     ```
     
+    To configure Spring Data JPA entities and repositories, you need to add the following annotations to either a Spring Boot application or a @Configuration annotated class:
+    ```
+    @EnableJpaRepositories(basePackages = "net.parkl.ocpp.repositories")
+    @EntityScan(basePackages = {"net.parkl.ocpp.entities"})
+    ```
+    
 3. OCPP specific configuration
     ```
     # When the WebSocket/Json charge point opens more than one WebSocket connection,

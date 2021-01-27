@@ -66,31 +66,6 @@ public class SteveConfiguration {
 
 
 
-    private static String useFallbackIfNotSet(String value, String fallback) {
-        if (value == null) {
-            // if the property is optional, value will be null
-            return fallback;
-        } else if (value.startsWith("${")) {
-            // property value variables start with "${" (if maven is not used, the value will not be set)
-            return fallback;
-        } else {
-            return value;
-        }
-    }
-
-    private String sanitizeContextPath(String s) {
-        if (s == null || "/".equals(s)) {
-            return "";
-
-        } else if (s.startsWith("/")) {
-            return s;
-
-        } else {
-            return "/" + s;
-        }
-    }
-
-
     // OCPP-related configuration
     @Builder
     @Getter

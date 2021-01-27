@@ -7,7 +7,6 @@ import net.parkl.ocpp.module.esp.model.ESPChargingResult;
 import net.parkl.ocpp.module.esp.model.ESPChargingStartRequest;
 import net.parkl.ocpp.module.esp.model.ESPChargingStartResult;
 import net.parkl.ocpp.module.esp.model.ESPChargingUserStopRequest;
-import net.parkl.ocpp.service.cs.OcppServerService;
 import org.joda.time.DateTime;
 import org.junit.Assert;
 import org.springframework.beans.factory.annotation.Autowired;

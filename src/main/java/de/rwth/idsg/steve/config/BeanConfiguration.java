@@ -50,10 +50,6 @@ public class BeanConfiguration implements WebMvcConfigurer {
 
     private ScheduledThreadPoolExecutor executor;
 
-    @Autowired
-    private WebModule pluggableWebModule;
-
-
 
     @Bean
     public ScheduledExecutorService scheduledExecutorService() {

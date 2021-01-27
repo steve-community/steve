@@ -21,9 +21,8 @@ package de.rwth.idsg.steve.ocpp.soap;
 import de.rwth.idsg.steve.ocpp.OcppProtocol;
 import de.rwth.idsg.steve.service.ChargePointHelperService;
 import lombok.extern.slf4j.Slf4j;
+import net.parkl.ocpp.service.cs.ChargePointService;
 import ocpp.cs._2015._10.RegistrationStatus;
-
-import net.parkl.ocpp.service.cs.OcppServerService;
 
 import org.apache.cxf.binding.soap.Soap12;
 import org.apache.cxf.binding.soap.SoapFault;
@@ -52,7 +51,7 @@ import static org.apache.cxf.ws.addressing.JAXWSAConstants.ADDRESSING_PROPERTIES
  * 2. Intercepts incoming OCPP messages to update the endpoint address ("From" field of the WS-A header) in DB.
  * And the absence of the field is not a deal breaker anymore. But, as a side effect, the user will not be able
  * to send commands to the charging station, since the DB call to list the charge points will filter it out. See
- * {@link ChargePointRepositoryImpl#getChargePointSelect(OcppProtocol)}.
+ * {@link ChargePointService#getChargePointSelect(OcppProtocol)}.
  *
  * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
  * @since 15.06.2015
@@ -61,7 +60,7 @@ import static org.apache.cxf.ws.addressing.JAXWSAConstants.ADDRESSING_PROPERTIES
 @Component("MessageHeaderInterceptor")
 public class MessageHeaderInterceptor extends AbstractPhaseInterceptor<Message> {
 
-    @Autowired private OcppServerService ocppServerService;
+    @Autowired private ChargePointService chargePointService;
     @Autowired private ChargePointHelperService chargePointHelperService;
     @Autowired private ScheduledExecutorService executorService;
 
@@ -98,7 +97,7 @@ public class MessageHeaderInterceptor extends AbstractPhaseInterceptor<Message> 
             try {
                 String endpointAddress = getEndpointAddress(message);
                 if (endpointAddress != null) {
-                    ocppServerService.updateEndpointAddress(chargeBoxId, endpointAddress);
+                    chargePointService.updateEndpointAddress(chargeBoxId, endpointAddress);
                 }
             } catch (Exception e) {
                 log.error("Exception occurred", e);

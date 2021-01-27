@@ -5,7 +5,6 @@ import de.rwth.idsg.steve.repository.dto.InsertConnectorStatusParams;
 import de.rwth.idsg.steve.repository.dto.UpdateChargeboxParams;
 import lombok.NoArgsConstructor;
 import net.parkl.ocpp.service.OcppMiddleware;
-import net.parkl.ocpp.service.cs.OcppServerService;
 import org.joda.time.DateTime;
 
 @NoArgsConstructor

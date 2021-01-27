@@ -1,7 +1,6 @@
 package net.parkl.ocpp.service.driver;
 
 import net.parkl.ocpp.service.OcppMiddleware;
-import net.parkl.ocpp.service.cs.OcppServerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

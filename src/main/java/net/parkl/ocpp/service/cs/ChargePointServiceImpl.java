@@ -10,7 +10,9 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
 
+import de.rwth.idsg.steve.repository.dto.UpdateChargeboxParams;
 import de.rwth.idsg.steve.web.dto.ConnectorStatusForm;
+import lombok.extern.slf4j.Slf4j;
 import net.parkl.ocpp.entities.OcppAddress;
 import net.parkl.ocpp.entities.OcppChargeBox;
 import net.parkl.ocpp.repositories.ConnectorRepository;
@@ -38,6 +40,7 @@ import de.rwth.idsg.steve.web.dto.ChargePointQueryForm;
  * @since 14.08.2014
  */
 @Service
+@Slf4j
 public class ChargePointServiceImpl implements ChargePointService {
 
     @Autowired private OcppChargeBoxRepository chargeBoxRepository;
@@ -292,7 +295,87 @@ public class ChargePointServiceImpl implements ChargePointService {
        
     }
 
+	@Override
+	@Transactional
+	public void updateChargeboxHeartbeat(String chargeBoxId, DateTime now) {
+		OcppChargeBox cb = chargeBoxRepository.findByChargeBoxId(chargeBoxId);
+		if (cb==null) {
+			throw new IllegalArgumentException("Invalid charge box id: "+chargeBoxId);
+		}
+		cb.setLastHeartbeatTimestamp(now.toDate());
+		chargeBoxRepository.save(cb);
+	}
 
-   
+	@Override
+	@Transactional
+	public void updateEndpointAddress(String chargeBoxId, String endpointAddress) {
+		OcppChargeBox cb = chargeBoxRepository.findByChargeBoxId(chargeBoxId);
+		if (cb==null) {
+			throw new IllegalArgumentException("Invalid charge box id: "+chargeBoxId);
+		}
+		cb.setEndpointAddress(endpointAddress);
+		chargeBoxRepository.save(cb);
+
+	}
+
+	@Override
+	@Transactional
+	public boolean updateChargebox(UpdateChargeboxParams p) {
+		OcppChargeBox cb = chargeBoxRepository.findByChargeBoxId(p.getChargeBoxId());
+		if (cb==null) {
+			log.error("The chargebox '{}' is NOT registered and its boot NOT acknowledged.", p.getChargeBoxId());
+			return false;
+		}
+		cb.setOcppProtocol(p.getOcppProtocol().getCompositeValue());
+		cb.setChargePointVendor(p.getVendor());
+		cb.setChargePointModel(p.getModel());
+		cb.setChargePointSerialNumber(p.getPointSerial());
+		cb.setChargeBoxSerialNumber(p.getBoxSerial());
+		cb.setFwVersion(p.getFwVersion());
+		cb.setIccid(p.getIccid());
+		cb.setImsi(p.getImsi());
+		cb.setMeterType(p.getMeterType());
+		cb.setMeterSerialNumber(p.getMeterSerial());
+		if (p.getHeartbeatTimestamp()!=null) {
+			cb.setLastHeartbeatTimestamp(p.getHeartbeatTimestamp().toDate());
+		}
+
+		chargeBoxRepository.save(cb);
+		log.info("The chargebox '{}' is registered and its boot acknowledged.", p.getChargeBoxId());
+		return true;
+	}
+
+	@Override
+	@Transactional
+	public void updateChargeboxFirmwareStatus(String chargeBoxId, String status) {
+		OcppChargeBox cb = chargeBoxRepository.findByChargeBoxId(chargeBoxId);
+		if (cb==null) {
+			throw new IllegalArgumentException("Invalid charge box id: "+chargeBoxId);
+		}
+		cb.setFwUpdateStatus(status);
+		cb.setFwUpdateTimestamp(new Date());
+		chargeBoxRepository.save(cb);
+
+	}
+
+
+
+	@Override
+	@Transactional
+	public void updateChargeboxDiagnosticsStatus(String chargeBoxId, String status) {
+		OcppChargeBox cb = chargeBoxRepository.findByChargeBoxId(chargeBoxId);
+		if (cb==null) {
+			throw new IllegalArgumentException("Invalid charge box id: "+chargeBoxId);
+		}
+		cb.setDiagnosticsStatus(status);
+		cb.setDiagnosticsTimestamp(new Date());
+		chargeBoxRepository.save(cb);
+	}
+
+
+
+
+
+
 
 }

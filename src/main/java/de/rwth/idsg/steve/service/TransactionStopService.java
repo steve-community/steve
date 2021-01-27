@@ -27,7 +27,6 @@ import de.rwth.idsg.steve.utils.DateTimeConverter;
 import lombok.Builder;
 import net.parkl.ocpp.entities.TransactionStart;
 import net.parkl.ocpp.entities.TransactionStopEventActor;
-import net.parkl.ocpp.service.cs.OcppServerService;
 import net.parkl.ocpp.service.cs.TransactionService;
 import ocpp.cs._2012._06.UnitOfMeasure;
 import org.jetbrains.annotations.Nullable;
@@ -46,7 +45,6 @@ import java.util.List;
 public class TransactionStopService {
 
     @Autowired private TransactionService transactionService;
-    @Autowired private OcppServerService ocppServerService;
 
     public void stop(List<Integer> transactionPkList) {
         transactionPkList.stream()
@@ -65,7 +63,7 @@ public class TransactionStopService {
 
         TerminationValues values = findNeededValues(thisTxDetails);
 
-        ocppServerService.updateTransaction(UpdateTransactionParams.builder()
+        transactionService.updateTransaction(UpdateTransactionParams.builder()
                                                                       .transactionId(thisTx.getId())
                                                                       .chargeBoxId(thisTx.getChargeBoxId())
                                                                       .stopMeterValue(values.stopValue)

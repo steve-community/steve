@@ -57,8 +57,6 @@ public class WebSocketConfiguration implements WebSocketConfigurer {
     @Autowired private Ocpp16WebSocketEndpoint ocpp16WebSocketEndpoint;
 
 
-    @Autowired private WebModule pluggableWebModule;
-
     @Override
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
         /*WebSocketPolicy policy = new WebSocketPolicy(WebSocketBehavior.SERVER);

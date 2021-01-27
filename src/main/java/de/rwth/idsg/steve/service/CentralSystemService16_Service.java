@@ -28,8 +28,7 @@ import net.parkl.ocpp.entities.OcppChargingProcess;
 import net.parkl.ocpp.module.esp.model.ESPRfidChargingStartRequest;
 import net.parkl.ocpp.service.OcppMiddleware;
 import net.parkl.ocpp.service.OcppProxyService;
-import net.parkl.ocpp.service.cs.OcppServerService;
-import net.parkl.ocpp.service.cs.SettingsService;
+import net.parkl.ocpp.service.cs.*;
 import ocpp.cs._2015._10.*;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,7 +49,14 @@ import static ocpp.cs._2015._10.DataTransferStatus.ACCEPTED;
 public class CentralSystemService16_Service {
 
     @Autowired
-    private OcppServerService ocppServerService;
+    private TransactionService transactionService;
+    @Autowired
+    private ChargePointService chargePointService;
+    @Autowired
+    private ConnectorService connectorService;
+    @Autowired
+    private MeterValueService meterValueService;
+
     @Autowired
     private SettingsService settingsService;
     @Autowired
@@ -92,7 +98,7 @@ public class CentralSystemService16_Service {
                             .heartbeatTimestamp(now)
                             .build();
 
-            ocppServerService.updateChargebox(params);
+            chargePointService.updateChargebox(params);
         }
 
         return new BootNotificationResponse()
@@ -104,7 +110,7 @@ public class CentralSystemService16_Service {
     public FirmwareStatusNotificationResponse firmwareStatusNotification(
             FirmwareStatusNotificationRequest parameters, String chargeBoxIdentity) {
         String status = parameters.getStatus().value();
-        ocppServerService.updateChargeboxFirmwareStatus(chargeBoxIdentity, status);
+        chargePointService.updateChargeboxFirmwareStatus(chargeBoxIdentity, status);
         return new FirmwareStatusNotificationResponse();
     }
 
@@ -125,7 +131,7 @@ public class CentralSystemService16_Service {
                         .vendorErrorCode(parameters.getVendorErrorCode())
                         .build();
 
-        ocppServerService.insertConnectorStatus(params);
+        connectorService.insertConnectorStatus(params);
 
         if (parameters.getStatus() == ChargePointStatus.FAULTED) {
             notificationService.ocppStationStatusFailure(
@@ -137,7 +143,7 @@ public class CentralSystemService16_Service {
 
     public MeterValuesResponse meterValues(MeterValuesRequest parameters, String chargeBoxIdentity) {
         if (parameters.isSetMeterValue() && parameters.getTransactionId() != null) {
-            ocppServerService.insertMeterValues(chargeBoxIdentity, parameters.getMeterValue(),
+            meterValueService.insertMeterValues(chargeBoxIdentity, parameters.getMeterValue(),
                     parameters.getConnectorId(), parameters.getTransactionId());
         }
         return new MeterValuesResponse();
@@ -146,7 +152,7 @@ public class CentralSystemService16_Service {
     public DiagnosticsStatusNotificationResponse diagnosticsStatusNotification(
             DiagnosticsStatusNotificationRequest parameters, String chargeBoxIdentity) {
         String status = parameters.getStatus().value();
-        ocppServerService.updateChargeboxDiagnosticsStatus(chargeBoxIdentity, status);
+        chargePointService.updateChargeboxDiagnosticsStatus(chargeBoxIdentity, status);
         return new DiagnosticsStatusNotificationResponse();
     }
 
@@ -185,7 +191,7 @@ public class CentralSystemService16_Service {
                     null,
                     null);
 
-            transactionId = ocppServerService.insertTransaction(params);
+            transactionId = transactionService.insertTransaction(params);
 
             ESPRfidChargingStartRequest startRequest = new ESPRfidChargingStartRequest();
             startRequest.setRfidTag(parameters.getIdTag());
@@ -197,7 +203,7 @@ public class CentralSystemService16_Service {
             }
             proxyServerFacade.notifyAboutRfidStart(startRequest);
         } else {
-            transactionId = ocppServerService.insertTransaction(params);
+            transactionId = transactionService.insertTransaction(params);
         }
 
         notificationService.ocppTransactionStarted(chargeBoxIdentity, transactionId, parameters.getConnectorId());
@@ -232,9 +238,9 @@ public class CentralSystemService16_Service {
                         .eventActor(station)
                         .build();
 
-        ocppServerService.updateTransaction(params);
+        transactionService.updateTransaction(params);
 
-        ocppServerService.insertMeterValues(chargeBoxIdentity, parameters.getTransactionData(), transactionId);
+        meterValueService.insertMeterValues(chargeBoxIdentity, parameters.getTransactionData(), transactionId);
 
         notificationService.ocppTransactionEnded(chargeBoxIdentity, transactionId);
 
@@ -243,7 +249,7 @@ public class CentralSystemService16_Service {
 
     public HeartbeatResponse heartbeat(HeartbeatRequest parameters, String chargeBoxIdentity) {
         DateTime now = DateTime.now();
-        ocppServerService.updateChargeboxHeartbeat(chargeBoxIdentity, now);
+        chargePointService.updateChargeboxHeartbeat(chargeBoxIdentity, now);
         return new HeartbeatResponse().withCurrentTime(now);
     }
 

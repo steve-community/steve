@@ -26,9 +26,9 @@ import de.rwth.idsg.steve.ocpp.OcppVersion;
 import de.rwth.idsg.steve.ocpp.ws.data.CommunicationContext;
 import de.rwth.idsg.steve.ocpp.ws.data.SessionContext;
 import de.rwth.idsg.steve.ocpp.ws.pipeline.IncomingPipeline;
-import net.parkl.ocpp.service.cs.OcppServerService;
 
 import de.rwth.idsg.steve.service.NotificationService;
+import net.parkl.ocpp.service.cs.ChargePointService;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.socket.BinaryMessage;
@@ -56,9 +56,10 @@ import javax.annotation.PostConstruct;
 public abstract class AbstractWebSocketEndpoint extends ConcurrentWebSocketHandler {
 
     @Autowired private ScheduledExecutorService service;
-    @Autowired private OcppServerService ocppServerService;
     @Autowired private FutureResponseContextStore futureResponseContextStore;
     @Autowired private NotificationService notificationService;
+
+    @Autowired private ChargePointService chargePointService;
     
     @Autowired
     private SteveConfiguration config;
@@ -122,7 +123,7 @@ public abstract class AbstractWebSocketEndpoint extends ConcurrentWebSocketHandl
 
     private void handlePongMessage(WebSocketSession session) {
         WebSocketLogger.receivedPong(getChargeBoxId(session), session);
-        ocppServerService.updateChargeboxHeartbeat(getChargeBoxId(session), DateTime.now());
+        chargePointService.updateChargeboxHeartbeat(getChargeBoxId(session), DateTime.now());
     }
 
     @Override

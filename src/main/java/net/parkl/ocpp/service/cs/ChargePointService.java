@@ -5,10 +5,12 @@ import de.rwth.idsg.steve.ocpp.OcppProtocol;
 import de.rwth.idsg.steve.repository.dto.ChargePoint;
 import de.rwth.idsg.steve.repository.dto.ChargePointSelect;
 import de.rwth.idsg.steve.repository.dto.ConnectorStatus;
+import de.rwth.idsg.steve.repository.dto.UpdateChargeboxParams;
 import de.rwth.idsg.steve.web.dto.ChargePointForm;
 import de.rwth.idsg.steve.web.dto.ChargePointQueryForm;
 import de.rwth.idsg.steve.web.dto.ConnectorStatusForm;
 import org.jetbrains.annotations.Nullable;
+import org.joda.time.DateTime;
 
 import java.util.List;
 import java.util.Map;
@@ -36,4 +38,15 @@ public interface ChargePointService {
     void updateChargePoint(ChargePointForm form);
     void deleteChargePoint(int chargeBoxPk);
 	void addChargePointList(List<String> chargeBoxIdList);
+
+
+    void updateChargeboxHeartbeat(String chargeBoxId, DateTime now);
+
+    void updateEndpointAddress(String chargeBoxId, String endpointAddress);
+
+    boolean updateChargebox(UpdateChargeboxParams params);
+
+    void updateChargeboxFirmwareStatus(String chargeBoxIdentity, String status);
+    void updateChargeboxDiagnosticsStatus(String chargeBoxIdentity, String status);
+
 }

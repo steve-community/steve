@@ -4,7 +4,9 @@ import java.io.Writer;
 import java.util.List;
 import java.util.Optional;
 
+import de.rwth.idsg.steve.repository.dto.InsertTransactionParams;
 import de.rwth.idsg.steve.repository.dto.TransactionDetails;
+import de.rwth.idsg.steve.repository.dto.UpdateTransactionParams;
 import de.rwth.idsg.steve.web.dto.TransactionQueryForm;
 import net.parkl.ocpp.entities.OcppTag;
 import net.parkl.ocpp.entities.Transaction;
@@ -24,4 +26,9 @@ public interface TransactionService {
 	default TransactionDetails getDetails(int transactionPk) {
 		return getDetails(transactionPk, true);
 	}
+
+	Integer insertTransaction(InsertTransactionParams params);
+
+	void updateTransaction(UpdateTransactionParams params);
+
 }

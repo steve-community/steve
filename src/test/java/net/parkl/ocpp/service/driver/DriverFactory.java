@@ -1,6 +1,7 @@
 package net.parkl.ocpp.service.driver;
 
 import net.parkl.ocpp.service.OcppMiddleware;
+import net.parkl.ocpp.service.chargepoint.TestChargePoint;
 import net.parkl.ocpp.service.config.AdvancedChargeBoxConfigService;
 import net.parkl.ocpp.service.cs.ChargePointService;
 import net.parkl.ocpp.service.cs.ConnectorService;
@@ -18,6 +19,8 @@ public class DriverFactory {
     private ConnectorService connectorService;
     @Autowired
     private AdvancedChargeBoxConfigService advancedChargeBoxConfigService;
+    @Autowired
+    private TestChargePoint testChargePoint;
 
     public ChargeBoxDriver createChargeBoxDriver() {
         return ChargeBoxDriver.createChargeBoxDriver(ocppMiddleware,
@@ -25,6 +28,6 @@ public class DriverFactory {
     }
 
     public ChargingDriver createChargingDriver() {
-        return ChargingDriver.createChargingDriver(ocppMiddleware);
+        return ChargingDriver.createChargingDriver(ocppMiddleware, testChargePoint);
     }
 }

@@ -50,7 +50,7 @@ public class TestChargePointHelperService implements ChargePointHelperService {
 
 	@Override
 	public List<ChargePointSelect> getChargePoints(OcppVersion version) {
-		return chargePointService.getChargePointSelect(OcppProtocol.V_16_SOAP, Collections.singletonList(RegistrationStatus.ACCEPTED.name()));
+		return chargePointService.getChargePointSelect(OcppProtocol.V_16_SOAP, Collections.singletonList(RegistrationStatus.ACCEPTED.value()));
 	}
 
 	@Override

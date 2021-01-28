@@ -1,4 +1,4 @@
-package net.parkl.ocpp.service.invoker;
+package net.parkl.ocpp.service.chargepoint;
 
 import javax.xml.ws.Response;
 import java.util.Map;

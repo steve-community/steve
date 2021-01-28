@@ -28,7 +28,11 @@ import net.parkl.ocpp.entities.OcppChargingProcess;
 import net.parkl.ocpp.module.esp.model.ESPRfidChargingStartRequest;
 import net.parkl.ocpp.service.OcppMiddleware;
 import net.parkl.ocpp.service.OcppProxyService;
-import net.parkl.ocpp.service.cs.*;
+import net.parkl.ocpp.service.cs.ChargePointService;
+import net.parkl.ocpp.service.cs.ConnectorService;
+import net.parkl.ocpp.service.cs.MeterValueService;
+import net.parkl.ocpp.service.cs.SettingsService;
+import net.parkl.ocpp.service.cs.TransactionService;
 import ocpp.cs._2015._10.*;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,7 +60,6 @@ public class CentralSystemService16_Service {
     private ConnectorService connectorService;
     @Autowired
     private MeterValueService meterValueService;
-
     @Autowired
     private SettingsService settingsService;
     @Autowired

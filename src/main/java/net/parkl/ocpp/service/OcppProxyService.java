@@ -1,33 +1,43 @@
 package net.parkl.ocpp.service;
 
-import java.util.List;
-
 import net.parkl.ocpp.entities.ConnectorMeterValue;
 import net.parkl.ocpp.entities.OcppChargingProcess;
 import net.parkl.ocpp.entities.TransactionStart;
 
+import java.util.List;
+
 public interface OcppProxyService {
-	OcppChargingProcess findOpenChargingProcessWithoutTransaction(String chargeBoxId, int connectorId);
-	OcppChargingProcess findOpenChargingProcess(String chargeBoxId, int connectorId);
-	OcppChargingProcess createChargingProcess(String chargeBoxId,int connectorId,String idTag, String licensePlate, Float limitKwh, Integer limitMin);
+    OcppChargingProcess findOpenChargingProcessWithoutTransaction(String chargeBoxId, int connectorId);
 
-	OcppChargingProcess findOcppChargingProcess(String processId);
+    OcppChargingProcess findOpenChargingProcess(String chargeBoxId, int connectorId);
 
-	OcppChargingProcess stopChargingProcess(String processId);
+    OcppChargingProcess createChargingProcess(String chargeBoxId, int connectorId, String idTag, String licensePlate, Float limitKwh, Integer limitMin);
 
-	List<ConnectorMeterValue> getConnectorMeterValueByTransactionAndMeasurand(TransactionStart transaction, String measurand);
+    OcppChargingProcess findOcppChargingProcess(String processId);
 
-	OcppChargingProcess stopRequested(String processId);
-	ConnectorMeterValue getLastConnectorMeterValueByTransactionAndMeasurand(TransactionStart transaction, String measurand);
-	OcppChargingProcess stopRequestCancelled(String externalChargeId);
-	List<OcppChargingProcess> getActiveProcessesByChargeBox(String chargeBoxId);
-	List<OcppChargingProcess> findOpenChargingProcessesWithoutTransaction();
-	OcppChargingProcess checkForChargingProcessWithoutTransaction(String chargeBoxId, int connectorId);
-	boolean isWaitingForChargingProcess(String chargeBoxId);
+    OcppChargingProcess stopChargingProcess(String processId);
 
-	List<OcppChargingProcess> findOpenChargingProcessesWithLimitKwh();
-	List<OcppChargingProcess> findOpenChargingProcessesWithLimitMinute();
+    OcppChargingProcess stopRequested(String processId);
 
-	OcppChargingProcess findOpenProcessForRfidTag(String rfidTag, int connectorId, String chargeBoxId);
-	OcppChargingProcess findByTransactionId(int transactionId);
+    OcppChargingProcess stopRequestCancelled(String externalChargeId);
+
+    List<OcppChargingProcess> getActiveProcessesByChargeBox(String chargeBoxId);
+
+    List<OcppChargingProcess> findOpenChargingProcessesWithoutTransaction();
+
+    OcppChargingProcess checkForChargingProcessWithoutTransaction(String chargeBoxId, int connectorId);
+
+    boolean isWaitingForChargingProcess(String chargeBoxId);
+
+    List<OcppChargingProcess> findOpenChargingProcessesWithLimitKwh();
+
+    List<OcppChargingProcess> findOpenChargingProcessesWithLimitMinute();
+
+    OcppChargingProcess findOpenProcessForRfidTag(String rfidTag, int connectorId, String chargeBoxId);
+
+    OcppChargingProcess findByTransactionId(int transactionId);
+
+    List<ConnectorMeterValue> getConnectorMeterValueByTransactionAndMeasurand(TransactionStart transaction, String measurand);
+
+    ConnectorMeterValue getLastConnectorMeterValueByTransactionAndMeasurand(TransactionStart transaction, String measurand);
 }

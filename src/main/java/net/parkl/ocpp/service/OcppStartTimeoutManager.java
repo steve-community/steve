@@ -9,6 +9,8 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 
+import static java.lang.System.currentTimeMillis;
+
 @Component
 public class OcppStartTimeoutManager {
     private static final Logger LOGGER = LoggerFactory.getLogger(OcppStartTimeoutManager.class);
@@ -41,7 +43,7 @@ public class OcppStartTimeoutManager {
                 } catch (Exception ex) {
                     LOGGER.error("Failed to process start timeout: " + cp.getOcppChargingProcessId(), ex);
                 }
-            }else if (config.isPreparingTimeoutEnabled(cp.getConnector().getChargeBoxId())){
+            } else if (config.isPreparingTimeoutEnabled(cp.getConnector().getChargeBoxId())) {
                 LOGGER.info("Checking for preparing timeout of process: {}...", cp.getOcppChargingProcessId());
                 try {
                     checkForProcessPreparingTimeout(cp);
@@ -52,17 +54,19 @@ public class OcppStartTimeoutManager {
         }
     }
 
-    private void checkForProcessStartTimeout(OcppChargingProcess cp) throws Exception {
-        if (cp.getStartDate().getTime() + config.getStartTimeoutSecs(cp.getConnector().getChargeBoxId()) * 1000 < System.currentTimeMillis()) {
-            LOGGER.info("Charging process start timeout: {}", cp.getOcppChargingProcessId());
+    private void checkForProcessStartTimeout(OcppChargingProcess chargingProcess) throws Exception {
+        if (chargingProcess.getStartDate().getTime()
+                + config.getStartTimeoutSecs(chargingProcess.getConnector().getChargeBoxId()) * 1000L < currentTimeMillis()) {
+            LOGGER.info("Charging process start timeout: {}", chargingProcess.getOcppChargingProcessId());
             LOGGER.info("Charging process stopped on timeout, connector reset: {}-{}",
-                    cp.getConnector().getChargeBoxId(), cp.getConnector().getConnectorId());
-            changerAvailability(cp);
+                    chargingProcess.getConnector().getChargeBoxId(), chargingProcess.getConnector().getConnectorId());
+            changerAvailability(chargingProcess);
         }
     }
 
-    private void checkForProcessPreparingTimeout(OcppChargingProcess chargingProcess) throws InterruptedException {
-        if (chargingProcess.getStartDate().getTime() + config.getPreparingTimeoutSecs(chargingProcess.getConnector().getChargeBoxId()) * 1000 < System.currentTimeMillis()) {
+    private void checkForProcessPreparingTimeout(OcppChargingProcess chargingProcess) {
+        if (chargingProcess.getStartDate().getTime()
+                + config.getPreparingTimeoutSecs(chargingProcess.getConnector().getChargeBoxId()) * 1000L < currentTimeMillis()) {
             LOGGER.info("Charging process preparing timeout: {}", chargingProcess.getOcppChargingProcessId());
             LOGGER.info("Charging process stopped on timeout, connector reset: {}-{}",
                     chargingProcess.getConnector().getChargeBoxId(), chargingProcess.getConnector().getConnectorId());
@@ -70,12 +74,15 @@ public class OcppStartTimeoutManager {
         }
     }
 
-    private void changerAvailability(OcppChargingProcess cp) throws InterruptedException {
-        facade.changeAvailability(cp.getConnector().getChargeBoxId(), String.valueOf(cp.getConnector().getConnectorId()), false);
+    private void changerAvailability(OcppChargingProcess chargingProcess) throws InterruptedException {
+        facade.changeAvailability(chargingProcess.getConnector().getChargeBoxId(),
+                String.valueOf(chargingProcess.getConnector().getConnectorId()),
+                false);
         Thread.sleep(1000);
-        facade.changeAvailability(cp.getConnector().getChargeBoxId(), String.valueOf(cp.getConnector().getConnectorId()), true);
+        facade.changeAvailability(chargingProcess.getConnector().getChargeBoxId(),
+                String.valueOf(chargingProcess.getConnector().getConnectorId()),
+                true);
     }
-
 
 
 }

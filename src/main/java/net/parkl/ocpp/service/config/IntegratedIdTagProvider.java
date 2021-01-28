@@ -3,7 +3,7 @@ package net.parkl.ocpp.service.config;
 import java.util.List;
 
 /**
- * TODO
+ * Interface for externally provided id tags
  */
 public interface IntegratedIdTagProvider {
 

@@ -1,20 +1,13 @@
 package net.parkl.ocpp.service.cs;
 
-import java.io.Writer;
-import java.util.*;
-
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
-import javax.persistence.TypedQuery;
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Predicate;
-import javax.persistence.criteria.Root;
-
 import com.google.common.base.Throwables;
+import de.rwth.idsg.steve.SteveException;
 import de.rwth.idsg.steve.repository.ReservationStatus;
 import de.rwth.idsg.steve.repository.dto.InsertTransactionParams;
+import de.rwth.idsg.steve.repository.dto.TransactionDetails;
 import de.rwth.idsg.steve.repository.dto.UpdateTransactionParams;
+import de.rwth.idsg.steve.utils.DateTimeUtils;
+import de.rwth.idsg.steve.web.dto.TransactionQueryForm;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
@@ -23,6 +16,7 @@ import net.parkl.ocpp.entities.*;
 import net.parkl.ocpp.repositories.*;
 import net.parkl.ocpp.service.OcppConstants;
 import net.parkl.ocpp.service.OcppMiddleware;
+import net.parkl.ocpp.service.config.AdvancedChargeBoxConfiguration;
 import net.parkl.stevep.util.CalendarUtils;
 import net.parkl.stevep.util.ListTransform;
 import org.joda.time.DateTime;
@@ -31,12 +25,17 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
-
-import de.rwth.idsg.steve.SteveException;
-import de.rwth.idsg.steve.repository.dto.TransactionDetails;
-import de.rwth.idsg.steve.utils.DateTimeUtils;
-import de.rwth.idsg.steve.web.dto.TransactionQueryForm;
 import org.springframework.transaction.annotation.Transactional;
+
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.persistence.TypedQuery;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
+import java.io.Writer;
+import java.util.*;
 
 @Service
 @Slf4j
@@ -100,7 +99,8 @@ public class TransactionServiceImpl implements TransactionService {
 	@Autowired
 	private OcppMiddleware ocppMiddleware;
 
-
+	@Autowired
+	private AdvancedChargeBoxConfiguration config;
 
 	@Override
 	public List<Integer> getActiveTransactionIds(String chargeBoxId) {
@@ -444,7 +444,7 @@ public class TransactionServiceImpl implements TransactionService {
 		// -------------------------------------------------------------------------
 		// Step 3 for OCPP >= 1.5: A startTransaction may be related to a reservation
 		// -------------------------------------------------------------------------
-		if (p.isSetReservationId() && p.getReservationId().intValue()!=-1) {
+		if (p.isSetReservationId() && p.getReservationId() !=-1 && config.checkReservationId(p.getChargeBoxId())) {
 			OcppReservation r = reservationRepo.findById(p.getReservationId()).
 					orElseThrow(() -> new IllegalArgumentException("Invalid reservation: "+p.getReservationId()));
 

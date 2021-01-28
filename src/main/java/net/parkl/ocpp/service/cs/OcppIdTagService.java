@@ -1,11 +1,11 @@
 package net.parkl.ocpp.service.cs;
 
-import java.util.List;
-
 import de.rwth.idsg.steve.repository.dto.OcppTag.Overview;
 import de.rwth.idsg.steve.web.dto.OcppTagForm;
 import de.rwth.idsg.steve.web.dto.OcppTagQueryForm;
 import net.parkl.ocpp.entities.OcppTag;
+
+import java.util.List;
 
 public interface OcppIdTagService {
 
@@ -35,4 +35,5 @@ public interface OcppIdTagService {
 
 	void updateOcppTag(OcppTagForm ocppTagForm);
 
+	void addRfidTagIfNotExists(String idTag);
 }

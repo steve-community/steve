@@ -32,8 +32,10 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
-import java.util.*;
-import java.util.concurrent.Callable;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 import static de.rwth.idsg.steve.web.dto.ocpp.AvailabilityType.INOPERATIVE;
 import static de.rwth.idsg.steve.web.dto.ocpp.AvailabilityType.OPERATIVE;
@@ -134,16 +136,21 @@ public class OcppMiddlewareImpl implements OcppMiddleware {
             return ESPChargingStartResult.builder().errorCode(ERROR_CODE_CHARGER_OCCUPIED).build();
         }
 
-        String idTag = getAvailableIntegrationIdTag(chargeBox);
+        String idTag = req.getRfidTag();
         if (idTag == null) {
             log.error("No ID tag not found");
             return ESPChargingStartResult.builder().errorCode(ERROR_CODE_CHARGER_ERROR).build();
         }
 
-        OcppTag tag = idTagService.getRecord(idTag);
-        if (tag == null) {
-            log.error("ID tag not found: {}", idTag);
-            return ESPChargingStartResult.builder().errorCode(ERROR_CODE_CHARGER_ERROR).build();
+        if (config.isIdTagMax10Characters(c.getChargeBoxId())) {
+            log.info("Charge box (id = {}) uses ID tag with max length of 10, shortening ID tag...", c.getChargeBoxId());
+            idTag = idTag.substring(0, 9);
+            idTagService.addRfidTagIfNotExists(idTag);
+        }
+
+        if (config.isUsingIntegratedTag(c.getChargeBoxId())) {
+            log.info("Using integrated  ID tag for charge box (id = {}) instead of user's unique tag", c.getChargeBoxId());
+            idTag = getAvailableIntegrationIdTag(chargeBox);
         }
 
         RemoteStartTransactionParams p = new RemoteStartTransactionParams();
@@ -563,7 +570,7 @@ public class OcppMiddlewareImpl implements OcppMiddleware {
         }
 
         GetConfigurationParams params = new GetConfigurationParams();
-        params.setChargePointSelectList(Arrays.asList(c));
+        params.setChargePointSelectList(singletonList(c));
         int taskId = sendGetConfiguration(params, chargeBox.getOcppProtocol());
 
         RequestResult result = waitForResult(chargeBoxId, taskId);
@@ -576,13 +583,7 @@ public class OcppMiddlewareImpl implements OcppMiddleware {
         AsyncWaiter<RequestResult> waiter = new AsyncWaiter<>(10000);
         waiter.setDelayMs(WAIT_MS);
         waiter.setIntervalMs(WAIT_MS);
-        RequestResult result = waiter.waitFor(new Callable<RequestResult>() {
-            @Override
-            public RequestResult call() throws Exception {
-                return getResponse(taskId, chargeBoxId);
-            }
-        });
-        return result;
+        return waiter.waitFor(() -> getResponse(taskId, chargeBoxId));
     }
 
     private List<ESPChargeBoxConfiguration> processGetConfigurationResult(String chargeBoxId,
@@ -675,7 +676,7 @@ public class OcppMiddlewareImpl implements OcppMiddleware {
 
 
         ChangeConfigurationParams params = new ChangeConfigurationParams();
-        params.setChargePointSelectList(Arrays.asList(c));
+        params.setChargePointSelectList(singletonList(c));
         params.setConfKey(key);
         params.setValue(value);
         int taskId = sendChangeConfiguration(params, chargeBox.getOcppProtocol());

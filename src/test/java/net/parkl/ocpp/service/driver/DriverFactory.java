@@ -1,6 +1,7 @@
 package net.parkl.ocpp.service.driver;
 
 import net.parkl.ocpp.service.OcppMiddleware;
+import net.parkl.ocpp.service.config.AdvancedChargeBoxConfigService;
 import net.parkl.ocpp.service.cs.ChargePointService;
 import net.parkl.ocpp.service.cs.ConnectorService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,9 +16,12 @@ public class DriverFactory {
     private ChargePointService chargePointService;
     @Autowired
     private ConnectorService connectorService;
+    @Autowired
+    private AdvancedChargeBoxConfigService advancedChargeBoxConfigService;
 
     public ChargeBoxDriver createChargeBoxDriver() {
-        return ChargeBoxDriver.createChargeBoxDriver(ocppMiddleware, chargePointService, connectorService);
+        return ChargeBoxDriver.createChargeBoxDriver(ocppMiddleware,
+                chargePointService, connectorService, advancedChargeBoxConfigService);
     }
 
     public ChargingDriver createChargingDriver() {

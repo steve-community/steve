@@ -1,6 +1,6 @@
 package net.parkl.ocpp.service.config;
 
-import org.hibernate.dialect.MySQL57Dialect;
+import org.hibernate.dialect.H2Dialect;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
@@ -22,14 +22,14 @@ public class OcppJpaTestConfig {
 	@Primary
 	public LocalContainerEntityManagerFactoryBean entityManagerFactory() {
 		LocalContainerEntityManagerFactoryBean em = new LocalContainerEntityManagerFactoryBean();
-		em.setPersistenceUnitName("ParklOcppPU");
+		em.setPersistenceUnitName("TestPU");
 		em.setDataSource(dataSource());
 		em.setPackagesToScan("net.parkl.ocpp.entities");
 
 		HibernateJpaVendorAdapter vendorAdapter = new HibernateJpaVendorAdapter();
 		vendorAdapter.setShowSql(false);
 		vendorAdapter.setGenerateDdl(true);
-		vendorAdapter.setDatabasePlatform(MySQL57Dialect.class.getName());
+		vendorAdapter.setDatabasePlatform(H2Dialect.class.getName());
 		
 		em.setJpaVendorAdapter(vendorAdapter);
 		return em;

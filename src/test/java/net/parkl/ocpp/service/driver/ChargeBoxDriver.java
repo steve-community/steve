@@ -5,7 +5,6 @@ import de.rwth.idsg.steve.repository.dto.InsertConnectorStatusParams;
 import de.rwth.idsg.steve.repository.dto.UpdateChargeboxParams;
 import lombok.NoArgsConstructor;
 import net.parkl.ocpp.service.OcppMiddleware;
-import net.parkl.ocpp.service.config.AdvancedChargeBoxConfigService;
 import net.parkl.ocpp.service.cs.ChargePointService;
 import net.parkl.ocpp.service.cs.ConnectorService;
 import org.joda.time.DateTime;
@@ -15,7 +14,6 @@ public class ChargeBoxDriver {
     private OcppMiddleware ocppMiddleware;
     private ChargePointService chargePointService;
     private ConnectorService connectorService;
-    private AdvancedChargeBoxConfigService advancedChargeBoxConfigService;
 
     private String name;
     private OcppProtocol protocol;
@@ -23,13 +21,11 @@ public class ChargeBoxDriver {
 
     public static ChargeBoxDriver createChargeBoxDriver(OcppMiddleware facade,
                                                         ChargePointService chargePointService,
-                                                        ConnectorService connectorService,
-                                                        AdvancedChargeBoxConfigService advancedChargeBoxConfigService) {
+                                                        ConnectorService connectorService) {
         ChargeBoxDriver driver = new ChargeBoxDriver();
         driver.ocppMiddleware = facade;
         driver.chargePointService = chargePointService;
         driver.connectorService = connectorService;
-        driver.advancedChargeBoxConfigService = advancedChargeBoxConfigService;
         return driver;
     }
 
@@ -52,10 +48,6 @@ public class ChargeBoxDriver {
                     .build();
             connectorService.insertConnectorStatus(p2);
         }
-    }
-
-    public void deleteAdvancedConfigByKey(String key) {
-        advancedChargeBoxConfigService.deleteByKey(key);
     }
 
     public ChargeBoxDriver withName(String name) {

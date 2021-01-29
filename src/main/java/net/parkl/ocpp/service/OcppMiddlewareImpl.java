@@ -934,7 +934,7 @@ public class OcppMiddlewareImpl implements OcppMiddleware {
                 end(process.getEndDate()).
                 totalPower(consumptionHelper.getTotalPower(transaction)).
                 startValue(consumptionHelper.getStartValue(transaction)).
-                stopValue(consumptionHelper.getStartValue(transaction)).
+                stopValue(consumptionHelper.getStopValue(transaction)).
                 build();
 
         emobilityServiceProvider.updateChargingConsumptionExternal(req);

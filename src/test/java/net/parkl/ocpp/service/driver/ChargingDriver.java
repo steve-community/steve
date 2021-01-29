@@ -32,6 +32,7 @@ public class ChargingDriver {
     }
 
     public String start() {
+        testConsumptionListener.reset();
         ocppMiddleware.registerConsumptionListener(testConsumptionListener);
 
         ESPChargingStartRequest req = ESPChargingStartRequest.builder()
@@ -67,8 +68,12 @@ public class ChargingDriver {
         }
 
         private ESPChargingConsumptionRequest listenForConsumption() {
-            new AsyncWaiter<>(10000).waitFor(() -> this.lastConsumption);
+            new AsyncWaiter<>(5000).waitFor(() -> this.lastConsumption);
             return lastConsumption;
+        }
+
+        public void reset() {
+            lastConsumption = null;
         }
     }
 

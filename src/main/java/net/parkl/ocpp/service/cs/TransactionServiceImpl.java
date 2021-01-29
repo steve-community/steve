@@ -518,7 +518,7 @@ public class TransactionServiceImpl implements TransactionService {
 
             OcppChargingProcess process = chargingProcessRepo.findByTransactionId(p.getTransactionId());
             stop.setTransaction(process.getTransaction());
-            stop = transactionStopRepo.save(stop);
+            transactionStopRepo.save(stop);
 
             //update charging process
 
@@ -594,7 +594,7 @@ public class TransactionServiceImpl implements TransactionService {
                 } else {
                     log.info("Notifying ESP about consumption of transaction: {}...", p.getTransactionId());
                     Transaction t = transactionRepo.findById(p.getTransactionId()).orElseThrow(() -> new IllegalArgumentException("Invalid transaction id: " + p.getTransactionId()));
-
+                    log.info("start: {}, stop: {}", t.getStartValue(), t.getStopValue());
                     ocppMiddleware.updateConsumption(pr, t.getStartValue(), t.getStopValue());
                 }
             });

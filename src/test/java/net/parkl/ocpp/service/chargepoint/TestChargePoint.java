@@ -42,8 +42,8 @@ public class TestChargePoint implements ChargePointService16_Invoker {
 
     private String lastIdTag;
 
-    private int consumptionStart = 100;
-    private int consumptionStop = 500;
+    private int consumptionStart;
+    private int consumptionStop;
 
     @Override
     public void dataTransfer(ChargePointSelect cp, DataTransferTask task) {

@@ -23,11 +23,14 @@ public class DriverFactory {
     private TestChargePoint testChargePoint;
 
     public ChargeBoxDriver createChargeBoxDriver() {
-        return ChargeBoxDriver.createChargeBoxDriver(ocppMiddleware,
-                chargePointService, connectorService, advancedChargeBoxConfigService);
+        return ChargeBoxDriver.createChargeBoxDriver(ocppMiddleware, chargePointService, connectorService);
     }
 
     public ChargingDriver createChargingDriver() {
         return ChargingDriver.createChargingDriver(ocppMiddleware, testChargePoint);
+    }
+
+    public AdvancedChargeBoxConfigDriver createAdvancedChargeBoxDriver() {
+        return AdvancedChargeBoxConfigDriver.createAdvancedChargeBoxDriver(advancedChargeBoxConfigService);
     }
 }

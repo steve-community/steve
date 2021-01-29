@@ -52,36 +52,8 @@
         <assertj.version>3.15.0</assertj.version>
     </properties>
 
-    <profiles>
-        <profile>
-            <id>prod</id>
-            <activation>
-                <activeByDefault>true</activeByDefault>
-            </activation>
-            <properties>
-                <envName>prod</envName>
-                <skipTests>true</skipTests>
-            </properties>
-        </profile>
-        <profile>
-            <id>dev</id>
-            <properties>
-                <envName>dev</envName>
-                <skipTests>true</skipTests>
-            </properties>
-        </profile>
-        <profile>
-            <id>test</id>
-            <properties>
-                <envName>test</envName>
-                <skipTests>false</skipTests>
-            </properties>
-        </profile>
-    </profiles>
-
     <build>
         <finalName>${project.artifactId}</finalName>
-
 
         <plugins>
             <plugin>
@@ -91,21 +63,6 @@
                     <source>${java.version}</source>
                     <target>${java.version}</target>
                 </configuration>
-            </plugin>
-
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-deploy-plugin</artifactId>
-                <version>${maven-deploy-plugin.version}</version>
-                <executions>
-                    <execution>
-                        <id>default-deploy</id>
-                        <phase>deploy</phase>
-                        <goals>
-                            <goal>deploy</goal>
-                        </goals>
-                    </execution>
-                </executions>
             </plugin>
 
         </plugins>
@@ -162,24 +119,19 @@
                 <scope>import</scope>
             </dependency>
 
-            <dependency>
-                <groupId>org.apache.logging.log4j</groupId>
-                <artifactId>log4j-bom</artifactId>
-                <version>2.14.0</version>
-                <scope>import</scope>
-                <type>pom</type>
-            </dependency>
         </dependencies>
     </dependencyManagement>
 
     <dependencies>
 
-
         <dependency>
-            <groupId>org.hibernate</groupId>
-            <artifactId>hibernate-entitymanager</artifactId>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-websocket</artifactId>
         </dependency>
-
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-security</artifactId>
+        </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-jpa</artifactId>
@@ -188,7 +140,11 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
-
+        <dependency>
+            <groupId>org.hibernate.validator</groupId>
+            <artifactId>hibernate-validator</artifactId>
+            <version>${hibernate.validator.version}</version>
+        </dependency>
 
         <dependency>
             <groupId>com.github.goekay</groupId>
@@ -233,22 +189,10 @@
             <version>20.1.0</version>
             <scope>compile</scope>
         </dependency>
-
-        <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-            <version>${lombok.version}</version>
-            <scope>provided</scope>
-        </dependency>
         <dependency>
             <groupId>joda-time</groupId>
             <artifactId>joda-time</artifactId>
             <version>2.10.8</version>
-        </dependency>
-        <dependency>
-            <groupId>org.hibernate.validator</groupId>
-            <artifactId>hibernate-validator</artifactId>
-            <version>${hibernate.validator.version}</version>
         </dependency>
         <dependency>
             <groupId>com.google.guava</groupId>
@@ -271,18 +215,6 @@
             <version>${jackson.version}</version>
         </dependency>
 
-        <!-- Spring -->
-
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-websocket</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-security</artifactId>
-        </dependency>
-
-
         <!-- Logging -->
         <dependency>
             <groupId>org.slf4j</groupId>
@@ -296,11 +228,6 @@
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.lmax</groupId>
-            <artifactId>disruptor</artifactId>
-            <version>3.4.2</version>
         </dependency>
 
         <!-- CXF -->
@@ -324,36 +251,17 @@
             <artifactId>cxf-rt-features-logging</artifactId>
             <version>${cxf.version}</version>
         </dependency>
-
         <dependency>
             <groupId>org.awaitility</groupId>
             <artifactId>awaitility</artifactId>
             <version>${awaitility.version}</version>
         </dependency>
-
         <dependency>
             <groupId>javax</groupId>
             <artifactId>javaee-web-api</artifactId>
             <version>${javaee.web.api.version}</version>
             <scope>provided</scope>
         </dependency>
-
-
-        <!-- Tomcat -->
-        <dependency>
-            <groupId>org.apache.tomcat</groupId>
-            <artifactId>tomcat-websocket</artifactId>
-            <version>${tomcat.version}</version>
-            <scope>provided</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.apache.tomcat</groupId>
-            <artifactId>tomcat-catalina</artifactId>
-            <version>${tomcat.version}</version>
-            <scope>provided</scope>
-        </dependency>
-
 
         <!-- DB -->
         <dependency>
@@ -362,17 +270,18 @@
             <version>${mysql.jdbc.version}</version>
         </dependency>
 
+        <!-- Codes according to ISO standards
+             https://github.com/TakahikoKawasaki/nv-i18n -->
+        <dependency>
+            <groupId>com.neovisionaries</groupId>
+            <artifactId>nv-i18n</artifactId>
+            <version>1.27</version>
+        </dependency>
 
         <!-- Test -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>4.13</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -385,34 +294,6 @@
             <artifactId>assertj-core</artifactId>
             <version>${assertj.version}</version>
             <scope>test</scope>
-        </dependency>
-        <!-- https://mvnrepository.com/artifact/javax.el/javax.el-api -->
-        <dependency>
-            <groupId>javax.el</groupId>
-            <artifactId>javax.el-api</artifactId>
-            <version>3.0.1-b06</version>
-        </dependency>
-        <!-- https://mvnrepository.com/artifact/org.glassfish/javax.el -->
-        <dependency>
-            <groupId>org.glassfish</groupId>
-            <artifactId>javax.el</artifactId>
-            <version>3.0.1-b11</version>
-        </dependency>
-
-
-        <!-- https://github.com/zafarkhaja/jsemver -->
-        <dependency>
-            <groupId>com.github.zafarkhaja</groupId>
-            <artifactId>java-semver</artifactId>
-            <version>0.9.0</version>
-        </dependency>
-
-        <!-- Codes according to ISO standards
-             https://github.com/TakahikoKawasaki/nv-i18n -->
-        <dependency>
-            <groupId>com.neovisionaries</groupId>
-            <artifactId>nv-i18n</artifactId>
-            <version>1.27</version>
         </dependency>
 
     </dependencies>

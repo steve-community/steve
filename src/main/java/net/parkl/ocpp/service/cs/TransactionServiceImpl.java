@@ -12,29 +12,8 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-import net.parkl.ocpp.entities.Connector;
-import net.parkl.ocpp.entities.ConnectorMeterValue;
-import net.parkl.ocpp.entities.ConnectorStatus;
-import net.parkl.ocpp.entities.OcppChargeBox;
-import net.parkl.ocpp.entities.OcppChargingProcess;
-import net.parkl.ocpp.entities.OcppReservation;
-import net.parkl.ocpp.entities.OcppTag;
-import net.parkl.ocpp.entities.Transaction;
-import net.parkl.ocpp.entities.TransactionStart;
-import net.parkl.ocpp.entities.TransactionStop;
-import net.parkl.ocpp.entities.TransactionStopFailed;
-import net.parkl.ocpp.entities.TransactionStopId;
-import net.parkl.ocpp.repositories.ConnectorMeterValueRepository;
-import net.parkl.ocpp.repositories.ConnectorRepository;
-import net.parkl.ocpp.repositories.ConnectorStatusRepository;
-import net.parkl.ocpp.repositories.OcppChargeBoxRepository;
-import net.parkl.ocpp.repositories.OcppChargingProcessRepository;
-import net.parkl.ocpp.repositories.OcppReservationRepository;
-import net.parkl.ocpp.repositories.OcppTagRepository;
-import net.parkl.ocpp.repositories.TransactionRepository;
-import net.parkl.ocpp.repositories.TransactionStartRepository;
-import net.parkl.ocpp.repositories.TransactionStopFailedRepository;
-import net.parkl.ocpp.repositories.TransactionStopRepository;
+import net.parkl.ocpp.entities.*;
+import net.parkl.ocpp.repositories.*;
 import net.parkl.ocpp.service.OcppConstants;
 import net.parkl.ocpp.service.OcppMiddleware;
 import net.parkl.ocpp.service.config.AdvancedChargeBoxConfiguration;
@@ -56,11 +35,7 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import java.io.Writer;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 @Slf4j
@@ -493,7 +468,11 @@ public class TransactionServiceImpl implements TransactionService {
         // -------------------------------------------------------------------------
         // Step 1: insert transaction stop data
         // -------------------------------------------------------------------------
-        boolean stopValueNull = p.getStopMeterValue() == null;
+
+        Transaction transaction = transactionRepo.findById(p.getTransactionId())
+                .orElseThrow(() -> new IllegalArgumentException("Invalid transaction id: " + p.getTransactionId()));
+
+        boolean stopValueNull = transaction.getStopValue() == null;
         OcppChargingProcess savedProcess = null;
         boolean notifyStop = false;
 

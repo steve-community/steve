@@ -4,21 +4,10 @@ import lombok.Getter;
 import org.hibernate.annotations.Immutable;
 import org.hibernate.annotations.Subselect;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.FetchType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
+import javax.persistence.*;
 import java.util.Date;
 
 @Entity
-@Table(name = "ocpp_transaction")
 @Immutable
 @Subselect("SELECT\n" +
         "  tx1.transaction_pk, tx1.connector_pk, tx1.id_tag, tx1.event_timestamp as start_event_timestamp, tx1.start_timestamp, tx1.start_value,\n" +

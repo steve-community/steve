@@ -4,12 +4,12 @@ import net.parkl.ocpp.module.esp.model.ESPChargingConsumptionRequest;
 import net.parkl.ocpp.service.driver.ChargeBoxDriver;
 import net.parkl.ocpp.service.driver.ChargingDriver;
 import net.parkl.ocpp.service.driver.DriverTestBase;
-import org.assertj.core.api.Assertions;
 import org.junit.Before;
 import org.junit.Test;
 
 import static de.rwth.idsg.steve.ocpp.OcppProtocol.V_16_SOAP;
 import static net.parkl.ocpp.service.config.AdvancedChargeBoxConfigKeys.KEY_TRANSACTION_PARTIAL_ENABLED;
+import static org.assertj.core.api.Assertions.assertThat;
 
 
 public class OcppConsumptionDriverTest extends DriverTestBase {
@@ -23,7 +23,7 @@ public class OcppConsumptionDriverTest extends DriverTestBase {
     }
 
     @Test
-    public void testOcppConsumption() throws InterruptedException {
+    public void testStopChargingWithoutStopValueProduceConsumptionUpdate() throws InterruptedException {
         chargeBoxDriver.deleteAdvancedConfigByKey(KEY_TRANSACTION_PARTIAL_ENABLED);
 
         chargeBoxDriver.withName("test1")
@@ -35,6 +35,7 @@ public class OcppConsumptionDriverTest extends DriverTestBase {
                 chargingDriver.withChargeBoxId("test1")
                         .withConnectorId(1)
                         .withStartValue(200)
+                        .withStopValue(500)
                         .withPlate("ABC123")
                         .withRfid("TAG_1")
                         .start();
@@ -43,7 +44,7 @@ public class OcppConsumptionDriverTest extends DriverTestBase {
         chargingDriver.withStopValue(500).stop(chargingProcessId);
 
         ESPChargingConsumptionRequest consumption = chargingDriver.waitForConsumption();
-        Assertions.assertThat(consumption).isNotNull();
+        assertThat(consumption).isNotNull();
 
     }
 

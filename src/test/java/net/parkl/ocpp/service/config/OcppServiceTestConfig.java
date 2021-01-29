@@ -1,7 +1,5 @@
 package net.parkl.ocpp.service.config;
 
-import java.util.concurrent.ScheduledThreadPoolExecutor;
-
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -10,10 +8,12 @@ import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+
 
 @Configuration
 @ComponentScan(basePackages = {"net.parkl.ocpp","de.rwth.idsg.steve.repository"})
-@Import({ OcppJpaTestConfig.class, OcppServiceTestAdditionalConfig.class})
+@Import({ JpaTestConfig.class, OcppServiceTestAdditionalConfig.class})
 public class OcppServiceTestConfig {
 	@Bean
     public static PropertySourcesPlaceholderConfigurer propertyConfigurer() {

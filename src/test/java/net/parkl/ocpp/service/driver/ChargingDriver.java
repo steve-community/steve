@@ -16,7 +16,7 @@ public class ChargingDriver {
     private OcppMiddleware ocppMiddleware;
     private TestChargePoint testChargePoint;
 
-    private TestConsumptionListener testConsumptionListener = new TestConsumptionListener();
+    private final TestConsumptionListener testConsumptionListener = new TestConsumptionListener();
     private String chargeBoxId;
     private int connectorId;
     private String plate;
@@ -58,7 +58,7 @@ public class ChargingDriver {
     }
 
     @Getter
-    private class TestConsumptionListener implements OcppConsumptionListener {
+    private static class TestConsumptionListener implements OcppConsumptionListener {
         private ESPChargingConsumptionRequest lastConsumption;
 
         @Override

@@ -38,7 +38,7 @@
         <spring.security.version>5.4.2</spring.security.version>
         <mysql.jdbc.version>8.0.22</mysql.jdbc.version>
         <jetty.version>9.4.36.v20210114</jetty.version>
-        <lombok.version>1.18.16</lombok.version>
+        <lombok.version>1.18.18</lombok.version>
         <jackson.version>2.12.1</jackson.version>
 
         <!-- In Mysql: schema == database (http://dev.mysql.com/doc/refman/5.6/en/glossary.html#glos_schema) -->

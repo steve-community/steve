@@ -22,7 +22,7 @@ In order to achieve the above goals, the following technical changes have been m
 * migration from JOGL to Spring Data JPA
 * removing MySQL dependent functionality
 * migration from Jetty websockets to Apache Tomcat websockets
-* introduction of the EmobilityServiceProvider and EmobilityServiceProviderFacade interfaces to communicate with an ESP backend
+* introduction of the EmobilityServiceProvider and OcppMiddleware interfaces to communicate with an ESP backend
 
 
 ### Charge Point Support

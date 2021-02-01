@@ -58,6 +58,11 @@ public class ChargingDriver {
         return testConsumptionListener.listenForConsumption();
     }
 
+    //TODO wait for transaction (using transaction service)
+    public void awaitForTransaction() {
+
+    }
+
     @Getter
     private static class TestConsumptionListener implements OcppConsumptionListener {
         private ESPChargingConsumptionRequest lastConsumption;

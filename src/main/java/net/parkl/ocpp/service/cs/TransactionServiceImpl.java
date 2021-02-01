@@ -335,15 +335,9 @@ public class TransactionServiceImpl implements TransactionService {
         // -------------------------------------------------------------------------
 
         if (chargePointService.shouldInsertConnectorStatusAfterTransactionMsg(params.getChargeBoxId())) {
-            ConnectorStatus s = new ConnectorStatus();
-            s.setConnector(t.getConnector());
-            if (params.getStartTimestamp() != null) {
-                s.setStatusTimestamp(params.getStartTimestamp().toDate());
-            }
-            s.setStatus(params.getStatusUpdate().getStatus());
-            s.setErrorCode(params.getStatusUpdate().getErrorCode());
-
-            connectorStatusRepo.save(s);
+            connectorService.createConnectorStatus(t.getConnector(),
+                                                   params.getStartTimestamp(),
+                                                   params.getStatusUpdate());
         }
 
         return t.getTransactionPk();
@@ -428,18 +422,14 @@ public class TransactionServiceImpl implements TransactionService {
         // -------------------------------------------------------------------------
 
         if (chargePointService.shouldInsertConnectorStatusAfterTransactionMsg(params.getChargeBoxId())) {
-            TransactionStart transactionStart = transactionStartRepo.findById(params.getTransactionId()).orElseThrow(() -> new IllegalArgumentException("Invalid transaction id: " + params.getTransactionId()));
+            TransactionStart transactionStart =
+                    transactionStartRepo.findById(params.getTransactionId())
+                            .orElseThrow(() -> new IllegalArgumentException("Invalid transaction id: "
+                                                                                    + params.getTransactionId()));
 
-            ConnectorStatus s = new ConnectorStatus();
-            s.setConnector(transactionStart.getConnector());
-            if (params.getStopTimestamp() != null) {
-                s.setStatusTimestamp(params.getStopTimestamp().toDate());
-            }
-            s.setStatus(params.getStatusUpdate().getStatus());
-            s.setErrorCode(params.getStatusUpdate().getErrorCode());
-
-            connectorStatusRepo.save(s);
-
+            connectorService.createConnectorStatus(transactionStart.getConnector(),
+                                                   params.getStopTimestamp(),
+                                                   params.getStatusUpdate());
         }
 
         //ESP notification

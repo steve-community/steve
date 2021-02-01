@@ -1,6 +1,7 @@
 package net.parkl.ocpp.service.cs;
 
 import de.rwth.idsg.steve.repository.dto.InsertConnectorStatusParams;
+import de.rwth.idsg.steve.repository.dto.TransactionStatusUpdate;
 import lombok.extern.slf4j.Slf4j;
 import net.parkl.ocpp.entities.Connector;
 import net.parkl.ocpp.entities.ConnectorStatus;
@@ -11,6 +12,7 @@ import net.parkl.ocpp.repositories.OcppChargingProcessRepository;
 import net.parkl.ocpp.service.OcppConstants;
 import net.parkl.ocpp.service.OcppErrorTranslator;
 import net.parkl.ocpp.service.OcppMiddleware;
+import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.task.TaskExecutor;
@@ -108,6 +110,19 @@ public class ConnectorServiceImpl implements ConnectorService {
     @Override
     public Optional<Connector> findById(int connectorId) {
         return connectorRepo.findById(connectorId);
+    }
 
+    @Override
+    @Transactional
+    public void createConnectorStatus(Connector connector, DateTime startTimestamp, TransactionStatusUpdate statusUpdate) {
+        ConnectorStatus s = new ConnectorStatus();
+        s.setConnector(connector);
+        if (startTimestamp != null) {
+            s.setStatusTimestamp(startTimestamp.toDate());
+        }
+        s.setStatus(statusUpdate.getStatus());
+        s.setErrorCode(statusUpdate.getErrorCode());
+
+        connectorStatusRepo.save(s);
     }
 }

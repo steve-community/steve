@@ -2,7 +2,6 @@ package net.parkl.ocpp.service;
 
 import lombok.extern.slf4j.Slf4j;
 import net.parkl.ocpp.entities.OcppChargingProcess;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -15,13 +14,15 @@ import java.util.List;
 @Slf4j
 public class OcppChargingLimitWatcher {
 
-    @Autowired
-    private OcppProxyService proxyService;
-    @Autowired
-    private OcppMiddleware facade;
+    private final OcppProxyService proxyService;
+    private final OcppMiddleware facade;
+    private final TaskExecutor taskExecutor;
 
-    @Autowired
-    private TaskExecutor taskExecutor;
+    public OcppChargingLimitWatcher(OcppProxyService proxyService, OcppMiddleware facade, TaskExecutor taskExecutor) {
+        this.proxyService = proxyService;
+        this.facade = facade;
+        this.taskExecutor = taskExecutor;
+    }
 
     @Scheduled(fixedRate = 10000)
     public void checkChargingLimit() {
@@ -34,15 +35,9 @@ public class OcppChargingLimitWatcher {
                 PowerValue pw = facade.getPowerValue(cp.getTransaction());
                 float kWh = OcppConsumptionHelper.getKwhValue(pw.getValue(), pw.getUnit());
                 if (kWh >= cp.getLimitKwh()) {
-                    log.info("Limit {} exceeded ({}) for charing process, stopping: {}...", cp.getLimitKwh(), kWh, cp.getOcppChargingProcessId());
+                    log.info("Limit {} exceeded ({}) for charging process, stopping: {}...", cp.getLimitKwh(), kWh, cp.getOcppChargingProcessId());
 
-                    taskExecutor.execute(new Runnable() {
-
-                        @Override
-                        public void run() {
-                            facade.stopChargingWithLimit(cp.getOcppChargingProcessId(), cp.getLimitKwh());
-                        }
-                    });
+                    taskExecutor.execute(() -> facade.stopChargingWithLimit(cp.getOcppChargingProcessId(), cp.getLimitKwh()));
                 }
             }
         }
@@ -53,18 +48,12 @@ public class OcppChargingLimitWatcher {
                 log.info("Checking charging process with minute limit: {}...", cp.getOcppChargingProcessId());
                 int duration = Duration.between(cp.getStartDate().toInstant(), new Date().toInstant()).toMinutesPart();
                 if (duration >= cp.getLimitMinute()) {
-                    log.info("Limit {} exceeded ({}) for charing process, stopping: {}...", cp.getLimitMinute(), duration, cp.getOcppChargingProcessId());
+                    log.info("Limit {} exceeded ({}) for charging process, stopping: {}...", cp.getLimitMinute(), duration, cp.getOcppChargingProcessId());
 
                     PowerValue pw = facade.getPowerValue(cp.getTransaction());
                     float kWh = OcppConsumptionHelper.getKwhValue(pw.getValue(), pw.getUnit());
 
-                    taskExecutor.execute(new Runnable() {
-
-                        @Override
-                        public void run() {
-                            facade.stopChargingWithLimit(cp.getOcppChargingProcessId(), kWh);
-                        }
-                    });
+                    taskExecutor.execute(() -> facade.stopChargingWithLimit(cp.getOcppChargingProcessId(), kWh));
                 }
             }
         }

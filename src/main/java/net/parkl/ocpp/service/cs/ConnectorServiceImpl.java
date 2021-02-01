@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
+import java.util.Optional;
 
 @Service
 @Slf4j
@@ -96,5 +97,11 @@ public class ConnectorServiceImpl implements ConnectorService {
                 }
             });
         }
+    }
+
+    @Override
+    public Optional<Connector> findById(int connectorId) {
+        return connectorRepo.findById(connectorId);
+
     }
 }

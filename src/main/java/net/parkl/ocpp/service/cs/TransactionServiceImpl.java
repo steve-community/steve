@@ -9,8 +9,29 @@ import de.rwth.idsg.steve.repository.dto.UpdateTransactionParams;
 import de.rwth.idsg.steve.utils.DateTimeUtils;
 import de.rwth.idsg.steve.web.dto.TransactionQueryForm;
 import lombok.extern.slf4j.Slf4j;
-import net.parkl.ocpp.entities.*;
-import net.parkl.ocpp.repositories.*;
+import net.parkl.ocpp.entities.Connector;
+import net.parkl.ocpp.entities.ConnectorMeterValue;
+import net.parkl.ocpp.entities.ConnectorStatus;
+import net.parkl.ocpp.entities.OcppChargeBox;
+import net.parkl.ocpp.entities.OcppChargingProcess;
+import net.parkl.ocpp.entities.OcppReservation;
+import net.parkl.ocpp.entities.OcppTag;
+import net.parkl.ocpp.entities.Transaction;
+import net.parkl.ocpp.entities.TransactionStart;
+import net.parkl.ocpp.entities.TransactionStop;
+import net.parkl.ocpp.entities.TransactionStopFailed;
+import net.parkl.ocpp.entities.TransactionStopId;
+import net.parkl.ocpp.repositories.ConnectorMeterValueRepository;
+import net.parkl.ocpp.repositories.ConnectorRepository;
+import net.parkl.ocpp.repositories.ConnectorStatusRepository;
+import net.parkl.ocpp.repositories.OcppChargeBoxRepository;
+import net.parkl.ocpp.repositories.OcppReservationRepository;
+import net.parkl.ocpp.repositories.OcppTagRepository;
+import net.parkl.ocpp.repositories.TransactionCriteriaRepository;
+import net.parkl.ocpp.repositories.TransactionRepository;
+import net.parkl.ocpp.repositories.TransactionStartRepository;
+import net.parkl.ocpp.repositories.TransactionStopFailedRepository;
+import net.parkl.ocpp.repositories.TransactionStopRepository;
 import net.parkl.ocpp.service.ChargingProcessService;
 import net.parkl.ocpp.service.OcppConstants;
 import net.parkl.ocpp.service.OcppMiddleware;
@@ -25,7 +46,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.Writer;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 @Service
 @Slf4j
@@ -251,6 +276,11 @@ public class TransactionServiceImpl implements TransactionService {
     @Override
     public Optional<Transaction> findTransaction(int transactionPk) {
         return transactionRepo.findById(transactionPk);
+    }
+
+    @Override
+    public Optional<TransactionStart> findTransactionStart(int transactionPk) {
+        return transactionStartRepo.findById(transactionPk);
     }
 
     @Override

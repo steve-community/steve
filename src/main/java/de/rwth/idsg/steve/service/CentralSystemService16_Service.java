@@ -25,10 +25,15 @@ import de.rwth.idsg.steve.repository.dto.UpdateChargeboxParams;
 import de.rwth.idsg.steve.repository.dto.UpdateTransactionParams;
 import lombok.extern.slf4j.Slf4j;
 import net.parkl.ocpp.entities.OcppChargingProcess;
+import net.parkl.ocpp.entities.TransactionStart;
 import net.parkl.ocpp.module.esp.model.ESPRfidChargingStartRequest;
 import net.parkl.ocpp.service.ChargingProcessService;
 import net.parkl.ocpp.service.OcppMiddleware;
-import net.parkl.ocpp.service.cs.*;
+import net.parkl.ocpp.service.cs.ChargePointService;
+import net.parkl.ocpp.service.cs.ConnectorService;
+import net.parkl.ocpp.service.cs.MeterValueService;
+import net.parkl.ocpp.service.cs.SettingsService;
+import net.parkl.ocpp.service.cs.TransactionService;
 import ocpp.cs._2015._10.*;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -141,9 +146,14 @@ public class CentralSystemService16_Service {
     }
 
     public MeterValuesResponse meterValues(MeterValuesRequest parameters, String chargeBoxIdentity) {
-        if (parameters.isSetMeterValue() && parameters.getTransactionId() != null) {
-            meterValueService.insertMeterValues(chargeBoxIdentity, parameters.getMeterValue(),
-                    parameters.getConnectorId(), parameters.getTransactionId());
+        Integer transactionId = parameters.getTransactionId();
+
+        if (parameters.isSetMeterValue() && transactionId != null) {
+            TransactionStart transactionStart =
+                    transactionService.findTransactionStart(transactionId).orElseThrow(() ->
+                            new IllegalArgumentException("Invalid transaction id: " + transactionId));
+
+            meterValueService.insertMeterValues(parameters.getMeterValue(), transactionStart);
         }
         return new MeterValuesResponse();
     }
@@ -230,7 +240,10 @@ public class CentralSystemService16_Service {
 
         transactionService.updateTransaction(params);
 
-        meterValueService.insertMeterValues(chargeBoxIdentity, parameters.getTransactionData(), transactionId);
+        TransactionStart transactionStart =
+                transactionService.findTransactionStart(transactionId).orElseThrow(() ->
+                        new IllegalArgumentException("Invalid transaction id: " + transactionId));
+        meterValueService.insertMeterValues(parameters.getTransactionData(), transactionStart);
 
         notificationService.ocppTransactionEnded(chargeBoxIdentity, transactionId);
 

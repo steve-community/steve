@@ -8,28 +8,8 @@ import de.rwth.idsg.steve.repository.dto.TransactionDetails;
 import de.rwth.idsg.steve.repository.dto.UpdateTransactionParams;
 import de.rwth.idsg.steve.web.dto.TransactionQueryForm;
 import lombok.extern.slf4j.Slf4j;
-import net.parkl.ocpp.entities.Connector;
-import net.parkl.ocpp.entities.ConnectorMeterValue;
-import net.parkl.ocpp.entities.ConnectorStatus;
-import net.parkl.ocpp.entities.OcppChargeBox;
-import net.parkl.ocpp.entities.OcppChargingProcess;
-import net.parkl.ocpp.entities.OcppReservation;
-import net.parkl.ocpp.entities.OcppTag;
-import net.parkl.ocpp.entities.Transaction;
-import net.parkl.ocpp.entities.TransactionStart;
-import net.parkl.ocpp.entities.TransactionStop;
-import net.parkl.ocpp.entities.TransactionStopFailed;
-import net.parkl.ocpp.entities.TransactionStopId;
-import net.parkl.ocpp.repositories.ConnectorRepository;
-import net.parkl.ocpp.repositories.ConnectorStatusRepository;
-import net.parkl.ocpp.repositories.OcppChargeBoxRepository;
-import net.parkl.ocpp.repositories.OcppReservationRepository;
-import net.parkl.ocpp.repositories.OcppTagRepository;
-import net.parkl.ocpp.repositories.TransactionCriteriaRepository;
-import net.parkl.ocpp.repositories.TransactionRepository;
-import net.parkl.ocpp.repositories.TransactionStartRepository;
-import net.parkl.ocpp.repositories.TransactionStopFailedRepository;
-import net.parkl.ocpp.repositories.TransactionStopRepository;
+import net.parkl.ocpp.entities.*;
+import net.parkl.ocpp.repositories.*;
 import net.parkl.ocpp.service.ChargingProcessService;
 import net.parkl.ocpp.service.OcppConstants;
 import net.parkl.ocpp.service.OcppMiddleware;
@@ -44,11 +24,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.Writer;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 import static net.parkl.ocpp.service.cs.converter.TransactionDtoConverter.toTransactionDto;
 
@@ -75,8 +51,6 @@ public class TransactionServiceImpl implements TransactionService {
     @Autowired
     private ConnectorMeterValueService connectorMeterValueService;
     @Autowired
-    private ConnectorRepository connectorRepo;
-    @Autowired
     private ConnectorStatusRepository connectorStatusRepo;
 
     @Autowired
@@ -94,6 +68,9 @@ public class TransactionServiceImpl implements TransactionService {
 
     @Autowired
     private ChargingProcessService chargingProcessService;
+
+    @Autowired
+    private ConnectorService connectorService;
 
     @Override
     public List<Integer> getActiveTransactionIds(String chargeBoxId) {
@@ -277,16 +254,8 @@ public class TransactionServiceImpl implements TransactionService {
     public Integer insertTransaction(InsertTransactionParams params) {
         log.info("Starting transaction: chargeBoxId={},connectorId={},idTag={}...",
                 params.getChargeBoxId(), params.getConnectorId(), params.getIdTag());
-        Connector c = connectorRepo.findByChargeBoxIdAndConnectorId(params.getChargeBoxId(), params.getConnectorId());
-        // -------------------------------------------------------------------------
-        // Step 1: Insert connector and idTag, if they are new to us
-        // -------------------------------------------------------------------------
-        if (c == null) {
-            c = new Connector();
-            c.setChargeBoxId(params.getChargeBoxId());
-            c.setConnectorId(params.getConnectorId());
-            c = connectorRepo.save(c);
-        }
+        Connector connector = connectorService.createConnectorIfNotExists(params.getChargeBoxId(),
+                                                                          params.getConnectorId());
 
         OcppTag tag = tagRepo.findByIdTag(params.getIdTag());
         boolean unknownTagInserted = false;
@@ -305,7 +274,7 @@ public class TransactionServiceImpl implements TransactionService {
         // Step 2: Insert transaction if it does not exist already
         // ---------------------------------------------------------------------------
         TransactionStart existing = transactionStartRepo.findByConnectorAndIdTagAndStartValues(
-                c, params.getIdTag(),
+                connector, params.getIdTag(),
                 params.getStartTimestamp() != null ? params.getStartTimestamp().toDate() : null,
                 params.getStartMeterValue());
 
@@ -315,7 +284,7 @@ public class TransactionServiceImpl implements TransactionService {
         }
 
         TransactionStart t = new TransactionStart();
-        t.setConnector(c);
+        t.setConnector(connector);
         t.setOcppTag(params.getIdTag());
         if (params.getStartTimestamp() != null) {
             t.setStartTimestamp(params.getStartTimestamp().toDate());
@@ -337,16 +306,16 @@ public class TransactionServiceImpl implements TransactionService {
 
         log.info("Transaction saved id={}, querying charing suitable process for connector: {}",
                 t.getTransactionPk(),
-                c.getConnectorId());
+                connector.getConnectorId());
         OcppChargingProcess proc = chargingProcessService.fetchChargingProcess(params.getConnectorId(),
                 params.getChargeBoxId(),
                 2000);
         if (proc != null) {
-            log.info("Setting transaction on connector {} to process: {}...", c.getConnectorId(), proc.getOcppChargingProcessId());
+            log.info("Setting transaction on connector {} to process: {}...", connector.getConnectorId(), proc.getOcppChargingProcessId());
             proc.setTransaction(t);
             chargingProcessService.save(proc);
         } else {
-            log.warn("No active charging process found without transaction for connector: {}", c.getConnectorId());
+            log.warn("No active charging process found without transaction for connector: {}", connector.getConnectorId());
         }
 
         // -------------------------------------------------------------------------

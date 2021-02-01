@@ -43,16 +43,10 @@ public class ConnectorServiceImpl implements ConnectorService {
     @Override
     @Transactional
     public void insertConnectorStatus(InsertConnectorStatusParams p) {
-        Connector c=connectorRepo.findByChargeBoxIdAndConnectorId(p.getChargeBoxId(),p.getConnectorId());
-        if (c==null) {
-            c=new Connector();
-            c.setChargeBoxId(p.getChargeBoxId());
-            c.setConnectorId(p.getConnectorId());
-            c=connectorRepo.save(c);
-        }
+        Connector connector = createConnectorIfNotExists(p.getChargeBoxId(), p.getConnectorId());
 
         ConnectorStatus s=new ConnectorStatus();
-        s.setConnector(c);
+        s.setConnector(connector);
         if (p.getTimestamp()!=null) {
             s.setStatusTimestamp(p.getTimestamp().toDate());
         }
@@ -66,14 +60,14 @@ public class ConnectorServiceImpl implements ConnectorService {
 
         OcppChargingProcess savedProcess=null;
         if (s.getStatus().equals("Available")) {
-            OcppChargingProcess process = chargingProcessRepo.findByConnectorAndTransactionIsNullAndEndDateIsNull(c);
+            OcppChargingProcess process = chargingProcessRepo.findByConnectorAndTransactionIsNullAndEndDateIsNull(connector);
             if (process!=null) {
                 log.info("Ending charging process on available connector status: {}",process.getOcppChargingProcessId());
                 process.setEndDate(new Date());
                 savedProcess=chargingProcessRepo.save(process);
             }
         } else if (s.getStatus().equals("Faulted") || s.getStatus().equals("Unavailable")) {
-            OcppChargingProcess process = chargingProcessRepo.findByConnectorAndTransactionIsNullAndEndDateIsNull(c);
+            OcppChargingProcess process = chargingProcessRepo.findByConnectorAndTransactionIsNullAndEndDateIsNull(connector);
             if (process!=null) {
                 log.info("Saving connector status error to charging process: {} [error={}]...",process.getOcppChargingProcessId(),
                         s.getErrorCode());
@@ -97,6 +91,18 @@ public class ConnectorServiceImpl implements ConnectorService {
                 }
             });
         }
+    }
+
+    @Override
+    public Connector createConnectorIfNotExists(String chargeBoxId, int connectorId) {
+        Connector c = connectorRepo.findByChargeBoxIdAndConnectorId(chargeBoxId, connectorId);
+        if (c == null) {
+            c = new Connector();
+            c.setChargeBoxId(chargeBoxId);
+            c.setConnectorId(connectorId);
+            c = connectorRepo.save(c);
+        }
+        return c;
     }
 
     @Override

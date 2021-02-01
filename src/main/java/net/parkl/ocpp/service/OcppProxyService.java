@@ -25,9 +25,9 @@ public interface OcppProxyService {
 
     List<OcppChargingProcess> findOpenChargingProcessesWithoutTransaction();
 
-    OcppChargingProcess checkForChargingProcessWithoutTransaction(String chargeBoxId, int connectorId);
+    OcppChargingProcess waitingForChargingProcessOnConnector(String chargeBoxId, int connectorId, int timeout);
 
-    boolean isWaitingForChargingProcess(String chargeBoxId);
+    boolean waitingForChargingProcessEnabled(String chargeBoxId);
 
     List<OcppChargingProcess> findOpenChargingProcessesWithLimitKwh();
 

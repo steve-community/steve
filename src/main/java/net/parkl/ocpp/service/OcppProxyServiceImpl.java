@@ -164,19 +164,19 @@ public class OcppProxyServiceImpl implements OcppProxyService {
     }
 
     @Override
-    public OcppChargingProcess checkForChargingProcessWithoutTransaction(String chargeBoxId, int connectorId) {
+    public OcppChargingProcess waitingForChargingProcessOnConnector(String chargeBoxId, int connectorId, int timeout) {
         Connector conn = connectorRepo.findByChargeBoxIdAndConnectorId(chargeBoxId, connectorId);
         if (conn == null) {
             throw new IllegalArgumentException("Connector not found: " + chargeBoxId + "/" + connectorId);
         }
-        AsyncWaiter<OcppChargingProcess> waiter = new AsyncWaiter<>(2000);
+        AsyncWaiter<OcppChargingProcess> waiter = new AsyncWaiter<>(timeout);
         waiter.setDelayMs(0);
         waiter.setIntervalMs(200);
         return waiter.waitFor(() -> chargingProcessRepo.findByConnectorAndTransactionIsNullAndEndDateIsNull(conn));
     }
 
     @Override
-    public boolean isWaitingForChargingProcess(String chargeBoxId) {
+    public boolean waitingForChargingProcessEnabled(String chargeBoxId) {
         return specialConfig.isWaitingForChargingProcessEnabled(chargeBoxId);
 
     }

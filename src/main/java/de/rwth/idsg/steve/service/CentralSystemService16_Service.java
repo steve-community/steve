@@ -28,11 +28,7 @@ import net.parkl.ocpp.entities.OcppChargingProcess;
 import net.parkl.ocpp.module.esp.model.ESPRfidChargingStartRequest;
 import net.parkl.ocpp.service.OcppMiddleware;
 import net.parkl.ocpp.service.OcppProxyService;
-import net.parkl.ocpp.service.cs.ChargePointService;
-import net.parkl.ocpp.service.cs.ConnectorService;
-import net.parkl.ocpp.service.cs.MeterValueService;
-import net.parkl.ocpp.service.cs.SettingsService;
-import net.parkl.ocpp.service.cs.TransactionService;
+import net.parkl.ocpp.service.cs.*;
 import ocpp.cs._2015._10.*;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -171,9 +167,11 @@ public class CentralSystemService16_Service {
                         .eventTimestamp(DateTime.now())
                         .build();
 
-        if (proxyService.isWaitingForChargingProcess(params.getChargeBoxId())) {
+        if (proxyService.waitingForChargingProcessEnabled(params.getChargeBoxId())) {
             OcppChargingProcess chargingProcess =
-                    proxyService.checkForChargingProcessWithoutTransaction(params.getChargeBoxId(), params.getConnectorId());
+                    proxyService.waitingForChargingProcessOnConnector(params.getChargeBoxId(),
+                            params.getConnectorId(),
+                            2000);
             if (chargingProcess == null) {
                 log.error("Charging process not found without transaction: {}/{}", params.getChargeBoxId(), params.getConnectorId());
                 throw new IllegalStateException("Charging process not found without transaction: " + params.getConnectorId());

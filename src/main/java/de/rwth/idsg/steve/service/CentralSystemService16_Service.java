@@ -167,17 +167,6 @@ public class CentralSystemService16_Service {
                         .eventTimestamp(DateTime.now())
                         .build();
 
-        if (proxyService.waitingForChargingProcessEnabled(params.getChargeBoxId())) {
-            OcppChargingProcess chargingProcess =
-                    proxyService.waitingForChargingProcessOnConnector(params.getChargeBoxId(),
-                            params.getConnectorId(),
-                            2000);
-            if (chargingProcess == null) {
-                log.error("Charging process not found without transaction: {}/{}", params.getChargeBoxId(), params.getConnectorId());
-                throw new IllegalStateException("Charging process not found without transaction: " + params.getConnectorId());
-            }
-        }
-
         Integer transactionId;
 
         if (proxyService

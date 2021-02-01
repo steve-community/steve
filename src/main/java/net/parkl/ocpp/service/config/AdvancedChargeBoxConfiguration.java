@@ -58,7 +58,7 @@ public class AdvancedChargeBoxConfiguration {
         return getConfigValueAsBool(chargeBoxId, AdvancedChargeBoxConfigKeys.KEY_TRANSACTION_PARTIAL_ENABLED, false);
     }
 
-    public boolean isWaitingForChargingProcessEnabled(String chargeBoxId) {
+    public boolean waitingForChargingProcessEnabled(String chargeBoxId) {
         return getConfigValueAsBool(chargeBoxId, AdvancedChargeBoxConfigKeys.KEY_WAITING_FOR_CHARGING_PROCESS_ENABLED, false);
     }
 

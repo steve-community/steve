@@ -1,5 +1,6 @@
 package net.parkl.ocpp.service;
 
+import lombok.extern.slf4j.Slf4j;
 import net.parkl.ocpp.entities.Connector;
 import net.parkl.ocpp.entities.OcppChargingProcess;
 import net.parkl.ocpp.entities.TransactionStart;
@@ -18,6 +19,7 @@ import java.util.List;
 import java.util.UUID;
 
 
+@Slf4j
 @Service
 @Transactional
 public class ChargingProcessService {
@@ -101,7 +103,6 @@ public class ChargingProcessService {
     }
 
 
-
     public OcppChargingProcess stopRequested(String processId) {
         OcppChargingProcess cp = chargingProcessRepo.findById(processId).
                 orElseThrow(() -> new IllegalStateException("Invalid OcppChargingProcess id: " + processId));
@@ -132,21 +133,6 @@ public class ChargingProcessService {
         return chargingProcessRepo.findAllByTransactionIsNullAndEndDateIsNull();
     }
 
-    public OcppChargingProcess waitingForChargingProcessOnConnector(String chargeBoxId, int connectorId, int timeout) {
-        Connector conn = connectorRepo.findByChargeBoxIdAndConnectorId(chargeBoxId, connectorId);
-        if (conn == null) {
-            throw new IllegalArgumentException("Connector not found: " + chargeBoxId + "/" + connectorId);
-        }
-        AsyncWaiter<OcppChargingProcess> waiter = new AsyncWaiter<>(timeout);
-        waiter.setDelayMs(0);
-        waiter.setIntervalMs(200);
-        return waiter.waitFor(() -> chargingProcessRepo.findByConnectorAndTransactionIsNullAndEndDateIsNull(conn));
-    }
-
-    public boolean waitingForChargingProcessEnabled(String chargeBoxId) {
-        return specialConfig.isWaitingForChargingProcessEnabled(chargeBoxId);
-
-    }
 
     public List<OcppChargingProcess> findOpenChargingProcessesWithLimitKwh() {
         return chargingProcessRepo.findAllByTransactionIsNotNullAndLimitKwhIsNotNullAndEndDateIsNull();
@@ -170,16 +156,30 @@ public class ChargingProcessService {
         return chargingProcessRepo.findByTransaction(transaction);
     }
 
-    /*public OcppChargingProcess fetchChargingProcess(int connectorId, String chargeBoxId) {
-        if (proxyService.waitingForChargingProcessEnabled(params.getChargeBoxId())) {
+    public OcppChargingProcess fetchChargingProcess(int connectorId, String chargeBoxId, int timeout) {
+        if (specialConfig.waitingForChargingProcessEnabled(chargeBoxId)) {
             OcppChargingProcess chargingProcess =
-                    proxyService.waitingForChargingProcessOnConnector(params.getChargeBoxId(),
-                            params.getConnectorId(),
-                            2000);
+                    waitingForChargingProcessOnConnector(chargeBoxId,
+                            connectorId,
+                            timeout);
             if (chargingProcess == null) {
-                log.error("Charging process not found without transaction: {}/{}", params.getChargeBoxId(), params.getConnectorId());
-                throw new IllegalStateException("Charging process not found without transaction: " + params.getConnectorId());
+                log.error("Charging process not found without transaction: {}/{}", chargeBoxId, connectorId);
+                throw new IllegalStateException("Charging process not found without transaction: " + connectorId);
             }
+            return chargingProcess;
         }
-    }*/
+        return findOpenChargingProcessWithoutTransaction(chargeBoxId, connectorId);
+    }
+
+    private OcppChargingProcess waitingForChargingProcessOnConnector(String chargeBoxId, int connectorId, int timeout) {
+        Connector conn = connectorRepo.findByChargeBoxIdAndConnectorId(chargeBoxId, connectorId);
+        if (conn == null) {
+            throw new IllegalArgumentException("Connector not found: " + chargeBoxId + "/" + connectorId);
+        }
+        AsyncWaiter<OcppChargingProcess> waiter = new AsyncWaiter<>(timeout);
+        waiter.setDelayMs(0);
+        waiter.setIntervalMs(200);
+        return waiter.waitFor(() -> chargingProcessRepo.findByConnectorAndTransactionIsNullAndEndDateIsNull(conn));
+    }
+
 }

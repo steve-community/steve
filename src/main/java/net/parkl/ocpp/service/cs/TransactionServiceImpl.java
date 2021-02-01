@@ -8,33 +8,10 @@ import de.rwth.idsg.steve.repository.dto.TransactionDetails;
 import de.rwth.idsg.steve.repository.dto.UpdateTransactionParams;
 import de.rwth.idsg.steve.utils.DateTimeUtils;
 import de.rwth.idsg.steve.web.dto.TransactionQueryForm;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-import net.parkl.ocpp.entities.Connector;
-import net.parkl.ocpp.entities.ConnectorMeterValue;
-import net.parkl.ocpp.entities.ConnectorStatus;
-import net.parkl.ocpp.entities.OcppChargeBox;
-import net.parkl.ocpp.entities.OcppChargingProcess;
-import net.parkl.ocpp.entities.OcppReservation;
-import net.parkl.ocpp.entities.OcppTag;
-import net.parkl.ocpp.entities.Transaction;
-import net.parkl.ocpp.entities.TransactionStart;
-import net.parkl.ocpp.entities.TransactionStop;
-import net.parkl.ocpp.entities.TransactionStopFailed;
-import net.parkl.ocpp.entities.TransactionStopId;
-import net.parkl.ocpp.repositories.ConnectorMeterValueRepository;
-import net.parkl.ocpp.repositories.ConnectorRepository;
-import net.parkl.ocpp.repositories.ConnectorStatusRepository;
-import net.parkl.ocpp.repositories.OcppChargeBoxRepository;
-import net.parkl.ocpp.repositories.OcppChargingProcessRepository;
-import net.parkl.ocpp.repositories.OcppReservationRepository;
-import net.parkl.ocpp.repositories.OcppTagRepository;
-import net.parkl.ocpp.repositories.TransactionRepository;
-import net.parkl.ocpp.repositories.TransactionStartRepository;
-import net.parkl.ocpp.repositories.TransactionStopFailedRepository;
-import net.parkl.ocpp.repositories.TransactionStopRepository;
+import net.parkl.ocpp.entities.*;
+import net.parkl.ocpp.repositories.*;
+import net.parkl.ocpp.service.ChargingProcessService;
 import net.parkl.ocpp.service.OcppConstants;
 import net.parkl.ocpp.service.OcppMiddleware;
 import net.parkl.ocpp.service.config.AdvancedChargeBoxConfiguration;
@@ -56,39 +33,11 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import java.io.Writer;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 @Slf4j
 public class TransactionServiceImpl implements TransactionService {
-    @Getter
-    @Setter
-    @EqualsAndHashCode
-    static class MeterValueKey {
-        private String value;
-        private String readingContext;
-        private String format;
-        private String measurand;
-        private String location;
-        private String unit;
-
-        public MeterValueKey(String value, String readingContext, String format, String measurand, String location,
-                             String unit) {
-            super();
-            this.value = value;
-            this.readingContext = readingContext;
-            this.format = format;
-            this.measurand = measurand;
-            this.location = location;
-            this.unit = unit;
-        }
-
-
-    }
 
     @PersistenceContext
     private EntityManager em;
@@ -126,6 +75,9 @@ public class TransactionServiceImpl implements TransactionService {
 
     @Autowired
     private AdvancedChargeBoxConfiguration config;
+
+    @Autowired
+    private ChargingProcessService chargingProcessService;
 
     @Override
     public List<Integer> getActiveTransactionIds(String chargeBoxId) {
@@ -385,26 +337,26 @@ public class TransactionServiceImpl implements TransactionService {
 
     @Override
     @Transactional
-    public Integer insertTransaction(InsertTransactionParams p) {
+    public Integer insertTransaction(InsertTransactionParams params) {
         log.info("Starting transaction: chargeBoxId={},connectorId={},idTag={}...",
-                p.getChargeBoxId(), p.getConnectorId(), p.getIdTag());
-        Connector c = connectorRepo.findByChargeBoxIdAndConnectorId(p.getChargeBoxId(), p.getConnectorId());
+                params.getChargeBoxId(), params.getConnectorId(), params.getIdTag());
+        Connector c = connectorRepo.findByChargeBoxIdAndConnectorId(params.getChargeBoxId(), params.getConnectorId());
         // -------------------------------------------------------------------------
         // Step 1: Insert connector and idTag, if they are new to us
         // -------------------------------------------------------------------------
         if (c == null) {
             c = new Connector();
-            c.setChargeBoxId(p.getChargeBoxId());
-            c.setConnectorId(p.getConnectorId());
+            c.setChargeBoxId(params.getChargeBoxId());
+            c.setConnectorId(params.getConnectorId());
             c = connectorRepo.save(c);
         }
 
-        OcppTag tag = tagRepo.findByIdTag(p.getIdTag());
+        OcppTag tag = tagRepo.findByIdTag(params.getIdTag());
         boolean unknownTagInserted = false;
         if (tag == null) {
             tag = new OcppTag();
-            tag.setIdTag(p.getIdTag());
-            String note = "This unknown idTag was used in a transaction that started @ " + p.getStartTimestamp()
+            tag.setIdTag(params.getIdTag());
+            String note = "This unknown idTag was used in a transaction that started @ " + params.getStartTimestamp()
                     + ". It was reported @ " + DateTime.now() + ".";
             tag.setMaxActiveTransactionCount(0);
             tagRepo.save(tag);
@@ -416,9 +368,9 @@ public class TransactionServiceImpl implements TransactionService {
         // Step 2: Insert transaction if it does not exist already
         // ---------------------------------------------------------------------------
         TransactionStart existing = transactionStartRepo.findByConnectorAndIdTagAndStartValues(
-                c, p.getIdTag(),
-                p.getStartTimestamp() != null ? p.getStartTimestamp().toDate() : null,
-                p.getStartMeterValue());
+                c, params.getIdTag(),
+                params.getStartTimestamp() != null ? params.getStartTimestamp().toDate() : null,
+                params.getStartMeterValue());
 
         if (existing != null) {
             log.warn("Transaction already exists: {}", existing.getTransactionPk());
@@ -427,13 +379,13 @@ public class TransactionServiceImpl implements TransactionService {
 
         TransactionStart t = new TransactionStart();
         t.setConnector(c);
-        t.setOcppTag(p.getIdTag());
-        if (p.getStartTimestamp() != null) {
-            t.setStartTimestamp(p.getStartTimestamp().toDate());
+        t.setOcppTag(params.getIdTag());
+        if (params.getStartTimestamp() != null) {
+            t.setStartTimestamp(params.getStartTimestamp().toDate());
         }
-        t.setStartValue(p.getStartMeterValue());
-        if (p.getEventTimestamp() != null) {
-            t.setEventTimestamp(p.getEventTimestamp().toDate());
+        t.setStartValue(params.getStartMeterValue());
+        if (params.getEventTimestamp() != null) {
+            t.setEventTimestamp(params.getEventTimestamp().toDate());
         }
 
 
@@ -442,12 +394,16 @@ public class TransactionServiceImpl implements TransactionService {
 
         if (unknownTagInserted) {
             log.warn("The transaction '{}' contains an unknown idTag '{}' which was inserted into DB "
-                    + "to prevent information loss and has been blocked", t.getTransactionPk(), p.getIdTag());
+                    + "to prevent information loss and has been blocked", t.getTransactionPk(), params.getIdTag());
         }
 
 
-        log.info("Transaction saved id={}, querying charing suitable process for connector: {}", t.getTransactionPk(), c.getConnectorId());
-        OcppChargingProcess proc = chargingProcessRepo.findByConnectorAndTransactionIsNullAndEndDateIsNull(c);
+        log.info("Transaction saved id={}, querying charing suitable process for connector: {}",
+                t.getTransactionPk(),
+                c.getConnectorId());
+        OcppChargingProcess proc = chargingProcessService.fetchChargingProcess(params.getConnectorId(),
+                params.getChargeBoxId(),
+                2000);
         if (proc != null) {
             log.info("Setting transaction on connector {} to process: {}...", c.getConnectorId(), proc.getOcppChargingProcessId());
             proc.setTransaction(t);
@@ -459,9 +415,9 @@ public class TransactionServiceImpl implements TransactionService {
         // -------------------------------------------------------------------------
         // Step 3 for OCPP >= 1.5: A startTransaction may be related to a reservation
         // -------------------------------------------------------------------------
-        if (p.isSetReservationId() && p.getReservationId() != -1 && config.checkReservationId(p.getChargeBoxId())) {
-            OcppReservation r = reservationRepo.findById(p.getReservationId()).
-                    orElseThrow(() -> new IllegalArgumentException("Invalid reservation: " + p.getReservationId()));
+        if (params.isSetReservationId() && params.getReservationId() != -1 && config.checkReservationId(params.getChargeBoxId())) {
+            OcppReservation r = reservationRepo.findById(params.getReservationId()).
+                    orElseThrow(() -> new IllegalArgumentException("Invalid reservation: " + params.getReservationId()));
 
             r.setStatus(ReservationStatus.USED.name());
             r.setTransaction(t);
@@ -472,14 +428,14 @@ public class TransactionServiceImpl implements TransactionService {
         // Step 4: Set connector status
         // -------------------------------------------------------------------------
 
-        if (shouldInsertConnectorStatusAfterTransactionMsg(p.getChargeBoxId())) {
+        if (shouldInsertConnectorStatusAfterTransactionMsg(params.getChargeBoxId())) {
             ConnectorStatus s = new ConnectorStatus();
             s.setConnector(t.getConnector());
-            if (p.getStartTimestamp() != null) {
-                s.setStatusTimestamp(p.getStartTimestamp().toDate());
+            if (params.getStartTimestamp() != null) {
+                s.setStatusTimestamp(params.getStartTimestamp().toDate());
             }
-            s.setStatus(p.getStatusUpdate().getStatus());
-            s.setErrorCode(p.getStatusUpdate().getErrorCode());
+            s.setStatus(params.getStatusUpdate().getStatus());
+            s.setErrorCode(params.getStatusUpdate().getErrorCode());
 
             connectorStatusRepo.save(s);
         }

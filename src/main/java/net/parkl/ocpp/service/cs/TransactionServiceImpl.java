@@ -2,7 +2,6 @@ package net.parkl.ocpp.service.cs;
 
 import com.google.common.base.Throwables;
 import de.rwth.idsg.steve.SteveException;
-import de.rwth.idsg.steve.repository.ReservationStatus;
 import de.rwth.idsg.steve.repository.dto.InsertTransactionParams;
 import de.rwth.idsg.steve.repository.dto.TransactionDetails;
 import de.rwth.idsg.steve.repository.dto.UpdateTransactionParams;
@@ -11,14 +10,10 @@ import lombok.extern.slf4j.Slf4j;
 import net.parkl.ocpp.entities.*;
 import net.parkl.ocpp.repositories.*;
 import net.parkl.ocpp.service.ChargingProcessService;
-import net.parkl.ocpp.service.OcppConstants;
-import net.parkl.ocpp.service.OcppMiddleware;
-import net.parkl.ocpp.service.config.AdvancedChargeBoxConfiguration;
+import net.parkl.ocpp.service.ESPNotificationService;
 import net.parkl.stevep.util.ListTransform;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.core.task.TaskExecutor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -47,17 +42,6 @@ public class TransactionServiceImpl implements TransactionService {
     private ConnectorMeterValueService connectorMeterValueService;
 
     @Autowired
-    private OcppReservationRepository reservationRepo;
-
-    @Autowired
-    @Qualifier("taskExecutor")
-    private TaskExecutor executor;
-
-    @Autowired
-    private OcppMiddleware ocppMiddleware;
-    @Autowired
-    private AdvancedChargeBoxConfiguration config;
-    @Autowired
     private ChargingProcessService chargingProcessService;
     @Autowired
     private ConnectorService connectorService;
@@ -65,6 +49,10 @@ public class TransactionServiceImpl implements TransactionService {
     private ChargePointService chargePointService;
     @Autowired
     private OcppIdTagService ocppIdTagService;
+    @Autowired
+    private ReservationService reservationService;
+    @Autowired
+    private ESPNotificationService espNotificationService;
 
     @Override
     public List<Integer> getActiveTransactionIds(String chargeBoxId) {
@@ -296,13 +284,8 @@ public class TransactionServiceImpl implements TransactionService {
         // -------------------------------------------------------------------------
         // Step 3 for OCPP >= 1.5: A startTransaction may be related to a reservation
         // -------------------------------------------------------------------------
-        if (params.isSetReservationId() && params.getReservationId() != -1 && config.checkReservationId(params.getChargeBoxId())) {
-            OcppReservation r = reservationRepo.findById(params.getReservationId()).
-                    orElseThrow(() -> new IllegalArgumentException("Invalid reservation: " + params.getReservationId()));
-
-            r.setStatus(ReservationStatus.USED.name());
-            r.setTransaction(t);
-            reservationRepo.save(r);
+        if (params.hasReservation()) {
+            reservationService.markReservationAsUsed(t, params.getReservationId(), params.getChargeBoxId());
         }
 
         // -------------------------------------------------------------------------
@@ -328,9 +311,9 @@ public class TransactionServiceImpl implements TransactionService {
         Transaction transaction = transactionRepo.findById(params.getTransactionId())
                 .orElseThrow(() -> new IllegalArgumentException("Invalid transaction id: " + params.getTransactionId()));
 
-        boolean stopValueNull = transaction.getStopValue() == null;
+        boolean vehicleUnplugged = transaction.getStopValue() == null;
         OcppChargingProcess savedProcess = null;
-        boolean notifyStop = false;
+        boolean chargingStopped = false;
 
         try {
             TransactionStop stop = new TransactionStop();
@@ -362,7 +345,7 @@ public class TransactionServiceImpl implements TransactionService {
                         params.getStopTimestamp());
                 process.setEndDate(params.getStopTimestamp().toDate());
                 if (process.getStopRequestDate() == null) {
-                    notifyStop = true;
+                    chargingStopped = true;
                 }
                 savedProcess = chargingProcessService.save(process);
             }
@@ -408,21 +391,13 @@ public class TransactionServiceImpl implements TransactionService {
         }
 
         //ESP notification
-        if (stopValueNull || notifyStop) {
-            boolean stopped = notifyStop;
-            final OcppChargingProcess pr = savedProcess;
-            executor.execute(() -> {
-                if (stopped) {
-                    // if stop charging was not initiated by the ESP
-                    log.info("Notifying ESP about stop transaction from charger: {}...", params.getTransactionId());
-                    ocppMiddleware.stopChargingExternal(pr, OcppConstants.REASON_VEHICLE_CHARGED);
-                } else {
-                    log.info("Notifying ESP about consumption of transaction: {}...", params.getTransactionId());
-                    Transaction t = transactionRepo.findById(params.getTransactionId()).orElseThrow(() -> new IllegalArgumentException("Invalid transaction id: " + params.getTransactionId()));
-                    log.info("start: {}, stop: {}", t.getStartValue(), t.getStopValue());
-                    ocppMiddleware.updateConsumption(pr, t.getStartValue(), t.getStopValue());
-                }
-            });
+        if (vehicleUnplugged || chargingStopped) {
+            if (chargingStopped) {
+                // if stop charging was not initiated by the ESP
+                espNotificationService.notifyAboutChargingStopped(savedProcess);
+            } else {
+                espNotificationService.notifyAboutConsumptionUpdated(savedProcess, transaction);
+            }
         }
     }
 }

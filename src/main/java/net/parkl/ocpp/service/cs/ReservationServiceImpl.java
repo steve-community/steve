@@ -1,10 +1,21 @@
 package net.parkl.ocpp.service.cs;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import de.rwth.idsg.steve.SteveException;
+import de.rwth.idsg.steve.repository.ReservationStatus;
+import de.rwth.idsg.steve.repository.dto.InsertReservationParams;
+import de.rwth.idsg.steve.utils.DateTimeUtils;
+import de.rwth.idsg.steve.web.dto.ReservationQueryForm;
+import lombok.extern.slf4j.Slf4j;
+import net.parkl.ocpp.entities.*;
+import net.parkl.ocpp.repositories.ConnectorRepository;
+import net.parkl.ocpp.repositories.OcppChargeBoxRepository;
+import net.parkl.ocpp.repositories.OcppReservationRepository;
+import net.parkl.ocpp.repositories.OcppTagRepository;
+import net.parkl.ocpp.service.config.AdvancedChargeBoxConfiguration;
+import org.joda.time.DateTime;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -12,31 +23,13 @@ import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
+import java.util.*;
 
-import net.parkl.ocpp.entities.Connector;
-import net.parkl.ocpp.entities.OcppChargeBox;
-import net.parkl.ocpp.entities.OcppReservation;
-import net.parkl.ocpp.entities.OcppTag;
-import net.parkl.ocpp.repositories.ConnectorRepository;
-import net.parkl.ocpp.repositories.OcppChargeBoxRepository;
-import net.parkl.ocpp.repositories.OcppReservationRepository;
-import net.parkl.ocpp.repositories.OcppTagRepository;
-import org.joda.time.DateTime;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import de.rwth.idsg.steve.SteveException;
-import de.rwth.idsg.steve.repository.ReservationStatus;
-import de.rwth.idsg.steve.repository.dto.InsertReservationParams;
-import de.rwth.idsg.steve.utils.DateTimeUtils;
-import de.rwth.idsg.steve.web.dto.ReservationQueryForm;
+import static de.rwth.idsg.steve.repository.ReservationStatus.USED;
 
 @Service
+@Slf4j
 public class ReservationServiceImpl implements ReservationService {
-	private static Logger LOGGER=LoggerFactory.getLogger(ReservationServiceImpl.class);
 	@Autowired
 	private OcppReservationRepository reservationRepo;
 	@Autowired
@@ -45,6 +38,8 @@ public class ReservationServiceImpl implements ReservationService {
 	private OcppChargeBoxRepository chargeBoxRepo;
 	@Autowired
 	private OcppTagRepository tagRepo;
+	@Autowired
+	private AdvancedChargeBoxConfiguration config;
 	
 	@PersistenceContext
 	private EntityManager em;
@@ -63,7 +58,7 @@ public class ReservationServiceImpl implements ReservationService {
 	@Transactional
 	public void delete(int reservationId) {
 		reservationRepo.deleteById(reservationId);
-		LOGGER.debug("The reservation '{}' is deleted.", reservationId);
+		log.debug("The reservation '{}' is deleted.", reservationId);
 	}
 
 	@Override
@@ -92,7 +87,7 @@ public class ReservationServiceImpl implements ReservationService {
 		}
 		r.setStatus(ReservationStatus.WAITING.name());
 		r=reservationRepo.save(r);
-		LOGGER.debug("A new reservation '{}' is inserted.", r.getReservationPk());
+		log.debug("A new reservation '{}' is inserted.", r.getReservationPk());
         return r.getReservationPk();
 	}
 
@@ -187,4 +182,14 @@ public class ReservationServiceImpl implements ReservationService {
 		}
 	}
 
+	@Override
+	public void markReservationAsUsed(TransactionStart transactionStart, int reservationId, String chargeBoxId) {
+		if (reservationId != -1 && config.checkReservationId(chargeBoxId)) {
+			OcppReservation reservation = reservationRepo.findById(reservationId)
+					.orElseThrow(() -> new IllegalArgumentException("Invalid reservation: " + reservationId));
+			reservation.setStatus(USED.name());
+			reservation.setTransaction(transactionStart);
+			reservationRepo.save(reservation);
+		}
+	}
 }

@@ -44,11 +44,7 @@ public class TransactionServiceImpl implements TransactionService {
     private TransactionCriteriaRepository transactionCriteriaRepository;
 
     @Autowired
-    private OcppTagRepository tagRepo;
-    @Autowired
     private ConnectorMeterValueService connectorMeterValueService;
-    @Autowired
-    private ConnectorStatusRepository connectorStatusRepo;
 
     @Autowired
     private OcppReservationRepository reservationRepo;
@@ -59,18 +55,16 @@ public class TransactionServiceImpl implements TransactionService {
 
     @Autowired
     private OcppMiddleware ocppMiddleware;
-
     @Autowired
     private AdvancedChargeBoxConfiguration config;
-
     @Autowired
     private ChargingProcessService chargingProcessService;
-
     @Autowired
     private ConnectorService connectorService;
-
     @Autowired
     private ChargePointService chargePointService;
+    @Autowired
+    private OcppIdTagService ocppIdTagService;
 
     @Override
     public List<Integer> getActiveTransactionIds(String chargeBoxId) {
@@ -82,7 +76,7 @@ public class TransactionServiceImpl implements TransactionService {
         List<Transaction> list = transactionCriteriaRepository.getInternal(form);
 
 
-        Map<String, OcppTag> tagMap = ListTransform.transformToMap(tagRepo.findAll(),
+        Map<String, OcppTag> tagMap = ListTransform.transformToMap(ocppIdTagService.findTags(),
                 OcppTag::getIdTag);
 
         Map<String, OcppChargeBox> boxMap = ListTransform.transformToMap(chargePointService.findAllChargePoints(),
@@ -132,7 +126,7 @@ public class TransactionServiceImpl implements TransactionService {
         String chargeBoxId = transaction.getConnector().getChargeBoxId();
         int connectorId = transaction.getConnector().getConnectorId();
 
-        OcppTag tag = tagRepo.findByIdTag(transaction.getOcppTag());
+        OcppTag tag = ocppIdTagService.getRecord(transaction.getOcppTag());
         if (tag == null) {
             throw new IllegalStateException("Invalid id tag: " + transaction.getOcppTag());
         }
@@ -257,18 +251,7 @@ public class TransactionServiceImpl implements TransactionService {
         Connector connector = connectorService.createConnectorIfNotExists(params.getChargeBoxId(),
                                                                           params.getConnectorId());
 
-        OcppTag tag = tagRepo.findByIdTag(params.getIdTag());
-        boolean unknownTagInserted = false;
-        if (tag == null) {
-            tag = new OcppTag();
-            tag.setIdTag(params.getIdTag());
-            String note = "This unknown idTag was used in a transaction that started @ " + params.getStartTimestamp()
-                    + ". It was reported @ " + DateTime.now() + ".";
-            tag.setMaxActiveTransactionCount(0);
-            tagRepo.save(tag);
-
-            unknownTagInserted = true;
-        }
+        ocppIdTagService.createTagWithoutActiveTransactionIfNotExists(params.getIdTag());
 
         // -------------------------------------------------------------------------
         // Step 2: Insert transaction if it does not exist already
@@ -294,15 +277,7 @@ public class TransactionServiceImpl implements TransactionService {
             t.setEventTimestamp(params.getEventTimestamp().toDate());
         }
 
-
         t = transactionStartRepo.save(t);
-
-
-        if (unknownTagInserted) {
-            log.warn("The transaction '{}' contains an unknown idTag '{}' which was inserted into DB "
-                    + "to prevent information loss and has been blocked", t.getTransactionPk(), params.getIdTag());
-        }
-
 
         log.info("Transaction saved id={}, querying charing suitable process for connector: {}",
                 t.getTransactionPk(),

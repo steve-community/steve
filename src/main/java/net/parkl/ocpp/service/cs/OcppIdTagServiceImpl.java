@@ -266,4 +266,22 @@ public class OcppIdTagServiceImpl implements OcppIdTagService {
         }
     }
 
+    @Override
+    @Transactional
+    public void createTagWithoutActiveTransactionIfNotExists(String idTag) {
+        OcppTag tag = tagRepo.findByIdTag(idTag);
+        if (tag == null) {
+            tag = new OcppTag();
+            tag.setIdTag(idTag);
+            tag.setMaxActiveTransactionCount(0);
+            tagRepo.save(tag);
+            log.warn("An unknown idTag '{}' was inserted into DB to prevent information loss and has been blocked",
+                     idTag);
+        }
+    }
+
+    @Override
+    public List<OcppTag> findTags() {
+        return tagRepo.findTags();
+    }
 }

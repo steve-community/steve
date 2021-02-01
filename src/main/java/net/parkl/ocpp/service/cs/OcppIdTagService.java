@@ -36,4 +36,8 @@ public interface OcppIdTagService {
 	void updateOcppTag(OcppTagForm ocppTagForm);
 
 	void addRfidTagIfNotExists(String idTag);
+
+	void createTagWithoutActiveTransactionIfNotExists(String idTag);
+
+	List<OcppTag> findTags();
 }

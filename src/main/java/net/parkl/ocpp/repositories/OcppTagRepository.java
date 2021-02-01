@@ -1,7 +1,6 @@
 package net.parkl.ocpp.repositories;
 
 import net.parkl.ocpp.entities.OcppTag;
-
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 
@@ -28,4 +27,6 @@ public interface OcppTagRepository extends CrudRepository<OcppTag, Integer>{
 	@Query("SELECT DISTINCT t.parentIdTag FROM OcppTag AS t WHERE t.parentIdTag IS NOT NULL")
 	List<String> findParentIdTags();
 
+	@Query("SELECT tag FROM OcppTag AS tag")
+	List<OcppTag> findTags();
 }

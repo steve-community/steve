@@ -117,12 +117,12 @@ public class ChargingProcessService {
     }
 
 
-    public OcppChargingProcess stopRequestCancelled(String processId) {
+    public void stopRequestCancelled(String processId) {
         OcppChargingProcess cp = chargingProcessRepo.findById(processId).
                 orElseThrow(() -> new IllegalStateException("Invalid OcppChargingProcess id: " + processId));
 
         cp.setStopRequestDate(null);
-        return chargingProcessRepo.save(cp);
+        chargingProcessRepo.save(cp);
     }
 
     public List<OcppChargingProcess> getActiveProcessesByChargeBox(String chargeBoxId) {
@@ -154,6 +154,10 @@ public class ChargingProcessService {
         TransactionStart transaction = transactionStartRepository
                 .findById(transactionId).orElseThrow(() -> new IllegalStateException("Invalid transaction id"));
         return chargingProcessRepo.findByTransaction(transaction);
+    }
+
+    public OcppChargingProcess save(OcppChargingProcess process) {
+        return chargingProcessRepo.save(process);
     }
 
     public OcppChargingProcess fetchChargingProcess(int connectorId, String chargeBoxId, int timeout) {

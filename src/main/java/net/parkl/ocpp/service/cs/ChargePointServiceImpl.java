@@ -1,29 +1,6 @@
 package net.parkl.ocpp.service.cs;
 
 
-import java.util.*;
-
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
-import javax.persistence.TypedQuery;
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Root;
-
-import de.rwth.idsg.steve.repository.dto.UpdateChargeboxParams;
-import de.rwth.idsg.steve.web.dto.ConnectorStatusForm;
-import lombok.extern.slf4j.Slf4j;
-import net.parkl.ocpp.entities.OcppAddress;
-import net.parkl.ocpp.entities.OcppChargeBox;
-import net.parkl.ocpp.repositories.ConnectorRepository;
-import net.parkl.ocpp.repositories.ConnectorStatusRepository;
-import net.parkl.ocpp.repositories.OcppAddressRepository;
-import net.parkl.ocpp.repositories.OcppChargeBoxRepository;
-import org.joda.time.DateTime;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import de.rwth.idsg.steve.SteveException;
 import de.rwth.idsg.steve.ocpp.OcppProtocol;
 import de.rwth.idsg.steve.ocpp.OcppTransport;
@@ -31,9 +8,21 @@ import de.rwth.idsg.steve.repository.dto.ChargePoint;
 import de.rwth.idsg.steve.repository.dto.ChargePoint.Overview;
 import de.rwth.idsg.steve.repository.dto.ChargePointSelect;
 import de.rwth.idsg.steve.repository.dto.ConnectorStatus;
+import de.rwth.idsg.steve.repository.dto.UpdateChargeboxParams;
 import de.rwth.idsg.steve.utils.DateTimeUtils;
 import de.rwth.idsg.steve.web.dto.ChargePointForm;
 import de.rwth.idsg.steve.web.dto.ChargePointQueryForm;
+import de.rwth.idsg.steve.web.dto.ConnectorStatusForm;
+import lombok.extern.slf4j.Slf4j;
+import net.parkl.ocpp.entities.OcppAddress;
+import net.parkl.ocpp.entities.OcppChargeBox;
+import net.parkl.ocpp.repositories.*;
+import org.joda.time.DateTime;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.*;
 
 /**
  * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
@@ -43,19 +32,24 @@ import de.rwth.idsg.steve.web.dto.ChargePointQueryForm;
 @Slf4j
 public class ChargePointServiceImpl implements ChargePointService {
 
-    @Autowired private OcppChargeBoxRepository chargeBoxRepository;
-    @Autowired private OcppAddressRepository addressRepository;
-    @Autowired private ConnectorRepository connectorRepository;
-    @Autowired private ConnectorStatusRepository connectorStatusRepository;
-    
-    @PersistenceContext
-	private EntityManager em;
+    private final OcppChargeBoxRepository chargeBoxRepository;
+    private final OcppAddressRepository addressRepository;
+    private final ConnectorRepository connectorRepository;
+    private final ConnectorStatusRepository connectorStatusRepository;
+    private final ChargePointCriteriaRepository chargePointCriteriaRepository;
+	private final AddressService addressService;
 
-    
-    @Autowired
-    private AddressService addressService;
+	@Autowired
+	public ChargePointServiceImpl(OcppChargeBoxRepository chargeBoxRepository, OcppAddressRepository addressRepository, ConnectorRepository connectorRepository, ConnectorStatusRepository connectorStatusRepository, ChargePointCriteriaRepository chargePointCriteriaRepository, AddressService addressService) {
+		this.chargeBoxRepository = chargeBoxRepository;
+		this.addressRepository = addressRepository;
+		this.connectorRepository = connectorRepository;
+		this.connectorStatusRepository = connectorStatusRepository;
+		this.chargePointCriteriaRepository = chargePointCriteriaRepository;
+		this.addressService = addressService;
+	}
 
-    @Override
+	@Override
     public Optional<String> getRegistrationStatus(String chargeBoxId) {
         String status = chargeBoxRepository.findChargeBoxRegistrationStatus(chargeBoxId);
 
@@ -92,8 +86,7 @@ public class ChargePointServiceImpl implements ChargePointService {
 
     @Override
     public List<ChargePoint.Overview> getOverview(ChargePointQueryForm form) {
-        return toChargePointOverviewList(getOverviewInternal(form));
-
+        return toChargePointOverviewList(chargePointCriteriaRepository.getOverviewInternal(form));
     }
 
     private List<Overview> toChargePointOverviewList(List<OcppChargeBox> list) {
@@ -109,65 +102,6 @@ public class ChargePointServiceImpl implements ChargePointService {
 					                          .build());
 		}
 		return ret;
-	}
-
-    private List<OcppChargeBox> getOverviewInternal(ChargePointQueryForm form) {
-        
-        try {
-			CriteriaBuilder cb = em.getCriteriaBuilder();
-			CriteriaQuery<OcppChargeBox> cq = cb.createQuery(OcppChargeBox.class);
-			Root<OcppChargeBox> root = cq.from(OcppChargeBox.class);
-			cq.select(root);
-			if (form.isSetOcppVersion()) {
-				 cq=cq.where(cb.like(root.get("ocppProtocol"), form.getOcppVersion().getValue() + "%"));
-			}
-			
-			if (form.isSetDescription()) {
-				cq=cq.where(cb.like(root.get("description"), "%" + form.getDescription() + "%"));
-	        }
-
-	        if (form.isSetChargeBoxId()) {
-	        	cq=cq.where(cb.like(root.get("chargeBoxId"), "%" + form.getChargeBoxId() + "%"));
-	        }
-			
-	        DateTime now=DateTime.now();
-	        switch (form.getHeartbeatPeriod()) {
-	            case ALL:
-	                break;
-	
-	            case TODAY:
-	            	cq=cq.where(cb.between(root.get("lastHeartbeatTimestamp"), getDayStart(now),getDayEnd(now)));
-	                break;
-	
-	            case YESTERDAY:
-	            	cq=cq.where(cb.between(root.get("lastHeartbeatTimestamp"), getDayStart(now.minusDays(1)),getDayEnd(now.minusDays(1))));
-	                break;
-	
-	            case EARLIER:
-	            	cq=cq.where(cb.lessThan(root.get("lastHeartbeatTimestamp"), getDayStart(now.minusDays(1))));
-		               
-	                break;
-	
-	            default:
-	                throw new SteveException("Unknown enum type");
-	        }
-	        
-	        
-			cq=cq.orderBy(cb.asc(root.get("chargeBoxPk")));
-			TypedQuery<OcppChargeBox> q = em.createQuery(cq);
-			return q.getResultList();
-			
-		} finally { 
-			em.close();
-		}
-    }
-
-    private Date getDayStart(DateTime now) {
-		return now.withHourOfDay(0).withMinuteOfHour(0).withSecondOfMinute(0).withMillisOfSecond(0).toDate();
-	}
-
-	private Date getDayEnd(DateTime now) {
-		return now.withHourOfDay(23).withMinuteOfHour(59).withSecondOfMinute(59).withMillisOfSecond(999).toDate();
 	}
 
 	@Override

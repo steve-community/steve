@@ -30,8 +30,8 @@ import net.parkl.ocpp.module.esp.model.ESPRfidChargingStartRequest;
 import net.parkl.ocpp.service.ChargingProcessService;
 import net.parkl.ocpp.service.OcppMiddleware;
 import net.parkl.ocpp.service.cs.ChargePointService;
+import net.parkl.ocpp.service.cs.ConnectorMeterValueService;
 import net.parkl.ocpp.service.cs.ConnectorService;
-import net.parkl.ocpp.service.cs.MeterValueService;
 import net.parkl.ocpp.service.cs.SettingsService;
 import net.parkl.ocpp.service.cs.TransactionService;
 import ocpp.cs._2015._10.*;
@@ -60,7 +60,7 @@ public class CentralSystemService16_Service {
     @Autowired
     private ConnectorService connectorService;
     @Autowired
-    private MeterValueService meterValueService;
+    private ConnectorMeterValueService connectorMeterValueService;
     @Autowired
     private SettingsService settingsService;
     @Autowired
@@ -153,7 +153,7 @@ public class CentralSystemService16_Service {
                     transactionService.findTransactionStart(transactionId).orElseThrow(() ->
                             new IllegalArgumentException("Invalid transaction id: " + transactionId));
 
-            meterValueService.insertMeterValues(parameters.getMeterValue(), transactionStart);
+            connectorMeterValueService.insertMeterValues(parameters.getMeterValue(), transactionStart);
         }
         return new MeterValuesResponse();
     }
@@ -243,7 +243,7 @@ public class CentralSystemService16_Service {
         TransactionStart transactionStart =
                 transactionService.findTransactionStart(transactionId).orElseThrow(() ->
                         new IllegalArgumentException("Invalid transaction id: " + transactionId));
-        meterValueService.insertMeterValues(parameters.getTransactionData(), transactionStart);
+        connectorMeterValueService.insertMeterValues(parameters.getTransactionData(), transactionStart);
 
         notificationService.ocppTransactionEnded(chargeBoxIdentity, transactionId);
 

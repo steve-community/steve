@@ -21,7 +21,6 @@ import net.parkl.ocpp.entities.TransactionStart;
 import net.parkl.ocpp.entities.TransactionStop;
 import net.parkl.ocpp.entities.TransactionStopFailed;
 import net.parkl.ocpp.entities.TransactionStopId;
-import net.parkl.ocpp.repositories.ConnectorMeterValueRepository;
 import net.parkl.ocpp.repositories.ConnectorRepository;
 import net.parkl.ocpp.repositories.ConnectorStatusRepository;
 import net.parkl.ocpp.repositories.OcppChargeBoxRepository;
@@ -73,7 +72,7 @@ public class TransactionServiceImpl implements TransactionService {
     @Autowired
     private OcppTagRepository tagRepo;
     @Autowired
-    private ConnectorMeterValueRepository connectorMeterValueRepo;
+    private ConnectorMeterValueService connectorMeterValueService;
     @Autowired
     private ConnectorRepository connectorRepo;
     @Autowired
@@ -189,7 +188,7 @@ public class TransactionServiceImpl implements TransactionService {
 
         // Case 1: Ideal and most accurate case. Station sends meter values with transaction id set.
         //
-        List<ConnectorMeterValue> cmv1 = connectorMeterValueRepo.findByTransactionPk(transaction.getTransactionPk());
+        List<ConnectorMeterValue> cmv1 = connectorMeterValueService.findByTransactionPk(transaction.getTransactionPk());
 
         // Case 2: Fall back to filtering according to time windows
         //
@@ -207,13 +206,13 @@ public class TransactionServiceImpl implements TransactionService {
                     PageRequest.of(0, 1)).stream().findFirst().orElse(null);
             if (nextTx == null) {
                 // the last active transaction
-                cmv2 = connectorMeterValueRepo.findByChargeBoxIdAndConnectorIdAfter(chargeBoxId, connectorId, startTimestamp);
+                cmv2 = connectorMeterValueService.findByChargeBoxIdAndConnectorIdAfter(chargeBoxId, connectorId, startTimestamp);
             } else {
-                cmv2 = connectorMeterValueRepo.findByChargeBoxIdAndConnectorIdBetween(chargeBoxId, connectorId, startTimestamp, nextTx.getStartTimestamp());
+                cmv2 = connectorMeterValueService.findByChargeBoxIdAndConnectorIdBetween(chargeBoxId, connectorId, startTimestamp, nextTx.getStartTimestamp());
             }
         } else {
             // finished transaction
-            cmv2 = connectorMeterValueRepo.findByChargeBoxIdAndConnectorIdBetween(chargeBoxId, connectorId, startTimestamp, stopTimestamp);
+            cmv2 = connectorMeterValueService.findByChargeBoxIdAndConnectorIdBetween(chargeBoxId, connectorId, startTimestamp, stopTimestamp);
         }
 
 

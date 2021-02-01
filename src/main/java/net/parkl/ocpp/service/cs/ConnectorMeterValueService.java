@@ -10,17 +10,18 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Date;
 import java.util.List;
 
 @Service
 @Slf4j
 @Transactional
-public class MeterValueService {
+public class ConnectorMeterValueService {
 
     private final ConnectorMeterValueRepository connectorMeterValueRepo;
 
     @Autowired
-    public MeterValueService(ConnectorMeterValueRepository connectorMeterValueRepo) {
+    public ConnectorMeterValueService(ConnectorMeterValueRepository connectorMeterValueRepo) {
         this.connectorMeterValueRepo = connectorMeterValueRepo;
     }
 
@@ -61,5 +62,26 @@ public class MeterValueService {
             return null;
         }
         return list.get(0);
+    }
+
+    public List<ConnectorMeterValue> findByTransactionPk(int transactionPk) {
+        return connectorMeterValueRepo.findByTransactionPk(transactionPk);
+    }
+
+    public List<ConnectorMeterValue> findByChargeBoxIdAndConnectorIdAfter(String chargeBoxId,
+                                                                          int connectorId,
+                                                                          Date startTimestamp) {
+        return connectorMeterValueRepo.findByChargeBoxIdAndConnectorIdAfter(chargeBoxId, connectorId, startTimestamp);
+    }
+
+    public List<ConnectorMeterValue> findByChargeBoxIdAndConnectorIdBetween(String chargeBoxId,
+                                                                            int connectorId,
+                                                                            Date startTimestamp,
+                                                                            Date nextTxTimestamp) {
+
+        return connectorMeterValueRepo.findByChargeBoxIdAndConnectorIdBetween(chargeBoxId,
+                connectorId,
+                startTimestamp,
+                nextTxTimestamp);
     }
 }

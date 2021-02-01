@@ -50,7 +50,7 @@ import net.parkl.ocpp.repositories.ConnectorStatusRepository;
 import net.parkl.ocpp.repositories.OcppChargeBoxRepository;
 import net.parkl.ocpp.service.config.AdvancedChargeBoxConfiguration;
 import net.parkl.ocpp.service.cs.ChargePointService;
-import net.parkl.ocpp.service.cs.MeterValueService;
+import net.parkl.ocpp.service.cs.ConnectorMeterValueService;
 import net.parkl.ocpp.service.cs.OcppIdTagService;
 import net.parkl.ocpp.service.cs.TransactionService;
 import net.parkl.ocpp.util.AsyncWaiter;
@@ -131,7 +131,7 @@ public class OcppMiddlewareImpl implements OcppMiddleware {
     @Autowired
     private OcppConsumptionHelper consumptionHelper;
     @Autowired
-    private MeterValueService meterValueService;
+    private ConnectorMeterValueService connectorMeterValueService;
     private OcppConsumptionListener consumptionListener;
     private OcppStopListener stopListener;
 
@@ -549,7 +549,7 @@ public class OcppMiddlewareImpl implements OcppMiddleware {
         if (transaction != null) {
             PowerValue pw = getPowerValue(ocppChargingProcess.getTransaction());
             ConnectorMeterValue activePower =
-                    meterValueService.getLastConnectorMeterValueByTransactionAndMeasurand(ocppChargingProcess.getTransaction(),
+                    connectorMeterValueService.getLastConnectorMeterValueByTransactionAndMeasurand(ocppChargingProcess.getTransaction(),
                             MEASURAND_POWER_ACTIVE_IMPORT);
             if (activePower != null) {
                 ret.getStatus().setThroughputPower(OcppConsumptionHelper.getKwValue(parseFloat(activePower.getValue()),
@@ -565,7 +565,7 @@ public class OcppMiddlewareImpl implements OcppMiddleware {
 
     public PowerValue getPowerValue(TransactionStart transaction) {
         List<ConnectorMeterValue> connectorMeterValues =
-                meterValueService.getConnectorMeterValueByTransactionAndMeasurand(transaction, MEASURAND_ENERGY_ACTIVE_IMPORT);
+                connectorMeterValueService.getConnectorMeterValueByTransactionAndMeasurand(transaction, MEASURAND_ENERGY_ACTIVE_IMPORT);
         float diff = 0;
         String diffUnit = null;
         if (!connectorMeterValues.isEmpty()) {
@@ -577,7 +577,7 @@ public class OcppMiddlewareImpl implements OcppMiddleware {
             }
         } else {
             //handle Mennekes type chargers (no measurand, no unit)
-            connectorMeterValues = meterValueService.getConnectorMeterValueByTransactionAndMeasurand(transaction, null);
+            connectorMeterValues = connectorMeterValueService.getConnectorMeterValueByTransactionAndMeasurand(transaction, null);
             if (connectorMeterValues.size() > 1) {
                 diffUnit = connectorMeterValues.get(0).getUnit();
                 if (diffUnit == null) {

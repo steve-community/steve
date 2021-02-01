@@ -6,7 +6,6 @@ import de.rwth.idsg.steve.repository.ReservationStatus;
 import de.rwth.idsg.steve.repository.dto.InsertTransactionParams;
 import de.rwth.idsg.steve.repository.dto.TransactionDetails;
 import de.rwth.idsg.steve.repository.dto.UpdateTransactionParams;
-import de.rwth.idsg.steve.utils.DateTimeUtils;
 import de.rwth.idsg.steve.web.dto.TransactionQueryForm;
 import lombok.extern.slf4j.Slf4j;
 import net.parkl.ocpp.entities.Connector;
@@ -50,6 +49,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+
+import static net.parkl.ocpp.service.cs.converter.TransactionDtoConverter.toTransactionDto;
 
 @Service
 @Slf4j
@@ -126,23 +127,7 @@ public class TransactionServiceImpl implements TransactionService {
         return ret;
     }
 
-    private de.rwth.idsg.steve.repository.dto.Transaction toTransactionDto(Transaction t, OcppChargeBox box, OcppTag tag) {
-        return de.rwth.idsg.steve.repository.dto.Transaction.builder()
-                .id(t.getTransactionPk())
-                .chargeBoxId(t.getConnector().getChargeBoxId())
-                .connectorId(t.getConnector().getConnectorId())
-                .ocppIdTag(t.getOcppTag())
-                .startTimestampDT(t.getStartTimestamp() != null ? new DateTime(t.getStartTimestamp()) : null)
-                .startTimestamp(DateTimeUtils.humanize(t.getStartTimestamp() != null ? new DateTime(t.getStartTimestamp()) : null))
-                .startValue(t.getStartValue())
-                .stopTimestampDT(t.getStopTimestamp() != null ? new DateTime(t.getStopTimestamp()) : null)
-                .stopTimestamp(DateTimeUtils.humanize(t.getStopTimestamp() != null ? new DateTime(t.getStopTimestamp()) : null))
-                .stopValue(t.getStopValue())
-                .chargeBoxPk(box.getChargeBoxPk())
-                .ocppTagPk(tag.getOcppTagPk())
-                .stopEventActor(t.getStopEventActor())
-                .build();
-    }
+
 
     @Override
     public TransactionDetails getDetails(int transactionPk, boolean firstArrivingMeterValueIfMultiple) {

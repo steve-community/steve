@@ -9,6 +9,7 @@ import de.rwth.idsg.steve.repository.dto.UpdateChargeboxParams;
 import de.rwth.idsg.steve.web.dto.ChargePointForm;
 import de.rwth.idsg.steve.web.dto.ChargePointQueryForm;
 import de.rwth.idsg.steve.web.dto.ConnectorStatusForm;
+import net.parkl.ocpp.entities.OcppChargeBox;
 import org.jetbrains.annotations.Nullable;
 import org.joda.time.DateTime;
 
@@ -49,4 +50,9 @@ public interface ChargePointService {
     void updateChargeboxFirmwareStatus(String chargeBoxIdentity, String status);
     void updateChargeboxDiagnosticsStatus(String chargeBoxIdentity, String status);
 
+    List<OcppChargeBox> findAllChargePoints();
+
+    OcppChargeBox findByChargeBoxId(String chargeBoxId);
+
+    boolean shouldInsertConnectorStatusAfterTransactionMsg(String chargeBoxId);
 }

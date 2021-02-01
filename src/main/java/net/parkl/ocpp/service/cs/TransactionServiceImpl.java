@@ -44,9 +44,6 @@ public class TransactionServiceImpl implements TransactionService {
     private TransactionCriteriaRepository transactionCriteriaRepository;
 
     @Autowired
-    private OcppChargeBoxRepository chargeBoxRepo;
-
-    @Autowired
     private OcppTagRepository tagRepo;
     @Autowired
     private ConnectorMeterValueService connectorMeterValueService;
@@ -72,6 +69,9 @@ public class TransactionServiceImpl implements TransactionService {
     @Autowired
     private ConnectorService connectorService;
 
+    @Autowired
+    private ChargePointService chargePointService;
+
     @Override
     public List<Integer> getActiveTransactionIds(String chargeBoxId) {
         return transactionRepo.findActiveTransactionIds(chargeBoxId);
@@ -85,7 +85,7 @@ public class TransactionServiceImpl implements TransactionService {
         Map<String, OcppTag> tagMap = ListTransform.transformToMap(tagRepo.findAll(),
                 OcppTag::getIdTag);
 
-        Map<String, OcppChargeBox> boxMap = ListTransform.transformToMap(chargeBoxRepo.findAll(),
+        Map<String, OcppChargeBox> boxMap = ListTransform.transformToMap(chargePointService.findAllChargePoints(),
                 OcppChargeBox::getChargeBoxId);
 
         List<de.rwth.idsg.steve.repository.dto.Transaction> ret = new ArrayList<>();
@@ -137,7 +137,7 @@ public class TransactionServiceImpl implements TransactionService {
             throw new IllegalStateException("Invalid id tag: " + transaction.getOcppTag());
         }
 
-        OcppChargeBox box = chargeBoxRepo.findByChargeBoxId(transaction.getConnector().getChargeBoxId());
+        OcppChargeBox box = chargePointService.findByChargeBoxId(transaction.getConnector().getChargeBoxId());
         if (box == null) {
             throw new IllegalStateException("Invalid charge box id: " + transaction.getConnector().getChargeBoxId());
         }
@@ -334,7 +334,7 @@ public class TransactionServiceImpl implements TransactionService {
         // Step 4: Set connector status
         // -------------------------------------------------------------------------
 
-        if (shouldInsertConnectorStatusAfterTransactionMsg(params.getChargeBoxId())) {
+        if (chargePointService.shouldInsertConnectorStatusAfterTransactionMsg(params.getChargeBoxId())) {
             ConnectorStatus s = new ConnectorStatus();
             s.setConnector(t.getConnector());
             if (params.getStartTimestamp() != null) {
@@ -427,7 +427,7 @@ public class TransactionServiceImpl implements TransactionService {
         // fails. It probably and hopefully makes sense.
         // -------------------------------------------------------------------------
 
-        if (shouldInsertConnectorStatusAfterTransactionMsg(params.getChargeBoxId())) {
+        if (chargePointService.shouldInsertConnectorStatusAfterTransactionMsg(params.getChargeBoxId())) {
             TransactionStart transactionStart = transactionStartRepo.findById(params.getTransactionId()).orElseThrow(() -> new IllegalArgumentException("Invalid transaction id: " + params.getTransactionId()));
 
             ConnectorStatus s = new ConnectorStatus();
@@ -460,13 +460,4 @@ public class TransactionServiceImpl implements TransactionService {
             });
         }
     }
-
-    private boolean shouldInsertConnectorStatusAfterTransactionMsg(String chargeBoxId) {
-        OcppChargeBox cb = chargeBoxRepo.findByChargeBoxId(chargeBoxId);
-        return cb != null && cb.getInsertConnectorStatusAfterTransactionMsg() != null &&
-                cb.getInsertConnectorStatusAfterTransactionMsg();
-
-    }
-
-
 }

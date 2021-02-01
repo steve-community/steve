@@ -102,4 +102,7 @@ public class OcppChargeBox {
     @Column(name = "insert_connector_status_after_transaction_msg", length = 255, nullable = true)
     private Boolean insertConnectorStatusAfterTransactionMsg;
 
+    public boolean insertConnectorStatusAfterTransactionMsg () {
+        return insertConnectorStatusAfterTransactionMsg != null && insertConnectorStatusAfterTransactionMsg;
+    }
 }

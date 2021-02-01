@@ -306,10 +306,18 @@ public class ChargePointServiceImpl implements ChargePointService {
 		chargeBoxRepository.save(cb);
 	}
 
+	@Override
+	public List<OcppChargeBox> findAllChargePoints() {
+		return chargeBoxRepository.findAll();
+	}
 
+	@Override
+	public OcppChargeBox findByChargeBoxId(String chargeBoxId) {
+		return chargeBoxRepository.findByChargeBoxId(chargeBoxId);
+	}
 
-
-
-
-
+	public boolean shouldInsertConnectorStatusAfterTransactionMsg(String chargeBoxId) {
+		OcppChargeBox cb = chargeBoxRepository.findByChargeBoxId(chargeBoxId);
+		return cb != null && cb.insertConnectorStatusAfterTransactionMsg();
+	}
 }

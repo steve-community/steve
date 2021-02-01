@@ -14,11 +14,11 @@ import java.util.List;
 @Slf4j
 public class OcppChargingLimitWatcher {
 
-    private final OcppProxyService proxyService;
+    private final ChargingProcessService proxyService;
     private final OcppMiddleware facade;
     private final TaskExecutor taskExecutor;
 
-    public OcppChargingLimitWatcher(OcppProxyService proxyService, OcppMiddleware facade, TaskExecutor taskExecutor) {
+    public OcppChargingLimitWatcher(ChargingProcessService proxyService, OcppMiddleware facade, TaskExecutor taskExecutor) {
         this.proxyService = proxyService;
         this.facade = facade;
         this.taskExecutor = taskExecutor;

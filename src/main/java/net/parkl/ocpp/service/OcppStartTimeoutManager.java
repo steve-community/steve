@@ -16,11 +16,11 @@ public class OcppStartTimeoutManager {
     private static final Logger LOGGER = LoggerFactory.getLogger(OcppStartTimeoutManager.class);
 
     private final AdvancedChargeBoxConfiguration config;
-    private final OcppProxyService proxyService;
+    private final ChargingProcessService proxyService;
 
     private final OcppMiddleware facade;
 
-    public OcppStartTimeoutManager(AdvancedChargeBoxConfiguration config, OcppProxyService proxyService, OcppMiddleware facade) {
+    public OcppStartTimeoutManager(AdvancedChargeBoxConfiguration config, ChargingProcessService proxyService, OcppMiddleware facade) {
         this.config = config;
         this.proxyService = proxyService;
         this.facade = facade;

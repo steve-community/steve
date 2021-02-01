@@ -1,10 +1,8 @@
 package net.parkl.ocpp.service;
 
 import net.parkl.ocpp.entities.Connector;
-import net.parkl.ocpp.entities.ConnectorMeterValue;
 import net.parkl.ocpp.entities.OcppChargingProcess;
 import net.parkl.ocpp.entities.TransactionStart;
-import net.parkl.ocpp.repositories.ConnectorMeterValueRepository;
 import net.parkl.ocpp.repositories.ConnectorRepository;
 import net.parkl.ocpp.repositories.OcppChargingProcessRepository;
 import net.parkl.ocpp.repositories.TransactionStartRepository;
@@ -21,26 +19,24 @@ import java.util.UUID;
 
 
 @Service
-public class OcppProxyServiceImpl implements OcppProxyService {
-    private static final Logger LOGGER = LoggerFactory.getLogger(OcppProxyServiceImpl.class);
+@Transactional
+public class ChargingProcessService {
+    private static final Logger LOGGER = LoggerFactory.getLogger(ChargingProcessService.class);
 
     private final OcppChargingProcessRepository chargingProcessRepo;
 
     private final ConnectorRepository connectorRepo;
-    private final ConnectorMeterValueRepository connectorMeterValueRepo;
 
     private final AdvancedChargeBoxConfiguration specialConfig;
 
     private final TransactionStartRepository transactionStartRepository;
 
-    public OcppProxyServiceImpl(OcppChargingProcessRepository chargingProcessRepo,
-                                ConnectorRepository connectorRepo,
-                                ConnectorMeterValueRepository connectorMeterValueRepo,
-                                AdvancedChargeBoxConfiguration specialConfig,
-                                TransactionStartRepository transactionStartRepository) {
+    public ChargingProcessService(OcppChargingProcessRepository chargingProcessRepo,
+                                  ConnectorRepository connectorRepo,
+                                  AdvancedChargeBoxConfiguration specialConfig,
+                                  TransactionStartRepository transactionStartRepository) {
         this.chargingProcessRepo = chargingProcessRepo;
         this.connectorRepo = connectorRepo;
-        this.connectorMeterValueRepo = connectorMeterValueRepo;
         this.specialConfig = specialConfig;
         this.transactionStartRepository = transactionStartRepository;
     }
@@ -61,8 +57,6 @@ public class OcppProxyServiceImpl implements OcppProxyService {
         return chargingProcessRepo.findByConnectorAndEndDateIsNull(c);
     }
 
-    @Override
-    @Transactional
     public OcppChargingProcess createChargingProcess(String chargeBoxId,
                                                      int connectorId,
                                                      String idTag,
@@ -90,13 +84,10 @@ public class OcppProxyServiceImpl implements OcppProxyService {
         return chargingProcessRepo.save(p);
     }
 
-    @Override
     public OcppChargingProcess findOcppChargingProcess(String processId) {
         return chargingProcessRepo.findById(processId).orElse(null);
     }
 
-    @Override
-    @Transactional
     public OcppChargingProcess stopChargingProcess(String processId) {
         OcppChargingProcess cp = chargingProcessRepo.findById(processId).
                 orElseThrow(() -> new IllegalStateException("Invalid OcppChargingProcess id: " + processId));
@@ -109,15 +100,8 @@ public class OcppProxyServiceImpl implements OcppProxyService {
         return chargingProcessRepo.save(cp);
     }
 
-    @Override
-    public List<ConnectorMeterValue> getConnectorMeterValueByTransactionAndMeasurand(TransactionStart transaction,
-                                                                                     String measurand) {
-        return connectorMeterValueRepo.findByTransactionAndMeasurandAndPhaseIsNullOrderByValueTimestampDesc(transaction,
-                measurand);
-    }
 
-    @Override
-    @Transactional
+
     public OcppChargingProcess stopRequested(String processId) {
         OcppChargingProcess cp = chargingProcessRepo.findById(processId).
                 orElseThrow(() -> new IllegalStateException("Invalid OcppChargingProcess id: " + processId));
@@ -131,20 +115,7 @@ public class OcppProxyServiceImpl implements OcppProxyService {
         return chargingProcessRepo.save(cp);
     }
 
-    @Override
-    public ConnectorMeterValue getLastConnectorMeterValueByTransactionAndMeasurand(TransactionStart transaction,
-                                                                                   String measurand) {
-        List<ConnectorMeterValue> list =
-                connectorMeterValueRepo.findByTransactionAndMeasurandAndPhaseIsNullOrderByValueTimestampDesc(transaction,
-                        measurand);
-        if (list.isEmpty()) {
-            return null;
-        }
-        return list.get(0);
-    }
 
-    @Override
-    @Transactional
     public OcppChargingProcess stopRequestCancelled(String processId) {
         OcppChargingProcess cp = chargingProcessRepo.findById(processId).
                 orElseThrow(() -> new IllegalStateException("Invalid OcppChargingProcess id: " + processId));
@@ -153,17 +124,14 @@ public class OcppProxyServiceImpl implements OcppProxyService {
         return chargingProcessRepo.save(cp);
     }
 
-    @Override
     public List<OcppChargingProcess> getActiveProcessesByChargeBox(String chargeBoxId) {
         return chargingProcessRepo.findActiveByChargeBoxId(chargeBoxId);
     }
 
-    @Override
     public List<OcppChargingProcess> findOpenChargingProcessesWithoutTransaction() {
         return chargingProcessRepo.findAllByTransactionIsNullAndEndDateIsNull();
     }
 
-    @Override
     public OcppChargingProcess waitingForChargingProcessOnConnector(String chargeBoxId, int connectorId, int timeout) {
         Connector conn = connectorRepo.findByChargeBoxIdAndConnectorId(chargeBoxId, connectorId);
         if (conn == null) {
@@ -175,23 +143,19 @@ public class OcppProxyServiceImpl implements OcppProxyService {
         return waiter.waitFor(() -> chargingProcessRepo.findByConnectorAndTransactionIsNullAndEndDateIsNull(conn));
     }
 
-    @Override
     public boolean waitingForChargingProcessEnabled(String chargeBoxId) {
         return specialConfig.isWaitingForChargingProcessEnabled(chargeBoxId);
 
     }
 
-    @Override
     public List<OcppChargingProcess> findOpenChargingProcessesWithLimitKwh() {
         return chargingProcessRepo.findAllByTransactionIsNotNullAndLimitKwhIsNotNullAndEndDateIsNull();
     }
 
-    @Override
     public List<OcppChargingProcess> findOpenChargingProcessesWithLimitMinute() {
         return chargingProcessRepo.findAllByTransactionIsNotNullAndLimitMinuteIsNotNullAndEndDateIsNull();
     }
 
-    @Override
     public OcppChargingProcess findOpenProcessForRfidTag(String rfidTag, int connectorId, String chargeBoxId) {
         Connector connector = connectorRepo.findByChargeBoxIdAndConnectorId(chargeBoxId, connectorId);
         if (connector == null) {
@@ -200,10 +164,22 @@ public class OcppProxyServiceImpl implements OcppProxyService {
         return chargingProcessRepo.findByOcppTagAndConnectorAndEndDateIsNull(rfidTag, connector);
     }
 
-    @Override
     public OcppChargingProcess findByTransactionId(int transactionId) {
         TransactionStart transaction = transactionStartRepository
                 .findById(transactionId).orElseThrow(() -> new IllegalStateException("Invalid transaction id"));
         return chargingProcessRepo.findByTransaction(transaction);
     }
+
+    /*public OcppChargingProcess fetchChargingProcess(int connectorId, String chargeBoxId) {
+        if (proxyService.waitingForChargingProcessEnabled(params.getChargeBoxId())) {
+            OcppChargingProcess chargingProcess =
+                    proxyService.waitingForChargingProcessOnConnector(params.getChargeBoxId(),
+                            params.getConnectorId(),
+                            2000);
+            if (chargingProcess == null) {
+                log.error("Charging process not found without transaction: {}/{}", params.getChargeBoxId(), params.getConnectorId());
+                throw new IllegalStateException("Charging process not found without transaction: " + params.getConnectorId());
+            }
+        }
+    }*/
 }

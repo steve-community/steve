@@ -12,39 +12,11 @@ import de.rwth.idsg.steve.service.IChargePointService15_Client;
 import de.rwth.idsg.steve.service.IChargePointService16_Client;
 import de.rwth.idsg.steve.web.dto.Address;
 import de.rwth.idsg.steve.web.dto.ChargePointForm;
-import de.rwth.idsg.steve.web.dto.ocpp.ChangeAvailabilityParams;
-import de.rwth.idsg.steve.web.dto.ocpp.ChangeConfigurationParams;
-import de.rwth.idsg.steve.web.dto.ocpp.GetConfigurationParams;
-import de.rwth.idsg.steve.web.dto.ocpp.MultipleChargePointSelect;
-import de.rwth.idsg.steve.web.dto.ocpp.RemoteStartTransactionParams;
-import de.rwth.idsg.steve.web.dto.ocpp.RemoteStopTransactionParams;
-import de.rwth.idsg.steve.web.dto.ocpp.ResetParams;
-import de.rwth.idsg.steve.web.dto.ocpp.ResetType;
-import de.rwth.idsg.steve.web.dto.ocpp.SendLocalListParams;
-import de.rwth.idsg.steve.web.dto.ocpp.UnlockConnectorParams;
+import de.rwth.idsg.steve.web.dto.ocpp.*;
 import lombok.extern.slf4j.Slf4j;
-import net.parkl.ocpp.entities.Connector;
-import net.parkl.ocpp.entities.ConnectorMeterValue;
-import net.parkl.ocpp.entities.ConnectorStatus;
-import net.parkl.ocpp.entities.OcppChargeBox;
-import net.parkl.ocpp.entities.OcppChargingProcess;
-import net.parkl.ocpp.entities.Transaction;
-import net.parkl.ocpp.entities.TransactionStart;
+import net.parkl.ocpp.entities.*;
 import net.parkl.ocpp.module.esp.EmobilityServiceProvider;
-import net.parkl.ocpp.module.esp.model.ESPChargeBoxConfiguration;
-import net.parkl.ocpp.module.esp.model.ESPChargerState;
-import net.parkl.ocpp.module.esp.model.ESPChargerStatus;
-import net.parkl.ocpp.module.esp.model.ESPChargerStatusResult;
-import net.parkl.ocpp.module.esp.model.ESPChargingConsumptionRequest;
-import net.parkl.ocpp.module.esp.model.ESPChargingData;
-import net.parkl.ocpp.module.esp.model.ESPChargingResult;
-import net.parkl.ocpp.module.esp.model.ESPChargingStartRequest;
-import net.parkl.ocpp.module.esp.model.ESPChargingStartResult;
-import net.parkl.ocpp.module.esp.model.ESPChargingStatus;
-import net.parkl.ocpp.module.esp.model.ESPChargingStatusResult;
-import net.parkl.ocpp.module.esp.model.ESPChargingStopRequest;
-import net.parkl.ocpp.module.esp.model.ESPChargingUserStopRequest;
-import net.parkl.ocpp.module.esp.model.ESPRfidChargingStartRequest;
+import net.parkl.ocpp.module.esp.model.*;
 import net.parkl.ocpp.repositories.ConnectorRepository;
 import net.parkl.ocpp.repositories.ConnectorStatusRepository;
 import net.parkl.ocpp.repositories.OcppChargeBoxRepository;
@@ -69,17 +41,8 @@ import static de.rwth.idsg.steve.web.dto.ocpp.AvailabilityType.INOPERATIVE;
 import static de.rwth.idsg.steve.web.dto.ocpp.AvailabilityType.OPERATIVE;
 import static java.lang.Float.parseFloat;
 import static java.util.Collections.singletonList;
-import static net.parkl.ocpp.module.esp.ESPErrorCodes.ERROR_CODE_CHARGER_ERROR;
-import static net.parkl.ocpp.module.esp.ESPErrorCodes.ERROR_CODE_CHARGER_OCCUPIED;
-import static net.parkl.ocpp.module.esp.ESPErrorCodes.ERROR_CODE_CHARGER_OFFLINE;
-import static net.parkl.ocpp.module.esp.ESPErrorCodes.ERROR_CODE_CHARGING_ALREADY_STOPPED;
-import static net.parkl.ocpp.module.esp.ESPErrorCodes.ERROR_CODE_INVALID_CHARGER_ID;
-import static net.parkl.ocpp.module.esp.ESPErrorCodes.ERROR_CODE_INVALID_EXTERNAL_CHARGE_ID;
-import static net.parkl.ocpp.service.OcppConstants.MEASURAND_ENERGY_ACTIVE_IMPORT;
-import static net.parkl.ocpp.service.OcppConstants.MEASURAND_POWER_ACTIVE_IMPORT;
-import static net.parkl.ocpp.service.OcppConstants.REASON_LIMIT_EXCEEDED;
-import static net.parkl.ocpp.service.OcppConstants.REASON_VEHICLE_NOT_CONNECTED;
-import static net.parkl.ocpp.service.OcppConstants.UNIT_WH;
+import static net.parkl.ocpp.module.esp.ESPErrorCodes.*;
+import static net.parkl.ocpp.service.OcppConstants.*;
 import static ocpp.cp._2012._06.RemoteStartStopStatus.ACCEPTED;
 
 ;
@@ -118,7 +81,7 @@ public class OcppMiddlewareImpl implements OcppMiddleware {
     @Autowired
     private ChargePointService chargePointService;
     @Autowired
-    private OcppProxyService proxyService;
+    private ChargingProcessService proxyService;
     @Autowired
     private OcppIdTagService idTagService;
     @Autowired
@@ -129,6 +92,8 @@ public class OcppMiddlewareImpl implements OcppMiddleware {
     private EmobilityServiceProvider emobilityServiceProvider;
     @Autowired
     private OcppConsumptionHelper consumptionHelper;
+    @Autowired
+    private MeterValueService meterValueService;
     private OcppConsumptionListener consumptionListener;
     private OcppStopListener stopListener;
 
@@ -546,7 +511,7 @@ public class OcppMiddlewareImpl implements OcppMiddleware {
         if (transaction != null) {
             PowerValue pw = getPowerValue(ocppChargingProcess.getTransaction());
             ConnectorMeterValue activePower =
-                    proxyService.getLastConnectorMeterValueByTransactionAndMeasurand(ocppChargingProcess.getTransaction(),
+                    meterValueService.getLastConnectorMeterValueByTransactionAndMeasurand(ocppChargingProcess.getTransaction(),
                             MEASURAND_POWER_ACTIVE_IMPORT);
             if (activePower != null) {
                 ret.getStatus().setThroughputPower(OcppConsumptionHelper.getKwValue(parseFloat(activePower.getValue()),
@@ -562,7 +527,7 @@ public class OcppMiddlewareImpl implements OcppMiddleware {
 
     public PowerValue getPowerValue(TransactionStart transaction) {
         List<ConnectorMeterValue> connectorMeterValues =
-                proxyService.getConnectorMeterValueByTransactionAndMeasurand(transaction, MEASURAND_ENERGY_ACTIVE_IMPORT);
+                meterValueService.getConnectorMeterValueByTransactionAndMeasurand(transaction, MEASURAND_ENERGY_ACTIVE_IMPORT);
         float diff = 0;
         String diffUnit = null;
         if (!connectorMeterValues.isEmpty()) {
@@ -574,7 +539,7 @@ public class OcppMiddlewareImpl implements OcppMiddleware {
             }
         } else {
             //handle Mennekes type chargers (no measurand, no unit)
-            connectorMeterValues = proxyService.getConnectorMeterValueByTransactionAndMeasurand(transaction, null);
+            connectorMeterValues = meterValueService.getConnectorMeterValueByTransactionAndMeasurand(transaction, null);
             if (connectorMeterValues.size() > 1) {
                 diffUnit = connectorMeterValues.get(0).getUnit();
                 if (diffUnit == null) {

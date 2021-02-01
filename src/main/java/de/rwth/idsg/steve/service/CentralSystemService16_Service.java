@@ -26,8 +26,8 @@ import de.rwth.idsg.steve.repository.dto.UpdateTransactionParams;
 import lombok.extern.slf4j.Slf4j;
 import net.parkl.ocpp.entities.OcppChargingProcess;
 import net.parkl.ocpp.module.esp.model.ESPRfidChargingStartRequest;
+import net.parkl.ocpp.service.ChargingProcessService;
 import net.parkl.ocpp.service.OcppMiddleware;
-import net.parkl.ocpp.service.OcppProxyService;
 import net.parkl.ocpp.service.cs.*;
 import ocpp.cs._2015._10.*;
 import org.joda.time.DateTime;
@@ -65,7 +65,7 @@ public class CentralSystemService16_Service {
     @Autowired
     private ChargePointHelperService chargePointHelperService;
     @Autowired
-    private OcppProxyService proxyService;
+    private ChargingProcessService proxyService;
     @Autowired
     private OcppMiddleware proxyServerFacade;
 

@@ -303,45 +303,33 @@ public class TransactionServiceImpl implements TransactionService {
 
     @Override
     @Transactional
-    public void updateTransaction(UpdateTransactionParams params) {
-        Transaction transaction = transactionRepo.findById(params.getTransactionId())
-                .orElseThrow(() -> new IllegalArgumentException("Invalid transaction id: " + params.getTransactionId()));
-
-        boolean vehicleUnplugged = transaction.getStopValue() == null;
-        OcppChargingProcess savedProcess = null;
-        boolean chargingStopped = false;
+    public void updateTransaction(UpdateTransactionParams p) {
+        Transaction transaction = transactionRepo.findById(p.getTransactionId())
+                .orElseThrow(() -> new IllegalArgumentException("Invalid transaction id: " + p.getTransactionId()));
 
         try {
-            TransactionStop stop = TransactionFactory.createTransactionStop(params);
+            TransactionStop stop = TransactionFactory.createTransactionStop(p);
 
-            savedProcess = updateChargingProcess(stop, params);
-            if (savedProcess.getStopRequestDate() == null) {
-                chargingStopped = true;
+            OcppChargingProcess chargingProcess = updateChargingProcess(stop, p);
+            if (chargePointService.shouldInsertConnectorStatusAfterTransactionMsg(p.getChargeBoxId())) {
+                TransactionStart transactionStart =
+                        transactionStartRepo.findById(p.getTransactionId())
+                                .orElseThrow(() -> new IllegalArgumentException("Invalid transaction id: "
+                                        + p.getTransactionId()));
+
+                connectorService.createConnectorStatus(transactionStart.getConnector(), p.getStopTimestamp(), p.getStatusUpdate());
+            }
+
+            if (transaction.vehicleUnplugged() || chargingProcess.stoppedExternally()) {
+                if (chargingProcess.stoppedExternally()) {
+                    espNotificationService.notifyAboutChargingStopped(chargingProcess);
+                } else {
+                    espNotificationService.notifyAboutConsumptionUpdated(chargingProcess, transaction);
+                }
             }
         } catch (Exception e) {
             log.error("Transaction save failed", e);
-            transactionStopFailedRepo.save(TransactionFactory.createTransactionStopFailed(params, e));
-        }
-
-        if (chargePointService.shouldInsertConnectorStatusAfterTransactionMsg(params.getChargeBoxId())) {
-            TransactionStart transactionStart =
-                    transactionStartRepo.findById(params.getTransactionId())
-                            .orElseThrow(() -> new IllegalArgumentException("Invalid transaction id: "
-                                    + params.getTransactionId()));
-
-            connectorService.createConnectorStatus(transactionStart.getConnector(),
-                    params.getStopTimestamp(),
-                    params.getStatusUpdate());
-        }
-
-        //ESP notification
-        if (vehicleUnplugged || chargingStopped) {
-            if (chargingStopped) {
-                // if stop charging was not initiated by the ESP
-                espNotificationService.notifyAboutChargingStopped(savedProcess);
-            } else {
-                espNotificationService.notifyAboutConsumptionUpdated(savedProcess, transaction);
-            }
+            transactionStopFailedRepo.save(TransactionFactory.createTransactionStopFailed(p, e));
         }
     }
 

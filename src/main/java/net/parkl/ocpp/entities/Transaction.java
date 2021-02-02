@@ -60,4 +60,8 @@ public class Transaction {
 
     @Column(name = "stop_reason")
     private String stopReason;
+
+    public boolean vehicleUnplugged() {
+        return stopValue == null;
+    }
 }

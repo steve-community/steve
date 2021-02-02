@@ -55,4 +55,8 @@ public class OcppChargingProcess {
         startDate = new Date();
     }
 
+    public boolean stoppedExternally() {
+        return stopRequestDate == null;
+    }
+
 }

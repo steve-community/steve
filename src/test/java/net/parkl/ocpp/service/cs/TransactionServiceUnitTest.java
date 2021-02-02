@@ -37,8 +37,6 @@ public class TransactionServiceUnitTest {
     @Mock
     private ChargePointService chargePointService;
     @Mock
-    private ConnectorService connectorService;
-    @Mock
     private ESPNotificationService espNotificationService;
     @Mock
     private ChargingProcessService chargingProcessService;
@@ -102,6 +100,34 @@ public class TransactionServiceUnitTest {
         transactionService.updateTransaction(params);
         verify(espNotificationService, Mockito.times(1))
                 .notifyAboutConsumptionUpdated(chargingProcess, testTransaction);
+    }
+
+    @Test
+    public void updateTransactionStopFailed() {
+        int testTransactionId = 1;
+        Transaction testTransaction = mock(Transaction.class);
+
+        OcppChargingProcess chargingProcess = mock(OcppChargingProcess.class);
+
+        String testChargeBoxId = "testChargeBox";
+
+        UpdateTransactionParams params =
+                UpdateTransactionParams.builder()
+                        .chargeBoxId(testChargeBoxId)
+                        .transactionId(testTransactionId)
+                        .stopTimestamp(null)
+                        .stopMeterValue(String.valueOf(500))
+                        .stopReason(REASON_VEHICLE_NOT_CONNECTED)
+                        .eventTimestamp(DateTime.now())
+                        .eventActor(station)
+                        .build();
+
+        when(transactionRepository.findById(testTransactionId)).thenReturn(java.util.Optional.of(testTransaction));
+        when(chargingProcessService.findByTransactionId(testTransactionId)).thenReturn(chargingProcess);
+        when(chargePointService.shouldInsertConnectorStatusAfterTransactionMsg(testChargeBoxId)).thenReturn(true);
+
+        transactionService.updateTransaction(params);
+        verify(transactionStopFailedRepository, Mockito.times(1)).save(any());
     }
 
 }

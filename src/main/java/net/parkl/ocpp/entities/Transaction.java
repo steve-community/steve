@@ -18,7 +18,7 @@ import java.util.Date;
         "    FROM ocpp_transaction_stop s1\n" +
         "    WHERE s1.event_timestamp = (SELECT MAX(event_timestamp) FROM ocpp_transaction_stop s2 WHERE s1.transaction_pk = s2.transaction_pk)\n" +
         "    GROUP BY s1.transaction_pk, s1.event_timestamp) tx2\n" +
-        "  ON tx1.transaction_pk = tx2.transaction_pk\n")
+        "  ON tx1.transaction_pk = tx2.transaction_pk")
 @Getter
 public class Transaction {
     @Id

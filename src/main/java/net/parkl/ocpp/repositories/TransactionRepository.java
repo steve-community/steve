@@ -12,8 +12,7 @@ public interface TransactionRepository extends CrudRepository<Transaction, Integ
 	List<Integer> findActiveTransactionIds(String chargeBoxId);
 
 	long countByStopTimestampIsNull();
-	
-	
+
 	@Query("SELECT t.transactionPk FROM Transaction AS t WHERE t.connector.chargeBoxId=?1 AND t.connector.connectorId=?2 AND t.stopTimestamp IS NULL")
 	Integer findActiveTransactionId(String chargeBoxId,int connectorId);
 

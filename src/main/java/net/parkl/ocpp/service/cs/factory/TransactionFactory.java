@@ -1,10 +1,9 @@
 package net.parkl.ocpp.service.cs.factory;
 
 import com.google.common.base.Throwables;
+import de.rwth.idsg.steve.repository.dto.InsertTransactionParams;
 import de.rwth.idsg.steve.repository.dto.UpdateTransactionParams;
-import net.parkl.ocpp.entities.TransactionStop;
-import net.parkl.ocpp.entities.TransactionStopFailed;
-import net.parkl.ocpp.entities.TransactionStopId;
+import net.parkl.ocpp.entities.*;
 import org.joda.time.DateTime;
 
 public class TransactionFactory {
@@ -27,6 +26,20 @@ public class TransactionFactory {
         transactionStopId.setTransactionPk(transactionId);
         transactionStopId.setEventTimestamp(stop.toDate());
         return transactionStopId;
+    }
+
+    public static TransactionStart createTransactionStart(Connector connector, InsertTransactionParams params) {
+        TransactionStart start = new TransactionStart();
+        start.setConnector(connector);
+        start.setOcppTag(params.getIdTag());
+        if (params.getStartTimestamp() != null) {
+            start.setStartTimestamp(params.getStartTimestamp().toDate());
+        }
+        start.setStartValue(params.getStartMeterValue());
+        if (params.getEventTimestamp() != null) {
+            start.setEventTimestamp(params.getEventTimestamp().toDate());
+        }
+        return start;
     }
 
     private static void decorateTransactionStop(TransactionStop transactionStop, UpdateTransactionParams params) {

@@ -52,11 +52,9 @@ public class TransactionCriteriaRepository {
             cq = cq.orderBy(cb.desc(root.get("transactionPk")));
             TypedQuery<Transaction> q = entityManager.createQuery(cq);
             return q.getResultList();
-
         } finally {
             entityManager.close();
         }
-
     }
 
     private Predicate getTypePredicate(CriteriaBuilder cb, Root<Transaction> root, TransactionQueryForm form) {
@@ -64,25 +62,18 @@ public class TransactionCriteriaRepository {
 
         switch (form.getPeriodType()) {
             case TODAY:
-
                 return cb.between(root.get("startTimestamp"), net.parkl.stevep.util.CalendarUtils.getFirstMomentOfDay(now),
                         net.parkl.stevep.util.CalendarUtils.getLastMomentOfDay(now));
-
-
             case LAST_10:
             case LAST_30:
             case LAST_90:
                 return cb.between(root.get("startTimestamp"), net.parkl.stevep.util.CalendarUtils.createDaysBeforeNow(form.getPeriodType().getInterval()),
                         now);
-
             case ALL:
                 return null;
-
             case FROM_TO:
                 return cb.between(root.get("startTimestamp"), form.getFrom().toDate(),
                         form.getTo().toDate());
-
-
             default:
                 throw new SteveException("Unknown enum type: " + form.getPeriodType());
         }

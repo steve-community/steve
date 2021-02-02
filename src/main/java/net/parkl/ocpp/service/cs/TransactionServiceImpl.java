@@ -5,12 +5,12 @@ import de.rwth.idsg.steve.repository.dto.InsertTransactionParams;
 import de.rwth.idsg.steve.repository.dto.TransactionDetails;
 import de.rwth.idsg.steve.repository.dto.UpdateTransactionParams;
 import de.rwth.idsg.steve.web.dto.TransactionQueryForm;
+import de.rwth.idsg.steve.web.dto.TransactionQueryForm.QueryPeriodType;
 import lombok.extern.slf4j.Slf4j;
 import net.parkl.ocpp.entities.*;
 import net.parkl.ocpp.repositories.*;
 import net.parkl.ocpp.service.ChargingProcessService;
 import net.parkl.ocpp.service.ESPNotificationService;
-import net.parkl.ocpp.service.cs.factory.TransactionFactory;
 import net.parkl.ocpp.util.AsyncWaiter;
 import net.parkl.stevep.util.ListTransform;
 import org.joda.time.DateTime;
@@ -22,8 +22,11 @@ import org.springframework.transaction.annotation.Transactional;
 import java.io.Writer;
 import java.util.*;
 
+import static de.rwth.idsg.steve.web.dto.TransactionQueryForm.QueryType;
 import static net.parkl.ocpp.service.cs.converter.TransactionDtoConverter.toTransactionDto;
+import static net.parkl.ocpp.service.cs.factory.TransactionFactory.*;
 
+@SuppressWarnings("SpringJavaAutowiredFieldsWarningInspection")
 @Service
 @Slf4j
 public class TransactionServiceImpl implements TransactionService {
@@ -90,17 +93,12 @@ public class TransactionServiceImpl implements TransactionService {
 
     @Override
     public TransactionDetails getDetails(int transactionPk, boolean firstArrivingMeterValueIfMultiple) {
-        // -------------------------------------------------------------------------
-        // Step 1: Collect general data about transaction
-        // -------------------------------------------------------------------------
-
         TransactionQueryForm form = new TransactionQueryForm();
         form.setTransactionPk(transactionPk);
-        form.setType(TransactionQueryForm.QueryType.ALL);
-        form.setPeriodType(TransactionQueryForm.QueryPeriodType.ALL);
+        form.setType(QueryType.ALL);
+        form.setPeriodType(QueryPeriodType.ALL);
 
-        List<Transaction>
-                transactions = transactionCriteriaRepository.getInternal(form);
+        List<Transaction> transactions = transactionCriteriaRepository.getInternal(form);
 
         if (transactions == null || transactions.isEmpty()) {
             throw new SteveException("There is no transaction with id '%s'", transactionPk);
@@ -124,18 +122,12 @@ public class TransactionServiceImpl implements TransactionService {
             throw new IllegalStateException("Invalid charge box id: " + transaction.getConnector().getChargeBoxId());
         }
 
-        // -------------------------------------------------------------------------
-        // Step 2: Collect intermediate meter values
-        // -------------------------------------------------------------------------
-
-        TransactionStart nextTx = null;
+        TransactionStart nextTransaction = null;
 
         // Case 1: Ideal and most accurate case. Station sends meter values with transaction id set.
-        //
         List<ConnectorMeterValue> cmv1 = connectorMeterValueService.findByTransactionPk(transaction.getTransactionPk());
 
         // Case 2: Fall back to filtering according to time windows
-        //
         List<ConnectorMeterValue> cmv2;
         if (stopTimestamp == null && stopValue == null) {
             // https://github.com/RWTH-i5-IDSG/steve/issues/97
@@ -146,17 +138,25 @@ public class TransactionServiceImpl implements TransactionService {
             //
             // "what is the subsequent transaction at the same chargebox and connector?"
 
-            nextTx = transactionStartRepo.findNextTransactions(chargeBoxId, connectorId, startTimestamp,
+            nextTransaction = transactionStartRepo.findNextTransactions(chargeBoxId, connectorId, startTimestamp,
                     PageRequest.of(0, 1)).stream().findFirst().orElse(null);
-            if (nextTx == null) {
+            if (nextTransaction == null) {
                 // the last active transaction
-                cmv2 = connectorMeterValueService.findByChargeBoxIdAndConnectorIdAfter(chargeBoxId, connectorId, startTimestamp);
+                cmv2 = connectorMeterValueService.findByChargeBoxIdAndConnectorIdAfter(chargeBoxId,
+                        connectorId,
+                        startTimestamp);
             } else {
-                cmv2 = connectorMeterValueService.findByChargeBoxIdAndConnectorIdBetween(chargeBoxId, connectorId, startTimestamp, nextTx.getStartTimestamp());
+                cmv2 = connectorMeterValueService.findByChargeBoxIdAndConnectorIdBetween(chargeBoxId,
+                        connectorId,
+                        startTimestamp,
+                        nextTransaction.getStartTimestamp());
             }
         } else {
             // finished transaction
-            cmv2 = connectorMeterValueService.findByChargeBoxIdAndConnectorIdBetween(chargeBoxId, connectorId, startTimestamp, stopTimestamp);
+            cmv2 = connectorMeterValueService.findByChargeBoxIdAndConnectorIdBetween(chargeBoxId,
+                    connectorId,
+                    startTimestamp,
+                    stopTimestamp);
         }
 
 
@@ -203,7 +203,7 @@ public class TransactionServiceImpl implements TransactionService {
                     .build());
         }
 
-        return new TransactionDetails(toTransactionDto(transaction, box, tag), values, nextTx);
+        return new TransactionDetails(toTransactionDto(transaction, box, tag), values, nextTransaction);
     }
 
     @Override
@@ -241,9 +241,6 @@ public class TransactionServiceImpl implements TransactionService {
 
         ocppIdTagService.createTagWithoutActiveTransactionIfNotExists(params.getIdTag());
 
-        // -------------------------------------------------------------------------
-        // Step 2: Insert transaction if it does not exist already
-        // ---------------------------------------------------------------------------
         TransactionStart existing = transactionStartRepo.findByConnectorAndIdTagAndStartValues(
                 connector, params.getIdTag(),
                 params.getStartTimestamp() != null ? params.getStartTimestamp().toDate() : null,
@@ -254,51 +251,35 @@ public class TransactionServiceImpl implements TransactionService {
             return existing.getTransactionPk();
         }
 
-        TransactionStart t = new TransactionStart();
-        t.setConnector(connector);
-        t.setOcppTag(params.getIdTag());
-        if (params.getStartTimestamp() != null) {
-            t.setStartTimestamp(params.getStartTimestamp().toDate());
-        }
-        t.setStartValue(params.getStartMeterValue());
-        if (params.getEventTimestamp() != null) {
-            t.setEventTimestamp(params.getEventTimestamp().toDate());
-        }
+        TransactionStart transactionStart = transactionStartRepo.save(createTransactionStart(connector, params));
 
-        t = transactionStartRepo.save(t);
-
-        log.info("Transaction saved id={}, querying charing suitable process for connector: {}",
-                t.getTransactionPk(),
+        log.info("Transaction saved id={}, querying charging suitable process for connector: {}",
+                transactionStart.getTransactionPk(),
                 connector.getConnectorId());
-        OcppChargingProcess proc = chargingProcessService.fetchChargingProcess(params.getConnectorId(),
+        OcppChargingProcess chargingProcess = chargingProcessService.fetchChargingProcess(params.getConnectorId(),
                 params.getChargeBoxId(),
                 new AsyncWaiter<>(2000));
-        if (proc != null) {
-            log.info("Setting transaction on connector {} to process: {}...", connector.getConnectorId(), proc.getOcppChargingProcessId());
-            proc.setTransaction(t);
-            chargingProcessService.save(proc);
+        if (chargingProcess != null) {
+            log.info("Setting transaction on connector {} to process: {}...",
+                    connector.getConnectorId(),
+                    chargingProcess.getOcppChargingProcessId());
+            chargingProcess.setTransaction(transactionStart);
+            chargingProcessService.save(chargingProcess);
         } else {
             log.warn("No active charging process found without transaction for connector: {}", connector.getConnectorId());
         }
 
-        // -------------------------------------------------------------------------
-        // Step 3 for OCPP >= 1.5: A startTransaction may be related to a reservation
-        // -------------------------------------------------------------------------
         if (params.hasReservation()) {
-            reservationService.markReservationAsUsed(t, params.getReservationId(), params.getChargeBoxId());
+            reservationService.markReservationAsUsed(transactionStart, params.getReservationId(), params.getChargeBoxId());
         }
 
-        // -------------------------------------------------------------------------
-        // Step 4: Set connector status
-        // -------------------------------------------------------------------------
-
         if (chargePointService.shouldInsertConnectorStatusAfterTransactionMsg(params.getChargeBoxId())) {
-            connectorService.createConnectorStatus(t.getConnector(),
+            connectorService.createConnectorStatus(transactionStart.getConnector(),
                     params.getStartTimestamp(),
                     params.getStatusUpdate());
         }
 
-        return t.getTransactionPk();
+        return transactionStart.getTransactionPk();
     }
 
     @Override
@@ -308,7 +289,7 @@ public class TransactionServiceImpl implements TransactionService {
                 .orElseThrow(() -> new IllegalArgumentException("Invalid transaction id: " + p.getTransactionId()));
 
         try {
-            TransactionStop stop = TransactionFactory.createTransactionStop(p);
+            TransactionStop stop = createTransactionStop(p);
 
             OcppChargingProcess chargingProcess = updateChargingProcess(stop, p);
             if (chargePointService.shouldInsertConnectorStatusAfterTransactionMsg(p.getChargeBoxId())) {
@@ -329,7 +310,7 @@ public class TransactionServiceImpl implements TransactionService {
             }
         } catch (Exception e) {
             log.error("Transaction save failed", e);
-            transactionStopFailedRepo.save(TransactionFactory.createTransactionStopFailed(p, e));
+            transactionStopFailedRepo.save(createTransactionStopFailed(p, e));
         }
     }
 

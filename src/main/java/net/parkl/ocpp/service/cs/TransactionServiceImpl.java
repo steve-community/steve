@@ -1,6 +1,5 @@
 package net.parkl.ocpp.service.cs;
 
-import com.google.common.base.Throwables;
 import de.rwth.idsg.steve.SteveException;
 import de.rwth.idsg.steve.repository.dto.InsertTransactionParams;
 import de.rwth.idsg.steve.repository.dto.TransactionDetails;
@@ -11,6 +10,7 @@ import net.parkl.ocpp.entities.*;
 import net.parkl.ocpp.repositories.*;
 import net.parkl.ocpp.service.ChargingProcessService;
 import net.parkl.ocpp.service.ESPNotificationService;
+import net.parkl.ocpp.service.cs.factory.TransactionFactory;
 import net.parkl.ocpp.util.AsyncWaiter;
 import net.parkl.stevep.util.ListTransform;
 import org.joda.time.DateTime;
@@ -86,7 +86,6 @@ public class TransactionServiceImpl implements TransactionService {
         }
         return ret;
     }
-
 
 
     @Override
@@ -238,7 +237,7 @@ public class TransactionServiceImpl implements TransactionService {
         log.info("Starting transaction: chargeBoxId={},connectorId={},idTag={}...",
                 params.getChargeBoxId(), params.getConnectorId(), params.getIdTag());
         Connector connector = connectorService.createConnectorIfNotExists(params.getChargeBoxId(),
-                                                                          params.getConnectorId());
+                params.getConnectorId());
 
         ocppIdTagService.createTagWithoutActiveTransactionIfNotExists(params.getIdTag());
 
@@ -295,8 +294,8 @@ public class TransactionServiceImpl implements TransactionService {
 
         if (chargePointService.shouldInsertConnectorStatusAfterTransactionMsg(params.getChargeBoxId())) {
             connectorService.createConnectorStatus(t.getConnector(),
-                                                   params.getStartTimestamp(),
-                                                   params.getStatusUpdate());
+                    params.getStartTimestamp(),
+                    params.getStatusUpdate());
         }
 
         return t.getTransactionPk();
@@ -305,10 +304,6 @@ public class TransactionServiceImpl implements TransactionService {
     @Override
     @Transactional
     public void updateTransaction(UpdateTransactionParams params) {
-        // -------------------------------------------------------------------------
-        // Step 1: insert transaction stop data
-        // -------------------------------------------------------------------------
-
         Transaction transaction = transactionRepo.findById(params.getTransactionId())
                 .orElseThrow(() -> new IllegalArgumentException("Invalid transaction id: " + params.getTransactionId()));
 
@@ -317,78 +312,26 @@ public class TransactionServiceImpl implements TransactionService {
         boolean chargingStopped = false;
 
         try {
-            TransactionStop stop = new TransactionStop();
+            TransactionStop stop = TransactionFactory.createTransactionStop(params);
 
-            TransactionStopId id = new TransactionStopId();
-            id.setTransactionPk(params.getTransactionId());
-            id.setEventTimestamp(params.getEventTimestamp().toDate());
-            stop.setTransactionStopId(id);
-
-            stop.setEventActor(params.getEventActor());
-            if (params.getStopTimestamp() != null) {
-                stop.setStopTimestamp(params.getStopTimestamp().toDate());
-            }
-            stop.setStopValue(params.getStopMeterValue());
-            stop.setStopReason(params.getStopReason());
-
-            OcppChargingProcess process = chargingProcessService.findByTransactionId(params.getTransactionId());
-            stop.setTransaction(process.getTransaction());
-            transactionStopRepo.save(stop);
-
-            //update charging process
-
-            if (params.getStopTimestamp() != null) {
-                log.info("Transaction update: {} with end date: {}",
-                        params.getTransactionId(),
-                        params.getStopTimestamp());
-                log.info("Ending charging process on transaction update: {} with end date: {}",
-                        process.getOcppChargingProcessId(),
-                        params.getStopTimestamp());
-                process.setEndDate(params.getStopTimestamp().toDate());
-                if (process.getStopRequestDate() == null) {
-                    chargingStopped = true;
-                }
-                savedProcess = chargingProcessService.save(process);
+            savedProcess = updateChargingProcess(stop, params);
+            if (savedProcess.getStopRequestDate() == null) {
+                chargingStopped = true;
             }
         } catch (Exception e) {
             log.error("Transaction save failed", e);
-            try {
-                TransactionStopFailed fail = new TransactionStopFailed();
-
-                TransactionStopId id = new TransactionStopId();
-                id.setTransactionPk(params.getTransactionId());
-                id.setEventTimestamp(params.getEventTimestamp().toDate());
-                fail.setTransactionStopId(id);
-
-                fail.setEventActor(params.getEventActor());
-                if (params.getStopTimestamp() != null) {
-                    fail.setStopTimestamp(params.getStopTimestamp().toDate());
-                }
-                fail.setStopValue(params.getStopMeterValue());
-                fail.setStopReason(params.getStopReason());
-                fail.setFailReason(Throwables.getStackTraceAsString(e));
-
-                transactionStopFailedRepo.save(fail);
-            } catch (Exception ex) {
-                // This is where we give up and just log
-                log.error("Transaction stop failure save error", e);
-            }
+            transactionStopFailedRepo.save(TransactionFactory.createTransactionStopFailed(params, e));
         }
-
-        // -------------------------------------------------------------------------
-        // Step 2: Set connector status back. We do this even in cases where step 1
-        // fails. It probably and hopefully makes sense.
-        // -------------------------------------------------------------------------
 
         if (chargePointService.shouldInsertConnectorStatusAfterTransactionMsg(params.getChargeBoxId())) {
             TransactionStart transactionStart =
                     transactionStartRepo.findById(params.getTransactionId())
                             .orElseThrow(() -> new IllegalArgumentException("Invalid transaction id: "
-                                                                                    + params.getTransactionId()));
+                                    + params.getTransactionId()));
 
             connectorService.createConnectorStatus(transactionStart.getConnector(),
-                                                   params.getStopTimestamp(),
-                                                   params.getStatusUpdate());
+                    params.getStopTimestamp(),
+                    params.getStatusUpdate());
         }
 
         //ESP notification
@@ -400,5 +343,24 @@ public class TransactionServiceImpl implements TransactionService {
                 espNotificationService.notifyAboutConsumptionUpdated(savedProcess, transaction);
             }
         }
+    }
+
+    private OcppChargingProcess updateChargingProcess(TransactionStop stop, UpdateTransactionParams params) {
+        OcppChargingProcess process = chargingProcessService.findByTransactionId(params.getTransactionId());
+        stop.setTransaction(process.getTransaction());
+        transactionStopRepo.save(stop);
+
+        if (params.getStopTimestamp() != null) {
+            log.info("Transaction update: {} with end date: {}",
+                    params.getTransactionId(),
+                    params.getStopTimestamp());
+            log.info("Ending charging process on transaction update: {} with end date: {}",
+                    process.getOcppChargingProcessId(),
+                    params.getStopTimestamp());
+            process.setEndDate(params.getStopTimestamp().toDate());
+
+            return chargingProcessService.save(process);
+        }
+        return process;
     }
 }

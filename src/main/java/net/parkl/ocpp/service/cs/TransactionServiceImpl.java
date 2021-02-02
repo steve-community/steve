@@ -11,6 +11,7 @@ import net.parkl.ocpp.entities.*;
 import net.parkl.ocpp.repositories.*;
 import net.parkl.ocpp.service.ChargingProcessService;
 import net.parkl.ocpp.service.ESPNotificationService;
+import net.parkl.ocpp.util.AsyncWaiter;
 import net.parkl.stevep.util.ListTransform;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -272,7 +273,7 @@ public class TransactionServiceImpl implements TransactionService {
                 connector.getConnectorId());
         OcppChargingProcess proc = chargingProcessService.fetchChargingProcess(params.getConnectorId(),
                 params.getChargeBoxId(),
-                2000);
+                new AsyncWaiter<>(2000));
         if (proc != null) {
             log.info("Setting transaction on connector {} to process: {}...", connector.getConnectorId(), proc.getOcppChargingProcessId());
             proc.setTransaction(t);

@@ -29,17 +29,17 @@ public class ChargingProcessService {
 
     private final ConnectorRepository connectorRepo;
 
-    private final AdvancedChargeBoxConfiguration specialConfig;
+    private final AdvancedChargeBoxConfiguration advancedConfig;
 
     private final TransactionStartRepository transactionStartRepository;
 
     public ChargingProcessService(OcppChargingProcessRepository chargingProcessRepo,
                                   ConnectorRepository connectorRepo,
-                                  AdvancedChargeBoxConfiguration specialConfig,
+                                  AdvancedChargeBoxConfiguration advancedConfig,
                                   TransactionStartRepository transactionStartRepository) {
         this.chargingProcessRepo = chargingProcessRepo;
         this.connectorRepo = connectorRepo;
-        this.specialConfig = specialConfig;
+        this.advancedConfig = advancedConfig;
         this.transactionStartRepository = transactionStartRepository;
     }
 
@@ -160,12 +160,12 @@ public class ChargingProcessService {
         return chargingProcessRepo.save(process);
     }
 
-    public OcppChargingProcess fetchChargingProcess(int connectorId, String chargeBoxId, int timeout) {
-        if (specialConfig.waitingForChargingProcessEnabled(chargeBoxId)) {
+    public OcppChargingProcess fetchChargingProcess(int connectorId, String chargeBoxId, AsyncWaiter<OcppChargingProcess> waiter) {
+        if (advancedConfig.waitingForChargingProcessEnabled(chargeBoxId)) {
             OcppChargingProcess chargingProcess =
                     waitingForChargingProcessOnConnector(chargeBoxId,
                             connectorId,
-                            timeout);
+                            waiter);
             if (chargingProcess == null) {
                 log.error("Charging process not found without transaction: {}/{}", chargeBoxId, connectorId);
                 throw new IllegalStateException("Charging process not found without transaction: " + connectorId);
@@ -175,12 +175,11 @@ public class ChargingProcessService {
         return findOpenChargingProcessWithoutTransaction(chargeBoxId, connectorId);
     }
 
-    private OcppChargingProcess waitingForChargingProcessOnConnector(String chargeBoxId, int connectorId, int timeout) {
+    private OcppChargingProcess waitingForChargingProcessOnConnector(String chargeBoxId, int connectorId, AsyncWaiter<OcppChargingProcess> waiter) {
         Connector conn = connectorRepo.findByChargeBoxIdAndConnectorId(chargeBoxId, connectorId);
         if (conn == null) {
             throw new IllegalArgumentException("Connector not found: " + chargeBoxId + "/" + connectorId);
         }
-        AsyncWaiter<OcppChargingProcess> waiter = new AsyncWaiter<>(timeout);
         waiter.setDelayMs(0);
         waiter.setIntervalMs(200);
         return waiter.waitFor(() -> chargingProcessRepo.findByConnectorAndTransactionIsNullAndEndDateIsNull(conn));

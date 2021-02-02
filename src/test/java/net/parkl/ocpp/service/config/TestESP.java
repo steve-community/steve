@@ -1,4 +1,4 @@
-package net.parkl.ocpp.service;
+package net.parkl.ocpp.service.config;
 
 import lombok.extern.slf4j.Slf4j;
 import net.parkl.ocpp.module.esp.EmobilityServiceProvider;

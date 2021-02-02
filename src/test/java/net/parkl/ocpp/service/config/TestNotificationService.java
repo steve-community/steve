@@ -1,4 +1,4 @@
-package net.parkl.ocpp.service;
+package net.parkl.ocpp.service.config;
 
 import de.rwth.idsg.steve.service.NotificationService;
 import lombok.extern.slf4j.Slf4j;

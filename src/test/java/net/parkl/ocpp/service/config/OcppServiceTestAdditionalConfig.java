@@ -4,7 +4,6 @@ import de.rwth.idsg.steve.service.CentralSystemService16_Service;
 import de.rwth.idsg.steve.service.NotificationService;
 import de.rwth.idsg.steve.service.OcppTagService;
 import de.rwth.idsg.steve.service.OcppTagServiceImpl;
-import net.parkl.ocpp.service.TestNotificationService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 

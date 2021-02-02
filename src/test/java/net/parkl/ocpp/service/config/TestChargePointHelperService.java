@@ -1,4 +1,4 @@
-package net.parkl.ocpp.service;
+package net.parkl.ocpp.service.config;
 
 import de.rwth.idsg.steve.ocpp.OcppProtocol;
 import de.rwth.idsg.steve.ocpp.OcppVersion;
@@ -9,6 +9,7 @@ import de.rwth.idsg.steve.service.dto.UnidentifiedIncomingObject;
 import de.rwth.idsg.steve.utils.ConnectorStatusCountFilter;
 import de.rwth.idsg.steve.web.dto.OcppJsonStatus;
 import de.rwth.idsg.steve.web.dto.Statistics;
+import lombok.extern.slf4j.Slf4j;
 import net.parkl.ocpp.service.cs.ChargePointService;
 import net.parkl.ocpp.service.cs.GenericService;
 import ocpp.cs._2015._10.RegistrationStatus;
@@ -22,11 +23,18 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
+@Slf4j
 public class TestChargePointHelperService implements ChargePointHelperService {
-	 // SOAP-based charge points are stored in DB with an endpoint address
-    @Autowired private ChargePointService chargePointService;
-    @Autowired private GenericService genericService;
-    
+
+	private final ChargePointService chargePointService;
+	private final GenericService genericService;
+
+	@Autowired
+	public TestChargePointHelperService(ChargePointService chargePointService, GenericService genericService) {
+		this.chargePointService = chargePointService;
+		this.genericService = genericService;
+	}
+
 	@Override
 	public Optional<RegistrationStatus> getRegistrationStatus(String chargeBoxId) {
 		return Optional.empty();
@@ -44,8 +52,7 @@ public class TestChargePointHelperService implements ChargePointHelperService {
 
 	@Override
 	public List<OcppJsonStatus> getOcppJsonStatus() {
-		List<OcppJsonStatus> returnList = new ArrayList<>();
-		return returnList;
+		return new ArrayList<>();
 	}
 
 	@Override
@@ -59,37 +66,20 @@ public class TestChargePointHelperService implements ChargePointHelperService {
 				.collect(Collectors.toList()));
 	}
 
-	/*@Override
-	public List<ChargePointSelect> getChargePointsV12() {
-		 return getChargePoints(OcppProtocol.V_12_SOAP);
-	}
-
-	@Override
-	public List<ChargePointSelect> getChargePointsV15() {
-		return getChargePoints(OcppProtocol.V_15_SOAP);
-	}
-
-	@Override
-	public List<ChargePointSelect> getChargePointsV16() {
-		return getChargePoints(OcppProtocol.V_16_SOAP);
-	}*/
-
 	@Override
 	public List<UnidentifiedIncomingObject> getUnknownChargePoints() {
-		// TODO Auto-generated method stub
+		log.info("test getUnknownChargePoints called");
 		return null;
 	}
 
 	@Override
 	public void removeUnknown(String chargeBoxId) {
-		// TODO Auto-generated method stub
-		
+		log.info("test removeUnknown called with chargeBoxId: {}", chargeBoxId);
 	}
 
 	@Override
 	public void removeUnknown(List<String> chargeBoxIdList) {
-		// TODO Auto-generated method stub
-		
+		log.info("test removeUnknown called with chargeBoxIdList: {}", chargeBoxIdList);
 	}
  
 }

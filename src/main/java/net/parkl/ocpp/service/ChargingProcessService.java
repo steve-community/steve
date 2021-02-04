@@ -142,6 +142,17 @@ public class ChargingProcessService {
         return chargingProcessRepo.findAllByTransactionIsNotNullAndLimitMinuteIsNotNullAndEndDateIsNull();
     }
 
+    public OcppChargingProcess findByOcppTagAndConnectorAndEndDateIsNullAndTransactionIsNotNull (String rfidTag,
+                                                                                                 int connectorId,
+                                                                                                 String chargeBoxId) {
+
+        Connector connector = connectorRepo.findByChargeBoxIdAndConnectorId(chargeBoxId, connectorId);
+        if (connector == null) {
+            throw new IllegalStateException("Invalid charge box id/connector id: " + chargeBoxId + "/" + connectorId);
+        }
+        return chargingProcessRepo.findByOcppTagAndConnectorAndEndDateIsNullAndTransactionIsNotNull(rfidTag, connector);
+    }
+
     public OcppChargingProcess findOpenProcessForRfidTag(String rfidTag, int connectorId, String chargeBoxId) {
         Connector connector = connectorRepo.findByChargeBoxIdAndConnectorId(chargeBoxId, connectorId);
         if (connector == null) {

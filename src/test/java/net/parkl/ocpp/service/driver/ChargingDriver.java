@@ -2,19 +2,23 @@ package net.parkl.ocpp.service.driver;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import net.parkl.ocpp.module.esp.model.ESPChargingConsumptionRequest;
 import net.parkl.ocpp.module.esp.model.ESPChargingStartRequest;
 import net.parkl.ocpp.module.esp.model.ESPChargingUserStopRequest;
+import net.parkl.ocpp.service.ChargingProcessService;
 import net.parkl.ocpp.service.OcppConsumptionListener;
 import net.parkl.ocpp.service.OcppMiddleware;
 import net.parkl.ocpp.service.chargepoint.TestChargePoint;
 import net.parkl.ocpp.util.AsyncWaiter;
 
 @NoArgsConstructor
+@Slf4j
 public class ChargingDriver {
 
     private OcppMiddleware ocppMiddleware;
     private TestChargePoint testChargePoint;
+    private ChargingProcessService chargingProcessService;
 
     private final TestConsumptionListener testConsumptionListener = new TestConsumptionListener();
     private String chargeBoxId;
@@ -24,10 +28,13 @@ public class ChargingDriver {
     private int stopValue;
     private String rfidTag;
 
-    public static ChargingDriver createChargingDriver(OcppMiddleware ocppMiddleware, TestChargePoint testChargePoint) {
+    public static ChargingDriver createChargingDriver(OcppMiddleware ocppMiddleware,
+                                                      TestChargePoint testChargePoint,
+                                                      ChargingProcessService chargingProcessService) {
         ChargingDriver driver = new ChargingDriver();
         driver.testChargePoint = testChargePoint;
         driver.ocppMiddleware = ocppMiddleware;
+        driver.chargingProcessService = chargingProcessService;
         return driver;
     }
 
@@ -54,13 +61,13 @@ public class ChargingDriver {
                         .build());
     }
 
-    public ESPChargingConsumptionRequest waitForConsumption() {
-        return testConsumptionListener.listenForConsumption();
+    public void waitForChargingProcessStartedWithTransaction() {
+        new AsyncWaiter<>(5000).waitFor(() ->
+                chargingProcessService.findByOcppTagAndConnectorAndEndDateIsNullAndTransactionIsNotNull(rfidTag, connectorId, chargeBoxId));
     }
 
-    //TODO wait for transaction (using transaction service)
-    public void awaitForTransaction() {
-
+    public ESPChargingConsumptionRequest waitForConsumption() {
+        return testConsumptionListener.listenForConsumption();
     }
 
     @Getter
@@ -73,7 +80,7 @@ public class ChargingDriver {
         }
 
         private ESPChargingConsumptionRequest listenForConsumption() {
-            new AsyncWaiter<>(5000).waitFor(() -> this.lastConsumption);
+            new AsyncWaiter<>(10000).waitFor(() -> this.lastConsumption);
             return lastConsumption;
         }
 

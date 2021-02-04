@@ -38,6 +38,7 @@ import ocpp.cs._2015._10.*;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
@@ -70,7 +71,7 @@ public class CentralSystemService16_Service {
     @Autowired
     private ChargePointHelperService chargePointHelperService;
     @Autowired
-    private ChargingProcessService proxyService;
+    private ChargingProcessService chargingProcessService;
     @Autowired
     private OcppMiddleware proxyServerFacade;
 
@@ -165,6 +166,7 @@ public class CentralSystemService16_Service {
         return new DiagnosticsStatusNotificationResponse();
     }
 
+    @Transactional
     public StartTransactionResponse startTransaction(StartTransactionRequest parameters, String chargeBoxIdentity) {
         InsertTransactionParams params =
                 InsertTransactionParams.builder()
@@ -179,12 +181,12 @@ public class CentralSystemService16_Service {
 
         Integer transactionId;
 
-        if (proxyService
+        if (chargingProcessService
                 .findOpenProcessForRfidTag(parameters.getIdTag(), parameters.getConnectorId(), chargeBoxIdentity) == null) {
             log.info("No running ocpp charging process found for RFID tag: {} on charger: {}/{}",
                     parameters.getIdTag(), chargeBoxIdentity, parameters.getConnectorId());
 
-            proxyService.createChargingProcess(chargeBoxIdentity,
+            chargingProcessService.createChargingProcess(chargeBoxIdentity,
                     parameters.getConnectorId(),
                     parameters.getIdTag(),
                     null,
@@ -197,7 +199,7 @@ public class CentralSystemService16_Service {
             startRequest.setRfidTag(parameters.getIdTag());
             startRequest.setConnectorId(parameters.getConnectorId());
             startRequest.setChargeBoxId(chargeBoxIdentity);
-            OcppChargingProcess ocppChargingProcess = proxyService.findByTransactionId(transactionId);
+            OcppChargingProcess ocppChargingProcess = chargingProcessService.findByTransactionId(transactionId);
             if (ocppChargingProcess != null) {
                 startRequest.setExternalChargingProcessId(ocppChargingProcess.getOcppChargingProcessId());
             }

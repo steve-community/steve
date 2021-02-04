@@ -2,7 +2,6 @@ package net.parkl.ocpp.repositories;
 
 import net.parkl.ocpp.entities.Connector;
 import net.parkl.ocpp.entities.OcppChargingProcess;
-import net.parkl.ocpp.entities.Transaction;
 import net.parkl.ocpp.entities.TransactionStart;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.Query;
@@ -30,6 +29,8 @@ public interface OcppChargingProcessRepository extends CrudRepository<OcppChargi
 	List<OcppChargingProcess> findAllByTransactionIsNotNullAndLimitMinuteIsNotNullAndEndDateIsNull();
 
 	OcppChargingProcess findByOcppTagAndConnectorAndEndDateIsNull(String rfidTag, Connector connector);
+
+	OcppChargingProcess findByOcppTagAndConnectorAndEndDateIsNullAndTransactionIsNotNull(String rfidTag, Connector connector);
 
 	@Query("SELECT OBJECT(p) FROM OcppChargingProcess AS p WHERE p.transaction.transactionPk=?1")
     OcppChargingProcess findByTransactionId(int transactionId);

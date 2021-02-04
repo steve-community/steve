@@ -9,7 +9,6 @@ import org.junit.Before;
 import org.junit.Test;
 
 import static de.rwth.idsg.steve.ocpp.OcppProtocol.V_16_SOAP;
-import static java.lang.Thread.sleep;
 import static net.parkl.ocpp.service.config.AdvancedChargeBoxConfigKeys.KEY_TRANSACTION_PARTIAL_ENABLED;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -27,7 +26,7 @@ public class OcppConsumptionDriverTest extends DriverTestBase {
     }
 
     @Test
-    public void testConsumptionUpdate() throws InterruptedException {
+    public void testConsumptionUpdate()  {
         advancedChargeBoxConfigDriver.deleteByKey(KEY_TRANSACTION_PARTIAL_ENABLED);
 
         chargeBoxDriver.withName("test1")
@@ -43,7 +42,7 @@ public class OcppConsumptionDriverTest extends DriverTestBase {
                         .withRfid("TAG_1")
                         .start();
 
-        sleep(500);
+        chargingDriver.waitForChargingProcessStartedWithTransaction();
 
         chargingDriver.withStopValue(1100).stop(chargingProcessId);
 
@@ -61,7 +60,7 @@ public class OcppConsumptionDriverTest extends DriverTestBase {
                         .withRfid("TAG_2")
                         .start();
 
-        sleep(500);
+        chargingDriver.waitForChargingProcessStartedWithTransaction();
 
         chargingDriver.withStopValue(2300).stop(chargingProcess2Id);
 
@@ -93,7 +92,8 @@ public class OcppConsumptionDriverTest extends DriverTestBase {
                         .withRfid("TAG_3")
                         .start();
 
-        sleep(500);
+        chargingDriver.waitForChargingProcessStartedWithTransaction();
+
         chargingDriver.withStopValue(1100).stop(chargingProcessId);
 
         ESPChargingConsumptionRequest consumption = chargingDriver.waitForConsumption();
@@ -110,7 +110,8 @@ public class OcppConsumptionDriverTest extends DriverTestBase {
                         .withRfid("TAG_4")
                         .start();
 
-        sleep(500);
+        chargingDriver.waitForChargingProcessStartedWithTransaction();
+
         chargingDriver.withStopValue(2300).stop(chargingProcess2Id);
 
         consumption = chargingDriver.waitForConsumption();

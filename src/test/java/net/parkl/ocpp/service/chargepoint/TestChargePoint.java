@@ -12,6 +12,8 @@ import de.rwth.idsg.steve.web.dto.ocpp.SendLocalListParams;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import net.parkl.ocpp.service.ChargingProcessService;
+import net.parkl.ocpp.util.AsyncWaiter;
 import ocpp.cp._2015._10.GetLocalListVersionResponse;
 import ocpp.cp._2015._10.RemoteStartStopStatus;
 import ocpp.cp._2015._10.RemoteStartTransactionResponse;
@@ -39,6 +41,9 @@ public class TestChargePoint implements ChargePointService16_Invoker {
 
     @Autowired
     private TaskExecutor taskExecutor;
+
+    @Autowired
+    private ChargingProcessService chargingProcessService;
 
     private String lastIdTag;
 
@@ -133,26 +138,27 @@ public class TestChargePoint implements ChargePointService16_Invoker {
 
     @Override
     public void remoteStartTransaction(ChargePointSelect cp, RemoteStartTransactionTask task) {
-        task.getOcpp16Handler(cp.getChargeBoxId()).handleResponse(
+        //sending remote start transaction request to charger, then it replies with accepted state
+        String chargeBoxId = cp.getChargeBoxId();
+        task.getOcpp16Handler(chargeBoxId).handleResponse(
                 new ResponseWrapper<>(createRemoteStartTransactionResponse(task.getParams())));
 
+        String idTag = task.getParams().getIdTag();
+        Integer connectorId = task.getParams().getConnectorId();
+
         taskExecutor.execute(() -> {
-            try {
-                Thread.sleep(300);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            waitForChargingProcessCreated(idTag, connectorId, chargeBoxId);
 
             StartTransactionRequest req = new StartTransactionRequest();
-            req.setConnectorId(task.getParams().getConnectorId());
-            req.setIdTag(task.getParams().getIdTag());
+            req.setConnectorId(connectorId);
+            req.setIdTag(idTag);
             req.setMeterStart(consumptionStart);
             req.setTimestamp(DateTime.now());
 
-            centralSystemService16_service.startTransaction(req, cp.getChargeBoxId());
+            centralSystemService16_service.startTransaction(req, chargeBoxId);
         });
 
-        lastIdTag = task.getParams().getIdTag();
+        lastIdTag = idTag;
     }
 
     @Override
@@ -161,17 +167,15 @@ public class TestChargePoint implements ChargePointService16_Invoker {
                 new ResponseWrapper<>(createRemoteStopTransactionResponse(task.getParams())));
 
         taskExecutor.execute(() -> {
-            try {
-                Thread.sleep(300);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            Integer transactionId = task.getParams().getTransactionId();
+
+            waitForChargingProcessStopped(transactionId);
 
             StopTransactionRequest req = new StopTransactionRequest();
             req.setTimestamp(DateTime.now());
             req.setMeterStop(consumptionStop);
             req.setReason(Reason.LOCAL);
-            req.setTransactionId(task.getParams().getTransactionId());
+            req.setTransactionId(transactionId);
             req.setIdTag(lastIdTag);
             centralSystemService16_service.stopTransaction(req, cp.getChargeBoxId());
         });
@@ -187,6 +191,16 @@ public class TestChargePoint implements ChargePointService16_Invoker {
         RemoteStopTransactionResponse resp = new RemoteStopTransactionResponse();
         resp.setStatus(RemoteStartStopStatus.ACCEPTED);
         return resp;
+    }
+
+    public void waitForChargingProcessCreated(String idTag, Integer connectorId, String chargeBoxId) {
+        new AsyncWaiter<>(5000).waitFor(() ->
+                chargingProcessService.findOpenProcessForRfidTag(idTag, connectorId, chargeBoxId));
+    }
+
+    public void waitForChargingProcessStopped(int transactionId) {
+        new AsyncWaiter<>(5000).waitFor(() ->
+                chargingProcessService.findByTransactionId(transactionId).getStopRequestDate());
     }
 
 

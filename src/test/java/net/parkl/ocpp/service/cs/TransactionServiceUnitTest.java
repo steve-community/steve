@@ -13,7 +13,6 @@ import net.parkl.ocpp.repositories.TransactionStopRepository;
 import net.parkl.ocpp.service.ChargingProcessService;
 import net.parkl.ocpp.service.ESPNotificationService;
 import net.parkl.ocpp.util.AsyncWaiter;
-import org.assertj.core.api.Assertions;
 import org.joda.time.DateTime;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -25,7 +24,13 @@ import org.mockito.junit.MockitoJUnitRunner;
 import static net.parkl.ocpp.entities.TransactionStopEventActor.station;
 import static net.parkl.ocpp.service.OcppConstants.REASON_VEHICLE_CHARGED;
 import static net.parkl.ocpp.service.OcppConstants.REASON_VEHICLE_NOT_CONNECTED;
-import static org.mockito.Mockito.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.anyInt;
+import static org.mockito.Mockito.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class TransactionServiceUnitTest {
@@ -86,8 +91,10 @@ public class TransactionServiceUnitTest {
     public void updateTransactionNotifyAboutConsumption() {
         int testTransactionId = 1;
         Transaction testTransaction = mock(Transaction.class);
+        TransactionStart testTransactionStart = mock(TransactionStart.class);
 
         OcppChargingProcess chargingProcess = mock(OcppChargingProcess.class);
+
 
         String testChargeBoxId = "testChargeBox";
 
@@ -104,13 +111,15 @@ public class TransactionServiceUnitTest {
 
         when(transactionRepository.findById(testTransactionId)).thenReturn(java.util.Optional.of(testTransaction));
         when(chargingProcessService.findByTransactionId(testTransactionId)).thenReturn(chargingProcess);
+        when(chargingProcess.getTransactionStart()).thenReturn(testTransactionStart);
+        when(testTransactionStart.getStartValue()).thenReturn("0");
         when(chargePointService.shouldInsertConnectorStatusAfterTransactionMsg(testChargeBoxId)).thenReturn(false);
         when(testTransaction.vehicleUnplugged()).thenReturn(true);
         when(chargingProcess.stoppedExternally()).thenReturn(false);
 
         transactionService.updateTransaction(params);
         verify(espNotificationService, Mockito.times(1))
-                .notifyAboutConsumptionUpdated(chargingProcess, testTransaction);
+                .notifyAboutConsumptionUpdated(chargingProcess, "0", params.getStopMeterValue());
     }
 
     @Test
@@ -170,7 +179,7 @@ public class TransactionServiceUnitTest {
                 params.getStartMeterValue()))
                 .thenReturn(existing);
 
-        Assertions.assertThat(transactionService.insertTransaction(params)).isEqualTo(testTransactionPk);
+        assertThat(transactionService.insertTransaction(params)).isEqualTo(testTransactionPk);
     }
 
     @Test
@@ -199,7 +208,7 @@ public class TransactionServiceUnitTest {
 
         when(transactionStartRepository.save(any())).thenReturn(transactionStart);
 
-        Assertions.assertThat(transactionService.insertTransaction(params)).isEqualTo(testTransactionPk);
+        assertThat(transactionService.insertTransaction(params)).isEqualTo(testTransactionPk);
     }
 
     @Test
@@ -234,6 +243,6 @@ public class TransactionServiceUnitTest {
                 any(AsyncWaiter.class)))
                 .thenReturn(testChargingProcess);
 
-        Assertions.assertThat(transactionService.insertTransaction(params)).isEqualTo(testChargingProcess.getTransaction().getTransactionPk());
+        assertThat(transactionService.insertTransaction(params)).isEqualTo(testChargingProcess.getTransactionStart().getTransactionPk());
     }
 }

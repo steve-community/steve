@@ -3,7 +3,16 @@ package net.parkl.ocpp.entities;
 import lombok.Getter;
 import lombok.Setter;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.PrePersist;
+import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 import java.util.Date;
 
 @Entity
@@ -36,7 +45,7 @@ public class OcppChargingProcess {
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "transaction_pk", nullable = true)
-    private TransactionStart transaction;
+    private TransactionStart transactionStart;
 
     @Column(name = "id_tag", length = 255, nullable = true)
     private String ocppTag;

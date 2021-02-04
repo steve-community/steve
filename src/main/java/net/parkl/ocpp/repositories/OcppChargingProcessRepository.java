@@ -11,28 +11,28 @@ import java.util.List;
 
 public interface OcppChargingProcessRepository extends CrudRepository<OcppChargingProcess, String>{
 
-	OcppChargingProcess findByConnectorAndTransactionIsNullAndEndDateIsNull(Connector c);
+	OcppChargingProcess findByConnectorAndTransactionStartIsNullAndEndDateIsNull(Connector c);
 
-	OcppChargingProcess findByTransaction(TransactionStart t);
+	OcppChargingProcess findByTransactionStart(TransactionStart t);
 
-	@Query("SELECT OBJECT(p) FROM OcppChargingProcess AS p WHERE p.connector.chargeBoxId=?1 AND p.transaction IS NOT NULL AND p.endDate IS NULL")
+	@Query("SELECT OBJECT(p) FROM OcppChargingProcess AS p WHERE p.connector.chargeBoxId=?1 AND p.transactionStart IS NOT NULL AND p.endDate IS NULL")
 	List<OcppChargingProcess> findActiveByChargeBoxId(String chargeBoxId);
 
 	OcppChargingProcess findByConnectorAndEndDateIsNull(Connector c);
 
-	List<OcppChargingProcess> findAllByTransactionIsNullAndEndDateIsNull();
+	List<OcppChargingProcess> findAllByTransactionStartIsNullAndEndDateIsNull();
 
 	@EntityGraph(attributePaths = {"transaction"})
-	List<OcppChargingProcess> findAllByTransactionIsNotNullAndLimitKwhIsNotNullAndEndDateIsNull();
+	List<OcppChargingProcess> findAllByTransactionStartIsNotNullAndLimitKwhIsNotNullAndEndDateIsNull();
 
 	@EntityGraph(attributePaths = {"transaction"})
-	List<OcppChargingProcess> findAllByTransactionIsNotNullAndLimitMinuteIsNotNullAndEndDateIsNull();
+	List<OcppChargingProcess> findAllByTransactionStartIsNotNullAndLimitMinuteIsNotNullAndEndDateIsNull();
 
 	OcppChargingProcess findByOcppTagAndConnectorAndEndDateIsNull(String rfidTag, Connector connector);
 
-	OcppChargingProcess findByOcppTagAndConnectorAndEndDateIsNullAndTransactionIsNotNull(String rfidTag, Connector connector);
+	OcppChargingProcess findByOcppTagAndConnectorAndEndDateIsNullAndTransactionStartIsNotNull(String rfidTag, Connector connector);
 
-	@Query("SELECT OBJECT(p) FROM OcppChargingProcess AS p WHERE p.transaction.transactionPk=?1")
+	@Query("SELECT OBJECT(p) FROM OcppChargingProcess AS p WHERE p.transactionStart.transactionPk=?1")
     OcppChargingProcess findByTransactionId(int transactionId);
 
 

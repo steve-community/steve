@@ -13,7 +13,9 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ChargingProcessServiceUnitTest {
@@ -44,7 +46,7 @@ public class ChargingProcessServiceUnitTest {
         chargingProcessService.fetchChargingProcess(connectorId, chargeBoxId, waiter);
 
         verify(connectorRepo, Mockito.times(1)).findByChargeBoxIdAndConnectorId(chargeBoxId, connectorId);
-        verify(chargingProcessRepo, Mockito.times(1)).findByConnectorAndTransactionIsNullAndEndDateIsNull(testConnector);
+        verify(chargingProcessRepo, Mockito.times(1)).findByConnectorAndTransactionStartIsNullAndEndDateIsNull(testConnector);
         verify(waiter, Mockito.never()).waitFor(Mockito.any());
     }
 
@@ -66,7 +68,7 @@ public class ChargingProcessServiceUnitTest {
         chargingProcessService.fetchChargingProcess(connectorId, chargeBoxId, waiter);
 
         verify(connectorRepo, Mockito.times(1)).findByChargeBoxIdAndConnectorId(chargeBoxId, connectorId);
-        verify(chargingProcessRepo, Mockito.times(1)).findByConnectorAndTransactionIsNullAndEndDateIsNull(testConnector);
+        verify(chargingProcessRepo, Mockito.times(1)).findByConnectorAndTransactionStartIsNullAndEndDateIsNull(testConnector);
     }
 
     @Test

@@ -30,9 +30,9 @@ public class OcppChargingLimitWatcher {
 
         List<OcppChargingProcess> kwhLimitProcesses = proxyService.findOpenChargingProcessesWithLimitKwh();
         for (OcppChargingProcess cp : kwhLimitProcesses) {
-            if (cp.getTransaction() != null) {
+            if (cp.getTransactionStart() != null) {
                 log.info("Checking charging process with kwh limit: {}...", cp.getOcppChargingProcessId());
-                PowerValue pw = facade.getPowerValue(cp.getTransaction());
+                PowerValue pw = facade.getPowerValue(cp.getTransactionStart());
                 float kWh = OcppConsumptionHelper.getKwhValue(pw.getValue(), pw.getUnit());
                 if (kWh >= cp.getLimitKwh()) {
                     log.info("Limit {} exceeded ({}) for charging process, stopping: {}...", cp.getLimitKwh(), kWh, cp.getOcppChargingProcessId());
@@ -44,13 +44,13 @@ public class OcppChargingLimitWatcher {
 
         List<OcppChargingProcess> minuteLimitProcesses = proxyService.findOpenChargingProcessesWithLimitMinute();
         for (OcppChargingProcess cp : minuteLimitProcesses) {
-            if (cp.getTransaction() != null) {
+            if (cp.getTransactionStart() != null) {
                 log.info("Checking charging process with minute limit: {}...", cp.getOcppChargingProcessId());
                 int duration = Duration.between(cp.getStartDate().toInstant(), new Date().toInstant()).toMinutesPart();
                 if (duration >= cp.getLimitMinute()) {
                     log.info("Limit {} exceeded ({}) for charging process, stopping: {}...", cp.getLimitMinute(), duration, cp.getOcppChargingProcessId());
 
-                    PowerValue pw = facade.getPowerValue(cp.getTransaction());
+                    PowerValue pw = facade.getPowerValue(cp.getTransactionStart());
                     float kWh = OcppConsumptionHelper.getKwhValue(pw.getValue(), pw.getUnit());
 
                     taskExecutor.execute(() -> facade.stopChargingWithLimit(cp.getOcppChargingProcessId(), kWh));

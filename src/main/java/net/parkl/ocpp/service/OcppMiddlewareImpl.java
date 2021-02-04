@@ -303,11 +303,11 @@ public class OcppMiddlewareImpl implements OcppMiddleware {
 
         }
 
-        if (ocppChargingProcess.getTransaction() != null) {
+        if (ocppChargingProcess.getTransactionStart() != null) {
             Transaction transaction = transactionService
-                    .findTransaction(ocppChargingProcess.getTransaction().getTransactionPk())
+                    .findTransaction(ocppChargingProcess.getTransactionStart().getTransactionPk())
                     .orElseThrow(() -> new IllegalStateException("Invalid transaction id: " +
-                            ocppChargingProcess.getTransaction().getTransactionPk()));
+                            ocppChargingProcess.getTransactionStart().getTransactionPk()));
 
             if (transaction.getStopTimestamp() != null) {
                 log.info("Charging already stopped: {}", ocppChargingProcessId);
@@ -324,19 +324,19 @@ public class OcppMiddlewareImpl implements OcppMiddleware {
 
         ChargePointSelect chargePointSelect = null;
         OcppChargeBox chargeBox = null;
-        if (ocppChargingProcess.getTransaction() != null) {
+        if (ocppChargingProcess.getTransactionStart() != null) {
             chargeBox = chargeBoxRepo
-                    .findByChargeBoxId(ocppChargingProcess.getTransaction().getConnector().getChargeBoxId());
+                    .findByChargeBoxId(ocppChargingProcess.getTransactionStart().getConnector().getChargeBoxId());
             if (chargeBox == null) {
                 log.error("Invalid charge box id: {}",
-                        ocppChargingProcess.getTransaction().getConnector().getChargeBoxId());
+                        ocppChargingProcess.getTransactionStart().getConnector().getChargeBoxId());
                 return ESPChargingResult.builder().errorCode(ERROR_CODE_INVALID_CHARGER_ID).build();
             }
 
             chargePointSelect = getChargePoint(chargeBox.getChargeBoxId(), chargeBox.getOcppProtocol());
             if (chargePointSelect == null) {
                 log.error("Invalid charge point id: {}",
-                        ocppChargingProcess.getTransaction().getConnector().getChargeBoxId());
+                        ocppChargingProcess.getTransactionStart().getConnector().getChargeBoxId());
                 return ESPChargingResult.builder().errorCode(ERROR_CODE_CHARGER_ERROR).build();
             }
         }
@@ -345,17 +345,17 @@ public class OcppMiddlewareImpl implements OcppMiddleware {
         OcppChargingProcess chargingProcess = chargingProcessService.stopRequested(ocppChargingProcess.getOcppChargingProcessId());
 
 
-        if (chargingProcess.getTransaction() != null) {
-            log.info("Stopping charging transaction: {}...", chargingProcess.getTransaction().getTransactionPk());
+        if (chargingProcess.getTransactionStart() != null) {
+            log.info("Stopping charging transaction: {}...", chargingProcess.getTransactionStart().getTransactionPk());
 
             RemoteStopTransactionParams params = new RemoteStopTransactionParams();
             params.setChargePointSelectList(singletonList(chargePointSelect));
-            params.setTransactionId(chargingProcess.getTransaction().getTransactionPk());
+            params.setTransactionId(chargingProcess.getTransactionStart().getTransactionPk());
             int taskId = sendRemoteStopTransaction(params, chargeBox != null ? chargeBox.getOcppProtocol() : null);
 
-            RequestResult result = waitForResult(chargingProcess.getTransaction().getConnector().getChargeBoxId(), taskId);
+            RequestResult result = waitForResult(chargingProcess.getTransactionStart().getConnector().getChargeBoxId(), taskId);
 
-            return processRemoteStopResult(ocppChargingProcessId, chargingProcess.getTransaction().getTransactionPk(), result);
+            return processRemoteStopResult(ocppChargingProcessId, chargingProcess.getTransactionStart().getTransactionPk(), result);
 
 
         } else {
@@ -530,11 +530,11 @@ public class OcppMiddlewareImpl implements OcppMiddleware {
         }
 
         Transaction transaction = null;
-        if (ocppChargingProcess.getTransaction() != null) {
+        if (ocppChargingProcess.getTransactionStart() != null) {
             transaction = transactionService
-                    .findTransaction(ocppChargingProcess.getTransaction().getTransactionPk())
+                    .findTransaction(ocppChargingProcess.getTransactionStart().getTransactionPk())
                     .orElseThrow(() -> new IllegalStateException("Invalid transaction id: " +
-                            ocppChargingProcess.getTransaction().getTransactionPk()));
+                            ocppChargingProcess.getTransactionStart().getTransactionPk()));
 
             if (transaction.getStopTimestamp() != null) {
                 log.info("Charging already stopped: {}", externalChargeId);
@@ -549,9 +549,9 @@ public class OcppMiddlewareImpl implements OcppMiddleware {
 
         ret.getChargingData().setStart(ocppChargingProcess.getStartDate());
         if (transaction != null) {
-            PowerValue pw = getPowerValue(ocppChargingProcess.getTransaction());
+            PowerValue pw = getPowerValue(ocppChargingProcess.getTransactionStart());
             ConnectorMeterValue activePower =
-                    connectorMeterValueService.getLastConnectorMeterValueByTransactionAndMeasurand(ocppChargingProcess.getTransaction(),
+                    connectorMeterValueService.getLastConnectorMeterValueByTransactionAndMeasurand(ocppChargingProcess.getTransactionStart(),
                             MEASURAND_POWER_ACTIVE_IMPORT);
             if (activePower != null) {
                 ret.getStatus().setThroughputPower(OcppConsumptionHelper.getKwValue(parseFloat(activePower.getValue()),
@@ -900,8 +900,8 @@ public class OcppMiddlewareImpl implements OcppMiddleware {
         }
         log.info("Stopping charging process from OCPP proxy: {}...", process.getOcppChargingProcessId());
 
-        Transaction transaction = transactionService.findTransaction(process.getTransaction().getTransactionPk()).
-                orElseThrow(() -> new IllegalStateException("Invalid transaction id: " + process.getTransaction().getTransactionPk()));
+        Transaction transaction = transactionService.findTransaction(process.getTransactionStart().getTransactionPk()).
+                orElseThrow(() -> new IllegalStateException("Invalid transaction id: " + process.getTransactionStart().getTransactionPk()));
 
 
         ESPChargingData data = ESPChargingData.builder().
@@ -930,8 +930,8 @@ public class OcppMiddlewareImpl implements OcppMiddleware {
         }
         log.info("Updating charging process consumption from OCPP proxy: {}...", process.getOcppChargingProcessId());
 
-        Transaction transaction = transactionService.findTransaction(process.getTransaction().getTransactionPk()).
-                orElseThrow(() -> new IllegalStateException("Invalid transaction id: " + process.getTransaction().getTransactionPk()));
+        Transaction transaction = transactionService.findTransaction(process.getTransactionStart().getTransactionPk()).
+                orElseThrow(() -> new IllegalStateException("Invalid transaction id: " + process.getTransactionStart().getTransactionPk()));
 
         ESPChargingConsumptionRequest req = ESPChargingConsumptionRequest.builder().
                 externalChargeId(process.getOcppChargingProcessId()).
@@ -1030,8 +1030,8 @@ public class OcppMiddlewareImpl implements OcppMiddleware {
             if (res.getErrorCode() == null) {
                 OcppChargingProcess process = chargingProcessService.findOcppChargingProcess(chargingProcessId);
 
-                Transaction transaction = transactionService.findTransaction(process.getTransaction().getTransactionPk()).
-                        orElseThrow(() -> new IllegalStateException("Invalid transaction id: " + process.getTransaction().getTransactionPk()));
+                Transaction transaction = transactionService.findTransaction(process.getTransactionStart().getTransactionPk()).
+                        orElseThrow(() -> new IllegalStateException("Invalid transaction id: " + process.getTransactionStart().getTransactionPk()));
 
                 log.info("Successully stopped charging process with limit, notifying server: {}...", process.getOcppChargingProcessId());
                 float consumption = consumptionHelper.getTotalPower(transaction);
@@ -1065,8 +1065,8 @@ public class OcppMiddlewareImpl implements OcppMiddleware {
             if (res.getErrorCode() == null) {
                 OcppChargingProcess process = chargingProcessService.findOcppChargingProcess(chargingProcessId);
 
-                Transaction transaction = transactionService.findTransaction(process.getTransaction().getTransactionPk()).
-                        orElseThrow(() -> new IllegalStateException("Invalid transaction id: " + process.getTransaction().getTransactionPk()));
+                Transaction transaction = transactionService.findTransaction(process.getTransactionStart().getTransactionPk()).
+                        orElseThrow(() -> new IllegalStateException("Invalid transaction id: " + process.getTransactionStart().getTransactionPk()));
 
                 log.info("Successully stopped charging process wiht timeout, notifying server: {}...", process.getOcppChargingProcessId());
                 ESPChargingData data = ESPChargingData.builder().

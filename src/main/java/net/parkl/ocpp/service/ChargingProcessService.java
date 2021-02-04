@@ -48,7 +48,7 @@ public class ChargingProcessService {
         if (c == null) {
             throw new IllegalStateException("Invalid charge box id/connector id: " + chargeBoxId + "/" + connectorId);
         }
-        return chargingProcessRepo.findByConnectorAndTransactionIsNullAndEndDateIsNull(c);
+        return chargingProcessRepo.findByConnectorAndTransactionStartIsNullAndEndDateIsNull(c);
     }
 
     public OcppChargingProcess findOpenChargingProcess(String chargeBoxId, int connectorId) {
@@ -71,7 +71,7 @@ public class ChargingProcessService {
         }
         LOGGER.info("Creating OcppChargingProcess on {}/{} with id tag {} for: {}...", chargeBoxId, connectorId,
                 idTag, licensePlate);
-        OcppChargingProcess existing = chargingProcessRepo.findByConnectorAndTransactionIsNullAndEndDateIsNull(c);
+        OcppChargingProcess existing = chargingProcessRepo.findByConnectorAndTransactionStartIsNullAndEndDateIsNull(c);
         if (existing != null) {
             throw new IllegalStateException("Connector occupied: " + c.getConnectorId());
         }
@@ -130,16 +130,16 @@ public class ChargingProcessService {
     }
 
     public List<OcppChargingProcess> findOpenChargingProcessesWithoutTransaction() {
-        return chargingProcessRepo.findAllByTransactionIsNullAndEndDateIsNull();
+        return chargingProcessRepo.findAllByTransactionStartIsNullAndEndDateIsNull();
     }
 
 
     public List<OcppChargingProcess> findOpenChargingProcessesWithLimitKwh() {
-        return chargingProcessRepo.findAllByTransactionIsNotNullAndLimitKwhIsNotNullAndEndDateIsNull();
+        return chargingProcessRepo.findAllByTransactionStartIsNotNullAndLimitKwhIsNotNullAndEndDateIsNull();
     }
 
     public List<OcppChargingProcess> findOpenChargingProcessesWithLimitMinute() {
-        return chargingProcessRepo.findAllByTransactionIsNotNullAndLimitMinuteIsNotNullAndEndDateIsNull();
+        return chargingProcessRepo.findAllByTransactionStartIsNotNullAndLimitMinuteIsNotNullAndEndDateIsNull();
     }
 
     public OcppChargingProcess findByOcppTagAndConnectorAndEndDateIsNullAndTransactionIsNotNull (String rfidTag,
@@ -150,7 +150,7 @@ public class ChargingProcessService {
         if (connector == null) {
             throw new IllegalStateException("Invalid charge box id/connector id: " + chargeBoxId + "/" + connectorId);
         }
-        return chargingProcessRepo.findByOcppTagAndConnectorAndEndDateIsNullAndTransactionIsNotNull(rfidTag, connector);
+        return chargingProcessRepo.findByOcppTagAndConnectorAndEndDateIsNullAndTransactionStartIsNotNull(rfidTag, connector);
     }
 
     public OcppChargingProcess findOpenProcessForRfidTag(String rfidTag, int connectorId, String chargeBoxId) {
@@ -164,7 +164,7 @@ public class ChargingProcessService {
     public OcppChargingProcess findByTransactionId(int transactionId) {
         TransactionStart transaction = transactionStartRepository
                 .findById(transactionId).orElseThrow(() -> new IllegalStateException("Invalid transaction id"));
-        return chargingProcessRepo.findByTransaction(transaction);
+        return chargingProcessRepo.findByTransactionStart(transaction);
     }
 
     public OcppChargingProcess save(OcppChargingProcess process) {
@@ -193,7 +193,7 @@ public class ChargingProcessService {
         }
         waiter.setDelayMs(0);
         waiter.setIntervalMs(200);
-        return waiter.waitFor(() -> chargingProcessRepo.findByConnectorAndTransactionIsNullAndEndDateIsNull(conn));
+        return waiter.waitFor(() -> chargingProcessRepo.findByConnectorAndTransactionStartIsNullAndEndDateIsNull(conn));
     }
 
 }

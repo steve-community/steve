@@ -62,14 +62,14 @@ public class ConnectorServiceImpl implements ConnectorService {
 
         OcppChargingProcess savedProcess=null;
         if (s.getStatus().equals("Available")) {
-            OcppChargingProcess process = chargingProcessRepo.findByConnectorAndTransactionIsNullAndEndDateIsNull(connector);
+            OcppChargingProcess process = chargingProcessRepo.findByConnectorAndTransactionStartIsNullAndEndDateIsNull(connector);
             if (process!=null) {
                 log.info("Ending charging process on available connector status: {}",process.getOcppChargingProcessId());
                 process.setEndDate(new Date());
                 savedProcess=chargingProcessRepo.save(process);
             }
         } else if (s.getStatus().equals("Faulted") || s.getStatus().equals("Unavailable")) {
-            OcppChargingProcess process = chargingProcessRepo.findByConnectorAndTransactionIsNullAndEndDateIsNull(connector);
+            OcppChargingProcess process = chargingProcessRepo.findByConnectorAndTransactionStartIsNullAndEndDateIsNull(connector);
             if (process!=null) {
                 log.info("Saving connector status error to charging process: {} [error={}]...",process.getOcppChargingProcessId(),
                         s.getErrorCode());

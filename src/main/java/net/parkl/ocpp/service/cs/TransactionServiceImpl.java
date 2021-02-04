@@ -7,8 +7,19 @@ import de.rwth.idsg.steve.repository.dto.UpdateTransactionParams;
 import de.rwth.idsg.steve.web.dto.TransactionQueryForm;
 import de.rwth.idsg.steve.web.dto.TransactionQueryForm.QueryPeriodType;
 import lombok.extern.slf4j.Slf4j;
-import net.parkl.ocpp.entities.*;
-import net.parkl.ocpp.repositories.*;
+import net.parkl.ocpp.entities.Connector;
+import net.parkl.ocpp.entities.ConnectorMeterValue;
+import net.parkl.ocpp.entities.OcppChargeBox;
+import net.parkl.ocpp.entities.OcppChargingProcess;
+import net.parkl.ocpp.entities.OcppTag;
+import net.parkl.ocpp.entities.Transaction;
+import net.parkl.ocpp.entities.TransactionStart;
+import net.parkl.ocpp.entities.TransactionStop;
+import net.parkl.ocpp.repositories.TransactionCriteriaRepository;
+import net.parkl.ocpp.repositories.TransactionRepository;
+import net.parkl.ocpp.repositories.TransactionStartRepository;
+import net.parkl.ocpp.repositories.TransactionStopFailedRepository;
+import net.parkl.ocpp.repositories.TransactionStopRepository;
 import net.parkl.ocpp.service.ChargingProcessService;
 import net.parkl.ocpp.service.ESPNotificationService;
 import net.parkl.ocpp.util.AsyncWaiter;
@@ -20,11 +31,17 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.Writer;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 import static de.rwth.idsg.steve.web.dto.TransactionQueryForm.QueryType;
 import static net.parkl.ocpp.service.cs.converter.TransactionDtoConverter.toTransactionDto;
-import static net.parkl.ocpp.service.cs.factory.TransactionFactory.*;
+import static net.parkl.ocpp.service.cs.factory.TransactionFactory.createTransactionStart;
+import static net.parkl.ocpp.service.cs.factory.TransactionFactory.createTransactionStop;
+import static net.parkl.ocpp.service.cs.factory.TransactionFactory.createTransactionStopFailed;
 
 @SuppressWarnings("SpringJavaAutowiredFieldsWarningInspection")
 @Service
@@ -263,7 +280,7 @@ public class TransactionServiceImpl implements TransactionService {
             log.info("Setting transaction on connector {} to process: {}...",
                     connector.getConnectorId(),
                     chargingProcess.getOcppChargingProcessId());
-            chargingProcess.setTransaction(transactionStart);
+            chargingProcess.setTransactionStart(transactionStart);
             chargingProcessService.save(chargingProcess);
         } else {
             log.warn("No active charging process found without transaction for connector: {}", connector.getConnectorId());
@@ -285,13 +302,14 @@ public class TransactionServiceImpl implements TransactionService {
     @Override
     @Transactional
     public void updateTransaction(UpdateTransactionParams p) {
-        Transaction transaction = transactionRepo.findById(p.getTransactionId())
-                .orElseThrow(() -> new IllegalArgumentException("Invalid transaction id: " + p.getTransactionId()));
-
         try {
-            TransactionStop stop = createTransactionStop(p);
+            TransactionStop transactionStop = createTransactionStop(p);
 
-            OcppChargingProcess chargingProcess = updateChargingProcess(stop, p);
+            OcppChargingProcess chargingProcess = updateChargingProcess(transactionStop, p);
+
+            Transaction transaction = transactionRepo.findById(p.getTransactionId())
+                    .orElseThrow(() -> new IllegalArgumentException("Invalid transaction id: " + p.getTransactionId()));
+
             if (chargePointService.shouldInsertConnectorStatusAfterTransactionMsg(p.getChargeBoxId())) {
                 TransactionStart transactionStart =
                         transactionStartRepo.findById(p.getTransactionId())
@@ -305,7 +323,9 @@ public class TransactionServiceImpl implements TransactionService {
                 if (chargingProcess.stoppedExternally()) {
                     espNotificationService.notifyAboutChargingStopped(chargingProcess);
                 } else {
-                    espNotificationService.notifyAboutConsumptionUpdated(chargingProcess, transaction);
+                    String startValue = chargingProcess.getTransactionStart().getStartValue();
+                    String stopValue = transactionStop.getStopValue();
+                    espNotificationService.notifyAboutConsumptionUpdated(chargingProcess, startValue, stopValue);
                 }
             }
         } catch (Exception e) {
@@ -316,7 +336,7 @@ public class TransactionServiceImpl implements TransactionService {
 
     private OcppChargingProcess updateChargingProcess(TransactionStop stop, UpdateTransactionParams params) {
         OcppChargingProcess process = chargingProcessService.findByTransactionId(params.getTransactionId());
-        stop.setTransaction(process.getTransaction());
+        stop.setTransaction(process.getTransactionStart());
         transactionStopRepo.save(stop);
 
         if (params.getStopTimestamp() != null) {

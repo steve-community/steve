@@ -233,9 +233,6 @@ public class TransactionServiceUnitTest {
                 anyString(),
                 any(AsyncWaiter.class)))
                 .thenReturn(testChargingProcess);
-        when(chargingProcessService.findOpenChargingProcessWithoutTransaction(testChargeBoxId,
-                connectorId))
-                .thenReturn(testChargingProcess);
 
         Assertions.assertThat(transactionService.insertTransaction(params)).isEqualTo(testChargingProcess.getTransaction().getTransactionPk());
     }

@@ -2,7 +2,6 @@ package net.parkl.ocpp.service;
 
 import net.parkl.ocpp.entities.Connector;
 import net.parkl.ocpp.entities.Transaction;
-import net.parkl.ocpp.repositories.TransactionRepository;
 import net.parkl.ocpp.service.config.AdvancedChargeBoxConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,18 +21,19 @@ public class OcppConsumptionHelper {
     @Autowired
     private AdvancedChargeBoxConfiguration config;
 
-    @Autowired
-    private TransactionRepository transactionRepo;
-
     @PersistenceContext
     private EntityManager em;
 
     public float getTotalPower(Transaction t) {
+       return getTotalPower(t.getStartValue(), t.getStopValue());
+    }
+
+    public float getTotalPower(String startValue, String stopValue) {
         float ret = 0f;
-        if (t != null && t.getStopValue() != null) {
-            float stopVal = Float.parseFloat(t.getStopValue());
-            if (t.getStartValue() != null) {
-                float startVal = Float.parseFloat(t.getStartValue());
+        if (stopValue != null) {
+            float stopVal = Float.parseFloat(stopValue);
+            if (startValue != null) {
+                float startVal = Float.parseFloat(startValue);
                 ret = (stopVal - startVal) / 1000f;
             } else {
                 ret = stopVal / 1000f;

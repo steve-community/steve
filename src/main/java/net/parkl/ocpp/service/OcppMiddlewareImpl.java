@@ -937,7 +937,7 @@ public class OcppMiddlewareImpl implements OcppMiddleware {
                 externalChargeId(process.getOcppChargingProcessId()).
                 start(process.getStartDate()).
                 end(process.getEndDate()).
-                totalPower(consumptionHelper.getTotalPower(transaction)).
+                totalPower(consumptionHelper.getTotalPower(startValue, stopValue)).
                 startValue(consumptionHelper.getStartValue(transaction)).
                 stopValue(consumptionHelper.getStopValue(transaction)).
                 build();

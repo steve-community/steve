@@ -12,7 +12,7 @@ import net.parkl.ocpp.repositories.TransactionStopFailedRepository;
 import net.parkl.ocpp.repositories.TransactionStopRepository;
 import net.parkl.ocpp.service.ChargingProcessService;
 import net.parkl.ocpp.service.ESPNotificationService;
-import net.parkl.ocpp.service.config.AdvancedChargeBoxConfiguration;
+import net.parkl.ocpp.util.AsyncWaiter;
 import org.assertj.core.api.Assertions;
 import org.joda.time.DateTime;
 import org.junit.Test;
@@ -51,8 +51,6 @@ public class TransactionServiceUnitTest {
     private OcppIdTagService ocppIdTagService;
     @Mock
     private ReservationService reservationService;
-    @Mock
-    private AdvancedChargeBoxConfiguration advancedConfig;
 
     @Test
     public void updateTransactionNotifyAboutChargingStop() {
@@ -198,15 +196,47 @@ public class TransactionServiceUnitTest {
         int testTransactionPk = 2;
         TransactionStart transactionStart = new TransactionStart();
         transactionStart.setTransactionPk(testTransactionPk);
-        when(transactionStartRepository.findByConnectorAndIdTagAndStartValues(testConnector,
-                testRfidTag,
-                params.getStartTimestamp().toDate(),
-                params.getStartMeterValue()))
-                .thenReturn(null);
+
         when(transactionStartRepository.save(any())).thenReturn(transactionStart);
 
         Assertions.assertThat(transactionService.insertTransaction(params)).isEqualTo(testTransactionPk);
     }
 
+    @Test
+    public void insertTransactionWithChargingProcess() {
+        String testChargeBoxId = "chargeBox";
+        int connectorId = 1;
+        String testRfidTag = "myRfidTag";
 
+        InsertTransactionParams params =
+                InsertTransactionParams.builder()
+                        .chargeBoxId(testChargeBoxId)
+                        .connectorId(connectorId)
+                        .idTag(testRfidTag)
+                        .startTimestamp(DateTime.now())
+                        .startMeterValue(String.valueOf(0))
+                        .reservationId(null)
+                        .eventTimestamp(DateTime.now())
+                        .build();
+
+        Connector testConnector = mock(Connector.class);
+        when(connectorService.createConnectorIfNotExists(testChargeBoxId, connectorId)).thenReturn(testConnector);
+
+        int testTransactionPk = 2;
+        TransactionStart transactionStart = new TransactionStart();
+        transactionStart.setTransactionPk(testTransactionPk);
+
+        when(transactionStartRepository.save(any())).thenReturn(transactionStart);
+
+        OcppChargingProcess testChargingProcess = new OcppChargingProcess();
+        when(chargingProcessService.fetchChargingProcess(anyInt(),
+                anyString(),
+                any(AsyncWaiter.class)))
+                .thenReturn(testChargingProcess);
+        when(chargingProcessService.findOpenChargingProcessWithoutTransaction(testChargeBoxId,
+                connectorId))
+                .thenReturn(testChargingProcess);
+
+        Assertions.assertThat(transactionService.insertTransaction(params)).isEqualTo(testChargingProcess.getTransaction().getTransactionPk());
+    }
 }

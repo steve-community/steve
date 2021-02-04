@@ -28,7 +28,7 @@ public class TestESP implements EmobilityServiceProvider {
     @Override
     public boolean checkRfidTag(String rfidTag, String chargeBoxId) {
         log.info("checking rfid tag");
-        return false;
+        return true;
     }
 
     @Override

@@ -54,6 +54,7 @@ public class ChargingDriver {
     }
 
     public void stop(String externalChargingProcessId) {
+        testConsumptionListener.reset();
         testChargePoint.setConsumptionStop(stopValue);
         ocppMiddleware.stopCharging(
                 ESPChargingUserStopRequest.builder()

@@ -24,4 +24,9 @@ public class OcppServiceTestAdditionalConfig {
     public NotificationService notificationService() {
         return new TestNotificationService();
     }
+
+    @Bean
+    public IntegratedIdTagProvider idTagProvider() {
+        return new TestIntegrationIdProvider();
+    }
 }

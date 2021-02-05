@@ -10,6 +10,7 @@ import org.junit.Test;
 
 import static de.rwth.idsg.steve.ocpp.OcppProtocol.V_16_SOAP;
 import static net.parkl.ocpp.service.config.AdvancedChargeBoxConfigKeys.KEY_IDTAG_MAX10;
+import static net.parkl.ocpp.service.config.AdvancedChargeBoxConfigKeys.KEY_USING_INTEGRATED_IDTAG;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class AdvancedConfigRfidTagDriverTest extends DriverTestBase {
@@ -53,5 +54,33 @@ public class AdvancedConfigRfidTagDriverTest extends DriverTestBase {
         OcppChargingProcess started = chargingDriver.getChargingProcess(chargingProcessId);
 
         assertThat(started.getOcppTag()).isEqualTo(originalRfidTag.substring(0, 9));
+    }
+
+    @Test
+    public void testIntegratedIdTagProved() {
+        advancedChargeBoxConfigDriver
+                .withChargeBoxId("rfidChargeBox2")
+                .withKey(KEY_USING_INTEGRATED_IDTAG)
+                .withValue("true")
+                .createConfig();
+
+        chargeBoxDriver.withName("rfidChargeBox2")
+                .withProtocol(V_16_SOAP)
+                .withConnectors(2)
+                .createChargeBox();
+
+        String chargingProcessId =
+                chargingDriver.withChargeBoxId("rfidChargeBox2")
+                        .withConnectorId(1)
+                        .withStartValue(0)
+                        .withPlate("TSLA404")
+                        .withRfid("TAG_1")
+                        .start();
+
+        chargingDriver.waitForChargingProcessStartedWithTransaction();
+
+        OcppChargingProcess started = chargingDriver.getChargingProcess(chargingProcessId);
+
+        assertThat(started.getOcppTag()).isEqualTo("TEST_ID_TAG");
     }
 }

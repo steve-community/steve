@@ -70,7 +70,6 @@ public class AdvancedChargeBoxConfiguration {
         return chargeBoxConfigService.countByKey(AdvancedChargeBoxConfigKeys.KEY_PREPARING_TIMEOUT_ENABLED) > 0;
     }
 
-    // TODO: Integration test
     public boolean isUsingIntegratedTag(String chargeBoxId) {
         return getConfigValueAsBool(chargeBoxId, AdvancedChargeBoxConfigKeys.KEY_USING_INTEGRATED_IDTAG, false);
     }

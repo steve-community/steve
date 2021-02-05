@@ -70,10 +70,12 @@ public class AdvancedChargeBoxConfiguration {
         return chargeBoxConfigService.countByKey(AdvancedChargeBoxConfigKeys.KEY_PREPARING_TIMEOUT_ENABLED) > 0;
     }
 
+    // TODO: Integration test
     public boolean isUsingIntegratedTag(String chargeBoxId) {
         return getConfigValueAsBool(chargeBoxId, AdvancedChargeBoxConfigKeys.KEY_USING_INTEGRATED_IDTAG, false);
     }
 
+    // TODO: Integration test
     public boolean isIdTagMax10Characters(String chargeBoxId) {
         return getConfigValueAsBool(chargeBoxId, AdvancedChargeBoxConfigKeys.KEY_IDTAG_MAX10, false);
     }
@@ -82,6 +84,7 @@ public class AdvancedChargeBoxConfiguration {
         return idTagProvider == null ? emptyList() : idTagProvider.integratedTags();
     }
 
+    // TODO: Unit test
     public boolean checkReservationId(String chargeBoxId) {
         return getConfigValueAsBool(chargeBoxId, AdvancedChargeBoxConfigKeys.KEY_CHECK_RESERVATION, false);
     }

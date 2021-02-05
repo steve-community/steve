@@ -3,6 +3,7 @@ package net.parkl.ocpp.service.driver;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import net.parkl.ocpp.entities.OcppChargingProcess;
 import net.parkl.ocpp.module.esp.model.ESPChargingConsumptionRequest;
 import net.parkl.ocpp.module.esp.model.ESPChargingStartRequest;
 import net.parkl.ocpp.module.esp.model.ESPChargingUserStopRequest;
@@ -60,6 +61,10 @@ public class ChargingDriver {
                 ESPChargingUserStopRequest.builder()
                         .externalChargeId(externalChargingProcessId)
                         .build());
+    }
+
+    public OcppChargingProcess getChargingProcess(String chargingProcessId) {
+        return chargingProcessService.findOcppChargingProcess(chargingProcessId);
     }
 
     public void waitForChargingProcessStartedWithTransaction() {

@@ -75,7 +75,6 @@ public class AdvancedChargeBoxConfiguration {
         return getConfigValueAsBool(chargeBoxId, AdvancedChargeBoxConfigKeys.KEY_USING_INTEGRATED_IDTAG, false);
     }
 
-    // TODO: Integration test
     public boolean isIdTagMax10Characters(String chargeBoxId) {
         return getConfigValueAsBool(chargeBoxId, AdvancedChargeBoxConfigKeys.KEY_IDTAG_MAX10, false);
     }

@@ -8,6 +8,7 @@ import java.util.Date;
 
 @Entity
 @Table(name = "ocpp_transaction_stop")
+@Inheritance(strategy=InheritanceType.JOINED)
 @Getter
 @Setter
 public class TransactionStop {

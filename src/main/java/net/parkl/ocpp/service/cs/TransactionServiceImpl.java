@@ -28,8 +28,11 @@ import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.transaction.Transactional;
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Date;
@@ -74,6 +77,10 @@ public class TransactionServiceImpl implements TransactionService {
     private ReservationService reservationService;
     @Autowired
     private ESPNotificationService espNotificationService;
+
+    @PersistenceContext
+    public EntityManager entityManager;
+
 
     @Override
     public List<Integer> getActiveTransactionIds(String chargeBoxId) {
@@ -234,6 +241,7 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     @Override
+    @Transactional
     public Optional<Transaction> findTransaction(int transactionPk) {
         return transactionRepo.findById(transactionPk);
     }
@@ -249,7 +257,6 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     @Override
-    @Transactional
     public Integer insertTransaction(InsertTransactionParams params) {
         log.info("Starting transaction: chargeBoxId={},connectorId={},idTag={}...",
                 params.getChargeBoxId(), params.getConnectorId(), params.getIdTag());
@@ -300,23 +307,39 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     @Override
-    @Transactional
     public void updateTransaction(UpdateTransactionParams p) {
         try {
+            int transactionId = p.getTransactionId();
+            Transaction transaction = transactionRepo.findById(transactionId)
+                    .orElseThrow(() -> new IllegalArgumentException("Invalid transaction id: " + transactionId));
+
             TransactionStop transactionStop = createTransactionStop(p);
+            OcppChargingProcess chargingProcess = chargingProcessService.findByTransactionId(transactionId);
+            transactionStop.setTransaction(chargingProcess.getTransactionStart());
+            transactionStopRepo.save(transactionStop);
 
-            OcppChargingProcess chargingProcess = updateChargingProcess(transactionStop, p);
+            if (p.getStopTimestamp() != null) {
+                log.info("Transaction update: {} with end date: {}", transactionId, p.getStopTimestamp());
+                String chargingProcessId = chargingProcess.getOcppChargingProcessId();
+                log.info("Ending charging process on transaction update: {} with end date: {}", chargingProcessId, p.getStopTimestamp());
+                chargingProcess.setEndDate(p.getStopTimestamp().toDate());
 
-            Transaction transaction = transactionRepo.findById(p.getTransactionId())
-                    .orElseThrow(() -> new IllegalArgumentException("Invalid transaction id: " + p.getTransactionId()));
+                chargingProcess = chargingProcessService.save(chargingProcess);
+            }
+
+            log.info("actual transaction active: {} name: {}", TransactionSynchronizationManager.isActualTransactionActive(),
+                    TransactionSynchronizationManager.getCurrentTransactionName());
 
             if (chargePointService.shouldInsertConnectorStatusAfterTransactionMsg(p.getChargeBoxId())) {
                 TransactionStart transactionStart =
-                        transactionStartRepo.findById(p.getTransactionId())
-                                .orElseThrow(() -> new IllegalArgumentException("Invalid transaction id: "
-                                        + p.getTransactionId()));
+                        transactionStartRepo.findById(transactionId)
+                                .orElseThrow(() -> new IllegalArgumentException("Invalid transaction id: " + transactionId));
 
-                connectorService.createConnectorStatus(transactionStart.getConnector(), p.getStopTimestamp(), p.getStatusUpdate());
+                connectorService.createConnectorStatus(
+                        transactionStart.getConnector(),
+                        p.getStopTimestamp(),
+                        p.getStatusUpdate()
+                );
             }
 
             if (transaction.vehicleUnplugged() || chargingProcess.stoppedExternally()) {
@@ -334,22 +357,4 @@ public class TransactionServiceImpl implements TransactionService {
         }
     }
 
-    private OcppChargingProcess updateChargingProcess(TransactionStop stop, UpdateTransactionParams params) {
-        OcppChargingProcess process = chargingProcessService.findByTransactionId(params.getTransactionId());
-        stop.setTransaction(process.getTransactionStart());
-        transactionStopRepo.save(stop);
-
-        if (params.getStopTimestamp() != null) {
-            log.info("Transaction update: {} with end date: {}",
-                    params.getTransactionId(),
-                    params.getStopTimestamp());
-            log.info("Ending charging process on transaction update: {} with end date: {}",
-                    process.getOcppChargingProcessId(),
-                    params.getStopTimestamp());
-            process.setEndDate(params.getStopTimestamp().toDate());
-
-            return chargingProcessService.save(process);
-        }
-        return process;
-    }
 }

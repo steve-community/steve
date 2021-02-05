@@ -26,7 +26,7 @@ public class OcppConsumptionDriverTest extends DriverTestBase {
     }
 
     @Test
-    public void testConsumptionUpdate()  {
+    public void testConsumptionUpdate() {
         advancedChargeBoxConfigDriver.deleteByKey(KEY_TRANSACTION_PARTIAL_ENABLED);
 
         chargeBoxDriver.withName("test1")
@@ -72,7 +72,7 @@ public class OcppConsumptionDriverTest extends DriverTestBase {
     }
 
     @Test
-    public void testPartialConsumptionUpdate() throws InterruptedException {
+    public void testPartialConsumptionUpdate() {
         advancedChargeBoxConfigDriver
                 .withChargeBoxId("test2")
                 .withKey(KEY_TRANSACTION_PARTIAL_ENABLED)

@@ -16,7 +16,7 @@ import javax.sql.DataSource;
 import static java.util.Objects.requireNonNull;
 
 @Configuration
-@EnableTransactionManagement
+@EnableTransactionManagement(proxyTargetClass = true)
 @EnableJpaRepositories(basePackages = "net.parkl.ocpp.repositories", transactionManagerRef = "ocppTransactionManager")
 public class JpaTestConfig {
 

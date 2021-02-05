@@ -6,9 +6,11 @@ import org.springframework.core.task.TaskExecutor;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import java.time.Duration;
 import java.util.Date;
 import java.util.List;
+
+import static java.time.Duration.between;
+import static net.parkl.ocpp.service.OcppConsumptionHelper.getKwhValue;
 
 @Component
 @Slf4j
@@ -33,7 +35,7 @@ public class OcppChargingLimitWatcher {
             if (cp.getTransactionStart() != null) {
                 log.info("Checking charging process with kwh limit: {}...", cp.getOcppChargingProcessId());
                 PowerValue pw = facade.getPowerValue(cp.getTransactionStart());
-                float kWh = OcppConsumptionHelper.getKwhValue(pw.getValue(), pw.getUnit());
+                float kWh = getKwhValue(pw.getValue(), pw.getUnit());
                 if (kWh >= cp.getLimitKwh()) {
                     log.info("Limit {} exceeded ({}) for charging process, stopping: {}...", cp.getLimitKwh(), kWh, cp.getOcppChargingProcessId());
 
@@ -46,12 +48,12 @@ public class OcppChargingLimitWatcher {
         for (OcppChargingProcess cp : minuteLimitProcesses) {
             if (cp.getTransactionStart() != null) {
                 log.info("Checking charging process with minute limit: {}...", cp.getOcppChargingProcessId());
-                int duration = Duration.between(cp.getStartDate().toInstant(), new Date().toInstant()).toMinutesPart();
+                int duration = between(cp.getStartDate().toInstant(), new Date().toInstant()).toMinutesPart();
                 if (duration >= cp.getLimitMinute()) {
                     log.info("Limit {} exceeded ({}) for charging process, stopping: {}...", cp.getLimitMinute(), duration, cp.getOcppChargingProcessId());
 
                     PowerValue pw = facade.getPowerValue(cp.getTransactionStart());
-                    float kWh = OcppConsumptionHelper.getKwhValue(pw.getValue(), pw.getUnit());
+                    float kWh = getKwhValue(pw.getValue(), pw.getUnit());
 
                     taskExecutor.execute(() -> facade.stopChargingWithLimit(cp.getOcppChargingProcessId(), kWh));
                 }

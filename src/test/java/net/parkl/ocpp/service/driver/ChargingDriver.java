@@ -82,7 +82,7 @@ public class ChargingDriver {
 
         private ESPChargingConsumptionRequest listenForConsumption() {
             new AsyncWaiter<>(10000).waitFor(() -> this.lastConsumption);
-            log.info("Consumption received: {}", lastConsumption.getStopValue());
+            log.info("test Consumption: {}", lastConsumption);
             return lastConsumption;
         }
 

@@ -59,7 +59,6 @@ import ocpp.cs._2015._10.RegistrationStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
@@ -93,7 +92,6 @@ import static ocpp.cp._2012._06.RemoteStartStopStatus.ACCEPTED;
  */
 @Service
 @Slf4j
-@Transactional
 public class OcppMiddlewareImpl implements OcppMiddleware {
 
 

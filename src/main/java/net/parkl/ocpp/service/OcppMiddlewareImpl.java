@@ -900,9 +900,9 @@ public class OcppMiddlewareImpl implements OcppMiddleware {
         }
         log.info("Stopping charging process from OCPP proxy: {}...", process.getOcppChargingProcessId());
 
-        Transaction transaction = transactionService.findTransaction(process.getTransactionStart().getTransactionPk()).
-                orElseThrow(() -> new IllegalStateException("Invalid transaction id: " + process.getTransactionStart().getTransactionPk()));
-
+        int transactionPk = process.getTransactionStart().getTransactionPk();
+        Transaction transaction = transactionService.findTransaction(transactionPk)
+                .orElseThrow(() -> new IllegalStateException("Invalid transaction id: " + transactionPk));
 
         ESPChargingData data = ESPChargingData.builder().
                 start(process.getStartDate()).
@@ -930,8 +930,13 @@ public class OcppMiddlewareImpl implements OcppMiddleware {
         }
         log.info("Updating charging process consumption from OCPP proxy: {}...", process.getOcppChargingProcessId());
 
-        Transaction transaction = transactionService.findTransaction(process.getTransactionStart().getTransactionPk()).
-                orElseThrow(() -> new IllegalStateException("Invalid transaction id: " + process.getTransactionStart().getTransactionPk()));
+        int transactionPk = process.getTransactionStart().getTransactionPk();
+
+        Transaction transaction =
+                transactionService.findTransaction(transactionPk)
+                        .orElseThrow(() -> new IllegalStateException("Invalid transaction id: " + transactionPk));
+
+        log.info("transaction in consumption update: {}", transaction);
 
         ESPChargingConsumptionRequest req = ESPChargingConsumptionRequest.builder().
                 externalChargeId(process.getOcppChargingProcessId()).

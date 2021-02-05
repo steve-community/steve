@@ -1,10 +1,20 @@
 package net.parkl.ocpp.entities;
 
 import lombok.Getter;
+import lombok.ToString;
 import org.hibernate.annotations.Immutable;
 import org.hibernate.annotations.Subselect;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 import java.util.Date;
 
 @Entity
@@ -20,6 +30,7 @@ import java.util.Date;
         "    GROUP BY s1.transaction_pk, s1.event_timestamp) tx2\n" +
         "  ON tx1.transaction_pk = tx2.transaction_pk")
 @Getter
+@ToString
 public class Transaction {
     @Id
     @Column(name = "transaction_pk")

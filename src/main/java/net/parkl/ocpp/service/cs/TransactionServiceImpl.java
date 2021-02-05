@@ -28,11 +28,7 @@ import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.support.TransactionSynchronizationManager;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
-import javax.transaction.Transactional;
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Date;
@@ -77,9 +73,6 @@ public class TransactionServiceImpl implements TransactionService {
     private ReservationService reservationService;
     @Autowired
     private ESPNotificationService espNotificationService;
-
-    @PersistenceContext
-    public EntityManager entityManager;
 
 
     @Override
@@ -241,7 +234,6 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     @Override
-    @Transactional
     public Optional<Transaction> findTransaction(int transactionPk) {
         return transactionRepo.findById(transactionPk);
     }
@@ -326,9 +318,6 @@ public class TransactionServiceImpl implements TransactionService {
 
                 chargingProcess = chargingProcessService.save(chargingProcess);
             }
-
-            log.info("actual transaction active: {} name: {}", TransactionSynchronizationManager.isActualTransactionActive(),
-                    TransactionSynchronizationManager.getCurrentTransactionName());
 
             if (chargePointService.shouldInsertConnectorStatusAfterTransactionMsg(p.getChargeBoxId())) {
                 TransactionStart transactionStart =

@@ -3,6 +3,10 @@
  * Copyright (C) 2013-2020 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
  * All Rights Reserved.
  *
+ * Parkl Digital Technologies
+ * Copyright (C) 2020-2021
+ * All Rights Reserved.
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -20,21 +24,7 @@ package de.rwth.idsg.steve.ocpp;
 
 import de.rwth.idsg.steve.ocpp.soap.ClientProvider;
 import de.rwth.idsg.steve.ocpp.soap.ClientProviderWithCache;
-import de.rwth.idsg.steve.ocpp.task.CancelReservationTask;
-import de.rwth.idsg.steve.ocpp.task.ChangeAvailabilityTask;
-import de.rwth.idsg.steve.ocpp.task.ChangeConfigurationTask;
-import de.rwth.idsg.steve.ocpp.task.ClearCacheTask;
-import de.rwth.idsg.steve.ocpp.task.DataTransferTask;
-import de.rwth.idsg.steve.ocpp.task.GetConfigurationTask;
-import de.rwth.idsg.steve.ocpp.task.GetDiagnosticsTask;
-import de.rwth.idsg.steve.ocpp.task.GetLocalListVersionTask;
-import de.rwth.idsg.steve.ocpp.task.RemoteStartTransactionTask;
-import de.rwth.idsg.steve.ocpp.task.RemoteStopTransactionTask;
-import de.rwth.idsg.steve.ocpp.task.ReserveNowTask;
-import de.rwth.idsg.steve.ocpp.task.ResetTask;
-import de.rwth.idsg.steve.ocpp.task.SendLocalListTask;
-import de.rwth.idsg.steve.ocpp.task.UnlockConnectorTask;
-import de.rwth.idsg.steve.ocpp.task.UpdateFirmwareTask;
+import de.rwth.idsg.steve.ocpp.task.*;
 import de.rwth.idsg.steve.ocpp.ws.ChargePointServiceInvoker;
 import de.rwth.idsg.steve.ocpp.ws.ocpp15.Ocpp15TypeStore;
 import de.rwth.idsg.steve.ocpp.ws.ocpp15.Ocpp15WebSocketEndpoint;

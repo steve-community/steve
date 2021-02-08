@@ -3,6 +3,10 @@
  * Copyright (C) 2013-2020 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
  * All Rights Reserved.
  *
+ * Parkl Digital Technologies
+ * Copyright (C) 2020-2021
+ * All Rights Reserved.
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -23,7 +27,6 @@ import de.rwth.idsg.steve.service.ChargePointHelperService;
 import lombok.extern.slf4j.Slf4j;
 import net.parkl.ocpp.service.cs.ChargePointService;
 import ocpp.cs._2015._10.RegistrationStatus;
-
 import org.apache.cxf.binding.soap.Soap12;
 import org.apache.cxf.binding.soap.SoapFault;
 import org.apache.cxf.interceptor.Fault;

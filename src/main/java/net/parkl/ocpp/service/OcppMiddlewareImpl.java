@@ -1,3 +1,21 @@
+/*
+ * Parkl Digital Technologies
+ * Copyright (C) 2020-2021
+ * All Rights Reserved.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
 package net.parkl.ocpp.service;
 
 import de.rwth.idsg.steve.ocpp.CommunicationTask;
@@ -12,39 +30,11 @@ import de.rwth.idsg.steve.service.IChargePointService15_Client;
 import de.rwth.idsg.steve.service.IChargePointService16_Client;
 import de.rwth.idsg.steve.web.dto.Address;
 import de.rwth.idsg.steve.web.dto.ChargePointForm;
-import de.rwth.idsg.steve.web.dto.ocpp.ChangeAvailabilityParams;
-import de.rwth.idsg.steve.web.dto.ocpp.ChangeConfigurationParams;
-import de.rwth.idsg.steve.web.dto.ocpp.GetConfigurationParams;
-import de.rwth.idsg.steve.web.dto.ocpp.MultipleChargePointSelect;
-import de.rwth.idsg.steve.web.dto.ocpp.RemoteStartTransactionParams;
-import de.rwth.idsg.steve.web.dto.ocpp.RemoteStopTransactionParams;
-import de.rwth.idsg.steve.web.dto.ocpp.ResetParams;
-import de.rwth.idsg.steve.web.dto.ocpp.ResetType;
-import de.rwth.idsg.steve.web.dto.ocpp.SendLocalListParams;
-import de.rwth.idsg.steve.web.dto.ocpp.UnlockConnectorParams;
+import de.rwth.idsg.steve.web.dto.ocpp.*;
 import lombok.extern.slf4j.Slf4j;
-import net.parkl.ocpp.entities.Connector;
-import net.parkl.ocpp.entities.ConnectorMeterValue;
-import net.parkl.ocpp.entities.ConnectorStatus;
-import net.parkl.ocpp.entities.OcppChargeBox;
-import net.parkl.ocpp.entities.OcppChargingProcess;
-import net.parkl.ocpp.entities.Transaction;
-import net.parkl.ocpp.entities.TransactionStart;
+import net.parkl.ocpp.entities.*;
 import net.parkl.ocpp.module.esp.EmobilityServiceProvider;
-import net.parkl.ocpp.module.esp.model.ESPChargeBoxConfiguration;
-import net.parkl.ocpp.module.esp.model.ESPChargerState;
-import net.parkl.ocpp.module.esp.model.ESPChargerStatus;
-import net.parkl.ocpp.module.esp.model.ESPChargerStatusResult;
-import net.parkl.ocpp.module.esp.model.ESPChargingConsumptionRequest;
-import net.parkl.ocpp.module.esp.model.ESPChargingData;
-import net.parkl.ocpp.module.esp.model.ESPChargingResult;
-import net.parkl.ocpp.module.esp.model.ESPChargingStartRequest;
-import net.parkl.ocpp.module.esp.model.ESPChargingStartResult;
-import net.parkl.ocpp.module.esp.model.ESPChargingStatus;
-import net.parkl.ocpp.module.esp.model.ESPChargingStatusResult;
-import net.parkl.ocpp.module.esp.model.ESPChargingStopRequest;
-import net.parkl.ocpp.module.esp.model.ESPChargingUserStopRequest;
-import net.parkl.ocpp.module.esp.model.ESPRfidChargingStartRequest;
+import net.parkl.ocpp.module.esp.model.*;
 import net.parkl.ocpp.repositories.ConnectorRepository;
 import net.parkl.ocpp.repositories.ConnectorStatusRepository;
 import net.parkl.ocpp.repositories.OcppChargeBoxRepository;
@@ -70,17 +60,8 @@ import static de.rwth.idsg.steve.web.dto.ocpp.AvailabilityType.INOPERATIVE;
 import static de.rwth.idsg.steve.web.dto.ocpp.AvailabilityType.OPERATIVE;
 import static java.lang.Float.parseFloat;
 import static java.util.Collections.singletonList;
-import static net.parkl.ocpp.module.esp.ESPErrorCodes.ERROR_CODE_CHARGER_ERROR;
-import static net.parkl.ocpp.module.esp.ESPErrorCodes.ERROR_CODE_CHARGER_OCCUPIED;
-import static net.parkl.ocpp.module.esp.ESPErrorCodes.ERROR_CODE_CHARGER_OFFLINE;
-import static net.parkl.ocpp.module.esp.ESPErrorCodes.ERROR_CODE_CHARGING_ALREADY_STOPPED;
-import static net.parkl.ocpp.module.esp.ESPErrorCodes.ERROR_CODE_INVALID_CHARGER_ID;
-import static net.parkl.ocpp.module.esp.ESPErrorCodes.ERROR_CODE_INVALID_EXTERNAL_CHARGE_ID;
-import static net.parkl.ocpp.service.OcppConstants.MEASURAND_ENERGY_ACTIVE_IMPORT;
-import static net.parkl.ocpp.service.OcppConstants.MEASURAND_POWER_ACTIVE_IMPORT;
-import static net.parkl.ocpp.service.OcppConstants.REASON_LIMIT_EXCEEDED;
-import static net.parkl.ocpp.service.OcppConstants.REASON_VEHICLE_NOT_CONNECTED;
-import static net.parkl.ocpp.service.OcppConstants.UNIT_WH;
+import static net.parkl.ocpp.module.esp.ESPErrorCodes.*;
+import static net.parkl.ocpp.service.OcppConstants.*;
 import static ocpp.cp._2012._06.RemoteStartStopStatus.ACCEPTED;
 
 ;

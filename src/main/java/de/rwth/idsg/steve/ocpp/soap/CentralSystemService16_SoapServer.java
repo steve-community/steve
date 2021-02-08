@@ -3,6 +3,10 @@
  * Copyright (C) 2013-2020 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
  * All Rights Reserved.
  *
+ * Parkl Digital Technologies
+ * Copyright (C) 2020-2021
+ * All Rights Reserved.
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -22,27 +26,7 @@ import de.rwth.idsg.steve.ocpp.OcppProtocol;
 import de.rwth.idsg.steve.ocpp.OcppVersion;
 import de.rwth.idsg.steve.service.CentralSystemService16_Service;
 import lombok.extern.slf4j.Slf4j;
-import ocpp.cs._2015._10.AuthorizeRequest;
-import ocpp.cs._2015._10.AuthorizeResponse;
-import ocpp.cs._2015._10.BootNotificationRequest;
-import ocpp.cs._2015._10.BootNotificationResponse;
-import ocpp.cs._2015._10.CentralSystemService;
-import ocpp.cs._2015._10.DataTransferRequest;
-import ocpp.cs._2015._10.DataTransferResponse;
-import ocpp.cs._2015._10.DiagnosticsStatusNotificationRequest;
-import ocpp.cs._2015._10.DiagnosticsStatusNotificationResponse;
-import ocpp.cs._2015._10.FirmwareStatusNotificationRequest;
-import ocpp.cs._2015._10.FirmwareStatusNotificationResponse;
-import ocpp.cs._2015._10.HeartbeatRequest;
-import ocpp.cs._2015._10.HeartbeatResponse;
-import ocpp.cs._2015._10.MeterValuesRequest;
-import ocpp.cs._2015._10.MeterValuesResponse;
-import ocpp.cs._2015._10.StartTransactionRequest;
-import ocpp.cs._2015._10.StartTransactionResponse;
-import ocpp.cs._2015._10.StatusNotificationRequest;
-import ocpp.cs._2015._10.StatusNotificationResponse;
-import ocpp.cs._2015._10.StopTransactionRequest;
-import ocpp.cs._2015._10.StopTransactionResponse;
+import ocpp.cs._2015._10.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

@@ -1,3 +1,21 @@
+/*
+ * Parkl Digital Technologies
+ * Copyright (C) 2020-2021
+ * All Rights Reserved.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
 package net.parkl.ocpp.repositories;
 
 import de.rwth.idsg.steve.SteveException;
@@ -14,6 +32,8 @@ import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import java.util.Date;
 import java.util.List;
+
+import static net.parkl.ocpp.util.CalendarUtils.*;
 
 @Repository
 public class TransactionCriteriaRepository {
@@ -62,12 +82,11 @@ public class TransactionCriteriaRepository {
 
         switch (form.getPeriodType()) {
             case TODAY:
-                return cb.between(root.get("startTimestamp"), net.parkl.stevep.util.CalendarUtils.getFirstMomentOfDay(now),
-                        net.parkl.stevep.util.CalendarUtils.getLastMomentOfDay(now));
+                return cb.between(root.get("startTimestamp"), getFirstMomentOfDay(now), getLastMomentOfDay(now));
             case LAST_10:
             case LAST_30:
             case LAST_90:
-                return cb.between(root.get("startTimestamp"), net.parkl.stevep.util.CalendarUtils.createDaysBeforeNow(form.getPeriodType().getInterval()),
+                return cb.between(root.get("startTimestamp"), createDaysBeforeNow(form.getPeriodType().getInterval()),
                         now);
             case ALL:
                 return null;
@@ -78,5 +97,4 @@ public class TransactionCriteriaRepository {
                 throw new SteveException("Unknown enum type: " + form.getPeriodType());
         }
     }
-
 }

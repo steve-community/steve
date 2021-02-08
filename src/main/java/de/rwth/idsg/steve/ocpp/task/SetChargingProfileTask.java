@@ -3,6 +3,10 @@
  * Copyright (C) 2013-2020 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
  * All Rights Reserved.
  *
+ * Parkl Digital Technologies
+ * Copyright (C) 2020-2021
+ * All Rights Reserved.
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -21,18 +25,11 @@ package de.rwth.idsg.steve.ocpp.task;
 import de.rwth.idsg.steve.ocpp.Ocpp16AndAboveTask;
 import de.rwth.idsg.steve.ocpp.OcppCallback;
 import de.rwth.idsg.steve.ocpp.OcppVersion;
-import de.rwth.idsg.steve.utils.DateTimeConverter;
-import net.parkl.ocpp.service.cs.ChargingProfileService;
 import de.rwth.idsg.steve.service.dto.EnhancedSetChargingProfileParams;
-
+import de.rwth.idsg.steve.utils.DateTimeConverter;
 import net.parkl.ocpp.entities.OcppChargingProfile;
-import ocpp.cp._2015._10.ChargingProfileKindType;
-import ocpp.cp._2015._10.ChargingProfilePurposeType;
-import ocpp.cp._2015._10.ChargingRateUnitType;
-import ocpp.cp._2015._10.ChargingSchedule;
-import ocpp.cp._2015._10.ChargingSchedulePeriod;
-import ocpp.cp._2015._10.RecurrencyKindType;
-import ocpp.cp._2015._10.SetChargingProfileRequest;
+import net.parkl.ocpp.service.cs.ChargingProfileService;
+import ocpp.cp._2015._10.*;
 
 import javax.xml.ws.AsyncHandler;
 import java.util.List;

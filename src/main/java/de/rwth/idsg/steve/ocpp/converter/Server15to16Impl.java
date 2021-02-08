@@ -3,6 +3,10 @@
  * Copyright (C) 2013-2020 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
  * All Rights Reserved.
  *
+ * Parkl Digital Technologies
+ * Copyright (C) 2020-2021
+ * All Rights Reserved.
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -32,7 +36,7 @@ import ocpp.cs._2012._06.RegistrationStatus;
 import ocpp.cs._2012._06.StartTransactionResponse;
 import ocpp.cs._2012._06.StatusNotificationResponse;
 import ocpp.cs._2012._06.StopTransactionResponse;
-import ocpp.cs._2012._06.TransactionData;
+import ocpp.cs._2012._06.*;
 import ocpp.cs._2015._10.AuthorizeRequest;
 import ocpp.cs._2015._10.BootNotificationRequest;
 import ocpp.cs._2015._10.ChargePointErrorCode;
@@ -48,12 +52,12 @@ import ocpp.cs._2015._10.Measurand;
 import ocpp.cs._2015._10.MeterValue;
 import ocpp.cs._2015._10.MeterValuesRequest;
 import ocpp.cs._2015._10.ReadingContext;
-import ocpp.cs._2015._10.SampledValue;
 import ocpp.cs._2015._10.StartTransactionRequest;
 import ocpp.cs._2015._10.StatusNotificationRequest;
 import ocpp.cs._2015._10.StopTransactionRequest;
 import ocpp.cs._2015._10.UnitOfMeasure;
 import ocpp.cs._2015._10.ValueFormat;
+import ocpp.cs._2015._10.*;
 
 import java.util.List;
 import java.util.stream.Collectors;

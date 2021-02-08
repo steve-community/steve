@@ -3,6 +3,10 @@
  * Copyright (C) 2013-2020 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
  * All Rights Reserved.
  *
+ * Parkl Digital Technologies
+ * Copyright (C) 2020-2021
+ * All Rights Reserved.
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -19,16 +23,11 @@
 package de.rwth.idsg.steve.service;
 
 import de.rwth.idsg.steve.SteveException;
-import de.rwth.idsg.steve.ocpp.ChargePointService12_Invoker;
-import de.rwth.idsg.steve.ocpp.ChargePointService15_Invoker;
-import de.rwth.idsg.steve.ocpp.ChargePointService16_Invoker;
-import de.rwth.idsg.steve.ocpp.ChargePointService16_InvokerImpl;
-import de.rwth.idsg.steve.ocpp.OcppVersion;
+import de.rwth.idsg.steve.ocpp.*;
 import de.rwth.idsg.steve.ocpp.task.ClearChargingProfileTask;
 import de.rwth.idsg.steve.ocpp.task.GetCompositeScheduleTask;
 import de.rwth.idsg.steve.ocpp.task.SetChargingProfileTask;
 import de.rwth.idsg.steve.ocpp.task.TriggerMessageTask;
-
 import de.rwth.idsg.steve.repository.dto.ChargingProfile;
 import de.rwth.idsg.steve.service.dto.EnhancedSetChargingProfileParams;
 import de.rwth.idsg.steve.web.dto.ocpp.ClearChargingProfileParams;

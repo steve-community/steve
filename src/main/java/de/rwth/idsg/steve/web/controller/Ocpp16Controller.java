@@ -3,6 +3,10 @@
  * Copyright (C) 2013-2020 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
  * All Rights Reserved.
  *
+ * Parkl Digital Technologies
+ * Copyright (C) 2020-2021
+ * All Rights Reserved.
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -22,14 +26,7 @@ import de.rwth.idsg.steve.ocpp.OcppVersion;
 import de.rwth.idsg.steve.service.ChargePointService12_Client;
 import de.rwth.idsg.steve.service.ChargePointService15_Client;
 import de.rwth.idsg.steve.service.ChargePointService16_Client;
-import de.rwth.idsg.steve.web.dto.ocpp.ChangeConfigurationParams;
-import de.rwth.idsg.steve.web.dto.ocpp.ClearChargingProfileParams;
-import de.rwth.idsg.steve.web.dto.ocpp.ConfigurationKeyEnum;
-import de.rwth.idsg.steve.web.dto.ocpp.ConfigurationKeyReadWriteEnum;
-import de.rwth.idsg.steve.web.dto.ocpp.GetCompositeScheduleParams;
-import de.rwth.idsg.steve.web.dto.ocpp.GetConfigurationParams;
-import de.rwth.idsg.steve.web.dto.ocpp.SetChargingProfileParams;
-import de.rwth.idsg.steve.web.dto.ocpp.TriggerMessageParams;
+import de.rwth.idsg.steve.web.dto.ocpp.*;
 import net.parkl.ocpp.service.cs.ChargingProfileService;
 import ocpp.cs._2015._10.RegistrationStatus;
 import org.springframework.beans.factory.annotation.Autowired;

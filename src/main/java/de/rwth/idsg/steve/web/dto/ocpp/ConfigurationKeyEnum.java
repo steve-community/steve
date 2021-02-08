@@ -3,6 +3,10 @@
  * Copyright (C) 2013-2020 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
  * All Rights Reserved.
  *
+ * Parkl Digital Technologies
+ * Copyright (C) 2020-2021
+ * All Rights Reserved.
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -19,14 +23,13 @@
 package de.rwth.idsg.steve.web.dto.ocpp;
 
 import de.rwth.idsg.steve.ocpp.OcppVersion;
+
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
 import static com.google.common.collect.Sets.newHashSet;
-import static de.rwth.idsg.steve.ocpp.OcppVersion.V_12;
-import static de.rwth.idsg.steve.ocpp.OcppVersion.V_15;
-import static de.rwth.idsg.steve.ocpp.OcppVersion.V_16;
+import static de.rwth.idsg.steve.ocpp.OcppVersion.*;
 import static de.rwth.idsg.steve.web.dto.ocpp.ConfigurationKeyReadWriteEnum.R;
 import static de.rwth.idsg.steve.web.dto.ocpp.ConfigurationKeyReadWriteEnum.RW;
 

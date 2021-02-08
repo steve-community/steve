@@ -1,3 +1,21 @@
+/*
+ * Parkl Digital Technologies
+ * Copyright (C) 2020-2021
+ * All Rights Reserved.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
 package net.parkl.ocpp.service.cs;
 
 import de.rwth.idsg.steve.SteveException;
@@ -7,40 +25,23 @@ import de.rwth.idsg.steve.repository.dto.UpdateTransactionParams;
 import de.rwth.idsg.steve.web.dto.TransactionQueryForm;
 import de.rwth.idsg.steve.web.dto.TransactionQueryForm.QueryPeriodType;
 import lombok.extern.slf4j.Slf4j;
-import net.parkl.ocpp.entities.Connector;
-import net.parkl.ocpp.entities.ConnectorMeterValue;
-import net.parkl.ocpp.entities.OcppChargeBox;
-import net.parkl.ocpp.entities.OcppChargingProcess;
-import net.parkl.ocpp.entities.OcppTag;
-import net.parkl.ocpp.entities.Transaction;
-import net.parkl.ocpp.entities.TransactionStart;
-import net.parkl.ocpp.entities.TransactionStop;
-import net.parkl.ocpp.repositories.TransactionCriteriaRepository;
-import net.parkl.ocpp.repositories.TransactionRepository;
-import net.parkl.ocpp.repositories.TransactionStartRepository;
-import net.parkl.ocpp.repositories.TransactionStopFailedRepository;
-import net.parkl.ocpp.repositories.TransactionStopRepository;
+import net.parkl.ocpp.entities.*;
+import net.parkl.ocpp.repositories.*;
 import net.parkl.ocpp.service.ChargingProcessService;
 import net.parkl.ocpp.service.ESPNotificationService;
 import net.parkl.ocpp.util.AsyncWaiter;
-import net.parkl.stevep.util.ListTransform;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.io.Writer;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 import static de.rwth.idsg.steve.web.dto.TransactionQueryForm.QueryType;
 import static net.parkl.ocpp.service.cs.converter.TransactionDtoConverter.toTransactionDto;
-import static net.parkl.ocpp.service.cs.factory.TransactionFactory.createTransactionStart;
-import static net.parkl.ocpp.service.cs.factory.TransactionFactory.createTransactionStop;
-import static net.parkl.ocpp.service.cs.factory.TransactionFactory.createTransactionStopFailed;
+import static net.parkl.ocpp.service.cs.factory.TransactionFactory.*;
+import static net.parkl.ocpp.util.ListTransform.transformToMap;
 
 @SuppressWarnings("SpringJavaAutowiredFieldsWarningInspection")
 @Service
@@ -85,10 +86,9 @@ public class TransactionServiceImpl implements TransactionService {
         List<Transaction> list = transactionCriteriaRepository.getInternal(form);
 
 
-        Map<String, OcppTag> tagMap = ListTransform.transformToMap(ocppIdTagService.findTags(),
-                OcppTag::getIdTag);
+        Map<String, OcppTag> tagMap = transformToMap(ocppIdTagService.findTags(), OcppTag::getIdTag);
 
-        Map<String, OcppChargeBox> boxMap = ListTransform.transformToMap(chargePointService.findAllChargePoints(),
+        Map<String, OcppChargeBox> boxMap = transformToMap(chargePointService.findAllChargePoints(),
                 OcppChargeBox::getChargeBoxId);
 
         List<de.rwth.idsg.steve.repository.dto.Transaction> ret = new ArrayList<>();

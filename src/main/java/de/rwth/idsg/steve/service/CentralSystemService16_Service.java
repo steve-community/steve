@@ -3,6 +3,10 @@
  * Copyright (C) 2013-2020 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
  * All Rights Reserved.
  *
+ * Parkl Digital Technologies
+ * Copyright (C) 2020-2021
+ * All Rights Reserved.
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -29,11 +33,7 @@ import net.parkl.ocpp.entities.TransactionStart;
 import net.parkl.ocpp.module.esp.model.ESPRfidChargingStartRequest;
 import net.parkl.ocpp.service.ChargingProcessService;
 import net.parkl.ocpp.service.OcppMiddleware;
-import net.parkl.ocpp.service.cs.ChargePointService;
-import net.parkl.ocpp.service.cs.ConnectorMeterValueService;
-import net.parkl.ocpp.service.cs.ConnectorService;
-import net.parkl.ocpp.service.cs.SettingsService;
-import net.parkl.ocpp.service.cs.TransactionService;
+import net.parkl.ocpp.service.cs.*;
 import ocpp.cs._2015._10.*;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;

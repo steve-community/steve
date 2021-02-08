@@ -1,3 +1,25 @@
+/*
+ * SteVe - SteckdosenVerwaltung - https://github.com/RWTH-i5-IDSG/steve
+ * Copyright (C) 2013-2020 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
+ * All Rights Reserved.
+ *
+ * Parkl Digital Technologies
+ * Copyright (C) 2020-2021
+ * All Rights Reserved.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
 package net.parkl.ocpp.service.cs;
 
 import de.rwth.idsg.steve.SteveException;
@@ -11,7 +33,6 @@ import de.rwth.idsg.steve.web.dto.ChargingProfileQueryForm;
 import lombok.extern.slf4j.Slf4j;
 import net.parkl.ocpp.entities.*;
 import net.parkl.ocpp.repositories.*;
-import net.parkl.stevep.util.ListTransform;
 import ocpp.cp._2015._10.ChargingProfilePurposeType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -19,13 +40,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
-import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+
+import static net.parkl.ocpp.util.ListTransform.transformToMap;
+
 
 @Service
 @Slf4j
@@ -133,7 +156,7 @@ public class ChargingProfileServiceImpl implements ChargingProfileService {
         List<String> chargeBoxIds = connectorChargingProfiles.stream().map(k -> k.getConnector().getChargeBoxId()).
                 collect(Collectors.toList());
         List<OcppChargeBox> chargeBoxes = chargeBoxRepository.findByChargeBoxIdIn(chargeBoxIds);
-        Map<String, OcppChargeBox> chargeBoxMap = ListTransform.transformToMap(chargeBoxes, c -> c.getChargeBoxId());
+        Map<String, OcppChargeBox> chargeBoxMap = transformToMap(chargeBoxes, OcppChargeBox::getChargeBoxId);
         return connectorChargingProfiles.stream().
                 map(k -> ChargingProfileAssignment.builder()
                         .chargeBoxPk(chargeBoxMap.get(k.getConnector().getChargeBoxId()).getChargeBoxPk())

@@ -1,30 +1,41 @@
+/*
+ * Parkl Digital Technologies
+ * Copyright (C) 2020-2021
+ * All Rights Reserved.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
 package net.parkl.ocpp.service.cs;
 
-import java.nio.charset.StandardCharsets;
-import java.util.Base64;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
-
-import javax.annotation.Nullable;
-
+import com.google.common.base.Joiner;
+import com.google.common.base.Splitter;
+import de.rwth.idsg.steve.NotificationFeature;
+import de.rwth.idsg.steve.SteveException;
+import de.rwth.idsg.steve.repository.dto.MailSettings;
+import de.rwth.idsg.steve.web.dto.SettingsForm;
+import net.parkl.ocpp.entities.Setting;
 import net.parkl.ocpp.repositories.SettingRepository;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.google.common.base.Joiner;
-import com.google.common.base.Splitter;
-
-import de.rwth.idsg.steve.NotificationFeature;
-import de.rwth.idsg.steve.SteveException;
-import de.rwth.idsg.steve.repository.dto.MailSettings;
-import de.rwth.idsg.steve.web.dto.SettingsForm;
-import net.parkl.ocpp.entities.Setting;
+import javax.annotation.Nullable;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 @Service
 public class SettingsServiceImpl implements SettingsService {

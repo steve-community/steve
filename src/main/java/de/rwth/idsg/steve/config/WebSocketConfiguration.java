@@ -25,7 +25,6 @@ import de.rwth.idsg.steve.ocpp.ws.ocpp12.Ocpp12WebSocketEndpoint;
 import de.rwth.idsg.steve.ocpp.ws.ocpp15.Ocpp15WebSocketEndpoint;
 import de.rwth.idsg.steve.ocpp.ws.ocpp16.Ocpp16WebSocketEndpoint;
 import de.rwth.idsg.steve.service.ChargePointHelperService;
-import de.rwth.idsg.steve.service.NotificationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,7 +48,6 @@ import java.util.List;
 public class WebSocketConfiguration implements WebSocketConfigurer {
     private static final Logger log=LoggerFactory.getLogger(WebSocketConfiguration.class);
 
-    @Autowired private NotificationService notificationService;
     @Autowired private ChargePointHelperService chargePointHelperService;
 
     @Autowired private Ocpp12WebSocketEndpoint ocpp12WebSocketEndpoint;
@@ -68,7 +66,7 @@ public class WebSocketConfiguration implements WebSocketConfigurer {
         List<AbstractWebSocketEndpoint> endpoints = getEndpoints();
         String[] protocols = endpoints.stream().map(e -> e.getVersion().getValue()).toArray(String[]::new);
 
-        OcppWebSocketUpgrader upgradeStrategy = new OcppWebSocketUpgrader(endpoints, notificationService, chargePointHelperService);
+        OcppWebSocketUpgrader upgradeStrategy = new OcppWebSocketUpgrader(endpoints, chargePointHelperService);
 
         DefaultHandshakeHandler handler = new DefaultHandshakeHandler(upgradeStrategy);
         handler.setSupportedProtocols(protocols);

@@ -27,11 +27,13 @@ import static java.lang.String.format;
  */
 @Slf4j
 @Service
-public class NotificationService {
+public class NotificationService implements OcppNotificationService{
 
     @Autowired
     private MailService mailService;
 
+
+    @Override
     public void ocppStationBooted(String chargeBoxId, Optional<RegistrationStatus> status) {
         if (isDisabled(OcppStationBooted)) {
             return;
@@ -48,6 +50,7 @@ public class NotificationService {
         mailService.sendAsync(subject, addTimestamp(body));
     }
 
+    @Override
     public void ocppStationWebSocketConnected(String chargeBoxId) {
         if (isDisabled(OcppStationWebSocketConnected)) {
             return;
@@ -58,6 +61,7 @@ public class NotificationService {
         mailService.sendAsync(subject, addTimestamp(""));
     }
 
+    @Override
     public void ocppStationWebSocketDisconnected(String chargeBoxId) {
         if (isDisabled(OcppStationWebSocketDisconnected)) {
             return;
@@ -68,6 +72,7 @@ public class NotificationService {
         mailService.sendAsync(subject, addTimestamp(""));
     }
 
+    @Override
     public void ocppStationStatusFailure(String chargeBoxId, int connectorId, String errorCode) {
         if (isDisabled(OcppStationStatusFailure)) {
             return;
@@ -79,6 +84,8 @@ public class NotificationService {
         mailService.sendAsync(subject, addTimestamp(body));
     }
 
+
+    @Override
     public void ocppTransactionStarted(int transactionId, InsertTransactionParams params) {
         if (isDisabled(OcppTransactionStarted)) {
             return;
@@ -89,6 +96,7 @@ public class NotificationService {
         mailService.sendAsync(subject, addTimestamp(createContent(params)));
     }
 
+    @Override
     public void ocppTransactionEnded(UpdateTransactionParams params) {
        if (isDisabled(OcppTransactionEnded)) {
             return;

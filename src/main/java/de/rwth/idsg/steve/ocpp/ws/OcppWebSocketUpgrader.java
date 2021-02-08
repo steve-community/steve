@@ -19,7 +19,6 @@
 package de.rwth.idsg.steve.ocpp.ws;
 
 import de.rwth.idsg.steve.service.ChargePointHelperService;
-import de.rwth.idsg.steve.service.NotificationService;
 import ocpp.cs._2015._10.RegistrationStatus;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.http.server.ServerHttpRequest;
@@ -41,14 +40,11 @@ import java.util.Optional;
 public class OcppWebSocketUpgrader extends TomcatRequestUpgradeStrategy {
 
     private final List<AbstractWebSocketEndpoint> endpoints;
-    private final NotificationService notificationService;
     private final ChargePointHelperService chargePointHelperService;
 
     public OcppWebSocketUpgrader(List<AbstractWebSocketEndpoint> endpoints,
-                                 NotificationService notificationService,
                                  ChargePointHelperService chargePointHelperService) {
         this.endpoints = endpoints;
-        this.notificationService = notificationService;
         this.chargePointHelperService = chargePointHelperService;
     }
 

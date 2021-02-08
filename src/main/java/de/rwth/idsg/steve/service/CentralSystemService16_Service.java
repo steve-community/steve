@@ -66,7 +66,7 @@ public class CentralSystemService16_Service {
     @Autowired
     private OcppTagService ocppTagService;
     @Autowired
-    private NotificationService notificationService;
+    private OcppNotificationService notificationService;
     @Autowired
     private ChargePointHelperService chargePointHelperService;
     @Autowired

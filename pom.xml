@@ -41,7 +41,7 @@
         <jackson.version>2.12.1</jackson.version>
         <awaitility.version>4.0.2</awaitility.version>
 
-        <javaee.web.api.version>8.0</javaee.web.api.version>
+        <javaee.web.api.version>8.0.1</javaee.web.api.version>
 
         <tomcat.version>9.0.35</tomcat.version>
         <hibernate.validator.version>6.1.5.Final</hibernate.validator.version>

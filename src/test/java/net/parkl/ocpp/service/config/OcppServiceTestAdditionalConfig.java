@@ -1,7 +1,7 @@
 package net.parkl.ocpp.service.config;
 
 import de.rwth.idsg.steve.service.CentralSystemService16_Service;
-import de.rwth.idsg.steve.service.NotificationService;
+import de.rwth.idsg.steve.service.OcppNotificationService;
 import de.rwth.idsg.steve.service.OcppTagService;
 import de.rwth.idsg.steve.service.OcppTagServiceImpl;
 import org.springframework.context.annotation.Bean;
@@ -21,7 +21,7 @@ public class OcppServiceTestAdditionalConfig {
     }
 
     @Bean
-    public NotificationService notificationService() {
+    public OcppNotificationService notificationService() {
         return new TestNotificationService();
     }
 

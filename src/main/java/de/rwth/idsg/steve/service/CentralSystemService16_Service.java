@@ -66,7 +66,7 @@ public class CentralSystemService16_Service {
     @Autowired
     private OcppTagService ocppTagService;
     @Autowired
-    private NotificationService notificationService;
+    private OcppNotificationService notificationService;
     @Autowired
     private ChargePointHelperService chargePointHelperService;
     @Autowired
@@ -206,7 +206,7 @@ public class CentralSystemService16_Service {
             transactionId = transactionService.insertTransaction(params);
         }
 
-        notificationService.ocppTransactionStarted(chargeBoxIdentity, transactionId, parameters.getConnectorId());
+        notificationService.ocppTransactionStarted(transactionId, params);
 
         IdTagInfo info = new IdTagInfo();
         info.setStatus(AuthorizationStatus.ACCEPTED);
@@ -245,7 +245,7 @@ public class CentralSystemService16_Service {
                         new IllegalArgumentException("Invalid transaction id: " + transactionId));
         connectorMeterValueService.insertMeterValues(parameters.getTransactionData(), transactionStart);
 
-        notificationService.ocppTransactionEnded(chargeBoxIdentity, transactionId);
+        notificationService.ocppTransactionEnded(params);
 
         return new StopTransactionResponse().withIdTagInfo(idTagInfo);
     }

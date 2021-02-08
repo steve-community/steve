@@ -19,15 +19,13 @@
 package de.rwth.idsg.steve.ocpp.ws;
 
 import com.google.common.base.Strings;
-
 import de.rwth.idsg.steve.SteveConfiguration;
 import de.rwth.idsg.steve.config.WebSocketConfigurationConstants;
 import de.rwth.idsg.steve.ocpp.OcppVersion;
 import de.rwth.idsg.steve.ocpp.ws.data.CommunicationContext;
 import de.rwth.idsg.steve.ocpp.ws.data.SessionContext;
 import de.rwth.idsg.steve.ocpp.ws.pipeline.IncomingPipeline;
-
-import de.rwth.idsg.steve.service.NotificationService;
+import de.rwth.idsg.steve.service.OcppNotificationService;
 import net.parkl.ocpp.service.cs.ChargePointService;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,6 +36,7 @@ import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketMessage;
 import org.springframework.web.socket.WebSocketSession;
 
+import javax.annotation.PostConstruct;
 import java.util.ArrayList;
 import java.util.Deque;
 import java.util.List;
@@ -47,8 +46,6 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
-import javax.annotation.PostConstruct;
-
 /**
  * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
  * @since 17.03.2015
@@ -57,7 +54,7 @@ public abstract class AbstractWebSocketEndpoint extends ConcurrentWebSocketHandl
 
     @Autowired private ScheduledExecutorService service;
     @Autowired private FutureResponseContextStore futureResponseContextStore;
-    @Autowired private NotificationService notificationService;
+    @Autowired private OcppNotificationService notificationService;
 
     @Autowired private ChargePointService chargePointService;
     

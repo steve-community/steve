@@ -276,12 +276,22 @@ public class OcppIdTagServiceImpl implements OcppIdTagService {
             tag.setMaxActiveTransactionCount(0);
             tagRepo.save(tag);
             log.warn("An unknown idTag '{}' was inserted into DB to prevent information loss and has been blocked",
-                     idTag);
+                    idTag);
         }
     }
 
     @Override
     public List<OcppTag> findTags() {
         return tagRepo.findTags();
+    }
+
+    @Override
+    public Map<String, OcppTag> getRfidTagOcppTagMap() {
+        Iterable<OcppTag> tagsAll = tagRepo.findTags();
+        Map<String, OcppTag> tagMap = new HashMap<>();
+        for (OcppTag tag : tagsAll) {
+            tagMap.put(tag.getIdTag(), tag);
+        }
+        return tagMap;
     }
 }

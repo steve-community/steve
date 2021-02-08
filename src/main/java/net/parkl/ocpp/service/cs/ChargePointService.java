@@ -48,6 +48,7 @@ public interface ChargePointService {
     boolean updateChargebox(UpdateChargeboxParams params);
 
     void updateChargeboxFirmwareStatus(String chargeBoxIdentity, String status);
+
     void updateChargeboxDiagnosticsStatus(String chargeBoxIdentity, String status);
 
     List<OcppChargeBox> findAllChargePoints();
@@ -55,4 +56,6 @@ public interface ChargePointService {
     OcppChargeBox findByChargeBoxId(String chargeBoxId);
 
     boolean shouldInsertConnectorStatusAfterTransactionMsg(String chargeBoxId);
+
+    Map<String, OcppChargeBox> getIdChargeBoxMap();
 }

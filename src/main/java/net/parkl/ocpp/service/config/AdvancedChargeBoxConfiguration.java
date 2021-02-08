@@ -82,7 +82,6 @@ public class AdvancedChargeBoxConfiguration {
         return idTagProvider == null ? emptyList() : idTagProvider.integratedTags();
     }
 
-    // TODO: Unit test
     public boolean checkReservationId(String chargeBoxId) {
         return getConfigValueAsBool(chargeBoxId, AdvancedChargeBoxConfigKeys.KEY_CHECK_RESERVATION, false);
     }

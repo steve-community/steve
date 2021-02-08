@@ -320,4 +320,14 @@ public class ChargePointServiceImpl implements ChargePointService {
 		OcppChargeBox cb = chargeBoxRepository.findByChargeBoxId(chargeBoxId);
 		return cb != null && cb.insertConnectorStatusAfterTransactionMsg();
 	}
+
+	@Override
+	public Map<String, OcppChargeBox> getIdChargeBoxMap() {
+		Iterable<OcppChargeBox> boxesAll = chargeBoxRepository.findAll();
+		Map<String, OcppChargeBox> boxMap = new HashMap<>();
+		for (OcppChargeBox box : boxesAll) {
+			boxMap.put(box.getChargeBoxId(), box);
+		}
+		return boxMap;
+	}
 }

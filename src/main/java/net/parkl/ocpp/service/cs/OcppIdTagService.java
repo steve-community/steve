@@ -6,6 +6,7 @@ import de.rwth.idsg.steve.web.dto.OcppTagQueryForm;
 import net.parkl.ocpp.entities.OcppTag;
 
 import java.util.List;
+import java.util.Map;
 
 public interface OcppIdTagService {
 
@@ -40,4 +41,6 @@ public interface OcppIdTagService {
 	void createTagWithoutActiveTransactionIfNotExists(String idTag);
 
 	List<OcppTag> findTags();
+
+	Map<String, OcppTag> getRfidTagOcppTagMap();
 }

@@ -57,11 +57,12 @@ SteVe Pluggable is intended to run in any servlet container or in embedded web a
     <dependency>
             <groupId>net.parkl.ocpp</groupId>
             <artifactId>steve-pluggable</artifactId>
-            <version>1.0.2</version>
+            <version>[LATEST_VERSION]</version>
     </dependency>
     ```
     
-        
+    where [LATEST_VERSION] is the latest release version of the library
+
 2. Configure Spring Boot:
 
     An application that uses **SteVe Pluggable** should be configured in the standard Spring boot manner.
@@ -99,5 +100,15 @@ SteVe Pluggable is intended to run in any servlet container or in embedded web a
     ocpp.auth.password=$BCRYPT_HASH$
     ```
     
+# Build from source
+
+1. Build with Maven
+
+    **Steve Pluggable** can be built with maven using the following command:
+    ```
+    mvn clean install -Drevision=1-SNAPSHOT flatten:flatten
+    ```
+    
+
 
 

@@ -102,12 +102,16 @@ SteVe Pluggable is intended to run in any servlet container or in embedded web a
     
 # Build from source
 
+1. Build with Maven
+
     We use a CI friendly Maven command for building, described here: https://maven.apache.org/maven-ci-friendly.html
     The library can be built with maven using the following command:
+    
     
     ```
     mvn clean install -Drevision=[YOUR_VERSION] flatten:flatten
     ```
+    
     where [YOUR_VERSION] is the desired version of the build.
 
 

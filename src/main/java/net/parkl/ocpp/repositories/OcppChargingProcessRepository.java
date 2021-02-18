@@ -40,10 +40,10 @@ public interface OcppChargingProcessRepository extends CrudRepository<OcppChargi
 
 	List<OcppChargingProcess> findAllByTransactionStartIsNullAndEndDateIsNull();
 
-	@EntityGraph(attributePaths = {"transaction"})
+	@EntityGraph(attributePaths = {"transactionStart"})
 	List<OcppChargingProcess> findAllByTransactionStartIsNotNullAndLimitKwhIsNotNullAndEndDateIsNull();
 
-	@EntityGraph(attributePaths = {"transaction"})
+	@EntityGraph(attributePaths = {"transactionStart"})
 	List<OcppChargingProcess> findAllByTransactionStartIsNotNullAndLimitMinuteIsNotNullAndEndDateIsNull();
 
 	OcppChargingProcess findByOcppTagAndConnectorAndEndDateIsNull(String rfidTag, Connector connector);
@@ -51,7 +51,7 @@ public interface OcppChargingProcessRepository extends CrudRepository<OcppChargi
 	OcppChargingProcess findByOcppTagAndConnectorAndEndDateIsNullAndTransactionStartIsNotNull(String rfidTag, Connector connector);
 
 	@Query("SELECT OBJECT(p) FROM OcppChargingProcess AS p WHERE p.transactionStart.transactionPk=?1")
-    OcppChargingProcess findByTransactionId(int transactionId);
+	OcppChargingProcess findByTransactionId(int transactionId);
 
 
 }

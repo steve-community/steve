@@ -1052,7 +1052,7 @@ public class OcppMiddlewareImpl implements OcppMiddleware {
                 Transaction transaction = transactionService.findTransaction(process.getTransactionStart().getTransactionPk()).
                         orElseThrow(() -> new IllegalStateException("Invalid transaction id: " + process.getTransactionStart().getTransactionPk()));
 
-                log.info("Successully stopped charging process wiht timeout, notifying server: {}...", process.getOcppChargingProcessId());
+                log.info("Successfully stopped charging process with timeout, notifying server: {}...", process.getOcppChargingProcessId());
                 ESPChargingData data = ESPChargingData.builder().
                         start(process.getStartDate()).
                         end(process.getEndDate()).

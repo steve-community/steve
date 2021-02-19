@@ -13,6 +13,8 @@ import net.parkl.ocpp.service.OcppMiddleware;
 import net.parkl.ocpp.service.chargepoint.TestChargePoint;
 import net.parkl.ocpp.util.AsyncWaiter;
 
+import java.util.List;
+
 @NoArgsConstructor
 @Slf4j
 public class ChargingDriver {
@@ -28,6 +30,8 @@ public class ChargingDriver {
     private int startValue;
     private int stopValue;
     private String rfidTag;
+    private Float kwhLimit;
+    private Integer minuteLimit;
 
     public static ChargingDriver createChargingDriver(OcppMiddleware ocppMiddleware,
                                                       TestChargePoint testChargePoint,
@@ -47,7 +51,10 @@ public class ChargingDriver {
                 .chargeBoxId(chargeBoxId)
                 .chargerId(String.valueOf(connectorId))
                 .licensePlate(plate)
-                .rfidTag(rfidTag).build();
+                .rfidTag(rfidTag)
+                .limitKwh(kwhLimit)
+                .limitMin(minuteLimit)
+                .build();
 
         testChargePoint.setConsumptionStart(startValue);
 
@@ -74,6 +81,14 @@ public class ChargingDriver {
 
     public ESPChargingConsumptionRequest waitForConsumption() {
         return testConsumptionListener.listenForConsumption();
+    }
+
+    public List<OcppChargingProcess> findOpenChargingProcessesWithLimitKwh() {
+        return chargingProcessService.findOpenChargingProcessesWithLimitKwh();
+    }
+
+    public List<OcppChargingProcess> findOpenChargingProcessesWithLimitMinute() {
+        return chargingProcessService.findOpenChargingProcessesWithLimitMinute();
     }
 
     @Getter
@@ -126,4 +141,13 @@ public class ChargingDriver {
         return this;
     }
 
+    public ChargingDriver withLimitKwh(float kwhLimit) {
+        this.kwhLimit = kwhLimit;
+        return this;
+    }
+
+    public ChargingDriver withLimitMinute(int minuteLimit) {
+        this.minuteLimit = minuteLimit;
+        return this;
+    }
 }

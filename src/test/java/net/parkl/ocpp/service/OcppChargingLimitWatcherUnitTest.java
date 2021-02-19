@@ -72,7 +72,7 @@ public class OcppChargingLimitWatcherUnitTest {
         when(powerValueAfterLimit2.getUnit()).thenReturn(OcppConstants.UNIT_WH);
         when(chargingProcessAfterLimit1.getLimitKwh()).thenReturn(3f);
 
-        limitWatcher.checkChargingLimit();
+        limitWatcher.checkKwhChargingLimit();
 
         verify(executor, times(2)).execute(any(Runnable.class));
     }
@@ -105,7 +105,7 @@ public class OcppChargingLimitWatcherUnitTest {
         when(chargingProcessAfterLimit.getLimitMinute()).thenReturn(30);
         when(chargingProcessAfterLimit.getStartDate()).thenReturn(from(now().minusMinutes(40).atZone(systemDefault()).toInstant()));
 
-        limitWatcher.checkChargingLimit();
+        limitWatcher.checkMinuteChargingLimit();
 
         verify(executor, times(1)).execute(any(Runnable.class));
     }

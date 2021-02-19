@@ -21,7 +21,6 @@ package net.parkl.ocpp.service;
 import lombok.extern.slf4j.Slf4j;
 import net.parkl.ocpp.entities.OcppChargingProcess;
 import org.springframework.core.task.TaskExecutor;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
@@ -33,7 +32,6 @@ import static net.parkl.ocpp.service.OcppConsumptionHelper.getKwhValue;
 @Component
 @Slf4j
 public class OcppChargingLimitWatcher {
-
     private final ChargingProcessService proxyService;
     private final OcppMiddleware facade;
     private final TaskExecutor taskExecutor;
@@ -44,10 +42,8 @@ public class OcppChargingLimitWatcher {
         this.taskExecutor = taskExecutor;
     }
 
-    @Scheduled(fixedRate = 10000)
-    public void checkChargingLimit() {
-        log.debug("Checking charging limit...");
-
+    public void checkKwhChargingLimit() {
+        log.debug("Checking kwh charging limit...");
         List<OcppChargingProcess> kwhLimitProcesses = proxyService.findOpenChargingProcessesWithLimitKwh();
         for (OcppChargingProcess cp : kwhLimitProcesses) {
             if (cp.getTransactionStart() != null) {
@@ -61,6 +57,10 @@ public class OcppChargingLimitWatcher {
                 }
             }
         }
+    }
+
+    public void checkMinuteChargingLimit() {
+        log.debug("Checking minute charging limit...");
 
         List<OcppChargingProcess> minuteLimitProcesses = proxyService.findOpenChargingProcessesWithLimitMinute();
         for (OcppChargingProcess cp : minuteLimitProcesses) {

@@ -16,25 +16,26 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package net.parkl.ocpp.module.esp.model;
+package net.parkl.ocpp.service;
 
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Component;
 
-import java.util.Date;
+@Component
+@Slf4j
+public class ScheduledOcppChargingLimitWatcher {
 
-@Getter
-@Setter
-@Builder
-@ToString
-public class ESPChargingConsumptionRequest {
-    private String externalChargeId;
-    private float totalPower;
-    private Float startValue;
-    private Float stopValue;
+    private final OcppChargingLimitWatcher limitWatcher;
 
-    private Date start;
-    private Date end;
+    public ScheduledOcppChargingLimitWatcher(OcppChargingLimitWatcher limitWatcher) {
+        this.limitWatcher = limitWatcher;
+    }
+
+    @Scheduled(fixedRate = 10000)
+    public void checkChargingLimit() {
+        log.debug("Checking charging limit...");
+        limitWatcher.checkKwhChargingLimit();
+        limitWatcher.checkMinuteChargingLimit();
+    }
 }

@@ -41,6 +41,9 @@ public class SendLocalListParams extends MultipleChargePointSelect {
     @NotNull(message = "Update Type is required")
     private SendLocalListUpdateType updateType = SendLocalListUpdateType.FULL;
 
+    @NotNull
+    private Boolean sendEmptyListWhenFull = Boolean.FALSE;
+
     private List<String> deleteList;
     private List<String> addUpdateList;
 

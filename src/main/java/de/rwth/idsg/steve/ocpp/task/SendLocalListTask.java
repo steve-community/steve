@@ -24,9 +24,11 @@ import de.rwth.idsg.steve.ocpp.OcppVersion;
 import de.rwth.idsg.steve.service.OcppTagService;
 import de.rwth.idsg.steve.web.dto.ocpp.SendLocalListParams;
 import de.rwth.idsg.steve.web.dto.ocpp.SendLocalListUpdateType;
+import ocpp.cp._2015._10.AuthorizationData;
 
 import javax.xml.ws.AsyncHandler;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -109,10 +111,16 @@ public class SendLocalListTask extends Ocpp15AndAboveTask<SendLocalListParams, S
 
             // FULL update
         } else {
+            List<AuthorizationData> values = Collections.emptyList();
+
+            if (Boolean.FALSE.equals(params.getSendEmptyListWhenFull())) {
+                values = ocppTagService.getAuthDataOfAllTags();
+            }
+
             return new ocpp.cp._2015._10.SendLocalListRequest()
                     .withListVersion(params.getListVersion())
                     .withUpdateType(ocpp.cp._2015._10.UpdateType.FULL)
-                    .withLocalAuthorizationList(ocppTagService.getAuthDataOfAllTags());
+                    .withLocalAuthorizationList(values);
         }
     }
 

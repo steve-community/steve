@@ -41,4 +41,7 @@ public interface AdvancedChargeBoxConfigRepository extends CrudRepository<Advanc
 
 	@Query("SELECT config.chargeBoxId FROM AdvancedChargeBoxConfig AS config GROUP BY config.chargeBoxId")
 	List<String> getChargeBoxIds();
+
+	@Query("SELECT config.chargeBoxId FROM AdvancedChargeBoxConfig AS config WHERE config.configKey=?1")
+	List<String> getChargeBoxIdsForKey(String key);
 }

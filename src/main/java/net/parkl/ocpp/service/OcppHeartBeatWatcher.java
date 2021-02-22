@@ -2,10 +2,9 @@ package net.parkl.ocpp.service;
 
 import lombok.extern.slf4j.Slf4j;
 import net.parkl.ocpp.entities.OcppChargeBox;
-import net.parkl.ocpp.service.cs.ChargePointService;
+import net.parkl.ocpp.service.config.AdvancedChargeBoxConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.task.TaskExecutor;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.util.Calendar;
@@ -16,20 +15,21 @@ import java.util.Date;
 public class OcppHeartBeatWatcher {
 
     private static final int CHECK_INTERVAL_MINS = 5;
-    private final ChargePointService chargePointService;
     private final TaskExecutor taskExecutor;
     private final OcppMiddleware ocppMiddleware;
+    private final AdvancedChargeBoxConfiguration advancedChargeBoxConfiguration;
 
     @Autowired
-    public OcppHeartBeatWatcher(ChargePointService chargePointService, TaskExecutor taskExecutor, OcppMiddleware ocppProxyServerFacade) {
-        this.chargePointService = chargePointService;
+    public OcppHeartBeatWatcher(TaskExecutor taskExecutor,
+                                OcppMiddleware ocppProxyServerFacade,
+                                AdvancedChargeBoxConfiguration advancedChargeBoxConfiguration) {
         this.taskExecutor = taskExecutor;
         this.ocppMiddleware = ocppProxyServerFacade;
+        this.advancedChargeBoxConfiguration = advancedChargeBoxConfiguration;
     }
 
-    @Scheduled(fixedRate = 300000)
     public void watch() {
-        chargePointService.getAllChargeBoxes().forEach(this::heartBeatCheck);
+        advancedChargeBoxConfiguration.getChargeBoxesForAlert().forEach(this::heartBeatCheck);
     }
 
     public void heartBeatCheck(OcppChargeBox chargeBox) {
@@ -41,12 +41,7 @@ public class OcppHeartBeatWatcher {
                 chargeBox.getLastHeartbeatTimestamp().before(fiveMinBefore)) {
             log.info("Last heartbeat did not arrive in the {} mins period for chargebox with id={}, sending alert...",
                     CHECK_INTERVAL_MINS, chargeBox.getChargeBoxId());
-            taskExecutor.execute(new Runnable() {
-                @Override
-                public void run() {
-                    ocppMiddleware.sendHeartBeatOfflineAlert(chargeBox.getChargeBoxId());
-                }
-            });
+            taskExecutor.execute(() -> ocppMiddleware.sendHeartBeatOfflineAlert(chargeBox.getChargeBoxId()));
         }
     }
 }

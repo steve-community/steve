@@ -65,5 +65,10 @@ public class AdvancedChargeBoxConfigKeys {
      */
     public static final String KEY_CHECK_RESERVATION = "check.reservation";
 
+    /**
+     * Check heartbeat offline alert for chargebox
+     */
+    public static final String KEY_SKIP_HEARTBEAT_CHECK = "skip.heartbeat.check";
+
 
 }

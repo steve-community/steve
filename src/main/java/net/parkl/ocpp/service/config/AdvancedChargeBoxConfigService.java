@@ -20,12 +20,15 @@ package net.parkl.ocpp.service.config;
 
 import lombok.extern.slf4j.Slf4j;
 import net.parkl.ocpp.entities.AdvancedChargeBoxConfig;
+import net.parkl.ocpp.entities.OcppChargeBox;
 import net.parkl.ocpp.repositories.AdvancedChargeBoxConfigRepository;
+import net.parkl.ocpp.service.cs.ChargePointService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -33,6 +36,8 @@ import java.util.List;
 public class AdvancedChargeBoxConfigService {
     @Autowired
     private AdvancedChargeBoxConfigRepository repository;
+    @Autowired
+    private ChargePointService chargePointService;
 
     public AdvancedChargeBoxConfig findByChargeBoxIdAndKey(String chargeBoxId, String key) {
         return repository.findByChargeBoxIdAndConfigKey(chargeBoxId, key);
@@ -74,6 +79,19 @@ public class AdvancedChargeBoxConfigService {
 
     public List<AdvancedChargeBoxConfig> findByChargeBoxId(String chargeBoxId) {
         return repository.findByChargeBoxIdOrderByConfigKeyAsc(chargeBoxId);
+    }
+
+    public List<OcppChargeBox> getChargeBoxesForAlert(String key) {
+        List<OcppChargeBox> allChargeBox = chargePointService.getAllChargeBoxes();
+        List<String> skippedChargeBoxIds = getChargeBoxIdsForKey(key);
+        return allChargeBox
+                .stream()
+                .filter(ocppChargeBox -> skippedChargeBoxIds.contains(ocppChargeBox.getChargeBoxId()))
+                .collect(Collectors.toList());
+    }
+
+    public List<String> getChargeBoxIdsForKey(String key) {
+        return repository.getChargeBoxIdsForKey(key);
     }
 
 }

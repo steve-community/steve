@@ -2,7 +2,12 @@ package net.parkl.ocpp.service.driver;
 
 import lombok.NoArgsConstructor;
 import net.parkl.ocpp.entities.AdvancedChargeBoxConfig;
+import net.parkl.ocpp.entities.OcppChargeBox;
 import net.parkl.ocpp.service.config.AdvancedChargeBoxConfigService;
+
+import java.util.List;
+
+import static net.parkl.ocpp.service.config.AdvancedChargeBoxConfigKeys.KEY_SKIP_HEARTBEAT_CHECK;
 
 @NoArgsConstructor
 public class AdvancedChargeBoxConfigDriver {
@@ -31,20 +36,22 @@ public class AdvancedChargeBoxConfigDriver {
         service.saveConfigValue(chargeBoxId, key, value);
     }
 
-    public AdvancedChargeBoxConfigDriver withChargeBoxId(String chargeBoxId){
+    public AdvancedChargeBoxConfigDriver withChargeBoxId(String chargeBoxId) {
         this.chargeBoxId = chargeBoxId;
         return this;
     }
 
-    public AdvancedChargeBoxConfigDriver withKey(String key){
+    public AdvancedChargeBoxConfigDriver withKey(String key) {
         this.key = key;
         return this;
     }
 
-    public AdvancedChargeBoxConfigDriver withValue(String value){
+    public AdvancedChargeBoxConfigDriver withValue(String value) {
         this.value = value;
         return this;
     }
 
-
+    public List<OcppChargeBox> getChargeBoxForAlert() {
+        return service.getChargeBoxesForAlert(KEY_SKIP_HEARTBEAT_CHECK);
+    }
 }

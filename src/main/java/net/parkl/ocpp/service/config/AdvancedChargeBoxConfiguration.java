@@ -19,12 +19,14 @@
 package net.parkl.ocpp.service.config;
 
 import net.parkl.ocpp.entities.AdvancedChargeBoxConfig;
+import net.parkl.ocpp.entities.OcppChargeBox;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 
 import static java.util.Collections.emptyList;
+import static net.parkl.ocpp.service.config.AdvancedChargeBoxConfigKeys.*;
 
 /**
  * OCPP szerver külső konfigurációs komponens
@@ -57,43 +59,43 @@ public class AdvancedChargeBoxConfiguration {
 
     public boolean isStartTimeoutEnabled(String chargeBoxId) {
 
-        return getConfigValueAsBool(chargeBoxId, AdvancedChargeBoxConfigKeys.KEY_START_TIMEOUT_ENABLED, false);
+        return getConfigValueAsBool(chargeBoxId, KEY_START_TIMEOUT_ENABLED, false);
     }
 
     public int getStartTimeoutSecs(String chargeBoxId) {
-        return getConfigValueAsInt(chargeBoxId, AdvancedChargeBoxConfigKeys.KEY_START_TIMEOUT_SECS, 60);
+        return getConfigValueAsInt(chargeBoxId, KEY_START_TIMEOUT_SECS, 60);
     }
 
     public boolean isPreparingTimeoutEnabled(String chargeBoxId) {
-        return getConfigValueAsBool(chargeBoxId, AdvancedChargeBoxConfigKeys.KEY_PREPARING_TIMEOUT_ENABLED, false);
+        return getConfigValueAsBool(chargeBoxId, KEY_PREPARING_TIMEOUT_ENABLED, false);
     }
 
     public int getPreparingTimeoutSecs(String chargeBoxId) {
-        return getConfigValueAsInt(chargeBoxId, AdvancedChargeBoxConfigKeys.KEY_PREPARING_TIMEOUT_SECS, 60);
+        return getConfigValueAsInt(chargeBoxId, KEY_PREPARING_TIMEOUT_SECS, 60);
     }
 
     public boolean isTransactionPartialEnabled(String chargeBoxId) {
-        return getConfigValueAsBool(chargeBoxId, AdvancedChargeBoxConfigKeys.KEY_TRANSACTION_PARTIAL_ENABLED, false);
+        return getConfigValueAsBool(chargeBoxId, KEY_TRANSACTION_PARTIAL_ENABLED, false);
     }
 
     public boolean waitingForChargingProcessEnabled(String chargeBoxId) {
-        return getConfigValueAsBool(chargeBoxId, AdvancedChargeBoxConfigKeys.KEY_WAITING_FOR_CHARGING_PROCESS_ENABLED, false);
+        return getConfigValueAsBool(chargeBoxId, KEY_WAITING_FOR_CHARGING_PROCESS_ENABLED, false);
     }
 
     public boolean isStartTimeoutEnabledForAny() {
-        return chargeBoxConfigService.countByKey(AdvancedChargeBoxConfigKeys.KEY_START_TIMEOUT_ENABLED) > 0;
+        return chargeBoxConfigService.countByKey(KEY_START_TIMEOUT_ENABLED) > 0;
     }
 
     public boolean isPreparingTimeoutEnabledForAny() {
-        return chargeBoxConfigService.countByKey(AdvancedChargeBoxConfigKeys.KEY_PREPARING_TIMEOUT_ENABLED) > 0;
+        return chargeBoxConfigService.countByKey(KEY_PREPARING_TIMEOUT_ENABLED) > 0;
     }
 
     public boolean isUsingIntegratedTag(String chargeBoxId) {
-        return getConfigValueAsBool(chargeBoxId, AdvancedChargeBoxConfigKeys.KEY_USING_INTEGRATED_IDTAG, false);
+        return getConfigValueAsBool(chargeBoxId, KEY_USING_INTEGRATED_IDTAG, false);
     }
 
     public boolean isIdTagMax10Characters(String chargeBoxId) {
-        return getConfigValueAsBool(chargeBoxId, AdvancedChargeBoxConfigKeys.KEY_IDTAG_MAX10, false);
+        return getConfigValueAsBool(chargeBoxId, KEY_IDTAG_MAX10, false);
     }
 
     public List<String> getIntegrationIdTags() {
@@ -101,6 +103,11 @@ public class AdvancedChargeBoxConfiguration {
     }
 
     public boolean checkReservationId(String chargeBoxId) {
-        return getConfigValueAsBool(chargeBoxId, AdvancedChargeBoxConfigKeys.KEY_CHECK_RESERVATION, false);
+        return getConfigValueAsBool(chargeBoxId, KEY_CHECK_RESERVATION, false);
     }
+
+    public List<OcppChargeBox> getChargeBoxesForAlert() {
+        return chargeBoxConfigService.getChargeBoxesForAlert(KEY_SKIP_HEARTBEAT_CHECK);
+    }
+
 }

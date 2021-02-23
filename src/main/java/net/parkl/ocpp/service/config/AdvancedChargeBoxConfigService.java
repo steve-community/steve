@@ -86,7 +86,7 @@ public class AdvancedChargeBoxConfigService {
         List<String> skippedChargeBoxIds = getChargeBoxIdsForKey(key);
         return allChargeBox
                 .stream()
-                .filter(ocppChargeBox -> skippedChargeBoxIds.contains(ocppChargeBox.getChargeBoxId()))
+                .filter(ocppChargeBox -> !skippedChargeBoxIds.contains(ocppChargeBox.getChargeBoxId()))
                 .collect(Collectors.toList());
     }
 

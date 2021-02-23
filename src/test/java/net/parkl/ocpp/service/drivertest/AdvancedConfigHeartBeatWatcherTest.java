@@ -1,5 +1,6 @@
 package net.parkl.ocpp.service.drivertest;
 
+import net.parkl.ocpp.entities.OcppChargeBox;
 import net.parkl.ocpp.service.driver.AdvancedChargeBoxConfigDriver;
 import net.parkl.ocpp.service.driver.ChargeBoxDriver;
 import net.parkl.ocpp.service.driver.DriverTestBase;
@@ -7,6 +8,8 @@ import org.assertj.core.api.Assertions;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.stereotype.Component;
+
+import java.util.List;
 
 import static de.rwth.idsg.steve.ocpp.OcppProtocol.V_16_SOAP;
 import static net.parkl.ocpp.service.config.AdvancedChargeBoxConfigKeys.KEY_SKIP_HEARTBEAT_CHECK;
@@ -41,6 +44,8 @@ public class AdvancedConfigHeartBeatWatcherTest extends DriverTestBase {
                 .withConnectors(2)
                 .createChargeBox();
 
-        Assertions.assertThat(advancedChargeBoxConfigDriver.getChargeBoxForAlert()).hasSize(1);
+        List<OcppChargeBox> chargeBoxForAlert = advancedChargeBoxConfigDriver.getChargeBoxForAlert();
+        Assertions.assertThat(chargeBoxForAlert).hasSize(1);
+        Assertions.assertThat(chargeBoxForAlert).extracting("chargeBoxId").contains("testChargeBox");
     }
 }

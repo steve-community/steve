@@ -32,6 +32,7 @@ import net.parkl.ocpp.entities.OcppChargingProcess;
 import net.parkl.ocpp.entities.TransactionStart;
 import net.parkl.ocpp.module.esp.model.ESPRfidChargingStartRequest;
 import net.parkl.ocpp.service.ChargingProcessService;
+import net.parkl.ocpp.service.HeartBeatService;
 import net.parkl.ocpp.service.OcppMiddleware;
 import net.parkl.ocpp.service.cs.*;
 import ocpp.cs._2015._10.*;
@@ -73,6 +74,8 @@ public class CentralSystemService16_Service {
     private ChargingProcessService chargingProcessService;
     @Autowired
     private OcppMiddleware proxyServerFacade;
+    @Autowired
+    private HeartBeatService heartBeatService;
 
     public BootNotificationResponse bootNotification(BootNotificationRequest parameters, String chargeBoxIdentity,
                                                      OcppProtocol ocppProtocol) {
@@ -103,6 +106,8 @@ public class CentralSystemService16_Service {
                             .build();
 
             chargePointService.updateChargebox(params);
+
+            heartBeatService.changeConfig(ocppProtocol, chargeBoxIdentity, parameters);
         }
 
         return new BootNotificationResponse()

@@ -21,7 +21,9 @@ package net.parkl.ocpp.service.config;
 import lombok.extern.slf4j.Slf4j;
 import net.parkl.ocpp.entities.AdvancedChargeBoxConfig;
 import net.parkl.ocpp.entities.OcppChargeBox;
+import net.parkl.ocpp.entities.OcppChargingProcess;
 import net.parkl.ocpp.repositories.AdvancedChargeBoxConfigRepository;
+import net.parkl.ocpp.repositories.OcppChargingProcessRepository;
 import net.parkl.ocpp.service.cs.ChargePointService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -34,10 +36,18 @@ import java.util.stream.Collectors;
 @Slf4j
 @Transactional
 public class AdvancedChargeBoxConfigService {
+    private final AdvancedChargeBoxConfigRepository repository;
+    private final ChargePointService chargePointService;
+    private final OcppChargingProcessRepository chargingProcessRepository;
+
     @Autowired
-    private AdvancedChargeBoxConfigRepository repository;
-    @Autowired
-    private ChargePointService chargePointService;
+    public AdvancedChargeBoxConfigService(AdvancedChargeBoxConfigRepository repository,
+                                          ChargePointService chargePointService,
+                                          OcppChargingProcessRepository chargingProcessRepository) {
+        this.repository = repository;
+        this.chargePointService = chargePointService;
+        this.chargingProcessRepository = chargingProcessRepository;
+    }
 
     public AdvancedChargeBoxConfig findByChargeBoxIdAndKey(String chargeBoxId, String key) {
         return repository.findByChargeBoxIdAndConfigKey(chargeBoxId, key);
@@ -86,12 +96,22 @@ public class AdvancedChargeBoxConfigService {
         List<String> skippedChargeBoxIds = getChargeBoxIdsForKey(key);
         return allChargeBox
                 .stream()
-                .filter(ocppChargeBox -> !skippedChargeBoxIds.contains(ocppChargeBox.getChargeBoxId()))
+                .filter(ocppChargeBox -> {
+                    return !skippedChargeBoxIds.contains(ocppChargeBox.getChargeBoxId()) &&
+                            getActiveChargingProcesses(ocppChargeBox.getChargeBoxId()).isEmpty();
+                })
                 .collect(Collectors.toList());
     }
 
     public List<String> getChargeBoxIdsForKey(String key) {
         return repository.getChargeBoxIdsForKey(key);
     }
+
+    public List<OcppChargingProcess> getActiveChargingProcesses(String chargeBoxId) {
+        List<OcppChargingProcess> ret = chargingProcessRepository.findActiveByChargeBoxId(chargeBoxId);
+        return ret;
+    }
+
+
 
 }

@@ -4,10 +4,13 @@ import de.rwth.idsg.steve.ocpp.OcppProtocol;
 import de.rwth.idsg.steve.repository.dto.InsertConnectorStatusParams;
 import de.rwth.idsg.steve.repository.dto.UpdateChargeboxParams;
 import lombok.NoArgsConstructor;
+import net.parkl.ocpp.entities.OcppChargeBox;
 import net.parkl.ocpp.service.OcppMiddleware;
 import net.parkl.ocpp.service.cs.ChargePointService;
 import net.parkl.ocpp.service.cs.ConnectorService;
 import org.joda.time.DateTime;
+
+import java.util.List;
 
 @NoArgsConstructor
 public class ChargeBoxDriver {
@@ -63,6 +66,11 @@ public class ChargeBoxDriver {
     public ChargeBoxDriver withConnectors(int connectors) {
         this.connectors = connectors;
         return this;
+    }
+
+    public void deleteAllChargePoints() {
+        List<OcppChargeBox> chargeBoxList = chargePointService.getAllChargeBoxes();
+        chargeBoxList.forEach(c->chargePointService.deleteChargePoint(c.getChargeBoxPk()));
     }
 
 }

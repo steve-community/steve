@@ -5,25 +5,25 @@ import de.rwth.idsg.steve.ocpp.task.ChangeConfigurationTask;
 import de.rwth.idsg.steve.repository.dto.ChargePointSelect;
 import de.rwth.idsg.steve.service.ChargePointHelperService;
 import de.rwth.idsg.steve.web.dto.ocpp.ConfigurationKeyEnum;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-@ExtendWith(MockitoExtension.class)
-class HeartBeatServiceTest {
+@RunWith(MockitoJUnitRunner.class)
+public class HeartBeatServiceTest {
 
     @InjectMocks
     private HeartBeatService heartBeatService;
@@ -43,7 +43,7 @@ class HeartBeatServiceTest {
     private static final int heartBeatInterval = 60;
 
     @Test
-    void changeConfig15() {
+    public void changeConfig15() {
         ReflectionTestUtils.setField(heartBeatService, "heartBeatIntervalInSecs", heartBeatInterval);
 
         String chargeBoxId = "ID15";
@@ -62,7 +62,7 @@ class HeartBeatServiceTest {
     }
 
     @Test
-    void changeConfig16() {
+    public void changeConfig16() {
         ReflectionTestUtils.setField(heartBeatService, "heartBeatIntervalInSecs", heartBeatInterval);
 
         String chargeBoxId = "ID16";

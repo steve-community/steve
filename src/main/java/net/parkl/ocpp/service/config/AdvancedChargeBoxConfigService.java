@@ -87,19 +87,13 @@ public class AdvancedChargeBoxConfigService {
         return repository.getChargeBoxIds();
     }
 
-    public List<AdvancedChargeBoxConfig> findByChargeBoxId(String chargeBoxId) {
-        return repository.findByChargeBoxIdOrderByConfigKeyAsc(chargeBoxId);
-    }
-
     public List<OcppChargeBox> getChargeBoxesForAlert(String key) {
         List<OcppChargeBox> allChargeBox = chargePointService.getAllChargeBoxes();
         List<String> skippedChargeBoxIds = getChargeBoxIdsForKey(key);
         return allChargeBox
                 .stream()
-                .filter(ocppChargeBox -> {
-                    return !skippedChargeBoxIds.contains(ocppChargeBox.getChargeBoxId()) &&
-                            getActiveChargingProcesses(ocppChargeBox.getChargeBoxId()).isEmpty();
-                })
+                .filter(ocppChargeBox -> !skippedChargeBoxIds.contains(ocppChargeBox.getChargeBoxId()) &&
+                        getActiveChargingProcesses(ocppChargeBox.getChargeBoxId()).isEmpty())
                 .collect(Collectors.toList());
     }
 
@@ -108,10 +102,6 @@ public class AdvancedChargeBoxConfigService {
     }
 
     public List<OcppChargingProcess> getActiveChargingProcesses(String chargeBoxId) {
-        List<OcppChargingProcess> ret = chargingProcessRepository.findActiveByChargeBoxId(chargeBoxId);
-        return ret;
+        return chargingProcessRepository.findActiveByChargeBoxId(chargeBoxId);
     }
-
-
-
 }

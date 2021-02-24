@@ -8,14 +8,12 @@ import net.parkl.ocpp.service.driver.DriverTestBase;
 import org.assertj.core.api.Assertions;
 import org.junit.Before;
 import org.junit.Test;
-import org.springframework.stereotype.Component;
 
 import java.util.List;
 
 import static de.rwth.idsg.steve.ocpp.OcppProtocol.V_16_SOAP;
 import static net.parkl.ocpp.service.config.AdvancedChargeBoxConfigKeys.KEY_SKIP_HEARTBEAT_CHECK;
 
-@Component
 public class AdvancedConfigHeartBeatWatcherTest extends DriverTestBase {
 
     private AdvancedChargeBoxConfigDriver advancedChargeBoxConfigDriver;
@@ -27,6 +25,7 @@ public class AdvancedConfigHeartBeatWatcherTest extends DriverTestBase {
         chargeBoxDriver = driverFactory.createChargeBoxDriver();
         advancedChargeBoxConfigDriver = driverFactory.createAdvancedChargeBoxDriver();
         chargingDriver = driverFactory.createChargingDriver();
+        chargeBoxDriver.deleteAllChargePoints();
     }
 
     @Test

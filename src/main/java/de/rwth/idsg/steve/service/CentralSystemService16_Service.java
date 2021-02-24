@@ -107,7 +107,7 @@ public class CentralSystemService16_Service {
 
             chargePointService.updateChargebox(params);
 
-            heartBeatService.changeConfig(ocppProtocol, chargeBoxIdentity, parameters);
+            heartBeatService.changeConfig(ocppProtocol, chargeBoxIdentity);
         }
 
         return new BootNotificationResponse()

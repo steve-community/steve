@@ -9,6 +9,7 @@ import de.rwth.idsg.steve.repository.dto.ChargePointSelect;
 import de.rwth.idsg.steve.service.ChargePointHelperService;
 import de.rwth.idsg.steve.web.dto.ocpp.ChangeConfigurationParams;
 import de.rwth.idsg.steve.web.dto.ocpp.ConfigurationKeyEnum;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -17,6 +18,7 @@ import java.util.Collections;
 import java.util.List;
 
 @Service
+@Slf4j
 public class HeartBeatService {
 
 
@@ -42,16 +44,20 @@ public class HeartBeatService {
         ChangeConfigurationTask task;
 
         if (ocppProtocol.getVersion() == OcppVersion.V_16) {
+            log.info("Setting heartbeat interval secs to {} on OCPPv16", heartBeatIntervalInSecs);
             chargePoints = chargePointHelperService.getChargePoints(OcppVersion.V_16);
             chargePointSelect = filter(chargePoints, chargeBoxId);
             task = new ChangeConfigurationTask(OcppVersion.V_16, getParams(chargePointSelect));
             service16Invoker.changeConfiguration(chargePointSelect, task);
+            log.info("Successfully changed heartbeat interval on OCPPv16");
 
         } else if (ocppProtocol.getVersion() == OcppVersion.V_15) {
+            log.info("Setting heartbeat interval secs to {} on OCPPv15", heartBeatIntervalInSecs);
             chargePoints = chargePointHelperService.getChargePoints(OcppVersion.V_15);
             chargePointSelect = filter(chargePoints, chargeBoxId);
             task = new ChangeConfigurationTask(OcppVersion.V_15, getParams(chargePointSelect));
             service15Invoker.changeConfiguration(chargePointSelect, task);
+            log.info("Successfully changed heartbeat interval on OCPPv15");
         }
     }
 

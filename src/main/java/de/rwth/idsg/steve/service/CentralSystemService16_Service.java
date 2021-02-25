@@ -107,7 +107,11 @@ public class CentralSystemService16_Service {
 
             chargePointService.updateChargebox(params);
 
-            heartBeatService.changeConfig(ocppProtocol, chargeBoxIdentity);
+            try {
+                heartBeatService.changeConfig(ocppProtocol, chargeBoxIdentity);
+            } catch (Exception ex) {
+                log.error("Heart beat change configuration error: ", ex);
+            }
         }
 
         return new BootNotificationResponse()

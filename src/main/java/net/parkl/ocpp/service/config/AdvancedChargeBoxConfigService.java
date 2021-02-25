@@ -87,6 +87,10 @@ public class AdvancedChargeBoxConfigService {
         return repository.getChargeBoxIds();
     }
 
+    public List<AdvancedChargeBoxConfig> findByChargeBoxId(String chargeBoxId) {
+        return repository.findByChargeBoxIdOrderByConfigKeyAsc(chargeBoxId);
+    }
+
     public List<OcppChargeBox> getChargeBoxesForAlert(String key) {
         List<OcppChargeBox> allChargeBox = chargePointService.getAllChargeBoxes();
         List<String> skippedChargeBoxIds = getChargeBoxIdsForKey(key);

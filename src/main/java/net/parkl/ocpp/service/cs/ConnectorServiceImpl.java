@@ -59,15 +59,14 @@ public class ConnectorServiceImpl implements ConnectorService {
     private OcppMiddleware ocppMiddleware;
 
 
-
     @Override
     @Transactional
     public void insertConnectorStatus(InsertConnectorStatusParams p) {
         Connector connector = createConnectorIfNotExists(p.getChargeBoxId(), p.getConnectorId());
 
-        ConnectorStatus s=new ConnectorStatus();
+        ConnectorStatus s = new ConnectorStatus();
         s.setConnector(connector);
-        if (p.getTimestamp()!=null) {
+        if (p.getTimestamp() != null) {
             s.setStatusTimestamp(p.getTimestamp().toDate());
         }
         s.setStatus(p.getStatus());
@@ -78,21 +77,21 @@ public class ConnectorServiceImpl implements ConnectorService {
 
         connectorStatusRepo.save(s);
 
-        OcppChargingProcess savedProcess=null;
+        OcppChargingProcess savedProcess = null;
         if (s.getStatus().equals("Available")) {
             OcppChargingProcess process = chargingProcessRepo.findByConnectorAndTransactionStartIsNullAndEndDateIsNull(connector);
-            if (process!=null) {
-                log.info("Ending charging process on available connector status: {}",process.getOcppChargingProcessId());
+            if (process != null) {
+                log.info("Ending charging process on available connector status: {}", process.getOcppChargingProcessId());
                 process.setEndDate(new Date());
-                savedProcess=chargingProcessRepo.save(process);
+                savedProcess = chargingProcessRepo.save(process);
             }
         } else if (s.getStatus().equals("Faulted") || s.getStatus().equals("Unavailable")) {
             OcppChargingProcess process = chargingProcessRepo.findByConnectorAndTransactionStartIsNullAndEndDateIsNull(connector);
-            if (process!=null) {
-                log.info("Saving connector status error to charging process: {} [error={}]...",process.getOcppChargingProcessId(),
+            if (process != null) {
+                log.info("Saving connector status error to charging process: {} [error={}]...", process.getOcppChargingProcessId(),
                         s.getErrorCode());
                 String error = errorTranslator.translateError(s.getErrorCode());
-                if (error!=null) {
+                if (error != null) {
                     process.setErrorCode(error);
                     savedProcess = chargingProcessRepo.save(process);
                 }
@@ -100,15 +99,11 @@ public class ConnectorServiceImpl implements ConnectorService {
         }
         log.debug("Stored a new connector status for {}/{}.", p.getChargeBoxId(), p.getConnectorId());
 
-        if (savedProcess!=null) {
-            final OcppChargingProcess pr=savedProcess;
-            executor.execute(new Runnable() {
-
-                @Override
-                public void run() {
-                    log.info("Notifying Parkl about closing charging process: {}...",pr.getOcppChargingProcessId());
-                    ocppMiddleware.stopChargingExternal(pr, pr.getErrorCode()!=null?pr.getErrorCode(): OcppConstants.REASON_VEHICLE_NOT_CONNECTED);
-                }
+        if (savedProcess != null) {
+            final OcppChargingProcess pr = savedProcess;
+            executor.execute(() -> {
+                log.info("Notifying Parkl about closing charging process: {}...", pr.getOcppChargingProcessId());
+                ocppMiddleware.stopChargingExternal(pr, pr.getErrorCode() != null ? pr.getErrorCode() : OcppConstants.REASON_VEHICLE_NOT_CONNECTED);
             });
         }
     }

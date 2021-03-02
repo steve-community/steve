@@ -874,26 +874,31 @@ public class OcppMiddlewareImpl implements OcppMiddleware {
 
     @Override
     public void stopChargingExternal(OcppChargingProcess process, String reason) {
-        if (process == null) {
-            throw new IllegalArgumentException("OcppChargingProcess was null");
+        if (process == null || reason == null) {
+            throw new IllegalArgumentException("OcppChargingProcess or reason was null");
         }
         log.info("Stopping charging process from OCPP proxy: {}...", process.getOcppChargingProcessId());
 
-        int transactionPk = process.getTransactionStart().getTransactionPk();
-        Transaction transaction = transactionService.findTransaction(transactionPk)
-                .orElseThrow(() -> new IllegalStateException("Invalid transaction id: " + transactionPk));
-
-        ESPChargingData data = ESPChargingData.builder().
+        ESPChargingData.ESPChargingDataBuilder espChargingDataBuilder = ESPChargingData.builder().
                 start(process.getStartDate()).
-                end(process.getEndDate()).
-                totalPower(consumptionHelper.getTotalPower(transaction)).
-                startValue(consumptionHelper.getStartValue(transaction)).
-                stopValue(consumptionHelper.getStartValue(transaction)).build();
+                end(process.getEndDate());
+
+        if (!reason.equals(REASON_VEHICLE_NOT_CONNECTED)) {
+            int transactionPk = process.getTransactionStart().getTransactionPk();
+            Transaction transaction = transactionService.findTransaction(transactionPk)
+                    .orElseThrow(() -> new IllegalStateException("Invalid transaction id: " + transactionPk));
+
+            espChargingDataBuilder
+                    .totalPower(consumptionHelper.getTotalPower(transaction))
+                    .startValue(consumptionHelper.getStartValue(transaction))
+                    .stopValue(consumptionHelper.getStopValue(transaction));
+        }
+
 
         ESPChargingStopRequest req = ESPChargingStopRequest.builder().
                 externalChargeId(process.getOcppChargingProcessId()).
                 eventCode(reason).
-                chargingData(data).build();
+                chargingData(espChargingDataBuilder.build()).build();
 
         emobilityServiceProvider.stopChargingExternal(req);
 

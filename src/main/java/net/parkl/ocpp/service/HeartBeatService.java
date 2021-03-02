@@ -21,21 +21,21 @@ import java.util.List;
 @Slf4j
 public class HeartBeatService {
 
-
     private final ChargePointService15_Invoker service15Invoker;
     private final ChargePointService16_Invoker service16Invoker;
     private final ChargePointHelperService chargePointHelperService;
-
-    @Value("${heartbeat.interval.secs}")
-    private int heartBeatIntervalInSecs;
+    private final int heartBeatIntervalInSecs;
 
     @Autowired
     public HeartBeatService(ChargePointService15_Invoker chargePointService15_InvokerImpl,
                             ChargePointService16_Invoker chargePointService16_InvokerImpl,
-                            ChargePointHelperService chargePointHelperService) {
+                            ChargePointHelperService chargePointHelperService,
+                            @Value("${heartbeat.interval.secs}") int heartBeatIntervalInSecs) {
+
         this.service15Invoker = chargePointService15_InvokerImpl;
         this.service16Invoker = chargePointService16_InvokerImpl;
         this.chargePointHelperService = chargePointHelperService;
+        this.heartBeatIntervalInSecs = heartBeatIntervalInSecs;
     }
 
     public void changeConfig(OcppProtocol ocppProtocol, String chargeBoxId) {

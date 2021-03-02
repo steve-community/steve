@@ -23,7 +23,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.joda.time.LocalDateTime;
 
-import javax.validation.constraints.AssertTrue;
+import jakarta.validation.constraints.AssertTrue;
 
 /**
  * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>

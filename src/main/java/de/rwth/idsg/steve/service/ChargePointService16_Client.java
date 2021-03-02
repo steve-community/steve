@@ -125,7 +125,7 @@ public class ChargePointService16_Client extends ChargePointService15_Client {
     }
 
     /**
-     * Do some additional checks defined by OCPP spec, which cannot be captured with javax.validation
+     * Do some additional checks defined by OCPP spec, which cannot be captured with Hibernate validator
      */
     private static void checkAdditionalConstraints(SetChargingProfileParams params, ChargingProfile.Details details) {
         ChargingProfilePurposeType purpose = ChargingProfilePurposeType.fromValue(details.getProfile().getChargingProfilePurpose());

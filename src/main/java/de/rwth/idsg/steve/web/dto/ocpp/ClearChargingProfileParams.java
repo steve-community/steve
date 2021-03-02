@@ -22,10 +22,10 @@ import lombok.Getter;
 import lombok.Setter;
 import ocpp.cp._2015._10.ChargingProfilePurposeType;
 
-import javax.validation.constraints.AssertTrue;
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Positive;
+import jakarta.validation.constraints.AssertTrue;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 
 /**
  * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>

@@ -22,8 +22,8 @@ import lombok.Getter;
 import lombok.Setter;
 import org.joda.time.LocalDate;
 
-import javax.validation.constraints.Email;
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotNull;
 
 /**
  * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>

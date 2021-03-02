@@ -23,10 +23,10 @@ import lombok.Getter;
 import lombok.Setter;
 import org.joda.time.LocalDateTime;
 
-import javax.validation.constraints.Future;
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.Future;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
 /**
  * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>

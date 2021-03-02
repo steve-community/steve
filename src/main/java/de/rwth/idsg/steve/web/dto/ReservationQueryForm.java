@@ -23,7 +23,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
-import javax.validation.constraints.AssertTrue;
+import jakarta.validation.constraints.AssertTrue;
 
 /**
  * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>

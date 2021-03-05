@@ -28,16 +28,11 @@ import java.util.Date;
 
 @Entity
 @Immutable
-@Subselect("SELECT\n" +
-        "  tx1.transaction_pk, tx1.connector_pk, tx1.id_tag, tx1.event_timestamp as start_event_timestamp, tx1.start_timestamp, tx1.start_value,\n" +
-        "  tx2.event_actor as stop_event_actor, tx2.event_timestamp as stop_event_timestamp, tx2.stop_timestamp, tx2.stop_value, tx2.stop_reason\n" +
-        "  FROM ocpp_transaction_start tx1\n" +
-        "  LEFT JOIN (\n" +
-        "    SELECT s1.*\n" +
-        "    FROM ocpp_transaction_stop s1\n" +
-        "    WHERE s1.event_timestamp = (SELECT MAX(event_timestamp) FROM ocpp_transaction_stop s2 WHERE s1.transaction_pk = s2.transaction_pk)\n" +
-        "    GROUP BY s1.transaction_pk, s1.event_timestamp) tx2\n" +
-        "  ON tx1.transaction_pk = tx2.transaction_pk")
+@Subselect("SELECT tx1.transaction_pk, tx1.connector_pk, tx1.id_tag, tx1.event_timestamp as start_event_timestamp, " +
+                   "tx1.start_timestamp, tx1.start_value, tx2.event_actor as stop_event_actor, " +
+                   "tx2.event_timestamp as stop_event_timestamp, tx2.stop_timestamp, tx2.stop_value, " +
+                   "tx2.stop_reason FROM ocpp_transaction_start tx1, ocpp_transaction_stop tx2 " +
+                   "WHERE tx1.transaction_pk = tx2.transaction_pk")
 @Getter
 @ToString
 public class Transaction {

@@ -37,7 +37,7 @@
         <spring.version>5.3.4</spring.version>
         <spring.security.version>5.4.5</spring.security.version>
         <mysql.jdbc.version>8.0.23</mysql.jdbc.version>
-        <jetty.version>9.4.38.v20210224</jetty.version>
+        <jetty.version>10.0.1</jetty.version>
         <lombok.version>1.18.18</lombok.version>
         <jackson.version>2.12.2</jackson.version>
 
@@ -638,7 +638,7 @@
         </dependency>
         <dependency>
             <groupId>org.eclipse.jetty.websocket</groupId>
-            <artifactId>websocket-server</artifactId>
+            <artifactId>websocket-core-server</artifactId>
             <version>${jetty.version}</version>
         </dependency>
 

@@ -30,9 +30,10 @@ import java.util.Date;
 @Immutable
 @Subselect("SELECT tx1.transaction_pk, tx1.connector_pk, tx1.id_tag, tx1.event_timestamp as start_event_timestamp, " +
                    "tx1.start_timestamp, tx1.start_value, tx2.event_actor as stop_event_actor, " +
-                   "tx2.event_timestamp as stop_event_timestamp, tx2.stop_timestamp, tx2.stop_value, " +
-                   "tx2.stop_reason FROM ocpp_transaction_start tx1, ocpp_transaction_stop tx2 " +
-                   "WHERE tx1.transaction_pk = tx2.transaction_pk")
+                   "tx2.event_timestamp as stop_event_timestamp, tx2.stop_timestamp, tx2.stop_value, tx2.stop_reason " +
+                   "FROM ocpp_transaction_start tx1 " +
+                   "LEFT JOIN ocpp_transaction_stop tx2 " +
+                   "ON tx1.transaction_pk = tx2.transaction_pk")
 @Getter
 @ToString
 public class Transaction {

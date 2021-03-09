@@ -157,7 +157,7 @@ public class OcppTagServiceImpl implements OcppTagService {
                 return CONCURRENT_TX;
             }
         }
-        log.debug("The user with idTag '{}' is ACCEPTED.", record.getIdTag());
+        log.debug("The user with idTag '{}' is ACCEPTED.", idTag);
         return ACCEPTED;
     }
 

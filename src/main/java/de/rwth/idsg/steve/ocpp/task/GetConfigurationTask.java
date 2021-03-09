@@ -26,7 +26,6 @@ import com.google.common.base.Joiner;
 import de.rwth.idsg.steve.ocpp.Ocpp15AndAboveTask;
 import de.rwth.idsg.steve.ocpp.OcppCallback;
 import de.rwth.idsg.steve.ocpp.OcppVersion;
-import de.rwth.idsg.steve.ocpp.RequestResult;
 import de.rwth.idsg.steve.web.dto.ocpp.GetConfigurationParams;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -45,6 +44,15 @@ public class GetConfigurationTask extends Ocpp15AndAboveTask<GetConfigurationPar
 
     private static final Joiner JOINER = Joiner.on(", ");
 
+    private static final String FORMAT =
+            "<b>Known keys:</b>"
+                    + "<br>"
+                    + "%s"
+                    + "<br>"
+                    + "<b>Unknown keys:</b>"
+                    + "<br>"
+                    + "%s";
+
     public GetConfigurationTask(OcppVersion ocppVersion, GetConfigurationParams params) {
         super(ocppVersion, params);
     }
@@ -54,10 +62,12 @@ public class GetConfigurationTask extends Ocpp15AndAboveTask<GetConfigurationPar
         return new DefaultOcppCallback<ResponseWrapper>() {
             @Override
             public void success(String chargeBoxId, ResponseWrapper response) {
-                addNewResponse(chargeBoxId, "OK");
-
-                RequestResult result = getResultMap().get(chargeBoxId);
-                result.setDetails(response);
+                String str = String.format(
+                        FORMAT,
+                        toStringConfList(response.configurationKeys),
+                        response.unknownKeys
+                );
+                addNewResponse(chargeBoxId, str);
             }
         };
     }
@@ -113,6 +123,20 @@ public class GetConfigurationTask extends Ocpp15AndAboveTask<GetConfigurationPar
                 failed(chargeBoxId, e);
             }
         };
+    }
+
+    private static String toStringConfList(List<KeyValue> confList) {
+        StringBuilder sb = new StringBuilder();
+        for (KeyValue keyValue : confList) {
+            sb.append(keyValue.getKey())
+                    .append(": ")
+                    .append(keyValue.getValue());
+            if (keyValue.isReadonly()) {
+                sb.append(" (read-only)");
+            }
+            sb.append("<br>");
+        }
+        return sb.toString();
     }
 
     @Getter

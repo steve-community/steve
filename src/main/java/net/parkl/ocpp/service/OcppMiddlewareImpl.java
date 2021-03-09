@@ -609,6 +609,9 @@ public class OcppMiddlewareImpl implements OcppMiddleware {
     private List<ESPChargeBoxConfiguration> processGetConfigurationResult(String chargeBoxId,
                                                                           RequestResult result) {
         if (result != null) {
+            if (result.getDetails() != null) {
+                log.info(result.getDetails());
+            }
             if (result.getResponse() != null) {
                 return parseConfList(result.getResponse());
             } else if (result.getErrorMessage() != null) {

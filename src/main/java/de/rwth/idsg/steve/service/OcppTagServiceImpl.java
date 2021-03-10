@@ -91,9 +91,7 @@ public class OcppTagServiceImpl implements OcppTagService {
             case EXPIRED:
             case CONCURRENT_TX:
             case ACCEPTED:
-                return new IdTagInfo().withStatus(status)
-                        .withParentIdTag(record.getParentIdTag())
-                        .withExpiryDate(getExpiryDateOrDefault(record));
+                return new IdTagInfo().withStatus(status);
             default:
                 throw new SteveException("Unexpected AuthorizationStatus");
         }

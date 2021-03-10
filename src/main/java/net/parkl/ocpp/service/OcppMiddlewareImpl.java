@@ -1028,12 +1028,13 @@ public class OcppMiddlewareImpl implements OcppMiddleware {
                 log.info("Successully stopped charging process with limit, notifying server: {}...", process.getOcppChargingProcessId());
                 float consumption = consumptionHelper.getTotalPower(transaction);
 
-                ESPChargingData data = ESPChargingData.builder().
-                        start(process.getStartDate()).
-                        end(process.getEndDate()).
-                        totalPower(consumption == 0f ? totalPower : consumption).
-                        startValue(consumptionHelper.getStartValue(transaction)).
-                        stopValue(consumptionHelper.getStartValue(transaction)).build();
+                ESPChargingData data = ESPChargingData.builder()
+                        .start(process.getStartDate())
+                        .end(process.getEndDate())
+                        .totalPower(consumption == 0f ? totalPower : consumption)
+                        .startValue(consumptionHelper.getStartValue(transaction))
+                        .stopValue(consumptionHelper.getStopValue(transaction))
+                        .build();
                 ESPChargingStopRequest req = ESPChargingStopRequest.builder().
                         chargingData(data).
                         eventCode(REASON_LIMIT_EXCEEDED).
@@ -1048,7 +1049,6 @@ public class OcppMiddlewareImpl implements OcppMiddleware {
         }
     }
 
-
     @Override
     public void stopChargingWithPreparingTimeout(String chargingProcessId) {
         log.info("Stopping charging process with preparing limit: {}...", chargingProcessId);
@@ -1057,21 +1057,16 @@ public class OcppMiddlewareImpl implements OcppMiddleware {
             if (res.getErrorCode() == null) {
                 OcppChargingProcess process = chargingProcessService.findOcppChargingProcess(chargingProcessId);
 
-                Transaction transaction = transactionService.findTransaction(process.getTransactionStart().getTransactionPk()).
-                        orElseThrow(() -> new IllegalStateException("Invalid transaction id: " + process.getTransactionStart().getTransactionPk()));
-
-                log.info("Successfully stopped charging process with timeout, notifying server: {}...", process.getOcppChargingProcessId());
-                ESPChargingData data = ESPChargingData.builder().
-                        start(process.getStartDate()).
-                        end(process.getEndDate()).
-                        totalPower(consumptionHelper.getTotalPower(transaction)).
-                        startValue(consumptionHelper.getStartValue(transaction)).
-                        stopValue(consumptionHelper.getStartValue(transaction)).
-                        build();
-                ESPChargingStopRequest req = ESPChargingStopRequest.builder().
-                        chargingData(data).
-                        eventCode(REASON_VEHICLE_NOT_CONNECTED).
-                        build();
+                log.info("Successfully stopped charging process with timeout, notifying server: {}...",
+                         process.getOcppChargingProcessId());
+                ESPChargingData data = ESPChargingData.builder()
+                        .start(process.getStartDate())
+                        .end(process.getEndDate())
+                        .build();
+                ESPChargingStopRequest req = ESPChargingStopRequest.builder()
+                        .chargingData(data)
+                        .eventCode(REASON_VEHICLE_NOT_CONNECTED)
+                        .build();
 
                 emobilityServiceProvider.stopChargingExternal(req);
             } else {

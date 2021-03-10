@@ -1035,9 +1035,10 @@ public class OcppMiddlewareImpl implements OcppMiddleware {
                         .startValue(consumptionHelper.getStartValue(transaction))
                         .stopValue(consumptionHelper.getStopValue(transaction))
                         .build();
-                ESPChargingStopRequest req = ESPChargingStopRequest.builder().
-                        chargingData(data).
-                        eventCode(REASON_LIMIT_EXCEEDED).
+                ESPChargingStopRequest req = ESPChargingStopRequest.builder()
+                        .chargingData(data)
+                        .externalChargeId(chargingProcessId)
+                        .eventCode(REASON_LIMIT_EXCEEDED).
                         build();
 
                 emobilityServiceProvider.stopChargingExternal(req);
@@ -1065,6 +1066,7 @@ public class OcppMiddlewareImpl implements OcppMiddleware {
                         .build();
                 ESPChargingStopRequest req = ESPChargingStopRequest.builder()
                         .chargingData(data)
+                        .externalChargeId(chargingProcessId)
                         .eventCode(REASON_VEHICLE_NOT_CONNECTED)
                         .build();
 

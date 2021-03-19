@@ -35,6 +35,7 @@ import lombok.extern.slf4j.Slf4j;
 import net.parkl.ocpp.entities.*;
 import net.parkl.ocpp.module.esp.EmobilityServiceProvider;
 import net.parkl.ocpp.module.esp.model.*;
+import net.parkl.ocpp.repositories.ChargingConsumptionStateRepository;
 import net.parkl.ocpp.repositories.ConnectorRepository;
 import net.parkl.ocpp.repositories.ConnectorStatusRepository;
 import net.parkl.ocpp.repositories.OcppChargeBoxRepository;
@@ -113,6 +114,9 @@ public class OcppMiddlewareImpl implements OcppMiddleware {
     private OcppConsumptionHelper consumptionHelper;
     @Autowired
     private ConnectorMeterValueService connectorMeterValueService;
+    @Autowired
+    private ChargingConsumptionStateRepository consumptionStateRepository;
+
     private OcppConsumptionListener consumptionListener;
     private OcppStopListener stopListener;
 
@@ -936,6 +940,19 @@ public class OcppMiddlewareImpl implements OcppMiddleware {
 
         emobilityServiceProvider.updateChargingConsumptionExternal(req);
 
+        ChargingConsumptionState chargingConsumptionState = ChargingConsumptionState.builder()
+                .externalChargeBoxId(process.getConnector().getChargeBoxId())
+                .externalChargerId(String.valueOf(process.getConnector().getConnectorId()))
+                .externalChargeId(process.getOcppChargingProcessId())
+                .start(process.getStartDate())
+                .end(process.getEndDate())
+                .totalPower(consumptionHelper.getTotalPower(startValue, stopValue))
+                .startValue(consumptionHelper.getStartValue(transaction))
+                .stopValue(consumptionHelper.getStopValue(transaction))
+                .build();
+
+        consumptionStateRepository.save(chargingConsumptionState);
+
         if (consumptionListener != null) {
             consumptionListener.consumptionUpdated(req);
         }
@@ -1112,5 +1129,9 @@ public class OcppMiddlewareImpl implements OcppMiddleware {
         }
     }
 
-
+    @Override
+    public ChargingConsumptionState findByExternalChargeId(String externalChargeId) {
+        return consumptionStateRepository.findByExternalChargeId(externalChargeId)
+                .orElseThrow(()->new IllegalArgumentException("Invalid externalChargeId specified"));
+    }
 }

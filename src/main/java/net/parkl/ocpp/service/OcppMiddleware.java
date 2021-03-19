@@ -18,6 +18,7 @@
  */
 package net.parkl.ocpp.service;
 
+import net.parkl.ocpp.entities.ChargingConsumptionState;
 import net.parkl.ocpp.entities.OcppChargingProcess;
 import net.parkl.ocpp.entities.TransactionStart;
 import net.parkl.ocpp.module.esp.model.*;
@@ -132,4 +133,6 @@ public interface OcppMiddleware {
 	void notifyAboutRfidStart(ESPRfidChargingStartRequest startRequest);
 
 	boolean checkRfidTag(String rfidTag, String chargeBoxId);
+
+	ChargingConsumptionState findByExternalChargeId(String externalChargeId);
 }

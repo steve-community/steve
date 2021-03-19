@@ -48,4 +48,9 @@ public class ChargingConsumptionState implements Serializable {
 
     @Column(name = "StopValue",nullable=true)
     private Float stopValue;
+
+    @PrePersist
+    public void prePersist() {
+        createDate = new Date();
+    }
 }

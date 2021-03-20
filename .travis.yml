@@ -1,11 +1,17 @@
 sudo: false
 language: java
-dist: xenial
+
 
 # install dependencies
 install: mvn dependency:go-offline -s .travis-maven-settings.xml -B -V
 
 before_script:
+  - stage: Versions
+  # Display Versions
+  - mysqld -V
+  - java -version
+  - mvn -version
+  - stage: Database Setup
   # initalize empty database and privileges
   - mysql -uroot -e "CREATE DATABASE stevedb_test_2aa6a783d47d;" -v
   - mysql -uroot -e "GRANT ALL PRIVILEGES ON stevedb_test_2aa6a783d47d.* TO 'steve'@'localhost' IDENTIFIED BY 'changeme';" -v
@@ -15,24 +21,66 @@ before_script:
 
 # start the actual build
 script:
+  - stage: Build
   - mvn -s .travis-maven-settings.xml -Dmaven.javadoc.skip=true clean package -Ptest -B -V || travis_terminate 1
+  - stage: Run
   - java -Djava.net.preferIPv4Stack=true -jar target/steve.jar &
   - sleep 30
   - 'grep -C 50 -e "Exception: " ~/logs/steve.log && exit 255 || true'
+  - stage: Show Login Screen
   - elinks -dump -no-references http://localhost:8080/steve/manager/signin
   - killall java
 
+
+
 jobs:
   include:
-    - jdk: openjdk11
+    - name: OpenJDK11 with MySQL 8.0 (Ubuntu LTS 20.04)
+      jdk: openjdk11
+      dist: focal
       services: mysql
-    - jdk: openjdk13
+    - name: OpenJDK15 with MySQL 8.0 (Ubuntu LTS 20.04)
+      jdk: openjdk15
+      dist: focal
       services: mysql
-    - jdk: openjdk15
+    - name: OpenJDK11 with MySQL 5.7 (Ubuntu LTS 16.04)
+      jdk: openjdk11
+      dist: xenial
       services: mysql
-    - jdk: openjdk11
+    - name: OpenJDK15 with MySQL 5.7 (Ubuntu LTS 16.04)
+      jdk: openjdk15
+      dist: xenial
+      services: mysql
+      
+    - name: OpenJDK11 with MariaDB 10.3 (Ubuntu LTS 20.04)
+      jdk: openjdk11
+      dist: focal
       addons:
         mariadb: "10.3"
+        apt:
+          packages:
+            - elinks
+    - name: OpenJDK15 with MariaDB 10.3 (Ubuntu LTS 20.04)
+      jdk: openjdk15
+      dist: focal
+      addons:
+        mariadb: "10.3"
+        apt:
+          packages:
+            - elinks
+    - name: OpenJDK11 with MariaDB 10.5 (Ubuntu LTS 20.04)
+      jdk: openjdk11
+      dist: focal
+      addons:
+        mariadb: "10.5"
+        apt:
+          packages:
+            - elinks
+    - name: OpenJDK15 with MariaDB 10.5 (Ubuntu LTS 20.04)
+      jdk: openjdk15
+      dist: focal
+      addons:
+        mariadb: "10.5"
         apt:
           packages:
             - elinks

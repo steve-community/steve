@@ -397,6 +397,10 @@
                                     <includeTypes>(?i:(TINY|SMALL|MEDIUM|BIG)?INT(UNSIGNED)?\(1\))</includeTypes>
                                 </forcedType>
                                 <forcedType>
+                                    <name>BOOLEAN</name>
+                                    <includeExpression>.*\.OCPP_TAG_ACTIVITY\.(IN_TRANSACTION|BLOCKED)</includeExpression>
+                                </forcedType>
+                                <forcedType>
                                     <userType>org.joda.time.DateTime</userType>
                                     <converter>de.rwth.idsg.steve.utils.DateTimeConverter</converter>
                                     <includeExpression>.*</includeExpression>

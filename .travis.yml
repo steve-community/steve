@@ -12,7 +12,7 @@ before_script:
   - mvn -version
   # initalize empty database and privileges
   - mysql -uroot -e "CREATE DATABASE stevedb_test_2aa6a783d47d;" -v
-  - mysql -uroot -e "CREATE USER 'steve'@'localhost' IDENTIFIED BY 'changeme'"; -v
+  - mysql -uroot -e "CREATE USER 'steve'@'localhost' IDENTIFIED BY 'changeme';" -v
   - mysql -uroot -e "GRANT ALL PRIVILEGES ON stevedb_test_2aa6a783d47d.* TO 'steve'@'localhost';" -v
   - mysql -uroot -e "GRANT SELECT ON mysql.proc TO 'steve'@'localhost';" -v
   # grant super privilege required by MariaDB running with log-bin

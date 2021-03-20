@@ -43,11 +43,12 @@ SteVe is designed to run standalone, a java servlet container / web server (e.g.
     Make sure MySQL is reachable via TCP (e.g., remove `skip-networking` from `my.cnf`).
     The following MySQL statements can be used as database initialization (adjust database name and credentials according to your setup).
     
-    * For MySQL 5.7 (and MariaDB 10.3):
+    * For MySQL 5.7 (and MariaDB):
         ```
         CREATE DATABASE stevedb CHARACTER SET utf8 COLLATE utf8_unicode_ci;
-        GRANT ALL PRIVILEGES ON stevedb.* TO 'steve'@'localhost' IDENTIFIED BY 'changeme';
-        GRANT SELECT ON mysql.proc TO 'steve'@'localhost' IDENTIFIED BY 'changeme';
+        CREATE USER 'steve'@'localhost' IDENTIFIED BY 'changeme';
+        GRANT ALL PRIVILEGES ON stevedb.* TO 'steve'@'localhost';
+        GRANT SELECT ON mysql.proc TO 'steve'@'localhost';
         ```
     
     * For MySQL 8:
@@ -57,7 +58,7 @@ SteVe is designed to run standalone, a java servlet container / web server (e.g.
         GRANT ALL PRIVILEGES ON stevedb.* TO 'steve'@'localhost';
         GRANT SUPER ON *.* TO 'steve'@'localhost';
         ```
-        Note: The statement `GRANT SUPER [...]` is only necessary to execute some of the previous migration files and is only needed for the initial database setup. Afterwards, you can remove this privilage by executing 
+        Note: The statement `GRANT SUPER [...]` is only necessary to execute some of the previous migration files and is only needed for the initial database setup. Afterwards, you can remove this privilege by executing 
         ```
         REVOKE SUPER ON *.* FROM 'steve'@'localhost';
         ```

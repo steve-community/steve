@@ -113,7 +113,7 @@
                     <properties>
                         <owner>${project.organization.name}</owner>
                         <year>${project.inceptionYear}</year>
-                        <currentYear>2020</currentYear>
+                        <currentYear>2021</currentYear>
                     </properties>
                     <excludes>
                         <exclude>**/*.txt</exclude>
@@ -124,6 +124,10 @@
                         <exclude>**/*.html</exclude>
                         <exclude>**/*.css</exclude>
                         <exclude>**/*.js</exclude>
+                        <exclude>**/*.yml</exclude>
+                        <exclude>**/*.yaml</exclude>
+                        <exclude>**/*.PNG</exclude>
+                        <exclude>**/Dockerfile</exclude>
                         <!-- <exclude>**/*.jsp</exclude> -->
 
                     </excludes>

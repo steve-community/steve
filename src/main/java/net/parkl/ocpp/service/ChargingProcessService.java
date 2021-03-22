@@ -160,9 +160,9 @@ public class ChargingProcessService {
         return chargingProcessRepo.findAllByTransactionStartIsNotNullAndLimitMinuteIsNotNullAndEndDateIsNull();
     }
 
-    public OcppChargingProcess findByOcppTagAndConnectorAndEndDateIsNullAndTransactionIsNotNull (String rfidTag,
-                                                                                                 int connectorId,
-                                                                                                 String chargeBoxId) {
+    public OcppChargingProcess findByOcppTagAndConnectorAndEndDateIsNullAndTransactionIsNotNull(String rfidTag,
+                                                                                                int connectorId,
+                                                                                                String chargeBoxId) {
 
         Connector connector = connectorRepo.findByChargeBoxIdAndConnectorId(chargeBoxId, connectorId);
         if (connector == null) {
@@ -171,12 +171,10 @@ public class ChargingProcessService {
         return chargingProcessRepo.findByOcppTagAndConnectorAndEndDateIsNullAndTransactionStartIsNotNull(rfidTag, connector);
     }
 
-    public OcppChargingProcess findOpenProcessForRfidTag(String rfidTag, int connectorId, String chargeBoxId) {
-        Connector connector = connectorRepo.findByChargeBoxIdAndConnectorId(chargeBoxId, connectorId);
-        if (connector == null) {
-            throw new IllegalStateException("Invalid charge box id/connector id: " + chargeBoxId + "/" + connectorId);
-        }
-        return chargingProcessRepo.findByOcppTagAndConnectorAndEndDateIsNull(rfidTag, connector);
+    public boolean hasOpenProcessForRfidTag(String rfidTag, int connectorId, String chargeBoxId) {
+        OcppChargingProcess chargingProcess = fetchChargingProcess(connectorId, chargeBoxId, new AsyncWaiter<>(2000));
+
+        return chargingProcess != null && chargingProcess.getOcppTag().equals(rfidTag);
     }
 
     public OcppChargingProcess findByTransactionId(int transactionId) {

@@ -188,8 +188,8 @@ public class CentralSystemService16_Service {
 
         Integer transactionId;
 
-        if (chargingProcessService
-                .findOpenProcessForRfidTag(parameters.getIdTag(), parameters.getConnectorId(), chargeBoxIdentity) == null) {
+        if (!chargingProcessService
+                .hasOpenProcessForRfidTag(parameters.getIdTag(), parameters.getConnectorId(), chargeBoxIdentity)) {
             log.info("No running ocpp charging process found for RFID tag: {} on charger: {}/{}",
                     parameters.getIdTag(), chargeBoxIdentity, parameters.getConnectorId());
 

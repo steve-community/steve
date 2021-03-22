@@ -5,6 +5,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
 
-public interface ChargingConsumptionStateRepository extends JpaRepository<ChargingConsumptionState, Long> {
-    Optional<ChargingConsumptionState> findByExternalChargeId(String externalChargeId);
+public interface ChargingConsumptionStateRepository extends JpaRepository<ChargingConsumptionState, String> {
 }

@@ -1131,7 +1131,7 @@ public class OcppMiddlewareImpl implements OcppMiddleware {
 
     @Override
     public ChargingConsumptionState findByExternalChargeId(String externalChargeId) {
-        return consumptionStateRepository.findByExternalChargeId(externalChargeId)
+        return consumptionStateRepository.findById(externalChargeId)
                 .orElseThrow(()->new IllegalArgumentException("Invalid externalChargeId specified"));
     }
 }

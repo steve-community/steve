@@ -4,24 +4,13 @@ import de.rwth.idsg.steve.ocpp.ChargePointService16_Invoker;
 import de.rwth.idsg.steve.ocpp.task.*;
 import de.rwth.idsg.steve.repository.dto.ChargePointSelect;
 import de.rwth.idsg.steve.service.CentralSystemService16_Service;
-import de.rwth.idsg.steve.web.dto.ocpp.MultipleChargePointSelect;
-import de.rwth.idsg.steve.web.dto.ocpp.RemoteStartTransactionParams;
-import de.rwth.idsg.steve.web.dto.ocpp.RemoteStopTransactionParams;
-import de.rwth.idsg.steve.web.dto.ocpp.ResetParams;
-import de.rwth.idsg.steve.web.dto.ocpp.SendLocalListParams;
+import de.rwth.idsg.steve.web.dto.ocpp.*;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import net.parkl.ocpp.service.ChargingProcessService;
 import net.parkl.ocpp.util.AsyncWaiter;
-import ocpp.cp._2015._10.GetLocalListVersionResponse;
-import ocpp.cp._2015._10.RemoteStartStopStatus;
-import ocpp.cp._2015._10.RemoteStartTransactionResponse;
-import ocpp.cp._2015._10.RemoteStopTransactionResponse;
-import ocpp.cp._2015._10.ResetResponse;
-import ocpp.cp._2015._10.ResetStatus;
-import ocpp.cp._2015._10.SendLocalListResponse;
-import ocpp.cp._2015._10.UpdateStatus;
+import ocpp.cp._2015._10.*;
 import ocpp.cs._2015._10.Reason;
 import ocpp.cs._2015._10.StartTransactionRequest;
 import ocpp.cs._2015._10.StopTransactionRequest;
@@ -147,7 +136,7 @@ public class TestChargePoint implements ChargePointService16_Invoker {
         Integer connectorId = task.getParams().getConnectorId();
 
         taskExecutor.execute(() -> {
-            waitForChargingProcessCreated(idTag, connectorId, chargeBoxId);
+            waitForChargingProcessCreated(connectorId, chargeBoxId);
 
             StartTransactionRequest req = new StartTransactionRequest();
             req.setConnectorId(connectorId);
@@ -193,9 +182,9 @@ public class TestChargePoint implements ChargePointService16_Invoker {
         return resp;
     }
 
-    public void waitForChargingProcessCreated(String idTag, Integer connectorId, String chargeBoxId) {
+    public void waitForChargingProcessCreated(Integer connectorId, String chargeBoxId) {
         new AsyncWaiter<>(5000).waitFor(() ->
-                chargingProcessService.findOpenProcessForRfidTag(idTag, connectorId, chargeBoxId));
+                chargingProcessService.findOpenChargingProcessWithoutTransaction(chargeBoxId, connectorId));
     }
 
     public void waitForChargingProcessStopped(int transactionId) {

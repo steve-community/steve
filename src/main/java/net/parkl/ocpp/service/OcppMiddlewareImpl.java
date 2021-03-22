@@ -604,7 +604,7 @@ public class OcppMiddlewareImpl implements OcppMiddleware {
     }
 
     private RequestResult waitForResult(String chargeBoxId, int taskId) {
-        AsyncWaiter<RequestResult> waiter = new AsyncWaiter<>(10000);
+        AsyncWaiter<RequestResult> waiter = new AsyncWaiter<>(20000);
         waiter.setDelayMs(WAIT_MS);
         waiter.setIntervalMs(WAIT_MS);
         return waiter.waitFor(() -> getResponse(taskId, chargeBoxId));

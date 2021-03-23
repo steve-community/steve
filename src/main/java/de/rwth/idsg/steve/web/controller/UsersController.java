@@ -22,9 +22,9 @@ import de.rwth.idsg.steve.repository.OcppTagRepository;
 import de.rwth.idsg.steve.repository.UserRepository;
 import de.rwth.idsg.steve.repository.dto.User;
 import de.rwth.idsg.steve.utils.ControllerHelper;
+import de.rwth.idsg.steve.utils.mapper.UserFormMapper;
 import de.rwth.idsg.steve.web.dto.UserForm;
 import de.rwth.idsg.steve.web.dto.UserQueryForm;
-import de.rwth.idsg.steve.web.dto.UserSex;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -84,18 +84,7 @@ public class UsersController {
     @RequestMapping(value = DETAILS_PATH, method = RequestMethod.GET)
     public String getDetails(@PathVariable("userPk") int userPk, Model model) {
         User.Details details = userRepository.getDetails(userPk);
-
-        UserForm form = new UserForm();
-        form.setUserPk(details.getUserRecord().getUserPk());
-        form.setFirstName(details.getUserRecord().getFirstName());
-        form.setLastName(details.getUserRecord().getLastName());
-        form.setBirthDay(details.getUserRecord().getBirthDay());
-        form.setPhone(details.getUserRecord().getPhone());
-        form.setSex(UserSex.fromDatabaseValue(details.getUserRecord().getSex()));
-        form.setEMail(details.getUserRecord().getEMail());
-        form.setNote(details.getUserRecord().getNote());
-        form.setAddress(ControllerHelper.recordToDto(details.getAddress()));
-        form.setOcppIdTag(details.getOcppIdTag().orElse(ControllerHelper.EMPTY_OPTION));
+        UserForm form = UserFormMapper.toForm(details);
 
         model.addAttribute("userForm", form);
         setTags(model);

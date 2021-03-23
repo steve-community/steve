@@ -21,11 +21,11 @@ package de.rwth.idsg.steve.web.controller;
 import de.rwth.idsg.steve.repository.OcppTagRepository;
 import de.rwth.idsg.steve.service.OcppTagService;
 import de.rwth.idsg.steve.utils.ControllerHelper;
+import de.rwth.idsg.steve.utils.mapper.OcppTagFormMapper;
 import de.rwth.idsg.steve.web.dto.OcppTagBatchInsertForm;
 import de.rwth.idsg.steve.web.dto.OcppTagForm;
 import de.rwth.idsg.steve.web.dto.OcppTagQueryForm;
 import jooq.steve.db.tables.records.OcppTagActivityRecord;
-import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -88,24 +88,7 @@ public class OcppTagsController {
     @RequestMapping(value = DETAILS_PATH, method = RequestMethod.GET)
     public String getDetails(@PathVariable("ocppTagPk") int ocppTagPk, Model model) {
         OcppTagActivityRecord record = ocppTagRepository.getRecord(ocppTagPk);
-
-        OcppTagForm form = new OcppTagForm();
-        form.setOcppTagPk(record.getOcppTagPk());
-        form.setIdTag(record.getIdTag());
-
-        DateTime expiryDate = record.getExpiryDate();
-        if (expiryDate != null) {
-            form.setExpiration(expiryDate.toLocalDateTime());
-        }
-
-        form.setMaxActiveTransactionCount(record.getMaxActiveTransactionCount());
-        form.setNote(record.getNote());
-
-        String parentIdTag = record.getParentIdTag();
-        if (parentIdTag == null) {
-            parentIdTag = ControllerHelper.EMPTY_OPTION;
-        }
-        form.setParentIdTag(parentIdTag);
+        OcppTagForm form = OcppTagFormMapper.toForm(record);
 
         model.addAttribute("activeTransactionCount", record.getActiveTransactionCount());
         model.addAttribute("ocppTagForm", form);

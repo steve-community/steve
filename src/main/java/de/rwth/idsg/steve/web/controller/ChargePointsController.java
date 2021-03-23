@@ -23,6 +23,7 @@ import de.rwth.idsg.steve.repository.ChargePointRepository;
 import de.rwth.idsg.steve.repository.dto.ChargePoint;
 import de.rwth.idsg.steve.service.ChargePointHelperService;
 import de.rwth.idsg.steve.utils.ControllerHelper;
+import de.rwth.idsg.steve.utils.mapper.ChargePointDetailsMapper;
 import de.rwth.idsg.steve.web.dto.ChargePointBatchInsertForm;
 import de.rwth.idsg.steve.web.dto.ChargePointForm;
 import de.rwth.idsg.steve.web.dto.ChargePointQueryForm;
@@ -109,19 +110,7 @@ public class ChargePointsController {
     @RequestMapping(value = DETAILS_PATH, method = RequestMethod.GET)
     public String getDetails(@PathVariable("chargeBoxPk") int chargeBoxPk, Model model) {
         ChargePoint.Details cp = chargePointRepository.getDetails(chargeBoxPk);
-
-        ChargePointForm form = new ChargePointForm();
-        form.setChargeBoxPk(cp.getChargeBox().getChargeBoxPk());
-        form.setChargeBoxId(cp.getChargeBox().getChargeBoxId());
-        form.setNote(cp.getChargeBox().getNote());
-        form.setDescription(cp.getChargeBox().getDescription());
-        form.setLocationLatitude(cp.getChargeBox().getLocationLatitude());
-        form.setLocationLongitude(cp.getChargeBox().getLocationLongitude());
-        form.setInsertConnectorStatusAfterTransactionMsg(cp.getChargeBox().getInsertConnectorStatusAfterTransactionMsg());
-        form.setAdminAddress(cp.getChargeBox().getAdminAddress());
-        form.setRegistrationStatus(cp.getChargeBox().getRegistrationStatus());
-
-        form.setAddress(ControllerHelper.recordToDto(cp.getAddress()));
+        ChargePointForm form = ChargePointDetailsMapper.mapToForm(cp);
 
         model.addAttribute("chargePointForm", form);
         model.addAttribute("cp", cp);

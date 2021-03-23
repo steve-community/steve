@@ -21,16 +21,10 @@ package de.rwth.idsg.steve.web.controller;
 import de.rwth.idsg.steve.repository.ChargePointRepository;
 import de.rwth.idsg.steve.repository.ChargingProfileRepository;
 import de.rwth.idsg.steve.repository.dto.ChargingProfile;
-import de.rwth.idsg.steve.utils.DateTimeUtils;
+import de.rwth.idsg.steve.utils.mapper.ChargingProfileDetailsMapper;
 import de.rwth.idsg.steve.web.dto.ChargingProfileAssignmentQueryForm;
 import de.rwth.idsg.steve.web.dto.ChargingProfileForm;
 import de.rwth.idsg.steve.web.dto.ChargingProfileQueryForm;
-import jooq.steve.db.tables.records.ChargingProfileRecord;
-import jooq.steve.db.tables.records.ChargingSchedulePeriodRecord;
-import ocpp.cp._2015._10.ChargingProfileKindType;
-import ocpp.cp._2015._10.ChargingProfilePurposeType;
-import ocpp.cp._2015._10.ChargingRateUnitType;
-import ocpp.cp._2015._10.RecurrencyKindType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -41,10 +35,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import javax.validation.Valid;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
 
 /**
  * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
@@ -137,35 +127,7 @@ public class ChargingProfilesController {
     @RequestMapping(value = DETAILS_PATH, method = RequestMethod.GET)
     public String getDetails(@PathVariable("chargingProfilePk") int chargingProfilePk, Model model) {
         ChargingProfile.Details details = repository.getDetails(chargingProfilePk);
-
-        ChargingProfileRecord profile = details.getProfile();
-        List<ChargingSchedulePeriodRecord> periods = details.getPeriods();
-
-        ChargingProfileForm form = new ChargingProfileForm();
-        form.setChargingProfilePk(profile.getChargingProfilePk());
-        form.setDescription(profile.getDescription());
-        form.setNote(profile.getNote());
-        form.setStackLevel(profile.getStackLevel());
-        form.setChargingProfilePurpose(ChargingProfilePurposeType.fromValue(profile.getChargingProfilePurpose()));
-        form.setChargingProfileKind(ChargingProfileKindType.fromValue(profile.getChargingProfileKind()));
-        form.setRecurrencyKind(profile.getRecurrencyKind() == null ? null : RecurrencyKindType.fromValue(profile.getRecurrencyKind()));
-        form.setValidFrom(DateTimeUtils.toLocalDateTime(profile.getValidFrom()));
-        form.setValidTo(DateTimeUtils.toLocalDateTime(profile.getValidTo()));
-        form.setDurationInSeconds(profile.getDurationInSeconds());
-        form.setStartSchedule(DateTimeUtils.toLocalDateTime(profile.getStartSchedule()));
-        form.setChargingRateUnit(ChargingRateUnitType.fromValue(profile.getChargingRateUnit()));
-        form.setMinChargingRate(profile.getMinChargingRate());
-
-        Map<String, ChargingProfileForm.SchedulePeriod> periodMap = new LinkedHashMap<>();
-        for (ChargingSchedulePeriodRecord rec : periods) {
-            ChargingProfileForm.SchedulePeriod p = new ChargingProfileForm.SchedulePeriod();
-            p.setStartPeriodInSeconds(rec.getStartPeriodInSeconds());
-            p.setPowerLimitInAmperes(rec.getPowerLimitInAmperes());
-            p.setNumberPhases(rec.getNumberPhases());
-
-            periodMap.put(UUID.randomUUID().toString(), p);
-        }
-        form.setSchedulePeriodMap(periodMap);
+        ChargingProfileForm form = ChargingProfileDetailsMapper.mapToForm(details);
 
         model.addAttribute("form", form);
         return "data-man/chargingProfileDetails";

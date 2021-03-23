@@ -24,7 +24,7 @@ public class UserFormMapper {
         form.setSex(UserSex.fromDatabaseValue(userRecord.getSex()));
         form.setEMail(userRecord.getEMail());
         form.setNote(userRecord.getNote());
-        form.setAddress(ControllerHelper.recordToDto(details.getAddress()));
+        form.setAddress(AddressMapper.recordToDto(details.getAddress()));
         form.setOcppIdTag(details.getOcppIdTag().orElse(ControllerHelper.EMPTY_OPTION));
 
         return form;

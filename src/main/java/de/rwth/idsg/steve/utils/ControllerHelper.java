@@ -19,8 +19,6 @@
 package de.rwth.idsg.steve.utils;
 
 import com.neovisionaries.i18n.CountryCode;
-import de.rwth.idsg.steve.web.dto.Address;
-import jooq.steve.db.tables.records.AddressRecord;
 
 import java.util.Arrays;
 import java.util.Comparator;
@@ -39,19 +37,6 @@ public final class ControllerHelper {
     public static final String EMPTY_OPTION = "-- Empty --";
 
     public static final Map<String, String> COUNTRY_DROPDOWN = populateCountryCodes();
-
-    public static Address recordToDto(AddressRecord record) {
-        Address address = new Address();
-        if (record != null) {
-            address.setAddressPk(record.getAddressPk());
-            address.setStreet(record.getStreet());
-            address.setHouseNumber(record.getHouseNumber());
-            address.setZipCode(record.getZipCode());
-            address.setCity(record.getCity());
-            address.setCountry(CountryCode.getByCode(record.getCountry()));
-        }
-        return address;
-    }
 
     public static Map<String, String> idTagEnhancer(List<String> idTagList) {
         Map<String, String> map = new HashMap<>(idTagList.size() + 1);

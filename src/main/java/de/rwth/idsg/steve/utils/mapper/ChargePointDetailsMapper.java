@@ -2,6 +2,7 @@ package de.rwth.idsg.steve.utils.mapper;
 
 import de.rwth.idsg.steve.repository.dto.ChargePoint;
 import de.rwth.idsg.steve.utils.ControllerHelper;
+import de.rwth.idsg.steve.web.dto.Address;
 import de.rwth.idsg.steve.web.dto.ChargePointForm;
 import jooq.steve.db.tables.records.ChargeBoxRecord;
 
@@ -24,7 +25,7 @@ public class ChargePointDetailsMapper {
         form.setInsertConnectorStatusAfterTransactionMsg(chargeBox.getInsertConnectorStatusAfterTransactionMsg());
         form.setAdminAddress(chargeBox.getAdminAddress());
         form.setRegistrationStatus(chargeBox.getRegistrationStatus());
-        form.setAddress(ControllerHelper.recordToDto(cp.getAddress()));
+        form.setAddress(AddressMapper.recordToDto(cp.getAddress()));
 
         return form;
     }

@@ -18,14 +18,11 @@
  */
 package de.rwth.idsg.steve.utils;
 
-import com.neovisionaries.i18n.CountryCode;
-
-import java.util.Arrays;
-import java.util.Comparator;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+
+import static de.rwth.idsg.steve.utils.CountryCodesProvider.getCountryCodes;
 
 /**
  * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
@@ -36,7 +33,7 @@ public final class ControllerHelper {
 
     public static final String EMPTY_OPTION = "-- Empty --";
 
-    public static final Map<String, String> COUNTRY_DROPDOWN = populateCountryCodes();
+    public static final Map<String, String> COUNTRY_DROPDOWN = getCountryCodes();
 
     public static Map<String, String> idTagEnhancer(List<String> idTagList) {
         Map<String, String> map = new HashMap<>(idTagList.size() + 1);
@@ -48,27 +45,5 @@ public final class ControllerHelper {
         return map;
     }
 
-    private static Map<String, String> populateCountryCodes() {
-        CountryCode[] codes = CountryCode.values();
-        Arrays.sort(codes, Comparator.comparing(CountryCode::getName));
 
-        Map<String, String> map = new LinkedHashMap<>(codes.length + 1);
-        map.put("", EMPTY_OPTION);
-
-        for (CountryCode c : codes) {
-            if (shouldInclude(c)) {
-                map.put(c.getAlpha2(), c.getName());
-            }
-        }
-        return map;
-    }
-
-    /**
-     * There are some invalid codes like {@link CountryCode#UNDEFINED} and {@link CountryCode#EU},
-     * or some countries are listed twice {@link CountryCode#FI} - {@link CountryCode#SF} and
-     * {@link CountryCode#GB} - {@link CountryCode#UK} which are confusing. We filter these out.
-     */
-    private static boolean shouldInclude(CountryCode c) {
-        return c.getAssignment() == CountryCode.Assignment.OFFICIALLY_ASSIGNED;
-    }
 }

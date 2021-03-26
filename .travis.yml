@@ -2,7 +2,7 @@ language: java
 
 
 # install dependencies
-install: mvn dependency:go-offline -s .travis-maven-settings.xml -B -V
+install: mvn dependency:resolve dependency:resolve-plugins -s .travis-maven-settings.xml -B -V
 
 before_script:
   # Display Versions

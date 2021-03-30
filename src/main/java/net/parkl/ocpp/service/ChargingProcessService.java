@@ -39,7 +39,6 @@ import java.util.UUID;
 
 @Slf4j
 @Service
-@Transactional
 public class ChargingProcessService {
     private static final Logger LOGGER = LoggerFactory.getLogger(ChargingProcessService.class);
 
@@ -77,6 +76,7 @@ public class ChargingProcessService {
         return chargingProcessRepo.findByConnectorAndEndDateIsNull(c);
     }
 
+    @Transactional
     public OcppChargingProcess createChargingProcess(String chargeBoxId,
                                                      int connectorId,
                                                      String idTag,
@@ -108,6 +108,7 @@ public class ChargingProcessService {
         return chargingProcessRepo.findById(processId).orElse(null);
     }
 
+    @Transactional
     public OcppChargingProcess stopChargingProcess(String processId) {
         OcppChargingProcess cp = chargingProcessRepo.findById(processId).
                 orElseThrow(() -> new IllegalStateException("Invalid OcppChargingProcess id: " + processId));
@@ -120,7 +121,7 @@ public class ChargingProcessService {
         return chargingProcessRepo.save(cp);
     }
 
-
+    @Transactional
     public OcppChargingProcess stopRequested(String processId) {
         OcppChargingProcess cp = chargingProcessRepo.findById(processId).
                 orElseThrow(() -> new IllegalStateException("Invalid OcppChargingProcess id: " + processId));
@@ -135,6 +136,7 @@ public class ChargingProcessService {
     }
 
 
+    @Transactional
     public void stopRequestCancelled(String processId) {
         OcppChargingProcess cp = chargingProcessRepo.findById(processId).
                 orElseThrow(() -> new IllegalStateException("Invalid OcppChargingProcess id: " + processId));

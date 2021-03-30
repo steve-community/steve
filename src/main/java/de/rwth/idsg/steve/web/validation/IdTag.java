@@ -36,7 +36,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Constraint(validatedBy = {IdTagValidator.class, IdTagListValidator.class})
 public @interface IdTag {
 
-    String message() default "ID Tag can only contain upper or lower case letters, numbers and dot, dash, underscore symbols";
+    String message() default "ID Tag can only contain upper or lower case letters, numbers and dot, colon, dash, underscore symbols";
 
     // Required by validation runtime
     Class<?>[] groups() default {};

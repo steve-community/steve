@@ -236,6 +236,11 @@ public class CentralSystemService16_Service {
                 () -> null
         );
 
+        if (transactionId == 0) {
+            log.warn("StopRequest without transaction received");
+            return new StopTransactionResponse().withIdTagInfo(idTagInfo);
+        }
+
         UpdateTransactionParams params =
                 UpdateTransactionParams.builder()
                         .chargeBoxId(chargeBoxIdentity)

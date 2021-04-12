@@ -30,7 +30,7 @@ public class HeartBeatService {
     public HeartBeatService(ChargePointService15_Invoker chargePointService15_InvokerImpl,
                             ChargePointService16_Invoker chargePointService16_InvokerImpl,
                             ChargePointHelperService chargePointHelperService,
-                            @Value("${heartbeat.interval.secs}") int heartBeatIntervalInSecs) {
+                            @Value("${heartbeat.interval.secs:60}") int heartBeatIntervalInSecs) {
 
         this.service15Invoker = chargePointService15_InvokerImpl;
         this.service16Invoker = chargePointService16_InvokerImpl;

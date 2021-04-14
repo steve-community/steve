@@ -369,7 +369,7 @@ public class ChargingProfileRepositoryImpl implements ChargingProfileRepository 
                                                    .map(k -> ctx.newRecord(CHARGING_SCHEDULE_PERIOD)
                                                                 .setChargingProfilePk(form.getChargingProfilePk())
                                                                 .setStartPeriodInSeconds(k.getStartPeriodInSeconds())
-                                                                .setPowerLimitInAmperes(k.getPowerLimitInAmperes())
+                                                                .setPowerLimit(k.getPowerLimit())
                                                                 .setNumberPhases(k.getNumberPhases()))
                                                    .collect(Collectors.toList());
 

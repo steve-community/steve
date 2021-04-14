@@ -44,7 +44,7 @@ public class ChargingProfileDetailsMapper {
         for (ChargingSchedulePeriodRecord rec : periods) {
             ChargingProfileForm.SchedulePeriod p = new ChargingProfileForm.SchedulePeriod();
             p.setStartPeriodInSeconds(rec.getStartPeriodInSeconds());
-            p.setPowerLimitInAmperes(rec.getPowerLimitInAmperes());
+            p.setPowerLimit(rec.getPowerLimit());
             p.setNumberPhases(rec.getNumberPhases());
 
             periodMap.put(UUID.randomUUID().toString(), p);

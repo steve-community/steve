@@ -78,7 +78,7 @@ public class SetChargingProfileTask extends Ocpp16AndAboveTask<EnhancedSetChargi
                        .map(k -> {
                            ChargingSchedulePeriod p = new ChargingSchedulePeriod();
                            p.setStartPeriod(k.getStartPeriodInSeconds());
-                           p.setLimit(k.getPowerLimitInAmperes());
+                           p.setLimit(k.getPowerLimit());
                            p.setNumberPhases(k.getNumberPhases());
                            return p;
                        })

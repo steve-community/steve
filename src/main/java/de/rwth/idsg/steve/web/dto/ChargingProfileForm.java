@@ -125,7 +125,7 @@ public class ChargingProfileForm {
         private Integer startPeriodInSeconds; // from the startSchedule
 
         @NotNull(message = "Power Limit has to be set")
-        private BigDecimal powerLimitInAmperes;
+        private BigDecimal powerLimit;
 
         private Integer numberPhases;
 

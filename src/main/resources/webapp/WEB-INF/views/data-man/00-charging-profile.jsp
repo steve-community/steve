@@ -66,7 +66,7 @@
     <thead>
     <tr>
         <th>Start Period (in sec)</th>
-        <th>Power Limit (in amperes)</th>
+        <th>Power Limit (in Charging Rate Unit selected above)</th>
         <th>Number Phases</th>
         <th>
             <input type="button" id="addRow" value="Add">
@@ -77,7 +77,7 @@
     <c:forEach items="${form.schedulePeriodMap}" var="schedulePeriodMap" varStatus="status">
         <tr id="${schedulePeriodMap.key}">
             <td><form:input path="schedulePeriodMap[${schedulePeriodMap.key}].startPeriodInSeconds"/></td>
-            <td><form:input path="schedulePeriodMap[${schedulePeriodMap.key}].powerLimitInAmperes"/></td>
+            <td><form:input path="schedulePeriodMap[${schedulePeriodMap.key}].powerLimit"/></td>
             <td><form:input path="schedulePeriodMap[${schedulePeriodMap.key}].numberPhases" placeholder="if empty, 3 will be assumed"/></td>
             <td><input type="button" class="removeRow" value="Delete"></td>
         </tr>

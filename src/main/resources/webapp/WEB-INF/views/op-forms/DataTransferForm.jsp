@@ -25,7 +25,7 @@
     <table class="userInput">
         <tr><td>Vendor ID (String):</td><td><form:input path="vendorId" /></td></tr>
         <tr><td>Message ID (String):</td><td><form:input path="messageId" placeholder="optional" /></td></tr>
-        <tr><td>Data (Text):</td><td><form:input path="data" placeholder="optional" /></td></tr>
+        <tr><td>Data (Text):</td><td><form:textarea path="data" placeholder="optional" /></td></tr>
         <tr><td></td><td><div class="submit-button"><input type="submit" value="Perform"></div></td></tr>
     </table>
 </form:form>

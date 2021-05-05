@@ -274,7 +274,7 @@ public class TransactionServiceImpl implements TransactionService {
                 connector.getConnectorId());
         OcppChargingProcess chargingProcess = chargingProcessService.fetchChargingProcess(params.getConnectorId(),
                 params.getChargeBoxId(),
-                new AsyncWaiter<>(2000));
+                new AsyncWaiter<>(90000));
         if (chargingProcess != null) {
             log.info("Setting transaction on connector {} to process: {}...",
                     connector.getConnectorId(),

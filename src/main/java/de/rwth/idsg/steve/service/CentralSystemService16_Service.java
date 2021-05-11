@@ -34,7 +34,11 @@ import net.parkl.ocpp.module.esp.model.ESPRfidChargingStartRequest;
 import net.parkl.ocpp.service.ChargingProcessService;
 import net.parkl.ocpp.service.HeartBeatService;
 import net.parkl.ocpp.service.OcppMiddleware;
-import net.parkl.ocpp.service.cs.*;
+import net.parkl.ocpp.service.cs.ChargePointService;
+import net.parkl.ocpp.service.cs.ConnectorMeterValueService;
+import net.parkl.ocpp.service.cs.ConnectorService;
+import net.parkl.ocpp.service.cs.SettingsService;
+import net.parkl.ocpp.service.cs.TransactionService;
 import ocpp.cs._2015._10.*;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -235,6 +239,11 @@ public class CentralSystemService16_Service {
                 false, chargeBoxIdentity,
                 () -> null
         );
+
+        if (transactionId == 0) {
+            log.warn("StopRequest without transaction received");
+            return new StopTransactionResponse().withIdTagInfo(idTagInfo);
+        }
 
         UpdateTransactionParams params =
                 UpdateTransactionParams.builder()

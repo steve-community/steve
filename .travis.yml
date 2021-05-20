@@ -46,23 +46,6 @@ jobs:
       jdk: openjdk15
       dist: xenial
       services: mysql
-      
-    - name: OpenJDK11 with MariaDB 10.3 (Ubuntu LTS 20.04)
-      jdk: openjdk11
-      dist: focal
-      addons:
-        mariadb: "10.3"
-        apt:
-          packages:
-            - elinks
-    - name: OpenJDK15 with MariaDB 10.3 (Ubuntu LTS 20.04)
-      jdk: openjdk15
-      dist: focal
-      addons:
-        mariadb: "10.3"
-        apt:
-          packages:
-            - elinks
     - name: OpenJDK11 with MariaDB 10.5 (Ubuntu LTS 20.04)
       jdk: openjdk11
       dist: focal

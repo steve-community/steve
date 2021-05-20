@@ -69,7 +69,7 @@
         <th>Power Limit (in Charging Rate Unit selected above)</th>
         <th>Number Phases</th>
         <th>
-            <input type="button" id="addRow" value="Add">
+            <input type="button" id="addRow" value="Add Period">
         </th>
     </tr>
     </thead>

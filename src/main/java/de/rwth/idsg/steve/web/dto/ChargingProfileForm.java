@@ -121,10 +121,10 @@ public class ChargingProfileForm {
 
         private static final int defaultNumberPhases = 3;
 
-        @NotNull(message = "Start Period has to be set")
+        @NotNull(message = "Schedule period: Start Period has to be set")
         private Integer startPeriodInSeconds; // from the startSchedule
 
-        @NotNull(message = "Power Limit has to be set")
+        @NotNull(message = "Schedule period: Power Limit has to be set")
         private BigDecimal powerLimit;
 
         private Integer numberPhases;

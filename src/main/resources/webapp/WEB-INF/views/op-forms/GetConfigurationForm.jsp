@@ -30,7 +30,9 @@
                 <form:select path="confKeyList" multiple="true" size="14" >
                     <form:options items="${ocppConfKeys}" />
                 </form:select>
-            </td></tr>
+            </td>
+        </tr>
+        <tr><td>Custom Configuration Keys:</td><td><form:input path="commaSeparatedCustomConfKeys" placeholder="optional comma separated list" /></td></tr>
         <tr><td></td><td><div class="submit-button"><input type="submit" value="Perform"></div></td></tr>
     </table>
 </form:form>

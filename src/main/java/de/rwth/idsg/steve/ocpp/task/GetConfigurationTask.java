@@ -60,20 +60,12 @@ public class GetConfigurationTask extends Ocpp15AndAboveTask<GetConfigurationPar
 
     @Override
     public ocpp.cp._2012._06.GetConfigurationRequest getOcpp15Request() {
-        if (params.isSetConfKeyList()) {
-            return new GetConfigurationRequest().withKey(params.getConfKeyList());
-        } else {
-            return new GetConfigurationRequest();
-        }
+        return new GetConfigurationRequest().withKey(params.getAllKeys());
     }
 
     @Override
     public ocpp.cp._2015._10.GetConfigurationRequest getOcpp16Request() {
-        if (params.isSetConfKeyList()) {
-            return new ocpp.cp._2015._10.GetConfigurationRequest().withKey(params.getConfKeyList());
-        } else {
-            return new ocpp.cp._2015._10.GetConfigurationRequest();
-        }
+        return new ocpp.cp._2015._10.GetConfigurationRequest().withKey(params.getAllKeys());
     }
 
     @Override

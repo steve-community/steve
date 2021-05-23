@@ -18,15 +18,12 @@
  */
 package de.rwth.idsg.steve.repository.impl;
 
-import com.google.common.base.Joiner;
-import com.google.common.base.Splitter;
 import de.rwth.idsg.steve.NotificationFeature;
 import de.rwth.idsg.steve.SteveException;
 import de.rwth.idsg.steve.repository.SettingsRepository;
 import de.rwth.idsg.steve.repository.dto.MailSettings;
 import de.rwth.idsg.steve.web.dto.SettingsForm;
 import jooq.steve.db.tables.records.SettingsRecord;
-import org.jetbrains.annotations.Nullable;
 import org.jooq.DSLContext;
 import org.jooq.exception.DataAccessException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,13 +31,12 @@ import org.springframework.stereotype.Repository;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
+import static de.rwth.idsg.steve.utils.StringUtils.joinByComma;
+import static de.rwth.idsg.steve.utils.StringUtils.splitByComma;
 import static jooq.steve.db.tables.Settings.SETTINGS;
 
 /**
@@ -57,16 +53,13 @@ public class SettingsRepositoryImpl implements SettingsRepository {
             StandardCharsets.UTF_8
     );
 
-    private static final Splitter SPLITTER = Splitter.on(",").trimResults().omitEmptyStrings();
-    private static final Joiner JOINER = Joiner.on(",").skipNulls();
-
     @Autowired private DSLContext ctx;
 
     @Override
     public SettingsForm getForm() {
         SettingsRecord r = getInternal();
 
-        List<String> eMails = split(r.getMailRecipients());
+        List<String> eMails = splitByComma(r.getMailRecipients());
         List<NotificationFeature> features = splitFeatures(r.getNotificationFeatures());
 
         return SettingsForm.builder()
@@ -89,7 +82,7 @@ public class SettingsRepositoryImpl implements SettingsRepository {
     public MailSettings getMailSettings() {
         SettingsRecord r = getInternal();
 
-        List<String> eMails = split(r.getMailRecipients());
+        List<String> eMails = splitByComma(r.getMailRecipients());
         List<NotificationFeature> features = splitFeatures(r.getNotificationFeatures());
 
         return MailSettings.builder()
@@ -117,8 +110,8 @@ public class SettingsRepositoryImpl implements SettingsRepository {
 
     @Override
     public void update(SettingsForm form) {
-        String eMails = join(form.getRecipients());
-        String features = join(form.getEnabledFeatures());
+        String eMails = joinByComma(form.getRecipients());
+        String features = joinByComma(form.getEnabledFeatures());
 
         try {
             ctx.update(SETTINGS)
@@ -155,27 +148,11 @@ public class SettingsRepositoryImpl implements SettingsRepository {
         return (int) TimeUnit.MINUTES.toSeconds(minutes);
     }
 
-    @Nullable
-    private String join(Collection<?> col) {
-        if (col == null || col.isEmpty()) {
-            return null;
-        } else {
-            // Use HashSet to trim duplicates before inserting into DB
-            return JOINER.join(new HashSet<>(col));
-        }
-    }
 
-    private List<String> split(String str) {
-        if (str == null || str.isEmpty()) {
-            return Collections.emptyList();
-        } else {
-            return SPLITTER.splitToList(str);
-        }
-    }
 
     private List<NotificationFeature> splitFeatures(String str) {
-        return split(str).stream()
-                         .map(NotificationFeature::fromName)
-                         .collect(Collectors.toList());
+        return splitByComma(str).stream()
+                                .map(NotificationFeature::fromName)
+                                .collect(Collectors.toList());
     }
 }

@@ -243,12 +243,10 @@ public enum Server15to16Impl implements Server15to16 {
      * but something else might make more sense at this place
      */
     private static ChargePointStatus customMapStatus(ocpp.cs._2012._06.ChargePointStatus status) {
-        switch (status) {
-            case OCCUPIED:
-                return ChargePointStatus.CHARGING;
-            default:
-                return ChargePointStatus.fromValue(status.value());
+        if (status == ocpp.cs._2012._06.ChargePointStatus.OCCUPIED) {
+            return ChargePointStatus.CHARGING;
         }
+        return ChargePointStatus.fromValue(status.value());
     }
 
     /**
@@ -256,12 +254,10 @@ public enum Server15to16Impl implements Server15to16 {
      * Update: According to the 1.6 specification, MODE_3_ERROR was simply renamed to EV_COMMUNICATION_ERROR
      */
     private static ChargePointErrorCode customMapErrorCode(ocpp.cs._2012._06.ChargePointErrorCode errorCode15) {
-        switch (errorCode15) {
-            case MODE_3_ERROR:
-                return ChargePointErrorCode.EV_COMMUNICATION_ERROR;
-            default:
-                return ChargePointErrorCode.fromValue(errorCode15.value());
+        if (errorCode15 == ocpp.cs._2012._06.ChargePointErrorCode.MODE_3_ERROR) {
+            return ChargePointErrorCode.EV_COMMUNICATION_ERROR;
         }
+        return ChargePointErrorCode.fromValue(errorCode15.value());
     }
 
     /**

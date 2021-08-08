@@ -18,6 +18,7 @@
  */
 package de.rwth.idsg.steve;
 
+import de.rwth.idsg.steve.utils.FlywayMigrationRunner;
 import lombok.extern.slf4j.Slf4j;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -43,6 +44,8 @@ public class Application implements ApplicationStarter, AutoCloseable {
         TimeZone.setDefault(TimeZone.getTimeZone(sc.getTimeZoneId()));
         DateTimeZone.setDefault(DateTimeZone.forID(sc.getTimeZoneId()));
         log.info("Date/time zone of the application is set to {}. Current date/time: {}", sc.getTimeZoneId(), DateTime.now());
+
+        FlywayMigrationRunner.run(sc);
 
         switch (sc.getProfile()) {
             case DEV:

@@ -32,6 +32,7 @@
         <java.version>11</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
+        <flyway.version>7.15.0</flyway.version>
         <jooq.version>3.16.7</jooq.version>
         <cxf.version>3.5.4</cxf.version>
         <spring.version>5.3.23</spring.version>
@@ -81,7 +82,7 @@
                     <plugin>
                         <groupId>org.flywaydb</groupId>
                         <artifactId>flyway-maven-plugin</artifactId>
-                        <version>7.15.0</version>
+                        <version>${flyway.version}</version>
 
                         <!-- Must be in the same phase as Jooq -->
                         <executions>
@@ -242,6 +243,7 @@
                 <includes>
                     <include>webapp/static/**</include>
                     <include>webapp/WEB-INF/web.xml</include>
+                    <include>db/**</include>
                 </includes>
             </resource>
         </resources>
@@ -690,6 +692,11 @@
             <groupId>org.jooq</groupId>
             <artifactId>jooq</artifactId>
             <version>${jooq.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.flywaydb</groupId>
+            <artifactId>flyway-core</artifactId>
+            <version>${flyway.version}</version>
         </dependency>
 
         <!-- Test -->

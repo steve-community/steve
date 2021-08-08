@@ -269,6 +269,7 @@
                         <exclude>**/*.yaml</exclude>
                         <exclude>**/*.PNG</exclude>
                         <exclude>**/Dockerfile</exclude>
+                        <exclude>**/jooq/steve/db/**</exclude>
                         <!-- <exclude>**/*.jsp</exclude> -->
 
                     </excludes>

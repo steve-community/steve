@@ -40,3 +40,11 @@ jobs:
 
       - name: Build with Maven
         run: mvn -B -V -Dmaven.javadoc.skip=true -Ptest clean package --file pom.xml
+
+      - name: Start the app and visit signin web page
+        run: |
+          sudo apt-get install -y elinks
+          java -Djava.net.preferIPv4Stack=true -jar target/steve.jar &
+          sleep 30
+          elinks -dump -no-references http://localhost:8080/steve/manager/signin
+          killall java

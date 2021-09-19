@@ -1,6 +1,6 @@
 ![SteVe](src/main/resources/webapp/static/images/logo.png) 
 
-[![Build Status](https://travis-ci.org/RWTH-i5-IDSG/steve.svg?branch=master)](https://travis-ci.org/RWTH-i5-IDSG/steve)
+[![build and run tests](https://github.com/RWTH-i5-IDSG/steve/actions/workflows/main.yml/badge.svg)](https://github.com/RWTH-i5-IDSG/steve/actions/workflows/main.yml)
 
 
 # Introduction

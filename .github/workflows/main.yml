@@ -1,0 +1,50 @@
+name: build and run tests
+on: [ push ]
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ ubuntu-18.04, ubuntu-20.04 ]
+        java: [ '11', '15' ]
+        db: [ 'mysql:5.7.35', 'mysql:8.0', 'mariadb:10.3', 'mariadb:10.5' ]
+    runs-on: ${{ matrix.os }}
+    services:
+      mysql:
+        image: ${{ matrix.db }}
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: root
+        ports:
+          - 3306:3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Java ${{ matrix.Java }}
+        uses: actions/setup-java@v2
+        with:
+          java-version: ${{ matrix.java }}
+          distribution: 'adopt'
+          cache: maven
+
+      - name: Set up MySQL
+        run: |
+          mysql -h 127.0.0.1 -P 3306 -uroot -proot -e "SELECT @@VERSION;"
+          mysql -h 127.0.0.1 -P 3306 -uroot -proot -e "CREATE DATABASE stevedb_test_2aa6a783d47d;" -v
+          mysql -h 127.0.0.1 -P 3306 -uroot -proot -e "CREATE USER 'steve'@'%' IDENTIFIED BY 'changeme';" -v
+          mysql -h 127.0.0.1 -P 3306 -uroot -proot -e "GRANT ALL PRIVILEGES ON stevedb_test_2aa6a783d47d.* TO 'steve'@'%';" -v
+          mysql -h 127.0.0.1 -P 3306 -uroot -proot -e "GRANT SELECT ON mysql.proc TO 'steve'@'%';" -v || true
+          mysql -h 127.0.0.1 -P 3306 -uroot -proot -e "GRANT SUPER ON *.* TO 'steve'@'%';" -v || true
+
+      - name: Build with Maven
+        run: mvn -B -V -Dmaven.javadoc.skip=true -Ptest clean package --file pom.xml
+
+      - name: Start the app and visit signin web page
+        run: |
+          sudo apt-get install -y elinks
+          java -Djava.net.preferIPv4Stack=true -jar target/steve.jar &
+          sleep 30
+          elinks -dump -no-references http://localhost:8080/steve/manager/signin
+          killall java

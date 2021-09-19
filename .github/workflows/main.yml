@@ -1,4 +1,4 @@
-name: SteVe build with Java 11
+name: build and run tests
 on: [push]
 
 jobs:
@@ -8,9 +8,10 @@ jobs:
       fail-fast: false
       matrix:
         java: ['11', '15']
+        db: ['mysql:5.7.35', 'mysql:8.0', 'mariadb:10.3', 'mariadb:10.5']
     services:
       mysql:
-        image: mysql:5.7.35
+        image: ${{ matrix.db }}
         env:
           MYSQL_ROOT_PASSWORD: root
           MYSQL_DATABASE: root

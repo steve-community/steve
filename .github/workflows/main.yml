@@ -4,6 +4,10 @@ on: [push]
 jobs:
   build:
     runs-on: ubuntu-18.04
+    strategy:
+      fail-fast: false
+      matrix:
+        java: ['11', '15']
     services:
       mysql:
         image: mysql:5.7.35
@@ -14,10 +18,10 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
-      - name: Set up JDK 11
+      - name: Set up Java ${{ matrix.Java }}
         uses: actions/setup-java@v2
         with:
-          java-version: '11'
+          java-version: ${{ matrix.java }}
           distribution: 'adopt'
           cache: maven
       - name: Set up MySQL

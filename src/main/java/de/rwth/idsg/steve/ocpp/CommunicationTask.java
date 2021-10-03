@@ -180,9 +180,9 @@ public abstract class CommunicationTask<S extends ChargePointSelection, RESPONSE
     // Classes
     // -------------------------------------------------------------------------
 
-    public abstract class DefaultOcppCallback<RESPONSE> implements OcppCallback<RESPONSE> {
+    public abstract class DefaultOcppCallback<RES> implements OcppCallback<RES> {
 
-        public abstract void success(String chargeBoxId, RESPONSE response);
+        public abstract void success(String chargeBoxId, RES response);
 
         @Override
         public void success(String chargeBoxId, OcppJsonError error) {

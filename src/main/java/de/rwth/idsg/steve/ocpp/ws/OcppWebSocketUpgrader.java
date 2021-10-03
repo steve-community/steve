@@ -42,15 +42,12 @@ import java.util.Optional;
 public class OcppWebSocketUpgrader extends JettyRequestUpgradeStrategy {
 
     private final List<AbstractWebSocketEndpoint> endpoints;
-    private final NotificationService notificationService;
     private final ChargePointHelperService chargePointHelperService;
 
     public OcppWebSocketUpgrader(WebSocketPolicy policy, List<AbstractWebSocketEndpoint> endpoints,
-                                 NotificationService notificationService,
                                  ChargePointHelperService chargePointHelperService) {
         super(policy);
         this.endpoints = endpoints;
-        this.notificationService = notificationService;
         this.chargePointHelperService = chargePointHelperService;
     }
 

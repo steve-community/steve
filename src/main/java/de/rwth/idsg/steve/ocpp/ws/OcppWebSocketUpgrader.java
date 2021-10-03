@@ -19,7 +19,6 @@
 package de.rwth.idsg.steve.ocpp.ws;
 
 import de.rwth.idsg.steve.service.ChargePointHelperService;
-import de.rwth.idsg.steve.service.NotificationService;
 import ocpp.cs._2015._10.RegistrationStatus;
 import org.eclipse.jetty.websocket.api.WebSocketPolicy;
 import org.jetbrains.annotations.Nullable;

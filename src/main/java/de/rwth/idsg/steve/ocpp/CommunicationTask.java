@@ -60,14 +60,14 @@ public abstract class CommunicationTask<S extends ChargePointSelection, RESPONSE
     private final DateTime startTimestamp = DateTime.now();
     private DateTime endTimestamp;
 
-    private AtomicInteger errorCount = new AtomicInteger(0);
-    private AtomicInteger responseCount = new AtomicInteger(0);
+    private final AtomicInteger errorCount = new AtomicInteger(0);
+    private final AtomicInteger responseCount = new AtomicInteger(0);
 
     @Getter(AccessLevel.NONE) // disable getter generation
     private final Object lockObject = new Object();
 
     // The default initial capacity is 10. We probably won't need that much.
-    private ArrayList<OcppCallback<RESPONSE>> callbackList = new ArrayList<>(2);
+    private final ArrayList<OcppCallback<RESPONSE>> callbackList = new ArrayList<>(2);
 
     public CommunicationTask(OcppVersion ocppVersion, S params) {
         this(ocppVersion, params, TaskOrigin.INTERNAL, "SteVe");

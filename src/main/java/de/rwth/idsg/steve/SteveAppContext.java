@@ -56,7 +56,7 @@ import static de.rwth.idsg.steve.SteveConfiguration.CONFIG;
  */
 public class SteveAppContext {
 
-    private AnnotationConfigWebApplicationContext springContext;
+    private final AnnotationConfigWebApplicationContext springContext;
 
     public SteveAppContext() {
         springContext = new AnnotationConfigWebApplicationContext();

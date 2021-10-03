@@ -158,7 +158,7 @@ public class NotificationService {
     }
 
     private static String addTimestamp(String body) {
-        String eventTs = "Timestamp of the event: " + DateTime.now().toString();
+        String eventTs = "Timestamp of the event: " + DateTime.now();
         String newLine = System.lineSeparator() + System.lineSeparator();
 
         if (Strings.isNullOrEmpty(body)) {

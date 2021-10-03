@@ -25,6 +25,7 @@ import org.joda.time.LocalDateTime;
 
 import javax.validation.constraints.Future;
 import javax.validation.constraints.NotEmpty;
+import java.util.Objects;
 
 /**
  * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
@@ -55,10 +56,6 @@ public class OcppTagForm {
      * As specified in V0_9_9__update.sql default value is 1.
      */
     public Integer getMaxActiveTransactionCount() {
-        if (maxActiveTransactionCount == null) {
-            return 1;
-        } else {
-            return maxActiveTransactionCount;
-        }
+        return Objects.requireNonNullElse(maxActiveTransactionCount, 1);
     }
 }

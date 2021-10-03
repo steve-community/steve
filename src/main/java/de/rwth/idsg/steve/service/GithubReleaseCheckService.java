@@ -20,7 +20,7 @@ package de.rwth.idsg.steve.service;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.PropertyNamingStrategy;
+import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.github.zafarkhaja.semver.Version;
 import de.rwth.idsg.steve.SteveConfiguration;
 import de.rwth.idsg.steve.web.dto.ReleaseReport;
@@ -64,7 +64,7 @@ public class GithubReleaseCheckService implements ReleaseCheckService {
 
         ObjectMapper mapper = new ObjectMapper();
         mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
-        mapper.setPropertyNamingStrategy(new PropertyNamingStrategy.SnakeCaseStrategy());
+        mapper.setPropertyNamingStrategy(new PropertyNamingStrategies.SnakeCaseStrategy());
 
         restTemplate = new RestTemplate(Collections.singletonList(new MappingJackson2HttpMessageConverter(mapper)));
         restTemplate.setRequestFactory(factory);

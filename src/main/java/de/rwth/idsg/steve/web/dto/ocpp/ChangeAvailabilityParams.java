@@ -23,6 +23,7 @@ import lombok.Setter;
 
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
+import java.util.Objects;
 
 /**
  * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
@@ -41,10 +42,6 @@ public class ChangeAvailabilityParams extends MultipleChargePointSelect {
      * if empty, 0 = charge point as a whole
      */
     public void setConnectorId(Integer connectorId) {
-        if (connectorId == null) {
-            this.connectorId = 0;
-        } else {
-            this.connectorId = connectorId;
-        }
+        this.connectorId = Objects.requireNonNullElse(connectorId, 0);
     }
 }

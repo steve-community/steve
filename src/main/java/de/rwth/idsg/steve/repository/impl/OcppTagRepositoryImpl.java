@@ -237,12 +237,8 @@ public class OcppTagRepositoryImpl implements OcppTagRepository {
     private void processBooleanType(SelectQuery selectQuery,
                                     TableField<OcppTagActivityRecord, Boolean> field,
                                     OcppTagQueryForm.BooleanType type) {
-        switch (type) {
-            case ALL:
-                break;
-
-            default:
-                selectQuery.addConditions(field.eq(type.getBoolValue()));
+        if (type != OcppTagQueryForm.BooleanType.ALL) {
+            selectQuery.addConditions(field.eq(type.getBoolValue()));
         }
     }
 

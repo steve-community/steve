@@ -28,8 +28,7 @@ import de.rwth.idsg.steve.ocpp.ws.data.OcppJsonCall;
 import de.rwth.idsg.steve.ocpp.ws.pipeline.OutgoingCallPipeline;
 import de.rwth.idsg.steve.repository.dto.ChargePointSelect;
 import lombok.RequiredArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.UUID;
 
@@ -37,9 +36,9 @@ import java.util.UUID;
  * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
  * @since 20.03.2015
  */
+@Slf4j
 @RequiredArgsConstructor
 public class ChargePointServiceInvoker {
-    private final Logger log = LoggerFactory.getLogger(getClass());
 
     private final OutgoingCallPipeline outgoingCallPipeline;
     private final AbstractWebSocketEndpoint endpoint;
@@ -65,14 +64,13 @@ public class ChargePointServiceInvoker {
     private void run(String chargeBoxId, CommunicationTask task) {
         RequestType request = task.getRequest();
 
-        String messageId = UUID.randomUUID().toString();
         ActionResponsePair pair = typeStore.findActionResponse(request);
         if (pair == null) {
             throw new SteveException("Action name is not found");
         }
 
         OcppJsonCall call = new OcppJsonCall();
-        call.setMessageId(messageId);
+        call.setMessageId(UUID.randomUUID().toString());
         call.setPayload(request);
         call.setAction(pair.getAction());
 

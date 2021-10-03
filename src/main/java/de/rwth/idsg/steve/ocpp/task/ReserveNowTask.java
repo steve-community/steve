@@ -43,7 +43,7 @@ public class ReserveNowTask extends Ocpp15AndAboveTask<EnhancedReserveNowParams,
 
     @Override
     public OcppCallback<String> defaultCallback() {
-        return new OcppCallback<String>() {
+        return new StringOcppCallback() {
             @Override
             public void success(String chargeBoxId, String responseStatus) {
                 addNewResponse(chargeBoxId, responseStatus);

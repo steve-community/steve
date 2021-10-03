@@ -19,7 +19,6 @@
 package de.rwth.idsg.steve.ocpp.ws;
 
 import de.rwth.idsg.steve.service.ChargePointHelperService;
-import de.rwth.idsg.steve.service.NotificationService;
 import ocpp.cs._2015._10.RegistrationStatus;
 import org.eclipse.jetty.websocket.api.WebSocketPolicy;
 import org.jetbrains.annotations.Nullable;
@@ -42,15 +41,12 @@ import java.util.Optional;
 public class OcppWebSocketUpgrader extends JettyRequestUpgradeStrategy {
 
     private final List<AbstractWebSocketEndpoint> endpoints;
-    private final NotificationService notificationService;
     private final ChargePointHelperService chargePointHelperService;
 
     public OcppWebSocketUpgrader(WebSocketPolicy policy, List<AbstractWebSocketEndpoint> endpoints,
-                                 NotificationService notificationService,
                                  ChargePointHelperService chargePointHelperService) {
         super(policy);
         this.endpoints = endpoints;
-        this.notificationService = notificationService;
         this.chargePointHelperService = chargePointHelperService;
     }
 

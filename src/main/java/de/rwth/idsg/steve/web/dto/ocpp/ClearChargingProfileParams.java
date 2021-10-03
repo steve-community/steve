@@ -52,11 +52,7 @@ public class ClearChargingProfileParams extends MultipleChargePointSelect {
 
     @AssertTrue(message = "When filtering by id, charging profile id must be set")
     public boolean isValidWhenFilterById() {
-        if (filterType == ClearChargingProfileFilterType.ChargingProfileId
-                && chargingProfilePk == null) {
-            return false;
-        }
-        return true;
+        return filterType != ClearChargingProfileFilterType.ChargingProfileId || chargingProfilePk != null;
     }
 
 }

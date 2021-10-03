@@ -31,5 +31,5 @@ public enum TaskOrigin {
     INTERNAL,
 
     // When the action was triggered by an external system (e.g. integrated roaming partner)
-    EXTERNAL;
+    EXTERNAL
 }

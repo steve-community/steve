@@ -51,7 +51,7 @@ import static org.apache.cxf.ws.addressing.JAXWSAConstants.ADDRESSING_PROPERTIES
  * 2. Intercepts incoming OCPP messages to update the endpoint address ("From" field of the WS-A header) in DB.
  * And the absence of the field is not a deal breaker anymore. But, as a side effect, the user will not be able
  * to send commands to the charging station, since the DB call to list the charge points will filter it out. See
- * {@link ChargePointRepositoryImpl#getChargePointSelect(OcppProtocol)}.
+ * {@link ChargePointRepositoryImpl#getChargePointSelect(OcppProtocol, java.util.List)}.
  *
  * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
  * @since 15.06.2015

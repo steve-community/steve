@@ -66,14 +66,12 @@ public class TransactionRepositoryImpl implements TransactionRepository {
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public List<Transaction> getTransactions(TransactionQueryForm form) {
         return getInternal(form).fetch()
                                 .map(new TransactionMapper());
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public void writeTransactionsCSV(TransactionQueryForm form, Writer writer) {
         getInternalCSV(form).fetch()
                             .formatCSV(writer);

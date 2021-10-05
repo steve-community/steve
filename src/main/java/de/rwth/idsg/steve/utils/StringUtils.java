@@ -20,12 +20,14 @@ package de.rwth.idsg.steve.utils;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
+import com.google.common.base.Strings;
 import de.rwth.idsg.steve.ocpp.CommunicationTask;
 import org.jetbrains.annotations.Nullable;
+import org.springframework.util.CollectionUtils;
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 
 /**
@@ -40,8 +42,7 @@ public final class StringUtils {
     private StringUtils() { }
 
     /**
-     * We don't want to hard-code operation names,
-     * but derive them from the actual request object.
+     * We don't want to hard-code operation names, but derive them from the actual request object.
      *
      * Example for "ChangeAvailabilityTask":
      * - Remove "Task" at the end -> "ChangeAvailability"
@@ -62,16 +63,16 @@ public final class StringUtils {
 
     @Nullable
     public static String joinByComma(Collection<?> col) {
-        if (col == null || col.isEmpty()) {
+        if (CollectionUtils.isEmpty(col)) {
             return null;
         } else {
-            // Use HashSet to trim duplicates
-            return JOINER.join(new HashSet<>(col));
+            // Use set to trim duplicates and keep collection order
+            return JOINER.join(new LinkedHashSet<>(col));
         }
     }
 
     public static List<String> splitByComma(String str) {
-        if (str == null || str.isEmpty()) {
+        if (Strings.isNullOrEmpty(str)) {
             return Collections.emptyList();
         } else {
             return SPLITTER.splitToList(str);

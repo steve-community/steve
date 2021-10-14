@@ -929,13 +929,17 @@ public class OcppMiddlewareImpl implements OcppMiddleware {
 
         log.info("transaction in consumption update: {}", transaction);
 
+        float calculatedTotalPower = consumptionHelper.getTotalPower(startValue, stopValue);
+        Float calculatedStartValue = consumptionHelper.getStartValue(transaction);
+        Float calculatedStopValue = consumptionHelper.getStopValue(transaction);
+
         ESPChargingConsumptionRequest req = ESPChargingConsumptionRequest.builder().
                 externalChargeId(process.getOcppChargingProcessId()).
                 start(process.getStartDate()).
                 end(process.getEndDate()).
-                totalPower(consumptionHelper.getTotalPower(startValue, stopValue)).
-                startValue(consumptionHelper.getStartValue(transaction)).
-                stopValue(consumptionHelper.getStopValue(transaction)).
+                totalPower(calculatedTotalPower).
+                startValue(calculatedStartValue).
+                stopValue(calculatedStopValue).
                 build();
 
         emobilityServiceProvider.updateChargingConsumptionExternal(req);
@@ -946,9 +950,9 @@ public class OcppMiddlewareImpl implements OcppMiddleware {
                 .externalChargeId(process.getOcppChargingProcessId())
                 .start(process.getStartDate())
                 .end(process.getEndDate())
-                .totalPower(consumptionHelper.getTotalPower(startValue, stopValue))
-                .startValue(consumptionHelper.getStartValue(transaction))
-                .stopValue(consumptionHelper.getStopValue(transaction))
+                .totalPower(calculatedTotalPower)
+                .startValue(calculatedStartValue)
+                .stopValue(calculatedStopValue)
                 .build();
 
         consumptionStateRepository.save(chargingConsumptionState);

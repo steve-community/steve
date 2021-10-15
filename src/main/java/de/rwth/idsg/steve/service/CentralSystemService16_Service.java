@@ -34,11 +34,7 @@ import net.parkl.ocpp.module.esp.model.ESPRfidChargingStartRequest;
 import net.parkl.ocpp.service.ChargingProcessService;
 import net.parkl.ocpp.service.HeartBeatService;
 import net.parkl.ocpp.service.OcppMiddleware;
-import net.parkl.ocpp.service.cs.ChargePointService;
-import net.parkl.ocpp.service.cs.ConnectorMeterValueService;
-import net.parkl.ocpp.service.cs.ConnectorService;
-import net.parkl.ocpp.service.cs.SettingsService;
-import net.parkl.ocpp.service.cs.TransactionService;
+import net.parkl.ocpp.service.cs.*;
 import ocpp.cs._2015._10.*;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -161,7 +157,7 @@ public class CentralSystemService16_Service {
     public MeterValuesResponse meterValues(MeterValuesRequest parameters, String chargeBoxIdentity) {
         Integer transactionId = parameters.getTransactionId();
 
-        if (parameters.isSetMeterValue() && transactionId != null) {
+        if (parameters.isSetMeterValue() && transactionId != null && transactionId > 0) {
             TransactionStart transactionStart =
                     transactionService.findTransactionStart(transactionId).orElseThrow(() ->
                             new IllegalArgumentException("Invalid transaction id: " + transactionId));

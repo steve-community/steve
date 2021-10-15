@@ -25,13 +25,9 @@ import static net.parkl.ocpp.entities.TransactionStopEventActor.station;
 import static net.parkl.ocpp.service.OcppConstants.REASON_VEHICLE_CHARGED;
 import static net.parkl.ocpp.service.OcppConstants.REASON_VEHICLE_NOT_CONNECTED;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.anyInt;
-import static org.mockito.Mockito.anyString;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
+@SuppressWarnings("unused")
 @RunWith(MockitoJUnitRunner.class)
 public class TransactionServiceUnitTest {
     @InjectMocks
@@ -244,5 +240,48 @@ public class TransactionServiceUnitTest {
                 .thenReturn(testChargingProcess);
 
         assertThat(transactionService.insertTransaction(params)).isEqualTo(testChargingProcess.getTransactionStart().getTransactionPk());
+    }
+
+    @Test
+    public void updateTransactionInvalidTransaction() {
+        int testTransactionId = 1;
+        String testChargeBoxId = "testChargeBox";
+
+        UpdateTransactionParams params =
+                UpdateTransactionParams.builder()
+                        .chargeBoxId(testChargeBoxId)
+                        .transactionId(testTransactionId)
+                        .stopTimestamp(null)
+                        .stopMeterValue(String.valueOf(500))
+                        .stopReason(REASON_VEHICLE_NOT_CONNECTED)
+                        .eventTimestamp(DateTime.now())
+                        .eventActor(station)
+                        .build();
+
+        transactionService.updateTransaction(params);
+        verify(transactionStopFailedRepository, Mockito.times(0)).save(any());
+    }
+
+    @Test
+    public void updateTransactionNoChargingProcessForTransaction() {
+        int testTransactionId = 1;
+        Transaction testTransaction = mock(Transaction.class);
+        String testChargeBoxId = "testChargeBox";
+
+        UpdateTransactionParams params =
+                UpdateTransactionParams.builder()
+                        .chargeBoxId(testChargeBoxId)
+                        .transactionId(testTransactionId)
+                        .stopTimestamp(null)
+                        .stopMeterValue(String.valueOf(500))
+                        .stopReason(REASON_VEHICLE_NOT_CONNECTED)
+                        .eventTimestamp(DateTime.now())
+                        .eventActor(station)
+                        .build();
+
+        when(transactionRepository.findById(testTransactionId)).thenReturn(java.util.Optional.of(testTransaction));
+
+        transactionService.updateTransaction(params);
+        verify(transactionStopFailedRepository, Mockito.times(0)).save(any());
     }
 }

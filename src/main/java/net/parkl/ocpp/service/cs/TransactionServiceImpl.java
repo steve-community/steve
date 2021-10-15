@@ -302,11 +302,22 @@ public class TransactionServiceImpl implements TransactionService {
     public void updateTransaction(UpdateTransactionParams p) {
         try {
             int transactionId = p.getTransactionId();
-            Transaction transaction = transactionRepo.findById(transactionId)
-                    .orElseThrow(() -> new IllegalArgumentException("Invalid transaction id: " + transactionId));
+            log.info("Update transaction received from charge box {} with transaction id {}", p.getChargeBoxId(), transactionId);
+            Transaction transaction = transactionRepo.findById(transactionId).orElse(null);
+
+            if (transaction == null){
+                log.warn("Invalid transaction id {}", transactionId);
+                return;
+            }
 
             TransactionStop transactionStop = createTransactionStop(p);
             OcppChargingProcess chargingProcess = chargingProcessService.findByTransactionId(transactionId);
+
+            if (chargingProcess == null){
+                log.warn("Charging process not found for transaction {}", transactionId);
+                return;
+            }
+
             transactionStop.setTransaction(chargingProcess.getTransactionStart());
             transactionStopRepo.save(transactionStop);
 

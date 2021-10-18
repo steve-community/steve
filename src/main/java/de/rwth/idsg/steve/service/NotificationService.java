@@ -24,7 +24,7 @@ public class NotificationService implements OcppNotificationService {
 
     @Autowired
     private MailService mailService;
-    @Value("${notification.enabled}")
+    @Value("${notification.enabled:false}")
     private boolean notificationEnabled;
 
 

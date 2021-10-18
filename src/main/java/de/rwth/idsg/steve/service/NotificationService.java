@@ -1,24 +1,17 @@
 package de.rwth.idsg.steve.service;
 
 import com.google.common.base.Strings;
-import de.rwth.idsg.steve.NotificationFeature;
 import de.rwth.idsg.steve.repository.dto.InsertTransactionParams;
-import de.rwth.idsg.steve.repository.dto.MailSettings;
 import de.rwth.idsg.steve.repository.dto.UpdateTransactionParams;
 import lombok.extern.slf4j.Slf4j;
 import ocpp.cs._2015._10.RegistrationStatus;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 
-import static de.rwth.idsg.steve.NotificationFeature.OcppStationBooted;
-import static de.rwth.idsg.steve.NotificationFeature.OcppStationStatusFailure;
-import static de.rwth.idsg.steve.NotificationFeature.OcppStationWebSocketConnected;
-import static de.rwth.idsg.steve.NotificationFeature.OcppStationWebSocketDisconnected;
-import static de.rwth.idsg.steve.NotificationFeature.OcppTransactionEnded;
-import static de.rwth.idsg.steve.NotificationFeature.OcppTransactionStarted;
 import static java.lang.String.format;
 
 /**
@@ -27,15 +20,17 @@ import static java.lang.String.format;
  */
 @Slf4j
 @Service
-public class NotificationService implements OcppNotificationService{
+public class NotificationService implements OcppNotificationService {
 
     @Autowired
     private MailService mailService;
+    @Value("${notification.enabled}")
+    private boolean notificationEnabled;
 
 
     @Override
     public void ocppStationBooted(String chargeBoxId, Optional<RegistrationStatus> status) {
-        if (isDisabled(OcppStationBooted)) {
+        if (isDisabled()) {
             return;
         }
 
@@ -52,7 +47,7 @@ public class NotificationService implements OcppNotificationService{
 
     @Override
     public void ocppStationWebSocketConnected(String chargeBoxId) {
-        if (isDisabled(OcppStationWebSocketConnected)) {
+        if (isDisabled()) {
             return;
         }
 
@@ -63,7 +58,7 @@ public class NotificationService implements OcppNotificationService{
 
     @Override
     public void ocppStationWebSocketDisconnected(String chargeBoxId) {
-        if (isDisabled(OcppStationWebSocketDisconnected)) {
+        if (isDisabled()) {
             return;
         }
 
@@ -74,7 +69,7 @@ public class NotificationService implements OcppNotificationService{
 
     @Override
     public void ocppStationStatusFailure(String chargeBoxId, int connectorId, String errorCode) {
-        if (isDisabled(OcppStationStatusFailure)) {
+        if (isDisabled()) {
             return;
         }
 
@@ -87,7 +82,7 @@ public class NotificationService implements OcppNotificationService{
 
     @Override
     public void ocppTransactionStarted(int transactionId, InsertTransactionParams params) {
-        if (isDisabled(OcppTransactionStarted)) {
+        if (isDisabled()) {
             return;
         }
 
@@ -98,7 +93,7 @@ public class NotificationService implements OcppNotificationService{
 
     @Override
     public void ocppTransactionEnded(UpdateTransactionParams params) {
-       if (isDisabled(OcppTransactionEnded)) {
+        if (isDisabled()) {
             return;
         }
 
@@ -114,11 +109,11 @@ public class NotificationService implements OcppNotificationService{
 
     private static String createContent(InsertTransactionParams params) {
         StringBuilder sb = new StringBuilder("Details:").append(System.lineSeparator())
-            .append("- chargeBoxId: ").append(params.getChargeBoxId()).append(System.lineSeparator())
-            .append("- connectorId: ").append(params.getConnectorId()).append(System.lineSeparator())
-            .append("- idTag: ").append(params.getIdTag()).append(System.lineSeparator())
-            .append("- startTimestamp: ").append(params.getStartTimestamp()).append(System.lineSeparator())
-            .append("- startMeterValue: ").append(params.getStartMeterValue());
+                .append("- chargeBoxId: ").append(params.getChargeBoxId()).append(System.lineSeparator())
+                .append("- connectorId: ").append(params.getConnectorId()).append(System.lineSeparator())
+                .append("- idTag: ").append(params.getIdTag()).append(System.lineSeparator())
+                .append("- startTimestamp: ").append(params.getStartTimestamp()).append(System.lineSeparator())
+                .append("- startMeterValue: ").append(params.getStartMeterValue());
 
         if (params.hasReservation()) {
             sb.append(System.lineSeparator()).append("- reservationId: ").append(params.getReservationId());
@@ -129,27 +124,22 @@ public class NotificationService implements OcppNotificationService{
 
     private static String createContent(UpdateTransactionParams params) {
         return new StringBuilder("Details:").append(System.lineSeparator())
-            .append("- chargeBoxId: ").append(params.getChargeBoxId()).append(System.lineSeparator())
-            .append("- transactionId: ").append(params.getTransactionId()).append(System.lineSeparator())
-            .append("- stopTimestamp: ").append(params.getStopTimestamp()).append(System.lineSeparator())
-            .append("- stopMeterValue: ").append(params.getStopMeterValue()).append(System.lineSeparator())
-            .append("- stopReason: ").append(params.getStopReason())
-            .toString();
+                .append("- chargeBoxId: ").append(params.getChargeBoxId()).append(System.lineSeparator())
+                .append("- transactionId: ").append(params.getTransactionId()).append(System.lineSeparator())
+                .append("- stopTimestamp: ").append(params.getStopTimestamp()).append(System.lineSeparator())
+                .append("- stopMeterValue: ").append(params.getStopMeterValue()).append(System.lineSeparator())
+                .append("- stopReason: ").append(params.getStopReason())
+                .toString();
     }
 
 
-    private boolean isDisabled(NotificationFeature f) {
-        MailSettings settings = mailService.getSettings();
-
-        boolean isEnabled = settings.isEnabled()
-                && settings.getEnabledFeatures().contains(f)
-                && !settings.getRecipients().isEmpty();
-
-        return !isEnabled;
+    private boolean isDisabled() {
+        log.info("Mail sending disabled");
+        return notificationEnabled;
     }
 
     private static String addTimestamp(String body) {
-        String eventTs = "Timestamp of the event: " + DateTime.now().toString();
+        String eventTs = "Timestamp of the event: " + DateTime.now();
         String newLine = System.lineSeparator() + System.lineSeparator();
 
         if (Strings.isNullOrEmpty(body)) {

@@ -32,6 +32,7 @@ import de.rwth.idsg.steve.web.dto.ConnectorStatusForm;
 import jooq.steve.db.tables.records.AddressRecord;
 import jooq.steve.db.tables.records.ChargeBoxRecord;
 import lombok.extern.slf4j.Slf4j;
+import ocpp.cs._2015._10.RegistrationStatus;
 import org.joda.time.DateTime;
 import org.jooq.Condition;
 import org.jooq.DSLContext;
@@ -220,11 +221,11 @@ public class ChargePointRepositoryImpl implements ChargePointRepository {
                             .and(CONNECTOR_STATUS.STATUS_TIMESTAMP.equal(t1.field(t1TsMax)))
                          .asTable("t2");
 
-        final Condition chargeBoxCondition;
-        if (form == null || form.getChargeBoxId() == null) {
-            chargeBoxCondition = DSL.noCondition();
-        } else {
-            chargeBoxCondition = CHARGE_BOX.CHARGE_BOX_ID.eq(form.getChargeBoxId());
+        // https://github.com/RWTH-i5-IDSG/steve/issues/691
+        Condition chargeBoxCondition = CHARGE_BOX.REGISTRATION_STATUS.eq(RegistrationStatus.ACCEPTED.value());
+
+        if (form != null && form.getChargeBoxId() != null) {
+            chargeBoxCondition = chargeBoxCondition.and(CHARGE_BOX.CHARGE_BOX_ID.eq(form.getChargeBoxId()));
         }
 
         final Condition statusCondition;

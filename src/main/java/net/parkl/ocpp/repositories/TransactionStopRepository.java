@@ -20,7 +20,10 @@ package net.parkl.ocpp.repositories;
 
 import net.parkl.ocpp.entities.TransactionStop;
 import net.parkl.ocpp.entities.TransactionStopId;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 
 public interface TransactionStopRepository extends CrudRepository<TransactionStop, TransactionStopId> {
+    @Query("SELECT COUNT(s) FROM TransactionStop s WHERE s.transaction.transactionPk=?1")
+    long countByTransactionId(int transactionPk);
 }

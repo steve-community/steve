@@ -317,6 +317,11 @@ public class TransactionServiceImpl implements TransactionService {
                 log.warn("Charging process not found for transaction {}", transactionId);
                 return;
             }
+            if (transactionStopRepo.countByTransactionId(transactionId)>0) {
+                log.warn("Transaction {} already stopped for charging process: {}", transactionId,
+                        chargingProcess.getOcppChargingProcessId());
+                return;
+            }
 
             transactionStop.setTransaction(chargingProcess.getTransactionStart());
             transactionStopRepo.save(transactionStop);

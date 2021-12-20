@@ -1,5 +1,6 @@
 package de.rwth.idsg.steve.web.controller;
 
+import de.rwth.idsg.steve.config.WebEnvironment;
 import de.rwth.idsg.steve.ocpp.OcppVersion;
 import de.rwth.idsg.steve.service.ChargePointHelperService;
 import de.rwth.idsg.steve.service.ChargePointService12_Client;
@@ -61,7 +62,7 @@ public class Ocpp12Controller {
     private static final String UNLOCK_CON_PATH = "/UnlockConnector";
     private static final String UPDATE_FIRM_PATH = "/UpdateFirmware";
 
-    protected static final String REDIRECT_TASKS_PATH = "redirect:/manager/operations/tasks/";
+    protected static final String REDIRECT_TASKS_PATH = "redirect:"+ WebEnvironment.getContextRoot() +"/manager/operations/tasks/";
 
     // -------------------------------------------------------------------------
     // Helpers

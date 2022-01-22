@@ -37,7 +37,7 @@
         <cxf.version>3.4.2</cxf.version>
         <spring.boot.version>2.3.4.RELEASE</spring.boot.version>
 
-        <mysql.jdbc.version>8.0.22</mysql.jdbc.version>
+        <mysql.jdbc.version>8.0.28</mysql.jdbc.version>
         <jackson.version>2.12.1</jackson.version>
         <awaitility.version>4.0.2</awaitility.version>
 

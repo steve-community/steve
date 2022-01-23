@@ -60,6 +60,7 @@ import static de.rwth.idsg.steve.SteveConfiguration.CONFIG;
 public class JettyServer {
 
     private Server server;
+    private SteveAppContext steveAppContext;
 
     private static final int MIN_THREADS = 4;
     private static final int MAX_THREADS = 50;
@@ -109,7 +110,7 @@ public class JettyServer {
             server.addConnector(httpsConnector(httpConfig));
         }
 
-        SteveAppContext steveAppContext = new SteveAppContext();
+        steveAppContext = new SteveAppContext();
         server.setHandler(steveAppContext.getHandlers());
     }
 
@@ -160,6 +161,7 @@ public class JettyServer {
 
         if (server != null) {
             server.start();
+            steveAppContext.configureWebSocket();
             populateEndpointInfo();
         }
     }

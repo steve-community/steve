@@ -26,8 +26,6 @@ import de.rwth.idsg.steve.ocpp.ws.ocpp15.Ocpp15WebSocketEndpoint;
 import de.rwth.idsg.steve.ocpp.ws.ocpp16.Ocpp16WebSocketEndpoint;
 import de.rwth.idsg.steve.service.ChargePointHelperService;
 import lombok.extern.slf4j.Slf4j;
-import org.eclipse.jetty.websocket.api.WebSocketBehavior;
-import org.eclipse.jetty.websocket.api.WebSocketPolicy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.socket.config.annotation.EnableWebSocket;
@@ -35,6 +33,7 @@ import org.springframework.web.socket.config.annotation.WebSocketConfigurer;
 import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry;
 import org.springframework.web.socket.server.support.DefaultHandshakeHandler;
 
+import java.time.Duration;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -54,20 +53,15 @@ public class WebSocketConfiguration implements WebSocketConfigurer {
     @Autowired private Ocpp16WebSocketEndpoint ocpp16WebSocketEndpoint;
 
     public static final long PING_INTERVAL = TimeUnit.MINUTES.toMinutes(15);
-    private static final long IDLE_TIMEOUT = TimeUnit.HOURS.toMillis(2);
+    public static final Duration IDLE_TIMEOUT = Duration.ofHours(2);
     public static final int MAX_MSG_SIZE = 8_388_608; // 8 MB for max message size
 
     @Override
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
-        WebSocketPolicy policy = new WebSocketPolicy(WebSocketBehavior.SERVER);
-        policy.setMaxTextMessageBufferSize(MAX_MSG_SIZE);
-        policy.setMaxTextMessageSize(MAX_MSG_SIZE);
-        policy.setIdleTimeout(IDLE_TIMEOUT);
-
         List<AbstractWebSocketEndpoint> endpoints = getEndpoints();
         String[] protocols = endpoints.stream().map(e -> e.getVersion().getValue()).toArray(String[]::new);
 
-        OcppWebSocketUpgrader upgradeStrategy = new OcppWebSocketUpgrader(policy, endpoints, chargePointHelperService);
+        OcppWebSocketUpgrader upgradeStrategy = new OcppWebSocketUpgrader(endpoints, chargePointHelperService);
 
         DefaultHandshakeHandler handler = new DefaultHandshakeHandler(upgradeStrategy);
         handler.setSupportedProtocols(protocols);

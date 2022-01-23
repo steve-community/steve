@@ -125,7 +125,7 @@ public class JettyServer {
     private ServerConnector httpsConnector(HttpConfiguration httpConfig) {
         // === jetty-https.xml ===
         // SSL Context Factory
-        SslContextFactory sslContextFactory = new SslContextFactory.Server();
+        SslContextFactory.Server sslContextFactory = new SslContextFactory.Server();
         sslContextFactory.setKeyStorePath(CONFIG.getJetty().getKeyStorePath());
         sslContextFactory.setKeyStorePassword(CONFIG.getJetty().getKeyStorePassword());
         sslContextFactory.setKeyManagerPassword(CONFIG.getJetty().getKeyStorePassword());

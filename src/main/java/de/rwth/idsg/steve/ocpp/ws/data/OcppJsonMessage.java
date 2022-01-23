@@ -34,7 +34,7 @@ import lombok.Setter;
  *           +
  *           +--> OcppJsonError
  *
- * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
+ * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 12.03.2015
  */
 @Getter

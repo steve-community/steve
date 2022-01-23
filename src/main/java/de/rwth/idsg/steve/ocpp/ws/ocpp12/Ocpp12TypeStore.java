@@ -21,7 +21,7 @@ package de.rwth.idsg.steve.ocpp.ws.ocpp12;
 import de.rwth.idsg.steve.ocpp.ws.AbstractTypeStore;
 
 /**
- * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
+ * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 17.03.2015
  */
 public final class Ocpp12TypeStore extends AbstractTypeStore {

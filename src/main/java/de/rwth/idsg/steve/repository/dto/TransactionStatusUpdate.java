@@ -25,7 +25,7 @@ import ocpp.cs._2015._10.ChargePointStatus;
 /**
  * Exists only to ensure type safety
  *
- * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
+ * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 17.03.2016
  */
 @Getter

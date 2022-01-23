@@ -45,7 +45,7 @@ import java.util.function.Consumer;
 /**
  * Incoming String --> OcppJsonMessage
  *
- * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
+ * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 17.03.2015
  */
 @Slf4j

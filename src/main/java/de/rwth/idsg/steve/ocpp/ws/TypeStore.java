@@ -22,7 +22,7 @@ import de.rwth.idsg.ocpp.jaxb.RequestType;
 import de.rwth.idsg.steve.ocpp.ws.data.ActionResponsePair;
 
 /**
- * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
+ * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 17.03.2015
  */
 public interface TypeStore {

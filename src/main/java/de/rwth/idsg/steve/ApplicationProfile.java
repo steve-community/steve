@@ -19,7 +19,7 @@
 package de.rwth.idsg.steve;
 
 /**
- * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
+ * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 05.11.2015
  */
 public enum ApplicationProfile {

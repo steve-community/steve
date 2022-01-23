@@ -28,7 +28,7 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
+ * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 29.12.2014
  */
 @Getter

@@ -40,7 +40,7 @@ import static de.rwth.idsg.steve.NotificationFeature.OcppTransactionEnded;
 import static java.lang.String.format;
 
 /**
- * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
+ * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 22.01.2016
  */
 @Slf4j

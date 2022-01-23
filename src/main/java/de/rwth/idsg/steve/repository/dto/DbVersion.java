@@ -22,7 +22,7 @@ import lombok.Builder;
 import lombok.Getter;
 
 /**
- * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
+ * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 19.08.2014
  */
 @Getter

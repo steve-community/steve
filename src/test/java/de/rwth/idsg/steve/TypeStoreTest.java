@@ -28,7 +28,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 /**
- * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
+ * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 10.03.2018
  */
 @Ignore

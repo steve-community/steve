@@ -26,7 +26,7 @@ import ocpp.cp._2015._10.RecurrencyKindType;
 import org.joda.time.LocalDateTime;
 
 /**
- * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
+ * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 12.11.2018
  */
 @Getter

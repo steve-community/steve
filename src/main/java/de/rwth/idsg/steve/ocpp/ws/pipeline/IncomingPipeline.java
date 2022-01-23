@@ -31,7 +31,7 @@ import java.util.function.Consumer;
 /**
  * For all incoming message types.
  *
- * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
+ * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 23.03.2015
  */
 @Slf4j

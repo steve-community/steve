@@ -33,7 +33,7 @@ import java.util.function.BiFunction;
 /**
  * Presumption: The responses must be sent using the same connection as the requests!
  *
- * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
+ * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 21.03.2015
  */
 @Slf4j

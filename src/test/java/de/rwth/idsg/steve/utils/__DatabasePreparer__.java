@@ -61,7 +61,7 @@ import static jooq.steve.db.tables.Transaction.TRANSACTION;
  * inserting data while bypassing normal mechanisms of SteVe. However, for integration testing with reproducible
  * results we need a clean and isolated database.
  *
- * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
+ * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 21.03.2018
  */
 public class __DatabasePreparer__ {

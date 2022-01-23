@@ -34,7 +34,7 @@ import java.util.function.Consumer;
 /**
  * Default holder/context of incoming and outgoing messages.
  *
- * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
+ * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 23.03.2015
  */
 @RequiredArgsConstructor

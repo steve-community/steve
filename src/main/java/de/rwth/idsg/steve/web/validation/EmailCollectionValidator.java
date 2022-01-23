@@ -25,7 +25,7 @@ import javax.validation.ConstraintValidatorContext;
 import java.util.Collection;
 
 /**
- * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
+ * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 22.01.2016
  */
 public class EmailCollectionValidator implements ConstraintValidator<EmailCollection, Collection<String>> {

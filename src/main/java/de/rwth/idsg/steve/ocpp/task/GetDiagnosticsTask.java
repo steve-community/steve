@@ -28,7 +28,7 @@ import javax.xml.ws.AsyncHandler;
 import static de.rwth.idsg.steve.utils.DateTimeUtils.toDateTime;
 
 /**
- * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
+ * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 09.03.2018
  */
 public class GetDiagnosticsTask extends CommunicationTask<GetDiagnosticsParams, String> {

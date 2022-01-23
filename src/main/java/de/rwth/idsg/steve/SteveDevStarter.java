@@ -21,7 +21,7 @@ package de.rwth.idsg.steve;
 /**
  * ApplicationStarter for DEV profile
  *
- * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
+ * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 05.11.2015
  */
 public class SteveDevStarter implements ApplicationStarter {

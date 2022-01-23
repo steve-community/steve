@@ -30,7 +30,7 @@ import javax.validation.constraints.Pattern;
 import java.util.Objects;
 
 /**
- * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
+ * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 08.03.2018
  */
 @Getter

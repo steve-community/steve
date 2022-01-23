@@ -24,7 +24,7 @@ import org.jooq.Converter;
 import java.sql.Timestamp;
 
 /**
- * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
+ * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 29.09.2015
  */
 public class DateTimeConverter implements Converter<Timestamp, DateTime> {

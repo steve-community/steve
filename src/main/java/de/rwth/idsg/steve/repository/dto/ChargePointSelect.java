@@ -22,7 +22,7 @@ import de.rwth.idsg.steve.ocpp.OcppTransport;
 import lombok.Getter;
 
 /**
- * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
+ * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 29.12.2014
  */
 @Getter

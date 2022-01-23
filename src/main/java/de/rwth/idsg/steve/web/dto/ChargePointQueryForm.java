@@ -24,7 +24,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
 /**
- * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
+ * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 26.11.2015
  */
 @Getter

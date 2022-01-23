@@ -26,7 +26,7 @@ import org.jooq.Record1;
 import org.jooq.SelectConditionStep;
 
 /**
- * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
+ * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 24.11.2015
  */
 public interface AddressRepository {

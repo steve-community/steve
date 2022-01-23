@@ -48,7 +48,7 @@ import org.springframework.stereotype.Service;
 import java.util.concurrent.ScheduledExecutorService;
 
 /**
- * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
+ * @author Sevket Goekay <sevketgokay@gmail.com>
  */
 @Slf4j
 @Service

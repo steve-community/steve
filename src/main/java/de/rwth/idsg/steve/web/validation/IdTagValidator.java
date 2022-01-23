@@ -26,7 +26,7 @@ import java.util.regex.Pattern;
  * Allowed characters are:
  * Upper or lower case letters, numbers and dot, colon, dash, underscore symbols.
  *
- * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
+ * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 15.08.2014
  */
 public class IdTagValidator implements ConstraintValidator<IdTag, String> {

@@ -28,7 +28,7 @@ import java.util.Deque;
  * mechanism to select one WebSocketSession. Implementations of this interface should use
  * different mechanisms to realize that.
  *
- * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
+ * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 30.04.2015
  */
 public interface WsSessionSelectStrategy {

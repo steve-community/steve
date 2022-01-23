@@ -28,7 +28,7 @@ import de.rwth.idsg.steve.service.dto.EnhancedReserveNowParams;
 import javax.xml.ws.AsyncHandler;
 
 /**
- * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
+ * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 09.03.2018
  */
 public class ReserveNowTask extends Ocpp15AndAboveTask<EnhancedReserveNowParams, String> {

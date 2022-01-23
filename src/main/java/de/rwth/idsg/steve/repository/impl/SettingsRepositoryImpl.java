@@ -40,7 +40,7 @@ import static de.rwth.idsg.steve.utils.StringUtils.splitByComma;
 import static jooq.steve.db.tables.Settings.SETTINGS;
 
 /**
- * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
+ * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 06.11.2015
  */
 @Repository

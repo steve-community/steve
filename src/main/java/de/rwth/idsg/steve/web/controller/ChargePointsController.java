@@ -45,7 +45,7 @@ import java.util.stream.Collectors;
 
 /**
  *
- * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
+ * @author Sevket Goekay <sevketgokay@gmail.com>
  *
  */
 @Controller

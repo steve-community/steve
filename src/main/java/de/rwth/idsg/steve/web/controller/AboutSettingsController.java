@@ -42,7 +42,7 @@ import static de.rwth.idsg.steve.SteveConfiguration.CONFIG;
 /**
  * One controller for about and settings pages
  *
- * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
+ * @author Sevket Goekay <sevketgokay@gmail.com>
  */
 @Controller
 @RequestMapping(value = "/manager")

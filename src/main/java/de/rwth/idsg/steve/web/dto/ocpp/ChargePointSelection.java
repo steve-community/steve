@@ -23,7 +23,7 @@ import de.rwth.idsg.steve.repository.dto.ChargePointSelect;
 import java.util.List;
 
 /**
- * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
+ * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 09.03.2018
  */
 public interface ChargePointSelection {

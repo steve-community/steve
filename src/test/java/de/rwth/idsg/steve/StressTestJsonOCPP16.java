@@ -51,7 +51,7 @@ import static de.rwth.idsg.steve.utils.Helpers.getRandomString;
 import static de.rwth.idsg.steve.utils.Helpers.getRandomStrings;
 
 /**
- * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
+ * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 09.05.2018
  */
 public class StressTestJsonOCPP16 extends StressTest {

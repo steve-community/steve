@@ -27,7 +27,7 @@ import org.apache.cxf.ext.logging.slf4j.Slf4jVerboseEventSender;
  * Since {@link Slf4jEventSender} logs only the message and {@link Slf4jVerboseEventSender} logs everything, this
  * logging feature proxy finds a middle ground by logging the exchange id and the message (the most interesting parts).
  *
- * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
+ * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 03.04.2018
  */
 public enum LoggingFeatureProxy {

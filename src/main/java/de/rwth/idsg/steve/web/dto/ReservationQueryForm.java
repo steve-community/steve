@@ -26,7 +26,7 @@ import lombok.Setter;
 import javax.validation.constraints.AssertTrue;
 
 /**
- * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
+ * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 31.08.2015
  */
 @Getter

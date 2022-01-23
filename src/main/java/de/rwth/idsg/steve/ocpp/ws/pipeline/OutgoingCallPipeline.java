@@ -29,7 +29,7 @@ import java.util.function.Consumer;
 /**
  * For outgoing CALLs, triggered by the user.
  *
- * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
+ * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 27.03.2015
  */
 @Component

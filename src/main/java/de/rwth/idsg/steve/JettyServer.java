@@ -53,7 +53,7 @@ import java.util.stream.Collectors;
 import static de.rwth.idsg.steve.SteveConfiguration.CONFIG;
 
 /**
- * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
+ * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 12.12.2014
  */
 @Slf4j

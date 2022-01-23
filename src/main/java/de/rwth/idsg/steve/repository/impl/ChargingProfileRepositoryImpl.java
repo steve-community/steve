@@ -53,7 +53,7 @@ import static jooq.steve.db.Tables.CONNECTOR_CHARGING_PROFILE;
 import static jooq.steve.db.tables.ChargeBox.CHARGE_BOX;
 
 /**
- * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
+ * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 12.11.2018
  */
 @Slf4j

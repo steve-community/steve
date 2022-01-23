@@ -58,7 +58,7 @@ import java.util.concurrent.Future;
 /**
  * Service implementation of OCPP V1.2
  *
- * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
+ * @author Sevket Goekay <sevketgokay@gmail.com>
  */
 @Slf4j
 @Service

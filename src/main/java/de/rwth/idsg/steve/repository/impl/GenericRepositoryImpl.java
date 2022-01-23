@@ -43,7 +43,7 @@ import static org.jooq.impl.DSL.max;
 import static org.jooq.impl.DSL.select;
 
 /**
- * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
+ * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 14.08.2014
  */
 @Slf4j

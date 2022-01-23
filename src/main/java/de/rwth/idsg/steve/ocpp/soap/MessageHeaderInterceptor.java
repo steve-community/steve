@@ -53,7 +53,7 @@ import static org.apache.cxf.ws.addressing.JAXWSAConstants.ADDRESSING_PROPERTIES
  * to send commands to the charging station, since the DB call to list the charge points will filter it out. See
  * {@link ChargePointRepositoryImpl#getChargePointSelect(OcppProtocol, java.util.List)}.
  *
- * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
+ * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 15.06.2015
  */
 @Slf4j

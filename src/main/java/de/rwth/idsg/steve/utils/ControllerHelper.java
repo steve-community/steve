@@ -25,7 +25,7 @@ import java.util.Map;
 import static de.rwth.idsg.steve.utils.CountryCodesProvider.getCountryCodes;
 
 /**
- * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
+ * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 25.11.2015
  */
 public final class ControllerHelper {

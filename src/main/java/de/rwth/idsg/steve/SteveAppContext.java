@@ -51,7 +51,7 @@ import java.util.List;
 import static de.rwth.idsg.steve.SteveConfiguration.CONFIG;
 
 /**
- * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
+ * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 07.04.2015
  */
 public class SteveAppContext {

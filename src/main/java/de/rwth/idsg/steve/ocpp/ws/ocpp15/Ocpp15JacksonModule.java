@@ -29,7 +29,7 @@ import ocpp.cs._2012._06.MeterValuesRequest;
 import java.util.Arrays;
 
 /**
- * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
+ * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 27.04.2015
  */
 public class Ocpp15JacksonModule extends SimpleModule {

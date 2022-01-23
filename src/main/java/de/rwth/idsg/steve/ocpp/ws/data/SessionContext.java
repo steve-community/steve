@@ -26,7 +26,7 @@ import org.springframework.web.socket.WebSocketSession;
 import java.util.concurrent.ScheduledFuture;
 
 /**
- * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
+ * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 25.03.2015
  */
 @Getter

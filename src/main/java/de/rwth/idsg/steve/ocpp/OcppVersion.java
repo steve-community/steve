@@ -24,7 +24,7 @@ import lombok.RequiredArgsConstructor;
 /**
  * The values are as defined in spec "OCPP implementation guide SOAP - RC1 0.6" and in section "5. OCPP version"
  *
- * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
+ * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 01.12.2014
  */
 @RequiredArgsConstructor

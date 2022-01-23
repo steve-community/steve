@@ -25,7 +25,7 @@ import org.joda.time.DateTimeZone;
 import java.util.TimeZone;
 
 /**
- * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
+ * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 14.01.2015
  */
 @Slf4j

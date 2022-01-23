@@ -44,7 +44,7 @@ import static de.rwth.idsg.steve.utils.Helpers.getRandomString;
 /**
  * https://github.com/RWTH-i5-IDSG/steve/issues/73
  *
- * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
+ * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 02.07.2018
  */
 public class Issue73Fix {

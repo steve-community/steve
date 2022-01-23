@@ -31,7 +31,7 @@ import java.util.List;
  * Why a list, if the list size == 1?
  * To keep the method calls and data types (for ex: tasks api) consistent for both cases.
  *
- * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
+ * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 29.12.2014
  */
 @Getter

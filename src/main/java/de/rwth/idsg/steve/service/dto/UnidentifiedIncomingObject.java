@@ -23,7 +23,7 @@ import lombok.ToString;
 import org.joda.time.DateTime;
 
 /**
- * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
+ * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 20.03.2018
  */
 @ToString

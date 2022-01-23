@@ -42,7 +42,7 @@ import java.io.IOException;
 /**
  * One controller for transactions and reservations pages
  *
- * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
+ * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 15.08.2014
  */
 @Controller

@@ -37,7 +37,7 @@ import static de.rwth.idsg.steve.SteveConfiguration.CONFIG;
  * and then everything falls apart.
  *
  *
- * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
+ * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 28.12.2015
  */
 public class SteveProdCondition implements Condition {

@@ -57,7 +57,7 @@ import java.util.concurrent.Future;
 import java.util.function.Consumer;
 
 /**
- * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
+ * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 21.03.2018
  */
 @Slf4j

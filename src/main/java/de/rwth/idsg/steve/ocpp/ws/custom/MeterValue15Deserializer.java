@@ -38,7 +38,7 @@ import java.util.List;
  * that set the field name wrongfully to "values" rather than the correct "value".
  * We handle the situation by looking both fields up in the message.
  *
- * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
+ * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 01.09.2015
  */
 @Slf4j

@@ -29,7 +29,7 @@ import ocpp.cp._2012._06.DataTransferResponse;
 import javax.xml.ws.AsyncHandler;
 
 /**
- * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
+ * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 09.03.2018
  */
 public class DataTransferTask extends Ocpp15AndAboveTask<DataTransferParams, DataTransferTask.ResponseWrapper> {

@@ -19,7 +19,7 @@
 package de.rwth.idsg.steve.web.dto.ocpp;
 
 /**
- * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
+ * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 13.03.2018
  */
 public enum SendLocalListUpdateType {

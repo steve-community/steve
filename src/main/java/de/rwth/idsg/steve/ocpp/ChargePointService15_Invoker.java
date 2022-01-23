@@ -27,7 +27,7 @@ import de.rwth.idsg.steve.ocpp.task.SendLocalListTask;
 import de.rwth.idsg.steve.repository.dto.ChargePointSelect;
 
 /**
- * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
+ * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 20.03.2015
  */
 public interface ChargePointService15_Invoker extends ChargePointService12_Invoker {

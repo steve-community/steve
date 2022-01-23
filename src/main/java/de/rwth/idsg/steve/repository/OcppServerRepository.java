@@ -28,7 +28,7 @@ import org.joda.time.DateTime;
 import java.util.List;
 
 /**
- * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
+ * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 19.08.2014
  */
 public interface OcppServerRepository {

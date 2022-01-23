@@ -27,7 +27,7 @@ import ocpp.cp._2015._10.MessageTrigger;
 import javax.xml.ws.AsyncHandler;
 
 /**
- * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
+ * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 13.03.2018
  */
 public class TriggerMessageTask extends Ocpp16AndAboveTask<TriggerMessageParams, String> {

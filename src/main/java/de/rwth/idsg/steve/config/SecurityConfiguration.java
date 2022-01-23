@@ -33,7 +33,7 @@ import org.springframework.security.crypto.password.DelegatingPasswordEncoder;
 import static de.rwth.idsg.steve.SteveConfiguration.CONFIG;
 
 /**
- * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
+ * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 07.01.2015
  */
 @Configuration

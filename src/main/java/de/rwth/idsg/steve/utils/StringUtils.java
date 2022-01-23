@@ -31,7 +31,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 
 /**
- * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
+ * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 12.01.2015
  */
 public final class StringUtils {

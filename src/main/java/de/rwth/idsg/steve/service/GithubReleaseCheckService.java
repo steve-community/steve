@@ -36,7 +36,7 @@ import java.io.File;
 import java.util.Collections;
 
 /**
- * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
+ * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 19.04.2016
  */
 @Slf4j

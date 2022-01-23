@@ -27,7 +27,7 @@ import lombok.ToString;
  *
  * API doc: https://developer.github.com/v3/repos/releases/#get-the-latest-release
  *
- * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
+ * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 04.10.2016
  */
 @Getter

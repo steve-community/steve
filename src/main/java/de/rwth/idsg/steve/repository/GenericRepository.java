@@ -22,7 +22,7 @@ import de.rwth.idsg.steve.repository.dto.DbVersion;
 import de.rwth.idsg.steve.web.dto.Statistics;
 
 /**
- * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
+ * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 19.08.2014
  */
 public interface GenericRepository {

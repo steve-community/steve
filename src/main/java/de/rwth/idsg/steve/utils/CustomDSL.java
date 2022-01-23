@@ -30,7 +30,7 @@ import java.sql.Timestamp;
 import static org.jooq.impl.DSL.field;
 
 /**
- * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
+ * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 03.09.2015
  */
 public final class CustomDSL {

@@ -25,7 +25,7 @@ import org.springframework.web.socket.WebSocketSession;
 import java.util.Deque;
 
 /**
- * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
+ * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 30.04.2015
  */
 @Getter

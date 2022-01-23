@@ -21,7 +21,7 @@ package de.rwth.idsg.steve.ocpp.converter;
 import java.util.function.Function;
 
 /**
- * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
+ * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 08.03.2018
  */
 public class Convert {

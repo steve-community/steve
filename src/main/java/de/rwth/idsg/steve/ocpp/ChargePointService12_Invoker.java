@@ -30,7 +30,7 @@ import de.rwth.idsg.steve.ocpp.task.UpdateFirmwareTask;
 import de.rwth.idsg.steve.repository.dto.ChargePointSelect;
 
 /**
- * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
+ * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 20.03.2015
  */
 public interface ChargePointService12_Invoker {

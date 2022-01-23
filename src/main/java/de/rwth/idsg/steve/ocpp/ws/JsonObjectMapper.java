@@ -33,7 +33,7 @@ import static com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_NULL
 /**
  * Because ObjectMapper can and should be reused, if config does not change after init.
  *
- * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
+ * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 10.03.2018
  */
 public enum JsonObjectMapper {

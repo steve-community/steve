@@ -31,7 +31,7 @@ import java.util.concurrent.TimeUnit;
  * Since we log everything to a file, it can be confusing for the user to see nothing written to console, when starting
  * the app. So, this class prints some stuff to console.
  *
- * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
+ * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 05.11.2015
  */
 @Slf4j

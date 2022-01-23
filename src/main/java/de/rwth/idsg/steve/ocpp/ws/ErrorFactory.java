@@ -25,7 +25,7 @@ import de.rwth.idsg.steve.ocpp.ws.data.OcppJsonError;
  * Error generation should be handled by a central component for better control over the codes and messages.
  * This class just does that.
  *
- * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
+ * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 17.03.2015
  */
 public final class ErrorFactory {

@@ -31,7 +31,7 @@ import java.util.stream.Stream;
 import static de.rwth.idsg.steve.utils.StringUtils.splitByComma;
 
 /**
- * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
+ * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 02.01.2015
  */
 @Setter

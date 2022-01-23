@@ -21,7 +21,7 @@ package de.rwth.idsg.steve;
 import static java.lang.String.format;
 
 /**
- * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
+ * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 28.08.2014
  */
 public class SteveException extends RuntimeException {

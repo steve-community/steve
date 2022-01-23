@@ -33,7 +33,7 @@ import java.nio.file.Path;
 import java.util.Optional;
 
 /**
- * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
+ * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 15.08.2014
  */
 @Slf4j

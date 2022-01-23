@@ -38,7 +38,7 @@ import java.util.Comparator;
 import java.util.List;
 
 /**
- * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
+ * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 09.12.2018
  */
 @Service

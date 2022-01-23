@@ -50,7 +50,7 @@ import static de.rwth.idsg.steve.utils.Helpers.getRandomString;
 import static de.rwth.idsg.steve.utils.Helpers.getRandomStrings;
 
 /**
- * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
+ * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 18.04.2018
  */
 public class StressTestSoapOCPP16 extends StressTest {

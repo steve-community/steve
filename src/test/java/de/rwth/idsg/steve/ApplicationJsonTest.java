@@ -36,7 +36,7 @@ import org.junit.Test;
 import static de.rwth.idsg.steve.utils.Helpers.getRandomString;
 
 /**
- * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
+ * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 21.03.2018
  */
 @Slf4j

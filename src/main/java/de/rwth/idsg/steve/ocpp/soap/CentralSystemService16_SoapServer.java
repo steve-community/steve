@@ -55,7 +55,7 @@ import javax.xml.ws.soap.SOAPBinding;
 import java.util.concurrent.Future;
 
 /**
- * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
+ * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 13.03.2018
  */
 @Slf4j

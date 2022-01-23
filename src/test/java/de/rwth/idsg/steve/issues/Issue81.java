@@ -37,7 +37,7 @@ import static de.rwth.idsg.steve.utils.Helpers.getPath;
 import static de.rwth.idsg.steve.utils.Helpers.getRandomString;
 
 /**
- * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
+ * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 19.07.2018
  */
 public class Issue81 extends StressTest {

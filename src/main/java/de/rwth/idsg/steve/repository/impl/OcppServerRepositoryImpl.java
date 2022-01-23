@@ -62,7 +62,7 @@ import static jooq.steve.db.tables.TransactionStopFailed.TRANSACTION_STOP_FAILED
  *
  * http://www.jooq.org/doc/3.4/manual/sql-execution/transaction-management/
  *
- * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
+ * @author Sevket Goekay <sevketgokay@gmail.com>
  *
  */
 @Slf4j

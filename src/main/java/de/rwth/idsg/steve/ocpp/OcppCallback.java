@@ -24,7 +24,7 @@ import de.rwth.idsg.steve.ocpp.ws.data.OcppJsonError;
  * We need a mechanism to execute additional arbitrary logic, which _can_ be provided by the call site,
  * that acts on the response or the error.
  *
- * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
+ * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 20.11.2015
  */
 public interface OcppCallback<T> {

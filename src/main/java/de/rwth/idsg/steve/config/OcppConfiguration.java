@@ -47,7 +47,7 @@ import static java.util.Collections.singletonList;
 /**
  * Configuration and beans related to OCPP.
  *
- * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
+ * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 18.11.2014
  */
 @Configuration

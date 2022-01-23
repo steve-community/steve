@@ -33,7 +33,7 @@ import java.util.Properties;
 /**
  * Encapsulates java.util.Properties and adds type specific convenience methods
  *
- * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
+ * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 01.10.2015
  */
 @Slf4j

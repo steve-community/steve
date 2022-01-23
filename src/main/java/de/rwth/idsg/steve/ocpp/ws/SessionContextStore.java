@@ -40,7 +40,7 @@ import java.util.concurrent.locks.Lock;
 import static de.rwth.idsg.steve.SteveConfiguration.CONFIG;
 
 /**
- * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
+ * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 17.03.2015
  */
 @Slf4j

@@ -23,7 +23,7 @@ import javax.validation.ConstraintValidatorContext;
 import java.util.regex.Pattern;
 
 /**
- * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
+ * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 21.01.2016
  */
 public class ChargeBoxIdValidator implements ConstraintValidator<ChargeBoxId, String> {

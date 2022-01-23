@@ -31,7 +31,7 @@ import java.util.stream.Collectors;
 /**
  * The name of this class was inspired by UFO (Unidentified flying object) and enterprise software development.
  *
- * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
+ * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 20.03.2018
  */
 @Slf4j

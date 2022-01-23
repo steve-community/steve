@@ -34,7 +34,7 @@ import org.jetbrains.annotations.Nullable;
 import static jooq.steve.db.tables.Address.ADDRESS;
 
 /**
- * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
+ * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 24.11.2015
  */
 @Slf4j

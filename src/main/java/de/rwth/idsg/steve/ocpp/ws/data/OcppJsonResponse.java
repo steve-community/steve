@@ -19,7 +19,7 @@
 package de.rwth.idsg.steve.ocpp.ws.data;
 
 /**
- * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
+ * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 13.03.2015
  */
 public abstract class OcppJsonResponse extends OcppJsonMessage {

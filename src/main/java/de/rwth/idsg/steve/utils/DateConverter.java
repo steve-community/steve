@@ -24,7 +24,7 @@ import org.jooq.Converter;
 import java.sql.Date;
 
 /**
- * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
+ * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 25.11.2015
  */
 public class DateConverter implements Converter<Date, LocalDate> {

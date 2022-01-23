@@ -24,7 +24,7 @@ import de.rwth.idsg.steve.repository.dto.ChargePointSelect;
 import java.beans.PropertyEditorSupport;
 
 /**
- * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
+ * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 29.12.2014
  */
 public class ChargePointSelectEditor extends PropertyEditorSupport {

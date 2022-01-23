@@ -29,7 +29,7 @@ import javax.validation.constraints.Past;
 import javax.validation.constraints.Pattern;
 
 /**
- * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
+ * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 30.12.2014
  */
 @Getter

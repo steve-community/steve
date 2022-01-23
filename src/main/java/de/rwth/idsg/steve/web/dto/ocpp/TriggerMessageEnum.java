@@ -19,7 +19,7 @@
 package de.rwth.idsg.steve.web.dto.ocpp;
 
 /**
- * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
+ * @author Sevket Goekay <sevketgokay@gmail.com>
  * @author David Rerimassie <david@rerimassie.nl>
  * @since 20.03.2018
  */

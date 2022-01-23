@@ -32,7 +32,7 @@ import org.jooq.DSLContext;
 import java.util.concurrent.TimeUnit;
 
 /**
- * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
+ * @author Sevket Goekay <sevketgokay@gmail.com>
  */
 public final class DateTimeUtils {
     private DateTimeUtils() { }

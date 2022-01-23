@@ -37,7 +37,7 @@ import static org.apache.cxf.ws.addressing.JAXWSAConstants.ADDRESSING_PROPERTIES
  * http://www.w3.org/TR/2006/REC-ws-addr-core-20060509/#formreplymsg
  * http://comments.gmane.org/gmane.comp.apache.cxf.user/17599
  *
- * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
+ * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 17.02.2015
  */
 @Slf4j

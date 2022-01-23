@@ -26,7 +26,7 @@ import de.rwth.idsg.steve.web.dto.ocpp.RemoteStopTransactionParams;
 import javax.xml.ws.AsyncHandler;
 
 /**
- * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
+ * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 09.03.2018
  */
 public class RemoteStopTransactionTask extends CommunicationTask<RemoteStopTransactionParams, String> {

@@ -36,7 +36,7 @@ import javax.xml.ws.soap.SOAPBinding;
 import static de.rwth.idsg.steve.SteveConfiguration.CONFIG;
 
 /**
- * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
+ * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 21.10.2015
  */
 @Component

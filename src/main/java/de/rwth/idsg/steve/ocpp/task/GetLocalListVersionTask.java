@@ -26,7 +26,7 @@ import de.rwth.idsg.steve.web.dto.ocpp.MultipleChargePointSelect;
 import javax.xml.ws.AsyncHandler;
 
 /**
- * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
+ * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 09.03.2018
  */
 public class GetLocalListVersionTask extends Ocpp15AndAboveTask<MultipleChargePointSelect, String> {

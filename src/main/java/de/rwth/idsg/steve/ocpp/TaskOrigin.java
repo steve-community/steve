@@ -21,7 +21,7 @@ package de.rwth.idsg.steve.ocpp;
 import lombok.RequiredArgsConstructor;
 
 /**
- * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
+ * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 23.11.2015
  */
 @RequiredArgsConstructor

@@ -37,7 +37,7 @@
         <spring.version>5.3.15</spring.version>
         <spring.security.version>5.6.1</spring.security.version>
         <mysql.jdbc.version>8.0.28</mysql.jdbc.version>
-        <jetty.version>9.4.44.v20210927</jetty.version>
+        <jetty.version>11.0.0</jetty.version>
         <lombok.version>1.18.22</lombok.version>
         <jackson.version>2.13.1</jackson.version>
 
@@ -646,7 +646,7 @@
         </dependency>
         <dependency>
             <groupId>org.eclipse.jetty.websocket</groupId>
-            <artifactId>websocket-server</artifactId>
+            <artifactId>websocket-jetty-server</artifactId>
             <version>${jetty.version}</version>
         </dependency>
 
@@ -671,6 +671,12 @@
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.jetty.websocket</groupId>
+            <artifactId>websocket-jetty-client</artifactId>
+            <version>${jetty.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>

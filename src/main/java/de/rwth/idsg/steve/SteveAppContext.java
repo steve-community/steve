@@ -33,6 +33,8 @@ import org.eclipse.jetty.server.handler.gzip.GzipHandler;
 import org.eclipse.jetty.servlet.FilterHolder;
 import org.eclipse.jetty.servlet.ServletHolder;
 import org.eclipse.jetty.webapp.WebAppContext;
+import org.eclipse.jetty.websocket.core.WebSocketConstants;
+import org.eclipse.jetty.websocket.server.JettyWebSocketServerContainer;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.security.web.context.AbstractSecurityWebApplicationInitializer;
 import org.springframework.web.context.ContextLoaderListener;
@@ -49,6 +51,8 @@ import java.util.HashSet;
 import java.util.List;
 
 import static de.rwth.idsg.steve.SteveConfiguration.CONFIG;
+import static de.rwth.idsg.steve.config.WebSocketConfiguration.IDLE_TIMEOUT;
+import static de.rwth.idsg.steve.config.WebSocketConfiguration.MAX_MSG_SIZE;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -57,6 +61,7 @@ import static de.rwth.idsg.steve.SteveConfiguration.CONFIG;
 public class SteveAppContext {
 
     private final AnnotationConfigWebApplicationContext springContext;
+    private WebAppContext ctx;
 
     public SteveAppContext() {
         springContext = new AnnotationConfigWebApplicationContext();
@@ -71,6 +76,17 @@ public class SteveAppContext {
                         getWebApp()
                 });
         return handlerList;
+    }
+
+    /**
+     * Otherwise, defaults come from {@link WebSocketConstants}
+     */
+    public void configureWebSocket() {
+        JettyWebSocketServerContainer container = JettyWebSocketServerContainer.getContainer(ctx.getServletContext());
+        container.setInputBufferSize(MAX_MSG_SIZE);
+        container.setOutputBufferSize(MAX_MSG_SIZE);
+        container.setMaxTextMessageSize(MAX_MSG_SIZE);
+        container.setIdleTimeout(IDLE_TIMEOUT);
     }
 
     private Handler getWebApp() {
@@ -93,7 +109,7 @@ public class SteveAppContext {
     }
 
     private WebAppContext initWebApp() {
-        WebAppContext ctx = new WebAppContext();
+        ctx = new WebAppContext();
         ctx.setContextPath(CONFIG.getContextPath());
         ctx.setResourceBase(getWebAppURIAsString());
 

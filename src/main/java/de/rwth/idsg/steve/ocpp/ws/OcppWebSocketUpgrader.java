@@ -19,15 +19,15 @@
 package de.rwth.idsg.steve.ocpp.ws;
 
 import de.rwth.idsg.steve.service.ChargePointHelperService;
+import lombok.RequiredArgsConstructor;
 import ocpp.cs._2015._10.RegistrationStatus;
-import org.eclipse.jetty.websocket.api.WebSocketPolicy;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.http.server.ServerHttpResponse;
 import org.springframework.web.socket.WebSocketExtension;
 import org.springframework.web.socket.WebSocketHandler;
 import org.springframework.web.socket.server.HandshakeFailureException;
-import org.springframework.web.socket.server.jetty.JettyRequestUpgradeStrategy;
+import org.springframework.web.socket.server.jetty.Jetty10RequestUpgradeStrategy;
 
 import java.security.Principal;
 import java.util.List;
@@ -38,17 +38,11 @@ import java.util.Optional;
  * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 13.03.2015
  */
-public class OcppWebSocketUpgrader extends JettyRequestUpgradeStrategy {
+@RequiredArgsConstructor
+public class OcppWebSocketUpgrader extends Jetty10RequestUpgradeStrategy {
 
     private final List<AbstractWebSocketEndpoint> endpoints;
     private final ChargePointHelperService chargePointHelperService;
-
-    public OcppWebSocketUpgrader(WebSocketPolicy policy, List<AbstractWebSocketEndpoint> endpoints,
-                                 ChargePointHelperService chargePointHelperService) {
-        super(policy);
-        this.endpoints = endpoints;
-        this.chargePointHelperService = chargePointHelperService;
-    }
 
     @Override
     public void upgrade(ServerHttpRequest request, ServerHttpResponse response,

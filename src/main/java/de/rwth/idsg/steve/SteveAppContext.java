@@ -43,7 +43,6 @@ import org.springframework.web.filter.DelegatingFilterProxy;
 import org.springframework.web.servlet.DispatcherServlet;
 
 import javax.servlet.DispatcherType;
-import javax.servlet.Filter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.EnumSet;
@@ -61,28 +60,26 @@ import static de.rwth.idsg.steve.config.WebSocketConfiguration.MAX_MSG_SIZE;
 public class SteveAppContext {
 
     private final AnnotationConfigWebApplicationContext springContext;
-    private WebAppContext ctx;
+    private final WebAppContext webAppContext;
 
     public SteveAppContext() {
         springContext = new AnnotationConfigWebApplicationContext();
         springContext.scan("de.rwth.idsg.steve.config");
+        webAppContext = initWebApp();
     }
 
     public HandlerCollection getHandlers() {
-        HandlerList handlerList = new HandlerList();
-        handlerList.setHandlers(
-                new Handler[]{
-                        getRedirectHandler(),
-                        getWebApp()
-                });
-        return handlerList;
+        return new HandlerList(
+            getRedirectHandler(),
+            getWebApp()
+        );
     }
 
     /**
      * Otherwise, defaults come from {@link WebSocketConstants}
      */
     public void configureWebSocket() {
-        JettyWebSocketServerContainer container = JettyWebSocketServerContainer.getContainer(ctx.getServletContext());
+        JettyWebSocketServerContainer container = JettyWebSocketServerContainer.getContainer(webAppContext.getServletContext());
         container.setInputBufferSize(MAX_MSG_SIZE);
         container.setOutputBufferSize(MAX_MSG_SIZE);
         container.setMaxTextMessageSize(MAX_MSG_SIZE);
@@ -90,26 +87,19 @@ public class SteveAppContext {
     }
 
     private Handler getWebApp() {
-        if (CONFIG.getJetty().isGzipEnabled()) {
-            return enableGzip(initWebApp());
-        } else {
-            return initWebApp();
+        if (!CONFIG.getJetty().isGzipEnabled()) {
+            return webAppContext;
         }
-    }
 
-    /**
-     * Wraps the whole web app in a gzip handler to make Jetty return compressed content
-     *
-     * http://www.eclipse.org/jetty/documentation/current/gzip-filter.html
-     */
-    private Handler enableGzip(WebAppContext ctx) {
+        // Wraps the whole web app in a gzip handler to make Jetty return compressed content
+        // http://www.eclipse.org/jetty/documentation/current/gzip-filter.html
         GzipHandler gzipHandler = new GzipHandler();
-        gzipHandler.setHandler(ctx);
+        gzipHandler.setHandler(webAppContext);
         return gzipHandler;
     }
 
     private WebAppContext initWebApp() {
-        ctx = new WebAppContext();
+        WebAppContext ctx = new WebAppContext();
         ctx.setContextPath(CONFIG.getContextPath());
         ctx.setResourceBase(getWebAppURIAsString());
 
@@ -127,22 +117,17 @@ public class SteveAppContext {
         ctx.addServlet(cxf, CONFIG.getCxfMapping());
 
         if (CONFIG.getProfile().isProd()) {
-            addSecurityFilter(ctx);
+            // If PROD, add security filter
+            ctx.addFilter(
+                // The bean name is not arbitrary, but is as expected by Spring
+                new FilterHolder(new DelegatingFilterProxy(AbstractSecurityWebApplicationInitializer.DEFAULT_FILTER_NAME)),
+                CONFIG.getSpringManagerMapping(),
+                EnumSet.allOf(DispatcherType.class)
+            );
         }
 
         initJSP(ctx);
         return ctx;
-    }
-
-    private void addSecurityFilter(WebAppContext ctx) {
-        // The bean name is not arbitrary, but is as expected by Spring
-        Filter f = new DelegatingFilterProxy(AbstractSecurityWebApplicationInitializer.DEFAULT_FILTER_NAME);
-
-        ctx.addFilter(
-                new FilterHolder(f),
-                CONFIG.getSpringManagerMapping(),
-                EnumSet.allOf(DispatcherType.class)
-        );
     }
 
     private Handler getRedirectHandler() {
@@ -176,36 +161,27 @@ public class SteveAppContext {
         return redirectSet;
     }
 
+    /**
+     * Help by:
+     * https://github.com/jetty-project/embedded-jetty-jsp
+     * https://github.com/jasonish/jetty-springmvc-jsp-template
+     * http://examples.javacodegeeks.com/enterprise-java/jetty/jetty-jsp-example
+     */
+    private void initJSP(WebAppContext ctx) {
+        // Ensure the JSP engine is initialized correctly
+        List<ContainerInitializer> initializers = new ArrayList<>();
+        initializers.add(new ContainerInitializer(new JettyJasperInitializer(), null));
+
+        ctx.setAttribute("org.eclipse.jetty.containerInitializers", initializers);
+        ctx.setAttribute(InstanceManager.class.getName(), new SimpleInstanceManager());
+        ctx.addBean(new ServletContainerInitializersStarter(ctx), true);
+    }
+
     private static String getWebAppURIAsString() {
         try {
             return new ClassPathResource("webapp").getURI().toString();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-    }
-
-    // -------------------------------------------------------------------------
-    // JSP stuff
-    //
-    // Help by:
-    //
-    // https://github.com/jetty-project/embedded-jetty-jsp
-    // https://github.com/jasonish/jetty-springmvc-jsp-template
-    // http://examples.javacodegeeks.com/enterprise-java/jetty/jetty-jsp-example
-    // -------------------------------------------------------------------------
-
-    private void initJSP(WebAppContext ctx) {
-        ctx.setAttribute("org.eclipse.jetty.containerInitializers", jspInitializers());
-        ctx.setAttribute(InstanceManager.class.getName(), new SimpleInstanceManager());
-        ctx.addBean(new ServletContainerInitializersStarter(ctx), true);
-    }
-
-    /**
-     * Ensure the JSP engine is initialized correctly
-     */
-    private List<ContainerInitializer> jspInitializers() {
-        List<ContainerInitializer> initializers = new ArrayList<>();
-        initializers.add(new ContainerInitializer(new JettyJasperInitializer(), null));
-        return initializers;
     }
 }

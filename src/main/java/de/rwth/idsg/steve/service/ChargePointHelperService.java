@@ -34,6 +34,7 @@ import de.rwth.idsg.steve.repository.dto.ConnectorStatus;
 import de.rwth.idsg.steve.service.dto.UnidentifiedIncomingObject;
 import de.rwth.idsg.steve.utils.ConnectorStatusCountFilter;
 import de.rwth.idsg.steve.utils.DateTimeUtils;
+import de.rwth.idsg.steve.web.dto.ConnectorStatusForm;
 import de.rwth.idsg.steve.web.dto.OcppJsonStatus;
 import de.rwth.idsg.steve.web.dto.Statistics;
 import lombok.extern.slf4j.Slf4j;
@@ -47,9 +48,11 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Deque;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.locks.Lock;
 import java.util.stream.Collectors;
 
@@ -102,6 +105,28 @@ public class ChargePointHelperService {
         stats.setStatusCountMap(ConnectorStatusCountFilter.getStatusCountMap(latestList));
 
         return stats;
+    }
+
+    public List<ConnectorStatus> getChargePointConnectorStatus(ConnectorStatusForm params) {
+        Map<String, Deque<SessionContext>> ocpp12Map = ocpp12WebSocketEndpoint.getACopy();
+        Map<String, Deque<SessionContext>> ocpp15Map = ocpp15WebSocketEndpoint.getACopy();
+        Map<String, Deque<SessionContext>> ocpp16Map = ocpp16WebSocketEndpoint.getACopy();
+
+        Set<String> connectedJsonChargeBoxIds = new HashSet<>(extractIds(Arrays.asList(ocpp12Map, ocpp15Map, ocpp16Map)));
+
+        List<ConnectorStatus> latestList = chargePointRepository.getChargePointConnectorStatus(params);
+
+        // iterate over JSON stations and mark disconnected ones
+        // https://github.com/RWTH-i5-IDSG/steve/issues/355
+        //
+        for (ConnectorStatus status : latestList) {
+            OcppProtocol protocol = status.getOcppProtocol();
+            if (protocol != null && protocol.getTransport() == OcppTransport.JSON) {
+                status.setJsonAndDisconnected(!connectedJsonChargeBoxIds.contains(status.getChargeBoxId()));
+            }
+        }
+
+        return latestList;
     }
 
     public List<OcppJsonStatus> getOcppJsonStatus() {

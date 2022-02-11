@@ -137,6 +137,8 @@ public final class ConnectorStatusFilter {
                                                         .statusTimestamp(zeroStat.getStatusTimestamp())
                                                         .status(zeroStat.getStatus())
                                                         .errorCode(zeroStat.getErrorCode())
+                                                        .ocppProtocol(cs.getOcppProtocol())
+                                                        .jsonAndDisconnected(cs.isJsonAndDisconnected())
                                                         .build())
                               .collect(Collectors.toList());
             }

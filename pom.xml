@@ -140,7 +140,6 @@
         <dependency>
             <groupId>org.hibernate.validator</groupId>
             <artifactId>hibernate-validator</artifactId>
-            <version>${hibernate.validator.version}</version>
         </dependency>
 
         <dependency>
@@ -168,7 +167,6 @@
         <dependency>
             <groupId>javax.xml.ws</groupId>
             <artifactId>jaxws-api</artifactId>
-            <version>2.3.1</version>
         </dependency>
         <dependency>
             <groupId>javax.jws</groupId>
@@ -178,7 +176,6 @@
         <dependency>
             <groupId>org.glassfish.jaxb</groupId>
             <artifactId>jaxb-runtime</artifactId>
-            <version>3.0.2</version>
         </dependency>
         <dependency>
             <groupId>org.jetbrains</groupId>

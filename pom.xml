@@ -39,7 +39,7 @@
 
         <mysql.jdbc.version>8.0.28</mysql.jdbc.version>
         <jackson.version>2.12.1</jackson.version>
-        <awaitility.version>4.0.2</awaitility.version>
+        <awaitility.version>4.1.1</awaitility.version>
 
         <javaee.web.api.version>8.0.1</javaee.web.api.version>
 

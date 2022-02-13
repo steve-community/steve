@@ -37,14 +37,12 @@
         <cxf.version>3.4.2</cxf.version>
         <spring.boot.version>2.6.1</spring.boot.version>
 
-        <mysql.jdbc.version>8.0.28</mysql.jdbc.version>
-        <jackson.version>2.12.1</jackson.version>
         <awaitility.version>4.1.1</awaitility.version>
 
         <javaee.web.api.version>8.0.1</javaee.web.api.version>
 
         <tomcat.version>9.0.35</tomcat.version>
-        <hibernate.validator.version>7.0.2.Final</hibernate.validator.version>
+        <hibernate.validator.version>6.2.2.Final</hibernate.validator.version>
         <maven-deploy-plugin.version>2.8.1</maven-deploy-plugin.version>
 
         <junit.version>4.13.2</junit.version>
@@ -58,7 +56,7 @@
         <plugins>
             <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.8.1</version>
+                <version>3.9.0</version>
                 <configuration>
                     <source>${java.version}</source>
                     <target>${java.version}</target>
@@ -201,17 +199,14 @@
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
-            <version>${jackson.version}</version>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.module</groupId>
             <artifactId>jackson-module-jaxb-annotations</artifactId>
-            <version>${jackson.version}</version>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-annotations</artifactId>
-            <version>${jackson.version}</version>
         </dependency>
 
         <!-- Logging -->
@@ -266,7 +261,6 @@
         <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
-            <version>${mysql.jdbc.version}</version>
         </dependency>
 
         <!-- Codes according to ISO standards

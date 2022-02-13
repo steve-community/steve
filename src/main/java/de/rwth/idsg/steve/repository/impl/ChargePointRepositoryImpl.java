@@ -241,7 +241,8 @@ public class ChargePointRepositoryImpl implements ChargePointRepository {
                         CONNECTOR.CONNECTOR_ID,
                         t2.field(t2Ts),
                         t2.field(t2Status),
-                        t2.field(t2Error))
+                        t2.field(t2Error),
+                        CHARGE_BOX.OCPP_PROTOCOL)
                   .from(t2)
                   .join(CONNECTOR)
                         .on(CONNECTOR.CONNECTOR_PK.eq(t2.field(t2Pk)))
@@ -258,6 +259,7 @@ public class ChargePointRepositoryImpl implements ChargePointRepository {
                                            .statusTimestamp(r.value4())
                                            .status(r.value5())
                                            .errorCode(r.value6())
+                                           .ocppProtocol(r.value7() == null ? null : OcppProtocol.fromCompositeValue(r.value7()))
                                            .build()
                   );
     }

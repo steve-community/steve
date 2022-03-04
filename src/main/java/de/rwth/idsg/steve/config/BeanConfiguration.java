@@ -97,6 +97,9 @@ public class BeanConfiguration implements WebMvcConfigurer {
         hc.addDataSourceProperty(PropertyKey.connectionTimeZone.getKeyName(), CONFIG.getTimeZoneId());
         hc.addDataSourceProperty(PropertyKey.useSSL.getKeyName(), true);
 
+        // https://github.com/RWTH-i5-IDSG/steve/issues/736
+        hc.setMaxLifetime(580_000);
+
         dataSource = new HikariDataSource(hc);
     }
 

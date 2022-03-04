@@ -28,7 +28,7 @@ import ocpp.cs._2015._10.RegistrationStatus;
 import ocpp.cs._2015._10.StartTransactionRequest;
 import ocpp.cs._2015._10.StartTransactionResponse;
 import org.joda.time.DateTime;
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -66,7 +66,7 @@ public class Issue81 extends StressTest {
                                 .withChargePointVendor(getRandomString())
                                 .withChargePointModel(getRandomString()),
                         chargeBoxId.get());
-                Assert.assertEquals(RegistrationStatus.ACCEPTED, boot.getStatus());
+                Assertions.assertEquals(RegistrationStatus.ACCEPTED, boot.getStatus());
 
                 StartTransactionRequest req = new StartTransactionRequest()
                         .withConnectorId(ThreadLocalRandom.current().nextInt())
@@ -82,7 +82,7 @@ public class Issue81 extends StressTest {
             @Override
             public void toRepeat() {
                 Integer t2 = sendStartTx(client.get(), txRequest.get(), chargeBoxId.get());
-                Assert.assertEquals(txId.get(), t2);
+                Assertions.assertEquals(txId.get(), t2);
             }
 
             @Override
@@ -98,7 +98,7 @@ public class Issue81 extends StressTest {
 
     private static Integer sendStartTx(CentralSystemService client, StartTransactionRequest req, String chargeBoxId) {
         StartTransactionResponse start = client.startTransaction(req, chargeBoxId);
-        Assert.assertNotNull(start);
+        Assertions.assertNotNull(start);
         return start.getTransactionId();
     }
 }

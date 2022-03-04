@@ -36,7 +36,7 @@ import ocpp.cs._2015._10.StopTransactionRequest;
 import ocpp.cs._2015._10.StopTransactionResponse;
 import ocpp.cs._2015._10.UnitOfMeasure;
 import org.joda.time.DateTime;
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 
 import static de.rwth.idsg.steve.utils.Helpers.getForOcpp16;
 import static de.rwth.idsg.steve.utils.Helpers.getPath;
@@ -73,7 +73,7 @@ public class Issue72 extends StressTest {
                         .withChargePointVendor(getRandomString())
                         .withChargePointModel(getRandomString()),
                 chargeBoxId);
-        Assert.assertEquals(RegistrationStatus.ACCEPTED, boot.getStatus());
+        Assertions.assertEquals(RegistrationStatus.ACCEPTED, boot.getStatus());
 
         StartTransactionResponse start = getForOcpp16(path).startTransaction(
                 new StartTransactionRequest()
@@ -83,7 +83,7 @@ public class Issue72 extends StressTest {
                         .withMeterStart(meterStart),
                 chargeBoxId
         );
-        Assert.assertNotNull(start);
+        Assertions.assertNotNull(start);
 
         int transactionId = start.getTransactionId();
 
@@ -111,7 +111,7 @@ public class Issue72 extends StressTest {
                                                                 .withUnit(UnitOfMeasure.WH))),
                         chargeBoxId
                 );
-                Assert.assertNotNull(mvr);
+                Assertions.assertNotNull(mvr);
 
                 StopTransactionResponse stop = threadLocalClient.get().stopTransaction(
                         new StopTransactionRequest()
@@ -121,7 +121,7 @@ public class Issue72 extends StressTest {
                                 .withMeterStop(meterStop),
                         chargeBoxId
                 );
-                Assert.assertNotNull(stop);
+                Assertions.assertNotNull(stop);
             }
 
             @Override

@@ -40,7 +40,7 @@ import ocpp.cs._2015._10.StatusNotificationResponse;
 import ocpp.cs._2015._10.StopTransactionRequest;
 import ocpp.cs._2015._10.StopTransactionResponse;
 import org.joda.time.DateTime;
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
@@ -86,8 +86,8 @@ public class StressTestJsonOCPP16 extends StressTest {
                                 .withChargePointVendor(getRandomString())
                                 .withChargePointModel(getRandomString()),
                         BootNotificationResponse.class,
-                        bootResponse ->  Assert.assertEquals(RegistrationStatus.ACCEPTED, bootResponse.getStatus()),
-                        error -> Assert.fail()
+                        bootResponse ->  Assertions.assertEquals(RegistrationStatus.ACCEPTED, bootResponse.getStatus()),
+                        error -> Assertions.fail()
                 );
             }
 
@@ -104,8 +104,8 @@ public class StressTestJsonOCPP16 extends StressTest {
 
                 chargePoint.prepare(
                         new HeartbeatRequest(), HeartbeatResponse.class,
-                        Assert::assertNotNull,
-                        error -> Assert.fail()
+                        Assertions::assertNotNull,
+                        error -> Assertions.fail()
                 );
 
                 for (int i = 0; i <= CONNECTOR_COUNT_PER_CHARGE_BOX; i++) {
@@ -116,16 +116,16 @@ public class StressTestJsonOCPP16 extends StressTest {
                                     .withConnectorId(i)
                                     .withTimestamp(DateTime.now()),
                             StatusNotificationResponse.class,
-                            Assert::assertNotNull,
-                            error -> Assert.fail()
+                            Assertions::assertNotNull,
+                            error -> Assertions.fail()
                     );
                 }
 
                 chargePoint.prepare(
                         new AuthorizeRequest().withIdTag(idTag),
                         AuthorizeResponse.class,
-                        response -> Assert.assertNotEquals(AuthorizationStatus.ACCEPTED, response.getIdTagInfo().getStatus()),
-                        error -> Assert.fail()
+                        response -> Assertions.assertNotEquals(AuthorizationStatus.ACCEPTED, response.getIdTagInfo().getStatus()),
+                        error -> Assertions.fail()
                 );
 
                 final AtomicInteger transactionId = new AtomicInteger(-1);
@@ -138,10 +138,10 @@ public class StressTestJsonOCPP16 extends StressTest {
                                 .withMeterStart(transactionStart),
                         StartTransactionResponse.class,
                         response -> {
-                            Assert.assertNotNull(response);
+                            Assertions.assertNotNull(response);
                             transactionId.set(response.getTransactionId());
                         },
-                        error -> Assert.fail()
+                        error -> Assertions.fail()
                 );
 
                 // wait for StartTransactionResponse to arrive, since we need the transactionId from now on
@@ -154,8 +154,8 @@ public class StressTestJsonOCPP16 extends StressTest {
                                 .withConnectorId(connectorId)
                                 .withTimestamp(DateTime.now()),
                         StatusNotificationResponse.class,
-                        Assert::assertNotNull,
-                        error -> Assert.fail()
+                        Assertions::assertNotNull,
+                        error -> Assertions.fail()
                 );
 
                 chargePoint.prepare(
@@ -164,8 +164,8 @@ public class StressTestJsonOCPP16 extends StressTest {
                                 .withTransactionId(transactionId.get())
                                 .withMeterValue(getMeterValues(transactionStart, transactionStop)),
                         MeterValuesResponse.class,
-                        Assert::assertNotNull,
-                        error -> Assert.fail()
+                        Assertions::assertNotNull,
+                        error -> Assertions.fail()
                 );
 
                 chargePoint.prepare(
@@ -175,8 +175,8 @@ public class StressTestJsonOCPP16 extends StressTest {
                                 .withIdTag(idTag)
                                 .withMeterStop(transactionStop),
                         StopTransactionResponse.class,
-                        Assert::assertNotNull,
-                        error -> Assert.fail()
+                        Assertions::assertNotNull,
+                        error -> Assertions.fail()
                 );
 
                 chargePoint.prepare(
@@ -186,8 +186,8 @@ public class StressTestJsonOCPP16 extends StressTest {
                                 .withConnectorId(connectorId)
                                 .withTimestamp(DateTime.now()),
                         StatusNotificationResponse.class,
-                        Assert::assertNotNull,
-                        error -> Assert.fail()
+                        Assertions::assertNotNull,
+                        error -> Assertions.fail()
                 );
 
                 chargePoint.process();

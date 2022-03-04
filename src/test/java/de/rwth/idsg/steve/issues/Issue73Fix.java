@@ -33,7 +33,7 @@ import ocpp.cs._2015._10.RegistrationStatus;
 import ocpp.cs._2015._10.StartTransactionRequest;
 import ocpp.cs._2015._10.StartTransactionResponse;
 import org.joda.time.DateTime;
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 
 import java.util.List;
 
@@ -53,8 +53,8 @@ public class Issue73Fix {
     private static final String path = getPath();
 
     public static void main(String[] args) throws Exception {
-        Assert.assertEquals(ApplicationProfile.TEST, SteveConfiguration.CONFIG.getProfile());
-        Assert.assertTrue(SteveConfiguration.CONFIG.getOcpp().isAutoRegisterUnknownStations());
+        Assertions.assertEquals(ApplicationProfile.TEST, SteveConfiguration.CONFIG.getProfile());
+        Assertions.assertTrue(SteveConfiguration.CONFIG.getOcpp().isAutoRegisterUnknownStations());
 
         __DatabasePreparer__.prepare();
 
@@ -95,15 +95,15 @@ public class Issue73Fix {
                             .withChargePointVendor(getRandomString())
                             .withChargePointModel(getRandomString()),
                     chargeBoxId);
-            Assert.assertNotNull(boot);
-            Assert.assertEquals(RegistrationStatus.ACCEPTED, boot.getStatus());
+            Assertions.assertNotNull(boot);
+            Assertions.assertEquals(RegistrationStatus.ACCEPTED, boot.getStatus());
         }
     }
 
     private static void sendAuth(CentralSystemService client, String chargeBoxId, AuthorizationStatus expected) {
         AuthorizeResponse auth = client.authorize(new AuthorizeRequest().withIdTag(REGISTERED_OCPP_TAG), chargeBoxId);
-        Assert.assertNotNull(auth);
-        Assert.assertEquals(expected, auth.getIdTagInfo().getStatus());
+        Assertions.assertNotNull(auth);
+        Assertions.assertEquals(expected, auth.getIdTagInfo().getStatus());
     }
 
     private static void sendStartTx(CentralSystemService client, String chargeBoxId) {
@@ -115,8 +115,8 @@ public class Issue73Fix {
                         .withMeterStart(0),
                 chargeBoxId
         );
-        Assert.assertNotNull(start);
-        Assert.assertTrue(start.getTransactionId() > 0);
-        Assert.assertTrue(__DatabasePreparer__.getOcppTagRecord(REGISTERED_OCPP_TAG).getInTransaction());
+        Assertions.assertNotNull(start);
+        Assertions.assertTrue(start.getTransactionId() > 0);
+        Assertions.assertTrue(__DatabasePreparer__.getOcppTagRecord(REGISTERED_OCPP_TAG).getInTransaction());
     }
 }

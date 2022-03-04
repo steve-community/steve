@@ -23,15 +23,13 @@ import de.rwth.idsg.steve.ocpp.ws.data.ActionResponsePair;
 import de.rwth.idsg.steve.ocpp.ws.ocpp12.Ocpp12TypeStore;
 import de.rwth.idsg.steve.ocpp.ws.ocpp15.Ocpp15TypeStore;
 import de.rwth.idsg.steve.ocpp.ws.ocpp16.Ocpp16TypeStore;
-import org.junit.Assert;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 10.03.2018
  */
-@Ignore
 public class TypeStoreTest {
 
     @Test
@@ -39,12 +37,12 @@ public class TypeStoreTest {
         Ocpp12TypeStore typeStore = Ocpp12TypeStore.INSTANCE;
 
         ActionResponsePair actionResponse = typeStore.findActionResponse(new ocpp.cp._2010._08.ResetRequest());
-        Assert.assertNotNull(actionResponse);
-        Assert.assertEquals("Reset", actionResponse.getAction());
-        Assert.assertEquals(ocpp.cp._2010._08.ResetResponse.class, actionResponse.getResponseClass());
+        Assertions.assertNotNull(actionResponse);
+        Assertions.assertEquals("Reset", actionResponse.getAction());
+        Assertions.assertEquals(ocpp.cp._2010._08.ResetResponse.class, actionResponse.getResponseClass());
 
         Class<? extends RequestType> requestClass = typeStore.findRequestClass("BootNotification");
-        Assert.assertSame(ocpp.cs._2010._08.BootNotificationRequest.class, requestClass);
+        Assertions.assertSame(ocpp.cs._2010._08.BootNotificationRequest.class, requestClass);
     }
 
     @Test
@@ -52,12 +50,12 @@ public class TypeStoreTest {
         Ocpp15TypeStore typeStore = Ocpp15TypeStore.INSTANCE;
 
         ActionResponsePair actionResponse = typeStore.findActionResponse(new ocpp.cp._2012._06.UpdateFirmwareRequest());
-        Assert.assertNotNull(actionResponse);
-        Assert.assertEquals("UpdateFirmware", actionResponse.getAction());
-        Assert.assertEquals(ocpp.cp._2012._06.UpdateFirmwareResponse.class, actionResponse.getResponseClass());
+        Assertions.assertNotNull(actionResponse);
+        Assertions.assertEquals("UpdateFirmware", actionResponse.getAction());
+        Assertions.assertEquals(ocpp.cp._2012._06.UpdateFirmwareResponse.class, actionResponse.getResponseClass());
 
         Class<? extends RequestType> requestClass = typeStore.findRequestClass("BootNotification");
-        Assert.assertSame(ocpp.cs._2012._06.BootNotificationRequest.class, requestClass);
+        Assertions.assertSame(ocpp.cs._2012._06.BootNotificationRequest.class, requestClass);
     }
 
     @Test
@@ -65,11 +63,11 @@ public class TypeStoreTest {
         Ocpp16TypeStore typeStore = Ocpp16TypeStore.INSTANCE;
 
         ActionResponsePair actionResponse = typeStore.findActionResponse(new ocpp.cp._2015._10.UpdateFirmwareRequest());
-        Assert.assertNotNull(actionResponse);
-        Assert.assertEquals("UpdateFirmware", actionResponse.getAction());
-        Assert.assertEquals(ocpp.cp._2015._10.UpdateFirmwareResponse.class, actionResponse.getResponseClass());
+        Assertions.assertNotNull(actionResponse);
+        Assertions.assertEquals("UpdateFirmware", actionResponse.getAction());
+        Assertions.assertEquals(ocpp.cp._2015._10.UpdateFirmwareResponse.class, actionResponse.getResponseClass());
 
         Class<? extends RequestType> requestClass = typeStore.findRequestClass("BootNotification");
-        Assert.assertSame(ocpp.cs._2015._10.BootNotificationRequest.class, requestClass);
+        Assertions.assertSame(ocpp.cs._2015._10.BootNotificationRequest.class, requestClass);
     }
 }

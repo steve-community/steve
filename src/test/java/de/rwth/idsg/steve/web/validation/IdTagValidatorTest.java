@@ -18,8 +18,9 @@
  */
 package de.rwth.idsg.steve.web.validation;
 
-import org.junit.Assert;
-import org.junit.Test;
+
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -31,51 +32,51 @@ public class IdTagValidatorTest {
 
     @Test
     public void testNull() {
-        Assert.assertTrue(validator.isValid(null, null));
+        Assertions.assertTrue(validator.isValid(null, null));
     }
 
     @Test
     public void testAllLowercaseLetters() {
-        Assert.assertTrue(validator.isValid("test", null));
+        Assertions.assertTrue(validator.isValid("test", null));
     }
 
     @Test
     public void testAllUppercaseLetters() {
-        Assert.assertTrue(validator.isValid("TEST", null));
+        Assertions.assertTrue(validator.isValid("TEST", null));
     }
 
     @Test
     public void testMixedCaseLetters() {
-        Assert.assertTrue(validator.isValid("TesT", null));
-        Assert.assertTrue(validator.isValid("tEst", null));
+        Assertions.assertTrue(validator.isValid("TesT", null));
+        Assertions.assertTrue(validator.isValid("tEst", null));
     }
 
     @Test
     public void testLettersAndNumbers() {
-        Assert.assertTrue(validator.isValid("test12", null));
-        Assert.assertTrue(validator.isValid("89test", null));
-        Assert.assertTrue(validator.isValid("te9s0t", null));
+        Assertions.assertTrue(validator.isValid("test12", null));
+        Assertions.assertTrue(validator.isValid("89test", null));
+        Assertions.assertTrue(validator.isValid("te9s0t", null));
     }
 
     @Test
     public void testDot() {
-        Assert.assertTrue(validator.isValid(".test", null));
-        Assert.assertTrue(validator.isValid("test.", null));
-        Assert.assertTrue(validator.isValid("te..st", null));
+        Assertions.assertTrue(validator.isValid(".test", null));
+        Assertions.assertTrue(validator.isValid("test.", null));
+        Assertions.assertTrue(validator.isValid("te..st", null));
     }
 
     @Test
     public void testDash() {
-        Assert.assertTrue(validator.isValid("-test", null));
-        Assert.assertTrue(validator.isValid("test-", null));
-        Assert.assertTrue(validator.isValid("te--st", null));
+        Assertions.assertTrue(validator.isValid("-test", null));
+        Assertions.assertTrue(validator.isValid("test-", null));
+        Assertions.assertTrue(validator.isValid("te--st", null));
     }
 
     @Test
     public void testUnderscore() {
-        Assert.assertTrue(validator.isValid("_test", null));
-        Assert.assertTrue(validator.isValid("test_", null));
-        Assert.assertTrue(validator.isValid("te__st", null));
+        Assertions.assertTrue(validator.isValid("_test", null));
+        Assertions.assertTrue(validator.isValid("test_", null));
+        Assertions.assertTrue(validator.isValid("te__st", null));
     }
 
     /**
@@ -83,16 +84,16 @@ public class IdTagValidatorTest {
      */
     @Test
     public void testColon() {
-        Assert.assertTrue(validator.isValid(":test", null));
-        Assert.assertTrue(validator.isValid("test:", null));
-        Assert.assertTrue(validator.isValid("te::st", null));
+        Assertions.assertTrue(validator.isValid(":test", null));
+        Assertions.assertTrue(validator.isValid("test:", null));
+        Assertions.assertTrue(validator.isValid("te::st", null));
 
-        Assert.assertTrue(validator.isValid("VID:00XXXXXXXXXX", null));
+        Assertions.assertTrue(validator.isValid("VID:00XXXXXXXXXX", null));
     }
 
     @Test
     public void testCombined() {
-        Assert.assertTrue(validator.isValid("1t.E-S_:t20", null));
+        Assertions.assertTrue(validator.isValid("1t.E-S_:t20", null));
     }
 
 }

@@ -28,10 +28,10 @@ import ocpp.cs._2015._10.AuthorizeResponse;
 import ocpp.cs._2015._10.BootNotificationRequest;
 import ocpp.cs._2015._10.BootNotificationResponse;
 import ocpp.cs._2015._10.RegistrationStatus;
-import org.junit.AfterClass;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 import static de.rwth.idsg.steve.utils.Helpers.getRandomString;
 
@@ -50,16 +50,16 @@ public class ApplicationJsonTest {
 
     private static Application app;
 
-    @BeforeClass
+    @BeforeAll
     public static void init() throws Exception {
-        Assert.assertEquals(ApplicationProfile.TEST, SteveConfiguration.CONFIG.getProfile());
+        Assertions.assertEquals(ApplicationProfile.TEST, SteveConfiguration.CONFIG.getProfile());
         __DatabasePreparer__.prepare();
 
         app = new Application();
         app.start();
     }
 
-    @AfterClass
+    @AfterAll
     public static void destroy() throws Exception {
         if (app != null) {
             app.stop();
@@ -77,15 +77,15 @@ public class ApplicationJsonTest {
                 .withChargePointModel(getRandomString());
 
         chargePoint.prepare(boot, BootNotificationResponse.class,
-                bootResponse -> Assert.assertEquals(RegistrationStatus.ACCEPTED, bootResponse.getStatus()),
-                error -> Assert.fail()
+                bootResponse -> Assertions.assertEquals(RegistrationStatus.ACCEPTED, bootResponse.getStatus()),
+                error -> Assertions.fail()
         );
 
         AuthorizeRequest auth = new AuthorizeRequest().withIdTag(REGISTERED_OCPP_TAG);
 
         chargePoint.prepare(auth, AuthorizeResponse.class,
-                authResponse -> Assert.assertEquals(AuthorizationStatus.ACCEPTED, authResponse.getIdTagInfo().getStatus()),
-                error -> Assert.fail()
+                authResponse -> Assertions.assertEquals(AuthorizationStatus.ACCEPTED, authResponse.getIdTagInfo().getStatus()),
+                error -> Assertions.fail()
         );
 
         chargePoint.processAndClose();

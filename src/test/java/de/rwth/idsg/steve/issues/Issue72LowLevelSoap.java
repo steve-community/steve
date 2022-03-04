@@ -43,7 +43,7 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.joda.time.DateTime;
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 
 import static de.rwth.idsg.steve.utils.Helpers.getForOcpp16;
 import static de.rwth.idsg.steve.utils.Helpers.getPath;
@@ -80,7 +80,7 @@ public class Issue72LowLevelSoap extends StressTest {
                         .withChargePointVendor(getRandomString())
                         .withChargePointModel(getRandomString()),
                 chargeBoxId);
-        Assert.assertEquals(RegistrationStatus.ACCEPTED, boot.getStatus());
+        Assertions.assertEquals(RegistrationStatus.ACCEPTED, boot.getStatus());
 
         StartTransactionResponse start = getForOcpp16(path).startTransaction(
                 new StartTransactionRequest()
@@ -90,7 +90,7 @@ public class Issue72LowLevelSoap extends StressTest {
                         .withMeterStart(meterStart),
                 chargeBoxId
         );
-        Assert.assertNotNull(start);
+        Assertions.assertNotNull(start);
 
         int transactionId = start.getTransactionId();
 
@@ -130,7 +130,7 @@ public class Issue72LowLevelSoap extends StressTest {
                                                                 .withUnit(UnitOfMeasure.WH))),
                         chargeBoxId
                 );
-                Assert.assertNotNull(mvr);
+                Assertions.assertNotNull(mvr);
 
                 try {
                     httpClient.execute(req, httpResponse -> {

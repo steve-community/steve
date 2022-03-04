@@ -39,7 +39,7 @@ import ocpp.cs._2015._10.StatusNotificationResponse;
 import ocpp.cs._2015._10.StopTransactionRequest;
 import ocpp.cs._2015._10.StopTransactionResponse;
 import org.joda.time.DateTime;
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
@@ -84,7 +84,7 @@ public class StressTestSoapOCPP16 extends StressTest {
                                 .withChargePointVendor(getRandomString())
                                 .withChargePointModel(getRandomString()),
                         chargeBoxId);
-                Assert.assertEquals(RegistrationStatus.ACCEPTED, boot.getStatus());
+                Assertions.assertEquals(RegistrationStatus.ACCEPTED, boot.getStatus());
             }
 
             @Override
@@ -103,7 +103,7 @@ public class StressTestSoapOCPP16 extends StressTest {
                         new HeartbeatRequest(),
                         chargeBoxId
                 );
-                Assert.assertNotNull(heartbeat);
+                Assertions.assertNotNull(heartbeat);
 
                 for (int i = 0; i <= CONNECTOR_COUNT_PER_CHARGE_BOX; i++) {
                     StatusNotificationResponse status = client.statusNotification(
@@ -114,14 +114,14 @@ public class StressTestSoapOCPP16 extends StressTest {
                                     .withTimestamp(DateTime.now()),
                             chargeBoxId
                     );
-                    Assert.assertNotNull(status);
+                    Assertions.assertNotNull(status);
                 }
 
                 AuthorizeResponse auth = client.authorize(
                         new AuthorizeRequest().withIdTag(idTag),
                         chargeBoxId
                 );
-                Assert.assertNotEquals(AuthorizationStatus.ACCEPTED, auth.getIdTagInfo().getStatus());
+                Assertions.assertNotEquals(AuthorizationStatus.ACCEPTED, auth.getIdTagInfo().getStatus());
 
                 StartTransactionResponse start = client.startTransaction(
                         new StartTransactionRequest()
@@ -131,7 +131,7 @@ public class StressTestSoapOCPP16 extends StressTest {
                                 .withMeterStart(transactionStart),
                         chargeBoxId
                 );
-                Assert.assertNotNull(start);
+                Assertions.assertNotNull(start);
 
                 StatusNotificationResponse statusStart = client.statusNotification(
                         new StatusNotificationRequest()
@@ -141,7 +141,7 @@ public class StressTestSoapOCPP16 extends StressTest {
                                 .withTimestamp(DateTime.now()),
                         chargeBoxId
                 );
-                Assert.assertNotNull(statusStart);
+                Assertions.assertNotNull(statusStart);
 
                 MeterValuesResponse meter = client.meterValues(
                         new MeterValuesRequest()
@@ -150,7 +150,7 @@ public class StressTestSoapOCPP16 extends StressTest {
                                 .withMeterValue(getMeterValues(transactionStart, transactionStop)),
                         chargeBoxId
                 );
-                Assert.assertNotNull(meter);
+                Assertions.assertNotNull(meter);
 
                 StopTransactionResponse stop = client.stopTransaction(
                         new StopTransactionRequest()
@@ -160,7 +160,7 @@ public class StressTestSoapOCPP16 extends StressTest {
                                 .withMeterStop(transactionStop),
                         chargeBoxId
                 );
-                Assert.assertNotNull(stop);
+                Assertions.assertNotNull(stop);
 
                 StatusNotificationResponse statusStop = client.statusNotification(
                         new StatusNotificationRequest()
@@ -170,7 +170,7 @@ public class StressTestSoapOCPP16 extends StressTest {
                                 .withTimestamp(DateTime.now()),
                         chargeBoxId
                 );
-                Assert.assertNotNull(statusStop);
+                Assertions.assertNotNull(statusStop);
             }
 
             @Override

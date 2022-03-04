@@ -53,12 +53,12 @@ import ocpp.cs._2015._10.StatusNotificationResponse;
 import ocpp.cs._2015._10.StopTransactionRequest;
 import ocpp.cs._2015._10.StopTransactionResponse;
 import org.joda.time.DateTime;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import javax.xml.ws.WebServiceException;
 import java.util.Arrays;
@@ -82,32 +82,32 @@ public class OperationalTestSoapOCPP16 {
     private static final int numConnectors = 5;
     private static Application app;
 
-    @BeforeClass
+    @BeforeAll
     public static void initClass() throws Exception {
-        Assert.assertEquals(ApplicationProfile.TEST, SteveConfiguration.CONFIG.getProfile());
+        Assertions.assertEquals(ApplicationProfile.TEST, SteveConfiguration.CONFIG.getProfile());
 
         app = new Application();
         app.start();
     }
 
-    @AfterClass
+    @AfterAll
     public static void destroyClass() throws Exception {
         app.stop();
     }
 
-    @Before
+    @BeforeEach
     public void init() throws Exception {
         __DatabasePreparer__.prepare();
     }
 
-    @After
+    @AfterEach
     public void destroy() throws Exception {
         __DatabasePreparer__.cleanUp();
     }
 
     @Test
     public void testUnregisteredCP() {
-        Assert.assertFalse(SteveConfiguration.CONFIG.getOcpp().isAutoRegisterUnknownStations());
+        Assertions.assertFalse(SteveConfiguration.CONFIG.getOcpp().isAutoRegisterUnknownStations());
 
         CentralSystemService client = getForOcpp16(path);
 
@@ -117,8 +117,8 @@ public class OperationalTestSoapOCPP16 {
                         .withChargePointModel(getRandomString()),
                 getRandomString());
 
-        Assert.assertNotNull(boot);
-        Assert.assertNotEquals(RegistrationStatus.ACCEPTED, boot.getStatus());
+        Assertions.assertNotNull(boot);
+        Assertions.assertNotEquals(RegistrationStatus.ACCEPTED, boot.getStatus());
     }
 
     /**
@@ -132,15 +132,17 @@ public class OperationalTestSoapOCPP16 {
      *
      * WS/JSON stations cannot connect at all if they are not registered, as ensured by {@link OcppWebSocketUpgrader}.
      */
-    @Test(expected = WebServiceException.class)
+    @Test
     public void testUnregisteredCPWithInterceptor() {
-        Assert.assertFalse(SteveConfiguration.CONFIG.getOcpp().isAutoRegisterUnknownStations());
+        Assertions.assertThrows(WebServiceException.class, () -> {
+            Assertions.assertFalse(SteveConfiguration.CONFIG.getOcpp().isAutoRegisterUnknownStations());
 
-        CentralSystemService client = getForOcpp16(path);
+            CentralSystemService client = getForOcpp16(path);
 
-        client.authorize(
+            client.authorize(
                 new AuthorizeRequest().withIdTag(REGISTERED_OCPP_TAG),
                 getRandomString());
+        });
     }
 
     @Test
@@ -150,7 +152,7 @@ public class OperationalTestSoapOCPP16 {
         initStationWithBootNotification(client);
 
         ChargePoint.Details details = __DatabasePreparer__.getCBDetails(REGISTERED_CHARGE_BOX_ID);
-        Assert.assertTrue(details.getChargeBox().getOcppProtocol().contains("ocpp1.6"));
+        Assertions.assertTrue(details.getChargeBox().getOcppProtocol().contains("ocpp1.6"));
     }
 
     @Test
@@ -161,8 +163,8 @@ public class OperationalTestSoapOCPP16 {
                 new AuthorizeRequest().withIdTag(REGISTERED_OCPP_TAG),
                 REGISTERED_CHARGE_BOX_ID);
 
-        Assert.assertNotNull(auth);
-        Assert.assertEquals(AuthorizationStatus.ACCEPTED, auth.getIdTagInfo().getStatus());
+        Assertions.assertNotNull(auth);
+        Assertions.assertEquals(AuthorizationStatus.ACCEPTED, auth.getIdTagInfo().getStatus());
     }
 
     @Test
@@ -173,8 +175,8 @@ public class OperationalTestSoapOCPP16 {
                 new AuthorizeRequest().withIdTag(getRandomString()),
                 REGISTERED_CHARGE_BOX_ID);
 
-        Assert.assertNotNull(auth);
-        Assert.assertEquals(AuthorizationStatus.INVALID, auth.getIdTagInfo().getStatus());
+        Assertions.assertNotNull(auth);
+        Assertions.assertEquals(AuthorizationStatus.INVALID, auth.getIdTagInfo().getStatus());
     }
 
     @Test
@@ -190,9 +192,9 @@ public class OperationalTestSoapOCPP16 {
                 REGISTERED_CHARGE_BOX_ID
         );
 
-        Assert.assertNotNull(start);
-        Assert.assertTrue(start.getTransactionId() > 0);
-        Assert.assertTrue(__DatabasePreparer__.getOcppTagRecord(REGISTERED_OCPP_TAG).getInTransaction());
+        Assertions.assertNotNull(start);
+        Assertions.assertTrue(start.getTransactionId() > 0);
+        Assertions.assertTrue(__DatabasePreparer__.getOcppTagRecord(REGISTERED_OCPP_TAG).getInTransaction());
 
         StopTransactionResponse stop = client.stopTransaction(
                 new StopTransactionRequest()
@@ -203,8 +205,8 @@ public class OperationalTestSoapOCPP16 {
                 REGISTERED_CHARGE_BOX_ID
         );
 
-        Assert.assertNotNull(stop);
-        Assert.assertFalse(__DatabasePreparer__.getOcppTagRecord(REGISTERED_OCPP_TAG).getInTransaction());
+        Assertions.assertNotNull(stop);
+        Assertions.assertFalse(__DatabasePreparer__.getOcppTagRecord(REGISTERED_OCPP_TAG).getInTransaction());
     }
 
     /**
@@ -219,7 +221,7 @@ public class OperationalTestSoapOCPP16 {
             AuthorizeResponse auth1 = client.authorize(
                     new AuthorizeRequest().withIdTag(REGISTERED_OCPP_TAG),
                     REGISTERED_CHARGE_BOX_ID);
-            Assert.assertEquals(AuthorizationStatus.ACCEPTED, auth1.getIdTagInfo().getStatus());
+            Assertions.assertEquals(AuthorizationStatus.ACCEPTED, auth1.getIdTagInfo().getStatus());
 
             StartTransactionResponse start1 = client.startTransaction(
                     new StartTransactionRequest()
@@ -228,20 +230,20 @@ public class OperationalTestSoapOCPP16 {
                             .withTimestamp(DateTime.now())
                             .withMeterStart(0),
                     REGISTERED_CHARGE_BOX_ID);
-            Assert.assertTrue(start1.getTransactionId() > 0);
-            Assert.assertEquals(AuthorizationStatus.ACCEPTED, start1.getIdTagInfo().getStatus());
+            Assertions.assertTrue(start1.getTransactionId() > 0);
+            Assertions.assertEquals(AuthorizationStatus.ACCEPTED, start1.getIdTagInfo().getStatus());
 
             AuthorizeResponse auth1Retry = client.authorize(
                     new AuthorizeRequest().withIdTag(REGISTERED_OCPP_TAG),
                     REGISTERED_CHARGE_BOX_ID);
-            Assert.assertEquals(AuthorizationStatus.ACCEPTED, auth1Retry.getIdTagInfo().getStatus());
+            Assertions.assertEquals(AuthorizationStatus.ACCEPTED, auth1Retry.getIdTagInfo().getStatus());
         }
 
         {
             AuthorizeResponse auth2 = client.authorize(
                     new AuthorizeRequest().withIdTag(REGISTERED_OCPP_TAG),
                     REGISTERED_CHARGE_BOX_ID_2);
-            Assert.assertEquals(AuthorizationStatus.ACCEPTED, auth2.getIdTagInfo().getStatus());
+            Assertions.assertEquals(AuthorizationStatus.ACCEPTED, auth2.getIdTagInfo().getStatus());
 
             StartTransactionResponse start2 = client.startTransaction(
                     new StartTransactionRequest()
@@ -250,13 +252,13 @@ public class OperationalTestSoapOCPP16 {
                             .withTimestamp(DateTime.now())
                             .withMeterStart(0),
                     REGISTERED_CHARGE_BOX_ID_2);
-            Assert.assertTrue(start2.getTransactionId() > 0);
-            Assert.assertEquals(AuthorizationStatus.CONCURRENT_TX, start2.getIdTagInfo().getStatus());
+            Assertions.assertTrue(start2.getTransactionId() > 0);
+            Assertions.assertEquals(AuthorizationStatus.CONCURRENT_TX, start2.getIdTagInfo().getStatus());
 
             AuthorizeResponse auth2Retry = client.authorize(
                     new AuthorizeRequest().withIdTag(REGISTERED_OCPP_TAG),
                     REGISTERED_CHARGE_BOX_ID_2);
-            Assert.assertEquals(AuthorizationStatus.ACCEPTED, auth2Retry.getIdTagInfo().getStatus());
+            Assertions.assertEquals(AuthorizationStatus.ACCEPTED, auth2Retry.getIdTagInfo().getStatus());
         }
     }
 
@@ -282,13 +284,13 @@ public class OperationalTestSoapOCPP16 {
                                 .withTimestamp(DateTime.now()),
                         REGISTERED_CHARGE_BOX_ID
                 );
-                Assert.assertNotNull(status);
+                Assertions.assertNotNull(status);
             }
 
             List<ConnectorStatus> connectorStatusList = __DatabasePreparer__.getChargePointConnectorStatus();
             for (ConnectorStatus connectorStatus : connectorStatusList) {
-                Assert.assertEquals(chargePointStatus.value(), connectorStatus.getStatus());
-                Assert.assertEquals(ChargePointErrorCode.NO_ERROR.value(), connectorStatus.getErrorCode());
+                Assertions.assertEquals(chargePointStatus.value(), connectorStatus.getStatus());
+                Assertions.assertEquals(ChargePointErrorCode.NO_ERROR.value(), connectorStatus.getErrorCode());
             }
         }
 
@@ -306,17 +308,17 @@ public class OperationalTestSoapOCPP16 {
                         .withTimestamp(DateTime.now()),
                 REGISTERED_CHARGE_BOX_ID
         );
-        Assert.assertNotNull(statusConnectorError);
+        Assertions.assertNotNull(statusConnectorError);
 
 
         List<ConnectorStatus> connectorStatusList = __DatabasePreparer__.getChargePointConnectorStatus();
         for (ConnectorStatus connectorStatus : connectorStatusList) {
             if (connectorStatus.getConnectorId() == faultyConnectorId) {
-                Assert.assertEquals(ChargePointStatus.FAULTED.value(), connectorStatus.getStatus());
-                Assert.assertEquals(ChargePointErrorCode.HIGH_TEMPERATURE.value(), connectorStatus.getErrorCode());
+                Assertions.assertEquals(ChargePointStatus.FAULTED.value(), connectorStatus.getStatus());
+                Assertions.assertEquals(ChargePointErrorCode.HIGH_TEMPERATURE.value(), connectorStatus.getErrorCode());
             } else {
-                Assert.assertNotEquals(ChargePointStatus.FAULTED.value(), connectorStatus.getStatus());
-                Assert.assertNotEquals(ChargePointErrorCode.HIGH_TEMPERATURE.value(), connectorStatus.getErrorCode());
+                Assertions.assertNotEquals(ChargePointStatus.FAULTED.value(), connectorStatus.getStatus());
+                Assertions.assertNotEquals(ChargePointErrorCode.HIGH_TEMPERATURE.value(), connectorStatus.getErrorCode());
             }
         }
     }
@@ -351,20 +353,20 @@ public class OperationalTestSoapOCPP16 {
                         .withReservationId(nonExistingReservationId),
                 REGISTERED_CHARGE_BOX_ID
         );
-        Assert.assertNotNull(startInvalid);
+        Assertions.assertNotNull(startInvalid);
 
         // validate that the transaction is written to db, even though reservation was invalid
         List<Transaction> transactions = __DatabasePreparer__.getTransactions();
-        Assert.assertEquals(1, transactions.size());
-        Assert.assertEquals(startInvalid.getTransactionId(), transactions.get(0).getId());
+        Assertions.assertEquals(1, transactions.size());
+        Assertions.assertEquals(startInvalid.getTransactionId(), transactions.get(0).getId());
 
         // make sure that this invalid reservation had no side effects
         {
             List<Reservation> reservations = __DatabasePreparer__.getReservations();
-            Assert.assertEquals(1, reservations.size());
+            Assertions.assertEquals(1, reservations.size());
             Reservation res = reservations.get(0);
-            Assert.assertEquals(reservationId, res.getId());
-            Assert.assertEquals(ReservationStatus.ACCEPTED.value(), res.getStatus());
+            Assertions.assertEquals(reservationId, res.getId());
+            Assertions.assertEquals(ReservationStatus.ACCEPTED.value(), res.getStatus());
         }
 
         // -------------------------------------------------------------------------
@@ -380,14 +382,14 @@ public class OperationalTestSoapOCPP16 {
                         .withReservationId(reservationId),
                 REGISTERED_CHARGE_BOX_ID
         );
-        Assert.assertNotNull(startWrongTag);
+        Assertions.assertNotNull(startWrongTag);
 
         {
             List<Reservation> reservations = __DatabasePreparer__.getReservations();
-            Assert.assertEquals(1, reservations.size());
+            Assertions.assertEquals(1, reservations.size());
             Reservation res = reservations.get(0);
-            Assert.assertEquals(ReservationStatus.ACCEPTED.value(), res.getStatus());
-            Assert.assertNull(res.getTransactionId());
+            Assertions.assertEquals(ReservationStatus.ACCEPTED.value(), res.getStatus());
+            Assertions.assertNull(res.getTransactionId());
         }
 
         // -------------------------------------------------------------------------
@@ -403,15 +405,15 @@ public class OperationalTestSoapOCPP16 {
                         .withReservationId(reservationId),
                 REGISTERED_CHARGE_BOX_ID
         );
-        Assert.assertNotNull(startValidId);
+        Assertions.assertNotNull(startValidId);
         Integer transactionIdValid = startValidId.getTransactionId();
 
         {
             List<Reservation> reservations = __DatabasePreparer__.getReservations();
-            Assert.assertEquals(reservations.size(), 1);
+            Assertions.assertEquals(reservations.size(), 1);
             Reservation res = reservations.get(0);
-            Assert.assertEquals(ReservationStatus.USED.value(), res.getStatus());
-            Assert.assertEquals(transactionIdValid, res.getTransactionId());
+            Assertions.assertEquals(ReservationStatus.USED.value(), res.getStatus());
+            Assertions.assertEquals(transactionIdValid, res.getTransactionId());
         }
 
         // -------------------------------------------------------------------------
@@ -427,14 +429,14 @@ public class OperationalTestSoapOCPP16 {
                         .withReservationId(reservationId),
                 REGISTERED_CHARGE_BOX_ID
         );
-        Assert.assertNotNull(startValidIdUsedTwice);
+        Assertions.assertNotNull(startValidIdUsedTwice);
 
         {
             List<Reservation> reservations = __DatabasePreparer__.getReservations();
-            Assert.assertEquals(reservations.size(), 1);
+            Assertions.assertEquals(reservations.size(), 1);
             Reservation res = reservations.get(0);
-            Assert.assertEquals(ReservationStatus.USED.value(), res.getStatus());
-            Assert.assertEquals(transactionIdValid, res.getTransactionId());
+            Assertions.assertEquals(ReservationStatus.USED.value(), res.getStatus());
+            Assertions.assertEquals(transactionIdValid, res.getTransactionId());
         }
     }
 
@@ -471,7 +473,7 @@ public class OperationalTestSoapOCPP16 {
                 new HeartbeatRequest(),
                 REGISTERED_CHARGE_BOX_ID
         );
-        Assert.assertNotNull(heartbeat);
+        Assertions.assertNotNull(heartbeat);
 
         // Auth
         AuthorizeResponse auth = client.authorize(
@@ -479,8 +481,8 @@ public class OperationalTestSoapOCPP16 {
                 REGISTERED_CHARGE_BOX_ID
         );
         // Simple request, not much done here
-        Assert.assertNotNull(auth);
-        Assert.assertEquals(AuthorizationStatus.ACCEPTED, auth.getIdTagInfo().getStatus());
+        Assertions.assertNotNull(auth);
+        Assertions.assertEquals(AuthorizationStatus.ACCEPTED, auth.getIdTagInfo().getStatus());
 
 
         // startTransaction
@@ -493,21 +495,21 @@ public class OperationalTestSoapOCPP16 {
                         .withMeterStart(0),
                 REGISTERED_CHARGE_BOX_ID
         );
-        Assert.assertNotNull(start);
+        Assertions.assertNotNull(start);
 
         int transactionID = start.getTransactionId();
 
         List<TransactionRecord> allTransactions = __DatabasePreparer__.getTransactionRecords();
-        Assert.assertEquals(1, allTransactions.size());
+        Assertions.assertEquals(1, allTransactions.size());
 
         {
             TransactionRecord t = allTransactions.get(0);
-            Assert.assertEquals(startTimeStamp, t.getStartTimestamp());
-            Assert.assertEquals(0, Integer.parseInt(t.getStartValue()));
+            Assertions.assertEquals(startTimeStamp, t.getStartTimestamp());
+            Assertions.assertEquals(0, Integer.parseInt(t.getStartValue()));
 
-            Assert.assertNull(t.getStopTimestamp());
-            Assert.assertNull(t.getStopReason());
-            Assert.assertNull(t.getStopValue());
+            Assertions.assertNull(t.getStopTimestamp());
+            Assertions.assertNull(t.getStopReason());
+            Assertions.assertNull(t.getStopValue());
         }
 
         // status
@@ -520,7 +522,7 @@ public class OperationalTestSoapOCPP16 {
                 REGISTERED_CHARGE_BOX_ID
 
         );
-        Assert.assertNotNull(statusStart);
+        Assertions.assertNotNull(statusStart);
 
         // send meterValues
         if (meterValues != null) {
@@ -531,7 +533,7 @@ public class OperationalTestSoapOCPP16 {
                             .withMeterValue(meterValues),
                     REGISTERED_CHARGE_BOX_ID
             );
-            Assert.assertNotNull(meter);
+            Assertions.assertNotNull(meter);
             checkMeterValues(meterValues, transactionID);
         }
 
@@ -549,12 +551,12 @@ public class OperationalTestSoapOCPP16 {
         );
 
         {
-            Assert.assertNotNull(stop);
+            Assertions.assertNotNull(stop);
             List<TransactionRecord> transactionsStop = __DatabasePreparer__.getTransactionRecords();
-            Assert.assertEquals(1, transactionsStop.size());
+            Assertions.assertEquals(1, transactionsStop.size());
             TransactionRecord t = transactionsStop.get(0);
-            Assert.assertEquals(stopTimeStamp, t.getStopTimestamp());
-            Assert.assertEquals(stopValue, Integer.parseInt(t.getStopValue()));
+            Assertions.assertEquals(stopTimeStamp, t.getStopTimestamp());
+            Assertions.assertEquals(stopValue, Integer.parseInt(t.getStopValue()));
 
             if (transactionData != null) {
                 checkMeterValues(transactionData, transactionID);
@@ -570,7 +572,7 @@ public class OperationalTestSoapOCPP16 {
                         .withTimestamp(DateTime.now()),
                 REGISTERED_CHARGE_BOX_ID
         );
-        Assert.assertNotNull(statusStop);
+        Assertions.assertNotNull(statusStop);
     }
 
     private void initStationWithBootNotification(CentralSystemService client) {
@@ -579,8 +581,8 @@ public class OperationalTestSoapOCPP16 {
                         .withChargePointVendor(getRandomString())
                         .withChargePointModel(getRandomString()),
                 REGISTERED_CHARGE_BOX_ID);
-        Assert.assertNotNull(boot);
-        Assert.assertEquals(RegistrationStatus.ACCEPTED, boot.getStatus());
+        Assertions.assertNotNull(boot);
+        Assertions.assertEquals(RegistrationStatus.ACCEPTED, boot.getStatus());
     }
 
     private void initConnectorsWithStatusNotification(CentralSystemService client) {
@@ -593,7 +595,7 @@ public class OperationalTestSoapOCPP16 {
                             .withTimestamp(DateTime.now()),
                     REGISTERED_CHARGE_BOX_ID
             );
-            Assert.assertNotNull(statusBoot);
+            Assertions.assertNotNull(statusBoot);
         }
     }
 
@@ -603,7 +605,7 @@ public class OperationalTestSoapOCPP16 {
         // iterate over all created meter values
         for (MeterValue meterValue : meterValues) {
             List<SampledValue> sampledValues = meterValue.getSampledValue();
-            Assert.assertFalse(sampledValues.isEmpty());
+            Assertions.assertFalse(sampledValues.isEmpty());
             boolean thisValueFound = false;
             // and check, if it can be found in the DB
             for (TransactionDetails.MeterValues values : details.getValues()) {
@@ -612,7 +614,7 @@ public class OperationalTestSoapOCPP16 {
                     break;
                 }
             }
-            Assert.assertTrue(thisValueFound);
+            Assertions.assertTrue(thisValueFound);
         }
     }
 

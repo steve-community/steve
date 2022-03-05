@@ -143,7 +143,7 @@ public class ApplicationJsonTest {
     @Test
     public void testWithMissingVersion() {
         RuntimeException e = Assertions.assertThrows(RuntimeException.class, () -> {
-            OcppJsonChargePoint chargePoint = new OcppJsonChargePoint(null, REGISTERED_CHARGE_BOX_ID, PATH);
+            OcppJsonChargePoint chargePoint = new OcppJsonChargePoint((String) null, REGISTERED_CHARGE_BOX_ID, PATH);
             chargePoint.start();
         });
 
@@ -152,6 +152,20 @@ public class ApplicationJsonTest {
         UpgradeException actualCause = (UpgradeException) e.getCause().getCause();
 
         Assertions.assertEquals(HttpStatus.BAD_REQUEST.value(), actualCause.getResponseStatusCode());
+    }
+
+    @Test
+    public void testWithWrongVersion() {
+        RuntimeException e = Assertions.assertThrows(RuntimeException.class, () -> {
+            OcppJsonChargePoint chargePoint = new OcppJsonChargePoint("ocpp1234", REGISTERED_CHARGE_BOX_ID, PATH);
+            chargePoint.start();
+        });
+
+        Assertions.assertTrue(e.getCause().getCause() instanceof UpgradeException);
+
+        UpgradeException actualCause = (UpgradeException) e.getCause().getCause();
+
+        Assertions.assertEquals(HttpStatus.NOT_FOUND.value(), actualCause.getResponseStatusCode());
     }
 
     @Test

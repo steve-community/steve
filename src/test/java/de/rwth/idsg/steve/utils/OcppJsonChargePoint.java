@@ -64,7 +64,7 @@ import java.util.function.Consumer;
 @WebSocket
 public class OcppJsonChargePoint {
 
-    private final OcppVersion version;
+    private final String version;
     private final String chargeBoxId;
     private final String connectionPath;
     private final Map<String, ResponseContext> responseContextMap;
@@ -76,7 +76,11 @@ public class OcppJsonChargePoint {
     private Session session;
 
     public OcppJsonChargePoint(OcppVersion version, String chargeBoxId, String pathPrefix) {
-        this.version = version;
+        this(version.getValue(), chargeBoxId, pathPrefix);
+    }
+
+    public OcppJsonChargePoint(String ocppVersion, String chargeBoxId, String pathPrefix) {
+        this.version = ocppVersion;
         this.chargeBoxId = chargeBoxId;
         this.connectionPath = pathPrefix + chargeBoxId;
         this.responseContextMap = new LinkedHashMap<>(); // because we want to keep the insertion order of test cases
@@ -125,7 +129,7 @@ public class OcppJsonChargePoint {
         try {
             ClientUpgradeRequest request = new ClientUpgradeRequest();
             if (version != null) {
-                request.setSubProtocols(version.getValue());
+                request.setSubProtocols(version);
             }
 
             client.start();

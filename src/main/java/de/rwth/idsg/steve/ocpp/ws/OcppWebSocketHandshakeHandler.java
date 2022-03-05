@@ -98,7 +98,7 @@ public class OcppWebSocketHandshakeHandler implements HandshakeHandler {
 
         if (endpoint == null) {
             log.error("Requested protocol '{}' is not supported", selectedProtocol);
-            response.setStatusCode(HttpStatus.BAD_REQUEST);
+            response.setStatusCode(HttpStatus.NOT_FOUND);
             return false;
         }
 

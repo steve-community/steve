@@ -28,10 +28,12 @@ import ocpp.cs._2015._10.AuthorizeResponse;
 import ocpp.cs._2015._10.BootNotificationRequest;
 import ocpp.cs._2015._10.BootNotificationResponse;
 import ocpp.cs._2015._10.RegistrationStatus;
+import org.eclipse.jetty.websocket.api.exceptions.UpgradeException;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.springframework.http.HttpStatus;
 
 import static de.rwth.idsg.steve.utils.Helpers.getRandomString;
 
@@ -89,6 +91,34 @@ public class ApplicationJsonTest {
         );
 
         chargePoint.processAndClose();
+    }
+
+    @Test
+    public void testWithMissingVersion() {
+        RuntimeException e = Assertions.assertThrows(RuntimeException.class, () -> {
+            OcppJsonChargePoint chargePoint = new OcppJsonChargePoint(null, REGISTERED_CHARGE_BOX_ID, PATH);
+            chargePoint.start();
+        });
+
+        Assertions.assertTrue(e.getCause().getCause() instanceof UpgradeException);
+
+        UpgradeException actualCause = (UpgradeException) e.getCause().getCause();
+
+        Assertions.assertEquals(HttpStatus.BAD_REQUEST.value(), actualCause.getResponseStatusCode());
+    }
+
+    @Test
+    public void tesWithUnauthorizedStation() {
+        RuntimeException e = Assertions.assertThrows(RuntimeException.class, () -> {
+            OcppJsonChargePoint chargePoint = new OcppJsonChargePoint(VERSION, "unauth1234", PATH);
+            chargePoint.start();
+        });
+
+        Assertions.assertTrue(e.getCause().getCause() instanceof UpgradeException);
+
+        UpgradeException actualCause = (UpgradeException) e.getCause().getCause();
+
+        Assertions.assertEquals(HttpStatus.UNAUTHORIZED.value(), actualCause.getResponseStatusCode());
     }
 
 }

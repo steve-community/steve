@@ -19,8 +19,7 @@
 package de.rwth.idsg.steve.config;
 
 import com.google.common.collect.Lists;
-import de.rwth.idsg.steve.ocpp.ws.AbstractWebSocketEndpoint;
-import de.rwth.idsg.steve.ocpp.ws.OcppWebSocketUpgrader;
+import de.rwth.idsg.steve.ocpp.ws.OcppWebSocketHandshakeHandler;
 import de.rwth.idsg.steve.ocpp.ws.ocpp12.Ocpp12WebSocketEndpoint;
 import de.rwth.idsg.steve.ocpp.ws.ocpp15.Ocpp15WebSocketEndpoint;
 import de.rwth.idsg.steve.ocpp.ws.ocpp16.Ocpp16WebSocketEndpoint;
@@ -34,7 +33,6 @@ import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry
 import org.springframework.web.socket.server.support.DefaultHandshakeHandler;
 
 import java.time.Duration;
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -58,25 +56,15 @@ public class WebSocketConfiguration implements WebSocketConfigurer {
 
     @Override
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
-        List<AbstractWebSocketEndpoint> endpoints = getEndpoints();
-        String[] protocols = endpoints.stream().map(e -> e.getVersion().getValue()).toArray(String[]::new);
 
-        OcppWebSocketUpgrader upgradeStrategy = new OcppWebSocketUpgrader(endpoints, chargePointHelperService);
+        OcppWebSocketHandshakeHandler handshakeHandler = new OcppWebSocketHandshakeHandler(
+            new DefaultHandshakeHandler(),
+            Lists.newArrayList(ocpp16WebSocketEndpoint, ocpp15WebSocketEndpoint, ocpp12WebSocketEndpoint),
+            chargePointHelperService
+        );
 
-        DefaultHandshakeHandler handler = new DefaultHandshakeHandler(upgradeStrategy);
-        handler.setSupportedProtocols(protocols);
-
-        for (AbstractWebSocketEndpoint endpoint : endpoints) {
-            registry.addHandler(endpoint, "/websocket/CentralSystemService/*")
-                    .setHandshakeHandler(handler)
-                    .setAllowedOrigins("*");
-        }
-    }
-
-    /**
-     * The order affects the choice!
-     */
-    private List<AbstractWebSocketEndpoint> getEndpoints() {
-        return Lists.newArrayList(ocpp16WebSocketEndpoint, ocpp15WebSocketEndpoint, ocpp12WebSocketEndpoint);
+        registry.addHandler(handshakeHandler.getDummyWebSocketHandler(), "/websocket/CentralSystemService/*")
+                .setHandshakeHandler(handshakeHandler)
+                .setAllowedOrigins("*");
     }
 }

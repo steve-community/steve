@@ -124,14 +124,16 @@ public class OcppJsonChargePoint {
     public void start() {
         try {
             ClientUpgradeRequest request = new ClientUpgradeRequest();
-            request.setSubProtocols(version.getValue());
+            if (version != null) {
+                request.setSubProtocols(version.getValue());
+            }
 
             client.start();
 
             Future<Session> connect = client.connect(this, new URI(connectionPath), request);
             connect.get(); // block until session is created
         } catch (Throwable t) {
-            log.error("Exception", t);
+            throw new RuntimeException(t);
         }
     }
 

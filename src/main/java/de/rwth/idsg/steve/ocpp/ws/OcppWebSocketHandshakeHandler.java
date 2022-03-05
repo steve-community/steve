@@ -22,7 +22,6 @@ import de.rwth.idsg.steve.service.ChargePointHelperService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import ocpp.cs._2015._10.RegistrationStatus;
-import org.jetbrains.annotations.Nullable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.http.server.ServerHttpResponse;
@@ -73,48 +72,41 @@ public class OcppWebSocketHandshakeHandler implements HandshakeHandler {
         // Allow connections, if station is in db (registration_status field from db does not matter)
         boolean allowConnection = status.isPresent();
 
-        if (allowConnection) {
-            attributes.put(AbstractWebSocketEndpoint.CHARGEBOX_ID_KEY, chargeBoxId);
-        } else {
+        if (!allowConnection) {
             log.error("ChargeBoxId '{}' is not recognized.", chargeBoxId);
             response.setStatusCode(HttpStatus.UNAUTHORIZED);
             return false;
         }
 
+        attributes.put(AbstractWebSocketEndpoint.CHARGEBOX_ID_KEY, chargeBoxId);
+
         // -------------------------------------------------------------------------
         // 2. Route according to the selected protocol
         // -------------------------------------------------------------------------
 
-        List<String> wantedProtocols = new WebSocketHttpHeaders(request.getHeaders()).getSecWebSocketProtocol();
+        List<String> requestedProtocols = new WebSocketHttpHeaders(request.getHeaders()).getSecWebSocketProtocol();
 
-        if (CollectionUtils.isEmpty(wantedProtocols)) {
+        if (CollectionUtils.isEmpty(requestedProtocols)) {
             log.error("No protocol (OCPP version) is specified.");
             response.setStatusCode(HttpStatus.BAD_REQUEST);
             return false;
         }
 
-        String selectedProtocol = wantedProtocols.get(0);
-        AbstractWebSocketEndpoint endpoint = findEndpoint(selectedProtocol);
+        String requestedProcotol = requestedProtocols.get(0);
+
+        AbstractWebSocketEndpoint endpoint = endpoints.stream()
+            .filter(it -> it.getVersion().getValue().equals(requestedProcotol))
+            .findAny()
+            .orElse(null);
 
         if (endpoint == null) {
-            log.error("Requested protocol '{}' is not supported", selectedProtocol);
+            log.error("Requested protocol '{}' is not supported", requestedProcotol);
             response.setStatusCode(HttpStatus.NOT_FOUND);
             return false;
         }
 
         log.debug("ChargeBoxId '{}' will be using {}", chargeBoxId, endpoint.getClass().getSimpleName());
         return delegate.doHandshake(request, response, endpoint, attributes);
-    }
-
-
-    @Nullable
-    private AbstractWebSocketEndpoint findEndpoint(String selectedProtocol) {
-        for (AbstractWebSocketEndpoint endpoint : endpoints) {
-            if (endpoint.getVersion().getValue().equals(selectedProtocol)) {
-                return endpoint;
-            }
-        }
-        return null;
     }
 
     /**

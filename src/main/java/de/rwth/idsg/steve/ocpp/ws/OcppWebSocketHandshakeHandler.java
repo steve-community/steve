@@ -20,34 +20,47 @@ package de.rwth.idsg.steve.ocpp.ws;
 
 import de.rwth.idsg.steve.service.ChargePointHelperService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import ocpp.cs._2015._10.RegistrationStatus;
-import org.jetbrains.annotations.Nullable;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.http.server.ServerHttpResponse;
-import org.springframework.web.socket.WebSocketExtension;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.socket.WebSocketHandler;
+import org.springframework.web.socket.WebSocketHttpHeaders;
+import org.springframework.web.socket.handler.TextWebSocketHandler;
 import org.springframework.web.socket.server.HandshakeFailureException;
-import org.springframework.web.socket.server.jetty.Jetty10RequestUpgradeStrategy;
+import org.springframework.web.socket.server.HandshakeHandler;
+import org.springframework.web.socket.server.support.DefaultHandshakeHandler;
 
-import java.security.Principal;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
- * @since 13.03.2015
+ * @since 05.03.2022
  */
+@Slf4j
 @RequiredArgsConstructor
-public class OcppWebSocketUpgrader extends Jetty10RequestUpgradeStrategy {
+public class OcppWebSocketHandshakeHandler implements HandshakeHandler {
 
+    private final DefaultHandshakeHandler delegate;
     private final List<AbstractWebSocketEndpoint> endpoints;
     private final ChargePointHelperService chargePointHelperService;
 
+    /**
+     * We need some WebSocketHandler just for Spring to register it for the path. We will not use it for the actual
+     * operations. This instance will be passed to doHandshake(..) below. We will find the proper WebSocketEndpoint
+     * based on the selectedProtocol and replace the dummy one with the proper one in the subsequent call chain.
+     */
+    public WebSocketHandler getDummyWebSocketHandler() {
+        return new TextWebSocketHandler();
+    }
+
     @Override
-    public void upgrade(ServerHttpRequest request, ServerHttpResponse response,
-                        String selectedProtocol, List<WebSocketExtension> selectedExtensions, Principal user,
-                        WebSocketHandler wsHandler, Map<String, Object> attributes) throws HandshakeFailureException {
+    public boolean doHandshake(ServerHttpRequest request, ServerHttpResponse response,
+                               WebSocketHandler wsHandler, Map<String, Object> attributes) throws HandshakeFailureException {
 
         // -------------------------------------------------------------------------
         // 1. Check the chargeBoxId
@@ -59,37 +72,41 @@ public class OcppWebSocketUpgrader extends Jetty10RequestUpgradeStrategy {
         // Allow connections, if station is in db (registration_status field from db does not matter)
         boolean allowConnection = status.isPresent();
 
-        if (allowConnection) {
-            attributes.put(AbstractWebSocketEndpoint.CHARGEBOX_ID_KEY, chargeBoxId);
-        } else {
-            throw new HandshakeFailureException("ChargeBoxId '" + chargeBoxId + "' is not recognized.");
+        if (!allowConnection) {
+            log.error("ChargeBoxId '{}' is not recognized.", chargeBoxId);
+            response.setStatusCode(HttpStatus.UNAUTHORIZED);
+            return false;
         }
+
+        attributes.put(AbstractWebSocketEndpoint.CHARGEBOX_ID_KEY, chargeBoxId);
 
         // -------------------------------------------------------------------------
         // 2. Route according to the selected protocol
         // -------------------------------------------------------------------------
 
-        if (selectedProtocol == null) {
-            throw new HandshakeFailureException("No protocol (OCPP version) is specified.");
+        List<String> requestedProtocols = new WebSocketHttpHeaders(request.getHeaders()).getSecWebSocketProtocol();
+
+        if (CollectionUtils.isEmpty(requestedProtocols)) {
+            log.error("No protocol (OCPP version) is specified.");
+            response.setStatusCode(HttpStatus.BAD_REQUEST);
+            return false;
         }
 
-        AbstractWebSocketEndpoint endpoint = findEndpoint(selectedProtocol);
+        String requestedProcotol = requestedProtocols.get(0);
+
+        AbstractWebSocketEndpoint endpoint = endpoints.stream()
+            .filter(it -> it.getVersion().getValue().equals(requestedProcotol))
+            .findAny()
+            .orElse(null);
 
         if (endpoint == null) {
-            throw new HandshakeFailureException("Requested protocol '" + selectedProtocol + "' is not supported");
+            log.error("Requested protocol '{}' is not supported", requestedProcotol);
+            response.setStatusCode(HttpStatus.NOT_FOUND);
+            return false;
         }
 
-        super.upgrade(request, response, selectedProtocol, selectedExtensions, user, endpoint, attributes);
-    }
-
-    @Nullable
-    private AbstractWebSocketEndpoint findEndpoint(String selectedProtocol) {
-        for (AbstractWebSocketEndpoint endpoint : endpoints) {
-            if (endpoint.getVersion().getValue().equals(selectedProtocol)) {
-                return endpoint;
-            }
-        }
-        return null;
+        log.debug("ChargeBoxId '{}' will be using {}", chargeBoxId, endpoint.getClass().getSimpleName());
+        return delegate.doHandshake(request, response, endpoint, attributes);
     }
 
     /**

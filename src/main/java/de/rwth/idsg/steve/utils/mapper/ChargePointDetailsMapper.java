@@ -21,12 +21,15 @@ package de.rwth.idsg.steve.utils.mapper;
 import de.rwth.idsg.steve.repository.dto.ChargePoint;
 import de.rwth.idsg.steve.web.dto.ChargePointForm;
 import jooq.steve.db.tables.records.ChargeBoxRecord;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 23.03.2021
  */
-public class ChargePointDetailsMapper {
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
+public final class ChargePointDetailsMapper {
 
     public static ChargePointForm mapToForm(ChargePoint.Details cp) {
         ChargeBoxRecord chargeBox = cp.getChargeBox();

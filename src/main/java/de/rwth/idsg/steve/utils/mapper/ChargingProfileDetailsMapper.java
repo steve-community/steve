@@ -23,6 +23,8 @@ import de.rwth.idsg.steve.utils.DateTimeUtils;
 import de.rwth.idsg.steve.web.dto.ChargingProfileForm;
 import jooq.steve.db.tables.records.ChargingProfileRecord;
 import jooq.steve.db.tables.records.ChargingSchedulePeriodRecord;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import ocpp.cp._2015._10.ChargingProfileKindType;
 import ocpp.cp._2015._10.ChargingProfilePurposeType;
 import ocpp.cp._2015._10.ChargingRateUnitType;
@@ -37,7 +39,8 @@ import java.util.UUID;
  * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 23.03.2021
  */
-public class ChargingProfileDetailsMapper {
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
+public final class ChargingProfileDetailsMapper {
 
     public static ChargingProfileForm mapToForm(ChargingProfile.Details details) {
         ChargingProfileRecord profile = details.getProfile();

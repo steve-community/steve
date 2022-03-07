@@ -23,12 +23,15 @@ import de.rwth.idsg.steve.utils.ControllerHelper;
 import de.rwth.idsg.steve.web.dto.UserForm;
 import de.rwth.idsg.steve.web.dto.UserSex;
 import jooq.steve.db.tables.records.UserRecord;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 23.03.2021
  */
-public class UserFormMapper {
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
+public final class UserFormMapper {
 
     public static UserForm toForm(User.Details details) {
         UserRecord userRecord = details.getUserRecord();

@@ -21,13 +21,16 @@ package de.rwth.idsg.steve.utils.mapper;
 import de.rwth.idsg.steve.utils.ControllerHelper;
 import de.rwth.idsg.steve.web.dto.OcppTagForm;
 import jooq.steve.db.tables.records.OcppTagActivityRecord;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import org.joda.time.DateTime;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 23.03.2021
  */
-public class OcppTagFormMapper {
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
+public final class OcppTagFormMapper {
 
     public static OcppTagForm toForm(OcppTagActivityRecord record) {
         OcppTagForm form = new OcppTagForm();

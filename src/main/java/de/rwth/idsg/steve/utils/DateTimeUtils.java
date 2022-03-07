@@ -19,6 +19,8 @@
 package de.rwth.idsg.steve.utils;
 
 import de.rwth.idsg.steve.SteveException;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.LocalDateTime;
@@ -34,8 +36,8 @@ import java.util.concurrent.TimeUnit;
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
  */
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class DateTimeUtils {
-    private DateTimeUtils() { }
 
     private static final DateTimeFormatter HUMAN_FORMATTER = DateTimeFormat.forPattern("yyyy-MM-dd 'at' HH:mm");
     private static final DateTimeFormatter TIME_FORMATTER = DateTimeFormat.forPattern("HH:mm");

@@ -22,6 +22,8 @@ import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
 import com.google.common.base.Strings;
 import de.rwth.idsg.steve.ocpp.CommunicationTask;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.util.CollectionUtils;
 
@@ -34,12 +36,11 @@ import java.util.List;
  * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 12.01.2015
  */
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class StringUtils {
 
     private static final Splitter SPLITTER = Splitter.on(",").trimResults().omitEmptyStrings();
     private static final Joiner JOINER = Joiner.on(",").skipNulls();
-
-    private StringUtils() { }
 
     /**
      * We don't want to hard-code operation names, but derive them from the actual request object.

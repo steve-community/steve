@@ -19,6 +19,8 @@
 package de.rwth.idsg.steve.utils;
 
 import de.rwth.idsg.steve.repository.dto.ConnectorStatus;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 
 import java.util.Collections;
 import java.util.Comparator;
@@ -32,9 +34,8 @@ import java.util.stream.Collectors;
  * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 10.03.2016
  */
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class ConnectorStatusFilter {
-
-    private ConnectorStatusFilter() { }
 
     public static List<ConnectorStatus> filterAndPreferZero(List<ConnectorStatus> initialList) {
         return processAndFilterList(initialList, Strategy.PreferZero);

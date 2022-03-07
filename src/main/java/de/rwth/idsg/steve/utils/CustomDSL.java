@@ -18,6 +18,8 @@
  */
 package de.rwth.idsg.steve.utils;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import org.joda.time.DateTime;
 import org.jooq.Condition;
 import org.jooq.DSLContext;
@@ -33,9 +35,8 @@ import static org.jooq.impl.DSL.field;
  * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 03.09.2015
  */
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class CustomDSL {
-    private CustomDSL() {
-    }
 
     public static Field<DateTime> date(DateTime dt) {
         return date(DSL.val(dt, DateTime.class));

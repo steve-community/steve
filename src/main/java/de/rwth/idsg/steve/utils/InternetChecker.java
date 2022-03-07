@@ -19,6 +19,8 @@
 package de.rwth.idsg.steve.utils;
 
 import de.rwth.idsg.steve.SteveConfiguration;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
@@ -32,8 +34,8 @@ import java.util.List;
  * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 19.04.2016
  */
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class InternetChecker {
-    private InternetChecker() { }
 
     private static final int CONNECT_TIMEOUT = 5_000;
 

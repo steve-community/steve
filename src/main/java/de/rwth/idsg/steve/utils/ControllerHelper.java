@@ -18,6 +18,10 @@
  */
 package de.rwth.idsg.steve.utils;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
+import lombok.experimental.UtilityClass;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,8 +32,8 @@ import static de.rwth.idsg.steve.utils.CountryCodesProvider.getCountryCodes;
  * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 25.11.2015
  */
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class ControllerHelper {
-    private ControllerHelper() { }
 
     public static final String EMPTY_OPTION = "-- Empty --";
 

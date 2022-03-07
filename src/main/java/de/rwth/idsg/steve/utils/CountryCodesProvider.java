@@ -19,6 +19,8 @@
 package de.rwth.idsg.steve.utils;
 
 import com.neovisionaries.i18n.CountryCode;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 
 import java.util.Arrays;
 import java.util.Comparator;
@@ -31,7 +33,8 @@ import static de.rwth.idsg.steve.utils.ControllerHelper.EMPTY_OPTION;
  * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 23.03.2021
  */
-public class CountryCodesProvider {
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
+public final class CountryCodesProvider {
 
     public static Map<String, String> getCountryCodes() {
         CountryCode[] codes = CountryCode.values();

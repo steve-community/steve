@@ -92,15 +92,10 @@ public class OcppWebSocketHandshakeHandler implements HandshakeHandler {
             return false;
         }
 
-        String requestedProcotol = requestedProtocols.get(0);
-
-        AbstractWebSocketEndpoint endpoint = endpoints.stream()
-            .filter(it -> it.getVersion().getValue().equals(requestedProcotol))
-            .findAny()
-            .orElse(null);
+        AbstractWebSocketEndpoint endpoint = selectEndpoint(requestedProtocols);
 
         if (endpoint == null) {
-            log.error("Requested protocol '{}' is not supported", requestedProcotol);
+            log.error("None of the requested protocols '{}' is supported", requestedProtocols);
             response.setStatusCode(HttpStatus.NOT_FOUND);
             return false;
         }
@@ -114,5 +109,16 @@ public class OcppWebSocketHandshakeHandler implements HandshakeHandler {
      */
     private static String getLastBitFromUrl(final String url) {
         return url.replaceFirst(".*/([^/?]+).*", "$1");
+    }
+
+    private AbstractWebSocketEndpoint selectEndpoint(List<String> requestedProtocols ) {
+        for (String requestedProcotol : requestedProtocols) {
+            for (AbstractWebSocketEndpoint item : endpoints) {
+                if (item.getVersion().getValue().equals(requestedProcotol)) {
+                    return item;
+                }
+            }
+        }
+        return null;
     }
 }

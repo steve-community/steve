@@ -100,9 +100,13 @@ SteVe is designed to run standalone, a java servlet container / web server (e.g.
 
 # Docker
 
-If you prefer to build and start this project via docker (you can skip the steps 1 and 3, 4, 5 above), this can be done as follows: `docker-compose up -d `
+If you prefer to build and start this project via docker (you can skip the steps 1, 4 and 5 from above), this can be done as follows: `docker-compose up -d`
 
-The web interface will be accessible at: `http://localhost:8180`
+Because the docker-compose file is written to build the project for you, you still have to change the project configuration settings from step 3.
+Instead of changing the [main.properties in the prod directory](src/main/resources/config/prod/main.properties), you have to change the [main.properties in the docker directory](src/main/resources/config/docker/main.properties). There you have to change all configurations which are described in step 3.
+The database password for the user "steve" has to be the same as you have configured it in the docker-compose file.
+
+With the default docker-compose configuration, the web interface will be accessible at: `http://localhost:8180`
 
 # Kubernetes
 

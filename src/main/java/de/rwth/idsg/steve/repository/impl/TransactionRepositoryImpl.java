@@ -23,10 +23,13 @@ import de.rwth.idsg.steve.repository.TransactionRepository;
 import de.rwth.idsg.steve.repository.dto.Transaction;
 import de.rwth.idsg.steve.repository.dto.TransactionDetails;
 import de.rwth.idsg.steve.utils.DateTimeUtils;
+import de.rwth.idsg.steve.utils.StringUtils;
 import de.rwth.idsg.steve.web.dto.TransactionQueryForm;
 import jooq.steve.db.enums.TransactionStopEventActor;
 import jooq.steve.db.tables.records.ConnectorMeterValueRecord;
 import jooq.steve.db.tables.records.TransactionStartRecord;
+import ocpp.cs._2015._10.ValueFormat;
+import org.apache.commons.codec.DecoderException;
 import org.joda.time.DateTime;
 import org.jooq.Condition;
 import org.jooq.DSLContext;
@@ -215,6 +218,7 @@ public class TransactionRepositoryImpl implements TransactionRepository {
                    .map(r -> TransactionDetails.MeterValues.builder()
                                                            .valueTimestamp(r.value1())
                                                            .value(r.value2())
+                                                           .decodedValue(decodeValue(r.value2(), r.value4()))
                                                            .readingContext(r.value3())
                                                            .format(r.value4())
                                                            .measurand(r.value5())
@@ -342,6 +346,17 @@ public class TransactionRepositoryImpl implements TransactionRepository {
 
             default:
                 throw new SteveException("Unknown enum type");
+        }
+    }
+
+    private static String decodeValue(String valueFromDB, String formatFromDB) {
+        if (!ValueFormat.SIGNED_DATA.value().equals(formatFromDB)) {
+            return null;
+        }
+        try {
+            return StringUtils.hexToText(valueFromDB);
+        } catch (DecoderException e) {
+            return null;
         }
     }
 

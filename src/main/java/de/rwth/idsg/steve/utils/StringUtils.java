@@ -24,9 +24,12 @@ import com.google.common.base.Strings;
 import de.rwth.idsg.steve.ocpp.CommunicationTask;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import org.apache.commons.codec.DecoderException;
+import org.apache.commons.codec.binary.Hex;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.util.CollectionUtils;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashSet;
@@ -78,5 +81,13 @@ public final class StringUtils {
         } else {
             return SPLITTER.splitToList(str);
         }
+    }
+
+    public static String textToHex(String text) {
+        return Hex.encodeHexString(text.getBytes(StandardCharsets.UTF_8));
+    }
+
+    public static String hexToText(String hex) throws DecoderException {
+        return new String(Hex.decodeHex(hex.toCharArray()), StandardCharsets.UTF_8);
     }
 }

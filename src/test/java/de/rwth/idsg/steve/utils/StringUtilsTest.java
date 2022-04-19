@@ -24,6 +24,7 @@ import de.rwth.idsg.steve.ocpp.task.GetCompositeScheduleTask;
 import de.rwth.idsg.steve.web.dto.ocpp.CancelReservationParams;
 import de.rwth.idsg.steve.web.dto.ocpp.GetCompositeScheduleParams;
 import de.rwth.idsg.steve.web.dto.ocpp.MultipleChargePointSelect;
+import org.apache.commons.codec.DecoderException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -116,5 +117,24 @@ public class StringUtilsTest {
         List<String> sortedVal = val.stream().sorted().collect(Collectors.toList());
         Assertions.assertEquals("1one", sortedVal.get(0));
         Assertions.assertEquals("2two", sortedVal.get(1));
+    }
+
+    @Test
+    public void testToHex() {
+        String input = "testingsomehex";
+        String output = "74657374696e67736f6d65686578";
+
+        String actual = StringUtils.textToHex(input);
+        Assertions.assertEquals(output, actual);
+    }
+
+    @Test
+    public void testToHexAndBack() throws DecoderException {
+        String input = "this-is-some-textual-content-0123";
+
+        String hex = StringUtils.textToHex(input);
+        String actual = StringUtils.hexToText(hex);
+
+        Assertions.assertEquals(input, actual);
     }
 }

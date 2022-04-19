@@ -59,9 +59,21 @@
         <c:forEach items="${details.values}" var="v">
             <tr>
                 <td data-sort-value="${v.valueTimestamp.millis}">${v.valueTimestamp}</td>
-                <td>${v.value}</td>
+                <td>
+                    <c:choose>
+                        <c:when test="${not empty v.decodedValue}">${v.decodedValue}</c:when>
+                        <c:otherwise>${v.value}</c:otherwise>
+                    </c:choose>
+                </td>
                 <td>${v.readingContext}</td>
-                <td>${v.format}</td>
+                <td>${v.format}
+                    <c:if test="${not empty v.decodedValue}">
+                        <a class="tooltip" href="#">
+                            <img src="${ctxPath}/static/images/info.png" style="vertical-align:middle">
+                            <span>The value of this row is the decoded version of the original hex value.</span>
+                        </a>
+                    </c:if>
+                </td>
                 <td>${v.measurand}</td>
                 <td>${v.location}</td>
                 <td>${v.unit}</td>

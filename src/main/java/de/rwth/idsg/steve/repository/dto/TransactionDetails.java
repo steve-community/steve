@@ -52,5 +52,8 @@ public class TransactionDetails {
 
         // New in OCPP 1.6
         private final String phase;
+
+        // value converted from hex to text format, if format=SignedData. otherwise, null.
+        private final String decodedValue;
     }
 }

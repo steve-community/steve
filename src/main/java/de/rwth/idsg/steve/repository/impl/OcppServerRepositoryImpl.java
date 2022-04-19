@@ -21,6 +21,7 @@ package de.rwth.idsg.steve.repository.impl;
 import com.google.common.base.Throwables;
 import com.google.common.util.concurrent.Striped;
 import de.rwth.idsg.steve.SteveException;
+import de.rwth.idsg.steve.ocpp.OcppProtocol;
 import de.rwth.idsg.steve.repository.OcppServerRepository;
 import de.rwth.idsg.steve.repository.ReservationRepository;
 import de.rwth.idsg.steve.repository.dto.InsertConnectorStatusParams;
@@ -90,6 +91,14 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
            .set(CHARGE_BOX.LAST_HEARTBEAT_TIMESTAMP, p.getHeartbeatTimestamp())
            .where(CHARGE_BOX.CHARGE_BOX_ID.equal(p.getChargeBoxId()))
            .execute();
+    }
+
+    @Override
+    public void updateOcppProtocol(String chargeBoxIdentity, OcppProtocol protocol) {
+        ctx.update(CHARGE_BOX)
+            .set(CHARGE_BOX.OCPP_PROTOCOL, protocol.getCompositeValue())
+            .where(CHARGE_BOX.CHARGE_BOX_ID.equal(chargeBoxIdentity))
+            .execute();
     }
 
     @Override

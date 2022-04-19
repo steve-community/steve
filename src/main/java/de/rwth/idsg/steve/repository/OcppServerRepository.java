@@ -18,6 +18,7 @@
  */
 package de.rwth.idsg.steve.repository;
 
+import de.rwth.idsg.steve.ocpp.OcppProtocol;
 import de.rwth.idsg.steve.repository.dto.InsertConnectorStatusParams;
 import de.rwth.idsg.steve.repository.dto.InsertTransactionParams;
 import de.rwth.idsg.steve.repository.dto.UpdateChargeboxParams;
@@ -34,6 +35,7 @@ import java.util.List;
 public interface OcppServerRepository {
 
     void updateChargebox(UpdateChargeboxParams params);
+    void updateOcppProtocol(String chargeBoxId, OcppProtocol protocol);
     void updateEndpointAddress(String chargeBoxIdentity, String endpointAddress);
     void updateChargeboxFirmwareStatus(String chargeBoxIdentity, String firmwareStatus);
     void updateChargeboxDiagnosticsStatus(String chargeBoxIdentity, String status);

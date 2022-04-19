@@ -44,4 +44,13 @@ public enum OcppVersion {
         }
         throw new IllegalArgumentException(v);
     }
+
+    public OcppProtocol toProtocol(OcppTransport transport) {
+        for (OcppProtocol value : OcppProtocol.values()) {
+            if (value.getVersion() == this && value.getTransport() == transport) {
+                return value;
+            }
+        }
+        throw new IllegalArgumentException("Could not find OcppProtocol for " + transport);
+    }
 }

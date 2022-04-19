@@ -40,6 +40,7 @@ table.userInputFullPage td:first-child {width: 50%; text-align: right; padding: 
 table.sll { padding-bottom: 40px; }
 table.res {
 	border-collapse: collapse;
+	table-layout:fixed;
 }
 table.res th {
 	text-align: center;
@@ -60,6 +61,7 @@ table.res td {
 	padding: 5px;
 	text-align: center;
 	width: auto;
+	word-wrap: break-word;
 }
 /*** Table for charge point details ***/
 table.cpd {

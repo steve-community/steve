@@ -18,6 +18,7 @@
  */
 package de.rwth.idsg.steve.ocpp.ws;
 
+import de.rwth.idsg.steve.config.WebSocketConfiguration;
 import de.rwth.idsg.steve.service.ChargePointHelperService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -36,6 +37,8 @@ import org.springframework.web.socket.server.support.DefaultHandshakeHandler;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+
+import static de.rwth.idsg.steve.utils.StringUtils.getLastBitFromUrl;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -102,13 +105,6 @@ public class OcppWebSocketHandshakeHandler implements HandshakeHandler {
 
         log.debug("ChargeBoxId '{}' will be using {}", chargeBoxId, endpoint.getClass().getSimpleName());
         return delegate.doHandshake(request, response, endpoint, attributes);
-    }
-
-    /**
-     * Taken from: http://stackoverflow.com/a/4050276
-     */
-    private static String getLastBitFromUrl(final String url) {
-        return url.replaceFirst(".*/([^/?]+).*", "$1");
     }
 
     private AbstractWebSocketEndpoint selectEndpoint(List<String> requestedProtocols ) {

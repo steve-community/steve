@@ -174,3 +174,8 @@ Are you having issues?
 -----
 See the [FAQ](https://github.com/RWTH-i5-IDSG/steve/wiki/FAQ)
 
+Acknowledgments
+-----
+[goekay](https://github.com/goekay) thanks to
+- [JetBrains](https://jb.gg/OpenSourceSupport) who support this project by providing a free All Products Pack license, and
+- ej-technologies GmbH who support this project by providing a free license for their [Java profiler](https://www.ej-technologies.com/products/jprofiler/overview.html).

@@ -48,6 +48,7 @@ import org.eclipse.jetty.websocket.client.WebSocketClient;
 
 import java.io.IOException;
 import java.net.URI;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -87,6 +88,7 @@ public class OcppJsonChargePoint {
         this.deserializer = new ResponseDeserializer();
         this.client = new WebSocketClient();
         this.closeHappenedSignal = new CountDownLatch(1);
+        this.client.setIdleTimeout(Duration.ofHours(1));
     }
 
     @OnWebSocketConnect
@@ -139,6 +141,47 @@ public class OcppJsonChargePoint {
         } catch (Throwable t) {
             throw new RuntimeException(t);
         }
+    }
+
+    public <T extends ResponseType> void send(RequestType request, Class<T> responseClass,
+                                              Consumer<T> responseHandler, Consumer<OcppJsonError> errorHandler) {
+        String messageId = UUID.randomUUID().toString();
+
+        OcppJsonCall call = new OcppJsonCall();
+        call.setMessageId(messageId);
+        call.setPayload(request);
+        call.setAction(getOperationName(request));
+
+        // session is null, because we do not need org.springframework.web.socket.WebSocketSession
+        CommunicationContext ctx = new CommunicationContext(null, chargeBoxId);
+        ctx.setOutgoingMessage(call);
+
+        Serializer.INSTANCE.accept(ctx);
+
+        ResponseContext resCtx = new ResponseContext(ctx.getOutgoingString(), responseClass, responseHandler, errorHandler);
+        responseContextMap.put(messageId, resCtx);
+
+        // copy the values in a new list to be iterated over, because otherwise we get a ConcurrentModificationException,
+        // since the onMessage(..) uses the same responseContextMap to remove an item while looping over its items here.
+        ArrayList<ResponseContext> values = new ArrayList<>(responseContextMap.values());
+
+        receivedResponsesSignal = new CountDownLatch(values.size());
+
+        // send all messages
+        try {
+            session.getRemote().sendString(resCtx.outgoingMessage);
+        } catch (IOException e) {
+            log.error("Exception", e);
+        }
+
+        // wait for all responses to arrive and be processed
+        try {
+            receivedResponsesSignal.await();
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+
+        responseContextMap.clear();
     }
 
     public <T extends ResponseType> void prepare(RequestType request, Class<T> responseClass,

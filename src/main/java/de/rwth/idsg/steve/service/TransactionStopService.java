@@ -25,6 +25,7 @@ import de.rwth.idsg.steve.repository.TransactionRepository;
 import de.rwth.idsg.steve.repository.dto.Transaction;
 import de.rwth.idsg.steve.repository.dto.TransactionDetails;
 import de.rwth.idsg.steve.repository.dto.UpdateTransactionParams;
+import de.rwth.idsg.steve.utils.TransactionStopServiceHelper;
 import jooq.steve.db.enums.TransactionStopEventActor;
 import jooq.steve.db.tables.records.TransactionStartRecord;
 import lombok.Builder;
@@ -127,7 +128,7 @@ public class TransactionStopService {
     private static TransactionDetails.MeterValues findLastMeterValue(List<TransactionDetails.MeterValues> values) {
         TransactionDetails.MeterValues v =
                 values.stream()
-                      .filter(TransactionStopService::isEnergyValue)
+                      .filter(TransactionStopServiceHelper::isEnergyValue)
                       .max(Comparator.comparing(TransactionDetails.MeterValues::getValueTimestamp))
                       .orElse(null);
 
@@ -157,26 +158,6 @@ public class TransactionStopService {
     private static String floatingStringToIntString(String s) {
         // meter values can be floating, whereas start/end values are int
         return Integer.toString((int) Math.ceil(Double.parseDouble(s)));
-    }
-
-    private static boolean isEnergyValue(TransactionDetails.MeterValues v) {
-        // should not happen, but check it to be safe.
-        // https://github.com/RWTH-i5-IDSG/steve/issues/249
-        if (Strings.isNullOrEmpty(v.getValue())) {
-            return false;
-        }
-
-        // if the format is not "Raw" we cannot make any sense of this entry. we don't know how to decode it.
-        // https://github.com/RWTH-i5-IDSG/steve/issues/816
-        if (ValueFormat.SIGNED_DATA.value().equals(v.getFormat())) {
-            return false;
-        }
-
-        if (v.getUnit() == null) {
-            return v.getMeasurand() == null || v.getMeasurand().startsWith("Energy.Active.Import");
-        } else {
-            return UnitOfMeasure.WH.value().equals(v.getUnit()) || UnitOfMeasure.K_WH.value().equals(v.getUnit());
-        }
     }
 
     @Builder

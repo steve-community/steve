@@ -29,6 +29,7 @@ import jooq.steve.db.enums.TransactionStopEventActor;
 import jooq.steve.db.tables.records.TransactionStartRecord;
 import lombok.Builder;
 import ocpp.cs._2012._06.UnitOfMeasure;
+import ocpp.cs._2015._10.ValueFormat;
 import org.jetbrains.annotations.Nullable;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -162,6 +163,12 @@ public class TransactionStopService {
         // should not happen, but check it to be safe.
         // https://github.com/RWTH-i5-IDSG/steve/issues/249
         if (Strings.isNullOrEmpty(v.getValue())) {
+            return false;
+        }
+
+        // if the format is not "Raw" we cannot make any sense of this entry. we don't know how to decode it.
+        // https://github.com/RWTH-i5-IDSG/steve/issues/816
+        if (ValueFormat.SIGNED_DATA.value().equals(v.getFormat())) {
             return false;
         }
 

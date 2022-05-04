@@ -25,6 +25,14 @@ public class TransactionStopServiceHelper {
             return false;
         }
 
+        // is it a proper numeric/decimal value?
+        try {
+            Double.parseDouble(v.getValue());
+        } catch (Exception e) {
+            // swallow the exception. we got what we wanted.
+            return false;
+        }
+
         // from 1.6 docs: "To retain backward compatibility, the default values of all of the optional fields on a
         // sampledValue element are such that a value without any additional fields will be interpreted, as a register
         // reading of active import energy in Wh (Watt-hour) units."

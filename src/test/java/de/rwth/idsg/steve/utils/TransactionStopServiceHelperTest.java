@@ -45,6 +45,15 @@ public class TransactionStopServiceHelperTest {
     }
 
     @Test
+    public void testIsEnergy_onlyValueDecimal() {
+        var value = TransactionDetails.MeterValues.builder()
+            .value("22.5")
+            .build();
+
+        Assertions.assertTrue(TransactionStopServiceHelper.isEnergyValue(value));
+    }
+
+    @Test
     public void testIsEnergy_signedData() {
         var value = TransactionDetails.MeterValues.builder()
             .value("some gibberish that is not an energy value")
@@ -114,4 +123,15 @@ public class TransactionStopServiceHelperTest {
         Assertions.assertTrue(TransactionStopServiceHelper.isEnergyValue(value));
     }
 
+    @Test
+    public void testIsEnergy_nonNumericValue() {
+        var value = TransactionDetails.MeterValues.builder()
+            .value("22a819()b")
+            .format("Raw")
+            .unit("Wh")
+            .measurand("Energy.Active.Import.Register")
+            .build();
+
+        Assertions.assertFalse(TransactionStopServiceHelper.isEnergyValue(value));
+    }
 }

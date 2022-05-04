@@ -18,13 +18,13 @@
  */
 package de.rwth.idsg.steve.service;
 
-import com.google.common.base.Strings;
 import com.google.common.collect.Ordering;
 import de.rwth.idsg.steve.repository.OcppServerRepository;
 import de.rwth.idsg.steve.repository.TransactionRepository;
 import de.rwth.idsg.steve.repository.dto.Transaction;
 import de.rwth.idsg.steve.repository.dto.TransactionDetails;
 import de.rwth.idsg.steve.repository.dto.UpdateTransactionParams;
+import de.rwth.idsg.steve.utils.TransactionStopServiceHelper;
 import jooq.steve.db.enums.TransactionStopEventActor;
 import jooq.steve.db.tables.records.TransactionStartRecord;
 import lombok.Builder;
@@ -36,6 +36,9 @@ import org.springframework.stereotype.Service;
 
 import java.util.Comparator;
 import java.util.List;
+
+import static de.rwth.idsg.steve.utils.TransactionStopServiceHelper.floatingStringToIntString;
+import static de.rwth.idsg.steve.utils.TransactionStopServiceHelper.kWhStringToWhString;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -126,7 +129,7 @@ public class TransactionStopService {
     private static TransactionDetails.MeterValues findLastMeterValue(List<TransactionDetails.MeterValues> values) {
         TransactionDetails.MeterValues v =
                 values.stream()
-                      .filter(TransactionStopService::isEnergyValue)
+                      .filter(TransactionStopServiceHelper::isEnergyValue)
                       .max(Comparator.comparing(TransactionDetails.MeterValues::getValueTimestamp))
                       .orElse(null);
 
@@ -137,9 +140,8 @@ public class TransactionStopService {
 
         // convert kWh to Wh
         if (UnitOfMeasure.K_WH.value().equals(v.getUnit())) {
-            double kWhValue = Double.parseDouble(v.getValue());
             return TransactionDetails.MeterValues.builder()
-                                                 .value(Double.toString(kWhValue * 1000))
+                                                 .value(kWhStringToWhString(v.getValue()))
                                                  .valueTimestamp(v.getValueTimestamp())
                                                  .readingContext(v.getReadingContext())
                                                  .format(v.getFormat())
@@ -150,25 +152,6 @@ public class TransactionStopService {
                                                  .build();
         } else {
             return v;
-        }
-    }
-
-    private static String floatingStringToIntString(String s) {
-        // meter values can be floating, whereas start/end values are int
-        return Integer.toString((int) Math.ceil(Double.parseDouble(s)));
-    }
-
-    private static boolean isEnergyValue(TransactionDetails.MeterValues v) {
-        // should not happen, but check it to be safe.
-        // https://github.com/RWTH-i5-IDSG/steve/issues/249
-        if (Strings.isNullOrEmpty(v.getValue())) {
-            return false;
-        }
-
-        if (v.getUnit() == null) {
-            return v.getMeasurand() == null || v.getMeasurand().startsWith("Energy.Active.Import");
-        } else {
-            return UnitOfMeasure.WH.value().equals(v.getUnit()) || UnitOfMeasure.K_WH.value().equals(v.getUnit());
         }
     }
 

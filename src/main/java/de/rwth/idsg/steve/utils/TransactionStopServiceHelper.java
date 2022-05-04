@@ -8,6 +8,16 @@ import ocpp.cs._2015._10.ValueFormat;
 
 public class TransactionStopServiceHelper {
 
+    public static String floatingStringToIntString(String s) {
+        // meter values can be floating, whereas start/end values are int
+        return Integer.toString((int) Math.ceil(Double.parseDouble(s)));
+    }
+
+    public static String kWhStringToWhString(String s) {
+        double kWhValue = Double.parseDouble(s);
+        return Double.toString(kWhValue * 1000);
+    }
+
     public static boolean isEnergyValue(TransactionDetails.MeterValues v) {
         // should not happen, but check it to be safe.
         // https://github.com/RWTH-i5-IDSG/steve/issues/249

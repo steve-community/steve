@@ -7,6 +7,27 @@ import org.junit.jupiter.api.Test;
 public class TransactionStopServiceHelperTest {
 
     @Test
+    public void testFloatingStringToIntString() {
+        String actual = TransactionStopServiceHelper.floatingStringToIntString("11.01");
+
+        Assertions.assertEquals("12", actual);
+    }
+
+    @Test
+    public void testFloatingStringToIntString2() {
+        String actual = TransactionStopServiceHelper.floatingStringToIntString("234.678");
+
+        Assertions.assertEquals("235", actual);
+    }
+
+    @Test
+    public void testKWhStringToWhString() {
+        String actual = TransactionStopServiceHelper.kWhStringToWhString("12");
+
+        Assertions.assertEquals("12000.0", actual);
+    }
+
+    @Test
     public void testIsEnergy_empty() {
         var value = TransactionDetails.MeterValues.builder()
             .build();

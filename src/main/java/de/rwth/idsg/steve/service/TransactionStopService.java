@@ -18,7 +18,6 @@
  */
 package de.rwth.idsg.steve.service;
 
-import com.google.common.base.Strings;
 import com.google.common.collect.Ordering;
 import de.rwth.idsg.steve.repository.OcppServerRepository;
 import de.rwth.idsg.steve.repository.TransactionRepository;
@@ -30,7 +29,6 @@ import jooq.steve.db.enums.TransactionStopEventActor;
 import jooq.steve.db.tables.records.TransactionStartRecord;
 import lombok.Builder;
 import ocpp.cs._2012._06.UnitOfMeasure;
-import ocpp.cs._2015._10.ValueFormat;
 import org.jetbrains.annotations.Nullable;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,6 +36,9 @@ import org.springframework.stereotype.Service;
 
 import java.util.Comparator;
 import java.util.List;
+
+import static de.rwth.idsg.steve.utils.TransactionStopServiceHelper.floatingStringToIntString;
+import static de.rwth.idsg.steve.utils.TransactionStopServiceHelper.kWhStringToWhString;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -139,9 +140,8 @@ public class TransactionStopService {
 
         // convert kWh to Wh
         if (UnitOfMeasure.K_WH.value().equals(v.getUnit())) {
-            double kWhValue = Double.parseDouble(v.getValue());
             return TransactionDetails.MeterValues.builder()
-                                                 .value(Double.toString(kWhValue * 1000))
+                                                 .value(kWhStringToWhString(v.getValue()))
                                                  .valueTimestamp(v.getValueTimestamp())
                                                  .readingContext(v.getReadingContext())
                                                  .format(v.getFormat())
@@ -153,11 +153,6 @@ public class TransactionStopService {
         } else {
             return v;
         }
-    }
-
-    private static String floatingStringToIntString(String s) {
-        // meter values can be floating, whereas start/end values are int
-        return Integer.toString((int) Math.ceil(Double.parseDouble(s)));
     }
 
     @Builder

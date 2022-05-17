@@ -28,7 +28,9 @@
         </td>
             <td>
                 <form:select path="confKeyList" multiple="true" size="14" >
-                    <form:options items="${ocppConfKeys}" />
+                    <c:forEach items="${ocppConfKeys}" var="k">
+                    <option value="${k.getKey()}" label="${k.getValue()}" title="${k.getValue()}">
+                    </c:forEach>
                 </form:select>
             </td>
         </tr>

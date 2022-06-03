@@ -104,6 +104,7 @@ Transactions
                 <th data-sort="int">Start Value</th>
                 <th data-sort="date">Stop Date/Time</th>
                 <th data-sort="int">Stop Value</th>
+                <th data-sort="int">Energy charged Wh</th>
                 <th data-sort="string">Stop Reason</th>
                 <th></th>
             </tr>
@@ -119,6 +120,7 @@ Transactions
                 <td>${ta.startValue}</td>
                 <td data-sort-value="${ta.stopTimestampDT.millis}">${ta.stopTimestamp}</td>
                 <td>${ta.stopValue}</td>
+                <td>${ta.stopValue-ta.startValue}</td>
                 <td>${ta.stopReason}</td>
                 <td>
                     <c:if test="${empty ta.stopValue}">

@@ -34,7 +34,7 @@
 
         <jooq.version>3.16.6</jooq.version>
         <cxf.version>3.5.2</cxf.version>
-        <spring.version>5.3.20</spring.version>
+        <spring.version>5.3.21</spring.version>
         <spring.security.version>5.7.1</spring.security.version>
         <mysql.jdbc.version>8.0.29</mysql.jdbc.version>
         <jetty.version>10.0.7</jetty.version>
@@ -147,7 +147,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-enforcer-plugin</artifactId>
-                <version>3.0.0</version>
+                <version>3.1.0</version>
                 <executions>
                     <execution>
                         <id>enforce-java</id>

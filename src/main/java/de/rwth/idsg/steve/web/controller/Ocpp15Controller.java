@@ -102,7 +102,7 @@ public class Ocpp15Controller extends Ocpp12Controller {
     }
 
     private void setAllUserIdTagList(Model model) {
-        model.addAttribute("idTagList", ocppTagRepository.getIdTags());
+        model.addAttribute("idTagList", ocppTagService.getIdTags());
     }
 
     // -------------------------------------------------------------------------

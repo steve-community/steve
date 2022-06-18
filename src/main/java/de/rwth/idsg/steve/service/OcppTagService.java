@@ -22,7 +22,10 @@ import com.google.common.base.Strings;
 import de.rwth.idsg.steve.SteveException;
 import de.rwth.idsg.steve.repository.OcppTagRepository;
 import de.rwth.idsg.steve.repository.SettingsRepository;
+import de.rwth.idsg.steve.repository.dto.OcppTag;
 import de.rwth.idsg.steve.service.dto.UnidentifiedIncomingObject;
+import de.rwth.idsg.steve.web.dto.OcppTagForm;
+import de.rwth.idsg.steve.web.dto.OcppTagQueryForm;
 import jooq.steve.db.tables.records.OcppTagActivityRecord;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -60,6 +63,46 @@ public class OcppTagService {
     public List<AuthorizationData> getAuthData(List<String> idTagList) {
         return ocppTagRepository.getRecords(idTagList)
                                 .map(new AuthorisationDataMapper());
+    }
+
+    public List<OcppTag.Overview> getOverview(OcppTagQueryForm form) {
+        return ocppTagRepository.getOverview(form);
+    }
+
+    public List<String> getParentIdTags() {
+        return ocppTagRepository.getParentIdTags();
+    }
+
+    public String getParentIdtag(String idTag) {
+        return ocppTagRepository.getParentIdtag(idTag);
+    }
+
+    public List<String> getIdTags() {
+        return ocppTagRepository.getIdTags();
+    }
+
+    public List<String> getActiveIdTags() {
+        return ocppTagRepository.getActiveIdTags();
+    }
+
+    public void addOcppTagList(List<String> idTagList) {
+        ocppTagRepository.addOcppTagList(idTagList);
+    }
+
+    public int addOcppTag(OcppTagForm form) {
+        return ocppTagRepository.addOcppTag(form);
+    }
+
+    public void updateOcppTag(OcppTagForm form) {
+        ocppTagRepository.updateOcppTag(form);
+    }
+
+    public void deleteOcppTag(int ocppTagPk) {
+        ocppTagRepository.deleteOcppTag(ocppTagPk);
+    }
+
+    public OcppTagActivityRecord getRecord(int ocppTagPk) {
+        return ocppTagRepository.getRecord(ocppTagPk);
     }
 
     public List<UnidentifiedIncomingObject> getUnknownOcppTags() {

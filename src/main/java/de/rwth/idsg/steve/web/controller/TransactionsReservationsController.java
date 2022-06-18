@@ -18,11 +18,11 @@
  */
 package de.rwth.idsg.steve.web.controller;
 
-import de.rwth.idsg.steve.repository.ChargePointRepository;
-import de.rwth.idsg.steve.repository.OcppTagRepository;
 import de.rwth.idsg.steve.repository.ReservationRepository;
 import de.rwth.idsg.steve.repository.ReservationStatus;
 import de.rwth.idsg.steve.repository.TransactionRepository;
+import de.rwth.idsg.steve.service.ChargePointService;
+import de.rwth.idsg.steve.service.OcppTagService;
 import de.rwth.idsg.steve.service.TransactionStopService;
 import de.rwth.idsg.steve.web.dto.ReservationQueryForm;
 import de.rwth.idsg.steve.web.dto.TransactionQueryForm;
@@ -51,8 +51,8 @@ public class TransactionsReservationsController {
 
     @Autowired private TransactionRepository transactionRepository;
     @Autowired private ReservationRepository reservationRepository;
-    @Autowired private ChargePointRepository chargePointRepository;
-    @Autowired private OcppTagRepository ocppTagRepository;
+    @Autowired private ChargePointService chargePointService;
+    @Autowired private OcppTagService ocppTagService;
     @Autowired private TransactionStopService transactionStopService;
 
     private static final String PARAMS = "params";
@@ -144,8 +144,8 @@ public class TransactionsReservationsController {
     }
 
     private void initList(Model model) {
-        model.addAttribute("cpList", chargePointRepository.getChargeBoxIds());
-        model.addAttribute("idTagList", ocppTagRepository.getIdTags());
+        model.addAttribute("cpList", chargePointService.getChargeBoxIds());
+        model.addAttribute("idTagList", ocppTagService.getIdTags());
     }
 
     private void initResList(Model model) {

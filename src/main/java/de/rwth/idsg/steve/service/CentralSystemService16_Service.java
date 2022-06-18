@@ -58,6 +58,7 @@ import ocpp.cs._2015._10.StopTransactionRequest;
 import ocpp.cs._2015._10.StopTransactionResponse;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -74,14 +75,14 @@ public class CentralSystemService16_Service {
     @Autowired private SettingsRepository settingsRepository;
 
     @Autowired private OcppTagService ocppTagService;
-    @Autowired private NotificationService notificationService;
+    @Autowired private ApplicationEventPublisher applicationEventPublisher;
     @Autowired private ChargePointHelperService chargePointHelperService;
 
     public BootNotificationResponse bootNotification(BootNotificationRequest parameters, String chargeBoxIdentity,
                                                      OcppProtocol ocppProtocol) {
 
         Optional<RegistrationStatus> status = chargePointHelperService.getRegistrationStatus(chargeBoxIdentity);
-        notificationService.ocppStationBooted(new OccpStationBooted(chargeBoxIdentity, status));
+        applicationEventPublisher.publishEvent(new OccpStationBooted(chargeBoxIdentity, status));
         DateTime now = DateTime.now();
 
         if (status.isEmpty()) {
@@ -142,7 +143,7 @@ public class CentralSystemService16_Service {
         ocppServerRepository.insertConnectorStatus(params);
 
         if (parameters.getStatus() == ChargePointStatus.FAULTED) {
-            notificationService.ocppStationStatusFailure(new OcppStationStatusFailure(
+            applicationEventPublisher.publishEvent(new OcppStationStatusFailure(
                     chargeBoxIdentity, parameters.getConnectorId(), parameters.getErrorCode().value()));
         }
 
@@ -188,7 +189,7 @@ public class CentralSystemService16_Service {
 
         int transactionId = ocppServerRepository.insertTransaction(params);
 
-        notificationService.ocppTransactionStarted(new OcppTransactionStarted(transactionId, params));
+        applicationEventPublisher.publishEvent(new OcppTransactionStarted(transactionId, params));
 
         return new StartTransactionResponse()
                 .withIdTagInfo(info)
@@ -221,7 +222,7 @@ public class CentralSystemService16_Service {
 
         ocppServerRepository.insertMeterValues(chargeBoxIdentity, parameters.getTransactionData(), transactionId);
 
-        notificationService.ocppTransactionEnded(new OcppTransactionEnded(params));
+        applicationEventPublisher.publishEvent(new OcppTransactionEnded(params));
 
         return new StopTransactionResponse().withIdTagInfo(idTagInfo);
     }

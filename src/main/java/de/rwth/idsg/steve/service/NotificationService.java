@@ -32,6 +32,7 @@ import de.rwth.idsg.steve.service.notification.OcppTransactionStarted;
 import lombok.extern.slf4j.Slf4j;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 
 import static de.rwth.idsg.steve.NotificationFeature.OcppStationBooted;
@@ -52,6 +53,7 @@ public class NotificationService {
 
     @Autowired private MailService mailService;
 
+    @EventListener
     public void ocppStationBooted(OccpStationBooted notification) {
         if (isDisabled(OcppStationBooted)) {
             return;
@@ -68,6 +70,7 @@ public class NotificationService {
         mailService.sendAsync(subject, addTimestamp(body));
     }
 
+    @EventListener
     public void ocppStationWebSocketConnected(OcppStationWebSocketConnected notification) {
         if (isDisabled(OcppStationWebSocketConnected)) {
             return;
@@ -78,6 +81,7 @@ public class NotificationService {
         mailService.sendAsync(subject, addTimestamp(""));
     }
 
+    @EventListener
     public void ocppStationWebSocketDisconnected(OcppStationWebSocketDisconnected notification) {
         if (isDisabled(OcppStationWebSocketDisconnected)) {
             return;
@@ -88,6 +92,7 @@ public class NotificationService {
         mailService.sendAsync(subject, addTimestamp(""));
     }
 
+    @EventListener
     public void ocppStationStatusFailure(OcppStationStatusFailure notification) {
         if (isDisabled(OcppStationStatusFailure)) {
             return;
@@ -99,6 +104,7 @@ public class NotificationService {
         mailService.sendAsync(subject, addTimestamp(body));
     }
 
+    @EventListener
     public void ocppTransactionStarted(OcppTransactionStarted notification) {
         if (isDisabled(OcppTransactionStarted)) {
             return;
@@ -109,6 +115,7 @@ public class NotificationService {
         mailService.sendAsync(subject, addTimestamp(createContent(notification.getParams())));
     }
 
+    @EventListener
     public void ocppTransactionEnded(OcppTransactionEnded notification) {
        if (isDisabled(OcppTransactionEnded)) {
             return;

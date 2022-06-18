@@ -27,6 +27,8 @@ import de.rwth.idsg.steve.ocpp.ws.data.SessionContext;
 import de.rwth.idsg.steve.ocpp.ws.pipeline.IncomingPipeline;
 import de.rwth.idsg.steve.repository.OcppServerRepository;
 import de.rwth.idsg.steve.service.NotificationService;
+import de.rwth.idsg.steve.service.notification.OcppStationWebSocketConnected;
+import de.rwth.idsg.steve.service.notification.OcppStationWebSocketDisconnected;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.socket.BinaryMessage;
@@ -72,8 +74,8 @@ public abstract class AbstractWebSocketEndpoint extends ConcurrentWebSocketHandl
     public void init(IncomingPipeline pipeline) {
         this.pipeline = pipeline;
 
-        connectedCallbackList.add((chargeBoxId) -> notificationService.ocppStationWebSocketConnected(chargeBoxId));
-        disconnectedCallbackList.add((chargeBoxId) -> notificationService.ocppStationWebSocketDisconnected(chargeBoxId));
+        connectedCallbackList.add((chargeBoxId) -> notificationService.ocppStationWebSocketConnected(new OcppStationWebSocketConnected(chargeBoxId)));
+        disconnectedCallbackList.add((chargeBoxId) -> notificationService.ocppStationWebSocketDisconnected(new OcppStationWebSocketDisconnected(chargeBoxId)));
     }
 
     @Override

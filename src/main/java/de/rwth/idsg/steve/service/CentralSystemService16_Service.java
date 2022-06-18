@@ -25,6 +25,10 @@ import de.rwth.idsg.steve.repository.dto.InsertConnectorStatusParams;
 import de.rwth.idsg.steve.repository.dto.InsertTransactionParams;
 import de.rwth.idsg.steve.repository.dto.UpdateChargeboxParams;
 import de.rwth.idsg.steve.repository.dto.UpdateTransactionParams;
+import de.rwth.idsg.steve.service.notification.OccpStationBooted;
+import de.rwth.idsg.steve.service.notification.OcppStationStatusFailure;
+import de.rwth.idsg.steve.service.notification.OcppTransactionEnded;
+import de.rwth.idsg.steve.service.notification.OcppTransactionStarted;
 import jooq.steve.db.enums.TransactionStopEventActor;
 import lombok.extern.slf4j.Slf4j;
 import ocpp.cs._2015._10.AuthorizationStatus;
@@ -77,7 +81,7 @@ public class CentralSystemService16_Service {
                                                      OcppProtocol ocppProtocol) {
 
         Optional<RegistrationStatus> status = chargePointHelperService.getRegistrationStatus(chargeBoxIdentity);
-        notificationService.ocppStationBooted(chargeBoxIdentity, status);
+        notificationService.ocppStationBooted(new OccpStationBooted(chargeBoxIdentity, status));
         DateTime now = DateTime.now();
 
         if (status.isEmpty()) {
@@ -138,8 +142,8 @@ public class CentralSystemService16_Service {
         ocppServerRepository.insertConnectorStatus(params);
 
         if (parameters.getStatus() == ChargePointStatus.FAULTED) {
-            notificationService.ocppStationStatusFailure(
-                    chargeBoxIdentity, parameters.getConnectorId(), parameters.getErrorCode().value());
+            notificationService.ocppStationStatusFailure(new OcppStationStatusFailure(
+                    chargeBoxIdentity, parameters.getConnectorId(), parameters.getErrorCode().value()));
         }
 
         return new StatusNotificationResponse();
@@ -184,7 +188,7 @@ public class CentralSystemService16_Service {
 
         int transactionId = ocppServerRepository.insertTransaction(params);
 
-        notificationService.ocppTransactionStarted(transactionId, params);
+        notificationService.ocppTransactionStarted(new OcppTransactionStarted(transactionId, params));
 
         return new StartTransactionResponse()
                 .withIdTagInfo(info)
@@ -217,7 +221,7 @@ public class CentralSystemService16_Service {
 
         ocppServerRepository.insertMeterValues(chargeBoxIdentity, parameters.getTransactionData(), transactionId);
 
-        notificationService.ocppTransactionEnded(params);
+        notificationService.ocppTransactionEnded(new OcppTransactionEnded(params));
 
         return new StopTransactionResponse().withIdTagInfo(idTagInfo);
     }

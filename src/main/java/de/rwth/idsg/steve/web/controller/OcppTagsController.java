@@ -111,7 +111,7 @@ public class OcppTagsController {
             return "data-man/ocppTagAdd";
         }
 
-        add(ocppTagForm);
+        ocppTagService.addOcppTag(ocppTagForm);
         return toOverview();
     }
 
@@ -124,7 +124,7 @@ public class OcppTagsController {
             return "data-man/ocppTagAdd";
         }
 
-        add(form.getIdList());
+        ocppTagService.addOcppTagList(form.getIdList());
         return toOverview();
     }
 
@@ -148,7 +148,7 @@ public class OcppTagsController {
 
     @RequestMapping(value = UNKNOWN_ADD_PATH, method = RequestMethod.POST)
     public String addUnknownIdTag(@PathVariable("idTag") String idTag) {
-        add(Collections.singletonList(idTag));
+        ocppTagService.addOcppTagList(Collections.singletonList(idTag));
         return toOverview();
     }
 
@@ -187,19 +187,4 @@ public class OcppTagsController {
     protected String toOverview() {
         return "redirect:/manager/ocppTags";
     }
-
-    // -------------------------------------------------------------------------
-    // Helpers
-    // -------------------------------------------------------------------------
-
-    private void add(OcppTagForm form) {
-        ocppTagService.addOcppTag(form);
-        ocppTagService.removeUnknown(Collections.singletonList(form.getIdTag()));
-    }
-
-    private void add(List<String> idTagList) {
-        ocppTagService.addOcppTagList(idTagList);
-        ocppTagService.removeUnknown(idTagList);
-    }
-
 }

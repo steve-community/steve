@@ -145,6 +145,8 @@ public class CentralSystemService16_Service {
         if (parameters.getStatus() == ChargePointStatus.FAULTED) {
             applicationEventPublisher.publishEvent(new OcppStationStatusFailure(
                     chargeBoxIdentity, parameters.getConnectorId(), parameters.getErrorCode().value()));
+        } else {
+            // TODO add notification (ChargePointUpdated)
         }
 
         return new StatusNotificationResponse();
@@ -157,6 +159,7 @@ public class CentralSystemService16_Service {
                 parameters.getConnectorId(),
                 parameters.getTransactionId()
         );
+        // TODO add notification OcppTransactionOnGoing
 
         return new MeterValuesResponse();
     }
@@ -221,6 +224,7 @@ public class CentralSystemService16_Service {
         ocppServerRepository.updateTransaction(params);
 
         ocppServerRepository.insertMeterValues(chargeBoxIdentity, parameters.getTransactionData(), transactionId);
+        // TODO add notification OcppTransactionOnGoing
 
         applicationEventPublisher.publishEvent(new OcppTransactionEnded(params));
 

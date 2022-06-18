@@ -30,7 +30,6 @@ import de.rwth.idsg.steve.ocpp.ws.ocpp16.Ocpp16WebSocketEndpoint;
 import de.rwth.idsg.steve.repository.GenericRepository;
 import de.rwth.idsg.steve.repository.dto.ChargePointSelect;
 import de.rwth.idsg.steve.repository.dto.ConnectorStatus;
-import de.rwth.idsg.steve.service.dto.UnidentifiedIncomingObject;
 import de.rwth.idsg.steve.utils.ConnectorStatusCountFilter;
 import de.rwth.idsg.steve.utils.DateTimeUtils;
 import de.rwth.idsg.steve.web.dto.ConnectorStatusForm;
@@ -78,7 +77,6 @@ public class ChargePointHelperService {
     @Autowired private Ocpp15WebSocketEndpoint ocpp15WebSocketEndpoint;
     @Autowired private Ocpp16WebSocketEndpoint ocpp16WebSocketEndpoint;
 
-    private final UnidentifiedIncomingObjectService unknownChargePointService = new UnidentifiedIncomingObjectService(100);
 
     public Optional<RegistrationStatus> getRegistrationStatus(String chargeBoxId) {
         Lock l = isRegisteredLocks.get(chargeBoxId);
@@ -86,7 +84,7 @@ public class ChargePointHelperService {
         try {
             Optional<RegistrationStatus> status = getRegistrationStatusInternal(chargeBoxId);
             if (status.isEmpty()) {
-                unknownChargePointService.processNewUnidentified(chargeBoxId);
+                chargePointService.proceedUnknown(chargeBoxId);
             }
             return status;
         } finally {
@@ -160,14 +158,6 @@ public class ChargePointHelperService {
             default:
                 throw new IllegalArgumentException("Unknown OCPP version: " + version);
         }
-    }
-
-    public List<UnidentifiedIncomingObject> getUnknownChargePoints() {
-        return unknownChargePointService.getObjects();
-    }
-
-    public void removeUnknown(List<String> chargeBoxIdList) {
-        unknownChargePointService.removeAll(chargeBoxIdList);
     }
 
     // -------------------------------------------------------------------------

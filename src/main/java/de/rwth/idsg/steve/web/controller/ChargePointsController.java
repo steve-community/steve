@@ -104,7 +104,7 @@ public class ChargePointsController {
     private void initList(Model model, ChargePointQueryForm params) {
         model.addAttribute(PARAMS, params);
         model.addAttribute("cpList", chargePointService.getOverview(params));
-        model.addAttribute("unknownList", chargePointHelperService.getUnknownChargePoints());
+        model.addAttribute("unknownList", chargePointService.getUnknownChargePoints());
     }
 
     @RequestMapping(value = DETAILS_PATH, method = RequestMethod.GET)
@@ -152,7 +152,7 @@ public class ChargePointsController {
             return "data-man/chargepointAdd";
         }
 
-        add(chargePointForm);
+        chargePointService.addChargePoint(chargePointForm);
         return toOverview();
     }
 
@@ -165,7 +165,7 @@ public class ChargePointsController {
             return "data-man/chargepointAdd";
         }
 
-        add(form.getIdList());
+        chargePointService.addChargePointList(form.getIdList());
         return toOverview();
     }
 
@@ -189,13 +189,13 @@ public class ChargePointsController {
 
     @RequestMapping(value = UNKNOWN_ADD_PATH, method = RequestMethod.POST)
     public String addUnknownChargeBoxId(@PathVariable("chargeBoxId") String chargeBoxId) {
-        add(Collections.singletonList(chargeBoxId));
+        chargePointService.addChargePointList(Collections.singletonList(chargeBoxId));
         return toOverview();
     }
 
     @RequestMapping(value = UNKNOWN_REMOVE_PATH, method = RequestMethod.POST)
     public String removeUnknownChargeBoxId(@PathVariable("chargeBoxId") String chargeBoxId) {
-        chargePointHelperService.removeUnknown(Collections.singletonList(chargeBoxId));
+        chargePointService.removeUnknown(Collections.singletonList(chargeBoxId));
         return toOverview();
     }
 
@@ -230,15 +230,5 @@ public class ChargePointsController {
         model.addAttribute("batchChargePointForm", new ChargePointBatchInsertForm());
         // we don't know the protocol yet. but, a list with only "accepted" and "rejected" is a good starting point.
         model.addAttribute("registrationStatusList", upToOcpp15RegistrationStatusList);
-    }
-
-    private void add(ChargePointForm form) {
-        chargePointService.addChargePoint(form);
-        chargePointHelperService.removeUnknown(Collections.singletonList(form.getChargeBoxId()));
-    }
-
-    private void add(List<String> idList) {
-        chargePointService.addChargePointList(idList);
-        chargePointHelperService.removeUnknown(idList);
     }
 }

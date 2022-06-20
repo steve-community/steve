@@ -25,6 +25,10 @@ import de.rwth.idsg.steve.repository.dto.InsertConnectorStatusParams;
 import de.rwth.idsg.steve.repository.dto.InsertTransactionParams;
 import de.rwth.idsg.steve.repository.dto.UpdateChargeboxParams;
 import de.rwth.idsg.steve.repository.dto.UpdateTransactionParams;
+import de.rwth.idsg.steve.service.notification.OccpStationBooted;
+import de.rwth.idsg.steve.service.notification.OcppStationStatusFailure;
+import de.rwth.idsg.steve.service.notification.OcppTransactionEnded;
+import de.rwth.idsg.steve.service.notification.OcppTransactionStarted;
 import jooq.steve.db.enums.TransactionStopEventActor;
 import lombok.extern.slf4j.Slf4j;
 import ocpp.cs._2015._10.AuthorizationStatus;
@@ -54,6 +58,7 @@ import ocpp.cs._2015._10.StopTransactionRequest;
 import ocpp.cs._2015._10.StopTransactionResponse;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -70,14 +75,14 @@ public class CentralSystemService16_Service {
     @Autowired private SettingsRepository settingsRepository;
 
     @Autowired private OcppTagService ocppTagService;
-    @Autowired private NotificationService notificationService;
+    @Autowired private ApplicationEventPublisher applicationEventPublisher;
     @Autowired private ChargePointHelperService chargePointHelperService;
 
     public BootNotificationResponse bootNotification(BootNotificationRequest parameters, String chargeBoxIdentity,
                                                      OcppProtocol ocppProtocol) {
 
         Optional<RegistrationStatus> status = chargePointHelperService.getRegistrationStatus(chargeBoxIdentity);
-        notificationService.ocppStationBooted(chargeBoxIdentity, status);
+        applicationEventPublisher.publishEvent(new OccpStationBooted(chargeBoxIdentity, status));
         DateTime now = DateTime.now();
 
         if (status.isEmpty()) {
@@ -138,8 +143,8 @@ public class CentralSystemService16_Service {
         ocppServerRepository.insertConnectorStatus(params);
 
         if (parameters.getStatus() == ChargePointStatus.FAULTED) {
-            notificationService.ocppStationStatusFailure(
-                    chargeBoxIdentity, parameters.getConnectorId(), parameters.getErrorCode().value());
+            applicationEventPublisher.publishEvent(new OcppStationStatusFailure(
+                    chargeBoxIdentity, parameters.getConnectorId(), parameters.getErrorCode().value()));
         }
 
         return new StatusNotificationResponse();
@@ -184,7 +189,7 @@ public class CentralSystemService16_Service {
 
         int transactionId = ocppServerRepository.insertTransaction(params);
 
-        notificationService.ocppTransactionStarted(transactionId, params);
+        applicationEventPublisher.publishEvent(new OcppTransactionStarted(transactionId, params));
 
         return new StartTransactionResponse()
                 .withIdTagInfo(info)
@@ -217,7 +222,7 @@ public class CentralSystemService16_Service {
 
         ocppServerRepository.insertMeterValues(chargeBoxIdentity, parameters.getTransactionData(), transactionId);
 
-        notificationService.ocppTransactionEnded(params);
+        applicationEventPublisher.publishEvent(new OcppTransactionEnded(params));
 
         return new StopTransactionResponse().withIdTagInfo(idTagInfo);
     }

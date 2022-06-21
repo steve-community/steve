@@ -156,7 +156,7 @@ public class OcppTagsController {
 
     @RequestMapping(value = UNKNOWN_REMOVE_PATH, method = RequestMethod.POST)
     public String removeUnknownIdTag(@PathVariable("idTag") String idTag) {
-        ocppTagService.removeUnknown(idTag);
+        ocppTagService.removeUnknown(Collections.singletonList(idTag));
         return toOverview();
     }
 
@@ -196,7 +196,7 @@ public class OcppTagsController {
 
     private void add(OcppTagForm form) {
         ocppTagRepository.addOcppTag(form);
-        ocppTagService.removeUnknown(form.getIdTag());
+        ocppTagService.removeUnknown(Collections.singletonList(form.getIdTag()));
     }
 
     private void add(List<String> idTagList) {

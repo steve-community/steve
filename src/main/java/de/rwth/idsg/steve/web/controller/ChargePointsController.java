@@ -195,7 +195,7 @@ public class ChargePointsController {
 
     @RequestMapping(value = UNKNOWN_REMOVE_PATH, method = RequestMethod.POST)
     public String removeUnknownChargeBoxId(@PathVariable("chargeBoxId") String chargeBoxId) {
-        chargePointHelperService.removeUnknown(chargeBoxId);
+        chargePointHelperService.removeUnknown(Collections.singletonList(chargeBoxId));
         return toOverview();
     }
 
@@ -234,7 +234,7 @@ public class ChargePointsController {
 
     private void add(ChargePointForm form) {
         chargePointRepository.addChargePoint(form);
-        chargePointHelperService.removeUnknown(form.getChargeBoxId());
+        chargePointHelperService.removeUnknown(Collections.singletonList(form.getChargeBoxId()));
     }
 
     private void add(List<String> idList) {

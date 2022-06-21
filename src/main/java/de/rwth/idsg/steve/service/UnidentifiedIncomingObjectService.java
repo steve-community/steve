@@ -66,16 +66,6 @@ public class UnidentifiedIncomingObjectService {
         }
     }
 
-    public void remove(String key) {
-        synchronized (changeLock) {
-            try {
-                objectsHolder.invalidate(key);
-            } catch (Exception e) {
-                log.error("Error occurred", e);
-            }
-        }
-    }
-
     public void removeAll(Iterable<String> keys) {
         synchronized (changeLock) {
             try {

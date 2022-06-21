@@ -66,10 +66,6 @@ public class OcppTagService {
         return invalidOcppTagService.getObjects();
     }
 
-    public void removeUnknown(String idTag) {
-        invalidOcppTagService.remove(idTag);
-    }
-
     public void removeUnknown(List<String> idTagList) {
         invalidOcppTagService.removeAll(idTagList);
     }

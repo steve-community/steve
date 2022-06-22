@@ -49,7 +49,7 @@ import static java.lang.String.format;
  */
 @Slf4j
 @Service
-public class NotificationService {
+public class MailNotificationService {
 
     @Autowired private MailService mailService;
 

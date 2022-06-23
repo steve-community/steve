@@ -558,11 +558,14 @@ public class OcppMiddlewareImpl implements OcppMiddleware {
             connectorMeterValues = connectorMeterValueService.getConnectorMeterValueByTransactionAndMeasurand(transaction, null);
         }
 
-        diffUnit = connectorMeterValues.get(0).getUnit();
-        if (diffUnit == null) {
-            diffUnit = UNIT_WH;
+        if (connectorMeterValues.size() > 1) {
+            diffUnit = connectorMeterValues.get(0).getUnit();
+            if (diffUnit == null) {
+                diffUnit = UNIT_WH;
+            }
+            diff = parseFloat(connectorMeterValues.get(0).getValue())
+                    - parseFloat(connectorMeterValues.get(connectorMeterValues.size() - 1).getValue());
         }
-        diff = parseFloat(connectorMeterValues.get(0).getValue()) - parseFloat(transaction.getStartValue());
 
         return new PowerValue(diff, diffUnit);
 

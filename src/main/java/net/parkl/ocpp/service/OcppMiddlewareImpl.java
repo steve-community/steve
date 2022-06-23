@@ -553,25 +553,20 @@ public class OcppMiddlewareImpl implements OcppMiddleware {
                 connectorMeterValueService.getConnectorMeterValueByTransactionAndMeasurand(transaction, MEASURAND_ENERGY_ACTIVE_IMPORT);
         float diff = 0;
         String diffUnit = null;
-        if (!connectorMeterValues.isEmpty()) {
-
-            if (connectorMeterValues.size() > 1) {
-                diffUnit = connectorMeterValues.get(0).getUnit();
-                diff = parseFloat(connectorMeterValues.get(0).getValue())
-                        - parseFloat(connectorMeterValues.get(connectorMeterValues.size() - 1).getValue());
-            }
-        } else {
+        if (connectorMeterValues.isEmpty()) {
             //handle Mennekes type chargers (no measurand, no unit)
             connectorMeterValues = connectorMeterValueService.getConnectorMeterValueByTransactionAndMeasurand(transaction, null);
-            if (connectorMeterValues.size() > 1) {
-                diffUnit = connectorMeterValues.get(0).getUnit();
-                if (diffUnit == null) {
-                    diffUnit = UNIT_WH;
-                }
-                diff = parseFloat(connectorMeterValues.get(0).getValue())
-                        - parseFloat(connectorMeterValues.get(connectorMeterValues.size() - 1).getValue());
-            }
         }
+
+        if (connectorMeterValues.size() > 1) {
+            diffUnit = connectorMeterValues.get(0).getUnit();
+            if (diffUnit == null) {
+                diffUnit = UNIT_WH;
+            }
+            diff = parseFloat(connectorMeterValues.get(0).getValue())
+                    - parseFloat(connectorMeterValues.get(connectorMeterValues.size() - 1).getValue());
+        }
+
         return new PowerValue(diff, diffUnit);
 
     }
@@ -1080,7 +1075,7 @@ public class OcppMiddlewareImpl implements OcppMiddleware {
                 OcppChargingProcess process = chargingProcessService.findOcppChargingProcess(chargingProcessId);
 
                 log.info("Successfully stopped charging process with timeout, notifying server: {}...",
-                         process.getOcppChargingProcessId());
+                        process.getOcppChargingProcessId());
                 ESPChargingData data = ESPChargingData.builder()
                         .start(process.getStartDate())
                         .end(process.getEndDate())
@@ -1136,6 +1131,6 @@ public class OcppMiddlewareImpl implements OcppMiddleware {
     @Override
     public ChargingConsumptionState findByExternalChargeId(String externalChargeId) {
         return consumptionStateRepository.findById(externalChargeId)
-                .orElseThrow(()->new IllegalArgumentException("Invalid externalChargeId specified"));
+                .orElseThrow(() -> new IllegalArgumentException("Invalid externalChargeId specified"));
     }
 }

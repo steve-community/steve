@@ -18,9 +18,9 @@
  */
 package de.rwth.idsg.steve.web.controller;
 
-import de.rwth.idsg.steve.NotificationFeature;
 import de.rwth.idsg.steve.repository.GenericRepository;
 import de.rwth.idsg.steve.repository.SettingsRepository;
+import de.rwth.idsg.steve.service.MailNotificationService;
 import de.rwth.idsg.steve.service.MailService;
 import de.rwth.idsg.steve.service.ReleaseCheckService;
 import de.rwth.idsg.steve.web.dto.EndpointInfo;
@@ -80,7 +80,7 @@ public class AboutSettingsController {
     @RequestMapping(value = SETTINGS_PATH, method = RequestMethod.GET)
     public String getSettings(Model model) {
         SettingsForm form = settingsRepository.getForm();
-        model.addAttribute("features", NotificationFeature.values());
+        model.addAttribute("features", MailNotificationService.SUPPORTED_FEATURES);
         model.addAttribute("settingsForm", form);
         return "settings";
     }
@@ -89,7 +89,7 @@ public class AboutSettingsController {
     public String postSettings(@Valid @ModelAttribute("settingsForm") SettingsForm settingsForm,
                                BindingResult result, Model model) {
         if (result.hasErrors()) {
-            model.addAttribute("features", NotificationFeature.values());
+            model.addAttribute("features", MailNotificationService.SUPPORTED_FEATURES);
             return "settings";
         }
 
@@ -102,7 +102,7 @@ public class AboutSettingsController {
     public String testMail(@Valid @ModelAttribute("settingsForm") SettingsForm settingsForm,
                            BindingResult result, Model model) {
         if (result.hasErrors()) {
-            model.addAttribute("features", NotificationFeature.values());
+            model.addAttribute("features", MailNotificationService.SUPPORTED_FEATURES);
             return "settings";
         }
 

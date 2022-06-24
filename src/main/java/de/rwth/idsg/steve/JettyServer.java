@@ -22,7 +22,14 @@ import de.rwth.idsg.steve.web.dto.EndpointInfo;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.jetty.http.HttpScheme;
 import org.eclipse.jetty.http.HttpVersion;
-import org.eclipse.jetty.server.*;
+import org.eclipse.jetty.server.Connector;
+import org.eclipse.jetty.server.ForwardedRequestCustomizer;
+import org.eclipse.jetty.server.HttpConfiguration;
+import org.eclipse.jetty.server.HttpConnectionFactory;
+import org.eclipse.jetty.server.SecureRequestCustomizer;
+import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.server.ServerConnector;
+import org.eclipse.jetty.server.SslConnectionFactory;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.eclipse.jetty.util.thread.QueuedThreadPool;
 import org.eclipse.jetty.util.thread.ScheduledExecutorScheduler;
@@ -91,6 +98,7 @@ public class JettyServer {
         httpConfig.setSendXPoweredBy(false);
 
         // make sure X-Forwarded-For headers are picked up if set (e.g. by a load balancer)
+        // https://github.com/RWTH-i5-IDSG/steve/pull/570
         httpConfig.addCustomizer(new ForwardedRequestCustomizer());
 
         // Extra options

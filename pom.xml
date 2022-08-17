@@ -35,7 +35,7 @@
         <jooq.version>3.16.7</jooq.version>
         <cxf.version>3.5.3</cxf.version>
         <spring.version>5.3.22</spring.version>
-        <spring.security.version>5.7.2</spring.security.version>
+        <spring.security.version>5.7.3</spring.security.version>
         <mysql.jdbc.version>8.0.30</mysql.jdbc.version>
         <jetty.version>10.0.11</jetty.version>
         <lombok.version>1.18.24</lombok.version>
@@ -714,5 +714,10 @@
             <version>1.29</version>
         </dependency>
 
+        <dependency>
+            <groupId>org.owasp.encoder</groupId>
+            <artifactId>encoder</artifactId>
+            <version>1.2.3</version>
+        </dependency>
     </dependencies>
 </project>

@@ -19,6 +19,7 @@
 package net.parkl.ocpp.module.esp;
 
 import net.parkl.ocpp.module.esp.model.ESPChargingConsumptionRequest;
+import net.parkl.ocpp.module.esp.model.ESPChargingProcessCheckResult;
 import net.parkl.ocpp.module.esp.model.ESPChargingStopRequest;
 import net.parkl.ocpp.module.esp.model.ESPRfidChargingStartRequest;
 import net.parkl.ocpp.service.OcppMiddleware;
@@ -60,4 +61,6 @@ public interface EmobilityServiceProvider {
      * @param startRequest RFID tag start request (from the charger)
      */
     void notifyAboutRfidStart(ESPRfidChargingStartRequest startRequest);
+
+    ESPChargingProcessCheckResult checkChargingProcess(String chargingProcessId);
 }

@@ -3,6 +3,7 @@ package net.parkl.ocpp.service.config;
 import lombok.extern.slf4j.Slf4j;
 import net.parkl.ocpp.module.esp.EmobilityServiceProvider;
 import net.parkl.ocpp.module.esp.model.ESPChargingConsumptionRequest;
+import net.parkl.ocpp.module.esp.model.ESPChargingProcessCheckResult;
 import net.parkl.ocpp.module.esp.model.ESPChargingStopRequest;
 import net.parkl.ocpp.module.esp.model.ESPRfidChargingStartRequest;
 import org.springframework.stereotype.Component;
@@ -34,5 +35,10 @@ public class TestESP implements EmobilityServiceProvider {
     @Override
     public void notifyAboutRfidStart(ESPRfidChargingStartRequest startRequest) {
         log.info("notify about rfid start");
+    }
+
+    @Override
+    public ESPChargingProcessCheckResult checkChargingProcess(String chargingProcessId) {
+        return new ESPChargingProcessCheckResult(true,true);
     }
 }

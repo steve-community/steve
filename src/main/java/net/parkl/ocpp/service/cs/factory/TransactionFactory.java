@@ -32,9 +32,29 @@ public class TransactionFactory {
         return stop;
     }
 
+    public static TransactionStop createTransactionStopForCleanup(int transactionId, DateTime eventTimeStamp) {
+        TransactionStop stop = new TransactionStop();
+        stop.setTransactionStopId(createTransactionStopId(transactionId, eventTimeStamp));
+        stop.setEventActor(TransactionStopEventActor.manual);
+        stop.setStopTimestamp(eventTimeStamp.toDate());
+        stop.setStopReason("Cleanup");
+        return stop;
+    }
+
     public static TransactionStopFailed createTransactionStopFailed(UpdateTransactionParams params, Exception exception) {
         TransactionStopFailed failed = new TransactionStopFailed();
         decorateTransactionStop(failed, params);
+        failed.setFailReason(Throwables.getStackTraceAsString(exception));
+        return failed;
+    }
+
+    public static TransactionStopFailed createTransactionStopFailedForCleanup(int transactionId, Exception exception) {
+        TransactionStopFailed failed = new TransactionStopFailed();
+
+        DateTime eventTimeStamp = DateTime.now();
+        failed.setTransactionStopId(createTransactionStopId(transactionId, eventTimeStamp));
+        failed.setEventActor(TransactionStopEventActor.manual);
+        failed.setStopReason("Cleanup");
         failed.setFailReason(Throwables.getStackTraceAsString(exception));
         return failed;
     }

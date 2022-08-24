@@ -49,5 +49,8 @@ public class TransactionCleanupManagerDriverTest extends DriverTestBase {
         Assert.assertEquals(1, transactionIds.size());
 
         cleanupManager.cleanupTransactions();
+
+        transactionIds = transactionService.getActiveTransactionIds("cleanupTest");
+        Assert.assertEquals(0, transactionIds.size());
     }
 }

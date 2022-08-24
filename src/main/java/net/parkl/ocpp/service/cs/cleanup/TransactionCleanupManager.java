@@ -51,7 +51,7 @@ public class TransactionCleanupManager {
                 } else if (checkResult.isStopped()) {
                     log.info("Charging process {} already stopped at the ESP, transaction id={}",
                             chargingProcess.getOcppChargingProcessId(), transaction.getTransactionPk());
-                    cleanup = checkStoppedThreshold(transaction.getStartEventTimestamp());
+                    cleanup = checkStoppedThreshold(checkResult.getTimeElapsedSinceStop());
                 } else {
                     log.info("Charging process {} still running at the ESP, transaction id={}",
                             chargingProcess.getOcppChargingProcessId(), transaction.getTransactionPk());
@@ -73,9 +73,9 @@ public class TransactionCleanupManager {
         return new Date(System.currentTimeMillis()-cleanupCheckThresholdHours * HOURS_IN_MS);
     }
 
-    private boolean checkStoppedThreshold(Date startDate) {
-        log.info("Checking stopped threshold with start date {}: {} hours before now...", startDate, cleanupStoppedThresholdHours);
-        return startDate.getTime() < System.currentTimeMillis()-cleanupStoppedThresholdHours * HOURS_IN_MS;
+    private boolean checkStoppedThreshold(long timePassedSinceStop) {
+        log.info("Checking stopped threshold: {} hours before now...", cleanupStoppedThresholdHours);
+        return timePassedSinceStop > cleanupStoppedThresholdHours * HOURS_IN_MS;
     }
 
     private boolean checkNonExistentThreshold(Date startDate) {

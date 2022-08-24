@@ -39,6 +39,6 @@ public class TestESP implements EmobilityServiceProvider {
 
     @Override
     public ESPChargingProcessCheckResult checkChargingProcess(String chargingProcessId) {
-        return new ESPChargingProcessCheckResult(true,true);
+        return new ESPChargingProcessCheckResult(true,3*60*60*1000L);
     }
 }

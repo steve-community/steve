@@ -1,5 +1,6 @@
 package net.parkl.ocpp.module.esp.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 
 import java.io.Serializable;
@@ -12,5 +13,10 @@ import java.io.Serializable;
 @ToString
 public class ESPChargingProcessCheckResult implements Serializable {
     private boolean exists;
-    private boolean stopped;
+    private Long timeElapsedSinceStop;
+
+    @JsonIgnore
+    public boolean isStopped() {
+        return timeElapsedSinceStop != null;
+    }
 }

@@ -22,6 +22,7 @@ import net.parkl.ocpp.entities.Transaction;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 
+import java.util.Date;
 import java.util.List;
 
 public interface TransactionRepository extends CrudRepository<Transaction, Integer>{
@@ -49,4 +50,7 @@ public interface TransactionRepository extends CrudRepository<Transaction, Integ
 	@Query("SELECT COUNT(t.ocppTag) FROM Transaction AS t WHERE t.stopTimestamp IS NULL " +
 			"      AND t.stopValue IS NULL AND t.ocppTag=?1")
 	long countActiveTransactionsByIdTag(String idTag);
+
+	@Query("SELECT OBJECT(t) FROM Transaction AS t WHERE t.stopTimestamp IS NULL AND t.startEventTimestamp<?1 ORDER BY t.startEventTimestamp ASC")
+    List<Transaction> findActiveStartedBefore(Date threshold);
 }

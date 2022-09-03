@@ -480,9 +480,9 @@
             <version>2.0</version>
         </dependency>
         <dependency>
-            <groupId>com.github.RWTH-i5-IDSG</groupId>
+            <groupId>com.github.steve-community</groupId>
             <artifactId>ocpp-jaxb</artifactId>
-            <version>0.0.1</version>
+            <version>0.0.3</version>
         </dependency>
         <dependency>
             <groupId>com.sun.mail</groupId>

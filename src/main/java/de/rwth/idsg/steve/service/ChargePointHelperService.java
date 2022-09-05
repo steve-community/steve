@@ -27,11 +27,9 @@ import de.rwth.idsg.steve.ocpp.ws.data.SessionContext;
 import de.rwth.idsg.steve.ocpp.ws.ocpp12.Ocpp12WebSocketEndpoint;
 import de.rwth.idsg.steve.ocpp.ws.ocpp15.Ocpp15WebSocketEndpoint;
 import de.rwth.idsg.steve.ocpp.ws.ocpp16.Ocpp16WebSocketEndpoint;
-import de.rwth.idsg.steve.repository.ChargePointRepository;
 import de.rwth.idsg.steve.repository.GenericRepository;
 import de.rwth.idsg.steve.repository.dto.ChargePointSelect;
 import de.rwth.idsg.steve.repository.dto.ConnectorStatus;
-import de.rwth.idsg.steve.service.dto.UnidentifiedIncomingObject;
 import de.rwth.idsg.steve.utils.ConnectorStatusCountFilter;
 import de.rwth.idsg.steve.utils.DateTimeUtils;
 import de.rwth.idsg.steve.web.dto.ConnectorStatusForm;
@@ -72,14 +70,13 @@ public class ChargePointHelperService {
     @Autowired private GenericRepository genericRepository;
 
     // SOAP-based charge points are stored in DB with an endpoint address
-    @Autowired private ChargePointRepository chargePointRepository;
+    @Autowired private ChargePointService chargePointService;
 
     // For WebSocket-based charge points, the active sessions are stored in memory
     @Autowired private Ocpp12WebSocketEndpoint ocpp12WebSocketEndpoint;
     @Autowired private Ocpp15WebSocketEndpoint ocpp15WebSocketEndpoint;
     @Autowired private Ocpp16WebSocketEndpoint ocpp16WebSocketEndpoint;
 
-    private final UnidentifiedIncomingObjectService unknownChargePointService = new UnidentifiedIncomingObjectService(100);
 
     public Optional<RegistrationStatus> getRegistrationStatus(String chargeBoxId) {
         Lock l = isRegisteredLocks.get(chargeBoxId);
@@ -87,7 +84,7 @@ public class ChargePointHelperService {
         try {
             Optional<RegistrationStatus> status = getRegistrationStatusInternal(chargeBoxId);
             if (status.isEmpty()) {
-                unknownChargePointService.processNewUnidentified(chargeBoxId);
+                chargePointService.proceedUnknown(chargeBoxId);
             }
             return status;
         } finally {
@@ -101,7 +98,7 @@ public class ChargePointHelperService {
         stats.setNumOcpp15JChargeBoxes(ocpp15WebSocketEndpoint.getNumberOfChargeBoxes());
         stats.setNumOcpp16JChargeBoxes(ocpp16WebSocketEndpoint.getNumberOfChargeBoxes());
 
-        List<ConnectorStatus> latestList = chargePointRepository.getChargePointConnectorStatus();
+        List<ConnectorStatus> latestList = chargePointService.getChargePointConnectorStatus();
         stats.setStatusCountMap(ConnectorStatusCountFilter.getStatusCountMap(latestList));
 
         return stats;
@@ -114,7 +111,7 @@ public class ChargePointHelperService {
 
         Set<String> connectedJsonChargeBoxIds = new HashSet<>(extractIds(Arrays.asList(ocpp12Map, ocpp15Map, ocpp16Map)));
 
-        List<ConnectorStatus> latestList = chargePointRepository.getChargePointConnectorStatus(params);
+        List<ConnectorStatus> latestList = chargePointService.getChargePointConnectorStatus(params);
 
         // iterate over JSON stations and mark disconnected ones
         // https://github.com/RWTH-i5-IDSG/steve/issues/355
@@ -135,7 +132,7 @@ public class ChargePointHelperService {
         Map<String, Deque<SessionContext>> ocpp16Map = ocpp16WebSocketEndpoint.getACopy();
 
         List<String> idList = extractIds(Arrays.asList(ocpp12Map, ocpp15Map, ocpp16Map));
-        Map<String, Integer> primaryKeyLookup = chargePointRepository.getChargeBoxIdPkPair(idList);
+        Map<String, Integer> primaryKeyLookup = chargePointService.getChargeBoxIdPkPair(idList);
 
         DateTime now = DateTime.now();
         List<OcppJsonStatus> returnList = new ArrayList<>();
@@ -163,21 +160,13 @@ public class ChargePointHelperService {
         }
     }
 
-    public List<UnidentifiedIncomingObject> getUnknownChargePoints() {
-        return unknownChargePointService.getObjects();
-    }
-
-    public void removeUnknown(List<String> chargeBoxIdList) {
-        unknownChargePointService.removeAll(chargeBoxIdList);
-    }
-
     // -------------------------------------------------------------------------
     // Helpers
     // -------------------------------------------------------------------------
 
     private Optional<RegistrationStatus> getRegistrationStatusInternal(String chargeBoxId) {
         // 1. exit if already registered
-        Optional<String> status = chargePointRepository.getRegistrationStatus(chargeBoxId);
+        Optional<String> status = chargePointService.getRegistrationStatus(chargeBoxId);
         if (status.isPresent()) {
             try {
                 return Optional.ofNullable(RegistrationStatus.fromValue(status.get()));
@@ -195,7 +184,7 @@ public class ChargePointHelperService {
 
         // 3. chargeBoxId is unknown and auto-register is enabled. insert chargeBoxId
         try {
-            chargePointRepository.addChargePointList(Collections.singletonList(chargeBoxId));
+            chargePointService.addChargePointList(Collections.singletonList(chargeBoxId));
             log.warn("Auto-registered unknown chargebox '{}'", chargeBoxId);
             return Optional.of(RegistrationStatus.ACCEPTED); // default db value is accepted
         } catch (Exception e) {
@@ -210,7 +199,7 @@ public class ChargePointHelperService {
                                                   .map(RegistrationStatus::value)
                                                   .collect(Collectors.toList());
 
-        List<ChargePointSelect> returnList = chargePointRepository.getChargePointSelect(protocol, statusFilter);
+        List<ChargePointSelect> returnList = chargePointService.getChargePointSelect(protocol, statusFilter);
         for (String chargeBoxId : jsonEndpoint.getChargeBoxIdList()) {
             returnList.add(new ChargePointSelect(OcppTransport.JSON, chargeBoxId));
         }

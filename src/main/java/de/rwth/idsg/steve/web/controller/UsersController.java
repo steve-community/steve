@@ -18,9 +18,9 @@
  */
 package de.rwth.idsg.steve.web.controller;
 
-import de.rwth.idsg.steve.repository.OcppTagRepository;
-import de.rwth.idsg.steve.repository.UserRepository;
 import de.rwth.idsg.steve.repository.dto.User;
+import de.rwth.idsg.steve.service.OcppTagService;
+import de.rwth.idsg.steve.service.UserService;
 import de.rwth.idsg.steve.utils.ControllerHelper;
 import de.rwth.idsg.steve.utils.mapper.UserFormMapper;
 import de.rwth.idsg.steve.web.dto.UserForm;
@@ -44,8 +44,8 @@ import javax.validation.Valid;
 @RequestMapping(value = "/manager/users")
 public class UsersController {
 
-    @Autowired private OcppTagRepository ocppTagRepository;
-    @Autowired private UserRepository userRepository;
+    @Autowired private OcppTagService ocppTagService;
+    @Autowired private UserService userService;
 
     private static final String PARAMS = "params";
 
@@ -78,12 +78,12 @@ public class UsersController {
 
     private void initList(Model model, UserQueryForm params) {
         model.addAttribute(PARAMS, params);
-        model.addAttribute("userList", userRepository.getOverview(params));
+        model.addAttribute("userList", userService.getOverview(params));
     }
 
     @RequestMapping(value = DETAILS_PATH, method = RequestMethod.GET)
     public String getDetails(@PathVariable("userPk") int userPk, Model model) {
-        User.Details details = userRepository.getDetails(userPk);
+        User.Details details = userService.getDetails(userPk);
         UserForm form = UserFormMapper.toForm(details);
 
         model.addAttribute("userForm", form);
@@ -106,7 +106,7 @@ public class UsersController {
             return "data-man/userAdd";
         }
 
-        userRepository.add(userForm);
+        userService.add(userForm);
         return toOverview();
     }
 
@@ -118,19 +118,19 @@ public class UsersController {
             return "data-man/userDetails";
         }
 
-        userRepository.update(userForm);
+        userService.update(userForm);
         return toOverview();
     }
 
     @RequestMapping(value = DELETE_PATH, method = RequestMethod.POST)
     public String delete(@PathVariable("userPk") int userPk) {
-        userRepository.delete(userPk);
+        userService.delete(userPk);
         return toOverview();
     }
 
     private void setTags(Model model) {
         model.addAttribute("countryCodes", ControllerHelper.COUNTRY_DROPDOWN);
-        model.addAttribute("idTagList", ControllerHelper.idTagEnhancer(ocppTagRepository.getIdTags()));
+        model.addAttribute("idTagList", ControllerHelper.idTagEnhancer(ocppTagService.getIdTags()));
     }
 
     // -------------------------------------------------------------------------

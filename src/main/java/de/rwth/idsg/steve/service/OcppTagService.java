@@ -22,7 +22,18 @@ import com.google.common.base.Strings;
 import de.rwth.idsg.steve.SteveException;
 import de.rwth.idsg.steve.repository.OcppTagRepository;
 import de.rwth.idsg.steve.repository.SettingsRepository;
+import de.rwth.idsg.steve.repository.dto.OcppTag;
+import de.rwth.idsg.steve.repository.dto.OcppTag.Overview;
 import de.rwth.idsg.steve.service.dto.UnidentifiedIncomingObject;
+import de.rwth.idsg.steve.service.notification.OcppTagCreated;
+import de.rwth.idsg.steve.service.notification.OcppTagDeleted;
+import de.rwth.idsg.steve.service.notification.OcppTagUpdated;
+import de.rwth.idsg.steve.service.notification.UnidentifiedOcppTagProceed;
+import de.rwth.idsg.steve.service.notification.UnidentifiedOcppTagRemoved;
+import de.rwth.idsg.steve.web.dto.OcppTagForm;
+import de.rwth.idsg.steve.web.dto.OcppTagQueryForm;
+import de.rwth.idsg.steve.web.dto.OcppTagQueryForm.BooleanType;
+import java.util.Collections;
 import jooq.steve.db.tables.records.OcppTagActivityRecord;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -34,6 +45,7 @@ import org.jetbrains.annotations.Nullable;
 import org.joda.time.DateTime;
 import org.jooq.RecordMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -47,6 +59,7 @@ import java.util.function.Supplier;
 @Service
 public class OcppTagService {
 
+    @Autowired private ApplicationEventPublisher applicationEventPublisher;
     @Autowired private SettingsRepository settingsRepository;
     @Autowired private OcppTagRepository ocppTagRepository;
 
@@ -62,12 +75,37 @@ public class OcppTagService {
                                 .map(new AuthorisationDataMapper());
     }
 
+    public List<OcppTag.Overview> getOverview(OcppTagQueryForm form) {
+        return ocppTagRepository.getOverview(form);
+    }
+
+    public List<String> getParentIdTags() {
+        return ocppTagRepository.getParentIdTags();
+    }
+
+    public String getParentIdtag(String idTag) {
+        return ocppTagRepository.getParentIdtag(idTag);
+    }
+
+    public List<String> getIdTags() {
+        return ocppTagRepository.getIdTags();
+    }
+
+    public List<String> getActiveIdTags() {
+        return ocppTagRepository.getActiveIdTags();
+    }
+
+    public OcppTagActivityRecord getRecord(int ocppTagPk) {
+        return ocppTagRepository.getRecord(ocppTagPk);
+    }
+
     public List<UnidentifiedIncomingObject> getUnknownOcppTags() {
         return invalidOcppTagService.getObjects();
     }
 
     public void removeUnknown(List<String> idTagList) {
         invalidOcppTagService.removeAll(idTagList);
+        idTagList.forEach(idTag -> applicationEventPublisher.publishEvent(new UnidentifiedOcppTagRemoved(idTag)));
     }
 
     @Nullable
@@ -82,6 +120,7 @@ public class OcppTagService {
         switch (status) {
             case INVALID:
                 invalidOcppTagService.processNewUnidentified(idTag);
+                applicationEventPublisher.publishEvent(new UnidentifiedOcppTagProceed(idTag));
                 return new IdTagInfo().withStatus(status);
 
             case BLOCKED:
@@ -104,6 +143,40 @@ public class OcppTagService {
             log.error("Exception occurred", e);
             return supplierWhenException.get();
         }
+    }
+
+    public void addOcppTagList(List<String> idTagList) {
+        ocppTagRepository.addOcppTagList(idTagList);
+        idTagList.forEach(idTag -> {
+            OcppTagQueryForm form = new OcppTagQueryForm();
+            form.setIdTag(idTag);
+            form.setExpired(BooleanType.ALL);
+            form.setBlocked(BooleanType.ALL);
+            form.setInTransaction(BooleanType.ALL);
+            Overview overview = getOverview(form).get(0);
+            applicationEventPublisher.publishEvent(
+                new OcppTagCreated(overview.getOcppTagPk(), overview.getParentIdTag())
+            );
+        });
+        removeUnknown(idTagList);
+    }
+
+    public int addOcppTag(OcppTagForm form) {
+        int ocppTagPk = ocppTagRepository.addOcppTag(form);
+        applicationEventPublisher.publishEvent(new OcppTagCreated(ocppTagPk, form.getIdTag()));
+        removeUnknown(Collections.singletonList(form.getIdTag()));
+        return ocppTagPk;
+    }
+
+    public void updateOcppTag(OcppTagForm form) {
+        ocppTagRepository.updateOcppTag(form);
+        applicationEventPublisher.publishEvent(new OcppTagUpdated(form.getOcppTagPk(), form.getIdTag()));
+    }
+
+    public void deleteOcppTag(int ocppTagPk) {
+        OcppTagActivityRecord record = getRecord(ocppTagPk);
+        ocppTagRepository.deleteOcppTag(ocppTagPk);
+        applicationEventPublisher.publishEvent(new OcppTagDeleted(ocppTagPk, record.getIdTag()));
     }
 
     // -------------------------------------------------------------------------

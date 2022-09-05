@@ -117,12 +117,12 @@ public class UserRepositoryImpl implements UserRepository {
     }
 
     @Override
-    public void add(UserForm form) {
-        ctx.transaction(configuration -> {
+    public int add(UserForm form) {
+        return ctx.transactionResult(configuration -> {
             DSLContext ctx = DSL.using(configuration);
             try {
                 Integer addressId = addressRepository.updateOrInsert(ctx, form.getAddress());
-                addInternal(ctx, form, addressId);
+                return addInternal(ctx, form, addressId);
 
             } catch (DataAccessException e) {
                 throw new SteveException("Failed to add the user", e);
@@ -214,8 +214,8 @@ public class UserRepositoryImpl implements UserRepository {
                   .where(OCPP_TAG.ID_TAG.eq(ocppIdTag));
     }
 
-    private void addInternal(DSLContext ctx, UserForm form, Integer addressPk) {
-        int count = ctx.insertInto(USER)
+    private int addInternal(DSLContext ctx, UserForm form, Integer addressPk) {
+        return ctx.insertInto(USER)
                        .set(USER.FIRST_NAME, form.getFirstName())
                        .set(USER.LAST_NAME, form.getLastName())
                        .set(USER.BIRTH_DAY, form.getBirthDay())
@@ -225,11 +225,9 @@ public class UserRepositoryImpl implements UserRepository {
                        .set(USER.NOTE, form.getNote())
                        .set(USER.ADDRESS_PK, addressPk)
                        .set(USER.OCPP_TAG_PK, selectOcppTagPk(form.getOcppIdTag()))
-                       .execute();
-
-        if (count != 1) {
-            throw new SteveException("Failed to insert the user");
-        }
+                       .returning(USER.USER_PK)
+                       .fetchOne()
+                       .getUserPk();
     }
 
     private void updateInternal(DSLContext ctx, UserForm form, Integer addressPk) {

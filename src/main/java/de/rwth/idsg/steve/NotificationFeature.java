@@ -35,8 +35,23 @@ public enum NotificationFeature {
     OcppStationWebSocketConnected(" a JSON charging station connects"),
     OcppStationWebSocketDisconnected(" a JSON charging station disconnects"),
     OcppTransactionStarted(" a charging station starts a transaction"),
-    OcppTransactionEnded(" a charging station ends a transaction");
-
+    OcppTransactionEnded(" a charging station ends a transaction"),
+    //
+    // Charge Point related
+    //
+    ChargePointCreated(" a charging station has been created"),
+    ChargePointDeleted(" a charging station has been deleted"),
+    ChargePointUpdated(" a charging station has been updated"),
+    UnidentifiedChargePointProceed(" an unidentified charging station has been proceed"),
+    UnidentifiedChargePointRemoved(" an unidentified charging station has been removed"),
+    //
+    // Ocpp Tag related
+    //
+    OcppTagCreated(" an OCPP tag has been created"),
+    OcppTagDeleted(" an OCPP tag has been deleted"),
+    OcppTagUpdated(" an OCPP tag has been updated"),
+    UnidentifiedOcppTagProceed(" an unidentified OCPP tag has been proceed"),
+    UnidentifiedOcppTagRemoved(" an unidentified OCPP tag has been removed");
 
     @Getter
     private final String text;

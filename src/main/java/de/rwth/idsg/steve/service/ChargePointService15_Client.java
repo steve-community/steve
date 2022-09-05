@@ -28,7 +28,6 @@ import de.rwth.idsg.steve.ocpp.task.GetConfigurationTask;
 import de.rwth.idsg.steve.ocpp.task.GetLocalListVersionTask;
 import de.rwth.idsg.steve.ocpp.task.ReserveNowTask;
 import de.rwth.idsg.steve.ocpp.task.SendLocalListTask;
-import de.rwth.idsg.steve.repository.OcppTagRepository;
 import de.rwth.idsg.steve.repository.ReservationRepository;
 import de.rwth.idsg.steve.repository.dto.ChargePointSelect;
 import de.rwth.idsg.steve.repository.dto.InsertReservationParams;
@@ -55,7 +54,6 @@ import java.util.List;
 @Qualifier("ChargePointService15_Client")
 public class ChargePointService15_Client extends ChargePointService12_Client {
 
-    @Autowired protected OcppTagRepository userRepository;
     @Autowired protected OcppTagService ocppTagService;
     @Autowired protected ReservationRepository reservationRepository;
 
@@ -135,7 +133,7 @@ public class ChargePointService15_Client extends ChargePointService12_Client {
                                                              .build();
 
         int reservationId = reservationRepository.insert(res);
-        String parentIdTag = userRepository.getParentIdtag(params.getIdTag());
+        String parentIdTag = ocppTagService.getParentIdtag(params.getIdTag());
 
         EnhancedReserveNowParams enhancedParams = new EnhancedReserveNowParams(params, reservationId, parentIdTag);
         ReserveNowTask task = new ReserveNowTask(getVersion(), enhancedParams, reservationRepository);

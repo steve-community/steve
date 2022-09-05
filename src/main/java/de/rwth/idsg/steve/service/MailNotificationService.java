@@ -29,6 +29,7 @@ import de.rwth.idsg.steve.service.notification.OcppStationWebSocketConnected;
 import de.rwth.idsg.steve.service.notification.OcppStationWebSocketDisconnected;
 import de.rwth.idsg.steve.service.notification.OcppTransactionEnded;
 import de.rwth.idsg.steve.service.notification.OcppTransactionStarted;
+import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,7 +50,16 @@ import static java.lang.String.format;
  */
 @Slf4j
 @Service
-public class NotificationService {
+public class MailNotificationService {
+
+    public static final Set<NotificationFeature> SUPPORTED_FEATURES = Set.of(
+        OcppStationBooted,
+        OcppStationStatusFailure,
+        OcppStationWebSocketConnected,
+        OcppStationWebSocketDisconnected,
+        OcppTransactionStarted,
+        OcppTransactionEnded
+    );
 
     @Autowired private MailService mailService;
 

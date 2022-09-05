@@ -18,7 +18,6 @@
  */
 package de.rwth.idsg.steve.web.controller;
 
-import de.rwth.idsg.steve.repository.OcppTagRepository;
 import de.rwth.idsg.steve.service.OcppTagService;
 import de.rwth.idsg.steve.utils.ControllerHelper;
 import de.rwth.idsg.steve.utils.mapper.OcppTagFormMapper;
@@ -47,7 +46,6 @@ import java.util.List;
 @RequestMapping(value = "/manager/ocppTags")
 public class OcppTagsController {
 
-    @Autowired protected OcppTagRepository ocppTagRepository;
     @Autowired protected OcppTagService ocppTagService;
 
     protected static final String PARAMS = "params";
@@ -87,7 +85,7 @@ public class OcppTagsController {
 
     @RequestMapping(value = DETAILS_PATH, method = RequestMethod.GET)
     public String getDetails(@PathVariable("ocppTagPk") int ocppTagPk, Model model) {
-        OcppTagActivityRecord record = ocppTagRepository.getRecord(ocppTagPk);
+        OcppTagActivityRecord record = ocppTagService.getRecord(ocppTagPk);
         OcppTagForm form = OcppTagFormMapper.toForm(record);
 
         model.addAttribute("activeTransactionCount", record.getActiveTransactionCount());
@@ -113,7 +111,7 @@ public class OcppTagsController {
             return "data-man/ocppTagAdd";
         }
 
-        add(ocppTagForm);
+        ocppTagService.addOcppTag(ocppTagForm);
         return toOverview();
     }
 
@@ -126,7 +124,7 @@ public class OcppTagsController {
             return "data-man/ocppTagAdd";
         }
 
-        add(form.getIdList());
+        ocppTagService.addOcppTagList(form.getIdList());
         return toOverview();
     }
 
@@ -138,19 +136,19 @@ public class OcppTagsController {
             return "data-man/ocppTagDetails";
         }
 
-        ocppTagRepository.updateOcppTag(ocppTagForm);
+        ocppTagService.updateOcppTag(ocppTagForm);
         return toOverview();
     }
 
     @RequestMapping(value = DELETE_PATH, method = RequestMethod.POST)
     public String delete(@PathVariable("ocppTagPk") int ocppTagPk) {
-        ocppTagRepository.deleteOcppTag(ocppTagPk);
+        ocppTagService.deleteOcppTag(ocppTagPk);
         return toOverview();
     }
 
     @RequestMapping(value = UNKNOWN_ADD_PATH, method = RequestMethod.POST)
     public String addUnknownIdTag(@PathVariable("idTag") String idTag) {
-        add(Collections.singletonList(idTag));
+        ocppTagService.addOcppTagList(Collections.singletonList(idTag));
         return toOverview();
     }
 
@@ -162,14 +160,14 @@ public class OcppTagsController {
 
     private void initList(Model model, OcppTagQueryForm params) {
         model.addAttribute(PARAMS, params);
-        model.addAttribute("idTagList", ocppTagRepository.getIdTags());
-        model.addAttribute("parentIdTagList", ocppTagRepository.getParentIdTags());
-        model.addAttribute("ocppTagList", ocppTagRepository.getOverview(params));
+        model.addAttribute("idTagList", ocppTagService.getIdTags());
+        model.addAttribute("parentIdTagList", ocppTagService.getParentIdTags());
+        model.addAttribute("ocppTagList", ocppTagService.getOverview(params));
         model.addAttribute("unknownList", ocppTagService.getUnknownOcppTags());
     }
 
     protected void setTags(Model model) {
-        model.addAttribute("idTagList", ControllerHelper.idTagEnhancer(ocppTagRepository.getIdTags()));
+        model.addAttribute("idTagList", ControllerHelper.idTagEnhancer(ocppTagService.getIdTags()));
     }
 
     // -------------------------------------------------------------------------
@@ -189,19 +187,4 @@ public class OcppTagsController {
     protected String toOverview() {
         return "redirect:/manager/ocppTags";
     }
-
-    // -------------------------------------------------------------------------
-    // Helpers
-    // -------------------------------------------------------------------------
-
-    private void add(OcppTagForm form) {
-        ocppTagRepository.addOcppTag(form);
-        ocppTagService.removeUnknown(Collections.singletonList(form.getIdTag()));
-    }
-
-    private void add(List<String> idTagList) {
-        ocppTagRepository.addOcppTagList(idTagList);
-        ocppTagService.removeUnknown(idTagList);
-    }
-
 }

@@ -19,9 +19,9 @@
 package de.rwth.idsg.steve.web.controller;
 
 import de.rwth.idsg.steve.ocpp.OcppProtocol;
-import de.rwth.idsg.steve.repository.ChargePointRepository;
 import de.rwth.idsg.steve.repository.dto.ChargePoint;
 import de.rwth.idsg.steve.service.ChargePointHelperService;
+import de.rwth.idsg.steve.service.ChargePointService;
 import de.rwth.idsg.steve.utils.ControllerHelper;
 import de.rwth.idsg.steve.utils.mapper.ChargePointDetailsMapper;
 import de.rwth.idsg.steve.web.dto.ChargePointBatchInsertForm;
@@ -52,7 +52,7 @@ import java.util.stream.Collectors;
 @RequestMapping(value = "/manager/chargepoints")
 public class ChargePointsController {
 
-    @Autowired protected ChargePointRepository chargePointRepository;
+    @Autowired protected ChargePointService chargePointService;
     @Autowired protected ChargePointHelperService chargePointHelperService;
 
     protected static final String PARAMS = "params";
@@ -103,13 +103,13 @@ public class ChargePointsController {
 
     private void initList(Model model, ChargePointQueryForm params) {
         model.addAttribute(PARAMS, params);
-        model.addAttribute("cpList", chargePointRepository.getOverview(params));
-        model.addAttribute("unknownList", chargePointHelperService.getUnknownChargePoints());
+        model.addAttribute("cpList", chargePointService.getOverview(params));
+        model.addAttribute("unknownList", chargePointService.getUnknownChargePoints());
     }
 
     @RequestMapping(value = DETAILS_PATH, method = RequestMethod.GET)
     public String getDetails(@PathVariable("chargeBoxPk") int chargeBoxPk, Model model) {
-        ChargePoint.Details cp = chargePointRepository.getDetails(chargeBoxPk);
+        ChargePoint.Details cp = chargePointService.getDetails(chargeBoxPk);
         ChargePointForm form = ChargePointDetailsMapper.mapToForm(cp);
 
         model.addAttribute("chargePointForm", form);
@@ -152,7 +152,7 @@ public class ChargePointsController {
             return "data-man/chargepointAdd";
         }
 
-        add(chargePointForm);
+        chargePointService.addChargePoint(chargePointForm);
         return toOverview();
     }
 
@@ -165,7 +165,7 @@ public class ChargePointsController {
             return "data-man/chargepointAdd";
         }
 
-        add(form.getIdList());
+        chargePointService.addChargePointList(form.getIdList());
         return toOverview();
     }
 
@@ -177,25 +177,25 @@ public class ChargePointsController {
             return "data-man/chargepointDetails";
         }
 
-        chargePointRepository.updateChargePoint(chargePointForm);
+        chargePointService.updateChargePoint(chargePointForm);
         return toOverview();
     }
 
     @RequestMapping(value = DELETE_PATH, method = RequestMethod.POST)
     public String delete(@PathVariable("chargeBoxPk") int chargeBoxPk) {
-        chargePointRepository.deleteChargePoint(chargeBoxPk);
+        chargePointService.deleteChargePoint(chargeBoxPk);
         return toOverview();
     }
 
     @RequestMapping(value = UNKNOWN_ADD_PATH, method = RequestMethod.POST)
     public String addUnknownChargeBoxId(@PathVariable("chargeBoxId") String chargeBoxId) {
-        add(Collections.singletonList(chargeBoxId));
+        chargePointService.addChargePointList(Collections.singletonList(chargeBoxId));
         return toOverview();
     }
 
     @RequestMapping(value = UNKNOWN_REMOVE_PATH, method = RequestMethod.POST)
     public String removeUnknownChargeBoxId(@PathVariable("chargeBoxId") String chargeBoxId) {
-        chargePointHelperService.removeUnknown(Collections.singletonList(chargeBoxId));
+        chargePointService.removeUnknown(Collections.singletonList(chargeBoxId));
         return toOverview();
     }
 
@@ -230,15 +230,5 @@ public class ChargePointsController {
         model.addAttribute("batchChargePointForm", new ChargePointBatchInsertForm());
         // we don't know the protocol yet. but, a list with only "accepted" and "rejected" is a good starting point.
         model.addAttribute("registrationStatusList", upToOcpp15RegistrationStatusList);
-    }
-
-    private void add(ChargePointForm form) {
-        chargePointRepository.addChargePoint(form);
-        chargePointHelperService.removeUnknown(Collections.singletonList(form.getChargeBoxId()));
-    }
-
-    private void add(List<String> idList) {
-        chargePointRepository.addChargePointList(idList);
-        chargePointHelperService.removeUnknown(idList);
     }
 }

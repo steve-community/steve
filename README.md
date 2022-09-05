@@ -33,7 +33,7 @@ https://github.com/RWTH-i5-IDSG/steve/wiki/Charging-Station-Compatibility
 SteVe requires 
 * JDK 11 (both Oracle JDK and OpenJDK are supported)
 * Maven 
-* MariaDB 10.2.1 or later. MySQL 5.7.7 or later works as well, but especially MySQL 8 introduces more hassle. We suggest MariaDB 10.3.
+* MariaDB 10.3 or later. MySQL 8.0.x works as well.
 
 to build and run. 
 
@@ -47,26 +47,17 @@ SteVe is designed to run standalone, a java servlet container / web server (e.g.
 
     Make sure MySQL is reachable via TCP (e.g., remove `skip-networking` from `my.cnf`).
     The following MySQL statements can be used as database initialization (adjust database name and credentials according to your setup).
-    
-    * For MariaDB (all versions) and MySQL 5.7:
-        ```
-        CREATE DATABASE stevedb CHARACTER SET utf8 COLLATE utf8_unicode_ci;
-        CREATE USER 'steve'@'localhost' IDENTIFIED BY 'changeme';
-        GRANT ALL PRIVILEGES ON stevedb.* TO 'steve'@'localhost';
-        GRANT SELECT ON mysql.proc TO 'steve'@'localhost';
-        ```
-    
-    * For MySQL 8:
-        ```
-        CREATE DATABASE stevedb CHARACTER SET utf8 COLLATE utf8_unicode_ci;
-        CREATE USER 'steve'@'localhost' IDENTIFIED BY 'changeme';
-        GRANT ALL PRIVILEGES ON stevedb.* TO 'steve'@'localhost';
-        GRANT SUPER ON *.* TO 'steve'@'localhost';
-        ```
-        Note: The statement `GRANT SUPER [...]` is only necessary to execute some of the previous migration files and is only needed for the initial database setup. Afterwards, you can remove this privilege by executing 
-        ```
-        REVOKE SUPER ON *.* FROM 'steve'@'localhost';
-        ```
+
+    ```
+    CREATE DATABASE stevedb CHARACTER SET utf8 COLLATE utf8_unicode_ci;
+    CREATE USER 'steve'@'localhost' IDENTIFIED BY 'changeme';
+    GRANT ALL PRIVILEGES ON stevedb.* TO 'steve'@'localhost';
+    GRANT SUPER ON *.* TO 'steve'@'localhost';
+    ```
+    Note: The statement `GRANT SUPER [...]` is only necessary to execute some of the previous migration files and is only needed for the initial database setup. Afterwards, you can remove this privilege by executing 
+    ```
+    REVOKE SUPER ON *.* FROM 'steve'@'localhost';
+    ```
         
 2. Download and extract tarball:
 

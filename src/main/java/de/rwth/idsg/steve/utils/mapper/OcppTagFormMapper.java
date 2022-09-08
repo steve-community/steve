@@ -39,7 +39,7 @@ public final class OcppTagFormMapper {
 
         DateTime expiryDate = record.getExpiryDate();
         if (expiryDate != null) {
-            form.setExpiration(expiryDate.toLocalDateTime());
+            form.setExpiryDate(expiryDate.toLocalDateTime());
         }
 
         form.setMaxActiveTransactionCount(record.getMaxActiveTransactionCount());

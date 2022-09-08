@@ -48,7 +48,7 @@ public class OcppTagForm {
     private String parentIdTag;
 
     @Future(message = "Expiry Date/Time must be in future")
-    private LocalDateTime expiration;
+    private LocalDateTime expiryDate;
 
     private Integer maxActiveTransactionCount;
 

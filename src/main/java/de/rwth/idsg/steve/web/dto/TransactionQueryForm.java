@@ -21,6 +21,7 @@ package de.rwth.idsg.steve.web.dto;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 
 import javax.validation.constraints.AssertTrue;
 import javax.validation.constraints.NotNull;
@@ -31,6 +32,7 @@ import javax.validation.constraints.NotNull;
  */
 @Getter
 @Setter
+@ToString(callSuper = true)
 public class TransactionQueryForm extends QueryForm {
 
     // Internal database Id

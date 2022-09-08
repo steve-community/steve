@@ -21,6 +21,7 @@ package de.rwth.idsg.steve.web.dto;
 import de.rwth.idsg.steve.web.validation.IdTag;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 import org.joda.time.LocalDateTime;
 
 import javax.validation.constraints.Future;
@@ -33,6 +34,7 @@ import java.util.Objects;
  */
 @Getter
 @Setter
+@ToString
 public class OcppTagForm {
 
     // Internal database id

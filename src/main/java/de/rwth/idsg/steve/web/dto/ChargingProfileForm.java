@@ -20,6 +20,7 @@ package de.rwth.idsg.steve.web.dto;
 
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 import ocpp.cp._2015._10.ChargingProfileKindType;
 import ocpp.cp._2015._10.ChargingProfilePurposeType;
 import ocpp.cp._2015._10.ChargingRateUnitType;
@@ -43,6 +44,7 @@ import java.util.Objects;
  */
 @Getter
 @Setter
+@ToString
 public class ChargingProfileForm {
 
     // Internal database id
@@ -117,6 +119,7 @@ public class ChargingProfileForm {
 
     @Getter
     @Setter
+    @ToString
     public static class SchedulePeriod {
 
         private static final int defaultNumberPhases = 3;

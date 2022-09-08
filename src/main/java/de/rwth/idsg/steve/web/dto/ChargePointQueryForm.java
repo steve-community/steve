@@ -22,6 +22,7 @@ import de.rwth.idsg.steve.ocpp.OcppVersion;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -29,6 +30,7 @@ import lombok.Setter;
  */
 @Getter
 @Setter
+@ToString
 public class ChargePointQueryForm {
 
     private String chargeBoxId;

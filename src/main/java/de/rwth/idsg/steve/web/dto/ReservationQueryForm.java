@@ -22,6 +22,7 @@ import de.rwth.idsg.steve.repository.ReservationStatus;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 
 import javax.validation.constraints.AssertTrue;
 
@@ -31,6 +32,7 @@ import javax.validation.constraints.AssertTrue;
  */
 @Getter
 @Setter
+@ToString(callSuper = true)
 public class ReservationQueryForm extends QueryForm {
 
     private ReservationStatus status;

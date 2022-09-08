@@ -21,6 +21,7 @@ package de.rwth.idsg.steve.web.dto;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -28,6 +29,7 @@ import lombok.Setter;
  */
 @Getter
 @Setter
+@ToString
 public class OcppTagQueryForm {
 
     private String idTag;

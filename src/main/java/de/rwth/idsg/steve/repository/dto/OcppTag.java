@@ -20,6 +20,7 @@ package de.rwth.idsg.steve.repository.dto;
 
 import lombok.Builder;
 import lombok.Getter;
+import lombok.ToString;
 import org.joda.time.DateTime;
 
 /**
@@ -31,6 +32,7 @@ public final class OcppTag {
 
     @Getter
     @Builder
+    @ToString
     public static final class Overview {
         private final Integer ocppTagPk, parentOcppTagPk;
         private final String idTag, parentIdTag, expiryDate;

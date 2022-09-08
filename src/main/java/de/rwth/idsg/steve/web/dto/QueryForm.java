@@ -21,6 +21,7 @@ package de.rwth.idsg.steve.web.dto;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 import org.joda.time.LocalDateTime;
 
 import javax.validation.constraints.AssertTrue;
@@ -32,6 +33,7 @@ import javax.validation.constraints.AssertTrue;
 @Getter
 @Setter
 @NoArgsConstructor
+@ToString
 public abstract class QueryForm {
 
     private String chargeBoxId;

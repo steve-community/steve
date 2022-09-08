@@ -21,6 +21,7 @@ package de.rwth.idsg.steve.web.dto;
 import de.rwth.idsg.steve.web.validation.ChargeBoxId;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 import org.hibernate.validator.constraints.Range;
 import org.hibernate.validator.constraints.URL;
 
@@ -34,6 +35,7 @@ import java.math.BigDecimal;
  */
 @Getter
 @Setter
+@ToString
 public class ChargePointForm {
 
     // Internal database id

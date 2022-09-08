@@ -19,6 +19,7 @@
 package de.rwth.idsg.steve.web.dto;
 
 import lombok.Getter;
+import lombok.ToString;
 
 import java.util.Collections;
 import java.util.List;
@@ -29,6 +30,7 @@ import java.util.stream.Collectors;
  * @since 06.08.2018
  */
 @Getter
+@ToString
 public enum EndpointInfo {
     INSTANCE;
 
@@ -37,6 +39,7 @@ public enum EndpointInfo {
     private final ItemsWithInfo ocppWebSocket = new ItemsWithInfo("WebSocket/JSON endpoint for OCPP", "/websocket/CentralSystemService/(chargeBoxId)");
 
     @Getter
+    @ToString
     public static class ItemsWithInfo {
         private final String info;
         private final String dataElementPostFix;

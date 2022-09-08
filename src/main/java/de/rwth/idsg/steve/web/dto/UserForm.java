@@ -20,6 +20,7 @@ package de.rwth.idsg.steve.web.dto;
 
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 import org.joda.time.LocalDate;
 
 import javax.validation.constraints.Email;
@@ -31,6 +32,7 @@ import javax.validation.constraints.NotNull;
  */
 @Getter
 @Setter
+@ToString
 public class UserForm {
 
     // Internal database id

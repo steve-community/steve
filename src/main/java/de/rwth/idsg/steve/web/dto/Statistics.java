@@ -21,6 +21,7 @@ package de.rwth.idsg.steve.web.dto;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
 import java.util.Map;
 
@@ -31,6 +32,7 @@ import java.util.Map;
  */
 @Getter
 @Builder
+@ToString
 public final class Statistics {
     // Number of chargeboxes, ocppTags, users, reservations, transactions
     private final Integer numChargeBoxes, numOcppTags, numUsers, numReservations, numTransactions,

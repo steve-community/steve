@@ -21,6 +21,7 @@ package de.rwth.idsg.steve.repository.dto;
 import jooq.steve.db.enums.TransactionStopEventActor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.ToString;
 import org.jetbrains.annotations.Nullable;
 import org.joda.time.DateTime;
 
@@ -31,6 +32,7 @@ import org.joda.time.DateTime;
  */
 @Getter
 @Builder
+@ToString
 public final class Transaction {
     private final int id, connectorId, chargeBoxPk, ocppTagPk;
     private final String chargeBoxId, ocppIdTag, startTimestamp, startValue;

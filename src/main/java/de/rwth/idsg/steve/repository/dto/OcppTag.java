@@ -35,8 +35,8 @@ public final class OcppTag {
     @ToString
     public static final class Overview {
         private final Integer ocppTagPk, parentOcppTagPk;
-        private final String idTag, parentIdTag, expiryDate;
+        private final String idTag, parentIdTag, expiryDateFormatted;
         private final boolean inTransaction, blocked;
-        private final DateTime expiryDateDT;
+        private final DateTime expiryDate;
     }
 }

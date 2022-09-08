@@ -145,7 +145,7 @@
                             <a href="${ctxPath}/manager/ocppTags/details/${item.parentOcppTagPk}">${item.parentIdTag}</a>
                         </c:if>
                     </td>
-                    <td data-sort-value="${item.expiryDateDT.millis}">${item.expiryDate}</td>
+                    <td data-sort-value="${item.expiryDate.millis}">${item.expiryDateFormatted}</td>
                     <td>${item.inTransaction}</td>
                     <td>${item.blocked}</td>
                     <td>

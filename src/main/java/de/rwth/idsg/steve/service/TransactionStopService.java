@@ -121,7 +121,7 @@ public class TransactionStopService {
 
         return TerminationValues.builder()
                                 .stopValue(thisTx.getStartValue())
-                                .stopTimestamp(thisTx.getStartTimestampDT())
+                                .stopTimestamp(thisTx.getStartTimestamp())
                                 .build();
     }
 

@@ -35,12 +35,12 @@ import org.joda.time.DateTime;
 @ToString
 public final class Transaction {
     private final int id, connectorId, chargeBoxPk, ocppTagPk;
-    private final String chargeBoxId, ocppIdTag, startTimestamp, startValue;
-    private final DateTime startTimestampDT;
+    private final String chargeBoxId, ocppIdTag, startTimestampFormatted, startValue;
+    private final DateTime startTimestamp;
 
-    @Nullable private final String stopTimestamp;
+    @Nullable private final String stopTimestampFormatted;
     @Nullable private final String stopValue;
     @Nullable private final String stopReason; // new in OCPP 1.6
-    @Nullable private final DateTime stopTimestampDT;
+    @Nullable private final DateTime stopTimestamp;
     @Nullable private final TransactionStopEventActor stopEventActor;
 }

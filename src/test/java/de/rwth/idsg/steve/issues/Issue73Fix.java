@@ -42,7 +42,7 @@ import static de.rwth.idsg.steve.utils.Helpers.getPath;
 import static de.rwth.idsg.steve.utils.Helpers.getRandomString;
 
 /**
- * https://github.com/RWTH-i5-IDSG/steve/issues/73
+ * https://github.com/steve-community/steve/issues/73
  *
  * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 02.07.2018

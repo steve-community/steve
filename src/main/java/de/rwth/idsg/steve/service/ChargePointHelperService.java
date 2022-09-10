@@ -117,7 +117,7 @@ public class ChargePointHelperService {
         List<ConnectorStatus> latestList = chargePointRepository.getChargePointConnectorStatus(params);
 
         // iterate over JSON stations and mark disconnected ones
-        // https://github.com/RWTH-i5-IDSG/steve/issues/355
+        // https://github.com/steve-community/steve/issues/355
         //
         for (ConnectorStatus status : latestList) {
             OcppProtocol protocol = status.getOcppProtocol();

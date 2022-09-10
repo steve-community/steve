@@ -48,7 +48,7 @@ public class GithubReleaseCheckService implements ReleaseCheckService {
      */
     private static final int API_TIMEOUT_IN_MILLIS = 4_000;
 
-    private static final String API_URL = "https://api.github.com/repos/RWTH-i5-IDSG/steve/releases/latest";
+    private static final String API_URL = "https://api.github.com/repos/steve-community/steve/releases/latest";
 
     private static final String TAG_NAME_PREFIX = "steve-";
 

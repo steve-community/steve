@@ -50,7 +50,7 @@ public final class ConnectorStatusFilter {
      * station). Connector id 0 should have upper hand while providing status information if its timestamp is
      * more recent than the others and mask status info of other connectors.
      *
-     * Link: https://github.com/RWTH-i5-IDSG/steve/issues/16
+     * Link: https://github.com/steve-community/steve/issues/16
      *
      * Logic walk-through:
      *

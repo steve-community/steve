@@ -98,7 +98,7 @@ public class JettyServer {
         httpConfig.setSendXPoweredBy(false);
 
         // make sure X-Forwarded-For headers are picked up if set (e.g. by a load balancer)
-        // https://github.com/RWTH-i5-IDSG/steve/pull/570
+        // https://github.com/steve-community/steve/pull/570
         httpConfig.addCustomizer(new ForwardedRequestCustomizer());
 
         // Extra options

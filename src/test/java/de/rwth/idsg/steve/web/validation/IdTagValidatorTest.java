@@ -80,7 +80,7 @@ public class IdTagValidatorTest {
     }
 
     /**
-     * https://github.com/RWTH-i5-IDSG/steve/issues/475
+     * https://github.com/steve-community/steve/issues/475
      */
     @Test
     public void testColon() {

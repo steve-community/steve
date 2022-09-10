@@ -44,7 +44,7 @@ public class ChangeConfigurationParams extends MultipleChargePointSelect {
     @NotNull(message = "Key type is required")
     private ConfigurationKeyType keyType = ConfigurationKeyType.PREDEFINED;
 
-    // Disabled @NotBlank after https://github.com/RWTH-i5-IDSG/steve/issues/148
+    // Disabled @NotBlank after https://github.com/steve-community/steve/issues/148
     // @NotBlank(message = "Value is required")
     @Pattern(regexp = "\\S+", message = "Value cannot contain any whitespace")
     private String value;
@@ -81,7 +81,7 @@ public class ChangeConfigurationParams extends MultipleChargePointSelect {
     /**
      * Because we want to permit empty values
      *
-     * https://github.com/RWTH-i5-IDSG/steve/issues/148
+     * https://github.com/steve-community/steve/issues/148
      */
     public String getValue() {
         return Objects.requireNonNullElse(value, "");

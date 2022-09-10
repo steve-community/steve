@@ -38,7 +38,7 @@ public class TransactionStopServiceHelper {
 
     public static boolean isEnergyValue(TransactionDetails.MeterValues v) {
         // should not happen, but check it to be safe.
-        // https://github.com/RWTH-i5-IDSG/steve/issues/249
+        // https://github.com/steve-community/steve/issues/249
         if (Strings.isNullOrEmpty(v.getValue())) {
             return false;
         }
@@ -64,7 +64,7 @@ public class TransactionStopServiceHelper {
         }
 
         // if the format is "SignedData", we cannot make any sense of this entry. we don't know how to decode it.
-        // https://github.com/RWTH-i5-IDSG/steve/issues/816
+        // https://github.com/steve-community/steve/issues/816
         if (ValueFormat.SIGNED_DATA.value().equals(v.getFormat())) {
             return false;
         }

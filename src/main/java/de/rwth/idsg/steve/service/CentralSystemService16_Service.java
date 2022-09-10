@@ -258,7 +258,7 @@ public class CentralSystemService16_Service {
         }
 
         // OCPP requires a status to be set. Since this is a dummy impl, set it to "Accepted".
-        // https://github.com/RWTH-i5-IDSG/steve/pull/36
+        // https://github.com/steve-community/steve/pull/36
         return new DataTransferResponse().withStatus(DataTransferStatus.ACCEPTED);
     }
 }

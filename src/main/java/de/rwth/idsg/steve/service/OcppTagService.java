@@ -145,7 +145,7 @@ public class OcppTagService {
             return AuthorizationStatus.EXPIRED;
         }
 
-        // https://github.com/RWTH-i5-IDSG/steve/issues/219
+        // https://github.com/steve-community/steve/issues/219
         if (isStartTransactionReqContext && reachedLimitOfActiveTransactions(record)) {
             log.warn("The user with idTag '{}' is ALREADY in another transaction(s).", idTag);
             return AuthorizationStatus.CONCURRENT_TX;

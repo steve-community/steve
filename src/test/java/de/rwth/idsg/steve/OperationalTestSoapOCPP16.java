@@ -209,8 +209,8 @@ public class OperationalTestSoapOCPP16 {
     }
 
     /**
-     * https://github.com/RWTH-i5-IDSG/steve/issues/217
-     * https://github.com/RWTH-i5-IDSG/steve/issues/219
+     * https://github.com/steve-community/steve/issues/217
+     * https://github.com/steve-community/steve/issues/219
      */
     @Test
     public void testAuthorizationStatus() {

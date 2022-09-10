@@ -103,7 +103,7 @@ public abstract class AbstractWebSocketEndpoint extends ConcurrentWebSocketHandl
         String incomingString = webSocketMessage.getPayload();
         String chargeBoxId = getChargeBoxId(session);
 
-        // https://github.com/RWTH-i5-IDSG/steve/issues/66
+        // https://github.com/steve-community/steve/issues/66
         if (Strings.isNullOrEmpty(incomingString)) {
             WebSocketLogger.receivedEmptyText(chargeBoxId, session);
             return;

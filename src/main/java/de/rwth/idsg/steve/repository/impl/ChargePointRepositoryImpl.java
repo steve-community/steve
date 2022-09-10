@@ -221,7 +221,7 @@ public class ChargePointRepositoryImpl implements ChargePointRepository {
                             .and(CONNECTOR_STATUS.STATUS_TIMESTAMP.equal(t1.field(t1TsMax)))
                          .asTable("t2");
 
-        // https://github.com/RWTH-i5-IDSG/steve/issues/691
+        // https://github.com/steve-community/steve/issues/691
         Condition chargeBoxCondition = CHARGE_BOX.REGISTRATION_STATUS.eq(RegistrationStatus.ACCEPTED.value());
 
         if (form != null && form.getChargeBoxId() != null) {

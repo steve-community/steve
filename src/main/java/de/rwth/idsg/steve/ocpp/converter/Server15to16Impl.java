@@ -263,7 +263,7 @@ public enum Server15to16Impl implements Server15to16 {
     /**
      * AMP and VOLT are shortened to A and V, respectively.
      *
-     * https://github.com/RWTH-i5-IDSG/steve/issues/59
+     * https://github.com/steve-community/steve/issues/59
      */
     private static UnitOfMeasure convertUnit(ocpp.cs._2012._06.UnitOfMeasure unit) {
         switch (unit) {

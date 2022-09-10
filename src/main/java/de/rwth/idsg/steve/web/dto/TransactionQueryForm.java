@@ -25,6 +25,7 @@ import lombok.ToString;
 
 import javax.validation.constraints.AssertTrue;
 import javax.validation.constraints.NotNull;
+import java.util.Objects;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -38,21 +39,12 @@ public class TransactionQueryForm extends QueryForm {
     // Internal database Id
     private Integer transactionPk;
 
-    private boolean returnCSV;
-
-    @NotNull(message = "Query type is required")
-    private QueryType type;
-
-    private QueryPeriodType periodType;
-
     /**
      * Init with sensible default values
      */
-    public TransactionQueryForm() {
-        returnCSV = false;
-        periodType = QueryPeriodType.ALL;
-        type = QueryType.ACTIVE;
-    }
+    private boolean returnCSV = false;
+    private QueryType type = QueryType.ACTIVE;
+    private QueryPeriodType periodType = QueryPeriodType.ALL;
 
     @AssertTrue(message = "The values 'From' and 'To' must be both set")
     public boolean isPeriodFromToCorrect() {
@@ -61,6 +53,14 @@ public class TransactionQueryForm extends QueryForm {
 
     public boolean isTransactionPkSet() {
         return transactionPk != null;
+    }
+
+    public QueryType getType() {
+        return Objects.requireNonNullElse(type, QueryType.ALL);
+    }
+
+    public QueryPeriodType getPeriodType() {
+        return Objects.requireNonNullElse(periodType, QueryPeriodType.ALL);
     }
 
     // -------------------------------------------------------------------------

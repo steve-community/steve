@@ -32,7 +32,7 @@
 	<tr><td>Database Version:</td><td>${db.version}</td></tr>
 	<tr><td>Last Database Update:</td><td>${db.updateTimestamp}</td></tr>
     <tr><td>Log File:</td><td>${logFile}</td></tr>
-	<tr><td>GitHub Page:</td><td><a href="https://github.com/RWTH-i5-IDSG/steve">https://github.com/RWTH-i5-IDSG/steve</a></td></tr>
+	<tr><td>GitHub Page:</td><td><a href="https://github.com/steve-community/steve">https://github.com/steve-community/steve</a></td></tr>
     <tr><td>System Time:</td><td>${systemTime}</td></tr>
     <tr><td>System Time Zone:</td><td>${systemTimeZone}</td></tr>
 </table>

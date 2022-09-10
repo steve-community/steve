@@ -23,6 +23,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
+import java.util.Objects;
+
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 03.09.2015
@@ -35,18 +37,12 @@ public class OcppTagQueryForm {
     private String idTag;
     private String parentIdTag;
 
-    private BooleanType expired;
-    private BooleanType inTransaction;
-    private BooleanType blocked;
-
     /**
      * Init with sensible default values
      */
-    public OcppTagQueryForm() {
-        expired = BooleanType.FALSE;
-        blocked = BooleanType.FALSE;
-        inTransaction = BooleanType.ALL;
-    }
+    private BooleanType expired = BooleanType.FALSE;
+    private BooleanType inTransaction = BooleanType.ALL;
+    private BooleanType blocked = BooleanType.FALSE;
 
     public boolean isIdTagSet() {
         return idTag != null;
@@ -54,6 +50,18 @@ public class OcppTagQueryForm {
 
     public boolean isParentIdTagSet() {
         return parentIdTag != null;
+    }
+
+    public BooleanType getExpired() {
+        return Objects.requireNonNullElse(expired, BooleanType.ALL);
+    }
+
+    public BooleanType getInTransaction() {
+        return Objects.requireNonNullElse(inTransaction, BooleanType.ALL);
+    }
+
+    public BooleanType getBlocked() {
+        return Objects.requireNonNullElse(blocked, BooleanType.ALL);
     }
 
     @RequiredArgsConstructor

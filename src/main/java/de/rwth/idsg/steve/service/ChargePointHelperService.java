@@ -1,6 +1,6 @@
 /*
- * SteVe - SteckdosenVerwaltung - https://github.com/RWTH-i5-IDSG/steve
- * Copyright (C) 2013-2022 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
+ * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
+ * Copyright (C) 2013-2019 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -117,7 +117,7 @@ public class ChargePointHelperService {
         List<ConnectorStatus> latestList = chargePointRepository.getChargePointConnectorStatus(params);
 
         // iterate over JSON stations and mark disconnected ones
-        // https://github.com/RWTH-i5-IDSG/steve/issues/355
+        // https://github.com/steve-community/steve/issues/355
         //
         for (ConnectorStatus status : latestList) {
             OcppProtocol protocol = status.getOcppProtocol();

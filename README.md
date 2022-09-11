@@ -1,11 +1,11 @@
 ![SteVe](src/main/resources/webapp/static/images/logo.png) 
 
-[![build and run tests](https://github.com/RWTH-i5-IDSG/steve/actions/workflows/main.yml/badge.svg)](https://github.com/RWTH-i5-IDSG/steve/actions/workflows/main.yml)
+[![build and run tests](https://github.com/steve-community/steve/actions/workflows/main.yml/badge.svg)](https://github.com/steve-community/steve/actions/workflows/main.yml)
 
 
 # Introduction
 
-SteVe started its life at the RWTH Aachen University in 2013. 
+SteVe started its life at the RWTH Aachen University [in 2013](https://github.com/steve-community/steve/issues/827). 
 The name is derived from _Steckdosenverwaltung_ in German (in English: socket administration). 
 The aim of SteVe is to support the deployment and popularity of electric mobility, so it is easy to install and to use. 
 It provides basic functions for the administration of charge points, user data, and RFID cards for user authentication and was tested successfully in operation.
@@ -26,7 +26,7 @@ Electric charge points using the following OCPP versions are supported:
 * OCPP1.6J
 
 For Charging Station compatibility please check:
-https://github.com/RWTH-i5-IDSG/steve/wiki/Charging-Station-Compatibility
+https://github.com/steve-community/steve/wiki/Charging-Station-Compatibility
 
 ### System Requirements
 
@@ -72,7 +72,7 @@ SteVe is designed to run standalone, a java servlet container / web server (e.g.
 
     You can download and extract the SteVe releases using the following commands (replace X.X.X with the desired version number):
     ```
-    wget https://github.com/RWTH-i5-IDSG/steve/archive/steve-X.X.X.tar.gz
+    wget https://github.com/steve-community/steve/archive/steve-X.X.X.tar.gz
     tar xzvf steve-X.X.X.tar.gz
     cd steve-X.X.X
     ```
@@ -85,7 +85,7 @@ SteVe is designed to run standalone, a java servlet container / web server (e.g.
       - You _must_ change [web interface credentials](src/main/resources/config/prod/main.properties#L17-L18)
       - You _can_ access the application via HTTPS, by [enabling it and setting the keystore properties](src/main/resources/config/prod/main.properties#L32-L35)
      
-    For advanced configuration please see the [Configuration wiki](https://github.com/RWTH-i5-IDSG/steve/wiki/Configuration)
+    For advanced configuration please see the [Configuration wiki](https://github.com/steve-community/steve/wiki/Configuration)
 
 4. Build SteVe:
 
@@ -131,11 +131,11 @@ To access this publicaly, you'll also have to setup an ingress using something l
 
 # Ubuntu
 
-You'll find a tutorial how to prepare Ubuntu for SteVe here: https://github.com/RWTH-i5-IDSG/steve/wiki/Prepare-Ubuntu-VM-for-SteVe
+You'll find a tutorial how to prepare Ubuntu for SteVe here: https://github.com/steve-community/steve/wiki/Prepare-Ubuntu-VM-for-SteVe
 
 # AWS
 
-You'll find a tutorial how to setup SteVe in AWS using Lightsail here: https://github.com/RWTH-i5-IDSG/steve/wiki/Create-SteVe-Instance-in-AWS-Lightsail
+You'll find a tutorial how to setup SteVe in AWS using Lightsail here: https://github.com/steve-community/steve/wiki/Create-SteVe-Instance-in-AWS-Lightsail
 
 # First Steps
 
@@ -177,7 +177,7 @@ If you are in the EU and offer vehicle charging to other people using SteVe, kee
 
 Are you having issues?
 -----
-See the [FAQ](https://github.com/RWTH-i5-IDSG/steve/wiki/FAQ)
+See the [FAQ](https://github.com/steve-community/steve/wiki/FAQ)
 
 Acknowledgments
 -----

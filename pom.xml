@@ -7,8 +7,8 @@
     <packaging>jar</packaging>
 
     <organization>
-        <name>RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG)</name>
-        <url>http://dbis.rwth-aachen.de/cms/teaching/IDSG</url>
+        <name>SteVe Community Team</name>
+        <url>https://github.com/steve-community/steve</url>
     </organization>
 
     <inceptionYear>2013</inceptionYear>
@@ -110,11 +110,7 @@
                 <version>4.1</version>
                 <configuration>
                     <header>LICENSE-HEADER.txt</header>
-                    <properties>
-                        <owner>${project.organization.name}</owner>
-                        <year>${project.inceptionYear}</year>
-                        <currentYear>2022</currentYear>
-                    </properties>
+                    <properties/>
                     <excludes>
                         <exclude>**/*.txt</exclude>
                         <exclude>**/*.md</exclude>
@@ -319,7 +315,7 @@
                 </executions>
 
                 <configuration>
-                    <!-- https://github.com/RWTH-i5-IDSG/steve/issues/157 -->
+                    <!-- https://github.com/steve-community/steve/issues/157 -->
                     <initSql>SET default_storage_engine=InnoDB;</initSql>
                     <!-- we need this because of extensions. they have a higher version number
                          namespace reserved (e.g. 8.x.x). new migrations in core version should

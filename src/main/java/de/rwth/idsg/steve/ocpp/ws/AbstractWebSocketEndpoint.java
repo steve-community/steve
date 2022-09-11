@@ -1,6 +1,6 @@
 /*
- * SteVe - SteckdosenVerwaltung - https://github.com/RWTH-i5-IDSG/steve
- * Copyright (C) 2013-2022 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
+ * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
+ * Copyright (C) 2013-2019 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -103,7 +103,7 @@ public abstract class AbstractWebSocketEndpoint extends ConcurrentWebSocketHandl
         String incomingString = webSocketMessage.getPayload();
         String chargeBoxId = getChargeBoxId(session);
 
-        // https://github.com/RWTH-i5-IDSG/steve/issues/66
+        // https://github.com/steve-community/steve/issues/66
         if (Strings.isNullOrEmpty(incomingString)) {
             WebSocketLogger.receivedEmptyText(chargeBoxId, session);
             return;

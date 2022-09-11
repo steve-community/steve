@@ -1,6 +1,6 @@
 /*
- * SteVe - SteckdosenVerwaltung - https://github.com/RWTH-i5-IDSG/steve
- * Copyright (C) 2013-2022 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
+ * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
+ * Copyright (C) 2013-2019 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -97,7 +97,7 @@ public class BeanConfiguration implements WebMvcConfigurer {
         hc.addDataSourceProperty(PropertyKey.connectionTimeZone.getKeyName(), CONFIG.getTimeZoneId());
         hc.addDataSourceProperty(PropertyKey.useSSL.getKeyName(), true);
 
-        // https://github.com/RWTH-i5-IDSG/steve/issues/736
+        // https://github.com/steve-community/steve/issues/736
         hc.setMaxLifetime(580_000);
 
         dataSource = new HikariDataSource(hc);

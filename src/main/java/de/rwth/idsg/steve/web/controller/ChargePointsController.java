@@ -1,6 +1,6 @@
 /*
- * SteVe - SteckdosenVerwaltung - https://github.com/RWTH-i5-IDSG/steve
- * Copyright (C) 2013-2022 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
+ * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
+ * Copyright (C) 2013-2019 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -80,7 +80,7 @@ public class ChargePointsController {
     protected static final String ADD_BATCH_PATH = "/add/batch";
 
     // We need the slash at the end to support chargeBoxIds with dots etc. in them
-    // Issue: https://github.com/RWTH-i5-IDSG/steve/issues/270
+    // Issue: https://github.com/steve-community/steve/issues/270
     // Solution: https://stackoverflow.com/a/18378817
     protected static final String UNKNOWN_REMOVE_PATH = "/unknown/remove/{chargeBoxId}/";
     protected static final String UNKNOWN_ADD_PATH = "/unknown/add/{chargeBoxId}/";

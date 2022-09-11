@@ -5,7 +5,7 @@
 
 # Introduction
 
-SteVe started its life at the RWTH Aachen University in 2013. 
+SteVe started its life at the RWTH Aachen University [in 2013](https://github.com/steve-community/steve/issues/827). 
 The name is derived from _Steckdosenverwaltung_ in German (in English: socket administration). 
 The aim of SteVe is to support the deployment and popularity of electric mobility, so it is easy to install and to use. 
 It provides basic functions for the administration of charge points, user data, and RFID cards for user authentication and was tested successfully in operation.

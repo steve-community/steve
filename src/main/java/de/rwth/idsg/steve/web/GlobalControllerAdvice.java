@@ -36,7 +36,7 @@ import java.util.List;
  * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 15.08.2014
  */
-@ControllerAdvice(basePackages = "de.rwth.idsg.steve.web")
+@ControllerAdvice(basePackages = "de.rwth.idsg.steve.web.controller")
 @Slf4j
 public class GlobalControllerAdvice {
 

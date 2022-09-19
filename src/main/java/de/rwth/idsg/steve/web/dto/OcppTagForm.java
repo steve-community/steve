@@ -19,6 +19,7 @@
 package de.rwth.idsg.steve.web.dto;
 
 import de.rwth.idsg.steve.web.validation.IdTag;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -35,6 +36,7 @@ import java.util.Objects;
 @Getter
 @Setter
 @ToString
+@EqualsAndHashCode
 public class OcppTagForm {
 
     // Internal database id

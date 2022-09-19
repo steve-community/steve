@@ -52,7 +52,7 @@ import java.util.List;
  */
 @Slf4j
 @RestController
-@RequestMapping(value = "/api/v1/ocppTags", produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(value = "/api/v1/ocppTags", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 @RequiredArgsConstructor
 public class OcppTagsRestController {
 

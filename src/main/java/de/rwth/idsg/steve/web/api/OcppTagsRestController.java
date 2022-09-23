@@ -22,6 +22,7 @@ import de.rwth.idsg.steve.repository.OcppTagRepository;
 import de.rwth.idsg.steve.repository.dto.OcppTag;
 import de.rwth.idsg.steve.service.OcppTagService;
 import de.rwth.idsg.steve.web.api.ApiControllerAdvice.ApiErrorResponse;
+import de.rwth.idsg.steve.web.api.exception.NotFoundException;
 import de.rwth.idsg.steve.web.dto.OcppTagForm;
 import de.rwth.idsg.steve.web.dto.OcppTagQueryForm;
 import io.swagger.annotations.ApiResponse;
@@ -40,7 +41,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.server.ResponseStatusException;
 
 import javax.validation.Valid;
 import java.util.Collections;
@@ -52,7 +52,7 @@ import java.util.List;
  */
 @Slf4j
 @RestController
-@RequestMapping(value = "/api/v1/ocppTags", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+@RequestMapping(value = "/api/v1/ocppTags", produces = MediaType.APPLICATION_JSON_VALUE)
 @RequiredArgsConstructor
 public class OcppTagsRestController {
 
@@ -63,7 +63,6 @@ public class OcppTagsRestController {
         @ApiResponse(code = 200, message = "OK"),
         @ApiResponse(code = 400, message = "Bad Request", response = ApiErrorResponse.class),
         @ApiResponse(code = 401, message = "Unauthorized", response = ApiErrorResponse.class),
-        @ApiResponse(code = 403, message = "Forbidden", response = ApiErrorResponse.class),
         @ApiResponse(code = 500, message = "Internal Server Error", response = ApiErrorResponse.class)}
     )
     @GetMapping(value = "")
@@ -80,7 +79,6 @@ public class OcppTagsRestController {
         @ApiResponse(code = 200, message = "OK"),
         @ApiResponse(code = 400, message = "Bad Request", response = ApiErrorResponse.class),
         @ApiResponse(code = 401, message = "Unauthorized", response = ApiErrorResponse.class),
-        @ApiResponse(code = 403, message = "Forbidden", response = ApiErrorResponse.class),
         @ApiResponse(code = 404, message = "Not Found", response = ApiErrorResponse.class),
         @ApiResponse(code = 500, message = "Internal Server Error", response = ApiErrorResponse.class)}
     )
@@ -98,7 +96,6 @@ public class OcppTagsRestController {
         @ApiResponse(code = 201, message = "Created"),
         @ApiResponse(code = 400, message = "Bad Request", response = ApiErrorResponse.class),
         @ApiResponse(code = 401, message = "Unauthorized", response = ApiErrorResponse.class),
-        @ApiResponse(code = 403, message = "Forbidden", response = ApiErrorResponse.class),
         @ApiResponse(code = 404, message = "Not Found", response = ApiErrorResponse.class),
         @ApiResponse(code = 500, message = "Internal Server Error", response = ApiErrorResponse.class)}
     )
@@ -120,7 +117,6 @@ public class OcppTagsRestController {
         @ApiResponse(code = 200, message = "OK"),
         @ApiResponse(code = 400, message = "Bad Request", response = ApiErrorResponse.class),
         @ApiResponse(code = 401, message = "Unauthorized", response = ApiErrorResponse.class),
-        @ApiResponse(code = 403, message = "Forbidden", response = ApiErrorResponse.class),
         @ApiResponse(code = 404, message = "Not Found", response = ApiErrorResponse.class),
         @ApiResponse(code = 500, message = "Internal Server Error", response = ApiErrorResponse.class)}
     )
@@ -141,7 +137,6 @@ public class OcppTagsRestController {
         @ApiResponse(code = 200, message = "OK"),
         @ApiResponse(code = 400, message = "Bad Request", response = ApiErrorResponse.class),
         @ApiResponse(code = 401, message = "Unauthorized", response = ApiErrorResponse.class),
-        @ApiResponse(code = 403, message = "Forbidden", response = ApiErrorResponse.class),
         @ApiResponse(code = 404, message = "Not Found", response = ApiErrorResponse.class),
         @ApiResponse(code = 500, message = "Internal Server Error", response = ApiErrorResponse.class)}
     )
@@ -163,7 +158,7 @@ public class OcppTagsRestController {
 
         List<OcppTag.Overview> results = ocppTagRepository.getOverview(params);
         if (results.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Could not find this ocppTag");
+            throw new NotFoundException("Could not find this ocppTag");
         }
         return results.get(0);
     }

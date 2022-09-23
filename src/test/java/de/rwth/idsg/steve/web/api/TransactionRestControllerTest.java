@@ -41,7 +41,7 @@ public class TransactionRestControllerTest {
         mockMvc = MockMvcBuilders.standaloneSetup(new TransactionsRestController(transactionRepository))
             .setControllerAdvice(new ApiControllerAdvice())
             .setMessageConverters(new MappingJackson2HttpMessageConverter())
-            .alwaysExpect(content().contentType("application/json;charset=UTF-8"))
+            .alwaysExpect(content().contentType("application/json"))
             .build();
     }
 

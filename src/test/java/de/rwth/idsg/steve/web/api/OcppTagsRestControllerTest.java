@@ -49,7 +49,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ExtendWith(MockitoExtension.class)
 public class OcppTagsRestControllerTest {
 
-    private static final String CONTENT_TYPE = "application/json;charset=UTF-8";
+    private static final String CONTENT_TYPE = "application/json";
 
     private final ObjectMapper objectMapper = Jackson2ObjectMapperBuilder.json().build();
 

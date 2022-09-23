@@ -19,6 +19,8 @@
 package de.rwth.idsg.steve.web.api;
 
 import de.rwth.idsg.steve.web.LocalDateTimeEditor;
+import de.rwth.idsg.steve.web.api.exception.BadRequestException;
+import de.rwth.idsg.steve.web.api.exception.NotFoundException;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.joda.time.DateTime;
@@ -27,13 +29,11 @@ import org.springframework.beans.propertyeditors.StringTrimmerEditor;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.BindException;
 import org.springframework.web.bind.WebDataBinder;
-import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.InitBinder;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
-import org.springframework.web.server.ResponseStatusException;
-import org.springframework.web.servlet.ModelAndView;
-import org.springframework.web.servlet.view.json.MappingJackson2JsonView;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -41,11 +41,9 @@ import javax.servlet.http.HttpServletRequest;
  * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 13.09.2022
  */
-@ControllerAdvice(basePackages = "de.rwth.idsg.steve.web.api")
+@RestControllerAdvice(basePackages = "de.rwth.idsg.steve.web.api")
 @Slf4j
 public class ApiControllerAdvice {
-
-    private final MappingJackson2JsonView jsonView = new MappingJackson2JsonView();
 
     @InitBinder
     public void binder(WebDataBinder binder) {
@@ -54,50 +52,57 @@ public class ApiControllerAdvice {
     }
 
     @ExceptionHandler(BindException.class)
-    public ModelAndView handleBindException(HttpServletRequest req, BindException exception) {
-        StringBuffer url = req.getRequestURL();
+    @ResponseStatus(value = HttpStatus.BAD_REQUEST)
+    public ApiErrorResponse handleBindException(HttpServletRequest req, BindException exception) {
+        String url = req.getRequestURL().toString();
         log.error("Request: {} raised following exception.", url, exception);
         return createResponse(url, HttpStatus.BAD_REQUEST, "Error understanding the request");
     }
 
-    @ExceptionHandler(ResponseStatusException.class)
-    public ModelAndView handleResponseStatusException(HttpServletRequest req, ResponseStatusException exception) {
-        StringBuffer url = req.getRequestURL();
+    @ExceptionHandler(NotFoundException.class)
+    @ResponseStatus(value = HttpStatus.NOT_FOUND)
+    public ApiErrorResponse handleNotFoundException(HttpServletRequest req, NotFoundException exception) {
+        String url = req.getRequestURL().toString();
         log.error("Request: {} raised following exception.", url, exception);
-        return createResponse(url, exception.getStatus(), exception.getReason());
+        return createResponse(url, HttpStatus.NOT_FOUND, exception.getMessage());
+    }
+
+    @ExceptionHandler(BadRequestException.class)
+    @ResponseStatus(value = HttpStatus.BAD_REQUEST)
+    public ApiErrorResponse handleBadRequestException(HttpServletRequest req, BadRequestException exception) {
+        String url = req.getRequestURL().toString();
+        log.error("Request: {} raised following exception.", url, exception);
+        return createResponse(url, HttpStatus.BAD_REQUEST, exception.getMessage());
     }
 
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
-    public ModelAndView handleMethodArgumentTypeMismatchException(HttpServletRequest req, MethodArgumentTypeMismatchException exception) {
-        StringBuffer url = req.getRequestURL();
+    @ResponseStatus(value = HttpStatus.BAD_REQUEST)
+    public ApiErrorResponse handleMethodArgumentTypeMismatchException(HttpServletRequest req, MethodArgumentTypeMismatchException exception) {
+        String url = req.getRequestURL().toString();
         log.error("Request: {} raised following exception.", url, exception);
         return createResponse(url, HttpStatus.BAD_REQUEST, exception.getMessage());
     }
 
     @ExceptionHandler(Exception.class)
-    public ModelAndView handleException(HttpServletRequest req, Exception exception) {
-        StringBuffer url = req.getRequestURL();
+    @ResponseStatus(value = HttpStatus.INTERNAL_SERVER_ERROR)
+    public ApiErrorResponse handleException(HttpServletRequest req, Exception exception) {
+        String url = req.getRequestURL().toString();
         log.error("Request: {} raised following exception.", url, exception);
         return createResponse(url, HttpStatus.INTERNAL_SERVER_ERROR, exception.getMessage());
     }
 
-    private ModelAndView createResponse(StringBuffer url, HttpStatus status, String message) {
-        ModelAndView result = new ModelAndView(jsonView);
-        result.setStatus(status);
+    public static ApiErrorResponse createResponse(String url, HttpStatus status, String message) {
+        ApiErrorResponse result = new ApiErrorResponse();
 
-        result.addObject("timestamp", DateTime.now().toString());
-        result.addObject("status", status.value());
-        result.addObject("error", status.getReasonPhrase());
-        result.addObject("message", message);
-        result.addObject("path", url);
+        result.setTimestamp(DateTime.now().toString());
+        result.setStatus(status.value());
+        result.setError(status.getReasonPhrase());
+        result.setMessage(message);
+        result.setPath(url);
 
         return result;
     }
 
-    /**
-     * This is just here to be used by Swagger and for documentation purposes. It mirrors the fields used in
-     * {@link ApiControllerAdvice#createResponse(StringBuffer, HttpStatus, String)}
-     */
     @Data
     public static class ApiErrorResponse {
         private String timestamp;

@@ -249,12 +249,7 @@ public class ChargePointServiceImpl implements ChargePointService {
     @Override
     @Transactional
     public void updateChargeboxHeartbeat(String chargeBoxId, DateTime now) {
-        OcppChargeBox cb = chargeBoxRepository.findByChargeBoxId(chargeBoxId);
-        if (cb == null) {
-            throw new IllegalArgumentException("Invalid charge box id: " + chargeBoxId);
-        }
-        cb.setLastHeartbeatTimestamp(now.toDate());
-        chargeBoxRepository.save(cb);
+        chargeBoxRepository.updateChargeBoxLastHeartbeat(chargeBoxId, now.toDate());
     }
 
     @Override

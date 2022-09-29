@@ -20,6 +20,7 @@ package net.parkl.ocpp.repositories;
 
 import net.parkl.ocpp.entities.OcppChargeBox;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.Date;
@@ -45,6 +46,11 @@ public interface OcppChargeBoxRepository extends JpaRepository<OcppChargeBox, In
 	@Query("SELECT COUNT(c.lastHeartbeatTimestamp) FROM OcppChargeBox AS c WHERE c.lastHeartbeatTimestamp<?1")
 	long countLastHeartBeatBefore(Date date);
 	
-@Query("SELECT c.registrationStatus FROM OcppChargeBox AS c WHERE c.chargeBoxId=?1")
+	@Query("SELECT c.registrationStatus FROM OcppChargeBox AS c WHERE c.chargeBoxId=?1")
     String findChargeBoxRegistrationStatus(String chargeBoxId);
+
+	@Modifying(clearAutomatically=true)
+	@Query("UPDATE OcppChargeBox c SET c.lastHeartbeatTimestamp=?2 WHERE c.chargeBoxId=?1")
+	int updateChargeBoxLastHeartbeat(String chargeBoxId,Date lastHearbeat);
+
 }

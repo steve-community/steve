@@ -26,7 +26,6 @@ import lombok.Setter;
 
 import javax.validation.constraints.AssertTrue;
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Pattern;
 import java.util.Objects;
 
 /**
@@ -46,7 +45,9 @@ public class ChangeConfigurationParams extends MultipleChargePointSelect {
 
     // Disabled @NotBlank after https://github.com/steve-community/steve/issues/148
     // @NotBlank(message = "Value is required")
-    @Pattern(regexp = "\\S+", message = "Value cannot contain any whitespace")
+    //
+    // Disabled @Pattern after https://github.com/steve-community/steve/issues/920
+    // @Pattern(regexp = "\\S+", message = "Value cannot contain any whitespace")
     private String value;
 
     @AssertTrue(message = "Custom Configuration Key cannot be left blank")

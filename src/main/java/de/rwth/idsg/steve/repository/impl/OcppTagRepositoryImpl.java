@@ -20,6 +20,7 @@ package de.rwth.idsg.steve.repository.impl;
 
 import de.rwth.idsg.steve.SteveException;
 import de.rwth.idsg.steve.repository.OcppTagRepository;
+import de.rwth.idsg.steve.repository.OcppTagWriteRepository;
 import de.rwth.idsg.steve.repository.dto.OcppTag.Overview;
 import de.rwth.idsg.steve.web.dto.OcppTagForm;
 import de.rwth.idsg.steve.web.dto.OcppTagQueryForm;
@@ -31,7 +32,6 @@ import org.joda.time.DateTime;
 import org.jooq.DSLContext;
 import org.jooq.JoinType;
 import org.jooq.Record10;
-import org.jooq.Record7;
 import org.jooq.RecordMapper;
 import org.jooq.Result;
 import org.jooq.SelectQuery;
@@ -55,7 +55,7 @@ import static jooq.steve.db.tables.OcppTagActivity.OCPP_TAG_ACTIVITY;
  */
 @Slf4j
 @Repository
-public class OcppTagRepositoryImpl implements OcppTagRepository {
+public class OcppTagRepositoryImpl implements OcppTagRepository, OcppTagWriteRepository {
 
     private final DSLContext ctx;
 

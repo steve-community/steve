@@ -34,6 +34,10 @@
             <td>Connector ID (integer):</td>
             <td><form:input path="connectorId" placeholder="0 = charge point as a whole"/></td>
         </tr>
+        <tr>
+            <td>Transaction ID (integer):</td>
+            <td><form:input path="transactionId" placeholder="only necessary for TxProfile"/></td>
+        </tr>
         <tr><td></td><td><div class="submit-button"><input type="submit" value="Perform"></div></td></tr>
     </table>
 </form:form>

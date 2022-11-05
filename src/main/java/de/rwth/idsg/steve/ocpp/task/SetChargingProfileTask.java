@@ -93,6 +93,7 @@ public class SetChargingProfileTask extends Ocpp16AndAboveTask<EnhancedSetChargi
 
         ChargingProfile ocppProfile = new ChargingProfile()
                 .withChargingProfileId(profile.getChargingProfilePk())
+                .withTransactionId(params.getDelegate().getTransactionId())
                 .withStackLevel(profile.getStackLevel())
                 .withChargingProfilePurpose(ChargingProfilePurposeType.fromValue(profile.getChargingProfilePurpose()))
                 .withChargingProfileKind(ChargingProfileKindType.fromValue(profile.getChargingProfileKind()))

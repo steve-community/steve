@@ -139,5 +139,14 @@ public class ChargePointService16_Client extends ChargePointService15_Client {
             throw new SteveException("TxProfile should only be set at Charge Point ConnectorId > 0");
         }
 
+        if (ChargingProfilePurposeType.TX_PROFILE == purpose
+                && params.getTransactionId() == null) {
+            throw new SteveException("transaction id is required for TxProfile");
+        }
+
+        if (ChargingProfilePurposeType.TX_PROFILE != purpose
+                && params.getTransactionId() != null) {
+            throw new SteveException("transaction id should only be set for TxProfile");
+        }
     }
 }

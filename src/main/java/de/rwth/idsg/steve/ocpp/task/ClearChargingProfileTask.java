@@ -52,18 +52,16 @@ public class ClearChargingProfileTask extends Ocpp16AndAboveTask<ClearChargingPr
             public void success(String chargeBoxId, String statusValue) {
                 addNewResponse(chargeBoxId, statusValue);
 
-                if ("Accepted".equalsIgnoreCase(statusValue)) {
-                    switch (params.getFilterType()) {
-                        case ChargingProfileId:
-                            chargingProfileRepository.clearProfile(params.getChargingProfilePk(), chargeBoxId);
-                            break;
-                        case OtherParameters:
-                            chargingProfileRepository.clearProfile(chargeBoxId,
-                                    params.getConnectorId(), params.getChargingProfilePurpose(), params.getStackLevel());
-                            break;
-                        default:
-                            log.warn("Unexpected {} enum value", ClearChargingProfileFilterType.class.getSimpleName());
-                    }
+                switch (params.getFilterType()) {
+                    case ChargingProfileId:
+                        chargingProfileRepository.clearProfile(params.getChargingProfilePk(), chargeBoxId);
+                        break;
+                    case OtherParameters:
+                        chargingProfileRepository.clearProfile(chargeBoxId,
+                        params.getConnectorId(), params.getChargingProfilePurpose(), params.getStackLevel());
+		        break;
+                    default:
+                        log.warn("Unexpected {} enum value", ClearChargingProfileFilterType.class.getSimpleName());
                 }
             }
         };

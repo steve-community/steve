@@ -57,11 +57,13 @@ public class SetChargingProfileTask extends Ocpp16AndAboveTask<EnhancedSetChargi
         return new DefaultOcppCallback<String>() {
             @Override
             public void success(String chargeBoxId, String statusValue) {
+                ChargingProfilePurposeType purpose = ChargingProfilePurposeType.fromValue(params.getDetails().getProfile().getChargingProfilePurpose());
                 addNewResponse(chargeBoxId, statusValue);
 
-                if ("Accepted".equalsIgnoreCase(statusValue)) {
+                if ("Accepted".equalsIgnoreCase(statusValue) && ChargingProfilePurposeType.TX_PROFILE != purpose) {
                     int chargingProfilePk = params.getDetails().getProfile().getChargingProfilePk();
                     int connectorId = params.getDelegate().getConnectorId();
+
                     chargingProfileRepository.setProfile(chargingProfilePk, chargeBoxId, connectorId);
                 }
             }

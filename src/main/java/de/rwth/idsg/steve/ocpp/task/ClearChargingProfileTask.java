@@ -52,18 +52,22 @@ public class ClearChargingProfileTask extends Ocpp16AndAboveTask<ClearChargingPr
             public void success(String chargeBoxId, String statusValue) {
                 addNewResponse(chargeBoxId, statusValue);
 
-                if ("Accepted".equalsIgnoreCase(statusValue)) {
-                    switch (params.getFilterType()) {
-                        case ChargingProfileId:
-                            chargingProfileRepository.clearProfile(params.getChargingProfilePk(), chargeBoxId);
-                            break;
-                        case OtherParameters:
-                            chargingProfileRepository.clearProfile(chargeBoxId,
-                                    params.getConnectorId(), params.getChargingProfilePurpose(), params.getStackLevel());
-                            break;
-                        default:
-                            log.warn("Unexpected {} enum value", ClearChargingProfileFilterType.class.getSimpleName());
-                    }
+                switch (params.getFilterType()) {
+                    case ChargingProfileId:
+                        chargingProfileRepository.clearProfile(params.getChargingProfilePk(), chargeBoxId);
+                        break;
+                    case OtherParameters:
+                        chargingProfileRepository.clearProfile(chargeBoxId,
+                        params.getConnectorId(), params.getChargingProfilePurpose(), params.getStackLevel());
+                        break;
+                    default:
+                        log.warn("Unexpected {} enum value", ClearChargingProfileFilterType.class.getSimpleName());
+                        return;
+                }
+
+                // https://github.com/steve-community/steve/pull/968
+                if (!"Accepted".equalsIgnoreCase(statusValue)) {
+                    log.info("Deleted charging profile(s) for chargebox '{}' from DB even though the response was {}", chargeBoxId, statusValue);
                 }
             }
         };

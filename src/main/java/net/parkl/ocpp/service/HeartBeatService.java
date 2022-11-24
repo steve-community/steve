@@ -10,6 +10,7 @@ import de.rwth.idsg.steve.service.ChargePointHelperService;
 import de.rwth.idsg.steve.web.dto.ocpp.ChangeConfigurationParams;
 import de.rwth.idsg.steve.web.dto.ocpp.ConfigurationKeyEnum;
 import lombok.extern.slf4j.Slf4j;
+import net.parkl.ocpp.service.config.AdvancedChargeBoxConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -24,21 +25,28 @@ public class HeartBeatService {
     private final ChargePointService15_Invoker service15Invoker;
     private final ChargePointService16_Invoker service16Invoker;
     private final ChargePointHelperService chargePointHelperService;
+    private final AdvancedChargeBoxConfiguration chargeBoxConfiguration;
     private final int heartBeatIntervalInSecs;
 
     @Autowired
-    public HeartBeatService(ChargePointService15_Invoker chargePointService15_InvokerImpl,
-                            ChargePointService16_Invoker chargePointService16_InvokerImpl,
+    public HeartBeatService(ChargePointService15_Invoker chargePointService15Invoker,
+                            ChargePointService16_Invoker chargePointService16Invoker,
                             ChargePointHelperService chargePointHelperService,
+                            AdvancedChargeBoxConfiguration chargeBoxConfiguration,
                             @Value("${heartbeat.interval.secs:60}") int heartBeatIntervalInSecs) {
 
-        this.service15Invoker = chargePointService15_InvokerImpl;
-        this.service16Invoker = chargePointService16_InvokerImpl;
+        this.service15Invoker = chargePointService15Invoker;
+        this.service16Invoker = chargePointService16Invoker;
         this.chargePointHelperService = chargePointHelperService;
+        this.chargeBoxConfiguration = chargeBoxConfiguration;
         this.heartBeatIntervalInSecs = heartBeatIntervalInSecs;
     }
 
     public void changeConfig(OcppProtocol ocppProtocol, String chargeBoxId) {
+        if (chargeBoxConfiguration.skipHeartBeatConfig(chargeBoxId)) {
+            log.warn("HeartBeat change config skipped for charge box: {}", chargeBoxId);
+            return;
+        }
         List<ChargePointSelect> chargePoints;
         ChargePointSelect chargePointSelect;
         ChangeConfigurationTask task;

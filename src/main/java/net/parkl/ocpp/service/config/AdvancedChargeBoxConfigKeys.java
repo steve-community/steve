@@ -21,6 +21,9 @@ package net.parkl.ocpp.service.config;
 import net.parkl.ocpp.entities.OcppChargingProcess;
 
 public class AdvancedChargeBoxConfigKeys {
+    private AdvancedChargeBoxConfigKeys() {
+    }
+
     /**
      * Start timeout enabled for availability change
      */
@@ -69,6 +72,7 @@ public class AdvancedChargeBoxConfigKeys {
      * Check heartbeat offline alert for chargebox
      */
     public static final String KEY_SKIP_HEARTBEAT_CHECK = "skip.heartbeat.check";
+    public static final String KEY_SKIP_HEARTBEAT_CONFIG = "skip.heartbeat.config";
 
 
 }

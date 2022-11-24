@@ -110,4 +110,7 @@ public class AdvancedChargeBoxConfiguration {
         return chargeBoxConfigService.getChargeBoxesForAlert(KEY_SKIP_HEARTBEAT_CHECK);
     }
 
+    public boolean skipHeartBeatConfig(String chargeBoxId) {
+        return getConfigValueAsBool(chargeBoxId, KEY_SKIP_HEARTBEAT_CONFIG, false);
+    }
 }

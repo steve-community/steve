@@ -29,14 +29,14 @@ public class HeartBeatService {
     private final int heartBeatIntervalInSecs;
 
     @Autowired
-    public HeartBeatService(ChargePointService15_Invoker chargePointService15Invoker,
-                            ChargePointService16_Invoker chargePointService16Invoker,
+    public HeartBeatService(ChargePointService15_Invoker chargePointService15_InvokerImpl,
+                            ChargePointService16_Invoker chargePointService16_InvokerImpl,
                             ChargePointHelperService chargePointHelperService,
                             AdvancedChargeBoxConfiguration chargeBoxConfiguration,
                             @Value("${heartbeat.interval.secs:60}") int heartBeatIntervalInSecs) {
 
-        this.service15Invoker = chargePointService15Invoker;
-        this.service16Invoker = chargePointService16Invoker;
+        this.service15Invoker = chargePointService15_InvokerImpl;
+        this.service16Invoker = chargePointService16_InvokerImpl;
         this.chargePointHelperService = chargePointHelperService;
         this.chargeBoxConfiguration = chargeBoxConfiguration;
         this.heartBeatIntervalInSecs = heartBeatIntervalInSecs;

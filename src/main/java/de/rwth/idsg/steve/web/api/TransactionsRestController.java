@@ -56,7 +56,7 @@ public class TransactionsRestController {
     )
     @GetMapping(value = "")
     @ResponseBody
-    public List<Transaction> get(@Valid TransactionQueryForm params) {
+    public List<Transaction> get(@Valid TransactionQueryForm.ForApi params) {
         log.debug("Read request for query: {}", params);
 
         if (params.isReturnCSV()) {

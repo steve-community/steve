@@ -16,11 +16,24 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package de.rwth.idsg.steve.web.api.exception;
+package de.rwth.idsg.steve.web.api;
 
-public class BadRequestException extends RuntimeException {
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 
-    public BadRequestException(String message) {
-        super(message);
+public class AbstractControllerTest {
+
+    ObjectMapper objectMapper;
+
+    AbstractControllerTest() {
+        ObjectMapper objectMapper = Jackson2ObjectMapperBuilder.json().build();
+        // if the client sends unknown props, just ignore them instead of failing
+        objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        // default is true
+        objectMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
+
+        this.objectMapper = objectMapper;
     }
 }

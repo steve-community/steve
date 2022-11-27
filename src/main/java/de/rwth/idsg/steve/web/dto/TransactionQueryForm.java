@@ -46,7 +46,7 @@ public class TransactionQueryForm extends QueryForm {
     @ApiModelProperty(value = "Return active or all transactions? Defaults to ALL")
     private QueryType type = QueryType.ACTIVE;
 
-    @ApiModelProperty(value = "Return the time period of the transactions. If FROM_TO, 'from' and 'to' must be set. Additionally, 'to' must be after 'from'")
+    @ApiModelProperty(value = "Return the time period of the transactions. If FROM_TO, 'from' and 'to' must be set. Additionally, 'to' must be after 'from'. Defaults to ALL")
     private QueryPeriodType periodType = QueryPeriodType.ALL;
 
     @ApiModelProperty(hidden = true)
@@ -115,6 +115,16 @@ public class TransactionQueryForm extends QueryForm {
                 }
             }
             throw new IllegalArgumentException(v);
+        }
+    }
+
+    @ToString(callSuper = true)
+    public static class ForApi extends TransactionQueryForm {
+
+        public ForApi() {
+            super();
+            setType(QueryType.ALL);
+            setPeriodType(QueryPeriodType.ALL);
         }
     }
 }

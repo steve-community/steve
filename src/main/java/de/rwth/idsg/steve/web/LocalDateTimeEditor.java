@@ -19,9 +19,13 @@
 package de.rwth.idsg.steve.web;
 
 import com.google.common.base.Strings;
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
 import org.joda.time.LocalDateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
+import org.joda.time.format.ISODateTimeFormat;
+import org.springframework.security.core.parameters.P;
 
 import java.beans.PropertyEditorSupport;
 
@@ -29,9 +33,18 @@ import java.beans.PropertyEditorSupport;
  * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 04.01.2015
  */
+@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public class LocalDateTimeEditor extends PropertyEditorSupport {
 
-    private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm");
+    private final DateTimeFormatter dateTimeFormatter;
+
+    public static LocalDateTimeEditor forMvc() {
+        return new LocalDateTimeEditor(DateTimeFormat.forPattern("yyyy-MM-dd HH:mm"));
+    }
+
+    public static LocalDateTimeEditor forApi() {
+        return new LocalDateTimeEditor(ISODateTimeFormat.localDateOptionalTimeParser());
+    }
 
     @Override
     public String getAsText() {
@@ -39,7 +52,7 @@ public class LocalDateTimeEditor extends PropertyEditorSupport {
         if (value == null) {
             return null;
         } else {
-            return DATE_TIME_FORMATTER.print((LocalDateTime) value);
+            return dateTimeFormatter.print((LocalDateTime) value);
         }
     }
 
@@ -48,7 +61,7 @@ public class LocalDateTimeEditor extends PropertyEditorSupport {
         if (Strings.isNullOrEmpty(text)) {
             setValue(null);
         } else {
-            setValue(DATE_TIME_FORMATTER.parseLocalDateTime(text));
+            setValue(dateTimeFormatter.parseLocalDateTime(text));
         }
     }
 }

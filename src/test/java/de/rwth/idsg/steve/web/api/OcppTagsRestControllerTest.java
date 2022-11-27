@@ -1,6 +1,23 @@
+/*
+ * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
+ * Copyright (C) 2013-2019 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
+ * All Rights Reserved.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
 package de.rwth.idsg.steve.web.api;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import de.rwth.idsg.steve.SteveException;
 import de.rwth.idsg.steve.repository.OcppTagRepository;
 import de.rwth.idsg.steve.repository.dto.OcppTag;
@@ -15,7 +32,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultMatcher;
@@ -47,11 +63,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * @since 17.09.2022
  */
 @ExtendWith(MockitoExtension.class)
-public class OcppTagsRestControllerTest {
+public class OcppTagsRestControllerTest extends AbstractControllerTest {
 
     private static final String CONTENT_TYPE = "application/json";
-
-    private final ObjectMapper objectMapper = Jackson2ObjectMapperBuilder.json().build();
 
     @Mock
     private OcppTagRepository ocppTagRepository;
@@ -126,7 +140,7 @@ public class OcppTagsRestControllerTest {
     @DisplayName("GET all: Sets all valid params, expected 200")
     public void test5() throws Exception {
         // given
-        DateTime someDate = DateTime.parse("2020-10-01T00:00Z");
+        DateTime someDate = DateTime.parse("2020-10-01T00:00:00.000Z");
         OcppTag.Overview result = OcppTag.Overview.builder()
             .ocppTagPk(121)
             .idTag("id-1")
@@ -161,8 +175,7 @@ public class OcppTagsRestControllerTest {
             .andExpect(jsonPath("$[0].parentIdTag").value("parent-id-1"))
             .andExpect(jsonPath("$[0].inTransaction").value("false"))
             .andExpect(jsonPath("$[0].blocked").value("true"))
-            .andExpect(jsonPath("$[0].expiryDateFormatted").value("2020-10-01 at 00:00"))
-            .andExpect(jsonPath("$[0].expiryDate").value(someDate.getMillis()))
+            .andExpect(jsonPath("$[0].expiryDate").value("2020-10-01T00:00:00.000Z"))
             .andExpect(jsonPath("$[0].maxActiveTransactionCount").value("4"))
             .andExpect(jsonPath("$[0].activeTransactionCount").value("0"))
             .andExpect(jsonPath("$[0].note").value("some note"));

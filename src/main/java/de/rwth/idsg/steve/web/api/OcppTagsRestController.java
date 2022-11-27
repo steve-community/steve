@@ -18,11 +18,11 @@
  */
 package de.rwth.idsg.steve.web.api;
 
+import de.rwth.idsg.steve.SteveException;
 import de.rwth.idsg.steve.repository.OcppTagRepository;
 import de.rwth.idsg.steve.repository.dto.OcppTag;
 import de.rwth.idsg.steve.service.OcppTagService;
 import de.rwth.idsg.steve.web.api.ApiControllerAdvice.ApiErrorResponse;
-import de.rwth.idsg.steve.web.api.exception.NotFoundException;
 import de.rwth.idsg.steve.web.dto.OcppTagForm;
 import de.rwth.idsg.steve.web.dto.OcppTagQueryForm;
 import io.swagger.annotations.ApiResponse;
@@ -67,7 +67,7 @@ public class OcppTagsRestController {
     )
     @GetMapping(value = "")
     @ResponseBody
-    public List<OcppTag.Overview> get(OcppTagQueryForm params) {
+    public List<OcppTag.Overview> get(OcppTagQueryForm.ForApi params) {
         log.debug("Read request for query: {}", params);
 
         var response = ocppTagRepository.getOverview(params);
@@ -96,6 +96,7 @@ public class OcppTagsRestController {
         @ApiResponse(code = 201, message = "Created"),
         @ApiResponse(code = 400, message = "Bad Request", response = ApiErrorResponse.class),
         @ApiResponse(code = 401, message = "Unauthorized", response = ApiErrorResponse.class),
+        @ApiResponse(code = 422, message = "Unprocessable Entity", response = ApiErrorResponse.class),
         @ApiResponse(code = 404, message = "Not Found", response = ApiErrorResponse.class),
         @ApiResponse(code = 500, message = "Internal Server Error", response = ApiErrorResponse.class)}
     )
@@ -153,12 +154,12 @@ public class OcppTagsRestController {
     }
 
     private OcppTag.Overview getOneInternal(int ocppTagPk) {
-        OcppTagQueryForm params = new OcppTagQueryForm();
+        OcppTagQueryForm.ForApi params = new OcppTagQueryForm.ForApi();
         params.setOcppTagPk(ocppTagPk);
 
         List<OcppTag.Overview> results = ocppTagRepository.getOverview(params);
         if (results.isEmpty()) {
-            throw new NotFoundException("Could not find this ocppTag");
+            throw new SteveException.NotFound("Could not find this ocppTag");
         }
         return results.get(0);
     }

@@ -18,9 +18,9 @@
  */
 package de.rwth.idsg.steve.web.api;
 
+import de.rwth.idsg.steve.SteveException;
 import de.rwth.idsg.steve.web.LocalDateTimeEditor;
 import de.rwth.idsg.steve.web.api.exception.BadRequestException;
-import de.rwth.idsg.steve.web.api.exception.NotFoundException;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.joda.time.DateTime;
@@ -48,7 +48,7 @@ public class ApiControllerAdvice {
     @InitBinder
     public void binder(WebDataBinder binder) {
         binder.registerCustomEditor(String.class, new StringTrimmerEditor(true));
-        binder.registerCustomEditor(LocalDateTime.class, new LocalDateTimeEditor());
+        binder.registerCustomEditor(LocalDateTime.class, LocalDateTimeEditor.forApi());
     }
 
     @ExceptionHandler(BindException.class)
@@ -59,12 +59,20 @@ public class ApiControllerAdvice {
         return createResponse(url, HttpStatus.BAD_REQUEST, "Error understanding the request");
     }
 
-    @ExceptionHandler(NotFoundException.class)
+    @ExceptionHandler(SteveException.NotFound.class)
     @ResponseStatus(value = HttpStatus.NOT_FOUND)
-    public ApiErrorResponse handleNotFoundException(HttpServletRequest req, NotFoundException exception) {
+    public ApiErrorResponse handleNotFoundException(HttpServletRequest req, SteveException.NotFound exception) {
         String url = req.getRequestURL().toString();
         log.error("Request: {} raised following exception.", url, exception);
         return createResponse(url, HttpStatus.NOT_FOUND, exception.getMessage());
+    }
+
+    @ExceptionHandler(SteveException.AlreadyExists.class)
+    @ResponseStatus(value = HttpStatus.UNPROCESSABLE_ENTITY)
+    public ApiErrorResponse handleAlreadyExistsException(HttpServletRequest req, SteveException.AlreadyExists exception) {
+        String url = req.getRequestURL().toString();
+        log.error("Request: {} raised following exception.", url, exception);
+        return createResponse(url, HttpStatus.UNPROCESSABLE_ENTITY, exception.getMessage());
     }
 
     @ExceptionHandler(BadRequestException.class)
@@ -94,7 +102,7 @@ public class ApiControllerAdvice {
     public static ApiErrorResponse createResponse(String url, HttpStatus status, String message) {
         ApiErrorResponse result = new ApiErrorResponse();
 
-        result.setTimestamp(DateTime.now().toString());
+        result.setTimestamp(DateTime.now());
         result.setStatus(status.value());
         result.setError(status.getReasonPhrase());
         result.setMessage(message);
@@ -105,7 +113,7 @@ public class ApiControllerAdvice {
 
     @Data
     public static class ApiErrorResponse {
-        private String timestamp;
+        private DateTime timestamp;
         private int status;
         private String error;
         private String message;

@@ -1,3 +1,21 @@
+/*
+ * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
+ * Copyright (C) 2013-2019 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
+ * All Rights Reserved.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
 package de.rwth.idsg.steve.web.api;
 
 import de.rwth.idsg.steve.repository.TransactionRepository;
@@ -29,7 +47,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * @since 17.09.2022
  */
 @ExtendWith(MockitoExtension.class)
-public class TransactionRestControllerTest {
+public class TransactionRestControllerTest extends AbstractControllerTest {
 
     @Mock
     private TransactionRepository transactionRepository;
@@ -40,7 +58,7 @@ public class TransactionRestControllerTest {
     public void setup() {
         mockMvc = MockMvcBuilders.standaloneSetup(new TransactionsRestController(transactionRepository))
             .setControllerAdvice(new ApiControllerAdvice())
-            .setMessageConverters(new MappingJackson2HttpMessageConverter())
+            .setMessageConverters(new MappingJackson2HttpMessageConverter(objectMapper))
             .alwaysExpect(content().contentType("application/json"))
             .build();
     }
@@ -154,8 +172,8 @@ public class TransactionRestControllerTest {
                 .param("periodType", "FROM_TO")
                 .param("chargeBoxId", transaction.getChargeBoxId())
                 .param("ocppIdTag", transaction.getOcppIdTag())
-                .param("from", "2022-10-01 00:00")
-                .param("to", "2022-10-08 00:00")
+                .param("from", "2022-10-01T00:00")
+                .param("to", "2022-10-08T00:00")
             )
             .andExpect(status().isOk())
             .andExpect(jsonPath("$", hasSize(1)))

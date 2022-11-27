@@ -18,6 +18,8 @@
  */
 package de.rwth.idsg.steve.repository.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.ToString;
@@ -43,7 +45,13 @@ public final class OcppTag {
         private final boolean inTransaction;
         private final boolean blocked;
 
+        /**
+         * Only relevant for the web pages. Disabled for API
+         */
+        @JsonIgnore
+        @ApiModelProperty(hidden = true)
         private final String expiryDateFormatted;
+
         private final DateTime expiryDate;
 
         private final Integer maxActiveTransactionCount;

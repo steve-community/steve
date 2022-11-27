@@ -55,4 +55,22 @@ public class SteveException extends RuntimeException {
     public SteveException(String template, Object arg1, Object arg2, Throwable cause) {
         this(format(template, arg1, arg2), cause);
     }
+
+    // -------------------------------------------------------------------------
+    // Custom/extending classes
+    // -------------------------------------------------------------------------
+
+    public static class AlreadyExists extends SteveException {
+
+        public AlreadyExists(String template, Object arg1) {
+            super(format(template, arg1));
+        }
+    }
+
+    public static class NotFound extends SteveException {
+
+        public NotFound(String message) {
+            super(message);
+        }
+    }
 }

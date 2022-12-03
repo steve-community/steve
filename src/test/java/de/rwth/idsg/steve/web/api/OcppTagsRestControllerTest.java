@@ -24,12 +24,14 @@ import de.rwth.idsg.steve.repository.dto.OcppTag;
 import de.rwth.idsg.steve.service.OcppTagService;
 import de.rwth.idsg.steve.utils.DateTimeUtils;
 import de.rwth.idsg.steve.web.dto.OcppTagForm;
+import de.rwth.idsg.steve.web.dto.OcppTagQueryForm;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDateTime;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
@@ -41,6 +43,7 @@ import java.util.Collections;
 import java.util.List;
 
 import static org.hamcrest.Matchers.hasSize;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyList;
@@ -176,6 +179,7 @@ public class OcppTagsRestControllerTest extends AbstractControllerTest {
             .andExpect(jsonPath("$[0].inTransaction").value("false"))
             .andExpect(jsonPath("$[0].blocked").value("true"))
             .andExpect(jsonPath("$[0].expiryDate").value("2020-10-01T00:00:00.000Z"))
+            .andExpect(jsonPath("$[0].expiryDateFormatted").doesNotExist())
             .andExpect(jsonPath("$[0].maxActiveTransactionCount").value("4"))
             .andExpect(jsonPath("$[0].activeTransactionCount").value("0"))
             .andExpect(jsonPath("$[0].note").value("some note"));
@@ -422,6 +426,97 @@ public class OcppTagsRestControllerTest extends AbstractControllerTest {
             .andExpectAll(errorJsonMatchers());
 
         verify(ocppTagRepository, times(0)).deleteOcppTag(anyInt());
+    }
+
+    @Test
+    @DisplayName("POST: Cannot create because entity exists already, returns 422")
+    public void test18() throws Exception {
+        // given
+        int ocppTagPk = 123;
+
+        OcppTagForm form = new OcppTagForm();
+        form.setIdTag("id-123");
+
+        // when
+        when(ocppTagRepository.addOcppTag(eq(form))).thenThrow(new SteveException.AlreadyExists("A user with idTag '%s' already exists.", ocppTagPk));
+
+        // then
+        mockMvc.perform(
+                post("/api/v1/ocppTags")
+                    .content(objectMapper.writeValueAsString(form))
+                    .contentType(CONTENT_TYPE)
+            )
+            .andExpect(status().isUnprocessableEntity())
+            .andExpectAll(errorJsonMatchers());
+
+        verify(ocppTagService, times(0)).removeUnknown(anyList());
+        verify(ocppTagRepository, times(0)).getOverview(any(OcppTagQueryForm.ForApi.class));
+    }
+
+    @Test
+    @DisplayName("GET all: Query param 'expired' is translated correctly, while others are defaulted")
+    public void test19() throws Exception {
+        // given
+        ArgumentCaptor<OcppTagQueryForm.ForApi> formToCapture = ArgumentCaptor.forClass(OcppTagQueryForm.ForApi.class);
+
+        // when
+        when(ocppTagRepository.getOverview(any())).thenReturn(Collections.emptyList());
+
+        // then
+        mockMvc.perform(get("/api/v1/ocppTags")
+                .param("expired", "FALSE"))
+            .andExpect(status().isOk());
+
+        verify(ocppTagRepository).getOverview(formToCapture.capture());
+        OcppTagQueryForm.ForApi capturedForm = formToCapture.getValue();
+
+        assertEquals(capturedForm.getExpired(), OcppTagQueryForm.BooleanType.FALSE);
+        assertEquals(capturedForm.getInTransaction(), OcppTagQueryForm.BooleanType.ALL);
+        assertEquals(capturedForm.getBlocked(), OcppTagQueryForm.BooleanType.ALL);
+    }
+
+    @Test
+    @DisplayName("GET all: Query param 'inTransaction' is translated correctly, while others are defaulted")
+    public void test20() throws Exception {
+        // given
+        ArgumentCaptor<OcppTagQueryForm.ForApi> formToCapture = ArgumentCaptor.forClass(OcppTagQueryForm.ForApi.class);
+
+        // when
+        when(ocppTagRepository.getOverview(any())).thenReturn(Collections.emptyList());
+
+        // then
+        mockMvc.perform(get("/api/v1/ocppTags")
+                .param("inTransaction", "TRUE"))
+            .andExpect(status().isOk());
+
+        verify(ocppTagRepository).getOverview(formToCapture.capture());
+        OcppTagQueryForm.ForApi capturedForm = formToCapture.getValue();
+
+        assertEquals(capturedForm.getExpired(), OcppTagQueryForm.BooleanType.ALL);
+        assertEquals(capturedForm.getInTransaction(), OcppTagQueryForm.BooleanType.TRUE);
+        assertEquals(capturedForm.getBlocked(), OcppTagQueryForm.BooleanType.ALL);
+    }
+
+    @Test
+    @DisplayName("GET all: Query param 'inTransaction' is translated correctly, while others are defaulted")
+    public void test21() throws Exception {
+        // given
+        ArgumentCaptor<OcppTagQueryForm.ForApi> formToCapture = ArgumentCaptor.forClass(OcppTagQueryForm.ForApi.class);
+
+        // when
+        when(ocppTagRepository.getOverview(any())).thenReturn(Collections.emptyList());
+
+        // then
+        mockMvc.perform(get("/api/v1/ocppTags")
+                .param("blocked", "FALSE"))
+            .andExpect(status().isOk());
+
+        verify(ocppTagRepository).getOverview(formToCapture.capture());
+        OcppTagQueryForm.ForApi capturedForm = formToCapture.getValue();
+
+        assertEquals(capturedForm.getExpired(), OcppTagQueryForm.BooleanType.ALL);
+        assertEquals(capturedForm.getInTransaction(), OcppTagQueryForm.BooleanType.ALL);
+        assertEquals(capturedForm.getBlocked(), OcppTagQueryForm.BooleanType.FALSE);
     }
 
     private static ResultMatcher[] errorJsonMatchers() {

@@ -44,14 +44,18 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.core.Ordered;
+import org.springframework.format.support.FormattingConversionService;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
+import org.springframework.web.accept.ContentNegotiationManager;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupport;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter;
 import org.springframework.web.servlet.view.InternalResourceViewResolver;
 
 import javax.annotation.PreDestroy;
@@ -253,4 +257,18 @@ public class BeanConfiguration implements WebMvcConfigurer {
         }
     }
 
+    /**
+     * Find the ObjectMapper used in MappingJackson2HttpMessageConverter and initialized by Spring automatically.
+     * MappingJackson2HttpMessageConverter is not a Bean. It is created in {@link WebMvcConfigurationSupport#addDefaultHttpMessageConverters(List)}.
+     * Therefore, we have to access it via proxies that reference it. RequestMappingHandlerAdapter is a Bean, created in
+     * {@link WebMvcConfigurationSupport#requestMappingHandlerAdapter(ContentNegotiationManager, FormattingConversionService, org.springframework.validation.Validator)}.
+     */
+    @Bean
+    public ObjectMapper objectMapper(RequestMappingHandlerAdapter requestMappingHandlerAdapter) {
+        return requestMappingHandlerAdapter.getMessageConverters().stream()
+            .filter(converter -> converter instanceof MappingJackson2HttpMessageConverter)
+            .findAny()
+            .map(conv -> ((MappingJackson2HttpMessageConverter) conv).getObjectMapper())
+            .orElseThrow(() -> new RuntimeException("There is no MappingJackson2HttpMessageConverter in Spring context"));
+    }
 }

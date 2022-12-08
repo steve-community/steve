@@ -119,7 +119,7 @@ public class SecurityConfiguration {
 
     @Bean
     @Order(1)
-    public SecurityFilterChain apiKeyFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain apiKeyFilterChain(HttpSecurity http, ObjectMapper objectMapper) throws Exception {
         return http.antMatcher(CONFIG.getApiMapping() + "/**")
             .csrf().disable()
             .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
@@ -129,7 +129,7 @@ public class SecurityConfiguration {
             .anyRequest()
             .authenticated()
             .and()
-            .exceptionHandling().authenticationEntryPoint(new ApiKeyAuthenticationEntryPoint())
+            .exceptionHandling().authenticationEntryPoint(new ApiKeyAuthenticationEntryPoint(objectMapper))
             .and()
             .build();
     }
@@ -186,8 +186,11 @@ public class SecurityConfiguration {
 
     public static class ApiKeyAuthenticationEntryPoint implements AuthenticationEntryPoint {
 
-        private final ObjectMapper mapper = new ObjectMapper()
-                .registerModule(new JodaModule());
+        private final ObjectMapper mapper;
+
+        private ApiKeyAuthenticationEntryPoint(ObjectMapper mapper) {
+            this.mapper = mapper;
+        }
 
         @Override
         public void commence(HttpServletRequest request, HttpServletResponse response,

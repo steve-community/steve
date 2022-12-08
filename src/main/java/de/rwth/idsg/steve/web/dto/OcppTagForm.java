@@ -19,6 +19,8 @@
 package de.rwth.idsg.steve.web.dto;
 
 import de.rwth.idsg.steve.web.validation.IdTag;
+import io.swagger.annotations.ApiModelProperty;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -35,11 +37,14 @@ import java.util.Objects;
 @Getter
 @Setter
 @ToString
+@EqualsAndHashCode
 public class OcppTagForm {
 
     // Internal database id
+    @ApiModelProperty(hidden = true)
     private Integer ocppTagPk;
 
+    @ApiModelProperty(value = "Will be used in create/insert flows. Will be ignored in update flows.")
     @NotEmpty(message = "ID Tag is required")
     @IdTag
     private String idTag;
@@ -47,6 +52,7 @@ public class OcppTagForm {
     // Is a FK in DB table. No validation needed. Operation will fail if DB constraint fails.
     private String parentIdTag;
 
+    @ApiModelProperty(value = "A date/time without timezone. Example: 2022-10-10T09:00")
     @Future(message = "Expiry Date/Time must be in future")
     private LocalDateTime expiryDate;
 

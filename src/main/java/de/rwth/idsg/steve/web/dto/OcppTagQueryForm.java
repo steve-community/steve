@@ -18,6 +18,7 @@
  */
 package de.rwth.idsg.steve.web.dto;
 
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -34,20 +35,35 @@ import java.util.Objects;
 @ToString
 public class OcppTagQueryForm {
 
+    @ApiModelProperty(value = "Database primary key of the OCPP tag")
+    private Integer ocppTagPk;
+
+    @ApiModelProperty(value = "The OCPP tag")
     private String idTag;
+
+    @ApiModelProperty(value = "The parent OCPP tag of this OCPP tag")
     private String parentIdTag;
 
-    /**
-     * Init with sensible default values
-     */
+    @ApiModelProperty(value = "Return expired, not expired, or all Ocpp tags? Defaults to ALL")
     private BooleanType expired = BooleanType.FALSE;
+
+    @ApiModelProperty(value = "Return in-transaction, not in-transaction, or all Ocpp tags? Defaults to ALL")
     private BooleanType inTransaction = BooleanType.ALL;
+
+    @ApiModelProperty(value = "Return blocked, not blocked, or all Ocpp tags? Defaults to ALL")
     private BooleanType blocked = BooleanType.FALSE;
 
+    @ApiModelProperty(hidden = true)
+    public boolean isOcppTagPkSet() {
+        return ocppTagPk != null;
+    }
+
+    @ApiModelProperty(hidden = true)
     public boolean isIdTagSet() {
         return idTag != null;
     }
 
+    @ApiModelProperty(hidden = true)
     public boolean isParentIdTagSet() {
         return parentIdTag != null;
     }
@@ -87,6 +103,17 @@ public class OcppTagQueryForm {
                 }
             }
             throw new IllegalArgumentException(v);
+        }
+    }
+
+    @ToString(callSuper = true)
+    public static class ForApi extends OcppTagQueryForm {
+
+        public ForApi () {
+            super();
+            setExpired(BooleanType.ALL);
+            setInTransaction(BooleanType.ALL);
+            setBlocked(BooleanType.ALL);
         }
     }
 

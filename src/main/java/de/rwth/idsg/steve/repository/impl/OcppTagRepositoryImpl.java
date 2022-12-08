@@ -30,6 +30,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.joda.time.DateTime;
 import org.jooq.DSLContext;
 import org.jooq.JoinType;
+import org.jooq.Record10;
 import org.jooq.Record7;
 import org.jooq.RecordMapper;
 import org.jooq.Result;
@@ -78,10 +79,17 @@ public class OcppTagRepositoryImpl implements OcppTagRepository {
                 OCPP_TAG_ACTIVITY.PARENT_ID_TAG,
                 OCPP_TAG_ACTIVITY.EXPIRY_DATE,
                 OCPP_TAG_ACTIVITY.IN_TRANSACTION,
-                OCPP_TAG_ACTIVITY.BLOCKED
+                OCPP_TAG_ACTIVITY.BLOCKED,
+                OCPP_TAG_ACTIVITY.MAX_ACTIVE_TRANSACTION_COUNT,
+                OCPP_TAG_ACTIVITY.ACTIVE_TRANSACTION_COUNT,
+                OCPP_TAG_ACTIVITY.NOTE
         );
 
         selectQuery.addJoin(parentTable, JoinType.LEFT_OUTER_JOIN, parentTable.ID_TAG.eq(OCPP_TAG_ACTIVITY.PARENT_ID_TAG));
+
+        if (form.isOcppTagPkSet()) {
+            selectQuery.addConditions(OCPP_TAG_ACTIVITY.OCPP_TAG_PK.eq(form.getOcppTagPk()));
+        }
 
         if (form.isIdTagSet()) {
             selectQuery.addConditions(OCPP_TAG_ACTIVITY.ID_TAG.eq(form.getIdTag()));
@@ -201,7 +209,7 @@ public class OcppTagRepositoryImpl implements OcppTagRepository {
 
         } catch (DataAccessException e) {
             if (e.getCause() instanceof SQLIntegrityConstraintViolationException) {
-                throw new SteveException("A user with idTag '%s' already exists.", u.getIdTag());
+                throw new SteveException.AlreadyExists("A user with idTag '%s' already exists.", u.getIdTag());
             } else {
                 throw new SteveException("Execution of addOcppTag for idTag '%s' FAILED.", u.getIdTag(), e);
             }
@@ -243,9 +251,9 @@ public class OcppTagRepositoryImpl implements OcppTagRepository {
     }
 
     private static class UserMapper
-            implements RecordMapper<Record7<Integer, Integer, String, String, DateTime, Boolean, Boolean>, Overview> {
+            implements RecordMapper<Record10<Integer, Integer, String, String, DateTime, Boolean, Boolean, Integer, Long, String>, Overview> {
         @Override
-        public Overview map(Record7<Integer, Integer, String, String, DateTime, Boolean, Boolean> r) {
+        public Overview map(Record10<Integer, Integer, String, String, DateTime, Boolean, Boolean, Integer, Long, String> r) {
             return Overview.builder()
                           .ocppTagPk(r.value1())
                           .parentOcppTagPk(r.value2())
@@ -255,6 +263,9 @@ public class OcppTagRepositoryImpl implements OcppTagRepository {
                           .expiryDateFormatted(humanize(r.value5()))
                           .inTransaction(r.value6())
                           .blocked(r.value7())
+                          .maxActiveTransactionCount(r.value8())
+                          .activeTransactionCount(r.value9())
+                          .note(r.value10())
                           .build();
         }
     }

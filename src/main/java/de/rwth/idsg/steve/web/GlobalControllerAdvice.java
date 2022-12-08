@@ -46,7 +46,7 @@ public class GlobalControllerAdvice {
 
         binder.registerCustomEditor(String.class, new StringTrimmerEditor(true));
         binder.registerCustomEditor(LocalDate.class, new LocalDateEditor());
-        binder.registerCustomEditor(LocalDateTime.class, new LocalDateTimeEditor());
+        binder.registerCustomEditor(LocalDateTime.class, LocalDateTimeEditor.forMvc());
         binder.registerCustomEditor(ChargePointSelect.class, new ChargePointSelectEditor());
 
         binder.registerCustomEditor(List.class, "idList", batchInsertConverter);

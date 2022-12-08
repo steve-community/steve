@@ -19,6 +19,7 @@
 package de.rwth.idsg.steve.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.joda.JodaModule;
 import com.google.common.base.Strings;
 import de.rwth.idsg.steve.SteveProdCondition;
 import de.rwth.idsg.steve.web.api.ApiControllerAdvice;
@@ -185,7 +186,8 @@ public class SecurityConfiguration {
 
     public static class ApiKeyAuthenticationEntryPoint implements AuthenticationEntryPoint {
 
-        private final ObjectMapper mapper = new ObjectMapper();
+        private final ObjectMapper mapper = new ObjectMapper()
+                .registerModule(new JodaModule());
 
         @Override
         public void commence(HttpServletRequest request, HttpServletResponse response,

@@ -24,7 +24,6 @@ import de.rwth.idsg.steve.repository.OcppTagRepository;
 import de.rwth.idsg.steve.repository.SettingsRepository;
 import de.rwth.idsg.steve.service.dto.UnidentifiedIncomingObject;
 import jooq.steve.db.tables.records.OcppTagActivityRecord;
-import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import ocpp.cp._2015._10.AuthorizationData;
@@ -32,7 +31,6 @@ import ocpp.cs._2015._10.AuthorizationStatus;
 import ocpp.cs._2015._10.IdTagInfo;
 import org.jetbrains.annotations.Nullable;
 import org.joda.time.DateTime;
-import org.jooq.RecordMapper;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

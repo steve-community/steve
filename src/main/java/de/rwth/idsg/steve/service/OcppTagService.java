@@ -33,7 +33,6 @@ import ocpp.cs._2015._10.IdTagInfo;
 import org.jetbrains.annotations.Nullable;
 import org.joda.time.DateTime;
 import org.jooq.RecordMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -45,12 +44,13 @@ import java.util.function.Supplier;
  */
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class OcppTagService {
 
-    @Autowired private SettingsRepository settingsRepository;
-    @Autowired private OcppTagRepository ocppTagRepository;
-
     private final UnidentifiedIncomingObjectService invalidOcppTagService = new UnidentifiedIncomingObjectService(1000);
+
+    private final SettingsRepository settingsRepository;
+    private final OcppTagRepository ocppTagRepository;
 
     public List<AuthorizationData> getAuthDataOfAllTags() {
         return ocppTagRepository.getRecords()

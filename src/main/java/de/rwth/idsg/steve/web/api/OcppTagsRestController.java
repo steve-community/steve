@@ -19,7 +19,6 @@
 package de.rwth.idsg.steve.web.api;
 
 import de.rwth.idsg.steve.SteveException;
-import de.rwth.idsg.steve.repository.OcppTagRepository;
 import de.rwth.idsg.steve.repository.dto.OcppTag;
 import de.rwth.idsg.steve.service.OcppTagService;
 import de.rwth.idsg.steve.web.api.ApiControllerAdvice.ApiErrorResponse;
@@ -43,7 +42,6 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -56,7 +54,6 @@ import java.util.List;
 @RequiredArgsConstructor
 public class OcppTagsRestController {
 
-    private final OcppTagRepository ocppTagRepository;
     private final OcppTagService ocppTagService;
 
     @ApiResponses(value = {
@@ -70,7 +67,7 @@ public class OcppTagsRestController {
     public List<OcppTag.Overview> get(OcppTagQueryForm.ForApi params) {
         log.debug("Read request for query: {}", params);
 
-        var response = ocppTagRepository.getOverview(params);
+        var response = ocppTagService.getOverview(params);
         log.debug("Read response for query: {}", response);
         return response;
     }
@@ -106,8 +103,7 @@ public class OcppTagsRestController {
     public OcppTag.Overview create(@RequestBody @Valid OcppTagForm params) {
         log.debug("Create request: {}", params);
 
-        int ocppTagPk = ocppTagRepository.addOcppTag(params);
-        ocppTagService.removeUnknown(Collections.singletonList(params.getIdTag()));
+        int ocppTagPk = ocppTagService.addOcppTag(params);
 
         var response = getOneInternal(ocppTagPk);
         log.debug("Create response: {}", response);
@@ -127,7 +123,7 @@ public class OcppTagsRestController {
         params.setOcppTagPk(ocppTagPk); // the one from incoming params does not matter
         log.debug("Update request: {}", params);
 
-        ocppTagRepository.updateOcppTag(params);
+        ocppTagService.updateOcppTag(params);
 
         var response = getOneInternal(ocppTagPk);
         log.debug("Update response: {}", response);
@@ -147,7 +143,7 @@ public class OcppTagsRestController {
         log.debug("Delete request for ocppTagPk: {}", ocppTagPk);
 
         var response = getOneInternal(ocppTagPk);
-        ocppTagRepository.deleteOcppTag(ocppTagPk);
+        ocppTagService.deleteOcppTag(ocppTagPk);
 
         log.debug("Delete response: {}", response);
         return response;
@@ -157,7 +153,7 @@ public class OcppTagsRestController {
         OcppTagQueryForm.ForApi params = new OcppTagQueryForm.ForApi();
         params.setOcppTagPk(ocppTagPk);
 
-        List<OcppTag.Overview> results = ocppTagRepository.getOverview(params);
+        List<OcppTag.Overview> results = ocppTagService.getOverview(params);
         if (results.isEmpty()) {
             throw new SteveException.NotFound("Could not find this ocppTag");
         }

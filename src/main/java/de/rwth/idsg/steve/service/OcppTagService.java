@@ -176,23 +176,24 @@ public class OcppTagService {
     }
 
     private static boolean isBlocked(OcppTagActivityRecord record) {
-        return getToggle(record) == ConcurrencyToggle.Blocked;
+        return record.getMaxActiveTransactionCount() == 0;
     }
 
     private static boolean reachedLimitOfActiveTransactions(OcppTagActivityRecord record) {
-        ConcurrencyToggle toggle = getToggle(record);
-        switch (toggle) {
-            case Blocked:
-                return true; // for completeness
-            case AllowAll:
-                return false;
-            case AllowAsSpecified:
-                int max = record.getMaxActiveTransactionCount();
-                long active = record.getActiveTransactionCount();
-                return active >= max;
-            default:
-                throw new RuntimeException("Unexpected ConcurrencyToggle");
+        int max = record.getMaxActiveTransactionCount();
+
+        // blocked
+        if (max == 0) {
+            return true;
         }
+
+        // allow all
+        if (max < 0) {
+            return false;
+        }
+
+        // allow as specified
+        return record.getActiveTransactionCount() >= max;
     }
 
     private static AuthorizationData mapToAuthorizationData(OcppTagActivityRecord record, DateTime nowDt) {
@@ -203,20 +204,5 @@ public class OcppTagService {
                                                       .withParentIdTag(record.getParentIdTag())
                                                       .withExpiryDate(record.getExpiryDate())
                                       );
-    }
-
-    private enum ConcurrencyToggle {
-        Blocked, AllowAll, AllowAsSpecified
-    }
-
-    private static ConcurrencyToggle getToggle(OcppTagActivityRecord r) {
-        int max = r.getMaxActiveTransactionCount();
-        if (max == 0) {
-            return ConcurrencyToggle.Blocked;
-        } else if (max < 0) {
-            return ConcurrencyToggle.AllowAll;
-        } else {
-            return ConcurrencyToggle.AllowAsSpecified;
-        }
     }
 }

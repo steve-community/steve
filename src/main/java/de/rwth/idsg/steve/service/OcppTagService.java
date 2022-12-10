@@ -53,13 +53,13 @@ public class OcppTagService {
     private final OcppTagRepository ocppTagRepository;
 
     public List<AuthorizationData> getAuthDataOfAllTags() {
-        return ocppTagRepository.getRecords()
-                                .map(new AuthorisationDataMapper());
+        DateTime nowDt = DateTime.now();
+        return ocppTagRepository.getRecords().map(record -> mapToAuthorizationData(record, nowDt));
     }
 
     public List<AuthorizationData> getAuthData(List<String> idTagList) {
-        return ocppTagRepository.getRecords(idTagList)
-                                .map(new AuthorisationDataMapper());
+        DateTime nowDt = DateTime.now();
+        return ocppTagRepository.getRecords(idTagList).map(record -> mapToAuthorizationData(record, nowDt));
     }
 
     public List<UnidentifiedIncomingObject> getUnknownOcppTags() {
@@ -195,21 +195,14 @@ public class OcppTagService {
         }
     }
 
-    @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-    private static class AuthorisationDataMapper implements RecordMapper<OcppTagActivityRecord, AuthorizationData> {
-
-        private final DateTime nowDt = DateTime.now();
-
-        @Override
-        public AuthorizationData map(OcppTagActivityRecord record) {
-            return new AuthorizationData().withIdTag(record.getIdTag())
-                                          .withIdTagInfo(
-                                                  new ocpp.cp._2015._10.IdTagInfo()
-                                                          .withStatus(decideStatusForAuthData(record, nowDt))
-                                                          .withParentIdTag(record.getParentIdTag())
-                                                          .withExpiryDate(record.getExpiryDate())
-                                          );
-        }
+    private static AuthorizationData mapToAuthorizationData(OcppTagActivityRecord record, DateTime nowDt) {
+        return new AuthorizationData().withIdTag(record.getIdTag())
+                                      .withIdTagInfo(
+                                              new ocpp.cp._2015._10.IdTagInfo()
+                                                      .withStatus(decideStatusForAuthData(record, nowDt))
+                                                      .withParentIdTag(record.getParentIdTag())
+                                                      .withExpiryDate(record.getExpiryDate())
+                                      );
     }
 
     private enum ConcurrencyToggle {

@@ -22,9 +22,11 @@ import com.google.common.base.Strings;
 import de.rwth.idsg.steve.SteveException;
 import de.rwth.idsg.steve.repository.OcppTagRepository;
 import de.rwth.idsg.steve.repository.SettingsRepository;
+import de.rwth.idsg.steve.repository.dto.OcppTag;
 import de.rwth.idsg.steve.service.dto.UnidentifiedIncomingObject;
+import de.rwth.idsg.steve.web.dto.OcppTagForm;
+import de.rwth.idsg.steve.web.dto.OcppTagQueryForm;
 import jooq.steve.db.tables.records.OcppTagActivityRecord;
-import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import ocpp.cp._2015._10.AuthorizationData;
@@ -32,10 +34,9 @@ import ocpp.cs._2015._10.AuthorizationStatus;
 import ocpp.cs._2015._10.IdTagInfo;
 import org.jetbrains.annotations.Nullable;
 import org.joda.time.DateTime;
-import org.jooq.RecordMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.function.Supplier;
 
@@ -45,21 +46,46 @@ import java.util.function.Supplier;
  */
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class OcppTagService {
-
-    @Autowired private SettingsRepository settingsRepository;
-    @Autowired private OcppTagRepository ocppTagRepository;
 
     private final UnidentifiedIncomingObjectService invalidOcppTagService = new UnidentifiedIncomingObjectService(1000);
 
+    private final SettingsRepository settingsRepository;
+    private final OcppTagRepository ocppTagRepository;
+
+    public List<OcppTag.Overview> getOverview(OcppTagQueryForm form) {
+        return ocppTagRepository.getOverview(form);
+    }
+
+    public OcppTagActivityRecord getRecord(int ocppTagPk) {
+        return ocppTagRepository.getRecord(ocppTagPk);
+    }
+
+    public List<String> getIdTags() {
+        return ocppTagRepository.getIdTags();
+    }
+
+    public List<String> getActiveIdTags() {
+        return ocppTagRepository.getActiveIdTags();
+    }
+
+    public List<String> getParentIdTags() {
+        return ocppTagRepository.getParentIdTags();
+    }
+
+    public String getParentIdtag(String idTag) {
+        return ocppTagRepository.getParentIdtag(idTag);
+    }
+
     public List<AuthorizationData> getAuthDataOfAllTags() {
-        return ocppTagRepository.getRecords()
-                                .map(new AuthorisationDataMapper());
+        DateTime nowDt = DateTime.now();
+        return ocppTagRepository.getRecords().map(record -> mapToAuthorizationData(record, nowDt));
     }
 
     public List<AuthorizationData> getAuthData(List<String> idTagList) {
-        return ocppTagRepository.getRecords(idTagList)
-                                .map(new AuthorisationDataMapper());
+        DateTime nowDt = DateTime.now();
+        return ocppTagRepository.getRecords(idTagList).map(record -> mapToAuthorizationData(record, nowDt));
     }
 
     public List<UnidentifiedIncomingObject> getUnknownOcppTags() {
@@ -104,6 +130,28 @@ public class OcppTagService {
             log.error("Exception occurred", e);
             return supplierWhenException.get();
         }
+    }
+
+    // -------------------------------------------------------------------------
+    // Create, Update, Delete operations
+    // -------------------------------------------------------------------------
+
+    public int addOcppTag(OcppTagForm form) {
+        var id = ocppTagRepository.addOcppTag(form);
+        removeUnknown(Collections.singletonList(form.getIdTag()));
+        return id;
+    }
+    public void addOcppTagList(List<String> idTagList) {
+        ocppTagRepository.addOcppTagList(idTagList);
+        removeUnknown(idTagList);
+    }
+
+    public void updateOcppTag(OcppTagForm form) {
+        ocppTagRepository.updateOcppTag(form);
+    }
+
+    public void deleteOcppTag(int ocppTagPk) {
+        ocppTagRepository.deleteOcppTag(ocppTagPk);
     }
 
     // -------------------------------------------------------------------------
@@ -176,54 +224,33 @@ public class OcppTagService {
     }
 
     private static boolean isBlocked(OcppTagActivityRecord record) {
-        return getToggle(record) == ConcurrencyToggle.Blocked;
+        return record.getMaxActiveTransactionCount() == 0;
     }
 
     private static boolean reachedLimitOfActiveTransactions(OcppTagActivityRecord record) {
-        ConcurrencyToggle toggle = getToggle(record);
-        switch (toggle) {
-            case Blocked:
-                return true; // for completeness
-            case AllowAll:
-                return false;
-            case AllowAsSpecified:
-                int max = record.getMaxActiveTransactionCount();
-                long active = record.getActiveTransactionCount();
-                return active >= max;
-            default:
-                throw new RuntimeException("Unexpected ConcurrencyToggle");
-        }
-    }
+        int max = record.getMaxActiveTransactionCount();
 
-    @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-    private static class AuthorisationDataMapper implements RecordMapper<OcppTagActivityRecord, AuthorizationData> {
-
-        private final DateTime nowDt = DateTime.now();
-
-        @Override
-        public AuthorizationData map(OcppTagActivityRecord record) {
-            return new AuthorizationData().withIdTag(record.getIdTag())
-                                          .withIdTagInfo(
-                                                  new ocpp.cp._2015._10.IdTagInfo()
-                                                          .withStatus(decideStatusForAuthData(record, nowDt))
-                                                          .withParentIdTag(record.getParentIdTag())
-                                                          .withExpiryDate(record.getExpiryDate())
-                                          );
-        }
-    }
-
-    private enum ConcurrencyToggle {
-        Blocked, AllowAll, AllowAsSpecified
-    }
-
-    private static ConcurrencyToggle getToggle(OcppTagActivityRecord r) {
-        int max = r.getMaxActiveTransactionCount();
+        // blocked
         if (max == 0) {
-            return ConcurrencyToggle.Blocked;
-        } else if (max < 0) {
-            return ConcurrencyToggle.AllowAll;
-        } else {
-            return ConcurrencyToggle.AllowAsSpecified;
+            return true;
         }
+
+        // allow all
+        if (max < 0) {
+            return false;
+        }
+
+        // allow as specified
+        return record.getActiveTransactionCount() >= max;
+    }
+
+    private static AuthorizationData mapToAuthorizationData(OcppTagActivityRecord record, DateTime nowDt) {
+        return new AuthorizationData().withIdTag(record.getIdTag())
+                                      .withIdTagInfo(
+                                              new ocpp.cp._2015._10.IdTagInfo()
+                                                      .withStatus(decideStatusForAuthData(record, nowDt))
+                                                      .withParentIdTag(record.getParentIdTag())
+                                                      .withExpiryDate(record.getExpiryDate())
+                                      );
     }
 }

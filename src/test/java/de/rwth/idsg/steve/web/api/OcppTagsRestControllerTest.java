@@ -19,7 +19,6 @@
 package de.rwth.idsg.steve.web.api;
 
 import de.rwth.idsg.steve.SteveException;
-import de.rwth.idsg.steve.repository.OcppTagRepository;
 import de.rwth.idsg.steve.repository.dto.OcppTag;
 import de.rwth.idsg.steve.service.OcppTagService;
 import de.rwth.idsg.steve.utils.DateTimeUtils;
@@ -71,15 +70,13 @@ public class OcppTagsRestControllerTest extends AbstractControllerTest {
     private static final String CONTENT_TYPE = "application/json";
 
     @Mock
-    private OcppTagRepository ocppTagRepository;
-    @Mock
     private OcppTagService ocppTagService;
 
     private MockMvc mockMvc;
 
     @BeforeEach
     public void setup() {
-        mockMvc = MockMvcBuilders.standaloneSetup(new OcppTagsRestController(ocppTagRepository, ocppTagService))
+        mockMvc = MockMvcBuilders.standaloneSetup(new OcppTagsRestController(ocppTagService))
             .setControllerAdvice(new ApiControllerAdvice())
             .setMessageConverters(new MappingJackson2HttpMessageConverter(objectMapper))
             .alwaysExpect(content().contentType(CONTENT_TYPE))
@@ -93,7 +90,7 @@ public class OcppTagsRestControllerTest extends AbstractControllerTest {
         List<OcppTag.Overview> results = Collections.emptyList();
 
         // when
-        when(ocppTagRepository.getOverview(any())).thenReturn(results);
+        when(ocppTagService.getOverview(any())).thenReturn(results);
 
         // then
         mockMvc.perform(get("/api/v1/ocppTags"))
@@ -108,7 +105,7 @@ public class OcppTagsRestControllerTest extends AbstractControllerTest {
         List<OcppTag.Overview> results = List.of(OcppTag.Overview.builder().ocppTagPk(96).build());
 
         // when
-        when(ocppTagRepository.getOverview(any())).thenReturn(results);
+        when(ocppTagService.getOverview(any())).thenReturn(results);
 
         // then
         mockMvc.perform(get("/api/v1/ocppTags"))
@@ -121,7 +118,7 @@ public class OcppTagsRestControllerTest extends AbstractControllerTest {
     @DisplayName("GET all: Downstream bean throws exception, expected 500")
     public void test3() throws Exception {
         // when
-        when(ocppTagRepository.getOverview(any())).thenThrow(new RuntimeException("failed"));
+        when(ocppTagService.getOverview(any())).thenThrow(new RuntimeException("failed"));
 
         // then
         mockMvc.perform(get("/api/v1/ocppTags"))
@@ -159,7 +156,7 @@ public class OcppTagsRestControllerTest extends AbstractControllerTest {
             .build();
 
         // when
-        when(ocppTagRepository.getOverview(any())).thenReturn(List.of(result));
+        when(ocppTagService.getOverview(any())).thenReturn(List.of(result));
 
         // then
         mockMvc.perform(get("/api/v1/ocppTags")
@@ -197,7 +194,7 @@ public class OcppTagsRestControllerTest extends AbstractControllerTest {
     @DisplayName("GET one: Entity not found, expected 404")
     public void test7() throws Exception {
         // when
-        when(ocppTagRepository.getOverview(any())).thenReturn(Collections.emptyList());
+        when(ocppTagService.getOverview(any())).thenReturn(Collections.emptyList());
 
         // then
         mockMvc.perform(get("/api/v1/ocppTags/12"))
@@ -212,7 +209,7 @@ public class OcppTagsRestControllerTest extends AbstractControllerTest {
         OcppTag.Overview result = OcppTag.Overview.builder().ocppTagPk(12).build();
 
         // when
-        when(ocppTagRepository.getOverview(any())).thenReturn(List.of(result));
+        when(ocppTagService.getOverview(any())).thenReturn(List.of(result));
 
         // then
         mockMvc.perform(get("/api/v1/ocppTags/12"))
@@ -236,7 +233,7 @@ public class OcppTagsRestControllerTest extends AbstractControllerTest {
             .andExpect(status().isBadRequest())
             .andExpectAll(errorJsonMatchers());
 
-        verifyNoInteractions(ocppTagRepository, ocppTagService);
+        verifyNoInteractions(ocppTagService);
     }
 
     @Test
@@ -256,7 +253,7 @@ public class OcppTagsRestControllerTest extends AbstractControllerTest {
             .andExpect(status().isBadRequest())
             .andExpectAll(errorJsonMatchers());
 
-        verifyNoInteractions(ocppTagRepository, ocppTagService);
+        verifyNoInteractions(ocppTagService);
     }
 
     @Test
@@ -274,8 +271,8 @@ public class OcppTagsRestControllerTest extends AbstractControllerTest {
             .build();
 
         // when
-        when(ocppTagRepository.addOcppTag(eq(form))).thenReturn(ocppTagPk);
-        when(ocppTagRepository.getOverview(any())).thenReturn(List.of(result));
+        when(ocppTagService.addOcppTag(eq(form))).thenReturn(ocppTagPk);
+        when(ocppTagService.getOverview(any())).thenReturn(List.of(result));
 
         // then
         mockMvc.perform(
@@ -286,8 +283,6 @@ public class OcppTagsRestControllerTest extends AbstractControllerTest {
             .andExpect(status().isCreated())
             .andExpect(jsonPath("$.ocppTagPk").value("123"))
             .andExpect(jsonPath("$.idTag").value("id-123"));
-
-        verify(ocppTagService).removeUnknown(anyList());
     }
 
     @Test
@@ -308,7 +303,7 @@ public class OcppTagsRestControllerTest extends AbstractControllerTest {
             .build();
 
         // when
-        when(ocppTagRepository.getOverview(any())).thenReturn(List.of(result));
+        when(ocppTagService.getOverview(any())).thenReturn(List.of(result));
 
         // then
         mockMvc.perform(
@@ -318,7 +313,7 @@ public class OcppTagsRestControllerTest extends AbstractControllerTest {
             )
             .andExpect(status().isOk());
 
-        verify(ocppTagRepository).updateOcppTag(eq(form));
+        verify(ocppTagService).updateOcppTag(eq(form));
     }
 
     @Test
@@ -339,7 +334,7 @@ public class OcppTagsRestControllerTest extends AbstractControllerTest {
             )
             .andExpect(status().isBadRequest());
 
-        verifyNoInteractions(ocppTagRepository, ocppTagService);
+        verifyNoInteractions(ocppTagService);
     }
 
     @Test
@@ -354,7 +349,7 @@ public class OcppTagsRestControllerTest extends AbstractControllerTest {
         form.setNote("note-1");
 
         // when
-        doThrow(new SteveException("failed")).when(ocppTagRepository).updateOcppTag(any());
+        doThrow(new SteveException("failed")).when(ocppTagService).updateOcppTag(any());
 
         // then
         mockMvc.perform(
@@ -379,14 +374,14 @@ public class OcppTagsRestControllerTest extends AbstractControllerTest {
             .build();
 
         // when
-        when(ocppTagRepository.getOverview(any())).thenReturn(List.of(result));
+        when(ocppTagService.getOverview(any())).thenReturn(List.of(result));
 
         // then
         mockMvc.perform(delete("/api/v1/ocppTags/" + ocppTagPk))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.ocppTagPk").value("123"));
 
-        verify(ocppTagRepository).deleteOcppTag(eq(ocppTagPk));
+        verify(ocppTagService).deleteOcppTag(eq(ocppTagPk));
     }
 
     @Test
@@ -402,8 +397,8 @@ public class OcppTagsRestControllerTest extends AbstractControllerTest {
             .build();
 
         // when
-        when(ocppTagRepository.getOverview(any())).thenReturn(List.of(result));
-        doThrow(new SteveException("failed")).when(ocppTagRepository).deleteOcppTag(eq(ocppTagPk));
+        when(ocppTagService.getOverview(any())).thenReturn(List.of(result));
+        doThrow(new SteveException("failed")).when(ocppTagService).deleteOcppTag(eq(ocppTagPk));
 
         // then
         mockMvc.perform(delete("/api/v1/ocppTags/" + ocppTagPk))
@@ -418,14 +413,14 @@ public class OcppTagsRestControllerTest extends AbstractControllerTest {
         int ocppTagPk = 123;
 
         // when
-        when(ocppTagRepository.getOverview(any())).thenReturn(List.of());
+        when(ocppTagService.getOverview(any())).thenReturn(List.of());
 
         // then
         mockMvc.perform(delete("/api/v1/ocppTags/" + ocppTagPk))
             .andExpect(status().isNotFound())
             .andExpectAll(errorJsonMatchers());
 
-        verify(ocppTagRepository, times(0)).deleteOcppTag(anyInt());
+        verify(ocppTagService, times(0)).deleteOcppTag(anyInt());
     }
 
     @Test
@@ -438,7 +433,7 @@ public class OcppTagsRestControllerTest extends AbstractControllerTest {
         form.setIdTag("id-123");
 
         // when
-        when(ocppTagRepository.addOcppTag(eq(form))).thenThrow(new SteveException.AlreadyExists("A user with idTag '%s' already exists.", ocppTagPk));
+        when(ocppTagService.addOcppTag(eq(form))).thenThrow(new SteveException.AlreadyExists("A user with idTag '%s' already exists.", ocppTagPk));
 
         // then
         mockMvc.perform(
@@ -450,7 +445,7 @@ public class OcppTagsRestControllerTest extends AbstractControllerTest {
             .andExpectAll(errorJsonMatchers());
 
         verify(ocppTagService, times(0)).removeUnknown(anyList());
-        verify(ocppTagRepository, times(0)).getOverview(any(OcppTagQueryForm.ForApi.class));
+        verify(ocppTagService, times(0)).getOverview(any(OcppTagQueryForm.ForApi.class));
     }
 
     @Test
@@ -460,14 +455,14 @@ public class OcppTagsRestControllerTest extends AbstractControllerTest {
         ArgumentCaptor<OcppTagQueryForm.ForApi> formToCapture = ArgumentCaptor.forClass(OcppTagQueryForm.ForApi.class);
 
         // when
-        when(ocppTagRepository.getOverview(any())).thenReturn(Collections.emptyList());
+        when(ocppTagService.getOverview(any())).thenReturn(Collections.emptyList());
 
         // then
         mockMvc.perform(get("/api/v1/ocppTags")
                 .param("expired", "FALSE"))
             .andExpect(status().isOk());
 
-        verify(ocppTagRepository).getOverview(formToCapture.capture());
+        verify(ocppTagService).getOverview(formToCapture.capture());
         OcppTagQueryForm.ForApi capturedForm = formToCapture.getValue();
 
         assertEquals(capturedForm.getExpired(), OcppTagQueryForm.BooleanType.FALSE);
@@ -482,14 +477,14 @@ public class OcppTagsRestControllerTest extends AbstractControllerTest {
         ArgumentCaptor<OcppTagQueryForm.ForApi> formToCapture = ArgumentCaptor.forClass(OcppTagQueryForm.ForApi.class);
 
         // when
-        when(ocppTagRepository.getOverview(any())).thenReturn(Collections.emptyList());
+        when(ocppTagService.getOverview(any())).thenReturn(Collections.emptyList());
 
         // then
         mockMvc.perform(get("/api/v1/ocppTags")
                 .param("inTransaction", "TRUE"))
             .andExpect(status().isOk());
 
-        verify(ocppTagRepository).getOverview(formToCapture.capture());
+        verify(ocppTagService).getOverview(formToCapture.capture());
         OcppTagQueryForm.ForApi capturedForm = formToCapture.getValue();
 
         assertEquals(capturedForm.getExpired(), OcppTagQueryForm.BooleanType.ALL);
@@ -504,14 +499,14 @@ public class OcppTagsRestControllerTest extends AbstractControllerTest {
         ArgumentCaptor<OcppTagQueryForm.ForApi> formToCapture = ArgumentCaptor.forClass(OcppTagQueryForm.ForApi.class);
 
         // when
-        when(ocppTagRepository.getOverview(any())).thenReturn(Collections.emptyList());
+        when(ocppTagService.getOverview(any())).thenReturn(Collections.emptyList());
 
         // then
         mockMvc.perform(get("/api/v1/ocppTags")
                 .param("blocked", "FALSE"))
             .andExpect(status().isOk());
 
-        verify(ocppTagRepository).getOverview(formToCapture.capture());
+        verify(ocppTagService).getOverview(formToCapture.capture());
         OcppTagQueryForm.ForApi capturedForm = formToCapture.getValue();
 
         assertEquals(capturedForm.getExpired(), OcppTagQueryForm.BooleanType.ALL);

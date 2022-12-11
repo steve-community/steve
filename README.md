@@ -48,7 +48,7 @@ SteVe is designed to run standalone, a java servlet container / web server (e.g.
     Make sure MySQL is reachable via TCP (e.g., remove `skip-networking` from `my.cnf`).
     The following MySQL statements can be used as database initialization (adjust database name and credentials according to your setup).
     
-    * For MariaDB (all versions) and MySQL 5.7:
+    * For MariaDB (all LTS versions) and MySQL 5.7:
         ```
         CREATE DATABASE stevedb CHARACTER SET utf8 COLLATE utf8_unicode_ci;
         CREATE USER 'steve'@'localhost' IDENTIFIED BY 'changeme';

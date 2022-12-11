@@ -33,7 +33,7 @@ https://github.com/steve-community/steve/wiki/Charging-Station-Compatibility
 SteVe requires 
 * JDK 11 (both Oracle JDK and Adoptium are supported)
 * Maven 
-* MariaDB 10.2.1 or later. MySQL 5.7.7 or later works as well, but especially MySQL 8 introduces more hassle. We suggest MariaDB 10.3.
+* MariaDB 10.2.1 or later. MySQL 5.7.7 or later works as well, but especially MySQL 8 introduces more hassle. We suggest MariaDB 10.4.
 
 to build and run. 
 

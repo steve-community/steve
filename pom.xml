@@ -213,7 +213,7 @@
 
                                 <target>
                                     <packageName>jooq.steve.db</packageName>
-                                    <directory>${build.sourceDirectory}</directory>
+                                    <directory>${project.build.sourceDirectory}</directory>
                                 </target>
                             </generator>
                         </configuration>

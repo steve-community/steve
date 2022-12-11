@@ -6,9 +6,9 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ ubuntu-18.04, ubuntu-20.04 ]
-        java: [ '11', '15' ]
-        db: [ 'mysql:5.7.35', 'mysql:8.0', 'mariadb:10.3', 'mariadb:10.5' ]
+        os: [ ubuntu-20.04, ubuntu-22.04 ]
+        java: [ '11', '17' ]
+        db: [ 'mysql:5.7', 'mysql:8.0', 'mariadb:10.3', 'mariadb:10.4', 'mariadb:10.5', 'mariadb:10.6' ]
     runs-on: ${{ matrix.os }}
     services:
       mysql:
@@ -26,7 +26,7 @@ jobs:
         uses: actions/setup-java@v2
         with:
           java-version: ${{ matrix.java }}
-          distribution: 'adopt'
+          distribution: 'temurin'
           cache: maven
 
       - name: Set up MySQL

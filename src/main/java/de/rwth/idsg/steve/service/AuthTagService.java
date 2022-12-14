@@ -16,7 +16,8 @@ import org.springframework.stereotype.Service;
 public class AuthTagService {
 
   public AuthorizationStatus decideStatus(@Nullable OcppTagActivityRecord record, String idTag,
-      boolean isStartTransactionReqContext) {
+      boolean isStartTransactionReqContext, @Nullable String chargeBoxId,
+      @Nullable Integer connectorId) {
     if (record == null) {
       log.error("The user with idTag '{}' is INVALID (not present in DB).", idTag);
       return AuthorizationStatus.INVALID;

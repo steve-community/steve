@@ -102,13 +102,15 @@ public class OcppTagService {
     }
 
     @Nullable
-    public IdTagInfo getIdTagInfo(@Nullable String idTag, boolean isStartTransactionReqContext) {
+    public IdTagInfo getIdTagInfo(@Nullable String idTag, boolean isStartTransactionReqContext,
+        @Nullable String chargeBoxId, @Nullable Integer connectorId) {
         if (Strings.isNullOrEmpty(idTag)) {
             return null;
         }
 
         OcppTagActivityRecord record = ocppTagRepository.getRecord(idTag);
-        AuthorizationStatus status = authTagService.decideStatus(record, idTag, isStartTransactionReqContext);
+        AuthorizationStatus status = authTagService.decideStatus(record, idTag,
+            isStartTransactionReqContext, chargeBoxId, connectorId);
 
         switch (status) {
             case INVALID:
@@ -128,9 +130,11 @@ public class OcppTagService {
     }
 
     @Nullable
-    public IdTagInfo getIdTagInfo(@Nullable String idTag, boolean isStartTransactionReqContext, Supplier<IdTagInfo> supplierWhenException) {
+    public IdTagInfo getIdTagInfo(@Nullable String idTag, boolean isStartTransactionReqContext,
+        @Nullable String chargeBoxId, @Nullable Integer connectorId,
+        Supplier<IdTagInfo> supplierWhenException) {
         try {
-            return getIdTagInfo(idTag, isStartTransactionReqContext);
+            return getIdTagInfo(idTag, isStartTransactionReqContext, chargeBoxId, connectorId);
         } catch (Exception e) {
             log.error("Exception occurred", e);
             return supplierWhenException.get();

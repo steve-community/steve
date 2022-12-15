@@ -5,15 +5,20 @@ import static de.rwth.idsg.steve.utils.OcppTagActivityRecordUtils.isExpired;
 import static de.rwth.idsg.steve.utils.OcppTagActivityRecordUtils.reachedLimitOfActiveTransactions;
 
 import jooq.steve.db.tables.records.OcppTagActivityRecord;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import ocpp.cs._2015._10.AuthorizationStatus;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.joda.time.DateTime;
 import org.springframework.stereotype.Service;
 
 @Slf4j
+@RequiredArgsConstructor
 @Service
 public class AuthTagService {
+
+  private final RealtimeAuthService realtimeAuthService;
 
   public AuthorizationStatus decideStatus(@Nullable OcppTagActivityRecord record, String idTag,
       boolean isStartTransactionReqContext, @Nullable String chargeBoxId,
@@ -23,6 +28,32 @@ public class AuthTagService {
       return AuthorizationStatus.INVALID;
     }
 
+    switch (record.getWhitelist()) {
+      case always:
+      case allowed:
+        return getInternalAuthorizationStatus(record, idTag, isStartTransactionReqContext);
+      case allowed_offline:
+        try {
+          realtimeAuthService.decideStatus(idTag, chargeBoxId, connectorId);
+        } catch (Throwable t) {
+          log.error("RealtimeAuth failed, use internal logic.", t);
+          return getInternalAuthorizationStatus(record, idTag, isStartTransactionReqContext);
+        }
+      case never:
+        try {
+          return realtimeAuthService.decideStatus(idTag, chargeBoxId, connectorId);
+        } catch (Throwable t) {
+          log.error("RealtimeAuth failed, status is INVALID.", t);
+          return AuthorizationStatus.INVALID;
+        }
+      default:
+        throw new IllegalStateException("Unknown whitelist value: " + record.getWhitelist());
+    }
+  }
+
+  @NotNull
+  private static AuthorizationStatus getInternalAuthorizationStatus(@NotNull OcppTagActivityRecord record,
+      String idTag, boolean isStartTransactionReqContext) {
     if (isBlocked(record)) {
       log.error("The user with idTag '{}' is BLOCKED.", idTag);
       return AuthorizationStatus.BLOCKED;

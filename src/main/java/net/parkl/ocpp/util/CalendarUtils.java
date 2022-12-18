@@ -27,7 +27,7 @@ public class CalendarUtils {
     public static Date getLastMomentOfDay(Date date) {
         Calendar c = getInstance();
         c.setTime(date);
-        c.set(HOUR, 23);
+        c.set(HOUR_OF_DAY, 23);
         c.set(MINUTE, 59);
         c.set(SECOND, 59);
         c.set(MILLISECOND, 999);
@@ -37,7 +37,7 @@ public class CalendarUtils {
     public static Date getFirstMomentOfDay(Date date) {
         Calendar c = getInstance();
         c.setTime(date);
-        c.set(HOUR, 0);
+        c.set(HOUR_OF_DAY, 0);
         c.set(MINUTE, 0);
         c.set(SECOND, 0);
         c.set(MILLISECOND, 0);

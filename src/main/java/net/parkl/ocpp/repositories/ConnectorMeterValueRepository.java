@@ -21,6 +21,7 @@ package net.parkl.ocpp.repositories;
 import net.parkl.ocpp.entities.ConnectorMeterValue;
 import net.parkl.ocpp.entities.Transaction;
 import net.parkl.ocpp.entities.TransactionStart;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 
@@ -40,10 +41,11 @@ public interface ConnectorMeterValueRepository extends CrudRepository<ConnectorM
 
 	List<ConnectorMeterValue> findByTransactionOrderByValueTimestampDesc(TransactionStart transaction);
 
-	List<ConnectorMeterValue> findByTransactionAndMeasurandAndPhaseIsNullOrderByValueTimestampDesc(TransactionStart transaction, String measurand);
+	@Query("SELECT v.unit, v.value FROM ConnectorMeterValue AS v WHERE v.transaction=?1 AND v.measurand=?2 AND v.phase IS NULL ORDER BY v.valueTimestamp DESC")
+	List<Object[]> findByTransactionAndMeasurandAndPhaseIsNullOrderByValueTimestampDesc(TransactionStart transaction, String measurand, Pageable page);
 
-List<ConnectorMeterValue> findByTransactionAndMeasurandOrderByValueTimestampDesc(TransactionStart transaction, String measurand);
+	List<ConnectorMeterValue> findByTransactionAndMeasurandOrderByValueTimestampDesc(TransactionStart transaction, String measurand);
 
-@Query("SELECT OBJECT(v) FROM ConnectorMeterValue AS v WHERE v.transaction.transactionPk=?1")
+	@Query("SELECT OBJECT(v) FROM ConnectorMeterValue AS v WHERE v.transaction.transactionPk=?1")
 	List<ConnectorMeterValue> findByTransactionPk(int transactionPk);
 }

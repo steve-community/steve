@@ -599,7 +599,7 @@ public class OperationalTestSoapOCPP16 {
     }
 
     private void checkMeterValues(List<MeterValue> meterValues, int transactionPk) {
-        TransactionDetails details = __DatabasePreparer__.getDetails(transactionPk);
+        TransactionDetails details = __DatabasePreparer__.getDetails(transactionPk, true);
 
         // iterate over all created meter values
         for (MeterValue meterValue : meterValues) {

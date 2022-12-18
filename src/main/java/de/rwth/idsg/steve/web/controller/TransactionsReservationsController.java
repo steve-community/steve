@@ -90,7 +90,7 @@ public class TransactionsReservationsController {
 
     @RequestMapping(value = TRANSACTIONS_DETAILS_PATH)
     public String getTransactionDetails(@PathVariable("transactionPk") int transactionPk, Model model) {
-        model.addAttribute("details", transactionRepository.getDetails(transactionPk));
+        model.addAttribute("details", transactionRepository.getDetails(transactionPk, true));
         return "data-man/transactionDetails";
     }
 

@@ -26,6 +26,7 @@ import de.rwth.idsg.steve.service.OcppTagService;
 import de.rwth.idsg.steve.service.TransactionStopService;
 import de.rwth.idsg.steve.web.dto.ReservationQueryForm;
 import de.rwth.idsg.steve.web.dto.TransactionQueryForm;
+import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -38,6 +39,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.io.IOException;
+import org.springframework.web.bind.annotation.RequestParam;
 
 /**
  * One controller for transactions and reservations pages
@@ -89,8 +91,10 @@ public class TransactionsReservationsController {
     }
 
     @RequestMapping(value = TRANSACTIONS_DETAILS_PATH)
-    public String getTransactionDetails(@PathVariable("transactionPk") int transactionPk, Model model) {
-        model.addAttribute("details", transactionRepository.getDetails(transactionPk, true));
+    public String getTransactionDetails(@PathVariable("transactionPk") int transactionPk,
+        @RequestParam(value = "all-events") Optional<Boolean> allEvents, Model model) {
+        model.addAttribute("details",
+            transactionRepository.getDetails(transactionPk, !allEvents.orElse(false)));
         return "data-man/transactionDetails";
     }
 

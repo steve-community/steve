@@ -142,10 +142,10 @@ public class TransactionServiceImpl implements TransactionService {
         TransactionStart nextTransaction = null;
 
         // Case 1: Ideal and most accurate case. Station sends meter values with transaction id set.
-        List<ConnectorMeterValue> cmv1 = connectorMeterValueService.findByTransactionPk(transaction.getTransactionPk());
+        List<ConnectorMeterValueDetail> cmv1 = connectorMeterValueService.findByTransactionPk(transaction.getTransactionPk());
 
         // Case 2: Fall back to filtering according to time windows
-        List<ConnectorMeterValue> cmv2;
+        List<ConnectorMeterValueDetail> cmv2;
         if (stopTimestamp == null && stopValue == null) {
             // https://github.com/RWTH-i5-IDSG/steve/issues/97
             //
@@ -183,7 +183,7 @@ public class TransactionServiceImpl implements TransactionService {
         //
         // UNION removes all duplicate records
         //
-        List<ConnectorMeterValue> union = new ArrayList<>();
+        List<ConnectorMeterValueDetail> union = new ArrayList<>();
         union.addAll(cmv1);
         union.addAll(cmv2);
 
@@ -207,7 +207,7 @@ public class TransactionServiceImpl implements TransactionService {
 
 
         List<TransactionDetails.MeterValues> values = new ArrayList<>();
-        for (ConnectorMeterValue v : union) {
+        for (ConnectorMeterValueDetail v : union) {
             values.add(TransactionDetails.MeterValues.builder()
                     .valueTimestamp(new DateTime(v.getValueTimestamp()))
                     .value(v.getValue())

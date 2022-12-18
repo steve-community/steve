@@ -30,22 +30,21 @@ import java.util.List;
 
 public interface ConnectorMeterValueRepository extends CrudRepository<ConnectorMeterValue, Integer>{
 
-	List<ConnectorMeterValue> findByTransaction(Transaction transaction);
 
-	@Query("SELECT OBJECT(v) FROM ConnectorMeterValue AS v WHERE v.connector.chargeBoxId=?1 AND v.connector.connectorId=?2 AND v.valueTimestamp>?3")
-	List<ConnectorMeterValue> findByChargeBoxIdAndConnectorIdAfter(String chargeBoxId, int connectorId,
+	@Query("SELECT v.valueTimestamp, v.value, v.readingContext, v.format, v.measurand, v.location, v.unit, v.phase " +
+			"FROM ConnectorMeterValue AS v WHERE v.connector.chargeBoxId=?1 AND v.connector.connectorId=?2 AND v.valueTimestamp>?3")
+	List<Object[]> findByChargeBoxIdAndConnectorIdAfter(String chargeBoxId, int connectorId,
 			Date startTimestamp);
-	@Query("SELECT OBJECT(v) FROM ConnectorMeterValue AS v WHERE v.connector.chargeBoxId=?1 AND v.connector.connectorId=?2 AND v.valueTimestamp>?3 AND v.valueTimestamp<?4")
-	List<ConnectorMeterValue> findByChargeBoxIdAndConnectorIdBetween(String chargeBoxId, int connectorId,
+	@Query("SELECT v.valueTimestamp, v.value, v.readingContext, v.format, v.measurand, v.location, v.unit, v.phase " +
+			"FROM ConnectorMeterValue AS v WHERE v.connector.chargeBoxId=?1 AND v.connector.connectorId=?2 AND v.valueTimestamp>?3 AND v.valueTimestamp<?4")
+	List<Object[]> findByChargeBoxIdAndConnectorIdBetween(String chargeBoxId, int connectorId,
 			Date startTimestamp,Date stopTimestamp);
 
-	List<ConnectorMeterValue> findByTransactionOrderByValueTimestampDesc(TransactionStart transaction);
 
 	@Query("SELECT v.unit, v.value FROM ConnectorMeterValue AS v WHERE v.transaction=?1 AND v.measurand=?2 AND v.phase IS NULL ORDER BY v.valueTimestamp DESC")
 	List<Object[]> findByTransactionAndMeasurandAndPhaseIsNullOrderByValueTimestampDesc(TransactionStart transaction, String measurand, Pageable page);
 
-	List<ConnectorMeterValue> findByTransactionAndMeasurandOrderByValueTimestampDesc(TransactionStart transaction, String measurand);
-
-	@Query("SELECT OBJECT(v) FROM ConnectorMeterValue AS v WHERE v.transaction.transactionPk=?1")
-	List<ConnectorMeterValue> findByTransactionPk(int transactionPk);
+	@Query("SELECT v.valueTimestamp, v.value, v.readingContext, v.format, v.measurand, v.location, v.unit, v.phase " +
+			"FROM ConnectorMeterValue AS v WHERE v.transaction.transactionPk=?1")
+	List<Object[]> findByTransactionPk(int transactionPk);
 }

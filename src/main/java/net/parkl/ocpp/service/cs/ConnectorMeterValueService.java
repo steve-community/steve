@@ -91,24 +91,39 @@ public class ConnectorMeterValueService {
         return convertToMeterValueData(list.get(0));
     }
 
-    public List<ConnectorMeterValue> findByTransactionPk(int transactionPk) {
-        return connectorMeterValueRepo.findByTransactionPk(transactionPk);
+    private ConnectorMeterValueDetail convertToMeterValueDetail(Object[] row) {
+        return ConnectorMeterValueDetail.builder()
+                .valueTimestamp((Date) row[0])
+                .value((String) row[1])
+                .readingContext((String) row[2])
+                .format((String) row[3])
+                .measurand((String) row[4])
+                .location((String) row[5])
+                .unit((String) row[6])
+                .phase((String) row[7])
+                .build();
     }
 
-    public List<ConnectorMeterValue> findByChargeBoxIdAndConnectorIdAfter(String chargeBoxId,
+    public List<ConnectorMeterValueDetail> findByTransactionPk(int transactionPk) {
+        return ListTransform.transform(connectorMeterValueRepo.findByTransactionPk(transactionPk),
+                this::convertToMeterValueDetail);
+    }
+
+    public List<ConnectorMeterValueDetail> findByChargeBoxIdAndConnectorIdAfter(String chargeBoxId,
                                                                           int connectorId,
                                                                           Date startTimestamp) {
-        return connectorMeterValueRepo.findByChargeBoxIdAndConnectorIdAfter(chargeBoxId, connectorId, startTimestamp);
+        return ListTransform.transform(connectorMeterValueRepo.findByChargeBoxIdAndConnectorIdAfter(chargeBoxId, connectorId, startTimestamp),
+                this::convertToMeterValueDetail);
     }
 
-    public List<ConnectorMeterValue> findByChargeBoxIdAndConnectorIdBetween(String chargeBoxId,
+    public List<ConnectorMeterValueDetail> findByChargeBoxIdAndConnectorIdBetween(String chargeBoxId,
                                                                             int connectorId,
                                                                             Date startTimestamp,
                                                                             Date nextTxTimestamp) {
 
-        return connectorMeterValueRepo.findByChargeBoxIdAndConnectorIdBetween(chargeBoxId,
+        return ListTransform.transform(connectorMeterValueRepo.findByChargeBoxIdAndConnectorIdBetween(chargeBoxId,
                 connectorId,
                 startTimestamp,
-                nextTxTimestamp);
+                nextTxTimestamp), this::convertToMeterValueDetail);
     }
 }

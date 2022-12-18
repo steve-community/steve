@@ -79,6 +79,7 @@ public class CentralSystemService16_Service {
 
     public BootNotificationResponse bootNotification(BootNotificationRequest parameters, String chargeBoxIdentity,
                                                      OcppProtocol ocppProtocol) {
+        log.info("Boot notification: {}", chargeBoxIdentity);
         Optional<RegistrationStatus> status = chargePointHelperService.getRegistrationStatus(chargeBoxIdentity);
         notificationService.ocppStationBooted(chargeBoxIdentity, status);
         DateTime now = DateTime.now();
@@ -123,12 +124,15 @@ public class CentralSystemService16_Service {
     public FirmwareStatusNotificationResponse firmwareStatusNotification(
             FirmwareStatusNotificationRequest parameters, String chargeBoxIdentity) {
         String status = parameters.getStatus().value();
+        log.info("Firmware status notification on {}: {}", chargeBoxIdentity, status);
+
         chargePointService.updateChargeboxFirmwareStatus(chargeBoxIdentity, status);
         return new FirmwareStatusNotificationResponse();
     }
 
     public StatusNotificationResponse statusNotification(
             StatusNotificationRequest parameters, String chargeBoxIdentity) {
+        log.info("Status notification on {}: {}", chargeBoxIdentity, parameters.getStatus().value());
         // Optional field
         DateTime timestamp = parameters.isSetTimestamp() ? parameters.getTimestamp() : DateTime.now();
 
@@ -156,6 +160,7 @@ public class CentralSystemService16_Service {
 
     public MeterValuesResponse meterValues(MeterValuesRequest parameters, String chargeBoxIdentity) {
         Integer transactionId = parameters.getTransactionId();
+        log.info("Meter values request for transaction: {} [chargeBox={}]", transactionId, chargeBoxIdentity);
 
         if (parameters.isSetMeterValue() && transactionId != null && transactionId > 0) {
             TransactionStart transactionStart =
@@ -170,11 +175,13 @@ public class CentralSystemService16_Service {
     public DiagnosticsStatusNotificationResponse diagnosticsStatusNotification(
             DiagnosticsStatusNotificationRequest parameters, String chargeBoxIdentity) {
         String status = parameters.getStatus().value();
+        log.info("Diagnostics status on {}: {}...", chargeBoxIdentity, status);
         chargePointService.updateChargeboxDiagnosticsStatus(chargeBoxIdentity, status);
         return new DiagnosticsStatusNotificationResponse();
     }
 
     public StartTransactionResponse startTransaction(StartTransactionRequest parameters, String chargeBoxIdentity) {
+        log.info("Starting transaction on {}...", chargeBoxIdentity);
         InsertTransactionParams params =
                 InsertTransactionParams.builder()
                         .chargeBoxId(chargeBoxIdentity)
@@ -227,6 +234,8 @@ public class CentralSystemService16_Service {
 
     public StopTransactionResponse stopTransaction(StopTransactionRequest parameters, String chargeBoxIdentity) {
         int transactionId = parameters.getTransactionId();
+        log.info("Stopping transaction {} on charge box: {}", transactionId, chargeBoxIdentity);
+
         String stopReason = parameters.isSetReason() ? parameters.getReason().value() : null;
 
         // Get the authorization info of the user, before making tx changes (will affectAuthorizationStatus)
@@ -265,12 +274,14 @@ public class CentralSystemService16_Service {
     }
 
     public HeartbeatResponse heartbeat(HeartbeatRequest parameters, String chargeBoxIdentity) {
+        log.info("Heartbeat from charge box: {}", chargeBoxIdentity);
         DateTime now = DateTime.now();
         chargePointService.updateChargeboxHeartbeat(chargeBoxIdentity, now);
         return new HeartbeatResponse().withCurrentTime(now);
     }
 
     public AuthorizeResponse authorize(AuthorizeRequest parameters, String chargeBoxIdentity) {
+        log.info("Authorizing ID tag {} on charge box: {}...", parameters.getIdTag(), chargeBoxIdentity);
         // Get the authorization info of the user
         IdTagInfo idTagInfo = ocppTagService.getIdTagInfo(parameters.getIdTag(),
                 false,

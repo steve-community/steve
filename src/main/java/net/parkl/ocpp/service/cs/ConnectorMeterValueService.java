@@ -22,9 +22,11 @@ import lombok.extern.slf4j.Slf4j;
 import net.parkl.ocpp.entities.ConnectorMeterValue;
 import net.parkl.ocpp.entities.TransactionStart;
 import net.parkl.ocpp.repositories.ConnectorMeterValueRepository;
+import net.parkl.ocpp.util.ListTransform;
 import ocpp.cs._2015._10.MeterValue;
 import ocpp.cs._2015._10.SampledValue;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -65,21 +67,28 @@ public class ConnectorMeterValueService {
         }
     }
 
-    public List<ConnectorMeterValue> getConnectorMeterValueByTransactionAndMeasurand(TransactionStart transaction,
-                                                                                     String measurand) {
-        return connectorMeterValueRepo.findByTransactionAndMeasurandAndPhaseIsNullOrderByValueTimestampDesc(transaction,
-                measurand);
+    private ConnectorMeterValueData convertToMeterValueData(Object[] row) {
+        return ConnectorMeterValueData.builder()
+                .unit((String) row[0])
+                .value((String) row[1])
+                .build();
     }
 
-    public ConnectorMeterValue getLastConnectorMeterValueByTransactionAndMeasurand(TransactionStart transaction,
+    public List<ConnectorMeterValueData> getConnectorMeterValueByTransactionAndMeasurand(TransactionStart transaction,
+                                                                                     String measurand, int maxCount) {
+        return ListTransform.transform(connectorMeterValueRepo.findByTransactionAndMeasurandAndPhaseIsNullOrderByValueTimestampDesc(transaction,
+                measurand, PageRequest.of(0, maxCount)), this::convertToMeterValueData);
+    }
+
+    public ConnectorMeterValueData getLastConnectorMeterValueByTransactionAndMeasurand(TransactionStart transaction,
                                                                                    String measurand) {
-        List<ConnectorMeterValue> list =
+        List<Object[]> list =
                 connectorMeterValueRepo.findByTransactionAndMeasurandAndPhaseIsNullOrderByValueTimestampDesc(transaction,
-                        measurand);
+                        measurand, PageRequest.of(0, 1));
         if (list.isEmpty()) {
             return null;
         }
-        return list.get(0);
+        return convertToMeterValueData(list.get(0));
     }
 
     public List<ConnectorMeterValue> findByTransactionPk(int transactionPk) {

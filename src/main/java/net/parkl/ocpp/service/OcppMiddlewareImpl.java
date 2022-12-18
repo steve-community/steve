@@ -40,10 +40,7 @@ import net.parkl.ocpp.repositories.ConnectorRepository;
 import net.parkl.ocpp.repositories.ConnectorStatusRepository;
 import net.parkl.ocpp.repositories.OcppChargeBoxRepository;
 import net.parkl.ocpp.service.config.AdvancedChargeBoxConfiguration;
-import net.parkl.ocpp.service.cs.ChargePointService;
-import net.parkl.ocpp.service.cs.ConnectorMeterValueService;
-import net.parkl.ocpp.service.cs.OcppIdTagService;
-import net.parkl.ocpp.service.cs.TransactionService;
+import net.parkl.ocpp.service.cs.*;
 import net.parkl.ocpp.util.AsyncWaiter;
 import ocpp.cp._2012._06.AvailabilityStatus;
 import ocpp.cs._2015._10.RegistrationStatus;
@@ -533,7 +530,7 @@ public class OcppMiddlewareImpl implements OcppMiddleware {
         ret.getChargingData().setStart(ocppChargingProcess.getStartDate());
         if (transaction != null) {
             PowerValue pw = getPowerValue(ocppChargingProcess.getTransactionStart());
-            ConnectorMeterValue activePower =
+            ConnectorMeterValueData activePower =
                     connectorMeterValueService.getLastConnectorMeterValueByTransactionAndMeasurand(ocppChargingProcess.getTransactionStart(),
                             MEASURAND_POWER_ACTIVE_IMPORT);
             if (activePower != null) {
@@ -549,13 +546,13 @@ public class OcppMiddlewareImpl implements OcppMiddleware {
     }
 
     public PowerValue getPowerValue(TransactionStart transaction) {
-        List<ConnectorMeterValue> connectorMeterValues =
-                connectorMeterValueService.getConnectorMeterValueByTransactionAndMeasurand(transaction, MEASURAND_ENERGY_ACTIVE_IMPORT);
+        List<ConnectorMeterValueData> connectorMeterValues =
+                connectorMeterValueService.getConnectorMeterValueByTransactionAndMeasurand(transaction, MEASURAND_ENERGY_ACTIVE_IMPORT, 2);
         float diff = 0;
         String diffUnit = null;
         if (connectorMeterValues.isEmpty()) {
             //handle Mennekes type chargers (no measurand, no unit)
-            connectorMeterValues = connectorMeterValueService.getConnectorMeterValueByTransactionAndMeasurand(transaction, null);
+            connectorMeterValues = connectorMeterValueService.getConnectorMeterValueByTransactionAndMeasurand(transaction, null, 2);
         }
 
         if (connectorMeterValues.size() > 1) {

@@ -28,6 +28,7 @@ public class ClusteredInvokerClient {
     public void invoke(String chargeBoxId, ChargePointSelection cps) {
         ObjectMapper objectMapper = new ObjectMapper();
         ClusteredInvocationRequest request = new ClusteredInvocationRequest(chargeBoxId,
+                cps.getClass().getName(),
                 objectMapper.writeValueAsString(cps));
 
         postFor(getPodUrl(chargeBoxId), request, Void.class);

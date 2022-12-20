@@ -12,6 +12,7 @@ import java.io.Serializable;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ClusteredInvocationRequest implements Serializable {
+    private String chargeBoxId;
     private String requestType;
     private String request;
 }

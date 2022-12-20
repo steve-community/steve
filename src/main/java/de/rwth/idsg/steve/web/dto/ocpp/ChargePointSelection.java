@@ -32,5 +32,4 @@ import java.util.List;
  */
 public interface ChargePointSelection {
     List<ChargePointSelect> getChargePointSelectList();
-    void setChargePointSelectList(List<ChargePointSelect> selection);
 }

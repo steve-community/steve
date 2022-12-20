@@ -345,4 +345,15 @@ public class ChargePointServiceImpl implements ChargePointService {
     public List<OcppChargeBox> getAllChargeBoxes() {
         return chargeBoxRepository.findAll();
     }
+
+    @Override
+    public ChargePointSelect getChargePointSelectByChargeBoxId(String chargeBoxId) {
+        OcppChargeBox chargeBox = chargeBoxRepository.findByChargeBoxId(chargeBoxId);
+        if (chargeBox == null) {
+            throw new IllegalArgumentException("Invalid charge box id: " + chargeBoxId);
+        }
+        return new ChargePointSelect(OcppProtocol.fromCompositeValue(chargeBox.getOcppProtocol()).getTransport(),
+                chargeBox.getChargeBoxId(), chargeBox.getEndpointAddress());
+    }
+
 }

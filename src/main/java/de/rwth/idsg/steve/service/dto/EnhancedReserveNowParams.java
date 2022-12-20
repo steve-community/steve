@@ -45,4 +45,9 @@ public class EnhancedReserveNowParams implements ChargePointSelection {
     public List<ChargePointSelect> getChargePointSelectList() {
         return reserveNowParams.getChargePointSelectList();
     }
+
+    @Override
+    public void setChargePointSelectList(List<ChargePointSelect> selection) {
+        reserveNowParams.setChargePointSelectList(selection);
+    }
 }

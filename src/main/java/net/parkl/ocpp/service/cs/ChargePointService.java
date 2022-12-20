@@ -85,4 +85,6 @@ public interface ChargePointService {
     Map<String, OcppChargeBox> getIdChargeBoxMap();
 
     List<OcppChargeBox> getAllChargeBoxes();
+
+    ChargePointSelect getChargePointSelectByChargeBoxId(String chargeBoxId);
 }

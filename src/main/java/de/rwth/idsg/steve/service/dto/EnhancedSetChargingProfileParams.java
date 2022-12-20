@@ -46,4 +46,9 @@ public class EnhancedSetChargingProfileParams implements ChargePointSelection {
     public List<ChargePointSelect> getChargePointSelectList() {
         return delegate.getChargePointSelectList();
     }
+
+    @Override
+    public void setChargePointSelectList(List<ChargePointSelect> selection) {
+        delegate.setChargePointSelectList(selection);
+    }
 }

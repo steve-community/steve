@@ -1,7 +1,6 @@
 package de.rwth.idsg.steve.service;
 
 import com.google.common.util.concurrent.Striped;
-
 import de.rwth.idsg.steve.SteveConfiguration;
 import de.rwth.idsg.steve.ocpp.OcppProtocol;
 import de.rwth.idsg.steve.ocpp.OcppTransport;
@@ -12,16 +11,12 @@ import de.rwth.idsg.steve.ocpp.ws.ocpp12.Ocpp12WebSocketEndpoint;
 import de.rwth.idsg.steve.ocpp.ws.ocpp15.Ocpp15WebSocketEndpoint;
 import de.rwth.idsg.steve.ocpp.ws.ocpp16.Ocpp16WebSocketEndpoint;
 import de.rwth.idsg.steve.repository.dto.ChargePointSelect;
-import de.rwth.idsg.steve.repository.dto.ConnectorStatus;
 import de.rwth.idsg.steve.service.dto.UnidentifiedIncomingObject;
-import de.rwth.idsg.steve.utils.ConnectorStatusCountFilter;
 import de.rwth.idsg.steve.utils.DateTimeUtils;
 import de.rwth.idsg.steve.web.dto.OcppJsonStatus;
 import de.rwth.idsg.steve.web.dto.Statistics;
 import net.parkl.ocpp.service.cs.ChargePointService;
 import net.parkl.ocpp.service.cs.GenericService;
-
-
 import ocpp.cs._2015._10.RegistrationStatus;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
@@ -80,8 +75,8 @@ public class ChargePointHelperServiceImpl implements ChargePointHelperService {
         stats.setNumOcpp15JChargeBoxes(ocpp15WebSocketEndpoint.getNumberOfChargeBoxes());
         stats.setNumOcpp16JChargeBoxes(ocpp16WebSocketEndpoint.getNumberOfChargeBoxes());
 
-        List<ConnectorStatus> latestList = chargePointService.getChargePointConnectorStatus();
-        stats.setStatusCountMap(ConnectorStatusCountFilter.getStatusCountMap(latestList));
+        /*List<ConnectorStatus> latestList = chargePointService.getChargePointConnectorStatus();
+        stats.setStatusCountMap(ConnectorStatusCountFilter.getStatusCountMap(latestList));*/
 
         return stats;
     }

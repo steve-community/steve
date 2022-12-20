@@ -26,6 +26,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.util.concurrent.Striped;
 import de.rwth.idsg.steve.SteveConfiguration;
 import de.rwth.idsg.steve.SteveException;
+import de.rwth.idsg.steve.ocpp.ws.cluster.ClusteredWebSocketSessionStore;
 import de.rwth.idsg.steve.ocpp.ws.data.SessionContext;
 import lombok.extern.slf4j.Slf4j;
 import org.joda.time.DateTime;
@@ -53,11 +54,13 @@ public class SessionContextStore {
     private final Striped<Lock> locks = Striped.lock(16);
 
     private SteveConfiguration config;
+    private ClusteredWebSocketSessionStore clusteredWebSocketSessionStore;
 
     //private final WsSessionSelectStrategy wsSessionSelectStrategy = CONFIG.getOcpp().getWsSessionSelectStrategy();
 
-    public SessionContextStore(SteveConfiguration config) {
+    public SessionContextStore(SteveConfiguration config, ClusteredWebSocketSessionStore clusteredWebSocketSessionStore) {
         this.config=config;
+        this.clusteredWebSocketSessionStore = clusteredWebSocketSessionStore;
     }
 
 
@@ -69,6 +72,8 @@ public class SessionContextStore {
 
             Deque<SessionContext> endpointDeque = lookupTable.computeIfAbsent(chargeBoxId, str -> new ArrayDeque<>());
             endpointDeque.addLast(context); // Adding at the end
+
+            clusteredWebSocketSessionStore.add(session.getId(), chargeBoxId);
 
             log.debug("A new SessionContext is stored for chargeBoxId '{}'. Store size: {}",
                     chargeBoxId, endpointDeque.size());
@@ -112,6 +117,8 @@ public class SessionContextStore {
                 if (endpointDeque.size() == 0) {
                     lookupTable.remove(chargeBoxId);
                 }
+
+                clusteredWebSocketSessionStore.remove(session.getId());
             }
         } finally {
             l.unlock();
@@ -148,10 +155,18 @@ public class SessionContextStore {
     }
 
     public List<String> getChargeBoxIdList() {
+        if (clusteredWebSocketSessionStore.isClusteredSessionEnabled()) {
+            return clusteredWebSocketSessionStore.getChargeBoxIds();
+        }
+
         return Collections.list(lookupTable.keys());
     }
 
     public Map<String, Deque<SessionContext>> getACopy() {
         return ImmutableMap.copyOf(lookupTable);
+    }
+
+    public boolean containsLocalSession(String chargeBoxId) {
+        return lookupTable.containsKey(chargeBoxId);
     }
 }

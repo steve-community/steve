@@ -44,6 +44,5 @@ public class SingleChargePointSelect implements ChargePointSelection {
 
     @NotNull(message = "Charge point selection is required")
     @Size(min = 1, max = 1, message = "It is required to select exactly 1 charge point")
-    @JsonIgnore
     private List<ChargePointSelect> chargePointSelectList;
 }

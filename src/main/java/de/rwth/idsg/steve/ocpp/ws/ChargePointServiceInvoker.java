@@ -47,7 +47,6 @@ public class ChargePointServiceInvoker {
     private final Logger log = LoggerFactory.getLogger(getClass());
 
     private final OutgoingCallPipeline outgoingCallPipeline;
-    @Getter
     private final AbstractWebSocketEndpoint endpoint;
     private final TypeStore typeStore;
 

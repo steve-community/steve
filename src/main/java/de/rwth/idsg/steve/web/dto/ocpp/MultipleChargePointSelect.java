@@ -22,6 +22,7 @@
  */
 package de.rwth.idsg.steve.web.dto.ocpp;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import de.rwth.idsg.steve.repository.dto.ChargePointSelect;
 import lombok.Getter;
 import lombok.Setter;
@@ -40,5 +41,6 @@ public class MultipleChargePointSelect implements ChargePointSelection {
 
     @NotNull(message = "Charge point selection is required")
     @Size(min = 1, message = "Please select at least {min} charge point")
+    @JsonIgnore
     private List<ChargePointSelect> chargePointSelectList;
 }

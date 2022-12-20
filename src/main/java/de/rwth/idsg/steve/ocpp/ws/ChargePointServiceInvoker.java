@@ -31,6 +31,7 @@ import de.rwth.idsg.steve.ocpp.ws.data.FutureResponseContext;
 import de.rwth.idsg.steve.ocpp.ws.data.OcppJsonCall;
 import de.rwth.idsg.steve.ocpp.ws.pipeline.OutgoingCallPipeline;
 import de.rwth.idsg.steve.repository.dto.ChargePointSelect;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,6 +47,7 @@ public class ChargePointServiceInvoker {
     private final Logger log = LoggerFactory.getLogger(getClass());
 
     private final OutgoingCallPipeline outgoingCallPipeline;
+    @Getter
     private final AbstractWebSocketEndpoint endpoint;
     private final TypeStore typeStore;
 

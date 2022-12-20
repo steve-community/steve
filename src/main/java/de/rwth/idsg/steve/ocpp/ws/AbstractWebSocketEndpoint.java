@@ -26,6 +26,7 @@ import com.google.common.base.Strings;
 import de.rwth.idsg.steve.SteveConfiguration;
 import de.rwth.idsg.steve.config.WebSocketConfigurationConstants;
 import de.rwth.idsg.steve.ocpp.OcppVersion;
+import de.rwth.idsg.steve.ocpp.ws.cluster.ClusteredWebSocketSessionStore;
 import de.rwth.idsg.steve.ocpp.ws.data.CommunicationContext;
 import de.rwth.idsg.steve.ocpp.ws.data.SessionContext;
 import de.rwth.idsg.steve.ocpp.ws.pipeline.IncomingPipeline;
@@ -59,6 +60,8 @@ public abstract class AbstractWebSocketEndpoint extends ConcurrentWebSocketHandl
     
     @Autowired
     private SteveConfiguration config;
+    @Autowired
+    private ClusteredWebSocketSessionStore clusteredWebSocketSessionStore;
 
     public static final String CHARGEBOX_ID_KEY = "CHARGEBOX_ID_KEY";
 
@@ -73,7 +76,7 @@ public abstract class AbstractWebSocketEndpoint extends ConcurrentWebSocketHandl
     
     @PostConstruct
     public void setup() {
-    	sessionContextStore = new SessionContextStore(config);
+    	sessionContextStore = new SessionContextStore(config, clusteredWebSocketSessionStore);
     }
 
     public void init(IncomingPipeline pipeline) {
@@ -216,4 +219,7 @@ public abstract class AbstractWebSocketEndpoint extends ConcurrentWebSocketHandl
         return sessionContextStore.getSession(chargeBoxId);
     }
 
+    public boolean containsLocalSession(String chargeBoxId) {
+        return sessionContextStore.containsLocalSession(chargeBoxId);
+    }
 }

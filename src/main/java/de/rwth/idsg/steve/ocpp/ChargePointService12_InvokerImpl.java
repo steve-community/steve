@@ -26,6 +26,7 @@ import de.rwth.idsg.steve.ocpp.soap.ClientProvider;
 import de.rwth.idsg.steve.ocpp.soap.ClientProviderWithCache;
 import de.rwth.idsg.steve.ocpp.task.*;
 import de.rwth.idsg.steve.ocpp.ws.ChargePointServiceInvoker;
+import de.rwth.idsg.steve.ocpp.ws.cluster.ClusteredWebSocketInvoker;
 import de.rwth.idsg.steve.ocpp.ws.ocpp12.Ocpp12TypeStore;
 import de.rwth.idsg.steve.ocpp.ws.ocpp12.Ocpp12WebSocketEndpoint;
 import de.rwth.idsg.steve.ocpp.ws.pipeline.OutgoingCallPipeline;
@@ -43,11 +44,14 @@ public class ChargePointService12_InvokerImpl implements ChargePointService12_In
 
     private final ChargePointServiceInvoker wsHelper;
     private final ClientProviderWithCache<ChargePointService> soapHelper;
+    private final ClusteredWebSocketInvoker clusteredWebSocketInvoker;
 
     @Autowired
-    public ChargePointService12_InvokerImpl(OutgoingCallPipeline pipeline, Ocpp12WebSocketEndpoint endpoint, ClientProvider clientProvider) {
+    public ChargePointService12_InvokerImpl(OutgoingCallPipeline pipeline, Ocpp12WebSocketEndpoint endpoint,
+                                            ClientProvider clientProvider, ClusteredWebSocketInvoker clusteredWebSocketInvoker) {
         this.wsHelper = new ChargePointServiceInvoker(pipeline, endpoint, Ocpp12TypeStore.INSTANCE);
         this.soapHelper = new ClientProviderWithCache<>(clientProvider);
+        this.clusteredWebSocketInvoker = clusteredWebSocketInvoker;
     }
 
     @Override
@@ -132,7 +136,7 @@ public class ChargePointService12_InvokerImpl implements ChargePointService12_In
     }
 
     private void runPipeline(ChargePointSelect cp, CommunicationTask task) {
-        wsHelper.runPipeline(cp, task);
+        clusteredWebSocketInvoker.runPipeline(wsHelper, cp, task);
     }
 
     private ChargePointService create(ChargePointSelect cp) {

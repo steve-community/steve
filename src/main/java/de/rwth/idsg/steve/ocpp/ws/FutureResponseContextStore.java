@@ -47,6 +47,7 @@ public class FutureResponseContextStore {
     // We store for each chargeBox connection, multiple pairs of (messageId, context)
     // (session, (messageId, context))
     private final Map<WebSocketSession, Map<String, FutureResponseContext>> lookupTable = new ConcurrentHashMap<>();
+    private final Map<String, FutureResponseContext> remoteLookupTable = new ConcurrentHashMap<>();
 
     public void addSession(WebSocketSession session) {
         addIfAbsent(session);
@@ -75,6 +76,10 @@ public class FutureResponseContextStore {
             log.debug("Creating new store for sessionId '{}'", innerSession.getId());
             return new ConcurrentHashMap<>();
         });
+    }
+
+    public void addRemote(String messageId, FutureResponseContext context) {
+        remoteLookupTable.put(messageId, context);
     }
 
     @RequiredArgsConstructor(access = AccessLevel.PRIVATE)

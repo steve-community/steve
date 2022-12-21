@@ -2,6 +2,7 @@ package de.rwth.idsg.steve.ocpp.ws.cluster;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import de.rwth.idsg.ocpp.jaxb.ResponseType;
 import de.rwth.idsg.steve.web.dto.ocpp.ChargePointSelection;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
@@ -25,11 +26,9 @@ public class ClusteredInvokerClient {
         this.restTemplate = new RestTemplate();
     }
     @SneakyThrows
-    public void invoke(String chargeBoxId, ChargePointSelection cps) {
-        ObjectMapper objectMapper = new ObjectMapper();
+    public void invoke(String chargeBoxId, String payload) {
         ClusteredInvocationRequest request = new ClusteredInvocationRequest(chargeBoxId,
-                cps.getClass().getName(),
-                objectMapper.writeValueAsString(cps));
+                payload, ClusteredWebSocketHelper.getPodIp());
 
         postFor(getPodUrl(chargeBoxId), request, Void.class);
     }
@@ -59,4 +58,9 @@ public class ClusteredInvokerClient {
         return new HttpEntity<>(input, headers);
     }
 
+    public void callback(String chargeBoxId, ResponseType payload) {
+    }
+
+    public void errorCallback(String chargeBoxId, ResponseType payload) {
+    }
 }

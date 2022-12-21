@@ -26,6 +26,9 @@ import de.rwth.idsg.steve.ocpp.soap.ClientProvider;
 import de.rwth.idsg.steve.ocpp.soap.ClientProviderWithCache;
 import de.rwth.idsg.steve.ocpp.task.*;
 import de.rwth.idsg.steve.ocpp.ws.ChargePointServiceInvoker;
+import de.rwth.idsg.steve.ocpp.ws.cluster.ClusteredInvokerClient;
+import de.rwth.idsg.steve.ocpp.ws.cluster.ClusteredWebSocketConfig;
+import de.rwth.idsg.steve.ocpp.ws.cluster.ClusteredWebSocketHelper;
 import de.rwth.idsg.steve.ocpp.ws.ocpp16.Ocpp16TypeStore;
 import de.rwth.idsg.steve.ocpp.ws.ocpp16.Ocpp16WebSocketEndpoint;
 import de.rwth.idsg.steve.ocpp.ws.pipeline.OutgoingCallPipeline;
@@ -34,19 +37,26 @@ import ocpp.cp._2015._10.ChargePointService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import static de.rwth.idsg.steve.ocpp.ws.cluster.ClusteredWebSocketHelper.getClusterClientCommunicationMode;
+
 /**
  * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
  * @since 13.03.2018
  */
 @Service
 public class ChargePointService16_InvokerImpl implements ChargePointService16_Invoker {
+    private final ClusteredWebSocketConfig clusteredWebSocketConfig;
 
     private final ChargePointServiceInvoker wsHelper;
     private final ClientProviderWithCache<ChargePointService> soapHelper;
 
     @Autowired
-    public ChargePointService16_InvokerImpl(OutgoingCallPipeline pipeline, Ocpp16WebSocketEndpoint endpoint, ClientProvider clientProvider) {
-        this.wsHelper = new ChargePointServiceInvoker(pipeline, endpoint, Ocpp16TypeStore.INSTANCE);
+    public ChargePointService16_InvokerImpl(OutgoingCallPipeline pipeline, Ocpp16WebSocketEndpoint endpoint,
+                                            ClientProvider clientProvider,
+                                            ClusteredWebSocketConfig clusteredWebSocketConfig,
+                                            ClusteredInvokerClient clusteredInvokerClient) {
+        this.clusteredWebSocketConfig = clusteredWebSocketConfig;
+        this.wsHelper = new ChargePointServiceInvoker(pipeline, endpoint, clusteredInvokerClient, Ocpp16TypeStore.INSTANCE);
         this.soapHelper = new ClientProviderWithCache<>(clientProvider);
     }
 
@@ -223,7 +233,8 @@ public class ChargePointService16_InvokerImpl implements ChargePointService16_In
     }
 
     private void runPipeline(ChargePointSelect cp, CommunicationTask task) {
-        wsHelper.runPipeline(cp, task);
+        wsHelper.runPipeline(cp, task,
+                getClusterClientCommunicationMode(clusteredWebSocketConfig, wsHelper, cp.getChargeBoxId()));
     }
 
     private ChargePointService create(ChargePointSelect cp) {

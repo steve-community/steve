@@ -77,10 +77,10 @@ public class GetDiagnosticsTask extends CommunicationTask<GetDiagnosticsParams, 
     }
 
     @Override
-    public AsyncHandler<ocpp.cp._2010._08.GetDiagnosticsResponse> getOcpp12Handler(String chargeBoxId) {
+    public AsyncHandler<ocpp.cp._2010._08.GetDiagnosticsResponse> getOcpp12Handler(String chargeBoxId, boolean remote) {
         return res -> {
             try {
-                success(chargeBoxId, res.get().getFileName());
+                success(chargeBoxId, res.get().getFileName(),remote);
             } catch (Exception e) {
                 failed(chargeBoxId, e);
             }
@@ -88,10 +88,10 @@ public class GetDiagnosticsTask extends CommunicationTask<GetDiagnosticsParams, 
     }
 
     @Override
-    public AsyncHandler<ocpp.cp._2012._06.GetDiagnosticsResponse> getOcpp15Handler(String chargeBoxId) {
+    public AsyncHandler<ocpp.cp._2012._06.GetDiagnosticsResponse> getOcpp15Handler(String chargeBoxId, boolean remote) {
         return res -> {
             try {
-                success(chargeBoxId, res.get().getFileName());
+                success(chargeBoxId, res.get().getFileName(),remote);
             } catch (Exception e) {
                 failed(chargeBoxId, e);
             }
@@ -99,13 +99,15 @@ public class GetDiagnosticsTask extends CommunicationTask<GetDiagnosticsParams, 
     }
 
     @Override
-    public AsyncHandler<ocpp.cp._2015._10.GetDiagnosticsResponse> getOcpp16Handler(String chargeBoxId) {
+    public AsyncHandler<ocpp.cp._2015._10.GetDiagnosticsResponse> getOcpp16Handler(String chargeBoxId, boolean remote) {
         return res -> {
             try {
-                success(chargeBoxId, res.get().getFileName());
+                success(chargeBoxId, res.get().getFileName(),remote);
             } catch (Exception e) {
                 failed(chargeBoxId, e);
             }
         };
     }
+
+    
 }

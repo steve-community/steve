@@ -72,17 +72,24 @@ public class CommunicationContext {
     @SuppressWarnings("unchecked")
     public void createResultHandler(CommunicationTask task) {
         if (futureResponseContext.isRemote()) {
-            resultHandler = result -> clusteredInvokerClient.callback(chargeBoxId, result.getPayload());
+            resultHandler = result -> {
+                task.getHandler(chargeBoxId, true)
+                        .handleResponse(new DummyResponse(result.getPayload()));
+                clusteredInvokerClient.callback(chargeBoxId, result.getPayload());
+            };
         } else {
             // TODO: not so sure about this
-            resultHandler = result -> task.getHandler(chargeBoxId)
+            resultHandler = result -> task.getHandler(chargeBoxId, false)
                     .handleResponse(new DummyResponse(result.getPayload()));
         }
     }
 
     public void createErrorHandler(CommunicationTask task) {
         if (futureResponseContext.isRemote()) {
-            resultHandler = result -> clusteredInvokerClient.errorCallback(chargeBoxId, result.getPayload());
+            resultHandler = result -> {
+                task.addNewError(chargeBoxId, result.toString());
+                clusteredInvokerClient.errorCallback(chargeBoxId, result.getPayload());
+            };
         } else {
             // TODO: not so sure about this
             errorHandler = result -> task.defaultCallback()

@@ -128,10 +128,10 @@ public abstract class CommunicationTask<S extends ChargePointSelection, RESPONSE
         }
     }
 
-    protected void success(String chargeBoxId, RESPONSE response) {
+    protected void success(String chargeBoxId, RESPONSE response, boolean remote) {
         for (OcppCallback<RESPONSE> c : callbackList) {
             try {
-                c.success(chargeBoxId, response);
+                c.success(chargeBoxId, response, remote);
             } catch (Exception e) {
                 log.error("Exception occurred in OcppCallback", e);
             }
@@ -157,11 +157,11 @@ public abstract class CommunicationTask<S extends ChargePointSelection, RESPONSE
         }
     }
 
-    public <T extends ResponseType> AsyncHandler<T> getHandler(String chargeBoxId) {
+    public <T extends ResponseType> AsyncHandler<T> getHandler(String chargeBoxId, boolean remote) {
         switch (ocppVersion) {
-            case V_12: return getOcpp12Handler(chargeBoxId);
-            case V_15: return getOcpp15Handler(chargeBoxId);
-            case V_16: return getOcpp16Handler(chargeBoxId);
+            case V_12: return getOcpp12Handler(chargeBoxId, remote);
+            case V_15: return getOcpp15Handler(chargeBoxId, remote);
+            case V_16: return getOcpp16Handler(chargeBoxId, remote);
             default: throw new RuntimeException("ResponseType handler not found");
         }
     }
@@ -174,11 +174,12 @@ public abstract class CommunicationTask<S extends ChargePointSelection, RESPONSE
 
     public abstract <T extends RequestType> T getOcpp16Request();
 
-    public abstract <T extends ResponseType> AsyncHandler<T> getOcpp12Handler(String chargeBoxId);
+    public abstract <T extends ResponseType> AsyncHandler<T> getOcpp12Handler(String chargeBoxId, boolean remote);
 
-    public abstract <T extends ResponseType> AsyncHandler<T> getOcpp15Handler(String chargeBoxId);
+    public abstract <T extends ResponseType> AsyncHandler<T> getOcpp15Handler(String chargeBoxId, boolean remote);
 
-    public abstract <T extends ResponseType> AsyncHandler<T> getOcpp16Handler(String chargeBoxId);
+    public abstract <T extends ResponseType> AsyncHandler<T> getOcpp16Handler(String chargeBoxId, boolean remote);
+
 
     // -------------------------------------------------------------------------
     // Classes
@@ -186,7 +187,8 @@ public abstract class CommunicationTask<S extends ChargePointSelection, RESPONSE
 
     public abstract class DefaultOcppCallback<RESPONSE> implements OcppCallback<RESPONSE> {
 
-        public abstract void success(String chargeBoxId, RESPONSE response);
+        public abstract void success(String chargeBoxId, RESPONSE response, boolean remote);
+
 
         @Override
         public void success(String chargeBoxId, OcppJsonError error) {
@@ -202,8 +204,10 @@ public abstract class CommunicationTask<S extends ChargePointSelection, RESPONSE
     public class StringOcppCallback extends DefaultOcppCallback<String> {
 
         @Override
-        public void success(String chargeBoxId, String response) {
+        public void success(String chargeBoxId, String response, boolean remote) {
             addNewResponse(chargeBoxId, response);
         }
+
+
     }
 }

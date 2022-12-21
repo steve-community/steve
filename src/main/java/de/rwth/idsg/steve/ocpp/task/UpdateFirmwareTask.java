@@ -74,10 +74,10 @@ public class UpdateFirmwareTask extends CommunicationTask<UpdateFirmwareParams, 
     }
 
     @Override
-    public AsyncHandler<ocpp.cp._2010._08.UpdateFirmwareResponse> getOcpp12Handler(String chargeBoxId) {
+    public AsyncHandler<ocpp.cp._2010._08.UpdateFirmwareResponse> getOcpp12Handler(String chargeBoxId, boolean remote) {
         return res -> {
             try {
-                success(chargeBoxId, "OK");
+                success(chargeBoxId, "OK", remote);
             } catch (Exception e) {
                 failed(chargeBoxId, e);
             }
@@ -85,10 +85,10 @@ public class UpdateFirmwareTask extends CommunicationTask<UpdateFirmwareParams, 
     }
 
     @Override
-    public AsyncHandler<ocpp.cp._2012._06.UpdateFirmwareResponse> getOcpp15Handler(String chargeBoxId) {
+    public AsyncHandler<ocpp.cp._2012._06.UpdateFirmwareResponse> getOcpp15Handler(String chargeBoxId, boolean remote) {
         return res -> {
             try {
-                success(chargeBoxId, "OK");
+                success(chargeBoxId, "OK", remote);
             } catch (Exception e) {
                 failed(chargeBoxId, e);
             }
@@ -96,10 +96,10 @@ public class UpdateFirmwareTask extends CommunicationTask<UpdateFirmwareParams, 
     }
 
     @Override
-    public AsyncHandler<ocpp.cp._2015._10.UpdateFirmwareResponse> getOcpp16Handler(String chargeBoxId) {
+    public AsyncHandler<ocpp.cp._2015._10.UpdateFirmwareResponse> getOcpp16Handler(String chargeBoxId, boolean remote) {
         return res -> {
             try {
-                success(chargeBoxId, "OK");
+                success(chargeBoxId, "OK", remote);
             } catch (Exception e) {
                 failed(chargeBoxId, e);
             }

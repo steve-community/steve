@@ -66,10 +66,10 @@ public class ChangeConfigurationTask extends CommunicationTask<ChangeConfigurati
     }
 
     @Override
-    public AsyncHandler<ocpp.cp._2010._08.ChangeConfigurationResponse> getOcpp12Handler(String chargeBoxId) {
+    public AsyncHandler<ocpp.cp._2010._08.ChangeConfigurationResponse> getOcpp12Handler(String chargeBoxId, boolean remote) {
         return res -> {
             try {
-                success(chargeBoxId, res.get().getStatus().value());
+                success(chargeBoxId, res.get().getStatus().value(),remote);
             } catch (Exception e) {
                 failed(chargeBoxId, e);
             }
@@ -77,10 +77,10 @@ public class ChangeConfigurationTask extends CommunicationTask<ChangeConfigurati
     }
 
     @Override
-    public AsyncHandler<ocpp.cp._2012._06.ChangeConfigurationResponse> getOcpp15Handler(String chargeBoxId) {
+    public AsyncHandler<ocpp.cp._2012._06.ChangeConfigurationResponse> getOcpp15Handler(String chargeBoxId, boolean remote) {
         return res -> {
             try {
-                success(chargeBoxId, res.get().getStatus().value());
+                success(chargeBoxId, res.get().getStatus().value(),remote);
             } catch (Exception e) {
                 failed(chargeBoxId, e);
             }
@@ -88,10 +88,10 @@ public class ChangeConfigurationTask extends CommunicationTask<ChangeConfigurati
     }
 
     @Override
-    public AsyncHandler<ocpp.cp._2015._10.ChangeConfigurationResponse> getOcpp16Handler(String chargeBoxId) {
+    public AsyncHandler<ocpp.cp._2015._10.ChangeConfigurationResponse> getOcpp16Handler(String chargeBoxId, boolean remote) {
         return res -> {
             try {
-                success(chargeBoxId, res.get().getStatus().value());
+                success(chargeBoxId, res.get().getStatus().value(),remote);
             } catch (Exception e) {
                 failed(chargeBoxId, e);
             }

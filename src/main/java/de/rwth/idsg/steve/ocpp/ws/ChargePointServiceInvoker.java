@@ -57,10 +57,11 @@ public class ChargePointServiceInvoker {
     /**
      * Just a wrapper to make try-catch block and exception handling stand out
      */
-    public void runPipeline(ChargePointSelect cps, CommunicationTask task, ClusterCommunicationMode clusterCommunicationMode) {
+    public void runPipeline(ChargePointSelect cps, CommunicationTask task,
+                            ClusterCommunicationMode clusterCommunicationMode) {
         String chargeBoxId = cps.getChargeBoxId();
         try {
-            run(chargeBoxId, task, clusterCommunicationMode);
+            run(chargeBoxId, task, clusterCommunicationMode, null);
         } catch (Exception e) {
             log.error("Exception occurred", e);
             // Outgoing call failed due to technical problems. Pass the exception to handler to inform the user
@@ -71,7 +72,8 @@ public class ChargePointServiceInvoker {
     /**
      * Actual processing
      */
-    private void run(String chargeBoxId, CommunicationTask task, ClusterCommunicationMode clusterCommunicationMode) {
+    public void run(String chargeBoxId, CommunicationTask task,
+                     ClusterCommunicationMode clusterCommunicationMode, String originPodIp) {
         RequestType request = task.getRequest();
 
         String messageId = UUID.randomUUID().toString();
@@ -86,7 +88,7 @@ public class ChargePointServiceInvoker {
         call.setAction(pair.getAction());
 
         FutureResponseContext frc = new FutureResponseContext(task, pair.getResponseClass(),
-                ClusterCommunicationMode.REMOTE_SERVER==clusterCommunicationMode);
+                ClusterCommunicationMode.REMOTE_SERVER==clusterCommunicationMode, originPodIp);
 
         CommunicationContext context;
         if (clusterCommunicationMode != null) {

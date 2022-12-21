@@ -58,9 +58,9 @@ public class ClusteredInvokerClient {
         return new HttpEntity<>(input, headers);
     }
 
-    public void callback(String chargeBoxId, ResponseType payload) {
+    public void callback(String chargeBoxId, ResponseType payload, String originPodIp) {
     }
 
-    public void errorCallback(String chargeBoxId, ResponseType payload) {
+    public void errorCallback(String chargeBoxId, ResponseType payload, String originPodIp) {
     }
 }

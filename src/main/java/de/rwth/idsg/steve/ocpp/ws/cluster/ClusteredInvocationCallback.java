@@ -2,15 +2,13 @@ package de.rwth.idsg.steve.ocpp.ws.cluster;
 
 import lombok.*;
 
-import java.io.Serializable;
-
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
-public class ClusteredInvocationRequest implements Serializable {
+public class ClusteredInvocationCallback {
     private String chargeBoxId;
+    private String payloadType;
     private String payload;
-    private String callerIp;
 }

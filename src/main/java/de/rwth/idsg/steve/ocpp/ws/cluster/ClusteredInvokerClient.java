@@ -1,22 +1,24 @@
 package de.rwth.idsg.steve.ocpp.ws.cluster;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.rwth.idsg.ocpp.jaxb.ResponseType;
-import de.rwth.idsg.steve.web.dto.ocpp.ChargePointSelection;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.*;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
 import javax.annotation.PostConstruct;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 
 import static java.util.Collections.singletonList;
 
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class ClusteredInvokerClient {
     private RestTemplate restTemplate;
     private final ClusteredWebSocketSessionStore clusteredWebSocketSessionStore;
@@ -27,15 +29,20 @@ public class ClusteredInvokerClient {
     }
     @SneakyThrows
     public void invoke(String chargeBoxId, String payload) {
+        log.info("Sending payload to charge box pod {}: {}", chargeBoxId, payload);
         ClusteredInvocationRequest request = new ClusteredInvocationRequest(chargeBoxId,
-                payload, ClusteredWebSocketHelper.getPodIp());
+                Base64.getEncoder().encodeToString(payload.getBytes(StandardCharsets.UTF_8)),
+                ClusteredWebSocketHelper.getPodIp());
 
-        postFor(getPodUrl(chargeBoxId), request, Void.class);
+        postFor(getChargeBoxPodUrl(chargeBoxId), request, Void.class);
     }
 
-    private String getPodUrl(String chargeBoxId) {
+    private String getChargeBoxPodUrl(String chargeBoxId) {
         return String.format("http://%s/api/cluster/invoke",
                 clusteredWebSocketSessionStore.getChargeBoxIp(chargeBoxId));
+    }
+    private String getCallbackUrl(String podIp) {
+        return String.format("http://%s/api/cluster/callback", podIp);
     }
 
     private <T> T postFor(String url, Object request, Class<T> responseClass) throws IOException {
@@ -58,7 +65,14 @@ public class ClusteredInvokerClient {
         return new HttpEntity<>(input, headers);
     }
 
-    public void callback(String chargeBoxId, ResponseType payload, String originPodIp) {
+    @SneakyThrows
+    public void callback(String chargeBoxId, String payload, String originPodIp) {
+        log.info("Sending callback to invoking pod {}: {}", chargeBoxId, payload);
+        ClusteredInvocationRequest request = new ClusteredInvocationRequest(chargeBoxId,
+                Base64.getEncoder().encodeToString(payload.getBytes(StandardCharsets.UTF_8)),
+                ClusteredWebSocketHelper.getPodIp());
+
+        postFor(getCallbackUrl(originPodIp), request, Void.class);
     }
 
     public void errorCallback(String chargeBoxId, ResponseType payload, String originPodIp) {

@@ -75,7 +75,7 @@ public class CommunicationContext {
             resultHandler = result -> {
                 task.getHandler(chargeBoxId, true)
                         .handleResponse(new DummyResponse(result.getPayload()));
-                clusteredInvokerClient.callback(chargeBoxId, result.getPayload(), futureResponseContext.getOriginPodIp());
+                clusteredInvokerClient.callback(chargeBoxId, incomingString, futureResponseContext.getOriginPodIp());
             };
         } else {
             // TODO: not so sure about this
@@ -88,7 +88,7 @@ public class CommunicationContext {
         if (futureResponseContext.isRemote()) {
             resultHandler = result -> {
                 task.addNewError(chargeBoxId, result.toString());
-                clusteredInvokerClient.errorCallback(chargeBoxId, result.getPayload(), futureResponseContext.getOriginPodIp());
+                clusteredInvokerClient.callback(chargeBoxId, incomingString, futureResponseContext.getOriginPodIp());
             };
         } else {
             // TODO: not so sure about this

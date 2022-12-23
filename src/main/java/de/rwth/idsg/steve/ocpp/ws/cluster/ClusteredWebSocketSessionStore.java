@@ -22,7 +22,7 @@ public class ClusteredWebSocketSessionStore {
     public void add(String id, String chargeBoxId) {
         if (clusteredWebSocketConfig.isClusteredWebSocketSessionEnabled()) {
             log.info("Adding clustered session {} for charge box: {}", id, chargeBoxId);
-            webSocketClusterSessionService.addSession(id, chargeBoxId, System.getenv("POD_IP"));
+            webSocketClusterSessionService.addSession(id, chargeBoxId, ClusteredWebSocketHelper.getPodIp());
         }
     }
 

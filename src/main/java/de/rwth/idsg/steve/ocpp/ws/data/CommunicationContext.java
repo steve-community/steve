@@ -24,6 +24,8 @@ package de.rwth.idsg.steve.ocpp.ws.data;
 
 import de.rwth.idsg.ocpp.jaxb.ResponseType;
 import de.rwth.idsg.steve.ocpp.CommunicationTask;
+import de.rwth.idsg.steve.ocpp.ws.cluster.ClusterCommunicationMode;
+import de.rwth.idsg.steve.ocpp.ws.cluster.ClusteredInvokerClient;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -41,12 +43,15 @@ import java.util.function.Consumer;
  * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
  * @since 23.03.2015
  */
-@RequiredArgsConstructor
 @Getter
+@RequiredArgsConstructor
 public class CommunicationContext {
 
     private final WebSocketSession session;
+    private final ClusteredInvokerClient clusteredInvokerClient;
     private final String chargeBoxId;
+    private final ClusterCommunicationMode clusterCommunicationMode;
+
 
     @Setter private String incomingString;
     @Setter private String outgoingString;
@@ -66,15 +71,30 @@ public class CommunicationContext {
 
     @SuppressWarnings("unchecked")
     public void createResultHandler(CommunicationTask task) {
-        // TODO: not so sure about this
-        resultHandler = result -> task.getHandler(chargeBoxId)
-                                      .handleResponse(new DummyResponse(result.getPayload()));
+        if (futureResponseContext.isRemote()) {
+            resultHandler = result -> {
+                task.getHandler(chargeBoxId, true)
+                        .handleResponse(new DummyResponse(result.getPayload()));
+                clusteredInvokerClient.callback(chargeBoxId, incomingString, futureResponseContext.getOriginPodIp());
+            };
+        } else {
+            // TODO: not so sure about this
+            resultHandler = result -> task.getHandler(chargeBoxId, false)
+                    .handleResponse(new DummyResponse(result.getPayload()));
+        }
     }
 
     public void createErrorHandler(CommunicationTask task) {
-        // TODO: not so sure about this
-        errorHandler = result -> task.defaultCallback()
-                                     .success(chargeBoxId, result);
+        if (futureResponseContext.isRemote()) {
+            resultHandler = result -> {
+                task.addNewError(chargeBoxId, result.toString());
+                clusteredInvokerClient.callback(chargeBoxId, incomingString, futureResponseContext.getOriginPodIp());
+            };
+        } else {
+            // TODO: not so sure about this
+            errorHandler = result -> task.defaultCallback()
+                    .success(chargeBoxId, result);
+        }
     }
 
     @RequiredArgsConstructor(access = AccessLevel.PRIVATE)

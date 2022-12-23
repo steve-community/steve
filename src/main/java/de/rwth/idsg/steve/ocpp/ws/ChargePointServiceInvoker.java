@@ -25,6 +25,8 @@ package de.rwth.idsg.steve.ocpp.ws;
 import de.rwth.idsg.ocpp.jaxb.RequestType;
 import de.rwth.idsg.steve.SteveException;
 import de.rwth.idsg.steve.ocpp.CommunicationTask;
+import de.rwth.idsg.steve.ocpp.ws.cluster.ClusterCommunicationMode;
+import de.rwth.idsg.steve.ocpp.ws.cluster.ClusteredInvokerClient;
 import de.rwth.idsg.steve.ocpp.ws.data.ActionResponsePair;
 import de.rwth.idsg.steve.ocpp.ws.data.CommunicationContext;
 import de.rwth.idsg.steve.ocpp.ws.data.FutureResponseContext;
@@ -49,15 +51,17 @@ public class ChargePointServiceInvoker {
     private final OutgoingCallPipeline outgoingCallPipeline;
     @Getter
     private final AbstractWebSocketEndpoint endpoint;
+    private final ClusteredInvokerClient clusteredInvokerClient;
     private final TypeStore typeStore;
 
     /**
      * Just a wrapper to make try-catch block and exception handling stand out
      */
-    public void runPipeline(ChargePointSelect cps, CommunicationTask task) {
+    public void runPipeline(ChargePointSelect cps, CommunicationTask task,
+                            ClusterCommunicationMode clusterCommunicationMode) {
         String chargeBoxId = cps.getChargeBoxId();
         try {
-            run(chargeBoxId, task);
+            run(chargeBoxId, task, clusterCommunicationMode, null);
         } catch (Exception e) {
             log.error("Exception occurred", e);
             // Outgoing call failed due to technical problems. Pass the exception to handler to inform the user
@@ -68,7 +72,8 @@ public class ChargePointServiceInvoker {
     /**
      * Actual processing
      */
-    private void run(String chargeBoxId, CommunicationTask task) {
+    public void run(String chargeBoxId, CommunicationTask task,
+                     ClusterCommunicationMode clusterCommunicationMode, String originPodIp) {
         RequestType request = task.getRequest();
 
         String messageId = UUID.randomUUID().toString();
@@ -82,9 +87,18 @@ public class ChargePointServiceInvoker {
         call.setPayload(request);
         call.setAction(pair.getAction());
 
-        FutureResponseContext frc = new FutureResponseContext(task, pair.getResponseClass());
+        FutureResponseContext frc = new FutureResponseContext(task, pair.getResponseClass(),
+                ClusterCommunicationMode.REMOTE_SERVER==clusterCommunicationMode, originPodIp);
 
-        CommunicationContext context = new CommunicationContext(endpoint.getSession(chargeBoxId), chargeBoxId);
+        CommunicationContext context;
+        if (clusterCommunicationMode != null) {
+            context = new CommunicationContext(null, clusteredInvokerClient, chargeBoxId,
+                    clusterCommunicationMode);
+
+        } else {
+            context = new CommunicationContext(endpoint.getSession(chargeBoxId), null,
+                    chargeBoxId, null);
+        }
         context.setOutgoingMessage(call);
         context.setFutureResponseContext(frc);
 

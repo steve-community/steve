@@ -53,10 +53,10 @@ public class TriggerMessageTask extends Ocpp16AndAboveTask<TriggerMessageParams,
     }
 
     @Override
-    public AsyncHandler<ocpp.cp._2015._10.TriggerMessageResponse> getOcpp16Handler(String chargeBoxId) {
+    public AsyncHandler<ocpp.cp._2015._10.TriggerMessageResponse> getOcpp16Handler(String chargeBoxId, boolean remote) {
         return res -> {
             try {
-                success(chargeBoxId, res.get().getStatus().value());
+                success(chargeBoxId, res.get().getStatus().value(),remote);
             } catch (Exception e) {
                 failed(chargeBoxId, e);
             }

@@ -38,4 +38,6 @@ import lombok.Setter;
 public class FutureResponseContext {
     private final CommunicationTask task;
     private final Class<? extends ResponseType> responseClass;
+    private final boolean remote;
+    private final String originPodIp;
 }

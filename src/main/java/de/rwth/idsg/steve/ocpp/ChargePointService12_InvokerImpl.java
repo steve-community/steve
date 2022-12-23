@@ -26,7 +26,9 @@ import de.rwth.idsg.steve.ocpp.soap.ClientProvider;
 import de.rwth.idsg.steve.ocpp.soap.ClientProviderWithCache;
 import de.rwth.idsg.steve.ocpp.task.*;
 import de.rwth.idsg.steve.ocpp.ws.ChargePointServiceInvoker;
-import de.rwth.idsg.steve.ocpp.ws.cluster.ClusteredWebSocketInvoker;
+import de.rwth.idsg.steve.ocpp.ws.cluster.ClusteredInvokerClient;
+import de.rwth.idsg.steve.ocpp.ws.cluster.ClusteredWebSocketConfig;
+import de.rwth.idsg.steve.ocpp.ws.cluster.ClusteredWebSocketHelper;
 import de.rwth.idsg.steve.ocpp.ws.ocpp12.Ocpp12TypeStore;
 import de.rwth.idsg.steve.ocpp.ws.ocpp12.Ocpp12WebSocketEndpoint;
 import de.rwth.idsg.steve.ocpp.ws.pipeline.OutgoingCallPipeline;
@@ -35,29 +37,32 @@ import ocpp.cp._2010._08.ChargePointService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import static de.rwth.idsg.steve.ocpp.ws.cluster.ClusteredWebSocketHelper.getClusterClientCommunicationMode;
+
 /**
  * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
  * @since 10.03.2018
  */
 @Service
 public class ChargePointService12_InvokerImpl implements ChargePointService12_Invoker {
-
+    private final ClusteredWebSocketConfig clusteredWebSocketConfig;
     private final ChargePointServiceInvoker wsHelper;
     private final ClientProviderWithCache<ChargePointService> soapHelper;
-    private final ClusteredWebSocketInvoker clusteredWebSocketInvoker;
 
     @Autowired
     public ChargePointService12_InvokerImpl(OutgoingCallPipeline pipeline, Ocpp12WebSocketEndpoint endpoint,
-                                            ClientProvider clientProvider, ClusteredWebSocketInvoker clusteredWebSocketInvoker) {
-        this.wsHelper = new ChargePointServiceInvoker(pipeline, endpoint, Ocpp12TypeStore.INSTANCE);
+                                            ClientProvider clientProvider,
+                                            ClusteredWebSocketConfig clusteredWebSocketConfig,
+                                            ClusteredInvokerClient clusteredInvokerClient) {
+        this.clusteredWebSocketConfig = clusteredWebSocketConfig;
+        this.wsHelper = new ChargePointServiceInvoker(pipeline, endpoint, clusteredInvokerClient, Ocpp12TypeStore.INSTANCE);
         this.soapHelper = new ClientProviderWithCache<>(clientProvider);
-        this.clusteredWebSocketInvoker = clusteredWebSocketInvoker;
     }
 
     @Override
     public void reset(ChargePointSelect cp, ResetTask task) {
         if (cp.isSoap()) {
-            create(cp).resetAsync(task.getOcpp12Request(), cp.getChargeBoxId(), task.getOcpp12Handler(cp.getChargeBoxId()));
+            create(cp).resetAsync(task.getOcpp12Request(), cp.getChargeBoxId(), task.getOcpp12Handler(cp.getChargeBoxId(),false));
         } else {
             runPipeline(cp, task);
         }
@@ -66,7 +71,7 @@ public class ChargePointService12_InvokerImpl implements ChargePointService12_In
     @Override
     public void clearCache(ChargePointSelect cp, ClearCacheTask task) {
         if (cp.isSoap()) {
-            create(cp).clearCacheAsync(task.getOcpp12Request(), cp.getChargeBoxId(), task.getOcpp12Handler(cp.getChargeBoxId()));
+            create(cp).clearCacheAsync(task.getOcpp12Request(), cp.getChargeBoxId(), task.getOcpp12Handler(cp.getChargeBoxId(),false));
         } else {
             runPipeline(cp, task);
         }
@@ -75,7 +80,7 @@ public class ChargePointService12_InvokerImpl implements ChargePointService12_In
     @Override
     public void getDiagnostics(ChargePointSelect cp, GetDiagnosticsTask task) {
         if (cp.isSoap()) {
-            create(cp).getDiagnosticsAsync(task.getOcpp12Request(), cp.getChargeBoxId(), task.getOcpp12Handler(cp.getChargeBoxId()));
+            create(cp).getDiagnosticsAsync(task.getOcpp12Request(), cp.getChargeBoxId(), task.getOcpp12Handler(cp.getChargeBoxId(),false));
         } else {
             runPipeline(cp, task);
         }
@@ -84,7 +89,7 @@ public class ChargePointService12_InvokerImpl implements ChargePointService12_In
     @Override
     public void updateFirmware(ChargePointSelect cp, UpdateFirmwareTask task) {
         if (cp.isSoap()) {
-            create(cp).updateFirmwareAsync(task.getOcpp12Request(), cp.getChargeBoxId(), task.getOcpp12Handler(cp.getChargeBoxId()));
+            create(cp).updateFirmwareAsync(task.getOcpp12Request(), cp.getChargeBoxId(), task.getOcpp12Handler(cp.getChargeBoxId(),false));
         } else {
             runPipeline(cp, task);
         }
@@ -93,7 +98,7 @@ public class ChargePointService12_InvokerImpl implements ChargePointService12_In
     @Override
     public void unlockConnector(ChargePointSelect cp, UnlockConnectorTask task) {
         if (cp.isSoap()) {
-            create(cp).unlockConnectorAsync(task.getOcpp12Request(), cp.getChargeBoxId(), task.getOcpp12Handler(cp.getChargeBoxId()));
+            create(cp).unlockConnectorAsync(task.getOcpp12Request(), cp.getChargeBoxId(), task.getOcpp12Handler(cp.getChargeBoxId(),false));
         } else {
             runPipeline(cp, task);
         }
@@ -102,7 +107,7 @@ public class ChargePointService12_InvokerImpl implements ChargePointService12_In
     @Override
     public void changeAvailability(ChargePointSelect cp, ChangeAvailabilityTask task) {
         if (cp.isSoap()) {
-            create(cp).changeAvailabilityAsync(task.getOcpp12Request(), cp.getChargeBoxId(), task.getOcpp12Handler(cp.getChargeBoxId()));
+            create(cp).changeAvailabilityAsync(task.getOcpp12Request(), cp.getChargeBoxId(), task.getOcpp12Handler(cp.getChargeBoxId(),false));
         } else {
             runPipeline(cp, task);
         }
@@ -111,7 +116,7 @@ public class ChargePointService12_InvokerImpl implements ChargePointService12_In
     @Override
     public void changeConfiguration(ChargePointSelect cp, ChangeConfigurationTask task) {
         if (cp.isSoap()) {
-            create(cp).changeConfigurationAsync(task.getOcpp12Request(), cp.getChargeBoxId(), task.getOcpp12Handler(cp.getChargeBoxId()));
+            create(cp).changeConfigurationAsync(task.getOcpp12Request(), cp.getChargeBoxId(), task.getOcpp12Handler(cp.getChargeBoxId(),false));
         } else {
             runPipeline(cp, task);
         }
@@ -120,7 +125,7 @@ public class ChargePointService12_InvokerImpl implements ChargePointService12_In
     @Override
     public void remoteStartTransaction(ChargePointSelect cp, RemoteStartTransactionTask task) {
         if (cp.isSoap()) {
-            create(cp).remoteStartTransactionAsync(task.getOcpp12Request(), cp.getChargeBoxId(), task.getOcpp12Handler(cp.getChargeBoxId()));
+            create(cp).remoteStartTransactionAsync(task.getOcpp12Request(), cp.getChargeBoxId(), task.getOcpp12Handler(cp.getChargeBoxId(),false));
         } else {
             runPipeline(cp, task);
         }
@@ -129,14 +134,15 @@ public class ChargePointService12_InvokerImpl implements ChargePointService12_In
     @Override
     public void remoteStopTransaction(ChargePointSelect cp, RemoteStopTransactionTask task) {
         if (cp.isSoap()) {
-            create(cp).remoteStopTransactionAsync(task.getOcpp12Request(), cp.getChargeBoxId(), task.getOcpp12Handler(cp.getChargeBoxId()));
+            create(cp).remoteStopTransactionAsync(task.getOcpp12Request(), cp.getChargeBoxId(), task.getOcpp12Handler(cp.getChargeBoxId(),false));
         } else {
             runPipeline(cp, task);
         }
     }
 
     private void runPipeline(ChargePointSelect cp, CommunicationTask task) {
-        clusteredWebSocketInvoker.runPipeline(wsHelper, cp, task);
+        wsHelper.runPipeline(cp, task,
+                getClusterClientCommunicationMode(clusteredWebSocketConfig, wsHelper, cp.getChargeBoxId()));
     }
 
     private ChargePointService create(ChargePointSelect cp) {

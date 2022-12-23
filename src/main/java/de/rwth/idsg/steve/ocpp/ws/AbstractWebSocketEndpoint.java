@@ -26,10 +26,12 @@ import com.google.common.base.Strings;
 import de.rwth.idsg.steve.SteveConfiguration;
 import de.rwth.idsg.steve.config.WebSocketConfigurationConstants;
 import de.rwth.idsg.steve.ocpp.OcppVersion;
+import de.rwth.idsg.steve.ocpp.ws.cluster.ClusteredInvokerClient;
 import de.rwth.idsg.steve.ocpp.ws.cluster.ClusteredWebSocketSessionStore;
 import de.rwth.idsg.steve.ocpp.ws.data.CommunicationContext;
 import de.rwth.idsg.steve.ocpp.ws.data.SessionContext;
 import de.rwth.idsg.steve.ocpp.ws.pipeline.IncomingPipeline;
+import de.rwth.idsg.steve.repository.TaskStore;
 import de.rwth.idsg.steve.service.OcppNotificationService;
 import net.parkl.ocpp.service.cs.ChargePointService;
 import org.joda.time.DateTime;
@@ -57,7 +59,8 @@ public abstract class AbstractWebSocketEndpoint extends ConcurrentWebSocketHandl
     @Autowired private OcppNotificationService notificationService;
 
     @Autowired private ChargePointService chargePointService;
-    
+    @Autowired private ClusteredInvokerClient clusteredInvokerClient;
+
     @Autowired
     private SteveConfiguration config;
     @Autowired
@@ -114,7 +117,7 @@ public abstract class AbstractWebSocketEndpoint extends ConcurrentWebSocketHandl
 
         WebSocketLogger.receivedText(chargeBoxId, session, incomingString);
 
-        CommunicationContext context = new CommunicationContext(session, chargeBoxId);
+        CommunicationContext context = new CommunicationContext(session, clusteredInvokerClient, chargeBoxId, null);
         context.setIncomingString(incomingString);
 
         pipeline.accept(context);

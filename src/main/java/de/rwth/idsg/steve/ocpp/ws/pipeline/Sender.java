@@ -49,19 +49,23 @@ public enum Sender implements Consumer<CommunicationContext> {
         String chargeBoxId = context.getChargeBoxId();
         WebSocketSession session = context.getSession();
 
-        WebSocketLogger.sending(chargeBoxId, session, outgoingString);
+        if (session != null) {
+            WebSocketLogger.sending(chargeBoxId, session, outgoingString);
 
-        TextMessage out = new TextMessage(outgoingString);
-        try {
-            session.sendMessage(out);
-        } catch (IOException e) {
+            TextMessage out = new TextMessage(outgoingString);
+            try {
+                session.sendMessage(out);
+            } catch (IOException e) {
 
-            // Do NOT swallow exceptions for outgoing CALLs. For others just log.
-            if (context.getOutgoingMessage() instanceof OcppJsonCall) {
-                throw new SteveException(e.getMessage());
-            } else {
-                log.error("Could not send the outgoing message", e);
+                // Do NOT swallow exceptions for outgoing CALLs. For others just log.
+                if (context.getOutgoingMessage() instanceof OcppJsonCall) {
+                    throw new SteveException(e.getMessage());
+                } else {
+                    log.error("Could not send the outgoing message", e);
+                }
             }
+        } else {
+            context.getClusteredInvokerClient().invoke(chargeBoxId, outgoingString);
         }
     }
 }

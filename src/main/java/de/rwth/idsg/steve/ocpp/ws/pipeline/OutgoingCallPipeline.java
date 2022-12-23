@@ -23,6 +23,7 @@
 package de.rwth.idsg.steve.ocpp.ws.pipeline;
 
 import de.rwth.idsg.steve.ocpp.ws.FutureResponseContextStore;
+import de.rwth.idsg.steve.ocpp.ws.cluster.ClusterCommunicationMode;
 import de.rwth.idsg.steve.ocpp.ws.data.CommunicationContext;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,10 +57,15 @@ public class OutgoingCallPipeline implements Consumer<CommunicationContext> {
 
     private static Consumer<CommunicationContext> saveInStore(FutureResponseContextStore store) {
         return context -> {
-            // All went well, and the call is sent. Store the response context for later lookup.
-            store.add(context.getSession(),
-                      context.getOutgoingMessage().getMessageId(),
-                      context.getFutureResponseContext());
+            if (context.getSession() == null) {
+                store.addRemote(context.getOutgoingMessage().getMessageId(),
+                        context.getFutureResponseContext());
+            } else {
+                // All went well, and the call is sent. Store the response context for later lookup.
+                store.add(context.getSession(),
+                        context.getOutgoingMessage().getMessageId(),
+                        context.getFutureResponseContext());
+            }
         };
     }
 

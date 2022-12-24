@@ -28,10 +28,11 @@ public class ClusteredInvokerClient {
         this.restTemplate = new RestTemplate();
     }
     @SneakyThrows
-    public void invoke(String chargeBoxId, String payload) {
+    public void invoke(String chargeBoxId, String payload, String responseClassName) {
         log.info("Sending payload to charge box pod {}: {}", chargeBoxId, payload);
         ClusteredInvocationRequest request = new ClusteredInvocationRequest(chargeBoxId,
                 Base64.getEncoder().encodeToString(payload.getBytes(StandardCharsets.UTF_8)),
+                responseClassName,
                 ClusteredWebSocketHelper.getPodIp());
 
         postFor(getChargeBoxPodUrl(chargeBoxId), request, Void.class);
@@ -68,13 +69,11 @@ public class ClusteredInvokerClient {
     @SneakyThrows
     public void callback(String chargeBoxId, String payload, String originPodIp) {
         log.info("Sending callback to invoking pod {}: {}", chargeBoxId, payload);
-        ClusteredInvocationRequest request = new ClusteredInvocationRequest(chargeBoxId,
+        ClusteredInvocationCallback request = new ClusteredInvocationCallback(chargeBoxId,
                 Base64.getEncoder().encodeToString(payload.getBytes(StandardCharsets.UTF_8)),
                 ClusteredWebSocketHelper.getPodIp());
 
         postFor(getCallbackUrl(originPodIp), request, Void.class);
     }
 
-    public void errorCallback(String chargeBoxId, ResponseType payload, String originPodIp) {
-    }
 }

@@ -59,6 +59,10 @@ public class CommunicationContext {
     @Setter private OcppJsonMessage incomingMessage;
     @Setter private OcppJsonMessage outgoingMessage;
 
+    @Setter
+    @Getter
+    private String remoteMessageId;
+
     @Setter private FutureResponseContext futureResponseContext;
 
     // for incoming responses to previously sent requests
@@ -73,8 +77,8 @@ public class CommunicationContext {
     public void createResultHandler(CommunicationTask task) {
         if (futureResponseContext.isRemote()) {
             resultHandler = result -> {
-                task.getHandler(chargeBoxId, true)
-                        .handleResponse(new DummyResponse(result.getPayload()));
+                //task.getHandler(chargeBoxId, true)
+                //        .handleResponse(new DummyResponse(result.getPayload()));
                 clusteredInvokerClient.callback(chargeBoxId, incomingString, futureResponseContext.getOriginPodIp());
             };
         } else {
@@ -87,7 +91,7 @@ public class CommunicationContext {
     public void createErrorHandler(CommunicationTask task) {
         if (futureResponseContext.isRemote()) {
             resultHandler = result -> {
-                task.addNewError(chargeBoxId, result.toString());
+                //task.addNewError(chargeBoxId, result.toString());
                 clusteredInvokerClient.callback(chargeBoxId, incomingString, futureResponseContext.getOriginPodIp());
             };
         } else {

@@ -23,6 +23,7 @@
 package de.rwth.idsg.steve.ocpp.ws;
 
 import de.rwth.idsg.ocpp.jaxb.RequestType;
+import de.rwth.idsg.ocpp.jaxb.ResponseType;
 import de.rwth.idsg.steve.SteveException;
 import de.rwth.idsg.steve.ocpp.CommunicationTask;
 import de.rwth.idsg.steve.ocpp.ws.cluster.ClusterCommunicationMode;
@@ -35,6 +36,7 @@ import de.rwth.idsg.steve.ocpp.ws.pipeline.OutgoingCallPipeline;
 import de.rwth.idsg.steve.repository.dto.ChargePointSelect;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -61,7 +63,7 @@ public class ChargePointServiceInvoker {
                             ClusterCommunicationMode clusterCommunicationMode) {
         String chargeBoxId = cps.getChargeBoxId();
         try {
-            run(chargeBoxId, task, clusterCommunicationMode, null);
+            run(chargeBoxId, task, clusterCommunicationMode);
         } catch (Exception e) {
             log.error("Exception occurred", e);
             // Outgoing call failed due to technical problems. Pass the exception to handler to inform the user
@@ -72,8 +74,8 @@ public class ChargePointServiceInvoker {
     /**
      * Actual processing
      */
-    public void run(String chargeBoxId, CommunicationTask task,
-                     ClusterCommunicationMode clusterCommunicationMode, String originPodIp) {
+    private void run(String chargeBoxId, CommunicationTask task,
+                     ClusterCommunicationMode clusterCommunicationMode) {
         RequestType request = task.getRequest();
 
         String messageId = UUID.randomUUID().toString();
@@ -88,7 +90,7 @@ public class ChargePointServiceInvoker {
         call.setAction(pair.getAction());
 
         FutureResponseContext frc = new FutureResponseContext(task, pair.getResponseClass(),
-                ClusterCommunicationMode.REMOTE_SERVER==clusterCommunicationMode, originPodIp);
+                false, null);
 
         CommunicationContext context;
         if (clusterCommunicationMode != null) {
@@ -103,5 +105,20 @@ public class ChargePointServiceInvoker {
         context.setFutureResponseContext(frc);
 
         outgoingCallPipeline.accept(context);
+    }
+
+    @SneakyThrows
+    public void runRemote(String chargeBoxId, String outgoingString, String responseClassName, String messageId, String originPodIp) {
+        Class<? extends ResponseType> responseClass= (Class<? extends ResponseType>) Class.forName(responseClassName);
+        FutureResponseContext frc = new FutureResponseContext(null, responseClass,
+                true, originPodIp);
+
+        CommunicationContext context = new CommunicationContext(null, clusteredInvokerClient, chargeBoxId,
+                    ClusterCommunicationMode.REMOTE_SERVER);
+
+        context.setFutureResponseContext(frc);
+        context.setOutgoingString(outgoingString);
+        context.setRemoteMessageId(messageId);
+        outgoingCallPipeline.acceptRemote(context);
     }
 }

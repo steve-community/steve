@@ -12,5 +12,6 @@ import java.io.Serializable;
 public class ClusteredInvocationRequest implements Serializable {
     private String chargeBoxId;
     private String payload;
+    private String responseClassName;
     private String callerIp;
 }

@@ -42,17 +42,24 @@ import java.util.function.Consumer;
 public class OutgoingCallPipeline implements Consumer<CommunicationContext> {
 
     private final Consumer<CommunicationContext> chainedConsumers;
+    private final Consumer<CommunicationContext> remoteChainedConsumers;
 
     @Autowired
     public OutgoingCallPipeline(FutureResponseContextStore store) {
         chainedConsumers = OutgoingCallPipeline.start(Serializer.INSTANCE)
                                                .andThen(Sender.INSTANCE)
                                                .andThen(saveInStore(store));
+        remoteChainedConsumers = OutgoingCallPipeline.start(Sender.INSTANCE)
+                .andThen(saveInStore(store));
     }
 
     @Override
     public void accept(CommunicationContext ctx) {
         chainedConsumers.accept(ctx);
+    }
+
+    public void acceptRemote(CommunicationContext ctx) {
+        remoteChainedConsumers.accept(ctx);
     }
 
     private static Consumer<CommunicationContext> saveInStore(FutureResponseContextStore store) {
@@ -63,7 +70,8 @@ public class OutgoingCallPipeline implements Consumer<CommunicationContext> {
             } else {
                 // All went well, and the call is sent. Store the response context for later lookup.
                 store.add(context.getSession(),
-                        context.getOutgoingMessage().getMessageId(),
+                        context.getOutgoingMessage() != null ?
+                            context.getOutgoingMessage().getMessageId() : context.getRemoteMessageId(),
                         context.getFutureResponseContext());
             }
         };

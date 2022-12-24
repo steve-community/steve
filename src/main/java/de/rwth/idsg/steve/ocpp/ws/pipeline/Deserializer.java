@@ -33,6 +33,7 @@ import de.rwth.idsg.steve.ocpp.ws.ErrorFactory;
 import de.rwth.idsg.steve.ocpp.ws.FutureResponseContextStore;
 import de.rwth.idsg.steve.ocpp.ws.JsonObjectMapper;
 import de.rwth.idsg.steve.ocpp.ws.TypeStore;
+import de.rwth.idsg.steve.ocpp.ws.cluster.ClusterCommunicationMode;
 import de.rwth.idsg.steve.ocpp.ws.data.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -143,12 +144,23 @@ public class Deserializer implements Consumer<CommunicationContext> {
      * There is no mechanism in OCPP to report back such erroneous messages.
      */
     private void handleResult(CommunicationContext context, String messageId, JsonParser parser) {
-        FutureResponseContext responseContext = futureResponseContextStore.get(context.getSession(), messageId);
-        if (responseContext == null) {
-            throw new SteveException(
-                    "A result message was received as response to a not-sent call. The message was: %s",
-                    context.getIncomingString()
-            );
+        FutureResponseContext responseContext;
+        if (context.getClusterCommunicationMode() != ClusterCommunicationMode.REMOTE_CLIENT) {
+            responseContext = futureResponseContextStore.get(context.getSession(), messageId);
+            if (responseContext == null) {
+                throw new SteveException(
+                        "A result message was received as response to a not-sent call. The message was: %s",
+                        context.getIncomingString()
+                );
+            }
+        } else {
+            responseContext = futureResponseContextStore.getRemote(messageId);
+            if (responseContext == null) {
+                throw new SteveException(
+                        "A clustered result message was received as response to a not-sent call. The message was: %s",
+                        context.getIncomingString()
+                );
+            }
         }
 
         ResponseType res;

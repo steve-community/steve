@@ -82,6 +82,10 @@ public class FutureResponseContextStore {
         remoteLookupTable.put(messageId, context);
     }
 
+    public FutureResponseContext getRemote(String messageId) {
+        return remoteLookupTable.get(messageId);
+    }
+
     @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
     private static class RemoveFunction implements
             BiFunction<WebSocketSession, Map<String, FutureResponseContext>, Map<String, FutureResponseContext>> {

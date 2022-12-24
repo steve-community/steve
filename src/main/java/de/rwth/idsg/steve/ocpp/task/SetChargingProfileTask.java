@@ -54,10 +54,10 @@ public class SetChargingProfileTask extends Ocpp16AndAboveTask<EnhancedSetChargi
     public OcppCallback<String> defaultCallback() {
         return new DefaultOcppCallback<String>() {
             @Override
-            public void success(String chargeBoxId, String statusValue, boolean remote) {
+            public void success(String chargeBoxId, String statusValue) {
                 addNewResponse(chargeBoxId, statusValue);
 
-                if (!remote && "Accepted".equalsIgnoreCase(statusValue)) {
+                if ("Accepted".equalsIgnoreCase(statusValue)) {
                     int chargingProfilePk = params.getDetails().getProfile().getChargingProfilePk();
                     int connectorId = params.getDelegate().getConnectorId();
                     chargingProfileRepository.setProfile(chargingProfilePk, chargeBoxId, connectorId);
@@ -105,10 +105,10 @@ public class SetChargingProfileTask extends Ocpp16AndAboveTask<EnhancedSetChargi
     }
 
     @Override
-    public AsyncHandler<ocpp.cp._2015._10.SetChargingProfileResponse> getOcpp16Handler(String chargeBoxId, boolean remote) {
+    public AsyncHandler<ocpp.cp._2015._10.SetChargingProfileResponse> getOcpp16Handler(String chargeBoxId) {
         return res -> {
             try {
-                success(chargeBoxId, res.get().getStatus().value(),remote);
+                success(chargeBoxId, res.get().getStatus().value());
             } catch (Exception e) {
                 failed(chargeBoxId, e);
             }

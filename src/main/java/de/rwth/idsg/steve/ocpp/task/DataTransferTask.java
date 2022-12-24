@@ -46,7 +46,7 @@ public class DataTransferTask extends Ocpp15AndAboveTask<DataTransferParams, Dat
     public OcppCallback<ResponseWrapper> defaultCallback() {
         return new DefaultOcppCallback<ResponseWrapper>() {
             @Override
-            public void success(String chargeBoxId, ResponseWrapper response, boolean remote) {
+            public void success(String chargeBoxId, ResponseWrapper response) {
                 String status = response.getStatus();
                 String data = response.getData();
 
@@ -82,11 +82,11 @@ public class DataTransferTask extends Ocpp15AndAboveTask<DataTransferParams, Dat
     }
 
     @Override
-    public AsyncHandler<ocpp.cp._2012._06.DataTransferResponse> getOcpp15Handler(String chargeBoxId, boolean remote) {
+    public AsyncHandler<ocpp.cp._2012._06.DataTransferResponse> getOcpp15Handler(String chargeBoxId) {
         return res -> {
             try {
                 DataTransferResponse response = res.get();
-                success(chargeBoxId, new ResponseWrapper(response.getStatus().value(), response.getData()),remote);
+                success(chargeBoxId, new ResponseWrapper(response.getStatus().value(), response.getData()));
             } catch (Exception e) {
                 failed(chargeBoxId, e);
             }
@@ -94,11 +94,11 @@ public class DataTransferTask extends Ocpp15AndAboveTask<DataTransferParams, Dat
     }
 
     @Override
-    public AsyncHandler<ocpp.cp._2015._10.DataTransferResponse> getOcpp16Handler(String chargeBoxId,boolean remote) {
+    public AsyncHandler<ocpp.cp._2015._10.DataTransferResponse> getOcpp16Handler(String chargeBoxId) {
         return res -> {
             try {
                 ocpp.cp._2015._10.DataTransferResponse response = res.get();
-                success(chargeBoxId, new ResponseWrapper(response.getStatus().value(), response.getData()),remote);
+                success(chargeBoxId, new ResponseWrapper(response.getStatus().value(), response.getData()));
             } catch (Exception e) {
                 failed(chargeBoxId, e);
             }

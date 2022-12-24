@@ -177,7 +177,11 @@ public class Deserializer implements Consumer<CommunicationContext> {
         result.setPayload(res);
 
         context.setIncomingMessage(result);
-        context.createResultHandler(responseContext.getTask());
+        if (responseContext.isRemote()) {
+            context.createRemoteResultHandler();
+        } else {
+            context.createResultHandler(responseContext.getTask());
+        }
     }
 
     /**
@@ -229,7 +233,11 @@ public class Deserializer implements Consumer<CommunicationContext> {
         error.setErrorDetails(details);
 
         context.setIncomingMessage(error);
-        context.createErrorHandler(responseContext.getTask());
+        if (responseContext.isRemote()) {
+            context.createRemoteErrorHandler();
+        } else {
+            context.createErrorHandler(responseContext.getTask());
+        }
     }
 
 }

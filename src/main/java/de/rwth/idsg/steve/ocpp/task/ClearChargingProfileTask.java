@@ -53,10 +53,10 @@ public class ClearChargingProfileTask extends Ocpp16AndAboveTask<ClearChargingPr
     public OcppCallback<String> defaultCallback() {
         return new DefaultOcppCallback<String>() {
             @Override
-            public void success(String chargeBoxId, String statusValue, boolean remote) {
+            public void success(String chargeBoxId, String statusValue) {
                 addNewResponse(chargeBoxId, statusValue);
 
-                if (!remote && "Accepted".equalsIgnoreCase(statusValue)) {
+                if ("Accepted".equalsIgnoreCase(statusValue)) {
                     switch (params.getFilterType()) {
                         case ChargingProfileId:
                             chargingProfileRepository.clearProfile(params.getChargingProfilePk(), chargeBoxId);
@@ -83,10 +83,10 @@ public class ClearChargingProfileTask extends Ocpp16AndAboveTask<ClearChargingPr
     }
 
     @Override
-    public AsyncHandler<ocpp.cp._2015._10.ClearChargingProfileResponse> getOcpp16Handler(String chargeBoxId, boolean remote) {
+    public AsyncHandler<ocpp.cp._2015._10.ClearChargingProfileResponse> getOcpp16Handler(String chargeBoxId) {
         return res -> {
             try {
-                success(chargeBoxId, res.get().getStatus().value(),remote);
+                success(chargeBoxId, res.get().getStatus().value());
             } catch (Exception e) {
                 failed(chargeBoxId, e);
             }

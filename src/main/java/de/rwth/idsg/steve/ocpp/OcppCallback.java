@@ -33,7 +33,7 @@ import de.rwth.idsg.steve.ocpp.ws.data.OcppJsonError;
  */
 public interface OcppCallback<T> {
 
-    void success(String chargeBoxId, T response, boolean remote);
+    void success(String chargeBoxId, T response);
 
     /**
      * Relevant to WebSocket/JSON transport: Even though we have an error, this object is still a valid response from

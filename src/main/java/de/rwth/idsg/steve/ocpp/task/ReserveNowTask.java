@@ -49,16 +49,15 @@ public class ReserveNowTask extends Ocpp15AndAboveTask<EnhancedReserveNowParams,
     public OcppCallback<String> defaultCallback() {
         return new OcppCallback<String>() {
             @Override
-            public void success(String chargeBoxId, String responseStatus, boolean remote) {
+            public void success(String chargeBoxId, String responseStatus) {
                 addNewResponse(chargeBoxId, responseStatus);
 
-                if (!remote) {
-                    if ("Accepted".equalsIgnoreCase(responseStatus)) {
-                        reservationService.accepted(params.getReservationId());
-                    } else {
-                        delete();
-                    }
+                if ("Accepted".equalsIgnoreCase(responseStatus)) {
+                    reservationService.accepted(params.getReservationId());
+                } else {
+                    delete();
                 }
+
             }
 
             @Override
@@ -96,10 +95,10 @@ public class ReserveNowTask extends Ocpp15AndAboveTask<EnhancedReserveNowParams,
     }
 
     @Override
-    public AsyncHandler<ocpp.cp._2012._06.ReserveNowResponse> getOcpp15Handler(String chargeBoxId, boolean remote) {
+    public AsyncHandler<ocpp.cp._2012._06.ReserveNowResponse> getOcpp15Handler(String chargeBoxId) {
         return res -> {
             try {
-                success(chargeBoxId, res.get().getStatus().value(),remote);
+                success(chargeBoxId, res.get().getStatus().value());
             } catch (Exception e) {
                 failed(chargeBoxId, e);
             }
@@ -107,10 +106,10 @@ public class ReserveNowTask extends Ocpp15AndAboveTask<EnhancedReserveNowParams,
     }
 
     @Override
-    public AsyncHandler<ocpp.cp._2015._10.ReserveNowResponse> getOcpp16Handler(String chargeBoxId, boolean remote) {
+    public AsyncHandler<ocpp.cp._2015._10.ReserveNowResponse> getOcpp16Handler(String chargeBoxId) {
         return res -> {
             try {
-                success(chargeBoxId, res.get().getStatus().value(),remote);
+                success(chargeBoxId, res.get().getStatus().value());
             } catch (Exception e) {
                 failed(chargeBoxId, e);
             }

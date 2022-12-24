@@ -61,7 +61,7 @@ public class GetConfigurationTask extends Ocpp15AndAboveTask<GetConfigurationPar
     public OcppCallback<ResponseWrapper> defaultCallback() {
         return new DefaultOcppCallback<ResponseWrapper>() {
             @Override
-            public void success(String chargeBoxId, ResponseWrapper response, boolean remote) {
+            public void success(String chargeBoxId, ResponseWrapper response) {
                 String str = String.format(
                         FORMAT,
                         toStringConfList(response.configurationKeys),
@@ -91,7 +91,7 @@ public class GetConfigurationTask extends Ocpp15AndAboveTask<GetConfigurationPar
     }
 
     @Override
-    public AsyncHandler<ocpp.cp._2012._06.GetConfigurationResponse> getOcpp15Handler(String chargeBoxId, boolean remote) {
+    public AsyncHandler<ocpp.cp._2012._06.GetConfigurationResponse> getOcpp15Handler(String chargeBoxId) {
         return res -> {
             try {
                 GetConfigurationResponse response = res.get();
@@ -101,7 +101,7 @@ public class GetConfigurationTask extends Ocpp15AndAboveTask<GetConfigurationPar
                                                    .map(k -> new KeyValue(k.getKey(), k.getValue(), k.isReadonly()))
                                                    .collect(Collectors.toList());
 
-                success(chargeBoxId, new ResponseWrapper(keyValues, response.getUnknownKey()),remote);
+                success(chargeBoxId, new ResponseWrapper(keyValues, response.getUnknownKey()));
             } catch (Exception e) {
                 failed(chargeBoxId, e);
             }
@@ -109,7 +109,7 @@ public class GetConfigurationTask extends Ocpp15AndAboveTask<GetConfigurationPar
     }
 
     @Override
-    public AsyncHandler<ocpp.cp._2015._10.GetConfigurationResponse> getOcpp16Handler(String chargeBoxId, boolean remote) {
+    public AsyncHandler<ocpp.cp._2015._10.GetConfigurationResponse> getOcpp16Handler(String chargeBoxId) {
         return res -> {
             try {
                 ocpp.cp._2015._10.GetConfigurationResponse response = res.get();
@@ -118,7 +118,7 @@ public class GetConfigurationTask extends Ocpp15AndAboveTask<GetConfigurationPar
                                                    .map(k -> new KeyValue(k.getKey(), k.getValue(), k.isReadonly()))
                                                    .collect(Collectors.toList());
 
-                success(chargeBoxId, new ResponseWrapper(keyValues, response.getUnknownKey()),remote);
+                success(chargeBoxId, new ResponseWrapper(keyValues, response.getUnknownKey()));
             } catch (Exception e) {
                 failed(chargeBoxId, e);
             }

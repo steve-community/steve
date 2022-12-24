@@ -49,7 +49,7 @@ public class GetCompositeScheduleTask extends Ocpp16AndAboveTask<GetCompositeSch
         return new DefaultOcppCallback<GetCompositeScheduleResponse>() {
 
             @Override
-            public void success(String chargeBoxId, GetCompositeScheduleResponse response, boolean remote) {
+            public void success(String chargeBoxId, GetCompositeScheduleResponse response) {
                 addNewResponse(chargeBoxId, response.getStatus().value());
 
                 if (response.getStatus() == GetCompositeScheduleStatus.ACCEPTED) {
@@ -69,10 +69,10 @@ public class GetCompositeScheduleTask extends Ocpp16AndAboveTask<GetCompositeSch
     }
 
     @Override
-    public AsyncHandler<GetCompositeScheduleResponse> getOcpp16Handler(String chargeBoxId, boolean remote) {
+    public AsyncHandler<GetCompositeScheduleResponse> getOcpp16Handler(String chargeBoxId) {
         return res -> {
             try {
-                success(chargeBoxId, res.get(),remote);
+                success(chargeBoxId, res.get());
             } catch (Exception e) {
                 failed(chargeBoxId, e);
             }

@@ -46,7 +46,7 @@ public abstract class Ocpp16AndAboveTask<S extends ChargePointSelection, RESPONS
 
     @Deprecated
     @Override
-    public <T extends ResponseType> AsyncHandler<T> getOcpp15Handler(String chargeBoxId, boolean remote) {
+    public <T extends ResponseType> AsyncHandler<T> getOcpp15Handler(String chargeBoxId) {
         throw new RuntimeException("Not supported");
     }
 }

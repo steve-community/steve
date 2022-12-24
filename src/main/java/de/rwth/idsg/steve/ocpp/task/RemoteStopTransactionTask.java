@@ -63,10 +63,10 @@ public class RemoteStopTransactionTask extends CommunicationTask<RemoteStopTrans
     }
 
     @Override
-    public AsyncHandler<ocpp.cp._2010._08.RemoteStopTransactionResponse> getOcpp12Handler(String chargeBoxId, boolean remote) {
+    public AsyncHandler<ocpp.cp._2010._08.RemoteStopTransactionResponse> getOcpp12Handler(String chargeBoxId) {
         return res -> {
             try {
-                success(chargeBoxId, res.get().getStatus().value(),remote);
+                success(chargeBoxId, res.get().getStatus().value());
             } catch (Exception e) {
                 failed(chargeBoxId, e);
             }
@@ -74,10 +74,10 @@ public class RemoteStopTransactionTask extends CommunicationTask<RemoteStopTrans
     }
 
     @Override
-    public AsyncHandler<ocpp.cp._2012._06.RemoteStopTransactionResponse> getOcpp15Handler(String chargeBoxId, boolean remote) {
+    public AsyncHandler<ocpp.cp._2012._06.RemoteStopTransactionResponse> getOcpp15Handler(String chargeBoxId) {
         return res -> {
             try {
-                success(chargeBoxId, res.get().getStatus().value(),remote);
+                success(chargeBoxId, res.get().getStatus().value());
             } catch (Exception e) {
                 failed(chargeBoxId, e);
             }
@@ -85,10 +85,10 @@ public class RemoteStopTransactionTask extends CommunicationTask<RemoteStopTrans
     }
 
     @Override
-    public AsyncHandler<ocpp.cp._2015._10.RemoteStopTransactionResponse> getOcpp16Handler(String chargeBoxId, boolean remote) {
+    public AsyncHandler<ocpp.cp._2015._10.RemoteStopTransactionResponse> getOcpp16Handler(String chargeBoxId) {
         return res -> {
             try {
-                success(chargeBoxId, res.get().getStatus().value(),remote);
+                success(chargeBoxId, res.get().getStatus().value());
             } catch (Exception e) {
                 failed(chargeBoxId, e);
             }

@@ -19,7 +19,7 @@ public class TestRemoteStartTransactionTask extends RemoteStartTransactionTask {
         finishedLatch = new CountDownLatch(1);
         this.addCallback(new DefaultOcppCallback<String>() {
             @Override
-            public void success(String chargeBoxId, String s, boolean remote) {
+            public void success(String chargeBoxId, String s) {
                 log.info("test remote start transaction finished for chargeBox: {}", chargeBoxId);
                 responseLatch.countDown();
             }

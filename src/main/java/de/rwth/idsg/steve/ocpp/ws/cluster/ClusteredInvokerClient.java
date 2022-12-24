@@ -28,9 +28,9 @@ public class ClusteredInvokerClient {
         this.restTemplate = new RestTemplate();
     }
     @SneakyThrows
-    public void invoke(String chargeBoxId, String payload, String responseClassName) {
+    public void invoke(String chargeBoxId, String messageId, String payload, String responseClassName) {
         log.info("Sending payload to charge box pod {}: {}", chargeBoxId, payload);
-        ClusteredInvocationRequest request = new ClusteredInvocationRequest(chargeBoxId,
+        ClusteredInvocationRequest request = new ClusteredInvocationRequest(chargeBoxId, messageId,
                 Base64.getEncoder().encodeToString(payload.getBytes(StandardCharsets.UTF_8)),
                 responseClassName,
                 ClusteredWebSocketHelper.getPodIp());

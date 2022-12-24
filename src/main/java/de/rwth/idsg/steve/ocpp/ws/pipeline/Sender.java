@@ -65,8 +65,8 @@ public enum Sender implements Consumer<CommunicationContext> {
                 }
             }
         } else {
-            context.getClusteredInvokerClient().invoke(chargeBoxId, outgoingString,
-                    context.getFutureResponseContext().getResponseClass().getName());
+            context.getClusteredInvokerClient().invoke(chargeBoxId, context.getOutgoingMessage().getMessageId(),
+                    outgoingString, context.getFutureResponseContext().getResponseClass().getName());
         }
     }
 }

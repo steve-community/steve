@@ -178,7 +178,7 @@ public class Deserializer implements Consumer<CommunicationContext> {
 
         context.setIncomingMessage(result);
         if (responseContext.isRemote()) {
-            context.createRemoteResultHandler();
+            context.createRemoteResultHandler(responseContext.getOriginPodIp());
         } else {
             context.createResultHandler(responseContext.getTask());
         }
@@ -234,7 +234,7 @@ public class Deserializer implements Consumer<CommunicationContext> {
 
         context.setIncomingMessage(error);
         if (responseContext.isRemote()) {
-            context.createRemoteErrorHandler();
+            context.createRemoteErrorHandler(responseContext.getOriginPodIp());
         } else {
             context.createErrorHandler(responseContext.getTask());
         }

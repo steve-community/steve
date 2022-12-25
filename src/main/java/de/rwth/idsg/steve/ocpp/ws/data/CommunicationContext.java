@@ -81,11 +81,11 @@ public class CommunicationContext {
 
     }
 
-    public void createRemoteResultHandler() {
+    public void createRemoteResultHandler(String originPodIp) {
         resultHandler = result -> {
             //task.getHandler(chargeBoxId, true)
             //        .handleResponse(new DummyResponse(result.getPayload()));
-            clusteredInvokerClient.callback(chargeBoxId, incomingString, futureResponseContext.getOriginPodIp());
+            clusteredInvokerClient.callback(chargeBoxId, incomingString, originPodIp);
         };
     }
 
@@ -96,10 +96,10 @@ public class CommunicationContext {
 
     }
 
-    public void createRemoteErrorHandler() {
+    public void createRemoteErrorHandler(String originPodIp) {
         resultHandler = result -> {
             //task.addNewError(chargeBoxId, result.toString());
-            clusteredInvokerClient.callback(chargeBoxId, incomingString, futureResponseContext.getOriginPodIp());
+            clusteredInvokerClient.callback(chargeBoxId, incomingString, originPodIp);
         };
     }
 

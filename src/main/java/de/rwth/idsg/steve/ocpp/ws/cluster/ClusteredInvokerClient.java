@@ -75,8 +75,7 @@ public class ClusteredInvokerClient {
     public void callback(String chargeBoxId, String payload, String originPodIp) {
         log.info("Sending callback to invoking pod {}: {}", chargeBoxId, payload);
         ClusteredInvocationCallback request = new ClusteredInvocationCallback(chargeBoxId,
-                Base64.getEncoder().encodeToString(payload.getBytes(StandardCharsets.UTF_8)),
-                ClusteredWebSocketHelper.getPodIp());
+                Base64.getEncoder().encodeToString(payload.getBytes(StandardCharsets.UTF_8)));
 
         postFor(getCallbackUrl(originPodIp), request, Void.class);
     }

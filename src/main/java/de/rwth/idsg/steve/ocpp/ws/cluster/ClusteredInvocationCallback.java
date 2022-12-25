@@ -9,6 +9,5 @@ import lombok.*;
 @ToString
 public class ClusteredInvocationCallback {
     private String chargeBoxId;
-    private String payloadType;
     private String payload;
 }

@@ -43,11 +43,11 @@ public class ClusteredInvokerClient {
     }
 
     private String getChargeBoxPodUrl(String chargeBoxId) {
-        return String.format("http://%s:%d/api/cluster/invoke",
+        return String.format("http://%s:%d/ocpp/api/cluster/invoke",
                 clusteredWebSocketSessionStore.getChargeBoxIp(chargeBoxId), podContainerPort);
     }
     private String getCallbackUrl(String podIp) {
-        return String.format("http://%s:%d/api/cluster/callback", podIp,
+        return String.format("http://%s:%d/ocpp/api/cluster/callback", podIp,
                 podContainerPort);
     }
 

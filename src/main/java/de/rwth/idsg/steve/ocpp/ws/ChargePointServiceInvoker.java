@@ -113,7 +113,7 @@ public class ChargePointServiceInvoker {
         FutureResponseContext frc = new FutureResponseContext(null, responseClass,
                 true, originPodIp);
 
-        CommunicationContext context = new CommunicationContext(null, clusteredInvokerClient, chargeBoxId,
+        CommunicationContext context = new CommunicationContext(endpoint.getSession(chargeBoxId), clusteredInvokerClient, chargeBoxId,
                     ClusterCommunicationMode.REMOTE_SERVER);
 
         context.setFutureResponseContext(frc);

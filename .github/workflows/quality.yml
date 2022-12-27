@@ -2,6 +2,7 @@ name: check quality
 on: [ push, pull_request ]
 
 jobs:
+  runs-on: 'ubuntu-latest'
   build:
     steps:
       - uses: actions/checkout@v3
@@ -9,10 +10,18 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: '17'
-      - uses: pmd/pmd-github-action@v1
+      - name: Run PMD
+        uses: pmd/pmd-github-action@v1
         with:
-          sourcePath: 'src/main/java'
+          sourcePath: './src/main/java'
           rulesets: 'https://raw.githubusercontent.com/apache/maven-pmd-plugin/maven-pmd-plugin-3.19.0/src/main/resources/rulesets/java/maven-pmd-plugin-default.xml'
+      - name: Run Checkstyle
+        uses: nikitasavinov/checkstyle-action@master
+        with:
+          checkstyle_config: './src/main/resources/checkstyle.xml'
+          workdir: './src/main/java'
+          reporter: 'github-pr-check'
+          tool_name: 'checkstyle'
       - name: Fail build if there are violations
         if: steps.pmd.outputs.violations != 0
         run: exit 1

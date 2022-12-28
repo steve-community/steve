@@ -1,6 +1,6 @@
 /*
- * SteVe - SteckdosenVerwaltung - https://github.com/RWTH-i5-IDSG/steve
- * Copyright (C) 2013-2020 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
+ * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
+ * Copyright (C) 2013-2019 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
  * All Rights Reserved.
  *
  * Parkl Digital Technologies
@@ -63,7 +63,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
+ * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 13.03.2018
  */
 public enum Server15to16Impl implements Server15to16 {
@@ -247,12 +247,10 @@ public enum Server15to16Impl implements Server15to16 {
      * but something else might make more sense at this place
      */
     private static ChargePointStatus customMapStatus(ocpp.cs._2012._06.ChargePointStatus status) {
-        switch (status) {
-            case OCCUPIED:
-                return ChargePointStatus.CHARGING;
-            default:
-                return ChargePointStatus.fromValue(status.value());
+        if (status == ocpp.cs._2012._06.ChargePointStatus.OCCUPIED) {
+            return ChargePointStatus.CHARGING;
         }
+        return ChargePointStatus.fromValue(status.value());
     }
 
     /**
@@ -260,18 +258,16 @@ public enum Server15to16Impl implements Server15to16 {
      * Update: According to the 1.6 specification, MODE_3_ERROR was simply renamed to EV_COMMUNICATION_ERROR
      */
     private static ChargePointErrorCode customMapErrorCode(ocpp.cs._2012._06.ChargePointErrorCode errorCode15) {
-        switch (errorCode15) {
-            case MODE_3_ERROR:
-                return ChargePointErrorCode.EV_COMMUNICATION_ERROR;
-            default:
-                return ChargePointErrorCode.fromValue(errorCode15.value());
+        if (errorCode15 == ocpp.cs._2012._06.ChargePointErrorCode.MODE_3_ERROR) {
+            return ChargePointErrorCode.EV_COMMUNICATION_ERROR;
         }
+        return ChargePointErrorCode.fromValue(errorCode15.value());
     }
 
     /**
      * AMP and VOLT are shortened to A and V, respectively.
      *
-     * https://github.com/RWTH-i5-IDSG/steve/issues/59
+     * https://github.com/steve-community/steve/issues/59
      */
     private static UnitOfMeasure convertUnit(ocpp.cs._2012._06.UnitOfMeasure unit) {
         switch (unit) {

@@ -1,6 +1,6 @@
 /*
- * SteVe - SteckdosenVerwaltung - https://github.com/RWTH-i5-IDSG/steve
- * Copyright (C) 2013-2020 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
+ * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
+ * Copyright (C) 2013-2019 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
  * All Rights Reserved.
  *
  * Parkl Digital Technologies
@@ -23,18 +23,19 @@
 package de.rwth.idsg.steve.utils;
 
 import de.rwth.idsg.steve.repository.dto.ConnectorStatus;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 
 import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 /**
- * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
+ * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 10.03.2016
  */
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class ConnectorStatusFilter {
-
-    private ConnectorStatusFilter() { }
 
     public static List<ConnectorStatus> filterAndPreferZero(List<ConnectorStatus> initialList) {
         return processAndFilterList(initialList, Strategy.PreferZero);
@@ -49,7 +50,7 @@ public final class ConnectorStatusFilter {
      * station). Connector id 0 should have upper hand while providing status information if its timestamp is
      * more recent than the others and mask status info of other connectors.
      *
-     * Link: https://github.com/RWTH-i5-IDSG/steve/issues/16
+     * Link: https://github.com/steve-community/steve/issues/16
      *
      * Logic walk-through:
      *
@@ -137,6 +138,8 @@ public final class ConnectorStatusFilter {
                                                         .statusTimestamp(zeroStat.getStatusTimestamp())
                                                         .status(zeroStat.getStatus())
                                                         .errorCode(zeroStat.getErrorCode())
+                                                        .ocppProtocol(cs.getOcppProtocol())
+                                                        .jsonAndDisconnected(cs.isJsonAndDisconnected())
                                                         .build())
                               .collect(Collectors.toList());
             }

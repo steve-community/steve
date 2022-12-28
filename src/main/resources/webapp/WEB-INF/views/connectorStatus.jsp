@@ -1,7 +1,7 @@
 <%--
 
-    SteVe - SteckdosenVerwaltung - https://github.com/RWTH-i5-IDSG/steve
-    Copyright (C) 2013-2020 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
+    SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
+    Copyright (C) 2013-2019 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
     All Rights Reserved.
 
     This program is free software: you can redistribute it and/or modify
@@ -74,7 +74,15 @@ Connector Status
 	<tbody>
 		<c:forEach items="${connectorStatusList}" var="cs">
 			<tr>
-				<td><a href="${ctxPath}/manager/chargepoints/details/${cs.chargeBoxPk}">${cs.chargeBoxId}</a></td>
+				<td>
+                    <a href="${ctxPath}/manager/chargepoints/details/${cs.chargeBoxPk}">${cs.chargeBoxId}</a>
+                    <c:if test="${cs.jsonAndDisconnected}">
+                        <a class="tooltip" href="#"><img src="${ctxPath}/static/images/offline-icon.svg" style="height: 1em">
+                            <span>This JSON charge point is currently disconnected. The status information of its
+                            connectors might be not up-to-date.</span>
+                        </a>
+                    </c:if>
+				</td>
 				<td>${cs.connectorId}</td>
 				<td data-sort-value="${cs.statusTimestamp.millis}">${cs.timeStamp}</td>
 				<td>${cs.status}</td>

@@ -1,6 +1,6 @@
 /*
- * SteVe - SteckdosenVerwaltung - https://github.com/RWTH-i5-IDSG/steve
- * Copyright (C) 2013-2020 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
+ * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
+ * Copyright (C) 2013-2019 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
  * All Rights Reserved.
  *
  * Parkl Digital Technologies
@@ -35,7 +35,7 @@ import java.util.stream.Collectors;
 /**
  * The name of this class was inspired by UFO (Unidentified flying object) and enterprise software development.
  *
- * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
+ * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 20.03.2018
  */
 @Slf4j
@@ -65,16 +65,6 @@ public class UnidentifiedIncomingObjectService {
                 objectsHolder.get(key, () -> new UnidentifiedIncomingObject(key))
                              .updateStats();
             } catch (ExecutionException e) {
-                log.error("Error occurred", e);
-            }
-        }
-    }
-
-    public void remove(String key) {
-        synchronized (changeLock) {
-            try {
-                objectsHolder.invalidate(key);
-            } catch (Exception e) {
                 log.error("Error occurred", e);
             }
         }

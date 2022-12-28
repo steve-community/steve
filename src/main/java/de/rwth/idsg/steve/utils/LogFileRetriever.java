@@ -1,28 +1,52 @@
+/*
+ * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
+ * Copyright (C) 2013-2019 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
+ * All Rights Reserved.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
 package de.rwth.idsg.steve.utils;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.core.Appender;
+import org.apache.logging.log4j.core.LoggerContext;
+import org.apache.logging.log4j.core.appender.FileAppender;
+import org.apache.logging.log4j.core.appender.MemoryMappedFileAppender;
+import org.apache.logging.log4j.core.appender.RandomAccessFileAppender;
+import org.apache.logging.log4j.core.appender.RollingFileAppender;
+import org.apache.logging.log4j.core.appender.RollingRandomAccessFileAppender;
+import org.apache.logging.log4j.core.config.Configuration;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 
 /**
- * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
+ * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 05.11.2015
  */
-public final class LogFileRetriever {
-	private static final Logger log = LoggerFactory.getLogger(LogFileRetriever.class);
+@Slf4j
+public enum LogFileRetriever {
+    INSTANCE;
 
-    public static final LogFileRetriever INSTANCE = new LogFileRetriever();
+    private final List<Path> logPathList;
 
-    private List<Path> logPathList;
-    private Random random = new Random();
-
-    private LogFileRetriever() {
+    LogFileRetriever() {
         logPathList = getActiveLogFilePaths();
     }
 
@@ -39,12 +63,8 @@ public final class LogFileRetriever {
     }
 
     public String getLogFilePathOrErrorMessage() {
-        Optional<Path> p = getPath();
-        if (p.isPresent()) {
-            return p.get().toAbsolutePath().toString();
-        } else {
-            return getErrorMessage();
-        }
+        return getPath().map(path -> path.toAbsolutePath().toString())
+                        .orElseGet(this::getErrorMessage);
     }
 
     public String getErrorMessage() {
@@ -62,7 +82,7 @@ public final class LogFileRetriever {
      */
     private Path rollTheDice() {
         log.trace("Rolling the dice...");
-        int index = random.nextInt(logPathList.size());
+        int index = ThreadLocalRandom.current().nextInt(logPathList.size());
         return logPathList.get(index);
     }
 

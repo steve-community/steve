@@ -18,8 +18,6 @@
  */
 package net.parkl.ocpp.service.cs;
 
-import com.google.common.base.Joiner;
-import com.google.common.base.Splitter;
 import de.rwth.idsg.steve.NotificationFeature;
 import de.rwth.idsg.steve.SteveException;
 import de.rwth.idsg.steve.repository.dto.MailSettings;
@@ -37,21 +35,22 @@ import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
+import static de.rwth.idsg.steve.utils.StringUtils.joinByComma;
+import static de.rwth.idsg.steve.utils.StringUtils.splitByComma;
+
+
 @Service
 public class SettingsServiceImpl implements SettingsService {
-	
+
 	private static final String APP_ID = new String(
             Base64.getEncoder().encode("ParklOcppCs".getBytes(StandardCharsets.UTF_8)),
             StandardCharsets.UTF_8
     );
-	
-	private static final Splitter SPLITTER = Splitter.on(",").trimResults().omitEmptyStrings();
-    private static final Joiner JOINER = Joiner.on(",").skipNulls();
-	
+
 	@Autowired
 	private SettingRepository settingRepo;
 
-	
+
 	private Setting getInternal() {
         return settingRepo.findById(APP_ID).orElse(null);
     }
@@ -65,15 +64,14 @@ public class SettingsServiceImpl implements SettingsService {
     public int getHoursToExpire() {
         return getInternal().getHoursToExpire();
     }
-
-	@Override
-	public MailSettings getMailSettings() {
-		Setting r = getInternal();
-		if (r==null) {
-			LoggerFactory.getLogger(SettingsServiceImpl.class).error("No settings in database");;
-			return null;
-		}
-        List<String> eMails = split(r.getMailRecipients());
+    @Override
+    public MailSettings getMailSettings() {
+        Setting r = getInternal();
+        if (r==null) {
+            LoggerFactory.getLogger(SettingsServiceImpl.class).error("No settings in database");;
+            return null;
+        }
+        List<String> eMails = splitByComma(r.getMailRecipients());
         List<NotificationFeature> features = splitFeatures(r.getNotificationFeatures());
 
         return MailSettings.builder()
@@ -93,7 +91,7 @@ public class SettingsServiceImpl implements SettingsService {
 	public SettingsForm getForm() {
 		Setting r = getInternal();
 
-		List<String> eMails = split(r.getMailRecipients());
+        List<String> eMails = splitByComma(r.getMailRecipients());
         List<NotificationFeature> features = splitFeatures(r.getNotificationFeatures());
 
         return SettingsForm.builder()
@@ -116,9 +114,9 @@ public class SettingsServiceImpl implements SettingsService {
 	public void update(SettingsForm form) {
 		Setting s=settingRepo.findById(APP_ID).
 				orElseThrow(() -> new IllegalStateException("No setting record found for app id: "+APP_ID));
-		
-		String eMails = join(form.getRecipients());
-        String features = join(form.getEnabledFeatures());
+
+        String eMails = joinByComma(form.getRecipients());
+        String features = joinByComma(form.getEnabledFeatures());
 
         try {
         	s.setHeartbeatIntervalInSeconds(toSec(form.getHeartbeat()));
@@ -129,7 +127,7 @@ public class SettingsServiceImpl implements SettingsService {
         	s.setMailPassword(form.getPassword());
         	s.setMailFrom(form.getFrom());
         	s.setMailProtocol(form.getProtocol());
-        	
+
         	s.setMailPort(form.getPort()!=null?form.getPort():0);
         	s.setMailRecipients(eMails);
         	s.setNotificationFeatures(features);
@@ -138,7 +136,7 @@ public class SettingsServiceImpl implements SettingsService {
             throw new SteveException("FAILED to save the settings", e);
         }
 	}
-	
+
 	private static int toMin(int seconds) {
         return (int) TimeUnit.SECONDS.toMinutes(seconds);
     }
@@ -147,28 +145,12 @@ public class SettingsServiceImpl implements SettingsService {
         return (int) TimeUnit.MINUTES.toSeconds(minutes);
     }
 
-    @Nullable
-    private String join(Collection<?> col) {
-        if (col == null || col.isEmpty()) {
-            return null;
-        } else {
-            // Use HashSet to trim duplicates before inserting into DB
-            return JOINER.join(new HashSet<>(col));
-        }
-    }
 
-    private List<String> split(String str) {
-        if (str == null || str.isEmpty()) {
-            return Collections.emptyList();
-        } else {
-            return SPLITTER.splitToList(str);
-        }
-    }
 
     private List<NotificationFeature> splitFeatures(String str) {
-        return split(str).stream()
-                         .map(NotificationFeature::fromName)
-                         .collect(Collectors.toList());
+        return splitByComma(str).stream()
+                                .map(NotificationFeature::fromName)
+                                .collect(Collectors.toList());
     }
 
 	@Override

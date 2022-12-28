@@ -1,6 +1,6 @@
 /*
- * SteVe - SteckdosenVerwaltung - https://github.com/RWTH-i5-IDSG/steve
- * Copyright (C) 2013-2020 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
+ * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
+ * Copyright (C) 2013-2019 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
  * All Rights Reserved.
  *
  * Parkl Digital Technologies
@@ -25,10 +25,17 @@ package de.rwth.idsg.steve.web.dto.ocpp;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import static de.rwth.idsg.steve.utils.StringUtils.splitByComma;
 
 /**
- * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
+ * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 02.01.2015
  */
 @Setter
@@ -37,7 +44,14 @@ public class GetConfigurationParams extends MultipleChargePointSelect {
 
     private List<String> confKeyList;
 
-    public boolean isSetConfKeyList() {
-        return confKeyList != null && !confKeyList.isEmpty();
+    private String commaSeparatedCustomConfKeys;
+
+    public List<String> getAllKeys() {
+        List<String> fromPredefined = Objects.requireNonNullElse(confKeyList, Collections.emptyList());
+        List<String> fromCustom = splitByComma(commaSeparatedCustomConfKeys);
+
+        return Stream.of(fromPredefined, fromCustom)
+                     .flatMap(Collection::stream)
+                     .collect(Collectors.toList());
     }
 }

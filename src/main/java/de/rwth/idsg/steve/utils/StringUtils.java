@@ -1,6 +1,6 @@
 /*
- * SteVe - SteckdosenVerwaltung - https://github.com/RWTH-i5-IDSG/steve
- * Copyright (C) 2013-2020 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
+ * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
+ * Copyright (C) 2013-2019 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
  * All Rights Reserved.
  *
  * Parkl Digital Technologies
@@ -22,18 +22,33 @@
  */
 package de.rwth.idsg.steve.utils;
 
+import com.google.common.base.Joiner;
+import com.google.common.base.Splitter;
+import com.google.common.base.Strings;
+import de.rwth.idsg.steve.config.WebSocketConfiguration;
 import de.rwth.idsg.steve.ocpp.CommunicationTask;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
+import org.jetbrains.annotations.Nullable;
+import org.springframework.util.CollectionUtils;
+
+import java.util.Collection;
+import java.util.Collections;
+import java.util.LinkedHashSet;
+import java.util.List;
 
 /**
- * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
+ * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 12.01.2015
  */
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class StringUtils {
-    private StringUtils() { }
+
+    private static final Splitter SPLITTER = Splitter.on(",").trimResults().omitEmptyStrings();
+    private static final Joiner JOINER = Joiner.on(",").skipNulls();
 
     /**
-     * We don't want to hard-code operation names,
-     * but derive them from the actual request object.
+     * We don't want to hard-code operation names, but derive them from the actual request object.
      *
      * Example for "ChangeAvailabilityTask":
      * - Remove "Task" at the end -> "ChangeAvailability"
@@ -50,5 +65,38 @@ public final class StringUtils {
         s = s.replaceAll("(\\p{Ll})(\\p{Lu})", "$1 $2");
 
         return s;
+    }
+
+    @Nullable
+    public static String joinByComma(Collection<?> col) {
+        if (CollectionUtils.isEmpty(col)) {
+            return null;
+        } else {
+            // Use set to trim duplicates and keep collection order
+            return JOINER.join(new LinkedHashSet<>(col));
+        }
+    }
+
+    public static List<String> splitByComma(String str) {
+        if (Strings.isNullOrEmpty(str)) {
+            return Collections.emptyList();
+        } else {
+            return SPLITTER.splitToList(str);
+        }
+    }
+
+    public static String getLastBitFromUrl(final String input) {
+        if (Strings.isNullOrEmpty(input)) {
+            return "";
+        }
+
+        final String substring = WebSocketConfiguration.PATH_INFIX;
+
+        int index = input.indexOf(substring);
+        if (index == -1) {
+            return "";
+        } else {
+            return input.substring(index + substring.length());
+        }
     }
 }

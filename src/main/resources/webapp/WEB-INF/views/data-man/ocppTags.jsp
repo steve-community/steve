@@ -1,7 +1,7 @@
 <%--
 
-    SteVe - SteckdosenVerwaltung - https://github.com/RWTH-i5-IDSG/steve
-    Copyright (C) 2013-2020 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
+    SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
+    Copyright (C) 2013-2019 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
     All Rights Reserved.
 
     This program is free software: you can redistribute it and/or modify
@@ -145,7 +145,7 @@
                             <a href="${ctxPath}/manager/ocppTags/details/${item.parentOcppTagPk}">${item.parentIdTag}</a>
                         </c:if>
                     </td>
-                    <td data-sort-value="${item.expiryDateDT.millis}">${item.expiryDate}</td>
+                    <td data-sort-value="${item.expiryDate.millis}">${item.expiryDateFormatted}</td>
                     <td>${item.inTransaction}</td>
                     <td>${item.blocked}</td>
                     <td>

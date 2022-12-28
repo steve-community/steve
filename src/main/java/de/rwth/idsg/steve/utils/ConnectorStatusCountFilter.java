@@ -1,6 +1,6 @@
 /*
- * SteVe - SteckdosenVerwaltung - https://github.com/RWTH-i5-IDSG/steve
- * Copyright (C) 2013-2020 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
+ * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
+ * Copyright (C) 2013-2019 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
  * All Rights Reserved.
  *
  * Parkl Digital Technologies
@@ -23,18 +23,19 @@
 package de.rwth.idsg.steve.utils;
 
 import de.rwth.idsg.steve.repository.dto.ConnectorStatus;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 
 import java.util.*;
 
 /**
- * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
+ * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 10.03.2016
  */
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class ConnectorStatusCountFilter {
 
     public static final Set<String> ALL_STATUS_VALUES = allStatusValues();
-
-    private ConnectorStatusCountFilter() { }
 
     public static Map<String, Integer> getStatusCountMap(List<ConnectorStatus> latestList) {
         return getStatusCountMap(latestList, false);

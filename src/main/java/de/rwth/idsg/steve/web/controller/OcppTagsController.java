@@ -1,7 +1,26 @@
+/*
+ * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
+ * Copyright (C) 2013-2019 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
+ * All Rights Reserved.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
 package de.rwth.idsg.steve.web.controller;
 
 import de.rwth.idsg.steve.service.OcppTagService;
 import de.rwth.idsg.steve.utils.ControllerHelper;
+import de.rwth.idsg.steve.utils.mapper.OcppTagFormMapper;
 import de.rwth.idsg.steve.web.dto.OcppTagBatchInsertForm;
 import de.rwth.idsg.steve.web.dto.OcppTagForm;
 import de.rwth.idsg.steve.web.dto.OcppTagQueryForm;
@@ -24,7 +43,7 @@ import java.util.List;
 
 import net.parkl.ocpp.entities.OcppTag;
 /**
- * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
+ * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 26.11.2015
  */
 @Controller
@@ -74,27 +93,8 @@ public class OcppTagsController {
     @RequestMapping(value = DETAILS_PATH, method = RequestMethod.GET)
     public String getDetails(@PathVariable("ocppTagPk") int ocppTagPk, Model model) {
         OcppTag record = tagService.getRecord(ocppTagPk);
+        OcppTagForm form = OcppTagFormMapper.toForm(record);
 
-        OcppTagForm form = new OcppTagForm();
-        form.setOcppTagPk(record.getOcppTagPk());
-        form.setIdTag(record.getIdTag());
-
-        DateTime expiryDate = null;
-        if (record.getExpiryDate()!=null) {
-        	expiryDate=new DateTime(record.getExpiryDate());
-        }
-        if (expiryDate != null) {
-            form.setExpiration(expiryDate.toLocalDateTime());
-        }
-
-        form.setMaxActiveTransactionCount(record.getMaxActiveTransactionCount());
-        form.setNote(record.getNote());
-
-        String parentIdTag = record.getParentIdTag();
-        if (parentIdTag == null) {
-            parentIdTag = ControllerHelper.EMPTY_OPTION;
-        }
-        form.setParentIdTag(parentIdTag);
 
         model.addAttribute("activeTransactionCount", transactionService.getActiveTransactionCountByIdTag(record.getIdTag()));
         model.addAttribute("ocppTagForm", form);
@@ -162,7 +162,7 @@ public class OcppTagsController {
 
     @RequestMapping(value = UNKNOWN_REMOVE_PATH, method = RequestMethod.POST)
     public String removeUnknownIdTag(@PathVariable("idTag") String idTag) {
-        ocppTagService.removeUnknown(idTag);
+        ocppTagService.removeUnknown(Collections.singletonList(idTag));
         return toOverview();
     }
 
@@ -202,7 +202,7 @@ public class OcppTagsController {
 
     private void add(OcppTagForm form) {
         tagService.addOcppTag(form);
-        ocppTagService.removeUnknown(form.getIdTag());
+        ocppTagService.removeUnknown(Collections.singletonList(form.getIdTag()));
     }
 
     private void add(List<String> idTagList) {

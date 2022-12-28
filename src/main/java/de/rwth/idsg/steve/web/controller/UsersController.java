@@ -1,5 +1,30 @@
+/*
+ * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
+ * Copyright (C) 2013-2019 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
+ * All Rights Reserved.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
 package de.rwth.idsg.steve.web.controller;
 
+import de.rwth.idsg.steve.repository.OcppTagRepository;
+import de.rwth.idsg.steve.repository.UserRepository;
+import de.rwth.idsg.steve.repository.dto.User;
+import de.rwth.idsg.steve.utils.ControllerHelper;
+import de.rwth.idsg.steve.utils.mapper.UserFormMapper;
+import de.rwth.idsg.steve.web.dto.UserForm;
+import de.rwth.idsg.steve.web.dto.UserQueryForm;
 
 import javax.validation.Valid;
 
@@ -22,7 +47,7 @@ import net.parkl.ocpp.service.cs.OcppIdTagService;
 import net.parkl.ocpp.service.cs.UserService;
 
 /**
- * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
+ * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 25.11.2015
  */
 @Controller
@@ -69,20 +94,7 @@ public class UsersController {
     @RequestMapping(value = DETAILS_PATH, method = RequestMethod.GET)
     public String getDetails(@PathVariable("userPk") int userPk, Model model) {
         User.Details details = userService.getDetails(userPk);
-
-        UserForm form = new UserForm();
-        form.setUserPk(details.getUserRecord().getUserPk());
-        form.setFirstName(details.getUserRecord().getFirstName());
-        form.setLastName(details.getUserRecord().getLastName());
-        if (details.getUserRecord().getBirthDay()!=null) {
-        	form.setBirthDay(new DateTime(details.getUserRecord().getBirthDay()).toLocalDate());
-        }
-        form.setPhone(details.getUserRecord().getPhone());
-        form.setSex(UserSex.fromDatabaseValue(details.getUserRecord().getSex()));
-        form.setEMail(details.getUserRecord().getEmail());
-        form.setNote(details.getUserRecord().getNote());
-        form.setAddress(ControllerHelper.recordToDto(details.getAddress()));
-        form.setOcppIdTag(details.getOcppIdTag().orElse(ControllerHelper.EMPTY_OPTION));
+        UserForm form = UserFormMapper.toForm(details);
 
         model.addAttribute("userForm", form);
         setTags(model);

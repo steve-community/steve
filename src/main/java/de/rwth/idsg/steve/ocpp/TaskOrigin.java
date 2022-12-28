@@ -1,6 +1,6 @@
 /*
- * SteVe - SteckdosenVerwaltung - https://github.com/RWTH-i5-IDSG/steve
- * Copyright (C) 2013-2020 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
+ * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
+ * Copyright (C) 2013-2019 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
  * All Rights Reserved.
  *
  * Parkl Digital Technologies
@@ -25,7 +25,7 @@ package de.rwth.idsg.steve.ocpp;
 import lombok.RequiredArgsConstructor;
 
 /**
- * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
+ * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 23.11.2015
  */
 @RequiredArgsConstructor
@@ -35,5 +35,5 @@ public enum TaskOrigin {
     INTERNAL,
 
     // When the action was triggered by an external system (e.g. integrated roaming partner)
-    EXTERNAL;
+    EXTERNAL
 }

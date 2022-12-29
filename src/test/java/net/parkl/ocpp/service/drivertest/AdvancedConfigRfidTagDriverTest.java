@@ -5,8 +5,8 @@ import net.parkl.ocpp.service.driver.AdvancedChargeBoxConfigDriver;
 import net.parkl.ocpp.service.driver.ChargeBoxDriver;
 import net.parkl.ocpp.service.driver.ChargingDriver;
 import net.parkl.ocpp.service.driver.DriverTestBase;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import static de.rwth.idsg.steve.ocpp.OcppProtocol.V_16_SOAP;
 import static net.parkl.ocpp.service.config.AdvancedChargeBoxConfigKeys.KEY_IDTAG_MAX10;
@@ -19,7 +19,7 @@ public class AdvancedConfigRfidTagDriverTest extends DriverTestBase {
     private ChargingDriver chargingDriver;
     private AdvancedChargeBoxConfigDriver advancedChargeBoxConfigDriver;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         chargeBoxDriver = driverFactory.createChargeBoxDriver();
         chargingDriver = driverFactory.createChargingDriver();

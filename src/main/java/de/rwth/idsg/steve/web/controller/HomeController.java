@@ -82,7 +82,7 @@ public class HomeController {
         model.addAttribute("statusValues", ConnectorStatusCountFilter.ALL_STATUS_VALUES);
         model.addAttribute(PARAMS, params);
 
-        List<ConnectorStatus> latestList = chargePointHelperService.getChargePointConnectorStatus(params);
+        List<ConnectorStatus> latestList = chargePointService.getChargePointConnectorStatus(params);
         List<ConnectorStatus> filteredList = ConnectorStatusFilter.filterAndPreferZero(latestList);
         model.addAttribute("connectorStatusList", filteredList);
         return "connectorStatus";

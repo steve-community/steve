@@ -345,4 +345,10 @@ public class ChargePointServiceImpl implements ChargePointService {
     public List<OcppChargeBox> getAllChargeBoxes() {
         return chargeBoxRepository.findAll();
     }
+
+    @Override
+    @Transactional
+    public void updateOcppProtocol(String chargeBoxId, OcppProtocol protocol) {
+        chargeBoxRepository.updateOcppProtocol(chargeBoxId, protocol.getCompositeValue());
+    }
 }

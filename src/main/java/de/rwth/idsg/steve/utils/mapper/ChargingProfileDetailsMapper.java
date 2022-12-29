@@ -19,12 +19,13 @@
 package de.rwth.idsg.steve.utils.mapper;
 
 import de.rwth.idsg.steve.repository.dto.ChargingProfile;
+import de.rwth.idsg.steve.utils.DateTimeConverter;
 import de.rwth.idsg.steve.utils.DateTimeUtils;
 import de.rwth.idsg.steve.web.dto.ChargingProfileForm;
-import jooq.steve.db.tables.records.ChargingProfileRecord;
-import jooq.steve.db.tables.records.ChargingSchedulePeriodRecord;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import net.parkl.ocpp.entities.ChargingSchedulePeriod;
+import net.parkl.ocpp.entities.OcppChargingProfile;
 import ocpp.cp._2015._10.ChargingProfileKindType;
 import ocpp.cp._2015._10.ChargingProfilePurposeType;
 import ocpp.cp._2015._10.ChargingRateUnitType;
@@ -43,8 +44,8 @@ import java.util.UUID;
 public final class ChargingProfileDetailsMapper {
 
     public static ChargingProfileForm mapToForm(ChargingProfile.Details details) {
-        ChargingProfileRecord profile = details.getProfile();
-        List<ChargingSchedulePeriodRecord> periods = details.getPeriods();
+        OcppChargingProfile profile = details.getProfile();
+        List<ChargingSchedulePeriod> periods = details.getPeriods();
 
         ChargingProfileForm form = new ChargingProfileForm();
         form.setChargingProfilePk(profile.getChargingProfilePk());
@@ -54,15 +55,21 @@ public final class ChargingProfileDetailsMapper {
         form.setChargingProfilePurpose(ChargingProfilePurposeType.fromValue(profile.getChargingProfilePurpose()));
         form.setChargingProfileKind(ChargingProfileKindType.fromValue(profile.getChargingProfileKind()));
         form.setRecurrencyKind(profile.getRecurrencyKind() == null ? null : RecurrencyKindType.fromValue(profile.getRecurrencyKind()));
-        form.setValidFrom(DateTimeUtils.toLocalDateTime(profile.getValidFrom()));
-        form.setValidTo(DateTimeUtils.toLocalDateTime(profile.getValidTo()));
+        if (profile.getValidFrom()!=null) {
+            form.setValidFrom(DateTimeUtils.toLocalDateTime(DateTimeConverter.from(profile.getValidFrom())));
+        }
+        if (profile.getValidTo()!=null) {
+            form.setValidTo(DateTimeUtils.toLocalDateTime(DateTimeConverter.from(profile.getValidTo())));
+        }
         form.setDurationInSeconds(profile.getDurationInSeconds());
-        form.setStartSchedule(DateTimeUtils.toLocalDateTime(profile.getStartSchedule()));
+        if (profile.getStartSchedule()!=null) {
+            form.setStartSchedule(DateTimeUtils.toLocalDateTime(DateTimeConverter.from(profile.getStartSchedule())));
+        }
         form.setChargingRateUnit(ChargingRateUnitType.fromValue(profile.getChargingRateUnit()));
         form.setMinChargingRate(profile.getMinChargingRate());
 
         Map<String, ChargingProfileForm.SchedulePeriod> periodMap = new LinkedHashMap<>();
-        for (ChargingSchedulePeriodRecord rec : periods) {
+        for (ChargingSchedulePeriod rec : periods) {
             ChargingProfileForm.SchedulePeriod p = new ChargingProfileForm.SchedulePeriod();
             p.setStartPeriodInSeconds(rec.getStartPeriodInSeconds());
             p.setPowerLimit(rec.getPowerLimit());

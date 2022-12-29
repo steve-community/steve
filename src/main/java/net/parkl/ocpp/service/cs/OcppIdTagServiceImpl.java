@@ -102,8 +102,8 @@ public class OcppIdTagServiceImpl implements OcppIdTagService {
             OcppTag tag = new OcppTag();
             tag.setIdTag(form.getIdTag());
             tag.setParentIdTag(form.getParentIdTag());
-            if (form.getExpiration() != null) {
-                tag.setExpiryDate(form.getExpiration().toDate());
+            if (form.getExpiryDate() != null) {
+                tag.setExpiryDate(form.getExpiryDate().toDate());
             }
             tag.setNote(form.getNote());
             tag.setMaxActiveTransactionCount(form.getMaxActiveTransactionCount());
@@ -200,8 +200,8 @@ public class OcppIdTagServiceImpl implements OcppIdTagService {
                             .parentOcppTagPk(parent != null ? parent.getOcppTagPk() : null)
                             .idTag(r.getIdTag())
                             .parentIdTag(r.getParentIdTag())
-                            .expiryDateDT(r.getExpiryDate() != null ? new DateTime(r.getExpiryDate()) : null)
-                            .expiryDate(DateTimeUtils.humanize(r.getExpiryDate() != null ? new DateTime(r.getExpiryDate()) : null))
+                            .expiryDate(r.getExpiryDate() != null ? new DateTime(r.getExpiryDate()) : null)
+                            .expiryDateFormatted(DateTimeUtils.humanize(r.getExpiryDate() != null ? new DateTime(r.getExpiryDate()) : null))
                             .inTransaction(tagsInTransaction.containsKey(r.getIdTag()) &&
                                     tagsInTransaction.get(r.getIdTag()) > 0)
                             .blocked(r.getMaxActiveTransactionCount() == 0)
@@ -262,7 +262,7 @@ public class OcppIdTagServiceImpl implements OcppIdTagService {
 
         try {
             tag.setParentIdTag(form.getParentIdTag());
-            tag.setExpiryDate(form.getExpiration().toDate());
+            tag.setExpiryDate(form.getExpiryDate().toDate());
             tag.setNote(form.getNote());
             tag.setMaxActiveTransactionCount(form.getMaxActiveTransactionCount());
             tagRepo.save(tag);

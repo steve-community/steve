@@ -23,6 +23,7 @@
 package de.rwth.idsg.steve.ocpp.ws;
 
 import com.google.common.base.Strings;
+import de.rwth.idsg.steve.SteveConfiguration;
 import de.rwth.idsg.steve.config.WebSocketConfiguration;
 import de.rwth.idsg.steve.ocpp.OcppTransport;
 import de.rwth.idsg.steve.ocpp.OcppVersion;
@@ -31,10 +32,10 @@ import de.rwth.idsg.steve.ocpp.ws.cluster.ClusteredWebSocketSessionStore;
 import de.rwth.idsg.steve.ocpp.ws.data.CommunicationContext;
 import de.rwth.idsg.steve.ocpp.ws.data.SessionContext;
 import de.rwth.idsg.steve.ocpp.ws.pipeline.IncomingPipeline;
-import de.rwth.idsg.steve.repository.OcppServerRepository;
 import de.rwth.idsg.steve.service.notification.OcppStationWebSocketConnected;
 import de.rwth.idsg.steve.service.notification.OcppStationWebSocketDisconnected;
 import de.rwth.idsg.steve.repository.TaskStore;
+import net.parkl.ocpp.entities.OcppChargeBox;
 import net.parkl.ocpp.service.cs.ChargePointService;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -64,6 +65,7 @@ public abstract class AbstractWebSocketEndpoint extends ConcurrentWebSocketHandl
 
     @Autowired private ChargePointService chargePointService;
     @Autowired private ClusteredInvokerClient clusteredInvokerClient;
+
 
     @Autowired
     private SteveConfiguration config;
@@ -142,14 +144,14 @@ public abstract class AbstractWebSocketEndpoint extends ConcurrentWebSocketHandl
         String chargeBoxId = getChargeBoxId(session);
 
         WebSocketLogger.connected(chargeBoxId, session);
-        ocppServerRepository.updateOcppProtocol(chargeBoxId, getVersion().toProtocol(OcppTransport.JSON));
+        chargePointService.updateOcppProtocol(chargeBoxId, getVersion().toProtocol(OcppTransport.JSON));
 
         // Just to keep the connection alive, such that the servers do not close
         // the connection because of a idle timeout, we ping-pong at fixed intervals.
         ScheduledFuture pingSchedule = service.scheduleAtFixedRate(
                 new PingTask(chargeBoxId, session),
-                WebSocketConfigurationConstants.PING_INTERVAL,
-                WebSocketConfigurationConstants.PING_INTERVAL,
+                WebSocketConfiguration.PING_INTERVAL,
+                WebSocketConfiguration.PING_INTERVAL,
                 TimeUnit.MINUTES);
 
         futureResponseContextStore.addSession(session);

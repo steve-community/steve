@@ -20,9 +20,9 @@ package de.rwth.idsg.steve.utils.mapper;
 
 import de.rwth.idsg.steve.repository.dto.ChargePoint;
 import de.rwth.idsg.steve.web.dto.ChargePointForm;
-import jooq.steve.db.tables.records.ChargeBoxRecord;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import net.parkl.ocpp.entities.OcppChargeBox;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -32,7 +32,7 @@ import lombok.NoArgsConstructor;
 public final class ChargePointDetailsMapper {
 
     public static ChargePointForm mapToForm(ChargePoint.Details cp) {
-        ChargeBoxRecord chargeBox = cp.getChargeBox();
+        OcppChargeBox chargeBox = cp.getChargeBox();
 
         ChargePointForm form = new ChargePointForm();
         form.setChargeBoxPk(chargeBox.getChargeBoxPk());

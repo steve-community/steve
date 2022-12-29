@@ -19,6 +19,7 @@
 package de.rwth.idsg.steve.service;
 
 import com.google.common.base.Strings;
+import de.rwth.idsg.steve.NotificationFeature;
 import de.rwth.idsg.steve.repository.dto.InsertTransactionParams;
 import de.rwth.idsg.steve.repository.dto.UpdateTransactionParams;
 import de.rwth.idsg.steve.service.notification.OccpStationBooted;
@@ -48,7 +49,7 @@ import static java.lang.String.format;
  */
 @Slf4j
 @Service
-public class NotificationService implements OcppNotificationService {
+public class NotificationService {
 
     @Autowired
     private MailService mailService;
@@ -141,7 +142,7 @@ public class NotificationService implements OcppNotificationService {
             .append("- startTimestamp: ").append(params.getStartTimestamp()).append(System.lineSeparator())
             .append("- startMeterValue: ").append(params.getStartMeterValue());
 
-        if (params.isSetReservationId()) {
+        if (params.hasReservation()) {
             sb.append(System.lineSeparator()).append("- reservationId: ").append(params.getReservationId());
         }
 
@@ -160,14 +161,7 @@ public class NotificationService implements OcppNotificationService {
 
 
     private boolean isDisabled(NotificationFeature f) {
-        MailSettings settings = mailService.getSettings();
-
-        return notificationEnabled;
-        boolean isEnabled = settings.isEnabled()
-                && settings.getEnabledFeatures().contains(f)
-                && !settings.getRecipients().isEmpty();
-
-        return !isEnabled;
+        return !notificationEnabled;
     }
 
     private static String addTimestamp(String body) {

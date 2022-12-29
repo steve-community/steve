@@ -39,6 +39,5 @@ public interface OcppTagService {
     List<AuthorizationData> getAuthDataOfAllTags();
     List<AuthorizationData> getAuthData(List<String> idTagList);
     List<UnidentifiedIncomingObject> getUnknownOcppTags();
-    void removeUnknown(String idTag);
     void removeUnknown(List<String> idTagList);
 }

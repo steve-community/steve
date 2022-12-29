@@ -4,9 +4,10 @@ import net.parkl.ocpp.service.cs.TransactionService;
 import net.parkl.ocpp.service.driver.ChargeBoxDriver;
 import net.parkl.ocpp.service.driver.ChargingDriver;
 import net.parkl.ocpp.service.driver.DriverTestBase;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
@@ -23,7 +24,7 @@ public class TransactionCleanupManagerDriverTest extends DriverTestBase {
     @Autowired
     TransactionCleanupManager cleanupManager;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         chargeBoxDriver = driverFactory.createChargeBoxDriver();
         chargingDriver = driverFactory.createChargingDriver();
@@ -46,11 +47,11 @@ public class TransactionCleanupManagerDriverTest extends DriverTestBase {
         chargingDriver.waitForChargingProcessStartedWithTransaction();
 
         List<Integer> transactionIds = transactionService.getActiveTransactionIds("cleanupTest");
-        Assert.assertEquals(1, transactionIds.size());
+        Assertions.assertEquals(1, transactionIds.size());
 
         cleanupManager.cleanupTransactions();
 
         transactionIds = transactionService.getActiveTransactionIds("cleanupTest");
-        Assert.assertEquals(0, transactionIds.size());
+        Assertions.assertEquals(0, transactionIds.size());
     }
 }

@@ -31,7 +31,6 @@ import de.rwth.idsg.steve.service.notification.OccpStationBooted;
 import de.rwth.idsg.steve.service.notification.OcppStationStatusFailure;
 import de.rwth.idsg.steve.service.notification.OcppTransactionEnded;
 import de.rwth.idsg.steve.service.notification.OcppTransactionStarted;
-import jooq.steve.db.enums.TransactionStopEventActor;
 import lombok.extern.slf4j.Slf4j;
 import net.parkl.ocpp.entities.OcppChargingProcess;
 import net.parkl.ocpp.entities.TransactionStart;
@@ -50,7 +49,6 @@ import java.util.Optional;
 
 import static net.parkl.ocpp.entities.TransactionStopEventActor.station;
 import static ocpp.cs._2015._10.AuthorizationStatus.INVALID;
-import static ocpp.cs._2015._10.DataTransferStatus.ACCEPTED;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>

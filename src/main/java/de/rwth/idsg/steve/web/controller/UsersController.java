@@ -18,17 +18,13 @@
  */
 package de.rwth.idsg.steve.web.controller;
 
-import de.rwth.idsg.steve.repository.OcppTagRepository;
-import de.rwth.idsg.steve.repository.UserRepository;
 import de.rwth.idsg.steve.repository.dto.User;
 import de.rwth.idsg.steve.utils.ControllerHelper;
 import de.rwth.idsg.steve.utils.mapper.UserFormMapper;
 import de.rwth.idsg.steve.web.dto.UserForm;
 import de.rwth.idsg.steve.web.dto.UserQueryForm;
-
-import javax.validation.Valid;
-
-import org.joda.time.DateTime;
+import net.parkl.ocpp.service.cs.OcppIdTagService;
+import net.parkl.ocpp.service.cs.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -38,13 +34,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
-import de.rwth.idsg.steve.repository.dto.User;
-import de.rwth.idsg.steve.utils.ControllerHelper;
-import de.rwth.idsg.steve.web.dto.UserForm;
-import de.rwth.idsg.steve.web.dto.UserQueryForm;
-import de.rwth.idsg.steve.web.dto.UserSex;
-import net.parkl.ocpp.service.cs.OcppIdTagService;
-import net.parkl.ocpp.service.cs.UserService;
+import javax.validation.Valid;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>

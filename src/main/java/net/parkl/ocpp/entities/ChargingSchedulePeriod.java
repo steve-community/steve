@@ -43,8 +43,8 @@ public class ChargingSchedulePeriod {
     @Column(name = "start_period_in_seconds", nullable = false)
     private int startPeriodInSeconds;
 
-    @Column(name = "power_limit_in_amperes", nullable = false, precision = 15, scale = 1)
-    private BigDecimal powerLimitInAmperes;
+    @Column(name = "power_limit", nullable = false, precision = 15, scale = 1)
+    private BigDecimal powerLimit;
 
     @Column(name = "number_phases", nullable = true)
     private Integer numberPhases;

@@ -20,9 +20,9 @@ package de.rwth.idsg.steve.utils.mapper;
 
 import com.neovisionaries.i18n.CountryCode;
 import de.rwth.idsg.steve.web.dto.Address;
-import jooq.steve.db.tables.records.AddressRecord;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import net.parkl.ocpp.entities.OcppAddress;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -31,7 +31,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class AddressMapper {
 
-    public static Address recordToDto(AddressRecord record) {
+    public static Address recordToDto(OcppAddress record) {
         Address address = new Address();
         if (record != null) {
             address.setAddressPk(record.getAddressPk());

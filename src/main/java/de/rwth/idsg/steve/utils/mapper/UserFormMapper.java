@@ -22,9 +22,9 @@ import de.rwth.idsg.steve.repository.dto.User;
 import de.rwth.idsg.steve.utils.ControllerHelper;
 import de.rwth.idsg.steve.web.dto.UserForm;
 import de.rwth.idsg.steve.web.dto.UserSex;
-import jooq.steve.db.tables.records.UserRecord;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import org.joda.time.DateTime;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -34,16 +34,18 @@ import lombok.NoArgsConstructor;
 public final class UserFormMapper {
 
     public static UserForm toForm(User.Details details) {
-        UserRecord userRecord = details.getUserRecord();
+        net.parkl.ocpp.entities.User userRecord = details.getUserRecord();
 
         UserForm form = new UserForm();
         form.setUserPk(userRecord.getUserPk());
         form.setFirstName(userRecord.getFirstName());
         form.setLastName(userRecord.getLastName());
-        form.setBirthDay(userRecord.getBirthDay());
+        if (userRecord.getBirthDay()!=null) {
+            form.setBirthDay(new DateTime(userRecord.getBirthDay()).toLocalDate());
+        }
         form.setPhone(userRecord.getPhone());
         form.setSex(UserSex.fromDatabaseValue(userRecord.getSex()));
-        form.setEMail(userRecord.getEMail());
+        form.setEMail(userRecord.getEmail());
         form.setNote(userRecord.getNote());
         form.setAddress(AddressMapper.recordToDto(details.getAddress()));
         form.setOcppIdTag(details.getOcppIdTag().orElse(ControllerHelper.EMPTY_OPTION));

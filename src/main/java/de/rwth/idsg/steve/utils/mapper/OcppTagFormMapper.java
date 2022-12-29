@@ -20,9 +20,9 @@ package de.rwth.idsg.steve.utils.mapper;
 
 import de.rwth.idsg.steve.utils.ControllerHelper;
 import de.rwth.idsg.steve.web.dto.OcppTagForm;
-import jooq.steve.db.tables.records.OcppTagActivityRecord;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import net.parkl.ocpp.entities.OcppTag;
 import org.joda.time.DateTime;
 
 /**
@@ -32,12 +32,15 @@ import org.joda.time.DateTime;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class OcppTagFormMapper {
 
-    public static OcppTagForm toForm(OcppTagActivityRecord record) {
+    public static OcppTagForm toForm(OcppTag record) {
         OcppTagForm form = new OcppTagForm();
         form.setOcppTagPk(record.getOcppTagPk());
         form.setIdTag(record.getIdTag());
 
-        DateTime expiryDate = record.getExpiryDate();
+        DateTime expiryDate = null;
+        if (record.getExpiryDate()!=null) {
+            expiryDate=new DateTime(record.getExpiryDate());
+        }
         if (expiryDate != null) {
             form.setExpiryDate(expiryDate.toLocalDateTime());
         }

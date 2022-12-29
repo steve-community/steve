@@ -119,10 +119,6 @@ public class ChargePointHelperServiceImpl implements ChargePointHelperService {
         return unknownChargePointService.getObjects();
     }
 
-    public void removeUnknown(String chargeBoxId) {
-        unknownChargePointService.remove(chargeBoxId);
-    }
-
     public void removeUnknown(List<String> chargeBoxIdList) {
         unknownChargePointService.removeAll(chargeBoxIdList);
     }

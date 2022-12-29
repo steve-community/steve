@@ -2,11 +2,11 @@ package net.parkl.ocpp.service;
 
 import net.parkl.ocpp.entities.OcppChargeBox;
 import net.parkl.ocpp.service.config.AdvancedChargeBoxConfiguration;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.core.task.TaskExecutor;
 
 import java.util.Calendar;
@@ -15,7 +15,7 @@ import java.util.Date;
 
 import static org.mockito.Mockito.*;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class OcppHeartBeatWatcherUnitTest {
     @InjectMocks
     private OcppHeartBeatWatcher heartBeatWatcher;

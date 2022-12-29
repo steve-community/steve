@@ -45,8 +45,8 @@ import java.util.concurrent.TimeUnit;
  */
 @EnableWebSocket
 @Configuration
+@Slf4j
 public class WebSocketConfiguration implements WebSocketConfigurer {
-    private static final Logger log=LoggerFactory.getLogger(WebSocketConfiguration.class);
 
     @Autowired private ChargePointHelperService chargePointHelperService;
 

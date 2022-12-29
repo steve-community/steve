@@ -22,6 +22,5 @@ public interface ChargePointHelperService {
     List<ChargePointSelect> getChargePoints(OcppVersion version);
     List<ChargePointSelect> getChargePoints(OcppVersion version, List<RegistrationStatus> inStatusFilter);
     List<UnidentifiedIncomingObject> getUnknownChargePoints();
-    void removeUnknown(String chargeBoxId);
     void removeUnknown(List<String> chargeBoxIdList);
 }

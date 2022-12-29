@@ -6,9 +6,9 @@ import net.parkl.ocpp.service.driver.ChargeBoxDriver;
 import net.parkl.ocpp.service.driver.ChargingDriver;
 import net.parkl.ocpp.service.driver.DriverTestBase;
 import org.joda.time.DateTime;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
@@ -23,7 +23,7 @@ public class TransactionStopDriverTest extends DriverTestBase {
     @Autowired
     TransactionService transactionService;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         chargeBoxDriver = driverFactory.createChargeBoxDriver();
         chargingDriver = driverFactory.createChargingDriver();
@@ -46,11 +46,11 @@ public class TransactionStopDriverTest extends DriverTestBase {
         chargingDriver.waitForChargingProcessStartedWithTransaction();
 
         List<Integer> transactionIds = transactionService.getActiveTransactionIds("stopTest");
-        Assert.assertEquals(1, transactionIds.size());
+        Assertions.assertEquals(1, transactionIds.size());
 
         int transactionId = transactionIds.get(0);
         Transaction transaction = transactionService.findTransaction(transactionId).orElse(null);
-        Assert.assertNotNull(transaction);
+        Assertions.assertNotNull(transaction);
 
         UpdateTransactionParams params =
                 UpdateTransactionParams.builder()
@@ -79,7 +79,7 @@ public class TransactionStopDriverTest extends DriverTestBase {
 
         transactionService.updateTransaction(params2);
         transaction = transactionService.findTransaction(transactionId).orElse(null);
-        Assert.assertNotNull(transaction);
+        Assertions.assertNotNull(transaction);
 
     }
 }

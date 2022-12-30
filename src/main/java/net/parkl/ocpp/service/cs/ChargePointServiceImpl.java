@@ -31,12 +31,14 @@ import de.rwth.idsg.steve.utils.DateTimeUtils;
 import de.rwth.idsg.steve.web.dto.ChargePointForm;
 import de.rwth.idsg.steve.web.dto.ChargePointQueryForm;
 import de.rwth.idsg.steve.web.dto.ConnectorStatusForm;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import net.parkl.ocpp.entities.ConnectorLastStatus;
 import net.parkl.ocpp.entities.OcppAddress;
 import net.parkl.ocpp.entities.OcppChargeBox;
 import net.parkl.ocpp.repositories.*;
+import ocpp.cs._2010._08.RegistrationStatus;
 import org.joda.time.DateTime;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -48,24 +50,16 @@ import java.util.*;
  */
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class ChargePointServiceImpl implements ChargePointService {
 
     private final OcppChargeBoxRepository chargeBoxRepository;
     private final OcppAddressRepository addressRepository;
     private final ConnectorRepository connectorRepository;
-    private final ConnectorStatusRepository connectorStatusRepository;
+    private final ConnectorLastStatusRepository connectorLastStatusRepository;
     private final ChargePointCriteriaRepository chargePointCriteriaRepository;
     private final AddressService addressService;
 
-    @Autowired
-    public ChargePointServiceImpl(OcppChargeBoxRepository chargeBoxRepository, OcppAddressRepository addressRepository, ConnectorRepository connectorRepository, ConnectorStatusRepository connectorStatusRepository, ChargePointCriteriaRepository chargePointCriteriaRepository, AddressService addressService) {
-        this.chargeBoxRepository = chargeBoxRepository;
-        this.addressRepository = addressRepository;
-        this.connectorRepository = connectorRepository;
-        this.connectorStatusRepository = connectorStatusRepository;
-        this.chargePointCriteriaRepository = chargePointCriteriaRepository;
-        this.addressService = addressService;
-    }
 
     @Override
     public Optional<String> getRegistrationStatus(String chargeBoxId) {
@@ -133,7 +127,7 @@ public class ChargePointServiceImpl implements ChargePointService {
 
     @Override
     public List<ConnectorStatus> getChargePointConnectorStatus(ConnectorStatusForm form) {
-        List<net.parkl.ocpp.entities.ConnectorStatus> result = connectorStatusRepository.findAllByOrderByStatusTimestampDesc();
+        Iterable<ConnectorLastStatus> result = connectorLastStatusRepository.findAll();
 
 
         Map<String, OcppChargeBox> chargeBoxMap = new HashMap<>();
@@ -142,34 +136,37 @@ public class ChargePointServiceImpl implements ChargePointService {
             chargeBoxMap.put(c.getChargeBoxId(), c);
         }
 
-        Map<Integer, ConnectorStatus> statusMap = new HashMap<>();
+        List<ConnectorStatus> statusList = new ArrayList<>();
 
-        for (net.parkl.ocpp.entities.ConnectorStatus r : result) {
-            OcppChargeBox cb = chargeBoxMap.get(r.getConnector().getChargeBoxId());
+        for (ConnectorLastStatus r : result) {
+            OcppChargeBox cb = chargeBoxMap.get(r.getChargeBoxId());
             if (cb == null) {
-                throw new IllegalArgumentException("Invalid charge box id: " + r.getConnector().getChargeBoxId());
+                throw new IllegalArgumentException("Invalid charge box id: " + r.getChargeBoxId());
             }
 
-            if (form == null || form.getStatus() == null ||
-                    form.getStatus().equals(r.getStatus())) {
+            // https://github.com/steve-community/steve/issues/691
+            boolean chargeBoxStatusCondition = cb.getRegistrationStatus().equals(RegistrationStatus.ACCEPTED.value());
+
+            boolean statusCondition = form == null || form.getStatus() == null ||
+                    form.getStatus().equals(r.getStatus());
+
+            boolean chargeBoxCondition = form == null || form.getChargeBoxId() == null ||
+                    form.getChargeBoxId().equals(r.getChargeBoxId());
+            if (chargeBoxStatusCondition && statusCondition && chargeBoxCondition) {
                 ConnectorStatus s = ConnectorStatus.builder()
                         .chargeBoxPk(cb.getChargeBoxPk())
-                        .chargeBoxId(r.getConnector().getChargeBoxId())
-                        .connectorId(r.getConnector().getConnectorId())
+                        .chargeBoxId(r.getChargeBoxId())
+                        .connectorId(r.getConnectorId())
                         .timeStamp(r.getStatusTimestamp() != null ? DateTimeUtils.humanize(new DateTime(r.getStatusTimestamp())) : null)
                         .statusTimestamp(r.getStatusTimestamp() != null ? new DateTime(r.getStatusTimestamp()) : null)
                         .status(r.getStatus())
                         .errorCode(r.getErrorCode())
                         .build();
-                if (!statusMap.containsKey(r.getConnector().getConnectorId()) ||
-                        statusMap.get(r.getConnector().getConnectorId()).getStatusTimestamp().isBefore(r.getStatusTimestamp().getTime())) {
-                    statusMap.put(r.getConnector().getConnectorId(), s);
-                    //ret.add(s);
-                }
+                statusList.add(s);
             }
         }
 
-        return new ArrayList<>(statusMap.values());
+        return statusList;
     }
 
     @Override

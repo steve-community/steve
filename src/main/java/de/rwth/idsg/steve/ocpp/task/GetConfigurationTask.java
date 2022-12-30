@@ -1,6 +1,6 @@
 /*
- * SteVe - SteckdosenVerwaltung - https://github.com/RWTH-i5-IDSG/steve
- * Copyright (C) 2013-2020 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
+ * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
+ * Copyright (C) 2013-2019 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
  * All Rights Reserved.
  *
  * Parkl Digital Technologies
@@ -37,7 +37,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
+ * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 09.03.2018
  */
 public class GetConfigurationTask extends Ocpp15AndAboveTask<GetConfigurationParams, GetConfigurationTask.ResponseWrapper> {
@@ -74,20 +74,12 @@ public class GetConfigurationTask extends Ocpp15AndAboveTask<GetConfigurationPar
 
     @Override
     public ocpp.cp._2012._06.GetConfigurationRequest getOcpp15Request() {
-        if (params.isSetConfKeyList()) {
-            return new GetConfigurationRequest().withKey(params.getConfKeyList());
-        } else {
-            return new GetConfigurationRequest();
-        }
+        return new GetConfigurationRequest().withKey(params.getAllKeys());
     }
 
     @Override
     public ocpp.cp._2015._10.GetConfigurationRequest getOcpp16Request() {
-        if (params.isSetConfKeyList()) {
-            return new ocpp.cp._2015._10.GetConfigurationRequest().withKey(params.getConfKeyList());
-        } else {
-            return new ocpp.cp._2015._10.GetConfigurationRequest();
-        }
+        return new ocpp.cp._2015._10.GetConfigurationRequest().withKey(params.getAllKeys());
     }
 
     @Override

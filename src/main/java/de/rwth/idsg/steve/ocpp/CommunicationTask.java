@@ -1,6 +1,6 @@
 /*
- * SteVe - SteckdosenVerwaltung - https://github.com/RWTH-i5-IDSG/steve
- * Copyright (C) 2013-2020 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
+ * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
+ * Copyright (C) 2013-2019 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
  * All Rights Reserved.
  *
  * Parkl Digital Technologies
@@ -44,7 +44,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 /**
  * Contains the context for a request/response communication and callbacks for handling responses/errors.
  *
- * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
+ * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 09.03.2018
  */
 @Getter
@@ -64,14 +64,14 @@ public abstract class CommunicationTask<S extends ChargePointSelection, RESPONSE
     private final DateTime startTimestamp = DateTime.now();
     private DateTime endTimestamp;
 
-    private AtomicInteger errorCount = new AtomicInteger(0);
-    private AtomicInteger responseCount = new AtomicInteger(0);
+    private final AtomicInteger errorCount = new AtomicInteger(0);
+    private final AtomicInteger responseCount = new AtomicInteger(0);
 
     @Getter(AccessLevel.NONE) // disable getter generation
     private final Object lockObject = new Object();
 
     // The default initial capacity is 10. We probably won't need that much.
-    private ArrayList<OcppCallback<RESPONSE>> callbackList = new ArrayList<>(2);
+    private final ArrayList<OcppCallback<RESPONSE>> callbackList = new ArrayList<>(2);
 
     public CommunicationTask(OcppVersion ocppVersion, S params) {
         this(ocppVersion, params, TaskOrigin.INTERNAL, "SteVe");
@@ -169,15 +169,11 @@ public abstract class CommunicationTask<S extends ChargePointSelection, RESPONSE
     public abstract OcppCallback<RESPONSE> defaultCallback();
 
     public abstract <T extends RequestType> T getOcpp12Request();
-
     public abstract <T extends RequestType> T getOcpp15Request();
-
     public abstract <T extends RequestType> T getOcpp16Request();
 
     public abstract <T extends ResponseType> AsyncHandler<T> getOcpp12Handler(String chargeBoxId);
-
     public abstract <T extends ResponseType> AsyncHandler<T> getOcpp15Handler(String chargeBoxId);
-
     public abstract <T extends ResponseType> AsyncHandler<T> getOcpp16Handler(String chargeBoxId);
 
 
@@ -185,9 +181,9 @@ public abstract class CommunicationTask<S extends ChargePointSelection, RESPONSE
     // Classes
     // -------------------------------------------------------------------------
 
-    public abstract class DefaultOcppCallback<RESPONSE> implements OcppCallback<RESPONSE> {
+    public abstract class DefaultOcppCallback<RES> implements OcppCallback<RES> {
 
-        public abstract void success(String chargeBoxId, RESPONSE response);
+        public abstract void success(String chargeBoxId, RES response);
 
 
         @Override

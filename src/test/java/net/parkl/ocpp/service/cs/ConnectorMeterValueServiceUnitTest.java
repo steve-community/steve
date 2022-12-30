@@ -4,11 +4,11 @@ import net.parkl.ocpp.entities.TransactionStart;
 import net.parkl.ocpp.repositories.ConnectorMeterValueRepository;
 import ocpp.cs._2015._10.MeterValue;
 import ocpp.cs._2015._10.SampledValue;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import static java.util.Collections.singletonList;
 import static ocpp.cs._2015._10.Measurand.POWER_ACTIVE_IMPORT;
@@ -17,7 +17,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class ConnectorMeterValueServiceUnitTest {
     @InjectMocks
     private ConnectorMeterValueService connectorMeterValueService;

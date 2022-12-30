@@ -18,6 +18,7 @@
  */
 package net.parkl.ocpp.repositories;
 
+import de.rwth.idsg.steve.ocpp.OcppProtocol;
 import net.parkl.ocpp.entities.OcppChargeBox;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -53,4 +54,7 @@ public interface OcppChargeBoxRepository extends JpaRepository<OcppChargeBox, In
 	@Query("UPDATE OcppChargeBox c SET c.lastHeartbeatTimestamp=?2 WHERE c.chargeBoxId=?1")
 	int updateChargeBoxLastHeartbeat(String chargeBoxId,Date lastHearbeat);
 
+	@Modifying(clearAutomatically=true)
+	@Query("UPDATE OcppChargeBox c SET c.ocppProtocol=?2 WHERE c.chargeBoxId=?1")
+    void updateOcppProtocol(String chargeBoxId, String protocol);
 }

@@ -1,6 +1,6 @@
 /*
- * SteVe - SteckdosenVerwaltung - https://github.com/RWTH-i5-IDSG/steve
- * Copyright (C) 2013-2020 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
+ * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
+ * Copyright (C) 2013-2019 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
  * All Rights Reserved.
  *
  * Parkl Digital Technologies
@@ -28,14 +28,16 @@ import de.rwth.idsg.steve.ocpp.OcppVersion;
 import de.rwth.idsg.steve.service.OcppTagService;
 import de.rwth.idsg.steve.web.dto.ocpp.SendLocalListParams;
 import de.rwth.idsg.steve.web.dto.ocpp.SendLocalListUpdateType;
+import ocpp.cp._2015._10.AuthorizationData;
 
 import javax.xml.ws.AsyncHandler;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
+ * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 09.03.2018
  */
 public class SendLocalListTask extends Ocpp15AndAboveTask<SendLocalListParams, String> {
@@ -113,10 +115,16 @@ public class SendLocalListTask extends Ocpp15AndAboveTask<SendLocalListParams, S
 
             // FULL update
         } else {
+            List<AuthorizationData> values = Collections.emptyList();
+
+            if (Boolean.FALSE.equals(params.getSendEmptyListWhenFull())) {
+                values = ocppTagService.getAuthDataOfAllTags();
+            }
+
             return new ocpp.cp._2015._10.SendLocalListRequest()
                     .withListVersion(params.getListVersion())
                     .withUpdateType(ocpp.cp._2015._10.UpdateType.FULL)
-                    .withLocalAuthorizationList(ocppTagService.getAuthDataOfAllTags());
+                    .withLocalAuthorizationList(values);
         }
     }
 

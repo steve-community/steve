@@ -1,6 +1,6 @@
 /*
- * SteVe - SteckdosenVerwaltung - https://github.com/RWTH-i5-IDSG/steve
- * Copyright (C) 2013-2020 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
+ * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
+ * Copyright (C) 2013-2019 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
  * All Rights Reserved.
  *
  * Parkl Digital Technologies
@@ -25,36 +25,30 @@ package de.rwth.idsg.steve.web.dto;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 
 import javax.validation.constraints.AssertTrue;
 import javax.validation.constraints.NotNull;
+import java.util.Objects;
 
 /**
- * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
+ * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 31.08.2015
  */
 @Getter
 @Setter
+@ToString(callSuper = true)
 public class TransactionQueryForm extends QueryForm {
 
     // Internal database Id
     private Integer transactionPk;
 
-    private boolean returnCSV;
-
-    @NotNull(message = "Query type is required")
-    private QueryType type;
-
-    private QueryPeriodType periodType;
-
     /**
      * Init with sensible default values
      */
-    public TransactionQueryForm() {
-        returnCSV = false;
-        periodType = QueryPeriodType.ALL;
-        type = QueryType.ACTIVE;
-    }
+    private boolean returnCSV = false;
+    private QueryType type = QueryType.ACTIVE;
+    private QueryPeriodType periodType = QueryPeriodType.ALL;
 
     @AssertTrue(message = "The values 'From' and 'To' must be both set")
     public boolean isPeriodFromToCorrect() {
@@ -63,6 +57,14 @@ public class TransactionQueryForm extends QueryForm {
 
     public boolean isTransactionPkSet() {
         return transactionPk != null;
+    }
+
+    public QueryType getType() {
+        return Objects.requireNonNullElse(type, QueryType.ALL);
+    }
+
+    public QueryPeriodType getPeriodType() {
+        return Objects.requireNonNullElse(periodType, QueryPeriodType.ALL);
     }
 
     // -------------------------------------------------------------------------

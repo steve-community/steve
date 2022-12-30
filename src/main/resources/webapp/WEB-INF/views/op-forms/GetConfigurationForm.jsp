@@ -1,7 +1,7 @@
 <%--
 
-    SteVe - SteckdosenVerwaltung - https://github.com/RWTH-i5-IDSG/steve
-    Copyright (C) 2013-2020 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
+    SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
+    Copyright (C) 2013-2019 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
     All Rights Reserved.
 
     This program is free software: you can redistribute it and/or modify
@@ -28,9 +28,13 @@
         </td>
             <td>
                 <form:select path="confKeyList" multiple="true" size="14" >
-                    <form:options items="${ocppConfKeys}" />
+                    <c:forEach items="${ocppConfKeys}" var="k">
+                    <option value="${k.getKey()}" label="${k.getValue()}" title="${k.getValue()}">
+                    </c:forEach>
                 </form:select>
-            </td></tr>
+            </td>
+        </tr>
+        <tr><td>Custom Configuration Keys:</td><td><form:input path="commaSeparatedCustomConfKeys" placeholder="optional comma separated list" /></td></tr>
         <tr><td></td><td><div class="submit-button"><input type="submit" value="Perform"></div></td></tr>
     </table>
 </form:form>

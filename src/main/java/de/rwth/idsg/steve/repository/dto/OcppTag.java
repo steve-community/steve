@@ -1,6 +1,6 @@
 /*
- * SteVe - SteckdosenVerwaltung - https://github.com/RWTH-i5-IDSG/steve
- * Copyright (C) 2013-2020 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
+ * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
+ * Copyright (C) 2013-2019 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
  * All Rights Reserved.
  *
  * Parkl Digital Technologies
@@ -24,21 +24,23 @@ package de.rwth.idsg.steve.repository.dto;
 
 import lombok.Builder;
 import lombok.Getter;
+import lombok.ToString;
 import org.joda.time.DateTime;
 
 /**
  *
- * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
+ * @author Sevket Goekay <sevketgokay@gmail.com>
  *
  */
 public final class OcppTag {
 
     @Getter
     @Builder
+    @ToString
     public static final class Overview {
         private final Integer ocppTagPk, parentOcppTagPk;
-        private final String idTag, parentIdTag, expiryDate;
+        private final String idTag, parentIdTag, expiryDateFormatted;
         private final boolean inTransaction, blocked;
-        private final DateTime expiryDateDT;
+        private final DateTime expiryDate;
     }
 }

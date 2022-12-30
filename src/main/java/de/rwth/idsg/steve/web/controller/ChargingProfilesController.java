@@ -1,6 +1,6 @@
 /*
- * SteVe - SteckdosenVerwaltung - https://github.com/RWTH-i5-IDSG/steve
- * Copyright (C) 2013-2020 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
+ * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
+ * Copyright (C) 2013-2019 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
  * All Rights Reserved.
  *
  * Parkl Digital Technologies
@@ -23,6 +23,7 @@
 package de.rwth.idsg.steve.web.controller;
 
 import de.rwth.idsg.steve.repository.dto.ChargingProfile;
+import de.rwth.idsg.steve.utils.mapper.ChargingProfileDetailsMapper;
 import de.rwth.idsg.steve.utils.DateTimeConverter;
 import de.rwth.idsg.steve.utils.DateTimeUtils;
 import de.rwth.idsg.steve.web.dto.ChargingProfileAssignmentQueryForm;
@@ -46,13 +47,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import javax.validation.Valid;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
 
 /**
- * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
+ * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 12.11.2018
  */
 @Controller
@@ -142,42 +139,7 @@ public class ChargingProfilesController {
     @RequestMapping(value = DETAILS_PATH, method = RequestMethod.GET)
     public String getDetails(@PathVariable("chargingProfilePk") int chargingProfilePk, Model model) {
         ChargingProfile.Details details = repository.getDetails(chargingProfilePk);
-
-        OcppChargingProfile profile = details.getProfile();
-        List<ChargingSchedulePeriod> periods = details.getPeriods();
-
-        ChargingProfileForm form = new ChargingProfileForm();
-        form.setChargingProfilePk(profile.getChargingProfilePk());
-        form.setDescription(profile.getDescription());
-        form.setNote(profile.getNote());
-        form.setStackLevel(profile.getStackLevel());
-        form.setChargingProfilePurpose(ChargingProfilePurposeType.fromValue(profile.getChargingProfilePurpose()));
-        form.setChargingProfileKind(ChargingProfileKindType.fromValue(profile.getChargingProfileKind()));
-        form.setRecurrencyKind(profile.getRecurrencyKind() == null ? null : RecurrencyKindType.fromValue(profile.getRecurrencyKind()));
-
-        if (profile.getValidFrom()!=null) {
-            form.setValidFrom(DateTimeUtils.toLocalDateTime(DateTimeConverter.from(profile.getValidFrom())));
-        }
-        if (profile.getValidTo()!=null) {
-            form.setValidTo(DateTimeUtils.toLocalDateTime(DateTimeConverter.from(profile.getValidTo())));
-        }
-        form.setDurationInSeconds(profile.getDurationInSeconds());
-        if (profile.getStartSchedule()!=null) {
-            form.setStartSchedule(DateTimeUtils.toLocalDateTime(DateTimeConverter.from(profile.getStartSchedule())));
-        }
-        form.setChargingRateUnit(ChargingRateUnitType.fromValue(profile.getChargingRateUnit()));
-        form.setMinChargingRate(profile.getMinChargingRate());
-
-        Map<String, ChargingProfileForm.SchedulePeriod> periodMap = new LinkedHashMap<>();
-        for (ChargingSchedulePeriod rec : periods) {
-            ChargingProfileForm.SchedulePeriod p = new ChargingProfileForm.SchedulePeriod();
-            p.setStartPeriodInSeconds(rec.getStartPeriodInSeconds());
-            p.setPowerLimitInAmperes(rec.getPowerLimitInAmperes());
-            p.setNumberPhases(rec.getNumberPhases());
-
-            periodMap.put(UUID.randomUUID().toString(), p);
-        }
-        form.setSchedulePeriodMap(periodMap);
+        ChargingProfileForm form = ChargingProfileDetailsMapper.mapToForm(details);
 
         model.addAttribute("form", form);
         return "data-man/chargingProfileDetails";

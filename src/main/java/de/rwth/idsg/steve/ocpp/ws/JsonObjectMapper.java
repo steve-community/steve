@@ -1,6 +1,6 @@
 /*
- * SteVe - SteckdosenVerwaltung - https://github.com/RWTH-i5-IDSG/steve
- * Copyright (C) 2013-2020 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
+ * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
+ * Copyright (C) 2013-2019 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
  * All Rights Reserved.
  *
  * Parkl Digital Technologies
@@ -27,6 +27,7 @@ import com.fasterxml.jackson.databind.AnnotationIntrospector;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.introspect.JacksonAnnotationIntrospector;
 import com.fasterxml.jackson.module.jaxb.JaxbAnnotationIntrospector;
+import de.rwth.idsg.steve.ocpp.ws.custom.CustomStringModule;
 import de.rwth.idsg.steve.ocpp.ws.ocpp12.Ocpp12JacksonModule;
 import de.rwth.idsg.steve.ocpp.ws.ocpp15.Ocpp15JacksonModule;
 import de.rwth.idsg.steve.ocpp.ws.ocpp16.Ocpp16JacksonModule;
@@ -37,7 +38,7 @@ import static com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_NULL
 /**
  * Because ObjectMapper can and should be reused, if config does not change after init.
  *
- * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
+ * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 10.03.2018
  */
 public enum JsonObjectMapper {
@@ -60,6 +61,7 @@ public enum JsonObjectMapper {
 
         mapper.configure(WRITE_BIGDECIMAL_AS_PLAIN, true);
 
+        mapper.registerModule(new CustomStringModule());
         mapper.registerModule(new Ocpp12JacksonModule());
         mapper.registerModule(new Ocpp15JacksonModule());
         mapper.registerModule(new Ocpp16JacksonModule());

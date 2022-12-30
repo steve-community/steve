@@ -1,6 +1,6 @@
 /*
- * SteVe - SteckdosenVerwaltung - https://github.com/RWTH-i5-IDSG/steve
- * Copyright (C) 2013-2020 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
+ * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
+ * Copyright (C) 2013-2019 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
  * All Rights Reserved.
  *
  * Parkl Digital Technologies
@@ -28,7 +28,7 @@ import lombok.RequiredArgsConstructor;
 /**
  * The values are as defined in spec "OCPP implementation guide SOAP - RC1 0.6" and in section "5. OCPP version"
  *
- * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
+ * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 01.12.2014
  */
 @RequiredArgsConstructor
@@ -47,5 +47,14 @@ public enum OcppVersion {
             }
         }
         throw new IllegalArgumentException(v);
+    }
+
+    public OcppProtocol toProtocol(OcppTransport transport) {
+        for (OcppProtocol value : OcppProtocol.values()) {
+            if (value.getVersion() == this && value.getTransport() == transport) {
+                return value;
+            }
+        }
+        throw new IllegalArgumentException("Could not find OcppProtocol for " + transport);
     }
 }

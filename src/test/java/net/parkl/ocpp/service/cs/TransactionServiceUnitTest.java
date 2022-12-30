@@ -14,12 +14,12 @@ import net.parkl.ocpp.service.ChargingProcessService;
 import net.parkl.ocpp.service.ESPNotificationService;
 import net.parkl.ocpp.util.AsyncWaiter;
 import org.joda.time.DateTime;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import static net.parkl.ocpp.entities.TransactionStopEventActor.station;
 import static net.parkl.ocpp.service.OcppConstants.REASON_VEHICLE_CHARGED;
@@ -28,7 +28,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
 
 @SuppressWarnings("unused")
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class TransactionServiceUnitTest {
     @InjectMocks
     private TransactionServiceImpl transactionService;

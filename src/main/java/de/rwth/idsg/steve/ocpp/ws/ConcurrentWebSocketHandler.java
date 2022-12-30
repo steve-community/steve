@@ -1,6 +1,6 @@
 /*
- * SteVe - SteckdosenVerwaltung - https://github.com/RWTH-i5-IDSG/steve
- * Copyright (C) 2013-2020 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
+ * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
+ * Copyright (C) 2013-2019 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
  * All Rights Reserved.
  *
  * Parkl Digital Technologies
@@ -22,7 +22,7 @@
  */
 package de.rwth.idsg.steve.ocpp.ws;
 
-import de.rwth.idsg.steve.config.WebSocketConfigurationConstants;
+import de.rwth.idsg.steve.config.WebSocketConfiguration;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.WebSocketHandler;
 import org.springframework.web.socket.WebSocketMessage;
@@ -34,13 +34,13 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
 /**
- * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
+ * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 07.05.2019
  */
 public abstract class ConcurrentWebSocketHandler implements WebSocketHandler {
 
     private static final int sendTimeLimit = (int) TimeUnit.SECONDS.toMillis(10);
-    private static final int bufferSizeLimit = 5 * WebSocketConfigurationConstants.MAX_MSG_SIZE;
+    private static final int bufferSizeLimit = 5 * WebSocketConfiguration.MAX_MSG_SIZE;
 
     private final Map<String, ConcurrentWebSocketSessionDecorator> sessions = new ConcurrentHashMap<>();
 

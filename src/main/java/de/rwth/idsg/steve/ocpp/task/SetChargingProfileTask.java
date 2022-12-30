@@ -1,6 +1,6 @@
 /*
- * SteVe - SteckdosenVerwaltung - https://github.com/RWTH-i5-IDSG/steve
- * Copyright (C) 2013-2020 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
+ * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
+ * Copyright (C) 2013-2019 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
  * All Rights Reserved.
  *
  * Parkl Digital Technologies
@@ -36,7 +36,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
+ * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 13.03.2018
  */
 public class SetChargingProfileTask extends Ocpp16AndAboveTask<EnhancedSetChargingProfileParams, String> {
@@ -76,7 +76,7 @@ public class SetChargingProfileTask extends Ocpp16AndAboveTask<EnhancedSetChargi
                        .map(k -> {
                            ChargingSchedulePeriod p = new ChargingSchedulePeriod();
                            p.setStartPeriod(k.getStartPeriodInSeconds());
-                           p.setLimit(k.getPowerLimitInAmperes());
+                           p.setLimit(k.getPowerLimit());
                            p.setNumberPhases(k.getNumberPhases());
                            return p;
                        })

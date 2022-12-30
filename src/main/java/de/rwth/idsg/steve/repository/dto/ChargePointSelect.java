@@ -1,6 +1,6 @@
 /*
- * SteVe - SteckdosenVerwaltung - https://github.com/RWTH-i5-IDSG/steve
- * Copyright (C) 2013-2020 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
+ * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
+ * Copyright (C) 2013-2019 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
  * All Rights Reserved.
  *
  * Parkl Digital Technologies
@@ -24,22 +24,18 @@ package de.rwth.idsg.steve.repository.dto;
 
 import de.rwth.idsg.steve.ocpp.OcppTransport;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
 /**
- * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
+ * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 29.12.2014
  */
+@RequiredArgsConstructor
 @Getter
 public final class ChargePointSelect {
     private final OcppTransport ocppTransport;
     private final String chargeBoxId;
     private final String endpointAddress;
-
-    public ChargePointSelect(OcppTransport ocppTransport, String chargeBoxId, String endpointAddress) {
-        this.ocppTransport = ocppTransport;
-        this.chargeBoxId = chargeBoxId;
-        this.endpointAddress = endpointAddress;
-    }
 
     public ChargePointSelect(OcppTransport ocppTransport, String chargeBoxId) {
         // Provide a non-null value (or placeholder if you will) to frontend for JSON charge points.

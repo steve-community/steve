@@ -1,16 +1,17 @@
 package de.rwth.idsg.steve.service;
 
 import de.rwth.idsg.steve.repository.dto.UpdateTransactionParams;
+import de.rwth.idsg.steve.service.notification.OcppTransactionEnded;
 import net.parkl.ocpp.entities.TransactionStart;
 import net.parkl.ocpp.service.cs.ConnectorMeterValueService;
 import net.parkl.ocpp.service.cs.TransactionService;
 import ocpp.cs._2015._10.StopTransactionRequest;
 import ocpp.cs._2015._10.StopTransactionResponse;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -19,7 +20,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class CentralSystemService16_ServiceUnitTest {
 
     @InjectMocks
@@ -43,7 +44,7 @@ public class CentralSystemService16_ServiceUnitTest {
 
         verify(transactionService, never()).updateTransaction(any(UpdateTransactionParams.class));
         verify(connectorMeterValueService, never()).insertMeterValues(anyList(), any(TransactionStart.class));
-        verify(notificationService, never()).ocppTransactionEnded(any(UpdateTransactionParams.class));
+        verify(notificationService, never()).ocppTransactionEnded(any(OcppTransactionEnded.class));
 
         assertThat(response).isNotNull();
     }

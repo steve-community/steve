@@ -1,7 +1,6 @@
 package net.parkl.ocpp.service.config;
 
 import de.rwth.idsg.steve.service.CentralSystemService16_Service;
-import de.rwth.idsg.steve.service.OcppNotificationService;
 import de.rwth.idsg.steve.service.OcppTagService;
 import de.rwth.idsg.steve.service.OcppTagServiceImpl;
 import org.springframework.context.annotation.Bean;
@@ -20,10 +19,6 @@ public class OcppServiceTestAdditionalConfig {
         return new CentralSystemService16_Service();
     }
 
-    @Bean
-    public OcppNotificationService notificationService() {
-        return new TestNotificationService();
-    }
 
     @Bean
     public IntegratedIdTagProvider idTagProvider() {

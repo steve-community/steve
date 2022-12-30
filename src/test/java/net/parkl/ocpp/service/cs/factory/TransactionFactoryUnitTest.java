@@ -4,7 +4,7 @@ import de.rwth.idsg.steve.repository.dto.InsertTransactionParams;
 import de.rwth.idsg.steve.repository.dto.UpdateTransactionParams;
 import net.parkl.ocpp.entities.*;
 import org.joda.time.DateTime;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static com.google.common.base.Throwables.getStackTraceAsString;
 import static net.parkl.ocpp.entities.TransactionStopEventActor.manual;

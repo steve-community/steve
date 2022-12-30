@@ -11,7 +11,9 @@ import de.rwth.idsg.steve.ocpp.ws.ocpp12.Ocpp12WebSocketEndpoint;
 import de.rwth.idsg.steve.ocpp.ws.ocpp15.Ocpp15WebSocketEndpoint;
 import de.rwth.idsg.steve.ocpp.ws.ocpp16.Ocpp16WebSocketEndpoint;
 import de.rwth.idsg.steve.repository.dto.ChargePointSelect;
+import de.rwth.idsg.steve.repository.dto.ConnectorStatus;
 import de.rwth.idsg.steve.service.dto.UnidentifiedIncomingObject;
+import de.rwth.idsg.steve.utils.ConnectorStatusCountFilter;
 import de.rwth.idsg.steve.utils.DateTimeUtils;
 import de.rwth.idsg.steve.web.dto.OcppJsonStatus;
 import de.rwth.idsg.steve.web.dto.Statistics;
@@ -75,8 +77,8 @@ public class ChargePointHelperServiceImpl implements ChargePointHelperService {
         stats.setNumOcpp15JChargeBoxes(ocpp15WebSocketEndpoint.getNumberOfChargeBoxes());
         stats.setNumOcpp16JChargeBoxes(ocpp16WebSocketEndpoint.getNumberOfChargeBoxes());
 
-        /*List<ConnectorStatus> latestList = chargePointService.getChargePointConnectorStatus();
-        stats.setStatusCountMap(ConnectorStatusCountFilter.getStatusCountMap(latestList));*/
+        List<ConnectorStatus> latestList = chargePointService.getChargePointConnectorStatus();
+        stats.setStatusCountMap(ConnectorStatusCountFilter.getStatusCountMap(latestList));
 
         return stats;
     }
@@ -117,10 +119,6 @@ public class ChargePointHelperServiceImpl implements ChargePointHelperService {
 
     public List<UnidentifiedIncomingObject> getUnknownChargePoints() {
         return unknownChargePointService.getObjects();
-    }
-
-    public void removeUnknown(String chargeBoxId) {
-        unknownChargePointService.remove(chargeBoxId);
     }
 
     public void removeUnknown(List<String> chargeBoxIdList) {

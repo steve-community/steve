@@ -72,10 +72,6 @@ public class TestChargePointHelperService implements ChargePointHelperService {
 		return null;
 	}
 
-	@Override
-	public void removeUnknown(String chargeBoxId) {
-		log.info("test removeUnknown called with chargeBoxId: {}", chargeBoxId);
-	}
 
 	@Override
 	public void removeUnknown(List<String> chargeBoxIdList) {

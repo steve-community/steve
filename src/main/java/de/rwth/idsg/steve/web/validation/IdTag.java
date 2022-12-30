@@ -1,6 +1,6 @@
 /*
- * SteVe - SteckdosenVerwaltung - https://github.com/RWTH-i5-IDSG/steve
- * Copyright (C) 2013-2020 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
+ * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
+ * Copyright (C) 2013-2019 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
  * All Rights Reserved.
  *
  * Parkl Digital Technologies
@@ -32,7 +32,7 @@ import static java.lang.annotation.ElementType.METHOD;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
- * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
+ * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 15.08.2014
  */
 @Target({FIELD, METHOD})
@@ -40,7 +40,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Constraint(validatedBy = {IdTagValidator.class, IdTagListValidator.class})
 public @interface IdTag {
 
-    String message() default "ID Tag can only contain upper or lower case letters, numbers and dot, dash, underscore symbols";
+    String message() default "ID Tag can only contain upper or lower case letters, numbers and dot, colon, dash, underscore symbols";
 
     // Required by validation runtime
     Class<?>[] groups() default {};

@@ -85,4 +85,6 @@ public interface ChargePointService {
     Map<String, OcppChargeBox> getIdChargeBoxMap();
 
     List<OcppChargeBox> getAllChargeBoxes();
+
+    void updateOcppProtocol(String chargeBoxId, OcppProtocol protocol);
 }

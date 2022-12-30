@@ -1,6 +1,6 @@
 /*
- * SteVe - SteckdosenVerwaltung - https://github.com/RWTH-i5-IDSG/steve
- * Copyright (C) 2013-2020 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
+ * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
+ * Copyright (C) 2013-2019 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
  * All Rights Reserved.
  *
  * Parkl Digital Technologies
@@ -22,12 +22,12 @@
  */
 package de.rwth.idsg.steve.service;
 
-import com.google.common.base.Strings;
 import com.google.common.collect.Ordering;
 import de.rwth.idsg.steve.repository.dto.Transaction;
 import de.rwth.idsg.steve.repository.dto.TransactionDetails;
 import de.rwth.idsg.steve.repository.dto.UpdateTransactionParams;
 import de.rwth.idsg.steve.utils.DateTimeConverter;
+import de.rwth.idsg.steve.utils.TransactionStopServiceHelper;
 import lombok.Builder;
 import net.parkl.ocpp.entities.TransactionStart;
 import net.parkl.ocpp.entities.TransactionStopEventActor;
@@ -41,8 +41,11 @@ import org.springframework.stereotype.Service;
 import java.util.Comparator;
 import java.util.List;
 
+import static de.rwth.idsg.steve.utils.TransactionStopServiceHelper.floatingStringToIntString;
+import static de.rwth.idsg.steve.utils.TransactionStopServiceHelper.kWhStringToWhString;
+
 /**
- * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
+ * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 09.12.2018
  */
 @Service
@@ -121,7 +124,7 @@ public class TransactionStopService {
 
         return TerminationValues.builder()
                                 .stopValue(thisTx.getStartValue())
-                                .stopTimestamp(thisTx.getStartTimestampDT())
+                                .stopTimestamp(thisTx.getStartTimestamp())
                                 .build();
     }
 
@@ -129,7 +132,7 @@ public class TransactionStopService {
     private static TransactionDetails.MeterValues findLastMeterValue(List<TransactionDetails.MeterValues> values) {
         TransactionDetails.MeterValues v =
                 values.stream()
-                      .filter(TransactionStopService::isEnergyValue)
+                      .filter(TransactionStopServiceHelper::isEnergyValue)
                       .max(Comparator.comparing(TransactionDetails.MeterValues::getValueTimestamp))
                       .orElse(null);
 
@@ -140,9 +143,8 @@ public class TransactionStopService {
 
         // convert kWh to Wh
         if (UnitOfMeasure.K_WH.value().equals(v.getUnit())) {
-            double kWhValue = Double.parseDouble(v.getValue());
             return TransactionDetails.MeterValues.builder()
-                                                 .value(Double.toString(kWhValue * 1000))
+                                                 .value(kWhStringToWhString(v.getValue()))
                                                  .valueTimestamp(v.getValueTimestamp())
                                                  .readingContext(v.getReadingContext())
                                                  .format(v.getFormat())
@@ -153,25 +155,6 @@ public class TransactionStopService {
                                                  .build();
         } else {
             return v;
-        }
-    }
-
-    private static String floatingStringToIntString(String s) {
-        // meter values can be floating, whereas start/end values are int
-        return Integer.toString((int) Math.ceil(Double.parseDouble(s)));
-    }
-
-    private static boolean isEnergyValue(TransactionDetails.MeterValues v) {
-        // should not happen, but check it to be safe.
-        // https://github.com/RWTH-i5-IDSG/steve/issues/249
-        if (Strings.isNullOrEmpty(v.getValue())) {
-            return false;
-        }
-
-        if (v.getUnit() == null) {
-            return v.getMeasurand() == null || v.getMeasurand().startsWith("Energy.Active.Import");
-        } else {
-            return UnitOfMeasure.WH.value().equals(v.getUnit()) || UnitOfMeasure.K_WH.value().equals(v.getUnit());
         }
     }
 

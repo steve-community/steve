@@ -1,6 +1,6 @@
 /*
- * SteVe - SteckdosenVerwaltung - https://github.com/RWTH-i5-IDSG/steve
- * Copyright (C) 2013-2020 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
+ * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
+ * Copyright (C) 2013-2019 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
  * All Rights Reserved.
  *
  * Parkl Digital Technologies
@@ -25,17 +25,20 @@ package de.rwth.idsg.steve.web.dto;
 import de.rwth.idsg.steve.web.validation.IdTag;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 import org.joda.time.LocalDateTime;
 
 import javax.validation.constraints.Future;
 import javax.validation.constraints.NotEmpty;
+import java.util.Objects;
 
 /**
- * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
+ * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 15.08.2014
  */
 @Getter
 @Setter
+@ToString
 public class OcppTagForm {
 
     // Internal database id
@@ -49,7 +52,7 @@ public class OcppTagForm {
     private String parentIdTag;
 
     @Future(message = "Expiry Date/Time must be in future")
-    private LocalDateTime expiration;
+    private LocalDateTime expiryDate;
 
     private Integer maxActiveTransactionCount;
 
@@ -59,10 +62,6 @@ public class OcppTagForm {
      * As specified in V0_9_9__update.sql default value is 1.
      */
     public Integer getMaxActiveTransactionCount() {
-        if (maxActiveTransactionCount == null) {
-            return 1;
-        } else {
-            return maxActiveTransactionCount;
-        }
+        return Objects.requireNonNullElse(maxActiveTransactionCount, 1);
     }
 }

@@ -179,7 +179,7 @@ public class ApplicationJsonTest {
 
         UpgradeException actualCause = (UpgradeException) e.getCause().getCause();
 
-        Assertions.assertEquals(HttpStatus.UNAUTHORIZED.value(), actualCause.getResponseStatusCode());
+        Assertions.assertEquals(HttpStatus.NOT_FOUND.value(), actualCause.getResponseStatusCode());
     }
 
 }

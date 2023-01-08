@@ -13,7 +13,8 @@ jobs:
       - name: Run PMD
         uses: pmd/pmd-github-action@v1
         with:
-          sourcePath: 'src/main/java'
+          version: '6.49.0'
+          sourcePath: './src/main/java'
           rulesets: 'https://raw.githubusercontent.com/apache/maven-pmd-plugin/maven-pmd-plugin-3.19.0/src/main/resources/rulesets/java/maven-pmd-plugin-default.xml'
       - name: Fail build if there are violations
         if: steps.pmd.outputs.violations != 0

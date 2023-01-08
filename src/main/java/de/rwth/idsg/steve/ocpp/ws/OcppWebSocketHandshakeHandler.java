@@ -75,9 +75,10 @@ public class OcppWebSocketHandshakeHandler implements HandshakeHandler {
         // Allow connections, if station is in db (registration_status field from db does not matter)
         boolean allowConnection = status.isPresent();
 
+        // https://github.com/steve-community/steve/issues/1020
         if (!allowConnection) {
             log.error("ChargeBoxId '{}' is not recognized.", chargeBoxId);
-            response.setStatusCode(HttpStatus.UNAUTHORIZED);
+            response.setStatusCode(HttpStatus.NOT_FOUND);
             return false;
         }
 

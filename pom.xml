@@ -192,6 +192,11 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-pmd-plugin</artifactId>
                 <version>3.19.0</version>
+                <configuration>
+                    <rulesets>
+                        <ruleset>${project.basedir}/src/main/resources/maven-pmd-plugin-default.xml</ruleset>
+                    </rulesets>
+                </configuration>
             </plugin>
             <plugin>
                 <groupId>com.github.spotbugs</groupId>

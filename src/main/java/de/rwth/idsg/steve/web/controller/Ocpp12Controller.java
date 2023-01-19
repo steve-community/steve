@@ -105,7 +105,7 @@ public class Ocpp12Controller {
     }
 
     protected String getRedirectPath() {
-        return "redirect:/manager/operations/v1.2/ChangeAvailability";
+        return "redirect:"+WebEnvironment.getContextRoot()+"/manager/operations/v1.2/ChangeAvailability";
     }
 
     protected String getPrefix() {

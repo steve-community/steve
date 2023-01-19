@@ -22,6 +22,7 @@
  */
 package de.rwth.idsg.steve.web.controller;
 
+import de.rwth.idsg.steve.config.WebEnvironment;
 import de.rwth.idsg.steve.repository.dto.ChargingProfile;
 import de.rwth.idsg.steve.utils.mapper.ChargingProfileDetailsMapper;
 import de.rwth.idsg.steve.utils.DateTimeConverter;
@@ -159,6 +160,6 @@ public class ChargingProfilesController {
     }
 
     private String toOverview() {
-        return "redirect:/manager/chargingProfiles";
+        return "redirect:"+ WebEnvironment.getContextRoot()+"/manager/chargingProfiles";
     }
 }

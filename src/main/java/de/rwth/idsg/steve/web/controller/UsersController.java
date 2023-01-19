@@ -18,6 +18,7 @@
  */
 package de.rwth.idsg.steve.web.controller;
 
+import de.rwth.idsg.steve.config.WebEnvironment;
 import de.rwth.idsg.steve.repository.dto.User;
 import de.rwth.idsg.steve.utils.ControllerHelper;
 import de.rwth.idsg.steve.utils.mapper.UserFormMapper;
@@ -148,6 +149,6 @@ public class UsersController {
     }
 
     private String toOverview() {
-        return "redirect:/manager/users";
+        return "redirect:"+ WebEnvironment.getContextRoot()+"/manager/users";
     }
 }

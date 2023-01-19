@@ -22,6 +22,7 @@
  */
 package de.rwth.idsg.steve.web.controller;
 
+import de.rwth.idsg.steve.config.WebEnvironment;
 import org.springframework.security.web.authentication.logout.CookieClearingLogoutHandler;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.security.web.authentication.rememberme.AbstractRememberMeServices;
@@ -46,6 +47,6 @@ public class SignOutController {
                 .logout(request, response, null);
         new CookieClearingLogoutHandler(AbstractRememberMeServices.SPRING_SECURITY_REMEMBER_ME_COOKIE_KEY)
                 .logout(request, response, null);
-        return "redirect:/manager/signin";
+        return "redirect:"+ WebEnvironment.getContextRoot()+"/manager/signin";
     }
 }

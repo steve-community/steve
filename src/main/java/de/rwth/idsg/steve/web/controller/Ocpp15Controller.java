@@ -18,6 +18,7 @@
  */
 package de.rwth.idsg.steve.web.controller;
 
+import de.rwth.idsg.steve.config.WebEnvironment;
 import de.rwth.idsg.steve.ocpp.OcppVersion;
 import de.rwth.idsg.steve.service.ChargePointService12_Client;
 import de.rwth.idsg.steve.service.ChargePointService15_Client;
@@ -93,7 +94,7 @@ public class Ocpp15Controller extends Ocpp12Controller {
 
     @Override
     protected String getRedirectPath() {
-        return "redirect:/manager/operations/v1.5/ChangeAvailability";
+        return "redirect:"+ WebEnvironment.getContextRoot()+"/manager/operations/v1.5/ChangeAvailability";
     }
 
     @Override

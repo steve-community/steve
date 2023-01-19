@@ -23,6 +23,7 @@
 package de.rwth.idsg.steve.web.controller;
 
 
+import de.rwth.idsg.steve.config.WebEnvironment;
 import de.rwth.idsg.steve.ocpp.OcppProtocol;
 import de.rwth.idsg.steve.repository.dto.ChargePoint;
 import de.rwth.idsg.steve.service.ChargePointHelperService;
@@ -223,7 +224,7 @@ public class ChargePointsController {
     }
 
     protected String toOverview() {
-        return "redirect:/manager/chargepoints";
+        return "redirect:"+ WebEnvironment.getContextRoot()+"/manager/chargepoints";
     }
 
     // -------------------------------------------------------------------------

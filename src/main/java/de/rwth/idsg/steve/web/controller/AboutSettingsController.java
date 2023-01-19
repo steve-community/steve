@@ -20,6 +20,7 @@ package de.rwth.idsg.steve.web.controller;
 
 import de.rwth.idsg.steve.NotificationFeature;
 
+import de.rwth.idsg.steve.config.WebEnvironment;
 import de.rwth.idsg.steve.service.EndpointService;
 import de.rwth.idsg.steve.service.MailService;
 import de.rwth.idsg.steve.web.dto.SettingsForm;
@@ -94,7 +95,7 @@ public class AboutSettingsController {
 
         settingsService.update(settingsForm);
         mailService.loadSettingsFromDB();
-        return "redirect:/manager/settings";
+        return "redirect:"+ WebEnvironment.getContextRoot()+"/manager/settings";
     }
 
     @RequestMapping(params = "testMail", value = SETTINGS_PATH, method = RequestMethod.POST)
@@ -109,6 +110,6 @@ public class AboutSettingsController {
         mailService.loadSettingsFromDB();
         mailService.sendTestMail();
 
-        return "redirect:/manager/settings";
+        return "redirect:"+WebEnvironment.getContextRoot()+"/manager/settings";
     }
 }

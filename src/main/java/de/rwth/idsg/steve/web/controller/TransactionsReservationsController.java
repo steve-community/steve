@@ -22,6 +22,7 @@
  */
 package de.rwth.idsg.steve.web.controller;
 
+import de.rwth.idsg.steve.config.WebEnvironment;
 import de.rwth.idsg.steve.repository.ReservationStatus;
 import de.rwth.idsg.steve.service.TransactionStopService;
 import de.rwth.idsg.steve.web.dto.ReservationQueryForm;
@@ -90,7 +91,7 @@ public class TransactionsReservationsController {
     @RequestMapping(value = TRANSACTION_STOP_PATH, method = RequestMethod.POST)
     public String stopTransaction(@PathVariable("transactionPk") int transactionPk) {
         transactionStopService.stop(transactionPk);
-        return "redirect:/manager/transactions";
+        return "redirect:"+ WebEnvironment.getContextRoot()+"/manager/transactions";
     }
 
     @RequestMapping(value = TRANSACTIONS_DETAILS_PATH)

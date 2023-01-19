@@ -18,6 +18,7 @@
  */
 package de.rwth.idsg.steve.web.controller;
 
+import de.rwth.idsg.steve.config.WebEnvironment;
 import de.rwth.idsg.steve.service.OcppTagService;
 import de.rwth.idsg.steve.utils.ControllerHelper;
 import de.rwth.idsg.steve.utils.mapper.OcppTagFormMapper;
@@ -193,7 +194,7 @@ public class OcppTagsController {
     }
 
     protected String toOverview() {
-        return "redirect:/manager/ocppTags";
+        return "redirect:"+ WebEnvironment.getContextRoot()+"/manager/ocppTags";
     }
 
     // -------------------------------------------------------------------------

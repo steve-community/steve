@@ -26,6 +26,7 @@ import de.rwth.idsg.steve.ocpp.CommunicationTask;
 import de.rwth.idsg.steve.ocpp.OcppCallback;
 import de.rwth.idsg.steve.ocpp.OcppVersion;
 import de.rwth.idsg.steve.web.dto.ocpp.RemoteStartTransactionParams;
+import net.parkl.ocpp.service.cluster.PersistentTaskResultCallback;
 
 import javax.xml.ws.AsyncHandler;
 
@@ -35,8 +36,9 @@ import javax.xml.ws.AsyncHandler;
  */
 public class RemoteStartTransactionTask extends CommunicationTask<RemoteStartTransactionParams, String> {
 
-    public RemoteStartTransactionTask(OcppVersion ocppVersion, RemoteStartTransactionParams params) {
-        super(ocppVersion, params);
+    public RemoteStartTransactionTask(PersistentTaskResultCallback persistentCallback,
+                                      OcppVersion ocppVersion, RemoteStartTransactionParams params) {
+        super(persistentCallback, ocppVersion, params);
     }
 
     @Override

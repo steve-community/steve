@@ -26,6 +26,7 @@ import de.rwth.idsg.steve.ocpp.CommunicationTask;
 import de.rwth.idsg.steve.ocpp.OcppCallback;
 import de.rwth.idsg.steve.ocpp.OcppVersion;
 import de.rwth.idsg.steve.web.dto.ocpp.MultipleChargePointSelect;
+import net.parkl.ocpp.service.cluster.PersistentTaskResultCallback;
 
 import javax.xml.ws.AsyncHandler;
 
@@ -35,8 +36,8 @@ import javax.xml.ws.AsyncHandler;
  */
 public class ClearCacheTask extends CommunicationTask<MultipleChargePointSelect, String> {
 
-    public ClearCacheTask(OcppVersion ocppVersion, MultipleChargePointSelect params) {
-        super(ocppVersion, params);
+    public ClearCacheTask(PersistentTaskResultCallback persistentCallback, OcppVersion ocppVersion, MultipleChargePointSelect params) {
+        super(persistentCallback, ocppVersion, params);
     }
 
     @Override

@@ -25,6 +25,7 @@ package de.rwth.idsg.steve.ocpp;
 import de.rwth.idsg.ocpp.jaxb.RequestType;
 import de.rwth.idsg.ocpp.jaxb.ResponseType;
 import de.rwth.idsg.steve.web.dto.ocpp.ChargePointSelection;
+import net.parkl.ocpp.service.cluster.PersistentTaskResultCallback;
 
 import javax.xml.ws.AsyncHandler;
 
@@ -34,8 +35,8 @@ import javax.xml.ws.AsyncHandler;
  */
 public abstract class Ocpp15AndAboveTask<S extends ChargePointSelection, RESPONSE> extends CommunicationTask<S, RESPONSE> {
 
-    public Ocpp15AndAboveTask(OcppVersion ocppVersion, S params) {
-        super(ocppVersion, params);
+    public Ocpp15AndAboveTask(PersistentTaskResultCallback persistentCallback, OcppVersion ocppVersion, S params) {
+        super(persistentCallback, ocppVersion, params);
     }
 
     @Deprecated

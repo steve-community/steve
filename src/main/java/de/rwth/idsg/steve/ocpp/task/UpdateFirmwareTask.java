@@ -26,6 +26,7 @@ import de.rwth.idsg.steve.ocpp.CommunicationTask;
 import de.rwth.idsg.steve.ocpp.OcppCallback;
 import de.rwth.idsg.steve.ocpp.OcppVersion;
 import de.rwth.idsg.steve.web.dto.ocpp.UpdateFirmwareParams;
+import net.parkl.ocpp.service.cluster.PersistentTaskResultCallback;
 
 import javax.xml.ws.AsyncHandler;
 
@@ -37,8 +38,8 @@ import static de.rwth.idsg.steve.utils.DateTimeUtils.toDateTime;
  */
 public class UpdateFirmwareTask extends CommunicationTask<UpdateFirmwareParams, String> {
 
-    public UpdateFirmwareTask(OcppVersion ocppVersion, UpdateFirmwareParams params) {
-        super(ocppVersion, params);
+    public UpdateFirmwareTask(PersistentTaskResultCallback persistentCallback, OcppVersion ocppVersion, UpdateFirmwareParams params) {
+        super(persistentCallback, ocppVersion, params);
     }
 
     @Override

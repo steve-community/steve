@@ -29,6 +29,7 @@ import de.rwth.idsg.steve.ocpp.task.*;
 import de.rwth.idsg.steve.repository.TaskStore;
 import de.rwth.idsg.steve.web.dto.ocpp.*;
 import lombok.extern.slf4j.Slf4j;
+import net.parkl.ocpp.service.cluster.PersistentTaskService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -45,6 +46,7 @@ public class ChargePointService12_Client implements IChargePointService12_Client
 
     @Autowired protected ScheduledExecutorService executorService;
     @Autowired protected TaskStore taskStore;
+    @Autowired protected PersistentTaskService persistentTaskService;
 
     @Autowired private ChargePointService12_InvokerImpl invoker12;
 
@@ -61,7 +63,7 @@ public class ChargePointService12_Client implements IChargePointService12_Client
     // -------------------------------------------------------------------------
 
     public int changeAvailability(ChangeAvailabilityParams params) {
-        ChangeAvailabilityTask task = new ChangeAvailabilityTask(getVersion(), params);
+        ChangeAvailabilityTask task = new ChangeAvailabilityTask(persistentTaskService, getVersion(), params);
 
         BackgroundService.with(executorService)
                          .forEach(task.getParams().getChargePointSelectList())
@@ -71,7 +73,7 @@ public class ChargePointService12_Client implements IChargePointService12_Client
     }
 
     public int changeConfiguration(ChangeConfigurationParams params) {
-        ChangeConfigurationTask task = new ChangeConfigurationTask(getVersion(), params);
+        ChangeConfigurationTask task = new ChangeConfigurationTask(persistentTaskService, getVersion(), params);
 
         BackgroundService.with(executorService)
                          .forEach(task.getParams().getChargePointSelectList())
@@ -81,7 +83,7 @@ public class ChargePointService12_Client implements IChargePointService12_Client
     }
 
     public int clearCache(MultipleChargePointSelect params) {
-        ClearCacheTask task = new ClearCacheTask(getVersion(), params);
+        ClearCacheTask task = new ClearCacheTask(persistentTaskService, getVersion(), params);
 
         BackgroundService.with(executorService)
                          .forEach(task.getParams().getChargePointSelectList())
@@ -91,7 +93,7 @@ public class ChargePointService12_Client implements IChargePointService12_Client
     }
 
     public int getDiagnostics(GetDiagnosticsParams params) {
-        GetDiagnosticsTask task = new GetDiagnosticsTask(getVersion(), params);
+        GetDiagnosticsTask task = new GetDiagnosticsTask(persistentTaskService, getVersion(), params);
 
         BackgroundService.with(executorService)
                          .forEach(task.getParams().getChargePointSelectList())
@@ -101,7 +103,7 @@ public class ChargePointService12_Client implements IChargePointService12_Client
     }
 
     public int reset(ResetParams params) {
-        ResetTask task = new ResetTask(getVersion(), params);
+        ResetTask task = new ResetTask(persistentTaskService, getVersion(), params);
 
         BackgroundService.with(executorService)
                          .forEach(task.getParams().getChargePointSelectList())
@@ -111,7 +113,7 @@ public class ChargePointService12_Client implements IChargePointService12_Client
     }
 
     public int updateFirmware(UpdateFirmwareParams params) {
-        UpdateFirmwareTask task = new UpdateFirmwareTask(getVersion(), params);
+        UpdateFirmwareTask task = new UpdateFirmwareTask(persistentTaskService, getVersion(), params);
 
         BackgroundService.with(executorService)
                          .forEach(task.getParams().getChargePointSelectList())
@@ -125,7 +127,7 @@ public class ChargePointService12_Client implements IChargePointService12_Client
     // -------------------------------------------------------------------------
 
     public int remoteStartTransaction(RemoteStartTransactionParams params) {
-        RemoteStartTransactionTask task = new RemoteStartTransactionTask(getVersion(), params);
+        RemoteStartTransactionTask task = new RemoteStartTransactionTask(persistentTaskService, getVersion(), params);
 
         BackgroundService.with(executorService)
                          .forFirst(task.getParams().getChargePointSelectList())

@@ -8,7 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
-public class PersistentTaskService {
+public class PersistentTaskService implements PersistentTaskResultCallback {
     private final PersistentTaskRepository taskRepository;
 
     public PersistentTask findById(Integer taskId) {

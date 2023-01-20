@@ -26,6 +26,7 @@ import de.rwth.idsg.steve.ocpp.CommunicationTask;
 import de.rwth.idsg.steve.ocpp.OcppCallback;
 import de.rwth.idsg.steve.ocpp.OcppVersion;
 import de.rwth.idsg.steve.web.dto.ocpp.ChangeConfigurationParams;
+import net.parkl.ocpp.service.cluster.PersistentTaskResultCallback;
 
 import javax.xml.ws.AsyncHandler;
 
@@ -35,8 +36,9 @@ import javax.xml.ws.AsyncHandler;
  */
 public class ChangeConfigurationTask extends CommunicationTask<ChangeConfigurationParams, String> {
 
-    public ChangeConfigurationTask(OcppVersion ocppVersion, ChangeConfigurationParams params) {
-        super(ocppVersion, params);
+    public ChangeConfigurationTask(PersistentTaskResultCallback persistentCallback,
+                                   OcppVersion ocppVersion, ChangeConfigurationParams params) {
+        super(persistentCallback, ocppVersion, params);
     }
 
     @Override

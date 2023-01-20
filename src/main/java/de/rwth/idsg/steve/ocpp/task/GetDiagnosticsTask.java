@@ -26,6 +26,7 @@ import de.rwth.idsg.steve.ocpp.CommunicationTask;
 import de.rwth.idsg.steve.ocpp.OcppCallback;
 import de.rwth.idsg.steve.ocpp.OcppVersion;
 import de.rwth.idsg.steve.web.dto.ocpp.GetDiagnosticsParams;
+import net.parkl.ocpp.service.cluster.PersistentTaskResultCallback;
 
 import javax.xml.ws.AsyncHandler;
 
@@ -37,8 +38,9 @@ import static de.rwth.idsg.steve.utils.DateTimeUtils.toDateTime;
  */
 public class GetDiagnosticsTask extends CommunicationTask<GetDiagnosticsParams, String> {
 
-    public GetDiagnosticsTask(OcppVersion ocppVersion, GetDiagnosticsParams params) {
-        super(ocppVersion, params);
+    public GetDiagnosticsTask(PersistentTaskResultCallback persistentCallback,
+                              OcppVersion ocppVersion, GetDiagnosticsParams params) {
+        super(persistentCallback, ocppVersion, params);
     }
 
     @Override

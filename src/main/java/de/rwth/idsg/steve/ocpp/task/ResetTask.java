@@ -26,6 +26,7 @@ import de.rwth.idsg.steve.ocpp.CommunicationTask;
 import de.rwth.idsg.steve.ocpp.OcppCallback;
 import de.rwth.idsg.steve.ocpp.OcppVersion;
 import de.rwth.idsg.steve.web.dto.ocpp.ResetParams;
+import net.parkl.ocpp.service.cluster.PersistentTaskResultCallback;
 
 import javax.xml.ws.AsyncHandler;
 
@@ -35,8 +36,8 @@ import javax.xml.ws.AsyncHandler;
  */
 public class ResetTask extends CommunicationTask<ResetParams, String> {
 
-    public ResetTask(OcppVersion ocppVersion, ResetParams params) {
-        super(ocppVersion, params);
+    public ResetTask(PersistentTaskResultCallback persistentCallback, OcppVersion ocppVersion, ResetParams params) {
+        super(persistentCallback, ocppVersion, params);
     }
 
     @Override

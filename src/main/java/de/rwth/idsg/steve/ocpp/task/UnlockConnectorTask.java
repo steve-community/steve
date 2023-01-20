@@ -26,6 +26,7 @@ import de.rwth.idsg.steve.ocpp.CommunicationTask;
 import de.rwth.idsg.steve.ocpp.OcppCallback;
 import de.rwth.idsg.steve.ocpp.OcppVersion;
 import de.rwth.idsg.steve.web.dto.ocpp.UnlockConnectorParams;
+import net.parkl.ocpp.service.cluster.PersistentTaskResultCallback;
 
 import javax.xml.ws.AsyncHandler;
 
@@ -35,8 +36,9 @@ import javax.xml.ws.AsyncHandler;
  */
 public class UnlockConnectorTask extends CommunicationTask<UnlockConnectorParams, String> {
 
-    public UnlockConnectorTask(OcppVersion ocppVersion, UnlockConnectorParams params) {
-        super(ocppVersion, params);
+    public UnlockConnectorTask(PersistentTaskResultCallback persistentCallback,
+                               OcppVersion ocppVersion, UnlockConnectorParams params) {
+        super(persistentCallback, ocppVersion, params);
     }
 
     @Override

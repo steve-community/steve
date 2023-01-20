@@ -31,6 +31,7 @@ import de.rwth.idsg.steve.web.dto.ocpp.ChargePointSelection;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
+import net.parkl.ocpp.service.cluster.PersistentTaskResultCallback;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -76,14 +77,14 @@ public abstract class CommunicationTask<S extends ChargePointSelection, RESPONSE
     // The default initial capacity is 10. We probably won't need that much.
     private final ArrayList<OcppCallback<RESPONSE>> callbackList = new ArrayList<>(2);
 
-    public CommunicationTask(OcppVersion ocppVersion, S params) {
-        this(ocppVersion, params, TaskOrigin.INTERNAL, "SteVe");
+    public CommunicationTask(PersistentTaskResultCallback persistentCallback, OcppVersion ocppVersion, S params) {
+        this(persistentCallback, ocppVersion, params, TaskOrigin.INTERNAL, "SteVe");
     }
 
     /**
      * Do not expose the constructor, make it package-private
      */
-    CommunicationTask(OcppVersion ocppVersion, S params, TaskOrigin origin, String caller) {
+    CommunicationTask(PersistentTaskResultCallback persistentCallback, OcppVersion ocppVersion, S params, TaskOrigin origin, String caller) {
         List<ChargePointSelect> cpsList = params.getChargePointSelectList();
 
         this.ocppVersion = ocppVersion;

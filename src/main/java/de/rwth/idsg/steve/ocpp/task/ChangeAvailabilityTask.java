@@ -26,6 +26,7 @@ import de.rwth.idsg.steve.ocpp.CommunicationTask;
 import de.rwth.idsg.steve.ocpp.OcppCallback;
 import de.rwth.idsg.steve.ocpp.OcppVersion;
 import de.rwth.idsg.steve.web.dto.ocpp.ChangeAvailabilityParams;
+import net.parkl.ocpp.service.cluster.PersistentTaskResultCallback;
 
 import javax.xml.ws.AsyncHandler;
 
@@ -35,8 +36,9 @@ import javax.xml.ws.AsyncHandler;
  */
 public class ChangeAvailabilityTask extends CommunicationTask<ChangeAvailabilityParams, String> {
 
-    public ChangeAvailabilityTask(OcppVersion ocppVersion, ChangeAvailabilityParams params) {
-        super(ocppVersion, params);
+    public ChangeAvailabilityTask(PersistentTaskResultCallback persistentCallback,
+                                  OcppVersion ocppVersion, ChangeAvailabilityParams params) {
+        super(persistentCallback, ocppVersion, params);
     }
 
     @Override

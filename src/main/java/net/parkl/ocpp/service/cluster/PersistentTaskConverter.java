@@ -21,6 +21,7 @@ public class PersistentTaskConverter {
     private final ReservationService reservationService;
     private final ChargingProfileService chargingProfileService;
     private final OcppTagService ocppTagService;
+    private final PersistentTaskService persistentTaskService;
 
     public PersistentTask toPersistentTask(CommunicationTask task) {
         PersistentTask persistentTask = new PersistentTask();
@@ -50,15 +51,15 @@ public class PersistentTaskConverter {
                     deserializeParams(persistentTask.getParams(), CancelReservationParams.class), reservationService);
         }
         if (className.equals(ChangeAvailabilityTask.class.getSimpleName())) {
-            return new ChangeAvailabilityTask(version,
+            return new ChangeAvailabilityTask(persistentTaskService, version,
                     deserializeParams(persistentTask.getParams(), ChangeAvailabilityParams.class));
         }
         if (className.equals(ChangeConfigurationTask.class.getSimpleName())) {
-            return new ChangeConfigurationTask(version,
+            return new ChangeConfigurationTask(persistentTaskService, version,
                     deserializeParams(persistentTask.getParams(), ChangeConfigurationParams.class));
         }
         if (className.equals(ClearCacheTask.class.getSimpleName())) {
-            return new ClearCacheTask(version,
+            return new ClearCacheTask(persistentTaskService, version,
                     deserializeParams(persistentTask.getParams(), MultipleChargePointSelect.class));
         }
         if (className.equals(ClearChargingProfileTask.class.getSimpleName())) {
@@ -79,7 +80,7 @@ public class PersistentTaskConverter {
                     deserializeParams(persistentTask.getParams(), GetConfigurationParams.class));
         }
         if (className.equals(GetDiagnosticsTask.class.getSimpleName())) {
-            return new GetDiagnosticsTask(version,
+            return new GetDiagnosticsTask(persistentTaskService, version,
                     deserializeParams(persistentTask.getParams(), GetDiagnosticsParams.class));
         }
         if (className.equals(GetLocalListVersionTask.class.getSimpleName())) {
@@ -87,11 +88,11 @@ public class PersistentTaskConverter {
                     deserializeParams(persistentTask.getParams(), MultipleChargePointSelect.class));
         }
         if (className.equals(RemoteStartTransactionTask.class.getSimpleName())) {
-            return new RemoteStartTransactionTask(version,
+            return new RemoteStartTransactionTask(persistentTaskService, version,
                     deserializeParams(persistentTask.getParams(), RemoteStartTransactionParams.class));
         }
         if (className.equals(RemoteStopTransactionTask.class.getSimpleName())) {
-            return new RemoteStopTransactionTask(version,
+            return new RemoteStopTransactionTask(persistentTaskService, version,
                     deserializeParams(persistentTask.getParams(), RemoteStopTransactionParams.class));
         }
         if (className.equals(ReserveNowTask.class.getSimpleName())) {
@@ -99,7 +100,7 @@ public class PersistentTaskConverter {
                     deserializeParams(persistentTask.getParams(), EnhancedReserveNowParams.class), reservationService);
         }
         if (className.equals(ResetTask.class.getSimpleName())) {
-            return new ResetTask(version,
+            return new ResetTask(persistentTaskService, version,
                     deserializeParams(persistentTask.getParams(), ResetParams.class));
         }
         if (className.equals(SendLocalListTask.class.getSimpleName())) {
@@ -116,11 +117,11 @@ public class PersistentTaskConverter {
                     deserializeParams(persistentTask.getParams(), TriggerMessageParams.class));
         }
         if (className.equals(UnlockConnectorTask.class.getSimpleName())) {
-            return new UnlockConnectorTask(version,
+            return new UnlockConnectorTask(persistentTaskService, version,
                     deserializeParams(persistentTask.getParams(), UnlockConnectorParams.class));
         }
         if (className.equals(UpdateFirmwareTask.class.getSimpleName())) {
-            return new UpdateFirmwareTask(version,
+            return new UpdateFirmwareTask(persistentTaskService, version,
                     deserializeParams(persistentTask.getParams(), UpdateFirmwareParams.class));
         }
         throw new IllegalArgumentException("Invalid task class name: "+className);

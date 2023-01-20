@@ -11,6 +11,7 @@ import de.rwth.idsg.steve.web.dto.ocpp.ChangeConfigurationParams;
 import de.rwth.idsg.steve.web.dto.ocpp.ConfigurationKeyEnum;
 import lombok.extern.slf4j.Slf4j;
 import net.parkl.ocpp.service.cluster.PersistentTaskService;
+import net.parkl.ocpp.service.cluster.PersistentTaskServiceImpl;
 import net.parkl.ocpp.service.config.AdvancedChargeBoxConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;

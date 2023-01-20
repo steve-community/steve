@@ -4,7 +4,7 @@ import de.rwth.idsg.steve.ocpp.*;
 import de.rwth.idsg.steve.ocpp.task.ChangeConfigurationTask;
 import de.rwth.idsg.steve.repository.dto.ChargePointSelect;
 import de.rwth.idsg.steve.service.ChargePointHelperService;
-import net.parkl.ocpp.service.cluster.PersistentTaskService;
+import net.parkl.ocpp.service.cluster.PersistentTaskServiceImpl;
 import net.parkl.ocpp.service.config.AdvancedChargeBoxConfiguration;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -28,7 +28,7 @@ public class HeartBeatServiceUnitTest {
         AdvancedChargeBoxConfiguration mockConfiguration = mock(AdvancedChargeBoxConfiguration.class);
         ChargePointService15_InvokerImpl mockChargePointService15_invoker = mock(ChargePointService15_InvokerImpl.class);
         ChargePointService16_InvokerImpl mockChargePointService16_invoker = mock(ChargePointService16_InvokerImpl.class);
-        PersistentTaskService mockPersistentTaskService = mock(PersistentTaskService.class);
+        PersistentTaskServiceImpl mockPersistentTaskService = mock(PersistentTaskServiceImpl.class);
 
         HeartBeatService heartBeatService =
                 new HeartBeatService(mockChargePointService15_invoker,
@@ -61,7 +61,7 @@ public class HeartBeatServiceUnitTest {
         AdvancedChargeBoxConfiguration mockConfiguration = mock(AdvancedChargeBoxConfiguration.class);
         ChargePointService15_InvokerImpl mockChargePointService15_invoker = mock(ChargePointService15_InvokerImpl.class);
         ChargePointService16_InvokerImpl mockChargePointService16_invoker = mock(ChargePointService16_InvokerImpl.class);
-        PersistentTaskService mockPersistentTaskService = mock(PersistentTaskService.class);
+        PersistentTaskServiceImpl mockPersistentTaskService = mock(PersistentTaskServiceImpl.class);
 
 
         HeartBeatService heartBeatService =
@@ -96,7 +96,7 @@ public class HeartBeatServiceUnitTest {
         AdvancedChargeBoxConfiguration mockConfiguration = mock(AdvancedChargeBoxConfiguration.class);
         ChargePointService15_InvokerImpl mockChargePointService15_invoker = mock(ChargePointService15_InvokerImpl.class);
         ChargePointService16_InvokerImpl mockChargePointService16_invoker = mock(ChargePointService16_InvokerImpl.class);
-        PersistentTaskService mockPersistentTaskService = mock(PersistentTaskService.class);
+        PersistentTaskServiceImpl mockPersistentTaskService = mock(PersistentTaskServiceImpl.class);
 
 
         HeartBeatService heartBeatService =

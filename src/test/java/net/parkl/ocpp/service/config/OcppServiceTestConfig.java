@@ -10,7 +10,7 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 
 
 @Configuration
-@ComponentScan(basePackages = {"net.parkl.ocpp","de.rwth.idsg.steve.repository"})
+@ComponentScan(basePackages = {"net.parkl.ocpp","de.rwth.idsg.steve.repository","de.rwth.idsg.steve.ocpp.ws.cluster"})
 @Import({ JpaTestConfig.class, OcppServiceTestAdditionalConfig.class})
 public class OcppServiceTestConfig {
 	

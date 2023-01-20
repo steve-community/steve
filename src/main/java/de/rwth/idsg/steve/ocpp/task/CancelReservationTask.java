@@ -26,6 +26,7 @@ import de.rwth.idsg.steve.ocpp.Ocpp15AndAboveTask;
 import de.rwth.idsg.steve.ocpp.OcppCallback;
 import de.rwth.idsg.steve.ocpp.OcppVersion;
 import de.rwth.idsg.steve.web.dto.ocpp.CancelReservationParams;
+import net.parkl.ocpp.service.cluster.PersistentTaskResultCallback;
 import net.parkl.ocpp.service.cs.ReservationService;
 import ocpp.cp._2012._06.CancelReservationRequest;
 import ocpp.cp._2012._06.CancelReservationResponse;
@@ -40,9 +41,10 @@ public class CancelReservationTask extends Ocpp15AndAboveTask<CancelReservationP
 
     private final ReservationService reservationService;
 
-    public CancelReservationTask(OcppVersion ocppVersion, CancelReservationParams params,
+    public CancelReservationTask(PersistentTaskResultCallback persistentCallback,
+                                 OcppVersion ocppVersion, CancelReservationParams params,
                                  ReservationService reservationService) {
-        super(ocppVersion, params);
+        super(persistentCallback, ocppVersion, params);
         this.reservationService = reservationService;
     }
 

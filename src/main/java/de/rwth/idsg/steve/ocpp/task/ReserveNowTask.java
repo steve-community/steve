@@ -27,6 +27,7 @@ import de.rwth.idsg.steve.ocpp.OcppCallback;
 import de.rwth.idsg.steve.ocpp.OcppVersion;
 import de.rwth.idsg.steve.ocpp.ws.data.OcppJsonError;
 import de.rwth.idsg.steve.service.dto.EnhancedReserveNowParams;
+import net.parkl.ocpp.service.cluster.PersistentTaskResultCallback;
 import net.parkl.ocpp.service.cs.ReservationService;
 
 import javax.xml.ws.AsyncHandler;
@@ -39,9 +40,10 @@ public class ReserveNowTask extends Ocpp15AndAboveTask<EnhancedReserveNowParams,
 
     private final ReservationService reservationService;
 
-    public ReserveNowTask(OcppVersion ocppVersion, EnhancedReserveNowParams params,
+    public ReserveNowTask(PersistentTaskResultCallback persistentCallback,
+                          OcppVersion ocppVersion, EnhancedReserveNowParams params,
                           ReservationService reservationService) {
-        super(ocppVersion, params);
+        super(persistentCallback, ocppVersion, params);
         this.reservationService = reservationService;
     }
 

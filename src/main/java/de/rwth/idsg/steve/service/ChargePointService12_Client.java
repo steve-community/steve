@@ -137,7 +137,7 @@ public class ChargePointService12_Client implements IChargePointService12_Client
     }
 
     public int remoteStopTransaction(RemoteStopTransactionParams params) {
-        RemoteStopTransactionTask task = new RemoteStopTransactionTask(getVersion(), params);
+        RemoteStopTransactionTask task = new RemoteStopTransactionTask(persistentTaskService, getVersion(), params);
 
         BackgroundService.with(executorService)
                          .forFirst(task.getParams().getChargePointSelectList())
@@ -147,7 +147,7 @@ public class ChargePointService12_Client implements IChargePointService12_Client
     }
 
     public int unlockConnector(UnlockConnectorParams params) {
-        UnlockConnectorTask task = new UnlockConnectorTask(getVersion(), params);
+        UnlockConnectorTask task = new UnlockConnectorTask(persistentTaskService, getVersion(), params);
 
         BackgroundService.with(executorService)
                          .forFirst(task.getParams().getChargePointSelectList())

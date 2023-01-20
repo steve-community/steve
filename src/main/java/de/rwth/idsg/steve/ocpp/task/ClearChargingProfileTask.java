@@ -28,6 +28,7 @@ import de.rwth.idsg.steve.ocpp.OcppVersion;
 import de.rwth.idsg.steve.web.dto.ocpp.ClearChargingProfileFilterType;
 import de.rwth.idsg.steve.web.dto.ocpp.ClearChargingProfileParams;
 import lombok.extern.slf4j.Slf4j;
+import net.parkl.ocpp.service.cluster.PersistentTaskResultCallback;
 import net.parkl.ocpp.service.cs.ChargingProfileService;
 import ocpp.cp._2015._10.ClearChargingProfileRequest;
 
@@ -42,10 +43,10 @@ public class ClearChargingProfileTask extends Ocpp16AndAboveTask<ClearChargingPr
 
     private final ChargingProfileService chargingProfileRepository;
 
-    public ClearChargingProfileTask(OcppVersion ocppVersion,
+    public ClearChargingProfileTask(PersistentTaskResultCallback persistentCallback, OcppVersion ocppVersion,
                                     ClearChargingProfileParams params,
                                     ChargingProfileService chargingProfileRepository) {
-        super(ocppVersion, params);
+        super(persistentCallback, ocppVersion, params);
         this.chargingProfileRepository = chargingProfileRepository;
     }
 

@@ -77,7 +77,7 @@ public class ChargePointService16_Client extends ChargePointService15_Client imp
     // -------------------------------------------------------------------------
 
     public int triggerMessage(TriggerMessageParams params) {
-        TriggerMessageTask task = new TriggerMessageTask(getVersion(), params);
+        TriggerMessageTask task = new TriggerMessageTask(persistentTaskService, getVersion(), params);
 
         BackgroundService.with(executorService)
                          .forEach(task.getParams().getChargePointSelectList())
@@ -92,7 +92,8 @@ public class ChargePointService16_Client extends ChargePointService15_Client imp
         checkAdditionalConstraints(params, details);
 
         EnhancedSetChargingProfileParams enhancedParams = new EnhancedSetChargingProfileParams(params, details);
-        SetChargingProfileTask task = new SetChargingProfileTask(getVersion(), enhancedParams, chargingProfileService);
+        SetChargingProfileTask task = new SetChargingProfileTask(persistentTaskService,
+                getVersion(), enhancedParams, chargingProfileService);
 
         BackgroundService.with(executorService)
                          .forEach(task.getParams().getChargePointSelectList())
@@ -102,7 +103,8 @@ public class ChargePointService16_Client extends ChargePointService15_Client imp
     }
 
     public int clearChargingProfile(ClearChargingProfileParams params) {
-        ClearChargingProfileTask task = new ClearChargingProfileTask(getVersion(), params, chargingProfileService);
+        ClearChargingProfileTask task = new ClearChargingProfileTask(persistentTaskService,
+                getVersion(), params, chargingProfileService);
 
         BackgroundService.with(executorService)
                          .forEach(task.getParams().getChargePointSelectList())
@@ -112,7 +114,8 @@ public class ChargePointService16_Client extends ChargePointService15_Client imp
     }
 
     public int getCompositeSchedule(GetCompositeScheduleParams params) {
-        GetCompositeScheduleTask task = new GetCompositeScheduleTask(getVersion(), params);
+        GetCompositeScheduleTask task = new GetCompositeScheduleTask(persistentTaskService,
+                getVersion(), params);
 
         BackgroundService.with(executorService)
                          .forEach(task.getParams().getChargePointSelectList())

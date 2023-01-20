@@ -24,6 +24,7 @@ import de.rwth.idsg.steve.web.dto.ocpp.ResetParams;
 import de.rwth.idsg.steve.web.dto.ocpp.UnlockConnectorParams;
 import de.rwth.idsg.steve.web.dto.ocpp.UpdateFirmwareParams;
 import net.parkl.ocpp.service.chargepoint.TestChargePoint;
+import net.parkl.ocpp.service.cluster.PersistentTaskService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -38,6 +39,7 @@ public class TestChargePointService12_Client implements IChargePointService12_Cl
 	
 	@Autowired protected ScheduledExecutorService executorService;
     @Autowired protected TaskStore taskStore;
+	@Autowired protected PersistentTaskService persistentTaskService;
 
     
     protected OcppVersion getVersion() {
@@ -50,7 +52,7 @@ public class TestChargePointService12_Client implements IChargePointService12_Cl
 	}
 
 	public int changeAvailability(ChangeAvailabilityParams params) {
-		ChangeAvailabilityTask task = new ChangeAvailabilityTask(getVersion(), params);
+		ChangeAvailabilityTask task = new ChangeAvailabilityTask(persistentTaskService, getVersion(), params);
 
 		BackgroundService.with(executorService).forEach(task.getParams().getChargePointSelectList())
 				.execute(c -> getOcpp12Invoker().changeAvailability(c, task));
@@ -59,7 +61,7 @@ public class TestChargePointService12_Client implements IChargePointService12_Cl
 	}
 
 	public int changeConfiguration(ChangeConfigurationParams params) {
-		ChangeConfigurationTask task = new ChangeConfigurationTask(getVersion(), params);
+		ChangeConfigurationTask task = new ChangeConfigurationTask(persistentTaskService, getVersion(), params);
 
 		BackgroundService.with(executorService).forEach(task.getParams().getChargePointSelectList())
 				.execute(c -> getOcpp12Invoker().changeConfiguration(c, task));
@@ -68,7 +70,7 @@ public class TestChargePointService12_Client implements IChargePointService12_Cl
 	}
 
 	public int clearCache(MultipleChargePointSelect params) {
-		ClearCacheTask task = new ClearCacheTask(getVersion(), params);
+		ClearCacheTask task = new ClearCacheTask(persistentTaskService, getVersion(), params);
 
 		BackgroundService.with(executorService).forEach(task.getParams().getChargePointSelectList())
 				.execute(c -> getOcpp12Invoker().clearCache(c, task));
@@ -77,7 +79,7 @@ public class TestChargePointService12_Client implements IChargePointService12_Cl
 	}
 
 	public int getDiagnostics(GetDiagnosticsParams params) {
-		GetDiagnosticsTask task = new GetDiagnosticsTask(getVersion(), params);
+		GetDiagnosticsTask task = new GetDiagnosticsTask(persistentTaskService, getVersion(), params);
 
 		BackgroundService.with(executorService).forEach(task.getParams().getChargePointSelectList())
 				.execute(c -> getOcpp12Invoker().getDiagnostics(c, task));
@@ -86,7 +88,7 @@ public class TestChargePointService12_Client implements IChargePointService12_Cl
 	}
 
 	public int reset(ResetParams params) {
-		ResetTask task = new ResetTask(getVersion(), params);
+		ResetTask task = new ResetTask(persistentTaskService, getVersion(), params);
 
 		BackgroundService.with(executorService).forEach(task.getParams().getChargePointSelectList())
 				.execute(c -> getOcpp12Invoker().reset(c, task));
@@ -95,7 +97,7 @@ public class TestChargePointService12_Client implements IChargePointService12_Cl
 	}
 
 	public int updateFirmware(UpdateFirmwareParams params) {
-		UpdateFirmwareTask task = new UpdateFirmwareTask(getVersion(), params);
+		UpdateFirmwareTask task = new UpdateFirmwareTask(persistentTaskService, getVersion(), params);
 
 		BackgroundService.with(executorService).forEach(task.getParams().getChargePointSelectList())
 				.execute(c -> getOcpp12Invoker().updateFirmware(c, task));
@@ -108,7 +110,7 @@ public class TestChargePointService12_Client implements IChargePointService12_Cl
 	// -------------------------------------------------------------------------
 
 	public int remoteStartTransaction(RemoteStartTransactionParams params) {
-		RemoteStartTransactionTask task = new RemoteStartTransactionTask(getVersion(), params);
+		RemoteStartTransactionTask task = new RemoteStartTransactionTask(persistentTaskService, getVersion(), params);
 
 		BackgroundService.with(executorService).forFirst(task.getParams().getChargePointSelectList())
 				.execute(c -> getOcpp12Invoker().remoteStartTransaction(c, task));
@@ -117,7 +119,7 @@ public class TestChargePointService12_Client implements IChargePointService12_Cl
 	}
 
 	public int remoteStopTransaction(RemoteStopTransactionParams params) {
-		RemoteStopTransactionTask task = new RemoteStopTransactionTask(getVersion(), params);
+		RemoteStopTransactionTask task = new RemoteStopTransactionTask(persistentTaskService, getVersion(), params);
 
 		BackgroundService.with(executorService).forFirst(task.getParams().getChargePointSelectList())
 				.execute(c -> getOcpp12Invoker().remoteStopTransaction(c, task));
@@ -126,7 +128,7 @@ public class TestChargePointService12_Client implements IChargePointService12_Cl
 	}
 
 	public int unlockConnector(UnlockConnectorParams params) {
-		UnlockConnectorTask task = new UnlockConnectorTask(getVersion(), params);
+		UnlockConnectorTask task = new UnlockConnectorTask(persistentTaskService, getVersion(), params);
 
 		BackgroundService.with(executorService).forFirst(task.getParams().getChargePointSelectList())
 				.execute(c -> getOcpp12Invoker().unlockConnector(c, task));

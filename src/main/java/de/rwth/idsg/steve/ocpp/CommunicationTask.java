@@ -68,6 +68,10 @@ public abstract class CommunicationTask<S extends ChargePointSelection, RESPONSE
     @Setter
     private DateTime endTimestamp;
 
+    @Getter
+    @Setter
+    private int taskId;
+
     private final AtomicInteger errorCount = new AtomicInteger(0);
     private final AtomicInteger responseCount = new AtomicInteger(0);
 

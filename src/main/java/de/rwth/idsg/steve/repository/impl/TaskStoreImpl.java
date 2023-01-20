@@ -109,6 +109,7 @@ public class TaskStoreImpl implements TaskStore {
         } else {
             taskId = atomicInteger.incrementAndGet();
         }
+        task.setTaskId(taskId);
         lookupTable.put(taskId, task);
         return taskId;
     }

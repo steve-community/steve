@@ -45,7 +45,7 @@ public class TestChargePointService15_Client extends TestChargePointService12_Cl
     // -------------------------------------------------------------------------
 
     public int dataTransfer(DataTransferParams params) {
-        DataTransferTask task = new DataTransferTask(getVersion(), params);
+        DataTransferTask task = new DataTransferTask(persistentTaskService,getVersion(), params);
 
         BackgroundService.with(executorService)
                          .forEach(task.getParams().getChargePointSelectList())
@@ -55,7 +55,7 @@ public class TestChargePointService15_Client extends TestChargePointService12_Cl
     }
 
     public int getConfiguration(GetConfigurationParams params) {
-        GetConfigurationTask task = new GetConfigurationTask(getVersion(), params);
+        GetConfigurationTask task = new GetConfigurationTask(persistentTaskService, getVersion(), params);
 
         BackgroundService.with(executorService)
                          .forEach(task.getParams().getChargePointSelectList())
@@ -65,7 +65,7 @@ public class TestChargePointService15_Client extends TestChargePointService12_Cl
     }
 
     public int getLocalListVersion(MultipleChargePointSelect params) {
-        GetLocalListVersionTask task = new GetLocalListVersionTask(getVersion(), params);
+        GetLocalListVersionTask task = new GetLocalListVersionTask(persistentTaskService, getVersion(), params);
 
         BackgroundService.with(executorService)
                          .forEach(task.getParams().getChargePointSelectList())
@@ -75,7 +75,7 @@ public class TestChargePointService15_Client extends TestChargePointService12_Cl
     }
 
     public int sendLocalList(SendLocalListParams params) {
-        SendLocalListTask task = new SendLocalListTask(getVersion(), params, ocppTagService);
+        SendLocalListTask task = new SendLocalListTask(persistentTaskService, getVersion(), params, ocppTagService);
 
         BackgroundService.with(executorService)
                          .forEach(task.getParams().getChargePointSelectList())
@@ -103,7 +103,7 @@ public class TestChargePointService15_Client extends TestChargePointService12_Cl
         String parentIdTag = userService.getParentIdtag(params.getIdTag());
 
         EnhancedReserveNowParams enhancedParams = new EnhancedReserveNowParams(params, reservationId, parentIdTag);
-        ReserveNowTask task = new ReserveNowTask(getVersion(), enhancedParams, reservationService);
+        ReserveNowTask task = new ReserveNowTask(persistentTaskService, getVersion(), enhancedParams, reservationService);
 
         BackgroundService.with(executorService)
                          .forFirst(task.getParams().getChargePointSelectList())
@@ -113,7 +113,7 @@ public class TestChargePointService15_Client extends TestChargePointService12_Cl
     }
 
     public int cancelReservation(CancelReservationParams params) {
-        CancelReservationTask task = new CancelReservationTask(getVersion(), params, reservationService);
+        CancelReservationTask task = new CancelReservationTask(persistentTaskService, getVersion(), params, reservationService);
 
         BackgroundService.with(executorService)
                          .forFirst(task.getParams().getChargePointSelectList())

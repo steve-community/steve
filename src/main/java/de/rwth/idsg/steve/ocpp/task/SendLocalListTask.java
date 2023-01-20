@@ -28,6 +28,7 @@ import de.rwth.idsg.steve.ocpp.OcppVersion;
 import de.rwth.idsg.steve.service.OcppTagService;
 import de.rwth.idsg.steve.web.dto.ocpp.SendLocalListParams;
 import de.rwth.idsg.steve.web.dto.ocpp.SendLocalListUpdateType;
+import net.parkl.ocpp.service.cluster.PersistentTaskResultCallback;
 import ocpp.cp._2015._10.AuthorizationData;
 
 import javax.xml.ws.AsyncHandler;
@@ -44,8 +45,9 @@ public class SendLocalListTask extends Ocpp15AndAboveTask<SendLocalListParams, S
 
     private final ocpp.cp._2015._10.SendLocalListRequest request;
 
-    public SendLocalListTask(OcppVersion ocppVersion, SendLocalListParams params, OcppTagService ocppTagService) {
-        super(ocppVersion, params);
+    public SendLocalListTask(PersistentTaskResultCallback persistentCallback,
+                             OcppVersion ocppVersion, SendLocalListParams params, OcppTagService ocppTagService) {
+        super(persistentCallback, ocppVersion, params);
         this.request = createOcpp16Request(ocppTagService);
     }
 

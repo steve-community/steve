@@ -21,7 +21,7 @@ public class TestChargePointService16_Client extends TestChargePointService15_Cl
     // -------------------------------------------------------------------------
 
     public int triggerMessage(TriggerMessageParams params) {
-        TriggerMessageTask task = new TriggerMessageTask(getVersion(), params);
+        TriggerMessageTask task = new TriggerMessageTask(persistentTaskService, getVersion(), params);
 
         BackgroundService.with(executorService)
                          .forEach(task.getParams().getChargePointSelectList())

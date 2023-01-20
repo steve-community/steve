@@ -29,6 +29,7 @@ import de.rwth.idsg.steve.ocpp.OcppVersion;
 import de.rwth.idsg.steve.web.dto.ocpp.GetConfigurationParams;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import net.parkl.ocpp.service.cluster.PersistentTaskResultCallback;
 import ocpp.cp._2012._06.GetConfigurationRequest;
 import ocpp.cp._2012._06.GetConfigurationResponse;
 
@@ -53,8 +54,9 @@ public class GetConfigurationTask extends Ocpp15AndAboveTask<GetConfigurationPar
                     + "<br>"
                     + "%s";
 
-    public GetConfigurationTask(OcppVersion ocppVersion, GetConfigurationParams params) {
-        super(ocppVersion, params);
+    public GetConfigurationTask(PersistentTaskResultCallback persistentCallback,
+                                OcppVersion ocppVersion, GetConfigurationParams params) {
+        super(persistentCallback, ocppVersion, params);
     }
 
     @Override

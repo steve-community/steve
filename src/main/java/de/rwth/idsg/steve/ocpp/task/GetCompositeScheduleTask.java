@@ -27,6 +27,7 @@ import de.rwth.idsg.steve.ocpp.OcppCallback;
 import de.rwth.idsg.steve.ocpp.OcppVersion;
 import de.rwth.idsg.steve.ocpp.RequestResult;
 import de.rwth.idsg.steve.web.dto.ocpp.GetCompositeScheduleParams;
+import net.parkl.ocpp.service.cluster.PersistentTaskResultCallback;
 import ocpp.cp._2015._10.GetCompositeScheduleRequest;
 import ocpp.cp._2015._10.GetCompositeScheduleResponse;
 import ocpp.cp._2015._10.GetCompositeScheduleStatus;
@@ -39,9 +40,10 @@ import javax.xml.ws.AsyncHandler;
  */
 public class GetCompositeScheduleTask extends Ocpp16AndAboveTask<GetCompositeScheduleParams, GetCompositeScheduleResponse> {
 
-    public GetCompositeScheduleTask(OcppVersion ocppVersion,
+    public GetCompositeScheduleTask(PersistentTaskResultCallback persistentCallback,
+                                    OcppVersion ocppVersion,
                                     GetCompositeScheduleParams params) {
-        super(ocppVersion, params);
+        super(persistentCallback, ocppVersion, params);
     }
 
     @Override

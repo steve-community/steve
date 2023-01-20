@@ -28,6 +28,7 @@ import de.rwth.idsg.steve.ocpp.OcppVersion;
 import de.rwth.idsg.steve.web.dto.ocpp.DataTransferParams;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import net.parkl.ocpp.service.cluster.PersistentTaskResultCallback;
 import ocpp.cp._2012._06.DataTransferResponse;
 
 import javax.xml.ws.AsyncHandler;
@@ -38,8 +39,9 @@ import javax.xml.ws.AsyncHandler;
  */
 public class DataTransferTask extends Ocpp15AndAboveTask<DataTransferParams, DataTransferTask.ResponseWrapper> {
 
-    public DataTransferTask(OcppVersion ocppVersion, DataTransferParams params) {
-        super(ocppVersion, params);
+    public DataTransferTask(PersistentTaskResultCallback persistentCallback,
+                            OcppVersion ocppVersion, DataTransferParams params) {
+        super(persistentCallback, ocppVersion, params);
     }
 
     @Override

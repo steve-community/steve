@@ -28,6 +28,7 @@ import de.rwth.idsg.steve.ocpp.OcppVersion;
 import de.rwth.idsg.steve.service.dto.EnhancedSetChargingProfileParams;
 import de.rwth.idsg.steve.utils.DateTimeConverter;
 import net.parkl.ocpp.entities.OcppChargingProfile;
+import net.parkl.ocpp.service.cluster.PersistentTaskResultCallback;
 import net.parkl.ocpp.service.cs.ChargingProfileService;
 import ocpp.cp._2015._10.*;
 
@@ -43,10 +44,11 @@ public class SetChargingProfileTask extends Ocpp16AndAboveTask<EnhancedSetChargi
 
     private final ChargingProfileService chargingProfileRepository;
 
-    public SetChargingProfileTask(OcppVersion ocppVersion,
+    public SetChargingProfileTask(PersistentTaskResultCallback persistentCallback,
+                                  OcppVersion ocppVersion,
                                   EnhancedSetChargingProfileParams params,
                                   ChargingProfileService chargingProfileRepository) {
-        super(ocppVersion, params);
+        super(persistentCallback, ocppVersion, params);
         this.chargingProfileRepository = chargingProfileRepository;
     }
 

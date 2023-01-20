@@ -4,6 +4,7 @@ import de.rwth.idsg.steve.ocpp.OcppVersion;
 import de.rwth.idsg.steve.ocpp.task.RemoteStartTransactionTask;
 import de.rwth.idsg.steve.web.dto.ocpp.RemoteStartTransactionParams;
 import lombok.extern.slf4j.Slf4j;
+import net.parkl.ocpp.service.cluster.PersistentTaskResultCallback;
 
 import java.util.concurrent.CountDownLatch;
 
@@ -12,10 +13,11 @@ public class TestRemoteStartTransactionTask extends RemoteStartTransactionTask {
 
     private CountDownLatch finishedLatch;
 
-    public TestRemoteStartTransactionTask(OcppVersion ocppVersion,
+    public TestRemoteStartTransactionTask(PersistentTaskResultCallback persistentCallback,
+                                          OcppVersion ocppVersion,
                                           RemoteStartTransactionParams params,
                                           CountDownLatch responseLatch) {
-        super(ocppVersion, params);
+        super(persistentCallback, ocppVersion, params);
         finishedLatch = new CountDownLatch(1);
         this.addCallback(new DefaultOcppCallback<String>() {
             @Override

@@ -22,13 +22,23 @@
  */
 package de.rwth.idsg.steve.repository.impl;
 
+import de.rwth.idsg.ocpp.jaxb.RequestType;
 import de.rwth.idsg.steve.SteveException;
 import de.rwth.idsg.steve.ocpp.CommunicationTask;
+import de.rwth.idsg.steve.ocpp.OcppCallback;
+import de.rwth.idsg.steve.ocpp.OcppProtocol;
+import de.rwth.idsg.steve.ocpp.OcppVersion;
+import de.rwth.idsg.steve.ocpp.task.ChangeConfigurationTask;
+import de.rwth.idsg.steve.ocpp.ws.cluster.ClusteredWebSocketConfig;
 import de.rwth.idsg.steve.repository.TaskStore;
 import de.rwth.idsg.steve.repository.dto.TaskOverview;
 import lombok.extern.slf4j.Slf4j;
+import net.parkl.ocpp.entities.PersistentTask;
+import net.parkl.ocpp.service.cluster.PersistentTaskService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import javax.xml.ws.AsyncHandler;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -41,6 +51,10 @@ import java.util.stream.Collectors;
 @Slf4j
 @Repository
 public class TaskStoreImpl implements TaskStore {
+    @Autowired
+    private ClusteredWebSocketConfig clusteredWebSocketConfig;
+    @Autowired
+    private PersistentTaskService persistentTaskService;
 
     private final AtomicInteger atomicInteger = new AtomicInteger(0);
     private final ConcurrentHashMap<Integer, CommunicationTask> lookupTable = new ConcurrentHashMap<>();
@@ -67,6 +81,9 @@ public class TaskStoreImpl implements TaskStore {
     @Override
     public CommunicationTask get(Integer taskId) {
         CommunicationTask r = lookupTable.get(taskId);
+        if (r == null && clusteredWebSocketConfig.isClusteredWebSocketSessionEnabled()) {
+            r = loadPersistentTask(taskId);
+        }
         if (r == null) {
             throw new SteveException("There is no task with taskId '%s'", taskId);
         } else {
@@ -74,11 +91,60 @@ public class TaskStoreImpl implements TaskStore {
         }
     }
 
+    private CommunicationTask loadPersistentTask(Integer taskId) {
+        log.info("Loading persistent task: {}", taskId);
+        PersistentTask persistentTask = persistentTaskService.findById(taskId);
+        return new CommunicationTask(OcppVersion.fromValue(persistentTask.getOcppVersion())) {
+            @Override
+            public OcppCallback defaultCallback() {
+                return null;
+            }
+
+            @Override
+            public RequestType getOcpp12Request() {
+                return null;
+            }
+
+            @Override
+            public RequestType getOcpp15Request() {
+                return null;
+            }
+
+            @Override
+            public RequestType getOcpp16Request() {
+                return null;
+            }
+
+            @Override
+            public AsyncHandler getOcpp12Handler(String chargeBoxId, boolean remote) {
+                return null;
+            }
+
+            @Override
+            public AsyncHandler getOcpp15Handler(String chargeBoxId, boolean remote) {
+                return null;
+            }
+
+            @Override
+            public AsyncHandler getOcpp16Handler(String chargeBoxId, boolean remote) {
+                return null;
+            }
+        };
+    }
+
     @Override
     public Integer add(CommunicationTask task) {
-        int taskId = atomicInteger.incrementAndGet();
+        int taskId;
+        if (clusteredWebSocketConfig.isClusteredWebSocketSessionEnabled()) {
+            taskId = savePersistentTask(task);
+        } else {
+            taskId = atomicInteger.incrementAndGet();
+        }
         lookupTable.put(taskId, task);
         return taskId;
+    }
+
+    private int savePersistentTask(CommunicationTask task) {
     }
 
     @Override

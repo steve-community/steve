@@ -22,11 +22,11 @@
  */
 package de.rwth.idsg.steve.service.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import de.rwth.idsg.steve.repository.dto.ChargePointSelect;
 import de.rwth.idsg.steve.web.dto.ocpp.ChargePointSelection;
 import de.rwth.idsg.steve.web.dto.ocpp.ReserveNowParams;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import lombok.*;
 
 import java.util.List;
 
@@ -35,13 +35,16 @@ import java.util.List;
  * @since 09.03.18
  */
 @Getter
-@RequiredArgsConstructor
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class EnhancedReserveNowParams implements ChargePointSelection {
-    private final ReserveNowParams reserveNowParams;
-    private final int reservationId;
-    private final String parentIdTag;
+    private ReserveNowParams reserveNowParams;
+    private int reservationId;
+    private String parentIdTag;
 
     @Override
+    @JsonIgnore
     public List<ChargePointSelect> getChargePointSelectList() {
         return reserveNowParams.getChargePointSelectList();
     }

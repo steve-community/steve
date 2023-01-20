@@ -22,20 +22,22 @@
  */
 package de.rwth.idsg.steve.repository.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import de.rwth.idsg.steve.ocpp.OcppTransport;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import lombok.*;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 29.12.2014
  */
-@RequiredArgsConstructor
+@AllArgsConstructor
+@NoArgsConstructor
 @Getter
+@Setter
 public final class ChargePointSelect {
-    private final OcppTransport ocppTransport;
-    private final String chargeBoxId;
-    private final String endpointAddress;
+    private OcppTransport ocppTransport;
+    private String chargeBoxId;
+    private String endpointAddress;
 
     public ChargePointSelect(OcppTransport ocppTransport, String chargeBoxId) {
         // Provide a non-null value (or placeholder if you will) to frontend for JSON charge points.
@@ -43,10 +45,12 @@ public final class ChargePointSelect {
         this(ocppTransport, chargeBoxId, "-");
     }
 
+    @JsonIgnore
     public boolean isEndpointAddressSet() {
         return !("-".equals(endpointAddress));
     }
 
+    @JsonIgnore
     public boolean isSoap() {
         return OcppTransport.SOAP == ocppTransport;
     }

@@ -22,6 +22,7 @@
  */
 package de.rwth.idsg.steve.web.dto.ocpp;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -46,6 +47,7 @@ public class GetConfigurationParams extends MultipleChargePointSelect {
 
     private String commaSeparatedCustomConfKeys;
 
+    @JsonIgnore
     public List<String> getAllKeys() {
         List<String> fromPredefined = Objects.requireNonNullElse(confKeyList, Collections.emptyList());
         List<String> fromCustom = splitByComma(commaSeparatedCustomConfKeys);

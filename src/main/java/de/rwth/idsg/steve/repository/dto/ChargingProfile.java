@@ -22,6 +22,7 @@
  */
 package de.rwth.idsg.steve.repository.dto;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -62,7 +63,7 @@ public class ChargingProfile {
     }
 
     @Getter
-    @RequiredArgsConstructor
+    @AllArgsConstructor
     public static final class Details {
         private final OcppChargingProfile profile;
         private final List<ChargingSchedulePeriod> periods;

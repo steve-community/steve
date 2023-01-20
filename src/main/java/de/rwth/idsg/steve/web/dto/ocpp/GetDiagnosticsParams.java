@@ -22,6 +22,7 @@
  */
 package de.rwth.idsg.steve.web.dto.ocpp;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
 import org.joda.time.LocalDateTime;
@@ -53,6 +54,7 @@ public class GetDiagnosticsParams extends MultipleChargePointSelect {
     private LocalDateTime stop;
 
     @AssertTrue(message = "Stop Date/Time must be after Start Date/Time")
+    @JsonIgnore
     public boolean isValid() {
         return !(start != null && stop != null) || stop.isAfter(start);
     }

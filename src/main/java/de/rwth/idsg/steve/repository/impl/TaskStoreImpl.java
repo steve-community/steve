@@ -34,6 +34,7 @@ import de.rwth.idsg.steve.repository.TaskStore;
 import de.rwth.idsg.steve.repository.dto.TaskOverview;
 import lombok.extern.slf4j.Slf4j;
 import net.parkl.ocpp.entities.PersistentTask;
+import net.parkl.ocpp.service.cluster.PersistentTaskConverter;
 import net.parkl.ocpp.service.cluster.PersistentTaskService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -55,6 +56,9 @@ public class TaskStoreImpl implements TaskStore {
     private ClusteredWebSocketConfig clusteredWebSocketConfig;
     @Autowired
     private PersistentTaskService persistentTaskService;
+
+    @Autowired
+    private PersistentTaskConverter persistentTaskConverter;
 
     private final AtomicInteger atomicInteger = new AtomicInteger(0);
     private final ConcurrentHashMap<Integer, CommunicationTask> lookupTable = new ConcurrentHashMap<>();
@@ -94,42 +98,7 @@ public class TaskStoreImpl implements TaskStore {
     private CommunicationTask loadPersistentTask(Integer taskId) {
         log.info("Loading persistent task: {}", taskId);
         PersistentTask persistentTask = persistentTaskService.findById(taskId);
-        return new CommunicationTask(OcppVersion.fromValue(persistentTask.getOcppVersion())) {
-            @Override
-            public OcppCallback defaultCallback() {
-                return null;
-            }
-
-            @Override
-            public RequestType getOcpp12Request() {
-                return null;
-            }
-
-            @Override
-            public RequestType getOcpp15Request() {
-                return null;
-            }
-
-            @Override
-            public RequestType getOcpp16Request() {
-                return null;
-            }
-
-            @Override
-            public AsyncHandler getOcpp12Handler(String chargeBoxId, boolean remote) {
-                return null;
-            }
-
-            @Override
-            public AsyncHandler getOcpp15Handler(String chargeBoxId, boolean remote) {
-                return null;
-            }
-
-            @Override
-            public AsyncHandler getOcpp16Handler(String chargeBoxId, boolean remote) {
-                return null;
-            }
-        };
+        return persistentTaskConverter.fromPersistentTask(persistentTask);
     }
 
     @Override
@@ -145,6 +114,9 @@ public class TaskStoreImpl implements TaskStore {
     }
 
     private int savePersistentTask(CommunicationTask task) {
+        PersistentTask persistentTask = persistentTaskConverter.toPersistentTask(task);
+        PersistentTask saved = persistentTaskService.save(persistentTask);
+        return saved.getPersistentTaskId();
     }
 
     @Override

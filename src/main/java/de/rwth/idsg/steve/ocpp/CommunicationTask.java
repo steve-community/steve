@@ -30,6 +30,7 @@ import de.rwth.idsg.steve.utils.StringUtils;
 import de.rwth.idsg.steve.web.dto.ocpp.ChargePointSelection;
 import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.Setter;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,6 +53,7 @@ public abstract class CommunicationTask<S extends ChargePointSelection, RESPONSE
 
     private final Logger log = LoggerFactory.getLogger(getClass());
 
+    @Getter
     private final OcppVersion ocppVersion;
     private final String operationName;
     private final TaskOrigin origin;
@@ -62,6 +64,7 @@ public abstract class CommunicationTask<S extends ChargePointSelection, RESPONSE
     private final int resultSize;
 
     private final DateTime startTimestamp = DateTime.now();
+    @Setter
     private DateTime endTimestamp;
 
     private final AtomicInteger errorCount = new AtomicInteger(0);
@@ -118,6 +121,12 @@ public abstract class CommunicationTask<S extends ChargePointSelection, RESPONSE
         }
     }
 
+    public void addPersistentResponse(String chargeBoxId, String response) {
+        resultMap.get(chargeBoxId).setResponse(response);
+        responseCount.incrementAndGet();
+        
+    }
+
     public void addNewError(String chargeBoxId, String errorMessage) {
         resultMap.get(chargeBoxId).setErrorMessage(errorMessage);
 
@@ -126,6 +135,11 @@ public abstract class CommunicationTask<S extends ChargePointSelection, RESPONSE
                 endTimestamp = DateTime.now();
             }
         }
+    }
+    public void addPersistentError(String chargeBoxId, String errorMessage) {
+        resultMap.get(chargeBoxId).setErrorMessage(errorMessage);
+        errorCount.incrementAndGet();
+
     }
 
     protected void success(String chargeBoxId, RESPONSE response) {

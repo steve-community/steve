@@ -22,6 +22,7 @@
  */
 package de.rwth.idsg.steve.web.dto.ocpp;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.google.common.base.Strings;
 import de.rwth.idsg.steve.SteveException;
 import lombok.Getter;
@@ -54,6 +55,7 @@ public class ChangeConfigurationParams extends MultipleChargePointSelect {
     private String value;
 
     @AssertTrue(message = "Custom Configuration Key cannot be left blank")
+    @JsonIgnore
     public boolean isValidCustom() {
         if (keyType == ConfigurationKeyType.CUSTOM) {
             return !Strings.isNullOrEmpty(customConfKey);
@@ -63,6 +65,7 @@ public class ChangeConfigurationParams extends MultipleChargePointSelect {
     }
 
     @AssertTrue(message = "Configuration Key is required")
+    @JsonIgnore
     public boolean isValidPredefined() {
         if (keyType == ConfigurationKeyType.PREDEFINED) {
             return confKey != null;
@@ -71,6 +74,7 @@ public class ChangeConfigurationParams extends MultipleChargePointSelect {
         }
     }
 
+    @JsonIgnore
     public String getKey() {
         if (keyType == ConfigurationKeyType.PREDEFINED) {
             return confKey;
@@ -96,7 +100,7 @@ public class ChangeConfigurationParams extends MultipleChargePointSelect {
     // -------------------------------------------------------------------------
 
     @RequiredArgsConstructor
-    private enum ConfigurationKeyType {
+    public enum ConfigurationKeyType {
         PREDEFINED("Predefined"),
         CUSTOM("Custom");
 

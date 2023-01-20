@@ -2,6 +2,7 @@ package net.parkl.ocpp.entities;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.joda.time.DateTime;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -19,4 +20,12 @@ public class PersistentTask implements Serializable {
     @Column(name = "ocpp_version", length = 255, nullable = false)
     private String ocppVersion;
 
+    @Column(name = "class_name", length = 255, nullable = false)
+    private String className;
+
+    @Column(name = "params", nullable = false)
+    private String params;
+
+    @Column(name = "end_timestamp", nullable = true)
+    private DateTime endTimestamp;
 }

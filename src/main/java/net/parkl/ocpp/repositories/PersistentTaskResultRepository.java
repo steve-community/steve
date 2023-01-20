@@ -22,6 +22,9 @@ import net.parkl.ocpp.entities.PersistentTask;
 import net.parkl.ocpp.entities.PersistentTaskResult;
 import org.springframework.data.repository.CrudRepository;
 
+import java.util.List;
+
 public interface PersistentTaskResultRepository extends CrudRepository<PersistentTaskResult, Integer>{
 
+    List<PersistentTaskResult> findByTask(PersistentTask persistentTask);
 }

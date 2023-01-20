@@ -1,7 +1,26 @@
+/*
+ * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
+ * Copyright (C) 2013-2019 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
+ * All Rights Reserved.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
 package de.rwth.idsg.steve.web.controller;
 
 import de.rwth.idsg.steve.NotificationFeature;
 
+import de.rwth.idsg.steve.config.WebEnvironment;
 import de.rwth.idsg.steve.service.EndpointService;
 import de.rwth.idsg.steve.service.MailService;
 import de.rwth.idsg.steve.web.dto.SettingsForm;
@@ -22,7 +41,7 @@ import net.parkl.ocpp.service.cs.SettingsService;
 /**
  * One controller for about and settings pages
  *
- * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
+ * @author Sevket Goekay <sevketgokay@gmail.com>
  */
 @Controller
 @RequestMapping(value = "/manager")
@@ -76,7 +95,7 @@ public class AboutSettingsController {
 
         settingsService.update(settingsForm);
         mailService.loadSettingsFromDB();
-        return "redirect:/manager/settings";
+        return "redirect:"+ WebEnvironment.getContextRoot()+"/manager/settings";
     }
 
     @RequestMapping(params = "testMail", value = SETTINGS_PATH, method = RequestMethod.POST)
@@ -91,6 +110,6 @@ public class AboutSettingsController {
         mailService.loadSettingsFromDB();
         mailService.sendTestMail();
 
-        return "redirect:/manager/settings";
+        return "redirect:"+WebEnvironment.getContextRoot()+"/manager/settings";
     }
 }

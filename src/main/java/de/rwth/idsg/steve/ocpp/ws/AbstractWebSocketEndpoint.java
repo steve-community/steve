@@ -1,6 +1,6 @@
 /*
- * SteVe - SteckdosenVerwaltung - https://github.com/RWTH-i5-IDSG/steve
- * Copyright (C) 2013-2020 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
+ * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
+ * Copyright (C) 2013-2019 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
  * All Rights Reserved.
  *
  * Parkl Digital Technologies
@@ -24,22 +24,27 @@ package de.rwth.idsg.steve.ocpp.ws;
 
 import com.google.common.base.Strings;
 import de.rwth.idsg.steve.SteveConfiguration;
-import de.rwth.idsg.steve.config.WebSocketConfigurationConstants;
+import de.rwth.idsg.steve.config.WebSocketConfiguration;
+import de.rwth.idsg.steve.ocpp.OcppTransport;
 import de.rwth.idsg.steve.ocpp.OcppVersion;
 import de.rwth.idsg.steve.ocpp.ws.cluster.ClusteredInvokerClient;
 import de.rwth.idsg.steve.ocpp.ws.cluster.ClusteredWebSocketSessionStore;
 import de.rwth.idsg.steve.ocpp.ws.data.CommunicationContext;
 import de.rwth.idsg.steve.ocpp.ws.data.SessionContext;
 import de.rwth.idsg.steve.ocpp.ws.pipeline.IncomingPipeline;
+import de.rwth.idsg.steve.service.notification.OcppStationWebSocketConnected;
+import de.rwth.idsg.steve.service.notification.OcppStationWebSocketDisconnected;
 import de.rwth.idsg.steve.repository.TaskStore;
-import de.rwth.idsg.steve.service.OcppNotificationService;
+import net.parkl.ocpp.entities.OcppChargeBox;
 import net.parkl.ocpp.service.cs.ChargePointService;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.web.socket.*;
 
 import javax.annotation.PostConstruct;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Deque;
 import java.util.List;
 import java.util.Map;
@@ -49,17 +54,18 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
 /**
- * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
+ * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 17.03.2015
  */
-public abstract class AbstractWebSocketEndpoint extends ConcurrentWebSocketHandler {
+public abstract class AbstractWebSocketEndpoint extends ConcurrentWebSocketHandler implements SubProtocolCapable {
 
     @Autowired private ScheduledExecutorService service;
     @Autowired private FutureResponseContextStore futureResponseContextStore;
-    @Autowired private OcppNotificationService notificationService;
+    @Autowired private ApplicationEventPublisher applicationEventPublisher;
 
     @Autowired private ChargePointService chargePointService;
     @Autowired private ClusteredInvokerClient clusteredInvokerClient;
+
 
     @Autowired
     private SteveConfiguration config;
@@ -76,7 +82,7 @@ public abstract class AbstractWebSocketEndpoint extends ConcurrentWebSocketHandl
     private IncomingPipeline pipeline;
 
     public abstract OcppVersion getVersion();
-    
+
     @PostConstruct
     public void setup() {
     	sessionContextStore = new SessionContextStore(config, clusteredWebSocketSessionStore);
@@ -85,8 +91,13 @@ public abstract class AbstractWebSocketEndpoint extends ConcurrentWebSocketHandl
     public void init(IncomingPipeline pipeline) {
         this.pipeline = pipeline;
 
-        connectedCallbackList.add((chargeBoxId) -> notificationService.ocppStationWebSocketConnected(chargeBoxId));
-        disconnectedCallbackList.add((chargeBoxId) -> notificationService.ocppStationWebSocketDisconnected(chargeBoxId));
+        connectedCallbackList.add((chargeBoxId) -> applicationEventPublisher.publishEvent(new OcppStationWebSocketConnected(chargeBoxId)));
+        disconnectedCallbackList.add((chargeBoxId) -> applicationEventPublisher.publishEvent(new OcppStationWebSocketDisconnected(chargeBoxId)));
+    }
+
+    @Override
+    public List<String> getSubProtocols() {
+        return Collections.singletonList(getVersion().getValue());
     }
 
     @Override
@@ -109,7 +120,7 @@ public abstract class AbstractWebSocketEndpoint extends ConcurrentWebSocketHandl
         String incomingString = webSocketMessage.getPayload();
         String chargeBoxId = getChargeBoxId(session);
 
-        // https://github.com/RWTH-i5-IDSG/steve/issues/66
+        // https://github.com/steve-community/steve/issues/66
         if (Strings.isNullOrEmpty(incomingString)) {
             WebSocketLogger.receivedEmptyText(chargeBoxId, session);
             return;
@@ -133,13 +144,14 @@ public abstract class AbstractWebSocketEndpoint extends ConcurrentWebSocketHandl
         String chargeBoxId = getChargeBoxId(session);
 
         WebSocketLogger.connected(chargeBoxId, session);
+        chargePointService.updateOcppProtocol(chargeBoxId, getVersion().toProtocol(OcppTransport.JSON));
 
         // Just to keep the connection alive, such that the servers do not close
         // the connection because of a idle timeout, we ping-pong at fixed intervals.
         ScheduledFuture pingSchedule = service.scheduleAtFixedRate(
                 new PingTask(chargeBoxId, session),
-                WebSocketConfigurationConstants.PING_INTERVAL,
-                WebSocketConfigurationConstants.PING_INTERVAL,
+                WebSocketConfiguration.PING_INTERVAL,
+                WebSocketConfiguration.PING_INTERVAL,
                 TimeUnit.MINUTES);
 
         futureResponseContextStore.addSession(session);

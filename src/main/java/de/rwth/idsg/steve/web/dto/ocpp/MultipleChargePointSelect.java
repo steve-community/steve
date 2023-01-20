@@ -1,6 +1,6 @@
 /*
- * SteVe - SteckdosenVerwaltung - https://github.com/RWTH-i5-IDSG/steve
- * Copyright (C) 2013-2020 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
+ * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
+ * Copyright (C) 2013-2019 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
  * All Rights Reserved.
  *
  * Parkl Digital Technologies
@@ -29,10 +29,11 @@ import lombok.Setter;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import java.util.Collections;
 import java.util.List;
 
 /**
- * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
+ * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 29.12.2014
  */
 @Getter
@@ -41,5 +42,5 @@ public class MultipleChargePointSelect implements ChargePointSelection {
 
     @NotNull(message = "Charge point selection is required")
     @Size(min = 1, message = "Please select at least {min} charge point")
-    private List<ChargePointSelect> chargePointSelectList;
+    private List<ChargePointSelect> chargePointSelectList = Collections.emptyList();
 }

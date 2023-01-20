@@ -1,7 +1,7 @@
 <%--
 
-    SteVe - SteckdosenVerwaltung - https://github.com/RWTH-i5-IDSG/steve
-    Copyright (C) 2013-2020 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
+    SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
+    Copyright (C) 2013-2019 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
     All Rights Reserved.
 
     This program is free software: you can redistribute it and/or modify
@@ -25,7 +25,7 @@
     <table class="userInput">
         <tr><td>Vendor ID (String):</td><td><form:input path="vendorId" /></td></tr>
         <tr><td>Message ID (String):</td><td><form:input path="messageId" placeholder="optional" /></td></tr>
-        <tr><td>Data (Text):</td><td><form:input path="data" placeholder="optional" /></td></tr>
+        <tr><td>Data (Text):</td><td><form:textarea path="data" placeholder="optional" /></td></tr>
         <tr><td></td><td><div class="submit-button"><input type="submit" value="Perform"></div></td></tr>
     </table>
 </form:form>

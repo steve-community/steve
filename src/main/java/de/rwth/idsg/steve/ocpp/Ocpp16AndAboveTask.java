@@ -1,6 +1,6 @@
 /*
- * SteVe - SteckdosenVerwaltung - https://github.com/RWTH-i5-IDSG/steve
- * Copyright (C) 2013-2020 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
+ * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
+ * Copyright (C) 2013-2019 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
  * All Rights Reserved.
  *
  * Parkl Digital Technologies
@@ -29,7 +29,7 @@ import de.rwth.idsg.steve.web.dto.ocpp.ChargePointSelection;
 import javax.xml.ws.AsyncHandler;
 
 /**
- * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
+ * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 30.10.2018
  */
 public abstract class Ocpp16AndAboveTask<S extends ChargePointSelection, RESPONSE> extends Ocpp15AndAboveTask<S, RESPONSE> {
@@ -46,7 +46,7 @@ public abstract class Ocpp16AndAboveTask<S extends ChargePointSelection, RESPONS
 
     @Deprecated
     @Override
-    public <T extends ResponseType> AsyncHandler<T> getOcpp15Handler(String chargeBoxId, boolean remote) {
+    public <T extends ResponseType> AsyncHandler<T> getOcpp15Handler(String chargeBoxId) {
         throw new RuntimeException("Not supported");
     }
 }

@@ -1,6 +1,6 @@
 /*
- * SteVe - SteckdosenVerwaltung - https://github.com/RWTH-i5-IDSG/steve
- * Copyright (C) 2013-2020 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
+ * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
+ * Copyright (C) 2013-2019 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
  * All Rights Reserved.
  *
  * Parkl Digital Technologies
@@ -22,13 +22,15 @@
  */
 package de.rwth.idsg.steve.repository.dto;
 
+import de.rwth.idsg.steve.ocpp.OcppProtocol;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.Setter;
 import org.joda.time.DateTime;
 
 /**
  *
- * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
+ * @author Sevket Goekay <sevketgokay@gmail.com>
  *
  */
 @Getter
@@ -41,4 +43,11 @@ public final class ConnectorStatus {
     // String version above, which is for representation on frontend
     private final DateTime statusTimestamp;
 
+    private final OcppProtocol ocppProtocol;
+
+    // This is true, if the chargeBox this connector belongs to is a WS/JSON station
+    // and it is disconnected at the moment of building this DTO.
+    @Setter
+    @Builder.Default
+    private boolean jsonAndDisconnected = false;
 }

@@ -1,6 +1,6 @@
 /*
- * SteVe - SteckdosenVerwaltung - https://github.com/RWTH-i5-IDSG/steve
- * Copyright (C) 2013-2020 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
+ * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
+ * Copyright (C) 2013-2019 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
  * All Rights Reserved.
  *
  * Parkl Digital Technologies
@@ -34,7 +34,7 @@ import java.util.function.Consumer;
 /**
  * For outgoing CALLs, triggered by the user.
  *
- * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
+ * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 27.03.2015
  */
 @Component

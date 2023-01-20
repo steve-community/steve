@@ -1,6 +1,6 @@
 /*
- * SteVe - SteckdosenVerwaltung - https://github.com/RWTH-i5-IDSG/steve
- * Copyright (C) 2013-2020 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
+ * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
+ * Copyright (C) 2013-2019 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
  * All Rights Reserved.
  *
  * Parkl Digital Technologies
@@ -36,7 +36,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
+ * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 13.03.2018
  */
 public class SetChargingProfileTask extends Ocpp16AndAboveTask<EnhancedSetChargingProfileParams, String> {
@@ -54,10 +54,10 @@ public class SetChargingProfileTask extends Ocpp16AndAboveTask<EnhancedSetChargi
     public OcppCallback<String> defaultCallback() {
         return new DefaultOcppCallback<String>() {
             @Override
-            public void success(String chargeBoxId, String statusValue, boolean remote) {
+            public void success(String chargeBoxId, String statusValue) {
                 addNewResponse(chargeBoxId, statusValue);
 
-                if (!remote && "Accepted".equalsIgnoreCase(statusValue)) {
+                if ("Accepted".equalsIgnoreCase(statusValue)) {
                     int chargingProfilePk = params.getDetails().getProfile().getChargingProfilePk();
                     int connectorId = params.getDelegate().getConnectorId();
                     chargingProfileRepository.setProfile(chargingProfilePk, chargeBoxId, connectorId);
@@ -76,7 +76,7 @@ public class SetChargingProfileTask extends Ocpp16AndAboveTask<EnhancedSetChargi
                        .map(k -> {
                            ChargingSchedulePeriod p = new ChargingSchedulePeriod();
                            p.setStartPeriod(k.getStartPeriodInSeconds());
-                           p.setLimit(k.getPowerLimitInAmperes());
+                           p.setLimit(k.getPowerLimit());
                            p.setNumberPhases(k.getNumberPhases());
                            return p;
                        })
@@ -105,10 +105,10 @@ public class SetChargingProfileTask extends Ocpp16AndAboveTask<EnhancedSetChargi
     }
 
     @Override
-    public AsyncHandler<ocpp.cp._2015._10.SetChargingProfileResponse> getOcpp16Handler(String chargeBoxId, boolean remote) {
+    public AsyncHandler<ocpp.cp._2015._10.SetChargingProfileResponse> getOcpp16Handler(String chargeBoxId) {
         return res -> {
             try {
-                success(chargeBoxId, res.get().getStatus().value(),remote);
+                success(chargeBoxId, res.get().getStatus().value());
             } catch (Exception e) {
                 failed(chargeBoxId, e);
             }

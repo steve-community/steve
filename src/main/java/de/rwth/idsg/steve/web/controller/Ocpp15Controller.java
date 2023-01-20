@@ -1,5 +1,24 @@
+/*
+ * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
+ * Copyright (C) 2013-2019 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
+ * All Rights Reserved.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
 package de.rwth.idsg.steve.web.controller;
 
+import de.rwth.idsg.steve.config.WebEnvironment;
 import de.rwth.idsg.steve.ocpp.OcppVersion;
 import de.rwth.idsg.steve.service.ChargePointService12_Client;
 import de.rwth.idsg.steve.service.ChargePointService15_Client;
@@ -26,7 +45,7 @@ import java.util.Map;
 import static de.rwth.idsg.steve.web.dto.ocpp.ConfigurationKeyReadWriteEnum.RW;
 
 /**
- * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
+ * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 07.11.2014
  */
 @Controller
@@ -51,7 +70,7 @@ public class Ocpp15Controller extends Ocpp12Controller {
     // -------------------------------------------------------------------------
     // Helpers
     // -------------------------------------------------------------------------
-    
+
     protected ChargePointService15_Client getClient15() {
         return client15;
     }
@@ -75,7 +94,7 @@ public class Ocpp15Controller extends Ocpp12Controller {
 
     @Override
     protected String getRedirectPath() {
-        return "redirect:/manager/operations/v1.5/ChangeAvailability";
+        return "redirect:"+ WebEnvironment.getContextRoot()+"/manager/operations/v1.5/ChangeAvailability";
     }
 
     @Override

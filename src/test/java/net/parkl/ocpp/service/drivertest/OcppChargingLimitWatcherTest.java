@@ -4,8 +4,8 @@ import net.parkl.ocpp.entities.OcppChargingProcess;
 import net.parkl.ocpp.service.driver.ChargeBoxDriver;
 import net.parkl.ocpp.service.driver.ChargingDriver;
 import net.parkl.ocpp.service.driver.DriverTestBase;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -18,7 +18,7 @@ public class OcppChargingLimitWatcherTest extends DriverTestBase {
     private ChargeBoxDriver chargeBoxDriver;
     private ChargingDriver chargingDriver;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         chargeBoxDriver = driverFactory.createChargeBoxDriver();
         chargingDriver = driverFactory.createChargingDriver();

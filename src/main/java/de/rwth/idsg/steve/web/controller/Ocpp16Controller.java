@@ -1,6 +1,6 @@
 /*
- * SteVe - SteckdosenVerwaltung - https://github.com/RWTH-i5-IDSG/steve
- * Copyright (C) 2013-2020 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
+ * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
+ * Copyright (C) 2013-2019 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
  * All Rights Reserved.
  *
  * Parkl Digital Technologies
@@ -22,6 +22,7 @@
  */
 package de.rwth.idsg.steve.web.controller;
 
+import de.rwth.idsg.steve.config.WebEnvironment;
 import de.rwth.idsg.steve.ocpp.OcppVersion;
 import de.rwth.idsg.steve.service.ChargePointService12_Client;
 import de.rwth.idsg.steve.service.ChargePointService15_Client;
@@ -48,7 +49,7 @@ import static de.rwth.idsg.steve.web.dto.ocpp.ConfigurationKeyReadWriteEnum.R;
 import static de.rwth.idsg.steve.web.dto.ocpp.ConfigurationKeyReadWriteEnum.RW;
 
 /**
- * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
+ * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 15.03.2018
  */
 @Controller
@@ -122,7 +123,7 @@ public class Ocpp16Controller extends Ocpp15Controller {
 
     @Override
     protected String getRedirectPath() {
-        return "redirect:/manager/operations/v1.6/ChangeAvailability";
+        return "redirect:"+ WebEnvironment.getContextRoot()+"/manager/operations/v1.6/ChangeAvailability";
     }
 
     @Override

@@ -1,6 +1,6 @@
 /*
- * SteVe - SteckdosenVerwaltung - https://github.com/RWTH-i5-IDSG/steve
- * Copyright (C) 2013-2020 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
+ * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
+ * Copyright (C) 2013-2019 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
  * All Rights Reserved.
  *
  * Parkl Digital Technologies
@@ -54,9 +54,9 @@ import static org.apache.cxf.ws.addressing.JAXWSAConstants.ADDRESSING_PROPERTIES
  * 2. Intercepts incoming OCPP messages to update the endpoint address ("From" field of the WS-A header) in DB.
  * And the absence of the field is not a deal breaker anymore. But, as a side effect, the user will not be able
  * to send commands to the charging station, since the DB call to list the charge points will filter it out. See
- * {@link ChargePointService#getChargePointSelect(OcppProtocol)}.
+ * {@link ChargePointService#getChargePointSelect(OcppProtocol, java.util.List)}.
  *
- * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
+ * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 15.06.2015
  */
 @Slf4j

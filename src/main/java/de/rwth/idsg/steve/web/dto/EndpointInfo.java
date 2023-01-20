@@ -1,5 +1,25 @@
+/*
+ * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
+ * Copyright (C) 2013-2019 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
+ * All Rights Reserved.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
 package de.rwth.idsg.steve.web.dto;
 
+import lombok.Getter;
+import lombok.ToString;
 
 import de.rwth.idsg.steve.config.WebEnvironment;
 
@@ -8,9 +28,11 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
+ * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 06.08.2018
  */
+@Getter
+@ToString
 public class EndpointInfo implements IEndpointInfo{
    private static final EndpointInfo INSTANCE=new EndpointInfo();
 
@@ -22,7 +44,8 @@ public class EndpointInfo implements IEndpointInfo{
     private final ItemsWithInfo ocppSoap = new ItemsWithInfo("SOAP endpoint for OCPP", WebEnvironment.getContextRoot()+"/services/CentralSystemService");
     private final ItemsWithInfo ocppWebSocket = new ItemsWithInfo("WebSocket/JSON endpoint for OCPP", WebEnvironment.getContextRoot()+"/websocket/CentralSystemService/(chargeBoxId)");
 
-
+    @Getter
+    @ToString
     public static class ItemsWithInfo {
         private final String info;
         private final String dataElementPostFix;
@@ -39,32 +62,5 @@ public class EndpointInfo implements IEndpointInfo{
                             .map(s -> s + dataElementPostFix)
                             .collect(Collectors.toList());
         }
-
-		public String getInfo() {
-			return info;
-		}
-
-		public String getDataElementPostFix() {
-			return dataElementPostFix;
-		}
-
-		public List<String> getData() {
-			return data;
-		}
     }
-
-
-	public ItemsWithInfo getWebInterface() {
-		return webInterface;
-	}
-
-
-	public ItemsWithInfo getOcppSoap() {
-		return ocppSoap;
-	}
-
-
-	public ItemsWithInfo getOcppWebSocket() {
-		return ocppWebSocket;
-	}
 }

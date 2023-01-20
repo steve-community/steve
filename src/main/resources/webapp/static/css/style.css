@@ -40,6 +40,7 @@ table.userInputFullPage td:first-child {width: 50%; text-align: right; padding: 
 table.sll { padding-bottom: 40px; }
 table.res {
 	border-collapse: collapse;
+	table-layout:fixed;
 }
 table.res th {
 	text-align: center;
@@ -60,6 +61,7 @@ table.res td {
 	padding: 5px;
 	text-align: center;
 	width: auto;
+	word-wrap: break-word;
 }
 /*** Table for charge point details ***/
 table.cpd {
@@ -289,7 +291,6 @@ ul.navigation ul li a {
 }
 .main { height: auto; min-height: 100%; }
 .main-wrapper {
-	padding-bottom: 70px;
 	height: auto; 
 }
 .top-banner {
@@ -322,23 +323,6 @@ ul.navigation ul li a {
 .submit-button {
 	margin-top: 20px;
 }
-.footer {
-	width: 80%;
-	border-left: 1px solid #CCC;
-	border-top: 1px solid #CCC;
-	border-right: 1px solid #CCC;
-	border-top-left-radius: 4px;
-	border-top-right-radius: 4px;
-	position: relative;
-	padding: 12px;
-	margin-top: -70px;
-	margin-right: auto;
-	margin-left: auto;
-	height: 60px;
-	text-align: center;
-	background: #fff;
-}
-.footer a { margin-right: 10px; }
 .right-content { margin: 0 0 0 230px; border-left: 1px solid #CCC; padding-left:12px; }
 .right-content div { display:none; }
 .right-content div:first-child { display:block; }

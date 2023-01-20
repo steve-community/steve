@@ -1,6 +1,6 @@
 /*
- * SteVe - SteckdosenVerwaltung - https://github.com/RWTH-i5-IDSG/steve
- * Copyright (C) 2013-2020 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
+ * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
+ * Copyright (C) 2013-2019 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
  * All Rights Reserved.
  *
  * Parkl Digital Technologies
@@ -23,10 +23,12 @@
 package de.rwth.idsg.steve.web.controller;
 
 
+import de.rwth.idsg.steve.config.WebEnvironment;
 import de.rwth.idsg.steve.ocpp.OcppProtocol;
 import de.rwth.idsg.steve.repository.dto.ChargePoint;
 import de.rwth.idsg.steve.service.ChargePointHelperService;
 import de.rwth.idsg.steve.utils.ControllerHelper;
+import de.rwth.idsg.steve.utils.mapper.ChargePointDetailsMapper;
 import de.rwth.idsg.steve.web.dto.ChargePointBatchInsertForm;
 import de.rwth.idsg.steve.web.dto.ChargePointForm;
 import de.rwth.idsg.steve.web.dto.ChargePointQueryForm;
@@ -49,7 +51,7 @@ import java.util.stream.Collectors;
 
 /**
  *
- * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
+ * @author Sevket Goekay <sevketgokay@gmail.com>
  *
  */
 @Controller
@@ -84,7 +86,7 @@ public class ChargePointsController {
     protected static final String ADD_BATCH_PATH = "/add/batch";
 
     // We need the slash at the end to support chargeBoxIds with dots etc. in them
-    // Issue: https://github.com/RWTH-i5-IDSG/steve/issues/270
+    // Issue: https://github.com/steve-community/steve/issues/270
     // Solution: https://stackoverflow.com/a/18378817
     protected static final String UNKNOWN_REMOVE_PATH = "/unknown/remove/{chargeBoxId}/";
     protected static final String UNKNOWN_ADD_PATH = "/unknown/add/{chargeBoxId}/";
@@ -114,19 +116,7 @@ public class ChargePointsController {
     @RequestMapping(value = DETAILS_PATH, method = RequestMethod.GET)
     public String getDetails(@PathVariable("chargeBoxPk") int chargeBoxPk, Model model) {
         ChargePoint.Details cp = chargePointService.getDetails(chargeBoxPk);
-
-        ChargePointForm form = new ChargePointForm();
-        form.setChargeBoxPk(cp.getChargeBox().getChargeBoxPk());
-        form.setChargeBoxId(cp.getChargeBox().getChargeBoxId());
-        form.setNote(cp.getChargeBox().getNote());
-        form.setDescription(cp.getChargeBox().getDescription());
-        form.setLocationLatitude(cp.getChargeBox().getLocationLatitude());
-        form.setLocationLongitude(cp.getChargeBox().getLocationLongitude());
-        form.setInsertConnectorStatusAfterTransactionMsg(cp.getChargeBox().getInsertConnectorStatusAfterTransactionMsg());
-        form.setAdminAddress(cp.getChargeBox().getAdminAddress());
-        form.setRegistrationStatus(cp.getChargeBox().getRegistrationStatus());
-
-        form.setAddress(ControllerHelper.recordToDto(cp.getAddress()));
+        ChargePointForm form = ChargePointDetailsMapper.mapToForm(cp);
 
         model.addAttribute("chargePointForm", form);
         model.addAttribute("cp", cp);
@@ -211,7 +201,7 @@ public class ChargePointsController {
 
     @RequestMapping(value = UNKNOWN_REMOVE_PATH, method = RequestMethod.POST)
     public String removeUnknownChargeBoxId(@PathVariable("chargeBoxId") String chargeBoxId) {
-        chargePointHelperService.removeUnknown(chargeBoxId);
+        chargePointHelperService.removeUnknown(Collections.singletonList(chargeBoxId));
         return toOverview();
     }
 
@@ -234,7 +224,7 @@ public class ChargePointsController {
     }
 
     protected String toOverview() {
-        return "redirect:/manager/chargepoints";
+        return "redirect:"+ WebEnvironment.getContextRoot()+"/manager/chargepoints";
     }
 
     // -------------------------------------------------------------------------
@@ -250,7 +240,7 @@ public class ChargePointsController {
 
     private void add(ChargePointForm form) {
         chargePointService.addChargePoint(form);
-        chargePointHelperService.removeUnknown(form.getChargeBoxId());
+        chargePointHelperService.removeUnknown(Collections.singletonList(form.getChargeBoxId()));
     }
 
     private void add(List<String> idList) {

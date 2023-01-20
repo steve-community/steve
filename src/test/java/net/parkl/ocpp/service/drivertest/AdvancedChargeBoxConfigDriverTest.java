@@ -2,8 +2,8 @@ package net.parkl.ocpp.service.drivertest;
 
 import net.parkl.ocpp.service.driver.AdvancedChargeBoxConfigDriver;
 import net.parkl.ocpp.service.driver.DriverTestBase;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -11,7 +11,7 @@ public class AdvancedChargeBoxConfigDriverTest extends DriverTestBase {
 
     private AdvancedChargeBoxConfigDriver configDriver;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         configDriver = driverFactory.createAdvancedChargeBoxDriver();
     }

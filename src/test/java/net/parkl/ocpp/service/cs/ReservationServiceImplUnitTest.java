@@ -4,15 +4,16 @@ import net.parkl.ocpp.entities.OcppReservation;
 import net.parkl.ocpp.entities.TransactionStart;
 import net.parkl.ocpp.repositories.OcppReservationRepository;
 import net.parkl.ocpp.service.config.AdvancedChargeBoxConfiguration;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.mockito.Mockito.*;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class ReservationServiceImplUnitTest {
     @InjectMocks
     private ReservationServiceImpl reservationService;
@@ -49,14 +50,17 @@ public class ReservationServiceImplUnitTest {
         verify(reservationRepository, times(1)).save(any());
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void markReservationAsUsedThrowsException() {
-        TransactionStart testTransactionStart = mock(TransactionStart.class);
-        int reservationId = 32;
-        String testChargeBoxId = "chargeBoxId";
+        Assertions.assertThrows(IllegalArgumentException.class,() -> {
+            TransactionStart testTransactionStart = mock(TransactionStart.class);
+            int reservationId = 32;
+            String testChargeBoxId = "chargeBoxId";
 
-        when(config.checkReservationId(testChargeBoxId)).thenReturn(true);
+            when(config.checkReservationId(testChargeBoxId)).thenReturn(true);
 
-        reservationService.markReservationAsUsed(testTransactionStart, reservationId, testChargeBoxId);
+            reservationService.markReservationAsUsed(testTransactionStart, reservationId, testChargeBoxId);
+        });
+
     }
 }

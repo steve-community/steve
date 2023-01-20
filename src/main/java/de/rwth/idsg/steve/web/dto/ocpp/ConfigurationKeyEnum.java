@@ -1,6 +1,6 @@
 /*
- * SteVe - SteckdosenVerwaltung - https://github.com/RWTH-i5-IDSG/steve
- * Copyright (C) 2013-2020 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
+ * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
+ * Copyright (C) 2013-2019 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
  * All Rights Reserved.
  *
  * Parkl Digital Technologies
@@ -34,7 +34,7 @@ import static de.rwth.idsg.steve.web.dto.ocpp.ConfigurationKeyReadWriteEnum.R;
 import static de.rwth.idsg.steve.web.dto.ocpp.ConfigurationKeyReadWriteEnum.RW;
 
 /**
- * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
+ * @author Sevket Goekay <sevketgokay@gmail.com>
  * @author David Rerimassie <david@rerimassie.nl>
  * @since 02.01.2015
  */
@@ -107,7 +107,17 @@ public enum ConfigurationKeyEnum {
     ChargingScheduleAllowedChargingRateUnit("comma separated list", R, newHashSet(V_16)),
     ChargingScheduleMaxPeriods("integer", R, newHashSet(V_16)),
     ConnectorSwitch3to1PhaseSupported("boolean", R, newHashSet(V_16)),
-    MaxChargingProfilesInstalled("integer", R, newHashSet(V_16));
+    MaxChargingProfilesInstalled("integer", R, newHashSet(V_16)),
+
+    // -------------------------------------------------------------------------
+    // Recommended additional configuration keys for OCMF by SAFE e.V.
+    // see https://github.com/SAFE-eV/OCMF-Open-Charge-Metering-Format/blob/master/OCMF-de.md
+    // -------------------------------------------------------------------------
+
+    // StopTransactionSignatureFormat Read or Read-Write is up to Charge Point implementation so set to RW for now
+    StopTransactionSignatureFormat("string; specific to OCMF", RW, newHashSet(V_15, V_16)),
+    StopTransactionSignatureContexts("comma separated list; specific to OCMF", RW, newHashSet(V_15, V_16)),
+    MeterValuesSignatureContexts("comma separated list; specific to OCMF", RW, newHashSet(V_15, V_16));
 
     private final String value;
     private final String text;

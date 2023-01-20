@@ -36,8 +36,8 @@ import net.parkl.ocpp.entities.*;
 import net.parkl.ocpp.module.esp.EmobilityServiceProvider;
 import net.parkl.ocpp.module.esp.model.*;
 import net.parkl.ocpp.repositories.ChargingConsumptionStateRepository;
+import net.parkl.ocpp.repositories.ConnectorLastStatusRepository;
 import net.parkl.ocpp.repositories.ConnectorRepository;
-import net.parkl.ocpp.repositories.ConnectorStatusRepository;
 import net.parkl.ocpp.repositories.OcppChargeBoxRepository;
 import net.parkl.ocpp.service.config.AdvancedChargeBoxConfiguration;
 import net.parkl.ocpp.service.cs.*;
@@ -49,10 +49,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import static de.rwth.idsg.steve.web.dto.ocpp.AvailabilityType.INOPERATIVE;
 import static de.rwth.idsg.steve.web.dto.ocpp.AvailabilityType.OPERATIVE;
@@ -92,7 +89,7 @@ public class OcppMiddlewareImpl implements OcppMiddleware {
     @Autowired
     private ConnectorRepository connectorRepo;
     @Autowired
-    private ConnectorStatusRepository connectorStatusRepo;
+    private ConnectorLastStatusRepository connectorLastStatusRepository;
     @Autowired
     private ChargePointHelperService chargePointHelperService;
     @Autowired
@@ -972,6 +969,13 @@ public class OcppMiddlewareImpl implements OcppMiddleware {
     public ESPChargerStatusResult getChargerStatuses() {
         log.info("Querying all connector statuses...");
         List<Connector> connectors = connectorRepo.findAllByOrderByConnectorPkAsc();
+        Iterable<ConnectorLastStatus> statuses = connectorLastStatusRepository.findAll();
+        Map<Integer, ConnectorLastStatus> statusMap = new HashMap<>();
+
+        for (ConnectorLastStatus status : statuses) {
+            statusMap.put(status.getConnectorPk(), status);
+        }
+
         ESPChargerStatusResult ret = ESPChargerStatusResult.builder().status(new ArrayList<>()).build();
 
 
@@ -979,7 +983,7 @@ public class OcppMiddlewareImpl implements OcppMiddleware {
             ESPChargerStatus dto = ESPChargerStatus.builder().
                     externalChargerId(String.format("%s_%d", connector.getChargeBoxId(), connector.getConnectorId())).build();
 
-            ConnectorStatus status = connectorStatusRepo.findFirstByConnectorOrderByStatusTimestampDesc(connector);
+            ConnectorLastStatus status = statusMap.get(connector.getConnectorPk());
             if (status != null) {
                 switch (status.getStatus()) {
                     case "Available":
@@ -1008,7 +1012,8 @@ public class OcppMiddlewareImpl implements OcppMiddleware {
             throw new IllegalArgumentException("OcppConnector was null");
         }
 
-        ConnectorStatus connectorStatus = connectorStatusRepo.findFirstByConnectorOrderByStatusTimestampDesc(connector);
+        ConnectorLastStatus connectorStatus = connectorLastStatusRepository.findById(connector.getConnectorPk())
+                .orElse(null);
 
         if (connectorStatus != null) {
             switch (connectorStatus.getStatus()) {

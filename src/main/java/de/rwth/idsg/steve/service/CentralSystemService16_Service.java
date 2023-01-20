@@ -1,6 +1,6 @@
 /*
- * SteVe - SteckdosenVerwaltung - https://github.com/RWTH-i5-IDSG/steve
- * Copyright (C) 2013-2020 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
+ * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
+ * Copyright (C) 2013-2019 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
  * All Rights Reserved.
  *
  * Parkl Digital Technologies
@@ -27,6 +27,10 @@ import de.rwth.idsg.steve.repository.dto.InsertConnectorStatusParams;
 import de.rwth.idsg.steve.repository.dto.InsertTransactionParams;
 import de.rwth.idsg.steve.repository.dto.UpdateChargeboxParams;
 import de.rwth.idsg.steve.repository.dto.UpdateTransactionParams;
+import de.rwth.idsg.steve.service.notification.OccpStationBooted;
+import de.rwth.idsg.steve.service.notification.OcppStationStatusFailure;
+import de.rwth.idsg.steve.service.notification.OcppTransactionEnded;
+import de.rwth.idsg.steve.service.notification.OcppTransactionStarted;
 import lombok.extern.slf4j.Slf4j;
 import net.parkl.ocpp.entities.OcppChargingProcess;
 import net.parkl.ocpp.entities.TransactionStart;
@@ -38,16 +42,16 @@ import net.parkl.ocpp.service.cs.*;
 import ocpp.cs._2015._10.*;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 
 import static net.parkl.ocpp.entities.TransactionStopEventActor.station;
 import static ocpp.cs._2015._10.AuthorizationStatus.INVALID;
-import static ocpp.cs._2015._10.DataTransferStatus.ACCEPTED;
 
 /**
- * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
+ * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 13.03.2018
  */
 @Slf4j
@@ -67,7 +71,8 @@ public class CentralSystemService16_Service {
     @Autowired
     private OcppTagService ocppTagService;
     @Autowired
-    private OcppNotificationService notificationService;
+    private ApplicationEventPublisher applicationEventPublisher;
+
     @Autowired
     private ChargePointHelperService chargePointHelperService;
     @Autowired
@@ -81,7 +86,7 @@ public class CentralSystemService16_Service {
                                                      OcppProtocol ocppProtocol) {
         log.info("Boot notification: {}", chargeBoxIdentity);
         Optional<RegistrationStatus> status = chargePointHelperService.getRegistrationStatus(chargeBoxIdentity);
-        notificationService.ocppStationBooted(chargeBoxIdentity, status);
+        applicationEventPublisher.publishEvent(new OccpStationBooted(chargeBoxIdentity, status));
         DateTime now = DateTime.now();
 
         if (status.isEmpty()) {
@@ -151,8 +156,8 @@ public class CentralSystemService16_Service {
         connectorService.insertConnectorStatus(params);
 
         if (parameters.getStatus() == ChargePointStatus.FAULTED) {
-            notificationService.ocppStationStatusFailure(
-                    chargeBoxIdentity, parameters.getConnectorId(), parameters.getErrorCode().value());
+            applicationEventPublisher.publishEvent(new OcppStationStatusFailure(
+                    chargeBoxIdentity, parameters.getConnectorId(), parameters.getErrorCode().value()));
         }
 
         return new StatusNotificationResponse();
@@ -222,7 +227,7 @@ public class CentralSystemService16_Service {
             transactionId = transactionService.insertTransaction(params);
         }
 
-        notificationService.ocppTransactionStarted(transactionId, params);
+        applicationEventPublisher.publishEvent(new OcppTransactionStarted(transactionId, params));
 
         IdTagInfo info = new IdTagInfo();
         info.setStatus(AuthorizationStatus.ACCEPTED);
@@ -268,7 +273,7 @@ public class CentralSystemService16_Service {
                         new IllegalArgumentException("Invalid transaction id: " + transactionId));
         connectorMeterValueService.insertMeterValues(parameters.getTransactionData(), transactionStart);
 
-        notificationService.ocppTransactionEnded(params);
+        applicationEventPublisher.publishEvent(new OcppTransactionEnded(params));
 
         return new StopTransactionResponse().withIdTagInfo(idTagInfo);
     }
@@ -304,7 +309,7 @@ public class CentralSystemService16_Service {
         }
 
         // OCPP requires a status to be set. Since this is a dummy impl, set it to "Accepted".
-        // https://github.com/RWTH-i5-IDSG/steve/pull/36
-        return new DataTransferResponse().withStatus(ACCEPTED);
+        // https://github.com/steve-community/steve/pull/36
+        return new DataTransferResponse().withStatus(DataTransferStatus.ACCEPTED);
     }
 }

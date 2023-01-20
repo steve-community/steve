@@ -1,7 +1,7 @@
 <%--
 
-    SteVe - SteckdosenVerwaltung - https://github.com/RWTH-i5-IDSG/steve
-    Copyright (C) 2013-2020 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
+    SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
+    Copyright (C) 2013-2019 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
     All Rights Reserved.
 
     This program is free software: you can redistribute it and/or modify
@@ -61,18 +61,29 @@
         <a class="tileRow1" href="${ctxPath}/manager/chargepoints">
             Received Heartbeats
             <span class="baseTable">
-			<span class="baseRow">
-				<span class="baseCell">Today :</span>
-				<span class="baseCell formatNumber">${stats.heartbeatToday}</span>
-			</span>
-			<span class="baseRow">
-				<span class="baseCell">Yesterday :</span>
-				<span class="baseCell formatNumber">${stats.heartbeatYesterday}</span>
-			</span>
-			<span class="baseRow">
-				<span class="baseCell">Earlier :</span>
-				<span class="baseCell formatNumber">${stats.heartbeatEarlier}</span>
-			</span>
+                <span class="baseRow">
+                    <span class="baseCell">Today :</span>
+                    <span class="baseCell formatNumber">${stats.heartbeatToday}</span>
+                </span>
+                <span class="baseRow">
+                    <span class="baseCell">Yesterday :</span>
+                    <span class="baseCell formatNumber">${stats.heartbeatYesterday}</span>
+                </span>
+                <span class="baseRow">
+                    <span class="baseCell">Earlier :</span>
+                    <span class="baseCell formatNumber">${stats.heartbeatEarlier}</span>
+                </span>
+            </span>
+        </a>
+        <a class="tileRow1" href="${ctxPath}/manager/home/connectorStatus">
+            Connector Status
+            <span class="baseTable">
+			<c:forEach items="${stats.statusCountMap}" var="it">
+				<span class="baseRow">
+					<span class="baseCell">${it.key} :</span>
+					<span class="baseCell formatNumber">${it.value}</span>
+				</span>
+            </c:forEach>
 		</span>
         </a>
     </div>

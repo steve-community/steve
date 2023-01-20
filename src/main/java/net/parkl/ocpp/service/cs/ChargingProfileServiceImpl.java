@@ -311,7 +311,7 @@ public class ChargingProfileServiceImpl implements ChargingProfileService {
         ChargingSchedulePeriod p=new ChargingSchedulePeriod();
         p.setChargingProfile(profile);
         p.setStartPeriodInSeconds(k.getStartPeriodInSeconds());
-        p.setPowerLimitInAmperes(k.getPowerLimitInAmperes());
+        p.setPowerLimit(k.getPowerLimit());
         p.setNumberPhases(k.getNumberPhases());
         return p;
     }

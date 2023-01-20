@@ -1,6 +1,6 @@
 /*
- * SteVe - SteckdosenVerwaltung - https://github.com/RWTH-i5-IDSG/steve
- * Copyright (C) 2013-2020 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
+ * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
+ * Copyright (C) 2013-2019 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
  * All Rights Reserved.
  *
  * Parkl Digital Technologies
@@ -30,7 +30,7 @@ import de.rwth.idsg.steve.web.dto.ocpp.MultipleChargePointSelect;
 import javax.xml.ws.AsyncHandler;
 
 /**
- * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
+ * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 09.03.2018
  */
 public class ClearCacheTask extends CommunicationTask<MultipleChargePointSelect, String> {
@@ -60,10 +60,10 @@ public class ClearCacheTask extends CommunicationTask<MultipleChargePointSelect,
     }
 
     @Override
-    public AsyncHandler<ocpp.cp._2010._08.ClearCacheResponse> getOcpp12Handler(String chargeBoxId, boolean remote) {
+    public AsyncHandler<ocpp.cp._2010._08.ClearCacheResponse> getOcpp12Handler(String chargeBoxId) {
         return res -> {
             try {
-                success(chargeBoxId, res.get().getStatus().value(), remote);
+                success(chargeBoxId, res.get().getStatus().value());
             } catch (Exception e) {
                 failed(chargeBoxId, e);
             }
@@ -71,10 +71,10 @@ public class ClearCacheTask extends CommunicationTask<MultipleChargePointSelect,
     }
 
     @Override
-    public AsyncHandler<ocpp.cp._2012._06.ClearCacheResponse> getOcpp15Handler(String chargeBoxId, boolean remote) {
+    public AsyncHandler<ocpp.cp._2012._06.ClearCacheResponse> getOcpp15Handler(String chargeBoxId) {
         return res -> {
             try {
-                success(chargeBoxId, res.get().getStatus().value(), remote);
+                success(chargeBoxId, res.get().getStatus().value());
             } catch (Exception e) {
                 failed(chargeBoxId, e);
             }
@@ -82,10 +82,10 @@ public class ClearCacheTask extends CommunicationTask<MultipleChargePointSelect,
     }
 
     @Override
-    public AsyncHandler<ocpp.cp._2015._10.ClearCacheResponse> getOcpp16Handler(String chargeBoxId, boolean remote) {
+    public AsyncHandler<ocpp.cp._2015._10.ClearCacheResponse> getOcpp16Handler(String chargeBoxId) {
         return res -> {
             try {
-                ClearCacheTask.this.success(chargeBoxId, res.get().getStatus().value(), remote);
+                ClearCacheTask.this.success(chargeBoxId, res.get().getStatus().value());
             } catch (Exception e) {
                 ClearCacheTask.this.failed(chargeBoxId, e);
             }

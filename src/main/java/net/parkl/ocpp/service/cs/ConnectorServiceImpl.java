@@ -22,8 +22,10 @@ import de.rwth.idsg.steve.repository.dto.InsertConnectorStatusParams;
 import de.rwth.idsg.steve.repository.dto.TransactionStatusUpdate;
 import lombok.extern.slf4j.Slf4j;
 import net.parkl.ocpp.entities.Connector;
+import net.parkl.ocpp.entities.ConnectorLastStatus;
 import net.parkl.ocpp.entities.ConnectorStatus;
 import net.parkl.ocpp.entities.OcppChargingProcess;
+import net.parkl.ocpp.repositories.ConnectorLastStatusRepository;
 import net.parkl.ocpp.repositories.ConnectorRepository;
 import net.parkl.ocpp.repositories.ConnectorStatusRepository;
 import net.parkl.ocpp.repositories.OcppChargingProcessRepository;
@@ -52,6 +54,8 @@ public class ConnectorServiceImpl implements ConnectorService {
     @Autowired
     private ConnectorStatusRepository connectorStatusRepo;
     @Autowired
+    private ConnectorLastStatusRepository connectorLastStatusRepo;
+    @Autowired
     @Qualifier("taskExecutor")
     private TaskExecutor executor;
 
@@ -76,6 +80,23 @@ public class ConnectorServiceImpl implements ConnectorService {
         s.setVendorErrorCode(p.getVendorErrorCode());
 
         connectorStatusRepo.save(s);
+
+        ConnectorLastStatus ls = new ConnectorLastStatus();
+        ls.setConnectorPk(connector.getConnectorPk());
+        if (p.getTimestamp() != null) {
+            ls.setStatusTimestamp(p.getTimestamp().toDate());
+        } else {
+            ls.setStatusTimestamp(new Date());
+        }
+        ls.setStatus(p.getStatus());
+        ls.setErrorCode(p.getErrorCode());
+        ls.setErrorInfo(p.getErrorInfo());
+        ls.setVendorId(p.getVendorId());
+        ls.setVendorErrorCode(p.getVendorErrorCode());
+        ls.setChargeBoxId(p.getChargeBoxId());
+        ls.setConnectorId(p.getConnectorId());
+
+        connectorLastStatusRepo.save(ls);
 
         OcppChargingProcess savedProcess = null;
         if (s.getStatus().equals("Available")) {
@@ -137,5 +158,19 @@ public class ConnectorServiceImpl implements ConnectorService {
         s.setErrorCode(statusUpdate.getErrorCode());
 
         connectorStatusRepo.save(s);
+
+        ConnectorLastStatus ls = new ConnectorLastStatus();
+        ls.setConnectorPk(connector.getConnectorPk());
+        if (startTimestamp != null) {
+            ls.setStatusTimestamp(startTimestamp.toDate());
+        } else {
+            ls.setStatusTimestamp(new Date());
+        }
+        ls.setStatus(statusUpdate.getStatus());
+        ls.setErrorCode(statusUpdate.getErrorCode());
+        ls.setChargeBoxId(connector.getChargeBoxId());
+        ls.setConnectorId(connector.getConnectorId());
+
+        connectorLastStatusRepo.save(ls);
     }
 }

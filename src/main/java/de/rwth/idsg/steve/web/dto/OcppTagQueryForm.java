@@ -1,6 +1,6 @@
 /*
- * SteVe - SteckdosenVerwaltung - https://github.com/RWTH-i5-IDSG/steve
- * Copyright (C) 2013-2020 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
+ * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
+ * Copyright (C) 2013-2019 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
  * All Rights Reserved.
  *
  * Parkl Digital Technologies
@@ -25,30 +25,28 @@ package de.rwth.idsg.steve.web.dto;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
+
+import java.util.Objects;
 
 /**
- * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
+ * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 03.09.2015
  */
 @Getter
 @Setter
+@ToString
 public class OcppTagQueryForm {
 
     private String idTag;
     private String parentIdTag;
 
-    private BooleanType expired;
-    private BooleanType inTransaction;
-    private BooleanType blocked;
-
     /**
      * Init with sensible default values
      */
-    public OcppTagQueryForm() {
-        expired = BooleanType.FALSE;
-        blocked = BooleanType.FALSE;
-        inTransaction = BooleanType.ALL;
-    }
+    private BooleanType expired = BooleanType.FALSE;
+    private BooleanType inTransaction = BooleanType.ALL;
+    private BooleanType blocked = BooleanType.FALSE;
 
     public boolean isIdTagSet() {
         return idTag != null;
@@ -56,6 +54,18 @@ public class OcppTagQueryForm {
 
     public boolean isParentIdTagSet() {
         return parentIdTag != null;
+    }
+
+    public BooleanType getExpired() {
+        return Objects.requireNonNullElse(expired, BooleanType.ALL);
+    }
+
+    public BooleanType getInTransaction() {
+        return Objects.requireNonNullElse(inTransaction, BooleanType.ALL);
+    }
+
+    public BooleanType getBlocked() {
+        return Objects.requireNonNullElse(blocked, BooleanType.ALL);
     }
 
     @RequiredArgsConstructor

@@ -51,13 +51,13 @@ public class TestChargePoint implements ChargePointService16_Invoker {
 
     @Override
     public void getLocalListVersion(ChargePointSelect cp, GetLocalListVersionTask task) {
-        task.getOcpp16Handler(cp.getChargeBoxId(),false).handleResponse(
+        task.getOcpp16Handler(cp.getChargeBoxId()).handleResponse(
                 new ResponseWrapper<>(createGetLocalListVersionResponse(task.getParams())));
     }
 
     @Override
     public void sendLocalList(ChargePointSelect cp, SendLocalListTask task) {
-        task.getOcpp16Handler(cp.getChargeBoxId(),false).handleResponse(
+        task.getOcpp16Handler(cp.getChargeBoxId()).handleResponse(
                 new ResponseWrapper<>(createSendLocalListResponse(task.getParams())));
     }
 
@@ -73,7 +73,7 @@ public class TestChargePoint implements ChargePointService16_Invoker {
 
     @Override
     public void reset(ChargePointSelect cp, ResetTask task) {
-        task.getOcpp16Handler(cp.getChargeBoxId(),false).handleResponse(
+        task.getOcpp16Handler(cp.getChargeBoxId()).handleResponse(
                 new ResponseWrapper<>(createResetResponse(task.getParams())));
     }
 
@@ -129,7 +129,7 @@ public class TestChargePoint implements ChargePointService16_Invoker {
     public void remoteStartTransaction(ChargePointSelect cp, RemoteStartTransactionTask task) {
         //sending remote start transaction request to charger, then it replies with accepted state
         String chargeBoxId = cp.getChargeBoxId();
-        task.getOcpp16Handler(chargeBoxId,false).handleResponse(
+        task.getOcpp16Handler(chargeBoxId).handleResponse(
                 new ResponseWrapper<>(createRemoteStartTransactionResponse(task.getParams())));
 
         String idTag = task.getParams().getIdTag();
@@ -152,7 +152,7 @@ public class TestChargePoint implements ChargePointService16_Invoker {
 
     @Override
     public void remoteStopTransaction(ChargePointSelect cp, RemoteStopTransactionTask task) {
-        task.getOcpp16Handler(cp.getChargeBoxId(),false).handleResponse(
+        task.getOcpp16Handler(cp.getChargeBoxId()).handleResponse(
                 new ResponseWrapper<>(createRemoteStopTransactionResponse(task.getParams())));
 
         taskExecutor.execute(() -> {

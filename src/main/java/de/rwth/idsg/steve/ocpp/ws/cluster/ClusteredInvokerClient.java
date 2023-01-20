@@ -5,6 +5,7 @@ import de.rwth.idsg.ocpp.jaxb.ResponseType;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
@@ -23,6 +24,9 @@ public class ClusteredInvokerClient {
     private RestTemplate restTemplate;
     private final ClusteredWebSocketSessionStore clusteredWebSocketSessionStore;
 
+    @Value("${ocpp.pod.container.port:8080}")
+    private int podContainerPort;
+
     @PostConstruct
     public void init() {
         this.restTemplate = new RestTemplate();
@@ -39,11 +43,12 @@ public class ClusteredInvokerClient {
     }
 
     private String getChargeBoxPodUrl(String chargeBoxId) {
-        return String.format("http://%s/api/cluster/invoke",
-                clusteredWebSocketSessionStore.getChargeBoxIp(chargeBoxId));
+        return String.format("http://%s:%d/ocpp/api/cluster/invoke",
+                clusteredWebSocketSessionStore.getChargeBoxIp(chargeBoxId), podContainerPort);
     }
     private String getCallbackUrl(String podIp) {
-        return String.format("http://%s/api/cluster/callback", podIp);
+        return String.format("http://%s:%d/ocpp/api/cluster/callback", podIp,
+                podContainerPort);
     }
 
     private <T> T postFor(String url, Object request, Class<T> responseClass) throws IOException {
@@ -70,8 +75,7 @@ public class ClusteredInvokerClient {
     public void callback(String chargeBoxId, String payload, String originPodIp) {
         log.info("Sending callback to invoking pod {}: {}", chargeBoxId, payload);
         ClusteredInvocationCallback request = new ClusteredInvocationCallback(chargeBoxId,
-                Base64.getEncoder().encodeToString(payload.getBytes(StandardCharsets.UTF_8)),
-                ClusteredWebSocketHelper.getPodIp());
+                Base64.getEncoder().encodeToString(payload.getBytes(StandardCharsets.UTF_8)));
 
         postFor(getCallbackUrl(originPodIp), request, Void.class);
     }

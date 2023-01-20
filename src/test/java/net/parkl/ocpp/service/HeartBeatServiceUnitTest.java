@@ -5,7 +5,7 @@ import de.rwth.idsg.steve.ocpp.task.ChangeConfigurationTask;
 import de.rwth.idsg.steve.repository.dto.ChargePointSelect;
 import de.rwth.idsg.steve.service.ChargePointHelperService;
 import net.parkl.ocpp.service.config.AdvancedChargeBoxConfiguration;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
 import java.util.ArrayList;

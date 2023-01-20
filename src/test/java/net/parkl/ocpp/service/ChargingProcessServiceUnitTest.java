@@ -6,18 +6,17 @@ import net.parkl.ocpp.repositories.ConnectorRepository;
 import net.parkl.ocpp.repositories.OcppChargingProcessRepository;
 import net.parkl.ocpp.service.config.AdvancedChargeBoxConfiguration;
 import net.parkl.ocpp.util.AsyncWaiter;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class ChargingProcessServiceUnitTest {
     @InjectMocks
     private ChargingProcessService chargingProcessService;
@@ -50,25 +49,28 @@ public class ChargingProcessServiceUnitTest {
         verify(waiter, Mockito.never()).waitFor(Mockito.any());
     }
 
-    @Test(expected = IllegalStateException.class)
+    @Test
     public void fetchNullChargingProcessWithWait() {
-        String chargeBoxId = "testChargeBoxId";
-        int connectorId = 1;
+        Assertions.assertThrows(IllegalStateException.class, () -> {
+            String chargeBoxId = "testChargeBoxId";
+            int connectorId = 1;
 
-        String chargingProcessId = "testChargingProcessId";
-        OcppChargingProcess testChargingProcess = mock(OcppChargingProcess.class);
-        testChargingProcess.setOcppChargingProcessId(chargingProcessId);
+            String chargingProcessId = "testChargingProcessId";
+            OcppChargingProcess testChargingProcess = mock(OcppChargingProcess.class);
+            testChargingProcess.setOcppChargingProcessId(chargingProcessId);
 
-        when(advancedConfig.waitingForChargingProcessEnabled(chargeBoxId)).thenReturn(true);
+            when(advancedConfig.waitingForChargingProcessEnabled(chargeBoxId)).thenReturn(true);
 
-        Connector testConnector = new Connector();
-        when(connectorRepo.findByChargeBoxIdAndConnectorId(chargeBoxId, connectorId)).thenReturn(testConnector);
+            Connector testConnector = new Connector();
+            when(connectorRepo.findByChargeBoxIdAndConnectorId(chargeBoxId, connectorId)).thenReturn(testConnector);
 
-        @SuppressWarnings("unchecked") AsyncWaiter<OcppChargingProcess> waiter = mock(AsyncWaiter.class);
-        chargingProcessService.fetchChargingProcess(connectorId, chargeBoxId, waiter);
+            @SuppressWarnings("unchecked") AsyncWaiter<OcppChargingProcess> waiter = mock(AsyncWaiter.class);
+            chargingProcessService.fetchChargingProcess(connectorId, chargeBoxId, waiter);
 
-        verify(connectorRepo, Mockito.times(1)).findByChargeBoxIdAndConnectorId(chargeBoxId, connectorId);
-        verify(chargingProcessRepo, Mockito.times(1)).findByConnectorAndTransactionStartIsNullAndEndDateIsNull(testConnector);
+            verify(connectorRepo, Mockito.times(1)).findByChargeBoxIdAndConnectorId(chargeBoxId, connectorId);
+            verify(chargingProcessRepo, Mockito.times(1)).findByConnectorAndTransactionStartIsNullAndEndDateIsNull(testConnector);
+        });
+
     }
 
     @Test

@@ -1,6 +1,6 @@
 /*
- * SteVe - SteckdosenVerwaltung - https://github.com/RWTH-i5-IDSG/steve
- * Copyright (C) 2013-2020 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
+ * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
+ * Copyright (C) 2013-2019 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
  * All Rights Reserved.
  *
  * Parkl Digital Technologies
@@ -40,7 +40,7 @@ import java.util.function.Consumer;
 /**
  * Default holder/context of incoming and outgoing messages.
  *
- * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
+ * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 23.03.2015
  */
 @Getter
@@ -75,30 +75,32 @@ public class CommunicationContext {
 
     @SuppressWarnings("unchecked")
     public void createResultHandler(CommunicationTask task) {
-        if (futureResponseContext.isRemote()) {
-            resultHandler = result -> {
-                //task.getHandler(chargeBoxId, true)
-                //        .handleResponse(new DummyResponse(result.getPayload()));
-                clusteredInvokerClient.callback(chargeBoxId, incomingString, futureResponseContext.getOriginPodIp());
-            };
-        } else {
-            // TODO: not so sure about this
-            resultHandler = result -> task.getHandler(chargeBoxId, false)
-                    .handleResponse(new DummyResponse(result.getPayload()));
-        }
+        // TODO: not so sure about this
+        resultHandler = result -> task.getHandler(chargeBoxId)
+                .handleResponse(new DummyResponse(result.getPayload()));
+
+    }
+
+    public void createRemoteResultHandler(String originPodIp) {
+        resultHandler = result -> {
+            //task.getHandler(chargeBoxId, true)
+            //        .handleResponse(new DummyResponse(result.getPayload()));
+            clusteredInvokerClient.callback(chargeBoxId, incomingString, originPodIp);
+        };
     }
 
     public void createErrorHandler(CommunicationTask task) {
-        if (futureResponseContext.isRemote()) {
-            resultHandler = result -> {
-                //task.addNewError(chargeBoxId, result.toString());
-                clusteredInvokerClient.callback(chargeBoxId, incomingString, futureResponseContext.getOriginPodIp());
-            };
-        } else {
-            // TODO: not so sure about this
-            errorHandler = result -> task.defaultCallback()
-                    .success(chargeBoxId, result);
-        }
+        // TODO: not so sure about this
+        errorHandler = result -> task.defaultCallback()
+            .success(chargeBoxId, result);
+
+    }
+
+    public void createRemoteErrorHandler(String originPodIp) {
+        resultHandler = result -> {
+            //task.addNewError(chargeBoxId, result.toString());
+            clusteredInvokerClient.callback(chargeBoxId, incomingString, originPodIp);
+        };
     }
 
     @RequiredArgsConstructor(access = AccessLevel.PRIVATE)

@@ -1,6 +1,6 @@
 /*
- * SteVe - SteckdosenVerwaltung - https://github.com/RWTH-i5-IDSG/steve
- * Copyright (C) 2013-2020 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
+ * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
+ * Copyright (C) 2013-2019 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
  * All Rights Reserved.
  *
  * Parkl Digital Technologies
@@ -33,7 +33,7 @@ import ocpp.cp._2012._06.CancelReservationResponse;
 import javax.xml.ws.AsyncHandler;
 
 /**
- * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
+ * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 09.03.2018
  */
 public class CancelReservationTask extends Ocpp15AndAboveTask<CancelReservationParams, String> {
@@ -50,10 +50,10 @@ public class CancelReservationTask extends Ocpp15AndAboveTask<CancelReservationP
     public OcppCallback<String> defaultCallback() {
         return new DefaultOcppCallback<String>() {
             @Override
-            public void success(String chargeBoxId, String statusValue, boolean remote) {
+            public void success(String chargeBoxId, String statusValue) {
                 addNewResponse(chargeBoxId, statusValue);
 
-                if (!remote && "Accepted".equalsIgnoreCase(statusValue)) {
+                if ("Accepted".equalsIgnoreCase(statusValue)) {
                     reservationService.cancelled(params.getReservationId());
                 }
             }
@@ -73,10 +73,10 @@ public class CancelReservationTask extends Ocpp15AndAboveTask<CancelReservationP
     }
 
     @Override
-    public AsyncHandler<CancelReservationResponse> getOcpp15Handler(String chargeBoxId, boolean remote) {
+    public AsyncHandler<CancelReservationResponse> getOcpp15Handler(String chargeBoxId) {
         return res -> {
             try {
-                success(chargeBoxId, res.get().getStatus().value(),remote);
+                success(chargeBoxId, res.get().getStatus().value());
             } catch (Exception e) {
                 failed(chargeBoxId, e);
             }
@@ -84,10 +84,10 @@ public class CancelReservationTask extends Ocpp15AndAboveTask<CancelReservationP
     }
 
     @Override
-    public AsyncHandler<ocpp.cp._2015._10.CancelReservationResponse> getOcpp16Handler(String chargeBoxId, boolean remote) {
+    public AsyncHandler<ocpp.cp._2015._10.CancelReservationResponse> getOcpp16Handler(String chargeBoxId) {
         return res -> {
             try {
-                success(chargeBoxId, res.get().getStatus().value(),remote);
+                success(chargeBoxId, res.get().getStatus().value());
             } catch (Exception e) {
                 failed(chargeBoxId, e);
             }

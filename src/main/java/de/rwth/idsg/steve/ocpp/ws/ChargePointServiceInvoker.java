@@ -1,6 +1,6 @@
 /*
- * SteVe - SteckdosenVerwaltung - https://github.com/RWTH-i5-IDSG/steve
- * Copyright (C) 2013-2020 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
+ * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
+ * Copyright (C) 2013-2019 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
  * All Rights Reserved.
  *
  * Parkl Digital Technologies
@@ -36,19 +36,18 @@ import de.rwth.idsg.steve.ocpp.ws.pipeline.OutgoingCallPipeline;
 import de.rwth.idsg.steve.repository.dto.ChargePointSelect;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import lombok.SneakyThrows;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.UUID;
 
 /**
- * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
+ * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 20.03.2015
  */
+@Slf4j
 @RequiredArgsConstructor
 public class ChargePointServiceInvoker {
-    private final Logger log = LoggerFactory.getLogger(getClass());
 
     private final OutgoingCallPipeline outgoingCallPipeline;
     @Getter
@@ -78,14 +77,13 @@ public class ChargePointServiceInvoker {
                      ClusterCommunicationMode clusterCommunicationMode) {
         RequestType request = task.getRequest();
 
-        String messageId = UUID.randomUUID().toString();
         ActionResponsePair pair = typeStore.findActionResponse(request);
         if (pair == null) {
             throw new SteveException("Action name is not found");
         }
 
         OcppJsonCall call = new OcppJsonCall();
-        call.setMessageId(messageId);
+        call.setMessageId(UUID.randomUUID().toString());
         call.setPayload(request);
         call.setAction(pair.getAction());
 
@@ -113,7 +111,7 @@ public class ChargePointServiceInvoker {
         FutureResponseContext frc = new FutureResponseContext(null, responseClass,
                 true, originPodIp);
 
-        CommunicationContext context = new CommunicationContext(null, clusteredInvokerClient, chargeBoxId,
+        CommunicationContext context = new CommunicationContext(endpoint.getSession(chargeBoxId), clusteredInvokerClient, chargeBoxId,
                     ClusterCommunicationMode.REMOTE_SERVER);
 
         context.setFutureResponseContext(frc);

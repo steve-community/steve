@@ -1,6 +1,6 @@
 /*
- * SteVe - SteckdosenVerwaltung - https://github.com/RWTH-i5-IDSG/steve
- * Copyright (C) 2013-2020 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
+ * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
+ * Copyright (C) 2013-2019 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
  * All Rights Reserved.
  *
  * Parkl Digital Technologies
@@ -22,6 +22,7 @@
  */
 package de.rwth.idsg.steve.web.controller;
 
+import de.rwth.idsg.steve.config.WebEnvironment;
 import de.rwth.idsg.steve.repository.ReservationStatus;
 import de.rwth.idsg.steve.service.TransactionStopService;
 import de.rwth.idsg.steve.web.dto.ReservationQueryForm;
@@ -47,7 +48,7 @@ import java.io.IOException;
 /**
  * One controller for transactions and reservations pages
  *
- * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
+ * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 15.08.2014
  */
 @Controller
@@ -90,7 +91,7 @@ public class TransactionsReservationsController {
     @RequestMapping(value = TRANSACTION_STOP_PATH, method = RequestMethod.POST)
     public String stopTransaction(@PathVariable("transactionPk") int transactionPk) {
         transactionStopService.stop(transactionPk);
-        return "redirect:/manager/transactions";
+        return "redirect:"+ WebEnvironment.getContextRoot()+"/manager/transactions";
     }
 
     @RequestMapping(value = TRANSACTIONS_DETAILS_PATH)

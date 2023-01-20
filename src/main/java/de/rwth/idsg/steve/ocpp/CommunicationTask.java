@@ -54,6 +54,7 @@ public abstract class CommunicationTask<S extends ChargePointSelection, RESPONSE
 
     private final Logger log = LoggerFactory.getLogger(getClass());
 
+    private final PersistentTaskResultCallback persistentTaskResultCallback;
     @Getter
     private final OcppVersion ocppVersion;
     private final String operationName;
@@ -88,7 +89,8 @@ public abstract class CommunicationTask<S extends ChargePointSelection, RESPONSE
     /**
      * Do not expose the constructor, make it package-private
      */
-    CommunicationTask(PersistentTaskResultCallback persistentCallback, OcppVersion ocppVersion, S params, TaskOrigin origin, String caller) {
+    CommunicationTask(PersistentTaskResultCallback persistentTaskResultCallback,
+                      OcppVersion ocppVersion, S params, TaskOrigin origin, String caller) {
         List<ChargePointSelect> cpsList = params.getChargePointSelectList();
 
         this.ocppVersion = ocppVersion;
@@ -104,6 +106,7 @@ public abstract class CommunicationTask<S extends ChargePointSelection, RESPONSE
 
         callbackList.add(defaultCallback());
         operationName = StringUtils.getOperationName(this);
+        this.persistentTaskResultCallback = persistentTaskResultCallback;
     }
 
     public void addCallback(OcppCallback<RESPONSE> cb) {
@@ -124,6 +127,8 @@ public abstract class CommunicationTask<S extends ChargePointSelection, RESPONSE
                 endTimestamp = DateTime.now();
             }
         }
+
+        persistentTaskResultCallback.addNewResponse(taskId, chargeBoxId, response, endTimestamp);
     }
 
     public void addPersistentResponse(String chargeBoxId, String response) {
@@ -140,6 +145,8 @@ public abstract class CommunicationTask<S extends ChargePointSelection, RESPONSE
                 endTimestamp = DateTime.now();
             }
         }
+
+        persistentTaskResultCallback.addNewError(taskId, chargeBoxId, errorMessage, endTimestamp);
     }
     public void addPersistentError(String chargeBoxId, String errorMessage) {
         resultMap.get(chargeBoxId).setErrorMessage(errorMessage);

@@ -14,6 +14,7 @@ import net.parkl.ocpp.entities.PersistentTask;
 import net.parkl.ocpp.entities.PersistentTaskResult;
 import net.parkl.ocpp.service.cs.ChargingProfileService;
 import net.parkl.ocpp.service.cs.ReservationService;
+import org.joda.time.DateTime;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -42,7 +43,9 @@ public class PersistentTaskConverter {
 
     public CommunicationTask fromPersistentTask(PersistentTask persistentTask) {
         CommunicationTask task = createTask(persistentTask);
-        task.setEndTimestamp(persistentTask.getEndTimestamp());
+        if (persistentTask.getEndTimestamp()!=null) {
+            task.setEndTimestamp(new DateTime(persistentTask.getEndTimestamp()));
+        }
 
         List<PersistentTaskResult> results = persistentTaskService.findResultsByTask(persistentTask);
         for (PersistentTaskResult result : results) {

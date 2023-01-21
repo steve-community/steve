@@ -44,7 +44,7 @@ public class PersistentTaskServiceImpl implements PersistentTaskService {
             taskResultRepository.save(result);
 
             if (endTimestamp!=null) {
-                task.setEndTimestamp(endTimestamp);
+                task.setEndTimestamp(endTimestamp.toDate());
                 taskRepository.save(task);
             }
         }
@@ -65,7 +65,7 @@ public class PersistentTaskServiceImpl implements PersistentTaskService {
             taskResultRepository.save(result);
 
             if (endTimestamp != null) {
-                task.setEndTimestamp(endTimestamp);
+                task.setEndTimestamp(endTimestamp.toDate());
                 taskRepository.save(task);
             }
 

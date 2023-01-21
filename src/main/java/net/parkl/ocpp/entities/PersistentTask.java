@@ -6,6 +6,7 @@ import org.joda.time.DateTime;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.Date;
 
 @Entity
 @Table(name = "persistent_task")
@@ -28,5 +29,5 @@ public class PersistentTask implements Serializable {
 
     @Column(name = "end_timestamp", nullable = true)
     @Temporal(TemporalType.TIMESTAMP)
-    private DateTime endTimestamp;
+    private Date endTimestamp;
 }

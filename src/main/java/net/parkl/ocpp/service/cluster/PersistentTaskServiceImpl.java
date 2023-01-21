@@ -33,7 +33,7 @@ public class PersistentTaskServiceImpl implements PersistentTaskService {
     @Override
     @Transactional
     public void addNewResponse(int taskId, String chargeBoxId, String response, DateTime endTimestamp) {
-        if (clusteredWebSocketConfig.isClusteredWebSocketSessionEnabled()) {
+        if (clusteredWebSocketConfig.isClusteredWebSocketSessionEnabled() && taskId !=0) {
             log.info("Adding new persistent response: {}-{}, {}", taskId, chargeBoxId, response);
             PersistentTask task = findById(taskId);
 
@@ -53,7 +53,7 @@ public class PersistentTaskServiceImpl implements PersistentTaskService {
     @Override
     @Transactional
     public void addNewError(int taskId, String chargeBoxId, String errorMessage, DateTime endTimestamp) {
-        if (clusteredWebSocketConfig.isClusteredWebSocketSessionEnabled()) {
+        if (clusteredWebSocketConfig.isClusteredWebSocketSessionEnabled() && taskId != 0) {
             log.info("Adding new persistent error: {}-{}, {}", taskId, chargeBoxId, errorMessage);
 
             PersistentTask task = findById(taskId);
@@ -64,7 +64,7 @@ public class PersistentTaskServiceImpl implements PersistentTaskService {
             result.setErrorMessage(errorMessage);
             taskResultRepository.save(result);
 
-            if (endTimestamp!=null) {
+            if (endTimestamp != null) {
                 task.setEndTimestamp(endTimestamp);
                 taskRepository.save(task);
             }

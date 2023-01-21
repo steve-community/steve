@@ -27,5 +27,6 @@ public class PersistentTask implements Serializable {
     private String params;
 
     @Column(name = "end_timestamp", nullable = true)
+    @Temporal(TemporalType.TIMESTAMP)
     private DateTime endTimestamp;
 }

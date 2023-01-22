@@ -47,41 +47,49 @@ public class TestChargePointService15_Client extends TestChargePointService12_Cl
     public int dataTransfer(DataTransferParams params) {
         DataTransferTask task = new DataTransferTask(persistentTaskService,getVersion(), params);
 
+        Integer taskId = taskStore.add(task);
+
         BackgroundService.with(executorService)
                          .forEach(task.getParams().getChargePointSelectList())
                          .execute(c -> getOcpp15Invoker().dataTransfer(c, task));
 
-        return taskStore.add(task);
+        return taskId;
     }
 
     public int getConfiguration(GetConfigurationParams params) {
         GetConfigurationTask task = new GetConfigurationTask(persistentTaskService, getVersion(), params);
 
+        Integer taskId = taskStore.add(task);
+
         BackgroundService.with(executorService)
                          .forEach(task.getParams().getChargePointSelectList())
                          .execute(c -> getOcpp15Invoker().getConfiguration(c, task));
 
-        return taskStore.add(task);
+        return taskId;
     }
 
     public int getLocalListVersion(MultipleChargePointSelect params) {
         GetLocalListVersionTask task = new GetLocalListVersionTask(persistentTaskService, getVersion(), params);
 
+        Integer taskId = taskStore.add(task);
+
         BackgroundService.with(executorService)
                          .forEach(task.getParams().getChargePointSelectList())
                          .execute(c -> getOcpp15Invoker().getLocalListVersion(c, task));
 
-        return taskStore.add(task);
+        return taskId;
     }
 
     public int sendLocalList(SendLocalListParams params) {
         SendLocalListTask task = new SendLocalListTask(persistentTaskService, getVersion(), params, ocppTagService);
 
+        Integer taskId = taskStore.add(task);
+
         BackgroundService.with(executorService)
                          .forEach(task.getParams().getChargePointSelectList())
                          .execute(c -> getOcpp15Invoker().sendLocalList(c, task));
 
-        return taskStore.add(task);
+        return taskId;
     }
 
 
@@ -105,21 +113,25 @@ public class TestChargePointService15_Client extends TestChargePointService12_Cl
         EnhancedReserveNowParams enhancedParams = new EnhancedReserveNowParams(params, reservationId, parentIdTag);
         ReserveNowTask task = new ReserveNowTask(persistentTaskService, getVersion(), enhancedParams, reservationService);
 
+        Integer taskId = taskStore.add(task);
+
         BackgroundService.with(executorService)
                          .forFirst(task.getParams().getChargePointSelectList())
                          .execute(c -> getOcpp15Invoker().reserveNow(c, task));
 
-        return taskStore.add(task);
+        return taskId;
     }
 
     public int cancelReservation(CancelReservationParams params) {
         CancelReservationTask task = new CancelReservationTask(persistentTaskService, getVersion(), params, reservationService);
 
+        Integer taskId = taskStore.add(task);
+
         BackgroundService.with(executorService)
                          .forFirst(task.getParams().getChargePointSelectList())
                          .execute(c -> getOcpp15Invoker().cancelReservation(c, task));
 
-        return taskStore.add(task);
+        return taskId;
     }
 
 

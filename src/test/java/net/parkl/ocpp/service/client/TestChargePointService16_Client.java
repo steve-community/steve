@@ -23,10 +23,12 @@ public class TestChargePointService16_Client extends TestChargePointService15_Cl
     public int triggerMessage(TriggerMessageParams params) {
         TriggerMessageTask task = new TriggerMessageTask(persistentTaskService, getVersion(), params);
 
+        Integer taskId = taskStore.add(task);
+
         BackgroundService.with(executorService)
                          .forEach(task.getParams().getChargePointSelectList())
                          .execute(c -> getOcpp16Invoker().triggerMessage(c, task));
 
-        return taskStore.add(task);
+        return taskId;
     }
 }

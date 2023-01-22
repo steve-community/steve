@@ -79,11 +79,13 @@ public class ChargePointService16_Client extends ChargePointService15_Client imp
     public int triggerMessage(TriggerMessageParams params) {
         TriggerMessageTask task = new TriggerMessageTask(persistentTaskService, getVersion(), params);
 
+        Integer taskId = taskStore.add(task);
+
         BackgroundService.with(executorService)
                          .forEach(task.getParams().getChargePointSelectList())
                          .execute(c -> getOcpp16Invoker().triggerMessage(c, task));
 
-        return taskStore.add(task);
+        return taskId;
     }
 
     public int setChargingProfile(SetChargingProfileParams params) {
@@ -95,33 +97,39 @@ public class ChargePointService16_Client extends ChargePointService15_Client imp
         SetChargingProfileTask task = new SetChargingProfileTask(persistentTaskService,
                 getVersion(), enhancedParams, chargingProfileService);
 
+        Integer taskId = taskStore.add(task);
+
         BackgroundService.with(executorService)
                          .forEach(task.getParams().getChargePointSelectList())
                          .execute(c -> getOcpp16Invoker().setChargingProfile(c, task));
 
-        return taskStore.add(task);
+        return taskId;
     }
 
     public int clearChargingProfile(ClearChargingProfileParams params) {
         ClearChargingProfileTask task = new ClearChargingProfileTask(persistentTaskService,
                 getVersion(), params, chargingProfileService);
 
+        Integer taskId = taskStore.add(task);
+
         BackgroundService.with(executorService)
                          .forEach(task.getParams().getChargePointSelectList())
                          .execute(c -> getOcpp16Invoker().clearChargingProfile(c, task));
 
-        return taskStore.add(task);
+        return taskId;
     }
 
     public int getCompositeSchedule(GetCompositeScheduleParams params) {
         GetCompositeScheduleTask task = new GetCompositeScheduleTask(persistentTaskService,
                 getVersion(), params);
 
+        Integer taskId = taskStore.add(task);
+
         BackgroundService.with(executorService)
                          .forEach(task.getParams().getChargePointSelectList())
                          .execute(c -> getOcpp16Invoker().getCompositeSchedule(c, task));
 
-        return taskStore.add(task);
+        return taskId;
     }
 
     /**

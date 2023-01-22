@@ -55,55 +55,67 @@ public class TestChargePointService12_Client implements IChargePointService12_Cl
 	public int changeAvailability(ChangeAvailabilityParams params) {
 		ChangeAvailabilityTask task = new ChangeAvailabilityTask(persistentTaskService, getVersion(), params);
 
+		Integer taskId = taskStore.add(task);
+
 		BackgroundService.with(executorService).forEach(task.getParams().getChargePointSelectList())
 				.execute(c -> getOcpp12Invoker().changeAvailability(c, task));
 
-		return taskStore.add(task);
+		return taskId;
 	}
 
 	public int changeConfiguration(ChangeConfigurationParams params) {
 		ChangeConfigurationTask task = new ChangeConfigurationTask(persistentTaskService, getVersion(), params);
 
+		Integer taskId = taskStore.add(task);
+
 		BackgroundService.with(executorService).forEach(task.getParams().getChargePointSelectList())
 				.execute(c -> getOcpp12Invoker().changeConfiguration(c, task));
 
-		return taskStore.add(task);
+		return taskId;
 	}
 
 	public int clearCache(MultipleChargePointSelect params) {
 		ClearCacheTask task = new ClearCacheTask(persistentTaskService, getVersion(), params);
 
+		Integer taskId = taskStore.add(task);
+
 		BackgroundService.with(executorService).forEach(task.getParams().getChargePointSelectList())
 				.execute(c -> getOcpp12Invoker().clearCache(c, task));
 
-		return taskStore.add(task);
+		return taskId;
 	}
 
 	public int getDiagnostics(GetDiagnosticsParams params) {
 		GetDiagnosticsTask task = new GetDiagnosticsTask(persistentTaskService, getVersion(), params);
 
+		Integer taskId = taskStore.add(task);
+
 		BackgroundService.with(executorService).forEach(task.getParams().getChargePointSelectList())
 				.execute(c -> getOcpp12Invoker().getDiagnostics(c, task));
 
-		return taskStore.add(task);
+		return taskId;
 	}
 
 	public int reset(ResetParams params) {
 		ResetTask task = new ResetTask(persistentTaskService, getVersion(), params);
 
+		Integer taskId = taskStore.add(task);
+
 		BackgroundService.with(executorService).forEach(task.getParams().getChargePointSelectList())
 				.execute(c -> getOcpp12Invoker().reset(c, task));
 
-		return taskStore.add(task);
+		return taskId;
 	}
 
 	public int updateFirmware(UpdateFirmwareParams params) {
 		UpdateFirmwareTask task = new UpdateFirmwareTask(persistentTaskService, getVersion(), params);
 
+		Integer taskId = taskStore.add(task);
+
 		BackgroundService.with(executorService).forEach(task.getParams().getChargePointSelectList())
 				.execute(c -> getOcpp12Invoker().updateFirmware(c, task));
 
-		return taskStore.add(task);
+		return taskId;
 	}
 
 	// -------------------------------------------------------------------------
@@ -113,28 +125,34 @@ public class TestChargePointService12_Client implements IChargePointService12_Cl
 	public int remoteStartTransaction(RemoteStartTransactionParams params) {
 		RemoteStartTransactionTask task = new RemoteStartTransactionTask(persistentTaskService, getVersion(), params);
 
+		Integer taskId = taskStore.add(task);
+
 		BackgroundService.with(executorService).forFirst(task.getParams().getChargePointSelectList())
 				.execute(c -> getOcpp12Invoker().remoteStartTransaction(c, task));
 
-		return taskStore.add(task);
+		return taskId;
 	}
 
 	public int remoteStopTransaction(RemoteStopTransactionParams params) {
 		RemoteStopTransactionTask task = new RemoteStopTransactionTask(persistentTaskService, getVersion(), params);
 
+		Integer taskId = taskStore.add(task);
+
 		BackgroundService.with(executorService).forFirst(task.getParams().getChargePointSelectList())
 				.execute(c -> getOcpp12Invoker().remoteStopTransaction(c, task));
 
-		return taskStore.add(task);
+		return taskId;
 	}
 
 	public int unlockConnector(UnlockConnectorParams params) {
 		UnlockConnectorTask task = new UnlockConnectorTask(persistentTaskService, getVersion(), params);
 
+		Integer taskId = taskStore.add(task);
+
 		BackgroundService.with(executorService).forFirst(task.getParams().getChargePointSelectList())
 				.execute(c -> getOcpp12Invoker().unlockConnector(c, task));
 
-		return taskStore.add(task);
+		return taskId;
 	}
 
 

@@ -80,8 +80,6 @@ public class SteveAppContext {
      */
     public void configureWebSocket() {
         JettyWebSocketServerContainer container = JettyWebSocketServerContainer.getContainer(webAppContext.getServletContext());
-        container.setInputBufferSize(MAX_MSG_SIZE);
-        container.setOutputBufferSize(MAX_MSG_SIZE);
         container.setMaxTextMessageSize(MAX_MSG_SIZE);
         container.setIdleTimeout(IDLE_TIMEOUT);
     }

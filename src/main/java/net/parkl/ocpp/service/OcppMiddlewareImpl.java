@@ -544,12 +544,12 @@ public class OcppMiddlewareImpl implements OcppMiddleware {
 
     public PowerValue getPowerValue(TransactionStart transaction) {
         List<ConnectorMeterValueData> connectorMeterValues =
-                connectorMeterValueService.getConnectorMeterValueByTransactionAndMeasurand(transaction, MEASURAND_ENERGY_ACTIVE_IMPORT, 2);
+                connectorMeterValueService.getConnectorMeterValueByTransactionAndMeasurand(transaction, MEASURAND_ENERGY_ACTIVE_IMPORT);
         float diff = 0;
         String diffUnit = null;
         if (connectorMeterValues.isEmpty()) {
             //handle Mennekes type chargers (no measurand, no unit)
-            connectorMeterValues = connectorMeterValueService.getConnectorMeterValueByTransactionAndMeasurand(transaction, null, 2);
+            connectorMeterValues = connectorMeterValueService.getConnectorMeterValueByTransactionAndMeasurand(transaction, null);
         }
 
         if (connectorMeterValues.size() > 1) {

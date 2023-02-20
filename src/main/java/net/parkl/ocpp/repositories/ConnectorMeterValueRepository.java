@@ -42,7 +42,11 @@ public interface ConnectorMeterValueRepository extends CrudRepository<ConnectorM
 
 
 	@Query("SELECT v.unit, v.value FROM ConnectorMeterValue AS v WHERE v.transaction=?1 AND v.measurand=?2 AND v.phase IS NULL ORDER BY v.valueTimestamp DESC")
-	List<Object[]> findByTransactionAndMeasurandAndPhaseIsNullOrderByValueTimestampDesc(TransactionStart transaction, String measurand, Pageable page);
+	List<Object[]> findByTransactionAndMeasurandAndPhaseIsNullOrderByValueTimestampDesc(TransactionStart transaction, String measurand);
+
+	@Query("SELECT v.unit, v.value FROM ConnectorMeterValue AS v WHERE v.transaction=?1 AND v.measurand=?2 AND v.phase IS NULL ORDER BY v.valueTimestamp DESC")
+	List<Object[]> findByTransactionAndMeasurandAndPhaseIsNullOrderByValueTimestampDescPage(TransactionStart transaction, String measurand, Pageable pageable);
+
 
 	@Query("SELECT v.valueTimestamp, v.value, v.readingContext, v.format, v.measurand, v.location, v.unit, v.phase " +
 			"FROM ConnectorMeterValue AS v WHERE v.transaction.transactionPk=?1")

@@ -75,15 +75,15 @@ public class ConnectorMeterValueService {
     }
 
     public List<ConnectorMeterValueData> getConnectorMeterValueByTransactionAndMeasurand(TransactionStart transaction,
-                                                                                     String measurand, int maxCount) {
+                                                                                     String measurand) {
         return ListTransform.transform(connectorMeterValueRepo.findByTransactionAndMeasurandAndPhaseIsNullOrderByValueTimestampDesc(transaction,
-                measurand, PageRequest.of(0, maxCount)), this::convertToMeterValueData);
+                measurand), this::convertToMeterValueData);
     }
 
     public ConnectorMeterValueData getLastConnectorMeterValueByTransactionAndMeasurand(TransactionStart transaction,
                                                                                    String measurand) {
         List<Object[]> list =
-                connectorMeterValueRepo.findByTransactionAndMeasurandAndPhaseIsNullOrderByValueTimestampDesc(transaction,
+                connectorMeterValueRepo.findByTransactionAndMeasurandAndPhaseIsNullOrderByValueTimestampDescPage(transaction,
                         measurand, PageRequest.of(0, 1));
         if (list.isEmpty()) {
             return null;

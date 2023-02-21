@@ -50,6 +50,8 @@ public class OcppChargingLimitWatcher {
                 log.info("Checking charging process with kwh limit: {}...", cp.getOcppChargingProcessId());
                 PowerValue pw = facade.getPowerValue(cp.getTransactionStart());
                 float kWh = getKwhValue(pw.getValue(), pw.getUnit());
+                log.info("Current consumption = {} limit = {} for charging process id = {}",
+                        kWh, cp.getLimitKwh(), cp.getOcppChargingProcessId());
                 if (kWh >= cp.getLimitKwh()) {
                     log.info("Limit {} exceeded ({}) for charging process, stopping: {}...", cp.getLimitKwh(), kWh, cp.getOcppChargingProcessId());
 
@@ -67,6 +69,8 @@ public class OcppChargingLimitWatcher {
             if (cp.getTransactionStart() != null) {
                 log.info("Checking charging process with minute limit: {}...", cp.getOcppChargingProcessId());
                 int duration = between(cp.getStartDate().toInstant(), new Date().toInstant()).toMinutesPart();
+                log.info("Current duration = {} limit = {} for charging process id = {}",
+                        duration, cp.getLimitMinute(), cp.getOcppChargingProcessId());
                 if (duration >= cp.getLimitMinute()) {
                     log.info("Limit {} exceeded ({}) for charging process, stopping: {}...", cp.getLimitMinute(), duration, cp.getOcppChargingProcessId());
 

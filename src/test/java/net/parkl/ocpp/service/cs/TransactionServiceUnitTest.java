@@ -49,8 +49,6 @@ public class TransactionServiceUnitTest {
     @Mock
     private ConnectorService connectorService;
     @Mock
-    private OcppIdTagService ocppIdTagService;
-    @Mock
     private ReservationService reservationService;
 
     @Test

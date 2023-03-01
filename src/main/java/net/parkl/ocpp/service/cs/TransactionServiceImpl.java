@@ -69,8 +69,6 @@ public class TransactionServiceImpl implements TransactionService {
     @Autowired
     private ChargePointService chargePointService;
     @Autowired
-    private OcppIdTagService ocppIdTagService;
-    @Autowired
     private ReservationService reservationService;
     @Autowired
     private ESPNotificationService espNotificationService;
@@ -86,7 +84,6 @@ public class TransactionServiceImpl implements TransactionService {
         List<Transaction> list = transactionCriteriaRepository.getInternal(form);
 
 
-        Map<String, OcppTag> tagMap = transformToMap(ocppIdTagService.findTags(), OcppTag::getIdTag);
 
         Map<String, OcppChargeBox> boxMap = transformToMap(chargePointService.findAllChargePoints(),
                 OcppChargeBox::getChargeBoxId);
@@ -98,11 +95,7 @@ public class TransactionServiceImpl implements TransactionService {
                 throw new IllegalStateException("Invalid charge box id: " + t.getConnector().getChargeBoxId());
             }
 
-            OcppTag tag = tagMap.get(t.getOcppTag());
-            if (tag == null) {
-                throw new IllegalStateException("Invalid id tag: " + t.getOcppTag());
-            }
-            ret.add(toTransactionDto(t, box, tag));
+            ret.add(toTransactionDto(t, box));
         }
         return ret;
     }
@@ -128,11 +121,6 @@ public class TransactionServiceImpl implements TransactionService {
         String stopValue = transaction.getStopValue();
         String chargeBoxId = transaction.getConnector().getChargeBoxId();
         int connectorId = transaction.getConnector().getConnectorId();
-
-        OcppTag tag = ocppIdTagService.getRecord(transaction.getOcppTag());
-        if (tag == null) {
-            throw new IllegalStateException("Invalid id tag: " + transaction.getOcppTag());
-        }
 
         OcppChargeBox box = chargePointService.findByChargeBoxId(transaction.getConnector().getChargeBoxId());
         if (box == null) {
@@ -220,7 +208,7 @@ public class TransactionServiceImpl implements TransactionService {
                     .build());
         }
 
-        return new TransactionDetails(toTransactionDto(transaction, box, tag), values, nextTransaction);
+        return new TransactionDetails(toTransactionDto(transaction, box), values, nextTransaction);
     }
 
     @Override
@@ -254,8 +242,6 @@ public class TransactionServiceImpl implements TransactionService {
                 params.getChargeBoxId(), params.getConnectorId(), params.getIdTag());
         Connector connector = connectorService.createConnectorIfNotExists(params.getChargeBoxId(),
                 params.getConnectorId());
-
-        ocppIdTagService.createTagWithoutActiveTransactionIfNotExists(params.getIdTag());
 
         TransactionStart existing = transactionStartRepo.findByConnectorAndIdTagAndStartValues(
                 connector, params.getIdTag(),

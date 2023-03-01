@@ -26,7 +26,10 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import de.rwth.idsg.steve.repository.dto.ChargePointSelect;
 import de.rwth.idsg.steve.web.dto.ocpp.ChargePointSelection;
 import de.rwth.idsg.steve.web.dto.ocpp.ReserveNowParams;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.util.List;
 
@@ -41,7 +44,6 @@ import java.util.List;
 public class EnhancedReserveNowParams implements ChargePointSelection {
     private ReserveNowParams reserveNowParams;
     private int reservationId;
-    private String parentIdTag;
 
     @Override
     @JsonIgnore

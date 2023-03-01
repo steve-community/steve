@@ -82,8 +82,7 @@ public class ReserveNowTask extends Ocpp15AndAboveTask<EnhancedReserveNowParams,
                 .withConnectorId(params.getReserveNowParams().getConnectorId())
                 .withExpiryDate(params.getReserveNowParams().getExpiry().toDateTime())
                 .withIdTag(params.getReserveNowParams().getIdTag())
-                .withReservationId(params.getReservationId())
-                .withParentIdTag(params.getParentIdTag());
+                .withReservationId(params.getReservationId());
     }
 
     @Override
@@ -92,8 +91,7 @@ public class ReserveNowTask extends Ocpp15AndAboveTask<EnhancedReserveNowParams,
                 .withConnectorId(params.getReserveNowParams().getConnectorId())
                 .withExpiryDate(params.getReserveNowParams().getExpiry().toDateTime())
                 .withIdTag(params.getReserveNowParams().getIdTag())
-                .withReservationId(params.getReservationId())
-                .withParentIdTag(params.getParentIdTag());
+                .withReservationId(params.getReservationId());
     }
 
     @Override

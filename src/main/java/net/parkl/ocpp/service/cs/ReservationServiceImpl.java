@@ -22,7 +22,10 @@ import de.rwth.idsg.steve.repository.ReservationStatus;
 import de.rwth.idsg.steve.repository.dto.InsertReservationParams;
 import de.rwth.idsg.steve.web.dto.ReservationQueryForm;
 import lombok.extern.slf4j.Slf4j;
-import net.parkl.ocpp.entities.*;
+import net.parkl.ocpp.entities.Connector;
+import net.parkl.ocpp.entities.OcppChargeBox;
+import net.parkl.ocpp.entities.OcppReservation;
+import net.parkl.ocpp.entities.TransactionStart;
 import net.parkl.ocpp.repositories.OcppReservationCriteriaRepository;
 import net.parkl.ocpp.repositories.OcppReservationRepository;
 import net.parkl.ocpp.service.config.AdvancedChargeBoxConfiguration;
@@ -42,7 +45,6 @@ public class ReservationServiceImpl implements ReservationService {
     private final OcppReservationRepository reservationRepo;
     private final ConnectorService connectorService;
     private final ChargePointService chargePointService;
-    private final OcppIdTagService ocppIdTagService;
     private final AdvancedChargeBoxConfiguration config;
     private final OcppReservationCriteriaRepository reservationCriteriaRepository;
 
@@ -50,13 +52,11 @@ public class ReservationServiceImpl implements ReservationService {
     public ReservationServiceImpl(OcppReservationRepository reservationRepo,
                                   ConnectorService connectorService,
                                   ChargePointService chargePointService,
-                                  OcppIdTagService ocppIdTagService,
                                   AdvancedChargeBoxConfiguration config,
                                   OcppReservationCriteriaRepository reservationCriteriaRepository) {
         this.reservationRepo = reservationRepo;
         this.connectorService = connectorService;
         this.chargePointService = chargePointService;
-        this.ocppIdTagService = ocppIdTagService;
         this.config = config;
         this.reservationCriteriaRepository = reservationCriteriaRepository;
     }
@@ -115,11 +115,8 @@ public class ReservationServiceImpl implements ReservationService {
 
     @Override
     public List<de.rwth.idsg.steve.repository.dto.Reservation> getReservations(ReservationQueryForm form) {
-        Map<String, OcppTag> tagMap = ocppIdTagService.getRfidTagOcppTagMap();
-
         Map<String, OcppChargeBox> boxMap = chargePointService.getIdChargeBoxMap();
-
-        return reservationCriteriaRepository.getReservations(form, tagMap, boxMap);
+        return reservationCriteriaRepository.getReservations(form, boxMap);
     }
 
 

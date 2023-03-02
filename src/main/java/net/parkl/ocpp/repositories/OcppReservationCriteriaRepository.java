@@ -24,7 +24,6 @@ import de.rwth.idsg.steve.utils.DateTimeUtils;
 import de.rwth.idsg.steve.web.dto.ReservationQueryForm;
 import net.parkl.ocpp.entities.OcppChargeBox;
 import net.parkl.ocpp.entities.OcppReservation;
-import net.parkl.ocpp.entities.OcppTag;
 import org.joda.time.DateTime;
 import org.springframework.stereotype.Repository;
 
@@ -45,7 +44,7 @@ public class OcppReservationCriteriaRepository {
     @PersistenceContext
     public EntityManager entityManager;
 
-    public List<Reservation> getReservations(ReservationQueryForm form, Map<String, OcppTag> tagMap, Map<String, OcppChargeBox> boxMap) {
+    public List<Reservation> getReservations(ReservationQueryForm form, Map<String, OcppChargeBox> boxMap) {
         try {
             CriteriaBuilder cb = entityManager.getCriteriaBuilder();
             CriteriaQuery<OcppReservation> cq = cb.createQuery(OcppReservation.class);
@@ -87,11 +86,6 @@ public class OcppReservationCriteriaRepository {
             List<Reservation> ret = new ArrayList<>();
             for (OcppReservation r : result) {
 
-                OcppTag tag = tagMap.get(r.getOcppTag());
-                if (tag == null) {
-                    throw new IllegalStateException("Invalid id tag: " + r.getOcppTag());
-                }
-
                 OcppChargeBox box = boxMap.get(r.getConnector().getChargeBoxId());
                 if (box == null) {
                     throw new IllegalStateException("Invalid charge box id: " + r.getConnector().getChargeBoxId());
@@ -100,7 +94,6 @@ public class OcppReservationCriteriaRepository {
                 ret.add(Reservation.builder()
                         .id(r.getReservationPk())
                         .transactionId(r.getTransaction() != null ? r.getTransaction().getTransactionPk() : null)
-                        .ocppTagPk(tag.getOcppTagPk())
                         .chargeBoxPk(box.getChargeBoxPk())
                         .ocppIdTag(r.getOcppTag())
                         .chargeBoxId(r.getConnector().getChargeBoxId())

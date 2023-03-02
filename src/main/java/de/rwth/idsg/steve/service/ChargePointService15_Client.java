@@ -31,7 +31,6 @@ import de.rwth.idsg.steve.repository.dto.ChargePointSelect;
 import de.rwth.idsg.steve.repository.dto.InsertReservationParams;
 import de.rwth.idsg.steve.service.dto.EnhancedReserveNowParams;
 import de.rwth.idsg.steve.web.dto.ocpp.*;
-import net.parkl.ocpp.service.cs.OcppIdTagService;
 import net.parkl.ocpp.service.cs.ReservationService;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,7 +46,6 @@ import java.util.List;
 @Qualifier("ChargePointService15_Client")
 public class ChargePointService15_Client extends ChargePointService12_Client implements IChargePointService15_Client {
 
-	@Autowired private OcppIdTagService userService;
     @Autowired protected OcppTagService ocppTagService;
     @Autowired protected ReservationService reservationService;
 
@@ -135,9 +133,8 @@ public class ChargePointService15_Client extends ChargePointService12_Client imp
                                                              .build();
 
         int reservationId = reservationService.insert(res);
-        String parentIdTag = userService.getParentIdtag(params.getIdTag());
 
-        EnhancedReserveNowParams enhancedParams = new EnhancedReserveNowParams(params, reservationId, parentIdTag);
+        EnhancedReserveNowParams enhancedParams = new EnhancedReserveNowParams(params, reservationId);
         ReserveNowTask task = new ReserveNowTask(persistentTaskService, getVersion(), enhancedParams, reservationService);
 
         Integer taskId = taskStore.add(task);

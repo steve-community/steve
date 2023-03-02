@@ -28,7 +28,6 @@ import de.rwth.idsg.steve.service.TransactionStopService;
 import de.rwth.idsg.steve.web.dto.ReservationQueryForm;
 import de.rwth.idsg.steve.web.dto.TransactionQueryForm;
 import net.parkl.ocpp.service.cs.ChargePointService;
-import net.parkl.ocpp.service.cs.OcppIdTagService;
 import net.parkl.ocpp.service.cs.ReservationService;
 import net.parkl.ocpp.service.cs.TransactionService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -58,7 +57,6 @@ public class TransactionsReservationsController {
     @Autowired private TransactionService transactionService;
     @Autowired private ReservationService reservationService;
     @Autowired private ChargePointService chargePointService;
-    @Autowired private OcppIdTagService ocppTagService;
     @Autowired private TransactionStopService transactionStopService;
 
     private static final String PARAMS = "params";
@@ -151,7 +149,6 @@ public class TransactionsReservationsController {
 
     private void initList(Model model) {
         model.addAttribute("cpList", chargePointService.getChargeBoxIds());
-        model.addAttribute("idTagList", ocppTagService.getIdTags());
     }
 
     private void initResList(Model model) {

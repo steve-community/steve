@@ -25,10 +25,6 @@
             Number of<br>Charge Points
             <span class="base formatNumber">${stats.numChargeBoxes}</span>
         </a>
-        <a class="tileRow1" href="${ctxPath}/manager/ocppTags">
-            Number of<br>OCPP Tags
-            <span class="base formatNumber">${stats.numOcppTags}</span>
-        </a>
         <a class="tileRow1" href="${ctxPath}/manager/users">
             Number of<br>Users
             <span class="base formatNumber">${stats.numUsers}</span>

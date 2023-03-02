@@ -107,9 +107,6 @@ public class SendLocalListTask extends Ocpp15AndAboveTask<SendLocalListParams, S
                 auths.add(new ocpp.cp._2015._10.AuthorizationData().withIdTag(idTag));
             }
 
-            // Step 2: For the idTags to be added or updated, insert them with their IdTagInfos
-            auths.addAll(ocppTagService.getAuthData(params.getAddUpdateList()));
-
             return new ocpp.cp._2015._10.SendLocalListRequest()
                     .withListVersion(params.getListVersion())
                     .withUpdateType(ocpp.cp._2015._10.UpdateType.DIFFERENTIAL)
@@ -118,10 +115,6 @@ public class SendLocalListTask extends Ocpp15AndAboveTask<SendLocalListParams, S
             // FULL update
         } else {
             List<AuthorizationData> values = Collections.emptyList();
-
-            if (Boolean.FALSE.equals(params.getSendEmptyListWhenFull())) {
-                values = ocppTagService.getAuthDataOfAllTags();
-            }
 
             return new ocpp.cp._2015._10.SendLocalListRequest()
                     .withListVersion(params.getListVersion())

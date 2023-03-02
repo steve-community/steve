@@ -24,7 +24,6 @@ import de.rwth.idsg.steve.utils.ControllerHelper;
 import de.rwth.idsg.steve.utils.mapper.UserFormMapper;
 import de.rwth.idsg.steve.web.dto.UserForm;
 import de.rwth.idsg.steve.web.dto.UserQueryForm;
-import net.parkl.ocpp.service.cs.OcppIdTagService;
 import net.parkl.ocpp.service.cs.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -45,7 +44,6 @@ import javax.validation.Valid;
 @RequestMapping(value = "/manager/users")
 public class UsersController {
 
-    @Autowired private OcppIdTagService ocppTagService;
     @Autowired private UserService userService;
 
     private static final String PARAMS = "params";
@@ -131,7 +129,6 @@ public class UsersController {
 
     private void setTags(Model model) {
         model.addAttribute("countryCodes", ControllerHelper.COUNTRY_DROPDOWN);
-        model.addAttribute("idTagList", ControllerHelper.idTagEnhancer(ocppTagService.getIdTags()));
     }
 
     // -------------------------------------------------------------------------

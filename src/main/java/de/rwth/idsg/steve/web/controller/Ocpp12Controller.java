@@ -22,19 +22,7 @@ import de.rwth.idsg.steve.config.WebEnvironment;
 import de.rwth.idsg.steve.ocpp.OcppVersion;
 import de.rwth.idsg.steve.service.ChargePointHelperService;
 import de.rwth.idsg.steve.service.ChargePointService12_Client;
-import de.rwth.idsg.steve.web.dto.ocpp.ChangeAvailabilityParams;
-import de.rwth.idsg.steve.web.dto.ocpp.ChangeConfigurationParams;
-import de.rwth.idsg.steve.web.dto.ocpp.ConfigurationKeyEnum;
-import de.rwth.idsg.steve.web.dto.ocpp.ConfigurationKeyReadWriteEnum;
-import de.rwth.idsg.steve.web.dto.ocpp.GetDiagnosticsParams;
-import de.rwth.idsg.steve.web.dto.ocpp.MultipleChargePointSelect;
-import de.rwth.idsg.steve.web.dto.ocpp.RemoteStartTransactionParams;
-import de.rwth.idsg.steve.web.dto.ocpp.RemoteStopTransactionParams;
-import de.rwth.idsg.steve.web.dto.ocpp.ResetParams;
-import de.rwth.idsg.steve.web.dto.ocpp.UnlockConnectorParams;
-import de.rwth.idsg.steve.web.dto.ocpp.UpdateFirmwareParams;
-import net.parkl.ocpp.service.cs.OcppIdTagService;
-
+import de.rwth.idsg.steve.web.dto.ocpp.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
@@ -58,8 +46,6 @@ import static de.rwth.idsg.steve.web.dto.ocpp.ConfigurationKeyReadWriteEnum.RW;
 public class Ocpp12Controller {
 
     @Autowired protected ChargePointHelperService chargePointHelperService;
-    @Autowired protected OcppIdTagService tagService;
-
     @Autowired
     @Qualifier("ChargePointService12_Client")
     private ChargePointService12_Client client12;
@@ -112,10 +98,6 @@ public class Ocpp12Controller {
         return "op12";
     }
 
-    protected void setActiveUserIdTagList(Model model) {
-        model.addAttribute("idTagList", tagService.getActiveIdTags());
-    }
-
     // -------------------------------------------------------------------------
     // Http methods (GET)
     // -------------------------------------------------------------------------
@@ -157,7 +139,6 @@ public class Ocpp12Controller {
     @RequestMapping(value = REMOTE_START_TX_PATH, method = RequestMethod.GET)
     public String getRemoteStartTx(Model model) {
         setCommonAttributesForTx(model);
-        setActiveUserIdTagList(model);
         model.addAttribute(PARAMS, new RemoteStartTransactionParams());
         return getPrefix() + REMOTE_START_TX_PATH;
     }
@@ -240,7 +221,6 @@ public class Ocpp12Controller {
                                     BindingResult result, Model model) {
         if (result.hasErrors()) {
             setCommonAttributesForTx(model);
-            setActiveUserIdTagList(model);
             return getPrefix() + REMOTE_START_TX_PATH;
         }
         return REDIRECT_TASKS_PATH + getClient12().remoteStartTransaction(params);

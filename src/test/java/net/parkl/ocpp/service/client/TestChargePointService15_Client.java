@@ -1,37 +1,25 @@
 package net.parkl.ocpp.service.client;
 
-import java.util.List;
-
-import net.parkl.ocpp.service.cs.ReservationService;
-import org.joda.time.DateTime;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.stereotype.Service;
-
 import de.rwth.idsg.steve.ocpp.ChargePointService15_Invoker;
-import de.rwth.idsg.steve.ocpp.task.CancelReservationTask;
-import de.rwth.idsg.steve.ocpp.task.DataTransferTask;
-import de.rwth.idsg.steve.ocpp.task.GetConfigurationTask;
-import de.rwth.idsg.steve.ocpp.task.GetLocalListVersionTask;
-import de.rwth.idsg.steve.ocpp.task.ReserveNowTask;
-import de.rwth.idsg.steve.ocpp.task.SendLocalListTask;
+import de.rwth.idsg.steve.ocpp.task.*;
 import de.rwth.idsg.steve.repository.dto.ChargePointSelect;
 import de.rwth.idsg.steve.repository.dto.InsertReservationParams;
 import de.rwth.idsg.steve.service.BackgroundService;
 import de.rwth.idsg.steve.service.IChargePointService15_Client;
 import de.rwth.idsg.steve.service.OcppTagService;
 import de.rwth.idsg.steve.service.dto.EnhancedReserveNowParams;
-import de.rwth.idsg.steve.web.dto.ocpp.CancelReservationParams;
-import de.rwth.idsg.steve.web.dto.ocpp.DataTransferParams;
-import de.rwth.idsg.steve.web.dto.ocpp.GetConfigurationParams;
-import de.rwth.idsg.steve.web.dto.ocpp.MultipleChargePointSelect;
-import de.rwth.idsg.steve.web.dto.ocpp.ReserveNowParams;
-import de.rwth.idsg.steve.web.dto.ocpp.SendLocalListParams;
+import de.rwth.idsg.steve.web.dto.ocpp.*;
+import net.parkl.ocpp.service.cs.ReservationService;
+import org.joda.time.DateTime;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 @Qualifier("ChargePointService15_Client")
 public class TestChargePointService15_Client extends TestChargePointService12_Client implements IChargePointService15_Client {
-	@Autowired private net.parkl.ocpp.service.cs.OcppIdTagService userService;
     @Autowired protected OcppTagService ocppTagService;
     @Autowired protected ReservationService reservationService;
 
@@ -108,9 +96,8 @@ public class TestChargePointService15_Client extends TestChargePointService12_Cl
                                                              .build();
 
         int reservationId = reservationService.insert(res);
-        String parentIdTag = userService.getParentIdtag(params.getIdTag());
 
-        EnhancedReserveNowParams enhancedParams = new EnhancedReserveNowParams(params, reservationId, parentIdTag);
+        EnhancedReserveNowParams enhancedParams = new EnhancedReserveNowParams(params, reservationId);
         ReserveNowTask task = new ReserveNowTask(persistentTaskService, getVersion(), enhancedParams, reservationService);
 
         Integer taskId = taskStore.add(task);

@@ -40,7 +40,10 @@ import net.parkl.ocpp.repositories.ConnectorLastStatusRepository;
 import net.parkl.ocpp.repositories.ConnectorRepository;
 import net.parkl.ocpp.repositories.OcppChargeBoxRepository;
 import net.parkl.ocpp.service.config.AdvancedChargeBoxConfiguration;
-import net.parkl.ocpp.service.cs.*;
+import net.parkl.ocpp.service.cs.ChargePointService;
+import net.parkl.ocpp.service.cs.ConnectorMeterValueData;
+import net.parkl.ocpp.service.cs.ConnectorMeterValueService;
+import net.parkl.ocpp.service.cs.TransactionService;
 import net.parkl.ocpp.util.AsyncWaiter;
 import ocpp.cp._2012._06.AvailabilityStatus;
 import ocpp.cs._2015._10.RegistrationStatus;
@@ -96,8 +99,6 @@ public class OcppMiddlewareImpl implements OcppMiddleware {
     private ChargePointService chargePointService;
     @Autowired
     private ChargingProcessService chargingProcessService;
-    @Autowired
-    private OcppIdTagService idTagService;
     @Autowired
     private TransactionService transactionService;
     @Autowired
@@ -164,7 +165,6 @@ public class OcppMiddlewareImpl implements OcppMiddleware {
         if (config.isIdTagMax10Characters(c.getChargeBoxId())) {
             log.info("Charge box (id = {}) uses ID tag with max length of 10, shortening ID tag...", c.getChargeBoxId());
             idTag = idTag.substring(0, 9);
-            idTagService.addRfidTagIfNotExists(idTag);
         }
 
         if (config.isUsingIntegratedTag(c.getChargeBoxId())) {

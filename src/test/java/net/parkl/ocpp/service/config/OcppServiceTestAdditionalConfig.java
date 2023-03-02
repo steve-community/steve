@@ -18,10 +18,4 @@ public class OcppServiceTestAdditionalConfig {
     public CentralSystemService16_Service centralSystemService16_Service() {
         return new CentralSystemService16_Service();
     }
-
-
-    @Bean
-    public IntegratedIdTagProvider idTagProvider() {
-        return new TestIntegrationIdProvider();
-    }
 }

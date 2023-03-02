@@ -22,11 +22,8 @@
  */
 package de.rwth.idsg.steve.service;
 
-import de.rwth.idsg.steve.service.dto.UnidentifiedIncomingObject;
-import ocpp.cp._2015._10.AuthorizationData;
 import ocpp.cs._2015._10.IdTagInfo;
 
-import java.util.List;
 import java.util.function.Supplier;
 
 /**
@@ -36,8 +33,4 @@ import java.util.function.Supplier;
 public interface OcppTagService {
     IdTagInfo getIdTagInfo(String idTag, boolean isStartTransactionReqContext,String askingChargeBoxId);
     IdTagInfo getIdTagInfo(String idTag, boolean isStartTransactionReqContext,String askingChargeBoxId, Supplier<IdTagInfo> supplierWhenException);
-    List<AuthorizationData> getAuthDataOfAllTags();
-    List<AuthorizationData> getAuthData(List<String> idTagList);
-    List<UnidentifiedIncomingObject> getUnknownOcppTags();
-    void removeUnknown(List<String> idTagList);
 }

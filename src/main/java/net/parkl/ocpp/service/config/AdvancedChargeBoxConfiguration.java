@@ -32,45 +32,45 @@ import static java.util.Collections.emptyList;
  */
 @Component
 public class AdvancedChargeBoxConfiguration {
-    @Autowired
+    @Autowired(required = false)
     private ChargeBoxConfiguration chargeBoxConfiguration;
     @Autowired(required = false)
     private IntegratedIdTagProvider idTagProvider;
 
     public boolean isStartTimeoutEnabled(String chargeBoxId) {
-        return chargeBoxConfiguration.isStartTimeoutEnabled(chargeBoxId);
+        return chargeBoxConfiguration != null && chargeBoxConfiguration.isStartTimeoutEnabled(chargeBoxId);
     }
 
     public int getStartTimeoutSecs(String chargeBoxId) {
-        return chargeBoxConfiguration.getStartTimeoutSecs(chargeBoxId);
+        return chargeBoxConfiguration == null ? 0 : chargeBoxConfiguration.getStartTimeoutSecs(chargeBoxId);
     }
 
     public boolean isPreparingTimeoutEnabled(String chargeBoxId) {
-        return chargeBoxConfiguration.isPreparingTimeoutEnabled(chargeBoxId);
+        return chargeBoxConfiguration != null && chargeBoxConfiguration.isPreparingTimeoutEnabled(chargeBoxId);
     }
 
     public int getPreparingTimeoutSecs(String chargeBoxId) {
-        return chargeBoxConfiguration.getPreparingTimeoutSecs(chargeBoxId);
+        return chargeBoxConfiguration == null ? 0 : chargeBoxConfiguration.getPreparingTimeoutSecs(chargeBoxId);
     }
 
     public boolean isTransactionPartialEnabled(String chargeBoxId) {
-        return chargeBoxConfiguration.isTransactionPartialEnabled(chargeBoxId);
+        return chargeBoxConfiguration != null && chargeBoxConfiguration.isTransactionPartialEnabled(chargeBoxId);
     }
 
     public boolean waitingForChargingProcessEnabled(String chargeBoxId) {
-        return chargeBoxConfiguration.waitingForChargingProcessEnabled(chargeBoxId);
+        return chargeBoxConfiguration != null && chargeBoxConfiguration.waitingForChargingProcessEnabled(chargeBoxId);
     }
 
     public boolean isStartTimeoutEnabledForAny() {
-        return chargeBoxConfiguration.isStartTimeoutEnabledForAny();
+        return chargeBoxConfiguration != null && chargeBoxConfiguration.isStartTimeoutEnabledForAny();
     }
 
     public boolean isPreparingTimeoutEnabledForAny() {
-        return chargeBoxConfiguration.isPreparingTimeoutEnabledForAny();
+        return chargeBoxConfiguration != null && chargeBoxConfiguration.isPreparingTimeoutEnabledForAny();
     }
 
     public boolean isUsingIntegratedTag(String chargeBoxId) {
-        return chargeBoxConfiguration.isUsingIntegratedTag(chargeBoxId);
+        return chargeBoxConfiguration != null && chargeBoxConfiguration.isUsingIntegratedTag(chargeBoxId);
     }
 
     public List<String> getIntegrationIdTags() {
@@ -78,14 +78,14 @@ public class AdvancedChargeBoxConfiguration {
     }
 
     public boolean checkReservationId(String chargeBoxId) {
-        return chargeBoxConfiguration.checkReservationId(chargeBoxId);
+        return chargeBoxConfiguration != null && chargeBoxConfiguration.checkReservationId(chargeBoxId);
     }
 
     public List<String> getChargeBoxesForAlert() {
-        return chargeBoxConfiguration.getChargeBoxesForAlert();
+        return chargeBoxConfiguration == null ? emptyList() : chargeBoxConfiguration.getChargeBoxesForAlert();
     }
 
     public boolean skipHeartBeatConfig(String chargeBoxId) {
-        return chargeBoxConfiguration.skipHeartBeatConfig(chargeBoxId);
+        return chargeBoxConfiguration != null && chargeBoxConfiguration.skipHeartBeatConfig(chargeBoxId);
     }
 }

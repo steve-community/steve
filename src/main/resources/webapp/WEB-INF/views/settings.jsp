@@ -37,7 +37,8 @@
             <form:input path="heartbeat"/>
         </td></tr>
         <tr><td><i>
-            The time interval in <b>minutes</b> for how often a charge point <br> should request the current time from SteVe.
+            The time interval in <b>minutes</b> for how often a charge point <br> should request the current time from SteVe.<br>
+            The value 0 requests clients to use reasonable default values.
         </i></td><td></td></tr>
         <tr><td>Expiration:</td><td>
             <form:input path="expiration"/>

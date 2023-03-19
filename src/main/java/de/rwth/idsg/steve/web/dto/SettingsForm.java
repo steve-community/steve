@@ -48,7 +48,7 @@ public class SettingsForm {
     // OCPP
     // -------------------------------------------------------------------------
 
-    @Min(value = 1, message = "Heartbeat Interval must be at least {value}")
+    @Min(value = 0, message = "Heartbeat Interval must be at least {value}")
     @NotNull(message = "Heartbeat Interval is required")
     private Integer heartbeat;
 

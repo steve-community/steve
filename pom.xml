@@ -35,7 +35,7 @@
         <java.version>11</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-        <jooq.version>3.16.7</jooq.version>
+        <jooq.version>3.18.1</jooq.version>
         <cxf.version>3.5.5</cxf.version>
         <spring.version>5.3.23</spring.version>
         <spring.security.version>5.7.5</spring.security.version>

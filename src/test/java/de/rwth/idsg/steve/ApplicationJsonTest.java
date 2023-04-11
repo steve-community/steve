@@ -27,6 +27,7 @@ import ocpp.cs._2015._10.AuthorizeRequest;
 import ocpp.cs._2015._10.AuthorizeResponse;
 import ocpp.cs._2015._10.BootNotificationRequest;
 import ocpp.cs._2015._10.BootNotificationResponse;
+import ocpp.cs._2015._10.HeartbeatResponse;
 import ocpp.cs._2015._10.RegistrationStatus;
 import org.eclipse.jetty.websocket.api.exceptions.UpgradeException;
 import org.junit.jupiter.api.AfterAll;
@@ -180,6 +181,22 @@ public class ApplicationJsonTest {
         UpgradeException actualCause = (UpgradeException) e.getCause().getCause();
 
         Assertions.assertEquals(HttpStatus.NOT_FOUND.value(), actualCause.getResponseStatusCode());
+    }
+
+    /**
+     * https://github.com/steve-community/steve/issues/1109
+     */
+    @Test
+    public void testWithNullPayload() {
+        OcppJsonChargePoint chargePoint = new OcppJsonChargePoint(OcppVersion.V_16, REGISTERED_CHARGE_BOX_ID, PATH);
+        chargePoint.start();
+
+        chargePoint.prepare(null, "Heartbeat", HeartbeatResponse.class,
+            response -> Assertions.assertNotNull(response.getCurrentTime()),
+            error -> Assertions.fail()
+        );
+
+        chargePoint.processAndClose();
     }
 
 }

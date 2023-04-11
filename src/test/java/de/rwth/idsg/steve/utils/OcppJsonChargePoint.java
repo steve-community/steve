@@ -143,12 +143,17 @@ public class OcppJsonChargePoint {
 
     public <T extends ResponseType> void prepare(RequestType request, Class<T> responseClass,
                                                  Consumer<T> responseHandler, Consumer<OcppJsonError> errorHandler) {
+        prepare(request, getOperationName(request), responseClass, responseHandler, errorHandler);
+    }
+
+    public <T extends ResponseType> void prepare(RequestType payload, String action, Class<T> responseClass,
+                                                 Consumer<T> responseHandler, Consumer<OcppJsonError> errorHandler) {
         String messageId = UUID.randomUUID().toString();
 
         OcppJsonCall call = new OcppJsonCall();
         call.setMessageId(messageId);
-        call.setPayload(request);
-        call.setAction(getOperationName(request));
+        call.setPayload(payload);
+        call.setAction(action);
 
         // session is null, because we do not need org.springframework.web.socket.WebSocketSession
         CommunicationContext ctx = new CommunicationContext(null, chargeBoxId);

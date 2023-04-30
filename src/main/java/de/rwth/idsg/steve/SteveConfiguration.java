@@ -95,6 +95,14 @@ public enum SteveConfiguration {
                    .passwordEncoder(encoder)
                    .userName(p.getString("auth.user"))
                    .encodedPassword(encoder.encode(p.getString("auth.password")))
+                   .method(p.getOptionalString("auth.method"))
+                   .oAuthAuthorizationUri(p.getOptionalString("auth.oauth2.authorization-uri"))
+                   .oAuthClientId(p.getOptionalString("auth.oauth2.client-id"))
+                   .oAuthClientSecret(p.getOptionalString("auth.oauth2.client-secret"))
+                   .oAuthTokenUri(p.getOptionalString("auth.oauth2.token-uri"))
+                   .oAuthJwkSetUri(p.getOptionalString("auth.oauth2.jwk-set-uri"))
+                   .oAuthUserInfoUri(p.getOptionalString("auth.oauth2.user-info-uri"))
+                   .oAuthLogoutUri(p.getOptionalString("auth.oauth2.logout-uri"))
                    .build();
 
         webApi = WebApi.builder()
@@ -185,6 +193,14 @@ public enum SteveConfiguration {
     // Credentials for Web interface access
     @Builder @Getter
     public static class Auth {
+        private final String method;
+        private final String oAuthClientId;
+        private final String oAuthClientSecret;
+        private final String oAuthAuthorizationUri;
+        private final String oAuthTokenUri;
+        private final String oAuthUserInfoUri;
+        private final String oAuthJwkSetUri;
+        private final String oAuthLogoutUri;
         private final PasswordEncoder passwordEncoder;
         private final String userName;
         private final String encodedPassword;

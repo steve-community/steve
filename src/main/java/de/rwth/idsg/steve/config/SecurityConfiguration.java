@@ -107,29 +107,32 @@ public class SecurityConfiguration {
     }
     @Bean
     public ClientRegistrationRepository clientRegistrationRepository() {
-        ClientRegistration registration = ClientRegistration.withRegistrationId("sso")
-                .clientId(CONFIG.getAuth().getOAuthClientId())
-                .clientSecret(CONFIG.getAuth().getOAuthClientSecret())
-                .authorizationUri(CONFIG.getAuth().getOAuthAuthorizationUri())
-                .jwkSetUri(CONFIG.getAuth().getOAuthJwkSetUri())
-                .userInfoUri(CONFIG.getAuth().getOAuthUserInfoUri())
-                .scope("openid", "profile", "email")
-                .tokenUri(CONFIG.getAuth().getOAuthTokenUri())
-                .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
-                .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
-                .userNameAttributeName(IdTokenClaimNames.SUB)
-                .redirectUri("{baseUrl}/login/oauth2/code/sso")
-                .clientName("SSO")
-                .build();
+        if (CONFIG.getAuth().getMethod().equals("oauth2")){
+            ClientRegistration registration = ClientRegistration.withRegistrationId("sso")
+                    .clientId(CONFIG.getAuth().getOAuthClientId())
+                    .clientSecret(CONFIG.getAuth().getOAuthClientSecret())
+                    .authorizationUri(CONFIG.getAuth().getOAuthAuthorizationUri())
+                    .jwkSetUri(CONFIG.getAuth().getOAuthJwkSetUri())
+                    .userInfoUri(CONFIG.getAuth().getOAuthUserInfoUri())
+                    .scope("openid", "profile", "email")
+                    .tokenUri(CONFIG.getAuth().getOAuthTokenUri())
+                    .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
+                    .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
+                    .userNameAttributeName(IdTokenClaimNames.SUB)
+                    .redirectUri("{baseUrl}/login/oauth2/code/sso")
+                    .clientName("SSO")
+                    .build();
 
-        return new InMemoryClientRegistrationRepository(registration);
+            return new InMemoryClientRegistrationRepository(registration);
+        }
+        return null;
     }
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         final String prefix = CONFIG.getSpringManagerMapping();
 
-        if (Objects.equals(CONFIG.getAuth().getMethod(), "oauth2")){
+        if (CONFIG.getAuth().getMethod().equals("oauth2")){
             return http.authorizeHttpRequests(req -> req.antMatchers(prefix + "/**").authenticated()).oauth2Login(Customizer.withDefaults())
                     .logout(
                             req -> req.logoutUrl(prefix + "/signout")

@@ -36,6 +36,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
         <jooq.version>3.16.7</jooq.version>
+        <testcontainers.version>1.18.0</testcontainers.version>
         <cxf.version>3.5.5</cxf.version>
         <spring.version>5.3.23</spring.version>
         <spring.security.version>5.7.5</spring.security.version>
@@ -44,12 +45,100 @@
         <lombok.version>1.18.26</lombok.version>
         <jackson.version>2.15.0</jackson.version>
         <plugin.license-maven.version>4.2</plugin.license-maven.version>
-
-        <!-- In Mysql: schema == database (http://dev.mysql.com/doc/refman/5.6/en/glossary.html#glos_schema) -->
-        <jdbcUrl>jdbc:mysql://${db.ip}:${db.port}/${db.schema}?useSSL=true&amp;serverTimezone=UTC</jdbcUrl>
+        <plugin.groovy-maven.version>2.1.1</plugin.groovy-maven.version>
     </properties>
 
     <profiles>
+        <profile>
+            <id>testcontainers</id>
+            <build>
+                <plugins>
+                    <!-- From https://github.com/jOOQ/jOOQ/blob/main/jOOQ-examples/jOOQ-testcontainers-flyway-example/pom.xml -->
+                    <plugin>
+                        <groupId>org.codehaus.gmaven</groupId>
+                        <artifactId>groovy-maven-plugin</artifactId>
+                        <version>${plugin.groovy-maven.version}</version>
+                        <executions>
+                            <execution>
+                                <id>testcontainers-start</id>
+                                <phase>initialize</phase>
+                                <goals>
+                                    <goal>execute</goal>
+                                </goals>
+                                <configuration>
+                                    <source>
+                                        import groovy.sql.Sql
+                                        import org.testcontainers.containers.MySQLContainer
+
+                                        db = new MySQLContainer('mysql:8.0')
+                                                .withEnv('MYSQL_ROOT_PASSWORD', "${db.password}")
+                                                .withUsername("${db.user}")
+                                                .withDatabaseName("${db.schema}")
+                                                .withPassword("${db.password}")
+                                                .withUrlParam('useSSL', 'true')
+                                                .withUrlParam('serverTimezone', 'UTC')
+                                        db.start()
+
+                                        Sql.withInstance([
+                                                url: db.getJdbcUrl(),
+                                                user: 'root',
+                                                password: "${db.password}",
+                                                driver: 'com.mysql.cj.jdbc.Driver',
+                                        ]) { sql -> sql.execute "GRANT SUPER ON *.* TO '${db.user}'" }
+
+                                        // After you've started the container, collect its generated
+                                        // JDBC URL (which contains a random port)
+                                        project.properties.setProperty('jdbcUrl', db.getJdbcUrl())
+                                        project.properties.setProperty('testcontainers.containerid', db.getContainerId())
+                                        project.properties.setProperty('testcontainers.imageName', db.getDockerImageName())
+                                    </source>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>testcontainers-stop</id>
+                                <phase>post-integration-test</phase>
+                                <goals>
+                                    <goal>execute</goal>
+                                </goals>
+                                <configuration>
+                                    <source>
+                                        import org.testcontainers.DockerClientFactory
+
+                                        containerId = "${testcontainers.containerid}"
+                                        imageName = "${testcontainers.imageName}"
+                                        println("Stopping testcontainers $containerId - $imageName")
+
+                                        dockerClient = DockerClientFactory.instance().client()
+                                        dockerClient.killContainerCmd(containerId).exec()
+                                        dockerClient.removeContainerCmd(containerId).withRemoveVolumes(true).withForce(true).exec()
+                                    </source>
+                                </configuration>
+                            </execution>
+                        </executions>
+
+                        <dependencies>
+                            <dependency>
+                                <groupId>org.testcontainers</groupId>
+                                <artifactId>mysql</artifactId>
+                                <version>${testcontainers.version}</version>
+                            </dependency>
+                            <dependency>
+                                <groupId>mysql</groupId>
+                                <artifactId>mysql-connector-java</artifactId>
+                                <version>${mysql.jdbc.version}</version>
+                            </dependency>
+                        </dependencies>
+                    </plugin>
+                </plugins>
+            </build>
+            <dependencies>
+                <dependency>
+                    <groupId>org.testcontainers</groupId>
+                    <artifactId>mysql</artifactId>
+                    <version>${testcontainers.version}</version>
+                </dependency>
+            </dependencies>
+        </profile>
         <profile>
             <id>prod</id>
             <activation>
@@ -260,6 +349,31 @@
                     </execution>
                 </executions>
             </plugin>
+            <!-- Setup jdbcUrl as dynamic property otherwise maven doesn't propagate dynamic changes like testcontainers step -->
+            <plugin>
+                <groupId>org.codehaus.gmaven</groupId>
+                <artifactId>groovy-maven-plugin</artifactId>
+                <version>${plugin.groovy-maven.version}</version>
+                <executions>
+                    <execution>
+                        <id>setup-jdbcUrl</id>
+                        <phase>initialize</phase>
+                        <goals>
+                            <goal>execute</goal>
+                        </goals>
+                        <configuration>
+                            <source>
+                                jdbcUrl = project.properties.getProperty('jdbcUrl')
+                                if (jdbcUrl == null || jdbcUrl.isBlanck()) {
+                                    // In Mysql: schema == database (http://dev.mysql.com/doc/refman/5.6/en/glossary.html#glos_schema)
+                                    jdbcUrl = "jdbc:mysql://${db.ip}:${db.port}/${db.schema}?useSSL=true&amp;serverTimezone=UTC"
+                                    project.properties.setProperty('jdbcUrl', jdbcUrl)
+                                }
+                            </source>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
 
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -358,6 +472,18 @@
                         <location>filesystem:src/main/resources/db/migration</location>
                     </locations>
                 </configuration>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.testcontainers</groupId>
+                        <artifactId>testcontainers</artifactId>
+                        <version>${testcontainers.version}</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>org.testcontainers</groupId>
+                        <artifactId>mysql</artifactId>
+                        <version>${testcontainers.version}</version>
+                    </dependency>
+                </dependencies>
             </plugin>
 
             <plugin>

@@ -46,6 +46,8 @@
         <jackson.version>2.15.0</jackson.version>
         <plugin.license-maven.version>4.2</plugin.license-maven.version>
         <plugin.groovy-maven.version>2.1.1</plugin.groovy-maven.version>
+
+        <db.baseline>V0</db.baseline>
     </properties>
 
     <profiles>
@@ -79,12 +81,15 @@
                                                 .withUrlParam('serverTimezone', 'UTC')
                                         db.start()
 
-                                        Sql.withInstance([
-                                                url: db.getJdbcUrl(),
-                                                user: 'root',
-                                                password: "${db.password}",
-                                                driver: 'com.mysql.cj.jdbc.Driver',
-                                        ]) { sql -> sql.execute "GRANT SUPER ON *.* TO '${db.user}'" }
+                                        if ("${db.baseline}".equals('V0')) {
+                                            // Grant SUPER privileges to the user so that we can apply all migrations from V0 as baseline
+                                            Sql.withInstance([
+                                                    url: db.getJdbcUrl(),
+                                                    user: 'root',
+                                                    password: "${db.password}",
+                                                    driver: 'com.mysql.cj.jdbc.Driver',
+                                            ]) { sql -> sql.execute "GRANT SUPER ON *.* TO '${db.user}'" }
+                                        }
 
                                         // After you've started the container, collect its generated
                                         // JDBC URL (which contains a random port)
@@ -469,7 +474,8 @@
                         <schema>${db.schema}</schema>
                     </schemas>
                     <locations>
-                        <location>filesystem:src/main/resources/db/migration</location>
+                        <location>filesystem:src/main/resources/db/migration/${db.baseline}</location>
+                        <location>filesystem:src/main/resources/db/migration/updates</location>
                     </locations>
                 </configuration>
                 <dependencies>

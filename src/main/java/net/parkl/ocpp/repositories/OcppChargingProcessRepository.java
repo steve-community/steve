@@ -22,9 +22,11 @@ import net.parkl.ocpp.entities.Connector;
 import net.parkl.ocpp.entities.OcppChargingProcess;
 import net.parkl.ocpp.entities.TransactionStart;
 import org.springframework.data.jpa.repository.EntityGraph;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 
+import java.util.Date;
 import java.util.List;
 
 public interface OcppChargingProcessRepository extends CrudRepository<OcppChargingProcess, String>{
@@ -53,5 +55,8 @@ public interface OcppChargingProcessRepository extends CrudRepository<OcppChargi
 	@Query("SELECT OBJECT(p) FROM OcppChargingProcess AS p WHERE p.transactionStart.transactionPk=?1")
 	OcppChargingProcess findByTransactionId(int transactionId);
 
+	@Query("DELETE FROM OcppChargingProcess p WHERE p.transactionStart IS NULL AND p.endDate IS NULL AND p.startDate<?1")
+	@Modifying
+	int deleteWithoutTransaction(Date date);
 
 }

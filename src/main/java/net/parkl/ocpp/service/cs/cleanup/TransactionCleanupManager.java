@@ -67,6 +67,9 @@ public class TransactionCleanupManager {
         }
 
         log.info("Transaction cleanup completed: {} of {} transactions", cleanedUp, transactions.size() );
+
+        int deleted = chargingProcessService.cleanupWithoutTransaction();
+        log.info("Cleaned up {} charging processes without transaction", deleted);
     }
 
     private Date getCleanupCheckThreshold() {

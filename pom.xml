@@ -41,7 +41,7 @@
         <spring.security.version>5.7.5</spring.security.version>
         <mysql.jdbc.version>8.0.30</mysql.jdbc.version>
         <jetty.version>10.0.14</jetty.version>
-        <lombok.version>1.18.26</lombok.version>
+        <lombok.version>1.18.28</lombok.version>
         <jackson.version>2.15.1</jackson.version>
         <plugin.license-maven.version>4.2</plugin.license-maven.version>
 

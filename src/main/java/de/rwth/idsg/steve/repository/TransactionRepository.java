@@ -33,12 +33,13 @@ public interface TransactionRepository {
     List<Transaction> getTransactions(TransactionQueryForm form);
 
     void writeTransactionsCSV(TransactionQueryForm form, Writer writer);
+    void writeTransactionsDetailsCSV(int transactionPk, Writer writer, boolean DataReduction, boolean firstArrivingMeterValueIfMultiple);
 
     List<Integer> getActiveTransactionIds(String chargeBoxId);
 
-    TransactionDetails getDetails(int transactionPk, boolean firstArrivingMeterValueIfMultiple);
+    TransactionDetails getDetails(int transactionPk, boolean DataReduction, boolean firstArrivingMeterValueIfMultiple);
 
     default TransactionDetails getDetails(int transactionPk) {
-        return getDetails(transactionPk, true);
+        return getDetails(transactionPk, true, true);
     }
 }

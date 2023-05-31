@@ -25,6 +25,7 @@ import de.rwth.idsg.steve.repository.TransactionRepository;
 import de.rwth.idsg.steve.service.OcppTagService;
 import de.rwth.idsg.steve.service.TransactionStopService;
 import de.rwth.idsg.steve.web.dto.ReservationQueryForm;
+import de.rwth.idsg.steve.web.dto.TransactionDetailQueryForm;
 import de.rwth.idsg.steve.web.dto.TransactionQueryForm;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -64,6 +65,8 @@ public class TransactionsReservationsController {
     private static final String TRANSACTIONS_PATH = "/transactions";
     private static final String TRANSACTION_STOP_PATH = "/transactions/stop/{transactionPk}";
     private static final String TRANSACTIONS_DETAILS_PATH = "/transactions/details/{transactionPk}";
+    private static final String TRANSACTIONS_DETAILS_XLS_PATH ="/transactions/detailsxls";
+    
     private static final String TRANSACTIONS_QUERY_PATH = "/transactions/query";
     private static final String RESERVATIONS_PATH = "/reservations";
     private static final String RESERVATIONS_QUERY_PATH = "/reservations/query";
@@ -90,6 +93,8 @@ public class TransactionsReservationsController {
 
     @RequestMapping(value = TRANSACTIONS_DETAILS_PATH)
     public String getTransactionDetails(@PathVariable("transactionPk") int transactionPk, Model model) {
+        TransactionDetailQueryForm params = new TransactionDetailQueryForm();
+        model.addAttribute(PARAMS, params);
         model.addAttribute("details", transactionRepository.getDetails(transactionPk));
         return "data-man/transactionDetails";
     }
@@ -121,6 +126,26 @@ public class TransactionsReservationsController {
         }
     }
 
+    @RequestMapping(value = TRANSACTIONS_DETAILS_XLS_PATH)
+    public String getTransactionsDetailXLS(@Valid @ModelAttribute(PARAMS) TransactionDetailQueryForm params,
+                                       BindingResult result, Model model,
+                                       HttpServletResponse response) throws IOException {
+        if (result.hasErrors()) {
+            return null;
+        }
+        int transaction_pk = params.getTransactionPk();
+        
+        String fileName = "transaction" + transaction_pk +"_MeterValues.csv";
+        String headerKey = "Content-Disposition";
+        String headerValue = String.format("attachment; filename=\"%s\"", fileName);
+        response.setContentType("text/csv");
+        response.setHeader(headerKey, headerValue);
+        
+        transactionRepository.writeTransactionsDetailsCSV(transaction_pk, response.getWriter(),params.isDataReduction(),params.isFirstArrivingMeterValueIfMultiple());
+        return null;
+
+    }
+    
     @RequestMapping(value = RESERVATIONS_PATH)
     public String getReservations(Model model) {
         ReservationQueryForm params = new ReservationQueryForm();

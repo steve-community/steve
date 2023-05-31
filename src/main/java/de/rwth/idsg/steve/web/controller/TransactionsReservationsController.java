@@ -65,7 +65,7 @@ public class TransactionsReservationsController {
     private static final String TRANSACTIONS_PATH = "/transactions";
     private static final String TRANSACTION_STOP_PATH = "/transactions/stop/{transactionPk}";
     private static final String TRANSACTIONS_DETAILS_PATH = "/transactions/details/{transactionPk}";
-    private static final String TRANSACTIONS_DETAILS_XLS_PATH ="/transactions/detailsxls";
+    private static final String TRANSACTIONS_DETAILS_XLS_PATH = "/transactions/detailsxls";
     
     private static final String TRANSACTIONS_QUERY_PATH = "/transactions/query";
     private static final String RESERVATIONS_PATH = "/reservations";
@@ -133,24 +133,26 @@ public class TransactionsReservationsController {
         if (result.hasErrors()) {
             return null;
         }
-        int transaction_pk = params.getTransactionPk();
+        int transactionPk = params.getTransactionPk();
         
-        String fileName = "transaction" + transaction_pk +"_MeterValues.csv";
+        String fileName = "transaction" + transactionPk + "_MeterValues.csv";
         String headerKey = "Content-Disposition";
         String headerValue = String.format("attachment; filename=\"%s\"", fileName);
         response.setContentType("text/csv");
         response.setHeader(headerKey, headerValue);
         
-        transactionRepository.writeTransactionsDetailsCSV(transaction_pk, response.getWriter(),params.isDataReduction(),params.isFirstArrivingMeterValueIfMultiple());
+        transactionRepository.writeTransactionsDetailsCSV(transactionPk,
+                                                          response.getWriter(),
+                                                          params.isDataReduction(),
+                                                          params.isFirstArrivingMeterValueIfMultiple());
         return null;
-
     }
     
     @RequestMapping(value = RESERVATIONS_PATH)
     public String getReservations(Model model) {
         ReservationQueryForm params = new ReservationQueryForm();
         initResList(model);
-
+        
         model.addAttribute("reservList", reservationRepository.getReservations(params));
         model.addAttribute(PARAMS, params);
         return "data-man/reservations";
@@ -162,7 +164,7 @@ public class TransactionsReservationsController {
         if (!result.hasErrors()) {
             model.addAttribute("reservList", reservationRepository.getReservations(params));
         }
-
+        
         initResList(model);
         model.addAttribute(PARAMS, params);
         return "data-man/reservations";

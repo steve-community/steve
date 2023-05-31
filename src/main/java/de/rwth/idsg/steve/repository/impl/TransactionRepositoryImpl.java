@@ -36,7 +36,7 @@ import org.jooq.Record9;
 import org.jooq.RecordMapper;
 import org.jooq.SelectQuery;
 import org.jooq.Table;
-//import org.jooq.impl.DSL;
+import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -52,7 +52,7 @@ import static jooq.steve.db.tables.Transaction.TRANSACTION;
 import static jooq.steve.db.tables.TransactionStart.TRANSACTION_START;
 import org.jooq.Record11;
 import org.jooq.Record8;
-import static org.jooq.impl.DSL.*;
+//import static org.jooq.impl.DSL.*;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -81,7 +81,8 @@ public class TransactionRepositoryImpl implements TransactionRepository {
     }
 
     @Override
-    public void writeTransactionsDetailsCSV(int transactionPk, Writer writer, boolean DataReduction, boolean firstArrivingMeterValueIfMultiple){
+    public void writeTransactionsDetailsCSV(int transactionPk, Writer writer, 
+                    boolean dataReduction, boolean firstArrivingMeterValueIfMultiple) {
         
         // write a few information about the transaction 
         TransactionQueryForm form = new TransactionQueryForm();
@@ -91,20 +92,18 @@ public class TransactionRepositoryImpl implements TransactionRepository {
         
         //getInternalCSV(form).fetch().formatCSV(writer);
         
-        Record12<Integer, String, Integer, String, DateTime, String, DateTime, String, String, Integer, Integer, TransactionStopEventActor>
+        Record12<Integer, String, Integer, String, DateTime, String, DateTime, 
+                    String, String, Integer, Integer, TransactionStopEventActor>
                 res = getInternal(form).fetchOne();
         if (res == null) {
             throw new SteveException("There is no transaction with id '%s'", transactionPk);
         }
         res.formatCSV(writer);
-        
         Transaction transaction = new TransactionMapper().map(res); //.map(new TransactionMapper());
-        
         TransactionStartRecord nextTx = null;
-        
-        getDetailsQuery(transaction,nextTx, transactionPk, DataReduction, firstArrivingMeterValueIfMultiple).fetch().formatCSV(writer);
+        getDetailsQuery(transaction, nextTx, transactionPk, dataReduction, firstArrivingMeterValueIfMultiple)
+                .fetch().formatCSV(writer);
     }
-
     
     @Override
     public List<Integer> getActiveTransactionIds(String chargeBoxId) {
@@ -118,32 +117,33 @@ public class TransactionRepositoryImpl implements TransactionRepository {
     }
 
     @Override
-    public TransactionDetails getDetails(int transactionPk, boolean DataReduction, boolean firstArrivingMeterValueIfMultiple) {
-
+    public TransactionDetails getDetails(int transactionPk, 
+            boolean dataReduction, boolean firstArrivingMeterValueIfMultiple) {
+        
         // -------------------------------------------------------------------------
         // Step 1: Collect general data about transaction
         // -------------------------------------------------------------------------
-
+        
         TransactionQueryForm form = new TransactionQueryForm();
         form.setTransactionPk(transactionPk);
         form.setType(TransactionQueryForm.QueryType.ALL);
         form.setPeriodType(TransactionQueryForm.QueryPeriodType.ALL);
 
-        Record12<Integer, String, Integer, String, DateTime, String, DateTime, String, String, Integer, Integer, TransactionStopEventActor>
+        Record12<Integer, String, Integer, String, DateTime, String, DateTime, 
+                String, String, Integer, Integer, TransactionStopEventActor>
                 res = getInternal(form).fetchOne();
 
         if (res == null) {
             throw new SteveException("There is no transaction with id '%s'", transactionPk);
         }
-
+        
         //Transaction transaction = getInternal(form).fetchOne(new TransactionMapper());
         TransactionMapper mapper = new TransactionMapper();
         Transaction transaction = mapper.map(res);
-        
         TransactionStartRecord nextTx = null;
         
         List<TransactionDetails.MeterValues> values = 
-                getDetailsQuery(transaction,nextTx, transactionPk, DataReduction, firstArrivingMeterValueIfMultiple)
+                getDetailsQuery(transaction, nextTx, transactionPk, dataReduction, firstArrivingMeterValueIfMultiple)
                    .fetch()
                    .map(r -> TransactionDetails.MeterValues.builder()
                                                            .valueTimestamp(r.value1())
@@ -155,13 +155,14 @@ public class TransactionRepositoryImpl implements TransactionRepository {
                                                            .unit(r.value7())
                                                            .phase(r.value8())
                                                            .build());
-
+        
         return new TransactionDetails(transaction, values, nextTx);
     }
 
     private SelectQuery<Record8<DateTime, String, String, String, String, String, String, String>> 
-        getDetailsQuery(Transaction transaction,TransactionStartRecord nextTx, int transactionPk, boolean DataReduction, boolean firstArrivingMeterValueIfMultiple) {
-
+        getDetailsQuery(Transaction transaction, TransactionStartRecord nextTx, int transactionPk, 
+                boolean dataReduction, boolean firstArrivingMeterValueIfMultiple) {
+            
 //        // -------------------------------------------------------------------------
 //        // Step 1a: Collect general data about transaction
 //        // -------------------------------------------------------------------------
@@ -171,16 +172,16 @@ public class TransactionRepositoryImpl implements TransactionRepository {
         String stopValue = transaction.getStopValue();
         String chargeBoxId = transaction.getChargeBoxId();
         int connectorId = transaction.getConnectorId();
-
+        
         // -------------------------------------------------------------------------
         // Step 2: Collect intermediate meter values
         // -------------------------------------------------------------------------
-
+        
         Condition timestampCondition;
         //TransactionStartRecord nextTx = null;
-
+        
         if (stopTimestamp == null && stopValue == null) {
-
+            
             // https://github.com/steve-community/steve/issues/97
             //
             // handle "zombie" transaction, for which we did not receive any StopTransaction. if we do not handle it,
@@ -234,7 +235,7 @@ public class TransactionRepositoryImpl implements TransactionRepository {
         // UNION removes all duplicate records
         //
         Table<ConnectorMeterValueRecord> t1 = transactionQuery.union(timestampQuery).asTable("t1");
-        if (DataReduction == false){
+        if (dataReduction == false) {
             return ctx.select(
                         t1.field(2, DateTime.class),
                         t1.field(3, String.class),
@@ -247,7 +248,7 @@ public class TransactionRepositoryImpl implements TransactionRepository {
                    .from(t1)
                    //.orderBy(innerTable.field(2))
                 .getQuery();
-         }
+        }
 
         // -------------------------------------------------------------------------
         // Step 3: Charging station might send meter vales at fixed intervals (e.g.
@@ -258,7 +259,8 @@ public class TransactionRepositoryImpl implements TransactionRepository {
         // -------------------------------------------------------------------------
 
         //Field<DateTime> dateTimeField;
-        Table<Record11<Integer, Integer, DateTime, String, String, String, String, String, String, String, Double>> innerTable;
+        Table<Record11<Integer, Integer, DateTime, String, String, String, 
+                String, String, String, String, Double>> innerTable;
         if (firstArrivingMeterValueIfMultiple) {
             //dateTimeField = DSL.min(t1.field(2, DateTime.class)).as("min");
              innerTable =
@@ -275,8 +277,8 @@ public class TransactionRepositoryImpl implements TransactionRepository {
                         //lag(t1.field("value"))
                         //        .over(partitionBy(t1.field("measurand"),t1.field("phase"))
                         //                .orderBy(t1.field("value_timestamp"))).cast(String.class).as("lagVal"),
-                        t1.field("value", Double.class).sub(lag(t1.field("value", Double.class))
-                                .over(partitionBy(t1.field("measurand"),t1.field("phase"))
+                        t1.field("value", Double.class).sub(DSL.lag(t1.field("value", Double.class))
+                                .over(DSL.partitionBy(t1.field("measurand"), t1.field("phase"))
                                         .orderBy(t1.field("value_timestamp")))).as("diff"))
                         .from(t1)
                    .where(t1.field("transaction_pk", Integer.class).eq(transactionPk))
@@ -299,8 +301,8 @@ public class TransactionRepositoryImpl implements TransactionRepository {
                         //lead(t1.field("value"))
                         //        .over(partitionBy(t1.field("measurand"),t1.field("phase"))
                         //                .orderBy(t1.field("value_timestamp"))).cast(String.class).as("leadVal"),
-                        t1.field("value", Double.class).sub(lead(t1.field("value", Double.class))
-                                .over(partitionBy(t1.field("measurand"),t1.field("phase"))
+                        t1.field("value", Double.class).sub(DSL.lead(t1.field("value", Double.class))
+                                .over(DSL.partitionBy(t1.field("measurand"), t1.field("phase"))
                                         .orderBy(t1.field("value_timestamp")))).as("diff"))
                    .from(t1)
                    .where(t1.field("transaction_pk", Integer.class).eq(transactionPk))

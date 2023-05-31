@@ -65,8 +65,7 @@ public class TransactionsReservationsController {
     private static final String TRANSACTIONS_PATH = "/transactions";
     private static final String TRANSACTION_STOP_PATH = "/transactions/stop/{transactionPk}";
     private static final String TRANSACTIONS_DETAILS_PATH = "/transactions/details/{transactionPk}";
-    private static final String TRANSACTIONS_DETAILS_XLS_PATH = "/transactions/detailsxls";
-    
+    private static final String TRANSACTIONS_DETAILS_XLS_PATH = "/transactions/detailsxls"; 
     private static final String TRANSACTIONS_QUERY_PATH = "/transactions/query";
     private static final String RESERVATIONS_PATH = "/reservations";
     private static final String RESERVATIONS_QUERY_PATH = "/reservations/query";
@@ -134,13 +133,11 @@ public class TransactionsReservationsController {
             return null;
         }
         int transactionPk = params.getTransactionPk();
-        
         String fileName = "transaction" + transactionPk + "_MeterValues.csv";
         String headerKey = "Content-Disposition";
         String headerValue = String.format("attachment; filename=\"%s\"", fileName);
         response.setContentType("text/csv");
         response.setHeader(headerKey, headerValue);
-        
         transactionRepository.writeTransactionsDetailsCSV(transactionPk,
                                                           response.getWriter(),
                                                           params.isDataReduction(),
@@ -152,7 +149,6 @@ public class TransactionsReservationsController {
     public String getReservations(Model model) {
         ReservationQueryForm params = new ReservationQueryForm();
         initResList(model);
-        
         model.addAttribute("reservList", reservationRepository.getReservations(params));
         model.addAttribute(PARAMS, params);
         return "data-man/reservations";
@@ -164,7 +160,6 @@ public class TransactionsReservationsController {
         if (!result.hasErrors()) {
             model.addAttribute("reservList", reservationRepository.getReservations(params));
         }
-        
         initResList(model);
         model.addAttribute(PARAMS, params);
         return "data-man/reservations";

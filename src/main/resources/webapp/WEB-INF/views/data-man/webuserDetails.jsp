@@ -40,7 +40,7 @@
             <tbody>
                 <tr><td>Username:</td><td>${webusername}<form:hidden path="webusername" readonly="true"/></td></tr>
                 <tr><td>Password:</td><td><form:password path="password" title="password_title"/></td></tr>
-                <tr><td>Password confirmation:</td><td><form:password path="password_comparison" title="pwCompar_title"/></td></tr>
+                <tr><td>Password confirmation:</td><td><form:password path="passwordComparison" title="pwCompar_title"/></td></tr>
                 <tr><td>Roles:</td>
                     <td>
                         <select id="myRoleList" name="roles" path="roles" title="roleList_title">

@@ -45,7 +45,7 @@
             <tbody>
             <tr><td>Webusername:</td><td><form:input path="webusername" title="webUserName_title"/></td></tr>
             <tr><td>Password:</td><td><form:password path="password" title="password_title"/></td></tr>
-            <tr><td>Password confirmation:</td><td><form:password path="password_comparison" title="pwConfirm_title"/></td></tr>
+            <tr><td>Password confirmation:</td><td><form:password path="passwordComparison" title="pwConfirm_title"/></td></tr>
             <tr><td>Roles:</td>
                 <td>
                     <form><select id="myRoleList" name="roles" path="roles" title="roleList_title">

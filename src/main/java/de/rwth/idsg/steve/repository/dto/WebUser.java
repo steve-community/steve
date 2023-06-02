@@ -43,6 +43,6 @@ public class WebUser {
     @Builder
     public static final class Details {
         private final WebusersRecord webusersRecord;
-        private final List<WebauthoritiesRecord> webauthoritiesRecord_List;
+        private final List<WebauthoritiesRecord> webauthoritiesRecordList;
     }
 }

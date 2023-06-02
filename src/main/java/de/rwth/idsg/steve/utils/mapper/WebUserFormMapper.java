@@ -24,41 +24,40 @@ import de.rwth.idsg.steve.web.dto.WebUserForm;
 import java.util.List;
 import jooq.steve.db.tables.records.WebusersRecord;
 import jooq.steve.db.tables.records.WebauthoritiesRecord;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 
  /**
  * @author Frank Brosi
  * @since 01.04.2022
  */
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class WebUserFormMapper {
 
     public static WebUserForm toForm(WebUser.Details details) {
         WebusersRecord webuserRecord = details.getWebusersRecord();
-        List<WebauthoritiesRecord> authRecords = details.getWebauthoritiesRecord_List();
-        
+        List<WebauthoritiesRecord> authRecords = details.getWebauthoritiesRecordList();
 
         WebUserForm form = new WebUserForm();
         form.setWebusername(webuserRecord.getUsername());
         form.setEnabled(webuserRecord.getEnabled());
-        
-        
+
         form.setRoles(rolesStr(authRecords));
-        
+
         return form;
     }
-    
-    private static String rolesStr(List<WebauthoritiesRecord> authRecords){
+
+    private static String rolesStr(List<WebauthoritiesRecord> authRecords) {
         String roles = "";
-        
-        for(WebauthoritiesRecord ar :  authRecords)
-        {
-            roles = roles + ar.getAuthority()+ "; ";
+
+        for (WebauthoritiesRecord ar : authRecords) {
+            roles = roles + ar.getAuthority() + "; ";
         }
         roles = roles.strip();
-        if (!roles.isBlank()) //(roles.endsWith(";"))
-        {
-            roles = roles.substring(0, (roles.length()-1));
+        if (!roles.isBlank()) { //(roles.endsWith(";"))
+            roles = roles.substring(0, (roles.length() - 1));
         }
-                
+
         return roles;
     }
 }

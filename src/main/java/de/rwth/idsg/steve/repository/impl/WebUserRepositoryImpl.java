@@ -61,8 +61,8 @@ public class WebUserRepositoryImpl implements WebUserRepository {
 
     @Autowired private DSLContext ctx;
     //@Autowired private AddressRepository addressRepository;
-    
-    PasswordEncoder encoder = new BCryptPasswordEncoder();
+
+    private PasswordEncoder encoder = new BCryptPasswordEncoder();
 
     @Override
     public List<WebUser.Overview> getOverview(WebUserQueryForm form) {
@@ -74,8 +74,8 @@ public class WebUserRepositoryImpl implements WebUserRepository {
                                        .build()
                 );
     }
-    
-   
+
+
     @Override
     public WebUser.Details getDetails(String webusername) {
 
@@ -95,22 +95,21 @@ public class WebUserRepositoryImpl implements WebUserRepository {
         // 2. address table
         // -------------------------------------------------------------------------
 
-        List<WebauthoritiesRecord> Lar = ctx.selectFrom(WEBAUTHORITIES)
+        List<WebauthoritiesRecord> lar = ctx.selectFrom(WEBAUTHORITIES)
                 .where(WEBAUTHORITIES.USERNAME.eq(webusername))
                 .fetch();
 
-        if (Lar == null) {
+        if (lar == null) {
             throw new SteveException("There is no role for user '%s' defined", webusername);
         }
-        
+
         // -------------------------------------------------------------------------
         // 3. ocpp_tag table
         // -------------------------------------------------------------------------
 
-        
         return WebUser.Details.builder()
                            .webusersRecord(ur)
-                           .webauthoritiesRecord_List(Lar)
+                           .webauthoritiesRecordList(lar)
                            .build();
     }
 
@@ -151,7 +150,7 @@ public class WebUserRepositoryImpl implements WebUserRepository {
             }
         });
     }
-    
+
     @Override
     public void delete(String webusername) {
         ctx.transaction(configuration -> {
@@ -167,7 +166,7 @@ public class WebUserRepositoryImpl implements WebUserRepository {
     // -------------------------------------------------------------------------
     // Private helpers
     // -------------------------------------------------------------------------
-    
+
     @SuppressWarnings("unchecked")
     private Result<Record3<String, Boolean, String>> getOverviewInternal(WebUserQueryForm form) {
         SelectQuery selectQuery = ctx.selectQuery();
@@ -189,29 +188,26 @@ public class WebUserRepositoryImpl implements WebUserRepository {
 
         if (form.isSetRoles()) {
             String[] roles = form.getRoles().split(";"); //Semicolon seperated String to StringArray
-            for (String role : roles)
-            {
+            for (String role : roles) {
                 selectQuery.addConditions(includes(WEBAUTHORITIES.AUTHORITY, role.strip())); // strip--> No Withspace
             }
         }
 
         return selectQuery.fetch();
     }
-    
 
 
     private void addInternal(DSLContext ctx, WebUserForm form) {
         int count = 0;
-        
+
         count = ctx.insertInto(WEBUSERS)
                        .set(WEBUSERS.USERNAME, form.getWebusername())
                        .set(WEBUSERS.ENABLED, form.getEnabled())
                        .set(WEBUSERS.PASSWORD, encoder.encode(form.getPassword()))
                        .execute();
-        
+
         String[] roles = form.getRoles().split(";"); //Semicolon seperated String to StringArray
-        for (String role : roles)
-        {
+        for (String role : roles) {
             count =+ ctx.insertInto(WEBAUTHORITIES)
                        .set(WEBAUTHORITIES.USERNAME, form.getWebusername())
                        .set(WEBAUTHORITIES.AUTHORITY, role.strip())
@@ -224,32 +220,30 @@ public class WebUserRepositoryImpl implements WebUserRepository {
     }
 
     private void updateInternal(DSLContext ctx, WebUserForm form) {
-        if (form.getPassword()==null)
-        {
+        if (form.getPassword() == null) {
             ctx.update(WEBUSERS)
                 .set(WEBUSERS.USERNAME, form.getWebusername())
                 .set(WEBUSERS.ENABLED, form.getEnabled())
                 //.set(WEBUSERS.PASSWORD, encoder.encode(form.getPassword()))
-                .where(WEBUSERS.USERNAME.eq(form.getWebusername())) //set Username unnessary until WebUserForm has oldName or the table and the form uses a primary key
+                //set Username unnessary until WebUserForm has oldName or the table and the form uses a primary key
+                .where(WEBUSERS.USERNAME.eq(form.getWebusername())) 
                 .execute();
-        }
-        else
-        {
+        } else {
             ctx.update(WEBUSERS)
                 .set(WEBUSERS.USERNAME, form.getWebusername())
                 .set(WEBUSERS.ENABLED, form.getEnabled())
                 .set(WEBUSERS.PASSWORD, encoder.encode(form.getPassword()))
-                .where(WEBUSERS.USERNAME.eq(form.getWebusername())) //set Username unnessary until WebUserForm has oldName or the table and the form uses a primary key
+                //set Username unnessary until WebUserForm has oldName or the table and the form uses a primary key
+                .where(WEBUSERS.USERNAME.eq(form.getWebusername())) 
                 .execute();
         }
         // delete all Authority entries for this webuser 
         ctx.delete(WEBAUTHORITIES)
            .where(WEBAUTHORITIES.USERNAME.equal(form.getWebusername()))
            .execute();
-        
+
         String[] roles = form.getRoles().split(";"); //Semicolon seperated String to StringArray
-        for (String role : roles)
-        {
+        for (String role : roles) {
             ctx.insertInto(WEBAUTHORITIES)
                 .set(WEBAUTHORITIES.USERNAME, form.getWebusername())
                 .set(WEBAUTHORITIES.AUTHORITY, role.strip())
@@ -258,30 +252,29 @@ public class WebUserRepositoryImpl implements WebUserRepository {
     }
 
     private void deleteInternal(DSLContext ctx, String webusername, String role) {
-        
+
         ctx.delete(WEBAUTHORITIES)
            .where(WEBAUTHORITIES.USERNAME.equal(webusername))
            .and(WEBAUTHORITIES.AUTHORITY.eq(role))
            .execute();
-        
+
         boolean isEmpty = ctx.selectFrom(WEBAUTHORITIES)
                 .where(WEBAUTHORITIES.USERNAME.equal(webusername))
                 .fetch().isEmpty();
-        
-        if (isEmpty){
+
+        if (isEmpty) {
         ctx.delete(WEBUSERS)
            .where(WEBUSERS.USERNAME.equal(webusername))
            .execute();
         }
-        
+
     }
-    
+
     private void deleteInternal(DSLContext ctx, String webusername) {
-    
+
         Integer count = ctx.selectCount().from(WEBUSERS).execute();
-        
-        if (count > 1) // don't delete the last webuser!
-        {
+
+        if (count > 1) { // don't delete the last webuser!
             ctx.delete(WEBAUTHORITIES)
                .where(WEBAUTHORITIES.USERNAME.equal(webusername))
                .execute();

@@ -59,8 +59,7 @@ public class WebUsersController {
     private static final String DELETE_ALL_PATH = "/delete/{webusername}";
     private static final String UPDATE_PATH = "/update";
     private static final String ADD_PATH = "/add";
-    
-    
+
     // -------------------------------------------------------------------------
     // HTTP methods
     // -------------------------------------------------------------------------
@@ -103,23 +102,24 @@ public class WebUsersController {
         if (result.hasErrors()) {
             return "data-man/webuserAdd";
         }
-        
+
         // password is Null, Blank, Empty or less than 8 Characters then don't add and show an Error
-        if((webuserForm.getPassword()== null)){
+        if ((webuserForm.getPassword() == null)) {
             webuserForm.setPwerror(Boolean.TRUE);
             return "data-man/webuserAddd";
-        }
-        if ((webuserForm.getPassword().length() < 8)  | webuserForm.getPassword().isBlank()) { // | webuserForm.getPassword().isEmpty() in isBlank included
+
+        }// | webuserForm.getPassword().isEmpty() in isBlank included
+        if ((webuserForm.getPassword().length() < 8) | webuserForm.getPassword().isBlank()) {
             webuserForm.setPwerror(Boolean.TRUE);
             return "data-man/webuserAdd";
         }
-        
+
         // Compare both the password inputs
-        if (!webuserForm.getPassword().equals(webuserForm.getPassword_comparison())) {
+        if (!webuserForm.getPassword().equals(webuserForm.getPasswordComparison())) {
             webuserForm.setPwerror(Boolean.TRUE);
             return "data-man/webuserAdd";
         }
-        
+
         webuserForm.setPwerror(Boolean.FALSE);
 
         webuserRepository.add(webuserForm);
@@ -132,13 +132,14 @@ public class WebUsersController {
         if (result.hasErrors()) {
             return "data-man/webuserDetails";
         }
-        
-        if (webuserForm.getPassword()!=null){
-            if (!webuserForm.getPassword().equals(webuserForm.getPassword_comparison())) {
+
+        if (webuserForm.getPassword() != null) {
+            if (!webuserForm.getPassword().equals(webuserForm.getPasswordComparison())) {
                 webuserForm.setPwerror(Boolean.TRUE);
                 return "data-man/webuserDetails";
             }
-            // password is Blank or less than 8 Characters then don't update and show an Error --> WebUserRepositoryImpl: Null and Empty update without updating the password 
+            // password is Blank or less than 8 Characters then don't update and show an Error 
+            // --> WebUserRepositoryImpl: Null and Empty update without updating the password 
             if (webuserForm.getPassword().isBlank() | webuserForm.getPassword().length() < 8) {
                 webuserForm.setPwerror(Boolean.TRUE);
                 return "data-man/webuserDetails";

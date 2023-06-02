@@ -82,11 +82,10 @@ public class SecurityConfiguration {
      * [1] https://spring.io/blog/2017/11/01/spring-security-5-0-0-rc1-released#password-storage-format
      * [2] {@link PasswordEncoderFactories#createDelegatingPasswordEncoder()}
     */
-    
-    
+
     /**
      *
-     * @return 
+     * @return
      */
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -105,7 +104,7 @@ public class SecurityConfiguration {
         return new InMemoryUserDetailsManager(webPageUser);
     }
     */
-    
+
 
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer() {
@@ -138,13 +137,13 @@ public class SecurityConfiguration {
 
         return http
             .authorizeRequests(
-                 req -> req               
-                    .antMatchers(prefix + "/home").hasAnyRole("USER","ADMIN")
-                    .antMatchers(prefix + "/users/" + "**").hasAnyRole("USER","ADMIN")
-                    //.antMatchers(prefix + "/usergroups/" + "**").hasAnyRole("USER","ADMIN")
-                    .antMatchers(prefix + "/ocppTags/" + "**").hasAnyRole("USER","ADMIN")
-                    .antMatchers(prefix + "/signout/" + "**").hasAnyRole("USER","ADMIN")
-                    .antMatchers(prefix + "/noAccess/" + "**").hasAnyRole("USER","ADMIN")
+                 req -> req
+                    .antMatchers(prefix + "/home").hasAnyRole("USER", "ADMIN")
+                    .antMatchers(prefix + "/users/" + "**").hasAnyRole("USER", "ADMIN")
+                    //.antMatchers(prefix + "/usergroups/" + "**").hasAnyRole("USER", "ADMIN")
+                    .antMatchers(prefix + "/ocppTags/" + "**").hasAnyRole("USER", "ADMIN")
+                    .antMatchers(prefix + "/signout/" + "**").hasAnyRole("USER", "ADMIN")
+                    .antMatchers(prefix + "/noAccess/" + "**").hasAnyRole("USER", "ADMIN")
                     .antMatchers(prefix + "/**").hasRole("ADMIN")
                 )
             .sessionManagement(
@@ -160,25 +159,26 @@ public class SecurityConfiguration {
                 req -> req
                     .logoutUrl(prefix + "/signout")
                 )
-                
+
             .exceptionHandling(
                 req -> req
-                    .accessDeniedPage(prefix + "/noAccess") 
+                    .accessDeniedPage(prefix + "/noAccess")
                 )
             .build();
     }
 
     @Autowired
     private DataSource dataSource;
-    
-    @Bean 
-    public DataSource getDataSource() { 
+
+    @Bean
+    public DataSource getDataSource() {
         SteveConfiguration.DB dbConfig = CONFIG.getDb();
-        DataSourceBuilder dataSourceBuilder = DataSourceBuilder.create(); 
-        dataSourceBuilder.url("jdbc:mysql://" + dbConfig.getIp() + ":" + dbConfig.getPort() + "/" + dbConfig.getSchema());
-        dataSourceBuilder.username(dbConfig.getUserName()); 
-        dataSourceBuilder.password(dbConfig.getPassword()); 
-        return dataSourceBuilder.build(); 
+        DataSourceBuilder dataSourceBuilder = DataSourceBuilder.create();
+        dataSourceBuilder.url("jdbc:mysql://" + dbConfig.getIp()
+                + ":" + dbConfig.getPort() + "/" + dbConfig.getSchema());
+        dataSourceBuilder.username(dbConfig.getUserName());
+        dataSourceBuilder.password(dbConfig.getPassword());
+        return dataSourceBuilder.build();
     }
 
     /**
@@ -187,7 +187,7 @@ public class SecurityConfiguration {
      * @throws Exception
      */
     @Autowired
-    public void configureGlobal(AuthenticationManagerBuilder auth) 
+    public void configureGlobal(AuthenticationManagerBuilder auth)
       throws Exception {
         auth.jdbcAuthentication()
             .passwordEncoder(CONFIG.getAuth().getPasswordEncoder())
@@ -195,8 +195,8 @@ public class SecurityConfiguration {
             .usersByUsernameQuery("select username,password,enabled from webusers where username = ?")
             .authoritiesByUsernameQuery("select username,authority from webauthorities where username = ?");
     }
-    
-    
+
+
     /**
      * 
      * @return 
@@ -207,20 +207,21 @@ public class SecurityConfiguration {
       // Adapt used SQL-Commands to the right table names (user -> webuser; authorities -> webauthorities)
       users.setAuthoritiesByUsernameQuery("select username,authority from webauthorities where username=?");
       users.setUsersByUsernameQuery("select username,password,enabled from webusers where username=?");
-      
-      /* Adding the admin from config-file to the database/webusers --> changing the name in the file will not delete the corresponding webuser in the database!
+
+      /* Adding the admin from config-file to the database/webusers
+            --> changing the name in the file will not delete the corresponding webuser in the database!
       users.setCreateUserSql("insert into webusers (username, password, enabled) values (?,?,?)");
       users.setCreateAuthoritySql("insert into webauthorities (username, authority) values (?,?)");
       users.setUserExistsSql("select username from webusers where username = ?");
       users.setUpdateUserSql("update webusers set password = ?, enabled = ? where username = ?");
       users.setDeleteUserAuthoritiesSql("delete from webauthorities where username = ?");
-      
+
       UserDetails localUser = User.builder()
                 .username(CONFIG.getAuth().getUserName())
                 .password(CONFIG.getAuth().getEncodedPassword())
                 .roles("USER")
                 .build();
-      
+
       if (users.userExists(CONFIG.getAuth().getUserName()))
       {
           users.updateUser(localUser);

@@ -34,13 +34,12 @@ public class WebUserForm {
     private Boolean enabled;
 
     private String webusername;
-    
+
     private String password;
-    
-    private String password_comparison;
+
+    private String passwordComparison;
 
     private String roles;
-    
+
     private Boolean pwerror;
-    
 }

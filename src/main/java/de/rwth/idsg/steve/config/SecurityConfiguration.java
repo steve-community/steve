@@ -18,6 +18,7 @@
  */
 package de.rwth.idsg.steve.config;
 
+import de.rwth.idsg.steve.SteveConfiguration;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.joda.JodaModule;
 import com.google.common.base.Strings;
@@ -38,13 +39,13 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.crypto.factory.PasswordEncoderFactories;
-import org.springframework.security.crypto.password.DelegatingPasswordEncoder;
+//import org.springframework.security.core.userdetails.User;
+//import org.springframework.security.core.userdetails.UserDetails;
+//import org.springframework.security.core.userdetails.UserDetailsService;
+//import org.springframework.security.crypto.factory.PasswordEncoderFactories;
+//import org.springframework.security.crypto.password.DelegatingPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
+//import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.preauth.AbstractPreAuthenticatedProcessingFilter;
@@ -56,8 +57,16 @@ import java.io.IOException;
 
 import static de.rwth.idsg.steve.SteveConfiguration.CONFIG;
 
+import javax.sql.DataSource;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.jdbc.DataSourceBuilder;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.provisioning.JdbcUserDetailsManager;
+import org.springframework.security.provisioning.UserDetailsManager;
+
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
+ * @author Frank Brosi
  * @since 07.01.2015
  */
 @Slf4j
@@ -72,12 +81,19 @@ public class SecurityConfiguration {
      *
      * [1] https://spring.io/blog/2017/11/01/spring-security-5-0-0-rc1-released#password-storage-format
      * [2] {@link PasswordEncoderFactories#createDelegatingPasswordEncoder()}
+    */
+    
+    
+    /**
+     *
+     * @return 
      */
     @Bean
     public PasswordEncoder passwordEncoder() {
         return CONFIG.getAuth().getPasswordEncoder();
     }
 
+    /*
     @Bean
     public UserDetailsService userDetailsService() {
         UserDetails webPageUser = User.builder()
@@ -88,6 +104,8 @@ public class SecurityConfiguration {
 
         return new InMemoryUserDetailsManager(webPageUser);
     }
+    */
+    
 
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer() {
@@ -101,6 +119,7 @@ public class SecurityConfiguration {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         final String prefix = CONFIG.getSpringManagerMapping();
 
+        /*
         return http
             .authorizeHttpRequests(
                 req -> req.antMatchers(prefix + "/**").hasRole("ADMIN")
@@ -115,6 +134,103 @@ public class SecurityConfiguration {
                 req -> req.logoutUrl(prefix + "/signout")
             )
             .build();
+        */
+
+        return http
+            .authorizeRequests(
+                 req -> req               
+                    .antMatchers(prefix + "/home").hasAnyRole("USER","ADMIN")
+                    .antMatchers(prefix + "/users/" + "**").hasAnyRole("USER","ADMIN")
+                    //.antMatchers(prefix + "/usergroups/" + "**").hasAnyRole("USER","ADMIN")
+                    .antMatchers(prefix + "/ocppTags/" + "**").hasAnyRole("USER","ADMIN")
+                    .antMatchers(prefix + "/signout/" + "**").hasAnyRole("USER","ADMIN")
+                    .antMatchers(prefix + "/noAccess/" + "**").hasAnyRole("USER","ADMIN")
+                    .antMatchers(prefix + "/**").hasRole("ADMIN")
+                )
+            .sessionManagement(
+                 req -> req
+                    .invalidSessionUrl(prefix + "/signin")
+                )
+            .formLogin(
+                req -> req
+                    .loginPage(prefix + "/signin")
+                    .permitAll()
+                )
+            .logout(
+                req -> req
+                    .logoutUrl(prefix + "/signout")
+                )
+                
+            .exceptionHandling(
+                req -> req
+                    .accessDeniedPage(prefix + "/noAccess") 
+                )
+            .build();
+    }
+
+    @Autowired
+    private DataSource dataSource;
+    
+    @Bean 
+    public DataSource getDataSource() { 
+        SteveConfiguration.DB dbConfig = CONFIG.getDb();
+        DataSourceBuilder dataSourceBuilder = DataSourceBuilder.create(); 
+        dataSourceBuilder.url("jdbc:mysql://" + dbConfig.getIp() + ":" + dbConfig.getPort() + "/" + dbConfig.getSchema());
+        dataSourceBuilder.username(dbConfig.getUserName()); 
+        dataSourceBuilder.password(dbConfig.getPassword()); 
+        return dataSourceBuilder.build(); 
+    }
+
+    /**
+     *
+     * @param auth
+     * @throws Exception
+     */
+    @Autowired
+    public void configureGlobal(AuthenticationManagerBuilder auth) 
+      throws Exception {
+        auth.jdbcAuthentication()
+            .passwordEncoder(CONFIG.getAuth().getPasswordEncoder())
+            .dataSource(dataSource)
+            .usersByUsernameQuery("select username,password,enabled from webusers where username = ?")
+            .authoritiesByUsernameQuery("select username,authority from webauthorities where username = ?");
+    }
+    
+    
+    /**
+     * 
+     * @return 
+     */
+    @Bean
+    public UserDetailsManager authenticateUsers() {
+      JdbcUserDetailsManager users = new JdbcUserDetailsManager(dataSource);
+      // Adapt used SQL-Commands to the right table names (user -> webuser; authorities -> webauthorities)
+      users.setAuthoritiesByUsernameQuery("select username,authority from webauthorities where username=?");
+      users.setUsersByUsernameQuery("select username,password,enabled from webusers where username=?");
+      
+      /* Adding the admin from config-file to the database/webusers --> changing the name in the file will not delete the corresponding webuser in the database!
+      users.setCreateUserSql("insert into webusers (username, password, enabled) values (?,?,?)");
+      users.setCreateAuthoritySql("insert into webauthorities (username, authority) values (?,?)");
+      users.setUserExistsSql("select username from webusers where username = ?");
+      users.setUpdateUserSql("update webusers set password = ?, enabled = ? where username = ?");
+      users.setDeleteUserAuthoritiesSql("delete from webauthorities where username = ?");
+      
+      UserDetails localUser = User.builder()
+                .username(CONFIG.getAuth().getUserName())
+                .password(CONFIG.getAuth().getEncodedPassword())
+                .roles("USER")
+                .build();
+      
+      if (users.userExists(CONFIG.getAuth().getUserName()))
+      {
+          users.updateUser(localUser);
+      }
+      else
+      {
+          users.createUser(localUser);
+      }
+      */
+      return users;
     }
 
     @Bean

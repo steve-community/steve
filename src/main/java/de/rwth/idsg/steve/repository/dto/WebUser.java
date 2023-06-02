@@ -16,34 +16,33 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package de.rwth.idsg.steve.web.dto;
+package de.rwth.idsg.steve.repository.dto;
 
+import java.util.List;
+import jooq.steve.db.tables.records.WebauthoritiesRecord;
+import jooq.steve.db.tables.records.WebusersRecord;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
 
-import java.util.Map;
+//import java.util.Optional;
 
-/**
- *
- * @author Sevket Goekay <sevketgokay@gmail.com>
- *
+ /**
+ * @author Frank Brosi
+ * @since 01.04.2022
  */
-@Getter
-@Builder
-@ToString
-public final class Statistics {
-    // Number of chargeboxes, ocppTags, users, reservations, transactions
-    private final Integer numChargeBoxes, numOcppTags, numUsers, numReservations, numTransactions,
-    // Received heartbeats
-    heartbeatToday, heartbeatYesterday, heartbeatEarlier,
-    //WebUser
-    numWebUsers;
+public class WebUser {
 
-    // Number of connected WebSocket/JSON chargeboxes
-    @Setter private int numOcpp12JChargeBoxes, numOcpp15JChargeBoxes, numOcpp16JChargeBoxes;
+    @Getter
+    @Builder
+    public static final class Overview {
+        private final Boolean enabled;
+        private final String webusername, roles;
+    }
 
-    // Count of connectors based on their status
-    @Setter private Map<String, Integer> statusCountMap;
+    @Getter
+    @Builder
+    public static final class Details {
+        private final WebusersRecord webusersRecord;
+        private final List<WebauthoritiesRecord> webauthoritiesRecord_List;
+    }
 }

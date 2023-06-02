@@ -28,7 +28,7 @@ import org.joda.time.DateTime;
 import org.jooq.DSLContext;
 import org.jooq.Field;
 import org.jooq.Record2;
-import org.jooq.Record8;
+import org.jooq.Record9;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -39,6 +39,7 @@ import static jooq.steve.db.tables.ChargeBox.CHARGE_BOX;
 import static jooq.steve.db.tables.OcppTag.OCPP_TAG;
 import static jooq.steve.db.tables.SchemaVersion.SCHEMA_VERSION;
 import static jooq.steve.db.tables.User.USER;
+import static jooq.steve.db.tables.Webusers.WEBUSERS;
 import static org.jooq.impl.DSL.max;
 import static org.jooq.impl.DSL.select;
 
@@ -103,7 +104,12 @@ public class GenericRepositoryImpl implements GenericRepository {
                    .where(date(CHARGE_BOX.LAST_HEARTBEAT_TIMESTAMP).lessThan(date(yesterdaysNow)))
                    .asField("heartbeats_earlier");
 
-        Record8<Integer, Integer, Integer, Integer, Integer, Integer, Integer, Integer> gs =
+        Field<Integer> numWebUsers =
+                ctx.selectCount()
+                   .from(WEBUSERS)
+                   .asField("num_webusers");
+
+        Record9<Integer, Integer, Integer, Integer, Integer, Integer, Integer, Integer, Integer> gs =
                 ctx.select(
                         numChargeBoxes,
                         numOcppTags,
@@ -112,7 +118,8 @@ public class GenericRepositoryImpl implements GenericRepository {
                         numTransactions,
                         heartbeatsToday,
                         heartbeatsYesterday,
-                        heartbeatsEarlier
+                        heartbeatsEarlier,
+                        numWebUsers
                 ).fetchOne();
 
         return Statistics.builder()
@@ -124,6 +131,7 @@ public class GenericRepositoryImpl implements GenericRepository {
                          .heartbeatToday(gs.value6())
                          .heartbeatYesterday(gs.value7())
                          .heartbeatEarlier(gs.value8())
+                         .numWebUsers(gs.value9())
                          .build();
     }
 

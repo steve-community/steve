@@ -38,7 +38,6 @@ public class NoAccessController {
 
     //private static final String PARAMS = "params";
 
-    
     // -------------------------------------------------------------------------
     // HTTP methods
     // -------------------------------------------------------------------------
@@ -47,5 +46,4 @@ public class NoAccessController {
     public String accessDenied() {
         return "noAccess";
     }
-
 }

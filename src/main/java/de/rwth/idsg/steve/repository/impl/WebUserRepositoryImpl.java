@@ -208,7 +208,7 @@ public class WebUserRepositoryImpl implements WebUserRepository {
 
         String[] roles = form.getRoles().split(";"); //Semicolon seperated String to StringArray
         for (String role : roles) {
-            count =+ ctx.insertInto(WEBAUTHORITIES)
+            count += ctx.insertInto(WEBAUTHORITIES)
                        .set(WEBAUTHORITIES.USERNAME, form.getWebusername())
                        .set(WEBAUTHORITIES.AUTHORITY, role.strip())
                        .execute();
@@ -226,7 +226,7 @@ public class WebUserRepositoryImpl implements WebUserRepository {
                 .set(WEBUSERS.ENABLED, form.getEnabled())
                 //.set(WEBUSERS.PASSWORD, encoder.encode(form.getPassword()))
                 //set Username unnessary until WebUserForm has oldName or the table and the form uses a primary key
-                .where(WEBUSERS.USERNAME.eq(form.getWebusername())) 
+                .where(WEBUSERS.USERNAME.eq(form.getWebusername()))
                 .execute();
         } else {
             ctx.update(WEBUSERS)
@@ -234,10 +234,10 @@ public class WebUserRepositoryImpl implements WebUserRepository {
                 .set(WEBUSERS.ENABLED, form.getEnabled())
                 .set(WEBUSERS.PASSWORD, encoder.encode(form.getPassword()))
                 //set Username unnessary until WebUserForm has oldName or the table and the form uses a primary key
-                .where(WEBUSERS.USERNAME.eq(form.getWebusername())) 
+                .where(WEBUSERS.USERNAME.eq(form.getWebusername()))
                 .execute();
         }
-        // delete all Authority entries for this webuser 
+        // delete all Authority entries for this webuser
         ctx.delete(WEBAUTHORITIES)
            .where(WEBAUTHORITIES.USERNAME.equal(form.getWebusername()))
            .execute();

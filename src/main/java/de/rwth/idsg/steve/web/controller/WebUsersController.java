@@ -108,8 +108,10 @@ public class WebUsersController {
             webuserForm.setPwerror(Boolean.TRUE);
             return "data-man/webuserAddd";
 
-        }// | webuserForm.getPassword().isEmpty() in isBlank included
-        if ((webuserForm.getPassword().length() < 8) | webuserForm.getPassword().isBlank()) {
+        }
+
+        if ((webuserForm.getPassword().length() < 8) | webuserForm.getPassword().isBlank())
+        /* | webuserForm.getPassword().isEmpty() in isBlank included */ {
             webuserForm.setPwerror(Boolean.TRUE);
             return "data-man/webuserAdd";
         }
@@ -138,8 +140,8 @@ public class WebUsersController {
                 webuserForm.setPwerror(Boolean.TRUE);
                 return "data-man/webuserDetails";
             }
-            // password is Blank or less than 8 Characters then don't update and show an Error 
-            // --> WebUserRepositoryImpl: Null and Empty update without updating the password 
+            // password is Blank or less than 8 Characters then don't update and show an Error
+            // --> WebUserRepositoryImpl: Null and Empty update without updating the password
             if (webuserForm.getPassword().isBlank() | webuserForm.getPassword().length() < 8) {
                 webuserForm.setPwerror(Boolean.TRUE);
                 return "data-man/webuserDetails";

@@ -32,7 +32,7 @@ import lombok.NoArgsConstructor;
  * @since 01.04.2022
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class WebUserFormMapper {
+public final class WebUserFormMapper {
 
     public static WebUserForm toForm(WebUser.Details details) {
         WebusersRecord webuserRecord = details.getWebusersRecord();

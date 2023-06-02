@@ -198,8 +198,8 @@ public class SecurityConfiguration {
 
 
     /**
-     * 
-     * @return 
+     *
+     * @return
      */
     @Bean
     public UserDetailsManager authenticateUsers() {

@@ -21,7 +21,6 @@ package de.rwth.idsg.steve.web.controller;
 
 import de.rwth.idsg.steve.repository.WebUserRepository;
 import de.rwth.idsg.steve.repository.dto.WebUser;
-//import de.rwth.idsg.steve.utils.ControllerHelper;
 import de.rwth.idsg.steve.utils.mapper.WebUserFormMapper;
 import de.rwth.idsg.steve.web.dto.WebUserForm;
 import de.rwth.idsg.steve.web.dto.WebUserQueryForm;
@@ -104,7 +103,7 @@ public class WebUsersController {
         }
 
         // password is Null, Blank, Empty or less than 8 Characters then don't add and show an Error
-        if ((webuserForm.getPassword() == null)) {
+        if (webuserForm.getPassword() == null) {
             webuserForm.setPwerror(Boolean.TRUE);
             return "data-man/webuserAddd";
 

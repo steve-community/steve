@@ -19,7 +19,6 @@
 package de.rwth.idsg.steve.utils.mapper;
 
 import de.rwth.idsg.steve.repository.dto.WebUser;
-//import de.rwth.idsg.steve.utils.ControllerHelper;
 import de.rwth.idsg.steve.web.dto.WebUserForm;
 import java.util.List;
 import jooq.steve.db.tables.records.WebusersRecord;
@@ -55,7 +54,7 @@ public final class WebUserFormMapper {
         }
         roles = roles.strip();
         if (!roles.isBlank()) { //(roles.endsWith(";"))
-            roles = roles.substring(0, (roles.length() - 1));
+            roles = roles.substring(0, roles.length() - 1);
         }
 
         return roles;

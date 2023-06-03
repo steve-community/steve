@@ -27,14 +27,9 @@ import jooq.steve.db.tables.records.WebauthoritiesRecord;
 import jooq.steve.db.tables.records.WebusersRecord;
 import lombok.extern.slf4j.Slf4j;
 import org.jooq.DSLContext;
-//import org.jooq.Field;
 import org.jooq.JoinType;
-//import org.jooq.Record1;
-//import org.jooq.Record2;
 import org.jooq.Record3;
-//import org.jooq.Record7;
 import org.jooq.Result;
-//import org.jooq.SelectConditionStep;
 import org.jooq.SelectQuery;
 import org.jooq.exception.DataAccessException;
 import org.jooq.impl.DSL;
@@ -42,7 +37,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
-//import java.util.Optional;
 
 import static de.rwth.idsg.steve.utils.CustomDSL.includes;
 import static jooq.steve.db.tables.Webusers.WEBUSERS;
@@ -60,7 +54,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 public class WebUserRepositoryImpl implements WebUserRepository {
 
     @Autowired private DSLContext ctx;
-    //@Autowired private AddressRepository addressRepository;
 
     private PasswordEncoder encoder = new BCryptPasswordEncoder();
 
@@ -224,7 +217,6 @@ public class WebUserRepositoryImpl implements WebUserRepository {
             ctx.update(WEBUSERS)
                 .set(WEBUSERS.USERNAME, form.getWebusername())
                 .set(WEBUSERS.ENABLED, form.getEnabled())
-                //.set(WEBUSERS.PASSWORD, encoder.encode(form.getPassword()))
                 //set Username unnessary until WebUserForm has oldName or the table and the form uses a primary key
                 .where(WEBUSERS.USERNAME.eq(form.getWebusername()))
                 .execute();

@@ -24,8 +24,6 @@ import jooq.steve.db.tables.records.WebusersRecord;
 import lombok.Builder;
 import lombok.Getter;
 
-//import java.util.Optional;
-
  /**
  * @author Frank Brosi
  * @since 01.04.2022

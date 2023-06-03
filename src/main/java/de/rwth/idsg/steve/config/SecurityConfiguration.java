@@ -20,7 +20,6 @@ package de.rwth.idsg.steve.config;
 
 import de.rwth.idsg.steve.SteveConfiguration;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.joda.JodaModule;
 import com.google.common.base.Strings;
 import de.rwth.idsg.steve.SteveProdCondition;
 import de.rwth.idsg.steve.web.api.ApiControllerAdvice;
@@ -39,13 +38,7 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
-//import org.springframework.security.core.userdetails.User;
-//import org.springframework.security.core.userdetails.UserDetails;
-//import org.springframework.security.core.userdetails.UserDetailsService;
-//import org.springframework.security.crypto.factory.PasswordEncoderFactories;
-//import org.springframework.security.crypto.password.DelegatingPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-//import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.preauth.AbstractPreAuthenticatedProcessingFilter;
@@ -92,20 +85,6 @@ public class SecurityConfiguration {
         return CONFIG.getAuth().getPasswordEncoder();
     }
 
-    /*
-    @Bean
-    public UserDetailsService userDetailsService() {
-        UserDetails webPageUser = User.builder()
-                .username(CONFIG.getAuth().getUserName())
-                .password(CONFIG.getAuth().getEncodedPassword())
-                .roles("ADMIN")
-                .build();
-
-        return new InMemoryUserDetailsManager(webPageUser);
-    }
-    */
-
-
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer() {
         return (web) -> web.ignoring().antMatchers(
@@ -117,30 +96,11 @@ public class SecurityConfiguration {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         final String prefix = CONFIG.getSpringManagerMapping();
-
-        /*
-        return http
-            .authorizeHttpRequests(
-                req -> req.antMatchers(prefix + "/**").hasRole("ADMIN")
-            )
-            .sessionManagement(
-                req -> req.invalidSessionUrl(prefix + "/signin")
-            )
-            .formLogin(
-                req -> req.loginPage(prefix + "/signin").permitAll()
-            )
-            .logout(
-                req -> req.logoutUrl(prefix + "/signout")
-            )
-            .build();
-        */
-
         return http
             .authorizeRequests(
                  req -> req
                     .antMatchers(prefix + "/home").hasAnyRole("USER", "ADMIN")
                     .antMatchers(prefix + "/users/" + "**").hasAnyRole("USER", "ADMIN")
-                    //.antMatchers(prefix + "/usergroups/" + "**").hasAnyRole("USER", "ADMIN")
                     .antMatchers(prefix + "/ocppTags/" + "**").hasAnyRole("USER", "ADMIN")
                     .antMatchers(prefix + "/signout/" + "**").hasAnyRole("USER", "ADMIN")
                     .antMatchers(prefix + "/noAccess/" + "**").hasAnyRole("USER", "ADMIN")
@@ -204,7 +164,7 @@ public class SecurityConfiguration {
     @Bean
     public UserDetailsManager authenticateUsers() {
       JdbcUserDetailsManager users = new JdbcUserDetailsManager(dataSource);
-      // Adapt used SQL-Commands to the right table names (user -> webuser; authorities -> webauthorities)
+      // Adapt the SQL-Commands to the correct table names (user -> webuser; authorities -> webauthorities)
       users.setAuthoritiesByUsernameQuery("select username,authority from webauthorities where username=?");
       users.setUsersByUsernameQuery("select username,password,enabled from webusers where username=?");
 

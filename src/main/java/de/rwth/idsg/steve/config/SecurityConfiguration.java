@@ -18,9 +18,10 @@
  */
 package de.rwth.idsg.steve.config;
 
-import de.rwth.idsg.steve.SteveConfiguration;
+import static de.rwth.idsg.steve.SteveConfiguration.CONFIG;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Strings;
+import com.zaxxer.hikari.HikariDataSource;
 import de.rwth.idsg.steve.SteveProdCondition;
 import de.rwth.idsg.steve.web.api.ApiControllerAdvice;
 import lombok.extern.slf4j.Slf4j;
@@ -48,11 +49,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-import static de.rwth.idsg.steve.SteveConfiguration.CONFIG;
-
-import javax.sql.DataSource;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.provisioning.JdbcUserDetailsManager;
 import org.springframework.security.provisioning.UserDetailsManager;
@@ -68,6 +65,10 @@ import org.springframework.security.provisioning.UserDetailsManager;
 @Conditional(SteveProdCondition.class)
 public class SecurityConfiguration {
 
+    @Autowired
+    private HikariDataSource dataSource;
+
+    
     /**
      * Password encoding changed with spring-security 5.0.0. We either have to use a prefix before the password to
      * indicate which actual encoder {@link DelegatingPasswordEncoder} should use [1, 2] or specify the encoder as we do.
@@ -125,20 +126,6 @@ public class SecurityConfiguration {
                     .accessDeniedPage(prefix + "/noAccess")
                 )
             .build();
-    }
-
-    @Autowired
-    private DataSource dataSource;
-
-    @Bean
-    public DataSource getDataSource() {
-        SteveConfiguration.DB dbConfig = CONFIG.getDb();
-        DataSourceBuilder dataSourceBuilder = DataSourceBuilder.create();
-        dataSourceBuilder.url("jdbc:mysql://" + dbConfig.getIp()
-                + ":" + dbConfig.getPort() + "/" + dbConfig.getSchema());
-        dataSourceBuilder.username(dbConfig.getUserName());
-        dataSourceBuilder.password(dbConfig.getPassword());
-        return dataSourceBuilder.build();
     }
 
     /**

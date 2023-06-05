@@ -26,6 +26,7 @@ import com.mysql.cj.conf.PropertyKey;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import de.rwth.idsg.steve.SteveConfiguration;
+import static de.rwth.idsg.steve.SteveConfiguration.CONFIG;
 import de.rwth.idsg.steve.service.DummyReleaseCheckService;
 import de.rwth.idsg.steve.service.GithubReleaseCheckService;
 import de.rwth.idsg.steve.service.ReleaseCheckService;
@@ -67,7 +68,8 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 
-import static de.rwth.idsg.steve.SteveConfiguration.CONFIG;
+import org.springframework.beans.factory.annotation.Autowired;
+
 
 /**
  * Configuration and beans of Spring Framework.
@@ -82,13 +84,14 @@ import static de.rwth.idsg.steve.SteveConfiguration.CONFIG;
 @ComponentScan("de.rwth.idsg.steve")
 public class BeanConfiguration implements WebMvcConfigurer {
 
-    private HikariDataSource dataSource;
+    @Autowired private HikariDataSource dataSource;
     private ScheduledThreadPoolExecutor executor;
 
     /**
      * https://github.com/brettwooldridge/HikariCP/wiki/MySQL-Configuration
      */
-    private void initDataSource() {
+    @Bean
+    public HikariDataSource initDataSource() {
         SteveConfiguration.DB dbConfig = CONFIG.getDb();
 
         HikariConfig hc = new HikariConfig();
@@ -111,6 +114,7 @@ public class BeanConfiguration implements WebMvcConfigurer {
         hc.setMaxLifetime(580_000);
 
         dataSource = new HikariDataSource(hc);
+        return dataSource;
     }
 
     /**
@@ -127,7 +131,6 @@ public class BeanConfiguration implements WebMvcConfigurer {
      */
     @Bean
     public DSLContext dslContext() {
-        initDataSource();
 
         Settings settings = new Settings()
                 // Normally, the records are "attached" to the Configuration that created (i.e. fetch/insert) them.

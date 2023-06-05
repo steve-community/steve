@@ -105,7 +105,7 @@ public class WebUsersController {
         // password is Null, Blank, Empty or less than 8 Characters then don't add and show an Error
         if (webuserForm.getPassword() == null) {
             webuserForm.setPwerror(Boolean.TRUE);
-            return "data-man/webuserAddd";
+            return "data-man/webuserAdd";
 
         }
 

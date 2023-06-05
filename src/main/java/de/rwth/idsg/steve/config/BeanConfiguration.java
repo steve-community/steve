@@ -113,8 +113,7 @@ public class BeanConfiguration implements WebMvcConfigurer {
         // https://github.com/steve-community/steve/issues/736
         hc.setMaxLifetime(580_000);
 
-        dataSource = new HikariDataSource(hc);
-        return dataSource;
+        return new HikariDataSource(hc);
     }
 
     /**
@@ -131,6 +130,9 @@ public class BeanConfiguration implements WebMvcConfigurer {
      */
     @Bean
     public DSLContext dslContext() {
+        if (dataSource == null) {
+            dataSource = initDataSource();
+        }
 
         Settings settings = new Settings()
                 // Normally, the records are "attached" to the Configuration that created (i.e. fetch/insert) them.

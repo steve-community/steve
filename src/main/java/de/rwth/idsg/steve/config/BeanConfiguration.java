@@ -68,7 +68,6 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 
-import org.springframework.beans.factory.annotation.Autowired;
 
 
 /**
@@ -84,14 +83,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 @ComponentScan("de.rwth.idsg.steve")
 public class BeanConfiguration implements WebMvcConfigurer {
 
-    @Autowired private HikariDataSource dataSource;
+    private HikariDataSource dataSource;
     private ScheduledThreadPoolExecutor executor;
 
     /**
      * https://github.com/brettwooldridge/HikariCP/wiki/MySQL-Configuration
      */
     @Bean
-    public HikariDataSource initDataSource() {
+    public HikariDataSource dataSource() {
         SteveConfiguration.DB dbConfig = CONFIG.getDb();
 
         HikariConfig hc = new HikariConfig();
@@ -131,7 +130,7 @@ public class BeanConfiguration implements WebMvcConfigurer {
     @Bean
     public DSLContext dslContext() {
         if (dataSource == null) {
-            dataSource = initDataSource();
+            dataSource = dataSource();
         }
 
         Settings settings = new Settings()

@@ -101,10 +101,27 @@ public class SecurityConfiguration {
             .authorizeRequests(
                  req -> req
                     .antMatchers(prefix + "/home").hasAnyRole("USER", "ADMIN")
-                    .antMatchers(prefix + "/users/" + "**").hasAnyRole("USER", "ADMIN")
-                    .antMatchers(prefix + "/ocppTags/" + "**").hasAnyRole("USER", "ADMIN")
+                     // webuser
+                    .antMatchers(prefix + "/webusers").hasAnyRole("USER", "ADMIN")
+                    .antMatchers(prefix + "/webusers" + "/details/**").hasAnyRole("USER", "ADMIN")
+                    // users
+                    .antMatchers(prefix + "/users").hasAnyRole("USER", "ADMIN")
+                    .antMatchers(prefix + "/users" + "/details/**").hasAnyRole("USER", "ADMIN")
+                     //ocppTags
+                    .antMatchers(prefix + "/ocppTags").hasAnyRole("USER", "ADMIN")
+                    .antMatchers(prefix + "/ocppTags" + "/details/**").hasAnyRole("USER", "ADMIN")
+                     // chargepoints
+                    .antMatchers(prefix + "/chargepoints").hasAnyRole("USER", "ADMIN")
+                    .antMatchers(prefix + "/chargepoints" + "/details/**").hasAnyRole("USER", "ADMIN")
+                     // transactions and reservations
+                    .antMatchers(prefix + "/transactions").hasAnyRole("USER", "ADMIN")
+                    .antMatchers(prefix + "/transactions" + "/details/**").hasAnyRole("USER", "ADMIN")
+                    .antMatchers(prefix + "/reservations").hasAnyRole("USER", "ADMIN")
+                    .antMatchers(prefix + "/reservations" + "/**").hasRole("ADMIN")
+                     // singout and noAccess
                     .antMatchers(prefix + "/signout/" + "**").hasAnyRole("USER", "ADMIN")
                     .antMatchers(prefix + "/noAccess/" + "**").hasAnyRole("USER", "ADMIN")
+                     // any other site
                     .antMatchers(prefix + "/**").hasRole("ADMIN")
                 )
             .sessionManagement(

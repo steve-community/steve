@@ -22,7 +22,6 @@ package de.rwth.idsg.steve.web.controller;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 
 
 
@@ -34,16 +33,13 @@ import org.springframework.web.bind.annotation.RequestMethod;
 @RequestMapping(value = "/manager/noAccess")
 public class NoAccessController {
 
-    //@Autowired private WebUserRepository webuserRepository;
-
-    //private static final String PARAMS = "params";
-
     // -------------------------------------------------------------------------
     // HTTP methods
     // -------------------------------------------------------------------------
 
-    @RequestMapping(method = RequestMethod.GET)
+    @RequestMapping()
     public String accessDenied() {
         return "noAccess";
     }
+
 }

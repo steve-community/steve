@@ -2,6 +2,7 @@ variables:
   major: 2
   minor: 0
   master: $[eq(variables['Build.SourceBranch'], 'refs/heads/master')]
+  java17: $[eq(variables['Build.SourceBranch'], 'refs/heads/java17')]
 
 pr: none
 
@@ -18,7 +19,7 @@ stages:
     displayName: Build Version Number
     jobs:
       - job: Build_Version_Number_Master
-        condition: eq(variables.master, true)
+        condition: eq(variables.master, true) or eq(variables.java17, true)
         variables:
           patch: $[counter(variables['minor'], 0)]
         steps:

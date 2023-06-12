@@ -35,7 +35,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
         <cxf.version>4.0.1</cxf.version>
-        <spring.boot.version>2.7.12</spring.boot.version>
+        <spring.boot.version>2.6.7</spring.boot.version>
 
         <awaitility.version>4.1.1</awaitility.version>
 

@@ -31,7 +31,7 @@ import lombok.RequiredArgsConstructor;
 import net.parkl.ocpp.service.cluster.PersistentTaskResultCallback;
 import ocpp.cp._2012._06.DataTransferResponse;
 
-import javax.xml.ws.AsyncHandler;
+import jakarta.xml.ws.AsyncHandler;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>

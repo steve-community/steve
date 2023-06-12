@@ -29,7 +29,7 @@ import de.rwth.idsg.steve.web.dto.ocpp.TriggerMessageParams;
 import net.parkl.ocpp.service.cluster.PersistentTaskResultCallback;
 import ocpp.cp._2015._10.MessageTrigger;
 
-import javax.xml.ws.AsyncHandler;
+import jakarta.xml.ws.AsyncHandler;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>

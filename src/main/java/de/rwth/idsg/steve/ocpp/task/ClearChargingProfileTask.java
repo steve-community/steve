@@ -32,7 +32,7 @@ import net.parkl.ocpp.service.cluster.PersistentTaskResultCallback;
 import net.parkl.ocpp.service.cs.ChargingProfileService;
 import ocpp.cp._2015._10.ClearChargingProfileRequest;
 
-import javax.xml.ws.AsyncHandler;
+import jakarta.xml.ws.AsyncHandler;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>

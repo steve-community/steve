@@ -19,7 +19,7 @@ stages:
     displayName: Build Version Number
     jobs:
       - job: Build_Version_Number_Master
-        condition: eq(variables.master, true) or eq(variables.java17, true)
+        condition: or(eq(variables.master, true), eq(variables.java17, true))
         variables:
           patch: $[counter(variables['minor'], 0)]
         steps:

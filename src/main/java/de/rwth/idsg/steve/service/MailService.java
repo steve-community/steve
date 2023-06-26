@@ -21,21 +21,15 @@ package de.rwth.idsg.steve.service;
 import com.google.common.base.Strings;
 import de.rwth.idsg.steve.SteveException;
 import de.rwth.idsg.steve.repository.dto.MailSettings;
+import jakarta.mail.*;
+import jakarta.mail.internet.InternetAddress;
+import jakarta.mail.internet.MimeMessage;
 import lombok.extern.slf4j.Slf4j;
 import net.parkl.ocpp.service.cs.SettingsService;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
-import jakarta.mail.Authenticator;
-import jakarta.mail.Message;
-import jakarta.mail.MessagingException;
-import jakarta.mail.PasswordAuthentication;
-import jakarta.mail.Session;
-import jakarta.mail.Transport;
-import jakarta.mail.internet.InternetAddress;
-import jakarta.mail.internet.MimeMessage;
 import java.util.Properties;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.locks.Lock;
@@ -50,8 +44,10 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 @Service
 public class MailService {
 
-    @Autowired private SettingsService settingsRepository;
-    @Autowired private ScheduledExecutorService executorService;
+    @Autowired
+    private SettingsService settingsService;
+    @Autowired
+    private ScheduledExecutorService executorService;
 
     private final ReadWriteLock readWriteLock = new ReentrantReadWriteLock();
     private final Lock readLock = readWriteLock.readLock();
@@ -64,12 +60,12 @@ public class MailService {
     public void loadSettingsFromDB() {
         writeLock.lock();
         try {
-            settings = settingsRepository.getMailSettings();
+            settings = settingsService.getMailSettings();
         } finally {
             writeLock.unlock();
         }
-        if (settings!=null) {
-        	session = createSession(getSettings());
+        if (settings != null && settings.isEnabled()) {
+            session = createSession(getSettings());
         }
     }
 

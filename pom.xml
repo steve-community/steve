@@ -43,6 +43,8 @@
         <jetty.version>10.0.14</jetty.version>
         <lombok.version>1.18.28</lombok.version>
         <jackson.version>2.15.2</jackson.version>
+        <flyway.version>7.15.0</flyway.version>
+        <junit.version>5.9.3</junit.version>
         <testcontainers.version>1.18.3</testcontainers.version>
 
         <plugin.license-maven.version>4.2</plugin.license-maven.version>
@@ -193,6 +195,11 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>3.1.2</version>
+                <configuration>
+                    <systemPropertyVariables>
+                        <schemaToTruncate>${db.schema}</schemaToTruncate>
+                    </systemPropertyVariables>
+                </configuration>
             </plugin>
 
             <!-- Static analysis and check style -->
@@ -247,26 +254,6 @@
                     <failOnNoGitDirectory>false</failOnNoGitDirectory>
                     <failOnUnableToExtractRepoInfo>false</failOnUnableToExtractRepoInfo>
                 </configuration>
-            </plugin>
-
-            <!-- Read from main.properties the DB configuration -->
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>properties-maven-plugin</artifactId>
-                <version>1.2.0</version>
-                <executions>
-                    <execution>
-                        <phase>initialize</phase>
-                        <goals>
-                            <goal>read-project-properties</goal>
-                        </goals>
-                        <configuration>
-                            <files>
-                                <file>src/main/resources/config/${envName}/main.properties</file>
-                            </files>
-                        </configuration>
-                    </execution>
-                </executions>
             </plugin>
 
             <plugin>
@@ -716,6 +703,12 @@
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-params</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.flywaydb</groupId>
+            <artifactId>flyway-core</artifactId>
+            <version>${flyway.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>

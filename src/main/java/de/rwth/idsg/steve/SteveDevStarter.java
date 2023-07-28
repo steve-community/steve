@@ -28,8 +28,8 @@ public class SteveDevStarter implements ApplicationStarter {
 
     private final JettyServer jettyServer;
 
-    SteveDevStarter() {
-        this.jettyServer = new JettyServer();
+    SteveDevStarter(SteveConfiguration config) {
+        this.jettyServer = new JettyServer(config);
     }
 
     @Override

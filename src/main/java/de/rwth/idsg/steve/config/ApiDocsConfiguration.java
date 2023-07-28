@@ -47,7 +47,7 @@ public class ApiDocsConfiguration {
     }
 
     @Bean
-    public Docket apiDocs() {
+    public Docket apiDocs(SteveConfiguration config) {
         String title = "SteVe REST API Documentation";
 
         var apiInfo = new ApiInfoBuilder()
@@ -55,7 +55,7 @@ public class ApiDocsConfiguration {
             .description(title)
             .license("GPL-3.0")
             .licenseUrl("https://github.com/steve-community/steve/blob/master/LICENSE.txt")
-            .version(SteveConfiguration.CONFIG.getSteveVersion())
+            .version(config.getSteveVersion())
             .build();
 
         return new Docket(DocumentationType.OAS_30)

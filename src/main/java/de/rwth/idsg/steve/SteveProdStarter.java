@@ -43,8 +43,8 @@ public class SteveProdStarter implements ApplicationStarter {
     private final JettyServer jettyServer;
     private Thread dotThread;
 
-    SteveProdStarter() {
-        this.jettyServer = new JettyServer();
+    SteveProdStarter(SteveConfiguration config) {
+        this.jettyServer = new JettyServer(config);
     }
 
     @Override

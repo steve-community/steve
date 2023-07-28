@@ -18,8 +18,7 @@
  */
 package de.rwth.idsg.steve.ocpp.ws;
 
-import de.rwth.idsg.steve.config.WebSocketConfiguration;
-import de.rwth.idsg.steve.service.ChargePointHelperService;
+import de.rwth.idsg.steve.service.UnknownChargePointService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import ocpp.cs._2015._10.RegistrationStatus;
@@ -50,7 +49,7 @@ public class OcppWebSocketHandshakeHandler implements HandshakeHandler {
 
     private final DefaultHandshakeHandler delegate;
     private final List<AbstractWebSocketEndpoint> endpoints;
-    private final ChargePointHelperService chargePointHelperService;
+    private final UnknownChargePointService unknownChargePointService;
 
     /**
      * We need some WebSocketHandler just for Spring to register it for the path. We will not use it for the actual
@@ -70,7 +69,7 @@ public class OcppWebSocketHandshakeHandler implements HandshakeHandler {
         // -------------------------------------------------------------------------
 
         String chargeBoxId = getLastBitFromUrl(request.getURI().getPath());
-        Optional<RegistrationStatus> status = chargePointHelperService.getRegistrationStatus(chargeBoxId);
+        Optional<RegistrationStatus> status = unknownChargePointService.getRegistrationStatus(chargeBoxId);
 
         // Allow connections, if station is in db (registration_status field from db does not matter)
         boolean allowConnection = status.isPresent();

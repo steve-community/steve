@@ -18,6 +18,7 @@
  */
 package de.rwth.idsg.steve.issues;
 
+import de.rwth.idsg.steve.SteveConfiguration;
 import de.rwth.idsg.steve.StressTest;
 import de.rwth.idsg.steve.utils.Helpers;
 import de.rwth.idsg.steve.utils.StressTester;
@@ -42,10 +43,15 @@ import static de.rwth.idsg.steve.utils.Helpers.getRandomString;
  */
 public class Issue81 extends StressTest {
 
-    private static final String path = getPath();
+    private final String path;
 
     public static void main(String[] args) throws Exception {
         new Issue81().attack();
+    }
+
+    Issue81() {
+        SteveConfiguration config = new SteveConfiguration();
+        path = getPath(config);
     }
 
     protected void attackInternal() throws Exception {

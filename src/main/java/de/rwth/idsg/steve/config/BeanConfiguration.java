@@ -67,8 +67,6 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 
-import static de.rwth.idsg.steve.SteveConfiguration.CONFIG;
-
 /**
  * Configuration and beans of Spring Framework.
  *
@@ -82,6 +80,12 @@ import static de.rwth.idsg.steve.SteveConfiguration.CONFIG;
 @ComponentScan("de.rwth.idsg.steve")
 public class BeanConfiguration implements WebMvcConfigurer {
 
+    private final SteveConfiguration config;
+
+    public BeanConfiguration(SteveConfiguration config) {
+        this.config = config;
+    }
+
     private HikariDataSource dataSource;
     private ScheduledThreadPoolExecutor executor;
 
@@ -89,7 +93,7 @@ public class BeanConfiguration implements WebMvcConfigurer {
      * https://github.com/brettwooldridge/HikariCP/wiki/MySQL-Configuration
      */
     private void initDataSource() {
-        SteveConfiguration.DB dbConfig = CONFIG.getDb();
+        SteveConfiguration.DB dbConfig = config.getDb();
 
         HikariConfig hc = new HikariConfig();
 
@@ -104,7 +108,7 @@ public class BeanConfiguration implements WebMvcConfigurer {
         hc.addDataSourceProperty(PropertyKey.prepStmtCacheSize.getKeyName(), 250);
         hc.addDataSourceProperty(PropertyKey.prepStmtCacheSqlLimit.getKeyName(), 2048);
         hc.addDataSourceProperty(PropertyKey.characterEncoding.getKeyName(), "utf8");
-        hc.addDataSourceProperty(PropertyKey.connectionTimeZone.getKeyName(), CONFIG.getTimeZoneId());
+        hc.addDataSourceProperty(PropertyKey.connectionTimeZone.getKeyName(), config.getTimeZoneId());
         hc.addDataSourceProperty(PropertyKey.useSSL.getKeyName(), true);
 
         // https://github.com/steve-community/steve/issues/736
@@ -136,7 +140,7 @@ public class BeanConfiguration implements WebMvcConfigurer {
                 // operations. We do not use or need that.
                 .withAttachRecords(false)
                 // To log or not to log the sql queries, that is the question
-                .withExecuteLogging(CONFIG.getDb().isSqlLogging());
+                .withExecuteLogging(config.getDb().isSqlLogging());
 
         // Configuration for JOOQ
         org.jooq.Configuration conf = new DefaultConfiguration()
@@ -168,9 +172,9 @@ public class BeanConfiguration implements WebMvcConfigurer {
      * steps and return a "no new version" report immediately.
      */
     @Bean
-    public ReleaseCheckService releaseCheckService() {
-        if (InternetChecker.isInternetAvailable()) {
-            return new GithubReleaseCheckService();
+    public ReleaseCheckService releaseCheckService(InternetChecker internetChecker) {
+        if (internetChecker.isInternetAvailable()) {
+            return new GithubReleaseCheckService(config);
         } else {
             return new DummyReleaseCheckService();
         }

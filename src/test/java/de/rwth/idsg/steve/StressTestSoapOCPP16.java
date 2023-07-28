@@ -55,10 +55,15 @@ import static de.rwth.idsg.steve.utils.Helpers.getRandomStrings;
  */
 public class StressTestSoapOCPP16 extends StressTest {
 
-    private static final String path = getPath();
+    private final String path;
 
     public static void main(String[] args) throws Exception {
         new StressTestSoapOCPP16().attack();
+    }
+
+    StressTestSoapOCPP16() {
+        SteveConfiguration config = new SteveConfiguration();
+        path = getPath(config);
     }
 
     protected void attackInternal() throws Exception {

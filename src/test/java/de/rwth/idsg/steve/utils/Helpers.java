@@ -18,6 +18,7 @@
  */
 package de.rwth.idsg.steve.utils;
 
+import de.rwth.idsg.steve.SteveConfiguration;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.apache.cxf.ws.addressing.WSAddressingFeature;
 
@@ -25,8 +26,6 @@ import javax.xml.ws.soap.SOAPBinding;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-
-import static de.rwth.idsg.steve.SteveConfiguration.CONFIG;
 
 /**
  * @author Andreas Heuvels <andreas.heuvels@rwth-aachen.de>
@@ -46,40 +45,40 @@ public class Helpers {
         return list;
     }
 
-    public static String getPath() {
+    public static String getPath(SteveConfiguration config) {
         String prefix;
         int port;
 
-        if (CONFIG.getJetty().isHttpEnabled()) {
+        if (config.getJetty().isHttpEnabled()) {
             prefix = "http://";
-            port = CONFIG.getJetty().getHttpPort();
-        } else if (CONFIG.getJetty().isHttpsEnabled()) {
+            port = config.getJetty().getHttpPort();
+        } else if (config.getJetty().isHttpsEnabled()) {
             prefix = "https://";
-            port = CONFIG.getJetty().getHttpsPort();
+            port = config.getJetty().getHttpsPort();
         } else {
             throw new RuntimeException();
         }
 
-        return prefix + CONFIG.getJetty().getServerHost() + ":" + port
-                + CONFIG.getContextPath() + "/services" + CONFIG.getRouterEndpointPath();
+        return prefix + config.getJetty().getServerHost() + ":" + port
+                + config.getContextPath() + "/services" + config.getRouterEndpointPath();
     }
 
-    public static String getJsonPath() {
+    public static String getJsonPath(SteveConfiguration config) {
         String prefix;
         int port;
 
-        if (CONFIG.getJetty().isHttpEnabled()) {
+        if (config.getJetty().isHttpEnabled()) {
             prefix = "ws://";
-            port = CONFIG.getJetty().getHttpPort();
-        } else if (CONFIG.getJetty().isHttpsEnabled()) {
+            port = config.getJetty().getHttpPort();
+        } else if (config.getJetty().isHttpsEnabled()) {
             prefix = "wss://";
-            port = CONFIG.getJetty().getHttpsPort();
+            port = config.getJetty().getHttpsPort();
         } else {
             throw new RuntimeException();
         }
 
-        return prefix + CONFIG.getJetty().getServerHost() + ":" + port
-                + CONFIG.getContextPath() + "/websocket/CentralSystemService/";
+        return prefix + config.getJetty().getServerHost() + ":" + port
+                + config.getContextPath() + "/websocket/CentralSystemService/";
     }
 
     public static ocpp.cs._2015._10.CentralSystemService getForOcpp16(String path) {

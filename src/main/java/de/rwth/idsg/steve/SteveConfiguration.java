@@ -31,8 +31,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
  * @since 19.08.2014
  */
 @Getter
-public enum SteveConfiguration {
-    CONFIG;
+public class SteveConfiguration {
 
     // Root mapping for Spring
     private final String springMapping = "/";
@@ -61,7 +60,7 @@ public enum SteveConfiguration {
     private final DB db;
     private final Jetty jetty;
 
-    SteveConfiguration() {
+    public SteveConfiguration() {
         PropertiesFileLoader p = new PropertiesFileLoader("main.properties");
 
         contextPath = sanitizeContextPath(p.getOptionalString("context.path"));

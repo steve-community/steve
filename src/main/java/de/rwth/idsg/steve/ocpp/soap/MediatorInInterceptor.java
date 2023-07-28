@@ -18,6 +18,7 @@
  */
 package de.rwth.idsg.steve.ocpp.soap;
 
+import de.rwth.idsg.steve.SteveConfiguration;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.cxf.Bus;
 import org.apache.cxf.binding.soap.SoapMessage;
@@ -42,8 +43,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static de.rwth.idsg.steve.SteveConfiguration.CONFIG;
-
 /**
  * Taken from http://cxf.apache.org/docs/service-routing.html and modified.
  */
@@ -52,10 +51,10 @@ public class MediatorInInterceptor extends AbstractPhaseInterceptor<SoapMessage>
 
     private final Map<String, Server> actualServers;
 
-    public MediatorInInterceptor(Bus bus) {
+    public MediatorInInterceptor(Bus bus, SteveConfiguration config) {
         super(Phase.POST_STREAM);
         super.addBefore(StaxInInterceptor.class.getName());
-        actualServers = initServerLookupMap(bus);
+        actualServers = initServerLookupMap(bus, config);
     }
 
     public final void handleMessage(SoapMessage message) {
@@ -105,7 +104,7 @@ public class MediatorInInterceptor extends AbstractPhaseInterceptor<SoapMessage>
      * redirect to the version-specific implementation according to the namespace
      * of the incoming message.
      */
-    private static Map<String, Server> initServerLookupMap(Bus bus) {
+    private static Map<String, Server> initServerLookupMap(Bus bus, SteveConfiguration config) {
         String exceptionMsg = "The services are not created and/or registered to the bus yet.";
 
         ServerRegistry serverRegistry = bus.getExtension(ServerRegistry.class);
@@ -124,7 +123,7 @@ public class MediatorInInterceptor extends AbstractPhaseInterceptor<SoapMessage>
             String address = info.getAddress();
 
             // exclude the 'dummy' routing server
-            if (CONFIG.getRouterEndpointPath().equals(address)) {
+            if (config.getRouterEndpointPath().equals(address)) {
                 continue;
             }
 

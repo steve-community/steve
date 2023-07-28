@@ -54,7 +54,8 @@ public class ApplicationJsonTest {
 
     @BeforeAll
     public static void init() throws Exception {
-        Assertions.assertEquals(ApplicationProfile.TEST, SteveConfiguration.CONFIG.getProfile());
+        SteveConfiguration config = new SteveConfiguration();
+        Assertions.assertEquals(ApplicationProfile.TEST, config.getProfile());
         __DatabasePreparer__.prepare();
 
         app = new Application();

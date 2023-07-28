@@ -77,13 +77,17 @@ public class OperationalTestSoapOCPP16 {
     private static final String REGISTERED_CHARGE_BOX_ID = __DatabasePreparer__.getRegisteredChargeBoxId();
     private static final String REGISTERED_CHARGE_BOX_ID_2 = __DatabasePreparer__.getRegisteredChargeBoxId2();
     private static final String REGISTERED_OCPP_TAG = __DatabasePreparer__.getRegisteredOcppTag();
-    private static final String path = getPath();
     private static final int numConnectors = 5;
+
+    private static SteveConfiguration config;
+    private static String path;
     private static Application app;
 
     @BeforeAll
     public static void initClass() throws Exception {
-        Assertions.assertEquals(ApplicationProfile.TEST, SteveConfiguration.CONFIG.getProfile());
+        config = new SteveConfiguration();
+        Assertions.assertEquals(ApplicationProfile.TEST, config.getProfile());
+        path = getPath(config);
 
         app = new Application();
         app.start();
@@ -106,7 +110,7 @@ public class OperationalTestSoapOCPP16 {
 
     @Test
     public void testUnregisteredCP() {
-        Assertions.assertFalse(SteveConfiguration.CONFIG.getOcpp().isAutoRegisterUnknownStations());
+        Assertions.assertFalse(config.getOcpp().isAutoRegisterUnknownStations());
 
         CentralSystemService client = getForOcpp16(path);
 
@@ -134,7 +138,7 @@ public class OperationalTestSoapOCPP16 {
     @Test
     public void testUnregisteredCPWithInterceptor() {
         Assertions.assertThrows(WebServiceException.class, () -> {
-            Assertions.assertFalse(SteveConfiguration.CONFIG.getOcpp().isAutoRegisterUnknownStations());
+            Assertions.assertFalse(config.getOcpp().isAutoRegisterUnknownStations());
 
             CentralSystemService client = getForOcpp16(path);
 

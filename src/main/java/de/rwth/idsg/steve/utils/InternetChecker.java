@@ -19,8 +19,7 @@
 package de.rwth.idsg.steve.utils;
 
 import de.rwth.idsg.steve.SteveConfiguration;
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
+import org.springframework.stereotype.Component;
 
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
@@ -34,7 +33,7 @@ import java.util.List;
  * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 19.04.2016
  */
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
+@Component
 public final class InternetChecker {
 
     private static final int CONNECT_TIMEOUT = 5_000;
@@ -48,8 +47,8 @@ public final class InternetChecker {
             "https://www.facebook.com"
     );
 
-    static {
-        System.setProperty("http.agent", "SteVe/" + SteveConfiguration.CONFIG.getSteveCompositeVersion());
+    InternetChecker(SteveConfiguration config) {
+        System.setProperty("http.agent", "SteVe/" + config.getSteveCompositeVersion());
     }
 
     /**
@@ -57,7 +56,7 @@ public final class InternetChecker {
      * big players are down at the same time, that's okay too, because the end of the world must have arrived,
      * obviously.
      */
-    public static boolean isInternetAvailable() {
+    public boolean isInternetAvailable() {
         for (String s : HOST_LIST) {
             if (isHostAvailable(s)) {
                 return true;

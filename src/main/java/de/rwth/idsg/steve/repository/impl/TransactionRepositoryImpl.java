@@ -66,6 +66,16 @@ public class TransactionRepositoryImpl implements TransactionRepository {
     }
 
     @Override
+    public Transaction getTransaction(int transaction_pk) {
+        TransactionQueryForm form = new TransactionQueryForm();
+        form.setTransactionPk(transaction_pk);
+        form.setReturnCSV(false);
+        form.setType(TransactionQueryForm.QueryType.ALL);
+        return getInternal(form).fetch()
+                                .map(new TransactionMapper()).get(0);
+    }
+
+    @Override
     public List<Transaction> getTransactions(TransactionQueryForm form) {
         return getInternal(form).fetch()
                                 .map(new TransactionMapper());

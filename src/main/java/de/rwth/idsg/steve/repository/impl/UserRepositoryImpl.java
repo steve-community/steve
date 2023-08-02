@@ -117,6 +117,43 @@ public class UserRepositoryImpl implements UserRepository {
     }
 
     @Override
+    public User.Details getDetails(String ocppIdTag) {
+        
+        Integer ocppPk = ctx.select(OCPP_TAG.OCPP_TAG_PK)
+                                        .from(OCPP_TAG)
+                                        .where(OCPP_TAG.ID_TAG.eq(ocppIdTag))
+                                        .fetchOne(OCPP_TAG.OCPP_TAG_PK);
+        
+        if (ocppPk == null) {
+            throw new SteveException("There is no OCPP_Tag: '%s'", ocppIdTag);
+        }
+
+        // -------------------------------------------------------------------------
+        // 1. user table
+        // -------------------------------------------------------------------------
+
+        UserRecord ur = ctx.selectFrom(USER)
+                           .where(USER.OCPP_TAG_PK.equal(ocppPk))
+                           .fetchOne();
+
+        if (ur == null) {
+            throw new SteveException("There is no user with OCPP_TAG '%s'", ocppIdTag);
+        }
+
+        // -------------------------------------------------------------------------
+        // 2. address table
+        // -------------------------------------------------------------------------
+
+        AddressRecord ar = addressRepository.get(ctx, ur.getAddressPk());
+
+        return User.Details.builder()
+                           .userRecord(ur)
+                           .address(ar)
+                           .ocppIdTag(Optional.ofNullable(ocppIdTag))
+                           .build();
+    }
+
+    @Override
     public void add(UserForm form) {
         ctx.transaction(configuration -> {
             DSLContext ctx = DSL.using(configuration);

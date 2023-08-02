@@ -99,6 +99,15 @@ public class TransactionRepositoryImpl implements TransactionRepository {
     }
 
     @Override
+    public String getOcppTagOfActiveTransaction(Integer connectorPk) {
+        return ctx.select(TRANSACTION.ID_TAG)
+                .from(TRANSACTION)
+                .where(TRANSACTION.CONNECTOR_PK.eq(connectorPk))
+                .and(TRANSACTION.STOP_VALUE.isNull())
+                .fetchAny(TRANSACTION.ID_TAG);
+    }
+
+    @Override
     public TransactionDetails getDetails(int transactionPk, boolean firstArrivingMeterValueIfMultiple) {
 
         // -------------------------------------------------------------------------

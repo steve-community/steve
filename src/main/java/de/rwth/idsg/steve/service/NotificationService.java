@@ -41,7 +41,11 @@ import static de.rwth.idsg.steve.NotificationFeature.OcppStationWebSocketConnect
 import static de.rwth.idsg.steve.NotificationFeature.OcppStationWebSocketDisconnected;
 import static de.rwth.idsg.steve.NotificationFeature.OcppTransactionStarted;
 import static de.rwth.idsg.steve.NotificationFeature.OcppTransactionEnded;
+import de.rwth.idsg.steve.repository.TransactionRepository;
+import de.rwth.idsg.steve.repository.UserRepository;
+import de.rwth.idsg.steve.repository.dto.Transaction;
 import static java.lang.String.format;
+import jooq.steve.db.tables.records.UserRecord;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -52,6 +56,8 @@ import static java.lang.String.format;
 public class NotificationService {
 
     @Autowired private MailService mailService;
+    @Autowired private TransactionRepository transactionRepository;
+    @Autowired private UserRepository userRepository;
 
     @EventListener
     public void ocppStationBooted(OccpStationBooted notification) {
@@ -117,7 +123,24 @@ public class NotificationService {
 
     @EventListener
     public void ocppTransactionEnded(OcppTransactionEnded notification) {
-       if (isDisabled(OcppTransactionEnded)) {
+        Transaction TransActParams = transactionRepository.getTransaction(notification.getParams().getTransactionId());
+
+        TransActParams.getOcppTagPk();
+        UserRecord userRecord = userRepository.getDetails(TransActParams.getOcppIdTag()).getUserRecord();
+        String eMailAddress = userRecord.getEMail();
+
+        // mail to user
+        if (!Strings.isNullOrEmpty(eMailAddress)) {
+            String subjectUserMail = format("Transaction '%s' has ended on charging station '%s'", TransActParams.getId(), TransActParams.getChargeBoxId());
+
+            // if the Transactionstop is received within the first 1 Minute don't send an E-Mail 
+            if (TransActParams.getStopTimestamp().isAfter(TransActParams.getStartTimestamp().plusMinutes(1))){
+                mailService.sendAsync(subjectUserMail, addTimestamp(createContent(TransActParams, userRecord)), eMailAddress);
+            }
+        }
+
+        /* mail defined in settings */ 
+        if (isDisabled(OcppTransactionEnded)) {
             return;
         }
 
@@ -156,6 +179,39 @@ public class NotificationService {
             .toString();
     }
 
+private static String createContent(Transaction params, UserRecord userRecord) {
+        Double meterValueDiff;
+        Integer meterValueStop;
+        Integer meterValueStart;
+        String str_meterValueDiff = "-";
+        try
+        {
+            meterValueStop = Integer.valueOf(params.getStopValue());
+            meterValueStart = Integer.valueOf(params.getStartValue());
+            meterValueDiff = (meterValueStop - meterValueStart)/1000.0; // --> kWh
+            str_meterValueDiff = meterValueDiff.toString() + " kWh";
+        }
+        catch(NumberFormatException e)
+        {
+            log.error("Failed to calculate charged energy! ", e);
+        }
+        
+        return new StringBuilder("User: ")
+            .append(userRecord.getFirstName()).append(" ").append(userRecord.getLastName())
+            .append(System.lineSeparator())
+            .append(System.lineSeparator())
+            .append("Details:").append(System.lineSeparator())
+            .append("- chargeBoxId: ").append(params.getChargeBoxId()).append(System.lineSeparator())
+            .append("- connectorId: ").append(params.getConnectorId()).append(System.lineSeparator())
+            .append("- transactionId: ").append(params.getId()).append(System.lineSeparator())  // getTransactionId()
+            .append("- startTimestamp (UTC): ").append(params.getStartTimestamp()).append(System.lineSeparator())
+            .append("- startMeterValue: ").append(params.getStartValue()).append(System.lineSeparator())
+            .append("- stopTimestamp (UTC): ").append(params.getStopTimestamp()).append(System.lineSeparator())
+            .append("- stopMeterValue: ").append(params.getStopValue()).append(System.lineSeparator())
+            .append("- stopReason: ").append(params.getStopReason()).append(System.lineSeparator())
+            .append("- charged energy: ").append(str_meterValueDiff).append(System.lineSeparator())    
+            .toString();
+    }
 
     private boolean isDisabled(NotificationFeature f) {
         MailSettings settings = mailService.getSettings();

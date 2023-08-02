@@ -40,6 +40,9 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+import static de.rwth.idsg.steve.utils.StringUtils.splitByComma;
+import static de.rwth.idsg.steve.utils.StringUtils.isValidAddress;
+import java.util.List;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -81,7 +84,7 @@ public class MailService {
 
     public void sendTestMail() {
         try {
-            send("Test", "Test");
+            send("Test", "Test","");
         } catch (MessagingException e) {
             throw new SteveException("Failed to send mail", e);
         }
@@ -90,28 +93,59 @@ public class MailService {
     public void sendAsync(String subject, String body) {
         executorService.execute(() -> {
             try {
-                send(subject, body);
+                send(subject, body, "");
             } catch (MessagingException e) {
                 log.error("Failed to send mail", e);
             }
         });
     }
 
-    public void send(String subject, String body) throws MessagingException {
-        MailSettings settings = getSettings();
+    public void sendAsync(String subject, String body, String RecipientAddresses) {
+        executorService.execute(() -> {
+            try {
+                send(subject, body, RecipientAddresses);
+            } catch (MessagingException e) {
+                log.error("Failed to send mail", e);
+            }
+        });
+    }
 
-        Message mail = new MimeMessage(session);
-        mail.setSubject("[SteVe] " + subject);
-        mail.setContent(body, "text/plain");
-        mail.setFrom(new InternetAddress(settings.getFrom()));
+    private void send(String subject, String body, String RecipientAddresses) throws MessagingException {
+    MailSettings settingsLocal = getSettings();
 
-        for (String rep : settings.getRecipients()) {
+    Message mail = new MimeMessage(session);
+    mail.setSubject("[SteVe] " + subject);
+    mail.setContent(body, "text/plain");
+    mail.setFrom(new InternetAddress(settingsLocal.getFrom()));
+
+    List<String> eMailAddresses;
+
+    if (RecipientAddresses.isEmpty())
+    {
+        eMailAddresses = settingsLocal.getRecipients();
+    }
+    else
+    {
+
+        eMailAddresses = splitByComma(RecipientAddresses);
+    }
+
+    for (String rep : eMailAddresses) {
+        if (isValidAddress(rep)){
             mail.addRecipient(Message.RecipientType.TO, new InternetAddress(rep));
         }
+        else{
+            log.error("Failed to send mail to " + rep + "! Format of the address is invalid.");
+        }
+    }
 
         try (Transport transport = session.getTransport()) {
             transport.connect();
             transport.sendMessage(mail, mail.getAllRecipients());
+        }
+        catch(Exception e)
+        {
+            log.error("Failed to send mail(s)! ", e);
         }
     }
 

@@ -166,6 +166,15 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
     }
 
     @Override
+    public Integer getConnectorPk(String chargeBoxId, int connectorId){
+        return ctx.select(CONNECTOR.CONNECTOR_PK)
+                .from(CONNECTOR)
+                .where(CONNECTOR.CHARGE_BOX_ID.equal(chargeBoxId))
+                .and(CONNECTOR.CONNECTOR_ID.equal(connectorId))
+                .fetchOne().value1();   
+    }
+
+    @Override
     public void insertMeterValues(String chargeBoxIdentity, List<MeterValue> list, int connectorId, Integer transactionId) {
         if (CollectionUtils.isEmpty(list)) {
             return;

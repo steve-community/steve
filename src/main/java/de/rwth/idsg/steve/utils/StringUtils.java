@@ -32,6 +32,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.regex.Pattern;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -94,5 +95,15 @@ public final class StringUtils {
         } else {
             return input.substring(index + substring.length());
         }
+    }
+
+    // https://www.baeldung.com/java-email-validation-regex
+    public static boolean isValidAddress(String emailAddress) {
+       String regexPattern = "^(?=.{1,64}@)[A-Za-z0-9_-]+(\\.[A-Za-z0-9_-]+)*@[^-][A-Za-z0-9-]+(\\.[A-Za-z0-9-]+)*(\\.[A-Za-z]{2,})$"; // Strict Regular Expression Validation
+       //String regexPattern = "^(?=.{1,64}@)[\\p{L}0-9_-]+(\\.[\\p{L}0-9_-]+)*@[^-][\\p{L}0-9-]+(\\.[\\p{L}0-9-]+)*(\\.[\\p{L}]{2,})$"; //Regular Expression for Validation of Non-Latin or Unicode Characters Email
+       //String regexPattern = "^[a-zA-Z0-9_!#$%&'*+/=?`{|}~^.-]+@[a-zA-Z0-9.-]+$" // Regular Expression by RFC 5322 for Email Validation
+       return Pattern.compile(regexPattern)
+            .matcher(emailAddress)
+            .matches();
     }
 }

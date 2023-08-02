@@ -41,11 +41,14 @@ import static de.rwth.idsg.steve.NotificationFeature.OcppStationWebSocketConnect
 import static de.rwth.idsg.steve.NotificationFeature.OcppStationWebSocketDisconnected;
 import static de.rwth.idsg.steve.NotificationFeature.OcppTransactionStarted;
 import static de.rwth.idsg.steve.NotificationFeature.OcppTransactionEnded;
+import de.rwth.idsg.steve.repository.OcppServerRepository;
 import de.rwth.idsg.steve.repository.TransactionRepository;
 import de.rwth.idsg.steve.repository.UserRepository;
 import de.rwth.idsg.steve.repository.dto.Transaction;
+import de.rwth.idsg.steve.service.notification.OcppStationStatusSuspendedEV;
 import static java.lang.String.format;
 import jooq.steve.db.tables.records.UserRecord;
+import org.springframework.scheduling.annotation.Async;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -58,6 +61,7 @@ public class NotificationService {
     @Autowired private MailService mailService;
     @Autowired private TransactionRepository transactionRepository;
     @Autowired private UserRepository userRepository;
+    @Autowired private OcppServerRepository ocppServerRepository;
 
     @EventListener
     public void ocppStationBooted(OccpStationBooted notification) {
@@ -122,6 +126,28 @@ public class NotificationService {
     }
 
     @EventListener
+    @Async
+    public void ocppStationStatusSuspendedEV(OcppStationStatusSuspendedEV notification){
+        // Connector_pk
+        Integer connectorPk = ocppServerRepository.getConnectorPk(notification.getChargeBoxId(), notification.getConnectorId());
+        String ocppTag = transactionRepository.getOcppTagOfActiveTransaction(connectorPk);
+        if (ocppTag == null){return;}
+        UserRecord userRecord = userRepository.getDetails(ocppTag).getUserRecord();
+        String eMailAddy = userRecord.getEMail(); //userRepository.getMailAddy(OCPP_TAG);
+        if (Strings.isNullOrEmpty(eMailAddy))
+        {return;}
+
+        String subject = format("EV stopped charging at charging station %s", notification.getChargeBoxId());
+
+        //String body = format("Connector '%s' of charging station '%s' notifies Suspended_EV", connectorId, chargeBoxId);
+        String body = "User: " + userRecord.getFirstName() + " " + userRecord.getLastName() + System.lineSeparator() + System.lineSeparator()
+                + "Connector " + notification.getConnectorId() + " of charging station " + notification.getChargeBoxId() + " notifies Suspended_EV";
+
+        mailService.sendAsync( subject, addTimestamp(body), eMailAddy);
+    }
+
+    @EventListener
+    @Async
     public void ocppTransactionEnded(OcppTransactionEnded notification) {
         Transaction TransActParams = transactionRepository.getTransaction(notification.getParams().getTransactionId());
 

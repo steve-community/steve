@@ -150,7 +150,7 @@ public class CentralSystemService16_Service {
 
          if (parameters.getStatus() == ChargePointStatus.SUSPENDED_EV) {
             applicationEventPublisher.publishEvent(new OcppStationStatusSuspendedEV(
-                    chargeBoxIdentity, parameters.getConnectorId())); //, connPk));
+                    chargeBoxIdentity, parameters.getConnectorId()));
         }
 
         return new StatusNotificationResponse();

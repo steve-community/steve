@@ -128,18 +128,20 @@ public class NotificationService {
     @EventListener
     @Async
     public void ocppStationStatusSuspendedEV(OcppStationStatusSuspendedEV notification){
-        // Connector_pk
         Integer connectorPk = ocppServerRepository.getConnectorPk(notification.getChargeBoxId(), notification.getConnectorId());
         String ocppTag = transactionRepository.getOcppTagOfActiveTransaction(connectorPk);
-        if (ocppTag == null){return;}
+
+        if (ocppTag == null){
+            return;
+        }
+
         UserRecord userRecord = userRepository.getDetails(ocppTag).getUserRecord();
-        String eMailAddy = userRecord.getEMail(); //userRepository.getMailAddy(OCPP_TAG);
-        if (Strings.isNullOrEmpty(eMailAddy))
-        {return;}
+        String eMailAddy = userRecord.getEMail();
+        if (Strings.isNullOrEmpty(eMailAddy)){
+            return;
+        }
 
         String subject = format("EV stopped charging at charging station %s", notification.getChargeBoxId());
-
-        //String body = format("Connector '%s' of charging station '%s' notifies Suspended_EV", connectorId, chargeBoxId);
         String body = "User: " + userRecord.getFirstName() + " " + userRecord.getLastName() + System.lineSeparator() + System.lineSeparator()
                 + "Connector " + notification.getConnectorId() + " of charging station " + notification.getChargeBoxId() + " notifies Suspended_EV";
 
@@ -159,7 +161,7 @@ public class NotificationService {
         if (!Strings.isNullOrEmpty(eMailAddress)) {
             String subjectUserMail = format("Transaction '%s' has ended on charging station '%s'", TransActParams.getId(), TransActParams.getChargeBoxId());
 
-            // if the Transactionstop is received within the first 1 Minute don't send an E-Mail 
+            // if the Transactionstop is received within the first Minute don't send an E-Mail
             if (TransActParams.getStopTimestamp().isAfter(TransActParams.getStartTimestamp().plusMinutes(1))){
                 mailService.sendAsync(subjectUserMail, addTimestamp(createContent(TransActParams, userRecord)), eMailAddress);
             }
@@ -178,7 +180,6 @@ public class NotificationService {
     // -------------------------------------------------------------------------
     // Private helpers
     // -------------------------------------------------------------------------
-
 
     private static String createContent(InsertTransactionParams params) {
         StringBuilder sb = new StringBuilder("Details:").append(System.lineSeparator())
@@ -229,7 +230,7 @@ private static String createContent(Transaction params, UserRecord userRecord) {
             .append("Details:").append(System.lineSeparator())
             .append("- chargeBoxId: ").append(params.getChargeBoxId()).append(System.lineSeparator())
             .append("- connectorId: ").append(params.getConnectorId()).append(System.lineSeparator())
-            .append("- transactionId: ").append(params.getId()).append(System.lineSeparator())  // getTransactionId()
+            .append("- transactionId: ").append(params.getId()).append(System.lineSeparator())
             .append("- startTimestamp (UTC): ").append(params.getStartTimestamp()).append(System.lineSeparator())
             .append("- startMeterValue: ").append(params.getStartValue()).append(System.lineSeparator())
             .append("- stopTimestamp (UTC): ").append(params.getStopTimestamp()).append(System.lineSeparator())

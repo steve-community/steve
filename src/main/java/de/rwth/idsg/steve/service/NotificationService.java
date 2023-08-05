@@ -132,26 +132,34 @@ public class NotificationService {
         Integer connectorPk = ocppServerRepository.getConnectorPk(notification.getChargeBoxId(), notification.getConnectorId());
         String ocppTag = transactionRepository.getOcppTagOfActiveTransaction(connectorPk);
 
-        if (ocppTag == null){
-            return;
+        String subject = format("EV stopped charging at charging station %s, Connector %d", 
+                    notification.getChargeBoxId(), 
+                    notification.getConnectorId());
+        if (ocppTag != null){
+
+            UserRecord userRecord = userRepository.getDetails(ocppTag).getUserRecord();
+            String eMailAddy = userRecord.getEMail();
+            if (!Strings.isNullOrEmpty(eMailAddy)){
+                //String bodyUserMail = "User: " + userRecord.getFirstName() + " " + userRecord.getLastName() + System.lineSeparator() + System.lineSeparator()
+                //        + "Connector " + notification.getConnectorId() + " of charging station " + notification.getChargeBoxId() + " notifies Suspended_EV";
+                
+                String bodyUserMail = format("User: %s %s \n\n Connector %d of charging station %s notifies Suspended_EV",
+                userRecord.getFirstName(),
+                userRecord.getLastName(),
+                notification.getConnectorId(),
+                notification.getChargeBoxId());
+
+                mailService.sendAsync( subject, addTimestamp(bodyUserMail), eMailAddy);
+            }
         }
-
-        UserRecord userRecord = userRepository.getDetails(ocppTag).getUserRecord();
-        String eMailAddy = userRecord.getEMail();
-        if (Strings.isNullOrEmpty(eMailAddy)){
-            return;
-        }
-
-        String subject = format("EV stopped charging at charging station %s", notification.getChargeBoxId());
-        String body = "User: " + userRecord.getFirstName() + " " + userRecord.getLastName() + System.lineSeparator() + System.lineSeparator()
-                + "Connector " + notification.getConnectorId() + " of charging station " + notification.getChargeBoxId() + " notifies Suspended_EV";
-
-        mailService.sendAsync( subject, addTimestamp(body), eMailAddy);
 
         /* mail defined in settings */ 
         if (isDisabled(OcppStationStatusSuspendedEV)) {
             return;
         }
+        String body = format("Connector %d of charging station %s notifies Suspended_EV", 
+                notification.getConnectorId(),
+                notification.getChargeBoxId());
         mailService.sendAsync( subject, addTimestamp(body), "");
     }
 

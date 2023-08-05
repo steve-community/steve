@@ -28,6 +28,7 @@ import de.rwth.idsg.steve.service.notification.OcppStationStatusFailure;
 import de.rwth.idsg.steve.service.notification.OcppStationWebSocketConnected;
 import de.rwth.idsg.steve.service.notification.OcppStationWebSocketDisconnected;
 import de.rwth.idsg.steve.service.notification.OcppTransactionEnded;
+import de.rwth.idsg.steve.service.notification.OcppStationStatusSuspendedEV;
 import de.rwth.idsg.steve.service.notification.OcppTransactionStarted;
 import lombok.extern.slf4j.Slf4j;
 import org.joda.time.DateTime;
@@ -40,12 +41,12 @@ import static de.rwth.idsg.steve.NotificationFeature.OcppStationStatusFailure;
 import static de.rwth.idsg.steve.NotificationFeature.OcppStationWebSocketConnected;
 import static de.rwth.idsg.steve.NotificationFeature.OcppStationWebSocketDisconnected;
 import static de.rwth.idsg.steve.NotificationFeature.OcppTransactionStarted;
+import static de.rwth.idsg.steve.NotificationFeature.OcppStationStatusSuspendedEV;
 import static de.rwth.idsg.steve.NotificationFeature.OcppTransactionEnded;
 import de.rwth.idsg.steve.repository.OcppServerRepository;
 import de.rwth.idsg.steve.repository.TransactionRepository;
 import de.rwth.idsg.steve.repository.UserRepository;
 import de.rwth.idsg.steve.repository.dto.Transaction;
-import de.rwth.idsg.steve.service.notification.OcppStationStatusSuspendedEV;
 import static java.lang.String.format;
 import jooq.steve.db.tables.records.UserRecord;
 import org.springframework.scheduling.annotation.Async;
@@ -146,6 +147,12 @@ public class NotificationService {
                 + "Connector " + notification.getConnectorId() + " of charging station " + notification.getChargeBoxId() + " notifies Suspended_EV";
 
         mailService.sendAsync( subject, addTimestamp(body), eMailAddy);
+
+        /* mail defined in settings */ 
+        if (isDisabled(OcppStationStatusSuspendedEV)) {
+            return;
+        }
+        mailService.sendAsync( subject, addTimestamp(body), "");
     }
 
     @EventListener

@@ -1,3 +1,9 @@
+ALTER TABLE `connector`
+    DROP FOREIGN KEY `FK_chargeBoxId_c`;
+ALTER TABLE `reservation`
+    DROP FOREIGN KEY `FK_chargeBoxId_r`,
+    DROP FOREIGN KEY `FK_idTag_r`;
+
 ALTER TABLE `chargebox`
 CHANGE COLUMN `chargeBoxId` `chargeBoxId` VARCHAR(255) NOT NULL COMMENT '' ,
 CHANGE COLUMN `endpoint_address` `endpoint_address` VARCHAR(255) NULL DEFAULT NULL COMMENT '' ,
@@ -14,9 +20,6 @@ CHANGE COLUMN `meterType` `meterType` VARCHAR(255) NULL DEFAULT NULL COMMENT '' 
 CHANGE COLUMN `meterSerialNumber` `meterSerialNumber` VARCHAR(255) NULL DEFAULT NULL COMMENT '' ,
 CHANGE COLUMN `diagnosticsStatus` `diagnosticsStatus` VARCHAR(255) NULL DEFAULT NULL COMMENT '' ;
 
-
-ALTER TABLE `connector`
-DROP FOREIGN KEY `FK_chargeBoxId_c`;
 ALTER TABLE `connector`
 CHANGE COLUMN `chargeBoxId` `chargeBoxId` VARCHAR(255) NOT NULL COMMENT '' ;
 ALTER TABLE `connector`
@@ -42,10 +45,6 @@ CHANGE COLUMN `errorCode` `errorCode` VARCHAR(255) NULL DEFAULT NULL COMMENT '' 
 CHANGE COLUMN `errorInfo` `errorInfo` VARCHAR(255) NULL DEFAULT NULL COMMENT '' ,
 CHANGE COLUMN `vendorErrorCode` `vendorErrorCode` VARCHAR(255) NULL DEFAULT NULL COMMENT '' ;
 
-
-ALTER TABLE `reservation`
-DROP FOREIGN KEY `FK_chargeBoxId_r`,
-DROP FOREIGN KEY `FK_idTag_r`;
 ALTER TABLE `reservation`
 CHANGE COLUMN `idTag` `idTag` VARCHAR(255) NOT NULL COMMENT '' ,
 CHANGE COLUMN `chargeBoxId` `chargeBoxId` VARCHAR(255) NOT NULL COMMENT '' ,
@@ -55,11 +54,6 @@ ADD CONSTRAINT `FK_chargeBoxId_r`
 FOREIGN KEY (`chargeBoxId`)
 REFERENCES `chargebox` (`chargeBoxId`)
   ON DELETE CASCADE
-  ON UPDATE NO ACTION,
-ADD CONSTRAINT `FK_idTag_r`
-FOREIGN KEY (`idTag`)
-REFERENCES `user` (`idTag`)
-  ON DELETE CASCADE
   ON UPDATE NO ACTION;
 
 ALTER TABLE `transaction`
@@ -68,12 +62,6 @@ ALTER TABLE `transaction`
 CHANGE COLUMN `idTag` `idTag` VARCHAR(255) NOT NULL COMMENT '' ,
 CHANGE COLUMN `startValue` `startValue` VARCHAR(255) NULL DEFAULT NULL COMMENT '' ,
 CHANGE COLUMN `stopValue` `stopValue` VARCHAR(255) NULL DEFAULT NULL COMMENT '' ;
-ALTER TABLE `transaction`
-ADD CONSTRAINT `FK_idTag_t`
-FOREIGN KEY (`idTag`)
-REFERENCES `user` (`idTag`)
-  ON DELETE CASCADE
-  ON UPDATE NO ACTION;
 
 ALTER TABLE `user`
 DROP FOREIGN KEY `FK_user_parentIdTag`;
@@ -86,3 +74,17 @@ FOREIGN KEY (`parentIdTag`)
 REFERENCES `user` (`idTag`)
   ON DELETE NO ACTION
   ON UPDATE NO ACTION;
+
+ALTER TABLE `transaction`
+    ADD CONSTRAINT `FK_idTag_t`
+        FOREIGN KEY (`idTag`)
+            REFERENCES `user` (`idTag`)
+            ON DELETE CASCADE
+            ON UPDATE NO ACTION;
+
+ALTER TABLE `reservation`
+    ADD CONSTRAINT `FK_idTag_r`
+        FOREIGN KEY (`idTag`)
+            REFERENCES `user` (`idTag`)
+            ON DELETE CASCADE
+            ON UPDATE NO ACTION;

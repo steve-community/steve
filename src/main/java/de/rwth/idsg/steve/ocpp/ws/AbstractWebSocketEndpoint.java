@@ -60,17 +60,18 @@ public abstract class AbstractWebSocketEndpoint extends ConcurrentWebSocketHandl
     private final ScheduledExecutorService service;
     private final OcppServerRepository ocppServerRepository;
     private final FutureResponseContextStore futureResponseContextStore;
-    private final SessionContextStore sessionContextStore = new SessionContextStore();
+    private final SessionContextStore sessionContextStore;
     private final List<Consumer<String>> connectedCallbackList = new ArrayList<>();
     private final List<Consumer<String>> disconnectedCallbackList = new ArrayList<>();
     private final Object sessionContextLock = new Object();
 
     private final IncomingPipeline pipeline;
 
-    public AbstractWebSocketEndpoint(ScheduledExecutorService service, OcppServerRepository ocppServerRepository, FutureResponseContextStore futureResponseContextStore, ApplicationEventPublisher applicationEventPublisher, AbstractCallHandler server, AbstractTypeStore store) {
+    public AbstractWebSocketEndpoint(ScheduledExecutorService service, OcppServerRepository ocppServerRepository, FutureResponseContextStore futureResponseContextStore, ApplicationEventPublisher applicationEventPublisher, AbstractCallHandler server, AbstractTypeStore store, SessionContextStore sessionContextStore) {
         this.service = service;
         this.ocppServerRepository = ocppServerRepository;
         this.futureResponseContextStore = futureResponseContextStore;
+        this.sessionContextStore = sessionContextStore;
         Deserializer deserializer = new Deserializer(futureResponseContextStore, store);
         this.pipeline = new IncomingPipeline(deserializer, server);
 
@@ -195,28 +196,7 @@ public abstract class AbstractWebSocketEndpoint extends ConcurrentWebSocketHandl
         return (String) session.getAttributes().get(CHARGEBOX_ID_KEY);
     }
 
-    protected void registerConnectedCallback(Consumer<String> consumer) {
-        connectedCallbackList.add(consumer);
-    }
-
-    protected void registerDisconnectedCallback(Consumer<String> consumer) {
-        disconnectedCallbackList.add(consumer);
-    }
-
-    public List<String> getChargeBoxIdList() {
-        return sessionContextStore.getChargeBoxIdList();
-    }
-
-    public int getNumberOfChargeBoxes() {
-        return sessionContextStore.getNumberOfChargeBoxes();
-    }
-
-    public Map<String, Deque<SessionContext>> getACopy() {
-        return sessionContextStore.getACopy();
-    }
-
     public WebSocketSession getSession(String chargeBoxId) {
         return sessionContextStore.getSession(chargeBoxId);
     }
-
 }

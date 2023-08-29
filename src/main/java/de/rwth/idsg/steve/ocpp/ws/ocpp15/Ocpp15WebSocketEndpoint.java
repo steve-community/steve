@@ -25,6 +25,7 @@ import de.rwth.idsg.steve.ocpp.OcppVersion;
 import de.rwth.idsg.steve.ocpp.soap.CentralSystemService15_SoapServer;
 import de.rwth.idsg.steve.ocpp.ws.AbstractWebSocketEndpoint;
 import de.rwth.idsg.steve.ocpp.ws.FutureResponseContextStore;
+import de.rwth.idsg.steve.ocpp.ws.SessionContextStore;
 import de.rwth.idsg.steve.ocpp.ws.pipeline.AbstractCallHandler;
 import de.rwth.idsg.steve.ocpp.ws.pipeline.Deserializer;
 import de.rwth.idsg.steve.ocpp.ws.pipeline.IncomingPipeline;
@@ -40,6 +41,7 @@ import ocpp.cs._2012._06.MeterValuesRequest;
 import ocpp.cs._2012._06.StartTransactionRequest;
 import ocpp.cs._2012._06.StatusNotificationRequest;
 import ocpp.cs._2012._06.StopTransactionRequest;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 
@@ -51,8 +53,8 @@ import java.util.concurrent.ScheduledExecutorService;
  */
 @Component
 public class Ocpp15WebSocketEndpoint extends AbstractWebSocketEndpoint {
-    public Ocpp15WebSocketEndpoint(ScheduledExecutorService service, OcppServerRepository ocppServerRepository, FutureResponseContextStore futureResponseContextStore, ApplicationEventPublisher applicationEventPublisher, CentralSystemService15_SoapServer server) {
-        super(service, ocppServerRepository, futureResponseContextStore, applicationEventPublisher, new Ocpp15CallHandler(server), Ocpp15TypeStore.INSTANCE);
+    public Ocpp15WebSocketEndpoint(ScheduledExecutorService service, OcppServerRepository ocppServerRepository, FutureResponseContextStore futureResponseContextStore, ApplicationEventPublisher applicationEventPublisher, CentralSystemService15_SoapServer server, @Qualifier("sessionContextStore15") SessionContextStore sessionContextStore) {
+        super(service, ocppServerRepository, futureResponseContextStore, applicationEventPublisher, new Ocpp15CallHandler(server), Ocpp15TypeStore.INSTANCE, sessionContextStore);
     }
 
     @Override

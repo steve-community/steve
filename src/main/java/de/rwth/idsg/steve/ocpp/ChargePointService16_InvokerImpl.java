@@ -22,11 +22,13 @@ import de.rwth.idsg.steve.ocpp.soap.ClientProvider;
 import de.rwth.idsg.steve.ocpp.soap.ClientProviderWithCache;
 import de.rwth.idsg.steve.ocpp.task.*;
 import de.rwth.idsg.steve.ocpp.ws.ChargePointServiceInvoker;
+import de.rwth.idsg.steve.ocpp.ws.SessionContextStore;
 import de.rwth.idsg.steve.ocpp.ws.ocpp16.Ocpp16TypeStore;
 import de.rwth.idsg.steve.ocpp.ws.ocpp16.Ocpp16WebSocketEndpoint;
 import de.rwth.idsg.steve.ocpp.ws.pipeline.OutgoingCallPipeline;
 import de.rwth.idsg.steve.repository.dto.ChargePointSelect;
 import ocpp.cp._2015._10.ChargePointService;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 /**
@@ -39,8 +41,8 @@ public class ChargePointService16_InvokerImpl implements ChargePointService16_In
     private final ChargePointServiceInvoker wsHelper;
     private final ClientProviderWithCache<ChargePointService> soapHelper;
 
-    public ChargePointService16_InvokerImpl(OutgoingCallPipeline pipeline, Ocpp16WebSocketEndpoint endpoint, ClientProvider clientProvider) {
-        this.wsHelper = new ChargePointServiceInvoker(pipeline, endpoint, Ocpp16TypeStore.INSTANCE);
+    public ChargePointService16_InvokerImpl(OutgoingCallPipeline pipeline, @Qualifier("sessionContextStore16") SessionContextStore sessionContextStore, ClientProvider clientProvider) {
+        this.wsHelper = new ChargePointServiceInvoker(pipeline, sessionContextStore, Ocpp16TypeStore.INSTANCE);
         this.soapHelper = new ClientProviderWithCache<>(clientProvider);
     }
 

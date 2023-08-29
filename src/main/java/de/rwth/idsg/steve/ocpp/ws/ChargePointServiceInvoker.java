@@ -41,7 +41,7 @@ import java.util.UUID;
 public class ChargePointServiceInvoker {
 
     private final OutgoingCallPipeline outgoingCallPipeline;
-    private final AbstractWebSocketEndpoint endpoint;
+    private final SessionContextStore sessionContextStore;
     private final TypeStore typeStore;
 
     /**
@@ -76,7 +76,7 @@ public class ChargePointServiceInvoker {
 
         FutureResponseContext frc = new FutureResponseContext(task, pair.getResponseClass());
 
-        CommunicationContext context = new CommunicationContext(endpoint.getSession(chargeBoxId), chargeBoxId);
+        CommunicationContext context = new CommunicationContext(sessionContextStore.getSession(chargeBoxId), chargeBoxId);
         context.setOutgoingMessage(call);
         context.setFutureResponseContext(frc);
 

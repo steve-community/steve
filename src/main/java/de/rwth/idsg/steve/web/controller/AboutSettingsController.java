@@ -25,9 +25,9 @@ import de.rwth.idsg.steve.service.MailService;
 import de.rwth.idsg.steve.service.ReleaseCheckService;
 import de.rwth.idsg.steve.web.dto.EndpointInfo;
 import de.rwth.idsg.steve.web.dto.SettingsForm;
+import lombok.RequiredArgsConstructor;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -44,15 +44,16 @@ import static de.rwth.idsg.steve.SteveConfiguration.CONFIG;
  *
  * @author Sevket Goekay <sevketgokay@gmail.com>
  */
+@RequiredArgsConstructor
 @Controller
 @RequestMapping(value = "/manager")
 public class AboutSettingsController {
 
-    @Autowired private GenericRepository genericRepository;
-    @Autowired private LogController logController;
-    @Autowired private SettingsRepository settingsRepository;
-    @Autowired private MailService mailService;
-    @Autowired private ReleaseCheckService releaseCheckService;
+    private final GenericRepository genericRepository;
+    private final LogController logController;
+    private final SettingsRepository settingsRepository;
+    private final MailService mailService;
+    private final ReleaseCheckService releaseCheckService;
 
     // -------------------------------------------------------------------------
     // Paths

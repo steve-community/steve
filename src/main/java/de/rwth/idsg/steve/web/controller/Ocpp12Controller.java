@@ -33,7 +33,6 @@ import de.rwth.idsg.steve.web.dto.ocpp.RemoteStopTransactionParams;
 import de.rwth.idsg.steve.web.dto.ocpp.ResetParams;
 import de.rwth.idsg.steve.web.dto.ocpp.UnlockConnectorParams;
 import de.rwth.idsg.steve.web.dto.ocpp.UpdateFirmwareParams;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -55,12 +54,16 @@ import static de.rwth.idsg.steve.web.dto.ocpp.ConfigurationKeyReadWriteEnum.RW;
 @RequestMapping(value = "/manager/operations/v1.2")
 public class Ocpp12Controller {
 
-    @Autowired protected ChargePointHelperService chargePointHelperService;
-    @Autowired protected OcppTagService ocppTagService;
+    protected final ChargePointHelperService chargePointHelperService;
+    protected final OcppTagService ocppTagService;
 
-    @Autowired
-    @Qualifier("ChargePointService12_Client")
-    private ChargePointService12_Client client12;
+    private final ChargePointService12_Client client12;
+
+    public Ocpp12Controller(ChargePointHelperService chargePointHelperService, OcppTagService ocppTagService, @Qualifier("ChargePointService12_Client") ChargePointService12_Client client12) {
+        this.chargePointHelperService = chargePointHelperService;
+        this.ocppTagService = ocppTagService;
+        this.client12 = client12;
+    }
 
     protected static final String PARAMS = "params";
 

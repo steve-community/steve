@@ -27,6 +27,7 @@ import de.rwth.idsg.steve.web.dto.TransactionQueryForm;
 import jooq.steve.db.enums.TransactionStopEventActor;
 import jooq.steve.db.tables.records.ConnectorMeterValueRecord;
 import jooq.steve.db.tables.records.TransactionStartRecord;
+import lombok.RequiredArgsConstructor;
 import org.joda.time.DateTime;
 import org.jooq.Condition;
 import org.jooq.DSLContext;
@@ -37,7 +38,6 @@ import org.jooq.RecordMapper;
 import org.jooq.SelectQuery;
 import org.jooq.Table;
 import org.jooq.impl.DSL;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.io.Writer;
@@ -55,15 +55,11 @@ import static jooq.steve.db.tables.TransactionStart.TRANSACTION_START;
  * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 14.08.2014
  */
+@RequiredArgsConstructor
 @Repository
 public class TransactionRepositoryImpl implements TransactionRepository {
 
     private final DSLContext ctx;
-
-    @Autowired
-    public TransactionRepositoryImpl(DSLContext ctx) {
-        this.ctx = ctx;
-    }
 
     @Override
     public List<Transaction> getTransactions(TransactionQueryForm form) {

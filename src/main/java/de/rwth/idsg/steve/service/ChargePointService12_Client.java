@@ -40,8 +40,8 @@ import de.rwth.idsg.steve.web.dto.ocpp.RemoteStopTransactionParams;
 import de.rwth.idsg.steve.web.dto.ocpp.ResetParams;
 import de.rwth.idsg.steve.web.dto.ocpp.UnlockConnectorParams;
 import de.rwth.idsg.steve.web.dto.ocpp.UpdateFirmwareParams;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
@@ -51,14 +51,15 @@ import java.util.concurrent.ScheduledExecutorService;
  * @author Sevket Goekay <sevketgokay@gmail.com>
  */
 @Slf4j
+@RequiredArgsConstructor
 @Service
 @Qualifier("ChargePointService12_Client")
 public class ChargePointService12_Client {
 
-    @Autowired protected ScheduledExecutorService executorService;
-    @Autowired protected TaskStore taskStore;
+    protected final ScheduledExecutorService executorService;
+    protected final TaskStore taskStore;
 
-    @Autowired private ChargePointService12_InvokerImpl invoker12;
+    private final ChargePointService12_InvokerImpl invoker12;
 
     protected OcppVersion getVersion() {
         return OcppVersion.V_12;

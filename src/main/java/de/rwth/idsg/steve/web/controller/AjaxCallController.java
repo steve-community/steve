@@ -25,7 +25,6 @@ import de.rwth.idsg.steve.repository.ChargePointRepository;
 import de.rwth.idsg.steve.repository.ReservationRepository;
 import de.rwth.idsg.steve.repository.TransactionRepository;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -33,7 +32,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
@@ -51,14 +49,16 @@ import java.util.List;
         produces = MediaType.APPLICATION_JSON_VALUE)
 public class AjaxCallController {
 
-    @Autowired private ChargePointRepository chargePointRepository;
-    @Autowired private TransactionRepository transactionRepository;
-    @Autowired private ReservationRepository reservationRepository;
+    private final ChargePointRepository chargePointRepository;
+    private final TransactionRepository transactionRepository;
+    private final ReservationRepository reservationRepository;
 
-    private ObjectMapper objectMapper;
+    private final ObjectMapper objectMapper;
 
-    @PostConstruct
-    private void init() {
+    public AjaxCallController(ChargePointRepository chargePointRepository, TransactionRepository transactionRepository, ReservationRepository reservationRepository) {
+        this.chargePointRepository = chargePointRepository;
+        this.transactionRepository = transactionRepository;
+        this.reservationRepository = reservationRepository;
         objectMapper = new ObjectMapper();
         objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
     }

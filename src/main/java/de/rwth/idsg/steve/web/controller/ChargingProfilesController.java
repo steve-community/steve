@@ -25,7 +25,7 @@ import de.rwth.idsg.steve.utils.mapper.ChargingProfileDetailsMapper;
 import de.rwth.idsg.steve.web.dto.ChargingProfileAssignmentQueryForm;
 import de.rwth.idsg.steve.web.dto.ChargingProfileForm;
 import de.rwth.idsg.steve.web.dto.ChargingProfileQueryForm;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -40,12 +40,13 @@ import javax.validation.Valid;
  * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 12.11.2018
  */
+@RequiredArgsConstructor
 @Controller
 @RequestMapping(value = "/manager/chargingProfiles")
 public class ChargingProfilesController {
 
-    @Autowired private ChargePointRepository chargePointRepository;
-    @Autowired private ChargingProfileRepository repository;
+    private final ChargePointRepository chargePointRepository;
+    private final ChargingProfileRepository repository;
 
     private static final String PARAMS = "params";
 

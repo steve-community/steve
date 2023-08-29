@@ -21,6 +21,7 @@ package de.rwth.idsg.steve.config;
 import de.rwth.idsg.steve.ocpp.soap.LoggingFeatureProxy;
 import de.rwth.idsg.steve.ocpp.soap.MediatorInInterceptor;
 import de.rwth.idsg.steve.ocpp.soap.MessageIdInterceptor;
+import ocpp.cs._2010._08.CentralSystemService;
 import org.apache.cxf.Bus;
 import org.apache.cxf.bus.spring.SpringBus;
 import org.apache.cxf.common.logging.LogUtils;
@@ -30,12 +31,10 @@ import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.jaxws.JaxWsServerFactoryBean;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.PhaseInterceptor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import javax.annotation.PostConstruct;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -57,16 +56,7 @@ public class OcppConfiguration {
         LogUtils.setLoggerClass(Slf4jLogger.class);
     }
 
-    @Autowired private ocpp.cs._2010._08.CentralSystemService ocpp12Server;
-    @Autowired private ocpp.cs._2012._06.CentralSystemService ocpp15Server;
-    @Autowired private ocpp.cs._2015._10.CentralSystemService ocpp16Server;
-
-    @Autowired
-    @Qualifier("MessageHeaderInterceptor")
-    private PhaseInterceptor<Message> messageHeaderInterceptor;
-
-    @PostConstruct
-    public void init() {
+    public OcppConfiguration(CentralSystemService ocpp12Server, ocpp.cs._2012._06.CentralSystemService ocpp15Server, ocpp.cs._2015._10.CentralSystemService ocpp16Server, @Qualifier("MessageHeaderInterceptor") PhaseInterceptor<Message> messageHeaderInterceptor) {
         List<Interceptor<? extends Message>> interceptors = asList(new MessageIdInterceptor(), messageHeaderInterceptor);
         List<Feature> logging = singletonList(LoggingFeatureProxy.INSTANCE.get());
 

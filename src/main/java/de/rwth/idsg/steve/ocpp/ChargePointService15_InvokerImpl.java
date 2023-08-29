@@ -41,7 +41,6 @@ import de.rwth.idsg.steve.ocpp.ws.ocpp15.Ocpp15WebSocketEndpoint;
 import de.rwth.idsg.steve.ocpp.ws.pipeline.OutgoingCallPipeline;
 import de.rwth.idsg.steve.repository.dto.ChargePointSelect;
 import ocpp.cp._2012._06.ChargePointService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 /**
@@ -54,7 +53,6 @@ public class ChargePointService15_InvokerImpl implements ChargePointService15_In
     private final ChargePointServiceInvoker wsHelper;
     private final ClientProviderWithCache<ChargePointService> soapHelper;
 
-    @Autowired
     public ChargePointService15_InvokerImpl(OutgoingCallPipeline pipeline, Ocpp15WebSocketEndpoint endpoint, ClientProvider clientProvider) {
         this.wsHelper = new ChargePointServiceInvoker(pipeline, endpoint, Ocpp15TypeStore.INSTANCE);
         this.soapHelper = new ClientProviderWithCache<>(clientProvider);

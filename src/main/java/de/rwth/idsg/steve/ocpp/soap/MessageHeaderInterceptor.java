@@ -36,7 +36,6 @@ import org.apache.cxf.service.model.MessagePartInfo;
 import org.apache.cxf.ws.addressing.AddressingProperties;
 import org.apache.cxf.ws.addressing.ContextUtils;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.xml.namespace.QName;
@@ -60,15 +59,18 @@ import static org.apache.cxf.ws.addressing.JAXWSAConstants.ADDRESSING_PROPERTIES
 @Component("MessageHeaderInterceptor")
 public class MessageHeaderInterceptor extends AbstractPhaseInterceptor<Message> {
 
-    @Autowired private OcppServerRepository ocppServerRepository;
-    @Autowired private ChargePointHelperService chargePointHelperService;
-    @Autowired private ScheduledExecutorService executorService;
+    private final OcppServerRepository ocppServerRepository;
+    private final ChargePointHelperService chargePointHelperService;
+    private final ScheduledExecutorService executorService;
 
     private static final String BOOT_OPERATION_NAME = "BootNotification";
     private static final String CHARGEBOX_ID_HEADER = "ChargeBoxIdentity";
 
-    public MessageHeaderInterceptor() {
+    public MessageHeaderInterceptor(OcppServerRepository ocppServerRepository, ChargePointHelperService chargePointHelperService, ScheduledExecutorService executorService) {
         super(Phase.PRE_INVOKE);
+        this.ocppServerRepository = ocppServerRepository;
+        this.chargePointHelperService = chargePointHelperService;
+        this.executorService = executorService;
     }
 
     @Override

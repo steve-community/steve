@@ -26,6 +26,7 @@ import de.rwth.idsg.steve.web.dto.OcppTagQueryForm;
 import jooq.steve.db.tables.OcppTagActivity;
 import jooq.steve.db.tables.records.OcppTagActivityRecord;
 import jooq.steve.db.tables.records.OcppTagRecord;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.joda.time.DateTime;
 import org.jooq.DSLContext;
@@ -36,7 +37,6 @@ import org.jooq.Result;
 import org.jooq.SelectQuery;
 import org.jooq.TableField;
 import org.jooq.exception.DataAccessException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.sql.SQLIntegrityConstraintViolationException;
@@ -53,15 +53,11 @@ import static jooq.steve.db.tables.OcppTagActivity.OCPP_TAG_ACTIVITY;
  * @since 14.08.2014
  */
 @Slf4j
+@RequiredArgsConstructor
 @Repository
 public class OcppTagRepositoryImpl implements OcppTagRepository {
 
     private final DSLContext ctx;
-
-    @Autowired
-    public OcppTagRepositoryImpl(DSLContext ctx) {
-        this.ctx = ctx;
-    }
 
     @Override
     @SuppressWarnings("unchecked")

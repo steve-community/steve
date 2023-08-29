@@ -28,6 +28,7 @@ import de.rwth.idsg.steve.ocpp.ws.FutureResponseContextStore;
 import de.rwth.idsg.steve.ocpp.ws.pipeline.AbstractCallHandler;
 import de.rwth.idsg.steve.ocpp.ws.pipeline.Deserializer;
 import de.rwth.idsg.steve.ocpp.ws.pipeline.IncomingPipeline;
+import de.rwth.idsg.steve.repository.OcppServerRepository;
 import lombok.RequiredArgsConstructor;
 import ocpp.cs._2012._06.AuthorizeRequest;
 import ocpp.cs._2012._06.BootNotificationRequest;
@@ -39,10 +40,10 @@ import ocpp.cs._2012._06.MeterValuesRequest;
 import ocpp.cs._2012._06.StartTransactionRequest;
 import ocpp.cs._2012._06.StatusNotificationRequest;
 import ocpp.cs._2012._06.StopTransactionRequest;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
+import java.util.concurrent.ScheduledExecutorService;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -50,15 +51,8 @@ import javax.annotation.PostConstruct;
  */
 @Component
 public class Ocpp15WebSocketEndpoint extends AbstractWebSocketEndpoint {
-
-    @Autowired private CentralSystemService15_SoapServer server;
-    @Autowired private FutureResponseContextStore futureResponseContextStore;
-
-    @PostConstruct
-    public void init() {
-        Deserializer deserializer = new Deserializer(futureResponseContextStore, Ocpp15TypeStore.INSTANCE);
-        IncomingPipeline pipeline = new IncomingPipeline(deserializer, new Ocpp15CallHandler(server));
-        super.init(pipeline);
+    public Ocpp15WebSocketEndpoint(ScheduledExecutorService service, OcppServerRepository ocppServerRepository, FutureResponseContextStore futureResponseContextStore, ApplicationEventPublisher applicationEventPublisher, CentralSystemService15_SoapServer server) {
+        super(service, ocppServerRepository, futureResponseContextStore, applicationEventPublisher, new Ocpp15CallHandler(server), Ocpp15TypeStore.INSTANCE);
     }
 
     @Override

@@ -24,8 +24,8 @@ import de.rwth.idsg.steve.ocpp.ws.ocpp12.Ocpp12WebSocketEndpoint;
 import de.rwth.idsg.steve.ocpp.ws.ocpp15.Ocpp15WebSocketEndpoint;
 import de.rwth.idsg.steve.ocpp.ws.ocpp16.Ocpp16WebSocketEndpoint;
 import de.rwth.idsg.steve.service.ChargePointHelperService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.socket.config.annotation.EnableWebSocket;
 import org.springframework.web.socket.config.annotation.WebSocketConfigurer;
@@ -42,13 +42,13 @@ import java.util.concurrent.TimeUnit;
 @EnableWebSocket
 @Configuration
 @Slf4j
+@RequiredArgsConstructor
 public class WebSocketConfiguration implements WebSocketConfigurer {
 
-    @Autowired private ChargePointHelperService chargePointHelperService;
-
-    @Autowired private Ocpp12WebSocketEndpoint ocpp12WebSocketEndpoint;
-    @Autowired private Ocpp15WebSocketEndpoint ocpp15WebSocketEndpoint;
-    @Autowired private Ocpp16WebSocketEndpoint ocpp16WebSocketEndpoint;
+    private final ChargePointHelperService chargePointHelperService;
+    private final Ocpp12WebSocketEndpoint ocpp12WebSocketEndpoint;
+    private final Ocpp15WebSocketEndpoint ocpp15WebSocketEndpoint;
+    private final Ocpp16WebSocketEndpoint ocpp16WebSocketEndpoint;
 
     public static final String PATH_INFIX = "/websocket/CentralSystemService/";
     public static final long PING_INTERVAL = TimeUnit.MINUTES.toMinutes(15);

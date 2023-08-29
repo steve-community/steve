@@ -19,6 +19,7 @@
 package de.rwth.idsg.steve.service;
 
 import de.rwth.idsg.steve.ocpp.ChargePointService12_Invoker;
+import de.rwth.idsg.steve.ocpp.ChargePointService12_InvokerImpl;
 import de.rwth.idsg.steve.ocpp.ChargePointService15_Invoker;
 import de.rwth.idsg.steve.ocpp.ChargePointService15_InvokerImpl;
 import de.rwth.idsg.steve.ocpp.OcppVersion;
@@ -29,6 +30,7 @@ import de.rwth.idsg.steve.ocpp.task.GetLocalListVersionTask;
 import de.rwth.idsg.steve.ocpp.task.ReserveNowTask;
 import de.rwth.idsg.steve.ocpp.task.SendLocalListTask;
 import de.rwth.idsg.steve.repository.ReservationRepository;
+import de.rwth.idsg.steve.repository.TaskStore;
 import de.rwth.idsg.steve.repository.dto.ChargePointSelect;
 import de.rwth.idsg.steve.repository.dto.InsertReservationParams;
 import de.rwth.idsg.steve.service.dto.EnhancedReserveNowParams;
@@ -40,11 +42,11 @@ import de.rwth.idsg.steve.web.dto.ocpp.ReserveNowParams;
 import de.rwth.idsg.steve.web.dto.ocpp.SendLocalListParams;
 import lombok.extern.slf4j.Slf4j;
 import org.joda.time.DateTime;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.concurrent.ScheduledExecutorService;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -54,10 +56,17 @@ import java.util.List;
 @Qualifier("ChargePointService15_Client")
 public class ChargePointService15_Client extends ChargePointService12_Client {
 
-    @Autowired protected OcppTagService ocppTagService;
-    @Autowired protected ReservationRepository reservationRepository;
+    protected final OcppTagService ocppTagService;
+    protected final ReservationRepository reservationRepository;
 
-    @Autowired private ChargePointService15_InvokerImpl invoker15;
+    private final ChargePointService15_InvokerImpl invoker15;
+
+    public ChargePointService15_Client(ScheduledExecutorService executorService, TaskStore taskStore, ChargePointService12_InvokerImpl invoker12, OcppTagService ocppTagService, ReservationRepository reservationRepository, ChargePointService15_InvokerImpl invoker15) {
+        super(executorService, taskStore, invoker12);
+        this.ocppTagService = ocppTagService;
+        this.reservationRepository = reservationRepository;
+        this.invoker15 = invoker15;
+    }
 
     @Override
     protected OcppVersion getVersion() {

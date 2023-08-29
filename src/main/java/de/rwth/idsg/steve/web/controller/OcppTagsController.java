@@ -25,7 +25,7 @@ import de.rwth.idsg.steve.web.dto.OcppTagBatchInsertForm;
 import de.rwth.idsg.steve.web.dto.OcppTagForm;
 import de.rwth.idsg.steve.web.dto.OcppTagQueryForm;
 import jooq.steve.db.tables.records.OcppTagActivityRecord;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -36,17 +36,17 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import javax.validation.Valid;
 import java.util.Collections;
-import java.util.List;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 26.11.2015
  */
+@RequiredArgsConstructor
 @Controller
 @RequestMapping(value = "/manager/ocppTags")
 public class OcppTagsController {
 
-    @Autowired protected OcppTagService ocppTagService;
+    protected final OcppTagService ocppTagService;
 
     protected static final String PARAMS = "params";
 

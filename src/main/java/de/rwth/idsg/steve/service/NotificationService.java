@@ -29,9 +29,9 @@ import de.rwth.idsg.steve.service.notification.OcppStationWebSocketConnected;
 import de.rwth.idsg.steve.service.notification.OcppStationWebSocketDisconnected;
 import de.rwth.idsg.steve.service.notification.OcppTransactionEnded;
 import de.rwth.idsg.steve.service.notification.OcppTransactionStarted;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.joda.time.DateTime;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 
@@ -48,10 +48,11 @@ import static java.lang.String.format;
  * @since 22.01.2016
  */
 @Slf4j
+@RequiredArgsConstructor
 @Service
 public class NotificationService {
 
-    @Autowired private MailService mailService;
+    private final MailService mailService;
 
     @EventListener
     public void ocppStationBooted(OccpStationBooted notification) {

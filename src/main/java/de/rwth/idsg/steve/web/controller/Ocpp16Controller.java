@@ -20,9 +20,7 @@ package de.rwth.idsg.steve.web.controller;
 
 import de.rwth.idsg.steve.ocpp.OcppVersion;
 import de.rwth.idsg.steve.repository.ChargingProfileRepository;
-import de.rwth.idsg.steve.service.ChargePointService12_Client;
-import de.rwth.idsg.steve.service.ChargePointService15_Client;
-import de.rwth.idsg.steve.service.ChargePointService16_Client;
+import de.rwth.idsg.steve.service.*;
 import de.rwth.idsg.steve.web.dto.ocpp.ChangeConfigurationParams;
 import de.rwth.idsg.steve.web.dto.ocpp.ClearChargingProfileParams;
 import de.rwth.idsg.steve.web.dto.ocpp.ConfigurationKeyEnum;
@@ -32,7 +30,6 @@ import de.rwth.idsg.steve.web.dto.ocpp.GetConfigurationParams;
 import de.rwth.idsg.steve.web.dto.ocpp.SetChargingProfileParams;
 import de.rwth.idsg.steve.web.dto.ocpp.TriggerMessageParams;
 import ocpp.cs._2015._10.RegistrationStatus;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -58,11 +55,9 @@ import static de.rwth.idsg.steve.web.dto.ocpp.ConfigurationKeyReadWriteEnum.RW;
 @RequestMapping(value = "/manager/operations/v1.6")
 public class Ocpp16Controller extends Ocpp15Controller {
 
-    @Autowired
-    @Qualifier("ChargePointService16_Client")
-    private ChargePointService16_Client client16;
+    private final ChargePointService16_Client client16;
 
-    @Autowired private ChargingProfileRepository chargingProfileRepository;
+    private final ChargingProfileRepository chargingProfileRepository;
 
     // -------------------------------------------------------------------------
     // Paths
@@ -72,6 +67,12 @@ public class Ocpp16Controller extends Ocpp15Controller {
     private static final String CLEAR_CHARGING_PATH = "/ClearChargingProfile";
     private static final String SET_CHARGING_PATH = "/SetChargingProfile";
     private static final String TRIGGER_MESSAGE_PATH = "/TriggerMessage";
+
+    public Ocpp16Controller(ChargePointHelperService chargePointHelperService, OcppTagService ocppTagService, @Qualifier("ChargePointService12_Client") ChargePointService12_Client client12, @Qualifier("ChargePointService15_Client") ChargePointService15_Client client15, @Qualifier("ChargePointService16_Client") ChargePointService16_Client client16, ChargingProfileRepository chargingProfileRepository) {
+        super(chargePointHelperService, ocppTagService, client12, client15);
+        this.client16 = client16;
+        this.chargingProfileRepository = chargingProfileRepository;
+    }
 
     // -------------------------------------------------------------------------
     // Helpers

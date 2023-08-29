@@ -26,6 +26,7 @@ import de.rwth.idsg.steve.web.dto.UserForm;
 import de.rwth.idsg.steve.web.dto.UserQueryForm;
 import jooq.steve.db.tables.records.AddressRecord;
 import jooq.steve.db.tables.records.UserRecord;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jooq.DSLContext;
 import org.jooq.Field;
@@ -37,7 +38,6 @@ import org.jooq.SelectConditionStep;
 import org.jooq.SelectQuery;
 import org.jooq.exception.DataAccessException;
 import org.jooq.impl.DSL;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -52,11 +52,12 @@ import static jooq.steve.db.tables.User.USER;
  * @since 25.11.2015
  */
 @Slf4j
+@RequiredArgsConstructor
 @Repository
 public class UserRepositoryImpl implements UserRepository {
 
-    @Autowired private DSLContext ctx;
-    @Autowired private AddressRepository addressRepository;
+    private final DSLContext ctx;
+    private final AddressRepository addressRepository;
 
     @Override
     public List<User.Overview> getOverview(UserQueryForm form) {

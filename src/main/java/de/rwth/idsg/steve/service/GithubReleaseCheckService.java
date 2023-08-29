@@ -32,7 +32,6 @@ import org.springframework.http.converter.json.MappingJackson2HttpMessageConvert
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
-import javax.annotation.PostConstruct;
 import java.io.File;
 import java.util.Collections;
 
@@ -55,10 +54,9 @@ public class GithubReleaseCheckService implements ReleaseCheckService {
 
     private static final String FILE_SEPARATOR = File.separator;
 
-    private RestTemplate restTemplate;
+    private final RestTemplate restTemplate;
 
-    @PostConstruct
-    private void init() {
+    public GithubReleaseCheckService() {
         HttpComponentsClientHttpRequestFactory factory = new HttpComponentsClientHttpRequestFactory();
         factory.setReadTimeout(API_TIMEOUT_IN_MILLIS);
         factory.setConnectTimeout(API_TIMEOUT_IN_MILLIS);

@@ -19,8 +19,10 @@
 package de.rwth.idsg.steve.web.controller;
 
 import de.rwth.idsg.steve.ocpp.OcppVersion;
+import de.rwth.idsg.steve.service.ChargePointHelperService;
 import de.rwth.idsg.steve.service.ChargePointService12_Client;
 import de.rwth.idsg.steve.service.ChargePointService15_Client;
+import de.rwth.idsg.steve.service.OcppTagService;
 import de.rwth.idsg.steve.web.dto.ocpp.CancelReservationParams;
 import de.rwth.idsg.steve.web.dto.ocpp.ConfigurationKeyEnum;
 import de.rwth.idsg.steve.web.dto.ocpp.ConfigurationKeyReadWriteEnum;
@@ -29,7 +31,6 @@ import de.rwth.idsg.steve.web.dto.ocpp.GetConfigurationParams;
 import de.rwth.idsg.steve.web.dto.ocpp.MultipleChargePointSelect;
 import de.rwth.idsg.steve.web.dto.ocpp.ReserveNowParams;
 import de.rwth.idsg.steve.web.dto.ocpp.SendLocalListParams;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -51,9 +52,12 @@ import static de.rwth.idsg.steve.web.dto.ocpp.ConfigurationKeyReadWriteEnum.RW;
 @RequestMapping(value = "/manager/operations/v1.5")
 public class Ocpp15Controller extends Ocpp12Controller {
 
-    @Autowired
-    @Qualifier("ChargePointService15_Client")
-    private ChargePointService15_Client client15;
+    private final ChargePointService15_Client client15;
+
+    public Ocpp15Controller(ChargePointHelperService chargePointHelperService, OcppTagService ocppTagService, @Qualifier("ChargePointService12_Client") ChargePointService12_Client client12, @Qualifier("ChargePointService15_Client") ChargePointService15_Client client15) {
+        super(chargePointHelperService, ocppTagService, client12);
+        this.client15 = client15;
+    }
 
     // -------------------------------------------------------------------------
     // Paths

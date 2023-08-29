@@ -20,7 +20,9 @@ package de.rwth.idsg.steve.service;
 
 import de.rwth.idsg.steve.SteveException;
 import de.rwth.idsg.steve.ocpp.ChargePointService12_Invoker;
+import de.rwth.idsg.steve.ocpp.ChargePointService12_InvokerImpl;
 import de.rwth.idsg.steve.ocpp.ChargePointService15_Invoker;
+import de.rwth.idsg.steve.ocpp.ChargePointService15_InvokerImpl;
 import de.rwth.idsg.steve.ocpp.ChargePointService16_Invoker;
 import de.rwth.idsg.steve.ocpp.ChargePointService16_InvokerImpl;
 import de.rwth.idsg.steve.ocpp.OcppVersion;
@@ -29,6 +31,8 @@ import de.rwth.idsg.steve.ocpp.task.GetCompositeScheduleTask;
 import de.rwth.idsg.steve.ocpp.task.SetChargingProfileTask;
 import de.rwth.idsg.steve.ocpp.task.TriggerMessageTask;
 import de.rwth.idsg.steve.repository.ChargingProfileRepository;
+import de.rwth.idsg.steve.repository.ReservationRepository;
+import de.rwth.idsg.steve.repository.TaskStore;
 import de.rwth.idsg.steve.repository.dto.ChargingProfile;
 import de.rwth.idsg.steve.service.dto.EnhancedSetChargingProfileParams;
 import de.rwth.idsg.steve.web.dto.ocpp.ClearChargingProfileParams;
@@ -37,9 +41,10 @@ import de.rwth.idsg.steve.web.dto.ocpp.SetChargingProfileParams;
 import de.rwth.idsg.steve.web.dto.ocpp.TriggerMessageParams;
 import lombok.extern.slf4j.Slf4j;
 import ocpp.cp._2015._10.ChargingProfilePurposeType;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+
+import java.util.concurrent.ScheduledExecutorService;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -50,8 +55,14 @@ import org.springframework.stereotype.Service;
 @Qualifier("ChargePointService16_Client")
 public class ChargePointService16_Client extends ChargePointService15_Client {
 
-    @Autowired private ChargePointService16_InvokerImpl invoker16;
-    @Autowired private ChargingProfileRepository chargingProfileRepository;
+    private final ChargePointService16_InvokerImpl invoker16;
+    private final ChargingProfileRepository chargingProfileRepository;
+
+    public ChargePointService16_Client(ScheduledExecutorService executorService, TaskStore taskStore, ChargePointService12_InvokerImpl invoker12, OcppTagService ocppTagService, ReservationRepository reservationRepository, ChargePointService15_InvokerImpl invoker15, ChargePointService16_InvokerImpl invoker16, ChargingProfileRepository chargingProfileRepository) {
+        super(executorService, taskStore, invoker12, ocppTagService, reservationRepository, invoker15);
+        this.invoker16 = invoker16;
+        this.chargingProfileRepository = chargingProfileRepository;
+    }
 
     @Override
     protected OcppVersion getVersion() {

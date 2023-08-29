@@ -25,7 +25,7 @@ import de.rwth.idsg.steve.utils.ControllerHelper;
 import de.rwth.idsg.steve.utils.mapper.UserFormMapper;
 import de.rwth.idsg.steve.web.dto.UserForm;
 import de.rwth.idsg.steve.web.dto.UserQueryForm;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -40,12 +40,13 @@ import javax.validation.Valid;
  * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 25.11.2015
  */
+@RequiredArgsConstructor
 @Controller
 @RequestMapping(value = "/manager/users")
 public class UsersController {
 
-    @Autowired private OcppTagService ocppTagService;
-    @Autowired private UserRepository userRepository;
+    private final OcppTagService ocppTagService;
+    private final UserRepository userRepository;
 
     private static final String PARAMS = "params";
 

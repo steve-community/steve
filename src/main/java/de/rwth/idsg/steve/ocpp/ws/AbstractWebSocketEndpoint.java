@@ -24,12 +24,13 @@ import de.rwth.idsg.steve.ocpp.OcppTransport;
 import de.rwth.idsg.steve.ocpp.OcppVersion;
 import de.rwth.idsg.steve.ocpp.ws.data.CommunicationContext;
 import de.rwth.idsg.steve.ocpp.ws.data.SessionContext;
+import de.rwth.idsg.steve.ocpp.ws.pipeline.AbstractCallHandler;
+import de.rwth.idsg.steve.ocpp.ws.pipeline.Deserializer;
 import de.rwth.idsg.steve.ocpp.ws.pipeline.IncomingPipeline;
 import de.rwth.idsg.steve.repository.OcppServerRepository;
 import de.rwth.idsg.steve.service.notification.OcppStationWebSocketConnected;
 import de.rwth.idsg.steve.service.notification.OcppStationWebSocketDisconnected;
 import org.joda.time.DateTime;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.web.socket.BinaryMessage;
 import org.springframework.web.socket.CloseStatus;
@@ -54,29 +55,30 @@ import java.util.function.Consumer;
  * @since 17.03.2015
  */
 public abstract class AbstractWebSocketEndpoint extends ConcurrentWebSocketHandler implements SubProtocolCapable {
-
-    @Autowired private ScheduledExecutorService service;
-    @Autowired private OcppServerRepository ocppServerRepository;
-    @Autowired private FutureResponseContextStore futureResponseContextStore;
-    @Autowired private ApplicationEventPublisher applicationEventPublisher;
-
     public static final String CHARGEBOX_ID_KEY = "CHARGEBOX_ID_KEY";
 
+    private final ScheduledExecutorService service;
+    private final OcppServerRepository ocppServerRepository;
+    private final FutureResponseContextStore futureResponseContextStore;
     private final SessionContextStore sessionContextStore = new SessionContextStore();
     private final List<Consumer<String>> connectedCallbackList = new ArrayList<>();
     private final List<Consumer<String>> disconnectedCallbackList = new ArrayList<>();
     private final Object sessionContextLock = new Object();
 
-    private IncomingPipeline pipeline;
+    private final IncomingPipeline pipeline;
 
-    public abstract OcppVersion getVersion();
-
-    public void init(IncomingPipeline pipeline) {
-        this.pipeline = pipeline;
+    public AbstractWebSocketEndpoint(ScheduledExecutorService service, OcppServerRepository ocppServerRepository, FutureResponseContextStore futureResponseContextStore, ApplicationEventPublisher applicationEventPublisher, AbstractCallHandler server, AbstractTypeStore store) {
+        this.service = service;
+        this.ocppServerRepository = ocppServerRepository;
+        this.futureResponseContextStore = futureResponseContextStore;
+        Deserializer deserializer = new Deserializer(futureResponseContextStore, store);
+        this.pipeline = new IncomingPipeline(deserializer, server);
 
         connectedCallbackList.add((chargeBoxId) -> applicationEventPublisher.publishEvent(new OcppStationWebSocketConnected(chargeBoxId)));
         disconnectedCallbackList.add((chargeBoxId) -> applicationEventPublisher.publishEvent(new OcppStationWebSocketDisconnected(chargeBoxId)));
     }
+
+    public abstract OcppVersion getVersion();
 
     @Override
     public List<String> getSubProtocols() {

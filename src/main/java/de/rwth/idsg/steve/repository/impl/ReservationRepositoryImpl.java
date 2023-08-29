@@ -25,6 +25,7 @@ import de.rwth.idsg.steve.repository.dto.InsertReservationParams;
 import de.rwth.idsg.steve.repository.dto.Reservation;
 import de.rwth.idsg.steve.utils.DateTimeUtils;
 import de.rwth.idsg.steve.web.dto.ReservationQueryForm;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.joda.time.DateTime;
 import org.jooq.DSLContext;
@@ -36,7 +37,6 @@ import org.jooq.SelectConditionStep;
 import org.jooq.SelectQuery;
 import org.jooq.exception.DataAccessException;
 import org.jooq.impl.DSL;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -51,15 +51,11 @@ import static jooq.steve.db.tables.Reservation.RESERVATION;
  * @since 14.08.2014
  */
 @Slf4j
+@RequiredArgsConstructor
 @Repository
 public class ReservationRepositoryImpl implements ReservationRepository {
 
     private final DSLContext ctx;
-
-    @Autowired
-    public ReservationRepositoryImpl(DSLContext ctx) {
-        this.ctx = ctx;
-    }
 
     @Override
     @SuppressWarnings("unchecked")

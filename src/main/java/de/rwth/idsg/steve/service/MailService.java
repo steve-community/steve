@@ -23,10 +23,8 @@ import de.rwth.idsg.steve.SteveException;
 import de.rwth.idsg.steve.repository.SettingsRepository;
 import de.rwth.idsg.steve.repository.dto.MailSettings;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.PostConstruct;
 import jakarta.mail.Authenticator;
 import jakarta.mail.Message;
 import jakarta.mail.MessagingException;
@@ -48,18 +46,24 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 @Slf4j
 @Service
 public class MailService {
+    private final SettingsRepository settingsRepository;
+    private final ScheduledExecutorService executorService;
 
-    @Autowired private SettingsRepository settingsRepository;
-    @Autowired private ScheduledExecutorService executorService;
-
-    private final ReadWriteLock readWriteLock = new ReentrantReadWriteLock();
-    private final Lock readLock = readWriteLock.readLock();
-    private final Lock writeLock = readWriteLock.writeLock();
+    private final Lock readLock;
+    private final Lock writeLock;
 
     private MailSettings settings;
     private Session session;
 
-    @PostConstruct
+    public MailService(SettingsRepository settingsRepository, ScheduledExecutorService executorService) {
+        this.settingsRepository = settingsRepository;
+        this.executorService = executorService;
+        ReadWriteLock readWriteLock = new ReentrantReadWriteLock();
+        readLock = readWriteLock.readLock();
+        writeLock = readWriteLock.writeLock();
+        loadSettingsFromDB();
+    }
+
     public void loadSettingsFromDB() {
         writeLock.lock();
         try {

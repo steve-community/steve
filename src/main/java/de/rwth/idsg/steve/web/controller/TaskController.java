@@ -24,8 +24,8 @@ import de.rwth.idsg.steve.ocpp.RequestResult;
 import de.rwth.idsg.steve.ocpp.task.GetCompositeScheduleTask;
 import de.rwth.idsg.steve.ocpp.task.GetConfigurationTask;
 import de.rwth.idsg.steve.repository.TaskStore;
+import lombok.RequiredArgsConstructor;
 import ocpp.cp._2015._10.GetCompositeScheduleResponse;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -36,11 +36,12 @@ import org.springframework.web.bind.annotation.RequestMethod;
  * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 29.12.2014
  */
+@RequiredArgsConstructor
 @Controller
 @RequestMapping(value = "/manager/operations/tasks")
 public class TaskController {
 
-    @Autowired private TaskStore taskStore;
+    private final TaskStore taskStore;
 
     // -------------------------------------------------------------------------
     // Paths

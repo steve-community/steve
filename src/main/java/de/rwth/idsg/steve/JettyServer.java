@@ -69,9 +69,7 @@ public class JettyServer {
     private static final long STOP_TIMEOUT = TimeUnit.SECONDS.toMillis(5);
     private static final long IDLE_TIMEOUT = TimeUnit.MINUTES.toMillis(1);
 
-    /**
-     * A fully configured Jetty Server instance
-     */
+    /** A fully configured Jetty Server instance */
     private void prepare() {
 
         // === jetty.xml ===
@@ -149,18 +147,18 @@ public class JettyServer {
         httpsConfig.addCustomizer(new SecureRequestCustomizer());
 
         // SSL Connector
-        ServerConnector https = new ServerConnector(server,
-                new SslConnectionFactory(sslContextFactory, HttpVersion.HTTP_1_1.asString()),
-                new HttpConnectionFactory(httpsConfig));
+        ServerConnector https =
+                new ServerConnector(
+                        server,
+                        new SslConnectionFactory(sslContextFactory, HttpVersion.HTTP_1_1.asString()),
+                        new HttpConnectionFactory(httpsConfig));
         https.setHost(CONFIG.getJetty().getServerHost());
         https.setPort(CONFIG.getJetty().getHttpsPort());
         https.setIdleTimeout(IDLE_TIMEOUT);
         return https;
     }
 
-    /**
-     * Starts the Jetty Server instance
-     */
+    /** Starts the Jetty Server instance */
     public void start() throws Exception {
         prepare();
 
@@ -171,9 +169,7 @@ public class JettyServer {
         }
     }
 
-    /**
-     * Join the server thread with the current thread
-     */
+    /** Join the server thread with the current thread */
     public void join() throws Exception {
         if (server != null) {
             server.join();
@@ -206,9 +202,9 @@ public class JettyServer {
         }
 
         return Arrays.stream(server.getConnectors())
-                     .map(JettyServer::getConnectorPath)
-                     .flatMap(Collection::stream)
-                     .collect(Collectors.toList());
+                .map(JettyServer::getConnectorPath)
+                .flatMap(Collection::stream)
+                .collect(Collectors.toList());
     }
 
     private static List<String> getConnectorPath(Connector c) {
@@ -232,14 +228,12 @@ public class JettyServer {
         String layout = "%s://%s:%d" + CONFIG.getContextPath();
 
         return ips.stream()
-                  .map(k -> String.format(layout, prefix, k, sc.getPort()))
-                  .collect(Collectors.toList());
+                .map(k -> String.format(layout, prefix, k, sc.getPort()))
+                .collect(Collectors.toList());
     }
 
     private List<String> buildList(List<String> list, boolean replaceHttp) {
-        return list.stream()
-                   .map(s -> getElementPrefix(s, replaceHttp))
-                   .collect(Collectors.toList());
+        return list.stream().map(s -> getElementPrefix(s, replaceHttp)).collect(Collectors.toList());
     }
 
     private String getElementPrefix(String str, boolean replaceHttp) {
@@ -250,9 +244,7 @@ public class JettyServer {
         }
     }
 
-    /**
-     * Uses different APIs to find out the IP of this machine.
-     */
+    /** Uses different APIs to find out the IP of this machine. */
     private static List<String> getPossibleIpAddresses() {
         final String host = "treibhaus.informatik.rwth-aachen.de";
         final List<String> ips = new ArrayList<>();
@@ -281,9 +273,11 @@ public class JettyServer {
 
         // https://stackoverflow.com/a/20418809
         try {
-            for (Enumeration<NetworkInterface> ifaces = NetworkInterface.getNetworkInterfaces(); ifaces.hasMoreElements();) {
+            for (Enumeration<NetworkInterface> ifaces = NetworkInterface.getNetworkInterfaces();
+                    ifaces.hasMoreElements(); ) {
                 NetworkInterface iface = ifaces.nextElement();
-                for (Enumeration<InetAddress> inetAddrs = iface.getInetAddresses(); inetAddrs.hasMoreElements();) {
+                for (Enumeration<InetAddress> inetAddrs = iface.getInetAddresses();
+                        inetAddrs.hasMoreElements(); ) {
                     InetAddress inetAddr = inetAddrs.nextElement();
                     if (!inetAddr.isLoopbackAddress() && (inetAddr instanceof Inet4Address)) {
                         ips.add(inetAddr.getHostAddress());

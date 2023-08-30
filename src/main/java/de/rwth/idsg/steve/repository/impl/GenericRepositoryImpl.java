@@ -57,88 +57,78 @@ public class GenericRepositoryImpl implements GenericRepository {
         DateTime now = DateTime.now();
         DateTime yesterdaysNow = now.minusDays(1);
 
-        Field<Integer> numChargeBoxes =
-                ctx.selectCount()
-                   .from(CHARGE_BOX)
-                   .asField("num_charge_boxes");
+        Field<Integer> numChargeBoxes = ctx.selectCount().from(CHARGE_BOX).asField("num_charge_boxes");
 
-        Field<Integer> numOcppTags =
-                ctx.selectCount()
-                   .from(OCPP_TAG)
-                   .asField("num_ocpp_tags");
+        Field<Integer> numOcppTags = ctx.selectCount().from(OCPP_TAG).asField("num_ocpp_tags");
 
-        Field<Integer> numUsers =
-                ctx.selectCount()
-                   .from(USER)
-                   .asField("num_users");
+        Field<Integer> numUsers = ctx.selectCount().from(USER).asField("num_users");
 
         Field<Integer> numReservations =
                 ctx.selectCount()
-                   .from(RESERVATION)
-                   .where(RESERVATION.EXPIRY_DATETIME.greaterThan(now))
-                   .and(RESERVATION.STATUS.eq(ReservationStatus.ACCEPTED.name()))
-                   .asField("num_reservations");
+                        .from(RESERVATION)
+                        .where(RESERVATION.EXPIRY_DATETIME.greaterThan(now))
+                        .and(RESERVATION.STATUS.eq(ReservationStatus.ACCEPTED.name()))
+                        .asField("num_reservations");
 
         Field<Integer> numTransactions =
                 ctx.selectCount()
-                   .from(TRANSACTION)
-                   .where(TRANSACTION.STOP_TIMESTAMP.isNull())
-                   .asField("num_transactions");
+                        .from(TRANSACTION)
+                        .where(TRANSACTION.STOP_TIMESTAMP.isNull())
+                        .asField("num_transactions");
 
         Field<Integer> heartbeatsToday =
                 ctx.selectCount()
-                   .from(CHARGE_BOX)
-                   .where(date(CHARGE_BOX.LAST_HEARTBEAT_TIMESTAMP).eq(date(now)))
-                   .asField("heartbeats_today");
+                        .from(CHARGE_BOX)
+                        .where(date(CHARGE_BOX.LAST_HEARTBEAT_TIMESTAMP).eq(date(now)))
+                        .asField("heartbeats_today");
 
         Field<Integer> heartbeatsYesterday =
                 ctx.selectCount()
-                   .from(CHARGE_BOX)
-                   .where(date(CHARGE_BOX.LAST_HEARTBEAT_TIMESTAMP).eq(date(yesterdaysNow)))
-                   .asField("heartbeats_yesterday");
+                        .from(CHARGE_BOX)
+                        .where(date(CHARGE_BOX.LAST_HEARTBEAT_TIMESTAMP).eq(date(yesterdaysNow)))
+                        .asField("heartbeats_yesterday");
 
         Field<Integer> heartbeatsEarlier =
                 ctx.selectCount()
-                   .from(CHARGE_BOX)
-                   .where(date(CHARGE_BOX.LAST_HEARTBEAT_TIMESTAMP).lessThan(date(yesterdaysNow)))
-                   .asField("heartbeats_earlier");
+                        .from(CHARGE_BOX)
+                        .where(date(CHARGE_BOX.LAST_HEARTBEAT_TIMESTAMP).lessThan(date(yesterdaysNow)))
+                        .asField("heartbeats_earlier");
 
         Record8<Integer, Integer, Integer, Integer, Integer, Integer, Integer, Integer> gs =
                 ctx.select(
-                        numChargeBoxes,
-                        numOcppTags,
-                        numUsers,
-                        numReservations,
-                        numTransactions,
-                        heartbeatsToday,
-                        heartbeatsYesterday,
-                        heartbeatsEarlier
-                ).fetchOne();
+                                numChargeBoxes,
+                                numOcppTags,
+                                numUsers,
+                                numReservations,
+                                numTransactions,
+                                heartbeatsToday,
+                                heartbeatsYesterday,
+                                heartbeatsEarlier)
+                        .fetchOne();
 
         return Statistics.builder()
-                         .numChargeBoxes(gs.value1())
-                         .numOcppTags(gs.value2())
-                         .numUsers(gs.value3())
-                         .numReservations(gs.value4())
-                         .numTransactions(gs.value5())
-                         .heartbeatToday(gs.value6())
-                         .heartbeatYesterday(gs.value7())
-                         .heartbeatEarlier(gs.value8())
-                         .build();
+                .numChargeBoxes(gs.value1())
+                .numOcppTags(gs.value2())
+                .numUsers(gs.value3())
+                .numReservations(gs.value4())
+                .numTransactions(gs.value5())
+                .heartbeatToday(gs.value6())
+                .heartbeatYesterday(gs.value7())
+                .heartbeatEarlier(gs.value8())
+                .build();
     }
 
     @Override
     public DbVersion getDBVersion() {
-        Record2<String, DateTime> record = ctx.select(SCHEMA_VERSION.VERSION, SCHEMA_VERSION.INSTALLED_ON)
-                                              .from(SCHEMA_VERSION)
-                                              .where(SCHEMA_VERSION.INSTALLED_RANK.eq(
-                                                      select(max(SCHEMA_VERSION.INSTALLED_RANK)).from(SCHEMA_VERSION)))
-                                              .fetchOne();
+        Record2<String, DateTime> record =
+                ctx.select(SCHEMA_VERSION.VERSION, SCHEMA_VERSION.INSTALLED_ON)
+                        .from(SCHEMA_VERSION)
+                        .where(
+                                SCHEMA_VERSION.INSTALLED_RANK.eq(
+                                        select(max(SCHEMA_VERSION.INSTALLED_RANK)).from(SCHEMA_VERSION)))
+                        .fetchOne();
 
         String ts = DateTimeUtils.humanize(record.value2());
-        return DbVersion.builder()
-                        .version(record.value1())
-                        .updateTimestamp(ts)
-                        .build();
+        return DbVersion.builder().version(record.value1()).updateTimestamp(ts).build();
     }
 }

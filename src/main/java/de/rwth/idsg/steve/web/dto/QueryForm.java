@@ -43,10 +43,14 @@ public abstract class QueryForm {
     @ApiModelProperty(value = "The OCPP tag")
     private String ocppIdTag;
 
-    @ApiModelProperty(value = "Show results that happened after this date/time. Format: ISO8601 without timezone. Example: `2022-10-10T09:00:00`")
+    @ApiModelProperty(
+            value =
+                    "Show results that happened after this date/time. Format: ISO8601 without timezone. Example: `2022-10-10T09:00:00`")
     private LocalDateTime from;
 
-    @ApiModelProperty(value = "Show results that happened before this date/time. Format: ISO8601 without timezone. Example: `2022-10-10T12:00:00`")
+    @ApiModelProperty(
+            value =
+                    "Show results that happened before this date/time. Format: ISO8601 without timezone. Example: `2022-10-10T12:00:00`")
     private LocalDateTime to;
 
     @ApiModelProperty(hidden = true)

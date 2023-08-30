@@ -49,19 +49,16 @@ public class SettingsForm {
     // -------------------------------------------------------------------------
 
     @Min(value = 0, message = "Heartbeat Interval must be at least {value}")
-    @NotNull(message = "Heartbeat Interval is required")
-    private Integer heartbeat;
+    @NotNull(message = "Heartbeat Interval is required") private Integer heartbeat;
 
     @Min(value = 0, message = "Expiration must be at least {value}")
-    @NotNull(message = "Expiration is required")
-    private Integer expiration;
+    @NotNull(message = "Expiration is required") private Integer expiration;
 
     // -------------------------------------------------------------------------
     // Mail notification
     // -------------------------------------------------------------------------
 
-    @NotNull
-    private Boolean enabled;
+    @NotNull private Boolean enabled;
 
     @Email(message = "'From' field is not a valid e-mail address")
     private String from;
@@ -71,8 +68,7 @@ public class SettingsForm {
     @Min(value = 1, message = "Port must be positive")
     private Integer port;
 
-    @EmailCollection
-    private List<String> recipients;
+    @EmailCollection private List<String> recipients;
 
     private List<NotificationFeature> enabledFeatures;
 }

@@ -51,7 +51,8 @@ public class GetLocalListVersionTask extends Ocpp15AndAboveTask<MultipleChargePo
     }
 
     @Override
-    public AsyncHandler<ocpp.cp._2012._06.GetLocalListVersionResponse> getOcpp15Handler(String chargeBoxId) {
+    public AsyncHandler<ocpp.cp._2012._06.GetLocalListVersionResponse> getOcpp15Handler(
+            String chargeBoxId) {
         return res -> {
             try {
                 success(chargeBoxId, String.valueOf(res.get().getListVersion()));
@@ -62,7 +63,8 @@ public class GetLocalListVersionTask extends Ocpp15AndAboveTask<MultipleChargePo
     }
 
     @Override
-    public AsyncHandler<ocpp.cp._2015._10.GetLocalListVersionResponse> getOcpp16Handler(String chargeBoxId) {
+    public AsyncHandler<ocpp.cp._2015._10.GetLocalListVersionResponse> getOcpp16Handler(
+            String chargeBoxId) {
         return res -> {
             try {
                 success(chargeBoxId, String.valueOf(res.get().getListVersion()));

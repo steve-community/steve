@@ -31,7 +31,7 @@ import java.util.function.Consumer;
  */
 public final class EnumProcessor {
 
-    private EnumProcessor() { }
+    private EnumProcessor() {}
 
     public static void apply(List<String> packageNames, Consumer<Class<?>> clazzConsumer) {
         packageNames.forEach(p -> apply(p, clazzConsumer));
@@ -41,7 +41,7 @@ public final class EnumProcessor {
         try {
             ImmutableSet<ClassPath.ClassInfo> classInfos =
                     ClassPath.from(Thread.currentThread().getContextClassLoader())
-                             .getTopLevelClasses(packageName);
+                            .getTopLevelClasses(packageName);
 
             for (ClassPath.ClassInfo classInfo : classInfos) {
                 Class<?> clazz = classInfo.load();

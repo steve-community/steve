@@ -68,67 +68,73 @@ public class Issue72 extends StressTest {
         int meterStart = 444;
         int meterStop = 99999;
 
-        BootNotificationResponse boot = getForOcpp16(path).bootNotification(
-                new BootNotificationRequest()
-                        .withChargePointVendor(getRandomString())
-                        .withChargePointModel(getRandomString()),
-                chargeBoxId);
+        BootNotificationResponse boot =
+                getForOcpp16(path)
+                        .bootNotification(
+                                new BootNotificationRequest()
+                                        .withChargePointVendor(getRandomString())
+                                        .withChargePointModel(getRandomString()),
+                                chargeBoxId);
         Assertions.assertEquals(RegistrationStatus.ACCEPTED, boot.getStatus());
 
-        StartTransactionResponse start = getForOcpp16(path).startTransaction(
-                new StartTransactionRequest()
-                        .withConnectorId(connectorId)
-                        .withIdTag(idTag)
-                        .withTimestamp(startDateTime)
-                        .withMeterStart(meterStart),
-                chargeBoxId
-        );
+        StartTransactionResponse start =
+                getForOcpp16(path)
+                        .startTransaction(
+                                new StartTransactionRequest()
+                                        .withConnectorId(connectorId)
+                                        .withIdTag(idTag)
+                                        .withTimestamp(startDateTime)
+                                        .withMeterStart(meterStart),
+                                chargeBoxId);
         Assertions.assertNotNull(start);
 
         int transactionId = start.getTransactionId();
 
-        StressTester.Runnable runnable = new StressTester.Runnable() {
+        StressTester.Runnable runnable =
+                new StressTester.Runnable() {
 
-            private final ThreadLocal<CentralSystemService> threadLocalClient = new ThreadLocal<>();
+                    private final ThreadLocal<CentralSystemService> threadLocalClient = new ThreadLocal<>();
 
-            @Override
-            public void beforeRepeat() {
-                threadLocalClient.set(getForOcpp16(path));
-            }
+                    @Override
+                    public void beforeRepeat() {
+                        threadLocalClient.set(getForOcpp16(path));
+                    }
 
-            @Override
-            public void toRepeat() {
-                MeterValuesResponse mvr = threadLocalClient.get().meterValues(
-                        new MeterValuesRequest()
-                                .withConnectorId(connectorId)
-                                .withTransactionId(transactionId)
-                                .withMeterValue(
-                                        new MeterValue()
-                                                .withTimestamp(stopDateTime)
-                                                .withSampledValue(
-                                                        new SampledValue()
-                                                                .withValue("555")
-                                                                .withUnit(UnitOfMeasure.WH))),
-                        chargeBoxId
-                );
-                Assertions.assertNotNull(mvr);
+                    @Override
+                    public void toRepeat() {
+                        MeterValuesResponse mvr =
+                                threadLocalClient
+                                        .get()
+                                        .meterValues(
+                                                new MeterValuesRequest()
+                                                        .withConnectorId(connectorId)
+                                                        .withTransactionId(transactionId)
+                                                        .withMeterValue(
+                                                                new MeterValue()
+                                                                        .withTimestamp(stopDateTime)
+                                                                        .withSampledValue(
+                                                                                new SampledValue()
+                                                                                        .withValue("555")
+                                                                                        .withUnit(UnitOfMeasure.WH))),
+                                                chargeBoxId);
+                        Assertions.assertNotNull(mvr);
 
-                StopTransactionResponse stop = threadLocalClient.get().stopTransaction(
-                        new StopTransactionRequest()
-                                .withTransactionId(transactionId)
-                                .withTimestamp(stopDateTime)
-                                .withIdTag(idTag)
-                                .withMeterStop(meterStop),
-                        chargeBoxId
-                );
-                Assertions.assertNotNull(stop);
-            }
+                        StopTransactionResponse stop =
+                                threadLocalClient
+                                        .get()
+                                        .stopTransaction(
+                                                new StopTransactionRequest()
+                                                        .withTransactionId(transactionId)
+                                                        .withTimestamp(stopDateTime)
+                                                        .withIdTag(idTag)
+                                                        .withMeterStop(meterStop),
+                                                chargeBoxId);
+                        Assertions.assertNotNull(stop);
+                    }
 
-            @Override
-            public void afterRepeat() {
-
-            }
-        };
+                    @Override
+                    public void afterRepeat() {}
+                };
 
         StressTester tester = new StressTester(THREAD_COUNT, REPEAT_COUNT_PER_THREAD);
         tester.test(runnable);

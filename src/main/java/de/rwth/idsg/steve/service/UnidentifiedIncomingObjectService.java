@@ -29,7 +29,8 @@ import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
 /**
- * The name of this class was inspired by UFO (Unidentified flying object) and enterprise software development.
+ * The name of this class was inspired by UFO (Unidentified flying object) and enterprise software
+ * development.
  *
  * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 20.03.2018
@@ -42,24 +43,19 @@ public class UnidentifiedIncomingObjectService {
     private final Cache<String, UnidentifiedIncomingObject> objectsHolder;
 
     public UnidentifiedIncomingObjectService(int maxSize) {
-        objectsHolder = CacheBuilder.newBuilder()
-                                    .maximumSize(maxSize)
-                                    .build();
+        objectsHolder = CacheBuilder.newBuilder().maximumSize(maxSize).build();
     }
 
     public List<UnidentifiedIncomingObject> getObjects() {
-        return objectsHolder.asMap()
-                            .values()
-                            .stream()
-                            .sorted(Comparator.comparingInt(UnidentifiedIncomingObject::getNumberOfAttempts).reversed())
-                            .collect(Collectors.toList());
+        return objectsHolder.asMap().values().stream()
+                .sorted(Comparator.comparingInt(UnidentifiedIncomingObject::getNumberOfAttempts).reversed())
+                .collect(Collectors.toList());
     }
 
     public void processNewUnidentified(String key) {
         synchronized (changeLock) {
             try {
-                objectsHolder.get(key, () -> new UnidentifiedIncomingObject(key))
-                             .updateStats();
+                objectsHolder.get(key, () -> new UnidentifiedIncomingObject(key)).updateStats();
             } catch (ExecutionException e) {
                 log.error("Error occurred", e);
             }

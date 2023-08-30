@@ -37,11 +37,9 @@ public class ChargePointSelectEditor extends PropertyEditorSupport {
             // chargePointItem[0] : ocpp transport type
             // chargePointItem[1] : chargebox id
             // chargePointItem[2] : endpoint (IP) address
-            ChargePointSelect cps = new ChargePointSelect(
-                    OcppTransport.fromName(chargePointItem[0]),
-                    chargePointItem[1],
-                    chargePointItem[2]
-            );
+            ChargePointSelect cps =
+                    new ChargePointSelect(
+                            OcppTransport.fromName(chargePointItem[0]), chargePointItem[1], chargePointItem[2]);
 
             setValue(cps);
         }

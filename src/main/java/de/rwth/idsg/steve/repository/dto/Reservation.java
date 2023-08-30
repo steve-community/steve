@@ -23,9 +23,7 @@ import lombok.Getter;
 import org.joda.time.DateTime;
 
 /**
- *
  * @author Sevket Goekay <sevketgokay@gmail.com>
- *
  */
 @Getter
 @Builder

@@ -34,9 +34,13 @@ import java.util.stream.Collectors;
 public enum EndpointInfo {
     INSTANCE;
 
-    private final ItemsWithInfo webInterface = new ItemsWithInfo("Access the web interface using", "/manager/home");
-    private final ItemsWithInfo ocppSoap = new ItemsWithInfo("SOAP endpoint for OCPP", "/services/CentralSystemService");
-    private final ItemsWithInfo ocppWebSocket = new ItemsWithInfo("WebSocket/JSON endpoint for OCPP", "/websocket/CentralSystemService/(chargeBoxId)");
+    private final ItemsWithInfo webInterface =
+            new ItemsWithInfo("Access the web interface using", "/manager/home");
+    private final ItemsWithInfo ocppSoap =
+            new ItemsWithInfo("SOAP endpoint for OCPP", "/services/CentralSystemService");
+    private final ItemsWithInfo ocppWebSocket =
+            new ItemsWithInfo(
+                    "WebSocket/JSON endpoint for OCPP", "/websocket/CentralSystemService/(chargeBoxId)");
 
     @Getter
     @ToString
@@ -52,9 +56,7 @@ public enum EndpointInfo {
         }
 
         public synchronized void setData(List<String> data) {
-            this.data = data.stream()
-                            .map(s -> s + dataElementPostFix)
-                            .collect(Collectors.toList());
+            this.data = data.stream().map(s -> s + dataElementPostFix).collect(Collectors.toList());
         }
     }
 }

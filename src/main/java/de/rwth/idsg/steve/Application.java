@@ -42,7 +42,10 @@ public class Application implements ApplicationStarter, AutoCloseable {
 
         TimeZone.setDefault(TimeZone.getTimeZone(sc.getTimeZoneId()));
         DateTimeZone.setDefault(DateTimeZone.forID(sc.getTimeZoneId()));
-        log.info("Date/time zone of the application is set to {}. Current date/time: {}", sc.getTimeZoneId(), DateTime.now());
+        log.info(
+                "Date/time zone of the application is set to {}. Current date/time: {}",
+                sc.getTimeZoneId(),
+                DateTime.now());
 
         switch (sc.getProfile()) {
             case DEV:

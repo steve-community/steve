@@ -33,10 +33,10 @@ import javax.xml.ws.AsyncHandler;
  * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 13.03.2018
  */
-public class GetCompositeScheduleTask extends Ocpp16AndAboveTask<GetCompositeScheduleParams, GetCompositeScheduleResponse> {
+public class GetCompositeScheduleTask
+        extends Ocpp16AndAboveTask<GetCompositeScheduleParams, GetCompositeScheduleResponse> {
 
-    public GetCompositeScheduleTask(OcppVersion ocppVersion,
-                                    GetCompositeScheduleParams params) {
+    public GetCompositeScheduleTask(OcppVersion ocppVersion, GetCompositeScheduleParams params) {
         super(ocppVersion, params);
     }
 

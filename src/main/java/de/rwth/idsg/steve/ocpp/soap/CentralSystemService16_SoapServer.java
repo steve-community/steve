@@ -71,8 +71,8 @@ public class CentralSystemService16_SoapServer implements CentralSystemService {
 
     @Autowired private CentralSystemService16_Service service;
 
-    public BootNotificationResponse bootNotificationWithTransport(BootNotificationRequest parameters,
-                                                                  String chargeBoxIdentity, OcppProtocol protocol) {
+    public BootNotificationResponse bootNotificationWithTransport(
+            BootNotificationRequest parameters, String chargeBoxIdentity, OcppProtocol protocol) {
         if (protocol.getVersion() != OcppVersion.V_16) {
             throw new IllegalArgumentException("Unexpected OCPP version: " + protocol.getVersion());
         }
@@ -80,19 +80,21 @@ public class CentralSystemService16_SoapServer implements CentralSystemService {
     }
 
     @Override
-    public BootNotificationResponse bootNotification(BootNotificationRequest parameters, String chargeBoxIdentity) {
-        return this.bootNotificationWithTransport(parameters, chargeBoxIdentity, OcppProtocol.V_16_SOAP);
+    public BootNotificationResponse bootNotification(
+            BootNotificationRequest parameters, String chargeBoxIdentity) {
+        return this.bootNotificationWithTransport(
+                parameters, chargeBoxIdentity, OcppProtocol.V_16_SOAP);
     }
 
     @Override
-    public FirmwareStatusNotificationResponse firmwareStatusNotification(FirmwareStatusNotificationRequest parameters,
-                                                                         String chargeBoxIdentity) {
+    public FirmwareStatusNotificationResponse firmwareStatusNotification(
+            FirmwareStatusNotificationRequest parameters, String chargeBoxIdentity) {
         return service.firmwareStatusNotification(parameters, chargeBoxIdentity);
     }
 
     @Override
-    public StatusNotificationResponse statusNotification(StatusNotificationRequest parameters,
-                                                         String chargeBoxIdentity) {
+    public StatusNotificationResponse statusNotification(
+            StatusNotificationRequest parameters, String chargeBoxIdentity) {
         return service.statusNotification(parameters, chargeBoxIdentity);
     }
 
@@ -108,12 +110,14 @@ public class CentralSystemService16_SoapServer implements CentralSystemService {
     }
 
     @Override
-    public StartTransactionResponse startTransaction(StartTransactionRequest parameters, String chargeBoxIdentity) {
+    public StartTransactionResponse startTransaction(
+            StartTransactionRequest parameters, String chargeBoxIdentity) {
         return service.startTransaction(parameters, chargeBoxIdentity);
     }
 
     @Override
-    public StopTransactionResponse stopTransaction(StopTransactionRequest parameters, String chargeBoxIdentity) {
+    public StopTransactionResponse stopTransaction(
+            StopTransactionRequest parameters, String chargeBoxIdentity) {
         return service.stopTransaction(parameters, chargeBoxIdentity);
     }
 
@@ -128,7 +132,8 @@ public class CentralSystemService16_SoapServer implements CentralSystemService {
     }
 
     @Override
-    public DataTransferResponse dataTransfer(DataTransferRequest parameters, String chargeBoxIdentity) {
+    public DataTransferResponse dataTransfer(
+            DataTransferRequest parameters, String chargeBoxIdentity) {
         return service.dataTransfer(parameters, chargeBoxIdentity);
     }
 
@@ -137,49 +142,58 @@ public class CentralSystemService16_SoapServer implements CentralSystemService {
     // -------------------------------------------------------------------------
 
     @Override
-    public Response<StopTransactionResponse> stopTransactionAsync(StopTransactionRequest parameters,
-                                                                  String chargeBoxIdentity) {
+    public Response<StopTransactionResponse> stopTransactionAsync(
+            StopTransactionRequest parameters, String chargeBoxIdentity) {
         return null;
     }
 
     @Override
-    public Future<?> stopTransactionAsync(StopTransactionRequest parameters, String chargeBoxIdentity,
-                                          AsyncHandler<StopTransactionResponse> asyncHandler) {
+    public Future<?> stopTransactionAsync(
+            StopTransactionRequest parameters,
+            String chargeBoxIdentity,
+            AsyncHandler<StopTransactionResponse> asyncHandler) {
         return null;
     }
 
     @Override
-    public Response<StatusNotificationResponse> statusNotificationAsync(StatusNotificationRequest parameters,
-                                                                        String chargeBoxIdentity) {
+    public Response<StatusNotificationResponse> statusNotificationAsync(
+            StatusNotificationRequest parameters, String chargeBoxIdentity) {
         return null;
     }
 
     @Override
-    public Future<?> statusNotificationAsync(StatusNotificationRequest parameters, String chargeBoxIdentity,
-                                             AsyncHandler<StatusNotificationResponse> asyncHandler) {
+    public Future<?> statusNotificationAsync(
+            StatusNotificationRequest parameters,
+            String chargeBoxIdentity,
+            AsyncHandler<StatusNotificationResponse> asyncHandler) {
         return null;
     }
 
     @Override
-    public Response<AuthorizeResponse> authorizeAsync(AuthorizeRequest parameters, String chargeBoxIdentity) {
+    public Response<AuthorizeResponse> authorizeAsync(
+            AuthorizeRequest parameters, String chargeBoxIdentity) {
         return null;
     }
 
     @Override
-    public Future<?> authorizeAsync(AuthorizeRequest parameters, String chargeBoxIdentity,
-                                    AsyncHandler<AuthorizeResponse> asyncHandler) {
+    public Future<?> authorizeAsync(
+            AuthorizeRequest parameters,
+            String chargeBoxIdentity,
+            AsyncHandler<AuthorizeResponse> asyncHandler) {
         return null;
     }
 
     @Override
-    public Response<StartTransactionResponse> startTransactionAsync(StartTransactionRequest parameters,
-                                                                    String chargeBoxIdentity) {
+    public Response<StartTransactionResponse> startTransactionAsync(
+            StartTransactionRequest parameters, String chargeBoxIdentity) {
         return null;
     }
 
     @Override
-    public Future<?> startTransactionAsync(StartTransactionRequest parameters, String chargeBoxIdentity,
-                                           AsyncHandler<StartTransactionResponse> asyncHandler) {
+    public Future<?> startTransactionAsync(
+            StartTransactionRequest parameters,
+            String chargeBoxIdentity,
+            AsyncHandler<StartTransactionResponse> asyncHandler) {
         return null;
     }
 
@@ -190,54 +204,66 @@ public class CentralSystemService16_SoapServer implements CentralSystemService {
     }
 
     @Override
-    public Future<?> firmwareStatusNotificationAsync(FirmwareStatusNotificationRequest parameters,
-                                                     String chargeBoxIdentity,
-                                                     AsyncHandler<FirmwareStatusNotificationResponse> asyncHandler) {
+    public Future<?> firmwareStatusNotificationAsync(
+            FirmwareStatusNotificationRequest parameters,
+            String chargeBoxIdentity,
+            AsyncHandler<FirmwareStatusNotificationResponse> asyncHandler) {
         return null;
     }
 
     @Override
-    public Response<BootNotificationResponse> bootNotificationAsync(BootNotificationRequest parameters,
-                                                                    String chargeBoxIdentity) {
+    public Response<BootNotificationResponse> bootNotificationAsync(
+            BootNotificationRequest parameters, String chargeBoxIdentity) {
         return null;
     }
 
     @Override
-    public Future<?> bootNotificationAsync(BootNotificationRequest parameters, String chargeBoxIdentity,
-                                           AsyncHandler<BootNotificationResponse> asyncHandler) {
+    public Future<?> bootNotificationAsync(
+            BootNotificationRequest parameters,
+            String chargeBoxIdentity,
+            AsyncHandler<BootNotificationResponse> asyncHandler) {
         return null;
     }
 
     @Override
-    public Response<HeartbeatResponse> heartbeatAsync(HeartbeatRequest parameters, String chargeBoxIdentity) {
+    public Response<HeartbeatResponse> heartbeatAsync(
+            HeartbeatRequest parameters, String chargeBoxIdentity) {
         return null;
     }
 
     @Override
-    public Future<?> heartbeatAsync(HeartbeatRequest parameters, String chargeBoxIdentity,
-                                    AsyncHandler<HeartbeatResponse> asyncHandler) {
+    public Future<?> heartbeatAsync(
+            HeartbeatRequest parameters,
+            String chargeBoxIdentity,
+            AsyncHandler<HeartbeatResponse> asyncHandler) {
         return null;
     }
 
     @Override
-    public Response<MeterValuesResponse> meterValuesAsync(MeterValuesRequest parameters, String chargeBoxIdentity) {
+    public Response<MeterValuesResponse> meterValuesAsync(
+            MeterValuesRequest parameters, String chargeBoxIdentity) {
         return null;
     }
 
     @Override
-    public Future<?> meterValuesAsync(MeterValuesRequest parameters, String chargeBoxIdentity,
-                                      AsyncHandler<MeterValuesResponse> asyncHandler) {
+    public Future<?> meterValuesAsync(
+            MeterValuesRequest parameters,
+            String chargeBoxIdentity,
+            AsyncHandler<MeterValuesResponse> asyncHandler) {
         return null;
     }
 
     @Override
-    public Response<DataTransferResponse> dataTransferAsync(DataTransferRequest parameters, String chargeBoxIdentity) {
+    public Response<DataTransferResponse> dataTransferAsync(
+            DataTransferRequest parameters, String chargeBoxIdentity) {
         return null;
     }
 
     @Override
-    public Future<?> dataTransferAsync(DataTransferRequest parameters, String chargeBoxIdentity,
-                                       AsyncHandler<DataTransferResponse> asyncHandler) {
+    public Future<?> dataTransferAsync(
+            DataTransferRequest parameters,
+            String chargeBoxIdentity,
+            AsyncHandler<DataTransferResponse> asyncHandler) {
         return null;
     }
 
@@ -248,9 +274,10 @@ public class CentralSystemService16_SoapServer implements CentralSystemService {
     }
 
     @Override
-    public Future<?> diagnosticsStatusNotificationAsync(DiagnosticsStatusNotificationRequest parameters,
-                                                        String chargeBoxIdentity,
-                                                        AsyncHandler<DiagnosticsStatusNotificationResponse> asyncHandler) {
+    public Future<?> diagnosticsStatusNotificationAsync(
+            DiagnosticsStatusNotificationRequest parameters,
+            String chargeBoxIdentity,
+            AsyncHandler<DiagnosticsStatusNotificationResponse> asyncHandler) {
         return null;
     }
 }

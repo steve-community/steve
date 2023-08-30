@@ -47,7 +47,8 @@ public class OcppTagQueryForm {
     @ApiModelProperty(value = "Return expired, not expired, or all Ocpp tags? Defaults to ALL")
     private BooleanType expired = BooleanType.FALSE;
 
-    @ApiModelProperty(value = "Return in-transaction, not in-transaction, or all Ocpp tags? Defaults to ALL")
+    @ApiModelProperty(
+            value = "Return in-transaction, not in-transaction, or all Ocpp tags? Defaults to ALL")
     private BooleanType inTransaction = BooleanType.ALL;
 
     @ApiModelProperty(value = "Return blocked, not blocked, or all Ocpp tags? Defaults to ALL")
@@ -91,13 +92,14 @@ public class OcppTagQueryForm {
 
         public boolean getBoolValue() {
             if (this.boolValue == null) {
-                throw new UnsupportedOperationException("This enum does not have any meaningful bool value set.");
+                throw new UnsupportedOperationException(
+                        "This enum does not have any meaningful bool value set.");
             }
             return this.boolValue;
         }
 
         public static BooleanType fromValue(String v) {
-            for (BooleanType c: BooleanType.values()) {
+            for (BooleanType c : BooleanType.values()) {
                 if (c.value.equals(v)) {
                     return c;
                 }
@@ -109,12 +111,11 @@ public class OcppTagQueryForm {
     @ToString(callSuper = true)
     public static class ForApi extends OcppTagQueryForm {
 
-        public ForApi () {
+        public ForApi() {
             super();
             setExpired(BooleanType.ALL);
             setInTransaction(BooleanType.ALL);
             setBlocked(BooleanType.ALL);
         }
     }
-
 }

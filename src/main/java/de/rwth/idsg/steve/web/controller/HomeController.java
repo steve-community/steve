@@ -34,9 +34,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import java.util.List;
 
 /**
- *
  * @author Sevket Goekay <sevketgokay@gmail.com>
- *
  */
 @Controller
 @RequestMapping(value = "/manager", method = RequestMethod.GET)
@@ -56,6 +54,7 @@ public class HomeController {
     private static final String OCPP_JSON_STATUS = HOME_PREFIX + "/ocppJsonStatus";
     private static final String CONNECTOR_STATUS_PATH = HOME_PREFIX + "/connectorStatus";
     private static final String CONNECTOR_STATUS_QUERY_PATH = HOME_PREFIX + "/connectorStatus/query";
+
     // -------------------------------------------------------------------------
     // HTTP methods
     // -------------------------------------------------------------------------
@@ -72,12 +71,14 @@ public class HomeController {
     }
 
     @RequestMapping(value = CONNECTOR_STATUS_QUERY_PATH)
-    public String getConnectorStatusQuery(@ModelAttribute(PARAMS) ConnectorStatusForm params, Model model) {
+    public String getConnectorStatusQuery(
+            @ModelAttribute(PARAMS) ConnectorStatusForm params, Model model) {
         model.addAttribute("cpList", chargePointRepository.getChargeBoxIds());
         model.addAttribute("statusValues", ConnectorStatusCountFilter.ALL_STATUS_VALUES);
         model.addAttribute(PARAMS, params);
 
-        List<ConnectorStatus> latestList = chargePointHelperService.getChargePointConnectorStatus(params);
+        List<ConnectorStatus> latestList =
+                chargePointHelperService.getChargePointConnectorStatus(params);
         List<ConnectorStatus> filteredList = ConnectorStatusFilter.filterAndPreferZero(latestList);
         model.addAttribute("connectorStatusList", filteredList);
         return "connectorStatus";

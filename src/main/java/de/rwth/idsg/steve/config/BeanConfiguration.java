@@ -85,16 +85,15 @@ public class BeanConfiguration implements WebMvcConfigurer {
     private HikariDataSource dataSource;
     private ScheduledThreadPoolExecutor executor;
 
-    /**
-     * https://github.com/brettwooldridge/HikariCP/wiki/MySQL-Configuration
-     */
+    /** https://github.com/brettwooldridge/HikariCP/wiki/MySQL-Configuration */
     private void initDataSource() {
         SteveConfiguration.DB dbConfig = CONFIG.getDb();
 
         HikariConfig hc = new HikariConfig();
 
         // set standard params
-        hc.setJdbcUrl("jdbc:mysql://" + dbConfig.getIp() + ":" + dbConfig.getPort() + "/" + dbConfig.getSchema());
+        hc.setJdbcUrl(
+                "jdbc:mysql://" + dbConfig.getIp() + ":" + dbConfig.getPort() + "/" + dbConfig.getSchema());
         hc.setUsername(dbConfig.getUserName());
         hc.setPassword(dbConfig.getPassword());
 
@@ -114,43 +113,48 @@ public class BeanConfiguration implements WebMvcConfigurer {
     }
 
     /**
-     * Can we re-use DSLContext as a Spring bean (singleton)? Yes, the Spring tutorial of
-     * Jooq also does it that way, but only if we do not change anything about the
-     * config after the init (which we don't do anyways) and if the ConnectionProvider
-     * does not store any shared state (we use DataSourceConnectionProvider of Jooq, so no problem).
+     * Can we re-use DSLContext as a Spring bean (singleton)? Yes, the Spring tutorial of Jooq also
+     * does it that way, but only if we do not change anything about the config after the init (which
+     * we don't do anyways) and if the ConnectionProvider does not store any shared state (we use
+     * DataSourceConnectionProvider of Jooq, so no problem).
      *
-     * Some sources and discussion:
-     * - http://www.jooq.org/doc/3.6/manual/getting-started/tutorials/jooq-with-spring/
-     * - http://jooq-user.narkive.com/2fvuLodn/dslcontext-and-threads
-     * - https://groups.google.com/forum/#!topic/jooq-user/VK7KQcjj3Co
-     * - http://stackoverflow.com/questions/32848865/jooq-dslcontext-correct-autowiring-with-spring
+     * <p>Some sources and discussion: -
+     * http://www.jooq.org/doc/3.6/manual/getting-started/tutorials/jooq-with-spring/ -
+     * http://jooq-user.narkive.com/2fvuLodn/dslcontext-and-threads -
+     * https://groups.google.com/forum/#!topic/jooq-user/VK7KQcjj3Co -
+     * http://stackoverflow.com/questions/32848865/jooq-dslcontext-correct-autowiring-with-spring
      */
     @Bean
     public DSLContext dslContext() {
         initDataSource();
 
-        Settings settings = new Settings()
-                // Normally, the records are "attached" to the Configuration that created (i.e. fetch/insert) them.
-                // This means that they hold an internal reference to the same database connection that was used.
-                // The idea behind this is to make CRUD easier for potential subsequent store/refresh/delete
-                // operations. We do not use or need that.
-                .withAttachRecords(false)
-                // To log or not to log the sql queries, that is the question
-                .withExecuteLogging(CONFIG.getDb().isSqlLogging());
+        Settings settings =
+                new Settings()
+                        // Normally, the records are "attached" to the Configuration that created (i.e.
+                        // fetch/insert) them.
+                        // This means that they hold an internal reference to the same database connection that
+                        // was used.
+                        // The idea behind this is to make CRUD easier for potential subsequent
+                        // store/refresh/delete
+                        // operations. We do not use or need that.
+                        .withAttachRecords(false)
+                        // To log or not to log the sql queries, that is the question
+                        .withExecuteLogging(CONFIG.getDb().isSqlLogging());
 
         // Configuration for JOOQ
-        org.jooq.Configuration conf = new DefaultConfiguration()
-                .set(SQLDialect.MYSQL)
-                .set(new DataSourceConnectionProvider(dataSource))
-                .set(settings);
+        org.jooq.Configuration conf =
+                new DefaultConfiguration()
+                        .set(SQLDialect.MYSQL)
+                        .set(new DataSourceConnectionProvider(dataSource))
+                        .set(settings);
 
         return DSL.using(conf);
     }
 
     @Bean
     public ScheduledExecutorService scheduledExecutorService() {
-        ThreadFactory threadFactory = new ThreadFactoryBuilder().setNameFormat("SteVe-Executor-%d")
-                                                                .build();
+        ThreadFactory threadFactory =
+                new ThreadFactoryBuilder().setNameFormat("SteVe-Executor-%d").build();
 
         executor = new ScheduledThreadPoolExecutor(5, threadFactory);
         return executor;
@@ -162,10 +166,11 @@ public class BeanConfiguration implements WebMvcConfigurer {
     }
 
     /**
-     * There might be instances deployed in a local/closed network with no internet connection. In such situations,
-     * it is unnecessary to try to access Github every time, even though the request will time out and result
-     * report will be correct (that there is no new version). With DummyReleaseCheckService we bypass the intermediate
-     * steps and return a "no new version" report immediately.
+     * There might be instances deployed in a local/closed network with no internet connection. In
+     * such situations, it is unnecessary to try to access Github every time, even though the request
+     * will time out and result report will be correct (that there is no new version). With
+     * DummyReleaseCheckService we bypass the intermediate steps and return a "no new version" report
+     * immediately.
      */
     @Bean
     public ReleaseCheckService releaseCheckService() {
@@ -213,8 +218,8 @@ public class BeanConfiguration implements WebMvcConfigurer {
     // -------------------------------------------------------------------------
 
     /**
-     * Resolver for JSP views/templates. Controller classes process the requests
-     * and forward to JSP files for rendering.
+     * Resolver for JSP views/templates. Controller classes process the requests and forward to JSP
+     * files for rendering.
      */
     @Bean
     public InternalResourceViewResolver urlBasedViewResolver() {
@@ -224,9 +229,7 @@ public class BeanConfiguration implements WebMvcConfigurer {
         return resolver;
     }
 
-    /**
-     * Resource path for static content of the Web interface.
-     */
+    /** Resource path for static content of the Web interface. */
     @Override
     public void addResourceHandlers(final ResourceHandlerRegistry registry) {
         registry.addResourceHandler("/static/**").addResourceLocations("static/");
@@ -258,17 +261,22 @@ public class BeanConfiguration implements WebMvcConfigurer {
     }
 
     /**
-     * Find the ObjectMapper used in MappingJackson2HttpMessageConverter and initialized by Spring automatically.
-     * MappingJackson2HttpMessageConverter is not a Bean. It is created in {@link WebMvcConfigurationSupport#addDefaultHttpMessageConverters(List)}.
-     * Therefore, we have to access it via proxies that reference it. RequestMappingHandlerAdapter is a Bean, created in
-     * {@link WebMvcConfigurationSupport#requestMappingHandlerAdapter(ContentNegotiationManager, FormattingConversionService, org.springframework.validation.Validator)}.
+     * Find the ObjectMapper used in MappingJackson2HttpMessageConverter and initialized by Spring
+     * automatically. MappingJackson2HttpMessageConverter is not a Bean. It is created in {@link
+     * WebMvcConfigurationSupport#addDefaultHttpMessageConverters(List)}. Therefore, we have to access
+     * it via proxies that reference it. RequestMappingHandlerAdapter is a Bean, created in {@link
+     * WebMvcConfigurationSupport#requestMappingHandlerAdapter(ContentNegotiationManager,
+     * FormattingConversionService, org.springframework.validation.Validator)}.
      */
     @Bean
     public ObjectMapper objectMapper(RequestMappingHandlerAdapter requestMappingHandlerAdapter) {
         return requestMappingHandlerAdapter.getMessageConverters().stream()
-            .filter(converter -> converter instanceof MappingJackson2HttpMessageConverter)
-            .findAny()
-            .map(conv -> ((MappingJackson2HttpMessageConverter) conv).getObjectMapper())
-            .orElseThrow(() -> new RuntimeException("There is no MappingJackson2HttpMessageConverter in Spring context"));
+                .filter(converter -> converter instanceof MappingJackson2HttpMessageConverter)
+                .findAny()
+                .map(conv -> ((MappingJackson2HttpMessageConverter) conv).getObjectMapper())
+                .orElseThrow(
+                        () ->
+                                new RuntimeException(
+                                        "There is no MappingJackson2HttpMessageConverter in Spring context"));
     }
 }

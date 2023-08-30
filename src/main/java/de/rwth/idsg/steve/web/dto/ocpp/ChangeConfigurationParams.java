@@ -40,8 +40,7 @@ public class ChangeConfigurationParams extends MultipleChargePointSelect {
 
     private String customConfKey;
 
-    @NotNull(message = "Key type is required")
-    private ConfigurationKeyType keyType = ConfigurationKeyType.PREDEFINED;
+    @NotNull(message = "Key type is required") private ConfigurationKeyType keyType = ConfigurationKeyType.PREDEFINED;
 
     // Disabled @NotBlank after https://github.com/steve-community/steve/issues/148
     // @NotBlank(message = "Value is required")
@@ -82,7 +81,7 @@ public class ChangeConfigurationParams extends MultipleChargePointSelect {
     /**
      * Because we want to permit empty values
      *
-     * https://github.com/steve-community/steve/issues/148
+     * <p>https://github.com/steve-community/steve/issues/148
      */
     public String getValue() {
         return Objects.requireNonNullElse(value, "");
@@ -108,5 +107,4 @@ public class ChangeConfigurationParams extends MultipleChargePointSelect {
             throw new IllegalArgumentException(v);
         }
     }
-
 }

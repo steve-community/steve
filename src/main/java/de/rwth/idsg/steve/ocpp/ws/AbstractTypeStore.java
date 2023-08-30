@@ -39,10 +39,10 @@ public abstract class AbstractTypeStore implements TypeStore {
     private static final String RESPONSE_CLASS_SUFFIX = "Response";
 
     private final Map<String, Class<? extends RequestType>> requestClassMap = new HashMap<>();
-    private final Map<Class<? extends RequestType>, ActionResponsePair> actionResponseMap = new HashMap<>();
+    private final Map<Class<? extends RequestType>, ActionResponsePair> actionResponseMap =
+            new HashMap<>();
 
-    public AbstractTypeStore(String packageForRequestClassMap,
-                             String packageForActionResponseMap) {
+    public AbstractTypeStore(String packageForRequestClassMap, String packageForActionResponseMap) {
         populateRequestClassMap(packageForRequestClassMap);
         populateActionResponseMap(packageForActionResponseMap);
     }
@@ -62,7 +62,8 @@ public abstract class AbstractTypeStore implements TypeStore {
     // -------------------------------------------------------------------------
 
     private void populateRequestClassMap(String packageName) {
-        Map<String, Class<RequestType>> classes = getClassesWithInterface(packageName, RequestType.class);
+        Map<String, Class<RequestType>> classes =
+                getClassesWithInterface(packageName, RequestType.class);
         for (Class<RequestType> clazz : classes.values()) {
             String action = getAction(clazz);
             Preconditions.checkNotNull(action);
@@ -71,8 +72,10 @@ public abstract class AbstractTypeStore implements TypeStore {
     }
 
     private void populateActionResponseMap(String packageName) {
-        Map<String, Class<RequestType>> requestClasses = getClassesWithInterface(packageName, RequestType.class);
-        Map<String, Class<ResponseType>> responseClasses = getClassesWithInterface(packageName, ResponseType.class);
+        Map<String, Class<RequestType>> requestClasses =
+                getClassesWithInterface(packageName, RequestType.class);
+        Map<String, Class<ResponseType>> responseClasses =
+                getClassesWithInterface(packageName, ResponseType.class);
 
         for (Class<RequestType> requestClass : requestClasses.values()) {
             String action = getAction(requestClass);
@@ -90,12 +93,13 @@ public abstract class AbstractTypeStore implements TypeStore {
      * @return <simple name of class, class>
      */
     @SuppressWarnings("unchecked")
-    private static <INTERFACE, IMPL extends INTERFACE> Map<String, Class<IMPL>> getClassesWithInterface(
-            String packageName, Class<INTERFACE> interfaceClass) {
+    private static <INTERFACE, IMPL extends INTERFACE>
+            Map<String, Class<IMPL>> getClassesWithInterface(
+                    String packageName, Class<INTERFACE> interfaceClass) {
         try {
             ImmutableSet<ClassPath.ClassInfo> classInfos =
                     ClassPath.from(Thread.currentThread().getContextClassLoader())
-                             .getTopLevelClasses(packageName);
+                            .getTopLevelClasses(packageName);
 
             Map<String, Class<IMPL>> map = new HashMap<>();
             for (ClassPath.ClassInfo classInfo : classInfos) {

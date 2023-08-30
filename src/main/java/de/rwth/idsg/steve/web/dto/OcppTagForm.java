@@ -60,9 +60,7 @@ public class OcppTagForm {
 
     private String note;
 
-    /**
-     * As specified in V0_9_9__update.sql default value is 1.
-     */
+    /** As specified in V0_9_9__update.sql default value is 1. */
     public Integer getMaxActiveTransactionCount() {
         return Objects.requireNonNullElse(maxActiveTransactionCount, 1);
     }

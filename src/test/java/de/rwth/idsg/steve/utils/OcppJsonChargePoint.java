@@ -83,7 +83,8 @@ public class OcppJsonChargePoint {
         this.version = ocppVersion;
         this.chargeBoxId = chargeBoxId;
         this.connectionPath = pathPrefix + chargeBoxId;
-        this.responseContextMap = new LinkedHashMap<>(); // because we want to keep the insertion order of test cases
+        this.responseContextMap =
+                new LinkedHashMap<>(); // because we want to keep the insertion order of test cases
         this.deserializer = new ResponseDeserializer();
         this.client = new WebSocketClient();
         this.closeHappenedSignal = new CountDownLatch(1);
@@ -141,13 +142,20 @@ public class OcppJsonChargePoint {
         }
     }
 
-    public <T extends ResponseType> void prepare(RequestType request, Class<T> responseClass,
-                                                 Consumer<T> responseHandler, Consumer<OcppJsonError> errorHandler) {
+    public <T extends ResponseType> void prepare(
+            RequestType request,
+            Class<T> responseClass,
+            Consumer<T> responseHandler,
+            Consumer<OcppJsonError> errorHandler) {
         prepare(request, getOperationName(request), responseClass, responseHandler, errorHandler);
     }
 
-    public <T extends ResponseType> void prepare(RequestType payload, String action, Class<T> responseClass,
-                                                 Consumer<T> responseHandler, Consumer<OcppJsonError> errorHandler) {
+    public <T extends ResponseType> void prepare(
+            RequestType payload,
+            String action,
+            Class<T> responseClass,
+            Consumer<T> responseHandler,
+            Consumer<OcppJsonError> errorHandler) {
         String messageId = UUID.randomUUID().toString();
 
         OcppJsonCall call = new OcppJsonCall();
@@ -161,13 +169,16 @@ public class OcppJsonChargePoint {
 
         Serializer.INSTANCE.accept(ctx);
 
-        ResponseContext resCtx = new ResponseContext(ctx.getOutgoingString(), responseClass, responseHandler, errorHandler);
+        ResponseContext resCtx =
+                new ResponseContext(ctx.getOutgoingString(), responseClass, responseHandler, errorHandler);
         responseContextMap.put(messageId, resCtx);
     }
 
     public void process() {
-        // copy the values in a new list to be iterated over, because otherwise we get a ConcurrentModificationException,
-        // since the onMessage(..) uses the same responseContextMap to remove an item while looping over its items here.
+        // copy the values in a new list to be iterated over, because otherwise we get a
+        // ConcurrentModificationException,
+        // since the onMessage(..) uses the same responseContextMap to remove an item while looping over
+        // its items here.
         ArrayList<ResponseContext> values = new ArrayList<>(responseContextMap.values());
 
         receivedResponsesSignal = new CountDownLatch(values.size());
@@ -228,10 +239,11 @@ public class OcppJsonChargePoint {
         private final Consumer<OcppJsonError> errorHandler;
 
         @SuppressWarnings("unchecked")
-        private <T extends ResponseType> ResponseContext(String outgoingMessage,
-                                                         Class<T> responseClass,
-                                                         Consumer<T> responseHandler,
-                                                         Consumer<OcppJsonError> errorHandler) {
+        private <T extends ResponseType> ResponseContext(
+                String outgoingMessage,
+                Class<T> responseClass,
+                Consumer<T> responseHandler,
+                Consumer<OcppJsonError> errorHandler) {
             this.outgoingMessage = outgoingMessage;
             this.responseClass = (Class<ResponseType>) responseClass;
             this.responseHandler = (Consumer<ResponseType>) responseHandler;
@@ -302,5 +314,4 @@ public class OcppJsonChargePoint {
             return error;
         }
     }
-
 }

@@ -49,54 +49,57 @@ public class Issue81 extends StressTest {
     }
 
     protected void attackInternal() throws Exception {
-        StressTester.Runnable runnable = new StressTester.Runnable() {
+        StressTester.Runnable runnable =
+                new StressTester.Runnable() {
 
-            private final ThreadLocal<CentralSystemService> client = new ThreadLocal<>();
-            private final ThreadLocal<String> chargeBoxId = new ThreadLocal<>();
-            private final ThreadLocal<StartTransactionRequest> txRequest = new ThreadLocal<>();
-            private final ThreadLocal<Integer> txId = new ThreadLocal<>();
+                    private final ThreadLocal<CentralSystemService> client = new ThreadLocal<>();
+                    private final ThreadLocal<String> chargeBoxId = new ThreadLocal<>();
+                    private final ThreadLocal<StartTransactionRequest> txRequest = new ThreadLocal<>();
+                    private final ThreadLocal<Integer> txId = new ThreadLocal<>();
 
-            @Override
-            public void beforeRepeat() {
-                client.set(getForOcpp16(path));
-                chargeBoxId.set(Helpers.getRandomString());
+                    @Override
+                    public void beforeRepeat() {
+                        client.set(getForOcpp16(path));
+                        chargeBoxId.set(Helpers.getRandomString());
 
-                BootNotificationResponse boot = getForOcpp16(path).bootNotification(
-                        new BootNotificationRequest()
-                                .withChargePointVendor(getRandomString())
-                                .withChargePointModel(getRandomString()),
-                        chargeBoxId.get());
-                Assertions.assertEquals(RegistrationStatus.ACCEPTED, boot.getStatus());
+                        BootNotificationResponse boot =
+                                getForOcpp16(path)
+                                        .bootNotification(
+                                                new BootNotificationRequest()
+                                                        .withChargePointVendor(getRandomString())
+                                                        .withChargePointModel(getRandomString()),
+                                                chargeBoxId.get());
+                        Assertions.assertEquals(RegistrationStatus.ACCEPTED, boot.getStatus());
 
-                StartTransactionRequest req = new StartTransactionRequest()
-                        .withConnectorId(ThreadLocalRandom.current().nextInt())
-                        .withIdTag(Helpers.getRandomString())
-                        .withTimestamp(DateTime.now())
-                        .withMeterStart(ThreadLocalRandom.current().nextInt());
-                txRequest.set(req);
+                        StartTransactionRequest req =
+                                new StartTransactionRequest()
+                                        .withConnectorId(ThreadLocalRandom.current().nextInt())
+                                        .withIdTag(Helpers.getRandomString())
+                                        .withTimestamp(DateTime.now())
+                                        .withMeterStart(ThreadLocalRandom.current().nextInt());
+                        txRequest.set(req);
 
-                Integer t1 = sendStartTx(client.get(), txRequest.get(), chargeBoxId.get());
-                txId.set(t1);
-            }
+                        Integer t1 = sendStartTx(client.get(), txRequest.get(), chargeBoxId.get());
+                        txId.set(t1);
+                    }
 
-            @Override
-            public void toRepeat() {
-                Integer t2 = sendStartTx(client.get(), txRequest.get(), chargeBoxId.get());
-                Assertions.assertEquals(txId.get(), t2);
-            }
+                    @Override
+                    public void toRepeat() {
+                        Integer t2 = sendStartTx(client.get(), txRequest.get(), chargeBoxId.get());
+                        Assertions.assertEquals(txId.get(), t2);
+                    }
 
-            @Override
-            public void afterRepeat() {
-
-            }
-        };
+                    @Override
+                    public void afterRepeat() {}
+                };
 
         StressTester tester = new StressTester(THREAD_COUNT, REPEAT_COUNT_PER_THREAD);
         tester.test(runnable);
         tester.shutDown();
     }
 
-    private static Integer sendStartTx(CentralSystemService client, StartTransactionRequest req, String chargeBoxId) {
+    private static Integer sendStartTx(
+            CentralSystemService client, StartTransactionRequest req, String chargeBoxId) {
         StartTransactionResponse start = client.startTransaction(req, chargeBoxId);
         Assertions.assertNotNull(start);
         return start.getTransactionId();

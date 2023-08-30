@@ -46,7 +46,9 @@ public class TransactionQueryForm extends QueryForm {
     @ApiModelProperty(value = "Return active or all transactions? Defaults to ALL")
     private QueryType type = QueryType.ACTIVE;
 
-    @ApiModelProperty(value = "Return the time period of the transactions. If FROM_TO, 'from' and 'to' must be set. Additionally, 'to' must be after 'from'. Defaults to ALL")
+    @ApiModelProperty(
+            value =
+                    "Return the time period of the transactions. If FROM_TO, 'from' and 'to' must be set. Additionally, 'to' must be after 'from'. Defaults to ALL")
     private QueryPeriodType periodType = QueryPeriodType.ALL;
 
     @ApiModelProperty(hidden = true)
@@ -80,7 +82,7 @@ public class TransactionQueryForm extends QueryForm {
         @Getter private final String value;
 
         public static QueryType fromValue(String v) {
-            for (QueryType c: QueryType.values()) {
+            for (QueryType c : QueryType.values()) {
                 if (c.value.equals(v)) {
                     return c;
                 }
@@ -103,13 +105,14 @@ public class TransactionQueryForm extends QueryForm {
 
         public int getInterval() {
             if (this.interval == -1) {
-                throw new UnsupportedOperationException("This enum does not have any meaningful interval set.");
+                throw new UnsupportedOperationException(
+                        "This enum does not have any meaningful interval set.");
             }
             return this.interval;
         }
 
         public static QueryPeriodType fromValue(String v) {
-            for (QueryPeriodType c: QueryPeriodType.values()) {
+            for (QueryPeriodType c : QueryPeriodType.values()) {
                 if (c.value.equals(v)) {
                     return c;
                 }

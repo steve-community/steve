@@ -39,23 +39,24 @@ public final class InternetChecker {
 
     private static final int CONNECT_TIMEOUT = 5_000;
 
-    private static final List<String> HOST_LIST = Arrays.asList(
-            "https://treibhaus.informatik.rwth-aachen.de/heartbeat/",
-            "https://github.com",
-            "https://www.wikipedia.org",
-            "https://www.google.com",
-            "https://www.apple.com",
-            "https://www.facebook.com"
-    );
+    private static final List<String> HOST_LIST =
+            Arrays.asList(
+                    "https://treibhaus.informatik.rwth-aachen.de/heartbeat/",
+                    "https://github.com",
+                    "https://www.wikipedia.org",
+                    "https://www.google.com",
+                    "https://www.apple.com",
+                    "https://www.facebook.com");
 
     static {
-        System.setProperty("http.agent", "SteVe/" + SteveConfiguration.CONFIG.getSteveCompositeVersion());
+        System.setProperty(
+                "http.agent", "SteVe/" + SteveConfiguration.CONFIG.getSteveCompositeVersion());
     }
 
     /**
-     * We try every item in the list to compensate for the possibility that one of hosts might be down. If all these
-     * big players are down at the same time, that's okay too, because the end of the world must have arrived,
-     * obviously.
+     * We try every item in the list to compensate for the possibility that one of hosts might be
+     * down. If all these big players are down at the same time, that's okay too, because the end of
+     * the world must have arrived, obviously.
      */
     public static boolean isInternetAvailable() {
         for (String s : HOST_LIST) {
@@ -71,7 +72,7 @@ public final class InternetChecker {
         try {
             URL url = new URL(str);
             HttpURLConnection con = (HttpURLConnection) url.openConnection();
-            con.setRequestProperty("Connection", "close");  // otherwise, default setting is "keep-alive"
+            con.setRequestProperty("Connection", "close"); // otherwise, default setting is "keep-alive"
             try {
                 con.setConnectTimeout(CONNECT_TIMEOUT);
                 con.connect();

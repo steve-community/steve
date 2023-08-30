@@ -58,7 +58,7 @@ public enum OcppProtocol {
         OcppVersion ov = OcppVersion.fromValue(version);
         OcppTransport ot = OcppTransport.fromValue(transport);
 
-        for (OcppProtocol c: OcppProtocol.values()) {
+        for (OcppProtocol c : OcppProtocol.values()) {
             if (c.getVersion() == ov && c.getTransport() == ot) {
                 return c;
             }

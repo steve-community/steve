@@ -43,10 +43,11 @@ public interface ChargingProfileRepository {
 
     void clearProfile(int chargingProfilePk, String chargeBoxId);
 
-    void clearProfile(@NotNull String chargeBoxId,
-                      @Nullable Integer connectorId,
-                      @Nullable ChargingProfilePurposeType purpose,
-                      @Nullable Integer stackLevel);
+    void clearProfile(
+            @NotNull String chargeBoxId,
+            @Nullable Integer connectorId,
+            @Nullable ChargingProfilePurposeType purpose,
+            @Nullable Integer stackLevel);
 
     // -------------------------------------------------------------------------
     // CRUD stuff

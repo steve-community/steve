@@ -42,5 +42,4 @@ public class ChargingProfileQueryForm {
     private RecurrencyKindType recurrencyKind;
     private LocalDateTime validFrom;
     private LocalDateTime validTo;
-
 }

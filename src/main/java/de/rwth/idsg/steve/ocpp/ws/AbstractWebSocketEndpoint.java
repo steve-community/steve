@@ -53,7 +53,8 @@ import java.util.function.Consumer;
  * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 17.03.2015
  */
-public abstract class AbstractWebSocketEndpoint extends ConcurrentWebSocketHandler implements SubProtocolCapable {
+public abstract class AbstractWebSocketEndpoint extends ConcurrentWebSocketHandler
+        implements SubProtocolCapable {
 
     @Autowired private ScheduledExecutorService service;
     @Autowired private OcppServerRepository ocppServerRepository;
@@ -74,8 +75,13 @@ public abstract class AbstractWebSocketEndpoint extends ConcurrentWebSocketHandl
     public void init(IncomingPipeline pipeline) {
         this.pipeline = pipeline;
 
-        connectedCallbackList.add((chargeBoxId) -> applicationEventPublisher.publishEvent(new OcppStationWebSocketConnected(chargeBoxId)));
-        disconnectedCallbackList.add((chargeBoxId) -> applicationEventPublisher.publishEvent(new OcppStationWebSocketDisconnected(chargeBoxId)));
+        connectedCallbackList.add(
+                (chargeBoxId) ->
+                        applicationEventPublisher.publishEvent(new OcppStationWebSocketConnected(chargeBoxId)));
+        disconnectedCallbackList.add(
+                (chargeBoxId) ->
+                        applicationEventPublisher.publishEvent(
+                                new OcppStationWebSocketDisconnected(chargeBoxId)));
     }
 
     @Override
@@ -99,7 +105,8 @@ public abstract class AbstractWebSocketEndpoint extends ConcurrentWebSocketHandl
         }
     }
 
-    private void handleTextMessage(WebSocketSession session, TextMessage webSocketMessage) throws Exception {
+    private void handleTextMessage(WebSocketSession session, TextMessage webSocketMessage)
+            throws Exception {
         String incomingString = webSocketMessage.getPayload();
         String chargeBoxId = getChargeBoxId(session);
 
@@ -127,15 +134,17 @@ public abstract class AbstractWebSocketEndpoint extends ConcurrentWebSocketHandl
         String chargeBoxId = getChargeBoxId(session);
 
         WebSocketLogger.connected(chargeBoxId, session);
-        ocppServerRepository.updateOcppProtocol(chargeBoxId, getVersion().toProtocol(OcppTransport.JSON));
+        ocppServerRepository.updateOcppProtocol(
+                chargeBoxId, getVersion().toProtocol(OcppTransport.JSON));
 
         // Just to keep the connection alive, such that the servers do not close
         // the connection because of a idle timeout, we ping-pong at fixed intervals.
-        ScheduledFuture pingSchedule = service.scheduleAtFixedRate(
-                new PingTask(chargeBoxId, session),
-                WebSocketConfiguration.PING_INTERVAL,
-                WebSocketConfiguration.PING_INTERVAL,
-                TimeUnit.MINUTES);
+        ScheduledFuture pingSchedule =
+                service.scheduleAtFixedRate(
+                        new PingTask(chargeBoxId, session),
+                        WebSocketConfiguration.PING_INTERVAL,
+                        WebSocketConfiguration.PING_INTERVAL,
+                        TimeUnit.MINUTES);
 
         futureResponseContextStore.addSession(session);
 
@@ -216,5 +225,4 @@ public abstract class AbstractWebSocketEndpoint extends ConcurrentWebSocketHandl
     public WebSocketSession getSession(String chargeBoxId) {
         return sessionContextStore.getSession(chargeBoxId);
     }
-
 }

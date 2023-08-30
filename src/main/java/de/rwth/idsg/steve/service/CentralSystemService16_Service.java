@@ -78,10 +78,11 @@ public class CentralSystemService16_Service {
     @Autowired private ApplicationEventPublisher applicationEventPublisher;
     @Autowired private ChargePointHelperService chargePointHelperService;
 
-    public BootNotificationResponse bootNotification(BootNotificationRequest parameters, String chargeBoxIdentity,
-                                                     OcppProtocol ocppProtocol) {
+    public BootNotificationResponse bootNotification(
+            BootNotificationRequest parameters, String chargeBoxIdentity, OcppProtocol ocppProtocol) {
 
-        Optional<RegistrationStatus> status = chargePointHelperService.getRegistrationStatus(chargeBoxIdentity);
+        Optional<RegistrationStatus> status =
+                chargePointHelperService.getRegistrationStatus(chargeBoxIdentity);
         applicationEventPublisher.publishEvent(new OccpStationBooted(chargeBoxIdentity, status));
         DateTime now = DateTime.now();
 
@@ -90,22 +91,25 @@ public class CentralSystemService16_Service {
             log.error("The chargebox '{}' is NOT in database.", chargeBoxIdentity);
         } else {
             // Applies to all stations in db (even with registration_status Rejected)
-            log.info("The boot of the chargebox '{}' with registration status '{}' is acknowledged.", chargeBoxIdentity, status);
+            log.info(
+                    "The boot of the chargebox '{}' with registration status '{}' is acknowledged.",
+                    chargeBoxIdentity,
+                    status);
             UpdateChargeboxParams params =
                     UpdateChargeboxParams.builder()
-                                         .ocppProtocol(ocppProtocol)
-                                         .vendor(parameters.getChargePointVendor())
-                                         .model(parameters.getChargePointModel())
-                                         .pointSerial(parameters.getChargePointSerialNumber())
-                                         .boxSerial(parameters.getChargeBoxSerialNumber())
-                                         .fwVersion(parameters.getFirmwareVersion())
-                                         .iccid(parameters.getIccid())
-                                         .imsi(parameters.getImsi())
-                                         .meterType(parameters.getMeterType())
-                                         .meterSerial(parameters.getMeterSerialNumber())
-                                         .chargeBoxId(chargeBoxIdentity)
-                                         .heartbeatTimestamp(now)
-                                         .build();
+                            .ocppProtocol(ocppProtocol)
+                            .vendor(parameters.getChargePointVendor())
+                            .model(parameters.getChargePointModel())
+                            .pointSerial(parameters.getChargePointSerialNumber())
+                            .boxSerial(parameters.getChargeBoxSerialNumber())
+                            .fwVersion(parameters.getFirmwareVersion())
+                            .iccid(parameters.getIccid())
+                            .imsi(parameters.getImsi())
+                            .meterType(parameters.getMeterType())
+                            .meterSerial(parameters.getMeterSerialNumber())
+                            .chargeBoxId(chargeBoxIdentity)
+                            .heartbeatTimestamp(now)
+                            .build();
 
             ocppServerRepository.updateChargebox(params);
         }
@@ -130,21 +134,22 @@ public class CentralSystemService16_Service {
 
         InsertConnectorStatusParams params =
                 InsertConnectorStatusParams.builder()
-                                           .chargeBoxId(chargeBoxIdentity)
-                                           .connectorId(parameters.getConnectorId())
-                                           .status(parameters.getStatus().value())
-                                           .errorCode(parameters.getErrorCode().value())
-                                           .timestamp(timestamp)
-                                           .errorInfo(parameters.getInfo())
-                                           .vendorId(parameters.getVendorId())
-                                           .vendorErrorCode(parameters.getVendorErrorCode())
-                                           .build();
+                        .chargeBoxId(chargeBoxIdentity)
+                        .connectorId(parameters.getConnectorId())
+                        .status(parameters.getStatus().value())
+                        .errorCode(parameters.getErrorCode().value())
+                        .timestamp(timestamp)
+                        .errorInfo(parameters.getInfo())
+                        .vendorId(parameters.getVendorId())
+                        .vendorErrorCode(parameters.getVendorErrorCode())
+                        .build();
 
         ocppServerRepository.insertConnectorStatus(params);
 
         if (parameters.getStatus() == ChargePointStatus.FAULTED) {
-            applicationEventPublisher.publishEvent(new OcppStationStatusFailure(
-                    chargeBoxIdentity, parameters.getConnectorId(), parameters.getErrorCode().value()));
+            applicationEventPublisher.publishEvent(
+                    new OcppStationStatusFailure(
+                            chargeBoxIdentity, parameters.getConnectorId(), parameters.getErrorCode().value()));
         }
 
         return new StatusNotificationResponse();
@@ -155,8 +160,7 @@ public class CentralSystemService16_Service {
                 chargeBoxIdentity,
                 parameters.getMeterValue(),
                 parameters.getConnectorId(),
-                parameters.getTransactionId()
-        );
+                parameters.getTransactionId());
 
         return new MeterValuesResponse();
     }
@@ -168,59 +172,59 @@ public class CentralSystemService16_Service {
         return new DiagnosticsStatusNotificationResponse();
     }
 
-    public StartTransactionResponse startTransaction(StartTransactionRequest parameters, String chargeBoxIdentity) {
-        // Get the authorization info of the user, before making tx changes (will affectAuthorizationStatus)
-        IdTagInfo info = ocppTagService.getIdTagInfo(
-                parameters.getIdTag(),
-                true,
-                () -> new IdTagInfo().withStatus(AuthorizationStatus.INVALID) // IdTagInfo is required
-        );
+    public StartTransactionResponse startTransaction(
+            StartTransactionRequest parameters, String chargeBoxIdentity) {
+        // Get the authorization info of the user, before making tx changes (will
+        // affectAuthorizationStatus)
+        IdTagInfo info =
+                ocppTagService.getIdTagInfo(
+                        parameters.getIdTag(),
+                        true,
+                        () -> new IdTagInfo().withStatus(AuthorizationStatus.INVALID) // IdTagInfo is required
+                        );
 
         InsertTransactionParams params =
                 InsertTransactionParams.builder()
-                                       .chargeBoxId(chargeBoxIdentity)
-                                       .connectorId(parameters.getConnectorId())
-                                       .idTag(parameters.getIdTag())
-                                       .startTimestamp(parameters.getTimestamp())
-                                       .startMeterValue(Integer.toString(parameters.getMeterStart()))
-                                       .reservationId(parameters.getReservationId())
-                                       .eventTimestamp(DateTime.now())
-                                       .build();
+                        .chargeBoxId(chargeBoxIdentity)
+                        .connectorId(parameters.getConnectorId())
+                        .idTag(parameters.getIdTag())
+                        .startTimestamp(parameters.getTimestamp())
+                        .startMeterValue(Integer.toString(parameters.getMeterStart()))
+                        .reservationId(parameters.getReservationId())
+                        .eventTimestamp(DateTime.now())
+                        .build();
 
         int transactionId = ocppServerRepository.insertTransaction(params);
 
         applicationEventPublisher.publishEvent(new OcppTransactionStarted(transactionId, params));
 
-        return new StartTransactionResponse()
-                .withIdTagInfo(info)
-                .withTransactionId(transactionId);
+        return new StartTransactionResponse().withIdTagInfo(info).withTransactionId(transactionId);
     }
 
-    public StopTransactionResponse stopTransaction(StopTransactionRequest parameters, String chargeBoxIdentity) {
+    public StopTransactionResponse stopTransaction(
+            StopTransactionRequest parameters, String chargeBoxIdentity) {
         int transactionId = parameters.getTransactionId();
         String stopReason = parameters.isSetReason() ? parameters.getReason().value() : null;
 
-        // Get the authorization info of the user, before making tx changes (will affectAuthorizationStatus)
-        IdTagInfo idTagInfo = ocppTagService.getIdTagInfo(
-                parameters.getIdTag(),
-                false,
-                () -> null
-        );
+        // Get the authorization info of the user, before making tx changes (will
+        // affectAuthorizationStatus)
+        IdTagInfo idTagInfo = ocppTagService.getIdTagInfo(parameters.getIdTag(), false, () -> null);
 
         UpdateTransactionParams params =
                 UpdateTransactionParams.builder()
-                                       .chargeBoxId(chargeBoxIdentity)
-                                       .transactionId(transactionId)
-                                       .stopTimestamp(parameters.getTimestamp())
-                                       .stopMeterValue(Integer.toString(parameters.getMeterStop()))
-                                       .stopReason(stopReason)
-                                       .eventTimestamp(DateTime.now())
-                                       .eventActor(TransactionStopEventActor.station)
-                                       .build();
+                        .chargeBoxId(chargeBoxIdentity)
+                        .transactionId(transactionId)
+                        .stopTimestamp(parameters.getTimestamp())
+                        .stopMeterValue(Integer.toString(parameters.getMeterStop()))
+                        .stopReason(stopReason)
+                        .eventTimestamp(DateTime.now())
+                        .eventActor(TransactionStopEventActor.station)
+                        .build();
 
         ocppServerRepository.updateTransaction(params);
 
-        ocppServerRepository.insertMeterValues(chargeBoxIdentity, parameters.getTransactionData(), transactionId);
+        ocppServerRepository.insertMeterValues(
+                chargeBoxIdentity, parameters.getTransactionData(), transactionId);
 
         applicationEventPublisher.publishEvent(new OcppTransactionEnded(params));
 
@@ -236,20 +240,22 @@ public class CentralSystemService16_Service {
 
     public AuthorizeResponse authorize(AuthorizeRequest parameters, String chargeBoxIdentity) {
         // Get the authorization info of the user
-        IdTagInfo idTagInfo = ocppTagService.getIdTagInfo(
-                parameters.getIdTag(),
-                false,
-                () -> new IdTagInfo().withStatus(AuthorizationStatus.INVALID)
-        );
+        IdTagInfo idTagInfo =
+                ocppTagService.getIdTagInfo(
+                        parameters.getIdTag(),
+                        false,
+                        () -> new IdTagInfo().withStatus(AuthorizationStatus.INVALID));
 
         return new AuthorizeResponse().withIdTagInfo(idTagInfo);
     }
 
-    /**
-     * Dummy implementation. This is new in OCPP 1.5. It must be vendor-specific.
-     */
-    public DataTransferResponse dataTransfer(DataTransferRequest parameters, String chargeBoxIdentity) {
-        log.info("[Data Transfer] Charge point: {}, Vendor Id: {}", chargeBoxIdentity, parameters.getVendorId());
+    /** Dummy implementation. This is new in OCPP 1.5. It must be vendor-specific. */
+    public DataTransferResponse dataTransfer(
+            DataTransferRequest parameters, String chargeBoxIdentity) {
+        log.info(
+                "[Data Transfer] Charge point: {}, Vendor Id: {}",
+                chargeBoxIdentity,
+                parameters.getVendorId());
         if (parameters.isSetMessageId()) {
             log.info("[Data Transfer] Message Id: {}", parameters.getMessageId());
         }

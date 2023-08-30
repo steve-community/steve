@@ -38,7 +38,8 @@ public class PingTask implements Runnable {
     private final String chargeBoxId;
     private final WebSocketSession session;
 
-    private static final PingMessage PING_MESSAGE = new PingMessage(ByteBuffer.wrap("ping".getBytes(UTF_8)));
+    private static final PingMessage PING_MESSAGE =
+            new PingMessage(ByteBuffer.wrap("ping".getBytes(UTF_8)));
 
     @Override
     public void run() {

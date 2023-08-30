@@ -52,8 +52,7 @@ import static de.rwth.idsg.steve.web.dto.ocpp.ConfigurationKeyReadWriteEnum.RW;
 public class Ocpp15Controller extends Ocpp12Controller {
 
     @Autowired
-    @Qualifier("ChargePointService15_Client")
-    private ChargePointService15_Client client15;
+    @Qualifier("ChargePointService15_Client") private ChargePointService15_Client client15;
 
     // -------------------------------------------------------------------------
     // Paths
@@ -159,8 +158,8 @@ public class Ocpp15Controller extends Ocpp12Controller {
     // -------------------------------------------------------------------------
 
     @RequestMapping(value = RESERVE_PATH, method = RequestMethod.POST)
-    public String postReserveNow(@Valid @ModelAttribute(PARAMS) ReserveNowParams params,
-                                 BindingResult result, Model model) {
+    public String postReserveNow(
+            @Valid @ModelAttribute(PARAMS) ReserveNowParams params, BindingResult result, Model model) {
         if (result.hasErrors()) {
             setCommonAttributes(model);
             setActiveUserIdTagList(model);
@@ -170,8 +169,10 @@ public class Ocpp15Controller extends Ocpp12Controller {
     }
 
     @RequestMapping(value = CANCEL_RESERV_PATH, method = RequestMethod.POST)
-    public String postCancelReserv(@Valid @ModelAttribute(PARAMS) CancelReservationParams params,
-                                   BindingResult result, Model model) {
+    public String postCancelReserv(
+            @Valid @ModelAttribute(PARAMS) CancelReservationParams params,
+            BindingResult result,
+            Model model) {
         if (result.hasErrors()) {
             setCommonAttributes(model);
             return getPrefix() + CANCEL_RESERV_PATH;
@@ -180,8 +181,8 @@ public class Ocpp15Controller extends Ocpp12Controller {
     }
 
     @RequestMapping(value = DATA_TRANSFER_PATH, method = RequestMethod.POST)
-    public String postDataTransfer(@Valid @ModelAttribute(PARAMS) DataTransferParams params,
-                                   BindingResult result, Model model) {
+    public String postDataTransfer(
+            @Valid @ModelAttribute(PARAMS) DataTransferParams params, BindingResult result, Model model) {
         if (result.hasErrors()) {
             setCommonAttributes(model);
             return getPrefix() + DATA_TRANSFER_PATH;
@@ -190,8 +191,10 @@ public class Ocpp15Controller extends Ocpp12Controller {
     }
 
     @RequestMapping(value = GET_CONF_PATH, method = RequestMethod.POST)
-    public String postGetConf(@Valid @ModelAttribute(PARAMS) GetConfigurationParams params,
-                              BindingResult result, Model model) {
+    public String postGetConf(
+            @Valid @ModelAttribute(PARAMS) GetConfigurationParams params,
+            BindingResult result,
+            Model model) {
         if (result.hasErrors()) {
             setCommonAttributes(model);
             model.addAttribute("ocppConfKeys", getConfigurationKeys(RW));
@@ -201,8 +204,10 @@ public class Ocpp15Controller extends Ocpp12Controller {
     }
 
     @RequestMapping(value = GET_LIST_VERSION_PATH, method = RequestMethod.POST)
-    public String postListVersion(@Valid @ModelAttribute(PARAMS) MultipleChargePointSelect params,
-                                  BindingResult result, Model model) {
+    public String postListVersion(
+            @Valid @ModelAttribute(PARAMS) MultipleChargePointSelect params,
+            BindingResult result,
+            Model model) {
         if (result.hasErrors()) {
             setCommonAttributes(model);
             return getPrefix() + GET_LIST_VERSION_PATH;
@@ -211,8 +216,10 @@ public class Ocpp15Controller extends Ocpp12Controller {
     }
 
     @RequestMapping(value = SEND_LIST_PATH, method = RequestMethod.POST)
-    public String postSendList(@Valid @ModelAttribute(PARAMS) SendLocalListParams params,
-                               BindingResult result, Model model) {
+    public String postSendList(
+            @Valid @ModelAttribute(PARAMS) SendLocalListParams params,
+            BindingResult result,
+            Model model) {
         if (result.hasErrors()) {
             setCommonAttributes(model);
             setAllUserIdTagList(model);

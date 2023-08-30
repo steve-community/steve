@@ -59,8 +59,7 @@ public class Ocpp12Controller {
     @Autowired protected OcppTagService ocppTagService;
 
     @Autowired
-    @Qualifier("ChargePointService12_Client")
-    private ChargePointService12_Client client12;
+    @Qualifier("ChargePointService12_Client") private ChargePointService12_Client client12;
 
     protected static final String PARAMS = "params";
 
@@ -193,8 +192,10 @@ public class Ocpp12Controller {
     // -------------------------------------------------------------------------
 
     @RequestMapping(value = CHANGE_AVAIL_PATH, method = RequestMethod.POST)
-    public String postChangeAvail(@Valid @ModelAttribute(PARAMS) ChangeAvailabilityParams params,
-                                  BindingResult result, Model model) {
+    public String postChangeAvail(
+            @Valid @ModelAttribute(PARAMS) ChangeAvailabilityParams params,
+            BindingResult result,
+            Model model) {
         if (result.hasErrors()) {
             setCommonAttributes(model);
             return getPrefix() + CHANGE_AVAIL_PATH;
@@ -203,8 +204,10 @@ public class Ocpp12Controller {
     }
 
     @RequestMapping(value = CHANGE_CONF_PATH, method = RequestMethod.POST)
-    public String postChangeConf(@Valid @ModelAttribute(PARAMS) ChangeConfigurationParams params,
-                                 BindingResult result, Model model) {
+    public String postChangeConf(
+            @Valid @ModelAttribute(PARAMS) ChangeConfigurationParams params,
+            BindingResult result,
+            Model model) {
         if (result.hasErrors()) {
             setCommonAttributes(model);
             model.addAttribute("ocppConfKeys", getConfigurationKeys(RW));
@@ -214,8 +217,10 @@ public class Ocpp12Controller {
     }
 
     @RequestMapping(value = CLEAR_CACHE_PATH, method = RequestMethod.POST)
-    public String postClearCache(@Valid @ModelAttribute(PARAMS) MultipleChargePointSelect params,
-                                 BindingResult result, Model model) {
+    public String postClearCache(
+            @Valid @ModelAttribute(PARAMS) MultipleChargePointSelect params,
+            BindingResult result,
+            Model model) {
         if (result.hasErrors()) {
             setCommonAttributes(model);
             return getPrefix() + CLEAR_CACHE_PATH;
@@ -224,8 +229,10 @@ public class Ocpp12Controller {
     }
 
     @RequestMapping(value = GET_DIAG_PATH, method = RequestMethod.POST)
-    public String postGetDiag(@Valid @ModelAttribute(PARAMS) GetDiagnosticsParams params,
-                              BindingResult result, Model model) {
+    public String postGetDiag(
+            @Valid @ModelAttribute(PARAMS) GetDiagnosticsParams params,
+            BindingResult result,
+            Model model) {
         if (result.hasErrors()) {
             setCommonAttributes(model);
             return getPrefix() + GET_DIAG_PATH;
@@ -234,8 +241,10 @@ public class Ocpp12Controller {
     }
 
     @RequestMapping(value = REMOTE_START_TX_PATH, method = RequestMethod.POST)
-    public String postRemoteStartTx(@Valid @ModelAttribute(PARAMS) RemoteStartTransactionParams params,
-                                    BindingResult result, Model model) {
+    public String postRemoteStartTx(
+            @Valid @ModelAttribute(PARAMS) RemoteStartTransactionParams params,
+            BindingResult result,
+            Model model) {
         if (result.hasErrors()) {
             setCommonAttributesForTx(model);
             setActiveUserIdTagList(model);
@@ -245,8 +254,10 @@ public class Ocpp12Controller {
     }
 
     @RequestMapping(value = REMOTE_STOP_TX_PATH, method = RequestMethod.POST)
-    public String postRemoteStopTx(@Valid @ModelAttribute(PARAMS) RemoteStopTransactionParams params,
-                                   BindingResult result, Model model) {
+    public String postRemoteStopTx(
+            @Valid @ModelAttribute(PARAMS) RemoteStopTransactionParams params,
+            BindingResult result,
+            Model model) {
         if (result.hasErrors()) {
             setCommonAttributesForTx(model);
             return getPrefix() + REMOTE_STOP_TX_PATH;
@@ -255,8 +266,8 @@ public class Ocpp12Controller {
     }
 
     @RequestMapping(value = RESET_PATH, method = RequestMethod.POST)
-    public String postReset(@Valid @ModelAttribute(PARAMS) ResetParams params,
-                            BindingResult result, Model model) {
+    public String postReset(
+            @Valid @ModelAttribute(PARAMS) ResetParams params, BindingResult result, Model model) {
         if (result.hasErrors()) {
             setCommonAttributes(model);
             return getPrefix() + RESET_PATH;
@@ -265,8 +276,10 @@ public class Ocpp12Controller {
     }
 
     @RequestMapping(value = UNLOCK_CON_PATH, method = RequestMethod.POST)
-    public String postUnlockCon(@Valid @ModelAttribute(PARAMS) UnlockConnectorParams params,
-                                BindingResult result, Model model) {
+    public String postUnlockCon(
+            @Valid @ModelAttribute(PARAMS) UnlockConnectorParams params,
+            BindingResult result,
+            Model model) {
         if (result.hasErrors()) {
             setCommonAttributes(model);
             return getPrefix() + UNLOCK_CON_PATH;
@@ -275,8 +288,10 @@ public class Ocpp12Controller {
     }
 
     @RequestMapping(value = UPDATE_FIRM_PATH, method = RequestMethod.POST)
-    public String postUpdateFirm(@Valid @ModelAttribute(PARAMS) UpdateFirmwareParams params,
-                                 BindingResult result, Model model) {
+    public String postUpdateFirm(
+            @Valid @ModelAttribute(PARAMS) UpdateFirmwareParams params,
+            BindingResult result,
+            Model model) {
         if (result.hasErrors()) {
             setCommonAttributes(model);
             return getPrefix() + UPDATE_FIRM_PATH;

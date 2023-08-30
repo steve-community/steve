@@ -23,9 +23,10 @@ import lombok.Setter;
 import lombok.ToString;
 
 /**
- * Does not contain all the fields in the actual response, but only the ones that we are interested in.
+ * Does not contain all the fields in the actual response, but only the ones that we are interested
+ * in.
  *
- * API doc: https://developer.github.com/v3/repos/releases/#get-the-latest-release
+ * <p>API doc: https://developer.github.com/v3/repos/releases/#get-the-latest-release
  *
  * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 04.10.2016

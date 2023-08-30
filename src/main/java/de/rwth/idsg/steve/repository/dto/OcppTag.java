@@ -26,9 +26,7 @@ import lombok.ToString;
 import org.joda.time.DateTime;
 
 /**
- *
  * @author Sevket Goekay <sevketgokay@gmail.com>
- *
  */
 public final class OcppTag {
 
@@ -45,9 +43,7 @@ public final class OcppTag {
         private final boolean inTransaction;
         private final boolean blocked;
 
-        /**
-         * Only relevant for the web pages. Disabled for API
-         */
+        /** Only relevant for the web pages. Disabled for API */
         @JsonIgnore
         @ApiModelProperty(hidden = true)
         private final String expiryDateFormatted;

@@ -24,15 +24,8 @@ import lombok.Setter;
 /**
  * Class hierarchy:
  *
- *      OcppJsonMessage
- *      +
- *      +--> OcppJsonCall
- *      +
- *      +--> OcppJsonResponse
- *           +
- *           +--> OcppJsonResult
- *           +
- *           +--> OcppJsonError
+ * <p>OcppJsonMessage + +--> OcppJsonCall + +--> OcppJsonResponse + +--> OcppJsonResult + +-->
+ * OcppJsonError
  *
  * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 12.03.2015

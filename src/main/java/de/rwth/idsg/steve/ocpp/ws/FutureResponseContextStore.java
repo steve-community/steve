@@ -42,7 +42,8 @@ public class FutureResponseContextStore {
 
     // We store for each chargeBox connection, multiple pairs of (messageId, context)
     // (session, (messageId, context))
-    private final Map<WebSocketSession, Map<String, FutureResponseContext>> lookupTable = new ConcurrentHashMap<>();
+    private final Map<WebSocketSession, Map<String, FutureResponseContext>> lookupTable =
+            new ConcurrentHashMap<>();
 
     public void addSession(WebSocketSession session) {
         addIfAbsent(session);
@@ -59,30 +60,34 @@ public class FutureResponseContextStore {
         log.debug("Store size for sessionId '{}': {}", session.getId(), map.size());
     }
 
-    @Nullable
-    public FutureResponseContext get(WebSocketSession session, String messageId) {
+    @Nullable public FutureResponseContext get(WebSocketSession session, String messageId) {
         RemoveFunction removeFunction = new RemoveFunction(messageId);
         lookupTable.computeIfPresent(session, removeFunction);
         return removeFunction.removedContext;
     }
 
     private Map<String, FutureResponseContext> addIfAbsent(WebSocketSession session) {
-        return lookupTable.computeIfAbsent(session, innerSession -> {
-            log.debug("Creating new store for sessionId '{}'", innerSession.getId());
-            return new ConcurrentHashMap<>();
-        });
+        return lookupTable.computeIfAbsent(
+                session,
+                innerSession -> {
+                    log.debug("Creating new store for sessionId '{}'", innerSession.getId());
+                    return new ConcurrentHashMap<>();
+                });
     }
 
     @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-    private static class RemoveFunction implements
-            BiFunction<WebSocketSession, Map<String, FutureResponseContext>, Map<String, FutureResponseContext>> {
+    private static class RemoveFunction
+            implements BiFunction<
+                    WebSocketSession,
+                    Map<String, FutureResponseContext>,
+                    Map<String, FutureResponseContext>> {
 
         private final String messageId;
         @Nullable private FutureResponseContext removedContext;
 
         @Override
-        public Map<String, FutureResponseContext> apply(WebSocketSession session,
-                                                        Map<String, FutureResponseContext> map) {
+        public Map<String, FutureResponseContext> apply(
+                WebSocketSession session, Map<String, FutureResponseContext> map) {
             removedContext = map.remove(messageId);
             log.debug("Store size for sessionId '{}': {}", session.getId(), map.size());
             return map;

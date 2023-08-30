@@ -41,12 +41,12 @@ public final class ChargePointDetailsMapper {
         form.setDescription(chargeBox.getDescription());
         form.setLocationLatitude(chargeBox.getLocationLatitude());
         form.setLocationLongitude(chargeBox.getLocationLongitude());
-        form.setInsertConnectorStatusAfterTransactionMsg(chargeBox.getInsertConnectorStatusAfterTransactionMsg());
+        form.setInsertConnectorStatusAfterTransactionMsg(
+                chargeBox.getInsertConnectorStatusAfterTransactionMsg());
         form.setAdminAddress(chargeBox.getAdminAddress());
         form.setRegistrationStatus(chargeBox.getRegistrationStatus());
         form.setAddress(AddressMapper.recordToDto(cp.getAddress()));
 
         return form;
     }
-
 }

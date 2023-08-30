@@ -52,9 +52,9 @@ public final class CountryCodesProvider {
     }
 
     /**
-     * There are some invalid codes like {@link CountryCode#UNDEFINED} and {@link CountryCode#EU},
-     * or some countries are listed twice {@link CountryCode#FI} - {@link CountryCode#SF} and
-     * {@link CountryCode#GB} - {@link CountryCode#UK} which are confusing. We filter these out.
+     * There are some invalid codes like {@link CountryCode#UNDEFINED} and {@link CountryCode#EU}, or
+     * some countries are listed twice {@link CountryCode#FI} - {@link CountryCode#SF} and {@link
+     * CountryCode#GB} - {@link CountryCode#UK} which are confusing. We filter these out.
      */
     private static boolean shouldInclude(CountryCode c) {
         return c.getAssignment() == CountryCode.Assignment.OFFICIALLY_ASSIGNED;

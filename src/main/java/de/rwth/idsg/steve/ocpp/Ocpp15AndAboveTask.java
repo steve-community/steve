@@ -28,7 +28,8 @@ import javax.xml.ws.AsyncHandler;
  * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 30.10.2018
  */
-public abstract class Ocpp15AndAboveTask<S extends ChargePointSelection, RESPONSE> extends CommunicationTask<S, RESPONSE> {
+public abstract class Ocpp15AndAboveTask<S extends ChargePointSelection, RESPONSE>
+        extends CommunicationTask<S, RESPONSE> {
 
     public Ocpp15AndAboveTask(OcppVersion ocppVersion, S params) {
         super(ocppVersion, params);

@@ -40,7 +40,8 @@ public class SendLocalListTask extends Ocpp15AndAboveTask<SendLocalListParams, S
 
     private final ocpp.cp._2015._10.SendLocalListRequest request;
 
-    public SendLocalListTask(OcppVersion ocppVersion, SendLocalListParams params, OcppTagService ocppTagService) {
+    public SendLocalListTask(
+            OcppVersion ocppVersion, SendLocalListParams params, OcppTagService ocppTagService) {
         super(ocppVersion, params);
         this.request = createOcpp16Request(ocppTagService);
     }
@@ -56,7 +57,8 @@ public class SendLocalListTask extends Ocpp15AndAboveTask<SendLocalListParams, S
 
         return new ocpp.cp._2012._06.SendLocalListRequest()
                 .withListVersion(ocpp16Request.getListVersion())
-                .withUpdateType(ocpp.cp._2012._06.UpdateType.fromValue(ocpp16Request.getUpdateType().value()))
+                .withUpdateType(
+                        ocpp.cp._2012._06.UpdateType.fromValue(ocpp16Request.getUpdateType().value()))
                 .withLocalAuthorisationList(toOcpp15(ocpp16Request.getLocalAuthorizationList()));
     }
 
@@ -66,7 +68,8 @@ public class SendLocalListTask extends Ocpp15AndAboveTask<SendLocalListParams, S
     }
 
     @Override
-    public AsyncHandler<ocpp.cp._2012._06.SendLocalListResponse> getOcpp15Handler(String chargeBoxId) {
+    public AsyncHandler<ocpp.cp._2012._06.SendLocalListResponse> getOcpp15Handler(
+            String chargeBoxId) {
         return res -> {
             try {
                 success(chargeBoxId, res.get().getStatus().value());
@@ -77,7 +80,8 @@ public class SendLocalListTask extends Ocpp15AndAboveTask<SendLocalListParams, S
     }
 
     @Override
-    public AsyncHandler<ocpp.cp._2015._10.SendLocalListResponse> getOcpp16Handler(String chargeBoxId) {
+    public AsyncHandler<ocpp.cp._2015._10.SendLocalListResponse> getOcpp16Handler(
+            String chargeBoxId) {
         return res -> {
             try {
                 success(chargeBoxId, res.get().getStatus().value());
@@ -91,7 +95,8 @@ public class SendLocalListTask extends Ocpp15AndAboveTask<SendLocalListParams, S
     // Helpers
     // -------------------------------------------------------------------------
 
-    private ocpp.cp._2015._10.SendLocalListRequest createOcpp16Request(OcppTagService ocppTagService) {
+    private ocpp.cp._2015._10.SendLocalListRequest createOcpp16Request(
+            OcppTagService ocppTagService) {
         // DIFFERENTIAL update
         if (params.getUpdateType() == SendLocalListUpdateType.DIFFERENTIAL) {
             List<ocpp.cp._2015._10.AuthorizationData> auths = new ArrayList<>();
@@ -127,9 +132,12 @@ public class SendLocalListTask extends Ocpp15AndAboveTask<SendLocalListParams, S
     private static List<ocpp.cp._2012._06.AuthorisationData> toOcpp15(
             List<ocpp.cp._2015._10.AuthorizationData> ocpp16) {
         return ocpp16.stream()
-                     .map(k -> new ocpp.cp._2012._06.AuthorisationData().withIdTag(k.getIdTag())
-                                                                        .withIdTagInfo(toOcpp15(k.getIdTagInfo())))
-                     .collect(Collectors.toList());
+                .map(
+                        k ->
+                                new ocpp.cp._2012._06.AuthorisationData()
+                                        .withIdTag(k.getIdTag())
+                                        .withIdTagInfo(toOcpp15(k.getIdTagInfo())))
+                .collect(Collectors.toList());
     }
 
     private static ocpp.cp._2012._06.IdTagInfo toOcpp15(ocpp.cp._2015._10.IdTagInfo ocpp16) {

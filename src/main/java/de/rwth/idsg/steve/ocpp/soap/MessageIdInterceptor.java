@@ -29,12 +29,11 @@ import org.apache.cxf.ws.addressing.ContextUtils;
 import static org.apache.cxf.ws.addressing.JAXWSAConstants.ADDRESSING_PROPERTIES_INBOUND;
 
 /**
- * There are some implementations of SOAP/WS-A, which leave the required MessageID element out.
- * This behaviour is incorrect! Since CXF throws an exception in absence of this element,
- * we provide a workaround which adds this SOAP header to the incoming message.
+ * There are some implementations of SOAP/WS-A, which leave the required MessageID element out. This
+ * behaviour is incorrect! Since CXF throws an exception in absence of this element, we provide a
+ * workaround which adds this SOAP header to the incoming message.
  *
- * Further reading:
- * http://www.w3.org/TR/2006/REC-ws-addr-core-20060509/#formreplymsg
+ * <p>Further reading: http://www.w3.org/TR/2006/REC-ws-addr-core-20060509/#formreplymsg
  * http://comments.gmane.org/gmane.comp.apache.cxf.user/17599
  *
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -50,7 +49,8 @@ public class MessageIdInterceptor extends AbstractPhaseInterceptor<Message> {
 
     @Override
     public void handleMessage(Message message) throws Fault {
-        AddressingProperties addressProp = (AddressingProperties) message.get(ADDRESSING_PROPERTIES_INBOUND);
+        AddressingProperties addressProp =
+                (AddressingProperties) message.get(ADDRESSING_PROPERTIES_INBOUND);
 
         // Ws-Addressing is not used in the message. Early exit
         if (addressProp == null) {
@@ -62,5 +62,4 @@ public class MessageIdInterceptor extends AbstractPhaseInterceptor<Message> {
             addressProp.setMessageID(ContextUtils.getAttributedURI(ContextUtils.generateUUID()));
         }
     }
-
 }

@@ -39,8 +39,8 @@ import static de.rwth.idsg.steve.NotificationFeature.OcppStationBooted;
 import static de.rwth.idsg.steve.NotificationFeature.OcppStationStatusFailure;
 import static de.rwth.idsg.steve.NotificationFeature.OcppStationWebSocketConnected;
 import static de.rwth.idsg.steve.NotificationFeature.OcppStationWebSocketDisconnected;
-import static de.rwth.idsg.steve.NotificationFeature.OcppTransactionStarted;
 import static de.rwth.idsg.steve.NotificationFeature.OcppTransactionEnded;
+import static de.rwth.idsg.steve.NotificationFeature.OcppTransactionStarted;
 import static java.lang.String.format;
 
 /**
@@ -62,7 +62,10 @@ public class NotificationService {
         String subject = format("Received boot notification from '%s'", notification.getChargeBoxId());
         String body;
         if (notification.getStatus().isPresent()) {
-            body = format("Charging station '%s' is in database and has registration status '%s'.", notification.getChargeBoxId(), notification.getStatus().get().value());
+            body =
+                    format(
+                            "Charging station '%s' is in database and has registration status '%s'.",
+                            notification.getChargeBoxId(), notification.getStatus().get().value());
         } else {
             body = format("Charging station '%s' is NOT in database", notification.getChargeBoxId());
         }
@@ -76,7 +79,8 @@ public class NotificationService {
             return;
         }
 
-        String subject = format("Connected to JSON charging station '%s'", notification.getChargeBoxId());
+        String subject =
+                format("Connected to JSON charging station '%s'", notification.getChargeBoxId());
 
         mailService.sendAsync(subject, addTimestamp(""));
     }
@@ -87,7 +91,8 @@ public class NotificationService {
             return;
         }
 
-        String subject = format("Disconnected from JSON charging station '%s'", notification.getChargeBoxId());
+        String subject =
+                format("Disconnected from JSON charging station '%s'", notification.getChargeBoxId());
 
         mailService.sendAsync(subject, addTimestamp(""));
     }
@@ -98,7 +103,10 @@ public class NotificationService {
             return;
         }
 
-        String subject = format("Connector '%s' of charging station '%s' is FAULTED", notification.getConnectorId(), notification.getChargeBoxId());
+        String subject =
+                format(
+                        "Connector '%s' of charging station '%s' is FAULTED",
+                        notification.getConnectorId(), notification.getChargeBoxId());
         String body = format("Status Error Code: '%s'", notification.getErrorCode());
 
         mailService.sendAsync(subject, addTimestamp(body));
@@ -110,18 +118,26 @@ public class NotificationService {
             return;
         }
 
-        String subject = format("Transaction '%s' has started on charging station '%s' on connector '%s'", notification.getTransactionId(), notification.getParams().getChargeBoxId(), notification.getParams().getConnectorId());
+        String subject =
+                format(
+                        "Transaction '%s' has started on charging station '%s' on connector '%s'",
+                        notification.getTransactionId(),
+                        notification.getParams().getChargeBoxId(),
+                        notification.getParams().getConnectorId());
 
         mailService.sendAsync(subject, addTimestamp(createContent(notification.getParams())));
     }
 
     @EventListener
     public void ocppTransactionEnded(OcppTransactionEnded notification) {
-       if (isDisabled(OcppTransactionEnded)) {
+        if (isDisabled(OcppTransactionEnded)) {
             return;
         }
 
-        String subject = format("Transaction '%s' has ended on charging station '%s'", notification.getParams().getTransactionId(), notification.getParams().getChargeBoxId());
+        String subject =
+                format(
+                        "Transaction '%s' has ended on charging station '%s'",
+                        notification.getParams().getTransactionId(), notification.getParams().getChargeBoxId());
 
         mailService.sendAsync(subject, addTimestamp(createContent(notification.getParams())));
     }
@@ -130,39 +146,61 @@ public class NotificationService {
     // Private helpers
     // -------------------------------------------------------------------------
 
-
     private static String createContent(InsertTransactionParams params) {
-        StringBuilder sb = new StringBuilder("Details:").append(System.lineSeparator())
-            .append("- chargeBoxId: ").append(params.getChargeBoxId()).append(System.lineSeparator())
-            .append("- connectorId: ").append(params.getConnectorId()).append(System.lineSeparator())
-            .append("- idTag: ").append(params.getIdTag()).append(System.lineSeparator())
-            .append("- startTimestamp: ").append(params.getStartTimestamp()).append(System.lineSeparator())
-            .append("- startMeterValue: ").append(params.getStartMeterValue());
+        StringBuilder sb =
+                new StringBuilder("Details:")
+                        .append(System.lineSeparator())
+                        .append("- chargeBoxId: ")
+                        .append(params.getChargeBoxId())
+                        .append(System.lineSeparator())
+                        .append("- connectorId: ")
+                        .append(params.getConnectorId())
+                        .append(System.lineSeparator())
+                        .append("- idTag: ")
+                        .append(params.getIdTag())
+                        .append(System.lineSeparator())
+                        .append("- startTimestamp: ")
+                        .append(params.getStartTimestamp())
+                        .append(System.lineSeparator())
+                        .append("- startMeterValue: ")
+                        .append(params.getStartMeterValue());
 
         if (params.isSetReservationId()) {
-            sb.append(System.lineSeparator()).append("- reservationId: ").append(params.getReservationId());
+            sb.append(System.lineSeparator())
+                    .append("- reservationId: ")
+                    .append(params.getReservationId());
         }
 
         return sb.toString();
     }
 
     private static String createContent(UpdateTransactionParams params) {
-        return new StringBuilder("Details:").append(System.lineSeparator())
-            .append("- chargeBoxId: ").append(params.getChargeBoxId()).append(System.lineSeparator())
-            .append("- transactionId: ").append(params.getTransactionId()).append(System.lineSeparator())
-            .append("- stopTimestamp: ").append(params.getStopTimestamp()).append(System.lineSeparator())
-            .append("- stopMeterValue: ").append(params.getStopMeterValue()).append(System.lineSeparator())
-            .append("- stopReason: ").append(params.getStopReason())
-            .toString();
+        return new StringBuilder("Details:")
+                .append(System.lineSeparator())
+                .append("- chargeBoxId: ")
+                .append(params.getChargeBoxId())
+                .append(System.lineSeparator())
+                .append("- transactionId: ")
+                .append(params.getTransactionId())
+                .append(System.lineSeparator())
+                .append("- stopTimestamp: ")
+                .append(params.getStopTimestamp())
+                .append(System.lineSeparator())
+                .append("- stopMeterValue: ")
+                .append(params.getStopMeterValue())
+                .append(System.lineSeparator())
+                .append("- stopReason: ")
+                .append(params.getStopReason())
+                .toString();
     }
-
 
     private boolean isDisabled(NotificationFeature f) {
         MailSettings settings = mailService.getSettings();
 
-        boolean isEnabled = settings.isEnabled()
-                && settings.getEnabledFeatures().contains(f)
-                && !settings.getRecipients().isEmpty();
+        boolean isEnabled =
+                settings.isEnabled()
+                        && settings.getEnabledFeatures().contains(f)
+                        && !settings.getRecipients().isEmpty();
 
         return !isEnabled;
     }
@@ -177,5 +215,4 @@ public class NotificationService {
             return body + newLine + "--" + newLine + eventTs;
         }
     }
-
 }

@@ -44,9 +44,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- *
  * @author Sevket Goekay <sevketgokay@gmail.com>
- *
  */
 @Controller
 @RequestMapping(value = "/manager/chargepoints")
@@ -57,13 +55,15 @@ public class ChargePointsController {
 
     protected static final String PARAMS = "params";
 
-    private static final List<String> upToOcpp15RegistrationStatusList = Arrays.stream(ocpp.cs._2012._06.RegistrationStatus.values())
-                                                                               .map(ocpp.cs._2012._06.RegistrationStatus::value)
-                                                                               .collect(Collectors.toList());
+    private static final List<String> upToOcpp15RegistrationStatusList =
+            Arrays.stream(ocpp.cs._2012._06.RegistrationStatus.values())
+                    .map(ocpp.cs._2012._06.RegistrationStatus::value)
+                    .collect(Collectors.toList());
 
-    private static final List<String> ocpp16RegistrationStatusList = Arrays.stream(ocpp.cs._2015._10.RegistrationStatus.values())
-                                                                           .map(ocpp.cs._2015._10.RegistrationStatus::value)
-                                                                           .collect(Collectors.toList());
+    private static final List<String> ocpp16RegistrationStatusList =
+            Arrays.stream(ocpp.cs._2015._10.RegistrationStatus.values())
+                    .map(ocpp.cs._2015._10.RegistrationStatus::value)
+                    .collect(Collectors.toList());
 
     // -------------------------------------------------------------------------
     // Paths
@@ -145,8 +145,10 @@ public class ChargePointsController {
     }
 
     @RequestMapping(params = "add", value = ADD_SINGLE_PATH, method = RequestMethod.POST)
-    public String addSinglePost(@Valid @ModelAttribute("chargePointForm") ChargePointForm chargePointForm,
-                                BindingResult result, Model model) {
+    public String addSinglePost(
+            @Valid @ModelAttribute("chargePointForm") ChargePointForm chargePointForm,
+            BindingResult result,
+            Model model) {
         if (result.hasErrors()) {
             setCommonAttributesForSingleAdd(model);
             return "data-man/chargepointAdd";
@@ -157,8 +159,10 @@ public class ChargePointsController {
     }
 
     @RequestMapping(value = ADD_BATCH_PATH, method = RequestMethod.POST)
-    public String addBatchPost(@Valid @ModelAttribute("batchChargePointForm") ChargePointBatchInsertForm form,
-                               BindingResult result, Model model) {
+    public String addBatchPost(
+            @Valid @ModelAttribute("batchChargePointForm") ChargePointBatchInsertForm form,
+            BindingResult result,
+            Model model) {
         if (result.hasErrors()) {
             addCountryCodes(model);
             model.addAttribute("chargePointForm", new ChargePointForm());
@@ -170,8 +174,10 @@ public class ChargePointsController {
     }
 
     @RequestMapping(params = "update", value = UPDATE_PATH, method = RequestMethod.POST)
-    public String update(@Valid @ModelAttribute("chargePointForm") ChargePointForm chargePointForm,
-                         BindingResult result, Model model) {
+    public String update(
+            @Valid @ModelAttribute("chargePointForm") ChargePointForm chargePointForm,
+            BindingResult result,
+            Model model) {
         if (result.hasErrors()) {
             addCountryCodes(model);
             return "data-man/chargepointDetails";
@@ -228,7 +234,8 @@ public class ChargePointsController {
     private void setCommonAttributesForSingleAdd(Model model) {
         addCountryCodes(model);
         model.addAttribute("batchChargePointForm", new ChargePointBatchInsertForm());
-        // we don't know the protocol yet. but, a list with only "accepted" and "rejected" is a good starting point.
+        // we don't know the protocol yet. but, a list with only "accepted" and "rejected" is a good
+        // starting point.
         model.addAttribute("registrationStatusList", upToOcpp15RegistrationStatusList);
     }
 

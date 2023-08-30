@@ -38,7 +38,8 @@ public abstract class ConcurrentWebSocketHandler implements WebSocketHandler {
     private static final int sendTimeLimit = (int) TimeUnit.SECONDS.toMillis(10);
     private static final int bufferSizeLimit = 5 * WebSocketConfiguration.MAX_MSG_SIZE;
 
-    private final Map<String, ConcurrentWebSocketSessionDecorator> sessions = new ConcurrentHashMap<>();
+    private final Map<String, ConcurrentWebSocketSessionDecorator> sessions =
+            new ConcurrentHashMap<>();
 
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
@@ -46,7 +47,8 @@ public abstract class ConcurrentWebSocketHandler implements WebSocketHandler {
     }
 
     @Override
-    public void handleMessage(WebSocketSession session, WebSocketMessage<?> message) throws Exception {
+    public void handleMessage(WebSocketSession session, WebSocketMessage<?> message)
+            throws Exception {
         this.onMessage(internalGet(session), message);
     }
 
@@ -56,12 +58,15 @@ public abstract class ConcurrentWebSocketHandler implements WebSocketHandler {
     }
 
     @Override
-    public void afterConnectionClosed(WebSocketSession session, CloseStatus closeStatus) throws Exception {
+    public void afterConnectionClosed(WebSocketSession session, CloseStatus closeStatus)
+            throws Exception {
         this.onClose(sessions.remove(session.getId()), closeStatus);
     }
 
     private ConcurrentWebSocketSessionDecorator internalGet(WebSocketSession session) {
-        return sessions.computeIfAbsent(session.getId(), s -> new ConcurrentWebSocketSessionDecorator(session, sendTimeLimit, bufferSizeLimit));
+        return sessions.computeIfAbsent(
+                session.getId(),
+                s -> new ConcurrentWebSocketSessionDecorator(session, sendTimeLimit, bufferSizeLimit));
     }
 
     // -------------------------------------------------------------------------
@@ -69,7 +74,10 @@ public abstract class ConcurrentWebSocketHandler implements WebSocketHandler {
     // -------------------------------------------------------------------------
 
     abstract void onMessage(WebSocketSession session, WebSocketMessage<?> message) throws Exception;
+
     abstract void onOpen(WebSocketSession session) throws Exception;
+
     abstract void onClose(WebSocketSession session, CloseStatus closeStatus) throws Exception;
+
     abstract void onError(WebSocketSession session, Throwable throwable) throws Exception;
 }

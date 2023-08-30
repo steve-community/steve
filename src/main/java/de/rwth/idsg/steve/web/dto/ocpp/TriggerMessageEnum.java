@@ -24,7 +24,6 @@ package de.rwth.idsg.steve.web.dto.ocpp;
  * @since 20.03.2018
  */
 public enum TriggerMessageEnum {
-
     BootNotification("BootNotification"),
     DiagnosticsStatusNotification("DiagnosticsStatusNotification"),
     FirmwareStatusNotification("FirmwareStatusNotification"),
@@ -51,4 +50,3 @@ public enum TriggerMessageEnum {
         throw new IllegalArgumentException(v);
     }
 }
-

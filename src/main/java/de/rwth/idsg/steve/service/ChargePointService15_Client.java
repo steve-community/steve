@@ -51,8 +51,7 @@ import java.util.List;
  */
 @Slf4j
 @Service
-@Qualifier("ChargePointService15_Client")
-public class ChargePointService15_Client extends ChargePointService12_Client {
+@Qualifier("ChargePointService15_Client") public class ChargePointService15_Client extends ChargePointService12_Client {
 
     @Autowired protected OcppTagService ocppTagService;
     @Autowired protected ReservationRepository reservationRepository;
@@ -81,8 +80,8 @@ public class ChargePointService15_Client extends ChargePointService12_Client {
         DataTransferTask task = new DataTransferTask(getVersion(), params);
 
         BackgroundService.with(executorService)
-                         .forEach(task.getParams().getChargePointSelectList())
-                         .execute(c -> getOcpp15Invoker().dataTransfer(c, task));
+                .forEach(task.getParams().getChargePointSelectList())
+                .execute(c -> getOcpp15Invoker().dataTransfer(c, task));
 
         return taskStore.add(task);
     }
@@ -91,8 +90,8 @@ public class ChargePointService15_Client extends ChargePointService12_Client {
         GetConfigurationTask task = new GetConfigurationTask(getVersion(), params);
 
         BackgroundService.with(executorService)
-                         .forEach(task.getParams().getChargePointSelectList())
-                         .execute(c -> getOcpp15Invoker().getConfiguration(c, task));
+                .forEach(task.getParams().getChargePointSelectList())
+                .execute(c -> getOcpp15Invoker().getConfiguration(c, task));
 
         return taskStore.add(task);
     }
@@ -101,8 +100,8 @@ public class ChargePointService15_Client extends ChargePointService12_Client {
         GetLocalListVersionTask task = new GetLocalListVersionTask(getVersion(), params);
 
         BackgroundService.with(executorService)
-                         .forEach(task.getParams().getChargePointSelectList())
-                         .execute(c -> getOcpp15Invoker().getLocalListVersion(c, task));
+                .forEach(task.getParams().getChargePointSelectList())
+                .execute(c -> getOcpp15Invoker().getLocalListVersion(c, task));
 
         return taskStore.add(task);
     }
@@ -111,12 +110,11 @@ public class ChargePointService15_Client extends ChargePointService12_Client {
         SendLocalListTask task = new SendLocalListTask(getVersion(), params, ocppTagService);
 
         BackgroundService.with(executorService)
-                         .forEach(task.getParams().getChargePointSelectList())
-                         .execute(c -> getOcpp15Invoker().sendLocalList(c, task));
+                .forEach(task.getParams().getChargePointSelectList())
+                .execute(c -> getOcpp15Invoker().sendLocalList(c, task));
 
         return taskStore.add(task);
     }
-
 
     // -------------------------------------------------------------------------
     // Single Execution - since OCPP 1.5
@@ -124,36 +122,37 @@ public class ChargePointService15_Client extends ChargePointService12_Client {
 
     public int reserveNow(ReserveNowParams params) {
         List<ChargePointSelect> list = params.getChargePointSelectList();
-        InsertReservationParams res = InsertReservationParams.builder()
-                                                             .idTag(params.getIdTag())
-                                                             .chargeBoxId(list.get(0).getChargeBoxId())
-                                                             .connectorId(params.getConnectorId())
-                                                             .startTimestamp(DateTime.now())
-                                                             .expiryTimestamp(params.getExpiry().toDateTime())
-                                                             .build();
+        InsertReservationParams res =
+                InsertReservationParams.builder()
+                        .idTag(params.getIdTag())
+                        .chargeBoxId(list.get(0).getChargeBoxId())
+                        .connectorId(params.getConnectorId())
+                        .startTimestamp(DateTime.now())
+                        .expiryTimestamp(params.getExpiry().toDateTime())
+                        .build();
 
         int reservationId = reservationRepository.insert(res);
         String parentIdTag = ocppTagService.getParentIdtag(params.getIdTag());
 
-        EnhancedReserveNowParams enhancedParams = new EnhancedReserveNowParams(params, reservationId, parentIdTag);
+        EnhancedReserveNowParams enhancedParams =
+                new EnhancedReserveNowParams(params, reservationId, parentIdTag);
         ReserveNowTask task = new ReserveNowTask(getVersion(), enhancedParams, reservationRepository);
 
         BackgroundService.with(executorService)
-                         .forFirst(task.getParams().getChargePointSelectList())
-                         .execute(c -> getOcpp15Invoker().reserveNow(c, task));
+                .forFirst(task.getParams().getChargePointSelectList())
+                .execute(c -> getOcpp15Invoker().reserveNow(c, task));
 
         return taskStore.add(task);
     }
 
     public int cancelReservation(CancelReservationParams params) {
-        CancelReservationTask task = new CancelReservationTask(getVersion(), params, reservationRepository);
+        CancelReservationTask task =
+                new CancelReservationTask(getVersion(), params, reservationRepository);
 
         BackgroundService.with(executorService)
-                         .forFirst(task.getParams().getChargePointSelectList())
-                         .execute(c -> getOcpp15Invoker().cancelReservation(c, task));
+                .forFirst(task.getParams().getChargePointSelectList())
+                .execute(c -> getOcpp15Invoker().cancelReservation(c, task));
 
         return taskStore.add(task);
     }
-
-
 }

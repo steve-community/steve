@@ -44,9 +44,7 @@ import java.util.Map;
 
 import static de.rwth.idsg.steve.SteveConfiguration.CONFIG;
 
-/**
- * Taken from http://cxf.apache.org/docs/service-routing.html and modified.
- */
+/** Taken from http://cxf.apache.org/docs/service-routing.html and modified. */
 @Slf4j
 public class MediatorInInterceptor extends AbstractPhaseInterceptor<SoapMessage> {
 
@@ -100,10 +98,9 @@ public class MediatorInInterceptor extends AbstractPhaseInterceptor<SoapMessage>
     }
 
     /**
-     * Iterate over all available servers registered on the bus and build a map
-     * consisting of (namespace, server) pairs for later lookup, so we can
-     * redirect to the version-specific implementation according to the namespace
-     * of the incoming message.
+     * Iterate over all available servers registered on the bus and build a map consisting of
+     * (namespace, server) pairs for later lookup, so we can redirect to the version-specific
+     * implementation according to the namespace of the incoming message.
      */
     private static Map<String, Server> initServerLookupMap(Bus bus) {
         String exceptionMsg = "The services are not created and/or registered to the bus yet.";

@@ -67,137 +67,135 @@ public class StressTestJsonOCPP16 extends StressTest {
         final List<String> idTags = getRandomStrings(ID_TAG_COUNT);
         final List<String> chargeBoxIds = getRandomStrings(CHARGE_BOX_COUNT);
 
-        StressTester.Runnable runnable = new StressTester.Runnable() {
+        StressTester.Runnable runnable =
+                new StressTester.Runnable() {
 
-            private final ThreadLocal<OcppJsonChargePoint> threadLocalChargePoint = new ThreadLocal<>();
+                    private final ThreadLocal<OcppJsonChargePoint> threadLocalChargePoint =
+                            new ThreadLocal<>();
 
-            @Override
-            public void beforeRepeat() {
-                ThreadLocalRandom localRandom = ThreadLocalRandom.current();
+                    @Override
+                    public void beforeRepeat() {
+                        ThreadLocalRandom localRandom = ThreadLocalRandom.current();
 
-                String chargeBoxId = chargeBoxIds.get(localRandom.nextInt(chargeBoxIds.size()));
-                threadLocalChargePoint.set(new OcppJsonChargePoint(VERSION, chargeBoxId, PATH));
+                        String chargeBoxId = chargeBoxIds.get(localRandom.nextInt(chargeBoxIds.size()));
+                        threadLocalChargePoint.set(new OcppJsonChargePoint(VERSION, chargeBoxId, PATH));
 
-                OcppJsonChargePoint chargePoint = threadLocalChargePoint.get();
-                chargePoint.start();
+                        OcppJsonChargePoint chargePoint = threadLocalChargePoint.get();
+                        chargePoint.start();
 
-                chargePoint.prepare(
-                        new BootNotificationRequest()
-                                .withChargePointVendor(getRandomString())
-                                .withChargePointModel(getRandomString()),
-                        BootNotificationResponse.class,
-                        bootResponse ->  Assertions.assertEquals(RegistrationStatus.ACCEPTED, bootResponse.getStatus()),
-                        error -> Assertions.fail()
-                );
-            }
+                        chargePoint.prepare(
+                                new BootNotificationRequest()
+                                        .withChargePointVendor(getRandomString())
+                                        .withChargePointModel(getRandomString()),
+                                BootNotificationResponse.class,
+                                bootResponse ->
+                                        Assertions.assertEquals(RegistrationStatus.ACCEPTED, bootResponse.getStatus()),
+                                error -> Assertions.fail());
+                    }
 
-            @Override
-            public void toRepeat() {
-                ThreadLocalRandom localRandom = ThreadLocalRandom.current();
+                    @Override
+                    public void toRepeat() {
+                        ThreadLocalRandom localRandom = ThreadLocalRandom.current();
 
-                OcppJsonChargePoint chargePoint = threadLocalChargePoint.get();
+                        OcppJsonChargePoint chargePoint = threadLocalChargePoint.get();
 
-                String idTag = idTags.get(localRandom.nextInt(idTags.size()));
-                int connectorId = localRandom.nextInt(1, CONNECTOR_COUNT_PER_CHARGE_BOX + 1);
-                int transactionStart = localRandom.nextInt(0, Integer.MAX_VALUE);
-                int transactionStop = localRandom.nextInt(transactionStart + 1, Integer.MAX_VALUE);
+                        String idTag = idTags.get(localRandom.nextInt(idTags.size()));
+                        int connectorId = localRandom.nextInt(1, CONNECTOR_COUNT_PER_CHARGE_BOX + 1);
+                        int transactionStart = localRandom.nextInt(0, Integer.MAX_VALUE);
+                        int transactionStop = localRandom.nextInt(transactionStart + 1, Integer.MAX_VALUE);
 
-                chargePoint.prepare(
-                        new HeartbeatRequest(), HeartbeatResponse.class,
-                        Assertions::assertNotNull,
-                        error -> Assertions.fail()
-                );
+                        chargePoint.prepare(
+                                new HeartbeatRequest(),
+                                HeartbeatResponse.class,
+                                Assertions::assertNotNull,
+                                error -> Assertions.fail());
 
-                for (int i = 0; i <= CONNECTOR_COUNT_PER_CHARGE_BOX; i++) {
-                    chargePoint.prepare(
-                            new StatusNotificationRequest()
-                                    .withErrorCode(ChargePointErrorCode.NO_ERROR)
-                                    .withStatus(ChargePointStatus.AVAILABLE)
-                                    .withConnectorId(i)
-                                    .withTimestamp(DateTime.now()),
-                            StatusNotificationResponse.class,
-                            Assertions::assertNotNull,
-                            error -> Assertions.fail()
-                    );
-                }
+                        for (int i = 0; i <= CONNECTOR_COUNT_PER_CHARGE_BOX; i++) {
+                            chargePoint.prepare(
+                                    new StatusNotificationRequest()
+                                            .withErrorCode(ChargePointErrorCode.NO_ERROR)
+                                            .withStatus(ChargePointStatus.AVAILABLE)
+                                            .withConnectorId(i)
+                                            .withTimestamp(DateTime.now()),
+                                    StatusNotificationResponse.class,
+                                    Assertions::assertNotNull,
+                                    error -> Assertions.fail());
+                        }
 
-                chargePoint.prepare(
-                        new AuthorizeRequest().withIdTag(idTag),
-                        AuthorizeResponse.class,
-                        response -> Assertions.assertNotEquals(AuthorizationStatus.ACCEPTED, response.getIdTagInfo().getStatus()),
-                        error -> Assertions.fail()
-                );
+                        chargePoint.prepare(
+                                new AuthorizeRequest().withIdTag(idTag),
+                                AuthorizeResponse.class,
+                                response ->
+                                        Assertions.assertNotEquals(
+                                                AuthorizationStatus.ACCEPTED, response.getIdTagInfo().getStatus()),
+                                error -> Assertions.fail());
 
-                final AtomicInteger transactionId = new AtomicInteger(-1);
+                        final AtomicInteger transactionId = new AtomicInteger(-1);
 
-                chargePoint.prepare(
-                        new StartTransactionRequest()
-                                .withConnectorId(connectorId)
-                                .withIdTag(idTag)
-                                .withTimestamp(DateTime.now())
-                                .withMeterStart(transactionStart),
-                        StartTransactionResponse.class,
-                        response -> {
-                            Assertions.assertNotNull(response);
-                            transactionId.set(response.getTransactionId());
-                        },
-                        error -> Assertions.fail()
-                );
+                        chargePoint.prepare(
+                                new StartTransactionRequest()
+                                        .withConnectorId(connectorId)
+                                        .withIdTag(idTag)
+                                        .withTimestamp(DateTime.now())
+                                        .withMeterStart(transactionStart),
+                                StartTransactionResponse.class,
+                                response -> {
+                                    Assertions.assertNotNull(response);
+                                    transactionId.set(response.getTransactionId());
+                                },
+                                error -> Assertions.fail());
 
-                // wait for StartTransactionResponse to arrive, since we need the transactionId from now on
-                chargePoint.process();
+                        // wait for StartTransactionResponse to arrive, since we need the transactionId from now
+                        // on
+                        chargePoint.process();
 
-                chargePoint.prepare(
-                        new StatusNotificationRequest()
-                                .withErrorCode(ChargePointErrorCode.NO_ERROR)
-                                .withStatus(ChargePointStatus.CHARGING)
-                                .withConnectorId(connectorId)
-                                .withTimestamp(DateTime.now()),
-                        StatusNotificationResponse.class,
-                        Assertions::assertNotNull,
-                        error -> Assertions.fail()
-                );
+                        chargePoint.prepare(
+                                new StatusNotificationRequest()
+                                        .withErrorCode(ChargePointErrorCode.NO_ERROR)
+                                        .withStatus(ChargePointStatus.CHARGING)
+                                        .withConnectorId(connectorId)
+                                        .withTimestamp(DateTime.now()),
+                                StatusNotificationResponse.class,
+                                Assertions::assertNotNull,
+                                error -> Assertions.fail());
 
-                chargePoint.prepare(
-                        new MeterValuesRequest()
-                                .withConnectorId(connectorId)
-                                .withTransactionId(transactionId.get())
-                                .withMeterValue(getMeterValues(transactionStart, transactionStop)),
-                        MeterValuesResponse.class,
-                        Assertions::assertNotNull,
-                        error -> Assertions.fail()
-                );
+                        chargePoint.prepare(
+                                new MeterValuesRequest()
+                                        .withConnectorId(connectorId)
+                                        .withTransactionId(transactionId.get())
+                                        .withMeterValue(getMeterValues(transactionStart, transactionStop)),
+                                MeterValuesResponse.class,
+                                Assertions::assertNotNull,
+                                error -> Assertions.fail());
 
-                chargePoint.prepare(
-                        new StopTransactionRequest()
-                                .withTransactionId(transactionId.get())
-                                .withTimestamp(DateTime.now())
-                                .withIdTag(idTag)
-                                .withMeterStop(transactionStop),
-                        StopTransactionResponse.class,
-                        Assertions::assertNotNull,
-                        error -> Assertions.fail()
-                );
+                        chargePoint.prepare(
+                                new StopTransactionRequest()
+                                        .withTransactionId(transactionId.get())
+                                        .withTimestamp(DateTime.now())
+                                        .withIdTag(idTag)
+                                        .withMeterStop(transactionStop),
+                                StopTransactionResponse.class,
+                                Assertions::assertNotNull,
+                                error -> Assertions.fail());
 
-                chargePoint.prepare(
-                        new StatusNotificationRequest()
-                                .withErrorCode(ChargePointErrorCode.NO_ERROR)
-                                .withStatus(ChargePointStatus.AVAILABLE)
-                                .withConnectorId(connectorId)
-                                .withTimestamp(DateTime.now()),
-                        StatusNotificationResponse.class,
-                        Assertions::assertNotNull,
-                        error -> Assertions.fail()
-                );
+                        chargePoint.prepare(
+                                new StatusNotificationRequest()
+                                        .withErrorCode(ChargePointErrorCode.NO_ERROR)
+                                        .withStatus(ChargePointStatus.AVAILABLE)
+                                        .withConnectorId(connectorId)
+                                        .withTimestamp(DateTime.now()),
+                                StatusNotificationResponse.class,
+                                Assertions::assertNotNull,
+                                error -> Assertions.fail());
 
-                chargePoint.process();
-            }
+                        chargePoint.process();
+                    }
 
-            @Override
-            public void afterRepeat() {
-                threadLocalChargePoint.get().close();
-            }
-        };
+                    @Override
+                    public void afterRepeat() {
+                        threadLocalChargePoint.get().close();
+                    }
+                };
 
         StressTester tester = new StressTester(THREAD_COUNT, REPEAT_COUNT_PER_THREAD);
         tester.test(runnable);

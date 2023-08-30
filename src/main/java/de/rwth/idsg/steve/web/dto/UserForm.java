@@ -46,12 +46,10 @@ public class UserForm {
     private String phone;
     private String note;
 
-    @NotNull(message = "Sex is required")
-    private UserSex sex;
+    @NotNull(message = "Sex is required") private UserSex sex;
 
     @Email(message = "Not a valid e-mail address")
     private String eMail;
 
     private Address address;
-
 }

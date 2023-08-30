@@ -40,19 +40,24 @@ public class StringUtilsTest {
 
     @Test
     public void testOperationName_ocpp12andMultiple() {
-        var operationName = StringUtils.getOperationName(new ClearCacheTask(null, new MultipleChargePointSelect()));
+        var operationName =
+                StringUtils.getOperationName(new ClearCacheTask(null, new MultipleChargePointSelect()));
         Assertions.assertEquals("Clear Cache", operationName);
     }
 
     @Test
     public void testOperationName_ocpp15andSingle() {
-        var operationName = StringUtils.getOperationName(new CancelReservationTask(null, new CancelReservationParams(), null));
+        var operationName =
+                StringUtils.getOperationName(
+                        new CancelReservationTask(null, new CancelReservationParams(), null));
         Assertions.assertEquals("Cancel Reservation", operationName);
     }
 
     @Test
     public void testOperationName_ocpp16() {
-        var operationName = StringUtils.getOperationName(new GetCompositeScheduleTask(null, new GetCompositeScheduleParams()));
+        var operationName =
+                StringUtils.getOperationName(
+                        new GetCompositeScheduleTask(null, new GetCompositeScheduleParams()));
         Assertions.assertEquals("Get Composite Schedule", operationName);
     }
 
@@ -85,7 +90,6 @@ public class StringUtilsTest {
         String val = StringUtils.joinByComma(Arrays.asList("hey", "ho", "hey"));
         Assertions.assertEquals("hey,ho", val);
     }
-
 
     @Test
     public void testSplitByComma_inputNull() {

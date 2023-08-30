@@ -35,19 +35,23 @@ public interface ReservationRepository {
 
     List<Integer> getActiveReservationIds(String chargeBoxId);
 
-    /**
-     * Returns the id of the reservation, if the reservation is inserted.
-     */
+    /** Returns the id of the reservation, if the reservation is inserted. */
     int insert(InsertReservationParams params);
 
     /**
-     * Deletes the temporarily inserted reservation, when
-     * 1) the charging station does not accept the reservation,
-     * 2) there is a technical problem (communication failure etc.) with the charging station,
+     * Deletes the temporarily inserted reservation, when 1) the charging station does not accept the
+     * reservation, 2) there is a technical problem (communication failure etc.) with the charging
+     * station,
      */
     void delete(int reservationId);
 
     void accepted(int reservationId);
+
     void cancelled(int reservationId);
-    void used(Select<Record1<Integer>> connectorPkSelect, String ocppIdTag, int reservationId, int transactionId);
+
+    void used(
+            Select<Record1<Integer>> connectorPkSelect,
+            String ocppIdTag,
+            int reservationId,
+            int transactionId);
 }

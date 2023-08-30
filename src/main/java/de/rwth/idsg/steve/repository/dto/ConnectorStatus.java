@@ -25,9 +25,7 @@ import lombok.Setter;
 import org.joda.time.DateTime;
 
 /**
- *
  * @author Sevket Goekay <sevketgokay@gmail.com>
- *
  */
 @Getter
 @Builder
@@ -43,7 +41,5 @@ public final class ConnectorStatus {
 
     // This is true, if the chargeBox this connector belongs to is a WS/JSON station
     // and it is disconnected at the moment of building this DTO.
-    @Setter
-    @Builder.Default
-    private boolean jsonAndDisconnected = false;
+    @Setter @Builder.Default private boolean jsonAndDisconnected = false;
 }

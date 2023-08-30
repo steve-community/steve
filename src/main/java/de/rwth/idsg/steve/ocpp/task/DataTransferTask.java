@@ -32,7 +32,8 @@ import javax.xml.ws.AsyncHandler;
  * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 09.03.2018
  */
-public class DataTransferTask extends Ocpp15AndAboveTask<DataTransferParams, DataTransferTask.ResponseWrapper> {
+public class DataTransferTask
+        extends Ocpp15AndAboveTask<DataTransferParams, DataTransferTask.ResponseWrapper> {
 
     public DataTransferTask(OcppVersion ocppVersion, DataTransferParams params) {
         super(ocppVersion, params);
@@ -55,9 +56,7 @@ public class DataTransferTask extends Ocpp15AndAboveTask<DataTransferParams, Dat
         };
     }
 
-    /**
-     * Dummy implementation. It must be vendor-specific.
-     */
+    /** Dummy implementation. It must be vendor-specific. */
     @Override
     public ocpp.cp._2012._06.DataTransferRequest getOcpp15Request() {
         return new ocpp.cp._2012._06.DataTransferRequest()
@@ -66,9 +65,7 @@ public class DataTransferTask extends Ocpp15AndAboveTask<DataTransferParams, Dat
                 .withVendorId(params.getVendorId());
     }
 
-    /**
-     * Dummy implementation. It must be vendor-specific.
-     */
+    /** Dummy implementation. It must be vendor-specific. */
     @Override
     public ocpp.cp._2015._10.DataTransferRequest getOcpp16Request() {
         return new ocpp.cp._2015._10.DataTransferRequest()

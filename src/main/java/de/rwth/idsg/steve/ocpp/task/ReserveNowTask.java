@@ -35,8 +35,10 @@ public class ReserveNowTask extends Ocpp15AndAboveTask<EnhancedReserveNowParams,
 
     private final ReservationRepository reservationRepository;
 
-    public ReserveNowTask(OcppVersion ocppVersion, EnhancedReserveNowParams params,
-                          ReservationRepository reservationRepository) {
+    public ReserveNowTask(
+            OcppVersion ocppVersion,
+            EnhancedReserveNowParams params,
+            ReservationRepository reservationRepository) {
         super(ocppVersion, params);
         this.reservationRepository = reservationRepository;
     }
@@ -114,5 +116,4 @@ public class ReserveNowTask extends Ocpp15AndAboveTask<EnhancedReserveNowParams,
     private void delete() {
         reservationRepository.delete(params.getReservationId());
     }
-
 }

@@ -19,7 +19,6 @@
 package de.rwth.idsg.steve.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.joda.JodaModule;
 import com.google.common.base.Strings;
 import de.rwth.idsg.steve.SteveProdCondition;
 import de.rwth.idsg.steve.web.api.ApiControllerAdvice;
@@ -67,10 +66,12 @@ import static de.rwth.idsg.steve.SteveConfiguration.CONFIG;
 public class SecurityConfiguration {
 
     /**
-     * Password encoding changed with spring-security 5.0.0. We either have to use a prefix before the password to
-     * indicate which actual encoder {@link DelegatingPasswordEncoder} should use [1, 2] or specify the encoder as we do.
+     * Password encoding changed with spring-security 5.0.0. We either have to use a prefix before the
+     * password to indicate which actual encoder {@link DelegatingPasswordEncoder} should use [1, 2]
+     * or specify the encoder as we do.
      *
-     * [1] https://spring.io/blog/2017/11/01/spring-security-5-0-0-rc1-released#password-storage-format
+     * <p>[1]
+     * https://spring.io/blog/2017/11/01/spring-security-5-0-0-rc1-released#password-storage-format
      * [2] {@link PasswordEncoderFactories#createDelegatingPasswordEncoder()}
      */
     @Bean
@@ -80,68 +81,62 @@ public class SecurityConfiguration {
 
     @Bean
     public UserDetailsService userDetailsService() {
-        UserDetails webPageUser = User.builder()
-                .username(CONFIG.getAuth().getUserName())
-                .password(CONFIG.getAuth().getEncodedPassword())
-                .roles("ADMIN")
-                .build();
+        UserDetails webPageUser =
+                User.builder()
+                        .username(CONFIG.getAuth().getUserName())
+                        .password(CONFIG.getAuth().getEncodedPassword())
+                        .roles("ADMIN")
+                        .build();
 
         return new InMemoryUserDetailsManager(webPageUser);
     }
 
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer() {
-        return (web) -> web.ignoring().antMatchers(
-            "/static/**",
-            CONFIG.getCxfMapping() + "/**"
-        );
+        return (web) -> web.ignoring().antMatchers("/static/**", CONFIG.getCxfMapping() + "/**");
     }
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         final String prefix = CONFIG.getSpringManagerMapping();
 
-        return http
-            .authorizeHttpRequests(
-                req -> req.antMatchers(prefix + "/**").hasRole("ADMIN")
-            )
-            .sessionManagement(
-                req -> req.invalidSessionUrl(prefix + "/signin")
-            )
-            .formLogin(
-                req -> req.loginPage(prefix + "/signin").permitAll()
-            )
-            .logout(
-                req -> req.logoutUrl(prefix + "/signout")
-            )
-            .build();
+        return http.authorizeHttpRequests(req -> req.antMatchers(prefix + "/**").hasRole("ADMIN"))
+                .sessionManagement(req -> req.invalidSessionUrl(prefix + "/signin"))
+                .formLogin(req -> req.loginPage(prefix + "/signin").permitAll())
+                .logout(req -> req.logoutUrl(prefix + "/signout"))
+                .build();
     }
 
     @Bean
     @Order(1)
-    public SecurityFilterChain apiKeyFilterChain(HttpSecurity http, ObjectMapper objectMapper) throws Exception {
+    public SecurityFilterChain apiKeyFilterChain(HttpSecurity http, ObjectMapper objectMapper)
+            throws Exception {
         return http.antMatcher(CONFIG.getApiMapping() + "/**")
-            .csrf().disable()
-            .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-            .and()
-            .addFilter(new ApiKeyFilter())
-            .authorizeRequests()
-            .anyRequest()
-            .authenticated()
-            .and()
-            .exceptionHandling().authenticationEntryPoint(new ApiKeyAuthenticationEntryPoint(objectMapper))
-            .and()
-            .build();
+                .csrf()
+                .disable()
+                .sessionManagement()
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                .and()
+                .addFilter(new ApiKeyFilter())
+                .authorizeRequests()
+                .anyRequest()
+                .authenticated()
+                .and()
+                .exceptionHandling()
+                .authenticationEntryPoint(new ApiKeyAuthenticationEntryPoint(objectMapper))
+                .and()
+                .build();
     }
 
     /**
-     * Enable Web APIs only if both properties for API key are set. This has two consequences:
-     * 1) Backwards compatibility: Existing installations with older properties file, that does not include these two
-     * new keys, will not expose the APIs. Every call will be blocked by default.
-     * 2) If you want to expose your APIs, you MUST set these properties. This action activates authentication (i.e.
-     * APIs without authentication are not possible, and this is a good thing).
+     * Enable Web APIs only if both properties for API key are set. This has two consequences: 1)
+     * Backwards compatibility: Existing installations with older properties file, that does not
+     * include these two new keys, will not expose the APIs. Every call will be blocked by default. 2)
+     * If you want to expose your APIs, you MUST set these properties. This action activates
+     * authentication (i.e. APIs without authentication are not possible, and this is a good thing).
      */
-    public static class ApiKeyFilter extends AbstractPreAuthenticatedProcessingFilter implements AuthenticationManager {
+    public static class ApiKeyFilter extends AbstractPreAuthenticatedProcessingFilter
+            implements AuthenticationManager {
 
         private final String headerKey;
         private final String headerValue;
@@ -155,7 +150,8 @@ public class SecurityConfiguration {
             isApiEnabled = !Strings.isNullOrEmpty(headerKey) && !Strings.isNullOrEmpty(headerValue);
 
             if (!isApiEnabled) {
-                log.warn("Web APIs will not be exposed. Reason: 'webapi.key' and 'webapi.value' are not set in config file");
+                log.warn(
+                        "Web APIs will not be exposed. Reason: 'webapi.key' and 'webapi.value' are not set in config file");
             }
         }
 
@@ -173,7 +169,8 @@ public class SecurityConfiguration {
         }
 
         @Override
-        public Authentication authenticate(Authentication authentication) throws AuthenticationException {
+        public Authentication authenticate(Authentication authentication)
+                throws AuthenticationException {
             if (!isApiEnabled) {
                 throw new DisabledException("Web APIs are not exposed");
             }
@@ -193,15 +190,18 @@ public class SecurityConfiguration {
         }
 
         @Override
-        public void commence(HttpServletRequest request, HttpServletResponse response,
-                             AuthenticationException authException) throws IOException, ServletException {
+        public void commence(
+                HttpServletRequest request,
+                HttpServletResponse response,
+                AuthenticationException authException)
+                throws IOException, ServletException {
             HttpStatus status = HttpStatus.UNAUTHORIZED;
 
-            var apiResponse = ApiControllerAdvice.createResponse(
-                request.getRequestURL().toString(),
-                status,
-                "Full authentication is required to access this resource"
-            );
+            var apiResponse =
+                    ApiControllerAdvice.createResponse(
+                            request.getRequestURL().toString(),
+                            status,
+                            "Full authentication is required to access this resource");
 
             response.setStatus(status.value());
             response.setContentType(MediaType.APPLICATION_JSON_VALUE);

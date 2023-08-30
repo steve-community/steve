@@ -86,8 +86,10 @@ public class AboutSettingsController {
     }
 
     @RequestMapping(params = "change", value = SETTINGS_PATH, method = RequestMethod.POST)
-    public String postSettings(@Valid @ModelAttribute("settingsForm") SettingsForm settingsForm,
-                               BindingResult result, Model model) {
+    public String postSettings(
+            @Valid @ModelAttribute("settingsForm") SettingsForm settingsForm,
+            BindingResult result,
+            Model model) {
         if (result.hasErrors()) {
             model.addAttribute("features", NotificationFeature.values());
             return "settings";
@@ -99,8 +101,10 @@ public class AboutSettingsController {
     }
 
     @RequestMapping(params = "testMail", value = SETTINGS_PATH, method = RequestMethod.POST)
-    public String testMail(@Valid @ModelAttribute("settingsForm") SettingsForm settingsForm,
-                           BindingResult result, Model model) {
+    public String testMail(
+            @Valid @ModelAttribute("settingsForm") SettingsForm settingsForm,
+            BindingResult result,
+            Model model) {
         if (result.hasErrors()) {
             model.addAttribute("features", NotificationFeature.values());
             return "settings";

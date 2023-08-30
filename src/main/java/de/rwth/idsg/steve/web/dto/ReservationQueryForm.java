@@ -39,9 +39,7 @@ public class ReservationQueryForm extends QueryForm {
 
     private QueryPeriodType periodType;
 
-    /**
-     * Init with sensible default values
-     */
+    /** Init with sensible default values */
     public ReservationQueryForm() {
         periodType = QueryPeriodType.ACTIVE;
     }
@@ -67,7 +65,7 @@ public class ReservationQueryForm extends QueryForm {
         @Getter private final String value;
 
         public static QueryPeriodType fromValue(String v) {
-            for (QueryPeriodType c: QueryPeriodType.values()) {
+            for (QueryPeriodType c : QueryPeriodType.values()) {
                 if (c.value.equals(v)) {
                     return c;
                 }

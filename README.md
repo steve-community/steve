@@ -1,17 +1,17 @@
-![SteVe](src/main/resources/webapp/static/images/logo.png) 
+![SteVe](src/main/resources/webapp/static/images/logo.png)
 
 [![build and run tests](https://github.com/steve-community/steve/actions/workflows/main.yml/badge.svg)](https://github.com/steve-community/steve/actions/workflows/main.yml)
 
 
 # Introduction
 
-SteVe started its life at the RWTH Aachen University [in 2013](https://github.com/steve-community/steve/issues/827). 
-The name is derived from _Steckdosenverwaltung_ in German (in English: socket administration). 
-The aim of SteVe is to support the deployment and popularity of electric mobility, so it is easy to install and to use. 
+SteVe started its life at the RWTH Aachen University [in 2013](https://github.com/steve-community/steve/issues/827).
+The name is derived from _Steckdosenverwaltung_ in German (in English: socket administration).
+The aim of SteVe is to support the deployment and popularity of electric mobility, so it is easy to install and to use.
 It provides basic functions for the administration of charge points, user data, and RFID cards for user authentication and was tested successfully in operation.
 
-SteVe is considered as an open platform to implement, test and evaluate novel ideas for electric mobility, like authentication protocols, reservation mechanisms for charge points, and business models for electric mobility. 
-The project is distributed under [GPL](LICENSE.txt) and is free to use. 
+SteVe is considered as an open platform to implement, test and evaluate novel ideas for electric mobility, like authentication protocols, reservation mechanisms for charge points, and business models for electric mobility.
+The project is distributed under [GPL](LICENSE.txt) and is free to use.
 If you are going to deploy it we are happy to see the [logo](website/logo/managed-by-steve.pdf) on a charge point.
 
 ### Charge Point Support
@@ -30,12 +30,12 @@ https://github.com/steve-community/steve/wiki/Charging-Station-Compatibility
 
 ### System Requirements
 
-SteVe requires 
+SteVe requires
 * JDK 11 (both Oracle JDK and Adoptium are supported)
-* Maven 
+* Maven
 * MariaDB 10.2.1 or later. MySQL 5.7.7 or later works as well, but especially MySQL 8 introduces more hassle. We suggest MariaDB 10.4.
 
-to build and run. 
+to build and run.
 
 SteVe is designed to run standalone, a java servlet container / web server (e.g. Apache Tomcat), is **not** required.
 
@@ -47,7 +47,7 @@ SteVe is designed to run standalone, a java servlet container / web server (e.g.
 
     Make sure MySQL is reachable via TCP (e.g., remove `skip-networking` from `my.cnf`).
     The following MySQL statements can be used as database initialization (adjust database name and credentials according to your setup).
-    
+
     * For MariaDB (all LTS versions) and MySQL 5.7:
         ```
         CREATE DATABASE stevedb CHARACTER SET utf8 COLLATE utf8_unicode_ci;
@@ -55,7 +55,7 @@ SteVe is designed to run standalone, a java servlet container / web server (e.g.
         GRANT ALL PRIVILEGES ON stevedb.* TO 'steve'@'localhost';
         GRANT SELECT ON mysql.proc TO 'steve'@'localhost';
         ```
-    
+
     * For MySQL 8:
         ```
         CREATE DATABASE stevedb CHARACTER SET utf8 COLLATE utf8_unicode_ci;
@@ -63,11 +63,11 @@ SteVe is designed to run standalone, a java servlet container / web server (e.g.
         GRANT ALL PRIVILEGES ON stevedb.* TO 'steve'@'localhost';
         GRANT SUPER ON *.* TO 'steve'@'localhost';
         ```
-        Note: The statement `GRANT SUPER [...]` is only necessary to execute some of the previous migration files and is only needed for the initial database setup. Afterwards, you can remove this privilege by executing 
+        Note: The statement `GRANT SUPER [...]` is only necessary to execute some of the previous migration files and is only needed for the initial database setup. Afterwards, you can remove this privilege by executing
         ```
         REVOKE SUPER ON *.* FROM 'steve'@'localhost';
         ```
-        
+
 2. Download and extract tarball:
 
     You can download and extract the SteVe releases using the following commands (replace X.X.X with the desired version number):
@@ -84,7 +84,7 @@ SteVe is designed to run standalone, a java servlet container / web server (e.g.
       - You _must_ change [the host](src/main/resources/config/prod/main.properties#L22) to the correct IP address of your server
       - You _must_ change [web interface credentials](src/main/resources/config/prod/main.properties#L17-L18)
       - You _can_ access the application via HTTPS, by [enabling it and setting the keystore properties](src/main/resources/config/prod/main.properties#L32-L35)
-     
+
     For advanced configuration please see the [Configuration wiki](https://github.com/steve-community/steve/wiki/Configuration)
 
 4. Build SteVe:
@@ -127,7 +127,7 @@ Then go to `k8s/yaml/Deployment.yaml` and change `### YOUR BUILT IMAGE HERE ###`
 After this, create the namespace using `kubectl create ns steve` and apply your yaml with `kubectl apply -f k8s/yaml/Deployment.yaml` followed by `kubectl apply -f k8s/yaml/Service.yaml`
 
 
-To access this publicaly, you'll also have to setup an ingress using something like nginx or traefik. 
+To access this publicaly, you'll also have to setup an ingress using something like nginx or traefik.
 
 # Ubuntu
 
@@ -142,7 +142,7 @@ You'll find a tutorial how to setup SteVe in AWS using Lightsail here: https://g
 After SteVe has successfully started, you can access the web interface using the configured credentials under:
 
     http://<your-server-ip>:<port>/steve/manager
-    
+
 The default port number is 8080.
 
 ### Add a charge point
@@ -155,7 +155,7 @@ The default port number is 8080.
 
 
 As soon as a heartbeat is received, you should see the status of the charge point in the SteVe Dashboard.
- 
+
 *Have fun!*
 
 Screenshots

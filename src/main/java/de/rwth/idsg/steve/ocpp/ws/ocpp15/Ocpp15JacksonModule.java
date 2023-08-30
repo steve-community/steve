@@ -47,9 +47,7 @@ public class Ocpp15JacksonModule extends SimpleModule {
         EnumProcessor.apply(
                 Arrays.asList(
                         ocpp.cs._2012._06.ObjectFactory.class.getPackage().getName(),
-                        ocpp.cp._2012._06.ObjectFactory.class.getPackage().getName()
-                ),
-                clazz -> sc.setMixInAnnotations(clazz, EnumMixin.class)
-        );
+                        ocpp.cp._2012._06.ObjectFactory.class.getPackage().getName()),
+                clazz -> sc.setMixInAnnotations(clazz, EnumMixin.class));
     }
 }

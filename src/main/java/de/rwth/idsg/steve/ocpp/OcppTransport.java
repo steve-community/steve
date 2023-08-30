@@ -28,8 +28,8 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @Getter
 public enum OcppTransport {
-    SOAP("S"),  // HTTP with SOAP payloads
-    JSON("J");  // WebSocket with JSON payloads
+    SOAP("S"), // HTTP with SOAP payloads
+    JSON("J"); // WebSocket with JSON payloads
 
     // The value should always contain ONE character!
     // Otherwise, it will break OcppProtocol.fromCompositeValue()
@@ -37,7 +37,7 @@ public enum OcppTransport {
     private final String value;
 
     public static OcppTransport fromValue(String v) {
-        for (OcppTransport c: OcppTransport.values()) {
+        for (OcppTransport c : OcppTransport.values()) {
             if (c.getValue().equals(v)) {
                 return c;
             }
@@ -46,7 +46,7 @@ public enum OcppTransport {
     }
 
     public static OcppTransport fromName(String v) {
-        for (OcppTransport c: OcppTransport.values()) {
+        for (OcppTransport c : OcppTransport.values()) {
             if (c.name().equals(v)) {
                 return c;
             }

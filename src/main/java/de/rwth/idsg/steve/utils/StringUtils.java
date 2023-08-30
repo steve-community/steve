@@ -46,9 +46,8 @@ public final class StringUtils {
     /**
      * We don't want to hard-code operation names, but derive them from the actual request object.
      *
-     * Example for "ChangeAvailabilityTask":
-     * - Remove "Task" at the end -> "ChangeAvailability"
-     * - Insert space -> "Change Availability"
+     * <p>Example for "ChangeAvailabilityTask": - Remove "Task" at the end -> "ChangeAvailability" -
+     * Insert space -> "Change Availability"
      */
     public static String getOperationName(CommunicationTask task) {
         String s = task.getClass().getSimpleName();
@@ -63,8 +62,7 @@ public final class StringUtils {
         return s;
     }
 
-    @Nullable
-    public static String joinByComma(Collection<?> col) {
+    @Nullable public static String joinByComma(Collection<?> col) {
         if (CollectionUtils.isEmpty(col)) {
             return null;
         } else {

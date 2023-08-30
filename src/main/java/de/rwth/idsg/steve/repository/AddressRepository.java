@@ -31,6 +31,8 @@ import org.jooq.SelectConditionStep;
  */
 public interface AddressRepository {
     @Nullable AddressRecord get(DSLContext ctx, Integer addressPk);
+
     @Nullable Integer updateOrInsert(DSLContext ctx, Address address);
+
     void delete(DSLContext ctx, SelectConditionStep<Record1<Integer>> addressPkSelect);
 }

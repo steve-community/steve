@@ -24,8 +24,9 @@ import org.apache.cxf.ext.logging.slf4j.Slf4jEventSender;
 import org.apache.cxf.ext.logging.slf4j.Slf4jVerboseEventSender;
 
 /**
- * Since {@link Slf4jEventSender} logs only the message and {@link Slf4jVerboseEventSender} logs everything, this
- * logging feature proxy finds a middle ground by logging the exchange id and the message (the most interesting parts).
+ * Since {@link Slf4jEventSender} logs only the message and {@link Slf4jVerboseEventSender} logs
+ * everything, this logging feature proxy finds a middle ground by logging the exchange id and the
+ * message (the most interesting parts).
  *
  * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 03.04.2018
@@ -50,9 +51,11 @@ public enum LoggingFeatureProxy {
             StringBuilder b = new StringBuilder();
 
             b.append('\n') // Start from the next line to have the output well-aligned
-             .append("    ExchangeId: ").append(event.getExchangeId())
-             .append('\n')
-             .append("    Payload: ").append(event.getPayload());
+                    .append("    ExchangeId: ")
+                    .append(event.getExchangeId())
+                    .append('\n')
+                    .append("    Payload: ")
+                    .append(event.getPayload());
 
             return b.toString();
         }

@@ -45,7 +45,7 @@ public enum SteveConfiguration {
     // Dummy service path
     private final String routerEndpointPath = "/CentralSystemService";
     // Time zone for the application and database connections
-    private final String timeZoneId = "UTC";  // or ZoneId.systemDefault().getId();
+    private final String timeZoneId = "UTC"; // or ZoneId.systemDefault().getId();
 
     // -------------------------------------------------------------------------
     // main.properties
@@ -69,44 +69,49 @@ public enum SteveConfiguration {
         gitDescribe = useFallbackIfNotSet(p.getOptionalString("git.describe"), null);
         profile = ApplicationProfile.fromName(p.getString("profile"));
 
-        jetty = Jetty.builder()
-                     .serverHost(p.getString("server.host"))
-                     .gzipEnabled(p.getBoolean("server.gzip.enabled"))
-                     .httpEnabled(p.getBoolean("http.enabled"))
-                     .httpPort(p.getInt("http.port"))
-                     .httpsEnabled(p.getBoolean("https.enabled"))
-                     .httpsPort(p.getInt("https.port"))
-                     .keyStorePath(p.getOptionalString("keystore.path"))
-                     .keyStorePassword(p.getOptionalString("keystore.password"))
-                     .build();
+        jetty =
+                Jetty.builder()
+                        .serverHost(p.getString("server.host"))
+                        .gzipEnabled(p.getBoolean("server.gzip.enabled"))
+                        .httpEnabled(p.getBoolean("http.enabled"))
+                        .httpPort(p.getInt("http.port"))
+                        .httpsEnabled(p.getBoolean("https.enabled"))
+                        .httpsPort(p.getInt("https.port"))
+                        .keyStorePath(p.getOptionalString("keystore.path"))
+                        .keyStorePassword(p.getOptionalString("keystore.password"))
+                        .build();
 
-        db = DB.builder()
-               .ip(p.getString("db.ip"))
-               .port(p.getInt("db.port"))
-               .schema(p.getString("db.schema"))
-               .userName(p.getString("db.user"))
-               .password(p.getString("db.password"))
-               .sqlLogging(p.getBoolean("db.sql.logging"))
-               .build();
+        db =
+                DB.builder()
+                        .ip(p.getString("db.ip"))
+                        .port(p.getInt("db.port"))
+                        .schema(p.getString("db.schema"))
+                        .userName(p.getString("db.user"))
+                        .password(p.getString("db.password"))
+                        .sqlLogging(p.getBoolean("db.sql.logging"))
+                        .build();
 
         PasswordEncoder encoder = new BCryptPasswordEncoder();
 
-        auth = Auth.builder()
-                   .passwordEncoder(encoder)
-                   .userName(p.getString("auth.user"))
-                   .encodedPassword(encoder.encode(p.getString("auth.password")))
-                   .build();
+        auth =
+                Auth.builder()
+                        .passwordEncoder(encoder)
+                        .userName(p.getString("auth.user"))
+                        .encodedPassword(encoder.encode(p.getString("auth.password")))
+                        .build();
 
-        webApi = WebApi.builder()
-                       .headerKey(p.getOptionalString("webapi.key"))
-                       .headerValue(p.getOptionalString("webapi.value"))
-                       .build();
+        webApi =
+                WebApi.builder()
+                        .headerKey(p.getOptionalString("webapi.key"))
+                        .headerValue(p.getOptionalString("webapi.value"))
+                        .build();
 
-        ocpp = Ocpp.builder()
-                   .autoRegisterUnknownStations(p.getOptionalBoolean("auto.register.unknown.stations"))
-                   .wsSessionSelectStrategy(
-                           WsSessionSelectStrategyEnum.fromName(p.getString("ws.session.select.strategy")))
-                   .build();
+        ocpp =
+                Ocpp.builder()
+                        .autoRegisterUnknownStations(p.getOptionalBoolean("auto.register.unknown.stations"))
+                        .wsSessionSelectStrategy(
+                                WsSessionSelectStrategyEnum.fromName(p.getString("ws.session.select.strategy")))
+                        .build();
 
         validate();
     }
@@ -155,7 +160,8 @@ public enum SteveConfiguration {
     // -------------------------------------------------------------------------
 
     // Jetty configuration
-    @Builder @Getter
+    @Builder
+    @Getter
     public static class Jetty {
         private final String serverHost;
         private final boolean gzipEnabled;
@@ -172,7 +178,8 @@ public enum SteveConfiguration {
     }
 
     // Database configuration
-    @Builder @Getter
+    @Builder
+    @Getter
     public static class DB {
         private final String ip;
         private final int port;
@@ -183,24 +190,26 @@ public enum SteveConfiguration {
     }
 
     // Credentials for Web interface access
-    @Builder @Getter
+    @Builder
+    @Getter
     public static class Auth {
         private final PasswordEncoder passwordEncoder;
         private final String userName;
         private final String encodedPassword;
     }
 
-    @Builder @Getter
+    @Builder
+    @Getter
     public static class WebApi {
         private final String headerKey;
         private final String headerValue;
     }
 
     // OCPP-related configuration
-    @Builder @Getter
+    @Builder
+    @Getter
     public static class Ocpp {
         private final boolean autoRegisterUnknownStations;
         private final WsSessionSelectStrategy wsSessionSelectStrategy;
     }
-
 }

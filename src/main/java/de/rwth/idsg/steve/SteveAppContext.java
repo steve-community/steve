@@ -69,17 +69,13 @@ public class SteveAppContext {
     }
 
     public HandlerCollection getHandlers() {
-        return new HandlerList(
-            getRedirectHandler(),
-            getWebApp()
-        );
+        return new HandlerList(getRedirectHandler(), getWebApp());
     }
 
-    /**
-     * Otherwise, defaults come from {@link WebSocketConstants}
-     */
+    /** Otherwise, defaults come from {@link WebSocketConstants} */
     public void configureWebSocket() {
-        JettyWebSocketServerContainer container = JettyWebSocketServerContainer.getContainer(webAppContext.getServletContext());
+        JettyWebSocketServerContainer container =
+                JettyWebSocketServerContainer.getContainer(webAppContext.getServletContext());
         container.setMaxTextMessageSize(MAX_MSG_SIZE);
         container.setIdleTimeout(IDLE_TIMEOUT);
     }
@@ -107,7 +103,8 @@ public class SteveAppContext {
         // Disable directory listings if no index.html is found.
         ctx.setInitParameter("org.eclipse.jetty.servlet.Default.dirAllowed", "false");
 
-        ServletHolder web = new ServletHolder("spring-dispatcher", new DispatcherServlet(springContext));
+        ServletHolder web =
+                new ServletHolder("spring-dispatcher", new DispatcherServlet(springContext));
         ServletHolder cxf = new ServletHolder("cxf", new CXFServlet());
 
         ctx.addEventListener(new ContextLoaderListener(springContext));
@@ -117,11 +114,12 @@ public class SteveAppContext {
         if (CONFIG.getProfile().isProd()) {
             // If PROD, add security filter
             ctx.addFilter(
-                // The bean name is not arbitrary, but is as expected by Spring
-                new FilterHolder(new DelegatingFilterProxy(AbstractSecurityWebApplicationInitializer.DEFAULT_FILTER_NAME)),
-                CONFIG.getSpringMapping() + "*",
-                EnumSet.allOf(DispatcherType.class)
-            );
+                    // The bean name is not arbitrary, but is as expected by Spring
+                    new FilterHolder(
+                            new DelegatingFilterProxy(
+                                    AbstractSecurityWebApplicationInitializer.DEFAULT_FILTER_NAME)),
+                    CONFIG.getSpringMapping() + "*",
+                    EnumSet.allOf(DispatcherType.class));
         }
 
         initJSP(ctx);
@@ -160,8 +158,7 @@ public class SteveAppContext {
     }
 
     /**
-     * Help by:
-     * https://github.com/jetty-project/embedded-jetty-jsp
+     * Help by: https://github.com/jetty-project/embedded-jetty-jsp
      * https://github.com/jasonish/jetty-springmvc-jsp-template
      * http://examples.javacodegeeks.com/enterprise-java/jetty/jetty-jsp-example
      */

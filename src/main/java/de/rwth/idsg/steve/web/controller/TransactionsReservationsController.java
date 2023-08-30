@@ -89,15 +89,19 @@ public class TransactionsReservationsController {
     }
 
     @RequestMapping(value = TRANSACTIONS_DETAILS_PATH)
-    public String getTransactionDetails(@PathVariable("transactionPk") int transactionPk, Model model) {
+    public String getTransactionDetails(
+            @PathVariable("transactionPk") int transactionPk, Model model) {
         model.addAttribute("details", transactionRepository.getDetails(transactionPk));
         return "data-man/transactionDetails";
     }
 
     @RequestMapping(value = TRANSACTIONS_QUERY_PATH)
-    public String getTransactionsQuery(@Valid @ModelAttribute(PARAMS) TransactionQueryForm params,
-                                       BindingResult result, Model model,
-                                       HttpServletResponse response) throws IOException {
+    public String getTransactionsQuery(
+            @Valid @ModelAttribute(PARAMS) TransactionQueryForm params,
+            BindingResult result,
+            Model model,
+            HttpServletResponse response)
+            throws IOException {
         if (result.hasErrors()) {
             initList(model);
             model.addAttribute(PARAMS, params);
@@ -132,8 +136,9 @@ public class TransactionsReservationsController {
     }
 
     @RequestMapping(value = RESERVATIONS_QUERY_PATH)
-    public String getReservationsQuery(@Valid @ModelAttribute(PARAMS) ReservationQueryForm params,
-                                      BindingResult result, Model model) throws IOException {
+    public String getReservationsQuery(
+            @Valid @ModelAttribute(PARAMS) ReservationQueryForm params, BindingResult result, Model model)
+            throws IOException {
         if (!result.hasErrors()) {
             model.addAttribute("reservList", reservationRepository.getReservations(params));
         }
@@ -152,5 +157,4 @@ public class TransactionsReservationsController {
         initList(model);
         model.addAttribute("statusList", ReservationStatus.getValues());
     }
-
 }

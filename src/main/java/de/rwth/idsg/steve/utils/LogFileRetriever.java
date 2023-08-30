@@ -63,8 +63,7 @@ public enum LogFileRetriever {
     }
 
     public String getLogFilePathOrErrorMessage() {
-        return getPath().map(path -> path.toAbsolutePath().toString())
-                        .orElseGet(this::getErrorMessage);
+        return getPath().map(path -> path.toAbsolutePath().toString()).orElseGet(this::getErrorMessage);
     }
 
     public String getErrorMessage() {
@@ -76,9 +75,8 @@ public enum LogFileRetriever {
     // -------------------------------------------------------------------------
 
     /**
-     * If the user configured multiple file appenders, which log file should we choose?
-     * Clearly, the only sane solution is rolling the dice.
-     * Easter egg mode: On
+     * If the user configured multiple file appenders, which log file should we choose? Clearly, the
+     * only sane solution is rolling the dice. Easter egg mode: On
      */
     private Path rollTheDice() {
         log.trace("Rolling the dice...");
@@ -88,8 +86,8 @@ public enum LogFileRetriever {
 
     /**
      * We cannot presume that the default file name/location setting won't be changed by the user.
-     * Therefore, we should be able to retrieve that info from the underlying logging mechanism
-     * by iterating over appenders.
+     * Therefore, we should be able to retrieve that info from the underlying logging mechanism by
+     * iterating over appenders.
      */
     private List<Path> getActiveLogFilePaths() {
         LoggerContext context = (LoggerContext) LogManager.getContext(false);
@@ -106,9 +104,7 @@ public enum LogFileRetriever {
         return fileNameList;
     }
 
-    /**
-     * File appender types do not share a "write-to-file" superclass.
-     */
+    /** File appender types do not share a "write-to-file" superclass. */
     private String extractFileName(Appender a) {
         if (a instanceof FileAppender) {
             return ((FileAppender) a).getFileName();

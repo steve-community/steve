@@ -35,7 +35,6 @@ import java.util.List;
 @Setter
 public class MultipleChargePointSelect implements ChargePointSelection {
 
-    @NotNull(message = "Charge point selection is required")
-    @Size(min = 1, message = "Please select at least {min} charge point")
+    @NotNull(message = "Charge point selection is required") @Size(min = 1, message = "Please select at least {min} charge point")
     private List<ChargePointSelect> chargePointSelectList = Collections.emptyList();
 }

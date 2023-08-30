@@ -28,8 +28,8 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * Why a list, if the list size == 1?
- * To keep the method calls and data types (for ex: tasks api) consistent for both cases.
+ * Why a list, if the list size == 1? To keep the method calls and data types (for ex: tasks api)
+ * consistent for both cases.
  *
  * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 29.12.2014
@@ -38,7 +38,6 @@ import java.util.List;
 @Setter
 public class SingleChargePointSelect implements ChargePointSelection {
 
-    @NotNull(message = "Charge point selection is required")
-    @Size(min = 1, max = 1, message = "It is required to select exactly 1 charge point")
+    @NotNull(message = "Charge point selection is required") @Size(min = 1, max = 1, message = "It is required to select exactly 1 charge point")
     private List<ChargePointSelect> chargePointSelectList = Collections.emptyList();
 }

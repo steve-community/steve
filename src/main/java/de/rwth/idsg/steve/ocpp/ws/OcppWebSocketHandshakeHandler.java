@@ -18,7 +18,6 @@
  */
 package de.rwth.idsg.steve.ocpp.ws;
 
-import de.rwth.idsg.steve.config.WebSocketConfiguration;
 import de.rwth.idsg.steve.service.ChargePointHelperService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -53,24 +52,30 @@ public class OcppWebSocketHandshakeHandler implements HandshakeHandler {
     private final ChargePointHelperService chargePointHelperService;
 
     /**
-     * We need some WebSocketHandler just for Spring to register it for the path. We will not use it for the actual
-     * operations. This instance will be passed to doHandshake(..) below. We will find the proper WebSocketEndpoint
-     * based on the selectedProtocol and replace the dummy one with the proper one in the subsequent call chain.
+     * We need some WebSocketHandler just for Spring to register it for the path. We will not use it
+     * for the actual operations. This instance will be passed to doHandshake(..) below. We will find
+     * the proper WebSocketEndpoint based on the selectedProtocol and replace the dummy one with the
+     * proper one in the subsequent call chain.
      */
     public WebSocketHandler getDummyWebSocketHandler() {
         return new TextWebSocketHandler();
     }
 
     @Override
-    public boolean doHandshake(ServerHttpRequest request, ServerHttpResponse response,
-                               WebSocketHandler wsHandler, Map<String, Object> attributes) throws HandshakeFailureException {
+    public boolean doHandshake(
+            ServerHttpRequest request,
+            ServerHttpResponse response,
+            WebSocketHandler wsHandler,
+            Map<String, Object> attributes)
+            throws HandshakeFailureException {
 
         // -------------------------------------------------------------------------
         // 1. Check the chargeBoxId
         // -------------------------------------------------------------------------
 
         String chargeBoxId = getLastBitFromUrl(request.getURI().getPath());
-        Optional<RegistrationStatus> status = chargePointHelperService.getRegistrationStatus(chargeBoxId);
+        Optional<RegistrationStatus> status =
+                chargePointHelperService.getRegistrationStatus(chargeBoxId);
 
         // Allow connections, if station is in db (registration_status field from db does not matter)
         boolean allowConnection = status.isPresent();
@@ -88,7 +93,8 @@ public class OcppWebSocketHandshakeHandler implements HandshakeHandler {
         // 2. Route according to the selected protocol
         // -------------------------------------------------------------------------
 
-        List<String> requestedProtocols = new WebSocketHttpHeaders(request.getHeaders()).getSecWebSocketProtocol();
+        List<String> requestedProtocols =
+                new WebSocketHttpHeaders(request.getHeaders()).getSecWebSocketProtocol();
 
         if (CollectionUtils.isEmpty(requestedProtocols)) {
             log.error("No protocol (OCPP version) is specified.");
@@ -104,11 +110,12 @@ public class OcppWebSocketHandshakeHandler implements HandshakeHandler {
             return false;
         }
 
-        log.debug("ChargeBoxId '{}' will be using {}", chargeBoxId, endpoint.getClass().getSimpleName());
+        log.debug(
+                "ChargeBoxId '{}' will be using {}", chargeBoxId, endpoint.getClass().getSimpleName());
         return delegate.doHandshake(request, response, endpoint, attributes);
     }
 
-    private AbstractWebSocketEndpoint selectEndpoint(List<String> requestedProtocols ) {
+    private AbstractWebSocketEndpoint selectEndpoint(List<String> requestedProtocols) {
         for (String requestedProcotol : requestedProtocols) {
             for (AbstractWebSocketEndpoint item : endpoints) {
                 if (item.getVersion().getValue().equals(requestedProcotol)) {

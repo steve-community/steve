@@ -225,6 +225,61 @@
                     <configLocation>${basedir}/src/main/resources/checkstyle.xml</configLocation>
                 </configuration>
             </plugin>
+            <plugin>
+                <groupId>com.diffplug.spotless</groupId>
+                <artifactId>spotless-maven-plugin</artifactId>
+                <version>2.39.0</version>
+                <configuration>
+                    <ratchetFrom>origin/master</ratchetFrom>
+                    <formats>
+                        <format>
+                            <includes>
+                                <include>*.md</include>
+                                <include>.gitignore</include>
+                            </includes>
+                            <trimTrailingWhitespace/>
+                            <endWithNewline/>
+                            <indent>
+                                <spaces>true</spaces>
+                                <spacesPerTab>4</spacesPerTab>
+                            </indent>
+                        </format>
+                    </formats>
+                    <java>
+                        <cleanthat/>
+                        <googleJavaFormat/>
+                        <indent>
+                            <tabs>true</tabs>
+                            <spacesPerTab>2</spacesPerTab>
+                        </indent>
+                        <indent>
+                            <spaces>true</spaces>
+                            <spacesPerTab>4</spacesPerTab>
+                        </indent>
+
+                        <importOrder>
+                            <order>,javax|java,\#</order>
+                        </importOrder>
+
+                        <removeUnusedImports />
+                        <trimTrailingWhitespace/>
+                        <endWithNewline/>
+                        <formatAnnotations/>
+
+                        <!-- some issues when apply -->
+                        <!--licenseHeader>
+                            <file>${project.basedir}/LICENSE-HEADER.txt</file>
+                        </licenseHeader-->
+                    </java>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
 
             <plugin>
                 <groupId>io.github.git-commit-id</groupId>

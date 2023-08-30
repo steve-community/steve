@@ -24,7 +24,6 @@ import de.rwth.idsg.steve.ocpp.task.*;
 import de.rwth.idsg.steve.ocpp.ws.ChargePointServiceInvoker;
 import de.rwth.idsg.steve.ocpp.ws.SessionContextStore;
 import de.rwth.idsg.steve.ocpp.ws.ocpp16.Ocpp16TypeStore;
-import de.rwth.idsg.steve.ocpp.ws.ocpp16.Ocpp16WebSocketEndpoint;
 import de.rwth.idsg.steve.ocpp.ws.pipeline.OutgoingCallPipeline;
 import de.rwth.idsg.steve.repository.dto.ChargePointSelect;
 import ocpp.cp._2015._10.ChargePointService;
@@ -36,12 +35,17 @@ import org.springframework.stereotype.Service;
  * @since 13.03.2018
  */
 @Service
+@Qualifier("ChargePointService16_Invoker")
 public class ChargePointService16_InvokerImpl implements ChargePointService16_Invoker {
 
     private final ChargePointServiceInvoker wsHelper;
     private final ClientProviderWithCache<ChargePointService> soapHelper;
 
-    public ChargePointService16_InvokerImpl(OutgoingCallPipeline pipeline, @Qualifier("sessionContextStore16") SessionContextStore sessionContextStore, ClientProvider clientProvider) {
+    public ChargePointService16_InvokerImpl(
+            OutgoingCallPipeline pipeline,
+            @Qualifier("sessionContextStore16") SessionContextStore sessionContextStore,
+            ClientProvider clientProvider
+    ) {
         this.wsHelper = new ChargePointServiceInvoker(pipeline, sessionContextStore, Ocpp16TypeStore.INSTANCE);
         this.soapHelper = new ClientProviderWithCache<>(clientProvider);
     }
@@ -49,7 +53,9 @@ public class ChargePointService16_InvokerImpl implements ChargePointService16_In
     @Override
     public void clearChargingProfile(ChargePointSelect cp, ClearChargingProfileTask task) {
         if (cp.isSoap()) {
-            create(cp).clearChargingProfileAsync(task.getOcpp16Request(), cp.getChargeBoxId(), task.getOcpp16Handler(cp.getChargeBoxId()));
+            create(cp).clearChargingProfileAsync(
+                    task.getOcpp16Request(), cp.getChargeBoxId(), task.getOcpp16Handler(cp.getChargeBoxId())
+            );
         } else {
             runPipeline(cp, task);
         }
@@ -58,7 +64,9 @@ public class ChargePointService16_InvokerImpl implements ChargePointService16_In
     @Override
     public void setChargingProfile(ChargePointSelect cp, SetChargingProfileTask task) {
         if (cp.isSoap()) {
-            create(cp).setChargingProfileAsync(task.getOcpp16Request(), cp.getChargeBoxId(), task.getOcpp16Handler(cp.getChargeBoxId()));
+            create(cp).setChargingProfileAsync(
+                    task.getOcpp16Request(), cp.getChargeBoxId(), task.getOcpp16Handler(cp.getChargeBoxId())
+            );
         } else {
             runPipeline(cp, task);
         }
@@ -67,7 +75,9 @@ public class ChargePointService16_InvokerImpl implements ChargePointService16_In
     @Override
     public void getCompositeSchedule(ChargePointSelect cp, GetCompositeScheduleTask task) {
         if (cp.isSoap()) {
-            create(cp).getCompositeScheduleAsync(task.getOcpp16Request(), cp.getChargeBoxId(), task.getOcpp16Handler(cp.getChargeBoxId()));
+            create(cp).getCompositeScheduleAsync(
+                    task.getOcpp16Request(), cp.getChargeBoxId(), task.getOcpp16Handler(cp.getChargeBoxId())
+            );
         } else {
             runPipeline(cp, task);
         }
@@ -76,7 +86,9 @@ public class ChargePointService16_InvokerImpl implements ChargePointService16_In
     @Override
     public void triggerMessage(ChargePointSelect cp, TriggerMessageTask task) {
         if (cp.isSoap()) {
-            create(cp).triggerMessageAsync(task.getOcpp16Request(), cp.getChargeBoxId(), task.getOcpp16Handler(cp.getChargeBoxId()));
+            create(cp).triggerMessageAsync(
+                    task.getOcpp16Request(), cp.getChargeBoxId(), task.getOcpp16Handler(cp.getChargeBoxId())
+            );
         } else {
             runPipeline(cp, task);
         }
@@ -85,7 +97,9 @@ public class ChargePointService16_InvokerImpl implements ChargePointService16_In
     @Override
     public void reset(ChargePointSelect cp, ResetTask task) {
         if (cp.isSoap()) {
-            create(cp).resetAsync(task.getOcpp16Request(), cp.getChargeBoxId(), task.getOcpp16Handler(cp.getChargeBoxId()));
+            create(cp).resetAsync(
+                    task.getOcpp16Request(), cp.getChargeBoxId(), task.getOcpp16Handler(cp.getChargeBoxId())
+            );
         } else {
             runPipeline(cp, task);
         }
@@ -94,7 +108,9 @@ public class ChargePointService16_InvokerImpl implements ChargePointService16_In
     @Override
     public void clearCache(ChargePointSelect cp, ClearCacheTask task) {
         if (cp.isSoap()) {
-            create(cp).clearCacheAsync(task.getOcpp16Request(), cp.getChargeBoxId(), task.getOcpp16Handler(cp.getChargeBoxId()));
+            create(cp).clearCacheAsync(
+                    task.getOcpp16Request(), cp.getChargeBoxId(), task.getOcpp16Handler(cp.getChargeBoxId())
+            );
         } else {
             runPipeline(cp, task);
         }
@@ -103,7 +119,9 @@ public class ChargePointService16_InvokerImpl implements ChargePointService16_In
     @Override
     public void getDiagnostics(ChargePointSelect cp, GetDiagnosticsTask task) {
         if (cp.isSoap()) {
-            create(cp).getDiagnosticsAsync(task.getOcpp16Request(), cp.getChargeBoxId(), task.getOcpp16Handler(cp.getChargeBoxId()));
+            create(cp).getDiagnosticsAsync(
+                    task.getOcpp16Request(), cp.getChargeBoxId(), task.getOcpp16Handler(cp.getChargeBoxId())
+            );
         } else {
             runPipeline(cp, task);
         }
@@ -112,7 +130,9 @@ public class ChargePointService16_InvokerImpl implements ChargePointService16_In
     @Override
     public void updateFirmware(ChargePointSelect cp, UpdateFirmwareTask task) {
         if (cp.isSoap()) {
-            create(cp).updateFirmwareAsync(task.getOcpp16Request(), cp.getChargeBoxId(), task.getOcpp16Handler(cp.getChargeBoxId()));
+            create(cp).updateFirmwareAsync(
+                    task.getOcpp16Request(), cp.getChargeBoxId(), task.getOcpp16Handler(cp.getChargeBoxId())
+            );
         } else {
             runPipeline(cp, task);
         }
@@ -121,7 +141,9 @@ public class ChargePointService16_InvokerImpl implements ChargePointService16_In
     @Override
     public void unlockConnector(ChargePointSelect cp, UnlockConnectorTask task) {
         if (cp.isSoap()) {
-            create(cp).unlockConnectorAsync(task.getOcpp16Request(), cp.getChargeBoxId(), task.getOcpp16Handler(cp.getChargeBoxId()));
+            create(cp).unlockConnectorAsync(
+                    task.getOcpp16Request(), cp.getChargeBoxId(), task.getOcpp16Handler(cp.getChargeBoxId())
+            );
 
         } else {
             runPipeline(cp, task);
@@ -131,7 +153,9 @@ public class ChargePointService16_InvokerImpl implements ChargePointService16_In
     @Override
     public void changeAvailability(ChargePointSelect cp, ChangeAvailabilityTask task) {
         if (cp.isSoap()) {
-            create(cp).changeAvailabilityAsync(task.getOcpp16Request(), cp.getChargeBoxId(), task.getOcpp16Handler(cp.getChargeBoxId()));
+            create(cp).changeAvailabilityAsync(
+                    task.getOcpp16Request(), cp.getChargeBoxId(), task.getOcpp16Handler(cp.getChargeBoxId())
+            );
         } else {
             runPipeline(cp, task);
         }
@@ -140,7 +164,9 @@ public class ChargePointService16_InvokerImpl implements ChargePointService16_In
     @Override
     public void changeConfiguration(ChargePointSelect cp, ChangeConfigurationTask task) {
         if (cp.isSoap()) {
-            create(cp).changeConfigurationAsync(task.getOcpp16Request(), cp.getChargeBoxId(), task.getOcpp16Handler(cp.getChargeBoxId()));
+            create(cp).changeConfigurationAsync(
+                    task.getOcpp16Request(), cp.getChargeBoxId(), task.getOcpp16Handler(cp.getChargeBoxId())
+            );
         } else {
             runPipeline(cp, task);
         }
@@ -149,7 +175,9 @@ public class ChargePointService16_InvokerImpl implements ChargePointService16_In
     @Override
     public void remoteStartTransaction(ChargePointSelect cp, RemoteStartTransactionTask task) {
         if (cp.isSoap()) {
-            create(cp).remoteStartTransactionAsync(task.getOcpp16Request(), cp.getChargeBoxId(), task.getOcpp16Handler(cp.getChargeBoxId()));
+            create(cp).remoteStartTransactionAsync(
+                    task.getOcpp16Request(), cp.getChargeBoxId(), task.getOcpp16Handler(cp.getChargeBoxId())
+            );
         } else {
             runPipeline(cp, task);
         }
@@ -158,7 +186,9 @@ public class ChargePointService16_InvokerImpl implements ChargePointService16_In
     @Override
     public void remoteStopTransaction(ChargePointSelect cp, RemoteStopTransactionTask task) {
         if (cp.isSoap()) {
-            create(cp).remoteStopTransactionAsync(task.getOcpp16Request(), cp.getChargeBoxId(), task.getOcpp16Handler(cp.getChargeBoxId()));
+            create(cp).remoteStopTransactionAsync(
+                    task.getOcpp16Request(), cp.getChargeBoxId(), task.getOcpp16Handler(cp.getChargeBoxId())
+            );
         } else {
             runPipeline(cp, task);
         }
@@ -167,7 +197,9 @@ public class ChargePointService16_InvokerImpl implements ChargePointService16_In
     @Override
     public void dataTransfer(ChargePointSelect cp, DataTransferTask task) {
         if (cp.isSoap()) {
-            create(cp).dataTransferAsync(task.getOcpp16Request(), cp.getChargeBoxId(), task.getOcpp16Handler(cp.getChargeBoxId()));
+            create(cp).dataTransferAsync(
+                    task.getOcpp16Request(), cp.getChargeBoxId(), task.getOcpp16Handler(cp.getChargeBoxId())
+            );
         } else {
             runPipeline(cp, task);
         }
@@ -176,7 +208,9 @@ public class ChargePointService16_InvokerImpl implements ChargePointService16_In
     @Override
     public void getConfiguration(ChargePointSelect cp, GetConfigurationTask task) {
         if (cp.isSoap()) {
-            create(cp).getConfigurationAsync(task.getOcpp16Request(), cp.getChargeBoxId(), task.getOcpp16Handler(cp.getChargeBoxId()));
+            create(cp).getConfigurationAsync(
+                    task.getOcpp16Request(), cp.getChargeBoxId(), task.getOcpp16Handler(cp.getChargeBoxId())
+            );
         } else {
             runPipeline(cp, task);
         }
@@ -185,7 +219,9 @@ public class ChargePointService16_InvokerImpl implements ChargePointService16_In
     @Override
     public void getLocalListVersion(ChargePointSelect cp, GetLocalListVersionTask task) {
         if (cp.isSoap()) {
-            create(cp).getLocalListVersionAsync(task.getOcpp16Request(), cp.getChargeBoxId(), task.getOcpp16Handler(cp.getChargeBoxId()));
+            create(cp).getLocalListVersionAsync(
+                    task.getOcpp16Request(), cp.getChargeBoxId(), task.getOcpp16Handler(cp.getChargeBoxId())
+            );
         } else {
             runPipeline(cp, task);
         }
@@ -194,7 +230,9 @@ public class ChargePointService16_InvokerImpl implements ChargePointService16_In
     @Override
     public void sendLocalList(ChargePointSelect cp, SendLocalListTask task) {
         if (cp.isSoap()) {
-            create(cp).sendLocalListAsync(task.getOcpp16Request(), cp.getChargeBoxId(), task.getOcpp16Handler(cp.getChargeBoxId()));
+            create(cp).sendLocalListAsync(
+                    task.getOcpp16Request(), cp.getChargeBoxId(), task.getOcpp16Handler(cp.getChargeBoxId())
+            );
         } else {
             runPipeline(cp, task);
         }
@@ -203,7 +241,9 @@ public class ChargePointService16_InvokerImpl implements ChargePointService16_In
     @Override
     public void reserveNow(ChargePointSelect cp, ReserveNowTask task) {
         if (cp.isSoap()) {
-            create(cp).reserveNowAsync(task.getOcpp16Request(), cp.getChargeBoxId(), task.getOcpp16Handler(cp.getChargeBoxId()));
+            create(cp).reserveNowAsync(
+                    task.getOcpp16Request(), cp.getChargeBoxId(), task.getOcpp16Handler(cp.getChargeBoxId())
+            );
         } else {
             runPipeline(cp, task);
         }
@@ -212,7 +252,9 @@ public class ChargePointService16_InvokerImpl implements ChargePointService16_In
     @Override
     public void cancelReservation(ChargePointSelect cp, CancelReservationTask task) {
         if (cp.isSoap()) {
-            create(cp).cancelReservationAsync(task.getOcpp16Request(), cp.getChargeBoxId(), task.getOcpp16Handler(cp.getChargeBoxId()));
+            create(cp).cancelReservationAsync(
+                    task.getOcpp16Request(), cp.getChargeBoxId(), task.getOcpp16Handler(cp.getChargeBoxId())
+            );
         } else {
             runPipeline(cp, task);
         }

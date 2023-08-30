@@ -46,7 +46,7 @@ import java.util.Collections;
 @RequestMapping(value = "/manager/ocppTags")
 public class OcppTagsController {
 
-    protected final OcppTagService ocppTagService;
+    private final OcppTagService ocppTagService;
 
     protected static final String PARAMS = "params";
 

@@ -76,7 +76,9 @@ public class ChargePointServiceInvoker {
 
         FutureResponseContext frc = new FutureResponseContext(task, pair.getResponseClass());
 
-        CommunicationContext context = new CommunicationContext(sessionContextStore.getSession(chargeBoxId), chargeBoxId);
+        CommunicationContext context = new CommunicationContext(
+                sessionContextStore.getSession(chargeBoxId), chargeBoxId
+        );
         context.setOutgoingMessage(call);
         context.setFutureResponseContext(frc);
 

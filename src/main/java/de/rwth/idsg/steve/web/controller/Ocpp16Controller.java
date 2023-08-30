@@ -20,7 +20,11 @@ package de.rwth.idsg.steve.web.controller;
 
 import de.rwth.idsg.steve.ocpp.OcppVersion;
 import de.rwth.idsg.steve.repository.ChargingProfileRepository;
-import de.rwth.idsg.steve.service.*;
+import de.rwth.idsg.steve.service.ChargePointHelperService;
+import de.rwth.idsg.steve.service.ChargePointService12_Client;
+import de.rwth.idsg.steve.service.ChargePointService15_Client;
+import de.rwth.idsg.steve.service.ChargePointService16_Client;
+import de.rwth.idsg.steve.service.OcppTagService;
 import de.rwth.idsg.steve.web.dto.ocpp.ChangeConfigurationParams;
 import de.rwth.idsg.steve.web.dto.ocpp.ClearChargingProfileParams;
 import de.rwth.idsg.steve.web.dto.ocpp.ConfigurationKeyEnum;
@@ -68,7 +72,14 @@ public class Ocpp16Controller extends Ocpp15Controller {
     private static final String SET_CHARGING_PATH = "/SetChargingProfile";
     private static final String TRIGGER_MESSAGE_PATH = "/TriggerMessage";
 
-    public Ocpp16Controller(ChargePointHelperService chargePointHelperService, OcppTagService ocppTagService, @Qualifier("ChargePointService12_Client") ChargePointService12_Client client12, @Qualifier("ChargePointService15_Client") ChargePointService15_Client client15, @Qualifier("ChargePointService16_Client") ChargePointService16_Client client16, ChargingProfileRepository chargingProfileRepository) {
+    public Ocpp16Controller(
+            ChargePointHelperService chargePointHelperService,
+            OcppTagService ocppTagService,
+            @Qualifier("ChargePointService12_Client") ChargePointService12_Client client12,
+            @Qualifier("ChargePointService15_Client") ChargePointService15_Client client15,
+            @Qualifier("ChargePointService16_Client") ChargePointService16_Client client16,
+            ChargingProfileRepository chargingProfileRepository
+    ) {
         super(chargePointHelperService, ocppTagService, client12, client15);
         this.client16 = client16;
         this.chargingProfileRepository = chargingProfileRepository;
@@ -94,7 +105,7 @@ public class Ocpp16Controller extends Ocpp15Controller {
 
     @Override
     protected void setCommonAttributesForTx(Model model) {
-        model.addAttribute("cpList", chargePointHelperService.getChargePoints(OcppVersion.V_16));
+        model.addAttribute("cpList", getChargePointHelperService().getChargePoints(OcppVersion.V_16));
         model.addAttribute("opVersion", "v1.6");
     }
 
@@ -108,7 +119,7 @@ public class Ocpp16Controller extends Ocpp15Controller {
     @Override
     protected void setCommonAttributes(Model model) {
         List<RegistrationStatus> inStatusFilter = Arrays.asList(RegistrationStatus.ACCEPTED, RegistrationStatus.PENDING);
-        model.addAttribute("cpList", chargePointHelperService.getChargePoints(OcppVersion.V_16, inStatusFilter));
+        model.addAttribute("cpList", getChargePointHelperService().getChargePoints(OcppVersion.V_16, inStatusFilter));
         model.addAttribute("opVersion", "v1.6");
     }
 

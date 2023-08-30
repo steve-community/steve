@@ -23,13 +23,10 @@ import de.rwth.idsg.ocpp.jaxb.ResponseType;
 import de.rwth.idsg.steve.ocpp.OcppProtocol;
 import de.rwth.idsg.steve.ocpp.OcppVersion;
 import de.rwth.idsg.steve.ocpp.soap.CentralSystemService12_SoapServer;
-import de.rwth.idsg.steve.ocpp.ws.AbstractTypeStore;
 import de.rwth.idsg.steve.ocpp.ws.AbstractWebSocketEndpoint;
 import de.rwth.idsg.steve.ocpp.ws.FutureResponseContextStore;
 import de.rwth.idsg.steve.ocpp.ws.SessionContextStore;
 import de.rwth.idsg.steve.ocpp.ws.pipeline.AbstractCallHandler;
-import de.rwth.idsg.steve.ocpp.ws.pipeline.Deserializer;
-import de.rwth.idsg.steve.ocpp.ws.pipeline.IncomingPipeline;
 import de.rwth.idsg.steve.repository.OcppServerRepository;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -55,8 +52,23 @@ import java.util.concurrent.ScheduledExecutorService;
 @Component
 public class Ocpp12WebSocketEndpoint extends AbstractWebSocketEndpoint {
 
-    public Ocpp12WebSocketEndpoint(ScheduledExecutorService service, OcppServerRepository ocppServerRepository, FutureResponseContextStore futureResponseContextStore, ApplicationEventPublisher applicationEventPublisher, CentralSystemService12_SoapServer server, @Qualifier("sessionContextStore12") SessionContextStore sessionContextStore) {
-        super(service, ocppServerRepository, futureResponseContextStore, applicationEventPublisher, new Ocpp12CallHandler(server), Ocpp12TypeStore.INSTANCE, sessionContextStore);
+    public Ocpp12WebSocketEndpoint(
+            ScheduledExecutorService service,
+            OcppServerRepository ocppServerRepository,
+            FutureResponseContextStore futureResponseContextStore,
+            ApplicationEventPublisher applicationEventPublisher,
+            CentralSystemService12_SoapServer server,
+            @Qualifier("sessionContextStore12") SessionContextStore sessionContextStore
+    ) {
+        super(
+                service,
+                ocppServerRepository,
+                futureResponseContextStore,
+                applicationEventPublisher,
+                new Ocpp12CallHandler(server),
+                Ocpp12TypeStore.INSTANCE,
+                sessionContextStore
+        );
     }
 
     @Override
@@ -74,7 +86,9 @@ public class Ocpp12WebSocketEndpoint extends AbstractWebSocketEndpoint {
             ResponseType r;
 
             if (params instanceof BootNotificationRequest) {
-                r = server.bootNotificationWithTransport((BootNotificationRequest) params, chargeBoxId, OcppProtocol.V_12_JSON);
+                r = server.bootNotificationWithTransport(
+                        (BootNotificationRequest) params, chargeBoxId, OcppProtocol.V_12_JSON
+                );
 
             } else if (params instanceof FirmwareStatusNotificationRequest) {
                 r = server.firmwareStatusNotification((FirmwareStatusNotificationRequest) params, chargeBoxId);

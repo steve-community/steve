@@ -23,7 +23,6 @@ import de.rwth.idsg.steve.config.WebSocketConfiguration;
 import de.rwth.idsg.steve.ocpp.OcppTransport;
 import de.rwth.idsg.steve.ocpp.OcppVersion;
 import de.rwth.idsg.steve.ocpp.ws.data.CommunicationContext;
-import de.rwth.idsg.steve.ocpp.ws.data.SessionContext;
 import de.rwth.idsg.steve.ocpp.ws.pipeline.AbstractCallHandler;
 import de.rwth.idsg.steve.ocpp.ws.pipeline.Deserializer;
 import de.rwth.idsg.steve.ocpp.ws.pipeline.IncomingPipeline;
@@ -42,9 +41,7 @@ import org.springframework.web.socket.WebSocketSession;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Deque;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
@@ -67,7 +64,15 @@ public abstract class AbstractWebSocketEndpoint extends ConcurrentWebSocketHandl
 
     private final IncomingPipeline pipeline;
 
-    public AbstractWebSocketEndpoint(ScheduledExecutorService service, OcppServerRepository ocppServerRepository, FutureResponseContextStore futureResponseContextStore, ApplicationEventPublisher applicationEventPublisher, AbstractCallHandler server, AbstractTypeStore store, SessionContextStore sessionContextStore) {
+    public AbstractWebSocketEndpoint(
+            ScheduledExecutorService service,
+            OcppServerRepository ocppServerRepository,
+            FutureResponseContextStore futureResponseContextStore,
+            ApplicationEventPublisher applicationEventPublisher,
+            AbstractCallHandler server,
+            AbstractTypeStore store,
+            SessionContextStore sessionContextStore
+    ) {
         this.service = service;
         this.ocppServerRepository = ocppServerRepository;
         this.futureResponseContextStore = futureResponseContextStore;
@@ -75,8 +80,12 @@ public abstract class AbstractWebSocketEndpoint extends ConcurrentWebSocketHandl
         Deserializer deserializer = new Deserializer(futureResponseContextStore, store);
         this.pipeline = new IncomingPipeline(deserializer, server);
 
-        connectedCallbackList.add((chargeBoxId) -> applicationEventPublisher.publishEvent(new OcppStationWebSocketConnected(chargeBoxId)));
-        disconnectedCallbackList.add((chargeBoxId) -> applicationEventPublisher.publishEvent(new OcppStationWebSocketDisconnected(chargeBoxId)));
+        connectedCallbackList.add((chargeBoxId) ->
+                applicationEventPublisher.publishEvent(new OcppStationWebSocketConnected(chargeBoxId))
+        );
+        disconnectedCallbackList.add((chargeBoxId) ->
+                applicationEventPublisher.publishEvent(new OcppStationWebSocketDisconnected(chargeBoxId))
+        );
     }
 
     public abstract OcppVersion getVersion();

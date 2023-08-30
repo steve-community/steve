@@ -66,7 +66,11 @@ public class MessageHeaderInterceptor extends AbstractPhaseInterceptor<Message> 
     private static final String BOOT_OPERATION_NAME = "BootNotification";
     private static final String CHARGEBOX_ID_HEADER = "ChargeBoxIdentity";
 
-    public MessageHeaderInterceptor(OcppServerRepository ocppServerRepository, ChargePointHelperService chargePointHelperService, ScheduledExecutorService executorService) {
+    public MessageHeaderInterceptor(
+            OcppServerRepository ocppServerRepository,
+            ChargePointHelperService chargePointHelperService,
+            ScheduledExecutorService executorService
+    ) {
         super(Phase.PRE_INVOKE);
         this.ocppServerRepository = ocppServerRepository;
         this.chargePointHelperService = chargePointHelperService;

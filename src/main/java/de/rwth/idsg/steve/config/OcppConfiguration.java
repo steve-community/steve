@@ -35,9 +35,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.event.ContextRefreshedEvent;
-import org.springframework.context.event.ContextStartedEvent;
 import org.springframework.context.event.EventListener;
-import org.springframework.stereotype.Component;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -67,7 +65,12 @@ public class OcppConfiguration {
     private final List<Feature> logging;
     private final String routerEndpointPath;
 
-    public OcppConfiguration(CentralSystemService ocpp12Server, ocpp.cs._2012._06.CentralSystemService ocpp15Server, ocpp.cs._2015._10.CentralSystemService ocpp16Server, @Qualifier("MessageHeaderInterceptor") PhaseInterceptor<Message> messageHeaderInterceptor) {
+    public OcppConfiguration(
+            CentralSystemService ocpp12Server,
+            ocpp.cs._2012._06.CentralSystemService ocpp15Server,
+            ocpp.cs._2015._10.CentralSystemService ocpp16Server,
+            @Qualifier("MessageHeaderInterceptor") PhaseInterceptor<Message> messageHeaderInterceptor
+    ) {
         this.ocpp12Server = ocpp12Server;
         this.ocpp15Server = ocpp15Server;
         this.ocpp16Server = ocpp16Server;

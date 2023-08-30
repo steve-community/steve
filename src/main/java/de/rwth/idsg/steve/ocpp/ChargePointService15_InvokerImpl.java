@@ -38,7 +38,6 @@ import de.rwth.idsg.steve.ocpp.task.UpdateFirmwareTask;
 import de.rwth.idsg.steve.ocpp.ws.ChargePointServiceInvoker;
 import de.rwth.idsg.steve.ocpp.ws.SessionContextStore;
 import de.rwth.idsg.steve.ocpp.ws.ocpp15.Ocpp15TypeStore;
-import de.rwth.idsg.steve.ocpp.ws.ocpp15.Ocpp15WebSocketEndpoint;
 import de.rwth.idsg.steve.ocpp.ws.pipeline.OutgoingCallPipeline;
 import de.rwth.idsg.steve.repository.dto.ChargePointSelect;
 import ocpp.cp._2012._06.ChargePointService;
@@ -50,12 +49,17 @@ import org.springframework.stereotype.Service;
  * @since 10.03.2018
  */
 @Service
+@Qualifier("ChargePointService15_Invoker")
 public class ChargePointService15_InvokerImpl implements ChargePointService15_Invoker {
 
     private final ChargePointServiceInvoker wsHelper;
     private final ClientProviderWithCache<ChargePointService> soapHelper;
 
-    public ChargePointService15_InvokerImpl(OutgoingCallPipeline pipeline, @Qualifier("sessionContextStore15") SessionContextStore sessionContextStore, ClientProvider clientProvider) {
+    public ChargePointService15_InvokerImpl(
+            OutgoingCallPipeline pipeline,
+            @Qualifier("sessionContextStore15") SessionContextStore sessionContextStore,
+            ClientProvider clientProvider
+    ) {
         this.wsHelper = new ChargePointServiceInvoker(pipeline, sessionContextStore, Ocpp15TypeStore.INSTANCE);
         this.soapHelper = new ClientProviderWithCache<>(clientProvider);
     }

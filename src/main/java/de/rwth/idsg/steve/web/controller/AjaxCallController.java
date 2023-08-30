@@ -55,7 +55,11 @@ public class AjaxCallController {
 
     private final ObjectMapper objectMapper;
 
-    public AjaxCallController(ChargePointRepository chargePointRepository, TransactionRepository transactionRepository, ReservationRepository reservationRepository) {
+    public AjaxCallController(
+            ChargePointRepository chargePointRepository,
+            TransactionRepository transactionRepository,
+            ReservationRepository reservationRepository
+    ) {
         this.chargePointRepository = chargePointRepository;
         this.transactionRepository = transactionRepository;
         this.reservationRepository = reservationRepository;

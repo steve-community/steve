@@ -27,8 +27,6 @@ import de.rwth.idsg.steve.ocpp.ws.AbstractWebSocketEndpoint;
 import de.rwth.idsg.steve.ocpp.ws.FutureResponseContextStore;
 import de.rwth.idsg.steve.ocpp.ws.SessionContextStore;
 import de.rwth.idsg.steve.ocpp.ws.pipeline.AbstractCallHandler;
-import de.rwth.idsg.steve.ocpp.ws.pipeline.Deserializer;
-import de.rwth.idsg.steve.ocpp.ws.pipeline.IncomingPipeline;
 import de.rwth.idsg.steve.repository.OcppServerRepository;
 import lombok.RequiredArgsConstructor;
 import ocpp.cs._2012._06.AuthorizeRequest;
@@ -53,8 +51,23 @@ import java.util.concurrent.ScheduledExecutorService;
  */
 @Component
 public class Ocpp15WebSocketEndpoint extends AbstractWebSocketEndpoint {
-    public Ocpp15WebSocketEndpoint(ScheduledExecutorService service, OcppServerRepository ocppServerRepository, FutureResponseContextStore futureResponseContextStore, ApplicationEventPublisher applicationEventPublisher, CentralSystemService15_SoapServer server, @Qualifier("sessionContextStore15") SessionContextStore sessionContextStore) {
-        super(service, ocppServerRepository, futureResponseContextStore, applicationEventPublisher, new Ocpp15CallHandler(server), Ocpp15TypeStore.INSTANCE, sessionContextStore);
+    public Ocpp15WebSocketEndpoint(
+            ScheduledExecutorService service,
+            OcppServerRepository ocppServerRepository,
+            FutureResponseContextStore futureResponseContextStore,
+            ApplicationEventPublisher applicationEventPublisher,
+            CentralSystemService15_SoapServer server,
+            @Qualifier("sessionContextStore15") SessionContextStore sessionContextStore
+    ) {
+        super(
+                service,
+                ocppServerRepository,
+                futureResponseContextStore,
+                applicationEventPublisher,
+                new Ocpp15CallHandler(server),
+                Ocpp15TypeStore.INSTANCE,
+                sessionContextStore
+        );
     }
 
     @Override
@@ -72,7 +85,9 @@ public class Ocpp15WebSocketEndpoint extends AbstractWebSocketEndpoint {
             ResponseType r;
 
             if (params instanceof BootNotificationRequest) {
-                r = server.bootNotificationWithTransport((BootNotificationRequest) params, chargeBoxId, OcppProtocol.V_15_JSON);
+                r = server.bootNotificationWithTransport(
+                        (BootNotificationRequest) params, chargeBoxId, OcppProtocol.V_15_JSON
+                );
 
             } else if (params instanceof FirmwareStatusNotificationRequest) {
                 r = server.firmwareStatusNotification((FirmwareStatusNotificationRequest) params, chargeBoxId);

@@ -77,9 +77,15 @@ public class ChargePointHelperService {
     private final SessionContextStore sessionContextStore15;
     private final SessionContextStore sessionContextStore16;
 
-    private final UnidentifiedIncomingObjectService unknownChargePointService = new UnidentifiedIncomingObjectService(100);
+    private final UnidentifiedIncomingObjectService unknownChargePointService;
 
-    public ChargePointHelperService(GenericRepository genericRepository, ChargePointRepository chargePointRepository, @Qualifier("sessionContextStore12") SessionContextStore sessionContextStore12, @Qualifier("sessionContextStore15") SessionContextStore sessionContextStore15, @Qualifier("sessionContextStore16") SessionContextStore sessionContextStore16) {
+    public ChargePointHelperService(
+            GenericRepository genericRepository,
+            ChargePointRepository chargePointRepository,
+            @Qualifier("sessionContextStore12") SessionContextStore sessionContextStore12,
+            @Qualifier("sessionContextStore15") SessionContextStore sessionContextStore15,
+            @Qualifier("sessionContextStore16") SessionContextStore sessionContextStore16
+    ) {
         this.autoRegisterUnknownStations = CONFIG.getOcpp().isAutoRegisterUnknownStations();
         this.isRegisteredLocks = Striped.lock(16);
         this.genericRepository = genericRepository;
@@ -87,6 +93,7 @@ public class ChargePointHelperService {
         this.sessionContextStore12 = sessionContextStore12;
         this.sessionContextStore15 = sessionContextStore15;
         this.sessionContextStore16 = sessionContextStore16;
+        this.unknownChargePointService = new UnidentifiedIncomingObjectService(100);
     }
 
     public Optional<RegistrationStatus> getRegistrationStatus(String chargeBoxId) {
@@ -120,7 +127,8 @@ public class ChargePointHelperService {
         Map<String, Deque<SessionContext>> ocpp15Map = sessionContextStore15.getACopy();
         Map<String, Deque<SessionContext>> ocpp16Map = sessionContextStore16.getACopy();
 
-        Set<String> connectedJsonChargeBoxIds = new HashSet<>(extractIds(Arrays.asList(ocpp12Map, ocpp15Map, ocpp16Map)));
+        Set<String> connectedJsonChargeBoxIds
+                = new HashSet<>(extractIds(Arrays.asList(ocpp12Map, ocpp15Map, ocpp16Map)));
 
         List<ConnectorStatus> latestList = chargePointRepository.getChargePointConnectorStatus(params);
 
@@ -155,7 +163,9 @@ public class ChargePointHelperService {
     }
 
     public List<ChargePointSelect> getChargePoints(OcppVersion version) {
-        return getChargePoints(version, Collections.singletonList(RegistrationStatus.ACCEPTED), Collections.emptyList());
+        return getChargePoints(
+                version, Collections.singletonList(RegistrationStatus.ACCEPTED), Collections.emptyList()
+        );
     }
 
     public List<ChargePointSelect> getChargePoints(OcppVersion version, List<RegistrationStatus> inStatusFilter) {
@@ -166,14 +176,19 @@ public class ChargePointHelperService {
         return getChargePoints(version, Collections.singletonList(RegistrationStatus.ACCEPTED), chargeBoxIdFilter);
     }
 
-    public List<ChargePointSelect> getChargePoints(OcppVersion version, List<RegistrationStatus> inStatusFilter, List<String> chargeBoxIdFilter) {
+    public List<ChargePointSelect> getChargePoints(
+            OcppVersion version, List<RegistrationStatus> inStatusFilter, List<String> chargeBoxIdFilter
+    ) {
         switch (version) {
             case V_12:
-                return getChargePoints(OcppProtocol.V_12_SOAP, inStatusFilter, chargeBoxIdFilter, sessionContextStore12);
+                return getChargePoints(
+                        OcppProtocol.V_12_SOAP, inStatusFilter, chargeBoxIdFilter, sessionContextStore12);
             case V_15:
-                return getChargePoints(OcppProtocol.V_15_SOAP, inStatusFilter, chargeBoxIdFilter, sessionContextStore15);
+                return getChargePoints(
+                        OcppProtocol.V_15_SOAP, inStatusFilter, chargeBoxIdFilter, sessionContextStore15);
             case V_16:
-                return getChargePoints(OcppProtocol.V_16_SOAP, inStatusFilter, chargeBoxIdFilter, sessionContextStore16);
+                return getChargePoints(
+                        OcppProtocol.V_16_SOAP, inStatusFilter, chargeBoxIdFilter, sessionContextStore16);
             default:
                 throw new IllegalArgumentException("Unknown OCPP version: " + version);
         }
@@ -220,21 +235,29 @@ public class ChargePointHelperService {
         }
     }
 
-    private List<ChargePointSelect> getChargePoints(OcppProtocol protocol, List<RegistrationStatus> inStatusFilter,
-                                                    List<String> chargeBoxIdFilter, SessionContextStore sessionContextStore) {
+    private List<ChargePointSelect> getChargePoints(OcppProtocol protocol,
+                                                    List<RegistrationStatus> inStatusFilter,
+                                                    List<String> chargeBoxIdFilter,
+                                                    SessionContextStore sessionContextStore) {
         // soap stations
         //
         List<String> statusFilter = inStatusFilter.stream()
                                                   .map(RegistrationStatus::value)
                                                   .collect(Collectors.toList());
 
-        List<ChargePointSelect> returnList = chargePointRepository.getChargePointSelect(protocol, statusFilter, chargeBoxIdFilter);
+        List<ChargePointSelect> returnList = chargePointRepository.getChargePointSelect(
+                protocol, statusFilter, chargeBoxIdFilter
+        );
 
         // json stations
         //
-        List<String> chargeBoxIdList = CollectionUtils.isEmpty(chargeBoxIdFilter)
-            ? sessionContextStore.getChargeBoxIdList()
-            : sessionContextStore.getChargeBoxIdList().stream().filter(chargeBoxIdFilter::contains).collect(Collectors.toList());
+        List<String> chargeBoxIdList;
+        if (CollectionUtils.isEmpty(chargeBoxIdFilter)) {
+            chargeBoxIdList = sessionContextStore.getChargeBoxIdList();
+        } else {
+            chargeBoxIdList = sessionContextStore.getChargeBoxIdList().stream()
+                    .filter(chargeBoxIdFilter::contains).collect(Collectors.toList());
+        }
 
         for (String chargeBoxId : chargeBoxIdList) {
             returnList.add(new ChargePointSelect(OcppTransport.JSON, chargeBoxId));

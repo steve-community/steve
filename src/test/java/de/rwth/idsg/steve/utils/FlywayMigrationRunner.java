@@ -29,7 +29,7 @@ public class FlywayMigrationRunner {
 
     private static final String INIT_SQL = "SET default_storage_engine=InnoDB;";
     private static final String BOOKKEEPING_TABLE = "schema_version";
-    private static final String LOCATION_OF_MIGRATIONS = "filesystem:src/main/resources/db/migration";
+    private static final String LOCATION_OF_MIGRATIONS = "classpath:db/migration";
 
     public static void run(SteveConfiguration sc) {
         try {

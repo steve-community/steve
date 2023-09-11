@@ -94,7 +94,7 @@ public class BeanConfiguration implements WebMvcConfigurer {
         HikariConfig hc = new HikariConfig();
 
         // set standard params
-        hc.setJdbcUrl("jdbc:mysql://" + dbConfig.getIp() + ":" + dbConfig.getPort() + "/" + dbConfig.getSchema());
+        hc.setJdbcUrl(dbConfig.getJdbcUrl());
         hc.setUsername(dbConfig.getUserName());
         hc.setPassword(dbConfig.getPassword());
 

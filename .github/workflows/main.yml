@@ -3,6 +3,10 @@ on: [ push, pull_request ]
 
 jobs:
   build:
+    env:
+      DB_USER: steve
+      DB_PASSWORD: changeme
+      DB_SCHEMA: stevedb_test_2aa6a783d47d
     strategy:
       fail-fast: false
       matrix:
@@ -22,24 +26,31 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
-      - name: Set up Java ${{ matrix.Java }}
+      - name: Set up Java 17 for build
         uses: actions/setup-java@v3
+        with:
+          java-version: 17
+          distribution: 'temurin'
+          cache: maven
+
+      - name: Set up MySQL for tests
+        run: |
+          mysql -h 127.0.0.1 -P 3306 -uroot -proot -e "SELECT @@VERSION;"
+          mysql -h 127.0.0.1 -P 3306 -uroot -proot -e "CREATE DATABASE $DB_SCHEMA;" -v
+          mysql -h 127.0.0.1 -P 3306 -uroot -proot -e "CREATE USER '$DB_USER'@'%' IDENTIFIED BY '$DB_PASSWORD';" -v
+          mysql -h 127.0.0.1 -P 3306 -uroot -proot -e "GRANT ALL PRIVILEGES ON $DB_SCHEMA.* TO '$DB_USER'@'%';" -v
+          mysql -h 127.0.0.1 -P 3306 -uroot -proot -e "GRANT SELECT ON mysql.proc TO '$DB_USER'@'%';" -v || true
+          mysql -h 127.0.0.1 -P 3306 -uroot -proot -e "GRANT SUPER ON *.* TO '$DB_USER'@'%';" -v || true
+
+      - name: Build with Maven
+        run: ./mvnw -B -V -Dmaven.javadoc.skip=true -Ddb.user=$DB_USER -Ddb.password=$DB_PASSWORD -Ddb.schema=$DB_SCHEMA -Ptest clean package --file pom.xml
+
+      - name: Set up Java ${{ matrix.Java }} for run
+        uses: actions/setup-java@v2
         with:
           java-version: ${{ matrix.java }}
           distribution: 'temurin'
           cache: maven
-
-      - name: Set up MySQL
-        run: |
-          mysql -h 127.0.0.1 -P 3306 -uroot -proot -e "SELECT @@VERSION;"
-          mysql -h 127.0.0.1 -P 3306 -uroot -proot -e "CREATE DATABASE stevedb_test_2aa6a783d47d;" -v
-          mysql -h 127.0.0.1 -P 3306 -uroot -proot -e "CREATE USER 'steve'@'%' IDENTIFIED BY 'changeme';" -v
-          mysql -h 127.0.0.1 -P 3306 -uroot -proot -e "GRANT ALL PRIVILEGES ON stevedb_test_2aa6a783d47d.* TO 'steve'@'%';" -v
-          mysql -h 127.0.0.1 -P 3306 -uroot -proot -e "GRANT SELECT ON mysql.proc TO 'steve'@'%';" -v || true
-          mysql -h 127.0.0.1 -P 3306 -uroot -proot -e "GRANT SUPER ON *.* TO 'steve'@'%';" -v || true
-
-      - name: Build with Maven
-        run: ./mvnw -B -V -Dmaven.javadoc.skip=true -Ptest clean package --file pom.xml
 
       - name: Start the app and visit signin web page
         run: |

@@ -19,6 +19,7 @@
 package de.rwth.idsg.steve.utils;
 
 import com.google.common.collect.Sets;
+import de.rwth.idsg.steve.SteveConfiguration;
 import de.rwth.idsg.steve.config.BeanConfiguration;
 import de.rwth.idsg.steve.repository.dto.ChargePoint;
 import de.rwth.idsg.steve.repository.dto.ConnectorStatus;
@@ -66,7 +67,7 @@ import static jooq.steve.db.tables.Transaction.TRANSACTION;
  */
 public class __DatabasePreparer__ {
 
-    private static final String SCHEMA_TO_TRUNCATE = "stevedb_test_2aa6a783d47d";
+    private static final String SCHEMA_TO_TRUNCATE = System.getProperty("schemaToTruncate", "stevedb_test_2aa6a783d47d");
     private static final String REGISTERED_CHARGE_BOX_ID = "charge_box_2aa6a783d47d";
     private static final String REGISTERED_CHARGE_BOX_ID_2 = "charge_box_2aa6a783d47d_2";
     private static final String REGISTERED_OCPP_TAG = "id_tag_2aa6a783d47d";
@@ -75,6 +76,8 @@ public class __DatabasePreparer__ {
     private static final DSLContext dslContext = beanConfiguration.dslContext();
 
     public static void prepare() {
+        SteveConfiguration sc = SteveConfiguration.CONFIG;
+        FlywayMigrationRunner.run(sc);
         runOperation(ctx -> {
             truncateTables(ctx);
             insertChargeBox(ctx);

@@ -180,6 +180,10 @@ public enum SteveConfiguration {
         private final String userName;
         private final String password;
         private final boolean sqlLogging;
+
+        public String getJdbcUrl() {
+            return "jdbc:mysql://" + ip + ":" + port + "/" + schema;
+        }
     }
 
     // Credentials for Web interface access

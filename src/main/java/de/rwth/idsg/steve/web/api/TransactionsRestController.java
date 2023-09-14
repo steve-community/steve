@@ -18,8 +18,12 @@
  */
 package de.rwth.idsg.steve.web.api;
 
+import de.rwth.idsg.steve.repository.ChargePointRepository;
+import de.rwth.idsg.steve.repository.ReservationRepository;
 import de.rwth.idsg.steve.repository.TransactionRepository;
 import de.rwth.idsg.steve.repository.dto.Transaction;
+import de.rwth.idsg.steve.service.OcppTagService;
+import de.rwth.idsg.steve.service.TransactionStopService;
 import de.rwth.idsg.steve.web.api.ApiControllerAdvice.ApiErrorResponse;
 import de.rwth.idsg.steve.web.api.exception.BadRequestException;
 import de.rwth.idsg.steve.web.dto.TransactionQueryForm;
@@ -27,10 +31,17 @@ import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
@@ -47,13 +58,14 @@ import java.util.List;
 public class TransactionsRestController {
 
     private final TransactionRepository transactionRepository;
+    @Autowired
+    private TransactionStopService transactionStopService;
 
     @ApiResponses(value = {
-        @ApiResponse(code = 200, message = "OK"),
-        @ApiResponse(code = 400, message = "Bad Request", response = ApiErrorResponse.class),
-        @ApiResponse(code = 401, message = "Unauthorized", response = ApiErrorResponse.class),
-        @ApiResponse(code = 500, message = "Internal Server Error", response = ApiErrorResponse.class)}
-    )
+            @ApiResponse(code = 200, message = "OK"),
+            @ApiResponse(code = 400, message = "Bad Request", response = ApiErrorResponse.class),
+            @ApiResponse(code = 401, message = "Unauthorized", response = ApiErrorResponse.class),
+            @ApiResponse(code = 500, message = "Internal Server Error", response = ApiErrorResponse.class) })
     @GetMapping(value = "")
     @ResponseBody
     public List<Transaction> get(@Valid TransactionQueryForm.ForApi params) {
@@ -67,4 +79,42 @@ public class TransactionsRestController {
         log.debug("Read response for query: {}", response);
         return response;
     }
+
+    // @ApiResponses(value = {
+    // @ApiResponse(code = 200, message = "OK"),
+    // @ApiResponse(code = 400, message = "Bad Request", response =
+    // ApiErrorResponse.class),
+    // @ApiResponse(code = 401, message = "Unauthorized", response =
+    // ApiErrorResponse.class),
+    // @ApiResponse(code = 500, message = "Internal Server Error", response =
+    // ApiErrorResponse.class)}
+    // )
+    // @PostMapping(value = "/start")
+    // @ResponseBody
+    // public String stopTransaction(@PathVariable("transactionPk") int
+    // transactionPk) {
+    // log.debug("Stop request for transactions: {}", transactionPk);
+
+    // transactionStopService.stop(transactionPk);
+
+    // log.debug("Transactions stopped successfully: {}", transactionPk);
+    // return "Transactions stopped successfully: " + transactionPk;
+    // }
+
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "OK"),
+            @ApiResponse(code = 400, message = "Bad Request", response = ApiErrorResponse.class),
+            @ApiResponse(code = 401, message = "Unauthorized", response = ApiErrorResponse.class),
+            @ApiResponse(code = 500, message = "Internal Server Error", response = ApiErrorResponse.class) })
+    @PostMapping(value = "{transactionPk}/stop")
+    @ResponseBody
+    public String stopTransaction(@PathVariable("transactionPk") int transactionPk) {
+        log.debug("Stop request for transactions: {}", transactionPk);
+
+        transactionStopService.stop(transactionPk);
+
+        log.debug("Transactions stopped successfully: {}", transactionPk);
+        return "Transactions stopped successfully: " + transactionPk;
+    }
+
 }

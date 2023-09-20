@@ -13,22 +13,40 @@ services:
     # TODO: Get database migrations to work with the latest point releases of
     # MariaDB 10.4.
     image: mariadb:10.4.30
-    ports:
-      - 3306:3306
+    expose:
+      - "3306"
     environment:
       MYSQL_RANDOM_ROOT_PASSWORD: "yes"
       MYSQL_DATABASE: stevedb
       MYSQL_USER: steve
       MYSQL_PASSWORD: changeme
-
+    networks:
+      - steve
   app:
     build: .
     links:
       - "db:mariadb"
     volumes:
       - .:/code
-    ports:
-      - "8180:8180"
-      - "8443:8443"
+    expose:
+      - "8180"
+      - "8443"
     depends_on:
       - db
+    networks:
+      - steve
+
+  nginx:
+    image: nginx:1.19.10
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - app
+    networks:
+      - steve
+networks:
+  steve:
+    driver: bridge

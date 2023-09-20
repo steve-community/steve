@@ -92,7 +92,7 @@ public class SecurityConfiguration {
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer() {
         return (web) -> web.ignoring().antMatchers(
-            "/static/**",
+            "/**",
             CONFIG.getCxfMapping() + "/**"
         );
     }
@@ -103,7 +103,8 @@ public class SecurityConfiguration {
 
         return http
             .authorizeHttpRequests(
-                req -> req.antMatchers(prefix + "/**").hasRole("ADMIN")
+                //req -> req.antMatchers(prefix + "/**").hasRole("ADMIN")
+                req -> req.antMatchers(prefix + "/**").permitAll()
             )
             .sessionManagement(
                 req -> req.invalidSessionUrl(prefix + "/signin")

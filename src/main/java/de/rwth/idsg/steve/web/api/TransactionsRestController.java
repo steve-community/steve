@@ -80,26 +80,19 @@ public class TransactionsRestController {
         return response;
     }
 
-    // @ApiResponses(value = {
-    // @ApiResponse(code = 200, message = "OK"),
-    // @ApiResponse(code = 400, message = "Bad Request", response =
-    // ApiErrorResponse.class),
-    // @ApiResponse(code = 401, message = "Unauthorized", response =
-    // ApiErrorResponse.class),
-    // @ApiResponse(code = 500, message = "Internal Server Error", response =
-    // ApiErrorResponse.class)}
-    // )
-    // @PostMapping(value = "/start")
-    // @ResponseBody
-    // public String stopTransaction(@PathVariable("transactionPk") int
-    // transactionPk) {
-    // log.debug("Stop request for transactions: {}", transactionPk);
+    //Remote Start Transaction Endpoint
+    // Write an endpoint for Remote Start Transaction
+    // The endpoint should accept the following parameters:
+    // - chargeBoxId
+    // - idTag
+    // - connectorId
+    // The endpoint should return the following response:
+    // - transactionId
+    // - status
+    // - timestamp
+    // - meterStart
+    
 
-    // transactionStopService.stop(transactionPk);
-
-    // log.debug("Transactions stopped successfully: {}", transactionPk);
-    // return "Transactions stopped successfully: " + transactionPk;
-    // }
 
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "OK"),
@@ -116,5 +109,7 @@ public class TransactionsRestController {
         log.debug("Transactions stopped successfully: {}", transactionPk);
         return "Transactions stopped successfully: " + transactionPk;
     }
+
+
 
 }

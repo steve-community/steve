@@ -90,7 +90,7 @@ public class OcppTagsRestController {
     }
 
     @ApiResponses(value = {
-        @ApiResponse(code = 201, message = "Created"),
+        @ApiResponse(code = 200, message = "Created"),
         @ApiResponse(code = 400, message = "Bad Request", response = ApiErrorResponse.class),
         @ApiResponse(code = 401, message = "Unauthorized", response = ApiErrorResponse.class),
         @ApiResponse(code = 422, message = "Unprocessable Entity", response = ApiErrorResponse.class),

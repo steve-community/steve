@@ -29,7 +29,7 @@ jobs:
       - name: Run PMD
         uses: pmd/pmd-github-action@v1
         with:
-          version: '6.49.0'
+          version: 'latest'
           sourcePath: './src/main/java'
           rulesets: './src/main/resources/maven-pmd-plugin-default.xml'
       - name: Fail build if there are violations

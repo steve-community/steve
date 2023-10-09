@@ -53,15 +53,12 @@ public class ChargingProfileForm {
     private String description;
     private String note;
 
-    @NotNull(message = "Stack Level has to be set")
-    @PositiveOrZero(message = "Stack Level has to be a positive number or 0")
+    @NotNull(message = "Stack Level has to be set") @PositiveOrZero(message = "Stack Level has to be a positive number or 0")
     private Integer stackLevel;
 
-    @NotNull(message = "Charging Profile Purpose has to be set")
-    private ChargingProfilePurposeType chargingProfilePurpose;
+    @NotNull(message = "Charging Profile Purpose has to be set") private ChargingProfilePurposeType chargingProfilePurpose;
 
-    @NotNull(message = "Charging Profile Kind has to be set")
-    private ChargingProfileKindType chargingProfileKind;
+    @NotNull(message = "Charging Profile Kind has to be set") private ChargingProfileKindType chargingProfileKind;
 
     private RecurrencyKindType recurrencyKind;
 
@@ -70,13 +67,11 @@ public class ChargingProfileForm {
     @Future(message = "Valid To must be in future")
     private LocalDateTime validTo;
 
-    @Positive(message = "Duration has to be a positive number")
-    private Integer durationInSeconds;
+    @Positive(message = "Duration has to be a positive number") private Integer durationInSeconds;
 
     private LocalDateTime startSchedule;
 
-    @NotNull(message = "Charging Rate Unit has to be set")
-    private ChargingRateUnitType chargingRateUnit;
+    @NotNull(message = "Charging Rate Unit has to be set") private ChargingRateUnitType chargingRateUnit;
 
     private BigDecimal minChargingRate;
 
@@ -124,11 +119,9 @@ public class ChargingProfileForm {
 
         private static final int defaultNumberPhases = 3;
 
-        @NotNull(message = "Schedule period: Start Period has to be set")
-        private Integer startPeriodInSeconds; // from the startSchedule
+        @NotNull(message = "Schedule period: Start Period has to be set") private Integer startPeriodInSeconds; // from the startSchedule
 
-        @NotNull(message = "Schedule period: Power Limit has to be set")
-        private BigDecimal powerLimit;
+        @NotNull(message = "Schedule period: Power Limit has to be set") private BigDecimal powerLimit;
 
         private Integer numberPhases;
 

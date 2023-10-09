@@ -56,7 +56,8 @@ public class Ocpp16WebSocketEndpoint extends AbstractWebSocketEndpoint {
 
     @PostConstruct
     public void init() {
-        Deserializer deserializer = new Deserializer(futureResponseContextStore, Ocpp16TypeStore.INSTANCE);
+        Deserializer deserializer =
+                new Deserializer(futureResponseContextStore, Ocpp16TypeStore.INSTANCE);
         IncomingPipeline pipeline = new IncomingPipeline(deserializer, new Ocpp16CallHandler(server));
         super.init(pipeline);
     }
@@ -76,10 +77,14 @@ public class Ocpp16WebSocketEndpoint extends AbstractWebSocketEndpoint {
             ResponseType r;
 
             if (params instanceof BootNotificationRequest) {
-                r = server.bootNotificationWithTransport((BootNotificationRequest) params, chargeBoxId, OcppProtocol.V_16_JSON);
+                r =
+                        server.bootNotificationWithTransport(
+                                (BootNotificationRequest) params, chargeBoxId, OcppProtocol.V_16_JSON);
 
             } else if (params instanceof FirmwareStatusNotificationRequest) {
-                r = server.firmwareStatusNotification((FirmwareStatusNotificationRequest) params, chargeBoxId);
+                r =
+                        server.firmwareStatusNotification(
+                                (FirmwareStatusNotificationRequest) params, chargeBoxId);
 
             } else if (params instanceof StatusNotificationRequest) {
                 r = server.statusNotification((StatusNotificationRequest) params, chargeBoxId);
@@ -88,7 +93,9 @@ public class Ocpp16WebSocketEndpoint extends AbstractWebSocketEndpoint {
                 r = server.meterValues((MeterValuesRequest) params, chargeBoxId);
 
             } else if (params instanceof DiagnosticsStatusNotificationRequest) {
-                r = server.diagnosticsStatusNotification((DiagnosticsStatusNotificationRequest) params, chargeBoxId);
+                r =
+                        server.diagnosticsStatusNotification(
+                                (DiagnosticsStatusNotificationRequest) params, chargeBoxId);
 
             } else if (params instanceof StartTransactionRequest) {
                 r = server.startTransaction((StartTransactionRequest) params, chargeBoxId);

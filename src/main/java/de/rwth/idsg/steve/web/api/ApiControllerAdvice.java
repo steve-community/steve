@@ -61,7 +61,8 @@ public class ApiControllerAdvice {
 
     @ExceptionHandler(SteveException.NotFound.class)
     @ResponseStatus(value = HttpStatus.NOT_FOUND)
-    public ApiErrorResponse handleNotFoundException(HttpServletRequest req, SteveException.NotFound exception) {
+    public ApiErrorResponse handleNotFoundException(
+            HttpServletRequest req, SteveException.NotFound exception) {
         String url = req.getRequestURL().toString();
         log.error("Request: {} raised following exception.", url, exception);
         return createResponse(url, HttpStatus.NOT_FOUND, exception.getMessage());
@@ -69,7 +70,8 @@ public class ApiControllerAdvice {
 
     @ExceptionHandler(SteveException.AlreadyExists.class)
     @ResponseStatus(value = HttpStatus.UNPROCESSABLE_ENTITY)
-    public ApiErrorResponse handleAlreadyExistsException(HttpServletRequest req, SteveException.AlreadyExists exception) {
+    public ApiErrorResponse handleAlreadyExistsException(
+            HttpServletRequest req, SteveException.AlreadyExists exception) {
         String url = req.getRequestURL().toString();
         log.error("Request: {} raised following exception.", url, exception);
         return createResponse(url, HttpStatus.UNPROCESSABLE_ENTITY, exception.getMessage());
@@ -77,7 +79,8 @@ public class ApiControllerAdvice {
 
     @ExceptionHandler(BadRequestException.class)
     @ResponseStatus(value = HttpStatus.BAD_REQUEST)
-    public ApiErrorResponse handleBadRequestException(HttpServletRequest req, BadRequestException exception) {
+    public ApiErrorResponse handleBadRequestException(
+            HttpServletRequest req, BadRequestException exception) {
         String url = req.getRequestURL().toString();
         log.error("Request: {} raised following exception.", url, exception);
         return createResponse(url, HttpStatus.BAD_REQUEST, exception.getMessage());
@@ -85,7 +88,8 @@ public class ApiControllerAdvice {
 
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
     @ResponseStatus(value = HttpStatus.BAD_REQUEST)
-    public ApiErrorResponse handleMethodArgumentTypeMismatchException(HttpServletRequest req, MethodArgumentTypeMismatchException exception) {
+    public ApiErrorResponse handleMethodArgumentTypeMismatchException(
+            HttpServletRequest req, MethodArgumentTypeMismatchException exception) {
         String url = req.getRequestURL().toString();
         log.error("Request: {} raised following exception.", url, exception);
         return createResponse(url, HttpStatus.BAD_REQUEST, exception.getMessage());
@@ -119,5 +123,4 @@ public class ApiControllerAdvice {
         private String message;
         private String path;
     }
-
 }

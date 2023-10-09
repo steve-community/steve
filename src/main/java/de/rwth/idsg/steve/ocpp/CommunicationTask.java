@@ -38,7 +38,8 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * Contains the context for a request/response communication and callbacks for handling responses/errors.
+ * Contains the context for a request/response communication and callbacks for handling
+ * responses/errors.
  *
  * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 09.03.2018
@@ -73,9 +74,7 @@ public abstract class CommunicationTask<S extends ChargePointSelection, RESPONSE
         this(ocppVersion, params, TaskOrigin.INTERNAL, "SteVe");
     }
 
-    /**
-     * Do not expose the constructor, make it package-private
-     */
+    /** Do not expose the constructor, make it package-private */
     CommunicationTask(OcppVersion ocppVersion, S params, TaskOrigin origin, String caller) {
         List<ChargePointSelect> cpsList = params.getChargePointSelectList();
 
@@ -146,30 +145,42 @@ public abstract class CommunicationTask<S extends ChargePointSelection, RESPONSE
 
     public RequestType getRequest() {
         switch (ocppVersion) {
-            case V_12: return getOcpp12Request();
-            case V_15: return getOcpp15Request();
-            case V_16: return getOcpp16Request();
-            default: throw new RuntimeException("Request type not found");
+            case V_12:
+                return getOcpp12Request();
+            case V_15:
+                return getOcpp15Request();
+            case V_16:
+                return getOcpp16Request();
+            default:
+                throw new RuntimeException("Request type not found");
         }
     }
 
     public <T extends ResponseType> AsyncHandler<T> getHandler(String chargeBoxId) {
         switch (ocppVersion) {
-            case V_12: return getOcpp12Handler(chargeBoxId);
-            case V_15: return getOcpp15Handler(chargeBoxId);
-            case V_16: return getOcpp16Handler(chargeBoxId);
-            default: throw new RuntimeException("ResponseType handler not found");
+            case V_12:
+                return getOcpp12Handler(chargeBoxId);
+            case V_15:
+                return getOcpp15Handler(chargeBoxId);
+            case V_16:
+                return getOcpp16Handler(chargeBoxId);
+            default:
+                throw new RuntimeException("ResponseType handler not found");
         }
     }
 
     public abstract OcppCallback<RESPONSE> defaultCallback();
 
     public abstract <T extends RequestType> T getOcpp12Request();
+
     public abstract <T extends RequestType> T getOcpp15Request();
+
     public abstract <T extends RequestType> T getOcpp16Request();
 
     public abstract <T extends ResponseType> AsyncHandler<T> getOcpp12Handler(String chargeBoxId);
+
     public abstract <T extends ResponseType> AsyncHandler<T> getOcpp15Handler(String chargeBoxId);
+
     public abstract <T extends ResponseType> AsyncHandler<T> getOcpp16Handler(String chargeBoxId);
 
     // -------------------------------------------------------------------------

@@ -30,14 +30,14 @@ public interface TypeStore {
     /**
      * For incoming requests
      *
-     * Action field --> Request JAXB class
+     * <p>Action field --> Request JAXB class
      */
     Class<? extends RequestType> findRequestClass(String action);
 
     /**
      * For outgoing requests
      *
-     * Request JAXB class --> Action field, Response JAXB class
+     * <p>Request JAXB class --> Action field, Response JAXB class
      */
     <T extends RequestType> ActionResponsePair findActionResponse(T requestPayload);
 }

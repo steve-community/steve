@@ -48,8 +48,7 @@ public class LogController {
         try (PrintWriter writer = response.getWriter()) {
             Optional<Path> p = LogFileRetriever.INSTANCE.getPath();
             if (p.isPresent()) {
-                Files.lines(p.get(), StandardCharsets.UTF_8)
-                     .forEach(writer::println);
+                Files.lines(p.get(), StandardCharsets.UTF_8).forEach(writer::println);
             } else {
                 writer.write(LogFileRetriever.INSTANCE.getErrorMessage());
             }
@@ -61,5 +60,4 @@ public class LogController {
     public String getLogFilePath() {
         return LogFileRetriever.INSTANCE.getLogFilePathOrErrorMessage();
     }
-
 }

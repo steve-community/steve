@@ -74,9 +74,10 @@ public class TaskController {
     }
 
     @RequestMapping(value = TASK_DETAILS_PATH, method = RequestMethod.GET)
-    public String getDetailsForChargeBox(@PathVariable("taskId") Integer taskId,
-                                         @PathVariable("chargeBoxId") String chargeBoxId,
-                                         Model model) {
+    public String getDetailsForChargeBox(
+            @PathVariable("taskId") Integer taskId,
+            @PathVariable("chargeBoxId") String chargeBoxId,
+            Model model) {
 
         CommunicationTask r = taskStore.get(taskId);
 
@@ -89,7 +90,8 @@ public class TaskController {
         }
     }
 
-    private String processForGetCompositeScheduleTask(GetCompositeScheduleTask k, String chargeBoxId, Model model) {
+    private String processForGetCompositeScheduleTask(
+            GetCompositeScheduleTask k, String chargeBoxId, Model model) {
         RequestResult result = extractResult(k, chargeBoxId);
         GetCompositeScheduleResponse response = result.getDetails();
 
@@ -98,7 +100,8 @@ public class TaskController {
         return "op16/GetCompositeScheduleResponse";
     }
 
-    private String processForGetConfigurationTask(GetConfigurationTask k, String chargeBoxId, Model model) {
+    private String processForGetConfigurationTask(
+            GetConfigurationTask k, String chargeBoxId, Model model) {
         RequestResult result = extractResult(k, chargeBoxId);
         GetConfigurationTask.ResponseWrapper response = result.getDetails();
 

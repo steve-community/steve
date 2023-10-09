@@ -78,7 +78,8 @@ public class ClientProvider {
     }
 
     private static boolean shouldInitSSL() {
-        return CONFIG.getJetty().getKeyStorePath() != null && CONFIG.getJetty().getKeyStorePassword() != null;
+        return CONFIG.getJetty().getKeyStorePath() != null
+                && CONFIG.getJetty().getKeyStorePassword() != null;
     }
 
     private static SSLSocketFactory setupSSL() {
@@ -86,12 +87,13 @@ public class ClientProvider {
         try {
             String keyStorePath = CONFIG.getJetty().getKeyStorePath();
             String keyStorePwd = CONFIG.getJetty().getKeyStorePassword();
-            ssl = SslContextBuilder.builder()
-                                   .keyStoreFromFile(keyStorePath, keyStorePwd)
-                                   .usingTLS()
-                                   .usingDefaultAlgorithm()
-                                   .usingKeyManagerPasswordFromKeyStore()
-                                   .buildMergedWithSystem();
+            ssl =
+                    SslContextBuilder.builder()
+                            .keyStoreFromFile(keyStorePath, keyStorePwd)
+                            .usingTLS()
+                            .usingDefaultAlgorithm()
+                            .usingKeyManagerPasswordFromKeyStore()
+                            .buildMergedWithSystem();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

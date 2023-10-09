@@ -70,7 +70,8 @@ public class UpdateFirmwareTask extends CommunicationTask<UpdateFirmwareParams, 
     }
 
     @Override
-    public AsyncHandler<ocpp.cp._2010._08.UpdateFirmwareResponse> getOcpp12Handler(String chargeBoxId) {
+    public AsyncHandler<ocpp.cp._2010._08.UpdateFirmwareResponse> getOcpp12Handler(
+            String chargeBoxId) {
         return res -> {
             try {
                 success(chargeBoxId, "OK");
@@ -81,7 +82,8 @@ public class UpdateFirmwareTask extends CommunicationTask<UpdateFirmwareParams, 
     }
 
     @Override
-    public AsyncHandler<ocpp.cp._2012._06.UpdateFirmwareResponse> getOcpp15Handler(String chargeBoxId) {
+    public AsyncHandler<ocpp.cp._2012._06.UpdateFirmwareResponse> getOcpp15Handler(
+            String chargeBoxId) {
         return res -> {
             try {
                 success(chargeBoxId, "OK");
@@ -92,7 +94,8 @@ public class UpdateFirmwareTask extends CommunicationTask<UpdateFirmwareParams, 
     }
 
     @Override
-    public AsyncHandler<ocpp.cp._2015._10.UpdateFirmwareResponse> getOcpp16Handler(String chargeBoxId) {
+    public AsyncHandler<ocpp.cp._2015._10.UpdateFirmwareResponse> getOcpp16Handler(
+            String chargeBoxId) {
         return res -> {
             try {
                 success(chargeBoxId, "OK");
@@ -101,5 +104,4 @@ public class UpdateFirmwareTask extends CommunicationTask<UpdateFirmwareParams, 
             }
         };
     }
-
 }

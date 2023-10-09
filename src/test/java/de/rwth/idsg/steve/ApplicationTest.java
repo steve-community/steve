@@ -47,8 +47,9 @@ import static de.rwth.idsg.steve.utils.Helpers.getRandomString;
 @Slf4j
 public class ApplicationTest {
 
-    private static final String REGISTERED_CHARGE_BOX_ID = __DatabasePreparer__.getRegisteredChargeBoxId();
-    private static final String REGISTERED_OCPP_TAG =  __DatabasePreparer__.getRegisteredOcppTag();
+    private static final String REGISTERED_CHARGE_BOX_ID =
+            __DatabasePreparer__.getRegisteredChargeBoxId();
+    private static final String REGISTERED_OCPP_TAG = __DatabasePreparer__.getRegisteredOcppTag();
     private static final String path = getPath();
 
     private static Application app;
@@ -74,18 +75,18 @@ public class ApplicationTest {
     public void testOcpp12() {
         ocpp.cs._2010._08.CentralSystemService client = getForOcpp12(path);
 
-        BootNotificationResponse boot = client.bootNotification(
-                new BootNotificationRequest()
-                        .withChargePointVendor(getRandomString())
-                        .withChargePointModel(getRandomString()),
-                REGISTERED_CHARGE_BOX_ID);
+        BootNotificationResponse boot =
+                client.bootNotification(
+                        new BootNotificationRequest()
+                                .withChargePointVendor(getRandomString())
+                                .withChargePointModel(getRandomString()),
+                        REGISTERED_CHARGE_BOX_ID);
         Assertions.assertNotNull(boot);
         Assertions.assertEquals(RegistrationStatus.ACCEPTED, boot.getStatus());
 
-        AuthorizeResponse auth = client.authorize(
-                new AuthorizeRequest()
-                        .withIdTag(REGISTERED_OCPP_TAG),
-                REGISTERED_CHARGE_BOX_ID);
+        AuthorizeResponse auth =
+                client.authorize(
+                        new AuthorizeRequest().withIdTag(REGISTERED_OCPP_TAG), REGISTERED_CHARGE_BOX_ID);
         Assertions.assertNotNull(auth);
         Assertions.assertEquals(AuthorizationStatus.ACCEPTED, auth.getIdTagInfo().getStatus());
     }
@@ -94,20 +95,22 @@ public class ApplicationTest {
     public void testOcpp15() {
         CentralSystemService client = getForOcpp15(path);
 
-        ocpp.cs._2012._06.BootNotificationResponse boot = client.bootNotification(
-                new ocpp.cs._2012._06.BootNotificationRequest()
-                        .withChargePointVendor(getRandomString())
-                        .withChargePointModel(getRandomString()),
-                REGISTERED_CHARGE_BOX_ID);
+        ocpp.cs._2012._06.BootNotificationResponse boot =
+                client.bootNotification(
+                        new ocpp.cs._2012._06.BootNotificationRequest()
+                                .withChargePointVendor(getRandomString())
+                                .withChargePointModel(getRandomString()),
+                        REGISTERED_CHARGE_BOX_ID);
         Assertions.assertNotNull(boot);
         Assertions.assertEquals(ocpp.cs._2012._06.RegistrationStatus.ACCEPTED, boot.getStatus());
 
-        ocpp.cs._2012._06.AuthorizeResponse auth = client.authorize(
-                new ocpp.cs._2012._06.AuthorizeRequest()
-                        .withIdTag(REGISTERED_OCPP_TAG),
-                REGISTERED_CHARGE_BOX_ID);
+        ocpp.cs._2012._06.AuthorizeResponse auth =
+                client.authorize(
+                        new ocpp.cs._2012._06.AuthorizeRequest().withIdTag(REGISTERED_OCPP_TAG),
+                        REGISTERED_CHARGE_BOX_ID);
         Assertions.assertNotNull(auth);
-        Assertions.assertEquals(ocpp.cs._2012._06.AuthorizationStatus.ACCEPTED, auth.getIdTagInfo().getStatus());
+        Assertions.assertEquals(
+                ocpp.cs._2012._06.AuthorizationStatus.ACCEPTED, auth.getIdTagInfo().getStatus());
     }
 
     /**
@@ -115,24 +118,27 @@ public class ApplicationTest {
      */
     @Test
     public void testOcpp16() {
-        Assertions.assertThrows(WebServiceException.class, () -> {
-            ocpp.cs._2015._10.CentralSystemService client = getForOcpp16(path);
+        Assertions.assertThrows(
+                WebServiceException.class,
+                () -> {
+                    ocpp.cs._2015._10.CentralSystemService client = getForOcpp16(path);
 
-            ocpp.cs._2015._10.BootNotificationResponse boot = client.bootNotification(
-                new ocpp.cs._2015._10.BootNotificationRequest()
-                    .withChargePointVendor(getRandomString())
-                    .withChargePointModel(getRandomString()),
-                getRandomString());
-            Assertions.assertNotNull(boot);
-            Assertions.assertEquals(ocpp.cs._2015._10.RegistrationStatus.REJECTED, boot.getStatus());
+                    ocpp.cs._2015._10.BootNotificationResponse boot =
+                            client.bootNotification(
+                                    new ocpp.cs._2015._10.BootNotificationRequest()
+                                            .withChargePointVendor(getRandomString())
+                                            .withChargePointModel(getRandomString()),
+                                    getRandomString());
+                    Assertions.assertNotNull(boot);
+                    Assertions.assertEquals(ocpp.cs._2015._10.RegistrationStatus.REJECTED, boot.getStatus());
 
-            ocpp.cs._2015._10.AuthorizeResponse auth = client.authorize(
-                new ocpp.cs._2015._10.AuthorizeRequest()
-                    .withIdTag(getRandomString()),
-                getRandomString());
-            Assertions.assertNotNull(auth);
-            Assertions.assertEquals(ocpp.cs._2015._10.AuthorizationStatus.INVALID, auth.getIdTagInfo().getStatus());
-        });
+                    ocpp.cs._2015._10.AuthorizeResponse auth =
+                            client.authorize(
+                                    new ocpp.cs._2015._10.AuthorizeRequest().withIdTag(getRandomString()),
+                                    getRandomString());
+                    Assertions.assertNotNull(auth);
+                    Assertions.assertEquals(
+                            ocpp.cs._2015._10.AuthorizationStatus.INVALID, auth.getIdTagInfo().getStatus());
+                });
     }
-
 }

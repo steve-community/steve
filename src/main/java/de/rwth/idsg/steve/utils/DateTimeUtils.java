@@ -39,16 +39,25 @@ import java.util.concurrent.TimeUnit;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class DateTimeUtils {
 
-    private static final DateTimeFormatter HUMAN_FORMATTER = DateTimeFormat.forPattern("yyyy-MM-dd 'at' HH:mm");
+    private static final DateTimeFormatter HUMAN_FORMATTER =
+            DateTimeFormat.forPattern("yyyy-MM-dd 'at' HH:mm");
     private static final DateTimeFormatter TIME_FORMATTER = DateTimeFormat.forPattern("HH:mm");
 
-    private static final PeriodFormatter PERIOD_FORMATTER = new PeriodFormatterBuilder()
-            .printZeroNever()
-            .appendDays().appendSuffix(" day", " days").appendSeparator(" ")
-            .appendHours().appendSuffix(" hour", " hours").appendSeparator(" ")
-            .appendMinutes().appendSuffix(" minute", " minutes").appendSeparator(" ")
-            .appendSeconds().appendSuffix(" second", " seconds")
-            .toFormatter();
+    private static final PeriodFormatter PERIOD_FORMATTER =
+            new PeriodFormatterBuilder()
+                    .printZeroNever()
+                    .appendDays()
+                    .appendSuffix(" day", " days")
+                    .appendSeparator(" ")
+                    .appendHours()
+                    .appendSuffix(" hour", " hours")
+                    .appendSeparator(" ")
+                    .appendMinutes()
+                    .appendSuffix(" minute", " minutes")
+                    .appendSeparator(" ")
+                    .appendSeconds()
+                    .appendSuffix(" second", " seconds")
+                    .toFormatter();
 
     public static DateTime toDateTime(LocalDateTime ldt) {
         if (ldt == null) {
@@ -66,9 +75,7 @@ public final class DateTimeUtils {
         }
     }
 
-    /**
-     * Print the date/time nicer, if it's from today, yesterday or tomorrow.
-     */
+    /** Print the date/time nicer, if it's from today, yesterday or tomorrow. */
     public static String humanize(DateTime dt) {
         if (dt == null) {
             return "";
@@ -82,15 +89,15 @@ public final class DateTimeUtils {
         if (inputAtMidnight.equals(todayAtMidnight)) {
             return "Today at " + TIME_FORMATTER.print(dt);
 
-        // Is it yesterday?
+            // Is it yesterday?
         } else if (inputAtMidnight.equals(todayAtMidnight.minusDays(1))) {
             return "Yesterday at " + TIME_FORMATTER.print(dt);
 
-        // Is it tomorrow?
+            // Is it tomorrow?
         } else if (inputAtMidnight.equals(todayAtMidnight.plusDays(1))) {
             return "Tomorrow at " + TIME_FORMATTER.print(dt);
 
-        // So long ago OR in the future...
+            // So long ago OR in the future...
         } else {
             return HUMAN_FORMATTER.print(dt);
         }
@@ -105,8 +112,10 @@ public final class DateTimeUtils {
         long java = DateTimeUtils.getOffsetFromUtcInSeconds();
 
         if (sql != java) {
-            throw new SteveException("MySQL and Java are not using the same time zone. " +
-                    "Java offset in seconds (%s) != MySQL offset in seconds (%s)", java, sql);
+            throw new SteveException(
+                    "MySQL and Java are not using the same time zone. "
+                            + "Java offset in seconds (%s) != MySQL offset in seconds (%s)",
+                    java, sql);
         }
     }
 

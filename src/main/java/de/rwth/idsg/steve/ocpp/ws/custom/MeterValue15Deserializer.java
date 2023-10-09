@@ -34,9 +34,9 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * Custom deserializer to work around broken charging station implementations,
- * that set the field name wrongfully to "values" rather than the correct "value".
- * We handle the situation by looking both fields up in the message.
+ * Custom deserializer to work around broken charging station implementations, that set the field
+ * name wrongfully to "values" rather than the correct "value". We handle the situation by looking
+ * both fields up in the message.
  *
  * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 01.09.2015

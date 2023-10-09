@@ -43,7 +43,8 @@ public final class ConnectorStatusCountFilter {
         return getStatusCountMap(latestList, false);
     }
 
-    public static Map<String, Integer> getStatusCountMap(List<ConnectorStatus> latestList, boolean printZero) {
+    public static Map<String, Integer> getStatusCountMap(
+            List<ConnectorStatus> latestList, boolean printZero) {
         List<ConnectorStatus> filteredList = ConnectorStatusFilter.filterAndPreferZero(latestList);
 
         // TreeMap because we want a consistent order of the listing on the page
@@ -75,5 +76,4 @@ public final class ConnectorStatusCountFilter {
 
         return set;
     }
-
 }

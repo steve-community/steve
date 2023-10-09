@@ -22,7 +22,8 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 /**
- * The values are as defined in spec "OCPP implementation guide SOAP - RC1 0.6" and in section "5. OCPP version"
+ * The values are as defined in spec "OCPP implementation guide SOAP - RC1 0.6" and in section "5.
+ * OCPP version"
  *
  * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 01.12.2014
@@ -37,7 +38,7 @@ public enum OcppVersion {
     private final String value;
 
     public static OcppVersion fromValue(String v) {
-        for (OcppVersion c: OcppVersion.values()) {
+        for (OcppVersion c : OcppVersion.values()) {
             if (c.getValue().equals(v)) {
                 return c;
             }

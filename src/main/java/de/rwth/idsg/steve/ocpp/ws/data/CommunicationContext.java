@@ -63,14 +63,14 @@ public class CommunicationContext {
     @SuppressWarnings("unchecked")
     public void createResultHandler(CommunicationTask task) {
         // TODO: not so sure about this
-        resultHandler = result -> task.getHandler(chargeBoxId)
-                                      .handleResponse(new DummyResponse(result.getPayload()));
+        resultHandler =
+                result ->
+                        task.getHandler(chargeBoxId).handleResponse(new DummyResponse(result.getPayload()));
     }
 
     public void createErrorHandler(CommunicationTask task) {
         // TODO: not so sure about this
-        errorHandler = result -> task.defaultCallback()
-                                     .success(chargeBoxId, result);
+        errorHandler = result -> task.defaultCallback().success(chargeBoxId, result);
     }
 
     @RequiredArgsConstructor(access = AccessLevel.PRIVATE)

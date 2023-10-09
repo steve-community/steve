@@ -43,14 +43,16 @@ public class CustomStringModuleTest {
     public void testLink() throws Exception {
         SimpleJsonModel input = new SimpleJsonModel("<a href=\"link\">Some link</a>");
         String output = mapper.writeValueAsString(input);
-        Assertions.assertEquals("{\"someText\":\"&lt;a href=&#34;link&#34;&gt;Some link&lt;/a&gt;\"}", output);
+        Assertions.assertEquals(
+                "{\"someText\":\"&lt;a href=&#34;link&#34;&gt;Some link&lt;/a&gt;\"}", output);
     }
 
     @Test
     public void testScript() throws Exception {
         SimpleJsonModel input = new SimpleJsonModel("<script src=\"http://someurl.com/script.js\"/>");
         String output = mapper.writeValueAsString(input);
-        Assertions.assertEquals("{\"someText\":\"&lt;script src=&#34;http://someurl.com/script.js&#34;/&gt;\"}", output);
+        Assertions.assertEquals(
+                "{\"someText\":\"&lt;script src=&#34;http://someurl.com/script.js&#34;/&gt;\"}", output);
     }
 
     @Data

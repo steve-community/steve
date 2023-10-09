@@ -48,10 +48,10 @@ public class SettingsRepositoryImpl implements SettingsRepository {
 
     // Totally unnecessary to specify charset here. We just do it to make findbugs plugin happy.
     //
-    private static final String APP_ID = new String(
-            Base64.getEncoder().encode("SteckdosenVerwaltung".getBytes(StandardCharsets.UTF_8)),
-            StandardCharsets.UTF_8
-    );
+    private static final String APP_ID =
+            new String(
+                    Base64.getEncoder().encode("SteckdosenVerwaltung".getBytes(StandardCharsets.UTF_8)),
+                    StandardCharsets.UTF_8);
 
     @Autowired private DSLContext ctx;
 
@@ -63,19 +63,18 @@ public class SettingsRepositoryImpl implements SettingsRepository {
         List<NotificationFeature> features = splitFeatures(r.getNotificationFeatures());
 
         return SettingsForm.builder()
-                           .heartbeat(toMin(r.getHeartbeatIntervalInSeconds()))
-                           .expiration(r.getHoursToExpire())
-                           .enabled(r.getMailEnabled())
-                           .host(r.getMailHost())
-                           .username(r.getMailUsername())
-                           .password(r.getMailPassword())
-                           .from(r.getMailFrom())
-                           .protocol(r.getMailProtocol())
-                           .port(r.getMailPort())
-                           .recipients(eMails)
-                           .enabledFeatures(features)
-                           .build();
-
+                .heartbeat(toMin(r.getHeartbeatIntervalInSeconds()))
+                .expiration(r.getHoursToExpire())
+                .enabled(r.getMailEnabled())
+                .host(r.getMailHost())
+                .username(r.getMailUsername())
+                .password(r.getMailPassword())
+                .from(r.getMailFrom())
+                .protocol(r.getMailProtocol())
+                .port(r.getMailPort())
+                .recipients(eMails)
+                .enabledFeatures(features)
+                .build();
     }
 
     @Override
@@ -86,16 +85,16 @@ public class SettingsRepositoryImpl implements SettingsRepository {
         List<NotificationFeature> features = splitFeatures(r.getNotificationFeatures());
 
         return MailSettings.builder()
-                           .enabled(r.getMailEnabled())
-                           .host(r.getMailHost())
-                           .username(r.getMailUsername())
-                           .password(r.getMailPassword())
-                           .from(r.getMailFrom())
-                           .protocol(r.getMailProtocol())
-                           .port(r.getMailPort())
-                           .recipients(eMails)
-                           .enabledFeatures(features)
-                           .build();
+                .enabled(r.getMailEnabled())
+                .host(r.getMailHost())
+                .username(r.getMailUsername())
+                .password(r.getMailPassword())
+                .from(r.getMailFrom())
+                .protocol(r.getMailProtocol())
+                .port(r.getMailPort())
+                .recipients(eMails)
+                .enabledFeatures(features)
+                .build();
     }
 
     @Override
@@ -115,19 +114,19 @@ public class SettingsRepositoryImpl implements SettingsRepository {
 
         try {
             ctx.update(SETTINGS)
-               .set(SETTINGS.HEARTBEAT_INTERVAL_IN_SECONDS, toSec(form.getHeartbeat()))
-               .set(SETTINGS.HOURS_TO_EXPIRE, form.getExpiration())
-               .set(SETTINGS.MAIL_ENABLED, form.getEnabled())
-               .set(SETTINGS.MAIL_HOST, form.getHost())
-               .set(SETTINGS.MAIL_USERNAME, form.getUsername())
-               .set(SETTINGS.MAIL_PASSWORD, form.getPassword())
-               .set(SETTINGS.MAIL_FROM, form.getFrom())
-               .set(SETTINGS.MAIL_PROTOCOL, form.getProtocol())
-               .set(SETTINGS.MAIL_PORT, form.getPort())
-               .set(SETTINGS.MAIL_RECIPIENTS, eMails)
-               .set(SETTINGS.NOTIFICATION_FEATURES, features)
-               .where(SETTINGS.APP_ID.eq(APP_ID))
-               .execute();
+                    .set(SETTINGS.HEARTBEAT_INTERVAL_IN_SECONDS, toSec(form.getHeartbeat()))
+                    .set(SETTINGS.HOURS_TO_EXPIRE, form.getExpiration())
+                    .set(SETTINGS.MAIL_ENABLED, form.getEnabled())
+                    .set(SETTINGS.MAIL_HOST, form.getHost())
+                    .set(SETTINGS.MAIL_USERNAME, form.getUsername())
+                    .set(SETTINGS.MAIL_PASSWORD, form.getPassword())
+                    .set(SETTINGS.MAIL_FROM, form.getFrom())
+                    .set(SETTINGS.MAIL_PROTOCOL, form.getProtocol())
+                    .set(SETTINGS.MAIL_PORT, form.getPort())
+                    .set(SETTINGS.MAIL_RECIPIENTS, eMails)
+                    .set(SETTINGS.NOTIFICATION_FEATURES, features)
+                    .where(SETTINGS.APP_ID.eq(APP_ID))
+                    .execute();
 
         } catch (DataAccessException e) {
             throw new SteveException("FAILED to save the settings", e);
@@ -135,9 +134,7 @@ public class SettingsRepositoryImpl implements SettingsRepository {
     }
 
     private SettingsRecord getInternal() {
-        return ctx.selectFrom(SETTINGS)
-                  .where(SETTINGS.APP_ID.eq(APP_ID))
-                  .fetchOne();
+        return ctx.selectFrom(SETTINGS).where(SETTINGS.APP_ID.eq(APP_ID)).fetchOne();
     }
 
     private static int toMin(int seconds) {
@@ -148,11 +145,9 @@ public class SettingsRepositoryImpl implements SettingsRepository {
         return (int) TimeUnit.MINUTES.toSeconds(minutes);
     }
 
-
-
     private List<NotificationFeature> splitFeatures(String str) {
         return splitByComma(str).stream()
-                                .map(NotificationFeature::fromName)
-                                .collect(Collectors.toList());
+                .map(NotificationFeature::fromName)
+                .collect(Collectors.toList());
     }
 }

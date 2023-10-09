@@ -56,12 +56,16 @@ public class OcppTagsRestController {
 
     private final OcppTagService ocppTagService;
 
-    @ApiResponses(value = {
-        @ApiResponse(code = 200, message = "OK"),
-        @ApiResponse(code = 400, message = "Bad Request", response = ApiErrorResponse.class),
-        @ApiResponse(code = 401, message = "Unauthorized", response = ApiErrorResponse.class),
-        @ApiResponse(code = 500, message = "Internal Server Error", response = ApiErrorResponse.class)}
-    )
+    @ApiResponses(
+            value = {
+                @ApiResponse(code = 200, message = "OK"),
+                @ApiResponse(code = 400, message = "Bad Request", response = ApiErrorResponse.class),
+                @ApiResponse(code = 401, message = "Unauthorized", response = ApiErrorResponse.class),
+                @ApiResponse(
+                        code = 500,
+                        message = "Internal Server Error",
+                        response = ApiErrorResponse.class)
+            })
     @GetMapping(value = "")
     @ResponseBody
     public List<OcppTag.Overview> get(OcppTagQueryForm.ForApi params) {
@@ -72,13 +76,17 @@ public class OcppTagsRestController {
         return response;
     }
 
-    @ApiResponses(value = {
-        @ApiResponse(code = 200, message = "OK"),
-        @ApiResponse(code = 400, message = "Bad Request", response = ApiErrorResponse.class),
-        @ApiResponse(code = 401, message = "Unauthorized", response = ApiErrorResponse.class),
-        @ApiResponse(code = 404, message = "Not Found", response = ApiErrorResponse.class),
-        @ApiResponse(code = 500, message = "Internal Server Error", response = ApiErrorResponse.class)}
-    )
+    @ApiResponses(
+            value = {
+                @ApiResponse(code = 200, message = "OK"),
+                @ApiResponse(code = 400, message = "Bad Request", response = ApiErrorResponse.class),
+                @ApiResponse(code = 401, message = "Unauthorized", response = ApiErrorResponse.class),
+                @ApiResponse(code = 404, message = "Not Found", response = ApiErrorResponse.class),
+                @ApiResponse(
+                        code = 500,
+                        message = "Internal Server Error",
+                        response = ApiErrorResponse.class)
+            })
     @GetMapping("/{ocppTagPk}")
     @ResponseBody
     public OcppTag.Overview getOne(@PathVariable("ocppTagPk") Integer ocppTagPk) {
@@ -89,14 +97,21 @@ public class OcppTagsRestController {
         return response;
     }
 
-    @ApiResponses(value = {
-        @ApiResponse(code = 201, message = "Created"),
-        @ApiResponse(code = 400, message = "Bad Request", response = ApiErrorResponse.class),
-        @ApiResponse(code = 401, message = "Unauthorized", response = ApiErrorResponse.class),
-        @ApiResponse(code = 422, message = "Unprocessable Entity", response = ApiErrorResponse.class),
-        @ApiResponse(code = 404, message = "Not Found", response = ApiErrorResponse.class),
-        @ApiResponse(code = 500, message = "Internal Server Error", response = ApiErrorResponse.class)}
-    )
+    @ApiResponses(
+            value = {
+                @ApiResponse(code = 201, message = "Created"),
+                @ApiResponse(code = 400, message = "Bad Request", response = ApiErrorResponse.class),
+                @ApiResponse(code = 401, message = "Unauthorized", response = ApiErrorResponse.class),
+                @ApiResponse(
+                        code = 422,
+                        message = "Unprocessable Entity",
+                        response = ApiErrorResponse.class),
+                @ApiResponse(code = 404, message = "Not Found", response = ApiErrorResponse.class),
+                @ApiResponse(
+                        code = 500,
+                        message = "Internal Server Error",
+                        response = ApiErrorResponse.class)
+            })
     @PostMapping
     @ResponseBody
     @ResponseStatus(HttpStatus.CREATED)
@@ -110,16 +125,21 @@ public class OcppTagsRestController {
         return response;
     }
 
-    @ApiResponses(value = {
-        @ApiResponse(code = 200, message = "OK"),
-        @ApiResponse(code = 400, message = "Bad Request", response = ApiErrorResponse.class),
-        @ApiResponse(code = 401, message = "Unauthorized", response = ApiErrorResponse.class),
-        @ApiResponse(code = 404, message = "Not Found", response = ApiErrorResponse.class),
-        @ApiResponse(code = 500, message = "Internal Server Error", response = ApiErrorResponse.class)}
-    )
+    @ApiResponses(
+            value = {
+                @ApiResponse(code = 200, message = "OK"),
+                @ApiResponse(code = 400, message = "Bad Request", response = ApiErrorResponse.class),
+                @ApiResponse(code = 401, message = "Unauthorized", response = ApiErrorResponse.class),
+                @ApiResponse(code = 404, message = "Not Found", response = ApiErrorResponse.class),
+                @ApiResponse(
+                        code = 500,
+                        message = "Internal Server Error",
+                        response = ApiErrorResponse.class)
+            })
     @PutMapping("/{ocppTagPk}")
     @ResponseBody
-    public OcppTag.Overview update(@PathVariable("ocppTagPk") Integer ocppTagPk, @RequestBody @Valid OcppTagForm params) {
+    public OcppTag.Overview update(
+            @PathVariable("ocppTagPk") Integer ocppTagPk, @RequestBody @Valid OcppTagForm params) {
         params.setOcppTagPk(ocppTagPk); // the one from incoming params does not matter
         log.debug("Update request: {}", params);
 
@@ -130,13 +150,17 @@ public class OcppTagsRestController {
         return response;
     }
 
-    @ApiResponses(value = {
-        @ApiResponse(code = 200, message = "OK"),
-        @ApiResponse(code = 400, message = "Bad Request", response = ApiErrorResponse.class),
-        @ApiResponse(code = 401, message = "Unauthorized", response = ApiErrorResponse.class),
-        @ApiResponse(code = 404, message = "Not Found", response = ApiErrorResponse.class),
-        @ApiResponse(code = 500, message = "Internal Server Error", response = ApiErrorResponse.class)}
-    )
+    @ApiResponses(
+            value = {
+                @ApiResponse(code = 200, message = "OK"),
+                @ApiResponse(code = 400, message = "Bad Request", response = ApiErrorResponse.class),
+                @ApiResponse(code = 401, message = "Unauthorized", response = ApiErrorResponse.class),
+                @ApiResponse(code = 404, message = "Not Found", response = ApiErrorResponse.class),
+                @ApiResponse(
+                        code = 500,
+                        message = "Internal Server Error",
+                        response = ApiErrorResponse.class)
+            })
     @DeleteMapping("/{ocppTagPk}")
     @ResponseBody
     public OcppTag.Overview delete(@PathVariable("ocppTagPk") Integer ocppTagPk) {

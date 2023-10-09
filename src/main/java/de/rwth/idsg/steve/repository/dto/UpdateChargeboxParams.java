@@ -32,6 +32,14 @@ import org.joda.time.DateTime;
 public final class UpdateChargeboxParams {
     private final OcppProtocol ocppProtocol;
     private final DateTime heartbeatTimestamp;
-    private final String vendor, model, pointSerial, boxSerial, fwVersion,
-            iccid, imsi, meterType, meterSerial, chargeBoxId;
+    private final String vendor,
+            model,
+            pointSerial,
+            boxSerial,
+            fwVersion,
+            iccid,
+            imsi,
+            meterType,
+            meterSerial,
+            chargeBoxId;
 }

@@ -91,11 +91,12 @@ public enum Server15to16Impl implements Server15to16 {
     }
 
     /**
-     * New logic: Connector with Id 0 can only be AVAILABLE, UNAVAILABLE and FAULTED. But we do not handle this, since
-     * this semantic change does not require a custom mapping.
+     * New logic: Connector with Id 0 can only be AVAILABLE, UNAVAILABLE and FAULTED. But we do not
+     * handle this, since this semantic change does not require a custom mapping.
      */
     @Override
-    public StatusNotificationRequest convertRequest(ocpp.cs._2012._06.StatusNotificationRequest request) {
+    public StatusNotificationRequest convertRequest(
+            ocpp.cs._2012._06.StatusNotificationRequest request) {
         return new StatusNotificationRequest()
                 .withConnectorId(request.getConnectorId())
                 .withStatus(customMapStatus(request.getStatus()))
@@ -108,10 +109,10 @@ public enum Server15to16Impl implements Server15to16 {
 
     @Override
     public MeterValuesRequest convertRequest(ocpp.cs._2012._06.MeterValuesRequest request) {
-        List<MeterValue> values16 = request.getValues()
-                                           .stream()
-                                           .map(Server15to16Impl::toOcpp16MeterValue)
-                                           .collect(Collectors.toList());
+        List<MeterValue> values16 =
+                request.getValues().stream()
+                        .map(Server15to16Impl::toOcpp16MeterValue)
+                        .collect(Collectors.toList());
 
         return new MeterValuesRequest()
                 .withTransactionId(request.getTransactionId())
@@ -136,9 +137,7 @@ public enum Server15to16Impl implements Server15to16 {
                 .withReservationId(request.getReservationId());
     }
 
-    /**
-     * Reason was introduced with 1.6 and is optional (no mapping needed)
-     */
+    /** Reason was introduced with 1.6 and is optional (no mapping needed) */
     @Override
     public StopTransactionRequest convertRequest(ocpp.cs._2012._06.StopTransactionRequest request) {
         return new StopTransactionRequest()
@@ -156,8 +155,7 @@ public enum Server15to16Impl implements Server15to16 {
 
     @Override
     public AuthorizeRequest convertRequest(ocpp.cs._2012._06.AuthorizeRequest request) {
-        return new AuthorizeRequest()
-                .withIdTag(request.getIdTag());
+        return new AuthorizeRequest().withIdTag(request.getIdTag());
     }
 
     @Override
@@ -173,7 +171,8 @@ public enum Server15to16Impl implements Server15to16 {
     // -------------------------------------------------------------------------
 
     @Override
-    public BootNotificationResponse convertResponse(ocpp.cs._2015._10.BootNotificationResponse response) {
+    public BootNotificationResponse convertResponse(
+            ocpp.cs._2015._10.BootNotificationResponse response) {
         return new BootNotificationResponse()
                 .withCurrentTime(response.getCurrentTime())
                 .withHeartbeatInterval(response.getInterval())
@@ -187,7 +186,8 @@ public enum Server15to16Impl implements Server15to16 {
     }
 
     @Override
-    public StatusNotificationResponse convertResponse(ocpp.cs._2015._10.StatusNotificationResponse response) {
+    public StatusNotificationResponse convertResponse(
+            ocpp.cs._2015._10.StatusNotificationResponse response) {
         return new StatusNotificationResponse();
     }
 
@@ -203,28 +203,27 @@ public enum Server15to16Impl implements Server15to16 {
     }
 
     @Override
-    public StartTransactionResponse convertResponse(ocpp.cs._2015._10.StartTransactionResponse response) {
+    public StartTransactionResponse convertResponse(
+            ocpp.cs._2015._10.StartTransactionResponse response) {
         return new StartTransactionResponse()
                 .withIdTagInfo(toOcpp15IdTagInfo(response.getIdTagInfo()))
                 .withTransactionId(response.getTransactionId());
     }
 
     @Override
-    public StopTransactionResponse convertResponse(ocpp.cs._2015._10.StopTransactionResponse response) {
-        return new StopTransactionResponse()
-                .withIdTagInfo(toOcpp15IdTagInfo(response.getIdTagInfo()));
+    public StopTransactionResponse convertResponse(
+            ocpp.cs._2015._10.StopTransactionResponse response) {
+        return new StopTransactionResponse().withIdTagInfo(toOcpp15IdTagInfo(response.getIdTagInfo()));
     }
 
     @Override
     public HeartbeatResponse convertResponse(ocpp.cs._2015._10.HeartbeatResponse response) {
-        return new HeartbeatResponse()
-                .withCurrentTime(response.getCurrentTime());
+        return new HeartbeatResponse().withCurrentTime(response.getCurrentTime());
     }
 
     @Override
     public AuthorizeResponse convertResponse(ocpp.cs._2015._10.AuthorizeResponse response) {
-        return new AuthorizeResponse()
-                .withIdTagInfo(toOcpp15IdTagInfo(response.getIdTagInfo()));
+        return new AuthorizeResponse().withIdTagInfo(toOcpp15IdTagInfo(response.getIdTagInfo()));
     }
 
     @Override
@@ -239,8 +238,8 @@ public enum Server15to16Impl implements Server15to16 {
     // -------------------------------------------------------------------------
 
     /**
-     * OCCUPIED was replaced with several more specific values. For now it will be replaced with "CHARGING",
-     * but something else might make more sense at this place
+     * OCCUPIED was replaced with several more specific values. For now it will be replaced with
+     * "CHARGING", but something else might make more sense at this place
      */
     private static ChargePointStatus customMapStatus(ocpp.cs._2012._06.ChargePointStatus status) {
         if (status == ocpp.cs._2012._06.ChargePointStatus.OCCUPIED) {
@@ -250,10 +249,11 @@ public enum Server15to16Impl implements Server15to16 {
     }
 
     /**
-     * Mapping required: Enum values in both directions don't necessarily match.
-     * Update: According to the 1.6 specification, MODE_3_ERROR was simply renamed to EV_COMMUNICATION_ERROR
+     * Mapping required: Enum values in both directions don't necessarily match. Update: According to
+     * the 1.6 specification, MODE_3_ERROR was simply renamed to EV_COMMUNICATION_ERROR
      */
-    private static ChargePointErrorCode customMapErrorCode(ocpp.cs._2012._06.ChargePointErrorCode errorCode15) {
+    private static ChargePointErrorCode customMapErrorCode(
+            ocpp.cs._2012._06.ChargePointErrorCode errorCode15) {
         if (errorCode15 == ocpp.cs._2012._06.ChargePointErrorCode.MODE_3_ERROR) {
             return ChargePointErrorCode.EV_COMMUNICATION_ERROR;
         }
@@ -263,7 +263,7 @@ public enum Server15to16Impl implements Server15to16 {
     /**
      * AMP and VOLT are shortened to A and V, respectively.
      *
-     * https://github.com/steve-community/steve/issues/59
+     * <p>https://github.com/steve-community/steve/issues/59
      */
     private static UnitOfMeasure convertUnit(ocpp.cs._2012._06.UnitOfMeasure unit) {
         switch (unit) {
@@ -300,21 +300,21 @@ public enum Server15to16Impl implements Server15to16 {
                 .withValue(f.getValue());
     }
 
-    private static List<SampledValue> toOcpp16SampledValueList(List<ocpp.cs._2012._06.MeterValue.Value> vals) {
-        return vals.stream()
-                   .map(Server15to16Impl::toOcpp16SampledValue)
-                   .collect(Collectors.toList());
+    private static List<SampledValue> toOcpp16SampledValueList(
+            List<ocpp.cs._2012._06.MeterValue.Value> vals) {
+        return vals.stream().map(Server15to16Impl::toOcpp16SampledValue).collect(Collectors.toList());
     }
 
     private static MeterValue toOcpp16MeterValue(ocpp.cs._2012._06.MeterValue e) {
-        return new MeterValue().withTimestamp(e.getTimestamp())
-                               .withSampledValue(toOcpp16SampledValueList(e.getValue()));
+        return new MeterValue()
+                .withTimestamp(e.getTimestamp())
+                .withSampledValue(toOcpp16SampledValueList(e.getValue()));
     }
 
     private static List<MeterValue> toOcpp16TransactionData(List<TransactionData> transactionData) {
         return transactionData.stream()
-                              .flatMap(data -> data.getValues().stream())
-                              .map(Server15to16Impl::toOcpp16MeterValue)
-                              .collect(Collectors.toList());
+                .flatMap(data -> data.getValues().stream())
+                .map(Server15to16Impl::toOcpp16MeterValue)
+                .collect(Collectors.toList());
     }
 }

@@ -37,10 +37,8 @@ public class ClientProviderWithCache<T> {
 
     public ClientProviderWithCache(ClientProvider delegate) {
         this.delegate = delegate;
-        this.cache = CacheBuilder.newBuilder()
-                                 .maximumSize(500)
-                                 .expireAfterAccess(1, TimeUnit.HOURS)
-                                 .build();
+        this.cache =
+                CacheBuilder.newBuilder().maximumSize(500).expireAfterAccess(1, TimeUnit.HOURS).build();
     }
 
     public T createClient(Class<T> clazz, String endpointAddress) {

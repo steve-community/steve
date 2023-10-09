@@ -34,13 +34,15 @@ import javax.xml.ws.AsyncHandler;
  * @since 13.03.2018
  */
 @Slf4j
-public class ClearChargingProfileTask extends Ocpp16AndAboveTask<ClearChargingProfileParams, String> {
+public class ClearChargingProfileTask
+        extends Ocpp16AndAboveTask<ClearChargingProfileParams, String> {
 
     private final ChargingProfileRepository chargingProfileRepository;
 
-    public ClearChargingProfileTask(OcppVersion ocppVersion,
-                                    ClearChargingProfileParams params,
-                                    ChargingProfileRepository chargingProfileRepository) {
+    public ClearChargingProfileTask(
+            OcppVersion ocppVersion,
+            ClearChargingProfileParams params,
+            ChargingProfileRepository chargingProfileRepository) {
         super(ocppVersion, params);
         this.chargingProfileRepository = chargingProfileRepository;
     }
@@ -57,17 +59,24 @@ public class ClearChargingProfileTask extends Ocpp16AndAboveTask<ClearChargingPr
                         chargingProfileRepository.clearProfile(params.getChargingProfilePk(), chargeBoxId);
                         break;
                     case OtherParameters:
-                        chargingProfileRepository.clearProfile(chargeBoxId,
-                        params.getConnectorId(), params.getChargingProfilePurpose(), params.getStackLevel());
+                        chargingProfileRepository.clearProfile(
+                                chargeBoxId,
+                                params.getConnectorId(),
+                                params.getChargingProfilePurpose(),
+                                params.getStackLevel());
                         break;
                     default:
-                        log.warn("Unexpected {} enum value", ClearChargingProfileFilterType.class.getSimpleName());
+                        log.warn(
+                                "Unexpected {} enum value", ClearChargingProfileFilterType.class.getSimpleName());
                         return;
                 }
 
                 // https://github.com/steve-community/steve/pull/968
                 if (!"Accepted".equalsIgnoreCase(statusValue)) {
-                    log.info("Deleted charging profile(s) for chargebox '{}' from DB even though the response was {}", chargeBoxId, statusValue);
+                    log.info(
+                            "Deleted charging profile(s) for chargebox '{}' from DB even though the response was {}",
+                            chargeBoxId,
+                            statusValue);
                 }
             }
         };
@@ -83,7 +92,8 @@ public class ClearChargingProfileTask extends Ocpp16AndAboveTask<ClearChargingPr
     }
 
     @Override
-    public AsyncHandler<ocpp.cp._2015._10.ClearChargingProfileResponse> getOcpp16Handler(String chargeBoxId) {
+    public AsyncHandler<ocpp.cp._2015._10.ClearChargingProfileResponse> getOcpp16Handler(
+            String chargeBoxId) {
         return res -> {
             try {
                 success(chargeBoxId, res.get().getStatus().value());

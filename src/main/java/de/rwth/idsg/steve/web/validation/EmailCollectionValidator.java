@@ -28,7 +28,8 @@ import java.util.Collection;
  * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 22.01.2016
  */
-public class EmailCollectionValidator implements ConstraintValidator<EmailCollection, Collection<String>> {
+public class EmailCollectionValidator
+        implements ConstraintValidator<EmailCollection, Collection<String>> {
 
     private static final EmailValidator VALIDATOR = new EmailValidator();
 

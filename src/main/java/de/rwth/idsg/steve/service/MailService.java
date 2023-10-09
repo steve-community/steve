@@ -22,11 +22,6 @@ import com.google.common.base.Strings;
 import de.rwth.idsg.steve.SteveException;
 import de.rwth.idsg.steve.repository.SettingsRepository;
 import de.rwth.idsg.steve.repository.dto.MailSettings;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import javax.annotation.PostConstruct;
 import jakarta.mail.Authenticator;
 import jakarta.mail.Message;
 import jakarta.mail.MessagingException;
@@ -35,6 +30,11 @@ import jakarta.mail.Session;
 import jakarta.mail.Transport;
 import jakarta.mail.internet.InternetAddress;
 import jakarta.mail.internet.MimeMessage;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import javax.annotation.PostConstruct;
 import java.util.Properties;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.locks.Lock;
@@ -88,13 +88,14 @@ public class MailService {
     }
 
     public void sendAsync(String subject, String body) {
-        executorService.execute(() -> {
-            try {
-                send(subject, body);
-            } catch (MessagingException e) {
-                log.error("Failed to send mail", e);
-            }
-        });
+        executorService.execute(
+                () -> {
+                    try {
+                        send(subject, body);
+                    } catch (MessagingException e) {
+                        log.error("Failed to send mail", e);
+                    }
+                });
     }
 
     public void send(String subject, String body) throws MessagingException {

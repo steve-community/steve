@@ -39,7 +39,7 @@ import java.util.function.Consumer;
 /**
  * Outgoing OcppJsonMessage --> String.
  *
- * This class should remain stateless.
+ * <p>This class should remain stateless.
  *
  * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 17.03.2015
@@ -86,27 +86,27 @@ public enum Serializer implements Consumer<CommunicationContext> {
     // -------------------------------------------------------------------------
 
     /**
-     * Do NOT catch and handle exceptions for outgoing CALLs. Do NOT send the message.
-     * Let the processing fail and acknowledge the user.
+     * Do NOT catch and handle exceptions for outgoing CALLs. Do NOT send the message. Let the
+     * processing fail and acknowledge the user.
      */
     private ArrayNode handleCall(OcppJsonCall call) {
         JsonNode payloadNode;
         try {
             payloadNode = mapper.valueToTree(call.getPayload());
         } catch (IllegalArgumentException e) {
-            throw new SteveException("The payload of the outgoing call could not be converted to JSON", e);
+            throw new SteveException(
+                    "The payload of the outgoing call could not be converted to JSON", e);
         }
 
-        return mapper.createArrayNode()
-                     .add(call.getMessageType().getTypeNr())
-                     .add(call.getMessageId())
-                     .add(call.getAction())
-                     .add(payloadNode);
+        return mapper
+                .createArrayNode()
+                .add(call.getMessageType().getTypeNr())
+                .add(call.getMessageId())
+                .add(call.getAction())
+                .add(payloadNode);
     }
 
-    /**
-     * Catch exceptions and wrap them in outgoing ERRORs for outgoing RESPONSEs.
-     */
+    /** Catch exceptions and wrap them in outgoing ERRORs for outgoing RESPONSEs. */
     private ArrayNode handleResult(OcppJsonResult result) {
         JsonNode payloadNode;
         try {
@@ -116,10 +116,11 @@ public enum Serializer implements Consumer<CommunicationContext> {
             return handleError(ErrorFactory.payloadSerializeError(result.getMessageId(), e.getMessage()));
         }
 
-        return mapper.createArrayNode()
-                     .add(result.getMessageType().getTypeNr())
-                     .add(result.getMessageId())
-                     .add(payloadNode);
+        return mapper
+                .createArrayNode()
+                .add(result.getMessageType().getTypeNr())
+                .add(result.getMessageId())
+                .add(payloadNode);
     }
 
     /**
@@ -137,17 +138,19 @@ public enum Serializer implements Consumer<CommunicationContext> {
 
         // From spec:
         // ErrorDetails - This JSON object describes error details in an undefined way.
-        // If there are no error details you should fill in an empty object {}, missing or null is not allowed
+        // If there are no error details you should fill in an empty object {}, missing or null is not
+        // allowed
         ObjectNode detailsNode = mapper.createObjectNode();
         if (error.isSetDetails()) {
             detailsNode.set("errorMsg", mapper.getNodeFactory().textNode(error.toStringErrorDetails()));
         }
 
-        return mapper.createArrayNode()
-                     .add(error.getMessageType().getTypeNr())
-                     .add(error.getMessageId())
-                     .add(error.getErrorCode().name())
-                     .add(description)
-                     .add(detailsNode);
+        return mapper
+                .createArrayNode()
+                .add(error.getMessageType().getTypeNr())
+                .add(error.getMessageId())
+                .add(error.getErrorCode().name())
+                .add(description)
+                .add(detailsNode);
     }
 }

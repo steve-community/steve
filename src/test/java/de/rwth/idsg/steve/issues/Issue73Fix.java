@@ -90,33 +90,37 @@ public class Issue73Fix {
 
     private static void sendBoot(CentralSystemService client, List<String> chargeBoxIdList) {
         for (String chargeBoxId : chargeBoxIdList) {
-            BootNotificationResponse boot = client.bootNotification(
-                    new BootNotificationRequest()
-                            .withChargePointVendor(getRandomString())
-                            .withChargePointModel(getRandomString()),
-                    chargeBoxId);
+            BootNotificationResponse boot =
+                    client.bootNotification(
+                            new BootNotificationRequest()
+                                    .withChargePointVendor(getRandomString())
+                                    .withChargePointModel(getRandomString()),
+                            chargeBoxId);
             Assertions.assertNotNull(boot);
             Assertions.assertEquals(RegistrationStatus.ACCEPTED, boot.getStatus());
         }
     }
 
-    private static void sendAuth(CentralSystemService client, String chargeBoxId, AuthorizationStatus expected) {
-        AuthorizeResponse auth = client.authorize(new AuthorizeRequest().withIdTag(REGISTERED_OCPP_TAG), chargeBoxId);
+    private static void sendAuth(
+            CentralSystemService client, String chargeBoxId, AuthorizationStatus expected) {
+        AuthorizeResponse auth =
+                client.authorize(new AuthorizeRequest().withIdTag(REGISTERED_OCPP_TAG), chargeBoxId);
         Assertions.assertNotNull(auth);
         Assertions.assertEquals(expected, auth.getIdTagInfo().getStatus());
     }
 
     private static void sendStartTx(CentralSystemService client, String chargeBoxId) {
-        StartTransactionResponse start = client.startTransaction(
-                new StartTransactionRequest()
-                        .withConnectorId(2)
-                        .withIdTag(REGISTERED_OCPP_TAG)
-                        .withTimestamp(DateTime.now())
-                        .withMeterStart(0),
-                chargeBoxId
-        );
+        StartTransactionResponse start =
+                client.startTransaction(
+                        new StartTransactionRequest()
+                                .withConnectorId(2)
+                                .withIdTag(REGISTERED_OCPP_TAG)
+                                .withTimestamp(DateTime.now())
+                                .withMeterStart(0),
+                        chargeBoxId);
         Assertions.assertNotNull(start);
         Assertions.assertTrue(start.getTransactionId() > 0);
-        Assertions.assertTrue(__DatabasePreparer__.getOcppTagRecord(REGISTERED_OCPP_TAG).getInTransaction());
+        Assertions.assertTrue(
+                __DatabasePreparer__.getOcppTagRecord(REGISTERED_OCPP_TAG).getInTransaction());
     }
 }

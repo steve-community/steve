@@ -39,16 +39,20 @@ import java.util.Optional;
 public interface ChargePointRepository {
     Optional<String> getRegistrationStatus(String chargeBoxId);
 
-    List<ChargePointSelect> getChargePointSelect(OcppProtocol protocol, List<String> inStatusFilter, List<String> chargeBoxIdFilter);
+    List<ChargePointSelect> getChargePointSelect(
+            OcppProtocol protocol, List<String> inStatusFilter, List<String> chargeBoxIdFilter);
 
-    default List<ChargePointSelect> getChargePointSelect(OcppProtocol protocol, List<String> inStatusFilter) {
+    default List<ChargePointSelect> getChargePointSelect(
+            OcppProtocol protocol, List<String> inStatusFilter) {
         return getChargePointSelect(protocol, inStatusFilter, Collections.emptyList());
     }
 
     List<String> getChargeBoxIds();
+
     Map<String, Integer> getChargeBoxIdPkPair(List<String> chargeBoxIdList);
 
     List<ChargePoint.Overview> getOverview(ChargePointQueryForm form);
+
     ChargePoint.Details getDetails(int chargeBoxPk);
 
     default List<ConnectorStatus> getChargePointConnectorStatus() {
@@ -60,7 +64,10 @@ public interface ChargePointRepository {
     List<Integer> getNonZeroConnectorIds(String chargeBoxId);
 
     void addChargePointList(List<String> chargeBoxIdList);
+
     int addChargePoint(ChargePointForm form);
+
     void updateChargePoint(ChargePointForm form);
+
     void deleteChargePoint(int chargeBoxPk);
 }

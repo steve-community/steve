@@ -48,10 +48,11 @@ import static org.apache.cxf.ws.addressing.JAXWSAConstants.ADDRESSING_PROPERTIES
 /**
  * 1. Checks the registration status of a station for operations other than BootNotification.
  *
- * 2. Intercepts incoming OCPP messages to update the endpoint address ("From" field of the WS-A header) in DB.
- * And the absence of the field is not a deal breaker anymore. But, as a side effect, the user will not be able
- * to send commands to the charging station, since the DB call to list the charge points will filter it out. See
- * {@link ChargePointRepositoryImpl#getChargePointSelect(OcppProtocol, java.util.List)}.
+ * <p>2. Intercepts incoming OCPP messages to update the endpoint address ("From" field of the WS-A
+ * header) in DB. And the absence of the field is not a deal breaker anymore. But, as a side effect,
+ * the user will not be able to send commands to the charging station, since the DB call to list the
+ * charge points will filter it out. See {@link
+ * ChargePointRepositoryImpl#getChargePointSelect(OcppProtocol, java.util.List)}.
  *
  * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 15.06.2015
@@ -82,7 +83,8 @@ public class MessageHeaderInterceptor extends AbstractPhaseInterceptor<Message> 
         QName opName = message.getExchange().getBindingOperationInfo().getOperationInfo().getName();
 
         if (!BOOT_OPERATION_NAME.equals(opName.getLocalPart())) {
-            Optional<RegistrationStatus> status = chargePointHelperService.getRegistrationStatus(chargeBoxId);
+            Optional<RegistrationStatus> status =
+                    chargePointHelperService.getRegistrationStatus(chargeBoxId);
             boolean allow = status.isPresent() && status.get() != RegistrationStatus.REJECTED;
             if (!allow) {
                 throw createAuthFault(opName);
@@ -93,16 +95,17 @@ public class MessageHeaderInterceptor extends AbstractPhaseInterceptor<Message> 
         // 2. update endpoint
         // -------------------------------------------------------------------------
 
-        executorService.execute(() -> {
-            try {
-                String endpointAddress = getEndpointAddress(message);
-                if (endpointAddress != null) {
-                    ocppServerRepository.updateEndpointAddress(chargeBoxId, endpointAddress);
-                }
-            } catch (Exception e) {
-                log.error("Exception occurred", e);
-            }
-        });
+        executorService.execute(
+                () -> {
+                    try {
+                        String endpointAddress = getEndpointAddress(message);
+                        if (endpointAddress != null) {
+                            ocppServerRepository.updateEndpointAddress(chargeBoxId, endpointAddress);
+                        }
+                    } catch (Exception e) {
+                        log.error("Exception occurred", e);
+                    }
+                });
     }
 
     private String getChargeBoxId(Message message) {
@@ -116,11 +119,13 @@ public class MessageHeaderInterceptor extends AbstractPhaseInterceptor<Message> 
             }
         }
         // should not happen
-        throw createSpecFault(message.getExchange().getBindingOperationInfo().getOperationInfo().getName());
+        throw createSpecFault(
+                message.getExchange().getBindingOperationInfo().getOperationInfo().getName());
     }
 
     private String getEndpointAddress(Message message) {
-        AddressingProperties addressProp = (AddressingProperties) message.get(ADDRESSING_PROPERTIES_INBOUND);
+        AddressingProperties addressProp =
+                (AddressingProperties) message.get(ADDRESSING_PROPERTIES_INBOUND);
         if (addressProp == null) {
             return null;
         }
@@ -135,7 +140,8 @@ public class MessageHeaderInterceptor extends AbstractPhaseInterceptor<Message> 
 
     private static SoapFault createAuthFault(QName qName) {
         // as defined by OCPP spec
-        String message = "Sender failed authentication or is not authorized to use the requested operation.";
+        String message =
+                "Sender failed authentication or is not authorized to use the requested operation.";
         SoapFault sf = new SoapFault(message, Soap12.getInstance().getSender());
         sf.addSubCode(new QName(qName.getNamespaceURI(), "SecurityError"));
         return sf;

@@ -42,16 +42,17 @@ public class PropertiesFileLoader {
     private Properties prop;
 
     /**
-     * The name parameter acts as
-     * 1) the file name to load from classpath, and
-     * 2) the system property which can be set to load from file system.
+     * The name parameter acts as 1) the file name to load from classpath, and 2) the system property
+     * which can be set to load from file system.
      */
     public PropertiesFileLoader(String name) {
         String externalFileName = System.getProperty(name);
 
         if (externalFileName == null) {
-            log.info("Hint: The Java system property '{}' can be set to point to an external properties file, " +
-                    "which will be prioritized over the bundled one", name);
+            log.info(
+                    "Hint: The Java system property '{}' can be set to point to an external properties file, "
+                            + "which will be prioritized over the bundled one",
+                    name);
             loadFromClasspath(name);
 
         } else {
@@ -66,11 +67,11 @@ public class PropertiesFileLoader {
     public String getString(String key) {
         String s = prop.getProperty(key);
         // initial property value might be null/empty
-        checkForNullAndEmpty(key,s);
+        checkForNullAndEmpty(key, s);
 
         s = resolveIfSystemEnv(s);
         // check again, system env value might be null/empty
-        checkForNullAndEmpty(key,s);
+        checkForNullAndEmpty(key, s);
 
         return trim(key, s);
     }
@@ -102,10 +103,7 @@ public class PropertiesFileLoader {
             return Collections.emptyList();
         }
         s = resolveIfSystemEnv(s);
-        return Splitter.on(",")
-                       .trimResults()
-                       .omitEmptyStrings()
-                       .splitToList(s);
+        return Splitter.on(",").trimResults().omitEmptyStrings().splitToList(s);
     }
 
     public boolean getOptionalBoolean(String key) {
@@ -145,7 +143,8 @@ public class PropertiesFileLoader {
     private void loadFromClasspath(String fileName) {
         try (InputStream is = this.getClass().getClassLoader().getResourceAsStream(fileName)) {
             if (is == null) {
-                throw new FileNotFoundException("Property file '" + fileName + "' is not found in classpath");
+                throw new FileNotFoundException(
+                        "Property file '" + fileName + "' is not found in classpath");
             }
             prop = new Properties();
             prop.load(is);
@@ -155,11 +154,12 @@ public class PropertiesFileLoader {
     }
 
     /**
-     * If the first character of the value of the property is a dollar sign, we deduce that this property points to a
-     * system environment variable and look it up.
+     * If the first character of the value of the property is a dollar sign, we deduce that this
+     * property points to a system environment variable and look it up.
      *
-     * However, if the resolved value is null, we do not use it and fallback to the initial value. This might be the
-     * case for example with passwords, which use arbitrary characters and start with a dollar sign.
+     * <p>However, if the resolved value is null, we do not use it and fallback to the initial value.
+     * This might be the case for example with passwords, which use arbitrary characters and start
+     * with a dollar sign.
      */
     private static String resolveIfSystemEnv(String value) {
         if (value == null) {

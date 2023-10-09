@@ -29,7 +29,8 @@ import javax.xml.ws.AsyncHandler;
  * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 09.03.2018
  */
-public class RemoteStartTransactionTask extends CommunicationTask<RemoteStartTransactionParams, String> {
+public class RemoteStartTransactionTask
+        extends CommunicationTask<RemoteStartTransactionParams, String> {
 
     public RemoteStartTransactionTask(OcppVersion ocppVersion, RemoteStartTransactionParams params) {
         super(ocppVersion, params);
@@ -54,9 +55,7 @@ public class RemoteStartTransactionTask extends CommunicationTask<RemoteStartTra
                 .withConnectorId(params.getConnectorId());
     }
 
-    /**
-     * TODO: RemoteStartTransactionRequest.chargingProfile not implemented
-     */
+    /** TODO: RemoteStartTransactionRequest.chargingProfile not implemented */
     @Override
     public ocpp.cp._2015._10.RemoteStartTransactionRequest getOcpp16Request() {
         return new ocpp.cp._2015._10.RemoteStartTransactionRequest()
@@ -65,7 +64,8 @@ public class RemoteStartTransactionTask extends CommunicationTask<RemoteStartTra
     }
 
     @Override
-    public AsyncHandler<ocpp.cp._2010._08.RemoteStartTransactionResponse> getOcpp12Handler(String chargeBoxId) {
+    public AsyncHandler<ocpp.cp._2010._08.RemoteStartTransactionResponse> getOcpp12Handler(
+            String chargeBoxId) {
         return res -> {
             try {
                 success(chargeBoxId, res.get().getStatus().value());
@@ -76,7 +76,8 @@ public class RemoteStartTransactionTask extends CommunicationTask<RemoteStartTra
     }
 
     @Override
-    public AsyncHandler<ocpp.cp._2012._06.RemoteStartTransactionResponse> getOcpp15Handler(String chargeBoxId) {
+    public AsyncHandler<ocpp.cp._2012._06.RemoteStartTransactionResponse> getOcpp15Handler(
+            String chargeBoxId) {
         return res -> {
             try {
                 success(chargeBoxId, res.get().getStatus().value());
@@ -86,9 +87,9 @@ public class RemoteStartTransactionTask extends CommunicationTask<RemoteStartTra
         };
     }
 
-
     @Override
-    public AsyncHandler<ocpp.cp._2015._10.RemoteStartTransactionResponse> getOcpp16Handler(String chargeBoxId) {
+    public AsyncHandler<ocpp.cp._2015._10.RemoteStartTransactionResponse> getOcpp16Handler(
+            String chargeBoxId) {
         return res -> {
             try {
                 success(chargeBoxId, res.get().getStatus().value());

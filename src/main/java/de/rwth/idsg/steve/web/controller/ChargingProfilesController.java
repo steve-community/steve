@@ -87,8 +87,8 @@ public class ChargingProfilesController {
     }
 
     @RequestMapping(params = "add", value = ADD_PATH, method = RequestMethod.POST)
-    public String addPost(@Valid @ModelAttribute("form") ChargingProfileForm form,
-                          BindingResult result, Model model) {
+    public String addPost(
+            @Valid @ModelAttribute("form") ChargingProfileForm form, BindingResult result, Model model) {
         if (result.hasErrors()) {
             return "data-man/chargingProfileAdd";
         }
@@ -98,8 +98,8 @@ public class ChargingProfilesController {
     }
 
     @RequestMapping(params = "update", value = UPDATE_PATH, method = RequestMethod.POST)
-    public String update(@Valid @ModelAttribute("form") ChargingProfileForm form,
-                         BindingResult result, Model model) {
+    public String update(
+            @Valid @ModelAttribute("form") ChargingProfileForm form, BindingResult result, Model model) {
         if (result.hasErrors()) {
             return "data-man/chargingProfileDetails";
         }
@@ -134,7 +134,8 @@ public class ChargingProfilesController {
     }
 
     @RequestMapping(value = ASSIGNMENTS_PATH, method = RequestMethod.GET)
-    public String getAssignments(@ModelAttribute(PARAMS) ChargingProfileAssignmentQueryForm form, Model model) {
+    public String getAssignments(
+            @ModelAttribute(PARAMS) ChargingProfileAssignmentQueryForm form, Model model) {
         model.addAttribute(PARAMS, form);
         model.addAttribute("profileList", repository.getBasicInfo());
         model.addAttribute("cpList", chargePointRepository.getChargeBoxIds());

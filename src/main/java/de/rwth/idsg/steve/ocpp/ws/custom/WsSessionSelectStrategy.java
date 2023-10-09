@@ -25,8 +25,8 @@ import java.util.Deque;
 
 /**
  * We want to support multiple connections to a charge point. For sending messages we need a
- * mechanism to select one WebSocketSession. Implementations of this interface should use
- * different mechanisms to realize that.
+ * mechanism to select one WebSocketSession. Implementations of this interface should use different
+ * mechanisms to realize that.
  *
  * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 30.04.2015

@@ -35,7 +35,5 @@ import java.util.List;
 @ToString
 public class OcppTagBatchInsertForm {
 
-    @IdTag
-    @NotEmpty
-    private List<String> idList;
+    @IdTag @NotEmpty private List<String> idList;
 }

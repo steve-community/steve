@@ -44,12 +44,13 @@ import java.util.Collections;
 public class GithubReleaseCheckService implements ReleaseCheckService {
 
     /**
-     * If the Github api is slow to respond, we don't want the client of this class to wait forever (until the default
-     * timeout kicks in).
+     * If the Github api is slow to respond, we don't want the client of this class to wait forever
+     * (until the default timeout kicks in).
      */
     private static final int API_TIMEOUT_IN_MILLIS = 4_000;
 
-    private static final String API_URL = "https://api.github.com/repos/steve-community/steve/releases/latest";
+    private static final String API_URL =
+            "https://api.github.com/repos/steve-community/steve/releases/latest";
 
     private static final String TAG_NAME_PREFIX = "steve-";
 
@@ -63,12 +64,13 @@ public class GithubReleaseCheckService implements ReleaseCheckService {
         factory.setReadTimeout(API_TIMEOUT_IN_MILLIS);
         factory.setConnectTimeout(API_TIMEOUT_IN_MILLIS);
 
-        ObjectMapper mapper = new ObjectMapper()
-                .registerModule(new JodaModule());
+        ObjectMapper mapper = new ObjectMapper().registerModule(new JodaModule());
         mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
         mapper.setPropertyNamingStrategy(new PropertyNamingStrategies.SnakeCaseStrategy());
 
-        restTemplate = new RestTemplate(Collections.singletonList(new MappingJackson2HttpMessageConverter(mapper)));
+        restTemplate =
+                new RestTemplate(
+                        Collections.singletonList(new MappingJackson2HttpMessageConverter(mapper)));
         restTemplate.setRequestFactory(factory);
     }
 
@@ -118,15 +120,16 @@ public class GithubReleaseCheckService implements ReleaseCheckService {
     }
 
     /**
-     * A little bit hacky, but good-enough solution. We only need to find out the family of the os (whether unix
-     * or win). Therefore, we don't need full blown os detection, such as
+     * A little bit hacky, but good-enough solution. We only need to find out the family of the os
+     * (whether unix or win). Therefore, we don't need full blown os detection, such as
      *
-     * - https://github.com/apache/commons-lang/blob/master/src/main/java/org/apache/commons/lang3/SystemUtils.java
+     * <p>-
+     * https://github.com/apache/commons-lang/blob/master/src/main/java/org/apache/commons/lang3/SystemUtils.java
      * - http://stackoverflow.com/a/24861219
      *
-     * So, we base or decision on file.separator property. According to
-     * https://docs.oracle.com/javase/tutorial/essential/environment/sysprop.html,
-     * it is "/" on UNIX and "\" on Windows.
+     * <p>So, we base or decision on file.separator property. According to
+     * https://docs.oracle.com/javase/tutorial/essential/environment/sysprop.html, it is "/" on UNIX
+     * and "\" on Windows.
      */
     private static boolean isWindows() {
         return FILE_SEPARATOR.equals("\\");

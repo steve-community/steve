@@ -37,11 +37,12 @@ public class RemoteStartTransactionParams extends SingleChargePointSelect {
 
     @NotBlank(message = "User ID Tag is required")
     @IdTag
-    @Setter private String idTag;
+    @Setter
+    private String idTag;
 
     /**
-     * Not for a specific connector, when frontend sends the value 0.
-     * This corresponds to not to include the connector id parameter in OCPP request.
+     * Not for a specific connector, when frontend sends the value 0. This corresponds to not to
+     * include the connector id parameter in OCPP request.
      */
     public void setConnectorId(Integer connectorId) {
         if (connectorId == 0) {

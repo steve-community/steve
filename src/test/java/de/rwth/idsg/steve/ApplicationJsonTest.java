@@ -47,8 +47,9 @@ public class ApplicationJsonTest {
 
     private static final String PATH = "ws://localhost:8080/steve/websocket/CentralSystemService/";
 
-    private static final String REGISTERED_CHARGE_BOX_ID = __DatabasePreparer__.getRegisteredChargeBoxId();
-    private static final String REGISTERED_OCPP_TAG =  __DatabasePreparer__.getRegisteredOcppTag();
+    private static final String REGISTERED_CHARGE_BOX_ID =
+            __DatabasePreparer__.getRegisteredChargeBoxId();
+    private static final String REGISTERED_OCPP_TAG = __DatabasePreparer__.getRegisteredOcppTag();
 
     private static Application app;
 
@@ -71,82 +72,113 @@ public class ApplicationJsonTest {
 
     @Test
     public void testOcpp12() {
-        OcppJsonChargePoint chargePoint = new OcppJsonChargePoint(OcppVersion.V_12, REGISTERED_CHARGE_BOX_ID, PATH);
+        OcppJsonChargePoint chargePoint =
+                new OcppJsonChargePoint(OcppVersion.V_12, REGISTERED_CHARGE_BOX_ID, PATH);
         chargePoint.start();
 
-        ocpp.cs._2010._08.BootNotificationRequest boot = new ocpp.cs._2010._08.BootNotificationRequest()
-            .withChargePointVendor(getRandomString())
-            .withChargePointModel(getRandomString());
+        ocpp.cs._2010._08.BootNotificationRequest boot =
+                new ocpp.cs._2010._08.BootNotificationRequest()
+                        .withChargePointVendor(getRandomString())
+                        .withChargePointModel(getRandomString());
 
-        chargePoint.prepare(boot, ocpp.cs._2010._08.BootNotificationResponse.class,
-            bootResponse -> Assertions.assertEquals(ocpp.cs._2010._08.RegistrationStatus.ACCEPTED, bootResponse.getStatus()),
-            error -> Assertions.fail()
-        );
+        chargePoint.prepare(
+                boot,
+                ocpp.cs._2010._08.BootNotificationResponse.class,
+                bootResponse ->
+                        Assertions.assertEquals(
+                                ocpp.cs._2010._08.RegistrationStatus.ACCEPTED, bootResponse.getStatus()),
+                error -> Assertions.fail());
 
-        ocpp.cs._2010._08.AuthorizeRequest auth = new ocpp.cs._2010._08.AuthorizeRequest().withIdTag(REGISTERED_OCPP_TAG);
+        ocpp.cs._2010._08.AuthorizeRequest auth =
+                new ocpp.cs._2010._08.AuthorizeRequest().withIdTag(REGISTERED_OCPP_TAG);
 
-        chargePoint.prepare(auth, ocpp.cs._2010._08.AuthorizeResponse.class,
-            authResponse -> Assertions.assertEquals(ocpp.cs._2010._08.AuthorizationStatus.ACCEPTED, authResponse.getIdTagInfo().getStatus()),
-            error -> Assertions.fail()
-        );
+        chargePoint.prepare(
+                auth,
+                ocpp.cs._2010._08.AuthorizeResponse.class,
+                authResponse ->
+                        Assertions.assertEquals(
+                                ocpp.cs._2010._08.AuthorizationStatus.ACCEPTED,
+                                authResponse.getIdTagInfo().getStatus()),
+                error -> Assertions.fail());
 
         chargePoint.processAndClose();
     }
 
     @Test
     public void testOcpp15() {
-        OcppJsonChargePoint chargePoint = new OcppJsonChargePoint(OcppVersion.V_15, REGISTERED_CHARGE_BOX_ID, PATH);
+        OcppJsonChargePoint chargePoint =
+                new OcppJsonChargePoint(OcppVersion.V_15, REGISTERED_CHARGE_BOX_ID, PATH);
         chargePoint.start();
 
-        ocpp.cs._2012._06.BootNotificationRequest boot = new ocpp.cs._2012._06.BootNotificationRequest()
-            .withChargePointVendor(getRandomString())
-            .withChargePointModel(getRandomString());
+        ocpp.cs._2012._06.BootNotificationRequest boot =
+                new ocpp.cs._2012._06.BootNotificationRequest()
+                        .withChargePointVendor(getRandomString())
+                        .withChargePointModel(getRandomString());
 
-        chargePoint.prepare(boot, ocpp.cs._2012._06.BootNotificationResponse.class,
-            bootResponse -> Assertions.assertEquals(ocpp.cs._2012._06.RegistrationStatus.ACCEPTED, bootResponse.getStatus()),
-            error -> Assertions.fail()
-        );
+        chargePoint.prepare(
+                boot,
+                ocpp.cs._2012._06.BootNotificationResponse.class,
+                bootResponse ->
+                        Assertions.assertEquals(
+                                ocpp.cs._2012._06.RegistrationStatus.ACCEPTED, bootResponse.getStatus()),
+                error -> Assertions.fail());
 
-        ocpp.cs._2012._06.AuthorizeRequest auth = new ocpp.cs._2012._06.AuthorizeRequest().withIdTag(REGISTERED_OCPP_TAG);
+        ocpp.cs._2012._06.AuthorizeRequest auth =
+                new ocpp.cs._2012._06.AuthorizeRequest().withIdTag(REGISTERED_OCPP_TAG);
 
-        chargePoint.prepare(auth, ocpp.cs._2012._06.AuthorizeResponse.class,
-            authResponse -> Assertions.assertEquals(ocpp.cs._2012._06.AuthorizationStatus.ACCEPTED, authResponse.getIdTagInfo().getStatus()),
-            error -> Assertions.fail()
-        );
+        chargePoint.prepare(
+                auth,
+                ocpp.cs._2012._06.AuthorizeResponse.class,
+                authResponse ->
+                        Assertions.assertEquals(
+                                ocpp.cs._2012._06.AuthorizationStatus.ACCEPTED,
+                                authResponse.getIdTagInfo().getStatus()),
+                error -> Assertions.fail());
 
         chargePoint.processAndClose();
     }
 
     @Test
     public void testOcpp16() {
-        OcppJsonChargePoint chargePoint = new OcppJsonChargePoint(OcppVersion.V_16, REGISTERED_CHARGE_BOX_ID, PATH);
+        OcppJsonChargePoint chargePoint =
+                new OcppJsonChargePoint(OcppVersion.V_16, REGISTERED_CHARGE_BOX_ID, PATH);
         chargePoint.start();
 
-        BootNotificationRequest boot = new BootNotificationRequest()
-                .withChargePointVendor(getRandomString())
-                .withChargePointModel(getRandomString());
+        BootNotificationRequest boot =
+                new BootNotificationRequest()
+                        .withChargePointVendor(getRandomString())
+                        .withChargePointModel(getRandomString());
 
-        chargePoint.prepare(boot, BootNotificationResponse.class,
-                bootResponse -> Assertions.assertEquals(RegistrationStatus.ACCEPTED, bootResponse.getStatus()),
-                error -> Assertions.fail()
-        );
+        chargePoint.prepare(
+                boot,
+                BootNotificationResponse.class,
+                bootResponse ->
+                        Assertions.assertEquals(RegistrationStatus.ACCEPTED, bootResponse.getStatus()),
+                error -> Assertions.fail());
 
         AuthorizeRequest auth = new AuthorizeRequest().withIdTag(REGISTERED_OCPP_TAG);
 
-        chargePoint.prepare(auth, AuthorizeResponse.class,
-                authResponse -> Assertions.assertEquals(AuthorizationStatus.ACCEPTED, authResponse.getIdTagInfo().getStatus()),
-                error -> Assertions.fail()
-        );
+        chargePoint.prepare(
+                auth,
+                AuthorizeResponse.class,
+                authResponse ->
+                        Assertions.assertEquals(
+                                AuthorizationStatus.ACCEPTED, authResponse.getIdTagInfo().getStatus()),
+                error -> Assertions.fail());
 
         chargePoint.processAndClose();
     }
 
     @Test
     public void testWithMissingVersion() {
-        RuntimeException e = Assertions.assertThrows(RuntimeException.class, () -> {
-            OcppJsonChargePoint chargePoint = new OcppJsonChargePoint((String) null, REGISTERED_CHARGE_BOX_ID, PATH);
-            chargePoint.start();
-        });
+        RuntimeException e =
+                Assertions.assertThrows(
+                        RuntimeException.class,
+                        () -> {
+                            OcppJsonChargePoint chargePoint =
+                                    new OcppJsonChargePoint((String) null, REGISTERED_CHARGE_BOX_ID, PATH);
+                            chargePoint.start();
+                        });
 
         Assertions.assertTrue(e.getCause().getCause() instanceof UpgradeException);
 
@@ -157,10 +189,14 @@ public class ApplicationJsonTest {
 
     @Test
     public void testWithWrongVersion() {
-        RuntimeException e = Assertions.assertThrows(RuntimeException.class, () -> {
-            OcppJsonChargePoint chargePoint = new OcppJsonChargePoint("ocpp1234", REGISTERED_CHARGE_BOX_ID, PATH);
-            chargePoint.start();
-        });
+        RuntimeException e =
+                Assertions.assertThrows(
+                        RuntimeException.class,
+                        () -> {
+                            OcppJsonChargePoint chargePoint =
+                                    new OcppJsonChargePoint("ocpp1234", REGISTERED_CHARGE_BOX_ID, PATH);
+                            chargePoint.start();
+                        });
 
         Assertions.assertTrue(e.getCause().getCause() instanceof UpgradeException);
 
@@ -171,10 +207,14 @@ public class ApplicationJsonTest {
 
     @Test
     public void tesWithUnauthorizedStation() {
-        RuntimeException e = Assertions.assertThrows(RuntimeException.class, () -> {
-            OcppJsonChargePoint chargePoint = new OcppJsonChargePoint(OcppVersion.V_16, "unauth1234", PATH);
-            chargePoint.start();
-        });
+        RuntimeException e =
+                Assertions.assertThrows(
+                        RuntimeException.class,
+                        () -> {
+                            OcppJsonChargePoint chargePoint =
+                                    new OcppJsonChargePoint(OcppVersion.V_16, "unauth1234", PATH);
+                            chargePoint.start();
+                        });
 
         Assertions.assertTrue(e.getCause().getCause() instanceof UpgradeException);
 
@@ -183,20 +223,20 @@ public class ApplicationJsonTest {
         Assertions.assertEquals(HttpStatus.NOT_FOUND.value(), actualCause.getResponseStatusCode());
     }
 
-    /**
-     * https://github.com/steve-community/steve/issues/1109
-     */
+    /** https://github.com/steve-community/steve/issues/1109 */
     @Test
     public void testWithNullPayload() {
-        OcppJsonChargePoint chargePoint = new OcppJsonChargePoint(OcppVersion.V_16, REGISTERED_CHARGE_BOX_ID, PATH);
+        OcppJsonChargePoint chargePoint =
+                new OcppJsonChargePoint(OcppVersion.V_16, REGISTERED_CHARGE_BOX_ID, PATH);
         chargePoint.start();
 
-        chargePoint.prepare(null, "Heartbeat", HeartbeatResponse.class,
-            response -> Assertions.assertNotNull(response.getCurrentTime()),
-            error -> Assertions.fail()
-        );
+        chargePoint.prepare(
+                null,
+                "Heartbeat",
+                HeartbeatResponse.class,
+                response -> Assertions.assertNotNull(response.getCurrentTime()),
+                error -> Assertions.fail());
 
         chargePoint.processAndClose();
     }
-
 }

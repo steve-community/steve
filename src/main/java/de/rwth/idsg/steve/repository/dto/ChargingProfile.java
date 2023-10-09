@@ -43,7 +43,7 @@ public class ChargingProfile {
             if (description == null) {
                 return Integer.toString(chargingProfilePk);
             } else {
-                return chargingProfilePk + " ("  + description + ")";
+                return chargingProfilePk + " (" + description + ")";
             }
         }
     }

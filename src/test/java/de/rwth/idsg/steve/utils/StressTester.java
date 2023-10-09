@@ -42,17 +42,18 @@ public class StressTester {
         final CountDownLatch doneSignal = new CountDownLatch(threadCount);
 
         for (int i = 0; i < threadCount; i++) {
-            executorService.execute(() -> {
-                try {
-                    runnable.beforeRepeat();
-                    for (int j = 0; j < perThreadRepeatCount; j++) {
-                        runnable.toRepeat();
-                    }
-                    runnable.afterRepeat();
-                } finally {
-                    doneSignal.countDown();
-                }
-            });
+            executorService.execute(
+                    () -> {
+                        try {
+                            runnable.beforeRepeat();
+                            for (int j = 0; j < perThreadRepeatCount; j++) {
+                                runnable.toRepeat();
+                            }
+                            runnable.afterRepeat();
+                        } finally {
+                            doneSignal.countDown();
+                        }
+                    });
         }
 
         doneSignal.await();
@@ -64,7 +65,9 @@ public class StressTester {
 
     public interface Runnable {
         void beforeRepeat();
+
         void toRepeat();
+
         void afterRepeat();
     }
 }

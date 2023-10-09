@@ -48,12 +48,16 @@ public class TransactionsRestController {
 
     private final TransactionRepository transactionRepository;
 
-    @ApiResponses(value = {
-        @ApiResponse(code = 200, message = "OK"),
-        @ApiResponse(code = 400, message = "Bad Request", response = ApiErrorResponse.class),
-        @ApiResponse(code = 401, message = "Unauthorized", response = ApiErrorResponse.class),
-        @ApiResponse(code = 500, message = "Internal Server Error", response = ApiErrorResponse.class)}
-    )
+    @ApiResponses(
+            value = {
+                @ApiResponse(code = 200, message = "OK"),
+                @ApiResponse(code = 400, message = "Bad Request", response = ApiErrorResponse.class),
+                @ApiResponse(code = 401, message = "Unauthorized", response = ApiErrorResponse.class),
+                @ApiResponse(
+                        code = 500,
+                        message = "Internal Server Error",
+                        response = ApiErrorResponse.class)
+            })
     @GetMapping(value = "")
     @ResponseBody
     public List<Transaction> get(@Valid TransactionQueryForm.ForApi params) {

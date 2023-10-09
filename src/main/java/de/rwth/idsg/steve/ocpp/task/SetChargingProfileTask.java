@@ -41,13 +41,15 @@ import java.util.stream.Collectors;
  * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 13.03.2018
  */
-public class SetChargingProfileTask extends Ocpp16AndAboveTask<EnhancedSetChargingProfileParams, String> {
+public class SetChargingProfileTask
+        extends Ocpp16AndAboveTask<EnhancedSetChargingProfileParams, String> {
 
     private final ChargingProfileRepository chargingProfileRepository;
 
-    public SetChargingProfileTask(OcppVersion ocppVersion,
-                                  EnhancedSetChargingProfileParams params,
-                                  ChargingProfileRepository chargingProfileRepository) {
+    public SetChargingProfileTask(
+            OcppVersion ocppVersion,
+            EnhancedSetChargingProfileParams params,
+            ChargingProfileRepository chargingProfileRepository) {
         super(ocppVersion, params);
         this.chargingProfileRepository = chargingProfileRepository;
     }
@@ -73,33 +75,40 @@ public class SetChargingProfileTask extends Ocpp16AndAboveTask<EnhancedSetChargi
         ChargingProfileRecord profile = params.getDetails().getProfile();
 
         List<ChargingSchedulePeriod> schedulePeriods =
-                params.getDetails().getPeriods()
-                       .stream()
-                       .map(k -> {
-                           ChargingSchedulePeriod p = new ChargingSchedulePeriod();
-                           p.setStartPeriod(k.getStartPeriodInSeconds());
-                           p.setLimit(k.getPowerLimit());
-                           p.setNumberPhases(k.getNumberPhases());
-                           return p;
-                       })
-                       .collect(Collectors.toList());
+                params.getDetails().getPeriods().stream()
+                        .map(
+                                k -> {
+                                    ChargingSchedulePeriod p = new ChargingSchedulePeriod();
+                                    p.setStartPeriod(k.getStartPeriodInSeconds());
+                                    p.setLimit(k.getPowerLimit());
+                                    p.setNumberPhases(k.getNumberPhases());
+                                    return p;
+                                })
+                        .collect(Collectors.toList());
 
-        ChargingSchedule schedule = new ChargingSchedule()
-                .withDuration(profile.getDurationInSeconds())
-                .withStartSchedule(profile.getStartSchedule())
-                .withChargingRateUnit(ChargingRateUnitType.fromValue(profile.getChargingRateUnit()))
-                .withMinChargingRate(profile.getMinChargingRate())
-                .withChargingSchedulePeriod(schedulePeriods);
+        ChargingSchedule schedule =
+                new ChargingSchedule()
+                        .withDuration(profile.getDurationInSeconds())
+                        .withStartSchedule(profile.getStartSchedule())
+                        .withChargingRateUnit(ChargingRateUnitType.fromValue(profile.getChargingRateUnit()))
+                        .withMinChargingRate(profile.getMinChargingRate())
+                        .withChargingSchedulePeriod(schedulePeriods);
 
-        ChargingProfile ocppProfile = new ChargingProfile()
-                .withChargingProfileId(profile.getChargingProfilePk())
-                .withStackLevel(profile.getStackLevel())
-                .withChargingProfilePurpose(ChargingProfilePurposeType.fromValue(profile.getChargingProfilePurpose()))
-                .withChargingProfileKind(ChargingProfileKindType.fromValue(profile.getChargingProfileKind()))
-                .withRecurrencyKind(profile.getRecurrencyKind() == null ? null : RecurrencyKindType.fromValue(profile.getRecurrencyKind()))
-                .withValidFrom(profile.getValidFrom())
-                .withValidTo(profile.getValidTo())
-                .withChargingSchedule(schedule);
+        ChargingProfile ocppProfile =
+                new ChargingProfile()
+                        .withChargingProfileId(profile.getChargingProfilePk())
+                        .withStackLevel(profile.getStackLevel())
+                        .withChargingProfilePurpose(
+                                ChargingProfilePurposeType.fromValue(profile.getChargingProfilePurpose()))
+                        .withChargingProfileKind(
+                                ChargingProfileKindType.fromValue(profile.getChargingProfileKind()))
+                        .withRecurrencyKind(
+                                profile.getRecurrencyKind() == null
+                                        ? null
+                                        : RecurrencyKindType.fromValue(profile.getRecurrencyKind()))
+                        .withValidFrom(profile.getValidFrom())
+                        .withValidTo(profile.getValidTo())
+                        .withChargingSchedule(schedule);
 
         return new SetChargingProfileRequest()
                 .withConnectorId(params.getDelegate().getConnectorId())
@@ -107,7 +116,8 @@ public class SetChargingProfileTask extends Ocpp16AndAboveTask<EnhancedSetChargi
     }
 
     @Override
-    public AsyncHandler<ocpp.cp._2015._10.SetChargingProfileResponse> getOcpp16Handler(String chargeBoxId) {
+    public AsyncHandler<ocpp.cp._2015._10.SetChargingProfileResponse> getOcpp16Handler(
+            String chargeBoxId) {
         return res -> {
             try {
                 success(chargeBoxId, res.get().getStatus().value());

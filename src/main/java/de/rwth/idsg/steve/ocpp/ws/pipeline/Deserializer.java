@@ -93,7 +93,8 @@ public class Deserializer implements Consumer<CommunicationContext> {
                     throw new SteveException("Unknown enum type");
             }
         } catch (IOException e) {
-            throw new SteveException("Deserialization of incoming string failed: %s", context.getIncomingString(), e);
+            throw new SteveException(
+                    "Deserialization of incoming string failed: %s", context.getIncomingString(), e);
         }
     }
 
@@ -101,9 +102,7 @@ public class Deserializer implements Consumer<CommunicationContext> {
     // Private Helpers
     // -------------------------------------------------------------------------
 
-    /**
-     * Catch exceptions and wrap them in outgoing ERRORs for incoming CALLs.
-     */
+    /** Catch exceptions and wrap them in outgoing ERRORs for incoming CALLs. */
     private void handleCall(CommunicationContext context, String messageId, JsonParser parser) {
         // parse action
         String action;
@@ -150,16 +149,16 @@ public class Deserializer implements Consumer<CommunicationContext> {
     }
 
     /**
-     * Do NOT catch and handle exceptions for incoming RESPONSEs. Let the processing fail.
-     * There is no mechanism in OCPP to report back such erroneous messages.
+     * Do NOT catch and handle exceptions for incoming RESPONSEs. Let the processing fail. There is no
+     * mechanism in OCPP to report back such erroneous messages.
      */
     private void handleResult(CommunicationContext context, String messageId, JsonParser parser) {
-        FutureResponseContext responseContext = futureResponseContextStore.get(context.getSession(), messageId);
+        FutureResponseContext responseContext =
+                futureResponseContextStore.get(context.getSession(), messageId);
         if (responseContext == null) {
             throw new SteveException(
                     "A result message was received as response to a not-sent call. The message was: %s",
-                    context.getIncomingString()
-            );
+                    context.getIncomingString());
         }
 
         ResponseType res;
@@ -180,16 +179,16 @@ public class Deserializer implements Consumer<CommunicationContext> {
     }
 
     /**
-     * Do NOT catch and handle exceptions for incoming RESPONSEs. Let the processing fail.
-     * There is no mechanism in OCPP to report back such erroneous messages.
+     * Do NOT catch and handle exceptions for incoming RESPONSEs. Let the processing fail. There is no
+     * mechanism in OCPP to report back such erroneous messages.
      */
     private void handleError(CommunicationContext context, String messageId, JsonParser parser) {
-        FutureResponseContext responseContext = futureResponseContextStore.get(context.getSession(), messageId);
+        FutureResponseContext responseContext =
+                futureResponseContextStore.get(context.getSession(), messageId);
         if (responseContext == null) {
             throw new SteveException(
                     "An error message was received as response to a not-sent call. The message was: %s",
-                    context.getIncomingString()
-            );
+                    context.getIncomingString());
         }
 
         ErrorCode code;
@@ -210,7 +209,8 @@ public class Deserializer implements Consumer<CommunicationContext> {
 
             // From spec:
             // ErrorDetails - This JSON object describes error details in an undefined way.
-            // If there are no error details you should fill in an empty object {}, missing or null is not allowed
+            // If there are no error details you should fill in an empty object {}, missing or null is not
+            // allowed
             parser.nextToken();
             TreeNode detailsNode = parser.readValueAsTree();
             if (detailsNode != null && detailsNode.size() != 0) {
@@ -230,5 +230,4 @@ public class Deserializer implements Consumer<CommunicationContext> {
         context.setIncomingMessage(error);
         context.createErrorHandler(responseContext.getTask());
     }
-
 }

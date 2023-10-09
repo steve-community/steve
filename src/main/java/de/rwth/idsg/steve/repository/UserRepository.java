@@ -30,9 +30,12 @@ import java.util.List;
  */
 public interface UserRepository {
     List<User.Overview> getOverview(UserQueryForm form);
+
     User.Details getDetails(int userPk);
 
     void add(UserForm form);
+
     void update(UserForm form);
+
     void delete(int userPk);
 }

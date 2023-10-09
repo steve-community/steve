@@ -50,19 +50,20 @@ public class ApiDocsConfiguration {
     public Docket apiDocs() {
         String title = "SteVe REST API Documentation";
 
-        var apiInfo = new ApiInfoBuilder()
-            .title(title)
-            .description(title)
-            .license("GPL-3.0")
-            .licenseUrl("https://github.com/steve-community/steve/blob/master/LICENSE.txt")
-            .version(SteveConfiguration.CONFIG.getSteveVersion())
-            .build();
+        var apiInfo =
+                new ApiInfoBuilder()
+                        .title(title)
+                        .description(title)
+                        .license("GPL-3.0")
+                        .licenseUrl("https://github.com/steve-community/steve/blob/master/LICENSE.txt")
+                        .version(SteveConfiguration.CONFIG.getSteveVersion())
+                        .build();
 
         return new Docket(DocumentationType.OAS_30)
-            .useDefaultResponseMessages(false)
-            .apiInfo(apiInfo)
-            .select()
-            .apis(withClassAnnotation(RestController.class))
-            .build();
+                .useDefaultResponseMessages(false)
+                .apiInfo(apiInfo)
+                .select()
+                .apis(withClassAnnotation(RestController.class))
+                .build();
     }
 }

@@ -38,9 +38,7 @@ public class ChargePointQueryForm {
     private OcppVersion ocppVersion;
     private QueryPeriodType heartbeatPeriod;
 
-    /**
-     * Init with sensible default values
-     */
+    /** Init with sensible default values */
     public ChargePointQueryForm() {
         heartbeatPeriod = QueryPeriodType.ALL;
     }
@@ -67,7 +65,7 @@ public class ChargePointQueryForm {
         @Getter private final String value;
 
         public static QueryPeriodType fromValue(String v) {
-            for (QueryPeriodType c: QueryPeriodType.values()) {
+            for (QueryPeriodType c : QueryPeriodType.values()) {
                 if (c.value.equals(v)) {
                     return c;
                 }
@@ -75,5 +73,4 @@ public class ChargePointQueryForm {
             throw new IllegalArgumentException(v);
         }
     }
-
 }

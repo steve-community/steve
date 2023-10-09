@@ -36,9 +36,7 @@ public final class TaskOverview implements Comparable<TaskOverview> {
     private final DateTime start, end;
     private final TaskOrigin origin;
 
-    /**
-     * We want the tasks to be printed in descending order.
-     */
+    /** We want the tasks to be printed in descending order. */
     @Override
     public int compareTo(TaskOverview o) {
         return (o.taskId - this.taskId);

@@ -46,5 +46,4 @@ public class InsertTransactionParams {
     public boolean isSetReservationId() {
         return reservationId != null;
     }
-
 }

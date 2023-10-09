@@ -34,5 +34,4 @@ public class ChargingProfileAssignmentQueryForm {
     private String chargeBoxId;
     private Integer chargingProfilePk;
     private String chargingProfileDescription;
-
 }

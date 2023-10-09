@@ -50,8 +50,8 @@ public class CustomStringModule extends SimpleModule {
     }
 
     /**
-     * Since {@link com.fasterxml.jackson.databind.ser.std.StringSerializer} is marked as final, its contents are
-     * copied here (and adjusted as needed).
+     * Since {@link com.fasterxml.jackson.databind.ser.std.StringSerializer} is marked as final, its
+     * contents are copied here (and adjusted as needed).
      */
     private static class CustomStringSerializer extends StdScalarSerializer<Object> {
 
@@ -68,13 +68,15 @@ public class CustomStringModule extends SimpleModule {
         }
 
         @Override
-        public void serialize(Object value, JsonGenerator gen, SerializerProvider provider) throws IOException {
+        public void serialize(Object value, JsonGenerator gen, SerializerProvider provider)
+                throws IOException {
             gen.writeString(objectToString(value));
         }
 
         @Override
-        public final void serializeWithType(Object value, JsonGenerator gen, SerializerProvider provider,
-                                            TypeSerializer typeSer) throws IOException {
+        public final void serializeWithType(
+                Object value, JsonGenerator gen, SerializerProvider provider, TypeSerializer typeSer)
+                throws IOException {
             gen.writeString(objectToString(value));
         }
 
@@ -84,7 +86,8 @@ public class CustomStringModule extends SimpleModule {
         }
 
         @Override
-        public void acceptJsonFormatVisitor(JsonFormatVisitorWrapper visitor, JavaType typeHint) throws JsonMappingException {
+        public void acceptJsonFormatVisitor(JsonFormatVisitorWrapper visitor, JavaType typeHint)
+                throws JsonMappingException {
             visitStringFormat(visitor, typeHint);
         }
 

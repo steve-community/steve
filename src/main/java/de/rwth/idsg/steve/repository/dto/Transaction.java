@@ -28,9 +28,7 @@ import org.jetbrains.annotations.Nullable;
 import org.joda.time.DateTime;
 
 /**
- *
  * @author Sevket Goekay <sevketgokay@gmail.com>
- *
  */
 @Getter
 @Builder
@@ -46,9 +44,7 @@ public final class Transaction {
 
     private final String ocppIdTag;
 
-    /**
-     * Only relevant for the web pages. Disabled for API
-     */
+    /** Only relevant for the web pages. Disabled for API */
     @JsonIgnore
     @ApiModelProperty(hidden = true)
     private final String startTimestampFormatted;
@@ -57,23 +53,16 @@ public final class Transaction {
 
     private final DateTime startTimestamp;
 
-    /**
-     * Only relevant for the web pages. Disabled for API
-     */
+    /** Only relevant for the web pages. Disabled for API */
     @JsonIgnore
     @ApiModelProperty(hidden = true)
-    @Nullable
-    private final String stopTimestampFormatted;
+    @Nullable private final String stopTimestampFormatted;
 
-    @Nullable
-    private final String stopValue;
+    @Nullable private final String stopValue;
 
-    @Nullable
-    private final String stopReason; // new in OCPP 1.6
+    @Nullable private final String stopReason; // new in OCPP 1.6
 
-    @Nullable
-    private final DateTime stopTimestamp;
+    @Nullable private final DateTime stopTimestamp;
 
-    @Nullable
-    private final TransactionStopEventActor stopEventActor;
+    @Nullable private final TransactionStopEventActor stopEventActor;
 }

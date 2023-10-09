@@ -99,8 +99,8 @@ public class UsersController {
     }
 
     @RequestMapping(params = "add", value = ADD_PATH, method = RequestMethod.POST)
-    public String addPost(@Valid @ModelAttribute("userForm") UserForm userForm,
-                          BindingResult result, Model model) {
+    public String addPost(
+            @Valid @ModelAttribute("userForm") UserForm userForm, BindingResult result, Model model) {
         if (result.hasErrors()) {
             setTags(model);
             return "data-man/userAdd";
@@ -111,8 +111,8 @@ public class UsersController {
     }
 
     @RequestMapping(params = "update", value = UPDATE_PATH, method = RequestMethod.POST)
-    public String update(@Valid @ModelAttribute("userForm") UserForm userForm,
-                         BindingResult result, Model model) {
+    public String update(
+            @Valid @ModelAttribute("userForm") UserForm userForm, BindingResult result, Model model) {
         if (result.hasErrors()) {
             setTags(model);
             return "data-man/userDetails";

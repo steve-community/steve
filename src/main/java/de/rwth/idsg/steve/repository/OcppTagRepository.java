@@ -34,19 +34,26 @@ public interface OcppTagRepository {
     List<OcppTag.Overview> getOverview(OcppTagQueryForm form);
 
     Result<OcppTagActivityRecord> getRecords();
+
     Result<OcppTagActivityRecord> getRecords(List<String> idTagList);
 
     OcppTagActivityRecord getRecord(String idTag);
+
     OcppTagActivityRecord getRecord(int ocppTagPk);
 
     List<String> getIdTags();
+
     List<String> getActiveIdTags();
 
     List<String> getParentIdTags();
+
     String getParentIdtag(String idTag);
 
     void addOcppTagList(List<String> idTagList);
+
     int addOcppTag(OcppTagForm form);
+
     void updateOcppTag(OcppTagForm form);
+
     void deleteOcppTag(int ocppTagPk);
 }

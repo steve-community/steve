@@ -60,8 +60,13 @@ public class Helpers {
             throw new RuntimeException();
         }
 
-        return prefix + CONFIG.getJetty().getServerHost() + ":" + port
-                + CONFIG.getContextPath() + "/services" + CONFIG.getRouterEndpointPath();
+        return prefix
+                + CONFIG.getJetty().getServerHost()
+                + ":"
+                + port
+                + CONFIG.getContextPath()
+                + "/services"
+                + CONFIG.getRouterEndpointPath();
     }
 
     public static String getJsonPath() {
@@ -78,8 +83,12 @@ public class Helpers {
             throw new RuntimeException();
         }
 
-        return prefix + CONFIG.getJetty().getServerHost() + ":" + port
-                + CONFIG.getContextPath() + "/websocket/CentralSystemService/";
+        return prefix
+                + CONFIG.getJetty().getServerHost()
+                + ":"
+                + port
+                + CONFIG.getContextPath()
+                + "/websocket/CentralSystemService/";
     }
 
     public static ocpp.cs._2015._10.CentralSystemService getForOcpp16(String path) {
@@ -107,5 +116,4 @@ public class Helpers {
         f.setAddress(endpointAddress);
         return f;
     }
-
 }

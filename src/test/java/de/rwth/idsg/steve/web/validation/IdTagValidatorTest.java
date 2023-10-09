@@ -18,7 +18,6 @@
  */
 package de.rwth.idsg.steve.web.validation;
 
-
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -79,9 +78,7 @@ public class IdTagValidatorTest {
         Assertions.assertTrue(validator.isValid("te__st", null));
     }
 
-    /**
-     * https://github.com/steve-community/steve/issues/475
-     */
+    /** https://github.com/steve-community/steve/issues/475 */
     @Test
     public void testColon() {
         Assertions.assertTrue(validator.isValid(":test", null));
@@ -95,5 +92,4 @@ public class IdTagValidatorTest {
     public void testCombined() {
         Assertions.assertTrue(validator.isValid("1t.E-S_:t20", null));
     }
-
 }

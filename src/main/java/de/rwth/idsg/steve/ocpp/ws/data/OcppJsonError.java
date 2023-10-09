@@ -60,11 +60,11 @@ public class OcppJsonError extends OcppJsonResponse {
     }
 
     /**
-     * Let's be defensive and prevent problems due to errorDetails
-     * that can be longer than what is expected/allowed on the receiving end.
+     * Let's be defensive and prevent problems due to errorDetails that can be longer than what is
+     * expected/allowed on the receiving end.
      *
-     * It actually happened with a charge point which responded with the message
-     * "ERROR: dropped too large packet" and the connection was closed.
+     * <p>It actually happened with a charge point which responded with the message "ERROR: dropped
+     * too large packet" and the connection was closed.
      */
     public String toStringErrorDetails() {
         if (errorDetails.length() > 100) {

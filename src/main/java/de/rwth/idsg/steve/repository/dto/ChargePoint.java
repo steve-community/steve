@@ -26,9 +26,7 @@ import lombok.RequiredArgsConstructor;
 import org.joda.time.DateTime;
 
 /**
- *
  * @author Sevket Goekay <sevketgokay@gmail.com>
- *
  */
 public final class ChargePoint {
 
@@ -46,5 +44,4 @@ public final class ChargePoint {
         private final ChargeBoxRecord chargeBox;
         private final AddressRecord address;
     }
-
 }

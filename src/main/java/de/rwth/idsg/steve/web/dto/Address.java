@@ -50,9 +50,7 @@ public class Address {
                 && country == null;
     }
 
-    /**
-     * Otherwise, if the country field is not set, we would get a NPE.
-     */
+    /** Otherwise, if the country field is not set, we would get a NPE. */
     public String getCountryAlpha2OrNull() {
         if (country == null) {
             return null;

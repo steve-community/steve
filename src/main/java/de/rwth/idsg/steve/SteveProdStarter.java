@@ -28,8 +28,8 @@ import java.util.concurrent.TimeUnit;
 /**
  * ApplicationStarter for PROD profile
  *
- * Since we log everything to a file, it can be confusing for the user to see nothing written to console, when starting
- * the app. So, this class prints some stuff to console.
+ * <p>Since we log everything to a file, it can be confusing for the user to see nothing written to
+ * console, when starting the app. So, this class prints some stuff to console.
  *
  * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 05.11.2015
@@ -37,7 +37,8 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 public class SteveProdStarter implements ApplicationStarter {
 
-    private static final String HINT = "Hint: You can stop the application by pressing CTRL+C" + sep();
+    private static final String HINT =
+            "Hint: You can stop the application by pressing CTRL+C" + sep();
     private static final String REFER = "Please refer to the log file for details";
 
     private final JettyServer jettyServer;
@@ -85,10 +86,11 @@ public class SteveProdStarter implements ApplicationStarter {
     // -------------------------------------------------------------------------
 
     private void starting() {
-        String msg = "Log file: "
-                + LogFileRetriever.INSTANCE.getLogFilePathOrErrorMessage()
-                + sep()
-                + "Starting";
+        String msg =
+                "Log file: "
+                        + LogFileRetriever.INSTANCE.getLogFilePathOrErrorMessage()
+                        + sep()
+                        + "Starting";
 
         print(msg);
         startPrintingDots();
@@ -121,19 +123,15 @@ public class SteveProdStarter implements ApplicationStarter {
     }
 
     private void printInfo(EndpointInfo.ItemsWithInfo itemsWithInfo) {
-        StringBuilder sb  = new StringBuilder(itemsWithInfo.getInfo())
-                .append(sep());
+        StringBuilder sb = new StringBuilder(itemsWithInfo.getInfo()).append(sep());
 
         Iterator<String> it = itemsWithInfo.getData().iterator();
 
         if (it.hasNext()) {
-            sb.append("- ")
-              .append(it.next());
+            sb.append("- ").append(it.next());
 
             while (it.hasNext()) {
-                sb.append(sep())
-                  .append("- ")
-                  .append(it.next());
+                sb.append(sep()).append("- ").append(it.next());
             }
         }
 
@@ -157,18 +155,20 @@ public class SteveProdStarter implements ApplicationStarter {
     // -------------------------------------------------------------------------
 
     private void startPrintingDots() {
-        dotThread = new Thread() {
-            public void run() {
-                try {
-                    while (!isInterrupted()) {
-                        print(".");
-                        TimeUnit.MILLISECONDS.sleep(600);
+        dotThread =
+                new Thread() {
+                    public void run() {
+                        try {
+                            while (!isInterrupted()) {
+                                print(".");
+                                TimeUnit.MILLISECONDS.sleep(600);
+                            }
+                        } catch (InterruptedException e) {
+                            // This is expected, since stopPrintingDots() is called. Do nothing and let the thread
+                            // end.
+                        }
                     }
-                } catch (InterruptedException e) {
-                    // This is expected, since stopPrintingDots() is called. Do nothing and let the thread end.
-                }
-            }
-        };
+                };
 
         dotThread.start();
     }

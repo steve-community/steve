@@ -19,6 +19,7 @@
 package de.rwth.idsg.steve.web.dto.ocpp;
 
 import de.rwth.idsg.steve.ocpp.OcppVersion;
+
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
@@ -68,7 +69,8 @@ public enum ConfigurationKeyEnum {
     HeartbeatInterval("in seconds", RW, newHashSet(V_16)),
     AllowOfflineTxForUnknownId("boolean", RW, newHashSet(V_16)),
     AuthorizationCacheEnabled("boolean", RW, newHashSet(V_16)),
-    // AuthorizeRemoteTxRequests Read or Read-Write is up to Charge Point implementation so set to RW for now
+    // AuthorizeRemoteTxRequests Read or Read-Write is up to Charge Point implementation so set to RW
+    // for now
     AuthorizeRemoteTxRequests("boolean", RW, newHashSet(V_16)),
     ConnectorPhaseRotation("comma separated list", RW, newHashSet(V_16)),
     ConnectorPhaseRotationMaxLength("integer", R, newHashSet(V_16)),
@@ -111,10 +113,13 @@ public enum ConfigurationKeyEnum {
     // see https://github.com/SAFE-eV/OCMF-Open-Charge-Metering-Format/blob/master/OCMF-de.md
     // -------------------------------------------------------------------------
 
-    // StopTransactionSignatureFormat Read or Read-Write is up to Charge Point implementation so set to RW for now
+    // StopTransactionSignatureFormat Read or Read-Write is up to Charge Point implementation so set
+    // to RW for now
     StopTransactionSignatureFormat("string; specific to OCMF", RW, newHashSet(V_15, V_16)),
-    StopTransactionSignatureContexts("comma separated list; specific to OCMF", RW, newHashSet(V_15, V_16)),
-    MeterValuesSignatureContexts("comma separated list; specific to OCMF", RW, newHashSet(V_15, V_16));
+    StopTransactionSignatureContexts(
+            "comma separated list; specific to OCMF", RW, newHashSet(V_15, V_16)),
+    MeterValuesSignatureContexts(
+            "comma separated list; specific to OCMF", RW, newHashSet(V_15, V_16));
 
     private final String value;
     private final String text;
@@ -128,8 +133,8 @@ public enum ConfigurationKeyEnum {
     public static final Map<String, String> OCPP_16_MAP_R = asMap(OcppVersion.V_16, R);
     public static final Map<String, String> OCPP_16_MAP_RW = asMap(OcppVersion.V_16, RW);
 
-
-    ConfigurationKeyEnum(String valueType, ConfigurationKeyReadWriteEnum rw, Set<OcppVersion> versions) {
+    ConfigurationKeyEnum(
+            String valueType, ConfigurationKeyReadWriteEnum rw, Set<OcppVersion> versions) {
         this.value = this.name();
         this.text = String.format("%s (%s)", value, valueType);
         this.rw = rw;

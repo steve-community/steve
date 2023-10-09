@@ -39,25 +39,26 @@ import java.util.stream.Collectors;
 public class TaskStoreImpl implements TaskStore {
 
     private final AtomicInteger atomicInteger = new AtomicInteger(0);
-    private final ConcurrentHashMap<Integer, CommunicationTask> lookupTable = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<Integer, CommunicationTask> lookupTable =
+            new ConcurrentHashMap<>();
 
     @Override
     public List<TaskOverview> getOverview() {
-        return lookupTable.entrySet()
-                          .stream()
-                          .map(entry -> {
-                              CommunicationTask r = entry.getValue();
-                              return TaskOverview.builder()
-                                                 .taskId(entry.getKey())
-                                                 .origin(r.getOrigin())
-                                                 .start(r.getStartTimestamp())
-                                                 .end(r.getEndTimestamp())
-                                                 .responseCount(r.getResponseCount().get())
-                                                 .requestCount(r.getResultMap().size())
-                                                 .build();
-                          })
-                          .sorted()
-                          .collect(Collectors.toList());
+        return lookupTable.entrySet().stream()
+                .map(
+                        entry -> {
+                            CommunicationTask r = entry.getValue();
+                            return TaskOverview.builder()
+                                    .taskId(entry.getKey())
+                                    .origin(r.getOrigin())
+                                    .start(r.getStartTimestamp())
+                                    .end(r.getEndTimestamp())
+                                    .responseCount(r.getResponseCount().get())
+                                    .requestCount(r.getResultMap().size())
+                                    .build();
+                        })
+                .sorted()
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -79,9 +80,8 @@ public class TaskStoreImpl implements TaskStore {
 
     @Override
     public void clearFinished() {
-        lookupTable.entrySet()
-                   .stream()
-                   .filter(entry -> entry.getValue().isFinished())
-                   .forEach(entry -> lookupTable.remove(entry.getKey()));
+        lookupTable.entrySet().stream()
+                .filter(entry -> entry.getValue().isFinished())
+                .forEach(entry -> lookupTable.remove(entry.getKey()));
     }
 }

@@ -51,9 +51,7 @@ public class TransactionStopService {
     @Autowired private OcppServerRepository ocppServerRepository;
 
     public void stop(List<Integer> transactionPkList) {
-        transactionPkList.stream()
-                         .sorted(Ordering.natural())
-                         .forEach(this::stop);
+        transactionPkList.stream().sorted(Ordering.natural()).forEach(this::stop);
     }
 
     public void stop(Integer transactionPk) {
@@ -67,14 +65,15 @@ public class TransactionStopService {
 
         TerminationValues values = findNeededValues(thisTxDetails);
 
-        ocppServerRepository.updateTransaction(UpdateTransactionParams.builder()
-                                                                      .transactionId(thisTx.getId())
-                                                                      .chargeBoxId(thisTx.getChargeBoxId())
-                                                                      .stopMeterValue(values.stopValue)
-                                                                      .stopTimestamp(values.stopTimestamp)
-                                                                      .eventActor(TransactionStopEventActor.manual)
-                                                                      .eventTimestamp(DateTime.now())
-                                                                      .build());
+        ocppServerRepository.updateTransaction(
+                UpdateTransactionParams.builder()
+                        .transactionId(thisTx.getId())
+                        .chargeBoxId(thisTx.getChargeBoxId())
+                        .stopMeterValue(values.stopValue)
+                        .stopTimestamp(values.stopTimestamp)
+                        .eventActor(TransactionStopEventActor.manual)
+                        .eventTimestamp(DateTime.now())
+                        .build());
     }
 
     private static TerminationValues findNeededValues(TransactionDetails thisTxDetails) {
@@ -89,9 +88,9 @@ public class TransactionStopService {
         TransactionDetails.MeterValues last = findLastMeterValue(intermediateValues);
         if (last != null) {
             return TerminationValues.builder()
-                                    .stopValue(floatingStringToIntString(last.getValue()))
-                                    .stopTimestamp(last.getValueTimestamp())
-                                    .build();
+                    .stopValue(floatingStringToIntString(last.getValue()))
+                    .stopTimestamp(last.getValueTimestamp())
+                    .build();
         }
 
         // -------------------------------------------------------------------------
@@ -103,15 +102,15 @@ public class TransactionStopService {
             // continue counting. in such cases, use the value of subsequent transaction's start value
             if (Integer.parseInt(nextTx.getStartValue()) > Integer.parseInt(thisTx.getStartValue())) {
                 return TerminationValues.builder()
-                                        .stopValue(nextTx.getStartValue())
-                                        .stopTimestamp(nextTx.getStartTimestamp())
-                                        .build();
+                        .stopValue(nextTx.getStartValue())
+                        .stopTimestamp(nextTx.getStartTimestamp())
+                        .build();
             } else {
                 // this mix of strategies might be really confusing
                 return TerminationValues.builder()
-                                        .stopValue(thisTx.getStartValue())
-                                        .stopTimestamp(nextTx.getStartTimestamp())
-                                        .build();
+                        .stopValue(thisTx.getStartValue())
+                        .stopTimestamp(nextTx.getStartTimestamp())
+                        .build();
             }
         }
 
@@ -120,18 +119,18 @@ public class TransactionStopService {
         // -------------------------------------------------------------------------
 
         return TerminationValues.builder()
-                                .stopValue(thisTx.getStartValue())
-                                .stopTimestamp(thisTx.getStartTimestamp())
-                                .build();
+                .stopValue(thisTx.getStartValue())
+                .stopTimestamp(thisTx.getStartTimestamp())
+                .build();
     }
 
-    @Nullable
-    private static TransactionDetails.MeterValues findLastMeterValue(List<TransactionDetails.MeterValues> values) {
+    @Nullable private static TransactionDetails.MeterValues findLastMeterValue(
+            List<TransactionDetails.MeterValues> values) {
         TransactionDetails.MeterValues v =
                 values.stream()
-                      .filter(TransactionStopServiceHelper::isEnergyValue)
-                      .max(Comparator.comparing(TransactionDetails.MeterValues::getValueTimestamp))
-                      .orElse(null);
+                        .filter(TransactionStopServiceHelper::isEnergyValue)
+                        .max(Comparator.comparing(TransactionDetails.MeterValues::getValueTimestamp))
+                        .orElse(null);
 
         // if the list of values is empty, we fall to this case, as well.
         if (v == null) {
@@ -141,15 +140,15 @@ public class TransactionStopService {
         // convert kWh to Wh
         if (UnitOfMeasure.K_WH.value().equals(v.getUnit())) {
             return TransactionDetails.MeterValues.builder()
-                                                 .value(kWhStringToWhString(v.getValue()))
-                                                 .valueTimestamp(v.getValueTimestamp())
-                                                 .readingContext(v.getReadingContext())
-                                                 .format(v.getFormat())
-                                                 .measurand(v.getMeasurand())
-                                                 .location(v.getLocation())
-                                                 .unit(v.getUnit())
-                                                 .phase(v.getPhase())
-                                                 .build();
+                    .value(kWhStringToWhString(v.getValue()))
+                    .valueTimestamp(v.getValueTimestamp())
+                    .readingContext(v.getReadingContext())
+                    .format(v.getFormat())
+                    .measurand(v.getMeasurand())
+                    .location(v.getLocation())
+                    .unit(v.getUnit())
+                    .phase(v.getPhase())
+                    .build();
         } else {
             return v;
         }

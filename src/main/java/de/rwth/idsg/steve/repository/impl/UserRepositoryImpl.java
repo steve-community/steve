@@ -61,15 +61,16 @@ public class UserRepositoryImpl implements UserRepository {
     @Override
     public List<User.Overview> getOverview(UserQueryForm form) {
         return getOverviewInternal(form)
-                .map(r -> User.Overview.builder()
-                                       .userPk(r.value1())
-                                       .ocppTagPk(r.value2())
-                                       .ocppIdTag(r.value3())
-                                       .name(r.value4() + " " + r.value5())
-                                       .phone(r.value6())
-                                       .email(r.value7())
-                                       .build()
-                );
+                .map(
+                        r ->
+                                User.Overview.builder()
+                                        .userPk(r.value1())
+                                        .ocppTagPk(r.value2())
+                                        .ocppIdTag(r.value3())
+                                        .name(r.value4() + " " + r.value5())
+                                        .phone(r.value6())
+                                        .email(r.value7())
+                                        .build());
     }
 
     @Override
@@ -79,9 +80,7 @@ public class UserRepositoryImpl implements UserRepository {
         // 1. user table
         // -------------------------------------------------------------------------
 
-        UserRecord ur = ctx.selectFrom(USER)
-                           .where(USER.USER_PK.equal(userPk))
-                           .fetchOne();
+        UserRecord ur = ctx.selectFrom(USER).where(USER.USER_PK.equal(userPk)).fetchOne();
 
         if (ur == null) {
             throw new SteveException("There is no user with id '%s'", userPk);
@@ -99,10 +98,11 @@ public class UserRepositoryImpl implements UserRepository {
 
         String ocppIdTag = null;
         if (ur.getOcppTagPk() != null) {
-            Record1<String> record = ctx.select(OCPP_TAG.ID_TAG)
-                                        .from(OCPP_TAG)
-                                        .where(OCPP_TAG.OCPP_TAG_PK.eq(ur.getOcppTagPk()))
-                                        .fetchOne();
+            Record1<String> record =
+                    ctx.select(OCPP_TAG.ID_TAG)
+                            .from(OCPP_TAG)
+                            .where(OCPP_TAG.OCPP_TAG_PK.eq(ur.getOcppTagPk()))
+                            .fetchOne();
 
             if (record != null) {
                 ocppIdTag = record.value1();
@@ -110,52 +110,55 @@ public class UserRepositoryImpl implements UserRepository {
         }
 
         return User.Details.builder()
-                           .userRecord(ur)
-                           .address(ar)
-                           .ocppIdTag(Optional.ofNullable(ocppIdTag))
-                           .build();
+                .userRecord(ur)
+                .address(ar)
+                .ocppIdTag(Optional.ofNullable(ocppIdTag))
+                .build();
     }
 
     @Override
     public void add(UserForm form) {
-        ctx.transaction(configuration -> {
-            DSLContext ctx = DSL.using(configuration);
-            try {
-                Integer addressId = addressRepository.updateOrInsert(ctx, form.getAddress());
-                addInternal(ctx, form, addressId);
+        ctx.transaction(
+                configuration -> {
+                    DSLContext ctx = DSL.using(configuration);
+                    try {
+                        Integer addressId = addressRepository.updateOrInsert(ctx, form.getAddress());
+                        addInternal(ctx, form, addressId);
 
-            } catch (DataAccessException e) {
-                throw new SteveException("Failed to add the user", e);
-            }
-        });
+                    } catch (DataAccessException e) {
+                        throw new SteveException("Failed to add the user", e);
+                    }
+                });
     }
 
     @Override
     public void update(UserForm form) {
-        ctx.transaction(configuration -> {
-            DSLContext ctx = DSL.using(configuration);
-            try {
-                Integer addressId = addressRepository.updateOrInsert(ctx, form.getAddress());
-                updateInternal(ctx, form, addressId);
+        ctx.transaction(
+                configuration -> {
+                    DSLContext ctx = DSL.using(configuration);
+                    try {
+                        Integer addressId = addressRepository.updateOrInsert(ctx, form.getAddress());
+                        updateInternal(ctx, form, addressId);
 
-            } catch (DataAccessException e) {
-                throw new SteveException("Failed to update the user", e);
-            }
-        });
+                    } catch (DataAccessException e) {
+                        throw new SteveException("Failed to update the user", e);
+                    }
+                });
     }
 
     @Override
     public void delete(int userPk) {
-        ctx.transaction(configuration -> {
-            DSLContext ctx = DSL.using(configuration);
-            try {
-                addressRepository.delete(ctx, selectAddressId(userPk));
-                deleteInternal(ctx, userPk);
+        ctx.transaction(
+                configuration -> {
+                    DSLContext ctx = DSL.using(configuration);
+                    try {
+                        addressRepository.delete(ctx, selectAddressId(userPk));
+                        deleteInternal(ctx, userPk);
 
-            } catch (DataAccessException e) {
-                throw new SteveException("Failed to delete the user", e);
-            }
-        });
+                    } catch (DataAccessException e) {
+                        throw new SteveException("Failed to delete the user", e);
+                    }
+                });
     }
 
     // -------------------------------------------------------------------------
@@ -163,10 +166,12 @@ public class UserRepositoryImpl implements UserRepository {
     // -------------------------------------------------------------------------
 
     @SuppressWarnings("unchecked")
-    private Result<Record7<Integer, Integer, String, String, String, String, String>> getOverviewInternal(UserQueryForm form) {
+    private Result<Record7<Integer, Integer, String, String, String, String, String>>
+            getOverviewInternal(UserQueryForm form) {
         SelectQuery selectQuery = ctx.selectQuery();
         selectQuery.addFrom(USER);
-        selectQuery.addJoin(OCPP_TAG, JoinType.LEFT_OUTER_JOIN, USER.OCPP_TAG_PK.eq(OCPP_TAG.OCPP_TAG_PK));
+        selectQuery.addJoin(
+                OCPP_TAG, JoinType.LEFT_OUTER_JOIN, USER.OCPP_TAG_PK.eq(OCPP_TAG.OCPP_TAG_PK));
         selectQuery.addSelect(
                 USER.USER_PK,
                 USER.OCPP_TAG_PK,
@@ -174,8 +179,7 @@ public class UserRepositoryImpl implements UserRepository {
                 USER.FIRST_NAME,
                 USER.LAST_NAME,
                 USER.PHONE,
-                USER.E_MAIL
-        );
+                USER.E_MAIL);
 
         if (form.isSetUserPk()) {
             selectQuery.addConditions(USER.USER_PK.eq(form.getUserPk()));
@@ -203,29 +207,26 @@ public class UserRepositoryImpl implements UserRepository {
     }
 
     private SelectConditionStep<Record1<Integer>> selectAddressId(int userPk) {
-        return ctx.select(USER.ADDRESS_PK)
-                  .from(USER)
-                  .where(USER.USER_PK.eq(userPk));
+        return ctx.select(USER.ADDRESS_PK).from(USER).where(USER.USER_PK.eq(userPk));
     }
 
     private SelectConditionStep<Record1<Integer>> selectOcppTagPk(String ocppIdTag) {
-        return ctx.select(OCPP_TAG.OCPP_TAG_PK)
-                  .from(OCPP_TAG)
-                  .where(OCPP_TAG.ID_TAG.eq(ocppIdTag));
+        return ctx.select(OCPP_TAG.OCPP_TAG_PK).from(OCPP_TAG).where(OCPP_TAG.ID_TAG.eq(ocppIdTag));
     }
 
     private void addInternal(DSLContext ctx, UserForm form, Integer addressPk) {
-        int count = ctx.insertInto(USER)
-                       .set(USER.FIRST_NAME, form.getFirstName())
-                       .set(USER.LAST_NAME, form.getLastName())
-                       .set(USER.BIRTH_DAY, form.getBirthDay())
-                       .set(USER.SEX, form.getSex().getDatabaseValue())
-                       .set(USER.PHONE, form.getPhone())
-                       .set(USER.E_MAIL, form.getEMail())
-                       .set(USER.NOTE, form.getNote())
-                       .set(USER.ADDRESS_PK, addressPk)
-                       .set(USER.OCPP_TAG_PK, selectOcppTagPk(form.getOcppIdTag()))
-                       .execute();
+        int count =
+                ctx.insertInto(USER)
+                        .set(USER.FIRST_NAME, form.getFirstName())
+                        .set(USER.LAST_NAME, form.getLastName())
+                        .set(USER.BIRTH_DAY, form.getBirthDay())
+                        .set(USER.SEX, form.getSex().getDatabaseValue())
+                        .set(USER.PHONE, form.getPhone())
+                        .set(USER.E_MAIL, form.getEMail())
+                        .set(USER.NOTE, form.getNote())
+                        .set(USER.ADDRESS_PK, addressPk)
+                        .set(USER.OCPP_TAG_PK, selectOcppTagPk(form.getOcppIdTag()))
+                        .execute();
 
         if (count != 1) {
             throw new SteveException("Failed to insert the user");
@@ -234,22 +235,20 @@ public class UserRepositoryImpl implements UserRepository {
 
     private void updateInternal(DSLContext ctx, UserForm form, Integer addressPk) {
         ctx.update(USER)
-           .set(USER.FIRST_NAME, form.getFirstName())
-           .set(USER.LAST_NAME, form.getLastName())
-           .set(USER.BIRTH_DAY, form.getBirthDay())
-           .set(USER.SEX, form.getSex().getDatabaseValue())
-           .set(USER.PHONE, form.getPhone())
-           .set(USER.E_MAIL, form.getEMail())
-           .set(USER.NOTE, form.getNote())
-           .set(USER.ADDRESS_PK, addressPk)
-           .set(USER.OCPP_TAG_PK, selectOcppTagPk(form.getOcppIdTag()))
-           .where(USER.USER_PK.eq(form.getUserPk()))
-           .execute();
+                .set(USER.FIRST_NAME, form.getFirstName())
+                .set(USER.LAST_NAME, form.getLastName())
+                .set(USER.BIRTH_DAY, form.getBirthDay())
+                .set(USER.SEX, form.getSex().getDatabaseValue())
+                .set(USER.PHONE, form.getPhone())
+                .set(USER.E_MAIL, form.getEMail())
+                .set(USER.NOTE, form.getNote())
+                .set(USER.ADDRESS_PK, addressPk)
+                .set(USER.OCPP_TAG_PK, selectOcppTagPk(form.getOcppIdTag()))
+                .where(USER.USER_PK.eq(form.getUserPk()))
+                .execute();
     }
 
     private void deleteInternal(DSLContext ctx, int userPk) {
-        ctx.delete(USER)
-           .where(USER.USER_PK.equal(userPk))
-           .execute();
+        ctx.delete(USER).where(USER.USER_PK.equal(userPk)).execute();
     }
 }

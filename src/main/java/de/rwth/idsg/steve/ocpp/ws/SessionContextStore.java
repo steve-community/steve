@@ -46,15 +46,14 @@ import static de.rwth.idsg.steve.SteveConfiguration.CONFIG;
 @Slf4j
 public class SessionContextStore {
 
-    /**
-     * Key   (String)                = chargeBoxId
-     * Value (Deque<SessionContext>) = WebSocket session contexts
-     */
-    private final ConcurrentHashMap<String, Deque<SessionContext>> lookupTable = new ConcurrentHashMap<>();
+    /** Key (String) = chargeBoxId Value (Deque<SessionContext>) = WebSocket session contexts */
+    private final ConcurrentHashMap<String, Deque<SessionContext>> lookupTable =
+            new ConcurrentHashMap<>();
 
     private final Striped<Lock> locks = Striped.lock(16);
 
-    private final WsSessionSelectStrategy wsSessionSelectStrategy = CONFIG.getOcpp().getWsSessionSelectStrategy();
+    private final WsSessionSelectStrategy wsSessionSelectStrategy =
+            CONFIG.getOcpp().getWsSessionSelectStrategy();
 
     public void add(String chargeBoxId, WebSocketSession session, ScheduledFuture pingSchedule) {
         Lock l = locks.get(chargeBoxId);
@@ -62,11 +61,14 @@ public class SessionContextStore {
         try {
             SessionContext context = new SessionContext(session, pingSchedule, DateTime.now());
 
-            Deque<SessionContext> endpointDeque = lookupTable.computeIfAbsent(chargeBoxId, str -> new ArrayDeque<>());
+            Deque<SessionContext> endpointDeque =
+                    lookupTable.computeIfAbsent(chargeBoxId, str -> new ArrayDeque<>());
             endpointDeque.addLast(context); // Adding at the end
 
-            log.debug("A new SessionContext is stored for chargeBoxId '{}'. Store size: {}",
-                    chargeBoxId, endpointDeque.size());
+            log.debug(
+                    "A new SessionContext is stored for chargeBoxId '{}'. Store size: {}",
+                    chargeBoxId,
+                    endpointDeque.size());
         } finally {
             l.unlock();
         }
@@ -99,8 +101,10 @@ public class SessionContextStore {
                 toRemove.getPingSchedule().cancel(true);
                 // 2. Delete from collection
                 if (endpointDeque.remove(toRemove)) {
-                    log.debug("A SessionContext is removed for chargeBoxId '{}'. Store size: {}",
-                            chargeBoxId, endpointDeque.size());
+                    log.debug(
+                            "A SessionContext is removed for chargeBoxId '{}'. Store size: {}",
+                            chargeBoxId,
+                            endpointDeque.size());
                 }
                 // 3. Delete empty collection from lookup table in order to correctly calculate
                 // the number of connected chargeboxes with getNumberOfChargeBoxes()

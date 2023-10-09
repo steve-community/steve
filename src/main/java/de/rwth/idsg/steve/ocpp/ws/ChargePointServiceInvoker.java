@@ -44,23 +44,20 @@ public class ChargePointServiceInvoker {
     private final AbstractWebSocketEndpoint endpoint;
     private final TypeStore typeStore;
 
-    /**
-     * Just a wrapper to make try-catch block and exception handling stand out
-     */
+    /** Just a wrapper to make try-catch block and exception handling stand out */
     public void runPipeline(ChargePointSelect cps, CommunicationTask task) {
         String chargeBoxId = cps.getChargeBoxId();
         try {
             run(chargeBoxId, task);
         } catch (Exception e) {
             log.error("Exception occurred", e);
-            // Outgoing call failed due to technical problems. Pass the exception to handler to inform the user
+            // Outgoing call failed due to technical problems. Pass the exception to handler to inform the
+            // user
             task.defaultCallback().failed(chargeBoxId, e);
         }
     }
 
-    /**
-     * Actual processing
-     */
+    /** Actual processing */
     private void run(String chargeBoxId, CommunicationTask task) {
         RequestType request = task.getRequest();
 
@@ -76,7 +73,8 @@ public class ChargePointServiceInvoker {
 
         FutureResponseContext frc = new FutureResponseContext(task, pair.getResponseClass());
 
-        CommunicationContext context = new CommunicationContext(endpoint.getSession(chargeBoxId), chargeBoxId);
+        CommunicationContext context =
+                new CommunicationContext(endpoint.getSession(chargeBoxId), chargeBoxId);
         context.setOutgoingMessage(call);
         context.setFutureResponseContext(frc);
 

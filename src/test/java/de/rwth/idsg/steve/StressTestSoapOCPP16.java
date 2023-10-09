@@ -65,119 +65,115 @@ public class StressTestSoapOCPP16 extends StressTest {
         final List<String> idTags = getRandomStrings(ID_TAG_COUNT);
         final List<String> chargeBoxIds = getRandomStrings(CHARGE_BOX_COUNT);
 
-        StressTester.Runnable runnable = new StressTester.Runnable() {
+        StressTester.Runnable runnable =
+                new StressTester.Runnable() {
 
-            private final ThreadLocal<String> threadLocalChargeBoxId = new ThreadLocal<>();
+                    private final ThreadLocal<String> threadLocalChargeBoxId = new ThreadLocal<>();
 
-            @Override
-            public void beforeRepeat() {
-                CentralSystemService client = getForOcpp16(path);
-                ThreadLocalRandom localRandom = ThreadLocalRandom.current();
+                    @Override
+                    public void beforeRepeat() {
+                        CentralSystemService client = getForOcpp16(path);
+                        ThreadLocalRandom localRandom = ThreadLocalRandom.current();
 
-                threadLocalChargeBoxId.set(chargeBoxIds.get(localRandom.nextInt(chargeBoxIds.size())));
+                        threadLocalChargeBoxId.set(chargeBoxIds.get(localRandom.nextInt(chargeBoxIds.size())));
 
-                String chargeBoxId = threadLocalChargeBoxId.get();
+                        String chargeBoxId = threadLocalChargeBoxId.get();
 
-                // to insert threadLocalChargeBoxId into db
-                BootNotificationResponse boot = client.bootNotification(
-                        new BootNotificationRequest()
-                                .withChargePointVendor(getRandomString())
-                                .withChargePointModel(getRandomString()),
-                        chargeBoxId);
-                Assertions.assertEquals(RegistrationStatus.ACCEPTED, boot.getStatus());
-            }
+                        // to insert threadLocalChargeBoxId into db
+                        BootNotificationResponse boot =
+                                client.bootNotification(
+                                        new BootNotificationRequest()
+                                                .withChargePointVendor(getRandomString())
+                                                .withChargePointModel(getRandomString()),
+                                        chargeBoxId);
+                        Assertions.assertEquals(RegistrationStatus.ACCEPTED, boot.getStatus());
+                    }
 
-            @Override
-            public void toRepeat() {
-                CentralSystemService client = getForOcpp16(path);
-                ThreadLocalRandom localRandom = ThreadLocalRandom.current();
+                    @Override
+                    public void toRepeat() {
+                        CentralSystemService client = getForOcpp16(path);
+                        ThreadLocalRandom localRandom = ThreadLocalRandom.current();
 
-                String chargeBoxId = threadLocalChargeBoxId.get();
+                        String chargeBoxId = threadLocalChargeBoxId.get();
 
-                String idTag = idTags.get(localRandom.nextInt(idTags.size()));
-                int connectorId = localRandom.nextInt(1, CONNECTOR_COUNT_PER_CHARGE_BOX + 1);
-                int transactionStart = localRandom.nextInt(0, Integer.MAX_VALUE);
-                int transactionStop = localRandom.nextInt(transactionStart + 1, Integer.MAX_VALUE);
+                        String idTag = idTags.get(localRandom.nextInt(idTags.size()));
+                        int connectorId = localRandom.nextInt(1, CONNECTOR_COUNT_PER_CHARGE_BOX + 1);
+                        int transactionStart = localRandom.nextInt(0, Integer.MAX_VALUE);
+                        int transactionStop = localRandom.nextInt(transactionStart + 1, Integer.MAX_VALUE);
 
-                HeartbeatResponse heartbeat = client.heartbeat(
-                        new HeartbeatRequest(),
-                        chargeBoxId
-                );
-                Assertions.assertNotNull(heartbeat);
+                        HeartbeatResponse heartbeat = client.heartbeat(new HeartbeatRequest(), chargeBoxId);
+                        Assertions.assertNotNull(heartbeat);
 
-                for (int i = 0; i <= CONNECTOR_COUNT_PER_CHARGE_BOX; i++) {
-                    StatusNotificationResponse status = client.statusNotification(
-                            new StatusNotificationRequest()
-                                    .withErrorCode(ChargePointErrorCode.NO_ERROR)
-                                    .withStatus(ChargePointStatus.AVAILABLE)
-                                    .withConnectorId(i)
-                                    .withTimestamp(DateTime.now()),
-                            chargeBoxId
-                    );
-                    Assertions.assertNotNull(status);
-                }
+                        for (int i = 0; i <= CONNECTOR_COUNT_PER_CHARGE_BOX; i++) {
+                            StatusNotificationResponse status =
+                                    client.statusNotification(
+                                            new StatusNotificationRequest()
+                                                    .withErrorCode(ChargePointErrorCode.NO_ERROR)
+                                                    .withStatus(ChargePointStatus.AVAILABLE)
+                                                    .withConnectorId(i)
+                                                    .withTimestamp(DateTime.now()),
+                                            chargeBoxId);
+                            Assertions.assertNotNull(status);
+                        }
 
-                AuthorizeResponse auth = client.authorize(
-                        new AuthorizeRequest().withIdTag(idTag),
-                        chargeBoxId
-                );
-                Assertions.assertNotEquals(AuthorizationStatus.ACCEPTED, auth.getIdTagInfo().getStatus());
+                        AuthorizeResponse auth =
+                                client.authorize(new AuthorizeRequest().withIdTag(idTag), chargeBoxId);
+                        Assertions.assertNotEquals(
+                                AuthorizationStatus.ACCEPTED, auth.getIdTagInfo().getStatus());
 
-                StartTransactionResponse start = client.startTransaction(
-                        new StartTransactionRequest()
-                                .withConnectorId(connectorId)
-                                .withIdTag(idTag)
-                                .withTimestamp(DateTime.now())
-                                .withMeterStart(transactionStart),
-                        chargeBoxId
-                );
-                Assertions.assertNotNull(start);
+                        StartTransactionResponse start =
+                                client.startTransaction(
+                                        new StartTransactionRequest()
+                                                .withConnectorId(connectorId)
+                                                .withIdTag(idTag)
+                                                .withTimestamp(DateTime.now())
+                                                .withMeterStart(transactionStart),
+                                        chargeBoxId);
+                        Assertions.assertNotNull(start);
 
-                StatusNotificationResponse statusStart = client.statusNotification(
-                        new StatusNotificationRequest()
-                                .withErrorCode(ChargePointErrorCode.NO_ERROR)
-                                .withStatus(ChargePointStatus.CHARGING)
-                                .withConnectorId(connectorId)
-                                .withTimestamp(DateTime.now()),
-                        chargeBoxId
-                );
-                Assertions.assertNotNull(statusStart);
+                        StatusNotificationResponse statusStart =
+                                client.statusNotification(
+                                        new StatusNotificationRequest()
+                                                .withErrorCode(ChargePointErrorCode.NO_ERROR)
+                                                .withStatus(ChargePointStatus.CHARGING)
+                                                .withConnectorId(connectorId)
+                                                .withTimestamp(DateTime.now()),
+                                        chargeBoxId);
+                        Assertions.assertNotNull(statusStart);
 
-                MeterValuesResponse meter = client.meterValues(
-                        new MeterValuesRequest()
-                                .withConnectorId(connectorId)
-                                .withTransactionId(start.getTransactionId())
-                                .withMeterValue(getMeterValues(transactionStart, transactionStop)),
-                        chargeBoxId
-                );
-                Assertions.assertNotNull(meter);
+                        MeterValuesResponse meter =
+                                client.meterValues(
+                                        new MeterValuesRequest()
+                                                .withConnectorId(connectorId)
+                                                .withTransactionId(start.getTransactionId())
+                                                .withMeterValue(getMeterValues(transactionStart, transactionStop)),
+                                        chargeBoxId);
+                        Assertions.assertNotNull(meter);
 
-                StopTransactionResponse stop = client.stopTransaction(
-                        new StopTransactionRequest()
-                                .withTransactionId(start.getTransactionId())
-                                .withTimestamp(DateTime.now())
-                                .withIdTag(idTag)
-                                .withMeterStop(transactionStop),
-                        chargeBoxId
-                );
-                Assertions.assertNotNull(stop);
+                        StopTransactionResponse stop =
+                                client.stopTransaction(
+                                        new StopTransactionRequest()
+                                                .withTransactionId(start.getTransactionId())
+                                                .withTimestamp(DateTime.now())
+                                                .withIdTag(idTag)
+                                                .withMeterStop(transactionStop),
+                                        chargeBoxId);
+                        Assertions.assertNotNull(stop);
 
-                StatusNotificationResponse statusStop = client.statusNotification(
-                        new StatusNotificationRequest()
-                                .withErrorCode(ChargePointErrorCode.NO_ERROR)
-                                .withStatus(ChargePointStatus.AVAILABLE)
-                                .withConnectorId(connectorId)
-                                .withTimestamp(DateTime.now()),
-                        chargeBoxId
-                );
-                Assertions.assertNotNull(statusStop);
-            }
+                        StatusNotificationResponse statusStop =
+                                client.statusNotification(
+                                        new StatusNotificationRequest()
+                                                .withErrorCode(ChargePointErrorCode.NO_ERROR)
+                                                .withStatus(ChargePointStatus.AVAILABLE)
+                                                .withConnectorId(connectorId)
+                                                .withTimestamp(DateTime.now()),
+                                        chargeBoxId);
+                        Assertions.assertNotNull(statusStop);
+                    }
 
-            @Override
-            public void afterRepeat() {
-
-            }
-        };
+                    @Override
+                    public void afterRepeat() {}
+                };
 
         StressTester tester = new StressTester(THREAD_COUNT, REPEAT_COUNT_PER_THREAD);
         tester.test(runnable);

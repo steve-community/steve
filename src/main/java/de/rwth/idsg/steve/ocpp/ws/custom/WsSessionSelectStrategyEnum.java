@@ -30,11 +30,8 @@ import java.util.Deque;
  */
 @Getter
 public enum WsSessionSelectStrategyEnum implements WsSessionSelectStrategy {
-
     ALWAYS_LAST {
-        /**
-         * Always use the last opened session/connection.
-         */
+        /** Always use the last opened session/connection. */
         @Override
         public WebSocketSession getSession(Deque<SessionContext> sessionContexts) {
             return sessionContexts.getLast().getSession();
@@ -43,8 +40,8 @@ public enum WsSessionSelectStrategyEnum implements WsSessionSelectStrategy {
 
     ROUND_ROBIN {
         /**
-         * The sessions/connections are chosen in a round robin fashion.
-         * This would allow to distribute load to different connections.
+         * The sessions/connections are chosen in a round robin fashion. This would allow to distribute
+         * load to different connections.
          */
         @Override
         public WebSocketSession getSession(Deque<SessionContext> sessionContexts) {
@@ -56,11 +53,12 @@ public enum WsSessionSelectStrategyEnum implements WsSessionSelectStrategy {
     };
 
     public static WsSessionSelectStrategy fromName(String v) {
-        for (WsSessionSelectStrategyEnum s: WsSessionSelectStrategyEnum.values()) {
+        for (WsSessionSelectStrategyEnum s : WsSessionSelectStrategyEnum.values()) {
             if (s.name().equals(v)) {
                 return s;
             }
         }
-        throw new IllegalArgumentException("Could not find a valid WsSessionSelectStrategy for name: " + v);
+        throw new IllegalArgumentException(
+                "Could not find a valid WsSessionSelectStrategy for name: " + v);
     }
 }

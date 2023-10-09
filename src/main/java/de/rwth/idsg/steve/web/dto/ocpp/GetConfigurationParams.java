@@ -47,7 +47,7 @@ public class GetConfigurationParams extends MultipleChargePointSelect {
         List<String> fromCustom = splitByComma(commaSeparatedCustomConfKeys);
 
         return Stream.of(fromPredefined, fromCustom)
-                     .flatMap(Collection::stream)
-                     .collect(Collectors.toList());
+                .flatMap(Collection::stream)
+                .collect(Collectors.toList());
     }
 }

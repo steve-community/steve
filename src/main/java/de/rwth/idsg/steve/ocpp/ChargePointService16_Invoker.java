@@ -37,5 +37,4 @@ public interface ChargePointService16_Invoker extends ChargePointService15_Invok
     void getCompositeSchedule(ChargePointSelect cp, GetCompositeScheduleTask task);
 
     void triggerMessage(ChargePointSelect cp, TriggerMessageTask task);
-
 }

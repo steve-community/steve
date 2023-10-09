@@ -57,9 +57,9 @@ import static jooq.steve.db.tables.OcppTag.OCPP_TAG;
 import static jooq.steve.db.tables.Transaction.TRANSACTION;
 
 /**
- * This is a dangerous class. It performs database operations no class should do, like truncating all tables and
- * inserting data while bypassing normal mechanisms of SteVe. However, for integration testing with reproducible
- * results we need a clean and isolated database.
+ * This is a dangerous class. It performs database operations no class should do, like truncating
+ * all tables and inserting data while bypassing normal mechanisms of SteVe. However, for
+ * integration testing with reproducible results we need a clean and isolated database.
  *
  * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 21.03.2018
@@ -75,21 +75,23 @@ public class __DatabasePreparer__ {
     private static final DSLContext dslContext = beanConfiguration.dslContext();
 
     public static void prepare() {
-        runOperation(ctx -> {
-            truncateTables(ctx);
-            insertChargeBox(ctx);
-            insertOcppIdTag(ctx);
-        });
+        runOperation(
+                ctx -> {
+                    truncateTables(ctx);
+                    insertChargeBox(ctx);
+                    insertOcppIdTag(ctx);
+                });
     }
 
     public static int makeReservation(int connectorId) {
         ReservationRepositoryImpl r = new ReservationRepositoryImpl(dslContext);
-        InsertReservationParams params = InsertReservationParams.builder()
-                                                                .chargeBoxId(REGISTERED_CHARGE_BOX_ID)
-                                                                .idTag(REGISTERED_OCPP_TAG)
-                                                                .connectorId(connectorId)
-                                                                .expiryTimestamp(DateTime.now().plusHours(1))
-                                                                .build();
+        InsertReservationParams params =
+                InsertReservationParams.builder()
+                        .chargeBoxId(REGISTERED_CHARGE_BOX_ID)
+                        .idTag(REGISTERED_OCPP_TAG)
+                        .connectorId(connectorId)
+                        .expiryTimestamp(DateTime.now().plusHours(1))
+                        .build();
         int reservationId = r.insert(params);
         r.accepted(reservationId);
         return reservationId;
@@ -115,6 +117,7 @@ public class __DatabasePreparer__ {
         TransactionRepositoryImpl impl = new TransactionRepositoryImpl(dslContext);
         return impl.getTransactions(new TransactionQueryForm());
     }
+
     public static List<TransactionRecord> getTransactionRecords() {
         return dslContext.selectFrom(TRANSACTION).fetch();
     }
@@ -125,7 +128,8 @@ public class __DatabasePreparer__ {
     }
 
     public static List<ConnectorStatus> getChargePointConnectorStatus() {
-        ChargePointRepositoryImpl impl = new ChargePointRepositoryImpl(dslContext, new AddressRepositoryImpl());
+        ChargePointRepositoryImpl impl =
+                new ChargePointRepositoryImpl(dslContext, new AddressRepositoryImpl());
         return impl.getChargePointConnectorStatus();
     }
 
@@ -140,7 +144,8 @@ public class __DatabasePreparer__ {
     }
 
     public static ChargePoint.Details getCBDetails(String chargeboxID) {
-        ChargePointRepositoryImpl impl = new ChargePointRepositoryImpl(dslContext, new AddressRepositoryImpl());
+        ChargePointRepositoryImpl impl =
+                new ChargePointRepositoryImpl(dslContext, new AddressRepositoryImpl());
         Map<String, Integer> pkMap = impl.getChargeBoxIdPkPair(Arrays.asList(chargeboxID));
         int pk = pkMap.get(chargeboxID);
         return impl.getDetails(pk);
@@ -151,49 +156,45 @@ public class __DatabasePreparer__ {
     }
 
     private static void truncateTables(DSLContext ctx) {
-        Set<Table<?>> skipList = Sets.newHashSet(
-                SchemaVersion.SCHEMA_VERSION,
-                Settings.SETTINGS,
-                OcppTagActivity.OCPP_TAG_ACTIVITY, // only a view
-                TRANSACTION // only a view
-        );
+        Set<Table<?>> skipList =
+                Sets.newHashSet(
+                        SchemaVersion.SCHEMA_VERSION,
+                        Settings.SETTINGS,
+                        OcppTagActivity.OCPP_TAG_ACTIVITY, // only a view
+                        TRANSACTION // only a view
+                        );
 
-        ctx.transaction(configuration -> {
-            Schema schema = DefaultCatalog.DEFAULT_CATALOG.getSchemas()
-                                                          .stream()
-                                                          .filter(s -> SCHEMA_TO_TRUNCATE.equals(s.getName()))
-                                                          .findFirst()
-                                                          .orElseThrow(() -> new RuntimeException("Could not find schema"));
+        ctx.transaction(
+                configuration -> {
+                    Schema schema =
+                            DefaultCatalog.DEFAULT_CATALOG.getSchemas().stream()
+                                    .filter(s -> SCHEMA_TO_TRUNCATE.equals(s.getName()))
+                                    .findFirst()
+                                    .orElseThrow(() -> new RuntimeException("Could not find schema"));
 
-            List<Table<?>> tables = schema.getTables()
-                                          .stream()
-                                          .filter(t -> !skipList.contains(t))
-                                          .collect(Collectors.toList());
+                    List<Table<?>> tables =
+                            schema.getTables().stream()
+                                    .filter(t -> !skipList.contains(t))
+                                    .collect(Collectors.toList());
 
-            if (tables.isEmpty()) {
-                throw new RuntimeException("Could not find tables to truncate");
-            }
+                    if (tables.isEmpty()) {
+                        throw new RuntimeException("Could not find tables to truncate");
+                    }
 
-            DSLContext internalCtx = DSL.using(configuration);
-            internalCtx.execute("SET FOREIGN_KEY_CHECKS=0");
-            tables.forEach(t -> internalCtx.truncate(t).execute());
-            internalCtx.execute("SET FOREIGN_KEY_CHECKS=1");
-        });
+                    DSLContext internalCtx = DSL.using(configuration);
+                    internalCtx.execute("SET FOREIGN_KEY_CHECKS=0");
+                    tables.forEach(t -> internalCtx.truncate(t).execute());
+                    internalCtx.execute("SET FOREIGN_KEY_CHECKS=1");
+                });
     }
 
     private static void insertChargeBox(DSLContext ctx) {
-        ctx.insertInto(CHARGE_BOX)
-           .set(CHARGE_BOX.CHARGE_BOX_ID, getRegisteredChargeBoxId())
-           .execute();
+        ctx.insertInto(CHARGE_BOX).set(CHARGE_BOX.CHARGE_BOX_ID, getRegisteredChargeBoxId()).execute();
 
-        ctx.insertInto(CHARGE_BOX)
-           .set(CHARGE_BOX.CHARGE_BOX_ID, getRegisteredChargeBoxId2())
-           .execute();
+        ctx.insertInto(CHARGE_BOX).set(CHARGE_BOX.CHARGE_BOX_ID, getRegisteredChargeBoxId2()).execute();
     }
 
     private static void insertOcppIdTag(DSLContext ctx) {
-        ctx.insertInto(OCPP_TAG)
-           .set(OCPP_TAG.ID_TAG, getRegisteredOcppTag())
-           .execute();
+        ctx.insertInto(OCPP_TAG).set(OCPP_TAG.ID_TAG, getRegisteredOcppTag()).execute();
     }
 }

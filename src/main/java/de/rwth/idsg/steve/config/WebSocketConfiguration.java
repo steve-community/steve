@@ -58,13 +58,15 @@ public class WebSocketConfiguration implements WebSocketConfigurer {
     @Override
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
 
-        OcppWebSocketHandshakeHandler handshakeHandler = new OcppWebSocketHandshakeHandler(
-            new DefaultHandshakeHandler(),
-            Lists.newArrayList(ocpp16WebSocketEndpoint, ocpp15WebSocketEndpoint, ocpp12WebSocketEndpoint),
-            chargePointHelperService
-        );
+        OcppWebSocketHandshakeHandler handshakeHandler =
+                new OcppWebSocketHandshakeHandler(
+                        new DefaultHandshakeHandler(),
+                        Lists.newArrayList(
+                                ocpp16WebSocketEndpoint, ocpp15WebSocketEndpoint, ocpp12WebSocketEndpoint),
+                        chargePointHelperService);
 
-        registry.addHandler(handshakeHandler.getDummyWebSocketHandler(), PATH_INFIX + "*")
+        registry
+                .addHandler(handshakeHandler.getDummyWebSocketHandler(), PATH_INFIX + "*")
                 .setHandshakeHandler(handshakeHandler)
                 .setAllowedOrigins("*");
     }

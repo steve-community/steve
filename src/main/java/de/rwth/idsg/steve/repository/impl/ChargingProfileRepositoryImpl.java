@@ -68,45 +68,50 @@ public class ChargingProfileRepositoryImpl implements ChargingProfileRepository 
 
     @Override
     public void setProfile(int chargingProfilePk, String chargeBoxId, int connectorId) {
-        SelectConditionStep<Record1<Integer>> connectorPkSelect = ctx.select(CONNECTOR.CONNECTOR_PK)
-                                                                     .from(CONNECTOR)
-                                                                     .where(CONNECTOR.CHARGE_BOX_ID.eq(chargeBoxId))
-                                                                     .and(CONNECTOR.CONNECTOR_ID.eq(connectorId));
+        SelectConditionStep<Record1<Integer>> connectorPkSelect =
+                ctx.select(CONNECTOR.CONNECTOR_PK)
+                        .from(CONNECTOR)
+                        .where(CONNECTOR.CHARGE_BOX_ID.eq(chargeBoxId))
+                        .and(CONNECTOR.CONNECTOR_ID.eq(connectorId));
 
         ctx.insertInto(CONNECTOR_CHARGING_PROFILE)
-           .set(CONNECTOR_CHARGING_PROFILE.CONNECTOR_PK, connectorPkSelect)
-           .set(CONNECTOR_CHARGING_PROFILE.CHARGING_PROFILE_PK, chargingProfilePk)
-           .execute();
+                .set(CONNECTOR_CHARGING_PROFILE.CONNECTOR_PK, connectorPkSelect)
+                .set(CONNECTOR_CHARGING_PROFILE.CHARGING_PROFILE_PK, chargingProfilePk)
+                .execute();
     }
 
     @Override
     public void clearProfile(int chargingProfilePk, String chargeBoxId) {
-        SelectConditionStep<Record1<Integer>> connectorPkSelect = ctx.select(CONNECTOR.CONNECTOR_PK)
-                                                                     .from(CONNECTOR)
-                                                                     .where(CONNECTOR.CHARGE_BOX_ID.eq(chargeBoxId));
+        SelectConditionStep<Record1<Integer>> connectorPkSelect =
+                ctx.select(CONNECTOR.CONNECTOR_PK)
+                        .from(CONNECTOR)
+                        .where(CONNECTOR.CHARGE_BOX_ID.eq(chargeBoxId));
 
         ctx.delete(CONNECTOR_CHARGING_PROFILE)
-           .where(CONNECTOR_CHARGING_PROFILE.CONNECTOR_PK.in(connectorPkSelect))
-           .and(CONNECTOR_CHARGING_PROFILE.CHARGING_PROFILE_PK.eq(chargingProfilePk))
-           .execute();
+                .where(CONNECTOR_CHARGING_PROFILE.CONNECTOR_PK.in(connectorPkSelect))
+                .and(CONNECTOR_CHARGING_PROFILE.CHARGING_PROFILE_PK.eq(chargingProfilePk))
+                .execute();
     }
 
     @Override
-    public void clearProfile(@NotNull String chargeBoxId,
-                             @Nullable Integer connectorId,
-                             @Nullable ChargingProfilePurposeType purpose,
-                             @Nullable Integer stackLevel) {
+    public void clearProfile(
+            @NotNull String chargeBoxId,
+            @Nullable Integer connectorId,
+            @Nullable ChargingProfilePurposeType purpose,
+            @Nullable Integer stackLevel) {
 
         // -------------------------------------------------------------------------
         // Connector select
         // -------------------------------------------------------------------------
 
-        Condition connectorIdCondition = (connectorId == null) ? DSL.trueCondition() : CONNECTOR.CONNECTOR_ID.eq(connectorId);
+        Condition connectorIdCondition =
+                (connectorId == null) ? DSL.trueCondition() : CONNECTOR.CONNECTOR_ID.eq(connectorId);
 
-        SelectConditionStep<Record1<Integer>> connectorPkSelect = ctx.select(CONNECTOR.CONNECTOR_PK)
-                                                                     .from(CONNECTOR)
-                                                                     .where(CONNECTOR.CHARGE_BOX_ID.eq(chargeBoxId))
-                                                                     .and(connectorIdCondition);
+        SelectConditionStep<Record1<Integer>> connectorPkSelect =
+                ctx.select(CONNECTOR.CONNECTOR_PK)
+                        .from(CONNECTOR)
+                        .where(CONNECTOR.CHARGE_BOX_ID.eq(chargeBoxId))
+                        .and(connectorIdCondition);
 
         // -------------------------------------------------------------------------
         // Profile select
@@ -117,14 +122,19 @@ public class ChargingProfileRepositoryImpl implements ChargingProfileRepository 
         if (purpose == null && stackLevel == null) {
             profilePkCondition = DSL.trueCondition();
         } else {
-            Condition purposeCondition = (purpose == null) ?  DSL.trueCondition() : CHARGING_PROFILE.CHARGING_PROFILE_PURPOSE.eq(purpose.value());
+            Condition purposeCondition =
+                    (purpose == null)
+                            ? DSL.trueCondition()
+                            : CHARGING_PROFILE.CHARGING_PROFILE_PURPOSE.eq(purpose.value());
 
-            Condition stackLevelCondition = (stackLevel == null) ? DSL.trueCondition() : CHARGING_PROFILE.STACK_LEVEL.eq(stackLevel);
+            Condition stackLevelCondition =
+                    (stackLevel == null) ? DSL.trueCondition() : CHARGING_PROFILE.STACK_LEVEL.eq(stackLevel);
 
-            SelectConditionStep<Record1<Integer>> profilePkSelect = ctx.select(CHARGING_PROFILE.CHARGING_PROFILE_PK)
-                                                                       .from(CHARGING_PROFILE)
-                                                                       .where(purposeCondition)
-                                                                       .and(stackLevelCondition);
+            SelectConditionStep<Record1<Integer>> profilePkSelect =
+                    ctx.select(CHARGING_PROFILE.CHARGING_PROFILE_PK)
+                            .from(CHARGING_PROFILE)
+                            .where(purposeCondition)
+                            .and(stackLevelCondition);
 
             profilePkCondition = CONNECTOR_CHARGING_PROFILE.CHARGING_PROFILE_PK.in(profilePkSelect);
         }
@@ -134,9 +144,9 @@ public class ChargingProfileRepositoryImpl implements ChargingProfileRepository 
         // -------------------------------------------------------------------------
 
         ctx.delete(CONNECTOR_CHARGING_PROFILE)
-           .where(CONNECTOR_CHARGING_PROFILE.CONNECTOR_PK.in(connectorPkSelect))
-           .and(profilePkCondition)
-           .execute();
+                .where(CONNECTOR_CHARGING_PROFILE.CONNECTOR_PK.in(connectorPkSelect))
+                .and(profilePkCondition)
+                .execute();
     }
 
     // -------------------------------------------------------------------------
@@ -152,11 +162,14 @@ public class ChargingProfileRepositoryImpl implements ChargingProfileRepository 
         }
 
         if (query.getChargingProfilePk() != null) {
-            conditions = conditions.and(CHARGING_PROFILE.CHARGING_PROFILE_PK.eq(query.getChargingProfilePk()));
+            conditions =
+                    conditions.and(CHARGING_PROFILE.CHARGING_PROFILE_PK.eq(query.getChargingProfilePk()));
         }
 
         if (query.getChargingProfileDescription() != null) {
-            conditions = conditions.and(includes(CHARGING_PROFILE.DESCRIPTION, query.getChargingProfileDescription()));
+            conditions =
+                    conditions.and(
+                            includes(CHARGING_PROFILE.DESCRIPTION, query.getChargingProfileDescription()));
         }
 
         return ctx.select(
@@ -165,35 +178,36 @@ public class ChargingProfileRepositoryImpl implements ChargingProfileRepository 
                         CONNECTOR.CONNECTOR_ID,
                         CONNECTOR_CHARGING_PROFILE.CHARGING_PROFILE_PK,
                         CHARGING_PROFILE.DESCRIPTION)
-                  .from(CONNECTOR_CHARGING_PROFILE)
-                  .join(CONNECTOR)
-                    .on(CONNECTOR.CONNECTOR_PK.eq(CONNECTOR_CHARGING_PROFILE.CONNECTOR_PK))
-                  .join(CHARGING_PROFILE)
-                    .on(CHARGING_PROFILE.CHARGING_PROFILE_PK.eq(CONNECTOR_CHARGING_PROFILE.CHARGING_PROFILE_PK))
-                  .join(CHARGE_BOX)
-                    .on(CHARGE_BOX.CHARGE_BOX_ID.eq(CONNECTOR.CHARGE_BOX_ID))
-                  .where(conditions)
-                  .orderBy(
-                          CHARGE_BOX.CHARGE_BOX_ID,
-                          CONNECTOR.CONNECTOR_ID,
-                          CONNECTOR_CHARGING_PROFILE.CHARGING_PROFILE_PK)
-                  .fetch()
-                  .map(k -> ChargingProfileAssignment.builder()
-                                                     .chargeBoxPk(k.value1())
-                                                     .chargeBoxId(k.value2())
-                                                     .connectorId(k.value3())
-                                                     .chargingProfilePk(k.value4())
-                                                     .chargingProfileDescription(k.value5())
-                                                     .build()
-                  );
+                .from(CONNECTOR_CHARGING_PROFILE)
+                .join(CONNECTOR)
+                .on(CONNECTOR.CONNECTOR_PK.eq(CONNECTOR_CHARGING_PROFILE.CONNECTOR_PK))
+                .join(CHARGING_PROFILE)
+                .on(CHARGING_PROFILE.CHARGING_PROFILE_PK.eq(CONNECTOR_CHARGING_PROFILE.CHARGING_PROFILE_PK))
+                .join(CHARGE_BOX)
+                .on(CHARGE_BOX.CHARGE_BOX_ID.eq(CONNECTOR.CHARGE_BOX_ID))
+                .where(conditions)
+                .orderBy(
+                        CHARGE_BOX.CHARGE_BOX_ID,
+                        CONNECTOR.CONNECTOR_ID,
+                        CONNECTOR_CHARGING_PROFILE.CHARGING_PROFILE_PK)
+                .fetch()
+                .map(
+                        k ->
+                                ChargingProfileAssignment.builder()
+                                        .chargeBoxPk(k.value1())
+                                        .chargeBoxId(k.value2())
+                                        .connectorId(k.value3())
+                                        .chargingProfilePk(k.value4())
+                                        .chargingProfileDescription(k.value5())
+                                        .build());
     }
 
     @Override
     public List<ChargingProfile.BasicInfo> getBasicInfo() {
         return ctx.select(CHARGING_PROFILE.CHARGING_PROFILE_PK, CHARGING_PROFILE.DESCRIPTION)
-                  .from(CHARGING_PROFILE)
-                  .fetch()
-                  .map(r -> new ChargingProfile.BasicInfo(r.value1(), r.value2()));
+                .from(CHARGING_PROFILE)
+                .fetch()
+                .map(r -> new ChargingProfile.BasicInfo(r.value1(), r.value2()));
     }
 
     @Override
@@ -201,7 +215,8 @@ public class ChargingProfileRepositoryImpl implements ChargingProfileRepository 
         Condition conditions = DSL.trueCondition();
 
         if (form.getChargingProfilePk() != null) {
-            conditions = conditions.and(CHARGING_PROFILE.CHARGING_PROFILE_PK.eq(form.getChargingProfilePk()));
+            conditions =
+                    conditions.and(CHARGING_PROFILE.CHARGING_PROFILE_PK.eq(form.getChargingProfilePk()));
         }
 
         if (form.getStackLevel() != null) {
@@ -213,128 +228,154 @@ public class ChargingProfileRepositoryImpl implements ChargingProfileRepository 
         }
 
         if (form.getProfilePurpose() != null) {
-            conditions = conditions.and(CHARGING_PROFILE.CHARGING_PROFILE_PURPOSE.eq(form.getProfilePurpose().value()));
+            conditions =
+                    conditions.and(
+                            CHARGING_PROFILE.CHARGING_PROFILE_PURPOSE.eq(form.getProfilePurpose().value()));
         }
 
         if (form.getProfileKind() != null) {
-            conditions = conditions.and(CHARGING_PROFILE.CHARGING_PROFILE_KIND.eq(form.getProfileKind().value()));
+            conditions =
+                    conditions.and(CHARGING_PROFILE.CHARGING_PROFILE_KIND.eq(form.getProfileKind().value()));
         }
 
         if (form.getRecurrencyKind() != null) {
-            conditions = conditions.and(CHARGING_PROFILE.RECURRENCY_KIND.eq(form.getRecurrencyKind().value()));
+            conditions =
+                    conditions.and(CHARGING_PROFILE.RECURRENCY_KIND.eq(form.getRecurrencyKind().value()));
         }
 
         if (form.getValidFrom() != null) {
-            conditions = conditions.and(CHARGING_PROFILE.VALID_FROM.greaterOrEqual(form.getValidFrom().toDateTime()));
+            conditions =
+                    conditions.and(
+                            CHARGING_PROFILE.VALID_FROM.greaterOrEqual(form.getValidFrom().toDateTime()));
         }
 
         if (form.getValidTo() != null) {
-            conditions = conditions.and(CHARGING_PROFILE.VALID_TO.lessOrEqual(form.getValidTo().toDateTime()));
+            conditions =
+                    conditions.and(CHARGING_PROFILE.VALID_TO.lessOrEqual(form.getValidTo().toDateTime()));
         }
 
         return ctx.selectFrom(CHARGING_PROFILE)
-                  .where(conditions)
-                  .fetch()
-                  .map(r -> ChargingProfile.Overview.builder()
-                                                    .chargingProfilePk(r.getChargingProfilePk())
-                                                    .stackLevel(r.getStackLevel())
-                                                    .description(r.getDescription())
-                                                    .profilePurpose(r.getChargingProfilePurpose())
-                                                    .profileKind(r.getChargingProfileKind())
-                                                    .recurrencyKind(r.getRecurrencyKind())
-                                                    .validFrom(r.getValidFrom())
-                                                    .validTo(r.getValidTo())
-                                                    .build()
-                  );
+                .where(conditions)
+                .fetch()
+                .map(
+                        r ->
+                                ChargingProfile.Overview.builder()
+                                        .chargingProfilePk(r.getChargingProfilePk())
+                                        .stackLevel(r.getStackLevel())
+                                        .description(r.getDescription())
+                                        .profilePurpose(r.getChargingProfilePurpose())
+                                        .profileKind(r.getChargingProfileKind())
+                                        .recurrencyKind(r.getRecurrencyKind())
+                                        .validFrom(r.getValidFrom())
+                                        .validTo(r.getValidTo())
+                                        .build());
     }
 
     @Override
     public ChargingProfile.Details getDetails(int chargingProfilePk) {
         ChargingProfileRecord profile =
                 ctx.selectFrom(CHARGING_PROFILE)
-                   .where(CHARGING_PROFILE.CHARGING_PROFILE_PK.eq(chargingProfilePk))
-                   .fetchOne();
+                        .where(CHARGING_PROFILE.CHARGING_PROFILE_PK.eq(chargingProfilePk))
+                        .fetchOne();
 
         List<ChargingSchedulePeriodRecord> periods =
                 ctx.selectFrom(CHARGING_SCHEDULE_PERIOD)
-                   .where(CHARGING_SCHEDULE_PERIOD.CHARGING_PROFILE_PK.eq(chargingProfilePk))
-                   .fetch();
+                        .where(CHARGING_SCHEDULE_PERIOD.CHARGING_PROFILE_PK.eq(chargingProfilePk))
+                        .fetch();
 
         return new ChargingProfile.Details(profile, periods);
     }
 
     @Override
     public int add(ChargingProfileForm form) {
-        return ctx.transactionResult(configuration -> {
-            DSLContext ctx = DSL.using(configuration);
-            try {
-                int profilePk = ctx.insertInto(CHARGING_PROFILE)
-                                   .set(CHARGING_PROFILE.DESCRIPTION, form.getDescription())
-                                   .set(CHARGING_PROFILE.NOTE, form.getNote())
-                                   .set(CHARGING_PROFILE.STACK_LEVEL, form.getStackLevel())
-                                   .set(CHARGING_PROFILE.CHARGING_PROFILE_PURPOSE, form.getChargingProfilePurpose().value())
-                                   .set(CHARGING_PROFILE.CHARGING_PROFILE_KIND, form.getChargingProfileKind().value())
-                                   .set(CHARGING_PROFILE.RECURRENCY_KIND, form.getRecurrencyKind() == null ? null : form.getRecurrencyKind().value())
-                                   .set(CHARGING_PROFILE.VALID_FROM, DateTimeUtils.toDateTime(form.getValidFrom()))
-                                   .set(CHARGING_PROFILE.VALID_TO, DateTimeUtils.toDateTime(form.getValidTo()))
-                                   .set(CHARGING_PROFILE.DURATION_IN_SECONDS, form.getDurationInSeconds())
-                                   .set(CHARGING_PROFILE.START_SCHEDULE, DateTimeUtils.toDateTime(form.getStartSchedule()))
-                                   .set(CHARGING_PROFILE.CHARGING_RATE_UNIT, form.getChargingRateUnit().value())
-                                   .set(CHARGING_PROFILE.MIN_CHARGING_RATE, form.getMinChargingRate())
-                                   .returning(CHARGING_SCHEDULE_PERIOD.CHARGING_PROFILE_PK)
-                                   .fetchOne()
-                                   .getChargingProfilePk();
+        return ctx.transactionResult(
+                configuration -> {
+                    DSLContext ctx = DSL.using(configuration);
+                    try {
+                        int profilePk =
+                                ctx.insertInto(CHARGING_PROFILE)
+                                        .set(CHARGING_PROFILE.DESCRIPTION, form.getDescription())
+                                        .set(CHARGING_PROFILE.NOTE, form.getNote())
+                                        .set(CHARGING_PROFILE.STACK_LEVEL, form.getStackLevel())
+                                        .set(
+                                                CHARGING_PROFILE.CHARGING_PROFILE_PURPOSE,
+                                                form.getChargingProfilePurpose().value())
+                                        .set(
+                                                CHARGING_PROFILE.CHARGING_PROFILE_KIND,
+                                                form.getChargingProfileKind().value())
+                                        .set(
+                                                CHARGING_PROFILE.RECURRENCY_KIND,
+                                                form.getRecurrencyKind() == null ? null : form.getRecurrencyKind().value())
+                                        .set(CHARGING_PROFILE.VALID_FROM, DateTimeUtils.toDateTime(form.getValidFrom()))
+                                        .set(CHARGING_PROFILE.VALID_TO, DateTimeUtils.toDateTime(form.getValidTo()))
+                                        .set(CHARGING_PROFILE.DURATION_IN_SECONDS, form.getDurationInSeconds())
+                                        .set(
+                                                CHARGING_PROFILE.START_SCHEDULE,
+                                                DateTimeUtils.toDateTime(form.getStartSchedule()))
+                                        .set(CHARGING_PROFILE.CHARGING_RATE_UNIT, form.getChargingRateUnit().value())
+                                        .set(CHARGING_PROFILE.MIN_CHARGING_RATE, form.getMinChargingRate())
+                                        .returning(CHARGING_SCHEDULE_PERIOD.CHARGING_PROFILE_PK)
+                                        .fetchOne()
+                                        .getChargingProfilePk();
 
-                form.setChargingProfilePk(profilePk);
-                insertPeriods(ctx, form);
-                return profilePk;
+                        form.setChargingProfilePk(profilePk);
+                        insertPeriods(ctx, form);
+                        return profilePk;
 
-            } catch (DataAccessException e) {
-                throw new SteveException("Failed to add the charging profile", e);
-            }
-        });
+                    } catch (DataAccessException e) {
+                        throw new SteveException("Failed to add the charging profile", e);
+                    }
+                });
     }
 
     @Override
     public void update(ChargingProfileForm form) {
         checkProfileUsage(form.getChargingProfilePk());
 
-        ctx.transaction(configuration -> {
-            DSLContext ctx = DSL.using(configuration);
-            try {
-                ctx.update(CHARGING_PROFILE)
-                   .set(CHARGING_PROFILE.DESCRIPTION, form.getDescription())
-                   .set(CHARGING_PROFILE.NOTE, form.getNote())
-                   .set(CHARGING_PROFILE.STACK_LEVEL, form.getStackLevel())
-                   .set(CHARGING_PROFILE.CHARGING_PROFILE_PURPOSE, form.getChargingProfilePurpose().value())
-                   .set(CHARGING_PROFILE.CHARGING_PROFILE_KIND, form.getChargingProfileKind().value())
-                   .set(CHARGING_PROFILE.RECURRENCY_KIND, form.getRecurrencyKind() == null ? null : form.getRecurrencyKind().value())
-                   .set(CHARGING_PROFILE.VALID_FROM, DateTimeUtils.toDateTime(form.getValidFrom()))
-                   .set(CHARGING_PROFILE.VALID_TO, DateTimeUtils.toDateTime(form.getValidTo()))
-                   .set(CHARGING_PROFILE.DURATION_IN_SECONDS, form.getDurationInSeconds())
-                   .set(CHARGING_PROFILE.START_SCHEDULE, DateTimeUtils.toDateTime(form.getStartSchedule()))
-                   .set(CHARGING_PROFILE.CHARGING_RATE_UNIT, form.getChargingRateUnit().value())
-                   .set(CHARGING_PROFILE.MIN_CHARGING_RATE, form.getMinChargingRate())
-                   .where(CHARGING_PROFILE.CHARGING_PROFILE_PK.eq(form.getChargingProfilePk()))
-                   .execute();
+        ctx.transaction(
+                configuration -> {
+                    DSLContext ctx = DSL.using(configuration);
+                    try {
+                        ctx.update(CHARGING_PROFILE)
+                                .set(CHARGING_PROFILE.DESCRIPTION, form.getDescription())
+                                .set(CHARGING_PROFILE.NOTE, form.getNote())
+                                .set(CHARGING_PROFILE.STACK_LEVEL, form.getStackLevel())
+                                .set(
+                                        CHARGING_PROFILE.CHARGING_PROFILE_PURPOSE,
+                                        form.getChargingProfilePurpose().value())
+                                .set(CHARGING_PROFILE.CHARGING_PROFILE_KIND, form.getChargingProfileKind().value())
+                                .set(
+                                        CHARGING_PROFILE.RECURRENCY_KIND,
+                                        form.getRecurrencyKind() == null ? null : form.getRecurrencyKind().value())
+                                .set(CHARGING_PROFILE.VALID_FROM, DateTimeUtils.toDateTime(form.getValidFrom()))
+                                .set(CHARGING_PROFILE.VALID_TO, DateTimeUtils.toDateTime(form.getValidTo()))
+                                .set(CHARGING_PROFILE.DURATION_IN_SECONDS, form.getDurationInSeconds())
+                                .set(
+                                        CHARGING_PROFILE.START_SCHEDULE,
+                                        DateTimeUtils.toDateTime(form.getStartSchedule()))
+                                .set(CHARGING_PROFILE.CHARGING_RATE_UNIT, form.getChargingRateUnit().value())
+                                .set(CHARGING_PROFILE.MIN_CHARGING_RATE, form.getMinChargingRate())
+                                .where(CHARGING_PROFILE.CHARGING_PROFILE_PK.eq(form.getChargingProfilePk()))
+                                .execute();
 
-                // -------------------------------------------------------------------------
-                // the form contains all period information for this schedule. instead of
-                // computing a delta about what to insert/update, we can simply delete everything
-                // for this profile and re-insert.
-                // -------------------------------------------------------------------------
+                        // -------------------------------------------------------------------------
+                        // the form contains all period information for this schedule. instead of
+                        // computing a delta about what to insert/update, we can simply delete everything
+                        // for this profile and re-insert.
+                        // -------------------------------------------------------------------------
 
-                ctx.delete(CHARGING_SCHEDULE_PERIOD)
-                   .where(CHARGING_SCHEDULE_PERIOD.CHARGING_PROFILE_PK.eq(form.getChargingProfilePk()))
-                   .execute();
+                        ctx.delete(CHARGING_SCHEDULE_PERIOD)
+                                .where(CHARGING_SCHEDULE_PERIOD.CHARGING_PROFILE_PK.eq(form.getChargingProfilePk()))
+                                .execute();
 
-                insertPeriods(ctx, form);
+                        insertPeriods(ctx, form);
 
-            } catch (DataAccessException e) {
-                throw new SteveException("Failed to update the charging profile with id '%s'",
-                        form.getChargingProfilePk(), e);
-            }
-        });
+                    } catch (DataAccessException e) {
+                        throw new SteveException(
+                                "Failed to update the charging profile with id '%s'",
+                                form.getChargingProfilePk(), e);
+                    }
+                });
     }
 
     @Override
@@ -342,19 +383,22 @@ public class ChargingProfileRepositoryImpl implements ChargingProfileRepository 
         checkProfileUsage(chargingProfilePk);
 
         ctx.delete(CHARGING_PROFILE)
-           .where(CHARGING_PROFILE.CHARGING_PROFILE_PK.eq(chargingProfilePk))
-           .execute();
+                .where(CHARGING_PROFILE.CHARGING_PROFILE_PK.eq(chargingProfilePk))
+                .execute();
     }
 
     private void checkProfileUsage(int chargingProfilePk) {
-        List<String> r = ctx.select(CONNECTOR.CHARGE_BOX_ID)
-                            .from(CONNECTOR_CHARGING_PROFILE)
-                            .join(CONNECTOR)
-                            .on(CONNECTOR.CONNECTOR_PK.eq(CONNECTOR_CHARGING_PROFILE.CONNECTOR_PK))
-                            .where(CONNECTOR_CHARGING_PROFILE.CHARGING_PROFILE_PK.eq(chargingProfilePk))
-                            .fetch(CONNECTOR.CHARGE_BOX_ID);
+        List<String> r =
+                ctx.select(CONNECTOR.CHARGE_BOX_ID)
+                        .from(CONNECTOR_CHARGING_PROFILE)
+                        .join(CONNECTOR)
+                        .on(CONNECTOR.CONNECTOR_PK.eq(CONNECTOR_CHARGING_PROFILE.CONNECTOR_PK))
+                        .where(CONNECTOR_CHARGING_PROFILE.CHARGING_PROFILE_PK.eq(chargingProfilePk))
+                        .fetch(CONNECTOR.CHARGE_BOX_ID);
         if (!r.isEmpty()) {
-            throw new SteveException("Cannot modify this charging profile, since the following stations are still using it: %s", r);
+            throw new SteveException(
+                    "Cannot modify this charging profile, since the following stations are still using it: %s",
+                    r);
         }
     }
 
@@ -363,15 +407,16 @@ public class ChargingProfileRepositoryImpl implements ChargingProfileRepository 
             return;
         }
 
-        List<ChargingSchedulePeriodRecord> r = form.getSchedulePeriodMap()
-                                                   .values()
-                                                   .stream()
-                                                   .map(k -> ctx.newRecord(CHARGING_SCHEDULE_PERIOD)
-                                                                .setChargingProfilePk(form.getChargingProfilePk())
-                                                                .setStartPeriodInSeconds(k.getStartPeriodInSeconds())
-                                                                .setPowerLimit(k.getPowerLimit())
-                                                                .setNumberPhases(k.getNumberPhases()))
-                                                   .collect(Collectors.toList());
+        List<ChargingSchedulePeriodRecord> r =
+                form.getSchedulePeriodMap().values().stream()
+                        .map(
+                                k ->
+                                        ctx.newRecord(CHARGING_SCHEDULE_PERIOD)
+                                                .setChargingProfilePk(form.getChargingProfilePk())
+                                                .setStartPeriodInSeconds(k.getStartPeriodInSeconds())
+                                                .setPowerLimit(k.getPowerLimit())
+                                                .setNumberPhases(k.getNumberPhases()))
+                        .collect(Collectors.toList());
 
         ctx.batchInsert(r).execute();
     }

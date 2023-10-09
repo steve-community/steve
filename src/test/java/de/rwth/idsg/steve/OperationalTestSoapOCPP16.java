@@ -74,8 +74,10 @@ import static de.rwth.idsg.steve.utils.Helpers.getRandomString;
 @Slf4j
 public class OperationalTestSoapOCPP16 {
 
-    private static final String REGISTERED_CHARGE_BOX_ID = __DatabasePreparer__.getRegisteredChargeBoxId();
-    private static final String REGISTERED_CHARGE_BOX_ID_2 = __DatabasePreparer__.getRegisteredChargeBoxId2();
+    private static final String REGISTERED_CHARGE_BOX_ID =
+            __DatabasePreparer__.getRegisteredChargeBoxId();
+    private static final String REGISTERED_CHARGE_BOX_ID_2 =
+            __DatabasePreparer__.getRegisteredChargeBoxId2();
     private static final String REGISTERED_OCPP_TAG = __DatabasePreparer__.getRegisteredOcppTag();
     private static final String path = getPath();
     private static final int numConnectors = 5;
@@ -110,38 +112,45 @@ public class OperationalTestSoapOCPP16 {
 
         CentralSystemService client = getForOcpp16(path);
 
-        BootNotificationResponse boot = client.bootNotification(
-                new BootNotificationRequest()
-                        .withChargePointVendor(getRandomString())
-                        .withChargePointModel(getRandomString()),
-                getRandomString());
+        BootNotificationResponse boot =
+                client.bootNotification(
+                        new BootNotificationRequest()
+                                .withChargePointVendor(getRandomString())
+                                .withChargePointModel(getRandomString()),
+                        getRandomString());
 
         Assertions.assertNotNull(boot);
         Assertions.assertNotEquals(RegistrationStatus.ACCEPTED, boot.getStatus());
     }
 
     /**
-     * Reason: We started to check registration status by intercepting every SOAP message other than BootNotification
-     * in {@link MessageHeaderInterceptor} and throw exception if station is not registered and auto-register is
-     * disabled (and therefore early-exit the processing pipeline of the message).
+     * Reason: We started to check registration status by intercepting every SOAP message other than
+     * BootNotification in {@link MessageHeaderInterceptor} and throw exception if station is not
+     * registered and auto-register is disabled (and therefore early-exit the processing pipeline of
+     * the message).
      *
-     * In case of BootNotification, the expected behaviour is to set RegistrationStatus.REJECTED in response, as done
-     * by {@link CentralSystemService16_Service#bootNotification(BootNotificationRequest, String, OcppProtocol)}.
-     * Therefore, no exception. This case is tested by {@link OperationalTestSoapOCPP16#testUnregisteredCP()} already.
+     * <p>In case of BootNotification, the expected behaviour is to set RegistrationStatus.REJECTED in
+     * response, as done by {@link
+     * CentralSystemService16_Service#bootNotification(BootNotificationRequest, String,
+     * OcppProtocol)}. Therefore, no exception. This case is tested by {@link
+     * OperationalTestSoapOCPP16#testUnregisteredCP()} already.
      *
-     * WS/JSON stations cannot connect at all if they are not registered, as ensured by {@link OcppWebSocketUpgrader}.
+     * <p>WS/JSON stations cannot connect at all if they are not registered, as ensured by {@link
+     * OcppWebSocketUpgrader}.
      */
     @Test
     public void testUnregisteredCPWithInterceptor() {
-        Assertions.assertThrows(WebServiceException.class, () -> {
-            Assertions.assertFalse(SteveConfiguration.CONFIG.getOcpp().isAutoRegisterUnknownStations());
+        Assertions.assertThrows(
+                WebServiceException.class,
+                () -> {
+                    Assertions.assertFalse(
+                            SteveConfiguration.CONFIG.getOcpp().isAutoRegisterUnknownStations());
 
-            CentralSystemService client = getForOcpp16(path);
+                    CentralSystemService client = getForOcpp16(path);
 
-            client.authorize(
-                new AuthorizeRequest().withIdTag(REGISTERED_OCPP_TAG),
-                getRandomString());
-        });
+                    client.authorize(
+                            new AuthorizeRequest().withIdTag(REGISTERED_OCPP_TAG), getRandomString());
+                });
     }
 
     @Test
@@ -158,9 +167,9 @@ public class OperationalTestSoapOCPP16 {
     public void testRegisteredIdTag() {
         CentralSystemService client = getForOcpp16(path);
 
-        AuthorizeResponse auth = client.authorize(
-                new AuthorizeRequest().withIdTag(REGISTERED_OCPP_TAG),
-                REGISTERED_CHARGE_BOX_ID);
+        AuthorizeResponse auth =
+                client.authorize(
+                        new AuthorizeRequest().withIdTag(REGISTERED_OCPP_TAG), REGISTERED_CHARGE_BOX_ID);
 
         Assertions.assertNotNull(auth);
         Assertions.assertEquals(AuthorizationStatus.ACCEPTED, auth.getIdTagInfo().getStatus());
@@ -170,9 +179,9 @@ public class OperationalTestSoapOCPP16 {
     public void testUnregisteredIdTag() {
         CentralSystemService client = getForOcpp16(path);
 
-        AuthorizeResponse auth = client.authorize(
-                new AuthorizeRequest().withIdTag(getRandomString()),
-                REGISTERED_CHARGE_BOX_ID);
+        AuthorizeResponse auth =
+                client.authorize(
+                        new AuthorizeRequest().withIdTag(getRandomString()), REGISTERED_CHARGE_BOX_ID);
 
         Assertions.assertNotNull(auth);
         Assertions.assertEquals(AuthorizationStatus.INVALID, auth.getIdTagInfo().getStatus());
@@ -182,30 +191,32 @@ public class OperationalTestSoapOCPP16 {
     public void testInTransactionStatusOfIdTag() {
         CentralSystemService client = getForOcpp16(path);
 
-        StartTransactionResponse start = client.startTransaction(
-                new StartTransactionRequest()
-                        .withConnectorId(2)
-                        .withIdTag(REGISTERED_OCPP_TAG)
-                        .withTimestamp(DateTime.now())
-                        .withMeterStart(0),
-                REGISTERED_CHARGE_BOX_ID
-        );
+        StartTransactionResponse start =
+                client.startTransaction(
+                        new StartTransactionRequest()
+                                .withConnectorId(2)
+                                .withIdTag(REGISTERED_OCPP_TAG)
+                                .withTimestamp(DateTime.now())
+                                .withMeterStart(0),
+                        REGISTERED_CHARGE_BOX_ID);
 
         Assertions.assertNotNull(start);
         Assertions.assertTrue(start.getTransactionId() > 0);
-        Assertions.assertTrue(__DatabasePreparer__.getOcppTagRecord(REGISTERED_OCPP_TAG).getInTransaction());
+        Assertions.assertTrue(
+                __DatabasePreparer__.getOcppTagRecord(REGISTERED_OCPP_TAG).getInTransaction());
 
-        StopTransactionResponse stop = client.stopTransaction(
-                new StopTransactionRequest()
-                        .withTransactionId(start.getTransactionId())
-                        .withTimestamp(DateTime.now())
-                        .withIdTag(REGISTERED_OCPP_TAG)
-                        .withMeterStop(30),
-                REGISTERED_CHARGE_BOX_ID
-        );
+        StopTransactionResponse stop =
+                client.stopTransaction(
+                        new StopTransactionRequest()
+                                .withTransactionId(start.getTransactionId())
+                                .withTimestamp(DateTime.now())
+                                .withIdTag(REGISTERED_OCPP_TAG)
+                                .withMeterStop(30),
+                        REGISTERED_CHARGE_BOX_ID);
 
         Assertions.assertNotNull(stop);
-        Assertions.assertFalse(__DatabasePreparer__.getOcppTagRecord(REGISTERED_OCPP_TAG).getInTransaction());
+        Assertions.assertFalse(
+                __DatabasePreparer__.getOcppTagRecord(REGISTERED_OCPP_TAG).getInTransaction());
     }
 
     /**
@@ -217,46 +228,48 @@ public class OperationalTestSoapOCPP16 {
         CentralSystemService client = getForOcpp16(path);
 
         {
-            AuthorizeResponse auth1 = client.authorize(
-                    new AuthorizeRequest().withIdTag(REGISTERED_OCPP_TAG),
-                    REGISTERED_CHARGE_BOX_ID);
+            AuthorizeResponse auth1 =
+                    client.authorize(
+                            new AuthorizeRequest().withIdTag(REGISTERED_OCPP_TAG), REGISTERED_CHARGE_BOX_ID);
             Assertions.assertEquals(AuthorizationStatus.ACCEPTED, auth1.getIdTagInfo().getStatus());
 
-            StartTransactionResponse start1 = client.startTransaction(
-                    new StartTransactionRequest()
-                            .withConnectorId(2)
-                            .withIdTag(REGISTERED_OCPP_TAG)
-                            .withTimestamp(DateTime.now())
-                            .withMeterStart(0),
-                    REGISTERED_CHARGE_BOX_ID);
+            StartTransactionResponse start1 =
+                    client.startTransaction(
+                            new StartTransactionRequest()
+                                    .withConnectorId(2)
+                                    .withIdTag(REGISTERED_OCPP_TAG)
+                                    .withTimestamp(DateTime.now())
+                                    .withMeterStart(0),
+                            REGISTERED_CHARGE_BOX_ID);
             Assertions.assertTrue(start1.getTransactionId() > 0);
             Assertions.assertEquals(AuthorizationStatus.ACCEPTED, start1.getIdTagInfo().getStatus());
 
-            AuthorizeResponse auth1Retry = client.authorize(
-                    new AuthorizeRequest().withIdTag(REGISTERED_OCPP_TAG),
-                    REGISTERED_CHARGE_BOX_ID);
+            AuthorizeResponse auth1Retry =
+                    client.authorize(
+                            new AuthorizeRequest().withIdTag(REGISTERED_OCPP_TAG), REGISTERED_CHARGE_BOX_ID);
             Assertions.assertEquals(AuthorizationStatus.ACCEPTED, auth1Retry.getIdTagInfo().getStatus());
         }
 
         {
-            AuthorizeResponse auth2 = client.authorize(
-                    new AuthorizeRequest().withIdTag(REGISTERED_OCPP_TAG),
-                    REGISTERED_CHARGE_BOX_ID_2);
+            AuthorizeResponse auth2 =
+                    client.authorize(
+                            new AuthorizeRequest().withIdTag(REGISTERED_OCPP_TAG), REGISTERED_CHARGE_BOX_ID_2);
             Assertions.assertEquals(AuthorizationStatus.ACCEPTED, auth2.getIdTagInfo().getStatus());
 
-            StartTransactionResponse start2 = client.startTransaction(
-                    new StartTransactionRequest()
-                            .withConnectorId(2)
-                            .withIdTag(REGISTERED_OCPP_TAG)
-                            .withTimestamp(DateTime.now())
-                            .withMeterStart(0),
-                    REGISTERED_CHARGE_BOX_ID_2);
+            StartTransactionResponse start2 =
+                    client.startTransaction(
+                            new StartTransactionRequest()
+                                    .withConnectorId(2)
+                                    .withIdTag(REGISTERED_OCPP_TAG)
+                                    .withTimestamp(DateTime.now())
+                                    .withMeterStart(0),
+                            REGISTERED_CHARGE_BOX_ID_2);
             Assertions.assertTrue(start2.getTransactionId() > 0);
             Assertions.assertEquals(AuthorizationStatus.CONCURRENT_TX, start2.getIdTagInfo().getStatus());
 
-            AuthorizeResponse auth2Retry = client.authorize(
-                    new AuthorizeRequest().withIdTag(REGISTERED_OCPP_TAG),
-                    REGISTERED_CHARGE_BOX_ID_2);
+            AuthorizeResponse auth2Retry =
+                    client.authorize(
+                            new AuthorizeRequest().withIdTag(REGISTERED_OCPP_TAG), REGISTERED_CHARGE_BOX_ID_2);
             Assertions.assertEquals(AuthorizationStatus.ACCEPTED, auth2Retry.getIdTagInfo().getStatus());
         }
     }
@@ -275,21 +288,23 @@ public class OperationalTestSoapOCPP16 {
         for (ChargePointStatus chargePointStatus : ChargePointStatus.values()) {
             // status for numConnectors connectors + connector 0 (main controller of CP)
             for (int i = 0; i <= numConnectors; i++) {
-                StatusNotificationResponse status = client.statusNotification(
-                        new StatusNotificationRequest()
-                                .withErrorCode(ChargePointErrorCode.NO_ERROR)
-                                .withStatus(chargePointStatus)
-                                .withConnectorId(i)
-                                .withTimestamp(DateTime.now()),
-                        REGISTERED_CHARGE_BOX_ID
-                );
+                StatusNotificationResponse status =
+                        client.statusNotification(
+                                new StatusNotificationRequest()
+                                        .withErrorCode(ChargePointErrorCode.NO_ERROR)
+                                        .withStatus(chargePointStatus)
+                                        .withConnectorId(i)
+                                        .withTimestamp(DateTime.now()),
+                                REGISTERED_CHARGE_BOX_ID);
                 Assertions.assertNotNull(status);
             }
 
-            List<ConnectorStatus> connectorStatusList = __DatabasePreparer__.getChargePointConnectorStatus();
+            List<ConnectorStatus> connectorStatusList =
+                    __DatabasePreparer__.getChargePointConnectorStatus();
             for (ConnectorStatus connectorStatus : connectorStatusList) {
                 Assertions.assertEquals(chargePointStatus.value(), connectorStatus.getStatus());
-                Assertions.assertEquals(ChargePointErrorCode.NO_ERROR.value(), connectorStatus.getErrorCode());
+                Assertions.assertEquals(
+                        ChargePointErrorCode.NO_ERROR.value(), connectorStatus.getErrorCode());
             }
         }
 
@@ -299,25 +314,27 @@ public class OperationalTestSoapOCPP16 {
 
         int faultyConnectorId = 1;
 
-        StatusNotificationResponse statusConnectorError = client.statusNotification(
-                new StatusNotificationRequest()
-                        .withErrorCode(ChargePointErrorCode.HIGH_TEMPERATURE)
-                        .withStatus(ChargePointStatus.FAULTED)
-                        .withConnectorId(faultyConnectorId)
-                        .withTimestamp(DateTime.now()),
-                REGISTERED_CHARGE_BOX_ID
-        );
+        StatusNotificationResponse statusConnectorError =
+                client.statusNotification(
+                        new StatusNotificationRequest()
+                                .withErrorCode(ChargePointErrorCode.HIGH_TEMPERATURE)
+                                .withStatus(ChargePointStatus.FAULTED)
+                                .withConnectorId(faultyConnectorId)
+                                .withTimestamp(DateTime.now()),
+                        REGISTERED_CHARGE_BOX_ID);
         Assertions.assertNotNull(statusConnectorError);
 
-
-        List<ConnectorStatus> connectorStatusList = __DatabasePreparer__.getChargePointConnectorStatus();
+        List<ConnectorStatus> connectorStatusList =
+                __DatabasePreparer__.getChargePointConnectorStatus();
         for (ConnectorStatus connectorStatus : connectorStatusList) {
             if (connectorStatus.getConnectorId() == faultyConnectorId) {
                 Assertions.assertEquals(ChargePointStatus.FAULTED.value(), connectorStatus.getStatus());
-                Assertions.assertEquals(ChargePointErrorCode.HIGH_TEMPERATURE.value(), connectorStatus.getErrorCode());
+                Assertions.assertEquals(
+                        ChargePointErrorCode.HIGH_TEMPERATURE.value(), connectorStatus.getErrorCode());
             } else {
                 Assertions.assertNotEquals(ChargePointStatus.FAULTED.value(), connectorStatus.getStatus());
-                Assertions.assertNotEquals(ChargePointErrorCode.HIGH_TEMPERATURE.value(), connectorStatus.getErrorCode());
+                Assertions.assertNotEquals(
+                        ChargePointErrorCode.HIGH_TEMPERATURE.value(), connectorStatus.getErrorCode());
             }
         }
     }
@@ -343,15 +360,15 @@ public class OperationalTestSoapOCPP16 {
 
         int nonExistingReservationId = reservationId + 17;
 
-        StartTransactionResponse startInvalid = client.startTransaction(
-                new StartTransactionRequest()
-                        .withConnectorId(usedConnectorID)
-                        .withIdTag(REGISTERED_OCPP_TAG)
-                        .withTimestamp(DateTime.now())
-                        .withMeterStart(0)
-                        .withReservationId(nonExistingReservationId),
-                REGISTERED_CHARGE_BOX_ID
-        );
+        StartTransactionResponse startInvalid =
+                client.startTransaction(
+                        new StartTransactionRequest()
+                                .withConnectorId(usedConnectorID)
+                                .withIdTag(REGISTERED_OCPP_TAG)
+                                .withTimestamp(DateTime.now())
+                                .withMeterStart(0)
+                                .withReservationId(nonExistingReservationId),
+                        REGISTERED_CHARGE_BOX_ID);
         Assertions.assertNotNull(startInvalid);
 
         // validate that the transaction is written to db, even though reservation was invalid
@@ -372,15 +389,15 @@ public class OperationalTestSoapOCPP16 {
         // startTransaction (idtag and connectorid are not the ones from the reservation)
         // -------------------------------------------------------------------------
 
-        StartTransactionResponse startWrongTag = client.startTransaction(
-                new StartTransactionRequest()
-                        .withConnectorId(3)
-                        .withIdTag(getRandomString())
-                        .withTimestamp(DateTime.now())
-                        .withMeterStart(0)
-                        .withReservationId(reservationId),
-                REGISTERED_CHARGE_BOX_ID
-        );
+        StartTransactionResponse startWrongTag =
+                client.startTransaction(
+                        new StartTransactionRequest()
+                                .withConnectorId(3)
+                                .withIdTag(getRandomString())
+                                .withTimestamp(DateTime.now())
+                                .withMeterStart(0)
+                                .withReservationId(reservationId),
+                        REGISTERED_CHARGE_BOX_ID);
         Assertions.assertNotNull(startWrongTag);
 
         {
@@ -395,15 +412,15 @@ public class OperationalTestSoapOCPP16 {
         // startTransaction (valid)
         // -------------------------------------------------------------------------
 
-        StartTransactionResponse startValidId = client.startTransaction(
-                new StartTransactionRequest()
-                        .withConnectorId(usedConnectorID)
-                        .withIdTag(REGISTERED_OCPP_TAG)
-                        .withTimestamp(DateTime.now())
-                        .withMeterStart(0)
-                        .withReservationId(reservationId),
-                REGISTERED_CHARGE_BOX_ID
-        );
+        StartTransactionResponse startValidId =
+                client.startTransaction(
+                        new StartTransactionRequest()
+                                .withConnectorId(usedConnectorID)
+                                .withIdTag(REGISTERED_OCPP_TAG)
+                                .withTimestamp(DateTime.now())
+                                .withMeterStart(0)
+                                .withReservationId(reservationId),
+                        REGISTERED_CHARGE_BOX_ID);
         Assertions.assertNotNull(startValidId);
         Integer transactionIdValid = startValidId.getTransactionId();
 
@@ -419,15 +436,15 @@ public class OperationalTestSoapOCPP16 {
         // startTransaction (valid again)
         // -------------------------------------------------------------------------
 
-        StartTransactionResponse startValidIdUsedTwice = client.startTransaction(
-                new StartTransactionRequest()
-                        .withConnectorId(usedConnectorID)
-                        .withIdTag(REGISTERED_OCPP_TAG)
-                        .withTimestamp(DateTime.now())
-                        .withMeterStart(0)
-                        .withReservationId(reservationId),
-                REGISTERED_CHARGE_BOX_ID
-        );
+        StartTransactionResponse startValidIdUsedTwice =
+                client.startTransaction(
+                        new StartTransactionRequest()
+                                .withConnectorId(usedConnectorID)
+                                .withIdTag(REGISTERED_OCPP_TAG)
+                                .withTimestamp(DateTime.now())
+                                .withMeterStart(0)
+                                .withReservationId(reservationId),
+                        REGISTERED_CHARGE_BOX_ID);
         Assertions.assertNotNull(startValidIdUsedTwice);
 
         {
@@ -468,32 +485,28 @@ public class OperationalTestSoapOCPP16 {
         initConnectorsWithStatusNotification(client);
 
         // heartbeat
-        HeartbeatResponse heartbeat = client.heartbeat(
-                new HeartbeatRequest(),
-                REGISTERED_CHARGE_BOX_ID
-        );
+        HeartbeatResponse heartbeat =
+                client.heartbeat(new HeartbeatRequest(), REGISTERED_CHARGE_BOX_ID);
         Assertions.assertNotNull(heartbeat);
 
         // Auth
-        AuthorizeResponse auth = client.authorize(
-                new AuthorizeRequest().withIdTag(REGISTERED_OCPP_TAG),
-                REGISTERED_CHARGE_BOX_ID
-        );
+        AuthorizeResponse auth =
+                client.authorize(
+                        new AuthorizeRequest().withIdTag(REGISTERED_OCPP_TAG), REGISTERED_CHARGE_BOX_ID);
         // Simple request, not much done here
         Assertions.assertNotNull(auth);
         Assertions.assertEquals(AuthorizationStatus.ACCEPTED, auth.getIdTagInfo().getStatus());
 
-
         // startTransaction
         DateTime startTimeStamp = DateTime.now();
-        StartTransactionResponse start = client.startTransaction(
-                new StartTransactionRequest()
-                        .withConnectorId(usedConnectorID)
-                        .withIdTag(REGISTERED_OCPP_TAG)
-                        .withTimestamp(startTimeStamp)
-                        .withMeterStart(0),
-                REGISTERED_CHARGE_BOX_ID
-        );
+        StartTransactionResponse start =
+                client.startTransaction(
+                        new StartTransactionRequest()
+                                .withConnectorId(usedConnectorID)
+                                .withIdTag(REGISTERED_OCPP_TAG)
+                                .withTimestamp(startTimeStamp)
+                                .withMeterStart(0),
+                        REGISTERED_CHARGE_BOX_ID);
         Assertions.assertNotNull(start);
 
         int transactionID = start.getTransactionId();
@@ -512,26 +525,25 @@ public class OperationalTestSoapOCPP16 {
         }
 
         // status
-        StatusNotificationResponse statusStart = client.statusNotification(
-                new StatusNotificationRequest()
-                        .withStatus(ChargePointStatus.CHARGING)
-                        .withErrorCode(ChargePointErrorCode.NO_ERROR)
-                        .withConnectorId(0)
-                        .withTimestamp(DateTime.now()),
-                REGISTERED_CHARGE_BOX_ID
-
-        );
+        StatusNotificationResponse statusStart =
+                client.statusNotification(
+                        new StatusNotificationRequest()
+                                .withStatus(ChargePointStatus.CHARGING)
+                                .withErrorCode(ChargePointErrorCode.NO_ERROR)
+                                .withConnectorId(0)
+                                .withTimestamp(DateTime.now()),
+                        REGISTERED_CHARGE_BOX_ID);
         Assertions.assertNotNull(statusStart);
 
         // send meterValues
         if (meterValues != null) {
-            MeterValuesResponse meter = client.meterValues(
-                    new MeterValuesRequest()
-                            .withConnectorId(usedConnectorID)
-                            .withTransactionId(transactionID)
-                            .withMeterValue(meterValues),
-                    REGISTERED_CHARGE_BOX_ID
-            );
+            MeterValuesResponse meter =
+                    client.meterValues(
+                            new MeterValuesRequest()
+                                    .withConnectorId(usedConnectorID)
+                                    .withTransactionId(transactionID)
+                                    .withMeterValue(meterValues),
+                            REGISTERED_CHARGE_BOX_ID);
             Assertions.assertNotNull(meter);
             checkMeterValues(meterValues, transactionID);
         }
@@ -539,15 +551,15 @@ public class OperationalTestSoapOCPP16 {
         // stopTransaction
         DateTime stopTimeStamp = DateTime.now();
         int stopValue = 30;
-        StopTransactionResponse stop = client.stopTransaction(
-                new StopTransactionRequest()
-                        .withTransactionId(transactionID)
-                        .withTransactionData(transactionData)
-                        .withTimestamp(stopTimeStamp)
-                        .withIdTag(REGISTERED_OCPP_TAG)
-                        .withMeterStop(stopValue),
-                REGISTERED_CHARGE_BOX_ID
-        );
+        StopTransactionResponse stop =
+                client.stopTransaction(
+                        new StopTransactionRequest()
+                                .withTransactionId(transactionID)
+                                .withTransactionData(transactionData)
+                                .withTimestamp(stopTimeStamp)
+                                .withIdTag(REGISTERED_OCPP_TAG)
+                                .withMeterStop(stopValue),
+                        REGISTERED_CHARGE_BOX_ID);
 
         {
             Assertions.assertNotNull(stop);
@@ -563,37 +575,38 @@ public class OperationalTestSoapOCPP16 {
         }
 
         // status
-        StatusNotificationResponse statusStop = client.statusNotification(
-                new StatusNotificationRequest()
-                        .withStatus(ChargePointStatus.AVAILABLE)
-                        .withErrorCode(ChargePointErrorCode.NO_ERROR)
-                        .withConnectorId(usedConnectorID)
-                        .withTimestamp(DateTime.now()),
-                REGISTERED_CHARGE_BOX_ID
-        );
+        StatusNotificationResponse statusStop =
+                client.statusNotification(
+                        new StatusNotificationRequest()
+                                .withStatus(ChargePointStatus.AVAILABLE)
+                                .withErrorCode(ChargePointErrorCode.NO_ERROR)
+                                .withConnectorId(usedConnectorID)
+                                .withTimestamp(DateTime.now()),
+                        REGISTERED_CHARGE_BOX_ID);
         Assertions.assertNotNull(statusStop);
     }
 
     private void initStationWithBootNotification(CentralSystemService client) {
-        BootNotificationResponse boot = client.bootNotification(
-                new BootNotificationRequest()
-                        .withChargePointVendor(getRandomString())
-                        .withChargePointModel(getRandomString()),
-                REGISTERED_CHARGE_BOX_ID);
+        BootNotificationResponse boot =
+                client.bootNotification(
+                        new BootNotificationRequest()
+                                .withChargePointVendor(getRandomString())
+                                .withChargePointModel(getRandomString()),
+                        REGISTERED_CHARGE_BOX_ID);
         Assertions.assertNotNull(boot);
         Assertions.assertEquals(RegistrationStatus.ACCEPTED, boot.getStatus());
     }
 
     private void initConnectorsWithStatusNotification(CentralSystemService client) {
         for (int i = 0; i <= numConnectors; i++) {
-            StatusNotificationResponse statusBoot = client.statusNotification(
-                    new StatusNotificationRequest()
-                            .withErrorCode(ChargePointErrorCode.NO_ERROR)
-                            .withStatus(ChargePointStatus.AVAILABLE)
-                            .withConnectorId(i)
-                            .withTimestamp(DateTime.now()),
-                    REGISTERED_CHARGE_BOX_ID
-            );
+            StatusNotificationResponse statusBoot =
+                    client.statusNotification(
+                            new StatusNotificationRequest()
+                                    .withErrorCode(ChargePointErrorCode.NO_ERROR)
+                                    .withStatus(ChargePointStatus.AVAILABLE)
+                                    .withConnectorId(i)
+                                    .withTimestamp(DateTime.now()),
+                            REGISTERED_CHARGE_BOX_ID);
             Assertions.assertNotNull(statusBoot);
         }
     }
@@ -622,20 +635,17 @@ public class OperationalTestSoapOCPP16 {
                 createMeterValue("0.0"),
                 createMeterValue("10.0"),
                 createMeterValue("20.0"),
-                createMeterValue("30.0")
-        );
+                createMeterValue("30.0"));
     }
 
     private List<MeterValue> getMeterValues() {
         return Arrays.asList(
-                createMeterValue("3.0"),
-                createMeterValue("13.0"),
-                createMeterValue("23.0")
-        );
+                createMeterValue("3.0"), createMeterValue("13.0"), createMeterValue("23.0"));
     }
 
     private static MeterValue createMeterValue(String val) {
-        return new MeterValue().withTimestamp(DateTime.now())
-                               .withSampledValue(new SampledValue().withValue(val));
+        return new MeterValue()
+                .withTimestamp(DateTime.now())
+                .withSampledValue(new SampledValue().withValue(val));
     }
 }

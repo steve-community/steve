@@ -54,18 +54,18 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ExtendWith(MockitoExtension.class)
 public class TransactionRestControllerTest extends AbstractControllerTest {
 
-    @Mock
-    private TransactionRepository transactionRepository;
+    @Mock private TransactionRepository transactionRepository;
 
     private MockMvc mockMvc;
 
     @BeforeEach
     public void setup() {
-        mockMvc = MockMvcBuilders.standaloneSetup(new TransactionsRestController(transactionRepository))
-            .setControllerAdvice(new ApiControllerAdvice())
-            .setMessageConverters(new MappingJackson2HttpMessageConverter(objectMapper))
-            .alwaysExpect(content().contentType("application/json"))
-            .build();
+        mockMvc =
+                MockMvcBuilders.standaloneSetup(new TransactionsRestController(transactionRepository))
+                        .setControllerAdvice(new ApiControllerAdvice())
+                        .setMessageConverters(new MappingJackson2HttpMessageConverter(objectMapper))
+                        .alwaysExpect(content().contentType("application/json"))
+                        .build();
     }
 
     @Test
@@ -78,9 +78,10 @@ public class TransactionRestControllerTest extends AbstractControllerTest {
         when(transactionRepository.getTransactions(any())).thenReturn(results);
 
         // then
-        mockMvc.perform(get("/api/v1/transactions"))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$", hasSize(0)));
+        mockMvc
+                .perform(get("/api/v1/transactions"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", hasSize(0)));
     }
 
     @Test
@@ -93,12 +94,12 @@ public class TransactionRestControllerTest extends AbstractControllerTest {
         when(transactionRepository.getTransactions(any())).thenReturn(results);
 
         // then
-        mockMvc.perform(get("/api/v1/transactions"))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$", hasSize(1)))
-            .andExpect(jsonPath("$[0].id").value("234"));
+        mockMvc
+                .perform(get("/api/v1/transactions"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", hasSize(1)))
+                .andExpect(jsonPath("$[0].id").value("234"));
     }
-
 
     @Test
     @DisplayName("Downstream bean throws exception, expected 500")
@@ -107,53 +108,50 @@ public class TransactionRestControllerTest extends AbstractControllerTest {
         when(transactionRepository.getTransactions(any())).thenThrow(new RuntimeException("failed"));
 
         // then
-        mockMvc.perform(get("/api/v1/transactions"))
-            .andExpect(status().isInternalServerError())
-            .andExpectAll(errorJsonMatchers());
+        mockMvc
+                .perform(get("/api/v1/transactions"))
+                .andExpect(status().isInternalServerError())
+                .andExpectAll(errorJsonMatchers());
     }
-
 
     @Test
     @DisplayName("Hidden param used, expected 400")
     public void test4() throws Exception {
-        mockMvc.perform(get("/api/v1/transactions")
-                .param("returnCSV", "true")
-            )
-            .andExpect(status().isBadRequest())
-            .andExpectAll(errorJsonMatchers());
+        mockMvc
+                .perform(get("/api/v1/transactions").param("returnCSV", "true"))
+                .andExpect(status().isBadRequest())
+                .andExpectAll(errorJsonMatchers());
     }
-
 
     @Test
     @DisplayName("Typo in param makes validation fail, expected 400")
     public void test5() throws Exception {
-        mockMvc.perform(get("/api/v1/transactions")
-                .param("periodType", "TODAYZZZ")
-            )
-            .andExpect(status().isBadRequest())
-            .andExpectAll(errorJsonMatchers());
+        mockMvc
+                .perform(get("/api/v1/transactions").param("periodType", "TODAYZZZ"))
+                .andExpect(status().isBadRequest())
+                .andExpectAll(errorJsonMatchers());
     }
 
     @Test
     @DisplayName("Param requires other params which are not set, expected 400")
     public void test6() throws Exception {
-        mockMvc.perform(get("/api/v1/transactions")
-                .param("periodType", "FROM_TO")
-            )
-            .andExpect(status().isBadRequest())
-            .andExpectAll(errorJsonMatchers());
+        mockMvc
+                .perform(get("/api/v1/transactions").param("periodType", "FROM_TO"))
+                .andExpect(status().isBadRequest())
+                .andExpectAll(errorJsonMatchers());
     }
 
     @Test
     @DisplayName("to is before from when using FROM_TO, expected 400")
     public void test7() throws Exception {
-        mockMvc.perform(get("/api/v1/transactions")
-                .param("periodType", "FROM_TO")
-                .param("from", "2022-10-01T00:00")
-                .param("to", "2022-09-01T00:00")
-            )
-            .andExpect(status().isBadRequest())
-            .andExpectAll(errorJsonMatchers());
+        mockMvc
+                .perform(
+                        get("/api/v1/transactions")
+                                .param("periodType", "FROM_TO")
+                                .param("from", "2022-10-01T00:00")
+                                .param("to", "2022-09-01T00:00"))
+                .andExpect(status().isBadRequest())
+                .andExpectAll(errorJsonMatchers());
     }
 
     @Test
@@ -163,65 +161,66 @@ public class TransactionRestControllerTest extends AbstractControllerTest {
         DateTime stop = start.plusHours(2);
 
         // given
-        Transaction transaction = Transaction
-            .builder()
-            .startTimestamp(start)
-            .stopTimestamp(stop)
-            .id(1)
-            .chargeBoxId("cb-2")
-            .ocppIdTag("id-3")
-            .build();
+        Transaction transaction =
+                Transaction.builder()
+                        .startTimestamp(start)
+                        .stopTimestamp(stop)
+                        .id(1)
+                        .chargeBoxId("cb-2")
+                        .ocppIdTag("id-3")
+                        .build();
 
         // when
         when(transactionRepository.getTransactions(any())).thenReturn(List.of(transaction));
 
         // then
-        mockMvc.perform(get("/api/v1/transactions")
-                .param("transactionPk", String.valueOf(transaction.getId()))
-                .param("type", "ACTIVE")
-                .param("periodType", "FROM_TO")
-                .param("chargeBoxId", transaction.getChargeBoxId())
-                .param("ocppIdTag", transaction.getOcppIdTag())
-                .param("from", "2022-10-01T00:00")
-                .param("to", "2022-10-08T00:00")
-            )
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$", hasSize(1)))
-            .andExpect(jsonPath("$[0].id").value("1"))
-            .andExpect(jsonPath("$[0].chargeBoxId").value("cb-2"))
-            .andExpect(jsonPath("$[0].ocppIdTag").value("id-3"))
-            .andExpect(jsonPath("$[0].ocppIdTag").value("id-3"))
-            .andExpect(jsonPath("$[0].startTimestamp").value(start.toString()))
-            .andExpect(jsonPath("$[0].startTimestampFormatted").doesNotExist())
-            .andExpect(jsonPath("$[0].stopTimestamp").value(stop.toString()))
-            .andExpect(jsonPath("$[0].stopTimestampFormatted").doesNotExist());
+        mockMvc
+                .perform(
+                        get("/api/v1/transactions")
+                                .param("transactionPk", String.valueOf(transaction.getId()))
+                                .param("type", "ACTIVE")
+                                .param("periodType", "FROM_TO")
+                                .param("chargeBoxId", transaction.getChargeBoxId())
+                                .param("ocppIdTag", transaction.getOcppIdTag())
+                                .param("from", "2022-10-01T00:00")
+                                .param("to", "2022-10-08T00:00"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", hasSize(1)))
+                .andExpect(jsonPath("$[0].id").value("1"))
+                .andExpect(jsonPath("$[0].chargeBoxId").value("cb-2"))
+                .andExpect(jsonPath("$[0].ocppIdTag").value("id-3"))
+                .andExpect(jsonPath("$[0].ocppIdTag").value("id-3"))
+                .andExpect(jsonPath("$[0].startTimestamp").value(start.toString()))
+                .andExpect(jsonPath("$[0].startTimestampFormatted").doesNotExist())
+                .andExpect(jsonPath("$[0].stopTimestamp").value(stop.toString()))
+                .andExpect(jsonPath("$[0].stopTimestampFormatted").doesNotExist());
     }
 
     @Test
     @DisplayName("from and to have are not conform with ISO")
     public void test9() throws Exception {
-        mockMvc.perform(get("/api/v1/transactions")
-                .param("periodType", "FROM_TO")
-                .param("from", "2022-10-01 00:00")
-                .param("to", "2023-10-01 00:00")
-            )
-            .andExpect(status().isBadRequest())
-            .andExpectAll(errorJsonMatchers());
+        mockMvc
+                .perform(
+                        get("/api/v1/transactions")
+                                .param("periodType", "FROM_TO")
+                                .param("from", "2022-10-01 00:00")
+                                .param("to", "2023-10-01 00:00"))
+                .andExpect(status().isBadRequest())
+                .andExpectAll(errorJsonMatchers());
     }
 
     @Test
     @DisplayName("GET all: Query param 'type' is translated correctly, while others are defaulted")
     public void test10() throws Exception {
         // given
-        ArgumentCaptor<TransactionQueryForm.ForApi> formToCapture = ArgumentCaptor.forClass(TransactionQueryForm.ForApi.class);
+        ArgumentCaptor<TransactionQueryForm.ForApi> formToCapture =
+                ArgumentCaptor.forClass(TransactionQueryForm.ForApi.class);
 
         // when
         when(transactionRepository.getTransactions(any())).thenReturn(Collections.emptyList());
 
         // then
-        mockMvc.perform(get("/api/v1/transactions")
-                .param("type", "ACTIVE"))
-            .andExpect(status().isOk());
+        mockMvc.perform(get("/api/v1/transactions").param("type", "ACTIVE")).andExpect(status().isOk());
 
         verify(transactionRepository).getTransactions(formToCapture.capture());
         TransactionQueryForm.ForApi capturedForm = formToCapture.getValue();
@@ -231,18 +230,20 @@ public class TransactionRestControllerTest extends AbstractControllerTest {
     }
 
     @Test
-    @DisplayName("GET all: Query param 'periodType' is translated correctly, while others are defaulted")
+    @DisplayName(
+            "GET all: Query param 'periodType' is translated correctly, while others are defaulted")
     public void test11() throws Exception {
         // given
-        ArgumentCaptor<TransactionQueryForm.ForApi> formToCapture = ArgumentCaptor.forClass(TransactionQueryForm.ForApi.class);
+        ArgumentCaptor<TransactionQueryForm.ForApi> formToCapture =
+                ArgumentCaptor.forClass(TransactionQueryForm.ForApi.class);
 
         // when
         when(transactionRepository.getTransactions(any())).thenReturn(Collections.emptyList());
 
         // then
-        mockMvc.perform(get("/api/v1/transactions")
-                .param("periodType", "LAST_30"))
-            .andExpect(status().isOk());
+        mockMvc
+                .perform(get("/api/v1/transactions").param("periodType", "LAST_30"))
+                .andExpect(status().isOk());
 
         verify(transactionRepository).getTransactions(formToCapture.capture());
         TransactionQueryForm.ForApi capturedForm = formToCapture.getValue();

@@ -41,9 +41,12 @@ public abstract class StressTest {
 
     // lower values -> more stress
     //
-    // reason: these only specify the size of the values "bag" from which a test picks a value randomly. if there are
-    // less values to pick from, it is more likely that tests will use the same value at the same time. this produces
-    // more overhead for steve (especially db) when multiple threads "fight" for inserting/updating a db row/cell.
+    // reason: these only specify the size of the values "bag" from which a test picks a value
+    // randomly. if there are
+    // less values to pick from, it is more likely that tests will use the same value at the same
+    // time. this produces
+    // more overhead for steve (especially db) when multiple threads "fight" for inserting/updating a
+    // db row/cell.
     //
     protected static final int ID_TAG_COUNT = 50;
     protected static final int CHARGE_BOX_COUNT = THREAD_COUNT;
@@ -86,7 +89,8 @@ public abstract class StressTest {
     }
 
     protected static MeterValue createMeterValue(int val) {
-        return new MeterValue().withTimestamp(DateTime.now())
-                               .withSampledValue(new SampledValue().withValue(Integer.toString(val)));
+        return new MeterValue()
+                .withTimestamp(DateTime.now())
+                .withSampledValue(new SampledValue().withValue(Integer.toString(val)));
     }
 }

@@ -37,13 +37,13 @@
 
         <jooq.version>3.16.7</jooq.version>
         <cxf.version>3.5.5</cxf.version>
-        <spring.version>5.3.23</spring.version>
-        <spring.security.version>5.7.5</spring.security.version>
+        <spring.version>5.3.30</spring.version>
+        <spring.security.version>5.7.10</spring.security.version>
         <mysql.jdbc.version>8.0.30</mysql.jdbc.version>
         <jetty.version>10.0.14</jetty.version>
-        <lombok.version>1.18.28</lombok.version>
+        <lombok.version>1.18.30</lombok.version>
         <jackson.version>2.15.2</jackson.version>
-        <plugin.license-maven.version>4.2</plugin.license-maven.version>
+        <plugin.license-maven.version>4.3</plugin.license-maven.version>
 
         <!-- In Mysql: schema == database (http://dev.mysql.com/doc/refman/5.6/en/glossary.html#glos_schema) -->
         <jdbcUrl>jdbc:mysql://${db.ip}:${db.port}/${db.schema}?useSSL=true&amp;serverTimezone=UTC</jdbcUrl>
@@ -154,7 +154,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-enforcer-plugin</artifactId>
-                <version>3.3.0</version>
+                <version>3.4.1</version>
                 <executions>
                     <execution>
                         <id>enforce-java</id>
@@ -204,7 +204,7 @@
             <plugin>
                 <groupId>com.github.spotbugs</groupId>
                 <artifactId>spotbugs-maven-plugin</artifactId>
-                <version>4.7.3.5</version>
+                <version>4.7.3.6</version>
                 <configuration>
                     <failOnError>false</failOnError>
                     <onlyAnalyze>de.rwth.idsg.steve.-</onlyAnalyze>
@@ -248,7 +248,7 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>properties-maven-plugin</artifactId>
-                <version>1.1.0</version>
+                <version>1.2.0</version>
                 <executions>
                     <execution>
                         <phase>initialize</phase>
@@ -485,6 +485,20 @@
                 <scope>import</scope>
                 <type>pom</type>
             </dependency>
+            <dependency>
+                <groupId>org.junit</groupId>
+                <artifactId>junit-bom</artifactId>
+                <version>5.10.0</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-bom</artifactId>
+                <version>2.0.9</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -541,7 +555,7 @@
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
-            <version>32.1.1-jre</version>
+            <version>32.1.2-jre</version>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
@@ -617,12 +631,10 @@
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
-            <version>2.0.7</version>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>jcl-over-slf4j</artifactId>
-            <version>2.0.7</version>
         </dependency>
         <dependency>
             <groupId>com.lmax</groupId>
@@ -721,25 +733,23 @@
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-engine</artifactId>
-            <version>5.9.3</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-params</artifactId>
-            <version>5.9.3</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-junit-jupiter</artifactId>
-            <version>5.4.0</version>
+            <version>5.6.0</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>net.bytebuddy</groupId>
             <artifactId>byte-buddy</artifactId>
-            <version>1.14.5</version>
+            <version>1.14.8</version>
             <scope>test</scope>
         </dependency>
         <dependency>

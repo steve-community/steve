@@ -109,7 +109,7 @@ public class NotificationService {
             return;
         }
 
-        String subject = format("Connector '%s' of charging station '%s' is FAULTED", 
+        String subject = format("Connector '%s' of charging station '%s' is FAULTED",
                 notification.getConnectorId(),
                 notification.getChargeBoxId()
         );
@@ -135,27 +135,31 @@ public class NotificationService {
 
     @EventListener
     @Async
-    public void ocppStationStatusSuspendedEV(OcppStationStatusSuspendedEV notification){
-        Integer connectorPk = ocppServerRepository.getConnectorPk(notification.getChargeBoxId(), notification.getConnectorId());
+    public void ocppStationStatusSuspendedEV(OcppStationStatusSuspendedEV notification) {
+        Integer connectorPk = ocppServerRepository.getConnectorPk(notification.getChargeBoxId(), 
+                notification.getConnectorId()
+        );
         String ocppTag = transactionRepository.getOcppTagOfActiveTransaction(connectorPk);
 
-        String subject = format("EV stopped charging at charging station %s, Connector %d", 
-                    notification.getChargeBoxId(), 
-                    notification.getConnectorId());
+        String subject = format("EV stopped charging at charging station %s, Connector %d",
+                    notification.getChargeBoxId(),
+                    notification.getConnectorId()
+        );
         if (ocppTag != null){
 
             UserRecord userRecord = userRepository.getDetails(ocppTag).getUserRecord();
             String eMailAddy = userRecord.getEMail();
             // send email if user with eMail address found
-            if (!Strings.isNullOrEmpty(eMailAddy)){
-                String bodyUserMail = format("User: %s %s \n\n Connector %d of charging station %s notifies Suspended_EV",
-                    userRecord.getFirstName(),
-                    userRecord.getLastName(),
-                    notification.getConnectorId(),
-                    notification.getChargeBoxId()
-                );
+            if (!Strings.isNullOrEmpty(eMailAddy)) {
+                String bodyUserMail = 
+                        format("User: %s %s \n\n Connector %d of charging station %s notifies Suspended_EV",
+                                userRecord.getFirstName(),
+                                userRecord.getLastName(),
+                                notification.getConnectorId(),
+                                notification.getChargeBoxId()
+                        );
 
-                mailService.sendAsync( subject, addTimestamp(bodyUserMail), eMailAddy);
+                mailService.sendAsync(subject, addTimestamp(bodyUserMail), eMailAddy);
             }
         }
 
@@ -163,31 +167,35 @@ public class NotificationService {
         if (isDisabled(OcppStationStatusSuspendedEV)) {
             return;
         }
-        String body = format("Connector %d of charging station %s notifies Suspended_EV", 
+        String body = format("Connector %d of charging station %s notifies Suspended_EV",
                 notification.getConnectorId(),
-                notification.getChargeBoxId());
-        mailService.sendAsync( subject, addTimestamp(body), "");
+                notification.getChargeBoxId()
+        );
+        mailService.sendAsync(subject, addTimestamp(body), "");
     }
 
     @EventListener
     @Async
     public void ocppTransactionEnded(OcppTransactionEnded notification) {
-        Transaction TransActParams = transactionRepository.getTransaction(notification.getParams().getTransactionId());
+        Transaction transActParams = transactionRepository.getTransaction(notification.getParams().getTransactionId());
 
-        TransActParams.getOcppTagPk();
-        UserRecord userRecord = userRepository.getDetails(TransActParams.getOcppIdTag()).getUserRecord();
+        transActParams.getOcppTagPk();
+        UserRecord userRecord = userRepository.getDetails(transActParams.getOcppIdTag()).getUserRecord();
         String eMailAddress = userRecord.getEMail();
 
         // mail to user
         if (!Strings.isNullOrEmpty(eMailAddress)) {
-            String subjectUserMail = format("Transaction '%s' has ended on charging station '%s'", 
-                    TransActParams.getId(),
-                    TransActParams.getChargeBoxId()
+            String subjectUserMail = format("Transaction '%s' has ended on charging station '%s'",
+                    transActParams.getId(),
+                    transActParams.getChargeBoxId()
             );
 
             // if the Transactionstop is received within the first Minute don't send an E-Mail
-            if (TransActParams.getStopTimestamp().isAfter(TransActParams.getStartTimestamp().plusMinutes(1))){
-                mailService.sendAsync(subjectUserMail, addTimestamp(createContent(TransActParams, userRecord)), eMailAddress);
+            if (transActParams.getStopTimestamp().isAfter(transActParams.getStartTimestamp().plusMinutes(1))) {
+                mailService.sendAsync(subjectUserMail,
+                        addTimestamp(createContent(transActParams, userRecord)),
+                        eMailAddress
+                );
             }
         }
 
@@ -233,20 +241,18 @@ public class NotificationService {
             .toString();
     }
 
-private static String createContent(Transaction params, UserRecord userRecord) {
+    private static String createContent(Transaction params, UserRecord userRecord) {
         Double meterValueDiff;
         Integer meterValueStop;
         Integer meterValueStart;
-        String str_meterValueDiff = "-";
-        try
-        {
+        String strMeterValueDiff = "-";
+        try {
             meterValueStop = Integer.valueOf(params.getStopValue());
             meterValueStart = Integer.valueOf(params.getStartValue());
-            meterValueDiff = (meterValueStop - meterValueStart)/1000.0; // --> kWh
-            str_meterValueDiff = meterValueDiff.toString() + " kWh";
+            meterValueDiff = (meterValueStop - meterValueStart) / 1000.0; // --> kWh
+            strMeterValueDiff = meterValueDiff.toString() + " kWh";
         }
-        catch(NumberFormatException e)
-        {
+        catch(NumberFormatException e) {
             log.error("Failed to calculate charged energy! ", e);
         }
         
@@ -263,7 +269,7 @@ private static String createContent(Transaction params, UserRecord userRecord) {
             .append("- stopTimestamp (UTC): ").append(params.getStopTimestamp()).append(System.lineSeparator())
             .append("- stopMeterValue: ").append(params.getStopValue()).append(System.lineSeparator())
             .append("- stopReason: ").append(params.getStopReason()).append(System.lineSeparator())
-            .append("- charged energy: ").append(str_meterValueDiff).append(System.lineSeparator())    
+            .append("- charged energy: ").append(strMeterValueDiff).append(System.lineSeparator())
             .toString();
     }
 

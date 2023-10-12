@@ -30,7 +30,7 @@ import java.util.List;
  * @since 19.08.2014
  */
 public interface TransactionRepository {
-    Transaction getTransaction(int transaction_pk);
+    Transaction getTransaction(int transactionPk);
 
     List<Transaction> getTransactions(TransactionQueryForm form);
 

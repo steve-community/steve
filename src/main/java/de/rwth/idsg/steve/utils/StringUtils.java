@@ -99,9 +99,14 @@ public final class StringUtils {
 
     // https://www.baeldung.com/java-email-validation-regex
     public static boolean isValidAddress(String emailAddress) {
-       String regexPattern = "^(?=.{1,64}@)[A-Za-z0-9_-]+(\\.[A-Za-z0-9_-]+)*@[^-][A-Za-z0-9-]+(\\.[A-Za-z0-9-]+)*(\\.[A-Za-z]{2,})$"; // Strict Regular Expression Validation
-       //String regexPattern = "^(?=.{1,64}@)[\\p{L}0-9_-]+(\\.[\\p{L}0-9_-]+)*@[^-][\\p{L}0-9-]+(\\.[\\p{L}0-9-]+)*(\\.[\\p{L}]{2,})$"; //Regular Expression for Validation of Non-Latin or Unicode Characters Email
-       //String regexPattern = "^[a-zA-Z0-9_!#$%&'*+/=?`{|}~^.-]+@[a-zA-Z0-9.-]+$" // Regular Expression by RFC 5322 for Email Validation
+       // Strict Regular Expression Validation
+        String regexPattern =
+           "^(?=.{1,64}@)[A-Za-z0-9_-]+(\\.[A-Za-z0-9_-]+)*@[^-][A-Za-z0-9-]+(\\.[A-Za-z0-9-]+)*(\\.[A-Za-z]{2,})$";
+       //Regular Expression for Validation of Non-Latin or Unicode Characters Email
+       //String regexPattern =
+       //   "^(?=.{1,64}@)[\\p{L}0-9_-]+(\\.[\\p{L}0-9_-]+)*@[^-][\\p{L}0-9-]+(\\.[\\p{L}0-9-]+)*(\\.[\\p{L}]{2,})$";
+       // Regular Expression by RFC 5322 for Email Validation
+       //String regexPattern = "^[a-zA-Z0-9_!#$%&'*+/=?`{|}~^.-]+@[a-zA-Z0-9.-]+$"
        return Pattern.compile(regexPattern)
             .matcher(emailAddress)
             .matches();

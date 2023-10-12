@@ -166,12 +166,12 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
     }
 
     @Override
-    public Integer getConnectorPk(String chargeBoxId, int connectorId){
+    public Integer getConnectorPk(String chargeBoxId, int connectorId) {
         return ctx.select(CONNECTOR.CONNECTOR_PK)
                 .from(CONNECTOR)
                 .where(CONNECTOR.CHARGE_BOX_ID.equal(chargeBoxId))
                 .and(CONNECTOR.CONNECTOR_ID.equal(connectorId))
-                .fetchOne().value1();   
+                .fetchOne().value1();
     }
 
     @Override

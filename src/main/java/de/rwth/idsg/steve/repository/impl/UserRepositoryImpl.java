@@ -118,12 +118,11 @@ public class UserRepositoryImpl implements UserRepository {
 
     @Override
     public User.Details getDetails(String ocppIdTag) {
-        
         Integer ocppPk = ctx.select(OCPP_TAG.OCPP_TAG_PK)
                                         .from(OCPP_TAG)
                                         .where(OCPP_TAG.ID_TAG.eq(ocppIdTag))
                                         .fetchOne(OCPP_TAG.OCPP_TAG_PK);
-        
+
         if (ocppPk == null) {
             throw new SteveException("There is no OCPP_Tag: '%s'", ocppIdTag);
         }

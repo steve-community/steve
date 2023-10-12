@@ -23,8 +23,8 @@ import lombok.Data;
 /**
  * @author fnkbsi
  * @since 12.10.2022
- * 
  */
+
 @Data
 public class OcppStationStatusSuspendedEV {
 

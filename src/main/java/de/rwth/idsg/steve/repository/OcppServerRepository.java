@@ -42,7 +42,7 @@ public interface OcppServerRepository {
     void updateChargeboxHeartbeat(String chargeBoxIdentity, DateTime ts);
 
     void insertConnectorStatus(InsertConnectorStatusParams params);
-    public Integer getConnectorPk(String chargeBoxId, int connectorId);
+    Integer getConnectorPk(String chargeBoxId, int connectorId);
 
     void insertMeterValues(String chargeBoxIdentity, List<MeterValue> list, int connectorId, Integer transactionId);
     void insertMeterValues(String chargeBoxIdentity, List<MeterValue> list, int transactionId);

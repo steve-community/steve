@@ -21,7 +21,7 @@ package de.rwth.idsg.steve.service.notification;
 import lombok.Data;
 
 /**
- * @author Frank Brosi
+ * @author fnkbsi
  * @since 12.10.2022
  * 
  */

@@ -109,7 +109,10 @@ public class NotificationService {
             return;
         }
 
-        String subject = format("Connector '%s' of charging station '%s' is FAULTED", notification.getConnectorId(), notification.getChargeBoxId());
+        String subject = format("Connector '%s' of charging station '%s' is FAULTED", 
+                notification.getConnectorId(),
+                notification.getChargeBoxId()
+        );
         String body = format("Status Error Code: '%s'", notification.getErrorCode());
 
         mailService.sendAsync(subject, addTimestamp(body));
@@ -121,7 +124,11 @@ public class NotificationService {
             return;
         }
 
-        String subject = format("Transaction '%s' has started on charging station '%s' on connector '%s'", notification.getTransactionId(), notification.getParams().getChargeBoxId(), notification.getParams().getConnectorId());
+        String subject = format("Transaction '%s' has started on charging station '%s' on connector '%s'",
+                notification.getTransactionId(),
+                notification.getParams().getChargeBoxId(),
+                notification.getParams().getConnectorId()
+        );
 
         mailService.sendAsync(subject, addTimestamp(createContent(notification.getParams())));
     }
@@ -139,15 +146,14 @@ public class NotificationService {
 
             UserRecord userRecord = userRepository.getDetails(ocppTag).getUserRecord();
             String eMailAddy = userRecord.getEMail();
+            // send email if user with eMail address found
             if (!Strings.isNullOrEmpty(eMailAddy)){
-                //String bodyUserMail = "User: " + userRecord.getFirstName() + " " + userRecord.getLastName() + System.lineSeparator() + System.lineSeparator()
-                //        + "Connector " + notification.getConnectorId() + " of charging station " + notification.getChargeBoxId() + " notifies Suspended_EV";
-                
                 String bodyUserMail = format("User: %s %s \n\n Connector %d of charging station %s notifies Suspended_EV",
-                userRecord.getFirstName(),
-                userRecord.getLastName(),
-                notification.getConnectorId(),
-                notification.getChargeBoxId());
+                    userRecord.getFirstName(),
+                    userRecord.getLastName(),
+                    notification.getConnectorId(),
+                    notification.getChargeBoxId()
+                );
 
                 mailService.sendAsync( subject, addTimestamp(bodyUserMail), eMailAddy);
             }
@@ -174,7 +180,10 @@ public class NotificationService {
 
         // mail to user
         if (!Strings.isNullOrEmpty(eMailAddress)) {
-            String subjectUserMail = format("Transaction '%s' has ended on charging station '%s'", TransActParams.getId(), TransActParams.getChargeBoxId());
+            String subjectUserMail = format("Transaction '%s' has ended on charging station '%s'", 
+                    TransActParams.getId(),
+                    TransActParams.getChargeBoxId()
+            );
 
             // if the Transactionstop is received within the first Minute don't send an E-Mail
             if (TransActParams.getStopTimestamp().isAfter(TransActParams.getStartTimestamp().plusMinutes(1))){
@@ -187,7 +196,10 @@ public class NotificationService {
             return;
         }
 
-        String subject = format("Transaction '%s' has ended on charging station '%s'", notification.getParams().getTransactionId(), notification.getParams().getChargeBoxId());
+        String subject = format("Transaction '%s' has ended on charging station '%s'",
+                notification.getParams().getTransactionId(),
+                notification.getParams().getChargeBoxId()
+        );
 
         mailService.sendAsync(subject, addTimestamp(createContent(notification.getParams())));
     }

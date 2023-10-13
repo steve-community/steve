@@ -68,10 +68,11 @@ import static jooq.steve.db.tables.TransactionStopFailed.TRANSACTION_STOP_FAILED
  */
 @Slf4j
 @Repository
+@RequiredArgsConstructor
 public class OcppServerRepositoryImpl implements OcppServerRepository {
 
-    @Autowired private DSLContext ctx;
-    @Autowired private ReservationRepository reservationRepository;
+    private final DSLContext ctx;
+    private final ReservationRepository reservationRepository;
 
     private final Striped<Lock> transactionTableLocks = Striped.lock(16);
 

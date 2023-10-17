@@ -84,7 +84,7 @@ public class MailService {
 
     public void sendTestMail() {
         try {
-            send("Test", "Test","");
+            send("Test", "Test", "");
         } catch (MessagingException e) {
             throw new SteveException("Failed to send mail", e);
         }
@@ -100,51 +100,45 @@ public class MailService {
         });
     }
 
-    public void sendAsync(String subject, String body, String RecipientAddresses) {
+    public void sendAsync(String subject, String body, String recipientAddresses) {
         executorService.execute(() -> {
             try {
-                send(subject, body, RecipientAddresses);
+                send(subject, body, recipientAddresses);
             } catch (MessagingException e) {
                 log.error("Failed to send mail", e);
             }
         });
     }
 
-    private void send(String subject, String body, String RecipientAddresses) throws MessagingException {
-    MailSettings settingsLocal = getSettings();
+    private void send(String subject, String body, String recipientAddresses) throws MessagingException {
+        MailSettings settingsLocal = getSettings();
 
-    Message mail = new MimeMessage(session);
-    mail.setSubject("[SteVe] " + subject);
-    mail.setContent(body, "text/plain");
-    mail.setFrom(new InternetAddress(settingsLocal.getFrom()));
+        Message mail = new MimeMessage(session);
+        mail.setSubject("[SteVe] " + subject);
+        mail.setContent(body, "text/plain");
+        mail.setFrom(new InternetAddress(settingsLocal.getFrom()));
 
-    List<String> eMailAddresses;
+        List<String> eMailAddresses;
 
-    if (RecipientAddresses.isEmpty())
-    {
-        eMailAddresses = settingsLocal.getRecipients();
-    }
-    else
-    {
-
-        eMailAddresses = splitByComma(RecipientAddresses);
-    }
-
-    for (String rep : eMailAddresses) {
-        if (isValidAddress(rep)){
-            mail.addRecipient(Message.RecipientType.TO, new InternetAddress(rep));
+        if (recipientAddresses.isEmpty()) {
+            eMailAddresses = settingsLocal.getRecipients();
+        } else {
+            eMailAddresses = splitByComma(recipientAddresses);
         }
-        else{
-            log.error("Failed to send mail to " + rep + "! Format of the address is invalid.");
+
+        for (String rep : eMailAddresses) {
+            if (isValidAddress(rep)) {
+                mail.addRecipient(Message.RecipientType.TO, new InternetAddress(rep));
+            } else {
+                log.error("Failed to send mail to " + rep + "! Format of the address is invalid.");
+            }
         }
-    }
 
         try (Transport transport = session.getTransport()) {
             transport.connect();
             transport.sendMessage(mail, mail.getAllRecipients());
         }
-        catch(Exception e)
-        {
+        catch (Exception e) {
             log.error("Failed to send mail(s)! ", e);
         }
     }

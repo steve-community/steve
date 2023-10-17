@@ -136,7 +136,7 @@ public class NotificationService {
     @EventListener
     @Async
     public void ocppStationStatusSuspendedEV(OcppStationStatusSuspendedEV notification) {
-        Integer connectorPk = ocppServerRepository.getConnectorPk(notification.getChargeBoxId(), 
+        Integer connectorPk = ocppServerRepository.getConnectorPk(notification.getChargeBoxId(),
                 notification.getConnectorId()
         );
         String ocppTag = transactionRepository.getOcppTagOfActiveTransaction(connectorPk);
@@ -145,13 +145,12 @@ public class NotificationService {
                     notification.getChargeBoxId(),
                     notification.getConnectorId()
         );
-        if (ocppTag != null){
-
+        if (ocppTag != null) {
             UserRecord userRecord = userRepository.getDetails(ocppTag).getUserRecord();
             String eMailAddy = userRecord.getEMail();
             // send email if user with eMail address found
             if (!Strings.isNullOrEmpty(eMailAddy)) {
-                String bodyUserMail = 
+                String bodyUserMail =
                         format("User: %s %s \n\n Connector %d of charging station %s notifies Suspended_EV",
                                 userRecord.getFirstName(),
                                 userRecord.getLastName(),
@@ -163,7 +162,7 @@ public class NotificationService {
             }
         }
 
-        /* mail defined in settings */ 
+        /* mail defined in settings */
         if (isDisabled(OcppStationStatusSuspendedEV)) {
             return;
         }
@@ -199,7 +198,7 @@ public class NotificationService {
             }
         }
 
-        /* mail defined in settings */ 
+        /* mail defined in settings */
         if (isDisabled(OcppTransactionEnded)) {
             return;
         }
@@ -251,11 +250,10 @@ public class NotificationService {
             meterValueStart = Integer.valueOf(params.getStartValue());
             meterValueDiff = (meterValueStop - meterValueStart) / 1000.0; // --> kWh
             strMeterValueDiff = meterValueDiff.toString() + " kWh";
-        }
-        catch(NumberFormatException e) {
+        } catch (NumberFormatException e) {
             log.error("Failed to calculate charged energy! ", e);
         }
-        
+
         return new StringBuilder("User: ")
             .append(userRecord.getFirstName()).append(" ").append(userRecord.getLastName())
             .append(System.lineSeparator())

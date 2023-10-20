@@ -35,6 +35,8 @@ public interface TransactionRepository {
     void writeTransactionsCSV(TransactionQueryForm form, Writer writer);
 
     List<Integer> getActiveTransactionIds(String chargeBoxId);
+    Integer getActiveTransactionId(String chargeBoxId, Integer connectorId);
+    String getOcppTagOfTransaction(Integer transaction_pk);
 
     TransactionDetails getDetails(int transactionPk, boolean firstArrivingMeterValueIfMultiple);
 

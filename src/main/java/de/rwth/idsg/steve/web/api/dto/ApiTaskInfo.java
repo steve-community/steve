@@ -67,8 +67,8 @@ public class ApiTaskInfo {
     public AtomicInteger errorCount = new AtomicInteger(0);
     @ApiModelProperty(value = "Response count")
     public AtomicInteger responseCount = new AtomicInteger(0);
-    
-    
+
+
     public ApiTaskInfo(Integer taskId, CommunicationTask r) {
         this.taskId = taskId;
         this.ocppVersion = r.getOcppVersion();

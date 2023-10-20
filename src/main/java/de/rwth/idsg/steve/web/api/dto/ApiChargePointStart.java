@@ -41,11 +41,11 @@ public class ApiChargePointStart {
     private Integer connectorId;
     @ApiModelProperty(value = "OCPP Tag")
     private String ocppTag;
-    
+
     public ApiChargePointStart (String chargeBoxId, Integer connectorId, String ocppTag) {
         this.chargeBoxId = chargeBoxId;
         this.connectorId = connectorId;
         this.ocppTag = ocppTag;
     }
-    
+
 }

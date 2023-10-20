@@ -106,7 +106,7 @@ public class TransactionRepositoryImpl implements TransactionRepository {
                 .from(TRANSACTION)
                 .where(TRANSACTION.TRANSACTION_PK.eq(transaction_pk))
                 .fetchAny(TRANSACTION.ID_TAG);
-                /* .fetch().sortDesc(TRANSACTION.START_TIMESTAMP).getValue(0, TRANSACTION.ID_TAG); 
+                /* .fetch().sortDesc(TRANSACTION.START_TIMESTAMP).getValue(0, TRANSACTION.ID_TAG);
                        if TRANSACTION has sometimes errors an more then one open/active transaction per connector */
     }
 

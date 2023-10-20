@@ -38,12 +38,12 @@ import lombok.Setter;
 public class ApiChargePointList {
     @ApiModelProperty(value = "List of charge points")
     List<ChargePointInfo> chargePointList =  new ArrayList<>();;
-    
+
     public void addCP(String chargeBoxId, List<Integer> connectorIds){
         ChargePointInfo cp = new ChargePointInfo(chargeBoxId, connectorIds);
         this.chargePointList.add(cp);
     }
-    
+
     @Getter
     @Setter
     class ChargePointInfo {
@@ -51,11 +51,11 @@ public class ApiChargePointList {
         private String chargeBoxId;
         @ApiModelProperty(value = "List of the charge box connectors")
         private List<Integer> connectorIds;
-    
+
         public ChargePointInfo (String chargeBoxId, List<Integer> connectorIds) {
             this.chargeBoxId = chargeBoxId;
             this.connectorIds = connectorIds;
         }
     }
-    
+
 }

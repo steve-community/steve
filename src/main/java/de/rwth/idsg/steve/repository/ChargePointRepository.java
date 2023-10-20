@@ -45,6 +45,8 @@ public interface ChargePointRepository {
         return getChargePointSelect(protocol, inStatusFilter, Collections.emptyList());
     }
 
+    List<ChargePointSelect> getChargePointSelect(String ChageBoxID);
+
     List<String> getChargeBoxIds();
     Map<String, Integer> getChargeBoxIdPkPair(List<String> chargeBoxIdList);
 

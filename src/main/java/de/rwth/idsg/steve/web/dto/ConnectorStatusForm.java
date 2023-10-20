@@ -18,6 +18,7 @@
  */
 package de.rwth.idsg.steve.web.dto;
 
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -30,6 +31,8 @@ import lombok.ToString;
 @Setter
 @ToString
 public class ConnectorStatusForm {
+    @ApiModelProperty(value = "Charge Box Id")
     private String chargeBoxId;
+    @ApiModelProperty(value = "Status of the Charge Box")
     private String status;
 }

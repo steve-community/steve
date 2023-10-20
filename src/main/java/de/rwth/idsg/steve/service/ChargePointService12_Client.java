@@ -138,7 +138,15 @@ public class ChargePointService12_Client {
 
     public int remoteStartTransaction(RemoteStartTransactionParams params) {
         RemoteStartTransactionTask task = new RemoteStartTransactionTask(getVersion(), params);
+        return addRemoteStartTask(task);
+    }
+    
+    public int remoteStartTransaction(RemoteStartTransactionParams params, String caller) {
+        RemoteStartTransactionTask task = new RemoteStartTransactionTask(getVersion(), params, caller);
+        return addRemoteStartTask(task);
+    }
 
+     private int addRemoteStartTask(RemoteStartTransactionTask task) {
         BackgroundService.with(executorService)
                          .forFirst(task.getParams().getChargePointSelectList())
                          .execute(c -> getOcpp12Invoker().remoteStartTransaction(c, task));
@@ -146,9 +154,17 @@ public class ChargePointService12_Client {
         return taskStore.add(task);
     }
 
+    public int remoteStopTransaction(RemoteStopTransactionParams params, String caller) {
+        RemoteStopTransactionTask task = new RemoteStopTransactionTask(getVersion(), params, caller);
+        return addRemoteStopTask(task);
+    }
+
     public int remoteStopTransaction(RemoteStopTransactionParams params) {
         RemoteStopTransactionTask task = new RemoteStopTransactionTask(getVersion(), params);
-
+        return addRemoteStopTask(task);
+    }
+        
+    private int addRemoteStopTask(RemoteStopTransactionTask task) {
         BackgroundService.with(executorService)
                          .forFirst(task.getParams().getChargePointSelectList())
                          .execute(c -> getOcpp12Invoker().remoteStopTransaction(c, task));
@@ -158,6 +174,15 @@ public class ChargePointService12_Client {
 
     public int unlockConnector(UnlockConnectorParams params) {
         UnlockConnectorTask task = new UnlockConnectorTask(getVersion(), params);
+        return addRemoteUnlockTask(task);
+    }
+    
+    public int unlockConnector(UnlockConnectorParams params, String caller) {
+        UnlockConnectorTask task = new UnlockConnectorTask(getVersion(), params, caller);
+        return addRemoteUnlockTask(task);
+    }
+
+     private int addRemoteUnlockTask(UnlockConnectorTask task) {
 
         BackgroundService.with(executorService)
                          .forFirst(task.getParams().getChargePointSelectList())

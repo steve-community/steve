@@ -34,7 +34,7 @@ import lombok.Setter;
 import org.joda.time.DateTime;
 
 /**
- * @author Frank Brosi
+ * @author fnkbsi
  * @since 18.10.2023
  */
 

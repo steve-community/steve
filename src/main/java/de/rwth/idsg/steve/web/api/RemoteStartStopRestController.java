@@ -18,9 +18,6 @@
  */
 package de.rwth.idsg.steve.web.api;
 
-//import de.rwth.idsg.steve.web.controller.*;
-import de.rwth.idsg.steve.SteveException;
-
 import de.rwth.idsg.steve.ocpp.OcppVersion;
 import de.rwth.idsg.steve.repository.ChargePointRepository;
 import de.rwth.idsg.steve.repository.TaskStore;
@@ -45,6 +42,7 @@ import de.rwth.idsg.steve.web.api.dto.ApiChargePointList;
 import de.rwth.idsg.steve.web.api.dto.ApiChargePointStart;
 import de.rwth.idsg.steve.web.api.dto.ApiTaskInfo;
 import de.rwth.idsg.steve.web.api.dto.ApiTaskList;
+import de.rwth.idsg.steve.web.api.exception.BadRequestException;
 import de.rwth.idsg.steve.web.dto.ChargePointQueryForm;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
@@ -60,12 +58,13 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.validation.Valid;
 
 import java.util.List;
+import static java.util.Objects.isNull;
 
 
 
 /**
- * @author Sevket Goekay <sevketgokay@gmail.com>
- * @since 15.08.2014
+ * @author fnkbsi
+ * @since 18.10.2023
  */
 @Slf4j
 @RestController
@@ -90,12 +89,6 @@ public class RemoteStartStopRestController {
     @Autowired
     @Qualifier("ChargePointService16_Client")
     private ChargePointService16_Client client16;
-
-    // -------------------------------------------------------------------------
-    // Paths
-    // -------------------------------------------------------------------------
-
-
 
     // -------------------------------------------------------------------------
     // Helpers
@@ -326,10 +319,16 @@ public class RemoteStartStopRestController {
         RemoteStopTransactionParams transactionParams = new RemoteStopTransactionParams();
         transactionParams.setChargePointSelectList(chargePointRepository.getChargePointSelect(params.getChargeBoxId()));
         Integer transactionId = transactionRepository.getActiveTransactionId(params.getChargeBoxId(),params.getConnectorId());
+        if (isNull(transactionId)){
+            String errMsg = String.format("No active transaction found for connector %s at ChargeBox %s!",
+                    params.getConnectorId(),
+                    params.getChargeBoxId()
+            );
+            throw new BadRequestException(errMsg);
+        }
         String ocppTag = transactionRepository.getOcppTagOfTransaction(transactionId);
         if (!params.getOcppTag().contentEquals(ocppTag)){
-            // t.b.d.
-             throw new SteveException.NotFound("Wrong OCPP Tag!");
+             throw new BadRequestException("The transaction wass authorised with another OCPP Tag!");
         }
         transactionParams.setTransactionId(transactionId);
 
@@ -348,10 +347,16 @@ public class RemoteStartStopRestController {
         UnlockConnectorParams transactionParams = new UnlockConnectorParams();
         transactionParams.setChargePointSelectList(chargePointRepository.getChargePointSelect(params.getChargeBoxId()));
         Integer transactionId = transactionRepository.getActiveTransactionId(params.getChargeBoxId(), params.getConnectorId());
+        if (isNull(transactionId)){
+            String errMsg = String.format("No active transaction found for connector %s at ChargeBox %s!",
+                    params.getConnectorId(),
+                    params.getChargeBoxId()
+            );
+            throw new BadRequestException(errMsg);
+        }
         String ocppTag = transactionRepository.getOcppTagOfTransaction(transactionId);
         if (!params.getOcppTag().contentEquals(ocppTag)){
-            // t.b.d.
-             throw new SteveException.NotFound("Wrong OCPP Tag!");
+             throw new BadRequestException("The transaction wass authorised with another OCPP Tag!");
         }
         transactionParams.setConnectorId(params.getConnectorId());
         return remoteUnlock(params.getChargeBoxId(), transactionParams);

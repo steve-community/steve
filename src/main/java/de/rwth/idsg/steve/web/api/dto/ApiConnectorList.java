@@ -49,5 +49,5 @@ public class ApiConnectorList {
     Boolean isFiltered = false;
 
     @ApiModelProperty(value = "List of connectors")
-    List<ConnectorStatus> connectors = new ArrayList<>();;
+    List<ConnectorStatus> connectors = new ArrayList<>();
 }

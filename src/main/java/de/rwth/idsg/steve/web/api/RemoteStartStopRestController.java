@@ -272,11 +272,11 @@ public class RemoteStartStopRestController {
     @ResponseBody
     public Integer postRemoteStopTx(@Valid ApiChargePointStart params) {
         RemoteStopTransactionParams transactionParams = new RemoteStopTransactionParams();
-        // set the ChargPointSelectionList, maybe check nessesary that length is one 
+        // set the ChargPointSelectionList, maybe check nessesary that length is one
         transactionParams.setChargePointSelectList(chargePointRepository.getChargePointSelect(params.getChargeBoxId()));
 
-        // Get the transactionId of the active transaction on the connector. If no transaction active don't send RemoteStop 
-        Integer transactionId = transactionRepository.getActiveTransactionId(params.getChargeBoxId(),params.getConnectorId());
+        // Get the transactionId of the active transaction on the connector. If no transaction active don't send RemoteStop
+        Integer transactionId = transactionRepository.getActiveTransactionId(params.getChargeBoxId(), params.getConnectorId());
         if (isNull(transactionId)){
             String errMsg = String.format("No active transaction found for connector %s at ChargeBox %s!",
                     params.getConnectorId(),
@@ -306,7 +306,7 @@ public class RemoteStartStopRestController {
     public Integer postUnlockCon(@Valid ApiChargePointStart params) {
         UnlockConnectorParams transactionParams = new UnlockConnectorParams();
         transactionParams.setChargePointSelectList(chargePointRepository.getChargePointSelect(params.getChargeBoxId()));
-        
+
         /* If a active transaction is found, don't unlock the connection. */
         Integer transactionId = transactionRepository.getActiveTransactionId(params.getChargeBoxId(), params.getConnectorId());
         if (!isNull(transactionId)){

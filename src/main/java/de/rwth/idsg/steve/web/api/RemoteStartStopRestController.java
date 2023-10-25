@@ -20,7 +20,6 @@ package de.rwth.idsg.steve.web.api;
 
 import de.rwth.idsg.steve.ocpp.OcppVersion;
 import de.rwth.idsg.steve.repository.ChargePointRepository;
-import de.rwth.idsg.steve.repository.TaskStore;
 import de.rwth.idsg.steve.repository.TransactionRepository;
 import de.rwth.idsg.steve.repository.dto.ChargePointSelect;
 
@@ -40,8 +39,6 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import de.rwth.idsg.steve.web.api.ApiControllerAdvice.ApiErrorResponse;
 import de.rwth.idsg.steve.web.api.dto.ApiChargePointList;
 import de.rwth.idsg.steve.web.api.dto.ApiChargePointStart;
-import de.rwth.idsg.steve.web.api.dto.ApiTaskInfo;
-import de.rwth.idsg.steve.web.api.dto.ApiTaskList;
 import de.rwth.idsg.steve.web.api.exception.BadRequestException;
 import de.rwth.idsg.steve.web.dto.ChargePointQueryForm;
 import io.swagger.annotations.ApiResponse;
@@ -75,8 +72,6 @@ public class RemoteStartStopRestController {
     @Autowired protected ChargePointHelperService chargePointHelperService;
     @Autowired private ChargePointRepository chargePointRepository;
     @Autowired private TransactionRepository transactionRepository;
-    //@Autowired private OcppTagService ocppTagService;
-    @Autowired private TaskStore taskStore;
 
     @Autowired
     @Qualifier("ChargePointService12_Client")
@@ -184,12 +179,6 @@ public class RemoteStartStopRestController {
         return lsCp;
     }
 
-    private ApiTaskList getTaskList() {
-        ApiTaskList lsTasks = new ApiTaskList();
-        lsTasks.setTasks(taskStore.getOverview());
-        return lsTasks;
-    }
-
     // -------------------------------------------------------------------------
     // Http methods (GET)
     // -------------------------------------------------------------------------
@@ -240,49 +229,6 @@ public class RemoteStartStopRestController {
     @ResponseBody
     public ApiChargePointList getUnlockCon() {
         return getChargePoints();
-    }
-
-    // -------------------------------------------------------------------------
-    // Task --> need of polling
-    // -------------------------------------------------------------------------
-
-   @ApiResponses(value = {
-        @ApiResponse(code = 200, message = "OK"),
-        @ApiResponse(code = 400, message = "Bad Request", response = ApiErrorResponse.class),
-        @ApiResponse(code = 401, message = "Unauthorized", response = ApiErrorResponse.class),
-        @ApiResponse(code = 500, message = "Internal Server Error", response = ApiErrorResponse.class)}
-    )
-    @GetMapping(value = "taskoverview")
-    @ResponseBody
-    public ApiTaskList getOverview() {
-        return getTaskList();
-    }
-
-
-    @ApiResponses(value = {
-        @ApiResponse(code = 200, message = "OK"),
-        @ApiResponse(code = 400, message = "Bad Request", response = ApiErrorResponse.class),
-        @ApiResponse(code = 401, message = "Unauthorized", response = ApiErrorResponse.class),
-        @ApiResponse(code = 500, message = "Internal Server Error", response = ApiErrorResponse.class)}
-    )
-    @PostMapping(value = "clearfinishedtasks")
-    @ResponseBody
-    public ApiTaskList clearFinished() {
-        taskStore.clearFinished();
-        return getTaskList();
-    }
-
-    @ApiResponses(value = {
-        @ApiResponse(code = 200, message = "OK"),
-        @ApiResponse(code = 400, message = "Bad Request", response = ApiErrorResponse.class),
-        @ApiResponse(code = 401, message = "Unauthorized", response = ApiErrorResponse.class),
-        @ApiResponse(code = 500, message = "Internal Server Error", response = ApiErrorResponse.class)}
-    )
-    @GetMapping(value = "task")
-    @ResponseBody
-    public ApiTaskInfo getTaskDetails(@Valid Integer taskId) {
-        ApiTaskInfo taskInfo = new ApiTaskInfo(taskId, taskStore.get(taskId));
-        return taskInfo;
     }
 
     // -------------------------------------------------------------------------

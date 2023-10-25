@@ -102,7 +102,7 @@ public class RemoteStartStopRestController {
 
      private Integer remoteStart(String chargeBoxId, RemoteStartTransactionParams transactionParams) {
         String ocppProtocol = getOcppProtocol(chargeBoxId);
-        Integer taskId = 0;
+        Integer taskId;
         switch (ocppProtocol) {
             case "OCPP1.6J":
             case "OCPP1.6S":
@@ -121,9 +121,10 @@ public class RemoteStartStopRestController {
         }
         return taskId;
     }
-    private Integer remoteStop(String chargeBoxId, RemoteStopTransactionParams transactionParams) {
+
+     private Integer remoteStop(String chargeBoxId, RemoteStopTransactionParams transactionParams) {
         String ocppProtocol = getOcppProtocol(chargeBoxId);
-        Integer taskId = 0;
+        Integer taskId;
         switch (ocppProtocol) {
             case "OCPP1.6J":
             case "OCPP1.6S":
@@ -139,14 +140,13 @@ public class RemoteStartStopRestController {
                 break;
             default:
                  taskId = client12.remoteStopTransaction(transactionParams, "SteveWebApi");
-
         }
          return taskId;
     }
 
     private Integer remoteUnlock(String chargeBoxId, UnlockConnectorParams transactionParams) {
         String ocppProtocol = getOcppProtocol(chargeBoxId);
-        Integer taskId = 0;
+        Integer taskId;
         switch (ocppProtocol) {
             case "OCPP1.6J":
             case "OCPP1.6S":
@@ -189,8 +189,6 @@ public class RemoteStartStopRestController {
         lsTasks.setTasks(taskStore.getOverview());
         return lsTasks;
     }
-
-
 
     // -------------------------------------------------------------------------
     // Http methods (GET)
@@ -300,6 +298,17 @@ public class RemoteStartStopRestController {
     @PostMapping(value = "start")
     @ResponseBody
     public Integer postRemoteStartTx(@Valid ApiChargePointStart params) {
+        // Check for acctive transactions on the connector, If a active transaction is found, don't send RemoteStart.
+        Integer transactionId = transactionRepository.getActiveTransactionId(params.getChargeBoxId(), params.getConnectorId());
+        if (!isNull(transactionId)){
+            String errMsg = String.format("Active transaction found for connector %s at ChargeBox %s!",
+                    params.getConnectorId(),
+                    params.getChargeBoxId()
+            );
+            throw new BadRequestException(errMsg);
+        }
+        // Check if OCPP-Tag is allowed to use the connector? To be discussed and t.b.d.!
+
         RemoteStartTransactionParams transactionParams = new RemoteStartTransactionParams();
         transactionParams.setChargePointSelectList(chargePointRepository.getChargePointSelect(params.getChargeBoxId()));
         transactionParams.setConnectorId(params.getConnectorId());
@@ -317,7 +326,10 @@ public class RemoteStartStopRestController {
     @ResponseBody
     public Integer postRemoteStopTx(@Valid ApiChargePointStart params) {
         RemoteStopTransactionParams transactionParams = new RemoteStopTransactionParams();
+        // set the ChargPointSelectionList, maybe check nessesary that length is one 
         transactionParams.setChargePointSelectList(chargePointRepository.getChargePointSelect(params.getChargeBoxId()));
+
+        // Get the transactionId of the active transaction on the connector. If no transaction active don't send RemoteStop 
         Integer transactionId = transactionRepository.getActiveTransactionId(params.getChargeBoxId(),params.getConnectorId());
         if (isNull(transactionId)){
             String errMsg = String.format("No active transaction found for connector %s at ChargeBox %s!",
@@ -326,6 +338,8 @@ public class RemoteStartStopRestController {
             );
             throw new BadRequestException(errMsg);
         }
+
+        // check the user is allowed to stop this transaction (actual only the one who started it!)
         String ocppTag = transactionRepository.getOcppTagOfTransaction(transactionId);
         if (!params.getOcppTag().contentEquals(ocppTag)){
              throw new BadRequestException("The transaction wass authorised with another OCPP Tag!");
@@ -346,18 +360,17 @@ public class RemoteStartStopRestController {
     public Integer postUnlockCon(@Valid ApiChargePointStart params) {
         UnlockConnectorParams transactionParams = new UnlockConnectorParams();
         transactionParams.setChargePointSelectList(chargePointRepository.getChargePointSelect(params.getChargeBoxId()));
+        
+        /* If a active transaction is found, don't unlock the connection. */
         Integer transactionId = transactionRepository.getActiveTransactionId(params.getChargeBoxId(), params.getConnectorId());
-        if (isNull(transactionId)){
-            String errMsg = String.format("No active transaction found for connector %s at ChargeBox %s!",
+        if (!isNull(transactionId)){
+            String errMsg = String.format("Active transaction found for connector %s at ChargeBox %s!",
                     params.getConnectorId(),
                     params.getChargeBoxId()
             );
             throw new BadRequestException(errMsg);
         }
-        String ocppTag = transactionRepository.getOcppTagOfTransaction(transactionId);
-        if (!params.getOcppTag().contentEquals(ocppTag)){
-             throw new BadRequestException("The transaction wass authorised with another OCPP Tag!");
-        }
+
         transactionParams.setConnectorId(params.getConnectorId());
         return remoteUnlock(params.getChargeBoxId(), transactionParams);
     }

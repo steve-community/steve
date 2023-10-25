@@ -18,7 +18,6 @@
  */
 package de.rwth.idsg.steve.web.api.dto;
 
-//import de.rwth.idsg.steve.ocpp.OcppTransport;
 import de.rwth.idsg.steve.ocpp.CommunicationTask;
 import de.rwth.idsg.steve.ocpp.OcppVersion;
 import de.rwth.idsg.steve.ocpp.RequestResult;
@@ -26,10 +25,8 @@ import de.rwth.idsg.steve.ocpp.TaskOrigin;
 import io.swagger.annotations.ApiModelProperty;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
-//import java.util.Collections;
-//import java.util.List;
+
 import lombok.Getter;
-//import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import org.joda.time.DateTime;
 
@@ -40,7 +37,6 @@ import org.joda.time.DateTime;
 
 @Getter
 @Setter
-//@RequiredArgsConstructor
 public class ApiTaskInfo {
     @ApiModelProperty(value = "Task ID")
     public Integer taskId;

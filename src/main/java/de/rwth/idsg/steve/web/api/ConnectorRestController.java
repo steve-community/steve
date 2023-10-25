@@ -68,7 +68,7 @@ public class ConnectorRestController {
     )
     @GetMapping(value = "")
     @ResponseBody
-    public ApiConnectorList getConnectorStatusQuery(@Valid ConnectorStatusForm queryParams) {
+    public ApiConnectorList getConnectors(@Valid ConnectorStatusForm queryParams) {
         ApiConnectorList conList = new ApiConnectorList();
         conList.setChargeBoxList(chargePointRepository.getChargeBoxIds());
 

@@ -18,10 +18,13 @@
  */
 package de.rwth.idsg.steve.web.api;
 
+import de.rwth.idsg.steve.ocpp.CommunicationTask;
 import de.rwth.idsg.steve.ocpp.OcppVersion;
 import de.rwth.idsg.steve.repository.ChargePointRepository;
+import de.rwth.idsg.steve.repository.TaskStore;
 import de.rwth.idsg.steve.repository.TransactionRepository;
 import de.rwth.idsg.steve.repository.dto.ChargePointSelect;
+import de.rwth.idsg.steve.repository.dto.TaskOverview;
 
 import de.rwth.idsg.steve.service.ChargePointHelperService;
 import de.rwth.idsg.steve.service.ChargePointService12_Client;
@@ -72,6 +75,7 @@ public class RemoteStartStopRestController {
     @Autowired protected ChargePointHelperService chargePointHelperService;
     @Autowired private ChargePointRepository chargePointRepository;
     @Autowired private TransactionRepository transactionRepository;
+    @Autowired private TaskStore taskStore;
 
     @Autowired
     @Qualifier("ChargePointService12_Client")
@@ -90,7 +94,7 @@ public class RemoteStartStopRestController {
     // -------------------------------------------------------------------------
 
      private String getOcppProtocol(String chargeBoxId) {
-         ChargePointQueryForm form = new ChargePointQueryForm();
+        ChargePointQueryForm form = new ChargePointQueryForm();
         form.setChargeBoxId(chargeBoxId);
         return chargePointRepository.getOverview(form).get(0).getOcppProtocol().toUpperCase();
      }
@@ -179,6 +183,21 @@ public class RemoteStartStopRestController {
         return lsCp;
     }
 
+    private Boolean activeTaskOnChargeBox(String chargeBoxId) {
+        Boolean retValue = false;
+        List<TaskOverview> taskList = taskStore.getOverview();
+        for (TaskOverview taOverview : taskList) {
+            CommunicationTask task = taskStore.get(taOverview.getTaskId());
+            if (!task.isFinished()) {
+                if (!isNull(task.getResultMap().get(chargeBoxId))) {
+                    retValue = true;
+                    break;
+                }
+            }
+        }
+        return retValue;
+    }
+
     // -------------------------------------------------------------------------
     // Http methods (GET)
     // -------------------------------------------------------------------------
@@ -233,6 +252,7 @@ public class RemoteStartStopRestController {
 
     // -------------------------------------------------------------------------
     // Http methods (POST)
+    // the methods return the taskID, check the sucess with the TaskRestController
     // -------------------------------------------------------------------------
 
     @ApiResponses(value = {
@@ -244,9 +264,17 @@ public class RemoteStartStopRestController {
     @PostMapping(value = "start")
     @ResponseBody
     public Integer postRemoteStartTx(@Valid ApiChargePointStart params) {
+        // only one active task per charge box over api; to be discussed!
+        if (activeTaskOnChargeBox(params.getChargeBoxId())) {
+            String errMsg = String.format("Active task found on ChargeBox %s!",
+                    params.getChargeBoxId()
+            );
+            throw new BadRequestException(errMsg);
+        }
+
         // Check for acctive transactions on the connector, If a active transaction is found, don't send RemoteStart.
         Integer transactionId = transactionRepository.getActiveTransactionId(params.getChargeBoxId(), params.getConnectorId());
-        if (!isNull(transactionId)){
+        if (!isNull(transactionId)) {
             String errMsg = String.format("Active transaction found for connector %s at ChargeBox %s!",
                     params.getConnectorId(),
                     params.getChargeBoxId()
@@ -271,6 +299,14 @@ public class RemoteStartStopRestController {
     @PostMapping(value = "stop")
     @ResponseBody
     public Integer postRemoteStopTx(@Valid ApiChargePointStart params) {
+        // only one active task per charge box over api; to be discussed!
+        if (activeTaskOnChargeBox(params.getChargeBoxId())) {
+            String errMsg = String.format("Active task found on ChargeBox %s!",
+                    params.getChargeBoxId()
+            );
+            throw new BadRequestException(errMsg);
+        }
+
         RemoteStopTransactionParams transactionParams = new RemoteStopTransactionParams();
         // set the ChargPointSelectionList, maybe check nessesary that length is one
         transactionParams.setChargePointSelectList(chargePointRepository.getChargePointSelect(params.getChargeBoxId()));
@@ -304,6 +340,14 @@ public class RemoteStartStopRestController {
     @PostMapping(value = "unlock")
     @ResponseBody
     public Integer postUnlockCon(@Valid ApiChargePointStart params) {
+        // only one active task per charge box over api; to be discussed!
+        if (activeTaskOnChargeBox(params.getChargeBoxId())) {
+            String errMsg = String.format("Active task found on ChargeBox %s!",
+                    params.getChargeBoxId()
+            );
+            throw new BadRequestException(errMsg);
+        }
+
         UnlockConnectorParams transactionParams = new UnlockConnectorParams();
         transactionParams.setChargePointSelectList(chargePointRepository.getChargePointSelect(params.getChargeBoxId()));
 

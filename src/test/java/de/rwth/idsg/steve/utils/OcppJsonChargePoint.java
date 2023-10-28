@@ -32,6 +32,7 @@ import de.rwth.idsg.steve.ocpp.ws.data.ErrorCode;
 import de.rwth.idsg.steve.ocpp.ws.data.MessageType;
 import de.rwth.idsg.steve.ocpp.ws.data.OcppJsonCall;
 import de.rwth.idsg.steve.ocpp.ws.data.OcppJsonError;
+import de.rwth.idsg.steve.ocpp.ws.data.OcppJsonMessage;
 import de.rwth.idsg.steve.ocpp.ws.data.OcppJsonResponse;
 import de.rwth.idsg.steve.ocpp.ws.data.OcppJsonResult;
 import de.rwth.idsg.steve.ocpp.ws.pipeline.Serializer;
@@ -68,11 +69,14 @@ public class OcppJsonChargePoint {
     private final String chargeBoxId;
     private final String connectionPath;
     private final Map<String, ResponseContext> responseContextMap;
-    private final ResponseDeserializer deserializer;
+    private final MessageDeserializer deserializer;
     private final WebSocketClient client;
     private final CountDownLatch closeHappenedSignal;
 
-    private CountDownLatch receivedResponsesSignal;
+    private final Thread testerThread;
+    private RuntimeException testerThreadInterruptReason;
+
+    private CountDownLatch receivedMessagesSignal;
     private Session session;
 
     public OcppJsonChargePoint(OcppVersion version, String chargeBoxId, String pathPrefix) {
@@ -84,9 +88,10 @@ public class OcppJsonChargePoint {
         this.chargeBoxId = chargeBoxId;
         this.connectionPath = pathPrefix + chargeBoxId;
         this.responseContextMap = new LinkedHashMap<>(); // because we want to keep the insertion order of test cases
-        this.deserializer = new ResponseDeserializer();
+        this.deserializer = new MessageDeserializer();
         this.client = new WebSocketClient();
         this.closeHappenedSignal = new CountDownLatch(1);
+        this.testerThread = Thread.currentThread();
     }
 
     @OnWebSocketConnect
@@ -108,19 +113,20 @@ public class OcppJsonChargePoint {
     @OnWebSocketMessage
     public void onMessage(Session session, String msg) {
         try {
-            OcppJsonResponse response = deserializer.extractResponse(msg);
-            ResponseContext ctx = responseContextMap.remove(response.getMessageId());
+            OcppJsonMessage ocppMsg = deserializer.extract(msg);
 
-            if (response instanceof OcppJsonResult) {
-                ctx.responseHandler.accept(((OcppJsonResult) response).getPayload());
-            } else if (response instanceof OcppJsonError) {
-                ctx.errorHandler.accept((OcppJsonError) response);
+            if (ocppMsg instanceof OcppJsonResult) {
+                ResponseContext ctx = responseContextMap.remove(ocppMsg.getMessageId());
+                ctx.responseHandler.accept(((OcppJsonResult) ocppMsg).getPayload());
+            } else if (ocppMsg instanceof OcppJsonError) {
+                ResponseContext ctx = responseContextMap.remove(ocppMsg.getMessageId());
+                ctx.errorHandler.accept((OcppJsonError) ocppMsg);
             }
         } catch (Exception e) {
             log.error("Exception", e);
         } finally {
-            if (receivedResponsesSignal != null) {
-                receivedResponsesSignal.countDown();
+            if (receivedMessagesSignal != null) {
+                receivedMessagesSignal.countDown();
             }
         }
     }
@@ -166,11 +172,12 @@ public class OcppJsonChargePoint {
     }
 
     public void process() {
+        int responseCount = responseContextMap.values().size();
+        receivedMessagesSignal = new CountDownLatch(responseCount);
+
         // copy the values in a new list to be iterated over, because otherwise we get a ConcurrentModificationException,
         // since the onMessage(..) uses the same responseContextMap to remove an item while looping over its items here.
         ArrayList<ResponseContext> values = new ArrayList<>(responseContextMap.values());
-
-        receivedResponsesSignal = new CountDownLatch(values.size());
 
         // send all messages
         for (ResponseContext ctx : values) {
@@ -183,8 +190,11 @@ public class OcppJsonChargePoint {
 
         // wait for all responses to arrive and be processed
         try {
-            receivedResponsesSignal.await();
+            receivedMessagesSignal.await();
         } catch (InterruptedException e) {
+            if (testerThreadInterruptReason != null) {
+                throw testerThreadInterruptReason;
+            }
             throw new RuntimeException(e);
         }
     }
@@ -239,9 +249,9 @@ public class OcppJsonChargePoint {
         }
     }
 
-    private class ResponseDeserializer {
+    private class MessageDeserializer {
 
-        private OcppJsonResponse extractResponse(String msg) throws Exception {
+        private OcppJsonMessage extract(String msg) throws Exception {
             ObjectMapper mapper = JsonObjectMapper.INSTANCE.getMapper();
 
             try (JsonParser parser = mapper.getFactory().createParser(msg)) {

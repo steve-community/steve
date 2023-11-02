@@ -37,7 +37,7 @@ import lombok.Setter;
 public class ApiChargePointStart {
     @ApiModelProperty(value = "Charge Box ID")
     private String chargeBoxId;
-    @ApiModelProperty(value = "List of the charge box connectors")
+    @ApiModelProperty(value = "Connector ID")
     private Integer connectorId;
     @ApiModelProperty(value = "OCPP Tag")
     private String ocppTag;

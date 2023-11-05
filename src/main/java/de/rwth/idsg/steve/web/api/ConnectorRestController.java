@@ -74,7 +74,12 @@ public class ConnectorRestController {
 
         conList.setIsFiltered(isFilterd(queryParams));
         List<ConnectorStatus> latestList = chargePointHelperService.getChargePointConnectorStatus(queryParams);
-        List<ConnectorStatus> sortedList = ConnectorStatusFilter.filterAndPreferZero(latestList);
+        List<ConnectorStatus> sortedList;
+        if (queryParams.getStrategy() == ConnectorStatusForm.Strategy.PreferZero) {
+            sortedList = ConnectorStatusFilter.filterAndPreferZero(latestList);
+        } else {
+            sortedList = ConnectorStatusFilter.filterAndPreferOthersWithStatusOfZero(latestList);
+        }
         conList.setConnectors(sortedList);
         return conList;
     }

@@ -33,6 +33,13 @@ import lombok.ToString;
 public class ConnectorStatusForm {
     @ApiModelProperty(value = "Charge Box Id")
     private String chargeBoxId;
-    @ApiModelProperty(value = "Status of the Charge Box")
+    @ApiModelProperty(value = "Connector Status")
     private String status;
+    @ApiModelProperty(value = "Strategy of listing the connector")
+    private Strategy strategy = Strategy.PreferZero;
+
+    public enum Strategy {
+        PreferZero,
+        PreferOthersWithStatusOfZero;
+    }
 }

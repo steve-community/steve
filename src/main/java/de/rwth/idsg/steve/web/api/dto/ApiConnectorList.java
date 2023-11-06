@@ -40,14 +40,14 @@ import lombok.Setter;
 public class ApiConnectorList {
 
     @ApiModelProperty(value = "List of charge boxes")
-    List<String> chargeBoxList = new ArrayList<>();
+    private List<String> chargeBoxList = new ArrayList<>();
 
     @ApiModelProperty(value = "List of possible states")
-    final Set<String> statusFilterValues = ConnectorStatusCountFilter.ALL_STATUS_VALUES;
+    private final Set<String> statusFilterValues = ConnectorStatusCountFilter.ALL_STATUS_VALUES;
 
     @ApiModelProperty(value = "List of connectors is filtered")
-    Boolean isFiltered = false;
+    private Boolean isFiltered = false;
 
     @ApiModelProperty(value = "List of connectors")
-    List<ConnectorStatus> connectors = new ArrayList<>();
+    private List<ConnectorStatus> connectors = new ArrayList<>();
 }

@@ -35,5 +35,5 @@ import lombok.Setter;
 //@RequiredArgsConstructor
 public class ApiTaskList {
     @ApiModelProperty(value = "List of tasks")
-    List<TaskOverview> tasks;
+    private List<TaskOverview> tasks;
 }

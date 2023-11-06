@@ -39,30 +39,30 @@ import org.joda.time.DateTime;
 @Setter
 public class ApiTaskInfo {
     @ApiModelProperty(value = "Task ID")
-    public Integer taskId;
+    private Integer taskId;
     @ApiModelProperty(value = "OCPP version")
-    public OcppVersion ocppVersion;
+    private OcppVersion ocppVersion;
     @ApiModelProperty(value = "OCPP operation")
-    public String operationName;
+    private String operationName;
     @ApiModelProperty(value = "external / internal")
-    public TaskOrigin origin;
+    private TaskOrigin origin;
     @ApiModelProperty(value = "Caller of the Task")
-    public String caller;
+    private String caller;
 
     @ApiModelProperty(value = "Results")
-    public Map<String, RequestResult> resultMap;
+    private Map<String, RequestResult> resultMap;
     @ApiModelProperty(value = "Count of Results")
-    public int resultSize;
+    private int resultSize;
 
     @ApiModelProperty(value = "Starttime")
-    public DateTime startTimestamp = DateTime.now();
+    private DateTime startTimestamp = DateTime.now();
     @ApiModelProperty(value = "Endtime")
-    public DateTime endTimestamp;
+    private DateTime endTimestamp;
 
     @ApiModelProperty(value = "Error count")
-    public AtomicInteger errorCount = new AtomicInteger(0);
+    private AtomicInteger errorCount = new AtomicInteger(0);
     @ApiModelProperty(value = "Response count")
-    public AtomicInteger responseCount = new AtomicInteger(0);
+    private AtomicInteger responseCount = new AtomicInteger(0);
 
 
     public ApiTaskInfo(Integer taskId, CommunicationTask r) {

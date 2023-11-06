@@ -36,7 +36,7 @@ public interface TransactionRepository {
 
     List<Integer> getActiveTransactionIds(String chargeBoxId);
     Integer getActiveTransactionId(String chargeBoxId, Integer connectorId);
-    String getOcppTagOfTransaction(Integer transaction_pk);
+    String getOcppTagOfTransaction(Integer transactionPk);
 
     TransactionDetails getDetails(int transactionPk, boolean firstArrivingMeterValueIfMultiple);
 

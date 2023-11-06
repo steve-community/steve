@@ -79,7 +79,7 @@ public class HomeController {
 
         List<ConnectorStatus> latestList = chargePointHelperService.getChargePointConnectorStatus(params);
         List<ConnectorStatus> filteredList;
-        if (params.getStrategy()== ConnectorStatusForm.Strategy.PreferZero){
+        if (params.getStrategy() == ConnectorStatusForm.Strategy.PreferZero) {
             filteredList = ConnectorStatusFilter.filterAndPreferZero(latestList);
         } else {
             filteredList = ConnectorStatusFilter.filterAndPreferOthersWithStatusOfZero(latestList);

@@ -45,6 +45,6 @@ public final class OcppJsonStatus {
     private final String connectionDuration;
     @ApiModelProperty(value = "Ocpp version")
     private final OcppVersion version;
-    @ApiModelProperty(value = "Connected since as DT", hidden= true)
+    @ApiModelProperty(value = "Connected since as DT", hidden = true)
     private final DateTime connectedSinceDT;
 }

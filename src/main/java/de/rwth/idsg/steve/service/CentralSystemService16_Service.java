@@ -173,6 +173,8 @@ public class CentralSystemService16_Service {
         IdTagInfo info = ocppTagService.getIdTagInfo(
                 parameters.getIdTag(),
                 true,
+                chargeBoxIdentity,
+                parameters.getConnectorId(),
                 () -> new IdTagInfo().withStatus(AuthorizationStatus.INVALID) // IdTagInfo is required
         );
 
@@ -204,6 +206,8 @@ public class CentralSystemService16_Service {
         IdTagInfo idTagInfo = ocppTagService.getIdTagInfo(
                 parameters.getIdTag(),
                 false,
+                chargeBoxIdentity,
+                null,
                 () -> null
         );
 
@@ -239,6 +243,8 @@ public class CentralSystemService16_Service {
         IdTagInfo idTagInfo = ocppTagService.getIdTagInfo(
                 parameters.getIdTag(),
                 false,
+                chargeBoxIdentity,
+                null,
                 () -> new IdTagInfo().withStatus(AuthorizationStatus.INVALID)
         );
 

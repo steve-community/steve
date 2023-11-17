@@ -140,29 +140,29 @@ public class ChargePointServiceImpl implements ChargePointService {
 
         for (ConnectorLastStatus r : result) {
             OcppChargeBox cb = chargeBoxMap.get(r.getChargeBoxId());
-            if (cb == null) {
-                throw new IllegalArgumentException("Invalid charge box id: " + r.getChargeBoxId());
-            }
+            if (cb != null) {
+                // https://github.com/steve-community/steve/issues/691
+                boolean chargeBoxStatusCondition = cb.getRegistrationStatus().equals(RegistrationStatus.ACCEPTED.value());
 
-            // https://github.com/steve-community/steve/issues/691
-            boolean chargeBoxStatusCondition = cb.getRegistrationStatus().equals(RegistrationStatus.ACCEPTED.value());
+                boolean statusCondition = form == null || form.getStatus() == null ||
+                        form.getStatus().equals(r.getStatus());
 
-            boolean statusCondition = form == null || form.getStatus() == null ||
-                    form.getStatus().equals(r.getStatus());
-
-            boolean chargeBoxCondition = form == null || form.getChargeBoxId() == null ||
-                    form.getChargeBoxId().equals(r.getChargeBoxId());
-            if (chargeBoxStatusCondition && statusCondition && chargeBoxCondition) {
-                ConnectorStatus s = ConnectorStatus.builder()
-                        .chargeBoxPk(cb.getChargeBoxPk())
-                        .chargeBoxId(r.getChargeBoxId())
-                        .connectorId(r.getConnectorId())
-                        .timeStamp(r.getStatusTimestamp() != null ? DateTimeUtils.humanize(new DateTime(r.getStatusTimestamp())) : null)
-                        .statusTimestamp(r.getStatusTimestamp() != null ? new DateTime(r.getStatusTimestamp()) : null)
-                        .status(r.getStatus())
-                        .errorCode(r.getErrorCode())
-                        .build();
-                statusList.add(s);
+                boolean chargeBoxCondition = form == null || form.getChargeBoxId() == null ||
+                        form.getChargeBoxId().equals(r.getChargeBoxId());
+                if (chargeBoxStatusCondition && statusCondition && chargeBoxCondition) {
+                    ConnectorStatus s = ConnectorStatus.builder()
+                            .chargeBoxPk(cb.getChargeBoxPk())
+                            .chargeBoxId(r.getChargeBoxId())
+                            .connectorId(r.getConnectorId())
+                            .timeStamp(r.getStatusTimestamp() != null ? DateTimeUtils.humanize(new DateTime(r.getStatusTimestamp())) : null)
+                            .statusTimestamp(r.getStatusTimestamp() != null ? new DateTime(r.getStatusTimestamp()) : null)
+                            .status(r.getStatus())
+                            .errorCode(r.getErrorCode())
+                            .build();
+                    statusList.add(s);
+                }
+            } else {
+                log.warn("Invalid charge box id: {}" + r.getChargeBoxId());
             }
         }
 
@@ -234,6 +234,7 @@ public class ChargePointServiceImpl implements ChargePointService {
 
         try {
             OcppAddress addr = cb.getAddress();
+
 
             chargeBoxRepository.delete(cb);
             addressRepository.delete(addr);

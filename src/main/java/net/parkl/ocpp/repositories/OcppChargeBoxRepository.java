@@ -18,7 +18,6 @@
  */
 package net.parkl.ocpp.repositories;
 
-import de.rwth.idsg.steve.ocpp.OcppProtocol;
 import net.parkl.ocpp.entities.OcppChargeBox;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;

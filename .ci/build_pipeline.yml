@@ -15,7 +15,7 @@ steps:
       goals: 'clean install -Drevision=1-SNAPSHOT flatten:flatten'
       publishJUnitResults: false
       javaHomeOption: 'JDKVersion'
-      jdkVersionOption: '1.11'
+      jdkVersionOption: '1.17'
       mavenVersionOption: 'Default'
       mavenAuthenticateFeed: false
       effectivePomSkip: false

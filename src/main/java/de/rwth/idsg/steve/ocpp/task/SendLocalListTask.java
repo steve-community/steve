@@ -31,7 +31,7 @@ import de.rwth.idsg.steve.web.dto.ocpp.SendLocalListUpdateType;
 import net.parkl.ocpp.service.cluster.PersistentTaskResultCallback;
 import ocpp.cp._2015._10.AuthorizationData;
 
-import javax.xml.ws.AsyncHandler;
+import jakarta.xml.ws.AsyncHandler;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;

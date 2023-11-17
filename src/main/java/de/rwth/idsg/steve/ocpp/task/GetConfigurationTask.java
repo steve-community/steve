@@ -33,7 +33,7 @@ import net.parkl.ocpp.service.cluster.PersistentTaskResultCallback;
 import ocpp.cp._2012._06.GetConfigurationRequest;
 import ocpp.cp._2012._06.GetConfigurationResponse;
 
-import javax.xml.ws.AsyncHandler;
+import jakarta.xml.ws.AsyncHandler;
 import java.util.List;
 import java.util.stream.Collectors;
 

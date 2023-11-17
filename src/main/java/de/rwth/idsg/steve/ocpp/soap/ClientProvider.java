@@ -38,7 +38,7 @@ import org.springframework.util.StringUtils;
 import javax.annotation.PostConstruct;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocketFactory;
-import javax.xml.ws.soap.SOAPBinding;
+import jakarta.xml.ws.soap.SOAPBinding;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>

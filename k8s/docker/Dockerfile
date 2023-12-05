@@ -1,5 +1,5 @@
 # syntax=docker/dockerfile:1
-FROM eclipse-temurin:11-jdk as build
+FROM eclipse-temurin:11-jdk as base
 
 ENV LANG=C.UTF-8 LC_ALL=C.UTF-8
 
@@ -8,6 +8,8 @@ ARG DB_USERNAME
 ARG DB_PASSWORD
 ARG DB_DATABASE
 ARG DB_PORT
+
+FROM base as build
 
 WORKDIR /code
 
@@ -25,18 +27,10 @@ RUN sed -i 's|${db.schema}|${env.DB_DATABASE}|g' pom.xml
 
 RUN ./mvnw clean package -Pkubernetes -Djdk.tls.client.protocols="TLSv1,TLSv1.1,TLSv1.2"
 
-FROM eclipse-temurin:11-jdk
+FROM base
 MAINTAINER daynnnnn
 
-ENV LANG=C.UTF-8 LC_ALL=C.UTF-8
-
-ARG DB_HOST
-ARG DB_USERNAME
-ARG DB_PASSWORD
-ARG DB_DATABASE
-ARG DB_PORT
-
 COPY --from=build /code/target/steve.jar steve.jar
-COPY --from=build /code/libs libs
+COPY --from=build /code/target/libs libs
 
 CMD java -jar steve.jar

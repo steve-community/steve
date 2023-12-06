@@ -64,7 +64,7 @@ public class ConnectorRestController {
         @ApiResponse(code = 200, message = "OK"),
         @ApiResponse(code = 400, message = "Bad Request", response = ApiControllerAdvice.ApiErrorResponse.class),
         @ApiResponse(code = 401, message = "Unauthorized", response = ApiControllerAdvice.ApiErrorResponse.class),
-        @ApiResponse(code = 500, message = "Internal Server Error", 
+        @ApiResponse(code = 500, message = "Internal Server Error",
                 response = ApiControllerAdvice.ApiErrorResponse.class)}
     )
     @GetMapping(value = "")
@@ -89,7 +89,7 @@ public class ConnectorRestController {
         @ApiResponse(code = 200, message = "OK"),
         @ApiResponse(code = 400, message = "Bad Request", response = ApiControllerAdvice.ApiErrorResponse.class),
         @ApiResponse(code = 401, message = "Unauthorized", response = ApiControllerAdvice.ApiErrorResponse.class),
-        @ApiResponse(code = 500, message = "Internal Server Error", 
+        @ApiResponse(code = 500, message = "Internal Server Error",
                 response = ApiControllerAdvice.ApiErrorResponse.class)}
     )
     @GetMapping(value = "OCPP_JSON_STATUS")

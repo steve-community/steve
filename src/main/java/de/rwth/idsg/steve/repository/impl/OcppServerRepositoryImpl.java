@@ -455,6 +455,7 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
         try {
             ctx.insertInto(TRANSACTION_STOP_FAILED)
                .set(TRANSACTION_STOP_FAILED.TRANSACTION_PK, p.getTransactionId())
+               .set(TRANSACTION_STOP_FAILED.CHARGE_BOX_ID, p.getChargeBoxId())
                .set(TRANSACTION_STOP_FAILED.EVENT_TIMESTAMP, p.getEventTimestamp())
                .set(TRANSACTION_STOP_FAILED.EVENT_ACTOR, mapActor(p.getEventActor()))
                .set(TRANSACTION_STOP_FAILED.STOP_TIMESTAMP, p.getStopTimestamp())

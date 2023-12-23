@@ -104,6 +104,7 @@ public class TransactionRepositoryImpl implements TransactionRepository {
                 .from(TRANSACTION)
                 .where(TRANSACTION.CONNECTOR_PK.eq(connectorPk))
                 .and(TRANSACTION.STOP_VALUE.isNull())
+                .orderBy(TRANSACTION.TRANSACTION_PK.desc()) // to avoid fetching ghost transactions, fetch the latest
                 .fetchAny(TRANSACTION.ID_TAG);
     }
 

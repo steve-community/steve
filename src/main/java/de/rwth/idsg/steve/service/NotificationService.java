@@ -146,10 +146,16 @@ public class NotificationService {
                     notification.getConnectorId()
         );
         if (ocppTag != null) {
-            UserRecord userRecord = userRepository.getDetails(ocppTag).getUserRecord();
-            String eMailAddy = userRecord.getEMail();
+            String eMailAddress = null;
+            UserRecord userRecord = new UserRecord();
+            try {
+                userRecord = userRepository.getDetails(ocppTag).getUserRecord();
+                eMailAddress = userRecord.getEMail();
+            } catch (Exception e) {
+                log.error("Failed to send email (SuspendedEV). User not found! ", e);    
+            }
             // send email if user with eMail address found
-            if (!Strings.isNullOrEmpty(eMailAddy)) {
+            if (!Strings.isNullOrEmpty(eMailAddress)) {
                 String bodyUserMail =
                         format("User: %s %s \n\n Connector %d of charging station %s notifies Suspended_EV",
                                 userRecord.getFirstName(),
@@ -158,7 +164,7 @@ public class NotificationService {
                                 notification.getChargeBoxId()
                         );
 
-                mailService.sendAsync(subject, addTimestamp(bodyUserMail), eMailAddy);
+                mailService.sendAsync(subject, addTimestamp(bodyUserMail), eMailAddress);
             }
         }
 
@@ -170,17 +176,24 @@ public class NotificationService {
                 notification.getConnectorId(),
                 notification.getChargeBoxId()
         );
-        mailService.sendAsync(subject, addTimestamp(body), "");
+        mailService.sendAsync(subject, addTimestamp(body));
     }
 
     @EventListener
     @Async
     public void ocppTransactionEnded(OcppTransactionEnded notification) {
+        String eMailAddress = null;
+        UserRecord userRecord = new UserRecord();
+            
         Transaction transActParams = transactionRepository.getTransaction(notification.getParams().getTransactionId());
 
         transActParams.getOcppTagPk();
-        UserRecord userRecord = userRepository.getDetails(transActParams.getOcppIdTag()).getUserRecord();
-        String eMailAddress = userRecord.getEMail();
+        try {
+            userRecord = userRepository.getDetails(transActParams.getOcppIdTag()).getUserRecord();
+            eMailAddress = userRecord.getEMail();
+        } catch (Exception e) {
+            log.error("Failed to send email (TransactionStop). User not found! ", e);    
+        }
 
         // mail to user
         if (!Strings.isNullOrEmpty(eMailAddress)) {

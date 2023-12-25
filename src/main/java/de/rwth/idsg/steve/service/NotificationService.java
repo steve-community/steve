@@ -187,7 +187,6 @@ public class NotificationService {
             
         Transaction transActParams = transactionRepository.getTransaction(notification.getParams().getTransactionId());
 
-        transActParams.getOcppTagPk();
         try {
             userRecord = userRepository.getDetails(transActParams.getOcppIdTag()).getUserRecord();
             eMailAddress = userRecord.getEMail();

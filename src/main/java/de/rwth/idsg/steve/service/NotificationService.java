@@ -49,7 +49,7 @@ import de.rwth.idsg.steve.repository.UserRepository;
 import de.rwth.idsg.steve.repository.dto.Transaction;
 import static java.lang.String.format;
 import jooq.steve.db.tables.records.UserRecord;
-import org.springframework.scheduling.annotation.Async;
+import java.util.concurrent.ScheduledExecutorService;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -63,6 +63,7 @@ public class NotificationService {
     @Autowired private TransactionRepository transactionRepository;
     @Autowired private UserRepository userRepository;
     @Autowired private OcppServerRepository ocppServerRepository;
+    @Autowired private ScheduledExecutorService executorService;
 
     @EventListener
     public void ocppStationBooted(OccpStationBooted notification) {
@@ -134,8 +135,17 @@ public class NotificationService {
     }
 
     @EventListener
-    @Async
     public void ocppStationStatusSuspendedEV(OcppStationStatusSuspendedEV notification) {
+         executorService.execute(() -> {
+            try {
+                notificationActionSuspendedEV(notification);
+            } catch (Exception e) {
+                log.error("Failed to execute the notification of SuspendedEV", e);
+            }
+        });
+    }
+
+    private void notificationActionSuspendedEV(OcppStationStatusSuspendedEV notification) {
         Integer connectorPk = ocppServerRepository.getConnectorPk(notification.getChargeBoxId(),
                 notification.getConnectorId()
         );
@@ -180,8 +190,17 @@ public class NotificationService {
     }
 
     @EventListener
-    @Async
     public void ocppTransactionEnded(OcppTransactionEnded notification) {
+             executorService.execute(() -> {
+            try {
+                notificationActionTransactionEnded(notification);
+            } catch (Exception e) {
+                log.error("Failed to execute the notification of SuspendedEV", e);
+            }
+        });
+    }
+
+    private void notificationActionTransactionEnded(OcppTransactionEnded notification) {
         String eMailAddress = null;
         UserRecord userRecord = new UserRecord();
 

@@ -1,6 +1,6 @@
 /*
- * SteVe - SteckdosenVerwaltung - https://github.com/RWTH-i5-IDSG/steve
- * Copyright (C) 2013-2022 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
+ * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
+ * Copyright (C) 2013-2024 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -18,8 +18,11 @@
  */
 package de.rwth.idsg.steve.repository.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.ToString;
 import org.joda.time.DateTime;
 
 /**
@@ -31,10 +34,28 @@ public final class OcppTag {
 
     @Getter
     @Builder
+    @ToString
     public static final class Overview {
-        private final Integer ocppTagPk, parentOcppTagPk;
-        private final String idTag, parentIdTag, expiryDate;
-        private final boolean inTransaction, blocked;
-        private final DateTime expiryDateDT;
+        private final Integer ocppTagPk;
+        private final String idTag;
+
+        private final Integer parentOcppTagPk;
+        private final String parentIdTag;
+
+        private final boolean inTransaction;
+        private final boolean blocked;
+
+        /**
+         * Only relevant for the web pages. Disabled for API
+         */
+        @JsonIgnore
+        @ApiModelProperty(hidden = true)
+        private final String expiryDateFormatted;
+
+        private final DateTime expiryDate;
+
+        private final Integer maxActiveTransactionCount;
+        private final Long activeTransactionCount;
+        private final String note;
     }
 }

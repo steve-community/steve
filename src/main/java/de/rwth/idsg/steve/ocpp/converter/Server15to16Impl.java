@@ -1,6 +1,6 @@
 /*
- * SteVe - SteckdosenVerwaltung - https://github.com/RWTH-i5-IDSG/steve
- * Copyright (C) 2013-2022 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
+ * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
+ * Copyright (C) 2013-2024 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -263,7 +263,7 @@ public enum Server15to16Impl implements Server15to16 {
     /**
      * AMP and VOLT are shortened to A and V, respectively.
      *
-     * https://github.com/RWTH-i5-IDSG/steve/issues/59
+     * https://github.com/steve-community/steve/issues/59
      */
     private static UnitOfMeasure convertUnit(ocpp.cs._2012._06.UnitOfMeasure unit) {
         switch (unit) {

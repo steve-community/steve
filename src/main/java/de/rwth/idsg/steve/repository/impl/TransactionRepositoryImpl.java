@@ -1,6 +1,6 @@
 /*
- * SteVe - SteckdosenVerwaltung - https://github.com/RWTH-i5-IDSG/steve
- * Copyright (C) 2013-2022 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
+ * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
+ * Copyright (C) 2013-2024 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -122,7 +122,7 @@ public class TransactionRepositoryImpl implements TransactionRepository {
 
         if (stopTimestamp == null && stopValue == null) {
 
-            // https://github.com/RWTH-i5-IDSG/steve/issues/97
+            // https://github.com/steve-community/steve/issues/97
             //
             // handle "zombie" transaction, for which we did not receive any StopTransaction. if we do not handle it,
             // meter values for all subsequent transactions at this chargebox and connector will be falsely attributed
@@ -353,11 +353,11 @@ public class TransactionRepositoryImpl implements TransactionRepository {
                               .chargeBoxId(r.value2())
                               .connectorId(r.value3())
                               .ocppIdTag(r.value4())
-                              .startTimestampDT(r.value5())
-                              .startTimestamp(DateTimeUtils.humanize(r.value5()))
+                              .startTimestamp(r.value5())
+                              .startTimestampFormatted(DateTimeUtils.humanize(r.value5()))
                               .startValue(r.value6())
-                              .stopTimestampDT(r.value7())
-                              .stopTimestamp(DateTimeUtils.humanize(r.value7()))
+                              .stopTimestamp(r.value7())
+                              .stopTimestampFormatted(DateTimeUtils.humanize(r.value7()))
                               .stopValue(r.value8())
                               .stopReason(r.value9())
                               .chargeBoxPk(r.value10())

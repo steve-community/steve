@@ -1,6 +1,6 @@
 /*
- * SteVe - SteckdosenVerwaltung - https://github.com/RWTH-i5-IDSG/steve
- * Copyright (C) 2013-2022 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
+ * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
+ * Copyright (C) 2013-2024 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -75,9 +75,10 @@ public class OcppWebSocketHandshakeHandler implements HandshakeHandler {
         // Allow connections, if station is in db (registration_status field from db does not matter)
         boolean allowConnection = status.isPresent();
 
+        // https://github.com/steve-community/steve/issues/1020
         if (!allowConnection) {
             log.error("ChargeBoxId '{}' is not recognized.", chargeBoxId);
-            response.setStatusCode(HttpStatus.UNAUTHORIZED);
+            response.setStatusCode(HttpStatus.NOT_FOUND);
             return false;
         }
 

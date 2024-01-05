@@ -1,6 +1,6 @@
 /*
- * SteVe - SteckdosenVerwaltung - https://github.com/RWTH-i5-IDSG/steve
- * Copyright (C) 2013-2022 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
+ * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
+ * Copyright (C) 2013-2024 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -455,6 +455,7 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
         try {
             ctx.insertInto(TRANSACTION_STOP_FAILED)
                .set(TRANSACTION_STOP_FAILED.TRANSACTION_PK, p.getTransactionId())
+               .set(TRANSACTION_STOP_FAILED.CHARGE_BOX_ID, p.getChargeBoxId())
                .set(TRANSACTION_STOP_FAILED.EVENT_TIMESTAMP, p.getEventTimestamp())
                .set(TRANSACTION_STOP_FAILED.EVENT_ACTOR, mapActor(p.getEventActor()))
                .set(TRANSACTION_STOP_FAILED.STOP_TIMESTAMP, p.getStopTimestamp())

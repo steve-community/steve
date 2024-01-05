@@ -1,6 +1,6 @@
 /*
- * SteVe - SteckdosenVerwaltung - https://github.com/RWTH-i5-IDSG/steve
- * Copyright (C) 2013-2022 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
+ * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
+ * Copyright (C) 2013-2024 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -98,7 +98,7 @@ public class JettyServer {
         httpConfig.setSendXPoweredBy(false);
 
         // make sure X-Forwarded-For headers are picked up if set (e.g. by a load balancer)
-        // https://github.com/RWTH-i5-IDSG/steve/pull/570
+        // https://github.com/steve-community/steve/pull/570
         httpConfig.addCustomizer(new ForwardedRequestCustomizer());
 
         // Extra options

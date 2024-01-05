@@ -1,6 +1,6 @@
 /*
- * SteVe - SteckdosenVerwaltung - https://github.com/RWTH-i5-IDSG/steve
- * Copyright (C) 2013-2022 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
+ * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
+ * Copyright (C) 2013-2024 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -36,7 +36,7 @@ import java.util.List;
  * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 15.08.2014
  */
-@ControllerAdvice(basePackages = "de.rwth.idsg.steve.web")
+@ControllerAdvice(basePackages = "de.rwth.idsg.steve.web.controller")
 @Slf4j
 public class GlobalControllerAdvice {
 
@@ -46,7 +46,7 @@ public class GlobalControllerAdvice {
 
         binder.registerCustomEditor(String.class, new StringTrimmerEditor(true));
         binder.registerCustomEditor(LocalDate.class, new LocalDateEditor());
-        binder.registerCustomEditor(LocalDateTime.class, new LocalDateTimeEditor());
+        binder.registerCustomEditor(LocalDateTime.class, LocalDateTimeEditor.forMvc());
         binder.registerCustomEditor(ChargePointSelect.class, new ChargePointSelectEditor());
 
         binder.registerCustomEditor(List.class, "idList", batchInsertConverter);

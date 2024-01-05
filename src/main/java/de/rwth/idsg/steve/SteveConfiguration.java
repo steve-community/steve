@@ -1,6 +1,6 @@
 /*
- * SteVe - SteckdosenVerwaltung - https://github.com/RWTH-i5-IDSG/steve
- * Copyright (C) 2013-2022 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
+ * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
+ * Copyright (C) 2013-2024 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -37,9 +37,11 @@ public enum SteveConfiguration {
     // Root mapping for Spring
     private final String springMapping = "/";
     // Web frontend
-    private final String springManagerMapping = "/manager/*";
+    private final String springManagerMapping = "/manager";
     // Mapping for CXF SOAP services
-    private final String cxfMapping = "/services/*";
+    private final String cxfMapping = "/services";
+    // Mapping for Web APIs
+    private final String apiMapping = "/api";
     // Dummy service path
     private final String routerEndpointPath = "/CentralSystemService";
     // Time zone for the application and database connections
@@ -55,6 +57,7 @@ public enum SteveConfiguration {
     private final ApplicationProfile profile;
     private final Ocpp ocpp;
     private final Auth auth;
+    private final WebApi webApi;
     private final DB db;
     private final Jetty jetty;
 
@@ -93,6 +96,11 @@ public enum SteveConfiguration {
                    .userName(p.getString("auth.user"))
                    .encodedPassword(encoder.encode(p.getString("auth.password")))
                    .build();
+
+        webApi = WebApi.builder()
+                       .headerKey(p.getOptionalString("webapi.key"))
+                       .headerValue(p.getOptionalString("webapi.value"))
+                       .build();
 
         ocpp = Ocpp.builder()
                    .autoRegisterUnknownStations(p.getOptionalBoolean("auto.register.unknown.stations"))
@@ -180,6 +188,12 @@ public enum SteveConfiguration {
         private final PasswordEncoder passwordEncoder;
         private final String userName;
         private final String encodedPassword;
+    }
+
+    @Builder @Getter
+    public static class WebApi {
+        private final String headerKey;
+        private final String headerValue;
     }
 
     // OCPP-related configuration

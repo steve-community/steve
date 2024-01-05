@@ -1,6 +1,6 @@
 /*
- * SteVe - SteckdosenVerwaltung - https://github.com/RWTH-i5-IDSG/steve
- * Copyright (C) 2013-2022 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
+ * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
+ * Copyright (C) 2013-2024 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -21,6 +21,7 @@ package de.rwth.idsg.steve.service;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
+import com.fasterxml.jackson.datatype.joda.JodaModule;
 import com.github.zafarkhaja.semver.Version;
 import de.rwth.idsg.steve.SteveConfiguration;
 import de.rwth.idsg.steve.web.dto.ReleaseReport;
@@ -48,7 +49,7 @@ public class GithubReleaseCheckService implements ReleaseCheckService {
      */
     private static final int API_TIMEOUT_IN_MILLIS = 4_000;
 
-    private static final String API_URL = "https://api.github.com/repos/RWTH-i5-IDSG/steve/releases/latest";
+    private static final String API_URL = "https://api.github.com/repos/steve-community/steve/releases/latest";
 
     private static final String TAG_NAME_PREFIX = "steve-";
 
@@ -62,7 +63,8 @@ public class GithubReleaseCheckService implements ReleaseCheckService {
         factory.setReadTimeout(API_TIMEOUT_IN_MILLIS);
         factory.setConnectTimeout(API_TIMEOUT_IN_MILLIS);
 
-        ObjectMapper mapper = new ObjectMapper();
+        ObjectMapper mapper = new ObjectMapper()
+                .registerModule(new JodaModule());
         mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
         mapper.setPropertyNamingStrategy(new PropertyNamingStrategies.SnakeCaseStrategy());
 

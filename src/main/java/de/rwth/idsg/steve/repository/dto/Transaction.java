@@ -1,6 +1,6 @@
 /*
- * SteVe - SteckdosenVerwaltung - https://github.com/RWTH-i5-IDSG/steve
- * Copyright (C) 2013-2022 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
+ * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
+ * Copyright (C) 2013-2024 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -18,9 +18,12 @@
  */
 package de.rwth.idsg.steve.repository.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import io.swagger.annotations.ApiModelProperty;
 import jooq.steve.db.enums.TransactionStopEventActor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.ToString;
 import org.jetbrains.annotations.Nullable;
 import org.joda.time.DateTime;
 
@@ -31,14 +34,46 @@ import org.joda.time.DateTime;
  */
 @Getter
 @Builder
+@ToString
 public final class Transaction {
-    private final int id, connectorId, chargeBoxPk, ocppTagPk;
-    private final String chargeBoxId, ocppIdTag, startTimestamp, startValue;
-    private final DateTime startTimestampDT;
 
-    @Nullable private final String stopTimestamp;
-    @Nullable private final String stopValue;
-    @Nullable private final String stopReason; // new in OCPP 1.6
-    @Nullable private final DateTime stopTimestampDT;
-    @Nullable private final TransactionStopEventActor stopEventActor;
+    private final int id;
+    private final int connectorId;
+    private final int chargeBoxPk;
+    private final int ocppTagPk;
+
+    private final String chargeBoxId;
+
+    private final String ocppIdTag;
+
+    /**
+     * Only relevant for the web pages. Disabled for API
+     */
+    @JsonIgnore
+    @ApiModelProperty(hidden = true)
+    private final String startTimestampFormatted;
+
+    private final String startValue;
+
+    private final DateTime startTimestamp;
+
+    /**
+     * Only relevant for the web pages. Disabled for API
+     */
+    @JsonIgnore
+    @ApiModelProperty(hidden = true)
+    @Nullable
+    private final String stopTimestampFormatted;
+
+    @Nullable
+    private final String stopValue;
+
+    @Nullable
+    private final String stopReason; // new in OCPP 1.6
+
+    @Nullable
+    private final DateTime stopTimestamp;
+
+    @Nullable
+    private final TransactionStopEventActor stopEventActor;
 }

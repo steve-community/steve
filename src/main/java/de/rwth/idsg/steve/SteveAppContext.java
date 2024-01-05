@@ -1,6 +1,6 @@
 /*
- * SteVe - SteckdosenVerwaltung - https://github.com/RWTH-i5-IDSG/steve
- * Copyright (C) 2013-2022 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
+ * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
+ * Copyright (C) 2013-2024 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -80,8 +80,6 @@ public class SteveAppContext {
      */
     public void configureWebSocket() {
         JettyWebSocketServerContainer container = JettyWebSocketServerContainer.getContainer(webAppContext.getServletContext());
-        container.setInputBufferSize(MAX_MSG_SIZE);
-        container.setOutputBufferSize(MAX_MSG_SIZE);
         container.setMaxTextMessageSize(MAX_MSG_SIZE);
         container.setIdleTimeout(IDLE_TIMEOUT);
     }
@@ -114,14 +112,14 @@ public class SteveAppContext {
 
         ctx.addEventListener(new ContextLoaderListener(springContext));
         ctx.addServlet(web, CONFIG.getSpringMapping());
-        ctx.addServlet(cxf, CONFIG.getCxfMapping());
+        ctx.addServlet(cxf, CONFIG.getCxfMapping() + "/*");
 
         if (CONFIG.getProfile().isProd()) {
             // If PROD, add security filter
             ctx.addFilter(
                 // The bean name is not arbitrary, but is as expected by Spring
                 new FilterHolder(new DelegatingFilterProxy(AbstractSecurityWebApplicationInitializer.DEFAULT_FILTER_NAME)),
-                CONFIG.getSpringManagerMapping(),
+                CONFIG.getSpringMapping() + "*",
                 EnumSet.allOf(DispatcherType.class)
             );
         }

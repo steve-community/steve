@@ -1,6 +1,6 @@
 /*
- * SteVe - SteckdosenVerwaltung - https://github.com/RWTH-i5-IDSG/steve
- * Copyright (C) 2013-2022 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
+ * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
+ * Copyright (C) 2013-2024 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -18,6 +18,9 @@
  */
 package de.rwth.idsg.steve.config;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.mysql.cj.conf.PropertyKey;
 import com.zaxxer.hikari.HikariConfig;
@@ -41,16 +44,23 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.core.Ordered;
+import org.springframework.format.support.FormattingConversionService;
+import org.springframework.http.converter.HttpMessageConverter;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
+import org.springframework.web.accept.ContentNegotiationManager;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupport;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter;
 import org.springframework.web.servlet.view.InternalResourceViewResolver;
 
 import javax.annotation.PreDestroy;
 import javax.validation.Validator;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
@@ -97,7 +107,7 @@ public class BeanConfiguration implements WebMvcConfigurer {
         hc.addDataSourceProperty(PropertyKey.connectionTimeZone.getKeyName(), CONFIG.getTimeZoneId());
         hc.addDataSourceProperty(PropertyKey.useSSL.getKeyName(), true);
 
-        // https://github.com/RWTH-i5-IDSG/steve/issues/736
+        // https://github.com/steve-community/steve/issues/736
         hc.setMaxLifetime(580_000);
 
         dataSource = new HikariDataSource(hc);
@@ -228,4 +238,37 @@ public class BeanConfiguration implements WebMvcConfigurer {
         registry.setOrder(Ordered.HIGHEST_PRECEDENCE);
     }
 
+    // -------------------------------------------------------------------------
+    // API config
+    // -------------------------------------------------------------------------
+
+    @Override
+    public void extendMessageConverters(List<HttpMessageConverter<?>> converters) {
+        for (HttpMessageConverter<?> converter : converters) {
+            if (converter instanceof MappingJackson2HttpMessageConverter) {
+                MappingJackson2HttpMessageConverter conv = (MappingJackson2HttpMessageConverter) converter;
+                ObjectMapper objectMapper = conv.getObjectMapper();
+                // if the client sends unknown props, just ignore them instead of failing
+                objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+                // default is true
+                objectMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
+                break;
+            }
+        }
+    }
+
+    /**
+     * Find the ObjectMapper used in MappingJackson2HttpMessageConverter and initialized by Spring automatically.
+     * MappingJackson2HttpMessageConverter is not a Bean. It is created in {@link WebMvcConfigurationSupport#addDefaultHttpMessageConverters(List)}.
+     * Therefore, we have to access it via proxies that reference it. RequestMappingHandlerAdapter is a Bean, created in
+     * {@link WebMvcConfigurationSupport#requestMappingHandlerAdapter(ContentNegotiationManager, FormattingConversionService, org.springframework.validation.Validator)}.
+     */
+    @Bean
+    public ObjectMapper objectMapper(RequestMappingHandlerAdapter requestMappingHandlerAdapter) {
+        return requestMappingHandlerAdapter.getMessageConverters().stream()
+            .filter(converter -> converter instanceof MappingJackson2HttpMessageConverter)
+            .findAny()
+            .map(conv -> ((MappingJackson2HttpMessageConverter) conv).getObjectMapper())
+            .orElseThrow(() -> new RuntimeException("There is no MappingJackson2HttpMessageConverter in Spring context"));
+    }
 }

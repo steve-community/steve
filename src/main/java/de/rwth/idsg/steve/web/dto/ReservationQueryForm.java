@@ -1,6 +1,6 @@
 /*
- * SteVe - SteckdosenVerwaltung - https://github.com/RWTH-i5-IDSG/steve
- * Copyright (C) 2013-2022 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
+ * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
+ * Copyright (C) 2013-2024 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -22,6 +22,7 @@ import de.rwth.idsg.steve.repository.ReservationStatus;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 
 import javax.validation.constraints.AssertTrue;
 
@@ -31,6 +32,7 @@ import javax.validation.constraints.AssertTrue;
  */
 @Getter
 @Setter
+@ToString(callSuper = true)
 public class ReservationQueryForm extends QueryForm {
 
     private ReservationStatus status;

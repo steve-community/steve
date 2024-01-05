@@ -1,6 +1,6 @@
 /*
- * SteVe - SteckdosenVerwaltung - https://github.com/RWTH-i5-IDSG/steve
- * Copyright (C) 2013-2022 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
+ * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
+ * Copyright (C) 2013-2024 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -19,8 +19,11 @@
 package de.rwth.idsg.steve.web.dto;
 
 import de.rwth.idsg.steve.web.validation.IdTag;
+import io.swagger.annotations.ApiModelProperty;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 import org.joda.time.LocalDateTime;
 
 import javax.validation.constraints.Future;
@@ -33,11 +36,15 @@ import java.util.Objects;
  */
 @Getter
 @Setter
+@ToString
+@EqualsAndHashCode
 public class OcppTagForm {
 
     // Internal database id
+    @ApiModelProperty(hidden = true)
     private Integer ocppTagPk;
 
+    @ApiModelProperty(value = "Will be used in create/insert flows. Will be ignored in update flows.")
     @NotEmpty(message = "ID Tag is required")
     @IdTag
     private String idTag;
@@ -45,8 +52,9 @@ public class OcppTagForm {
     // Is a FK in DB table. No validation needed. Operation will fail if DB constraint fails.
     private String parentIdTag;
 
+    @ApiModelProperty(value = "A date/time without timezone. Example: 2022-10-10T09:00")
     @Future(message = "Expiry Date/Time must be in future")
-    private LocalDateTime expiration;
+    private LocalDateTime expiryDate;
 
     private Integer maxActiveTransactionCount;
 

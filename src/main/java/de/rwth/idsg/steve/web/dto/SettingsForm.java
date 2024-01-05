@@ -1,6 +1,6 @@
 /*
- * SteVe - SteckdosenVerwaltung - https://github.com/RWTH-i5-IDSG/steve
- * Copyright (C) 2013-2022 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
+ * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
+ * Copyright (C) 2013-2024 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -25,6 +25,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.Min;
@@ -40,13 +41,14 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@ToString
 public class SettingsForm {
 
     // -------------------------------------------------------------------------
     // OCPP
     // -------------------------------------------------------------------------
 
-    @Min(value = 1, message = "Heartbeat Interval must be at least {value}")
+    @Min(value = 0, message = "Heartbeat Interval must be at least {value}")
     @NotNull(message = "Heartbeat Interval is required")
     private Integer heartbeat;
 

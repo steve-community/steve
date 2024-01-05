@@ -1,6 +1,6 @@
 /*
- * SteVe - SteckdosenVerwaltung - https://github.com/RWTH-i5-IDSG/steve
- * Copyright (C) 2013-2022 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
+ * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
+ * Copyright (C) 2013-2024 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -19,9 +19,9 @@
 package de.rwth.idsg.steve.web.controller;
 
 import de.rwth.idsg.steve.ocpp.OcppVersion;
-import de.rwth.idsg.steve.repository.OcppTagRepository;
 import de.rwth.idsg.steve.service.ChargePointHelperService;
 import de.rwth.idsg.steve.service.ChargePointService12_Client;
+import de.rwth.idsg.steve.service.OcppTagService;
 import de.rwth.idsg.steve.web.dto.ocpp.ChangeAvailabilityParams;
 import de.rwth.idsg.steve.web.dto.ocpp.ChangeConfigurationParams;
 import de.rwth.idsg.steve.web.dto.ocpp.ConfigurationKeyEnum;
@@ -56,7 +56,7 @@ import static de.rwth.idsg.steve.web.dto.ocpp.ConfigurationKeyReadWriteEnum.RW;
 public class Ocpp12Controller {
 
     @Autowired protected ChargePointHelperService chargePointHelperService;
-    @Autowired protected OcppTagRepository ocppTagRepository;
+    @Autowired protected OcppTagService ocppTagService;
 
     @Autowired
     @Qualifier("ChargePointService12_Client")
@@ -111,7 +111,7 @@ public class Ocpp12Controller {
     }
 
     protected void setActiveUserIdTagList(Model model) {
-        model.addAttribute("idTagList", ocppTagRepository.getActiveIdTags());
+        model.addAttribute("idTagList", ocppTagService.getActiveIdTags());
     }
 
     // -------------------------------------------------------------------------

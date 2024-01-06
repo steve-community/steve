@@ -31,7 +31,7 @@ https://github.com/steve-community/steve/wiki/Charging-Station-Compatibility
 ### System Requirements
 
 SteVe requires 
-* JDK 11 (both Oracle JDK and Adoptium are supported)
+* JDK 17 or newer
 * Maven 
 * MySQL or MariaDB. You should use [one of these](.github/workflows/main.yml#L11) supported versions.
 

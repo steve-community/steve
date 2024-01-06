@@ -36,6 +36,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
         <jooq.version>3.16.7</jooq.version>
+        <flyway.version>9.2.2</flyway.version>
         <cxf.version>3.5.5</cxf.version>
         <spring.version>5.3.31</spring.version>
         <spring.security.version>5.7.10</spring.security.version>
@@ -321,7 +322,7 @@
             <plugin>
                 <groupId>org.flywaydb</groupId>
                 <artifactId>flyway-maven-plugin</artifactId>
-                <version>7.15.0</version>
+                <version>${flyway.version}</version>
 
                 <!-- Must be in the same phase as Jooq -->
                 <executions>
@@ -361,6 +362,13 @@
                         <location>filesystem:src/main/resources/db/migration</location>
                     </locations>
                 </configuration>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.flywaydb</groupId>
+                        <artifactId>flyway-mysql</artifactId>
+                        <version>${flyway.version}</version>
+                    </dependency>
+                </dependencies>
             </plugin>
 
             <plugin>

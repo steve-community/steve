@@ -32,6 +32,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.DisabledException;
+import org.springframework.security.config.Customizer;
+import org.springframework.security.oauth2.client.registration.ClientRegistration;
+import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
@@ -44,6 +47,10 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.DelegatingPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.client.registration.InMemoryClientRegistrationRepository;
+import org.springframework.security.oauth2.core.AuthorizationGrantType;
+import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
+import org.springframework.security.oauth2.core.oidc.IdTokenClaimNames;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
@@ -53,6 +60,8 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.Objects;
 
 import static de.rwth.idsg.steve.SteveConfiguration.CONFIG;
 
@@ -96,25 +105,54 @@ public class SecurityConfiguration {
             CONFIG.getCxfMapping() + "/**"
         );
     }
+    @Bean
+    public ClientRegistrationRepository clientRegistrationRepository() {
+        if (CONFIG.getAuth().getMethod().equals("oauth2")){
+            ClientRegistration registration = ClientRegistration.withRegistrationId("sso")
+                    .clientId(CONFIG.getAuth().getOAuthClientId())
+                    .clientSecret(CONFIG.getAuth().getOAuthClientSecret())
+                    .authorizationUri(CONFIG.getAuth().getOAuthAuthorizationUri())
+                    .jwkSetUri(CONFIG.getAuth().getOAuthJwkSetUri())
+                    .userInfoUri(CONFIG.getAuth().getOAuthUserInfoUri())
+                    .scope("openid", "profile", "email")
+                    .tokenUri(CONFIG.getAuth().getOAuthTokenUri())
+                    .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
+                    .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
+                    .userNameAttributeName(IdTokenClaimNames.SUB)
+                    .redirectUri("{baseUrl}/login/oauth2/code/sso")
+                    .clientName("SSO")
+                    .build();
+
+            return new InMemoryClientRegistrationRepository(registration);
+        }
+        return null;
+    }
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         final String prefix = CONFIG.getSpringManagerMapping();
 
-        return http
-            .authorizeHttpRequests(
-                req -> req.antMatchers(prefix + "/**").hasRole("ADMIN")
-            )
-            .sessionManagement(
-                req -> req.invalidSessionUrl(prefix + "/signin")
-            )
-            .formLogin(
-                req -> req.loginPage(prefix + "/signin").permitAll()
-            )
-            .logout(
-                req -> req.logoutUrl(prefix + "/signout")
-            )
-            .build();
+        if (CONFIG.getAuth().getMethod().equals("oauth2")){
+            return http.authorizeHttpRequests(req -> req.antMatchers(prefix + "/**").authenticated()).oauth2Login(Customizer.withDefaults())
+                    .logout(
+                            req -> req.logoutUrl(prefix + "/signout")
+                    ).build();
+        } else {
+            return http
+                .authorizeHttpRequests(
+                    req -> req.antMatchers(prefix + "/**").hasRole("ADMIN")
+                )
+                .sessionManagement(
+                    req -> req.invalidSessionUrl(prefix + "/signin")
+                )
+                .formLogin(
+                    req -> req.loginPage(prefix + "/signin").permitAll()
+                )
+                .logout(
+                    req -> req.logoutUrl(prefix + "/signout")
+                )
+                .build();
+        }
     }
 
     @Bean

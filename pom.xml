@@ -777,7 +777,7 @@
         <dependency>
             <groupId>com.github.zafarkhaja</groupId>
             <artifactId>java-semver</artifactId>
-            <version>0.9.0</version>
+            <version>0.10.1</version>
         </dependency>
 
         <!-- Codes according to ISO standards

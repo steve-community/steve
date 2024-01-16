@@ -44,7 +44,7 @@ import javax.validation.Valid;
  */
 @Slf4j
 @RestController
-@RequestMapping(value = "/api/v1/remote", produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(value = "/api/v1/tasks", produces = MediaType.APPLICATION_JSON_VALUE)
 @RequiredArgsConstructor
 public class TaskRestController {
 
@@ -55,9 +55,9 @@ public class TaskRestController {
     // -------------------------------------------------------------------------
 
     private ApiTaskList getTaskList() {
-        ApiTaskList lsTasks = new ApiTaskList();
-        lsTasks.setTasks(taskStore.getOverview());
-        return lsTasks;
+        ApiTaskList taskList = new ApiTaskList();
+        taskList.setTasks(taskStore.getOverview());
+        return taskList;
     }
 
     // -------------------------------------------------------------------------

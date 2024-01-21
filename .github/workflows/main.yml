@@ -40,6 +40,7 @@ jobs:
         image: ${{ matrix.database.image }}
         command: ${{ matrix.database.command }}
         env:
+          TZ: +00:00
           MYSQL_ROOT_PASSWORD: root
           MARIADB_ROOT_PASSWORD: root
           MYSQL_DATABASE: root

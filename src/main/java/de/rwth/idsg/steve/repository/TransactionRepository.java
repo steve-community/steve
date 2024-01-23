@@ -30,13 +30,14 @@ import java.util.List;
  * @since 19.08.2014
  */
 public interface TransactionRepository {
+    Transaction getTransaction(int transactionPk);
+
     List<Transaction> getTransactions(TransactionQueryForm form);
 
     void writeTransactionsCSV(TransactionQueryForm form, Writer writer);
 
     List<Integer> getActiveTransactionIds(String chargeBoxId);
     Integer getActiveTransactionId(String chargeBoxId, Integer connectorId);
-    String getOcppTagOfTransaction(Integer transactionPk);
 
     TransactionDetails getDetails(int transactionPk, boolean firstArrivingMeterValueIfMultiple);
 

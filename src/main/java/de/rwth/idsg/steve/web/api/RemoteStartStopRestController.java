@@ -66,6 +66,7 @@ import static java.util.Objects.isNull;
  * @author fnkbsi
  * @since 18.10.2023
  */
+
 @Slf4j
 @RestController
 @RequestMapping(value = "/api/v1/remote", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -102,67 +103,37 @@ public class RemoteStartStopRestController {
      private Integer remoteStart(String chargeBoxId, RemoteStartTransactionParams transactionParams) {
         String ocppProtocol = getOcppProtocol(chargeBoxId);
         Integer taskId;
-        switch (ocppProtocol) {
-            case "OCPP1.6J":
-            case "OCPP1.6S":
-                taskId = client16.remoteStartTransaction(transactionParams, "SteveWebApi");
-                break;
-            case "OCPP1.5J":
-            case "OCPP1.5S":
-            case "OCPP1.5":
-                taskId = client15.remoteStartTransaction(transactionParams, "SteveWebApi");
-                break;
-            case "OCPP1.2":
-                taskId = client12.remoteStartTransaction(transactionParams, "SteveWebApi");
-                break;
-            default:
-                taskId = client12.remoteStartTransaction(transactionParams, "SteveWebApi");
-        }
+        taskId = switch (ocppProtocol) {
+            case "OCPP1.6J", "OCPP1.6S" -> client16.remoteStartTransaction(transactionParams, "SteveWebApi");
+            case "OCPP1.5J", "OCPP1.5S", "OCPP1.5" -> client15.remoteStartTransaction(transactionParams, "SteveWebApi");
+            case "OCPP1.2" -> client12.remoteStartTransaction(transactionParams, "SteveWebApi");
+            default -> client12.remoteStartTransaction(transactionParams, "SteveWebApi");
+        };
         return taskId;
     }
 
      private Integer remoteStop(String chargeBoxId, RemoteStopTransactionParams transactionParams) {
         String ocppProtocol = getOcppProtocol(chargeBoxId);
         Integer taskId;
-        switch (ocppProtocol) {
-            case "OCPP1.6J":
-            case "OCPP1.6S":
-                    taskId = client16.remoteStopTransaction(transactionParams, "SteveWebApi");
-                    break;
-            case "OCPP1.5J":
-            case "OCPP1.5S":
-            case "OCPP1.5":
-                    taskId = client15.remoteStopTransaction(transactionParams, "SteveWebApi");
-                    break;
-            case "OCPP1.2":
-                 taskId = client12.remoteStopTransaction(transactionParams, "SteveWebApi");
-                break;
-            default:
-                 taskId = client12.remoteStopTransaction(transactionParams, "SteveWebApi");
-        }
-         return taskId;
+        taskId = switch (ocppProtocol) {
+            case "OCPP1.6J", "OCPP1.6S" -> client16.remoteStopTransaction(transactionParams, "SteveWebApi");
+            case "OCPP1.5J", "OCPP1.5S", "OCPP1.5" -> client15.remoteStopTransaction(transactionParams, "SteveWebApi");
+            case "OCPP1.2" -> client12.remoteStopTransaction(transactionParams, "SteveWebApi");
+            default -> client12.remoteStopTransaction(transactionParams, "SteveWebApi");
+        };
+        return taskId;
     }
 
     private Integer remoteUnlock(String chargeBoxId, UnlockConnectorParams transactionParams) {
         String ocppProtocol = getOcppProtocol(chargeBoxId);
         Integer taskId;
-        switch (ocppProtocol) {
-            case "OCPP1.6J":
-            case "OCPP1.6S":
-                   taskId = client16.unlockConnector(transactionParams, "SteveWebApi");
-                   break;
-            case "OCPP1.5J":
-            case "OCPP1.5S":
-            case "OCPP1.5":
-                taskId = client15.unlockConnector(transactionParams, "SteveWebApi");
-                break;
-            case "OCPP1.2":
-                 taskId = client12.unlockConnector(transactionParams, "SteveWebApi");
-                break;
-            default:
-                 taskId = client12.unlockConnector(transactionParams, "SteveWebApi");
-        }
-         return taskId;
+        taskId = switch (ocppProtocol) {
+            case "OCPP1.6J", "OCPP1.6S" -> client16.unlockConnector(transactionParams, "SteveWebApi");
+            case "OCPP1.5J", "OCPP1.5S", "OCPP1.5" -> client15.unlockConnector(transactionParams, "SteveWebApi");
+            case "OCPP1.2" -> client12.unlockConnector(transactionParams, "SteveWebApi");
+            default -> client12.unlockConnector(transactionParams, "SteveWebApi");
+        };
+        return taskId;
     }
 
     private ApiChargePointList getChargePoints() {

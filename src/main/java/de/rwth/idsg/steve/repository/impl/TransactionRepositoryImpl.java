@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2023 SteVe Community Team
+ * Copyright (C) 2013-2024 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -99,13 +99,15 @@ public class TransactionRepositoryImpl implements TransactionRepository {
     }
 
     @Override
-    public String getOcppTagOfActiveTransaction(Integer connectorPk) {
-        return ctx.select(TRANSACTION.ID_TAG)
-                .from(TRANSACTION)
-                .where(TRANSACTION.CONNECTOR_PK.eq(connectorPk))
-                .and(TRANSACTION.STOP_VALUE.isNull())
-                .orderBy(TRANSACTION.TRANSACTION_PK.desc()) // to avoid fetching ghost transactions, fetch the latest
-                .fetchAny(TRANSACTION.ID_TAG);
+    public Integer getActiveTransactionId(String chargeBoxId, Integer connectorId) {
+        return ctx.select(TRANSACTION.TRANSACTION_PK)
+                  .from(TRANSACTION)
+                  .join(CONNECTOR)
+                    .on(TRANSACTION.CONNECTOR_PK.equal(CONNECTOR.CONNECTOR_PK))
+                    .and(CONNECTOR.CHARGE_BOX_ID.equal(chargeBoxId))
+                  .where(TRANSACTION.STOP_TIMESTAMP.isNull())
+                    .and(CONNECTOR.CONNECTOR_ID.equal(connectorId))
+                  .fetchAny(TRANSACTION.TRANSACTION_PK);
     }
 
     @Override

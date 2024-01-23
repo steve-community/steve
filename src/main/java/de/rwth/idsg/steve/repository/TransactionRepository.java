@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2023 SteVe Community Team
+ * Copyright (C) 2013-2024 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -37,8 +37,7 @@ public interface TransactionRepository {
     void writeTransactionsCSV(TransactionQueryForm form, Writer writer);
 
     List<Integer> getActiveTransactionIds(String chargeBoxId);
-
-    String getOcppTagOfActiveTransaction(Integer connectorPk);
+    Integer getActiveTransactionId(String chargeBoxId, Integer connectorId);
 
     TransactionDetails getDetails(int transactionPk, boolean firstArrivingMeterValueIfMultiple);
 

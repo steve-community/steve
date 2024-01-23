@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2023 SteVe Community Team
+ * Copyright (C) 2013-2024 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -19,6 +19,7 @@
 package de.rwth.idsg.steve.service.notification;
 
 import lombok.Data;
+import org.joda.time.DateTime;
 
 /**
  * @author fnkbsi
@@ -30,4 +31,5 @@ public class OcppStationStatusSuspendedEV {
 
   private final String chargeBoxId;
   private final int connectorId;
+  private final DateTime timestamp;
 }

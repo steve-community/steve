@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2023 SteVe Community Team
+ * Copyright (C) 2013-2024 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -150,7 +150,7 @@ public class CentralSystemService16_Service {
 
          if (parameters.getStatus() == ChargePointStatus.SUSPENDED_EV) {
             applicationEventPublisher.publishEvent(new OcppStationStatusSuspendedEV(
-                    chargeBoxIdentity, parameters.getConnectorId()));
+                    chargeBoxIdentity, parameters.getConnectorId(), parameters.getTimestamp()));
         }
 
         return new StatusNotificationResponse();

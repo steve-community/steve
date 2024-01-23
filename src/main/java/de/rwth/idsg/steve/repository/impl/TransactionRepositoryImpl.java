@@ -107,6 +107,7 @@ public class TransactionRepositoryImpl implements TransactionRepository {
                     .and(CONNECTOR.CHARGE_BOX_ID.equal(chargeBoxId))
                   .where(TRANSACTION.STOP_TIMESTAMP.isNull())
                     .and(CONNECTOR.CONNECTOR_ID.equal(connectorId))
+                  .orderBy(TRANSACTION.TRANSACTION_PK.desc()) // to avoid fetching ghost transactions, fetch the latest
                   .fetchAny(TRANSACTION.TRANSACTION_PK);
     }
 

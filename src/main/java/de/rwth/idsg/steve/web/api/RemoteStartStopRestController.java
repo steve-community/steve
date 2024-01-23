@@ -325,9 +325,9 @@ public class RemoteStartStopRestController {
         }
 
         // check the user is allowed to stop this transaction (actual only the one who started it!)
-        String ocppTag = transactionRepository.getOcppTagOfTransaction(transactionId);
+        String ocppTag = transactionRepository.getTransaction(transactionId).getOcppIdTag();
         if (!params.getOcppTag().contentEquals(ocppTag)) {
-             throw new BadRequestException("The transaction wass authorised with another OCPP Tag!");
+             throw new BadRequestException("The transaction was authorised with another OCPP Tag!");
         }
         transactionParams.setTransactionId(transactionId);
 

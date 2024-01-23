@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2023 SteVe Community Team
+ * Copyright (C) 2013-2024 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -163,15 +163,6 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
 
             log.debug("Stored a new connector status for {}/{}.", p.getChargeBoxId(), p.getConnectorId());
         });
-    }
-
-    @Override
-    public Integer getConnectorPk(String chargeBoxId, int connectorId) {
-        return ctx.select(CONNECTOR.CONNECTOR_PK)
-                .from(CONNECTOR)
-                .where(CONNECTOR.CHARGE_BOX_ID.equal(chargeBoxId))
-                .and(CONNECTOR.CONNECTOR_ID.equal(connectorId))
-                .fetchOne().value1();
     }
 
     @Override

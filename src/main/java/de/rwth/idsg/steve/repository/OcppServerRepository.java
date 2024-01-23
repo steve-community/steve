@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2023 SteVe Community Team
+ * Copyright (C) 2013-2024 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -42,7 +42,6 @@ public interface OcppServerRepository {
     void updateChargeboxHeartbeat(String chargeBoxIdentity, DateTime ts);
 
     void insertConnectorStatus(InsertConnectorStatusParams params);
-    Integer getConnectorPk(String chargeBoxId, int connectorId);
 
     void insertMeterValues(String chargeBoxIdentity, List<MeterValue> list, int connectorId, Integer transactionId);
     void insertMeterValues(String chargeBoxIdentity, List<MeterValue> list, int transactionId);

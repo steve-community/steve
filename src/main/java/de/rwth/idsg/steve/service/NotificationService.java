@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2023 SteVe Community Team
+ * Copyright (C) 2013-2024 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -43,7 +43,6 @@ import static de.rwth.idsg.steve.NotificationFeature.OcppStationWebSocketDisconn
 import static de.rwth.idsg.steve.NotificationFeature.OcppTransactionStarted;
 import static de.rwth.idsg.steve.NotificationFeature.OcppStationStatusSuspendedEV;
 import static de.rwth.idsg.steve.NotificationFeature.OcppTransactionEnded;
-import de.rwth.idsg.steve.repository.OcppServerRepository;
 import de.rwth.idsg.steve.repository.TransactionRepository;
 import de.rwth.idsg.steve.repository.UserRepository;
 import de.rwth.idsg.steve.repository.dto.Transaction;
@@ -62,7 +61,6 @@ public class NotificationService {
     @Autowired private MailService mailService;
     @Autowired private TransactionRepository transactionRepository;
     @Autowired private UserRepository userRepository;
-    @Autowired private OcppServerRepository ocppServerRepository;
     @Autowired private ScheduledExecutorService executorService;
 
     @EventListener
@@ -146,35 +144,39 @@ public class NotificationService {
     }
 
     private void notificationActionSuspendedEV(OcppStationStatusSuspendedEV notification) {
-        Integer connectorPk = ocppServerRepository.getConnectorPk(notification.getChargeBoxId(),
-                notification.getConnectorId()
-        );
-        String ocppTag = transactionRepository.getOcppTagOfActiveTransaction(connectorPk);
-
         String subject = format("EV stopped charging at charging station %s, Connector %d",
                     notification.getChargeBoxId(),
                     notification.getConnectorId()
         );
-        if (ocppTag != null) {
-            String eMailAddress = null;
-            UserRecord userRecord = new UserRecord();
-            try {
-                userRecord = userRepository.getDetails(ocppTag).getUserRecord();
-                eMailAddress = userRecord.getEMail();
-            } catch (Exception e) {
-                log.error("Failed to send email (SuspendedEV). User not found! " + e.getMessage());
-            }
-            // send email if user with eMail address found
-            if (!Strings.isNullOrEmpty(eMailAddress)) {
-                String bodyUserMail =
-                        format("User: %s %s \n\n Connector %d of charging station %s notifies Suspended_EV",
-                                userRecord.getFirstName(),
-                                userRecord.getLastName(),
-                                notification.getConnectorId(),
-                                notification.getChargeBoxId()
-                        );
 
-                mailService.sendAsync(subject, addTimestamp(bodyUserMail), eMailAddress);
+        Integer transactionPk = transactionRepository.getActiveTransactionId(notification.getChargeBoxId(),
+                notification.getConnectorId());
+        if (transactionPk != null) {
+            Transaction transaction = transactionRepository.getTransaction(transactionPk);
+            String ocppTag = transaction.getOcppIdTag();
+            if (ocppTag != null) {
+                // No mail directly after the start of the transaction, 
+                if (notification.getTimestamp().isAfter(transaction.getStartTimestamp().plusMinutes(1))) {
+                    String eMailAddress = null;
+                    UserRecord userRecord = new UserRecord();
+                    try {
+                        userRecord = userRepository.getDetails(ocppTag).getUserRecord();
+                        eMailAddress = userRecord.getEMail();
+                    } catch (Exception e) {
+                        log.error("Failed to send email (SuspendedEV). User not found! " + e.getMessage());
+                    }
+                    // send email if user with eMail address found
+                    if (!Strings.isNullOrEmpty(eMailAddress)) {
+                        String bodyUserMail =
+                                format("User: %s %s \n\n Connector %d of charging station %s notifies Suspended_EV",
+                                        userRecord.getFirstName(),
+                                        userRecord.getLastName(),
+                                        notification.getConnectorId(),
+                                        notification.getChargeBoxId()
+                                );
+                        mailService.sendAsync(subject, addTimestamp(bodyUserMail), eMailAddress);
+                    }
+                }
             }
         }
 

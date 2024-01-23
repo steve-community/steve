@@ -71,8 +71,7 @@ public class TransactionRepositoryImpl implements TransactionRepository {
         form.setTransactionPk(transactionPk);
         form.setReturnCSV(false);
         form.setType(TransactionQueryForm.QueryType.ALL);
-        return getInternal(form).fetch()
-                                .map(new TransactionMapper()).get(0);
+        return getInternal(form).fetchAny(new TransactionMapper());
     }
 
     @Override

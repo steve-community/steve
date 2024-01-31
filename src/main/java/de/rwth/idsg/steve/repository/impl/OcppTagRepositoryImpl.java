@@ -161,9 +161,12 @@ public class OcppTagRepositoryImpl implements OcppTagRepository {
     public List<String> getActiveIdTags() {
         return ctx.select(OCPP_TAG_ACTIVITY.ID_TAG)
                   .from(OCPP_TAG_ACTIVITY)
-                  .where(OCPP_TAG_ACTIVITY.IN_TRANSACTION.isFalse())
+                  .where(OCPP_TAG_ACTIVITY.ACTIVE_TRANSACTION_COUNT
+                          .lessThan(OCPP_TAG_ACTIVITY.MAX_ACTIVE_TRANSACTION_COUNT.cast(Long.class))
+                          .or(OCPP_TAG_ACTIVITY.MAX_ACTIVE_TRANSACTION_COUNT.lessThan(0)))
                     .and(OCPP_TAG_ACTIVITY.BLOCKED.isFalse())
-                    .and(OCPP_TAG_ACTIVITY.EXPIRY_DATE.isNull().or(OCPP_TAG_ACTIVITY.EXPIRY_DATE.greaterThan(DateTime.now())))
+                    .and(OCPP_TAG_ACTIVITY.EXPIRY_DATE.isNull()
+                            .or(OCPP_TAG_ACTIVITY.EXPIRY_DATE.greaterThan(DateTime.now())))
                   .fetch(OCPP_TAG_ACTIVITY.ID_TAG);
     }
 

@@ -18,10 +18,8 @@
  */
 package de.rwth.idsg.steve.web.api.dto;
 
-//import de.rwth.idsg.steve.ocpp.OcppTransport;
 import io.swagger.annotations.ApiModelProperty;
 import java.util.ArrayList;
-//import java.util.Collections;
 import java.util.List;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -52,10 +50,9 @@ public class ApiChargePointList {
         @ApiModelProperty(value = "List of the charge box connectors")
         private List<Integer> connectorIds;
 
-        ChargePointInfo(String chargeBoxId, List<Integer> connectorIds) {
+        public ChargePointInfo(String chargeBoxId, List<Integer> connectorIds) {
             this.chargeBoxId = chargeBoxId;
             this.connectorIds = connectorIds;
         }
     }
-
 }

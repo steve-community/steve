@@ -244,7 +244,7 @@ public class RemoteStartStopRestController {
         }
 
         // Check for acctive transactions on the connector, If a active transaction is found, don't send RemoteStart.
-        Integer transactionId = transactionRepository.getActiveTransactionId(params.getChargeBoxId(), 
+        Integer transactionId = transactionRepository.getActiveTransactionId(params.getChargeBoxId(),
                 params.getConnectorId());
         if (!isNull(transactionId)) {
             String errMsg = String.format("Active transaction found for connector %s at ChargeBox %s!",
@@ -283,9 +283,9 @@ public class RemoteStartStopRestController {
         // set the ChargPointSelectionList, maybe check nessesary that length is one
         transactionParams.setChargePointSelectList(chargePointRepository.getChargePointSelect(params.getChargeBoxId()));
 
-        // Get the transactionId of the active transaction on the connector. 
+        // Get the transactionId of the active transaction on the connector.
         // If no transaction active don't send RemoteStop
-        Integer transactionId = transactionRepository.getActiveTransactionId(params.getChargeBoxId(), 
+        Integer transactionId = transactionRepository.getActiveTransactionId(params.getChargeBoxId(),
                 params.getConnectorId());
         if (isNull(transactionId)) {
             String errMsg = String.format("No active transaction found for connector %s at ChargeBox %s!",
@@ -326,7 +326,7 @@ public class RemoteStartStopRestController {
         transactionParams.setChargePointSelectList(chargePointRepository.getChargePointSelect(params.getChargeBoxId()));
 
         /* If a active transaction is found, don't unlock the connection. */
-        Integer transactionId = transactionRepository.getActiveTransactionId(params.getChargeBoxId(), 
+        Integer transactionId = transactionRepository.getActiveTransactionId(params.getChargeBoxId(),
                 params.getConnectorId());
         if (!isNull(transactionId)) {
             String errMsg = String.format("Active transaction found for connector %s at ChargeBox %s!",

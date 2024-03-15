@@ -16,30 +16,38 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package de.rwth.idsg.steve.web.dto;
+package de.rwth.idsg.steve.web.api.dto;
 
+//import de.rwth.idsg.steve.ocpp.OcppTransport;
+import de.rwth.idsg.steve.repository.dto.ConnectorStatus;
+import de.rwth.idsg.steve.utils.ConnectorStatusCountFilter;
 import io.swagger.annotations.ApiModelProperty;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import lombok.Setter;
-import lombok.ToString;
 
 /**
- * @author Sevket Goekay <sevketgokay@gmail.com>
- * @since 18.09.2018
+ * @author fnkbsi
+ * @since 20.10.2023
  */
+
 @Getter
 @Setter
-@ToString
-public class ConnectorStatusForm {
-    @ApiModelProperty(value = "Charge Box Id")
-    private String chargeBoxId;
-    @ApiModelProperty(value = "Connector Status")
-    private String status;
-    @ApiModelProperty(value = "Strategy of listing the connector")
-    private Strategy strategy = Strategy.PreferZero;
+@RequiredArgsConstructor
+public class ApiConnectorList {
 
-    public enum Strategy {
-        PreferZero,
-        PreferOthersWithStatusOfZero;
-    }
+    @ApiModelProperty(value = "List of charge boxes")
+    private List<String> chargeBoxList = new ArrayList<>();
+
+    @ApiModelProperty(value = "List of possible states")
+    private final Set<String> statusFilterValues = ConnectorStatusCountFilter.ALL_STATUS_VALUES;
+
+    @ApiModelProperty(value = "List of connectors is filtered")
+    private Boolean isFiltered = false;
+
+    @ApiModelProperty(value = "List of connectors")
+    private List<ConnectorStatus> connectors = new ArrayList<>();
 }

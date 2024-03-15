@@ -16,30 +16,24 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package de.rwth.idsg.steve.web.dto;
+package de.rwth.idsg.steve.web.api.dto;
 
+import de.rwth.idsg.steve.repository.dto.TaskOverview;
 import io.swagger.annotations.ApiModelProperty;
+import java.util.List;
+
 import lombok.Getter;
 import lombok.Setter;
-import lombok.ToString;
 
 /**
- * @author Sevket Goekay <sevketgokay@gmail.com>
- * @since 18.09.2018
+ * @author fnkbsi
+ * @since 18.10.2023
  */
+
 @Getter
 @Setter
-@ToString
-public class ConnectorStatusForm {
-    @ApiModelProperty(value = "Charge Box Id")
-    private String chargeBoxId;
-    @ApiModelProperty(value = "Connector Status")
-    private String status;
-    @ApiModelProperty(value = "Strategy of listing the connector")
-    private Strategy strategy = Strategy.PreferZero;
-
-    public enum Strategy {
-        PreferZero,
-        PreferOthersWithStatusOfZero;
-    }
+//@RequiredArgsConstructor
+public class ApiTaskList {
+    @ApiModelProperty(value = "List of tasks")
+    private List<TaskOverview> tasks;
 }

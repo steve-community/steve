@@ -28,7 +28,6 @@ import org.apache.cxf.ws.addressing.WSAddressingFeature;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocketFactory;
 import javax.xml.ws.soap.SOAPBinding;
@@ -42,10 +41,9 @@ import static de.rwth.idsg.steve.SteveConfiguration.CONFIG;
 @Component
 public class ClientProvider {
 
-    @Nullable private TLSClientParameters tlsClientParams;
+    @Nullable private final TLSClientParameters tlsClientParams;
 
-    @PostConstruct
-    private void init() {
+    public ClientProvider() {
         if (shouldInitSSL()) {
             tlsClientParams = new TLSClientParameters();
             tlsClientParams.setSSLSocketFactory(setupSSL());

@@ -30,6 +30,7 @@ import de.rwth.idsg.steve.service.notification.OcppStationStatusFailure;
 import de.rwth.idsg.steve.service.notification.OcppTransactionEnded;
 import de.rwth.idsg.steve.service.notification.OcppTransactionStarted;
 import jooq.steve.db.enums.TransactionStopEventActor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import ocpp.cs._2015._10.AuthorizationStatus;
 import ocpp.cs._2015._10.AuthorizeRequest;
@@ -57,7 +58,6 @@ import ocpp.cs._2015._10.StatusNotificationResponse;
 import ocpp.cs._2015._10.StopTransactionRequest;
 import ocpp.cs._2015._10.StopTransactionResponse;
 import org.joda.time.DateTime;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
@@ -68,15 +68,16 @@ import java.util.Optional;
  * @since 13.03.2018
  */
 @Slf4j
+@RequiredArgsConstructor
 @Service
 public class CentralSystemService16_Service {
 
-    @Autowired private OcppServerRepository ocppServerRepository;
-    @Autowired private SettingsRepository settingsRepository;
+    private final OcppServerRepository ocppServerRepository;
+    private final SettingsRepository settingsRepository;
 
-    @Autowired private OcppTagService ocppTagService;
-    @Autowired private ApplicationEventPublisher applicationEventPublisher;
-    @Autowired private ChargePointHelperService chargePointHelperService;
+    private final OcppTagService ocppTagService;
+    private final ApplicationEventPublisher applicationEventPublisher;
+    private final ChargePointHelperService chargePointHelperService;
 
     public BootNotificationResponse bootNotification(BootNotificationRequest parameters, String chargeBoxIdentity,
                                                      OcppProtocol ocppProtocol) {

@@ -28,10 +28,10 @@ import de.rwth.idsg.steve.utils.TransactionStopServiceHelper;
 import jooq.steve.db.enums.TransactionStopEventActor;
 import jooq.steve.db.tables.records.TransactionStartRecord;
 import lombok.Builder;
+import lombok.RequiredArgsConstructor;
 import ocpp.cs._2012._06.UnitOfMeasure;
 import org.jetbrains.annotations.Nullable;
 import org.joda.time.DateTime;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Comparator;
@@ -44,11 +44,12 @@ import static de.rwth.idsg.steve.utils.TransactionStopServiceHelper.kWhStringToW
  * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 09.12.2018
  */
+@RequiredArgsConstructor
 @Service
 public class TransactionStopService {
 
-    @Autowired private TransactionRepository transactionRepository;
-    @Autowired private OcppServerRepository ocppServerRepository;
+    private final TransactionRepository transactionRepository;
+    private final OcppServerRepository ocppServerRepository;
 
     public void stop(List<Integer> transactionPkList) {
         transactionPkList.stream()

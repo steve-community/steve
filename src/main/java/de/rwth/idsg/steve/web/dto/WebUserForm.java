@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2024 SteVe Community Team
+ * Copyright (C) 2013-2023 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -18,32 +18,28 @@
  */
 package de.rwth.idsg.steve.web.dto;
 
-import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.ToString;
 
-import java.util.Map;
 
-/**
- *
- * @author Sevket Goekay <sevketgokay@gmail.com>
- *
+ /**
+ * @author Frank Brosi
+ * @since 01.04.2022
  */
 @Getter
-@Builder
-@ToString
-public final class Statistics {
-    // Number of chargeboxes, ocppTags, users, reservations, transactions
-    private final Integer numChargeBoxes, numOcppTags, numUsers, numReservations, numTransactions,
-    // Received heartbeats
-    heartbeatToday, heartbeatYesterday, heartbeatEarlier,
-    //WebUser
-    numWebUsers;
+@Setter
+public class WebUserForm {
 
-    // Number of connected WebSocket/JSON chargeboxes
-    @Setter private int numOcpp12JChargeBoxes, numOcpp15JChargeBoxes, numOcpp16JChargeBoxes;
+    // Internal database id
+    private Boolean enabled;
 
-    // Count of connectors based on their status
-    @Setter private Map<String, Integer> statusCountMap;
+    private String webusername;
+
+    private String password;
+
+    private String passwordComparison;
+
+    private String roles;
+
+    private Boolean pwerror;
 }

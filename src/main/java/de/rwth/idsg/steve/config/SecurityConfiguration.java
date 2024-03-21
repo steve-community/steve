@@ -18,9 +18,10 @@
  */
 package de.rwth.idsg.steve.config;
 
+import static de.rwth.idsg.steve.SteveConfiguration.CONFIG;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.joda.JodaModule;
 import com.google.common.base.Strings;
+import com.zaxxer.hikari.HikariDataSource;
 import de.rwth.idsg.steve.SteveProdCondition;
 import de.rwth.idsg.steve.web.api.ApiControllerAdvice;
 import lombok.extern.slf4j.Slf4j;
@@ -38,13 +39,7 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.crypto.factory.PasswordEncoderFactories;
-import org.springframework.security.crypto.password.DelegatingPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.preauth.AbstractPreAuthenticatedProcessingFilter;
@@ -54,10 +49,14 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-import static de.rwth.idsg.steve.SteveConfiguration.CONFIG;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.provisioning.JdbcUserDetailsManager;
+import org.springframework.security.provisioning.UserDetailsManager;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
+ * @author Frank Brosi
  * @since 07.01.2015
  */
 @Slf4j
@@ -66,27 +65,25 @@ import static de.rwth.idsg.steve.SteveConfiguration.CONFIG;
 @Conditional(SteveProdCondition.class)
 public class SecurityConfiguration {
 
+    @Autowired
+    private HikariDataSource dataSource;
+
+    
     /**
      * Password encoding changed with spring-security 5.0.0. We either have to use a prefix before the password to
      * indicate which actual encoder {@link DelegatingPasswordEncoder} should use [1, 2] or specify the encoder as we do.
      *
      * [1] https://spring.io/blog/2017/11/01/spring-security-5-0-0-rc1-released#password-storage-format
      * [2] {@link PasswordEncoderFactories#createDelegatingPasswordEncoder()}
+    */
+
+    /**
+     *
+     * @return
      */
     @Bean
     public PasswordEncoder passwordEncoder() {
         return CONFIG.getAuth().getPasswordEncoder();
-    }
-
-    @Bean
-    public UserDetailsService userDetailsService() {
-        UserDetails webPageUser = User.builder()
-                .username(CONFIG.getAuth().getUserName())
-                .password(CONFIG.getAuth().getEncodedPassword())
-                .roles("ADMIN")
-                .build();
-
-        return new InMemoryUserDetailsManager(webPageUser);
     }
 
     @Bean
@@ -100,21 +97,105 @@ public class SecurityConfiguration {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         final String prefix = CONFIG.getSpringManagerMapping();
-
         return http
-            .authorizeHttpRequests(
-                req -> req.antMatchers(prefix + "/**").hasRole("ADMIN")
-            )
+            .authorizeRequests(
+                 req -> req
+                    .antMatchers(prefix + "/home").hasAnyRole("USER", "ADMIN")
+                     // webuser
+                    .antMatchers(prefix + "/webusers").hasAnyRole("USER", "ADMIN")
+                    .antMatchers(prefix + "/webusers" + "/details/**").hasAnyRole("USER", "ADMIN")
+                    // users
+                    .antMatchers(prefix + "/users").hasAnyRole("USER", "ADMIN")
+                    .antMatchers(prefix + "/users" + "/details/**").hasAnyRole("USER", "ADMIN")
+                     //ocppTags
+                    .antMatchers(prefix + "/ocppTags").hasAnyRole("USER", "ADMIN")
+                    .antMatchers(prefix + "/ocppTags" + "/details/**").hasAnyRole("USER", "ADMIN")
+                     // chargepoints
+                    .antMatchers(prefix + "/chargepoints").hasAnyRole("USER", "ADMIN")
+                    .antMatchers(prefix + "/chargepoints" + "/details/**").hasAnyRole("USER", "ADMIN")
+                     // transactions and reservations
+                    .antMatchers(prefix + "/transactions").hasAnyRole("USER", "ADMIN")
+                    .antMatchers(prefix + "/transactions" + "/details/**").hasAnyRole("USER", "ADMIN")
+                    .antMatchers(prefix + "/reservations").hasAnyRole("USER", "ADMIN")
+                    .antMatchers(prefix + "/reservations" + "/**").hasRole("ADMIN")
+                     // singout and noAccess
+                    .antMatchers(prefix + "/signout/" + "**").hasAnyRole("USER", "ADMIN")
+                    .antMatchers(prefix + "/noAccess/" + "**").hasAnyRole("USER", "ADMIN")
+                     // any other site
+                    .antMatchers(prefix + "/**").hasRole("ADMIN")
+                )
             .sessionManagement(
-                req -> req.invalidSessionUrl(prefix + "/signin")
-            )
+                 req -> req
+                    .invalidSessionUrl(prefix + "/signin")
+                )
             .formLogin(
-                req -> req.loginPage(prefix + "/signin").permitAll()
-            )
+                req -> req
+                    .loginPage(prefix + "/signin")
+                    .permitAll()
+                )
             .logout(
-                req -> req.logoutUrl(prefix + "/signout")
-            )
+                req -> req
+                    .logoutUrl(prefix + "/signout")
+                )
+
+            .exceptionHandling(
+                req -> req
+                    .accessDeniedPage(prefix + "/noAccess")
+                )
             .build();
+    }
+
+    /**
+     *
+     * @param auth
+     * @throws Exception
+     */
+    @Autowired
+    public void configureGlobal(AuthenticationManagerBuilder auth)
+      throws Exception {
+        auth.jdbcAuthentication()
+            .passwordEncoder(CONFIG.getAuth().getPasswordEncoder())
+            .dataSource(dataSource)
+            .usersByUsernameQuery("select username,password,enabled from webusers where username = ?")
+            .authoritiesByUsernameQuery("select username,authority from webauthorities where username = ?");
+    }
+
+
+    /**
+     *
+     * @return
+     */
+    @Bean
+    public UserDetailsManager authenticateUsers() {
+      JdbcUserDetailsManager users = new JdbcUserDetailsManager(dataSource);
+      // Adapt the SQL-Commands to the correct table names (user -> webuser; authorities -> webauthorities)
+      users.setAuthoritiesByUsernameQuery("select username,authority from webauthorities where username=?");
+      users.setUsersByUsernameQuery("select username,password,enabled from webusers where username=?");
+
+      /* Adding the admin from config-file to the database/webusers
+            --> changing the name in the file will not delete the corresponding webuser in the database!
+      users.setCreateUserSql("insert into webusers (username, password, enabled) values (?,?,?)");
+      users.setCreateAuthoritySql("insert into webauthorities (username, authority) values (?,?)");
+      users.setUserExistsSql("select username from webusers where username = ?");
+      users.setUpdateUserSql("update webusers set password = ?, enabled = ? where username = ?");
+      users.setDeleteUserAuthoritiesSql("delete from webauthorities where username = ?");
+
+      UserDetails localUser = User.builder()
+                .username(CONFIG.getAuth().getUserName())
+                .password(CONFIG.getAuth().getEncodedPassword())
+                .roles("USER")
+                .build();
+
+      if (users.userExists(CONFIG.getAuth().getUserName()))
+      {
+          users.updateUser(localUser);
+      }
+      else
+      {
+          users.createUser(localUser);
+      }
+      */
+      return users;
     }
 
     @Bean

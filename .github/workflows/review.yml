@@ -27,7 +27,7 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
       - name: Run PMD
-        uses: pmd/pmd-github-action@v1
+        uses: pmd/pmd-github-action@v2
         with:
           version: 'latest'
           sourcePath: './src/main/java'

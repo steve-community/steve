@@ -40,10 +40,10 @@
     <table class="userInputFullPage">
         <tr>
             <td>${endpointInfo.ocppSoap.info}:</td>
-            <td><c:forEach items="${endpointInfo.ocppSoap.data}" var="i">${i}<br></c:forEach></td>
+            <td>${endpointInfo.ocppSoap.url}</td>
         <tr>
             <td>${endpointInfo.ocppWebSocket.info}:</td>
-            <td><c:forEach items="${endpointInfo.ocppWebSocket.data}" var="i">${i}<br></c:forEach></td>
+            <td>${endpointInfo.ocppWebSocket.url}</td>
         </tr>
     </tr>
     </table>

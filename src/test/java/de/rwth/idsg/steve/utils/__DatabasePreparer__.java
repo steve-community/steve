@@ -129,9 +129,9 @@ public class __DatabasePreparer__ {
         return impl.getChargePointConnectorStatus();
     }
 
-    public static TransactionDetails getDetails(int transactionPk) {
+    public static TransactionDetails getDetails(int transactionPk, boolean firstArrivingMeterValueIfMultiple) {
         TransactionRepositoryImpl impl = new TransactionRepositoryImpl(dslContext);
-        return impl.getDetails(transactionPk);
+        return impl.getDetails(transactionPk, firstArrivingMeterValueIfMultiple);
     }
 
     public static OcppTagActivityRecord getOcppTagRecord(String idTag) {

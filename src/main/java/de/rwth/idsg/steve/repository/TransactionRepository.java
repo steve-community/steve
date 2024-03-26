@@ -38,6 +38,10 @@ public interface TransactionRepository {
 
     TransactionDetails getDetails(int transactionPk, boolean firstArrivingMeterValueIfMultiple);
 
+    /**
+     * @deprecated Use {@link #getDetails(int, boolean)} instead
+     */
+    @Deprecated
     default TransactionDetails getDetails(int transactionPk) {
         return getDetails(transactionPk, true);
     }

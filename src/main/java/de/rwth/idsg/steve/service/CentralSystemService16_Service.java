@@ -57,7 +57,6 @@ import ocpp.cs._2015._10.StatusNotificationResponse;
 import ocpp.cs._2015._10.StopTransactionRequest;
 import ocpp.cs._2015._10.StopTransactionResponse;
 import org.joda.time.DateTime;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
@@ -71,17 +70,31 @@ import java.util.Optional;
 @Service
 public class CentralSystemService16_Service {
 
-    @Autowired private OcppServerRepository ocppServerRepository;
-    @Autowired private SettingsRepository settingsRepository;
+    private final OcppServerRepository ocppServerRepository;
+    private final SettingsRepository settingsRepository;
 
-    @Autowired private OcppTagService ocppTagService;
-    @Autowired private ApplicationEventPublisher applicationEventPublisher;
-    @Autowired private ChargePointHelperService chargePointHelperService;
+    private final OcppTagService ocppTagService;
+    private final ApplicationEventPublisher applicationEventPublisher;
+    private final UnknownChargePointService unknownChargePointService;
+
+    public CentralSystemService16_Service(
+            OcppServerRepository ocppServerRepository,
+            SettingsRepository settingsRepository,
+            OcppTagService ocppTagService,
+            ApplicationEventPublisher applicationEventPublisher,
+            UnknownChargePointService unknownChargePointService
+    ) {
+        this.ocppServerRepository = ocppServerRepository;
+        this.settingsRepository = settingsRepository;
+        this.ocppTagService = ocppTagService;
+        this.applicationEventPublisher = applicationEventPublisher;
+        this.unknownChargePointService = unknownChargePointService;
+    }
 
     public BootNotificationResponse bootNotification(BootNotificationRequest parameters, String chargeBoxIdentity,
                                                      OcppProtocol ocppProtocol) {
 
-        Optional<RegistrationStatus> status = chargePointHelperService.getRegistrationStatus(chargeBoxIdentity);
+        Optional<RegistrationStatus> status = unknownChargePointService.getRegistrationStatus(chargeBoxIdentity);
         applicationEventPublisher.publishEvent(new OccpStationBooted(chargeBoxIdentity, status));
         DateTime now = DateTime.now();
 

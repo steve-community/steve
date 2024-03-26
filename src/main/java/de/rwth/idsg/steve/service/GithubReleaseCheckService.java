@@ -29,10 +29,10 @@ import de.rwth.idsg.steve.web.dto.ReleaseResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
-import javax.annotation.PostConstruct;
 import java.io.File;
 import java.util.Collections;
 
@@ -40,6 +40,7 @@ import java.util.Collections;
  * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 19.04.2016
  */
+@Component
 @Slf4j
 public class GithubReleaseCheckService implements ReleaseCheckService {
 
@@ -55,10 +56,10 @@ public class GithubReleaseCheckService implements ReleaseCheckService {
 
     private static final String FILE_SEPARATOR = File.separator;
 
-    private RestTemplate restTemplate;
+    private final RestTemplate restTemplate;
+    private final Version build;
 
-    @PostConstruct
-    private void init() {
+    public GithubReleaseCheckService(SteveConfiguration config) {
         HttpComponentsClientHttpRequestFactory factory = new HttpComponentsClientHttpRequestFactory();
         factory.setReadTimeout(API_TIMEOUT_IN_MILLIS);
         factory.setConnectTimeout(API_TIMEOUT_IN_MILLIS);
@@ -70,6 +71,7 @@ public class GithubReleaseCheckService implements ReleaseCheckService {
 
         restTemplate = new RestTemplate(Collections.singletonList(new MappingJackson2HttpMessageConverter(mapper)));
         restTemplate.setRequestFactory(factory);
+        build = Version.valueOf(config.getSteveVersion());
     }
 
     @Override
@@ -89,10 +91,9 @@ public class GithubReleaseCheckService implements ReleaseCheckService {
     // Private helpers
     // -------------------------------------------------------------------------
 
-    private static ReleaseReport getReport(ReleaseResponse response) {
+    private ReleaseReport getReport(ReleaseResponse response) {
         String githubVersion = extractVersion(response);
 
-        Version build = Version.valueOf(SteveConfiguration.CONFIG.getSteveVersion());
         Version github = Version.valueOf(githubVersion);
 
         boolean isGithubMoreRecent = github.greaterThan(build);

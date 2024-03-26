@@ -37,7 +37,7 @@ public class Application implements ApplicationStarter, AutoCloseable {
         // For Hibernate validator
         System.setProperty("org.jboss.logging.provider", "slf4j");
 
-        SteveConfiguration sc = SteveConfiguration.CONFIG;
+        SteveConfiguration sc = new SteveConfiguration();
         log.info("Loaded the properties. Starting with the '{}' profile", sc.getProfile());
 
         TimeZone.setDefault(TimeZone.getTimeZone(sc.getTimeZoneId()));
@@ -46,11 +46,11 @@ public class Application implements ApplicationStarter, AutoCloseable {
 
         switch (sc.getProfile()) {
             case DEV:
-                delegate = new SteveDevStarter();
+                delegate = new SteveDevStarter(sc);
                 break;
             case TEST:
             case PROD:
-                delegate = new SteveProdStarter();
+                delegate = new SteveProdStarter(sc);
                 break;
             default:
                 throw new RuntimeException("Unexpected profile");

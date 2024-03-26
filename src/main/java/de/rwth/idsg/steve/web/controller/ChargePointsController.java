@@ -21,14 +21,13 @@ package de.rwth.idsg.steve.web.controller;
 import de.rwth.idsg.steve.ocpp.OcppProtocol;
 import de.rwth.idsg.steve.repository.ChargePointRepository;
 import de.rwth.idsg.steve.repository.dto.ChargePoint;
-import de.rwth.idsg.steve.service.ChargePointHelperService;
+import de.rwth.idsg.steve.service.UnknownChargePointService;
 import de.rwth.idsg.steve.utils.ControllerHelper;
 import de.rwth.idsg.steve.utils.mapper.ChargePointDetailsMapper;
 import de.rwth.idsg.steve.web.dto.ChargePointBatchInsertForm;
 import de.rwth.idsg.steve.web.dto.ChargePointForm;
 import de.rwth.idsg.steve.web.dto.ChargePointQueryForm;
 import jooq.steve.db.tables.records.ChargeBoxRecord;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -52,8 +51,8 @@ import java.util.stream.Collectors;
 @RequestMapping(value = "/manager/chargepoints")
 public class ChargePointsController {
 
-    @Autowired protected ChargePointRepository chargePointRepository;
-    @Autowired protected ChargePointHelperService chargePointHelperService;
+    private final ChargePointRepository chargePointRepository;
+    private final UnknownChargePointService unknownChargePointService;
 
     protected static final String PARAMS = "params";
 
@@ -85,6 +84,14 @@ public class ChargePointsController {
     protected static final String UNKNOWN_REMOVE_PATH = "/unknown/remove/{chargeBoxId}/";
     protected static final String UNKNOWN_ADD_PATH = "/unknown/add/{chargeBoxId}/";
 
+    public ChargePointsController(
+            ChargePointRepository chargePointRepository,
+            UnknownChargePointService unknownChargePointService
+    ) {
+        this.chargePointRepository = chargePointRepository;
+        this.unknownChargePointService = unknownChargePointService;
+    }
+
     // -------------------------------------------------------------------------
     // HTTP methods
     // -------------------------------------------------------------------------
@@ -104,7 +111,7 @@ public class ChargePointsController {
     private void initList(Model model, ChargePointQueryForm params) {
         model.addAttribute(PARAMS, params);
         model.addAttribute("cpList", chargePointRepository.getOverview(params));
-        model.addAttribute("unknownList", chargePointHelperService.getUnknownChargePoints());
+        model.addAttribute("unknownList", unknownChargePointService.getUnknownChargePoints());
     }
 
     @RequestMapping(value = DETAILS_PATH, method = RequestMethod.GET)
@@ -195,7 +202,7 @@ public class ChargePointsController {
 
     @RequestMapping(value = UNKNOWN_REMOVE_PATH, method = RequestMethod.POST)
     public String removeUnknownChargeBoxId(@PathVariable("chargeBoxId") String chargeBoxId) {
-        chargePointHelperService.removeUnknown(Collections.singletonList(chargeBoxId));
+        unknownChargePointService.removeUnknown(Collections.singletonList(chargeBoxId));
         return toOverview();
     }
 
@@ -234,11 +241,11 @@ public class ChargePointsController {
 
     private void add(ChargePointForm form) {
         chargePointRepository.addChargePoint(form);
-        chargePointHelperService.removeUnknown(Collections.singletonList(form.getChargeBoxId()));
+        unknownChargePointService.removeUnknown(Collections.singletonList(form.getChargeBoxId()));
     }
 
     private void add(List<String> idList) {
         chargePointRepository.addChargePointList(idList);
-        chargePointHelperService.removeUnknown(idList);
+        unknownChargePointService.removeUnknown(idList);
     }
 }

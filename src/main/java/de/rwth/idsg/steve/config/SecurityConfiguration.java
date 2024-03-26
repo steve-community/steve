@@ -19,8 +19,8 @@
 package de.rwth.idsg.steve.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.joda.JodaModule;
 import com.google.common.base.Strings;
+import de.rwth.idsg.steve.SteveConfiguration;
 import de.rwth.idsg.steve.SteveProdCondition;
 import de.rwth.idsg.steve.web.api.ApiControllerAdvice;
 import lombok.extern.slf4j.Slf4j;
@@ -54,8 +54,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-import static de.rwth.idsg.steve.SteveConfiguration.CONFIG;
-
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 07.01.2015
@@ -74,15 +72,15 @@ public class SecurityConfiguration {
      * [2] {@link PasswordEncoderFactories#createDelegatingPasswordEncoder()}
      */
     @Bean
-    public PasswordEncoder passwordEncoder() {
-        return CONFIG.getAuth().getPasswordEncoder();
+    public PasswordEncoder passwordEncoder(SteveConfiguration config) {
+        return config.getAuth().getPasswordEncoder();
     }
 
     @Bean
-    public UserDetailsService userDetailsService() {
+    public UserDetailsService userDetailsService(SteveConfiguration config) {
         UserDetails webPageUser = User.builder()
-                .username(CONFIG.getAuth().getUserName())
-                .password(CONFIG.getAuth().getEncodedPassword())
+                .username(config.getAuth().getUserName())
+                .password(config.getAuth().getEncodedPassword())
                 .roles("ADMIN")
                 .build();
 
@@ -90,16 +88,16 @@ public class SecurityConfiguration {
     }
 
     @Bean
-    public WebSecurityCustomizer webSecurityCustomizer() {
+    public WebSecurityCustomizer webSecurityCustomizer(SteveConfiguration config) {
         return (web) -> web.ignoring().antMatchers(
             "/static/**",
-            CONFIG.getCxfMapping() + "/**"
+            config.getCxfMapping() + "/**"
         );
     }
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        final String prefix = CONFIG.getSpringManagerMapping();
+    public SecurityFilterChain securityFilterChain(HttpSecurity http, SteveConfiguration config) throws Exception {
+        final String prefix = config.getSpringManagerMapping();
 
         return http
             .authorizeHttpRequests(
@@ -119,12 +117,12 @@ public class SecurityConfiguration {
 
     @Bean
     @Order(1)
-    public SecurityFilterChain apiKeyFilterChain(HttpSecurity http, ObjectMapper objectMapper) throws Exception {
-        return http.antMatcher(CONFIG.getApiMapping() + "/**")
+    public SecurityFilterChain apiKeyFilterChain(HttpSecurity http, ObjectMapper objectMapper, SteveConfiguration config) throws Exception {
+        return http.antMatcher(config.getApiMapping() + "/**")
             .csrf().disable()
             .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             .and()
-            .addFilter(new ApiKeyFilter())
+            .addFilter(new ApiKeyFilter(config))
             .authorizeRequests()
             .anyRequest()
             .authenticated()
@@ -147,11 +145,11 @@ public class SecurityConfiguration {
         private final String headerValue;
         private final boolean isApiEnabled;
 
-        public ApiKeyFilter() {
+        public ApiKeyFilter(SteveConfiguration config) {
             setAuthenticationManager(this);
 
-            headerKey = CONFIG.getWebApi().getHeaderKey();
-            headerValue = CONFIG.getWebApi().getHeaderValue();
+            headerKey = config.getWebApi().getHeaderKey();
+            headerValue = config.getWebApi().getHeaderValue();
             isApiEnabled = !Strings.isNullOrEmpty(headerKey) && !Strings.isNullOrEmpty(headerValue);
 
             if (!isApiEnabled) {

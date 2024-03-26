@@ -19,6 +19,7 @@
 package de.rwth.idsg.steve.ocpp.ws;
 
 import com.google.common.base.Strings;
+import de.rwth.idsg.steve.SteveConfiguration;
 import de.rwth.idsg.steve.config.WebSocketConfiguration;
 import de.rwth.idsg.steve.ocpp.OcppTransport;
 import de.rwth.idsg.steve.ocpp.OcppVersion;
@@ -29,7 +30,6 @@ import de.rwth.idsg.steve.repository.OcppServerRepository;
 import de.rwth.idsg.steve.service.notification.OcppStationWebSocketConnected;
 import de.rwth.idsg.steve.service.notification.OcppStationWebSocketDisconnected;
 import org.joda.time.DateTime;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.web.socket.BinaryMessage;
 import org.springframework.web.socket.CloseStatus;
@@ -54,20 +54,35 @@ import java.util.function.Consumer;
  * @since 17.03.2015
  */
 public abstract class AbstractWebSocketEndpoint extends ConcurrentWebSocketHandler implements SubProtocolCapable {
-
-    @Autowired private ScheduledExecutorService service;
-    @Autowired private OcppServerRepository ocppServerRepository;
-    @Autowired private FutureResponseContextStore futureResponseContextStore;
-    @Autowired private ApplicationEventPublisher applicationEventPublisher;
-
     public static final String CHARGEBOX_ID_KEY = "CHARGEBOX_ID_KEY";
 
-    private final SessionContextStore sessionContextStore = new SessionContextStore();
-    private final List<Consumer<String>> connectedCallbackList = new ArrayList<>();
-    private final List<Consumer<String>> disconnectedCallbackList = new ArrayList<>();
-    private final Object sessionContextLock = new Object();
+    private final ScheduledExecutorService service;
+    private final OcppServerRepository ocppServerRepository;
+    protected final FutureResponseContextStore futureResponseContextStore;
+    private final ApplicationEventPublisher applicationEventPublisher;
+    private final SessionContextStore sessionContextStore;
+    private final List<Consumer<String>> connectedCallbackList;
+    private final List<Consumer<String>> disconnectedCallbackList;
+    private final Object sessionContextLock;
 
     private IncomingPipeline pipeline;
+
+    protected AbstractWebSocketEndpoint(
+            ScheduledExecutorService service,
+            OcppServerRepository ocppServerRepository,
+            FutureResponseContextStore futureResponseContextStore,
+            ApplicationEventPublisher applicationEventPublisher,
+            SteveConfiguration config
+    ) {
+        this.service = service;
+        this.ocppServerRepository = ocppServerRepository;
+        this.futureResponseContextStore = futureResponseContextStore;
+        this.applicationEventPublisher = applicationEventPublisher;
+        this.sessionContextStore = new SessionContextStore(config);
+        this.connectedCallbackList = new ArrayList<>();
+        this.disconnectedCallbackList = new ArrayList<>();
+        this.sessionContextLock = new Object();
+    }
 
     public abstract OcppVersion getVersion();
 

@@ -56,11 +56,16 @@ import static de.rwth.idsg.steve.utils.Helpers.getRandomStrings;
  */
 public class StressTestJsonOCPP16 extends StressTest {
 
-    private static final String PATH = getJsonPath();
     private static final OcppVersion VERSION = OcppVersion.V_16;
+    private final String path;
 
     public static void main(String[] args) throws Exception {
         new StressTestJsonOCPP16().attack();
+    }
+
+    StressTestJsonOCPP16() {
+        SteveConfiguration config = new SteveConfiguration();
+        path = getJsonPath(config);
     }
 
     protected void attackInternal() throws Exception {
@@ -76,7 +81,7 @@ public class StressTestJsonOCPP16 extends StressTest {
                 ThreadLocalRandom localRandom = ThreadLocalRandom.current();
 
                 String chargeBoxId = chargeBoxIds.get(localRandom.nextInt(chargeBoxIds.size()));
-                threadLocalChargePoint.set(new OcppJsonChargePoint(VERSION, chargeBoxId, PATH));
+                threadLocalChargePoint.set(new OcppJsonChargePoint(VERSION, chargeBoxId, path));
 
                 OcppJsonChargePoint chargePoint = threadLocalChargePoint.get();
                 chargePoint.start();

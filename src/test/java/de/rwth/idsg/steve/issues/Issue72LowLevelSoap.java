@@ -19,6 +19,7 @@
 package de.rwth.idsg.steve.issues;
 
 import com.google.common.net.MediaType;
+import de.rwth.idsg.steve.SteveConfiguration;
 import de.rwth.idsg.steve.StressTest;
 import de.rwth.idsg.steve.utils.Helpers;
 import de.rwth.idsg.steve.utils.StressTester;
@@ -57,10 +58,15 @@ import static de.rwth.idsg.steve.utils.Helpers.getRandomString;
  */
 public class Issue72LowLevelSoap extends StressTest {
 
-    private static final String path = getPath();
+    private final String path;
 
     public static void main(String[] args) throws Exception {
         new Issue72LowLevelSoap().attack();
+    }
+
+    Issue72LowLevelSoap() {
+        SteveConfiguration config = new SteveConfiguration();
+        path = getPath(config);
     }
 
     protected void attackInternal() throws Exception {
@@ -158,7 +164,7 @@ public class Issue72LowLevelSoap extends StressTest {
         }
     }
 
-    private static String buildRequest(String chargeBoxId, int transactionId, String idTag,
+    private String buildRequest(String chargeBoxId, int transactionId, String idTag,
                                        DateTime stop, int meterStop) {
         return "<soap:Envelope xmlns:soap=\"http://www.w3.org/2003/05/soap-envelope\">" +
                 "<soap:Header><Action xmlns=\"http://www.w3.org/2005/08/addressing\">/StopTransaction</Action>" +

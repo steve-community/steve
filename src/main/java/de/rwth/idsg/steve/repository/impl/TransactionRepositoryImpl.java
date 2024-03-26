@@ -36,7 +36,6 @@ import org.jooq.Record9;
 import org.jooq.RecordMapper;
 import org.jooq.SelectQuery;
 import org.jooq.Table;
-import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -89,7 +88,7 @@ public class TransactionRepositoryImpl implements TransactionRepository {
     }
 
     @Override
-    public TransactionDetails getDetails(int transactionPk, boolean firstArrivingMeterValueIfMultiple) {
+    public TransactionDetails getDetails(int transactionPk) {
 
         // -------------------------------------------------------------------------
         // Step 1: Collect general data about transaction
@@ -176,20 +175,7 @@ public class TransactionRepositoryImpl implements TransactionRepository {
         //
         Table<ConnectorMeterValueRecord> t1 = transactionQuery.union(timestampQuery).asTable("t1");
 
-        // -------------------------------------------------------------------------
-        // Step 3: Charging station might send meter vales at fixed intervals (e.g.
-        // every 15 min) regardless of the fact that connector's meter value did not
-        // change (e.g. vehicle is fully charged, but cable is still connected). This
-        // yields multiple entries in db with the same value but different timestamp.
-        // We are only interested in the first (or last) arriving entry.
-        // -------------------------------------------------------------------------
-
-        Field<DateTime> dateTimeField;
-        if (firstArrivingMeterValueIfMultiple) {
-            dateTimeField = DSL.min(t1.field(2, DateTime.class)).as("min");
-        } else {
-            dateTimeField = DSL.max(t1.field(2, DateTime.class)).as("max");
-        }
+        Field<DateTime> dateTimeField = t1.field(2, DateTime.class);
 
         List<TransactionDetails.MeterValues> values =
                 ctx.select(
@@ -202,14 +188,6 @@ public class TransactionRepositoryImpl implements TransactionRepository {
                         t1.field(8, String.class),
                         t1.field(9, String.class))
                    .from(t1)
-                   .groupBy(
-                           t1.field(3),
-                           t1.field(4),
-                           t1.field(5),
-                           t1.field(6),
-                           t1.field(7),
-                           t1.field(8),
-                           t1.field(9))
                    .orderBy(dateTimeField)
                    .fetch()
                    .map(r -> TransactionDetails.MeterValues.builder()

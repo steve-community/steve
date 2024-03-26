@@ -36,9 +36,5 @@ public interface TransactionRepository {
 
     List<Integer> getActiveTransactionIds(String chargeBoxId);
 
-    TransactionDetails getDetails(int transactionPk, boolean firstArrivingMeterValueIfMultiple);
-
-    default TransactionDetails getDetails(int transactionPk) {
-        return getDetails(transactionPk, true);
-    }
+    TransactionDetails getDetails(int transactionPk);
 }

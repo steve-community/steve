@@ -30,7 +30,7 @@ import jooq.steve.db.tables.records.TransactionStartRecord;
 import org.joda.time.DateTime;
 import org.jooq.Condition;
 import org.jooq.DSLContext;
-import org.jooq.Field;
+//import org.jooq.Field;
 import org.jooq.Record12;
 import org.jooq.Record9;
 import org.jooq.RecordMapper;
@@ -50,6 +50,9 @@ import static jooq.steve.db.tables.ConnectorMeterValue.CONNECTOR_METER_VALUE;
 import static jooq.steve.db.tables.OcppTag.OCPP_TAG;
 import static jooq.steve.db.tables.Transaction.TRANSACTION;
 import static jooq.steve.db.tables.TransactionStart.TRANSACTION_START;
+import org.jooq.Record11;
+import org.jooq.Record8;
+//import static org.jooq.impl.DSL.*;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -78,6 +81,28 @@ public class TransactionRepositoryImpl implements TransactionRepository {
     }
 
     @Override
+    public void writeTransactionsDetailsCSV(int transactionPk, Writer writer, 
+                    boolean dataReduction, boolean firstArrivingMeterValueIfMultiple) {
+        // write a few information about the transaction
+        TransactionQueryForm form = new TransactionQueryForm();
+        form.setTransactionPk(transactionPk);
+        form.setType(TransactionQueryForm.QueryType.ALL);
+        form.setPeriodType(TransactionQueryForm.QueryPeriodType.ALL);
+        //getInternalCSV(form).fetch().formatCSV(writer);
+        Record12<Integer, String, Integer, String, DateTime, String, DateTime,
+                    String, String, Integer, Integer, TransactionStopEventActor>
+                res = getInternal(form).fetchOne();
+        if (res == null) {
+            throw new SteveException("There is no transaction with id '%s'", transactionPk);
+        }
+        res.formatCSV(writer);
+        Transaction transaction = new TransactionMapper().map(res); //.map(new TransactionMapper());
+        TransactionStartRecord nextTx = null;
+        getDetailsQuery(transaction, nextTx, transactionPk, dataReduction, firstArrivingMeterValueIfMultiple)
+                .fetch().formatCSV(writer);
+    }
+    
+    @Override
     public List<Integer> getActiveTransactionIds(String chargeBoxId) {
         return ctx.select(TRANSACTION.TRANSACTION_PK)
                   .from(TRANSACTION)
@@ -89,39 +114,64 @@ public class TransactionRepositoryImpl implements TransactionRepository {
     }
 
     @Override
-    public TransactionDetails getDetails(int transactionPk, boolean firstArrivingMeterValueIfMultiple) {
-
+    public TransactionDetails getDetails(int transactionPk,
+            boolean dataReduction, boolean firstArrivingMeterValueIfMultiple) {
         // -------------------------------------------------------------------------
         // Step 1: Collect general data about transaction
         // -------------------------------------------------------------------------
-
+        //
         TransactionQueryForm form = new TransactionQueryForm();
         form.setTransactionPk(transactionPk);
         form.setType(TransactionQueryForm.QueryType.ALL);
         form.setPeriodType(TransactionQueryForm.QueryPeriodType.ALL);
 
-        Record12<Integer, String, Integer, String, DateTime, String, DateTime, String, String, Integer, Integer, TransactionStopEventActor>
-                transaction = getInternal(form).fetchOne();
+        Record12<Integer, String, Integer, String, DateTime, String, DateTime,
+                String, String, Integer, Integer, TransactionStopEventActor>
+                res = getInternal(form).fetchOne();
 
-        if (transaction == null) {
+        if (res == null) {
             throw new SteveException("There is no transaction with id '%s'", transactionPk);
         }
+        //Transaction transaction = getInternal(form).fetchOne(new TransactionMapper());
+        TransactionMapper mapper = new TransactionMapper();
+        Transaction transaction = mapper.map(res);
+        TransactionStartRecord nextTx = null;
+        List<TransactionDetails.MeterValues> values =
+                getDetailsQuery(transaction, nextTx, transactionPk, dataReduction, firstArrivingMeterValueIfMultiple)
+                   .fetch()
+                   .map(r -> TransactionDetails.MeterValues.builder()
+                                                           .valueTimestamp(r.value1())
+                                                           .value(r.value2())
+                                                           .readingContext(r.value3())
+                                                           .format(r.value4())
+                                                           .measurand(r.value5())
+                                                           .location(r.value6())
+                                                           .unit(r.value7())
+                                                           .phase(r.value8())
+                                                           .build());
+        
+        return new TransactionDetails(transaction, values, nextTx);
+    }
 
-        DateTime startTimestamp = transaction.value5();
-        DateTime stopTimestamp = transaction.value7();
-        String stopValue = transaction.value8();
-        String chargeBoxId = transaction.value2();
-        int connectorId = transaction.value3();
-
+    private SelectQuery<Record8<DateTime, String, String, String, String, String, String, String>>
+        getDetailsQuery(Transaction transaction, TransactionStartRecord nextTx, int transactionPk,
+                boolean dataReduction, boolean firstArrivingMeterValueIfMultiple) {
+        // -------------------------------------------------------------------------
+        // Step 1a: Collect general data about transaction
+        // -------------------------------------------------------------------------
+        //
+        DateTime startTimestamp = transaction.getStartTimestamp();
+        DateTime stopTimestamp = transaction.getStopTimestamp();
+        String stopValue = transaction.getStopValue();
+        String chargeBoxId = transaction.getChargeBoxId();
+        int connectorId = transaction.getConnectorId();
         // -------------------------------------------------------------------------
         // Step 2: Collect intermediate meter values
         // -------------------------------------------------------------------------
-
+        //
         Condition timestampCondition;
-        TransactionStartRecord nextTx = null;
-
+        //TransactionStartRecord nextTx = null;
         if (stopTimestamp == null && stopValue == null) {
-
             // https://github.com/steve-community/steve/issues/97
             //
             // handle "zombie" transaction, for which we did not receive any StopTransaction. if we do not handle it,
@@ -175,55 +225,94 @@ public class TransactionRepositoryImpl implements TransactionRepository {
         // UNION removes all duplicate records
         //
         Table<ConnectorMeterValueRecord> t1 = transactionQuery.union(timestampQuery).asTable("t1");
+        if (!dataReduction) {
+            return ctx.select(
+                    t1.field(2, DateTime.class),
+                    t1.field(3, String.class),
+                    t1.field(4, String.class),
+                    t1.field(5, String.class),
+                    t1.field(6, String.class),
+                    t1.field(7, String.class),
+                    t1.field(8, String.class),
+                    t1.field(9, String.class))
+                    .from(t1)
+                    //.orderBy(innerTable.field(2))
+                    .getQuery();
+        }
 
         // -------------------------------------------------------------------------
         // Step 3: Charging station might send meter vales at fixed intervals (e.g.
         // every 15 min) regardless of the fact that connector's meter value did not
         // change (e.g. vehicle is fully charged, but cable is still connected). This
-        // yields multiple entries in db with the same value but different timestamp.
+        // yields multiple entries in db with the same value but different timestamps.
         // We are only interested in the first (or last) arriving entry.
         // -------------------------------------------------------------------------
 
-        Field<DateTime> dateTimeField;
+        //Field<DateTime> dateTimeField;
+        Table<Record11<Integer, Integer, DateTime, String, String, String,
+                String, String, String, String, Double>> innerTable;
         if (firstArrivingMeterValueIfMultiple) {
-            dateTimeField = DSL.min(t1.field(2, DateTime.class)).as("min");
-        } else {
-            dateTimeField = DSL.max(t1.field(2, DateTime.class)).as("max");
-        }
-
-        List<TransactionDetails.MeterValues> values =
-                ctx.select(
-                        dateTimeField,
+            //dateTimeField = DSL.min(t1.field(2, DateTime.class)).as("min");
+             innerTable =
+                 ctx.select(t1.field(0, Integer.class),
+                        t1.field(1, Integer.class),
+                        t1.field(2, DateTime.class),
                         t1.field(3, String.class),
                         t1.field(4, String.class),
                         t1.field(5, String.class),
                         t1.field(6, String.class),
                         t1.field(7, String.class),
                         t1.field(8, String.class),
-                        t1.field(9, String.class))
+                        t1.field(9, String.class),
+                        //lag(t1.field("value"))
+                        //        .over(partitionBy(t1.field("measurand"),t1.field("phase"))
+                        //                .orderBy(t1.field("value_timestamp"))).cast(String.class).as("lagVal"),
+                        t1.field("value", Double.class).sub(DSL.lag(t1.field("value", Double.class))
+                                .over(DSL.partitionBy(t1.field("measurand"), t1.field("phase"))
+                                        .orderBy(t1.field("value_timestamp")))).as("diff"))
+                        .from(t1)
+                   .where(t1.field("transaction_pk", Integer.class).eq(transactionPk))
+                        .and((t1.field("format", String.class).eq("raw")).or(t1.field("format", String.class).isNull()))
+                        .asTable();
+        } else {
+            //dateTimeField = DSL.max(t1.field(2, DateTime.class)).as("max");
+            innerTable =
+                 ctx.select(t1.field(0, Integer.class),
+                        t1.field(1, Integer.class),
+                        t1.field(2, DateTime.class),
+                        t1.field(3, String.class),
+                        t1.field(4, String.class),
+                        t1.field(5, String.class),
+                        t1.field(6, String.class),
+                        t1.field(7, String.class),
+                        t1.field(8, String.class),
+                        t1.field(9, String.class),
+                        //lead(t1.field("value"))
+                        //        .over(partitionBy(t1.field("measurand"),t1.field("phase"))
+                        //                .orderBy(t1.field("value_timestamp"))).cast(String.class).as("leadVal"),
+                        t1.field("value", Double.class).sub(DSL.lead(t1.field("value", Double.class))
+                                .over(DSL.partitionBy(t1.field("measurand"), t1.field("phase"))
+                                        .orderBy(t1.field("value_timestamp")))).as("diff"))
                    .from(t1)
-                   .groupBy(
-                           t1.field(3),
-                           t1.field(4),
-                           t1.field(5),
-                           t1.field(6),
-                           t1.field(7),
-                           t1.field(8),
-                           t1.field(9))
-                   .orderBy(dateTimeField)
-                   .fetch()
-                   .map(r -> TransactionDetails.MeterValues.builder()
-                                                           .valueTimestamp(r.value1())
-                                                           .value(r.value2())
-                                                           .readingContext(r.value3())
-                                                           .format(r.value4())
-                                                           .measurand(r.value5())
-                                                           .location(r.value6())
-                                                           .unit(r.value7())
-                                                           .phase(r.value8())
-                                                           .build());
+                   .where(t1.field("transaction_pk", Integer.class).eq(transactionPk))
+                        .and((t1.field("format", String.class).eq("raw")).or(t1.field("format", String.class).isNull()))
+                        .asTable();
+        }
 
-        return new TransactionDetails(new TransactionMapper().map(transaction), values, nextTx);
+        return ctx.select(
+                        innerTable.field(2, DateTime.class),
+                        innerTable.field(3, String.class),
+                        innerTable.field(4, String.class),
+                        innerTable.field(5, String.class),
+                        innerTable.field(6, String.class),
+                        innerTable.field(7, String.class),
+                        innerTable.field(8, String.class),
+                        innerTable.field(9, String.class))
+                   .from(innerTable)
+                    .where(innerTable.field(10, Double.class).ne(0.0))
+                        .or(innerTable.field(10, Double.class).isNull())
+                   //.orderBy(innerTable.field(2))
+                .getQuery();
     }
 
     // -------------------------------------------------------------------------

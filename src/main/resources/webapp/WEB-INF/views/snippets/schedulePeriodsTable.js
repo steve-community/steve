@@ -1,5 +1,5 @@
 // https://stackoverflow.com/a/14533243
-$('#periodsTable').on('click', '.removeRow', function() {
+$('#periodsTable').on('click', '#removeRow', function() {
     $(this).closest("tr").remove();
 });
 

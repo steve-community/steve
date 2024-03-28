@@ -134,7 +134,6 @@ After SteVe has successfully started, you can access the web interface using the
 
     http://<your-server-ip>:<port>/steve/manager
     
-The default port number is 8080.
 
 ### Add a charge point
 

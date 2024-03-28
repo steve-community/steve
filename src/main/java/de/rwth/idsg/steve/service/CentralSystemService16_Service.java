@@ -157,11 +157,13 @@ public class CentralSystemService16_Service {
     }
 
     public MeterValuesResponse meterValues(MeterValuesRequest parameters, String chargeBoxIdentity) {
+        Integer transactionId = getTransactionId(parameters);
+
         ocppServerRepository.insertMeterValues(
                 chargeBoxIdentity,
                 parameters.getMeterValue(),
                 parameters.getConnectorId(),
-                parameters.getTransactionId()
+                transactionId
         );
 
         return new MeterValuesResponse();
@@ -266,5 +268,20 @@ public class CentralSystemService16_Service {
         // OCPP requires a status to be set. Since this is a dummy impl, set it to "Accepted".
         // https://github.com/steve-community/steve/pull/36
         return new DataTransferResponse().withStatus(DataTransferStatus.ACCEPTED);
+    }
+
+    // -------------------------------------------------------------------------
+    // Helpers
+    // -------------------------------------------------------------------------
+
+    /**
+     * https://github.com/steve-community/steve/issues/1415
+     */
+    private Integer getTransactionId(MeterValuesRequest parameters) {
+        Integer transactionId = parameters.getTransactionId();
+        if (transactionId == null || transactionId == 0) {
+            return null;
+        }
+        return transactionId;
     }
 }

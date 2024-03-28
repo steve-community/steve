@@ -43,8 +43,11 @@ public class InsertTransactionParams {
     // this came after splitting transaction table into two tables (start and stop)
     private final DateTime eventTimestamp;
 
+    /**
+     * https://github.com/steve-community/steve/issues/1414
+     */
     public boolean isSetReservationId() {
-        return reservationId != null;
+        return reservationId != null && reservationId != 0;
     }
 
 }

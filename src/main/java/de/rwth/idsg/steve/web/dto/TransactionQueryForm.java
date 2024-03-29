@@ -44,7 +44,7 @@ public class TransactionQueryForm extends QueryForm {
     private boolean returnCSV = false;
 
     @ApiModelProperty(value = "Return active or all transactions? Defaults to ALL")
-    private QueryType type = QueryType.ACTIVE;
+    private QueryType type = QueryType.ALL;
 
     @ApiModelProperty(value = "Return the time period of the transactions. If FROM_TO, 'from' and 'to' must be set. Additionally, 'to' must be after 'from'. Defaults to ALL")
     private QueryPeriodType periodType = QueryPeriodType.ALL;

@@ -57,7 +57,7 @@ public class TransactionStopService {
     }
 
     public void stop(Integer transactionPk) {
-        TransactionDetails thisTxDetails = transactionRepository.getDetails(transactionPk, false);
+        TransactionDetails thisTxDetails = transactionRepository.getDetails(transactionPk);
         Transaction thisTx = thisTxDetails.getTransaction();
 
         // early exit, if transaction is already stopped

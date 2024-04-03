@@ -110,6 +110,7 @@ public class TransactionRepositoryImpl implements TransactionRepository {
                   .fetchAny(TRANSACTION.TRANSACTION_PK);
     }
 
+    @Override
     public TransactionDetails getDetails(int transactionPk) {
 
         // -------------------------------------------------------------------------

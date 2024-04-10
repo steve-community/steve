@@ -10,7 +10,6 @@ from `ocpp_tag` `o` left join `transaction` `t` on (
     `t`.`stop_value` is null)
 group by
     `o`.`ocpp_tag_pk`,
-    `o`.`id_tag`,
     `o`.`parent_id_tag`,
     `o`.`expiry_date`,
     `o`.`max_active_transaction_count`,

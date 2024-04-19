@@ -31,7 +31,6 @@ import org.joda.time.DateTime;
 import org.jooq.DSLContext;
 import org.jooq.JoinType;
 import org.jooq.Record10;
-import org.jooq.Record7;
 import org.jooq.RecordMapper;
 import org.jooq.Result;
 import org.jooq.SelectQuery;

@@ -251,6 +251,9 @@ CREATE TABLE IF NOT EXISTS `settings` (
   UNIQUE KEY `settings_id_UNIQUE` (`app_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_unicode_ci;
 
+-- Exported data of table stevedb.settings: ~1 rows (approx.)
+INSERT INTO `settings` (`app_id`, `heartbeat_interval_in_seconds`, `hours_to_expire`, `mail_enabled`, `mail_host`, `mail_username`, `mail_password`, `mail_from`, `mail_protocol`, `mail_port`, `mail_recipients`, `notification_features`) VALUES
+	('U3RlY2tkb3NlblZlcndhbHR1bmc=', 14400, 1, 0, NULL, NULL, NULL, NULL, 'smtp', 25, NULL, NULL);
 
 -- Exported structur of view stevedb.transaction
 -- Create a temporary table, to be upfront of view-dependencies

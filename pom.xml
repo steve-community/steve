@@ -38,7 +38,7 @@
         <jooq.version>3.19.7</jooq.version>
         <flyway.version>10.11.1</flyway.version>
         <cxf.version>3.5.5</cxf.version>
-        <spring.version>5.3.33</spring.version>
+        <spring.version>5.3.34</spring.version>
         <spring.security.version>5.7.11</spring.security.version>
         <mysql.jdbc.version>8.0.30</mysql.jdbc.version>
         <jetty.version>10.0.14</jetty.version>

@@ -48,6 +48,7 @@
 
         <!-- In Mysql: schema == database (http://dev.mysql.com/doc/refman/5.6/en/glossary.html#glos_schema) -->
         <jdbcUrl>jdbc:mysql://${db.ip}:${db.port}/${db.schema}?useSSL=true&amp;serverTimezone=UTC</jdbcUrl>
+        <db.driver>com.mysql.cj.jdbc.Driver</db.driver>
     </properties>
 
     <profiles>
@@ -57,6 +58,12 @@
                 <activeByDefault>true</activeByDefault>
             </activation>
             <properties>
+                <db.ip>localhost</db.ip>
+                <dp.port>3306</dp.port>
+                <db.schema>stevedb</db.schema>
+                <db.user>steve</db.user>
+                <db.password>changeme</db.password>
+
                 <envName>prod</envName>
                 <skipTests>true</skipTests>
             </properties>
@@ -64,6 +71,12 @@
         <profile>
             <id>docker</id>
             <properties>
+                <db.ip>mariadb</db.ip>
+                <dp.port>3306</dp.port>
+                <db.schema>stevedb</db.schema>
+                <db.user>steve</db.user>
+                <db.password>changeme</db.password>
+
                 <envName>docker</envName>
                 <skipTests>true</skipTests>
             </properties>
@@ -71,6 +84,12 @@
         <profile>
             <id>kubernetes</id>
             <properties>
+                <db.ip>$DB_HOST</db.ip>
+                <dp.port>$DB_PORT</dp.port>
+                <db.schema>$DB_DATABASE</db.schema>
+                <db.user>$DB_USERNAME</db.user>
+                <db.password>$DB_PASSWORD</db.password>
+
                 <envName>kubernetes</envName>
                 <skipTests>true</skipTests>
             </properties>
@@ -78,6 +97,12 @@
         <profile>
             <id>dev</id>
             <properties>
+                <db.ip>localhost</db.ip>
+                <dp.port>3306</dp.port>
+                <db.schema>stevedb</db.schema>
+                <db.user>steve</db.user>
+                <db.password>changeme</db.password>
+
                 <envName>dev</envName>
                 <skipTests>true</skipTests>
             </properties>
@@ -85,6 +110,12 @@
         <profile>
             <id>test</id>
             <properties>
+                <db.ip>localhost</db.ip>
+                <dp.port>3306</dp.port>
+                <db.schema>stevedb_test_2aa6a783d47d</db.schema>
+                <db.user>steve</db.user>
+                <db.password>changeme</db.password>
+
                 <envName>test</envName>
                 <skipTests>false</skipTests>
             </properties>
@@ -245,26 +276,6 @@
                 </configuration>
             </plugin>
 
-            <!-- Read from main.properties the DB configuration -->
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>properties-maven-plugin</artifactId>
-                <version>1.2.1</version>
-                <executions>
-                    <execution>
-                        <phase>initialize</phase>
-                        <goals>
-                            <goal>read-project-properties</goal>
-                        </goals>
-                        <configuration>
-                            <files>
-                                <file>src/main/resources/config/${envName}/main.properties</file>
-                            </files>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-dependency-plugin</artifactId>
@@ -351,7 +362,7 @@
                     <table>schema_version</table>
 
                     <cleanDisabled>true</cleanDisabled>
-                    <driver>com.mysql.cj.jdbc.Driver</driver>
+                    <driver>${db.driver}</driver>
                     <url>${jdbcUrl}</url>
                     <user>${db.user}</user>
                     <password>${db.password}</password>
@@ -410,7 +421,7 @@
                      http://www.jooq.org/doc/3.5/manual/code-generation/codegen-advanced/ -->
                 <configuration>
                     <jdbc>
-                        <driver>com.mysql.cj.jdbc.Driver</driver>
+                        <driver>${db.driver}</driver>
                         <url>${jdbcUrl}</url>
                         <user>${db.user}</user>
                         <password>${db.password}</password>

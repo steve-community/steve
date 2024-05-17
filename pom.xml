@@ -84,11 +84,11 @@
         <profile>
             <id>kubernetes</id>
             <properties>
-                <db-ip>$DB_HOST</db-ip>
-                <db-port>$DB_PORT</db-port>
-                <db-schema>$DB_DATABASE</db-schema>
-                <db-user>$DB_USERNAME</db-user>
-                <db-password>$DB_PASSWORD</db-password>
+                <db-ip>${env.DB_HOST}</db-ip>
+                <db-port>${env.DB_PORT}</db-port>
+                <db-schema>${env.DB_DATABASE}</db-schema>
+                <db-user>${env.DB_USERNAME}</db-user>
+                <db-password>${env.DB_PASSWORD}</db-password>
 
                 <envName>kubernetes</envName>
                 <skipTests>true</skipTests>

@@ -220,6 +220,11 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>3.2.5</version>
+                <configuration>
+                    <systemPropertyVariables>
+                        <schemaToTruncate>${db-schema}</schemaToTruncate>
+                    </systemPropertyVariables>
+                </configuration>
             </plugin>
 
             <!-- Static analysis and check style -->

@@ -47,8 +47,8 @@
         <plugin.license-maven.version>4.3</plugin.license-maven.version>
 
         <!-- In Mysql: schema == database (http://dev.mysql.com/doc/refman/5.6/en/glossary.html#glos_schema) -->
-        <jdbcUrl>jdbc:mysql://${db.ip}:${db.port}/${db.schema}?useSSL=true&amp;serverTimezone=UTC</jdbcUrl>
-        <db.driver>com.mysql.cj.jdbc.Driver</db.driver>
+        <jdbcUrl>jdbc:mysql://${db-ip}:${db-port}/${db-schema}?useSSL=true&amp;serverTimezone=UTC</jdbcUrl>
+        <db-driver>com.mysql.cj.jdbc.Driver</db-driver>
     </properties>
 
     <profiles>
@@ -58,11 +58,11 @@
                 <activeByDefault>true</activeByDefault>
             </activation>
             <properties>
-                <db.ip>localhost</db.ip>
-                <dp.port>3306</dp.port>
-                <db.schema>stevedb</db.schema>
-                <db.user>steve</db.user>
-                <db.password>changeme</db.password>
+                <db-ip>localhost</db-ip>
+                <db-port>3306</db-port>
+                <db-schema>stevedb</db-schema>
+                <db-user>steve</db-user>
+                <db-password>changeme</db-password>
 
                 <envName>prod</envName>
                 <skipTests>true</skipTests>
@@ -71,11 +71,11 @@
         <profile>
             <id>docker</id>
             <properties>
-                <db.ip>mariadb</db.ip>
-                <dp.port>3306</dp.port>
-                <db.schema>stevedb</db.schema>
-                <db.user>steve</db.user>
-                <db.password>changeme</db.password>
+                <db-ip>mariadb</db-ip>
+                <db-port>3306</db-port>
+                <db-schema>stevedb</db-schema>
+                <db-user>steve</db-user>
+                <db-password>changeme</db-password>
 
                 <envName>docker</envName>
                 <skipTests>true</skipTests>
@@ -84,11 +84,11 @@
         <profile>
             <id>kubernetes</id>
             <properties>
-                <db.ip>$DB_HOST</db.ip>
-                <dp.port>$DB_PORT</dp.port>
-                <db.schema>$DB_DATABASE</db.schema>
-                <db.user>$DB_USERNAME</db.user>
-                <db.password>$DB_PASSWORD</db.password>
+                <db-ip>$DB_HOST</db-ip>
+                <db-port>$DB_PORT</db-port>
+                <db-schema>$DB_DATABASE</db-schema>
+                <db-user>$DB_USERNAME</db-user>
+                <db-password>$DB_PASSWORD</db-password>
 
                 <envName>kubernetes</envName>
                 <skipTests>true</skipTests>
@@ -97,11 +97,11 @@
         <profile>
             <id>dev</id>
             <properties>
-                <db.ip>localhost</db.ip>
-                <dp.port>3306</dp.port>
-                <db.schema>stevedb</db.schema>
-                <db.user>steve</db.user>
-                <db.password>changeme</db.password>
+                <db-ip>localhost</db-ip>
+                <db-port>3306</db-port>
+                <db-schema>stevedb</db-schema>
+                <db-user>steve</db-user>
+                <db-password>changeme</db-password>
 
                 <envName>dev</envName>
                 <skipTests>true</skipTests>
@@ -110,11 +110,11 @@
         <profile>
             <id>test</id>
             <properties>
-                <db.ip>localhost</db.ip>
-                <dp.port>3306</dp.port>
-                <db.schema>stevedb_test_2aa6a783d47d</db.schema>
-                <db.user>steve</db.user>
-                <db.password>changeme</db.password>
+                <db-ip>localhost</db-ip>
+                <db-port>3306</db-port>
+                <db-schema>stevedb_test_2aa6a783d47d</db-schema>
+                <db-user>steve</db-user>
+                <db-password>changeme</db-password>
 
                 <envName>test</envName>
                 <skipTests>false</skipTests>
@@ -362,12 +362,12 @@
                     <table>schema_version</table>
 
                     <cleanDisabled>true</cleanDisabled>
-                    <driver>${db.driver}</driver>
+                    <driver>${db-driver}</driver>
                     <url>${jdbcUrl}</url>
-                    <user>${db.user}</user>
-                    <password>${db.password}</password>
+                    <user>${db-user}</user>
+                    <password>${db-password}</password>
                     <schemas>
-                        <schema>${db.schema}</schema>
+                        <schema>${db-schema}</schema>
                     </schemas>
                     <locations>
                         <location>filesystem:src/main/resources/db/migration</location>
@@ -421,10 +421,10 @@
                      http://www.jooq.org/doc/3.5/manual/code-generation/codegen-advanced/ -->
                 <configuration>
                     <jdbc>
-                        <driver>${db.driver}</driver>
+                        <driver>${db-driver}</driver>
                         <url>${jdbcUrl}</url>
-                        <user>${db.user}</user>
-                        <password>${db.password}</password>
+                        <user>${db-user}</user>
+                        <password>${db-password}</password>
                     </jdbc>
 
                     <generator>
@@ -432,7 +432,7 @@
                             <name>org.jooq.meta.mysql.MySQLDatabase</name>
                             <includes>.*</includes>
                             <excludes/>
-                            <inputSchema>${db.schema}</inputSchema>
+                            <inputSchema>${db-schema}</inputSchema>
                             <unsignedTypes>false</unsignedTypes>
 
                             <forcedTypes>

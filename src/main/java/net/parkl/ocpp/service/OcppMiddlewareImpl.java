@@ -462,6 +462,9 @@ public class OcppMiddlewareImpl implements OcppMiddleware {
 
 
     private ChargePointSelect getChargePoint(String chargeBoxId, String protocol) {
+        if (protocol==null) {
+            throw new IllegalArgumentException("No protocol specified for charge box: " + chargeBoxId);
+        }
         OcppProtocol ocppProtocol = OcppProtocol.fromCompositeValue(protocol);
         List<ChargePointSelect> chargePoints;
         switch (ocppProtocol) {

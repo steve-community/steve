@@ -30,6 +30,7 @@ import de.rwth.idsg.steve.ocpp.ws.ocpp16.Ocpp16JacksonModule;
 
 import static com.fasterxml.jackson.core.JsonGenerator.Feature.WRITE_BIGDECIMAL_AS_PLAIN;
 import static com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_NULL_FOR_PRIMITIVES;
+import static com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES;
 
 /**
  * Because ObjectMapper can and should be reused, if config does not change after init.
@@ -56,6 +57,8 @@ public enum JsonObjectMapper {
         mapper.configure(FAIL_ON_NULL_FOR_PRIMITIVES, true);
 
         mapper.configure(WRITE_BIGDECIMAL_AS_PLAIN, true);
+
+        mapper.configure(FAIL_ON_UNKNOWN_PROPERTIES, false);
 
         mapper.registerModule(new CustomStringModule());
         mapper.registerModule(new Ocpp12JacksonModule());

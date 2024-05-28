@@ -68,7 +68,10 @@ public class WebSocketConfiguration implements WebSocketConfigurer {
             chargePointHelperService
         );
 
-        registry.addHandler(handshakeHandler.getDummyWebSocketHandler(), WebEnvironment.getContextRoot()+PATH_INFIX + "*")
+        String path = WebEnvironment.getContextRoot() + PATH_INFIX + "*";
+        log.info("Registering WebSocket handlers: {}...", path);
+
+        registry.addHandler(handshakeHandler.getDummyWebSocketHandler(), path)
                 .setHandshakeHandler(handshakeHandler)
                 .setAllowedOrigins("*");
     }

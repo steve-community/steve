@@ -319,6 +319,12 @@ CREATE TABLE `settings` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
+
+-- Exported data of table stevedb.settings: ~1 rows (approx.)
+INSERT INTO `settings` (`app_id`, `heartbeat_interval_in_seconds`, `hours_to_expire`, `mail_enabled`, `mail_host`, `mail_username`, `mail_password`, `mail_from`, `mail_protocol`, `mail_port`, `mail_recipients`, `notification_features`) VALUES
+	('U3RlY2tkb3NlblZlcndhbHR1bmc=', 14400, 1, 0, NULL, NULL, NULL, NULL, 'smtp', 25, NULL, NULL);
+
+
 --
 -- Temporary table structure for view `transaction`
 --

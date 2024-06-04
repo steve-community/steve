@@ -65,6 +65,15 @@ public class TransactionRepositoryImpl implements TransactionRepository {
     }
 
     @Override
+    public Transaction getTransaction(int transactionPk) {
+        TransactionQueryForm form = new TransactionQueryForm();
+        form.setTransactionPk(transactionPk);
+        form.setReturnCSV(false);
+        form.setType(TransactionQueryForm.QueryType.ALL);
+        return getInternal(form).fetchAny(new TransactionMapper());
+    }
+
+    @Override
     public List<Transaction> getTransactions(TransactionQueryForm form) {
         return getInternal(form).fetch()
                                 .map(new TransactionMapper());
@@ -85,6 +94,19 @@ public class TransactionRepositoryImpl implements TransactionRepository {
                     .and(CONNECTOR.CHARGE_BOX_ID.equal(chargeBoxId))
                   .where(TRANSACTION.STOP_TIMESTAMP.isNull())
                   .fetch(TRANSACTION.TRANSACTION_PK);
+    }
+
+    @Override
+    public Integer getActiveTransactionId(String chargeBoxId, Integer connectorId) {
+        return ctx.select(TRANSACTION.TRANSACTION_PK)
+                  .from(TRANSACTION)
+                  .join(CONNECTOR)
+                    .on(TRANSACTION.CONNECTOR_PK.equal(CONNECTOR.CONNECTOR_PK))
+                    .and(CONNECTOR.CHARGE_BOX_ID.equal(chargeBoxId))
+                  .where(TRANSACTION.STOP_TIMESTAMP.isNull())
+                    .and(CONNECTOR.CONNECTOR_ID.equal(connectorId))
+                  .orderBy(TRANSACTION.TRANSACTION_PK.desc()) // to avoid fetching ghost transactions, fetch the latest
+                  .fetchAny(TRANSACTION.TRANSACTION_PK);
     }
 
     @Override

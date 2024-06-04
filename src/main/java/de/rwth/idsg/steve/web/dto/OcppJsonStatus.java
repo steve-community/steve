@@ -18,7 +18,9 @@
  */
 package de.rwth.idsg.steve.web.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import de.rwth.idsg.steve.ocpp.OcppVersion;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.ToString;
@@ -32,9 +34,17 @@ import org.joda.time.DateTime;
 @Builder
 @ToString
 public final class OcppJsonStatus {
+    @JsonIgnore
+    @ApiModelProperty(value = "Charge Box Pk", hidden = true)
     private final int chargeBoxPk;
-    private final String chargeBoxId, connectedSince;
+    @ApiModelProperty(value = "Charge Box Id")
+    private final String chargeBoxId;
+    @ApiModelProperty(value = "Connected since")
+    private final String connectedSince;
+    @ApiModelProperty(value = "Duration of the Connection")
     private final String connectionDuration;
+    @ApiModelProperty(value = "Ocpp version")
     private final OcppVersion version;
+    @ApiModelProperty(value = "Connected since as DT", hidden = true)
     private final DateTime connectedSinceDT;
 }

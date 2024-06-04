@@ -52,6 +52,14 @@ Connector Status
 			</td>
 		</tr>
 		<tr>
+			<td>Status:</td>
+			<td><form:select path="strategy">
+				<option value="PreferZero" selected >Prefer Connector Zero</option>
+				<option value="PreferOthersWithStatusOfZero">Prefer Others</option>
+			</form:select>
+			</td>
+		</tr>
+		<tr>
 			<td></td>
 			<td id="add_space">
 				<input type="submit" value="Get">

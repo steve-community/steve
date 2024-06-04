@@ -18,7 +18,9 @@
  */
 package de.rwth.idsg.steve.repository.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import de.rwth.idsg.steve.ocpp.OcppProtocol;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -32,17 +34,32 @@ import org.joda.time.DateTime;
 @Getter
 @Builder
 public final class ConnectorStatus {
-    private final String chargeBoxId, timeStamp, status, errorCode;
-    private final int chargeBoxPk, connectorId;
+    @JsonIgnore
+    @ApiModelProperty(value = "Charge Box DB key", hidden = true)
+    private final int chargeBoxPk;
+    @ApiModelProperty(value = "Charge Box ID")
+    private final String chargeBoxId;
+    @ApiModelProperty(value = "Connector ID")
+    private final int connectorId;
 
+    @ApiModelProperty(value = "Status")
+    private final String status;
+    @ApiModelProperty(value = "Error code")
+    private final String errorCode;
+
+    @ApiModelProperty(value = "Timestamp")
+    private final String timeStamp;
     // For additional internal processing. Not related to the humanized
     // String version above, which is for representation on frontend
+    @ApiModelProperty(value = "Timestamp of the status")
     private final DateTime statusTimestamp;
 
+    @ApiModelProperty(value = "OCPP version")
     private final OcppProtocol ocppProtocol;
 
     // This is true, if the chargeBox this connector belongs to is a WS/JSON station
     // and it is disconnected at the moment of building this DTO.
+    @ApiModelProperty(value = "Json and Disconnected")
     @Setter
     @Builder.Default
     private boolean jsonAndDisconnected = false;

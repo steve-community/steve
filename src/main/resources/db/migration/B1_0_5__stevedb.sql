@@ -5,13 +5,13 @@
 -- ------------------------------------------------------
 -- Server version	11.4.2-MariaDB
 
-/*!40101 SET NAMES utf8mb4 */;
-/*!40103 SET TIME_ZONE='+00:00' */;
-/*!40101 SET character_set_client = utf8 */;
+SET NAMES utf8mb4;
+SET TIME_ZONE='+00:00';
+SET character_set_client = utf8;
 
-/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
-/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
-/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
+SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0;
+SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0;
+SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO';
 
 --
 -- Table structure for table `address`
@@ -342,23 +342,23 @@ CREATE TABLE `user` (
 -- Final view structure for view `transaction`
 --
 
-/*!50001 DROP VIEW IF EXISTS `transaction`*/;
-/*!50001 CREATE ALGORITHM=UNDEFINED */
-/*!50013 DEFINER=`steve`@`localhost` SQL SECURITY DEFINER */
-/*!50001 VIEW `transaction` AS select `tx1`.`transaction_pk` AS `transaction_pk`,`tx1`.`connector_pk` AS `connector_pk`,`tx1`.`id_tag` AS `id_tag`,`tx1`.`event_timestamp` AS `start_event_timestamp`,`tx1`.`start_timestamp` AS `start_timestamp`,`tx1`.`start_value` AS `start_value`,`tx2`.`event_actor` AS `stop_event_actor`,`tx2`.`event_timestamp` AS `stop_event_timestamp`,`tx2`.`stop_timestamp` AS `stop_timestamp`,`tx2`.`stop_value` AS `stop_value`,`tx2`.`stop_reason` AS `stop_reason` from (`transaction_start` `tx1` left join `transaction_stop` `tx2` on(`tx1`.`transaction_pk` = `tx2`.`transaction_pk` and `tx2`.`event_timestamp` = (select max(`s2`.`event_timestamp`) from `transaction_stop` `s2` where `tx2`.`transaction_pk` = `s2`.`transaction_pk`))) */;
+DROP VIEW IF EXISTS `transaction`;
+CREATE ALGORITHM=UNDEFINED
+DEFINER=`steve`@`localhost` SQL SECURITY DEFINER
+VIEW `transaction` AS select `tx1`.`transaction_pk` AS `transaction_pk`,`tx1`.`connector_pk` AS `connector_pk`,`tx1`.`id_tag` AS `id_tag`,`tx1`.`event_timestamp` AS `start_event_timestamp`,`tx1`.`start_timestamp` AS `start_timestamp`,`tx1`.`start_value` AS `start_value`,`tx2`.`event_actor` AS `stop_event_actor`,`tx2`.`event_timestamp` AS `stop_event_timestamp`,`tx2`.`stop_timestamp` AS `stop_timestamp`,`tx2`.`stop_value` AS `stop_value`,`tx2`.`stop_reason` AS `stop_reason` from (`transaction_start` `tx1` left join `transaction_stop` `tx2` on(`tx1`.`transaction_pk` = `tx2`.`transaction_pk` and `tx2`.`event_timestamp` = (select max(`s2`.`event_timestamp`) from `transaction_stop` `s2` where `tx2`.`transaction_pk` = `s2`.`transaction_pk`)));
 
 
 --
 -- Final view structure for view `ocpp_tag_activity`
 --
 
-/*!50001 DROP VIEW IF EXISTS `ocpp_tag_activity`*/;
-/*!50001 CREATE ALGORITHM=UNDEFINED */
-/*!50013 DEFINER=`steve`@`localhost` SQL SECURITY DEFINER */
-/*!50001 VIEW `ocpp_tag_activity` AS select `o`.`ocpp_tag_pk` AS `ocpp_tag_pk`,`o`.`id_tag` AS `id_tag`,`o`.`parent_id_tag` AS `parent_id_tag`,`o`.`expiry_date` AS `expiry_date`,`o`.`max_active_transaction_count` AS `max_active_transaction_count`,`o`.`note` AS `note`,count(`t`.`id_tag`) AS `active_transaction_count`,case when count(`t`.`id_tag`) > 0 then 1 else 0 end AS `in_transaction`,case when `o`.`max_active_transaction_count` = 0 then 1 else 0 end AS `blocked` from (`ocpp_tag` `o` left join `transaction` `t` on(`o`.`id_tag` = `t`.`id_tag` and `t`.`stop_timestamp` is null and `t`.`stop_value` is null)) group by `o`.`ocpp_tag_pk`,`o`.`parent_id_tag`,`o`.`expiry_date`,`o`.`max_active_transaction_count`,`o`.`note` */;
+DROP VIEW IF EXISTS `ocpp_tag_activity`;
+CREATE ALGORITHM=UNDEFINED
+DEFINER=`steve`@`localhost` SQL SECURITY DEFINER
+VIEW `ocpp_tag_activity` AS select `o`.`ocpp_tag_pk` AS `ocpp_tag_pk`,`o`.`id_tag` AS `id_tag`,`o`.`parent_id_tag` AS `parent_id_tag`,`o`.`expiry_date` AS `expiry_date`,`o`.`max_active_transaction_count` AS `max_active_transaction_count`,`o`.`note` AS `note`,count(`t`.`id_tag`) AS `active_transaction_count`,case when count(`t`.`id_tag`) > 0 then 1 else 0 end AS `in_transaction`,case when `o`.`max_active_transaction_count` = 0 then 1 else 0 end AS `blocked` from (`ocpp_tag` `o` left join `transaction` `t` on(`o`.`id_tag` = `t`.`id_tag` and `t`.`stop_timestamp` is null and `t`.`stop_value` is null)) group by `o`.`ocpp_tag_pk`,`o`.`parent_id_tag`,`o`.`expiry_date`,`o`.`max_active_transaction_count`,`o`.`note`;
 
 
-/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
-/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
-/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
+SET SQL_MODE=@OLD_SQL_MODE;
+SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
+SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
 

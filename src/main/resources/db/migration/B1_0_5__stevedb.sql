@@ -5,10 +5,13 @@
 -- ------------------------------------------------------
 -- Server version	11.4.2-MariaDB
 
+# Set some DB settings
 SET NAMES utf8mb4;
 SET TIME_ZONE='+00:00';
 SET character_set_client = utf8;
 
+# Save Settings of Unique check, Foreign Kex check and the current sql mode.
+# Then deactivate the checks and set sql mode to 'NO_AUTO_VALUE_ON_ZERO'
 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0;
 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0;
 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO';
@@ -357,7 +360,7 @@ CREATE ALGORITHM=UNDEFINED
 DEFINER=`steve`@`localhost` SQL SECURITY DEFINER
 VIEW `ocpp_tag_activity` AS select `o`.`ocpp_tag_pk` AS `ocpp_tag_pk`,`o`.`id_tag` AS `id_tag`,`o`.`parent_id_tag` AS `parent_id_tag`,`o`.`expiry_date` AS `expiry_date`,`o`.`max_active_transaction_count` AS `max_active_transaction_count`,`o`.`note` AS `note`,count(`t`.`id_tag`) AS `active_transaction_count`,case when count(`t`.`id_tag`) > 0 then 1 else 0 end AS `in_transaction`,case when `o`.`max_active_transaction_count` = 0 then 1 else 0 end AS `blocked` from (`ocpp_tag` `o` left join `transaction` `t` on(`o`.`id_tag` = `t`.`id_tag` and `t`.`stop_timestamp` is null and `t`.`stop_value` is null)) group by `o`.`ocpp_tag_pk`,`o`.`parent_id_tag`,`o`.`expiry_date`,`o`.`max_active_transaction_count`,`o`.`note`;
 
-
+# Reset the checks and sql mode to the value before executing this script
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;

@@ -348,7 +348,23 @@ CREATE TABLE `user` (
 DROP VIEW IF EXISTS `transaction`;
 CREATE ALGORITHM=UNDEFINED
 DEFINER=`steve`@`localhost` SQL SECURITY DEFINER
-VIEW `transaction` AS select `tx1`.`transaction_pk` AS `transaction_pk`,`tx1`.`connector_pk` AS `connector_pk`,`tx1`.`id_tag` AS `id_tag`,`tx1`.`event_timestamp` AS `start_event_timestamp`,`tx1`.`start_timestamp` AS `start_timestamp`,`tx1`.`start_value` AS `start_value`,`tx2`.`event_actor` AS `stop_event_actor`,`tx2`.`event_timestamp` AS `stop_event_timestamp`,`tx2`.`stop_timestamp` AS `stop_timestamp`,`tx2`.`stop_value` AS `stop_value`,`tx2`.`stop_reason` AS `stop_reason` from (`transaction_start` `tx1` left join `transaction_stop` `tx2` on(`tx1`.`transaction_pk` = `tx2`.`transaction_pk` and `tx2`.`event_timestamp` = (select max(`s2`.`event_timestamp`) from `transaction_stop` `s2` where `tx2`.`transaction_pk` = `s2`.`transaction_pk`)));
+VIEW `transaction` AS select 
+    `tx1`.`transaction_pk` AS `transaction_pk`,
+    `tx1`.`connector_pk` AS `connector_pk`,
+    `tx1`.`id_tag` AS `id_tag`,
+    `tx1`.`event_timestamp` AS `start_event_timestamp`,
+    `tx1`.`start_timestamp` AS `start_timestamp`,
+    `tx1`.`start_value` AS `start_value`,
+    `tx2`.`event_actor` AS `stop_event_actor`,
+    `tx2`.`event_timestamp` AS `stop_event_timestamp`,
+    `tx2`.`stop_timestamp` AS `stop_timestamp`,
+    `tx2`.`stop_value` AS `stop_value`,
+    `tx2`.`stop_reason` AS `stop_reason`
+ from (`transaction_start` `tx1`
+    left join `transaction_stop` `tx2`
+    on(`tx1`.`transaction_pk` = `tx2`.`transaction_pk`
+    and `tx2`.`event_timestamp` = (select max(`s2`.`event_timestamp`)
+    from `transaction_stop` `s2` where `tx2`.`transaction_pk` = `s2`.`transaction_pk`)));
 
 
 --
@@ -358,7 +374,25 @@ VIEW `transaction` AS select `tx1`.`transaction_pk` AS `transaction_pk`,`tx1`.`c
 DROP VIEW IF EXISTS `ocpp_tag_activity`;
 CREATE ALGORITHM=UNDEFINED
 DEFINER=`steve`@`localhost` SQL SECURITY DEFINER
-VIEW `ocpp_tag_activity` AS select `o`.`ocpp_tag_pk` AS `ocpp_tag_pk`,`o`.`id_tag` AS `id_tag`,`o`.`parent_id_tag` AS `parent_id_tag`,`o`.`expiry_date` AS `expiry_date`,`o`.`max_active_transaction_count` AS `max_active_transaction_count`,`o`.`note` AS `note`,count(`t`.`id_tag`) AS `active_transaction_count`,case when count(`t`.`id_tag`) > 0 then 1 else 0 end AS `in_transaction`,case when `o`.`max_active_transaction_count` = 0 then 1 else 0 end AS `blocked` from (`ocpp_tag` `o` left join `transaction` `t` on(`o`.`id_tag` = `t`.`id_tag` and `t`.`stop_timestamp` is null and `t`.`stop_value` is null)) group by `o`.`ocpp_tag_pk`,`o`.`parent_id_tag`,`o`.`expiry_date`,`o`.`max_active_transaction_count`,`o`.`note`;
+VIEW `ocpp_tag_activity` AS select
+    `o`.`ocpp_tag_pk` AS `ocpp_tag_pk`,
+    `o`.`id_tag` AS `id_tag`,
+    `o`.`parent_id_tag` AS `parent_id_tag`,
+    `o`.`expiry_date` AS `expiry_date`,
+    `o`.`max_active_transaction_count` AS `max_active_transaction_count`,
+    `o`.`note` AS `note`,
+    count(`t`.`id_tag`) AS `active_transaction_count`,
+    case when count(`t`.`id_tag`) > 0 then 1 else 0 end AS `in_transaction`,
+    case when `o`.`max_active_transaction_count` = 0 then 1 else 0 end AS `blocked` 
+from (`ocpp_tag` `o` left join `transaction` `t` on(
+    `o`.`id_tag` = `t`.`id_tag` and
+    `t`.`stop_timestamp` is null and
+    `t`.`stop_value` is null)) 
+group by `o`.`ocpp_tag_pk`,
+    `o`.`parent_id_tag`,
+    `o`.`expiry_date`,
+    `o`.`max_active_transaction_count`,
+    `o`.`note`;
 
 # Reset the checks and sql mode to the value before executing this script
 SET SQL_MODE=@OLD_SQL_MODE;

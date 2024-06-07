@@ -18,6 +18,9 @@ VOLUME ["/code"]
 # Copy the application's code
 COPY . /code
 
+# Ensure mvnw is executable
+RUN chmod +x /code/mvnw
+
 # Wait for the db to startup(via dockerize), then 
 # Build and run steve, requires a db to be available on port 3306
 CMD dockerize -wait tcp://mariadb:3306 -timeout 60s && \

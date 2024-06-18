@@ -46,6 +46,7 @@ import net.parkl.ocpp.service.cs.ConnectorMeterValueService;
 import net.parkl.ocpp.service.cs.TransactionService;
 import net.parkl.ocpp.util.AsyncWaiter;
 import ocpp.cp._2012._06.AvailabilityStatus;
+import ocpp.cp._2015._10.UnlockStatus;
 import ocpp.cs._2015._10.RegistrationStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -623,9 +624,17 @@ public class OcppMiddlewareImpl implements OcppMiddleware {
                 if (result.getResponse().equals(AvailabilityStatus.ACCEPTED.value())) {
                     log.info("{} accepted: {}", type, chargeBoxId);
 
-                } else {
+                } else if (result.getResponse().equals(AvailabilityStatus.REJECTED.value())) {
                     log.info("{} rejected: {}", type, chargeBoxId);
                     throw new IllegalStateException(type + " rejected: " + chargeBoxId);
+                } else if (result.getResponse().equals(UnlockStatus.UNLOCK_FAILED.value())) {
+                    log.info("{} unlock failed: {}", type, chargeBoxId);
+                    throw new IllegalStateException(type + " unlock failed: " + chargeBoxId);
+                } else if (result.getResponse().equals(UnlockStatus.NOT_SUPPORTED.value())) {
+                    log.info("{} unlock not supported: {}", type, chargeBoxId);
+                    throw new IllegalStateException(type + " not supported: " + chargeBoxId);
+                } else {
+                    log.info("{} success response {}: {}", type, result.getResponse(), chargeBoxId);
                 }
             } else if (result.getErrorMessage() != null) {
                 throw new IllegalStateException(result.getErrorMessage());

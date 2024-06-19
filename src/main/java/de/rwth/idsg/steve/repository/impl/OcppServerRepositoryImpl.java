@@ -379,7 +379,7 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
     /**
      * If the connector information was not received before, insert it. Otherwise, ignore.
      */
-    private void insertIgnoreConnector(DSLContext ctx, String chargeBoxIdentity, int connectorId) {
+    public static void insertIgnoreConnector(DSLContext ctx, String chargeBoxIdentity, int connectorId) {
         int count = ctx.insertInto(CONNECTOR,
                             CONNECTOR.CHARGE_BOX_ID, CONNECTOR.CONNECTOR_ID)
                        .values(chargeBoxIdentity, connectorId)

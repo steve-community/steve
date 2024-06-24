@@ -33,4 +33,6 @@ public interface ChargeBoxConfiguration {
     boolean checkReservationId(String chargeBoxId);
     List<String> getChargeBoxesForAlert();
     boolean skipHeartBeatConfig(String chargeBoxId);
+
+    boolean isIdTagMax10Characters(String chargeBoxId);
 }

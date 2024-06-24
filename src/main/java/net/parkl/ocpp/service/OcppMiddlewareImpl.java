@@ -161,6 +161,11 @@ public class OcppMiddlewareImpl implements OcppMiddleware {
             return ESPChargingStartResult.builder().errorCode(ERROR_CODE_CHARGER_ERROR).build();
         }
 
+        if (config.isIdTagMax10Characters(c.getChargeBoxId())) {
+            log.info("Charge box (id = {}) uses ID tag with max length of 10, shortening ID tag...", c.getChargeBoxId());
+            idTag = idTag.substring(0, 9);
+        }
+
         if (config.isUsingIntegratedTag(c.getChargeBoxId())) {
             log.info("Using integrated  ID tag for charge box (id = {}) instead of user's unique tag", c.getChargeBoxId());
             idTag = getAvailableIntegrationIdTag(chargeBox);

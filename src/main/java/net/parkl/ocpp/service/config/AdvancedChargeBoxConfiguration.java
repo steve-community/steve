@@ -88,4 +88,8 @@ public class AdvancedChargeBoxConfiguration {
     public boolean skipHeartBeatConfig(String chargeBoxId) {
         return chargeBoxConfiguration != null && chargeBoxConfiguration.skipHeartBeatConfig(chargeBoxId);
     }
+
+    public boolean isIdTagMax10Characters(String chargeBoxId) {
+        return chargeBoxConfiguration != null && chargeBoxConfiguration.isIdTagMax10Characters(chargeBoxId);
+    }
 }

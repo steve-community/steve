@@ -65,4 +65,9 @@ public class TestChargeBoxConfiguration implements ChargeBoxConfiguration {
     public boolean skipHeartBeatConfig(String chargeBoxId) {
         return true;
     }
+
+    @Override
+    public boolean isIdTagMax10Characters(String chargeBoxId) {
+        return false;
+    }
 }

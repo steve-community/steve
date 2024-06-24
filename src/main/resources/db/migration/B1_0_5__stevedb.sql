@@ -347,7 +347,6 @@ CREATE TABLE `user` (
 
 DROP VIEW IF EXISTS `transaction`;
 CREATE ALGORITHM=UNDEFINED
-DEFINER=`steve`@`localhost` SQL SECURITY DEFINER
 VIEW `transaction` AS select 
     `tx1`.`transaction_pk` AS `transaction_pk`,
     `tx1`.`connector_pk` AS `connector_pk`,
@@ -373,7 +372,6 @@ VIEW `transaction` AS select
 
 DROP VIEW IF EXISTS `ocpp_tag_activity`;
 CREATE ALGORITHM=UNDEFINED
-DEFINER=`steve`@`localhost` SQL SECURITY DEFINER
 VIEW `ocpp_tag_activity` AS select
     `o`.`ocpp_tag_pk` AS `ocpp_tag_pk`,
     `o`.`id_tag` AS `id_tag`,

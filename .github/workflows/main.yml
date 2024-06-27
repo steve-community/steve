@@ -35,8 +35,6 @@ jobs:
           mysql -h 127.0.0.1 -P 3306 -uroot -proot -e "CREATE DATABASE stevedb_test_2aa6a783d47d;" -v
           mysql -h 127.0.0.1 -P 3306 -uroot -proot -e "CREATE USER 'steve'@'%' IDENTIFIED BY 'changeme';" -v
           mysql -h 127.0.0.1 -P 3306 -uroot -proot -e "GRANT ALL PRIVILEGES ON stevedb_test_2aa6a783d47d.* TO 'steve'@'%';" -v
-          mysql -h 127.0.0.1 -P 3306 -uroot -proot -e "GRANT SELECT ON mysql.proc TO 'steve'@'%';" -v || true
-          mysql -h 127.0.0.1 -P 3306 -uroot -proot -e "GRANT SUPER ON *.* TO 'steve'@'%';" -v || true
 
       - name: Build with Maven
         run: ./mvnw -B -V -Dmaven.javadoc.skip=true -Ptest clean package --file pom.xml

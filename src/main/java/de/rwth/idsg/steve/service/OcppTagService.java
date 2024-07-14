@@ -24,17 +24,14 @@ import static de.rwth.idsg.steve.utils.OcppTagActivityRecordUtils.isExpired;
 import com.google.common.base.Strings;
 import de.rwth.idsg.steve.SteveException;
 import de.rwth.idsg.steve.repository.OcppTagRepository;
-import de.rwth.idsg.steve.repository.SettingsRepository;
 import de.rwth.idsg.steve.repository.dto.OcppTag;
 import de.rwth.idsg.steve.service.dto.UnidentifiedIncomingObject;
-import de.rwth.idsg.steve.utils.OcppTagActivityRecordUtils;
 import de.rwth.idsg.steve.web.dto.OcppTagForm;
 import de.rwth.idsg.steve.web.dto.OcppTagQueryForm;
 import jooq.steve.db.tables.records.OcppTagActivityRecord;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import ocpp.cp._2015._10.AuthorizationData;
-import ocpp.cs._2015._10.AuthorizationStatus;
 import ocpp.cs._2015._10.IdTagInfo;
 import org.jetbrains.annotations.Nullable;
 import org.joda.time.DateTime;
@@ -55,7 +52,6 @@ public class OcppTagService {
 
     private final UnidentifiedIncomingObjectService invalidOcppTagService = new UnidentifiedIncomingObjectService(1000);
 
-    private final SettingsRepository settingsRepository;
     private final OcppTagRepository ocppTagRepository;
     private final AuthTagService authTagService;
 
@@ -108,22 +104,19 @@ public class OcppTagService {
             return null;
         }
 
-        OcppTagActivityRecord record = ocppTagRepository.getRecord(idTag);
-        AuthorizationStatus status = authTagService.decideStatus(record, idTag,
+        IdTagInfo idTagInfo = authTagService.decideStatus(idTag,
             isStartTransactionReqContext, chargeBoxId, connectorId);
-
-        switch (status) {
+        switch (idTagInfo.getStatus()) {
             case INVALID:
                 invalidOcppTagService.processNewUnidentified(idTag);
-                return new IdTagInfo().withStatus(status);
+                return idTagInfo;
 
             case BLOCKED:
             case EXPIRED:
             case CONCURRENT_TX:
             case ACCEPTED:
-                return new IdTagInfo().withStatus(status)
-                                      .withParentIdTag(record.getParentIdTag())
-                                      .withExpiryDate(getExpiryDateOrDefault(record));
+                return idTagInfo;
+
             default:
                 throw new SteveException("Unexpected AuthorizationStatus");
         }
@@ -166,25 +159,6 @@ public class OcppTagService {
     // -------------------------------------------------------------------------
     // Private helpers
     // -------------------------------------------------------------------------
-
-    /**
-     * If the database contains an actual expiry, use it. Otherwise, calculate an expiry for cached info
-     */
-    @Nullable
-    private DateTime getExpiryDateOrDefault(OcppTagActivityRecord record) {
-        if (record.getExpiryDate() != null) {
-            return record.getExpiryDate();
-        }
-
-        int hoursToExpire = settingsRepository.getHoursToExpire();
-
-        // From web page: The value 0 disables this functionality (i.e. no expiry date will be set).
-        if (hoursToExpire == 0) {
-            return null;
-        } else {
-            return DateTime.now().plusHours(hoursToExpire);
-        }
-    }
 
     /**
      * ConcurrentTx is only valid for StartTransactionRequest

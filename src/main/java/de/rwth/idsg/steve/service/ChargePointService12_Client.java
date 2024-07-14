@@ -19,7 +19,6 @@
 package de.rwth.idsg.steve.service;
 
 import de.rwth.idsg.steve.ocpp.ChargePointService12_Invoker;
-import de.rwth.idsg.steve.ocpp.ChargePointService12_InvokerImpl;
 import de.rwth.idsg.steve.ocpp.OcppVersion;
 import de.rwth.idsg.steve.ocpp.task.ChangeAvailabilityTask;
 import de.rwth.idsg.steve.ocpp.task.ChangeConfigurationTask;
@@ -40,8 +39,9 @@ import de.rwth.idsg.steve.web.dto.ocpp.RemoteStopTransactionParams;
 import de.rwth.idsg.steve.web.dto.ocpp.ResetParams;
 import de.rwth.idsg.steve.web.dto.ocpp.UnlockConnectorParams;
 import de.rwth.idsg.steve.web.dto.ocpp.UpdateFirmwareParams;
+import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
@@ -55,10 +55,22 @@ import java.util.concurrent.ScheduledExecutorService;
 @Qualifier("ChargePointService12_Client")
 public class ChargePointService12_Client {
 
-    @Autowired protected ScheduledExecutorService executorService;
-    @Autowired protected TaskStore taskStore;
+    @Getter(AccessLevel.PROTECTED)
+    private final ScheduledExecutorService executorService;
+    @Getter(AccessLevel.PROTECTED)
+    private final TaskStore taskStore;
 
-    @Autowired private ChargePointService12_InvokerImpl invoker12;
+    private final ChargePointService12_Invoker invoker12;
+
+    public ChargePointService12_Client(
+            ScheduledExecutorService executorService,
+            TaskStore taskStore,
+            @Qualifier("ChargePointService12_Invoker") ChargePointService12_Invoker invoker12
+    ) {
+        this.executorService = executorService;
+        this.taskStore = taskStore;
+        this.invoker12 = invoker12;
+    }
 
     protected OcppVersion getVersion() {
         return OcppVersion.V_12;

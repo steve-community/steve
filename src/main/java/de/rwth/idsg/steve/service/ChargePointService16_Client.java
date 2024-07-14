@@ -22,13 +22,14 @@ import de.rwth.idsg.steve.SteveException;
 import de.rwth.idsg.steve.ocpp.ChargePointService12_Invoker;
 import de.rwth.idsg.steve.ocpp.ChargePointService15_Invoker;
 import de.rwth.idsg.steve.ocpp.ChargePointService16_Invoker;
-import de.rwth.idsg.steve.ocpp.ChargePointService16_InvokerImpl;
 import de.rwth.idsg.steve.ocpp.OcppVersion;
 import de.rwth.idsg.steve.ocpp.task.ClearChargingProfileTask;
 import de.rwth.idsg.steve.ocpp.task.GetCompositeScheduleTask;
 import de.rwth.idsg.steve.ocpp.task.SetChargingProfileTask;
 import de.rwth.idsg.steve.ocpp.task.TriggerMessageTask;
 import de.rwth.idsg.steve.repository.ChargingProfileRepository;
+import de.rwth.idsg.steve.repository.ReservationRepository;
+import de.rwth.idsg.steve.repository.TaskStore;
 import de.rwth.idsg.steve.repository.dto.ChargingProfile;
 import de.rwth.idsg.steve.service.dto.EnhancedSetChargingProfileParams;
 import de.rwth.idsg.steve.web.dto.ocpp.ClearChargingProfileParams;
@@ -37,9 +38,10 @@ import de.rwth.idsg.steve.web.dto.ocpp.SetChargingProfileParams;
 import de.rwth.idsg.steve.web.dto.ocpp.TriggerMessageParams;
 import lombok.extern.slf4j.Slf4j;
 import ocpp.cp._2015._10.ChargingProfilePurposeType;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+
+import java.util.concurrent.ScheduledExecutorService;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -50,8 +52,21 @@ import org.springframework.stereotype.Service;
 @Qualifier("ChargePointService16_Client")
 public class ChargePointService16_Client extends ChargePointService15_Client {
 
-    @Autowired private ChargePointService16_InvokerImpl invoker16;
-    @Autowired private ChargingProfileRepository chargingProfileRepository;
+    private final ChargePointService16_Invoker invoker16;
+    private final ChargingProfileRepository chargingProfileRepository;
+
+    public ChargePointService16_Client(
+            ScheduledExecutorService executorService,
+            TaskStore taskStore,
+            @Qualifier("ChargePointService16_Invoker") ChargePointService16_Invoker invoker16,
+            OcppTagService ocppTagService,
+            ReservationRepository reservationRepository,
+            ChargingProfileRepository chargingProfileRepository
+    ) {
+        super(executorService, taskStore, invoker16, ocppTagService, reservationRepository);
+        this.invoker16 = invoker16;
+        this.chargingProfileRepository = chargingProfileRepository;
+    }
 
     @Override
     protected OcppVersion getVersion() {
@@ -79,11 +94,11 @@ public class ChargePointService16_Client extends ChargePointService15_Client {
     public int triggerMessage(TriggerMessageParams params) {
         TriggerMessageTask task = new TriggerMessageTask(getVersion(), params);
 
-        BackgroundService.with(executorService)
+        BackgroundService.with(getExecutorService())
                          .forEach(task.getParams().getChargePointSelectList())
                          .execute(c -> getOcpp16Invoker().triggerMessage(c, task));
 
-        return taskStore.add(task);
+        return getTaskStore().add(task);
     }
 
     public int setChargingProfile(SetChargingProfileParams params) {
@@ -94,31 +109,31 @@ public class ChargePointService16_Client extends ChargePointService15_Client {
         EnhancedSetChargingProfileParams enhancedParams = new EnhancedSetChargingProfileParams(params, details);
         SetChargingProfileTask task = new SetChargingProfileTask(getVersion(), enhancedParams, chargingProfileRepository);
 
-        BackgroundService.with(executorService)
+        BackgroundService.with(getExecutorService())
                          .forEach(task.getParams().getChargePointSelectList())
                          .execute(c -> getOcpp16Invoker().setChargingProfile(c, task));
 
-        return taskStore.add(task);
+        return getTaskStore().add(task);
     }
 
     public int clearChargingProfile(ClearChargingProfileParams params) {
         ClearChargingProfileTask task = new ClearChargingProfileTask(getVersion(), params, chargingProfileRepository);
 
-        BackgroundService.with(executorService)
+        BackgroundService.with(getExecutorService())
                          .forEach(task.getParams().getChargePointSelectList())
                          .execute(c -> getOcpp16Invoker().clearChargingProfile(c, task));
 
-        return taskStore.add(task);
+        return getTaskStore().add(task);
     }
 
     public int getCompositeSchedule(GetCompositeScheduleParams params) {
         GetCompositeScheduleTask task = new GetCompositeScheduleTask(getVersion(), params);
 
-        BackgroundService.with(executorService)
+        BackgroundService.with(getExecutorService())
                          .forEach(task.getParams().getChargePointSelectList())
                          .execute(c -> getOcpp16Invoker().getCompositeSchedule(c, task));
 
-        return taskStore.add(task);
+        return getTaskStore().add(task);
     }
 
     /**

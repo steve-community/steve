@@ -24,9 +24,9 @@ import de.rwth.idsg.steve.repository.SettingsRepository;
 import de.rwth.idsg.steve.repository.dto.MailSettings;
 import de.rwth.idsg.steve.web.dto.SettingsForm;
 import jooq.steve.db.tables.records.SettingsRecord;
+import lombok.RequiredArgsConstructor;
 import org.jooq.DSLContext;
 import org.jooq.exception.DataAccessException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.nio.charset.StandardCharsets;
@@ -43,6 +43,7 @@ import static jooq.steve.db.tables.Settings.SETTINGS;
  * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 06.11.2015
  */
+@RequiredArgsConstructor
 @Repository
 public class SettingsRepositoryImpl implements SettingsRepository {
 
@@ -53,7 +54,7 @@ public class SettingsRepositoryImpl implements SettingsRepository {
             StandardCharsets.UTF_8
     );
 
-    @Autowired private DSLContext ctx;
+    private final DSLContext ctx;
 
     @Override
     public SettingsForm getForm() {

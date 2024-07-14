@@ -22,11 +22,8 @@ import com.google.common.util.concurrent.Striped;
 import de.rwth.idsg.steve.ocpp.OcppProtocol;
 import de.rwth.idsg.steve.ocpp.OcppTransport;
 import de.rwth.idsg.steve.ocpp.OcppVersion;
-import de.rwth.idsg.steve.ocpp.ws.AbstractWebSocketEndpoint;
+import de.rwth.idsg.steve.ocpp.ws.SessionContextStore;
 import de.rwth.idsg.steve.ocpp.ws.data.SessionContext;
-import de.rwth.idsg.steve.ocpp.ws.ocpp12.Ocpp12WebSocketEndpoint;
-import de.rwth.idsg.steve.ocpp.ws.ocpp15.Ocpp15WebSocketEndpoint;
-import de.rwth.idsg.steve.ocpp.ws.ocpp16.Ocpp16WebSocketEndpoint;
 import de.rwth.idsg.steve.repository.ChargePointRepository;
 import de.rwth.idsg.steve.repository.GenericRepository;
 import de.rwth.idsg.steve.repository.dto.ChargePointSelect;
@@ -40,7 +37,7 @@ import de.rwth.idsg.steve.web.dto.Statistics;
 import lombok.extern.slf4j.Slf4j;
 import ocpp.cs._2015._10.RegistrationStatus;
 import org.joda.time.DateTime;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
@@ -67,20 +64,37 @@ import static de.rwth.idsg.steve.SteveConfiguration.CONFIG;
 @Service
 public class ChargePointHelperService {
 
-    private final boolean autoRegisterUnknownStations = CONFIG.getOcpp().isAutoRegisterUnknownStations();
-    private final Striped<Lock> isRegisteredLocks = Striped.lock(16);
+    private final boolean autoRegisterUnknownStations;
+    private final Striped<Lock> isRegisteredLocks;
 
-    @Autowired private GenericRepository genericRepository;
+    private final GenericRepository genericRepository;
 
     // SOAP-based charge points are stored in DB with an endpoint address
-    @Autowired private ChargePointRepository chargePointRepository;
+    private final ChargePointRepository chargePointRepository;
 
     // For WebSocket-based charge points, the active sessions are stored in memory
-    @Autowired private Ocpp12WebSocketEndpoint ocpp12WebSocketEndpoint;
-    @Autowired private Ocpp15WebSocketEndpoint ocpp15WebSocketEndpoint;
-    @Autowired private Ocpp16WebSocketEndpoint ocpp16WebSocketEndpoint;
+    private final SessionContextStore sessionContextStore12;
+    private final SessionContextStore sessionContextStore15;
+    private final SessionContextStore sessionContextStore16;
 
-    private final UnidentifiedIncomingObjectService unknownChargePointService = new UnidentifiedIncomingObjectService(100);
+    private final UnidentifiedIncomingObjectService unknownChargePointService;
+
+    public ChargePointHelperService(
+            GenericRepository genericRepository,
+            ChargePointRepository chargePointRepository,
+            @Qualifier("sessionContextStore12") SessionContextStore sessionContextStore12,
+            @Qualifier("sessionContextStore15") SessionContextStore sessionContextStore15,
+            @Qualifier("sessionContextStore16") SessionContextStore sessionContextStore16
+    ) {
+        this.autoRegisterUnknownStations = CONFIG.getOcpp().isAutoRegisterUnknownStations();
+        this.isRegisteredLocks = Striped.lock(16);
+        this.genericRepository = genericRepository;
+        this.chargePointRepository = chargePointRepository;
+        this.sessionContextStore12 = sessionContextStore12;
+        this.sessionContextStore15 = sessionContextStore15;
+        this.sessionContextStore16 = sessionContextStore16;
+        this.unknownChargePointService = new UnidentifiedIncomingObjectService(100);
+    }
 
     public Optional<RegistrationStatus> getRegistrationStatus(String chargeBoxId) {
         Lock l = isRegisteredLocks.get(chargeBoxId);
@@ -98,9 +112,9 @@ public class ChargePointHelperService {
 
     public Statistics getStats() {
         Statistics stats = genericRepository.getStats();
-        stats.setNumOcpp12JChargeBoxes(ocpp12WebSocketEndpoint.getNumberOfChargeBoxes());
-        stats.setNumOcpp15JChargeBoxes(ocpp15WebSocketEndpoint.getNumberOfChargeBoxes());
-        stats.setNumOcpp16JChargeBoxes(ocpp16WebSocketEndpoint.getNumberOfChargeBoxes());
+        stats.setNumOcpp12JChargeBoxes(sessionContextStore12.getNumberOfChargeBoxes());
+        stats.setNumOcpp15JChargeBoxes(sessionContextStore15.getNumberOfChargeBoxes());
+        stats.setNumOcpp16JChargeBoxes(sessionContextStore16.getNumberOfChargeBoxes());
 
         List<ConnectorStatus> latestList = chargePointRepository.getChargePointConnectorStatus();
         stats.setStatusCountMap(ConnectorStatusCountFilter.getStatusCountMap(latestList));
@@ -109,11 +123,12 @@ public class ChargePointHelperService {
     }
 
     public List<ConnectorStatus> getChargePointConnectorStatus(ConnectorStatusForm params) {
-        Map<String, Deque<SessionContext>> ocpp12Map = ocpp12WebSocketEndpoint.getACopy();
-        Map<String, Deque<SessionContext>> ocpp15Map = ocpp15WebSocketEndpoint.getACopy();
-        Map<String, Deque<SessionContext>> ocpp16Map = ocpp16WebSocketEndpoint.getACopy();
+        Map<String, Deque<SessionContext>> ocpp12Map = sessionContextStore12.getACopy();
+        Map<String, Deque<SessionContext>> ocpp15Map = sessionContextStore15.getACopy();
+        Map<String, Deque<SessionContext>> ocpp16Map = sessionContextStore16.getACopy();
 
-        Set<String> connectedJsonChargeBoxIds = new HashSet<>(extractIds(Arrays.asList(ocpp12Map, ocpp15Map, ocpp16Map)));
+        Set<String> connectedJsonChargeBoxIds
+                = new HashSet<>(extractIds(Arrays.asList(ocpp12Map, ocpp15Map, ocpp16Map)));
 
         List<ConnectorStatus> latestList = chargePointRepository.getChargePointConnectorStatus(params);
 
@@ -131,9 +146,9 @@ public class ChargePointHelperService {
     }
 
     public List<OcppJsonStatus> getOcppJsonStatus() {
-        Map<String, Deque<SessionContext>> ocpp12Map = ocpp12WebSocketEndpoint.getACopy();
-        Map<String, Deque<SessionContext>> ocpp15Map = ocpp15WebSocketEndpoint.getACopy();
-        Map<String, Deque<SessionContext>> ocpp16Map = ocpp16WebSocketEndpoint.getACopy();
+        Map<String, Deque<SessionContext>> ocpp12Map = sessionContextStore12.getACopy();
+        Map<String, Deque<SessionContext>> ocpp15Map = sessionContextStore15.getACopy();
+        Map<String, Deque<SessionContext>> ocpp16Map = sessionContextStore16.getACopy();
 
         List<String> idList = extractIds(Arrays.asList(ocpp12Map, ocpp15Map, ocpp16Map));
         Map<String, Integer> primaryKeyLookup = chargePointRepository.getChargeBoxIdPkPair(idList);
@@ -148,7 +163,9 @@ public class ChargePointHelperService {
     }
 
     public List<ChargePointSelect> getChargePoints(OcppVersion version) {
-        return getChargePoints(version, Collections.singletonList(RegistrationStatus.ACCEPTED), Collections.emptyList());
+        return getChargePoints(
+                version, Collections.singletonList(RegistrationStatus.ACCEPTED), Collections.emptyList()
+        );
     }
 
     public List<ChargePointSelect> getChargePoints(OcppVersion version, List<RegistrationStatus> inStatusFilter) {
@@ -159,14 +176,19 @@ public class ChargePointHelperService {
         return getChargePoints(version, Collections.singletonList(RegistrationStatus.ACCEPTED), chargeBoxIdFilter);
     }
 
-    public List<ChargePointSelect> getChargePoints(OcppVersion version, List<RegistrationStatus> inStatusFilter, List<String> chargeBoxIdFilter) {
+    public List<ChargePointSelect> getChargePoints(
+            OcppVersion version, List<RegistrationStatus> inStatusFilter, List<String> chargeBoxIdFilter
+    ) {
         switch (version) {
             case V_12:
-                return getChargePoints(OcppProtocol.V_12_SOAP, inStatusFilter, chargeBoxIdFilter, ocpp12WebSocketEndpoint);
+                return getChargePoints(
+                        OcppProtocol.V_12_SOAP, inStatusFilter, chargeBoxIdFilter, sessionContextStore12);
             case V_15:
-                return getChargePoints(OcppProtocol.V_15_SOAP, inStatusFilter, chargeBoxIdFilter, ocpp15WebSocketEndpoint);
+                return getChargePoints(
+                        OcppProtocol.V_15_SOAP, inStatusFilter, chargeBoxIdFilter, sessionContextStore15);
             case V_16:
-                return getChargePoints(OcppProtocol.V_16_SOAP, inStatusFilter, chargeBoxIdFilter, ocpp16WebSocketEndpoint);
+                return getChargePoints(
+                        OcppProtocol.V_16_SOAP, inStatusFilter, chargeBoxIdFilter, sessionContextStore16);
             default:
                 throw new IllegalArgumentException("Unknown OCPP version: " + version);
         }
@@ -213,21 +235,29 @@ public class ChargePointHelperService {
         }
     }
 
-    private List<ChargePointSelect> getChargePoints(OcppProtocol protocol, List<RegistrationStatus> inStatusFilter,
-                                                    List<String> chargeBoxIdFilter, AbstractWebSocketEndpoint jsonEndpoint) {
+    private List<ChargePointSelect> getChargePoints(OcppProtocol protocol,
+                                                    List<RegistrationStatus> inStatusFilter,
+                                                    List<String> chargeBoxIdFilter,
+                                                    SessionContextStore sessionContextStore) {
         // soap stations
         //
         List<String> statusFilter = inStatusFilter.stream()
                                                   .map(RegistrationStatus::value)
                                                   .collect(Collectors.toList());
 
-        List<ChargePointSelect> returnList = chargePointRepository.getChargePointSelect(protocol, statusFilter, chargeBoxIdFilter);
+        List<ChargePointSelect> returnList = chargePointRepository.getChargePointSelect(
+                protocol, statusFilter, chargeBoxIdFilter
+        );
 
         // json stations
         //
-        List<String> chargeBoxIdList = CollectionUtils.isEmpty(chargeBoxIdFilter)
-            ? jsonEndpoint.getChargeBoxIdList()
-            : jsonEndpoint.getChargeBoxIdList().stream().filter(chargeBoxIdFilter::contains).collect(Collectors.toList());
+        List<String> chargeBoxIdList;
+        if (CollectionUtils.isEmpty(chargeBoxIdFilter)) {
+            chargeBoxIdList = sessionContextStore.getChargeBoxIdList();
+        } else {
+            chargeBoxIdList = sessionContextStore.getChargeBoxIdList().stream()
+                    .filter(chargeBoxIdFilter::contains).collect(Collectors.toList());
+        }
 
         for (String chargeBoxId : chargeBoxIdList) {
             returnList.add(new ChargePointSelect(OcppTransport.JSON, chargeBoxId));

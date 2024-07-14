@@ -21,6 +21,7 @@ package de.rwth.idsg.steve.config;
 import de.rwth.idsg.steve.ocpp.soap.LoggingFeatureProxy;
 import de.rwth.idsg.steve.ocpp.soap.MediatorInInterceptor;
 import de.rwth.idsg.steve.ocpp.soap.MessageIdInterceptor;
+import ocpp.cs._2010._08.CentralSystemService;
 import org.apache.cxf.Bus;
 import org.apache.cxf.bus.spring.SpringBus;
 import org.apache.cxf.common.logging.LogUtils;
@@ -30,12 +31,12 @@ import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.jaxws.JaxWsServerFactoryBean;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.PhaseInterceptor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.event.ContextRefreshedEvent;
+import org.springframework.context.event.EventListener;
 
-import javax.annotation.PostConstruct;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -57,19 +58,29 @@ public class OcppConfiguration {
         LogUtils.setLoggerClass(Slf4jLogger.class);
     }
 
-    @Autowired private ocpp.cs._2010._08.CentralSystemService ocpp12Server;
-    @Autowired private ocpp.cs._2012._06.CentralSystemService ocpp15Server;
-    @Autowired private ocpp.cs._2015._10.CentralSystemService ocpp16Server;
+    private final CentralSystemService ocpp12Server;
+    private final ocpp.cs._2012._06.CentralSystemService ocpp15Server;
+    private final ocpp.cs._2015._10.CentralSystemService ocpp16Server;
+    private final List<Interceptor<? extends Message>> interceptors;
+    private final List<Feature> logging;
+    private final String routerEndpointPath;
 
-    @Autowired
-    @Qualifier("MessageHeaderInterceptor")
-    private PhaseInterceptor<Message> messageHeaderInterceptor;
+    public OcppConfiguration(
+            CentralSystemService ocpp12Server,
+            ocpp.cs._2012._06.CentralSystemService ocpp15Server,
+            ocpp.cs._2015._10.CentralSystemService ocpp16Server,
+            @Qualifier("MessageHeaderInterceptor") PhaseInterceptor<Message> messageHeaderInterceptor
+    ) {
+        this.ocpp12Server = ocpp12Server;
+        this.ocpp15Server = ocpp15Server;
+        this.ocpp16Server = ocpp16Server;
+        this.interceptors = asList(new MessageIdInterceptor(), messageHeaderInterceptor);
+        this.logging = singletonList(LoggingFeatureProxy.INSTANCE.get());
+        this.routerEndpointPath = CONFIG.getRouterEndpointPath();
+    }
 
-    @PostConstruct
-    public void init() {
-        List<Interceptor<? extends Message>> interceptors = asList(new MessageIdInterceptor(), messageHeaderInterceptor);
-        List<Feature> logging = singletonList(LoggingFeatureProxy.INSTANCE.get());
-
+    @EventListener
+    public void afterStart(ContextRefreshedEvent event) {
         createOcppService(ocpp12Server, "/CentralSystemServiceOCPP12", interceptors, logging);
         createOcppService(ocpp15Server, "/CentralSystemServiceOCPP15", interceptors, logging);
         createOcppService(ocpp16Server, "/CentralSystemServiceOCPP16", interceptors, logging);
@@ -78,7 +89,7 @@ public class OcppConfiguration {
         // one to be created, since in MediatorInInterceptor we go over created/registered services and build a map.
         //
         List<Interceptor<? extends Message>> mediator = singletonList(new MediatorInInterceptor(springBus()));
-        createOcppService(ocpp12Server, CONFIG.getRouterEndpointPath(), mediator, Collections.emptyList());
+        createOcppService(ocpp12Server, routerEndpointPath, mediator, Collections.emptyList());
     }
 
     @Bean(name = Bus.DEFAULT_BUS_ID, destroyMethod = "shutdown")

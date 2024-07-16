@@ -24,7 +24,7 @@ import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Profile;
 import org.springframework.core.type.AnnotatedTypeMetadata;
 
-import static de.rwth.idsg.steve.SteveConfiguration.CONFIG;
+import java.util.Arrays;
 
 /**
  * We might also have used {@link Profile} for registering beans depending on profile,
@@ -44,6 +44,8 @@ public class SteveProdCondition implements Condition {
 
     @Override
     public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata) {
-        return CONFIG.getProfile().isProd();
+        return Arrays.stream(context.getEnvironment().getActiveProfiles())
+                .map(ApplicationProfile::fromName)
+                .anyMatch(ApplicationProfile::isProd);
     }
 }

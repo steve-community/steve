@@ -50,18 +50,18 @@ import static de.rwth.idsg.steve.utils.Helpers.getRandomString;
 public class Issue73Fix {
 
     private static final String REGISTERED_OCPP_TAG = __DatabasePreparer__.getRegisteredOcppTag();
-    private static final String path = getPath();
 
     public static void main(String[] args) throws Exception {
-        Assertions.assertEquals(ApplicationProfile.TEST, SteveConfiguration.CONFIG.getProfile());
-        Assertions.assertTrue(SteveConfiguration.CONFIG.getOcpp().isAutoRegisterUnknownStations());
+        SteveConfiguration config = new SteveConfiguration();
+        Assertions.assertEquals(ApplicationProfile.TEST, config.getProfile());
+        Assertions.assertTrue(config.getOcpp().isAutoRegisterUnknownStations());
 
         __DatabasePreparer__.prepare();
 
         Application app = new Application();
         try {
             app.start();
-            test();
+            test(getPath(config));
         } finally {
             try {
                 app.stop();
@@ -71,7 +71,7 @@ public class Issue73Fix {
         }
     }
 
-    private static void test() {
+    private static void test(String path) {
         ocpp.cs._2015._10.CentralSystemService client = getForOcpp16(path);
 
         String chargeBox1 = getRandomString();

@@ -18,6 +18,7 @@
  */
 package de.rwth.idsg.steve.issues;
 
+import de.rwth.idsg.steve.SteveConfiguration;
 import de.rwth.idsg.steve.StressTest;
 import de.rwth.idsg.steve.utils.Helpers;
 import de.rwth.idsg.steve.utils.StressTester;
@@ -38,9 +39,7 @@ import ocpp.cs._2015._10.UnitOfMeasure;
 import org.joda.time.DateTime;
 import org.junit.jupiter.api.Assertions;
 
-import static de.rwth.idsg.steve.utils.Helpers.getForOcpp16;
-import static de.rwth.idsg.steve.utils.Helpers.getPath;
-import static de.rwth.idsg.steve.utils.Helpers.getRandomString;
+import static de.rwth.idsg.steve.utils.Helpers.*;
 
 /**
  * https://github.com/steve-community/steve/issues/72
@@ -50,10 +49,15 @@ import static de.rwth.idsg.steve.utils.Helpers.getRandomString;
  */
 public class Issue72 extends StressTest {
 
-    private static final String path = getPath();
+    private final String path;
 
     public static void main(String[] args) throws Exception {
         new Issue72().attack();
+    }
+
+    Issue72() {
+        SteveConfiguration config = new SteveConfiguration();
+        path = getPath(config);
     }
 
     protected void attackInternal() throws Exception {

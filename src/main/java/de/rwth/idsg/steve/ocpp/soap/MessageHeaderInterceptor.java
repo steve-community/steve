@@ -21,7 +21,7 @@ package de.rwth.idsg.steve.ocpp.soap;
 import de.rwth.idsg.steve.ocpp.OcppProtocol;
 import de.rwth.idsg.steve.repository.OcppServerRepository;
 import de.rwth.idsg.steve.repository.impl.ChargePointRepositoryImpl;
-import de.rwth.idsg.steve.service.ChargePointHelperService;
+import de.rwth.idsg.steve.service.UnknownChargePointService;
 import lombok.extern.slf4j.Slf4j;
 import ocpp.cs._2015._10.RegistrationStatus;
 import org.apache.cxf.binding.soap.Soap12;
@@ -36,7 +36,6 @@ import org.apache.cxf.service.model.MessagePartInfo;
 import org.apache.cxf.ws.addressing.AddressingProperties;
 import org.apache.cxf.ws.addressing.ContextUtils;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.xml.namespace.QName;
@@ -60,15 +59,22 @@ import static org.apache.cxf.ws.addressing.JAXWSAConstants.ADDRESSING_PROPERTIES
 @Component("MessageHeaderInterceptor")
 public class MessageHeaderInterceptor extends AbstractPhaseInterceptor<Message> {
 
-    @Autowired private OcppServerRepository ocppServerRepository;
-    @Autowired private ChargePointHelperService chargePointHelperService;
-    @Autowired private ScheduledExecutorService executorService;
+    private final OcppServerRepository ocppServerRepository;
+    private final UnknownChargePointService unknownChargePointService;
+    private final ScheduledExecutorService executorService;
 
     private static final String BOOT_OPERATION_NAME = "BootNotification";
     private static final String CHARGEBOX_ID_HEADER = "ChargeBoxIdentity";
 
-    public MessageHeaderInterceptor() {
+    public MessageHeaderInterceptor(
+            OcppServerRepository ocppServerRepository,
+            UnknownChargePointService unknownChargePointService,
+            ScheduledExecutorService executorService
+    ) {
         super(Phase.PRE_INVOKE);
+        this.ocppServerRepository = ocppServerRepository;
+        this.unknownChargePointService = unknownChargePointService;
+        this.executorService = executorService;
     }
 
     @Override
@@ -82,7 +88,7 @@ public class MessageHeaderInterceptor extends AbstractPhaseInterceptor<Message> 
         QName opName = message.getExchange().getBindingOperationInfo().getOperationInfo().getName();
 
         if (!BOOT_OPERATION_NAME.equals(opName.getLocalPart())) {
-            Optional<RegistrationStatus> status = chargePointHelperService.getRegistrationStatus(chargeBoxId);
+            Optional<RegistrationStatus> status = unknownChargePointService.getRegistrationStatus(chargeBoxId);
             boolean allow = status.isPresent() && status.get() != RegistrationStatus.REJECTED;
             if (!allow) {
                 throw createAuthFault(opName);

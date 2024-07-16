@@ -49,7 +49,6 @@ import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.List;
 
-import static de.rwth.idsg.steve.SteveConfiguration.CONFIG;
 import static de.rwth.idsg.steve.config.WebSocketConfiguration.IDLE_TIMEOUT;
 import static de.rwth.idsg.steve.config.WebSocketConfiguration.MAX_MSG_SIZE;
 
@@ -59,13 +58,22 @@ import static de.rwth.idsg.steve.config.WebSocketConfiguration.MAX_MSG_SIZE;
  */
 public class SteveAppContext {
 
+    private final SteveConfiguration config;
     private final AnnotationConfigWebApplicationContext springContext;
     private final WebAppContext webAppContext;
 
-    public SteveAppContext() {
-        springContext = new AnnotationConfigWebApplicationContext();
+    public SteveAppContext(SteveConfiguration config) {
+        this.config = config;
+        this.springContext = createSpringContext(config);
+        this.webAppContext = initWebApp(config, springContext);
+    }
+
+    private static AnnotationConfigWebApplicationContext createSpringContext(SteveConfiguration config) {
+        AnnotationConfigWebApplicationContext springContext = new AnnotationConfigWebApplicationContext();
+        springContext.getEnvironment().setActiveProfiles(config.getProfile().name());
+        springContext.addBeanFactoryPostProcessor(factory -> factory.registerSingleton(SteveConfiguration.class.getName(), config));
         springContext.scan("de.rwth.idsg.steve.config");
-        webAppContext = initWebApp();
+        return springContext;
     }
 
     public HandlerCollection getHandlers() {
@@ -85,7 +93,7 @@ public class SteveAppContext {
     }
 
     private Handler getWebApp() {
-        if (!CONFIG.getJetty().isGzipEnabled()) {
+        if (!config.getJetty().isGzipEnabled()) {
             return webAppContext;
         }
 
@@ -96,9 +104,9 @@ public class SteveAppContext {
         return gzipHandler;
     }
 
-    private WebAppContext initWebApp() {
+    private static WebAppContext initWebApp(SteveConfiguration config, AnnotationConfigWebApplicationContext springContext) {
         WebAppContext ctx = new WebAppContext();
-        ctx.setContextPath(CONFIG.getContextPath());
+        ctx.setContextPath(config.getContextPath());
         ctx.setResourceBase(getWebAppURIAsString());
 
         // if during startup an exception happens, do not swallow it, throw it
@@ -111,15 +119,15 @@ public class SteveAppContext {
         ServletHolder cxf = new ServletHolder("cxf", new CXFServlet());
 
         ctx.addEventListener(new ContextLoaderListener(springContext));
-        ctx.addServlet(web, CONFIG.getSpringMapping());
-        ctx.addServlet(cxf, CONFIG.getCxfMapping() + "/*");
+        ctx.addServlet(web, config.getSpringMapping());
+        ctx.addServlet(cxf, config.getCxfMapping() + "/*");
 
-        if (CONFIG.getProfile().isProd()) {
+        if (config.getProfile().isProd()) {
             // If PROD, add security filter
             ctx.addFilter(
                 // The bean name is not arbitrary, but is as expected by Spring
                 new FilterHolder(new DelegatingFilterProxy(AbstractSecurityWebApplicationInitializer.DEFAULT_FILTER_NAME)),
-                CONFIG.getSpringMapping() + "*",
+                config.getSpringMapping() + "*",
                 EnumSet.allOf(DispatcherType.class)
             );
         }
@@ -137,14 +145,14 @@ public class SteveAppContext {
             RedirectPatternRule rule = new RedirectPatternRule();
             rule.setTerminating(true);
             rule.setPattern(redirect);
-            rule.setLocation(CONFIG.getContextPath() + "/manager/home");
+            rule.setLocation(config.getContextPath() + "/manager/home");
             rewrite.addRule(rule);
         }
         return rewrite;
     }
 
     private HashSet<String> getRedirectSet() {
-        String path = CONFIG.getContextPath();
+        String path = config.getContextPath();
 
         HashSet<String> redirectSet = new HashSet<>(3);
         redirectSet.add("");
@@ -165,7 +173,7 @@ public class SteveAppContext {
      * https://github.com/jasonish/jetty-springmvc-jsp-template
      * http://examples.javacodegeeks.com/enterprise-java/jetty/jetty-jsp-example
      */
-    private void initJSP(WebAppContext ctx) {
+    private static void initJSP(WebAppContext ctx) {
         // Ensure the JSP engine is initialized correctly
         List<ContainerInitializer> initializers = new ArrayList<>();
         initializers.add(new ContainerInitializer(new JettyJasperInitializer(), null));

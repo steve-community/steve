@@ -14,6 +14,8 @@ WORKDIR /code
 ADD /src /code/src
 ADD /website /code/website
 ADD /pom.xml /code/pom.xml
+ADD /mvnw /code/mvnw
+ADD /.mvn /code/.mvn
 
 RUN sed -i 's|${db.ip}|${env.DB_HOST}|g' pom.xml
 RUN sed -i 's|${db.port}|${env.DB_PORT}|g' pom.xml

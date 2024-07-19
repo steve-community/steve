@@ -3,6 +3,7 @@ package net.parkl.ocpp.service;
 import lombok.extern.slf4j.Slf4j;
 import net.parkl.ocpp.entities.OcppChargingProcess;
 import net.parkl.ocpp.entities.TransactionStart;
+import net.parkl.ocpp.service.middleware.OcppChargingMiddleware;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -24,7 +25,7 @@ public class OcppChargingLimitWatcherUnitTest {
     @Mock
     private ChargingProcessService chargingProcessService;
     @Mock
-    private OcppMiddleware ocppMiddleware;
+    private OcppChargingMiddleware chargingMiddleware;
     @Mock
     private TaskExecutor executor;
 
@@ -50,7 +51,7 @@ public class OcppChargingLimitWatcherUnitTest {
 
         when(chargingProcessBeforeLimit.getOcppChargingProcessId()).thenReturn(beforeLimitProcessId);
         when(chargingProcessBeforeLimit.getTransactionStart()).thenReturn(transactionStartBeforeLimit);
-        when(ocppMiddleware.getPowerValue(chargingProcessBeforeLimit.getTransactionStart()))
+        when(chargingMiddleware.getPowerValue(chargingProcessBeforeLimit.getTransactionStart()))
                 .thenReturn(powerValueBeforeLimit);
         when(powerValueBeforeLimit.getValue()).thenReturn(2000f);
         when(powerValueBeforeLimit.getUnit()).thenReturn(OcppConstants.UNIT_WH);
@@ -58,7 +59,7 @@ public class OcppChargingLimitWatcherUnitTest {
 
         when(chargingProcessAfterLimit1.getOcppChargingProcessId()).thenReturn(afterLimitProcessId1);
         when(chargingProcessAfterLimit1.getTransactionStart()).thenReturn(transactionStartAfterLimit1);
-        when(ocppMiddleware.getPowerValue(chargingProcessAfterLimit1.getTransactionStart()))
+        when(chargingMiddleware.getPowerValue(chargingProcessAfterLimit1.getTransactionStart()))
                 .thenReturn(powerValueAfterLimit1);
         when(powerValueAfterLimit1.getValue()).thenReturn(3100f);
         when(powerValueAfterLimit1.getUnit()).thenReturn(OcppConstants.UNIT_WH);
@@ -66,7 +67,7 @@ public class OcppChargingLimitWatcherUnitTest {
 
         when(chargingProcessAfterLimit2.getOcppChargingProcessId()).thenReturn(afterLimitProcessId2);
         when(chargingProcessAfterLimit2.getTransactionStart()).thenReturn(transactionStartAfterLimit2);
-        when(ocppMiddleware.getPowerValue(chargingProcessAfterLimit2.getTransactionStart()))
+        when(chargingMiddleware.getPowerValue(chargingProcessAfterLimit2.getTransactionStart()))
                 .thenReturn(powerValueAfterLimit2);
         when(powerValueAfterLimit2.getValue()).thenReturn(3050f);
         when(powerValueAfterLimit2.getUnit()).thenReturn(OcppConstants.UNIT_WH);
@@ -98,7 +99,7 @@ public class OcppChargingLimitWatcherUnitTest {
 
         when(chargingProcessAfterLimit.getOcppChargingProcessId()).thenReturn(afterLimitProcessId);
         when(chargingProcessAfterLimit.getTransactionStart()).thenReturn(transactionStartAfterLimit);
-        when(ocppMiddleware.getPowerValue(chargingProcessAfterLimit.getTransactionStart()))
+        when(chargingMiddleware.getPowerValue(chargingProcessAfterLimit.getTransactionStart()))
                 .thenReturn(powerValueAfterLimit);
         when(powerValueAfterLimit.getValue()).thenReturn(3100f);
         when(powerValueAfterLimit.getUnit()).thenReturn(OcppConstants.UNIT_WH);

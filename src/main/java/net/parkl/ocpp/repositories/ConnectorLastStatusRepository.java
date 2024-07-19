@@ -21,6 +21,8 @@ package net.parkl.ocpp.repositories;
 import net.parkl.ocpp.entities.ConnectorLastStatus;
 import org.springframework.data.repository.CrudRepository;
 
-public interface ConnectorLastStatusRepository extends CrudRepository<ConnectorLastStatus, Integer>{
+import java.util.List;
 
+public interface ConnectorLastStatusRepository extends CrudRepository<ConnectorLastStatus, Integer>{
+    List<ConnectorLastStatus> findByChargeBoxId(String chargeBoxId);
 }

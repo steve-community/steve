@@ -3,6 +3,8 @@ package net.parkl.ocpp.service;
 import net.parkl.ocpp.entities.Connector;
 import net.parkl.ocpp.entities.OcppChargingProcess;
 import net.parkl.ocpp.service.config.AdvancedChargeBoxConfiguration;
+import net.parkl.ocpp.service.middleware.OcppChargePointMiddleware;
+import net.parkl.ocpp.service.middleware.OcppChargingMiddleware;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -25,8 +27,9 @@ public class OcppStartTimeoutManagerUnitTest {
     @Mock
     private ChargingProcessService chargingProcessService;
     @Mock
-    private OcppMiddleware ocppMiddleware;
-
+    private OcppChargePointMiddleware chargePointMiddleware;
+    @Mock
+    private OcppChargingMiddleware chargingMiddleware;
     @Test
     public void checkForStartTimeoutNoEnabledCharger() {
         when(advancedChargeBoxConfiguration.isStartTimeoutEnabledForAny()).thenReturn(false);
@@ -55,7 +58,7 @@ public class OcppStartTimeoutManagerUnitTest {
 
         startTimeoutManager.checkForStartTimeout();
 
-        verify(ocppMiddleware, times(2)).changeAvailability(anyString(), anyString(), anyBoolean());
+        verify(chargePointMiddleware, times(2)).changeAvailability(anyString(), anyString(), anyBoolean());
     }
 
     @Test
@@ -79,6 +82,6 @@ public class OcppStartTimeoutManagerUnitTest {
 
         startTimeoutManager.checkForStartTimeout();
 
-        verify(ocppMiddleware, times(1)).stopChargingWithPreparingTimeout(chargingProcessId);
+        verify(chargingMiddleware, times(1)).stopChargingWithPreparingTimeout(chargingProcessId);
     }
 }

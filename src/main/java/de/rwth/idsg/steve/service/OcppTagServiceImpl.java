@@ -3,9 +3,9 @@ package de.rwth.idsg.steve.service;
 import com.google.common.base.Strings;
 import de.rwth.idsg.steve.SteveException;
 import lombok.extern.slf4j.Slf4j;
-import net.parkl.ocpp.service.OcppMiddleware;
 import net.parkl.ocpp.service.config.AdvancedChargeBoxConfiguration;
 import net.parkl.ocpp.service.config.IntegratedIdTagProvider;
+import net.parkl.ocpp.service.middleware.OcppChargingMiddleware;
 import ocpp.cs._2015._10.AuthorizationStatus;
 import ocpp.cs._2015._10.IdTagInfo;
 import org.jetbrains.annotations.Nullable;
@@ -25,7 +25,7 @@ import static ocpp.cs._2015._10.AuthorizationStatus.INVALID;
 @Service
 public class OcppTagServiceImpl implements OcppTagService {
     @Autowired
-    private OcppMiddleware proxyServerFacade;
+    private OcppChargingMiddleware chargingMiddleware;
     @Autowired
     private AdvancedChargeBoxConfiguration config;
     @Autowired
@@ -71,7 +71,7 @@ public class OcppTagServiceImpl implements OcppTagService {
                 && integratedIdTagProvider.integratedTags().stream().noneMatch(idTag::equalsIgnoreCase)) {
             return INVALID;
         } else {
-            if (!proxyServerFacade.checkRfidTag(idTag, askingChargeBoxId)) {
+            if (!chargingMiddleware.checkRfidTag(idTag, askingChargeBoxId)) {
                 log.error("The user with idTag '{}' is INVALID (validation failed on Parkl backend).", idTag);
                 return INVALID;
             }

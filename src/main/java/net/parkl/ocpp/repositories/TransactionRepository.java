@@ -18,7 +18,10 @@
  */
 package net.parkl.ocpp.repositories;
 
+import net.parkl.ocpp.entities.Connector;
 import net.parkl.ocpp.entities.Transaction;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 
@@ -53,4 +56,9 @@ public interface TransactionRepository extends CrudRepository<Transaction, Integ
 
 	@Query("SELECT OBJECT(t) FROM Transaction AS t WHERE t.stopTimestamp IS NULL AND t.startEventTimestamp<?1 ORDER BY t.startEventTimestamp ASC")
     List<Transaction> findActiveStartedBefore(Date threshold);
+
+	List<Transaction> findByConnectorAndStopTimestampIsNullOrderByStartTimestampDesc(Connector connector);
+
+
+	Page<Transaction> findByConnectorAndStopTimestampIsNotNullOrderByStartTimestampDesc(Connector connector, Pageable pageable);
 }

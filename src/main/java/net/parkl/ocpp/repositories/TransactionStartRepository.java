@@ -33,4 +33,6 @@ public interface TransactionStartRepository extends CrudRepository<TransactionSt
 
     @Query("SELECT OBJECT(t) FROM TransactionStart AS t WHERE t.connector=?1 AND t.ocppTag=?2 AND t.startTimestamp=?3 AND t.startValue=?4")
     TransactionStart findByConnectorAndIdTagAndStartValues(Connector c, String idTag, Date startDate, String startValue);
+
+    List<TransactionStart> findByConnectorOrderByStartTimestampDesc(Connector c);
 }

@@ -59,4 +59,6 @@ public interface OcppChargingProcessRepository extends CrudRepository<OcppChargi
 	@Modifying
 	int deleteWithoutTransaction(Date date);
 
+	@Query("SELECT OBJECT(p) FROM OcppChargingProcess AS p JOIN FETCH p.transactionStart t WHERE t.transactionPk IN ?1")
+	List<OcppChargingProcess> findByTransactionIdIn(List<Integer> transactionIds);
 }

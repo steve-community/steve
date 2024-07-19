@@ -22,7 +22,6 @@ import net.parkl.ocpp.module.esp.model.ESPChargingConsumptionRequest;
 import net.parkl.ocpp.module.esp.model.ESPChargingProcessCheckResult;
 import net.parkl.ocpp.module.esp.model.ESPChargingStopRequest;
 import net.parkl.ocpp.module.esp.model.ESPRfidChargingStartRequest;
-import net.parkl.ocpp.service.OcppMiddleware;
 
 /**
  * Interface for the communication with an e-mobility service provider, initiated by the SteVe Pluggable library (outgoing events).<br>

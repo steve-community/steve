@@ -9,8 +9,8 @@ import net.parkl.ocpp.module.esp.model.ESPChargingStartRequest;
 import net.parkl.ocpp.module.esp.model.ESPChargingUserStopRequest;
 import net.parkl.ocpp.service.ChargingProcessService;
 import net.parkl.ocpp.service.OcppConsumptionListener;
-import net.parkl.ocpp.service.OcppMiddleware;
 import net.parkl.ocpp.service.chargepoint.TestChargePoint;
+import net.parkl.ocpp.service.middleware.OcppChargingMiddleware;
 import net.parkl.ocpp.util.AsyncWaiter;
 
 import java.util.List;
@@ -19,7 +19,7 @@ import java.util.List;
 @Slf4j
 public class ChargingDriver {
 
-    private OcppMiddleware ocppMiddleware;
+    private OcppChargingMiddleware chargingMiddleware;
     private TestChargePoint testChargePoint;
     private ChargingProcessService chargingProcessService;
 
@@ -33,19 +33,19 @@ public class ChargingDriver {
     private Float kwhLimit;
     private Integer minuteLimit;
 
-    public static ChargingDriver createChargingDriver(OcppMiddleware ocppMiddleware,
+    public static ChargingDriver createChargingDriver(OcppChargingMiddleware ocppMiddleware,
                                                       TestChargePoint testChargePoint,
                                                       ChargingProcessService chargingProcessService) {
         ChargingDriver driver = new ChargingDriver();
         driver.testChargePoint = testChargePoint;
-        driver.ocppMiddleware = ocppMiddleware;
+        driver.chargingMiddleware = ocppMiddleware;
         driver.chargingProcessService = chargingProcessService;
         return driver;
     }
 
     public String start() {
         testConsumptionListener.reset();
-        ocppMiddleware.registerConsumptionListener(testConsumptionListener);
+        chargingMiddleware.registerConsumptionListener(testConsumptionListener);
 
         ESPChargingStartRequest req = ESPChargingStartRequest.builder()
                 .chargeBoxId(chargeBoxId)
@@ -58,13 +58,13 @@ public class ChargingDriver {
 
         testChargePoint.setConsumptionStart(startValue);
 
-        return ocppMiddleware.startCharging(req).getExternalChargingProcessId();
+        return chargingMiddleware.startCharging(req).getExternalChargingProcessId();
     }
 
     public void stop(String externalChargingProcessId) {
         testConsumptionListener.reset();
         testChargePoint.setConsumptionStop(stopValue);
-        ocppMiddleware.stopCharging(
+        chargingMiddleware.stopCharging(
                 ESPChargingUserStopRequest.builder()
                         .externalChargeId(externalChargingProcessId)
                         .build());

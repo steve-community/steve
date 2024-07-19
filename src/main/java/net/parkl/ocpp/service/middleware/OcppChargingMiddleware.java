@@ -1,119 +1,57 @@
-/*
- * Parkl Digital Technologies
- * Copyright (C) 2020-2021
- * All Rights Reserved.
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
- */
-package net.parkl.ocpp.service;
+package net.parkl.ocpp.service.middleware;
 
-import de.rwth.idsg.steve.ocpp.CommunicationTask;
 import de.rwth.idsg.steve.ocpp.OcppProtocol;
-import de.rwth.idsg.steve.ocpp.OcppVersion;
 import de.rwth.idsg.steve.ocpp.RequestResult;
-import de.rwth.idsg.steve.repository.TaskStore;
 import de.rwth.idsg.steve.repository.dto.ChargePointSelect;
-import de.rwth.idsg.steve.service.ChargePointHelperService;
-import de.rwth.idsg.steve.service.IChargePointService12_Client;
-import de.rwth.idsg.steve.service.IChargePointService15_Client;
-import de.rwth.idsg.steve.service.IChargePointService16_Client;
-import de.rwth.idsg.steve.web.dto.Address;
-import de.rwth.idsg.steve.web.dto.ChargePointForm;
-import de.rwth.idsg.steve.web.dto.ocpp.*;
+import de.rwth.idsg.steve.web.dto.ocpp.RemoteStartTransactionParams;
+import de.rwth.idsg.steve.web.dto.ocpp.RemoteStopTransactionParams;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.parkl.ocpp.entities.*;
 import net.parkl.ocpp.module.esp.EmobilityServiceProvider;
 import net.parkl.ocpp.module.esp.model.*;
 import net.parkl.ocpp.repositories.ChargingConsumptionStateRepository;
-import net.parkl.ocpp.repositories.ConnectorLastStatusRepository;
-import net.parkl.ocpp.repositories.ConnectorRepository;
-import net.parkl.ocpp.repositories.OcppChargeBoxRepository;
+import net.parkl.ocpp.service.*;
 import net.parkl.ocpp.service.config.AdvancedChargeBoxConfiguration;
-import net.parkl.ocpp.service.cs.ChargePointService;
 import net.parkl.ocpp.service.cs.ConnectorMeterValueData;
 import net.parkl.ocpp.service.cs.ConnectorMeterValueService;
 import net.parkl.ocpp.service.cs.TransactionService;
-import net.parkl.ocpp.util.AsyncWaiter;
-import ocpp.cp._2012._06.AvailabilityStatus;
-import ocpp.cp._2015._10.UnlockStatus;
-import ocpp.cs._2015._10.RegistrationStatus;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
-import static de.rwth.idsg.steve.web.dto.ocpp.AvailabilityType.INOPERATIVE;
-import static de.rwth.idsg.steve.web.dto.ocpp.AvailabilityType.OPERATIVE;
 import static java.lang.Float.parseFloat;
 import static java.util.Collections.singletonList;
 import static net.parkl.ocpp.module.esp.ESPErrorCodes.*;
 import static net.parkl.ocpp.service.OcppConstants.*;
 import static ocpp.cp._2012._06.RemoteStartStopStatus.ACCEPTED;
 
-/**
- * Middleware component between the e-mobility service provider (ESP) backend and the SteVe Pluggable library.<br>
- *
- * @author andor
- */
 @Service
 @Slf4j
-public class OcppMiddlewareImpl implements OcppMiddleware {
-
-
-    private static final long WAIT_MS = 100;
-
-    @Autowired
-    private TaskStore requestTaskStore;
-    @Autowired
-    @Qualifier("ChargePointService15_Client")
-    private IChargePointService15_Client client15;
-    @Autowired
-    @Qualifier("ChargePointService12_Client")
-    private IChargePointService12_Client client12;
-    @Autowired
-    @Qualifier("ChargePointService16_Client")
-    private IChargePointService16_Client client16;
-    @Autowired
-    private OcppChargeBoxRepository chargeBoxRepo;
-    @Autowired
-    private ConnectorRepository connectorRepo;
-    @Autowired
-    private ConnectorLastStatusRepository connectorLastStatusRepository;
-    @Autowired
-    private ChargePointHelperService chargePointHelperService;
-    @Autowired
-    private ChargePointService chargePointService;
-    @Autowired
-    private ChargingProcessService chargingProcessService;
-    @Autowired
-    private TransactionService transactionService;
+public class OcppChargingMiddleware extends AbstractOcppMiddleware {
     @Autowired
     private AdvancedChargeBoxConfiguration config;
-    @Autowired
-    private EmobilityServiceProvider emobilityServiceProvider;
     @Autowired
     private OcppConsumptionHelper consumptionHelper;
     @Autowired
     private ConnectorMeterValueService connectorMeterValueService;
     @Autowired
     private ChargingConsumptionStateRepository consumptionStateRepository;
+    @Autowired
+    private ChargingProcessService chargingProcessService;
+
+    @Autowired
+    private TransactionService transactionService;
+
+    @Autowired
+    private EmobilityServiceProvider emobilityServiceProvider;
 
     private OcppConsumptionListener consumptionListener;
     private OcppStopListener stopListener;
-
 
     public ESPChargingStartResult startCharging(ESPChargingStartRequest req) {
         log.info("Starting charging: {}-{} (licensePlate={})...",
@@ -217,7 +155,6 @@ public class OcppMiddlewareImpl implements OcppMiddleware {
 
     }
 
-
     private String getAvailableIntegrationIdTag(OcppChargeBox cb) {
         List<OcppChargingProcess> processes = chargingProcessService.getActiveProcessesByChargeBox(cb.getChargeBoxId());
         Set<String> idTagsUsed = new HashSet<>();
@@ -255,14 +192,11 @@ public class OcppMiddlewareImpl implements OcppMiddleware {
         }
     }
 
-    @SuppressWarnings("rawtypes")
-    private RequestResult getResponse(int taskId, String chargeBoxId) {
-        CommunicationTask task = requestTaskStore.get(taskId);
-        RequestResult result = (RequestResult) task.getResultMap().get(chargeBoxId);
-        if (result != null && (result.getResponse() != null || result.getErrorMessage() != null)) {
-            return result;
-        }
-        return null;
+    private ChargerIdentity toIdentity(String chargeBoxId, String chargerId) {
+        ChargerIdentity id = new ChargerIdentity();
+        id.setChargeBoxId(chargeBoxId);
+        id.setConnectorId(Integer.parseInt(chargerId));
+        return id;
     }
 
     public ESPChargingResult stopCharging(ESPChargingUserStopRequest req) {
@@ -397,107 +331,6 @@ public class OcppMiddlewareImpl implements OcppMiddleware {
         }
     }
 
-    private int sendGetConfiguration(GetConfigurationParams params, String protocol) {
-        OcppProtocol ocppProtocol = OcppProtocol.fromCompositeValue(protocol);
-
-        switch (ocppProtocol) {
-            case V_15_SOAP:
-            case V_15_JSON:
-                return client15.getConfiguration(params);
-            case V_16_SOAP:
-            case V_16_JSON:
-                return client16.getConfiguration(params);
-            default:
-                throw new IllegalStateException("OCPP protocol not supported: " + ocppProtocol);
-        }
-    }
-
-    @SuppressWarnings("unused")
-    private int sendGetLocalListVersion(MultipleChargePointSelect params, String protocol) {
-        OcppProtocol ocppProtocol = OcppProtocol.fromCompositeValue(protocol);
-
-        switch (ocppProtocol) {
-            case V_15_SOAP:
-            case V_15_JSON:
-                return client15.getLocalListVersion(params);
-            case V_16_SOAP:
-            case V_16_JSON:
-                return client16.getLocalListVersion(params);
-            default:
-                throw new IllegalStateException("OCPP protocol not supported: " + ocppProtocol);
-        }
-    }
-
-    @SuppressWarnings("unused")
-    private int sendLocalList(SendLocalListParams params, String protocol) {
-        OcppProtocol ocppProtocol = OcppProtocol.fromCompositeValue(protocol);
-
-        switch (ocppProtocol) {
-            case V_15_SOAP:
-            case V_15_JSON:
-                return client15.sendLocalList(params);
-            case V_16_SOAP:
-            case V_16_JSON:
-                return client16.sendLocalList(params);
-            default:
-                throw new IllegalStateException("OCPP protocol not supported: " + ocppProtocol);
-        }
-    }
-
-    private int sendChangeConfiguration(ChangeConfigurationParams params, String protocol) {
-        OcppProtocol ocppProtocol = OcppProtocol.fromCompositeValue(protocol);
-
-        switch (ocppProtocol) {
-            case V_15_SOAP:
-            case V_15_JSON:
-                return client15.changeConfiguration(params);
-            case V_16_SOAP:
-            case V_16_JSON:
-                return client16.changeConfiguration(params);
-            default:
-                throw new IllegalStateException("OCPP protocol not supported: " + ocppProtocol);
-        }
-    }
-
-    private ChargerIdentity toIdentity(String chargeBoxId, String chargerId) {
-        ChargerIdentity id = new ChargerIdentity();
-        id.setChargeBoxId(chargeBoxId);
-        id.setConnectorId(Integer.parseInt(chargerId));
-        return id;
-    }
-
-
-    private ChargePointSelect getChargePoint(String chargeBoxId, String protocol) {
-        if (protocol==null) {
-            throw new IllegalArgumentException("No protocol specified for charge box: " + chargeBoxId);
-        }
-        OcppProtocol ocppProtocol = OcppProtocol.fromCompositeValue(protocol);
-        List<ChargePointSelect> chargePoints;
-        switch (ocppProtocol) {
-            case V_12_SOAP:
-            case V_12_JSON:
-                chargePoints = chargePointHelperService.getChargePoints(OcppVersion.V_12);
-                break;
-            case V_15_SOAP:
-            case V_15_JSON:
-                chargePoints = chargePointHelperService.getChargePoints(OcppVersion.V_15);
-                break;
-            case V_16_SOAP:
-            case V_16_JSON:
-                chargePoints = chargePointHelperService.getChargePoints(OcppVersion.V_16);
-                break;
-            default:
-                throw new IllegalStateException("OCPP protocol not supported: " + ocppProtocol);
-        }
-
-        for (ChargePointSelect c : chargePoints) {
-            if (c.getChargeBoxId().equals(chargeBoxId)) {
-                return c;
-            }
-        }
-        return null;
-    }
-
     public ESPChargingStatusResult getStatus(String externalChargeId) {
         log.info("Status request: {}...", externalChargeId);
 
@@ -567,318 +400,7 @@ public class OcppMiddlewareImpl implements OcppMiddleware {
 
     }
 
-    @Override
-    public List<ESPChargeBoxConfiguration> getChargeBoxConfiguration(String chargeBoxId) {
-        log.info("Configuration request: {}...", chargeBoxId);
-        ChargePointSelect c;
-        OcppChargeBox chargeBox = chargeBoxRepo.findByChargeBoxId(chargeBoxId);
-        if (chargeBox == null) {
-            log.error("Invalid charge box id: {}", chargeBoxId);
-            throw new IllegalArgumentException("Invalid charge box ID: " + chargeBoxId);
-        }
 
-        c = getChargePoint(chargeBox.getChargeBoxId(), chargeBox.getOcppProtocol());
-        if (c == null) {
-            log.error("Invalid charge point id: {}", chargeBoxId);
-            throw new IllegalArgumentException("Invalid charge box ID: " + chargeBoxId);
-
-        }
-
-        GetConfigurationParams params = new GetConfigurationParams();
-        params.setChargePointSelectList(singletonList(c));
-        int taskId = sendGetConfiguration(params, chargeBox.getOcppProtocol());
-
-        RequestResult result = waitForResult(chargeBoxId, taskId);
-
-        return processGetConfigurationResult(chargeBoxId, result);
-
-    }
-
-    private RequestResult waitForResult(String chargeBoxId, int taskId) {
-        AsyncWaiter<RequestResult> waiter = new AsyncWaiter<>(90000);
-        waiter.setDelayMs(WAIT_MS);
-        waiter.setIntervalMs(WAIT_MS);
-        return waiter.waitFor(() -> getResponse(taskId, chargeBoxId));
-    }
-
-    private List<ESPChargeBoxConfiguration> processGetConfigurationResult(String chargeBoxId,
-                                                                          RequestResult result) {
-        if (result != null) {
-            if (result.getDetails() != null) {
-                log.info(result.getDetails());
-            }
-            if (result.getResponse() != null) {
-                return parseConfList(result.getResponse());
-            } else if (result.getErrorMessage() != null) {
-                throw new IllegalStateException(result.getErrorMessage());
-            } else {
-                log.info("Get configuration unknown error: {}", chargeBoxId);
-                throw new IllegalStateException("Unknown error: " + chargeBoxId);
-
-            }
-        } else {
-            log.info("Get configuration no response error: {}", chargeBoxId);
-            throw new IllegalStateException("No response from charge box: " + chargeBoxId);
-        }
-    }
-
-    private void processGenericResult(String type, String chargeBoxId,
-                                      RequestResult result) {
-        if (result != null) {
-            if (result.getResponse() != null) {
-                if (result.getResponse().equals(AvailabilityStatus.ACCEPTED.value())) {
-                    log.info("{} accepted: {}", type, chargeBoxId);
-
-                } else if (result.getResponse().equals(AvailabilityStatus.REJECTED.value())) {
-                    log.info("{} rejected: {}", type, chargeBoxId);
-                    throw new IllegalStateException(type + " rejected: " + chargeBoxId);
-                } else if (result.getResponse().equals(UnlockStatus.UNLOCK_FAILED.value())) {
-                    log.info("{} unlock failed: {}", type, chargeBoxId);
-                    throw new IllegalStateException(type + " unlock failed: " + chargeBoxId);
-                } else if (result.getResponse().equals(UnlockStatus.NOT_SUPPORTED.value())) {
-                    log.info("{} unlock not supported: {}", type, chargeBoxId);
-                    throw new IllegalStateException(type + " not supported: " + chargeBoxId);
-                } else {
-                    log.info("{} success response {}: {}", type, result.getResponse(), chargeBoxId);
-                }
-            } else if (result.getErrorMessage() != null) {
-                throw new IllegalStateException(result.getErrorMessage());
-            } else {
-                log.info("{} unknown error: {}", type, chargeBoxId);
-                throw new IllegalStateException("Unknown error: " + chargeBoxId);
-
-            }
-        } else {
-            log.info("{} no response error: {}", type, chargeBoxId);
-            throw new IllegalStateException("No response from charge box: " + chargeBoxId);
-        }
-    }
-
-
-    private List<ESPChargeBoxConfiguration> parseConfList(String response) {
-        log.info("Parsing configuration: {}...", response);
-        List<ESPChargeBoxConfiguration> ret = new ArrayList<>();
-        String[] split = response.split("<br>");
-        for (String line : split) {
-            log.info("Parsing config line: {}...", line);
-            if (line.startsWith("<b>Unknown keys")) {
-                log.info("Unknown keys reached, exiting...");
-                break;
-            }
-            if (!StringUtils.isEmpty(line.trim()) && !line.startsWith("<b>Known keys")) {
-                boolean readOnly = false;
-                if (line.endsWith(" (read-only)")) {
-                    line = line.replace(" (read-only)", "");
-                    readOnly = true;
-                }
-                String[] keyVal = line.split("\\:");
-
-                ESPChargeBoxConfiguration c = ESPChargeBoxConfiguration.builder().
-                        key(keyVal[0].trim()).value(keyVal[1].trim()).readOnly(readOnly).build();
-                log.info("Configuration parsed: {}={} (read-only={})", c.getKey(), c.getValue(), c.isReadOnly());
-                ret.add(c);
-            }
-        }
-        return ret;
-    }
-
-    @Override
-    public List<ESPChargeBoxConfiguration> changeChargeBoxConfiguration(String chargeBoxId, String key,
-                                                                        String value) {
-        log.info("Configuration change request for {}: {}={}...", chargeBoxId, key, value);
-        ChargePointSelect c = null;
-        OcppChargeBox chargeBox = chargeBoxRepo.findByChargeBoxId(chargeBoxId);
-        if (chargeBox == null) {
-            log.error("Invalid charge box id: {}", chargeBoxId);
-            throw new IllegalArgumentException("Invalid charge box ID: " + chargeBoxId);
-        }
-
-        c = getChargePoint(chargeBox.getChargeBoxId(), chargeBox.getOcppProtocol());
-        if (c == null) {
-            log.error("Invalid charge point id: {}", chargeBoxId);
-            throw new IllegalArgumentException("Invalid charge box ID: " + chargeBoxId);
-
-        }
-
-
-        ChangeConfigurationParams params = new ChangeConfigurationParams();
-        params.setChargePointSelectList(singletonList(c));
-        params.setConfKey(key);
-        params.setValue(value);
-        int taskId = sendChangeConfiguration(params, chargeBox.getOcppProtocol());
-
-        RequestResult result = waitForResult(chargeBoxId, taskId);
-        processGenericResult("Change configuration", chargeBoxId, result);
-
-        return getChargeBoxConfiguration(chargeBoxId);
-    }
-
-    @Override
-    public void registerChargeBox(String chargeBoxId) {
-        log.info("Register charge box request: {}...", chargeBoxId);
-
-        OcppChargeBox chargeBox = chargeBoxRepo.findByChargeBoxId(chargeBoxId);
-        if (chargeBox != null) {
-            log.error("Charge box already exists: {}", chargeBoxId);
-            throw new IllegalArgumentException("Charge box already exists: " + chargeBoxId);
-        }
-
-        ChargePointForm form = new ChargePointForm();
-        form.setChargeBoxId(chargeBoxId);
-        form.setAddress(new Address());
-        form.setRegistrationStatus(RegistrationStatus.ACCEPTED.value());
-        chargePointService.addChargePoint(form);
-    }
-
-    @Override
-    public void unregisterChargeBox(String chargeBoxId) {
-        log.info("Unregister charge box request: {}...", chargeBoxId);
-
-        OcppChargeBox chargeBox = chargeBoxRepo.findByChargeBoxId(chargeBoxId);
-        if (chargeBox == null) {
-            log.error("Invalid charge box id: {}", chargeBoxId);
-            throw new IllegalArgumentException("Invalid charge box ID: " + chargeBoxId);
-        }
-
-        chargePointService.deleteChargePoint(chargeBox.getChargeBoxPk());
-    }
-
-    @Override
-    public void changeAvailability(String chargeBoxId, String chargerId, boolean available) {
-        log.info("Availability change request for {}-{}: {}...", chargeBoxId, chargerId, available);
-        ChargePointSelect c;
-        OcppChargeBox chargeBox = chargeBoxRepo.findByChargeBoxId(chargeBoxId);
-        if (chargeBox == null) {
-            log.error("Invalid charge box id: {}", chargeBoxId);
-            throw new IllegalArgumentException("Invalid charge box ID: " + chargeBoxId);
-        }
-
-        c = getChargePoint(chargeBox.getChargeBoxId(), chargeBox.getOcppProtocol());
-        if (c == null) {
-            log.error("Invalid charge point id: {}", chargeBoxId);
-            throw new IllegalArgumentException("Invalid charge box ID: " + chargeBoxId);
-
-        }
-
-        ChangeAvailabilityParams params = new ChangeAvailabilityParams();
-        params.setChargePointSelectList(singletonList(c));
-        params.setConnectorId(Integer.parseInt(chargerId));
-        params.setAvailType(available ? OPERATIVE : INOPERATIVE);
-        int taskId = sendChangeAvailability(params, chargeBox.getOcppProtocol());
-
-        RequestResult result = waitForResult(chargeBoxId, taskId);
-        processGenericResult("Change availability", chargeBoxId, result);
-    }
-
-    private int sendChangeAvailability(ChangeAvailabilityParams params, String protocol) {
-        OcppProtocol ocppProtocol = OcppProtocol.fromCompositeValue(protocol);
-
-        switch (ocppProtocol) {
-            case V_12_SOAP:
-            case V_12_JSON:
-                return client12.changeAvailability(params);
-            case V_15_SOAP:
-            case V_15_JSON:
-                return client15.changeAvailability(params);
-            case V_16_SOAP:
-            case V_16_JSON:
-                return client16.changeAvailability(params);
-            default:
-                throw new IllegalStateException("OCPP protocol not supported: " + ocppProtocol);
-        }
-    }
-
-
-    @Override
-    public void unlockConnector(String chargeBoxId, String chargerId) {
-        log.info("Unlock connector request for {}-{}...", chargeBoxId, chargerId);
-        ChargePointSelect c;
-        OcppChargeBox chargeBox = chargeBoxRepo.findByChargeBoxId(chargeBoxId);
-        if (chargeBox == null) {
-            log.error("Invalid charge box id: {}", chargeBoxId);
-            throw new IllegalArgumentException("Invalid charge box ID: " + chargeBoxId);
-        }
-
-        c = getChargePoint(chargeBox.getChargeBoxId(), chargeBox.getOcppProtocol());
-        if (c == null) {
-            log.error("Invalid charge point id: {}", chargeBoxId);
-            throw new IllegalArgumentException("Invalid charge box ID: " + chargeBoxId);
-
-        }
-
-        UnlockConnectorParams params = new UnlockConnectorParams();
-        params.setChargePointSelectList(singletonList(c));
-        params.setConnectorId(Integer.parseInt(chargerId));
-        int taskId = sendUnlockConnector(params, chargeBox.getOcppProtocol());
-
-        RequestResult result = waitForResult(chargeBoxId, taskId);
-        processGenericResult("Unlock connector", chargeBoxId, result);
-    }
-
-    private int sendUnlockConnector(UnlockConnectorParams params, String protocol) {
-        OcppProtocol ocppProtocol = OcppProtocol.fromCompositeValue(protocol);
-
-        switch (ocppProtocol) {
-            case V_12_SOAP:
-            case V_12_JSON:
-                return client12.unlockConnector(params);
-            case V_15_SOAP:
-            case V_15_JSON:
-                return client15.unlockConnector(params);
-            case V_16_SOAP:
-            case V_16_JSON:
-                return client16.unlockConnector(params);
-            default:
-                throw new IllegalStateException("OCPP protocol not supported: " + ocppProtocol);
-        }
-    }
-
-    @Override
-    public void resetChargeBox(String chargeBoxId, boolean soft) {
-        log.info("Reset request for {} (soft={}}...", chargeBoxId, soft);
-        ChargePointSelect c = null;
-        OcppChargeBox chargeBox = chargeBoxRepo.findByChargeBoxId(chargeBoxId);
-        if (chargeBox == null) {
-            log.error("Invalid charge box id: {}", chargeBoxId);
-            throw new IllegalArgumentException("Invalid charge box ID: " + chargeBoxId);
-        }
-
-        c = getChargePoint(chargeBox.getChargeBoxId(), chargeBox.getOcppProtocol());
-        if (c == null) {
-            log.error("Invalid charge point id: {}", chargeBoxId);
-            throw new IllegalArgumentException("Invalid charge box ID: " + chargeBoxId);
-
-        }
-
-        ResetParams params = new ResetParams();
-        params.setChargePointSelectList(singletonList(c));
-        params.setResetType(soft ? ResetType.SOFT : ResetType.HARD);
-        int taskId = sendResetRequest(params, chargeBox.getOcppProtocol());
-
-        RequestResult result = waitForResult(chargeBoxId, taskId);
-        processGenericResult("Reset request", chargeBoxId, result);
-    }
-
-    private int sendResetRequest(ResetParams params, String protocol) {
-        OcppProtocol ocppProtocol = OcppProtocol.fromCompositeValue(protocol);
-
-        switch (ocppProtocol) {
-            case V_12_SOAP:
-            case V_12_JSON:
-                return client12.reset(params);
-            case V_15_SOAP:
-            case V_15_JSON:
-                return client15.reset(params);
-            case V_16_SOAP:
-            case V_16_JSON:
-                return client16.reset(params);
-            default:
-                throw new IllegalStateException("OCPP protocol not supported: " + ocppProtocol);
-        }
-    }
-
-
-    @Override
     public void stopChargingExternal(OcppChargingProcess process, String reason) {
         if (process == null || reason == null) {
             throw new IllegalArgumentException("OcppChargingProcess or reason was null");
@@ -913,7 +435,6 @@ public class OcppMiddlewareImpl implements OcppMiddleware {
         }
     }
 
-    @Override
     public void updateConsumption(OcppChargingProcess process, String startValue, String stopValue) {
         if (process == null) {
             throw new IllegalArgumentException("OcppChargingProcess was null");
@@ -961,7 +482,6 @@ public class OcppMiddlewareImpl implements OcppMiddleware {
         }
     }
 
-    @Override
     public boolean isConnectorCharging(String chargeBoxId, int connectorId) {
         return chargingProcessService.findOpenChargingProcess(chargeBoxId, connectorId) != null;
     }
@@ -974,75 +494,6 @@ public class OcppMiddlewareImpl implements OcppMiddleware {
         this.stopListener = l;
     }
 
-
-    @Override
-    public ESPChargerStatusResult getChargerStatuses() {
-        log.info("Querying all connector statuses...");
-        List<Connector> connectors = connectorRepo.findAllByOrderByConnectorPkAsc();
-        Iterable<ConnectorLastStatus> statuses = connectorLastStatusRepository.findAll();
-        Map<Integer, ConnectorLastStatus> statusMap = new HashMap<>();
-
-        for (ConnectorLastStatus status : statuses) {
-            statusMap.put(status.getConnectorPk(), status);
-        }
-
-        ESPChargerStatusResult ret = ESPChargerStatusResult.builder().status(new ArrayList<>()).build();
-
-
-        for (Connector connector : connectors) {
-            ESPChargerStatus dto = ESPChargerStatus.builder().
-                    externalChargerId(String.format("%s_%d", connector.getChargeBoxId(), connector.getConnectorId())).build();
-
-            ConnectorLastStatus status = statusMap.get(connector.getConnectorPk());
-            if (status != null) {
-                switch (status.getStatus()) {
-                    case "Available":
-                        dto.setState(ESPChargerState.Free);
-                        break;
-                    case "Charging":
-                    case "Preparing":
-                    case "Finishing":
-                        dto.setState(ESPChargerState.Occupied);
-                        break;
-                    default:
-                        dto.setState(ESPChargerState.Error);
-                        break;
-                }
-            }
-            ret.getStatus().add(dto);
-        }
-        return ret;
-    }
-
-    @Override
-    public ESPChargerState getChargerStatus(String chargeBoxId, int connectorId) {
-        Connector connector = connectorRepo.findByChargeBoxIdAndConnectorId(chargeBoxId, connectorId);
-
-        if (connector == null) {
-            throw new IllegalArgumentException("OcppConnector was null");
-        }
-
-        ConnectorLastStatus connectorStatus = connectorLastStatusRepository.findById(connector.getConnectorPk())
-                .orElse(null);
-
-        if (connectorStatus != null) {
-            switch (connectorStatus.getStatus()) {
-                case "Available":
-                    return ESPChargerState.Free;
-                case "Charging":
-                case "Preparing":
-                case "Finishing":
-                    return ESPChargerState.Occupied;
-                default:
-                    return ESPChargerState.Error;
-            }
-        }
-
-        return null;
-    }
-
-
-    @Override
     public void stopChargingWithLimit(String chargingProcessId, float totalPower) {
         log.info("Stopping charging process with limit: {}...", chargingProcessId);
         try {
@@ -1078,7 +529,6 @@ public class OcppMiddlewareImpl implements OcppMiddleware {
         }
     }
 
-    @Override
     public void stopChargingWithPreparingTimeout(String chargingProcessId) {
         log.info("Stopping charging process with preparing limit: {}...", chargingProcessId);
         try {
@@ -1107,29 +557,6 @@ public class OcppMiddlewareImpl implements OcppMiddleware {
         }
     }
 
-    @Override
-    public void sendHeartBeatOfflineAlert(String chargeBoxId) {
-        log.info("Sending heart beat offline alert, chargeBoxId: {}", chargeBoxId);
-        try {
-            emobilityServiceProvider.sendHeartBeatOfflineAlert(chargeBoxId);
-        } catch (Exception ex) {
-            log.error("Failed to end heart beat offline alert, chargeBoxId:{} ", chargeBoxId, ex);
-        }
-    }
-
-    @Override
-    public void notifyAboutRfidStart(ESPRfidChargingStartRequest startRequest) {
-        log.info("Notify about RFID start, RFID = {}, charger = {}/{}",
-                startRequest.getRfidTag(), startRequest.getChargeBoxId(), startRequest.getConnectorId());
-        try {
-            emobilityServiceProvider.notifyAboutRfidStart(startRequest);
-        } catch (Exception ex) {
-            log.error("Failed to notify about RFID start, RFID = {}, charger = {}/{}",
-                    startRequest.getRfidTag(), startRequest.getChargeBoxId(), startRequest.getConnectorId(), ex);
-        }
-    }
-
-    @Override
     public boolean checkRfidTag(String rfidTag, String chargeBoxId) {
         log.info("Check RFID tag validity on backend, RFID = {}", rfidTag);
         try {
@@ -1140,7 +567,6 @@ public class OcppMiddlewareImpl implements OcppMiddleware {
         }
     }
 
-    @Override
     public ChargingConsumptionState findByExternalChargeId(String externalChargeId) {
         return consumptionStateRepository.findById(externalChargeId)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid externalChargeId specified"));

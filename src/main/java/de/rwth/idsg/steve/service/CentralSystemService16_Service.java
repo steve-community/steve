@@ -37,8 +37,8 @@ import net.parkl.ocpp.entities.TransactionStart;
 import net.parkl.ocpp.module.esp.model.ESPRfidChargingStartRequest;
 import net.parkl.ocpp.service.ChargingProcessService;
 import net.parkl.ocpp.service.HeartBeatService;
-import net.parkl.ocpp.service.OcppMiddleware;
 import net.parkl.ocpp.service.cs.*;
+import net.parkl.ocpp.service.middleware.OcppNotificationMiddleware;
 import ocpp.cs._2015._10.*;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -78,7 +78,7 @@ public class CentralSystemService16_Service {
     @Autowired
     private ChargingProcessService chargingProcessService;
     @Autowired
-    private OcppMiddleware proxyServerFacade;
+    private OcppNotificationMiddleware notificationMiddleware;
     @Autowired
     private HeartBeatService heartBeatService;
 
@@ -222,7 +222,7 @@ public class CentralSystemService16_Service {
             if (ocppChargingProcess != null) {
                 startRequest.setExternalChargingProcessId(ocppChargingProcess.getOcppChargingProcessId());
             }
-            proxyServerFacade.notifyAboutRfidStart(startRequest);
+            notificationMiddleware.notifyAboutRfidStart(startRequest);
         } else {
             transactionId = transactionService.insertTransaction(params);
         }

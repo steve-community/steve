@@ -31,7 +31,7 @@ import net.parkl.ocpp.repositories.ConnectorStatusRepository;
 import net.parkl.ocpp.repositories.OcppChargingProcessRepository;
 import net.parkl.ocpp.service.OcppConstants;
 import net.parkl.ocpp.service.OcppErrorTranslator;
-import net.parkl.ocpp.service.OcppMiddleware;
+import net.parkl.ocpp.service.middleware.OcppChargingMiddleware;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -60,7 +60,7 @@ public class ConnectorServiceImpl implements ConnectorService {
     private TaskExecutor executor;
 
     @Autowired
-    private OcppMiddleware ocppMiddleware;
+    private OcppChargingMiddleware chargingMiddleware;
 
 
     @Override
@@ -124,7 +124,7 @@ public class ConnectorServiceImpl implements ConnectorService {
             final OcppChargingProcess pr = savedProcess;
             executor.execute(() -> {
                 log.info("Notifying Parkl about closing charging process: {}...", pr.getOcppChargingProcessId());
-                ocppMiddleware.stopChargingExternal(pr, pr.getErrorCode() != null ? pr.getErrorCode() : OcppConstants.REASON_VEHICLE_NOT_CONNECTED);
+                chargingMiddleware.stopChargingExternal(pr, pr.getErrorCode() != null ? pr.getErrorCode() : OcppConstants.REASON_VEHICLE_NOT_CONNECTED);
             });
         }
     }

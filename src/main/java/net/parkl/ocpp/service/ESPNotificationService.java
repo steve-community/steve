@@ -20,6 +20,7 @@ package net.parkl.ocpp.service;
 
 import lombok.extern.slf4j.Slf4j;
 import net.parkl.ocpp.entities.OcppChargingProcess;
+import net.parkl.ocpp.service.middleware.OcppChargingMiddleware;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.task.TaskExecutor;
@@ -35,13 +36,13 @@ public class ESPNotificationService {
     private TaskExecutor executor;
 
     @Autowired
-    private OcppMiddleware ocppMiddleware;
+    private OcppChargingMiddleware chargingMiddleware;
 
     public void notifyAboutChargingStopped(OcppChargingProcess chargingProcess) {
         executor.execute(() -> {
             log.info("Notifying ESP about stop transaction from charger: {}...",
                     chargingProcess.getTransactionStart().getTransactionPk());
-            ocppMiddleware.stopChargingExternal(chargingProcess, REASON_VEHICLE_CHARGED);
+            chargingMiddleware.stopChargingExternal(chargingProcess, REASON_VEHICLE_CHARGED);
         });
     }
 
@@ -50,7 +51,7 @@ public class ESPNotificationService {
             log.info("Notifying ESP about consumption of transaction: {}...",
                     chargingProcess.getTransactionStart().getTransactionPk());
             log.info("start: {}, stop: {}", startValue, stopValue);
-            ocppMiddleware.updateConsumption(chargingProcess, startValue, stopValue);
+            chargingMiddleware.updateConsumption(chargingProcess, startValue, stopValue);
         });
     }
 }

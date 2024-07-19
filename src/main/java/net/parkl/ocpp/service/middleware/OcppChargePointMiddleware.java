@@ -209,6 +209,7 @@ public class OcppChargePointMiddleware extends AbstractOcppMiddleware {
 
     private ESPConnectorStatus toConnectorStatus(ConnectorLastStatus connectorLastStatus) {
         return ESPConnectorStatus.builder()
+                .connectorId(connectorLastStatus.getConnectorId())
                 .status(connectorLastStatus.getStatus())
                 .statusTimestamp(connectorLastStatus.getStatusTimestamp())
                 .errorCode(connectorLastStatus.getErrorCode())

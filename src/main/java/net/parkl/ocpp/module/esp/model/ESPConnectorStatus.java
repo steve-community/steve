@@ -12,6 +12,7 @@ import java.util.Date;
 @Builder
 @ToString
 public class ESPConnectorStatus implements Serializable {
+    private int connectorId;
     private String errorCode;
     private String errorInfo;
     private String status;

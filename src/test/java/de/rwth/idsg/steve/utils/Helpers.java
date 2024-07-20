@@ -21,7 +21,7 @@ package de.rwth.idsg.steve.utils;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.apache.cxf.ws.addressing.WSAddressingFeature;
 
-import javax.xml.ws.soap.SOAPBinding;
+import jakarta.xml.ws.soap.SOAPBinding;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;

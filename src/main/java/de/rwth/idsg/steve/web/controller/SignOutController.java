@@ -28,6 +28,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import static de.rwth.idsg.steve.SteveConfiguration.CONFIG;
+
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 15.08.2014
@@ -42,6 +44,9 @@ public class SignOutController {
                 .logout(request, response, null);
         new CookieClearingLogoutHandler(AbstractRememberMeServices.SPRING_SECURITY_REMEMBER_ME_COOKIE_KEY)
                 .logout(request, response, null);
+        if (CONFIG.getAuth().getMethod().equals("oauth2")){
+            return "redirect:" + CONFIG.getAuth().getOAuthLogoutUri();
+        }
         return "redirect:/manager/signin";
     }
 }

@@ -19,7 +19,6 @@
 package de.rwth.idsg.steve.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.joda.JodaModule;
 import com.google.common.base.Strings;
 import de.rwth.idsg.steve.SteveProdCondition;
 import de.rwth.idsg.steve.web.api.ApiControllerAdvice;
@@ -91,7 +90,7 @@ public class SecurityConfiguration {
 
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer() {
-        return (web) -> web.ignoring().antMatchers(
+        return (web) -> web.ignoring().requestMatchers(
             "/static/**",
             CONFIG.getCxfMapping() + "/**"
         );
@@ -103,7 +102,7 @@ public class SecurityConfiguration {
 
         return http
             .authorizeHttpRequests(
-                req -> req.antMatchers(prefix + "/**").hasRole("ADMIN")
+                req -> req.requestMatchers(prefix + "/**").hasRole("ADMIN")
             )
             .sessionManagement(
                 req -> req.invalidSessionUrl(prefix + "/signin")
@@ -120,17 +119,12 @@ public class SecurityConfiguration {
     @Bean
     @Order(1)
     public SecurityFilterChain apiKeyFilterChain(HttpSecurity http, ObjectMapper objectMapper) throws Exception {
-        return http.antMatcher(CONFIG.getApiMapping() + "/**")
-            .csrf().disable()
-            .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-            .and()
+        return http.securityMatcher(CONFIG.getApiMapping() + "/**")
+            .csrf(k -> k.disable())
+            .sessionManagement(k -> k.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .addFilter(new ApiKeyFilter())
-            .authorizeRequests()
-            .anyRequest()
-            .authenticated()
-            .and()
-            .exceptionHandling().authenticationEntryPoint(new ApiKeyAuthenticationEntryPoint(objectMapper))
-            .and()
+            .authorizeHttpRequests(k -> k.anyRequest().authenticated())
+            .exceptionHandling(k -> k.authenticationEntryPoint(new ApiKeyAuthenticationEntryPoint(objectMapper)))
             .build();
     }
 

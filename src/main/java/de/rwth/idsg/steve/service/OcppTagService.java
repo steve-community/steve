@@ -32,6 +32,7 @@ import jooq.steve.db.tables.records.OcppTagActivityRecord;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import ocpp.cp._2015._10.AuthorizationData;
+import ocpp.cs._2015._10.AuthorizationStatus;
 import ocpp.cs._2015._10.IdTagInfo;
 import org.jetbrains.annotations.Nullable;
 import org.joda.time.DateTime;
@@ -99,32 +100,23 @@ public class OcppTagService {
 
     @Nullable
     public IdTagInfo getIdTagInfo(@Nullable String idTag, boolean isStartTransactionReqContext,
-        @Nullable String chargeBoxId, @Nullable Integer connectorId) {
+                                  @Nullable String chargeBoxId, @Nullable Integer connectorId) {
         if (Strings.isNullOrEmpty(idTag)) {
             return null;
         }
 
-        IdTagInfo idTagInfo = authTagService.decideStatus(idTag,
-            isStartTransactionReqContext, chargeBoxId, connectorId);
-        switch (idTagInfo.getStatus()) {
-            case INVALID:
-                invalidOcppTagService.processNewUnidentified(idTag);
-                return idTagInfo;
+        IdTagInfo idTagInfo = authTagService.decideStatus(idTag, isStartTransactionReqContext, chargeBoxId, connectorId);
 
-            case BLOCKED:
-            case EXPIRED:
-            case CONCURRENT_TX:
-            case ACCEPTED:
-                return idTagInfo;
-
-            default:
-                throw new SteveException("Unexpected AuthorizationStatus");
+        if (idTagInfo.getStatus() == AuthorizationStatus.INVALID) {
+            invalidOcppTagService.processNewUnidentified(idTag);
         }
+
+        return idTagInfo;
     }
 
     @Nullable
     public IdTagInfo getIdTagInfo(@Nullable String idTag, boolean isStartTransactionReqContext,
-        @Nullable String chargeBoxId, @Nullable Integer connectorId,
+                                  @Nullable String chargeBoxId, @Nullable Integer connectorId,
         Supplier<IdTagInfo> supplierWhenException) {
         try {
             return getIdTagInfo(idTag, isStartTransactionReqContext, chargeBoxId, connectorId);

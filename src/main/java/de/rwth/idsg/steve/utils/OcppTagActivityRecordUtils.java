@@ -8,29 +8,29 @@ import org.joda.time.DateTime;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class OcppTagActivityRecordUtils {
 
-  public static boolean isExpired(OcppTagActivityRecord record, DateTime now) {
-    DateTime expiry = record.getExpiryDate();
-    return expiry != null && now.isAfter(expiry);
-  }
-
-  public static boolean isBlocked(OcppTagActivityRecord record) {
-    return record.getMaxActiveTransactionCount() == 0;
-  }
-
-  public static boolean reachedLimitOfActiveTransactions(OcppTagActivityRecord record) {
-    int max = record.getMaxActiveTransactionCount();
-
-    // blocked
-    if (max == 0) {
-      return true;
+    public static boolean isExpired(OcppTagActivityRecord record, DateTime now) {
+        DateTime expiry = record.getExpiryDate();
+        return expiry != null && now.isAfter(expiry);
     }
 
-    // allow all
-    if (max < 0) {
-      return false;
+    public static boolean isBlocked(OcppTagActivityRecord record) {
+        return record.getMaxActiveTransactionCount() == 0;
     }
 
-    // allow as specified
-    return record.getActiveTransactionCount() >= max;
-  }
+    public static boolean reachedLimitOfActiveTransactions(OcppTagActivityRecord record) {
+        int max = record.getMaxActiveTransactionCount();
+
+        // blocked
+        if (max == 0) {
+            return true;
+        }
+
+        // allow all
+        if (max < 0) {
+            return false;
+        }
+
+        // allow as specified
+        return record.getActiveTransactionCount() >= max;
+    }
 }

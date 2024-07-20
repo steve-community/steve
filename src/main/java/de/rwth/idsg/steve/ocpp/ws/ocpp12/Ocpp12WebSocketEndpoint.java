@@ -42,7 +42,7 @@ import ocpp.cs._2010._08.StopTransactionRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
+import jakarta.annotation.PostConstruct;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>

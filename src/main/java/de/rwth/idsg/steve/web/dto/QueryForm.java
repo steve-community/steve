@@ -25,7 +25,7 @@ import lombok.Setter;
 import lombok.ToString;
 import org.joda.time.LocalDateTime;
 
-import javax.validation.constraints.AssertTrue;
+import jakarta.validation.constraints.AssertTrue;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>

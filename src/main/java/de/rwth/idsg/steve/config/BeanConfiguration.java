@@ -21,6 +21,7 @@ package de.rwth.idsg.steve.config;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.joda.JodaModule;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.mysql.cj.conf.PropertyKey;
 import com.zaxxer.hikari.HikariConfig;
@@ -248,6 +249,7 @@ public class BeanConfiguration implements WebMvcConfigurer {
             if (converter instanceof MappingJackson2HttpMessageConverter) {
                 MappingJackson2HttpMessageConverter conv = (MappingJackson2HttpMessageConverter) converter;
                 ObjectMapper objectMapper = conv.getObjectMapper();
+                objectMapper.findAndRegisterModules();
                 // if the client sends unknown props, just ignore them instead of failing
                 objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
                 // default is true

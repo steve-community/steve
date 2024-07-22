@@ -39,6 +39,9 @@ import java.util.List;
 @ControllerAdvice(basePackages = "de.rwth.idsg.steve.web.controller")
 @Slf4j
 public class GlobalControllerAdvice {
+    public static final String EXCEPTION_MODEL_KEY = "exception";
+    public static final String EXCEPTION_VIEW_NAME = "00-error";
+
 
     @InitBinder
     public void binder(WebDataBinder binder) {
@@ -58,8 +61,8 @@ public class GlobalControllerAdvice {
         log.error("Request: {} raised following exception.", req.getRequestURL(), exception);
 
         ModelAndView mav = new ModelAndView();
-        mav.addObject("exception", exception);
-        mav.setViewName("00-error");
+        mav.addObject(EXCEPTION_MODEL_KEY, exception);
+        mav.setViewName(EXCEPTION_VIEW_NAME);
         return mav;
     }
 }

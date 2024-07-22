@@ -18,23 +18,19 @@
  */
 package de.rwth.idsg.steve;
 
+import jakarta.servlet.DispatcherType;
 import org.apache.cxf.transport.servlet.CXFServlet;
-import org.apache.tomcat.InstanceManager;
-import org.apache.tomcat.SimpleInstanceManager;
-import org.eclipse.jetty.annotations.ServletContainerInitializersStarter;
-import org.eclipse.jetty.apache.jsp.JettyJasperInitializer;
-import org.eclipse.jetty.plus.annotation.ContainerInitializer;
+import org.eclipse.jetty.ee10.servlet.FilterHolder;
+import org.eclipse.jetty.ee10.servlet.ServletHolder;
+import org.eclipse.jetty.ee10.webapp.WebAppContext;
+import org.eclipse.jetty.ee10.websocket.server.JettyWebSocketServerContainer;
 import org.eclipse.jetty.rewrite.handler.RedirectPatternRule;
 import org.eclipse.jetty.rewrite.handler.RewriteHandler;
 import org.eclipse.jetty.server.Handler;
-import org.eclipse.jetty.server.handler.HandlerCollection;
-import org.eclipse.jetty.server.handler.HandlerList;
+import org.eclipse.jetty.server.handler.ContextHandler;
+import org.eclipse.jetty.server.handler.ContextHandlerCollection;
 import org.eclipse.jetty.server.handler.gzip.GzipHandler;
-import org.eclipse.jetty.servlet.FilterHolder;
-import org.eclipse.jetty.servlet.ServletHolder;
-import org.eclipse.jetty.webapp.WebAppContext;
 import org.eclipse.jetty.websocket.core.WebSocketConstants;
-import org.eclipse.jetty.websocket.server.JettyWebSocketServerContainer;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.security.web.context.AbstractSecurityWebApplicationInitializer;
 import org.springframework.web.context.ContextLoaderListener;
@@ -42,12 +38,9 @@ import org.springframework.web.context.support.AnnotationConfigWebApplicationCon
 import org.springframework.web.filter.DelegatingFilterProxy;
 import org.springframework.web.servlet.DispatcherServlet;
 
-import jakarta.servlet.DispatcherType;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.HashSet;
-import java.util.List;
 
 import static de.rwth.idsg.steve.SteveConfiguration.CONFIG;
 import static de.rwth.idsg.steve.config.WebSocketConfiguration.IDLE_TIMEOUT;
@@ -68,10 +61,10 @@ public class SteveAppContext {
         webAppContext = initWebApp();
     }
 
-    public HandlerCollection getHandlers() {
-        return new HandlerList(
-            getRedirectHandler(),
-            getWebApp()
+    public ContextHandlerCollection getHandlers() {
+        return new ContextHandlerCollection(
+            new ContextHandler(getRedirectHandler()),
+            new ContextHandler(getWebApp())
         );
     }
 
@@ -91,15 +84,13 @@ public class SteveAppContext {
 
         // Wraps the whole web app in a gzip handler to make Jetty return compressed content
         // http://www.eclipse.org/jetty/documentation/current/gzip-filter.html
-        GzipHandler gzipHandler = new GzipHandler();
-        gzipHandler.setHandler(webAppContext);
-        return gzipHandler;
+        return new GzipHandler(webAppContext);
     }
 
     private WebAppContext initWebApp() {
         WebAppContext ctx = new WebAppContext();
         ctx.setContextPath(CONFIG.getContextPath());
-        ctx.setResourceBase(getWebAppURIAsString());
+        ctx.setBaseResourceAsString(getWebAppURIAsString());
 
         // if during startup an exception happens, do not swallow it, throw it
         ctx.setThrowUnavailableOnStartupException(true);
@@ -130,8 +121,9 @@ public class SteveAppContext {
 
     private Handler getRedirectHandler() {
         RewriteHandler rewrite = new RewriteHandler();
-        rewrite.setRewriteRequestURI(true);
-        rewrite.setRewritePathInfo(true);
+        // TODO
+//        rewrite.setRewriteRequestURI(true);
+//        rewrite.setRewritePathInfo(true);
 
         for (String redirect : getRedirectSet()) {
             RedirectPatternRule rule = new RedirectPatternRule();
@@ -167,12 +159,13 @@ public class SteveAppContext {
      */
     private void initJSP(WebAppContext ctx) {
         // Ensure the JSP engine is initialized correctly
-        List<ContainerInitializer> initializers = new ArrayList<>();
-        initializers.add(new ContainerInitializer(new JettyJasperInitializer(), null));
-
-        ctx.setAttribute("org.eclipse.jetty.containerInitializers", initializers);
-        ctx.setAttribute(InstanceManager.class.getName(), new SimpleInstanceManager());
-        ctx.addBean(new ServletContainerInitializersStarter(ctx), true);
+        // TODO
+//        List<ContainerInitializer> initializers = new ArrayList<>();
+//        initializers.add(new ContainerInitializer(new JettyJasperInitializer(), null));
+//
+//        ctx.setAttribute("org.eclipse.jetty.containerInitializers", initializers);
+//        ctx.setAttribute(InstanceManager.class.getName(), new SimpleInstanceManager());
+//        ctx.addBean(new EmbeddedJspStarter(ctx), true);
     }
 
     private static String getWebAppURIAsString() {

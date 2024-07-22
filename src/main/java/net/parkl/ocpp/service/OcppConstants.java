@@ -32,7 +32,7 @@ public class OcppConstants {
 	
 	public static final String MEASURAND_POWER_ACTIVE_IMPORT = "Power.Active.Import";
 	public static final String MEASURAND_ENERGY_ACTIVE_IMPORT = "Energy.Active.Import.Register";
-
+	public static final String MEASURAND_SOC = "SoC";
 	public static final String UNIT_WH = "Wh";
 	public static final String UNIT_W = "W";
 

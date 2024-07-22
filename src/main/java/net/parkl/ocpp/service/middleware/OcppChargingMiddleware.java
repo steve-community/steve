@@ -370,6 +370,13 @@ public class OcppChargingMiddleware extends AbstractOcppMiddleware {
                         activePower.getUnit()));
             }
 
+            ConnectorMeterValueData soc =
+                    connectorMeterValueService.getLastConnectorMeterValueByTransactionAndMeasurand(ocppChargingProcess.getTransactionStart(),
+                            MEASURAND_SOC);
+            if (soc != null && StringUtils.hasLength(soc.getValue())) {
+                ret.getStatus().setSoc(parseFloat(soc.getValue()));
+            }
+
             ret.getChargingData().setTotalPower(OcppConsumptionHelper.getKwhValue(pw.getValue(), pw.getUnit()));
             ret.getChargingData().setStartValue(consumptionHelper.getStartValue(transaction));
             ret.getChargingData().setStopValue(consumptionHelper.getStopValue(transaction));

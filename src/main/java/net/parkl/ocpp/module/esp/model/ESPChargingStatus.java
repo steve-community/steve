@@ -28,5 +28,6 @@ import lombok.Setter;
 public class ESPChargingStatus {
     private float throughputPower;
     private float actualCurrent;
+    private Float soc;
 
 }

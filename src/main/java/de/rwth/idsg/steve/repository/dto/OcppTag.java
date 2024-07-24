@@ -19,7 +19,7 @@
 package de.rwth.idsg.steve.repository.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.ToString;
@@ -49,7 +49,7 @@ public final class OcppTag {
          * Only relevant for the web pages. Disabled for API
          */
         @JsonIgnore
-        @ApiModelProperty(hidden = true)
+        @Schema(hidden = true)
         private final String expiryDateFormatted;
 
         private final DateTime expiryDate;

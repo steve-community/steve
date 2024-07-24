@@ -19,7 +19,7 @@
 package de.rwth.idsg.steve.repository.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jooq.steve.db.enums.TransactionStopEventActor;
 import lombok.Builder;
 import lombok.Getter;
@@ -50,7 +50,7 @@ public final class Transaction {
      * Only relevant for the web pages. Disabled for API
      */
     @JsonIgnore
-    @ApiModelProperty(hidden = true)
+    @Schema(hidden = true)
     private final String startTimestampFormatted;
 
     private final String startValue;
@@ -61,7 +61,7 @@ public final class Transaction {
      * Only relevant for the web pages. Disabled for API
      */
     @JsonIgnore
-    @ApiModelProperty(hidden = true)
+    @Schema(hidden = true)
     @Nullable
     private final String stopTimestampFormatted;
 

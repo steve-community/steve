@@ -89,20 +89,18 @@ public class SecurityConfiguration {
     }
 
     @Bean
-    public WebSecurityCustomizer webSecurityCustomizer() {
-        return (web) -> web.ignoring().requestMatchers(
-            "/static/**",
-            CONFIG.getCxfMapping() + "/**"
-        );
-    }
-
-    @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         final String prefix = CONFIG.getSpringManagerMapping();
 
         return http
             .authorizeHttpRequests(
-                req -> req.requestMatchers(prefix + "/**").hasRole("ADMIN")
+                req -> req
+                    .requestMatchers(
+                        "/static/**",
+                        CONFIG.getCxfMapping() + "/**",
+                        "/WEB-INF/views/**" // https://github.com/spring-projects/spring-security/issues/13285#issuecomment-1579097065
+                    ).permitAll()
+                    .requestMatchers(prefix + "/**").hasRole("ADMIN")
             )
             .sessionManagement(
                 req -> req.invalidSessionUrl(prefix + "/signin")

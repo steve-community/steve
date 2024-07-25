@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @Slf4j
-public class OcppNotificationMiddleware extends AbstractOcppMiddleware {
+public class OcppNotificationMiddleware  {
 
     @Autowired
     private EmobilityServiceProvider emobilityServiceProvider;

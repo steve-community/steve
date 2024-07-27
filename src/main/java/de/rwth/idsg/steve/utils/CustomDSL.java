@@ -23,9 +23,11 @@ import lombok.NoArgsConstructor;
 import org.joda.time.DateTime;
 import org.jooq.Condition;
 import org.jooq.DSLContext;
+import org.jooq.DataType;
 import org.jooq.DatePart;
 import org.jooq.Field;
 import org.jooq.impl.DSL;
+import org.jooq.impl.SQLDataType;
 
 import java.sql.Timestamp;
 
@@ -38,12 +40,15 @@ import static org.jooq.impl.DSL.field;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class CustomDSL {
 
+    // https://github.com/steve-community/steve/issues/1520
+    private static final DataType<DateTime> DATE_TIME_TYPE = SQLDataType.TIMESTAMP.asConvertedDataType(new DateTimeConverter());
+
     public static Field<DateTime> date(DateTime dt) {
-        return date(DSL.val(dt, DateTime.class));
+        return date(DSL.val(dt, DATE_TIME_TYPE));
     }
 
     public static Field<DateTime> date(Field<DateTime> dt) {
-        return field("date({0})", DateTime.class, dt);
+        return field("date({0})", DATE_TIME_TYPE, dt);
     }
 
     /**

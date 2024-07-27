@@ -29,6 +29,7 @@ public class AbstractControllerTest {
 
     AbstractControllerTest() {
         ObjectMapper objectMapper = Jackson2ObjectMapperBuilder.json().build();
+        objectMapper.findAndRegisterModules();
         // if the client sends unknown props, just ignore them instead of failing
         objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         // default is true

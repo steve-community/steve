@@ -19,7 +19,6 @@
 package de.rwth.idsg.steve.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.joda.JodaModule;
 import com.google.common.base.Strings;
 import de.rwth.idsg.steve.SteveProdCondition;
 import de.rwth.idsg.steve.web.api.ApiControllerAdvice;
@@ -49,9 +48,9 @@ import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.preauth.AbstractPreAuthenticatedProcessingFilter;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 import static de.rwth.idsg.steve.SteveConfiguration.CONFIG;
@@ -90,20 +89,18 @@ public class SecurityConfiguration {
     }
 
     @Bean
-    public WebSecurityCustomizer webSecurityCustomizer() {
-        return (web) -> web.ignoring().antMatchers(
-            "/static/**",
-            CONFIG.getCxfMapping() + "/**"
-        );
-    }
-
-    @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         final String prefix = CONFIG.getSpringManagerMapping();
 
         return http
             .authorizeHttpRequests(
-                req -> req.antMatchers(prefix + "/**").hasRole("ADMIN")
+                req -> req
+                    .requestMatchers(
+                        "/static/**",
+                        CONFIG.getCxfMapping() + "/**",
+                        "/WEB-INF/views/**" // https://github.com/spring-projects/spring-security/issues/13285#issuecomment-1579097065
+                    ).permitAll()
+                    .requestMatchers(prefix + "/**").hasRole("ADMIN")
             )
             .sessionManagement(
                 req -> req.invalidSessionUrl(prefix + "/signin")
@@ -120,17 +117,12 @@ public class SecurityConfiguration {
     @Bean
     @Order(1)
     public SecurityFilterChain apiKeyFilterChain(HttpSecurity http, ObjectMapper objectMapper) throws Exception {
-        return http.antMatcher(CONFIG.getApiMapping() + "/**")
-            .csrf().disable()
-            .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-            .and()
+        return http.securityMatcher(CONFIG.getApiMapping() + "/**")
+            .csrf(k -> k.disable())
+            .sessionManagement(k -> k.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .addFilter(new ApiKeyFilter())
-            .authorizeRequests()
-            .anyRequest()
-            .authenticated()
-            .and()
-            .exceptionHandling().authenticationEntryPoint(new ApiKeyAuthenticationEntryPoint(objectMapper))
-            .and()
+            .authorizeHttpRequests(k -> k.anyRequest().authenticated())
+            .exceptionHandling(k -> k.authenticationEntryPoint(new ApiKeyAuthenticationEntryPoint(objectMapper)))
             .build();
     }
 

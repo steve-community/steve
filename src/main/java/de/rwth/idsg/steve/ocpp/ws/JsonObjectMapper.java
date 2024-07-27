@@ -22,7 +22,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.AnnotationIntrospector;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.introspect.JacksonAnnotationIntrospector;
-import com.fasterxml.jackson.module.jaxb.JaxbAnnotationIntrospector;
+import com.fasterxml.jackson.module.jakarta.xmlbind.JakartaXmlBindAnnotationIntrospector;
 import de.rwth.idsg.steve.ocpp.ws.custom.CustomStringModule;
 import de.rwth.idsg.steve.ocpp.ws.ocpp12.Ocpp12JacksonModule;
 import de.rwth.idsg.steve.ocpp.ws.ocpp15.Ocpp15JacksonModule;
@@ -68,7 +68,7 @@ public enum JsonObjectMapper {
         mapper.setAnnotationIntrospector(
                 AnnotationIntrospector.pair(
                         new JacksonAnnotationIntrospector(),
-                        new JaxbAnnotationIntrospector(mapper.getTypeFactory())
+                        new JakartaXmlBindAnnotationIntrospector(mapper.getTypeFactory())
                 )
         );
     }

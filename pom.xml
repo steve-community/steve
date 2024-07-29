@@ -89,6 +89,13 @@
                 <skipTests>false</skipTests>
             </properties>
         </profile>
+        <profile>
+            <id>no-flyway</id>
+            <properties>
+                <skipFlyway>true</skipFlyway>
+            </properties>
+        </profile>
+
     </profiles>
 
     <build>
@@ -331,6 +338,9 @@
                         <goals>
                             <goal>migrate</goal>
                         </goals>
+                        <configuration>
+                            <skip>${skipFlyway}</skip>
+                        </configuration>
                     </execution>
                 </executions>
 

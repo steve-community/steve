@@ -28,7 +28,7 @@ import java.util.regex.Pattern;
  */
 public class ChargeBoxIdValidator implements ConstraintValidator<ChargeBoxId, String> {
 
-    private static final String REGEX = "\\S+";
+    private static final String REGEX = "^[a-zA-Z0-9.:_#-]+$";
     private static final Pattern PATTERN = Pattern.compile(REGEX);
 
     @Override

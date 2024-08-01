@@ -20,6 +20,7 @@ package de.rwth.idsg.steve.ocpp.ws;
 
 import de.rwth.idsg.steve.config.WebSocketConfiguration;
 import de.rwth.idsg.steve.service.ChargePointHelperService;
+import de.rwth.idsg.steve.web.validation.ChargeBoxIdValidator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import ocpp.cs._2015._10.RegistrationStatus;
@@ -48,6 +49,8 @@ import static de.rwth.idsg.steve.utils.StringUtils.getLastBitFromUrl;
 @RequiredArgsConstructor
 public class OcppWebSocketHandshakeHandler implements HandshakeHandler {
 
+    private static final ChargeBoxIdValidator CHARGE_BOX_ID_VALIDATOR = new ChargeBoxIdValidator();
+
     private final DefaultHandshakeHandler delegate;
     private final List<AbstractWebSocketEndpoint> endpoints;
     private final ChargePointHelperService chargePointHelperService;
@@ -70,6 +73,12 @@ public class OcppWebSocketHandshakeHandler implements HandshakeHandler {
         // -------------------------------------------------------------------------
 
         String chargeBoxId = getLastBitFromUrl(request.getURI().getPath());
+        boolean isValid = CHARGE_BOX_ID_VALIDATOR.isValid(chargeBoxId, null);
+        if (!isValid) {
+            response.setStatusCode(HttpStatus.BAD_REQUEST);
+            return false;
+        }
+
         Optional<RegistrationStatus> status = chargePointHelperService.getRegistrationStatus(chargeBoxId);
 
         // Allow connections, if station is in db (registration_status field from db does not matter)

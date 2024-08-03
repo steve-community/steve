@@ -18,8 +18,10 @@
  */
 package de.rwth.idsg.steve.web.validation;
 
+import com.google.common.base.Strings;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
+
 import java.util.regex.Pattern;
 
 /**
@@ -28,7 +30,7 @@ import java.util.regex.Pattern;
  */
 public class ChargeBoxIdValidator implements ConstraintValidator<ChargeBoxId, String> {
 
-    private static final String REGEX = "^[a-zA-Z0-9.:_#-]+$";
+    private static final String REGEX = "[^=/()<>]*";
     private static final Pattern PATTERN = Pattern.compile(REGEX);
 
     @Override
@@ -39,5 +41,18 @@ public class ChargeBoxIdValidator implements ConstraintValidator<ChargeBoxId, St
     @Override
     public boolean isValid(String string, ConstraintValidatorContext constraintValidatorContext) {
         return string == null || PATTERN.matcher(string).matches();
+    }
+
+    public boolean isValid(String str) {
+        if (Strings.isNullOrEmpty(str)) {
+            return false;
+        }
+
+        String str1 = str.strip();
+        if (!str1.equals(str)) {
+            return false;
+        }
+
+        return PATTERN.matcher(str).matches();
     }
 }

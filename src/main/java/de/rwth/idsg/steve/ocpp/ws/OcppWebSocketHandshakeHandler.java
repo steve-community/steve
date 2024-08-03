@@ -73,7 +73,7 @@ public class OcppWebSocketHandshakeHandler implements HandshakeHandler {
         // -------------------------------------------------------------------------
 
         String chargeBoxId = getLastBitFromUrl(request.getURI().getPath());
-        boolean isValid = CHARGE_BOX_ID_VALIDATOR.isValid(chargeBoxId, null);
+        boolean isValid = CHARGE_BOX_ID_VALIDATOR.isValid(chargeBoxId);
         if (!isValid) {
             response.setStatusCode(HttpStatus.BAD_REQUEST);
             return false;

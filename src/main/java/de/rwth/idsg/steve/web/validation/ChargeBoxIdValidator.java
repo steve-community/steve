@@ -41,7 +41,10 @@ public class ChargeBoxIdValidator implements ConstraintValidator<ChargeBoxId, St
 
     @Override
     public boolean isValid(String string, ConstraintValidatorContext constraintValidatorContext) {
-        return string == null || PATTERN.matcher(string).matches();
+        if (string == null) {
+            return true; // null is valid, because it is another constraint's responsibility
+        }
+        return isValid(string);
     }
 
     public boolean isValid(String str) {

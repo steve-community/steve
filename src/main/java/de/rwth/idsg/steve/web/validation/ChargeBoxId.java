@@ -36,7 +36,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Constraint(validatedBy = {ChargeBoxIdValidator.class, ChargeBoxIdListValidator.class})
 public @interface ChargeBoxId {
 
-    String message() default "ChargeBox ID cannot contain any whitespace";
+    String message() default "ChargeBox ID violates the configured pattern";
 
     // Required by validation runtime
     Class<?>[] groups() default {};

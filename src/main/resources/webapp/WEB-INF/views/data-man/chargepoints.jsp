@@ -48,7 +48,7 @@
             <tbody>
             <c:forEach items="${unknownList}" var="item">
                 <tr>
-                    <td>${item.key}</td>
+                    <td><encode:forHtml value="${item.key}" /></td>
                     <td>${item.numberOfAttempts}</td>
                     <td data-sort-value="${item.lastAttemptTimestamp.millis}">${item.lastAttemptTimestamp}</td>
                     <td>

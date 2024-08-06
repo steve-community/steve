@@ -96,6 +96,7 @@ public enum SteveConfiguration {
 
         ocpp = Ocpp.builder()
                    .autoRegisterUnknownStations(p.getOptionalBoolean("auto.register.unknown.stations"))
+                   .chargeBoxIdValidationRegex(p.getOptionalString("charge-box-id.validation.regex"))
                    .wsSessionSelectStrategy(
                            WsSessionSelectStrategyEnum.fromName(p.getString("ws.session.select.strategy")))
                    .build();
@@ -186,6 +187,7 @@ public enum SteveConfiguration {
     @Builder @Getter
     public static class Ocpp {
         private final boolean autoRegisterUnknownStations;
+        private final String chargeBoxIdValidationRegex;
         private final WsSessionSelectStrategy wsSessionSelectStrategy;
     }
 

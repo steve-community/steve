@@ -39,8 +39,8 @@
 			<tbody>
 			<c:forEach items="${response.configurationKeys}" var="element">
 				<tr>
-					<td>${element.key}</td>
-					<td>${element.value}</td>
+					<td><encode:forHtml value="${element.key}" /></td>
+					<td><encode:forHtml value="${element.value}" /></td>
 					<td>${element.readonly}</td>
 				</tr>
 			</c:forEach>

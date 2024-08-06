@@ -119,7 +119,7 @@ Transactions
                 <td>${ta.startValue}</td>
                 <td data-sort-value="${ta.stopTimestamp.millis}">${ta.stopTimestampFormatted}</td>
                 <td>${ta.stopValue}</td>
-                <td>${ta.stopReason}</td>
+                <td><encode:forHtml value="${ta.stopReason}" /></td>
                 <td>
                     <c:if test="${empty ta.stopValue}">
                         <form:form action="${ctxPath}/manager/transactions/stop/${ta.id}">

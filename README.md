@@ -52,11 +52,6 @@ SteVe is designed to run standalone, a java servlet container / web server (e.g.
     CREATE DATABASE stevedb CHARACTER SET utf8 COLLATE utf8_unicode_ci;
     CREATE USER 'steve'@'localhost' IDENTIFIED BY 'changeme';
     GRANT ALL PRIVILEGES ON stevedb.* TO 'steve'@'localhost';
-    GRANT SUPER ON *.* TO 'steve'@'localhost';
-    ```
-    Note: The statement `GRANT SUPER [...]` is only necessary to execute some of the previous migration files and is only needed for the initial database setup. Afterwards, you can remove this privilege by executing 
-    ```
-    REVOKE SUPER ON *.* FROM 'steve'@'localhost';
     ```
         
 2. Download and extract tarball:

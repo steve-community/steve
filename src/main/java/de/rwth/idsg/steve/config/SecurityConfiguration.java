@@ -44,9 +44,9 @@ import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.preauth.AbstractPreAuthenticatedProcessingFilter;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -87,43 +87,29 @@ public class SecurityConfiguration {
     }
 
     @Bean
-    public WebSecurityCustomizer webSecurityCustomizer() {
-        return (web) -> web.ignoring().antMatchers(
-            "/static/**",
-            CONFIG.getCxfMapping() + "/**"
-        );
+    public UserDetailsService userDetailsService() {
+        UserDetails webPageUser = User.builder()
+                .username(CONFIG.getAuth().getUserName())
+                .password(CONFIG.getAuth().getEncodedPassword())
+                .roles("ADMIN")
+                .build();
+
+        return new InMemoryUserDetailsManager(webPageUser);
     }
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         final String prefix = CONFIG.getSpringManagerMapping();
         return http
-            .authorizeRequests(
-                 req -> req
-                    .antMatchers(prefix + "/home").hasAnyRole("USER", "ADMIN")
-                     // webuser
-                    .antMatchers(prefix + "/webusers").hasAnyRole("USER", "ADMIN")
-                    .antMatchers(prefix + "/webusers" + "/details/**").hasAnyRole("USER", "ADMIN")
-                    // users
-                    .antMatchers(prefix + "/users").hasAnyRole("USER", "ADMIN")
-                    .antMatchers(prefix + "/users" + "/details/**").hasAnyRole("USER", "ADMIN")
-                     //ocppTags
-                    .antMatchers(prefix + "/ocppTags").hasAnyRole("USER", "ADMIN")
-                    .antMatchers(prefix + "/ocppTags" + "/details/**").hasAnyRole("USER", "ADMIN")
-                     // chargepoints
-                    .antMatchers(prefix + "/chargepoints").hasAnyRole("USER", "ADMIN")
-                    .antMatchers(prefix + "/chargepoints" + "/details/**").hasAnyRole("USER", "ADMIN")
-                     // transactions and reservations
-                    .antMatchers(prefix + "/transactions").hasAnyRole("USER", "ADMIN")
-                    .antMatchers(prefix + "/transactions" + "/details/**").hasAnyRole("USER", "ADMIN")
-                    .antMatchers(prefix + "/reservations").hasAnyRole("USER", "ADMIN")
-                    .antMatchers(prefix + "/reservations" + "/**").hasRole("ADMIN")
-                     // singout and noAccess
-                    .antMatchers(prefix + "/signout/" + "**").hasAnyRole("USER", "ADMIN")
-                    .antMatchers(prefix + "/noAccess/" + "**").hasAnyRole("USER", "ADMIN")
-                     // any other site
-                    .antMatchers(prefix + "/**").hasRole("ADMIN")
-                )
+            .authorizeHttpRequests(
+                req -> req
+                    .requestMatchers(
+                        "/static/**",
+                        CONFIG.getCxfMapping() + "/**",
+                        "/WEB-INF/views/**" // https://github.com/spring-projects/spring-security/issues/13285#issuecomment-1579097065
+                    ).permitAll()
+                    .requestMatchers(prefix + "/**").hasRole("ADMIN")
+            )
             .sessionManagement(
                  req -> req
                     .invalidSessionUrl(prefix + "/signin")
@@ -201,17 +187,12 @@ public class SecurityConfiguration {
     @Bean
     @Order(1)
     public SecurityFilterChain apiKeyFilterChain(HttpSecurity http, ObjectMapper objectMapper) throws Exception {
-        return http.antMatcher(CONFIG.getApiMapping() + "/**")
-            .csrf().disable()
-            .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-            .and()
+        return http.securityMatcher(CONFIG.getApiMapping() + "/**")
+            .csrf(k -> k.disable())
+            .sessionManagement(k -> k.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .addFilter(new ApiKeyFilter())
-            .authorizeRequests()
-            .anyRequest()
-            .authenticated()
-            .and()
-            .exceptionHandling().authenticationEntryPoint(new ApiKeyAuthenticationEntryPoint(objectMapper))
-            .and()
+            .authorizeHttpRequests(k -> k.anyRequest().authenticated())
+            .exceptionHandling(k -> k.authenticationEntryPoint(new ApiKeyAuthenticationEntryPoint(objectMapper)))
             .build();
     }
 

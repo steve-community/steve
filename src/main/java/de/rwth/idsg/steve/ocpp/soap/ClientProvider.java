@@ -28,10 +28,10 @@ import org.apache.cxf.ws.addressing.WSAddressingFeature;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
+import jakarta.annotation.PostConstruct;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocketFactory;
-import javax.xml.ws.soap.SOAPBinding;
+import jakarta.xml.ws.soap.SOAPBinding;
 
 import static de.rwth.idsg.steve.SteveConfiguration.CONFIG;
 

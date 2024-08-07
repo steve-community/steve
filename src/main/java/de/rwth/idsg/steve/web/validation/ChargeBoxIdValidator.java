@@ -18,8 +18,11 @@
  */
 package de.rwth.idsg.steve.web.validation;
 
-import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintValidatorContext;
+import com.google.common.base.Strings;
+import de.rwth.idsg.steve.SteveConfiguration;
+import jakarta.validation.ConstraintValidator;
+import jakarta.validation.ConstraintValidatorContext;
+
 import java.util.regex.Pattern;
 
 /**
@@ -28,8 +31,8 @@ import java.util.regex.Pattern;
  */
 public class ChargeBoxIdValidator implements ConstraintValidator<ChargeBoxId, String> {
 
-    private static final String REGEX = "\\S+";
-    private static final Pattern PATTERN = Pattern.compile(REGEX);
+    private static final String REGEX = "[^=/()<>]*";
+    private static final Pattern PATTERN = Pattern.compile(getRegexToUse());
 
     @Override
     public void initialize(ChargeBoxId idTag) {
@@ -38,6 +41,27 @@ public class ChargeBoxIdValidator implements ConstraintValidator<ChargeBoxId, St
 
     @Override
     public boolean isValid(String string, ConstraintValidatorContext constraintValidatorContext) {
-        return string == null || PATTERN.matcher(string).matches();
+        if (string == null) {
+            return true; // null is valid, because it is another constraint's responsibility
+        }
+        return isValid(string);
+    }
+
+    public boolean isValid(String str) {
+        if (Strings.isNullOrEmpty(str)) {
+            return false;
+        }
+
+        String str1 = str.strip();
+        if (!str1.equals(str)) {
+            return false;
+        }
+
+        return PATTERN.matcher(str).matches();
+    }
+
+    private static String getRegexToUse() {
+        String regexFromConfig = SteveConfiguration.CONFIG.getOcpp().getChargeBoxIdValidationRegex();
+        return Strings.isNullOrEmpty(regexFromConfig) ? REGEX : regexFromConfig;
     }
 }

@@ -25,7 +25,7 @@ import de.rwth.idsg.steve.ocpp.ws.data.OcppJsonError;
 import de.rwth.idsg.steve.repository.ReservationRepository;
 import de.rwth.idsg.steve.service.dto.EnhancedReserveNowParams;
 
-import javax.xml.ws.AsyncHandler;
+import jakarta.xml.ws.AsyncHandler;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>

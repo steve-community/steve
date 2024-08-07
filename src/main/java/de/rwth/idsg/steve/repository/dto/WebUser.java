@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2023 SteVe Community Team
+ * Copyright (C) 2013-2024 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -25,7 +25,7 @@ import lombok.Builder;
 import lombok.Getter;
 
  /**
- * @author Frank Brosi
+ * @author fnkbsi
  * @since 01.04.2022
  */
 public class WebUser {

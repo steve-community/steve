@@ -35,7 +35,6 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
@@ -53,10 +52,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.provisioning.JdbcUserDetailsManager;
 import org.springframework.security.provisioning.UserDetailsManager;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
- * @author Frank Brosi
  * @since 07.01.2015
  */
 @Slf4j
@@ -68,7 +67,7 @@ public class SecurityConfiguration {
     @Autowired
     private HikariDataSource dataSource;
 
-    
+
     /**
      * Password encoding changed with spring-security 5.0.0. We either have to use a prefix before the password to
      * indicate which actual encoder {@link DelegatingPasswordEncoder} should use [1, 2] or specify the encoder as we do.
@@ -87,28 +86,40 @@ public class SecurityConfiguration {
     }
 
     @Bean
-    public UserDetailsService userDetailsService() {
-        UserDetails webPageUser = User.builder()
-                .username(CONFIG.getAuth().getUserName())
-                .password(CONFIG.getAuth().getEncodedPassword())
-                .roles("ADMIN")
-                .build();
-
-        return new InMemoryUserDetailsManager(webPageUser);
-    }
-
-    @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         final String prefix = CONFIG.getSpringManagerMapping();
         return http
             .authorizeHttpRequests(
                 req -> req
-                    .requestMatchers(
-                        "/static/**",
-                        CONFIG.getCxfMapping() + "/**",
-                        "/WEB-INF/views/**" // https://github.com/spring-projects/spring-security/issues/13285#issuecomment-1579097065
-                    ).permitAll()
+                    // https://github.com/spring-projects/spring-security/issues/13285#issuecomment-1579097065
+                    .requestMatchers(new AntPathRequestMatcher("/static/**")).permitAll()
+                    .requestMatchers(new AntPathRequestMatcher(CONFIG.getCxfMapping() + "/**")).permitAll()
+                    .requestMatchers(new AntPathRequestMatcher("/WEB-INF/views/**")).permitAll()
+
                     .requestMatchers(prefix + "/**").hasRole("ADMIN")
+                    .requestMatchers(new AntPathRequestMatcher(prefix + "/home")).hasAnyRole("USER", "ADMIN")
+                     // webuser
+                    .requestMatchers(new AntPathRequestMatcher(prefix + "/webusers")).hasAnyRole("USER", "ADMIN")
+                    .requestMatchers(new AntPathRequestMatcher(prefix + "/webusers" + "/details/**")).hasAnyRole("USER", "ADMIN")
+                    // users
+                    .requestMatchers(new AntPathRequestMatcher(prefix + "/users")).hasAnyRole("USER", "ADMIN")
+                    .requestMatchers(new AntPathRequestMatcher(prefix + "/users" + "/details/**")).hasAnyRole("USER", "ADMIN")
+                     //ocppTags
+                    .requestMatchers(new AntPathRequestMatcher(prefix + "/ocppTags")).hasAnyRole("USER", "ADMIN")
+                    .requestMatchers(new AntPathRequestMatcher(prefix + "/ocppTags" + "/details/**")).hasAnyRole("USER", "ADMIN")
+                     // chargepoints
+                    .requestMatchers(new AntPathRequestMatcher(prefix + "/chargepoints")).hasAnyRole("USER", "ADMIN")
+                    .requestMatchers(new AntPathRequestMatcher(prefix + "/chargepoints" + "/details/**")).hasAnyRole("USER", "ADMIN")
+                     // transactions and reservations
+                    .requestMatchers(new AntPathRequestMatcher(prefix + "/transactions")).hasAnyRole("USER", "ADMIN")
+                    .requestMatchers(new AntPathRequestMatcher(prefix + "/transactions" + "/details/**")).hasAnyRole("USER", "ADMIN")
+                    .requestMatchers(new AntPathRequestMatcher(prefix + "/reservations")).hasAnyRole("USER", "ADMIN")
+                    .requestMatchers(new AntPathRequestMatcher(prefix + "/reservations" + "/**")).hasRole("ADMIN")
+                     // singout and noAccess
+                    .requestMatchers(new AntPathRequestMatcher(prefix + "/signout/" + "**")).hasAnyRole("USER", "ADMIN")
+                    .requestMatchers(new AntPathRequestMatcher(prefix + "/noAccess/" + "**")).hasAnyRole("USER", "ADMIN")
+                     // any other site
+                    .requestMatchers(new AntPathRequestMatcher(prefix + "/**")).hasRole("ADMIN")
             )
             .sessionManagement(
                  req -> req

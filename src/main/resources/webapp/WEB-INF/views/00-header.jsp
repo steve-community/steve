@@ -27,8 +27,10 @@
 <%@ include file="00-context.jsp" %>
 
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width">
     <link rel="icon" href="${ctxPath}/static/images/favicon.ico" type="image/x-icon" />
     <link rel="shortcut icon" href="${ctxPath}/static/images/favicon.ico" type="image/x-icon" />
     <link rel="stylesheet" type="text/css" href="${ctxPath}/static/css/style.css">
@@ -45,7 +47,7 @@
 <div class="main">
     <div class="top-banner">
         <div class="container">
-            <a href="${ctxPath}/manager/home"><img src="${ctxPath}/static/images/logo2.png" height="80"></a>
+            <a href="${ctxPath}/manager/home"><img src="${ctxPath}/static/images/logo2.png" alt="Steve-Logo" height="80"></a>
         </div>
     </div>
     <div class="top-menu">
@@ -57,6 +59,7 @@
                             <li><a href="${ctxPath}/manager/chargepoints">CHARGE POINTS</a></li>
                             <li><a href="${ctxPath}/manager/ocppTags">OCPP TAGS</a></li>
                             <li><a href="${ctxPath}/manager/users">USERS</a></li>
+                            <li><a href="${ctxPath}/manager/webusers">WEBUSERS</a></li>
                             <li><a href="${ctxPath}/manager/chargingProfiles">CHARGING PROFILES</a></li>
                             <li><a href="${ctxPath}/manager/reservations">RESERVATIONS</a></li>
                             <li><a href="${ctxPath}/manager/transactions">TRANSACTIONS</a></li>

@@ -23,6 +23,7 @@ import com.google.common.base.Strings;
 import de.rwth.idsg.steve.SteveProdCondition;
 import de.rwth.idsg.steve.web.api.ApiControllerAdvice;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Configuration;
@@ -116,7 +117,7 @@ public class SecurityConfiguration {
 
     @Bean
     @Order(1)
-    public SecurityFilterChain apiKeyFilterChain(HttpSecurity http, ObjectMapper objectMapper) throws Exception {
+    public SecurityFilterChain apiKeyFilterChain(HttpSecurity http, @Qualifier("steveObjectMapper") ObjectMapper objectMapper) throws Exception {
         return http.securityMatcher(CONFIG.getApiMapping() + "/**")
             .csrf(k -> k.disable())
             .sessionManagement(k -> k.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

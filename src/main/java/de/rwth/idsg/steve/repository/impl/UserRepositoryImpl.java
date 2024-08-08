@@ -22,6 +22,7 @@ import de.rwth.idsg.steve.SteveException;
 import de.rwth.idsg.steve.repository.AddressRepository;
 import de.rwth.idsg.steve.repository.UserRepository;
 import de.rwth.idsg.steve.repository.dto.User;
+import de.rwth.idsg.steve.repository.dto.UserNotificationFeature;
 import de.rwth.idsg.steve.web.dto.UserForm;
 import de.rwth.idsg.steve.web.dto.UserQueryForm;
 import jooq.steve.db.tables.records.AddressRecord;
@@ -31,7 +32,7 @@ import org.jooq.DSLContext;
 import org.jooq.Field;
 import org.jooq.JoinType;
 import org.jooq.Record1;
-import org.jooq.Record7;
+import org.jooq.Record8;
 import org.jooq.Result;
 import org.jooq.SelectConditionStep;
 import org.jooq.SelectQuery;
@@ -68,6 +69,7 @@ public class UserRepositoryImpl implements UserRepository {
                                        .name(r.value4() + " " + r.value5())
                                        .phone(r.value6())
                                        .email(r.value7())
+                                       .enabledFeatures(UserNotificationFeature.splitFeatures(r.value8()))
                                        .build()
                 );
     }
@@ -199,7 +201,9 @@ public class UserRepositoryImpl implements UserRepository {
     // -------------------------------------------------------------------------
 
     @SuppressWarnings("unchecked")
-    private Result<Record7<Integer, Integer, String, String, String, String, String>> getOverviewInternal(UserQueryForm form) {
+    private Result<Record8<Integer, Integer, String, String, String, String, String, String>>
+                getOverviewInternal(UserQueryForm form) {
+
         SelectQuery selectQuery = ctx.selectQuery();
         selectQuery.addFrom(USER);
         selectQuery.addJoin(OCPP_TAG, JoinType.LEFT_OUTER_JOIN, USER.OCPP_TAG_PK.eq(OCPP_TAG.OCPP_TAG_PK));
@@ -210,7 +214,8 @@ public class UserRepositoryImpl implements UserRepository {
                 USER.FIRST_NAME,
                 USER.LAST_NAME,
                 USER.PHONE,
-                USER.E_MAIL
+                USER.E_MAIL,
+                USER.USER_NOTIFICATION_FEATURES
         );
 
         if (form.isSetUserPk()) {
@@ -261,6 +266,8 @@ public class UserRepositoryImpl implements UserRepository {
                        .set(USER.NOTE, form.getNote())
                        .set(USER.ADDRESS_PK, addressPk)
                        .set(USER.OCPP_TAG_PK, selectOcppTagPk(form.getOcppIdTag()))
+                       .set(USER.USER_NOTIFICATION_FEATURES,
+                               UserNotificationFeature.joinFeatures(form.getEnabledFeatures()))
                        .execute();
 
         if (count != 1) {
@@ -279,6 +286,7 @@ public class UserRepositoryImpl implements UserRepository {
            .set(USER.NOTE, form.getNote())
            .set(USER.ADDRESS_PK, addressPk)
            .set(USER.OCPP_TAG_PK, selectOcppTagPk(form.getOcppIdTag()))
+           .set(USER.USER_NOTIFICATION_FEATURES, UserNotificationFeature.joinFeatures(form.getEnabledFeatures()))
            .where(USER.USER_PK.eq(form.getUserPk()))
            .execute();
     }

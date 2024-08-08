@@ -33,5 +33,11 @@
 	</tr>
 	<tr><td>Phone:</td><td><form:input path="phone"/></td></tr>
 	<tr><td>E-mail:</td><td><form:input path="eMail"/></td></tr>
+        <tr>
+            <td>Notify when... </td>
+            <td><form:checkboxes items="${features}" path="enabledFeatures"
+                                 itemLabel="text" delimiter="<br/>"/>
+            </td>
+        </tr> 
 	<tr><td>Additional Note:</td><td><form:textarea path="note"/></td></tr>
 </table>

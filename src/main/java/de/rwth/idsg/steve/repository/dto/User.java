@@ -17,7 +17,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 package de.rwth.idsg.steve.repository.dto;
-
+import java.util.List;
 import jooq.steve.db.tables.records.AddressRecord;
 import jooq.steve.db.tables.records.UserRecord;
 import lombok.Builder;
@@ -36,6 +36,7 @@ public class User {
     public static final class Overview {
         private final Integer userPk, ocppTagPk;
         private final String ocppIdTag, name, phone, email;
+        private final List<UserNotificationFeature> enabledFeatures;
     }
 
     @Getter
@@ -43,6 +44,6 @@ public class User {
     public static final class Details {
         private final UserRecord userRecord;
         private final AddressRecord address;
-        private Optional<String> ocppIdTag;
+        private final Optional<String> ocppIdTag;
     }
 }

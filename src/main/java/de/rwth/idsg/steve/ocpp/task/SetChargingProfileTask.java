@@ -33,7 +33,7 @@ import ocpp.cp._2015._10.ChargingSchedulePeriod;
 import ocpp.cp._2015._10.RecurrencyKindType;
 import ocpp.cp._2015._10.SetChargingProfileRequest;
 
-import javax.xml.ws.AsyncHandler;
+import jakarta.xml.ws.AsyncHandler;
 import java.util.List;
 import java.util.stream.Collectors;
 

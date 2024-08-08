@@ -48,7 +48,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.StatusCode;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketClose;
-import org.eclipse.jetty.websocket.api.annotations.OnWebSocketConnect;
+import org.eclipse.jetty.websocket.api.annotations.OnWebSocketOpen;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketError;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
 import org.eclipse.jetty.websocket.api.annotations.WebSocket;
@@ -66,6 +66,8 @@ import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Future;
 import java.util.function.Consumer;
+
+import static org.eclipse.jetty.websocket.api.Callback.NOOP;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -106,7 +108,7 @@ public class OcppJsonChargePoint {
         this.testerThread = Thread.currentThread();
     }
 
-    @OnWebSocketConnect
+    @OnWebSocketOpen
     public void onConnect(Session session) {
         this.session = session;
     }
@@ -212,8 +214,8 @@ public class OcppJsonChargePoint {
         // send all messages
         for (ResponseContext ctx : values) {
             try {
-                session.getRemote().sendString(ctx.outgoingMessage);
-            } catch (IOException e) {
+                session.sendText(ctx.outgoingMessage, NOOP);
+            } catch (Exception e) {
                 log.error("Exception", e);
             }
         }
@@ -232,7 +234,7 @@ public class OcppJsonChargePoint {
     public void close() {
         try {
             // "enqueue" a graceful close
-            session.close(StatusCode.NORMAL, "Finished");
+            session.close(StatusCode.NORMAL, "Finished", NOOP);
 
             // wait for close to happen
             closeHappenedSignal.await();
@@ -270,7 +272,7 @@ public class OcppJsonChargePoint {
                 .add(call.getContext().getResponsePayload());
 
             String str = JsonObjectMapper.INSTANCE.getMapper().writeValueAsString(node);
-            session.getRemote().sendString(str);
+            session.sendText(str, NOOP);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

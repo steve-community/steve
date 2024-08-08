@@ -16,23 +16,13 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package de.rwth.idsg.steve.web.dto.ocpp;
+package de.rwth.idsg.steve.service;
 
-import lombok.Getter;
-import lombok.Setter;
+import ocpp.cs._2015._10.IdTagInfo;
+import org.jetbrains.annotations.Nullable;
 
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotNull;
+public interface AuthTagService {
 
-/**
- * @author Sevket Goekay <sevketgokay@gmail.com>
- * @since 02.01.2015
- */
-@Getter
-@Setter
-public class CancelReservationParams extends SingleChargePointSelect {
-
-    @NotNull(message = "Reservation ID is required")
-    @Min(value = 0, message = "Reservation ID must be at least {value}")
-    private Integer reservationId;
+    IdTagInfo decideStatus(String idTag, boolean isStartTransactionReqContext,
+                           @Nullable String chargeBoxId, @Nullable Integer connectorId);
 }

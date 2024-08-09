@@ -20,9 +20,12 @@ package de.rwth.idsg.steve.config;
 
 import de.rwth.idsg.steve.SteveConfiguration;
 import de.rwth.idsg.steve.SteveProdCondition;
+import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.info.License;
+import io.swagger.v3.oas.models.security.SecurityRequirement;
+import io.swagger.v3.oas.models.security.SecurityScheme;
 import org.springdoc.core.configuration.SpringDocConfiguration;
 import org.springdoc.core.properties.SwaggerUiConfigProperties;
 import org.springdoc.core.properties.SwaggerUiOAuthProperties;
@@ -66,6 +69,13 @@ public class ApiDocsConfiguration {
     public OpenAPI apiDocs() {
         String title = "SteVe REST API Documentation";
 
+        String securityName = SteveConfiguration.CONFIG.getWebApi().getHeaderKey();
+
+        SecurityScheme securityScheme = new SecurityScheme()
+            .type(SecurityScheme.Type.APIKEY)
+            .in(SecurityScheme.In.HEADER)
+            .name(securityName);
+
         return new OpenAPI()
             .info(new Info()
                 .title(title)
@@ -75,6 +85,10 @@ public class ApiDocsConfiguration {
                     .url("https://github.com/steve-community/steve/blob/master/LICENSE.txt")
                 )
                 .version(SteveConfiguration.CONFIG.getSteveVersion())
-            );
+            )
+            // define a security schema
+            .components(new Components().addSecuritySchemes(securityName, securityScheme))
+            // and activate it for all endpoints
+            .addSecurityItem(new SecurityRequirement().addList(securityName));
     }
 }

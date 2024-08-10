@@ -40,7 +40,7 @@
         <cxf.version>4.0.5</cxf.version>
         <spring.version>6.1.11</spring.version>
         <spring.security.version>6.3.1</spring.security.version>
-        <mysql.jdbc.version>8.0.30</mysql.jdbc.version>
+        <mysql.jdbc.version>8.4.0</mysql.jdbc.version>
         <jetty.version>12.0.12</jetty.version>
         <lombok.version>1.18.34</lombok.version>
         <jackson.version>2.17.2</jackson.version>
@@ -400,8 +400,8 @@
                         <version>${jooq.version}</version>
                     </dependency>
                     <dependency>
-                        <groupId>mysql</groupId>
-                        <artifactId>mysql-connector-java</artifactId>
+                        <groupId>com.mysql</groupId>
+                        <artifactId>mysql-connector-j</artifactId>
                         <version>${mysql.jdbc.version}</version>
                     </dependency>
                 </dependencies>
@@ -736,8 +736,8 @@
 
         <!-- DB -->
         <dependency>
-            <groupId>mysql</groupId>
-            <artifactId>mysql-connector-java</artifactId>
+            <groupId>com.mysql</groupId>
+            <artifactId>mysql-connector-j</artifactId>
             <version>${mysql.jdbc.version}</version>
         </dependency>
         <dependency>

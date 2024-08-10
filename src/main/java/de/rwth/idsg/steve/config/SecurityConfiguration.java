@@ -117,13 +117,13 @@ public class SecurityConfiguration {
 
     @Bean
     @Order(1)
-    public SecurityFilterChain apiKeyFilterChain(HttpSecurity http, @Qualifier("steveObjectMapper") ObjectMapper objectMapper) throws Exception {
+    public SecurityFilterChain apiKeyFilterChain(HttpSecurity http, ObjectMapper jacksonObjectMapper) throws Exception {
         return http.securityMatcher(CONFIG.getApiMapping() + "/**")
             .csrf(k -> k.disable())
             .sessionManagement(k -> k.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .addFilter(new ApiKeyFilter())
             .authorizeHttpRequests(k -> k.anyRequest().authenticated())
-            .exceptionHandling(k -> k.authenticationEntryPoint(new ApiKeyAuthenticationEntryPoint(objectMapper)))
+            .exceptionHandling(k -> k.authenticationEntryPoint(new ApiKeyAuthenticationEntryPoint(jacksonObjectMapper)))
             .build();
     }
 

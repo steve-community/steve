@@ -21,7 +21,6 @@ package de.rwth.idsg.steve.config;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.datatype.joda.JodaModule;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.mysql.cj.conf.PropertyKey;
 import com.zaxxer.hikari.HikariConfig;
@@ -39,7 +38,6 @@ import org.jooq.conf.Settings;
 import org.jooq.impl.DSL;
 import org.jooq.impl.DataSourceConnectionProvider;
 import org.jooq.impl.DefaultConfiguration;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -267,8 +265,7 @@ public class BeanConfiguration implements WebMvcConfigurer {
      * {@link WebMvcConfigurationSupport#requestMappingHandlerAdapter(ContentNegotiationManager, FormattingConversionService, org.springframework.validation.Validator)}.
      */
     @Bean
-    @Qualifier("steveObjectMapper")
-    public ObjectMapper objectMapper(RequestMappingHandlerAdapter requestMappingHandlerAdapter) {
+    public ObjectMapper jacksonObjectMapper(RequestMappingHandlerAdapter requestMappingHandlerAdapter) {
         return requestMappingHandlerAdapter.getMessageConverters().stream()
             .filter(converter -> converter instanceof MappingJackson2HttpMessageConverter)
             .findAny()

@@ -93,6 +93,13 @@ public class WebUserRepositoryImpl implements WebUserRepository {
     }
 
     @Override
+    public void deleteUser(int webUserPk) {
+        ctx.delete(WEB_USER)
+            .where(WEB_USER.WEB_USER_PK.eq(webUserPk))
+            .execute();
+    }
+
+    @Override
     public void changeStatusOfUser(String username, boolean enabled) {
         ctx.update(WEB_USER)
             .set(WEB_USER.ENABLED, enabled)

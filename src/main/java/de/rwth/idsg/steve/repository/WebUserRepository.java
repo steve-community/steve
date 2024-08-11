@@ -22,5 +22,7 @@ import org.springframework.security.provisioning.UserDetailsManager;
 
 public interface WebUserRepository extends UserDetailsManager {
 
+    void deleteUser(int webUserPk);
+
     void changeStatusOfUser(String username, boolean enabled);
 }

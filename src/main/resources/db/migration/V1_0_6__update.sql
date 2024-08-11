@@ -5,6 +5,9 @@ CREATE TABLE web_user
     password    varchar(500) NOT NULL,
     enabled     BOOLEAN      NOT NULL,
     authorities JSON         NOT NULL,
+
     PRIMARY KEY (web_user_pk),
-    UNIQUE KEY (username)
+    UNIQUE KEY (username),
+
+    CONSTRAINT authorities_must_be_array CHECK (json_type(authorities) = convert('ARRAY' using utf8))
 );

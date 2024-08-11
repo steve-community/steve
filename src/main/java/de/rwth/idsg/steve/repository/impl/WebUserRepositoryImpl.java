@@ -39,7 +39,8 @@ import org.springframework.stereotype.Repository;
 import org.springframework.util.Assert;
 
 import java.util.Collection;
-import java.util.List;
+import java.util.LinkedHashSet;
+import java.util.stream.Collectors;
 
 import static jooq.steve.db.Tables.WEB_USER;
 import static org.springframework.security.authentication.UsernamePasswordAuthenticationToken.authenticated;
@@ -162,9 +163,10 @@ public class WebUserRepositoryImpl implements WebUserRepository {
     }
 
     private JSON toJson(Collection<? extends GrantedAuthority> authorities) {
-        List<String> auths = authorities.stream()
+        Collection<String> auths = authorities.stream()
             .map(GrantedAuthority::getAuthority)
-            .toList();
+            .sorted() // keep a stable order of entries
+            .collect(Collectors.toCollection(LinkedHashSet::new)); // prevent duplicates
 
         try {
             String str = jacksonObjectMapper.writeValueAsString(auths);

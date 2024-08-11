@@ -27,7 +27,6 @@ import com.mysql.cj.conf.PropertyKey;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import de.rwth.idsg.steve.SteveConfiguration;
-import static de.rwth.idsg.steve.SteveConfiguration.CONFIG;
 import de.rwth.idsg.steve.service.DummyReleaseCheckService;
 import de.rwth.idsg.steve.service.GithubReleaseCheckService;
 import de.rwth.idsg.steve.service.ReleaseCheckService;
@@ -69,7 +68,7 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 
-
+import static de.rwth.idsg.steve.SteveConfiguration.CONFIG;
 
 /**
  * Configuration and beans of Spring Framework.

@@ -74,11 +74,6 @@ public class SecurityConfiguration {
      *
      * [1] https://spring.io/blog/2017/11/01/spring-security-5-0-0-rc1-released#password-storage-format
      * [2] {@link PasswordEncoderFactories#createDelegatingPasswordEncoder()}
-    */
-
-    /**
-     *
-     * @return
      */
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -88,6 +83,7 @@ public class SecurityConfiguration {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         final String prefix = CONFIG.getSpringManagerMapping();
+
         return http
             .authorizeHttpRequests(
                 req -> req
@@ -122,23 +118,17 @@ public class SecurityConfiguration {
                     .requestMatchers(new AntPathRequestMatcher(prefix + "/**")).hasRole("ADMIN")
             )
             .sessionManagement(
-                 req -> req
-                    .invalidSessionUrl(prefix + "/signin")
-                )
+                req -> req.invalidSessionUrl(prefix + "/signin")
+            )
             .formLogin(
-                req -> req
-                    .loginPage(prefix + "/signin")
-                    .permitAll()
-                )
+                req -> req.loginPage(prefix + "/signin").permitAll()
+            )
             .logout(
-                req -> req
-                    .logoutUrl(prefix + "/signout")
-                )
-
+                req -> req.logoutUrl(prefix + "/signout")
+            )
             .exceptionHandling(
-                req -> req
-                    .accessDeniedPage(prefix + "/noAccess")
-                )
+                req -> req.accessDeniedPage(prefix + "/noAccess")
+            )
             .build();
     }
 

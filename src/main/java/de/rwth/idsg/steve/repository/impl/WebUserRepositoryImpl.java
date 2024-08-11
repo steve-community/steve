@@ -1,3 +1,21 @@
+/*
+ * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
+ * Copyright (C) 2013-2024 SteVe Community Team
+ * All Rights Reserved.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
 package de.rwth.idsg.steve.repository.impl;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -8,11 +26,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jooq.DSLContext;
 import org.springframework.security.access.AccessDeniedException;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.context.SecurityContextHolderStrategy;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -25,6 +41,8 @@ import java.util.Collection;
 import java.util.List;
 
 import static jooq.steve.db.Tables.WEB_USER;
+import static org.springframework.security.authentication.UsernamePasswordAuthenticationToken.authenticated;
+import static org.springframework.security.core.context.SecurityContextHolder.getContextHolderStrategy;
 
 /**
  * Inspired by {@link org.springframework.security.provisioning.JdbcUserDetailsManager}
@@ -39,7 +57,7 @@ public class WebUserRepositoryImpl implements WebUserRepository {
 
     private final DSLContext ctx;
     private final ObjectMapper jacksonObjectMapper;
-    private final SecurityContextHolderStrategy securityContextHolderStrategy = SecurityContextHolder.getContextHolderStrategy();
+    private final SecurityContextHolderStrategy securityContextHolderStrategy = getContextHolderStrategy();
 
     @Override
     public void createUser(UserDetails user) {
@@ -81,14 +99,17 @@ public class WebUserRepositoryImpl implements WebUserRepository {
     }
 
     /**
-     * Not only just an SQL Update. The flow is inspired by {@link JdbcUserDetailsManager#changePassword(String, String)}
+     * Not only just an SQL Update.
+     * The flow is inspired by {@link JdbcUserDetailsManager#changePassword(String, String)}
      */
     @Override
     public void changePassword(String oldPassword, String newPassword) {
         Authentication currentUser = this.securityContextHolderStrategy.getContext().getAuthentication();
         if (currentUser == null) {
             // This would indicate bad coding somewhere
-            throw new AccessDeniedException("Can't change password as no Authentication object found in context " + "for current user.");
+            throw new AccessDeniedException(
+                "Can't change password as no Authentication object found in context for current user."
+            );
         }
 
         String username = currentUser.getName();
@@ -174,8 +195,8 @@ public class WebUserRepositoryImpl implements WebUserRepository {
      * Lifted from {@link JdbcUserDetailsManager#createNewAuthentication(Authentication, String)}
      */
     private Authentication createNewAuthentication(Authentication currentAuth, String newPassword) {
-        UserDetails user = loadUserByUsername(currentAuth.getName());
-        UsernamePasswordAuthenticationToken newAuthentication = UsernamePasswordAuthenticationToken.authenticated(user, null, user.getAuthorities());
+        var user = this.loadUserByUsername(currentAuth.getName());
+        var newAuthentication = authenticated(user, null, user.getAuthorities());
         newAuthentication.setDetails(currentAuth.getDetails());
         return newAuthentication;
     }

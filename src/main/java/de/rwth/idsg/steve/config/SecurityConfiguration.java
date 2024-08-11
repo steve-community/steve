@@ -20,8 +20,9 @@ package de.rwth.idsg.steve.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Strings;
-import de.rwth.idsg.steve.repository.impl.WebUserRepositoryImpl;
+import de.rwth.idsg.steve.SteveConfiguration;
 import de.rwth.idsg.steve.web.api.ApiControllerAdvice;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -35,14 +36,16 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.DelegatingPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.provisioning.UserDetailsManager;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.preauth.AbstractPreAuthenticatedProcessingFilter;
 
+import jakarta.annotation.PostConstruct;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -56,9 +59,29 @@ import static de.rwth.idsg.steve.SteveConfiguration.CONFIG;
  * @since 07.01.2015
  */
 @Slf4j
+@RequiredArgsConstructor
 @Configuration
 @EnableWebSecurity
 public class SecurityConfiguration {
+
+    private final UserDetailsManager userDetailsManager;
+
+    @PostConstruct
+    public void postConstruct() {
+        String userName = SteveConfiguration.CONFIG.getAuth().getUserName();
+        if (userDetailsManager.userExists(userName)) {
+            return;
+        }
+
+        var user = User
+            .withUsername(userName)
+            .password(SteveConfiguration.CONFIG.getAuth().getEncodedPassword())
+            .disabled(false)
+            .authorities("ADMIN")
+            .build();
+
+        userDetailsManager.createUser(user);
+    }
 
     /**
      * Password encoding changed with spring-security 5.0.0. We either have to use a prefix before the password to
@@ -70,11 +93,6 @@ public class SecurityConfiguration {
     @Bean
     public PasswordEncoder passwordEncoder() {
         return CONFIG.getAuth().getPasswordEncoder();
-    }
-
-    @Bean
-    public UserDetailsService userDetailsService(WebUserRepositoryImpl webUserRepository) {
-        return webUserRepository;
     }
 
     @Bean
@@ -90,7 +108,7 @@ public class SecurityConfiguration {
                         WebSocketConfiguration.PATH_INFIX + "**",
                         "/WEB-INF/views/**" // https://github.com/spring-projects/spring-security/issues/13285#issuecomment-1579097065
                     ).permitAll()
-                    .requestMatchers(prefix + "/**").hasRole("ADMIN")
+                    .requestMatchers(prefix + "/**").hasAuthority("ADMIN")
             )
             // SOAP stations are making POST calls for communication. even though the following path is permitted for
             // all access, there is a global default behaviour from spring security: enable CSRF for all POSTs.

@@ -435,6 +435,10 @@
                                     <includeExpression>.*\.OCPP_TAG_ACTIVITY\.(IN_TRANSACTION|BLOCKED)</includeExpression>
                                 </forcedType>
                                 <forcedType>
+                                    <name>JSON</name>
+                                    <includeExpression>.*\.WEB_USER\.(AUTHORITIES)</includeExpression>
+                                </forcedType>
+                                <forcedType>
                                     <userType>org.joda.time.DateTime</userType>
                                     <converter>de.rwth.idsg.steve.utils.DateTimeConverter</converter>
                                     <includeExpression>.*</includeExpression>

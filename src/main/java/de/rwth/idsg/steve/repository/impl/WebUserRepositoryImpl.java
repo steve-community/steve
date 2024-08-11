@@ -25,6 +25,7 @@ import jooq.steve.db.tables.records.WebUserRecord;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jooq.DSLContext;
+import org.jooq.JSON;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -152,21 +153,22 @@ public class WebUserRepositoryImpl implements WebUserRepository {
             .build();
     }
 
-    private String[] fromJson(String jsonArray) {
+    private String[] fromJson(JSON jsonArray) {
         try {
-            return jacksonObjectMapper.readValue(jsonArray, String[].class);
+            return jacksonObjectMapper.readValue(jsonArray.data(), String[].class);
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
     }
 
-    private String toJson(Collection<? extends GrantedAuthority> authorities) {
+    private JSON toJson(Collection<? extends GrantedAuthority> authorities) {
         List<String> auths = authorities.stream()
             .map(GrantedAuthority::getAuthority)
             .toList();
 
         try {
-            return jacksonObjectMapper.writeValueAsString(auths);
+            String str = jacksonObjectMapper.writeValueAsString(auths);
+            return JSON.jsonOrNull(str);
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }

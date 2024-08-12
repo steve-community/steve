@@ -50,6 +50,8 @@ public abstract class ConcurrentWebSocketHandler implements WebSocketHandler {
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
         this.onOpen(internalGet(session));
+        session.setBinaryMessageSizeLimit(bufferSizeLimit);
+        session.setTextMessageSizeLimit(bufferSizeLimit);
         log.info("Created new session {} with buffer size {}", session.getId(), session.getTextMessageSizeLimit());
     }
 
@@ -77,7 +79,10 @@ public abstract class ConcurrentWebSocketHandler implements WebSocketHandler {
     // -------------------------------------------------------------------------
 
     abstract void onMessage(WebSocketSession session, WebSocketMessage<?> message) throws Exception;
+
     abstract void onOpen(WebSocketSession session) throws Exception;
+
     abstract void onClose(WebSocketSession session, CloseStatus closeStatus) throws Exception;
+
     abstract void onError(WebSocketSession session, Throwable throwable) throws Exception;
 }

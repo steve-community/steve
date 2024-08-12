@@ -24,6 +24,7 @@ package de.rwth.idsg.steve.ocpp.ws;
 
 import de.rwth.idsg.steve.config.WebSocketConfiguration;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.WebSocketHandler;
 import org.springframework.web.socket.WebSocketMessage;
@@ -41,9 +42,12 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 public abstract class ConcurrentWebSocketHandler implements WebSocketHandler {
 
+    @Value("${bufferMultiplier:5}")
+    private int bufferMultiplier;
+
     private static final int sendTimeLimit = (int) TimeUnit.SECONDS.toMillis(10);
 
-    private static final int bufferSizeLimit = 10 * WebSocketConfiguration.MAX_MSG_SIZE;
+    private static final int bufferSizeLimit = WebSocketConfiguration.MAX_MSG_SIZE;
 
 
     private final Map<String, ConcurrentWebSocketSessionDecorator> sessions = new ConcurrentHashMap<>();
@@ -51,8 +55,8 @@ public abstract class ConcurrentWebSocketHandler implements WebSocketHandler {
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
         this.onOpen(internalGet(session));
-        session.setBinaryMessageSizeLimit(bufferSizeLimit);
-        session.setTextMessageSizeLimit(bufferSizeLimit);
+        session.setBinaryMessageSizeLimit(bufferMultiplier * bufferSizeLimit);
+        session.setTextMessageSizeLimit(bufferMultiplier * bufferSizeLimit);
         log.info("Created new session {} with buffer size {}", session.getId(), session.getTextMessageSizeLimit());
     }
 
@@ -72,7 +76,7 @@ public abstract class ConcurrentWebSocketHandler implements WebSocketHandler {
     }
 
     private ConcurrentWebSocketSessionDecorator internalGet(WebSocketSession session) {
-        return sessions.computeIfAbsent(session.getId(), s -> new ConcurrentWebSocketSessionDecorator(session, sendTimeLimit, bufferSizeLimit));
+        return sessions.computeIfAbsent(session.getId(), s -> new ConcurrentWebSocketSessionDecorator(session, sendTimeLimit, bufferMultiplier * bufferSizeLimit));
     }
 
     // -------------------------------------------------------------------------

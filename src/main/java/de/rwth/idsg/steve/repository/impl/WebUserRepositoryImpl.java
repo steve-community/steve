@@ -43,6 +43,7 @@ import java.util.LinkedHashSet;
 import java.util.stream.Collectors;
 
 import static jooq.steve.db.Tables.WEB_USER;
+import static org.jooq.impl.DSL.condition;
 import static org.springframework.security.authentication.UsernamePasswordAuthenticationToken.authenticated;
 import static org.springframework.security.core.context.SecurityContextHolder.getContextHolderStrategy;
 
@@ -105,6 +106,16 @@ public class WebUserRepositoryImpl implements WebUserRepository {
             .set(WEB_USER.ENABLED, enabled)
             .where(WEB_USER.USERNAME.eq(username))
             .execute();
+    }
+
+    @Override
+    public boolean hasUserWithAuthority(String authority) {
+        JSON authValue = JSON.json("\"" + authority + "\"");
+        return ctx.selectOne()
+            .from(WEB_USER)
+            .where(condition("json_contains({0}, {1})", WEB_USER.AUTHORITIES, authValue))
+            .fetchOptional()
+            .isPresent();
     }
 
     /**

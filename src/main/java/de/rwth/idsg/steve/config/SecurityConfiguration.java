@@ -21,6 +21,7 @@ package de.rwth.idsg.steve.config;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Strings;
 import de.rwth.idsg.steve.SteveConfiguration;
+import de.rwth.idsg.steve.repository.WebUserRepository;
 import de.rwth.idsg.steve.web.api.ApiControllerAdvice;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -40,7 +41,6 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.DelegatingPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.provisioning.UserDetailsManager;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.preauth.AbstractPreAuthenticatedProcessingFilter;
@@ -64,23 +64,22 @@ import static de.rwth.idsg.steve.SteveConfiguration.CONFIG;
 @EnableWebSecurity
 public class SecurityConfiguration {
 
-    private final UserDetailsManager userDetailsManager;
+    private final WebUserRepository webUserRepository;
 
     @PostConstruct
     public void postConstruct() {
-        String userName = SteveConfiguration.CONFIG.getAuth().getUserName();
-        if (userDetailsManager.userExists(userName)) {
+        if (webUserRepository.hasUserWithAuthority("ADMIN")) {
             return;
         }
 
         var user = User
-            .withUsername(userName)
+            .withUsername(SteveConfiguration.CONFIG.getAuth().getUserName())
             .password(SteveConfiguration.CONFIG.getAuth().getEncodedPassword())
             .disabled(false)
             .authorities("ADMIN")
             .build();
 
-        userDetailsManager.createUser(user);
+        webUserRepository.createUser(user);
     }
 
     /**

@@ -25,4 +25,6 @@ public interface WebUserRepository extends UserDetailsManager {
     void deleteUser(int webUserPk);
 
     void changeStatusOfUser(String username, boolean enabled);
+
+    boolean hasUserWithAuthority(String authority);
 }

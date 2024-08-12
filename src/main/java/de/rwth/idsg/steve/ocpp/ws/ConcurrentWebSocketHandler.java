@@ -42,7 +42,7 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 public abstract class ConcurrentWebSocketHandler implements WebSocketHandler {
 
-    @Value("${bufferMultiplier:5}")
+    @Value("${bufferMultiplier:1}")
     private int bufferMultiplier;
 
     private static final int sendTimeLimit = (int) TimeUnit.SECONDS.toMillis(10);

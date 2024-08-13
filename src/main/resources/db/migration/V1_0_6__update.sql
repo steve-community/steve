@@ -3,6 +3,7 @@ CREATE TABLE web_user
     web_user_pk INT          NOT NULL AUTO_INCREMENT,
     username    varchar(500) NOT NULL,
     password    varchar(500) NOT NULL,
+    api_token   varchar(500) NULL,
     enabled     BOOLEAN      NOT NULL,
     authorities JSON         NOT NULL,
 

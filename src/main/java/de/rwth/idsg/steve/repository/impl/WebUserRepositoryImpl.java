@@ -197,7 +197,7 @@ public class WebUserRepositoryImpl implements WebUserRepository {
     /**
      * Lifted from {@link JdbcUserDetailsManager#validateUserDetails(UserDetails)}
      */
-    private void validateUserDetails(UserDetails user) {
+    private static void validateUserDetails(UserDetails user) {
         Assert.hasText(user.getUsername(), "Username may not be empty or null");
         validateAuthorities(user.getAuthorities());
     }
@@ -205,7 +205,7 @@ public class WebUserRepositoryImpl implements WebUserRepository {
     /**
      * Lifted from {@link JdbcUserDetailsManager#validateAuthorities(Collection)}
      */
-    private void validateAuthorities(Collection<? extends GrantedAuthority> authorities) {
+    private static void validateAuthorities(Collection<? extends GrantedAuthority> authorities) {
         Assert.notNull(authorities, "Authorities list must not be null");
         for (GrantedAuthority authority : authorities) {
             Assert.notNull(authority, "Authorities list contains a null entry");

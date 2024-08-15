@@ -20,8 +20,6 @@ package de.rwth.idsg.steve.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Strings;
-import de.rwth.idsg.steve.SteveConfiguration;
-import de.rwth.idsg.steve.repository.WebUserRepository;
 import de.rwth.idsg.steve.web.api.ApiControllerAdvice;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -37,7 +35,6 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.DelegatingPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -45,7 +42,6 @@ import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.preauth.AbstractPreAuthenticatedProcessingFilter;
 
-import jakarta.annotation.PostConstruct;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -63,24 +59,6 @@ import static de.rwth.idsg.steve.SteveConfiguration.CONFIG;
 @Configuration
 @EnableWebSecurity
 public class SecurityConfiguration {
-
-    private final WebUserRepository webUserRepository;
-
-    @PostConstruct
-    public void postConstruct() {
-        if (webUserRepository.hasUserWithAuthority("ADMIN")) {
-            return;
-        }
-
-        var user = User
-            .withUsername(SteveConfiguration.CONFIG.getAuth().getUserName())
-            .password(SteveConfiguration.CONFIG.getAuth().getEncodedPassword())
-            .disabled(false)
-            .authorities("ADMIN")
-            .build();
-
-        webUserRepository.createUser(user);
-    }
 
     /**
      * Password encoding changed with spring-security 5.0.0. We either have to use a prefix before the password to

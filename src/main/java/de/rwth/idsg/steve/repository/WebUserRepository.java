@@ -18,13 +18,25 @@
  */
 package de.rwth.idsg.steve.repository;
 
-import org.springframework.security.provisioning.UserDetailsManager;
+import jooq.steve.db.tables.records.WebUserRecord;
 
-public interface WebUserRepository extends UserDetailsManager {
+public interface WebUserRepository  {
+
+    void createUser(WebUserRecord user);
+
+    void updateUser(WebUserRecord user);
+
+    void deleteUser(String username);
 
     void deleteUser(int webUserPk);
 
     void changeStatusOfUser(String username, boolean enabled);
 
-    boolean hasUserWithAuthority(String authority);
+    Integer getUserCountWithAuthority(String authority);
+
+    void changePassword(String username, String newPassword);
+
+    boolean userExists(String username);
+
+    WebUserRecord loadUserByUsername(String username);
 }

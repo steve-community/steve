@@ -20,12 +20,9 @@ package de.rwth.idsg.steve.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Strings;
-import de.rwth.idsg.steve.SteveProdCondition;
 import de.rwth.idsg.steve.web.api.ApiControllerAdvice;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
@@ -34,7 +31,6 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
@@ -52,6 +48,7 @@ import org.springframework.security.web.authentication.preauth.AbstractPreAuthen
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+
 import java.io.IOException;
 
 import static de.rwth.idsg.steve.SteveConfiguration.CONFIG;
@@ -63,7 +60,6 @@ import static de.rwth.idsg.steve.SteveConfiguration.CONFIG;
 @Slf4j
 @Configuration
 @EnableWebSecurity
-@Conditional(SteveProdCondition.class)
 public class SecurityConfiguration {
 
     /**
@@ -99,10 +95,15 @@ public class SecurityConfiguration {
                     .requestMatchers(
                         "/static/**",
                         CONFIG.getCxfMapping() + "/**",
+                        WebSocketConfiguration.PATH_INFIX + "**",
                         "/WEB-INF/views/**" // https://github.com/spring-projects/spring-security/issues/13285#issuecomment-1579097065
                     ).permitAll()
                     .requestMatchers(prefix + "/**").hasRole("ADMIN")
             )
+            // SOAP stations are making POST calls for communication. even though the following path is permitted for
+            // all access, there is a global default behaviour from spring security: enable CSRF for all POSTs.
+            // we need to disable CSRF for SOAP paths explicitly.
+            .csrf(c -> c.ignoringRequestMatchers(CONFIG.getCxfMapping() + "/**"))
             .sessionManagement(
                 req -> req.invalidSessionUrl(prefix + "/signin")
             )

@@ -104,6 +104,10 @@ public class SecurityConfiguration {
                     ).permitAll()
                     .requestMatchers(prefix + "/**").hasRole("ADMIN")
             )
+            // SOAP stations are making POST calls for communication. even though the following path is permitted for
+            // all access, there is a global default behaviour from spring security: enable CSRF for all POSTs.
+            // we need to disable CSRF for SOAP paths explicitly.
+            .csrf(c -> c.ignoringRequestMatchers(CONFIG.getCxfMapping() + "/**"))
             .sessionManagement(
                 req -> req.invalidSessionUrl(prefix + "/signin")
             )

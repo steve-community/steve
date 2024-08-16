@@ -21,6 +21,7 @@ package de.rwth.idsg.steve.config;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Strings;
 import de.rwth.idsg.steve.web.api.ApiControllerAdvice;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -34,13 +35,9 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.DelegatingPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.preauth.AbstractPreAuthenticatedProcessingFilter;
@@ -58,6 +55,7 @@ import static de.rwth.idsg.steve.SteveConfiguration.CONFIG;
  * @since 07.01.2015
  */
 @Slf4j
+@RequiredArgsConstructor
 @Configuration
 @EnableWebSecurity
 public class SecurityConfiguration {
@@ -75,17 +73,6 @@ public class SecurityConfiguration {
     }
 
     @Bean
-    public UserDetailsService userDetailsService() {
-        UserDetails webPageUser = User.builder()
-                .username(CONFIG.getAuth().getUserName())
-                .password(CONFIG.getAuth().getEncodedPassword())
-                .roles("ADMIN")
-                .build();
-
-        return new InMemoryUserDetailsManager(webPageUser);
-    }
-
-    @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         final String prefix = CONFIG.getSpringManagerMapping();
 
@@ -98,7 +85,7 @@ public class SecurityConfiguration {
                         WebSocketConfiguration.PATH_INFIX + "**",
                         "/WEB-INF/views/**" // https://github.com/spring-projects/spring-security/issues/13285#issuecomment-1579097065
                     ).permitAll()
-                    .requestMatchers(prefix + "/**").hasRole("ADMIN")
+                    .requestMatchers(prefix + "/**").hasAuthority("ADMIN")
             )
             // SOAP stations are making POST calls for communication. even though the following path is permitted for
             // all access, there is a global default behaviour from spring security: enable CSRF for all POSTs.

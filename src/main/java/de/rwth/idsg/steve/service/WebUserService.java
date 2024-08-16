@@ -21,7 +21,12 @@ package de.rwth.idsg.steve.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.rwth.idsg.steve.SteveConfiguration;
+import de.rwth.idsg.steve.SteveException;
 import de.rwth.idsg.steve.repository.WebUserRepository;
+import de.rwth.idsg.steve.repository.dto.WebUserOverview;
+import de.rwth.idsg.steve.web.dto.WebUserForm;
+import de.rwth.idsg.steve.web.dto.WebUserQueryForm;
+import java.util.ArrayList;
 import jooq.steve.db.tables.records.WebUserRecord;
 import lombok.RequiredArgsConstructor;
 import org.jooq.JSON;
@@ -42,10 +47,13 @@ import org.springframework.util.Assert;
 
 import java.util.Collection;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.stream.Collectors;
 
 import static org.springframework.security.authentication.UsernamePasswordAuthenticationToken.authenticated;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import static org.springframework.security.core.context.SecurityContextHolder.getContextHolderStrategy;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 /**
  * Inspired by {@link org.springframework.security.provisioning.JdbcUserDetailsManager}
@@ -60,6 +68,7 @@ public class WebUserService implements UserDetailsManager {
     private final ObjectMapper jacksonObjectMapper;
     private final WebUserRepository webUserRepository;
     private final SecurityContextHolderStrategy securityContextHolderStrategy = getContextHolderStrategy();
+    private final PasswordEncoder encoder;
 
     @EventListener
     public void afterStart(ContextRefreshedEvent event) {
@@ -153,6 +162,53 @@ public class WebUserService implements UserDetailsManager {
         return count != null && count > 0;
     }
 
+    // Methods for the website
+    public void add(WebUserForm form) {
+        createUser(toUserDetails(form));
+    }
+
+
+    public void update(WebUserForm form) {
+        updateUser(toUserDetails(form));
+    }
+
+    public List<WebUserOverview> getOverview(WebUserQueryForm form) {
+        return webUserRepository.getOverview(form);
+    }
+
+    public WebUserForm getDetails(Integer webuserpk) {
+        WebUserRecord ur = webUserRepository.loadUserByUsePk(webuserpk);
+
+        if (ur == null) {
+            throw new SteveException("There is no user with id '%d'", webuserpk);
+        }
+
+        WebUserForm form = new WebUserForm();
+
+        form.setEnabled(ur.getEnabled());
+        form.setWebusername(ur.getUsername());
+        form.setPassword(ur.getPassword());
+        form.setApitoken(ur.getApiToken());
+        form.setAuthorities(rolesStr(fromJson(ur.getAuthorities())));
+
+        return form;
+    }
+
+    private static String rolesStr(String[] authorities) {
+        String roles = "";
+
+        for (String ar : authorities) {
+            roles = roles + ar + ", ";
+        }
+        roles = roles.strip();
+        if (!roles.isBlank()) { //(roles.endsWith(","))
+            roles = roles.substring(0, roles.length() - 1);
+        }
+
+        return roles;
+    }
+
+    // Helpers
     private WebUserRecord toWebUserRecord(UserDetails user) {
         return new WebUserRecord()
             .setUsername(user.getUsername())
@@ -161,12 +217,37 @@ public class WebUserService implements UserDetailsManager {
             .setAuthorities(toJson(user.getAuthorities()));
     }
 
+    private UserDetails toUserDetails(WebUserForm form) {
+        String encPw = "";
+        if (form.getPassword()!= null) {
+            //encPw = form.getPassword();
+            encPw = encoder.encode(form.getPassword());
+        }
+        var user = User
+                .withUsername(form.getWebusername())
+                .password(encPw)
+                .disabled(!form.getEnabled())
+                .authorities(toAuthorities(form.getAuthorities()))
+                .build();
+        return user;
+    }
+
+
     private String[] fromJson(JSON jsonArray) {
         try {
             return jacksonObjectMapper.readValue(jsonArray.data(), String[].class);
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private Collection<? extends GrantedAuthority> toAuthorities(String authoritiesStr) {
+        String[] authoritiesList = authoritiesStr.split(",");
+        List<GrantedAuthority> authorities = new ArrayList<>();
+        for (String authStr: authoritiesList) {
+            authorities.add(new SimpleGrantedAuthority(authStr.strip()));
+        }
+        return authorities;
     }
 
     private JSON toJson(Collection<? extends GrantedAuthority> authorities) {

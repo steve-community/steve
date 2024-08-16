@@ -16,34 +16,34 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package de.rwth.idsg.steve.repository;
+package de.rwth.idsg.steve.web.dto;
 
-import jooq.steve.db.tables.records.WebUserRecord;
-import de.rwth.idsg.steve.repository.dto.WebUserOverview;
-import de.rwth.idsg.steve.web.dto.WebUserQueryForm;
-import java.util.List;
+import lombok.Getter;
+import lombok.Setter;
 
-public interface WebUserRepository  {
 
-    void createUser(WebUserRecord user);
+ /**
+ * @author fnkbsi
+ * @since 01.04.2022
+ */
+@Getter
+@Setter
+public class WebUserForm {
 
-    void updateUser(WebUserRecord user);
+    // Internal database id
+    //private Integer webUserPk;
 
-    void deleteUser(String username);
+    private Boolean enabled;
 
-    void deleteUser(int webUserPk);
+    private String webusername;
 
-    void changeStatusOfUser(String username, boolean enabled);
+    private String password;
 
-    Integer getUserCountWithAuthority(String authority);
+    private String passwordComparison;
 
-    void changePassword(String username, String newPassword);
+    private String authorities;
 
-    boolean userExists(String username);
+    private Boolean pwerror;
 
-    WebUserRecord loadUserByUsePk(Integer webUserPk);
-    WebUserRecord loadUserByUsername(String username);
-
-    List<WebUserOverview> getOverview(WebUserQueryForm form);
-
+    private String apitoken;
 }

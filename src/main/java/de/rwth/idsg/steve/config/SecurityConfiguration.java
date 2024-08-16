@@ -86,6 +86,27 @@ public class SecurityConfiguration {
                         "/WEB-INF/views/**" // https://github.com/spring-projects/spring-security/issues/13285#issuecomment-1579097065
                     ).permitAll()
                     .requestMatchers(prefix + "/**").hasAuthority("ADMIN")
+                    .requestMatchers(prefix + "/home").hasAnyAuthority("USER", "ADMIN")
+                     // webuser
+                    .requestMatchers(prefix + "/webusers").hasAnyAuthority("USER", "ADMIN")
+                    .requestMatchers(prefix + "/webusers" + "/details/**").hasAnyAuthority("USER", "ADMIN")
+                    // users
+                    .requestMatchers(prefix + "/users").hasAnyAuthority("USER", "ADMIN")
+                    .requestMatchers(prefix + "/users" + "/details/**").hasAnyAuthority("USER", "ADMIN")
+                     //ocppTags
+                    .requestMatchers(prefix + "/ocppTags").hasAnyAuthority("USER", "ADMIN")
+                    .requestMatchers(prefix + "/ocppTags" + "/details/**").hasAnyAuthority("USER", "ADMIN")
+                     // chargepoints
+                    .requestMatchers(prefix + "/chargepoints").hasAnyAuthority("USER", "ADMIN")
+                    .requestMatchers(prefix + "/chargepoints" + "/details/**").hasAnyAuthority("USER", "ADMIN")
+                     // transactions and reservations
+                    .requestMatchers(prefix + "/transactions").hasAnyAuthority("USER", "ADMIN")
+                    .requestMatchers(prefix + "/transactions" + "/details/**").hasAnyAuthority("USER", "ADMIN")
+                    .requestMatchers(prefix + "/reservations").hasAnyAuthority("USER", "ADMIN")
+                    .requestMatchers(prefix + "/reservations" + "/**").hasAnyAuthority("ADMIN")
+                     // singout and noAccess
+                    .requestMatchers(prefix + "/signout/" + "**").hasAnyAuthority("USER", "ADMIN")
+                    .requestMatchers(prefix + "/noAccess/" + "**").hasAnyAuthority("USER", "ADMIN")
             )
             // SOAP stations are making POST calls for communication. even though the following path is permitted for
             // all access, there is a global default behaviour from spring security: enable CSRF for all POSTs.
@@ -99,6 +120,9 @@ public class SecurityConfiguration {
             )
             .logout(
                 req -> req.logoutUrl(prefix + "/signout")
+            )
+            .exceptionHandling(
+                req -> req.accessDeniedPage(prefix + "/noAccess")
             )
             .build();
     }

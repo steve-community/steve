@@ -162,30 +162,30 @@ public class WebUserService implements UserDetailsManager {
         Integer count = webUserRepository.getUserCountWithAuthority(authority);
         return count != null && count > 0;
     }
-    
+
     // Methods for the website
     public void add(WebUserForm form) {
         createUser(toUserDetails(form));
     }
 
-    
+
     public void update(WebUserForm form) {
         updateUser(toUserDetails(form));
     }
-    
+
     public List<WebUserOverview> getOverview(WebUserQueryForm form) {
         return webUserRepository.getOverview(form);
     }
-    
+
     public WebUserForm getDetails(Integer webuserpk) {
         WebUserRecord ur = webUserRepository.loadUserByUsePk(webuserpk);
 
         if (ur == null) {
             throw new SteveException("There is no user with id '%d'", webuserpk);
         }
-        
+
         WebUserForm form = new WebUserForm();
-        
+
         form.setEnabled(ur.getEnabled());
         form.setWebusername(ur.getUsername());
         form.setPassword(ur.getPassword());
@@ -194,7 +194,7 @@ public class WebUserService implements UserDetailsManager {
 
         return form;
     }
-    
+
     private static String rolesStr(String[] authorities) {
         String roles = "";
 
@@ -217,7 +217,7 @@ public class WebUserService implements UserDetailsManager {
             .setEnabled(user.isEnabled())
             .setAuthorities(toJson(user.getAuthorities()));
     }
-    
+
     private UserDetails toUserDetails(WebUserForm form) {
         String encPw = "";
         if (form.getPassword()!= null) {
@@ -241,7 +241,7 @@ public class WebUserService implements UserDetailsManager {
             throw new RuntimeException(e);
         }
     }
-    
+
     Collection<? extends GrantedAuthority> toAuthorities(String authoritiesStr) {
         String[] authoritiesList = authoritiesStr.split(",");
         List<GrantedAuthority> authorities = new ArrayList<>();

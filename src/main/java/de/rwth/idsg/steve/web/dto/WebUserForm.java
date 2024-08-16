@@ -29,10 +29,10 @@ import lombok.Setter;
 @Getter
 @Setter
 public class WebUserForm {
-    
+
     // Internal database id
     //private Integer webUserPk;
-    
+
     private Boolean enabled;
 
     private String webusername;
@@ -44,6 +44,6 @@ public class WebUserForm {
     private String authorities;
 
     private Boolean pwerror;
-    
+
     private String apitoken;
 }

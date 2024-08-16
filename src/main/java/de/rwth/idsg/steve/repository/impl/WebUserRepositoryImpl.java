@@ -134,14 +134,14 @@ public class WebUserRepositoryImpl implements WebUserRepository {
             .where(WEB_USER.USERNAME.eq(username))
             .fetchOne();
     }
-    
+
     @Override
     public WebUserRecord loadUserByUsePk(Integer webUserPk) {
         return ctx.selectFrom(WEB_USER)
             .where(WEB_USER.WEB_USER_PK.eq(webUserPk))
             .fetchOne();
     }
-    
+
     @Override
     public List<WebUserOverview> getOverview(WebUserQueryForm form) {
         return getOverviewInternal(form)
@@ -153,7 +153,7 @@ public class WebUserRepositoryImpl implements WebUserRepository {
                         .build()
                 );
     }
-    
+
      private String[] fromJson(JSON jsonArray) {
         try {
             return jacksonObjectMapper.readValue(jsonArray.data(), String[].class);
@@ -161,7 +161,7 @@ public class WebUserRepositoryImpl implements WebUserRepository {
             throw new RuntimeException(e);
         }
     }
-    
+
     @SuppressWarnings("unchecked")
     private Result<Record4<Integer, String, Boolean, JSON>> getOverviewInternal(WebUserQueryForm form) {
         SelectQuery selectQuery = ctx.selectQuery();

@@ -16,16 +16,30 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package de.rwth.idsg.steve.web.dto.ocpp;
+package de.rwth.idsg.steve.web.controller;
 
-/**
- * Determines if a configuration key is read-only ("R") or read-write ("RW"). In case the key is read-only, the Central
- * System can read the value for the key using GetConfiguration, but not write it. In case the accessibility is
- * read-write, the Central System can also write the value for the key using ChangeConfiguration.
- *
- * This distinction was added in OCPP 1.6.
+
+
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+
+
+
+ /**
+ * @author fnkbsi
+ * @since 01.04.2022
  */
-public enum ConfigurationKeyReadWriteEnum {
-    R,
-    RW
+@Controller
+@RequestMapping(value = "/manager/noAccess")
+public class NoAccessController {
+
+    // -------------------------------------------------------------------------
+    // HTTP methods
+    // -------------------------------------------------------------------------
+
+    @RequestMapping()
+    public String accessDenied() {
+        return "noAccess";
+    }
+
 }

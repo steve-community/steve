@@ -16,16 +16,16 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package de.rwth.idsg.steve.web.dto.ocpp;
+package de.rwth.idsg.steve.repository.dto;
+import lombok.Builder;
+import lombok.Getter;
 
-/**
- * Determines if a configuration key is read-only ("R") or read-write ("RW"). In case the key is read-only, the Central
- * System can read the value for the key using GetConfiguration, but not write it. In case the accessibility is
- * read-write, the Central System can also write the value for the key using ChangeConfiguration.
- *
- * This distinction was added in OCPP 1.6.
- */
-public enum ConfigurationKeyReadWriteEnum {
-    R,
-    RW
+@Getter
+@Builder
+public final class WebUserOverview {
+
+    private final Integer webUserPk;
+    private final Boolean enabled;
+    private final String webusername;
+    private final String[] autorithies;
 }

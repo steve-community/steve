@@ -16,16 +16,32 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package de.rwth.idsg.steve.web.dto.ocpp;
+package de.rwth.idsg.steve.web.dto;
+
+import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
+
+import java.util.Map;
 
 /**
- * Determines if a configuration key is read-only ("R") or read-write ("RW"). In case the key is read-only, the Central
- * System can read the value for the key using GetConfiguration, but not write it. In case the accessibility is
- * read-write, the Central System can also write the value for the key using ChangeConfiguration.
  *
- * This distinction was added in OCPP 1.6.
+ * @author Sevket Goekay <sevketgokay@gmail.com>
+ *
  */
-public enum ConfigurationKeyReadWriteEnum {
-    R,
-    RW
+@Getter
+@Builder
+@ToString
+public final class Statistics {
+    // Number of chargeboxes, ocppTags, users, reservations, transactions
+    private final Integer numChargeBoxes, numOcppTags, numUsers, numReservations, numTransactions,
+    // Received heartbeats
+    heartbeatToday, heartbeatYesterday, heartbeatEarlier;
+
+    // Number of connected WebSocket/JSON chargeboxes
+    @Setter private int numOcpp12JChargeBoxes, numOcpp15JChargeBoxes, numOcpp16JChargeBoxes;
+
+    // Count of connectors based on their status
+    @Setter private Map<String, Integer> statusCountMap;
 }

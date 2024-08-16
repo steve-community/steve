@@ -19,6 +19,9 @@
 package de.rwth.idsg.steve.repository;
 
 import jooq.steve.db.tables.records.WebUserRecord;
+import de.rwth.idsg.steve.repository.dto.WebUserOverview;
+import de.rwth.idsg.steve.web.dto.WebUserQueryForm;
+import java.util.List;
 
 public interface WebUserRepository  {
 
@@ -38,5 +41,10 @@ public interface WebUserRepository  {
 
     boolean userExists(String username);
 
+    WebUserRecord loadUserByUsePk(Integer webUserPk);
     WebUserRecord loadUserByUsername(String username);
+
+    // methods for the website
+    List<WebUserOverview> getOverview(WebUserQueryForm form);
+
 }

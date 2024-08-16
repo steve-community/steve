@@ -1,5 +1,8 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
+ * Copyright (C) 2013-2023 SteVe Community Team
+/*
+ * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
  * Copyright (C) 2013-2024 SteVe Community Team
  * All Rights Reserved.
  *
@@ -16,16 +19,40 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package de.rwth.idsg.steve.web.dto.ocpp;
+package de.rwth.idsg.steve.web.dto;
 
-/**
- * Determines if a configuration key is read-only ("R") or read-write ("RW"). In case the key is read-only, the Central
- * System can read the value for the key using GetConfiguration, but not write it. In case the accessibility is
- * read-write, the Central System can also write the value for the key using ChangeConfiguration.
- *
- * This distinction was added in OCPP 1.6.
+import lombok.Getter;
+import lombok.Setter;
+
+ /**
+ * @author fnkbsi
+ * @since 01.04.2022
  */
-public enum ConfigurationKeyReadWriteEnum {
-    R,
-    RW
+@Getter
+@Setter
+public class WebUserQueryForm {
+
+    private Boolean enabled;
+
+    // Free text input
+    private String webusername;
+    private String roles;
+    private String apitoken;
+
+    public boolean isSetWebusername() {
+        return webusername != null;
+    }
+
+    public boolean isSetRoles() {
+        return roles != null;
+    }
+
+    public boolean isSetEnabled() {
+        return enabled != null;
+    }
+
+    public boolean isSetApiKey() {
+        return apitoken != null;
+    }
+
 }

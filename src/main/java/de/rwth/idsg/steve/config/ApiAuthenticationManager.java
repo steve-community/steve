@@ -99,8 +99,7 @@ public class ApiAuthenticationManager implements AuthenticationManager, Authenti
         response.getWriter().print(jacksonObjectMapper.writeValueAsString(apiResponse));
     }
 
-
-    private boolean areValuesSet(UserDetails userDetails) {
+    private static boolean areValuesSet(UserDetails userDetails) {
         if (userDetails == null) {
             return false;
         }

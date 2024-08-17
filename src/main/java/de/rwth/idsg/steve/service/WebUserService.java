@@ -23,7 +23,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import de.rwth.idsg.steve.SteveConfiguration;
 import de.rwth.idsg.steve.SteveException;
 import de.rwth.idsg.steve.repository.WebUserRepository;
-import de.rwth.idsg.steve.repository.dto.WebUserOverview;
+import de.rwth.idsg.steve.service.dto.WebUserOverview;
 import de.rwth.idsg.steve.web.dto.WebUserForm;
 import de.rwth.idsg.steve.web.dto.WebUserQueryForm;
 import java.util.ArrayList;
@@ -171,24 +171,32 @@ public class WebUserService implements UserDetailsManager {
     public void update(WebUserForm form) {
         updateUser(toUserDetails(form));
     }
-
+    
     public List<WebUserOverview> getOverview(WebUserQueryForm form) {
-        return webUserRepository.getOverview(form);
+        return webUserRepository.getOverview(form)
+                .map(r -> WebUserOverview.builder()
+                        .webUserPk(r.value1())
+                        .webUsername(r.value2())
+                        .enabled(r.value3())
+                        .authorities(fromJson(r.value4()))
+                        .build()
+                );
     }
 
-    public WebUserForm getDetails(Integer webuserpk) {
-        WebUserRecord ur = webUserRepository.loadUserByUsePk(webuserpk);
+
+    public WebUserForm getDetails(Integer webUserPk) {
+        WebUserRecord ur = webUserRepository.loadUserByUsePk(webUserPk);
 
         if (ur == null) {
-            throw new SteveException("There is no user with id '%d'", webuserpk);
+            throw new SteveException("There is no user with id '%d'", webUserPk);
         }
 
         WebUserForm form = new WebUserForm();
 
         form.setEnabled(ur.getEnabled());
-        form.setWebusername(ur.getUsername());
+        form.setWebUsername(ur.getUsername());
         form.setPassword(ur.getPassword());
-        form.setApitoken(ur.getApiToken());
+        form.setApiToken(ur.getApiToken());
         form.setAuthorities(rolesStr(fromJson(ur.getAuthorities())));
 
         return form;
@@ -224,14 +232,13 @@ public class WebUserService implements UserDetailsManager {
             encPw = encoder.encode(form.getPassword());
         }
         var user = User
-                .withUsername(form.getWebusername())
+                .withUsername(form.getWebUsername())
                 .password(encPw)
                 .disabled(!form.getEnabled())
                 .authorities(toAuthorities(form.getAuthorities()))
                 .build();
         return user;
     }
-
 
     private String[] fromJson(JSON jsonArray) {
         try {

@@ -18,12 +18,8 @@
  */
 package de.rwth.idsg.steve.repository.impl;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import de.rwth.idsg.steve.repository.WebUserRepository;
-import de.rwth.idsg.steve.repository.dto.WebUserOverview;
 import de.rwth.idsg.steve.web.dto.WebUserQueryForm;
-import java.util.List;
 import jooq.steve.db.tables.records.WebUserRecord;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -48,7 +44,6 @@ import static org.jooq.impl.DSL.count;
 public class WebUserRepositoryImpl implements WebUserRepository {
 
     private final DSLContext ctx;
-    private final ObjectMapper jacksonObjectMapper;
 
     @Override
     public void createUser(WebUserRecord user) {
@@ -141,29 +136,9 @@ public class WebUserRepositoryImpl implements WebUserRepository {
             .where(WEB_USER.WEB_USER_PK.eq(webUserPk))
             .fetchOne();
     }
-
+    
     @Override
-    public List<WebUserOverview> getOverview(WebUserQueryForm form) {
-        return getOverviewInternal(form)
-                .map(r -> WebUserOverview.builder()
-                        .webUserPk(r.value1())
-                        .webusername(r.value2())
-                        .enabled(r.value3())
-                        .autorithies(fromJson(r.value4()))
-                        .build()
-                );
-    }
-
-     private String[] fromJson(JSON jsonArray) {
-        try {
-            return jacksonObjectMapper.readValue(jsonArray.data(), String[].class);
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    @SuppressWarnings("unchecked")
-    private Result<Record4<Integer, String, Boolean, JSON>> getOverviewInternal(WebUserQueryForm form) {
+    public Result<Record4<Integer, String, Boolean, JSON>> getOverview(WebUserQueryForm form) {
         SelectQuery selectQuery = ctx.selectQuery();
         selectQuery.addFrom(WEB_USER);
         selectQuery.addSelect(
@@ -174,7 +149,7 @@ public class WebUserRepositoryImpl implements WebUserRepository {
         );
 
         if (form.isSetWebusername()) {
-            selectQuery.addConditions(WEB_USER.USERNAME.eq(form.getWebusername()));
+            selectQuery.addConditions(WEB_USER.USERNAME.eq(form.getWebUsername()));
         }
 
         if (form.isSetEnabled()) {
@@ -184,8 +159,8 @@ public class WebUserRepositoryImpl implements WebUserRepository {
         if (form.isSetRoles()) {
             String[] roles = form.getRoles().split(","); //Semicolon seperated String to StringArray
             for (String role : roles) {
-                JSON authValue = JSON.json("\"" + role.strip() + "\"");
-                selectQuery.addConditions(condition("json_contains({0}, {1})", WEB_USER.AUTHORITIES, authValue)); // strip--> No Withspace
+                JSON authValue = JSON.json("\"" + role.strip() + "\""); // strip --> No Withspace
+                selectQuery.addConditions(condition("json_contains({0}, {1})", WEB_USER.AUTHORITIES, authValue)); 
             }
         }
 

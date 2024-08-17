@@ -48,8 +48,8 @@ public class WebUsersController {
 
     private static final String QUERY_PATH = "/query";
 
-    private static final String DETAILS_PATH = "/details/{webuserpk}";
-    private static final String DELETE_ALL_PATH = "/delete/{webuserpk}";
+    private static final String DETAILS_PATH = "/details/{webUserPk}";
+    private static final String DELETE_ALL_PATH = "/delete/{webUserPk}";
     private static final String UPDATE_PATH = "/update";
     private static final String ADD_PATH = "/add";
 
@@ -75,8 +75,8 @@ public class WebUsersController {
     }
 
     @RequestMapping(value = DETAILS_PATH, method = RequestMethod.GET)
-    public String getDetails(@PathVariable("webuserpk") Integer webuserpk, Model model) {
-       WebUserForm form = webUserService.getDetails(webuserpk);
+    public String getDetails(@PathVariable("webUserPk") Integer webUserPk, Model model) {
+       WebUserForm form = webUserService.getDetails(webUserPk);
 
         model.addAttribute("webuserForm", form);
         return "data-man/webuserDetails";
@@ -97,24 +97,24 @@ public class WebUsersController {
 
         // password is Null, Blank/Empty or less than 8 Characters then don't add and show an Error
         if (webuserForm.getPassword() == null) {
-            webuserForm.setPwerror(Boolean.TRUE);
+            webuserForm.setPwError(Boolean.TRUE);
             return "data-man/webuserAdd";
 
         }
 
         if ((webuserForm.getPassword().length() < 8) | webuserForm.getPassword().isBlank())
         /* | webuserForm.getPassword().isEmpty() in isBlank included */ {
-            webuserForm.setPwerror(Boolean.TRUE);
+            webuserForm.setPwError(Boolean.TRUE);
             return "data-man/webuserAdd";
         }
 
         // Compare both the password inputs
         if (!webuserForm.getPassword().equals(webuserForm.getPasswordComparison())) {
-            webuserForm.setPwerror(Boolean.TRUE);
+            webuserForm.setPwError(Boolean.TRUE);
             return "data-man/webuserAdd";
         }
 
-        webuserForm.setPwerror(Boolean.FALSE);
+        webuserForm.setPwError(Boolean.FALSE);
 
         webUserService.add(webuserForm);
         return toOverview();
@@ -129,13 +129,13 @@ public class WebUsersController {
 
         if (webuserForm.getPassword() != null) {
             if (!webuserForm.getPassword().equals(webuserForm.getPasswordComparison())) {
-                webuserForm.setPwerror(Boolean.TRUE);
+                webuserForm.setPwError(Boolean.TRUE);
                 return "data-man/webuserDetails";
             }
             // password is Blank or less than 8 Characters then don't update and show an Error
             // --> WebUserRepositoryImpl: Null and Empty update without updating the password
             if (webuserForm.getPassword().isBlank() | webuserForm.getPassword().length() < 8) {
-                webuserForm.setPwerror(Boolean.TRUE);
+                webuserForm.setPwError(Boolean.TRUE);
                 return "data-man/webuserDetails";
             }
         }
@@ -145,8 +145,8 @@ public class WebUsersController {
     }
 
     @RequestMapping(value = DELETE_ALL_PATH, method = RequestMethod.POST)
-    public String delete(@PathVariable("webuserpk") Integer webuserpk) {
-        webUserService.deleteUser(webuserpk);
+    public String delete(@PathVariable("webUserPk") Integer webUserPk) {
+        webUserService.deleteUser(webUserPk);
         return toOverview();
     }
 

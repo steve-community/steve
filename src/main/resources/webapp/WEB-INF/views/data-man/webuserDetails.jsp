@@ -29,7 +29,7 @@
         </ul>
     </div>
 </spring:hasBindErrors>
-<c:if test="${webuserForm.pwerror == true}">
+<c:if test="${webuserForm.pwError == true}">
         <div class="error">The password is to short or the password input is not identical.</div>
 </c:if>
 <div class="content"><div>
@@ -38,7 +38,7 @@
         <table class="userInput">
             <thead><tr><th>Webuser</th><th></th></tr></thead>
             <tbody>
-                <tr><td>Username:</td><td>${webuserForm.webusername}<form:hidden path="webusername" readonly="true"/></td></tr>
+                <tr><td>Username:</td><td>${webuserForm.webUsername}<form:hidden path="webUsername" readonly="true"/></td></tr>
                 <tr><td>Password:</td><td><form:password path="password" title="If needed a new password can be set."/></td></tr>
                 <tr><td>Password confirmation:</td><td><form:password path="passwordComparison" title="Confirm the password, then push the update button" /></td></tr>
                 <tr><td>Roles:</td>

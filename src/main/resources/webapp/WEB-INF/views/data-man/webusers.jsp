@@ -30,7 +30,7 @@
         <table class="userInput">
             <tr>
                 <td>Username:</td>
-                <td><form:input path="webusername" title="Search Web-User with the name" /></td>
+                <td><form:input path="webUsername" title="Search Web-User with the name" /></td>
             </tr>
             <tr>
                 <td></td>
@@ -57,9 +57,9 @@
         <tbody>
         <c:forEach items="${webuserList}" var="cr">
             <tr>
-                <td><a href="${ctxPath}/manager/webusers/details/${cr.webUserPk}">${cr.webusername}</a></td>
+                <td><a href="${ctxPath}/manager/webusers/details/${cr.webUserPk}">${cr.webUsername}</a></td>
                 <td>
-                    <c:forEach items="${cr.autorithies}" var="auth">
+                    <c:forEach items="${cr.authorities}" var="auth">
                         ${auth}<br>
                     </c:forEach>
                 </td>

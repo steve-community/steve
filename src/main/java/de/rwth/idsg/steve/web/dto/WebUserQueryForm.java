@@ -35,12 +35,12 @@ public class WebUserQueryForm {
     private Boolean enabled;
 
     // Free text input
-    private String webusername;
+    private String webUsername;
     private String roles;
-    private String apitoken;
+    private String apiToken;
 
     public boolean isSetWebusername() {
-        return webusername != null;
+        return webUsername != null;
     }
 
     public boolean isSetRoles() {
@@ -52,7 +52,7 @@ public class WebUserQueryForm {
     }
 
     public boolean isSetApiKey() {
-        return apitoken != null;
+        return apiToken != null;
     }
 
 }

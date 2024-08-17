@@ -43,7 +43,7 @@ public class WebUserForm {
 
     private String authorities;
 
-    private Boolean pwerror;
+    private Boolean pwError;
 
-    private String apitoken;
+    private String apiToken;
 }

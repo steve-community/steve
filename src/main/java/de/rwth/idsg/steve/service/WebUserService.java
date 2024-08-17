@@ -63,6 +63,11 @@ public class WebUserService implements UserDetailsManager {
 
     @EventListener
     public void afterStart(ContextRefreshedEvent event) {
+        moveUserFromConfigToDatabase();
+        moveApiTokenFromConfigToDatabase();
+    }
+
+    private void moveUserFromConfigToDatabase() {
         if (this.hasUserWithAuthority("ADMIN")) {
             return;
         }
@@ -75,6 +80,10 @@ public class WebUserService implements UserDetailsManager {
             .build();
 
         this.createUser(user);
+    }
+
+    private void moveApiTokenFromConfigToDatabase() {
+        // TODO
     }
 
     @Override
@@ -135,6 +144,26 @@ public class WebUserService implements UserDetailsManager {
         return User
             .withUsername(record.getUsername())
             .password(record.getPassword())
+            .disabled(!record.getEnabled())
+            .authorities(fromJson(record.getAuthorities()))
+            .build();
+    }
+
+    public UserDetails loadUserByUsernameForApi(String username) {
+        WebUserRecord record = webUserRepository.loadUserByUsername(username);
+        if (record == null) {
+            return null;
+        }
+
+        // the builder User.password(..) does not allow null values
+        String apiPassword = record.getApiToken();
+        if (apiPassword == null) {
+            apiPassword = "";
+        }
+
+        return User
+            .withUsername(record.getUsername())
+            .password(apiPassword)
             .disabled(!record.getEnabled())
             .authorities(fromJson(record.getAuthorities()))
             .build();

@@ -35,7 +35,7 @@ public class WebUserForm {
 
     private Boolean enabled;
 
-    private String webusername;
+    private String webUsername;
 
     private String password;
 

@@ -195,8 +195,8 @@ public class WebUserService implements UserDetailsManager {
 
         form.setEnabled(ur.getEnabled());
         form.setWebUsername(ur.getUsername());
-        form.setPassword(ur.getPassword());
-        form.setApiToken(ur.getApiToken());
+        form.setPassword(""); // don't expose the pw 
+        form.setApiToken(""); // ur.getApiToken()
         form.setAuthorities(rolesStr(fromJson(ur.getAuthorities())));
 
         return form;

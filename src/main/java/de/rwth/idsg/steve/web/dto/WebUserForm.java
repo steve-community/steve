@@ -22,7 +22,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 
- /**
+/**
  * @author fnkbsi
  * @since 01.04.2022
  */
@@ -37,7 +37,7 @@ public class WebUserForm {
 
     private String webUsername;
 
-    private String password;
+    private String password = ""; // don't expose the pw
 
     private String passwordComparison;
 
@@ -45,5 +45,5 @@ public class WebUserForm {
 
     private Boolean pwError;
 
-    private String apiToken;
+    private String apiToken = "";
 }

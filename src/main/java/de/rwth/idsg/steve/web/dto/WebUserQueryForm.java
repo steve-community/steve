@@ -24,7 +24,7 @@ package de.rwth.idsg.steve.web.dto;
 import lombok.Getter;
 import lombok.Setter;
 
- /**
+/**
  * @author fnkbsi
  * @since 01.04.2022
  */
@@ -39,7 +39,7 @@ public class WebUserQueryForm {
     private String roles;
     private String apiToken;
 
-    public boolean isSetWebusername() {
+    public boolean isSetWebUsername() {
         return webUsername != null;
     }
 

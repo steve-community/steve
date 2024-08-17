@@ -23,6 +23,7 @@ import de.rwth.idsg.steve.web.dto.WebUserQueryForm;
 import jooq.steve.db.tables.records.WebUserRecord;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.jooq.Condition;
 import org.jooq.DSLContext;
 import org.jooq.JSON;
 import org.springframework.stereotype.Repository;
@@ -31,6 +32,11 @@ import static jooq.steve.db.Tables.WEB_USER;
 import org.jooq.Record4;
 import org.jooq.Result;
 import org.jooq.SelectQuery;
+
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
 import static org.jooq.impl.DSL.condition;
 import static org.jooq.impl.DSL.count;
 
@@ -99,10 +105,9 @@ public class WebUserRepositoryImpl implements WebUserRepository {
 
     @Override
     public Integer getUserCountWithAuthority(String authority) {
-        JSON authValue = JSON.json("\"" + authority + "\"");
         return ctx.selectCount()
             .from(WEB_USER)
-            .where(condition("json_contains({0}, {1})", WEB_USER.AUTHORITIES, authValue))
+            .where(conditionsForAuthorities(Collections.singletonList(authority)))
             .fetchOne(count());
     }
 
@@ -136,7 +141,7 @@ public class WebUserRepositoryImpl implements WebUserRepository {
             .where(WEB_USER.WEB_USER_PK.eq(webUserPk))
             .fetchOne();
     }
-    
+
     @Override
     public Result<Record4<Integer, String, Boolean, JSON>> getOverview(WebUserQueryForm form) {
         SelectQuery selectQuery = ctx.selectQuery();
@@ -148,7 +153,7 @@ public class WebUserRepositoryImpl implements WebUserRepository {
                 WEB_USER.AUTHORITIES
         );
 
-        if (form.isSetWebusername()) {
+        if (form.isSetWebUsername()) {
             selectQuery.addConditions(WEB_USER.USERNAME.eq(form.getWebUsername()));
         }
 
@@ -157,13 +162,18 @@ public class WebUserRepositoryImpl implements WebUserRepository {
         }
 
         if (form.isSetRoles()) {
-            String[] roles = form.getRoles().split(","); //Semicolon seperated String to StringArray
-            for (String role : roles) {
-                JSON authValue = JSON.json("\"" + role.strip() + "\""); // strip --> No Withspace
-                selectQuery.addConditions(condition("json_contains({0}, {1})", WEB_USER.AUTHORITIES, authValue)); 
-            }
+            String[] split = form.getRoles().split(","); //Semicolon seperated String to StringArray
+            List<String> roles = Arrays.stream(split).map(String::strip).toList();
+            selectQuery.addConditions(conditionsForAuthorities(roles));
         }
 
         return selectQuery.fetch();
+    }
+
+    private static List<Condition> conditionsForAuthorities(List<String> authorities) {
+        return authorities.stream()
+            .map(it -> JSON.json("\"" + it + "\""))
+            .map(it -> condition("json_contains({0}, {1})", WEB_USER.AUTHORITIES, it))
+            .toList();
     }
 }

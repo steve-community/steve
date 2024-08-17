@@ -26,7 +26,6 @@ import de.rwth.idsg.steve.repository.WebUserRepository;
 import de.rwth.idsg.steve.service.dto.WebUserOverview;
 import de.rwth.idsg.steve.web.dto.WebUserForm;
 import de.rwth.idsg.steve.web.dto.WebUserQueryForm;
-import java.util.ArrayList;
 import jooq.steve.db.tables.records.WebUserRecord;
 import lombok.RequiredArgsConstructor;
 import org.jooq.JSON;
@@ -40,6 +39,7 @@ import org.springframework.security.core.context.SecurityContextHolderStrategy;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.JdbcUserDetailsManager;
 import org.springframework.security.provisioning.UserDetailsManager;
 import org.springframework.stereotype.Service;
@@ -51,9 +51,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static org.springframework.security.authentication.UsernamePasswordAuthenticationToken.authenticated;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import static org.springframework.security.core.context.SecurityContextHolder.getContextHolderStrategy;
-import org.springframework.security.crypto.password.PasswordEncoder;
 
 /**
  * Inspired by {@link org.springframework.security.provisioning.JdbcUserDetailsManager}
@@ -167,11 +165,10 @@ public class WebUserService implements UserDetailsManager {
         createUser(toUserDetails(form));
     }
 
-
     public void update(WebUserForm form) {
         updateUser(toUserDetails(form));
     }
-    
+
     public List<WebUserOverview> getOverview(WebUserQueryForm form) {
         return webUserRepository.getOverview(form)
                 .map(r -> WebUserOverview.builder()
@@ -191,29 +188,14 @@ public class WebUserService implements UserDetailsManager {
             throw new SteveException("There is no user with id '%d'", webUserPk);
         }
 
-        WebUserForm form = new WebUserForm();
+        String[] authValues = fromJson(ur.getAuthorities());
+        String joinedAuthValues = String.join(", ", authValues);
 
+        WebUserForm form = new WebUserForm();
         form.setEnabled(ur.getEnabled());
         form.setWebUsername(ur.getUsername());
-        form.setPassword(""); // don't expose the pw 
-        form.setApiToken(""); // ur.getApiToken()
-        form.setAuthorities(rolesStr(fromJson(ur.getAuthorities())));
-
+        form.setAuthorities(joinedAuthValues);
         return form;
-    }
-
-    private static String rolesStr(String[] authorities) {
-        String roles = "";
-
-        for (String ar : authorities) {
-            roles = roles + ar + ", ";
-        }
-        roles = roles.strip();
-        if (!roles.isBlank()) { //(roles.endsWith(","))
-            roles = roles.substring(0, roles.length() - 1);
-        }
-
-        return roles;
     }
 
     // Helpers
@@ -227,17 +209,16 @@ public class WebUserService implements UserDetailsManager {
 
     private UserDetails toUserDetails(WebUserForm form) {
         String encPw = "";
-        if (form.getPassword()!= null) {
+        if (form.getPassword() != null) {
             //encPw = form.getPassword();
             encPw = encoder.encode(form.getPassword());
         }
-        var user = User
-                .withUsername(form.getWebUsername())
-                .password(encPw)
-                .disabled(!form.getEnabled())
-                .authorities(toAuthorities(form.getAuthorities()))
-                .build();
-        return user;
+        return User
+            .withUsername(form.getWebUsername())
+            .password(encPw)
+            .disabled(!form.getEnabled())
+            .authorities(form.getAuthorities().split(","))
+            .build();
     }
 
     private String[] fromJson(JSON jsonArray) {
@@ -246,15 +227,6 @@ public class WebUserService implements UserDetailsManager {
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
-    }
-
-    private Collection<? extends GrantedAuthority> toAuthorities(String authoritiesStr) {
-        String[] authoritiesList = authoritiesStr.split(",");
-        List<GrantedAuthority> authorities = new ArrayList<>();
-        for (String authStr: authoritiesList) {
-            authorities.add(new SimpleGrantedAuthority(authStr.strip()));
-        }
-        return authorities;
     }
 
     private JSON toJson(Collection<? extends GrantedAuthority> authorities) {

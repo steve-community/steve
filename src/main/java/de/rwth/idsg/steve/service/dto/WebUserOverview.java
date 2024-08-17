@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package de.rwth.idsg.steve.repository.dto;
+package de.rwth.idsg.steve.service.dto;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -26,6 +26,6 @@ public final class WebUserOverview {
 
     private final Integer webUserPk;
     private final Boolean enabled;
-    private final String webusername;
-    private final String[] autorithies;
+    private final String webUsername;
+    private final String[] authorities;
 }

@@ -41,7 +41,7 @@ public class WebUserForm {
 
     private String passwordComparison;
 
-    private String authorities;
+    private WebUserAuthority authorities;
 
     private Boolean pwError;
 

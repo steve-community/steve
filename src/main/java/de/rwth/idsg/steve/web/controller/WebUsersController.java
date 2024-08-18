@@ -20,6 +20,7 @@ package de.rwth.idsg.steve.web.controller;
 
 
 import de.rwth.idsg.steve.service.WebUserService;
+import de.rwth.idsg.steve.web.dto.WebUserAuthority;
 import de.rwth.idsg.steve.web.dto.WebUserForm;
 import de.rwth.idsg.steve.web.dto.WebUserQueryForm;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -84,7 +85,9 @@ public class WebUsersController {
 
     @RequestMapping(value = ADD_PATH, method = RequestMethod.GET)
     public String addGet(Model model) {
-        model.addAttribute("webuserForm", new WebUserForm());
+        WebUserForm webUserForm = new WebUserForm();
+        webUserForm.setAuthorities(WebUserAuthority.USER);
+        model.addAttribute("webuserForm", webUserForm);
         return "data-man/webuserAdd";
     }
 

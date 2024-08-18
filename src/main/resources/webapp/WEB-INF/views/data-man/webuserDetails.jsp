@@ -44,11 +44,10 @@
                 <tr><td>Roles:</td>
                     <td>
                         <select id="myRoleList" name="authorities" path="authorities" title="List of roles/authoriies the web-user has.">
-                            <option value="${webuserForm.authorities}" >${webuserForm.authorities}</option>
-                            <option value="USER" >USER</option>
-                            <option value="ADMIN" >ADMIN</option>
-                            <option value="USER,ADMIN" >USER, ADMIN</option>
-                        </select>
+                            <c:forEach items="${webuserForm.authorities.values()}" var="auth">
+                                <option value="${auth}" ${auth == webuserForm.authorities ? 'selected' : ''} >"${auth.value}"</option>
+                            </c:forEach>
+                        </select>     
                     </td>
                 </tr>
                 <tr>

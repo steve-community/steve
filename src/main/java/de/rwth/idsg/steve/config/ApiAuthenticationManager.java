@@ -20,8 +20,6 @@ package de.rwth.idsg.steve.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Strings;
-import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
 import de.rwth.idsg.steve.service.WebUserService;
 import de.rwth.idsg.steve.web.api.ApiControllerAdvice;
 import lombok.RequiredArgsConstructor;
@@ -34,7 +32,6 @@ import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.AuthenticationEntryPoint;
@@ -45,9 +42,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
-import java.util.Collections;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -58,17 +52,9 @@ import java.util.concurrent.TimeUnit;
 @RequiredArgsConstructor
 public class ApiAuthenticationManager implements AuthenticationManager, AuthenticationEntryPoint {
 
-    // Because Guava's cache does not accept a null value
-    private static final UserDetails DUMMY_USER = new User("#", "#", Collections.emptyList());
-
     private final WebUserService webUserService;
     private final PasswordEncoder passwordEncoder;
     private final ObjectMapper jacksonObjectMapper;
-
-    private final Cache<String, UserDetails> userCache = CacheBuilder.newBuilder()
-        .expireAfterWrite(10, TimeUnit.MINUTES) // TTL
-        .maximumSize(100)
-        .build();
 
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
@@ -79,7 +65,7 @@ public class ApiAuthenticationManager implements AuthenticationManager, Authenti
             throw new BadCredentialsException("Required parameters missing");
         }
 
-        UserDetails userDetails = getFromCacheOrDatabase(username);
+        UserDetails userDetails = webUserService.loadUserByUsernameForApi(username);
         if (!areValuesSet(userDetails)) {
             throw new DisabledException("The user does not exist, exists but is disabled or has API access disabled.");
         }
@@ -113,19 +99,8 @@ public class ApiAuthenticationManager implements AuthenticationManager, Authenti
         response.getWriter().print(jacksonObjectMapper.writeValueAsString(apiResponse));
     }
 
-    private UserDetails getFromCacheOrDatabase(String username) {
-        try {
-            return userCache.get(username, () -> {
-                UserDetails user = webUserService.loadUserByUsernameForApi(username);
-                return (user == null) ? DUMMY_USER : user;
-            });
-        } catch (ExecutionException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
     private static boolean areValuesSet(UserDetails userDetails) {
-        if (userDetails == null || userDetails == DUMMY_USER) {
+        if (userDetails == null) {
             return false;
         }
         if (!userDetails.isEnabled()) {

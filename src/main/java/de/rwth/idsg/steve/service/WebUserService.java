@@ -20,6 +20,8 @@ package de.rwth.idsg.steve.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 import de.rwth.idsg.steve.SteveConfiguration;
 import de.rwth.idsg.steve.repository.WebUserRepository;
 import jooq.steve.db.tables.records.WebUserRecord;
@@ -41,7 +43,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedHashSet;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import static org.springframework.security.authentication.UsernamePasswordAuthenticationToken.authenticated;
@@ -57,9 +62,17 @@ import static org.springframework.security.core.context.SecurityContextHolder.ge
 @RequiredArgsConstructor
 public class WebUserService implements UserDetailsManager {
 
+    // Because Guava's cache does not accept a null value
+    private static final UserDetails DUMMY_USER = new User("#", "#", Collections.emptyList());
+
     private final ObjectMapper jacksonObjectMapper;
     private final WebUserRepository webUserRepository;
     private final SecurityContextHolderStrategy securityContextHolderStrategy = getContextHolderStrategy();
+
+    private final Cache<String, UserDetails> userCache = CacheBuilder.newBuilder()
+        .expireAfterWrite(10, TimeUnit.MINUTES) // TTL
+        .maximumSize(100)
+        .build();
 
     @EventListener
     public void afterStart(ContextRefreshedEvent event) {
@@ -150,23 +163,17 @@ public class WebUserService implements UserDetailsManager {
     }
 
     public UserDetails loadUserByUsernameForApi(String username) {
-        WebUserRecord record = webUserRepository.loadUserByUsername(username);
-        if (record == null) {
-            return null;
+        try {
+            UserDetails userExt = userCache.get(username, () -> {
+                UserDetails user = this.loadUserByUsernameForApiInternal(username);
+                // map null to dummy
+                return (user == null) ? DUMMY_USER : user;
+            });
+            // map dummy back to null
+            return (userExt == DUMMY_USER) ? null : userExt;
+        } catch (ExecutionException e) {
+            throw new RuntimeException(e);
         }
-
-        // the builder User.password(..) does not allow null values
-        String apiPassword = record.getApiToken();
-        if (apiPassword == null) {
-            apiPassword = "";
-        }
-
-        return User
-            .withUsername(record.getUsername())
-            .password(apiPassword)
-            .disabled(!record.getEnabled())
-            .authorities(fromJson(record.getAuthorities()))
-            .build();
     }
 
     public void deleteUser(int webUserPk) {
@@ -180,6 +187,26 @@ public class WebUserService implements UserDetailsManager {
     public boolean hasUserWithAuthority(String authority) {
         Integer count = webUserRepository.getUserCountWithAuthority(authority);
         return count != null && count > 0;
+    }
+
+    private UserDetails loadUserByUsernameForApiInternal(String username) {
+        WebUserRecord record = webUserRepository.loadUserByUsername(username);
+        if (record == null) {
+            return null;
+        }
+
+        // the builder User.password(..) does not allow null values
+        String apiPassword = record.getApiPassword();
+        if (apiPassword == null) {
+            apiPassword = "";
+        }
+
+        return User
+            .withUsername(record.getUsername())
+            .password(apiPassword)
+            .disabled(!record.getEnabled())
+            .authorities(fromJson(record.getAuthorities()))
+            .build();
     }
 
     private WebUserRecord toWebUserRecord(UserDetails user) {

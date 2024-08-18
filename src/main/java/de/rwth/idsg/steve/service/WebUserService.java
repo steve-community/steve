@@ -26,6 +26,7 @@ import de.rwth.idsg.steve.repository.WebUserRepository;
 import de.rwth.idsg.steve.service.dto.WebUserOverview;
 import de.rwth.idsg.steve.web.dto.WebUserForm;
 import de.rwth.idsg.steve.web.dto.WebUserQueryForm;
+import java.util.Arrays;
 import jooq.steve.db.tables.records.WebUserRecord;
 import lombok.RequiredArgsConstructor;
 import org.jooq.JSON;
@@ -175,7 +176,7 @@ public class WebUserService implements UserDetailsManager {
                         .webUserPk(r.value1())
                         .webUsername(r.value2())
                         .enabled(r.value3())
-                        .authorities(fromJson(r.value4()))
+                        .authorities(fromJsonToString(r.value4()))
                         .build()
                 );
     }
@@ -188,13 +189,10 @@ public class WebUserService implements UserDetailsManager {
             throw new SteveException("There is no user with id '%d'", webUserPk);
         }
 
-        String[] authValues = fromJson(ur.getAuthorities());
-        String joinedAuthValues = String.join(", ", authValues);
-
         WebUserForm form = new WebUserForm();
         form.setEnabled(ur.getEnabled());
         form.setWebUsername(ur.getUsername());
-        form.setAuthorities(joinedAuthValues);
+        form.setAuthorities(fromJsonToString(ur.getAuthorities()));
         return form;
     }
 
@@ -219,6 +217,11 @@ public class WebUserService implements UserDetailsManager {
             .disabled(!form.getEnabled())
             .authorities(form.getAuthorities().split(","))
             .build();
+    }
+
+    private String fromJsonToString(JSON jsonArray) {
+        String[] authValues = fromJson(jsonArray);
+        return String.join(", ", authValues);
     }
 
     private String[] fromJson(JSON jsonArray) {

@@ -27,5 +27,5 @@ public final class WebUserOverview {
     private final Integer webUserPk;
     private final Boolean enabled;
     private final String webUsername;
-    private final String[] authorities;
+    private final String authorities;
 }

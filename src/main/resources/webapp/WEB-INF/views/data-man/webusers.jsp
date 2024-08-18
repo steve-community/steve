@@ -58,11 +58,7 @@
         <c:forEach items="${webuserList}" var="cr">
             <tr>
                 <td><a href="${ctxPath}/manager/webusers/details/${cr.webUserPk}">${cr.webUsername}</a></td>
-                <td>
-                    <c:forEach items="${cr.authorities}" var="auth">
-                        ${auth}<br>
-                    </c:forEach>
-                </td>
+                <td>"${cr.authorities}"</td>
                 <td>${cr.enabled}</td>
                 <td>
                     <form:form action="${ctxPath}/manager/webusers/delete/${cr.webUserPk}">

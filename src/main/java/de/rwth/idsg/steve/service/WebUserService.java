@@ -76,11 +76,6 @@ public class WebUserService implements UserDetailsManager {
 
     @EventListener
     public void afterStart(ContextRefreshedEvent event) {
-        moveUserFromConfigToDatabase();
-        moveApiTokenFromConfigToDatabase();
-    }
-
-    private void moveUserFromConfigToDatabase() {
         if (this.hasUserWithAuthority("ADMIN")) {
             return;
         }
@@ -93,10 +88,6 @@ public class WebUserService implements UserDetailsManager {
             .build();
 
         this.createUser(user);
-    }
-
-    private void moveApiTokenFromConfigToDatabase() {
-        // TODO
     }
 
     @Override

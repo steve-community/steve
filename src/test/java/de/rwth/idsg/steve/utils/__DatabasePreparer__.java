@@ -72,7 +72,7 @@ public class __DatabasePreparer__ {
     private static final String REGISTERED_OCPP_TAG = "id_tag_2aa6a783d47d";
 
     private static final BeanConfiguration beanConfiguration = new BeanConfiguration();
-    private static final DSLContext dslContext = beanConfiguration.dslContext();
+    private static final DSLContext dslContext = beanConfiguration.dslContext(beanConfiguration.dataSource());
 
     public static void prepare() {
         runOperation(ctx -> {

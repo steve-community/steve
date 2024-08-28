@@ -69,11 +69,11 @@ public class ApiDocsConfiguration {
     public OpenAPI apiDocs() {
         String title = "SteVe REST API Documentation";
 
-        String securityName = SteveConfiguration.CONFIG.getWebApi().getHeaderKey();
+        String securityName = "basicAuth";
 
         SecurityScheme securityScheme = new SecurityScheme()
-            .type(SecurityScheme.Type.APIKEY)
-            .in(SecurityScheme.In.HEADER)
+            .type(SecurityScheme.Type.HTTP)
+            .scheme("basic")
             .name(securityName);
 
         return new OpenAPI()

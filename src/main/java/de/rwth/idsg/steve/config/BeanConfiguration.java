@@ -29,7 +29,6 @@ import de.rwth.idsg.steve.SteveConfiguration;
 import de.rwth.idsg.steve.service.DummyReleaseCheckService;
 import de.rwth.idsg.steve.service.GithubReleaseCheckService;
 import de.rwth.idsg.steve.service.ReleaseCheckService;
-import de.rwth.idsg.steve.utils.DateTimeUtils;
 import de.rwth.idsg.steve.utils.InternetChecker;
 import lombok.extern.slf4j.Slf4j;
 import org.jooq.DSLContext;
@@ -41,8 +40,6 @@ import org.jooq.impl.DefaultConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.event.ContextRefreshedEvent;
-import org.springframework.context.event.EventListener;
 import org.springframework.core.Ordered;
 import org.springframework.format.support.FormattingConversionService;
 import org.springframework.http.converter.HttpMessageConverter;
@@ -60,6 +57,8 @@ import org.springframework.web.servlet.view.InternalResourceViewResolver;
 
 import jakarta.annotation.PreDestroy;
 import jakarta.validation.Validator;
+
+import javax.sql.DataSource;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ScheduledExecutorService;
@@ -82,13 +81,13 @@ import static de.rwth.idsg.steve.SteveConfiguration.CONFIG;
 @ComponentScan("de.rwth.idsg.steve")
 public class BeanConfiguration implements WebMvcConfigurer {
 
-    private HikariDataSource dataSource;
     private ScheduledThreadPoolExecutor executor;
 
     /**
      * https://github.com/brettwooldridge/HikariCP/wiki/MySQL-Configuration
      */
-    private void initDataSource() {
+    @Bean
+    public DataSource dataSource() {
         SteveConfiguration.DB dbConfig = CONFIG.getDb();
 
         HikariConfig hc = new HikariConfig();
@@ -110,7 +109,7 @@ public class BeanConfiguration implements WebMvcConfigurer {
         // https://github.com/steve-community/steve/issues/736
         hc.setMaxLifetime(580_000);
 
-        dataSource = new HikariDataSource(hc);
+        return new HikariDataSource(hc);
     }
 
     /**
@@ -126,9 +125,7 @@ public class BeanConfiguration implements WebMvcConfigurer {
      * - http://stackoverflow.com/questions/32848865/jooq-dslcontext-correct-autowiring-with-spring
      */
     @Bean
-    public DSLContext dslContext() {
-        initDataSource();
-
+    public DSLContext dslContext(DataSource dataSource) {
         Settings settings = new Settings()
                 // Normally, the records are "attached" to the Configuration that created (i.e. fetch/insert) them.
                 // This means that they hold an internal reference to the same database connection that was used.
@@ -176,17 +173,8 @@ public class BeanConfiguration implements WebMvcConfigurer {
         }
     }
 
-    @EventListener
-    public void afterStart(ContextRefreshedEvent event) {
-        DateTimeUtils.checkJavaAndMySQLOffsets(dslContext());
-    }
-
     @PreDestroy
     public void shutDown() {
-        if (dataSource != null) {
-            dataSource.close();
-        }
-
         if (executor != null) {
             gracefulShutDown(executor);
         }

@@ -18,6 +18,7 @@
  */
 package de.rwth.idsg.steve.repository.impl;
 
+import de.rwth.idsg.steve.SteveException;
 import de.rwth.idsg.steve.repository.GenericRepository;
 import de.rwth.idsg.steve.repository.ReservationStatus;
 import de.rwth.idsg.steve.repository.dto.DbVersion;
@@ -26,13 +27,18 @@ import de.rwth.idsg.steve.web.dto.Statistics;
 import lombok.extern.slf4j.Slf4j;
 import org.joda.time.DateTime;
 import org.jooq.DSLContext;
+import org.jooq.DatePart;
 import org.jooq.Field;
 import org.jooq.Record2;
 import org.jooq.Record9;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.event.ContextRefreshedEvent;
+import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Repository;
 
 import static de.rwth.idsg.steve.utils.CustomDSL.date;
+import static de.rwth.idsg.steve.utils.CustomDSL.timestampDiff;
+import static de.rwth.idsg.steve.utils.CustomDSL.utcTimestamp;
 import static jooq.steve.db.Tables.RESERVATION;
 import static jooq.steve.db.Tables.TRANSACTION;
 import static jooq.steve.db.tables.ChargeBox.CHARGE_BOX;
@@ -52,6 +58,25 @@ import static org.jooq.impl.DSL.select;
 public class GenericRepositoryImpl implements GenericRepository {
 
     @Autowired private DSLContext ctx;
+
+    @EventListener
+    public void afterStart(ContextRefreshedEvent event) {
+        checkJavaAndMySQLOffsets();
+    }
+
+    @Override
+    public void checkJavaAndMySQLOffsets() {
+        long java = DateTimeUtils.getOffsetFromUtcInSeconds();
+
+        long sql = ctx.select(timestampDiff(DatePart.SECOND, utcTimestamp(), DSL.currentTimestamp()))
+                      .fetchOne()
+                      .getValue(0, Long.class);
+
+        if (sql != java) {
+            throw new SteveException("MySQL and Java are not using the same time zone. " +
+                "Java offset in seconds (%s) != MySQL offset in seconds (%s)", java, sql);
+        }
+    }
 
     @Override
     public Statistics getStats() {

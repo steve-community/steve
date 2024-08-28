@@ -31,6 +31,7 @@ import org.jooq.DatePart;
 import org.jooq.Field;
 import org.jooq.Record2;
 import org.jooq.Record9;
+import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.EventListener;

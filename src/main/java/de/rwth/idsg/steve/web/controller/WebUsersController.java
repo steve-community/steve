@@ -123,11 +123,11 @@ public class WebUsersController {
         webUserForm.setWebUsername(webUserBaseForm.getWebUsername());
         webUserForm.setAuthorities(webUserBaseForm.getAuthorities());
         webUserForm.setEnabled(webUserBaseForm.getEnabled());
-        
+
         model.addAttribute("webuserForm", webUserForm);
         return "data-man/webuserPassword";
     }
-    
+
     @RequestMapping(params = "change", value = PASSWORD_PATH, method = RequestMethod.POST)
     public String passwordChange(@Valid @ModelAttribute("webuserForm") WebUserForm webuserForm,
                          BindingResult result, Model model) {
@@ -153,7 +153,7 @@ public class WebUsersController {
     public String passwordBackToOverview() {
         return toOverview();
     }
-    
+
     @RequestMapping(params = "backToOverview", value = ADD_PATH, method = RequestMethod.POST)
     public String addBackToOverview() {
         return toOverview();

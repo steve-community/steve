@@ -72,7 +72,7 @@ public class WebUserRepositoryImpl implements WebUserRepository {
             .where(WEB_USER.USERNAME.eq(user.getUsername()))
             .execute();
     }
-    
+
     @Override
     public void updateUserByPk(WebUserRecord user) {
         // To change the password use one of the changePassword methods
@@ -121,7 +121,7 @@ public class WebUserRepositoryImpl implements WebUserRepository {
             .where(WEB_USER.USERNAME.eq(username))
             .execute();
     }
-    
+
     @Override
     public void changePassword(Integer userPk, String newPassword) {
         ctx.update(WEB_USER)

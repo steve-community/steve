@@ -29,7 +29,7 @@ public interface WebUserRepository  {
     void createUser(WebUserRecord user);
 
     void updateUser(WebUserRecord user);
-    
+
     void updateUserByPk(WebUserRecord user);
 
     void deleteUser(String username);
@@ -41,7 +41,7 @@ public interface WebUserRepository  {
     Integer getUserCountWithAuthority(String authority);
 
     void changePassword(String username, String newPassword);
-    
+
     void changePassword(Integer userPk, String newPassword);
 
     boolean userExists(String username);

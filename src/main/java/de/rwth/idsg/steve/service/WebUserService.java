@@ -25,6 +25,7 @@ import de.rwth.idsg.steve.SteveException;
 import de.rwth.idsg.steve.repository.WebUserRepository;
 import de.rwth.idsg.steve.service.dto.WebUserOverview;
 import de.rwth.idsg.steve.web.dto.WebUserAuthority;
+import de.rwth.idsg.steve.web.dto.WebUserBaseForm;
 import de.rwth.idsg.steve.web.dto.WebUserForm;
 import de.rwth.idsg.steve.web.dto.WebUserQueryForm;
 import jooq.steve.db.tables.records.WebUserRecord;
@@ -166,8 +167,18 @@ public class WebUserService implements UserDetailsManager {
         createUser(toUserDetails(form));
     }
 
-    public void update(WebUserForm form) {
-        updateUser(toUserDetails(form));
+    public void update(WebUserBaseForm form) {
+        validateUserDetails(toUserDetailsBaseForm(form));
+        WebUserRecord record = new WebUserRecord();
+        record.setWebUserPk(form.getWebUserPk());
+        record.setUsername(form.getWebUsername());
+        record.setEnabled(form.getEnabled());
+        record.setAuthorities(form.getAuthorities().getJsonValue());
+        webUserRepository.updateUserByPk(record);
+    }
+
+    public void updatePassword(WebUserForm form) {
+        webUserRepository.changePassword(form.getWebUserPk(), encoder.encode(form.getPassword()));
     }
 
     public List<WebUserOverview> getOverview(WebUserQueryForm form) {
@@ -183,17 +194,17 @@ public class WebUserService implements UserDetailsManager {
     }
 
 
-    public WebUserForm getDetails(Integer webUserPk) {
+    public WebUserBaseForm getDetails(Integer webUserPk) {
         WebUserRecord ur = webUserRepository.loadUserByUsePk(webUserPk);
 
         if (ur == null) {
             throw new SteveException("There is no user with id '%d'", webUserPk);
         }
 
-        WebUserForm form = new WebUserForm();
+        WebUserBaseForm form = new WebUserBaseForm();
+        form.setWebUserPk(ur.getWebUserPk());
         form.setEnabled(ur.getEnabled());
         form.setWebUsername(ur.getUsername());
-        //form.setAuthorities(fromJsonToString(ur.getAuthorities()));
         form.setAuthorities(WebUserAuthority.fromJsonValue(ur.getAuthorities()));
         return form;
     }
@@ -205,6 +216,15 @@ public class WebUserService implements UserDetailsManager {
             .setPassword(user.getPassword())
             .setEnabled(user.isEnabled())
             .setAuthorities(toJson(user.getAuthorities()));
+    }
+
+    private UserDetails toUserDetailsBaseForm(WebUserBaseForm form) {
+        return User
+            .withUsername(form.getWebUsername())
+            .password("")
+            .disabled(!form.getEnabled())
+            .authorities(fromJson(form.getAuthorities().getJsonValue()))
+            .build();
     }
 
     private UserDetails toUserDetails(WebUserForm form) {

@@ -18,8 +18,10 @@
  */
 package de.rwth.idsg.steve.web.dto;
 
+import jakarta.validation.constraints.AssertTrue;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.Getter;
-import lombok.Setter;
 
 
 /**
@@ -27,23 +29,33 @@ import lombok.Setter;
  * @since 01.04.2022
  */
 @Getter
-@Setter
-public class WebUserForm {
+public class WebUserForm extends WebUserBaseForm {
 
-    // Internal database id
-    //private Integer webUserPk;
+    @NotNull(message = "Password is required")
+    @Size(min=8, message = "Password requires 8 or more characters")
+    private String password = "";
 
-    private Boolean enabled;
-
-    private String webUsername;
-
-    private String password = ""; // don't expose the pw
-
+    @NotNull(message = "Password repetition is required")
+    @Size(min=8, message = "The repeated password also requires 8 or more characters")
     private String passwordComparison;
 
-    private WebUserAuthority authorities;
-
+    @AssertTrue(message = "The repeated password did not match!")
     private Boolean pwError;
 
     private String apiToken = "";
+    
+    public void setPassword(String password) {
+        this.password = password;
+    }
+    
+    public void setPasswordComparison(String passwordComparison) {
+        this.passwordComparison = passwordComparison;
+        if (passwordComparison != null) {
+            this.pwError = passwordComparison.equals(this.password);
+        }
+    }
+    
+    public void setApiToken(String apiToken) {
+        this.apiToken = apiToken;
+    }
 }

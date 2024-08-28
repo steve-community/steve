@@ -63,22 +63,24 @@ public class WebUserRepositoryImpl implements WebUserRepository {
 
     @Override
     public void updateUser(WebUserRecord user) {
-        // There is not alway the need to change the password
-        if (user.getPassword().isBlank()) {
-            ctx.update(WEB_USER)
-                .set(WEB_USER.USERNAME, user.getUsername())
-                .set(WEB_USER.ENABLED, user.getEnabled())
-                .set(WEB_USER.AUTHORITIES, user.getAuthorities())
-                .where(WEB_USER.USERNAME.eq(user.getUsername()))
-                .execute();
-        } else {
-            ctx.update(WEB_USER)
-                .set(WEB_USER.PASSWORD, user.getPassword())
-                .set(WEB_USER.ENABLED, user.getEnabled())
-                .set(WEB_USER.AUTHORITIES, user.getAuthorities())
-                .where(WEB_USER.USERNAME.eq(user.getUsername()))
-                .execute();
-        }
+        // To change the password use one of the changePassword methods
+        ctx.update(WEB_USER)
+            .set(WEB_USER.USERNAME, user.getUsername())
+            .set(WEB_USER.ENABLED, user.getEnabled())
+            .set(WEB_USER.AUTHORITIES, user.getAuthorities())
+            .where(WEB_USER.USERNAME.eq(user.getUsername()))
+            .execute();
+    }
+    
+    @Override
+    public void updateUserByPk(WebUserRecord user) {
+        // To change the password use one of the changePassword methods
+        ctx.update(WEB_USER)
+            .set(WEB_USER.USERNAME, user.getUsername())
+            .set(WEB_USER.ENABLED, user.getEnabled())
+            .set(WEB_USER.AUTHORITIES, user.getAuthorities())
+            .where(WEB_USER.WEB_USER_PK.eq(user.getWebUserPk()))
+            .execute();
     }
 
     @Override
@@ -116,6 +118,14 @@ public class WebUserRepositoryImpl implements WebUserRepository {
         ctx.update(WEB_USER)
             .set(WEB_USER.PASSWORD, newPassword)
             .where(WEB_USER.USERNAME.eq(username))
+            .execute();
+    }
+    
+    @Override
+    public void changePassword(Integer userPk, String newPassword) {
+        ctx.update(WEB_USER)
+            .set(WEB_USER.PASSWORD, newPassword)
+            .where(WEB_USER.WEB_USER_PK.eq(userPk))
             .execute();
     }
 

@@ -29,18 +29,21 @@
         </ul>
     </div>
 </spring:hasBindErrors>
-<c:if test="${webuserForm.pwError == true}">
-        <div class="error">The password is to short or the password input is not identical.</div>
-</c:if>
 <div class="content"><div>
     <section><span>Webuser Details</span></section>
     <form:form action="${ctxPath}/manager/webusers/update" modelAttribute="webuserForm">    
         <table class="userInput">
             <thead><tr><th>Webuser</th><th></th></tr></thead>
             <tbody>
-                <tr><td>Username:</td><td>${webuserForm.webUsername}<form:hidden path="webUsername" readonly="true"/></td></tr>
-                <tr><td>Password:</td><td><form:password path="password" title="If needed a new password can be set."/></td></tr>
-                <tr><td>Password confirmation:</td><td><form:password path="passwordComparison" title="Confirm the password, then push the update button" /></td></tr>
+                <tr><td>Username:</td><td>${webuserForm.webUsername} 
+                        <form:hidden path="webUsername" readonly="true"/>
+                        <form:hidden path="webUserPk" readonly="true"/>
+                </td></tr>
+                <tr><td></td>
+                    <td><a href="${ctxPath}/manager/webusers/password/${webuserForm.webUserPk}">
+                        <B>Change Password</B></a>
+                    </td>
+                </tr>
                 <tr><td>Roles:</td>
                     <td>
                         <select id="myRoleList" name="authorities" path="authorities" title="List of roles/authoriies the web-user has.">

@@ -3,9 +3,7 @@ package net.parkl.ocpp.service.middleware;
 import de.rwth.idsg.steve.ocpp.OcppProtocol;
 import de.rwth.idsg.steve.ocpp.RequestResult;
 import de.rwth.idsg.steve.repository.dto.ChargePointSelect;
-import de.rwth.idsg.steve.web.dto.ocpp.ResetParams;
-import de.rwth.idsg.steve.web.dto.ocpp.ResetType;
-import de.rwth.idsg.steve.web.dto.ocpp.UnlockConnectorParams;
+import de.rwth.idsg.steve.web.dto.ocpp.*;
 import lombok.extern.slf4j.Slf4j;
 import net.parkl.ocpp.entities.*;
 import net.parkl.ocpp.module.esp.model.ESPActiveTransaction;
@@ -17,6 +15,7 @@ import net.parkl.ocpp.repositories.TransactionRepository;
 import net.parkl.ocpp.repositories.TransactionStopRepository;
 import net.parkl.ocpp.service.cs.TransactionService;
 import net.parkl.ocpp.util.ListTransform;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -43,19 +42,9 @@ public class OcppAdminMiddleware extends AbstractOcppMiddleware {
 
     public void unlockConnector(String chargeBoxId, String chargerId) {
         log.info("Unlock connector request for {}-{}...", chargeBoxId, chargerId);
-        ChargePointSelect c;
-        OcppChargeBox chargeBox = chargeBoxRepo.findByChargeBoxId(chargeBoxId);
-        if (chargeBox == null) {
-            log.error("Invalid charge box id: {}", chargeBoxId);
-            throw new IllegalArgumentException("Invalid charge box ID: " + chargeBoxId);
-        }
+        OcppChargeBox chargeBox = getOcppChargeBox(chargeBoxId);
 
-        c = getChargePoint(chargeBox.getChargeBoxId(), chargeBox.getOcppProtocol());
-        if (c == null) {
-            log.error("Invalid charge point id: {}", chargeBoxId);
-            throw new IllegalArgumentException("Invalid charge box ID: " + chargeBoxId);
-
-        }
+        ChargePointSelect c = getChargePointSelect(chargeBox.getChargeBoxId(), chargeBox.getOcppProtocol());
 
         UnlockConnectorParams params = new UnlockConnectorParams();
         params.setChargePointSelectList(singletonList(c));
@@ -84,21 +73,28 @@ public class OcppAdminMiddleware extends AbstractOcppMiddleware {
         }
     }
 
+    private int sendTriggerMessage(TriggerMessageParams params, String protocol) {
+        OcppProtocol ocppProtocol = OcppProtocol.fromCompositeValue(protocol);
+
+        switch (ocppProtocol) {
+            case V_12_SOAP:
+            case V_12_JSON:
+            case V_15_SOAP:
+            case V_15_JSON:
+                throw new UnsupportedOperationException("Trigger message not supported for OCPP 1.2 and 1.5");
+            case V_16_SOAP:
+            case V_16_JSON:
+                return client16.triggerMessage(params);
+            default:
+                throw new IllegalStateException("OCPP protocol not supported: " + ocppProtocol);
+        }
+    }
+
     public void resetChargeBox(String chargeBoxId, boolean soft) {
         log.info("Reset request for {} (soft={}}...", chargeBoxId, soft);
-        ChargePointSelect c = null;
-        OcppChargeBox chargeBox = chargeBoxRepo.findByChargeBoxId(chargeBoxId);
-        if (chargeBox == null) {
-            log.error("Invalid charge box id: {}", chargeBoxId);
-            throw new IllegalArgumentException("Invalid charge box ID: " + chargeBoxId);
-        }
+        OcppChargeBox chargeBox = getOcppChargeBox(chargeBoxId);
 
-        c = getChargePoint(chargeBox.getChargeBoxId(), chargeBox.getOcppProtocol());
-        if (c == null) {
-            log.error("Invalid charge point id: {}", chargeBoxId);
-            throw new IllegalArgumentException("Invalid charge box ID: " + chargeBoxId);
-
-        }
+        ChargePointSelect c = getChargePointSelect(chargeBox.getChargeBoxId(), chargeBox.getOcppProtocol());
 
         ResetParams params = new ResetParams();
         params.setChargePointSelectList(singletonList(c));
@@ -204,5 +200,43 @@ public class OcppAdminMiddleware extends AbstractOcppMiddleware {
                     .build());
         }
         return result;
+    }
+
+    public void triggerMessage(String chargeBoxId, String chargerId, TriggerMessageEnum message) {
+        log.info("Trigger message request for {}-{}...", chargeBoxId, chargerId);
+        ;
+        OcppChargeBox chargeBox = getOcppChargeBox(chargeBoxId);
+
+        ChargePointSelect c = getChargePointSelect(chargeBoxId, chargeBox.getOcppProtocol());
+
+        TriggerMessageParams params = new TriggerMessageParams();
+        params.setChargePointSelectList(singletonList(c));
+        params.setConnectorId(Integer.parseInt(chargerId));
+        params.setTriggerMessage(message);
+        int taskId = sendTriggerMessage(params, chargeBox.getOcppProtocol());
+
+        RequestResult result = waitForResult(chargeBoxId, taskId);
+        processGenericResult("Trigger message", chargeBoxId, result);
+    }
+
+    @NotNull
+    private ChargePointSelect getChargePointSelect(String chargeBoxId, String protocol) {
+        ChargePointSelect c = getChargePoint(chargeBoxId, protocol);
+        if (c == null) {
+            log.error("Invalid charge point id: {}", chargeBoxId);
+            throw new IllegalArgumentException("Invalid charge box ID: " + chargeBoxId);
+
+        }
+        return c;
+    }
+
+
+    private OcppChargeBox getOcppChargeBox(String chargeBoxId) {
+        OcppChargeBox chargeBox = chargeBoxRepo.findByChargeBoxId(chargeBoxId);
+        if (chargeBox == null) {
+            log.error("Invalid charge box id: {}", chargeBoxId);
+            throw new IllegalArgumentException("Invalid charge box ID: " + chargeBoxId);
+        }
+        return chargeBox;
     }
 }

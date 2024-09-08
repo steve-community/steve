@@ -6,6 +6,8 @@ import net.parkl.ocpp.entities.Connector;
 import net.parkl.ocpp.entities.OcppRemoteStart;
 import net.parkl.ocpp.repositories.ConnectorRepository;
 import net.parkl.ocpp.repositories.OcppRemoteStartRepository;
+import net.parkl.ocpp.service.config.AdvancedChargeBoxConfiguration;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,8 +19,9 @@ import java.util.Date;
 public class RemoteStartService {
     private final OcppRemoteStartRepository remoteStartRepository;
     private final ConnectorRepository connectorRepo;
+    private final AdvancedChargeBoxConfiguration advancedChargeBoxConfiguration;
 
-    public final static int REMOTE_START_VALIDITY_SECS = 60;
+    private final static int DEFAULT_REMOTE_START_VALIDITY_SECS = 60;
 
     @Transactional
     public void remoteStartRequested(String chargeBoxId, int connectorId, String idTag) {
@@ -52,6 +55,19 @@ public class RemoteStartService {
             throw new IllegalStateException("Invalid charge box id/connector id: " + chargeBoxId + "/" + connectorId);
         }
         return remoteStartRepository.coundByConnectorAndOcppTagAfter(c, idTag,
-                new Date(System.currentTimeMillis() - REMOTE_START_VALIDITY_SECS*1000)) > 0;
+                getRemoteStartValidityThreshold(chargeBoxId)) > 0;
+    }
+
+
+    public Date getRemoteStartValidityThreshold(String chargeBoxId) {
+        return new Date(System.currentTimeMillis() - getRemoteStartValiditySecs(chargeBoxId) * 1000);
+    }
+
+    private int getRemoteStartValiditySecs(String chargeBoxId) {
+        int startTimeoutSecs = advancedChargeBoxConfiguration.getStartTimeoutSecs(chargeBoxId);
+        if (startTimeoutSecs > 0) {
+            return startTimeoutSecs;
+        }
+        return DEFAULT_REMOTE_START_VALIDITY_SECS;
     }
 }

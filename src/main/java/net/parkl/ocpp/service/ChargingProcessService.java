@@ -51,17 +51,20 @@ public class ChargingProcessService {
 
     private final TransactionStartRepository transactionStartRepository;
     private final TransactionStopRepository transactionStopRepository;
+    private final RemoteStartService remoteStartService;
 
     public ChargingProcessService(OcppChargingProcessRepository chargingProcessRepo,
                                   ConnectorRepository connectorRepo,
                                   AdvancedChargeBoxConfiguration advancedConfig,
                                   TransactionStartRepository transactionStartRepository,
-                                  TransactionStopRepository transactionStopRepository) {
+                                  TransactionStopRepository transactionStopRepository,
+                                  RemoteStartService remoteStartService) {
         this.chargingProcessRepo = chargingProcessRepo;
         this.connectorRepo = connectorRepo;
         this.advancedConfig = advancedConfig;
         this.transactionStartRepository = transactionStartRepository;
         this.transactionStopRepository = transactionStopRepository;
+        this.remoteStartService = remoteStartService;
     }
 
     public OcppChargingProcess findOpenChargingProcessWithoutTransaction(String chargeBoxId, int connectorId) {
@@ -102,7 +105,8 @@ public class ChargingProcessService {
         TransactionStart lastTransaction = transactionStartRepository.findFirstByConnectorAndOcppTagOrderByStartTimestampDesc(c, idTag);
         if (lastTransaction != null) {
             if (transactionStopRepository.countByTransactionId(lastTransaction.getTransactionPk())==0 &&
-                    lastTransaction.getStartTimestamp().after(new Date(System.currentTimeMillis()-RemoteStartService.REMOTE_START_VALIDITY_SECS*1000))) {
+                    lastTransaction.getStartTimestamp()
+                            .after(remoteStartService.getRemoteStartValidityThreshold(chargeBoxId))) {
                 log.info("Using existing transaction for id tag {}: {}", idTag, lastTransaction.getTransactionPk());
                 startTransaction = lastTransaction;
             }

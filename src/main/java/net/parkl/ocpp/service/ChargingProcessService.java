@@ -25,6 +25,7 @@ import net.parkl.ocpp.entities.TransactionStart;
 import net.parkl.ocpp.repositories.ConnectorRepository;
 import net.parkl.ocpp.repositories.OcppChargingProcessRepository;
 import net.parkl.ocpp.repositories.TransactionStartRepository;
+import net.parkl.ocpp.repositories.TransactionStopRepository;
 import net.parkl.ocpp.service.config.AdvancedChargeBoxConfiguration;
 import net.parkl.ocpp.util.AsyncWaiter;
 import org.slf4j.Logger;
@@ -49,6 +50,7 @@ public class ChargingProcessService {
     private final AdvancedChargeBoxConfiguration advancedConfig;
 
     private final TransactionStartRepository transactionStartRepository;
+    private final TransactionStopRepository transactionStopRepository;
 
     public ChargingProcessService(OcppChargingProcessRepository chargingProcessRepo,
                                   ConnectorRepository connectorRepo,
@@ -94,6 +96,16 @@ public class ChargingProcessService {
             throw new IllegalStateException("Connector occupied: " + c.getConnectorId());
         }
 
+        TransactionStart startTransaction = null;
+        List<TransactionStart> startTransactions=transactionStartRepository.findByConnectorAndIdTagOrderByStartTimestampDesc(c, idTag);
+        if (!startTransactions.isEmpty()) {
+            TransactionStart lastTransaction = startTransactions.get(0);
+            if (transactionStopRepository.countByTransactionId(lastTransaction.getTransactionPk())==0) {
+                startTransaction = lastTransaction;
+            }
+
+        }
+
         OcppChargingProcess p = new OcppChargingProcess();
         p.setOcppChargingProcessId(UUID.randomUUID().toString());
         p.setConnector(c);
@@ -101,6 +113,7 @@ public class ChargingProcessService {
         p.setOcppTag(idTag);
         p.setLimitKwh(limitKwh);
         p.setLimitMinute(limitMinute);
+        p.setTransactionStart(startTransaction);
         return chargingProcessRepo.save(p);
     }
 

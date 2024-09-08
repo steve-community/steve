@@ -18,7 +18,7 @@ public class RemoteStartService {
     private final OcppRemoteStartRepository remoteStartRepository;
     private final ConnectorRepository connectorRepo;
 
-    private final static int REMOTE_START_VALIDITY_SECS = 5;
+    public final static int REMOTE_START_VALIDITY_SECS = 5;
 
     @Transactional
     public void remoteStartRequested(String chargeBoxId, int connectorId, String idTag) {

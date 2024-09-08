@@ -101,7 +101,9 @@ public class ChargingProcessService {
         TransactionStart startTransaction = null;
         TransactionStart lastTransaction = transactionStartRepository.findFirstByConnectorAndOcppTagOrderByStartTimestampDesc(c, idTag);
         if (lastTransaction != null) {
-            if (transactionStopRepository.countByTransactionId(lastTransaction.getTransactionPk())==0) {
+            if (transactionStopRepository.countByTransactionId(lastTransaction.getTransactionPk())==0 &&
+                    lastTransaction.getStartTimestamp().after(new Date(System.currentTimeMillis()-RemoteStartService.REMOTE_START_VALIDITY_SECS*1000))) {
+                log.info("Using existing transaction for id tag {}: {}", idTag, lastTransaction.getTransactionPk());
                 startTransaction = lastTransaction;
             }
 

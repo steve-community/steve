@@ -49,6 +49,8 @@ public class OcppChargingMiddleware extends AbstractOcppMiddleware {
 
     @Autowired
     private EmobilityServiceProvider emobilityServiceProvider;
+    @Autowired
+    private RemoteStartService remoteStartService;
 
     private OcppConsumptionListener consumptionListener;
     private OcppStopListener stopListener;
@@ -109,6 +111,9 @@ public class OcppChargingMiddleware extends AbstractOcppMiddleware {
             idTag = getAvailableIntegrationIdTag(chargeBox);
         }
 
+        remoteStartService.remoteStartRequested(c.getChargeBoxId(), id.getConnectorId(),
+                idTag);
+
         RemoteStartTransactionParams p = new RemoteStartTransactionParams();
         p.setIdTag(idTag);
         p.setChargePointSelectList(singletonList(c));
@@ -118,6 +123,7 @@ public class OcppChargingMiddleware extends AbstractOcppMiddleware {
 
         RequestResult result = waitForResult(req.getChargeBoxId(), taskId);
 
+        ESPChargingStartResult.ESPChargingStartResultBuilder resultBuilder = ESPChargingStartResult.builder();
         if (result != null) {
             if (result.getResponse() != null) {
                 if (result.getResponse().equals(ACCEPTED.value())) {
@@ -129,29 +135,30 @@ public class OcppChargingMiddleware extends AbstractOcppMiddleware {
                             req.getLimitKwh(),
                             req.getLimitMin());
                     log.info("Charging process created: {}", process.getOcppChargingProcessId());
-                    return ESPChargingStartResult.builder()
-                            .externalChargingProcessId(String.valueOf(process.getOcppChargingProcessId())).build();
+                    resultBuilder
+                            .externalChargingProcessId(String.valueOf(process.getOcppChargingProcessId()));
 
 
                 } else {
                     log.info("Proxy transaction rejected: {}", id.getChargeBoxId());
-                    return ESPChargingStartResult.builder().errorCode(ERROR_CODE_CHARGER_ERROR).build();
+                    resultBuilder.errorCode(ERROR_CODE_CHARGER_ERROR);
                 }
             } else if (result.getErrorMessage() != null) {
                 log.info("Proxy transaction error ({}): {}", result.getErrorMessage(), id.getChargeBoxId());
-                return ESPChargingStartResult.builder().errorCode(ERROR_CODE_CHARGER_ERROR).build();
+                resultBuilder.errorCode(ERROR_CODE_CHARGER_ERROR);
 
             } else {
                 log.info("Proxy start transaction unknown error: {}", id.getChargeBoxId());
-                return ESPChargingStartResult.builder().errorCode(ERROR_CODE_CHARGER_ERROR).build();
+                resultBuilder.errorCode(ERROR_CODE_CHARGER_ERROR);
 
             }
         } else {
             log.info("Proxy start transaction timeout: {}", id.getChargeBoxId());
-            return ESPChargingStartResult.builder().errorCode(ERROR_CODE_CHARGER_OFFLINE).build();
+            resultBuilder.errorCode(ERROR_CODE_CHARGER_OFFLINE);
 
         }
 
+        return resultBuilder.build();
 
     }
 

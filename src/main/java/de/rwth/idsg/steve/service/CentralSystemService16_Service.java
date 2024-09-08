@@ -37,6 +37,7 @@ import net.parkl.ocpp.entities.TransactionStart;
 import net.parkl.ocpp.module.esp.model.ESPRfidChargingStartRequest;
 import net.parkl.ocpp.service.ChargingProcessService;
 import net.parkl.ocpp.service.HeartBeatService;
+import net.parkl.ocpp.service.RemoteStartService;
 import net.parkl.ocpp.service.cs.*;
 import net.parkl.ocpp.service.middleware.OcppNotificationMiddleware;
 import ocpp.cs._2015._10.*;
@@ -81,6 +82,9 @@ public class CentralSystemService16_Service {
     private OcppNotificationMiddleware notificationMiddleware;
     @Autowired
     private HeartBeatService heartBeatService;
+
+    @Autowired
+    private RemoteStartService remoteStartService;
 
     public BootNotificationResponse bootNotification(BootNotificationRequest parameters, String chargeBoxIdentity,
                                                      OcppProtocol ocppProtocol) {
@@ -200,9 +204,9 @@ public class CentralSystemService16_Service {
 
         Integer transactionId;
 
-        if (!chargingProcessService
-                .hasOpenProcessForRfidTag(parameters.getIdTag(), parameters.getConnectorId(), chargeBoxIdentity)) {
-            log.info("No running ocpp charging process found for RFID tag: {} on charger: {}/{}",
+        if (!remoteStartService
+                .hasOpenRemoteStart(chargeBoxIdentity, parameters.getConnectorId(),parameters.getIdTag())) {
+            log.info("No remote start for RFID tag: {} on charger: {}/{}, interpreting as RFID start...",
                     parameters.getIdTag(), chargeBoxIdentity, parameters.getConnectorId());
 
             chargingProcessService.createChargingProcess(chargeBoxIdentity,
@@ -224,8 +228,14 @@ public class CentralSystemService16_Service {
             }
             notificationMiddleware.notifyAboutRfidStart(startRequest);
         } else {
+            log.info("Remote start found for RFID tag: {} on charger: {}/{}, " +
+                            "interpreting as remote start...",
+                    parameters.getIdTag(), chargeBoxIdentity, parameters.getConnectorId());
             transactionId = transactionService.insertTransaction(params);
         }
+
+        remoteStartService.remoteStartClosed(chargeBoxIdentity, parameters.getConnectorId(),
+                parameters.getIdTag());
 
         applicationEventPublisher.publishEvent(new OcppTransactionStarted(transactionId, params));
 

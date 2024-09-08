@@ -55,11 +55,13 @@ public class ChargingProcessService {
     public ChargingProcessService(OcppChargingProcessRepository chargingProcessRepo,
                                   ConnectorRepository connectorRepo,
                                   AdvancedChargeBoxConfiguration advancedConfig,
-                                  TransactionStartRepository transactionStartRepository) {
+                                  TransactionStartRepository transactionStartRepository,
+                                  TransactionStopRepository transactionStopRepository) {
         this.chargingProcessRepo = chargingProcessRepo;
         this.connectorRepo = connectorRepo;
         this.advancedConfig = advancedConfig;
         this.transactionStartRepository = transactionStartRepository;
+        this.transactionStopRepository = transactionStopRepository;
     }
 
     public OcppChargingProcess findOpenChargingProcessWithoutTransaction(String chargeBoxId, int connectorId) {
@@ -97,9 +99,8 @@ public class ChargingProcessService {
         }
 
         TransactionStart startTransaction = null;
-        List<TransactionStart> startTransactions=transactionStartRepository.findByConnectorAndIdTagOrderByStartTimestampDesc(c, idTag);
-        if (!startTransactions.isEmpty()) {
-            TransactionStart lastTransaction = startTransactions.get(0);
+        TransactionStart lastTransaction = transactionStartRepository.findFirstByConnectorAndOcppTagOrderByStartTimestampDesc(c, idTag);
+        if (lastTransaction != null) {
             if (transactionStopRepository.countByTransactionId(lastTransaction.getTransactionPk())==0) {
                 startTransaction = lastTransaction;
             }

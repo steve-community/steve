@@ -7,6 +7,7 @@ import net.parkl.ocpp.repositories.OcppChargeBoxRepository;
 import net.parkl.ocpp.service.config.AdvancedChargeBoxConfiguration;
 import net.parkl.ocpp.service.middleware.OcppNotificationMiddleware;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.stereotype.Component;
 
@@ -18,7 +19,13 @@ import java.util.List;
 @RequiredArgsConstructor
 @Slf4j
 public class OcppHeartBeatWatcher {
-    private static final int CHECK_INTERVAL_MINS = 5;
+
+    @Value("${ocpp.heartbeat.check.interval.mins:5}")
+    private int checkIntervalMins;
+
+    @Value("${ocpp.heartbeat.notification.async:true}")
+    private boolean asyncNotification;
+
     private final TaskExecutor taskExecutor;
     private final OcppNotificationMiddleware notificationMiddleware;
     private final OcppChargeBoxRepository chargeBoxRepository;
@@ -34,13 +41,18 @@ public class OcppHeartBeatWatcher {
     public void heartBeatCheck(OcppChargeBox chargeBox) {
         log.info("Checking last heartbeat timestamp for chargebox with id: {}", chargeBox.getChargeBoxId());
         Calendar date = Calendar.getInstance();
-        date.add(Calendar.MINUTE, -CHECK_INTERVAL_MINS);
+        date.add(Calendar.MINUTE, -checkIntervalMins);
         Date fiveMinBefore = date.getTime();
         if (chargeBox.getLastHeartbeatTimestamp() != null &&
                 chargeBox.getLastHeartbeatTimestamp().before(fiveMinBefore)) {
             log.info("Last heartbeat did not arrive in the {} mins period for chargebox with id={}, sending alert...",
-                    CHECK_INTERVAL_MINS, chargeBox.getChargeBoxId());
-            taskExecutor.execute(() -> notificationMiddleware.sendHeartBeatOfflineAlert(chargeBox.getChargeBoxId()));
+                    checkIntervalMins, chargeBox.getChargeBoxId());
+            if (asyncNotification) {
+                taskExecutor.execute(() -> notificationMiddleware.sendHeartBeatOfflineAlert(chargeBox.getChargeBoxId()));
+            } else {
+                notificationMiddleware.sendHeartBeatOfflineAlert(chargeBox.getChargeBoxId());
+            }
+
         }
     }
 }

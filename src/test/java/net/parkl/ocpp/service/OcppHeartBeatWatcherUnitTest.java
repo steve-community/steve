@@ -3,6 +3,7 @@ package net.parkl.ocpp.service;
 import net.parkl.ocpp.entities.OcppChargeBox;
 import net.parkl.ocpp.repositories.OcppChargeBoxRepository;
 import net.parkl.ocpp.service.config.AdvancedChargeBoxConfiguration;
+import net.parkl.ocpp.service.middleware.OcppNotificationMiddleware;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -20,15 +21,17 @@ class OcppHeartBeatWatcherUnitTest {
     private AdvancedChargeBoxConfiguration advancedChargeBoxConfiguration;
     private TaskExecutor taskExecutor;
     private OcppChargeBoxRepository chargeBoxRepository;
+    private OcppNotificationMiddleware notificationMiddleware;
 
     @BeforeEach
     public void setUp() {
         advancedChargeBoxConfiguration = Mockito.mock(AdvancedChargeBoxConfiguration.class);
         taskExecutor = Mockito.mock(TaskExecutor.class);
         chargeBoxRepository = Mockito.mock(OcppChargeBoxRepository.class);
+        notificationMiddleware = Mockito.mock(OcppNotificationMiddleware.class);
 
         heartBeatWatcher = new OcppHeartBeatWatcher(taskExecutor,
-                                                    null,
+                                                    notificationMiddleware,
                                                     chargeBoxRepository,
                                                     advancedChargeBoxConfiguration);
     }
@@ -45,6 +48,6 @@ class OcppHeartBeatWatcherUnitTest {
         when(advancedChargeBoxConfiguration.getChargeBoxesForAlert()).thenReturn(Collections.singletonList(testBox.getChargeBoxId()));
         when(chargeBoxRepository.findByChargeBoxIdIn(any())).thenReturn(List.of(testBox));
         heartBeatWatcher.watch();
-        verify(taskExecutor, times(1)).execute(any());
+        verify(notificationMiddleware, times(1)).sendHeartBeatOfflineAlert(any());
     }
 }

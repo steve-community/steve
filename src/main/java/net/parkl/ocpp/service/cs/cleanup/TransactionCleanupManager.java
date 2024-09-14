@@ -34,42 +34,45 @@ public class TransactionCleanupManager {
         Date cleanupCheckThreshold = getCleanupCheckThreshold();
         log.info("Checking transactions for cleanup before: {}...", cleanupCheckThreshold);
         List<Transaction> transactions = cleanupService.getTransactionsForCleanup(cleanupCheckThreshold);
-        log.info("Found {} possible transactions for cleanup...", transactions.size());
+        if (!transactions.isEmpty()) {
+            log.info("Found {} possible transactions for cleanup...", transactions.size());
 
-        int cleanedUp = 0;
-        for (Transaction transaction : transactions) {
-            log.info("Checking transaction {} for cleanup...", transaction.getTransactionPk());
-            OcppChargingProcess chargingProcess = chargingProcessService.findByTransactionId(transaction.getTransactionPk());
-            boolean cleanup = false;
-            if (chargingProcess != null) {
-                ESPChargingProcessCheckResult checkResult =
-                        emobilityServiceProvider.checkChargingProcess(chargingProcess.getOcppChargingProcessId());
-                if (!checkResult.isExists()) {
-                    log.info("Charging process {} does not exist at the ESP, transaction id={}",
-                            chargingProcess.getOcppChargingProcessId(), transaction.getTransactionPk());
-                    cleanup = checkNonExistentThreshold(transaction.getStartEventTimestamp());
-                } else if (checkResult.isStopped()) {
-                    log.info("Charging process {} already stopped at the ESP, transaction id={}",
-                            chargingProcess.getOcppChargingProcessId(), transaction.getTransactionPk());
-                    cleanup = checkStoppedThreshold(checkResult.getTimeElapsedSinceStop());
+            int cleanedUp = 0;
+            for (Transaction transaction : transactions) {
+                log.info("Checking transaction {} for cleanup...", transaction.getTransactionPk());
+                OcppChargingProcess chargingProcess = chargingProcessService.findByTransactionId(transaction.getTransactionPk());
+                boolean cleanup = false;
+                if (chargingProcess != null) {
+                    ESPChargingProcessCheckResult checkResult =
+                            emobilityServiceProvider.checkChargingProcess(chargingProcess.getOcppChargingProcessId());
+                    if (!checkResult.isExists()) {
+                        log.info("Charging process {} does not exist at the ESP, transaction id={}",
+                                chargingProcess.getOcppChargingProcessId(), transaction.getTransactionPk());
+                        cleanup = checkNonExistentThreshold(transaction.getStartEventTimestamp());
+                    } else if (checkResult.isStopped()) {
+                        log.info("Charging process {} already stopped at the ESP, transaction id={}",
+                                chargingProcess.getOcppChargingProcessId(), transaction.getTransactionPk());
+                        cleanup = checkStoppedThreshold(checkResult.getTimeElapsedSinceStop());
+                    } else {
+                        log.info("Charging process {} still running at the ESP, transaction id={}",
+                                chargingProcess.getOcppChargingProcessId(), transaction.getTransactionPk());
+                    }
                 } else {
-                    log.info("Charging process {} still running at the ESP, transaction id={}",
-                            chargingProcess.getOcppChargingProcessId(), transaction.getTransactionPk());
+                    log.info("Charging process was null for transaction: {}", transaction.getTransactionPk());
+                    cleanup = checkNonExistentThreshold(transaction.getStartEventTimestamp());
                 }
-            } else {
-                log.info("Charging process was null for transaction: {}", transaction.getTransactionPk());
-                cleanup = checkNonExistentThreshold(transaction.getStartEventTimestamp());
+
+                if (cleanup && cleanupService.cleanupTransaction(transaction.getTransactionPk())) {
+                    cleanedUp++;
+                }
             }
 
-            if (cleanup && cleanupService.cleanupTransaction(transaction.getTransactionPk())) {
-                cleanedUp++;
-            }
+            log.info("Transaction cleanup completed: {} of {} transactions", cleanedUp, transactions.size());
         }
-
-        log.info("Transaction cleanup completed: {} of {} transactions", cleanedUp, transactions.size() );
-
         int deleted = chargingProcessService.cleanupWithoutTransaction();
-        log.info("Cleaned up {} charging processes without transaction", deleted);
+        if (deleted > 0) {
+            log.info("Cleaned up {} charging processes without transaction", deleted);
+        }
     }
 
     private Date getCleanupCheckThreshold() {

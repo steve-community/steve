@@ -13,7 +13,7 @@ public class TransactionCleanupJob {
 
     @Scheduled(fixedRate = 300000)
     public void checkTransactionsForCleanup() {
-        log.info("Transactions cleanup started...");
+        log.debug("Transactions cleanup started...");
         long start = System.currentTimeMillis();
         cleanupManager.cleanupTransactions();
         log.info("Transactions cleanup completed in {} ms", System.currentTimeMillis()-start);

@@ -34,18 +34,21 @@ public class OcppHeartBeatWatcher {
 
 
     public void watch() {
+        long start=System.currentTimeMillis();
+        log.debug("Starting heartbeat check for all chargeboxes...");
         List<String> chargeBoxIds = advancedChargeBoxConfiguration.getChargeBoxesForAlert();
         chargeBoxRepository.findByChargeBoxIdIn(chargeBoxIds).forEach(this::heartBeatCheck);
+        log.info("Heartbeat check completed in {} ms", System.currentTimeMillis()-start);
     }
 
     public void heartBeatCheck(OcppChargeBox chargeBox) {
-        log.info("Checking last heartbeat timestamp for chargebox with id: {}", chargeBox.getChargeBoxId());
+        log.debug("Checking last heartbeat timestamp for chargebox with id: {}", chargeBox.getChargeBoxId());
         Calendar date = Calendar.getInstance();
         date.add(Calendar.MINUTE, -checkIntervalMins);
         Date fiveMinBefore = date.getTime();
         if (chargeBox.getLastHeartbeatTimestamp() != null &&
                 chargeBox.getLastHeartbeatTimestamp().before(fiveMinBefore)) {
-            log.info("Last heartbeat did not arrive in the {} mins period for chargebox with id={}, sending alert...",
+            log.debug("Last heartbeat did not arrive in the {} mins period for chargebox with id={}, sending alert...",
                     checkIntervalMins, chargeBox.getChargeBoxId());
             if (asyncNotification) {
                 taskExecutor.execute(() -> notificationMiddleware.sendHeartBeatOfflineAlert(chargeBox.getChargeBoxId()));

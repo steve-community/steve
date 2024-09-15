@@ -15,7 +15,11 @@ public class TransactionCleanupJob {
     public void checkTransactionsForCleanup() {
         log.debug("Transactions cleanup started...");
         long start = System.currentTimeMillis();
-        cleanupManager.cleanupTransactions();
-        log.info("Transactions cleanup completed in {} ms", System.currentTimeMillis()-start);
+        int cleanedUp = cleanupManager.cleanupTransactions();
+        if (cleanedUp > 0) {
+            log.info("Transactions cleanup completed in {} ms, {} transactions cleaned up", System.currentTimeMillis()-start, cleanedUp);
+        } else {
+            log.debug("Transactions cleanup completed in {} ms", System.currentTimeMillis() - start);
+        }
     }
 }

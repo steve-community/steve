@@ -88,7 +88,7 @@ public class OcppConfigurationMiddleware extends AbstractOcppMiddleware {
                 log.info(result.getDetails());
             }
             if (result.getResponse() != null) {
-                return parseConfList(result.getResponse());
+                return OcppConfigParser.parseConfList(result.getResponse());
             } else if (result.getErrorMessage() != null) {
                 throw new IllegalStateException(result.getErrorMessage());
             } else {
@@ -102,32 +102,7 @@ public class OcppConfigurationMiddleware extends AbstractOcppMiddleware {
         }
     }
 
-    private List<ESPChargeBoxConfiguration> parseConfList(String response) {
-        log.info("Parsing configuration: {}...", response);
-        List<ESPChargeBoxConfiguration> ret = new ArrayList<>();
-        String[] split = response.split("<br>");
-        for (String line : split) {
-            log.info("Parsing config line: {}...", line);
-            if (line.startsWith("<b>Unknown keys")) {
-                log.info("Unknown keys reached, exiting...");
-                break;
-            }
-            if (!StringUtils.isEmpty(line.trim()) && !line.startsWith("<b>Known keys")) {
-                boolean readOnly = false;
-                if (line.endsWith(" (read-only)")) {
-                    line = line.replace(" (read-only)", "");
-                    readOnly = true;
-                }
-                String[] keyVal = line.split("\\:");
 
-                ESPChargeBoxConfiguration c = ESPChargeBoxConfiguration.builder().
-                        key(keyVal[0].trim()).value(keyVal[1].trim()).readOnly(readOnly).build();
-                log.info("Configuration parsed: {}={} (read-only={})", c.getKey(), c.getValue(), c.isReadOnly());
-                ret.add(c);
-            }
-        }
-        return ret;
-    }
 
     public List<ESPChargeBoxConfiguration> changeChargeBoxConfiguration(String chargeBoxId, String key,
                                                                         String value) {

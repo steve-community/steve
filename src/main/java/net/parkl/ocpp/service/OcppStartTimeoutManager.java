@@ -24,7 +24,6 @@ import net.parkl.ocpp.entities.OcppChargingProcess;
 import net.parkl.ocpp.service.config.AdvancedChargeBoxConfiguration;
 import net.parkl.ocpp.service.middleware.OcppChargePointMiddleware;
 import net.parkl.ocpp.service.middleware.OcppChargingMiddleware;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -42,7 +41,6 @@ public class OcppStartTimeoutManager {
 
 
 
-    @Scheduled(fixedRate = 10000)
     public void checkForStartTimeout() {
         if (!config.isStartTimeoutEnabledForAny() && !config.isPreparingTimeoutEnabledForAny()) {
             return;

@@ -12,7 +12,7 @@ import java.util.Date;
 @Getter
 @Setter
 @Entity
-@Table(name = "ChargingConsumptionState")
+@Table(name = "charging_consumption_state")
 public class ChargingConsumptionState implements Serializable {
     @Id
     @Column(name = "ExternalChargeId")

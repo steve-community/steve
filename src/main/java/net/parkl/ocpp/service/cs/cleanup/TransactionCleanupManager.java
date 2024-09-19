@@ -7,6 +7,7 @@ import net.parkl.ocpp.entities.Transaction;
 import net.parkl.ocpp.module.esp.EmobilityServiceProvider;
 import net.parkl.ocpp.module.esp.model.ESPChargingProcessCheckResult;
 import net.parkl.ocpp.service.ChargingProcessService;
+import net.parkl.ocpp.util.CalendarUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -24,7 +25,8 @@ public class TransactionCleanupManager {
     private int cleanupNonExistentThresholdHours;
     @Value("${ocpp.transaction.cleanup.stopped.threshold.hrs:1}")
     private int cleanupStoppedThresholdHours;
-
+    @Value("${ocpp.consumption.threshold.days:30}")
+    private int cleanupConsumptionThresholdDays;
 
     private final TransactionCleanupService cleanupService;
     private final ChargingProcessService chargingProcessService;
@@ -98,5 +100,11 @@ public class TransactionCleanupManager {
     private boolean checkNonExistentThreshold(Date startDate) {
         log.info("Checking non-existent threshold with start date {}: {} hours before now...", startDate, cleanupNonExistentThresholdHours);
         return startDate.getTime() < System.currentTimeMillis()-cleanupNonExistentThresholdHours * HOURS_IN_MS;
+    }
+
+    public int cleanupConsumptionStates() {
+        Date date = CalendarUtils.createDaysBeforeNow(cleanupConsumptionThresholdDays);
+        log.info("Cleaning up consumption states older than {}...", date);
+        return cleanupService.cleanupConsumptionStates(date);
     }
 }

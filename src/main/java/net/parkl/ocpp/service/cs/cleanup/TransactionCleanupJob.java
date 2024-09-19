@@ -20,5 +20,13 @@ public class TransactionCleanupJob {
         } else {
             log.debug("Transactions cleanup completed in {} ms", System.currentTimeMillis() - start);
         }
+
+        start = System.currentTimeMillis();
+        int consumptionsCleanedUp = cleanupManager.cleanupConsumptionStates();
+        if (consumptionsCleanedUp > 0) {
+            log.info("Consumption state cleanup completed in {} ms, {} transactions cleaned up", System.currentTimeMillis()-start, consumptionsCleanedUp);
+        } else {
+            log.debug("Consumption state cleanup completed in {} ms", System.currentTimeMillis() - start);
+        }
     }
 }

@@ -7,10 +7,7 @@ import net.parkl.ocpp.entities.OcppChargingProcess;
 import net.parkl.ocpp.entities.Transaction;
 import net.parkl.ocpp.entities.TransactionStart;
 import net.parkl.ocpp.entities.TransactionStop;
-import net.parkl.ocpp.repositories.TransactionRepository;
-import net.parkl.ocpp.repositories.TransactionStartRepository;
-import net.parkl.ocpp.repositories.TransactionStopFailedRepository;
-import net.parkl.ocpp.repositories.TransactionStopRepository;
+import net.parkl.ocpp.repositories.*;
 import net.parkl.ocpp.service.ChargingProcessService;
 import org.joda.time.DateTime;
 import org.springframework.stereotype.Service;
@@ -30,6 +27,7 @@ public class TransactionCleanupService {
     private final TransactionStopRepository transactionStopRepo;
     private final TransactionStopFailedRepository transactionStopFailedRepo;
     private final ChargingProcessService chargingProcessService;
+    private final ChargingConsumptionStateRepository chargingConsumptionStateRepo;
 
     @Transactional
     public boolean cleanupTransaction(int transactionId) {
@@ -77,5 +75,10 @@ public class TransactionCleanupService {
 
     public List<Transaction> getTransactionsForCleanup(Date threshold) {
         return transactionRepo.findActiveStartedBefore(threshold);
+    }
+
+    @Transactional
+    public int cleanupConsumptionStates(Date date) {
+        return (int) chargingConsumptionStateRepo.deleteBefore(date);
     }
 }

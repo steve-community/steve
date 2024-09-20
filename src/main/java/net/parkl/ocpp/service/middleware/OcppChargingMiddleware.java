@@ -583,6 +583,6 @@ public class OcppChargingMiddleware extends AbstractOcppMiddleware {
 
     public ChargingConsumptionState findByExternalChargeId(String externalChargeId) {
         return consumptionStateRepository.findById(externalChargeId)
-                .orElseThrow(() -> new IllegalArgumentException("Invalid externalChargeId specified"));
+                .orElse(null);
     }
 }

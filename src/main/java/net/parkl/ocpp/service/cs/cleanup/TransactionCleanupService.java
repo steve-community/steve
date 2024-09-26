@@ -79,6 +79,6 @@ public class TransactionCleanupService {
 
     @Transactional
     public int cleanupConsumptionStates(Date date) {
-        return (int) chargingConsumptionStateRepo.deleteBefore(date);
+        return chargingConsumptionStateRepo.deleteBefore(date);
     }
 }

@@ -11,5 +11,5 @@ import java.util.Optional;
 public interface ChargingConsumptionStateRepository extends JpaRepository<ChargingConsumptionState, String> {
     @Query(value = "DELETE FROM ChargingConsumptionState AS l WHERE l.createDate<?1")
     @Modifying
-    long deleteBefore(Date date);
+    int deleteBefore(Date date);
 }

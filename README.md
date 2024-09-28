@@ -83,7 +83,7 @@ SteVe Pluggable is intended to run in any servlet container or in embedded web a
     spring.datasource.url=jdbc:mysql://${db.ocpp.host}/${db.ocpp.name}?useUnicode=true&characterEncoding=UTF-8&serverTimezone=CET
     spring.datasource.driver-class-name=com.mysql.jdbc.Driver
     spring.jpa.hibernate.naming.physical-strategy=org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
-    spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.MySQL5InnoDBDialect
+    spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.MySQL8Dialect
     spring.jpa.open-in-view=false
     spring.jpa.generate-ddl=true
     spring.jpa.hibernate.ddl-auto=update

@@ -1,9 +1,6 @@
 package net.parkl.ocpp.service;
 
-import de.rwth.idsg.steve.ocpp.ChargePointService15_Invoker;
-import de.rwth.idsg.steve.ocpp.ChargePointService16_Invoker;
-import de.rwth.idsg.steve.ocpp.OcppProtocol;
-import de.rwth.idsg.steve.ocpp.OcppVersion;
+import de.rwth.idsg.steve.ocpp.*;
 import de.rwth.idsg.steve.ocpp.task.ChangeConfigurationTask;
 import de.rwth.idsg.steve.repository.dto.ChargePointSelect;
 import de.rwth.idsg.steve.service.ChargePointHelperService;
@@ -24,8 +21,8 @@ import java.util.List;
 @Slf4j
 public class HeartBeatService {
 
-    private final ChargePointService15_Invoker service15Invoker;
-    private final ChargePointService16_Invoker service16Invoker;
+    private final ChargePointService15_InvokerImpl service15Invoker;
+    private final ChargePointService16_InvokerImpl service16Invoker;
     private final ChargePointHelperService chargePointHelperService;
     private final AdvancedChargeBoxConfiguration chargeBoxConfiguration;
 
@@ -33,8 +30,8 @@ public class HeartBeatService {
     private final int heartBeatIntervalInSecs;
 
     @Autowired
-    public HeartBeatService(ChargePointService15_Invoker chargePointService15_InvokerImpl,
-                            ChargePointService16_Invoker chargePointService16_InvokerImpl,
+    public HeartBeatService(ChargePointService15_InvokerImpl chargePointService15_InvokerImpl,
+                            ChargePointService16_InvokerImpl chargePointService16_InvokerImpl,
                             ChargePointHelperService chargePointHelperService,
                             AdvancedChargeBoxConfiguration chargeBoxConfiguration,
                             PersistentTaskService persistentTaskService,

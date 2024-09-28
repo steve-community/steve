@@ -6,7 +6,7 @@ import jakarta.jws.WebParam;
 import jakarta.jws.WebResult;
 import jakarta.jws.WebService;
 import jakarta.jws.soap.SOAPBinding;
-import javax.xml.bind.annotation.XmlSeeAlso;
+import jakarta.xml.bind.annotation.XmlSeeAlso;
 import jakarta.xml.ws.Action;
 import jakarta.xml.ws.AsyncHandler;
 import jakarta.xml.ws.Response;

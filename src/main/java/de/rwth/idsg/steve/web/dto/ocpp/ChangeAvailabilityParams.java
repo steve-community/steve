@@ -37,7 +37,6 @@ import java.util.Objects;
 public class ChangeAvailabilityParams extends MultipleChargePointSelect {
 
     @Min(value = 0, message = "Connector ID must be at least {value}")
-    @Setter
     private Integer connectorId;
 
     @NotNull(message = "Availability Type is required")

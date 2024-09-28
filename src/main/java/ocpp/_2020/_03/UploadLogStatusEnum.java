@@ -3,17 +3,15 @@ package ocpp._2020._03;
 
 import java.util.HashMap;
 import java.util.Map;
-import javax.annotation.Generated;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 
 /**
- * This contains the status of the log upload.
+ * This contains the status of the log upload.
  * 
  * 
  */
-@Generated("jsonschema2pojo")
 public enum UploadLogStatusEnum {
 
     BAD_MESSAGE("BadMessage"),

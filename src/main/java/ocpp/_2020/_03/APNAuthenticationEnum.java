@@ -3,19 +3,17 @@ package ocpp._2020._03;
 
 import java.util.HashMap;
 import java.util.Map;
-import javax.annotation.Generated;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 
 /**
- * APN. APN_ Authentication. APN_ Authentication_ Code
- * urn:x-oca:ocpp:uid:1:568828
- * Authentication method.
+ * APN. APN_ Authentication. APN_ Authentication_ Code
+ * urn:x-oca:ocpp:uid:1:568828
+ * Authentication method.
  * 
  * 
  */
-@Generated("jsonschema2pojo")
 public enum APNAuthenticationEnum {
 
     CHAP("CHAP"),

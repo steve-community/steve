@@ -1,21 +1,20 @@
 
 package ocpp._2020._03;
 
-import javax.annotation.Generated;
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import org.joda.time.DateTime;
 
 
 /**
- * Log
- * urn:x-enexis:ecdm:uid:2:233373
- * Generic class for the configuration of logging entries.
+ * Log
+ * urn:x-enexis:ecdm:uid:2:233373
+ * Generic class for the configuration of logging entries.
  * 
  * 
  */
@@ -26,7 +25,6 @@ import org.joda.time.DateTime;
     "oldestTimestamp",
     "latestTimestamp"
 })
-@Generated("jsonschema2pojo")
 public class LogParameters {
 
     /**
@@ -38,9 +36,9 @@ public class LogParameters {
     @Valid
     private CustomData customData;
     /**
-     * Log. Remote_ Location. URI
-     * urn:x-enexis:ecdm:uid:1:569484
-     * The URL of the location at the remote system where the log should be stored.
+     * Log. Remote_ Location. URI
+     * urn:x-enexis:ecdm:uid:1:569484
+     * The URL of the location at the remote system where the log should be stored.
      * 
      * (Required)
      * 
@@ -51,9 +49,9 @@ public class LogParameters {
     @NotNull
     private String remoteLocation;
     /**
-     * Log. Oldest_ Timestamp. Date_ Time
-     * urn:x-enexis:ecdm:uid:1:569477
-     * This contains the date and time of the oldest logging information to include in the diagnostics.
+     * Log. Oldest_ Timestamp. Date_ Time
+     * urn:x-enexis:ecdm:uid:1:569477
+     * This contains the date and time of the oldest logging information to include in the diagnostics.
      * 
      * 
      */
@@ -61,9 +59,9 @@ public class LogParameters {
     @JsonPropertyDescription("Log. Oldest_ Timestamp. Date_ Time\r\nurn:x-enexis:ecdm:uid:1:569477\r\nThis contains the date and time of the oldest logging information to include in the diagnostics.\r\n")
     private DateTime oldestTimestamp;
     /**
-     * Log. Latest_ Timestamp. Date_ Time
-     * urn:x-enexis:ecdm:uid:1:569482
-     * This contains the date and time of the latest logging information to include in the diagnostics.
+     * Log. Latest_ Timestamp. Date_ Time
+     * urn:x-enexis:ecdm:uid:1:569482
+     * This contains the date and time of the latest logging information to include in the diagnostics.
      * 
      * 
      */
@@ -95,9 +93,9 @@ public class LogParameters {
     }
 
     /**
-     * Log. Remote_ Location. URI
-     * urn:x-enexis:ecdm:uid:1:569484
-     * The URL of the location at the remote system where the log should be stored.
+     * Log. Remote_ Location. URI
+     * urn:x-enexis:ecdm:uid:1:569484
+     * The URL of the location at the remote system where the log should be stored.
      * 
      * (Required)
      * 
@@ -108,9 +106,9 @@ public class LogParameters {
     }
 
     /**
-     * Log. Remote_ Location. URI
-     * urn:x-enexis:ecdm:uid:1:569484
-     * The URL of the location at the remote system where the log should be stored.
+     * Log. Remote_ Location. URI
+     * urn:x-enexis:ecdm:uid:1:569484
+     * The URL of the location at the remote system where the log should be stored.
      * 
      * (Required)
      * 
@@ -126,9 +124,9 @@ public class LogParameters {
     }
 
     /**
-     * Log. Oldest_ Timestamp. Date_ Time
-     * urn:x-enexis:ecdm:uid:1:569477
-     * This contains the date and time of the oldest logging information to include in the diagnostics.
+     * Log. Oldest_ Timestamp. Date_ Time
+     * urn:x-enexis:ecdm:uid:1:569477
+     * This contains the date and time of the oldest logging information to include in the diagnostics.
      * 
      * 
      */
@@ -138,9 +136,9 @@ public class LogParameters {
     }
 
     /**
-     * Log. Oldest_ Timestamp. Date_ Time
-     * urn:x-enexis:ecdm:uid:1:569477
-     * This contains the date and time of the oldest logging information to include in the diagnostics.
+     * Log. Oldest_ Timestamp. Date_ Time
+     * urn:x-enexis:ecdm:uid:1:569477
+     * This contains the date and time of the oldest logging information to include in the diagnostics.
      * 
      * 
      */
@@ -155,9 +153,9 @@ public class LogParameters {
     }
 
     /**
-     * Log. Latest_ Timestamp. Date_ Time
-     * urn:x-enexis:ecdm:uid:1:569482
-     * This contains the date and time of the latest logging information to include in the diagnostics.
+     * Log. Latest_ Timestamp. Date_ Time
+     * urn:x-enexis:ecdm:uid:1:569482
+     * This contains the date and time of the latest logging information to include in the diagnostics.
      * 
      * 
      */
@@ -167,9 +165,9 @@ public class LogParameters {
     }
 
     /**
-     * Log. Latest_ Timestamp. Date_ Time
-     * urn:x-enexis:ecdm:uid:1:569482
-     * This contains the date and time of the latest logging information to include in the diagnostics.
+     * Log. Latest_ Timestamp. Date_ Time
+     * urn:x-enexis:ecdm:uid:1:569482
+     * This contains the date and time of the latest logging information to include in the diagnostics.
      * 
      * 
      */

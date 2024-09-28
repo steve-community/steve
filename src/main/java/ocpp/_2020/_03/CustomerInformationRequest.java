@@ -1,15 +1,14 @@
 
 package ocpp._2020._03;
 
-import javax.annotation.Generated;
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import de.rwth.idsg.ocpp.jaxb.RequestType;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
@@ -21,7 +20,6 @@ import de.rwth.idsg.ocpp.jaxb.RequestType;
     "clear",
     "customerIdentifier"
 })
-@Generated("jsonschema2pojo")
 public class CustomerInformationRequest implements RequestType
 {
 
@@ -37,7 +35,7 @@ public class CustomerInformationRequest implements RequestType
     @Valid
     private CertificateHashData customerCertificate;
     /**
-     * Contains a case insensitive identifier to use for the authorization and the type of authorization to support multiple forms of identifiers.
+     * Contains a case insensitive identifier to use for the authorization and the type of authorization to support multiple forms of identifiers.
      * 
      * 
      */
@@ -46,8 +44,8 @@ public class CustomerInformationRequest implements RequestType
     @Valid
     private IdToken idToken;
     /**
-     * The Id of the request.
-     * 
+     * The Id of the request.
+     * 
      * 
      * (Required)
      * 
@@ -57,7 +55,7 @@ public class CustomerInformationRequest implements RequestType
     @NotNull
     private Integer requestId;
     /**
-     * Flag indicating whether the Charging Station should return NotifyCustomerInformationRequest messages containing information about the customer referred to.
+     * Flag indicating whether the Charging Station should return NotifyCustomerInformationRequest messages containing information about the customer referred to.
      * 
      * (Required)
      * 
@@ -67,7 +65,7 @@ public class CustomerInformationRequest implements RequestType
     @NotNull
     private Boolean report;
     /**
-     * Flag indicating whether the Charging Station should clear all information about the customer referred to.
+     * Flag indicating whether the Charging Station should clear all information about the customer referred to.
      * 
      * (Required)
      * 
@@ -77,8 +75,8 @@ public class CustomerInformationRequest implements RequestType
     @NotNull
     private Boolean clear;
     /**
-     * A (e.g. vendor specific) identifier of the customer this request refers to. This field contains a custom identifier other than IdToken and Certificate.
-     * One of the possible identifiers (customerIdentifier, customerIdToken or customerCertificate) should be in the request message.
+     * A (e.g. vendor specific) identifier of the customer this request refers to. This field contains a custom identifier other than IdToken and Certificate.
+     * One of the possible identifiers (customerIdentifier, customerIdToken or customerCertificate) should be in the request message.
      * 
      * 
      */
@@ -126,7 +124,7 @@ public class CustomerInformationRequest implements RequestType
     }
 
     /**
-     * Contains a case insensitive identifier to use for the authorization and the type of authorization to support multiple forms of identifiers.
+     * Contains a case insensitive identifier to use for the authorization and the type of authorization to support multiple forms of identifiers.
      * 
      * 
      */
@@ -136,7 +134,7 @@ public class CustomerInformationRequest implements RequestType
     }
 
     /**
-     * Contains a case insensitive identifier to use for the authorization and the type of authorization to support multiple forms of identifiers.
+     * Contains a case insensitive identifier to use for the authorization and the type of authorization to support multiple forms of identifiers.
      * 
      * 
      */
@@ -151,8 +149,8 @@ public class CustomerInformationRequest implements RequestType
     }
 
     /**
-     * The Id of the request.
-     * 
+     * The Id of the request.
+     * 
      * 
      * (Required)
      * 
@@ -163,8 +161,8 @@ public class CustomerInformationRequest implements RequestType
     }
 
     /**
-     * The Id of the request.
-     * 
+     * The Id of the request.
+     * 
      * 
      * (Required)
      * 
@@ -180,7 +178,7 @@ public class CustomerInformationRequest implements RequestType
     }
 
     /**
-     * Flag indicating whether the Charging Station should return NotifyCustomerInformationRequest messages containing information about the customer referred to.
+     * Flag indicating whether the Charging Station should return NotifyCustomerInformationRequest messages containing information about the customer referred to.
      * 
      * (Required)
      * 
@@ -191,7 +189,7 @@ public class CustomerInformationRequest implements RequestType
     }
 
     /**
-     * Flag indicating whether the Charging Station should return NotifyCustomerInformationRequest messages containing information about the customer referred to.
+     * Flag indicating whether the Charging Station should return NotifyCustomerInformationRequest messages containing information about the customer referred to.
      * 
      * (Required)
      * 
@@ -207,7 +205,7 @@ public class CustomerInformationRequest implements RequestType
     }
 
     /**
-     * Flag indicating whether the Charging Station should clear all information about the customer referred to.
+     * Flag indicating whether the Charging Station should clear all information about the customer referred to.
      * 
      * (Required)
      * 
@@ -218,7 +216,7 @@ public class CustomerInformationRequest implements RequestType
     }
 
     /**
-     * Flag indicating whether the Charging Station should clear all information about the customer referred to.
+     * Flag indicating whether the Charging Station should clear all information about the customer referred to.
      * 
      * (Required)
      * 
@@ -234,8 +232,8 @@ public class CustomerInformationRequest implements RequestType
     }
 
     /**
-     * A (e.g. vendor specific) identifier of the customer this request refers to. This field contains a custom identifier other than IdToken and Certificate.
-     * One of the possible identifiers (customerIdentifier, customerIdToken or customerCertificate) should be in the request message.
+     * A (e.g. vendor specific) identifier of the customer this request refers to. This field contains a custom identifier other than IdToken and Certificate.
+     * One of the possible identifiers (customerIdentifier, customerIdToken or customerCertificate) should be in the request message.
      * 
      * 
      */
@@ -245,8 +243,8 @@ public class CustomerInformationRequest implements RequestType
     }
 
     /**
-     * A (e.g. vendor specific) identifier of the customer this request refers to. This field contains a custom identifier other than IdToken and Certificate.
-     * One of the possible identifiers (customerIdentifier, customerIdToken or customerCertificate) should be in the request message.
+     * A (e.g. vendor specific) identifier of the customer this request refers to. This field contains a custom identifier other than IdToken and Certificate.
+     * One of the possible identifiers (customerIdentifier, customerIdToken or customerCertificate) should be in the request message.
      * 
      * 
      */

@@ -1,20 +1,19 @@
 
 package ocpp._2020._03;
 
-import javax.annotation.Generated;
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 
 
 /**
- * Charge_ Point
- * urn:x-oca:ocpp:uid:2:233122
- * The physical system where an Electrical Vehicle (EV) can be charged.
+ * Charge_ Point
+ * urn:x-oca:ocpp:uid:2:233122
+ * The physical system where an Electrical Vehicle (EV) can be charged.
  * 
  * 
  */
@@ -27,7 +26,6 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
     "vendorName",
     "firmwareVersion"
 })
-@Generated("jsonschema2pojo")
 public class ChargingStation {
 
     /**
@@ -39,9 +37,9 @@ public class ChargingStation {
     @Valid
     private CustomData customData;
     /**
-     * Device. Serial_ Number. Serial_ Number
-     * urn:x-oca:ocpp:uid:1:569324
-     * Vendor-specific device identifier.
+     * Device. Serial_ Number. Serial_ Number
+     * urn:x-oca:ocpp:uid:1:569324
+     * Vendor-specific device identifier.
      * 
      * 
      */
@@ -50,9 +48,9 @@ public class ChargingStation {
     @Size(max = 25)
     private String serialNumber;
     /**
-     * Device. Model. CI20_ Text
-     * urn:x-oca:ocpp:uid:1:569325
-     * Defines the model of the device.
+     * Device. Model. CI20_ Text
+     * urn:x-oca:ocpp:uid:1:569325
+     * Defines the model of the device.
      * 
      * (Required)
      * 
@@ -63,9 +61,9 @@ public class ChargingStation {
     @NotNull
     private String model;
     /**
-     * Wireless_ Communication_ Module
-     * urn:x-oca:ocpp:uid:2:233306
-     * Defines parameters required for initiating and maintaining wireless communication with other devices.
+     * Wireless_ Communication_ Module
+     * urn:x-oca:ocpp:uid:2:233306
+     * Defines parameters required for initiating and maintaining wireless communication with other devices.
      * 
      * 
      */
@@ -74,7 +72,7 @@ public class ChargingStation {
     @Valid
     private Modem modem;
     /**
-     * Identifies the vendor (not necessarily in a unique manner).
+     * Identifies the vendor (not necessarily in a unique manner).
      * 
      * (Required)
      * 
@@ -85,8 +83,8 @@ public class ChargingStation {
     @NotNull
     private String vendorName;
     /**
-     * This contains the firmware version of the Charging Station.
-     * 
+     * This contains the firmware version of the Charging Station.
+     * 
      * 
      * 
      */
@@ -119,9 +117,9 @@ public class ChargingStation {
     }
 
     /**
-     * Device. Serial_ Number. Serial_ Number
-     * urn:x-oca:ocpp:uid:1:569324
-     * Vendor-specific device identifier.
+     * Device. Serial_ Number. Serial_ Number
+     * urn:x-oca:ocpp:uid:1:569324
+     * Vendor-specific device identifier.
      * 
      * 
      */
@@ -131,9 +129,9 @@ public class ChargingStation {
     }
 
     /**
-     * Device. Serial_ Number. Serial_ Number
-     * urn:x-oca:ocpp:uid:1:569324
-     * Vendor-specific device identifier.
+     * Device. Serial_ Number. Serial_ Number
+     * urn:x-oca:ocpp:uid:1:569324
+     * Vendor-specific device identifier.
      * 
      * 
      */
@@ -148,9 +146,9 @@ public class ChargingStation {
     }
 
     /**
-     * Device. Model. CI20_ Text
-     * urn:x-oca:ocpp:uid:1:569325
-     * Defines the model of the device.
+     * Device. Model. CI20_ Text
+     * urn:x-oca:ocpp:uid:1:569325
+     * Defines the model of the device.
      * 
      * (Required)
      * 
@@ -161,9 +159,9 @@ public class ChargingStation {
     }
 
     /**
-     * Device. Model. CI20_ Text
-     * urn:x-oca:ocpp:uid:1:569325
-     * Defines the model of the device.
+     * Device. Model. CI20_ Text
+     * urn:x-oca:ocpp:uid:1:569325
+     * Defines the model of the device.
      * 
      * (Required)
      * 
@@ -179,9 +177,9 @@ public class ChargingStation {
     }
 
     /**
-     * Wireless_ Communication_ Module
-     * urn:x-oca:ocpp:uid:2:233306
-     * Defines parameters required for initiating and maintaining wireless communication with other devices.
+     * Wireless_ Communication_ Module
+     * urn:x-oca:ocpp:uid:2:233306
+     * Defines parameters required for initiating and maintaining wireless communication with other devices.
      * 
      * 
      */
@@ -191,9 +189,9 @@ public class ChargingStation {
     }
 
     /**
-     * Wireless_ Communication_ Module
-     * urn:x-oca:ocpp:uid:2:233306
-     * Defines parameters required for initiating and maintaining wireless communication with other devices.
+     * Wireless_ Communication_ Module
+     * urn:x-oca:ocpp:uid:2:233306
+     * Defines parameters required for initiating and maintaining wireless communication with other devices.
      * 
      * 
      */
@@ -208,7 +206,7 @@ public class ChargingStation {
     }
 
     /**
-     * Identifies the vendor (not necessarily in a unique manner).
+     * Identifies the vendor (not necessarily in a unique manner).
      * 
      * (Required)
      * 
@@ -219,7 +217,7 @@ public class ChargingStation {
     }
 
     /**
-     * Identifies the vendor (not necessarily in a unique manner).
+     * Identifies the vendor (not necessarily in a unique manner).
      * 
      * (Required)
      * 
@@ -235,8 +233,8 @@ public class ChargingStation {
     }
 
     /**
-     * This contains the firmware version of the Charging Station.
-     * 
+     * This contains the firmware version of the Charging Station.
+     * 
      * 
      * 
      */
@@ -246,8 +244,8 @@ public class ChargingStation {
     }
 
     /**
-     * This contains the firmware version of the Charging Station.
-     * 
+     * This contains the firmware version of the Charging Station.
+     * 
      * 
      * 
      */

@@ -1,14 +1,13 @@
 
 package ocpp._2020._03;
 
-import javax.annotation.Generated;
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import de.rwth.idsg.ocpp.jaxb.ResponseType;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
@@ -16,7 +15,6 @@ import de.rwth.idsg.ocpp.jaxb.ResponseType;
     "status",
     "statusInfo"
 })
-@Generated("jsonschema2pojo")
 public class CustomerInformationResponse implements ResponseType
 {
 
@@ -29,7 +27,7 @@ public class CustomerInformationResponse implements ResponseType
     @Valid
     private CustomData customData;
     /**
-     * Indicates whether the request was accepted.
+     * Indicates whether the request was accepted.
      * 
      * (Required)
      * 
@@ -39,7 +37,7 @@ public class CustomerInformationResponse implements ResponseType
     @NotNull
     private CustomerInformationStatusEnum status;
     /**
-     * Element providing more information about the status.
+     * Element providing more information about the status.
      * 
      * 
      */
@@ -72,7 +70,7 @@ public class CustomerInformationResponse implements ResponseType
     }
 
     /**
-     * Indicates whether the request was accepted.
+     * Indicates whether the request was accepted.
      * 
      * (Required)
      * 
@@ -83,7 +81,7 @@ public class CustomerInformationResponse implements ResponseType
     }
 
     /**
-     * Indicates whether the request was accepted.
+     * Indicates whether the request was accepted.
      * 
      * (Required)
      * 
@@ -99,7 +97,7 @@ public class CustomerInformationResponse implements ResponseType
     }
 
     /**
-     * Element providing more information about the status.
+     * Element providing more information about the status.
      * 
      * 
      */
@@ -109,7 +107,7 @@ public class CustomerInformationResponse implements ResponseType
     }
 
     /**
-     * Element providing more information about the status.
+     * Element providing more information about the status.
      * 
      * 
      */

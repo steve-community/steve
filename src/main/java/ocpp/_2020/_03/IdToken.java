@@ -3,18 +3,17 @@ package ocpp._2020._03;
 
 import java.util.ArrayList;
 import java.util.List;
-import javax.annotation.Generated;
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 
 
 /**
- * Contains a case insensitive identifier to use for the authorization and the type of authorization to support multiple forms of identifiers.
+ * Contains a case insensitive identifier to use for the authorization and the type of authorization to support multiple forms of identifiers.
  * 
  * 
  */
@@ -25,7 +24,6 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
     "idToken",
     "type"
 })
-@Generated("jsonschema2pojo")
 public class IdToken {
 
     /**
@@ -41,7 +39,7 @@ public class IdToken {
     @Valid
     private List<AdditionalInfo> additionalInfo = new ArrayList<AdditionalInfo>();
     /**
-     * IdToken is case insensitive. Might hold the hidden id of an RFID tag, but can for example also contain a UUID.
+     * IdToken is case insensitive. Might hold the hidden id of an RFID tag, but can for example also contain a UUID.
      * 
      * (Required)
      * 
@@ -52,7 +50,7 @@ public class IdToken {
     @NotNull
     private String idToken;
     /**
-     * Enumeration of possible idToken types.
+     * Enumeration of possible idToken types.
      * 
      * (Required)
      * 
@@ -101,7 +99,7 @@ public class IdToken {
     }
 
     /**
-     * IdToken is case insensitive. Might hold the hidden id of an RFID tag, but can for example also contain a UUID.
+     * IdToken is case insensitive. Might hold the hidden id of an RFID tag, but can for example also contain a UUID.
      * 
      * (Required)
      * 
@@ -112,7 +110,7 @@ public class IdToken {
     }
 
     /**
-     * IdToken is case insensitive. Might hold the hidden id of an RFID tag, but can for example also contain a UUID.
+     * IdToken is case insensitive. Might hold the hidden id of an RFID tag, but can for example also contain a UUID.
      * 
      * (Required)
      * 
@@ -128,7 +126,7 @@ public class IdToken {
     }
 
     /**
-     * Enumeration of possible idToken types.
+     * Enumeration of possible idToken types.
      * 
      * (Required)
      * 
@@ -139,7 +137,7 @@ public class IdToken {
     }
 
     /**
-     * Enumeration of possible idToken types.
+     * Enumeration of possible idToken types.
      * 
      * (Required)
      * 

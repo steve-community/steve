@@ -45,7 +45,7 @@ public class ConnectorMeterValue implements Serializable {
     private String readingContext;
 
     private String unit;
-
+    @Column(name = "value")
     private String value;
 
     @Column(name = "value_timestamp")

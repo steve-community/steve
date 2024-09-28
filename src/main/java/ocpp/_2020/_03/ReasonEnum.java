@@ -3,19 +3,17 @@ package ocpp._2020._03;
 
 import java.util.HashMap;
 import java.util.Map;
-import javax.annotation.Generated;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 
 /**
- * Transaction. Stopped_ Reason. EOT_ Reason_ Code
- * urn:x-oca:ocpp:uid:1:569413
- * This contains the reason why the transaction was stopped. MAY only be omitted when Reason is "Local".
+ * Transaction. Stopped_ Reason. EOT_ Reason_ Code
+ * urn:x-oca:ocpp:uid:1:569413
+ * This contains the reason why the transaction was stopped. MAY only be omitted when Reason is "Local".
  * 
  * 
  */
-@Generated("jsonschema2pojo")
 public enum ReasonEnum {
 
     DE_AUTHORIZED("DeAuthorized"),

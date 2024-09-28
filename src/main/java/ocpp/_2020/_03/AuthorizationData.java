@@ -1,17 +1,16 @@
 
 package ocpp._2020._03;
 
-import javax.annotation.Generated;
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 
 
 /**
- * Contains the identifier to use for authorization.
+ * Contains the identifier to use for authorization.
  * 
  * 
  */
@@ -21,7 +20,6 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
     "idToken",
     "idTokenInfo"
 })
-@Generated("jsonschema2pojo")
 public class AuthorizationData {
 
     /**
@@ -33,7 +31,7 @@ public class AuthorizationData {
     @Valid
     private CustomData customData;
     /**
-     * Contains a case insensitive identifier to use for the authorization and the type of authorization to support multiple forms of identifiers.
+     * Contains a case insensitive identifier to use for the authorization and the type of authorization to support multiple forms of identifiers.
      * 
      * (Required)
      * 
@@ -44,10 +42,10 @@ public class AuthorizationData {
     @NotNull
     private IdToken idToken;
     /**
-     * ID_ Token
-     * urn:x-oca:ocpp:uid:2:233247
-     * Contains status information about an identifier.
-     * It is advised to not stop charging for a token that expires during charging, as ExpiryDate is only used for caching purposes. If ExpiryDate is not given, the status has no end date.
+     * ID_ Token
+     * urn:x-oca:ocpp:uid:2:233247
+     * Contains status information about an identifier.
+     * It is advised to not stop charging for a token that expires during charging, as ExpiryDate is only used for caching purposes. If ExpiryDate is not given, the status has no end date.
      * 
      * 
      */
@@ -80,7 +78,7 @@ public class AuthorizationData {
     }
 
     /**
-     * Contains a case insensitive identifier to use for the authorization and the type of authorization to support multiple forms of identifiers.
+     * Contains a case insensitive identifier to use for the authorization and the type of authorization to support multiple forms of identifiers.
      * 
      * (Required)
      * 
@@ -91,7 +89,7 @@ public class AuthorizationData {
     }
 
     /**
-     * Contains a case insensitive identifier to use for the authorization and the type of authorization to support multiple forms of identifiers.
+     * Contains a case insensitive identifier to use for the authorization and the type of authorization to support multiple forms of identifiers.
      * 
      * (Required)
      * 
@@ -107,10 +105,10 @@ public class AuthorizationData {
     }
 
     /**
-     * ID_ Token
-     * urn:x-oca:ocpp:uid:2:233247
-     * Contains status information about an identifier.
-     * It is advised to not stop charging for a token that expires during charging, as ExpiryDate is only used for caching purposes. If ExpiryDate is not given, the status has no end date.
+     * ID_ Token
+     * urn:x-oca:ocpp:uid:2:233247
+     * Contains status information about an identifier.
+     * It is advised to not stop charging for a token that expires during charging, as ExpiryDate is only used for caching purposes. If ExpiryDate is not given, the status has no end date.
      * 
      * 
      */
@@ -120,10 +118,10 @@ public class AuthorizationData {
     }
 
     /**
-     * ID_ Token
-     * urn:x-oca:ocpp:uid:2:233247
-     * Contains status information about an identifier.
-     * It is advised to not stop charging for a token that expires during charging, as ExpiryDate is only used for caching purposes. If ExpiryDate is not given, the status has no end date.
+     * ID_ Token
+     * urn:x-oca:ocpp:uid:2:233247
+     * Contains status information about an identifier.
+     * It is advised to not stop charging for a token that expires during charging, as ExpiryDate is only used for caching purposes. If ExpiryDate is not given, the status has no end date.
      * 
      * 
      */

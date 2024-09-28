@@ -1,15 +1,14 @@
 
 package ocpp._2020._03;
 
-import javax.annotation.Generated;
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import de.rwth.idsg.ocpp.jaxb.RequestType;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
@@ -17,7 +16,6 @@ import de.rwth.idsg.ocpp.jaxb.RequestType;
     "totalCost",
     "transactionId"
 })
-@Generated("jsonschema2pojo")
 public class CostUpdatedRequest implements RequestType
 {
 
@@ -30,8 +28,8 @@ public class CostUpdatedRequest implements RequestType
     @Valid
     private CustomData customData;
     /**
-     * Current total cost, based on the information known by the CSMS, of the transaction including taxes. In the currency configured with the configuration Variable: [&lt;&lt;configkey-currency, Currency&gt;&gt;]
-     * 
+     * Current total cost, based on the information known by the CSMS, of the transaction including taxes. In the currency configured with the configuration Variable: [&lt;&lt;configkey-currency, Currency&gt;&gt;]
+     * 
      * 
      * (Required)
      * 
@@ -41,8 +39,8 @@ public class CostUpdatedRequest implements RequestType
     @NotNull
     private Double totalCost;
     /**
-     * Transaction Id of the transaction the current cost are asked for.
-     * 
+     * Transaction Id of the transaction the current cost are asked for.
+     * 
      * 
      * (Required)
      * 
@@ -77,8 +75,8 @@ public class CostUpdatedRequest implements RequestType
     }
 
     /**
-     * Current total cost, based on the information known by the CSMS, of the transaction including taxes. In the currency configured with the configuration Variable: [&lt;&lt;configkey-currency, Currency&gt;&gt;]
-     * 
+     * Current total cost, based on the information known by the CSMS, of the transaction including taxes. In the currency configured with the configuration Variable: [&lt;&lt;configkey-currency, Currency&gt;&gt;]
+     * 
      * 
      * (Required)
      * 
@@ -89,8 +87,8 @@ public class CostUpdatedRequest implements RequestType
     }
 
     /**
-     * Current total cost, based on the information known by the CSMS, of the transaction including taxes. In the currency configured with the configuration Variable: [&lt;&lt;configkey-currency, Currency&gt;&gt;]
-     * 
+     * Current total cost, based on the information known by the CSMS, of the transaction including taxes. In the currency configured with the configuration Variable: [&lt;&lt;configkey-currency, Currency&gt;&gt;]
+     * 
      * 
      * (Required)
      * 
@@ -106,8 +104,8 @@ public class CostUpdatedRequest implements RequestType
     }
 
     /**
-     * Transaction Id of the transaction the current cost are asked for.
-     * 
+     * Transaction Id of the transaction the current cost are asked for.
+     * 
      * 
      * (Required)
      * 
@@ -118,8 +116,8 @@ public class CostUpdatedRequest implements RequestType
     }
 
     /**
-     * Transaction Id of the transaction the current cost are asked for.
-     * 
+     * Transaction Id of the transaction the current cost are asked for.
+     * 
      * 
      * (Required)
      * 

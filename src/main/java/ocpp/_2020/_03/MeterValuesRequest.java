@@ -3,20 +3,19 @@ package ocpp._2020._03;
 
 import java.util.ArrayList;
 import java.util.List;
-import javax.annotation.Generated;
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import de.rwth.idsg.ocpp.jaxb.RequestType;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 
 
 /**
- * Request_ Body
- * urn:x-enexis:ecdm:uid:2:234744
+ * Request_ Body
+ * urn:x-enexis:ecdm:uid:2:234744
  * 
  * 
  */
@@ -26,7 +25,6 @@ import de.rwth.idsg.ocpp.jaxb.RequestType;
     "evseId",
     "meterValue"
 })
-@Generated("jsonschema2pojo")
 public class MeterValuesRequest implements RequestType
 {
 
@@ -39,9 +37,9 @@ public class MeterValuesRequest implements RequestType
     @Valid
     private CustomData customData;
     /**
-     * Request_ Body. EVSEID. Numeric_ Identifier
-     * urn:x-enexis:ecdm:uid:1:571101
-     * This contains a number (&gt;0) designating an EVSE of the Charging Station. ‘0’ (zero) is used to designate the main power meter.
+     * Request_ Body. EVSEID. Numeric_ Identifier
+     * urn:x-enexis:ecdm:uid:1:571101
+     * This contains a number (&gt;0) designating an EVSE of the Charging Station. ‘0’ (zero) is used to designate the main power meter.
      * 
      * (Required)
      * 
@@ -85,9 +83,9 @@ public class MeterValuesRequest implements RequestType
     }
 
     /**
-     * Request_ Body. EVSEID. Numeric_ Identifier
-     * urn:x-enexis:ecdm:uid:1:571101
-     * This contains a number (&gt;0) designating an EVSE of the Charging Station. ‘0’ (zero) is used to designate the main power meter.
+     * Request_ Body. EVSEID. Numeric_ Identifier
+     * urn:x-enexis:ecdm:uid:1:571101
+     * This contains a number (&gt;0) designating an EVSE of the Charging Station. ‘0’ (zero) is used to designate the main power meter.
      * 
      * (Required)
      * 
@@ -98,9 +96,9 @@ public class MeterValuesRequest implements RequestType
     }
 
     /**
-     * Request_ Body. EVSEID. Numeric_ Identifier
-     * urn:x-enexis:ecdm:uid:1:571101
-     * This contains a number (&gt;0) designating an EVSE of the Charging Station. ‘0’ (zero) is used to designate the main power meter.
+     * Request_ Body. EVSEID. Numeric_ Identifier
+     * urn:x-enexis:ecdm:uid:1:571101
+     * This contains a number (&gt;0) designating an EVSE of the Charging Station. ‘0’ (zero) is used to designate the main power meter.
      * 
      * (Required)
      * 

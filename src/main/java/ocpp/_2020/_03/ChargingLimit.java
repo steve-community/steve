@@ -1,18 +1,17 @@
 
 package ocpp._2020._03;
 
-import javax.annotation.Generated;
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 
 
 /**
- * Charging_ Limit
- * urn:x-enexis:ecdm:uid:2:234489
+ * Charging_ Limit
+ * urn:x-enexis:ecdm:uid:2:234489
  * 
  * 
  */
@@ -22,7 +21,6 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
     "chargingLimitSource",
     "isGridCritical"
 })
-@Generated("jsonschema2pojo")
 public class ChargingLimit {
 
     /**
@@ -34,9 +32,9 @@ public class ChargingLimit {
     @Valid
     private CustomData customData;
     /**
-     * Charging_ Limit. Charging_ Limit_ Source. Charging_ Limit_ Source_ Code
-     * urn:x-enexis:ecdm:uid:1:570845
-     * Represents the source of the charging limit.
+     * Charging_ Limit. Charging_ Limit_ Source. Charging_ Limit_ Source_ Code
+     * urn:x-enexis:ecdm:uid:1:570845
+     * Represents the source of the charging limit.
      * 
      * (Required)
      * 
@@ -46,9 +44,9 @@ public class ChargingLimit {
     @NotNull
     private ChargingLimitSourceEnum chargingLimitSource;
     /**
-     * Charging_ Limit. Is_ Grid_ Critical. Indicator
-     * urn:x-enexis:ecdm:uid:1:570847
-     * Indicates whether the charging limit is critical for the grid.
+     * Charging_ Limit. Is_ Grid_ Critical. Indicator
+     * urn:x-enexis:ecdm:uid:1:570847
+     * Indicates whether the charging limit is critical for the grid.
      * 
      * 
      */
@@ -80,9 +78,9 @@ public class ChargingLimit {
     }
 
     /**
-     * Charging_ Limit. Charging_ Limit_ Source. Charging_ Limit_ Source_ Code
-     * urn:x-enexis:ecdm:uid:1:570845
-     * Represents the source of the charging limit.
+     * Charging_ Limit. Charging_ Limit_ Source. Charging_ Limit_ Source_ Code
+     * urn:x-enexis:ecdm:uid:1:570845
+     * Represents the source of the charging limit.
      * 
      * (Required)
      * 
@@ -93,9 +91,9 @@ public class ChargingLimit {
     }
 
     /**
-     * Charging_ Limit. Charging_ Limit_ Source. Charging_ Limit_ Source_ Code
-     * urn:x-enexis:ecdm:uid:1:570845
-     * Represents the source of the charging limit.
+     * Charging_ Limit. Charging_ Limit_ Source. Charging_ Limit_ Source_ Code
+     * urn:x-enexis:ecdm:uid:1:570845
+     * Represents the source of the charging limit.
      * 
      * (Required)
      * 
@@ -111,9 +109,9 @@ public class ChargingLimit {
     }
 
     /**
-     * Charging_ Limit. Is_ Grid_ Critical. Indicator
-     * urn:x-enexis:ecdm:uid:1:570847
-     * Indicates whether the charging limit is critical for the grid.
+     * Charging_ Limit. Is_ Grid_ Critical. Indicator
+     * urn:x-enexis:ecdm:uid:1:570847
+     * Indicates whether the charging limit is critical for the grid.
      * 
      * 
      */
@@ -123,9 +121,9 @@ public class ChargingLimit {
     }
 
     /**
-     * Charging_ Limit. Is_ Grid_ Critical. Indicator
-     * urn:x-enexis:ecdm:uid:1:570847
-     * Indicates whether the charging limit is critical for the grid.
+     * Charging_ Limit. Is_ Grid_ Critical. Indicator
+     * urn:x-enexis:ecdm:uid:1:570847
+     * Indicates whether the charging limit is critical for the grid.
      * 
      * 
      */

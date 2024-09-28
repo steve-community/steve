@@ -1,18 +1,17 @@
 
 package ocpp._2020._03;
 
-import javax.annotation.Generated;
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 
 
 /**
- * Class to hold results of GetVariables request.
+ * Class to hold results of GetVariables request.
  * 
  * 
  */
@@ -26,7 +25,6 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
     "component",
     "variable"
 })
-@Generated("jsonschema2pojo")
 public class GetVariableResult {
 
     /**
@@ -38,7 +36,7 @@ public class GetVariableResult {
     @Valid
     private CustomData customData;
     /**
-     * Element providing more information about the status.
+     * Element providing more information about the status.
      * 
      * 
      */
@@ -47,8 +45,8 @@ public class GetVariableResult {
     @Valid
     private StatusInfo attributeStatusInfo;
     /**
-     * Result status of getting the variable.
-     * 
+     * Result status of getting the variable.
+     * 
      * 
      * (Required)
      * 
@@ -58,7 +56,7 @@ public class GetVariableResult {
     @NotNull
     private GetVariableStatusEnum attributeStatus;
     /**
-     * Attribute type for which value is requested. When absent, default Actual is assumed.
+     * Attribute type for which value is requested. When absent, default Actual is assumed.
      * 
      * 
      */
@@ -66,10 +64,10 @@ public class GetVariableResult {
     @JsonPropertyDescription("Attribute type for which value is requested. When absent, default Actual is assumed.\r\n")
     private AttributeEnum attributeType = AttributeEnum.fromValue("Actual");
     /**
-     * Value of requested attribute type of component-variable. This field can only be empty when the given status is NOT accepted.
-     * 
-     * The Configuration Variable &lt;&lt;configkey-reporting-value-size,ReportingValueSize&gt;&gt; can be used to limit GetVariableResult.attributeValue, VariableAttribute.value and EventData.actualValue. The max size of these values will always remain equal. 
-     * 
+     * Value of requested attribute type of component-variable. This field can only be empty when the given status is NOT accepted.
+     * 
+     * The Configuration Variable &lt;&lt;configkey-reporting-value-size,ReportingValueSize&gt;&gt; can be used to limit GetVariableResult.attributeValue, VariableAttribute.value and EventData.actualValue. The max size of these values will always remain equal. 
+     * 
      * 
      * 
      */
@@ -78,7 +76,7 @@ public class GetVariableResult {
     @Size(max = 2500)
     private String attributeValue;
     /**
-     * A physical or logical component
+     * A physical or logical component
      * 
      * (Required)
      * 
@@ -89,7 +87,7 @@ public class GetVariableResult {
     @NotNull
     private Component component;
     /**
-     * Reference key to a component-variable.
+     * Reference key to a component-variable.
      * 
      * (Required)
      * 
@@ -124,7 +122,7 @@ public class GetVariableResult {
     }
 
     /**
-     * Element providing more information about the status.
+     * Element providing more information about the status.
      * 
      * 
      */
@@ -134,7 +132,7 @@ public class GetVariableResult {
     }
 
     /**
-     * Element providing more information about the status.
+     * Element providing more information about the status.
      * 
      * 
      */
@@ -149,8 +147,8 @@ public class GetVariableResult {
     }
 
     /**
-     * Result status of getting the variable.
-     * 
+     * Result status of getting the variable.
+     * 
      * 
      * (Required)
      * 
@@ -161,8 +159,8 @@ public class GetVariableResult {
     }
 
     /**
-     * Result status of getting the variable.
-     * 
+     * Result status of getting the variable.
+     * 
      * 
      * (Required)
      * 
@@ -178,7 +176,7 @@ public class GetVariableResult {
     }
 
     /**
-     * Attribute type for which value is requested. When absent, default Actual is assumed.
+     * Attribute type for which value is requested. When absent, default Actual is assumed.
      * 
      * 
      */
@@ -188,7 +186,7 @@ public class GetVariableResult {
     }
 
     /**
-     * Attribute type for which value is requested. When absent, default Actual is assumed.
+     * Attribute type for which value is requested. When absent, default Actual is assumed.
      * 
      * 
      */
@@ -203,10 +201,10 @@ public class GetVariableResult {
     }
 
     /**
-     * Value of requested attribute type of component-variable. This field can only be empty when the given status is NOT accepted.
-     * 
-     * The Configuration Variable &lt;&lt;configkey-reporting-value-size,ReportingValueSize&gt;&gt; can be used to limit GetVariableResult.attributeValue, VariableAttribute.value and EventData.actualValue. The max size of these values will always remain equal. 
-     * 
+     * Value of requested attribute type of component-variable. This field can only be empty when the given status is NOT accepted.
+     * 
+     * The Configuration Variable &lt;&lt;configkey-reporting-value-size,ReportingValueSize&gt;&gt; can be used to limit GetVariableResult.attributeValue, VariableAttribute.value and EventData.actualValue. The max size of these values will always remain equal. 
+     * 
      * 
      * 
      */
@@ -216,10 +214,10 @@ public class GetVariableResult {
     }
 
     /**
-     * Value of requested attribute type of component-variable. This field can only be empty when the given status is NOT accepted.
-     * 
-     * The Configuration Variable &lt;&lt;configkey-reporting-value-size,ReportingValueSize&gt;&gt; can be used to limit GetVariableResult.attributeValue, VariableAttribute.value and EventData.actualValue. The max size of these values will always remain equal. 
-     * 
+     * Value of requested attribute type of component-variable. This field can only be empty when the given status is NOT accepted.
+     * 
+     * The Configuration Variable &lt;&lt;configkey-reporting-value-size,ReportingValueSize&gt;&gt; can be used to limit GetVariableResult.attributeValue, VariableAttribute.value and EventData.actualValue. The max size of these values will always remain equal. 
+     * 
      * 
      * 
      */
@@ -234,7 +232,7 @@ public class GetVariableResult {
     }
 
     /**
-     * A physical or logical component
+     * A physical or logical component
      * 
      * (Required)
      * 
@@ -245,7 +243,7 @@ public class GetVariableResult {
     }
 
     /**
-     * A physical or logical component
+     * A physical or logical component
      * 
      * (Required)
      * 
@@ -261,7 +259,7 @@ public class GetVariableResult {
     }
 
     /**
-     * Reference key to a component-variable.
+     * Reference key to a component-variable.
      * 
      * (Required)
      * 
@@ -272,7 +270,7 @@ public class GetVariableResult {
     }
 
     /**
-     * Reference key to a component-variable.
+     * Reference key to a component-variable.
      * 
      * (Required)
      * 

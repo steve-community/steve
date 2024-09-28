@@ -3,19 +3,17 @@ package ocpp._2020._03;
 
 import java.util.HashMap;
 import java.util.Map;
-import javax.annotation.Generated;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 
 /**
- * Cost. Cost_ Kind. Cost_ Kind_ Code
- * urn:x-oca:ocpp:uid:1:569243
- * The kind of cost referred to in the message element amount
+ * Cost. Cost_ Kind. Cost_ Kind_ Code
+ * urn:x-oca:ocpp:uid:1:569243
+ * The kind of cost referred to in the message element amount
  * 
  * 
  */
-@Generated("jsonschema2pojo")
 public enum CostKindEnum {
 
     CARBON_DIOXIDE_EMISSION("CarbonDioxideEmission"),

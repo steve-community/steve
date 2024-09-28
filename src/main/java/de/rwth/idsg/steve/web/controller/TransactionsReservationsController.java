@@ -24,6 +24,7 @@ package de.rwth.idsg.steve.web.controller;
 
 import de.rwth.idsg.steve.config.WebEnvironment;
 import de.rwth.idsg.steve.repository.ReservationStatus;
+import de.rwth.idsg.steve.service.OcppTagService;
 import de.rwth.idsg.steve.service.TransactionStopService;
 import de.rwth.idsg.steve.web.dto.ReservationQueryForm;
 import de.rwth.idsg.steve.web.dto.TransactionQueryForm;
@@ -149,7 +150,7 @@ public class TransactionsReservationsController {
     }
 
     private void initList(Model model) {
-        model.addAttribute("cpList", chargePointRepository.getChargeBoxIds());
+        model.addAttribute("cpList", chargePointService.getChargeBoxIds());
         model.addAttribute("idTagList", ocppTagService.getIdTags());
     }
 

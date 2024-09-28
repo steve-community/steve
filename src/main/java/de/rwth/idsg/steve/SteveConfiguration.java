@@ -22,6 +22,7 @@ import de.rwth.idsg.steve.config.WebEnvironment;
 import de.rwth.idsg.steve.ocpp.ws.custom.WsSessionSelectStrategy;
 import de.rwth.idsg.steve.ocpp.ws.custom.WsSessionSelectStrategyEnum;
 import de.rwth.idsg.steve.utils.PropertiesFileLoader;
+import jakarta.annotation.PostConstruct;
 import lombok.Builder;
 import lombok.Getter;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -29,7 +30,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.beans.ConstructorProperties;
 
-import javax.annotation.PostConstruct;
 
 
 import org.springframework.beans.factory.annotation.Value;
@@ -52,7 +52,7 @@ public class SteveConfiguration {
     // Mapping for Web APIs
     private final String apiMapping = "/api";
     // Dummy service path
-    private final String routerEndpointPath = "/CentralSystemService";
+    private static final String routerEndpointPath = "/CentralSystemService";
     // Time zone for the application and database connections
     private final String timeZoneId = "UTC";  // or ZoneId.systemDefault().getId();
 
@@ -61,8 +61,6 @@ public class SteveConfiguration {
     // -------------------------------------------------------------------------
 
     private Ocpp ocpp;
-    private final Auth auth;
-    private final WebApi webApi;
 
 
     @Value("${ocpp.ws.session.select.strategy:ALWAYS_LAST}")
@@ -70,6 +68,9 @@ public class SteveConfiguration {
 
     @Value("${auto.register.unknown.stations:false}")
     private boolean autoRegisterUnknownStations;
+
+    @Value("${charge-box-id.validation.regex:}")
+    private String chargeBoxIdValidationRegex;
 
     @Value("${keystore.path:}")
     @Getter
@@ -81,17 +82,10 @@ public class SteveConfiguration {
 
     @PostConstruct
     public void init() {
-
-
-        webApi = WebApi.builder()
-                       .headerKey(p.getOptionalString("webapi.key"))
-                       .headerValue(p.getOptionalString("webapi.value"))
-                       .build();
-
-        ocpp = Ocpp.builder()
-                   .autoRegisterUnknownStations(p.getOptionalBoolean("auto.register.unknown.stations"))
-                   .chargeBoxIdValidationRegex(p.getOptionalString("charge-box-id.validation.regex"))
-                .wsSessionSelectStrategy(
+         ocpp = Ocpp.builder()
+                   .autoRegisterUnknownStations(autoRegisterUnknownStations)
+                   .chargeBoxIdValidationRegex(chargeBoxIdValidationRegex)
+                .wsSessionSelectStrategy(wsSessionSelectStrategy == null ? WsSessionSelectStrategyEnum.ALWAYS_LAST :
                         WsSessionSelectStrategyEnum.fromName(wsSessionSelectStrategy))
                 .build();
 

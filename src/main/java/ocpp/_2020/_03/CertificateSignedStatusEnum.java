@@ -3,17 +3,15 @@ package ocpp._2020._03;
 
 import java.util.HashMap;
 import java.util.Map;
-import javax.annotation.Generated;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 
 /**
- * Returns whether certificate signing has been accepted, otherwise rejected.
+ * Returns whether certificate signing has been accepted, otherwise rejected.
  * 
  * 
  */
-@Generated("jsonschema2pojo")
 public enum CertificateSignedStatusEnum {
 
     ACCEPTED("Accepted"),

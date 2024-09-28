@@ -31,8 +31,8 @@ import ocpp.cp._2015._10.ChargingRateUnitType;
 import ocpp.cp._2015._10.RecurrencyKindType;
 import org.joda.time.LocalDateTime;
 
-import javax.validation.Valid;
-import javax.validation.constraints.*;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.*;
 import java.math.BigDecimal;
 import java.util.Map;
 import java.util.Objects;

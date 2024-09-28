@@ -3,14 +3,13 @@ package ocpp._2020._03;
 
 import java.util.ArrayList;
 import java.util.List;
-import javax.annotation.Generated;
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
@@ -19,7 +18,6 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
     "certificateType",
     "childCertificateHashData"
 })
-@Generated("jsonschema2pojo")
 public class CertificateHashDataChain {
 
     /**
@@ -40,7 +38,7 @@ public class CertificateHashDataChain {
     @NotNull
     private CertificateHashData certificateHashData;
     /**
-     * Indicates the type of the requested certificate(s).
+     * Indicates the type of the requested certificate(s).
      * 
      * (Required)
      * 
@@ -103,7 +101,7 @@ public class CertificateHashDataChain {
     }
 
     /**
-     * Indicates the type of the requested certificate(s).
+     * Indicates the type of the requested certificate(s).
      * 
      * (Required)
      * 
@@ -114,7 +112,7 @@ public class CertificateHashDataChain {
     }
 
     /**
-     * Indicates the type of the requested certificate(s).
+     * Indicates the type of the requested certificate(s).
      * 
      * (Required)
      * 

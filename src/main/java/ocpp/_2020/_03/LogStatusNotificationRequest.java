@@ -1,14 +1,13 @@
 
 package ocpp._2020._03;
 
-import javax.annotation.Generated;
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import de.rwth.idsg.ocpp.jaxb.RequestType;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
@@ -16,7 +15,6 @@ import de.rwth.idsg.ocpp.jaxb.RequestType;
     "status",
     "requestId"
 })
-@Generated("jsonschema2pojo")
 public class LogStatusNotificationRequest implements RequestType
 {
 
@@ -29,7 +27,7 @@ public class LogStatusNotificationRequest implements RequestType
     @Valid
     private CustomData customData;
     /**
-     * This contains the status of the log upload.
+     * This contains the status of the log upload.
      * 
      * (Required)
      * 
@@ -39,8 +37,8 @@ public class LogStatusNotificationRequest implements RequestType
     @NotNull
     private UploadLogStatusEnum status;
     /**
-     * The request id that was provided in GetLogRequest that started this log upload. This field is mandatory,
-     * unless the message was triggered by a TriggerMessageRequest AND there is no log upload ongoing.
+     * The request id that was provided in GetLogRequest that started this log upload. This field is mandatory,
+     * unless the message was triggered by a TriggerMessageRequest AND there is no log upload ongoing.
      * 
      * 
      */
@@ -72,7 +70,7 @@ public class LogStatusNotificationRequest implements RequestType
     }
 
     /**
-     * This contains the status of the log upload.
+     * This contains the status of the log upload.
      * 
      * (Required)
      * 
@@ -83,7 +81,7 @@ public class LogStatusNotificationRequest implements RequestType
     }
 
     /**
-     * This contains the status of the log upload.
+     * This contains the status of the log upload.
      * 
      * (Required)
      * 
@@ -99,8 +97,8 @@ public class LogStatusNotificationRequest implements RequestType
     }
 
     /**
-     * The request id that was provided in GetLogRequest that started this log upload. This field is mandatory,
-     * unless the message was triggered by a TriggerMessageRequest AND there is no log upload ongoing.
+     * The request id that was provided in GetLogRequest that started this log upload. This field is mandatory,
+     * unless the message was triggered by a TriggerMessageRequest AND there is no log upload ongoing.
      * 
      * 
      */
@@ -110,8 +108,8 @@ public class LogStatusNotificationRequest implements RequestType
     }
 
     /**
-     * The request id that was provided in GetLogRequest that started this log upload. This field is mandatory,
-     * unless the message was triggered by a TriggerMessageRequest AND there is no log upload ongoing.
+     * The request id that was provided in GetLogRequest that started this log upload. This field is mandatory,
+     * unless the message was triggered by a TriggerMessageRequest AND there is no log upload ongoing.
      * 
      * 
      */

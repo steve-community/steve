@@ -26,6 +26,7 @@ import com.google.common.base.Strings;
 import de.rwth.idsg.steve.SteveConfiguration;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
+import lombok.RequiredArgsConstructor;
 
 import java.util.regex.Pattern;
 
@@ -33,10 +34,20 @@ import java.util.regex.Pattern;
  * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 21.01.2016
  */
+@RequiredArgsConstructor
 public class ChargeBoxIdValidator implements ConstraintValidator<ChargeBoxId, String> {
 
     private static final String REGEX = "[^=/()<>]*";
-    private static final Pattern PATTERN = Pattern.compile(getRegexToUse());
+    private static Pattern pattern = null;
+
+    private static Pattern getPattern(String regex) {
+        if (pattern == null) {
+            pattern = Pattern.compile(regex);
+        }
+        return pattern;
+    }
+
+    private final SteveConfiguration config;
 
     @Override
     public void initialize(ChargeBoxId idTag) {
@@ -60,12 +71,11 @@ public class ChargeBoxIdValidator implements ConstraintValidator<ChargeBoxId, St
         if (!str1.equals(str)) {
             return false;
         }
-
-        return PATTERN.matcher(str).matches();
+        return getPattern(getRegexToUse()).matcher(str).matches();
     }
 
-    private static String getRegexToUse() {
-        String regexFromConfig = SteveConfiguration.CONFIG.getOcpp().getChargeBoxIdValidationRegex();
+    private String getRegexToUse() {
+        String regexFromConfig = config.getOcpp().getChargeBoxIdValidationRegex();
         return Strings.isNullOrEmpty(regexFromConfig) ? REGEX : regexFromConfig;
     }
 }

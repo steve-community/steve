@@ -3,21 +3,19 @@ package ocpp._2020._03;
 
 import java.util.ArrayList;
 import java.util.List;
-import javax.annotation.Generated;
-import javax.validation.Valid;
-import javax.validation.constraints.Size;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import de.rwth.idsg.ocpp.jaxb.RequestType;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Size;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
     "customData",
     "certificateType"
 })
-@Generated("jsonschema2pojo")
 public class GetInstalledCertificateIdsRequest implements RequestType
 {
 
@@ -30,7 +28,7 @@ public class GetInstalledCertificateIdsRequest implements RequestType
     @Valid
     private CustomData customData;
     /**
-     * Indicates the type of certificates requested. When omitted, all certificate types are requested.
+     * Indicates the type of certificates requested. When omitted, all certificate types are requested.
      * 
      * 
      */
@@ -64,7 +62,7 @@ public class GetInstalledCertificateIdsRequest implements RequestType
     }
 
     /**
-     * Indicates the type of certificates requested. When omitted, all certificate types are requested.
+     * Indicates the type of certificates requested. When omitted, all certificate types are requested.
      * 
      * 
      */
@@ -74,7 +72,7 @@ public class GetInstalledCertificateIdsRequest implements RequestType
     }
 
     /**
-     * Indicates the type of certificates requested. When omitted, all certificate types are requested.
+     * Indicates the type of certificates requested. When omitted, all certificate types are requested.
      * 
      * 
      */

@@ -23,8 +23,6 @@ import de.rwth.idsg.steve.web.dto.Statistics;
 
 public interface GenericService {
 
-    void checkJavaAndMySQLOffsets();
-
     Statistics getStats();
 
 

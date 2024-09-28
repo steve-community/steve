@@ -3,20 +3,18 @@ package ocpp._2020._03;
 
 import java.util.HashMap;
 import java.util.Map;
-import javax.annotation.Generated;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 
 /**
- * Sampled_ Value. Location. Location_ Code
- * urn:x-oca:ocpp:uid:1:569265
- * Indicates where the measured value has been sampled. Default =  "Outlet"
- * 
+ * Sampled_ Value. Location. Location_ Code
+ * urn:x-oca:ocpp:uid:1:569265
+ * Indicates where the measured value has been sampled. Default =  "Outlet"
+ * 
  * 
  * 
  */
-@Generated("jsonschema2pojo")
 public enum LocationEnum {
 
     BODY("Body"),

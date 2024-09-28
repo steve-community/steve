@@ -1,11 +1,11 @@
 
 package ocpp.cs._2015._10;
 
+import de.rwth.idsg.ocpp.jaxb.RequestType;
 import jakarta.xml.bind.annotation.XmlAccessType;
 import jakarta.xml.bind.annotation.XmlAccessorType;
 import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlType;
-import de.rwth.idsg.ocpp.jaxb.RequestType;
 import lombok.ToString;
 
 
@@ -70,6 +70,15 @@ public class AuthorizeRequest
         return (this.idTag!= null);
     }
 
+    /**
+     * Sets the value of the idTag property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     * @return
+     *     The class instance
+     */
     public AuthorizeRequest withIdTag(String value) {
         setIdTag(value);
         return this;

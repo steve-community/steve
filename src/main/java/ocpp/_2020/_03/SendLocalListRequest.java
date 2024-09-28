@@ -3,15 +3,14 @@ package ocpp._2020._03;
 
 import java.util.ArrayList;
 import java.util.List;
-import javax.annotation.Generated;
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import de.rwth.idsg.ocpp.jaxb.RequestType;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
@@ -20,7 +19,6 @@ import de.rwth.idsg.ocpp.jaxb.RequestType;
     "versionNumber",
     "updateType"
 })
-@Generated("jsonschema2pojo")
 public class SendLocalListRequest implements RequestType
 {
 
@@ -37,7 +35,7 @@ public class SendLocalListRequest implements RequestType
     @Valid
     private List<AuthorizationData> localAuthorizationList = new ArrayList<AuthorizationData>();
     /**
-     * In case of a full update this is the version number of the full list. In case of a differential update it is the version number of the list after the update has been applied.
+     * In case of a full update this is the version number of the full list. In case of a differential update it is the version number of the list after the update has been applied.
      * 
      * (Required)
      * 
@@ -47,7 +45,7 @@ public class SendLocalListRequest implements RequestType
     @NotNull
     private Integer versionNumber;
     /**
-     * This contains the type of update (full or differential) of this request.
+     * This contains the type of update (full or differential) of this request.
      * 
      * (Required)
      * 
@@ -96,7 +94,7 @@ public class SendLocalListRequest implements RequestType
     }
 
     /**
-     * In case of a full update this is the version number of the full list. In case of a differential update it is the version number of the list after the update has been applied.
+     * In case of a full update this is the version number of the full list. In case of a differential update it is the version number of the list after the update has been applied.
      * 
      * (Required)
      * 
@@ -107,7 +105,7 @@ public class SendLocalListRequest implements RequestType
     }
 
     /**
-     * In case of a full update this is the version number of the full list. In case of a differential update it is the version number of the list after the update has been applied.
+     * In case of a full update this is the version number of the full list. In case of a differential update it is the version number of the list after the update has been applied.
      * 
      * (Required)
      * 
@@ -123,7 +121,7 @@ public class SendLocalListRequest implements RequestType
     }
 
     /**
-     * This contains the type of update (full or differential) of this request.
+     * This contains the type of update (full or differential) of this request.
      * 
      * (Required)
      * 
@@ -134,7 +132,7 @@ public class SendLocalListRequest implements RequestType
     }
 
     /**
-     * This contains the type of update (full or differential) of this request.
+     * This contains the type of update (full or differential) of this request.
      * 
      * (Required)
      * 

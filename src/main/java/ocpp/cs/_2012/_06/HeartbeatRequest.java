@@ -1,10 +1,10 @@
 
 package ocpp.cs._2012._06;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlType;
 import de.rwth.idsg.ocpp.jaxb.RequestType;
+import jakarta.xml.bind.annotation.XmlAccessType;
+import jakarta.xml.bind.annotation.XmlAccessorType;
+import jakarta.xml.bind.annotation.XmlType;
 import lombok.ToString;
 
 

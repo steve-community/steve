@@ -3,18 +3,16 @@ package ocpp._2020._03;
 
 import java.util.HashMap;
 import java.util.Map;
-import javax.annotation.Generated;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 
 /**
- * Can be used to force a power or current profile.
- * 
+ * Can be used to force a power or current profile.
+ * 
  * 
  * 
  */
-@Generated("jsonschema2pojo")
 public enum ChargingRateUnitEnum {
 
     W("W"),

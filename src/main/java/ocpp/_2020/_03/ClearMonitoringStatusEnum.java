@@ -3,18 +3,16 @@ package ocpp._2020._03;
 
 import java.util.HashMap;
 import java.util.Map;
-import javax.annotation.Generated;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 
 /**
- * Result of the clear request for this monitor, identified by its Id.
- * 
+ * Result of the clear request for this monitor, identified by its Id.
+ * 
  * 
  * 
  */
-@Generated("jsonschema2pojo")
 public enum ClearMonitoringStatusEnum {
 
     ACCEPTED("Accepted"),

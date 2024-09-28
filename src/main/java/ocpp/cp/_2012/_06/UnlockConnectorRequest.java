@@ -1,10 +1,10 @@
 
 package ocpp.cp._2012._06;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlType;
 import de.rwth.idsg.ocpp.jaxb.RequestType;
+import jakarta.xml.bind.annotation.XmlAccessType;
+import jakarta.xml.bind.annotation.XmlAccessorType;
+import jakarta.xml.bind.annotation.XmlType;
 import lombok.ToString;
 
 
@@ -60,6 +60,15 @@ public class UnlockConnectorRequest
         return true;
     }
 
+    /**
+     * Sets the value of the connectorId property.
+     * 
+     * @param value
+     *     allowed object is
+     *     int
+     * @return
+     *     The class instance
+     */
     public UnlockConnectorRequest withConnectorId(int value) {
         setConnectorId(value);
         return this;

@@ -3,17 +3,15 @@ package ocpp._2020._03;
 
 import java.util.HashMap;
 import java.util.Map;
-import javax.annotation.Generated;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 
 /**
- * Defines the mutability of this attribute. Default is ReadWrite when omitted.
+ * Defines the mutability of this attribute. Default is ReadWrite when omitted.
  * 
  * 
  */
-@Generated("jsonschema2pojo")
 public enum MutabilityEnum {
 
     READ_ONLY("ReadOnly"),

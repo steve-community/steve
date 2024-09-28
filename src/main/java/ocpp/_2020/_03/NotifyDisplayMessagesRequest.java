@@ -3,15 +3,14 @@ package ocpp._2020._03;
 
 import java.util.ArrayList;
 import java.util.List;
-import javax.annotation.Generated;
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import de.rwth.idsg.ocpp.jaxb.RequestType;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
@@ -20,7 +19,6 @@ import de.rwth.idsg.ocpp.jaxb.RequestType;
     "requestId",
     "tbc"
 })
-@Generated("jsonschema2pojo")
 public class NotifyDisplayMessagesRequest implements RequestType
 {
 
@@ -37,7 +35,7 @@ public class NotifyDisplayMessagesRequest implements RequestType
     @Valid
     private List<MessageInfo> messageInfo = new ArrayList<MessageInfo>();
     /**
-     * The id of the &lt;&lt;getdisplaymessagesrequest,GetDisplayMessagesRequest&gt;&gt; that requested this message.
+     * The id of the &lt;&lt;getdisplaymessagesrequest,GetDisplayMessagesRequest&gt;&gt; that requested this message.
      * 
      * (Required)
      * 
@@ -47,7 +45,7 @@ public class NotifyDisplayMessagesRequest implements RequestType
     @NotNull
     private Integer requestId;
     /**
-     * "to be continued" indicator. Indicates whether another part of the report follows in an upcoming NotifyDisplayMessagesRequest message. Default value when omitted is false.
+     * "to be continued" indicator. Indicates whether another part of the report follows in an upcoming NotifyDisplayMessagesRequest message. Default value when omitted is false.
      * 
      * 
      */
@@ -94,7 +92,7 @@ public class NotifyDisplayMessagesRequest implements RequestType
     }
 
     /**
-     * The id of the &lt;&lt;getdisplaymessagesrequest,GetDisplayMessagesRequest&gt;&gt; that requested this message.
+     * The id of the &lt;&lt;getdisplaymessagesrequest,GetDisplayMessagesRequest&gt;&gt; that requested this message.
      * 
      * (Required)
      * 
@@ -105,7 +103,7 @@ public class NotifyDisplayMessagesRequest implements RequestType
     }
 
     /**
-     * The id of the &lt;&lt;getdisplaymessagesrequest,GetDisplayMessagesRequest&gt;&gt; that requested this message.
+     * The id of the &lt;&lt;getdisplaymessagesrequest,GetDisplayMessagesRequest&gt;&gt; that requested this message.
      * 
      * (Required)
      * 
@@ -121,7 +119,7 @@ public class NotifyDisplayMessagesRequest implements RequestType
     }
 
     /**
-     * "to be continued" indicator. Indicates whether another part of the report follows in an upcoming NotifyDisplayMessagesRequest message. Default value when omitted is false.
+     * "to be continued" indicator. Indicates whether another part of the report follows in an upcoming NotifyDisplayMessagesRequest message. Default value when omitted is false.
      * 
      * 
      */
@@ -131,7 +129,7 @@ public class NotifyDisplayMessagesRequest implements RequestType
     }
 
     /**
-     * "to be continued" indicator. Indicates whether another part of the report follows in an upcoming NotifyDisplayMessagesRequest message. Default value when omitted is false.
+     * "to be continued" indicator. Indicates whether another part of the report follows in an upcoming NotifyDisplayMessagesRequest message. Default value when omitted is false.
      * 
      * 
      */

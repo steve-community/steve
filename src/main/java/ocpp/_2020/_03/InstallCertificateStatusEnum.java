@@ -3,17 +3,15 @@ package ocpp._2020._03;
 
 import java.util.HashMap;
 import java.util.Map;
-import javax.annotation.Generated;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 
 /**
- * Charging Station indicates if installation was successful.
+ * Charging Station indicates if installation was successful.
  * 
  * 
  */
-@Generated("jsonschema2pojo")
 public enum InstallCertificateStatusEnum {
 
     ACCEPTED("Accepted"),

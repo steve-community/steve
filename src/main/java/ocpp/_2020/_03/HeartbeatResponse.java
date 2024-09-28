@@ -1,14 +1,13 @@
 
 package ocpp._2020._03;
 
-import javax.annotation.Generated;
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import de.rwth.idsg.ocpp.jaxb.ResponseType;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import org.joda.time.DateTime;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -16,7 +15,6 @@ import org.joda.time.DateTime;
     "customData",
     "currentTime"
 })
-@Generated("jsonschema2pojo")
 public class HeartbeatResponse implements ResponseType
 {
 
@@ -29,7 +27,7 @@ public class HeartbeatResponse implements ResponseType
     @Valid
     private CustomData customData;
     /**
-     * Contains the current time of the CSMS.
+     * Contains the current time of the CSMS.
      * 
      * (Required)
      * 
@@ -63,7 +61,7 @@ public class HeartbeatResponse implements ResponseType
     }
 
     /**
-     * Contains the current time of the CSMS.
+     * Contains the current time of the CSMS.
      * 
      * (Required)
      * 
@@ -74,7 +72,7 @@ public class HeartbeatResponse implements ResponseType
     }
 
     /**
-     * Contains the current time of the CSMS.
+     * Contains the current time of the CSMS.
      * 
      * (Required)
      * 

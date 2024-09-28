@@ -23,6 +23,7 @@
 package de.rwth.idsg.steve.config;
 
 import com.google.common.collect.Lists;
+import de.rwth.idsg.steve.SteveConfiguration;
 import de.rwth.idsg.steve.ocpp.ws.OcppWebSocketHandshakeHandler;
 import de.rwth.idsg.steve.ocpp.ws.ocpp12.Ocpp12WebSocketEndpoint;
 import de.rwth.idsg.steve.ocpp.ws.ocpp15.Ocpp15WebSocketEndpoint;
@@ -53,6 +54,7 @@ public class WebSocketConfiguration implements WebSocketConfigurer {
     @Autowired private Ocpp12WebSocketEndpoint ocpp12WebSocketEndpoint;
     @Autowired private Ocpp15WebSocketEndpoint ocpp15WebSocketEndpoint;
     @Autowired private Ocpp16WebSocketEndpoint ocpp16WebSocketEndpoint;
+    @Autowired private SteveConfiguration configuration;
 
     public static final String PATH_INFIX = "/websocket/CentralSystemService/";
     public static final long PING_INTERVAL = TimeUnit.MINUTES.toMinutes(15);
@@ -65,7 +67,7 @@ public class WebSocketConfiguration implements WebSocketConfigurer {
         OcppWebSocketHandshakeHandler handshakeHandler = new OcppWebSocketHandshakeHandler(
             new DefaultHandshakeHandler(),
             Lists.newArrayList(ocpp16WebSocketEndpoint, ocpp15WebSocketEndpoint, ocpp12WebSocketEndpoint),
-            chargePointHelperService
+            chargePointHelperService, configuration
         );
 
         String path = WebEnvironment.getContextRoot() + PATH_INFIX + "*";

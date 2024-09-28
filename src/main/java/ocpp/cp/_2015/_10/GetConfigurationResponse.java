@@ -4,10 +4,10 @@ package ocpp.cp._2015._10;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlType;
 import de.rwth.idsg.ocpp.jaxb.ResponseType;
+import jakarta.xml.bind.annotation.XmlAccessType;
+import jakarta.xml.bind.annotation.XmlAccessorType;
+import jakarta.xml.bind.annotation.XmlType;
 import lombok.ToString;
 
 
@@ -52,7 +52,7 @@ public class GetConfigurationResponse
      * <p>
      * This accessor method returns a reference to the live list,
      * not a snapshot. Therefore any modification you make to the
-     * returned list will be present inside the JAXB object.
+     * returned list will be present inside the Jakarta XML Binding object.
      * This is why there is not a <CODE>set</CODE> method for the configurationKey property.
      * 
      * <p>
@@ -89,7 +89,7 @@ public class GetConfigurationResponse
      * <p>
      * This accessor method returns a reference to the live list,
      * not a snapshot. Therefore any modification you make to the
-     * returned list will be present inside the JAXB object.
+     * returned list will be present inside the Jakarta XML Binding object.
      * This is why there is not a <CODE>set</CODE> method for the unknownKey property.
      * 
      * <p>
@@ -120,6 +120,14 @@ public class GetConfigurationResponse
         this.unknownKey = null;
     }
 
+    /**
+     * Adds objects to the list of ConfigurationKey using add method
+     * 
+     * @param values
+     *     objects to add to the list ConfigurationKey
+     * @return
+     *     The class instance
+     */
     public GetConfigurationResponse withConfigurationKey(KeyValue... values) {
         if (values!= null) {
             for (KeyValue value: values) {
@@ -129,6 +137,14 @@ public class GetConfigurationResponse
         return this;
     }
 
+    /**
+     * Adds objects to the list of ConfigurationKey using addAll method
+     * 
+     * @param values
+     *     objects to add to the list ConfigurationKey
+     * @return
+     *     The class instance
+     */
     public GetConfigurationResponse withConfigurationKey(Collection<KeyValue> values) {
         if (values!= null) {
             getConfigurationKey().addAll(values);
@@ -136,6 +152,14 @@ public class GetConfigurationResponse
         return this;
     }
 
+    /**
+     * Adds objects to the list of UnknownKey using add method
+     * 
+     * @param values
+     *     objects to add to the list UnknownKey
+     * @return
+     *     The class instance
+     */
     public GetConfigurationResponse withUnknownKey(String... values) {
         if (values!= null) {
             for (String value: values) {
@@ -145,6 +169,14 @@ public class GetConfigurationResponse
         return this;
     }
 
+    /**
+     * Adds objects to the list of UnknownKey using addAll method
+     * 
+     * @param values
+     *     objects to add to the list UnknownKey
+     * @return
+     *     The class instance
+     */
     public GetConfigurationResponse withUnknownKey(Collection<String> values) {
         if (values!= null) {
             getUnknownKey().addAll(values);

@@ -1,11 +1,11 @@
 
 package ocpp.cs._2015._10;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlType;
 import de.rwth.idsg.ocpp.jaxb.ResponseType;
+import jakarta.xml.bind.annotation.XmlAccessType;
+import jakarta.xml.bind.annotation.XmlAccessorType;
+import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlType;
 import lombok.ToString;
 
 
@@ -93,11 +93,29 @@ public class StartTransactionResponse
         return (this.idTagInfo!= null);
     }
 
+    /**
+     * Sets the value of the transactionId property.
+     * 
+     * @param value
+     *     allowed object is
+     *     int
+     * @return
+     *     The class instance
+     */
     public StartTransactionResponse withTransactionId(int value) {
         setTransactionId(value);
         return this;
     }
 
+    /**
+     * Sets the value of the idTagInfo property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link IdTagInfo }
+     * @return
+     *     The class instance
+     */
     public StartTransactionResponse withIdTagInfo(IdTagInfo value) {
         setIdTagInfo(value);
         return this;

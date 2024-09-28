@@ -3,15 +3,14 @@ package ocpp._2020._03;
 
 import java.util.ArrayList;
 import java.util.List;
-import javax.annotation.Generated;
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import de.rwth.idsg.ocpp.jaxb.RequestType;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
@@ -22,7 +21,6 @@ import de.rwth.idsg.ocpp.jaxb.RequestType;
     "tbc",
     "evseId"
 })
-@Generated("jsonschema2pojo")
 public class ReportChargingProfilesRequest implements RequestType
 {
 
@@ -35,7 +33,7 @@ public class ReportChargingProfilesRequest implements RequestType
     @Valid
     private CustomData customData;
     /**
-     * Id used to match the &lt;&lt;getchargingprofilesrequest, GetChargingProfilesRequest&gt;&gt; message with the resulting ReportChargingProfilesRequest messages. When the CSMS provided a requestId in the &lt;&lt;getchargingprofilesrequest, GetChargingProfilesRequest&gt;&gt;, this field SHALL contain the same value.
+     * Id used to match the &lt;&lt;getchargingprofilesrequest, GetChargingProfilesRequest&gt;&gt; message with the resulting ReportChargingProfilesRequest messages. When the CSMS provided a requestId in the &lt;&lt;getchargingprofilesrequest, GetChargingProfilesRequest&gt;&gt;, this field SHALL contain the same value.
      * 
      * (Required)
      * 
@@ -45,7 +43,7 @@ public class ReportChargingProfilesRequest implements RequestType
     @NotNull
     private Integer requestId;
     /**
-     * Source that has installed this charging profile.
+     * Source that has installed this charging profile.
      * 
      * (Required)
      * 
@@ -65,7 +63,7 @@ public class ReportChargingProfilesRequest implements RequestType
     @NotNull
     private List<ChargingProfile> chargingProfile = new ArrayList<ChargingProfile>();
     /**
-     * To Be Continued. Default value when omitted: false. false indicates that there are no further messages as part of this report.
+     * To Be Continued. Default value when omitted: false. false indicates that there are no further messages as part of this report.
      * 
      * 
      */
@@ -73,7 +71,7 @@ public class ReportChargingProfilesRequest implements RequestType
     @JsonPropertyDescription("To Be Continued. Default value when omitted: false. false indicates that there are no further messages as part of this report.\r\n")
     private Boolean tbc = false;
     /**
-     * The evse to which the charging profile applies. If evseId = 0, the message contains an overall limit for the Charging Station.
+     * The evse to which the charging profile applies. If evseId = 0, the message contains an overall limit for the Charging Station.
      * 
      * (Required)
      * 
@@ -107,7 +105,7 @@ public class ReportChargingProfilesRequest implements RequestType
     }
 
     /**
-     * Id used to match the &lt;&lt;getchargingprofilesrequest, GetChargingProfilesRequest&gt;&gt; message with the resulting ReportChargingProfilesRequest messages. When the CSMS provided a requestId in the &lt;&lt;getchargingprofilesrequest, GetChargingProfilesRequest&gt;&gt;, this field SHALL contain the same value.
+     * Id used to match the &lt;&lt;getchargingprofilesrequest, GetChargingProfilesRequest&gt;&gt; message with the resulting ReportChargingProfilesRequest messages. When the CSMS provided a requestId in the &lt;&lt;getchargingprofilesrequest, GetChargingProfilesRequest&gt;&gt;, this field SHALL contain the same value.
      * 
      * (Required)
      * 
@@ -118,7 +116,7 @@ public class ReportChargingProfilesRequest implements RequestType
     }
 
     /**
-     * Id used to match the &lt;&lt;getchargingprofilesrequest, GetChargingProfilesRequest&gt;&gt; message with the resulting ReportChargingProfilesRequest messages. When the CSMS provided a requestId in the &lt;&lt;getchargingprofilesrequest, GetChargingProfilesRequest&gt;&gt;, this field SHALL contain the same value.
+     * Id used to match the &lt;&lt;getchargingprofilesrequest, GetChargingProfilesRequest&gt;&gt; message with the resulting ReportChargingProfilesRequest messages. When the CSMS provided a requestId in the &lt;&lt;getchargingprofilesrequest, GetChargingProfilesRequest&gt;&gt;, this field SHALL contain the same value.
      * 
      * (Required)
      * 
@@ -134,7 +132,7 @@ public class ReportChargingProfilesRequest implements RequestType
     }
 
     /**
-     * Source that has installed this charging profile.
+     * Source that has installed this charging profile.
      * 
      * (Required)
      * 
@@ -145,7 +143,7 @@ public class ReportChargingProfilesRequest implements RequestType
     }
 
     /**
-     * Source that has installed this charging profile.
+     * Source that has installed this charging profile.
      * 
      * (Required)
      * 
@@ -186,7 +184,7 @@ public class ReportChargingProfilesRequest implements RequestType
     }
 
     /**
-     * To Be Continued. Default value when omitted: false. false indicates that there are no further messages as part of this report.
+     * To Be Continued. Default value when omitted: false. false indicates that there are no further messages as part of this report.
      * 
      * 
      */
@@ -196,7 +194,7 @@ public class ReportChargingProfilesRequest implements RequestType
     }
 
     /**
-     * To Be Continued. Default value when omitted: false. false indicates that there are no further messages as part of this report.
+     * To Be Continued. Default value when omitted: false. false indicates that there are no further messages as part of this report.
      * 
      * 
      */
@@ -211,7 +209,7 @@ public class ReportChargingProfilesRequest implements RequestType
     }
 
     /**
-     * The evse to which the charging profile applies. If evseId = 0, the message contains an overall limit for the Charging Station.
+     * The evse to which the charging profile applies. If evseId = 0, the message contains an overall limit for the Charging Station.
      * 
      * (Required)
      * 
@@ -222,7 +220,7 @@ public class ReportChargingProfilesRequest implements RequestType
     }
 
     /**
-     * The evse to which the charging profile applies. If evseId = 0, the message contains an overall limit for the Charging Station.
+     * The evse to which the charging profile applies. If evseId = 0, the message contains an overall limit for the Charging Station.
      * 
      * (Required)
      * 

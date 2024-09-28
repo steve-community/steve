@@ -143,7 +143,7 @@ public class CentralSystemService16_Service {
             StatusNotificationRequest parameters, String chargeBoxIdentity) {
         log.info("Status notification on {}: {}", chargeBoxIdentity, parameters.getStatus().value());
         // Optional field
-        DateTime timestamp = parameters.isSetTimestamp() ? parameters.getTimestamp() : DateTime.now();
+        DateTime timestamp = parameters.getTimestamp()!=null ? parameters.getTimestamp() : DateTime.now();
 
         InsertConnectorStatusParams params =
                 InsertConnectorStatusParams.builder()
@@ -170,13 +170,6 @@ public class CentralSystemService16_Service {
     public MeterValuesResponse meterValues(MeterValuesRequest parameters, String chargeBoxIdentity) {
         Integer transactionId = getTransactionId(parameters);
         log.info("Meter values request for transaction: {} [chargeBox={}]", transactionId, chargeBoxIdentity);
-
-        ocppServerRepository.insertMeterValues(
-                chargeBoxIdentity,
-                parameters.getMeterValue(),
-                parameters.getConnectorId(),
-                transactionId
-        );
 
         if (parameters.isSetMeterValue() && transactionId != null && transactionId > 0) {
             TransactionStart transactionStart =
@@ -254,9 +247,6 @@ public class CentralSystemService16_Service {
                 parameters.getIdTag());
 
         applicationEventPublisher.publishEvent(new OcppTransactionStarted(transactionId, params));
-
-        IdTagInfo info = new IdTagInfo();
-        info.setStatus(AuthorizationStatus.ACCEPTED);
 
         return new StartTransactionResponse()
                 .withIdTagInfo(info)

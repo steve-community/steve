@@ -1,11 +1,11 @@
 
 package ocpp.cs._2012._06;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlType;
 import de.rwth.idsg.ocpp.jaxb.RequestType;
+import jakarta.xml.bind.annotation.XmlAccessType;
+import jakarta.xml.bind.annotation.XmlAccessorType;
+import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlType;
 import lombok.ToString;
 
 
@@ -132,16 +132,43 @@ public class DataTransferRequest
         return (this.data!= null);
     }
 
+    /**
+     * Sets the value of the vendorId property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     * @return
+     *     The class instance
+     */
     public DataTransferRequest withVendorId(String value) {
         setVendorId(value);
         return this;
     }
 
+    /**
+     * Sets the value of the messageId property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     * @return
+     *     The class instance
+     */
     public DataTransferRequest withMessageId(String value) {
         setMessageId(value);
         return this;
     }
 
+    /**
+     * Sets the value of the data property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     * @return
+     *     The class instance
+     */
     public DataTransferRequest withData(String value) {
         setData(value);
         return this;

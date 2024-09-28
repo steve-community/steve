@@ -142,7 +142,7 @@ public class NotificationService {
             .append("- startTimestamp: ").append(params.getStartTimestamp()).append(System.lineSeparator())
             .append("- startMeterValue: ").append(params.getStartMeterValue());
 
-        if (params.hasReservation()) {
+        if (params.isSetReservationId()) {
             sb.append(System.lineSeparator()).append("- reservationId: ").append(params.getReservationId());
         }
 

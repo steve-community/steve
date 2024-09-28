@@ -37,8 +37,9 @@ public class GenericServiceImpl implements GenericService {
 	private OcppReservationRepository reservationRepo;
 	@Autowired
 	private TransactionRepository transactionRepo;
-	
-	
+
+
+
 	@Override
 	public Statistics getStats() {
 		int chargeBoxCount=(int) chargeBoxRepo.count();

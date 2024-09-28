@@ -3,18 +3,16 @@ package ocpp._2020._03;
 
 import java.util.HashMap;
 import java.util.Map;
-import javax.annotation.Generated;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 
 /**
- * This contains the type of log file that the Charging Station
- * should send.
+ * This contains the type of log file that the Charging Station
+ * should send.
  * 
  * 
  */
-@Generated("jsonschema2pojo")
 public enum LogEnum {
 
     DIAGNOSTICS_LOG("DiagnosticsLog"),

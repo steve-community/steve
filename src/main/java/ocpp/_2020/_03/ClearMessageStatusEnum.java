@@ -3,17 +3,15 @@ package ocpp._2020._03;
 
 import java.util.HashMap;
 import java.util.Map;
-import javax.annotation.Generated;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 
 /**
- * Returns whether the Charging Station has been able to remove the message.
+ * Returns whether the Charging Station has been able to remove the message.
  * 
  * 
  */
-@Generated("jsonschema2pojo")
 public enum ClearMessageStatusEnum {
 
     ACCEPTED("Accepted"),

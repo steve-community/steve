@@ -1,14 +1,13 @@
 
 package ocpp._2020._03;
 
-import javax.annotation.Generated;
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import de.rwth.idsg.ocpp.jaxb.RequestType;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
@@ -16,7 +15,6 @@ import de.rwth.idsg.ocpp.jaxb.RequestType;
     "type",
     "evseId"
 })
-@Generated("jsonschema2pojo")
 public class ResetRequest implements RequestType
 {
 
@@ -29,7 +27,7 @@ public class ResetRequest implements RequestType
     @Valid
     private CustomData customData;
     /**
-     * This contains the type of reset that the Charging Station or EVSE should perform.
+     * This contains the type of reset that the Charging Station or EVSE should perform.
      * 
      * (Required)
      * 
@@ -39,7 +37,7 @@ public class ResetRequest implements RequestType
     @NotNull
     private ResetEnum type;
     /**
-     * This contains the ID of a specific EVSE that needs to be reset, instead of the entire Charging Station.
+     * This contains the ID of a specific EVSE that needs to be reset, instead of the entire Charging Station.
      * 
      * 
      */
@@ -71,7 +69,7 @@ public class ResetRequest implements RequestType
     }
 
     /**
-     * This contains the type of reset that the Charging Station or EVSE should perform.
+     * This contains the type of reset that the Charging Station or EVSE should perform.
      * 
      * (Required)
      * 
@@ -82,7 +80,7 @@ public class ResetRequest implements RequestType
     }
 
     /**
-     * This contains the type of reset that the Charging Station or EVSE should perform.
+     * This contains the type of reset that the Charging Station or EVSE should perform.
      * 
      * (Required)
      * 
@@ -98,7 +96,7 @@ public class ResetRequest implements RequestType
     }
 
     /**
-     * This contains the ID of a specific EVSE that needs to be reset, instead of the entire Charging Station.
+     * This contains the ID of a specific EVSE that needs to be reset, instead of the entire Charging Station.
      * 
      * 
      */
@@ -108,7 +106,7 @@ public class ResetRequest implements RequestType
     }
 
     /**
-     * This contains the ID of a specific EVSE that needs to be reset, instead of the entire Charging Station.
+     * This contains the ID of a specific EVSE that needs to be reset, instead of the entire Charging Station.
      * 
      * 
      */

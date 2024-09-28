@@ -1,18 +1,17 @@
 
 package ocpp._2020._03;
 
-import javax.annotation.Generated;
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 
 
 /**
- * Fixed read-only parameters of a variable.
+ * Fixed read-only parameters of a variable.
  * 
  * 
  */
@@ -26,7 +25,6 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
     "valuesList",
     "supportsMonitoring"
 })
-@Generated("jsonschema2pojo")
 public class VariableCharacteristics {
 
     /**
@@ -38,7 +36,7 @@ public class VariableCharacteristics {
     @Valid
     private CustomData customData;
     /**
-     * Unit of the variable. When the transmitted value has a unit, this field SHALL be included.
+     * Unit of the variable. When the transmitted value has a unit, this field SHALL be included.
      * 
      * 
      */
@@ -47,7 +45,7 @@ public class VariableCharacteristics {
     @Size(max = 16)
     private String unit;
     /**
-     * Data type of this variable.
+     * Data type of this variable.
      * 
      * (Required)
      * 
@@ -57,7 +55,7 @@ public class VariableCharacteristics {
     @NotNull
     private DataEnum dataType;
     /**
-     * Minimum possible value of this variable.
+     * Minimum possible value of this variable.
      * 
      * 
      */
@@ -65,7 +63,7 @@ public class VariableCharacteristics {
     @JsonPropertyDescription("Minimum possible value of this variable.\r\n")
     private Double minLimit;
     /**
-     * Maximum possible value of this variable. When the datatype of this Variable is String, OptionList, SequenceList or MemberList, this field defines the maximum length of the (CSV) string.
+     * Maximum possible value of this variable. When the datatype of this Variable is String, OptionList, SequenceList or MemberList, this field defines the maximum length of the (CSV) string.
      * 
      * 
      */
@@ -73,18 +71,18 @@ public class VariableCharacteristics {
     @JsonPropertyDescription("Maximum possible value of this variable. When the datatype of this Variable is String, OptionList, SequenceList or MemberList, this field defines the maximum length of the (CSV) string.\r\n")
     private Double maxLimit;
     /**
-     * Allowed values when variable is Option/Member/SequenceList. 
-     * 
-     * * OptionList: The (Actual) Variable value must be a single value from the reported (CSV) enumeration list.
-     * 
-     * * MemberList: The (Actual) Variable value  may be an (unordered) (sub-)set of the reported (CSV) valid values list.
-     * 
-     * * SequenceList: The (Actual) Variable value  may be an ordered (priority, etc)  (sub-)set of the reported (CSV) valid values.
-     * 
-     * This is a comma separated list.
-     * 
-     * The Configuration Variable &lt;&lt;configkey-configuration-value-size,ConfigurationValueSize&gt;&gt; can be used to limit SetVariableData.attributeValue and VariableCharacteristics.valueList. The max size of these values will always remain equal. 
-     * 
+     * Allowed values when variable is Option/Member/SequenceList. 
+     * 
+     * * OptionList: The (Actual) Variable value must be a single value from the reported (CSV) enumeration list.
+     * 
+     * * MemberList: The (Actual) Variable value  may be an (unordered) (sub-)set of the reported (CSV) valid values list.
+     * 
+     * * SequenceList: The (Actual) Variable value  may be an ordered (priority, etc)  (sub-)set of the reported (CSV) valid values.
+     * 
+     * This is a comma separated list.
+     * 
+     * The Configuration Variable &lt;&lt;configkey-configuration-value-size,ConfigurationValueSize&gt;&gt; can be used to limit SetVariableData.attributeValue and VariableCharacteristics.valueList. The max size of these values will always remain equal. 
+     * 
      * 
      * 
      */
@@ -93,7 +91,7 @@ public class VariableCharacteristics {
     @Size(max = 1000)
     private String valuesList;
     /**
-     * Flag indicating if this variable supports monitoring. 
+     * Flag indicating if this variable supports monitoring. 
      * 
      * (Required)
      * 
@@ -127,7 +125,7 @@ public class VariableCharacteristics {
     }
 
     /**
-     * Unit of the variable. When the transmitted value has a unit, this field SHALL be included.
+     * Unit of the variable. When the transmitted value has a unit, this field SHALL be included.
      * 
      * 
      */
@@ -137,7 +135,7 @@ public class VariableCharacteristics {
     }
 
     /**
-     * Unit of the variable. When the transmitted value has a unit, this field SHALL be included.
+     * Unit of the variable. When the transmitted value has a unit, this field SHALL be included.
      * 
      * 
      */
@@ -152,7 +150,7 @@ public class VariableCharacteristics {
     }
 
     /**
-     * Data type of this variable.
+     * Data type of this variable.
      * 
      * (Required)
      * 
@@ -163,7 +161,7 @@ public class VariableCharacteristics {
     }
 
     /**
-     * Data type of this variable.
+     * Data type of this variable.
      * 
      * (Required)
      * 
@@ -179,7 +177,7 @@ public class VariableCharacteristics {
     }
 
     /**
-     * Minimum possible value of this variable.
+     * Minimum possible value of this variable.
      * 
      * 
      */
@@ -189,7 +187,7 @@ public class VariableCharacteristics {
     }
 
     /**
-     * Minimum possible value of this variable.
+     * Minimum possible value of this variable.
      * 
      * 
      */
@@ -204,7 +202,7 @@ public class VariableCharacteristics {
     }
 
     /**
-     * Maximum possible value of this variable. When the datatype of this Variable is String, OptionList, SequenceList or MemberList, this field defines the maximum length of the (CSV) string.
+     * Maximum possible value of this variable. When the datatype of this Variable is String, OptionList, SequenceList or MemberList, this field defines the maximum length of the (CSV) string.
      * 
      * 
      */
@@ -214,7 +212,7 @@ public class VariableCharacteristics {
     }
 
     /**
-     * Maximum possible value of this variable. When the datatype of this Variable is String, OptionList, SequenceList or MemberList, this field defines the maximum length of the (CSV) string.
+     * Maximum possible value of this variable. When the datatype of this Variable is String, OptionList, SequenceList or MemberList, this field defines the maximum length of the (CSV) string.
      * 
      * 
      */
@@ -229,18 +227,18 @@ public class VariableCharacteristics {
     }
 
     /**
-     * Allowed values when variable is Option/Member/SequenceList. 
-     * 
-     * * OptionList: The (Actual) Variable value must be a single value from the reported (CSV) enumeration list.
-     * 
-     * * MemberList: The (Actual) Variable value  may be an (unordered) (sub-)set of the reported (CSV) valid values list.
-     * 
-     * * SequenceList: The (Actual) Variable value  may be an ordered (priority, etc)  (sub-)set of the reported (CSV) valid values.
-     * 
-     * This is a comma separated list.
-     * 
-     * The Configuration Variable &lt;&lt;configkey-configuration-value-size,ConfigurationValueSize&gt;&gt; can be used to limit SetVariableData.attributeValue and VariableCharacteristics.valueList. The max size of these values will always remain equal. 
-     * 
+     * Allowed values when variable is Option/Member/SequenceList. 
+     * 
+     * * OptionList: The (Actual) Variable value must be a single value from the reported (CSV) enumeration list.
+     * 
+     * * MemberList: The (Actual) Variable value  may be an (unordered) (sub-)set of the reported (CSV) valid values list.
+     * 
+     * * SequenceList: The (Actual) Variable value  may be an ordered (priority, etc)  (sub-)set of the reported (CSV) valid values.
+     * 
+     * This is a comma separated list.
+     * 
+     * The Configuration Variable &lt;&lt;configkey-configuration-value-size,ConfigurationValueSize&gt;&gt; can be used to limit SetVariableData.attributeValue and VariableCharacteristics.valueList. The max size of these values will always remain equal. 
+     * 
      * 
      * 
      */
@@ -250,18 +248,18 @@ public class VariableCharacteristics {
     }
 
     /**
-     * Allowed values when variable is Option/Member/SequenceList. 
-     * 
-     * * OptionList: The (Actual) Variable value must be a single value from the reported (CSV) enumeration list.
-     * 
-     * * MemberList: The (Actual) Variable value  may be an (unordered) (sub-)set of the reported (CSV) valid values list.
-     * 
-     * * SequenceList: The (Actual) Variable value  may be an ordered (priority, etc)  (sub-)set of the reported (CSV) valid values.
-     * 
-     * This is a comma separated list.
-     * 
-     * The Configuration Variable &lt;&lt;configkey-configuration-value-size,ConfigurationValueSize&gt;&gt; can be used to limit SetVariableData.attributeValue and VariableCharacteristics.valueList. The max size of these values will always remain equal. 
-     * 
+     * Allowed values when variable is Option/Member/SequenceList. 
+     * 
+     * * OptionList: The (Actual) Variable value must be a single value from the reported (CSV) enumeration list.
+     * 
+     * * MemberList: The (Actual) Variable value  may be an (unordered) (sub-)set of the reported (CSV) valid values list.
+     * 
+     * * SequenceList: The (Actual) Variable value  may be an ordered (priority, etc)  (sub-)set of the reported (CSV) valid values.
+     * 
+     * This is a comma separated list.
+     * 
+     * The Configuration Variable &lt;&lt;configkey-configuration-value-size,ConfigurationValueSize&gt;&gt; can be used to limit SetVariableData.attributeValue and VariableCharacteristics.valueList. The max size of these values will always remain equal. 
+     * 
      * 
      * 
      */
@@ -276,7 +274,7 @@ public class VariableCharacteristics {
     }
 
     /**
-     * Flag indicating if this variable supports monitoring. 
+     * Flag indicating if this variable supports monitoring. 
      * 
      * (Required)
      * 
@@ -287,7 +285,7 @@ public class VariableCharacteristics {
     }
 
     /**
-     * Flag indicating if this variable supports monitoring. 
+     * Flag indicating if this variable supports monitoring. 
      * 
      * (Required)
      * 

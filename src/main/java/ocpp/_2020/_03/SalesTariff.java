@@ -3,20 +3,19 @@ package ocpp._2020._03;
 
 import java.util.ArrayList;
 import java.util.List;
-import javax.annotation.Generated;
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 
 
 /**
- * Sales_ Tariff
- * urn:x-oca:ocpp:uid:2:233272
- * NOTE: This dataType is based on dataTypes from &lt;&lt;ref-ISOIEC15118-2,ISO 15118-2&gt;&gt;.
+ * Sales_ Tariff
+ * urn:x-oca:ocpp:uid:2:233272
+ * NOTE: This dataType is based on dataTypes from &lt;&lt;ref-ISOIEC15118-2,ISO 15118-2&gt;&gt;.
  * 
  * 
  */
@@ -28,7 +27,6 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
     "numEPriceLevels",
     "salesTariffEntry"
 })
-@Generated("jsonschema2pojo")
 public class SalesTariff {
 
     /**
@@ -40,9 +38,9 @@ public class SalesTariff {
     @Valid
     private CustomData customData;
     /**
-     * Identified_ Object. MRID. Numeric_ Identifier
-     * urn:x-enexis:ecdm:uid:1:569198
-     * SalesTariff identifier used to identify one sales tariff. An SAID remains a unique identifier for one schedule throughout a charging session.
+     * Identified_ Object. MRID. Numeric_ Identifier
+     * urn:x-enexis:ecdm:uid:1:569198
+     * SalesTariff identifier used to identify one sales tariff. An SAID remains a unique identifier for one schedule throughout a charging session.
      * 
      * (Required)
      * 
@@ -52,9 +50,9 @@ public class SalesTariff {
     @NotNull
     private Integer id;
     /**
-     * Sales_ Tariff. Sales. Tariff_ Description
-     * urn:x-oca:ocpp:uid:1:569283
-     * A human readable title/short description of the sales tariff e.g. for HMI display purposes.
+     * Sales_ Tariff. Sales. Tariff_ Description
+     * urn:x-oca:ocpp:uid:1:569283
+     * A human readable title/short description of the sales tariff e.g. for HMI display purposes.
      * 
      * 
      */
@@ -63,9 +61,9 @@ public class SalesTariff {
     @Size(max = 32)
     private String salesTariffDescription;
     /**
-     * Sales_ Tariff. Num_ E_ Price_ Levels. Counter
-     * urn:x-oca:ocpp:uid:1:569284
-     * Defines the overall number of distinct price levels used across all provided SalesTariff elements.
+     * Sales_ Tariff. Num_ E_ Price_ Levels. Counter
+     * urn:x-oca:ocpp:uid:1:569284
+     * Defines the overall number of distinct price levels used across all provided SalesTariff elements.
      * 
      * 
      */
@@ -107,9 +105,9 @@ public class SalesTariff {
     }
 
     /**
-     * Identified_ Object. MRID. Numeric_ Identifier
-     * urn:x-enexis:ecdm:uid:1:569198
-     * SalesTariff identifier used to identify one sales tariff. An SAID remains a unique identifier for one schedule throughout a charging session.
+     * Identified_ Object. MRID. Numeric_ Identifier
+     * urn:x-enexis:ecdm:uid:1:569198
+     * SalesTariff identifier used to identify one sales tariff. An SAID remains a unique identifier for one schedule throughout a charging session.
      * 
      * (Required)
      * 
@@ -120,9 +118,9 @@ public class SalesTariff {
     }
 
     /**
-     * Identified_ Object. MRID. Numeric_ Identifier
-     * urn:x-enexis:ecdm:uid:1:569198
-     * SalesTariff identifier used to identify one sales tariff. An SAID remains a unique identifier for one schedule throughout a charging session.
+     * Identified_ Object. MRID. Numeric_ Identifier
+     * urn:x-enexis:ecdm:uid:1:569198
+     * SalesTariff identifier used to identify one sales tariff. An SAID remains a unique identifier for one schedule throughout a charging session.
      * 
      * (Required)
      * 
@@ -138,9 +136,9 @@ public class SalesTariff {
     }
 
     /**
-     * Sales_ Tariff. Sales. Tariff_ Description
-     * urn:x-oca:ocpp:uid:1:569283
-     * A human readable title/short description of the sales tariff e.g. for HMI display purposes.
+     * Sales_ Tariff. Sales. Tariff_ Description
+     * urn:x-oca:ocpp:uid:1:569283
+     * A human readable title/short description of the sales tariff e.g. for HMI display purposes.
      * 
      * 
      */
@@ -150,9 +148,9 @@ public class SalesTariff {
     }
 
     /**
-     * Sales_ Tariff. Sales. Tariff_ Description
-     * urn:x-oca:ocpp:uid:1:569283
-     * A human readable title/short description of the sales tariff e.g. for HMI display purposes.
+     * Sales_ Tariff. Sales. Tariff_ Description
+     * urn:x-oca:ocpp:uid:1:569283
+     * A human readable title/short description of the sales tariff e.g. for HMI display purposes.
      * 
      * 
      */
@@ -167,9 +165,9 @@ public class SalesTariff {
     }
 
     /**
-     * Sales_ Tariff. Num_ E_ Price_ Levels. Counter
-     * urn:x-oca:ocpp:uid:1:569284
-     * Defines the overall number of distinct price levels used across all provided SalesTariff elements.
+     * Sales_ Tariff. Num_ E_ Price_ Levels. Counter
+     * urn:x-oca:ocpp:uid:1:569284
+     * Defines the overall number of distinct price levels used across all provided SalesTariff elements.
      * 
      * 
      */
@@ -179,9 +177,9 @@ public class SalesTariff {
     }
 
     /**
-     * Sales_ Tariff. Num_ E_ Price_ Levels. Counter
-     * urn:x-oca:ocpp:uid:1:569284
-     * Defines the overall number of distinct price levels used across all provided SalesTariff elements.
+     * Sales_ Tariff. Num_ E_ Price_ Levels. Counter
+     * urn:x-oca:ocpp:uid:1:569284
+     * Defines the overall number of distinct price levels used across all provided SalesTariff elements.
      * 
      * 
      */

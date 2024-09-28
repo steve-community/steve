@@ -3,21 +3,20 @@ package ocpp._2020._03;
 
 import java.util.ArrayList;
 import java.util.List;
-import javax.annotation.Generated;
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import org.joda.time.DateTime;
 
 
 /**
- * Charging_ Profile
- * urn:x-oca:ocpp:uid:2:233255
- * A ChargingProfile consists of ChargingSchedule, describing the amount of power or current that can be delivered per time interval.
+ * Charging_ Profile
+ * urn:x-oca:ocpp:uid:2:233255
+ * A ChargingProfile consists of ChargingSchedule, describing the amount of power or current that can be delivered per time interval.
  * 
  * 
  */
@@ -34,7 +33,6 @@ import org.joda.time.DateTime;
     "chargingSchedule",
     "transactionId"
 })
-@Generated("jsonschema2pojo")
 public class ChargingProfile {
 
     /**
@@ -46,9 +44,9 @@ public class ChargingProfile {
     @Valid
     private CustomData customData;
     /**
-     * Identified_ Object. MRID. Numeric_ Identifier
-     * urn:x-enexis:ecdm:uid:1:569198
-     * Id of ChargingProfile.
+     * Identified_ Object. MRID. Numeric_ Identifier
+     * urn:x-enexis:ecdm:uid:1:569198
+     * Id of ChargingProfile.
      * 
      * (Required)
      * 
@@ -58,9 +56,9 @@ public class ChargingProfile {
     @NotNull
     private Integer id;
     /**
-     * Charging_ Profile. Stack_ Level. Counter
-     * urn:x-oca:ocpp:uid:1:569230
-     * Value determining level in hierarchy stack of profiles. Higher values have precedence over lower values. Lowest level is 0.
+     * Charging_ Profile. Stack_ Level. Counter
+     * urn:x-oca:ocpp:uid:1:569230
+     * Value determining level in hierarchy stack of profiles. Higher values have precedence over lower values. Lowest level is 0.
      * 
      * (Required)
      * 
@@ -70,9 +68,9 @@ public class ChargingProfile {
     @NotNull
     private Integer stackLevel;
     /**
-     * Charging_ Profile. Charging_ Profile_ Purpose. Charging_ Profile_ Purpose_ Code
-     * urn:x-oca:ocpp:uid:1:569231
-     * Defines the purpose of the schedule transferred by this profile
+     * Charging_ Profile. Charging_ Profile_ Purpose. Charging_ Profile_ Purpose_ Code
+     * urn:x-oca:ocpp:uid:1:569231
+     * Defines the purpose of the schedule transferred by this profile
      * 
      * (Required)
      * 
@@ -82,9 +80,9 @@ public class ChargingProfile {
     @NotNull
     private ChargingProfilePurposeEnum chargingProfilePurpose;
     /**
-     * Charging_ Profile. Charging_ Profile_ Kind. Charging_ Profile_ Kind_ Code
-     * urn:x-oca:ocpp:uid:1:569232
-     * Indicates the kind of schedule.
+     * Charging_ Profile. Charging_ Profile_ Kind. Charging_ Profile_ Kind_ Code
+     * urn:x-oca:ocpp:uid:1:569232
+     * Indicates the kind of schedule.
      * 
      * (Required)
      * 
@@ -94,9 +92,9 @@ public class ChargingProfile {
     @NotNull
     private ChargingProfileKindEnum chargingProfileKind;
     /**
-     * Charging_ Profile. Recurrency_ Kind. Recurrency_ Kind_ Code
-     * urn:x-oca:ocpp:uid:1:569233
-     * Indicates the start point of a recurrence.
+     * Charging_ Profile. Recurrency_ Kind. Recurrency_ Kind_ Code
+     * urn:x-oca:ocpp:uid:1:569233
+     * Indicates the start point of a recurrence.
      * 
      * 
      */
@@ -104,9 +102,9 @@ public class ChargingProfile {
     @JsonPropertyDescription("Charging_ Profile. Recurrency_ Kind. Recurrency_ Kind_ Code\r\nurn:x-oca:ocpp:uid:1:569233\r\nIndicates the start point of a recurrence.\r\n")
     private RecurrencyKindEnum recurrencyKind;
     /**
-     * Charging_ Profile. Valid_ From. Date_ Time
-     * urn:x-oca:ocpp:uid:1:569234
-     * Point in time at which the profile starts to be valid. If absent, the profile is valid as soon as it is received by the Charging Station.
+     * Charging_ Profile. Valid_ From. Date_ Time
+     * urn:x-oca:ocpp:uid:1:569234
+     * Point in time at which the profile starts to be valid. If absent, the profile is valid as soon as it is received by the Charging Station.
      * 
      * 
      */
@@ -114,9 +112,9 @@ public class ChargingProfile {
     @JsonPropertyDescription("Charging_ Profile. Valid_ From. Date_ Time\r\nurn:x-oca:ocpp:uid:1:569234\r\nPoint in time at which the profile starts to be valid. If absent, the profile is valid as soon as it is received by the Charging Station.\r\n")
     private DateTime validFrom;
     /**
-     * Charging_ Profile. Valid_ To. Date_ Time
-     * urn:x-oca:ocpp:uid:1:569235
-     * Point in time at which the profile stops to be valid. If absent, the profile is valid until it is replaced by another profile.
+     * Charging_ Profile. Valid_ To. Date_ Time
+     * urn:x-oca:ocpp:uid:1:569235
+     * Point in time at which the profile stops to be valid. If absent, the profile is valid until it is replaced by another profile.
      * 
      * 
      */
@@ -134,7 +132,7 @@ public class ChargingProfile {
     @NotNull
     private List<ChargingSchedule> chargingSchedule = new ArrayList<ChargingSchedule>();
     /**
-     * SHALL only be included if ChargingProfilePurpose is set to TxProfile. The transactionId is used to match the profile to a specific transaction.
+     * SHALL only be included if ChargingProfilePurpose is set to TxProfile. The transactionId is used to match the profile to a specific transaction.
      * 
      * 
      */
@@ -167,9 +165,9 @@ public class ChargingProfile {
     }
 
     /**
-     * Identified_ Object. MRID. Numeric_ Identifier
-     * urn:x-enexis:ecdm:uid:1:569198
-     * Id of ChargingProfile.
+     * Identified_ Object. MRID. Numeric_ Identifier
+     * urn:x-enexis:ecdm:uid:1:569198
+     * Id of ChargingProfile.
      * 
      * (Required)
      * 
@@ -180,9 +178,9 @@ public class ChargingProfile {
     }
 
     /**
-     * Identified_ Object. MRID. Numeric_ Identifier
-     * urn:x-enexis:ecdm:uid:1:569198
-     * Id of ChargingProfile.
+     * Identified_ Object. MRID. Numeric_ Identifier
+     * urn:x-enexis:ecdm:uid:1:569198
+     * Id of ChargingProfile.
      * 
      * (Required)
      * 
@@ -198,9 +196,9 @@ public class ChargingProfile {
     }
 
     /**
-     * Charging_ Profile. Stack_ Level. Counter
-     * urn:x-oca:ocpp:uid:1:569230
-     * Value determining level in hierarchy stack of profiles. Higher values have precedence over lower values. Lowest level is 0.
+     * Charging_ Profile. Stack_ Level. Counter
+     * urn:x-oca:ocpp:uid:1:569230
+     * Value determining level in hierarchy stack of profiles. Higher values have precedence over lower values. Lowest level is 0.
      * 
      * (Required)
      * 
@@ -211,9 +209,9 @@ public class ChargingProfile {
     }
 
     /**
-     * Charging_ Profile. Stack_ Level. Counter
-     * urn:x-oca:ocpp:uid:1:569230
-     * Value determining level in hierarchy stack of profiles. Higher values have precedence over lower values. Lowest level is 0.
+     * Charging_ Profile. Stack_ Level. Counter
+     * urn:x-oca:ocpp:uid:1:569230
+     * Value determining level in hierarchy stack of profiles. Higher values have precedence over lower values. Lowest level is 0.
      * 
      * (Required)
      * 
@@ -229,9 +227,9 @@ public class ChargingProfile {
     }
 
     /**
-     * Charging_ Profile. Charging_ Profile_ Purpose. Charging_ Profile_ Purpose_ Code
-     * urn:x-oca:ocpp:uid:1:569231
-     * Defines the purpose of the schedule transferred by this profile
+     * Charging_ Profile. Charging_ Profile_ Purpose. Charging_ Profile_ Purpose_ Code
+     * urn:x-oca:ocpp:uid:1:569231
+     * Defines the purpose of the schedule transferred by this profile
      * 
      * (Required)
      * 
@@ -242,9 +240,9 @@ public class ChargingProfile {
     }
 
     /**
-     * Charging_ Profile. Charging_ Profile_ Purpose. Charging_ Profile_ Purpose_ Code
-     * urn:x-oca:ocpp:uid:1:569231
-     * Defines the purpose of the schedule transferred by this profile
+     * Charging_ Profile. Charging_ Profile_ Purpose. Charging_ Profile_ Purpose_ Code
+     * urn:x-oca:ocpp:uid:1:569231
+     * Defines the purpose of the schedule transferred by this profile
      * 
      * (Required)
      * 
@@ -260,9 +258,9 @@ public class ChargingProfile {
     }
 
     /**
-     * Charging_ Profile. Charging_ Profile_ Kind. Charging_ Profile_ Kind_ Code
-     * urn:x-oca:ocpp:uid:1:569232
-     * Indicates the kind of schedule.
+     * Charging_ Profile. Charging_ Profile_ Kind. Charging_ Profile_ Kind_ Code
+     * urn:x-oca:ocpp:uid:1:569232
+     * Indicates the kind of schedule.
      * 
      * (Required)
      * 
@@ -273,9 +271,9 @@ public class ChargingProfile {
     }
 
     /**
-     * Charging_ Profile. Charging_ Profile_ Kind. Charging_ Profile_ Kind_ Code
-     * urn:x-oca:ocpp:uid:1:569232
-     * Indicates the kind of schedule.
+     * Charging_ Profile. Charging_ Profile_ Kind. Charging_ Profile_ Kind_ Code
+     * urn:x-oca:ocpp:uid:1:569232
+     * Indicates the kind of schedule.
      * 
      * (Required)
      * 
@@ -291,9 +289,9 @@ public class ChargingProfile {
     }
 
     /**
-     * Charging_ Profile. Recurrency_ Kind. Recurrency_ Kind_ Code
-     * urn:x-oca:ocpp:uid:1:569233
-     * Indicates the start point of a recurrence.
+     * Charging_ Profile. Recurrency_ Kind. Recurrency_ Kind_ Code
+     * urn:x-oca:ocpp:uid:1:569233
+     * Indicates the start point of a recurrence.
      * 
      * 
      */
@@ -303,9 +301,9 @@ public class ChargingProfile {
     }
 
     /**
-     * Charging_ Profile. Recurrency_ Kind. Recurrency_ Kind_ Code
-     * urn:x-oca:ocpp:uid:1:569233
-     * Indicates the start point of a recurrence.
+     * Charging_ Profile. Recurrency_ Kind. Recurrency_ Kind_ Code
+     * urn:x-oca:ocpp:uid:1:569233
+     * Indicates the start point of a recurrence.
      * 
      * 
      */
@@ -320,9 +318,9 @@ public class ChargingProfile {
     }
 
     /**
-     * Charging_ Profile. Valid_ From. Date_ Time
-     * urn:x-oca:ocpp:uid:1:569234
-     * Point in time at which the profile starts to be valid. If absent, the profile is valid as soon as it is received by the Charging Station.
+     * Charging_ Profile. Valid_ From. Date_ Time
+     * urn:x-oca:ocpp:uid:1:569234
+     * Point in time at which the profile starts to be valid. If absent, the profile is valid as soon as it is received by the Charging Station.
      * 
      * 
      */
@@ -332,9 +330,9 @@ public class ChargingProfile {
     }
 
     /**
-     * Charging_ Profile. Valid_ From. Date_ Time
-     * urn:x-oca:ocpp:uid:1:569234
-     * Point in time at which the profile starts to be valid. If absent, the profile is valid as soon as it is received by the Charging Station.
+     * Charging_ Profile. Valid_ From. Date_ Time
+     * urn:x-oca:ocpp:uid:1:569234
+     * Point in time at which the profile starts to be valid. If absent, the profile is valid as soon as it is received by the Charging Station.
      * 
      * 
      */
@@ -349,9 +347,9 @@ public class ChargingProfile {
     }
 
     /**
-     * Charging_ Profile. Valid_ To. Date_ Time
-     * urn:x-oca:ocpp:uid:1:569235
-     * Point in time at which the profile stops to be valid. If absent, the profile is valid until it is replaced by another profile.
+     * Charging_ Profile. Valid_ To. Date_ Time
+     * urn:x-oca:ocpp:uid:1:569235
+     * Point in time at which the profile stops to be valid. If absent, the profile is valid until it is replaced by another profile.
      * 
      * 
      */
@@ -361,9 +359,9 @@ public class ChargingProfile {
     }
 
     /**
-     * Charging_ Profile. Valid_ To. Date_ Time
-     * urn:x-oca:ocpp:uid:1:569235
-     * Point in time at which the profile stops to be valid. If absent, the profile is valid until it is replaced by another profile.
+     * Charging_ Profile. Valid_ To. Date_ Time
+     * urn:x-oca:ocpp:uid:1:569235
+     * Point in time at which the profile stops to be valid. If absent, the profile is valid until it is replaced by another profile.
      * 
      * 
      */
@@ -403,7 +401,7 @@ public class ChargingProfile {
     }
 
     /**
-     * SHALL only be included if ChargingProfilePurpose is set to TxProfile. The transactionId is used to match the profile to a specific transaction.
+     * SHALL only be included if ChargingProfilePurpose is set to TxProfile. The transactionId is used to match the profile to a specific transaction.
      * 
      * 
      */
@@ -413,7 +411,7 @@ public class ChargingProfile {
     }
 
     /**
-     * SHALL only be included if ChargingProfilePurpose is set to TxProfile. The transactionId is used to match the profile to a specific transaction.
+     * SHALL only be included if ChargingProfilePurpose is set to TxProfile. The transactionId is used to match the profile to a specific transaction.
      * 
      * 
      */

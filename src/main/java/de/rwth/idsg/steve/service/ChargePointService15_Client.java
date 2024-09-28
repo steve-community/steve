@@ -132,7 +132,7 @@ public class ChargePointService15_Client extends ChargePointService12_Client imp
                                                              .expiryTimestamp(params.getExpiry().toDateTime())
                                                              .build();
 
-        int reservationId = reservationRepository.insert(res);
+        int reservationId = reservationService.insert(res);
         String parentIdTag = ocppTagService.getParentIdtag(params.getIdTag());
 
         EnhancedReserveNowParams enhancedParams = new EnhancedReserveNowParams(params, reservationId);

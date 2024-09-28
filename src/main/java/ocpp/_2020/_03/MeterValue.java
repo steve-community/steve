@@ -3,21 +3,20 @@ package ocpp._2020._03;
 
 import java.util.ArrayList;
 import java.util.List;
-import javax.annotation.Generated;
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import org.joda.time.DateTime;
 
 
 /**
- * Meter_ Value
- * urn:x-oca:ocpp:uid:2:233265
- * Collection of one or more sampled values in MeterValuesRequest and TransactionEvent. All sampled values in a MeterValue are sampled at the same point in time.
+ * Meter_ Value
+ * urn:x-oca:ocpp:uid:2:233265
+ * Collection of one or more sampled values in MeterValuesRequest and TransactionEvent. All sampled values in a MeterValue are sampled at the same point in time.
  * 
  * 
  */
@@ -27,7 +26,6 @@ import org.joda.time.DateTime;
     "sampledValue",
     "timestamp"
 })
-@Generated("jsonschema2pojo")
 public class MeterValue {
 
     /**
@@ -49,9 +47,9 @@ public class MeterValue {
     @NotNull
     private List<SampledValue> sampledValue = new ArrayList<SampledValue>();
     /**
-     * Meter_ Value. Timestamp. Date_ Time
-     * urn:x-oca:ocpp:uid:1:569259
-     * Timestamp for measured value(s).
+     * Meter_ Value. Timestamp. Date_ Time
+     * urn:x-oca:ocpp:uid:1:569259
+     * Timestamp for measured value(s).
      * 
      * (Required)
      * 
@@ -110,9 +108,9 @@ public class MeterValue {
     }
 
     /**
-     * Meter_ Value. Timestamp. Date_ Time
-     * urn:x-oca:ocpp:uid:1:569259
-     * Timestamp for measured value(s).
+     * Meter_ Value. Timestamp. Date_ Time
+     * urn:x-oca:ocpp:uid:1:569259
+     * Timestamp for measured value(s).
      * 
      * (Required)
      * 
@@ -123,9 +121,9 @@ public class MeterValue {
     }
 
     /**
-     * Meter_ Value. Timestamp. Date_ Time
-     * urn:x-oca:ocpp:uid:1:569259
-     * Timestamp for measured value(s).
+     * Meter_ Value. Timestamp. Date_ Time
+     * urn:x-oca:ocpp:uid:1:569259
+     * Timestamp for measured value(s).
      * 
      * (Required)
      * 

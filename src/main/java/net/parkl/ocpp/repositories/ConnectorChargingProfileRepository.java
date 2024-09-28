@@ -35,7 +35,7 @@ public interface ConnectorChargingProfileRepository extends CrudRepository<Conne
     void deleteByChargingProfileAndConnectors(OcppChargingProfile profile, List<Connector> connectors);
 
     @Modifying
-    @Query("DELETE FROM ConnectorChargingProfile AS ccp WHERE ccp.connector IN ?2")
+    @Query("DELETE FROM ConnectorChargingProfile AS ccp WHERE ccp.connector IN ?1")
     void deleteByConnectors(List<Connector> connectors);
 
     @Modifying

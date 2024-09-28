@@ -4,14 +4,14 @@ package ocpp.cs._2012._06;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlSchemaType;
-import javax.xml.bind.annotation.XmlType;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import de.rwth.idsg.ocpp.jaxb.JodaDateTimeConverter;
 import de.rwth.idsg.ocpp.jaxb.RequestType;
+import jakarta.xml.bind.annotation.XmlAccessType;
+import jakarta.xml.bind.annotation.XmlAccessorType;
+import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlSchemaType;
+import jakarta.xml.bind.annotation.XmlType;
+import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import lombok.ToString;
 import org.joda.time.DateTime;
 
@@ -165,7 +165,7 @@ public class StopTransactionRequest
      * <p>
      * This accessor method returns a reference to the live list,
      * not a snapshot. Therefore any modification you make to the
-     * returned list will be present inside the JAXB object.
+     * returned list will be present inside the Jakarta XML Binding object.
      * This is why there is not a <CODE>set</CODE> method for the transactionData property.
      * 
      * <p>
@@ -196,26 +196,70 @@ public class StopTransactionRequest
         this.transactionData = null;
     }
 
+    /**
+     * Sets the value of the transactionId property.
+     * 
+     * @param value
+     *     allowed object is
+     *     int
+     * @return
+     *     The class instance
+     */
     public StopTransactionRequest withTransactionId(int value) {
         setTransactionId(value);
         return this;
     }
 
+    /**
+     * Sets the value of the idTag property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     * @return
+     *     The class instance
+     */
     public StopTransactionRequest withIdTag(String value) {
         setIdTag(value);
         return this;
     }
 
+    /**
+     * Sets the value of the timestamp property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link DateTime }
+     * @return
+     *     The class instance
+     */
     public StopTransactionRequest withTimestamp(DateTime value) {
         setTimestamp(value);
         return this;
     }
 
+    /**
+     * Sets the value of the meterStop property.
+     * 
+     * @param value
+     *     allowed object is
+     *     int
+     * @return
+     *     The class instance
+     */
     public StopTransactionRequest withMeterStop(int value) {
         setMeterStop(value);
         return this;
     }
 
+    /**
+     * Adds objects to the list of TransactionData using add method
+     * 
+     * @param values
+     *     objects to add to the list TransactionData
+     * @return
+     *     The class instance
+     */
     public StopTransactionRequest withTransactionData(TransactionData... values) {
         if (values!= null) {
             for (TransactionData value: values) {
@@ -225,6 +269,14 @@ public class StopTransactionRequest
         return this;
     }
 
+    /**
+     * Adds objects to the list of TransactionData using addAll method
+     * 
+     * @param values
+     *     objects to add to the list TransactionData
+     * @return
+     *     The class instance
+     */
     public StopTransactionRequest withTransactionData(Collection<TransactionData> values) {
         if (values!= null) {
             getTransactionData().addAll(values);

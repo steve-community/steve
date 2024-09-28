@@ -3,20 +3,19 @@ package ocpp._2020._03;
 
 import java.util.ArrayList;
 import java.util.List;
-import javax.annotation.Generated;
-import javax.validation.Valid;
-import javax.validation.constraints.DecimalMin;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 
 
 /**
- * Sales_ Tariff_ Entry
- * urn:x-oca:ocpp:uid:2:233271
+ * Sales_ Tariff_ Entry
+ * urn:x-oca:ocpp:uid:2:233271
  * 
  * 
  */
@@ -27,7 +26,6 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
     "ePriceLevel",
     "consumptionCost"
 })
-@Generated("jsonschema2pojo")
 public class SalesTariffEntry {
 
     /**
@@ -39,8 +37,8 @@ public class SalesTariffEntry {
     @Valid
     private CustomData customData;
     /**
-     * Relative_ Timer_ Interval
-     * urn:x-oca:ocpp:uid:2:233270
+     * Relative_ Timer_ Interval
+     * urn:x-oca:ocpp:uid:2:233270
      * 
      * (Required)
      * 
@@ -51,9 +49,9 @@ public class SalesTariffEntry {
     @NotNull
     private RelativeTimeInterval relativeTimeInterval;
     /**
-     * Sales_ Tariff_ Entry. E_ Price_ Level. Unsigned_ Integer
-     * urn:x-oca:ocpp:uid:1:569281
-     * Defines the price level of this SalesTariffEntry (referring to NumEPriceLevels). Small values for the EPriceLevel represent a cheaper TariffEntry. Large values for the EPriceLevel represent a more expensive TariffEntry.
+     * Sales_ Tariff_ Entry. E_ Price_ Level. Unsigned_ Integer
+     * urn:x-oca:ocpp:uid:1:569281
+     * Defines the price level of this SalesTariffEntry (referring to NumEPriceLevels). Small values for the EPriceLevel represent a cheaper TariffEntry. Large values for the EPriceLevel represent a more expensive TariffEntry.
      * 
      * 
      */
@@ -90,8 +88,8 @@ public class SalesTariffEntry {
     }
 
     /**
-     * Relative_ Timer_ Interval
-     * urn:x-oca:ocpp:uid:2:233270
+     * Relative_ Timer_ Interval
+     * urn:x-oca:ocpp:uid:2:233270
      * 
      * (Required)
      * 
@@ -102,8 +100,8 @@ public class SalesTariffEntry {
     }
 
     /**
-     * Relative_ Timer_ Interval
-     * urn:x-oca:ocpp:uid:2:233270
+     * Relative_ Timer_ Interval
+     * urn:x-oca:ocpp:uid:2:233270
      * 
      * (Required)
      * 
@@ -119,9 +117,9 @@ public class SalesTariffEntry {
     }
 
     /**
-     * Sales_ Tariff_ Entry. E_ Price_ Level. Unsigned_ Integer
-     * urn:x-oca:ocpp:uid:1:569281
-     * Defines the price level of this SalesTariffEntry (referring to NumEPriceLevels). Small values for the EPriceLevel represent a cheaper TariffEntry. Large values for the EPriceLevel represent a more expensive TariffEntry.
+     * Sales_ Tariff_ Entry. E_ Price_ Level. Unsigned_ Integer
+     * urn:x-oca:ocpp:uid:1:569281
+     * Defines the price level of this SalesTariffEntry (referring to NumEPriceLevels). Small values for the EPriceLevel represent a cheaper TariffEntry. Large values for the EPriceLevel represent a more expensive TariffEntry.
      * 
      * 
      */
@@ -131,9 +129,9 @@ public class SalesTariffEntry {
     }
 
     /**
-     * Sales_ Tariff_ Entry. E_ Price_ Level. Unsigned_ Integer
-     * urn:x-oca:ocpp:uid:1:569281
-     * Defines the price level of this SalesTariffEntry (referring to NumEPriceLevels). Small values for the EPriceLevel represent a cheaper TariffEntry. Large values for the EPriceLevel represent a more expensive TariffEntry.
+     * Sales_ Tariff_ Entry. E_ Price_ Level. Unsigned_ Integer
+     * urn:x-oca:ocpp:uid:1:569281
+     * Defines the price level of this SalesTariffEntry (referring to NumEPriceLevels). Small values for the EPriceLevel represent a cheaper TariffEntry. Large values for the EPriceLevel represent a more expensive TariffEntry.
      * 
      * 
      */

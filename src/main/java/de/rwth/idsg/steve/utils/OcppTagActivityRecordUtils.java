@@ -18,24 +18,27 @@
  */
 package de.rwth.idsg.steve.utils;
 
-import jooq.steve.db.tables.records.OcppTagActivityRecord;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import net.parkl.ocpp.entities.OcppTag;
+import net.parkl.ocpp.service.cs.TransactionService;
 import org.joda.time.DateTime;
+
+import java.util.Date;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class OcppTagActivityRecordUtils {
 
-    public static boolean isExpired(OcppTagActivityRecord record, DateTime now) {
-        DateTime expiry = record.getExpiryDate();
-        return expiry != null && now.isAfter(expiry);
+    public static boolean isExpired(OcppTag record, DateTime now) {
+        Date expiry = record.getExpiryDate();
+        return expiry != null && now.isAfter(new DateTime(expiry));
     }
 
-    public static boolean isBlocked(OcppTagActivityRecord record) {
+    public static boolean isBlocked(OcppTag record) {
         return record.getMaxActiveTransactionCount() == 0;
     }
 
-    public static boolean reachedLimitOfActiveTransactions(OcppTagActivityRecord record) {
+    public static boolean reachedLimitOfActiveTransactions(TransactionService transactionService, OcppTag record) {
         int max = record.getMaxActiveTransactionCount();
 
         // blocked
@@ -49,6 +52,6 @@ public final class OcppTagActivityRecordUtils {
         }
 
         // allow as specified
-        return record.getActiveTransactionCount() >= max;
+        return transactionService.getActiveTransactionCountByIdTag(record.getIdTag()) >= max;
     }
 }

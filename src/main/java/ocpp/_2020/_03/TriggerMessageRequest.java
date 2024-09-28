@@ -1,14 +1,13 @@
 
 package ocpp._2020._03;
 
-import javax.annotation.Generated;
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import de.rwth.idsg.ocpp.jaxb.RequestType;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
@@ -16,7 +15,6 @@ import de.rwth.idsg.ocpp.jaxb.RequestType;
     "evse",
     "requestedMessage"
 })
-@Generated("jsonschema2pojo")
 public class TriggerMessageRequest implements RequestType
 {
 
@@ -29,9 +27,9 @@ public class TriggerMessageRequest implements RequestType
     @Valid
     private CustomData customData;
     /**
-     * EVSE
-     * urn:x-oca:ocpp:uid:2:233123
-     * Electric Vehicle Supply Equipment
+     * EVSE
+     * urn:x-oca:ocpp:uid:2:233123
+     * Electric Vehicle Supply Equipment
      * 
      * 
      */
@@ -40,7 +38,7 @@ public class TriggerMessageRequest implements RequestType
     @Valid
     private EVSE evse;
     /**
-     * Type of message to be triggered.
+     * Type of message to be triggered.
      * 
      * (Required)
      * 
@@ -74,9 +72,9 @@ public class TriggerMessageRequest implements RequestType
     }
 
     /**
-     * EVSE
-     * urn:x-oca:ocpp:uid:2:233123
-     * Electric Vehicle Supply Equipment
+     * EVSE
+     * urn:x-oca:ocpp:uid:2:233123
+     * Electric Vehicle Supply Equipment
      * 
      * 
      */
@@ -86,9 +84,9 @@ public class TriggerMessageRequest implements RequestType
     }
 
     /**
-     * EVSE
-     * urn:x-oca:ocpp:uid:2:233123
-     * Electric Vehicle Supply Equipment
+     * EVSE
+     * urn:x-oca:ocpp:uid:2:233123
+     * Electric Vehicle Supply Equipment
      * 
      * 
      */
@@ -103,7 +101,7 @@ public class TriggerMessageRequest implements RequestType
     }
 
     /**
-     * Type of message to be triggered.
+     * Type of message to be triggered.
      * 
      * (Required)
      * 
@@ -114,7 +112,7 @@ public class TriggerMessageRequest implements RequestType
     }
 
     /**
-     * Type of message to be triggered.
+     * Type of message to be triggered.
      * 
      * (Required)
      * 

@@ -1,14 +1,13 @@
 
 package ocpp._2020._03;
 
-import javax.annotation.Generated;
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import de.rwth.idsg.ocpp.jaxb.RequestType;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
@@ -17,7 +16,6 @@ import de.rwth.idsg.ocpp.jaxb.RequestType;
     "chargingNeeds",
     "evseId"
 })
-@Generated("jsonschema2pojo")
 public class NotifyEVChargingNeedsRequest implements RequestType
 {
 
@@ -30,7 +28,7 @@ public class NotifyEVChargingNeedsRequest implements RequestType
     @Valid
     private CustomData customData;
     /**
-     * Contains the maximum schedule tuples the car supports per schedule.
+     * Contains the maximum schedule tuples the car supports per schedule.
      * 
      * 
      */
@@ -38,8 +36,8 @@ public class NotifyEVChargingNeedsRequest implements RequestType
     @JsonPropertyDescription("Contains the maximum schedule tuples the car supports per schedule.\r\n")
     private Integer maxScheduleTuples;
     /**
-     * Charging_ Needs
-     * urn:x-oca:ocpp:uid:2:233249
+     * Charging_ Needs
+     * urn:x-oca:ocpp:uid:2:233249
      * 
      * (Required)
      * 
@@ -50,7 +48,7 @@ public class NotifyEVChargingNeedsRequest implements RequestType
     @NotNull
     private ChargingNeeds chargingNeeds;
     /**
-     * Defines the EVSE and connector to which the EV is connected. EvseId may not be 0.
+     * Defines the EVSE and connector to which the EV is connected. EvseId may not be 0.
      * 
      * (Required)
      * 
@@ -84,7 +82,7 @@ public class NotifyEVChargingNeedsRequest implements RequestType
     }
 
     /**
-     * Contains the maximum schedule tuples the car supports per schedule.
+     * Contains the maximum schedule tuples the car supports per schedule.
      * 
      * 
      */
@@ -94,7 +92,7 @@ public class NotifyEVChargingNeedsRequest implements RequestType
     }
 
     /**
-     * Contains the maximum schedule tuples the car supports per schedule.
+     * Contains the maximum schedule tuples the car supports per schedule.
      * 
      * 
      */
@@ -109,8 +107,8 @@ public class NotifyEVChargingNeedsRequest implements RequestType
     }
 
     /**
-     * Charging_ Needs
-     * urn:x-oca:ocpp:uid:2:233249
+     * Charging_ Needs
+     * urn:x-oca:ocpp:uid:2:233249
      * 
      * (Required)
      * 
@@ -121,8 +119,8 @@ public class NotifyEVChargingNeedsRequest implements RequestType
     }
 
     /**
-     * Charging_ Needs
-     * urn:x-oca:ocpp:uid:2:233249
+     * Charging_ Needs
+     * urn:x-oca:ocpp:uid:2:233249
      * 
      * (Required)
      * 
@@ -138,7 +136,7 @@ public class NotifyEVChargingNeedsRequest implements RequestType
     }
 
     /**
-     * Defines the EVSE and connector to which the EV is connected. EvseId may not be 0.
+     * Defines the EVSE and connector to which the EV is connected. EvseId may not be 0.
      * 
      * (Required)
      * 
@@ -149,7 +147,7 @@ public class NotifyEVChargingNeedsRequest implements RequestType
     }
 
     /**
-     * Defines the EVSE and connector to which the EV is connected. EvseId may not be 0.
+     * Defines the EVSE and connector to which the EV is connected. EvseId may not be 0.
      * 
      * (Required)
      * 

@@ -1,20 +1,19 @@
 
 package ocpp._2020._03;
 
-import javax.annotation.Generated;
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 
 
 /**
- * VPN
- * urn:x-oca:ocpp:uid:2:233268
- * VPN Configuration settings
+ * VPN
+ * urn:x-oca:ocpp:uid:2:233268
+ * VPN Configuration settings
  * 
  * 
  */
@@ -28,7 +27,6 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
     "key",
     "type"
 })
-@Generated("jsonschema2pojo")
 public class VPN {
 
     /**
@@ -40,9 +38,9 @@ public class VPN {
     @Valid
     private CustomData customData;
     /**
-     * VPN. Server. URI
-     * urn:x-oca:ocpp:uid:1:569272
-     * VPN Server Address
+     * VPN. Server. URI
+     * urn:x-oca:ocpp:uid:1:569272
+     * VPN Server Address
      * 
      * (Required)
      * 
@@ -53,9 +51,9 @@ public class VPN {
     @NotNull
     private String server;
     /**
-     * VPN. User. User_ Name
-     * urn:x-oca:ocpp:uid:1:569273
-     * VPN User
+     * VPN. User. User_ Name
+     * urn:x-oca:ocpp:uid:1:569273
+     * VPN User
      * 
      * (Required)
      * 
@@ -66,9 +64,9 @@ public class VPN {
     @NotNull
     private String user;
     /**
-     * VPN. Group. Group_ Name
-     * urn:x-oca:ocpp:uid:1:569274
-     * VPN group.
+     * VPN. Group. Group_ Name
+     * urn:x-oca:ocpp:uid:1:569274
+     * VPN group.
      * 
      * 
      */
@@ -77,9 +75,9 @@ public class VPN {
     @Size(max = 20)
     private String group;
     /**
-     * VPN. Password. Password
-     * urn:x-oca:ocpp:uid:1:569275
-     * VPN Password.
+     * VPN. Password. Password
+     * urn:x-oca:ocpp:uid:1:569275
+     * VPN Password.
      * 
      * (Required)
      * 
@@ -90,9 +88,9 @@ public class VPN {
     @NotNull
     private String password;
     /**
-     * VPN. Key. VPN_ Key
-     * urn:x-oca:ocpp:uid:1:569276
-     * VPN shared secret.
+     * VPN. Key. VPN_ Key
+     * urn:x-oca:ocpp:uid:1:569276
+     * VPN shared secret.
      * 
      * (Required)
      * 
@@ -103,9 +101,9 @@ public class VPN {
     @NotNull
     private String key;
     /**
-     * VPN. Type. VPN_ Code
-     * urn:x-oca:ocpp:uid:1:569277
-     * Type of VPN
+     * VPN. Type. VPN_ Code
+     * urn:x-oca:ocpp:uid:1:569277
+     * Type of VPN
      * 
      * (Required)
      * 
@@ -139,9 +137,9 @@ public class VPN {
     }
 
     /**
-     * VPN. Server. URI
-     * urn:x-oca:ocpp:uid:1:569272
-     * VPN Server Address
+     * VPN. Server. URI
+     * urn:x-oca:ocpp:uid:1:569272
+     * VPN Server Address
      * 
      * (Required)
      * 
@@ -152,9 +150,9 @@ public class VPN {
     }
 
     /**
-     * VPN. Server. URI
-     * urn:x-oca:ocpp:uid:1:569272
-     * VPN Server Address
+     * VPN. Server. URI
+     * urn:x-oca:ocpp:uid:1:569272
+     * VPN Server Address
      * 
      * (Required)
      * 
@@ -170,9 +168,9 @@ public class VPN {
     }
 
     /**
-     * VPN. User. User_ Name
-     * urn:x-oca:ocpp:uid:1:569273
-     * VPN User
+     * VPN. User. User_ Name
+     * urn:x-oca:ocpp:uid:1:569273
+     * VPN User
      * 
      * (Required)
      * 
@@ -183,9 +181,9 @@ public class VPN {
     }
 
     /**
-     * VPN. User. User_ Name
-     * urn:x-oca:ocpp:uid:1:569273
-     * VPN User
+     * VPN. User. User_ Name
+     * urn:x-oca:ocpp:uid:1:569273
+     * VPN User
      * 
      * (Required)
      * 
@@ -201,9 +199,9 @@ public class VPN {
     }
 
     /**
-     * VPN. Group. Group_ Name
-     * urn:x-oca:ocpp:uid:1:569274
-     * VPN group.
+     * VPN. Group. Group_ Name
+     * urn:x-oca:ocpp:uid:1:569274
+     * VPN group.
      * 
      * 
      */
@@ -213,9 +211,9 @@ public class VPN {
     }
 
     /**
-     * VPN. Group. Group_ Name
-     * urn:x-oca:ocpp:uid:1:569274
-     * VPN group.
+     * VPN. Group. Group_ Name
+     * urn:x-oca:ocpp:uid:1:569274
+     * VPN group.
      * 
      * 
      */
@@ -230,9 +228,9 @@ public class VPN {
     }
 
     /**
-     * VPN. Password. Password
-     * urn:x-oca:ocpp:uid:1:569275
-     * VPN Password.
+     * VPN. Password. Password
+     * urn:x-oca:ocpp:uid:1:569275
+     * VPN Password.
      * 
      * (Required)
      * 
@@ -243,9 +241,9 @@ public class VPN {
     }
 
     /**
-     * VPN. Password. Password
-     * urn:x-oca:ocpp:uid:1:569275
-     * VPN Password.
+     * VPN. Password. Password
+     * urn:x-oca:ocpp:uid:1:569275
+     * VPN Password.
      * 
      * (Required)
      * 
@@ -261,9 +259,9 @@ public class VPN {
     }
 
     /**
-     * VPN. Key. VPN_ Key
-     * urn:x-oca:ocpp:uid:1:569276
-     * VPN shared secret.
+     * VPN. Key. VPN_ Key
+     * urn:x-oca:ocpp:uid:1:569276
+     * VPN shared secret.
      * 
      * (Required)
      * 
@@ -274,9 +272,9 @@ public class VPN {
     }
 
     /**
-     * VPN. Key. VPN_ Key
-     * urn:x-oca:ocpp:uid:1:569276
-     * VPN shared secret.
+     * VPN. Key. VPN_ Key
+     * urn:x-oca:ocpp:uid:1:569276
+     * VPN shared secret.
      * 
      * (Required)
      * 
@@ -292,9 +290,9 @@ public class VPN {
     }
 
     /**
-     * VPN. Type. VPN_ Code
-     * urn:x-oca:ocpp:uid:1:569277
-     * Type of VPN
+     * VPN. Type. VPN_ Code
+     * urn:x-oca:ocpp:uid:1:569277
+     * Type of VPN
      * 
      * (Required)
      * 
@@ -305,9 +303,9 @@ public class VPN {
     }
 
     /**
-     * VPN. Type. VPN_ Code
-     * urn:x-oca:ocpp:uid:1:569277
-     * Type of VPN
+     * VPN. Type. VPN_ Code
+     * urn:x-oca:ocpp:uid:1:569277
+     * Type of VPN
      * 
      * (Required)
      * 

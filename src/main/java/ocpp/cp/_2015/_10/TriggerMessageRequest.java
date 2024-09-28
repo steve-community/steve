@@ -1,12 +1,12 @@
 
 package ocpp.cp._2015._10;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlSchemaType;
-import javax.xml.bind.annotation.XmlType;
 import de.rwth.idsg.ocpp.jaxb.RequestType;
+import jakarta.xml.bind.annotation.XmlAccessType;
+import jakarta.xml.bind.annotation.XmlAccessorType;
+import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlSchemaType;
+import jakarta.xml.bind.annotation.XmlType;
 import lombok.ToString;
 
 
@@ -103,11 +103,29 @@ public class TriggerMessageRequest
         return (this.connectorId!= null);
     }
 
+    /**
+     * Sets the value of the requestedMessage property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link MessageTrigger }
+     * @return
+     *     The class instance
+     */
     public TriggerMessageRequest withRequestedMessage(MessageTrigger value) {
         setRequestedMessage(value);
         return this;
     }
 
+    /**
+     * Sets the value of the connectorId property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link Integer }
+     * @return
+     *     The class instance
+     */
     public TriggerMessageRequest withConnectorId(Integer value) {
         setConnectorId(value);
         return this;

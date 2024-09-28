@@ -3,17 +3,15 @@ package ocpp._2020._03;
 
 import java.util.HashMap;
 import java.util.Map;
-import javax.annotation.Generated;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 
 /**
- * If provided the Charging Station shall return Display Messages with the given priority only.
+ * If provided the Charging Station shall return Display Messages with the given priority only.
  * 
  * 
  */
-@Generated("jsonschema2pojo")
 public enum MessagePriorityEnum {
 
     ALWAYS_FRONT("AlwaysFront"),

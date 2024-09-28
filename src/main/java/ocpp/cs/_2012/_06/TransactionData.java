@@ -4,9 +4,9 @@ package ocpp.cs._2012._06;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlType;
+import jakarta.xml.bind.annotation.XmlAccessType;
+import jakarta.xml.bind.annotation.XmlAccessorType;
+import jakarta.xml.bind.annotation.XmlType;
 import lombok.ToString;
 
 
@@ -46,7 +46,7 @@ public class TransactionData {
      * <p>
      * This accessor method returns a reference to the live list,
      * not a snapshot. Therefore any modification you make to the
-     * returned list will be present inside the JAXB object.
+     * returned list will be present inside the Jakarta XML Binding object.
      * This is why there is not a <CODE>set</CODE> method for the values property.
      * 
      * <p>
@@ -77,6 +77,14 @@ public class TransactionData {
         this.values = null;
     }
 
+    /**
+     * Adds objects to the list of Values using add method
+     * 
+     * @param values
+     *     objects to add to the list Values
+     * @return
+     *     The class instance
+     */
     public TransactionData withValues(MeterValue... values) {
         if (values!= null) {
             for (MeterValue value: values) {
@@ -86,6 +94,14 @@ public class TransactionData {
         return this;
     }
 
+    /**
+     * Adds objects to the list of Values using addAll method
+     * 
+     * @param values
+     *     objects to add to the list Values
+     * @return
+     *     The class instance
+     */
     public TransactionData withValues(Collection<MeterValue> values) {
         if (values!= null) {
             getValues().addAll(values);

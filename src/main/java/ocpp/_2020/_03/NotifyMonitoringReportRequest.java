@@ -3,15 +3,14 @@ package ocpp._2020._03;
 
 import java.util.ArrayList;
 import java.util.List;
-import javax.annotation.Generated;
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import de.rwth.idsg.ocpp.jaxb.RequestType;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import org.joda.time.DateTime;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -23,7 +22,6 @@ import org.joda.time.DateTime;
     "seqNo",
     "generatedAt"
 })
-@Generated("jsonschema2pojo")
 public class NotifyMonitoringReportRequest implements RequestType
 {
 
@@ -40,8 +38,8 @@ public class NotifyMonitoringReportRequest implements RequestType
     @Valid
     private List<MonitoringData> monitor = new ArrayList<MonitoringData>();
     /**
-     * The id of the GetMonitoringRequest that requested this report.
-     * 
+     * The id of the GetMonitoringRequest that requested this report.
+     * 
      * 
      * (Required)
      * 
@@ -51,7 +49,7 @@ public class NotifyMonitoringReportRequest implements RequestType
     @NotNull
     private Integer requestId;
     /**
-     * “to be continued” indicator. Indicates whether another part of the monitoringData follows in an upcoming notifyMonitoringReportRequest message. Default value when omitted is false.
+     * “to be continued” indicator. Indicates whether another part of the monitoringData follows in an upcoming notifyMonitoringReportRequest message. Default value when omitted is false.
      * 
      * 
      */
@@ -59,7 +57,7 @@ public class NotifyMonitoringReportRequest implements RequestType
     @JsonPropertyDescription("\u201cto be continued\u201d indicator. Indicates whether another part of the monitoringData follows in an upcoming notifyMonitoringReportRequest message. Default value when omitted is false.\r\n")
     private Boolean tbc = false;
     /**
-     * Sequence number of this message. First message starts at 0.
+     * Sequence number of this message. First message starts at 0.
      * 
      * (Required)
      * 
@@ -69,7 +67,7 @@ public class NotifyMonitoringReportRequest implements RequestType
     @NotNull
     private Integer seqNo;
     /**
-     * Timestamp of the moment this message was generated at the Charging Station.
+     * Timestamp of the moment this message was generated at the Charging Station.
      * 
      * (Required)
      * 
@@ -118,8 +116,8 @@ public class NotifyMonitoringReportRequest implements RequestType
     }
 
     /**
-     * The id of the GetMonitoringRequest that requested this report.
-     * 
+     * The id of the GetMonitoringRequest that requested this report.
+     * 
      * 
      * (Required)
      * 
@@ -130,8 +128,8 @@ public class NotifyMonitoringReportRequest implements RequestType
     }
 
     /**
-     * The id of the GetMonitoringRequest that requested this report.
-     * 
+     * The id of the GetMonitoringRequest that requested this report.
+     * 
      * 
      * (Required)
      * 
@@ -147,7 +145,7 @@ public class NotifyMonitoringReportRequest implements RequestType
     }
 
     /**
-     * “to be continued” indicator. Indicates whether another part of the monitoringData follows in an upcoming notifyMonitoringReportRequest message. Default value when omitted is false.
+     * “to be continued” indicator. Indicates whether another part of the monitoringData follows in an upcoming notifyMonitoringReportRequest message. Default value when omitted is false.
      * 
      * 
      */
@@ -157,7 +155,7 @@ public class NotifyMonitoringReportRequest implements RequestType
     }
 
     /**
-     * “to be continued” indicator. Indicates whether another part of the monitoringData follows in an upcoming notifyMonitoringReportRequest message. Default value when omitted is false.
+     * “to be continued” indicator. Indicates whether another part of the monitoringData follows in an upcoming notifyMonitoringReportRequest message. Default value when omitted is false.
      * 
      * 
      */
@@ -172,7 +170,7 @@ public class NotifyMonitoringReportRequest implements RequestType
     }
 
     /**
-     * Sequence number of this message. First message starts at 0.
+     * Sequence number of this message. First message starts at 0.
      * 
      * (Required)
      * 
@@ -183,7 +181,7 @@ public class NotifyMonitoringReportRequest implements RequestType
     }
 
     /**
-     * Sequence number of this message. First message starts at 0.
+     * Sequence number of this message. First message starts at 0.
      * 
      * (Required)
      * 
@@ -199,7 +197,7 @@ public class NotifyMonitoringReportRequest implements RequestType
     }
 
     /**
-     * Timestamp of the moment this message was generated at the Charging Station.
+     * Timestamp of the moment this message was generated at the Charging Station.
      * 
      * (Required)
      * 
@@ -210,7 +208,7 @@ public class NotifyMonitoringReportRequest implements RequestType
     }
 
     /**
-     * Timestamp of the moment this message was generated at the Charging Station.
+     * Timestamp of the moment this message was generated at the Charging Station.
      * 
      * (Required)
      * 

@@ -1,21 +1,20 @@
 
 package ocpp._2020._03;
 
-import javax.annotation.Generated;
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 
 
 /**
- * Sampled_ Value
- * urn:x-oca:ocpp:uid:2:233266
- * Single sampled value in MeterValues. Each value can be accompanied by optional fields.
- * 
- * To save on mobile data usage, default values of all of the optional fields are such that. The value without any additional fields will be interpreted, as a register reading of active import energy in Wh (Watt-hour) units.
+ * Sampled_ Value
+ * urn:x-oca:ocpp:uid:2:233266
+ * Single sampled value in MeterValues. Each value can be accompanied by optional fields.
+ * 
+ * To save on mobile data usage, default values of all of the optional fields are such that. The value without any additional fields will be interpreted, as a register reading of active import energy in Wh (Watt-hour) units.
  * 
  * 
  */
@@ -30,7 +29,6 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
     "signedMeterValue",
     "unitOfMeasure"
 })
-@Generated("jsonschema2pojo")
 public class SampledValue {
 
     /**
@@ -42,10 +40,10 @@ public class SampledValue {
     @Valid
     private CustomData customData;
     /**
-     * Sampled_ Value. Value. Measure
-     * urn:x-oca:ocpp:uid:1:569260
-     * Indicates the measured value.
-     * 
+     * Sampled_ Value. Value. Measure
+     * urn:x-oca:ocpp:uid:1:569260
+     * Indicates the measured value.
+     * 
      * 
      * (Required)
      * 
@@ -55,9 +53,9 @@ public class SampledValue {
     @NotNull
     private Double value;
     /**
-     * Sampled_ Value. Context. Reading_ Context_ Code
-     * urn:x-oca:ocpp:uid:1:569261
-     * Type of detail value: start, end or sample. Default = "Sample.Periodic"
+     * Sampled_ Value. Context. Reading_ Context_ Code
+     * urn:x-oca:ocpp:uid:1:569261
+     * Type of detail value: start, end or sample. Default = "Sample.Periodic"
      * 
      * 
      */
@@ -65,9 +63,9 @@ public class SampledValue {
     @JsonPropertyDescription("Sampled_ Value. Context. Reading_ Context_ Code\r\nurn:x-oca:ocpp:uid:1:569261\r\nType of detail value: start, end or sample. Default = \"Sample.Periodic\"\r\n")
     private ReadingContextEnum context = ReadingContextEnum.fromValue("Sample.Periodic");
     /**
-     * Sampled_ Value. Measurand. Measurand_ Code
-     * urn:x-oca:ocpp:uid:1:569263
-     * Type of measurement. Default = "Energy.Active.Import.Register"
+     * Sampled_ Value. Measurand. Measurand_ Code
+     * urn:x-oca:ocpp:uid:1:569263
+     * Type of measurement. Default = "Energy.Active.Import.Register"
      * 
      * 
      */
@@ -75,9 +73,9 @@ public class SampledValue {
     @JsonPropertyDescription("Sampled_ Value. Measurand. Measurand_ Code\r\nurn:x-oca:ocpp:uid:1:569263\r\nType of measurement. Default = \"Energy.Active.Import.Register\"\r\n")
     private MeasurandEnum measurand = MeasurandEnum.fromValue("Energy.Active.Import.Register");
     /**
-     * Sampled_ Value. Phase. Phase_ Code
-     * urn:x-oca:ocpp:uid:1:569264
-     * Indicates how the measured value is to be interpreted. For instance between L1 and neutral (L1-N) Please note that not all values of phase are applicable to all Measurands. When phase is absent, the measured value is interpreted as an overall value.
+     * Sampled_ Value. Phase. Phase_ Code
+     * urn:x-oca:ocpp:uid:1:569264
+     * Indicates how the measured value is to be interpreted. For instance between L1 and neutral (L1-N) Please note that not all values of phase are applicable to all Measurands. When phase is absent, the measured value is interpreted as an overall value.
      * 
      * 
      */
@@ -85,10 +83,10 @@ public class SampledValue {
     @JsonPropertyDescription("Sampled_ Value. Phase. Phase_ Code\r\nurn:x-oca:ocpp:uid:1:569264\r\nIndicates how the measured value is to be interpreted. For instance between L1 and neutral (L1-N) Please note that not all values of phase are applicable to all Measurands. When phase is absent, the measured value is interpreted as an overall value.\r\n")
     private PhaseEnum phase;
     /**
-     * Sampled_ Value. Location. Location_ Code
-     * urn:x-oca:ocpp:uid:1:569265
-     * Indicates where the measured value has been sampled. Default =  "Outlet"
-     * 
+     * Sampled_ Value. Location. Location_ Code
+     * urn:x-oca:ocpp:uid:1:569265
+     * Indicates where the measured value has been sampled. Default =  "Outlet"
+     * 
      * 
      * 
      */
@@ -96,7 +94,7 @@ public class SampledValue {
     @JsonPropertyDescription("Sampled_ Value. Location. Location_ Code\r\nurn:x-oca:ocpp:uid:1:569265\r\nIndicates where the measured value has been sampled. Default =  \"Outlet\"\r\n\r\n")
     private LocationEnum location = LocationEnum.fromValue("Outlet");
     /**
-     * Represent a signed version of the meter value.
+     * Represent a signed version of the meter value.
      * 
      * 
      */
@@ -105,7 +103,7 @@ public class SampledValue {
     @Valid
     private SignedMeterValue signedMeterValue;
     /**
-     * Represents a UnitOfMeasure with a multiplier
+     * Represents a UnitOfMeasure with a multiplier
      * 
      * 
      */
@@ -138,10 +136,10 @@ public class SampledValue {
     }
 
     /**
-     * Sampled_ Value. Value. Measure
-     * urn:x-oca:ocpp:uid:1:569260
-     * Indicates the measured value.
-     * 
+     * Sampled_ Value. Value. Measure
+     * urn:x-oca:ocpp:uid:1:569260
+     * Indicates the measured value.
+     * 
      * 
      * (Required)
      * 
@@ -152,10 +150,10 @@ public class SampledValue {
     }
 
     /**
-     * Sampled_ Value. Value. Measure
-     * urn:x-oca:ocpp:uid:1:569260
-     * Indicates the measured value.
-     * 
+     * Sampled_ Value. Value. Measure
+     * urn:x-oca:ocpp:uid:1:569260
+     * Indicates the measured value.
+     * 
      * 
      * (Required)
      * 
@@ -171,9 +169,9 @@ public class SampledValue {
     }
 
     /**
-     * Sampled_ Value. Context. Reading_ Context_ Code
-     * urn:x-oca:ocpp:uid:1:569261
-     * Type of detail value: start, end or sample. Default = "Sample.Periodic"
+     * Sampled_ Value. Context. Reading_ Context_ Code
+     * urn:x-oca:ocpp:uid:1:569261
+     * Type of detail value: start, end or sample. Default = "Sample.Periodic"
      * 
      * 
      */
@@ -183,9 +181,9 @@ public class SampledValue {
     }
 
     /**
-     * Sampled_ Value. Context. Reading_ Context_ Code
-     * urn:x-oca:ocpp:uid:1:569261
-     * Type of detail value: start, end or sample. Default = "Sample.Periodic"
+     * Sampled_ Value. Context. Reading_ Context_ Code
+     * urn:x-oca:ocpp:uid:1:569261
+     * Type of detail value: start, end or sample. Default = "Sample.Periodic"
      * 
      * 
      */
@@ -200,9 +198,9 @@ public class SampledValue {
     }
 
     /**
-     * Sampled_ Value. Measurand. Measurand_ Code
-     * urn:x-oca:ocpp:uid:1:569263
-     * Type of measurement. Default = "Energy.Active.Import.Register"
+     * Sampled_ Value. Measurand. Measurand_ Code
+     * urn:x-oca:ocpp:uid:1:569263
+     * Type of measurement. Default = "Energy.Active.Import.Register"
      * 
      * 
      */
@@ -212,9 +210,9 @@ public class SampledValue {
     }
 
     /**
-     * Sampled_ Value. Measurand. Measurand_ Code
-     * urn:x-oca:ocpp:uid:1:569263
-     * Type of measurement. Default = "Energy.Active.Import.Register"
+     * Sampled_ Value. Measurand. Measurand_ Code
+     * urn:x-oca:ocpp:uid:1:569263
+     * Type of measurement. Default = "Energy.Active.Import.Register"
      * 
      * 
      */
@@ -229,9 +227,9 @@ public class SampledValue {
     }
 
     /**
-     * Sampled_ Value. Phase. Phase_ Code
-     * urn:x-oca:ocpp:uid:1:569264
-     * Indicates how the measured value is to be interpreted. For instance between L1 and neutral (L1-N) Please note that not all values of phase are applicable to all Measurands. When phase is absent, the measured value is interpreted as an overall value.
+     * Sampled_ Value. Phase. Phase_ Code
+     * urn:x-oca:ocpp:uid:1:569264
+     * Indicates how the measured value is to be interpreted. For instance between L1 and neutral (L1-N) Please note that not all values of phase are applicable to all Measurands. When phase is absent, the measured value is interpreted as an overall value.
      * 
      * 
      */
@@ -241,9 +239,9 @@ public class SampledValue {
     }
 
     /**
-     * Sampled_ Value. Phase. Phase_ Code
-     * urn:x-oca:ocpp:uid:1:569264
-     * Indicates how the measured value is to be interpreted. For instance between L1 and neutral (L1-N) Please note that not all values of phase are applicable to all Measurands. When phase is absent, the measured value is interpreted as an overall value.
+     * Sampled_ Value. Phase. Phase_ Code
+     * urn:x-oca:ocpp:uid:1:569264
+     * Indicates how the measured value is to be interpreted. For instance between L1 and neutral (L1-N) Please note that not all values of phase are applicable to all Measurands. When phase is absent, the measured value is interpreted as an overall value.
      * 
      * 
      */
@@ -258,10 +256,10 @@ public class SampledValue {
     }
 
     /**
-     * Sampled_ Value. Location. Location_ Code
-     * urn:x-oca:ocpp:uid:1:569265
-     * Indicates where the measured value has been sampled. Default =  "Outlet"
-     * 
+     * Sampled_ Value. Location. Location_ Code
+     * urn:x-oca:ocpp:uid:1:569265
+     * Indicates where the measured value has been sampled. Default =  "Outlet"
+     * 
      * 
      * 
      */
@@ -271,10 +269,10 @@ public class SampledValue {
     }
 
     /**
-     * Sampled_ Value. Location. Location_ Code
-     * urn:x-oca:ocpp:uid:1:569265
-     * Indicates where the measured value has been sampled. Default =  "Outlet"
-     * 
+     * Sampled_ Value. Location. Location_ Code
+     * urn:x-oca:ocpp:uid:1:569265
+     * Indicates where the measured value has been sampled. Default =  "Outlet"
+     * 
      * 
      * 
      */
@@ -289,7 +287,7 @@ public class SampledValue {
     }
 
     /**
-     * Represent a signed version of the meter value.
+     * Represent a signed version of the meter value.
      * 
      * 
      */
@@ -299,7 +297,7 @@ public class SampledValue {
     }
 
     /**
-     * Represent a signed version of the meter value.
+     * Represent a signed version of the meter value.
      * 
      * 
      */
@@ -314,7 +312,7 @@ public class SampledValue {
     }
 
     /**
-     * Represents a UnitOfMeasure with a multiplier
+     * Represents a UnitOfMeasure with a multiplier
      * 
      * 
      */
@@ -324,7 +322,7 @@ public class SampledValue {
     }
 
     /**
-     * Represents a UnitOfMeasure with a multiplier
+     * Represents a UnitOfMeasure with a multiplier
      * 
      * 
      */

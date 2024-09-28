@@ -3,17 +3,15 @@ package ocpp._2020._03;
 
 import java.util.HashMap;
 import java.util.Map;
-import javax.annotation.Generated;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 
 /**
- * The type of this monitor, e.g. a threshold, delta or periodic monitor. 
+ * The type of this monitor, e.g. a threshold, delta or periodic monitor. 
  * 
  * 
  */
-@Generated("jsonschema2pojo")
 public enum MonitorEnum {
 
     UPPER_THRESHOLD("UpperThreshold"),

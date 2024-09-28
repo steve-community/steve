@@ -3,18 +3,16 @@ package ocpp._2020._03;
 
 import java.util.HashMap;
 import java.util.Map;
-import javax.annotation.Generated;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 
 /**
- * The Charging Station will indicate if it was
- * able to process the request
+ * The Charging Station will indicate if it was
+ * able to process the request
  * 
  * 
  */
-@Generated("jsonschema2pojo")
 public enum GenericStatusEnum {
 
     ACCEPTED("Accepted"),

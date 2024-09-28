@@ -18,7 +18,9 @@
  */
 package de.rwth.idsg.steve.web.validation;
 
+import de.rwth.idsg.steve.SteveConfiguration;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -27,7 +29,14 @@ import org.junit.jupiter.api.Test;
  */
 public class ChargeBoxIdValidatorTest {
 
-    ChargeBoxIdValidator validator = new ChargeBoxIdValidator();
+    ChargeBoxIdValidator validator;
+
+    @BeforeEach
+    public void setUp() {
+        SteveConfiguration config = new SteveConfiguration();
+        config.init();
+        validator = new ChargeBoxIdValidator(config);
+    }
 
     @Test
     public void testNull() {

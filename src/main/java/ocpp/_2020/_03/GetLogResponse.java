@@ -1,15 +1,14 @@
 
 package ocpp._2020._03;
 
-import javax.annotation.Generated;
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import de.rwth.idsg.ocpp.jaxb.ResponseType;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
@@ -18,7 +17,6 @@ import de.rwth.idsg.ocpp.jaxb.ResponseType;
     "statusInfo",
     "filename"
 })
-@Generated("jsonschema2pojo")
 public class GetLogResponse implements ResponseType
 {
 
@@ -31,7 +29,7 @@ public class GetLogResponse implements ResponseType
     @Valid
     private CustomData customData;
     /**
-     * This field indicates whether the Charging Station was able to accept the request.
+     * This field indicates whether the Charging Station was able to accept the request.
      * 
      * (Required)
      * 
@@ -41,7 +39,7 @@ public class GetLogResponse implements ResponseType
     @NotNull
     private LogStatusEnum status;
     /**
-     * Element providing more information about the status.
+     * Element providing more information about the status.
      * 
      * 
      */
@@ -50,7 +48,7 @@ public class GetLogResponse implements ResponseType
     @Valid
     private StatusInfo statusInfo;
     /**
-     * This contains the name of the log file that will be uploaded. This field is not present when no logging information is available.
+     * This contains the name of the log file that will be uploaded. This field is not present when no logging information is available.
      * 
      * 
      */
@@ -83,7 +81,7 @@ public class GetLogResponse implements ResponseType
     }
 
     /**
-     * This field indicates whether the Charging Station was able to accept the request.
+     * This field indicates whether the Charging Station was able to accept the request.
      * 
      * (Required)
      * 
@@ -94,7 +92,7 @@ public class GetLogResponse implements ResponseType
     }
 
     /**
-     * This field indicates whether the Charging Station was able to accept the request.
+     * This field indicates whether the Charging Station was able to accept the request.
      * 
      * (Required)
      * 
@@ -110,7 +108,7 @@ public class GetLogResponse implements ResponseType
     }
 
     /**
-     * Element providing more information about the status.
+     * Element providing more information about the status.
      * 
      * 
      */
@@ -120,7 +118,7 @@ public class GetLogResponse implements ResponseType
     }
 
     /**
-     * Element providing more information about the status.
+     * Element providing more information about the status.
      * 
      * 
      */
@@ -135,7 +133,7 @@ public class GetLogResponse implements ResponseType
     }
 
     /**
-     * This contains the name of the log file that will be uploaded. This field is not present when no logging information is available.
+     * This contains the name of the log file that will be uploaded. This field is not present when no logging information is available.
      * 
      * 
      */
@@ -145,7 +143,7 @@ public class GetLogResponse implements ResponseType
     }
 
     /**
-     * This contains the name of the log file that will be uploaded. This field is not present when no logging information is available.
+     * This contains the name of the log file that will be uploaded. This field is not present when no logging information is available.
      * 
      * 
      */

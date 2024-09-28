@@ -3,11 +3,9 @@ package ocpp._2020._03;
 
 import java.util.HashMap;
 import java.util.Map;
-import javax.annotation.Generated;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
-@Generated("jsonschema2pojo")
 public enum GetCertificateIdUseEnum {
 
     V_2_G_ROOT_CERTIFICATE("V2GRootCertificate"),

@@ -1,14 +1,13 @@
 
 package ocpp._2020._03;
 
-import javax.annotation.Generated;
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import de.rwth.idsg.ocpp.jaxb.RequestType;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
@@ -16,7 +15,6 @@ import de.rwth.idsg.ocpp.jaxb.RequestType;
     "requestId",
     "reportBase"
 })
-@Generated("jsonschema2pojo")
 public class GetBaseReportRequest implements RequestType
 {
 
@@ -29,7 +27,7 @@ public class GetBaseReportRequest implements RequestType
     @Valid
     private CustomData customData;
     /**
-     * The Id of the request.
+     * The Id of the request.
      * 
      * (Required)
      * 
@@ -39,7 +37,7 @@ public class GetBaseReportRequest implements RequestType
     @NotNull
     private Integer requestId;
     /**
-     * This field specifies the report base.
+     * This field specifies the report base.
      * 
      * (Required)
      * 
@@ -73,7 +71,7 @@ public class GetBaseReportRequest implements RequestType
     }
 
     /**
-     * The Id of the request.
+     * The Id of the request.
      * 
      * (Required)
      * 
@@ -84,7 +82,7 @@ public class GetBaseReportRequest implements RequestType
     }
 
     /**
-     * The Id of the request.
+     * The Id of the request.
      * 
      * (Required)
      * 
@@ -100,7 +98,7 @@ public class GetBaseReportRequest implements RequestType
     }
 
     /**
-     * This field specifies the report base.
+     * This field specifies the report base.
      * 
      * (Required)
      * 
@@ -111,7 +109,7 @@ public class GetBaseReportRequest implements RequestType
     }
 
     /**
-     * This field specifies the report base.
+     * This field specifies the report base.
      * 
      * (Required)
      * 

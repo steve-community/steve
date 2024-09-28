@@ -1,14 +1,13 @@
 
 package ocpp._2020._03;
 
-import javax.annotation.Generated;
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import de.rwth.idsg.ocpp.jaxb.RequestType;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
@@ -19,7 +18,6 @@ import de.rwth.idsg.ocpp.jaxb.RequestType;
     "retries",
     "retryInterval"
 })
-@Generated("jsonschema2pojo")
 public class GetLogRequest implements RequestType
 {
 
@@ -32,9 +30,9 @@ public class GetLogRequest implements RequestType
     @Valid
     private CustomData customData;
     /**
-     * Log
-     * urn:x-enexis:ecdm:uid:2:233373
-     * Generic class for the configuration of logging entries.
+     * Log
+     * urn:x-enexis:ecdm:uid:2:233373
+     * Generic class for the configuration of logging entries.
      * 
      * (Required)
      * 
@@ -45,8 +43,8 @@ public class GetLogRequest implements RequestType
     @NotNull
     private LogParameters log;
     /**
-     * This contains the type of log file that the Charging Station
-     * should send.
+     * This contains the type of log file that the Charging Station
+     * should send.
      * 
      * (Required)
      * 
@@ -56,7 +54,7 @@ public class GetLogRequest implements RequestType
     @NotNull
     private LogEnum logType;
     /**
-     * The Id of this request
+     * The Id of this request
      * 
      * (Required)
      * 
@@ -66,7 +64,7 @@ public class GetLogRequest implements RequestType
     @NotNull
     private Integer requestId;
     /**
-     * This specifies how many times the Charging Station must try to upload the log before giving up. If this field is not present, it is left to Charging Station to decide how many times it wants to retry.
+     * This specifies how many times the Charging Station must try to upload the log before giving up. If this field is not present, it is left to Charging Station to decide how many times it wants to retry.
      * 
      * 
      */
@@ -74,7 +72,7 @@ public class GetLogRequest implements RequestType
     @JsonPropertyDescription("This specifies how many times the Charging Station must try to upload the log before giving up. If this field is not present, it is left to Charging Station to decide how many times it wants to retry.\r\n")
     private Integer retries;
     /**
-     * The interval in seconds after which a retry may be attempted. If this field is not present, it is left to Charging Station to decide how long to wait between attempts.
+     * The interval in seconds after which a retry may be attempted. If this field is not present, it is left to Charging Station to decide how long to wait between attempts.
      * 
      * 
      */
@@ -106,9 +104,9 @@ public class GetLogRequest implements RequestType
     }
 
     /**
-     * Log
-     * urn:x-enexis:ecdm:uid:2:233373
-     * Generic class for the configuration of logging entries.
+     * Log
+     * urn:x-enexis:ecdm:uid:2:233373
+     * Generic class for the configuration of logging entries.
      * 
      * (Required)
      * 
@@ -119,9 +117,9 @@ public class GetLogRequest implements RequestType
     }
 
     /**
-     * Log
-     * urn:x-enexis:ecdm:uid:2:233373
-     * Generic class for the configuration of logging entries.
+     * Log
+     * urn:x-enexis:ecdm:uid:2:233373
+     * Generic class for the configuration of logging entries.
      * 
      * (Required)
      * 
@@ -137,8 +135,8 @@ public class GetLogRequest implements RequestType
     }
 
     /**
-     * This contains the type of log file that the Charging Station
-     * should send.
+     * This contains the type of log file that the Charging Station
+     * should send.
      * 
      * (Required)
      * 
@@ -149,8 +147,8 @@ public class GetLogRequest implements RequestType
     }
 
     /**
-     * This contains the type of log file that the Charging Station
-     * should send.
+     * This contains the type of log file that the Charging Station
+     * should send.
      * 
      * (Required)
      * 
@@ -166,7 +164,7 @@ public class GetLogRequest implements RequestType
     }
 
     /**
-     * The Id of this request
+     * The Id of this request
      * 
      * (Required)
      * 
@@ -177,7 +175,7 @@ public class GetLogRequest implements RequestType
     }
 
     /**
-     * The Id of this request
+     * The Id of this request
      * 
      * (Required)
      * 
@@ -193,7 +191,7 @@ public class GetLogRequest implements RequestType
     }
 
     /**
-     * This specifies how many times the Charging Station must try to upload the log before giving up. If this field is not present, it is left to Charging Station to decide how many times it wants to retry.
+     * This specifies how many times the Charging Station must try to upload the log before giving up. If this field is not present, it is left to Charging Station to decide how many times it wants to retry.
      * 
      * 
      */
@@ -203,7 +201,7 @@ public class GetLogRequest implements RequestType
     }
 
     /**
-     * This specifies how many times the Charging Station must try to upload the log before giving up. If this field is not present, it is left to Charging Station to decide how many times it wants to retry.
+     * This specifies how many times the Charging Station must try to upload the log before giving up. If this field is not present, it is left to Charging Station to decide how many times it wants to retry.
      * 
      * 
      */
@@ -218,7 +216,7 @@ public class GetLogRequest implements RequestType
     }
 
     /**
-     * The interval in seconds after which a retry may be attempted. If this field is not present, it is left to Charging Station to decide how long to wait between attempts.
+     * The interval in seconds after which a retry may be attempted. If this field is not present, it is left to Charging Station to decide how long to wait between attempts.
      * 
      * 
      */
@@ -228,7 +226,7 @@ public class GetLogRequest implements RequestType
     }
 
     /**
-     * The interval in seconds after which a retry may be attempted. If this field is not present, it is left to Charging Station to decide how long to wait between attempts.
+     * The interval in seconds after which a retry may be attempted. If this field is not present, it is left to Charging Station to decide how long to wait between attempts.
      * 
      * 
      */

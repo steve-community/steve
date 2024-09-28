@@ -18,20 +18,26 @@
  */
 package de.rwth.idsg.steve.service;
 
-import de.rwth.idsg.steve.repository.OcppTagRepository;
-import de.rwth.idsg.steve.repository.SettingsRepository;
-import jooq.steve.db.tables.records.OcppTagActivityRecord;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import net.parkl.ocpp.entities.OcppTag;
+import net.parkl.ocpp.repositories.OcppTagRepository;
+import net.parkl.ocpp.service.config.AdvancedChargeBoxConfiguration;
+import net.parkl.ocpp.service.config.IntegratedIdTagProvider;
+import net.parkl.ocpp.service.cs.SettingsService;
+import net.parkl.ocpp.service.cs.TransactionService;
+import net.parkl.ocpp.service.middleware.OcppChargingMiddleware;
 import ocpp.cs._2015._10.AuthorizationStatus;
 import ocpp.cs._2015._10.IdTagInfo;
 import org.jetbrains.annotations.Nullable;
 import org.joda.time.DateTime;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import static de.rwth.idsg.steve.utils.OcppTagActivityRecordUtils.isBlocked;
 import static de.rwth.idsg.steve.utils.OcppTagActivityRecordUtils.isExpired;
 import static de.rwth.idsg.steve.utils.OcppTagActivityRecordUtils.reachedLimitOfActiveTransactions;
+import static ocpp.cs._2015._10.AuthorizationStatus.INVALID;
 
 @Slf4j
 @Service
@@ -39,17 +45,31 @@ import static de.rwth.idsg.steve.utils.OcppTagActivityRecordUtils.reachedLimitOf
 public class AuthTagServiceLocal implements AuthTagService {
 
     private final OcppTagRepository ocppTagRepository;
-    private final SettingsRepository settingsRepository;
+    private final SettingsService settingsService;
+    private final TransactionService transactionService;
+    private final OcppChargingMiddleware chargingMiddleware;
+    private final AdvancedChargeBoxConfiguration config;
+    private final IntegratedIdTagProvider integratedIdTagProvider;
+
 
     @Override
     public IdTagInfo decideStatus(String idTag, boolean isStartTransactionReqContext,
                                   @Nullable String chargeBoxId, @Nullable Integer connectorId) {
-        OcppTagActivityRecord record = ocppTagRepository.getRecord(idTag);
+        OcppTag record = ocppTagRepository.findByIdTag(idTag);
         if (record == null) {
             log.error("The user with idTag '{}' is INVALID (not present in DB).", idTag);
             return new IdTagInfo().withStatus(AuthorizationStatus.INVALID);
         }
 
+        if (config.isUsingIntegratedTag(chargeBoxId)
+                && integratedIdTagProvider.integratedTags().stream().noneMatch(idTag::equalsIgnoreCase)) {
+            return new IdTagInfo().withStatus(AuthorizationStatus.INVALID);
+        } else {
+            if (!chargingMiddleware.checkRfidTag(idTag, chargeBoxId)) {
+                log.error("The user with idTag '{}' is INVALID (validation failed on Parkl backend).", idTag);
+                return new IdTagInfo().withStatus(AuthorizationStatus.INVALID);
+            }
+        }
         if (isBlocked(record)) {
             log.error("The user with idTag '{}' is BLOCKED.", idTag);
             return new IdTagInfo()
@@ -67,13 +87,14 @@ public class AuthTagServiceLocal implements AuthTagService {
         }
 
         // https://github.com/steve-community/steve/issues/219
-        if (isStartTransactionReqContext && reachedLimitOfActiveTransactions(record)) {
+        if (isStartTransactionReqContext && reachedLimitOfActiveTransactions(transactionService, record)) {
             log.warn("The user with idTag '{}' is ALREADY in another transaction(s).", idTag);
             return new IdTagInfo()
                 .withStatus(AuthorizationStatus.CONCURRENT_TX)
                 .withParentIdTag(record.getParentIdTag())
                 .withExpiryDate(getExpiryDateOrDefault(record));
         }
+
 
         log.debug("The user with idTag '{}' is ACCEPTED.", record.getIdTag());
         return new IdTagInfo()
@@ -86,12 +107,12 @@ public class AuthTagServiceLocal implements AuthTagService {
      * If the database contains an actual expiry, use it. Otherwise, calculate an expiry for cached info
      */
     @Nullable
-    private DateTime getExpiryDateOrDefault(OcppTagActivityRecord record) {
+    private DateTime getExpiryDateOrDefault(OcppTag record) {
         if (record.getExpiryDate() != null) {
-            return record.getExpiryDate();
+            return new DateTime(record.getExpiryDate());
         }
 
-        int hoursToExpire = settingsRepository.getHoursToExpire();
+        int hoursToExpire = settingsService.getHoursToExpire();
 
         // From web page: The value 0 disables this functionality (i.e. no expiry date will be set).
         if (hoursToExpire == 0) {

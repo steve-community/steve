@@ -1,14 +1,13 @@
 
 package ocpp._2020._03;
 
-import javax.annotation.Generated;
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import de.rwth.idsg.ocpp.jaxb.ResponseType;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
@@ -16,7 +15,6 @@ import de.rwth.idsg.ocpp.jaxb.ResponseType;
     "status",
     "statusInfo"
 })
-@Generated("jsonschema2pojo")
 public class UpdateFirmwareResponse implements ResponseType
 {
 
@@ -29,8 +27,8 @@ public class UpdateFirmwareResponse implements ResponseType
     @Valid
     private CustomData customData;
     /**
-     * This field indicates whether the Charging Station was able to accept the request.
-     * 
+     * This field indicates whether the Charging Station was able to accept the request.
+     * 
      * 
      * (Required)
      * 
@@ -40,7 +38,7 @@ public class UpdateFirmwareResponse implements ResponseType
     @NotNull
     private UpdateFirmwareStatusEnum status;
     /**
-     * Element providing more information about the status.
+     * Element providing more information about the status.
      * 
      * 
      */
@@ -73,8 +71,8 @@ public class UpdateFirmwareResponse implements ResponseType
     }
 
     /**
-     * This field indicates whether the Charging Station was able to accept the request.
-     * 
+     * This field indicates whether the Charging Station was able to accept the request.
+     * 
      * 
      * (Required)
      * 
@@ -85,8 +83,8 @@ public class UpdateFirmwareResponse implements ResponseType
     }
 
     /**
-     * This field indicates whether the Charging Station was able to accept the request.
-     * 
+     * This field indicates whether the Charging Station was able to accept the request.
+     * 
      * 
      * (Required)
      * 
@@ -102,7 +100,7 @@ public class UpdateFirmwareResponse implements ResponseType
     }
 
     /**
-     * Element providing more information about the status.
+     * Element providing more information about the status.
      * 
      * 
      */
@@ -112,7 +110,7 @@ public class UpdateFirmwareResponse implements ResponseType
     }
 
     /**
-     * Element providing more information about the status.
+     * Element providing more information about the status.
      * 
      * 
      */

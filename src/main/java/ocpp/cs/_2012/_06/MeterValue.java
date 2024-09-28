@@ -4,15 +4,15 @@ package ocpp.cs._2012._06;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlSchemaType;
-import javax.xml.bind.annotation.XmlType;
-import javax.xml.bind.annotation.XmlValue;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import de.rwth.idsg.ocpp.jaxb.JodaDateTimeConverter;
+import jakarta.xml.bind.annotation.XmlAccessType;
+import jakarta.xml.bind.annotation.XmlAccessorType;
+import jakarta.xml.bind.annotation.XmlAttribute;
+import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlSchemaType;
+import jakarta.xml.bind.annotation.XmlType;
+import jakarta.xml.bind.annotation.XmlValue;
+import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import lombok.ToString;
 import org.joda.time.DateTime;
 
@@ -64,15 +64,15 @@ public class MeterValue {
     @XmlSchemaType(name = "dateTime")
     protected DateTime timestamp;
     @XmlElement(required = true)
-    protected List<Value> value;
+    protected List<MeterValue.Value> value;
 
     /**
      * Gets the value of the timestamp property.
-     *
+     * 
      * @return
      *     possible object is
      *     {@link String }
-     *
+     *     
      */
     public DateTime getTimestamp() {
         return timestamp;
@@ -80,11 +80,11 @@ public class MeterValue {
 
     /**
      * Sets the value of the timestamp property.
-     *
+     * 
      * @param value
      *     allowed object is
      *     {@link String }
-     *
+     *     
      */
     public void setTimestamp(DateTime value) {
         this.timestamp = value;
@@ -96,29 +96,29 @@ public class MeterValue {
 
     /**
      * Gets the value of the value property.
-     *
+     * 
      * <p>
      * This accessor method returns a reference to the live list,
      * not a snapshot. Therefore any modification you make to the
-     * returned list will be present inside the JAXB object.
+     * returned list will be present inside the Jakarta XML Binding object.
      * This is why there is not a <CODE>set</CODE> method for the value property.
-     *
+     * 
      * <p>
      * For example, to add a new item, do as follows:
      * <pre>
      *    getValue().add(newItem);
      * </pre>
-     *
-     *
+     * 
+     * 
      * <p>
      * Objects of the following type(s) are allowed in the list
-     * {@link Value }
-     *
-     *
+     * {@link MeterValue.Value }
+     * 
+     * 
      */
-    public List<Value> getValue() {
+    public List<MeterValue.Value> getValue() {
         if (value == null) {
-            value = new ArrayList<Value>();
+            value = new ArrayList<MeterValue.Value>();
         }
         return this.value;
     }
@@ -131,21 +131,46 @@ public class MeterValue {
         this.value = null;
     }
 
+    /**
+     * Sets the value of the timestamp property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link DateTime }
+     * @return
+     *     The class instance
+     */
     public MeterValue withTimestamp(DateTime value) {
         setTimestamp(value);
         return this;
     }
 
-    public MeterValue withValue(Value... values) {
+    /**
+     * Adds objects to the list of Value using add method
+     * 
+     * @param values
+     *     objects to add to the list Value
+     * @return
+     *     The class instance
+     */
+    public MeterValue withValue(MeterValue.Value... values) {
         if (values!= null) {
-            for (Value value: values) {
+            for (MeterValue.Value value: values) {
                 getValue().add(value);
             }
         }
         return this;
     }
 
-    public MeterValue withValue(Collection<Value> values) {
+    /**
+     * Adds objects to the list of Value using addAll method
+     * 
+     * @param values
+     *     objects to add to the list Value
+     * @return
+     *     The class instance
+     */
+    public MeterValue withValue(Collection<MeterValue.Value> values) {
         if (values!= null) {
             getValue().addAll(values);
         }
@@ -155,9 +180,9 @@ public class MeterValue {
 
     /**
      * <p>Java class for anonymous complex type.
-     *
+     * 
      * <p>The following schema fragment specifies the expected content contained within this class.
-     *
+     * 
      * <pre>
      * &lt;complexType&gt;
      *   &lt;simpleContent&gt;
@@ -171,8 +196,8 @@ public class MeterValue {
      *   &lt;/simpleContent&gt;
      * &lt;/complexType&gt;
      * </pre>
-     *
-     *
+     * 
+     * 
      */
     @XmlAccessorType(XmlAccessType.FIELD)
     @XmlType(name = "", propOrder = {
@@ -195,11 +220,11 @@ public class MeterValue {
 
         /**
          * Gets the value of the value property.
-         *
+         * 
          * @return
          *     possible object is
          *     {@link String }
-         *
+         *     
          */
         public String getValue() {
             return value;
@@ -207,11 +232,11 @@ public class MeterValue {
 
         /**
          * Sets the value of the value property.
-         *
+         * 
          * @param value
          *     allowed object is
          *     {@link String }
-         *
+         *     
          */
         public void setValue(String value) {
             this.value = value;
@@ -223,11 +248,11 @@ public class MeterValue {
 
         /**
          * Gets the value of the context property.
-         *
+         * 
          * @return
          *     possible object is
          *     {@link ReadingContext }
-         *
+         *     
          */
         public ReadingContext getContext() {
             return context;
@@ -235,11 +260,11 @@ public class MeterValue {
 
         /**
          * Sets the value of the context property.
-         *
+         * 
          * @param value
          *     allowed object is
          *     {@link ReadingContext }
-         *
+         *     
          */
         public void setContext(ReadingContext value) {
             this.context = value;
@@ -251,11 +276,11 @@ public class MeterValue {
 
         /**
          * Gets the value of the format property.
-         *
+         * 
          * @return
          *     possible object is
          *     {@link ValueFormat }
-         *
+         *     
          */
         public ValueFormat getFormat() {
             return format;
@@ -263,11 +288,11 @@ public class MeterValue {
 
         /**
          * Sets the value of the format property.
-         *
+         * 
          * @param value
          *     allowed object is
          *     {@link ValueFormat }
-         *
+         *     
          */
         public void setFormat(ValueFormat value) {
             this.format = value;
@@ -279,11 +304,11 @@ public class MeterValue {
 
         /**
          * Gets the value of the measurand property.
-         *
+         * 
          * @return
          *     possible object is
          *     {@link Measurand }
-         *
+         *     
          */
         public Measurand getMeasurand() {
             return measurand;
@@ -291,11 +316,11 @@ public class MeterValue {
 
         /**
          * Sets the value of the measurand property.
-         *
+         * 
          * @param value
          *     allowed object is
          *     {@link Measurand }
-         *
+         *     
          */
         public void setMeasurand(Measurand value) {
             this.measurand = value;
@@ -307,11 +332,11 @@ public class MeterValue {
 
         /**
          * Gets the value of the location property.
-         *
+         * 
          * @return
          *     possible object is
          *     {@link Location }
-         *
+         *     
          */
         public Location getLocation() {
             return location;
@@ -319,11 +344,11 @@ public class MeterValue {
 
         /**
          * Sets the value of the location property.
-         *
+         * 
          * @param value
          *     allowed object is
          *     {@link Location }
-         *
+         *     
          */
         public void setLocation(Location value) {
             this.location = value;
@@ -335,11 +360,11 @@ public class MeterValue {
 
         /**
          * Gets the value of the unit property.
-         *
+         * 
          * @return
          *     possible object is
          *     {@link UnitOfMeasure }
-         *
+         *     
          */
         public UnitOfMeasure getUnit() {
             return unit;
@@ -347,11 +372,11 @@ public class MeterValue {
 
         /**
          * Sets the value of the unit property.
-         *
+         * 
          * @param value
          *     allowed object is
          *     {@link UnitOfMeasure }
-         *
+         *     
          */
         public void setUnit(UnitOfMeasure value) {
             this.unit = value;
@@ -361,32 +386,86 @@ public class MeterValue {
             return (this.unit!= null);
         }
 
-        public Value withValue(String value) {
+        /**
+         * Sets the value of the value property.
+         * 
+         * @param value
+         *     allowed object is
+         *     {@link String }
+         * @return
+         *     The class instance
+         */
+        public MeterValue.Value withValue(String value) {
             setValue(value);
             return this;
         }
 
-        public Value withContext(ReadingContext value) {
+        /**
+         * Sets the value of the context property.
+         * 
+         * @param value
+         *     allowed object is
+         *     {@link ReadingContext }
+         * @return
+         *     The class instance
+         */
+        public MeterValue.Value withContext(ReadingContext value) {
             setContext(value);
             return this;
         }
 
-        public Value withFormat(ValueFormat value) {
+        /**
+         * Sets the value of the format property.
+         * 
+         * @param value
+         *     allowed object is
+         *     {@link ValueFormat }
+         * @return
+         *     The class instance
+         */
+        public MeterValue.Value withFormat(ValueFormat value) {
             setFormat(value);
             return this;
         }
 
-        public Value withMeasurand(Measurand value) {
+        /**
+         * Sets the value of the measurand property.
+         * 
+         * @param value
+         *     allowed object is
+         *     {@link Measurand }
+         * @return
+         *     The class instance
+         */
+        public MeterValue.Value withMeasurand(Measurand value) {
             setMeasurand(value);
             return this;
         }
 
-        public Value withLocation(Location value) {
+        /**
+         * Sets the value of the location property.
+         * 
+         * @param value
+         *     allowed object is
+         *     {@link Location }
+         * @return
+         *     The class instance
+         */
+        public MeterValue.Value withLocation(Location value) {
             setLocation(value);
             return this;
         }
 
-        public Value withUnit(UnitOfMeasure value) {
+        /**
+         * Sets the value of the unit property.
+         * 
+         * @param value
+         *     allowed object is
+         *     {@link UnitOfMeasure }
+         * @return
+         *     The class instance
+         */
+        public MeterValue.Value withUnit(UnitOfMeasure value) {
             setUnit(value);
             return this;
         }

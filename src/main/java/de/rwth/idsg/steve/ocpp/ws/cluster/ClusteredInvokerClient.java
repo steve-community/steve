@@ -1,7 +1,7 @@
 package de.rwth.idsg.steve.ocpp.ws.cluster;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import de.rwth.idsg.ocpp.jaxb.ResponseType;
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -10,7 +10,6 @@ import org.springframework.http.*;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
-import javax.annotation.PostConstruct;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;

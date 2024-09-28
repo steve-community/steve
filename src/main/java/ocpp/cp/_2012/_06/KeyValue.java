@@ -1,10 +1,10 @@
 
 package ocpp.cp._2012._06;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlType;
+import jakarta.xml.bind.annotation.XmlAccessType;
+import jakarta.xml.bind.annotation.XmlAccessorType;
+import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlType;
 import lombok.ToString;
 
 
@@ -121,16 +121,43 @@ public class KeyValue {
         return (this.value!= null);
     }
 
+    /**
+     * Sets the value of the key property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     * @return
+     *     The class instance
+     */
     public KeyValue withKey(String value) {
         setKey(value);
         return this;
     }
 
+    /**
+     * Sets the value of the readonly property.
+     * 
+     * @param value
+     *     allowed object is
+     *     boolean
+     * @return
+     *     The class instance
+     */
     public KeyValue withReadonly(boolean value) {
         setReadonly(value);
         return this;
     }
 
+    /**
+     * Sets the value of the value property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     * @return
+     *     The class instance
+     */
     public KeyValue withValue(String value) {
         setValue(value);
         return this;

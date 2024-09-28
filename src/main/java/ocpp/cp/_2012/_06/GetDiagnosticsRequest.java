@@ -1,14 +1,14 @@
 
 package ocpp.cp._2012._06;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlSchemaType;
-import javax.xml.bind.annotation.XmlType;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import de.rwth.idsg.ocpp.jaxb.JodaDateTimeConverter;
 import de.rwth.idsg.ocpp.jaxb.RequestType;
+import jakarta.xml.bind.annotation.XmlAccessType;
+import jakarta.xml.bind.annotation.XmlAccessorType;
+import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlSchemaType;
+import jakarta.xml.bind.annotation.XmlType;
+import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import lombok.ToString;
 import org.joda.time.DateTime;
 
@@ -205,26 +205,71 @@ public class GetDiagnosticsRequest
         return (this.retryInterval!= null);
     }
 
+    /**
+     * Sets the value of the location property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     * @return
+     *     The class instance
+     */
     public GetDiagnosticsRequest withLocation(String value) {
         setLocation(value);
         return this;
     }
 
+    /**
+     * Sets the value of the startTime property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link DateTime }
+     * @return
+     *     The class instance
+     */
     public GetDiagnosticsRequest withStartTime(DateTime value) {
         setStartTime(value);
         return this;
     }
 
+    /**
+     * Sets the value of the stopTime property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link DateTime }
+     * @return
+     *     The class instance
+     */
     public GetDiagnosticsRequest withStopTime(DateTime value) {
         setStopTime(value);
         return this;
     }
 
+    /**
+     * Sets the value of the retries property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link Integer }
+     * @return
+     *     The class instance
+     */
     public GetDiagnosticsRequest withRetries(Integer value) {
         setRetries(value);
         return this;
     }
 
+    /**
+     * Sets the value of the retryInterval property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link Integer }
+     * @return
+     *     The class instance
+     */
     public GetDiagnosticsRequest withRetryInterval(Integer value) {
         setRetryInterval(value);
         return this;

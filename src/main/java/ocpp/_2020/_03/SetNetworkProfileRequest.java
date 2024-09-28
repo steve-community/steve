@@ -1,14 +1,13 @@
 
 package ocpp._2020._03;
 
-import javax.annotation.Generated;
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import de.rwth.idsg.ocpp.jaxb.RequestType;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
@@ -16,7 +15,6 @@ import de.rwth.idsg.ocpp.jaxb.RequestType;
     "configurationSlot",
     "connectionData"
 })
-@Generated("jsonschema2pojo")
 public class SetNetworkProfileRequest implements RequestType
 {
 
@@ -29,7 +27,7 @@ public class SetNetworkProfileRequest implements RequestType
     @Valid
     private CustomData customData;
     /**
-     * Slot in which the configuration should be stored.
+     * Slot in which the configuration should be stored.
      * 
      * (Required)
      * 
@@ -39,9 +37,9 @@ public class SetNetworkProfileRequest implements RequestType
     @NotNull
     private Integer configurationSlot;
     /**
-     * Communication_ Function
-     * urn:x-oca:ocpp:uid:2:233304
-     * The NetworkConnectionProfile defines the functional and technical parameters of a communication link.
+     * Communication_ Function
+     * urn:x-oca:ocpp:uid:2:233304
+     * The NetworkConnectionProfile defines the functional and technical parameters of a communication link.
      * 
      * (Required)
      * 
@@ -76,7 +74,7 @@ public class SetNetworkProfileRequest implements RequestType
     }
 
     /**
-     * Slot in which the configuration should be stored.
+     * Slot in which the configuration should be stored.
      * 
      * (Required)
      * 
@@ -87,7 +85,7 @@ public class SetNetworkProfileRequest implements RequestType
     }
 
     /**
-     * Slot in which the configuration should be stored.
+     * Slot in which the configuration should be stored.
      * 
      * (Required)
      * 
@@ -103,9 +101,9 @@ public class SetNetworkProfileRequest implements RequestType
     }
 
     /**
-     * Communication_ Function
-     * urn:x-oca:ocpp:uid:2:233304
-     * The NetworkConnectionProfile defines the functional and technical parameters of a communication link.
+     * Communication_ Function
+     * urn:x-oca:ocpp:uid:2:233304
+     * The NetworkConnectionProfile defines the functional and technical parameters of a communication link.
      * 
      * (Required)
      * 
@@ -116,9 +114,9 @@ public class SetNetworkProfileRequest implements RequestType
     }
 
     /**
-     * Communication_ Function
-     * urn:x-oca:ocpp:uid:2:233304
-     * The NetworkConnectionProfile defines the functional and technical parameters of a communication link.
+     * Communication_ Function
+     * urn:x-oca:ocpp:uid:2:233304
+     * The NetworkConnectionProfile defines the functional and technical parameters of a communication link.
      * 
      * (Required)
      * 

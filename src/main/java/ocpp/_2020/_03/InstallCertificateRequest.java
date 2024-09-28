@@ -1,15 +1,14 @@
 
 package ocpp._2020._03;
 
-import javax.annotation.Generated;
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import de.rwth.idsg.ocpp.jaxb.RequestType;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
@@ -17,7 +16,6 @@ import de.rwth.idsg.ocpp.jaxb.RequestType;
     "certificateType",
     "certificate"
 })
-@Generated("jsonschema2pojo")
 public class InstallCertificateRequest implements RequestType
 {
 
@@ -30,7 +28,7 @@ public class InstallCertificateRequest implements RequestType
     @Valid
     private CustomData customData;
     /**
-     * Indicates the certificate type that is sent.
+     * Indicates the certificate type that is sent.
      * 
      * (Required)
      * 
@@ -40,7 +38,7 @@ public class InstallCertificateRequest implements RequestType
     @NotNull
     private InstallCertificateUseEnum certificateType;
     /**
-     * A PEM encoded X.509 certificate.
+     * A PEM encoded X.509 certificate.
      * 
      * (Required)
      * 
@@ -75,7 +73,7 @@ public class InstallCertificateRequest implements RequestType
     }
 
     /**
-     * Indicates the certificate type that is sent.
+     * Indicates the certificate type that is sent.
      * 
      * (Required)
      * 
@@ -86,7 +84,7 @@ public class InstallCertificateRequest implements RequestType
     }
 
     /**
-     * Indicates the certificate type that is sent.
+     * Indicates the certificate type that is sent.
      * 
      * (Required)
      * 
@@ -102,7 +100,7 @@ public class InstallCertificateRequest implements RequestType
     }
 
     /**
-     * A PEM encoded X.509 certificate.
+     * A PEM encoded X.509 certificate.
      * 
      * (Required)
      * 
@@ -113,7 +111,7 @@ public class InstallCertificateRequest implements RequestType
     }
 
     /**
-     * A PEM encoded X.509 certificate.
+     * A PEM encoded X.509 certificate.
      * 
      * (Required)
      * 

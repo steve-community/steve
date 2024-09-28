@@ -3,17 +3,15 @@ package ocpp._2020._03;
 
 import java.util.HashMap;
 import java.util.Map;
-import javax.annotation.Generated;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 
 /**
- * This indicates the success or failure of the data transfer.
+ * This indicates the success or failure of the data transfer.
  * 
  * 
  */
-@Generated("jsonschema2pojo")
 public enum DataTransferStatusEnum {
 
     ACCEPTED("Accepted"),

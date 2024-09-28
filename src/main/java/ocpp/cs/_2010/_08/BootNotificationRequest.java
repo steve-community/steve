@@ -1,11 +1,11 @@
 
 package ocpp.cs._2010._08;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlType;
 import de.rwth.idsg.ocpp.jaxb.RequestType;
+import jakarta.xml.bind.annotation.XmlAccessType;
+import jakarta.xml.bind.annotation.XmlAccessorType;
+import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlType;
 import lombok.ToString;
 
 
@@ -319,46 +319,127 @@ public class BootNotificationRequest
         return (this.meterSerialNumber!= null);
     }
 
+    /**
+     * Sets the value of the chargePointVendor property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     * @return
+     *     The class instance
+     */
     public BootNotificationRequest withChargePointVendor(String value) {
         setChargePointVendor(value);
         return this;
     }
 
+    /**
+     * Sets the value of the chargePointModel property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     * @return
+     *     The class instance
+     */
     public BootNotificationRequest withChargePointModel(String value) {
         setChargePointModel(value);
         return this;
     }
 
+    /**
+     * Sets the value of the chargePointSerialNumber property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     * @return
+     *     The class instance
+     */
     public BootNotificationRequest withChargePointSerialNumber(String value) {
         setChargePointSerialNumber(value);
         return this;
     }
 
+    /**
+     * Sets the value of the chargeBoxSerialNumber property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     * @return
+     *     The class instance
+     */
     public BootNotificationRequest withChargeBoxSerialNumber(String value) {
         setChargeBoxSerialNumber(value);
         return this;
     }
 
+    /**
+     * Sets the value of the firmwareVersion property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     * @return
+     *     The class instance
+     */
     public BootNotificationRequest withFirmwareVersion(String value) {
         setFirmwareVersion(value);
         return this;
     }
 
+    /**
+     * Sets the value of the iccid property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     * @return
+     *     The class instance
+     */
     public BootNotificationRequest withIccid(String value) {
         setIccid(value);
         return this;
     }
 
+    /**
+     * Sets the value of the imsi property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     * @return
+     *     The class instance
+     */
     public BootNotificationRequest withImsi(String value) {
         setImsi(value);
         return this;
     }
 
+    /**
+     * Sets the value of the meterType property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     * @return
+     *     The class instance
+     */
     public BootNotificationRequest withMeterType(String value) {
         setMeterType(value);
         return this;
     }
 
+    /**
+     * Sets the value of the meterSerialNumber property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     * @return
+     *     The class instance
+     */
     public BootNotificationRequest withMeterSerialNumber(String value) {
         setMeterSerialNumber(value);
         return this;

@@ -24,6 +24,7 @@ package de.rwth.idsg.steve.service;
 
 import ocpp.cs._2015._10.IdTagInfo;
 
+import java.util.List;
 import java.util.function.Supplier;
 
 /**
@@ -31,6 +32,12 @@ import java.util.function.Supplier;
  * @since 03.01.2015
  */
 public interface OcppTagService {
-    IdTagInfo getIdTagInfo(String idTag, boolean isStartTransactionReqContext,String askingChargeBoxId);
-    IdTagInfo getIdTagInfo(String idTag, boolean isStartTransactionReqContext,String askingChargeBoxId, Supplier<IdTagInfo> supplierWhenException);
+    IdTagInfo getIdTagInfo(String idTag, boolean isStartTransactionReqContext,String askingChargeBoxId, Integer connectorId);
+    IdTagInfo getIdTagInfo(String idTag, boolean isStartTransactionReqContext,String askingChargeBoxId, Integer connectorId, Supplier<IdTagInfo> supplierWhenException);
+
+    String getParentIdtag(String idTag);
+
+    List<String> getActiveIdTags();
+
+    List<String> getIdTags();
 }

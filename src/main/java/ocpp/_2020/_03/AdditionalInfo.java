@@ -1,18 +1,17 @@
 
 package ocpp._2020._03;
 
-import javax.annotation.Generated;
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 
 
 /**
- * Contains a case insensitive identifier to use for the authorization and the type of authorization to support multiple forms of identifiers.
+ * Contains a case insensitive identifier to use for the authorization and the type of authorization to support multiple forms of identifiers.
  * 
  * 
  */
@@ -22,7 +21,6 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
     "additionalIdToken",
     "type"
 })
-@Generated("jsonschema2pojo")
 public class AdditionalInfo {
 
     /**
@@ -34,7 +32,7 @@ public class AdditionalInfo {
     @Valid
     private CustomData customData;
     /**
-     * This field specifies the additional IdToken.
+     * This field specifies the additional IdToken.
      * 
      * (Required)
      * 
@@ -45,7 +43,7 @@ public class AdditionalInfo {
     @NotNull
     private String additionalIdToken;
     /**
-     * This defines the type of the additionalIdToken. This is a custom type, so the implementation needs to be agreed upon by all involved parties.
+     * This defines the type of the additionalIdToken. This is a custom type, so the implementation needs to be agreed upon by all involved parties.
      * 
      * (Required)
      * 
@@ -80,7 +78,7 @@ public class AdditionalInfo {
     }
 
     /**
-     * This field specifies the additional IdToken.
+     * This field specifies the additional IdToken.
      * 
      * (Required)
      * 
@@ -91,7 +89,7 @@ public class AdditionalInfo {
     }
 
     /**
-     * This field specifies the additional IdToken.
+     * This field specifies the additional IdToken.
      * 
      * (Required)
      * 
@@ -107,7 +105,7 @@ public class AdditionalInfo {
     }
 
     /**
-     * This defines the type of the additionalIdToken. This is a custom type, so the implementation needs to be agreed upon by all involved parties.
+     * This defines the type of the additionalIdToken. This is a custom type, so the implementation needs to be agreed upon by all involved parties.
      * 
      * (Required)
      * 
@@ -118,7 +116,7 @@ public class AdditionalInfo {
     }
 
     /**
-     * This defines the type of the additionalIdToken. This is a custom type, so the implementation needs to be agreed upon by all involved parties.
+     * This defines the type of the additionalIdToken. This is a custom type, so the implementation needs to be agreed upon by all involved parties.
      * 
      * (Required)
      * 

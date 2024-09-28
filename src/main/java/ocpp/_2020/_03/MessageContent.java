@@ -1,21 +1,20 @@
 
 package ocpp._2020._03;
 
-import javax.annotation.Generated;
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 
 
 /**
- * Message_ Content
- * urn:x-enexis:ecdm:uid:2:234490
- * Contains message details, for a message to be displayed on a Charging Station.
- * 
+ * Message_ Content
+ * urn:x-enexis:ecdm:uid:2:234490
+ * Contains message details, for a message to be displayed on a Charging Station.
+ * 
  * 
  * 
  */
@@ -26,7 +25,6 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
     "language",
     "content"
 })
-@Generated("jsonschema2pojo")
 public class MessageContent {
 
     /**
@@ -38,9 +36,9 @@ public class MessageContent {
     @Valid
     private CustomData customData;
     /**
-     * Message_ Content. Format. Message_ Format_ Code
-     * urn:x-enexis:ecdm:uid:1:570848
-     * Format of the message.
+     * Message_ Content. Format. Message_ Format_ Code
+     * urn:x-enexis:ecdm:uid:1:570848
+     * Format of the message.
      * 
      * (Required)
      * 
@@ -50,9 +48,9 @@ public class MessageContent {
     @NotNull
     private MessageFormatEnum format;
     /**
-     * Message_ Content. Language. Language_ Code
-     * urn:x-enexis:ecdm:uid:1:570849
-     * Message language identifier. Contains a language code as defined in &lt;&lt;ref-RFC5646,[RFC5646]&gt;&gt;.
+     * Message_ Content. Language. Language_ Code
+     * urn:x-enexis:ecdm:uid:1:570849
+     * Message language identifier. Contains a language code as defined in &lt;&lt;ref-RFC5646,[RFC5646]&gt;&gt;.
      * 
      * 
      */
@@ -61,10 +59,10 @@ public class MessageContent {
     @Size(max = 8)
     private String language;
     /**
-     * Message_ Content. Content. Message
-     * urn:x-enexis:ecdm:uid:1:570852
-     * Message contents.
-     * 
+     * Message_ Content. Content. Message
+     * urn:x-enexis:ecdm:uid:1:570852
+     * Message contents.
+     * 
      * 
      * (Required)
      * 
@@ -99,9 +97,9 @@ public class MessageContent {
     }
 
     /**
-     * Message_ Content. Format. Message_ Format_ Code
-     * urn:x-enexis:ecdm:uid:1:570848
-     * Format of the message.
+     * Message_ Content. Format. Message_ Format_ Code
+     * urn:x-enexis:ecdm:uid:1:570848
+     * Format of the message.
      * 
      * (Required)
      * 
@@ -112,9 +110,9 @@ public class MessageContent {
     }
 
     /**
-     * Message_ Content. Format. Message_ Format_ Code
-     * urn:x-enexis:ecdm:uid:1:570848
-     * Format of the message.
+     * Message_ Content. Format. Message_ Format_ Code
+     * urn:x-enexis:ecdm:uid:1:570848
+     * Format of the message.
      * 
      * (Required)
      * 
@@ -130,9 +128,9 @@ public class MessageContent {
     }
 
     /**
-     * Message_ Content. Language. Language_ Code
-     * urn:x-enexis:ecdm:uid:1:570849
-     * Message language identifier. Contains a language code as defined in &lt;&lt;ref-RFC5646,[RFC5646]&gt;&gt;.
+     * Message_ Content. Language. Language_ Code
+     * urn:x-enexis:ecdm:uid:1:570849
+     * Message language identifier. Contains a language code as defined in &lt;&lt;ref-RFC5646,[RFC5646]&gt;&gt;.
      * 
      * 
      */
@@ -142,9 +140,9 @@ public class MessageContent {
     }
 
     /**
-     * Message_ Content. Language. Language_ Code
-     * urn:x-enexis:ecdm:uid:1:570849
-     * Message language identifier. Contains a language code as defined in &lt;&lt;ref-RFC5646,[RFC5646]&gt;&gt;.
+     * Message_ Content. Language. Language_ Code
+     * urn:x-enexis:ecdm:uid:1:570849
+     * Message language identifier. Contains a language code as defined in &lt;&lt;ref-RFC5646,[RFC5646]&gt;&gt;.
      * 
      * 
      */
@@ -159,10 +157,10 @@ public class MessageContent {
     }
 
     /**
-     * Message_ Content. Content. Message
-     * urn:x-enexis:ecdm:uid:1:570852
-     * Message contents.
-     * 
+     * Message_ Content. Content. Message
+     * urn:x-enexis:ecdm:uid:1:570852
+     * Message contents.
+     * 
      * 
      * (Required)
      * 
@@ -173,10 +171,10 @@ public class MessageContent {
     }
 
     /**
-     * Message_ Content. Content. Message
-     * urn:x-enexis:ecdm:uid:1:570852
-     * Message contents.
-     * 
+     * Message_ Content. Content. Message
+     * urn:x-enexis:ecdm:uid:1:570852
+     * Message contents.
+     * 
      * 
      * (Required)
      * 

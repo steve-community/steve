@@ -1,14 +1,13 @@
 
 package ocpp._2020._03;
 
-import javax.annotation.Generated;
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import de.rwth.idsg.ocpp.jaxb.RequestType;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
@@ -16,7 +15,6 @@ import de.rwth.idsg.ocpp.jaxb.RequestType;
     "status",
     "requestId"
 })
-@Generated("jsonschema2pojo")
 public class FirmwareStatusNotificationRequest implements RequestType
 {
 
@@ -29,7 +27,7 @@ public class FirmwareStatusNotificationRequest implements RequestType
     @Valid
     private CustomData customData;
     /**
-     * This contains the progress status of the firmware installation.
+     * This contains the progress status of the firmware installation.
      * 
      * (Required)
      * 
@@ -39,9 +37,9 @@ public class FirmwareStatusNotificationRequest implements RequestType
     @NotNull
     private FirmwareStatusEnum status;
     /**
-     * The request id that was provided in the
-     * UpdateFirmwareRequest that started this firmware update.
-     * This field is mandatory, unless the message was triggered by a TriggerMessageRequest AND there is no firmware update ongoing.
+     * The request id that was provided in the
+     * UpdateFirmwareRequest that started this firmware update.
+     * This field is mandatory, unless the message was triggered by a TriggerMessageRequest AND there is no firmware update ongoing.
      * 
      * 
      */
@@ -73,7 +71,7 @@ public class FirmwareStatusNotificationRequest implements RequestType
     }
 
     /**
-     * This contains the progress status of the firmware installation.
+     * This contains the progress status of the firmware installation.
      * 
      * (Required)
      * 
@@ -84,7 +82,7 @@ public class FirmwareStatusNotificationRequest implements RequestType
     }
 
     /**
-     * This contains the progress status of the firmware installation.
+     * This contains the progress status of the firmware installation.
      * 
      * (Required)
      * 
@@ -100,9 +98,9 @@ public class FirmwareStatusNotificationRequest implements RequestType
     }
 
     /**
-     * The request id that was provided in the
-     * UpdateFirmwareRequest that started this firmware update.
-     * This field is mandatory, unless the message was triggered by a TriggerMessageRequest AND there is no firmware update ongoing.
+     * The request id that was provided in the
+     * UpdateFirmwareRequest that started this firmware update.
+     * This field is mandatory, unless the message was triggered by a TriggerMessageRequest AND there is no firmware update ongoing.
      * 
      * 
      */
@@ -112,9 +110,9 @@ public class FirmwareStatusNotificationRequest implements RequestType
     }
 
     /**
-     * The request id that was provided in the
-     * UpdateFirmwareRequest that started this firmware update.
-     * This field is mandatory, unless the message was triggered by a TriggerMessageRequest AND there is no firmware update ongoing.
+     * The request id that was provided in the
+     * UpdateFirmwareRequest that started this firmware update.
+     * This field is mandatory, unless the message was triggered by a TriggerMessageRequest AND there is no firmware update ongoing.
      * 
      * 
      */

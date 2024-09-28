@@ -4,12 +4,12 @@ package ocpp.cp._2015._10;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlSchemaType;
-import javax.xml.bind.annotation.XmlType;
 import de.rwth.idsg.ocpp.jaxb.RequestType;
+import jakarta.xml.bind.annotation.XmlAccessType;
+import jakarta.xml.bind.annotation.XmlAccessorType;
+import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlSchemaType;
+import jakarta.xml.bind.annotation.XmlType;
 import lombok.ToString;
 
 
@@ -79,7 +79,7 @@ public class SendLocalListRequest
      * <p>
      * This accessor method returns a reference to the live list,
      * not a snapshot. Therefore any modification you make to the
-     * returned list will be present inside the JAXB object.
+     * returned list will be present inside the Jakarta XML Binding object.
      * This is why there is not a <CODE>set</CODE> method for the localAuthorizationList property.
      * 
      * <p>
@@ -138,11 +138,28 @@ public class SendLocalListRequest
         return (this.updateType!= null);
     }
 
+    /**
+     * Sets the value of the listVersion property.
+     * 
+     * @param value
+     *     allowed object is
+     *     int
+     * @return
+     *     The class instance
+     */
     public SendLocalListRequest withListVersion(int value) {
         setListVersion(value);
         return this;
     }
 
+    /**
+     * Adds objects to the list of LocalAuthorizationList using add method
+     * 
+     * @param values
+     *     objects to add to the list LocalAuthorizationList
+     * @return
+     *     The class instance
+     */
     public SendLocalListRequest withLocalAuthorizationList(AuthorizationData... values) {
         if (values!= null) {
             for (AuthorizationData value: values) {
@@ -152,6 +169,14 @@ public class SendLocalListRequest
         return this;
     }
 
+    /**
+     * Adds objects to the list of LocalAuthorizationList using addAll method
+     * 
+     * @param values
+     *     objects to add to the list LocalAuthorizationList
+     * @return
+     *     The class instance
+     */
     public SendLocalListRequest withLocalAuthorizationList(Collection<AuthorizationData> values) {
         if (values!= null) {
             getLocalAuthorizationList().addAll(values);
@@ -159,6 +184,15 @@ public class SendLocalListRequest
         return this;
     }
 
+    /**
+     * Sets the value of the updateType property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link UpdateType }
+     * @return
+     *     The class instance
+     */
     public SendLocalListRequest withUpdateType(UpdateType value) {
         setUpdateType(value);
         return this;

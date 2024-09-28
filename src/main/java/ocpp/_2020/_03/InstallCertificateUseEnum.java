@@ -3,17 +3,15 @@ package ocpp._2020._03;
 
 import java.util.HashMap;
 import java.util.Map;
-import javax.annotation.Generated;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 
 /**
- * Indicates the certificate type that is sent.
+ * Indicates the certificate type that is sent.
  * 
  * 
  */
-@Generated("jsonschema2pojo")
 public enum InstallCertificateUseEnum {
 
     V_2_G_ROOT_CERTIFICATE("V2GRootCertificate"),

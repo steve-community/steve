@@ -1,20 +1,19 @@
 
 package ocpp._2020._03;
 
-import javax.annotation.Generated;
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 
 
 /**
- * AC_ Charging_ Parameters
- * urn:x-oca:ocpp:uid:2:233250
- * EV AC charging parameters.
- * 
+ * AC_ Charging_ Parameters
+ * urn:x-oca:ocpp:uid:2:233250
+ * EV AC charging parameters.
+ * 
  * 
  * 
  */
@@ -26,7 +25,6 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
     "evMaxCurrent",
     "evMaxVoltage"
 })
-@Generated("jsonschema2pojo")
 public class ACChargingParameters {
 
     /**
@@ -38,9 +36,9 @@ public class ACChargingParameters {
     @Valid
     private CustomData customData;
     /**
-     * AC_ Charging_ Parameters. Energy_ Amount. Energy_ Amount
-     * urn:x-oca:ocpp:uid:1:569211
-     * Amount of energy requested (in Wh). This includes energy required for preconditioning.
+     * AC_ Charging_ Parameters. Energy_ Amount. Energy_ Amount
+     * urn:x-oca:ocpp:uid:1:569211
+     * Amount of energy requested (in Wh). This includes energy required for preconditioning.
      * 
      * (Required)
      * 
@@ -50,9 +48,9 @@ public class ACChargingParameters {
     @NotNull
     private Integer energyAmount;
     /**
-     * AC_ Charging_ Parameters. EV_ Min. Current
-     * urn:x-oca:ocpp:uid:1:569212
-     * Minimum current (amps) supported by the electric vehicle (per phase).
+     * AC_ Charging_ Parameters. EV_ Min. Current
+     * urn:x-oca:ocpp:uid:1:569212
+     * Minimum current (amps) supported by the electric vehicle (per phase).
      * 
      * (Required)
      * 
@@ -62,9 +60,9 @@ public class ACChargingParameters {
     @NotNull
     private Integer evMinCurrent;
     /**
-     * AC_ Charging_ Parameters. EV_ Max. Current
-     * urn:x-oca:ocpp:uid:1:569213
-     * Maximum current (amps) supported by the electric vehicle (per phase). Includes cable capacity.
+     * AC_ Charging_ Parameters. EV_ Max. Current
+     * urn:x-oca:ocpp:uid:1:569213
+     * Maximum current (amps) supported by the electric vehicle (per phase). Includes cable capacity.
      * 
      * (Required)
      * 
@@ -74,9 +72,9 @@ public class ACChargingParameters {
     @NotNull
     private Integer evMaxCurrent;
     /**
-     * AC_ Charging_ Parameters. EV_ Max. Voltage
-     * urn:x-oca:ocpp:uid:1:569214
-     * Maximum voltage supported by the electric vehicle
+     * AC_ Charging_ Parameters. EV_ Max. Voltage
+     * urn:x-oca:ocpp:uid:1:569214
+     * Maximum voltage supported by the electric vehicle
      * 
      * (Required)
      * 
@@ -110,9 +108,9 @@ public class ACChargingParameters {
     }
 
     /**
-     * AC_ Charging_ Parameters. Energy_ Amount. Energy_ Amount
-     * urn:x-oca:ocpp:uid:1:569211
-     * Amount of energy requested (in Wh). This includes energy required for preconditioning.
+     * AC_ Charging_ Parameters. Energy_ Amount. Energy_ Amount
+     * urn:x-oca:ocpp:uid:1:569211
+     * Amount of energy requested (in Wh). This includes energy required for preconditioning.
      * 
      * (Required)
      * 
@@ -123,9 +121,9 @@ public class ACChargingParameters {
     }
 
     /**
-     * AC_ Charging_ Parameters. Energy_ Amount. Energy_ Amount
-     * urn:x-oca:ocpp:uid:1:569211
-     * Amount of energy requested (in Wh). This includes energy required for preconditioning.
+     * AC_ Charging_ Parameters. Energy_ Amount. Energy_ Amount
+     * urn:x-oca:ocpp:uid:1:569211
+     * Amount of energy requested (in Wh). This includes energy required for preconditioning.
      * 
      * (Required)
      * 
@@ -141,9 +139,9 @@ public class ACChargingParameters {
     }
 
     /**
-     * AC_ Charging_ Parameters. EV_ Min. Current
-     * urn:x-oca:ocpp:uid:1:569212
-     * Minimum current (amps) supported by the electric vehicle (per phase).
+     * AC_ Charging_ Parameters. EV_ Min. Current
+     * urn:x-oca:ocpp:uid:1:569212
+     * Minimum current (amps) supported by the electric vehicle (per phase).
      * 
      * (Required)
      * 
@@ -154,9 +152,9 @@ public class ACChargingParameters {
     }
 
     /**
-     * AC_ Charging_ Parameters. EV_ Min. Current
-     * urn:x-oca:ocpp:uid:1:569212
-     * Minimum current (amps) supported by the electric vehicle (per phase).
+     * AC_ Charging_ Parameters. EV_ Min. Current
+     * urn:x-oca:ocpp:uid:1:569212
+     * Minimum current (amps) supported by the electric vehicle (per phase).
      * 
      * (Required)
      * 
@@ -172,9 +170,9 @@ public class ACChargingParameters {
     }
 
     /**
-     * AC_ Charging_ Parameters. EV_ Max. Current
-     * urn:x-oca:ocpp:uid:1:569213
-     * Maximum current (amps) supported by the electric vehicle (per phase). Includes cable capacity.
+     * AC_ Charging_ Parameters. EV_ Max. Current
+     * urn:x-oca:ocpp:uid:1:569213
+     * Maximum current (amps) supported by the electric vehicle (per phase). Includes cable capacity.
      * 
      * (Required)
      * 
@@ -185,9 +183,9 @@ public class ACChargingParameters {
     }
 
     /**
-     * AC_ Charging_ Parameters. EV_ Max. Current
-     * urn:x-oca:ocpp:uid:1:569213
-     * Maximum current (amps) supported by the electric vehicle (per phase). Includes cable capacity.
+     * AC_ Charging_ Parameters. EV_ Max. Current
+     * urn:x-oca:ocpp:uid:1:569213
+     * Maximum current (amps) supported by the electric vehicle (per phase). Includes cable capacity.
      * 
      * (Required)
      * 
@@ -203,9 +201,9 @@ public class ACChargingParameters {
     }
 
     /**
-     * AC_ Charging_ Parameters. EV_ Max. Voltage
-     * urn:x-oca:ocpp:uid:1:569214
-     * Maximum voltage supported by the electric vehicle
+     * AC_ Charging_ Parameters. EV_ Max. Voltage
+     * urn:x-oca:ocpp:uid:1:569214
+     * Maximum voltage supported by the electric vehicle
      * 
      * (Required)
      * 
@@ -216,9 +214,9 @@ public class ACChargingParameters {
     }
 
     /**
-     * AC_ Charging_ Parameters. EV_ Max. Voltage
-     * urn:x-oca:ocpp:uid:1:569214
-     * Maximum voltage supported by the electric vehicle
+     * AC_ Charging_ Parameters. EV_ Max. Voltage
+     * urn:x-oca:ocpp:uid:1:569214
+     * Maximum voltage supported by the electric vehicle
      * 
      * (Required)
      * 

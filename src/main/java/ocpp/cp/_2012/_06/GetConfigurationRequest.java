@@ -4,10 +4,10 @@ package ocpp.cp._2012._06;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlType;
 import de.rwth.idsg.ocpp.jaxb.RequestType;
+import jakarta.xml.bind.annotation.XmlAccessType;
+import jakarta.xml.bind.annotation.XmlAccessorType;
+import jakarta.xml.bind.annotation.XmlType;
 import lombok.ToString;
 
 
@@ -49,7 +49,7 @@ public class GetConfigurationRequest
      * <p>
      * This accessor method returns a reference to the live list,
      * not a snapshot. Therefore any modification you make to the
-     * returned list will be present inside the JAXB object.
+     * returned list will be present inside the Jakarta XML Binding object.
      * This is why there is not a <CODE>set</CODE> method for the key property.
      * 
      * <p>
@@ -80,6 +80,14 @@ public class GetConfigurationRequest
         this.key = null;
     }
 
+    /**
+     * Adds objects to the list of Key using add method
+     * 
+     * @param values
+     *     objects to add to the list Key
+     * @return
+     *     The class instance
+     */
     public GetConfigurationRequest withKey(String... values) {
         if (values!= null) {
             for (String value: values) {
@@ -89,6 +97,14 @@ public class GetConfigurationRequest
         return this;
     }
 
+    /**
+     * Adds objects to the list of Key using addAll method
+     * 
+     * @param values
+     *     objects to add to the list Key
+     * @return
+     *     The class instance
+     */
     public GetConfigurationRequest withKey(Collection<String> values) {
         if (values!= null) {
             getKey().addAll(values);

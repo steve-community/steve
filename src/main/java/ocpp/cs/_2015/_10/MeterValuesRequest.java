@@ -4,10 +4,10 @@ package ocpp.cs._2015._10;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlType;
 import de.rwth.idsg.ocpp.jaxb.RequestType;
+import jakarta.xml.bind.annotation.XmlAccessType;
+import jakarta.xml.bind.annotation.XmlAccessorType;
+import jakarta.xml.bind.annotation.XmlType;
 import lombok.ToString;
 
 
@@ -103,7 +103,7 @@ public class MeterValuesRequest
      * <p>
      * This accessor method returns a reference to the live list,
      * not a snapshot. Therefore any modification you make to the
-     * returned list will be present inside the JAXB object.
+     * returned list will be present inside the Jakarta XML Binding object.
      * This is why there is not a <CODE>set</CODE> method for the meterValue property.
      * 
      * <p>
@@ -134,16 +134,42 @@ public class MeterValuesRequest
         this.meterValue = null;
     }
 
+    /**
+     * Sets the value of the connectorId property.
+     * 
+     * @param value
+     *     allowed object is
+     *     int
+     * @return
+     *     The class instance
+     */
     public MeterValuesRequest withConnectorId(int value) {
         setConnectorId(value);
         return this;
     }
 
+    /**
+     * Sets the value of the transactionId property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link Integer }
+     * @return
+     *     The class instance
+     */
     public MeterValuesRequest withTransactionId(Integer value) {
         setTransactionId(value);
         return this;
     }
 
+    /**
+     * Adds objects to the list of MeterValue using add method
+     * 
+     * @param values
+     *     objects to add to the list MeterValue
+     * @return
+     *     The class instance
+     */
     public MeterValuesRequest withMeterValue(MeterValue... values) {
         if (values!= null) {
             for (MeterValue value: values) {
@@ -153,6 +179,14 @@ public class MeterValuesRequest
         return this;
     }
 
+    /**
+     * Adds objects to the list of MeterValue using addAll method
+     * 
+     * @param values
+     *     objects to add to the list MeterValue
+     * @return
+     *     The class instance
+     */
     public MeterValuesRequest withMeterValue(Collection<MeterValue> values) {
         if (values!= null) {
             getMeterValue().addAll(values);

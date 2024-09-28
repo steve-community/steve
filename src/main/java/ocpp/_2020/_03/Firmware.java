@@ -1,21 +1,20 @@
 
 package ocpp._2020._03;
 
-import javax.annotation.Generated;
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import org.joda.time.DateTime;
 
 
 /**
- * Firmware
- * urn:x-enexis:ecdm:uid:2:233291
- * Represents a copy of the firmware that can be loaded/updated on the Charging Station.
+ * Firmware
+ * urn:x-enexis:ecdm:uid:2:233291
+ * Represents a copy of the firmware that can be loaded/updated on the Charging Station.
  * 
  * 
  */
@@ -28,7 +27,6 @@ import org.joda.time.DateTime;
     "signingCertificate",
     "signature"
 })
-@Generated("jsonschema2pojo")
 public class Firmware {
 
     /**
@@ -40,9 +38,9 @@ public class Firmware {
     @Valid
     private CustomData customData;
     /**
-     * Firmware. Location. URI
-     * urn:x-enexis:ecdm:uid:1:569460
-     * URI defining the origin of the firmware.
+     * Firmware. Location. URI
+     * urn:x-enexis:ecdm:uid:1:569460
+     * URI defining the origin of the firmware.
      * 
      * (Required)
      * 
@@ -53,9 +51,9 @@ public class Firmware {
     @NotNull
     private String location;
     /**
-     * Firmware. Retrieve. Date_ Time
-     * urn:x-enexis:ecdm:uid:1:569461
-     * Date and time at which the firmware shall be retrieved.
+     * Firmware. Retrieve. Date_ Time
+     * urn:x-enexis:ecdm:uid:1:569461
+     * Date and time at which the firmware shall be retrieved.
      * 
      * (Required)
      * 
@@ -65,9 +63,9 @@ public class Firmware {
     @NotNull
     private DateTime retrieveDateTime;
     /**
-     * Firmware. Install. Date_ Time
-     * urn:x-enexis:ecdm:uid:1:569462
-     * Date and time at which the firmware shall be installed.
+     * Firmware. Install. Date_ Time
+     * urn:x-enexis:ecdm:uid:1:569462
+     * Date and time at which the firmware shall be installed.
      * 
      * 
      */
@@ -75,8 +73,8 @@ public class Firmware {
     @JsonPropertyDescription("Firmware. Install. Date_ Time\r\nurn:x-enexis:ecdm:uid:1:569462\r\nDate and time at which the firmware shall be installed.\r\n")
     private DateTime installDateTime;
     /**
-     * Certificate with which the firmware was signed.
-     * PEM encoded X.509 certificate.
+     * Certificate with which the firmware was signed.
+     * PEM encoded X.509 certificate.
      * 
      * 
      */
@@ -85,9 +83,9 @@ public class Firmware {
     @Size(max = 5500)
     private String signingCertificate;
     /**
-     * Firmware. Signature. Signature
-     * urn:x-enexis:ecdm:uid:1:569464
-     * Base64 encoded firmware signature.
+     * Firmware. Signature. Signature
+     * urn:x-enexis:ecdm:uid:1:569464
+     * Base64 encoded firmware signature.
      * 
      * 
      */
@@ -120,9 +118,9 @@ public class Firmware {
     }
 
     /**
-     * Firmware. Location. URI
-     * urn:x-enexis:ecdm:uid:1:569460
-     * URI defining the origin of the firmware.
+     * Firmware. Location. URI
+     * urn:x-enexis:ecdm:uid:1:569460
+     * URI defining the origin of the firmware.
      * 
      * (Required)
      * 
@@ -133,9 +131,9 @@ public class Firmware {
     }
 
     /**
-     * Firmware. Location. URI
-     * urn:x-enexis:ecdm:uid:1:569460
-     * URI defining the origin of the firmware.
+     * Firmware. Location. URI
+     * urn:x-enexis:ecdm:uid:1:569460
+     * URI defining the origin of the firmware.
      * 
      * (Required)
      * 
@@ -151,9 +149,9 @@ public class Firmware {
     }
 
     /**
-     * Firmware. Retrieve. Date_ Time
-     * urn:x-enexis:ecdm:uid:1:569461
-     * Date and time at which the firmware shall be retrieved.
+     * Firmware. Retrieve. Date_ Time
+     * urn:x-enexis:ecdm:uid:1:569461
+     * Date and time at which the firmware shall be retrieved.
      * 
      * (Required)
      * 
@@ -164,9 +162,9 @@ public class Firmware {
     }
 
     /**
-     * Firmware. Retrieve. Date_ Time
-     * urn:x-enexis:ecdm:uid:1:569461
-     * Date and time at which the firmware shall be retrieved.
+     * Firmware. Retrieve. Date_ Time
+     * urn:x-enexis:ecdm:uid:1:569461
+     * Date and time at which the firmware shall be retrieved.
      * 
      * (Required)
      * 
@@ -182,9 +180,9 @@ public class Firmware {
     }
 
     /**
-     * Firmware. Install. Date_ Time
-     * urn:x-enexis:ecdm:uid:1:569462
-     * Date and time at which the firmware shall be installed.
+     * Firmware. Install. Date_ Time
+     * urn:x-enexis:ecdm:uid:1:569462
+     * Date and time at which the firmware shall be installed.
      * 
      * 
      */
@@ -194,9 +192,9 @@ public class Firmware {
     }
 
     /**
-     * Firmware. Install. Date_ Time
-     * urn:x-enexis:ecdm:uid:1:569462
-     * Date and time at which the firmware shall be installed.
+     * Firmware. Install. Date_ Time
+     * urn:x-enexis:ecdm:uid:1:569462
+     * Date and time at which the firmware shall be installed.
      * 
      * 
      */
@@ -211,8 +209,8 @@ public class Firmware {
     }
 
     /**
-     * Certificate with which the firmware was signed.
-     * PEM encoded X.509 certificate.
+     * Certificate with which the firmware was signed.
+     * PEM encoded X.509 certificate.
      * 
      * 
      */
@@ -222,8 +220,8 @@ public class Firmware {
     }
 
     /**
-     * Certificate with which the firmware was signed.
-     * PEM encoded X.509 certificate.
+     * Certificate with which the firmware was signed.
+     * PEM encoded X.509 certificate.
      * 
      * 
      */
@@ -238,9 +236,9 @@ public class Firmware {
     }
 
     /**
-     * Firmware. Signature. Signature
-     * urn:x-enexis:ecdm:uid:1:569464
-     * Base64 encoded firmware signature.
+     * Firmware. Signature. Signature
+     * urn:x-enexis:ecdm:uid:1:569464
+     * Base64 encoded firmware signature.
      * 
      * 
      */
@@ -250,9 +248,9 @@ public class Firmware {
     }
 
     /**
-     * Firmware. Signature. Signature
-     * urn:x-enexis:ecdm:uid:1:569464
-     * Base64 encoded firmware signature.
+     * Firmware. Signature. Signature
+     * urn:x-enexis:ecdm:uid:1:569464
+     * Base64 encoded firmware signature.
      * 
      * 
      */

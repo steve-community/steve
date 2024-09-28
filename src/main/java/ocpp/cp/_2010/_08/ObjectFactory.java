@@ -1,10 +1,10 @@
 
 package ocpp.cp._2010._08;
 
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.annotation.XmlElementDecl;
-import javax.xml.bind.annotation.XmlRegistry;
 import javax.xml.namespace.QName;
+import jakarta.xml.bind.JAXBElement;
+import jakarta.xml.bind.annotation.XmlElementDecl;
+import jakarta.xml.bind.annotation.XmlRegistry;
 
 
 /**
@@ -196,8 +196,12 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link String }{@code >}}
+     * Create an instance of {@link JAXBElement }{@code <}{@link String }{@code >}
      * 
+     * @param value
+     *     Java instance representing xml element's value.
+     * @return
+     *     the new instance of {@link JAXBElement }{@code <}{@link String }{@code >}
      */
     @XmlElementDecl(namespace = "urn://Ocpp/Cp/2010/08/", name = "chargeBoxIdentity")
     public JAXBElement<String> createChargeBoxIdentity(String value) {
@@ -205,8 +209,12 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link UnlockConnectorRequest }{@code >}}
+     * Create an instance of {@link JAXBElement }{@code <}{@link UnlockConnectorRequest }{@code >}
      * 
+     * @param value
+     *     Java instance representing xml element's value.
+     * @return
+     *     the new instance of {@link JAXBElement }{@code <}{@link UnlockConnectorRequest }{@code >}
      */
     @XmlElementDecl(namespace = "urn://Ocpp/Cp/2010/08/", name = "unlockConnectorRequest")
     public JAXBElement<UnlockConnectorRequest> createUnlockConnectorRequest(UnlockConnectorRequest value) {
@@ -214,8 +222,12 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link UnlockConnectorResponse }{@code >}}
+     * Create an instance of {@link JAXBElement }{@code <}{@link UnlockConnectorResponse }{@code >}
      * 
+     * @param value
+     *     Java instance representing xml element's value.
+     * @return
+     *     the new instance of {@link JAXBElement }{@code <}{@link UnlockConnectorResponse }{@code >}
      */
     @XmlElementDecl(namespace = "urn://Ocpp/Cp/2010/08/", name = "unlockConnectorResponse")
     public JAXBElement<UnlockConnectorResponse> createUnlockConnectorResponse(UnlockConnectorResponse value) {
@@ -223,8 +235,12 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link ResetRequest }{@code >}}
+     * Create an instance of {@link JAXBElement }{@code <}{@link ResetRequest }{@code >}
      * 
+     * @param value
+     *     Java instance representing xml element's value.
+     * @return
+     *     the new instance of {@link JAXBElement }{@code <}{@link ResetRequest }{@code >}
      */
     @XmlElementDecl(namespace = "urn://Ocpp/Cp/2010/08/", name = "resetRequest")
     public JAXBElement<ResetRequest> createResetRequest(ResetRequest value) {
@@ -232,8 +248,12 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link ResetResponse }{@code >}}
+     * Create an instance of {@link JAXBElement }{@code <}{@link ResetResponse }{@code >}
      * 
+     * @param value
+     *     Java instance representing xml element's value.
+     * @return
+     *     the new instance of {@link JAXBElement }{@code <}{@link ResetResponse }{@code >}
      */
     @XmlElementDecl(namespace = "urn://Ocpp/Cp/2010/08/", name = "resetResponse")
     public JAXBElement<ResetResponse> createResetResponse(ResetResponse value) {
@@ -241,8 +261,12 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link ChangeAvailabilityRequest }{@code >}}
+     * Create an instance of {@link JAXBElement }{@code <}{@link ChangeAvailabilityRequest }{@code >}
      * 
+     * @param value
+     *     Java instance representing xml element's value.
+     * @return
+     *     the new instance of {@link JAXBElement }{@code <}{@link ChangeAvailabilityRequest }{@code >}
      */
     @XmlElementDecl(namespace = "urn://Ocpp/Cp/2010/08/", name = "changeAvailabilityRequest")
     public JAXBElement<ChangeAvailabilityRequest> createChangeAvailabilityRequest(ChangeAvailabilityRequest value) {
@@ -250,8 +274,12 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link ChangeAvailabilityResponse }{@code >}}
+     * Create an instance of {@link JAXBElement }{@code <}{@link ChangeAvailabilityResponse }{@code >}
      * 
+     * @param value
+     *     Java instance representing xml element's value.
+     * @return
+     *     the new instance of {@link JAXBElement }{@code <}{@link ChangeAvailabilityResponse }{@code >}
      */
     @XmlElementDecl(namespace = "urn://Ocpp/Cp/2010/08/", name = "changeAvailabilityResponse")
     public JAXBElement<ChangeAvailabilityResponse> createChangeAvailabilityResponse(ChangeAvailabilityResponse value) {
@@ -259,8 +287,12 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link GetDiagnosticsRequest }{@code >}}
+     * Create an instance of {@link JAXBElement }{@code <}{@link GetDiagnosticsRequest }{@code >}
      * 
+     * @param value
+     *     Java instance representing xml element's value.
+     * @return
+     *     the new instance of {@link JAXBElement }{@code <}{@link GetDiagnosticsRequest }{@code >}
      */
     @XmlElementDecl(namespace = "urn://Ocpp/Cp/2010/08/", name = "getDiagnosticsRequest")
     public JAXBElement<GetDiagnosticsRequest> createGetDiagnosticsRequest(GetDiagnosticsRequest value) {
@@ -268,8 +300,12 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link GetDiagnosticsResponse }{@code >}}
+     * Create an instance of {@link JAXBElement }{@code <}{@link GetDiagnosticsResponse }{@code >}
      * 
+     * @param value
+     *     Java instance representing xml element's value.
+     * @return
+     *     the new instance of {@link JAXBElement }{@code <}{@link GetDiagnosticsResponse }{@code >}
      */
     @XmlElementDecl(namespace = "urn://Ocpp/Cp/2010/08/", name = "getDiagnosticsResponse")
     public JAXBElement<GetDiagnosticsResponse> createGetDiagnosticsResponse(GetDiagnosticsResponse value) {
@@ -277,8 +313,12 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link ClearCacheRequest }{@code >}}
+     * Create an instance of {@link JAXBElement }{@code <}{@link ClearCacheRequest }{@code >}
      * 
+     * @param value
+     *     Java instance representing xml element's value.
+     * @return
+     *     the new instance of {@link JAXBElement }{@code <}{@link ClearCacheRequest }{@code >}
      */
     @XmlElementDecl(namespace = "urn://Ocpp/Cp/2010/08/", name = "clearCacheRequest")
     public JAXBElement<ClearCacheRequest> createClearCacheRequest(ClearCacheRequest value) {
@@ -286,8 +326,12 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link ClearCacheResponse }{@code >}}
+     * Create an instance of {@link JAXBElement }{@code <}{@link ClearCacheResponse }{@code >}
      * 
+     * @param value
+     *     Java instance representing xml element's value.
+     * @return
+     *     the new instance of {@link JAXBElement }{@code <}{@link ClearCacheResponse }{@code >}
      */
     @XmlElementDecl(namespace = "urn://Ocpp/Cp/2010/08/", name = "clearCacheResponse")
     public JAXBElement<ClearCacheResponse> createClearCacheResponse(ClearCacheResponse value) {
@@ -295,8 +339,12 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link UpdateFirmwareRequest }{@code >}}
+     * Create an instance of {@link JAXBElement }{@code <}{@link UpdateFirmwareRequest }{@code >}
      * 
+     * @param value
+     *     Java instance representing xml element's value.
+     * @return
+     *     the new instance of {@link JAXBElement }{@code <}{@link UpdateFirmwareRequest }{@code >}
      */
     @XmlElementDecl(namespace = "urn://Ocpp/Cp/2010/08/", name = "updateFirmwareRequest")
     public JAXBElement<UpdateFirmwareRequest> createUpdateFirmwareRequest(UpdateFirmwareRequest value) {
@@ -304,8 +352,12 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link UpdateFirmwareResponse }{@code >}}
+     * Create an instance of {@link JAXBElement }{@code <}{@link UpdateFirmwareResponse }{@code >}
      * 
+     * @param value
+     *     Java instance representing xml element's value.
+     * @return
+     *     the new instance of {@link JAXBElement }{@code <}{@link UpdateFirmwareResponse }{@code >}
      */
     @XmlElementDecl(namespace = "urn://Ocpp/Cp/2010/08/", name = "updateFirmwareResponse")
     public JAXBElement<UpdateFirmwareResponse> createUpdateFirmwareResponse(UpdateFirmwareResponse value) {
@@ -313,8 +365,12 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link ChangeConfigurationRequest }{@code >}}
+     * Create an instance of {@link JAXBElement }{@code <}{@link ChangeConfigurationRequest }{@code >}
      * 
+     * @param value
+     *     Java instance representing xml element's value.
+     * @return
+     *     the new instance of {@link JAXBElement }{@code <}{@link ChangeConfigurationRequest }{@code >}
      */
     @XmlElementDecl(namespace = "urn://Ocpp/Cp/2010/08/", name = "changeConfigurationRequest")
     public JAXBElement<ChangeConfigurationRequest> createChangeConfigurationRequest(ChangeConfigurationRequest value) {
@@ -322,8 +378,12 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link ChangeConfigurationResponse }{@code >}}
+     * Create an instance of {@link JAXBElement }{@code <}{@link ChangeConfigurationResponse }{@code >}
      * 
+     * @param value
+     *     Java instance representing xml element's value.
+     * @return
+     *     the new instance of {@link JAXBElement }{@code <}{@link ChangeConfigurationResponse }{@code >}
      */
     @XmlElementDecl(namespace = "urn://Ocpp/Cp/2010/08/", name = "changeConfigurationResponse")
     public JAXBElement<ChangeConfigurationResponse> createChangeConfigurationResponse(ChangeConfigurationResponse value) {
@@ -331,8 +391,12 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link RemoteStartTransactionRequest }{@code >}}
+     * Create an instance of {@link JAXBElement }{@code <}{@link RemoteStartTransactionRequest }{@code >}
      * 
+     * @param value
+     *     Java instance representing xml element's value.
+     * @return
+     *     the new instance of {@link JAXBElement }{@code <}{@link RemoteStartTransactionRequest }{@code >}
      */
     @XmlElementDecl(namespace = "urn://Ocpp/Cp/2010/08/", name = "remoteStartTransactionRequest")
     public JAXBElement<RemoteStartTransactionRequest> createRemoteStartTransactionRequest(RemoteStartTransactionRequest value) {
@@ -340,8 +404,12 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link RemoteStartTransactionResponse }{@code >}}
+     * Create an instance of {@link JAXBElement }{@code <}{@link RemoteStartTransactionResponse }{@code >}
      * 
+     * @param value
+     *     Java instance representing xml element's value.
+     * @return
+     *     the new instance of {@link JAXBElement }{@code <}{@link RemoteStartTransactionResponse }{@code >}
      */
     @XmlElementDecl(namespace = "urn://Ocpp/Cp/2010/08/", name = "remoteStartTransactionResponse")
     public JAXBElement<RemoteStartTransactionResponse> createRemoteStartTransactionResponse(RemoteStartTransactionResponse value) {
@@ -349,8 +417,12 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link RemoteStopTransactionRequest }{@code >}}
+     * Create an instance of {@link JAXBElement }{@code <}{@link RemoteStopTransactionRequest }{@code >}
      * 
+     * @param value
+     *     Java instance representing xml element's value.
+     * @return
+     *     the new instance of {@link JAXBElement }{@code <}{@link RemoteStopTransactionRequest }{@code >}
      */
     @XmlElementDecl(namespace = "urn://Ocpp/Cp/2010/08/", name = "remoteStopTransactionRequest")
     public JAXBElement<RemoteStopTransactionRequest> createRemoteStopTransactionRequest(RemoteStopTransactionRequest value) {
@@ -358,8 +430,12 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link RemoteStopTransactionResponse }{@code >}}
+     * Create an instance of {@link JAXBElement }{@code <}{@link RemoteStopTransactionResponse }{@code >}
      * 
+     * @param value
+     *     Java instance representing xml element's value.
+     * @return
+     *     the new instance of {@link JAXBElement }{@code <}{@link RemoteStopTransactionResponse }{@code >}
      */
     @XmlElementDecl(namespace = "urn://Ocpp/Cp/2010/08/", name = "remoteStopTransactionResponse")
     public JAXBElement<RemoteStopTransactionResponse> createRemoteStopTransactionResponse(RemoteStopTransactionResponse value) {

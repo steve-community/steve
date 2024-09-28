@@ -33,6 +33,8 @@ public interface OcppChargeBoxRepository extends JpaRepository<OcppChargeBox, In
 	@Query("SELECT OBJECT(c) FROM OcppChargeBox AS c WHERE c.ocppProtocol=?1 AND c.endpointAddress IS NOT NULL AND c.registrationStatus IN ?2")
 	List<OcppChargeBox> findByOcppProtocolAndRegistrationStatuses(String protocol, List<String> statuses);
 
+	@Query("SELECT OBJECT(c) FROM OcppChargeBox AS c WHERE c.ocppProtocol=?1 AND c.endpointAddress IS NOT NULL AND c.registrationStatus IN ?2 AND c.chargeBoxId IN ?3")
+	List<OcppChargeBox> findByOcppProtocolAndRegistrationStatusesAndChargeBoxIdIn(String protocol, List<String> statuses, List<String> chargeBoxIdList);
 	List<OcppChargeBox> findByChargeBoxIdIn(List<String> chargeBoxIdList);
 
 	@Query("SELECT c.chargeBoxId FROM OcppChargeBox AS c")

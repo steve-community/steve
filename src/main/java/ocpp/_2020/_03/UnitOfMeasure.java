@@ -1,17 +1,16 @@
 
 package ocpp._2020._03;
 
-import javax.annotation.Generated;
-import javax.validation.Valid;
-import javax.validation.constraints.Size;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Size;
 
 
 /**
- * Represents a UnitOfMeasure with a multiplier
+ * Represents a UnitOfMeasure with a multiplier
  * 
  * 
  */
@@ -21,7 +20,6 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
     "unit",
     "multiplier"
 })
-@Generated("jsonschema2pojo")
 public class UnitOfMeasure {
 
     /**
@@ -33,9 +31,9 @@ public class UnitOfMeasure {
     @Valid
     private CustomData customData;
     /**
-     * Unit of the value. Default = "Wh" if the (default) measurand is an "Energy" type.
-     * This field SHALL use a value from the list Standardized Units of Measurements in Part 2 Appendices. 
-     * If an applicable unit is available in that list, otherwise a "custom" unit might be used.
+     * Unit of the value. Default = "Wh" if the (default) measurand is an "Energy" type.
+     * This field SHALL use a value from the list Standardized Units of Measurements in Part 2 Appendices. 
+     * If an applicable unit is available in that list, otherwise a "custom" unit might be used.
      * 
      * 
      */
@@ -44,7 +42,7 @@ public class UnitOfMeasure {
     @Size(max = 20)
     private String unit = "Wh";
     /**
-     * Multiplier, this value represents the exponent to base 10. I.e. multiplier 3 means 10 raised to the 3rd power. Default is 0.
+     * Multiplier, this value represents the exponent to base 10. I.e. multiplier 3 means 10 raised to the 3rd power. Default is 0.
      * 
      * 
      */
@@ -76,9 +74,9 @@ public class UnitOfMeasure {
     }
 
     /**
-     * Unit of the value. Default = "Wh" if the (default) measurand is an "Energy" type.
-     * This field SHALL use a value from the list Standardized Units of Measurements in Part 2 Appendices. 
-     * If an applicable unit is available in that list, otherwise a "custom" unit might be used.
+     * Unit of the value. Default = "Wh" if the (default) measurand is an "Energy" type.
+     * This field SHALL use a value from the list Standardized Units of Measurements in Part 2 Appendices. 
+     * If an applicable unit is available in that list, otherwise a "custom" unit might be used.
      * 
      * 
      */
@@ -88,9 +86,9 @@ public class UnitOfMeasure {
     }
 
     /**
-     * Unit of the value. Default = "Wh" if the (default) measurand is an "Energy" type.
-     * This field SHALL use a value from the list Standardized Units of Measurements in Part 2 Appendices. 
-     * If an applicable unit is available in that list, otherwise a "custom" unit might be used.
+     * Unit of the value. Default = "Wh" if the (default) measurand is an "Energy" type.
+     * This field SHALL use a value from the list Standardized Units of Measurements in Part 2 Appendices. 
+     * If an applicable unit is available in that list, otherwise a "custom" unit might be used.
      * 
      * 
      */
@@ -105,7 +103,7 @@ public class UnitOfMeasure {
     }
 
     /**
-     * Multiplier, this value represents the exponent to base 10. I.e. multiplier 3 means 10 raised to the 3rd power. Default is 0.
+     * Multiplier, this value represents the exponent to base 10. I.e. multiplier 3 means 10 raised to the 3rd power. Default is 0.
      * 
      * 
      */
@@ -115,7 +113,7 @@ public class UnitOfMeasure {
     }
 
     /**
-     * Multiplier, this value represents the exponent to base 10. I.e. multiplier 3 means 10 raised to the 3rd power. Default is 0.
+     * Multiplier, this value represents the exponent to base 10. I.e. multiplier 3 means 10 raised to the 3rd power. Default is 0.
      * 
      * 
      */

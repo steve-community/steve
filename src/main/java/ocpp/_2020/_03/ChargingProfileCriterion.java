@@ -3,19 +3,18 @@ package ocpp._2020._03;
 
 import java.util.ArrayList;
 import java.util.List;
-import javax.annotation.Generated;
-import javax.validation.Valid;
-import javax.validation.constraints.Size;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Size;
 
 
 /**
- * Charging_ Profile
- * urn:x-oca:ocpp:uid:2:233255
- * A ChargingProfile consists of ChargingSchedule, describing the amount of power or current that can be delivered per time interval.
+ * Charging_ Profile
+ * urn:x-oca:ocpp:uid:2:233255
+ * A ChargingProfile consists of ChargingSchedule, describing the amount of power or current that can be delivered per time interval.
  * 
  * 
  */
@@ -27,7 +26,6 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
     "chargingProfileId",
     "chargingLimitSource"
 })
-@Generated("jsonschema2pojo")
 public class ChargingProfileCriterion {
 
     /**
@@ -39,9 +37,9 @@ public class ChargingProfileCriterion {
     @Valid
     private CustomData customData;
     /**
-     * Charging_ Profile. Charging_ Profile_ Purpose. Charging_ Profile_ Purpose_ Code
-     * urn:x-oca:ocpp:uid:1:569231
-     * Defines the purpose of the schedule transferred by this profile
+     * Charging_ Profile. Charging_ Profile_ Purpose. Charging_ Profile_ Purpose_ Code
+     * urn:x-oca:ocpp:uid:1:569231
+     * Defines the purpose of the schedule transferred by this profile
      * 
      * 
      */
@@ -49,9 +47,9 @@ public class ChargingProfileCriterion {
     @JsonPropertyDescription("Charging_ Profile. Charging_ Profile_ Purpose. Charging_ Profile_ Purpose_ Code\r\nurn:x-oca:ocpp:uid:1:569231\r\nDefines the purpose of the schedule transferred by this profile\r\n")
     private ChargingProfilePurposeEnum chargingProfilePurpose;
     /**
-     * Charging_ Profile. Stack_ Level. Counter
-     * urn:x-oca:ocpp:uid:1:569230
-     * Value determining level in hierarchy stack of profiles. Higher values have precedence over lower values. Lowest level is 0.
+     * Charging_ Profile. Stack_ Level. Counter
+     * urn:x-oca:ocpp:uid:1:569230
+     * Value determining level in hierarchy stack of profiles. Higher values have precedence over lower values. Lowest level is 0.
      * 
      * 
      */
@@ -59,8 +57,8 @@ public class ChargingProfileCriterion {
     @JsonPropertyDescription("Charging_ Profile. Stack_ Level. Counter\r\nurn:x-oca:ocpp:uid:1:569230\r\nValue determining level in hierarchy stack of profiles. Higher values have precedence over lower values. Lowest level is 0.\r\n")
     private Integer stackLevel;
     /**
-     * List of all the chargingProfileIds requested. Any ChargingProfile that matches one of these profiles will be reported. If omitted, the Charging Station SHALL not filter on chargingProfileId. This field SHALL NOT contain more ids than set in &lt;&lt;configkey-charging-profile-entries,ChargingProfileEntries.maxLimit&gt;&gt;
-     * 
+     * List of all the chargingProfileIds requested. Any ChargingProfile that matches one of these profiles will be reported. If omitted, the Charging Station SHALL not filter on chargingProfileId. This field SHALL NOT contain more ids than set in &lt;&lt;configkey-charging-profile-entries,ChargingProfileEntries.maxLimit&gt;&gt;
+     * 
      * 
      * 
      */
@@ -70,7 +68,7 @@ public class ChargingProfileCriterion {
     @Valid
     private List<Integer> chargingProfileId = new ArrayList<Integer>();
     /**
-     * For which charging limit sources, charging profiles SHALL be reported. If omitted, the Charging Station SHALL not filter on chargingLimitSource.
+     * For which charging limit sources, charging profiles SHALL be reported. If omitted, the Charging Station SHALL not filter on chargingLimitSource.
      * 
      * 
      */
@@ -104,9 +102,9 @@ public class ChargingProfileCriterion {
     }
 
     /**
-     * Charging_ Profile. Charging_ Profile_ Purpose. Charging_ Profile_ Purpose_ Code
-     * urn:x-oca:ocpp:uid:1:569231
-     * Defines the purpose of the schedule transferred by this profile
+     * Charging_ Profile. Charging_ Profile_ Purpose. Charging_ Profile_ Purpose_ Code
+     * urn:x-oca:ocpp:uid:1:569231
+     * Defines the purpose of the schedule transferred by this profile
      * 
      * 
      */
@@ -116,9 +114,9 @@ public class ChargingProfileCriterion {
     }
 
     /**
-     * Charging_ Profile. Charging_ Profile_ Purpose. Charging_ Profile_ Purpose_ Code
-     * urn:x-oca:ocpp:uid:1:569231
-     * Defines the purpose of the schedule transferred by this profile
+     * Charging_ Profile. Charging_ Profile_ Purpose. Charging_ Profile_ Purpose_ Code
+     * urn:x-oca:ocpp:uid:1:569231
+     * Defines the purpose of the schedule transferred by this profile
      * 
      * 
      */
@@ -133,9 +131,9 @@ public class ChargingProfileCriterion {
     }
 
     /**
-     * Charging_ Profile. Stack_ Level. Counter
-     * urn:x-oca:ocpp:uid:1:569230
-     * Value determining level in hierarchy stack of profiles. Higher values have precedence over lower values. Lowest level is 0.
+     * Charging_ Profile. Stack_ Level. Counter
+     * urn:x-oca:ocpp:uid:1:569230
+     * Value determining level in hierarchy stack of profiles. Higher values have precedence over lower values. Lowest level is 0.
      * 
      * 
      */
@@ -145,9 +143,9 @@ public class ChargingProfileCriterion {
     }
 
     /**
-     * Charging_ Profile. Stack_ Level. Counter
-     * urn:x-oca:ocpp:uid:1:569230
-     * Value determining level in hierarchy stack of profiles. Higher values have precedence over lower values. Lowest level is 0.
+     * Charging_ Profile. Stack_ Level. Counter
+     * urn:x-oca:ocpp:uid:1:569230
+     * Value determining level in hierarchy stack of profiles. Higher values have precedence over lower values. Lowest level is 0.
      * 
      * 
      */
@@ -162,8 +160,8 @@ public class ChargingProfileCriterion {
     }
 
     /**
-     * List of all the chargingProfileIds requested. Any ChargingProfile that matches one of these profiles will be reported. If omitted, the Charging Station SHALL not filter on chargingProfileId. This field SHALL NOT contain more ids than set in &lt;&lt;configkey-charging-profile-entries,ChargingProfileEntries.maxLimit&gt;&gt;
-     * 
+     * List of all the chargingProfileIds requested. Any ChargingProfile that matches one of these profiles will be reported. If omitted, the Charging Station SHALL not filter on chargingProfileId. This field SHALL NOT contain more ids than set in &lt;&lt;configkey-charging-profile-entries,ChargingProfileEntries.maxLimit&gt;&gt;
+     * 
      * 
      * 
      */
@@ -173,8 +171,8 @@ public class ChargingProfileCriterion {
     }
 
     /**
-     * List of all the chargingProfileIds requested. Any ChargingProfile that matches one of these profiles will be reported. If omitted, the Charging Station SHALL not filter on chargingProfileId. This field SHALL NOT contain more ids than set in &lt;&lt;configkey-charging-profile-entries,ChargingProfileEntries.maxLimit&gt;&gt;
-     * 
+     * List of all the chargingProfileIds requested. Any ChargingProfile that matches one of these profiles will be reported. If omitted, the Charging Station SHALL not filter on chargingProfileId. This field SHALL NOT contain more ids than set in &lt;&lt;configkey-charging-profile-entries,ChargingProfileEntries.maxLimit&gt;&gt;
+     * 
      * 
      * 
      */
@@ -189,7 +187,7 @@ public class ChargingProfileCriterion {
     }
 
     /**
-     * For which charging limit sources, charging profiles SHALL be reported. If omitted, the Charging Station SHALL not filter on chargingLimitSource.
+     * For which charging limit sources, charging profiles SHALL be reported. If omitted, the Charging Station SHALL not filter on chargingLimitSource.
      * 
      * 
      */
@@ -199,7 +197,7 @@ public class ChargingProfileCriterion {
     }
 
     /**
-     * For which charging limit sources, charging profiles SHALL be reported. If omitted, the Charging Station SHALL not filter on chargingLimitSource.
+     * For which charging limit sources, charging profiles SHALL be reported. If omitted, the Charging Station SHALL not filter on chargingLimitSource.
      * 
      * 
      */

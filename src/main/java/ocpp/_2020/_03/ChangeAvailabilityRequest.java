@@ -1,14 +1,13 @@
 
 package ocpp._2020._03;
 
-import javax.annotation.Generated;
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import de.rwth.idsg.ocpp.jaxb.RequestType;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
@@ -16,7 +15,6 @@ import de.rwth.idsg.ocpp.jaxb.RequestType;
     "evse",
     "operationalStatus"
 })
-@Generated("jsonschema2pojo")
 public class ChangeAvailabilityRequest implements RequestType
 {
 
@@ -29,9 +27,9 @@ public class ChangeAvailabilityRequest implements RequestType
     @Valid
     private CustomData customData;
     /**
-     * EVSE
-     * urn:x-oca:ocpp:uid:2:233123
-     * Electric Vehicle Supply Equipment
+     * EVSE
+     * urn:x-oca:ocpp:uid:2:233123
+     * Electric Vehicle Supply Equipment
      * 
      * 
      */
@@ -40,8 +38,8 @@ public class ChangeAvailabilityRequest implements RequestType
     @Valid
     private EVSE evse;
     /**
-     * This contains the type of availability change that the Charging Station should perform.
-     * 
+     * This contains the type of availability change that the Charging Station should perform.
+     * 
      * 
      * (Required)
      * 
@@ -75,9 +73,9 @@ public class ChangeAvailabilityRequest implements RequestType
     }
 
     /**
-     * EVSE
-     * urn:x-oca:ocpp:uid:2:233123
-     * Electric Vehicle Supply Equipment
+     * EVSE
+     * urn:x-oca:ocpp:uid:2:233123
+     * Electric Vehicle Supply Equipment
      * 
      * 
      */
@@ -87,9 +85,9 @@ public class ChangeAvailabilityRequest implements RequestType
     }
 
     /**
-     * EVSE
-     * urn:x-oca:ocpp:uid:2:233123
-     * Electric Vehicle Supply Equipment
+     * EVSE
+     * urn:x-oca:ocpp:uid:2:233123
+     * Electric Vehicle Supply Equipment
      * 
      * 
      */
@@ -104,8 +102,8 @@ public class ChangeAvailabilityRequest implements RequestType
     }
 
     /**
-     * This contains the type of availability change that the Charging Station should perform.
-     * 
+     * This contains the type of availability change that the Charging Station should perform.
+     * 
      * 
      * (Required)
      * 
@@ -116,8 +114,8 @@ public class ChangeAvailabilityRequest implements RequestType
     }
 
     /**
-     * This contains the type of availability change that the Charging Station should perform.
-     * 
+     * This contains the type of availability change that the Charging Station should perform.
+     * 
      * 
      * (Required)
      * 

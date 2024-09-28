@@ -1,14 +1,13 @@
 
 package ocpp._2020._03;
 
-import javax.annotation.Generated;
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import de.rwth.idsg.ocpp.jaxb.ResponseType;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import org.joda.time.DateTime;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -19,7 +18,6 @@ import org.joda.time.DateTime;
     "status",
     "statusInfo"
 })
-@Generated("jsonschema2pojo")
 public class BootNotificationResponse implements ResponseType
 {
 
@@ -32,7 +30,7 @@ public class BootNotificationResponse implements ResponseType
     @Valid
     private CustomData customData;
     /**
-     * This contains the CSMS’s current time.
+     * This contains the CSMS’s current time.
      * 
      * (Required)
      * 
@@ -42,7 +40,7 @@ public class BootNotificationResponse implements ResponseType
     @NotNull
     private DateTime currentTime;
     /**
-     * When &lt;&lt;cmn_registrationstatusenumtype,Status&gt;&gt; is Accepted, this contains the heartbeat interval in seconds. If the CSMS returns something other than Accepted, the value of the interval field indicates the minimum wait time before sending a next BootNotification request.
+     * When &lt;&lt;cmn_registrationstatusenumtype,Status&gt;&gt; is Accepted, this contains the heartbeat interval in seconds. If the CSMS returns something other than Accepted, the value of the interval field indicates the minimum wait time before sending a next BootNotification request.
      * 
      * (Required)
      * 
@@ -52,8 +50,8 @@ public class BootNotificationResponse implements ResponseType
     @NotNull
     private Integer interval;
     /**
-     * This contains whether the Charging Station has been registered
-     * within the CSMS.
+     * This contains whether the Charging Station has been registered
+     * within the CSMS.
      * 
      * (Required)
      * 
@@ -63,7 +61,7 @@ public class BootNotificationResponse implements ResponseType
     @NotNull
     private RegistrationStatusEnum status;
     /**
-     * Element providing more information about the status.
+     * Element providing more information about the status.
      * 
      * 
      */
@@ -96,7 +94,7 @@ public class BootNotificationResponse implements ResponseType
     }
 
     /**
-     * This contains the CSMS’s current time.
+     * This contains the CSMS’s current time.
      * 
      * (Required)
      * 
@@ -107,7 +105,7 @@ public class BootNotificationResponse implements ResponseType
     }
 
     /**
-     * This contains the CSMS’s current time.
+     * This contains the CSMS’s current time.
      * 
      * (Required)
      * 
@@ -123,7 +121,7 @@ public class BootNotificationResponse implements ResponseType
     }
 
     /**
-     * When &lt;&lt;cmn_registrationstatusenumtype,Status&gt;&gt; is Accepted, this contains the heartbeat interval in seconds. If the CSMS returns something other than Accepted, the value of the interval field indicates the minimum wait time before sending a next BootNotification request.
+     * When &lt;&lt;cmn_registrationstatusenumtype,Status&gt;&gt; is Accepted, this contains the heartbeat interval in seconds. If the CSMS returns something other than Accepted, the value of the interval field indicates the minimum wait time before sending a next BootNotification request.
      * 
      * (Required)
      * 
@@ -134,7 +132,7 @@ public class BootNotificationResponse implements ResponseType
     }
 
     /**
-     * When &lt;&lt;cmn_registrationstatusenumtype,Status&gt;&gt; is Accepted, this contains the heartbeat interval in seconds. If the CSMS returns something other than Accepted, the value of the interval field indicates the minimum wait time before sending a next BootNotification request.
+     * When &lt;&lt;cmn_registrationstatusenumtype,Status&gt;&gt; is Accepted, this contains the heartbeat interval in seconds. If the CSMS returns something other than Accepted, the value of the interval field indicates the minimum wait time before sending a next BootNotification request.
      * 
      * (Required)
      * 
@@ -150,8 +148,8 @@ public class BootNotificationResponse implements ResponseType
     }
 
     /**
-     * This contains whether the Charging Station has been registered
-     * within the CSMS.
+     * This contains whether the Charging Station has been registered
+     * within the CSMS.
      * 
      * (Required)
      * 
@@ -162,8 +160,8 @@ public class BootNotificationResponse implements ResponseType
     }
 
     /**
-     * This contains whether the Charging Station has been registered
-     * within the CSMS.
+     * This contains whether the Charging Station has been registered
+     * within the CSMS.
      * 
      * (Required)
      * 
@@ -179,7 +177,7 @@ public class BootNotificationResponse implements ResponseType
     }
 
     /**
-     * Element providing more information about the status.
+     * Element providing more information about the status.
      * 
      * 
      */
@@ -189,7 +187,7 @@ public class BootNotificationResponse implements ResponseType
     }
 
     /**
-     * Element providing more information about the status.
+     * Element providing more information about the status.
      * 
      * 
      */

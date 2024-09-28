@@ -3,15 +3,14 @@ package ocpp._2020._03;
 
 import java.util.ArrayList;
 import java.util.List;
-import javax.annotation.Generated;
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import de.rwth.idsg.ocpp.jaxb.RequestType;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
@@ -21,7 +20,6 @@ import de.rwth.idsg.ocpp.jaxb.RequestType;
     "priority",
     "state"
 })
-@Generated("jsonschema2pojo")
 public class GetDisplayMessagesRequest implements RequestType
 {
 
@@ -34,8 +32,8 @@ public class GetDisplayMessagesRequest implements RequestType
     @Valid
     private CustomData customData;
     /**
-     * If provided the Charging Station shall return Display Messages of the given ids. This field SHALL NOT contain more ids than set in &lt;&lt;configkey-number-of-display-messages,NumberOfDisplayMessages.maxLimit&gt;&gt;
-     * 
+     * If provided the Charging Station shall return Display Messages of the given ids. This field SHALL NOT contain more ids than set in &lt;&lt;configkey-number-of-display-messages,NumberOfDisplayMessages.maxLimit&gt;&gt;
+     * 
      * 
      * 
      */
@@ -45,7 +43,7 @@ public class GetDisplayMessagesRequest implements RequestType
     @Valid
     private List<Integer> id = new ArrayList<Integer>();
     /**
-     * The Id of this request.
+     * The Id of this request.
      * 
      * (Required)
      * 
@@ -55,7 +53,7 @@ public class GetDisplayMessagesRequest implements RequestType
     @NotNull
     private Integer requestId;
     /**
-     * If provided the Charging Station shall return Display Messages with the given priority only.
+     * If provided the Charging Station shall return Display Messages with the given priority only.
      * 
      * 
      */
@@ -63,7 +61,7 @@ public class GetDisplayMessagesRequest implements RequestType
     @JsonPropertyDescription("If provided the Charging Station shall return Display Messages with the given priority only.\r\n")
     private MessagePriorityEnum priority;
     /**
-     * If provided the Charging Station shall return Display Messages with the given state only. 
+     * If provided the Charging Station shall return Display Messages with the given state only. 
      * 
      * 
      */
@@ -95,8 +93,8 @@ public class GetDisplayMessagesRequest implements RequestType
     }
 
     /**
-     * If provided the Charging Station shall return Display Messages of the given ids. This field SHALL NOT contain more ids than set in &lt;&lt;configkey-number-of-display-messages,NumberOfDisplayMessages.maxLimit&gt;&gt;
-     * 
+     * If provided the Charging Station shall return Display Messages of the given ids. This field SHALL NOT contain more ids than set in &lt;&lt;configkey-number-of-display-messages,NumberOfDisplayMessages.maxLimit&gt;&gt;
+     * 
      * 
      * 
      */
@@ -106,8 +104,8 @@ public class GetDisplayMessagesRequest implements RequestType
     }
 
     /**
-     * If provided the Charging Station shall return Display Messages of the given ids. This field SHALL NOT contain more ids than set in &lt;&lt;configkey-number-of-display-messages,NumberOfDisplayMessages.maxLimit&gt;&gt;
-     * 
+     * If provided the Charging Station shall return Display Messages of the given ids. This field SHALL NOT contain more ids than set in &lt;&lt;configkey-number-of-display-messages,NumberOfDisplayMessages.maxLimit&gt;&gt;
+     * 
      * 
      * 
      */
@@ -122,7 +120,7 @@ public class GetDisplayMessagesRequest implements RequestType
     }
 
     /**
-     * The Id of this request.
+     * The Id of this request.
      * 
      * (Required)
      * 
@@ -133,7 +131,7 @@ public class GetDisplayMessagesRequest implements RequestType
     }
 
     /**
-     * The Id of this request.
+     * The Id of this request.
      * 
      * (Required)
      * 
@@ -149,7 +147,7 @@ public class GetDisplayMessagesRequest implements RequestType
     }
 
     /**
-     * If provided the Charging Station shall return Display Messages with the given priority only.
+     * If provided the Charging Station shall return Display Messages with the given priority only.
      * 
      * 
      */
@@ -159,7 +157,7 @@ public class GetDisplayMessagesRequest implements RequestType
     }
 
     /**
-     * If provided the Charging Station shall return Display Messages with the given priority only.
+     * If provided the Charging Station shall return Display Messages with the given priority only.
      * 
      * 
      */
@@ -174,7 +172,7 @@ public class GetDisplayMessagesRequest implements RequestType
     }
 
     /**
-     * If provided the Charging Station shall return Display Messages with the given state only. 
+     * If provided the Charging Station shall return Display Messages with the given state only. 
      * 
      * 
      */
@@ -184,7 +182,7 @@ public class GetDisplayMessagesRequest implements RequestType
     }
 
     /**
-     * If provided the Charging Station shall return Display Messages with the given state only. 
+     * If provided the Charging Station shall return Display Messages with the given state only. 
      * 
      * 
      */

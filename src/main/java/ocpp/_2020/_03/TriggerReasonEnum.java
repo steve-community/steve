@@ -3,17 +3,15 @@ package ocpp._2020._03;
 
 import java.util.HashMap;
 import java.util.Map;
-import javax.annotation.Generated;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 
 /**
- * Reason the Charging Station sends this message to the CSMS
+ * Reason the Charging Station sends this message to the CSMS
  * 
  * 
  */
-@Generated("jsonschema2pojo")
 public enum TriggerReasonEnum {
 
     AUTHORIZED("Authorized"),

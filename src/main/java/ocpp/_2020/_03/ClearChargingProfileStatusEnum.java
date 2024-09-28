@@ -3,17 +3,15 @@ package ocpp._2020._03;
 
 import java.util.HashMap;
 import java.util.Map;
-import javax.annotation.Generated;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 
 /**
- * Indicates if the Charging Station was able to execute the request.
+ * Indicates if the Charging Station was able to execute the request.
  * 
  * 
  */
-@Generated("jsonschema2pojo")
 public enum ClearChargingProfileStatusEnum {
 
     ACCEPTED("Accepted"),

@@ -1,14 +1,13 @@
 
 package ocpp._2020._03;
 
-import javax.annotation.Generated;
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
@@ -18,7 +17,6 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
     "component",
     "variable"
 })
-@Generated("jsonschema2pojo")
 public class SetVariableData {
 
     /**
@@ -30,7 +28,7 @@ public class SetVariableData {
     @Valid
     private CustomData customData;
     /**
-     * Type of attribute: Actual, Target, MinSet, MaxSet. Default is Actual when omitted.
+     * Type of attribute: Actual, Target, MinSet, MaxSet. Default is Actual when omitted.
      * 
      * 
      */
@@ -38,9 +36,9 @@ public class SetVariableData {
     @JsonPropertyDescription("Type of attribute: Actual, Target, MinSet, MaxSet. Default is Actual when omitted.\r\n")
     private AttributeEnum attributeType = AttributeEnum.fromValue("Actual");
     /**
-     * Value to be assigned to attribute of variable.
-     * 
-     * The Configuration Variable &lt;&lt;configkey-configuration-value-size,ConfigurationValueSize&gt;&gt; can be used to limit SetVariableData.attributeValue and VariableCharacteristics.valueList. The max size of these values will always remain equal. 
+     * Value to be assigned to attribute of variable.
+     * 
+     * The Configuration Variable &lt;&lt;configkey-configuration-value-size,ConfigurationValueSize&gt;&gt; can be used to limit SetVariableData.attributeValue and VariableCharacteristics.valueList. The max size of these values will always remain equal. 
      * 
      * (Required)
      * 
@@ -51,7 +49,7 @@ public class SetVariableData {
     @NotNull
     private String attributeValue;
     /**
-     * A physical or logical component
+     * A physical or logical component
      * 
      * (Required)
      * 
@@ -62,7 +60,7 @@ public class SetVariableData {
     @NotNull
     private Component component;
     /**
-     * Reference key to a component-variable.
+     * Reference key to a component-variable.
      * 
      * (Required)
      * 
@@ -97,7 +95,7 @@ public class SetVariableData {
     }
 
     /**
-     * Type of attribute: Actual, Target, MinSet, MaxSet. Default is Actual when omitted.
+     * Type of attribute: Actual, Target, MinSet, MaxSet. Default is Actual when omitted.
      * 
      * 
      */
@@ -107,7 +105,7 @@ public class SetVariableData {
     }
 
     /**
-     * Type of attribute: Actual, Target, MinSet, MaxSet. Default is Actual when omitted.
+     * Type of attribute: Actual, Target, MinSet, MaxSet. Default is Actual when omitted.
      * 
      * 
      */
@@ -122,9 +120,9 @@ public class SetVariableData {
     }
 
     /**
-     * Value to be assigned to attribute of variable.
-     * 
-     * The Configuration Variable &lt;&lt;configkey-configuration-value-size,ConfigurationValueSize&gt;&gt; can be used to limit SetVariableData.attributeValue and VariableCharacteristics.valueList. The max size of these values will always remain equal. 
+     * Value to be assigned to attribute of variable.
+     * 
+     * The Configuration Variable &lt;&lt;configkey-configuration-value-size,ConfigurationValueSize&gt;&gt; can be used to limit SetVariableData.attributeValue and VariableCharacteristics.valueList. The max size of these values will always remain equal. 
      * 
      * (Required)
      * 
@@ -135,9 +133,9 @@ public class SetVariableData {
     }
 
     /**
-     * Value to be assigned to attribute of variable.
-     * 
-     * The Configuration Variable &lt;&lt;configkey-configuration-value-size,ConfigurationValueSize&gt;&gt; can be used to limit SetVariableData.attributeValue and VariableCharacteristics.valueList. The max size of these values will always remain equal. 
+     * Value to be assigned to attribute of variable.
+     * 
+     * The Configuration Variable &lt;&lt;configkey-configuration-value-size,ConfigurationValueSize&gt;&gt; can be used to limit SetVariableData.attributeValue and VariableCharacteristics.valueList. The max size of these values will always remain equal. 
      * 
      * (Required)
      * 
@@ -153,7 +151,7 @@ public class SetVariableData {
     }
 
     /**
-     * A physical or logical component
+     * A physical or logical component
      * 
      * (Required)
      * 
@@ -164,7 +162,7 @@ public class SetVariableData {
     }
 
     /**
-     * A physical or logical component
+     * A physical or logical component
      * 
      * (Required)
      * 
@@ -180,7 +178,7 @@ public class SetVariableData {
     }
 
     /**
-     * Reference key to a component-variable.
+     * Reference key to a component-variable.
      * 
      * (Required)
      * 
@@ -191,7 +189,7 @@ public class SetVariableData {
     }
 
     /**
-     * Reference key to a component-variable.
+     * Reference key to a component-variable.
      * 
      * (Required)
      * 

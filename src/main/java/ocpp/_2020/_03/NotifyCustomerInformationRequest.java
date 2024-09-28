@@ -1,15 +1,14 @@
 
 package ocpp._2020._03;
 
-import javax.annotation.Generated;
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import de.rwth.idsg.ocpp.jaxb.RequestType;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import org.joda.time.DateTime;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -21,7 +20,6 @@ import org.joda.time.DateTime;
     "generatedAt",
     "requestId"
 })
-@Generated("jsonschema2pojo")
 public class NotifyCustomerInformationRequest implements RequestType
 {
 
@@ -34,7 +32,7 @@ public class NotifyCustomerInformationRequest implements RequestType
     @Valid
     private CustomData customData;
     /**
-     * (Part of) the requested data. No format specified in which the data is returned. Should be human readable.
+     * (Part of) the requested data. No format specified in which the data is returned. Should be human readable.
      * 
      * (Required)
      * 
@@ -45,7 +43,7 @@ public class NotifyCustomerInformationRequest implements RequestType
     @NotNull
     private String data;
     /**
-     * “to be continued” indicator. Indicates whether another part of the monitoringData follows in an upcoming notifyMonitoringReportRequest message. Default value when omitted is false.
+     * “to be continued” indicator. Indicates whether another part of the monitoringData follows in an upcoming notifyMonitoringReportRequest message. Default value when omitted is false.
      * 
      * 
      */
@@ -53,7 +51,7 @@ public class NotifyCustomerInformationRequest implements RequestType
     @JsonPropertyDescription("\u201cto be continued\u201d indicator. Indicates whether another part of the monitoringData follows in an upcoming notifyMonitoringReportRequest message. Default value when omitted is false.\r\n")
     private Boolean tbc = false;
     /**
-     * Sequence number of this message. First message starts at 0.
+     * Sequence number of this message. First message starts at 0.
      * 
      * (Required)
      * 
@@ -63,7 +61,7 @@ public class NotifyCustomerInformationRequest implements RequestType
     @NotNull
     private Integer seqNo;
     /**
-     *  Timestamp of the moment this message was generated at the Charging Station.
+     *  Timestamp of the moment this message was generated at the Charging Station.
      * 
      * (Required)
      * 
@@ -73,8 +71,8 @@ public class NotifyCustomerInformationRequest implements RequestType
     @NotNull
     private DateTime generatedAt;
     /**
-     * The Id of the request.
-     * 
+     * The Id of the request.
+     * 
      * 
      * (Required)
      * 
@@ -108,7 +106,7 @@ public class NotifyCustomerInformationRequest implements RequestType
     }
 
     /**
-     * (Part of) the requested data. No format specified in which the data is returned. Should be human readable.
+     * (Part of) the requested data. No format specified in which the data is returned. Should be human readable.
      * 
      * (Required)
      * 
@@ -119,7 +117,7 @@ public class NotifyCustomerInformationRequest implements RequestType
     }
 
     /**
-     * (Part of) the requested data. No format specified in which the data is returned. Should be human readable.
+     * (Part of) the requested data. No format specified in which the data is returned. Should be human readable.
      * 
      * (Required)
      * 
@@ -135,7 +133,7 @@ public class NotifyCustomerInformationRequest implements RequestType
     }
 
     /**
-     * “to be continued” indicator. Indicates whether another part of the monitoringData follows in an upcoming notifyMonitoringReportRequest message. Default value when omitted is false.
+     * “to be continued” indicator. Indicates whether another part of the monitoringData follows in an upcoming notifyMonitoringReportRequest message. Default value when omitted is false.
      * 
      * 
      */
@@ -145,7 +143,7 @@ public class NotifyCustomerInformationRequest implements RequestType
     }
 
     /**
-     * “to be continued” indicator. Indicates whether another part of the monitoringData follows in an upcoming notifyMonitoringReportRequest message. Default value when omitted is false.
+     * “to be continued” indicator. Indicates whether another part of the monitoringData follows in an upcoming notifyMonitoringReportRequest message. Default value when omitted is false.
      * 
      * 
      */
@@ -160,7 +158,7 @@ public class NotifyCustomerInformationRequest implements RequestType
     }
 
     /**
-     * Sequence number of this message. First message starts at 0.
+     * Sequence number of this message. First message starts at 0.
      * 
      * (Required)
      * 
@@ -171,7 +169,7 @@ public class NotifyCustomerInformationRequest implements RequestType
     }
 
     /**
-     * Sequence number of this message. First message starts at 0.
+     * Sequence number of this message. First message starts at 0.
      * 
      * (Required)
      * 
@@ -187,7 +185,7 @@ public class NotifyCustomerInformationRequest implements RequestType
     }
 
     /**
-     *  Timestamp of the moment this message was generated at the Charging Station.
+     *  Timestamp of the moment this message was generated at the Charging Station.
      * 
      * (Required)
      * 
@@ -198,7 +196,7 @@ public class NotifyCustomerInformationRequest implements RequestType
     }
 
     /**
-     *  Timestamp of the moment this message was generated at the Charging Station.
+     *  Timestamp of the moment this message was generated at the Charging Station.
      * 
      * (Required)
      * 
@@ -214,8 +212,8 @@ public class NotifyCustomerInformationRequest implements RequestType
     }
 
     /**
-     * The Id of the request.
-     * 
+     * The Id of the request.
+     * 
      * 
      * (Required)
      * 
@@ -226,8 +224,8 @@ public class NotifyCustomerInformationRequest implements RequestType
     }
 
     /**
-     * The Id of the request.
-     * 
+     * The Id of the request.
+     * 
      * 
      * (Required)
      * 

@@ -1,14 +1,14 @@
 
 package ocpp.cs._2010._08;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlSchemaType;
-import javax.xml.bind.annotation.XmlType;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import de.rwth.idsg.ocpp.jaxb.JodaDateTimeConverter;
 import de.rwth.idsg.ocpp.jaxb.RequestType;
+import jakarta.xml.bind.annotation.XmlAccessType;
+import jakarta.xml.bind.annotation.XmlAccessorType;
+import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlSchemaType;
+import jakarta.xml.bind.annotation.XmlType;
+import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import lombok.ToString;
 import org.joda.time.DateTime;
 
@@ -153,21 +153,57 @@ public class StopTransactionRequest
         return true;
     }
 
+    /**
+     * Sets the value of the transactionId property.
+     * 
+     * @param value
+     *     allowed object is
+     *     int
+     * @return
+     *     The class instance
+     */
     public StopTransactionRequest withTransactionId(int value) {
         setTransactionId(value);
         return this;
     }
 
+    /**
+     * Sets the value of the idTag property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     * @return
+     *     The class instance
+     */
     public StopTransactionRequest withIdTag(String value) {
         setIdTag(value);
         return this;
     }
 
+    /**
+     * Sets the value of the timestamp property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link DateTime }
+     * @return
+     *     The class instance
+     */
     public StopTransactionRequest withTimestamp(DateTime value) {
         setTimestamp(value);
         return this;
     }
 
+    /**
+     * Sets the value of the meterStop property.
+     * 
+     * @param value
+     *     allowed object is
+     *     int
+     * @return
+     *     The class instance
+     */
     public StopTransactionRequest withMeterStop(int value) {
         setMeterStop(value);
         return this;

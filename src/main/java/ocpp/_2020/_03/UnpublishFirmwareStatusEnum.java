@@ -3,17 +3,15 @@ package ocpp._2020._03;
 
 import java.util.HashMap;
 import java.util.Map;
-import javax.annotation.Generated;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 
 /**
- * Indicates whether the Local Controller succeeded in unpublishing the firmware.
+ * Indicates whether the Local Controller succeeded in unpublishing the firmware.
  * 
  * 
  */
-@Generated("jsonschema2pojo")
 public enum UnpublishFirmwareStatusEnum {
 
     DOWNLOAD_ONGOING("DownloadOngoing"),

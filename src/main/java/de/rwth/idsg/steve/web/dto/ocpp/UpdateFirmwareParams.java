@@ -26,7 +26,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.joda.time.LocalDateTime;
 
-import javax.validation.constraints.*;
+import jakarta.validation.constraints.*;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>

@@ -1,17 +1,16 @@
 
 package ocpp._2020._03;
 
-import javax.annotation.Generated;
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 
 
 /**
- * Class to report components, variables and variable attributes and characteristics.
+ * Class to report components, variables and variable attributes and characteristics.
  * 
  * 
  */
@@ -21,7 +20,6 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
     "component",
     "variable"
 })
-@Generated("jsonschema2pojo")
 public class ComponentVariable {
 
     /**
@@ -33,7 +31,7 @@ public class ComponentVariable {
     @Valid
     private CustomData customData;
     /**
-     * A physical or logical component
+     * A physical or logical component
      * 
      * (Required)
      * 
@@ -44,7 +42,7 @@ public class ComponentVariable {
     @NotNull
     private Component component;
     /**
-     * Reference key to a component-variable.
+     * Reference key to a component-variable.
      * 
      * 
      */
@@ -77,7 +75,7 @@ public class ComponentVariable {
     }
 
     /**
-     * A physical or logical component
+     * A physical or logical component
      * 
      * (Required)
      * 
@@ -88,7 +86,7 @@ public class ComponentVariable {
     }
 
     /**
-     * A physical or logical component
+     * A physical or logical component
      * 
      * (Required)
      * 
@@ -104,7 +102,7 @@ public class ComponentVariable {
     }
 
     /**
-     * Reference key to a component-variable.
+     * Reference key to a component-variable.
      * 
      * 
      */
@@ -114,7 +112,7 @@ public class ComponentVariable {
     }
 
     /**
-     * Reference key to a component-variable.
+     * Reference key to a component-variable.
      * 
      * 
      */

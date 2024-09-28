@@ -3,15 +3,14 @@ package ocpp._2020._03;
 
 import java.util.ArrayList;
 import java.util.List;
-import javax.annotation.Generated;
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import de.rwth.idsg.ocpp.jaxb.RequestType;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
@@ -20,7 +19,6 @@ import de.rwth.idsg.ocpp.jaxb.RequestType;
     "evseId",
     "chargingLimit"
 })
-@Generated("jsonschema2pojo")
 public class NotifyChargingLimitRequest implements RequestType
 {
 
@@ -37,7 +35,7 @@ public class NotifyChargingLimitRequest implements RequestType
     @Valid
     private List<ChargingSchedule> chargingSchedule = new ArrayList<ChargingSchedule>();
     /**
-     * The charging schedule contained in this notification applies to an EVSE. evseId must be &gt; 0.
+     * The charging schedule contained in this notification applies to an EVSE. evseId must be &gt; 0.
      * 
      * 
      */
@@ -45,8 +43,8 @@ public class NotifyChargingLimitRequest implements RequestType
     @JsonPropertyDescription("The charging schedule contained in this notification applies to an EVSE. evseId must be &gt; 0.\r\n")
     private Integer evseId;
     /**
-     * Charging_ Limit
-     * urn:x-enexis:ecdm:uid:2:234489
+     * Charging_ Limit
+     * urn:x-enexis:ecdm:uid:2:234489
      * 
      * (Required)
      * 
@@ -96,7 +94,7 @@ public class NotifyChargingLimitRequest implements RequestType
     }
 
     /**
-     * The charging schedule contained in this notification applies to an EVSE. evseId must be &gt; 0.
+     * The charging schedule contained in this notification applies to an EVSE. evseId must be &gt; 0.
      * 
      * 
      */
@@ -106,7 +104,7 @@ public class NotifyChargingLimitRequest implements RequestType
     }
 
     /**
-     * The charging schedule contained in this notification applies to an EVSE. evseId must be &gt; 0.
+     * The charging schedule contained in this notification applies to an EVSE. evseId must be &gt; 0.
      * 
      * 
      */
@@ -121,8 +119,8 @@ public class NotifyChargingLimitRequest implements RequestType
     }
 
     /**
-     * Charging_ Limit
-     * urn:x-enexis:ecdm:uid:2:234489
+     * Charging_ Limit
+     * urn:x-enexis:ecdm:uid:2:234489
      * 
      * (Required)
      * 
@@ -133,8 +131,8 @@ public class NotifyChargingLimitRequest implements RequestType
     }
 
     /**
-     * Charging_ Limit
-     * urn:x-enexis:ecdm:uid:2:234489
+     * Charging_ Limit
+     * urn:x-enexis:ecdm:uid:2:234489
      * 
      * (Required)
      * 

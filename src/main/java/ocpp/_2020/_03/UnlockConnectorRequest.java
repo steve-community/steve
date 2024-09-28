@@ -1,14 +1,13 @@
 
 package ocpp._2020._03;
 
-import javax.annotation.Generated;
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import de.rwth.idsg.ocpp.jaxb.RequestType;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
@@ -16,7 +15,6 @@ import de.rwth.idsg.ocpp.jaxb.RequestType;
     "evseId",
     "connectorId"
 })
-@Generated("jsonschema2pojo")
 public class UnlockConnectorRequest implements RequestType
 {
 
@@ -29,7 +27,7 @@ public class UnlockConnectorRequest implements RequestType
     @Valid
     private CustomData customData;
     /**
-     * This contains the identifier of the EVSE for which a connector needs to be unlocked.
+     * This contains the identifier of the EVSE for which a connector needs to be unlocked.
      * 
      * (Required)
      * 
@@ -39,7 +37,7 @@ public class UnlockConnectorRequest implements RequestType
     @NotNull
     private Integer evseId;
     /**
-     * This contains the identifier of the connector that needs to be unlocked.
+     * This contains the identifier of the connector that needs to be unlocked.
      * 
      * (Required)
      * 
@@ -73,7 +71,7 @@ public class UnlockConnectorRequest implements RequestType
     }
 
     /**
-     * This contains the identifier of the EVSE for which a connector needs to be unlocked.
+     * This contains the identifier of the EVSE for which a connector needs to be unlocked.
      * 
      * (Required)
      * 
@@ -84,7 +82,7 @@ public class UnlockConnectorRequest implements RequestType
     }
 
     /**
-     * This contains the identifier of the EVSE for which a connector needs to be unlocked.
+     * This contains the identifier of the EVSE for which a connector needs to be unlocked.
      * 
      * (Required)
      * 
@@ -100,7 +98,7 @@ public class UnlockConnectorRequest implements RequestType
     }
 
     /**
-     * This contains the identifier of the connector that needs to be unlocked.
+     * This contains the identifier of the connector that needs to be unlocked.
      * 
      * (Required)
      * 
@@ -111,7 +109,7 @@ public class UnlockConnectorRequest implements RequestType
     }
 
     /**
-     * This contains the identifier of the connector that needs to be unlocked.
+     * This contains the identifier of the connector that needs to be unlocked.
      * 
      * (Required)
      * 

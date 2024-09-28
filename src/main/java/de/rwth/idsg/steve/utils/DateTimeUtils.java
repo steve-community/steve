@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2019 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
+ * Copyright (C) 2013-2024 SteVe Community Team
  * All Rights Reserved.
  *
  * Parkl Digital Technologies
@@ -22,7 +22,6 @@
  */
 package de.rwth.idsg.steve.utils;
 
-import de.rwth.idsg.steve.SteveException;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.joda.time.DateTime;
@@ -103,9 +102,7 @@ public final class DateTimeUtils {
         return PERIOD_FORMATTER.print(new Period(from, to));
     }
 
-
-
-    private static long getOffsetFromUtcInSeconds() {
+    public static long getOffsetFromUtcInSeconds() {
         DateTimeZone timeZone = DateTimeZone.getDefault();
         DateTime now = DateTime.now();
         long offsetInMilliseconds = timeZone.getOffset(now.getMillis());

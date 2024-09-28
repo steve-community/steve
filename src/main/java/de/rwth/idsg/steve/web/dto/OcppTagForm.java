@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2019 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
+ * Copyright (C) 2013-2024 SteVe Community Team
  * All Rights Reserved.
  *
  * Parkl Digital Technologies
@@ -23,13 +23,15 @@
 package de.rwth.idsg.steve.web.dto;
 
 import de.rwth.idsg.steve.web.validation.IdTag;
+import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import org.joda.time.LocalDateTime;
 
-import javax.validation.constraints.Future;
-import javax.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.Future;
+import jakarta.validation.constraints.NotEmpty;
 import java.util.Objects;
 
 /**
@@ -39,11 +41,14 @@ import java.util.Objects;
 @Getter
 @Setter
 @ToString
+@EqualsAndHashCode
 public class OcppTagForm {
 
     // Internal database id
+    @Schema(hidden = true)
     private Integer ocppTagPk;
 
+    @Schema(description = "Will be used in create/insert flows. Will be ignored in update flows.")
     @NotEmpty(message = "ID Tag is required")
     @IdTag
     private String idTag;
@@ -51,6 +56,7 @@ public class OcppTagForm {
     // Is a FK in DB table. No validation needed. Operation will fail if DB constraint fails.
     private String parentIdTag;
 
+    @Schema(description = "A date/time without timezone. Example: 2022-10-10T09:00")
     @Future(message = "Expiry Date/Time must be in future")
     private LocalDateTime expiryDate;
 

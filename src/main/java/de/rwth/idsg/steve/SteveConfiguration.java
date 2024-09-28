@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2019 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
+ * Copyright (C) 2013-2024 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -43,8 +43,16 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class SteveConfiguration {
+    // Root mapping for Spring
+    private final String springMapping = "/";
+    // Web frontend
+    private final String springManagerMapping = "/manager";
+    // Mapping for CXF SOAP services
+    private final String cxfMapping = "/services";
+    // Mapping for Web APIs
+    private final String apiMapping = "/api";
     // Dummy service path
-    private static final String routerEndpointPath = WebEnvironment.getContextRoot()+"/CentralSystemService";
+    private final String routerEndpointPath = "/CentralSystemService";
     // Time zone for the application and database connections
     private final String timeZoneId = "UTC";  // or ZoneId.systemDefault().getId();
 
@@ -53,6 +61,9 @@ public class SteveConfiguration {
     // -------------------------------------------------------------------------
 
     private Ocpp ocpp;
+    private final Auth auth;
+    private final WebApi webApi;
+
 
     @Value("${ocpp.ws.session.select.strategy:ALWAYS_LAST}")
     private String wsSessionSelectStrategy;
@@ -72,9 +83,14 @@ public class SteveConfiguration {
     public void init() {
 
 
+        webApi = WebApi.builder()
+                       .headerKey(p.getOptionalString("webapi.key"))
+                       .headerValue(p.getOptionalString("webapi.value"))
+                       .build();
 
         ocpp = Ocpp.builder()
-                .autoRegisterUnknownStations(autoRegisterUnknownStations)
+                   .autoRegisterUnknownStations(p.getOptionalBoolean("auto.register.unknown.stations"))
+                   .chargeBoxIdValidationRegex(p.getOptionalString("charge-box-id.validation.regex"))
                 .wsSessionSelectStrategy(
                         WsSessionSelectStrategyEnum.fromName(wsSessionSelectStrategy))
                 .build();
@@ -84,11 +100,18 @@ public class SteveConfiguration {
 
 
 
+    @Builder @Getter
+    public static class WebApi {
+        private final String headerKey;
+        private final String headerValue;
+    }
+
     // OCPP-related configuration
     @Builder
     @Getter
     public static class Ocpp {
         private final boolean autoRegisterUnknownStations;
+        private final String chargeBoxIdValidationRegex;
         private final WsSessionSelectStrategy wsSessionSelectStrategy;
 
 

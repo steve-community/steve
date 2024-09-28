@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2019 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
+ * Copyright (C) 2013-2024 SteVe Community Team
  * All Rights Reserved.
  *
  * Parkl Digital Technologies
@@ -58,5 +58,23 @@ public class SteveException extends RuntimeException {
 
     public SteveException(String template, Object arg1, Object arg2, Throwable cause) {
         this(format(template, arg1, arg2), cause);
+    }
+
+    // -------------------------------------------------------------------------
+    // Custom/extending classes
+    // -------------------------------------------------------------------------
+
+    public static class AlreadyExists extends SteveException {
+
+        public AlreadyExists(String template, Object arg1) {
+            super(format(template, arg1));
+        }
+    }
+
+    public static class NotFound extends SteveException {
+
+        public NotFound(String message) {
+            super(message);
+        }
     }
 }

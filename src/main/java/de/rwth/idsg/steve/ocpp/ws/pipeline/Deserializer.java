@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2019 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
+ * Copyright (C) 2013-2024 SteVe Community Team
  * All Rights Reserved.
  *
  * Parkl Digital Technologies
@@ -26,6 +26,9 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.TreeNode;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.NullNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import de.rwth.idsg.ocpp.jaxb.RequestType;
 import de.rwth.idsg.ocpp.jaxb.ResponseType;
 import de.rwth.idsg.steve.SteveException;
@@ -124,6 +127,12 @@ public class Deserializer implements Consumer<CommunicationContext> {
         try {
             parser.nextToken();
             JsonNode requestPayload = parser.readValueAsTree();
+
+            // https://github.com/steve-community/steve/issues/1109
+            if (requestPayload instanceof NullNode) {
+                requestPayload = new ObjectNode(JsonNodeFactory.instance);
+            }
+
             req = mapper.treeToValue(requestPayload, clazz);
         } catch (IOException e) {
             log.error("Exception occurred", e);

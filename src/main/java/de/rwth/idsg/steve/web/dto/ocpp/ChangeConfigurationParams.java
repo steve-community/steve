@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2019 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
+ * Copyright (C) 2013-2024 SteVe Community Team
  * All Rights Reserved.
  *
  * Parkl Digital Technologies
@@ -29,9 +29,8 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
-import javax.validation.constraints.AssertTrue;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Pattern;
+import jakarta.validation.constraints.AssertTrue;
+import jakarta.validation.constraints.NotNull;
 import java.util.Objects;
 
 /**
@@ -51,7 +50,9 @@ public class ChangeConfigurationParams extends MultipleChargePointSelect {
 
     // Disabled @NotBlank after https://github.com/steve-community/steve/issues/148
     // @NotBlank(message = "Value is required")
-    @Pattern(regexp = "\\S+", message = "Value cannot contain any whitespace")
+    //
+    // Disabled @Pattern after https://github.com/steve-community/steve/issues/920
+    // @Pattern(regexp = "\\S+", message = "Value cannot contain any whitespace")
     private String value;
 
     @AssertTrue(message = "Custom Configuration Key cannot be left blank")

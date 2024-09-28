@@ -41,13 +41,16 @@ Electric charge points using the following OCPP versions are supported:
 * OCPP1.6S
 * OCPP1.6J
 
+⚠️ Currently, Steve doesn't support [the OCPP-1.6 security whitepaper](https://openchargealliance.org/wp-content/uploads/2023/11/OCPP-1.6-security-whitepaper-edition-3-2.zip) yet (see [#100](https://github.com/steve-community/steve/issues/100)) and anyone can send events to a public steve instance once the chargebox id is known.
+Please, don't expose a Steve instance without knowing that risk.
+
 For Charging Station compatibility please check:
 https://github.com/steve-community/steve/wiki/Charging-Station-Compatibility
 
 ### System Requirements
 
 SteVe requires 
-* JDK 11 (both Oracle JDK and OpenJDK are supported)
+* JDK 17 or newer
 * Maven 
 * Any JPA compatible database server
 

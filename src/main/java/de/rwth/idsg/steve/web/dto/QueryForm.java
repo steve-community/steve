@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2019 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
+ * Copyright (C) 2013-2024 SteVe Community Team
  * All Rights Reserved.
  *
  * Parkl Digital Technologies
@@ -22,13 +22,13 @@
  */
 package de.rwth.idsg.steve.web.dto;
 
+import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.AssertTrue;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 import org.joda.time.LocalDateTime;
-
-import javax.validation.constraints.AssertTrue;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -40,25 +40,35 @@ import javax.validation.constraints.AssertTrue;
 @ToString
 public abstract class QueryForm {
 
+    @Schema(description = "The identifier of the chargebox (i.e. charging station)")
     private String chargeBoxId;
+
+    @Schema(description = "The OCPP tag")
     private String ocppIdTag;
 
+    @Schema(description = "Show results that happened after this date/time. Format: ISO8601 without timezone. Example: `2022-10-10T09:00:00`")
     private LocalDateTime from;
+
+    @Schema(description = "Show results that happened before this date/time. Format: ISO8601 without timezone. Example: `2022-10-10T12:00:00`")
     private LocalDateTime to;
 
+    @Schema(hidden = true)
     @AssertTrue(message = "'To' must be after 'From'")
     public boolean isFromToValid() {
         return !isFromToSet() || to.isAfter(from);
     }
 
+    @Schema(hidden = true)
     boolean isFromToSet() {
         return from != null && to != null;
     }
 
+    @Schema(hidden = true)
     public boolean isChargeBoxIdSet() {
         return chargeBoxId != null;
     }
 
+    @Schema(hidden = true)
     public boolean isOcppIdTagSet() {
         return ocppIdTag != null;
     }

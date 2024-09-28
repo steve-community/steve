@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2019 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
+ * Copyright (C) 2013-2024 SteVe Community Team
  * All Rights Reserved.
  *
  * Parkl Digital Technologies
@@ -26,9 +26,9 @@ import de.rwth.idsg.steve.NotificationFeature;
 import de.rwth.idsg.steve.web.validation.EmailCollection;
 import lombok.*;
 
-import javax.validation.constraints.Email;
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
 import java.util.List;
 
 /**
@@ -47,7 +47,7 @@ public class SettingsForm {
     // OCPP
     // -------------------------------------------------------------------------
 
-    @Min(value = 1, message = "Heartbeat Interval must be at least {value}")
+    @Min(value = 0, message = "Heartbeat Interval must be at least {value}")
     @NotNull(message = "Heartbeat Interval is required")
     private Integer heartbeat;
 

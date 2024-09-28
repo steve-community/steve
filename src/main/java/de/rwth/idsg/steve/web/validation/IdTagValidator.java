@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2019 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
+ * Copyright (C) 2013-2024 SteVe Community Team
  * All Rights Reserved.
  *
  * Parkl Digital Technologies
@@ -22,8 +22,8 @@
  */
 package de.rwth.idsg.steve.web.validation;
 
-import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintValidatorContext;
+import jakarta.validation.ConstraintValidator;
+import jakarta.validation.ConstraintValidatorContext;
 import java.util.regex.Pattern;
 
 /**
@@ -35,7 +35,7 @@ import java.util.regex.Pattern;
  */
 public class IdTagValidator implements ConstraintValidator<IdTag, String> {
 
-    private static final String IDTAG_PATTERN = "^[a-zA-Z0-9.:_-]{1,20}$";
+    private static final String IDTAG_PATTERN = "^[a-zA-Z0-9.:_#-]{1,20}$";
     private static final Pattern PATTERN = Pattern.compile(IDTAG_PATTERN);
 
     @Override

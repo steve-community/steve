@@ -31,6 +31,7 @@ import net.parkl.ocpp.entities.OcppChargeBox;
 import org.jetbrains.annotations.Nullable;
 import org.joda.time.DateTime;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -39,7 +40,11 @@ import java.util.Optional;
 public interface ChargePointService {
     Optional<String> getRegistrationStatus(String chargeBoxId);
 
-    List<ChargePointSelect> getChargePointSelect(OcppProtocol protocol, List<String> statusFilter);
+    List<ChargePointSelect> getChargePointSelect(OcppProtocol protocol, List<String> inStatusFilter, List<String> chargeBoxIdFilter);
+
+    default List<ChargePointSelect> getChargePointSelect(OcppProtocol protocol, List<String> inStatusFilter) {
+        return getChargePointSelect(protocol, inStatusFilter, Collections.emptyList());
+    }
 
     List<String> getChargeBoxIds();
 

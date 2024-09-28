@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2019 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
+ * Copyright (C) 2013-2024 SteVe Community Team
  * All Rights Reserved.
  *
  * Parkl Digital Technologies
@@ -22,8 +22,8 @@
  */
 package de.rwth.idsg.steve.web.validation;
 
-import javax.validation.Constraint;
-import javax.validation.Payload;
+import jakarta.validation.Constraint;
+import jakarta.validation.Payload;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
@@ -40,7 +40,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Constraint(validatedBy = {IdTagValidator.class, IdTagListValidator.class})
 public @interface IdTag {
 
-    String message() default "ID Tag can only contain upper or lower case letters, numbers and dot, colon, dash, underscore symbols";
+    String message() default "ID Tag can only contain upper or lower case letters, numbers and dot, colon, dash, underscore or hash symbols";
 
     // Required by validation runtime
     Class<?>[] groups() default {};

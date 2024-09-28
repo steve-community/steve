@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2019 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
+ * Copyright (C) 2013-2024 SteVe Community Team
  * All Rights Reserved.
  *
  * Parkl Digital Technologies
@@ -22,8 +22,8 @@
  */
 package de.rwth.idsg.steve.web.validation;
 
-import javax.validation.Constraint;
-import javax.validation.Payload;
+import jakarta.validation.Constraint;
+import jakarta.validation.Payload;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
@@ -40,7 +40,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Constraint(validatedBy = {ChargeBoxIdValidator.class, ChargeBoxIdListValidator.class})
 public @interface ChargeBoxId {
 
-    String message() default "ChargeBox ID cannot contain any whitespace";
+    String message() default "ChargeBox ID violates the configured pattern";
 
     // Required by validation runtime
     Class<?>[] groups() default {};

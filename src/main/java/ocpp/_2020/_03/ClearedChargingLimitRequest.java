@@ -1,14 +1,13 @@
 
 package ocpp._2020._03;
 
-import javax.annotation.Generated;
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import de.rwth.idsg.ocpp.jaxb.RequestType;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
@@ -16,7 +15,6 @@ import de.rwth.idsg.ocpp.jaxb.RequestType;
     "chargingLimitSource",
     "evseId"
 })
-@Generated("jsonschema2pojo")
 public class ClearedChargingLimitRequest implements RequestType
 {
 
@@ -29,7 +27,7 @@ public class ClearedChargingLimitRequest implements RequestType
     @Valid
     private CustomData customData;
     /**
-     * Source of the charging limit.
+     * Source of the charging limit.
      * 
      * (Required)
      * 
@@ -39,7 +37,7 @@ public class ClearedChargingLimitRequest implements RequestType
     @NotNull
     private ChargingLimitSourceEnum chargingLimitSource;
     /**
-     * EVSE Identifier.
+     * EVSE Identifier.
      * 
      * 
      */
@@ -71,7 +69,7 @@ public class ClearedChargingLimitRequest implements RequestType
     }
 
     /**
-     * Source of the charging limit.
+     * Source of the charging limit.
      * 
      * (Required)
      * 
@@ -82,7 +80,7 @@ public class ClearedChargingLimitRequest implements RequestType
     }
 
     /**
-     * Source of the charging limit.
+     * Source of the charging limit.
      * 
      * (Required)
      * 
@@ -98,7 +96,7 @@ public class ClearedChargingLimitRequest implements RequestType
     }
 
     /**
-     * EVSE Identifier.
+     * EVSE Identifier.
      * 
      * 
      */
@@ -108,7 +106,7 @@ public class ClearedChargingLimitRequest implements RequestType
     }
 
     /**
-     * EVSE Identifier.
+     * EVSE Identifier.
      * 
      * 
      */

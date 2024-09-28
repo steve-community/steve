@@ -1,18 +1,17 @@
 
 package ocpp._2020._03;
 
-import javax.annotation.Generated;
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 
 
 /**
- * Cost
- * urn:x-oca:ocpp:uid:2:233258
+ * Cost
+ * urn:x-oca:ocpp:uid:2:233258
  * 
  * 
  */
@@ -23,7 +22,6 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
     "amount",
     "amountMultiplier"
 })
-@Generated("jsonschema2pojo")
 public class Cost {
 
     /**
@@ -35,9 +33,9 @@ public class Cost {
     @Valid
     private CustomData customData;
     /**
-     * Cost. Cost_ Kind. Cost_ Kind_ Code
-     * urn:x-oca:ocpp:uid:1:569243
-     * The kind of cost referred to in the message element amount
+     * Cost. Cost_ Kind. Cost_ Kind_ Code
+     * urn:x-oca:ocpp:uid:1:569243
+     * The kind of cost referred to in the message element amount
      * 
      * (Required)
      * 
@@ -47,9 +45,9 @@ public class Cost {
     @NotNull
     private CostKindEnum costKind;
     /**
-     * Cost. Amount. Amount
-     * urn:x-oca:ocpp:uid:1:569244
-     * The estimated or actual cost per kWh
+     * Cost. Amount. Amount
+     * urn:x-oca:ocpp:uid:1:569244
+     * The estimated or actual cost per kWh
      * 
      * (Required)
      * 
@@ -59,9 +57,9 @@ public class Cost {
     @NotNull
     private Integer amount;
     /**
-     * Cost. Amount_ Multiplier. Integer
-     * urn:x-oca:ocpp:uid:1:569245
-     * Values: -3..3, The amountMultiplier defines the exponent to base 10 (dec). The final value is determined by: amount * 10 ^ amountMultiplier
+     * Cost. Amount_ Multiplier. Integer
+     * urn:x-oca:ocpp:uid:1:569245
+     * Values: -3..3, The amountMultiplier defines the exponent to base 10 (dec). The final value is determined by: amount * 10 ^ amountMultiplier
      * 
      * 
      */
@@ -93,9 +91,9 @@ public class Cost {
     }
 
     /**
-     * Cost. Cost_ Kind. Cost_ Kind_ Code
-     * urn:x-oca:ocpp:uid:1:569243
-     * The kind of cost referred to in the message element amount
+     * Cost. Cost_ Kind. Cost_ Kind_ Code
+     * urn:x-oca:ocpp:uid:1:569243
+     * The kind of cost referred to in the message element amount
      * 
      * (Required)
      * 
@@ -106,9 +104,9 @@ public class Cost {
     }
 
     /**
-     * Cost. Cost_ Kind. Cost_ Kind_ Code
-     * urn:x-oca:ocpp:uid:1:569243
-     * The kind of cost referred to in the message element amount
+     * Cost. Cost_ Kind. Cost_ Kind_ Code
+     * urn:x-oca:ocpp:uid:1:569243
+     * The kind of cost referred to in the message element amount
      * 
      * (Required)
      * 
@@ -124,9 +122,9 @@ public class Cost {
     }
 
     /**
-     * Cost. Amount. Amount
-     * urn:x-oca:ocpp:uid:1:569244
-     * The estimated or actual cost per kWh
+     * Cost. Amount. Amount
+     * urn:x-oca:ocpp:uid:1:569244
+     * The estimated or actual cost per kWh
      * 
      * (Required)
      * 
@@ -137,9 +135,9 @@ public class Cost {
     }
 
     /**
-     * Cost. Amount. Amount
-     * urn:x-oca:ocpp:uid:1:569244
-     * The estimated or actual cost per kWh
+     * Cost. Amount. Amount
+     * urn:x-oca:ocpp:uid:1:569244
+     * The estimated or actual cost per kWh
      * 
      * (Required)
      * 
@@ -155,9 +153,9 @@ public class Cost {
     }
 
     /**
-     * Cost. Amount_ Multiplier. Integer
-     * urn:x-oca:ocpp:uid:1:569245
-     * Values: -3..3, The amountMultiplier defines the exponent to base 10 (dec). The final value is determined by: amount * 10 ^ amountMultiplier
+     * Cost. Amount_ Multiplier. Integer
+     * urn:x-oca:ocpp:uid:1:569245
+     * Values: -3..3, The amountMultiplier defines the exponent to base 10 (dec). The final value is determined by: amount * 10 ^ amountMultiplier
      * 
      * 
      */
@@ -167,9 +165,9 @@ public class Cost {
     }
 
     /**
-     * Cost. Amount_ Multiplier. Integer
-     * urn:x-oca:ocpp:uid:1:569245
-     * Values: -3..3, The amountMultiplier defines the exponent to base 10 (dec). The final value is determined by: amount * 10 ^ amountMultiplier
+     * Cost. Amount_ Multiplier. Integer
+     * urn:x-oca:ocpp:uid:1:569245
+     * Values: -3..3, The amountMultiplier defines the exponent to base 10 (dec). The final value is determined by: amount * 10 ^ amountMultiplier
      * 
      * 
      */

@@ -3,19 +3,17 @@ package ocpp._2020._03;
 
 import java.util.HashMap;
 import java.util.Map;
-import javax.annotation.Generated;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 
 /**
- * Sampled_ Value. Phase. Phase_ Code
- * urn:x-oca:ocpp:uid:1:569264
- * Indicates how the measured value is to be interpreted. For instance between L1 and neutral (L1-N) Please note that not all values of phase are applicable to all Measurands. When phase is absent, the measured value is interpreted as an overall value.
+ * Sampled_ Value. Phase. Phase_ Code
+ * urn:x-oca:ocpp:uid:1:569264
+ * Indicates how the measured value is to be interpreted. For instance between L1 and neutral (L1-N) Please note that not all values of phase are applicable to all Measurands. When phase is absent, the measured value is interpreted as an overall value.
  * 
  * 
  */
-@Generated("jsonschema2pojo")
 public enum PhaseEnum {
 
     L_1("L1"),

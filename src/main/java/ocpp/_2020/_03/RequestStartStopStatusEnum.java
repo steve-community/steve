@@ -3,17 +3,15 @@ package ocpp._2020._03;
 
 import java.util.HashMap;
 import java.util.Map;
-import javax.annotation.Generated;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 
 /**
- * Status indicating whether the Charging Station accepts the request to start a transaction.
+ * Status indicating whether the Charging Station accepts the request to start a transaction.
  * 
  * 
  */
-@Generated("jsonschema2pojo")
 public enum RequestStartStopStatusEnum {
 
     ACCEPTED("Accepted"),

@@ -1,14 +1,13 @@
 
 package ocpp._2020._03;
 
-import javax.annotation.Generated;
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import de.rwth.idsg.ocpp.jaxb.ResponseType;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
@@ -16,7 +15,6 @@ import de.rwth.idsg.ocpp.jaxb.ResponseType;
     "status",
     "statusInfo"
 })
-@Generated("jsonschema2pojo")
 public class GetDisplayMessagesResponse implements ResponseType
 {
 
@@ -29,7 +27,7 @@ public class GetDisplayMessagesResponse implements ResponseType
     @Valid
     private CustomData customData;
     /**
-     * Indicates if the Charging Station has Display Messages that match the request criteria in the &lt;&lt;getdisplaymessagesrequest,GetDisplayMessagesRequest&gt;&gt;
+     * Indicates if the Charging Station has Display Messages that match the request criteria in the &lt;&lt;getdisplaymessagesrequest,GetDisplayMessagesRequest&gt;&gt;
      * 
      * (Required)
      * 
@@ -39,7 +37,7 @@ public class GetDisplayMessagesResponse implements ResponseType
     @NotNull
     private GetDisplayMessagesStatusEnum status;
     /**
-     * Element providing more information about the status.
+     * Element providing more information about the status.
      * 
      * 
      */
@@ -72,7 +70,7 @@ public class GetDisplayMessagesResponse implements ResponseType
     }
 
     /**
-     * Indicates if the Charging Station has Display Messages that match the request criteria in the &lt;&lt;getdisplaymessagesrequest,GetDisplayMessagesRequest&gt;&gt;
+     * Indicates if the Charging Station has Display Messages that match the request criteria in the &lt;&lt;getdisplaymessagesrequest,GetDisplayMessagesRequest&gt;&gt;
      * 
      * (Required)
      * 
@@ -83,7 +81,7 @@ public class GetDisplayMessagesResponse implements ResponseType
     }
 
     /**
-     * Indicates if the Charging Station has Display Messages that match the request criteria in the &lt;&lt;getdisplaymessagesrequest,GetDisplayMessagesRequest&gt;&gt;
+     * Indicates if the Charging Station has Display Messages that match the request criteria in the &lt;&lt;getdisplaymessagesrequest,GetDisplayMessagesRequest&gt;&gt;
      * 
      * (Required)
      * 
@@ -99,7 +97,7 @@ public class GetDisplayMessagesResponse implements ResponseType
     }
 
     /**
-     * Element providing more information about the status.
+     * Element providing more information about the status.
      * 
      * 
      */
@@ -109,7 +107,7 @@ public class GetDisplayMessagesResponse implements ResponseType
     }
 
     /**
-     * Element providing more information about the status.
+     * Element providing more information about the status.
      * 
      * 
      */

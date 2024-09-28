@@ -1,14 +1,13 @@
 
 package ocpp._2020._03;
 
-import javax.annotation.Generated;
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import de.rwth.idsg.ocpp.jaxb.RequestType;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import org.joda.time.DateTime;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -21,7 +20,6 @@ import org.joda.time.DateTime;
     "evseId",
     "groupIdToken"
 })
-@Generated("jsonschema2pojo")
 public class ReserveNowRequest implements RequestType
 {
 
@@ -34,7 +32,7 @@ public class ReserveNowRequest implements RequestType
     @Valid
     private CustomData customData;
     /**
-     * Id of reservation.
+     * Id of reservation.
      * 
      * (Required)
      * 
@@ -44,7 +42,7 @@ public class ReserveNowRequest implements RequestType
     @NotNull
     private Integer id;
     /**
-     * Date and time at which the reservation expires.
+     * Date and time at which the reservation expires.
      * 
      * (Required)
      * 
@@ -54,7 +52,7 @@ public class ReserveNowRequest implements RequestType
     @NotNull
     private DateTime expiryDateTime;
     /**
-     * This field specifies the connector type.
+     * This field specifies the connector type.
      * 
      * 
      */
@@ -62,7 +60,7 @@ public class ReserveNowRequest implements RequestType
     @JsonPropertyDescription("This field specifies the connector type.\r\n")
     private ConnectorEnum connectorType;
     /**
-     * Contains a case insensitive identifier to use for the authorization and the type of authorization to support multiple forms of identifiers.
+     * Contains a case insensitive identifier to use for the authorization and the type of authorization to support multiple forms of identifiers.
      * 
      * (Required)
      * 
@@ -73,7 +71,7 @@ public class ReserveNowRequest implements RequestType
     @NotNull
     private IdToken idToken;
     /**
-     * This contains ID of the evse to be reserved.
+     * This contains ID of the evse to be reserved.
      * 
      * 
      */
@@ -81,7 +79,7 @@ public class ReserveNowRequest implements RequestType
     @JsonPropertyDescription("This contains ID of the evse to be reserved.\r\n")
     private Integer evseId;
     /**
-     * Contains a case insensitive identifier to use for the authorization and the type of authorization to support multiple forms of identifiers.
+     * Contains a case insensitive identifier to use for the authorization and the type of authorization to support multiple forms of identifiers.
      * 
      * 
      */
@@ -114,7 +112,7 @@ public class ReserveNowRequest implements RequestType
     }
 
     /**
-     * Id of reservation.
+     * Id of reservation.
      * 
      * (Required)
      * 
@@ -125,7 +123,7 @@ public class ReserveNowRequest implements RequestType
     }
 
     /**
-     * Id of reservation.
+     * Id of reservation.
      * 
      * (Required)
      * 
@@ -141,7 +139,7 @@ public class ReserveNowRequest implements RequestType
     }
 
     /**
-     * Date and time at which the reservation expires.
+     * Date and time at which the reservation expires.
      * 
      * (Required)
      * 
@@ -152,7 +150,7 @@ public class ReserveNowRequest implements RequestType
     }
 
     /**
-     * Date and time at which the reservation expires.
+     * Date and time at which the reservation expires.
      * 
      * (Required)
      * 
@@ -168,7 +166,7 @@ public class ReserveNowRequest implements RequestType
     }
 
     /**
-     * This field specifies the connector type.
+     * This field specifies the connector type.
      * 
      * 
      */
@@ -178,7 +176,7 @@ public class ReserveNowRequest implements RequestType
     }
 
     /**
-     * This field specifies the connector type.
+     * This field specifies the connector type.
      * 
      * 
      */
@@ -193,7 +191,7 @@ public class ReserveNowRequest implements RequestType
     }
 
     /**
-     * Contains a case insensitive identifier to use for the authorization and the type of authorization to support multiple forms of identifiers.
+     * Contains a case insensitive identifier to use for the authorization and the type of authorization to support multiple forms of identifiers.
      * 
      * (Required)
      * 
@@ -204,7 +202,7 @@ public class ReserveNowRequest implements RequestType
     }
 
     /**
-     * Contains a case insensitive identifier to use for the authorization and the type of authorization to support multiple forms of identifiers.
+     * Contains a case insensitive identifier to use for the authorization and the type of authorization to support multiple forms of identifiers.
      * 
      * (Required)
      * 
@@ -220,7 +218,7 @@ public class ReserveNowRequest implements RequestType
     }
 
     /**
-     * This contains ID of the evse to be reserved.
+     * This contains ID of the evse to be reserved.
      * 
      * 
      */
@@ -230,7 +228,7 @@ public class ReserveNowRequest implements RequestType
     }
 
     /**
-     * This contains ID of the evse to be reserved.
+     * This contains ID of the evse to be reserved.
      * 
      * 
      */
@@ -245,7 +243,7 @@ public class ReserveNowRequest implements RequestType
     }
 
     /**
-     * Contains a case insensitive identifier to use for the authorization and the type of authorization to support multiple forms of identifiers.
+     * Contains a case insensitive identifier to use for the authorization and the type of authorization to support multiple forms of identifiers.
      * 
      * 
      */
@@ -255,7 +253,7 @@ public class ReserveNowRequest implements RequestType
     }
 
     /**
-     * Contains a case insensitive identifier to use for the authorization and the type of authorization to support multiple forms of identifiers.
+     * Contains a case insensitive identifier to use for the authorization and the type of authorization to support multiple forms of identifiers.
      * 
      * 
      */

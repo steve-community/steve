@@ -1,15 +1,14 @@
 
 package ocpp._2020._03;
 
-import javax.annotation.Generated;
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import de.rwth.idsg.ocpp.jaxb.RequestType;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
@@ -18,7 +17,6 @@ import de.rwth.idsg.ocpp.jaxb.RequestType;
     "action",
     "exiRequest"
 })
-@Generated("jsonschema2pojo")
 public class Get15118EVCertificateRequest implements RequestType
 {
 
@@ -31,8 +29,8 @@ public class Get15118EVCertificateRequest implements RequestType
     @Valid
     private CustomData customData;
     /**
-     * Schema version currently used for the 15118 session between EV and Charging Station. Needed for parsing of the EXI stream by the CSMS.
-     * 
+     * Schema version currently used for the 15118 session between EV and Charging Station. Needed for parsing of the EXI stream by the CSMS.
+     * 
      * 
      * (Required)
      * 
@@ -43,7 +41,7 @@ public class Get15118EVCertificateRequest implements RequestType
     @NotNull
     private String iso15118SchemaVersion;
     /**
-     * Defines whether certificate needs to be installed or updated.
+     * Defines whether certificate needs to be installed or updated.
      * 
      * (Required)
      * 
@@ -53,7 +51,7 @@ public class Get15118EVCertificateRequest implements RequestType
     @NotNull
     private CertificateActionEnum action;
     /**
-     * Raw CertificateInstallationReq request from EV, Base64 encoded.
+     * Raw CertificateInstallationReq request from EV, Base64 encoded.
      * 
      * (Required)
      * 
@@ -88,8 +86,8 @@ public class Get15118EVCertificateRequest implements RequestType
     }
 
     /**
-     * Schema version currently used for the 15118 session between EV and Charging Station. Needed for parsing of the EXI stream by the CSMS.
-     * 
+     * Schema version currently used for the 15118 session between EV and Charging Station. Needed for parsing of the EXI stream by the CSMS.
+     * 
      * 
      * (Required)
      * 
@@ -100,8 +98,8 @@ public class Get15118EVCertificateRequest implements RequestType
     }
 
     /**
-     * Schema version currently used for the 15118 session between EV and Charging Station. Needed for parsing of the EXI stream by the CSMS.
-     * 
+     * Schema version currently used for the 15118 session between EV and Charging Station. Needed for parsing of the EXI stream by the CSMS.
+     * 
      * 
      * (Required)
      * 
@@ -117,7 +115,7 @@ public class Get15118EVCertificateRequest implements RequestType
     }
 
     /**
-     * Defines whether certificate needs to be installed or updated.
+     * Defines whether certificate needs to be installed or updated.
      * 
      * (Required)
      * 
@@ -128,7 +126,7 @@ public class Get15118EVCertificateRequest implements RequestType
     }
 
     /**
-     * Defines whether certificate needs to be installed or updated.
+     * Defines whether certificate needs to be installed or updated.
      * 
      * (Required)
      * 
@@ -144,7 +142,7 @@ public class Get15118EVCertificateRequest implements RequestType
     }
 
     /**
-     * Raw CertificateInstallationReq request from EV, Base64 encoded.
+     * Raw CertificateInstallationReq request from EV, Base64 encoded.
      * 
      * (Required)
      * 
@@ -155,7 +153,7 @@ public class Get15118EVCertificateRequest implements RequestType
     }
 
     /**
-     * Raw CertificateInstallationReq request from EV, Base64 encoded.
+     * Raw CertificateInstallationReq request from EV, Base64 encoded.
      * 
      * (Required)
      * 

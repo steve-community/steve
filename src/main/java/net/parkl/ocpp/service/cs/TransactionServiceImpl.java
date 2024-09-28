@@ -271,7 +271,7 @@ public class TransactionServiceImpl implements TransactionService {
             log.warn("No active charging process found without transaction for connector: {}", connector.getConnectorId());
         }
 
-        if (params.hasReservation()) {
+        if (params.getReservationId()!=null) {
             reservationService.markReservationAsUsed(transactionStart, params.getReservationId(), params.getChargeBoxId());
         }
 

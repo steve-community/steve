@@ -1,14 +1,14 @@
 
 package ocpp.cp._2015._10;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlSchemaType;
-import javax.xml.bind.annotation.XmlType;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import de.rwth.idsg.ocpp.jaxb.JodaDateTimeConverter;
 import de.rwth.idsg.ocpp.jaxb.ResponseType;
+import jakarta.xml.bind.annotation.XmlAccessType;
+import jakarta.xml.bind.annotation.XmlAccessorType;
+import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlSchemaType;
+import jakarta.xml.bind.annotation.XmlType;
+import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import lombok.ToString;
 import org.joda.time.DateTime;
 
@@ -171,21 +171,57 @@ public class GetCompositeScheduleResponse
         return (this.chargingSchedule!= null);
     }
 
+    /**
+     * Sets the value of the status property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link GetCompositeScheduleStatus }
+     * @return
+     *     The class instance
+     */
     public GetCompositeScheduleResponse withStatus(GetCompositeScheduleStatus value) {
         setStatus(value);
         return this;
     }
 
+    /**
+     * Sets the value of the connectorId property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link Integer }
+     * @return
+     *     The class instance
+     */
     public GetCompositeScheduleResponse withConnectorId(Integer value) {
         setConnectorId(value);
         return this;
     }
 
+    /**
+     * Sets the value of the scheduleStart property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link DateTime }
+     * @return
+     *     The class instance
+     */
     public GetCompositeScheduleResponse withScheduleStart(DateTime value) {
         setScheduleStart(value);
         return this;
     }
 
+    /**
+     * Sets the value of the chargingSchedule property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link ChargingSchedule }
+     * @return
+     *     The class instance
+     */
     public GetCompositeScheduleResponse withChargingSchedule(ChargingSchedule value) {
         setChargingSchedule(value);
         return this;

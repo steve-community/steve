@@ -4,7 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.joda.time.DateTime;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.io.Serializable;
 
 @Entity

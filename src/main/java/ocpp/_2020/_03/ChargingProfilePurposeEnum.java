@@ -3,19 +3,17 @@ package ocpp._2020._03;
 
 import java.util.HashMap;
 import java.util.Map;
-import javax.annotation.Generated;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 
 /**
- * Charging_ Profile. Charging_ Profile_ Purpose. Charging_ Profile_ Purpose_ Code
- * urn:x-oca:ocpp:uid:1:569231
- * Specifies to purpose of the charging profiles that will be cleared, if they meet the other criteria in the request.
+ * Charging_ Profile. Charging_ Profile_ Purpose. Charging_ Profile_ Purpose_ Code
+ * urn:x-oca:ocpp:uid:1:569231
+ * Specifies to purpose of the charging profiles that will be cleared, if they meet the other criteria in the request.
  * 
  * 
  */
-@Generated("jsonschema2pojo")
 public enum ChargingProfilePurposeEnum {
 
     CHARGING_STATION_EXTERNAL_CONSTRAINTS("ChargingStationExternalConstraints"),

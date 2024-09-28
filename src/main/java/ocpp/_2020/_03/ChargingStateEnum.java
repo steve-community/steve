@@ -3,20 +3,18 @@ package ocpp._2020._03;
 
 import java.util.HashMap;
 import java.util.Map;
-import javax.annotation.Generated;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 
 /**
- * Transaction. State. Transaction_ State_ Code
- * urn:x-oca:ocpp:uid:1:569419
- * Current charging state, is required when state
- * has changed.
+ * Transaction. State. Transaction_ State_ Code
+ * urn:x-oca:ocpp:uid:1:569419
+ * Current charging state, is required when state
+ * has changed.
  * 
  * 
  */
-@Generated("jsonschema2pojo")
 public enum ChargingStateEnum {
 
     CHARGING("Charging"),

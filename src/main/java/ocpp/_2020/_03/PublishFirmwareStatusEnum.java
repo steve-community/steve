@@ -3,18 +3,16 @@ package ocpp._2020._03;
 
 import java.util.HashMap;
 import java.util.Map;
-import javax.annotation.Generated;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 
 /**
- * This contains the progress status of the publishfirmware
- * installation.
+ * This contains the progress status of the publishfirmware
+ * installation.
  * 
  * 
  */
-@Generated("jsonschema2pojo")
 public enum PublishFirmwareStatusEnum {
 
     IDLE("Idle"),

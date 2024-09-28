@@ -3,15 +3,14 @@ package ocpp._2020._03;
 
 import java.util.ArrayList;
 import java.util.List;
-import javax.annotation.Generated;
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import de.rwth.idsg.ocpp.jaxb.ResponseType;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
@@ -20,7 +19,6 @@ import de.rwth.idsg.ocpp.jaxb.ResponseType;
     "statusInfo",
     "certificateHashDataChain"
 })
-@Generated("jsonschema2pojo")
 public class GetInstalledCertificateIdsResponse implements ResponseType
 {
 
@@ -33,7 +31,7 @@ public class GetInstalledCertificateIdsResponse implements ResponseType
     @Valid
     private CustomData customData;
     /**
-     * Charging Station indicates if it can process the request.
+     * Charging Station indicates if it can process the request.
      * 
      * (Required)
      * 
@@ -43,7 +41,7 @@ public class GetInstalledCertificateIdsResponse implements ResponseType
     @NotNull
     private GetInstalledCertificateStatusEnum status;
     /**
-     * Element providing more information about the status.
+     * Element providing more information about the status.
      * 
      * 
      */
@@ -80,7 +78,7 @@ public class GetInstalledCertificateIdsResponse implements ResponseType
     }
 
     /**
-     * Charging Station indicates if it can process the request.
+     * Charging Station indicates if it can process the request.
      * 
      * (Required)
      * 
@@ -91,7 +89,7 @@ public class GetInstalledCertificateIdsResponse implements ResponseType
     }
 
     /**
-     * Charging Station indicates if it can process the request.
+     * Charging Station indicates if it can process the request.
      * 
      * (Required)
      * 
@@ -107,7 +105,7 @@ public class GetInstalledCertificateIdsResponse implements ResponseType
     }
 
     /**
-     * Element providing more information about the status.
+     * Element providing more information about the status.
      * 
      * 
      */
@@ -117,7 +115,7 @@ public class GetInstalledCertificateIdsResponse implements ResponseType
     }
 
     /**
-     * Element providing more information about the status.
+     * Element providing more information about the status.
      * 
      * 
      */

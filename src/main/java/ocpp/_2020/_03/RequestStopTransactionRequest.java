@@ -1,22 +1,20 @@
 
 package ocpp._2020._03;
 
-import javax.annotation.Generated;
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import de.rwth.idsg.ocpp.jaxb.RequestType;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
     "customData",
     "transactionId"
 })
-@Generated("jsonschema2pojo")
 public class RequestStopTransactionRequest implements RequestType
 {
 
@@ -29,7 +27,7 @@ public class RequestStopTransactionRequest implements RequestType
     @Valid
     private CustomData customData;
     /**
-     * The identifier of the transaction which the Charging Station is requested to stop.
+     * The identifier of the transaction which the Charging Station is requested to stop.
      * 
      * (Required)
      * 
@@ -64,7 +62,7 @@ public class RequestStopTransactionRequest implements RequestType
     }
 
     /**
-     * The identifier of the transaction which the Charging Station is requested to stop.
+     * The identifier of the transaction which the Charging Station is requested to stop.
      * 
      * (Required)
      * 
@@ -75,7 +73,7 @@ public class RequestStopTransactionRequest implements RequestType
     }
 
     /**
-     * The identifier of the transaction which the Charging Station is requested to stop.
+     * The identifier of the transaction which the Charging Station is requested to stop.
      * 
      * (Required)
      * 

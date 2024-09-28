@@ -1,14 +1,13 @@
 
 package ocpp._2020._03;
 
-import javax.annotation.Generated;
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import de.rwth.idsg.ocpp.jaxb.RequestType;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
@@ -19,7 +18,6 @@ import de.rwth.idsg.ocpp.jaxb.RequestType;
     "remoteStartId",
     "chargingProfile"
 })
-@Generated("jsonschema2pojo")
 public class RequestStartTransactionRequest implements RequestType
 {
 
@@ -32,7 +30,7 @@ public class RequestStartTransactionRequest implements RequestType
     @Valid
     private CustomData customData;
     /**
-     * Number of the EVSE on which to start the transaction. EvseId SHALL be &gt; 0
+     * Number of the EVSE on which to start the transaction. EvseId SHALL be &gt; 0
      * 
      * 
      */
@@ -40,7 +38,7 @@ public class RequestStartTransactionRequest implements RequestType
     @JsonPropertyDescription("Number of the EVSE on which to start the transaction. EvseId SHALL be &gt; 0\r\n")
     private Integer evseId;
     /**
-     * Contains a case insensitive identifier to use for the authorization and the type of authorization to support multiple forms of identifiers.
+     * Contains a case insensitive identifier to use for the authorization and the type of authorization to support multiple forms of identifiers.
      * 
      * 
      */
@@ -49,7 +47,7 @@ public class RequestStartTransactionRequest implements RequestType
     @Valid
     private IdToken groupIdToken;
     /**
-     * Contains a case insensitive identifier to use for the authorization and the type of authorization to support multiple forms of identifiers.
+     * Contains a case insensitive identifier to use for the authorization and the type of authorization to support multiple forms of identifiers.
      * 
      * (Required)
      * 
@@ -60,7 +58,7 @@ public class RequestStartTransactionRequest implements RequestType
     @NotNull
     private IdToken idToken;
     /**
-     * Id given by the server to this start request. The Charging Station might return this in the &lt;&lt;transactioneventrequest, TransactionEventRequest&gt;&gt;, letting the server know which transaction was started for this request. Use to start a transaction.
+     * Id given by the server to this start request. The Charging Station might return this in the &lt;&lt;transactioneventrequest, TransactionEventRequest&gt;&gt;, letting the server know which transaction was started for this request. Use to start a transaction.
      * 
      * (Required)
      * 
@@ -70,9 +68,9 @@ public class RequestStartTransactionRequest implements RequestType
     @NotNull
     private Integer remoteStartId;
     /**
-     * Charging_ Profile
-     * urn:x-oca:ocpp:uid:2:233255
-     * A ChargingProfile consists of ChargingSchedule, describing the amount of power or current that can be delivered per time interval.
+     * Charging_ Profile
+     * urn:x-oca:ocpp:uid:2:233255
+     * A ChargingProfile consists of ChargingSchedule, describing the amount of power or current that can be delivered per time interval.
      * 
      * 
      */
@@ -105,7 +103,7 @@ public class RequestStartTransactionRequest implements RequestType
     }
 
     /**
-     * Number of the EVSE on which to start the transaction. EvseId SHALL be &gt; 0
+     * Number of the EVSE on which to start the transaction. EvseId SHALL be &gt; 0
      * 
      * 
      */
@@ -115,7 +113,7 @@ public class RequestStartTransactionRequest implements RequestType
     }
 
     /**
-     * Number of the EVSE on which to start the transaction. EvseId SHALL be &gt; 0
+     * Number of the EVSE on which to start the transaction. EvseId SHALL be &gt; 0
      * 
      * 
      */
@@ -130,7 +128,7 @@ public class RequestStartTransactionRequest implements RequestType
     }
 
     /**
-     * Contains a case insensitive identifier to use for the authorization and the type of authorization to support multiple forms of identifiers.
+     * Contains a case insensitive identifier to use for the authorization and the type of authorization to support multiple forms of identifiers.
      * 
      * 
      */
@@ -140,7 +138,7 @@ public class RequestStartTransactionRequest implements RequestType
     }
 
     /**
-     * Contains a case insensitive identifier to use for the authorization and the type of authorization to support multiple forms of identifiers.
+     * Contains a case insensitive identifier to use for the authorization and the type of authorization to support multiple forms of identifiers.
      * 
      * 
      */
@@ -155,7 +153,7 @@ public class RequestStartTransactionRequest implements RequestType
     }
 
     /**
-     * Contains a case insensitive identifier to use for the authorization and the type of authorization to support multiple forms of identifiers.
+     * Contains a case insensitive identifier to use for the authorization and the type of authorization to support multiple forms of identifiers.
      * 
      * (Required)
      * 
@@ -166,7 +164,7 @@ public class RequestStartTransactionRequest implements RequestType
     }
 
     /**
-     * Contains a case insensitive identifier to use for the authorization and the type of authorization to support multiple forms of identifiers.
+     * Contains a case insensitive identifier to use for the authorization and the type of authorization to support multiple forms of identifiers.
      * 
      * (Required)
      * 
@@ -182,7 +180,7 @@ public class RequestStartTransactionRequest implements RequestType
     }
 
     /**
-     * Id given by the server to this start request. The Charging Station might return this in the &lt;&lt;transactioneventrequest, TransactionEventRequest&gt;&gt;, letting the server know which transaction was started for this request. Use to start a transaction.
+     * Id given by the server to this start request. The Charging Station might return this in the &lt;&lt;transactioneventrequest, TransactionEventRequest&gt;&gt;, letting the server know which transaction was started for this request. Use to start a transaction.
      * 
      * (Required)
      * 
@@ -193,7 +191,7 @@ public class RequestStartTransactionRequest implements RequestType
     }
 
     /**
-     * Id given by the server to this start request. The Charging Station might return this in the &lt;&lt;transactioneventrequest, TransactionEventRequest&gt;&gt;, letting the server know which transaction was started for this request. Use to start a transaction.
+     * Id given by the server to this start request. The Charging Station might return this in the &lt;&lt;transactioneventrequest, TransactionEventRequest&gt;&gt;, letting the server know which transaction was started for this request. Use to start a transaction.
      * 
      * (Required)
      * 
@@ -209,9 +207,9 @@ public class RequestStartTransactionRequest implements RequestType
     }
 
     /**
-     * Charging_ Profile
-     * urn:x-oca:ocpp:uid:2:233255
-     * A ChargingProfile consists of ChargingSchedule, describing the amount of power or current that can be delivered per time interval.
+     * Charging_ Profile
+     * urn:x-oca:ocpp:uid:2:233255
+     * A ChargingProfile consists of ChargingSchedule, describing the amount of power or current that can be delivered per time interval.
      * 
      * 
      */
@@ -221,9 +219,9 @@ public class RequestStartTransactionRequest implements RequestType
     }
 
     /**
-     * Charging_ Profile
-     * urn:x-oca:ocpp:uid:2:233255
-     * A ChargingProfile consists of ChargingSchedule, describing the amount of power or current that can be delivered per time interval.
+     * Charging_ Profile
+     * urn:x-oca:ocpp:uid:2:233255
+     * A ChargingProfile consists of ChargingSchedule, describing the amount of power or current that can be delivered per time interval.
      * 
      * 
      */

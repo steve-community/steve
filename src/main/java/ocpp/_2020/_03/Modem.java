@@ -1,19 +1,18 @@
 
 package ocpp._2020._03;
 
-import javax.annotation.Generated;
-import javax.validation.Valid;
-import javax.validation.constraints.Size;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Size;
 
 
 /**
- * Wireless_ Communication_ Module
- * urn:x-oca:ocpp:uid:2:233306
- * Defines parameters required for initiating and maintaining wireless communication with other devices.
+ * Wireless_ Communication_ Module
+ * urn:x-oca:ocpp:uid:2:233306
+ * Defines parameters required for initiating and maintaining wireless communication with other devices.
  * 
  * 
  */
@@ -23,7 +22,6 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
     "iccid",
     "imsi"
 })
-@Generated("jsonschema2pojo")
 public class Modem {
 
     /**
@@ -35,9 +33,9 @@ public class Modem {
     @Valid
     private CustomData customData;
     /**
-     * Wireless_ Communication_ Module. ICCID. CI20_ Text
-     * urn:x-oca:ocpp:uid:1:569327
-     * This contains the ICCID of the modem’s SIM card.
+     * Wireless_ Communication_ Module. ICCID. CI20_ Text
+     * urn:x-oca:ocpp:uid:1:569327
+     * This contains the ICCID of the modem’s SIM card.
      * 
      * 
      */
@@ -46,9 +44,9 @@ public class Modem {
     @Size(max = 20)
     private String iccid;
     /**
-     * Wireless_ Communication_ Module. IMSI. CI20_ Text
-     * urn:x-oca:ocpp:uid:1:569328
-     * This contains the IMSI of the modem’s SIM card.
+     * Wireless_ Communication_ Module. IMSI. CI20_ Text
+     * urn:x-oca:ocpp:uid:1:569328
+     * This contains the IMSI of the modem’s SIM card.
      * 
      * 
      */
@@ -81,9 +79,9 @@ public class Modem {
     }
 
     /**
-     * Wireless_ Communication_ Module. ICCID. CI20_ Text
-     * urn:x-oca:ocpp:uid:1:569327
-     * This contains the ICCID of the modem’s SIM card.
+     * Wireless_ Communication_ Module. ICCID. CI20_ Text
+     * urn:x-oca:ocpp:uid:1:569327
+     * This contains the ICCID of the modem’s SIM card.
      * 
      * 
      */
@@ -93,9 +91,9 @@ public class Modem {
     }
 
     /**
-     * Wireless_ Communication_ Module. ICCID. CI20_ Text
-     * urn:x-oca:ocpp:uid:1:569327
-     * This contains the ICCID of the modem’s SIM card.
+     * Wireless_ Communication_ Module. ICCID. CI20_ Text
+     * urn:x-oca:ocpp:uid:1:569327
+     * This contains the ICCID of the modem’s SIM card.
      * 
      * 
      */
@@ -110,9 +108,9 @@ public class Modem {
     }
 
     /**
-     * Wireless_ Communication_ Module. IMSI. CI20_ Text
-     * urn:x-oca:ocpp:uid:1:569328
-     * This contains the IMSI of the modem’s SIM card.
+     * Wireless_ Communication_ Module. IMSI. CI20_ Text
+     * urn:x-oca:ocpp:uid:1:569328
+     * This contains the IMSI of the modem’s SIM card.
      * 
      * 
      */
@@ -122,9 +120,9 @@ public class Modem {
     }
 
     /**
-     * Wireless_ Communication_ Module. IMSI. CI20_ Text
-     * urn:x-oca:ocpp:uid:1:569328
-     * This contains the IMSI of the modem’s SIM card.
+     * Wireless_ Communication_ Module. IMSI. CI20_ Text
+     * urn:x-oca:ocpp:uid:1:569328
+     * This contains the IMSI of the modem’s SIM card.
      * 
      * 
      */

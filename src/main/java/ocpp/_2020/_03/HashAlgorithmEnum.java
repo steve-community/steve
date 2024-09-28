@@ -3,17 +3,15 @@ package ocpp._2020._03;
 
 import java.util.HashMap;
 import java.util.Map;
-import javax.annotation.Generated;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 
 /**
- * Used algorithms for the hashes provided.
+ * Used algorithms for the hashes provided.
  * 
  * 
  */
-@Generated("jsonschema2pojo")
 public enum HashAlgorithmEnum {
 
     SHA_256("SHA256"),

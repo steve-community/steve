@@ -3,19 +3,17 @@ package ocpp._2020._03;
 
 import java.util.HashMap;
 import java.util.Map;
-import javax.annotation.Generated;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 
 /**
- * Charging_ Profile. Charging_ Profile_ Kind. Charging_ Profile_ Kind_ Code
- * urn:x-oca:ocpp:uid:1:569232
- * Indicates the kind of schedule.
+ * Charging_ Profile. Charging_ Profile_ Kind. Charging_ Profile_ Kind_ Code
+ * urn:x-oca:ocpp:uid:1:569232
+ * Indicates the kind of schedule.
  * 
  * 
  */
-@Generated("jsonschema2pojo")
 public enum ChargingProfileKindEnum {
 
     ABSOLUTE("Absolute"),

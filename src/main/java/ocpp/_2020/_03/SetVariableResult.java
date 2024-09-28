@@ -1,13 +1,12 @@
 
 package ocpp._2020._03;
 
-import javax.annotation.Generated;
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
@@ -18,7 +17,6 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
     "component",
     "variable"
 })
-@Generated("jsonschema2pojo")
 public class SetVariableResult {
 
     /**
@@ -30,7 +28,7 @@ public class SetVariableResult {
     @Valid
     private CustomData customData;
     /**
-     * Type of attribute: Actual, Target, MinSet, MaxSet. Default is Actual when omitted.
+     * Type of attribute: Actual, Target, MinSet, MaxSet. Default is Actual when omitted.
      * 
      * 
      */
@@ -38,7 +36,7 @@ public class SetVariableResult {
     @JsonPropertyDescription("Type of attribute: Actual, Target, MinSet, MaxSet. Default is Actual when omitted.\r\n")
     private AttributeEnum attributeType = AttributeEnum.fromValue("Actual");
     /**
-     * Result status of setting the variable.
+     * Result status of setting the variable.
      * 
      * (Required)
      * 
@@ -48,7 +46,7 @@ public class SetVariableResult {
     @NotNull
     private SetVariableStatusEnum attributeStatus;
     /**
-     * Element providing more information about the status.
+     * Element providing more information about the status.
      * 
      * 
      */
@@ -57,7 +55,7 @@ public class SetVariableResult {
     @Valid
     private StatusInfo attributeStatusInfo;
     /**
-     * A physical or logical component
+     * A physical or logical component
      * 
      * (Required)
      * 
@@ -68,7 +66,7 @@ public class SetVariableResult {
     @NotNull
     private Component component;
     /**
-     * Reference key to a component-variable.
+     * Reference key to a component-variable.
      * 
      * (Required)
      * 
@@ -103,7 +101,7 @@ public class SetVariableResult {
     }
 
     /**
-     * Type of attribute: Actual, Target, MinSet, MaxSet. Default is Actual when omitted.
+     * Type of attribute: Actual, Target, MinSet, MaxSet. Default is Actual when omitted.
      * 
      * 
      */
@@ -113,7 +111,7 @@ public class SetVariableResult {
     }
 
     /**
-     * Type of attribute: Actual, Target, MinSet, MaxSet. Default is Actual when omitted.
+     * Type of attribute: Actual, Target, MinSet, MaxSet. Default is Actual when omitted.
      * 
      * 
      */
@@ -128,7 +126,7 @@ public class SetVariableResult {
     }
 
     /**
-     * Result status of setting the variable.
+     * Result status of setting the variable.
      * 
      * (Required)
      * 
@@ -139,7 +137,7 @@ public class SetVariableResult {
     }
 
     /**
-     * Result status of setting the variable.
+     * Result status of setting the variable.
      * 
      * (Required)
      * 
@@ -155,7 +153,7 @@ public class SetVariableResult {
     }
 
     /**
-     * Element providing more information about the status.
+     * Element providing more information about the status.
      * 
      * 
      */
@@ -165,7 +163,7 @@ public class SetVariableResult {
     }
 
     /**
-     * Element providing more information about the status.
+     * Element providing more information about the status.
      * 
      * 
      */
@@ -180,7 +178,7 @@ public class SetVariableResult {
     }
 
     /**
-     * A physical or logical component
+     * A physical or logical component
      * 
      * (Required)
      * 
@@ -191,7 +189,7 @@ public class SetVariableResult {
     }
 
     /**
-     * A physical or logical component
+     * A physical or logical component
      * 
      * (Required)
      * 
@@ -207,7 +205,7 @@ public class SetVariableResult {
     }
 
     /**
-     * Reference key to a component-variable.
+     * Reference key to a component-variable.
      * 
      * (Required)
      * 
@@ -218,7 +216,7 @@ public class SetVariableResult {
     }
 
     /**
-     * Reference key to a component-variable.
+     * Reference key to a component-variable.
      * 
      * (Required)
      * 

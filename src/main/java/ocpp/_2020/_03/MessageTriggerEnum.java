@@ -3,17 +3,15 @@ package ocpp._2020._03;
 
 import java.util.HashMap;
 import java.util.Map;
-import javax.annotation.Generated;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 
 /**
- * Type of message to be triggered.
+ * Type of message to be triggered.
  * 
  * 
  */
-@Generated("jsonschema2pojo")
 public enum MessageTriggerEnum {
 
     BOOT_NOTIFICATION("BootNotification"),

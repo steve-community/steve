@@ -3,17 +3,15 @@ package ocpp._2020._03;
 
 import java.util.HashMap;
 import java.util.Map;
-import javax.annotation.Generated;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 
 /**
- * Applicable Network Interface.
+ * Applicable Network Interface.
  * 
  * 
  */
-@Generated("jsonschema2pojo")
 public enum OCPPInterfaceEnum {
 
     WIRED_0("Wired0"),

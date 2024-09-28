@@ -69,11 +69,17 @@ public class ChargePointServiceImpl implements ChargePointService {
     }
 
     @Override
-    public List<ChargePointSelect> getChargePointSelect(OcppProtocol protocol, List<String> inStatusFilter) {
+    public List<ChargePointSelect> getChargePointSelect(OcppProtocol protocol, List<String> inStatusFilter, List<String> chargeBoxIdFilter) {
         final OcppTransport transport = protocol.getTransport();
 
-        List<OcppChargeBox> result = chargeBoxRepository.findByOcppProtocolAndRegistrationStatuses(protocol.getCompositeValue(),
-                inStatusFilter);
+        List<OcppChargeBox> result = null;
+        if (chargeBoxIdFilter != null && !chargeBoxIdFilter.isEmpty()) {
+            result = chargeBoxRepository.findByOcppProtocolAndRegistrationStatusesAndChargeBoxIdIn(protocol.getCompositeValue(),
+                    inStatusFilter, chargeBoxIdFilter);
+        } else {
+            result = chargeBoxRepository.findByOcppProtocolAndRegistrationStatuses(protocol.getCompositeValue(),
+                    inStatusFilter);
+        }
         List<ChargePointSelect> ret = new ArrayList<>();
         for (OcppChargeBox r : result) {
             ret.add(new ChargePointSelect(transport, r.getChargeBoxId(), r.getEndpointAddress()));

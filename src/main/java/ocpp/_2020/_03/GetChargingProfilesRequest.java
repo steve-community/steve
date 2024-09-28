@@ -1,14 +1,13 @@
 
 package ocpp._2020._03;
 
-import javax.annotation.Generated;
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import de.rwth.idsg.ocpp.jaxb.RequestType;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
@@ -17,7 +16,6 @@ import de.rwth.idsg.ocpp.jaxb.RequestType;
     "evseId",
     "chargingProfile"
 })
-@Generated("jsonschema2pojo")
 public class GetChargingProfilesRequest implements RequestType
 {
 
@@ -30,7 +28,7 @@ public class GetChargingProfilesRequest implements RequestType
     @Valid
     private CustomData customData;
     /**
-     * Reference identification that is to be used by the Charging Station in the &lt;&lt;reportchargingprofilesrequest, ReportChargingProfilesRequest&gt;&gt; when provided.
+     * Reference identification that is to be used by the Charging Station in the &lt;&lt;reportchargingprofilesrequest, ReportChargingProfilesRequest&gt;&gt; when provided.
      * 
      * (Required)
      * 
@@ -40,7 +38,7 @@ public class GetChargingProfilesRequest implements RequestType
     @NotNull
     private Integer requestId;
     /**
-     * For which EVSE installed charging profiles SHALL be reported. If 0, only charging profiles installed on the Charging Station itself (the grid connection) SHALL be reported. If omitted, all installed charging profiles SHALL be reported.
+     * For which EVSE installed charging profiles SHALL be reported. If 0, only charging profiles installed on the Charging Station itself (the grid connection) SHALL be reported. If omitted, all installed charging profiles SHALL be reported.
      * 
      * 
      */
@@ -48,9 +46,9 @@ public class GetChargingProfilesRequest implements RequestType
     @JsonPropertyDescription("For which EVSE installed charging profiles SHALL be reported. If 0, only charging profiles installed on the Charging Station itself (the grid connection) SHALL be reported. If omitted, all installed charging profiles SHALL be reported.\r\n")
     private Integer evseId;
     /**
-     * Charging_ Profile
-     * urn:x-oca:ocpp:uid:2:233255
-     * A ChargingProfile consists of ChargingSchedule, describing the amount of power or current that can be delivered per time interval.
+     * Charging_ Profile
+     * urn:x-oca:ocpp:uid:2:233255
+     * A ChargingProfile consists of ChargingSchedule, describing the amount of power or current that can be delivered per time interval.
      * 
      * (Required)
      * 
@@ -85,7 +83,7 @@ public class GetChargingProfilesRequest implements RequestType
     }
 
     /**
-     * Reference identification that is to be used by the Charging Station in the &lt;&lt;reportchargingprofilesrequest, ReportChargingProfilesRequest&gt;&gt; when provided.
+     * Reference identification that is to be used by the Charging Station in the &lt;&lt;reportchargingprofilesrequest, ReportChargingProfilesRequest&gt;&gt; when provided.
      * 
      * (Required)
      * 
@@ -96,7 +94,7 @@ public class GetChargingProfilesRequest implements RequestType
     }
 
     /**
-     * Reference identification that is to be used by the Charging Station in the &lt;&lt;reportchargingprofilesrequest, ReportChargingProfilesRequest&gt;&gt; when provided.
+     * Reference identification that is to be used by the Charging Station in the &lt;&lt;reportchargingprofilesrequest, ReportChargingProfilesRequest&gt;&gt; when provided.
      * 
      * (Required)
      * 
@@ -112,7 +110,7 @@ public class GetChargingProfilesRequest implements RequestType
     }
 
     /**
-     * For which EVSE installed charging profiles SHALL be reported. If 0, only charging profiles installed on the Charging Station itself (the grid connection) SHALL be reported. If omitted, all installed charging profiles SHALL be reported.
+     * For which EVSE installed charging profiles SHALL be reported. If 0, only charging profiles installed on the Charging Station itself (the grid connection) SHALL be reported. If omitted, all installed charging profiles SHALL be reported.
      * 
      * 
      */
@@ -122,7 +120,7 @@ public class GetChargingProfilesRequest implements RequestType
     }
 
     /**
-     * For which EVSE installed charging profiles SHALL be reported. If 0, only charging profiles installed on the Charging Station itself (the grid connection) SHALL be reported. If omitted, all installed charging profiles SHALL be reported.
+     * For which EVSE installed charging profiles SHALL be reported. If 0, only charging profiles installed on the Charging Station itself (the grid connection) SHALL be reported. If omitted, all installed charging profiles SHALL be reported.
      * 
      * 
      */
@@ -137,9 +135,9 @@ public class GetChargingProfilesRequest implements RequestType
     }
 
     /**
-     * Charging_ Profile
-     * urn:x-oca:ocpp:uid:2:233255
-     * A ChargingProfile consists of ChargingSchedule, describing the amount of power or current that can be delivered per time interval.
+     * Charging_ Profile
+     * urn:x-oca:ocpp:uid:2:233255
+     * A ChargingProfile consists of ChargingSchedule, describing the amount of power or current that can be delivered per time interval.
      * 
      * (Required)
      * 
@@ -150,9 +148,9 @@ public class GetChargingProfilesRequest implements RequestType
     }
 
     /**
-     * Charging_ Profile
-     * urn:x-oca:ocpp:uid:2:233255
-     * A ChargingProfile consists of ChargingSchedule, describing the amount of power or current that can be delivered per time interval.
+     * Charging_ Profile
+     * urn:x-oca:ocpp:uid:2:233255
+     * A ChargingProfile consists of ChargingSchedule, describing the amount of power or current that can be delivered per time interval.
      * 
      * (Required)
      * 

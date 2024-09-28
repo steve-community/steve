@@ -1,15 +1,14 @@
 
 package ocpp._2020._03;
 
-import javax.annotation.Generated;
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import de.rwth.idsg.ocpp.jaxb.RequestType;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
@@ -20,7 +19,6 @@ import de.rwth.idsg.ocpp.jaxb.RequestType;
     "requestId",
     "retryInterval"
 })
-@Generated("jsonschema2pojo")
 public class PublishFirmwareRequest implements RequestType
 {
 
@@ -33,8 +31,8 @@ public class PublishFirmwareRequest implements RequestType
     @Valid
     private CustomData customData;
     /**
-     * This contains a string containing a URI pointing to a
-     * location from which to retrieve the firmware.
+     * This contains a string containing a URI pointing to a
+     * location from which to retrieve the firmware.
      * 
      * (Required)
      * 
@@ -45,9 +43,9 @@ public class PublishFirmwareRequest implements RequestType
     @NotNull
     private String location;
     /**
-     * This specifies how many times Charging Station must try
-     * to download the firmware before giving up. If this field is not
-     * present, it is left to Charging Station to decide how many times it wants to retry.
+     * This specifies how many times Charging Station must try
+     * to download the firmware before giving up. If this field is not
+     * present, it is left to Charging Station to decide how many times it wants to retry.
      * 
      * 
      */
@@ -55,7 +53,7 @@ public class PublishFirmwareRequest implements RequestType
     @JsonPropertyDescription("This specifies how many times Charging Station must try\r\nto download the firmware before giving up. If this field is not\r\npresent, it is left to Charging Station to decide how many times it wants to retry.\r\n")
     private Integer retries;
     /**
-     * The MD5 checksum over the entire firmware file as a hexadecimal string of length 32. 
+     * The MD5 checksum over the entire firmware file as a hexadecimal string of length 32. 
      * 
      * (Required)
      * 
@@ -66,7 +64,7 @@ public class PublishFirmwareRequest implements RequestType
     @NotNull
     private String checksum;
     /**
-     * The Id of the request.
+     * The Id of the request.
      * 
      * (Required)
      * 
@@ -76,12 +74,12 @@ public class PublishFirmwareRequest implements RequestType
     @NotNull
     private Integer requestId;
     /**
-     * The interval in seconds
-     * after which a retry may be
-     * attempted. If this field is not
-     * present, it is left to Charging
-     * Station to decide how long to wait
-     * between attempts.
+     * The interval in seconds
+     * after which a retry may be
+     * attempted. If this field is not
+     * present, it is left to Charging
+     * Station to decide how long to wait
+     * between attempts.
      * 
      * 
      */
@@ -113,8 +111,8 @@ public class PublishFirmwareRequest implements RequestType
     }
 
     /**
-     * This contains a string containing a URI pointing to a
-     * location from which to retrieve the firmware.
+     * This contains a string containing a URI pointing to a
+     * location from which to retrieve the firmware.
      * 
      * (Required)
      * 
@@ -125,8 +123,8 @@ public class PublishFirmwareRequest implements RequestType
     }
 
     /**
-     * This contains a string containing a URI pointing to a
-     * location from which to retrieve the firmware.
+     * This contains a string containing a URI pointing to a
+     * location from which to retrieve the firmware.
      * 
      * (Required)
      * 
@@ -142,9 +140,9 @@ public class PublishFirmwareRequest implements RequestType
     }
 
     /**
-     * This specifies how many times Charging Station must try
-     * to download the firmware before giving up. If this field is not
-     * present, it is left to Charging Station to decide how many times it wants to retry.
+     * This specifies how many times Charging Station must try
+     * to download the firmware before giving up. If this field is not
+     * present, it is left to Charging Station to decide how many times it wants to retry.
      * 
      * 
      */
@@ -154,9 +152,9 @@ public class PublishFirmwareRequest implements RequestType
     }
 
     /**
-     * This specifies how many times Charging Station must try
-     * to download the firmware before giving up. If this field is not
-     * present, it is left to Charging Station to decide how many times it wants to retry.
+     * This specifies how many times Charging Station must try
+     * to download the firmware before giving up. If this field is not
+     * present, it is left to Charging Station to decide how many times it wants to retry.
      * 
      * 
      */
@@ -171,7 +169,7 @@ public class PublishFirmwareRequest implements RequestType
     }
 
     /**
-     * The MD5 checksum over the entire firmware file as a hexadecimal string of length 32. 
+     * The MD5 checksum over the entire firmware file as a hexadecimal string of length 32. 
      * 
      * (Required)
      * 
@@ -182,7 +180,7 @@ public class PublishFirmwareRequest implements RequestType
     }
 
     /**
-     * The MD5 checksum over the entire firmware file as a hexadecimal string of length 32. 
+     * The MD5 checksum over the entire firmware file as a hexadecimal string of length 32. 
      * 
      * (Required)
      * 
@@ -198,7 +196,7 @@ public class PublishFirmwareRequest implements RequestType
     }
 
     /**
-     * The Id of the request.
+     * The Id of the request.
      * 
      * (Required)
      * 
@@ -209,7 +207,7 @@ public class PublishFirmwareRequest implements RequestType
     }
 
     /**
-     * The Id of the request.
+     * The Id of the request.
      * 
      * (Required)
      * 
@@ -225,12 +223,12 @@ public class PublishFirmwareRequest implements RequestType
     }
 
     /**
-     * The interval in seconds
-     * after which a retry may be
-     * attempted. If this field is not
-     * present, it is left to Charging
-     * Station to decide how long to wait
-     * between attempts.
+     * The interval in seconds
+     * after which a retry may be
+     * attempted. If this field is not
+     * present, it is left to Charging
+     * Station to decide how long to wait
+     * between attempts.
      * 
      * 
      */
@@ -240,12 +238,12 @@ public class PublishFirmwareRequest implements RequestType
     }
 
     /**
-     * The interval in seconds
-     * after which a retry may be
-     * attempted. If this field is not
-     * present, it is left to Charging
-     * Station to decide how long to wait
-     * between attempts.
+     * The interval in seconds
+     * after which a retry may be
+     * attempted. If this field is not
+     * present, it is left to Charging
+     * Station to decide how long to wait
+     * between attempts.
      * 
      * 
      */

@@ -6,9 +6,9 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ ubuntu-18.04, ubuntu-20.04 ]
-        java: [ '11', '15' ]
-        db: [ 'mysql:5.7.35', 'mysql:8.0', 'mariadb:10.3', 'mariadb:10.5' ]
+        os: [ ubuntu-20.04, ubuntu-22.04 ]
+        java: [ '17', '21' ]
+        db: [ 'mysql:8.0', 'mariadb:10.3', 'mariadb:10.4.30', 'mariadb:10.5.21', 'mariadb:10.6.14' ]
     runs-on: ${{ matrix.os }}
     services:
       mysql:
@@ -21,12 +21,12 @@ jobs:
         options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - name: Set up Java ${{ matrix.Java }}
-        uses: actions/setup-java@v2
+        uses: actions/setup-java@v4
         with:
           java-version: ${{ matrix.java }}
-          distribution: 'adopt'
+          distribution: 'temurin'
           cache: maven
 
       - name: Set up MySQL
@@ -35,11 +35,9 @@ jobs:
           mysql -h 127.0.0.1 -P 3306 -uroot -proot -e "CREATE DATABASE stevedb_test_2aa6a783d47d;" -v
           mysql -h 127.0.0.1 -P 3306 -uroot -proot -e "CREATE USER 'steve'@'%' IDENTIFIED BY 'changeme';" -v
           mysql -h 127.0.0.1 -P 3306 -uroot -proot -e "GRANT ALL PRIVILEGES ON stevedb_test_2aa6a783d47d.* TO 'steve'@'%';" -v
-          mysql -h 127.0.0.1 -P 3306 -uroot -proot -e "GRANT SELECT ON mysql.proc TO 'steve'@'%';" -v || true
-          mysql -h 127.0.0.1 -P 3306 -uroot -proot -e "GRANT SUPER ON *.* TO 'steve'@'%';" -v || true
 
       - name: Build with Maven
-        run: mvn -B -V -Dmaven.javadoc.skip=true -Ptest clean package --file pom.xml
+        run: ./mvnw -B -V -Dmaven.javadoc.skip=true -Ptest clean package --file pom.xml
 
       - name: Start the app and visit signin web page
         run: |

@@ -1,6 +1,6 @@
 variables:
   major: 2
-  minor: 2
+  minor: 3
   master: $[eq(variables['Build.SourceBranch'], 'refs/heads/master')]
   legacy_javax: $[eq(variables['Build.SourceBranch'], 'refs/heads/legacy_javax')]
 

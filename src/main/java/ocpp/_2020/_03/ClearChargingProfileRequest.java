@@ -1,13 +1,12 @@
 
 package ocpp._2020._03;
 
-import javax.annotation.Generated;
-import javax.validation.Valid;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import de.rwth.idsg.ocpp.jaxb.RequestType;
+import jakarta.validation.Valid;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
@@ -15,7 +14,6 @@ import de.rwth.idsg.ocpp.jaxb.RequestType;
     "chargingProfileId",
     "chargingProfileCriteria"
 })
-@Generated("jsonschema2pojo")
 public class ClearChargingProfileRequest implements RequestType
 {
 
@@ -28,7 +26,7 @@ public class ClearChargingProfileRequest implements RequestType
     @Valid
     private CustomData customData;
     /**
-     * The Id of the charging profile to clear.
+     * The Id of the charging profile to clear.
      * 
      * 
      */
@@ -36,9 +34,9 @@ public class ClearChargingProfileRequest implements RequestType
     @JsonPropertyDescription("The Id of the charging profile to clear.\r\n")
     private Integer chargingProfileId;
     /**
-     * Charging_ Profile
-     * urn:x-oca:ocpp:uid:2:233255
-     * A ChargingProfile consists of a ChargingSchedule, describing the amount of power or current that can be delivered per time interval.
+     * Charging_ Profile
+     * urn:x-oca:ocpp:uid:2:233255
+     * A ChargingProfile consists of a ChargingSchedule, describing the amount of power or current that can be delivered per time interval.
      * 
      * 
      */
@@ -71,7 +69,7 @@ public class ClearChargingProfileRequest implements RequestType
     }
 
     /**
-     * The Id of the charging profile to clear.
+     * The Id of the charging profile to clear.
      * 
      * 
      */
@@ -81,7 +79,7 @@ public class ClearChargingProfileRequest implements RequestType
     }
 
     /**
-     * The Id of the charging profile to clear.
+     * The Id of the charging profile to clear.
      * 
      * 
      */
@@ -96,9 +94,9 @@ public class ClearChargingProfileRequest implements RequestType
     }
 
     /**
-     * Charging_ Profile
-     * urn:x-oca:ocpp:uid:2:233255
-     * A ChargingProfile consists of a ChargingSchedule, describing the amount of power or current that can be delivered per time interval.
+     * Charging_ Profile
+     * urn:x-oca:ocpp:uid:2:233255
+     * A ChargingProfile consists of a ChargingSchedule, describing the amount of power or current that can be delivered per time interval.
      * 
      * 
      */
@@ -108,9 +106,9 @@ public class ClearChargingProfileRequest implements RequestType
     }
 
     /**
-     * Charging_ Profile
-     * urn:x-oca:ocpp:uid:2:233255
-     * A ChargingProfile consists of a ChargingSchedule, describing the amount of power or current that can be delivered per time interval.
+     * Charging_ Profile
+     * urn:x-oca:ocpp:uid:2:233255
+     * A ChargingProfile consists of a ChargingSchedule, describing the amount of power or current that can be delivered per time interval.
      * 
      * 
      */

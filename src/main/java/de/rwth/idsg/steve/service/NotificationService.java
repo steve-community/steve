@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2019 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
+ * Copyright (C) 2013-2024 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -142,7 +142,7 @@ public class NotificationService {
             .append("- startTimestamp: ").append(params.getStartTimestamp()).append(System.lineSeparator())
             .append("- startMeterValue: ").append(params.getStartMeterValue());
 
-        if (params.hasReservation()) {
+        if (params.isSetReservationId()) {
             sb.append(System.lineSeparator()).append("- reservationId: ").append(params.getReservationId());
         }
 

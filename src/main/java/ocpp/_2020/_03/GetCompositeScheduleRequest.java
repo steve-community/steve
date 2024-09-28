@@ -1,14 +1,13 @@
 
 package ocpp._2020._03;
 
-import javax.annotation.Generated;
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import de.rwth.idsg.ocpp.jaxb.RequestType;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
@@ -17,7 +16,6 @@ import de.rwth.idsg.ocpp.jaxb.RequestType;
     "chargingRateUnit",
     "evseId"
 })
-@Generated("jsonschema2pojo")
 public class GetCompositeScheduleRequest implements RequestType
 {
 
@@ -30,8 +28,8 @@ public class GetCompositeScheduleRequest implements RequestType
     @Valid
     private CustomData customData;
     /**
-     * Length of the requested schedule in seconds.
-     * 
+     * Length of the requested schedule in seconds.
+     * 
      * 
      * (Required)
      * 
@@ -41,8 +39,8 @@ public class GetCompositeScheduleRequest implements RequestType
     @NotNull
     private Integer duration;
     /**
-     * Can be used to force a power or current profile.
-     * 
+     * Can be used to force a power or current profile.
+     * 
      * 
      * 
      */
@@ -50,7 +48,7 @@ public class GetCompositeScheduleRequest implements RequestType
     @JsonPropertyDescription("Can be used to force a power or current profile.\r\n\r\n")
     private ChargingRateUnitEnum chargingRateUnit;
     /**
-     * The ID of the EVSE for which the schedule is requested. When evseid=0, the Charging Station will calculate the expected consumption for the grid connection.
+     * The ID of the EVSE for which the schedule is requested. When evseid=0, the Charging Station will calculate the expected consumption for the grid connection.
      * 
      * (Required)
      * 
@@ -84,8 +82,8 @@ public class GetCompositeScheduleRequest implements RequestType
     }
 
     /**
-     * Length of the requested schedule in seconds.
-     * 
+     * Length of the requested schedule in seconds.
+     * 
      * 
      * (Required)
      * 
@@ -96,8 +94,8 @@ public class GetCompositeScheduleRequest implements RequestType
     }
 
     /**
-     * Length of the requested schedule in seconds.
-     * 
+     * Length of the requested schedule in seconds.
+     * 
      * 
      * (Required)
      * 
@@ -113,8 +111,8 @@ public class GetCompositeScheduleRequest implements RequestType
     }
 
     /**
-     * Can be used to force a power or current profile.
-     * 
+     * Can be used to force a power or current profile.
+     * 
      * 
      * 
      */
@@ -124,8 +122,8 @@ public class GetCompositeScheduleRequest implements RequestType
     }
 
     /**
-     * Can be used to force a power or current profile.
-     * 
+     * Can be used to force a power or current profile.
+     * 
      * 
      * 
      */
@@ -140,7 +138,7 @@ public class GetCompositeScheduleRequest implements RequestType
     }
 
     /**
-     * The ID of the EVSE for which the schedule is requested. When evseid=0, the Charging Station will calculate the expected consumption for the grid connection.
+     * The ID of the EVSE for which the schedule is requested. When evseid=0, the Charging Station will calculate the expected consumption for the grid connection.
      * 
      * (Required)
      * 
@@ -151,7 +149,7 @@ public class GetCompositeScheduleRequest implements RequestType
     }
 
     /**
-     * The ID of the EVSE for which the schedule is requested. When evseid=0, the Charging Station will calculate the expected consumption for the grid connection.
+     * The ID of the EVSE for which the schedule is requested. When evseid=0, the Charging Station will calculate the expected consumption for the grid connection.
      * 
      * (Required)
      * 

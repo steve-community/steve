@@ -1,11 +1,11 @@
 
 package ocpp.cp._2015._10;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlSchemaType;
-import javax.xml.bind.annotation.XmlType;
 import de.rwth.idsg.ocpp.jaxb.RequestType;
+import jakarta.xml.bind.annotation.XmlAccessType;
+import jakarta.xml.bind.annotation.XmlAccessorType;
+import jakarta.xml.bind.annotation.XmlSchemaType;
+import jakarta.xml.bind.annotation.XmlType;
 import lombok.ToString;
 
 
@@ -116,16 +116,43 @@ public class GetCompositeScheduleRequest
         return (this.chargingRateUnit!= null);
     }
 
+    /**
+     * Sets the value of the connectorId property.
+     * 
+     * @param value
+     *     allowed object is
+     *     int
+     * @return
+     *     The class instance
+     */
     public GetCompositeScheduleRequest withConnectorId(int value) {
         setConnectorId(value);
         return this;
     }
 
+    /**
+     * Sets the value of the duration property.
+     * 
+     * @param value
+     *     allowed object is
+     *     int
+     * @return
+     *     The class instance
+     */
     public GetCompositeScheduleRequest withDuration(int value) {
         setDuration(value);
         return this;
     }
 
+    /**
+     * Sets the value of the chargingRateUnit property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link ChargingRateUnitType }
+     * @return
+     *     The class instance
+     */
     public GetCompositeScheduleRequest withChargingRateUnit(ChargingRateUnitType value) {
         setChargingRateUnit(value);
         return this;

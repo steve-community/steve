@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2019 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
+ * Copyright (C) 2013-2024 SteVe Community Team
  * All Rights Reserved.
  *
  * Parkl Digital Technologies
@@ -143,7 +143,7 @@ public class CentralSystemService16_Service {
             StatusNotificationRequest parameters, String chargeBoxIdentity) {
         log.info("Status notification on {}: {}", chargeBoxIdentity, parameters.getStatus().value());
         // Optional field
-        DateTime timestamp = parameters.isSetTimestamp() ? parameters.getTimestamp() : DateTime.now();
+        DateTime timestamp = parameters.getTimestamp()!=null ? parameters.getTimestamp() : DateTime.now();
 
         InsertConnectorStatusParams params =
                 InsertConnectorStatusParams.builder()
@@ -168,7 +168,7 @@ public class CentralSystemService16_Service {
     }
 
     public MeterValuesResponse meterValues(MeterValuesRequest parameters, String chargeBoxIdentity) {
-        Integer transactionId = parameters.getTransactionId();
+        Integer transactionId = getTransactionId(parameters);
         log.info("Meter values request for transaction: {} [chargeBox={}]", transactionId, chargeBoxIdentity);
 
         if (parameters.isSetMeterValue() && transactionId != null && transactionId > 0) {
@@ -190,6 +190,15 @@ public class CentralSystemService16_Service {
     }
 
     public StartTransactionResponse startTransaction(StartTransactionRequest parameters, String chargeBoxIdentity) {
+        // Get the authorization info of the user, before making tx changes (will affectAuthorizationStatus)
+        IdTagInfo info = ocppTagService.getIdTagInfo(
+                parameters.getIdTag(),
+                true,
+                chargeBoxIdentity,
+                parameters.getConnectorId(),
+                () -> new IdTagInfo().withStatus(AuthorizationStatus.INVALID) // IdTagInfo is required
+        );
+
         log.info("Starting transaction on {}...", chargeBoxIdentity);
         InsertTransactionParams params =
                 InsertTransactionParams.builder()
@@ -239,9 +248,6 @@ public class CentralSystemService16_Service {
 
         applicationEventPublisher.publishEvent(new OcppTransactionStarted(transactionId, params));
 
-        IdTagInfo info = new IdTagInfo();
-        info.setStatus(AuthorizationStatus.ACCEPTED);
-
         return new StartTransactionResponse()
                 .withIdTagInfo(info)
                 .withTransactionId(transactionId);
@@ -256,7 +262,9 @@ public class CentralSystemService16_Service {
         // Get the authorization info of the user, before making tx changes (will affectAuthorizationStatus)
         IdTagInfo idTagInfo = ocppTagService.getIdTagInfo(
                 parameters.getIdTag(),
-                false, chargeBoxIdentity,
+                false,
+                chargeBoxIdentity,
+                null,
                 () -> null
         );
 
@@ -301,7 +309,9 @@ public class CentralSystemService16_Service {
         IdTagInfo idTagInfo = ocppTagService.getIdTagInfo(parameters.getIdTag(),
                 false,
                 chargeBoxIdentity,
-                () -> new IdTagInfo().withStatus(INVALID));
+                null,
+                () -> new IdTagInfo().withStatus(AuthorizationStatus.INVALID)
+        );
 
         return new AuthorizeResponse().withIdTagInfo(idTagInfo);
     }
@@ -321,5 +331,20 @@ public class CentralSystemService16_Service {
         // OCPP requires a status to be set. Since this is a dummy impl, set it to "Accepted".
         // https://github.com/steve-community/steve/pull/36
         return new DataTransferResponse().withStatus(DataTransferStatus.ACCEPTED);
+    }
+
+    // -------------------------------------------------------------------------
+    // Helpers
+    // -------------------------------------------------------------------------
+
+    /**
+     * https://github.com/steve-community/steve/issues/1415
+     */
+    private Integer getTransactionId(MeterValuesRequest parameters) {
+        Integer transactionId = parameters.getTransactionId();
+        if (transactionId == null || transactionId == 0) {
+            return null;
+        }
+        return transactionId;
     }
 }

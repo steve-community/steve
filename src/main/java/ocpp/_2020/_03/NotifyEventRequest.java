@@ -3,15 +3,14 @@ package ocpp._2020._03;
 
 import java.util.ArrayList;
 import java.util.List;
-import javax.annotation.Generated;
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import de.rwth.idsg.ocpp.jaxb.RequestType;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import org.joda.time.DateTime;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -22,7 +21,6 @@ import org.joda.time.DateTime;
     "seqNo",
     "eventData"
 })
-@Generated("jsonschema2pojo")
 public class NotifyEventRequest implements RequestType
 {
 
@@ -35,7 +33,7 @@ public class NotifyEventRequest implements RequestType
     @Valid
     private CustomData customData;
     /**
-     * Timestamp of the moment this message was generated at the Charging Station.
+     * Timestamp of the moment this message was generated at the Charging Station.
      * 
      * (Required)
      * 
@@ -45,7 +43,7 @@ public class NotifyEventRequest implements RequestType
     @NotNull
     private DateTime generatedAt;
     /**
-     * “to be continued” indicator. Indicates whether another part of the report follows in an upcoming notifyEventRequest message. Default value when omitted is false. 
+     * “to be continued” indicator. Indicates whether another part of the report follows in an upcoming notifyEventRequest message. Default value when omitted is false. 
      * 
      * 
      */
@@ -53,7 +51,7 @@ public class NotifyEventRequest implements RequestType
     @JsonPropertyDescription("\u201cto be continued\u201d indicator. Indicates whether another part of the report follows in an upcoming notifyEventRequest message. Default value when omitted is false. \r\n")
     private Boolean tbc = false;
     /**
-     * Sequence number of this message. First message starts at 0.
+     * Sequence number of this message. First message starts at 0.
      * 
      * (Required)
      * 
@@ -97,7 +95,7 @@ public class NotifyEventRequest implements RequestType
     }
 
     /**
-     * Timestamp of the moment this message was generated at the Charging Station.
+     * Timestamp of the moment this message was generated at the Charging Station.
      * 
      * (Required)
      * 
@@ -108,7 +106,7 @@ public class NotifyEventRequest implements RequestType
     }
 
     /**
-     * Timestamp of the moment this message was generated at the Charging Station.
+     * Timestamp of the moment this message was generated at the Charging Station.
      * 
      * (Required)
      * 
@@ -124,7 +122,7 @@ public class NotifyEventRequest implements RequestType
     }
 
     /**
-     * “to be continued” indicator. Indicates whether another part of the report follows in an upcoming notifyEventRequest message. Default value when omitted is false. 
+     * “to be continued” indicator. Indicates whether another part of the report follows in an upcoming notifyEventRequest message. Default value when omitted is false. 
      * 
      * 
      */
@@ -134,7 +132,7 @@ public class NotifyEventRequest implements RequestType
     }
 
     /**
-     * “to be continued” indicator. Indicates whether another part of the report follows in an upcoming notifyEventRequest message. Default value when omitted is false. 
+     * “to be continued” indicator. Indicates whether another part of the report follows in an upcoming notifyEventRequest message. Default value when omitted is false. 
      * 
      * 
      */
@@ -149,7 +147,7 @@ public class NotifyEventRequest implements RequestType
     }
 
     /**
-     * Sequence number of this message. First message starts at 0.
+     * Sequence number of this message. First message starts at 0.
      * 
      * (Required)
      * 
@@ -160,7 +158,7 @@ public class NotifyEventRequest implements RequestType
     }
 
     /**
-     * Sequence number of this message. First message starts at 0.
+     * Sequence number of this message. First message starts at 0.
      * 
      * (Required)
      * 

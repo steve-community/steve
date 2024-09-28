@@ -1,15 +1,14 @@
 
 package ocpp._2020._03;
 
-import javax.annotation.Generated;
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import de.rwth.idsg.ocpp.jaxb.ResponseType;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
@@ -18,7 +17,6 @@ import de.rwth.idsg.ocpp.jaxb.ResponseType;
     "statusInfo",
     "transactionId"
 })
-@Generated("jsonschema2pojo")
 public class RequestStartTransactionResponse implements ResponseType
 {
 
@@ -31,7 +29,7 @@ public class RequestStartTransactionResponse implements ResponseType
     @Valid
     private CustomData customData;
     /**
-     * Status indicating whether the Charging Station accepts the request to start a transaction.
+     * Status indicating whether the Charging Station accepts the request to start a transaction.
      * 
      * (Required)
      * 
@@ -41,7 +39,7 @@ public class RequestStartTransactionResponse implements ResponseType
     @NotNull
     private RequestStartStopStatusEnum status;
     /**
-     * Element providing more information about the status.
+     * Element providing more information about the status.
      * 
      * 
      */
@@ -50,7 +48,7 @@ public class RequestStartTransactionResponse implements ResponseType
     @Valid
     private StatusInfo statusInfo;
     /**
-     * When the transaction was already started by the Charging Station before the RequestStartTransactionRequest was received, for example: cable plugged in first. This contains the transactionId of the already started transaction.
+     * When the transaction was already started by the Charging Station before the RequestStartTransactionRequest was received, for example: cable plugged in first. This contains the transactionId of the already started transaction.
      * 
      * 
      */
@@ -83,7 +81,7 @@ public class RequestStartTransactionResponse implements ResponseType
     }
 
     /**
-     * Status indicating whether the Charging Station accepts the request to start a transaction.
+     * Status indicating whether the Charging Station accepts the request to start a transaction.
      * 
      * (Required)
      * 
@@ -94,7 +92,7 @@ public class RequestStartTransactionResponse implements ResponseType
     }
 
     /**
-     * Status indicating whether the Charging Station accepts the request to start a transaction.
+     * Status indicating whether the Charging Station accepts the request to start a transaction.
      * 
      * (Required)
      * 
@@ -110,7 +108,7 @@ public class RequestStartTransactionResponse implements ResponseType
     }
 
     /**
-     * Element providing more information about the status.
+     * Element providing more information about the status.
      * 
      * 
      */
@@ -120,7 +118,7 @@ public class RequestStartTransactionResponse implements ResponseType
     }
 
     /**
-     * Element providing more information about the status.
+     * Element providing more information about the status.
      * 
      * 
      */
@@ -135,7 +133,7 @@ public class RequestStartTransactionResponse implements ResponseType
     }
 
     /**
-     * When the transaction was already started by the Charging Station before the RequestStartTransactionRequest was received, for example: cable plugged in first. This contains the transactionId of the already started transaction.
+     * When the transaction was already started by the Charging Station before the RequestStartTransactionRequest was received, for example: cable plugged in first. This contains the transactionId of the already started transaction.
      * 
      * 
      */
@@ -145,7 +143,7 @@ public class RequestStartTransactionResponse implements ResponseType
     }
 
     /**
-     * When the transaction was already started by the Charging Station before the RequestStartTransactionRequest was received, for example: cable plugged in first. This contains the transactionId of the already started transaction.
+     * When the transaction was already started by the Charging Station before the RequestStartTransactionRequest was received, for example: cable plugged in first. This contains the transactionId of the already started transaction.
      * 
      * 
      */

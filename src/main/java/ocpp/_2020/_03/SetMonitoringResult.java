@@ -1,17 +1,16 @@
 
 package ocpp._2020._03;
 
-import javax.annotation.Generated;
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 
 
 /**
- * Class to hold result of SetVariableMonitoring request.
+ * Class to hold result of SetVariableMonitoring request.
  * 
  * 
  */
@@ -26,7 +25,6 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
     "variable",
     "severity"
 })
-@Generated("jsonschema2pojo")
 public class SetMonitoringResult {
 
     /**
@@ -38,7 +36,7 @@ public class SetMonitoringResult {
     @Valid
     private CustomData customData;
     /**
-     * Id given to the VariableMonitor by the Charging Station. The Id is only returned when status is accepted. Installed VariableMonitors should have unique id's but the id's of removed Installed monitors should have unique id's but the id's of removed monitors MAY be reused.
+     * Id given to the VariableMonitor by the Charging Station. The Id is only returned when status is accepted. Installed VariableMonitors should have unique id's but the id's of removed Installed monitors should have unique id's but the id's of removed monitors MAY be reused.
      * 
      * 
      */
@@ -46,7 +44,7 @@ public class SetMonitoringResult {
     @JsonPropertyDescription("Id given to the VariableMonitor by the Charging Station. The Id is only returned when status is accepted. Installed VariableMonitors should have unique id's but the id's of removed Installed monitors should have unique id's but the id's of removed monitors MAY be reused.\r\n")
     private Integer id;
     /**
-     * Element providing more information about the status.
+     * Element providing more information about the status.
      * 
      * 
      */
@@ -55,7 +53,7 @@ public class SetMonitoringResult {
     @Valid
     private StatusInfo statusInfo;
     /**
-     * Status is OK if a value could be returned. Otherwise this will indicate the reason why a value could not be returned.
+     * Status is OK if a value could be returned. Otherwise this will indicate the reason why a value could not be returned.
      * 
      * (Required)
      * 
@@ -65,8 +63,8 @@ public class SetMonitoringResult {
     @NotNull
     private SetMonitoringStatusEnum status;
     /**
-     * The type of this monitor, e.g. a threshold, delta or periodic monitor. 
-     * 
+     * The type of this monitor, e.g. a threshold, delta or periodic monitor. 
+     * 
      * 
      * (Required)
      * 
@@ -76,7 +74,7 @@ public class SetMonitoringResult {
     @NotNull
     private MonitorEnum type;
     /**
-     * A physical or logical component
+     * A physical or logical component
      * 
      * (Required)
      * 
@@ -87,7 +85,7 @@ public class SetMonitoringResult {
     @NotNull
     private Component component;
     /**
-     * Reference key to a component-variable.
+     * Reference key to a component-variable.
      * 
      * (Required)
      * 
@@ -98,30 +96,30 @@ public class SetMonitoringResult {
     @NotNull
     private Variable variable;
     /**
-     * The severity that will be assigned to an event that is triggered by this monitor. The severity range is 0-9, with 0 as the highest and 9 as the lowest severity level.
-     * 
-     * The severity levels have the following meaning: +
-     * *0-Danger* +
-     * Indicates lives are potentially in danger. Urgent attention is needed and action should be taken immediately. +
-     * *1-Hardware Failure* +
-     * Indicates that the Charging Station is unable to continue regular operations due to Hardware issues. Action is required. +
-     * *2-System Failure* +
-     * Indicates that the Charging Station is unable to continue regular operations due to software or minor hardware issues. Action is required. +
-     * *3-Critical* +
-     * Indicates a critical error. Action is required. +
-     * *4-Error* +
-     * Indicates a non-urgent error. Action is required. +
-     * *5-Alert* +
-     * Indicates an alert event. Default severity for any type of monitoring event.  +
-     * *6-Warning* +
-     * Indicates a warning event. Action may be required. +
-     * *7-Notice* +
-     * Indicates an unusual event. No immediate action is required. +
-     * *8-Informational* +
-     * Indicates a regular operational event. May be used for reporting, measuring throughput, etc. No action is required. +
-     * *9-Debug* +
-     * Indicates information useful to developers for debugging, not useful during operations.
-     * 
+     * The severity that will be assigned to an event that is triggered by this monitor. The severity range is 0-9, with 0 as the highest and 9 as the lowest severity level.
+     * 
+     * The severity levels have the following meaning: +
+     * *0-Danger* +
+     * Indicates lives are potentially in danger. Urgent attention is needed and action should be taken immediately. +
+     * *1-Hardware Failure* +
+     * Indicates that the Charging Station is unable to continue regular operations due to Hardware issues. Action is required. +
+     * *2-System Failure* +
+     * Indicates that the Charging Station is unable to continue regular operations due to software or minor hardware issues. Action is required. +
+     * *3-Critical* +
+     * Indicates a critical error. Action is required. +
+     * *4-Error* +
+     * Indicates a non-urgent error. Action is required. +
+     * *5-Alert* +
+     * Indicates an alert event. Default severity for any type of monitoring event.  +
+     * *6-Warning* +
+     * Indicates a warning event. Action may be required. +
+     * *7-Notice* +
+     * Indicates an unusual event. No immediate action is required. +
+     * *8-Informational* +
+     * Indicates a regular operational event. May be used for reporting, measuring throughput, etc. No action is required. +
+     * *9-Debug* +
+     * Indicates information useful to developers for debugging, not useful during operations.
+     * 
      * 
      * (Required)
      * 
@@ -155,7 +153,7 @@ public class SetMonitoringResult {
     }
 
     /**
-     * Id given to the VariableMonitor by the Charging Station. The Id is only returned when status is accepted. Installed VariableMonitors should have unique id's but the id's of removed Installed monitors should have unique id's but the id's of removed monitors MAY be reused.
+     * Id given to the VariableMonitor by the Charging Station. The Id is only returned when status is accepted. Installed VariableMonitors should have unique id's but the id's of removed Installed monitors should have unique id's but the id's of removed monitors MAY be reused.
      * 
      * 
      */
@@ -165,7 +163,7 @@ public class SetMonitoringResult {
     }
 
     /**
-     * Id given to the VariableMonitor by the Charging Station. The Id is only returned when status is accepted. Installed VariableMonitors should have unique id's but the id's of removed Installed monitors should have unique id's but the id's of removed monitors MAY be reused.
+     * Id given to the VariableMonitor by the Charging Station. The Id is only returned when status is accepted. Installed VariableMonitors should have unique id's but the id's of removed Installed monitors should have unique id's but the id's of removed monitors MAY be reused.
      * 
      * 
      */
@@ -180,7 +178,7 @@ public class SetMonitoringResult {
     }
 
     /**
-     * Element providing more information about the status.
+     * Element providing more information about the status.
      * 
      * 
      */
@@ -190,7 +188,7 @@ public class SetMonitoringResult {
     }
 
     /**
-     * Element providing more information about the status.
+     * Element providing more information about the status.
      * 
      * 
      */
@@ -205,7 +203,7 @@ public class SetMonitoringResult {
     }
 
     /**
-     * Status is OK if a value could be returned. Otherwise this will indicate the reason why a value could not be returned.
+     * Status is OK if a value could be returned. Otherwise this will indicate the reason why a value could not be returned.
      * 
      * (Required)
      * 
@@ -216,7 +214,7 @@ public class SetMonitoringResult {
     }
 
     /**
-     * Status is OK if a value could be returned. Otherwise this will indicate the reason why a value could not be returned.
+     * Status is OK if a value could be returned. Otherwise this will indicate the reason why a value could not be returned.
      * 
      * (Required)
      * 
@@ -232,8 +230,8 @@ public class SetMonitoringResult {
     }
 
     /**
-     * The type of this monitor, e.g. a threshold, delta or periodic monitor. 
-     * 
+     * The type of this monitor, e.g. a threshold, delta or periodic monitor. 
+     * 
      * 
      * (Required)
      * 
@@ -244,8 +242,8 @@ public class SetMonitoringResult {
     }
 
     /**
-     * The type of this monitor, e.g. a threshold, delta or periodic monitor. 
-     * 
+     * The type of this monitor, e.g. a threshold, delta or periodic monitor. 
+     * 
      * 
      * (Required)
      * 
@@ -261,7 +259,7 @@ public class SetMonitoringResult {
     }
 
     /**
-     * A physical or logical component
+     * A physical or logical component
      * 
      * (Required)
      * 
@@ -272,7 +270,7 @@ public class SetMonitoringResult {
     }
 
     /**
-     * A physical or logical component
+     * A physical or logical component
      * 
      * (Required)
      * 
@@ -288,7 +286,7 @@ public class SetMonitoringResult {
     }
 
     /**
-     * Reference key to a component-variable.
+     * Reference key to a component-variable.
      * 
      * (Required)
      * 
@@ -299,7 +297,7 @@ public class SetMonitoringResult {
     }
 
     /**
-     * Reference key to a component-variable.
+     * Reference key to a component-variable.
      * 
      * (Required)
      * 
@@ -315,30 +313,30 @@ public class SetMonitoringResult {
     }
 
     /**
-     * The severity that will be assigned to an event that is triggered by this monitor. The severity range is 0-9, with 0 as the highest and 9 as the lowest severity level.
-     * 
-     * The severity levels have the following meaning: +
-     * *0-Danger* +
-     * Indicates lives are potentially in danger. Urgent attention is needed and action should be taken immediately. +
-     * *1-Hardware Failure* +
-     * Indicates that the Charging Station is unable to continue regular operations due to Hardware issues. Action is required. +
-     * *2-System Failure* +
-     * Indicates that the Charging Station is unable to continue regular operations due to software or minor hardware issues. Action is required. +
-     * *3-Critical* +
-     * Indicates a critical error. Action is required. +
-     * *4-Error* +
-     * Indicates a non-urgent error. Action is required. +
-     * *5-Alert* +
-     * Indicates an alert event. Default severity for any type of monitoring event.  +
-     * *6-Warning* +
-     * Indicates a warning event. Action may be required. +
-     * *7-Notice* +
-     * Indicates an unusual event. No immediate action is required. +
-     * *8-Informational* +
-     * Indicates a regular operational event. May be used for reporting, measuring throughput, etc. No action is required. +
-     * *9-Debug* +
-     * Indicates information useful to developers for debugging, not useful during operations.
-     * 
+     * The severity that will be assigned to an event that is triggered by this monitor. The severity range is 0-9, with 0 as the highest and 9 as the lowest severity level.
+     * 
+     * The severity levels have the following meaning: +
+     * *0-Danger* +
+     * Indicates lives are potentially in danger. Urgent attention is needed and action should be taken immediately. +
+     * *1-Hardware Failure* +
+     * Indicates that the Charging Station is unable to continue regular operations due to Hardware issues. Action is required. +
+     * *2-System Failure* +
+     * Indicates that the Charging Station is unable to continue regular operations due to software or minor hardware issues. Action is required. +
+     * *3-Critical* +
+     * Indicates a critical error. Action is required. +
+     * *4-Error* +
+     * Indicates a non-urgent error. Action is required. +
+     * *5-Alert* +
+     * Indicates an alert event. Default severity for any type of monitoring event.  +
+     * *6-Warning* +
+     * Indicates a warning event. Action may be required. +
+     * *7-Notice* +
+     * Indicates an unusual event. No immediate action is required. +
+     * *8-Informational* +
+     * Indicates a regular operational event. May be used for reporting, measuring throughput, etc. No action is required. +
+     * *9-Debug* +
+     * Indicates information useful to developers for debugging, not useful during operations.
+     * 
      * 
      * (Required)
      * 
@@ -349,30 +347,30 @@ public class SetMonitoringResult {
     }
 
     /**
-     * The severity that will be assigned to an event that is triggered by this monitor. The severity range is 0-9, with 0 as the highest and 9 as the lowest severity level.
-     * 
-     * The severity levels have the following meaning: +
-     * *0-Danger* +
-     * Indicates lives are potentially in danger. Urgent attention is needed and action should be taken immediately. +
-     * *1-Hardware Failure* +
-     * Indicates that the Charging Station is unable to continue regular operations due to Hardware issues. Action is required. +
-     * *2-System Failure* +
-     * Indicates that the Charging Station is unable to continue regular operations due to software or minor hardware issues. Action is required. +
-     * *3-Critical* +
-     * Indicates a critical error. Action is required. +
-     * *4-Error* +
-     * Indicates a non-urgent error. Action is required. +
-     * *5-Alert* +
-     * Indicates an alert event. Default severity for any type of monitoring event.  +
-     * *6-Warning* +
-     * Indicates a warning event. Action may be required. +
-     * *7-Notice* +
-     * Indicates an unusual event. No immediate action is required. +
-     * *8-Informational* +
-     * Indicates a regular operational event. May be used for reporting, measuring throughput, etc. No action is required. +
-     * *9-Debug* +
-     * Indicates information useful to developers for debugging, not useful during operations.
-     * 
+     * The severity that will be assigned to an event that is triggered by this monitor. The severity range is 0-9, with 0 as the highest and 9 as the lowest severity level.
+     * 
+     * The severity levels have the following meaning: +
+     * *0-Danger* +
+     * Indicates lives are potentially in danger. Urgent attention is needed and action should be taken immediately. +
+     * *1-Hardware Failure* +
+     * Indicates that the Charging Station is unable to continue regular operations due to Hardware issues. Action is required. +
+     * *2-System Failure* +
+     * Indicates that the Charging Station is unable to continue regular operations due to software or minor hardware issues. Action is required. +
+     * *3-Critical* +
+     * Indicates a critical error. Action is required. +
+     * *4-Error* +
+     * Indicates a non-urgent error. Action is required. +
+     * *5-Alert* +
+     * Indicates an alert event. Default severity for any type of monitoring event.  +
+     * *6-Warning* +
+     * Indicates a warning event. Action may be required. +
+     * *7-Notice* +
+     * Indicates an unusual event. No immediate action is required. +
+     * *8-Informational* +
+     * Indicates a regular operational event. May be used for reporting, measuring throughput, etc. No action is required. +
+     * *9-Debug* +
+     * Indicates information useful to developers for debugging, not useful during operations.
+     * 
      * 
      * (Required)
      * 

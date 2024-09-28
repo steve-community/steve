@@ -1,21 +1,20 @@
 
 package ocpp._2020._03;
 
-import javax.annotation.Generated;
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import org.joda.time.DateTime;
 
 
 /**
- * Message_ Info
- * urn:x-enexis:ecdm:uid:2:233264
- * Contains message details, for a message to be displayed on a Charging Station.
+ * Message_ Info
+ * urn:x-enexis:ecdm:uid:2:233264
+ * Contains message details, for a message to be displayed on a Charging Station.
  * 
  * 
  */
@@ -31,7 +30,6 @@ import org.joda.time.DateTime;
     "transactionId",
     "message"
 })
-@Generated("jsonschema2pojo")
 public class MessageInfo {
 
     /**
@@ -43,7 +41,7 @@ public class MessageInfo {
     @Valid
     private CustomData customData;
     /**
-     * A physical or logical component
+     * A physical or logical component
      * 
      * 
      */
@@ -52,9 +50,9 @@ public class MessageInfo {
     @Valid
     private Component display;
     /**
-     * Identified_ Object. MRID. Numeric_ Identifier
-     * urn:x-enexis:ecdm:uid:1:569198
-     * Master resource identifier, unique within an exchange context. It is defined within the OCPP context as a positive Integer value (greater or equal to zero).
+     * Identified_ Object. MRID. Numeric_ Identifier
+     * urn:x-enexis:ecdm:uid:1:569198
+     * Master resource identifier, unique within an exchange context. It is defined within the OCPP context as a positive Integer value (greater or equal to zero).
      * 
      * (Required)
      * 
@@ -64,9 +62,9 @@ public class MessageInfo {
     @NotNull
     private Integer id;
     /**
-     * Message_ Info. Priority. Message_ Priority_ Code
-     * urn:x-enexis:ecdm:uid:1:569253
-     * With what priority should this message be shown
+     * Message_ Info. Priority. Message_ Priority_ Code
+     * urn:x-enexis:ecdm:uid:1:569253
+     * With what priority should this message be shown
      * 
      * (Required)
      * 
@@ -76,9 +74,9 @@ public class MessageInfo {
     @NotNull
     private MessagePriorityEnum priority;
     /**
-     * Message_ Info. State. Message_ State_ Code
-     * urn:x-enexis:ecdm:uid:1:569254
-     * During what state should this message be shown. When omitted this message should be shown in any state of the Charging Station.
+     * Message_ Info. State. Message_ State_ Code
+     * urn:x-enexis:ecdm:uid:1:569254
+     * During what state should this message be shown. When omitted this message should be shown in any state of the Charging Station.
      * 
      * 
      */
@@ -86,9 +84,9 @@ public class MessageInfo {
     @JsonPropertyDescription("Message_ Info. State. Message_ State_ Code\r\nurn:x-enexis:ecdm:uid:1:569254\r\nDuring what state should this message be shown. When omitted this message should be shown in any state of the Charging Station.\r\n")
     private MessageStateEnum state;
     /**
-     * Message_ Info. Start. Date_ Time
-     * urn:x-enexis:ecdm:uid:1:569256
-     * From what date-time should this message be shown. If omitted: directly.
+     * Message_ Info. Start. Date_ Time
+     * urn:x-enexis:ecdm:uid:1:569256
+     * From what date-time should this message be shown. If omitted: directly.
      * 
      * 
      */
@@ -96,9 +94,9 @@ public class MessageInfo {
     @JsonPropertyDescription("Message_ Info. Start. Date_ Time\r\nurn:x-enexis:ecdm:uid:1:569256\r\nFrom what date-time should this message be shown. If omitted: directly.\r\n")
     private DateTime startDateTime;
     /**
-     * Message_ Info. End. Date_ Time
-     * urn:x-enexis:ecdm:uid:1:569257
-     * Until what date-time should this message be shown, after this date/time this message SHALL be removed.
+     * Message_ Info. End. Date_ Time
+     * urn:x-enexis:ecdm:uid:1:569257
+     * Until what date-time should this message be shown, after this date/time this message SHALL be removed.
      * 
      * 
      */
@@ -106,9 +104,9 @@ public class MessageInfo {
     @JsonPropertyDescription("Message_ Info. End. Date_ Time\r\nurn:x-enexis:ecdm:uid:1:569257\r\nUntil what date-time should this message be shown, after this date/time this message SHALL be removed.\r\n")
     private DateTime endDateTime;
     /**
-     * During which transaction shall this message be shown.
-     * Message SHALL be removed by the Charging Station after transaction has
-     * ended.
+     * During which transaction shall this message be shown.
+     * Message SHALL be removed by the Charging Station after transaction has
+     * ended.
      * 
      * 
      */
@@ -117,10 +115,10 @@ public class MessageInfo {
     @Size(max = 36)
     private String transactionId;
     /**
-     * Message_ Content
-     * urn:x-enexis:ecdm:uid:2:234490
-     * Contains message details, for a message to be displayed on a Charging Station.
-     * 
+     * Message_ Content
+     * urn:x-enexis:ecdm:uid:2:234490
+     * Contains message details, for a message to be displayed on a Charging Station.
+     * 
      * 
      * (Required)
      * 
@@ -155,7 +153,7 @@ public class MessageInfo {
     }
 
     /**
-     * A physical or logical component
+     * A physical or logical component
      * 
      * 
      */
@@ -165,7 +163,7 @@ public class MessageInfo {
     }
 
     /**
-     * A physical or logical component
+     * A physical or logical component
      * 
      * 
      */
@@ -180,9 +178,9 @@ public class MessageInfo {
     }
 
     /**
-     * Identified_ Object. MRID. Numeric_ Identifier
-     * urn:x-enexis:ecdm:uid:1:569198
-     * Master resource identifier, unique within an exchange context. It is defined within the OCPP context as a positive Integer value (greater or equal to zero).
+     * Identified_ Object. MRID. Numeric_ Identifier
+     * urn:x-enexis:ecdm:uid:1:569198
+     * Master resource identifier, unique within an exchange context. It is defined within the OCPP context as a positive Integer value (greater or equal to zero).
      * 
      * (Required)
      * 
@@ -193,9 +191,9 @@ public class MessageInfo {
     }
 
     /**
-     * Identified_ Object. MRID. Numeric_ Identifier
-     * urn:x-enexis:ecdm:uid:1:569198
-     * Master resource identifier, unique within an exchange context. It is defined within the OCPP context as a positive Integer value (greater or equal to zero).
+     * Identified_ Object. MRID. Numeric_ Identifier
+     * urn:x-enexis:ecdm:uid:1:569198
+     * Master resource identifier, unique within an exchange context. It is defined within the OCPP context as a positive Integer value (greater or equal to zero).
      * 
      * (Required)
      * 
@@ -211,9 +209,9 @@ public class MessageInfo {
     }
 
     /**
-     * Message_ Info. Priority. Message_ Priority_ Code
-     * urn:x-enexis:ecdm:uid:1:569253
-     * With what priority should this message be shown
+     * Message_ Info. Priority. Message_ Priority_ Code
+     * urn:x-enexis:ecdm:uid:1:569253
+     * With what priority should this message be shown
      * 
      * (Required)
      * 
@@ -224,9 +222,9 @@ public class MessageInfo {
     }
 
     /**
-     * Message_ Info. Priority. Message_ Priority_ Code
-     * urn:x-enexis:ecdm:uid:1:569253
-     * With what priority should this message be shown
+     * Message_ Info. Priority. Message_ Priority_ Code
+     * urn:x-enexis:ecdm:uid:1:569253
+     * With what priority should this message be shown
      * 
      * (Required)
      * 
@@ -242,9 +240,9 @@ public class MessageInfo {
     }
 
     /**
-     * Message_ Info. State. Message_ State_ Code
-     * urn:x-enexis:ecdm:uid:1:569254
-     * During what state should this message be shown. When omitted this message should be shown in any state of the Charging Station.
+     * Message_ Info. State. Message_ State_ Code
+     * urn:x-enexis:ecdm:uid:1:569254
+     * During what state should this message be shown. When omitted this message should be shown in any state of the Charging Station.
      * 
      * 
      */
@@ -254,9 +252,9 @@ public class MessageInfo {
     }
 
     /**
-     * Message_ Info. State. Message_ State_ Code
-     * urn:x-enexis:ecdm:uid:1:569254
-     * During what state should this message be shown. When omitted this message should be shown in any state of the Charging Station.
+     * Message_ Info. State. Message_ State_ Code
+     * urn:x-enexis:ecdm:uid:1:569254
+     * During what state should this message be shown. When omitted this message should be shown in any state of the Charging Station.
      * 
      * 
      */
@@ -271,9 +269,9 @@ public class MessageInfo {
     }
 
     /**
-     * Message_ Info. Start. Date_ Time
-     * urn:x-enexis:ecdm:uid:1:569256
-     * From what date-time should this message be shown. If omitted: directly.
+     * Message_ Info. Start. Date_ Time
+     * urn:x-enexis:ecdm:uid:1:569256
+     * From what date-time should this message be shown. If omitted: directly.
      * 
      * 
      */
@@ -283,9 +281,9 @@ public class MessageInfo {
     }
 
     /**
-     * Message_ Info. Start. Date_ Time
-     * urn:x-enexis:ecdm:uid:1:569256
-     * From what date-time should this message be shown. If omitted: directly.
+     * Message_ Info. Start. Date_ Time
+     * urn:x-enexis:ecdm:uid:1:569256
+     * From what date-time should this message be shown. If omitted: directly.
      * 
      * 
      */
@@ -300,9 +298,9 @@ public class MessageInfo {
     }
 
     /**
-     * Message_ Info. End. Date_ Time
-     * urn:x-enexis:ecdm:uid:1:569257
-     * Until what date-time should this message be shown, after this date/time this message SHALL be removed.
+     * Message_ Info. End. Date_ Time
+     * urn:x-enexis:ecdm:uid:1:569257
+     * Until what date-time should this message be shown, after this date/time this message SHALL be removed.
      * 
      * 
      */
@@ -312,9 +310,9 @@ public class MessageInfo {
     }
 
     /**
-     * Message_ Info. End. Date_ Time
-     * urn:x-enexis:ecdm:uid:1:569257
-     * Until what date-time should this message be shown, after this date/time this message SHALL be removed.
+     * Message_ Info. End. Date_ Time
+     * urn:x-enexis:ecdm:uid:1:569257
+     * Until what date-time should this message be shown, after this date/time this message SHALL be removed.
      * 
      * 
      */
@@ -329,9 +327,9 @@ public class MessageInfo {
     }
 
     /**
-     * During which transaction shall this message be shown.
-     * Message SHALL be removed by the Charging Station after transaction has
-     * ended.
+     * During which transaction shall this message be shown.
+     * Message SHALL be removed by the Charging Station after transaction has
+     * ended.
      * 
      * 
      */
@@ -341,9 +339,9 @@ public class MessageInfo {
     }
 
     /**
-     * During which transaction shall this message be shown.
-     * Message SHALL be removed by the Charging Station after transaction has
-     * ended.
+     * During which transaction shall this message be shown.
+     * Message SHALL be removed by the Charging Station after transaction has
+     * ended.
      * 
      * 
      */
@@ -358,10 +356,10 @@ public class MessageInfo {
     }
 
     /**
-     * Message_ Content
-     * urn:x-enexis:ecdm:uid:2:234490
-     * Contains message details, for a message to be displayed on a Charging Station.
-     * 
+     * Message_ Content
+     * urn:x-enexis:ecdm:uid:2:234490
+     * Contains message details, for a message to be displayed on a Charging Station.
+     * 
      * 
      * (Required)
      * 
@@ -372,10 +370,10 @@ public class MessageInfo {
     }
 
     /**
-     * Message_ Content
-     * urn:x-enexis:ecdm:uid:2:234490
-     * Contains message details, for a message to be displayed on a Charging Station.
-     * 
+     * Message_ Content
+     * urn:x-enexis:ecdm:uid:2:234490
+     * Contains message details, for a message to be displayed on a Charging Station.
+     * 
      * 
      * (Required)
      * 

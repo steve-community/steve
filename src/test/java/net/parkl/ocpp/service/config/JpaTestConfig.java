@@ -1,5 +1,6 @@
 package net.parkl.ocpp.service.config;
 
+import com.mysql.jdbc.Driver;
 import org.hibernate.dialect.H2Dialect;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -47,8 +48,8 @@ public class JpaTestConfig {
     @Primary
     public DataSource dataSource() {
         DriverManagerDataSource ds = new DriverManagerDataSource();
-        ds.setDriverClassName(org.h2.Driver.class.getName());
-        ds.setUrl("jdbc:h2:mem:steve;MODE=HSQLDB;DB_CLOSE_DELAY=-1");
+        ds.setDriverClassName(Driver.class.getName());
+        ds.setUrl("jdbc:h2:mem:steve;MODE=MySQL;DB_CLOSE_DELAY=-1;NON_KEYWORDS=VALUE");
         return ds;
     }
 }

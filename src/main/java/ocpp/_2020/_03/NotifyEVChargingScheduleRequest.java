@@ -1,14 +1,13 @@
 
 package ocpp._2020._03;
 
-import javax.annotation.Generated;
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import de.rwth.idsg.ocpp.jaxb.RequestType;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import org.joda.time.DateTime;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -18,7 +17,6 @@ import org.joda.time.DateTime;
     "chargingSchedule",
     "evseId"
 })
-@Generated("jsonschema2pojo")
 public class NotifyEVChargingScheduleRequest implements RequestType
 {
 
@@ -31,7 +29,7 @@ public class NotifyEVChargingScheduleRequest implements RequestType
     @Valid
     private CustomData customData;
     /**
-     * Periods contained in the charging profile are relative to this point in time.
+     * Periods contained in the charging profile are relative to this point in time.
      * 
      * (Required)
      * 
@@ -41,9 +39,9 @@ public class NotifyEVChargingScheduleRequest implements RequestType
     @NotNull
     private DateTime timeBase;
     /**
-     * Charging_ Schedule
-     * urn:x-oca:ocpp:uid:2:233256
-     * Charging schedule structure defines a list of charging periods, as used in: GetCompositeSchedule.conf and ChargingProfile. 
+     * Charging_ Schedule
+     * urn:x-oca:ocpp:uid:2:233256
+     * Charging schedule structure defines a list of charging periods, as used in: GetCompositeSchedule.conf and ChargingProfile. 
      * 
      * (Required)
      * 
@@ -54,7 +52,7 @@ public class NotifyEVChargingScheduleRequest implements RequestType
     @NotNull
     private ChargingSchedule chargingSchedule;
     /**
-     * The charging schedule contained in this notification applies to an EVSE. EvseId must be &gt; 0.
+     * The charging schedule contained in this notification applies to an EVSE. EvseId must be &gt; 0.
      * 
      * (Required)
      * 
@@ -88,7 +86,7 @@ public class NotifyEVChargingScheduleRequest implements RequestType
     }
 
     /**
-     * Periods contained in the charging profile are relative to this point in time.
+     * Periods contained in the charging profile are relative to this point in time.
      * 
      * (Required)
      * 
@@ -99,7 +97,7 @@ public class NotifyEVChargingScheduleRequest implements RequestType
     }
 
     /**
-     * Periods contained in the charging profile are relative to this point in time.
+     * Periods contained in the charging profile are relative to this point in time.
      * 
      * (Required)
      * 
@@ -115,9 +113,9 @@ public class NotifyEVChargingScheduleRequest implements RequestType
     }
 
     /**
-     * Charging_ Schedule
-     * urn:x-oca:ocpp:uid:2:233256
-     * Charging schedule structure defines a list of charging periods, as used in: GetCompositeSchedule.conf and ChargingProfile. 
+     * Charging_ Schedule
+     * urn:x-oca:ocpp:uid:2:233256
+     * Charging schedule structure defines a list of charging periods, as used in: GetCompositeSchedule.conf and ChargingProfile. 
      * 
      * (Required)
      * 
@@ -128,9 +126,9 @@ public class NotifyEVChargingScheduleRequest implements RequestType
     }
 
     /**
-     * Charging_ Schedule
-     * urn:x-oca:ocpp:uid:2:233256
-     * Charging schedule structure defines a list of charging periods, as used in: GetCompositeSchedule.conf and ChargingProfile. 
+     * Charging_ Schedule
+     * urn:x-oca:ocpp:uid:2:233256
+     * Charging schedule structure defines a list of charging periods, as used in: GetCompositeSchedule.conf and ChargingProfile. 
      * 
      * (Required)
      * 
@@ -146,7 +144,7 @@ public class NotifyEVChargingScheduleRequest implements RequestType
     }
 
     /**
-     * The charging schedule contained in this notification applies to an EVSE. EvseId must be &gt; 0.
+     * The charging schedule contained in this notification applies to an EVSE. EvseId must be &gt; 0.
      * 
      * (Required)
      * 
@@ -157,7 +155,7 @@ public class NotifyEVChargingScheduleRequest implements RequestType
     }
 
     /**
-     * The charging schedule contained in this notification applies to an EVSE. EvseId must be &gt; 0.
+     * The charging schedule contained in this notification applies to an EVSE. EvseId must be &gt; 0.
      * 
      * (Required)
      * 

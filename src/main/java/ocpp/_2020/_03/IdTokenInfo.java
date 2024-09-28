@@ -3,22 +3,21 @@ package ocpp._2020._03;
 
 import java.util.ArrayList;
 import java.util.List;
-import javax.annotation.Generated;
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import org.joda.time.DateTime;
 
 
 /**
- * ID_ Token
- * urn:x-oca:ocpp:uid:2:233247
- * Contains status information about an identifier.
- * It is advised to not stop charging for a token that expires during charging, as ExpiryDate is only used for caching purposes. If ExpiryDate is not given, the status has no end date.
+ * ID_ Token
+ * urn:x-oca:ocpp:uid:2:233247
+ * Contains status information about an identifier.
+ * It is advised to not stop charging for a token that expires during charging, as ExpiryDate is only used for caching purposes. If ExpiryDate is not given, the status has no end date.
  * 
  * 
  */
@@ -34,7 +33,6 @@ import org.joda.time.DateTime;
     "language2",
     "personalMessage"
 })
-@Generated("jsonschema2pojo")
 public class IdTokenInfo {
 
     /**
@@ -46,9 +44,9 @@ public class IdTokenInfo {
     @Valid
     private CustomData customData;
     /**
-     * ID_ Token. Status. Authorization_ Status
-     * urn:x-oca:ocpp:uid:1:569372
-     * Current status of the ID Token.
+     * ID_ Token. Status. Authorization_ Status
+     * urn:x-oca:ocpp:uid:1:569372
+     * Current status of the ID Token.
      * 
      * (Required)
      * 
@@ -58,9 +56,9 @@ public class IdTokenInfo {
     @NotNull
     private AuthorizationStatusEnum status;
     /**
-     * ID_ Token. Expiry. Date_ Time
-     * urn:x-oca:ocpp:uid:1:569373
-     * Date and Time after which the token must be considered invalid.
+     * ID_ Token. Expiry. Date_ Time
+     * urn:x-oca:ocpp:uid:1:569373
+     * Date and Time after which the token must be considered invalid.
      * 
      * 
      */
@@ -68,7 +66,7 @@ public class IdTokenInfo {
     @JsonPropertyDescription("ID_ Token. Expiry. Date_ Time\r\nurn:x-oca:ocpp:uid:1:569373\r\nDate and Time after which the token must be considered invalid.\r\n")
     private DateTime cacheExpiryDateTime;
     /**
-     * Priority from a business point of view. Default priority is 0, The range is from -9 to 9. Higher values indicate a higher priority. The chargingPriority in &lt;&lt;transactioneventresponse,TransactionEventResponse&gt;&gt; overrules this one. 
+     * Priority from a business point of view. Default priority is 0, The range is from -9 to 9. Higher values indicate a higher priority. The chargingPriority in &lt;&lt;transactioneventresponse,TransactionEventResponse&gt;&gt; overrules this one. 
      * 
      * 
      */
@@ -76,10 +74,10 @@ public class IdTokenInfo {
     @JsonPropertyDescription("Priority from a business point of view. Default priority is 0, The range is from -9 to 9. Higher values indicate a higher priority. The chargingPriority in &lt;&lt;transactioneventresponse,TransactionEventResponse&gt;&gt; overrules this one. \r\n")
     private Integer chargingPriority;
     /**
-     * ID_ Token. Language1. Language_ Code
-     * urn:x-oca:ocpp:uid:1:569374
-     * Preferred user interface language of identifier user. Contains a language code as defined in &lt;&lt;ref-RFC5646,[RFC5646]&gt;&gt;.
-     * 
+     * ID_ Token. Language1. Language_ Code
+     * urn:x-oca:ocpp:uid:1:569374
+     * Preferred user interface language of identifier user. Contains a language code as defined in &lt;&lt;ref-RFC5646,[RFC5646]&gt;&gt;.
+     * 
      * 
      * 
      */
@@ -88,8 +86,8 @@ public class IdTokenInfo {
     @Size(max = 8)
     private String language1;
     /**
-     * Only used when the IdToken is only valid for one or more specific EVSEs, not for the entire Charging Station.
-     * 
+     * Only used when the IdToken is only valid for one or more specific EVSEs, not for the entire Charging Station.
+     * 
      * 
      * 
      */
@@ -99,7 +97,7 @@ public class IdTokenInfo {
     @Valid
     private List<Integer> evseId = new ArrayList<Integer>();
     /**
-     * Contains a case insensitive identifier to use for the authorization and the type of authorization to support multiple forms of identifiers.
+     * Contains a case insensitive identifier to use for the authorization and the type of authorization to support multiple forms of identifiers.
      * 
      * 
      */
@@ -108,9 +106,9 @@ public class IdTokenInfo {
     @Valid
     private IdToken groupIdToken;
     /**
-     * ID_ Token. Language2. Language_ Code
-     * urn:x-oca:ocpp:uid:1:569375
-     * Second preferred user interface language of identifier user. Don’t use when language1 is omitted, has to be different from language1. Contains a language code as defined in &lt;&lt;ref-RFC5646,[RFC5646]&gt;&gt;.
+     * ID_ Token. Language2. Language_ Code
+     * urn:x-oca:ocpp:uid:1:569375
+     * Second preferred user interface language of identifier user. Don’t use when language1 is omitted, has to be different from language1. Contains a language code as defined in &lt;&lt;ref-RFC5646,[RFC5646]&gt;&gt;.
      * 
      * 
      */
@@ -119,10 +117,10 @@ public class IdTokenInfo {
     @Size(max = 8)
     private String language2;
     /**
-     * Message_ Content
-     * urn:x-enexis:ecdm:uid:2:234490
-     * Contains message details, for a message to be displayed on a Charging Station.
-     * 
+     * Message_ Content
+     * urn:x-enexis:ecdm:uid:2:234490
+     * Contains message details, for a message to be displayed on a Charging Station.
+     * 
      * 
      * 
      */
@@ -155,9 +153,9 @@ public class IdTokenInfo {
     }
 
     /**
-     * ID_ Token. Status. Authorization_ Status
-     * urn:x-oca:ocpp:uid:1:569372
-     * Current status of the ID Token.
+     * ID_ Token. Status. Authorization_ Status
+     * urn:x-oca:ocpp:uid:1:569372
+     * Current status of the ID Token.
      * 
      * (Required)
      * 
@@ -168,9 +166,9 @@ public class IdTokenInfo {
     }
 
     /**
-     * ID_ Token. Status. Authorization_ Status
-     * urn:x-oca:ocpp:uid:1:569372
-     * Current status of the ID Token.
+     * ID_ Token. Status. Authorization_ Status
+     * urn:x-oca:ocpp:uid:1:569372
+     * Current status of the ID Token.
      * 
      * (Required)
      * 
@@ -186,9 +184,9 @@ public class IdTokenInfo {
     }
 
     /**
-     * ID_ Token. Expiry. Date_ Time
-     * urn:x-oca:ocpp:uid:1:569373
-     * Date and Time after which the token must be considered invalid.
+     * ID_ Token. Expiry. Date_ Time
+     * urn:x-oca:ocpp:uid:1:569373
+     * Date and Time after which the token must be considered invalid.
      * 
      * 
      */
@@ -198,9 +196,9 @@ public class IdTokenInfo {
     }
 
     /**
-     * ID_ Token. Expiry. Date_ Time
-     * urn:x-oca:ocpp:uid:1:569373
-     * Date and Time after which the token must be considered invalid.
+     * ID_ Token. Expiry. Date_ Time
+     * urn:x-oca:ocpp:uid:1:569373
+     * Date and Time after which the token must be considered invalid.
      * 
      * 
      */
@@ -215,7 +213,7 @@ public class IdTokenInfo {
     }
 
     /**
-     * Priority from a business point of view. Default priority is 0, The range is from -9 to 9. Higher values indicate a higher priority. The chargingPriority in &lt;&lt;transactioneventresponse,TransactionEventResponse&gt;&gt; overrules this one. 
+     * Priority from a business point of view. Default priority is 0, The range is from -9 to 9. Higher values indicate a higher priority. The chargingPriority in &lt;&lt;transactioneventresponse,TransactionEventResponse&gt;&gt; overrules this one. 
      * 
      * 
      */
@@ -225,7 +223,7 @@ public class IdTokenInfo {
     }
 
     /**
-     * Priority from a business point of view. Default priority is 0, The range is from -9 to 9. Higher values indicate a higher priority. The chargingPriority in &lt;&lt;transactioneventresponse,TransactionEventResponse&gt;&gt; overrules this one. 
+     * Priority from a business point of view. Default priority is 0, The range is from -9 to 9. Higher values indicate a higher priority. The chargingPriority in &lt;&lt;transactioneventresponse,TransactionEventResponse&gt;&gt; overrules this one. 
      * 
      * 
      */
@@ -240,10 +238,10 @@ public class IdTokenInfo {
     }
 
     /**
-     * ID_ Token. Language1. Language_ Code
-     * urn:x-oca:ocpp:uid:1:569374
-     * Preferred user interface language of identifier user. Contains a language code as defined in &lt;&lt;ref-RFC5646,[RFC5646]&gt;&gt;.
-     * 
+     * ID_ Token. Language1. Language_ Code
+     * urn:x-oca:ocpp:uid:1:569374
+     * Preferred user interface language of identifier user. Contains a language code as defined in &lt;&lt;ref-RFC5646,[RFC5646]&gt;&gt;.
+     * 
      * 
      * 
      */
@@ -253,10 +251,10 @@ public class IdTokenInfo {
     }
 
     /**
-     * ID_ Token. Language1. Language_ Code
-     * urn:x-oca:ocpp:uid:1:569374
-     * Preferred user interface language of identifier user. Contains a language code as defined in &lt;&lt;ref-RFC5646,[RFC5646]&gt;&gt;.
-     * 
+     * ID_ Token. Language1. Language_ Code
+     * urn:x-oca:ocpp:uid:1:569374
+     * Preferred user interface language of identifier user. Contains a language code as defined in &lt;&lt;ref-RFC5646,[RFC5646]&gt;&gt;.
+     * 
      * 
      * 
      */
@@ -271,8 +269,8 @@ public class IdTokenInfo {
     }
 
     /**
-     * Only used when the IdToken is only valid for one or more specific EVSEs, not for the entire Charging Station.
-     * 
+     * Only used when the IdToken is only valid for one or more specific EVSEs, not for the entire Charging Station.
+     * 
      * 
      * 
      */
@@ -282,8 +280,8 @@ public class IdTokenInfo {
     }
 
     /**
-     * Only used when the IdToken is only valid for one or more specific EVSEs, not for the entire Charging Station.
-     * 
+     * Only used when the IdToken is only valid for one or more specific EVSEs, not for the entire Charging Station.
+     * 
      * 
      * 
      */
@@ -298,7 +296,7 @@ public class IdTokenInfo {
     }
 
     /**
-     * Contains a case insensitive identifier to use for the authorization and the type of authorization to support multiple forms of identifiers.
+     * Contains a case insensitive identifier to use for the authorization and the type of authorization to support multiple forms of identifiers.
      * 
      * 
      */
@@ -308,7 +306,7 @@ public class IdTokenInfo {
     }
 
     /**
-     * Contains a case insensitive identifier to use for the authorization and the type of authorization to support multiple forms of identifiers.
+     * Contains a case insensitive identifier to use for the authorization and the type of authorization to support multiple forms of identifiers.
      * 
      * 
      */
@@ -323,9 +321,9 @@ public class IdTokenInfo {
     }
 
     /**
-     * ID_ Token. Language2. Language_ Code
-     * urn:x-oca:ocpp:uid:1:569375
-     * Second preferred user interface language of identifier user. Don’t use when language1 is omitted, has to be different from language1. Contains a language code as defined in &lt;&lt;ref-RFC5646,[RFC5646]&gt;&gt;.
+     * ID_ Token. Language2. Language_ Code
+     * urn:x-oca:ocpp:uid:1:569375
+     * Second preferred user interface language of identifier user. Don’t use when language1 is omitted, has to be different from language1. Contains a language code as defined in &lt;&lt;ref-RFC5646,[RFC5646]&gt;&gt;.
      * 
      * 
      */
@@ -335,9 +333,9 @@ public class IdTokenInfo {
     }
 
     /**
-     * ID_ Token. Language2. Language_ Code
-     * urn:x-oca:ocpp:uid:1:569375
-     * Second preferred user interface language of identifier user. Don’t use when language1 is omitted, has to be different from language1. Contains a language code as defined in &lt;&lt;ref-RFC5646,[RFC5646]&gt;&gt;.
+     * ID_ Token. Language2. Language_ Code
+     * urn:x-oca:ocpp:uid:1:569375
+     * Second preferred user interface language of identifier user. Don’t use when language1 is omitted, has to be different from language1. Contains a language code as defined in &lt;&lt;ref-RFC5646,[RFC5646]&gt;&gt;.
      * 
      * 
      */
@@ -352,10 +350,10 @@ public class IdTokenInfo {
     }
 
     /**
-     * Message_ Content
-     * urn:x-enexis:ecdm:uid:2:234490
-     * Contains message details, for a message to be displayed on a Charging Station.
-     * 
+     * Message_ Content
+     * urn:x-enexis:ecdm:uid:2:234490
+     * Contains message details, for a message to be displayed on a Charging Station.
+     * 
      * 
      * 
      */
@@ -365,10 +363,10 @@ public class IdTokenInfo {
     }
 
     /**
-     * Message_ Content
-     * urn:x-enexis:ecdm:uid:2:234490
-     * Contains message details, for a message to be displayed on a Charging Station.
-     * 
+     * Message_ Content
+     * urn:x-enexis:ecdm:uid:2:234490
+     * Contains message details, for a message to be displayed on a Charging Station.
+     * 
      * 
      * 
      */

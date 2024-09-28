@@ -3,17 +3,15 @@ package ocpp._2020._03;
 
 import java.util.HashMap;
 import java.util.Map;
-import javax.annotation.Generated;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 
 /**
- * This contains the type of update (full or differential) of this request.
+ * This contains the type of update (full or differential) of this request.
  * 
  * 
  */
-@Generated("jsonschema2pojo")
 public enum UpdateEnum {
 
     DIFFERENTIAL("Differential"),

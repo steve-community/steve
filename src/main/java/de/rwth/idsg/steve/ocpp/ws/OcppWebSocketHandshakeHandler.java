@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2019 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
+ * Copyright (C) 2013-2024 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -18,8 +18,9 @@
  */
 package de.rwth.idsg.steve.ocpp.ws;
 
-import de.rwth.idsg.steve.config.WebSocketConfiguration;
+import de.rwth.idsg.steve.SteveConfiguration;
 import de.rwth.idsg.steve.service.ChargePointHelperService;
+import de.rwth.idsg.steve.web.validation.ChargeBoxIdValidator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import ocpp.cs._2015._10.RegistrationStatus;
@@ -48,9 +49,19 @@ import static de.rwth.idsg.steve.utils.StringUtils.getLastBitFromUrl;
 @RequiredArgsConstructor
 public class OcppWebSocketHandshakeHandler implements HandshakeHandler {
 
+    private static ChargeBoxIdValidator chargeBoxIdValidator;
+
+    static ChargeBoxIdValidator getChargeBoxIdValidator(SteveConfiguration config) {
+        if (chargeBoxIdValidator==null) {
+            chargeBoxIdValidator = new ChargeBoxIdValidator(config);
+        }
+        return chargeBoxIdValidator;
+    }
+
     private final DefaultHandshakeHandler delegate;
     private final List<AbstractWebSocketEndpoint> endpoints;
     private final ChargePointHelperService chargePointHelperService;
+    private final SteveConfiguration config;
 
     /**
      * We need some WebSocketHandler just for Spring to register it for the path. We will not use it for the actual
@@ -70,14 +81,23 @@ public class OcppWebSocketHandshakeHandler implements HandshakeHandler {
         // -------------------------------------------------------------------------
 
         String chargeBoxId = getLastBitFromUrl(request.getURI().getPath());
+
+        boolean isValid = getChargeBoxIdValidator(config).isValid(chargeBoxId);
+        if (!isValid) {
+            log.error("ChargeBoxId '{}' violates the configured pattern.", chargeBoxId);
+            response.setStatusCode(HttpStatus.BAD_REQUEST);
+            return false;
+        }
+
         Optional<RegistrationStatus> status = chargePointHelperService.getRegistrationStatus(chargeBoxId);
 
         // Allow connections, if station is in db (registration_status field from db does not matter)
         boolean allowConnection = status.isPresent();
 
+        // https://github.com/steve-community/steve/issues/1020
         if (!allowConnection) {
             log.error("ChargeBoxId '{}' is not recognized.", chargeBoxId);
-            response.setStatusCode(HttpStatus.UNAUTHORIZED);
+            response.setStatusCode(HttpStatus.NOT_FOUND);
             return false;
         }
 

@@ -3,19 +3,17 @@ package ocpp._2020._03;
 
 import java.util.HashMap;
 import java.util.Map;
-import javax.annotation.Generated;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 
 /**
- * Charging_ Needs. Requested. Energy_ Transfer_ Mode_ Code
- * urn:x-oca:ocpp:uid:1:569209
- * Mode of energy transfer requested by the EV.
+ * Charging_ Needs. Requested. Energy_ Transfer_ Mode_ Code
+ * urn:x-oca:ocpp:uid:1:569209
+ * Mode of energy transfer requested by the EV.
  * 
  * 
  */
-@Generated("jsonschema2pojo")
 public enum EnergyTransferModeEnum {
 
     DC("DC"),

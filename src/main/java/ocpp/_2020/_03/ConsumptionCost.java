@@ -3,19 +3,18 @@ package ocpp._2020._03;
 
 import java.util.ArrayList;
 import java.util.List;
-import javax.annotation.Generated;
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 
 
 /**
- * Consumption_ Cost
- * urn:x-oca:ocpp:uid:2:233259
+ * Consumption_ Cost
+ * urn:x-oca:ocpp:uid:2:233259
  * 
  * 
  */
@@ -25,7 +24,6 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
     "startValue",
     "cost"
 })
-@Generated("jsonschema2pojo")
 public class ConsumptionCost {
 
     /**
@@ -37,9 +35,9 @@ public class ConsumptionCost {
     @Valid
     private CustomData customData;
     /**
-     * Consumption_ Cost. Start_ Value. Numeric
-     * urn:x-oca:ocpp:uid:1:569246
-     * The lowest level of consumption that defines the starting point of this consumption block. The block interval extends to the start of the next interval.
+     * Consumption_ Cost. Start_ Value. Numeric
+     * urn:x-oca:ocpp:uid:1:569246
+     * The lowest level of consumption that defines the starting point of this consumption block. The block interval extends to the start of the next interval.
      * 
      * (Required)
      * 
@@ -83,9 +81,9 @@ public class ConsumptionCost {
     }
 
     /**
-     * Consumption_ Cost. Start_ Value. Numeric
-     * urn:x-oca:ocpp:uid:1:569246
-     * The lowest level of consumption that defines the starting point of this consumption block. The block interval extends to the start of the next interval.
+     * Consumption_ Cost. Start_ Value. Numeric
+     * urn:x-oca:ocpp:uid:1:569246
+     * The lowest level of consumption that defines the starting point of this consumption block. The block interval extends to the start of the next interval.
      * 
      * (Required)
      * 
@@ -96,9 +94,9 @@ public class ConsumptionCost {
     }
 
     /**
-     * Consumption_ Cost. Start_ Value. Numeric
-     * urn:x-oca:ocpp:uid:1:569246
-     * The lowest level of consumption that defines the starting point of this consumption block. The block interval extends to the start of the next interval.
+     * Consumption_ Cost. Start_ Value. Numeric
+     * urn:x-oca:ocpp:uid:1:569246
+     * The lowest level of consumption that defines the starting point of this consumption block. The block interval extends to the start of the next interval.
      * 
      * (Required)
      * 

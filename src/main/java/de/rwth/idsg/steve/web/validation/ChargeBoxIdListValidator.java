@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2019 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
+ * Copyright (C) 2013-2024 SteVe Community Team
  * All Rights Reserved.
  *
  * Parkl Digital Technologies
@@ -22,8 +22,9 @@
  */
 package de.rwth.idsg.steve.web.validation;
 
-import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintValidatorContext;
+import de.rwth.idsg.steve.SteveConfiguration;
+import jakarta.validation.ConstraintValidator;
+import jakarta.validation.ConstraintValidatorContext;
 import java.util.List;
 
 /**
@@ -32,7 +33,12 @@ import java.util.List;
  */
 public class ChargeBoxIdListValidator implements ConstraintValidator<ChargeBoxId, List<String>> {
 
-    private static final ChargeBoxIdValidator VALIDATOR = new ChargeBoxIdValidator();
+    private final ChargeBoxIdValidator validator;
+
+    public ChargeBoxIdListValidator(SteveConfiguration config) {
+        this.validator = new ChargeBoxIdValidator(config);
+
+    }
 
     @Override
     public void initialize(ChargeBoxId constraintAnnotation) {
@@ -42,7 +48,7 @@ public class ChargeBoxIdListValidator implements ConstraintValidator<ChargeBoxId
     @Override
     public boolean isValid(List<String> value, ConstraintValidatorContext context) {
         for (String s : value) {
-            if (!VALIDATOR.isValid(s, context)) {
+            if (!validator.isValid(s, context)) {
                 return false;
             }
         }

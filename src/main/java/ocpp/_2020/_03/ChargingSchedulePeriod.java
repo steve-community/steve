@@ -1,19 +1,18 @@
 
 package ocpp._2020._03;
 
-import javax.annotation.Generated;
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 
 
 /**
- * Charging_ Schedule_ Period
- * urn:x-oca:ocpp:uid:2:233257
- * Charging schedule period structure defines a time period in a charging schedule.
+ * Charging_ Schedule_ Period
+ * urn:x-oca:ocpp:uid:2:233257
+ * Charging schedule period structure defines a time period in a charging schedule.
  * 
  * 
  */
@@ -25,7 +24,6 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
     "numberPhases",
     "phaseToUse"
 })
-@Generated("jsonschema2pojo")
 public class ChargingSchedulePeriod {
 
     /**
@@ -37,9 +35,9 @@ public class ChargingSchedulePeriod {
     @Valid
     private CustomData customData;
     /**
-     * Charging_ Schedule_ Period. Start_ Period. Elapsed_ Time
-     * urn:x-oca:ocpp:uid:1:569240
-     * Start of the period, in seconds from the start of schedule. The value of StartPeriod also defines the stop time of the previous period.
+     * Charging_ Schedule_ Period. Start_ Period. Elapsed_ Time
+     * urn:x-oca:ocpp:uid:1:569240
+     * Start of the period, in seconds from the start of schedule. The value of StartPeriod also defines the stop time of the previous period.
      * 
      * (Required)
      * 
@@ -49,9 +47,9 @@ public class ChargingSchedulePeriod {
     @NotNull
     private Integer startPeriod;
     /**
-     * Charging_ Schedule_ Period. Limit. Measure
-     * urn:x-oca:ocpp:uid:1:569241
-     * Charging rate limit during the schedule period, in the applicable chargingRateUnit, for example in Amperes (A) or Watts (W). Accepts at most one digit fraction (e.g. 8.1).
+     * Charging_ Schedule_ Period. Limit. Measure
+     * urn:x-oca:ocpp:uid:1:569241
+     * Charging rate limit during the schedule period, in the applicable chargingRateUnit, for example in Amperes (A) or Watts (W). Accepts at most one digit fraction (e.g. 8.1).
      * 
      * (Required)
      * 
@@ -61,9 +59,9 @@ public class ChargingSchedulePeriod {
     @NotNull
     private Double limit;
     /**
-     * Charging_ Schedule_ Period. Number_ Phases. Counter
-     * urn:x-oca:ocpp:uid:1:569242
-     * The number of phases that can be used for charging. If a number of phases is needed, numberPhases=3 will be assumed unless another number is given.
+     * Charging_ Schedule_ Period. Number_ Phases. Counter
+     * urn:x-oca:ocpp:uid:1:569242
+     * The number of phases that can be used for charging. If a number of phases is needed, numberPhases=3 will be assumed unless another number is given.
      * 
      * 
      */
@@ -71,8 +69,8 @@ public class ChargingSchedulePeriod {
     @JsonPropertyDescription("Charging_ Schedule_ Period. Number_ Phases. Counter\r\nurn:x-oca:ocpp:uid:1:569242\r\nThe number of phases that can be used for charging. If a number of phases is needed, numberPhases=3 will be assumed unless another number is given.\r\n")
     private Integer numberPhases;
     /**
-     * Values: 1..3, Used if numberPhases=1 and if the EVSE is capable of switching the phase connected to the EV, i.e. ACPhaseSwitchingSupported is defined and true. It’s not allowed unless both conditions above are true. If both conditions are true, and phaseToUse is omitted, the Charging Station / EVSE will make the selection on its own.
-     * 
+     * Values: 1..3, Used if numberPhases=1 and if the EVSE is capable of switching the phase connected to the EV, i.e. ACPhaseSwitchingSupported is defined and true. It’s not allowed unless both conditions above are true. If both conditions are true, and phaseToUse is omitted, the Charging Station / EVSE will make the selection on its own.
+     * 
      * 
      * 
      */
@@ -104,9 +102,9 @@ public class ChargingSchedulePeriod {
     }
 
     /**
-     * Charging_ Schedule_ Period. Start_ Period. Elapsed_ Time
-     * urn:x-oca:ocpp:uid:1:569240
-     * Start of the period, in seconds from the start of schedule. The value of StartPeriod also defines the stop time of the previous period.
+     * Charging_ Schedule_ Period. Start_ Period. Elapsed_ Time
+     * urn:x-oca:ocpp:uid:1:569240
+     * Start of the period, in seconds from the start of schedule. The value of StartPeriod also defines the stop time of the previous period.
      * 
      * (Required)
      * 
@@ -117,9 +115,9 @@ public class ChargingSchedulePeriod {
     }
 
     /**
-     * Charging_ Schedule_ Period. Start_ Period. Elapsed_ Time
-     * urn:x-oca:ocpp:uid:1:569240
-     * Start of the period, in seconds from the start of schedule. The value of StartPeriod also defines the stop time of the previous period.
+     * Charging_ Schedule_ Period. Start_ Period. Elapsed_ Time
+     * urn:x-oca:ocpp:uid:1:569240
+     * Start of the period, in seconds from the start of schedule. The value of StartPeriod also defines the stop time of the previous period.
      * 
      * (Required)
      * 
@@ -135,9 +133,9 @@ public class ChargingSchedulePeriod {
     }
 
     /**
-     * Charging_ Schedule_ Period. Limit. Measure
-     * urn:x-oca:ocpp:uid:1:569241
-     * Charging rate limit during the schedule period, in the applicable chargingRateUnit, for example in Amperes (A) or Watts (W). Accepts at most one digit fraction (e.g. 8.1).
+     * Charging_ Schedule_ Period. Limit. Measure
+     * urn:x-oca:ocpp:uid:1:569241
+     * Charging rate limit during the schedule period, in the applicable chargingRateUnit, for example in Amperes (A) or Watts (W). Accepts at most one digit fraction (e.g. 8.1).
      * 
      * (Required)
      * 
@@ -148,9 +146,9 @@ public class ChargingSchedulePeriod {
     }
 
     /**
-     * Charging_ Schedule_ Period. Limit. Measure
-     * urn:x-oca:ocpp:uid:1:569241
-     * Charging rate limit during the schedule period, in the applicable chargingRateUnit, for example in Amperes (A) or Watts (W). Accepts at most one digit fraction (e.g. 8.1).
+     * Charging_ Schedule_ Period. Limit. Measure
+     * urn:x-oca:ocpp:uid:1:569241
+     * Charging rate limit during the schedule period, in the applicable chargingRateUnit, for example in Amperes (A) or Watts (W). Accepts at most one digit fraction (e.g. 8.1).
      * 
      * (Required)
      * 
@@ -166,9 +164,9 @@ public class ChargingSchedulePeriod {
     }
 
     /**
-     * Charging_ Schedule_ Period. Number_ Phases. Counter
-     * urn:x-oca:ocpp:uid:1:569242
-     * The number of phases that can be used for charging. If a number of phases is needed, numberPhases=3 will be assumed unless another number is given.
+     * Charging_ Schedule_ Period. Number_ Phases. Counter
+     * urn:x-oca:ocpp:uid:1:569242
+     * The number of phases that can be used for charging. If a number of phases is needed, numberPhases=3 will be assumed unless another number is given.
      * 
      * 
      */
@@ -178,9 +176,9 @@ public class ChargingSchedulePeriod {
     }
 
     /**
-     * Charging_ Schedule_ Period. Number_ Phases. Counter
-     * urn:x-oca:ocpp:uid:1:569242
-     * The number of phases that can be used for charging. If a number of phases is needed, numberPhases=3 will be assumed unless another number is given.
+     * Charging_ Schedule_ Period. Number_ Phases. Counter
+     * urn:x-oca:ocpp:uid:1:569242
+     * The number of phases that can be used for charging. If a number of phases is needed, numberPhases=3 will be assumed unless another number is given.
      * 
      * 
      */
@@ -195,8 +193,8 @@ public class ChargingSchedulePeriod {
     }
 
     /**
-     * Values: 1..3, Used if numberPhases=1 and if the EVSE is capable of switching the phase connected to the EV, i.e. ACPhaseSwitchingSupported is defined and true. It’s not allowed unless both conditions above are true. If both conditions are true, and phaseToUse is omitted, the Charging Station / EVSE will make the selection on its own.
-     * 
+     * Values: 1..3, Used if numberPhases=1 and if the EVSE is capable of switching the phase connected to the EV, i.e. ACPhaseSwitchingSupported is defined and true. It’s not allowed unless both conditions above are true. If both conditions are true, and phaseToUse is omitted, the Charging Station / EVSE will make the selection on its own.
+     * 
      * 
      * 
      */
@@ -206,8 +204,8 @@ public class ChargingSchedulePeriod {
     }
 
     /**
-     * Values: 1..3, Used if numberPhases=1 and if the EVSE is capable of switching the phase connected to the EV, i.e. ACPhaseSwitchingSupported is defined and true. It’s not allowed unless both conditions above are true. If both conditions are true, and phaseToUse is omitted, the Charging Station / EVSE will make the selection on its own.
-     * 
+     * Values: 1..3, Used if numberPhases=1 and if the EVSE is capable of switching the phase connected to the EV, i.e. ACPhaseSwitchingSupported is defined and true. It’s not allowed unless both conditions above are true. If both conditions are true, and phaseToUse is omitted, the Charging Station / EVSE will make the selection on its own.
+     * 
      * 
      * 
      */

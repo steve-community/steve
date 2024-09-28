@@ -1,15 +1,14 @@
 
 package ocpp._2020._03;
 
-import javax.annotation.Generated;
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import de.rwth.idsg.ocpp.jaxb.ResponseType;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
@@ -18,7 +17,6 @@ import de.rwth.idsg.ocpp.jaxb.ResponseType;
     "statusInfo",
     "exiResponse"
 })
-@Generated("jsonschema2pojo")
 public class Get15118EVCertificateResponse implements ResponseType
 {
 
@@ -31,7 +29,7 @@ public class Get15118EVCertificateResponse implements ResponseType
     @Valid
     private CustomData customData;
     /**
-     * Indicates whether the message was processed properly.
+     * Indicates whether the message was processed properly.
      * 
      * (Required)
      * 
@@ -41,7 +39,7 @@ public class Get15118EVCertificateResponse implements ResponseType
     @NotNull
     private Iso15118EVCertificateStatusEnum status;
     /**
-     * Element providing more information about the status.
+     * Element providing more information about the status.
      * 
      * 
      */
@@ -50,7 +48,7 @@ public class Get15118EVCertificateResponse implements ResponseType
     @Valid
     private StatusInfo statusInfo;
     /**
-     * Raw CertificateInstallationRes response for the EV, Base64 encoded.
+     * Raw CertificateInstallationRes response for the EV, Base64 encoded.
      * 
      * (Required)
      * 
@@ -85,7 +83,7 @@ public class Get15118EVCertificateResponse implements ResponseType
     }
 
     /**
-     * Indicates whether the message was processed properly.
+     * Indicates whether the message was processed properly.
      * 
      * (Required)
      * 
@@ -96,7 +94,7 @@ public class Get15118EVCertificateResponse implements ResponseType
     }
 
     /**
-     * Indicates whether the message was processed properly.
+     * Indicates whether the message was processed properly.
      * 
      * (Required)
      * 
@@ -112,7 +110,7 @@ public class Get15118EVCertificateResponse implements ResponseType
     }
 
     /**
-     * Element providing more information about the status.
+     * Element providing more information about the status.
      * 
      * 
      */
@@ -122,7 +120,7 @@ public class Get15118EVCertificateResponse implements ResponseType
     }
 
     /**
-     * Element providing more information about the status.
+     * Element providing more information about the status.
      * 
      * 
      */
@@ -137,7 +135,7 @@ public class Get15118EVCertificateResponse implements ResponseType
     }
 
     /**
-     * Raw CertificateInstallationRes response for the EV, Base64 encoded.
+     * Raw CertificateInstallationRes response for the EV, Base64 encoded.
      * 
      * (Required)
      * 
@@ -148,7 +146,7 @@ public class Get15118EVCertificateResponse implements ResponseType
     }
 
     /**
-     * Raw CertificateInstallationRes response for the EV, Base64 encoded.
+     * Raw CertificateInstallationRes response for the EV, Base64 encoded.
      * 
      * (Required)
      * 

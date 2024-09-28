@@ -36,8 +36,8 @@ import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.view.InternalResourceViewResolver;
 
-import javax.annotation.PreDestroy;
-import javax.validation.Validator;
+import jakarta.annotation.PreDestroy;
+import jakarta.validation.Validator;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
@@ -101,35 +101,6 @@ public class BeanConfiguration implements WebMvcConfigurer {
         }
     }
 
-    // -------------------------------------------------------------------------
-    // Web config
-    // -------------------------------------------------------------------------
-
-    /**
-     * Resolver for JSP views/templates. Controller classes process the requests
-     * and forward to JSP files for rendering.
-     */
-    @Bean
-    public InternalResourceViewResolver urlBasedViewResolver() {
-        InternalResourceViewResolver resolver = new InternalResourceViewResolver();
-        resolver.setPrefix("/WEB-INF/views/");
-        resolver.setSuffix(".jsp");
-        return resolver;
-    }
-
-    /**
-     * Resource path for static content of the Web interface.
-     */
-    @Override
-    public void addResourceHandlers(final ResourceHandlerRegistry registry) {
-        registry.addResourceHandler(WebEnvironment.getContextRoot()+"/static/**").addResourceLocations("static/");
-    }
-
-    @Override
-    public void addViewControllers(ViewControllerRegistry registry) {
-        registry.addViewController("/manager/signin").setViewName("signin");
-        registry.setOrder(Ordered.HIGHEST_PRECEDENCE);
-    }
 
 
 }

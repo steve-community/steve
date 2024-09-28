@@ -3,17 +3,15 @@ package ocpp._2020._03;
 
 import java.util.HashMap;
 import java.util.Map;
-import javax.annotation.Generated;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 
 /**
- * Charging Station indicates if it can process the request.
+ * Charging Station indicates if it can process the request.
  * 
  * 
  */
-@Generated("jsonschema2pojo")
 public enum DeleteCertificateStatusEnum {
 
     ACCEPTED("Accepted"),

@@ -1,11 +1,11 @@
 
 package ocpp.cp._2015._10;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlSchemaType;
-import javax.xml.bind.annotation.XmlType;
 import de.rwth.idsg.ocpp.jaxb.RequestType;
+import jakarta.xml.bind.annotation.XmlAccessType;
+import jakarta.xml.bind.annotation.XmlAccessorType;
+import jakarta.xml.bind.annotation.XmlSchemaType;
+import jakarta.xml.bind.annotation.XmlType;
 import lombok.ToString;
 
 
@@ -163,21 +163,57 @@ public class ClearChargingProfileRequest
         return (this.stackLevel!= null);
     }
 
+    /**
+     * Sets the value of the id property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link Integer }
+     * @return
+     *     The class instance
+     */
     public ClearChargingProfileRequest withId(Integer value) {
         setId(value);
         return this;
     }
 
+    /**
+     * Sets the value of the connectorId property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link Integer }
+     * @return
+     *     The class instance
+     */
     public ClearChargingProfileRequest withConnectorId(Integer value) {
         setConnectorId(value);
         return this;
     }
 
+    /**
+     * Sets the value of the chargingProfilePurpose property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link ChargingProfilePurposeType }
+     * @return
+     *     The class instance
+     */
     public ClearChargingProfileRequest withChargingProfilePurpose(ChargingProfilePurposeType value) {
         setChargingProfilePurpose(value);
         return this;
     }
 
+    /**
+     * Sets the value of the stackLevel property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link Integer }
+     * @return
+     *     The class instance
+     */
     public ClearChargingProfileRequest withStackLevel(Integer value) {
         setStackLevel(value);
         return this;

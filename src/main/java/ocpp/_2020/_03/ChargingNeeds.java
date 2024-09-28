@@ -1,19 +1,18 @@
 
 package ocpp._2020._03;
 
-import javax.annotation.Generated;
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import org.joda.time.DateTime;
 
 
 /**
- * Charging_ Needs
- * urn:x-oca:ocpp:uid:2:233249
+ * Charging_ Needs
+ * urn:x-oca:ocpp:uid:2:233249
  * 
  * 
  */
@@ -25,7 +24,6 @@ import org.joda.time.DateTime;
     "requestedEnergyTransfer",
     "departureTime"
 })
-@Generated("jsonschema2pojo")
 public class ChargingNeeds {
 
     /**
@@ -37,10 +35,10 @@ public class ChargingNeeds {
     @Valid
     private CustomData customData;
     /**
-     * AC_ Charging_ Parameters
-     * urn:x-oca:ocpp:uid:2:233250
-     * EV AC charging parameters.
-     * 
+     * AC_ Charging_ Parameters
+     * urn:x-oca:ocpp:uid:2:233250
+     * EV AC charging parameters.
+     * 
      * 
      * 
      */
@@ -49,11 +47,11 @@ public class ChargingNeeds {
     @Valid
     private ACChargingParameters acChargingParameters;
     /**
-     * DC_ Charging_ Parameters
-     * urn:x-oca:ocpp:uid:2:233251
-     * EV DC charging parameters
-     * 
-     * 
+     * DC_ Charging_ Parameters
+     * urn:x-oca:ocpp:uid:2:233251
+     * EV DC charging parameters
+     * 
+     * 
      * 
      * 
      */
@@ -62,9 +60,9 @@ public class ChargingNeeds {
     @Valid
     private DCChargingParameters dcChargingParameters;
     /**
-     * Charging_ Needs. Requested. Energy_ Transfer_ Mode_ Code
-     * urn:x-oca:ocpp:uid:1:569209
-     * Mode of energy transfer requested by the EV.
+     * Charging_ Needs. Requested. Energy_ Transfer_ Mode_ Code
+     * urn:x-oca:ocpp:uid:1:569209
+     * Mode of energy transfer requested by the EV.
      * 
      * (Required)
      * 
@@ -74,9 +72,9 @@ public class ChargingNeeds {
     @NotNull
     private EnergyTransferModeEnum requestedEnergyTransfer;
     /**
-     * Charging_ Needs. Departure_ Time. Date_ Time
-     * urn:x-oca:ocpp:uid:1:569223
-     * Estimated departure time of the EV.
+     * Charging_ Needs. Departure_ Time. Date_ Time
+     * urn:x-oca:ocpp:uid:1:569223
+     * Estimated departure time of the EV.
      * 
      * 
      */
@@ -108,10 +106,10 @@ public class ChargingNeeds {
     }
 
     /**
-     * AC_ Charging_ Parameters
-     * urn:x-oca:ocpp:uid:2:233250
-     * EV AC charging parameters.
-     * 
+     * AC_ Charging_ Parameters
+     * urn:x-oca:ocpp:uid:2:233250
+     * EV AC charging parameters.
+     * 
      * 
      * 
      */
@@ -121,10 +119,10 @@ public class ChargingNeeds {
     }
 
     /**
-     * AC_ Charging_ Parameters
-     * urn:x-oca:ocpp:uid:2:233250
-     * EV AC charging parameters.
-     * 
+     * AC_ Charging_ Parameters
+     * urn:x-oca:ocpp:uid:2:233250
+     * EV AC charging parameters.
+     * 
      * 
      * 
      */
@@ -139,11 +137,11 @@ public class ChargingNeeds {
     }
 
     /**
-     * DC_ Charging_ Parameters
-     * urn:x-oca:ocpp:uid:2:233251
-     * EV DC charging parameters
-     * 
-     * 
+     * DC_ Charging_ Parameters
+     * urn:x-oca:ocpp:uid:2:233251
+     * EV DC charging parameters
+     * 
+     * 
      * 
      * 
      */
@@ -153,11 +151,11 @@ public class ChargingNeeds {
     }
 
     /**
-     * DC_ Charging_ Parameters
-     * urn:x-oca:ocpp:uid:2:233251
-     * EV DC charging parameters
-     * 
-     * 
+     * DC_ Charging_ Parameters
+     * urn:x-oca:ocpp:uid:2:233251
+     * EV DC charging parameters
+     * 
+     * 
      * 
      * 
      */
@@ -172,9 +170,9 @@ public class ChargingNeeds {
     }
 
     /**
-     * Charging_ Needs. Requested. Energy_ Transfer_ Mode_ Code
-     * urn:x-oca:ocpp:uid:1:569209
-     * Mode of energy transfer requested by the EV.
+     * Charging_ Needs. Requested. Energy_ Transfer_ Mode_ Code
+     * urn:x-oca:ocpp:uid:1:569209
+     * Mode of energy transfer requested by the EV.
      * 
      * (Required)
      * 
@@ -185,9 +183,9 @@ public class ChargingNeeds {
     }
 
     /**
-     * Charging_ Needs. Requested. Energy_ Transfer_ Mode_ Code
-     * urn:x-oca:ocpp:uid:1:569209
-     * Mode of energy transfer requested by the EV.
+     * Charging_ Needs. Requested. Energy_ Transfer_ Mode_ Code
+     * urn:x-oca:ocpp:uid:1:569209
+     * Mode of energy transfer requested by the EV.
      * 
      * (Required)
      * 
@@ -203,9 +201,9 @@ public class ChargingNeeds {
     }
 
     /**
-     * Charging_ Needs. Departure_ Time. Date_ Time
-     * urn:x-oca:ocpp:uid:1:569223
-     * Estimated departure time of the EV.
+     * Charging_ Needs. Departure_ Time. Date_ Time
+     * urn:x-oca:ocpp:uid:1:569223
+     * Estimated departure time of the EV.
      * 
      * 
      */
@@ -215,9 +213,9 @@ public class ChargingNeeds {
     }
 
     /**
-     * Charging_ Needs. Departure_ Time. Date_ Time
-     * urn:x-oca:ocpp:uid:1:569223
-     * Estimated departure time of the EV.
+     * Charging_ Needs. Departure_ Time. Date_ Time
+     * urn:x-oca:ocpp:uid:1:569223
+     * Estimated departure time of the EV.
      * 
      * 
      */

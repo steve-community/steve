@@ -1,14 +1,13 @@
 
 package ocpp._2020._03;
 
-import javax.annotation.Generated;
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import de.rwth.idsg.ocpp.jaxb.ResponseType;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
@@ -17,7 +16,6 @@ import de.rwth.idsg.ocpp.jaxb.ResponseType;
     "statusInfo",
     "data"
 })
-@Generated("jsonschema2pojo")
 public class DataTransferResponse implements ResponseType
 {
 
@@ -30,7 +28,7 @@ public class DataTransferResponse implements ResponseType
     @Valid
     private CustomData customData;
     /**
-     * This indicates the success or failure of the data transfer.
+     * This indicates the success or failure of the data transfer.
      * 
      * (Required)
      * 
@@ -40,7 +38,7 @@ public class DataTransferResponse implements ResponseType
     @NotNull
     private DataTransferStatusEnum status;
     /**
-     * Element providing more information about the status.
+     * Element providing more information about the status.
      * 
      * 
      */
@@ -49,7 +47,7 @@ public class DataTransferResponse implements ResponseType
     @Valid
     private StatusInfo statusInfo;
     /**
-     * Data without specified length or format, in response to request.
+     * Data without specified length or format, in response to request.
      * 
      * 
      */
@@ -81,7 +79,7 @@ public class DataTransferResponse implements ResponseType
     }
 
     /**
-     * This indicates the success or failure of the data transfer.
+     * This indicates the success or failure of the data transfer.
      * 
      * (Required)
      * 
@@ -92,7 +90,7 @@ public class DataTransferResponse implements ResponseType
     }
 
     /**
-     * This indicates the success or failure of the data transfer.
+     * This indicates the success or failure of the data transfer.
      * 
      * (Required)
      * 
@@ -108,7 +106,7 @@ public class DataTransferResponse implements ResponseType
     }
 
     /**
-     * Element providing more information about the status.
+     * Element providing more information about the status.
      * 
      * 
      */
@@ -118,7 +116,7 @@ public class DataTransferResponse implements ResponseType
     }
 
     /**
-     * Element providing more information about the status.
+     * Element providing more information about the status.
      * 
      * 
      */
@@ -133,7 +131,7 @@ public class DataTransferResponse implements ResponseType
     }
 
     /**
-     * Data without specified length or format, in response to request.
+     * Data without specified length or format, in response to request.
      * 
      * 
      */
@@ -143,7 +141,7 @@ public class DataTransferResponse implements ResponseType
     }
 
     /**
-     * Data without specified length or format, in response to request.
+     * Data without specified length or format, in response to request.
      * 
      * 
      */

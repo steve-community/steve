@@ -3,17 +3,15 @@ package ocpp._2020._03;
 
 import java.util.HashMap;
 import java.util.Map;
-import javax.annotation.Generated;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 
 /**
- * This indicates whether the Charging Station has successfully received and applied the update of the Local Authorization List.
+ * This indicates whether the Charging Station has successfully received and applied the update of the Local Authorization List.
  * 
  * 
  */
-@Generated("jsonschema2pojo")
 public enum SendLocalListStatusEnum {
 
     ACCEPTED("Accepted"),

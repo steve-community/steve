@@ -1,18 +1,17 @@
 
 package ocpp._2020._03;
 
-import javax.annotation.Generated;
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 
 
 /**
- * Reference key to a component-variable.
+ * Reference key to a component-variable.
  * 
  * 
  */
@@ -22,7 +21,6 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
     "name",
     "instance"
 })
-@Generated("jsonschema2pojo")
 public class Variable {
 
     /**
@@ -34,7 +32,7 @@ public class Variable {
     @Valid
     private CustomData customData;
     /**
-     * Name of the variable. Name should be taken from the list of standardized variable names whenever possible. Case Insensitive. strongly advised to use Camel Case.
+     * Name of the variable. Name should be taken from the list of standardized variable names whenever possible. Case Insensitive. strongly advised to use Camel Case.
      * 
      * (Required)
      * 
@@ -45,7 +43,7 @@ public class Variable {
     @NotNull
     private String name;
     /**
-     * Name of instance in case the variable exists as multiple instances. Case Insensitive. strongly advised to use Camel Case.
+     * Name of instance in case the variable exists as multiple instances. Case Insensitive. strongly advised to use Camel Case.
      * 
      * 
      */
@@ -78,7 +76,7 @@ public class Variable {
     }
 
     /**
-     * Name of the variable. Name should be taken from the list of standardized variable names whenever possible. Case Insensitive. strongly advised to use Camel Case.
+     * Name of the variable. Name should be taken from the list of standardized variable names whenever possible. Case Insensitive. strongly advised to use Camel Case.
      * 
      * (Required)
      * 
@@ -89,7 +87,7 @@ public class Variable {
     }
 
     /**
-     * Name of the variable. Name should be taken from the list of standardized variable names whenever possible. Case Insensitive. strongly advised to use Camel Case.
+     * Name of the variable. Name should be taken from the list of standardized variable names whenever possible. Case Insensitive. strongly advised to use Camel Case.
      * 
      * (Required)
      * 
@@ -105,7 +103,7 @@ public class Variable {
     }
 
     /**
-     * Name of instance in case the variable exists as multiple instances. Case Insensitive. strongly advised to use Camel Case.
+     * Name of instance in case the variable exists as multiple instances. Case Insensitive. strongly advised to use Camel Case.
      * 
      * 
      */
@@ -115,7 +113,7 @@ public class Variable {
     }
 
     /**
-     * Name of instance in case the variable exists as multiple instances. Case Insensitive. strongly advised to use Camel Case.
+     * Name of instance in case the variable exists as multiple instances. Case Insensitive. strongly advised to use Camel Case.
      * 
      * 
      */

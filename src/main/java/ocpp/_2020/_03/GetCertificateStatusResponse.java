@@ -1,15 +1,14 @@
 
 package ocpp._2020._03;
 
-import javax.annotation.Generated;
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import de.rwth.idsg.ocpp.jaxb.ResponseType;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
@@ -18,7 +17,6 @@ import de.rwth.idsg.ocpp.jaxb.ResponseType;
     "statusInfo",
     "ocspResult"
 })
-@Generated("jsonschema2pojo")
 public class GetCertificateStatusResponse implements ResponseType
 {
 
@@ -31,7 +29,7 @@ public class GetCertificateStatusResponse implements ResponseType
     @Valid
     private CustomData customData;
     /**
-     * This indicates whether the charging station was able to retrieve the OCSP certificate status.
+     * This indicates whether the charging station was able to retrieve the OCSP certificate status.
      * 
      * (Required)
      * 
@@ -41,7 +39,7 @@ public class GetCertificateStatusResponse implements ResponseType
     @NotNull
     private GetCertificateStatusEnum status;
     /**
-     * Element providing more information about the status.
+     * Element providing more information about the status.
      * 
      * 
      */
@@ -50,7 +48,7 @@ public class GetCertificateStatusResponse implements ResponseType
     @Valid
     private StatusInfo statusInfo;
     /**
-     * OCSPResponse class as defined in &lt;&lt;ref-ocpp_security_24, IETF RFC 6960&gt;&gt;. DER encoded (as defined in &lt;&lt;ref-ocpp_security_24, IETF RFC 6960&gt;&gt;), and then base64 encoded. MAY only be omitted when status is not Accepted.
+     * OCSPResponse class as defined in &lt;&lt;ref-ocpp_security_24, IETF RFC 6960&gt;&gt;. DER encoded (as defined in &lt;&lt;ref-ocpp_security_24, IETF RFC 6960&gt;&gt;), and then base64 encoded. MAY only be omitted when status is not Accepted.
      * 
      * 
      */
@@ -83,7 +81,7 @@ public class GetCertificateStatusResponse implements ResponseType
     }
 
     /**
-     * This indicates whether the charging station was able to retrieve the OCSP certificate status.
+     * This indicates whether the charging station was able to retrieve the OCSP certificate status.
      * 
      * (Required)
      * 
@@ -94,7 +92,7 @@ public class GetCertificateStatusResponse implements ResponseType
     }
 
     /**
-     * This indicates whether the charging station was able to retrieve the OCSP certificate status.
+     * This indicates whether the charging station was able to retrieve the OCSP certificate status.
      * 
      * (Required)
      * 
@@ -110,7 +108,7 @@ public class GetCertificateStatusResponse implements ResponseType
     }
 
     /**
-     * Element providing more information about the status.
+     * Element providing more information about the status.
      * 
      * 
      */
@@ -120,7 +118,7 @@ public class GetCertificateStatusResponse implements ResponseType
     }
 
     /**
-     * Element providing more information about the status.
+     * Element providing more information about the status.
      * 
      * 
      */
@@ -135,7 +133,7 @@ public class GetCertificateStatusResponse implements ResponseType
     }
 
     /**
-     * OCSPResponse class as defined in &lt;&lt;ref-ocpp_security_24, IETF RFC 6960&gt;&gt;. DER encoded (as defined in &lt;&lt;ref-ocpp_security_24, IETF RFC 6960&gt;&gt;), and then base64 encoded. MAY only be omitted when status is not Accepted.
+     * OCSPResponse class as defined in &lt;&lt;ref-ocpp_security_24, IETF RFC 6960&gt;&gt;. DER encoded (as defined in &lt;&lt;ref-ocpp_security_24, IETF RFC 6960&gt;&gt;), and then base64 encoded. MAY only be omitted when status is not Accepted.
      * 
      * 
      */
@@ -145,7 +143,7 @@ public class GetCertificateStatusResponse implements ResponseType
     }
 
     /**
-     * OCSPResponse class as defined in &lt;&lt;ref-ocpp_security_24, IETF RFC 6960&gt;&gt;. DER encoded (as defined in &lt;&lt;ref-ocpp_security_24, IETF RFC 6960&gt;&gt;), and then base64 encoded. MAY only be omitted when status is not Accepted.
+     * OCSPResponse class as defined in &lt;&lt;ref-ocpp_security_24, IETF RFC 6960&gt;&gt;. DER encoded (as defined in &lt;&lt;ref-ocpp_security_24, IETF RFC 6960&gt;&gt;), and then base64 encoded. MAY only be omitted when status is not Accepted.
      * 
      * 
      */

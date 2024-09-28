@@ -1,19 +1,18 @@
 
 package ocpp._2020._03;
 
-import javax.annotation.Generated;
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 
 
 /**
- * Transaction
- * urn:x-oca:ocpp:uid:2:233318
+ * Transaction
+ * urn:x-oca:ocpp:uid:2:233318
  * 
  * 
  */
@@ -26,7 +25,6 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
     "stoppedReason",
     "remoteStartId"
 })
-@Generated("jsonschema2pojo")
 public class Transaction {
 
     /**
@@ -38,7 +36,7 @@ public class Transaction {
     @Valid
     private CustomData customData;
     /**
-     * This contains the Id of the transaction.
+     * This contains the Id of the transaction.
      * 
      * (Required)
      * 
@@ -49,10 +47,10 @@ public class Transaction {
     @NotNull
     private String transactionId;
     /**
-     * Transaction. State. Transaction_ State_ Code
-     * urn:x-oca:ocpp:uid:1:569419
-     * Current charging state, is required when state
-     * has changed.
+     * Transaction. State. Transaction_ State_ Code
+     * urn:x-oca:ocpp:uid:1:569419
+     * Current charging state, is required when state
+     * has changed.
      * 
      * 
      */
@@ -60,9 +58,9 @@ public class Transaction {
     @JsonPropertyDescription("Transaction. State. Transaction_ State_ Code\r\nurn:x-oca:ocpp:uid:1:569419\r\nCurrent charging state, is required when state\r\nhas changed.\r\n")
     private ChargingStateEnum chargingState;
     /**
-     * Transaction. Time_ Spent_ Charging. Elapsed_ Time
-     * urn:x-oca:ocpp:uid:1:569415
-     * Contains the total time that energy flowed from EVSE to EV during the transaction (in seconds). Note that timeSpentCharging is smaller or equal to the duration of the transaction.
+     * Transaction. Time_ Spent_ Charging. Elapsed_ Time
+     * urn:x-oca:ocpp:uid:1:569415
+     * Contains the total time that energy flowed from EVSE to EV during the transaction (in seconds). Note that timeSpentCharging is smaller or equal to the duration of the transaction.
      * 
      * 
      */
@@ -70,9 +68,9 @@ public class Transaction {
     @JsonPropertyDescription("Transaction. Time_ Spent_ Charging. Elapsed_ Time\r\nurn:x-oca:ocpp:uid:1:569415\r\nContains the total time that energy flowed from EVSE to EV during the transaction (in seconds). Note that timeSpentCharging is smaller or equal to the duration of the transaction.\r\n")
     private Integer timeSpentCharging;
     /**
-     * Transaction. Stopped_ Reason. EOT_ Reason_ Code
-     * urn:x-oca:ocpp:uid:1:569413
-     * This contains the reason why the transaction was stopped. MAY only be omitted when Reason is "Local".
+     * Transaction. Stopped_ Reason. EOT_ Reason_ Code
+     * urn:x-oca:ocpp:uid:1:569413
+     * This contains the reason why the transaction was stopped. MAY only be omitted when Reason is "Local".
      * 
      * 
      */
@@ -80,7 +78,7 @@ public class Transaction {
     @JsonPropertyDescription("Transaction. Stopped_ Reason. EOT_ Reason_ Code\r\nurn:x-oca:ocpp:uid:1:569413\r\nThis contains the reason why the transaction was stopped. MAY only be omitted when Reason is \"Local\".\r\n")
     private ReasonEnum stoppedReason;
     /**
-     * The ID given to remote start request (&lt;&lt;requeststarttransactionrequest, RequestStartTransactionRequest&gt;&gt;. This enables to CSMS to match the started transaction to the given start request.
+     * The ID given to remote start request (&lt;&lt;requeststarttransactionrequest, RequestStartTransactionRequest&gt;&gt;. This enables to CSMS to match the started transaction to the given start request.
      * 
      * 
      */
@@ -112,7 +110,7 @@ public class Transaction {
     }
 
     /**
-     * This contains the Id of the transaction.
+     * This contains the Id of the transaction.
      * 
      * (Required)
      * 
@@ -123,7 +121,7 @@ public class Transaction {
     }
 
     /**
-     * This contains the Id of the transaction.
+     * This contains the Id of the transaction.
      * 
      * (Required)
      * 
@@ -139,10 +137,10 @@ public class Transaction {
     }
 
     /**
-     * Transaction. State. Transaction_ State_ Code
-     * urn:x-oca:ocpp:uid:1:569419
-     * Current charging state, is required when state
-     * has changed.
+     * Transaction. State. Transaction_ State_ Code
+     * urn:x-oca:ocpp:uid:1:569419
+     * Current charging state, is required when state
+     * has changed.
      * 
      * 
      */
@@ -152,10 +150,10 @@ public class Transaction {
     }
 
     /**
-     * Transaction. State. Transaction_ State_ Code
-     * urn:x-oca:ocpp:uid:1:569419
-     * Current charging state, is required when state
-     * has changed.
+     * Transaction. State. Transaction_ State_ Code
+     * urn:x-oca:ocpp:uid:1:569419
+     * Current charging state, is required when state
+     * has changed.
      * 
      * 
      */
@@ -170,9 +168,9 @@ public class Transaction {
     }
 
     /**
-     * Transaction. Time_ Spent_ Charging. Elapsed_ Time
-     * urn:x-oca:ocpp:uid:1:569415
-     * Contains the total time that energy flowed from EVSE to EV during the transaction (in seconds). Note that timeSpentCharging is smaller or equal to the duration of the transaction.
+     * Transaction. Time_ Spent_ Charging. Elapsed_ Time
+     * urn:x-oca:ocpp:uid:1:569415
+     * Contains the total time that energy flowed from EVSE to EV during the transaction (in seconds). Note that timeSpentCharging is smaller or equal to the duration of the transaction.
      * 
      * 
      */
@@ -182,9 +180,9 @@ public class Transaction {
     }
 
     /**
-     * Transaction. Time_ Spent_ Charging. Elapsed_ Time
-     * urn:x-oca:ocpp:uid:1:569415
-     * Contains the total time that energy flowed from EVSE to EV during the transaction (in seconds). Note that timeSpentCharging is smaller or equal to the duration of the transaction.
+     * Transaction. Time_ Spent_ Charging. Elapsed_ Time
+     * urn:x-oca:ocpp:uid:1:569415
+     * Contains the total time that energy flowed from EVSE to EV during the transaction (in seconds). Note that timeSpentCharging is smaller or equal to the duration of the transaction.
      * 
      * 
      */
@@ -199,9 +197,9 @@ public class Transaction {
     }
 
     /**
-     * Transaction. Stopped_ Reason. EOT_ Reason_ Code
-     * urn:x-oca:ocpp:uid:1:569413
-     * This contains the reason why the transaction was stopped. MAY only be omitted when Reason is "Local".
+     * Transaction. Stopped_ Reason. EOT_ Reason_ Code
+     * urn:x-oca:ocpp:uid:1:569413
+     * This contains the reason why the transaction was stopped. MAY only be omitted when Reason is "Local".
      * 
      * 
      */
@@ -211,9 +209,9 @@ public class Transaction {
     }
 
     /**
-     * Transaction. Stopped_ Reason. EOT_ Reason_ Code
-     * urn:x-oca:ocpp:uid:1:569413
-     * This contains the reason why the transaction was stopped. MAY only be omitted when Reason is "Local".
+     * Transaction. Stopped_ Reason. EOT_ Reason_ Code
+     * urn:x-oca:ocpp:uid:1:569413
+     * This contains the reason why the transaction was stopped. MAY only be omitted when Reason is "Local".
      * 
      * 
      */
@@ -228,7 +226,7 @@ public class Transaction {
     }
 
     /**
-     * The ID given to remote start request (&lt;&lt;requeststarttransactionrequest, RequestStartTransactionRequest&gt;&gt;. This enables to CSMS to match the started transaction to the given start request.
+     * The ID given to remote start request (&lt;&lt;requeststarttransactionrequest, RequestStartTransactionRequest&gt;&gt;. This enables to CSMS to match the started transaction to the given start request.
      * 
      * 
      */
@@ -238,7 +236,7 @@ public class Transaction {
     }
 
     /**
-     * The ID given to remote start request (&lt;&lt;requeststarttransactionrequest, RequestStartTransactionRequest&gt;&gt;. This enables to CSMS to match the started transaction to the given start request.
+     * The ID given to remote start request (&lt;&lt;requeststarttransactionrequest, RequestStartTransactionRequest&gt;&gt;. This enables to CSMS to match the started transaction to the given start request.
      * 
      * 
      */

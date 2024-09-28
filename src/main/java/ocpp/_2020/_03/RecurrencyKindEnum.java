@@ -3,19 +3,17 @@ package ocpp._2020._03;
 
 import java.util.HashMap;
 import java.util.Map;
-import javax.annotation.Generated;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 
 /**
- * Charging_ Profile. Recurrency_ Kind. Recurrency_ Kind_ Code
- * urn:x-oca:ocpp:uid:1:569233
- * Indicates the start point of a recurrence.
+ * Charging_ Profile. Recurrency_ Kind. Recurrency_ Kind_ Code
+ * urn:x-oca:ocpp:uid:1:569233
+ * Indicates the start point of a recurrence.
  * 
  * 
  */
-@Generated("jsonschema2pojo")
 public enum RecurrencyKindEnum {
 
     DAILY("Daily"),

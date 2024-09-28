@@ -1,14 +1,13 @@
 
 package ocpp._2020._03;
 
-import javax.annotation.Generated;
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
@@ -19,7 +18,6 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
     "serialNumber",
     "responderURL"
 })
-@Generated("jsonschema2pojo")
 public class OCSPRequestData {
 
     /**
@@ -31,7 +29,7 @@ public class OCSPRequestData {
     @Valid
     private CustomData customData;
     /**
-     * Used algorithms for the hashes provided.
+     * Used algorithms for the hashes provided.
      * 
      * (Required)
      * 
@@ -41,8 +39,8 @@ public class OCSPRequestData {
     @NotNull
     private HashAlgorithmEnum hashAlgorithm;
     /**
-     * Hashed value of the Issuer DN (Distinguished Name).
-     * 
+     * Hashed value of the Issuer DN (Distinguished Name).
+     * 
      * 
      * (Required)
      * 
@@ -53,7 +51,7 @@ public class OCSPRequestData {
     @NotNull
     private String issuerNameHash;
     /**
-     * Hashed value of the issuers public key
+     * Hashed value of the issuers public key
      * 
      * (Required)
      * 
@@ -64,7 +62,7 @@ public class OCSPRequestData {
     @NotNull
     private String issuerKeyHash;
     /**
-     * The serial number of the certificate.
+     * The serial number of the certificate.
      * 
      * (Required)
      * 
@@ -75,8 +73,8 @@ public class OCSPRequestData {
     @NotNull
     private String serialNumber;
     /**
-     * This contains the responder URL (Case insensitive). 
-     * 
+     * This contains the responder URL (Case insensitive). 
+     * 
      * 
      * (Required)
      * 
@@ -111,7 +109,7 @@ public class OCSPRequestData {
     }
 
     /**
-     * Used algorithms for the hashes provided.
+     * Used algorithms for the hashes provided.
      * 
      * (Required)
      * 
@@ -122,7 +120,7 @@ public class OCSPRequestData {
     }
 
     /**
-     * Used algorithms for the hashes provided.
+     * Used algorithms for the hashes provided.
      * 
      * (Required)
      * 
@@ -138,8 +136,8 @@ public class OCSPRequestData {
     }
 
     /**
-     * Hashed value of the Issuer DN (Distinguished Name).
-     * 
+     * Hashed value of the Issuer DN (Distinguished Name).
+     * 
      * 
      * (Required)
      * 
@@ -150,8 +148,8 @@ public class OCSPRequestData {
     }
 
     /**
-     * Hashed value of the Issuer DN (Distinguished Name).
-     * 
+     * Hashed value of the Issuer DN (Distinguished Name).
+     * 
      * 
      * (Required)
      * 
@@ -167,7 +165,7 @@ public class OCSPRequestData {
     }
 
     /**
-     * Hashed value of the issuers public key
+     * Hashed value of the issuers public key
      * 
      * (Required)
      * 
@@ -178,7 +176,7 @@ public class OCSPRequestData {
     }
 
     /**
-     * Hashed value of the issuers public key
+     * Hashed value of the issuers public key
      * 
      * (Required)
      * 
@@ -194,7 +192,7 @@ public class OCSPRequestData {
     }
 
     /**
-     * The serial number of the certificate.
+     * The serial number of the certificate.
      * 
      * (Required)
      * 
@@ -205,7 +203,7 @@ public class OCSPRequestData {
     }
 
     /**
-     * The serial number of the certificate.
+     * The serial number of the certificate.
      * 
      * (Required)
      * 
@@ -221,8 +219,8 @@ public class OCSPRequestData {
     }
 
     /**
-     * This contains the responder URL (Case insensitive). 
-     * 
+     * This contains the responder URL (Case insensitive). 
+     * 
      * 
      * (Required)
      * 
@@ -233,8 +231,8 @@ public class OCSPRequestData {
     }
 
     /**
-     * This contains the responder URL (Case insensitive). 
-     * 
+     * This contains the responder URL (Case insensitive). 
+     * 
      * 
      * (Required)
      * 

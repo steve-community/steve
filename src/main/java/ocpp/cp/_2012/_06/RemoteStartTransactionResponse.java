@@ -1,12 +1,12 @@
 
 package ocpp.cp._2012._06;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlSchemaType;
-import javax.xml.bind.annotation.XmlType;
 import de.rwth.idsg.ocpp.jaxb.ResponseType;
+import jakarta.xml.bind.annotation.XmlAccessType;
+import jakarta.xml.bind.annotation.XmlAccessorType;
+import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlSchemaType;
+import jakarta.xml.bind.annotation.XmlType;
 import lombok.ToString;
 
 
@@ -72,6 +72,15 @@ public class RemoteStartTransactionResponse
         return (this.status!= null);
     }
 
+    /**
+     * Sets the value of the status property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link RemoteStartStopStatus }
+     * @return
+     *     The class instance
+     */
     public RemoteStartTransactionResponse withStatus(RemoteStartStopStatus value) {
         setStatus(value);
         return this;

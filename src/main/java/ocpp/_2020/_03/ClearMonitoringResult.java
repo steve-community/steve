@@ -1,13 +1,12 @@
 
 package ocpp._2020._03;
 
-import javax.annotation.Generated;
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
@@ -16,7 +15,6 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
     "id",
     "statusInfo"
 })
-@Generated("jsonschema2pojo")
 public class ClearMonitoringResult {
 
     /**
@@ -28,8 +26,8 @@ public class ClearMonitoringResult {
     @Valid
     private CustomData customData;
     /**
-     * Result of the clear request for this monitor, identified by its Id.
-     * 
+     * Result of the clear request for this monitor, identified by its Id.
+     * 
      * 
      * (Required)
      * 
@@ -39,8 +37,8 @@ public class ClearMonitoringResult {
     @NotNull
     private ClearMonitoringStatusEnum status;
     /**
-     * Id of the monitor of which a clear was requested.
-     * 
+     * Id of the monitor of which a clear was requested.
+     * 
      * 
      * (Required)
      * 
@@ -50,7 +48,7 @@ public class ClearMonitoringResult {
     @NotNull
     private Integer id;
     /**
-     * Element providing more information about the status.
+     * Element providing more information about the status.
      * 
      * 
      */
@@ -83,8 +81,8 @@ public class ClearMonitoringResult {
     }
 
     /**
-     * Result of the clear request for this monitor, identified by its Id.
-     * 
+     * Result of the clear request for this monitor, identified by its Id.
+     * 
      * 
      * (Required)
      * 
@@ -95,8 +93,8 @@ public class ClearMonitoringResult {
     }
 
     /**
-     * Result of the clear request for this monitor, identified by its Id.
-     * 
+     * Result of the clear request for this monitor, identified by its Id.
+     * 
      * 
      * (Required)
      * 
@@ -112,8 +110,8 @@ public class ClearMonitoringResult {
     }
 
     /**
-     * Id of the monitor of which a clear was requested.
-     * 
+     * Id of the monitor of which a clear was requested.
+     * 
      * 
      * (Required)
      * 
@@ -124,8 +122,8 @@ public class ClearMonitoringResult {
     }
 
     /**
-     * Id of the monitor of which a clear was requested.
-     * 
+     * Id of the monitor of which a clear was requested.
+     * 
      * 
      * (Required)
      * 
@@ -141,7 +139,7 @@ public class ClearMonitoringResult {
     }
 
     /**
-     * Element providing more information about the status.
+     * Element providing more information about the status.
      * 
      * 
      */
@@ -151,7 +149,7 @@ public class ClearMonitoringResult {
     }
 
     /**
-     * Element providing more information about the status.
+     * Element providing more information about the status.
      * 
      * 
      */

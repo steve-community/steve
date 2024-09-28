@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2019 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
+ * Copyright (C) 2013-2024 SteVe Community Team
  * All Rights Reserved.
  *
  * Parkl Digital Technologies
@@ -24,6 +24,7 @@ package de.rwth.idsg.steve.web.controller;
 
 import de.rwth.idsg.steve.config.WebEnvironment;
 import de.rwth.idsg.steve.repository.ReservationStatus;
+import de.rwth.idsg.steve.service.OcppTagService;
 import de.rwth.idsg.steve.service.TransactionStopService;
 import de.rwth.idsg.steve.web.dto.ReservationQueryForm;
 import de.rwth.idsg.steve.web.dto.TransactionQueryForm;
@@ -39,8 +40,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
-import javax.servlet.http.HttpServletResponse;
-import javax.validation.Valid;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
 import java.io.IOException;
 
 
@@ -57,6 +58,7 @@ public class TransactionsReservationsController {
     @Autowired private TransactionService transactionService;
     @Autowired private ReservationService reservationService;
     @Autowired private ChargePointService chargePointService;
+    @Autowired private OcppTagService ocppTagService;
     @Autowired private TransactionStopService transactionStopService;
 
     private static final String PARAMS = "params";
@@ -149,6 +151,7 @@ public class TransactionsReservationsController {
 
     private void initList(Model model) {
         model.addAttribute("cpList", chargePointService.getChargeBoxIds());
+        model.addAttribute("idTagList", ocppTagService.getIdTags());
     }
 
     private void initResList(Model model) {

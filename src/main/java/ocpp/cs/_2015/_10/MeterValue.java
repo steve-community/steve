@@ -4,13 +4,13 @@ package ocpp.cs._2015._10;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlSchemaType;
-import javax.xml.bind.annotation.XmlType;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import de.rwth.idsg.ocpp.jaxb.JodaDateTimeConverter;
+import jakarta.xml.bind.annotation.XmlAccessType;
+import jakarta.xml.bind.annotation.XmlAccessorType;
+import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlSchemaType;
+import jakarta.xml.bind.annotation.XmlType;
+import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import lombok.ToString;
 import org.joda.time.DateTime;
 
@@ -86,7 +86,7 @@ public class MeterValue {
      * <p>
      * This accessor method returns a reference to the live list,
      * not a snapshot. Therefore any modification you make to the
-     * returned list will be present inside the JAXB object.
+     * returned list will be present inside the Jakarta XML Binding object.
      * This is why there is not a <CODE>set</CODE> method for the sampledValue property.
      * 
      * <p>
@@ -117,11 +117,28 @@ public class MeterValue {
         this.sampledValue = null;
     }
 
+    /**
+     * Sets the value of the timestamp property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link DateTime }
+     * @return
+     *     The class instance
+     */
     public MeterValue withTimestamp(DateTime value) {
         setTimestamp(value);
         return this;
     }
 
+    /**
+     * Adds objects to the list of SampledValue using add method
+     * 
+     * @param values
+     *     objects to add to the list SampledValue
+     * @return
+     *     The class instance
+     */
     public MeterValue withSampledValue(SampledValue... values) {
         if (values!= null) {
             for (SampledValue value: values) {
@@ -131,6 +148,14 @@ public class MeterValue {
         return this;
     }
 
+    /**
+     * Adds objects to the list of SampledValue using addAll method
+     * 
+     * @param values
+     *     objects to add to the list SampledValue
+     * @return
+     *     The class instance
+     */
     public MeterValue withSampledValue(Collection<SampledValue> values) {
         if (values!= null) {
             getSampledValue().addAll(values);

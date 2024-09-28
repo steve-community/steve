@@ -3,17 +3,15 @@ package ocpp._2020._03;
 
 import java.util.HashMap;
 import java.util.Map;
-import javax.annotation.Generated;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 
 /**
- * Status is OK if a value could be returned. Otherwise this will indicate the reason why a value could not be returned.
+ * Status is OK if a value could be returned. Otherwise this will indicate the reason why a value could not be returned.
  * 
  * 
  */
-@Generated("jsonschema2pojo")
 public enum SetMonitoringStatusEnum {
 
     ACCEPTED("Accepted"),

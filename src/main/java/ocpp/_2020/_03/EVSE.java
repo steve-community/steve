@@ -1,19 +1,18 @@
 
 package ocpp._2020._03;
 
-import javax.annotation.Generated;
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 
 
 /**
- * EVSE
- * urn:x-oca:ocpp:uid:2:233123
- * Electric Vehicle Supply Equipment
+ * EVSE
+ * urn:x-oca:ocpp:uid:2:233123
+ * Electric Vehicle Supply Equipment
  * 
  * 
  */
@@ -23,7 +22,6 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
     "id",
     "connectorId"
 })
-@Generated("jsonschema2pojo")
 public class EVSE {
 
     /**
@@ -35,9 +33,9 @@ public class EVSE {
     @Valid
     private CustomData customData;
     /**
-     * Identified_ Object. MRID. Numeric_ Identifier
-     * urn:x-enexis:ecdm:uid:1:569198
-     * EVSE Identifier. This contains a number (&gt; 0) designating an EVSE of the Charging Station.
+     * Identified_ Object. MRID. Numeric_ Identifier
+     * urn:x-enexis:ecdm:uid:1:569198
+     * EVSE Identifier. This contains a number (&gt; 0) designating an EVSE of the Charging Station.
      * 
      * (Required)
      * 
@@ -47,7 +45,7 @@ public class EVSE {
     @NotNull
     private Integer id;
     /**
-     * An id to designate a specific connector (on an EVSE) by connector index number.
+     * An id to designate a specific connector (on an EVSE) by connector index number.
      * 
      * 
      */
@@ -79,9 +77,9 @@ public class EVSE {
     }
 
     /**
-     * Identified_ Object. MRID. Numeric_ Identifier
-     * urn:x-enexis:ecdm:uid:1:569198
-     * EVSE Identifier. This contains a number (&gt; 0) designating an EVSE of the Charging Station.
+     * Identified_ Object. MRID. Numeric_ Identifier
+     * urn:x-enexis:ecdm:uid:1:569198
+     * EVSE Identifier. This contains a number (&gt; 0) designating an EVSE of the Charging Station.
      * 
      * (Required)
      * 
@@ -92,9 +90,9 @@ public class EVSE {
     }
 
     /**
-     * Identified_ Object. MRID. Numeric_ Identifier
-     * urn:x-enexis:ecdm:uid:1:569198
-     * EVSE Identifier. This contains a number (&gt; 0) designating an EVSE of the Charging Station.
+     * Identified_ Object. MRID. Numeric_ Identifier
+     * urn:x-enexis:ecdm:uid:1:569198
+     * EVSE Identifier. This contains a number (&gt; 0) designating an EVSE of the Charging Station.
      * 
      * (Required)
      * 
@@ -110,7 +108,7 @@ public class EVSE {
     }
 
     /**
-     * An id to designate a specific connector (on an EVSE) by connector index number.
+     * An id to designate a specific connector (on an EVSE) by connector index number.
      * 
      * 
      */
@@ -120,7 +118,7 @@ public class EVSE {
     }
 
     /**
-     * An id to designate a specific connector (on an EVSE) by connector index number.
+     * An id to designate a specific connector (on an EVSE) by connector index number.
      * 
      * 
      */

@@ -1,14 +1,13 @@
 
 package ocpp._2020._03;
 
-import javax.annotation.Generated;
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import de.rwth.idsg.ocpp.jaxb.RequestType;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import org.joda.time.DateTime;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -19,7 +18,6 @@ import org.joda.time.DateTime;
     "evseId",
     "connectorId"
 })
-@Generated("jsonschema2pojo")
 public class StatusNotificationRequest implements RequestType
 {
 
@@ -32,7 +30,7 @@ public class StatusNotificationRequest implements RequestType
     @Valid
     private CustomData customData;
     /**
-     * The time for which the status is reported. If absent time of receipt of the message will be assumed.
+     * The time for which the status is reported. If absent time of receipt of the message will be assumed.
      * 
      * (Required)
      * 
@@ -42,7 +40,7 @@ public class StatusNotificationRequest implements RequestType
     @NotNull
     private DateTime timestamp;
     /**
-     * This contains the current status of the Connector.
+     * This contains the current status of the Connector.
      * 
      * (Required)
      * 
@@ -52,7 +50,7 @@ public class StatusNotificationRequest implements RequestType
     @NotNull
     private ConnectorStatusEnum connectorStatus;
     /**
-     * The id of the EVSE to which the connector belongs for which the the status is reported.
+     * The id of the EVSE to which the connector belongs for which the the status is reported.
      * 
      * (Required)
      * 
@@ -62,7 +60,7 @@ public class StatusNotificationRequest implements RequestType
     @NotNull
     private Integer evseId;
     /**
-     * The id of the connector within the EVSE for which the status is reported.
+     * The id of the connector within the EVSE for which the status is reported.
      * 
      * (Required)
      * 
@@ -96,7 +94,7 @@ public class StatusNotificationRequest implements RequestType
     }
 
     /**
-     * The time for which the status is reported. If absent time of receipt of the message will be assumed.
+     * The time for which the status is reported. If absent time of receipt of the message will be assumed.
      * 
      * (Required)
      * 
@@ -107,7 +105,7 @@ public class StatusNotificationRequest implements RequestType
     }
 
     /**
-     * The time for which the status is reported. If absent time of receipt of the message will be assumed.
+     * The time for which the status is reported. If absent time of receipt of the message will be assumed.
      * 
      * (Required)
      * 
@@ -123,7 +121,7 @@ public class StatusNotificationRequest implements RequestType
     }
 
     /**
-     * This contains the current status of the Connector.
+     * This contains the current status of the Connector.
      * 
      * (Required)
      * 
@@ -134,7 +132,7 @@ public class StatusNotificationRequest implements RequestType
     }
 
     /**
-     * This contains the current status of the Connector.
+     * This contains the current status of the Connector.
      * 
      * (Required)
      * 
@@ -150,7 +148,7 @@ public class StatusNotificationRequest implements RequestType
     }
 
     /**
-     * The id of the EVSE to which the connector belongs for which the the status is reported.
+     * The id of the EVSE to which the connector belongs for which the the status is reported.
      * 
      * (Required)
      * 
@@ -161,7 +159,7 @@ public class StatusNotificationRequest implements RequestType
     }
 
     /**
-     * The id of the EVSE to which the connector belongs for which the the status is reported.
+     * The id of the EVSE to which the connector belongs for which the the status is reported.
      * 
      * (Required)
      * 
@@ -177,7 +175,7 @@ public class StatusNotificationRequest implements RequestType
     }
 
     /**
-     * The id of the connector within the EVSE for which the status is reported.
+     * The id of the connector within the EVSE for which the status is reported.
      * 
      * (Required)
      * 
@@ -188,7 +186,7 @@ public class StatusNotificationRequest implements RequestType
     }
 
     /**
-     * The id of the connector within the EVSE for which the status is reported.
+     * The id of the connector within the EVSE for which the status is reported.
      * 
      * (Required)
      * 

@@ -3,15 +3,14 @@ package ocpp._2020._03;
 
 import java.util.ArrayList;
 import java.util.List;
-import javax.annotation.Generated;
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import de.rwth.idsg.ocpp.jaxb.RequestType;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import org.joda.time.DateTime;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -30,7 +29,6 @@ import org.joda.time.DateTime;
     "evse",
     "idToken"
 })
-@Generated("jsonschema2pojo")
 public class TransactionEventRequest implements RequestType
 {
 
@@ -43,8 +41,8 @@ public class TransactionEventRequest implements RequestType
     @Valid
     private CustomData customData;
     /**
-     * This contains the type of this event.
-     * The first TransactionEvent of a transaction SHALL contain: "Started" The last TransactionEvent of a transaction SHALL contain: "Ended" All others SHALL contain: "Updated"
+     * This contains the type of this event.
+     * The first TransactionEvent of a transaction SHALL contain: "Started" The last TransactionEvent of a transaction SHALL contain: "Ended" All others SHALL contain: "Updated"
      * 
      * (Required)
      * 
@@ -58,7 +56,7 @@ public class TransactionEventRequest implements RequestType
     @Valid
     private List<MeterValue> meterValue = new ArrayList<MeterValue>();
     /**
-     * The date and time at which this transaction event occurred.
+     * The date and time at which this transaction event occurred.
      * 
      * (Required)
      * 
@@ -68,7 +66,7 @@ public class TransactionEventRequest implements RequestType
     @NotNull
     private DateTime timestamp;
     /**
-     * Reason the Charging Station sends this message to the CSMS
+     * Reason the Charging Station sends this message to the CSMS
      * 
      * (Required)
      * 
@@ -78,7 +76,7 @@ public class TransactionEventRequest implements RequestType
     @NotNull
     private TriggerReasonEnum triggerReason;
     /**
-     * Incremental sequence number, helps with determining if all messages of a transaction have been received.
+     * Incremental sequence number, helps with determining if all messages of a transaction have been received.
      * 
      * (Required)
      * 
@@ -88,7 +86,7 @@ public class TransactionEventRequest implements RequestType
     @NotNull
     private Integer seqNo;
     /**
-     * Indication that this transaction event happened when the Charging Station was offline. Default = false, meaning: the event occurred when the Charging Station was online.
+     * Indication that this transaction event happened when the Charging Station was offline. Default = false, meaning: the event occurred when the Charging Station was online.
      * 
      * 
      */
@@ -96,7 +94,7 @@ public class TransactionEventRequest implements RequestType
     @JsonPropertyDescription("Indication that this transaction event happened when the Charging Station was offline. Default = false, meaning: the event occurred when the Charging Station was online.\r\n")
     private Boolean offline = false;
     /**
-     * If the Charging Station is able to report the number of phases used, then it SHALL provide it. When omitted the CSMS may be able to determine the number of phases used via device management.
+     * If the Charging Station is able to report the number of phases used, then it SHALL provide it. When omitted the CSMS may be able to determine the number of phases used via device management.
      * 
      * 
      */
@@ -104,7 +102,7 @@ public class TransactionEventRequest implements RequestType
     @JsonPropertyDescription("If the Charging Station is able to report the number of phases used, then it SHALL provide it. When omitted the CSMS may be able to determine the number of phases used via device management.\r\n")
     private Integer numberOfPhasesUsed;
     /**
-     * The maximum current of the connected cable in Ampere (A).
+     * The maximum current of the connected cable in Ampere (A).
      * 
      * 
      */
@@ -112,7 +110,7 @@ public class TransactionEventRequest implements RequestType
     @JsonPropertyDescription("The maximum current of the connected cable in Ampere (A).\r\n")
     private Integer cableMaxCurrent;
     /**
-     * This contains the Id of the reservation that terminates as a result of this transaction.
+     * This contains the Id of the reservation that terminates as a result of this transaction.
      * 
      * 
      */
@@ -120,8 +118,8 @@ public class TransactionEventRequest implements RequestType
     @JsonPropertyDescription("This contains the Id of the reservation that terminates as a result of this transaction.\r\n")
     private Integer reservationId;
     /**
-     * Transaction
-     * urn:x-oca:ocpp:uid:2:233318
+     * Transaction
+     * urn:x-oca:ocpp:uid:2:233318
      * 
      * (Required)
      * 
@@ -132,9 +130,9 @@ public class TransactionEventRequest implements RequestType
     @NotNull
     private Transaction transactionInfo;
     /**
-     * EVSE
-     * urn:x-oca:ocpp:uid:2:233123
-     * Electric Vehicle Supply Equipment
+     * EVSE
+     * urn:x-oca:ocpp:uid:2:233123
+     * Electric Vehicle Supply Equipment
      * 
      * 
      */
@@ -143,7 +141,7 @@ public class TransactionEventRequest implements RequestType
     @Valid
     private EVSE evse;
     /**
-     * Contains a case insensitive identifier to use for the authorization and the type of authorization to support multiple forms of identifiers.
+     * Contains a case insensitive identifier to use for the authorization and the type of authorization to support multiple forms of identifiers.
      * 
      * 
      */
@@ -176,8 +174,8 @@ public class TransactionEventRequest implements RequestType
     }
 
     /**
-     * This contains the type of this event.
-     * The first TransactionEvent of a transaction SHALL contain: "Started" The last TransactionEvent of a transaction SHALL contain: "Ended" All others SHALL contain: "Updated"
+     * This contains the type of this event.
+     * The first TransactionEvent of a transaction SHALL contain: "Started" The last TransactionEvent of a transaction SHALL contain: "Ended" All others SHALL contain: "Updated"
      * 
      * (Required)
      * 
@@ -188,8 +186,8 @@ public class TransactionEventRequest implements RequestType
     }
 
     /**
-     * This contains the type of this event.
-     * The first TransactionEvent of a transaction SHALL contain: "Started" The last TransactionEvent of a transaction SHALL contain: "Ended" All others SHALL contain: "Updated"
+     * This contains the type of this event.
+     * The first TransactionEvent of a transaction SHALL contain: "Started" The last TransactionEvent of a transaction SHALL contain: "Ended" All others SHALL contain: "Updated"
      * 
      * (Required)
      * 
@@ -220,7 +218,7 @@ public class TransactionEventRequest implements RequestType
     }
 
     /**
-     * The date and time at which this transaction event occurred.
+     * The date and time at which this transaction event occurred.
      * 
      * (Required)
      * 
@@ -231,7 +229,7 @@ public class TransactionEventRequest implements RequestType
     }
 
     /**
-     * The date and time at which this transaction event occurred.
+     * The date and time at which this transaction event occurred.
      * 
      * (Required)
      * 
@@ -247,7 +245,7 @@ public class TransactionEventRequest implements RequestType
     }
 
     /**
-     * Reason the Charging Station sends this message to the CSMS
+     * Reason the Charging Station sends this message to the CSMS
      * 
      * (Required)
      * 
@@ -258,7 +256,7 @@ public class TransactionEventRequest implements RequestType
     }
 
     /**
-     * Reason the Charging Station sends this message to the CSMS
+     * Reason the Charging Station sends this message to the CSMS
      * 
      * (Required)
      * 
@@ -274,7 +272,7 @@ public class TransactionEventRequest implements RequestType
     }
 
     /**
-     * Incremental sequence number, helps with determining if all messages of a transaction have been received.
+     * Incremental sequence number, helps with determining if all messages of a transaction have been received.
      * 
      * (Required)
      * 
@@ -285,7 +283,7 @@ public class TransactionEventRequest implements RequestType
     }
 
     /**
-     * Incremental sequence number, helps with determining if all messages of a transaction have been received.
+     * Incremental sequence number, helps with determining if all messages of a transaction have been received.
      * 
      * (Required)
      * 
@@ -301,7 +299,7 @@ public class TransactionEventRequest implements RequestType
     }
 
     /**
-     * Indication that this transaction event happened when the Charging Station was offline. Default = false, meaning: the event occurred when the Charging Station was online.
+     * Indication that this transaction event happened when the Charging Station was offline. Default = false, meaning: the event occurred when the Charging Station was online.
      * 
      * 
      */
@@ -311,7 +309,7 @@ public class TransactionEventRequest implements RequestType
     }
 
     /**
-     * Indication that this transaction event happened when the Charging Station was offline. Default = false, meaning: the event occurred when the Charging Station was online.
+     * Indication that this transaction event happened when the Charging Station was offline. Default = false, meaning: the event occurred when the Charging Station was online.
      * 
      * 
      */
@@ -326,7 +324,7 @@ public class TransactionEventRequest implements RequestType
     }
 
     /**
-     * If the Charging Station is able to report the number of phases used, then it SHALL provide it. When omitted the CSMS may be able to determine the number of phases used via device management.
+     * If the Charging Station is able to report the number of phases used, then it SHALL provide it. When omitted the CSMS may be able to determine the number of phases used via device management.
      * 
      * 
      */
@@ -336,7 +334,7 @@ public class TransactionEventRequest implements RequestType
     }
 
     /**
-     * If the Charging Station is able to report the number of phases used, then it SHALL provide it. When omitted the CSMS may be able to determine the number of phases used via device management.
+     * If the Charging Station is able to report the number of phases used, then it SHALL provide it. When omitted the CSMS may be able to determine the number of phases used via device management.
      * 
      * 
      */
@@ -351,7 +349,7 @@ public class TransactionEventRequest implements RequestType
     }
 
     /**
-     * The maximum current of the connected cable in Ampere (A).
+     * The maximum current of the connected cable in Ampere (A).
      * 
      * 
      */
@@ -361,7 +359,7 @@ public class TransactionEventRequest implements RequestType
     }
 
     /**
-     * The maximum current of the connected cable in Ampere (A).
+     * The maximum current of the connected cable in Ampere (A).
      * 
      * 
      */
@@ -376,7 +374,7 @@ public class TransactionEventRequest implements RequestType
     }
 
     /**
-     * This contains the Id of the reservation that terminates as a result of this transaction.
+     * This contains the Id of the reservation that terminates as a result of this transaction.
      * 
      * 
      */
@@ -386,7 +384,7 @@ public class TransactionEventRequest implements RequestType
     }
 
     /**
-     * This contains the Id of the reservation that terminates as a result of this transaction.
+     * This contains the Id of the reservation that terminates as a result of this transaction.
      * 
      * 
      */
@@ -401,8 +399,8 @@ public class TransactionEventRequest implements RequestType
     }
 
     /**
-     * Transaction
-     * urn:x-oca:ocpp:uid:2:233318
+     * Transaction
+     * urn:x-oca:ocpp:uid:2:233318
      * 
      * (Required)
      * 
@@ -413,8 +411,8 @@ public class TransactionEventRequest implements RequestType
     }
 
     /**
-     * Transaction
-     * urn:x-oca:ocpp:uid:2:233318
+     * Transaction
+     * urn:x-oca:ocpp:uid:2:233318
      * 
      * (Required)
      * 
@@ -430,9 +428,9 @@ public class TransactionEventRequest implements RequestType
     }
 
     /**
-     * EVSE
-     * urn:x-oca:ocpp:uid:2:233123
-     * Electric Vehicle Supply Equipment
+     * EVSE
+     * urn:x-oca:ocpp:uid:2:233123
+     * Electric Vehicle Supply Equipment
      * 
      * 
      */
@@ -442,9 +440,9 @@ public class TransactionEventRequest implements RequestType
     }
 
     /**
-     * EVSE
-     * urn:x-oca:ocpp:uid:2:233123
-     * Electric Vehicle Supply Equipment
+     * EVSE
+     * urn:x-oca:ocpp:uid:2:233123
+     * Electric Vehicle Supply Equipment
      * 
      * 
      */
@@ -459,7 +457,7 @@ public class TransactionEventRequest implements RequestType
     }
 
     /**
-     * Contains a case insensitive identifier to use for the authorization and the type of authorization to support multiple forms of identifiers.
+     * Contains a case insensitive identifier to use for the authorization and the type of authorization to support multiple forms of identifiers.
      * 
      * 
      */
@@ -469,7 +467,7 @@ public class TransactionEventRequest implements RequestType
     }
 
     /**
-     * Contains a case insensitive identifier to use for the authorization and the type of authorization to support multiple forms of identifiers.
+     * Contains a case insensitive identifier to use for the authorization and the type of authorization to support multiple forms of identifiers.
      * 
      * 
      */

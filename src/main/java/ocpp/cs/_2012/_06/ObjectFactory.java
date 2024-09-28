@@ -1,10 +1,10 @@
 
 package ocpp.cs._2012._06;
 
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.annotation.XmlElementDecl;
-import javax.xml.bind.annotation.XmlRegistry;
 import javax.xml.namespace.QName;
+import jakarta.xml.bind.JAXBElement;
+import jakarta.xml.bind.annotation.XmlElementDecl;
+import jakarta.xml.bind.annotation.XmlRegistry;
 
 
 /**
@@ -246,8 +246,12 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link String }{@code >}}
+     * Create an instance of {@link JAXBElement }{@code <}{@link String }{@code >}
      * 
+     * @param value
+     *     Java instance representing xml element's value.
+     * @return
+     *     the new instance of {@link JAXBElement }{@code <}{@link String }{@code >}
      */
     @XmlElementDecl(namespace = "urn://Ocpp/Cs/2012/06/", name = "chargeBoxIdentity")
     public JAXBElement<String> createChargeBoxIdentity(String value) {
@@ -255,8 +259,12 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link AuthorizeRequest }{@code >}}
+     * Create an instance of {@link JAXBElement }{@code <}{@link AuthorizeRequest }{@code >}
      * 
+     * @param value
+     *     Java instance representing xml element's value.
+     * @return
+     *     the new instance of {@link JAXBElement }{@code <}{@link AuthorizeRequest }{@code >}
      */
     @XmlElementDecl(namespace = "urn://Ocpp/Cs/2012/06/", name = "authorizeRequest")
     public JAXBElement<AuthorizeRequest> createAuthorizeRequest(AuthorizeRequest value) {
@@ -264,8 +272,12 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link AuthorizeResponse }{@code >}}
+     * Create an instance of {@link JAXBElement }{@code <}{@link AuthorizeResponse }{@code >}
      * 
+     * @param value
+     *     Java instance representing xml element's value.
+     * @return
+     *     the new instance of {@link JAXBElement }{@code <}{@link AuthorizeResponse }{@code >}
      */
     @XmlElementDecl(namespace = "urn://Ocpp/Cs/2012/06/", name = "authorizeResponse")
     public JAXBElement<AuthorizeResponse> createAuthorizeResponse(AuthorizeResponse value) {
@@ -273,8 +285,12 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link StartTransactionRequest }{@code >}}
+     * Create an instance of {@link JAXBElement }{@code <}{@link StartTransactionRequest }{@code >}
      * 
+     * @param value
+     *     Java instance representing xml element's value.
+     * @return
+     *     the new instance of {@link JAXBElement }{@code <}{@link StartTransactionRequest }{@code >}
      */
     @XmlElementDecl(namespace = "urn://Ocpp/Cs/2012/06/", name = "startTransactionRequest")
     public JAXBElement<StartTransactionRequest> createStartTransactionRequest(StartTransactionRequest value) {
@@ -282,8 +298,12 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link StartTransactionResponse }{@code >}}
+     * Create an instance of {@link JAXBElement }{@code <}{@link StartTransactionResponse }{@code >}
      * 
+     * @param value
+     *     Java instance representing xml element's value.
+     * @return
+     *     the new instance of {@link JAXBElement }{@code <}{@link StartTransactionResponse }{@code >}
      */
     @XmlElementDecl(namespace = "urn://Ocpp/Cs/2012/06/", name = "startTransactionResponse")
     public JAXBElement<StartTransactionResponse> createStartTransactionResponse(StartTransactionResponse value) {
@@ -291,8 +311,12 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link StopTransactionRequest }{@code >}}
+     * Create an instance of {@link JAXBElement }{@code <}{@link StopTransactionRequest }{@code >}
      * 
+     * @param value
+     *     Java instance representing xml element's value.
+     * @return
+     *     the new instance of {@link JAXBElement }{@code <}{@link StopTransactionRequest }{@code >}
      */
     @XmlElementDecl(namespace = "urn://Ocpp/Cs/2012/06/", name = "stopTransactionRequest")
     public JAXBElement<StopTransactionRequest> createStopTransactionRequest(StopTransactionRequest value) {
@@ -300,8 +324,12 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link StopTransactionResponse }{@code >}}
+     * Create an instance of {@link JAXBElement }{@code <}{@link StopTransactionResponse }{@code >}
      * 
+     * @param value
+     *     Java instance representing xml element's value.
+     * @return
+     *     the new instance of {@link JAXBElement }{@code <}{@link StopTransactionResponse }{@code >}
      */
     @XmlElementDecl(namespace = "urn://Ocpp/Cs/2012/06/", name = "stopTransactionResponse")
     public JAXBElement<StopTransactionResponse> createStopTransactionResponse(StopTransactionResponse value) {
@@ -309,8 +337,12 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link HeartbeatRequest }{@code >}}
+     * Create an instance of {@link JAXBElement }{@code <}{@link HeartbeatRequest }{@code >}
      * 
+     * @param value
+     *     Java instance representing xml element's value.
+     * @return
+     *     the new instance of {@link JAXBElement }{@code <}{@link HeartbeatRequest }{@code >}
      */
     @XmlElementDecl(namespace = "urn://Ocpp/Cs/2012/06/", name = "heartbeatRequest")
     public JAXBElement<HeartbeatRequest> createHeartbeatRequest(HeartbeatRequest value) {
@@ -318,8 +350,12 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link HeartbeatResponse }{@code >}}
+     * Create an instance of {@link JAXBElement }{@code <}{@link HeartbeatResponse }{@code >}
      * 
+     * @param value
+     *     Java instance representing xml element's value.
+     * @return
+     *     the new instance of {@link JAXBElement }{@code <}{@link HeartbeatResponse }{@code >}
      */
     @XmlElementDecl(namespace = "urn://Ocpp/Cs/2012/06/", name = "heartbeatResponse")
     public JAXBElement<HeartbeatResponse> createHeartbeatResponse(HeartbeatResponse value) {
@@ -327,8 +363,12 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link MeterValuesRequest }{@code >}}
+     * Create an instance of {@link JAXBElement }{@code <}{@link MeterValuesRequest }{@code >}
      * 
+     * @param value
+     *     Java instance representing xml element's value.
+     * @return
+     *     the new instance of {@link JAXBElement }{@code <}{@link MeterValuesRequest }{@code >}
      */
     @XmlElementDecl(namespace = "urn://Ocpp/Cs/2012/06/", name = "meterValuesRequest")
     public JAXBElement<MeterValuesRequest> createMeterValuesRequest(MeterValuesRequest value) {
@@ -336,8 +376,12 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link MeterValuesResponse }{@code >}}
+     * Create an instance of {@link JAXBElement }{@code <}{@link MeterValuesResponse }{@code >}
      * 
+     * @param value
+     *     Java instance representing xml element's value.
+     * @return
+     *     the new instance of {@link JAXBElement }{@code <}{@link MeterValuesResponse }{@code >}
      */
     @XmlElementDecl(namespace = "urn://Ocpp/Cs/2012/06/", name = "meterValuesResponse")
     public JAXBElement<MeterValuesResponse> createMeterValuesResponse(MeterValuesResponse value) {
@@ -345,8 +389,12 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link BootNotificationRequest }{@code >}}
+     * Create an instance of {@link JAXBElement }{@code <}{@link BootNotificationRequest }{@code >}
      * 
+     * @param value
+     *     Java instance representing xml element's value.
+     * @return
+     *     the new instance of {@link JAXBElement }{@code <}{@link BootNotificationRequest }{@code >}
      */
     @XmlElementDecl(namespace = "urn://Ocpp/Cs/2012/06/", name = "bootNotificationRequest")
     public JAXBElement<BootNotificationRequest> createBootNotificationRequest(BootNotificationRequest value) {
@@ -354,8 +402,12 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link BootNotificationResponse }{@code >}}
+     * Create an instance of {@link JAXBElement }{@code <}{@link BootNotificationResponse }{@code >}
      * 
+     * @param value
+     *     Java instance representing xml element's value.
+     * @return
+     *     the new instance of {@link JAXBElement }{@code <}{@link BootNotificationResponse }{@code >}
      */
     @XmlElementDecl(namespace = "urn://Ocpp/Cs/2012/06/", name = "bootNotificationResponse")
     public JAXBElement<BootNotificationResponse> createBootNotificationResponse(BootNotificationResponse value) {
@@ -363,8 +415,12 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link StatusNotificationRequest }{@code >}}
+     * Create an instance of {@link JAXBElement }{@code <}{@link StatusNotificationRequest }{@code >}
      * 
+     * @param value
+     *     Java instance representing xml element's value.
+     * @return
+     *     the new instance of {@link JAXBElement }{@code <}{@link StatusNotificationRequest }{@code >}
      */
     @XmlElementDecl(namespace = "urn://Ocpp/Cs/2012/06/", name = "statusNotificationRequest")
     public JAXBElement<StatusNotificationRequest> createStatusNotificationRequest(StatusNotificationRequest value) {
@@ -372,8 +428,12 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link StatusNotificationResponse }{@code >}}
+     * Create an instance of {@link JAXBElement }{@code <}{@link StatusNotificationResponse }{@code >}
      * 
+     * @param value
+     *     Java instance representing xml element's value.
+     * @return
+     *     the new instance of {@link JAXBElement }{@code <}{@link StatusNotificationResponse }{@code >}
      */
     @XmlElementDecl(namespace = "urn://Ocpp/Cs/2012/06/", name = "statusNotificationResponse")
     public JAXBElement<StatusNotificationResponse> createStatusNotificationResponse(StatusNotificationResponse value) {
@@ -381,8 +441,12 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link FirmwareStatusNotificationRequest }{@code >}}
+     * Create an instance of {@link JAXBElement }{@code <}{@link FirmwareStatusNotificationRequest }{@code >}
      * 
+     * @param value
+     *     Java instance representing xml element's value.
+     * @return
+     *     the new instance of {@link JAXBElement }{@code <}{@link FirmwareStatusNotificationRequest }{@code >}
      */
     @XmlElementDecl(namespace = "urn://Ocpp/Cs/2012/06/", name = "firmwareStatusNotificationRequest")
     public JAXBElement<FirmwareStatusNotificationRequest> createFirmwareStatusNotificationRequest(FirmwareStatusNotificationRequest value) {
@@ -390,8 +454,12 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link FirmwareStatusNotificationResponse }{@code >}}
+     * Create an instance of {@link JAXBElement }{@code <}{@link FirmwareStatusNotificationResponse }{@code >}
      * 
+     * @param value
+     *     Java instance representing xml element's value.
+     * @return
+     *     the new instance of {@link JAXBElement }{@code <}{@link FirmwareStatusNotificationResponse }{@code >}
      */
     @XmlElementDecl(namespace = "urn://Ocpp/Cs/2012/06/", name = "firmwareStatusNotificationResponse")
     public JAXBElement<FirmwareStatusNotificationResponse> createFirmwareStatusNotificationResponse(FirmwareStatusNotificationResponse value) {
@@ -399,8 +467,12 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link DiagnosticsStatusNotificationRequest }{@code >}}
+     * Create an instance of {@link JAXBElement }{@code <}{@link DiagnosticsStatusNotificationRequest }{@code >}
      * 
+     * @param value
+     *     Java instance representing xml element's value.
+     * @return
+     *     the new instance of {@link JAXBElement }{@code <}{@link DiagnosticsStatusNotificationRequest }{@code >}
      */
     @XmlElementDecl(namespace = "urn://Ocpp/Cs/2012/06/", name = "diagnosticsStatusNotificationRequest")
     public JAXBElement<DiagnosticsStatusNotificationRequest> createDiagnosticsStatusNotificationRequest(DiagnosticsStatusNotificationRequest value) {
@@ -408,8 +480,12 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link DiagnosticsStatusNotificationResponse }{@code >}}
+     * Create an instance of {@link JAXBElement }{@code <}{@link DiagnosticsStatusNotificationResponse }{@code >}
      * 
+     * @param value
+     *     Java instance representing xml element's value.
+     * @return
+     *     the new instance of {@link JAXBElement }{@code <}{@link DiagnosticsStatusNotificationResponse }{@code >}
      */
     @XmlElementDecl(namespace = "urn://Ocpp/Cs/2012/06/", name = "diagnosticsStatusNotificationResponse")
     public JAXBElement<DiagnosticsStatusNotificationResponse> createDiagnosticsStatusNotificationResponse(DiagnosticsStatusNotificationResponse value) {
@@ -417,8 +493,12 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link DataTransferRequest }{@code >}}
+     * Create an instance of {@link JAXBElement }{@code <}{@link DataTransferRequest }{@code >}
      * 
+     * @param value
+     *     Java instance representing xml element's value.
+     * @return
+     *     the new instance of {@link JAXBElement }{@code <}{@link DataTransferRequest }{@code >}
      */
     @XmlElementDecl(namespace = "urn://Ocpp/Cs/2012/06/", name = "dataTransferRequest")
     public JAXBElement<DataTransferRequest> createDataTransferRequest(DataTransferRequest value) {
@@ -426,8 +506,12 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link DataTransferResponse }{@code >}}
+     * Create an instance of {@link JAXBElement }{@code <}{@link DataTransferResponse }{@code >}
      * 
+     * @param value
+     *     Java instance representing xml element's value.
+     * @return
+     *     the new instance of {@link JAXBElement }{@code <}{@link DataTransferResponse }{@code >}
      */
     @XmlElementDecl(namespace = "urn://Ocpp/Cs/2012/06/", name = "dataTransferResponse")
     public JAXBElement<DataTransferResponse> createDataTransferResponse(DataTransferResponse value) {

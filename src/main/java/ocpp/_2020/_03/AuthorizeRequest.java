@@ -3,15 +3,14 @@ package ocpp._2020._03;
 
 import java.util.ArrayList;
 import java.util.List;
-import javax.annotation.Generated;
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import de.rwth.idsg.ocpp.jaxb.RequestType;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
@@ -20,7 +19,6 @@ import de.rwth.idsg.ocpp.jaxb.RequestType;
     "certificate",
     "iso15118CertificateHashData"
 })
-@Generated("jsonschema2pojo")
 public class AuthorizeRequest implements RequestType
 {
 
@@ -33,7 +31,7 @@ public class AuthorizeRequest implements RequestType
     @Valid
     private CustomData customData;
     /**
-     * Contains a case insensitive identifier to use for the authorization and the type of authorization to support multiple forms of identifiers.
+     * Contains a case insensitive identifier to use for the authorization and the type of authorization to support multiple forms of identifiers.
      * 
      * (Required)
      * 
@@ -44,7 +42,7 @@ public class AuthorizeRequest implements RequestType
     @NotNull
     private IdToken idToken;
     /**
-     * The X.509 certificated presented by EV and encoded in PEM format.
+     * The X.509 certificated presented by EV and encoded in PEM format.
      * 
      * 
      */
@@ -81,7 +79,7 @@ public class AuthorizeRequest implements RequestType
     }
 
     /**
-     * Contains a case insensitive identifier to use for the authorization and the type of authorization to support multiple forms of identifiers.
+     * Contains a case insensitive identifier to use for the authorization and the type of authorization to support multiple forms of identifiers.
      * 
      * (Required)
      * 
@@ -92,7 +90,7 @@ public class AuthorizeRequest implements RequestType
     }
 
     /**
-     * Contains a case insensitive identifier to use for the authorization and the type of authorization to support multiple forms of identifiers.
+     * Contains a case insensitive identifier to use for the authorization and the type of authorization to support multiple forms of identifiers.
      * 
      * (Required)
      * 
@@ -108,7 +106,7 @@ public class AuthorizeRequest implements RequestType
     }
 
     /**
-     * The X.509 certificated presented by EV and encoded in PEM format.
+     * The X.509 certificated presented by EV and encoded in PEM format.
      * 
      * 
      */
@@ -118,7 +116,7 @@ public class AuthorizeRequest implements RequestType
     }
 
     /**
-     * The X.509 certificated presented by EV and encoded in PEM format.
+     * The X.509 certificated presented by EV and encoded in PEM format.
      * 
      * 
      */

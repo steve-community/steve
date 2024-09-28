@@ -3,19 +3,17 @@ package ocpp._2020._03;
 
 import java.util.HashMap;
 import java.util.Map;
-import javax.annotation.Generated;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 
 /**
- * Communication_ Function. OCPP_ Version. OCPP_ Version_ Code
- * urn:x-oca:ocpp:uid:1:569355
- * Defines the OCPP version used for this communication function.
+ * Communication_ Function. OCPP_ Version. OCPP_ Version_ Code
+ * urn:x-oca:ocpp:uid:1:569355
+ * Defines the OCPP version used for this communication function.
  * 
  * 
  */
-@Generated("jsonschema2pojo")
 public enum OCPPVersionEnum {
 
     OCPP_12("OCPP12"),

@@ -1,14 +1,14 @@
 
 package ocpp.cp._2012._06;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlSchemaType;
-import javax.xml.bind.annotation.XmlType;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import de.rwth.idsg.ocpp.jaxb.JodaDateTimeConverter;
 import de.rwth.idsg.ocpp.jaxb.RequestType;
+import jakarta.xml.bind.annotation.XmlAccessType;
+import jakarta.xml.bind.annotation.XmlAccessorType;
+import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlSchemaType;
+import jakarta.xml.bind.annotation.XmlType;
+import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import lombok.ToString;
 import org.joda.time.DateTime;
 
@@ -185,26 +185,71 @@ public class ReserveNowRequest
         return true;
     }
 
+    /**
+     * Sets the value of the connectorId property.
+     * 
+     * @param value
+     *     allowed object is
+     *     int
+     * @return
+     *     The class instance
+     */
     public ReserveNowRequest withConnectorId(int value) {
         setConnectorId(value);
         return this;
     }
 
+    /**
+     * Sets the value of the expiryDate property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link DateTime }
+     * @return
+     *     The class instance
+     */
     public ReserveNowRequest withExpiryDate(DateTime value) {
         setExpiryDate(value);
         return this;
     }
 
+    /**
+     * Sets the value of the idTag property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     * @return
+     *     The class instance
+     */
     public ReserveNowRequest withIdTag(String value) {
         setIdTag(value);
         return this;
     }
 
+    /**
+     * Sets the value of the parentIdTag property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     * @return
+     *     The class instance
+     */
     public ReserveNowRequest withParentIdTag(String value) {
         setParentIdTag(value);
         return this;
     }
 
+    /**
+     * Sets the value of the reservationId property.
+     * 
+     * @param value
+     *     allowed object is
+     *     int
+     * @return
+     *     The class instance
+     */
     public ReserveNowRequest withReservationId(int value) {
         setReservationId(value);
         return this;

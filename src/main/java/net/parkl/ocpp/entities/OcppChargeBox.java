@@ -22,7 +22,7 @@ import lombok.Getter;
 import lombok.Setter;
 import ocpp.cs._2015._10.RegistrationStatus;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.math.BigDecimal;
 import java.util.Date;
 

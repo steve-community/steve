@@ -1,21 +1,19 @@
 
 package ocpp._2020._03;
 
-import javax.annotation.Generated;
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import de.rwth.idsg.ocpp.jaxb.RequestType;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
     "customData",
     "message"
 })
-@Generated("jsonschema2pojo")
 public class SetDisplayMessageRequest implements RequestType
 {
 
@@ -28,9 +26,9 @@ public class SetDisplayMessageRequest implements RequestType
     @Valid
     private CustomData customData;
     /**
-     * Message_ Info
-     * urn:x-enexis:ecdm:uid:2:233264
-     * Contains message details, for a message to be displayed on a Charging Station.
+     * Message_ Info
+     * urn:x-enexis:ecdm:uid:2:233264
+     * Contains message details, for a message to be displayed on a Charging Station.
      * 
      * (Required)
      * 
@@ -65,9 +63,9 @@ public class SetDisplayMessageRequest implements RequestType
     }
 
     /**
-     * Message_ Info
-     * urn:x-enexis:ecdm:uid:2:233264
-     * Contains message details, for a message to be displayed on a Charging Station.
+     * Message_ Info
+     * urn:x-enexis:ecdm:uid:2:233264
+     * Contains message details, for a message to be displayed on a Charging Station.
      * 
      * (Required)
      * 
@@ -78,9 +76,9 @@ public class SetDisplayMessageRequest implements RequestType
     }
 
     /**
-     * Message_ Info
-     * urn:x-enexis:ecdm:uid:2:233264
-     * Contains message details, for a message to be displayed on a Charging Station.
+     * Message_ Info
+     * urn:x-enexis:ecdm:uid:2:233264
+     * Contains message details, for a message to be displayed on a Charging Station.
      * 
      * (Required)
      * 

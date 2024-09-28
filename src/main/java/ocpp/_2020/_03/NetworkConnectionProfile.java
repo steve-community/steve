@@ -1,20 +1,19 @@
 
 package ocpp._2020._03;
 
-import javax.annotation.Generated;
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 
 
 /**
- * Communication_ Function
- * urn:x-oca:ocpp:uid:2:233304
- * The NetworkConnectionProfile defines the functional and technical parameters of a communication link.
+ * Communication_ Function
+ * urn:x-oca:ocpp:uid:2:233304
+ * The NetworkConnectionProfile defines the functional and technical parameters of a communication link.
  * 
  * 
  */
@@ -30,7 +29,6 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
     "ocppInterface",
     "vpn"
 })
-@Generated("jsonschema2pojo")
 public class NetworkConnectionProfile {
 
     /**
@@ -42,11 +40,11 @@ public class NetworkConnectionProfile {
     @Valid
     private CustomData customData;
     /**
-     * APN
-     * urn:x-oca:ocpp:uid:2:233134
-     * Collection of configuration data needed to make a data-connection over a cellular network.
-     * 
-     * NOTE: When asking a GSM modem to dial in, it is possible to specify which mobile operator should be used. This can be done with the mobile country code (MCC) in combination with a mobile network code (MNC). Example: If your preferred network is Vodafone Netherlands, the MCC=204 and the MNC=04 which means the key PreferredNetwork = 20404 Some modems allows to specify a preferred network, which means, if this network is not available, a different network is used. If you specify UseOnlyPreferredNetwork and this network is not available, the modem will not dial in.
+     * APN
+     * urn:x-oca:ocpp:uid:2:233134
+     * Collection of configuration data needed to make a data-connection over a cellular network.
+     * 
+     * NOTE: When asking a GSM modem to dial in, it is possible to specify which mobile operator should be used. This can be done with the mobile country code (MCC) in combination with a mobile network code (MNC). Example: If your preferred network is Vodafone Netherlands, the MCC=204 and the MNC=04 which means the key PreferredNetwork = 20404 Some modems allows to specify a preferred network, which means, if this network is not available, a different network is used. If you specify UseOnlyPreferredNetwork and this network is not available, the modem will not dial in.
      * 
      * 
      */
@@ -55,9 +53,9 @@ public class NetworkConnectionProfile {
     @Valid
     private APN apn;
     /**
-     * Communication_ Function. OCPP_ Version. OCPP_ Version_ Code
-     * urn:x-oca:ocpp:uid:1:569355
-     * Defines the OCPP version used for this communication function.
+     * Communication_ Function. OCPP_ Version. OCPP_ Version_ Code
+     * urn:x-oca:ocpp:uid:1:569355
+     * Defines the OCPP version used for this communication function.
      * 
      * (Required)
      * 
@@ -67,9 +65,9 @@ public class NetworkConnectionProfile {
     @NotNull
     private OCPPVersionEnum ocppVersion;
     /**
-     * Communication_ Function. OCPP_ Transport. OCPP_ Transport_ Code
-     * urn:x-oca:ocpp:uid:1:569356
-     * Defines the transport protocol (e.g. SOAP or JSON). Note: SOAP is not supported in OCPP 2.0, but is supported by other versions of OCPP.
+     * Communication_ Function. OCPP_ Transport. OCPP_ Transport_ Code
+     * urn:x-oca:ocpp:uid:1:569356
+     * Defines the transport protocol (e.g. SOAP or JSON). Note: SOAP is not supported in OCPP 2.0, but is supported by other versions of OCPP.
      * 
      * (Required)
      * 
@@ -79,9 +77,9 @@ public class NetworkConnectionProfile {
     @NotNull
     private OCPPTransportEnum ocppTransport;
     /**
-     * Communication_ Function. OCPP_ Central_ System_ URL. URI
-     * urn:x-oca:ocpp:uid:1:569357
-     * URL of the CSMS(s) that this Charging Station  communicates with.
+     * Communication_ Function. OCPP_ Central_ System_ URL. URI
+     * urn:x-oca:ocpp:uid:1:569357
+     * URL of the CSMS(s) that this Charging Station  communicates with.
      * 
      * (Required)
      * 
@@ -92,9 +90,9 @@ public class NetworkConnectionProfile {
     @NotNull
     private String ocppCsmsUrl;
     /**
-     * Duration in seconds before a message send by the Charging Station via this network connection times-out.
-     * The best setting depends on the underlying network and response times of the CSMS.
-     * If you are looking for a some guideline: use 30 seconds as a starting point.
+     * Duration in seconds before a message send by the Charging Station via this network connection times-out.
+     * The best setting depends on the underlying network and response times of the CSMS.
+     * If you are looking for a some guideline: use 30 seconds as a starting point.
      * 
      * (Required)
      * 
@@ -104,7 +102,7 @@ public class NetworkConnectionProfile {
     @NotNull
     private Integer messageTimeout;
     /**
-     * This field specifies the security profile used when connecting to the CSMS with this NetworkConnectionProfile.
+     * This field specifies the security profile used when connecting to the CSMS with this NetworkConnectionProfile.
      * 
      * (Required)
      * 
@@ -114,7 +112,7 @@ public class NetworkConnectionProfile {
     @NotNull
     private Integer securityProfile;
     /**
-     * Applicable Network Interface.
+     * Applicable Network Interface.
      * 
      * (Required)
      * 
@@ -124,9 +122,9 @@ public class NetworkConnectionProfile {
     @NotNull
     private OCPPInterfaceEnum ocppInterface;
     /**
-     * VPN
-     * urn:x-oca:ocpp:uid:2:233268
-     * VPN Configuration settings
+     * VPN
+     * urn:x-oca:ocpp:uid:2:233268
+     * VPN Configuration settings
      * 
      * 
      */
@@ -159,11 +157,11 @@ public class NetworkConnectionProfile {
     }
 
     /**
-     * APN
-     * urn:x-oca:ocpp:uid:2:233134
-     * Collection of configuration data needed to make a data-connection over a cellular network.
-     * 
-     * NOTE: When asking a GSM modem to dial in, it is possible to specify which mobile operator should be used. This can be done with the mobile country code (MCC) in combination with a mobile network code (MNC). Example: If your preferred network is Vodafone Netherlands, the MCC=204 and the MNC=04 which means the key PreferredNetwork = 20404 Some modems allows to specify a preferred network, which means, if this network is not available, a different network is used. If you specify UseOnlyPreferredNetwork and this network is not available, the modem will not dial in.
+     * APN
+     * urn:x-oca:ocpp:uid:2:233134
+     * Collection of configuration data needed to make a data-connection over a cellular network.
+     * 
+     * NOTE: When asking a GSM modem to dial in, it is possible to specify which mobile operator should be used. This can be done with the mobile country code (MCC) in combination with a mobile network code (MNC). Example: If your preferred network is Vodafone Netherlands, the MCC=204 and the MNC=04 which means the key PreferredNetwork = 20404 Some modems allows to specify a preferred network, which means, if this network is not available, a different network is used. If you specify UseOnlyPreferredNetwork and this network is not available, the modem will not dial in.
      * 
      * 
      */
@@ -173,11 +171,11 @@ public class NetworkConnectionProfile {
     }
 
     /**
-     * APN
-     * urn:x-oca:ocpp:uid:2:233134
-     * Collection of configuration data needed to make a data-connection over a cellular network.
-     * 
-     * NOTE: When asking a GSM modem to dial in, it is possible to specify which mobile operator should be used. This can be done with the mobile country code (MCC) in combination with a mobile network code (MNC). Example: If your preferred network is Vodafone Netherlands, the MCC=204 and the MNC=04 which means the key PreferredNetwork = 20404 Some modems allows to specify a preferred network, which means, if this network is not available, a different network is used. If you specify UseOnlyPreferredNetwork and this network is not available, the modem will not dial in.
+     * APN
+     * urn:x-oca:ocpp:uid:2:233134
+     * Collection of configuration data needed to make a data-connection over a cellular network.
+     * 
+     * NOTE: When asking a GSM modem to dial in, it is possible to specify which mobile operator should be used. This can be done with the mobile country code (MCC) in combination with a mobile network code (MNC). Example: If your preferred network is Vodafone Netherlands, the MCC=204 and the MNC=04 which means the key PreferredNetwork = 20404 Some modems allows to specify a preferred network, which means, if this network is not available, a different network is used. If you specify UseOnlyPreferredNetwork and this network is not available, the modem will not dial in.
      * 
      * 
      */
@@ -192,9 +190,9 @@ public class NetworkConnectionProfile {
     }
 
     /**
-     * Communication_ Function. OCPP_ Version. OCPP_ Version_ Code
-     * urn:x-oca:ocpp:uid:1:569355
-     * Defines the OCPP version used for this communication function.
+     * Communication_ Function. OCPP_ Version. OCPP_ Version_ Code
+     * urn:x-oca:ocpp:uid:1:569355
+     * Defines the OCPP version used for this communication function.
      * 
      * (Required)
      * 
@@ -205,9 +203,9 @@ public class NetworkConnectionProfile {
     }
 
     /**
-     * Communication_ Function. OCPP_ Version. OCPP_ Version_ Code
-     * urn:x-oca:ocpp:uid:1:569355
-     * Defines the OCPP version used for this communication function.
+     * Communication_ Function. OCPP_ Version. OCPP_ Version_ Code
+     * urn:x-oca:ocpp:uid:1:569355
+     * Defines the OCPP version used for this communication function.
      * 
      * (Required)
      * 
@@ -223,9 +221,9 @@ public class NetworkConnectionProfile {
     }
 
     /**
-     * Communication_ Function. OCPP_ Transport. OCPP_ Transport_ Code
-     * urn:x-oca:ocpp:uid:1:569356
-     * Defines the transport protocol (e.g. SOAP or JSON). Note: SOAP is not supported in OCPP 2.0, but is supported by other versions of OCPP.
+     * Communication_ Function. OCPP_ Transport. OCPP_ Transport_ Code
+     * urn:x-oca:ocpp:uid:1:569356
+     * Defines the transport protocol (e.g. SOAP or JSON). Note: SOAP is not supported in OCPP 2.0, but is supported by other versions of OCPP.
      * 
      * (Required)
      * 
@@ -236,9 +234,9 @@ public class NetworkConnectionProfile {
     }
 
     /**
-     * Communication_ Function. OCPP_ Transport. OCPP_ Transport_ Code
-     * urn:x-oca:ocpp:uid:1:569356
-     * Defines the transport protocol (e.g. SOAP or JSON). Note: SOAP is not supported in OCPP 2.0, but is supported by other versions of OCPP.
+     * Communication_ Function. OCPP_ Transport. OCPP_ Transport_ Code
+     * urn:x-oca:ocpp:uid:1:569356
+     * Defines the transport protocol (e.g. SOAP or JSON). Note: SOAP is not supported in OCPP 2.0, but is supported by other versions of OCPP.
      * 
      * (Required)
      * 
@@ -254,9 +252,9 @@ public class NetworkConnectionProfile {
     }
 
     /**
-     * Communication_ Function. OCPP_ Central_ System_ URL. URI
-     * urn:x-oca:ocpp:uid:1:569357
-     * URL of the CSMS(s) that this Charging Station  communicates with.
+     * Communication_ Function. OCPP_ Central_ System_ URL. URI
+     * urn:x-oca:ocpp:uid:1:569357
+     * URL of the CSMS(s) that this Charging Station  communicates with.
      * 
      * (Required)
      * 
@@ -267,9 +265,9 @@ public class NetworkConnectionProfile {
     }
 
     /**
-     * Communication_ Function. OCPP_ Central_ System_ URL. URI
-     * urn:x-oca:ocpp:uid:1:569357
-     * URL of the CSMS(s) that this Charging Station  communicates with.
+     * Communication_ Function. OCPP_ Central_ System_ URL. URI
+     * urn:x-oca:ocpp:uid:1:569357
+     * URL of the CSMS(s) that this Charging Station  communicates with.
      * 
      * (Required)
      * 
@@ -285,9 +283,9 @@ public class NetworkConnectionProfile {
     }
 
     /**
-     * Duration in seconds before a message send by the Charging Station via this network connection times-out.
-     * The best setting depends on the underlying network and response times of the CSMS.
-     * If you are looking for a some guideline: use 30 seconds as a starting point.
+     * Duration in seconds before a message send by the Charging Station via this network connection times-out.
+     * The best setting depends on the underlying network and response times of the CSMS.
+     * If you are looking for a some guideline: use 30 seconds as a starting point.
      * 
      * (Required)
      * 
@@ -298,9 +296,9 @@ public class NetworkConnectionProfile {
     }
 
     /**
-     * Duration in seconds before a message send by the Charging Station via this network connection times-out.
-     * The best setting depends on the underlying network and response times of the CSMS.
-     * If you are looking for a some guideline: use 30 seconds as a starting point.
+     * Duration in seconds before a message send by the Charging Station via this network connection times-out.
+     * The best setting depends on the underlying network and response times of the CSMS.
+     * If you are looking for a some guideline: use 30 seconds as a starting point.
      * 
      * (Required)
      * 
@@ -316,7 +314,7 @@ public class NetworkConnectionProfile {
     }
 
     /**
-     * This field specifies the security profile used when connecting to the CSMS with this NetworkConnectionProfile.
+     * This field specifies the security profile used when connecting to the CSMS with this NetworkConnectionProfile.
      * 
      * (Required)
      * 
@@ -327,7 +325,7 @@ public class NetworkConnectionProfile {
     }
 
     /**
-     * This field specifies the security profile used when connecting to the CSMS with this NetworkConnectionProfile.
+     * This field specifies the security profile used when connecting to the CSMS with this NetworkConnectionProfile.
      * 
      * (Required)
      * 
@@ -343,7 +341,7 @@ public class NetworkConnectionProfile {
     }
 
     /**
-     * Applicable Network Interface.
+     * Applicable Network Interface.
      * 
      * (Required)
      * 
@@ -354,7 +352,7 @@ public class NetworkConnectionProfile {
     }
 
     /**
-     * Applicable Network Interface.
+     * Applicable Network Interface.
      * 
      * (Required)
      * 
@@ -370,9 +368,9 @@ public class NetworkConnectionProfile {
     }
 
     /**
-     * VPN
-     * urn:x-oca:ocpp:uid:2:233268
-     * VPN Configuration settings
+     * VPN
+     * urn:x-oca:ocpp:uid:2:233268
+     * VPN Configuration settings
      * 
      * 
      */
@@ -382,9 +380,9 @@ public class NetworkConnectionProfile {
     }
 
     /**
-     * VPN
-     * urn:x-oca:ocpp:uid:2:233268
-     * VPN Configuration settings
+     * VPN
+     * urn:x-oca:ocpp:uid:2:233268
+     * VPN Configuration settings
      * 
      * 
      */

@@ -1,14 +1,14 @@
 
 package ocpp.cs._2010._08;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlSchemaType;
-import javax.xml.bind.annotation.XmlType;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import de.rwth.idsg.ocpp.jaxb.JodaDateTimeConverter;
 import de.rwth.idsg.ocpp.jaxb.ResponseType;
+import jakarta.xml.bind.annotation.XmlAccessType;
+import jakarta.xml.bind.annotation.XmlAccessorType;
+import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlSchemaType;
+import jakarta.xml.bind.annotation.XmlType;
+import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import lombok.ToString;
 import org.joda.time.DateTime;
 
@@ -140,16 +140,43 @@ public class BootNotificationResponse
         return (this.heartbeatInterval!= null);
     }
 
+    /**
+     * Sets the value of the status property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link RegistrationStatus }
+     * @return
+     *     The class instance
+     */
     public BootNotificationResponse withStatus(RegistrationStatus value) {
         setStatus(value);
         return this;
     }
 
+    /**
+     * Sets the value of the currentTime property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link DateTime }
+     * @return
+     *     The class instance
+     */
     public BootNotificationResponse withCurrentTime(DateTime value) {
         setCurrentTime(value);
         return this;
     }
 
+    /**
+     * Sets the value of the heartbeatInterval property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link Integer }
+     * @return
+     *     The class instance
+     */
     public BootNotificationResponse withHeartbeatInterval(Integer value) {
         setHeartbeatInterval(value);
         return this;

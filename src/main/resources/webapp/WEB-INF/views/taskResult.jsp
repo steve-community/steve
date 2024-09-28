@@ -1,7 +1,7 @@
 <%--
 
     SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
-    Copyright (C) 2013-2019 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
+    Copyright (C) 2013-2024 SteVe Community Team
     All Rights Reserved.
 
     This program is free software: you can redistribute it and/or modify
@@ -52,10 +52,10 @@
                 <td>
                     <c:choose>
                         <c:when test="${result.value.details == null}">
-                            ${result.value.response}
+                            <encode:forHtml value="${result.value.response}" />
                         </c:when>
                         <c:otherwise>
-                            ${result.value.response} (<a href="${ctxPath}/manager/operations/tasks/${taskId}/details/${result.key}/">Details</a>)
+                            <encode:forHtml value="${result.value.response}" /> (<a href="${ctxPath}/manager/operations/tasks/${taskId}/details/${result.key}/">Details</a>)
                         </c:otherwise>
                     </c:choose>
                 </td>

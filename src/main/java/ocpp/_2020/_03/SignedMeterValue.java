@@ -1,18 +1,17 @@
 
 package ocpp._2020._03;
 
-import javax.annotation.Generated;
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 
 
 /**
- * Represent a signed version of the meter value.
+ * Represent a signed version of the meter value.
  * 
  * 
  */
@@ -24,7 +23,6 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
     "encodingMethod",
     "publicKey"
 })
-@Generated("jsonschema2pojo")
 public class SignedMeterValue {
 
     /**
@@ -36,7 +34,7 @@ public class SignedMeterValue {
     @Valid
     private CustomData customData;
     /**
-     * Base64 encoded, contains the signed data which might contain more then just the meter value. It can contain information like timestamps, reference to a customer etc.
+     * Base64 encoded, contains the signed data which might contain more then just the meter value. It can contain information like timestamps, reference to a customer etc.
      * 
      * (Required)
      * 
@@ -47,7 +45,7 @@ public class SignedMeterValue {
     @NotNull
     private String signedMeterData;
     /**
-     * Method used to create the digital signature.
+     * Method used to create the digital signature.
      * 
      * (Required)
      * 
@@ -58,7 +56,7 @@ public class SignedMeterValue {
     @NotNull
     private String signingMethod;
     /**
-     * Method used to encode the meter values before applying the digital signature algorithm.
+     * Method used to encode the meter values before applying the digital signature algorithm.
      * 
      * (Required)
      * 
@@ -69,7 +67,7 @@ public class SignedMeterValue {
     @NotNull
     private String encodingMethod;
     /**
-     * Base64 encoded, sending depends on configuration variable _PublicKeyWithSignedMeterValue_.
+     * Base64 encoded, sending depends on configuration variable _PublicKeyWithSignedMeterValue_.
      * 
      * (Required)
      * 
@@ -104,7 +102,7 @@ public class SignedMeterValue {
     }
 
     /**
-     * Base64 encoded, contains the signed data which might contain more then just the meter value. It can contain information like timestamps, reference to a customer etc.
+     * Base64 encoded, contains the signed data which might contain more then just the meter value. It can contain information like timestamps, reference to a customer etc.
      * 
      * (Required)
      * 
@@ -115,7 +113,7 @@ public class SignedMeterValue {
     }
 
     /**
-     * Base64 encoded, contains the signed data which might contain more then just the meter value. It can contain information like timestamps, reference to a customer etc.
+     * Base64 encoded, contains the signed data which might contain more then just the meter value. It can contain information like timestamps, reference to a customer etc.
      * 
      * (Required)
      * 
@@ -131,7 +129,7 @@ public class SignedMeterValue {
     }
 
     /**
-     * Method used to create the digital signature.
+     * Method used to create the digital signature.
      * 
      * (Required)
      * 
@@ -142,7 +140,7 @@ public class SignedMeterValue {
     }
 
     /**
-     * Method used to create the digital signature.
+     * Method used to create the digital signature.
      * 
      * (Required)
      * 
@@ -158,7 +156,7 @@ public class SignedMeterValue {
     }
 
     /**
-     * Method used to encode the meter values before applying the digital signature algorithm.
+     * Method used to encode the meter values before applying the digital signature algorithm.
      * 
      * (Required)
      * 
@@ -169,7 +167,7 @@ public class SignedMeterValue {
     }
 
     /**
-     * Method used to encode the meter values before applying the digital signature algorithm.
+     * Method used to encode the meter values before applying the digital signature algorithm.
      * 
      * (Required)
      * 
@@ -185,7 +183,7 @@ public class SignedMeterValue {
     }
 
     /**
-     * Base64 encoded, sending depends on configuration variable _PublicKeyWithSignedMeterValue_.
+     * Base64 encoded, sending depends on configuration variable _PublicKeyWithSignedMeterValue_.
      * 
      * (Required)
      * 
@@ -196,7 +194,7 @@ public class SignedMeterValue {
     }
 
     /**
-     * Base64 encoded, sending depends on configuration variable _PublicKeyWithSignedMeterValue_.
+     * Base64 encoded, sending depends on configuration variable _PublicKeyWithSignedMeterValue_.
      * 
      * (Required)
      * 

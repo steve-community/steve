@@ -1,14 +1,13 @@
 
 package ocpp._2020._03;
 
-import javax.annotation.Generated;
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import de.rwth.idsg.ocpp.jaxb.ResponseType;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
@@ -16,7 +15,6 @@ import de.rwth.idsg.ocpp.jaxb.ResponseType;
     "idTokenInfo",
     "certificateStatus"
 })
-@Generated("jsonschema2pojo")
 public class AuthorizeResponse implements ResponseType
 {
 
@@ -29,10 +27,10 @@ public class AuthorizeResponse implements ResponseType
     @Valid
     private CustomData customData;
     /**
-     * ID_ Token
-     * urn:x-oca:ocpp:uid:2:233247
-     * Contains status information about an identifier.
-     * It is advised to not stop charging for a token that expires during charging, as ExpiryDate is only used for caching purposes. If ExpiryDate is not given, the status has no end date.
+     * ID_ Token
+     * urn:x-oca:ocpp:uid:2:233247
+     * Contains status information about an identifier.
+     * It is advised to not stop charging for a token that expires during charging, as ExpiryDate is only used for caching purposes. If ExpiryDate is not given, the status has no end date.
      * 
      * (Required)
      * 
@@ -43,9 +41,9 @@ public class AuthorizeResponse implements ResponseType
     @NotNull
     private IdTokenInfo idTokenInfo;
     /**
-     * Certificate status information. 
-     * - if all certificates are valid: return 'Accepted'.
-     * - if one of the certificates was revoked, return 'CertificateRevoked'.
+     * Certificate status information. 
+     * - if all certificates are valid: return 'Accepted'.
+     * - if one of the certificates was revoked, return 'CertificateRevoked'.
      * 
      * 
      */
@@ -77,10 +75,10 @@ public class AuthorizeResponse implements ResponseType
     }
 
     /**
-     * ID_ Token
-     * urn:x-oca:ocpp:uid:2:233247
-     * Contains status information about an identifier.
-     * It is advised to not stop charging for a token that expires during charging, as ExpiryDate is only used for caching purposes. If ExpiryDate is not given, the status has no end date.
+     * ID_ Token
+     * urn:x-oca:ocpp:uid:2:233247
+     * Contains status information about an identifier.
+     * It is advised to not stop charging for a token that expires during charging, as ExpiryDate is only used for caching purposes. If ExpiryDate is not given, the status has no end date.
      * 
      * (Required)
      * 
@@ -91,10 +89,10 @@ public class AuthorizeResponse implements ResponseType
     }
 
     /**
-     * ID_ Token
-     * urn:x-oca:ocpp:uid:2:233247
-     * Contains status information about an identifier.
-     * It is advised to not stop charging for a token that expires during charging, as ExpiryDate is only used for caching purposes. If ExpiryDate is not given, the status has no end date.
+     * ID_ Token
+     * urn:x-oca:ocpp:uid:2:233247
+     * Contains status information about an identifier.
+     * It is advised to not stop charging for a token that expires during charging, as ExpiryDate is only used for caching purposes. If ExpiryDate is not given, the status has no end date.
      * 
      * (Required)
      * 
@@ -110,9 +108,9 @@ public class AuthorizeResponse implements ResponseType
     }
 
     /**
-     * Certificate status information. 
-     * - if all certificates are valid: return 'Accepted'.
-     * - if one of the certificates was revoked, return 'CertificateRevoked'.
+     * Certificate status information. 
+     * - if all certificates are valid: return 'Accepted'.
+     * - if one of the certificates was revoked, return 'CertificateRevoked'.
      * 
      * 
      */
@@ -122,9 +120,9 @@ public class AuthorizeResponse implements ResponseType
     }
 
     /**
-     * Certificate status information. 
-     * - if all certificates are valid: return 'Accepted'.
-     * - if one of the certificates was revoked, return 'CertificateRevoked'.
+     * Certificate status information. 
+     * - if all certificates are valid: return 'Accepted'.
+     * - if one of the certificates was revoked, return 'CertificateRevoked'.
      * 
      * 
      */

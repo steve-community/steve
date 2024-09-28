@@ -3,18 +3,16 @@ package ocpp._2020._03;
 
 import java.util.HashMap;
 import java.util.Map;
-import javax.annotation.Generated;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 
 /**
- * Specifies the event notification type of the message.
- * 
+ * Specifies the event notification type of the message.
+ * 
  * 
  * 
  */
-@Generated("jsonschema2pojo")
 public enum EventNotificationEnum {
 
     HARD_WIRED_NOTIFICATION("HardWiredNotification"),

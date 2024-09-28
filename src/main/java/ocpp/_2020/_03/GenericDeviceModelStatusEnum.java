@@ -3,17 +3,15 @@ package ocpp._2020._03;
 
 import java.util.HashMap;
 import java.util.Map;
-import javax.annotation.Generated;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 
 /**
- * This indicates whether the Charging Station is able to accept this request.
+ * This indicates whether the Charging Station is able to accept this request.
  * 
  * 
  */
-@Generated("jsonschema2pojo")
 public enum GenericDeviceModelStatusEnum {
 
     ACCEPTED("Accepted"),

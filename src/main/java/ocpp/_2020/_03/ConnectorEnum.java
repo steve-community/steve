@@ -3,17 +3,15 @@ package ocpp._2020._03;
 
 import java.util.HashMap;
 import java.util.Map;
-import javax.annotation.Generated;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 
 /**
- * This field specifies the connector type.
+ * This field specifies the connector type.
  * 
  * 
  */
-@Generated("jsonschema2pojo")
 public enum ConnectorEnum {
 
     C_CCS_1("cCCS1"),

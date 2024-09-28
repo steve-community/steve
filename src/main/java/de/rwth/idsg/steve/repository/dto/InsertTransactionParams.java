@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2019 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
+ * Copyright (C) 2013-2024 SteVe Community Team
  * All Rights Reserved.
  *
  * Parkl Digital Technologies
@@ -47,7 +47,10 @@ public class InsertTransactionParams {
     // this came after splitting transaction table into two tables (start and stop)
     private final DateTime eventTimestamp;
 
-    public boolean hasReservation() {
-        return reservationId != null;
+    /**
+     * https://github.com/steve-community/steve/issues/1414
+     */
+    public boolean isSetReservationId() {
+        return reservationId != null && reservationId != 0;
     }
 }

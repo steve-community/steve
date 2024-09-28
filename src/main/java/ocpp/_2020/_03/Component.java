@@ -1,18 +1,17 @@
 
 package ocpp._2020._03;
 
-import javax.annotation.Generated;
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 
 
 /**
- * A physical or logical component
+ * A physical or logical component
  * 
  * 
  */
@@ -23,7 +22,6 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
     "name",
     "instance"
 })
-@Generated("jsonschema2pojo")
 public class Component {
 
     /**
@@ -35,9 +33,9 @@ public class Component {
     @Valid
     private CustomData customData;
     /**
-     * EVSE
-     * urn:x-oca:ocpp:uid:2:233123
-     * Electric Vehicle Supply Equipment
+     * EVSE
+     * urn:x-oca:ocpp:uid:2:233123
+     * Electric Vehicle Supply Equipment
      * 
      * 
      */
@@ -46,7 +44,7 @@ public class Component {
     @Valid
     private EVSE evse;
     /**
-     * Name of the component. Name should be taken from the list of standardized component names whenever possible. Case Insensitive. strongly advised to use Camel Case.
+     * Name of the component. Name should be taken from the list of standardized component names whenever possible. Case Insensitive. strongly advised to use Camel Case.
      * 
      * (Required)
      * 
@@ -57,7 +55,7 @@ public class Component {
     @NotNull
     private String name;
     /**
-     * Name of instance in case the component exists as multiple instances. Case Insensitive. strongly advised to use Camel Case.
+     * Name of instance in case the component exists as multiple instances. Case Insensitive. strongly advised to use Camel Case.
      * 
      * 
      */
@@ -90,9 +88,9 @@ public class Component {
     }
 
     /**
-     * EVSE
-     * urn:x-oca:ocpp:uid:2:233123
-     * Electric Vehicle Supply Equipment
+     * EVSE
+     * urn:x-oca:ocpp:uid:2:233123
+     * Electric Vehicle Supply Equipment
      * 
      * 
      */
@@ -102,9 +100,9 @@ public class Component {
     }
 
     /**
-     * EVSE
-     * urn:x-oca:ocpp:uid:2:233123
-     * Electric Vehicle Supply Equipment
+     * EVSE
+     * urn:x-oca:ocpp:uid:2:233123
+     * Electric Vehicle Supply Equipment
      * 
      * 
      */
@@ -119,7 +117,7 @@ public class Component {
     }
 
     /**
-     * Name of the component. Name should be taken from the list of standardized component names whenever possible. Case Insensitive. strongly advised to use Camel Case.
+     * Name of the component. Name should be taken from the list of standardized component names whenever possible. Case Insensitive. strongly advised to use Camel Case.
      * 
      * (Required)
      * 
@@ -130,7 +128,7 @@ public class Component {
     }
 
     /**
-     * Name of the component. Name should be taken from the list of standardized component names whenever possible. Case Insensitive. strongly advised to use Camel Case.
+     * Name of the component. Name should be taken from the list of standardized component names whenever possible. Case Insensitive. strongly advised to use Camel Case.
      * 
      * (Required)
      * 
@@ -146,7 +144,7 @@ public class Component {
     }
 
     /**
-     * Name of instance in case the component exists as multiple instances. Case Insensitive. strongly advised to use Camel Case.
+     * Name of instance in case the component exists as multiple instances. Case Insensitive. strongly advised to use Camel Case.
      * 
      * 
      */
@@ -156,7 +154,7 @@ public class Component {
     }
 
     /**
-     * Name of instance in case the component exists as multiple instances. Case Insensitive. strongly advised to use Camel Case.
+     * Name of instance in case the component exists as multiple instances. Case Insensitive. strongly advised to use Camel Case.
      * 
      * 
      */

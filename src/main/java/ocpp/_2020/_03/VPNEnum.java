@@ -3,19 +3,17 @@ package ocpp._2020._03;
 
 import java.util.HashMap;
 import java.util.Map;
-import javax.annotation.Generated;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 
 /**
- * VPN. Type. VPN_ Code
- * urn:x-oca:ocpp:uid:1:569277
- * Type of VPN
+ * VPN. Type. VPN_ Code
+ * urn:x-oca:ocpp:uid:1:569277
+ * Type of VPN
  * 
  * 
  */
-@Generated("jsonschema2pojo")
 public enum VPNEnum {
 
     IK_EV_2("IKEv2"),

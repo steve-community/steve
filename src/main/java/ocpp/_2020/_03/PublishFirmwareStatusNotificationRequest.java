@@ -3,15 +3,14 @@ package ocpp._2020._03;
 
 import java.util.ArrayList;
 import java.util.List;
-import javax.annotation.Generated;
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import de.rwth.idsg.ocpp.jaxb.RequestType;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
@@ -20,7 +19,6 @@ import de.rwth.idsg.ocpp.jaxb.RequestType;
     "location",
     "requestId"
 })
-@Generated("jsonschema2pojo")
 public class PublishFirmwareStatusNotificationRequest implements RequestType
 {
 
@@ -33,8 +31,8 @@ public class PublishFirmwareStatusNotificationRequest implements RequestType
     @Valid
     private CustomData customData;
     /**
-     * This contains the progress status of the publishfirmware
-     * installation.
+     * This contains the progress status of the publishfirmware
+     * installation.
      * 
      * (Required)
      * 
@@ -44,7 +42,7 @@ public class PublishFirmwareStatusNotificationRequest implements RequestType
     @NotNull
     private PublishFirmwareStatusEnum status;
     /**
-     * Required if status is Published. Can be multiple URI’s, if the Local Controller supports e.g. HTTP, HTTPS, and FTP.
+     * Required if status is Published. Can be multiple URI’s, if the Local Controller supports e.g. HTTP, HTTPS, and FTP.
      * 
      * 
      */
@@ -54,10 +52,10 @@ public class PublishFirmwareStatusNotificationRequest implements RequestType
     @Valid
     private List<String> location = new ArrayList<String>();
     /**
-     * The request id that was
-     * provided in the
-     * PublishFirmwareRequest which
-     * triggered this action.
+     * The request id that was
+     * provided in the
+     * PublishFirmwareRequest which
+     * triggered this action.
      * 
      * 
      */
@@ -89,8 +87,8 @@ public class PublishFirmwareStatusNotificationRequest implements RequestType
     }
 
     /**
-     * This contains the progress status of the publishfirmware
-     * installation.
+     * This contains the progress status of the publishfirmware
+     * installation.
      * 
      * (Required)
      * 
@@ -101,8 +99,8 @@ public class PublishFirmwareStatusNotificationRequest implements RequestType
     }
 
     /**
-     * This contains the progress status of the publishfirmware
-     * installation.
+     * This contains the progress status of the publishfirmware
+     * installation.
      * 
      * (Required)
      * 
@@ -118,7 +116,7 @@ public class PublishFirmwareStatusNotificationRequest implements RequestType
     }
 
     /**
-     * Required if status is Published. Can be multiple URI’s, if the Local Controller supports e.g. HTTP, HTTPS, and FTP.
+     * Required if status is Published. Can be multiple URI’s, if the Local Controller supports e.g. HTTP, HTTPS, and FTP.
      * 
      * 
      */
@@ -128,7 +126,7 @@ public class PublishFirmwareStatusNotificationRequest implements RequestType
     }
 
     /**
-     * Required if status is Published. Can be multiple URI’s, if the Local Controller supports e.g. HTTP, HTTPS, and FTP.
+     * Required if status is Published. Can be multiple URI’s, if the Local Controller supports e.g. HTTP, HTTPS, and FTP.
      * 
      * 
      */
@@ -143,10 +141,10 @@ public class PublishFirmwareStatusNotificationRequest implements RequestType
     }
 
     /**
-     * The request id that was
-     * provided in the
-     * PublishFirmwareRequest which
-     * triggered this action.
+     * The request id that was
+     * provided in the
+     * PublishFirmwareRequest which
+     * triggered this action.
      * 
      * 
      */
@@ -156,10 +154,10 @@ public class PublishFirmwareStatusNotificationRequest implements RequestType
     }
 
     /**
-     * The request id that was
-     * provided in the
-     * PublishFirmwareRequest which
-     * triggered this action.
+     * The request id that was
+     * provided in the
+     * PublishFirmwareRequest which
+     * triggered this action.
      * 
      * 
      */

@@ -1,15 +1,14 @@
 
 package ocpp._2020._03;
 
-import javax.annotation.Generated;
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import de.rwth.idsg.ocpp.jaxb.RequestType;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import org.joda.time.DateTime;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -19,7 +18,6 @@ import org.joda.time.DateTime;
     "timestamp",
     "techInfo"
 })
-@Generated("jsonschema2pojo")
 public class SecurityEventNotificationRequest implements RequestType
 {
 
@@ -32,7 +30,7 @@ public class SecurityEventNotificationRequest implements RequestType
     @Valid
     private CustomData customData;
     /**
-     * Type of the security event. This value should be taken from the Security events list.
+     * Type of the security event. This value should be taken from the Security events list.
      * 
      * (Required)
      * 
@@ -43,7 +41,7 @@ public class SecurityEventNotificationRequest implements RequestType
     @NotNull
     private String type;
     /**
-     * Date and time at which the event occurred.
+     * Date and time at which the event occurred.
      * 
      * (Required)
      * 
@@ -53,7 +51,7 @@ public class SecurityEventNotificationRequest implements RequestType
     @NotNull
     private DateTime timestamp;
     /**
-     * Additional information about the occurred security event.
+     * Additional information about the occurred security event.
      * 
      * 
      */
@@ -86,7 +84,7 @@ public class SecurityEventNotificationRequest implements RequestType
     }
 
     /**
-     * Type of the security event. This value should be taken from the Security events list.
+     * Type of the security event. This value should be taken from the Security events list.
      * 
      * (Required)
      * 
@@ -97,7 +95,7 @@ public class SecurityEventNotificationRequest implements RequestType
     }
 
     /**
-     * Type of the security event. This value should be taken from the Security events list.
+     * Type of the security event. This value should be taken from the Security events list.
      * 
      * (Required)
      * 
@@ -113,7 +111,7 @@ public class SecurityEventNotificationRequest implements RequestType
     }
 
     /**
-     * Date and time at which the event occurred.
+     * Date and time at which the event occurred.
      * 
      * (Required)
      * 
@@ -124,7 +122,7 @@ public class SecurityEventNotificationRequest implements RequestType
     }
 
     /**
-     * Date and time at which the event occurred.
+     * Date and time at which the event occurred.
      * 
      * (Required)
      * 
@@ -140,7 +138,7 @@ public class SecurityEventNotificationRequest implements RequestType
     }
 
     /**
-     * Additional information about the occurred security event.
+     * Additional information about the occurred security event.
      * 
      * 
      */
@@ -150,7 +148,7 @@ public class SecurityEventNotificationRequest implements RequestType
     }
 
     /**
-     * Additional information about the occurred security event.
+     * Additional information about the occurred security event.
      * 
      * 
      */

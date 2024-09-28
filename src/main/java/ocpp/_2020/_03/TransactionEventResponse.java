@@ -1,13 +1,12 @@
 
 package ocpp._2020._03;
 
-import javax.annotation.Generated;
-import javax.validation.Valid;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import de.rwth.idsg.ocpp.jaxb.ResponseType;
+import jakarta.validation.Valid;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
@@ -17,7 +16,6 @@ import de.rwth.idsg.ocpp.jaxb.ResponseType;
     "idTokenInfo",
     "updatedPersonalMessage"
 })
-@Generated("jsonschema2pojo")
 public class TransactionEventResponse implements ResponseType
 {
 
@@ -30,8 +28,8 @@ public class TransactionEventResponse implements ResponseType
     @Valid
     private CustomData customData;
     /**
-     * SHALL only be sent when charging has ended. Final total cost of this transaction, including taxes. In the currency configured with the Configuration Variable: &lt;&lt;configkey-currency,`Currency`&gt;&gt;. When omitted, the transaction was NOT free. To indicate a free transaction, the CSMS SHALL send 0.00.
-     * 
+     * SHALL only be sent when charging has ended. Final total cost of this transaction, including taxes. In the currency configured with the Configuration Variable: &lt;&lt;configkey-currency,`Currency`&gt;&gt;. When omitted, the transaction was NOT free. To indicate a free transaction, the CSMS SHALL send 0.00.
+     * 
      * 
      * 
      */
@@ -39,7 +37,7 @@ public class TransactionEventResponse implements ResponseType
     @JsonPropertyDescription("SHALL only be sent when charging has ended. Final total cost of this transaction, including taxes. In the currency configured with the Configuration Variable: &lt;&lt;configkey-currency,`Currency`&gt;&gt;. When omitted, the transaction was NOT free. To indicate a free transaction, the CSMS SHALL send 0.00.\r\n\r\n")
     private Double totalCost;
     /**
-     * Priority from a business point of view. Default priority is 0, The range is from -9 to 9. Higher values indicate a higher priority. The chargingPriority in &lt;&lt;transactioneventresponse,TransactionEventResponse&gt;&gt; is temporarily, so it may not be set in the &lt;&lt;cmn_idtokeninfotype,IdTokenInfoType&gt;&gt; afterwards. Also the chargingPriority in &lt;&lt;transactioneventresponse,TransactionEventResponse&gt;&gt; overrules the one in &lt;&lt;cmn_idtokeninfotype,IdTokenInfoType&gt;&gt;.  
+     * Priority from a business point of view. Default priority is 0, The range is from -9 to 9. Higher values indicate a higher priority. The chargingPriority in &lt;&lt;transactioneventresponse,TransactionEventResponse&gt;&gt; is temporarily, so it may not be set in the &lt;&lt;cmn_idtokeninfotype,IdTokenInfoType&gt;&gt; afterwards. Also the chargingPriority in &lt;&lt;transactioneventresponse,TransactionEventResponse&gt;&gt; overrules the one in &lt;&lt;cmn_idtokeninfotype,IdTokenInfoType&gt;&gt;.  
      * 
      * 
      */
@@ -47,10 +45,10 @@ public class TransactionEventResponse implements ResponseType
     @JsonPropertyDescription("Priority from a business point of view. Default priority is 0, The range is from -9 to 9. Higher values indicate a higher priority. The chargingPriority in &lt;&lt;transactioneventresponse,TransactionEventResponse&gt;&gt; is temporarily, so it may not be set in the &lt;&lt;cmn_idtokeninfotype,IdTokenInfoType&gt;&gt; afterwards. Also the chargingPriority in &lt;&lt;transactioneventresponse,TransactionEventResponse&gt;&gt; overrules the one in &lt;&lt;cmn_idtokeninfotype,IdTokenInfoType&gt;&gt;.  \r\n")
     private Integer chargingPriority;
     /**
-     * ID_ Token
-     * urn:x-oca:ocpp:uid:2:233247
-     * Contains status information about an identifier.
-     * It is advised to not stop charging for a token that expires during charging, as ExpiryDate is only used for caching purposes. If ExpiryDate is not given, the status has no end date.
+     * ID_ Token
+     * urn:x-oca:ocpp:uid:2:233247
+     * Contains status information about an identifier.
+     * It is advised to not stop charging for a token that expires during charging, as ExpiryDate is only used for caching purposes. If ExpiryDate is not given, the status has no end date.
      * 
      * 
      */
@@ -59,10 +57,10 @@ public class TransactionEventResponse implements ResponseType
     @Valid
     private IdTokenInfo idTokenInfo;
     /**
-     * Message_ Content
-     * urn:x-enexis:ecdm:uid:2:234490
-     * Contains message details, for a message to be displayed on a Charging Station.
-     * 
+     * Message_ Content
+     * urn:x-enexis:ecdm:uid:2:234490
+     * Contains message details, for a message to be displayed on a Charging Station.
+     * 
      * 
      * 
      */
@@ -95,8 +93,8 @@ public class TransactionEventResponse implements ResponseType
     }
 
     /**
-     * SHALL only be sent when charging has ended. Final total cost of this transaction, including taxes. In the currency configured with the Configuration Variable: &lt;&lt;configkey-currency,`Currency`&gt;&gt;. When omitted, the transaction was NOT free. To indicate a free transaction, the CSMS SHALL send 0.00.
-     * 
+     * SHALL only be sent when charging has ended. Final total cost of this transaction, including taxes. In the currency configured with the Configuration Variable: &lt;&lt;configkey-currency,`Currency`&gt;&gt;. When omitted, the transaction was NOT free. To indicate a free transaction, the CSMS SHALL send 0.00.
+     * 
      * 
      * 
      */
@@ -106,8 +104,8 @@ public class TransactionEventResponse implements ResponseType
     }
 
     /**
-     * SHALL only be sent when charging has ended. Final total cost of this transaction, including taxes. In the currency configured with the Configuration Variable: &lt;&lt;configkey-currency,`Currency`&gt;&gt;. When omitted, the transaction was NOT free. To indicate a free transaction, the CSMS SHALL send 0.00.
-     * 
+     * SHALL only be sent when charging has ended. Final total cost of this transaction, including taxes. In the currency configured with the Configuration Variable: &lt;&lt;configkey-currency,`Currency`&gt;&gt;. When omitted, the transaction was NOT free. To indicate a free transaction, the CSMS SHALL send 0.00.
+     * 
      * 
      * 
      */
@@ -122,7 +120,7 @@ public class TransactionEventResponse implements ResponseType
     }
 
     /**
-     * Priority from a business point of view. Default priority is 0, The range is from -9 to 9. Higher values indicate a higher priority. The chargingPriority in &lt;&lt;transactioneventresponse,TransactionEventResponse&gt;&gt; is temporarily, so it may not be set in the &lt;&lt;cmn_idtokeninfotype,IdTokenInfoType&gt;&gt; afterwards. Also the chargingPriority in &lt;&lt;transactioneventresponse,TransactionEventResponse&gt;&gt; overrules the one in &lt;&lt;cmn_idtokeninfotype,IdTokenInfoType&gt;&gt;.  
+     * Priority from a business point of view. Default priority is 0, The range is from -9 to 9. Higher values indicate a higher priority. The chargingPriority in &lt;&lt;transactioneventresponse,TransactionEventResponse&gt;&gt; is temporarily, so it may not be set in the &lt;&lt;cmn_idtokeninfotype,IdTokenInfoType&gt;&gt; afterwards. Also the chargingPriority in &lt;&lt;transactioneventresponse,TransactionEventResponse&gt;&gt; overrules the one in &lt;&lt;cmn_idtokeninfotype,IdTokenInfoType&gt;&gt;.  
      * 
      * 
      */
@@ -132,7 +130,7 @@ public class TransactionEventResponse implements ResponseType
     }
 
     /**
-     * Priority from a business point of view. Default priority is 0, The range is from -9 to 9. Higher values indicate a higher priority. The chargingPriority in &lt;&lt;transactioneventresponse,TransactionEventResponse&gt;&gt; is temporarily, so it may not be set in the &lt;&lt;cmn_idtokeninfotype,IdTokenInfoType&gt;&gt; afterwards. Also the chargingPriority in &lt;&lt;transactioneventresponse,TransactionEventResponse&gt;&gt; overrules the one in &lt;&lt;cmn_idtokeninfotype,IdTokenInfoType&gt;&gt;.  
+     * Priority from a business point of view. Default priority is 0, The range is from -9 to 9. Higher values indicate a higher priority. The chargingPriority in &lt;&lt;transactioneventresponse,TransactionEventResponse&gt;&gt; is temporarily, so it may not be set in the &lt;&lt;cmn_idtokeninfotype,IdTokenInfoType&gt;&gt; afterwards. Also the chargingPriority in &lt;&lt;transactioneventresponse,TransactionEventResponse&gt;&gt; overrules the one in &lt;&lt;cmn_idtokeninfotype,IdTokenInfoType&gt;&gt;.  
      * 
      * 
      */
@@ -147,10 +145,10 @@ public class TransactionEventResponse implements ResponseType
     }
 
     /**
-     * ID_ Token
-     * urn:x-oca:ocpp:uid:2:233247
-     * Contains status information about an identifier.
-     * It is advised to not stop charging for a token that expires during charging, as ExpiryDate is only used for caching purposes. If ExpiryDate is not given, the status has no end date.
+     * ID_ Token
+     * urn:x-oca:ocpp:uid:2:233247
+     * Contains status information about an identifier.
+     * It is advised to not stop charging for a token that expires during charging, as ExpiryDate is only used for caching purposes. If ExpiryDate is not given, the status has no end date.
      * 
      * 
      */
@@ -160,10 +158,10 @@ public class TransactionEventResponse implements ResponseType
     }
 
     /**
-     * ID_ Token
-     * urn:x-oca:ocpp:uid:2:233247
-     * Contains status information about an identifier.
-     * It is advised to not stop charging for a token that expires during charging, as ExpiryDate is only used for caching purposes. If ExpiryDate is not given, the status has no end date.
+     * ID_ Token
+     * urn:x-oca:ocpp:uid:2:233247
+     * Contains status information about an identifier.
+     * It is advised to not stop charging for a token that expires during charging, as ExpiryDate is only used for caching purposes. If ExpiryDate is not given, the status has no end date.
      * 
      * 
      */
@@ -178,10 +176,10 @@ public class TransactionEventResponse implements ResponseType
     }
 
     /**
-     * Message_ Content
-     * urn:x-enexis:ecdm:uid:2:234490
-     * Contains message details, for a message to be displayed on a Charging Station.
-     * 
+     * Message_ Content
+     * urn:x-enexis:ecdm:uid:2:234490
+     * Contains message details, for a message to be displayed on a Charging Station.
+     * 
      * 
      * 
      */
@@ -191,10 +189,10 @@ public class TransactionEventResponse implements ResponseType
     }
 
     /**
-     * Message_ Content
-     * urn:x-enexis:ecdm:uid:2:234490
-     * Contains message details, for a message to be displayed on a Charging Station.
-     * 
+     * Message_ Content
+     * urn:x-enexis:ecdm:uid:2:234490
+     * Contains message details, for a message to be displayed on a Charging Station.
+     * 
      * 
      * 
      */

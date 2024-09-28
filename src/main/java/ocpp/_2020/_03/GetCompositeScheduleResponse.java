@@ -1,14 +1,13 @@
 
 package ocpp._2020._03;
 
-import javax.annotation.Generated;
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import de.rwth.idsg.ocpp.jaxb.ResponseType;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
@@ -17,7 +16,6 @@ import de.rwth.idsg.ocpp.jaxb.ResponseType;
     "statusInfo",
     "schedule"
 })
-@Generated("jsonschema2pojo")
 public class GetCompositeScheduleResponse implements ResponseType
 {
 
@@ -30,8 +28,8 @@ public class GetCompositeScheduleResponse implements ResponseType
     @Valid
     private CustomData customData;
     /**
-     * The Charging Station will indicate if it was
-     * able to process the request
+     * The Charging Station will indicate if it was
+     * able to process the request
      * 
      * (Required)
      * 
@@ -41,7 +39,7 @@ public class GetCompositeScheduleResponse implements ResponseType
     @NotNull
     private GenericStatusEnum status;
     /**
-     * Element providing more information about the status.
+     * Element providing more information about the status.
      * 
      * 
      */
@@ -50,8 +48,8 @@ public class GetCompositeScheduleResponse implements ResponseType
     @Valid
     private StatusInfo statusInfo;
     /**
-     * Composite_ Schedule
-     * urn:x-oca:ocpp:uid:2:233362
+     * Composite_ Schedule
+     * urn:x-oca:ocpp:uid:2:233362
      * 
      * 
      */
@@ -84,8 +82,8 @@ public class GetCompositeScheduleResponse implements ResponseType
     }
 
     /**
-     * The Charging Station will indicate if it was
-     * able to process the request
+     * The Charging Station will indicate if it was
+     * able to process the request
      * 
      * (Required)
      * 
@@ -96,8 +94,8 @@ public class GetCompositeScheduleResponse implements ResponseType
     }
 
     /**
-     * The Charging Station will indicate if it was
-     * able to process the request
+     * The Charging Station will indicate if it was
+     * able to process the request
      * 
      * (Required)
      * 
@@ -113,7 +111,7 @@ public class GetCompositeScheduleResponse implements ResponseType
     }
 
     /**
-     * Element providing more information about the status.
+     * Element providing more information about the status.
      * 
      * 
      */
@@ -123,7 +121,7 @@ public class GetCompositeScheduleResponse implements ResponseType
     }
 
     /**
-     * Element providing more information about the status.
+     * Element providing more information about the status.
      * 
      * 
      */
@@ -138,8 +136,8 @@ public class GetCompositeScheduleResponse implements ResponseType
     }
 
     /**
-     * Composite_ Schedule
-     * urn:x-oca:ocpp:uid:2:233362
+     * Composite_ Schedule
+     * urn:x-oca:ocpp:uid:2:233362
      * 
      * 
      */
@@ -149,8 +147,8 @@ public class GetCompositeScheduleResponse implements ResponseType
     }
 
     /**
-     * Composite_ Schedule
-     * urn:x-oca:ocpp:uid:2:233362
+     * Composite_ Schedule
+     * urn:x-oca:ocpp:uid:2:233362
      * 
      * 
      */

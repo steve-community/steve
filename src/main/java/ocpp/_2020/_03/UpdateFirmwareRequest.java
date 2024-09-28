@@ -1,14 +1,13 @@
 
 package ocpp._2020._03;
 
-import javax.annotation.Generated;
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import de.rwth.idsg.ocpp.jaxb.RequestType;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
@@ -18,7 +17,6 @@ import de.rwth.idsg.ocpp.jaxb.RequestType;
     "requestId",
     "firmware"
 })
-@Generated("jsonschema2pojo")
 public class UpdateFirmwareRequest implements RequestType
 {
 
@@ -31,7 +29,7 @@ public class UpdateFirmwareRequest implements RequestType
     @Valid
     private CustomData customData;
     /**
-     * This specifies how many times Charging Station must try to download the firmware before giving up. If this field is not present, it is left to Charging Station to decide how many times it wants to retry.
+     * This specifies how many times Charging Station must try to download the firmware before giving up. If this field is not present, it is left to Charging Station to decide how many times it wants to retry.
      * 
      * 
      */
@@ -39,7 +37,7 @@ public class UpdateFirmwareRequest implements RequestType
     @JsonPropertyDescription("This specifies how many times Charging Station must try to download the firmware before giving up. If this field is not present, it is left to Charging Station to decide how many times it wants to retry.\r\n")
     private Integer retries;
     /**
-     * The interval in seconds after which a retry may be attempted. If this field is not present, it is left to Charging Station to decide how long to wait between attempts.
+     * The interval in seconds after which a retry may be attempted. If this field is not present, it is left to Charging Station to decide how long to wait between attempts.
      * 
      * 
      */
@@ -47,7 +45,7 @@ public class UpdateFirmwareRequest implements RequestType
     @JsonPropertyDescription("The interval in seconds after which a retry may be attempted. If this field is not present, it is left to Charging Station to decide how long to wait between attempts.\r\n")
     private Integer retryInterval;
     /**
-     * The Id of this request
+     * The Id of this request
      * 
      * (Required)
      * 
@@ -57,9 +55,9 @@ public class UpdateFirmwareRequest implements RequestType
     @NotNull
     private Integer requestId;
     /**
-     * Firmware
-     * urn:x-enexis:ecdm:uid:2:233291
-     * Represents a copy of the firmware that can be loaded/updated on the Charging Station.
+     * Firmware
+     * urn:x-enexis:ecdm:uid:2:233291
+     * Represents a copy of the firmware that can be loaded/updated on the Charging Station.
      * 
      * (Required)
      * 
@@ -94,7 +92,7 @@ public class UpdateFirmwareRequest implements RequestType
     }
 
     /**
-     * This specifies how many times Charging Station must try to download the firmware before giving up. If this field is not present, it is left to Charging Station to decide how many times it wants to retry.
+     * This specifies how many times Charging Station must try to download the firmware before giving up. If this field is not present, it is left to Charging Station to decide how many times it wants to retry.
      * 
      * 
      */
@@ -104,7 +102,7 @@ public class UpdateFirmwareRequest implements RequestType
     }
 
     /**
-     * This specifies how many times Charging Station must try to download the firmware before giving up. If this field is not present, it is left to Charging Station to decide how many times it wants to retry.
+     * This specifies how many times Charging Station must try to download the firmware before giving up. If this field is not present, it is left to Charging Station to decide how many times it wants to retry.
      * 
      * 
      */
@@ -119,7 +117,7 @@ public class UpdateFirmwareRequest implements RequestType
     }
 
     /**
-     * The interval in seconds after which a retry may be attempted. If this field is not present, it is left to Charging Station to decide how long to wait between attempts.
+     * The interval in seconds after which a retry may be attempted. If this field is not present, it is left to Charging Station to decide how long to wait between attempts.
      * 
      * 
      */
@@ -129,7 +127,7 @@ public class UpdateFirmwareRequest implements RequestType
     }
 
     /**
-     * The interval in seconds after which a retry may be attempted. If this field is not present, it is left to Charging Station to decide how long to wait between attempts.
+     * The interval in seconds after which a retry may be attempted. If this field is not present, it is left to Charging Station to decide how long to wait between attempts.
      * 
      * 
      */
@@ -144,7 +142,7 @@ public class UpdateFirmwareRequest implements RequestType
     }
 
     /**
-     * The Id of this request
+     * The Id of this request
      * 
      * (Required)
      * 
@@ -155,7 +153,7 @@ public class UpdateFirmwareRequest implements RequestType
     }
 
     /**
-     * The Id of this request
+     * The Id of this request
      * 
      * (Required)
      * 
@@ -171,9 +169,9 @@ public class UpdateFirmwareRequest implements RequestType
     }
 
     /**
-     * Firmware
-     * urn:x-enexis:ecdm:uid:2:233291
-     * Represents a copy of the firmware that can be loaded/updated on the Charging Station.
+     * Firmware
+     * urn:x-enexis:ecdm:uid:2:233291
+     * Represents a copy of the firmware that can be loaded/updated on the Charging Station.
      * 
      * (Required)
      * 
@@ -184,9 +182,9 @@ public class UpdateFirmwareRequest implements RequestType
     }
 
     /**
-     * Firmware
-     * urn:x-enexis:ecdm:uid:2:233291
-     * Represents a copy of the firmware that can be loaded/updated on the Charging Station.
+     * Firmware
+     * urn:x-enexis:ecdm:uid:2:233291
+     * Represents a copy of the firmware that can be loaded/updated on the Charging Station.
      * 
      * (Required)
      * 

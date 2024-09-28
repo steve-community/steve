@@ -1,17 +1,16 @@
 
 package ocpp._2020._03;
 
-import javax.annotation.Generated;
-import javax.validation.Valid;
-import javax.validation.constraints.Size;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Size;
 
 
 /**
- * Attribute data of a variable.
+ * Attribute data of a variable.
  * 
  * 
  */
@@ -24,7 +23,6 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
     "persistent",
     "constant"
 })
-@Generated("jsonschema2pojo")
 public class VariableAttribute {
 
     /**
@@ -36,8 +34,8 @@ public class VariableAttribute {
     @Valid
     private CustomData customData;
     /**
-     * Attribute: Actual, MinSet, MaxSet, etc.
-     * Defaults to Actual if absent.
+     * Attribute: Actual, MinSet, MaxSet, etc.
+     * Defaults to Actual if absent.
      * 
      * 
      */
@@ -45,9 +43,9 @@ public class VariableAttribute {
     @JsonPropertyDescription("Attribute: Actual, MinSet, MaxSet, etc.\r\nDefaults to Actual if absent.\r\n")
     private AttributeEnum type = AttributeEnum.fromValue("Actual");
     /**
-     * Value of the attribute. May only be omitted when mutability is set to 'WriteOnly'.
-     * 
-     * The Configuration Variable &lt;&lt;configkey-reporting-value-size,ReportingValueSize&gt;&gt; can be used to limit GetVariableResult.attributeValue, VariableAttribute.value and EventData.actualValue. The max size of these values will always remain equal. 
+     * Value of the attribute. May only be omitted when mutability is set to 'WriteOnly'.
+     * 
+     * The Configuration Variable &lt;&lt;configkey-reporting-value-size,ReportingValueSize&gt;&gt; can be used to limit GetVariableResult.attributeValue, VariableAttribute.value and EventData.actualValue. The max size of these values will always remain equal. 
      * 
      * 
      */
@@ -56,7 +54,7 @@ public class VariableAttribute {
     @Size(max = 2500)
     private String value;
     /**
-     * Defines the mutability of this attribute. Default is ReadWrite when omitted.
+     * Defines the mutability of this attribute. Default is ReadWrite when omitted.
      * 
      * 
      */
@@ -64,7 +62,7 @@ public class VariableAttribute {
     @JsonPropertyDescription("Defines the mutability of this attribute. Default is ReadWrite when omitted.\r\n")
     private MutabilityEnum mutability = MutabilityEnum.fromValue("ReadWrite");
     /**
-     * If true, value will be persistent across system reboots or power down. Default when omitted is false.
+     * If true, value will be persistent across system reboots or power down. Default when omitted is false.
      * 
      * 
      */
@@ -72,7 +70,7 @@ public class VariableAttribute {
     @JsonPropertyDescription("If true, value will be persistent across system reboots or power down. Default when omitted is false.\r\n")
     private Boolean persistent = false;
     /**
-     * If true, value that will never be changed by the Charging Station at runtime. Default when omitted is false.
+     * If true, value that will never be changed by the Charging Station at runtime. Default when omitted is false.
      * 
      * 
      */
@@ -104,8 +102,8 @@ public class VariableAttribute {
     }
 
     /**
-     * Attribute: Actual, MinSet, MaxSet, etc.
-     * Defaults to Actual if absent.
+     * Attribute: Actual, MinSet, MaxSet, etc.
+     * Defaults to Actual if absent.
      * 
      * 
      */
@@ -115,8 +113,8 @@ public class VariableAttribute {
     }
 
     /**
-     * Attribute: Actual, MinSet, MaxSet, etc.
-     * Defaults to Actual if absent.
+     * Attribute: Actual, MinSet, MaxSet, etc.
+     * Defaults to Actual if absent.
      * 
      * 
      */
@@ -131,9 +129,9 @@ public class VariableAttribute {
     }
 
     /**
-     * Value of the attribute. May only be omitted when mutability is set to 'WriteOnly'.
-     * 
-     * The Configuration Variable &lt;&lt;configkey-reporting-value-size,ReportingValueSize&gt;&gt; can be used to limit GetVariableResult.attributeValue, VariableAttribute.value and EventData.actualValue. The max size of these values will always remain equal. 
+     * Value of the attribute. May only be omitted when mutability is set to 'WriteOnly'.
+     * 
+     * The Configuration Variable &lt;&lt;configkey-reporting-value-size,ReportingValueSize&gt;&gt; can be used to limit GetVariableResult.attributeValue, VariableAttribute.value and EventData.actualValue. The max size of these values will always remain equal. 
      * 
      * 
      */
@@ -143,9 +141,9 @@ public class VariableAttribute {
     }
 
     /**
-     * Value of the attribute. May only be omitted when mutability is set to 'WriteOnly'.
-     * 
-     * The Configuration Variable &lt;&lt;configkey-reporting-value-size,ReportingValueSize&gt;&gt; can be used to limit GetVariableResult.attributeValue, VariableAttribute.value and EventData.actualValue. The max size of these values will always remain equal. 
+     * Value of the attribute. May only be omitted when mutability is set to 'WriteOnly'.
+     * 
+     * The Configuration Variable &lt;&lt;configkey-reporting-value-size,ReportingValueSize&gt;&gt; can be used to limit GetVariableResult.attributeValue, VariableAttribute.value and EventData.actualValue. The max size of these values will always remain equal. 
      * 
      * 
      */
@@ -160,7 +158,7 @@ public class VariableAttribute {
     }
 
     /**
-     * Defines the mutability of this attribute. Default is ReadWrite when omitted.
+     * Defines the mutability of this attribute. Default is ReadWrite when omitted.
      * 
      * 
      */
@@ -170,7 +168,7 @@ public class VariableAttribute {
     }
 
     /**
-     * Defines the mutability of this attribute. Default is ReadWrite when omitted.
+     * Defines the mutability of this attribute. Default is ReadWrite when omitted.
      * 
      * 
      */
@@ -185,7 +183,7 @@ public class VariableAttribute {
     }
 
     /**
-     * If true, value will be persistent across system reboots or power down. Default when omitted is false.
+     * If true, value will be persistent across system reboots or power down. Default when omitted is false.
      * 
      * 
      */
@@ -195,7 +193,7 @@ public class VariableAttribute {
     }
 
     /**
-     * If true, value will be persistent across system reboots or power down. Default when omitted is false.
+     * If true, value will be persistent across system reboots or power down. Default when omitted is false.
      * 
      * 
      */
@@ -210,7 +208,7 @@ public class VariableAttribute {
     }
 
     /**
-     * If true, value that will never be changed by the Charging Station at runtime. Default when omitted is false.
+     * If true, value that will never be changed by the Charging Station at runtime. Default when omitted is false.
      * 
      * 
      */
@@ -220,7 +218,7 @@ public class VariableAttribute {
     }
 
     /**
-     * If true, value that will never be changed by the Charging Station at runtime. Default when omitted is false.
+     * If true, value that will never be changed by the Charging Station at runtime. Default when omitted is false.
      * 
      * 
      */

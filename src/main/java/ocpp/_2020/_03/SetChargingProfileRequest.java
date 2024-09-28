@@ -1,14 +1,13 @@
 
 package ocpp._2020._03;
 
-import javax.annotation.Generated;
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import de.rwth.idsg.ocpp.jaxb.RequestType;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
@@ -16,7 +15,6 @@ import de.rwth.idsg.ocpp.jaxb.RequestType;
     "evseId",
     "chargingProfile"
 })
-@Generated("jsonschema2pojo")
 public class SetChargingProfileRequest implements RequestType
 {
 
@@ -29,7 +27,7 @@ public class SetChargingProfileRequest implements RequestType
     @Valid
     private CustomData customData;
     /**
-     * For TxDefaultProfile an evseId=0 applies the profile to each individual evse. For ChargingStationMaxProfile and ChargingStationExternalConstraints an evseId=0 contains an overal limit for the whole Charging Station.
+     * For TxDefaultProfile an evseId=0 applies the profile to each individual evse. For ChargingStationMaxProfile and ChargingStationExternalConstraints an evseId=0 contains an overal limit for the whole Charging Station.
      * 
      * (Required)
      * 
@@ -39,9 +37,9 @@ public class SetChargingProfileRequest implements RequestType
     @NotNull
     private Integer evseId;
     /**
-     * Charging_ Profile
-     * urn:x-oca:ocpp:uid:2:233255
-     * A ChargingProfile consists of ChargingSchedule, describing the amount of power or current that can be delivered per time interval.
+     * Charging_ Profile
+     * urn:x-oca:ocpp:uid:2:233255
+     * A ChargingProfile consists of ChargingSchedule, describing the amount of power or current that can be delivered per time interval.
      * 
      * (Required)
      * 
@@ -76,7 +74,7 @@ public class SetChargingProfileRequest implements RequestType
     }
 
     /**
-     * For TxDefaultProfile an evseId=0 applies the profile to each individual evse. For ChargingStationMaxProfile and ChargingStationExternalConstraints an evseId=0 contains an overal limit for the whole Charging Station.
+     * For TxDefaultProfile an evseId=0 applies the profile to each individual evse. For ChargingStationMaxProfile and ChargingStationExternalConstraints an evseId=0 contains an overal limit for the whole Charging Station.
      * 
      * (Required)
      * 
@@ -87,7 +85,7 @@ public class SetChargingProfileRequest implements RequestType
     }
 
     /**
-     * For TxDefaultProfile an evseId=0 applies the profile to each individual evse. For ChargingStationMaxProfile and ChargingStationExternalConstraints an evseId=0 contains an overal limit for the whole Charging Station.
+     * For TxDefaultProfile an evseId=0 applies the profile to each individual evse. For ChargingStationMaxProfile and ChargingStationExternalConstraints an evseId=0 contains an overal limit for the whole Charging Station.
      * 
      * (Required)
      * 
@@ -103,9 +101,9 @@ public class SetChargingProfileRequest implements RequestType
     }
 
     /**
-     * Charging_ Profile
-     * urn:x-oca:ocpp:uid:2:233255
-     * A ChargingProfile consists of ChargingSchedule, describing the amount of power or current that can be delivered per time interval.
+     * Charging_ Profile
+     * urn:x-oca:ocpp:uid:2:233255
+     * A ChargingProfile consists of ChargingSchedule, describing the amount of power or current that can be delivered per time interval.
      * 
      * (Required)
      * 
@@ -116,9 +114,9 @@ public class SetChargingProfileRequest implements RequestType
     }
 
     /**
-     * Charging_ Profile
-     * urn:x-oca:ocpp:uid:2:233255
-     * A ChargingProfile consists of ChargingSchedule, describing the amount of power or current that can be delivered per time interval.
+     * Charging_ Profile
+     * urn:x-oca:ocpp:uid:2:233255
+     * A ChargingProfile consists of ChargingSchedule, describing the amount of power or current that can be delivered per time interval.
      * 
      * (Required)
      * 

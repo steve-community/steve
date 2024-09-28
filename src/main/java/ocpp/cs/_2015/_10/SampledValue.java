@@ -1,11 +1,11 @@
 
 package ocpp.cs._2015._10;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlSchemaType;
-import javax.xml.bind.annotation.XmlType;
+import jakarta.xml.bind.annotation.XmlAccessType;
+import jakarta.xml.bind.annotation.XmlAccessorType;
+import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlSchemaType;
+import jakarta.xml.bind.annotation.XmlType;
 import lombok.ToString;
 
 
@@ -260,36 +260,99 @@ public class SampledValue {
         return (this.unit!= null);
     }
 
+    /**
+     * Sets the value of the value property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     * @return
+     *     The class instance
+     */
     public SampledValue withValue(String value) {
         setValue(value);
         return this;
     }
 
+    /**
+     * Sets the value of the context property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link ReadingContext }
+     * @return
+     *     The class instance
+     */
     public SampledValue withContext(ReadingContext value) {
         setContext(value);
         return this;
     }
 
+    /**
+     * Sets the value of the format property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link ValueFormat }
+     * @return
+     *     The class instance
+     */
     public SampledValue withFormat(ValueFormat value) {
         setFormat(value);
         return this;
     }
 
+    /**
+     * Sets the value of the measurand property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link Measurand }
+     * @return
+     *     The class instance
+     */
     public SampledValue withMeasurand(Measurand value) {
         setMeasurand(value);
         return this;
     }
 
+    /**
+     * Sets the value of the phase property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link Phase }
+     * @return
+     *     The class instance
+     */
     public SampledValue withPhase(Phase value) {
         setPhase(value);
         return this;
     }
 
+    /**
+     * Sets the value of the location property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link Location }
+     * @return
+     *     The class instance
+     */
     public SampledValue withLocation(Location value) {
         setLocation(value);
         return this;
     }
 
+    /**
+     * Sets the value of the unit property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link UnitOfMeasure }
+     * @return
+     *     The class instance
+     */
     public SampledValue withUnit(UnitOfMeasure value) {
         setUnit(value);
         return this;

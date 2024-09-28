@@ -2,7 +2,10 @@ package de.rwth.idsg.steve.service;
 
 import com.google.common.base.Strings;
 import de.rwth.idsg.steve.SteveException;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import net.parkl.ocpp.entities.OcppTag;
+import net.parkl.ocpp.repositories.OcppTagRepository;
 import net.parkl.ocpp.service.config.AdvancedChargeBoxConfiguration;
 import net.parkl.ocpp.service.config.IntegratedIdTagProvider;
 import net.parkl.ocpp.service.middleware.OcppChargingMiddleware;
@@ -12,6 +15,8 @@ import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
+import java.util.List;
 import java.util.function.Supplier;
 
 import static ocpp.cs._2015._10.AuthorizationStatus.ACCEPTED;
@@ -23,60 +28,59 @@ import static ocpp.cs._2015._10.AuthorizationStatus.INVALID;
  */
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class OcppTagServiceImpl implements OcppTagService {
-    @Autowired
-    private OcppChargingMiddleware chargingMiddleware;
-    @Autowired
-    private AdvancedChargeBoxConfiguration config;
-    @Autowired
-    private IntegratedIdTagProvider integratedIdTagProvider;
+    private final AuthTagService authTagService;
+    private final OcppTagRepository ocppTagRepository;
 
     private final UnidentifiedIncomingObjectService invalidOcppTagService = new UnidentifiedIncomingObjectService(1000);
 
     @Nullable
-    public IdTagInfo getIdTagInfo(@Nullable String idTag, boolean isStartTransactionReqContext, String askingChargeBoxId) {
+    public IdTagInfo getIdTagInfo(@Nullable String idTag, boolean isStartTransactionReqContext,
+                                  @Nullable String chargeBoxId, @Nullable Integer connectorId) {
         if (Strings.isNullOrEmpty(idTag)) {
             return null;
         }
 
-        AuthorizationStatus status = decideStatus(idTag, askingChargeBoxId);
+        IdTagInfo idTagInfo = authTagService.decideStatus(idTag, isStartTransactionReqContext, chargeBoxId, connectorId);
 
-        switch (status) {
-            case INVALID:
-                invalidOcppTagService.processNewUnidentified(idTag);
-                return new IdTagInfo().withStatus(status);
-            case BLOCKED:
-            case EXPIRED:
-            case CONCURRENT_TX:
-            case ACCEPTED:
-                return new IdTagInfo().withStatus(status);
-            default:
-                throw new SteveException("Unexpected AuthorizationStatus");
+        if (idTagInfo.getStatus() == AuthorizationStatus.INVALID) {
+            invalidOcppTagService.processNewUnidentified(idTag);
         }
+
+        return idTagInfo;
     }
 
     @Nullable
-    public IdTagInfo getIdTagInfo(@Nullable String idTag, boolean isStartTransactionReqContext, String askingChargeBoxId, Supplier<IdTagInfo> supplierWhenException) {
+    public IdTagInfo getIdTagInfo(@Nullable String idTag, boolean isStartTransactionReqContext,
+                                  @Nullable String chargeBoxId, @Nullable Integer connectorId,
+                                  Supplier<IdTagInfo> supplierWhenException) {
         try {
-            return getIdTagInfo(idTag, isStartTransactionReqContext, askingChargeBoxId);
+            return getIdTagInfo(idTag, isStartTransactionReqContext, chargeBoxId, connectorId);
         } catch (Exception e) {
             log.error("Exception occurred", e);
             return supplierWhenException.get();
         }
     }
 
-    private AuthorizationStatus decideStatus(String idTag, String askingChargeBoxId) {
-
-        if (config.isUsingIntegratedTag(askingChargeBoxId)
-                && integratedIdTagProvider.integratedTags().stream().noneMatch(idTag::equalsIgnoreCase)) {
-            return INVALID;
-        } else {
-            if (!chargingMiddleware.checkRfidTag(idTag, askingChargeBoxId)) {
-                log.error("The user with idTag '{}' is INVALID (validation failed on Parkl backend).", idTag);
-                return INVALID;
-            }
+    @Override
+    public String getParentIdtag(String idTag) {
+        OcppTag tag = ocppTagRepository.findByIdTag(idTag);
+        if (tag != null) {
+            return tag.getParentIdTag();
         }
-        log.debug("The user with idTag '{}' is ACCEPTED.", idTag);
-        return ACCEPTED;
+        return null;
     }
+
+    @Override
+    public List<String> getActiveIdTags() {
+        return ocppTagRepository.findIdTagsActive(new Date());
+    }
+
+    @Override
+    public List<String> getIdTags() {
+        return ocppTagRepository.findIdTagsAll();
+    }
+
+
 }

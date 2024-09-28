@@ -3,20 +3,19 @@ package ocpp._2020._03;
 
 import java.util.ArrayList;
 import java.util.List;
-import javax.annotation.Generated;
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import org.joda.time.DateTime;
 
 
 /**
- * Composite_ Schedule
- * urn:x-oca:ocpp:uid:2:233362
+ * Composite_ Schedule
+ * urn:x-oca:ocpp:uid:2:233362
  * 
  * 
  */
@@ -29,7 +28,6 @@ import org.joda.time.DateTime;
     "scheduleStart",
     "chargingRateUnit"
 })
-@Generated("jsonschema2pojo")
 public class CompositeSchedule {
 
     /**
@@ -51,10 +49,10 @@ public class CompositeSchedule {
     @NotNull
     private List<ChargingSchedulePeriod> chargingSchedulePeriod = new ArrayList<ChargingSchedulePeriod>();
     /**
-     * The ID of the EVSE for which the
-     * schedule is requested. When evseid=0, the
-     * Charging Station calculated the expected
-     * consumption for the grid connection.
+     * The ID of the EVSE for which the
+     * schedule is requested. When evseid=0, the
+     * Charging Station calculated the expected
+     * consumption for the grid connection.
      * 
      * (Required)
      * 
@@ -64,7 +62,7 @@ public class CompositeSchedule {
     @NotNull
     private Integer evseId;
     /**
-     * Duration of the schedule in seconds.
+     * Duration of the schedule in seconds.
      * 
      * (Required)
      * 
@@ -74,9 +72,9 @@ public class CompositeSchedule {
     @NotNull
     private Integer duration;
     /**
-     * Composite_ Schedule. Start. Date_ Time
-     * urn:x-oca:ocpp:uid:1:569456
-     * Date and time at which the schedule becomes active. All time measurements within the schedule are relative to this timestamp.
+     * Composite_ Schedule. Start. Date_ Time
+     * urn:x-oca:ocpp:uid:1:569456
+     * Date and time at which the schedule becomes active. All time measurements within the schedule are relative to this timestamp.
      * 
      * (Required)
      * 
@@ -86,8 +84,8 @@ public class CompositeSchedule {
     @NotNull
     private DateTime scheduleStart;
     /**
-     * The unit of measure Limit is
-     * expressed in.
+     * The unit of measure Limit is
+     * expressed in.
      * 
      * (Required)
      * 
@@ -146,10 +144,10 @@ public class CompositeSchedule {
     }
 
     /**
-     * The ID of the EVSE for which the
-     * schedule is requested. When evseid=0, the
-     * Charging Station calculated the expected
-     * consumption for the grid connection.
+     * The ID of the EVSE for which the
+     * schedule is requested. When evseid=0, the
+     * Charging Station calculated the expected
+     * consumption for the grid connection.
      * 
      * (Required)
      * 
@@ -160,10 +158,10 @@ public class CompositeSchedule {
     }
 
     /**
-     * The ID of the EVSE for which the
-     * schedule is requested. When evseid=0, the
-     * Charging Station calculated the expected
-     * consumption for the grid connection.
+     * The ID of the EVSE for which the
+     * schedule is requested. When evseid=0, the
+     * Charging Station calculated the expected
+     * consumption for the grid connection.
      * 
      * (Required)
      * 
@@ -179,7 +177,7 @@ public class CompositeSchedule {
     }
 
     /**
-     * Duration of the schedule in seconds.
+     * Duration of the schedule in seconds.
      * 
      * (Required)
      * 
@@ -190,7 +188,7 @@ public class CompositeSchedule {
     }
 
     /**
-     * Duration of the schedule in seconds.
+     * Duration of the schedule in seconds.
      * 
      * (Required)
      * 
@@ -206,9 +204,9 @@ public class CompositeSchedule {
     }
 
     /**
-     * Composite_ Schedule. Start. Date_ Time
-     * urn:x-oca:ocpp:uid:1:569456
-     * Date and time at which the schedule becomes active. All time measurements within the schedule are relative to this timestamp.
+     * Composite_ Schedule. Start. Date_ Time
+     * urn:x-oca:ocpp:uid:1:569456
+     * Date and time at which the schedule becomes active. All time measurements within the schedule are relative to this timestamp.
      * 
      * (Required)
      * 
@@ -219,9 +217,9 @@ public class CompositeSchedule {
     }
 
     /**
-     * Composite_ Schedule. Start. Date_ Time
-     * urn:x-oca:ocpp:uid:1:569456
-     * Date and time at which the schedule becomes active. All time measurements within the schedule are relative to this timestamp.
+     * Composite_ Schedule. Start. Date_ Time
+     * urn:x-oca:ocpp:uid:1:569456
+     * Date and time at which the schedule becomes active. All time measurements within the schedule are relative to this timestamp.
      * 
      * (Required)
      * 
@@ -237,8 +235,8 @@ public class CompositeSchedule {
     }
 
     /**
-     * The unit of measure Limit is
-     * expressed in.
+     * The unit of measure Limit is
+     * expressed in.
      * 
      * (Required)
      * 
@@ -249,8 +247,8 @@ public class CompositeSchedule {
     }
 
     /**
-     * The unit of measure Limit is
-     * expressed in.
+     * The unit of measure Limit is
+     * expressed in.
      * 
      * (Required)
      * 

@@ -3,17 +3,15 @@ package ocpp._2020._03;
 
 import java.util.HashMap;
 import java.util.Map;
-import javax.annotation.Generated;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 
 /**
- * If provided the Charging Station shall return Display Messages with the given state only. 
+ * If provided the Charging Station shall return Display Messages with the given state only. 
  * 
  * 
  */
-@Generated("jsonschema2pojo")
 public enum MessageStateEnum {
 
     CHARGING("Charging"),

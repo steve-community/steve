@@ -3,19 +3,17 @@ package ocpp._2020._03;
 
 import java.util.HashMap;
 import java.util.Map;
-import javax.annotation.Generated;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 
 /**
- * Certificate status information. 
- * - if all certificates are valid: return 'Accepted'.
- * - if one of the certificates was revoked, return 'CertificateRevoked'.
+ * Certificate status information. 
+ * - if all certificates are valid: return 'Accepted'.
+ * - if one of the certificates was revoked, return 'CertificateRevoked'.
  * 
  * 
  */
-@Generated("jsonschema2pojo")
 public enum AuthorizeCertificateStatusEnum {
 
     ACCEPTED("Accepted"),

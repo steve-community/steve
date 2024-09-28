@@ -1,7 +1,7 @@
 <%--
 
     SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
-    Copyright (C) 2013-2019 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
+    Copyright (C) 2013-2024 SteVe Community Team
     All Rights Reserved.
 
     This program is free software: you can redistribute it and/or modify
@@ -36,7 +36,7 @@
             <tr><td>Start Value</td><td>${details.transaction.startValue}</td></tr>
             <tr><td>Stop Date/Time</td><td>${details.transaction.stopTimestamp}</td></tr>
             <tr><td>Stop Value</td><td>${details.transaction.stopValue}</td></tr>
-            <tr><td>Stop Reason</td><td>${details.transaction.stopReason}</td></tr>
+            <tr><td>Stop Reason</td><td><encode:forHtml value="${details.transaction.stopReason}" /></td></tr>
             <tr><td>Stop Event Actor</td><td>${details.transaction.stopEventActor}</td></tr>
         </table>
     </center>
@@ -59,13 +59,13 @@
         <c:forEach items="${details.values}" var="v">
             <tr>
                 <td data-sort-value="${v.valueTimestamp.millis}">${v.valueTimestamp}</td>
-                <td>${v.value}</td>
-                <td>${v.readingContext}</td>
-                <td>${v.format}</td>
-                <td>${v.measurand}</td>
-                <td>${v.location}</td>
-                <td>${v.unit}</td>
-                <td>${v.phase}</td>
+                <td><encode:forHtml value="${v.value}" /></td>
+                <td><encode:forHtml value="${v.readingContext}" /></td>
+                <td><encode:forHtml value="${v.format}" /></td>
+                <td><encode:forHtml value="${v.measurand}" /></td>
+                <td><encode:forHtml value="${v.location}" /></td>
+                <td><encode:forHtml value="${v.unit}" /></td>
+                <td><encode:forHtml value="${v.phase}" /></td>
             </tr>
         </c:forEach>
         </tbody>

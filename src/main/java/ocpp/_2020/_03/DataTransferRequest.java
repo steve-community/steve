@@ -1,15 +1,14 @@
 
 package ocpp._2020._03;
 
-import javax.annotation.Generated;
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import de.rwth.idsg.ocpp.jaxb.RequestType;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
@@ -18,7 +17,6 @@ import de.rwth.idsg.ocpp.jaxb.RequestType;
     "data",
     "vendorId"
 })
-@Generated("jsonschema2pojo")
 public class DataTransferRequest implements RequestType
 {
 
@@ -31,7 +29,7 @@ public class DataTransferRequest implements RequestType
     @Valid
     private CustomData customData;
     /**
-     * May be used to indicate a specific message or implementation.
+     * May be used to indicate a specific message or implementation.
      * 
      * 
      */
@@ -40,7 +38,7 @@ public class DataTransferRequest implements RequestType
     @Size(max = 50)
     private String messageId;
     /**
-     * Data without specified length or format. This needs to be decided by both parties (Open to implementation).
+     * Data without specified length or format. This needs to be decided by both parties (Open to implementation).
      * 
      * 
      */
@@ -48,8 +46,8 @@ public class DataTransferRequest implements RequestType
     @JsonPropertyDescription("Data without specified length or format. This needs to be decided by both parties (Open to implementation).\r\n")
     private Object data;
     /**
-     * This identifies the Vendor specific implementation
-     * 
+     * This identifies the Vendor specific implementation
+     * 
      * 
      * (Required)
      * 
@@ -84,7 +82,7 @@ public class DataTransferRequest implements RequestType
     }
 
     /**
-     * May be used to indicate a specific message or implementation.
+     * May be used to indicate a specific message or implementation.
      * 
      * 
      */
@@ -94,7 +92,7 @@ public class DataTransferRequest implements RequestType
     }
 
     /**
-     * May be used to indicate a specific message or implementation.
+     * May be used to indicate a specific message or implementation.
      * 
      * 
      */
@@ -109,7 +107,7 @@ public class DataTransferRequest implements RequestType
     }
 
     /**
-     * Data without specified length or format. This needs to be decided by both parties (Open to implementation).
+     * Data without specified length or format. This needs to be decided by both parties (Open to implementation).
      * 
      * 
      */
@@ -119,7 +117,7 @@ public class DataTransferRequest implements RequestType
     }
 
     /**
-     * Data without specified length or format. This needs to be decided by both parties (Open to implementation).
+     * Data without specified length or format. This needs to be decided by both parties (Open to implementation).
      * 
      * 
      */
@@ -134,8 +132,8 @@ public class DataTransferRequest implements RequestType
     }
 
     /**
-     * This identifies the Vendor specific implementation
-     * 
+     * This identifies the Vendor specific implementation
+     * 
      * 
      * (Required)
      * 
@@ -146,8 +144,8 @@ public class DataTransferRequest implements RequestType
     }
 
     /**
-     * This identifies the Vendor specific implementation
-     * 
+     * This identifies the Vendor specific implementation
+     * 
      * 
      * (Required)
      * 

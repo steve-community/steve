@@ -1,17 +1,16 @@
 
 package ocpp._2020._03;
 
-import javax.annotation.Generated;
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 
 
 /**
- * Class to hold parameters for GetVariables request.
+ * Class to hold parameters for GetVariables request.
  * 
  * 
  */
@@ -22,7 +21,6 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
     "component",
     "variable"
 })
-@Generated("jsonschema2pojo")
 public class GetVariableData {
 
     /**
@@ -34,7 +32,7 @@ public class GetVariableData {
     @Valid
     private CustomData customData;
     /**
-     * Attribute type for which value is requested. When absent, default Actual is assumed.
+     * Attribute type for which value is requested. When absent, default Actual is assumed.
      * 
      * 
      */
@@ -42,7 +40,7 @@ public class GetVariableData {
     @JsonPropertyDescription("Attribute type for which value is requested. When absent, default Actual is assumed.\r\n")
     private AttributeEnum attributeType = AttributeEnum.fromValue("Actual");
     /**
-     * A physical or logical component
+     * A physical or logical component
      * 
      * (Required)
      * 
@@ -53,7 +51,7 @@ public class GetVariableData {
     @NotNull
     private Component component;
     /**
-     * Reference key to a component-variable.
+     * Reference key to a component-variable.
      * 
      * (Required)
      * 
@@ -88,7 +86,7 @@ public class GetVariableData {
     }
 
     /**
-     * Attribute type for which value is requested. When absent, default Actual is assumed.
+     * Attribute type for which value is requested. When absent, default Actual is assumed.
      * 
      * 
      */
@@ -98,7 +96,7 @@ public class GetVariableData {
     }
 
     /**
-     * Attribute type for which value is requested. When absent, default Actual is assumed.
+     * Attribute type for which value is requested. When absent, default Actual is assumed.
      * 
      * 
      */
@@ -113,7 +111,7 @@ public class GetVariableData {
     }
 
     /**
-     * A physical or logical component
+     * A physical or logical component
      * 
      * (Required)
      * 
@@ -124,7 +122,7 @@ public class GetVariableData {
     }
 
     /**
-     * A physical or logical component
+     * A physical or logical component
      * 
      * (Required)
      * 
@@ -140,7 +138,7 @@ public class GetVariableData {
     }
 
     /**
-     * Reference key to a component-variable.
+     * Reference key to a component-variable.
      * 
      * (Required)
      * 
@@ -151,7 +149,7 @@ public class GetVariableData {
     }
 
     /**
-     * Reference key to a component-variable.
+     * Reference key to a component-variable.
      * 
      * (Required)
      * 

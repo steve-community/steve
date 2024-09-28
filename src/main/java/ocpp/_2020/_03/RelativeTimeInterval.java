@@ -1,18 +1,17 @@
 
 package ocpp._2020._03;
 
-import javax.annotation.Generated;
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 
 
 /**
- * Relative_ Timer_ Interval
- * urn:x-oca:ocpp:uid:2:233270
+ * Relative_ Timer_ Interval
+ * urn:x-oca:ocpp:uid:2:233270
  * 
  * 
  */
@@ -22,7 +21,6 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
     "start",
     "duration"
 })
-@Generated("jsonschema2pojo")
 public class RelativeTimeInterval {
 
     /**
@@ -34,9 +32,9 @@ public class RelativeTimeInterval {
     @Valid
     private CustomData customData;
     /**
-     * Relative_ Timer_ Interval. Start. Elapsed_ Time
-     * urn:x-oca:ocpp:uid:1:569279
-     * Start of the interval, in seconds from NOW.
+     * Relative_ Timer_ Interval. Start. Elapsed_ Time
+     * urn:x-oca:ocpp:uid:1:569279
+     * Start of the interval, in seconds from NOW.
      * 
      * (Required)
      * 
@@ -46,9 +44,9 @@ public class RelativeTimeInterval {
     @NotNull
     private Integer start;
     /**
-     * Relative_ Timer_ Interval. Duration. Elapsed_ Time
-     * urn:x-oca:ocpp:uid:1:569280
-     * Duration of the interval, in seconds.
+     * Relative_ Timer_ Interval. Duration. Elapsed_ Time
+     * urn:x-oca:ocpp:uid:1:569280
+     * Duration of the interval, in seconds.
      * 
      * 
      */
@@ -80,9 +78,9 @@ public class RelativeTimeInterval {
     }
 
     /**
-     * Relative_ Timer_ Interval. Start. Elapsed_ Time
-     * urn:x-oca:ocpp:uid:1:569279
-     * Start of the interval, in seconds from NOW.
+     * Relative_ Timer_ Interval. Start. Elapsed_ Time
+     * urn:x-oca:ocpp:uid:1:569279
+     * Start of the interval, in seconds from NOW.
      * 
      * (Required)
      * 
@@ -93,9 +91,9 @@ public class RelativeTimeInterval {
     }
 
     /**
-     * Relative_ Timer_ Interval. Start. Elapsed_ Time
-     * urn:x-oca:ocpp:uid:1:569279
-     * Start of the interval, in seconds from NOW.
+     * Relative_ Timer_ Interval. Start. Elapsed_ Time
+     * urn:x-oca:ocpp:uid:1:569279
+     * Start of the interval, in seconds from NOW.
      * 
      * (Required)
      * 
@@ -111,9 +109,9 @@ public class RelativeTimeInterval {
     }
 
     /**
-     * Relative_ Timer_ Interval. Duration. Elapsed_ Time
-     * urn:x-oca:ocpp:uid:1:569280
-     * Duration of the interval, in seconds.
+     * Relative_ Timer_ Interval. Duration. Elapsed_ Time
+     * urn:x-oca:ocpp:uid:1:569280
+     * Duration of the interval, in seconds.
      * 
      * 
      */
@@ -123,9 +121,9 @@ public class RelativeTimeInterval {
     }
 
     /**
-     * Relative_ Timer_ Interval. Duration. Elapsed_ Time
-     * urn:x-oca:ocpp:uid:1:569280
-     * Duration of the interval, in seconds.
+     * Relative_ Timer_ Interval. Duration. Elapsed_ Time
+     * urn:x-oca:ocpp:uid:1:569280
+     * Duration of the interval, in seconds.
      * 
      * 
      */

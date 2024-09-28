@@ -1,18 +1,17 @@
 
 package ocpp._2020._03;
 
-import javax.annotation.Generated;
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 
 
 /**
- * Element providing more information about the status.
+ * Element providing more information about the status.
  * 
  * 
  */
@@ -22,7 +21,6 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
     "reasonCode",
     "additionalInfo"
 })
-@Generated("jsonschema2pojo")
 public class StatusInfo {
 
     /**
@@ -34,7 +32,7 @@ public class StatusInfo {
     @Valid
     private CustomData customData;
     /**
-     * A predefined code for the reason why the status is returned in this response. The string is case-insensitive.
+     * A predefined code for the reason why the status is returned in this response. The string is case-insensitive.
      * 
      * (Required)
      * 
@@ -45,7 +43,7 @@ public class StatusInfo {
     @NotNull
     private String reasonCode;
     /**
-     * Additional text to provide detailed information.
+     * Additional text to provide detailed information.
      * 
      * 
      */
@@ -78,7 +76,7 @@ public class StatusInfo {
     }
 
     /**
-     * A predefined code for the reason why the status is returned in this response. The string is case-insensitive.
+     * A predefined code for the reason why the status is returned in this response. The string is case-insensitive.
      * 
      * (Required)
      * 
@@ -89,7 +87,7 @@ public class StatusInfo {
     }
 
     /**
-     * A predefined code for the reason why the status is returned in this response. The string is case-insensitive.
+     * A predefined code for the reason why the status is returned in this response. The string is case-insensitive.
      * 
      * (Required)
      * 
@@ -105,7 +103,7 @@ public class StatusInfo {
     }
 
     /**
-     * Additional text to provide detailed information.
+     * Additional text to provide detailed information.
      * 
      * 
      */
@@ -115,7 +113,7 @@ public class StatusInfo {
     }
 
     /**
-     * Additional text to provide detailed information.
+     * Additional text to provide detailed information.
      * 
      * 
      */

@@ -3,17 +3,15 @@ package ocpp._2020._03;
 
 import java.util.HashMap;
 import java.util.Map;
-import javax.annotation.Generated;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 
 /**
- * Source of the charging limit.
+ * Source of the charging limit.
  * 
  * 
  */
-@Generated("jsonschema2pojo")
 public enum ChargingLimitSourceEnum {
 
     EMS("EMS"),

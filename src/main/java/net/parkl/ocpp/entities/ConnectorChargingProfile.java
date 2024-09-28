@@ -21,7 +21,7 @@ package net.parkl.ocpp.entities;
 import lombok.Getter;
 import lombok.Setter;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 
 @Entity
 @Table(name = "ocpp_connector_charging_profile", uniqueConstraints =

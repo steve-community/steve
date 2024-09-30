@@ -18,11 +18,15 @@ import java.util.List;
 @Slf4j
 @RequiredArgsConstructor
 public class TransactionCleanupManager {
-    private static final long HOURS_IN_MS = 60*60*1000;
+    private static final long HOURS_IN_MS = 60*60*1000L;
     @Value("${ocpp.transaction.cleanup.check.threshold.hrs:1}")
     private int cleanupCheckThresholdHours;
     @Value("${ocpp.transaction.cleanup.nonexistent.threshold.hrs:2}")
     private int cleanupNonExistentThresholdHours;
+
+    @Value("${ocpp.transaction.cleanup.no-transaction.threshold.hrs:24}")
+    private int cleanupNoTransactionThresholdHours;
+
     @Value("${ocpp.transaction.cleanup.stopped.threshold.hrs:1}")
     private int cleanupStoppedThresholdHours;
     @Value("${ocpp.consumption.threshold.days:30}")
@@ -55,7 +59,21 @@ public class TransactionCleanupManager {
             log.info("Transaction cleanup completed: {} of {} transactions", cleanedUp, transactions.size());
         }
 
-        int deleted = chargingProcessService.cleanupWithoutTransaction();
+        List<OcppChargingProcess> processes = chargingProcessService.findWithoutTransactionForCleanup(cleanupNoTransactionThresholdHours);
+        int deleted=0;
+        if (!processes.isEmpty()) {
+            log.info("Found {} charging processes without transaction for cleanup (before {})...", processes.size(),
+                    cleanupNoTransactionThresholdHours);
+            for (OcppChargingProcess process : processes) {
+                log.info("Checking process {} for cleanup...", process.getOcppChargingProcessId());
+                boolean cleanup = checkEmobilityServiceProvider(null, process);
+
+                if (cleanup) {
+                    chargingProcessService.deleteByChargingProcessId(process.getOcppChargingProcessId());
+                    deleted++;
+                }
+            }
+        }
         if (deleted > 0) {
             log.info("Cleaned up {} charging processes without transaction", deleted);
         }
@@ -67,23 +85,34 @@ public class TransactionCleanupManager {
         OcppChargingProcess chargingProcess = chargingProcessService.findByTransactionId(transaction.getTransactionPk());
         boolean cleanup = false;
         if (chargingProcess != null) {
-            ESPChargingProcessCheckResult checkResult =
-                    emobilityServiceProvider.checkChargingProcess(chargingProcess.getOcppChargingProcessId());
-            if (!checkResult.isExists()) {
-                log.info("Charging process {} does not exist at the ESP, transaction id={}",
-                        chargingProcess.getOcppChargingProcessId(), transaction.getTransactionPk());
-                cleanup = checkNonExistentThreshold(transaction.getStartEventTimestamp());
-            } else if (checkResult.isStopped()) {
-                log.info("Charging process {} already stopped at the ESP, transaction id={}",
-                        chargingProcess.getOcppChargingProcessId(), transaction.getTransactionPk());
-                cleanup = checkStoppedThreshold(checkResult.getTimeElapsedSinceStop());
-            } else {
-                log.info("Charging process {} still running at the ESP, transaction id={}",
-                        chargingProcess.getOcppChargingProcessId(), transaction.getTransactionPk());
-            }
+            cleanup = checkEmobilityServiceProvider(transaction, chargingProcess);
         } else {
             log.info("Charging process was null for transaction: {}", transaction.getTransactionPk());
             cleanup = checkNonExistentThreshold(transaction.getStartEventTimestamp());
+        }
+        return cleanup;
+    }
+
+    private boolean checkEmobilityServiceProvider(Transaction transaction, OcppChargingProcess chargingProcess) {
+        boolean cleanup = false;
+        ESPChargingProcessCheckResult checkResult =
+                emobilityServiceProvider.checkChargingProcess(chargingProcess.getOcppChargingProcessId());
+        if (!checkResult.isExists()) {
+            log.info("Charging process {} does not exist at the ESP, transaction id={}",
+                    chargingProcess.getOcppChargingProcessId(),
+                    transaction!=null ? String.valueOf(transaction.getTransactionPk()) : "-");
+            cleanup = checkNonExistentThreshold(
+                    transaction!=null ? transaction.getStartEventTimestamp() :
+                    chargingProcess.getStartDate());
+        } else if (checkResult.isStopped()) {
+            log.info("Charging process {} already stopped at the ESP, transaction id={}",
+                    chargingProcess.getOcppChargingProcessId(),
+                    transaction!=null ? String.valueOf(transaction.getTransactionPk()) : "-");
+            cleanup = checkStoppedThreshold(checkResult.getTimeElapsedSinceStop());
+        } else {
+            log.info("Charging process {} still running at the ESP, transaction id={}",
+                    chargingProcess.getOcppChargingProcessId(),
+                    transaction!=null ? String.valueOf(transaction.getTransactionPk()) : "-");
         }
         return cleanup;
     }

@@ -21,14 +21,14 @@ public class ClusteredWebSocketSessionStore {
 
     public void add(String id, String chargeBoxId) {
         if (clusteredWebSocketConfig.isClusteredWebSocketSessionEnabled()) {
-            log.info("Adding clustered session {} for charge box: {}", id, chargeBoxId);
+            log.debug("Adding clustered session {} for charge box: {}", id, chargeBoxId);
             webSocketClusterSessionService.addSession(id, chargeBoxId, ClusteredWebSocketHelper.getPodIp());
         }
     }
 
     public void remove(String id) {
         if (clusteredWebSocketConfig.isClusteredWebSocketSessionEnabled()) {
-            log.info("Removing clustered session: {}", id);
+            log.debug("Removing clustered session: {}", id);
             webSocketClusterSessionService.removeSession(id);
         }
     }

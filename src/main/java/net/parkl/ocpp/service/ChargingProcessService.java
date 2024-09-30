@@ -234,8 +234,5 @@ public class ChargingProcessService {
         return waiter.waitFor(() -> chargingProcessRepo.findByConnectorAndTransactionStartIsNullAndEndDateIsNull(conn));
     }
 
-    @Transactional
-    public int cleanupWithoutTransaction() {
-        return chargingProcessRepo.deleteWithoutTransaction(new Date(System.currentTimeMillis()-60*60*1000));
-    }
+
 }

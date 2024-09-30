@@ -289,7 +289,7 @@ public class CentralSystemService16_Service {
     }
 
     public HeartbeatResponse heartbeat(HeartbeatRequest parameters, String chargeBoxIdentity) {
-        log.info("Heartbeat from charge box: {}", chargeBoxIdentity);
+        log.debug("Heartbeat from charge box: {}", chargeBoxIdentity);
         DateTime now = DateTime.now();
         chargePointService.updateChargeboxHeartbeat(chargeBoxIdentity, now);
         return new HeartbeatResponse().withCurrentTime(now);

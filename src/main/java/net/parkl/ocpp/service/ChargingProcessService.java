@@ -235,7 +235,14 @@ public class ChargingProcessService {
     }
 
     @Transactional
-    public int cleanupWithoutTransaction() {
-        return chargingProcessRepo.deleteWithoutTransaction(new Date(System.currentTimeMillis()-60*60*1000));
+    public List<OcppChargingProcess> findWithoutTransactionForCleanup(int hoursBefore) {
+        return chargingProcessRepo.findWithoutTransactionBefore(new Date(System.currentTimeMillis()-hoursBefore*60*60*1000L));
+
+    }
+
+    @Transactional
+    public void deleteByChargingProcessId(String ocppChargingProcessId) {
+        chargingProcessRepo.deleteById(ocppChargingProcessId);
+
     }
 }

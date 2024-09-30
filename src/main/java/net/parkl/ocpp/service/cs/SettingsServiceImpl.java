@@ -26,6 +26,7 @@ import net.parkl.ocpp.entities.Setting;
 import net.parkl.ocpp.repositories.SettingRepository;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -41,6 +42,9 @@ import static de.rwth.idsg.steve.utils.StringUtils.splitByComma;
 
 @Service
 public class SettingsServiceImpl implements SettingsService {
+
+	@Value("${heartbeat.default.interval.secs:60}")
+	private int heartbeatIntervalInSeconds;
 
 	private static final String APP_ID = new String(
             Base64.getEncoder().encode("ParklOcppCs".getBytes(StandardCharsets.UTF_8)),
@@ -163,7 +167,7 @@ public class SettingsServiceImpl implements SettingsService {
 	public void saveDefaultSettings() {
 		Setting s=new Setting();
 		s.setAppId(APP_ID);
-		s.setHeartbeatIntervalInSeconds(14400);
+		s.setHeartbeatIntervalInSeconds(heartbeatIntervalInSeconds);
 		s.setHoursToExpire(1);
 		s.setMailPort(25);
 		settingRepo.save(s);

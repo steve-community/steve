@@ -3,17 +3,21 @@ package net.parkl.ocpp.service.middleware;
 import de.rwth.idsg.steve.ocpp.OcppProtocol;
 import de.rwth.idsg.steve.ocpp.RequestResult;
 import de.rwth.idsg.steve.repository.dto.ChargePointSelect;
+import de.rwth.idsg.steve.repository.dto.TransactionDetails;
 import de.rwth.idsg.steve.web.dto.ocpp.*;
 import lombok.extern.slf4j.Slf4j;
 import net.parkl.ocpp.entities.*;
 import net.parkl.ocpp.module.esp.model.ESPActiveTransaction;
 import net.parkl.ocpp.module.esp.model.ESPClosedTransaction;
 import net.parkl.ocpp.module.esp.model.ESPClosedTransactions;
+import net.parkl.ocpp.module.esp.model.ESPConnectorStopResults;
 import net.parkl.ocpp.repositories.ConnectorRepository;
 import net.parkl.ocpp.repositories.OcppChargingProcessRepository;
 import net.parkl.ocpp.repositories.TransactionRepository;
 import net.parkl.ocpp.repositories.TransactionStopRepository;
+import net.parkl.ocpp.service.cs.ConnectorService;
 import net.parkl.ocpp.service.cs.TransactionService;
+import net.parkl.ocpp.service.cs.cleanup.ConnectorStopService;
 import net.parkl.ocpp.util.ListTransform;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,11 +38,16 @@ import static java.util.Collections.singletonList;
 public class OcppAdminMiddleware extends AbstractOcppMiddleware {
     @Autowired
     private TransactionRepository transactionRepository;
+    @Autowired
+    private TransactionService transactionService;
 
     @Autowired
     private ConnectorRepository connectorRepository;
     @Autowired
     private OcppChargingProcessRepository ocppChargingProcessRepository;
+
+    @Autowired
+    private ConnectorStopService connectorStopService;
 
     public void unlockConnector(String chargeBoxId, String chargerId) {
         log.info("Unlock connector request for {}-{}...", chargeBoxId, chargerId);
@@ -238,5 +247,24 @@ public class OcppAdminMiddleware extends AbstractOcppMiddleware {
             throw new IllegalArgumentException("Invalid charge box ID: " + chargeBoxId);
         }
         return chargeBox;
+    }
+
+    public List<TransactionDetails.MeterValues> getTransactionDetails(String processId) {
+        OcppChargingProcess process = ocppChargingProcessRepository.findById(processId).orElseThrow();
+        if (process.getTransactionStart()==null) {
+            log.warn("No transaction start found for process: {}", processId);
+            return new ArrayList<>();
+        }
+        return transactionService.getDetails(process.getTransactionStart().getTransactionPk()).getValues();
+
+    }
+
+    public ESPConnectorStopResults stopConnectorCharging(String chargeBoxId, String chargerId) {
+        log.info("Stop connector charging request for {}-{}...", chargeBoxId, chargerId);
+        OcppChargeBox chargeBox = getOcppChargeBox(chargeBoxId);
+
+        ChargePointSelect c = getChargePointSelect(chargeBox.getChargeBoxId(), chargeBox.getOcppProtocol());
+
+        return connectorStopService.stopConnectorCharging(c);
     }
 }

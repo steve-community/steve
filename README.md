@@ -25,6 +25,9 @@ Electric charge points using the following OCPP versions are supported:
 * OCPP1.6S
 * OCPP1.6J
 
+⚠️ Currently, Steve doesn't support [the OCPP-1.6 security whitepaper](https://openchargealliance.org/wp-content/uploads/2023/11/OCPP-1.6-security-whitepaper-edition-3-2.zip) yet (see [#100](https://github.com/steve-community/steve/issues/100)) and anyone can send events to a public steve instance once the chargebox id is known.
+Please, don't expose a Steve instance without knowing that risk.
+
 For Charging Station compatibility please check:
 https://github.com/steve-community/steve/wiki/Charging-Station-Compatibility
 
@@ -52,11 +55,6 @@ SteVe is designed to run standalone, a java servlet container / web server (e.g.
     CREATE DATABASE stevedb CHARACTER SET utf8 COLLATE utf8_unicode_ci;
     CREATE USER 'steve'@'localhost' IDENTIFIED BY 'changeme';
     GRANT ALL PRIVILEGES ON stevedb.* TO 'steve'@'localhost';
-    GRANT SUPER ON *.* TO 'steve'@'localhost';
-    ```
-    Note: The statement `GRANT SUPER [...]` is only necessary to execute some of the previous migration files and is only needed for the initial database setup. Afterwards, you can remove this privilege by executing 
-    ```
-    REVOKE SUPER ON *.* FROM 'steve'@'localhost';
     ```
         
 2. Download and extract tarball:

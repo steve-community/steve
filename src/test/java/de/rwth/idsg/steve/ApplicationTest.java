@@ -32,7 +32,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
-import javax.xml.ws.WebServiceException;
+import jakarta.xml.ws.WebServiceException;
 
 import static de.rwth.idsg.steve.utils.Helpers.getForOcpp12;
 import static de.rwth.idsg.steve.utils.Helpers.getForOcpp15;

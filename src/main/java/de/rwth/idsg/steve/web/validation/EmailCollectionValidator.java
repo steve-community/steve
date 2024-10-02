@@ -20,8 +20,8 @@ package de.rwth.idsg.steve.web.validation;
 
 import org.hibernate.validator.internal.constraintvalidators.bv.EmailValidator;
 
-import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintValidatorContext;
+import jakarta.validation.ConstraintValidator;
+import jakarta.validation.ConstraintValidatorContext;
 import java.util.Collection;
 
 /**

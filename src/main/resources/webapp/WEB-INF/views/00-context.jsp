@@ -18,7 +18,7 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 --%>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib uri="jakarta.tags.core" prefix="c" %>
 
 <%-- This is the global variable to be used in every jsp file as the prefix of the links --%>
 <c:set var="ctxPath" value="${pageContext.request.contextPath}" />

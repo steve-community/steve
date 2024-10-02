@@ -23,10 +23,12 @@ import de.rwth.idsg.steve.repository.TransactionRepository;
 import de.rwth.idsg.steve.repository.dto.Transaction;
 import de.rwth.idsg.steve.repository.dto.TransactionDetails;
 import de.rwth.idsg.steve.utils.DateTimeUtils;
+import de.rwth.idsg.steve.utils.TransactionStopServiceHelper;
 import de.rwth.idsg.steve.web.dto.TransactionQueryForm;
 import jooq.steve.db.enums.TransactionStopEventActor;
 import jooq.steve.db.tables.records.ConnectorMeterValueRecord;
 import jooq.steve.db.tables.records.TransactionStartRecord;
+import ocpp.cs._2015._10.UnitOfMeasure;
 import org.joda.time.DateTime;
 import org.jooq.Condition;
 import org.jooq.DSLContext;
@@ -171,11 +173,16 @@ public class TransactionRepositoryImpl implements TransactionRepository {
             timestampCondition = CONNECTOR_METER_VALUE.VALUE_TIMESTAMP.between(startTimestamp, stopTimestamp);
         }
 
+        // https://github.com/steve-community/steve/issues/1514
+        Condition unitCondition = CONNECTOR_METER_VALUE.UNIT.isNull()
+            .or(CONNECTOR_METER_VALUE.UNIT.in("", UnitOfMeasure.WH.value(), UnitOfMeasure.K_WH.value()));
+
         // Case 1: Ideal and most accurate case. Station sends meter values with transaction id set.
         //
         SelectQuery<ConnectorMeterValueRecord> transactionQuery =
                 ctx.selectFrom(CONNECTOR_METER_VALUE)
                    .where(CONNECTOR_METER_VALUE.TRANSACTION_PK.eq(transactionPk))
+                   .and(unitCondition)
                    .getQuery();
 
         // Case 2: Fall back to filtering according to time windows
@@ -187,6 +194,7 @@ public class TransactionRepositoryImpl implements TransactionRepository {
                                                                    .where(CONNECTOR.CHARGE_BOX_ID.eq(chargeBoxId))
                                                                    .and(CONNECTOR.CONNECTOR_ID.eq(connectorId))))
                    .and(timestampCondition)
+                   .and(unitCondition)
                    .getQuery();
 
         // Actually, either case 1 applies or 2. If we retrieved values using 1, case 2 is should not be
@@ -221,7 +229,10 @@ public class TransactionRepositoryImpl implements TransactionRepository {
                                                            .location(r.value6())
                                                            .unit(r.value7())
                                                            .phase(r.value8())
-                                                           .build());
+                                                           .build())
+                   .stream()
+                   .filter(TransactionStopServiceHelper::isEnergyValue)
+                   .toList();
 
         return new TransactionDetails(new TransactionMapper().map(transaction), values, nextTx);
     }

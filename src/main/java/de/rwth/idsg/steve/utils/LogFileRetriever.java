@@ -68,7 +68,7 @@ public enum LogFileRetriever {
     }
 
     public String getErrorMessage() {
-        return "Not available";
+        return "Logs are not available here, because they are being directed to console/stdout instead";
     }
 
     // -------------------------------------------------------------------------

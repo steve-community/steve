@@ -14,18 +14,14 @@ import net.parkl.ocpp.module.esp.model.ESPConnectorStopResults;
 import net.parkl.ocpp.repositories.ConnectorRepository;
 import net.parkl.ocpp.repositories.OcppChargingProcessRepository;
 import net.parkl.ocpp.repositories.TransactionRepository;
-import net.parkl.ocpp.repositories.TransactionStopRepository;
-import net.parkl.ocpp.service.cs.ConnectorService;
 import net.parkl.ocpp.service.cs.TransactionService;
 import net.parkl.ocpp.service.cs.cleanup.ConnectorStopService;
-import net.parkl.ocpp.util.ListTransform;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
-import jakarta.persistence.criteria.CriteriaBuilder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -249,7 +245,7 @@ public class OcppAdminMiddleware extends AbstractOcppMiddleware {
         return chargeBox;
     }
 
-    public List<TransactionDetails.MeterValues> getTransactionDetails(String processId) {
+    public List<TransactionDetails.MeterValues> getProcessMeterValues(String processId) {
         OcppChargingProcess process = ocppChargingProcessRepository.findById(processId).orElseThrow();
         if (process.getTransactionStart()==null) {
             log.warn("No transaction start found for process: {}", processId);

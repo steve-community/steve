@@ -20,7 +20,7 @@ import static org.mockito.Mockito.*;
 
 public class HeartBeatServiceUnitTest {
 
-    private static final int heartBeatInterval = 60;
+    private static final int HEART_BEAT_INTERVAL = 60;
 
     @Test
     public void changeConfig15() {
@@ -36,7 +36,7 @@ public class HeartBeatServiceUnitTest {
                         mockChargePointHelperService,
                         mockConfiguration,
                         mockPersistentTaskService,
-                        heartBeatInterval);
+                        HEART_BEAT_INTERVAL);
 
         String chargeBoxId = "ID15";
         List<ChargePointSelect> chargePoints = new ArrayList<>();
@@ -52,7 +52,7 @@ public class HeartBeatServiceUnitTest {
         verify(mockChargePointService15_invoker).changeConfiguration(any(ChargePointSelect.class), argumentCaptor.capture());
 
         assertThat(argumentCaptor.getValue().getParams().getKey()).isEqualTo(HeartBeatInterval.value());
-        assertThat(argumentCaptor.getValue().getParams().getValue()).isEqualTo(String.valueOf(heartBeatInterval));
+        assertThat(argumentCaptor.getValue().getParams().getValue()).isEqualTo(String.valueOf(HEART_BEAT_INTERVAL));
     }
 
     @Test
@@ -70,7 +70,7 @@ public class HeartBeatServiceUnitTest {
                         mockChargePointHelperService,
                         mockConfiguration,
                         mockPersistentTaskService,
-                        heartBeatInterval);
+                        HEART_BEAT_INTERVAL);
 
 
         String chargeBoxId = "ID16";
@@ -87,7 +87,7 @@ public class HeartBeatServiceUnitTest {
         verify(mockChargePointService16_invoker).changeConfiguration(any(ChargePointSelect.class), argumentCaptor.capture());
 
         assertThat(argumentCaptor.getValue().getParams().getKey()).isEqualTo(HeartBeatInterval.value());
-        assertThat(argumentCaptor.getValue().getParams().getValue()).isEqualTo(String.valueOf(heartBeatInterval));
+        assertThat(argumentCaptor.getValue().getParams().getValue()).isEqualTo(String.valueOf(HEART_BEAT_INTERVAL));
     }
 
     @Test
@@ -105,7 +105,7 @@ public class HeartBeatServiceUnitTest {
                         mockChargePointHelperService,
                         mockConfiguration,
                         mockPersistentTaskService,
-                        heartBeatInterval);
+                        HEART_BEAT_INTERVAL);
 
 
         String chargeBoxId = "ID16";

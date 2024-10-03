@@ -3,23 +3,18 @@ package net.parkl.ocpp.service.middleware;
 import de.rwth.idsg.steve.ocpp.OcppProtocol;
 import de.rwth.idsg.steve.ocpp.RequestResult;
 import de.rwth.idsg.steve.repository.dto.ChargePointSelect;
-import de.rwth.idsg.steve.web.dto.Address;
-import de.rwth.idsg.steve.web.dto.ChargePointForm;
 import de.rwth.idsg.steve.web.dto.ocpp.ChangeConfigurationParams;
 import de.rwth.idsg.steve.web.dto.ocpp.GetConfigurationParams;
 import lombok.extern.slf4j.Slf4j;
 import net.parkl.ocpp.entities.OcppChargeBox;
 import net.parkl.ocpp.module.esp.model.ESPChargeBoxConfiguration;
-import net.parkl.ocpp.service.cs.ChargePointService;
-import ocpp.cs._2015._10.RegistrationStatus;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static java.util.Collections.singletonList;
+import static net.parkl.ocpp.service.ErrorMessages.INVALID_CHARGE_BOX_ID;
+import static net.parkl.ocpp.service.ErrorMessages.OCPP_PROTOCOL_NOT_SUPPORTED;
 
 @Service
 @Slf4j
@@ -51,7 +46,7 @@ public class OcppConfigurationMiddleware extends AbstractOcppMiddleware {
             case V_16_JSON:
                 return client16.changeConfiguration(params);
             default:
-                throw new IllegalStateException("OCPP protocol not supported: " + ocppProtocol);
+                throw new IllegalStateException(OCPP_PROTOCOL_NOT_SUPPORTED + ocppProtocol);
         }
     }
 
@@ -60,14 +55,13 @@ public class OcppConfigurationMiddleware extends AbstractOcppMiddleware {
         ChargePointSelect c;
         OcppChargeBox chargeBox = chargeBoxRepo.findByChargeBoxId(chargeBoxId);
         if (chargeBox == null) {
-            log.error("Invalid charge box id: {}", chargeBoxId);
-            throw new IllegalArgumentException("Invalid charge box ID: " + chargeBoxId);
+            throw new IllegalArgumentException(INVALID_CHARGE_BOX_ID + chargeBoxId);
         }
 
         c = getChargePoint(chargeBox.getChargeBoxId(), chargeBox.getOcppProtocol());
         if (c == null) {
             log.error("Invalid charge point id: {}", chargeBoxId);
-            throw new IllegalArgumentException("Invalid charge box ID: " + chargeBoxId);
+            throw new IllegalArgumentException(INVALID_CHARGE_BOX_ID + chargeBoxId);
 
         }
 
@@ -110,14 +104,13 @@ public class OcppConfigurationMiddleware extends AbstractOcppMiddleware {
         ChargePointSelect c = null;
         OcppChargeBox chargeBox = chargeBoxRepo.findByChargeBoxId(chargeBoxId);
         if (chargeBox == null) {
-            log.error("Invalid charge box id: {}", chargeBoxId);
-            throw new IllegalArgumentException("Invalid charge box ID: " + chargeBoxId);
+            throw new IllegalArgumentException(INVALID_CHARGE_BOX_ID + chargeBoxId);
         }
 
         c = getChargePoint(chargeBox.getChargeBoxId(), chargeBox.getOcppProtocol());
         if (c == null) {
             log.error("Invalid charge point id: {}", chargeBoxId);
-            throw new IllegalArgumentException("Invalid charge box ID: " + chargeBoxId);
+            throw new IllegalArgumentException(INVALID_CHARGE_BOX_ID + chargeBoxId);
 
         }
 

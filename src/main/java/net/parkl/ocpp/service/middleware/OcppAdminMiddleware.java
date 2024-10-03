@@ -28,7 +28,7 @@ import java.util.List;
 import java.util.Map;
 
 import static java.util.Collections.singletonList;
-import static net.parkl.ocpp.service.middleware.ErrorMessages.*;
+import static net.parkl.ocpp.service.ErrorMessages.*;
 
 @Service
 @Slf4j

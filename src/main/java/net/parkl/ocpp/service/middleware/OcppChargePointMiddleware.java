@@ -27,7 +27,7 @@ import java.util.Map;
 import static de.rwth.idsg.steve.web.dto.ocpp.AvailabilityType.INOPERATIVE;
 import static de.rwth.idsg.steve.web.dto.ocpp.AvailabilityType.OPERATIVE;
 import static java.util.Collections.singletonList;
-import static net.parkl.ocpp.service.middleware.ErrorMessages.INVALID_CHARGE_BOX_ID;
+import static net.parkl.ocpp.service.ErrorMessages.INVALID_CHARGE_BOX_ID;
 
 @Service
 @Slf4j

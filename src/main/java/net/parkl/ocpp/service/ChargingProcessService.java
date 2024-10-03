@@ -37,6 +37,9 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
+import static net.parkl.ocpp.service.ErrorMessages.INVALID_CHARGE_BOX_ID_CONNECTOR_ID;
+import static net.parkl.ocpp.service.ErrorMessages.INVALID_OCPP_CHARGING_PROCESS_ID;
+
 
 @Slf4j
 @Service
@@ -70,7 +73,7 @@ public class ChargingProcessService {
     public OcppChargingProcess findOpenChargingProcessWithoutTransaction(String chargeBoxId, int connectorId) {
         Connector c = connectorRepo.findByChargeBoxIdAndConnectorId(chargeBoxId, connectorId);
         if (c == null) {
-            throw new IllegalStateException("Invalid charge box id/connector id: " + chargeBoxId + "/" + connectorId);
+            throw new IllegalStateException(INVALID_CHARGE_BOX_ID_CONNECTOR_ID + chargeBoxId + "/" + connectorId);
         }
         return chargingProcessRepo.findByConnectorAndTransactionStartIsNullAndEndDateIsNull(c);
     }
@@ -78,7 +81,7 @@ public class ChargingProcessService {
     public OcppChargingProcess findOpenChargingProcess(String chargeBoxId, int connectorId) {
         Connector c = connectorRepo.findByChargeBoxIdAndConnectorId(chargeBoxId, connectorId);
         if (c == null) {
-            throw new IllegalStateException("Invalid charge box id/connector id: " + chargeBoxId + "/" + connectorId);
+            throw new IllegalStateException(INVALID_CHARGE_BOX_ID_CONNECTOR_ID + chargeBoxId + "/" + connectorId);
         }
         return chargingProcessRepo.findByConnectorAndEndDateIsNull(c);
     }
@@ -92,7 +95,7 @@ public class ChargingProcessService {
                                                      Integer limitMinute) {
         Connector c = connectorRepo.findByChargeBoxIdAndConnectorId(chargeBoxId, connectorId);
         if (c == null) {
-            throw new IllegalStateException("Invalid charge box id/connector id: " + chargeBoxId + "/" + connectorId);
+            throw new IllegalStateException(INVALID_CHARGE_BOX_ID_CONNECTOR_ID + chargeBoxId + "/" + connectorId);
         }
         LOGGER.info("Creating OcppChargingProcess on {}/{} with id tag {} for: {}...", chargeBoxId, connectorId,
                 idTag, licensePlate);
@@ -131,7 +134,7 @@ public class ChargingProcessService {
     @Transactional
     public OcppChargingProcess stopChargingProcess(String processId) {
         OcppChargingProcess cp = chargingProcessRepo.findById(processId).
-                orElseThrow(() -> new IllegalStateException("Invalid OcppChargingProcess id: " + processId));
+                orElseThrow(() -> new IllegalStateException(INVALID_OCPP_CHARGING_PROCESS_ID + processId));
 
         if (cp.getEndDate() != null) {
             throw new IllegalStateException("OcppChargingProcess already ended: " + processId);
@@ -144,7 +147,7 @@ public class ChargingProcessService {
     @Transactional
     public OcppChargingProcess stopRequested(String processId) {
         OcppChargingProcess cp = chargingProcessRepo.findById(processId).
-                orElseThrow(() -> new IllegalStateException("Invalid OcppChargingProcess id: " + processId));
+                orElseThrow(() -> new IllegalStateException(INVALID_OCPP_CHARGING_PROCESS_ID + processId));
 
         if (cp.getStopRequestDate() != null) {
             LOGGER.warn("OcppChargingProcess stop already requested: " + processId);
@@ -159,7 +162,7 @@ public class ChargingProcessService {
     @Transactional
     public void stopRequestCancelled(String processId) {
         OcppChargingProcess cp = chargingProcessRepo.findById(processId).
-                orElseThrow(() -> new IllegalStateException("Invalid OcppChargingProcess id: " + processId));
+                orElseThrow(() -> new IllegalStateException(INVALID_OCPP_CHARGING_PROCESS_ID + processId));
 
         cp.setStopRequestDate(null);
         chargingProcessRepo.save(cp);

@@ -7,11 +7,12 @@ import net.parkl.ocpp.entities.OcppRemoteStart;
 import net.parkl.ocpp.repositories.ConnectorRepository;
 import net.parkl.ocpp.repositories.OcppRemoteStartRepository;
 import net.parkl.ocpp.service.config.AdvancedChargeBoxConfiguration;
-import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
+
+import static net.parkl.ocpp.service.ErrorMessages.INVALID_CHARGE_BOX_ID_CONNECTOR_ID;
 
 @Service
 @RequiredArgsConstructor
@@ -28,7 +29,7 @@ public class RemoteStartService {
         log.info("Remote start requested for chargeBoxId: {}, connectorId: {}, idTag: {}", chargeBoxId, connectorId, idTag);
         Connector c = connectorRepo.findByChargeBoxIdAndConnectorId(chargeBoxId, connectorId);
         if (c == null) {
-            throw new IllegalStateException("Invalid charge box id/connector id: " + chargeBoxId + "/" + connectorId);
+            throw new IllegalStateException(INVALID_CHARGE_BOX_ID_CONNECTOR_ID + chargeBoxId + "/" + connectorId);
         }
 
 
@@ -43,7 +44,7 @@ public class RemoteStartService {
         log.info("Remote start closed for chargeBoxId: {}, connectorId: {}, idTag: {}", chargeBoxId, connectorId, idTag);
         Connector c = connectorRepo.findByChargeBoxIdAndConnectorId(chargeBoxId, connectorId);
         if (c == null) {
-            throw new IllegalStateException("Invalid charge box id/connector id: " + chargeBoxId + "/" + connectorId);
+            throw new IllegalStateException(INVALID_CHARGE_BOX_ID_CONNECTOR_ID + chargeBoxId + "/" + connectorId);
         }
 
         remoteStartRepository.deleteByConnectorAndOcppTag(c, idTag);
@@ -52,7 +53,7 @@ public class RemoteStartService {
     public boolean hasOpenRemoteStart(String chargeBoxId, int connectorId, String idTag) {
         Connector c = connectorRepo.findByChargeBoxIdAndConnectorId(chargeBoxId, connectorId);
         if (c == null) {
-            throw new IllegalStateException("Invalid charge box id/connector id: " + chargeBoxId + "/" + connectorId);
+            throw new IllegalStateException(INVALID_CHARGE_BOX_ID_CONNECTOR_ID + chargeBoxId + "/" + connectorId);
         }
         return remoteStartRepository.coundByConnectorAndOcppTagAfter(c, idTag,
                 getRemoteStartValidityThreshold(chargeBoxId)) > 0;
@@ -60,7 +61,7 @@ public class RemoteStartService {
 
 
     public Date getRemoteStartValidityThreshold(String chargeBoxId) {
-        return new Date(System.currentTimeMillis() - getRemoteStartValiditySecs(chargeBoxId) * 1000);
+        return new Date(System.currentTimeMillis() - getRemoteStartValiditySecs(chargeBoxId) * 1000L);
     }
 
     private int getRemoteStartValiditySecs(String chargeBoxId) {

@@ -36,8 +36,6 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class AuthTagServiceRemote implements AuthTagService {
 
-    private final SettingsService settingsService;
-
     private final OcppChargingMiddleware chargingMiddleware;
     private final AdvancedChargeBoxConfiguration config;
     private final IntegratedIdTagProvider integratedIdTagProvider;
@@ -64,22 +62,5 @@ public class AuthTagServiceRemote implements AuthTagService {
             .withStatus(AuthorizationStatus.ACCEPTED);
     }
 
-    /**
-     * If the database contains an actual expiry, use it. Otherwise, calculate an expiry for cached info
-     */
-    @Nullable
-    private DateTime getExpiryDateOrDefault(OcppTag record) {
-        if (record!=null && record.getExpiryDate() != null) {
-            return new DateTime(record.getExpiryDate());
-        }
 
-        int hoursToExpire = settingsService.getHoursToExpire();
-
-        // From web page: The value 0 disables this functionality (i.e. no expiry date will be set).
-        if (hoursToExpire == 0) {
-            return null;
-        } else {
-            return DateTime.now().plusHours(hoursToExpire);
-        }
-    }
 }

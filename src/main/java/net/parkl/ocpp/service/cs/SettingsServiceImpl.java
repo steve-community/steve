@@ -58,6 +58,9 @@ public class SettingsServiceImpl implements SettingsService {
 	private Setting getInternal() {
         return settingRepo.findById(APP_ID).orElseThrow();
     }
+	private Setting getInternalOrNull() {
+		return settingRepo.findById(APP_ID).orElse(null);
+	}
 
 	@Override
     public int getHeartbeatIntervalInSeconds() {
@@ -159,7 +162,7 @@ public class SettingsServiceImpl implements SettingsService {
 
 	@Override
 	public boolean isSettingsExisting() {
-		return getInternal()!=null;
+		return getInternalOrNull()!=null;
 	}
 
 	@Override

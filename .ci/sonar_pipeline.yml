@@ -1,0 +1,88 @@
+# Maven
+# Build your Java project and run tests with Apache Maven.
+# Add steps that analyze code, save build artifacts, deploy, and more:
+# https://docs.microsoft.com/azure/devops/pipelines/languages/java
+
+trigger:
+  none
+
+pr:
+  - main
+
+pool:
+  vmImage: 'ubuntu-20.04'
+
+variables:
+  major: 4
+  minor: 2
+  minorDev: 0
+  minorFeature: 0
+  main: $[eq(variables['Build.SourceBranch'], 'refs/heads/main')]
+  
+
+stages:
+  - stage:
+    displayName: Build Version Number
+    jobs:
+      - job: Build_Version_Number_Main
+        condition: eq(variables.main, true)
+        variables:
+          patch: $[counter(variables['minor'], 0)]
+        steps:
+          - bash: |
+                echo "##vso[build.updatebuildnumber]$(major).$(minor).$(patch)"
+            name: SetBuildName
+     
+      - job: Build_Version_Number_Branch
+        condition: eq(variables.main, false)
+        variables:
+          patch: $[counter(variables['minor'], 0)]
+        steps:
+          - bash: |
+                echo "##vso[build.updatebuildnumber]$(major).$(minorFeature).$(patch)"
+            name: SetBuildName
+  - stage: Sonar_check
+    displayName: Sonar check
+    jobs:
+      - job: Sonar
+        steps:
+          - task: SonarCloudPrepare@1
+            inputs:
+              SonarCloud: 'sonarcloud'
+              organization: 'parklci'
+              scannerMode: 'Other'
+              extraProperties: |
+                # Additional properties that will be passed to the scanner, 
+                # Put one key=value per line, example:
+                # sonar.exclusions=**/*.bin
+                sonar.qualitygate.wait=true
+                sonar.projectKey=steve-pluggable
+                sonar.coverage.jacoco.xmlReportPaths=/home/vsts/work/1/s/CCReport43F6D5EF/jacoco.xml
+          - task: MavenAuthenticate@0
+            inputs:
+              mavenServiceConnections: 'Parkl Public, Parkl Releases, parkl_snapshots'
+          - task: Maven@3
+            inputs:
+              mavenPomFile: 'pom.xml'
+              goals: 'clean verify sonar:sonar -Drevision=$(Build.BuildNumber)'
+              options: '-batch-mode -V -U -e'
+              mavenOptions: '-Xmx512m'
+              publishJUnitResults: true
+              testResultsFiles: '**/surefire-reports/TEST-*.xml'
+              isJacocoCoverageReportXML: true
+              codeCoverageToolOption: 'JaCoCo'
+              codeCoverageClassFilter: '+:net.parkl.*'
+              javaHomeOption: 'JDKVersion'
+              jdkVersionOption: '1.17'
+              mavenVersionOption: 'Default'
+              mavenAuthenticateFeed: false
+              effectivePomSkip: false
+              pmdRunAnalysis: false
+              findBugsRunAnalysis: false
+schedules:
+  - cron: "0 1 * * *"
+    displayName: Sonar build
+    branches:
+      include:
+        - main
+    always: true

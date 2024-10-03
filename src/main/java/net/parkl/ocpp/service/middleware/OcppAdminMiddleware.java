@@ -28,13 +28,12 @@ import java.util.List;
 import java.util.Map;
 
 import static java.util.Collections.singletonList;
+import static net.parkl.ocpp.service.middleware.ErrorMessages.*;
 
 @Service
 @Slf4j
 public class OcppAdminMiddleware extends AbstractOcppMiddleware {
-    public static final String OCPP_PROTOCOL_NOT_SUPPORTED = "OCPP protocol not supported: ";
-    public static final String INVALID_CONNECTOR_ID = "Invalid connector ID: ";
-    public static final String INVALID_CHARGE_BOX_ID = "Invalid charge box ID: ";
+
     @Autowired
     private TransactionRepository transactionRepository;
     @Autowired

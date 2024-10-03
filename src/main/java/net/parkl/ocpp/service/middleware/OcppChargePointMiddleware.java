@@ -27,6 +27,7 @@ import java.util.Map;
 import static de.rwth.idsg.steve.web.dto.ocpp.AvailabilityType.INOPERATIVE;
 import static de.rwth.idsg.steve.web.dto.ocpp.AvailabilityType.OPERATIVE;
 import static java.util.Collections.singletonList;
+import static net.parkl.ocpp.service.middleware.ErrorMessages.INVALID_CHARGE_BOX_ID;
 
 @Service
 @Slf4j
@@ -62,8 +63,7 @@ public class OcppChargePointMiddleware extends AbstractOcppMiddleware {
 
         OcppChargeBox chargeBox = chargeBoxRepo.findByChargeBoxId(chargeBoxId);
         if (chargeBox == null) {
-            log.error("Invalid charge box id: {}", chargeBoxId);
-            throw new IllegalArgumentException("Invalid charge box ID: " + chargeBoxId);
+            throw new IllegalArgumentException(INVALID_CHARGE_BOX_ID + chargeBoxId);
         }
 
         chargePointService.deleteChargePoint(chargeBox.getChargeBoxPk());
@@ -140,14 +140,13 @@ public class OcppChargePointMiddleware extends AbstractOcppMiddleware {
         ChargePointSelect c;
         OcppChargeBox chargeBox = chargeBoxRepo.findByChargeBoxId(chargeBoxId);
         if (chargeBox == null) {
-            log.error("Invalid charge box id: {}", chargeBoxId);
-            throw new IllegalArgumentException("Invalid charge box ID: " + chargeBoxId);
+            throw new IllegalArgumentException(INVALID_CHARGE_BOX_ID + chargeBoxId);
         }
 
         c = getChargePoint(chargeBox.getChargeBoxId(), chargeBox.getOcppProtocol());
         if (c == null) {
             log.error("Invalid charge point id: {}", chargeBoxId);
-            throw new IllegalArgumentException("Invalid charge box ID: " + chargeBoxId);
+            throw new IllegalArgumentException(INVALID_CHARGE_BOX_ID + chargeBoxId);
 
         }
 
@@ -184,7 +183,7 @@ public class OcppChargePointMiddleware extends AbstractOcppMiddleware {
         OcppChargeBox chargeBox = chargeBoxRepo.findByChargeBoxId(chargeBoxId);
         if (chargeBox == null) {
             log.error("Invalid charge box id: {}", chargeBoxId);
-            throw new IllegalArgumentException("Invalid charge box ID: " + chargeBoxId);
+            throw new IllegalArgumentException(INVALID_CHARGE_BOX_ID + chargeBoxId);
         }
 
         return ESPChargeBoxData.builder()

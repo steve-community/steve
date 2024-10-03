@@ -34,7 +34,7 @@ public class AddressServiceImpl implements AddressService {
 	public OcppAddress saveAddress(de.rwth.idsg.steve.web.dto.Address dto) {
 		OcppAddress addr = null;
 		if (dto.getAddressPk()!=null) {
-			addr = addressRepo.findById(dto.getAddressPk()).orElse(null);
+			addr = addressRepo.findById(dto.getAddressPk()).orElseThrow();
 		} else {
 			addr = new OcppAddress();
 		}

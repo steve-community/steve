@@ -56,7 +56,7 @@ public class SettingsServiceImpl implements SettingsService {
 
 
 	private Setting getInternal() {
-        return settingRepo.findById(APP_ID).orElse(null);
+        return settingRepo.findById(APP_ID).orElseThrow();
     }
 
 	@Override
@@ -125,7 +125,7 @@ public class SettingsServiceImpl implements SettingsService {
         try {
         	s.setHeartbeatIntervalInSeconds(toSec(form.getHeartbeat()));
         	s.setHoursToExpire(form.getExpiration());
-        	s.setMailEnabled(form.getEnabled()!=null?form.getEnabled():false);
+        	s.setMailEnabled(form.getEnabled()!=null &&form.getEnabled());
         	s.setMailHost(form.getHost());
         	s.setMailUsername(form.getUsername());
         	s.setMailPassword(form.getPassword());

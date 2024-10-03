@@ -43,18 +43,9 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class SteveConfiguration {
-    // Root mapping for Spring
-    private final String springMapping = "/";
-    // Web frontend
-    private final String springManagerMapping = "/manager";
-    // Mapping for CXF SOAP services
-    private final String cxfMapping = "/services";
-    // Mapping for Web APIs
-    private final String apiMapping = "/api";
+
     // Dummy service path
     private static final String routerEndpointPath = "/CentralSystemService";
-    // Time zone for the application and database connections
-    private final String timeZoneId = "UTC";  // or ZoneId.systemDefault().getId();
 
     // -------------------------------------------------------------------------
     // main.properties

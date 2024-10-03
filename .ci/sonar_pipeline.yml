@@ -58,6 +58,7 @@ stages:
                 sonar.qualitygate.wait=true
                 sonar.projectKey=steve-pluggable
                 sonar.coverage.jacoco.xmlReportPaths=/home/vsts/work/1/s/CCReport43F6D5EF/jacoco.xml
+                sonar.exclusions=**/*.sql,**/ocpp/_2020/**
           - task: MavenAuthenticate@0
             inputs:
               mavenServiceConnections: 'Parkl Public, Parkl Releases, parkl_snapshots'

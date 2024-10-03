@@ -7,7 +7,7 @@ trigger:
   none
 
 pr:
-  - main
+  - master
 
 pool:
   vmImage: 'ubuntu-20.04'
@@ -17,7 +17,7 @@ variables:
   minor: 2
   minorDev: 0
   minorFeature: 0
-  main: $[eq(variables['Build.SourceBranch'], 'refs/heads/main')]
+  master: $[eq(variables['Build.SourceBranch'], 'refs/heads/master')]
   
 
 stages:
@@ -25,7 +25,7 @@ stages:
     displayName: Build Version Number
     jobs:
       - job: Build_Version_Number_Main
-        condition: eq(variables.main, true)
+        condition: eq(variables.master, true)
         variables:
           patch: $[counter(variables['minor'], 0)]
         steps:
@@ -34,7 +34,7 @@ stages:
             name: SetBuildName
      
       - job: Build_Version_Number_Branch
-        condition: eq(variables.main, false)
+        condition: eq(variables.master, false)
         variables:
           patch: $[counter(variables['minor'], 0)]
         steps:
@@ -84,5 +84,5 @@ schedules:
     displayName: Sonar build
     branches:
       include:
-        - main
+        - master
     always: true

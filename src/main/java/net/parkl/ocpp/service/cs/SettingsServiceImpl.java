@@ -30,11 +30,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.annotation.Nullable;
 import java.nio.charset.StandardCharsets;
-import java.util.*;
+import java.util.Base64;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 
 import static de.rwth.idsg.steve.utils.StringUtils.joinByComma;
 import static de.rwth.idsg.steve.utils.StringUtils.splitByComma;
@@ -75,7 +74,7 @@ public class SettingsServiceImpl implements SettingsService {
     public MailSettings getMailSettings() {
         Setting r = getInternal();
         if (r==null) {
-            LoggerFactory.getLogger(SettingsServiceImpl.class).error("No settings in database");;
+            LoggerFactory.getLogger(SettingsServiceImpl.class).error("No settings in database");
             return null;
         }
         List<String> eMails = splitByComma(r.getMailRecipients());
@@ -157,7 +156,7 @@ public class SettingsServiceImpl implements SettingsService {
     private List<NotificationFeature> splitFeatures(String str) {
         return splitByComma(str).stream()
                                 .map(NotificationFeature::fromName)
-                                .collect(Collectors.toList());
+                                .toList();
     }
 
 	@Override

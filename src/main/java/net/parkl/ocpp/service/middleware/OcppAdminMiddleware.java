@@ -32,6 +32,9 @@ import static java.util.Collections.singletonList;
 @Service
 @Slf4j
 public class OcppAdminMiddleware extends AbstractOcppMiddleware {
+    public static final String OCPP_PROTOCOL_NOT_SUPPORTED = "OCPP protocol not supported: ";
+    public static final String INVALID_CONNECTOR_ID = "Invalid connector ID: ";
+    public static final String INVALID_CHARGE_BOX_ID = "Invalid charge box ID: ";
     @Autowired
     private TransactionRepository transactionRepository;
     @Autowired
@@ -74,7 +77,7 @@ public class OcppAdminMiddleware extends AbstractOcppMiddleware {
             case V_16_JSON:
                 return client16.unlockConnector(params);
             default:
-                throw new IllegalStateException("OCPP protocol not supported: " + ocppProtocol);
+                throw new IllegalStateException(OCPP_PROTOCOL_NOT_SUPPORTED + ocppProtocol);
         }
     }
 
@@ -91,7 +94,7 @@ public class OcppAdminMiddleware extends AbstractOcppMiddleware {
             case V_16_JSON:
                 return client16.triggerMessage(params);
             default:
-                throw new IllegalStateException("OCPP protocol not supported: " + ocppProtocol);
+                throw new IllegalStateException(OCPP_PROTOCOL_NOT_SUPPORTED + ocppProtocol);
         }
     }
 
@@ -124,7 +127,7 @@ public class OcppAdminMiddleware extends AbstractOcppMiddleware {
             case V_16_JSON:
                 return client16.reset(params);
             default:
-                throw new IllegalStateException("OCPP protocol not supported: " + ocppProtocol);
+                throw new IllegalStateException(OCPP_PROTOCOL_NOT_SUPPORTED + ocppProtocol);
         }
     }
 
@@ -132,7 +135,7 @@ public class OcppAdminMiddleware extends AbstractOcppMiddleware {
         Connector connector = connectorRepository.findByChargeBoxIdAndConnectorId(chargeBoxId, Integer.parseInt(chargerId));
         if (connector == null) {
             log.error("Invalid connector id: {}-{}", chargeBoxId, chargerId);
-            throw new IllegalArgumentException("Invalid connector ID: " + chargeBoxId + "-" + chargerId);
+            throw new IllegalArgumentException(INVALID_CONNECTOR_ID + chargeBoxId + "-" + chargerId);
         }
         List<Transaction> transactions = transactionRepository.findByConnectorAndStopTimestampIsNullOrderByStartTimestampDesc(connector);
 
@@ -167,7 +170,7 @@ public class OcppAdminMiddleware extends AbstractOcppMiddleware {
         Connector connector = connectorRepository.findByChargeBoxIdAndConnectorId(chargeBoxId, Integer.parseInt(chargerId));
         if (connector == null) {
             log.error("Invalid connector id: {}-{}", chargeBoxId, chargerId);
-            throw new IllegalArgumentException("Invalid connector ID: " + chargeBoxId + "-" + chargerId);
+            throw new IllegalArgumentException(INVALID_CONNECTOR_ID + chargeBoxId + "-" + chargerId);
         }
 
         Page<Transaction> transactions = transactionRepository.findByConnectorAndStopTimestampIsNotNullOrderByStartTimestampDesc(connector,
@@ -229,7 +232,7 @@ public class OcppAdminMiddleware extends AbstractOcppMiddleware {
         ChargePointSelect c = getChargePoint(chargeBoxId, protocol);
         if (c == null) {
             log.error("Invalid charge point id: {}", chargeBoxId);
-            throw new IllegalArgumentException("Invalid charge box ID: " + chargeBoxId);
+            throw new IllegalArgumentException(INVALID_CHARGE_BOX_ID + chargeBoxId);
 
         }
         return c;
@@ -240,7 +243,7 @@ public class OcppAdminMiddleware extends AbstractOcppMiddleware {
         OcppChargeBox chargeBox = chargeBoxRepo.findByChargeBoxId(chargeBoxId);
         if (chargeBox == null) {
             log.error("Invalid charge box id: {}", chargeBoxId);
-            throw new IllegalArgumentException("Invalid charge box ID: " + chargeBoxId);
+            throw new IllegalArgumentException(INVALID_CHARGE_BOX_ID + chargeBoxId);
         }
         return chargeBox;
     }

@@ -32,7 +32,7 @@ public class OcppServiceTestAdditionalConfig {
 
     @Bean
     public AuthTagService authTagService() {
-        return new AuthTagServiceRemote(ocppTagRepository, settingsService, transactionService,
+        return new AuthTagServiceRemote(settingsService,
                 chargingMiddleware, config, integratedIdTagProvider);
     }
 

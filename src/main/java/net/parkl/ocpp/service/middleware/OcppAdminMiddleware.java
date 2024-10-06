@@ -259,10 +259,11 @@ public class OcppAdminMiddleware extends AbstractOcppMiddleware {
 
     public ESPConnectorStopResults stopConnectorCharging(String chargeBoxId, String chargerId) {
         log.info("Stop connector charging request for {}-{}...", chargeBoxId, chargerId);
-        OcppChargeBox chargeBox = getOcppChargeBox(chargeBoxId);
-
-        ChargePointSelect c = getChargePointSelect(chargeBox.getChargeBoxId(), chargeBox.getOcppProtocol());
-
-        return connectorStopService.stopConnectorCharging(c);
+        Connector connector = connectorRepository.findByChargeBoxIdAndConnectorId(chargeBoxId, Integer.parseInt(chargerId));
+        if (connector == null) {
+            log.error("Invalid connector id: {}-{}", chargeBoxId, chargerId);
+            throw new IllegalArgumentException(INVALID_CONNECTOR_ID + chargeBoxId + "-" + chargerId);
+        }
+        return connectorStopService.stopConnectorCharging(connector);
     }
 }

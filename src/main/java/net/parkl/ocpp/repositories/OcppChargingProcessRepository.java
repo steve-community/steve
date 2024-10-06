@@ -61,4 +61,7 @@ public interface OcppChargingProcessRepository extends CrudRepository<OcppChargi
 
 	@Query("SELECT OBJECT(p) FROM OcppChargingProcess AS p JOIN FETCH p.transactionStart t WHERE t.transactionPk IN ?1")
 	List<OcppChargingProcess> findByTransactionIdIn(List<Integer> transactionIds);
+
+	@Query("SELECT OBJECT(p) FROM OcppChargingProcess p WHERE p.transactionStart IS NULL AND p.endDate IS NULL AND p.connector=?1")
+	List<OcppChargingProcess> findWithoutTransactionOnConnector(Connector connector);
 }

@@ -11,5 +11,6 @@ import java.util.List;
 @Builder
 @ToString
 public class ESPConnectorStopResults {
-    private List<ESPConnectorStopResult> results;
+    private int transactionsCleanedUp;
+    private int processesCleanedUp;
 }

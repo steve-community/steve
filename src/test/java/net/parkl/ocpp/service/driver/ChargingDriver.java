@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.parkl.ocpp.entities.OcppChargingProcess;
+import net.parkl.ocpp.module.esp.model.ESPChargingData;
 import net.parkl.ocpp.module.esp.model.ESPChargingStartRequest;
 import net.parkl.ocpp.module.esp.model.ESPChargingUserStopRequest;
 import net.parkl.ocpp.service.ChargingProcessService;
@@ -78,7 +79,7 @@ public class ChargingDriver {
                 chargingProcessService.findByOcppTagAndConnectorAndEndDateIsNullAndTransactionIsNotNull(rfidTag, connectorId, chargeBoxId));
     }
 
-    public ESPChargingConsumptionRequest waitForConsumption() {
+    public ESPChargingData waitForConsumption() {
         return testConsumptionListener.listenForConsumption();
     }
 
@@ -92,14 +93,14 @@ public class ChargingDriver {
 
     @Getter
     private static class TestConsumptionListener implements OcppConsumptionListener {
-        private ESPChargingConsumptionRequest lastConsumption;
+        private ESPChargingData lastConsumption;
 
         @Override
-        public void consumptionUpdated(ESPChargingConsumptionRequest request) {
+        public void consumptionUpdated(String externalChargeId,ESPChargingData request) {
             this.lastConsumption = request;
         }
 
-        private ESPChargingConsumptionRequest listenForConsumption() {
+        private ESPChargingData listenForConsumption() {
             new AsyncWaiter<>(10000).waitFor(() -> this.lastConsumption);
             log.info("test Consumption: {}", lastConsumption);
             return lastConsumption;

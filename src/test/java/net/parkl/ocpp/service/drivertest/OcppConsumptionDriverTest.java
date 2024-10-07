@@ -1,5 +1,6 @@
 package net.parkl.ocpp.service.drivertest;
 
+import net.parkl.ocpp.module.esp.model.ESPChargingData;
 import net.parkl.ocpp.service.driver.ChargeBoxDriver;
 import net.parkl.ocpp.service.driver.ChargingDriver;
 import net.parkl.ocpp.service.driver.DriverTestBase;
@@ -38,7 +39,7 @@ class OcppConsumptionDriverTest extends DriverTestBase {
 
         chargingDriver.withStopValue(1100).stop(chargingProcessId);
 
-        ESPChargingConsumptionRequest consumption = chargingDriver.waitForConsumption();
+        ESPChargingData consumption = chargingDriver.waitForConsumption();
         assertThat(consumption)
                 .isNotNull()
                 .extracting("totalPower", "startValue", "stopValue")
@@ -84,7 +85,7 @@ class OcppConsumptionDriverTest extends DriverTestBase {
 
         chargingDriver.withStopValue(1100).stop(chargingProcessId);
 
-        ESPChargingConsumptionRequest consumption = chargingDriver.waitForConsumption();
+        ESPChargingData consumption = chargingDriver.waitForConsumption();
         assertThat(consumption)
                 .isNotNull()
                 .extracting("totalPower", "startValue", "stopValue")

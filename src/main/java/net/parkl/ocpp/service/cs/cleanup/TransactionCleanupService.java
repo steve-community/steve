@@ -27,7 +27,6 @@ public class TransactionCleanupService {
     private final TransactionStopRepository transactionStopRepo;
     private final TransactionStopFailedRepository transactionStopFailedRepo;
     private final ChargingProcessService chargingProcessService;
-    private final ChargingConsumptionStateRepository chargingConsumptionStateRepo;
 
     @Transactional
     public boolean cleanupTransaction(int transactionId) {
@@ -77,8 +76,5 @@ public class TransactionCleanupService {
         return transactionRepo.findActiveStartedBefore(threshold);
     }
 
-    @Transactional
-    public int cleanupConsumptionStates(Date date) {
-        return chargingConsumptionStateRepo.deleteBefore(date);
-    }
+
 }

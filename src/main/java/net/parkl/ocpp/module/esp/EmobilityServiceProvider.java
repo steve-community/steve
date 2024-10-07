@@ -18,7 +18,6 @@
  */
 package net.parkl.ocpp.module.esp;
 
-import net.parkl.ocpp.module.esp.model.ESPChargingConsumptionRequest;
 import net.parkl.ocpp.module.esp.model.ESPChargingProcessCheckResult;
 import net.parkl.ocpp.module.esp.model.ESPChargingStopRequest;
 import net.parkl.ocpp.module.esp.model.ESPRfidChargingStartRequest;
@@ -26,7 +25,7 @@ import net.parkl.ocpp.module.esp.model.ESPRfidChargingStartRequest;
 /**
  * Interface for the communication with an e-mobility service provider, initiated by the SteVe Pluggable library (outgoing events).<br>
  * Implementors are free to use any communication protocols to any e-mobility service provider (ESP) backends.
- * @see OcppMiddleware
+ * @see net.parkl.ocpp.service.middleware.OcppChargingMiddleware
  */
 public interface EmobilityServiceProvider {
     /**
@@ -35,11 +34,6 @@ public interface EmobilityServiceProvider {
      */
     void stopChargingExternal(ESPChargingStopRequest req);
 
-    /**
-     * Updates the consumption of a charging process asynchronously, after the charging has stopped.
-     * @param req Consumption request (from the charger)
-     */
-    void updateChargingConsumptionExternal(ESPChargingConsumptionRequest req);
 
     /**
      * Notifies the e-mobility service provider of a charge box failing to send heartbeat messages

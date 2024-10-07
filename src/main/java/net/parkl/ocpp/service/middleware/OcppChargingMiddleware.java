@@ -14,7 +14,7 @@ import net.parkl.ocpp.service.config.AdvancedChargeBoxConfiguration;
 import net.parkl.ocpp.service.cs.ConnectorMeterValueData;
 import net.parkl.ocpp.service.cs.ConnectorMeterValueService;
 import net.parkl.ocpp.service.cs.TransactionService;
-import net.parkl.ocpp.service.middleware.receiver.AsyncMessageReceiverFactory;
+import net.parkl.ocpp.service.middleware.receiver.AsyncMessageReceiverLocator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -50,7 +50,7 @@ public class OcppChargingMiddleware extends AbstractOcppMiddleware {
     @Autowired
     private RemoteStartService remoteStartService;
     @Autowired
-    private AsyncMessageReceiverFactory asyncMessageReceiverFactory;
+    private AsyncMessageReceiverLocator asyncMessageReceiverLocator;
 
     private OcppConsumptionListener consumptionListener;
     private OcppStopListener stopListener;
@@ -212,7 +212,8 @@ public class OcppChargingMiddleware extends AbstractOcppMiddleware {
         Boolean stoppedWithoutTransaction = result.getStoppedWithoutTransaction();
         if (!req.isStopOnlyWhenCableRemoved() &&
                 (stoppedWithoutTransaction == null || !stoppedWithoutTransaction)) {
-            ESPChargingData chargingData = asyncMessageReceiverFactory.get().receiveAsyncStopData(req.getExternalChargeId());
+            ESPChargingData chargingData = asyncMessageReceiverLocator.get().receiveAsyncStopData(
+                    req.getExternalChargeId(), req.getStopResponseTimeout());
             if (chargingData != null) {
                 log.info("Consumption async data arrived for {}: startValue={}, stopValue={}",
                         req.getExternalChargeId(), chargingData.getStartValue(),
@@ -490,7 +491,7 @@ public class OcppChargingMiddleware extends AbstractOcppMiddleware {
                 stopValue(calculatedStopValue).
                 build();
 
-        asyncMessageReceiverFactory.get().updateChargingConsumption(
+        asyncMessageReceiverLocator.get().updateChargingConsumption(
                 process.getOcppChargingProcessId(), req);
 
 

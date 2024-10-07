@@ -1,5 +1,5 @@
 package net.parkl.ocpp.service.middleware.receiver;
 
-public interface AsyncMessageReceiverFactory {
+public interface AsyncMessageReceiverLocator {
     AsyncMessageReceiver get();
 }

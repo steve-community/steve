@@ -20,7 +20,7 @@ package de.rwth.idsg.steve.web.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import de.rwth.idsg.steve.ocpp.OcppVersion;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.ToString;
@@ -35,16 +35,16 @@ import org.joda.time.DateTime;
 @ToString
 public final class OcppJsonStatus {
     @JsonIgnore
-    @ApiModelProperty(value = "Charge Box Pk", hidden = true)
+    @Schema(description = "Charge Box Pk", hidden = true)
     private final int chargeBoxPk;
-    @ApiModelProperty(value = "Charge Box Id")
+    @Schema(description = "Charge Box Id")
     private final String chargeBoxId;
-    @ApiModelProperty(value = "Connected since")
+    @Schema(description = "Connected since")
     private final String connectedSince;
-    @ApiModelProperty(value = "Duration of the Connection")
+    @Schema(description = "Duration of the Connection")
     private final String connectionDuration;
-    @ApiModelProperty(value = "Ocpp version")
+    @Schema(description = "Ocpp version")
     private final OcppVersion version;
-    @ApiModelProperty(value = "Connected since as DT", hidden = true)
+    @Schema(description = "Connected since as DT", hidden = true)
     private final DateTime connectedSinceDT;
 }

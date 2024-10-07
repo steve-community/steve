@@ -19,7 +19,7 @@
 package de.rwth.idsg.steve.repository.dto;
 
 import de.rwth.idsg.steve.ocpp.TaskOrigin;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -33,17 +33,17 @@ import org.joda.time.DateTime;
 @EqualsAndHashCode
 @Builder
 public final class TaskOverview implements Comparable<TaskOverview> {
-    @ApiModelProperty(value = "Task ID")
+    @Schema(description = "Task ID")
     private final int taskId;
-    @ApiModelProperty(value = "Response count")
+    @Schema(description = "Response count")
     private final int responseCount;
-    @ApiModelProperty(value = "Request count")
+    @Schema(description = "Request count")
     private final int requestCount;
-    @ApiModelProperty(value = "Starttime")
+    @Schema(description = "Starttime")
     private final DateTime start;
-    @ApiModelProperty(value = "Endtime")
+    @Schema(description = "Endtime")
     private final DateTime end;
-    @ApiModelProperty(value = "Task triggered internal or external")
+    @Schema(description = "Task triggered internal or external")
     private final TaskOrigin origin;
 
     /**

@@ -21,7 +21,7 @@ package de.rwth.idsg.steve.web.api.dto;
 //import de.rwth.idsg.steve.ocpp.OcppTransport;
 import de.rwth.idsg.steve.repository.dto.ConnectorStatus;
 import de.rwth.idsg.steve.utils.ConnectorStatusCountFilter;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -39,15 +39,15 @@ import lombok.Setter;
 @RequiredArgsConstructor
 public class ApiConnectorList {
 
-    @ApiModelProperty(value = "List of charge boxes")
+    @Schema(description = "List of charge boxes")
     private List<String> chargeBoxList = new ArrayList<>();
 
-    @ApiModelProperty(value = "List of possible states")
+    @Schema(description = "List of possible states")
     private final Set<String> statusFilterValues = ConnectorStatusCountFilter.ALL_STATUS_VALUES;
 
-    @ApiModelProperty(value = "List of connectors is filtered")
+    @Schema(description = "List of connectors is filtered")
     private Boolean isFiltered = false;
 
-    @ApiModelProperty(value = "List of connectors")
+    @Schema(description = "List of connectors")
     private List<ConnectorStatus> connectors = new ArrayList<>();
 }

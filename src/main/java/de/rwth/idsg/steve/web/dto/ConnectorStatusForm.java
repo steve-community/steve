@@ -18,7 +18,7 @@
  */
 package de.rwth.idsg.steve.web.dto;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -31,11 +31,11 @@ import lombok.ToString;
 @Setter
 @ToString
 public class ConnectorStatusForm {
-    @ApiModelProperty(value = "Charge Box Id")
+    @Schema(description = "Charge Box Id")
     private String chargeBoxId;
-    @ApiModelProperty(value = "Connector Status")
+    @Schema(description = "Connector Status")
     private String status;
-    @ApiModelProperty(value = "Strategy of listing the connector")
+    @Schema(description = "Strategy of listing the connector")
     private Strategy strategy = Strategy.PreferZero;
 
     public enum Strategy {

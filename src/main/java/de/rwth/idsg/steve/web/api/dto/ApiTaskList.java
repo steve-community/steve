@@ -19,7 +19,7 @@
 package de.rwth.idsg.steve.web.api.dto;
 
 import de.rwth.idsg.steve.repository.dto.TaskOverview;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
 
 import lombok.Getter;
@@ -34,6 +34,6 @@ import lombok.Setter;
 @Setter
 //@RequiredArgsConstructor
 public class ApiTaskList {
-    @ApiModelProperty(value = "List of tasks")
+    @Schema(description = "List of tasks")
     private List<TaskOverview> tasks;
 }

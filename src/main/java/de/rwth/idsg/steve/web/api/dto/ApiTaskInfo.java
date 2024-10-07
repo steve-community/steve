@@ -22,7 +22,7 @@ import de.rwth.idsg.steve.ocpp.CommunicationTask;
 import de.rwth.idsg.steve.ocpp.OcppVersion;
 import de.rwth.idsg.steve.ocpp.RequestResult;
 import de.rwth.idsg.steve.ocpp.TaskOrigin;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -38,30 +38,30 @@ import org.joda.time.DateTime;
 @Getter
 @Setter
 public class ApiTaskInfo {
-    @ApiModelProperty(value = "Task ID")
+    @Schema(description = "Task ID")
     private Integer taskId;
-    @ApiModelProperty(value = "OCPP version")
+    @Schema(description = "OCPP version")
     private OcppVersion ocppVersion;
-    @ApiModelProperty(value = "OCPP operation")
+    @Schema(description = "OCPP operation")
     private String operationName;
-    @ApiModelProperty(value = "external / internal")
+    @Schema(description = "external / internal")
     private TaskOrigin origin;
-    @ApiModelProperty(value = "Caller of the Task")
+    @Schema(description = "Caller of the Task")
     private String caller;
 
-    @ApiModelProperty(value = "Results")
+    @Schema(description = "Results")
     private Map<String, RequestResult> resultMap;
-    @ApiModelProperty(value = "Count of Results")
+    @Schema(description = "Count of Results")
     private int resultSize;
 
-    @ApiModelProperty(value = "Starttime")
+    @Schema(description = "Starttime")
     private DateTime startTimestamp = DateTime.now();
-    @ApiModelProperty(value = "Endtime")
+    @Schema(description = "Endtime")
     private DateTime endTimestamp;
 
-    @ApiModelProperty(value = "Error count")
+    @Schema(description = "Error count")
     private AtomicInteger errorCount = new AtomicInteger(0);
-    @ApiModelProperty(value = "Response count")
+    @Schema(description = "Response count")
     private AtomicInteger responseCount = new AtomicInteger(0);
 
 

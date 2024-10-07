@@ -19,7 +19,7 @@
 package de.rwth.idsg.steve.web.api.dto;
 
 //import de.rwth.idsg.steve.ocpp.OcppTransport;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 //import java.util.Collections;
 //import java.util.List;
 import lombok.Getter;
@@ -35,11 +35,11 @@ import lombok.Setter;
 @Setter
 //@RequiredArgsConstructor
 public class ApiChargePointStart {
-    @ApiModelProperty(value = "Charge Box ID")
+    @Schema(description = "Charge Box ID")
     private String chargeBoxId;
-    @ApiModelProperty(value = "Connector ID")
+    @Schema(description = "Connector ID")
     private Integer connectorId;
-    @ApiModelProperty(value = "OCPP Tag")
+    @Schema(description = "OCPP Tag")
     private String ocppTag;
 
     public ApiChargePointStart(String chargeBoxId, Integer connectorId, String ocppTag) {

@@ -18,7 +18,7 @@
  */
 package de.rwth.idsg.steve.web.api.dto;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.Getter;
@@ -34,7 +34,7 @@ import lombok.Setter;
 @Setter
 @RequiredArgsConstructor
 public class ApiChargePointList {
-    @ApiModelProperty(value = "List of charge points")
+    @Schema(description = "List of charge points")
     private List<ChargePointInfo> chargePointList =  new ArrayList<>();
 
     public void addCP(String chargeBoxId, List<Integer> connectorIds) {
@@ -45,9 +45,9 @@ public class ApiChargePointList {
     @Getter
     @Setter
     class ChargePointInfo {
-        @ApiModelProperty(value = "Charge Box ID")
+        @Schema(description = "Charge Box ID")
         private String chargeBoxId;
-        @ApiModelProperty(value = "List of the charge box connectors")
+        @Schema(description = "List of the charge box connectors")
         private List<Integer> connectorIds;
 
         public ChargePointInfo(String chargeBoxId, List<Integer> connectorIds) {

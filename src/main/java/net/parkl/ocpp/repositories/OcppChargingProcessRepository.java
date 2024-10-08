@@ -64,4 +64,8 @@ public interface OcppChargingProcessRepository extends CrudRepository<OcppChargi
 
 	@Query("SELECT OBJECT(p) FROM OcppChargingProcess p WHERE p.transactionStart IS NULL AND p.endDate IS NULL AND p.connector=?1")
 	List<OcppChargingProcess> findWithoutTransactionOnConnector(Connector connector);
+
+	@Modifying
+	@Query("UPDATE OcppChargingProcess p SET p.stopOnlyWhenCableRemoved=?2 WHERE p.ocppChargingProcessId=?1")
+    void updateStopOnlyWhenCableRemoved(String ocppChargingProcessId, boolean value);
 }

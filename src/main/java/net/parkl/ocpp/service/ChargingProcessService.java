@@ -248,4 +248,9 @@ public class ChargingProcessService {
         chargingProcessRepo.deleteById(ocppChargingProcessId);
 
     }
+
+    @Transactional
+    public void updateStopOnlyWhenCableRemoved(String externalChargeId, boolean value) {
+        chargingProcessRepo.updateStopOnlyWhenCableRemoved(externalChargeId, value);
+    }
 }

@@ -208,6 +208,11 @@ public class OcppChargingMiddleware extends AbstractOcppMiddleware {
 
     public ESPChargingResult stopCharging(ESPChargingUserStopRequest req) {
         log.info("Stopping charging: {}...", req.getExternalChargeId());
+        if (req.isStopOnlyWhenCableRemoved()) {
+            log.info("Stop only when cable removed: {}", req.getExternalChargeId());
+            chargingProcessService.updateStopOnlyWhenCableRemoved(req.getExternalChargeId(), true);
+        }
+
         ESPChargingResult result = doStopCharging(req.getExternalChargeId());
         Boolean stoppedWithoutTransaction = result.getStoppedWithoutTransaction();
         if (!req.isStopOnlyWhenCableRemoved() &&
@@ -483,21 +488,36 @@ public class OcppChargingMiddleware extends AbstractOcppMiddleware {
         Float calculatedStartValue = consumptionHelper.getStartValue(transaction);
         Float calculatedStopValue = consumptionHelper.getStopValue(transaction);
 
-        ESPChargingData req = ESPChargingData.builder().
-                start(process.getStartDate()).
-                end(process.getEndDate()).
-                totalPower(calculatedTotalPower).
-                startValue(calculatedStartValue).
-                stopValue(calculatedStopValue).
-                build();
+        if (process.isStopOnlyWhenCableRemoved()) {
+            ESPChargingConsumptionRequest req = ESPChargingConsumptionRequest.builder().
+                    externalChargeId(process.getOcppChargingProcessId()).
+                    start(process.getStartDate()).
+                    end(process.getEndDate()).
+                    totalPower(calculatedTotalPower).
+                    startValue(calculatedStartValue).
+                    stopValue(calculatedStopValue).
+                    build();
 
-        asyncMessageReceiverLocator.get().updateChargingConsumption(
-                process.getOcppChargingProcessId(), req);
+            emobilityServiceProvider.updateChargingConsumptionExternal(req);
 
+        } else {
+            ESPChargingData req = ESPChargingData.builder().
+                    start(process.getStartDate()).
+                    end(process.getEndDate()).
+                    totalPower(calculatedTotalPower).
+                    startValue(calculatedStartValue).
+                    stopValue(calculatedStopValue).
+                    build();
 
-        if (consumptionListener != null) {
-            consumptionListener.consumptionUpdated(process.getOcppChargingProcessId(), req);
+            asyncMessageReceiverLocator.get().updateChargingConsumption(
+                    process.getOcppChargingProcessId(), req);
+
+            if (consumptionListener != null) {
+                consumptionListener.consumptionUpdated(process.getOcppChargingProcessId(), req);
+            }
         }
+
+
     }
 
     public boolean isConnectorCharging(String chargeBoxId, int connectorId) {

@@ -18,6 +18,7 @@
  */
 package net.parkl.ocpp.module.esp;
 
+import net.parkl.ocpp.module.esp.model.ESPChargingConsumptionRequest;
 import net.parkl.ocpp.module.esp.model.ESPChargingProcessCheckResult;
 import net.parkl.ocpp.module.esp.model.ESPChargingStopRequest;
 import net.parkl.ocpp.module.esp.model.ESPRfidChargingStartRequest;
@@ -34,6 +35,11 @@ public interface EmobilityServiceProvider {
      */
     void stopChargingExternal(ESPChargingStopRequest req);
 
+    /**
+     * Updates the consumption of a charging process asynchronously, after the charging has stopped.
+     * @param req Consumption request (from the charger)
+     */
+    void updateChargingConsumptionExternal(ESPChargingConsumptionRequest req);
 
     /**
      * Notifies the e-mobility service provider of a charge box failing to send heartbeat messages

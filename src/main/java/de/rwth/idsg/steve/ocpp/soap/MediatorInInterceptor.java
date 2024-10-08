@@ -97,6 +97,8 @@ public class MediatorInInterceptor extends AbstractPhaseInterceptor<SoapMessage>
         // Redirect the request
         if (targetServer != null) {
             targetServer.getDestination().getMessageObserver().onMessage(message);
+        } else {
+            log.error("No server found for namespace: {}", schemaNamespace);
         }
 
         // Now the response has been put in the message, abort the chain

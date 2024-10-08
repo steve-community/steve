@@ -45,7 +45,7 @@ import org.springframework.stereotype.Component;
 public class SteveConfiguration {
 
     // Dummy service path
-    private static final String routerEndpointPath = "/CentralSystemService";
+    private static final String routerEndpointPath = WebEnvironment.getContextRoot()+"/CentralSystemService";
 
     // -------------------------------------------------------------------------
     // main.properties

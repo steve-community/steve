@@ -16,34 +16,17 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package de.rwth.idsg.steve.web.dto;
-
+package de.rwth.idsg.steve.service.dto;
+import de.rwth.idsg.steve.web.dto.WebUserAuthority;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
 
-import java.util.Map;
-
-/**
- *
- * @author Sevket Goekay <sevketgokay@gmail.com>
- *
- */
 @Getter
 @Builder
-@ToString
-public final class Statistics {
-    // Number of chargeboxes, ocppTags, users, reservations, transactions
-    private final Integer numChargeBoxes, numOcppTags, numUsers, numReservations, numTransactions,
-    // Received heartbeats
-    heartbeatToday, heartbeatYesterday, heartbeatEarlier,
-    //WebUser
-    numWebUsers;
+public final class WebUserOverview {
 
-    // Number of connected WebSocket/JSON chargeboxes
-    @Setter private int numOcpp12JChargeBoxes, numOcpp15JChargeBoxes, numOcpp16JChargeBoxes;
-
-    // Count of connectors based on their status
-    @Setter private Map<String, Integer> statusCountMap;
+    private final Integer webUserPk;
+    private final Boolean enabled;
+    private final String webUsername;
+    private final WebUserAuthority authorities;
 }

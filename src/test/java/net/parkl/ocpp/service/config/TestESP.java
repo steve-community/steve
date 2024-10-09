@@ -2,6 +2,7 @@ package net.parkl.ocpp.service.config;
 
 import lombok.extern.slf4j.Slf4j;
 import net.parkl.ocpp.module.esp.EmobilityServiceProvider;
+import net.parkl.ocpp.module.esp.model.ESPChargingConsumptionRequest;
 import net.parkl.ocpp.module.esp.model.ESPChargingProcessCheckResult;
 import net.parkl.ocpp.module.esp.model.ESPChargingStopRequest;
 import net.parkl.ocpp.module.esp.model.ESPRfidChargingStartRequest;
@@ -15,6 +16,10 @@ public class TestESP implements EmobilityServiceProvider {
         log.info("stopping charging");
     }
 
+    @Override
+    public void updateChargingConsumptionExternal(ESPChargingConsumptionRequest req) {
+
+    }
 
 
     @Override

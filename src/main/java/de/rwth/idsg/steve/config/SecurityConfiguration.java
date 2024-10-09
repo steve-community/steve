@@ -33,6 +33,9 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 
 import static de.rwth.idsg.steve.SteveConfiguration.CONFIG;
+import org.springframework.http.HttpMethod;
+import org.springframework.security.web.access.expression.WebExpressionAuthorizationManager;
+import org.springframework.security.web.util.matcher.RequestMatcher;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -60,6 +63,8 @@ public class SecurityConfiguration {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         final String prefix = CONFIG.getSpringManagerMapping();
 
+        RequestMatcher toOverview = (request) -> request.getParameter("backToOverview") != null;
+
         return http
             .authorizeHttpRequests(
                 req -> req
@@ -70,9 +75,14 @@ public class SecurityConfiguration {
                         "/WEB-INF/views/**" // https://github.com/spring-projects/spring-security/issues/13285#issuecomment-1579097065
                     ).permitAll()
                     .requestMatchers(prefix + "/home").hasAnyAuthority("USER", "ADMIN")
-                     // webuser
-                    .requestMatchers(prefix + "/webusers").hasAnyAuthority("USER", "ADMIN")
-                    .requestMatchers(prefix + "/webusers" + "/details/**").hasAnyAuthority("USER", "ADMIN")
+                    // webuser
+                        //only allowed to change the own password
+                    .requestMatchers(prefix + "/webusers" + "/password/{name}")
+                        .access(new WebExpressionAuthorizationManager("#name == authentication.name"))
+                        // otherwise denies access on backToOverview!
+                    .requestMatchers(toOverview).hasAnyAuthority("USER", "ADMIN")
+                    .requestMatchers(HttpMethod.GET, prefix + "/webusers/**").hasAnyAuthority("USER", "ADMIN")
+                    .requestMatchers(HttpMethod.POST, prefix + "/webusers/**").hasAuthority("ADMIN")
                     // users
                     .requestMatchers(prefix + "/users").hasAnyAuthority("USER", "ADMIN")
                     .requestMatchers(prefix + "/users" + "/details/**").hasAnyAuthority("USER", "ADMIN")

@@ -236,6 +236,21 @@ public class WebUserService implements UserDetailsManager {
         form.setAuthorities(WebUserAuthority.fromJsonValue(ur.getAuthorities()));
         return form;
     }
+    
+    public WebUserBaseForm getDetails(String webUserName) {
+        WebUserRecord ur = webUserRepository.loadUserByUsername(webUserName);
+
+        if (ur == null) {
+            throw new SteveException("There is no user with id '%s'", webUserName);
+        }
+
+        WebUserBaseForm form = new WebUserBaseForm();
+        form.setWebUserPk(ur.getWebUserPk());
+        form.setEnabled(ur.getEnabled());
+        form.setWebUsername(ur.getUsername());
+        form.setAuthorities(WebUserAuthority.fromJsonValue(ur.getAuthorities()));
+        return form;
+    }
 
     // Helpers
     private UserDetails loadUserByUsernameForApiInternal(String username) {

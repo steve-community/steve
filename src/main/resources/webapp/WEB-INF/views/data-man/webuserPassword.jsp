@@ -19,11 +19,6 @@
 
 --%>
 <%@ include file="../00-header.jsp" %>
-<script type="text/javascript">
-    $(document).ready(function() {
-        <%@ include file="../snippets/datePicker-past.js" %>
-    });
-</script>
 <spring:hasBindErrors name="webuserForm">
     <div class="error">
         Error while trying to change password of webuser:
@@ -36,19 +31,20 @@
 </spring:hasBindErrors>
 <div class="content"><div>
 <section><span>Webuser change password</span></section>
-    <form:form action="${ctxPath}/manager/webusers/password/${webuserForm.webUserPk}" modelAttribute="webuserForm">
+    <form:form action="${ctxPath}/manager/webusers/password/${webuserForm.webUsername}" modelAttribute="webuserForm">
        <table class="userInput">
             <thead><tr><th>Webuser</th><th></th></thead>
             <tbody>
-            <tr><td>Webusername:</td><td>${webuserForm.webUsername}<form:hidden path="webUsername" value="${webuserForm.webUsername}"/></td></tr>
+            <tr><td>Webusername:</td><td>${webuserForm.webUsername}
+                    <form:hidden path="webUsername" value="${webuserForm.webUsername}"/>
+                    <form:hidden path="webUserPk" value="${webuserForm.webUserPk}"/>
+            </td></tr>
             <tr><td>Password:</td><td><form:password path="password" title="Set the password"/></td></tr>
             <tr><td>Password confirmation:</td><td><form:password  path="passwordComparison" title="Confirm the password"/></td></tr>
             <tr><td></td>
                 <td id="add_space">
-                    <c:set var="submitButtonName" value="change" />
-                    <c:set var="submitButtonValue" value="change" />
                     <input type="submit" name="change" value="Change">
-                    <input type="submit" name="backToOverview" value="Back to Overview">
+                    <input type="submit" name="backToOverview" value="Back to Details">
                 </td>
             </tr>
             </tbody>

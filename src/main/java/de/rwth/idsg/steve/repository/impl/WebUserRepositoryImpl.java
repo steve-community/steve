@@ -64,9 +64,8 @@ public class WebUserRepositoryImpl implements WebUserRepository {
 
     @Override
     public void updateUser(WebUserRecord user) {
+        // To change the password use one of the changePassword methods
         ctx.update(WEB_USER)
-            .set(WEB_USER.PASSWORD, user.getPassword())
-            .set(WEB_USER.API_PASSWORD, user.getApiPassword())
             .set(WEB_USER.ENABLED, user.getEnabled())
             .set(WEB_USER.AUTHORITIES, user.getAuthorities())
             .where(WEB_USER.USERNAME.eq(user.getUsername()))

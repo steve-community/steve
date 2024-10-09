@@ -40,7 +40,7 @@
                         <form:hidden path="webUserPk" readonly="true"/>
                 </td></tr>
                 <tr><td></td>
-                    <td><a href="${ctxPath}/manager/webusers/password/${webuserForm.webUserPk}">
+                    <td><a href="${ctxPath}/manager/webusers/password/${webuserForm.webUsername}">
                         <B>Change Password</B></a>
                     </td>
                 </tr>
@@ -65,8 +65,8 @@
                 </tr>                
                 <tr><td></td>
                     <td id="add_space">
-			<input type="submit" name="update" value="Update">
-			<input type="submit" name="backToOverview" value="Back to Overview">
+            <input type="submit" name="update" value="Update">
+            <input type="submit" name="backToOverview" value="Back to Overview">
                     </td>
                 </tr>
             </tbody>

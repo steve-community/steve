@@ -51,10 +51,10 @@ public class WebUsersController {
     private static final String QUERY_PATH = "/query";
 
     private static final String DETAILS_PATH = "/details/{webUserPk}";
-    private static final String DELETE_ALL_PATH = "/delete/{webUserPk}";
+    private static final String DELETE_PATH = "/delete/{webUserPk}";
     private static final String UPDATE_PATH = "/update";
     private static final String ADD_PATH = "/add";
-    private static final String PASSWORD_PATH = "/password/{webUserPk}";
+    private static final String PASSWORD_PATH = "/password/{webUserName}";
 
     // -------------------------------------------------------------------------
     // HTTP methods
@@ -114,11 +114,11 @@ public class WebUsersController {
         webUserService.update(webuserBaseForm);
         return toOverview();
     }
-    
+
     @RequestMapping(value = PASSWORD_PATH, method = RequestMethod.GET)
-    public String passwordChangeGet(@PathVariable("webUserPk") Integer webUserPk, Model model) {
+    public String passwordChangeGet(@PathVariable("webUserName") String webUserName, Model model) {
         WebUserForm webUserForm = new WebUserForm();
-        WebUserBaseForm webUserBaseForm = webUserService.getDetails(webUserPk);
+        WebUserBaseForm webUserBaseForm = webUserService.getDetails(webUserName);
         webUserForm.setWebUserPk(webUserBaseForm.getWebUserPk());
         webUserForm.setWebUsername(webUserBaseForm.getWebUsername());
         webUserForm.setAuthorities(webUserBaseForm.getAuthorities());
@@ -136,10 +136,11 @@ public class WebUsersController {
         }
 
         webUserService.updatePassword(webuserForm);
-        return toOverview();
+        String redirect_str = String.format("redirect:/manager/webusers/details/%s", webuserForm.getWebUserPk());
+        return redirect_str;
     }
 
-    @RequestMapping(value = DELETE_ALL_PATH, method = RequestMethod.POST)
+    @RequestMapping(value = DELETE_PATH, method = RequestMethod.POST)
     public String delete(@PathVariable("webUserPk") Integer webUserPk) {
         webUserService.deleteUser(webUserPk);
         return toOverview();
@@ -150,8 +151,10 @@ public class WebUsersController {
     // -------------------------------------------------------------------------
 
     @RequestMapping(params = "backToOverview", value = PASSWORD_PATH, method = RequestMethod.POST)
-    public String passwordBackToOverview() {
-        return toOverview();
+    public String passwordBackToOverview(@Valid @ModelAttribute("webuserForm") WebUserForm webuserForm,
+                         BindingResult result, Model model) {
+        String redirect_str = String.format("redirect:/manager/webusers/details/%s", webuserForm.getWebUserPk());
+        return redirect_str;
     }
 
     @RequestMapping(params = "backToOverview", value = ADD_PATH, method = RequestMethod.POST)

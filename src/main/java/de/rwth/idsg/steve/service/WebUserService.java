@@ -86,8 +86,15 @@ public class WebUserService implements UserDetailsManager {
             .disabled(false)
             .authorities("ADMIN")
             .build();
-
-        this.createUser(user);
+        
+        //this.createUser(user);
+        
+        // until there is no website to add web_user or to add/change the api_password of the web_user 
+        // the api_key will copied to the database 
+        validateUserDetails(user);
+        WebUserRecord record = toWebUserRecord(user);
+        record.setApiPassword(SteveConfiguration.CONFIG.getWebApi().getHeaderValue());
+        webUserRepository.createUser(record);
     }
 
     @Override

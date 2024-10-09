@@ -16,30 +16,36 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package de.rwth.idsg.steve.web.dto;
+package de.rwth.idsg.steve.web.api.dto;
 
+//import de.rwth.idsg.steve.ocpp.OcppTransport;
 import io.swagger.v3.oas.annotations.media.Schema;
+//import java.util.Collections;
+//import java.util.List;
 import lombok.Getter;
+//import lombok.RequiredArgsConstructor;
 import lombok.Setter;
-import lombok.ToString;
 
 /**
- * @author Sevket Goekay <sevketgokay@gmail.com>
- * @since 18.09.2018
+ * @author fnkbsi
+ * @since 18.10.2023
  */
+
 @Getter
 @Setter
-@ToString
-public class ConnectorStatusForm {
-    @Schema(description = "Charge Box Id")
+//@RequiredArgsConstructor
+public class ApiChargePointStart {
+    @Schema(description = "Charge Box ID")
     private String chargeBoxId;
-    @Schema(description = "Connector Status")
-    private String status;
-    @Schema(description = "Strategy of listing the connector")
-    private Strategy strategy = Strategy.PreferZero;
+    @Schema(description = "Connector ID")
+    private Integer connectorId;
+    @Schema(description = "OCPP Tag")
+    private String ocppTag;
 
-    public enum Strategy {
-        PreferZero,
-        PreferOthersWithStatusOfZero;
+    public ApiChargePointStart(String chargeBoxId, Integer connectorId, String ocppTag) {
+        this.chargeBoxId = chargeBoxId;
+        this.connectorId = connectorId;
+        this.ocppTag = ocppTag;
     }
+
 }

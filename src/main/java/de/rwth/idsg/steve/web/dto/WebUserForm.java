@@ -18,7 +18,7 @@
  */
 package de.rwth.idsg.steve.web.dto;
 
-import jakarta.validation.constraints.AssertTrue;
+import jakarta.validation.constraints.AssertFalse;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
@@ -39,7 +39,7 @@ public class WebUserForm extends WebUserBaseForm {
     @Size(min = 8, message = "The repeated password also requires 8 or more characters")
     private String passwordComparison;
 
-    @AssertTrue(message = "The repeated password did not match!")
+    @AssertFalse(message = "The repeated password did not match!")
     private Boolean pwError;
 
     private String apiToken = "";
@@ -49,9 +49,10 @@ public class WebUserForm extends WebUserBaseForm {
     }
 
     public void setPasswordComparison(String passwordComparison) {
+        this.pwError = true;
         this.passwordComparison = passwordComparison;
         if (passwordComparison != null) {
-            this.pwError = passwordComparison.equals(this.password);
+            this.pwError = !passwordComparison.equals(this.password);
         }
     }
 

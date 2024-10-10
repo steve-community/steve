@@ -28,12 +28,14 @@ import net.parkl.ocpp.service.cluster.PersistentTaskService;
 import net.parkl.ocpp.service.cluster.PersistentTaskServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
 import java.util.concurrent.ScheduledExecutorService;
 
 @Service
 @Qualifier("ChargePointService12_Client")
+@Primary
 public class TestChargePointService12_Client implements IChargePointService12_Client {
 	@Autowired
 	protected TestChargePoint invoker;

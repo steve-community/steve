@@ -18,22 +18,25 @@
  */
 package de.rwth.idsg.steve.repository;
 
-import de.rwth.idsg.steve.repository.dto.DbVersion;
-import de.rwth.idsg.steve.web.dto.Statistics;
+import jooq.steve.db.tables.records.WebUserRecord;
 
-/**
- * @author Sevket Goekay <sevketgokay@gmail.com>
- * @since 19.08.2014
- */
-public interface GenericRepository {
+public interface WebUserRepository  {
 
-    void checkJavaAndMySQLOffsets();
+    void createUser(WebUserRecord user);
 
-    Statistics getStats();
+    void updateUser(WebUserRecord user);
 
-    /**
-     * Returns database version of SteVe and last database update timestamp
-     *
-     */
-    DbVersion getDBVersion();
+    void deleteUser(String username);
+
+    void deleteUser(int webUserPk);
+
+    void changeStatusOfUser(String username, boolean enabled);
+
+    Integer getUserCountWithAuthority(String authority);
+
+    void changePassword(String username, String newPassword);
+
+    boolean userExists(String username);
+
+    WebUserRecord loadUserByUsername(String username);
 }

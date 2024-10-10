@@ -22,7 +22,6 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.joda.time.DateTime;
 import org.jooq.Condition;
-import org.jooq.DSLContext;
 import org.jooq.DataType;
 import org.jooq.DatePart;
 import org.jooq.Field;
@@ -71,24 +70,14 @@ public final class CustomDSL {
         return field.like("%" + input + "%");
     }
 
-    public static Long selectOffsetFromUtcInSeconds(DSLContext ctx) {
-        return ctx.select(timestampDiffBetweenUtcAndCurrent(DatePart.SECOND))
-                  .fetchOne()
-                  .getValue(0, Long.class);
-    }
-
-    private static Field<Long> timestampDiffBetweenUtcAndCurrent(DatePart part) {
-        return timestampDiff(part, utcTimestamp(), DSL.currentTimestamp());
-    }
-
     /**
      * Taken from https://github.com/jOOQ/jOOQ/issues/4303#issuecomment-105519975
      */
-    private static Field<Long> timestampDiff(DatePart part, Field<Timestamp> t1, Field<Timestamp> t2) {
+    public static Field<Long> timestampDiff(DatePart part, Field<Timestamp> t1, Field<Timestamp> t2) {
         return field("timestampdiff({0}, {1}, {2})", Long.class, DSL.keyword(part.toSQL()), t1, t2);
     }
 
-    private static Field<Timestamp> utcTimestamp() {
+    public static Field<Timestamp> utcTimestamp() {
         return field("{utc_timestamp()}", Timestamp.class);
     }
 }

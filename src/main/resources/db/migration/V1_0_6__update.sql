@@ -1,2 +1,14 @@
-ALTER TABLE `user`
-    ADD COLUMN `user_notification_features` TEXT NULL DEFAULT NULL COMMENT 'comma separated list' COLLATE 'utf8mb3_unicode_ci' AFTER `e_mail`;
+CREATE TABLE web_user
+(
+    web_user_pk INT          NOT NULL AUTO_INCREMENT,
+    username    varchar(500) NOT NULL,
+    password    varchar(500) NOT NULL,
+    api_token   varchar(500) NULL,
+    enabled     BOOLEAN      NOT NULL,
+    authorities JSON         NOT NULL,
+
+    PRIMARY KEY (web_user_pk),
+    UNIQUE KEY (username),
+
+    CONSTRAINT authorities_must_be_array CHECK (json_type(authorities) = convert('ARRAY' using utf8))
+);

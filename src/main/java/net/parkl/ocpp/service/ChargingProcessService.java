@@ -137,10 +137,10 @@ public class ChargingProcessService {
                 orElseThrow(() -> new IllegalStateException(INVALID_OCPP_CHARGING_PROCESS_ID + processId));
 
         if (cp.getEndDate() != null) {
-            throw new IllegalStateException("OcppChargingProcess already ended: " + processId);
+            log.warn("OcppChargingProcess already ended: " + processId);
+        } else {
+            cp.setEndDate(new Date());
         }
-
-        cp.setEndDate(new Date());
         return chargingProcessRepo.save(cp);
     }
 

@@ -67,6 +67,7 @@ public class ChargingDriver {
         chargingMiddleware.stopCharging(
                 ESPChargingUserStopRequest.builder()
                         .externalChargeId(externalChargingProcessId)
+                        .stopResponseTimeout(10000)
                         .build());
     }
 

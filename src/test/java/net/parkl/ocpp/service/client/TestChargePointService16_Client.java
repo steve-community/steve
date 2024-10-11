@@ -1,6 +1,7 @@
 package net.parkl.ocpp.service.client;
 
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
 import de.rwth.idsg.steve.ocpp.ChargePointService16_Invoker;
@@ -11,6 +12,7 @@ import de.rwth.idsg.steve.web.dto.ocpp.TriggerMessageParams;
 
 @Service
 @Qualifier("ChargePointService16_Client")
+@Primary
 public class TestChargePointService16_Client extends TestChargePointService15_Client implements IChargePointService16_Client {
 	protected ChargePointService16_Invoker getOcpp16Invoker() {
 		return invoker;

@@ -14,6 +14,7 @@ import net.parkl.ocpp.service.cs.ChargePointService;
 import net.parkl.ocpp.service.cs.GenericService;
 import ocpp.cs._2015._10.RegistrationStatus;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -24,6 +25,7 @@ import java.util.stream.Collectors;
 
 @Service
 @Slf4j
+@Primary
 public class TestChargePointHelperService implements ChargePointHelperService {
 
 	private final ChargePointService chargePointService;

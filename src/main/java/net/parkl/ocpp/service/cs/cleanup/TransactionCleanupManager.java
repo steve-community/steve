@@ -82,15 +82,4 @@ public class TransactionCleanupManager {
         return cleanedUp;
     }
 
-
-
-
-
-
-
-    public int cleanupConsumptionStates() {
-        Date date = CalendarUtils.createDaysBeforeNow(config.getCleanupConsumptionThresholdDays());
-        log.info("Cleaning up consumption states older than {}...", date);
-        return cleanupService.cleanupConsumptionStates(date);
-    }
 }

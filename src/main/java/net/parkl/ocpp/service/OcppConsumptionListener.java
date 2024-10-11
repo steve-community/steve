@@ -18,10 +18,10 @@
  */
 package net.parkl.ocpp.service;
 
-import net.parkl.ocpp.module.esp.model.ESPChargingConsumptionRequest;
+import net.parkl.ocpp.module.esp.model.ESPChargingData;
 
 public interface OcppConsumptionListener {
 
-	void consumptionUpdated(ESPChargingConsumptionRequest req);
+	void consumptionUpdated(String externalChargeId, ESPChargingData data);
 
 }

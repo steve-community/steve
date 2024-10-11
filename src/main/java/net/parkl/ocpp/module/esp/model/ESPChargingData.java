@@ -21,13 +21,16 @@ package net.parkl.ocpp.module.esp.model;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
+import java.io.Serializable;
 import java.util.Date;
 
 @Getter
 @Setter
 @Builder
-public class ESPChargingData {
+@ToString
+public class ESPChargingData implements Serializable {
     private Date start;
     private Date end;
     private float totalPower;

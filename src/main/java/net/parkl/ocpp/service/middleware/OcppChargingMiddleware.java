@@ -5,17 +5,16 @@ import de.rwth.idsg.steve.ocpp.RequestResult;
 import de.rwth.idsg.steve.repository.dto.ChargePointSelect;
 import de.rwth.idsg.steve.web.dto.ocpp.RemoteStartTransactionParams;
 import de.rwth.idsg.steve.web.dto.ocpp.RemoteStopTransactionParams;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.parkl.ocpp.entities.*;
 import net.parkl.ocpp.module.esp.EmobilityServiceProvider;
 import net.parkl.ocpp.module.esp.model.*;
-import net.parkl.ocpp.repositories.ChargingConsumptionStateRepository;
 import net.parkl.ocpp.service.*;
 import net.parkl.ocpp.service.config.AdvancedChargeBoxConfiguration;
 import net.parkl.ocpp.service.cs.ConnectorMeterValueData;
 import net.parkl.ocpp.service.cs.ConnectorMeterValueService;
 import net.parkl.ocpp.service.cs.TransactionService;
+import net.parkl.ocpp.service.middleware.receiver.AsyncMessageReceiverLocator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -39,8 +38,7 @@ public class OcppChargingMiddleware extends AbstractOcppMiddleware {
     private OcppConsumptionHelper consumptionHelper;
     @Autowired
     private ConnectorMeterValueService connectorMeterValueService;
-    @Autowired
-    private ChargingConsumptionStateRepository consumptionStateRepository;
+
     @Autowired
     private ChargingProcessService chargingProcessService;
 
@@ -51,6 +49,8 @@ public class OcppChargingMiddleware extends AbstractOcppMiddleware {
     private EmobilityServiceProvider emobilityServiceProvider;
     @Autowired
     private RemoteStartService remoteStartService;
+    @Autowired
+    private AsyncMessageReceiverLocator asyncMessageReceiverLocator;
 
     private OcppConsumptionListener consumptionListener;
     private OcppStopListener stopListener;
@@ -208,7 +208,28 @@ public class OcppChargingMiddleware extends AbstractOcppMiddleware {
 
     public ESPChargingResult stopCharging(ESPChargingUserStopRequest req) {
         log.info("Stopping charging: {}...", req.getExternalChargeId());
-        return doStopCharging(req.getExternalChargeId());
+        if (req.isStopOnlyWhenCableRemoved()) {
+            log.info("Stop only when cable removed: {}", req.getExternalChargeId());
+            chargingProcessService.updateStopOnlyWhenCableRemoved(req.getExternalChargeId(), true);
+        }
+
+        ESPChargingResult result = doStopCharging(req.getExternalChargeId());
+        Boolean stoppedWithoutTransaction = result.getStoppedWithoutTransaction();
+        if (!req.isStopOnlyWhenCableRemoved() &&
+                (stoppedWithoutTransaction == null || !stoppedWithoutTransaction)) {
+            ESPChargingData chargingData = asyncMessageReceiverLocator.get().receiveAsyncStopData(
+                    req.getExternalChargeId(), req.getStopResponseTimeout());
+            if (chargingData != null) {
+                log.info("Consumption async data arrived for {}: startValue={}, stopValue={}",
+                        req.getExternalChargeId(), chargingData.getStartValue(),
+                        chargingData.getStopValue());
+                result.setChargingData(chargingData);
+            } else {
+                log.error("Waiting for async consumption data expired: {}", req.getExternalChargeId());
+            }
+
+        }
+        return result;
 
     }
 
@@ -467,33 +488,36 @@ public class OcppChargingMiddleware extends AbstractOcppMiddleware {
         Float calculatedStartValue = consumptionHelper.getStartValue(transaction);
         Float calculatedStopValue = consumptionHelper.getStopValue(transaction);
 
-        ESPChargingConsumptionRequest req = ESPChargingConsumptionRequest.builder().
-                externalChargeId(process.getOcppChargingProcessId()).
-                start(process.getStartDate()).
-                end(process.getEndDate()).
-                totalPower(calculatedTotalPower).
-                startValue(calculatedStartValue).
-                stopValue(calculatedStopValue).
-                build();
+        if (process.isStopOnlyWhenCableRemoved()) {
+            ESPChargingConsumptionRequest req = ESPChargingConsumptionRequest.builder().
+                    externalChargeId(process.getOcppChargingProcessId()).
+                    start(process.getStartDate()).
+                    end(process.getEndDate()).
+                    totalPower(calculatedTotalPower).
+                    startValue(calculatedStartValue).
+                    stopValue(calculatedStopValue).
+                    build();
 
-        emobilityServiceProvider.updateChargingConsumptionExternal(req);
+            emobilityServiceProvider.updateChargingConsumptionExternal(req);
 
-        ChargingConsumptionState chargingConsumptionState = ChargingConsumptionState.builder()
-                .externalChargeBoxId(process.getConnector().getChargeBoxId())
-                .externalChargerId(String.valueOf(process.getConnector().getConnectorId()))
-                .externalChargeId(process.getOcppChargingProcessId())
-                .start(process.getStartDate())
-                .end(process.getEndDate())
-                .totalPower(calculatedTotalPower)
-                .startValue(calculatedStartValue)
-                .stopValue(calculatedStopValue)
-                .build();
+        } else {
+            ESPChargingData req = ESPChargingData.builder().
+                    start(process.getStartDate()).
+                    end(process.getEndDate()).
+                    totalPower(calculatedTotalPower).
+                    startValue(calculatedStartValue).
+                    stopValue(calculatedStopValue).
+                    build();
 
-        consumptionStateRepository.save(chargingConsumptionState);
+            asyncMessageReceiverLocator.get().updateChargingConsumption(
+                    process.getOcppChargingProcessId(), req);
 
-        if (consumptionListener != null) {
-            consumptionListener.consumptionUpdated(req);
+            if (consumptionListener != null) {
+                consumptionListener.consumptionUpdated(process.getOcppChargingProcessId(), req);
+            }
         }
+
+
     }
 
     public boolean isConnectorCharging(String chargeBoxId, int connectorId) {
@@ -581,8 +605,5 @@ public class OcppChargingMiddleware extends AbstractOcppMiddleware {
         }
     }
 
-    public ChargingConsumptionState findByExternalChargeId(String externalChargeId) {
-        return consumptionStateRepository.findById(externalChargeId)
-                .orElse(null);
-    }
+
 }

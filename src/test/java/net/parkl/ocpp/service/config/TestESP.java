@@ -18,8 +18,9 @@ public class TestESP implements EmobilityServiceProvider {
 
     @Override
     public void updateChargingConsumptionExternal(ESPChargingConsumptionRequest req) {
-        log.info("update charging consumption");
+
     }
+
 
     @Override
     public void sendHeartBeatOfflineAlert(String chargeBoxId) {

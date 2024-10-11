@@ -27,5 +27,6 @@ import lombok.Setter;
 @Builder
 public class ESPChargingUserStopRequest {
     private String externalChargeId;
-
+    private boolean stopOnlyWhenCableRemoved;
+    private long stopResponseTimeout;
 }

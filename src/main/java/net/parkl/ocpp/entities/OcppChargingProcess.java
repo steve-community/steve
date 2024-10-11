@@ -68,6 +68,9 @@ public class OcppChargingProcess {
     @Column(name = "limit_minute", nullable = true)
     private Integer limitMinute;
 
+    @Column(name = "stop_only_when_cable_removed", nullable = false)
+    private boolean stopOnlyWhenCableRemoved;
+
     @PrePersist
     public void prePersist() {
         startDate = new Date();

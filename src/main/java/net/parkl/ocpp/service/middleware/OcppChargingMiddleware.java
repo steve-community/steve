@@ -9,6 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import net.parkl.ocpp.entities.*;
 import net.parkl.ocpp.module.esp.EmobilityServiceProvider;
 import net.parkl.ocpp.module.esp.model.*;
+import net.parkl.ocpp.repositories.TransactionEnergyImportRepository;
 import net.parkl.ocpp.service.*;
 import net.parkl.ocpp.service.config.AdvancedChargeBoxConfiguration;
 import net.parkl.ocpp.service.cs.ConnectorMeterValueData;
@@ -44,6 +45,9 @@ public class OcppChargingMiddleware extends AbstractOcppMiddleware {
 
     @Autowired
     private TransactionService transactionService;
+
+    @Autowired
+    private TransactionEnergyImportRepository energyImportRepository;
 
     @Autowired
     private EmobilityServiceProvider emobilityServiceProvider;
@@ -389,7 +393,7 @@ public class OcppChargingMiddleware extends AbstractOcppMiddleware {
 
         ret.getChargingData().setStart(ocppChargingProcess.getStartDate());
         if (transaction != null) {
-            PowerValue pw = getPowerValue(ocppChargingProcess.getTransactionStart());
+            PowerValue pw = getPowerValue(ocppChargingProcess.getTransactionStart().getTransactionPk());
             ConnectorMeterValueData activePower =
                     connectorMeterValueService.getLastConnectorMeterValueByTransactionAndMeasurand(ocppChargingProcess.getTransactionStart(),
                             MEASURAND_POWER_ACTIVE_IMPORT);
@@ -412,23 +416,19 @@ public class OcppChargingMiddleware extends AbstractOcppMiddleware {
         return ret;
     }
 
-    public PowerValue getPowerValue(TransactionStart transaction) {
-        List<ConnectorMeterValueData> connectorMeterValues =
-                connectorMeterValueService.getConnectorMeterValueByTransactionAndMeasurand(transaction, MEASURAND_ENERGY_ACTIVE_IMPORT);
+    public PowerValue getPowerValue(int transactionPk) {
+        TransactionEnergyImport energyImport =
+                energyImportRepository.findById(transactionPk).orElse(null);
         float diff = 0;
         String diffUnit = null;
-        if (connectorMeterValues.isEmpty()) {
-            //handle Mennekes type chargers (no measurand, no unit)
-            connectorMeterValues = connectorMeterValueService.getConnectorMeterValueByTransactionAndMeasurand(transaction, null);
-        }
 
-        if (connectorMeterValues.size() > 1) {
-            diffUnit = connectorMeterValues.get(0).getUnit();
+        if (energyImport != null) {
+            diffUnit = energyImport.getUnit();
             if (diffUnit == null) {
                 diffUnit = UNIT_WH;
             }
-            diff = parseFloat(connectorMeterValues.get(0).getValue())
-                    - parseFloat(connectorMeterValues.get(connectorMeterValues.size() - 1).getValue());
+            diff = energyImport.getEndValue()
+                    - energyImport.getStartValue();
         }
 
         return new PowerValue(diff, diffUnit);

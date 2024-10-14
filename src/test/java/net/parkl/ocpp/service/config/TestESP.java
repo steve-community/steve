@@ -2,10 +2,7 @@ package net.parkl.ocpp.service.config;
 
 import lombok.extern.slf4j.Slf4j;
 import net.parkl.ocpp.module.esp.EmobilityServiceProvider;
-import net.parkl.ocpp.module.esp.model.ESPChargingConsumptionRequest;
-import net.parkl.ocpp.module.esp.model.ESPChargingProcessCheckResult;
-import net.parkl.ocpp.module.esp.model.ESPChargingStopRequest;
-import net.parkl.ocpp.module.esp.model.ESPRfidChargingStartRequest;
+import net.parkl.ocpp.module.esp.model.*;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -41,5 +38,10 @@ public class TestESP implements EmobilityServiceProvider {
     @Override
     public ESPChargingProcessCheckResult checkChargingProcess(String chargingProcessId) {
         return new ESPChargingProcessCheckResult(true,3*60*60*1000L);
+    }
+
+    @Override
+    public void updateChargingMeterValues(String chargingProcessId, ESPMeterValues values) {
+        log.info("updating meter values for {}: {}", chargingProcessId, values);
     }
 }

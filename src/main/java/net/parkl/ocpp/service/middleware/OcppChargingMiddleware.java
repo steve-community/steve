@@ -9,13 +9,17 @@ import lombok.extern.slf4j.Slf4j;
 import net.parkl.ocpp.entities.*;
 import net.parkl.ocpp.module.esp.EmobilityServiceProvider;
 import net.parkl.ocpp.module.esp.model.*;
+import net.parkl.ocpp.repositories.TransactionEnergyImportLegacyRepository;
 import net.parkl.ocpp.repositories.TransactionEnergyImportRepository;
 import net.parkl.ocpp.service.*;
 import net.parkl.ocpp.service.config.AdvancedChargeBoxConfiguration;
 import net.parkl.ocpp.service.cs.ConnectorMeterValueData;
 import net.parkl.ocpp.service.cs.ConnectorMeterValueService;
 import net.parkl.ocpp.service.cs.TransactionService;
+import net.parkl.ocpp.service.cs.status.ESPMeterValuesParser;
 import net.parkl.ocpp.service.middleware.receiver.AsyncMessageReceiverLocator;
+import ocpp.cs._2015._10.MeterValue;
+import ocpp.cs._2015._10.SampledValue;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -48,6 +52,8 @@ public class OcppChargingMiddleware extends AbstractOcppMiddleware {
 
     @Autowired
     private TransactionEnergyImportRepository energyImportRepository;
+    @Autowired
+    private TransactionEnergyImportLegacyRepository energyImportLegacyRepository;
 
     @Autowired
     private EmobilityServiceProvider emobilityServiceProvider;
@@ -373,7 +379,7 @@ public class OcppChargingMiddleware extends AbstractOcppMiddleware {
 
         }
 
-        Transaction transaction = null;
+       Transaction transaction = null;
         if (ocppChargingProcess.getTransactionStart() != null) {
             transaction = transactionService
                     .findTransaction(ocppChargingProcess.getTransactionStart().getTransactionPk())
@@ -381,7 +387,7 @@ public class OcppChargingMiddleware extends AbstractOcppMiddleware {
                             ocppChargingProcess.getTransactionStart().getTransactionPk()));
 
             if (transaction.getStopTimestamp() != null) {
-                log.info("Charging already stopped: {}", externalChargeId);
+                log.info("Charging already stopped: {}", ocppChargingProcess.getOcppChargingProcessId());
                 return ESPChargingStatusResult.builder().errorCode(ERROR_CODE_CHARGING_ALREADY_STOPPED).build();
             }
         }
@@ -417,8 +423,12 @@ public class OcppChargingMiddleware extends AbstractOcppMiddleware {
     }
 
     public PowerValue getPowerValue(int transactionPk) {
-        TransactionEnergyImport energyImport =
+        AbstractTransactionEnergyImport energyImport =
                 energyImportRepository.findById(transactionPk).orElse(null);
+        if (energyImport==null) {
+            //handle Mennekes type chargers (no measurand, no unit)
+            energyImport = energyImportLegacyRepository.findById(transactionPk).orElse(null);
+        }
         float diff = 0;
         String diffUnit = null;
 
@@ -606,4 +616,17 @@ public class OcppChargingMiddleware extends AbstractOcppMiddleware {
     }
 
 
+    public void updateMeterValues(TransactionStart transactionStart, List<MeterValue> meterValues) {
+        OcppChargingProcess process = chargingProcessService.findByTransactionId(transactionStart.getTransactionPk());
+        if (process == null) {
+            log.warn("No charging process found for transaction: {}", transactionStart.getTransactionPk());
+            return;
+        }
+
+        ESPMeterValues values = ESPMeterValuesParser.parseMeterValues(transactionStart, meterValues);
+        log.info("Updating meter values for {}: {}", process.getOcppChargingProcessId(),
+                values);
+        emobilityServiceProvider.updateChargingMeterValues(process.getOcppChargingProcessId(), values);
+
+    }
 }

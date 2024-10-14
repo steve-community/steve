@@ -20,11 +20,15 @@ package net.parkl.ocpp.service;
 
 import lombok.extern.slf4j.Slf4j;
 import net.parkl.ocpp.entities.OcppChargingProcess;
+import net.parkl.ocpp.entities.TransactionStart;
 import net.parkl.ocpp.service.middleware.OcppChargingMiddleware;
+import ocpp.cs._2015._10.MeterValue;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 import static net.parkl.ocpp.service.OcppConstants.REASON_VEHICLE_CHARGED;
 
@@ -52,6 +56,15 @@ public class ESPNotificationService {
                     chargingProcess.getTransactionStart().getTransactionPk());
             log.info("start: {}, stop: {}", startValue, stopValue);
             chargingMiddleware.updateConsumption(chargingProcess, startValue, stopValue);
+        });
+    }
+
+    public void notifyMeterValues(TransactionStart transactionStart,List<MeterValue> meterValues) {
+        executor.execute(() -> {
+            log.info("Notifying ESP about charging status of transaction: {}...",
+                    transactionStart.getTransactionPk());
+
+            chargingMiddleware.updateMeterValues(transactionStart, meterValues);
         });
     }
 }

@@ -51,4 +51,6 @@ public interface ConnectorMeterValueRepository extends CrudRepository<ConnectorM
 	@Query("SELECT v.valueTimestamp, v.value, v.readingContext, v.format, v.measurand, v.location, v.unit, v.phase " +
 			"FROM ConnectorMeterValue AS v WHERE v.transaction.transactionPk=?1")
 	List<Object[]> findByTransactionPk(int transactionPk);
+
+
 }

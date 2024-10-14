@@ -36,6 +36,7 @@ import net.parkl.ocpp.entities.OcppChargingProcess;
 import net.parkl.ocpp.entities.TransactionStart;
 import net.parkl.ocpp.module.esp.model.ESPRfidChargingStartRequest;
 import net.parkl.ocpp.service.ChargingProcessService;
+import net.parkl.ocpp.service.ESPNotificationService;
 import net.parkl.ocpp.service.HeartBeatService;
 import net.parkl.ocpp.service.RemoteStartService;
 import net.parkl.ocpp.service.cs.*;
@@ -85,6 +86,9 @@ public class CentralSystemService16_Service {
 
     @Autowired
     private RemoteStartService remoteStartService;
+
+    @Autowired
+    private ESPNotificationService espNotificationService;
 
     public BootNotificationResponse bootNotification(BootNotificationRequest parameters, String chargeBoxIdentity,
                                                      OcppProtocol ocppProtocol) {
@@ -177,6 +181,8 @@ public class CentralSystemService16_Service {
                             new IllegalArgumentException("Invalid transaction id: " + transactionId));
 
             connectorMeterValueService.insertMeterValues(parameters.getMeterValue(), transactionStart);
+            espNotificationService.notifyMeterValues(transactionStart, parameters.getMeterValue());
+
         }
         return new MeterValuesResponse();
     }

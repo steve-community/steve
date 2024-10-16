@@ -3,7 +3,6 @@ package net.parkl.ocpp.service.middleware;
 import de.rwth.idsg.steve.ocpp.OcppProtocol;
 import de.rwth.idsg.steve.ocpp.RequestResult;
 import de.rwth.idsg.steve.repository.dto.ChargePointSelect;
-import de.rwth.idsg.steve.repository.dto.TransactionDetails;
 import de.rwth.idsg.steve.web.dto.ocpp.*;
 import lombok.extern.slf4j.Slf4j;
 import net.parkl.ocpp.entities.*;
@@ -14,6 +13,8 @@ import net.parkl.ocpp.module.esp.model.ESPConnectorStopResults;
 import net.parkl.ocpp.repositories.ConnectorRepository;
 import net.parkl.ocpp.repositories.OcppChargingProcessRepository;
 import net.parkl.ocpp.repositories.TransactionRepository;
+import net.parkl.ocpp.service.cs.ChargingMeterValueDtoList;
+import net.parkl.ocpp.service.cs.ConnectorMeterValueService;
 import net.parkl.ocpp.service.cs.TransactionService;
 import net.parkl.ocpp.service.cs.cleanup.ConnectorStopService;
 import org.jetbrains.annotations.NotNull;
@@ -38,14 +39,14 @@ public class OcppAdminMiddleware extends AbstractOcppMiddleware {
     private TransactionRepository transactionRepository;
     @Autowired
     private TransactionService transactionService;
-
     @Autowired
     private ConnectorRepository connectorRepository;
     @Autowired
     private OcppChargingProcessRepository ocppChargingProcessRepository;
-
     @Autowired
     private ConnectorStopService connectorStopService;
+    @Autowired
+    private ConnectorMeterValueService connectorMeterValueService;
 
     public void unlockConnector(String chargeBoxId, String chargerId) {
         log.info("Unlock connector request for {}-{}...", chargeBoxId, chargerId);
@@ -247,14 +248,16 @@ public class OcppAdminMiddleware extends AbstractOcppMiddleware {
         return chargeBox;
     }
 
-    public List<TransactionDetails.MeterValues> getProcessMeterValues(String processId) {
+    public ChargingMeterValueDtoList getProcessMeterValues(String processId) {
         OcppChargingProcess process = ocppChargingProcessRepository.findById(processId).orElseThrow();
         if (process.getTransactionStart()==null) {
             log.warn("No transaction start found for process: {}", processId);
-            return new ArrayList<>();
+            return new ChargingMeterValueDtoList(null);
         }
-        return transactionService.getDetails(process.getTransactionStart().getTransactionPk()).getValues();
 
+        TransactionStart transactionStart = process.getTransactionStart();
+
+        return connectorMeterValueService.findByTransactionAndMeasurands(transactionStart);
     }
 
     public ESPConnectorStopResults stopConnectorCharging(String chargeBoxId, String chargerId) {
@@ -266,4 +269,5 @@ public class OcppAdminMiddleware extends AbstractOcppMiddleware {
         }
         return connectorStopService.stopConnectorCharging(connector);
     }
+
 }

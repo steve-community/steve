@@ -19,7 +19,6 @@
 package net.parkl.ocpp.repositories;
 
 import net.parkl.ocpp.entities.ConnectorMeterValue;
-import net.parkl.ocpp.entities.Transaction;
 import net.parkl.ocpp.entities.TransactionStart;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
@@ -52,5 +51,18 @@ public interface ConnectorMeterValueRepository extends CrudRepository<ConnectorM
 			"FROM ConnectorMeterValue AS v WHERE v.transaction.transactionPk=?1")
 	List<Object[]> findByTransactionPk(int transactionPk);
 
-
+	@Query("SELECT " +
+			"v.valueTimestamp, " +
+			"MAX(CASE WHEN v.measurand = 'Energy.Active.Import.Register' THEN v.value END), " +
+			"MAX(CASE WHEN v.measurand = 'Power.Active.Import' THEN v.value END), " +
+			"MAX(CASE WHEN v.measurand = 'Energy.Active.Import.Register' THEN v.unit END), " +
+			"MAX(CASE WHEN v.measurand = 'Power.Active.Import' THEN v.unit END), " +
+			"MAX(CASE WHEN v.measurand = 'SoC' THEN v.value END) " +
+			"FROM ConnectorMeterValue v " +
+			"WHERE v.transaction=?1 " +
+			"  AND v.measurand in ('Energy.Active.Import.Register', 'Power.Active.Import', 'SoC') " +
+			"  AND v.phase IS NULL " +
+			"GROUP BY v.valueTimestamp " +
+			"ORDER BY v.valueTimestamp ")
+	List<Object[]> findEnergyAndPowerDataForTransaction(TransactionStart transactionStart);
 }

@@ -31,7 +31,8 @@ public class InMemoryAsyncMessageReceiver implements AsyncMessageReceiver {
             log.info("Wait for async stop failed: {}", externalChargeId);
             return null;
         }
-        return null;
+        log.info("Received async stop data for {}: {}",externalChargeId, state);
+        return state;
     }
 
     @Override

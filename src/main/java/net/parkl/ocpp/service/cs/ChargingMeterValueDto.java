@@ -1,9 +1,6 @@
 package net.parkl.ocpp.service.cs;
 
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 
 import java.util.Date;
 
@@ -11,6 +8,8 @@ import java.util.Date;
 @Setter
 @Builder
 @ToString
+@AllArgsConstructor
+@NoArgsConstructor
 public class ChargingMeterValueDto {
     private Date valueTimestamp;
     private String energy;

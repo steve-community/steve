@@ -128,7 +128,7 @@ public class ConnectorMeterValueService {
                 nextTxTimestamp), this::convertToMeterValueDetail);
     }
 
-    public ChargingMeterValueDtoList findByTransactionAndMeasurands(TransactionStart transactionStart) {
+    public ChargingMeterValueDtoList findByTransaction(TransactionStart transactionStart) {
         List<Object[]> energyAndPowerData = connectorMeterValueRepo
                 .findEnergyAndPowerDataForTransaction(transactionStart);
 

@@ -98,7 +98,7 @@ public class MeterValueServiceIntegrationTest extends DriverTestBase {
         socValue.setValue("45");
         connectorMeterValueRepository.save(socValue);
 
-        ChargingMeterValueDtoList result = meterValueService.findByTransactionAndMeasurands(transactionStart);
+        ChargingMeterValueDtoList result = meterValueService.findByTransaction(transactionStart);
 
         // Then: Verify the results
         assertNotNull(result);

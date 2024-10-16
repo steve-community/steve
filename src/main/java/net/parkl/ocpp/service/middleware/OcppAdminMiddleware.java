@@ -257,7 +257,7 @@ public class OcppAdminMiddleware extends AbstractOcppMiddleware {
 
         TransactionStart transactionStart = process.getTransactionStart();
 
-        return connectorMeterValueService.findByTransactionAndMeasurands(transactionStart);
+        return connectorMeterValueService.findByTransaction(transactionStart);
     }
 
     public ESPConnectorStopResults stopConnectorCharging(String chargeBoxId, String chargerId) {

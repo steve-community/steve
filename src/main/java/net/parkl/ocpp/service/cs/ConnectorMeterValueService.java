@@ -30,6 +30,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -75,13 +76,13 @@ public class ConnectorMeterValueService {
     }
 
     public List<ConnectorMeterValueData> getConnectorMeterValueByTransactionAndMeasurand(TransactionStart transaction,
-                                                                                     String measurand) {
+                                                                                         String measurand) {
         return ListTransform.transform(connectorMeterValueRepo.findByTransactionAndMeasurandAndPhaseIsNullOrderByValueTimestampDesc(transaction,
                 measurand), this::convertToMeterValueData);
     }
 
     public ConnectorMeterValueData getLastConnectorMeterValueByTransactionAndMeasurand(TransactionStart transaction,
-                                                                                   String measurand) {
+                                                                                       String measurand) {
         List<Object[]> list =
                 connectorMeterValueRepo.findByTransactionAndMeasurandAndPhaseIsNullOrderByValueTimestampDescPage(transaction,
                         measurand, PageRequest.of(0, 1));
@@ -110,20 +111,41 @@ public class ConnectorMeterValueService {
     }
 
     public List<ConnectorMeterValueDetail> findByChargeBoxIdAndConnectorIdAfter(String chargeBoxId,
-                                                                          int connectorId,
-                                                                          Date startTimestamp) {
+                                                                                int connectorId,
+                                                                                Date startTimestamp) {
         return ListTransform.transform(connectorMeterValueRepo.findByChargeBoxIdAndConnectorIdAfter(chargeBoxId, connectorId, startTimestamp),
                 this::convertToMeterValueDetail);
     }
 
     public List<ConnectorMeterValueDetail> findByChargeBoxIdAndConnectorIdBetween(String chargeBoxId,
-                                                                            int connectorId,
-                                                                            Date startTimestamp,
-                                                                            Date nextTxTimestamp) {
+                                                                                  int connectorId,
+                                                                                  Date startTimestamp,
+                                                                                  Date nextTxTimestamp) {
 
         return ListTransform.transform(connectorMeterValueRepo.findByChargeBoxIdAndConnectorIdBetween(chargeBoxId,
                 connectorId,
                 startTimestamp,
                 nextTxTimestamp), this::convertToMeterValueDetail);
+    }
+
+    public ChargingMeterValueDtoList findByTransaction(TransactionStart transactionStart) {
+        List<Object[]> energyAndPowerData = connectorMeterValueRepo
+                .findEnergyAndPowerDataForTransaction(transactionStart);
+
+        List<ChargingMeterValueDto> meterValues = new ArrayList<>();
+        for (Object[] row : energyAndPowerData) {
+            meterValues.add(ChargingMeterValueDto.builder()
+                    .valueTimestamp((Date) row[0])
+                    .energy((String) row[1])
+                    .power((String) row[2])
+                    .energyUnit((String) row[3])
+                    .powerUnit((String) row[4])
+                    .soc((String) row[5])
+                    .build());
+        }
+
+        return ChargingMeterValueDtoList.builder()
+                .meterValues(meterValues)
+                .build();
     }
 }

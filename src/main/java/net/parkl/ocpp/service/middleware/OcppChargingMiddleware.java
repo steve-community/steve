@@ -217,7 +217,7 @@ public class OcppChargingMiddleware extends AbstractOcppMiddleware {
     }
 
     public ESPChargingResult stopCharging(ESPChargingUserStopRequest req) {
-        log.info("Stopping charging: {}...", req.getExternalChargeId());
+        log.info("Stopping charging: {} (timeout={})...", req.getExternalChargeId(),req.getStopResponseTimeout());
         if (req.isStopOnlyWhenCableRemoved()) {
             log.info("Stop only when cable removed: {}", req.getExternalChargeId());
             chargingProcessService.updateStopOnlyWhenCableRemoved(req.getExternalChargeId(), true);

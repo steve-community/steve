@@ -28,6 +28,8 @@ spec:
           value: ""
         - name: DB_DATABASE
           value: ""
+        - name: SERVER_HOST
+          value: "0.0.0.0"
         - name: ADMIN_USERNAME
           value: ""
         - name: ADMIN_PASSWORD

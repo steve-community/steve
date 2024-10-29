@@ -16,34 +16,20 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package de.rwth.idsg.steve.repository.dto;
-import java.util.List;
-import jooq.steve.db.tables.records.AddressRecord;
-import jooq.steve.db.tables.records.UserRecord;
-import lombok.Builder;
-import lombok.Getter;
+package de.rwth.idsg.steve.service.notification;
 
-import java.util.Optional;
+import lombok.Data;
+import org.joda.time.DateTime;
 
 /**
- * @author Sevket Goekay <sevketgokay@gmail.com>
- * @since 25.11.2015
+ * @author fnkbsi
+ * @since 12.10.2022
  */
-public class User {
 
-    @Getter
-    @Builder
-    public static final class Overview {
-        private final Integer userPk, ocppTagPk;
-        private final String ocppIdTag, name, phone, email;
-        private final List<UserNotificationFeature> enabledFeatures;
-    }
+@Data
+public class OcppStationStatusSuspendedEV {
 
-    @Getter
-    @Builder
-    public static final class Details {
-        private final UserRecord userRecord;
-        private final AddressRecord address;
-        private final Optional<String> ocppIdTag;
-    }
+  private final String chargeBoxId;
+  private final int connectorId;
+  private final DateTime timestamp;
 }

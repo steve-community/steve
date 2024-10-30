@@ -1,0 +1,19 @@
+{
+  "connectorId":1,
+  "meterValue":[
+    {
+      "sampledValue":[
+        {
+          "value":"1144330"
+        },
+        {
+          "measurand":"Power.Active.Import",
+          "unit":"kW",
+          "value":"10.857"
+        }
+      ],
+      "timestamp":"2024-10-30T08:54:42Z"
+    }
+  ],
+  "transactionId":372
+}

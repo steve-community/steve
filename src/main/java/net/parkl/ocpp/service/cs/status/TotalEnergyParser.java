@@ -20,7 +20,8 @@ public class TotalEnergyParser implements MeterValueParser {
     public void parseMeterValue(ESPMeterValues values, TransactionStart transactionStart, SampledValue sampledValue) {
         boolean measurandEnergyActiveImport = sampledValue.isSetMeasurand() &&
                 OcppConstants.MEASURAND_ENERGY_ACTIVE_IMPORT.equals(sampledValue.getMeasurand().value());
-        if (!sampledValue.isSetMeasurand() || measurandEnergyActiveImport) {
+        boolean hasPhase = sampledValue.isSetPhase();
+        if ((!sampledValue.isSetMeasurand() || measurandEnergyActiveImport) && !hasPhase) {
             AbstractTransactionEnergyImport energyImport = energyImportLoader.loadEnergyImport(
                     transactionStart.getTransactionPk());
             if (energyImport != null) {

@@ -11,7 +11,8 @@ import static net.parkl.ocpp.service.OcppConsumptionHelper.getKwValue;
 @Component
 public class ActivePowerParser implements MeterValueParser {
     public void parseMeterValue(ESPMeterValues values, TransactionStart transactionStart, SampledValue sampledValue) {
-        if (sampledValue.isSetMeasurand() && MEASURAND_POWER_ACTIVE_IMPORT.equals(sampledValue.getMeasurand().value())) {
+        if (sampledValue.isSetMeasurand() && MEASURAND_POWER_ACTIVE_IMPORT.equals(sampledValue.getMeasurand().value())
+                && !sampledValue.isSetPhase()) {
             values.setActivePowerImport(getKwValue(Float.parseFloat(sampledValue.getValue()),
                     sampledValue.getUnit().value()));
         }

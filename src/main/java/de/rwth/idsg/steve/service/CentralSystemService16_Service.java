@@ -196,14 +196,23 @@ public class CentralSystemService16_Service {
     }
 
     public StartTransactionResponse startTransaction(StartTransactionRequest parameters, String chargeBoxIdentity) {
+        boolean remoteStart = remoteStartService
+                .hasOpenRemoteStart(chargeBoxIdentity, parameters.getConnectorId(), parameters.getIdTag());
+
         // Get the authorization info of the user, before making tx changes (will affectAuthorizationStatus)
-        IdTagInfo info = ocppTagService.getIdTagInfo(
-                parameters.getIdTag(),
-                true,
-                chargeBoxIdentity,
-                parameters.getConnectorId(),
-                () -> new IdTagInfo().withStatus(AuthorizationStatus.INVALID) // IdTagInfo is required
-        );
+        IdTagInfo info;
+        if (!remoteStart) {
+            info = ocppTagService.getIdTagInfo(
+                    parameters.getIdTag(),
+                    true,
+                    chargeBoxIdentity,
+                    parameters.getConnectorId(),
+                    () -> new IdTagInfo().withStatus(AuthorizationStatus.INVALID) // IdTagInfo is required
+            );
+        } else {
+            info = new IdTagInfo()
+                    .withStatus(AuthorizationStatus.ACCEPTED);
+        }
 
         log.info("Starting transaction on {}...", chargeBoxIdentity);
         InsertTransactionParams params =
@@ -219,8 +228,7 @@ public class CentralSystemService16_Service {
 
         Integer transactionId;
 
-        if (!remoteStartService
-                .hasOpenRemoteStart(chargeBoxIdentity, parameters.getConnectorId(),parameters.getIdTag())) {
+         if (!remoteStart) {
             log.info("No remote start for RFID tag: {} on charger: {}/{}, interpreting as RFID start...",
                     parameters.getIdTag(), chargeBoxIdentity, parameters.getConnectorId());
 

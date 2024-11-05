@@ -13,6 +13,7 @@ services:
     # TODO: Get database migrations to work with the latest point releases of
     # MariaDB 10.4.
     image: mariadb:10.4.30
+    restart: unless-stopped
     ports:
       - 3306:3306
     environment:
@@ -20,8 +21,8 @@ services:
       MYSQL_DATABASE: stevedb
       MYSQL_USER: steve
       MYSQL_PASSWORD: changeme
-
   app:
+    restart: unless-stopped
     build: .
     links:
       - "db:mariadb"

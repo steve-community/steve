@@ -26,6 +26,9 @@ import de.rwth.idsg.steve.web.dto.Statistics;
  * @since 19.08.2014
  */
 public interface GenericRepository {
+
+    void checkJavaAndMySQLOffsets();
+
     Statistics getStats();
 
     /**

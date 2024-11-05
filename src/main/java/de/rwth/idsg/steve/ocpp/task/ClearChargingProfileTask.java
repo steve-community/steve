@@ -27,7 +27,7 @@ import de.rwth.idsg.steve.web.dto.ocpp.ClearChargingProfileParams;
 import lombok.extern.slf4j.Slf4j;
 import ocpp.cp._2015._10.ClearChargingProfileRequest;
 
-import javax.xml.ws.AsyncHandler;
+import jakarta.xml.ws.AsyncHandler;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>

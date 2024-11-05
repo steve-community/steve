@@ -25,5 +25,5 @@ RUN chmod +x /code/mvnw
 # Build and run steve, requires a db to be available on port 3306
 CMD dockerize -wait tcp://mariadb:3306 -timeout 60s && \
 	./mvnw clean package -Pdocker -Djdk.tls.client.protocols="TLSv1,TLSv1.1,TLSv1.2" && \
-	java -jar target/steve.jar
+	java -XX:MaxRAMPercentage=85 -jar target/steve.jar
 

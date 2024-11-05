@@ -93,8 +93,8 @@ Connector Status
 				</td>
 				<td>${cs.connectorId}</td>
 				<td data-sort-value="${cs.statusTimestamp.millis}">${cs.timeStamp}</td>
-				<td>${cs.status}</td>
-				<td>${cs.errorCode}</td>
+				<td><encode:forHtml value="${cs.status}" /></td>
+				<td><encode:forHtml value="${cs.errorCode}" /></td>
 			</tr>
 		</c:forEach>
 	</tbody>

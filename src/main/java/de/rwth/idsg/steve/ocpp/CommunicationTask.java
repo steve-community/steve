@@ -30,7 +30,7 @@ import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.xml.ws.AsyncHandler;
+import jakarta.xml.ws.AsyncHandler;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;

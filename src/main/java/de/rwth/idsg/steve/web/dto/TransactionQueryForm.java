@@ -18,13 +18,13 @@
  */
 package de.rwth.idsg.steve.web.dto;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
-import javax.validation.constraints.AssertTrue;
+import jakarta.validation.constraints.AssertTrue;
 import java.util.Objects;
 
 /**
@@ -37,25 +37,25 @@ import java.util.Objects;
 public class TransactionQueryForm extends QueryForm {
 
     // Internal database Id
-    @ApiModelProperty(value = "Database primary key of the transaction")
+    @Schema(description = "Database primary key of the transaction")
     private Integer transactionPk;
 
-    @ApiModelProperty(value = "Disabled for the Web APIs. Do not use and set", hidden = true)
+    @Schema(description = "Disabled for the Web APIs. Do not use and set", hidden = true)
     private boolean returnCSV = false;
 
-    @ApiModelProperty(value = "Return active or all transactions? Defaults to ALL")
+    @Schema(description = "Return active or all transactions? Defaults to ALL")
     private QueryType type = QueryType.ACTIVE;
 
-    @ApiModelProperty(value = "Return the time period of the transactions. If FROM_TO, 'from' and 'to' must be set. Additionally, 'to' must be after 'from'. Defaults to ALL")
+    @Schema(description = "Return the time period of the transactions. If FROM_TO, 'from' and 'to' must be set. Additionally, 'to' must be after 'from'. Defaults to ALL")
     private QueryPeriodType periodType = QueryPeriodType.ALL;
 
-    @ApiModelProperty(hidden = true)
+    @Schema(hidden = true)
     @AssertTrue(message = "The values 'From' and 'To' must be both set")
     public boolean isPeriodFromToCorrect() {
         return periodType != QueryPeriodType.FROM_TO || isFromToSet();
     }
 
-    @ApiModelProperty(hidden = true)
+    @Schema(hidden = true)
     public boolean isTransactionPkSet() {
         return transactionPk != null;
     }

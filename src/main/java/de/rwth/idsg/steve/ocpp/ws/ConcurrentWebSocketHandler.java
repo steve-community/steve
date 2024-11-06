@@ -43,7 +43,7 @@ import java.util.concurrent.TimeUnit;
 public abstract class ConcurrentWebSocketHandler implements WebSocketHandler {
 
     @Value("${bufferMultiplier:1}")
-    private int bufferMultiplier;
+    private float bufferMultiplier;
 
     private static final int sendTimeLimit = (int) TimeUnit.SECONDS.toMillis(10);
 
@@ -55,8 +55,8 @@ public abstract class ConcurrentWebSocketHandler implements WebSocketHandler {
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
         this.onOpen(internalGet(session));
-        session.setBinaryMessageSizeLimit(bufferMultiplier * bufferSizeLimit);
-        session.setTextMessageSizeLimit(bufferMultiplier * bufferSizeLimit);
+        session.setBinaryMessageSizeLimit((int)(bufferMultiplier * bufferSizeLimit));
+        session.setTextMessageSizeLimit((int)(bufferMultiplier * bufferSizeLimit));
         log.info("Created new session {} with buffer size {}", session.getId(), session.getTextMessageSizeLimit());
     }
 
@@ -76,7 +76,7 @@ public abstract class ConcurrentWebSocketHandler implements WebSocketHandler {
     }
 
     private ConcurrentWebSocketSessionDecorator internalGet(WebSocketSession session) {
-        return sessions.computeIfAbsent(session.getId(), s -> new ConcurrentWebSocketSessionDecorator(session, sendTimeLimit, bufferMultiplier * bufferSizeLimit));
+        return sessions.computeIfAbsent(session.getId(), s -> new ConcurrentWebSocketSessionDecorator(session, sendTimeLimit, (int)(bufferMultiplier * bufferSizeLimit)));
     }
 
     // -------------------------------------------------------------------------

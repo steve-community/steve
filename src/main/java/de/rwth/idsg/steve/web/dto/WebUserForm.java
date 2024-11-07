@@ -42,7 +42,7 @@ public class WebUserForm extends WebUserBaseForm {
     @AssertFalse(message = "The repeated password did not match!")
     private Boolean pwError;
 
-    private String apiToken = "";
+    private String apiPassword = "";
 
     public void setPassword(String password) {
         this.password = password;
@@ -56,7 +56,7 @@ public class WebUserForm extends WebUserBaseForm {
         }
     }
 
-    public void setApiToken(String apiToken) {
-        this.apiToken = apiToken;
+    public void setApiPassword(String apiPassword) {
+        this.apiPassword = apiPassword;
     }
 }

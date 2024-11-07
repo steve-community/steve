@@ -44,6 +44,11 @@
                         <B>Change Password</B></a>
                     </td>
                 </tr>
+                <tr><td></td>
+                    <td><a href="${ctxPath}/manager/webusers/apipassword/${webuserForm.webUsername}">
+                        <B>Change API Password</B></a>
+                    </td>
+                </tr>
                 <tr><td>Roles:</td>
                     <td>
                         <select id="myRoleList" name="authorities" path="authorities" title="List of roles/authoriies the web-user has.">

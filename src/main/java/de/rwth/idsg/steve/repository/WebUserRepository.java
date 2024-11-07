@@ -43,6 +43,8 @@ public interface WebUserRepository  {
     void changePassword(String username, String newPassword);
 
     void changePassword(Integer userPk, String newPassword);
+    
+    void changeApiPassword(Integer userPk, String newPassword);
 
     boolean userExists(String username);
 

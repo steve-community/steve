@@ -130,6 +130,14 @@ public class WebUserRepositoryImpl implements WebUserRepository {
     }
 
     @Override
+    public void changeApiPassword(Integer userPk, String newPassword) {
+        ctx.update(WEB_USER)
+            .set(WEB_USER.API_PASSWORD, newPassword)
+            .where(WEB_USER.WEB_USER_PK.eq(userPk))
+            .execute();
+    }
+
+    @Override
     public boolean userExists(String username) {
         return ctx.selectOne()
             .from(WEB_USER)

@@ -79,6 +79,8 @@ public class SecurityConfiguration {
                         //only allowed to change the own password
                     .requestMatchers(prefix + "/webusers" + "/password/{name}")
                         .access(new WebExpressionAuthorizationManager("#name == authentication.name"))
+                    .requestMatchers(prefix + "/webusers" + "/apipassword/{name}")
+                        .access(new WebExpressionAuthorizationManager("#name == authentication.name"))
                         // otherwise denies access on backToOverview!
                     .requestMatchers(toOverview).hasAnyAuthority("USER", "ADMIN")
                     .requestMatchers(HttpMethod.GET, prefix + "/webusers/**").hasAnyAuthority("USER", "ADMIN")

@@ -208,6 +208,14 @@ public class WebUserService implements UserDetailsManager {
     public void updatePassword(WebUserForm form) {
         webUserRepository.changePassword(form.getWebUserPk(), encoder.encode(form.getPassword()));
     }
+    
+    public void updateApiPassword(WebUserForm form) {
+        String newPassword = null;
+        if (form.getApiPassword() != null) {
+            newPassword = encoder.encode(form.getApiPassword());
+        }
+        webUserRepository.changeApiPassword(form.getWebUserPk(), newPassword);
+    }
 
     public List<WebUserOverview> getOverview(WebUserQueryForm form) {
         return webUserRepository.getOverview(form)

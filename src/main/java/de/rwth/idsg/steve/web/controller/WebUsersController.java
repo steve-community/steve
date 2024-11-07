@@ -55,6 +55,7 @@ public class WebUsersController {
     private static final String UPDATE_PATH = "/update";
     private static final String ADD_PATH = "/add";
     private static final String PASSWORD_PATH = "/password/{webUserName}";
+    private static final String API_PASSWORD_PATH = "/apipassword/{webUserName}";
 
     // -------------------------------------------------------------------------
     // HTTP methods
@@ -136,8 +137,31 @@ public class WebUsersController {
         }
 
         webUserService.updatePassword(webuserForm);
-        String redirect_str = String.format("redirect:/manager/webusers/details/%s", webuserForm.getWebUserPk());
-        return redirect_str;
+        return toDetails(webuserForm.getWebUserPk());
+    }
+
+    @RequestMapping(value = API_PASSWORD_PATH, method = RequestMethod.GET)
+    public String apiPasswordChangeGet(@PathVariable("webUserName") String webUserName, Model model) {
+        WebUserForm webUserForm = new WebUserForm();
+        WebUserBaseForm webUserBaseForm = webUserService.getDetails(webUserName);
+        webUserForm.setWebUserPk(webUserBaseForm.getWebUserPk());
+        webUserForm.setWebUsername(webUserBaseForm.getWebUsername());
+        webUserForm.setAuthorities(webUserBaseForm.getAuthorities());
+        webUserForm.setEnabled(webUserBaseForm.getEnabled());
+
+        model.addAttribute("webuserForm", webUserForm);
+        return "data-man/webuserApiPassword";
+    }
+
+    @RequestMapping(params = "change", value = API_PASSWORD_PATH, method = RequestMethod.POST)
+    public String apiPasswordChange(@Valid @ModelAttribute("webuserForm") WebUserForm webuserForm,
+                         BindingResult result, Model model) {
+        if (result.hasErrors()) {
+            return "data-man/webuserApiPassword";
+        }
+
+        webUserService.updateApiPassword(webuserForm);
+        return toDetails(webuserForm.getWebUserPk());
     }
 
     @RequestMapping(value = DELETE_PATH, method = RequestMethod.POST)
@@ -153,8 +177,13 @@ public class WebUsersController {
     @RequestMapping(params = "backToOverview", value = PASSWORD_PATH, method = RequestMethod.POST)
     public String passwordBackToOverview(@Valid @ModelAttribute("webuserForm") WebUserForm webuserForm,
                          BindingResult result, Model model) {
-        String redirect_str = String.format("redirect:/manager/webusers/details/%s", webuserForm.getWebUserPk());
-        return redirect_str;
+        return toDetails(webuserForm.getWebUserPk());
+    }
+
+    @RequestMapping(params = "backToOverview", value = API_PASSWORD_PATH, method = RequestMethod.POST)
+    public String apiPasswordBackToOverview(@Valid @ModelAttribute("webuserForm") WebUserForm webuserForm,
+                         BindingResult result, Model model) {
+        return toDetails(webuserForm.getWebUserPk());
     }
 
     @RequestMapping(params = "backToOverview", value = ADD_PATH, method = RequestMethod.POST)
@@ -169,5 +198,10 @@ public class WebUsersController {
 
     private String toOverview() {
         return "redirect:/manager/webusers";
+    }
+
+    private String toDetails(Integer userPk) {
+        String redirect_str = String.format("redirect:/manager/webusers/details/%s", userPk);
+        return redirect_str;
     }
 }

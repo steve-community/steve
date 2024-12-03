@@ -18,12 +18,9 @@
  */
 package de.rwth.idsg.steve.web.api.dto;
 
-//import de.rwth.idsg.steve.ocpp.OcppTransport;
 import io.swagger.v3.oas.annotations.media.Schema;
-//import java.util.Collections;
-//import java.util.List;
 import lombok.Getter;
-//import lombok.RequiredArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
 /**
@@ -33,7 +30,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-//@RequiredArgsConstructor
+@RequiredArgsConstructor
 public class ApiChargePointStart {
     @Schema(description = "Charge Box ID")
     private String chargeBoxId;
@@ -41,11 +38,4 @@ public class ApiChargePointStart {
     private Integer connectorId;
     @Schema(description = "OCPP Tag")
     private String ocppTag;
-
-    public ApiChargePointStart(String chargeBoxId, Integer connectorId, String ocppTag) {
-        this.chargeBoxId = chargeBoxId;
-        this.connectorId = connectorId;
-        this.ocppTag = ocppTag;
-    }
-
 }

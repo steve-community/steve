@@ -50,7 +50,7 @@ public class ApiChargePointList {
         @Schema(description = "List of the charge box connectors")
         private List<Integer> connectorIds;
 
-        public ChargePointInfo(String chargeBoxId, List<Integer> connectorIds) {
+        ChargePointInfo(String chargeBoxId, List<Integer> connectorIds) {
             this.chargeBoxId = chargeBoxId;
             this.connectorIds = connectorIds;
         }

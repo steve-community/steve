@@ -177,9 +177,15 @@ public class RemoteStartStopRestController {
 
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "OK"),
-        @ApiResponse(responseCode = "400", description = "Bad Request", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorResponse.class))}),
-        @ApiResponse(responseCode = "401", description = "Unauthorized", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorResponse.class))}),
-        @ApiResponse(responseCode = "500", description = "Internal Server Error", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorResponse.class))})}
+        @ApiResponse(responseCode = "400", description = "Bad Request",
+                content = {@Content(mediaType = "application/json",
+                        schema = @Schema(implementation = ApiErrorResponse.class))}),
+        @ApiResponse(responseCode = "401", description = "Unauthorized",
+                content = {@Content(mediaType = "application/json",
+                        schema = @Schema(implementation = ApiErrorResponse.class))}),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error",
+                content = {@Content(mediaType = "application/json",
+                        schema = @Schema(implementation = ApiErrorResponse.class))})}
     )
     @GetMapping(value = "")
     @ResponseBody
@@ -189,9 +195,15 @@ public class RemoteStartStopRestController {
 
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "OK"),
-        @ApiResponse(responseCode = "400", description = "Bad Request", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorResponse.class))}),
-        @ApiResponse(responseCode = "401", description = "Unauthorized", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorResponse.class))}),
-        @ApiResponse(responseCode = "500", description = "Internal Server Error", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorResponse.class))})}
+        @ApiResponse(responseCode = "400", description = "Bad Request",
+                content = {@Content(mediaType = "application/json",
+                        schema = @Schema(implementation = ApiErrorResponse.class))}),
+        @ApiResponse(responseCode = "401", description = "Unauthorized",
+                content = {@Content(mediaType = "application/json",
+                        schema = @Schema(implementation = ApiErrorResponse.class))}),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error",
+                content = {@Content(mediaType = "application/json",
+                        schema = @Schema(implementation = ApiErrorResponse.class))})}
     )
     @GetMapping(value = "start")
     @ResponseBody
@@ -201,9 +213,15 @@ public class RemoteStartStopRestController {
 
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "OK"),
-        @ApiResponse(responseCode = "400", description = "Bad Request", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorResponse.class))}),
-        @ApiResponse(responseCode = "401", description = "Unauthorized", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorResponse.class))}),
-        @ApiResponse(responseCode = "500", description = "Internal Server Error", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorResponse.class))})}
+        @ApiResponse(responseCode = "400", description = "Bad Request",
+                content = {@Content(mediaType = "application/json",
+                        schema = @Schema(implementation = ApiErrorResponse.class))}),
+        @ApiResponse(responseCode = "401", description = "Unauthorized",
+                content = {@Content(mediaType = "application/json",
+                        schema = @Schema(implementation = ApiErrorResponse.class))}),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error",
+                content = {@Content(mediaType = "application/json",
+                        schema = @Schema(implementation = ApiErrorResponse.class))})}
     )
     @GetMapping(value = "stop")
     @ResponseBody
@@ -213,9 +231,15 @@ public class RemoteStartStopRestController {
 
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "OK"),
-        @ApiResponse(responseCode = "400", description = "Bad Request", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorResponse.class))}),
-        @ApiResponse(responseCode = "401", description = "Unauthorized", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorResponse.class))}),
-        @ApiResponse(responseCode = "500", description = "Internal Server Error", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorResponse.class))})}
+        @ApiResponse(responseCode = "400", description = "Bad Request",
+                content = {@Content(mediaType = "application/json",
+                        schema = @Schema(implementation = ApiErrorResponse.class))}),
+        @ApiResponse(responseCode = "401", description = "Unauthorized",
+                content = {@Content(mediaType = "application/json",
+                        schema = @Schema(implementation = ApiErrorResponse.class))}),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error",
+                content = {@Content(mediaType = "application/json",
+                        schema = @Schema(implementation = ApiErrorResponse.class))})}
     )
     @GetMapping(value = "unlock")
     @ResponseBody
@@ -230,9 +254,15 @@ public class RemoteStartStopRestController {
 
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "OK"),
-        @ApiResponse(responseCode = "400", description = "Bad Request", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorResponse.class))}),
-        @ApiResponse(responseCode = "401", description = "Unauthorized", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorResponse.class))}),
-        @ApiResponse(responseCode = "500", description = "Internal Server Error", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorResponse.class))})}
+        @ApiResponse(responseCode = "400", description = "Bad Request",
+                content = {@Content(mediaType = "application/json",
+                        schema = @Schema(implementation = ApiErrorResponse.class))}),
+        @ApiResponse(responseCode = "401", description = "Unauthorized",
+                content = {@Content(mediaType = "application/json",
+                        schema = @Schema(implementation = ApiErrorResponse.class))}),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error",
+                content = {@Content(mediaType = "application/json",
+                        schema = @Schema(implementation = ApiErrorResponse.class))})}
     )
     @PostMapping(value = "start")
     @ResponseBody
@@ -266,9 +296,15 @@ public class RemoteStartStopRestController {
 
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "OK"),
-        @ApiResponse(responseCode = "400", description = "Bad Request", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorResponse.class))}),
-        @ApiResponse(responseCode = "401", description = "Unauthorized", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorResponse.class))}),
-        @ApiResponse(responseCode = "500", description = "Internal Server Error", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorResponse.class))})}
+        @ApiResponse(responseCode = "400", description = "Bad Request",
+                content = {@Content(mediaType = "application/json",
+                        schema = @Schema(implementation = ApiErrorResponse.class))}),
+        @ApiResponse(responseCode = "401", description = "Unauthorized",
+                content = {@Content(mediaType = "application/json",
+                        schema = @Schema(implementation = ApiErrorResponse.class))}),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error",
+                content = {@Content(mediaType = "application/json",
+                        schema = @Schema(implementation = ApiErrorResponse.class))})}
     )
     @PostMapping(value = "stop")
     @ResponseBody
@@ -309,9 +345,15 @@ public class RemoteStartStopRestController {
 
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "OK"),
-        @ApiResponse(responseCode = "400", description = "Bad Request", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorResponse.class))}),
-        @ApiResponse(responseCode = "401", description = "Unauthorized", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorResponse.class))}),
-        @ApiResponse(responseCode = "500", description = "Internal Server Error", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorResponse.class))})}
+        @ApiResponse(responseCode = "400", description = "Bad Request",
+                content = {@Content(mediaType = "application/json",
+                        schema = @Schema(implementation = ApiErrorResponse.class))}),
+        @ApiResponse(responseCode = "401", description = "Unauthorized",
+                content = {@Content(mediaType = "application/json",
+                        schema = @Schema(implementation = ApiErrorResponse.class))}),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error",
+                content = {@Content(mediaType = "application/json",
+                        schema = @Schema(implementation = ApiErrorResponse.class))})}
     )
     @PostMapping(value = "unlock")
     @ResponseBody

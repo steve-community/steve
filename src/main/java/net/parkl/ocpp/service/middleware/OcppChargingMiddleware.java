@@ -109,7 +109,7 @@ public class OcppChargingMiddleware extends AbstractOcppMiddleware {
             return ESPChargingStartResult.builder().errorCode(ERROR_CODE_CHARGER_ERROR).build();
         }
 
-        if (config.isIdTagMax10Characters(c.getChargeBoxId())) {
+        if (config.isIdTagMax10Characters(c.getChargeBoxId()) && idTag.length() > 10) {
             log.info("Charge box (id = {}) uses ID tag with max length of 10, shortening ID tag...", c.getChargeBoxId());
             idTag = idTag.substring(0, 9);
         }

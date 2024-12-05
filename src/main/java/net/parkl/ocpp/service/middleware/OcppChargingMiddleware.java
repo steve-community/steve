@@ -111,7 +111,7 @@ public class OcppChargingMiddleware extends AbstractOcppMiddleware {
 
         if (config.isIdTagMax10Characters(c.getChargeBoxId()) && idTag.length() > 10) {
             log.info("Charge box (id = {}) uses ID tag with max length of 10, shortening ID tag...", c.getChargeBoxId());
-            idTag = idTag.substring(0, 9);
+            idTag = idTag.substring(0, 10);
         }
 
         if (config.isUsingIntegratedTag(c.getChargeBoxId())) {

@@ -100,7 +100,6 @@ public class MeterValueServiceIntegrationTest extends DriverTestBase {
 
         ChargingMeterValueDtoList result = meterValueService.findByTransaction(transactionStart);
 
-        // Then: Verify the results
         assertNotNull(result);
         List<ChargingMeterValueDto> meterValues = result.getMeterValues();
         assertEquals(2, meterValues.size());

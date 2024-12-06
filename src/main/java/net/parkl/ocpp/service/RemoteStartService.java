@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
+import java.util.List;
 
 import static net.parkl.ocpp.service.ErrorMessages.INVALID_CHARGE_BOX_ID_CONNECTOR_ID;
 
@@ -55,8 +56,15 @@ public class RemoteStartService {
         if (c == null) {
             throw new IllegalStateException(INVALID_CHARGE_BOX_ID_CONNECTOR_ID + chargeBoxId + "/" + connectorId);
         }
-        return remoteStartRepository.coundByConnectorAndOcppTagAfter(c, idTag,
+        return remoteStartRepository.countByConnectorAndOcppTagAfter(c, idTag,
                 getRemoteStartValidityThreshold(chargeBoxId)) > 0;
+    }
+
+    public boolean hasOpenRemoteStart(String chargeBoxId, String idTag) {
+        List<Connector> connectors = connectorRepo.findByChargeBoxId(chargeBoxId);
+        long count = remoteStartRepository
+                .countByConnectorsAndOcppTagAfter(connectors, idTag, getRemoteStartValidityThreshold(chargeBoxId));
+        return count > 0;
     }
 
 

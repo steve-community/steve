@@ -50,7 +50,6 @@ import org.springframework.stereotype.Service;
 import java.util.Optional;
 
 import static net.parkl.ocpp.entities.TransactionStopEventActor.station;
-import static ocpp.cs._2015._10.AuthorizationStatus.INVALID;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -319,13 +318,21 @@ public class CentralSystemService16_Service {
 
     public AuthorizeResponse authorize(AuthorizeRequest parameters, String chargeBoxIdentity) {
         log.info("Authorizing ID tag {} on charge box: {}...", parameters.getIdTag(), chargeBoxIdentity);
-        // Get the authorization info of the user
-        IdTagInfo idTagInfo = ocppTagService.getIdTagInfo(parameters.getIdTag(),
-                false,
-                chargeBoxIdentity,
-                null,
-                () -> new IdTagInfo().withStatus(AuthorizationStatus.INVALID)
-        );
+
+        boolean remoteStart = remoteStartService.hasOpenRemoteStart(chargeBoxIdentity, parameters.getIdTag());
+
+        IdTagInfo idTagInfo;
+        if (!remoteStart) {
+            idTagInfo = ocppTagService.getIdTagInfo(parameters.getIdTag(),
+                    false,
+                    chargeBoxIdentity,
+                    null,
+                    () -> new IdTagInfo().withStatus(AuthorizationStatus.INVALID)
+            );
+        } else {
+            idTagInfo = new IdTagInfo()
+                    .withStatus(AuthorizationStatus.ACCEPTED);
+        }
 
         return new AuthorizeResponse().withIdTagInfo(idTagInfo);
     }

@@ -32,4 +32,5 @@ public interface ConnectorRepository extends CrudRepository<Connector, Integer>{
 	Connector findByChargeBoxIdAndConnectorId(String chargeBoxId, int connectorId);
 	List<Connector> findAllByOrderByConnectorPkAsc();
     List<Connector> findByChargeBoxId(String chargeBoxId);
+
 }

@@ -19,10 +19,7 @@
 package net.parkl.ocpp.repositories;
 
 import net.parkl.ocpp.entities.Connector;
-import net.parkl.ocpp.entities.OcppChargingProcess;
 import net.parkl.ocpp.entities.OcppRemoteStart;
-import net.parkl.ocpp.entities.TransactionStart;
-import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
@@ -35,5 +32,8 @@ public interface OcppRemoteStartRepository extends CrudRepository<OcppRemoteStar
     void deleteByConnectorAndOcppTag(Connector c, String idTag);
 
     @Query("select count(r) from OcppRemoteStart r where r.connector = ?1 and r.ocppTag = ?2 and r.createDate > ?3")
-    long coundByConnectorAndOcppTagAfter(Connector c, String idTag, Date date);
+    long countByConnectorAndOcppTagAfter(Connector c, String idTag, Date date);
+
+    @Query("select count(r) from OcppRemoteStart r where r.connector in ?1 and r.ocppTag = ?2 and r.createDate > ?3")
+    long countByConnectorsAndOcppTagAfter(List<Connector> connectors, String idTag, Date date);
 }

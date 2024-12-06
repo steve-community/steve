@@ -39,6 +39,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import jakarta.validation.Valid;
+import org.springframework.web.bind.annotation.RequestParam;
 
 /**
  * @author fnkbsi
@@ -118,7 +119,7 @@ public class TaskRestController {
     )
     @GetMapping(value = "task")
     @ResponseBody
-    public ApiTaskInfo getTaskDetails(@Valid Integer taskId) {
+    public ApiTaskInfo getTaskDetails(@RequestParam(name="id") @Valid Integer taskId) {
         ApiTaskInfo taskInfo = new ApiTaskInfo(taskId, taskStore.get(taskId));
         return taskInfo;
     }

@@ -16,24 +16,33 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package de.rwth.idsg.steve;
 
+package de.rwth.idsg.steve.repository.dto;
+
+//import static de.rwth.idsg.steve.utils.StringUtils.joinByComma;
+//import static de.rwth.idsg.steve.utils.StringUtils.splitByComma;
+//import java.util.List;
+//import java.util.stream.Collectors;
+import static de.rwth.idsg.steve.utils.StringUtils.joinByComma;
+import static de.rwth.idsg.steve.utils.StringUtils.splitByComma;
+import java.util.List;
+import java.util.stream.Collectors;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 /**
- * @author Sevket Goekay <sevketgokay@gmail.com>
- * @since 22.01.2016
+ *
+ * @author fnkbsi
  */
 @RequiredArgsConstructor
-public enum NotificationFeature {
+public enum UserNotificationFeature {
 
     // Ocpp related
     //
-    OcppStationBooted(" a charging station sends a boot notification (Note: This activates notifications about failed connection attempts for unregistered JSON stations, as well)"),
+    //OcppStationBooted(" a charging station sends a boot notification (Note: This activates notifications about failed connection attempts for unregistered JSON stations, as well)"),
     OcppStationStatusFailure(" a connector gets faulted"),
-    OcppStationWebSocketConnected(" a JSON charging station connects"),
-    OcppStationWebSocketDisconnected(" a JSON charging station disconnects"),
+    //OcppStationWebSocketConnected(" a JSON charging station connects"),
+    //OcppStationWebSocketDisconnected(" a JSON charging station disconnects"),
     OcppTransactionStarted(" a charging station starts a transaction"),
     OcppStationStatusSuspendedEV(" a EV suspended charging"),
     OcppTransactionEnded(" a charging station ends a transaction");
@@ -42,12 +51,22 @@ public enum NotificationFeature {
     @Getter
     private final String text;
 
-    public static NotificationFeature fromName(String v) {
-        for (NotificationFeature c: NotificationFeature.values()) {
+    public static UserNotificationFeature fromName(String v) {
+        for (UserNotificationFeature c: UserNotificationFeature.values()) {
             if (c.name().equalsIgnoreCase(v)) {
                 return c;
             }
         }
         throw new IllegalArgumentException(v);
+    }
+
+    public static List<UserNotificationFeature> splitFeatures(String str) {
+        return splitByComma(str).stream()
+                                .map(UserNotificationFeature::fromName)
+                                .collect(Collectors.toList());
+    }
+
+    public static String joinFeatures(List<UserNotificationFeature> enablesFeatures) {
+        return joinByComma(enablesFeatures);
     }
 }

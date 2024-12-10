@@ -53,16 +53,17 @@ public interface ConnectorMeterValueRepository extends CrudRepository<ConnectorM
 
 	@Query("SELECT " +
 			"v.valueTimestamp, " +
-			"MAX(CASE WHEN v.measurand = 'Energy.Active.Import.Register' THEN v.value END), " +
+			"MAX(CASE WHEN COALESCE(v.measurand, 'Energy.Active.Import.Register') = 'Energy.Active.Import.Register' THEN v.value END), " +
 			"MAX(CASE WHEN v.measurand = 'Power.Active.Import' THEN v.value END), " +
-			"MAX(CASE WHEN v.measurand = 'Energy.Active.Import.Register' THEN v.unit END), " +
+			"MAX(CASE WHEN COALESCE(v.measurand, 'Energy.Active.Import.Register') = 'Energy.Active.Import.Register' THEN COALESCE(v.unit, 'wh') END), " +
 			"MAX(CASE WHEN v.measurand = 'Power.Active.Import' THEN v.unit END), " +
 			"MAX(CASE WHEN v.measurand = 'SoC' THEN v.value END) " +
 			"FROM ConnectorMeterValue v " +
 			"WHERE v.transaction=?1 " +
-			"  AND v.measurand in ('Energy.Active.Import.Register', 'Power.Active.Import', 'SoC') " +
-			"  AND v.phase IS NULL " +
+			"	AND (v.measurand IN ('Energy.Active.Import.Register', 'Power.Active.Import', 'SoC') OR v.measurand IS NULL) " +
+			"	AND v.phase IS NULL " +
 			"GROUP BY v.valueTimestamp " +
 			"ORDER BY v.valueTimestamp ")
 	List<Object[]> findEnergyAndPowerDataForTransaction(TransactionStart transactionStart);
+
 }

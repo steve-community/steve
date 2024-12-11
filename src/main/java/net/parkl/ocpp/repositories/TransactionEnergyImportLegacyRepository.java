@@ -18,9 +18,9 @@
  */
 package net.parkl.ocpp.repositories;
 
-import net.parkl.ocpp.entities.TransactionEnergyImport;
+import net.parkl.ocpp.entities.TransactionEnergyImportLegacy;
 import org.springframework.data.repository.CrudRepository;
 
-public interface TransactionEnergyImportLegacyRepository extends CrudRepository<TransactionEnergyImport, Integer> {
+public interface TransactionEnergyImportLegacyRepository extends CrudRepository<TransactionEnergyImportLegacy, Integer> {
 
 }

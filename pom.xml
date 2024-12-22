@@ -39,7 +39,7 @@
         <flyway.version>11.1.0</flyway.version>
         <cxf.version>4.1.0</cxf.version>
         <spring.version>6.2.0</spring.version>
-        <spring.security.version>6.4.1</spring.security.version>
+        <spring.security.version>6.4.2</spring.security.version>
         <mysql.jdbc.version>9.1.0</mysql.jdbc.version>
         <jetty.version>12.0.16</jetty.version>
         <lombok.version>1.18.36</lombok.version>

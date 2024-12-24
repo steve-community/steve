@@ -35,16 +35,16 @@
         <java.version>17</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-        <jooq.version>3.19.11</jooq.version>
-        <flyway.version>10.18.2</flyway.version>
-        <cxf.version>4.0.5</cxf.version>
-        <spring.version>6.1.11</spring.version>
-        <spring.security.version>6.3.3</spring.security.version>
-        <mysql.jdbc.version>9.0.0</mysql.jdbc.version>
-        <jetty.version>12.0.13</jetty.version>
-        <lombok.version>1.18.34</lombok.version>
-        <jackson.version>2.18.0</jackson.version>
-        <plugin.license-maven.version>4.5</plugin.license-maven.version>
+        <jooq.version>3.19.16</jooq.version>
+        <flyway.version>11.1.0</flyway.version>
+        <cxf.version>4.1.0</cxf.version>
+        <spring.version>6.2.0</spring.version>
+        <spring.security.version>6.4.2</spring.security.version>
+        <mysql.jdbc.version>9.1.0</mysql.jdbc.version>
+        <jetty.version>12.0.16</jetty.version>
+        <lombok.version>1.18.36</lombok.version>
+        <jackson.version>2.18.2</jackson.version>
+        <plugin.license-maven.version>4.6</plugin.license-maven.version>
 
         <!-- In Mysql: schema == database (http://dev.mysql.com/doc/refman/5.6/en/glossary.html#glos_schema) -->
         <jdbcUrl>jdbc:mysql://${db.ip}:${db.port}/${db.schema}?useSSL=true&amp;serverTimezone=UTC</jdbcUrl>
@@ -181,6 +181,13 @@
                 <configuration>
                     <source>${java.version}</source>
                     <target>${java.version}</target>
+                    <annotationProcessorPaths>
+                        <path>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok</artifactId>
+                            <version>${lombok.version}</version>
+                        </path>
+                    </annotationProcessorPaths>
                 </configuration>
             </plugin>
 
@@ -188,14 +195,14 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>3.5.0</version>
+                <version>3.5.2</version>
             </plugin>
 
             <!-- Static analysis and check style -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-pmd-plugin</artifactId>
-                <version>3.25.0</version>
+                <version>3.26.0</version>
                 <configuration>
                     <rulesets>
                         <ruleset>${project.basedir}/src/main/resources/maven-pmd-plugin-default.xml</ruleset>
@@ -205,7 +212,7 @@
             <plugin>
                 <groupId>com.github.spotbugs</groupId>
                 <artifactId>spotbugs-maven-plugin</artifactId>
-                <version>4.8.6.4</version>
+                <version>4.8.6.6</version>
                 <configuration>
                     <failOnError>false</failOnError>
                     <onlyAnalyze>de.rwth.idsg.steve.-</onlyAnalyze>
@@ -221,7 +228,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-checkstyle-plugin</artifactId>
-                <version>3.5.0</version>
+                <version>3.6.0</version>
                 <configuration>
                     <configLocation>${basedir}/src/main/resources/checkstyle.xml</configLocation>
                 </configuration>
@@ -268,7 +275,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-dependency-plugin</artifactId>
-                <version>3.8.0</version>
+                <version>3.8.1</version>
                 <executions>
                     <execution>
                         <id>copy-dependencies</id>
@@ -493,14 +500,14 @@
             <dependency>
                 <groupId>org.apache.logging.log4j</groupId>
                 <artifactId>log4j-bom</artifactId>
-                <version>2.24.0</version>
+                <version>2.24.3</version>
                 <scope>import</scope>
                 <type>pom</type>
             </dependency>
             <dependency>
                 <groupId>org.junit</groupId>
                 <artifactId>junit-bom</artifactId>
-                <version>5.11.2</version>
+                <version>5.11.4</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -518,7 +525,7 @@
         <dependency>
             <groupId>org.springdoc</groupId>
             <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
-            <version>2.6.0</version>
+            <version>2.7.0</version>
         </dependency>
 
         <dependency>
@@ -539,7 +546,7 @@
         <dependency>
             <groupId>org.jetbrains</groupId>
             <artifactId>annotations</artifactId>
-            <version>25.0.0</version>
+            <version>26.0.1</version>
             <scope>compile</scope>
         </dependency>
 
@@ -557,12 +564,12 @@
         <dependency>
             <groupId>org.hibernate.validator</groupId>
             <artifactId>hibernate-validator</artifactId>
-            <version>8.0.1.Final</version>
+            <version>8.0.2.Final</version>
         </dependency>
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
-            <version>33.3.1-jre</version>
+            <version>33.4.0-jre</version>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
@@ -588,7 +595,7 @@
         <dependency>
             <groupId>org.apache.httpcomponents.client5</groupId>
             <artifactId>httpclient5</artifactId>
-            <version>5.4</version>
+            <version>5.4.1</version>
         </dependency>
         <dependency>
             <groupId>jakarta.websocket</groupId>
@@ -747,7 +754,7 @@
         <dependency>
             <groupId>com.zaxxer</groupId>
             <artifactId>HikariCP</artifactId>
-            <version>5.1.0</version>
+            <version>6.2.1</version>
         </dependency>
         <dependency>
             <groupId>org.jooq</groupId>
@@ -780,13 +787,13 @@
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-junit-jupiter</artifactId>
-            <version>5.14.1</version>
+            <version>5.14.2</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>net.bytebuddy</groupId>
             <artifactId>byte-buddy</artifactId>
-            <version>1.15.1</version>
+            <version>1.15.11</version>
             <scope>test</scope>
         </dependency>
         <dependency>

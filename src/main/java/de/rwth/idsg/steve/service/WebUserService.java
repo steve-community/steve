@@ -26,14 +26,12 @@ import de.rwth.idsg.steve.SteveConfiguration;
 import de.rwth.idsg.steve.repository.WebUserRepository;
 import jooq.steve.db.tables.records.WebUserRecord;
 import lombok.RequiredArgsConstructor;
-import org.apache.commons.lang3.StringUtils;
 import org.jooq.JSON;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolderStrategy;
 import org.springframework.security.core.userdetails.User;
@@ -82,20 +80,14 @@ public class WebUserService implements UserDetailsManager {
             return;
         }
 
-        var headerVal = SteveConfiguration.CONFIG.getWebApi().getHeaderValue();
+        var user = User
+            .withUsername(SteveConfiguration.CONFIG.getAuth().getUserName())
+            .password(SteveConfiguration.CONFIG.getAuth().getEncodedPassword())
+            .disabled(false)
+            .authorities("ADMIN")
+            .build();
 
-        var encodedApiPassword = StringUtils.isEmpty(headerVal)
-            ? null
-            : SteveConfiguration.CONFIG.getAuth().getPasswordEncoder().encode(headerVal);
-
-        var user = new WebUserRecord()
-            .setUsername(SteveConfiguration.CONFIG.getAuth().getUserName())
-            .setPassword(SteveConfiguration.CONFIG.getAuth().getEncodedPassword())
-            .setApiPassword(encodedApiPassword)
-            .setEnabled(true)
-            .setAuthorities(toJson(AuthorityUtils.createAuthorityList("ADMIN")));
-
-        webUserRepository.createUser(user);
+        this.createUser(user);
     }
 
     @Override

@@ -19,6 +19,7 @@
 package de.rwth.idsg.steve.config;
 
 import de.rwth.idsg.steve.SteveConfiguration;
+import de.rwth.idsg.steve.SteveProdCondition;
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
@@ -33,6 +34,7 @@ import org.springdoc.webmvc.ui.SwaggerConfig;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 
@@ -50,6 +52,7 @@ import org.springframework.context.annotation.Import;
     SwaggerUiConfigProperties.class,
     SwaggerUiOAuthProperties.class,
     JacksonAutoConfiguration.class})
+@Conditional(SteveProdCondition.class)
 public class ApiDocsConfiguration {
 
     static {

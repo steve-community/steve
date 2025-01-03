@@ -32,18 +32,32 @@ import org.joda.time.DateTime;
  * @author Sevket Goekay <sevketgokay@gmail.com>
  *
  */
+@Schema(description = """
+        For active transactions, all 'stop'-prefixed fields would be null.
+        The energy consumed during the transaction can be calculated by subtracting the 'startValue' from the 'stopValue'.
+        The unit of the 'startValue' and 'stopValue' is watt-hours (Wh).
+        """)
 @Getter
 @Builder
 @ToString
 public final class Transaction {
 
+    @Schema(description = "PK of the transaction")
     private final int id;
+
+    @Schema(description = "Connector ID of the charge box at which the transaction took place")
     private final int connectorId;
+
+    @Schema(description = "PK of the charge box at which the transaction took place")
     private final int chargeBoxPk;
+
+    @Schema(description = "PK of the OCPP tag used in the transaction")
     private final int ocppTagPk;
 
+    @Schema(description = "The identifier of the charge box at which the transaction took place")
     private final String chargeBoxId;
 
+    @Schema(description = "The Ocpp Tag used in the transaction")
     private final String ocppIdTag;
 
     /**
@@ -53,8 +67,10 @@ public final class Transaction {
     @Schema(hidden = true)
     private final String startTimestampFormatted;
 
+    @Schema(description = "The meter value reading at the start of the transaction")
     private final String startValue;
 
+    @Schema(description = "The timestamp at which the transaction started")
     private final DateTime startTimestamp;
 
     /**
@@ -66,14 +82,18 @@ public final class Transaction {
     private final String stopTimestampFormatted;
 
     @Nullable
+    @Schema(description = "The meter value reading at the end of the transaction")
     private final String stopValue;
 
     @Nullable
+    @Schema(description = "The reason for the transaction being stopped")
     private final String stopReason; // new in OCPP 1.6
 
     @Nullable
+    @Schema(description = "The timestamp at which the transaction ended")
     private final DateTime stopTimestamp;
 
     @Nullable
+    @Schema(description = "The actor who stopped the transaction")
     private final TransactionStopEventActor stopEventActor;
 }

@@ -25,10 +25,17 @@ import de.rwth.idsg.steve.ocpp.ws.data.ActionResponsePair;
 import de.rwth.idsg.steve.ocpp.ws.data.CommunicationContext;
 import de.rwth.idsg.steve.ocpp.ws.data.FutureResponseContext;
 import de.rwth.idsg.steve.ocpp.ws.data.OcppJsonCall;
+import de.rwth.idsg.steve.ocpp.ws.ocpp12.Ocpp12TypeStore;
+import de.rwth.idsg.steve.ocpp.ws.ocpp12.Ocpp12WebSocketEndpoint;
+import de.rwth.idsg.steve.ocpp.ws.ocpp15.Ocpp15TypeStore;
+import de.rwth.idsg.steve.ocpp.ws.ocpp15.Ocpp15WebSocketEndpoint;
+import de.rwth.idsg.steve.ocpp.ws.ocpp16.Ocpp16TypeStore;
+import de.rwth.idsg.steve.ocpp.ws.ocpp16.Ocpp16WebSocketEndpoint;
 import de.rwth.idsg.steve.ocpp.ws.pipeline.OutgoingCallPipeline;
 import de.rwth.idsg.steve.repository.dto.ChargePointSelect;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
 
 import java.util.UUID;
 
@@ -37,31 +44,47 @@ import java.util.UUID;
  * @since 20.03.2015
  */
 @Slf4j
+@Service
 @RequiredArgsConstructor
-public class ChargePointServiceInvoker {
+public class ChargePointServiceJsonInvoker {
 
     private final OutgoingCallPipeline outgoingCallPipeline;
-    private final AbstractWebSocketEndpoint endpoint;
-    private final TypeStore typeStore;
+
+    private final Ocpp12WebSocketEndpoint ocpp12WebSocketEndpoint;
+    private final Ocpp15WebSocketEndpoint ocpp15WebSocketEndpoint;
+    private final Ocpp16WebSocketEndpoint ocpp16WebSocketEndpoint;
 
     /**
      * Just a wrapper to make try-catch block and exception handling stand out
      */
     public void runPipeline(ChargePointSelect cps, CommunicationTask task) {
-        String chargeBoxId = cps.getChargeBoxId();
         try {
-            run(chargeBoxId, task);
+            run(cps, task);
         } catch (Exception e) {
             log.error("Exception occurred", e);
             // Outgoing call failed due to technical problems. Pass the exception to handler to inform the user
-            task.defaultCallback().failed(chargeBoxId, e);
+            task.defaultCallback().failed(cps.getChargeBoxId(), e);
         }
     }
 
     /**
      * Actual processing
      */
-    private void run(String chargeBoxId, CommunicationTask task) {
+    private void run(ChargePointSelect cps, CommunicationTask task) {
+        var chargeBoxId = cps.getChargeBoxId();
+
+        var endpoint = switch (cps.getOcppProtocol().getVersion()) {
+            case V_12 -> ocpp12WebSocketEndpoint;
+            case V_15 -> ocpp15WebSocketEndpoint;
+            case V_16 -> ocpp16WebSocketEndpoint;
+        };
+
+        var typeStore = switch (cps.getOcppProtocol().getVersion()) {
+            case V_12 -> Ocpp12TypeStore.INSTANCE;
+            case V_15 -> Ocpp15TypeStore.INSTANCE;
+            case V_16 -> Ocpp16TypeStore.INSTANCE;
+        };
+
         RequestType request = task.getRequest();
 
         ActionResponsePair pair = typeStore.findActionResponse(request);

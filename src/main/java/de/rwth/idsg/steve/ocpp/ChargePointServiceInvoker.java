@@ -18,22 +18,32 @@
  */
 package de.rwth.idsg.steve.ocpp;
 
+import de.rwth.idsg.steve.ocpp.task.CancelReservationTask;
 import de.rwth.idsg.steve.ocpp.task.ChangeAvailabilityTask;
 import de.rwth.idsg.steve.ocpp.task.ChangeConfigurationTask;
 import de.rwth.idsg.steve.ocpp.task.ClearCacheTask;
+import de.rwth.idsg.steve.ocpp.task.ClearChargingProfileTask;
+import de.rwth.idsg.steve.ocpp.task.DataTransferTask;
+import de.rwth.idsg.steve.ocpp.task.GetCompositeScheduleTask;
+import de.rwth.idsg.steve.ocpp.task.GetConfigurationTask;
 import de.rwth.idsg.steve.ocpp.task.GetDiagnosticsTask;
+import de.rwth.idsg.steve.ocpp.task.GetLocalListVersionTask;
 import de.rwth.idsg.steve.ocpp.task.RemoteStartTransactionTask;
 import de.rwth.idsg.steve.ocpp.task.RemoteStopTransactionTask;
+import de.rwth.idsg.steve.ocpp.task.ReserveNowTask;
 import de.rwth.idsg.steve.ocpp.task.ResetTask;
+import de.rwth.idsg.steve.ocpp.task.SendLocalListTask;
+import de.rwth.idsg.steve.ocpp.task.SetChargingProfileTask;
+import de.rwth.idsg.steve.ocpp.task.TriggerMessageTask;
 import de.rwth.idsg.steve.ocpp.task.UnlockConnectorTask;
 import de.rwth.idsg.steve.ocpp.task.UpdateFirmwareTask;
 import de.rwth.idsg.steve.repository.dto.ChargePointSelect;
 
-/**
- * @author Sevket Goekay <sevketgokay@gmail.com>
- * @since 20.03.2015
- */
-public interface ChargePointService12_Invoker {
+public interface ChargePointServiceInvoker {
+
+    // -------------------------------------------------------------------------
+    // since Ocpp 1.2
+    // -------------------------------------------------------------------------
 
     void reset(ChargePointSelect cp, ResetTask task);
 
@@ -52,4 +62,32 @@ public interface ChargePointService12_Invoker {
     void remoteStartTransaction(ChargePointSelect cp, RemoteStartTransactionTask task);
 
     void remoteStopTransaction(ChargePointSelect cp, RemoteStopTransactionTask task);
+
+    // -------------------------------------------------------------------------
+    // since Ocpp 1.5
+    // -------------------------------------------------------------------------
+
+    void dataTransfer(ChargePointSelect cp, DataTransferTask task);
+
+    void getConfiguration(ChargePointSelect cp, GetConfigurationTask task);
+
+    void getLocalListVersion(ChargePointSelect cp, GetLocalListVersionTask task);
+
+    void sendLocalList(ChargePointSelect cp, SendLocalListTask task);
+
+    void reserveNow(ChargePointSelect cp, ReserveNowTask task);
+
+    void cancelReservation(ChargePointSelect cp, CancelReservationTask task);
+
+    // -------------------------------------------------------------------------
+    // since Ocpp 1.6
+    // -------------------------------------------------------------------------
+
+    void clearChargingProfile(ChargePointSelect cp, ClearChargingProfileTask task);
+
+    void setChargingProfile(ChargePointSelect cp, SetChargingProfileTask task);
+
+    void getCompositeSchedule(ChargePointSelect cp, GetCompositeScheduleTask task);
+
+    void triggerMessage(ChargePointSelect cp, TriggerMessageTask task);
 }

@@ -60,6 +60,10 @@ public class ApiDocsConfiguration {
         System.setProperty("springdoc.swagger-ui.path", "/manager/swagger-ui/index.html");
         // We only want REST APIs here (de.rwth.idsg.steve.web.api package)
         System.setProperty("springdoc.paths-to-match", "/api/**");
+        // Sort controllers alphabetically by their path
+        System.setProperty("springdoc.swagger-ui.tagsSorter", "alpha");
+        // Sort endpoints (within a controller) alphabetically by their path
+        System.setProperty("springdoc.swagger-ui.operationsSorter", "alpha");
     }
 
     @Bean

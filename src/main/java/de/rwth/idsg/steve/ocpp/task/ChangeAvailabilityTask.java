@@ -20,7 +20,6 @@ package de.rwth.idsg.steve.ocpp.task;
 
 import de.rwth.idsg.steve.ocpp.CommunicationTask;
 import de.rwth.idsg.steve.ocpp.OcppCallback;
-import de.rwth.idsg.steve.ocpp.OcppVersion;
 import de.rwth.idsg.steve.web.dto.ocpp.ChangeAvailabilityParams;
 
 import jakarta.xml.ws.AsyncHandler;
@@ -31,8 +30,8 @@ import jakarta.xml.ws.AsyncHandler;
  */
 public class ChangeAvailabilityTask extends CommunicationTask<ChangeAvailabilityParams, String> {
 
-    public ChangeAvailabilityTask(OcppVersion ocppVersion, ChangeAvailabilityParams params) {
-        super(ocppVersion, params);
+    public ChangeAvailabilityTask(ChangeAvailabilityParams params) {
+        super(params);
     }
 
     @Override

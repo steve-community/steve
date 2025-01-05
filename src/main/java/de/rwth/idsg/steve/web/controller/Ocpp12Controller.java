@@ -103,10 +103,6 @@ public class Ocpp12Controller {
         return "op12";
     }
 
-    protected OcppVersion getVersion() {
-        return OcppVersion.V_12;
-    }
-
     protected void setActiveUserIdTagList(Model model) {
         model.addAttribute("idTagList", ocppTagService.getActiveIdTags());
     }
@@ -196,7 +192,7 @@ public class Ocpp12Controller {
             setCommonAttributes(model);
             return getPrefix() + CHANGE_AVAIL_PATH;
         }
-        return REDIRECT_TASKS_PATH + chargePointServiceClient.changeAvailability(getVersion(), params);
+        return REDIRECT_TASKS_PATH + chargePointServiceClient.changeAvailability(params);
     }
 
     @RequestMapping(value = CHANGE_CONF_PATH, method = RequestMethod.POST)
@@ -207,7 +203,7 @@ public class Ocpp12Controller {
             model.addAttribute("ocppConfKeys", getConfigurationKeys(RW));
             return getPrefix() + CHANGE_CONF_PATH;
         }
-        return REDIRECT_TASKS_PATH + chargePointServiceClient.changeConfiguration(getVersion(), params);
+        return REDIRECT_TASKS_PATH + chargePointServiceClient.changeConfiguration(params);
     }
 
     @RequestMapping(value = CLEAR_CACHE_PATH, method = RequestMethod.POST)
@@ -217,7 +213,7 @@ public class Ocpp12Controller {
             setCommonAttributes(model);
             return getPrefix() + CLEAR_CACHE_PATH;
         }
-        return REDIRECT_TASKS_PATH + chargePointServiceClient.clearCache(getVersion(), params);
+        return REDIRECT_TASKS_PATH + chargePointServiceClient.clearCache(params);
     }
 
     @RequestMapping(value = GET_DIAG_PATH, method = RequestMethod.POST)
@@ -227,7 +223,7 @@ public class Ocpp12Controller {
             setCommonAttributes(model);
             return getPrefix() + GET_DIAG_PATH;
         }
-        return REDIRECT_TASKS_PATH + chargePointServiceClient.getDiagnostics(getVersion(), params);
+        return REDIRECT_TASKS_PATH + chargePointServiceClient.getDiagnostics(params);
     }
 
     @RequestMapping(value = REMOTE_START_TX_PATH, method = RequestMethod.POST)
@@ -238,7 +234,7 @@ public class Ocpp12Controller {
             setActiveUserIdTagList(model);
             return getPrefix() + REMOTE_START_TX_PATH;
         }
-        return REDIRECT_TASKS_PATH + chargePointServiceClient.remoteStartTransaction(getVersion(), params);
+        return REDIRECT_TASKS_PATH + chargePointServiceClient.remoteStartTransaction(params);
     }
 
     @RequestMapping(value = REMOTE_STOP_TX_PATH, method = RequestMethod.POST)
@@ -248,7 +244,7 @@ public class Ocpp12Controller {
             setCommonAttributesForTx(model);
             return getPrefix() + REMOTE_STOP_TX_PATH;
         }
-        return REDIRECT_TASKS_PATH + chargePointServiceClient.remoteStopTransaction(getVersion(), params);
+        return REDIRECT_TASKS_PATH + chargePointServiceClient.remoteStopTransaction(params);
     }
 
     @RequestMapping(value = RESET_PATH, method = RequestMethod.POST)
@@ -258,7 +254,7 @@ public class Ocpp12Controller {
             setCommonAttributes(model);
             return getPrefix() + RESET_PATH;
         }
-        return REDIRECT_TASKS_PATH + chargePointServiceClient.reset(getVersion(), params);
+        return REDIRECT_TASKS_PATH + chargePointServiceClient.reset(params);
     }
 
     @RequestMapping(value = UNLOCK_CON_PATH, method = RequestMethod.POST)
@@ -268,7 +264,7 @@ public class Ocpp12Controller {
             setCommonAttributes(model);
             return getPrefix() + UNLOCK_CON_PATH;
         }
-        return REDIRECT_TASKS_PATH + chargePointServiceClient.unlockConnector(getVersion(), params);
+        return REDIRECT_TASKS_PATH + chargePointServiceClient.unlockConnector(params);
     }
 
     @RequestMapping(value = UPDATE_FIRM_PATH, method = RequestMethod.POST)
@@ -278,6 +274,6 @@ public class Ocpp12Controller {
             setCommonAttributes(model);
             return getPrefix() + UPDATE_FIRM_PATH;
         }
-        return REDIRECT_TASKS_PATH + chargePointServiceClient.updateFirmware(getVersion(), params);
+        return REDIRECT_TASKS_PATH + chargePointServiceClient.updateFirmware(params);
     }
 }

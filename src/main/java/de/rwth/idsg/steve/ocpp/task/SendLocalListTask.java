@@ -20,13 +20,13 @@ package de.rwth.idsg.steve.ocpp.task;
 
 import de.rwth.idsg.steve.ocpp.Ocpp15AndAboveTask;
 import de.rwth.idsg.steve.ocpp.OcppCallback;
-import de.rwth.idsg.steve.ocpp.OcppVersion;
 import de.rwth.idsg.steve.service.OcppTagService;
 import de.rwth.idsg.steve.web.dto.ocpp.SendLocalListParams;
 import de.rwth.idsg.steve.web.dto.ocpp.SendLocalListUpdateType;
 import ocpp.cp._2015._10.AuthorizationData;
 
 import jakarta.xml.ws.AsyncHandler;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -40,8 +40,8 @@ public class SendLocalListTask extends Ocpp15AndAboveTask<SendLocalListParams, S
 
     private final ocpp.cp._2015._10.SendLocalListRequest request;
 
-    public SendLocalListTask(OcppVersion ocppVersion, SendLocalListParams params, OcppTagService ocppTagService) {
-        super(ocppVersion, params);
+    public SendLocalListTask(SendLocalListParams params, OcppTagService ocppTagService) {
+        super(params);
         this.request = createOcpp16Request(ocppTagService);
     }
 

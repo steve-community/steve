@@ -112,11 +112,6 @@ public class Ocpp16Controller extends Ocpp15Controller {
         return "op16";
     }
 
-    @Override
-    protected OcppVersion getVersion() {
-        return OcppVersion.V_16;
-    }
-
     // -------------------------------------------------------------------------
     // Old Http methods with changed logic
     // -------------------------------------------------------------------------
@@ -145,7 +140,7 @@ public class Ocpp16Controller extends Ocpp15Controller {
             model.addAttribute("ocppConfKeys", getConfigurationKeys(R));
             return getPrefix() + GET_CONF_PATH;
         }
-        return REDIRECT_TASKS_PATH + chargePointServiceClient.getConfiguration(getVersion(), params);
+        return REDIRECT_TASKS_PATH + chargePointServiceClient.getConfiguration(params);
     }
 
     // -------------------------------------------------------------------------
@@ -193,7 +188,7 @@ public class Ocpp16Controller extends Ocpp15Controller {
             setCommonAttributes(model);
             return getPrefix() + TRIGGER_MESSAGE_PATH;
         }
-        return REDIRECT_TASKS_PATH + chargePointServiceClient.triggerMessage(getVersion(), params);
+        return REDIRECT_TASKS_PATH + chargePointServiceClient.triggerMessage(params);
     }
 
     @RequestMapping(value = SET_CHARGING_PATH, method = RequestMethod.POST)
@@ -203,7 +198,7 @@ public class Ocpp16Controller extends Ocpp15Controller {
             setCommonAttributes(model);
             return getPrefix() + SET_CHARGING_PATH;
         }
-        return REDIRECT_TASKS_PATH + chargePointServiceClient.setChargingProfile(getVersion(), params);
+        return REDIRECT_TASKS_PATH + chargePointServiceClient.setChargingProfile(params);
     }
 
     @RequestMapping(value = CLEAR_CHARGING_PATH, method = RequestMethod.POST)
@@ -213,7 +208,7 @@ public class Ocpp16Controller extends Ocpp15Controller {
             setCommonAttributes(model);
             return getPrefix() + CLEAR_CHARGING_PATH;
         }
-        return REDIRECT_TASKS_PATH + chargePointServiceClient.clearChargingProfile(getVersion(), params);
+        return REDIRECT_TASKS_PATH + chargePointServiceClient.clearChargingProfile(params);
     }
 
     @RequestMapping(value = GET_COMPOSITE_PATH, method = RequestMethod.POST)
@@ -223,6 +218,6 @@ public class Ocpp16Controller extends Ocpp15Controller {
             setCommonAttributes(model);
             return getPrefix() + GET_COMPOSITE_PATH;
         }
-        return REDIRECT_TASKS_PATH + chargePointServiceClient.getCompositeSchedule(getVersion(), params);
+        return REDIRECT_TASKS_PATH + chargePointServiceClient.getCompositeSchedule(params);
     }
 }

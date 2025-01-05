@@ -85,7 +85,11 @@ public class ChargePointServiceJsonInvoker {
             case V_16 -> Ocpp16TypeStore.INSTANCE;
         };
 
-        RequestType request = task.getRequest();
+        RequestType request = switch (cps.getOcppProtocol().getVersion()) {
+            case V_12 -> task.getOcpp12Request();
+            case V_15 -> task.getOcpp15Request();
+            case V_16 -> task.getOcpp16Request();
+        };
 
         ActionResponsePair pair = typeStore.findActionResponse(request);
         if (pair == null) {

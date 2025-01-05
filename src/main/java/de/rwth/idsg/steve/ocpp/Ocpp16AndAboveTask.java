@@ -30,8 +30,8 @@ import jakarta.xml.ws.AsyncHandler;
  */
 public abstract class Ocpp16AndAboveTask<S extends ChargePointSelection, RESPONSE> extends Ocpp15AndAboveTask<S, RESPONSE> {
 
-    public Ocpp16AndAboveTask(OcppVersion ocppVersion, S params) {
-        super(ocppVersion, params);
+    public Ocpp16AndAboveTask(S params) {
+        super(params);
     }
 
     @Deprecated

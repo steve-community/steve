@@ -48,12 +48,12 @@ public abstract class CommunicationTask<S extends ChargePointSelection, RESPONSE
 
     private final Logger log = LoggerFactory.getLogger(getClass());
 
-    private final OcppVersion ocppVersion;
     private final String operationName;
     private final TaskOrigin origin;
     private final String caller;
     protected final S params;
 
+    private final Map<String, OcppVersion> versionMap;
     private final Map<String, RequestResult> resultMap;
     private final int resultSize;
 
@@ -69,25 +69,26 @@ public abstract class CommunicationTask<S extends ChargePointSelection, RESPONSE
     // The default initial capacity is 10. We probably won't need that much.
     private final ArrayList<OcppCallback<RESPONSE>> callbackList = new ArrayList<>(2);
 
-    public CommunicationTask(OcppVersion ocppVersion, S params) {
-        this(ocppVersion, params, TaskOrigin.INTERNAL, "SteVe");
+    public CommunicationTask(S params) {
+        this(params, TaskOrigin.INTERNAL, "SteVe");
     }
 
     /**
      * Do not expose the constructor, make it package-private
      */
-    CommunicationTask(OcppVersion ocppVersion, S params, TaskOrigin origin, String caller) {
+    CommunicationTask(S params, TaskOrigin origin, String caller) {
         List<ChargePointSelect> cpsList = params.getChargePointSelectList();
 
-        this.ocppVersion = ocppVersion;
         this.resultSize = cpsList.size();
         this.origin = origin;
         this.caller = caller;
         this.params = params;
 
         resultMap = new HashMap<>(resultSize);
+        versionMap = new HashMap<>(resultSize);
         for (ChargePointSelect cps : cpsList) {
             resultMap.put(cps.getChargeBoxId(), new RequestResult());
+            versionMap.put(cps.getChargeBoxId(), cps.getOcppProtocol().getVersion());
         }
 
         callbackList.add(defaultCallback());
@@ -144,16 +145,8 @@ public abstract class CommunicationTask<S extends ChargePointSelection, RESPONSE
         }
     }
 
-    public RequestType getRequest() {
-        return switch (ocppVersion) {
-            case V_12 -> getOcpp12Request();
-            case V_15 -> getOcpp15Request();
-            case V_16 -> getOcpp16Request();
-        };
-    }
-
     public <T extends ResponseType> AsyncHandler<T> getHandler(String chargeBoxId) {
-        return switch (ocppVersion) {
+        return switch (versionMap.get(chargeBoxId)) {
             case V_12 -> getOcpp12Handler(chargeBoxId);
             case V_15 -> getOcpp15Handler(chargeBoxId);
             case V_16 -> getOcpp16Handler(chargeBoxId);

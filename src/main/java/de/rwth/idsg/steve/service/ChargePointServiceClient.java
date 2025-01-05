@@ -99,9 +99,9 @@ public class ChargePointServiceClient {
     // -------------------------------------------------------------------------
 
     @SafeVarargs
-    public final int changeAvailability(OcppVersion ocppVersion, ChangeAvailabilityParams params,
+    public final int changeAvailability(ChangeAvailabilityParams params,
                                         OcppCallback<String>... callbacks) {
-        ChangeAvailabilityTask task = new ChangeAvailabilityTask(ocppVersion, params);
+        ChangeAvailabilityTask task = new ChangeAvailabilityTask(params);
 
         for (var callback : callbacks) {
             task.addCallback(callback);
@@ -115,9 +115,9 @@ public class ChargePointServiceClient {
     }
 
     @SafeVarargs
-    public final int changeConfiguration(OcppVersion ocppVersion, ChangeConfigurationParams params,
+    public final int changeConfiguration(ChangeConfigurationParams params,
                                          OcppCallback<String>... callbacks) {
-        ChangeConfigurationTask task = new ChangeConfigurationTask(ocppVersion, params);
+        ChangeConfigurationTask task = new ChangeConfigurationTask(params);
 
         for (var callback : callbacks) {
             task.addCallback(callback);
@@ -131,9 +131,9 @@ public class ChargePointServiceClient {
     }
 
     @SafeVarargs
-    public final int clearCache(OcppVersion ocppVersion, MultipleChargePointSelect params,
+    public final int clearCache(MultipleChargePointSelect params,
                                 OcppCallback<String>... callbacks) {
-        ClearCacheTask task = new ClearCacheTask(ocppVersion, params);
+        ClearCacheTask task = new ClearCacheTask(params);
 
         for (var callback : callbacks) {
             task.addCallback(callback);
@@ -147,9 +147,9 @@ public class ChargePointServiceClient {
     }
 
     @SafeVarargs
-    public final int getDiagnostics(OcppVersion ocppVersion, GetDiagnosticsParams params,
+    public final int getDiagnostics(GetDiagnosticsParams params,
                                     OcppCallback<String>... callbacks) {
-        GetDiagnosticsTask task = new GetDiagnosticsTask(ocppVersion, params);
+        GetDiagnosticsTask task = new GetDiagnosticsTask(params);
 
         for (var callback : callbacks) {
             task.addCallback(callback);
@@ -163,9 +163,9 @@ public class ChargePointServiceClient {
     }
 
     @SafeVarargs
-    public final int reset(OcppVersion ocppVersion, ResetParams params,
+    public final int reset(ResetParams params,
                            OcppCallback<String>... callbacks) {
-        ResetTask task = new ResetTask(ocppVersion, params);
+        ResetTask task = new ResetTask(params);
 
         for (var callback : callbacks) {
             task.addCallback(callback);
@@ -179,9 +179,9 @@ public class ChargePointServiceClient {
     }
 
     @SafeVarargs
-    public final int updateFirmware(OcppVersion ocppVersion, UpdateFirmwareParams params,
+    public final int updateFirmware(UpdateFirmwareParams params,
                                     OcppCallback<String>... callbacks) {
-        UpdateFirmwareTask task = new UpdateFirmwareTask(ocppVersion, params);
+        UpdateFirmwareTask task = new UpdateFirmwareTask(params);
 
         for (var callback : callbacks) {
             task.addCallback(callback);
@@ -199,9 +199,9 @@ public class ChargePointServiceClient {
     // -------------------------------------------------------------------------
 
     @SafeVarargs
-    public final int remoteStartTransaction(OcppVersion ocppVersion, RemoteStartTransactionParams params,
+    public final int remoteStartTransaction(RemoteStartTransactionParams params,
                                             OcppCallback<String>... callbacks) {
-        RemoteStartTransactionTask task = new RemoteStartTransactionTask(ocppVersion, params);
+        RemoteStartTransactionTask task = new RemoteStartTransactionTask(params);
 
         for (var callback : callbacks) {
             task.addCallback(callback);
@@ -215,9 +215,9 @@ public class ChargePointServiceClient {
     }
 
     @SafeVarargs
-    public final int remoteStopTransaction(OcppVersion ocppVersion, RemoteStopTransactionParams params,
+    public final int remoteStopTransaction(RemoteStopTransactionParams params,
                                            OcppCallback<String>... callbacks) {
-        RemoteStopTransactionTask task = new RemoteStopTransactionTask(ocppVersion, params);
+        RemoteStopTransactionTask task = new RemoteStopTransactionTask(params);
 
         for (var callback : callbacks) {
             task.addCallback(callback);
@@ -231,9 +231,9 @@ public class ChargePointServiceClient {
     }
 
     @SafeVarargs
-    public final int unlockConnector(OcppVersion ocppVersion, UnlockConnectorParams params,
+    public final int unlockConnector(UnlockConnectorParams params,
                                      OcppCallback<String>... callbacks) {
-        UnlockConnectorTask task = new UnlockConnectorTask(ocppVersion, params);
+        UnlockConnectorTask task = new UnlockConnectorTask(params);
 
         for (var callback : callbacks) {
             task.addCallback(callback);
@@ -251,9 +251,9 @@ public class ChargePointServiceClient {
     // -------------------------------------------------------------------------
 
     @SafeVarargs
-    public final int dataTransfer(OcppVersion ocppVersion, DataTransferParams params,
+    public final int dataTransfer(DataTransferParams params,
                                   OcppCallback<DataTransferTask.ResponseWrapper>... callbacks) {
-        DataTransferTask task = new DataTransferTask(ocppVersion, params);
+        DataTransferTask task = new DataTransferTask(params);
 
         for (var callback : callbacks) {
             task.addCallback(callback);
@@ -267,9 +267,9 @@ public class ChargePointServiceClient {
     }
 
     @SafeVarargs
-    public final int getConfiguration(OcppVersion ocppVersion, GetConfigurationParams params,
+    public final int getConfiguration(GetConfigurationParams params,
                                       OcppCallback<GetConfigurationTask.ResponseWrapper>... callbacks) {
-        GetConfigurationTask task = new GetConfigurationTask(ocppVersion, params);
+        GetConfigurationTask task = new GetConfigurationTask(params);
 
         for (var callback : callbacks) {
             task.addCallback(callback);
@@ -283,9 +283,9 @@ public class ChargePointServiceClient {
     }
 
     @SafeVarargs
-    public final int getLocalListVersion(OcppVersion ocppVersion, MultipleChargePointSelect params,
+    public final int getLocalListVersion(MultipleChargePointSelect params,
                                          OcppCallback<String>... callbacks) {
-        GetLocalListVersionTask task = new GetLocalListVersionTask(ocppVersion, params);
+        GetLocalListVersionTask task = new GetLocalListVersionTask(params);
 
         for (var callback : callbacks) {
             task.addCallback(callback);
@@ -299,9 +299,9 @@ public class ChargePointServiceClient {
     }
 
     @SafeVarargs
-    public final int sendLocalList(OcppVersion ocppVersion, SendLocalListParams params,
+    public final int sendLocalList(SendLocalListParams params,
                                    OcppCallback<String>... callbacks) {
-        SendLocalListTask task = new SendLocalListTask(ocppVersion, params, ocppTagService);
+        SendLocalListTask task = new SendLocalListTask(params, ocppTagService);
 
         for (var callback : callbacks) {
             task.addCallback(callback);
@@ -319,7 +319,7 @@ public class ChargePointServiceClient {
     // -------------------------------------------------------------------------
 
     @SafeVarargs
-    public final int reserveNow(OcppVersion ocppVersion, ReserveNowParams params,
+    public final int reserveNow(ReserveNowParams params,
                                 OcppCallback<String>... callbacks) {
         List<ChargePointSelect> list = params.getChargePointSelectList();
 
@@ -335,7 +335,7 @@ public class ChargePointServiceClient {
         String parentIdTag = ocppTagService.getParentIdtag(params.getIdTag());
 
         EnhancedReserveNowParams enhancedParams = new EnhancedReserveNowParams(params, reservationId, parentIdTag);
-        ReserveNowTask task = new ReserveNowTask(ocppVersion, enhancedParams, reservationRepository);
+        ReserveNowTask task = new ReserveNowTask(enhancedParams, reservationRepository);
 
         for (var callback : callbacks) {
             task.addCallback(callback);
@@ -349,9 +349,9 @@ public class ChargePointServiceClient {
     }
 
     @SafeVarargs
-    public final int cancelReservation(OcppVersion ocppVersion, CancelReservationParams params,
+    public final int cancelReservation(CancelReservationParams params,
                                        OcppCallback<String>... callbacks) {
-        CancelReservationTask task = new CancelReservationTask(ocppVersion, params, reservationRepository);
+        CancelReservationTask task = new CancelReservationTask(params, reservationRepository);
 
         for (var callback : callbacks) {
             task.addCallback(callback);
@@ -369,9 +369,9 @@ public class ChargePointServiceClient {
     // -------------------------------------------------------------------------
 
     @SafeVarargs
-    public final int triggerMessage(OcppVersion ocppVersion, TriggerMessageParams params,
+    public final int triggerMessage(TriggerMessageParams params,
                                     OcppCallback<String>... callbacks) {
-        TriggerMessageTask task = new TriggerMessageTask(ocppVersion, params);
+        TriggerMessageTask task = new TriggerMessageTask(params);
 
         for (var callback : callbacks) {
             task.addCallback(callback);
@@ -385,14 +385,14 @@ public class ChargePointServiceClient {
     }
 
     @SafeVarargs
-    public final int setChargingProfile(OcppVersion ocppVersion, SetChargingProfileParams params,
+    public final int setChargingProfile(SetChargingProfileParams params,
                                         OcppCallback<String>... callbacks) {
         ChargingProfile.Details details = chargingProfileRepository.getDetails(params.getChargingProfilePk());
 
         checkAdditionalConstraints(params, details);
 
         EnhancedSetChargingProfileParams enhancedParams = new EnhancedSetChargingProfileParams(params, details);
-        SetChargingProfileTask task = new SetChargingProfileTask(ocppVersion, enhancedParams, chargingProfileRepository);
+        SetChargingProfileTask task = new SetChargingProfileTask(enhancedParams, chargingProfileRepository);
 
         for (var callback : callbacks) {
             task.addCallback(callback);
@@ -406,9 +406,9 @@ public class ChargePointServiceClient {
     }
 
     @SafeVarargs
-    public final int clearChargingProfile(OcppVersion ocppVersion, ClearChargingProfileParams params,
+    public final int clearChargingProfile(ClearChargingProfileParams params,
                                           OcppCallback<String>... callbacks) {
-        ClearChargingProfileTask task = new ClearChargingProfileTask(ocppVersion, params, chargingProfileRepository);
+        ClearChargingProfileTask task = new ClearChargingProfileTask(params, chargingProfileRepository);
 
         for (var callback : callbacks) {
             task.addCallback(callback);
@@ -422,9 +422,9 @@ public class ChargePointServiceClient {
     }
 
     @SafeVarargs
-    public final int getCompositeSchedule(OcppVersion ocppVersion, GetCompositeScheduleParams params,
+    public final int getCompositeSchedule(GetCompositeScheduleParams params,
                                           OcppCallback<GetCompositeScheduleResponse>... callbacks) {
-        GetCompositeScheduleTask task = new GetCompositeScheduleTask(ocppVersion, params);
+        GetCompositeScheduleTask task = new GetCompositeScheduleTask(params);
 
         for (var callback : callbacks) {
             task.addCallback(callback);

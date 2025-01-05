@@ -85,11 +85,6 @@ public class Ocpp15Controller extends Ocpp12Controller {
         return "op15";
     }
 
-    @Override
-    protected OcppVersion getVersion() {
-        return OcppVersion.V_15;
-    }
-
     private void setAllUserIdTagList(Model model) {
         model.addAttribute("idTagList", ocppTagService.getIdTags());
     }
@@ -155,7 +150,7 @@ public class Ocpp15Controller extends Ocpp12Controller {
             setActiveUserIdTagList(model);
             return getPrefix() + RESERVE_PATH;
         }
-        return REDIRECT_TASKS_PATH + chargePointServiceClient.reserveNow(getVersion(), params);
+        return REDIRECT_TASKS_PATH + chargePointServiceClient.reserveNow(params);
     }
 
     @RequestMapping(value = CANCEL_RESERV_PATH, method = RequestMethod.POST)
@@ -165,7 +160,7 @@ public class Ocpp15Controller extends Ocpp12Controller {
             setCommonAttributes(model);
             return getPrefix() + CANCEL_RESERV_PATH;
         }
-        return REDIRECT_TASKS_PATH + chargePointServiceClient.cancelReservation(getVersion(), params);
+        return REDIRECT_TASKS_PATH + chargePointServiceClient.cancelReservation(params);
     }
 
     @RequestMapping(value = DATA_TRANSFER_PATH, method = RequestMethod.POST)
@@ -175,7 +170,7 @@ public class Ocpp15Controller extends Ocpp12Controller {
             setCommonAttributes(model);
             return getPrefix() + DATA_TRANSFER_PATH;
         }
-        return REDIRECT_TASKS_PATH + chargePointServiceClient.dataTransfer(getVersion(), params);
+        return REDIRECT_TASKS_PATH + chargePointServiceClient.dataTransfer(params);
     }
 
     @RequestMapping(value = GET_CONF_PATH, method = RequestMethod.POST)
@@ -186,7 +181,7 @@ public class Ocpp15Controller extends Ocpp12Controller {
             model.addAttribute("ocppConfKeys", getConfigurationKeys(RW));
             return getPrefix() + GET_CONF_PATH;
         }
-        return REDIRECT_TASKS_PATH + chargePointServiceClient.getConfiguration(getVersion(), params);
+        return REDIRECT_TASKS_PATH + chargePointServiceClient.getConfiguration(params);
     }
 
     @RequestMapping(value = GET_LIST_VERSION_PATH, method = RequestMethod.POST)
@@ -196,7 +191,7 @@ public class Ocpp15Controller extends Ocpp12Controller {
             setCommonAttributes(model);
             return getPrefix() + GET_LIST_VERSION_PATH;
         }
-        return REDIRECT_TASKS_PATH + chargePointServiceClient.getLocalListVersion(getVersion(), params);
+        return REDIRECT_TASKS_PATH + chargePointServiceClient.getLocalListVersion(params);
     }
 
     @RequestMapping(value = SEND_LIST_PATH, method = RequestMethod.POST)
@@ -207,6 +202,6 @@ public class Ocpp15Controller extends Ocpp12Controller {
             setAllUserIdTagList(model);
             return getPrefix() + SEND_LIST_PATH;
         }
-        return REDIRECT_TASKS_PATH + chargePointServiceClient.sendLocalList(getVersion(), params);
+        return REDIRECT_TASKS_PATH + chargePointServiceClient.sendLocalList(params);
     }
 }

@@ -39,6 +39,10 @@ import de.rwth.idsg.steve.ocpp.task.UnlockConnectorTask;
 import de.rwth.idsg.steve.ocpp.task.UpdateFirmwareTask;
 import de.rwth.idsg.steve.repository.dto.ChargePointSelect;
 
+/**
+ * @author Sevket Goekay <sevketgokay@gmail.com>
+ * @since 05.01.2025
+ */
 public interface ChargePointServiceInvoker {
 
     // -------------------------------------------------------------------------

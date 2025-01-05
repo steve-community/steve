@@ -145,21 +145,19 @@ public abstract class CommunicationTask<S extends ChargePointSelection, RESPONSE
     }
 
     public RequestType getRequest() {
-        switch (ocppVersion) {
-            case V_12: return getOcpp12Request();
-            case V_15: return getOcpp15Request();
-            case V_16: return getOcpp16Request();
-            default: throw new RuntimeException("Request type not found");
-        }
+        return switch (ocppVersion) {
+            case V_12 -> getOcpp12Request();
+            case V_15 -> getOcpp15Request();
+            case V_16 -> getOcpp16Request();
+        };
     }
 
     public <T extends ResponseType> AsyncHandler<T> getHandler(String chargeBoxId) {
-        switch (ocppVersion) {
-            case V_12: return getOcpp12Handler(chargeBoxId);
-            case V_15: return getOcpp15Handler(chargeBoxId);
-            case V_16: return getOcpp16Handler(chargeBoxId);
-            default: throw new RuntimeException("ResponseType handler not found");
-        }
+        return switch (ocppVersion) {
+            case V_12 -> getOcpp12Handler(chargeBoxId);
+            case V_15 -> getOcpp15Handler(chargeBoxId);
+            case V_16 -> getOcpp16Handler(chargeBoxId);
+        };
     }
 
     public abstract OcppCallback<RESPONSE> defaultCallback();

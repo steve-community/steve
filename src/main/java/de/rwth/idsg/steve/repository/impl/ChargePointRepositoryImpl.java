@@ -100,7 +100,7 @@ public class ChargePointRepositoryImpl implements ChargePointRepository {
                   .and(CHARGE_BOX.REGISTRATION_STATUS.in(inStatusFilter))
                   .and(chargeBoxIdCondition)
                   .fetch()
-                  .map(r -> new ChargePointSelect(protocol.getTransport(), r.value1(), r.value2()));
+                  .map(r -> new ChargePointSelect(protocol, r.value1(), r.value2()));
     }
 
     @Override

@@ -20,7 +20,6 @@ package de.rwth.idsg.steve.ocpp.task;
 
 import de.rwth.idsg.steve.ocpp.Ocpp15AndAboveTask;
 import de.rwth.idsg.steve.ocpp.OcppCallback;
-import de.rwth.idsg.steve.ocpp.OcppVersion;
 import de.rwth.idsg.steve.ocpp.ws.data.OcppJsonError;
 import de.rwth.idsg.steve.repository.ReservationRepository;
 import de.rwth.idsg.steve.service.dto.EnhancedReserveNowParams;
@@ -35,9 +34,9 @@ public class ReserveNowTask extends Ocpp15AndAboveTask<EnhancedReserveNowParams,
 
     private final ReservationRepository reservationRepository;
 
-    public ReserveNowTask(OcppVersion ocppVersion, EnhancedReserveNowParams params,
+    public ReserveNowTask(EnhancedReserveNowParams params,
                           ReservationRepository reservationRepository) {
-        super(ocppVersion, params);
+        super(params);
         this.reservationRepository = reservationRepository;
     }
 

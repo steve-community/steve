@@ -25,7 +25,7 @@
 		<td>
 			<form:select path="chargePointSelectList" size="5" multiple="false">
 				<c:forEach items="${cpList}" var="cp">
-					<form:option value="${cp.ocppTransport};${cp.chargeBoxId};${cp.endpointAddress}" label="${cp.chargeBoxId}"/>
+					<form:option value="${cp.ocppProtocol};${cp.chargeBoxId};${cp.endpointAddress}" label="${cp.chargeBoxId}"/>
 				</c:forEach>
 			</form:select>
 		</td>

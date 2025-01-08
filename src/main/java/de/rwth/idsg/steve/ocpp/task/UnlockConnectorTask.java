@@ -20,7 +20,6 @@ package de.rwth.idsg.steve.ocpp.task;
 
 import de.rwth.idsg.steve.ocpp.CommunicationTask;
 import de.rwth.idsg.steve.ocpp.OcppCallback;
-import de.rwth.idsg.steve.ocpp.OcppVersion;
 import de.rwth.idsg.steve.web.dto.ocpp.UnlockConnectorParams;
 
 import jakarta.xml.ws.AsyncHandler;
@@ -31,8 +30,8 @@ import jakarta.xml.ws.AsyncHandler;
  */
 public class UnlockConnectorTask extends CommunicationTask<UnlockConnectorParams, String> {
 
-    public UnlockConnectorTask(OcppVersion ocppVersion, UnlockConnectorParams params) {
-        super(ocppVersion, params);
+    public UnlockConnectorTask(UnlockConnectorParams params) {
+        super(params);
     }
 
     @Override

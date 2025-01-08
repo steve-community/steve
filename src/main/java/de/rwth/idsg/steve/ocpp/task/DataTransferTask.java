@@ -20,7 +20,6 @@ package de.rwth.idsg.steve.ocpp.task;
 
 import de.rwth.idsg.steve.ocpp.Ocpp15AndAboveTask;
 import de.rwth.idsg.steve.ocpp.OcppCallback;
-import de.rwth.idsg.steve.ocpp.OcppVersion;
 import de.rwth.idsg.steve.web.dto.ocpp.DataTransferParams;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -34,8 +33,8 @@ import jakarta.xml.ws.AsyncHandler;
  */
 public class DataTransferTask extends Ocpp15AndAboveTask<DataTransferParams, DataTransferTask.ResponseWrapper> {
 
-    public DataTransferTask(OcppVersion ocppVersion, DataTransferParams params) {
-        super(ocppVersion, params);
+    public DataTransferTask(DataTransferParams params) {
+        super(params);
     }
 
     @Override

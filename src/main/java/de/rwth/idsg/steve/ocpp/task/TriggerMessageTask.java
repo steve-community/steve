@@ -20,7 +20,6 @@ package de.rwth.idsg.steve.ocpp.task;
 
 import de.rwth.idsg.steve.ocpp.Ocpp16AndAboveTask;
 import de.rwth.idsg.steve.ocpp.OcppCallback;
-import de.rwth.idsg.steve.ocpp.OcppVersion;
 import de.rwth.idsg.steve.web.dto.ocpp.TriggerMessageParams;
 import ocpp.cp._2015._10.MessageTrigger;
 
@@ -32,8 +31,8 @@ import jakarta.xml.ws.AsyncHandler;
  */
 public class TriggerMessageTask extends Ocpp16AndAboveTask<TriggerMessageParams, String> {
 
-    public TriggerMessageTask(OcppVersion ocppVersion, TriggerMessageParams params) {
-        super(ocppVersion, params);
+    public TriggerMessageTask(TriggerMessageParams params) {
+        super(params);
     }
 
     @Override

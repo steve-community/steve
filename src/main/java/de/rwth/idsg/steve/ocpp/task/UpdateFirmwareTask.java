@@ -20,7 +20,6 @@ package de.rwth.idsg.steve.ocpp.task;
 
 import de.rwth.idsg.steve.ocpp.CommunicationTask;
 import de.rwth.idsg.steve.ocpp.OcppCallback;
-import de.rwth.idsg.steve.ocpp.OcppVersion;
 import de.rwth.idsg.steve.web.dto.ocpp.UpdateFirmwareParams;
 
 import jakarta.xml.ws.AsyncHandler;
@@ -33,8 +32,8 @@ import static de.rwth.idsg.steve.utils.DateTimeUtils.toDateTime;
  */
 public class UpdateFirmwareTask extends CommunicationTask<UpdateFirmwareParams, String> {
 
-    public UpdateFirmwareTask(OcppVersion ocppVersion, UpdateFirmwareParams params) {
-        super(ocppVersion, params);
+    public UpdateFirmwareTask(UpdateFirmwareParams params) {
+        super(params);
     }
 
     @Override

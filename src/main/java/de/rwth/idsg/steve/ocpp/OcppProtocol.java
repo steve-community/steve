@@ -65,4 +65,13 @@ public enum OcppProtocol {
         }
         throw new IllegalArgumentException(v);
     }
+
+    public static OcppProtocol from(OcppVersion version, OcppTransport transport) {
+        for (OcppProtocol value : OcppProtocol.values()) {
+            if (value.getVersion() == version && value.getTransport() == transport) {
+                return value;
+            }
+        }
+        throw new IllegalArgumentException("Could not find OcppProtocol for " + version + " and " + transport);
+    }
 }

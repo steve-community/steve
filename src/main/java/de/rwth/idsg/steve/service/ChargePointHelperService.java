@@ -229,8 +229,10 @@ public class ChargePointHelperService {
             ? jsonEndpoint.getChargeBoxIdList()
             : jsonEndpoint.getChargeBoxIdList().stream().filter(chargeBoxIdFilter::contains).collect(Collectors.toList());
 
+        var jsonProtocol = OcppProtocol.from(jsonEndpoint.getVersion(), OcppTransport.JSON);
+
         for (String chargeBoxId : chargeBoxIdList) {
-            returnList.add(new ChargePointSelect(OcppTransport.JSON, chargeBoxId));
+            returnList.add(new ChargePointSelect(jsonProtocol, chargeBoxId));
         }
 
         return returnList;

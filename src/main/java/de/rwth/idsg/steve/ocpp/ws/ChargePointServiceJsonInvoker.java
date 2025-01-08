@@ -63,7 +63,7 @@ public class ChargePointServiceJsonInvoker {
         } catch (Exception e) {
             log.error("Exception occurred", e);
             // Outgoing call failed due to technical problems. Pass the exception to handler to inform the user
-            task.defaultCallback().failed(cps.getChargeBoxId(), e);
+            task.failed(cps.getChargeBoxId(), e);
         }
     }
 

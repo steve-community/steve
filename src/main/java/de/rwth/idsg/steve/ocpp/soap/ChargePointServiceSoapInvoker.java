@@ -50,6 +50,9 @@ import org.springframework.stereotype.Service;
 @Service
 public class ChargePointServiceSoapInvoker implements ChargePointServiceInvoker {
 
+    public static final Exception EXCEPTION_V12 = new IllegalArgumentException("This operation is not supported by this OCPP 1.2 station");
+    public static final Exception EXCEPTION_V15 = new IllegalArgumentException("This operation is not supported by this OCPP 1.5 station");
+
     private final ClientProviderWithCache<ocpp.cp._2010._08.ChargePointService> soapV12Helper;
     private final ClientProviderWithCache<ocpp.cp._2012._06.ChargePointService> soapV15Helper;
     private final ClientProviderWithCache<ocpp.cp._2015._10.ChargePointService> soapV16Helper;
@@ -150,7 +153,7 @@ public class ChargePointServiceSoapInvoker implements ChargePointServiceInvoker 
     @Override
     public void dataTransfer(ChargePointSelect cp, DataTransferTask task) {
         switch (cp.getOcppProtocol().getVersion()) {
-            case V_12 -> throw new IllegalArgumentException("Not supported");
+            case V_12 -> task.failed(cp.getChargeBoxId(), EXCEPTION_V12);
             case V_15 -> createV15(cp).dataTransferAsync(task.getOcpp15Request(), cp.getChargeBoxId(), task.getOcpp15Handler(cp.getChargeBoxId()));
             case V_16 -> createV16(cp).dataTransferAsync(task.getOcpp16Request(), cp.getChargeBoxId(), task.getOcpp16Handler(cp.getChargeBoxId()));
         }
@@ -159,7 +162,7 @@ public class ChargePointServiceSoapInvoker implements ChargePointServiceInvoker 
     @Override
     public void getConfiguration(ChargePointSelect cp, GetConfigurationTask task) {
         switch (cp.getOcppProtocol().getVersion()) {
-            case V_12 -> throw new IllegalArgumentException("Not supported");
+            case V_12 -> task.failed(cp.getChargeBoxId(), EXCEPTION_V12);
             case V_15 -> createV15(cp).getConfigurationAsync(task.getOcpp15Request(), cp.getChargeBoxId(), task.getOcpp15Handler(cp.getChargeBoxId()));
             case V_16 -> createV16(cp).getConfigurationAsync(task.getOcpp16Request(), cp.getChargeBoxId(), task.getOcpp16Handler(cp.getChargeBoxId()));
         }
@@ -168,7 +171,7 @@ public class ChargePointServiceSoapInvoker implements ChargePointServiceInvoker 
     @Override
     public void getLocalListVersion(ChargePointSelect cp, GetLocalListVersionTask task) {
         switch (cp.getOcppProtocol().getVersion()) {
-            case V_12 -> throw new IllegalArgumentException("Not supported");
+            case V_12 -> task.failed(cp.getChargeBoxId(), EXCEPTION_V12);
             case V_15 -> createV15(cp).getLocalListVersionAsync(task.getOcpp15Request(), cp.getChargeBoxId(), task.getOcpp15Handler(cp.getChargeBoxId()));
             case V_16 -> createV16(cp).getLocalListVersionAsync(task.getOcpp16Request(), cp.getChargeBoxId(), task.getOcpp16Handler(cp.getChargeBoxId()));
         }
@@ -177,7 +180,7 @@ public class ChargePointServiceSoapInvoker implements ChargePointServiceInvoker 
     @Override
     public void sendLocalList(ChargePointSelect cp, SendLocalListTask task) {
         switch (cp.getOcppProtocol().getVersion()) {
-            case V_12 -> throw new IllegalArgumentException("Not supported");
+            case V_12 -> task.failed(cp.getChargeBoxId(), EXCEPTION_V12);
             case V_15 -> createV15(cp).sendLocalListAsync(task.getOcpp15Request(), cp.getChargeBoxId(), task.getOcpp15Handler(cp.getChargeBoxId()));
             case V_16 -> createV16(cp).sendLocalListAsync(task.getOcpp16Request(), cp.getChargeBoxId(), task.getOcpp16Handler(cp.getChargeBoxId()));
         }
@@ -186,7 +189,7 @@ public class ChargePointServiceSoapInvoker implements ChargePointServiceInvoker 
     @Override
     public void reserveNow(ChargePointSelect cp, ReserveNowTask task) {
         switch (cp.getOcppProtocol().getVersion()) {
-            case V_12 -> throw new IllegalArgumentException("Not supported");
+            case V_12 -> task.failed(cp.getChargeBoxId(), EXCEPTION_V12);
             case V_15 -> createV15(cp).reserveNowAsync(task.getOcpp15Request(), cp.getChargeBoxId(), task.getOcpp15Handler(cp.getChargeBoxId()));
             case V_16 -> createV16(cp).reserveNowAsync(task.getOcpp16Request(), cp.getChargeBoxId(), task.getOcpp16Handler(cp.getChargeBoxId()));
         }
@@ -195,7 +198,7 @@ public class ChargePointServiceSoapInvoker implements ChargePointServiceInvoker 
     @Override
     public void cancelReservation(ChargePointSelect cp, CancelReservationTask task) {
         switch (cp.getOcppProtocol().getVersion()) {
-            case V_12 -> throw new IllegalArgumentException("Not supported");
+            case V_12 -> task.failed(cp.getChargeBoxId(), EXCEPTION_V12);
             case V_15 -> createV15(cp).cancelReservationAsync(task.getOcpp15Request(), cp.getChargeBoxId(), task.getOcpp15Handler(cp.getChargeBoxId()));
             case V_16 -> createV16(cp).cancelReservationAsync(task.getOcpp16Request(), cp.getChargeBoxId(), task.getOcpp16Handler(cp.getChargeBoxId()));
         }
@@ -208,7 +211,8 @@ public class ChargePointServiceSoapInvoker implements ChargePointServiceInvoker 
     @Override
     public void clearChargingProfile(ChargePointSelect cp, ClearChargingProfileTask task) {
         switch (cp.getOcppProtocol().getVersion()) {
-            case V_12, V_15 -> throw new IllegalArgumentException("Not supported");
+            case V_12 -> task.failed(cp.getChargeBoxId(), EXCEPTION_V12);
+            case V_15 -> task.failed(cp.getChargeBoxId(), EXCEPTION_V15);
             case V_16 -> createV16(cp).clearChargingProfileAsync(task.getOcpp16Request(), cp.getChargeBoxId(), task.getOcpp16Handler(cp.getChargeBoxId()));
         }
     }
@@ -216,7 +220,8 @@ public class ChargePointServiceSoapInvoker implements ChargePointServiceInvoker 
     @Override
     public void setChargingProfile(ChargePointSelect cp, SetChargingProfileTask task) {
         switch (cp.getOcppProtocol().getVersion()) {
-            case V_12, V_15 -> throw new IllegalArgumentException("Not supported");
+            case V_12 -> task.failed(cp.getChargeBoxId(), EXCEPTION_V12);
+            case V_15 -> task.failed(cp.getChargeBoxId(), EXCEPTION_V15);
             case V_16 -> createV16(cp).setChargingProfileAsync(task.getOcpp16Request(), cp.getChargeBoxId(), task.getOcpp16Handler(cp.getChargeBoxId()));
         }
     }
@@ -224,7 +229,8 @@ public class ChargePointServiceSoapInvoker implements ChargePointServiceInvoker 
     @Override
     public void getCompositeSchedule(ChargePointSelect cp, GetCompositeScheduleTask task) {
         switch (cp.getOcppProtocol().getVersion()) {
-            case V_12, V_15 -> throw new IllegalArgumentException("Not supported");
+            case V_12 -> task.failed(cp.getChargeBoxId(), EXCEPTION_V12);
+            case V_15 -> task.failed(cp.getChargeBoxId(), EXCEPTION_V15);
             case V_16 -> createV16(cp).getCompositeScheduleAsync(task.getOcpp16Request(), cp.getChargeBoxId(), task.getOcpp16Handler(cp.getChargeBoxId()));
         }
     }
@@ -232,7 +238,8 @@ public class ChargePointServiceSoapInvoker implements ChargePointServiceInvoker 
     @Override
     public void triggerMessage(ChargePointSelect cp, TriggerMessageTask task) {
         switch (cp.getOcppProtocol().getVersion()) {
-            case V_12, V_15 -> throw new IllegalArgumentException("Not supported");
+            case V_12 -> task.failed(cp.getChargeBoxId(), EXCEPTION_V12);
+            case V_15 -> task.failed(cp.getChargeBoxId(), EXCEPTION_V15);
             case V_16 -> createV16(cp).triggerMessageAsync(task.getOcpp16Request(), cp.getChargeBoxId(), task.getOcpp16Handler(cp.getChargeBoxId()));
         }
     }

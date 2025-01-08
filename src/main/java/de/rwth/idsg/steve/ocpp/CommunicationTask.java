@@ -125,7 +125,7 @@ public abstract class CommunicationTask<S extends ChargePointSelection, RESPONSE
         }
     }
 
-    protected void success(String chargeBoxId, RESPONSE response) {
+    public void success(String chargeBoxId, RESPONSE response) {
         for (OcppCallback<RESPONSE> c : callbackList) {
             try {
                 c.success(chargeBoxId, response);
@@ -135,7 +135,7 @@ public abstract class CommunicationTask<S extends ChargePointSelection, RESPONSE
         }
     }
 
-    protected void failed(String chargeBoxId, Exception exception) {
+    public void failed(String chargeBoxId, Exception exception) {
         for (OcppCallback<RESPONSE> c : callbackList) {
             try {
                 c.failed(chargeBoxId, exception);

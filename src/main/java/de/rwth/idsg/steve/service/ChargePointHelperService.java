@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2024 SteVe Community Team
+ * Copyright (C) 2013-2025 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -229,8 +229,10 @@ public class ChargePointHelperService {
             ? jsonEndpoint.getChargeBoxIdList()
             : jsonEndpoint.getChargeBoxIdList().stream().filter(chargeBoxIdFilter::contains).collect(Collectors.toList());
 
+        var jsonProtocol = OcppProtocol.from(jsonEndpoint.getVersion(), OcppTransport.JSON);
+
         for (String chargeBoxId : chargeBoxIdList) {
-            returnList.add(new ChargePointSelect(OcppTransport.JSON, chargeBoxId));
+            returnList.add(new ChargePointSelect(jsonProtocol, chargeBoxId));
         }
 
         return returnList;

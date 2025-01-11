@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2024 SteVe Community Team
+ * Copyright (C) 2013-2025 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -20,9 +20,6 @@ package de.rwth.idsg.steve.web.controller;
 
 import de.rwth.idsg.steve.ocpp.OcppVersion;
 import de.rwth.idsg.steve.repository.ChargingProfileRepository;
-import de.rwth.idsg.steve.service.ChargePointService12_Client;
-import de.rwth.idsg.steve.service.ChargePointService15_Client;
-import de.rwth.idsg.steve.service.ChargePointService16_Client;
 import de.rwth.idsg.steve.web.dto.ocpp.ChangeConfigurationParams;
 import de.rwth.idsg.steve.web.dto.ocpp.ClearChargingProfileParams;
 import de.rwth.idsg.steve.web.dto.ocpp.ConfigurationKeyEnum;
@@ -33,7 +30,6 @@ import de.rwth.idsg.steve.web.dto.ocpp.SetChargingProfileParams;
 import de.rwth.idsg.steve.web.dto.ocpp.TriggerMessageParams;
 import ocpp.cs._2015._10.RegistrationStatus;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -42,6 +38,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import jakarta.validation.Valid;
+
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -58,10 +55,6 @@ import static de.rwth.idsg.steve.web.dto.ocpp.ConfigurationKeyReadWriteEnum.RW;
 @RequestMapping(value = "/manager/operations/v1.6")
 public class Ocpp16Controller extends Ocpp15Controller {
 
-    @Autowired
-    @Qualifier("ChargePointService16_Client")
-    private ChargePointService16_Client client16;
-
     @Autowired private ChargingProfileRepository chargingProfileRepository;
 
     // -------------------------------------------------------------------------
@@ -76,20 +69,6 @@ public class Ocpp16Controller extends Ocpp15Controller {
     // -------------------------------------------------------------------------
     // Helpers
     // -------------------------------------------------------------------------
-
-    protected ChargePointService16_Client getClient16() {
-        return client16;
-    }
-
-    @Override
-    protected ChargePointService15_Client getClient15() {
-        return client16;
-    }
-
-    @Override
-    protected ChargePointService12_Client getClient12() {
-        return client16;
-    }
 
     @Override
     protected void setCommonAttributesForTx(Model model) {
@@ -161,7 +140,7 @@ public class Ocpp16Controller extends Ocpp15Controller {
             model.addAttribute("ocppConfKeys", getConfigurationKeys(R));
             return getPrefix() + GET_CONF_PATH;
         }
-        return REDIRECT_TASKS_PATH + getClient15().getConfiguration(params);
+        return REDIRECT_TASKS_PATH + chargePointServiceClient.getConfiguration(params);
     }
 
     // -------------------------------------------------------------------------
@@ -209,7 +188,7 @@ public class Ocpp16Controller extends Ocpp15Controller {
             setCommonAttributes(model);
             return getPrefix() + TRIGGER_MESSAGE_PATH;
         }
-        return REDIRECT_TASKS_PATH + getClient16().triggerMessage(params);
+        return REDIRECT_TASKS_PATH + chargePointServiceClient.triggerMessage(params);
     }
 
     @RequestMapping(value = SET_CHARGING_PATH, method = RequestMethod.POST)
@@ -219,7 +198,7 @@ public class Ocpp16Controller extends Ocpp15Controller {
             setCommonAttributes(model);
             return getPrefix() + SET_CHARGING_PATH;
         }
-        return REDIRECT_TASKS_PATH + getClient16().setChargingProfile(params);
+        return REDIRECT_TASKS_PATH + chargePointServiceClient.setChargingProfile(params);
     }
 
     @RequestMapping(value = CLEAR_CHARGING_PATH, method = RequestMethod.POST)
@@ -229,7 +208,7 @@ public class Ocpp16Controller extends Ocpp15Controller {
             setCommonAttributes(model);
             return getPrefix() + CLEAR_CHARGING_PATH;
         }
-        return REDIRECT_TASKS_PATH + getClient16().clearChargingProfile(params);
+        return REDIRECT_TASKS_PATH + chargePointServiceClient.clearChargingProfile(params);
     }
 
     @RequestMapping(value = GET_COMPOSITE_PATH, method = RequestMethod.POST)
@@ -239,6 +218,6 @@ public class Ocpp16Controller extends Ocpp15Controller {
             setCommonAttributes(model);
             return getPrefix() + GET_COMPOSITE_PATH;
         }
-        return REDIRECT_TASKS_PATH + getClient16().getCompositeSchedule(params);
+        return REDIRECT_TASKS_PATH + chargePointServiceClient.getCompositeSchedule(params);
     }
 }

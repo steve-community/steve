@@ -67,7 +67,7 @@ public class ApiTaskInfo {
 
     public ApiTaskInfo(Integer taskId, CommunicationTask r) {
         this.taskId = taskId;
-        this.ocppVersion = r.getOcppVersion();
+        //this.ocppVersion = r.getOcppVersion();
         this.operationName = r.getOperationName();
         this.origin = r.getOrigin();
         this.caller = r.getCaller();

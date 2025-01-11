@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2024 SteVe Community Team
+ * Copyright (C) 2013-2025 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -20,7 +20,6 @@ package de.rwth.idsg.steve.ocpp.task;
 
 import de.rwth.idsg.steve.ocpp.CommunicationTask;
 import de.rwth.idsg.steve.ocpp.OcppCallback;
-import de.rwth.idsg.steve.ocpp.OcppVersion;
 import de.rwth.idsg.steve.web.dto.ocpp.RemoteStopTransactionParams;
 
 import jakarta.xml.ws.AsyncHandler;
@@ -31,12 +30,12 @@ import jakarta.xml.ws.AsyncHandler;
  */
 public class RemoteStopTransactionTask extends CommunicationTask<RemoteStopTransactionParams, String> {
 
-    public RemoteStopTransactionTask(OcppVersion ocppVersion, RemoteStopTransactionParams params) {
-        super(ocppVersion, params);
+    public RemoteStopTransactionTask(RemoteStopTransactionParams params) {
+        super(params);
     }
 
-    public RemoteStopTransactionTask(OcppVersion ocppVersion, RemoteStopTransactionParams params, String caller) {
-        super(ocppVersion, params, caller);
+    public RemoteStopTransactionTask(RemoteStopTransactionParams params, String caller) {
+        super(params, caller);
     }
 
     @Override

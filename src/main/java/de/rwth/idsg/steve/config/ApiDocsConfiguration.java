@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2024 SteVe Community Team
+ * Copyright (C) 2013-2025 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -60,6 +60,10 @@ public class ApiDocsConfiguration {
         System.setProperty("springdoc.swagger-ui.path", "/manager/swagger-ui/index.html");
         // We only want REST APIs here (de.rwth.idsg.steve.web.api package)
         System.setProperty("springdoc.paths-to-match", "/api/**");
+        // Sort controllers alphabetically by their path
+        System.setProperty("springdoc.swagger-ui.tagsSorter", "alpha");
+        // Sort endpoints (within a controller) alphabetically by their path
+        System.setProperty("springdoc.swagger-ui.operationsSorter", "alpha");
     }
 
     @Bean

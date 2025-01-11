@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2024 SteVe Community Team
+ * Copyright (C) 2013-2025 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -30,8 +30,8 @@ import jakarta.xml.ws.AsyncHandler;
  */
 public abstract class Ocpp16AndAboveTask<S extends ChargePointSelection, RESPONSE> extends Ocpp15AndAboveTask<S, RESPONSE> {
 
-    public Ocpp16AndAboveTask(OcppVersion ocppVersion, S params) {
-        super(ocppVersion, params);
+    public Ocpp16AndAboveTask(S params) {
+        super(params);
     }
 
     @Deprecated

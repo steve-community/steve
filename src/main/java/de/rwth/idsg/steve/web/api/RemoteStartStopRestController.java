@@ -27,9 +27,7 @@ import de.rwth.idsg.steve.repository.dto.ChargePointSelect;
 import de.rwth.idsg.steve.repository.dto.TaskOverview;
 
 import de.rwth.idsg.steve.service.ChargePointHelperService;
-import de.rwth.idsg.steve.service.ChargePointService12_Client;
-import de.rwth.idsg.steve.service.ChargePointService15_Client;
-import de.rwth.idsg.steve.service.ChargePointService16_Client;
+import de.rwth.idsg.steve.service.ChargePointServiceClient;
 
 import de.rwth.idsg.steve.web.dto.ocpp.RemoteStartTransactionParams;
 import de.rwth.idsg.steve.web.dto.ocpp.RemoteStopTransactionParams;
@@ -37,13 +35,11 @@ import de.rwth.idsg.steve.web.dto.ocpp.RemoteStopTransactionParams;
 import de.rwth.idsg.steve.web.dto.ocpp.UnlockConnectorParams;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 
 import de.rwth.idsg.steve.web.api.ApiControllerAdvice.ApiErrorResponse;
 import de.rwth.idsg.steve.web.api.dto.ApiChargePointList;
 import de.rwth.idsg.steve.web.api.dto.ApiChargePointStart;
 import de.rwth.idsg.steve.web.api.exception.BadRequestException;
-import de.rwth.idsg.steve.web.dto.ChargePointQueryForm;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -80,63 +76,13 @@ public class RemoteStartStopRestController {
     @Autowired private TransactionRepository transactionRepository;
     @Autowired private TaskStore taskStore;
 
-    @Autowired
-    @Qualifier("ChargePointService12_Client")
-    private ChargePointService12_Client client12;
 
     @Autowired
-    @Qualifier("ChargePointService15_Client")
-    private ChargePointService15_Client client15;
-
-    @Autowired
-    @Qualifier("ChargePointService16_Client")
-    private ChargePointService16_Client client16;
+    private ChargePointServiceClient client;
 
     // -------------------------------------------------------------------------
     // Helpers
     // -------------------------------------------------------------------------
-
-     private String getOcppProtocol(String chargeBoxId) {
-        ChargePointQueryForm form = new ChargePointQueryForm();
-        form.setChargeBoxId(chargeBoxId);
-        return chargePointRepository.getOverview(form).get(0).getOcppProtocol().toUpperCase();
-     }
-
-     private Integer remoteStart(String chargeBoxId, RemoteStartTransactionParams transactionParams) {
-        String ocppProtocol = getOcppProtocol(chargeBoxId);
-        Integer taskId;
-        taskId = switch (ocppProtocol) {
-            case "OCPP1.6J", "OCPP1.6S" -> client16.remoteStartTransaction(transactionParams, "SteveWebApi");
-            case "OCPP1.5J", "OCPP1.5S", "OCPP1.5" -> client15.remoteStartTransaction(transactionParams, "SteveWebApi");
-            case "OCPP1.2" -> client12.remoteStartTransaction(transactionParams, "SteveWebApi");
-            default -> client12.remoteStartTransaction(transactionParams, "SteveWebApi");
-        };
-        return taskId;
-    }
-
-     private Integer remoteStop(String chargeBoxId, RemoteStopTransactionParams transactionParams) {
-        String ocppProtocol = getOcppProtocol(chargeBoxId);
-        Integer taskId;
-        taskId = switch (ocppProtocol) {
-            case "OCPP1.6J", "OCPP1.6S" -> client16.remoteStopTransaction(transactionParams, "SteveWebApi");
-            case "OCPP1.5J", "OCPP1.5S", "OCPP1.5" -> client15.remoteStopTransaction(transactionParams, "SteveWebApi");
-            case "OCPP1.2" -> client12.remoteStopTransaction(transactionParams, "SteveWebApi");
-            default -> client12.remoteStopTransaction(transactionParams, "SteveWebApi");
-        };
-        return taskId;
-    }
-
-    private Integer remoteUnlock(String chargeBoxId, UnlockConnectorParams transactionParams) {
-        String ocppProtocol = getOcppProtocol(chargeBoxId);
-        Integer taskId;
-        taskId = switch (ocppProtocol) {
-            case "OCPP1.6J", "OCPP1.6S" -> client16.unlockConnector(transactionParams, "SteveWebApi");
-            case "OCPP1.5J", "OCPP1.5S", "OCPP1.5" -> client15.unlockConnector(transactionParams, "SteveWebApi");
-            case "OCPP1.2" -> client12.unlockConnector(transactionParams, "SteveWebApi");
-            default -> client12.unlockConnector(transactionParams, "SteveWebApi");
-        };
-        return taskId;
-    }
 
     private ApiChargePointList getChargePoints() {
         List<ChargePointSelect> chargePoints = chargePointHelperService.getChargePoints(OcppVersion.V_12);
@@ -291,7 +237,7 @@ public class RemoteStartStopRestController {
         transactionParams.setChargePointSelectList(chargePointRepository.getChargePointSelect(params.getChargeBoxId()));
         transactionParams.setConnectorId(params.getConnectorId());
         transactionParams.setIdTag(params.getOcppTag());
-        return remoteStart(params.getChargeBoxId(), transactionParams);
+        return client.remoteStartTransaction(transactionParams, "SteveWebApi");
     }
 
     @ApiResponses(value = {
@@ -340,7 +286,7 @@ public class RemoteStartStopRestController {
         }
         transactionParams.setTransactionId(transactionId);
 
-        return remoteStop(params.getChargeBoxId(), transactionParams);
+        return client.remoteStopTransaction(transactionParams, "SteveWebApi");
     }
 
     @ApiResponses(value = {
@@ -381,6 +327,6 @@ public class RemoteStartStopRestController {
         }
 
         transactionParams.setConnectorId(params.getConnectorId());
-        return remoteUnlock(params.getChargeBoxId(), transactionParams);
+        return client.unlockConnector(transactionParams, "SteveWebApi");
     }
 }

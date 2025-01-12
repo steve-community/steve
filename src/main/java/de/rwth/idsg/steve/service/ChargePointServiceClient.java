@@ -199,14 +199,18 @@ public class ChargePointServiceClient {
     @SafeVarargs
     public final int remoteStartTransaction(RemoteStartTransactionParams params,
                                             OcppCallback<String>... callbacks) {
-            return remoteStartTransaction(params, "Steve", callbacks);
-        }
-
+        RemoteStartTransactionTask task = new RemoteStartTransactionTask(params);
+        return addRemoteStartTask(task, callbacks);
+    }
     @SafeVarargs
     public final int remoteStartTransaction(RemoteStartTransactionParams params, String caller,
                                             OcppCallback<String>... callbacks) {
         RemoteStartTransactionTask task = new RemoteStartTransactionTask(params, caller);
+        return addRemoteStartTask(task, callbacks);
+    }
 
+    private int addRemoteStartTask(RemoteStartTransactionTask task,
+                                            OcppCallback<String>... callbacks) {
         for (var callback : callbacks) {
             task.addCallback(callback);
         }
@@ -221,14 +225,19 @@ public class ChargePointServiceClient {
     @SafeVarargs
     public final int remoteStopTransaction(RemoteStopTransactionParams params,
                                            OcppCallback<String>... callbacks) {
-        return remoteStopTransaction(params, "Steve", callbacks);
+        RemoteStopTransactionTask task = new RemoteStopTransactionTask(params);
+        return addRemoteStopTask(task,callbacks);
     }
 
     @SafeVarargs
     public final int remoteStopTransaction(RemoteStopTransactionParams params, String caller,
                                            OcppCallback<String>... callbacks) {
         RemoteStopTransactionTask task = new RemoteStopTransactionTask(params, caller);
+        return addRemoteStopTask(task,callbacks);
+    }
 
+    private int addRemoteStopTask(RemoteStopTransactionTask task,
+                                           OcppCallback<String>... callbacks) {
         for (var callback : callbacks) {
             task.addCallback(callback);
         }
@@ -243,13 +252,19 @@ public class ChargePointServiceClient {
     @SafeVarargs
     public final int unlockConnector(UnlockConnectorParams params,
                                      OcppCallback<String>... callbacks) {
-        return unlockConnector(params, "Steve", callbacks);
+        UnlockConnectorTask task = new UnlockConnectorTask(params);
+        return addUnlockConnectorTask(task, callbacks);
     }
+
     @SafeVarargs
     public final int unlockConnector(UnlockConnectorParams params, String caller,
                                      OcppCallback<String>... callbacks) {
         UnlockConnectorTask task = new UnlockConnectorTask(params, caller);
+        return addUnlockConnectorTask(task, callbacks);
+    }
 
+    private int addUnlockConnectorTask(UnlockConnectorTask task,
+                                     OcppCallback<String>... callbacks) {
         for (var callback : callbacks) {
             task.addCallback(callback);
         }

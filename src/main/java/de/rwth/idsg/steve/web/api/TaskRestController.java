@@ -119,7 +119,7 @@ public class TaskRestController {
     )
     @GetMapping(value = "task")
     @ResponseBody
-    public ApiTaskInfo getTaskDetails(@RequestParam(name="id") @Valid Integer taskId) {
+    public ApiTaskInfo getTaskDetails(@RequestParam(name = "id") @Valid Integer taskId) {
         ApiTaskInfo taskInfo = new ApiTaskInfo(taskId, taskStore.get(taskId));
         return taskInfo;
     }

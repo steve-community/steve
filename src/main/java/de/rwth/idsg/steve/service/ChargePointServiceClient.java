@@ -21,7 +21,6 @@ package de.rwth.idsg.steve.service;
 import de.rwth.idsg.steve.SteveException;
 import de.rwth.idsg.steve.ocpp.ChargePointServiceInvokerImpl;
 import de.rwth.idsg.steve.ocpp.OcppCallback;
-import de.rwth.idsg.steve.ocpp.OcppVersion;
 import de.rwth.idsg.steve.ocpp.task.CancelReservationTask;
 import de.rwth.idsg.steve.ocpp.task.ChangeAvailabilityTask;
 import de.rwth.idsg.steve.ocpp.task.ChangeConfigurationTask;
@@ -202,7 +201,7 @@ public class ChargePointServiceClient {
                                             OcppCallback<String>... callbacks) {
             return remoteStartTransaction(params, "Steve", callbacks);
         }
-    
+
     @SafeVarargs
     public final int remoteStartTransaction(RemoteStartTransactionParams params, String caller,
                                             OcppCallback<String>... callbacks) {
@@ -218,7 +217,7 @@ public class ChargePointServiceClient {
 
         return taskStore.add(task);
     }
-    
+
     @SafeVarargs
     public final int remoteStopTransaction(RemoteStopTransactionParams params,
                                            OcppCallback<String>... callbacks) {

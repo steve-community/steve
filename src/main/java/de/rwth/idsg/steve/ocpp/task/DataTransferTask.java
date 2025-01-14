@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2024 SteVe Community Team
+ * Copyright (C) 2013-2025 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -20,7 +20,6 @@ package de.rwth.idsg.steve.ocpp.task;
 
 import de.rwth.idsg.steve.ocpp.Ocpp15AndAboveTask;
 import de.rwth.idsg.steve.ocpp.OcppCallback;
-import de.rwth.idsg.steve.ocpp.OcppVersion;
 import de.rwth.idsg.steve.web.dto.ocpp.DataTransferParams;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -34,8 +33,8 @@ import jakarta.xml.ws.AsyncHandler;
  */
 public class DataTransferTask extends Ocpp15AndAboveTask<DataTransferParams, DataTransferTask.ResponseWrapper> {
 
-    public DataTransferTask(OcppVersion ocppVersion, DataTransferParams params) {
-        super(ocppVersion, params);
+    public DataTransferTask(DataTransferParams params) {
+        super(params);
     }
 
     @Override

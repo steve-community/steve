@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2024 SteVe Community Team
+ * Copyright (C) 2013-2025 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -24,10 +24,12 @@ import de.rwth.idsg.steve.service.OcppTagService;
 import de.rwth.idsg.steve.web.api.ApiControllerAdvice.ApiErrorResponse;
 import de.rwth.idsg.steve.web.dto.OcppTagForm;
 import de.rwth.idsg.steve.web.dto.OcppTagQueryForm;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -50,6 +52,14 @@ import java.util.List;
  * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 13.09.2022
  */
+@Tag(name = "ocpp-tag-controller",
+    description = """
+        Operations related to managing Ocpp Tags.
+        An Ocpp Tag is the identifier of the actor that interacts with the charge box.
+        It can be used for authorization, but also to start and stop charging sessions.
+        An RFID card is an example of an Ocpp Tag.
+        """
+)
 @Slf4j
 @RestController
 @RequestMapping(value = "/api/v1/ocppTags", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -58,7 +68,10 @@ public class OcppTagsRestController {
 
     private final OcppTagService ocppTagService;
 
-
+    @Operation(description = """
+        Returns a list of Ocpp Tags based on the query parameters.
+        The query parameters can be used to filter the Ocpp Tags.
+        """)
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "OK"),
         @ApiResponse(responseCode = "400", description = "Bad Request", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorResponse.class))}),
@@ -75,6 +88,9 @@ public class OcppTagsRestController {
         return response;
     }
 
+    @Operation(description = """
+        Returns a single Ocpp Tag based on the ocppTagPk.
+        """)
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "OK"),
         @ApiResponse(responseCode = "400", description = "Bad Request", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorResponse.class))}),
@@ -92,6 +108,10 @@ public class OcppTagsRestController {
         return response;
     }
 
+    @Operation(description = """
+        Creates a new Ocpp Tag with the provided parameters.
+        The request body should contain the necessary information.
+        """)
     @ApiResponses(value = {
         @ApiResponse(responseCode = "201", description = "Created"),
         @ApiResponse(responseCode = "400", description = "Bad Request", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorResponse.class))}),
@@ -113,6 +133,9 @@ public class OcppTagsRestController {
         return response;
     }
 
+    @Operation(description = """
+        Updates an existing Ocpp Tag with the provided parameters.
+        """)
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "OK"),
         @ApiResponse(responseCode = "400", description = "Bad Request", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorResponse.class))}),
@@ -133,6 +156,10 @@ public class OcppTagsRestController {
         return response;
     }
 
+    @Operation(description = """
+        Deletes an existing Ocpp Tag based on the ocppTagPk.
+        Returns the deleted Ocpp Tag.
+        """)
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "OK"),
         @ApiResponse(responseCode = "400", description = "Bad Request", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorResponse.class))}),

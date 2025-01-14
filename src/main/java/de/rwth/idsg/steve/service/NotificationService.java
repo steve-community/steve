@@ -341,6 +341,7 @@ public class NotificationService {
     // Private helpers
     // -------------------------------------------------------------------------
 
+
     private static String createContent(InsertTransactionParams params) {
         StringBuilder sb = new StringBuilder("Details:").append(System.lineSeparator())
             .append("- chargeBoxId: ").append(params.getChargeBoxId()).append(System.lineSeparator())

@@ -14,6 +14,10 @@ SteVe is considered as an open platform to implement, test and evaluate novel id
 The project is distributed under [GPL](LICENSE.txt) and is free to use. 
 If you are going to deploy it we are happy to see the [logo](website/logo/managed-by-steve.pdf) on a charge point.
 
+## Relation to Powerfill
+
+[Powerfill](https://powerfill.co/) is a SaaS company to expand beyond the basics of SteVe: While SteVe covers the basics of OCPP functionality in a DIY sense, Powerfill offers more and enterprise features with ease of use. [See the announcement](https://github.com/steve-community/steve/issues/1643) and [sign up for early access](https://powerfill.co/early-access/).
+
 ### Charge Point Support
 
 Electric charge points using the following OCPP versions are supported:

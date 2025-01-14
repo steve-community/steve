@@ -94,7 +94,6 @@ public class AboutSettingsController {
         }
 
         settingsRepository.update(settingsForm);
-        mailService.loadSettingsFromDB();
         return "redirect:/manager/settings";
     }
 
@@ -107,7 +106,6 @@ public class AboutSettingsController {
         }
 
         settingsRepository.update(settingsForm);
-        mailService.loadSettingsFromDB();
         mailService.sendTestMail();
 
         return "redirect:/manager/settings";

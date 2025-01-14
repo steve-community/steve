@@ -67,7 +67,9 @@ public enum SteveConfiguration {
         contextPath = sanitizeContextPath(p.getOptionalString("context.path"));
         steveVersion = p.getString("steve.version");
         gitDescribe = useFallbackIfNotSet(p.getOptionalString("git.describe"), null);
+
         profile = ApplicationProfile.fromName(p.getString("profile"));
+        System.setProperty("spring.profiles.active", profile.name().toLowerCase());
 
         jetty = Jetty.builder()
                      .serverHost(p.getString("server.host"))

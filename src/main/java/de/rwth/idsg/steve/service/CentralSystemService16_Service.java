@@ -27,6 +27,7 @@ import de.rwth.idsg.steve.repository.dto.UpdateChargeboxParams;
 import de.rwth.idsg.steve.repository.dto.UpdateTransactionParams;
 import de.rwth.idsg.steve.service.notification.OccpStationBooted;
 import de.rwth.idsg.steve.service.notification.OcppStationStatusFailure;
+import de.rwth.idsg.steve.service.notification.OcppStationStatusSuspendedEV;
 import de.rwth.idsg.steve.service.notification.OcppTransactionEnded;
 import de.rwth.idsg.steve.service.notification.OcppTransactionStarted;
 import jooq.steve.db.enums.TransactionStopEventActor;
@@ -145,6 +146,11 @@ public class CentralSystemService16_Service {
         if (parameters.getStatus() == ChargePointStatus.FAULTED) {
             applicationEventPublisher.publishEvent(new OcppStationStatusFailure(
                     chargeBoxIdentity, parameters.getConnectorId(), parameters.getErrorCode().value()));
+        }
+
+         if (parameters.getStatus() == ChargePointStatus.SUSPENDED_EV) {
+            applicationEventPublisher.publishEvent(new OcppStationStatusSuspendedEV(
+                    chargeBoxIdentity, parameters.getConnectorId(), parameters.getTimestamp()));
         }
 
         return new StatusNotificationResponse();

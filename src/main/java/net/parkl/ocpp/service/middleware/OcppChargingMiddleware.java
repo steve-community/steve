@@ -18,6 +18,7 @@ import net.parkl.ocpp.service.cs.TransactionService;
 import net.parkl.ocpp.service.cs.status.ESPMeterValuesParser;
 import net.parkl.ocpp.service.middleware.receiver.AsyncMessageReceiverLocator;
 import ocpp.cs._2015._10.MeterValue;
+import ocpp.cs._2015._10.Reason;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -443,7 +444,8 @@ public class OcppChargingMiddleware extends AbstractOcppMiddleware {
         if (process == null || reason == null) {
             throw new IllegalArgumentException("OcppChargingProcess or reason was null");
         }
-        log.info("Stopping charging process from OCPP proxy: {}...", process.getOcppChargingProcessId());
+
+        String stopReason = reason;
 
         ESPChargingData.ESPChargingDataBuilder espChargingDataBuilder = ESPChargingData.builder().
                 start(process.getStartDate()).
@@ -454,22 +456,28 @@ public class OcppChargingMiddleware extends AbstractOcppMiddleware {
             Transaction transaction = transactionService.findTransaction(transactionPk)
                     .orElseThrow(() -> new IllegalStateException("Invalid transaction id: " + transactionPk));
 
+            if (reason.equals(REASON_VEHICLE_CHARGED) && transaction.getStopReason() != null) {
+                stopReason = Reason.fromValue(transaction.getStopReason()).toString();
+            }
+
             espChargingDataBuilder
                     .totalPower(consumptionHelper.getTotalPower(transaction))
                     .startValue(consumptionHelper.getStartValue(transaction))
                     .stopValue(consumptionHelper.getStopValue(transaction));
         }
 
-
         ESPChargingStopRequest req = ESPChargingStopRequest.builder().
                 externalChargeId(process.getOcppChargingProcessId()).
-                eventCode(reason).
+                eventCode(stopReason).
                 chargingData(espChargingDataBuilder.build()).build();
+
+        log.info("Stopping charging process from OCPP proxy: ocppChargingProcessId: {}, stop reason: {}",
+                process.getOcppChargingProcessId(), stopReason);
 
         emobilityServiceProvider.stopChargingExternal(req);
 
         if (stopListener != null) {
-            stopListener.chargingStopped(process, req.getChargingData(), reason);
+            stopListener.chargingStopped(process, req.getChargingData(), stopReason);
         }
     }
 

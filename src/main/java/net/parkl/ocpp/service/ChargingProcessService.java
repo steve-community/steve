@@ -253,4 +253,10 @@ public class ChargingProcessService {
     public void updateStopOnlyWhenCableRemoved(String externalChargeId, boolean value) {
         chargingProcessRepo.updateStopOnlyWhenCableRemoved(externalChargeId, value);
     }
+
+    public List<OcppChargingProcess> findListByTransactionId(int transactionId) {
+        TransactionStart transaction = transactionStartRepository
+                .findById(transactionId).orElseThrow(() -> new IllegalStateException("Invalid transaction id"));
+        return chargingProcessRepo.findListByTransactionStart(transaction);
+    }
 }

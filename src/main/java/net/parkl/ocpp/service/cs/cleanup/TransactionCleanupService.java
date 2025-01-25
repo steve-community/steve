@@ -45,24 +45,25 @@ public class TransactionCleanupService {
 
             DateTime eventTime = DateTime.now();
             TransactionStop transactionStop = createTransactionStopForCleanup(transactionId, eventTime);
-            OcppChargingProcess chargingProcess = chargingProcessService.findByTransactionId(transactionId);
+            List<OcppChargingProcess> chargingProcesses = chargingProcessService.findListByTransactionId(transactionId);
 
             transactionStop.setTransaction(transactionStart);
             transactionStopRepo.save(transactionStop);
 
-            if (chargingProcess != null) {
-                log.info("Transaction update: {} with end date: {}", transactionId, eventTime);
-                String chargingProcessId = chargingProcess.getOcppChargingProcessId();
-                log.info("Ending charging process on transaction update: {} with end date: {}", chargingProcessId, eventTime);
-                chargingProcess.setEndDate(eventTime.toDate());
+            if (!chargingProcesses.isEmpty()) {
+                log.info("Ending charging processes on transaction cleanup: {} with end date: {}", transactionId, eventTime);
 
-                chargingProcess = chargingProcessService.save(chargingProcess);
+                for (OcppChargingProcess chargingProcess : chargingProcesses) {
+                    log.info("Ending charging process on transaction cleanup: {} with end date: {}", chargingProcess.getOcppChargingProcessId(), eventTime);
+                    chargingProcess.setEndDate(eventTime.toDate());
+                    chargingProcessService.save(chargingProcess);
+                }
             } else {
-                log.warn("Charging process not found for transaction {}", transactionId);
+                log.warn("Charging processes not found for transaction {}", transactionId);
             }
 
-            log.info("Transaction cleaned up: transaction id={}, charging process id={}", transactionId,
-                    chargingProcess !=null ? chargingProcess.getOcppChargingProcessId() : "-");
+            log.info("Transaction cleaned up: transaction id={}, charging processes={}", transactionId,
+                    chargingProcesses.size());
             return true;
         } catch (Exception e) {
             log.error("Transaction cleanup failed for: "+transactionId, e);

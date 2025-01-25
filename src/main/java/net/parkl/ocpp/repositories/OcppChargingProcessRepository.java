@@ -35,6 +35,9 @@ public interface OcppChargingProcessRepository extends CrudRepository<OcppChargi
 
 	OcppChargingProcess findByTransactionStart(TransactionStart t);
 
+	@Query("SELECT OBJECT(p) FROM OcppChargingProcess AS p WHERE p.transactionStart=?1")
+	List<OcppChargingProcess> findListByTransactionStart(TransactionStart t);
+
 	@Query("SELECT OBJECT(p) FROM OcppChargingProcess AS p WHERE p.connector.chargeBoxId=?1 AND p.transactionStart IS NOT NULL AND p.endDate IS NULL")
 	List<OcppChargingProcess> findActiveByChargeBoxId(String chargeBoxId);
 

@@ -35,4 +35,5 @@ public interface ChargeBoxConfiguration {
     boolean skipHeartBeatConfig(String chargeBoxId);
 
     boolean isIdTagMax10Characters(String chargeBoxId);
+    float getWebSocketBufferMultiplier(String chargeBoxId, float defaultMultiplier);
 }

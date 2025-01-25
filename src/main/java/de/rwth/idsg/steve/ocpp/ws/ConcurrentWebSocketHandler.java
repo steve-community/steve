@@ -24,6 +24,8 @@ package de.rwth.idsg.steve.ocpp.ws;
 
 import de.rwth.idsg.steve.config.WebSocketConfiguration;
 import lombok.extern.slf4j.Slf4j;
+import net.parkl.ocpp.service.config.AdvancedChargeBoxConfiguration;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.WebSocketHandler;
@@ -43,7 +45,10 @@ import java.util.concurrent.TimeUnit;
 public abstract class ConcurrentWebSocketHandler implements WebSocketHandler {
 
     @Value("${ocpp.ws.buffer.multiplier:1}")
-    private float bufferMultiplier;
+    private float defaultBufferMultiplier;
+
+    @Autowired
+    protected AdvancedChargeBoxConfiguration advancedChargeBoxConfiguration;
 
     private static final int sendTimeLimit = (int) TimeUnit.SECONDS.toMillis(10);
 
@@ -55,9 +60,15 @@ public abstract class ConcurrentWebSocketHandler implements WebSocketHandler {
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
         this.onOpen(internalGet(session));
+        float bufferMultiplier = getBufferMultiplier(session);
         session.setBinaryMessageSizeLimit((int)(bufferMultiplier * bufferSizeLimit));
         session.setTextMessageSizeLimit((int)(bufferMultiplier * bufferSizeLimit));
         log.info("Created new session {} with buffer size {}", session.getId(), session.getTextMessageSizeLimit());
+    }
+
+    private float getBufferMultiplier(WebSocketSession session) {
+        String chargeBoxId=(String) session.getAttributes().get(AbstractWebSocketEndpoint.CHARGEBOX_ID_KEY);
+        return advancedChargeBoxConfiguration.getWebSocketBufferMultiplier(chargeBoxId, defaultBufferMultiplier);
     }
 
     @Override
@@ -76,7 +87,7 @@ public abstract class ConcurrentWebSocketHandler implements WebSocketHandler {
     }
 
     private ConcurrentWebSocketSessionDecorator internalGet(WebSocketSession session) {
-        return sessions.computeIfAbsent(session.getId(), s -> new ConcurrentWebSocketSessionDecorator(session, sendTimeLimit, (int)(bufferMultiplier * bufferSizeLimit)));
+        return sessions.computeIfAbsent(session.getId(), s -> new ConcurrentWebSocketSessionDecorator(session, sendTimeLimit, (int)(getBufferMultiplier(session) * bufferSizeLimit)));
     }
 
     // -------------------------------------------------------------------------

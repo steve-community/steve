@@ -92,4 +92,8 @@ public class AdvancedChargeBoxConfiguration {
     public boolean isIdTagMax10Characters(String chargeBoxId) {
         return chargeBoxConfiguration != null && chargeBoxConfiguration.isIdTagMax10Characters(chargeBoxId);
     }
+
+    public float getWebSocketBufferMultiplier(String chargeBoxId, float defaultBufferMultiplier) {
+        return chargeBoxConfiguration == null ? 1.0f : chargeBoxConfiguration.getWebSocketBufferMultiplier(chargeBoxId, defaultBufferMultiplier);
+    }
 }

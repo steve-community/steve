@@ -70,4 +70,9 @@ public class TestChargeBoxConfiguration implements ChargeBoxConfiguration {
     public boolean isIdTagMax10Characters(String chargeBoxId) {
         return false;
     }
+
+    @Override
+    public float getWebSocketBufferMultiplier(String chargeBoxId, float defaultMultiplier) {
+        return defaultMultiplier;
+    }
 }

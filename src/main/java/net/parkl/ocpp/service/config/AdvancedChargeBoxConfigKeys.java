@@ -73,6 +73,6 @@ public class AdvancedChargeBoxConfigKeys {
      */
     public static final String KEY_SKIP_HEARTBEAT_CHECK = "skip.heartbeat.check";
     public static final String KEY_SKIP_HEARTBEAT_CONFIG = "skip.heartbeat.config";
-
+    public static final String KEY_WEB_SOCKET_BUFFER_SIZE = "websocket.buffer.size";
 
 }

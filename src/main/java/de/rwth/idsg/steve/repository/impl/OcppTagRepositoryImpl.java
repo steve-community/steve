@@ -43,6 +43,7 @@ import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static de.rwth.idsg.steve.utils.CustomDSL.includes;
 import static de.rwth.idsg.steve.utils.DateTimeUtils.humanize;
 import static de.rwth.idsg.steve.utils.DateTimeUtils.toDateTime;
 import static jooq.steve.db.tables.OcppTag.OCPP_TAG;
@@ -96,6 +97,10 @@ public class OcppTagRepositoryImpl implements OcppTagRepository {
 
         if (form.isParentIdTagSet()) {
             selectQuery.addConditions(OCPP_TAG_ACTIVITY.PARENT_ID_TAG.eq(form.getParentIdTag()));
+        }
+
+        if (form.isNoteSet()) {
+            selectQuery.addConditions(includes(OCPP_TAG_ACTIVITY.NOTE, form.getNote()));
         }
 
         switch (form.getExpired()) {

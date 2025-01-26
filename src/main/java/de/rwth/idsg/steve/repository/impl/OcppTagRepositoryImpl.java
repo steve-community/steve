@@ -20,7 +20,7 @@ package de.rwth.idsg.steve.repository.impl;
 
 import de.rwth.idsg.steve.SteveException;
 import de.rwth.idsg.steve.repository.OcppTagRepository;
-import de.rwth.idsg.steve.repository.dto.OcppTag.Overview;
+import de.rwth.idsg.steve.repository.dto.OcppTag.OcppTagOverview;
 import de.rwth.idsg.steve.web.dto.OcppTagForm;
 import de.rwth.idsg.steve.web.dto.OcppTagQueryForm;
 import jooq.steve.db.tables.OcppTagActivity;
@@ -66,7 +66,7 @@ public class OcppTagRepositoryImpl implements OcppTagRepository {
 
     @Override
     @SuppressWarnings("unchecked")
-    public List<Overview> getOverview(OcppTagQueryForm form) {
+    public List<OcppTagOverview> getOverview(OcppTagQueryForm form) {
         SelectQuery selectQuery = ctx.selectQuery();
         selectQuery.addFrom(OCPP_TAG_ACTIVITY);
 
@@ -258,10 +258,10 @@ public class OcppTagRepositoryImpl implements OcppTagRepository {
     }
 
     private static class UserMapper
-            implements RecordMapper<Record10<Integer, Integer, String, String, DateTime, Boolean, Boolean, Integer, Long, String>, Overview> {
+            implements RecordMapper<Record10<Integer, Integer, String, String, DateTime, Boolean, Boolean, Integer, Long, String>, OcppTagOverview> {
         @Override
-        public Overview map(Record10<Integer, Integer, String, String, DateTime, Boolean, Boolean, Integer, Long, String> r) {
-            return Overview.builder()
+        public OcppTagOverview map(Record10<Integer, Integer, String, String, DateTime, Boolean, Boolean, Integer, Long, String> r) {
+            return OcppTagOverview.builder()
                           .ocppTagPk(r.value1())
                           .parentOcppTagPk(r.value2())
                           .idTag(r.value3())

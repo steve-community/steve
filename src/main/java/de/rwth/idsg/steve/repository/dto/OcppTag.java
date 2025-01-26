@@ -35,7 +35,7 @@ public final class OcppTag {
     @Getter
     @Builder
     @ToString
-    public static final class Overview {
+    public static final class OcppTagOverview {
         @Schema(description = "PK of the OCPP tag")
         private final Integer ocppTagPk;
 

@@ -116,9 +116,9 @@ public class OcppTagQueryForm {
     }
 
     @ToString(callSuper = true)
-    public static class ForApi extends OcppTagQueryForm {
+    public static class OcppTagQueryFormForApi extends OcppTagQueryForm {
 
-        public ForApi () {
+        public OcppTagQueryFormForApi() {
             super();
             setExpired(BooleanType.ALL);
             setInTransaction(BooleanType.ALL);

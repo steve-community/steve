@@ -94,7 +94,7 @@ public class Issue1219 {
         var repository = new OcppTagRepositoryImpl(ctx);
 
         long start = System.currentTimeMillis();
-        List<OcppTag.Overview> values = repository.getOverview(new OcppTagQueryForm());
+        List<OcppTag.OcppTagOverview> values = repository.getOverview(new OcppTagQueryForm());
         long stop = System.currentTimeMillis();
 
         System.out.println("took " + Duration.millis(stop - start));

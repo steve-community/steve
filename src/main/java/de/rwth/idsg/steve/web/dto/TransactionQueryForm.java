@@ -119,9 +119,9 @@ public class TransactionQueryForm extends QueryForm {
     }
 
     @ToString(callSuper = true)
-    public static class ForApi extends TransactionQueryForm {
+    public static class TransactionQueryFormForApi extends TransactionQueryForm {
 
-        public ForApi() {
+        public TransactionQueryFormForApi() {
             super();
             setType(QueryType.ALL);
             setPeriodType(QueryPeriodType.ALL);

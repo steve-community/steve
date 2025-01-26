@@ -31,7 +31,7 @@ import java.util.List;
  * @since 19.08.2014
  */
 public interface OcppTagRepository {
-    List<OcppTag.Overview> getOverview(OcppTagQueryForm form);
+    List<OcppTag.OcppTagOverview> getOverview(OcppTagQueryForm form);
 
     Result<OcppTagActivityRecord> getRecords();
     Result<OcppTagActivityRecord> getRecords(List<String> idTagList);

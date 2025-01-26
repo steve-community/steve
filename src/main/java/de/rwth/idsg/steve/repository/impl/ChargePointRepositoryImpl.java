@@ -158,6 +158,10 @@ public class ChargePointRepositoryImpl implements ChargePointRepository {
             selectQuery.addConditions(includes(CHARGE_BOX.CHARGE_BOX_ID, form.getChargeBoxId()));
         }
 
+        if (form.isSetNote()) {
+            selectQuery.addConditions(includes(CHARGE_BOX.NOTE, form.getNote()));
+        }
+
         switch (form.getHeartbeatPeriod()) {
             case ALL:
                 break;

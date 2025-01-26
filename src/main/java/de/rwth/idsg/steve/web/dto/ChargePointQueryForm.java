@@ -18,6 +18,7 @@
  */
 package de.rwth.idsg.steve.web.dto;
 
+import com.google.common.base.Strings;
 import de.rwth.idsg.steve.ocpp.OcppVersion;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -35,6 +36,7 @@ public class ChargePointQueryForm {
 
     private String chargeBoxId;
     private String description;
+    private String note;
     private OcppVersion ocppVersion;
     private QueryPeriodType heartbeatPeriod;
 
@@ -55,6 +57,10 @@ public class ChargePointQueryForm {
 
     public boolean isSetChargeBoxId() {
         return chargeBoxId != null;
+    }
+
+    public boolean isSetNote() {
+        return !Strings.isNullOrEmpty(note);
     }
 
     @RequiredArgsConstructor

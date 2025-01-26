@@ -22,7 +22,6 @@ import static de.rwth.idsg.steve.utils.OcppTagActivityRecordUtils.isBlocked;
 import static de.rwth.idsg.steve.utils.OcppTagActivityRecordUtils.isExpired;
 
 import com.google.common.base.Strings;
-import de.rwth.idsg.steve.SteveException;
 import de.rwth.idsg.steve.repository.OcppTagRepository;
 import de.rwth.idsg.steve.repository.dto.OcppTag;
 import de.rwth.idsg.steve.service.dto.UnidentifiedIncomingObject;
@@ -56,7 +55,7 @@ public class OcppTagService {
     private final OcppTagRepository ocppTagRepository;
     private final AuthTagService authTagService;
 
-    public List<OcppTag.Overview> getOverview(OcppTagQueryForm form) {
+    public List<OcppTag.OcppTagOverview> getOverview(OcppTagQueryForm form) {
         return ocppTagRepository.getOverview(form);
     }
 

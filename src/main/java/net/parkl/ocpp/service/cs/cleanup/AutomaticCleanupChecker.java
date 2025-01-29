@@ -7,6 +7,8 @@ import net.parkl.ocpp.entities.Transaction;
 import net.parkl.ocpp.service.ChargingProcessService;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+
 @Component
 @Slf4j
 @RequiredArgsConstructor
@@ -17,10 +19,15 @@ public class AutomaticCleanupChecker implements TransactionCleanupChecker {
 
     @Override
     public boolean checkTransactionForCleanup(Transaction transaction) {
-        OcppChargingProcess chargingProcess = chargingProcessService.findByTransactionId(transaction.getTransactionPk());
+        List<OcppChargingProcess> chargingProcesses = chargingProcessService.findListByTransactionId(transaction.getTransactionPk());
         boolean cleanup = false;
-        if (chargingProcess != null) {
-            cleanup = emobilityServiceProviderChecker.checkEmobilityServiceProvider(transaction, chargingProcess);
+        if (!chargingProcesses.isEmpty()) {
+            for (OcppChargingProcess chargingProcess : chargingProcesses) {
+                cleanup = emobilityServiceProviderChecker.checkEmobilityServiceProvider(transaction, chargingProcess);
+                if (!cleanup) {
+                    break;
+                }
+            }
         } else {
             log.info("Charging process was null for transaction: {}", transaction.getTransactionPk());
             cleanup = config.checkNonExistentThreshold(transaction.getStartEventTimestamp());

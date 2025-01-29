@@ -7,6 +7,8 @@ import net.parkl.ocpp.entities.Transaction;
 import net.parkl.ocpp.service.ChargingProcessService;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+
 @Component
 @Slf4j
 @RequiredArgsConstructor
@@ -17,9 +19,17 @@ public class ConnectorStopChecker implements TransactionCleanupChecker{
 
     @Override
     public boolean checkTransactionForCleanup(Transaction transaction) {
-        OcppChargingProcess chargingProcess = chargingProcessService.findByTransactionId(transaction.getTransactionPk());
-        if (chargingProcess != null) {
-            return emobilityServiceProviderChecker.checkEmobilityServiceProvider(transaction, chargingProcess);
+        List<OcppChargingProcess> chargingProcesses = chargingProcessService.findListByTransactionId(transaction.getTransactionPk());
+
+        if (!chargingProcesses.isEmpty()) {
+            boolean cleanup= false;
+            for (OcppChargingProcess chargingProcess : chargingProcesses) {
+                cleanup = emobilityServiceProviderChecker.checkEmobilityServiceProvider(transaction, chargingProcess);
+                if (!cleanup) {
+                    break;
+                }
+            }
+            return cleanup;
         } else {
             return true;
         }

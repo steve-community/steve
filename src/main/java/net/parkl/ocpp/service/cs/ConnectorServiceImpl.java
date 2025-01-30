@@ -132,7 +132,7 @@ public class ConnectorServiceImpl implements ConnectorService {
             return chargingProcessRepo.save(process);
         } else if (s.getStatus().equals(ChargePointStatus.FAULTED.value())
                 || s.getStatus().equals(ChargePointStatus.UNAVAILABLE.value())) {
-            if (s.getErrorCode() != null) {
+            if (s.getErrorCode() != null && !s.getErrorCode().equals(ChargePointErrorCode.NO_ERROR.value())) {
                 log.info("Saving connector status error to charging process: {} [error={}]...", process.getOcppChargingProcessId(),
                         s.getErrorCode());
                 process.setErrorCode(s.getErrorCode());

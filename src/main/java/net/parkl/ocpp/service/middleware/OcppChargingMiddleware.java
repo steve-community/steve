@@ -445,25 +445,31 @@ public class OcppChargingMiddleware extends AbstractOcppMiddleware {
             throw new IllegalArgumentException("OcppChargingProcess or reason was null");
         }
 
+        log.info("Trying to stop charging process: ocppChargingProcessId: {}", process.getOcppChargingProcessId());
+
         String stopReason = reason;
 
         ESPChargingData.ESPChargingDataBuilder espChargingDataBuilder = ESPChargingData.builder().
                 start(process.getStartDate()).
                 end(process.getEndDate());
 
-        if (!reason.equals(REASON_VEHICLE_NOT_CONNECTED)) {
-            int transactionPk = process.getTransactionStart().getTransactionPk();
-            Transaction transaction = transactionService.findTransaction(transactionPk)
-                    .orElseThrow(() -> new IllegalStateException("Invalid transaction id: " + transactionPk));
+        if (!stopReason.equals(REASON_VEHICLE_NOT_CONNECTED)) {
+            if (process.getTransactionStart() != null) {
+                int transactionPk = process.getTransactionStart().getTransactionPk();
+                Transaction transaction = transactionService.findTransaction(transactionPk)
+                        .orElseThrow(() -> new IllegalStateException("Invalid transaction id: " + transactionPk));
 
-            if (reason.equals(REASON_VEHICLE_CHARGED) && transaction.getStopReason() != null) {
-                stopReason = Reason.fromValue(transaction.getStopReason()).toString();
+                if (stopReason.equals(REASON_VEHICLE_CHARGED) && transaction.getStopReason() != null) {
+                    stopReason = Reason.fromValue(transaction.getStopReason()).toString();
+                }
+
+                espChargingDataBuilder
+                        .totalPower(consumptionHelper.getTotalPower(transaction))
+                        .startValue(consumptionHelper.getStartValue(transaction))
+                        .stopValue(consumptionHelper.getStopValue(transaction));
+            } else {
+                log.info("Transaction start is null for process with id: {}", process.getOcppChargingProcessId());
             }
-
-            espChargingDataBuilder
-                    .totalPower(consumptionHelper.getTotalPower(transaction))
-                    .startValue(consumptionHelper.getStartValue(transaction))
-                    .stopValue(consumptionHelper.getStopValue(transaction));
         }
 
         ESPChargingStopRequest req = ESPChargingStopRequest.builder().
@@ -471,7 +477,7 @@ public class OcppChargingMiddleware extends AbstractOcppMiddleware {
                 eventCode(stopReason).
                 chargingData(espChargingDataBuilder.build()).build();
 
-        log.info("Stopping charging process from OCPP proxy: ocppChargingProcessId: {}, stop reason: {}",
+        log.info("Stopping charging process: ocppChargingProcessId: {}, stop reason: {}",
                 process.getOcppChargingProcessId(), stopReason);
 
         emobilityServiceProvider.stopChargingExternal(req);

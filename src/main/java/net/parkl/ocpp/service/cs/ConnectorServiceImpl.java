@@ -30,8 +30,9 @@ import net.parkl.ocpp.repositories.ConnectorRepository;
 import net.parkl.ocpp.repositories.ConnectorStatusRepository;
 import net.parkl.ocpp.repositories.OcppChargingProcessRepository;
 import net.parkl.ocpp.service.OcppConstants;
-import net.parkl.ocpp.service.OcppErrorTranslator;
 import net.parkl.ocpp.service.middleware.OcppChargingMiddleware;
+import ocpp.cs._2015._10.ChargePointErrorCode;
+import ocpp.cs._2015._10.ChargePointStatus;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -45,8 +46,6 @@ import java.util.Optional;
 @Service
 @Slf4j
 public class ConnectorServiceImpl implements ConnectorService {
-    @Autowired
-    private OcppErrorTranslator errorTranslator;
     @Autowired
     private OcppChargingProcessRepository chargingProcessRepo;
     @Autowired
@@ -98,35 +97,49 @@ public class ConnectorServiceImpl implements ConnectorService {
 
         connectorLastStatusRepo.save(ls);
 
-        OcppChargingProcess savedProcess = null;
-        if (s.getStatus().equals("Available")) {
-            OcppChargingProcess process = chargingProcessRepo.findByConnectorAndTransactionStartIsNullAndEndDateIsNull(connector);
-            if (process != null) {
-                log.info("Ending charging process on available connector status: {}", process.getOcppChargingProcessId());
-                process.setEndDate(new Date());
-                savedProcess = chargingProcessRepo.save(process);
-            }
-        } else if (s.getStatus().equals("Faulted") || s.getStatus().equals("Unavailable")) {
-            OcppChargingProcess process = chargingProcessRepo.findByConnectorAndTransactionStartIsNullAndEndDateIsNull(connector);
-            if (process != null) {
-                log.info("Saving connector status error to charging process: {} [error={}]...", process.getOcppChargingProcessId(),
-                        s.getErrorCode());
-                String error = errorTranslator.translateError(s.getErrorCode());
-                if (error != null) {
-                    process.setErrorCode(error);
-                    savedProcess = chargingProcessRepo.save(process);
-                }
-            }
-        }
+        OcppChargingProcess savedOcppChargingProcess = handleChargingProcess(connector, s);
+
         log.debug("Stored a new connector status for {}/{}.", p.getChargeBoxId(), p.getConnectorId());
 
-        if (savedProcess != null) {
-            final OcppChargingProcess pr = savedProcess;
+        if (savedOcppChargingProcess != null) {
+            final OcppChargingProcess pr = savedOcppChargingProcess;
             executor.execute(() -> {
-                log.info("Notifying Parkl about closing charging process: {}...", pr.getOcppChargingProcessId());
-                chargingMiddleware.stopChargingExternal(pr, pr.getErrorCode() != null ? pr.getErrorCode() : OcppConstants.REASON_VEHICLE_NOT_CONNECTED);
+                log.info("Notifying Parkl about closing charging process with id: {}...", pr.getOcppChargingProcessId());
+                if (pr.getErrorCode() != null) {
+                    String errorCode = ChargePointErrorCode.fromValue(pr.getErrorCode()).toString();
+                    chargingMiddleware.stopChargingExternal(
+                            pr,
+                            errorCode);
+                } else {
+                    chargingMiddleware.stopChargingExternal(
+                            pr,
+                            OcppConstants.REASON_VEHICLE_NOT_CONNECTED);
+                }
             });
         }
+    }
+
+    private OcppChargingProcess handleChargingProcess(Connector connector, ConnectorStatus s) {
+        OcppChargingProcess process = chargingProcessRepo.findByConnectorAndTransactionStartIsNullAndEndDateIsNull(connector);
+
+        if (process == null) {
+            return null;
+        }
+
+        if (s.getStatus().equals(ChargePointStatus.AVAILABLE.value())) {
+            log.info("Ending charging process on available connector status: {}", process.getOcppChargingProcessId());
+            process.setEndDate(new Date());
+            return chargingProcessRepo.save(process);
+        } else if (s.getStatus().equals(ChargePointStatus.FAULTED.value())
+                || s.getStatus().equals(ChargePointStatus.UNAVAILABLE.value())) {
+            if (s.getErrorCode() != null && !s.getErrorCode().equals(ChargePointErrorCode.NO_ERROR.value())) {
+                log.info("Saving connector status error to charging process: {} [error={}]...", process.getOcppChargingProcessId(),
+                        s.getErrorCode());
+                process.setErrorCode(s.getErrorCode());
+                return chargingProcessRepo.save(process);
+            }
+        }
+        return null;
     }
 
     @Override

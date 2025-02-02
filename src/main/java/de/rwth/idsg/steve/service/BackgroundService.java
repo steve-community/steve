@@ -18,12 +18,12 @@
  */
 package de.rwth.idsg.steve.service;
 
+import de.rwth.idsg.steve.config.DelegatingTaskExecutor;
 import de.rwth.idsg.steve.repository.dto.ChargePointSelect;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 
 import java.util.List;
-import java.util.concurrent.Executor;
 import java.util.function.Consumer;
 
 /**
@@ -32,9 +32,10 @@ import java.util.function.Consumer;
  */
 @RequiredArgsConstructor
 public class BackgroundService {
-    private final Executor asyncTaskExecutor;
 
-    public static BackgroundService with(Executor asyncTaskExecutor) {
+    private final DelegatingTaskExecutor asyncTaskExecutor;
+
+    public static BackgroundService with(DelegatingTaskExecutor asyncTaskExecutor) {
         return new BackgroundService(asyncTaskExecutor);
     }
 

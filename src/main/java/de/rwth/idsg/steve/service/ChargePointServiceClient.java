@@ -19,6 +19,7 @@
 package de.rwth.idsg.steve.service;
 
 import de.rwth.idsg.steve.SteveException;
+import de.rwth.idsg.steve.config.DelegatingTaskExecutor;
 import de.rwth.idsg.steve.ocpp.ChargePointServiceInvokerImpl;
 import de.rwth.idsg.steve.ocpp.OcppCallback;
 import de.rwth.idsg.steve.ocpp.task.CancelReservationTask;
@@ -74,7 +75,6 @@ import org.joda.time.DateTime;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.concurrent.Executor;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -89,7 +89,7 @@ public class ChargePointServiceClient {
     private final ReservationRepository reservationRepository;
     private final OcppTagService ocppTagService;
 
-    private final Executor asyncTaskExecutor;
+    private final DelegatingTaskExecutor asyncTaskExecutor;
     private final TaskStore taskStore;
     private final ChargePointServiceInvokerImpl invoker;
 

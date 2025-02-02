@@ -20,6 +20,7 @@ package de.rwth.idsg.steve.service;
 
 import com.google.common.base.Strings;
 import de.rwth.idsg.steve.SteveException;
+import de.rwth.idsg.steve.config.DelegatingTaskExecutor;
 import de.rwth.idsg.steve.repository.SettingsRepository;
 import de.rwth.idsg.steve.repository.dto.MailSettings;
 import lombok.extern.slf4j.Slf4j;
@@ -36,7 +37,6 @@ import jakarta.mail.internet.InternetAddress;
 import jakarta.mail.internet.MimeMessage;
 
 import java.util.Properties;
-import java.util.concurrent.Executor;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -47,7 +47,7 @@ import java.util.concurrent.Executor;
 public class MailService {
 
     @Autowired private SettingsRepository settingsRepository;
-    @Autowired private Executor asyncTaskExecutor;
+    @Autowired private DelegatingTaskExecutor asyncTaskExecutor;
 
     public MailSettings getSettings() {
         return settingsRepository.getMailSettings();

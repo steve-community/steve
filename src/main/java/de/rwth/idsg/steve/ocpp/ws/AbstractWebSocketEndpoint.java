@@ -20,6 +20,7 @@ package de.rwth.idsg.steve.ocpp.ws;
 
 import com.google.common.base.Strings;
 import de.rwth.idsg.steve.config.WebSocketConfiguration;
+import de.rwth.idsg.steve.config.DelegatingTaskScheduler;
 import de.rwth.idsg.steve.ocpp.OcppTransport;
 import de.rwth.idsg.steve.ocpp.OcppVersion;
 import de.rwth.idsg.steve.ocpp.ws.data.CommunicationContext;
@@ -31,7 +32,6 @@ import de.rwth.idsg.steve.service.notification.OcppStationWebSocketDisconnected;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.web.socket.BinaryMessage;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.PongMessage;
@@ -55,7 +55,7 @@ import java.util.function.Consumer;
  */
 public abstract class AbstractWebSocketEndpoint extends ConcurrentWebSocketHandler implements SubProtocolCapable {
 
-    @Autowired private ThreadPoolTaskScheduler asyncTaskScheduler;
+    @Autowired private DelegatingTaskScheduler asyncTaskScheduler;
     @Autowired private OcppServerRepository ocppServerRepository;
     @Autowired private FutureResponseContextStore futureResponseContextStore;
     @Autowired private ApplicationEventPublisher applicationEventPublisher;

@@ -44,6 +44,7 @@ import org.springframework.format.support.FormattingConversionService;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 import org.springframework.web.accept.ContentNegotiationManager;
@@ -59,7 +60,6 @@ import jakarta.validation.Validator;
 
 import javax.sql.DataSource;
 import java.util.List;
-import java.util.concurrent.Executor;
 
 import static de.rwth.idsg.steve.SteveConfiguration.CONFIG;
 
@@ -137,15 +137,28 @@ public class BeanConfiguration implements WebMvcConfigurer {
         return DSL.using(conf);
     }
 
-    @Bean(name = {"asyncTaskScheduler", "asyncTaskExecutor"})
-    public ThreadPoolTaskScheduler asyncTaskScheduler() {
+    @Bean(destroyMethod = "close")
+    public DelegatingTaskScheduler asyncTaskScheduler() {
         ThreadPoolTaskScheduler scheduler = new ThreadPoolTaskScheduler();
         scheduler.setPoolSize(5);
-        scheduler.setThreadNamePrefix("SteVe-Executor-");
+        scheduler.setThreadNamePrefix("SteVe-TaskScheduler-");
         scheduler.setWaitForTasksToCompleteOnShutdown(true);
         scheduler.setAwaitTerminationSeconds(30);
         scheduler.initialize();
-        return scheduler;
+
+        return new DelegatingTaskScheduler(scheduler);
+    }
+
+    @Bean(destroyMethod = "close")
+    public DelegatingTaskExecutor asyncTaskExecutor() {
+        ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+        executor.setCorePoolSize(5);
+        executor.setThreadNamePrefix("SteVe-TaskExecutor-");
+        executor.setWaitForTasksToCompleteOnShutdown(true);
+        executor.setAwaitTerminationSeconds(30);
+        executor.initialize();
+
+        return new DelegatingTaskExecutor(executor);
     }
 
     @Bean

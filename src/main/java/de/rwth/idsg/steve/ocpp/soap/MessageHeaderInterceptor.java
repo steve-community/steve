@@ -18,6 +18,7 @@
  */
 package de.rwth.idsg.steve.ocpp.soap;
 
+import de.rwth.idsg.steve.config.DelegatingTaskExecutor;
 import de.rwth.idsg.steve.ocpp.OcppProtocol;
 import de.rwth.idsg.steve.repository.OcppServerRepository;
 import de.rwth.idsg.steve.repository.impl.ChargePointRepositoryImpl;
@@ -41,7 +42,6 @@ import org.springframework.stereotype.Component;
 
 import javax.xml.namespace.QName;
 import java.util.Optional;
-import java.util.concurrent.ScheduledExecutorService;
 
 import static org.apache.cxf.ws.addressing.JAXWSAConstants.ADDRESSING_PROPERTIES_INBOUND;
 
@@ -62,7 +62,7 @@ public class MessageHeaderInterceptor extends AbstractPhaseInterceptor<Message> 
 
     @Autowired private OcppServerRepository ocppServerRepository;
     @Autowired private ChargePointHelperService chargePointHelperService;
-    @Autowired private ScheduledExecutorService executorService;
+    @Autowired private DelegatingTaskExecutor asyncTaskExecutor;
 
     private static final String BOOT_OPERATION_NAME = "BootNotification";
     private static final String CHARGEBOX_ID_HEADER = "ChargeBoxIdentity";
@@ -93,7 +93,7 @@ public class MessageHeaderInterceptor extends AbstractPhaseInterceptor<Message> 
         // 2. update endpoint
         // -------------------------------------------------------------------------
 
-        executorService.execute(() -> {
+        asyncTaskExecutor.execute(() -> {
             try {
                 String endpointAddress = getEndpointAddress(message);
                 if (endpointAddress != null) {

@@ -21,7 +21,6 @@ package de.rwth.idsg.steve.config;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
-import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.mysql.cj.conf.PropertyKey;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
@@ -45,6 +44,7 @@ import org.springframework.format.support.FormattingConversionService;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 import org.springframework.web.accept.ContentNegotiationManager;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
@@ -55,16 +55,11 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter;
 import org.springframework.web.servlet.view.InternalResourceViewResolver;
 
-import jakarta.annotation.PreDestroy;
 import jakarta.validation.Validator;
 
 import javax.sql.DataSource;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
-import java.util.concurrent.ThreadFactory;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.Executor;
 
 import static de.rwth.idsg.steve.SteveConfiguration.CONFIG;
 
@@ -80,8 +75,6 @@ import static de.rwth.idsg.steve.SteveConfiguration.CONFIG;
 @EnableScheduling
 @ComponentScan("de.rwth.idsg.steve")
 public class BeanConfiguration implements WebMvcConfigurer {
-
-    private ScheduledThreadPoolExecutor executor;
 
     /**
      * https://github.com/brettwooldridge/HikariCP/wiki/MySQL-Configuration
@@ -144,13 +137,15 @@ public class BeanConfiguration implements WebMvcConfigurer {
         return DSL.using(conf);
     }
 
-    @Bean
-    public ScheduledExecutorService scheduledExecutorService() {
-        ThreadFactory threadFactory = new ThreadFactoryBuilder().setNameFormat("SteVe-Executor-%d")
-                                                                .build();
-
-        executor = new ScheduledThreadPoolExecutor(5, threadFactory);
-        return executor;
+    @Bean(name = {"asyncTaskScheduler", "asyncTaskExecutor"})
+    public ThreadPoolTaskScheduler asyncTaskScheduler() {
+        ThreadPoolTaskScheduler scheduler = new ThreadPoolTaskScheduler();
+        scheduler.setPoolSize(5);
+        scheduler.setThreadNamePrefix("SteVe-Executor-");
+        scheduler.setWaitForTasksToCompleteOnShutdown(true);
+        scheduler.setAwaitTerminationSeconds(30);
+        scheduler.initialize();
+        return scheduler;
     }
 
     @Bean
@@ -170,29 +165,6 @@ public class BeanConfiguration implements WebMvcConfigurer {
             return new GithubReleaseCheckService();
         } else {
             return new DummyReleaseCheckService();
-        }
-    }
-
-    @PreDestroy
-    public void shutDown() {
-        if (executor != null) {
-            gracefulShutDown(executor);
-        }
-    }
-
-    private void gracefulShutDown(ExecutorService executor) {
-        try {
-            executor.shutdown();
-            executor.awaitTermination(30, TimeUnit.SECONDS);
-
-        } catch (InterruptedException e) {
-            log.error("Termination interrupted", e);
-
-        } finally {
-            if (!executor.isTerminated()) {
-                log.warn("Killing non-finished tasks");
-            }
-            executor.shutdownNow();
         }
     }
 

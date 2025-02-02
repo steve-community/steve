@@ -41,7 +41,7 @@ import org.springframework.stereotype.Component;
 
 import javax.xml.namespace.QName;
 import java.util.Optional;
-import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.Executor;
 
 import static org.apache.cxf.ws.addressing.JAXWSAConstants.ADDRESSING_PROPERTIES_INBOUND;
 
@@ -62,7 +62,7 @@ public class MessageHeaderInterceptor extends AbstractPhaseInterceptor<Message> 
 
     @Autowired private OcppServerRepository ocppServerRepository;
     @Autowired private ChargePointHelperService chargePointHelperService;
-    @Autowired private ScheduledExecutorService executorService;
+    @Autowired private Executor asyncTaskExecutor;
 
     private static final String BOOT_OPERATION_NAME = "BootNotification";
     private static final String CHARGEBOX_ID_HEADER = "ChargeBoxIdentity";
@@ -93,7 +93,7 @@ public class MessageHeaderInterceptor extends AbstractPhaseInterceptor<Message> 
         // 2. update endpoint
         // -------------------------------------------------------------------------
 
-        executorService.execute(() -> {
+        asyncTaskExecutor.execute(() -> {
             try {
                 String endpointAddress = getEndpointAddress(message);
                 if (endpointAddress != null) {

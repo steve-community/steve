@@ -36,7 +36,7 @@ import jakarta.mail.internet.InternetAddress;
 import jakarta.mail.internet.MimeMessage;
 
 import java.util.Properties;
-import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.Executor;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -47,7 +47,7 @@ import java.util.concurrent.ScheduledExecutorService;
 public class MailService {
 
     @Autowired private SettingsRepository settingsRepository;
-    @Autowired private ScheduledExecutorService executorService;
+    @Autowired private Executor asyncTaskExecutor;
 
     public MailSettings getSettings() {
         return settingsRepository.getMailSettings();
@@ -62,7 +62,7 @@ public class MailService {
     }
 
     public void sendAsync(String subject, String body) {
-        executorService.execute(() -> {
+        asyncTaskExecutor.execute(() -> {
             try {
                 send(subject, body);
             } catch (MessagingException e) {

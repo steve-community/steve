@@ -31,6 +31,7 @@ import de.rwth.idsg.steve.service.notification.OcppStationWebSocketDisconnected;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.web.socket.BinaryMessage;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.PongMessage;
@@ -39,14 +40,13 @@ import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketMessage;
 import org.springframework.web.socket.WebSocketSession;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Deque;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
 /**
@@ -55,7 +55,7 @@ import java.util.function.Consumer;
  */
 public abstract class AbstractWebSocketEndpoint extends ConcurrentWebSocketHandler implements SubProtocolCapable {
 
-    @Autowired private ScheduledExecutorService service;
+    @Autowired private ThreadPoolTaskScheduler asyncTaskScheduler;
     @Autowired private OcppServerRepository ocppServerRepository;
     @Autowired private FutureResponseContextStore futureResponseContextStore;
     @Autowired private ApplicationEventPublisher applicationEventPublisher;
@@ -131,11 +131,11 @@ public abstract class AbstractWebSocketEndpoint extends ConcurrentWebSocketHandl
 
         // Just to keep the connection alive, such that the servers do not close
         // the connection because of a idle timeout, we ping-pong at fixed intervals.
-        ScheduledFuture pingSchedule = service.scheduleAtFixedRate(
+        ScheduledFuture pingSchedule = asyncTaskScheduler.scheduleAtFixedRate(
                 new PingTask(chargeBoxId, session),
-                WebSocketConfiguration.PING_INTERVAL,
-                WebSocketConfiguration.PING_INTERVAL,
-                TimeUnit.MINUTES);
+                Instant.now().plus(WebSocketConfiguration.PING_INTERVAL),
+                WebSocketConfiguration.PING_INTERVAL
+        );
 
         futureResponseContextStore.addSession(session);
 

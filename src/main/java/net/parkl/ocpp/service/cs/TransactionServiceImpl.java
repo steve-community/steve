@@ -288,6 +288,7 @@ public class TransactionServiceImpl implements TransactionService {
 
     @Override
     public void updateTransaction(UpdateTransactionParams p) {
+        TransactionStart transactionStart=null;
         try {
             int transactionId = p.getTransactionId();
             log.info("Update transaction received from charge box {} with transaction id {}", p.getChargeBoxId(), transactionId);
@@ -309,9 +310,11 @@ public class TransactionServiceImpl implements TransactionService {
                 log.warn("Transaction {} already stopped for charging process: {}", transactionId,
                         chargingProcess.getOcppChargingProcessId());
                 return;
+
             }
 
-            transactionStop.setTransaction(chargingProcess.getTransactionStart());
+            transactionStart = chargingProcess.getTransactionStart();
+            transactionStop.setTransaction(transactionStart);
             transactionStopRepo.save(transactionStop);
 
             if (p.getStopTimestamp() != null) {
@@ -324,7 +327,7 @@ public class TransactionServiceImpl implements TransactionService {
             }
 
             if (chargePointService.shouldInsertConnectorStatusAfterTransactionMsg(p.getChargeBoxId())) {
-                TransactionStart transactionStart =
+                transactionStart =
                         transactionStartRepo.findById(transactionId)
                                 .orElseThrow(() -> new IllegalArgumentException("Invalid transaction id: " + transactionId));
 
@@ -346,7 +349,11 @@ public class TransactionServiceImpl implements TransactionService {
             }
         } catch (Exception e) {
             log.error("Transaction save failed", e);
-            transactionStopFailedRepo.save(createTransactionStopFailed(p, e));
+            if (transactionStart != null) {
+                TransactionStopFailed stopFailed = createTransactionStopFailed(p, e);
+                stopFailed.setTransaction(transactionStart);
+                transactionStopFailedRepo.save(stopFailed);
+            }
         }
     }
 

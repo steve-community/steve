@@ -40,6 +40,7 @@ import org.springframework.core.task.TaskExecutor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.Optional;
 
@@ -128,7 +129,7 @@ public class ConnectorServiceImpl implements ConnectorService {
 
         if (s.getStatus().equals(ChargePointStatus.AVAILABLE.value())) {
             log.info("Ending charging process on available connector status: {}", process.getOcppChargingProcessId());
-            process.setEndDate(new Date());
+            process.setEndDate(LocalDateTime.now());
             return chargingProcessRepo.save(process);
         } else if (s.getStatus().equals(ChargePointStatus.FAULTED.value())
                 || s.getStatus().equals(ChargePointStatus.UNAVAILABLE.value())) {

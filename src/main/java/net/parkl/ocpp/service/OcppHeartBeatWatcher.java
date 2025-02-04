@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDateTime;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -43,11 +44,9 @@ public class OcppHeartBeatWatcher {
 
     public void heartBeatCheck(OcppChargeBox chargeBox) {
         log.debug("Checking last heartbeat timestamp for chargebox with id: {}", chargeBox.getChargeBoxId());
-        Calendar date = Calendar.getInstance();
-        date.add(Calendar.MINUTE, -checkIntervalMins);
-        Date fiveMinBefore = date.getTime();
+        LocalDateTime fiveMinBefore = LocalDateTime.now().minusMinutes(checkIntervalMins);
         if (chargeBox.getLastHeartbeatTimestamp() != null &&
-                chargeBox.getLastHeartbeatTimestamp().before(fiveMinBefore)) {
+                chargeBox.getLastHeartbeatTimestamp().isBefore(fiveMinBefore)) {
             log.debug("Last heartbeat did not arrive in the {} mins period for chargebox with id={}, sending alert...",
                     checkIntervalMins, chargeBox.getChargeBoxId());
             if (asyncNotification) {
@@ -55,7 +54,6 @@ public class OcppHeartBeatWatcher {
             } else {
                 notificationMiddleware.sendHeartBeatOfflineAlert(chargeBox.getChargeBoxId());
             }
-
         }
     }
 }

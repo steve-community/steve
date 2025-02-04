@@ -24,7 +24,8 @@ import org.hibernate.annotations.Immutable;
 import org.hibernate.annotations.Subselect;
 
 import jakarta.persistence.*;
-import java.util.Date;
+
+import java.time.LocalDateTime;
 
 @Entity
 @Immutable
@@ -50,11 +51,11 @@ public class Transaction {
 
     @Column(name = "start_event_timestamp")
     @Temporal(TemporalType.TIMESTAMP)
-    private Date startEventTimestamp;
+    private LocalDateTime startEventTimestamp;
 
     @Column(name = "start_timestamp")
     @Temporal(TemporalType.TIMESTAMP)
-    private Date startTimestamp;
+    private LocalDateTime startTimestamp;
 
     @Column(name = "start_value")
     private String startValue;
@@ -65,11 +66,11 @@ public class Transaction {
 
     @Column(name = "stop_event_timestamp")
     @Temporal(TemporalType.TIMESTAMP)
-    private Date stopEventTimestamp;
+    private LocalDateTime stopEventTimestamp;
 
     @Column(name = "stop_timestamp")
     @Temporal(TemporalType.TIMESTAMP)
-    private Date stopTimestamp;
+    private LocalDateTime stopTimestamp;
 
     @Column(name = "stop_value")
     private String stopValue;

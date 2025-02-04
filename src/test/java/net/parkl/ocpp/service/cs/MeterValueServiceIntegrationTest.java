@@ -42,10 +42,8 @@ public class MeterValueServiceIntegrationTest extends DriverTestBase {
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime dateTimePlusOneMinute = now.plusMinutes(1);
 
-        Date dateNow = Date.from(now.atZone(ZoneId.systemDefault()).toInstant());
-        Date datePlusOneMinute = Date.from(dateTimePlusOneMinute
-                .atZone(ZoneId.systemDefault())
-                .toInstant());
+        LocalDateTime dateNow = LocalDateTime.now();
+        LocalDateTime datePlusOneMinute = now.plusMinutes(1);
 
         TransactionStart transactionStart = new TransactionStart();
         transactionStart.setConnector(connector);

@@ -11,6 +11,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.core.task.TaskExecutor;
 
+import java.time.LocalDateTime;
+
 import static java.time.LocalDateTime.now;
 import static java.time.ZoneId.systemDefault;
 import static java.util.Arrays.asList;
@@ -98,7 +100,7 @@ public class OcppChargingLimitWatcherUnitTest {
         when(chargingProcessBeforeLimit.getOcppChargingProcessId()).thenReturn(beforeLimitProcessId);
         when(chargingProcessBeforeLimit.getTransactionStart()).thenReturn(transactionStartBeforeLimit);
         when(chargingProcessBeforeLimit.getLimitMinute()).thenReturn(30);
-        when(chargingProcessBeforeLimit.getStartDate()).thenReturn(from(now().minusMinutes(10).atZone(systemDefault()).toInstant()));
+        when(chargingProcessBeforeLimit.getStartDate()).thenReturn(LocalDateTime.now().minusMinutes(10));
 
         when(chargingProcessAfterLimit.getOcppChargingProcessId()).thenReturn(afterLimitProcessId);
         when(chargingProcessAfterLimit.getTransactionStart()).thenReturn(transactionStartAfterLimit);
@@ -107,7 +109,7 @@ public class OcppChargingLimitWatcherUnitTest {
         when(powerValueAfterLimit.getValue()).thenReturn(3100f);
         when(powerValueAfterLimit.getUnit()).thenReturn(OcppConstants.UNIT_WH);
         when(chargingProcessAfterLimit.getLimitMinute()).thenReturn(30);
-        when(chargingProcessAfterLimit.getStartDate()).thenReturn(from(now().minusMinutes(40).atZone(systemDefault()).toInstant()));
+        when(chargingProcessAfterLimit.getStartDate()).thenReturn(LocalDateTime.now().minusMinutes(40));
 
         limitWatcher.checkMinuteChargingLimit();
 

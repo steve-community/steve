@@ -23,7 +23,8 @@ import lombok.Setter;
 
 import jakarta.persistence.*;
 import java.io.Serializable;
-import java.util.Date;
+import java.time.LocalDateTime;
+
 
 @Entity
 @Table(name = "ocpp_tag")
@@ -37,7 +38,7 @@ public class OcppTag implements Serializable {
 
     @Column(name = "expiry_date")
     @Temporal(TemporalType.TIMESTAMP)
-    private Date expiryDate;
+    private LocalDateTime expiryDate;
 
     @Column(name = "id_tag", nullable = false, length = 255)
     private String idTag;

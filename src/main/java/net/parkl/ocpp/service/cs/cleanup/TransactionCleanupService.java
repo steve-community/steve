@@ -13,6 +13,7 @@ import org.joda.time.DateTime;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.ZoneId;
 import java.util.Date;
 import java.util.List;
 
@@ -55,7 +56,7 @@ public class TransactionCleanupService {
 
                 for (OcppChargingProcess chargingProcess : chargingProcesses) {
                     log.info("Ending charging process on transaction cleanup: {} with end date: {}", chargingProcess.getOcppChargingProcessId(), eventTime);
-                    chargingProcess.setEndDate(eventTime.toDate());
+                    chargingProcess.setEndDate(eventTime.toDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime());
                     chargingProcessService.save(chargingProcess);
                 }
             } else {

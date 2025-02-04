@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @Component
@@ -32,10 +33,9 @@ public class TransactionCleanupConfig {
     public Date getCleanupCheckThreshold() {
         return new Date(System.currentTimeMillis()-cleanupCheckThresholdHours * HOURS_IN_MS);
     }
-    public boolean checkNonExistentThreshold(Date startDate) {
+    public boolean checkNonExistentThreshold(LocalDateTime startDate) {
         log.info("Checking non-existent threshold with start date {}: {} hours before now...", startDate,
                 cleanupNonExistentThresholdHours);
-        return startDate.getTime() < System.currentTimeMillis() -
-                cleanupNonExistentThresholdHours * HOURS_IN_MS;
+        return startDate.isBefore(LocalDateTime.now().minusHours(cleanupNonExistentThresholdHours));
     }
 }

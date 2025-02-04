@@ -11,6 +11,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 
 import static java.time.LocalDateTime.now;
@@ -43,7 +44,7 @@ public class OcppStartTimeoutManagerUnitTest {
     public void checkForStartTimeout() {
         OcppChargingProcess chargingProcess = mock(OcppChargingProcess.class);
         Connector connector = mock(Connector.class);
-        Date startDate = Date.from(now().minusMinutes(1).atZone(systemDefault()).toInstant());
+        LocalDateTime startDate = LocalDateTime.now().minusMinutes(1);
 
         when(advancedChargeBoxConfiguration.isStartTimeoutEnabledForAny()).thenReturn(true);
         when(chargingProcessService.findOpenChargingProcessesWithoutTransaction())
@@ -66,7 +67,7 @@ public class OcppStartTimeoutManagerUnitTest {
         OcppChargingProcess chargingProcess = mock(OcppChargingProcess.class);
         String chargingProcessId = "id1";
         Connector connector = mock(Connector.class);
-        Date startDate = Date.from(now().minusMinutes(1).atZone(systemDefault()).toInstant());
+        LocalDateTime startDate = LocalDateTime.now().minusMinutes(1);
 
         when(advancedChargeBoxConfiguration.isPreparingTimeoutEnabledForAny()).thenReturn(true);
         when(chargingProcessService.findOpenChargingProcessesWithoutTransaction())

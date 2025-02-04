@@ -9,9 +9,10 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.core.task.TaskExecutor;
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Calendar;
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 
 import static org.mockito.Mockito.*;
@@ -42,7 +43,9 @@ class OcppHeartBeatWatcherUnitTest {
         testBox.setChargeBoxId("TestBox");
         Calendar date = Calendar.getInstance();
         date.add(Calendar.MINUTE, -10);
-        Date tenMinsBefore = date.getTime();
+        LocalDateTime tenMinsBefore = date.getTime().toInstant()
+                .atZone(ZoneId.systemDefault())
+                .toLocalDateTime();
         testBox.setLastHeartbeatTimestamp(tenMinsBefore);
 
         when(advancedChargeBoxConfiguration.getChargeBoxesForAlert()).thenReturn(Collections.singletonList(testBox.getChargeBoxId()));

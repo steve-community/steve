@@ -30,6 +30,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -55,7 +57,9 @@ public class ConnectorMeterValueService {
 
                 connectorMeterValue.setValue(sampledValue.getValue());
                 if (meterValue.getTimestamp() != null) {
-                    connectorMeterValue.setValueTimestamp(meterValue.getTimestamp().toDate());
+                    connectorMeterValue.setValueTimestamp(meterValue.getTimestamp().toDate().toInstant()
+                            .atZone(ZoneId.systemDefault())
+                            .toLocalDateTime());
                 }
                 connectorMeterValue.setReadingContext(sampledValue.isSetContext() ? sampledValue.getContext().value() : null);
                 connectorMeterValue.setFormat(sampledValue.isSetFormat() ? sampledValue.getFormat().value() : null);
@@ -112,15 +116,15 @@ public class ConnectorMeterValueService {
 
     public List<ConnectorMeterValueDetail> findByChargeBoxIdAndConnectorIdAfter(String chargeBoxId,
                                                                                 int connectorId,
-                                                                                Date startTimestamp) {
+                                                                                LocalDateTime startTimestamp) {
         return ListTransform.transform(connectorMeterValueRepo.findByChargeBoxIdAndConnectorIdAfter(chargeBoxId, connectorId, startTimestamp),
                 this::convertToMeterValueDetail);
     }
 
     public List<ConnectorMeterValueDetail> findByChargeBoxIdAndConnectorIdBetween(String chargeBoxId,
                                                                                   int connectorId,
-                                                                                  Date startTimestamp,
-                                                                                  Date nextTxTimestamp) {
+                                                                                  LocalDateTime startTimestamp,
+                                                                                  LocalDateTime nextTxTimestamp) {
 
         return ListTransform.transform(connectorMeterValueRepo.findByChargeBoxIdAndConnectorIdBetween(chargeBoxId,
                 connectorId,

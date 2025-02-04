@@ -23,6 +23,7 @@ import lombok.Setter;
 
 import jakarta.persistence.*;
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @Entity
@@ -50,7 +51,7 @@ public class ConnectorMeterValue implements Serializable {
 
     @Column(name = "value_timestamp")
     @Temporal(TemporalType.TIMESTAMP)
-    private Date valueTimestamp;
+    private LocalDateTime valueTimestamp;
 
     @ManyToOne
     @JoinColumn(name = "connector_pk", nullable = false)

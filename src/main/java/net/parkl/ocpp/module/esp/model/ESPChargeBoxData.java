@@ -2,9 +2,10 @@ package net.parkl.ocpp.module.esp.model;
 
 import lombok.*;
 
+
 import java.io.Serializable;
-import java.math.BigDecimal;
-import java.util.Date;
+import java.time.LocalDateTime;
+
 
 @Getter
 @Setter
@@ -22,6 +23,6 @@ public class ESPChargeBoxData implements Serializable {
     private String fwVersion;
     private String meterType;
     private String meterSerialNumber;
-    private Date lastHeartbeatTimestamp;
+    private LocalDateTime lastHeartbeatTimestamp;
 
 }

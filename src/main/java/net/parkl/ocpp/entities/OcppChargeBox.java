@@ -23,8 +23,11 @@ import lombok.Setter;
 import ocpp.cs._2015._10.RegistrationStatus;
 
 import jakarta.persistence.*;
+
+
 import java.math.BigDecimal;
-import java.util.Date;
+import java.time.LocalDateTime;
+
 
 @Entity
 @Table(name = "ocpp_charge_box", uniqueConstraints =
@@ -69,7 +72,7 @@ public class OcppChargeBox {
 
     @Column(name = "fw_update_timestamp", nullable = true)
     @Temporal(TemporalType.TIMESTAMP)
-    private Date fwUpdateTimestamp;
+    private LocalDateTime fwUpdateTimestamp;
 
     @Column(name = "iccid", length = 255, nullable = true)
     private String iccid;
@@ -88,11 +91,11 @@ public class OcppChargeBox {
 
     @Column(name = "diagnostics_timestamp", nullable = true)
     @Temporal(TemporalType.TIMESTAMP)
-    private Date diagnosticsTimestamp;
+    private LocalDateTime diagnosticsTimestamp;
 
     @Column(name = "last_heartbeat_timestamp", nullable = true)
     @Temporal(TemporalType.TIMESTAMP)
-    private Date lastHeartbeatTimestamp;
+    private LocalDateTime lastHeartbeatTimestamp;
 
     @Column(name = "description", nullable = true)
     @Lob

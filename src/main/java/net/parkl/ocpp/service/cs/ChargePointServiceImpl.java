@@ -42,6 +42,8 @@ import org.joda.time.DateTime;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.*;
 
 /**
@@ -287,7 +289,9 @@ public class ChargePointServiceImpl implements ChargePointService {
         cb.setMeterType(p.getMeterType());
         cb.setMeterSerialNumber(p.getMeterSerial());
         if (p.getHeartbeatTimestamp() != null) {
-            cb.setLastHeartbeatTimestamp(p.getHeartbeatTimestamp().toDate());
+            cb.setLastHeartbeatTimestamp(p.getHeartbeatTimestamp().toDate().toInstant()
+                    .atZone(ZoneId.systemDefault())
+                    .toLocalDateTime());
         }
 
         chargeBoxRepository.save(cb);
@@ -302,7 +306,7 @@ public class ChargePointServiceImpl implements ChargePointService {
             throw new IllegalArgumentException("Invalid charge box id: " + chargeBoxId);
         }
         cb.setFwUpdateStatus(status);
-        cb.setFwUpdateTimestamp(new Date());
+        cb.setFwUpdateTimestamp(LocalDateTime.now());
         chargeBoxRepository.save(cb);
 
     }
@@ -316,7 +320,7 @@ public class ChargePointServiceImpl implements ChargePointService {
             throw new IllegalArgumentException("Invalid charge box id: " + chargeBoxId);
         }
         cb.setDiagnosticsStatus(status);
-        cb.setDiagnosticsTimestamp(new Date());
+        cb.setDiagnosticsTimestamp(LocalDateTime.now());
         chargeBoxRepository.save(cb);
     }
 

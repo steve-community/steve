@@ -8,7 +8,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.Date;
+
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -24,7 +25,7 @@ public class RemoteStartRepositoryTest extends DriverTestBase {
     private Connector connector2;
     private Connector connector3;
 
-    private Date date;
+    private LocalDateTime date;
 
     private String idTag1 = "12345678";
     private String idTag2 = "987654321";
@@ -61,7 +62,7 @@ public class RemoteStartRepositoryTest extends DriverTestBase {
         remoteStart3.setOcppTag(idTag2);
         ocppRemoteStartRepository.save(remoteStart3);
 
-        date = new Date(System.currentTimeMillis() - 60 * 1000L);
+        LocalDateTime date = LocalDateTime.now().minusMinutes(1);
     }
 
     @AfterEach

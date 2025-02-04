@@ -24,6 +24,8 @@ import de.rwth.idsg.steve.repository.dto.UpdateTransactionParams;
 import net.parkl.ocpp.entities.*;
 import org.joda.time.DateTime;
 
+import java.time.ZoneId;
+
 public class TransactionFactory {
 
     public static TransactionStop createTransactionStop(UpdateTransactionParams params) {
@@ -71,11 +73,11 @@ public class TransactionFactory {
         start.setConnector(connector);
         start.setOcppTag(params.getIdTag());
         if (params.getStartTimestamp() != null) {
-            start.setStartTimestamp(params.getStartTimestamp().toDate());
+            start.setStartTimestamp(params.getStartTimestamp().toDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime());
         }
         start.setStartValue(params.getStartMeterValue());
         if (params.getEventTimestamp() != null) {
-            start.setEventTimestamp(params.getEventTimestamp().toDate());
+            start.setEventTimestamp(params.getEventTimestamp().toDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime());
         }
         return start;
     }

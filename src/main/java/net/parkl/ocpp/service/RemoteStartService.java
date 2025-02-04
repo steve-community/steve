@@ -10,6 +10,7 @@ import net.parkl.ocpp.service.config.AdvancedChargeBoxConfiguration;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 
@@ -68,8 +69,8 @@ public class RemoteStartService {
     }
 
 
-    public Date getRemoteStartValidityThreshold(String chargeBoxId) {
-        return new Date(System.currentTimeMillis() - getRemoteStartValiditySecs(chargeBoxId) * 1000L);
+    public LocalDateTime getRemoteStartValidityThreshold(String chargeBoxId) {
+        return LocalDateTime.now().minusSeconds(getRemoteStartValiditySecs(chargeBoxId));
     }
 
     private int getRemoteStartValiditySecs(String chargeBoxId) {

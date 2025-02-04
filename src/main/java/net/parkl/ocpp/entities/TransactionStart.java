@@ -24,7 +24,8 @@ import lombok.Setter;
 
 import jakarta.persistence.*;
 import java.io.Serializable;
-import java.util.Date;
+import java.time.LocalDateTime;
+
 
 @Entity
 @Table(name = "ocpp_transaction_start")
@@ -39,7 +40,7 @@ public class TransactionStart implements Serializable {
 
     @Column(name = "start_timestamp", nullable = false)
     @Temporal(TemporalType.TIMESTAMP)
-    private Date startTimestamp;
+    private LocalDateTime startTimestamp;
 
     @Column(name = "start_value")
     private String startValue;
@@ -53,6 +54,6 @@ public class TransactionStart implements Serializable {
 
     @Column(name = "event_timestamp", nullable = false)
     @Temporal(TemporalType.TIMESTAMP)
-    private Date eventTimestamp;
+    private LocalDateTime eventTimestamp;
 
 }

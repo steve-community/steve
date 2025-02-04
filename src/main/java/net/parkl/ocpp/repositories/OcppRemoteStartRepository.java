@@ -24,6 +24,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 
@@ -32,8 +33,8 @@ public interface OcppRemoteStartRepository extends CrudRepository<OcppRemoteStar
     void deleteByConnectorAndOcppTag(Connector c, String idTag);
 
     @Query("select count(r) from OcppRemoteStart r where r.connector = ?1 and r.ocppTag = ?2 and r.createDate > ?3")
-    long countByConnectorAndOcppTagAfter(Connector c, String idTag, Date date);
+    long countByConnectorAndOcppTagAfter(Connector c, String idTag, LocalDateTime date);
 
     @Query("select count(r) from OcppRemoteStart r where r.connector in ?1 and r.ocppTag = ?2 and r.createDate > ?3")
-    long countByConnectorsAndOcppTagAfter(List<Connector> connectors, String idTag, Date date);
+    long countByConnectorsAndOcppTagAfter(List<Connector> connectors, String idTag, LocalDateTime date);
 }

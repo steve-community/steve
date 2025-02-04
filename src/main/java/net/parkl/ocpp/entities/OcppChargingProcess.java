@@ -22,6 +22,8 @@ import lombok.Getter;
 import lombok.Setter;
 
 import jakarta.persistence.*;
+
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @Entity
@@ -35,11 +37,11 @@ public class OcppChargingProcess {
 
     @Column(name = "start_date", nullable = false)
     @Temporal(TemporalType.TIMESTAMP)
-    private Date startDate;
+    private LocalDateTime startDate;
 
     @Column(name = "end_date", nullable = true)
     @Temporal(TemporalType.TIMESTAMP)
-    private Date endDate;
+    private LocalDateTime endDate;
 
     @Column(name = "stop_request_date", nullable = true)
     @Temporal(TemporalType.TIMESTAMP)
@@ -73,7 +75,7 @@ public class OcppChargingProcess {
 
     @PrePersist
     public void prePersist() {
-        startDate = new Date();
+        startDate = LocalDateTime.now();
     }
 
     public boolean stoppedExternally() {

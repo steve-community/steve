@@ -32,7 +32,7 @@ public class TransactionCleanupConfig {
     private int cleanupConsumptionThresholdDays;
 
     public LocalDateTime getCleanupCheckThreshold() {
-        int cleanupCheckThresholdHours = 3;  // Set this to whatever you want
+        // Set this to whatever you want
         LocalDateTime dateTime = LocalDateTime.now().minus(cleanupCheckThresholdHours, ChronoUnit.HOURS);
         return dateTime;
     }

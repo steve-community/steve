@@ -11,7 +11,7 @@ import net.parkl.ocpp.util.CalendarUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -28,7 +28,7 @@ public class TransactionCleanupManager {
 
 
     public int cleanupTransactions() {
-        Date cleanupCheckThreshold = config.getCleanupCheckThreshold();
+        LocalDateTime cleanupCheckThreshold = config.getCleanupCheckThreshold();
         log.debug("Checking transactions for cleanup before: {}...", cleanupCheckThreshold);
         List<Transaction> transactions = cleanupService.getTransactionsForCleanup(cleanupCheckThreshold);
 

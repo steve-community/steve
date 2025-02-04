@@ -24,7 +24,6 @@ import lombok.Setter;
 import jakarta.persistence.*;
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.util.Date;
 
 @Entity
 @Table(name = "ocpp_connector_meter_value")

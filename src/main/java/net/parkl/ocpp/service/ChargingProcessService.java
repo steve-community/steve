@@ -34,7 +34,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.Date;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.UUID;
 
@@ -155,7 +155,7 @@ public class ChargingProcessService {
             return cp;
         }
 
-        cp.setStopRequestDate(new Date());
+        cp.setStopRequestDate(LocalDateTime.now());
         return chargingProcessRepo.save(cp);
     }
 
@@ -240,7 +240,8 @@ public class ChargingProcessService {
 
     @Transactional
     public List<OcppChargingProcess> findWithoutTransactionForCleanup(int hoursBefore) {
-        return chargingProcessRepo.findWithoutTransactionBefore(new Date(System.currentTimeMillis()-hoursBefore*60*60*1000L));
+        LocalDateTime dateTimeBefore = LocalDateTime.now().minus(hoursBefore, ChronoUnit.HOURS);
+        return chargingProcessRepo.findWithoutTransactionBefore(dateTimeBefore);
 
     }
 

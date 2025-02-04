@@ -98,7 +98,9 @@ public class ConnectorMeterValueService {
 
     private ConnectorMeterValueDetail convertToMeterValueDetail(Object[] row) {
         return ConnectorMeterValueDetail.builder()
-                .valueTimestamp((Date) row[0])
+                .valueTimestamp(((Date) row[0]).toInstant()
+                        .atZone(ZoneId.systemDefault())
+                        .toLocalDateTime())
                 .value((String) row[1])
                 .readingContext((String) row[2])
                 .format((String) row[3])
@@ -139,7 +141,9 @@ public class ConnectorMeterValueService {
         List<ChargingMeterValueDto> meterValues = new ArrayList<>();
         for (Object[] row : energyAndPowerData) {
             meterValues.add(ChargingMeterValueDto.builder()
-                    .valueTimestamp((Date) row[0])
+                    .valueTimestamp(((Date) row[0]).toInstant()
+                            .atZone(ZoneId.systemDefault())
+                            .toLocalDateTime())
                     .energy((String) row[1])
                     .power((String) row[2])
                     .energyUnit((String) row[3])

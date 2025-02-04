@@ -33,6 +33,8 @@ import net.parkl.ocpp.service.cs.ChargingProfileService;
 import ocpp.cp._2015._10.*;
 
 import jakarta.xml.ws.AsyncHandler;
+
+import java.sql.Timestamp;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -86,7 +88,7 @@ public class SetChargingProfileTask extends Ocpp16AndAboveTask<EnhancedSetChargi
 
         ChargingSchedule schedule = new ChargingSchedule()
                 .withDuration(profile.getDurationInSeconds())
-                .withStartSchedule(DateTimeConverter.from(profile.getStartSchedule()))
+                .withStartSchedule(DateTimeConverter.from(Timestamp.valueOf(profile.getStartSchedule())))
                 .withChargingRateUnit(ChargingRateUnitType.fromValue(profile.getChargingRateUnit()))
                 .withMinChargingRate(profile.getMinChargingRate())
                 .withChargingSchedulePeriod(schedulePeriods);
@@ -97,8 +99,8 @@ public class SetChargingProfileTask extends Ocpp16AndAboveTask<EnhancedSetChargi
                 .withChargingProfilePurpose(ChargingProfilePurposeType.fromValue(profile.getChargingProfilePurpose()))
                 .withChargingProfileKind(ChargingProfileKindType.fromValue(profile.getChargingProfileKind()))
                 .withRecurrencyKind(profile.getRecurrencyKind() == null ? null : RecurrencyKindType.fromValue(profile.getRecurrencyKind()))
-                .withValidFrom(DateTimeConverter.from(profile.getValidFrom()))
-                .withValidTo(DateTimeConverter.from(profile.getValidTo()))
+                .withValidFrom(DateTimeConverter.from(Timestamp.valueOf(profile.getValidFrom())))
+                .withValidTo(DateTimeConverter.from(Timestamp.valueOf(profile.getValidTo())))
                 .withChargingSchedule(schedule);
 
         return new SetChargingProfileRequest()

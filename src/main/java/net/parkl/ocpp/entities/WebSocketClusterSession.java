@@ -5,7 +5,8 @@ import lombok.Setter;
 
 import jakarta.persistence.*;
 import java.io.Serializable;
-import java.util.Date;
+import java.time.LocalDateTime;
+
 
 @Entity
 @Table(name = "web_socket_cluster_session")
@@ -25,10 +26,10 @@ public class WebSocketClusterSession implements Serializable {
 
     @Column(name = "create_date", nullable = false)
     @Temporal(TemporalType.TIMESTAMP)
-    private Date createDate;
+    private LocalDateTime createDate;
 
     @PrePersist
     public void prePersist() {
-        this.createDate = new Date();
+        this.createDate = LocalDateTime.now();
     }
 }

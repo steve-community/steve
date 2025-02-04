@@ -25,7 +25,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 
 import java.time.LocalDateTime;
-import java.util.Date;
+
 import java.util.List;
 
 public interface TransactionStartRepository extends CrudRepository<TransactionStart, Integer> {
@@ -33,7 +33,7 @@ public interface TransactionStartRepository extends CrudRepository<TransactionSt
     List<TransactionStart> findNextTransactions(String chargeBoxId, int connectorId, LocalDateTime startTimestamp, Pageable pageable);
 
     @Query("SELECT OBJECT(t) FROM TransactionStart AS t WHERE t.connector=?1 AND t.ocppTag=?2 AND t.startTimestamp=?3 AND t.startValue=?4")
-    TransactionStart findByConnectorAndIdTagAndStartValues(Connector c, String idTag, Date startDate, String startValue);
+    TransactionStart findByConnectorAndIdTagAndStartValues(Connector c, String idTag, LocalDateTime startDate, String startValue);
 
     TransactionStart findFirstByConnectorAndOcppTagOrderByStartTimestampDesc(Connector c, String idTag);
 

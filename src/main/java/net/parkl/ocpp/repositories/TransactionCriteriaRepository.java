@@ -30,7 +30,8 @@ import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
-import java.util.Date;
+
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static net.parkl.ocpp.util.CalendarUtils.*;
@@ -78,7 +79,7 @@ public class TransactionCriteriaRepository {
     }
 
     private Predicate getTypePredicate(CriteriaBuilder cb, Root<Transaction> root, TransactionQueryForm form) {
-        Date now = new Date();
+        LocalDateTime now = LocalDateTime.now();
 
         switch (form.getPeriodType()) {
             case TODAY:

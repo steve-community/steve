@@ -247,7 +247,9 @@ public class TransactionServiceImpl implements TransactionService {
 
         TransactionStart existing = transactionStartRepo.findByConnectorAndIdTagAndStartValues(
                 connector, params.getIdTag(),
-                params.getStartTimestamp() != null ? params.getStartTimestamp().toDate() : null,
+                params.getStartTimestamp() != null ? params.getStartTimestamp().toDate().toInstant()
+                        .atZone(ZoneId.systemDefault())
+                        .toLocalDateTime() : null,
                 params.getStartMeterValue());
 
         if (existing != null) {

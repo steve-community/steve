@@ -24,6 +24,9 @@ import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+
 @Service
 public class GenericServiceImpl implements GenericService {
 	@Autowired
@@ -32,7 +35,7 @@ public class GenericServiceImpl implements GenericService {
 	private OcppTagRepository tagRepo;
 	@Autowired
 	private UserRepository userRepo;
-	
+
 	@Autowired
 	private OcppReservationRepository reservationRepo;
 	@Autowired
@@ -46,20 +49,28 @@ public class GenericServiceImpl implements GenericService {
 		int tagCount=(int) tagRepo.count();
 		int userCount=(int) userRepo.count();
 		DateTime now = DateTime.now();
-		
-		int resCount=(int) reservationRepo.countByExpiryDateGreater(now.toDate());
-		
+
+		int resCount=(int) reservationRepo.countByExpiryDateGreater(LocalDateTime.now());
+
 		int trCount=(int) transactionRepo.countByStopTimestampIsNull();
-		
+
 		DateTime todayStart=now.withHourOfDay(0).withMinuteOfHour(0).withSecondOfMinute(0).withMillisOfSecond(0);
-		
-		int heartbeatsToday=(int)chargeBoxRepo.countLastHeartBeatAfter(todayStart.toDate());
-		
+
+		int heartbeatsToday=(int)chargeBoxRepo.countLastHeartBeatAfter(todayStart.toDate().toInstant()
+				.atZone(ZoneId.systemDefault())
+				.toLocalDateTime());
+
 		DateTime yesterdayStart = todayStart.minusDays(1);
-		int heartbeatsYesterday=(int)chargeBoxRepo.countLastHeartBeatBetween(yesterdayStart.toDate(),todayStart.toDate());
-		
-		int heartbeatsBefore=(int)chargeBoxRepo.countLastHeartBeatBefore(yesterdayStart.toDate());
-		
+		int heartbeatsYesterday=(int)chargeBoxRepo.countLastHeartBeatBetween(yesterdayStart.toDate().toInstant()
+				.atZone(ZoneId.systemDefault())
+				.toLocalDateTime(),todayStart.toDate().toInstant()
+				.atZone(ZoneId.systemDefault())
+				.toLocalDateTime());
+
+		int heartbeatsBefore=(int)chargeBoxRepo.countLastHeartBeatBefore(yesterdayStart.toDate().toInstant()
+				.atZone(ZoneId.systemDefault())
+				.toLocalDateTime());
+
 		return Statistics.builder()
                 .numChargeBoxes(chargeBoxCount)
                 .numOcppTags(tagCount)

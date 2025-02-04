@@ -24,7 +24,7 @@ import lombok.Setter;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
-import java.util.Date;
+
 
 @Entity
 @Table(name = "ocpp_charging_process")
@@ -45,7 +45,7 @@ public class OcppChargingProcess {
 
     @Column(name = "stop_request_date", nullable = true)
     @Temporal(TemporalType.TIMESTAMP)
-    private Date stopRequestDate;
+    private LocalDateTime stopRequestDate;
 
     @Column(name = "license_plate", nullable = true, length = 20)
     private String licensePlate;

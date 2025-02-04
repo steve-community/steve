@@ -6,7 +6,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
-import java.util.Date;
+import java.time.temporal.ChronoUnit;
+
 
 @Component
 @Slf4j
@@ -30,8 +31,10 @@ public class TransactionCleanupConfig {
     @Getter
     private int cleanupConsumptionThresholdDays;
 
-    public Date getCleanupCheckThreshold() {
-        return new Date(System.currentTimeMillis()-cleanupCheckThresholdHours * HOURS_IN_MS);
+    public LocalDateTime getCleanupCheckThreshold() {
+        int cleanupCheckThresholdHours = 3;  // Set this to whatever you want
+        LocalDateTime dateTime = LocalDateTime.now().minus(cleanupCheckThresholdHours, ChronoUnit.HOURS);
+        return dateTime;
     }
     public boolean checkNonExistentThreshold(LocalDateTime startDate) {
         log.info("Checking non-existent threshold with start date {}: {} hours before now...", startDate,

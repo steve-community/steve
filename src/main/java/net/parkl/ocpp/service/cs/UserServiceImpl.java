@@ -39,6 +39,8 @@ import jakarta.persistence.TypedQuery;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Root;
+
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -53,18 +55,18 @@ public class UserServiceImpl implements UserService {
 	private AddressService addressService;
 	@Autowired
 	private OcppAddressRepository addressRepo;
-	
+
 	@PersistenceContext
 	private EntityManager em;
-	
+
 
 	@Override
 	@Transactional
 	public void update(UserForm form) {
 		User user = userRepo.findById(form.getUserPk()).
 				orElseThrow(() -> new IllegalArgumentException("Invalid user id: "+form.getUserPk()));
-		
-		
+
+
 		OcppTag tag = tagRepo.findByIdTag(form.getOcppIdTag());
 		if (tag==null) {
 			throw new IllegalArgumentException("Invalid id tag: "+form.getOcppIdTag());
@@ -74,7 +76,9 @@ public class UserServiceImpl implements UserService {
 		user.setFirstName(form.getFirstName());
 		user.setLastName(form.getLastName());
 		if (form.getBirthDay()!=null) {
-			user.setBirthDay(form.getBirthDay().toDate());
+			user.setBirthDay(form.getBirthDay().toDate().toInstant()
+					.atZone(ZoneId.systemDefault())
+					.toLocalDateTime());
 		}
 		if (form.getSex()!=null) {
 			user.setSex(form.getSex().getDatabaseValue());
@@ -90,26 +94,28 @@ public class UserServiceImpl implements UserService {
 	@Transactional
 	public void delete(int userPk) {
 		User user = userRepo.findById(userPk).orElseThrow(() -> new IllegalArgumentException("Invalid user id: "+userPk));
-		
+
 		if (user.getAddress()!=null) {
 			addressRepo.delete(user.getAddress());
 		}
 		userRepo.delete(user);
-		
+
 	}
 
 	@Override
 	@Transactional
 	public void add(UserForm form) {
 		OcppTag tag = tagRepo.findByIdTag(form.getOcppIdTag());
-		
+
 		OcppAddress addr = addressService.saveAddress(form.getAddress());
 		User user=new User();
 		user.setAddress(addr);
 		user.setFirstName(form.getFirstName());
 		user.setLastName(form.getLastName());
 		if (form.getBirthDay()!=null) {
-			user.setBirthDay(form.getBirthDay().toDate());
+			user.setBirthDay(form.getBirthDay().toDate().toInstant()
+					.atZone(ZoneId.systemDefault())
+					.toLocalDateTime());
 		}
 		if (form.getSex()!=null) {
 			user.setSex(form.getSex().getDatabaseValue());
@@ -128,7 +134,7 @@ public class UserServiceImpl implements UserService {
 			CriteriaQuery<User> cq = cb.createQuery(User.class);
 			Root<User> root = cq.from(User.class);
 			cq.select(root);
-			
+
 	        if (form.isSetUserPk()) {
 	        	cq=cq.where(cb.equal(root.get("userPk"), form.getUserPk()));
 	        }
@@ -154,16 +160,16 @@ public class UserServiceImpl implements UserService {
 	            //selectQuery.addConditions(includes(joinedField, form.getName()));
 	        }
 
-	        
-	       	
+
+
 			cq=cq.orderBy(cb.asc(root.get("userPk")));
 			TypedQuery<User> q = em.createQuery(cq);
 			List<User> result = q.getResultList();
-			
+
 
 			List<Overview> ret=new ArrayList<>();
 			for (User u:result) {
-				
+
 				ret.add(de.rwth.idsg.steve.repository.dto.User.Overview.builder()
                         .userPk(u.getUserPk())
                         .ocppTagPk(u.getOcppTag().getOcppTagPk())
@@ -174,7 +180,7 @@ public class UserServiceImpl implements UserService {
                         .build());
 			}
 			return ret;
-		} finally { 
+		} finally {
 			em.close();
 		}
 	}
@@ -201,9 +207,9 @@ public class UserServiceImpl implements UserService {
 
         String ocppIdTag = null;
         if (ur.getOcppTag() != null) {
-            
+
             ocppIdTag = ur.getOcppTag().getIdTag();
-            
+
         }
 
         return de.rwth.idsg.steve.repository.dto.User.Details.builder()

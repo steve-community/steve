@@ -18,15 +18,10 @@
  */
 package net.parkl.ocpp.repositories;
 
-import net.parkl.ocpp.entities.Connector;
 import net.parkl.ocpp.entities.TransactionEnergyImport;
-import net.parkl.ocpp.entities.TransactionStart;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 
-import java.util.Date;
-import java.util.List;
+
 
 public interface TransactionEnergyImportRepository extends CrudRepository<TransactionEnergyImport, Integer> {
 

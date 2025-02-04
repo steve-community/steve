@@ -33,7 +33,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Date;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.Map;
 
@@ -97,10 +98,14 @@ public class ReservationServiceImpl implements ReservationService {
         r.setConnector(conn);
         r.setOcppTag(params.getIdTag());
         if (params.getStartTimestamp() != null) {
-            r.setStartDatetime(params.getStartTimestamp().toDate());
+            r.setStartDatetime(params.getStartTimestamp().toDate().toInstant()
+                    .atZone(ZoneId.systemDefault())
+                    .toLocalDateTime());
         }
         if (params.getExpiryTimestamp() != null) {
-            r.setExpiryDatetime(params.getExpiryTimestamp().toDate());
+            r.setExpiryDatetime(params.getExpiryTimestamp().toDate().toInstant()
+                    .atZone(ZoneId.systemDefault())
+                    .toLocalDateTime());
         }
         r.setStatus(ReservationStatus.WAITING.name());
         r = reservationRepo.save(r);
@@ -110,7 +115,7 @@ public class ReservationServiceImpl implements ReservationService {
 
     @Override
     public List<Integer> getActiveReservationIds(String chargeBoxId) {
-        return reservationRepo.findActiveReservationIds(chargeBoxId, new Date());
+        return reservationRepo.findActiveReservationIds(chargeBoxId, LocalDateTime.now());
     }
 
     @Override

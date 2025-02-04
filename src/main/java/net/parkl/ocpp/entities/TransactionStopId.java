@@ -27,7 +27,8 @@ import jakarta.persistence.Embeddable;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
 import java.io.Serializable;
-import java.util.Date;
+import java.time.LocalDateTime;
+
 
 @Embeddable
 @Getter
@@ -39,5 +40,5 @@ public class TransactionStopId implements Serializable {
 
     @Column(name = "event_timestamp", nullable = false)
     @Temporal(TemporalType.TIMESTAMP)
-    private Date eventTimestamp;
+    private LocalDateTime eventTimestamp;
 }

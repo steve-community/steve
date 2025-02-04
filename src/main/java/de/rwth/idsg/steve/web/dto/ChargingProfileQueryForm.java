@@ -28,7 +28,9 @@ import lombok.ToString;
 import ocpp.cp._2015._10.ChargingProfileKindType;
 import ocpp.cp._2015._10.ChargingProfilePurposeType;
 import ocpp.cp._2015._10.RecurrencyKindType;
-import org.joda.time.LocalDateTime;
+
+import java.time.LocalDateTime;
+
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>

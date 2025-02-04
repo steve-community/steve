@@ -21,6 +21,8 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.time.ZoneId;
+
 import static net.parkl.ocpp.entities.TransactionStopEventActor.station;
 import static net.parkl.ocpp.service.OcppConstants.REASON_VEHICLE_CHARGED;
 import static net.parkl.ocpp.service.OcppConstants.REASON_VEHICLE_NOT_CONNECTED;
@@ -169,7 +171,9 @@ public class TransactionServiceUnitTest {
         existing.setTransactionPk(testTransactionPk);
         when(transactionStartRepository.findByConnectorAndIdTagAndStartValues(testConnector,
                 testRfidTag,
-                params.getStartTimestamp().toDate(),
+                params.getStartTimestamp().toDate().toInstant()
+                        .atZone(ZoneId.systemDefault())
+                        .toLocalDateTime(),
                 params.getStartMeterValue()))
                 .thenReturn(existing);
 

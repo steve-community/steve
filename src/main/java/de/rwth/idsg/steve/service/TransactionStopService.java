@@ -38,9 +38,9 @@ import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.time.ZoneId;
+import java.sql.Timestamp;
 import java.util.Comparator;
-import java.util.Date;
+
 import java.util.List;
 
 import static de.rwth.idsg.steve.utils.TransactionStopServiceHelper.floatingStringToIntString;
@@ -109,13 +109,13 @@ public class TransactionStopService {
             if (Integer.parseInt(nextTx.getStartValue()) > Integer.parseInt(thisTx.getStartValue())) {
                 return TerminationValues.builder()
                                         .stopValue(nextTx.getStartValue())
-                                        .stopTimestamp(DateTimeConverter.from(Date.from(nextTx.getStartTimestamp().atZone(ZoneId.systemDefault()).toInstant())))
+                                        .stopTimestamp(DateTimeConverter.from(Timestamp.valueOf(nextTx.getStartTimestamp())))
                                         .build();
             } else {
                 // this mix of strategies might be really confusing
                 return TerminationValues.builder()
                                         .stopValue(thisTx.getStartValue())
-                                        .stopTimestamp(DateTimeConverter.from(Date.from(nextTx.getStartTimestamp().atZone(ZoneId.systemDefault()).toInstant())))
+                                        .stopTimestamp(DateTimeConverter.from(Timestamp.valueOf(nextTx.getStartTimestamp())))
                                         .build();
             }
         }

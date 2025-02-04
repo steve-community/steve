@@ -25,7 +25,9 @@ package de.rwth.idsg.steve.utils;
 import org.joda.time.DateTime;
 
 import java.sql.Timestamp;
-import java.util.Date;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -41,11 +43,11 @@ public class DateTimeConverter  {
         }
     }
 
-    public static DateTime from(Date date) {
+    public static DateTime from(LocalDateTime date) {
         if (date == null) {
             return null;
         } else {
-            return new DateTime(date);
+            return new DateTime(Timestamp.valueOf(date).getTime());
         }
     }
 
@@ -57,11 +59,11 @@ public class DateTimeConverter  {
         }
     }
 
-    public static Date toDate(DateTime dateTime) {
+    public static LocalDateTime toDate(DateTime dateTime) {
         if (dateTime == null) {
             return null;
         } else {
-            return new Date(dateTime.getMillis());
+            return LocalDateTime.ofInstant(dateTime.toDate().toInstant(), ZoneId.systemDefault());
         }
     }
 }

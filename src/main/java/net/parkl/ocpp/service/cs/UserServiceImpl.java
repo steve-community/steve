@@ -76,9 +76,7 @@ public class UserServiceImpl implements UserService {
 		user.setFirstName(form.getFirstName());
 		user.setLastName(form.getLastName());
 		if (form.getBirthDay()!=null) {
-			user.setBirthDay(form.getBirthDay().toDate().toInstant()
-					.atZone(ZoneId.systemDefault())
-					.toLocalDateTime());
+			user.setBirthDay(form.getBirthDay().toDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
 		}
 		if (form.getSex()!=null) {
 			user.setSex(form.getSex().getDatabaseValue());
@@ -113,9 +111,7 @@ public class UserServiceImpl implements UserService {
 		user.setFirstName(form.getFirstName());
 		user.setLastName(form.getLastName());
 		if (form.getBirthDay()!=null) {
-			user.setBirthDay(form.getBirthDay().toDate().toInstant()
-					.atZone(ZoneId.systemDefault())
-					.toLocalDateTime());
+			user.setBirthDay(form.getBirthDay().toDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
 		}
 		if (form.getSex()!=null) {
 			user.setSex(form.getSex().getDatabaseValue());

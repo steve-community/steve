@@ -23,6 +23,7 @@ import lombok.Setter;
 
 import jakarta.persistence.*;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
@@ -51,7 +52,7 @@ public class User {
 
 	@Column(name="birth_day",nullable=true)
 	@Temporal(TemporalType.DATE)
-	private LocalDateTime birthDay;
+	private LocalDate birthDay;
 
 	@Column(name="sex",length=1,nullable=true)
 	private String sex;

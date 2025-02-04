@@ -40,7 +40,8 @@ import org.springframework.core.task.TaskExecutor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Date;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Optional;
 
 @Service
@@ -70,7 +71,9 @@ public class ConnectorServiceImpl implements ConnectorService {
         ConnectorStatus s = new ConnectorStatus();
         s.setConnector(connector);
         if (p.getTimestamp() != null) {
-            s.setStatusTimestamp(p.getTimestamp().toDate());
+            s.setStatusTimestamp(p.getTimestamp().toDate().toInstant()
+                    .atZone(ZoneId.systemDefault())
+                    .toLocalDateTime());
         }
         s.setStatus(p.getStatus());
         s.setErrorCode(p.getErrorCode());
@@ -83,9 +86,11 @@ public class ConnectorServiceImpl implements ConnectorService {
         ConnectorLastStatus ls = new ConnectorLastStatus();
         ls.setConnectorPk(connector.getConnectorPk());
         if (p.getTimestamp() != null) {
-            ls.setStatusTimestamp(p.getTimestamp().toDate());
+            ls.setStatusTimestamp(p.getTimestamp().toDate().toInstant()
+                    .atZone(ZoneId.systemDefault())
+                    .toLocalDateTime());
         } else {
-            ls.setStatusTimestamp(new Date());
+            ls.setStatusTimestamp(LocalDateTime.now());
         }
         ls.setStatus(p.getStatus());
         ls.setErrorCode(p.getErrorCode());
@@ -128,7 +133,7 @@ public class ConnectorServiceImpl implements ConnectorService {
 
         if (s.getStatus().equals(ChargePointStatus.AVAILABLE.value())) {
             log.info("Ending charging process on available connector status: {}", process.getOcppChargingProcessId());
-            process.setEndDate(new Date());
+            process.setEndDate(LocalDateTime.now());
             return chargingProcessRepo.save(process);
         } else if (s.getStatus().equals(ChargePointStatus.FAULTED.value())
                 || s.getStatus().equals(ChargePointStatus.UNAVAILABLE.value())) {
@@ -165,7 +170,9 @@ public class ConnectorServiceImpl implements ConnectorService {
         ConnectorStatus s = new ConnectorStatus();
         s.setConnector(connector);
         if (startTimestamp != null) {
-            s.setStatusTimestamp(startTimestamp.toDate());
+            s.setStatusTimestamp(startTimestamp.toDate().toInstant()
+                    .atZone(ZoneId.systemDefault())
+                    .toLocalDateTime());
         }
         s.setStatus(statusUpdate.getStatus());
         s.setErrorCode(statusUpdate.getErrorCode());
@@ -175,9 +182,11 @@ public class ConnectorServiceImpl implements ConnectorService {
         ConnectorLastStatus ls = new ConnectorLastStatus();
         ls.setConnectorPk(connector.getConnectorPk());
         if (startTimestamp != null) {
-            ls.setStatusTimestamp(startTimestamp.toDate());
+            ls.setStatusTimestamp(startTimestamp.toDate().toInstant()
+                    .atZone(ZoneId.systemDefault())
+                    .toLocalDateTime());
         } else {
-            ls.setStatusTimestamp(new Date());
+            ls.setStatusTimestamp(LocalDateTime.now());
         }
         ls.setStatus(statusUpdate.getStatus());
         ls.setErrorCode(statusUpdate.getErrorCode());

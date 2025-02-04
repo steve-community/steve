@@ -33,8 +33,9 @@ import jakarta.persistence.TypedQuery;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Root;
+
+import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -64,7 +65,7 @@ public class OcppReservationCriteriaRepository {
 
             switch (form.getPeriodType()) {
                 case ACTIVE:
-                    cq = cq.where(cb.greaterThan(root.get("expiryDatetime"), new Date()));
+                    cq = cq.where(cb.greaterThan(root.get("expiryDatetime"), LocalDateTime.now()));
                     break;
 
                 case FROM_TO:

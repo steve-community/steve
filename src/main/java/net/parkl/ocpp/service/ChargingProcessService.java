@@ -33,7 +33,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Date;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.UUID;
 
@@ -109,7 +110,7 @@ public class ChargingProcessService {
         if (lastTransaction != null) {
             if (transactionStopRepository.countByTransactionId(lastTransaction.getTransactionPk())==0 &&
                     lastTransaction.getStartTimestamp()
-                            .after(remoteStartService.getRemoteStartValidityThreshold(chargeBoxId))) {
+                            .isAfter(remoteStartService.getRemoteStartValidityThreshold(chargeBoxId))) {
                 log.info("Using existing transaction for id tag {}: {}", idTag, lastTransaction.getTransactionPk());
                 startTransaction = lastTransaction;
             }
@@ -139,7 +140,7 @@ public class ChargingProcessService {
         if (cp.getEndDate() != null) {
             log.warn("OcppChargingProcess already ended: " + processId);
         } else {
-            cp.setEndDate(new Date());
+            cp.setEndDate(LocalDateTime.now());
         }
         return chargingProcessRepo.save(cp);
     }
@@ -154,7 +155,7 @@ public class ChargingProcessService {
             return cp;
         }
 
-        cp.setStopRequestDate(new Date());
+        cp.setStopRequestDate(LocalDateTime.now());
         return chargingProcessRepo.save(cp);
     }
 
@@ -239,7 +240,8 @@ public class ChargingProcessService {
 
     @Transactional
     public List<OcppChargingProcess> findWithoutTransactionForCleanup(int hoursBefore) {
-        return chargingProcessRepo.findWithoutTransactionBefore(new Date(System.currentTimeMillis()-hoursBefore*60*60*1000L));
+        LocalDateTime dateTimeBefore = LocalDateTime.now().minus(hoursBefore, ChronoUnit.HOURS);
+        return chargingProcessRepo.findWithoutTransactionBefore(dateTimeBefore);
 
     }
 

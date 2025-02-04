@@ -36,6 +36,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.io.Writer;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.*;
 
 import static de.rwth.idsg.steve.web.dto.TransactionQueryForm.QueryType;
@@ -116,8 +118,8 @@ public class TransactionServiceImpl implements TransactionService {
 
         Transaction transaction = transactions.get(0);
 
-        Date startTimestamp = transaction.getStartTimestamp();
-        Date stopTimestamp = transaction.getStopTimestamp();
+        LocalDateTime startTimestamp = transaction.getStartTimestamp();
+        LocalDateTime stopTimestamp = transaction.getStopTimestamp();
         String stopValue = transaction.getStopValue();
         String chargeBoxId = transaction.getConnector().getChargeBoxId();
         int connectorId = transaction.getConnector().getConnectorId();
@@ -245,7 +247,9 @@ public class TransactionServiceImpl implements TransactionService {
 
         TransactionStart existing = transactionStartRepo.findByConnectorAndIdTagAndStartValues(
                 connector, params.getIdTag(),
-                params.getStartTimestamp() != null ? params.getStartTimestamp().toDate() : null,
+                params.getStartTimestamp() != null ? params.getStartTimestamp().toDate().toInstant()
+                        .atZone(ZoneId.systemDefault())
+                        .toLocalDateTime() : null,
                 params.getStartMeterValue());
 
         if (existing != null) {
@@ -319,7 +323,7 @@ public class TransactionServiceImpl implements TransactionService {
                 log.info("Transaction update: {} with end date: {}", transactionId, p.getStopTimestamp());
                 String chargingProcessId = chargingProcess.getOcppChargingProcessId();
                 log.info("Ending charging process on transaction update: {} with end date: {}", chargingProcessId, p.getStopTimestamp());
-                chargingProcess.setEndDate(p.getStopTimestamp().toDate());
+                chargingProcess.setEndDate(p.getStopTimestamp().toDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime());
 
                 chargingProcess = chargingProcessService.save(chargingProcess);
             }

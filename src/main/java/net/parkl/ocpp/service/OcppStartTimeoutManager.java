@@ -26,6 +26,7 @@ import net.parkl.ocpp.service.middleware.OcppChargePointMiddleware;
 import net.parkl.ocpp.service.middleware.OcppChargingMiddleware;
 import org.springframework.stereotype.Component;
 
+import java.time.ZoneId;
 import java.util.List;
 
 import static java.lang.System.currentTimeMillis;
@@ -68,7 +69,7 @@ public class OcppStartTimeoutManager {
     }
 
     private void checkForProcessStartTimeout(OcppChargingProcess chargingProcess) throws Exception {
-        if (chargingProcess.getStartDate().getTime()
+        if (chargingProcess.getStartDate().atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()
                 + config.getStartTimeoutSecs(chargingProcess.getConnector().getChargeBoxId()) * 1000L < currentTimeMillis()) {
             log.info("Charging process start timeout: {}", chargingProcess.getOcppChargingProcessId());
             log.info("Charging process stopped on timeout, connector reset: {}-{}",
@@ -78,7 +79,7 @@ public class OcppStartTimeoutManager {
     }
 
     private void checkForProcessPreparingTimeout(OcppChargingProcess chargingProcess) {
-        if (chargingProcess.getStartDate().getTime()
+        if (chargingProcess.getStartDate().atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()
                 + config.getPreparingTimeoutSecs(chargingProcess.getConnector().getChargeBoxId()) * 1000L < currentTimeMillis()) {
             log.info("Charging process preparing timeout: {}", chargingProcess.getOcppChargingProcessId());
             log.info("Charging process stopped on timeout, connector reset: {}-{}",

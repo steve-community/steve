@@ -23,7 +23,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -35,6 +35,6 @@ public class ESPChargingConsumptionRequest {
     private Float startValue;
     private Float stopValue;
 
-    private Date start;
-    private Date end;
+    private LocalDateTime start;
+    private LocalDateTime end;
 }

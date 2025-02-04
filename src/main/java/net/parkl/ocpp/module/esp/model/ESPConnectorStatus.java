@@ -3,7 +3,7 @@ package net.parkl.ocpp.module.esp.model;
 import lombok.*;
 
 import java.io.Serializable;
-import java.util.Date;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -17,7 +17,7 @@ public class ESPConnectorStatus implements Serializable {
     private String errorInfo;
     private String status;
 
-    private Date statusTimestamp;
+    private LocalDateTime statusTimestamp;
 
     private String vendorErrorCode;
 

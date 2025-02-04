@@ -41,6 +41,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
+import java.sql.Timestamp;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -187,8 +189,8 @@ public class ChargingProfileServiceImpl implements ChargingProfileService {
                 form.getProfilePurpose()!=null?form.getProfilePurpose().value():null,
                 form.getProfileKind()!=null?form.getProfileKind().value():null,
                 form.getRecurrencyKind()!=null?form.getRecurrencyKind().value():null,
-                form.getValidFrom()!=null? DateTimeConverter.toDate(form.getValidFrom().toDateTime()) :null,
-                form.getValidTo()!=null ? DateTimeConverter.toDate(form.getValidTo().toDateTime()):null);
+                form.getValidFrom()!=null? form.getValidFrom() :null,
+                form.getValidTo()!=null ? form.getValidTo():null);
 
         return profiles.stream().
                 map(r -> ChargingProfile.Overview.builder()
@@ -198,8 +200,8 @@ public class ChargingProfileServiceImpl implements ChargingProfileService {
                         .profilePurpose(r.getChargingProfilePurpose())
                         .profileKind(r.getChargingProfileKind())
                         .recurrencyKind(r.getRecurrencyKind())
-                        .validFrom(r.getValidFrom()!=null?DateTimeConverter.from(r.getValidFrom()):null)
-                        .validTo(r.getValidTo()!=null?DateTimeConverter.from(r.getValidTo()):null)
+                        .validFrom(r.getValidFrom()!=null?DateTimeConverter.from(Timestamp.valueOf(r.getValidFrom())):null)
+                        .validTo(r.getValidTo()!=null?DateTimeConverter.from(Timestamp.valueOf(r.getValidTo())):null)
                         .build()
                 ).collect(Collectors.toList());
     }
@@ -242,10 +244,16 @@ public class ChargingProfileServiceImpl implements ChargingProfileService {
         profile.setChargingProfilePurpose(form.getChargingProfilePurpose().value());
         profile.setChargingProfileKind(form.getChargingProfileKind().value());
         profile.setRecurrencyKind(form.getRecurrencyKind() == null ? null : form.getRecurrencyKind().value());
-        profile.setValidFrom(DateTimeUtils.toDateTime(form.getValidFrom()).toDate());
-        profile.setValidTo(DateTimeUtils.toDateTime(form.getValidTo()).toDate());
+        profile.setValidFrom(DateTimeUtils.toDateTime(form.getValidFrom()).toDate().toInstant()
+                .atZone(ZoneId.systemDefault())
+                .toLocalDateTime());
+        profile.setValidTo(DateTimeUtils.toDateTime(form.getValidTo()).toDate().toInstant()
+                .atZone(ZoneId.systemDefault())
+                .toLocalDateTime());
         profile.setDurationInSeconds(form.getDurationInSeconds());
-        profile.setStartSchedule(DateTimeUtils.toDateTime(form.getStartSchedule()).toDate());
+        profile.setStartSchedule(DateTimeUtils.toDateTime(form.getStartSchedule()).toDate().toInstant()
+                .atZone(ZoneId.systemDefault())
+                .toLocalDateTime());
         profile.setChargingRateUnit(form.getChargingRateUnit().value());
         profile.setMinChargingRate(form.getMinChargingRate());
     }

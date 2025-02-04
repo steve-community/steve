@@ -24,15 +24,15 @@ import lombok.Setter;
 import lombok.ToString;
 
 import java.io.Serializable;
-import java.util.Date;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
 @Builder
 @ToString
 public class ESPChargingData implements Serializable {
-    private Date start;
-    private Date end;
+    private LocalDateTime start;
+    private LocalDateTime end;
     private float totalPower;
     private Float startValue;
     private Float stopValue;

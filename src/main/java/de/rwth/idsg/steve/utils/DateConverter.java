@@ -25,17 +25,18 @@ package de.rwth.idsg.steve.utils;
 import org.joda.time.LocalDate;
 
 import java.sql.Date;
+import java.time.LocalDateTime;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 25.11.2015
  */
 public class DateConverter {
-    public static LocalDate from(java.util.Date date) {
-        if (date == null) {
+    public static LocalDate from(LocalDateTime dateTime) {
+        if (dateTime == null) {
             return null;
         } else {
-            return new LocalDate(date.getTime());
+            return new LocalDate(dateTime.getYear(), dateTime.getMonthValue(), dateTime.getDayOfMonth());
         }
     }
 

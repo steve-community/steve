@@ -23,7 +23,7 @@ import lombok.Setter;
 
 import jakarta.persistence.*;
 import java.math.BigDecimal;
-import java.util.Date;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "ocpp_charging_profile")
@@ -49,18 +49,18 @@ public class OcppChargingProfile {
 
     @Column(name = "valid_from", nullable = true)
     @Temporal(TemporalType.TIMESTAMP)
-    private Date validFrom;
+    private LocalDateTime validFrom;
 
     @Column(name = "valid_to", nullable = true)
     @Temporal(TemporalType.TIMESTAMP)
-    private Date validTo;
+    private LocalDateTime validTo;
 
     @Column(name = "duration_in_seconds", nullable = true)
     private Integer durationInSeconds;
 
     @Column(name = "start_schedule", nullable = true)
     @Temporal(TemporalType.TIMESTAMP)
-    private Date startSchedule;
+    private LocalDateTime startSchedule;
 
     @Column(name = "charging_rate_unit", nullable = false)
     private String chargingRateUnit;

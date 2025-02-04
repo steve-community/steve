@@ -3,7 +3,7 @@ package net.parkl.ocpp.module.esp.model;
 import lombok.*;
 
 import java.io.Serializable;
-import java.util.Date;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -13,7 +13,7 @@ import java.util.Date;
 @ToString
 public class ESPActiveTransaction implements Serializable {
     private String ocppChargingProcessId;
-    private Date startDate;
+    private LocalDateTime startDate;
     private String startValue;
     private String ocppTag;
 }

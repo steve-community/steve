@@ -4,14 +4,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.parkl.ocpp.entities.OcppChargingProcess;
 import net.parkl.ocpp.entities.Transaction;
-import net.parkl.ocpp.module.esp.EmobilityServiceProvider;
-import net.parkl.ocpp.module.esp.model.ESPChargingProcessCheckResult;
 import net.parkl.ocpp.service.ChargingProcessService;
-import net.parkl.ocpp.util.CalendarUtils;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -28,7 +24,7 @@ public class TransactionCleanupManager {
 
 
     public int cleanupTransactions() {
-        Date cleanupCheckThreshold = config.getCleanupCheckThreshold();
+        LocalDateTime cleanupCheckThreshold = config.getCleanupCheckThreshold();
         log.debug("Checking transactions for cleanup before: {}...", cleanupCheckThreshold);
         List<Transaction> transactions = cleanupService.getTransactionsForCleanup(cleanupCheckThreshold);
 

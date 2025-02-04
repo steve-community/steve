@@ -31,6 +31,7 @@ import ocpp.cp._2015._10.ChargingProfilePurposeType;
 import ocpp.cp._2015._10.ChargingRateUnitType;
 import ocpp.cp._2015._10.RecurrencyKindType;
 
+import java.sql.Timestamp;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -56,14 +57,14 @@ public final class ChargingProfileDetailsMapper {
         form.setChargingProfileKind(ChargingProfileKindType.fromValue(profile.getChargingProfileKind()));
         form.setRecurrencyKind(profile.getRecurrencyKind() == null ? null : RecurrencyKindType.fromValue(profile.getRecurrencyKind()));
         if (profile.getValidFrom()!=null) {
-            form.setValidFrom(DateTimeUtils.toLocalDateTime(DateTimeConverter.from(profile.getValidFrom())));
+            form.setValidFrom(DateTimeUtils.toLocalDateTime(DateTimeConverter.from(Timestamp.valueOf(profile.getValidFrom()))));
         }
         if (profile.getValidTo()!=null) {
-            form.setValidTo(DateTimeUtils.toLocalDateTime(DateTimeConverter.from(profile.getValidTo())));
+            form.setValidTo(DateTimeUtils.toLocalDateTime(DateTimeConverter.from(Timestamp.valueOf(profile.getValidTo()))));
         }
         form.setDurationInSeconds(profile.getDurationInSeconds());
         if (profile.getStartSchedule()!=null) {
-            form.setStartSchedule(DateTimeUtils.toLocalDateTime(DateTimeConverter.from(profile.getStartSchedule())));
+            form.setStartSchedule(DateTimeUtils.toLocalDateTime(DateTimeConverter.from(Timestamp.valueOf(profile.getStartSchedule()))));
         }
         form.setChargingRateUnit(ChargingRateUnitType.fromValue(profile.getChargingRateUnit()));
         form.setMinChargingRate(profile.getMinChargingRate());

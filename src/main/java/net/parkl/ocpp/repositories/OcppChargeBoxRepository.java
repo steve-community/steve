@@ -23,7 +23,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 
 public interface OcppChargeBoxRepository extends JpaRepository<OcppChargeBox, Integer> {
@@ -41,19 +41,19 @@ public interface OcppChargeBoxRepository extends JpaRepository<OcppChargeBox, In
 	List<String> findAllChargeBoxIds();
 
 	@Query("SELECT COUNT(c.lastHeartbeatTimestamp) FROM OcppChargeBox AS c WHERE c.lastHeartbeatTimestamp>=?1")
-	long countLastHeartBeatAfter(Date date);
+	long countLastHeartBeatAfter(LocalDateTime date);
 	@Query("SELECT COUNT(c.lastHeartbeatTimestamp) FROM OcppChargeBox AS c WHERE c.lastHeartbeatTimestamp>=?1 AND c.lastHeartbeatTimestamp<?2")
-	long countLastHeartBeatBetween(Date date1,Date date2);
+	long countLastHeartBeatBetween(LocalDateTime date1,LocalDateTime date2);
 
 	@Query("SELECT COUNT(c.lastHeartbeatTimestamp) FROM OcppChargeBox AS c WHERE c.lastHeartbeatTimestamp<?1")
-	long countLastHeartBeatBefore(Date date);
-	
+	long countLastHeartBeatBefore(LocalDateTime date);
+
 	@Query("SELECT c.registrationStatus FROM OcppChargeBox AS c WHERE c.chargeBoxId=?1")
     String findChargeBoxRegistrationStatus(String chargeBoxId);
 
 	@Modifying(clearAutomatically=true)
 	@Query("UPDATE OcppChargeBox c SET c.lastHeartbeatTimestamp=?2 WHERE c.chargeBoxId=?1")
-	int updateChargeBoxLastHeartbeat(String chargeBoxId,Date lastHearbeat);
+	int updateChargeBoxLastHeartbeat(String chargeBoxId,LocalDateTime lastHearbeat);
 
 	@Modifying(clearAutomatically=true)
 	@Query("UPDATE OcppChargeBox c SET c.ocppProtocol=?2 WHERE c.chargeBoxId=?1")

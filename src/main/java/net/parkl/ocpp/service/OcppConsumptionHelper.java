@@ -29,7 +29,7 @@ import org.springframework.stereotype.Component;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import java.math.BigDecimal;
-import java.util.Date;
+import java.time.LocalDateTime;
 
 
 @Component
@@ -70,7 +70,7 @@ public class OcppConsumptionHelper {
 
         if (isTransactionPartialForChargeBox(t.getConnector().getChargeBoxId())) {
             if (t.getStartValue() != null) {
-                float sum = sumStopValueByConnectorBefore(t.getConnector(), t.getStartTimestamp() != null ? t.getStartTimestamp() : new Date());
+                float sum = sumStopValueByConnectorBefore(t.getConnector(), t.getStartTimestamp() != null ? t.getStartTimestamp() : LocalDateTime.now());
                 return sum / 1000f;
             }
             return null;
@@ -89,7 +89,7 @@ public class OcppConsumptionHelper {
 
         if (isTransactionPartialForChargeBox(t.getConnector().getChargeBoxId())) {
             if (t.getStopValue() != null) {
-                float sum = sumStopValueByConnectorBefore(t.getConnector(), t.getStopTimestamp() != null ? t.getStopTimestamp() : new Date());
+                float sum = sumStopValueByConnectorBefore(t.getConnector(), t.getStopTimestamp() != null ? t.getStopTimestamp() : LocalDateTime.now());
                 return (sum + Float.parseFloat(t.getStopValue())) / 1000f;
             }
             return null;
@@ -101,10 +101,12 @@ public class OcppConsumptionHelper {
         }
     }
 
-    private float sumStopValueByConnectorBefore(Connector connector, Date date) {
+    private float sumStopValueByConnectorBefore(Connector connector, LocalDateTime dateTime) {
         BigDecimal res = (BigDecimal) em.createNativeQuery(
-                "select sum(cast(stop_value as decimal(10,2))) from ocpp_transaction_stop as stop inner join ocpp_transaction_start as start on stop.transaction_pk=start.transaction_pk where connector_pk=? and stop_timestamp<?").
-                setParameter(1, connector.getConnectorPk()).setParameter(2, date).getSingleResult();
+                        "select sum(cast(stop_value as decimal(10,2))) from ocpp_transaction_stop as stop inner join ocpp_transaction_start as start on stop.transaction_pk=start.transaction_pk where connector_pk=?1 and stop_timestamp<?2")
+                .setParameter(1, connector.getConnectorPk())
+                .setParameter(2, dateTime)
+                .getSingleResult();
         if (res == null) {
             return 0f;
         }

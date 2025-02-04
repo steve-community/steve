@@ -25,7 +25,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 
 public interface TransactionRepository extends CrudRepository<Transaction, Integer>{
@@ -55,7 +55,7 @@ public interface TransactionRepository extends CrudRepository<Transaction, Integ
 	long countActiveTransactionsByIdTag(String idTag);
 
 	@Query("SELECT OBJECT(t) FROM Transaction AS t WHERE t.stopTimestamp IS NULL AND t.startEventTimestamp<?1 ORDER BY t.startEventTimestamp ASC")
-    List<Transaction> findActiveStartedBefore(Date threshold);
+    List<Transaction> findActiveStartedBefore(LocalDateTime threshold);
 
 	List<Transaction> findByConnectorAndStopTimestampIsNullOrderByStartTimestampDesc(Connector connector);
 

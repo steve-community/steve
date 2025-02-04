@@ -13,7 +13,8 @@ import org.joda.time.DateTime;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Date;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.List;
 
 import static net.parkl.ocpp.service.cs.factory.TransactionFactory.*;
@@ -55,7 +56,7 @@ public class TransactionCleanupService {
 
                 for (OcppChargingProcess chargingProcess : chargingProcesses) {
                     log.info("Ending charging process on transaction cleanup: {} with end date: {}", chargingProcess.getOcppChargingProcessId(), eventTime);
-                    chargingProcess.setEndDate(eventTime.toDate());
+                    chargingProcess.setEndDate(eventTime.toDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime());
                     chargingProcessService.save(chargingProcess);
                 }
             } else {
@@ -73,7 +74,7 @@ public class TransactionCleanupService {
     }
 
 
-    public List<Transaction> getTransactionsForCleanup(Date threshold) {
+    public List<Transaction> getTransactionsForCleanup(LocalDateTime threshold) {
         return transactionRepo.findActiveStartedBefore(threshold);
     }
 

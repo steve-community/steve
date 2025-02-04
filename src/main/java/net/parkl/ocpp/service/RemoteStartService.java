@@ -10,7 +10,7 @@ import net.parkl.ocpp.service.config.AdvancedChargeBoxConfiguration;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static net.parkl.ocpp.service.ErrorMessages.INVALID_CHARGE_BOX_ID_CONNECTOR_ID;
@@ -68,8 +68,8 @@ public class RemoteStartService {
     }
 
 
-    public Date getRemoteStartValidityThreshold(String chargeBoxId) {
-        return new Date(System.currentTimeMillis() - getRemoteStartValiditySecs(chargeBoxId) * 1000L);
+    public LocalDateTime getRemoteStartValidityThreshold(String chargeBoxId) {
+        return LocalDateTime.now().minusSeconds(getRemoteStartValiditySecs(chargeBoxId));
     }
 
     private int getRemoteStartValiditySecs(String chargeBoxId) {

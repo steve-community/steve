@@ -25,10 +25,10 @@ import net.parkl.ocpp.service.middleware.OcppChargingMiddleware;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.stereotype.Component;
 
-import java.util.Date;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 
-import static java.time.Duration.between;
 import static net.parkl.ocpp.service.OcppConsumptionHelper.getKwhValue;
 
 @Component
@@ -66,7 +66,7 @@ public class OcppChargingLimitWatcher {
         for (OcppChargingProcess cp : minuteLimitProcesses) {
             if (cp.getTransactionStart() != null) {
                 log.info("Checking charging process with minute limit: {}...", cp.getOcppChargingProcessId());
-                int duration = between(cp.getStartDate().toInstant(), new Date().toInstant()).toMinutesPart();
+                int duration = (int) ChronoUnit.MINUTES.between(cp.getStartDate(), LocalDateTime.now());
                 log.info("Current duration = {} limit = {} for charging process id = {}",
                         duration, cp.getLimitMinute(), cp.getOcppChargingProcessId());
                 if (duration >= cp.getLimitMinute()) {

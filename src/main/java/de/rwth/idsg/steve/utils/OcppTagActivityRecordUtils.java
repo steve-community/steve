@@ -24,14 +24,15 @@ import net.parkl.ocpp.entities.OcppTag;
 import net.parkl.ocpp.service.cs.TransactionService;
 import org.joda.time.DateTime;
 
-import java.util.Date;
+import java.time.LocalDateTime;
+
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class OcppTagActivityRecordUtils {
 
-    public static boolean isExpired(OcppTag record, DateTime now) {
-        Date expiry = record.getExpiryDate();
-        return expiry != null && now.isAfter(new DateTime(expiry));
+    public static boolean isExpired(OcppTag record, LocalDateTime now) {
+        LocalDateTime expiry = record.getExpiryDate();
+        return expiry != null && now.isAfter(expiry);
     }
 
     public static boolean isBlocked(OcppTag record) {

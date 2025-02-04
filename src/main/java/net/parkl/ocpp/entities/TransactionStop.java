@@ -22,7 +22,8 @@ import lombok.Getter;
 import lombok.Setter;
 
 import jakarta.persistence.*;
-import java.util.Date;
+
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "ocpp_transaction_stop")
@@ -45,7 +46,7 @@ public class TransactionStop {
 
     @Column(name = "stop_timestamp")
     @Temporal(TemporalType.TIMESTAMP)
-    private Date stopTimestamp;
+    private LocalDateTime stopTimestamp;
 
     @Column(name = "stop_value")
     private String stopValue;

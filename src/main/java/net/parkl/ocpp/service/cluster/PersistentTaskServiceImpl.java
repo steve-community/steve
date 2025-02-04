@@ -11,6 +11,7 @@ import org.joda.time.DateTime;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.ZoneId;
 import java.util.List;
 
 @Service
@@ -44,7 +45,9 @@ public class PersistentTaskServiceImpl implements PersistentTaskService {
             taskResultRepository.save(result);
 
             if (endTimestamp!=null) {
-                task.setEndTimestamp(endTimestamp.toDate());
+                task.setEndTimestamp(endTimestamp.toDate().toInstant()
+                        .atZone(ZoneId.systemDefault())
+                        .toLocalDateTime());
                 taskRepository.save(task);
             }
         }
@@ -65,7 +68,9 @@ public class PersistentTaskServiceImpl implements PersistentTaskService {
             taskResultRepository.save(result);
 
             if (endTimestamp != null) {
-                task.setEndTimestamp(endTimestamp.toDate());
+                task.setEndTimestamp(endTimestamp.toDate().toInstant()
+                        .atZone(ZoneId.systemDefault())
+                        .toLocalDateTime());
                 taskRepository.save(task);
             }
 

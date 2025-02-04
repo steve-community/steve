@@ -24,7 +24,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 
 public interface ConnectorMeterValueRepository extends CrudRepository<ConnectorMeterValue, Integer>{
@@ -33,11 +33,11 @@ public interface ConnectorMeterValueRepository extends CrudRepository<ConnectorM
 	@Query("SELECT v.valueTimestamp, v.value, v.readingContext, v.format, v.measurand, v.location, v.unit, v.phase " +
 			"FROM ConnectorMeterValue AS v WHERE v.connector.chargeBoxId=?1 AND v.connector.connectorId=?2 AND v.valueTimestamp>?3")
 	List<Object[]> findByChargeBoxIdAndConnectorIdAfter(String chargeBoxId, int connectorId,
-			Date startTimestamp);
+														LocalDateTime startTimestamp);
 	@Query("SELECT v.valueTimestamp, v.value, v.readingContext, v.format, v.measurand, v.location, v.unit, v.phase " +
 			"FROM ConnectorMeterValue AS v WHERE v.connector.chargeBoxId=?1 AND v.connector.connectorId=?2 AND v.valueTimestamp>?3 AND v.valueTimestamp<?4")
 	List<Object[]> findByChargeBoxIdAndConnectorIdBetween(String chargeBoxId, int connectorId,
-			Date startTimestamp,Date stopTimestamp);
+														  LocalDateTime startTimestamp, LocalDateTime stopTimestamp);
 
 
 	@Query("SELECT v.unit, v.value FROM ConnectorMeterValue AS v WHERE v.transaction=?1 AND v.measurand=?2 AND v.phase IS NULL ORDER BY v.valueTimestamp DESC")

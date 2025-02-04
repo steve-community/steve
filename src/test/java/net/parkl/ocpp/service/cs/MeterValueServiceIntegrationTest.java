@@ -38,6 +38,7 @@ public class MeterValueServiceIntegrationTest extends DriverTestBase {
 
 
         LocalDateTime now = LocalDateTime.now();
+
         LocalDateTime dateTimePlusOneMinute = now.plusMinutes(1);
 
         LocalDateTime dateNow = LocalDateTime.now();

@@ -36,4 +36,5 @@ public interface OcppRemoteStartRepository extends CrudRepository<OcppRemoteStar
 
     @Query("select count(r) from OcppRemoteStart r where r.connector in ?1 and r.ocppTag = ?2 and r.createDate > ?3")
     long countByConnectorsAndOcppTagAfter(List<Connector> connectors, String idTag, LocalDateTime date);
+
 }

@@ -62,7 +62,7 @@ public class RemoteStartRepositoryTest extends DriverTestBase {
         remoteStart3.setOcppTag(idTag2);
         ocppRemoteStartRepository.save(remoteStart3);
 
-        LocalDateTime date = LocalDateTime.now().minusMinutes(1);
+        date = LocalDateTime.now().minusMinutes(1);
     }
 
     @AfterEach

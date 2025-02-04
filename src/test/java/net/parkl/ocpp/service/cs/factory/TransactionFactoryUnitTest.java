@@ -6,6 +6,8 @@ import net.parkl.ocpp.entities.*;
 import org.joda.time.DateTime;
 import org.junit.jupiter.api.Test;
 
+import java.time.ZoneId;
+
 import static com.google.common.base.Throwables.getStackTraceAsString;
 import static net.parkl.ocpp.entities.TransactionStopEventActor.manual;
 import static net.parkl.ocpp.service.cs.factory.TransactionFactory.*;
@@ -37,7 +39,7 @@ public class TransactionFactoryUnitTest {
                             "stopValue",
                             "stopReason")
                 .contains(stopEventActor,
-                          timestamp.toDate(),
+                          timestamp.toDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime(),
                           stopMeterValue,
                           stopReason);
     }
@@ -67,7 +69,7 @@ public class TransactionFactoryUnitTest {
                             "stopReason",
                             "failReason")
                 .contains(stopEventActor,
-                          timestamp.toDate(),
+                          timestamp.toDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime(),
                           stopMeterValue,
                           stopReason,
                           getStackTraceAsString(exception));
@@ -83,7 +85,7 @@ public class TransactionFactoryUnitTest {
         assertThat(transactionStopId)
                 .isNotNull()
                 .extracting("transactionPk", "eventTimestamp")
-                .containsExactly(transactionPk, date.toDate());
+                .containsExactly(transactionPk, date.toDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime());
     }
 
     @Test
@@ -104,6 +106,6 @@ public class TransactionFactoryUnitTest {
         assertThat(transactionStart)
                 .isNotNull()
                 .extracting("connector", "ocppTag", "startTimestamp", "startValue", "eventTimestamp")
-                .contains(connector, ocppIdTag, timeStamp.toDate(), startMeterValue, timeStamp.toDate());
+                .contains(connector, ocppIdTag, timeStamp.toDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime(), startMeterValue, timeStamp.toDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime());
     }
 }

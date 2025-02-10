@@ -1,6 +1,7 @@
 package de.rwth.idsg.steve.ocpp.ws.cluster;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
@@ -61,6 +62,7 @@ public class ClusteredInvokerClient {
     private HttpEntity<String> getHttpEntity(Object request) {
         // create request body
         ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new JavaTimeModule());
         String input = objectMapper.writeValueAsString(request);
 
         // set headers

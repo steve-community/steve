@@ -1,6 +1,7 @@
 package net.parkl.ocpp.service.cluster;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import de.rwth.idsg.steve.ocpp.CommunicationTask;
 import de.rwth.idsg.steve.ocpp.OcppVersion;
 import de.rwth.idsg.steve.ocpp.task.*;
@@ -38,6 +39,7 @@ public class PersistentTaskConverter {
     @SneakyThrows
     private String serializeParams(ChargePointSelection params) {
         ObjectMapper mapper = new ObjectMapper();
+        mapper.registerModule(new JavaTimeModule());
         return mapper.writeValueAsString(params);
     }
 
@@ -146,6 +148,7 @@ public class PersistentTaskConverter {
     @SneakyThrows
     private <T> T deserializeParams(String serializedParams, Class<T> paramsClass) {
         ObjectMapper mapper = new ObjectMapper();
+        mapper.registerModule(new JavaTimeModule());
         return mapper.readValue(serializedParams, paramsClass);
     }
 }

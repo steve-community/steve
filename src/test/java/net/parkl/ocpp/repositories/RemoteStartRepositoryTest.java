@@ -20,6 +20,8 @@ public class RemoteStartRepositoryTest extends DriverTestBase {
 
     @Autowired
     private ConnectorRepository connectorRepository;
+    @Autowired
+    private ConnectorMeterValueRepository connectorMeterValueRepository;
 
     private Connector connector1;
     private Connector connector2;
@@ -68,6 +70,7 @@ public class RemoteStartRepositoryTest extends DriverTestBase {
     @AfterEach
     public void tearDown() {
         ocppRemoteStartRepository.deleteAll();
+        connectorMeterValueRepository.deleteAll();
         connectorRepository.deleteAll();
     }
 

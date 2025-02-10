@@ -34,17 +34,17 @@ public class RemoteStartRepositoryTest extends DriverTestBase {
     public void setUp() {
         connector1 = new Connector();
         connector1.setConnectorId(1);
-        connector1.setChargeBoxId("chargebox1");
+        connector1.setChargeBoxId("chargeboxR1");
         connector1 = connectorRepository.save(connector1);
 
         connector2 = new Connector();
         connector2.setConnectorId(2);
-        connector2.setChargeBoxId("chargebox1");
+        connector2.setChargeBoxId("chargeboxR1");
         connector2 = connectorRepository.save(connector2);
 
         connector3 = new Connector();
         connector3.setConnectorId(3);
-        connector3.setChargeBoxId("chargebox2");
+        connector3.setChargeBoxId("chargeboxR2");
         connector3 = connectorRepository.save(connector3);
 
         OcppRemoteStart remoteStart1 = new OcppRemoteStart();

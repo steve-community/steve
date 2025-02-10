@@ -7,6 +7,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 
 
 import java.time.LocalDateTime;
@@ -14,14 +15,13 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class RemoteStartRepositoryTest extends DriverTestBase {
+@Transactional
+class RemoteStartRepositoryTest extends DriverTestBase {
     @Autowired
     private OcppRemoteStartRepository ocppRemoteStartRepository;
 
     @Autowired
     private ConnectorRepository connectorRepository;
-    @Autowired
-    private ConnectorMeterValueRepository connectorMeterValueRepository;
 
     private Connector connector1;
     private Connector connector2;
@@ -69,9 +69,10 @@ public class RemoteStartRepositoryTest extends DriverTestBase {
 
     @AfterEach
     public void tearDown() {
-        ocppRemoteStartRepository.deleteAll();
-        connectorMeterValueRepository.deleteAll();
-        connectorRepository.deleteAll();
+        ocppRemoteStartRepository.deleteByConnectorIn(List.of(connector1, connector2, connector3));
+        connectorRepository.delete(connector1);
+        connectorRepository.delete(connector2);
+        connectorRepository.delete(connector3);
     }
 
     @Test

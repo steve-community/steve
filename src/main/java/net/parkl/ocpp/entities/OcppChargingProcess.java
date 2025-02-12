@@ -77,7 +77,7 @@ public class OcppChargingProcess {
     }
 
     public boolean stoppedExternally() {
-        return stopRequestDate == null;
+        return stopRequestDate != null;
     }
 
 }

@@ -120,6 +120,7 @@ public class TransactionServiceUnitTest {
     public void updateTransactionStopFailed() {
         int testTransactionId = 1;
         Transaction testTransaction = mock(Transaction.class);
+        TransactionStart testTransactionStart = mock(TransactionStart.class);
 
         OcppChargingProcess chargingProcess = mock(OcppChargingProcess.class);
 
@@ -138,6 +139,8 @@ public class TransactionServiceUnitTest {
 
         when(transactionRepository.findById(testTransactionId)).thenReturn(java.util.Optional.of(testTransaction));
         when(chargingProcessService.findByTransactionId(testTransactionId)).thenReturn(chargingProcess);
+        when(chargingProcess.getTransactionStart()).thenReturn(testTransactionStart);
+
         when(chargePointService.shouldInsertConnectorStatusAfterTransactionMsg(testChargeBoxId)).thenReturn(true);
 
         transactionService.updateTransaction(params);

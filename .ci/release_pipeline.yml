@@ -2,7 +2,7 @@ variables:
   major: 2
   minor: 4
   master: $[eq(variables['Build.SourceBranch'], 'refs/heads/master')]
-  legacy_javax: $[eq(variables['Build.SourceBranch'], 'refs/heads/legacy_javax')]
+  legacy_cet: $[eq(variables['Build.SourceBranch'], 'refs/heads/legacy_cet')]
 
 pr: none
 
@@ -19,7 +19,7 @@ stages:
     displayName: Build Version Number
     jobs:
       - job: Build_Version_Number_Master
-        condition: or(eq(variables.master, true), eq(variables.legacy_javax, true))
+        condition: or(eq(variables.master, true), eq(variables.legacy_cet, true))
         variables:
           patch: $[counter(variables['minor'], 0)]
         steps:

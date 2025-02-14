@@ -13,8 +13,8 @@ import org.joda.time.DateTime;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.Date;
 import java.util.List;
 
 import static net.parkl.ocpp.service.cs.factory.TransactionFactory.*;
@@ -74,7 +74,7 @@ public class TransactionCleanupService {
     }
 
 
-    public List<Transaction> getTransactionsForCleanup(Date threshold) {
+    public List<Transaction> getTransactionsForCleanup(LocalDateTime threshold) {
         return transactionRepo.findActiveStartedBefore(threshold);
     }
 

@@ -23,7 +23,8 @@ import lombok.Setter;
 
 import jakarta.persistence.*;
 import java.io.Serializable;
-import java.util.Date;
+import java.time.LocalDateTime;
+
 
 @Entity
 @Table(name = "ocpp_reservation")
@@ -37,11 +38,11 @@ public class OcppReservation implements Serializable {
 
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "expiry_datetime")
-    private Date expiryDatetime;
+    private LocalDateTime expiryDatetime;
 
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "start_datetime")
-    private Date startDatetime;
+    private LocalDateTime startDatetime;
 
     private String status;
 

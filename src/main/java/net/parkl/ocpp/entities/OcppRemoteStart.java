@@ -5,7 +5,7 @@ import lombok.Setter;
 
 import jakarta.persistence.*;
 import java.io.Serializable;
-import java.util.Date;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "ocpp_remote_start")
@@ -26,10 +26,10 @@ public class OcppRemoteStart implements Serializable {
 
     @Column(name = "create_date", nullable = false)
     @Temporal(TemporalType.TIMESTAMP)
-    private Date createDate;
+    private LocalDateTime createDate;
 
     @PrePersist
     public void prePersist() {
-        createDate = new Date();
+        createDate = LocalDateTime.now();
     }
 }

@@ -33,7 +33,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 @Service
@@ -98,7 +97,7 @@ public class ConnectorMeterValueService {
 
     private ConnectorMeterValueDetail convertToMeterValueDetail(Object[] row) {
         return ConnectorMeterValueDetail.builder()
-                .valueTimestamp((Date) row[0])
+                .valueTimestamp(((LocalDateTime) row[0]))
                 .value((String) row[1])
                 .readingContext((String) row[2])
                 .format((String) row[3])
@@ -139,7 +138,7 @@ public class ConnectorMeterValueService {
         List<ChargingMeterValueDto> meterValues = new ArrayList<>();
         for (Object[] row : energyAndPowerData) {
             meterValues.add(ChargingMeterValueDto.builder()
-                    .valueTimestamp((Date) row[0])
+                    .valueTimestamp((LocalDateTime) row[0])
                     .energy((String) row[1])
                     .power((String) row[2])
                     .energyUnit((String) row[3])

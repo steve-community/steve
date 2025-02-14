@@ -8,7 +8,6 @@ import net.parkl.ocpp.module.esp.EmobilityServiceProvider;
 import net.parkl.ocpp.module.esp.model.ESPChargingProcessCheckResult;
 import org.springframework.stereotype.Component;
 
-import java.util.Date;
 
 import static net.parkl.ocpp.service.cs.cleanup.TransactionCleanupConfig.HOURS_IN_MS;
 

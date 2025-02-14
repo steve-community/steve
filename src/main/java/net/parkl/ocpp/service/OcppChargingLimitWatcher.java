@@ -27,10 +27,8 @@ import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.Date;
 import java.util.List;
 
-import static java.time.Duration.between;
 import static net.parkl.ocpp.service.OcppConsumptionHelper.getKwhValue;
 
 @Component

@@ -38,7 +38,9 @@ public class TransactionFactory {
         TransactionStop stop = new TransactionStop();
         stop.setTransactionStopId(createTransactionStopId(transactionId, eventTimeStamp));
         stop.setEventActor(TransactionStopEventActor.manual);
-        stop.setStopTimestamp(eventTimeStamp.toDate());
+        stop.setStopTimestamp(eventTimeStamp.toDate().toInstant()
+                .atZone(ZoneId.systemDefault())
+                .toLocalDateTime());
         stop.setStopReason("Cleanup");
         return stop;
     }
@@ -64,7 +66,9 @@ public class TransactionFactory {
     public static TransactionStopId createTransactionStopId(int transactionId, DateTime stop) {
         TransactionStopId transactionStopId = new TransactionStopId();
         transactionStopId.setTransactionPk(transactionId);
-        transactionStopId.setEventTimestamp(stop.toDate());
+        transactionStopId.setEventTimestamp(stop.toDate().toInstant()
+                .atZone(ZoneId.systemDefault())
+                .toLocalDateTime());
         return transactionStopId;
     }
 
@@ -86,7 +90,9 @@ public class TransactionFactory {
         transactionStop.setTransactionStopId(createTransactionStopId(params.getTransactionId(), params.getEventTimestamp()));
         transactionStop.setEventActor(params.getEventActor());
         if (params.getStopTimestamp() != null) {
-            transactionStop.setStopTimestamp(params.getStopTimestamp().toDate());
+            transactionStop.setStopTimestamp(params.getStopTimestamp().toDate().toInstant()
+                    .atZone(ZoneId.systemDefault())
+                    .toLocalDateTime());
         }
         transactionStop.setStopValue(params.getStopMeterValue());
         transactionStop.setStopReason(params.getStopReason());

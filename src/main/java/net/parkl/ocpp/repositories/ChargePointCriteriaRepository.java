@@ -30,7 +30,9 @@ import jakarta.persistence.TypedQuery;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Root;
-import java.util.Date;
+
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.List;
 
 @Repository
@@ -86,11 +88,12 @@ public class ChargePointCriteriaRepository {
         }
     }
 
-    private Date getDayStart(DateTime now) {
-        return now.withHourOfDay(0).withMinuteOfHour(0).withSecondOfMinute(0).withMillisOfSecond(0).toDate();
+    private LocalDateTime getDayStart(DateTime now) {
+        LocalDateTime ldt = LocalDateTime.ofInstant(now.toDate().toInstant(), ZoneId.systemDefault());
+        return ldt.withHour(0).withMinute(0).withSecond(0).withNano(0);
     }
-
-    private Date getDayEnd(DateTime now) {
-        return now.withHourOfDay(23).withMinuteOfHour(59).withSecondOfMinute(59).withMillisOfSecond(999).toDate();
+    private LocalDateTime getDayEnd(DateTime now) {
+        LocalDateTime ldt = LocalDateTime.ofInstant(now.toDate().toInstant(), ZoneId.systemDefault());
+        return ldt.withHour(23).withMinute(59).withSecond(59).withNano(999_000_000);
     }
 }

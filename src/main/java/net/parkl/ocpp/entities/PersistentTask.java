@@ -2,11 +2,10 @@ package net.parkl.ocpp.entities;
 
 import lombok.Getter;
 import lombok.Setter;
-import org.joda.time.DateTime;
 
 import jakarta.persistence.*;
 import java.io.Serializable;
-import java.util.Date;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "persistent_task")
@@ -29,5 +28,5 @@ public class PersistentTask implements Serializable {
 
     @Column(name = "end_timestamp", nullable = true)
     @Temporal(TemporalType.TIMESTAMP)
-    private Date endTimestamp;
+    private LocalDateTime endTimestamp;
 }

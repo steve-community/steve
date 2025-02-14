@@ -12,10 +12,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDateTime;
-import java.util.Date;
-
-import static java.time.LocalDateTime.now;
-import static java.time.ZoneId.systemDefault;
 import static java.util.Collections.singletonList;
 import static org.mockito.Mockito.*;
 

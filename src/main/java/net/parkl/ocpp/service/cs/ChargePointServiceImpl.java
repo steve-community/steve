@@ -255,7 +255,9 @@ public class ChargePointServiceImpl implements ChargePointService {
     @Override
     @Transactional
     public void updateChargeboxHeartbeat(String chargeBoxId, DateTime now) {
-        chargeBoxRepository.updateChargeBoxLastHeartbeat(chargeBoxId, now.toDate());
+        chargeBoxRepository.updateChargeBoxLastHeartbeat(chargeBoxId, now.toDate().toInstant()
+                .atZone(ZoneId.systemDefault())
+                .toLocalDateTime());
     }
 
     @Override

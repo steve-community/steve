@@ -23,7 +23,7 @@ import lombok.Setter;
 
 import jakarta.persistence.*;
 import java.io.Serializable;
-import java.util.Date;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "ocpp_connector_status")
@@ -45,7 +45,7 @@ public class ConnectorStatus implements Serializable {
 
     @Column(name = "status_timestamp")
     @Temporal(TemporalType.TIMESTAMP)
-    private Date statusTimestamp;
+    private LocalDateTime statusTimestamp;
 
     @Column(name = "vendor_error_code")
     private String vendorErrorCode;

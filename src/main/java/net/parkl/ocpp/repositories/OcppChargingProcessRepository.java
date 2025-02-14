@@ -26,7 +26,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 
 public interface OcppChargingProcessRepository extends CrudRepository<OcppChargingProcess, String>{
@@ -60,7 +60,7 @@ public interface OcppChargingProcessRepository extends CrudRepository<OcppChargi
 
 	@Query("SELECT OBJECT(p) FROM OcppChargingProcess p WHERE p.transactionStart IS NULL AND p.endDate IS NULL AND p.startDate<?1")
 	@Modifying
-	List<OcppChargingProcess> findWithoutTransactionBefore(Date date);
+	List<OcppChargingProcess> findWithoutTransactionBefore(LocalDateTime date);
 
 	@Query("SELECT OBJECT(p) FROM OcppChargingProcess AS p JOIN FETCH p.transactionStart t WHERE t.transactionPk IN ?1")
 	List<OcppChargingProcess> findByTransactionIdIn(List<Integer> transactionIds);

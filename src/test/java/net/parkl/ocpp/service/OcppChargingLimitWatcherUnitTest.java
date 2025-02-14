@@ -13,10 +13,7 @@ import org.springframework.core.task.TaskExecutor;
 
 import java.time.LocalDateTime;
 
-import static java.time.LocalDateTime.now;
-import static java.time.ZoneId.systemDefault;
 import static java.util.Arrays.asList;
-import static java.util.Date.from;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)

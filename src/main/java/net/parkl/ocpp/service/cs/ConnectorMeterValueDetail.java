@@ -3,7 +3,7 @@ package net.parkl.ocpp.service.cs;
 import lombok.*;
 
 import java.io.Serializable;
-import java.util.Date;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -12,7 +12,7 @@ import java.util.Date;
 @Builder
 @ToString
 public class ConnectorMeterValueDetail implements Serializable {
-    private Date valueTimestamp;
+    private LocalDateTime valueTimestamp;
     private String value;
     private String readingContext;
     private String format;

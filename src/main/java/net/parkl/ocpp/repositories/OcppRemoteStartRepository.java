@@ -20,12 +20,12 @@ package net.parkl.ocpp.repositories;
 
 import net.parkl.ocpp.entities.Connector;
 import net.parkl.ocpp.entities.OcppRemoteStart;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 
 import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.List;
 
 public interface OcppRemoteStartRepository extends CrudRepository<OcppRemoteStart, Integer>{
@@ -37,4 +37,7 @@ public interface OcppRemoteStartRepository extends CrudRepository<OcppRemoteStar
 
     @Query("select count(r) from OcppRemoteStart r where r.connector in ?1 and r.ocppTag = ?2 and r.createDate > ?3")
     long countByConnectorsAndOcppTagAfter(List<Connector> connectors, String idTag, LocalDateTime date);
+
+    @Modifying
+    void deleteByConnectorIn(List<@NotNull Connector> connectors);
 }

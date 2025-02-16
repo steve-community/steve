@@ -18,7 +18,6 @@
  */
 package de.rwth.idsg.steve.service;
 
-import de.rwth.idsg.steve.SteveException;
 import de.rwth.idsg.steve.config.DelegatingTaskExecutor;
 import de.rwth.idsg.steve.ocpp.ChargePointServiceInvokerImpl;
 import de.rwth.idsg.steve.ocpp.OcppCallback;
@@ -402,8 +401,6 @@ public class ChargePointServiceClient {
                                         OcppCallback<String>... callbacks) {
         ChargingProfile.Details details = chargingProfileRepository.getDetails(params.getChargingProfilePk());
 
-        checkAdditionalConstraints(params, details);
-
         SetChargingProfileTaskFromDB task = new SetChargingProfileTaskFromDB(params, details, chargingProfileRepository);
 
         return setChargingProfile(task, callbacks);
@@ -441,22 +438,4 @@ public class ChargePointServiceClient {
         return taskStore.add(task);
     }
 
-    /**
-     * Do some additional checks defined by OCPP spec, which cannot be captured with javax.validation
-     */
-    private static void checkAdditionalConstraints(SetChargingProfileParams params, ChargingProfile.Details details) {
-        ChargingProfilePurposeType purpose = ChargingProfilePurposeType.fromValue(details.getProfile().getChargingProfilePurpose());
-
-        if (ChargingProfilePurposeType.CHARGE_POINT_MAX_PROFILE == purpose
-            && params.getConnectorId() != null
-            && params.getConnectorId() != 0) {
-            throw new SteveException("ChargePointMaxProfile can only be set at Charge Point ConnectorId 0");
-        }
-
-        if (ChargingProfilePurposeType.TX_PROFILE == purpose
-            && params.getConnectorId() != null
-            && params.getConnectorId() < 1) {
-            throw new SteveException("TxProfile should only be set at Charge Point ConnectorId > 0");
-        }
-    }
 }

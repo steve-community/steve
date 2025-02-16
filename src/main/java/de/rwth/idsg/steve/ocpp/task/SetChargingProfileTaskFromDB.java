@@ -102,9 +102,13 @@ public class SetChargingProfileTaskFromDB extends SetChargingProfileTask {
                 .withValidTo(profile.getValidTo())
                 .withChargingSchedule(schedule);
 
-        return new SetChargingProfileRequest()
+        var request = new SetChargingProfileRequest()
                 .withConnectorId(params.getConnectorId())
                 .withCsChargingProfiles(ocppProfile);
+
+        checkAdditionalConstraints(request);
+
+        return request;
     }
 
     @Override

@@ -18,8 +18,11 @@
  */
 package de.rwth.idsg.steve.ocpp.task;
 
+import de.rwth.idsg.steve.SteveException;
 import de.rwth.idsg.steve.ocpp.Ocpp16AndAboveTask;
 import de.rwth.idsg.steve.web.dto.ocpp.SetChargingProfileParams;
+import ocpp.cp._2015._10.ChargingProfilePurposeType;
+import ocpp.cp._2015._10.SetChargingProfileRequest;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -29,5 +32,22 @@ public abstract class SetChargingProfileTask extends Ocpp16AndAboveTask<SetCharg
 
     public SetChargingProfileTask(SetChargingProfileParams params) {
         super(params);
+    }
+
+    /**
+     * Do some additional checks defined by OCPP spec, which cannot be captured with javax.validation
+     */
+    protected static void checkAdditionalConstraints(SetChargingProfileRequest request) {
+        ChargingProfilePurposeType purpose = request.getCsChargingProfiles().getChargingProfilePurpose();
+
+        if (ChargingProfilePurposeType.CHARGE_POINT_MAX_PROFILE == purpose
+            && request.getConnectorId() != 0) {
+            throw new SteveException("ChargePointMaxProfile can only be set at Charge Point ConnectorId 0");
+        }
+
+        if (ChargingProfilePurposeType.TX_PROFILE == purpose
+            && request.getConnectorId() < 1) {
+            throw new SteveException("TxProfile should only be set at Charge Point ConnectorId > 0");
+        }
     }
 }

@@ -36,6 +36,7 @@ public class SetChargingProfileTaskAdhoc extends SetChargingProfileTask {
                                        SetChargingProfileRequest request) {
         super(params);
         this.request = request;
+        checkAdditionalConstraints(request);
     }
 
     @Override

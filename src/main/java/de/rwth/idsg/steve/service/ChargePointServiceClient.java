@@ -38,6 +38,7 @@ import de.rwth.idsg.steve.ocpp.task.ReserveNowTask;
 import de.rwth.idsg.steve.ocpp.task.ResetTask;
 import de.rwth.idsg.steve.ocpp.task.SendLocalListTask;
 import de.rwth.idsg.steve.ocpp.task.SetChargingProfileTask;
+import de.rwth.idsg.steve.ocpp.task.SetChargingProfileTaskFromDB;
 import de.rwth.idsg.steve.ocpp.task.TriggerMessageTask;
 import de.rwth.idsg.steve.ocpp.task.UnlockConnectorTask;
 import de.rwth.idsg.steve.ocpp.task.UpdateFirmwareTask;
@@ -48,7 +49,6 @@ import de.rwth.idsg.steve.repository.dto.ChargePointSelect;
 import de.rwth.idsg.steve.repository.dto.ChargingProfile;
 import de.rwth.idsg.steve.repository.dto.InsertReservationParams;
 import de.rwth.idsg.steve.service.dto.EnhancedReserveNowParams;
-import de.rwth.idsg.steve.service.dto.EnhancedSetChargingProfileParams;
 import de.rwth.idsg.steve.web.dto.ocpp.CancelReservationParams;
 import de.rwth.idsg.steve.web.dto.ocpp.ChangeAvailabilityParams;
 import de.rwth.idsg.steve.web.dto.ocpp.ChangeConfigurationParams;
@@ -384,15 +384,8 @@ public class ChargePointServiceClient {
     }
 
     @SafeVarargs
-    public final int setChargingProfile(SetChargingProfileParams params,
+    public final int setChargingProfile(SetChargingProfileTask task,
                                         OcppCallback<String>... callbacks) {
-        ChargingProfile.Details details = chargingProfileRepository.getDetails(params.getChargingProfilePk());
-
-        checkAdditionalConstraints(params, details);
-
-        EnhancedSetChargingProfileParams enhancedParams = new EnhancedSetChargingProfileParams(params, details);
-        SetChargingProfileTask task = new SetChargingProfileTask(enhancedParams, chargingProfileRepository);
-
         for (var callback : callbacks) {
             task.addCallback(callback);
         }
@@ -402,6 +395,18 @@ public class ChargePointServiceClient {
             .execute(c -> invoker.setChargingProfile(c, task));
 
         return taskStore.add(task);
+    }
+
+    @SafeVarargs
+    public final int setChargingProfile(SetChargingProfileParams params,
+                                        OcppCallback<String>... callbacks) {
+        ChargingProfile.Details details = chargingProfileRepository.getDetails(params.getChargingProfilePk());
+
+        checkAdditionalConstraints(params, details);
+
+        SetChargingProfileTaskFromDB task = new SetChargingProfileTaskFromDB(params, details, chargingProfileRepository);
+
+        return setChargingProfile(task, callbacks);
     }
 
     @SafeVarargs

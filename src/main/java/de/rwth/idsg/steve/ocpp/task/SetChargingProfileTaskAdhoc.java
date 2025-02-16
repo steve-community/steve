@@ -19,10 +19,8 @@
 package de.rwth.idsg.steve.ocpp.task;
 
 import de.rwth.idsg.steve.ocpp.OcppCallback;
-import de.rwth.idsg.steve.web.dto.ocpp.SetChargingProfileParams;
+import de.rwth.idsg.steve.web.dto.ocpp.MultipleChargePointSelect;
 import ocpp.cp._2015._10.SetChargingProfileRequest;
-
-import jakarta.xml.ws.AsyncHandler;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -32,7 +30,7 @@ public class SetChargingProfileTaskAdhoc extends SetChargingProfileTask {
 
     private final SetChargingProfileRequest request;
 
-    public SetChargingProfileTaskAdhoc(SetChargingProfileParams params,
+    public SetChargingProfileTaskAdhoc(MultipleChargePointSelect params,
                                        SetChargingProfileRequest request) {
         super(params);
         this.request = request;
@@ -47,16 +45,5 @@ public class SetChargingProfileTaskAdhoc extends SetChargingProfileTask {
     @Override
     public SetChargingProfileRequest getOcpp16Request() {
         return request;
-    }
-
-    @Override
-    public AsyncHandler<ocpp.cp._2015._10.SetChargingProfileResponse> getOcpp16Handler(String chargeBoxId) {
-        return res -> {
-            try {
-                success(chargeBoxId, res.get().getStatus().value());
-            } catch (Exception e) {
-                failed(chargeBoxId, e);
-            }
-        };
     }
 }

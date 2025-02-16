@@ -31,8 +31,6 @@ import ocpp.cp._2015._10.ChargingSchedulePeriod;
 import ocpp.cp._2015._10.RecurrencyKindType;
 import ocpp.cp._2015._10.SetChargingProfileRequest;
 
-import jakarta.xml.ws.AsyncHandler;
-
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -42,6 +40,7 @@ import java.util.stream.Collectors;
  */
 public class SetChargingProfileTaskFromDB extends SetChargingProfileTask {
 
+    private final int connectorId;
     private final ChargingProfile.Details details;
     private final ChargingProfileRepository chargingProfileRepository;
 
@@ -49,6 +48,7 @@ public class SetChargingProfileTaskFromDB extends SetChargingProfileTask {
                                         ChargingProfile.Details details,
                                         ChargingProfileRepository chargingProfileRepository) {
         super(params);
+        this.connectorId = params.getConnectorId();
         this.details = details;
         this.chargingProfileRepository = chargingProfileRepository;
     }
@@ -62,7 +62,6 @@ public class SetChargingProfileTaskFromDB extends SetChargingProfileTask {
 
                 if ("Accepted".equalsIgnoreCase(statusValue)) {
                     int chargingProfilePk = details.getProfile().getChargingProfilePk();
-                    int connectorId = params.getConnectorId();
                     chargingProfileRepository.setProfile(chargingProfilePk, chargeBoxId, connectorId);
                 }
             }
@@ -103,22 +102,11 @@ public class SetChargingProfileTaskFromDB extends SetChargingProfileTask {
                 .withChargingSchedule(schedule);
 
         var request = new SetChargingProfileRequest()
-                .withConnectorId(params.getConnectorId())
+                .withConnectorId(connectorId)
                 .withCsChargingProfiles(ocppProfile);
 
         checkAdditionalConstraints(request);
 
         return request;
-    }
-
-    @Override
-    public AsyncHandler<ocpp.cp._2015._10.SetChargingProfileResponse> getOcpp16Handler(String chargeBoxId) {
-        return res -> {
-            try {
-                success(chargeBoxId, res.get().getStatus().value());
-            } catch (Exception e) {
-                failed(chargeBoxId, e);
-            }
-        };
     }
 }

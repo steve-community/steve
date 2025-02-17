@@ -68,11 +68,11 @@ public abstract class ConcurrentWebSocketHandler implements WebSocketHandler {
         session.setTextMessageSizeLimit((int)(bufferMultiplier * bufferSizeLimit));
         final Session nativeSession = ((StandardWebSocketSession) session).getNativeSession(Session.class);
         nativeSession.getUserProperties()
-                .put("org.apache.tomcat.websocket.READ_IDLE_TIMEOUT_MS", WebSocketConfiguration.IDLE_TIMEOUT);
+                .put("org.apache.tomcat.websocket.READ_IDLE_TIMEOUT_MS", 7200000);
         nativeSession.getUserProperties()
-                .put("org.apache.tomcat.websocket.WRITE_IDLE_TIMEOUT_MS", WebSocketConfiguration.IDLE_TIMEOUT);
+                .put("org.apache.tomcat.websocket.WRITE_IDLE_TIMEOUT_MS", 7200000);
         nativeSession.getUserProperties()
-                .put("org.apache.tomcat.websocket.BLOCKING_SEND_TIMEOUT", WebSocketConfiguration.IDLE_TIMEOUT);
+                .put("org.apache.tomcat.websocket.BLOCKING_SEND_TIMEOUT", 7200000);
         nativeSession.getUserProperties().forEach((key, value) -> {
             log.info("User Property - Key: {}, Value: {}", key, value);
         });

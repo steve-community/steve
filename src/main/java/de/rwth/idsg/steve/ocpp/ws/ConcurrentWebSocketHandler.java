@@ -53,7 +53,7 @@ public abstract class ConcurrentWebSocketHandler implements WebSocketHandler {
     @Autowired
     protected AdvancedChargeBoxConfiguration advancedChargeBoxConfiguration;
 
-    private static final int sendTimeLimit = (int) TimeUnit.SECONDS.toMillis(10);
+    private static final int sendTimeLimit = (int) TimeUnit.SECONDS.toMillis(10000);
 
     private static final int bufferSizeLimit = WebSocketConfiguration.MAX_MSG_SIZE;
 

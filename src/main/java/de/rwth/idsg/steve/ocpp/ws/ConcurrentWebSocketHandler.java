@@ -23,6 +23,7 @@
 package de.rwth.idsg.steve.ocpp.ws;
 
 import de.rwth.idsg.steve.config.WebSocketConfiguration;
+import jakarta.websocket.Session;
 import lombok.extern.slf4j.Slf4j;
 import net.parkl.ocpp.service.config.AdvancedChargeBoxConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,11 +32,15 @@ import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.WebSocketHandler;
 import org.springframework.web.socket.WebSocketMessage;
 import org.springframework.web.socket.WebSocketSession;
+import org.springframework.web.socket.adapter.NativeWebSocketSession;
+import org.springframework.web.socket.adapter.standard.StandardWebSocketSession;
 import org.springframework.web.socket.handler.ConcurrentWebSocketSessionDecorator;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
+
+import static de.rwth.idsg.steve.config.WebSocketConfiguration.IDLE_TIMEOUT_IN_MS;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -50,7 +55,7 @@ public abstract class ConcurrentWebSocketHandler implements WebSocketHandler {
     @Autowired
     protected AdvancedChargeBoxConfiguration advancedChargeBoxConfiguration;
 
-    private static final int sendTimeLimit = (int) TimeUnit.SECONDS.toMillis(10);
+    private static final int sendTimeLimit = (int) TimeUnit.SECONDS.toMillis(300);
 
     private static final int bufferSizeLimit = WebSocketConfiguration.MAX_MSG_SIZE;
 
@@ -63,6 +68,14 @@ public abstract class ConcurrentWebSocketHandler implements WebSocketHandler {
         float bufferMultiplier = getBufferMultiplier(session);
         session.setBinaryMessageSizeLimit((int)(bufferMultiplier * bufferSizeLimit));
         session.setTextMessageSizeLimit((int)(bufferMultiplier * bufferSizeLimit));
+        final Session nativeSession = ((StandardWebSocketSession) session).getNativeSession(Session.class);
+        nativeSession.getUserProperties()
+                .put("org.apache.tomcat.websocket.READ_IDLE_TIMEOUT_MS", IDLE_TIMEOUT_IN_MS);
+        nativeSession.getUserProperties()
+                .put("org.apache.tomcat.websocket.WRITE_IDLE_TIMEOUT_MS", IDLE_TIMEOUT_IN_MS);
+        nativeSession.getUserProperties()
+                .put("org.apache.tomcat.websocket.BLOCKING_SEND_TIMEOUT", IDLE_TIMEOUT_IN_MS);
+
         log.info("Created new session {} with buffer size {}", session.getId(), session.getTextMessageSizeLimit());
     }
 

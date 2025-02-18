@@ -16,30 +16,34 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package de.rwth.idsg.steve.service.dto;
+package de.rwth.idsg.steve.ocpp.task;
 
-import de.rwth.idsg.steve.repository.dto.ChargePointSelect;
-import de.rwth.idsg.steve.repository.dto.ChargingProfile;
-import de.rwth.idsg.steve.web.dto.ocpp.ChargePointSelection;
-import de.rwth.idsg.steve.web.dto.ocpp.SetChargingProfileParams;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-
-import java.util.List;
+import de.rwth.idsg.steve.ocpp.OcppCallback;
+import de.rwth.idsg.steve.web.dto.ocpp.MultipleChargePointSelect;
+import ocpp.cp._2015._10.SetChargingProfileRequest;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
- * @since 12.11.2018
+ * @since 16.02.2025
  */
-@Getter
-@RequiredArgsConstructor
-public class EnhancedSetChargingProfileParams implements ChargePointSelection {
+public class SetChargingProfileTaskAdhoc extends SetChargingProfileTask {
 
-    private final SetChargingProfileParams delegate;
-    private final ChargingProfile.Details details;
+    private final SetChargingProfileRequest request;
+
+    public SetChargingProfileTaskAdhoc(MultipleChargePointSelect params,
+                                       SetChargingProfileRequest request) {
+        super(params);
+        this.request = request;
+        checkAdditionalConstraints(request);
+    }
 
     @Override
-    public List<ChargePointSelect> getChargePointSelectList() {
-        return delegate.getChargePointSelectList();
+    public OcppCallback<String> defaultCallback() {
+        return new StringOcppCallback();
+    }
+
+    @Override
+    public SetChargingProfileRequest getOcpp16Request() {
+        return request;
     }
 }

@@ -10,8 +10,6 @@ import org.mockito.Mockito;
 import org.springframework.core.task.TaskExecutor;
 
 import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.util.Calendar;
 import java.util.Collections;
 import java.util.List;
 
@@ -40,12 +38,7 @@ class OcppHeartBeatWatcherUnitTest {
     @Test
     void sendHeartbeatAlert() {
         OcppChargeBox testBox = new OcppChargeBox();
-        testBox.setChargeBoxId("TestBox");
-        Calendar date = Calendar.getInstance();
-        date.add(Calendar.MINUTE, -10);
-        LocalDateTime tenMinsBefore = date.getTime().toInstant()
-                .atZone(ZoneId.systemDefault())
-                .toLocalDateTime();
+        LocalDateTime tenMinsBefore = LocalDateTime.now().minusMinutes(10);
         testBox.setLastHeartbeatTimestamp(tenMinsBefore);
 
         when(advancedChargeBoxConfiguration.getChargeBoxesForAlert()).thenReturn(Collections.singletonList(testBox.getChargeBoxId()));

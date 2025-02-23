@@ -75,7 +75,8 @@ public class TransactionQueryForm extends QueryForm {
     @RequiredArgsConstructor
     public enum QueryType {
         ALL("All"),
-        ACTIVE("Active");
+        ACTIVE("Active"),
+        STOPPED("Stopped");
 
         @Getter private final String value;
 

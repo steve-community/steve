@@ -32,6 +32,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -80,7 +81,7 @@ public class OcppTagsRestController {
     )
     @GetMapping(value = "")
     @ResponseBody
-    public List<OcppTagOverview> get(OcppTagQueryFormForApi params) {
+    public List<OcppTagOverview> get(@ParameterObject OcppTagQueryFormForApi params) {
         log.debug("Read request for query: {}", params);
 
         var response = ocppTagService.getOverview(params);

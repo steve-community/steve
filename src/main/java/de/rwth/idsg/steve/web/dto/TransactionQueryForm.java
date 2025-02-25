@@ -75,7 +75,8 @@ public class TransactionQueryForm extends QueryForm {
     @RequiredArgsConstructor
     public enum QueryType {
         ALL("All"),
-        ACTIVE("Active");
+        ACTIVE("Active"),
+        STOPPED("Stopped");
 
         @Getter private final String value;
 
@@ -119,9 +120,9 @@ public class TransactionQueryForm extends QueryForm {
     }
 
     @ToString(callSuper = true)
-    public static class ForApi extends TransactionQueryForm {
+    public static class TransactionQueryFormForApi extends TransactionQueryForm {
 
-        public ForApi() {
+        public TransactionQueryFormForApi() {
             super();
             setType(QueryType.ALL);
             setPeriodType(QueryPeriodType.ALL);

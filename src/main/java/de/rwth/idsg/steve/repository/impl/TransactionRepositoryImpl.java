@@ -313,6 +313,9 @@ public class TransactionRepositoryImpl implements TransactionRepository {
 
         if (form.getType() == TransactionQueryForm.QueryType.ACTIVE) {
             selectQuery.addConditions(TRANSACTION.STOP_TIMESTAMP.isNull());
+
+        } else if (form.getType() == TransactionQueryForm.QueryType.STOPPED) {
+            selectQuery.addConditions(TRANSACTION.STOP_TIMESTAMP.isNotNull());
         }
 
         processType(selectQuery, form);

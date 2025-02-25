@@ -99,6 +99,10 @@
                     </td>
                 </tr>
                 <tr>
+                    <td>Note:</td>
+                    <td><form:input path="note"/></td>
+                </tr>
+                <tr>
                     <td></td>
                     <td id="add_space">
                         <input type="submit" value="Get">

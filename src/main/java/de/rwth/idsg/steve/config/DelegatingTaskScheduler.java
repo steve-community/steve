@@ -16,23 +16,36 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package de.rwth.idsg.steve.ocpp.ws;
+package de.rwth.idsg.steve.config;
 
-import de.rwth.idsg.steve.ocpp.ws.data.FutureResponseContext;
-import org.jetbrains.annotations.Nullable;
-import org.springframework.web.socket.WebSocketSession;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
+
+import java.io.Closeable;
+import java.io.IOException;
+import java.time.Duration;
+import java.time.Instant;
+import java.util.concurrent.ScheduledFuture;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
- * @since 08.02.2025
+ * @since 02.02.2025
  */
-public interface FutureResponseContextStore {
+@Slf4j
+@RequiredArgsConstructor
+public class DelegatingTaskScheduler implements Closeable {
 
-    void addSession(WebSocketSession session);
+    private final ThreadPoolTaskScheduler delegate;
 
-    void removeSession(WebSocketSession session);
+    @Override
+    public void close() throws IOException {
+        log.info("Shutting down");
+        delegate.shutdown();
+    }
 
-    void add(WebSocketSession session, String messageId, FutureResponseContext context);
+    public ScheduledFuture<?> scheduleAtFixedRate(Runnable task, Instant startTime, Duration period) {
+        return delegate.scheduleAtFixedRate(task, startTime, period);
+    }
 
-    @Nullable FutureResponseContext get(WebSocketSession session, String messageId);
 }

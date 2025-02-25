@@ -16,23 +16,34 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package de.rwth.idsg.steve.ocpp.ws;
+package de.rwth.idsg.steve.ocpp.task;
 
-import de.rwth.idsg.steve.ocpp.ws.data.FutureResponseContext;
-import org.jetbrains.annotations.Nullable;
-import org.springframework.web.socket.WebSocketSession;
+import de.rwth.idsg.steve.ocpp.OcppCallback;
+import de.rwth.idsg.steve.web.dto.ocpp.MultipleChargePointSelect;
+import ocpp.cp._2015._10.SetChargingProfileRequest;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
- * @since 08.02.2025
+ * @since 16.02.2025
  */
-public interface FutureResponseContextStore {
+public class SetChargingProfileTaskAdhoc extends SetChargingProfileTask {
 
-    void addSession(WebSocketSession session);
+    private final SetChargingProfileRequest request;
 
-    void removeSession(WebSocketSession session);
+    public SetChargingProfileTaskAdhoc(MultipleChargePointSelect params,
+                                       SetChargingProfileRequest request) {
+        super(params);
+        this.request = request;
+        checkAdditionalConstraints(request);
+    }
 
-    void add(WebSocketSession session, String messageId, FutureResponseContext context);
+    @Override
+    public OcppCallback<String> defaultCallback() {
+        return new StringOcppCallback();
+    }
 
-    @Nullable FutureResponseContext get(WebSocketSession session, String messageId);
+    @Override
+    public SetChargingProfileRequest getOcpp16Request() {
+        return request;
+    }
 }

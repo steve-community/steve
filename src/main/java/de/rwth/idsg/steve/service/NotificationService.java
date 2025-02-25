@@ -43,13 +43,13 @@ import static de.rwth.idsg.steve.NotificationFeature.OcppStationWebSocketDisconn
 import static de.rwth.idsg.steve.NotificationFeature.OcppTransactionStarted;
 import static de.rwth.idsg.steve.NotificationFeature.OcppStationStatusSuspendedEV;
 import static de.rwth.idsg.steve.NotificationFeature.OcppTransactionEnded;
+import de.rwth.idsg.steve.config.DelegatingTaskExecutor;
 import de.rwth.idsg.steve.repository.TransactionRepository;
 import de.rwth.idsg.steve.repository.UserRepository;
 import de.rwth.idsg.steve.repository.dto.Transaction;
 import de.rwth.idsg.steve.repository.dto.UserNotificationFeature;
 import static java.lang.String.format;
 import jooq.steve.db.tables.records.UserRecord;
-import java.util.concurrent.ScheduledExecutorService;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -62,7 +62,7 @@ public class NotificationService {
     @Autowired private MailService mailService;
     @Autowired private TransactionRepository transactionRepository;
     @Autowired private UserRepository userRepository;
-    @Autowired private ScheduledExecutorService executorService;
+    @Autowired private DelegatingTaskExecutor asyncTaskExecutor;
 
     @EventListener
     public void ocppStationBooted(OccpStationBooted notification) {
@@ -112,7 +112,7 @@ public class NotificationService {
         );
 
         // user mail in separate task, so database queries don't block the execution
-        executorService.execute(() -> {
+        asyncTaskExecutor.execute(() -> {
             try {
                 userNotificationocppStationStatusFailure(notification, subject);
             } catch (Exception e) {
@@ -174,7 +174,7 @@ public class NotificationService {
         );
 
         // user mail in separate task, so database queries don't block the execution
-        executorService.execute(() -> {
+        asyncTaskExecutor.execute(() -> {
             try {
                 userNotificationOcppTransactionStarted(notification, subject);
             } catch (Exception e) {
@@ -228,7 +228,7 @@ public class NotificationService {
         );
 
         // user mail in separate task, so database queries don't block the execution
-        executorService.execute(() -> {
+        asyncTaskExecutor.execute(() -> {
             try {
                 userNotificationActionSuspendedEV(notification, subject);
             } catch (Exception e) {
@@ -293,7 +293,7 @@ public class NotificationService {
         );
 
         // user mail in separate task, so database queries don't block the execution
-        executorService.execute(() -> {
+        asyncTaskExecutor.execute(() -> {
             try {
                 userNotificationActionTransactionEnded(notification, subject);
             } catch (Exception e) {

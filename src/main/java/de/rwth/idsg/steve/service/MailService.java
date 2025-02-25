@@ -37,6 +37,9 @@ import jakarta.mail.internet.InternetAddress;
 import jakarta.mail.internet.MimeMessage;
 
 import java.util.Properties;
+import static de.rwth.idsg.steve.utils.StringUtils.splitByComma;
+import static de.rwth.idsg.steve.utils.StringUtils.isValidAddress;
+import java.util.List;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -55,7 +58,7 @@ public class MailService {
 
     public void sendTestMail() {
         try {
-            send("Test", "Test");
+            send("Test", "Test", "");
         } catch (MessagingException e) {
             throw new SteveException("Failed to send mail", e);
         }
@@ -64,29 +67,54 @@ public class MailService {
     public void sendAsync(String subject, String body) {
         asyncTaskExecutor.execute(() -> {
             try {
-                send(subject, body);
+                send(subject, body, "");
             } catch (MessagingException e) {
                 log.error("Failed to send mail", e);
             }
         });
     }
 
-    public void send(String subject, String body) throws MessagingException {
+    public void sendAsync(String subject, String body, String recipientAddresses) {
+        asyncTaskExecutor.execute(() -> {
+            try {
+                send(subject, body, recipientAddresses);
+            } catch (MessagingException e) {
+                log.error("Failed to send mail", e);
+            }
+        });
+    }
+
+    private void send(String subject, String body, String recipientAddresses) throws MessagingException {
         MailSettings settings = getSettings();
-        Session session = createSession(getSettings());
+        Session session = createSession(settings);
 
         Message mail = new MimeMessage(session);
         mail.setSubject("[SteVe] " + subject);
         mail.setContent(body, "text/plain");
         mail.setFrom(new InternetAddress(settings.getFrom()));
 
-        for (String rep : settings.getRecipients()) {
-            mail.addRecipient(Message.RecipientType.TO, new InternetAddress(rep));
+        List<String> eMailAddresses;
+
+        if (recipientAddresses.isEmpty()) {
+            eMailAddresses = settings.getRecipients();
+        } else {
+            eMailAddresses = splitByComma(recipientAddresses);
+        }
+
+        for (String rep : eMailAddresses) {
+            if (isValidAddress(rep)) {
+                mail.addRecipient(Message.RecipientType.TO, new InternetAddress(rep));
+            } else {
+                log.error("Failed to send mail to " + rep + "! Format of the address is invalid.");
+            }
         }
 
         try (Transport transport = session.getTransport()) {
             transport.connect();
             transport.sendMessage(mail, mail.getAllRecipients());
+        }
+        catch (Exception e) {
+            log.error("Failed to send mail(s)! ", e);
         }
     }
 

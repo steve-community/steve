@@ -19,11 +19,11 @@
 package de.rwth.idsg.steve.web.api;
 
 import de.rwth.idsg.steve.SteveException;
-import de.rwth.idsg.steve.repository.dto.OcppTag;
+import de.rwth.idsg.steve.repository.dto.OcppTag.OcppTagOverview;
 import de.rwth.idsg.steve.service.OcppTagService;
 import de.rwth.idsg.steve.web.api.ApiControllerAdvice.ApiErrorResponse;
 import de.rwth.idsg.steve.web.dto.OcppTagForm;
-import de.rwth.idsg.steve.web.dto.OcppTagQueryForm;
+import de.rwth.idsg.steve.web.dto.OcppTagQueryForm.OcppTagQueryFormForApi;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -32,6 +32,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -80,7 +81,7 @@ public class OcppTagsRestController {
     )
     @GetMapping(value = "")
     @ResponseBody
-    public List<OcppTag.Overview> get(OcppTagQueryForm.ForApi params) {
+    public List<OcppTagOverview> get(@ParameterObject OcppTagQueryFormForApi params) {
         log.debug("Read request for query: {}", params);
 
         var response = ocppTagService.getOverview(params);
@@ -100,7 +101,7 @@ public class OcppTagsRestController {
     )
     @GetMapping("/{ocppTagPk}")
     @ResponseBody
-    public OcppTag.Overview getOne(@PathVariable("ocppTagPk") Integer ocppTagPk) {
+    public OcppTagOverview getOne(@PathVariable("ocppTagPk") Integer ocppTagPk) {
         log.debug("Read request for ocppTagPk: {}", ocppTagPk);
 
         var response = getOneInternal(ocppTagPk);
@@ -123,7 +124,7 @@ public class OcppTagsRestController {
     @PostMapping
     @ResponseBody
     @ResponseStatus(HttpStatus.CREATED)
-    public OcppTag.Overview create(@RequestBody @Valid OcppTagForm params) {
+    public OcppTagOverview create(@RequestBody @Valid OcppTagForm params) {
         log.debug("Create request: {}", params);
 
         int ocppTagPk = ocppTagService.addOcppTag(params);
@@ -145,7 +146,7 @@ public class OcppTagsRestController {
     )
     @PutMapping("/{ocppTagPk}")
     @ResponseBody
-    public OcppTag.Overview update(@PathVariable("ocppTagPk") Integer ocppTagPk, @RequestBody @Valid OcppTagForm params) {
+    public OcppTagOverview update(@PathVariable("ocppTagPk") Integer ocppTagPk, @RequestBody @Valid OcppTagForm params) {
         params.setOcppTagPk(ocppTagPk); // the one from incoming params does not matter
         log.debug("Update request: {}", params);
 
@@ -169,7 +170,7 @@ public class OcppTagsRestController {
     )
     @DeleteMapping("/{ocppTagPk}")
     @ResponseBody
-    public OcppTag.Overview delete(@PathVariable("ocppTagPk") Integer ocppTagPk) {
+    public OcppTagOverview delete(@PathVariable("ocppTagPk") Integer ocppTagPk) {
         log.debug("Delete request for ocppTagPk: {}", ocppTagPk);
 
         var response = getOneInternal(ocppTagPk);
@@ -179,11 +180,11 @@ public class OcppTagsRestController {
         return response;
     }
 
-    private OcppTag.Overview getOneInternal(int ocppTagPk) {
-        OcppTagQueryForm.ForApi params = new OcppTagQueryForm.ForApi();
+    private OcppTagOverview getOneInternal(int ocppTagPk) {
+        OcppTagQueryFormForApi params = new OcppTagQueryFormForApi();
         params.setOcppTagPk(ocppTagPk);
 
-        List<OcppTag.Overview> results = ocppTagService.getOverview(params);
+        List<OcppTagOverview> results = ocppTagService.getOverview(params);
         if (results.isEmpty()) {
             throw new SteveException.NotFound("Could not find this ocppTag");
         }

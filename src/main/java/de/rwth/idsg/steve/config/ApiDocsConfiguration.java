@@ -25,6 +25,7 @@ import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.info.License;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.security.SecurityScheme;
+import io.swagger.v3.oas.models.servers.Server;
 import org.springdoc.core.configuration.SpringDocConfiguration;
 import org.springdoc.core.properties.SwaggerUiConfigProperties;
 import org.springdoc.core.properties.SwaggerUiOAuthProperties;
@@ -35,6 +36,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
+
+import java.util.List;
 
 /**
  * https://stackoverflow.com/a/65557714
@@ -87,6 +90,8 @@ public class ApiDocsConfiguration {
                 )
                 .version(SteveConfiguration.CONFIG.getSteveVersion())
             )
+            // https://stackoverflow.com/a/68185254
+            .servers(List.of(new Server().url("/").description("Default Server URL")))
             // define a security schema
             .components(new Components().addSecuritySchemes(securityName, securityScheme))
             // and activate it for all endpoints

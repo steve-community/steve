@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2024 SteVe Community Team
+ * Copyright (C) 2013-2025 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -20,6 +20,7 @@ package de.rwth.idsg.steve.service;
 
 import com.google.common.base.Strings;
 import de.rwth.idsg.steve.SteveException;
+import de.rwth.idsg.steve.config.DelegatingTaskExecutor;
 import de.rwth.idsg.steve.repository.SettingsRepository;
 import de.rwth.idsg.steve.repository.dto.MailSettings;
 import lombok.extern.slf4j.Slf4j;
@@ -36,7 +37,6 @@ import jakarta.mail.internet.InternetAddress;
 import jakarta.mail.internet.MimeMessage;
 
 import java.util.Properties;
-import java.util.concurrent.ScheduledExecutorService;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -47,7 +47,7 @@ import java.util.concurrent.ScheduledExecutorService;
 public class MailService {
 
     @Autowired private SettingsRepository settingsRepository;
-    @Autowired private ScheduledExecutorService executorService;
+    @Autowired private DelegatingTaskExecutor asyncTaskExecutor;
 
     public MailSettings getSettings() {
         return settingsRepository.getMailSettings();
@@ -62,7 +62,7 @@ public class MailService {
     }
 
     public void sendAsync(String subject, String body) {
-        executorService.execute(() -> {
+        asyncTaskExecutor.execute(() -> {
             try {
                 send(subject, body);
             } catch (MessagingException e) {

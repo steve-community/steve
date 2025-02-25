@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2024 SteVe Community Team
+ * Copyright (C) 2013-2025 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -31,7 +31,7 @@ import java.util.List;
  * @since 19.08.2014
  */
 public interface OcppTagRepository {
-    List<OcppTag.Overview> getOverview(OcppTagQueryForm form);
+    List<OcppTag.OcppTagOverview> getOverview(OcppTagQueryForm form);
 
     Result<OcppTagActivityRecord> getRecords();
     Result<OcppTagActivityRecord> getRecords(List<String> idTagList);

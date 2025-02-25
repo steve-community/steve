@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2024 SteVe Community Team
+ * Copyright (C) 2013-2025 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -87,7 +87,7 @@ public class OcppTagsRestControllerTest extends AbstractControllerTest {
     @DisplayName("GET all: Test with empty results, expected 200")
     public void test1() throws Exception {
         // given
-        List<OcppTag.Overview> results = Collections.emptyList();
+        List<OcppTag.OcppTagOverview> results = Collections.emptyList();
 
         // when
         when(ocppTagService.getOverview(any())).thenReturn(results);
@@ -102,7 +102,7 @@ public class OcppTagsRestControllerTest extends AbstractControllerTest {
     @DisplayName("GET all: Test with one result, expected 200")
     public void test2() throws Exception {
         // given
-        List<OcppTag.Overview> results = List.of(OcppTag.Overview.builder().ocppTagPk(96).build());
+        List<OcppTag.OcppTagOverview> results = List.of(OcppTag.OcppTagOverview.builder().ocppTagPk(96).build());
 
         // when
         when(ocppTagService.getOverview(any())).thenReturn(results);
@@ -141,7 +141,7 @@ public class OcppTagsRestControllerTest extends AbstractControllerTest {
     public void test5() throws Exception {
         // given
         DateTime someDate = DateTime.parse("2020-10-01T00:00:00.000Z");
-        OcppTag.Overview result = OcppTag.Overview.builder()
+        OcppTag.OcppTagOverview result = OcppTag.OcppTagOverview.builder()
             .ocppTagPk(121)
             .idTag("id-1")
             .parentOcppTagPk(454)
@@ -206,7 +206,7 @@ public class OcppTagsRestControllerTest extends AbstractControllerTest {
     @DisplayName("GET one: One entity found, expected 200")
     public void test8() throws Exception {
         // given
-        OcppTag.Overview result = OcppTag.Overview.builder().ocppTagPk(12).build();
+        OcppTag.OcppTagOverview result = OcppTag.OcppTagOverview.builder().ocppTagPk(12).build();
 
         // when
         when(ocppTagService.getOverview(any())).thenReturn(List.of(result));
@@ -265,7 +265,7 @@ public class OcppTagsRestControllerTest extends AbstractControllerTest {
         OcppTagForm form = new OcppTagForm();
         form.setIdTag("id-123");
 
-        OcppTag.Overview result = OcppTag.Overview.builder()
+        OcppTag.OcppTagOverview result = OcppTag.OcppTagOverview.builder()
             .ocppTagPk(ocppTagPk)
             .idTag(form.getIdTag())
             .build();
@@ -296,7 +296,7 @@ public class OcppTagsRestControllerTest extends AbstractControllerTest {
         form.setIdTag("id-123");
         form.setNote("note-1");
 
-        OcppTag.Overview result = OcppTag.Overview.builder()
+        OcppTag.OcppTagOverview result = OcppTag.OcppTagOverview.builder()
             .ocppTagPk(ocppTagPk)
             .idTag(form.getIdTag())
             .note(form.getNote())
@@ -367,7 +367,7 @@ public class OcppTagsRestControllerTest extends AbstractControllerTest {
         // given
         int ocppTagPk = 123;
 
-        OcppTag.Overview result = OcppTag.Overview.builder()
+        OcppTag.OcppTagOverview result = OcppTag.OcppTagOverview.builder()
             .ocppTagPk(ocppTagPk)
             .idTag("id-123")
             .note("note-2")
@@ -390,7 +390,7 @@ public class OcppTagsRestControllerTest extends AbstractControllerTest {
         // given
         int ocppTagPk = 123;
 
-        OcppTag.Overview result = OcppTag.Overview.builder()
+        OcppTag.OcppTagOverview result = OcppTag.OcppTagOverview.builder()
             .ocppTagPk(ocppTagPk)
             .idTag("id-123")
             .note("note-2")
@@ -445,14 +445,14 @@ public class OcppTagsRestControllerTest extends AbstractControllerTest {
             .andExpectAll(errorJsonMatchers());
 
         verify(ocppTagService, times(0)).removeUnknown(anyList());
-        verify(ocppTagService, times(0)).getOverview(any(OcppTagQueryForm.ForApi.class));
+        verify(ocppTagService, times(0)).getOverview(any(OcppTagQueryForm.OcppTagQueryFormForApi.class));
     }
 
     @Test
     @DisplayName("GET all: Query param 'expired' is translated correctly, while others are defaulted")
     public void test19() throws Exception {
         // given
-        ArgumentCaptor<OcppTagQueryForm.ForApi> formToCapture = ArgumentCaptor.forClass(OcppTagQueryForm.ForApi.class);
+        ArgumentCaptor<OcppTagQueryForm.OcppTagQueryFormForApi> formToCapture = ArgumentCaptor.forClass(OcppTagQueryForm.OcppTagQueryFormForApi.class);
 
         // when
         when(ocppTagService.getOverview(any())).thenReturn(Collections.emptyList());
@@ -463,7 +463,7 @@ public class OcppTagsRestControllerTest extends AbstractControllerTest {
             .andExpect(status().isOk());
 
         verify(ocppTagService).getOverview(formToCapture.capture());
-        OcppTagQueryForm.ForApi capturedForm = formToCapture.getValue();
+        OcppTagQueryForm.OcppTagQueryFormForApi capturedForm = formToCapture.getValue();
 
         assertEquals(capturedForm.getExpired(), OcppTagQueryForm.BooleanType.FALSE);
         assertEquals(capturedForm.getInTransaction(), OcppTagQueryForm.BooleanType.ALL);
@@ -474,7 +474,7 @@ public class OcppTagsRestControllerTest extends AbstractControllerTest {
     @DisplayName("GET all: Query param 'inTransaction' is translated correctly, while others are defaulted")
     public void test20() throws Exception {
         // given
-        ArgumentCaptor<OcppTagQueryForm.ForApi> formToCapture = ArgumentCaptor.forClass(OcppTagQueryForm.ForApi.class);
+        ArgumentCaptor<OcppTagQueryForm.OcppTagQueryFormForApi> formToCapture = ArgumentCaptor.forClass(OcppTagQueryForm.OcppTagQueryFormForApi.class);
 
         // when
         when(ocppTagService.getOverview(any())).thenReturn(Collections.emptyList());
@@ -485,7 +485,7 @@ public class OcppTagsRestControllerTest extends AbstractControllerTest {
             .andExpect(status().isOk());
 
         verify(ocppTagService).getOverview(formToCapture.capture());
-        OcppTagQueryForm.ForApi capturedForm = formToCapture.getValue();
+        OcppTagQueryForm.OcppTagQueryFormForApi capturedForm = formToCapture.getValue();
 
         assertEquals(capturedForm.getExpired(), OcppTagQueryForm.BooleanType.ALL);
         assertEquals(capturedForm.getInTransaction(), OcppTagQueryForm.BooleanType.TRUE);
@@ -496,7 +496,7 @@ public class OcppTagsRestControllerTest extends AbstractControllerTest {
     @DisplayName("GET all: Query param 'inTransaction' is translated correctly, while others are defaulted")
     public void test21() throws Exception {
         // given
-        ArgumentCaptor<OcppTagQueryForm.ForApi> formToCapture = ArgumentCaptor.forClass(OcppTagQueryForm.ForApi.class);
+        ArgumentCaptor<OcppTagQueryForm.OcppTagQueryFormForApi> formToCapture = ArgumentCaptor.forClass(OcppTagQueryForm.OcppTagQueryFormForApi.class);
 
         // when
         when(ocppTagService.getOverview(any())).thenReturn(Collections.emptyList());
@@ -507,7 +507,7 @@ public class OcppTagsRestControllerTest extends AbstractControllerTest {
             .andExpect(status().isOk());
 
         verify(ocppTagService).getOverview(formToCapture.capture());
-        OcppTagQueryForm.ForApi capturedForm = formToCapture.getValue();
+        OcppTagQueryForm.OcppTagQueryFormForApi capturedForm = formToCapture.getValue();
 
         assertEquals(capturedForm.getExpired(), OcppTagQueryForm.BooleanType.ALL);
         assertEquals(capturedForm.getInTransaction(), OcppTagQueryForm.BooleanType.ALL);

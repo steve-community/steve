@@ -1,7 +1,7 @@
 <%--
 
     SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
-    Copyright (C) 2013-2024 SteVe Community Team
+    Copyright (C) 2013-2025 SteVe Community Team
     All Rights Reserved.
 
     This program is free software: you can redistribute it and/or modify
@@ -27,7 +27,7 @@
 		<td>
 			<form:select path="chargePointSelectList" size="5" multiple="true">
 				<c:forEach items="${cpList}" var="cp">
-					<form:option value="${cp.ocppTransport};${cp.chargeBoxId};${cp.endpointAddress}" label="${cp.chargeBoxId}"/>
+					<form:option value="${cp.ocppProtocol};${cp.chargeBoxId};${cp.endpointAddress}" label="${cp.chargeBoxId}"/>
 				</c:forEach>
 			</form:select>
 		</td>

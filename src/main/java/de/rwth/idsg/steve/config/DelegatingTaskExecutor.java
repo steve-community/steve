@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2024 SteVe Community Team
+ * Copyright (C) 2013-2025 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,30 +16,33 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package de.rwth.idsg.steve.service.dto;
+package de.rwth.idsg.steve.config;
 
-import de.rwth.idsg.steve.repository.dto.ChargePointSelect;
-import de.rwth.idsg.steve.repository.dto.ChargingProfile;
-import de.rwth.idsg.steve.web.dto.ocpp.ChargePointSelection;
-import de.rwth.idsg.steve.web.dto.ocpp.SetChargingProfileParams;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
-import java.util.List;
+import java.io.Closeable;
+import java.io.IOException;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
- * @since 12.11.2018
+ * @since 02.02.2025
  */
-@Getter
+@Slf4j
 @RequiredArgsConstructor
-public class EnhancedSetChargingProfileParams implements ChargePointSelection {
+public class DelegatingTaskExecutor implements Closeable {
 
-    private final SetChargingProfileParams delegate;
-    private final ChargingProfile.Details details;
+    private final ThreadPoolTaskExecutor delegate;
 
     @Override
-    public List<ChargePointSelect> getChargePointSelectList() {
-        return delegate.getChargePointSelectList();
+    public void close() throws IOException {
+        log.info("Shutting down");
+        delegate.shutdown();
     }
+
+    public void execute(Runnable task) {
+        delegate.execute(task);
+    }
+
 }

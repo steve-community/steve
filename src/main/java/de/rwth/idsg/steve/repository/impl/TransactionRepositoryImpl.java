@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2024 SteVe Community Team
+ * Copyright (C) 2013-2025 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -290,6 +290,9 @@ public class TransactionRepositoryImpl implements TransactionRepository {
 
         if (form.getType() == TransactionQueryForm.QueryType.ACTIVE) {
             selectQuery.addConditions(TRANSACTION.STOP_TIMESTAMP.isNull());
+
+        } else if (form.getType() == TransactionQueryForm.QueryType.STOPPED) {
+            selectQuery.addConditions(TRANSACTION.STOP_TIMESTAMP.isNotNull());
         }
 
         processType(selectQuery, form);

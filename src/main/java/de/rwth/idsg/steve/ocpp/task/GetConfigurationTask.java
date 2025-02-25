@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2024 SteVe Community Team
+ * Copyright (C) 2013-2025 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -21,7 +21,6 @@ package de.rwth.idsg.steve.ocpp.task;
 import com.google.common.base.Joiner;
 import de.rwth.idsg.steve.ocpp.Ocpp15AndAboveTask;
 import de.rwth.idsg.steve.ocpp.OcppCallback;
-import de.rwth.idsg.steve.ocpp.OcppVersion;
 import de.rwth.idsg.steve.ocpp.RequestResult;
 import de.rwth.idsg.steve.web.dto.ocpp.GetConfigurationParams;
 import lombok.Getter;
@@ -30,6 +29,7 @@ import ocpp.cp._2012._06.GetConfigurationRequest;
 import ocpp.cp._2012._06.GetConfigurationResponse;
 
 import jakarta.xml.ws.AsyncHandler;
+
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -41,8 +41,8 @@ public class GetConfigurationTask extends Ocpp15AndAboveTask<GetConfigurationPar
 
     private static final Joiner JOINER = Joiner.on(", ");
 
-    public GetConfigurationTask(OcppVersion ocppVersion, GetConfigurationParams params) {
-        super(ocppVersion, params);
+    public GetConfigurationTask(GetConfigurationParams params) {
+        super(params);
     }
 
     @Override

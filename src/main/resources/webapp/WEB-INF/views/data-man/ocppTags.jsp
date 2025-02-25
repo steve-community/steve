@@ -1,7 +1,7 @@
 <%--
 
     SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
-    Copyright (C) 2013-2024 SteVe Community Team
+    Copyright (C) 2013-2025 SteVe Community Team
     All Rights Reserved.
 
     This program is free software: you can redistribute it and/or modify
@@ -111,6 +111,10 @@
                         <form:options items="${blocked}" itemLabel="value"/>
                     </form:select>
                     </td>
+                </tr>
+                <tr>
+                    <td>Note:</td>
+                    <td><form:input path="note"/></td>
                 </tr>
                 <tr>
                     <td></td>

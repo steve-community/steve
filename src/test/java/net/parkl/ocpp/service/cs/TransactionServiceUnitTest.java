@@ -141,8 +141,10 @@ public class TransactionServiceUnitTest {
                         .build();
 
         when(transactionRepository.findById(testTransactionId)).thenReturn(java.util.Optional.of(testTransaction));
-        
+
         when(chargingProcessService.findByTransactionId(testTransactionId)).thenReturn(chargingProcess);
+        when(chargingProcess.getTransactionStart()).thenReturn(testTransactionStart);
+
         when(chargingProcess.getTransactionStart()).thenReturn(testTransactionStart);
         when(chargePointService.shouldInsertConnectorStatusAfterTransactionMsg(testChargeBoxId)).thenReturn(true);
 

@@ -59,6 +59,7 @@ public class WebSocketConfiguration implements WebSocketConfigurer {
     public static final String PATH_INFIX = "/websocket/CentralSystemService/";
     public static final long PING_INTERVAL = TimeUnit.MINUTES.toMinutes(15);
     public static final Duration IDLE_TIMEOUT = Duration.ofHours(2);
+    public static final int IDLE_TIMEOUT_IN_MS = 600000;
     public static final int MAX_MSG_SIZE = 4_199_304; // 4 MB for max message size
 
     @Override
@@ -72,6 +73,7 @@ public class WebSocketConfiguration implements WebSocketConfigurer {
 
         String path = WebEnvironment.getContextRoot() + PATH_INFIX + "*";
         log.info("Registering WebSocket handlers: {}...", path);
+
 
         registry.addHandler(handshakeHandler.getDummyWebSocketHandler(), path)
                 .setHandshakeHandler(handshakeHandler)

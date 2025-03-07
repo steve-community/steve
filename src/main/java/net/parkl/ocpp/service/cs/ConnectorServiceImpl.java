@@ -30,6 +30,7 @@ import net.parkl.ocpp.repositories.ConnectorRepository;
 import net.parkl.ocpp.repositories.ConnectorStatusRepository;
 import net.parkl.ocpp.repositories.OcppChargingProcessRepository;
 import net.parkl.ocpp.service.OcppConstants;
+import net.parkl.ocpp.service.config.AdvancedChargeBoxConfiguration;
 import net.parkl.ocpp.service.middleware.OcppChargingMiddleware;
 import ocpp.cs._2015._10.ChargePointErrorCode;
 import ocpp.cs._2015._10.ChargePointStatus;
@@ -58,10 +59,8 @@ public class ConnectorServiceImpl implements ConnectorService {
     @Autowired
     @Qualifier("taskExecutor")
     private TaskExecutor executor;
-
     @Autowired
     private OcppChargingMiddleware chargingMiddleware;
-
 
     @Override
     @Transactional
@@ -125,7 +124,7 @@ public class ConnectorServiceImpl implements ConnectorService {
     }
 
     private OcppChargingProcess handleChargingProcess(Connector connector, ConnectorStatus s) {
-        OcppChargingProcess process = chargingProcessRepo.findByConnectorAndTransactionStartIsNullAndEndDateIsNull(connector);
+        OcppChargingProcess process = chargingProcessRepo.findByConnectorAndEndDateIsNull(connector);
 
         if (process == null) {
             return null;

@@ -102,7 +102,7 @@ public class MailServiceDefault implements MailService {
         Properties props = new Properties();
         String protocol = settings.getProtocol();
 
-        props.setProperty("mail.host", "" + settings.getHost());
+        props.setProperty("mail.host", "" + settings.getMailHost());
         props.setProperty("mail.transport.protocol", "" + protocol);
         props.setProperty("mail." + protocol + ".port", "" + settings.getPort());
 

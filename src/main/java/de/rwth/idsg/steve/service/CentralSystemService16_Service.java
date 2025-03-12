@@ -285,7 +285,10 @@ public class CentralSystemService16_Service {
      */
     private Integer getTransactionId(MeterValuesRequest parameters) {
         Integer transactionId = parameters.getTransactionId();
-        if (transactionId == null || transactionId == 0) {
+        if (transactionId == null) {
+            return null;
+        } else if (transactionId < 1) {
+            log.warn("MeterValues transactionId is invalid ({}), ignoring it", transactionId);
             return null;
         }
         return transactionId;

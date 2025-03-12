@@ -18,143 +18,23 @@
  */
 package de.rwth.idsg.steve.service;
 
-import com.google.common.base.Strings;
-import de.rwth.idsg.steve.SteveException;
-import de.rwth.idsg.steve.config.DelegatingTaskExecutor;
-import de.rwth.idsg.steve.repository.SettingsRepository;
 import de.rwth.idsg.steve.repository.dto.MailSettings;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
-import jakarta.mail.Authenticator;
-import jakarta.mail.Message;
 import jakarta.mail.MessagingException;
-import jakarta.mail.PasswordAuthentication;
-import jakarta.mail.Session;
-import jakarta.mail.Transport;
-import jakarta.mail.internet.InternetAddress;
-import jakarta.mail.internet.MimeMessage;
-
-import java.util.Properties;
-import static de.rwth.idsg.steve.utils.StringUtils.splitByComma;
-import static de.rwth.idsg.steve.utils.StringUtils.isValidAddress;
-import java.util.List;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
- * @since 24.01.2016
+ * @since 11.03.2025
  */
-@Slf4j
-@Service
-public class MailService {
+public interface MailService {
 
-    @Autowired private SettingsRepository settingsRepository;
-    @Autowired private DelegatingTaskExecutor asyncTaskExecutor;
+    MailSettings getSettings();
 
-    public MailSettings getSettings() {
-        return settingsRepository.getMailSettings();
-    }
+    void sendTestMail();
 
-    public void sendTestMail() {
-        try {
-            send("Test", "Test", "");
-        } catch (MessagingException e) {
-            throw new SteveException("Failed to send mail", e);
-        }
-    }
+    void sendAsync(String subject, String body);
+    
+    void sendAsync(String subject, String body, String recipientAddresses);
 
-    public void sendAsync(String subject, String body) {
-        asyncTaskExecutor.execute(() -> {
-            try {
-                send(subject, body, "");
-            } catch (MessagingException e) {
-                log.error("Failed to send mail", e);
-            }
-        });
-    }
-
-    public void sendAsync(String subject, String body, String recipientAddresses) {
-        asyncTaskExecutor.execute(() -> {
-            try {
-                send(subject, body, recipientAddresses);
-            } catch (MessagingException e) {
-                log.error("Failed to send mail", e);
-            }
-        });
-    }
-
-    private void send(String subject, String body, String recipientAddresses) throws MessagingException {
-        MailSettings settings = getSettings();
-        Session session = createSession(settings);
-
-        Message mail = new MimeMessage(session);
-        mail.setSubject("[SteVe] " + subject);
-        mail.setContent(body, "text/plain");
-        mail.setFrom(new InternetAddress(settings.getFrom()));
-
-        List<String> eMailAddresses;
-
-        if (recipientAddresses.isEmpty()) {
-            eMailAddresses = settings.getRecipients();
-        } else {
-            eMailAddresses = splitByComma(recipientAddresses);
-        }
-
-        for (String rep : eMailAddresses) {
-            if (isValidAddress(rep)) {
-                mail.addRecipient(Message.RecipientType.TO, new InternetAddress(rep));
-            } else {
-                log.error("Failed to send mail to " + rep + "! Format of the address is invalid.");
-            }
-        }
-
-        try (Transport transport = session.getTransport()) {
-            transport.connect();
-            transport.sendMessage(mail, mail.getAllRecipients());
-        }
-        catch (Exception e) {
-            log.error("Failed to send mail(s)! ", e);
-        }
-    }
-
-    // -------------------------------------------------------------------------
-    // Private helpers
-    // -------------------------------------------------------------------------
-
-    private static Session createSession(MailSettings settings) {
-        Properties props = new Properties();
-        String protocol = settings.getProtocol();
-
-        props.setProperty("mail.host", "" + settings.getHost());
-        props.setProperty("mail.transport.protocol", "" + protocol);
-        props.setProperty("mail." + protocol + ".port", "" + settings.getPort());
-
-        if (settings.getPort() == 465) {
-            props.setProperty("mail." + protocol + ".ssl.enable", "" + true);
-
-        } else if (settings.getPort() == 587) {
-            props.setProperty("mail." + protocol + ".starttls.enable", "" + true);
-        }
-
-        boolean isUserSet = !Strings.isNullOrEmpty(settings.getUsername());
-        boolean isPassSet = !Strings.isNullOrEmpty(settings.getPassword());
-
-        if (isUserSet && isPassSet) {
-            props.setProperty("mail." + protocol + ".auth", "" + true);
-            return Session.getInstance(props, getAuth(settings));
-
-        } else {
-            return Session.getInstance(props);
-        }
-    }
-
-    private static Authenticator getAuth(MailSettings settings) {
-        return new Authenticator() {
-            @Override
-            protected PasswordAuthentication getPasswordAuthentication() {
-                return new PasswordAuthentication(settings.getUsername(), settings.getPassword());
-            }
-        };
-    }
+    void send(String subject, String body, String recipientAddresses) throws MessagingException;
 }

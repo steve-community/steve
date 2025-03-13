@@ -20,8 +20,6 @@ package de.rwth.idsg.steve.service;
 
 import de.rwth.idsg.steve.repository.dto.MailSettings;
 
-import jakarta.mail.MessagingException;
-
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 11.03.2025
@@ -35,6 +33,4 @@ public interface MailService {
     void sendAsync(String subject, String body);
     
     void sendAsync(String subject, String body, String recipientAddresses);
-
-    void send(String subject, String body, String recipientAddresses) throws MessagingException;
 }

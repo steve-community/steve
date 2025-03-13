@@ -16,6 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+
 package de.rwth.idsg.steve.service;
 
 import jakarta.mail.Authenticator;
@@ -88,9 +89,8 @@ public class MailServiceDefault implements MailService {
             }
         });
     }
-    
-    @Override
-    public void send(String subject, String body, String recipientAddresses) throws MessagingException {
+
+    private void send(String subject, String body, String recipientAddresses) throws MessagingException {
         MailSettings settings = getSettings();
         Session session = createSession(settings);
 

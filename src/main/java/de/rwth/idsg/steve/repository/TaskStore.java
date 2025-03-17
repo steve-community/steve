@@ -32,4 +32,5 @@ public interface TaskStore {
     CommunicationTask get(Integer taskId);
     Integer add(CommunicationTask task);
     void clearFinished();
+    void clearUnfinished();
 }

@@ -96,4 +96,8 @@ public class AdvancedChargeBoxConfiguration {
     public float getWebSocketBufferMultiplier(String chargeBoxId, float defaultBufferMultiplier) {
         return chargeBoxConfiguration == null ? 1.0f : chargeBoxConfiguration.getWebSocketBufferMultiplier(chargeBoxId, defaultBufferMultiplier);
     }
+
+    public boolean ignoreConnectorAvailableUntilStopTransaction(String chargeBoxId) {
+        return chargeBoxConfiguration != null && chargeBoxConfiguration.ignoreConnectorAvailableUntilStopTransaction(chargeBoxId);
+    }
 }

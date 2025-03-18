@@ -36,4 +36,5 @@ public interface ChargeBoxConfiguration {
 
     boolean isIdTagMax10Characters(String chargeBoxId);
     float getWebSocketBufferMultiplier(String chargeBoxId, float defaultMultiplier);
+    boolean ignoreConnectorAvailableUntilStopTransaction(String chargeBoxId);
 }

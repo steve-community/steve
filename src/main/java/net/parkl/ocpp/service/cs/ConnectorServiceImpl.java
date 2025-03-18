@@ -61,6 +61,8 @@ public class ConnectorServiceImpl implements ConnectorService {
     private TaskExecutor executor;
     @Autowired
     private OcppChargingMiddleware chargingMiddleware;
+    @Autowired
+    private AdvancedChargeBoxConfiguration advancedChargeBoxConfiguration;
 
     @Override
     @Transactional
@@ -131,6 +133,12 @@ public class ConnectorServiceImpl implements ConnectorService {
         }
 
         if (s.getStatus().equals(ChargePointStatus.AVAILABLE.value())) {
+            if (advancedChargeBoxConfiguration
+                    .ignoreConnectorAvailableUntilStopTransaction(process.getConnector().getChargeBoxId())) {
+                log.info("Ignore connector available state until StopTransaction event is turned on for chargeBoxId: {}",
+                        process.getConnector().getChargeBoxId());
+                return null;
+            }
             log.info("Ending charging process on available connector status: {}", process.getOcppChargingProcessId());
             process.setEndDate(LocalDateTime.now());
             return chargingProcessRepo.save(process);

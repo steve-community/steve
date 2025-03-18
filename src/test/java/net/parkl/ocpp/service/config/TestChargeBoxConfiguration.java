@@ -75,4 +75,9 @@ public class TestChargeBoxConfiguration implements ChargeBoxConfiguration {
     public float getWebSocketBufferMultiplier(String chargeBoxId, float defaultMultiplier) {
         return defaultMultiplier;
     }
+
+    @Override
+    public boolean ignoreConnectorAvailableUntilStopTransaction(String chargeBoxId) {
+        return false;
+    }
 }

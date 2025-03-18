@@ -74,5 +74,6 @@ public class AdvancedChargeBoxConfigKeys {
     public static final String KEY_SKIP_HEARTBEAT_CHECK = "skip.heartbeat.check";
     public static final String KEY_SKIP_HEARTBEAT_CONFIG = "skip.heartbeat.config";
     public static final String KEY_WEB_SOCKET_BUFFER_MULTIPLIER = "websocket.buffer.multiplier";
+    public static final String KEY_IGNORE_CONNECTOR_AVAILABLE_UNTIL_STOP_TRANSACTION = "ignore.connector.available.until.stop.transaction";
 
 }

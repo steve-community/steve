@@ -59,9 +59,15 @@ public class TaskController {
         return "tasks";
     }
 
-    @RequestMapping(method = RequestMethod.POST)
+    @RequestMapping(params = "finished", method = RequestMethod.POST)
     public String clearFinished(Model model) {
         taskStore.clearFinished();
+        return getOverview(model);
+    }
+
+    @RequestMapping(params = "unfinished", method = RequestMethod.POST)
+    public String clearUnfinished(Model model) {
+        taskStore.clearUnfinished();
         return getOverview(model);
     }
 

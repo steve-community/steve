@@ -51,37 +51,43 @@ public class TransactionStopServiceHelper {
             return false;
         }
 
-        //
-        // init relevant fields with default values if empty
-        //
-        ValueFormat format = Strings.isNullOrEmpty(v.getFormat())
-            ? ValueFormat.RAW
-            : ValueFormat.fromValue(v.getFormat());
+        // edge case handling for format
+        {
+            ValueFormat format = Strings.isNullOrEmpty(v.getFormat())
+                ? ValueFormat.RAW
+                : ValueFormat.fromValue(v.getFormat());
 
-        Measurand measurand = Strings.isNullOrEmpty(v.getMeasurand())
-            ? Measurand.ENERGY_ACTIVE_IMPORT_REGISTER
-            : Measurand.fromValue(v.getMeasurand());
-
-        UnitOfMeasure unit = Strings.isNullOrEmpty(v.getUnit())
-            ? UnitOfMeasure.WH
-            : UnitOfMeasure.fromValue(v.getUnit());
-
-        // if the format is "SignedData", we cannot make any sense of this entry. we don't know how to decode it.
-        // https://github.com/steve-community/steve/issues/816
-        if (ValueFormat.SIGNED_DATA == format) {
-            return false;
+            // if the format is "SignedData", we cannot make any sense of this entry. we don't know how to decode it.
+            // https://github.com/steve-community/steve/issues/816
+            if (ValueFormat.SIGNED_DATA == format) {
+                return false;
+            }
         }
 
-        if (!isWHOrKWH(unit)) {
-            return false;
+        // edge case handling for measurand
+        {
+            Measurand measurand = Strings.isNullOrEmpty(v.getMeasurand())
+                ? Measurand.ENERGY_ACTIVE_IMPORT_REGISTER
+                : Measurand.fromValue(v.getMeasurand());
+
+            if (Measurand.ENERGY_ACTIVE_IMPORT_REGISTER != measurand) {
+                return false;
+            }
         }
 
-        if (Measurand.ENERGY_ACTIVE_IMPORT_REGISTER != measurand) {
-            return false;
+        // edge case handling for unit
+        {
+            UnitOfMeasure unit = Strings.isNullOrEmpty(v.getUnit())
+                ? UnitOfMeasure.WH
+                : UnitOfMeasure.fromValue(v.getUnit());
+
+            if (!isWHOrKWH(unit)) {
+                return false;
+            }
         }
 
         // at this point, we have a value with
-        // - RAW or null format
+        // - RAW format
         // - Wh or kWh unit
         // - Energy.Active.Import.Register as the measurand
         return true;

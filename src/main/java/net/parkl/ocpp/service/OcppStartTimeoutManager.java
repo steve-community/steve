@@ -26,10 +26,9 @@ import net.parkl.ocpp.service.middleware.OcppChargePointMiddleware;
 import net.parkl.ocpp.service.middleware.OcppChargingMiddleware;
 import org.springframework.stereotype.Component;
 
-import java.time.ZoneId;
+import java.time.Clock;
+import java.time.LocalDateTime;
 import java.util.List;
-
-import static java.lang.System.currentTimeMillis;
 
 @Component
 @RequiredArgsConstructor
@@ -69,8 +68,7 @@ public class OcppStartTimeoutManager {
     }
 
     private void checkForProcessStartTimeout(OcppChargingProcess chargingProcess) throws Exception {
-        if (chargingProcess.getStartDate().atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()
-                + config.getStartTimeoutSecs(chargingProcess.getConnector().getChargeBoxId()) * 1000L < currentTimeMillis()) {
+        if (shouldStartTimeout(chargingProcess)) {
             log.info("Charging process start timeout: {}", chargingProcess.getOcppChargingProcessId());
             log.info("Charging process stopped on timeout, connector reset: {}-{}",
                      chargingProcess.getConnector().getChargeBoxId(), chargingProcess.getConnector().getConnectorId());
@@ -78,14 +76,25 @@ public class OcppStartTimeoutManager {
         }
     }
 
+    private boolean shouldStartTimeout(OcppChargingProcess chargingProcess) {
+        return chargingProcess.getStartDate()
+                .plusSeconds(config.getStartTimeoutSecs(chargingProcess.getConnector().getChargeBoxId()))
+                .isBefore(LocalDateTime.now(Clock.systemUTC()));
+    }
+
     private void checkForProcessPreparingTimeout(OcppChargingProcess chargingProcess) {
-        if (chargingProcess.getStartDate().atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()
-                + config.getPreparingTimeoutSecs(chargingProcess.getConnector().getChargeBoxId()) * 1000L < currentTimeMillis()) {
+        if (shouldPrepareTimeout(chargingProcess)) {
             log.info("Charging process preparing timeout: {}", chargingProcess.getOcppChargingProcessId());
             log.info("Charging process stopped on timeout, connector reset: {}-{}",
                      chargingProcess.getConnector().getChargeBoxId(), chargingProcess.getConnector().getConnectorId());
             chargingMiddleware.stopChargingWithPreparingTimeout(chargingProcess.getOcppChargingProcessId());
         }
+    }
+
+    private boolean shouldPrepareTimeout(OcppChargingProcess chargingProcess) {
+        return chargingProcess.getStartDate()
+                .plusSeconds(config.getPreparingTimeoutSecs(chargingProcess.getConnector().getChargeBoxId()))
+                .isBefore(LocalDateTime.now(Clock.systemUTC()));
     }
 
     private void changeAvailability(OcppChargingProcess chargingProcess) throws InterruptedException {

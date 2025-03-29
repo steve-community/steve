@@ -18,20 +18,17 @@
  */
 package de.rwth.idsg.steve.utils;
 
+import ch.qos.logback.classic.Logger;
+import ch.qos.logback.classic.spi.ILoggingEvent;
+import ch.qos.logback.core.Appender;
+import ch.qos.logback.core.FileAppender;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.core.Appender;
-import org.apache.logging.log4j.core.LoggerContext;
-import org.apache.logging.log4j.core.appender.FileAppender;
-import org.apache.logging.log4j.core.appender.MemoryMappedFileAppender;
-import org.apache.logging.log4j.core.appender.RandomAccessFileAppender;
-import org.apache.logging.log4j.core.appender.RollingFileAppender;
-import org.apache.logging.log4j.core.appender.RollingRandomAccessFileAppender;
-import org.apache.logging.log4j.core.config.Configuration;
+import org.slf4j.LoggerFactory;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ThreadLocalRandom;
@@ -92,39 +89,26 @@ public enum LogFileRetriever {
      * by iterating over appenders.
      */
     private List<Path> getActiveLogFilePaths() {
-        LoggerContext context = (LoggerContext) LogManager.getContext(false);
-        Configuration config = context.getConfiguration();
+        Logger logger = (Logger) LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
+        Iterator<Appender<ILoggingEvent>> appenderIterator = logger.iteratorForAppenders();
 
         List<Path> fileNameList = new ArrayList<>();
-        for (Appender appender : config.getAppenders().values()) {
+        if (appenderIterator.hasNext()) {
+            var appender = appenderIterator.next();
             String fileName = extractFileName(appender);
             if (fileName != null) {
                 fileNameList.add(Paths.get(fileName));
             }
         }
-
         return fileNameList;
     }
 
     /**
      * File appender types do not share a "write-to-file" superclass.
      */
-    private String extractFileName(Appender a) {
+    private String extractFileName(Appender<ILoggingEvent> a) {
         if (a instanceof FileAppender) {
-            return ((FileAppender) a).getFileName();
-
-        } else if (a instanceof RollingFileAppender) {
-            return ((RollingFileAppender) a).getFileName();
-
-        } else if (a instanceof RollingRandomAccessFileAppender) {
-            return ((RollingRandomAccessFileAppender) a).getFileName();
-
-        } else if (a instanceof RandomAccessFileAppender) {
-            return ((RandomAccessFileAppender) a).getFileName();
-
-        } else if (a instanceof MemoryMappedFileAppender) {
-            return ((MemoryMappedFileAppender) a).getFileName();
-
+            return ((FileAppender<ILoggingEvent>) a).getFile();
         } else {
             return null;
         }

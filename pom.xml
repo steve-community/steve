@@ -206,7 +206,7 @@
                 <version>3.26.0</version>
                 <configuration>
                     <rulesets>
-                        <ruleset>${project.basedir}/src/main/resources/maven-pmd-plugin-default.xml</ruleset>
+                        <ruleset>${project.basedir}/maven-pmd-plugin-default.xml</ruleset>
                     </rulesets>
                 </configuration>
             </plugin>
@@ -231,7 +231,7 @@
                 <artifactId>maven-checkstyle-plugin</artifactId>
                 <version>3.6.0</version>
                 <configuration>
-                    <configLocation>${basedir}/src/main/resources/checkstyle.xml</configLocation>
+                    <configLocation>${project.basedir}/checkstyle.xml</configLocation>
                 </configuration>
             </plugin>
 

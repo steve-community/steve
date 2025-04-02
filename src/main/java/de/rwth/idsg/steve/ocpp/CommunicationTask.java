@@ -26,11 +26,12 @@ import de.rwth.idsg.steve.utils.StringUtils;
 import de.rwth.idsg.steve.web.dto.ocpp.ChargePointSelection;
 import lombok.AccessLevel;
 import lombok.Getter;
-import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import jakarta.xml.ws.AsyncHandler;
+
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -57,8 +58,8 @@ public abstract class CommunicationTask<S extends ChargePointSelection, RESPONSE
     private final Map<String, RequestResult> resultMap;
     private final int resultSize;
 
-    private final DateTime startTimestamp = DateTime.now();
-    private DateTime endTimestamp;
+    private final OffsetDateTime startTimestamp = OffsetDateTime.now();
+    private OffsetDateTime endTimestamp;
 
     private final AtomicInteger errorCount = new AtomicInteger(0);
     private final AtomicInteger responseCount = new AtomicInteger(0);
@@ -110,7 +111,7 @@ public abstract class CommunicationTask<S extends ChargePointSelection, RESPONSE
 
         synchronized (lockObject) {
             if (resultSize == (errorCount.get() + responseCount.incrementAndGet())) {
-                endTimestamp = DateTime.now();
+                endTimestamp = OffsetDateTime.now();
             }
         }
     }
@@ -120,7 +121,7 @@ public abstract class CommunicationTask<S extends ChargePointSelection, RESPONSE
 
         synchronized (lockObject) {
             if (resultSize == (errorCount.incrementAndGet() + responseCount.get())) {
-                endTimestamp = DateTime.now();
+                endTimestamp = OffsetDateTime.now();
             }
         }
     }

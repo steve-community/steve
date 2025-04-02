@@ -20,9 +20,9 @@ package de.rwth.idsg.steve.ocpp.ws.data;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.joda.time.DateTime;
 import org.springframework.web.socket.WebSocketSession;
 
+import java.time.LocalDateTime;
 import java.util.concurrent.ScheduledFuture;
 
 /**
@@ -34,5 +34,5 @@ import java.util.concurrent.ScheduledFuture;
 public class SessionContext {
     private final WebSocketSession session;
     private final ScheduledFuture pingSchedule;
-    private final DateTime openSince;
+    private final LocalDateTime openSince;
 }

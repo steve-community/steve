@@ -18,6 +18,7 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 --%>
+<%@ taglib prefix="f" uri="https://www.steve-project.org/tld/datetime" %>
 <%@ include file="00-header.jsp" %>
 <script type="text/javascript">
     $(document).ready(function() {
@@ -45,7 +46,7 @@ Connection Status for JSON Charge Points
         <c:forEach items="${ocppJsonStatusList}" var="s">
             <tr><td><a href="${ctxPath}/manager/chargepoints/details/${s.chargeBoxPk}">${s.chargeBoxId}</a></td>
                 <td>${s.version.value}</td>
-                <td data-sort-value="${s.connectedSinceDT.millis}">${s.connectedSince}</td>
+                <td data-sort-value="${f:toMillis(s.connectedSinceDT)}">${s.connectedSince}</td>
                 <td>${s.connectionDuration}</td>
             </tr>
         </c:forEach>

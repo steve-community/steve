@@ -26,9 +26,9 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import ocpp.cs._2012._06.MeterValue;
-import org.joda.time.DateTime;
 
 import java.io.IOException;
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -98,7 +98,7 @@ public class MeterValue15Deserializer extends JsonDeserializer<List<MeterValue>>
 
     private void parseDateTime(MeterValue meterValue, JsonNode node) {
         if (!node.isMissingNode()) {
-            meterValue.setTimestamp(new DateTime(node.asText()));
+            meterValue.setTimestamp(OffsetDateTime.parse(node.asText()));
         }
     }
 }

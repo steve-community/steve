@@ -21,12 +21,13 @@ package de.rwth.idsg.steve.web.dto.ocpp;
 import de.rwth.idsg.steve.web.validation.IdTag;
 import lombok.Getter;
 import lombok.Setter;
-import org.joda.time.LocalDateTime;
 
 import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+
+import java.time.LocalDateTime;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>

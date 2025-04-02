@@ -54,10 +54,10 @@ public final class ChargingProfileDetailsMapper {
         form.setChargingProfilePurpose(ChargingProfilePurposeType.fromValue(profile.getChargingProfilePurpose()));
         form.setChargingProfileKind(ChargingProfileKindType.fromValue(profile.getChargingProfileKind()));
         form.setRecurrencyKind(profile.getRecurrencyKind() == null ? null : RecurrencyKindType.fromValue(profile.getRecurrencyKind()));
-        form.setValidFrom(DateTimeUtils.toLocalDateTime(profile.getValidFrom()));
-        form.setValidTo(DateTimeUtils.toLocalDateTime(profile.getValidTo()));
+        form.setValidFrom(profile.getValidFrom());
+        form.setValidTo(profile.getValidTo());
         form.setDurationInSeconds(profile.getDurationInSeconds());
-        form.setStartSchedule(DateTimeUtils.toLocalDateTime(profile.getStartSchedule()));
+        form.setStartSchedule(profile.getStartSchedule());
         form.setChargingRateUnit(ChargingRateUnitType.fromValue(profile.getChargingRateUnit()));
         form.setMinChargingRate(profile.getMinChargingRate());
 

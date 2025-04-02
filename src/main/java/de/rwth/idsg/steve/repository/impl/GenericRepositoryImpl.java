@@ -25,7 +25,6 @@ import de.rwth.idsg.steve.repository.dto.DbVersion;
 import de.rwth.idsg.steve.utils.DateTimeUtils;
 import de.rwth.idsg.steve.web.dto.Statistics;
 import lombok.extern.slf4j.Slf4j;
-import org.joda.time.DateTime;
 import org.jooq.DSLContext;
 import org.jooq.DatePart;
 import org.jooq.Field;
@@ -36,6 +35,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Repository;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import static de.rwth.idsg.steve.utils.CustomDSL.date;
 import static de.rwth.idsg.steve.utils.CustomDSL.timestampDiff;
@@ -80,8 +82,9 @@ public class GenericRepositoryImpl implements GenericRepository {
 
     @Override
     public Statistics getStats() {
-        DateTime now = DateTime.now();
-        DateTime yesterdaysNow = now.minusDays(1);
+        LocalDateTime nowTime = LocalDateTime.now();
+        LocalDate nowDate = nowTime.toLocalDate();
+        LocalDate yesterdaysNow = nowDate.minusDays(1);
 
         Field<Integer> numChargeBoxes =
                 ctx.selectCount()
@@ -101,7 +104,7 @@ public class GenericRepositoryImpl implements GenericRepository {
         Field<Integer> numReservations =
                 ctx.selectCount()
                    .from(RESERVATION)
-                   .where(RESERVATION.EXPIRY_DATETIME.greaterThan(now))
+                   .where(RESERVATION.EXPIRY_DATETIME.greaterThan(nowTime))
                    .and(RESERVATION.STATUS.eq(ReservationStatus.ACCEPTED.name()))
                    .asField("num_reservations");
 
@@ -114,19 +117,19 @@ public class GenericRepositoryImpl implements GenericRepository {
         Field<Integer> heartbeatsToday =
                 ctx.selectCount()
                    .from(CHARGE_BOX)
-                   .where(date(CHARGE_BOX.LAST_HEARTBEAT_TIMESTAMP).eq(date(now)))
+                   .where(date(CHARGE_BOX.LAST_HEARTBEAT_TIMESTAMP).eq(nowDate))
                    .asField("heartbeats_today");
 
         Field<Integer> heartbeatsYesterday =
                 ctx.selectCount()
                    .from(CHARGE_BOX)
-                   .where(date(CHARGE_BOX.LAST_HEARTBEAT_TIMESTAMP).eq(date(yesterdaysNow)))
+                   .where(date(CHARGE_BOX.LAST_HEARTBEAT_TIMESTAMP).eq(yesterdaysNow))
                    .asField("heartbeats_yesterday");
 
         Field<Integer> heartbeatsEarlier =
                 ctx.selectCount()
                    .from(CHARGE_BOX)
-                   .where(date(CHARGE_BOX.LAST_HEARTBEAT_TIMESTAMP).lessThan(date(yesterdaysNow)))
+                   .where(date(CHARGE_BOX.LAST_HEARTBEAT_TIMESTAMP).lessThan(yesterdaysNow))
                    .asField("heartbeats_earlier");
 
         Record8<Integer, Integer, Integer, Integer, Integer, Integer, Integer, Integer> gs =
@@ -155,7 +158,7 @@ public class GenericRepositoryImpl implements GenericRepository {
 
     @Override
     public DbVersion getDBVersion() {
-        Record2<String, DateTime> record = ctx.select(SCHEMA_VERSION.VERSION, SCHEMA_VERSION.INSTALLED_ON)
+        Record2<String, LocalDateTime> record = ctx.select(SCHEMA_VERSION.VERSION, SCHEMA_VERSION.INSTALLED_ON)
                                               .from(SCHEMA_VERSION)
                                               .where(SCHEMA_VERSION.INSTALLED_RANK.eq(
                                                       select(max(SCHEMA_VERSION.INSTALLED_RANK)).from(SCHEMA_VERSION)))

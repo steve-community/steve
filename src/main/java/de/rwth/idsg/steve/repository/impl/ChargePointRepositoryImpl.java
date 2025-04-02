@@ -33,7 +33,6 @@ import jooq.steve.db.tables.records.AddressRecord;
 import jooq.steve.db.tables.records.ChargeBoxRecord;
 import lombok.extern.slf4j.Slf4j;
 import ocpp.cs._2015._10.RegistrationStatus;
-import org.joda.time.DateTime;
 import org.jooq.Condition;
 import org.jooq.DSLContext;
 import org.jooq.Field;
@@ -49,6 +48,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.CollectionUtils;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -56,6 +57,7 @@ import java.util.stream.Collectors;
 
 import static de.rwth.idsg.steve.utils.CustomDSL.date;
 import static de.rwth.idsg.steve.utils.CustomDSL.includes;
+import static de.rwth.idsg.steve.utils.DateTimeUtils.toOffsetDateTime;
 import static jooq.steve.db.tables.ChargeBox.CHARGE_BOX;
 import static jooq.steve.db.tables.Connector.CONNECTOR;
 import static jooq.steve.db.tables.ConnectorStatus.CONNECTOR_STATUS;
@@ -133,7 +135,7 @@ public class ChargePointRepositoryImpl implements ChargePointRepository {
     }
 
     @SuppressWarnings("unchecked")
-    private Result<Record5<Integer, String, String, String, DateTime>> getOverviewInternal(ChargePointQueryForm form) {
+    private Result<Record5<Integer, String, String, String, LocalDateTime>> getOverviewInternal(ChargePointQueryForm form) {
         SelectQuery selectQuery = ctx.selectQuery();
         selectQuery.addFrom(CHARGE_BOX);
         selectQuery.addSelect(
@@ -168,19 +170,19 @@ public class ChargePointRepositoryImpl implements ChargePointRepository {
 
             case TODAY:
                 selectQuery.addConditions(
-                        date(CHARGE_BOX.LAST_HEARTBEAT_TIMESTAMP).eq(date(DateTime.now()))
+                        date(CHARGE_BOX.LAST_HEARTBEAT_TIMESTAMP).eq(LocalDate.now())
                 );
                 break;
 
             case YESTERDAY:
                 selectQuery.addConditions(
-                        date(CHARGE_BOX.LAST_HEARTBEAT_TIMESTAMP).eq(date(DateTime.now().minusDays(1)))
+                        date(CHARGE_BOX.LAST_HEARTBEAT_TIMESTAMP).eq(LocalDate.now().minusDays(1))
                 );
                 break;
 
             case EARLIER:
                 selectQuery.addConditions(
-                        date(CHARGE_BOX.LAST_HEARTBEAT_TIMESTAMP).lessThan(date(DateTime.now().minusDays(1)))
+                        date(CHARGE_BOX.LAST_HEARTBEAT_TIMESTAMP).lessThan(LocalDate.now().minusDays(1))
                 );
                 break;
 
@@ -213,7 +215,7 @@ public class ChargePointRepositoryImpl implements ChargePointRepository {
     public List<ConnectorStatus> getChargePointConnectorStatus(ConnectorStatusForm form) {
         // find out the latest timestamp for each connector
         Field<Integer> t1Pk = CONNECTOR_STATUS.CONNECTOR_PK.as("t1_pk");
-        Field<DateTime> t1TsMax = DSL.max(CONNECTOR_STATUS.STATUS_TIMESTAMP).as("t1_ts_max");
+        Field<LocalDateTime> t1TsMax = DSL.max(CONNECTOR_STATUS.STATUS_TIMESTAMP).as("t1_ts_max");
         Table<?> t1 = ctx.select(t1Pk, t1TsMax)
                          .from(CONNECTOR_STATUS)
                          .groupBy(CONNECTOR_STATUS.CONNECTOR_PK)
@@ -221,7 +223,7 @@ public class ChargePointRepositoryImpl implements ChargePointRepository {
 
         // get the status table with latest timestamps only
         Field<Integer> t2Pk = CONNECTOR_STATUS.CONNECTOR_PK.as("t2_pk");
-        Field<DateTime> t2Ts = CONNECTOR_STATUS.STATUS_TIMESTAMP.as("t2_ts");
+        Field<LocalDateTime> t2Ts = CONNECTOR_STATUS.STATUS_TIMESTAMP.as("t2_ts");
         Field<String> t2Status = CONNECTOR_STATUS.STATUS.as("t2_status");
         Field<String> t2Error = CONNECTOR_STATUS.ERROR_CODE.as("t2_error");
         Table<?> t2 = ctx.selectDistinct(t2Pk, t2Ts, t2Status, t2Error)
@@ -266,7 +268,7 @@ public class ChargePointRepositoryImpl implements ChargePointRepository {
                                            .chargeBoxId(r.value2())
                                            .connectorId(r.value3())
                                            .timeStamp(DateTimeUtils.humanize(r.value4()))
-                                           .statusTimestamp(r.value4())
+                                           .statusTimestamp(toOffsetDateTime(r.value4()))
                                            .status(r.value5())
                                            .errorCode(r.value6())
                                            .ocppProtocol(r.value7() == null ? null : OcppProtocol.fromCompositeValue(r.value7()))

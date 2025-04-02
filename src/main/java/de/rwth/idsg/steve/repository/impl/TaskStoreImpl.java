@@ -32,6 +32,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
+import static de.rwth.idsg.steve.utils.DateTimeUtils.toLocalDateTime;
+
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 29.12.2014
@@ -52,8 +54,8 @@ public class TaskStoreImpl implements TaskStore {
                               return TaskOverview.builder()
                                                  .taskId(entry.getKey())
                                                  .origin(r.getOrigin())
-                                                 .start(r.getStartTimestamp())
-                                                 .end(r.getEndTimestamp())
+                                                 .start(toLocalDateTime(r.getStartTimestamp()))
+                                                 .end(toLocalDateTime(r.getEndTimestamp()))
                                                  .responseCount(r.getResponseCount().get())
                                                  .requestCount(r.getResultMap().size())
                                                  .build();

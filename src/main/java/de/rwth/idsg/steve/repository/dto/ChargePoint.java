@@ -23,7 +23,8 @@ import jooq.steve.db.tables.records.ChargeBoxRecord;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.joda.time.DateTime;
+
+import java.time.LocalDateTime;
 
 /**
  *
@@ -37,7 +38,7 @@ public final class ChargePoint {
     public static final class Overview {
         private final int chargeBoxPk;
         private final String chargeBoxId, description, ocppProtocol, lastHeartbeatTimestamp;
-        private final DateTime lastHeartbeatTimestampDT;
+        private final LocalDateTime lastHeartbeatTimestampDT;
     }
 
     @Getter

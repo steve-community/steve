@@ -32,9 +32,9 @@ import ocpp.cs._2015._10.CentralSystemService;
 import ocpp.cs._2015._10.RegistrationStatus;
 import ocpp.cs._2015._10.StartTransactionRequest;
 import ocpp.cs._2015._10.StartTransactionResponse;
-import org.joda.time.DateTime;
 import org.junit.jupiter.api.Assertions;
 
+import java.time.OffsetDateTime;
 import java.util.List;
 
 import static de.rwth.idsg.steve.utils.Helpers.getForOcpp16;
@@ -111,7 +111,7 @@ public class Issue73Fix {
                 new StartTransactionRequest()
                         .withConnectorId(2)
                         .withIdTag(REGISTERED_OCPP_TAG)
-                        .withTimestamp(DateTime.now())
+                        .withTimestamp(OffsetDateTime.now())
                         .withMeterStart(0),
                 chargeBoxId
         );

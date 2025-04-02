@@ -39,11 +39,11 @@ import de.rwth.idsg.steve.web.dto.OcppJsonStatus;
 import de.rwth.idsg.steve.web.dto.Statistics;
 import lombok.extern.slf4j.Slf4j;
 import ocpp.cs._2015._10.RegistrationStatus;
-import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -138,7 +138,7 @@ public class ChargePointHelperService {
         List<String> idList = extractIds(Arrays.asList(ocpp12Map, ocpp15Map, ocpp16Map));
         Map<String, Integer> primaryKeyLookup = chargePointRepository.getChargeBoxIdPkPair(idList);
 
-        DateTime now = DateTime.now();
+        LocalDateTime now = LocalDateTime.now();
         List<OcppJsonStatus> returnList = new ArrayList<>();
 
         appendList(ocpp12Map, returnList, now, OcppVersion.V_12, primaryKeyLookup);
@@ -246,14 +246,14 @@ public class ChargePointHelperService {
     }
 
     private static void appendList(Map<String, Deque<SessionContext>> map, List<OcppJsonStatus> returnList,
-                                   DateTime now, OcppVersion version, Map<String, Integer> primaryKeyLookup) {
+                                   LocalDateTime now, OcppVersion version, Map<String, Integer> primaryKeyLookup) {
 
         for (Map.Entry<String, Deque<SessionContext>> entry : map.entrySet()) {
             String chargeBoxId = entry.getKey();
             Deque<SessionContext> endpointDeque = entry.getValue();
 
             for (SessionContext ctx : endpointDeque) {
-                DateTime openSince = ctx.getOpenSince();
+                LocalDateTime openSince = ctx.getOpenSince();
 
                 OcppJsonStatus status = OcppJsonStatus.builder()
                                                       .chargeBoxPk(primaryKeyLookup.get(chargeBoxId))

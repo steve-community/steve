@@ -22,7 +22,8 @@ import de.rwth.idsg.steve.ocpp.OcppVersion;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.ToString;
-import org.joda.time.DateTime;
+
+import java.time.LocalDateTime;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -36,5 +37,5 @@ public final class OcppJsonStatus {
     private final String chargeBoxId, connectedSince;
     private final String connectionDuration;
     private final OcppVersion version;
-    private final DateTime connectedSinceDT;
+    private final LocalDateTime connectedSinceDT;
 }

@@ -22,7 +22,8 @@ import de.rwth.idsg.steve.ocpp.OcppProtocol;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
-import org.joda.time.DateTime;
+
+import java.time.OffsetDateTime;
 
 /**
  *
@@ -37,7 +38,7 @@ public final class ConnectorStatus {
 
     // For additional internal processing. Not related to the humanized
     // String version above, which is for representation on frontend
-    private final DateTime statusTimestamp;
+    private final OffsetDateTime statusTimestamp;
 
     private final OcppProtocol ocppProtocol;
 

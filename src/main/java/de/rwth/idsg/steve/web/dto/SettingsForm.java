@@ -66,7 +66,7 @@ public class SettingsForm {
     @Email(message = "'From' field is not a valid e-mail address")
     private String from;
 
-    private String host, username, password, protocol;
+    private String mailHost, username, password, protocol;
 
     @Min(value = 1, message = "Port must be positive")
     private Integer port;

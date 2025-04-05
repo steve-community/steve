@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2024 SteVe Community Team
+ * Copyright (C) 2013-2025 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -379,7 +379,7 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
     /**
      * If the connector information was not received before, insert it. Otherwise, ignore.
      */
-    private void insertIgnoreConnector(DSLContext ctx, String chargeBoxIdentity, int connectorId) {
+    public static void insertIgnoreConnector(DSLContext ctx, String chargeBoxIdentity, int connectorId) {
         int count = ctx.insertInto(CONNECTOR,
                             CONNECTOR.CHARGE_BOX_ID, CONNECTOR.CONNECTOR_ID)
                        .values(chargeBoxIdentity, connectorId)

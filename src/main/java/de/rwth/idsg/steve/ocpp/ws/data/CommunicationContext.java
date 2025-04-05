@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2024 SteVe Community Team
+ * Copyright (C) 2013-2025 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -26,7 +26,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import org.springframework.web.socket.WebSocketSession;
 
-import javax.xml.ws.Response;
+import jakarta.xml.ws.Response;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;

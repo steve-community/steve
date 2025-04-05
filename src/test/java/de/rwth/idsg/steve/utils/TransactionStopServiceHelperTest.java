@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2024 SteVe Community Team
+ * Copyright (C) 2013-2025 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -151,5 +151,15 @@ public class TransactionStopServiceHelperTest {
             .build();
 
         Assertions.assertFalse(TransactionStopServiceHelper.isEnergyValue(value));
+    }
+
+    @Test
+    public void testIsEnergy_valueAndUnit() {
+        var value = TransactionDetails.MeterValues.builder()
+            .value("22")
+            .unit("Wh")
+            .build();
+
+        Assertions.assertTrue(TransactionStopServiceHelper.isEnergyValue(value));
     }
 }

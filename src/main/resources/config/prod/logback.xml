@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <property name="LOG_DIR" value="${user.home}/logs" />
+    <property name="LOG_PATTERN" value="[%-5level] %d %c \(%thread\) - %msg%n" />
+
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>${LOG_PATTERN}</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_DIR}/steve.log</file>
+
+        <!-- daily rollover -->
+        <!-- keep 30 days' worth of history capped at 3GB total size -->
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_DIR}/steve-%d{yyyy-MM-dd}.log.gz</fileNamePattern>
+            <maxHistory>30</maxHistory>
+            <totalSizeCap>3GB</totalSizeCap>
+        </rollingPolicy>
+
+        <encoder>
+            <pattern>${LOG_PATTERN}</pattern>
+        </encoder>
+    </appender>
+
+    <root level="INFO">
+        <appender-ref ref="FILE" />
+    </root>
+
+    <!-- Disable the Jooq logo in logs -->
+    <!-- https://github.com/jOOQ/jOOQ/issues/4019 -->
+    <logger name="org.jooq.Constants" level="WARN" />
+
+    <logger name="org.apache.jasper" level="WARN"/>
+    <logger name="org.apache.tomcat.util" level="WARN"/>
+    <logger name="jndi" level="WARN"/>
+
+</configuration>

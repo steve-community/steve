@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2024 SteVe Community Team
+ * Copyright (C) 2013-2025 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -100,7 +100,7 @@ public class ChargePointRepositoryImpl implements ChargePointRepository {
                   .and(CHARGE_BOX.REGISTRATION_STATUS.in(inStatusFilter))
                   .and(chargeBoxIdCondition)
                   .fetch()
-                  .map(r -> new ChargePointSelect(protocol.getTransport(), r.value1(), r.value2()));
+                  .map(r -> new ChargePointSelect(protocol, r.value1(), r.value2()));
     }
 
     @Override
@@ -156,6 +156,10 @@ public class ChargePointRepositoryImpl implements ChargePointRepository {
 
         if (form.isSetChargeBoxId()) {
             selectQuery.addConditions(includes(CHARGE_BOX.CHARGE_BOX_ID, form.getChargeBoxId()));
+        }
+
+        if (form.isSetNote()) {
+            selectQuery.addConditions(includes(CHARGE_BOX.NOTE, form.getNote()));
         }
 
         switch (form.getHeartbeatPeriod()) {

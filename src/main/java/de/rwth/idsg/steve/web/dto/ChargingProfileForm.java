@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2024 SteVe Community Team
+ * Copyright (C) 2013-2025 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -27,13 +27,13 @@ import ocpp.cp._2015._10.ChargingRateUnitType;
 import ocpp.cp._2015._10.RecurrencyKindType;
 import org.joda.time.LocalDateTime;
 
-import javax.validation.Valid;
-import javax.validation.constraints.AssertTrue;
-import javax.validation.constraints.Future;
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Positive;
-import javax.validation.constraints.PositiveOrZero;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.AssertTrue;
+import jakarta.validation.constraints.Future;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.PositiveOrZero;
 import java.math.BigDecimal;
 import java.util.Map;
 import java.util.Objects;

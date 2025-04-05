@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2024 SteVe Community Team
+ * Copyright (C) 2013-2025 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -32,7 +32,7 @@ import java.util.List;
 @Builder
 public class MailSettings {
     private final boolean enabled;
-    private final String host, username, password, from, protocol;
+    private final String mailHost, username, password, from, protocol;
     private final Integer port;
     private final List<String> recipients;
     private final List<NotificationFeature> enabledFeatures;

@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2024 SteVe Community Team
+ * Copyright (C) 2013-2025 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -40,19 +40,19 @@ public class StringUtilsTest {
 
     @Test
     public void testOperationName_ocpp12andMultiple() {
-        var operationName = StringUtils.getOperationName(new ClearCacheTask(null, new MultipleChargePointSelect()));
+        var operationName = StringUtils.getOperationName(new ClearCacheTask(new MultipleChargePointSelect()));
         Assertions.assertEquals("Clear Cache", operationName);
     }
 
     @Test
     public void testOperationName_ocpp15andSingle() {
-        var operationName = StringUtils.getOperationName(new CancelReservationTask(null, new CancelReservationParams(), null));
+        var operationName = StringUtils.getOperationName(new CancelReservationTask(new CancelReservationParams(), null));
         Assertions.assertEquals("Cancel Reservation", operationName);
     }
 
     @Test
     public void testOperationName_ocpp16() {
-        var operationName = StringUtils.getOperationName(new GetCompositeScheduleTask(null, new GetCompositeScheduleParams()));
+        var operationName = StringUtils.getOperationName(new GetCompositeScheduleTask(new GetCompositeScheduleParams()));
         Assertions.assertEquals("Get Composite Schedule", operationName);
     }
 

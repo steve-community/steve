@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2024 SteVe Community Team
+ * Copyright (C) 2013-2025 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -67,7 +67,9 @@ public enum SteveConfiguration {
         contextPath = sanitizeContextPath(p.getOptionalString("context.path"));
         steveVersion = p.getString("steve.version");
         gitDescribe = useFallbackIfNotSet(p.getOptionalString("git.describe"), null);
+
         profile = ApplicationProfile.fromName(p.getString("profile"));
+        System.setProperty("spring.profiles.active", profile.name().toLowerCase());
 
         jetty = Jetty.builder()
                      .serverHost(p.getString("server.host"))
@@ -104,6 +106,7 @@ public enum SteveConfiguration {
 
         ocpp = Ocpp.builder()
                    .autoRegisterUnknownStations(p.getOptionalBoolean("auto.register.unknown.stations"))
+                   .chargeBoxIdValidationRegex(p.getOptionalString("charge-box-id.validation.regex"))
                    .wsSessionSelectStrategy(
                            WsSessionSelectStrategyEnum.fromName(p.getString("ws.session.select.strategy")))
                    .build();
@@ -200,6 +203,7 @@ public enum SteveConfiguration {
     @Builder @Getter
     public static class Ocpp {
         private final boolean autoRegisterUnknownStations;
+        private final String chargeBoxIdValidationRegex;
         private final WsSessionSelectStrategy wsSessionSelectStrategy;
     }
 

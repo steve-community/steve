@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2024 SteVe Community Team
+ * Copyright (C) 2013-2025 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -72,7 +72,7 @@ public class __DatabasePreparer__ {
     private static final String REGISTERED_OCPP_TAG = "id_tag_2aa6a783d47d";
 
     private static final BeanConfiguration beanConfiguration = new BeanConfiguration();
-    private static final DSLContext dslContext = beanConfiguration.dslContext();
+    private static final DSLContext dslContext = beanConfiguration.dslContext(beanConfiguration.dataSource());
 
     public static void prepare() {
         runOperation(ctx -> {

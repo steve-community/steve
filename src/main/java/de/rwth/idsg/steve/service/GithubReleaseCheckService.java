@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2024 SteVe Community Team
+ * Copyright (C) 2013-2025 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -27,12 +27,17 @@ import de.rwth.idsg.steve.SteveConfiguration;
 import de.rwth.idsg.steve.web.dto.ReleaseReport;
 import de.rwth.idsg.steve.web.dto.ReleaseResponse;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.hc.client5.http.config.ConnectionConfig;
+import org.apache.hc.client5.http.config.RequestConfig;
+import org.apache.hc.client5.http.impl.classic.HttpClientBuilder;
+import org.apache.hc.core5.http.io.SocketConfig;
+import org.apache.hc.core5.util.Timeout;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
-import javax.annotation.PostConstruct;
+import jakarta.annotation.PostConstruct;
 import java.io.File;
 import java.util.Collections;
 
@@ -59,9 +64,17 @@ public class GithubReleaseCheckService implements ReleaseCheckService {
 
     @PostConstruct
     private void init() {
-        HttpComponentsClientHttpRequestFactory factory = new HttpComponentsClientHttpRequestFactory();
-        factory.setReadTimeout(API_TIMEOUT_IN_MILLIS);
-        factory.setConnectTimeout(API_TIMEOUT_IN_MILLIS);
+        var timeout = Timeout.ofMilliseconds(API_TIMEOUT_IN_MILLIS);
+
+        var connectionConfig = ConnectionConfig.custom().setConnectTimeout(timeout).build();
+        var socketConfig = SocketConfig.custom().setSoTimeout(timeout).build();
+        var requestConfig = RequestConfig.custom().setConnectionRequestTimeout(timeout).build();
+
+        var httpClient = HttpClientBuilder.create()
+            .setDefaultRequestConfig(requestConfig)
+            .build();
+
+        HttpComponentsClientHttpRequestFactory factory = new HttpComponentsClientHttpRequestFactory(httpClient);
 
         ObjectMapper mapper = new ObjectMapper()
                 .registerModule(new JodaModule());

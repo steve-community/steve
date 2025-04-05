@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2024 SteVe Community Team
+ * Copyright (C) 2013-2025 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -27,9 +27,9 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
-import javax.validation.constraints.Email;
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
 import java.util.List;
 
 /**
@@ -66,7 +66,7 @@ public class SettingsForm {
     @Email(message = "'From' field is not a valid e-mail address")
     private String from;
 
-    private String host, username, password, protocol;
+    private String mailHost, username, password, protocol;
 
     @Min(value = 1, message = "Port must be positive")
     private Integer port;

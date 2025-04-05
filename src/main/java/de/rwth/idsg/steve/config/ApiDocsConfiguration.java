@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2024 SteVe Community Team
+ * Copyright (C) 2013-2025 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -19,50 +19,82 @@
 package de.rwth.idsg.steve.config;
 
 import de.rwth.idsg.steve.SteveConfiguration;
-import de.rwth.idsg.steve.SteveProdCondition;
+import io.swagger.v3.oas.models.Components;
+import io.swagger.v3.oas.models.OpenAPI;
+import io.swagger.v3.oas.models.info.Info;
+import io.swagger.v3.oas.models.info.License;
+import io.swagger.v3.oas.models.security.SecurityRequirement;
+import io.swagger.v3.oas.models.security.SecurityScheme;
+import io.swagger.v3.oas.models.servers.Server;
+import org.springdoc.core.configuration.SpringDocConfiguration;
+import org.springdoc.core.properties.SwaggerUiConfigProperties;
+import org.springdoc.core.properties.SwaggerUiOAuthProperties;
+import org.springdoc.webmvc.core.configuration.SpringDocWebMvcConfiguration;
+import org.springdoc.webmvc.ui.SwaggerConfig;
+import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Conditional;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.web.bind.annotation.RestController;
-import springfox.documentation.builders.ApiInfoBuilder;
-import springfox.documentation.oas.annotations.EnableOpenApi;
-import springfox.documentation.spi.DocumentationType;
-import springfox.documentation.spring.web.plugins.Docket;
+import org.springframework.context.annotation.Import;
 
-import static springfox.documentation.builders.RequestHandlerSelectors.withClassAnnotation;
+import java.util.List;
 
 /**
+ * https://stackoverflow.com/a/65557714
+ *
  * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 15.09.2022
  */
 @Configuration
-@EnableOpenApi
-@Conditional(SteveProdCondition.class)
+@ComponentScan(basePackages = {"org.springdoc"})
+@Import({SpringDocConfiguration.class,
+    SpringDocWebMvcConfiguration.class,
+    SwaggerConfig.class,
+    SwaggerUiConfigProperties.class,
+    SwaggerUiOAuthProperties.class,
+    JacksonAutoConfiguration.class})
 public class ApiDocsConfiguration {
 
     static {
         // Set the path with prefix /manager to protect the documentation behind regular sign-in
         // Default is just /v3/api-docs
-        System.setProperty("springfox.documentation.open-api.v3.path", "/manager/v3/api-docs");
+        System.setProperty("springdoc.api-docs.path", "/manager/v3/api-docs");
+        // Same for swagger ui
+        System.setProperty("springdoc.swagger-ui.path", "/manager/swagger-ui/index.html");
+        // We only want REST APIs here (de.rwth.idsg.steve.web.api package)
+        System.setProperty("springdoc.paths-to-match", "/api/**");
+        // Sort controllers alphabetically by their path
+        System.setProperty("springdoc.swagger-ui.tagsSorter", "alpha");
+        // Sort endpoints (within a controller) alphabetically by their path
+        System.setProperty("springdoc.swagger-ui.operationsSorter", "alpha");
     }
 
     @Bean
-    public Docket apiDocs() {
+    public OpenAPI apiDocs() {
         String title = "SteVe REST API Documentation";
 
-        var apiInfo = new ApiInfoBuilder()
-            .title(title)
-            .description(title)
-            .license("GPL-3.0")
-            .licenseUrl("https://github.com/steve-community/steve/blob/master/LICENSE.txt")
-            .version(SteveConfiguration.CONFIG.getSteveVersion())
-            .build();
+        String securityName = "basicAuth";
 
-        return new Docket(DocumentationType.OAS_30)
-            .useDefaultResponseMessages(false)
-            .apiInfo(apiInfo)
-            .select()
-            .apis(withClassAnnotation(RestController.class))
-            .build();
+        SecurityScheme securityScheme = new SecurityScheme()
+            .type(SecurityScheme.Type.HTTP)
+            .scheme("basic")
+            .name(securityName);
+
+        return new OpenAPI()
+            .info(new Info()
+                .title(title)
+                .description(title)
+                .license(new License()
+                    .name("GPL-3.0")
+                    .url("https://github.com/steve-community/steve/blob/master/LICENSE.txt")
+                )
+                .version(SteveConfiguration.CONFIG.getSteveVersion())
+            )
+            // https://stackoverflow.com/a/68185254
+            .servers(List.of(new Server().url("/").description("Default Server URL")))
+            // define a security schema
+            .components(new Components().addSecuritySchemes(securityName, securityScheme))
+            // and activate it for all endpoints
+            .addSecurityItem(new SecurityRequirement().addList(securityName));
     }
 }

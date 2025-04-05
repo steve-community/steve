@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2024 SteVe Community Team
+ * Copyright (C) 2013-2025 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -66,7 +66,7 @@ public class SettingsRepositoryImpl implements SettingsRepository {
                            .heartbeat(toMin(r.getHeartbeatIntervalInSeconds()))
                            .expiration(r.getHoursToExpire())
                            .enabled(r.getMailEnabled())
-                           .host(r.getMailHost())
+                           .mailHost(r.getMailHost())
                            .username(r.getMailUsername())
                            .password(r.getMailPassword())
                            .from(r.getMailFrom())
@@ -87,7 +87,7 @@ public class SettingsRepositoryImpl implements SettingsRepository {
 
         return MailSettings.builder()
                            .enabled(r.getMailEnabled())
-                           .host(r.getMailHost())
+                           .mailHost(r.getMailHost())
                            .username(r.getMailUsername())
                            .password(r.getMailPassword())
                            .from(r.getMailFrom())
@@ -118,7 +118,7 @@ public class SettingsRepositoryImpl implements SettingsRepository {
                .set(SETTINGS.HEARTBEAT_INTERVAL_IN_SECONDS, toSec(form.getHeartbeat()))
                .set(SETTINGS.HOURS_TO_EXPIRE, form.getExpiration())
                .set(SETTINGS.MAIL_ENABLED, form.getEnabled())
-               .set(SETTINGS.MAIL_HOST, form.getHost())
+               .set(SETTINGS.MAIL_HOST, form.getMailHost())
                .set(SETTINGS.MAIL_USERNAME, form.getUsername())
                .set(SETTINGS.MAIL_PASSWORD, form.getPassword())
                .set(SETTINGS.MAIL_FROM, form.getFrom())

@@ -1,7 +1,7 @@
 <%--
 
     SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
-    Copyright (C) 2013-2024 SteVe Community Team
+    Copyright (C) 2013-2025 SteVe Community Team
     All Rights Reserved.
 
     This program is free software: you can redistribute it and/or modify
@@ -119,7 +119,7 @@ Transactions
                 <td>${ta.startValue}</td>
                 <td data-sort-value="${ta.stopTimestamp.millis}">${ta.stopTimestampFormatted}</td>
                 <td>${ta.stopValue}</td>
-                <td>${ta.stopReason}</td>
+                <td><encode:forHtml value="${ta.stopReason}" /></td>
                 <td>
                     <c:if test="${empty ta.stopValue}">
                         <form:form action="${ctxPath}/manager/transactions/stop/${ta.id}">

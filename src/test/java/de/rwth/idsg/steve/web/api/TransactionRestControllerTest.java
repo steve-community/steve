@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2024 SteVe Community Team
+ * Copyright (C) 2013-2025 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -213,7 +213,7 @@ public class TransactionRestControllerTest extends AbstractControllerTest {
     @DisplayName("GET all: Query param 'type' is translated correctly, while others are defaulted")
     public void test10() throws Exception {
         // given
-        ArgumentCaptor<TransactionQueryForm.ForApi> formToCapture = ArgumentCaptor.forClass(TransactionQueryForm.ForApi.class);
+        ArgumentCaptor<TransactionQueryForm.TransactionQueryFormForApi> formToCapture = ArgumentCaptor.forClass(TransactionQueryForm.TransactionQueryFormForApi.class);
 
         // when
         when(transactionRepository.getTransactions(any())).thenReturn(Collections.emptyList());
@@ -224,7 +224,7 @@ public class TransactionRestControllerTest extends AbstractControllerTest {
             .andExpect(status().isOk());
 
         verify(transactionRepository).getTransactions(formToCapture.capture());
-        TransactionQueryForm.ForApi capturedForm = formToCapture.getValue();
+        TransactionQueryForm.TransactionQueryFormForApi capturedForm = formToCapture.getValue();
 
         assertEquals(capturedForm.getType(), TransactionQueryForm.QueryType.ACTIVE);
         assertEquals(capturedForm.getPeriodType(), TransactionQueryForm.QueryPeriodType.ALL);
@@ -234,7 +234,7 @@ public class TransactionRestControllerTest extends AbstractControllerTest {
     @DisplayName("GET all: Query param 'periodType' is translated correctly, while others are defaulted")
     public void test11() throws Exception {
         // given
-        ArgumentCaptor<TransactionQueryForm.ForApi> formToCapture = ArgumentCaptor.forClass(TransactionQueryForm.ForApi.class);
+        ArgumentCaptor<TransactionQueryForm.TransactionQueryFormForApi> formToCapture = ArgumentCaptor.forClass(TransactionQueryForm.TransactionQueryFormForApi.class);
 
         // when
         when(transactionRepository.getTransactions(any())).thenReturn(Collections.emptyList());
@@ -245,7 +245,7 @@ public class TransactionRestControllerTest extends AbstractControllerTest {
             .andExpect(status().isOk());
 
         verify(transactionRepository).getTransactions(formToCapture.capture());
-        TransactionQueryForm.ForApi capturedForm = formToCapture.getValue();
+        TransactionQueryForm.TransactionQueryFormForApi capturedForm = formToCapture.getValue();
 
         assertEquals(capturedForm.getType(), TransactionQueryForm.QueryType.ALL);
         assertEquals(capturedForm.getPeriodType(), TransactionQueryForm.QueryPeriodType.LAST_30);

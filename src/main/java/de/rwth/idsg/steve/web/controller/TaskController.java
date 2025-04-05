@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2024 SteVe Community Team
+ * Copyright (C) 2013-2025 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -59,9 +59,15 @@ public class TaskController {
         return "tasks";
     }
 
-    @RequestMapping(method = RequestMethod.POST)
+    @RequestMapping(params = "finished", method = RequestMethod.POST)
     public String clearFinished(Model model) {
         taskStore.clearFinished();
+        return getOverview(model);
+    }
+
+    @RequestMapping(params = "unfinished", method = RequestMethod.POST)
+    public String clearUnfinished(Model model) {
+        taskStore.clearUnfinished();
         return getOverview(model);
     }
 

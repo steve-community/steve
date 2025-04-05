@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2024 SteVe Community Team
+ * Copyright (C) 2013-2025 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,14 +16,13 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package de.rwth.idsg.steve;
+package de.rwth.idsg.steve.service;
 
-/**
- * @author Sevket Goekay <sevketgokay@gmail.com>
- * @since 05.11.2015
- */
-public interface ApplicationStarter {
-    void start() throws Exception;
-    void join() throws Exception;
-    void stop() throws Exception;
+import ocpp.cs._2015._10.IdTagInfo;
+import org.jetbrains.annotations.Nullable;
+
+public interface AuthTagService {
+
+    IdTagInfo decideStatus(String idTag, boolean isStartTransactionReqContext,
+                           @Nullable String chargeBoxId, @Nullable Integer connectorId);
 }

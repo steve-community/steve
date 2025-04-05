@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2024 SteVe Community Team
+ * Copyright (C) 2013-2025 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -20,7 +20,7 @@ package de.rwth.idsg.steve.repository.impl;
 
 import de.rwth.idsg.steve.SteveException;
 import de.rwth.idsg.steve.repository.OcppTagRepository;
-import de.rwth.idsg.steve.repository.dto.OcppTag.Overview;
+import de.rwth.idsg.steve.repository.dto.OcppTag.OcppTagOverview;
 import de.rwth.idsg.steve.web.dto.OcppTagForm;
 import de.rwth.idsg.steve.web.dto.OcppTagQueryForm;
 import jooq.steve.db.tables.OcppTagActivity;
@@ -43,6 +43,7 @@ import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static de.rwth.idsg.steve.utils.CustomDSL.includes;
 import static de.rwth.idsg.steve.utils.DateTimeUtils.humanize;
 import static de.rwth.idsg.steve.utils.DateTimeUtils.toDateTime;
 import static jooq.steve.db.tables.OcppTag.OCPP_TAG;
@@ -65,7 +66,7 @@ public class OcppTagRepositoryImpl implements OcppTagRepository {
 
     @Override
     @SuppressWarnings("unchecked")
-    public List<Overview> getOverview(OcppTagQueryForm form) {
+    public List<OcppTagOverview> getOverview(OcppTagQueryForm form) {
         SelectQuery selectQuery = ctx.selectQuery();
         selectQuery.addFrom(OCPP_TAG_ACTIVITY);
 
@@ -96,6 +97,10 @@ public class OcppTagRepositoryImpl implements OcppTagRepository {
 
         if (form.isParentIdTagSet()) {
             selectQuery.addConditions(OCPP_TAG_ACTIVITY.PARENT_ID_TAG.eq(form.getParentIdTag()));
+        }
+
+        if (form.isNoteSet()) {
+            selectQuery.addConditions(includes(OCPP_TAG_ACTIVITY.NOTE, form.getNote()));
         }
 
         switch (form.getExpired()) {
@@ -253,10 +258,10 @@ public class OcppTagRepositoryImpl implements OcppTagRepository {
     }
 
     private static class UserMapper
-            implements RecordMapper<Record10<Integer, Integer, String, String, DateTime, Boolean, Boolean, Integer, Long, String>, Overview> {
+            implements RecordMapper<Record10<Integer, Integer, String, String, DateTime, Boolean, Boolean, Integer, Long, String>, OcppTagOverview> {
         @Override
-        public Overview map(Record10<Integer, Integer, String, String, DateTime, Boolean, Boolean, Integer, Long, String> r) {
-            return Overview.builder()
+        public OcppTagOverview map(Record10<Integer, Integer, String, String, DateTime, Boolean, Boolean, Integer, Long, String> r) {
+            return OcppTagOverview.builder()
                           .ocppTagPk(r.value1())
                           .parentOcppTagPk(r.value2())
                           .idTag(r.value3())

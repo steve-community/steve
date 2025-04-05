@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2024 SteVe Community Team
+ * Copyright (C) 2013-2025 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,34 +16,33 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package de.rwth.idsg.steve;
+package de.rwth.idsg.steve.config;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
+
+import java.io.Closeable;
+import java.io.IOException;
 
 /**
- * ApplicationStarter for DEV profile
- *
  * @author Sevket Goekay <sevketgokay@gmail.com>
- * @since 05.11.2015
+ * @since 02.02.2025
  */
-public class SteveDevStarter implements ApplicationStarter {
+@Slf4j
+@RequiredArgsConstructor
+public class DelegatingTaskExecutor implements Closeable {
 
-    private final JettyServer jettyServer;
-
-    SteveDevStarter() {
-        this.jettyServer = new JettyServer();
-    }
+    private final ThreadPoolTaskExecutor delegate;
 
     @Override
-    public void start() throws Exception {
-        jettyServer.start();
+    public void close() throws IOException {
+        log.info("Shutting down");
+        delegate.shutdown();
     }
 
-    @Override
-    public void stop() throws Exception {
-        jettyServer.stop();
+    public void execute(Runnable task) {
+        delegate.execute(task);
     }
 
-    @Override
-    public void join() throws Exception {
-        jettyServer.join();
-    }
 }

@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2024 SteVe Community Team
+ * Copyright (C) 2013-2025 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -18,10 +18,11 @@
  */
 package de.rwth.idsg.steve.service;
 
+import static de.rwth.idsg.steve.utils.OcppTagActivityRecordUtils.isBlocked;
+import static de.rwth.idsg.steve.utils.OcppTagActivityRecordUtils.isExpired;
+
 import com.google.common.base.Strings;
-import de.rwth.idsg.steve.SteveException;
 import de.rwth.idsg.steve.repository.OcppTagRepository;
-import de.rwth.idsg.steve.repository.SettingsRepository;
 import de.rwth.idsg.steve.repository.dto.OcppTag;
 import de.rwth.idsg.steve.service.dto.UnidentifiedIncomingObject;
 import de.rwth.idsg.steve.web.dto.OcppTagForm;
@@ -51,10 +52,10 @@ public class OcppTagService {
 
     private final UnidentifiedIncomingObjectService invalidOcppTagService = new UnidentifiedIncomingObjectService(1000);
 
-    private final SettingsRepository settingsRepository;
     private final OcppTagRepository ocppTagRepository;
+    private final AuthTagService authTagService;
 
-    public List<OcppTag.Overview> getOverview(OcppTagQueryForm form) {
+    public List<OcppTag.OcppTagOverview> getOverview(OcppTagQueryForm form) {
         return ocppTagRepository.getOverview(form);
     }
 
@@ -97,35 +98,27 @@ public class OcppTagService {
     }
 
     @Nullable
-    public IdTagInfo getIdTagInfo(@Nullable String idTag, boolean isStartTransactionReqContext) {
+    public IdTagInfo getIdTagInfo(@Nullable String idTag, boolean isStartTransactionReqContext,
+                                  @Nullable String chargeBoxId, @Nullable Integer connectorId) {
         if (Strings.isNullOrEmpty(idTag)) {
             return null;
         }
 
-        OcppTagActivityRecord record = ocppTagRepository.getRecord(idTag);
-        AuthorizationStatus status = decideStatus(record, idTag, isStartTransactionReqContext);
+        IdTagInfo idTagInfo = authTagService.decideStatus(idTag, isStartTransactionReqContext, chargeBoxId, connectorId);
 
-        switch (status) {
-            case INVALID:
-                invalidOcppTagService.processNewUnidentified(idTag);
-                return new IdTagInfo().withStatus(status);
-
-            case BLOCKED:
-            case EXPIRED:
-            case CONCURRENT_TX:
-            case ACCEPTED:
-                return new IdTagInfo().withStatus(status)
-                                      .withParentIdTag(record.getParentIdTag())
-                                      .withExpiryDate(getExpiryDateOrDefault(record));
-            default:
-                throw new SteveException("Unexpected AuthorizationStatus");
+        if (idTagInfo.getStatus() == AuthorizationStatus.INVALID) {
+            invalidOcppTagService.processNewUnidentified(idTag);
         }
+
+        return idTagInfo;
     }
 
     @Nullable
-    public IdTagInfo getIdTagInfo(@Nullable String idTag, boolean isStartTransactionReqContext, Supplier<IdTagInfo> supplierWhenException) {
+    public IdTagInfo getIdTagInfo(@Nullable String idTag, boolean isStartTransactionReqContext,
+                                  @Nullable String chargeBoxId, @Nullable Integer connectorId,
+        Supplier<IdTagInfo> supplierWhenException) {
         try {
-            return getIdTagInfo(idTag, isStartTransactionReqContext);
+            return getIdTagInfo(idTag, isStartTransactionReqContext, chargeBoxId, connectorId);
         } catch (Exception e) {
             log.error("Exception occurred", e);
             return supplierWhenException.get();
@@ -159,51 +152,6 @@ public class OcppTagService {
     // -------------------------------------------------------------------------
 
     /**
-     * If the database contains an actual expiry, use it. Otherwise, calculate an expiry for cached info
-     */
-    @Nullable
-    private DateTime getExpiryDateOrDefault(OcppTagActivityRecord record) {
-        if (record.getExpiryDate() != null) {
-            return record.getExpiryDate();
-        }
-
-        int hoursToExpire = settingsRepository.getHoursToExpire();
-
-        // From web page: The value 0 disables this functionality (i.e. no expiry date will be set).
-        if (hoursToExpire == 0) {
-            return null;
-        } else {
-            return DateTime.now().plusHours(hoursToExpire);
-        }
-    }
-
-    private AuthorizationStatus decideStatus(OcppTagActivityRecord record, String idTag, boolean isStartTransactionReqContext) {
-        if (record == null) {
-            log.error("The user with idTag '{}' is INVALID (not present in DB).", idTag);
-            return AuthorizationStatus.INVALID;
-        }
-
-        if (isBlocked(record)) {
-            log.error("The user with idTag '{}' is BLOCKED.", idTag);
-            return AuthorizationStatus.BLOCKED;
-        }
-
-        if (isExpired(record, DateTime.now())) {
-            log.error("The user with idTag '{}' is EXPIRED.", idTag);
-            return AuthorizationStatus.EXPIRED;
-        }
-
-        // https://github.com/steve-community/steve/issues/219
-        if (isStartTransactionReqContext && reachedLimitOfActiveTransactions(record)) {
-            log.warn("The user with idTag '{}' is ALREADY in another transaction(s).", idTag);
-            return AuthorizationStatus.CONCURRENT_TX;
-        }
-
-        log.debug("The user with idTag '{}' is ACCEPTED.", record.getIdTag());
-        return AuthorizationStatus.ACCEPTED;
-    }
-
-    /**
      * ConcurrentTx is only valid for StartTransactionRequest
      */
     private static ocpp.cp._2015._10.AuthorizationStatus decideStatusForAuthData(OcppTagActivityRecord record, DateTime now) {
@@ -216,32 +164,6 @@ public class OcppTagService {
         } else {
             return ocpp.cp._2015._10.AuthorizationStatus.ACCEPTED;
         }
-    }
-
-    private static boolean isExpired(OcppTagActivityRecord record, DateTime now) {
-        DateTime expiry = record.getExpiryDate();
-        return expiry != null && now.isAfter(expiry);
-    }
-
-    private static boolean isBlocked(OcppTagActivityRecord record) {
-        return record.getMaxActiveTransactionCount() == 0;
-    }
-
-    private static boolean reachedLimitOfActiveTransactions(OcppTagActivityRecord record) {
-        int max = record.getMaxActiveTransactionCount();
-
-        // blocked
-        if (max == 0) {
-            return true;
-        }
-
-        // allow all
-        if (max < 0) {
-            return false;
-        }
-
-        // allow as specified
-        return record.getActiveTransactionCount() >= max;
     }
 
     private static AuthorizationData mapToAuthorizationData(OcppTagActivityRecord record, DateTime nowDt) {

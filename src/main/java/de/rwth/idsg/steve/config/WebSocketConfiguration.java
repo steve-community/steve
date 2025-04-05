@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2024 SteVe Community Team
+ * Copyright (C) 2013-2025 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -51,7 +51,7 @@ public class WebSocketConfiguration implements WebSocketConfigurer {
     @Autowired private Ocpp16WebSocketEndpoint ocpp16WebSocketEndpoint;
 
     public static final String PATH_INFIX = "/websocket/CentralSystemService/";
-    public static final long PING_INTERVAL = TimeUnit.MINUTES.toMinutes(15);
+    public static final Duration PING_INTERVAL = Duration.ofMinutes(15);
     public static final Duration IDLE_TIMEOUT = Duration.ofHours(2);
     public static final int MAX_MSG_SIZE = 8_388_608; // 8 MB for max message size
 

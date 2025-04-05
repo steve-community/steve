@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2024 SteVe Community Team
+ * Copyright (C) 2013-2025 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -68,6 +68,8 @@ public class ChargingProfileRepositoryImpl implements ChargingProfileRepository 
 
     @Override
     public void setProfile(int chargingProfilePk, String chargeBoxId, int connectorId) {
+        OcppServerRepositoryImpl.insertIgnoreConnector(ctx, chargeBoxId, connectorId);
+
         SelectConditionStep<Record1<Integer>> connectorPkSelect = ctx.select(CONNECTOR.CONNECTOR_PK)
                                                                      .from(CONNECTOR)
                                                                      .where(CONNECTOR.CHARGE_BOX_ID.eq(chargeBoxId))

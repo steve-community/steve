@@ -1,7 +1,7 @@
 <%--
 
     SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
-    Copyright (C) 2013-2024 SteVe Community Team
+    Copyright (C) 2013-2025 SteVe Community Team
     All Rights Reserved.
 
     This program is free software: you can redistribute it and/or modify
@@ -84,21 +84,21 @@
                             </a>
                         </td>
                     </tr>
-                    <tr><td>Endpoint Address:</td><td>${cp.chargeBox.endpointAddress}</td></tr>
-                    <tr><td>Ocpp Protocol:</td><td>${cp.chargeBox.ocppProtocol}</td></tr>
-                    <tr><td>Charge Point Vendor:</td><td>${cp.chargeBox.chargePointVendor}</td></tr>
-                    <tr><td>Charge Point Model:</td><td>${cp.chargeBox.chargePointModel}</td></tr>
-                    <tr><td>Charge Point Serial Number:</td><td>${cp.chargeBox.chargePointSerialNumber}</td></tr>
-                    <tr><td>Charge Box Serial Number:</td><td>${cp.chargeBox.chargeBoxSerialNumber}</td></tr>
-                    <tr><td>Firmware Version:</td><td>${cp.chargeBox.fwVersion}</td></tr>
-                    <tr><td>Firmware Update Timestamp:</td><td>${cp.chargeBox.fwUpdateTimestamp}</td></tr>
-                    <tr><td>Iccid:</td><td>${cp.chargeBox.iccid}</td></tr>
-                    <tr><td>Imsi:</td><td>${cp.chargeBox.imsi}</td></tr>
-                    <tr><td>Meter Type:</td><td>${cp.chargeBox.meterType}</td></tr>
-                    <tr><td>Meter Serial Number:</td><td>${cp.chargeBox.meterSerialNumber}</td></tr>
-                    <tr><td>Diagnostics Status:</td><td>${cp.chargeBox.diagnosticsStatus}</td></tr>
-                    <tr><td>Diagnostics Timestamp:</td><td>${cp.chargeBox.diagnosticsTimestamp}</td></tr>
-                    <tr><td>Last Hearbeat Timestamp:</td><td>${cp.chargeBox.lastHeartbeatTimestamp}</td></tr>
+                    <tr><td>Endpoint Address:</td><td><encode:forHtml value="${cp.chargeBox.endpointAddress}" /></td></tr>
+                    <tr><td>Ocpp Protocol:</td><td><encode:forHtml value="${cp.chargeBox.ocppProtocol}" /></td></tr>
+                    <tr><td>Charge Point Vendor:</td><td><encode:forHtml value="${cp.chargeBox.chargePointVendor}" /></td></tr>
+                    <tr><td>Charge Point Model:</td><td><encode:forHtml value="${cp.chargeBox.chargePointModel}" /></td></tr>
+                    <tr><td>Charge Point Serial Number:</td><td><encode:forHtml value="${cp.chargeBox.chargePointSerialNumber}" /></td></tr>
+                    <tr><td>Charge Box Serial Number:</td><td><encode:forHtml value="${cp.chargeBox.chargeBoxSerialNumber}" /></td></tr>
+                    <tr><td>Firmware Version:</td><td><encode:forHtml value="${cp.chargeBox.fwVersion}" /></td></tr>
+                    <tr><td>Firmware Update Timestamp:</td><td><encode:forHtml value="${cp.chargeBox.fwUpdateTimestamp}" /></td></tr>
+                    <tr><td>Iccid:</td><td><encode:forHtml value="${cp.chargeBox.iccid}" /></td></tr>
+                    <tr><td>Imsi:</td><td><encode:forHtml value="${cp.chargeBox.imsi}" /></td></tr>
+                    <tr><td>Meter Type:</td><td><encode:forHtml value="${cp.chargeBox.meterType}" /></td></tr>
+                    <tr><td>Meter Serial Number:</td><td><encode:forHtml value="${cp.chargeBox.meterSerialNumber}" /></td></tr>
+                    <tr><td>Diagnostics Status:</td><td><encode:forHtml value="${cp.chargeBox.diagnosticsStatus}" /></td></tr>
+                    <tr><td>Diagnostics Timestamp:</td><td><encode:forHtml value="${cp.chargeBox.diagnosticsTimestamp}" /></td></tr>
+                    <tr><td>Last Heartbeat Timestamp:</td><td><encode:forHtml value="${cp.chargeBox.lastHeartbeatTimestamp}" /></td></tr>
                     <tr>
                         <td>Insert connector status after start/stop transaction:
                         </td>

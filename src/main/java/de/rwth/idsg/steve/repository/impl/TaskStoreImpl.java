@@ -26,8 +26,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 /**
@@ -79,9 +81,18 @@ public class TaskStoreImpl implements TaskStore {
 
     @Override
     public void clearFinished() {
+        removeTasks(entry -> entry.getValue().isFinished());
+    }
+
+    @Override
+    public void clearUnfinished() {
+        removeTasks(entry -> !entry.getValue().isFinished());
+    }
+
+    private void removeTasks(Predicate<Map.Entry<Integer, CommunicationTask>> filterPredicate) {
         lookupTable.entrySet()
                    .stream()
-                   .filter(entry -> entry.getValue().isFinished())
+                   .filter(filterPredicate)
                    .forEach(entry -> lookupTable.remove(entry.getKey()));
     }
 }

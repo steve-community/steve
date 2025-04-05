@@ -36,14 +36,15 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
         <jooq.version>3.19.18</jooq.version>
-        <flyway.version>11.3.3</flyway.version>
-        <cxf.version>4.1.0</cxf.version>
+        <flyway.version>11.4.0</flyway.version>
+        <cxf.version>4.1.1</cxf.version>
         <spring.version>6.2.0</spring.version>
         <spring.security.version>6.4.3</spring.security.version>
         <mysql.jdbc.version>9.2.0</mysql.jdbc.version>
-        <jetty.version>12.0.16</jetty.version>
+        <jetty.version>12.0.17</jetty.version>
         <lombok.version>1.18.36</lombok.version>
-        <jackson.version>2.18.2</jackson.version>
+        <jackson.version>2.18.3</jackson.version>
+        <slf4j.version>2.0.17</slf4j.version>
         <plugin.license-maven.version>4.6</plugin.license-maven.version>
 
         <!-- In Mysql: schema == database (http://dev.mysql.com/doc/refman/5.6/en/glossary.html#glos_schema) -->
@@ -205,14 +206,14 @@
                 <version>3.26.0</version>
                 <configuration>
                     <rulesets>
-                        <ruleset>${project.basedir}/src/main/resources/maven-pmd-plugin-default.xml</ruleset>
+                        <ruleset>${project.basedir}/maven-pmd-plugin-default.xml</ruleset>
                     </rulesets>
                 </configuration>
             </plugin>
             <plugin>
                 <groupId>com.github.spotbugs</groupId>
                 <artifactId>spotbugs-maven-plugin</artifactId>
-                <version>4.9.1.0</version>
+                <version>4.9.2.0</version>
                 <configuration>
                     <failOnError>false</failOnError>
                     <onlyAnalyze>de.rwth.idsg.steve.-</onlyAnalyze>
@@ -230,7 +231,7 @@
                 <artifactId>maven-checkstyle-plugin</artifactId>
                 <version>3.6.0</version>
                 <configuration>
-                    <configLocation>${basedir}/src/main/resources/checkstyle.xml</configLocation>
+                    <configLocation>${project.basedir}/checkstyle.xml</configLocation>
                 </configuration>
             </plugin>
 
@@ -498,23 +499,9 @@
                 <type>pom</type>
             </dependency>
             <dependency>
-                <groupId>org.apache.logging.log4j</groupId>
-                <artifactId>log4j-bom</artifactId>
-                <version>2.24.3</version>
-                <scope>import</scope>
-                <type>pom</type>
-            </dependency>
-            <dependency>
                 <groupId>org.junit</groupId>
                 <artifactId>junit-bom</artifactId>
-                <version>5.12.0</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.slf4j</groupId>
-                <artifactId>slf4j-bom</artifactId>
-                <version>2.0.16</version>
+                <version>5.12.1</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -656,34 +643,19 @@
 
         <!-- Logging -->
         <dependency>
-            <groupId>org.apache.logging.log4j</groupId>
-            <artifactId>log4j-core</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.logging.log4j</groupId>
-            <artifactId>log4j-api</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.logging.log4j</groupId>
-            <artifactId>log4j-slf4j2-impl</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.logging.log4j</groupId>
-            <artifactId>log4j-web</artifactId>
-            <scope>runtime</scope>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <version>1.5.18</version>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
+            <version>${slf4j.version}</version>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>jcl-over-slf4j</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.lmax</groupId>
-            <artifactId>disruptor</artifactId>
-            <version>3.4.4</version>
+            <version>${slf4j.version}</version>
         </dependency>
 
         <!-- CXF -->
@@ -787,13 +759,13 @@
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-junit-jupiter</artifactId>
-            <version>5.15.2</version>
+            <version>5.16.0</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>net.bytebuddy</groupId>
             <artifactId>byte-buddy</artifactId>
-            <version>1.17.1</version>
+            <version>1.17.2</version>
             <scope>test</scope>
         </dependency>
         <dependency>

@@ -60,7 +60,7 @@
     <table class="userInputFullPage">
         <tr><td>Enable Notifications?:</td><td><form:checkbox path="enabled"/></td></tr>
         <tr><td>Protocol:</td><td><form:input path="protocol"/></td></tr>
-        <tr><td>Host:</td><td><form:input path="host"/></td></tr>
+        <tr><td>Host:</td><td><form:input path="mailHost"/></td></tr>
         <tr><td>Port:</td><td><form:input path="port"/></td></tr>
         <tr><td>From:</td><td><form:input path="from"/></td></tr>
         <tr><td>User name:</td><td><form:input path="username"/></td></tr>

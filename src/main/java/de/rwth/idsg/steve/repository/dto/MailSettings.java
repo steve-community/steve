@@ -32,7 +32,7 @@ import java.util.List;
 @Builder
 public class MailSettings {
     private final boolean enabled;
-    private final String host, username, password, from, protocol;
+    private final String mailHost, username, password, from, protocol;
     private final Integer port;
     private final List<String> recipients;
     private final List<NotificationFeature> enabledFeatures;

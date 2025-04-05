@@ -152,4 +152,14 @@ public class TransactionStopServiceHelperTest {
 
         Assertions.assertFalse(TransactionStopServiceHelper.isEnergyValue(value));
     }
+
+    @Test
+    public void testIsEnergy_valueAndUnit() {
+        var value = TransactionDetails.MeterValues.builder()
+            .value("22")
+            .unit("Wh")
+            .build();
+
+        Assertions.assertTrue(TransactionStopServiceHelper.isEnergyValue(value));
+    }
 }

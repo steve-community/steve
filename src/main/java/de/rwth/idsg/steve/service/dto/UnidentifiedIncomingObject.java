@@ -20,7 +20,8 @@ package de.rwth.idsg.steve.service.dto;
 
 import lombok.Getter;
 import lombok.ToString;
-import org.joda.time.DateTime;
+
+import java.time.LocalDateTime;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -32,7 +33,7 @@ public class UnidentifiedIncomingObject {
 
     private final String key;
     private int numberOfAttempts = 0;
-    private DateTime lastAttemptTimestamp;
+    private LocalDateTime lastAttemptTimestamp;
 
     public UnidentifiedIncomingObject(String key) {
         this.key = key;
@@ -40,6 +41,6 @@ public class UnidentifiedIncomingObject {
 
     public synchronized void updateStats() {
         numberOfAttempts++;
-        lastAttemptTimestamp = DateTime.now();
+        lastAttemptTimestamp = LocalDateTime.now();
     }
 }

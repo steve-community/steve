@@ -24,10 +24,10 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
-import org.joda.time.LocalDateTime;
 
 import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.NotEmpty;
+import java.time.LocalDateTime;
 import java.util.Objects;
 
 /**

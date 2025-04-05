@@ -18,6 +18,7 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 --%>
+<%@ taglib prefix="f" uri="https://www.steve-project.org/tld/datetime" %>
 <%@ include file="00-header.jsp" %>
 <script type="text/javascript">
 	$(document).ready(function() {
@@ -84,7 +85,7 @@ Connector Status
                     </c:if>
 				</td>
 				<td>${cs.connectorId}</td>
-				<td data-sort-value="${cs.statusTimestamp.millis}">${cs.timeStamp}</td>
+				<td data-sort-value="${f:offsetToMillis(cs.statusTimestamp)}">${cs.timeStamp}</td>
 				<td><encode:forHtml value="${cs.status}" /></td>
 				<td><encode:forHtml value="${cs.errorCode}" /></td>
 			</tr>

@@ -25,7 +25,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.ToString;
 import org.jetbrains.annotations.Nullable;
-import org.joda.time.DateTime;
+
+import java.time.OffsetDateTime;
 
 /**
  *
@@ -71,7 +72,7 @@ public final class Transaction {
     private final String startValue;
 
     @Schema(description = "The timestamp at which the transaction started")
-    private final DateTime startTimestamp;
+    private final OffsetDateTime startTimestamp;
 
     /**
      * Only relevant for the web pages. Disabled for API
@@ -91,7 +92,7 @@ public final class Transaction {
 
     @Nullable
     @Schema(description = "The timestamp at which the transaction ended")
-    private final DateTime stopTimestamp;
+    private final OffsetDateTime stopTimestamp;
 
     @Nullable
     @Schema(description = "The actor who stopped the transaction")

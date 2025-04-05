@@ -18,6 +18,7 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 --%>
+<%@ taglib prefix="f" uri="https://www.steve-project.org/tld/datetime" %>
 <%@ include file="../00-header.jsp" %>
 <script type="text/javascript">
     $(document).ready(function() {
@@ -58,7 +59,7 @@
         <tbody>
         <c:forEach items="${details.values}" var="v">
             <tr>
-                <td data-sort-value="${v.valueTimestamp.millis}">${v.valueTimestamp}</td>
+                <td data-sort-value="${f:toMillis(v.valueTimestamp)}">${v.valueTimestamp}</td>
                 <td><encode:forHtml value="${v.value}" /></td>
                 <td><encode:forHtml value="${v.readingContext}" /></td>
                 <td><encode:forHtml value="${v.format}" /></td>

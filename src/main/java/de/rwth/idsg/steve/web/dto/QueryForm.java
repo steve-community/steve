@@ -24,7 +24,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-import org.joda.time.LocalDateTime;
+
+import java.time.LocalDateTime;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>

@@ -20,7 +20,9 @@ package de.rwth.idsg.steve.repository.dto;
 
 import lombok.Builder;
 import lombok.Getter;
-import org.joda.time.DateTime;
+
+import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -32,7 +34,7 @@ public class InsertTransactionParams {
     private final String chargeBoxId;
     private final int connectorId;
     private final String idTag;
-    private final DateTime startTimestamp;
+    private final OffsetDateTime startTimestamp;
     private final String startMeterValue;
 
     private final TransactionStatusUpdate statusUpdate = TransactionStatusUpdate.AfterStart;
@@ -41,7 +43,7 @@ public class InsertTransactionParams {
     private final Integer reservationId;
 
     // this came after splitting transaction table into two tables (start and stop)
-    private final DateTime eventTimestamp;
+    private final LocalDateTime eventTimestamp;
 
     /**
      * https://github.com/steve-community/steve/issues/1414

@@ -24,8 +24,6 @@ import de.rwth.idsg.steve.service.OcppTagService;
 import de.rwth.idsg.steve.utils.DateTimeUtils;
 import de.rwth.idsg.steve.web.dto.OcppTagForm;
 import de.rwth.idsg.steve.web.dto.OcppTagQueryForm;
-import org.joda.time.DateTime;
-import org.joda.time.LocalDateTime;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -38,6 +36,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultMatcher;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
+import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.Collections;
 import java.util.List;
 
@@ -140,7 +140,7 @@ public class OcppTagsRestControllerTest extends AbstractControllerTest {
     @DisplayName("GET all: Sets all valid params, expected 200")
     public void test5() throws Exception {
         // given
-        DateTime someDate = DateTime.parse("2020-10-01T00:00:00.000Z");
+        OffsetDateTime someDate = OffsetDateTime.parse("2020-10-01T00:00:00.000Z");
         OcppTag.OcppTagOverview result = OcppTag.OcppTagOverview.builder()
             .ocppTagPk(121)
             .idTag("id-1")
@@ -149,7 +149,7 @@ public class OcppTagsRestControllerTest extends AbstractControllerTest {
             .inTransaction(false)
             .blocked(true)
             .expiryDate(someDate)
-            .expiryDateFormatted(DateTimeUtils.humanize(someDate))
+            .expiryDateFormatted(DateTimeUtils.humanize(someDate.toLocalDateTime()))
             .maxActiveTransactionCount(4)
             .activeTransactionCount(0L)
             .note("some note")
@@ -175,7 +175,7 @@ public class OcppTagsRestControllerTest extends AbstractControllerTest {
             .andExpect(jsonPath("$[0].parentIdTag").value("parent-id-1"))
             .andExpect(jsonPath("$[0].inTransaction").value("false"))
             .andExpect(jsonPath("$[0].blocked").value("true"))
-            .andExpect(jsonPath("$[0].expiryDate").value("2020-10-01T00:00:00.000Z"))
+            .andExpect(jsonPath("$[0].expiryDate").value("2020-10-01T00:00:00Z"))
             .andExpect(jsonPath("$[0].expiryDateFormatted").doesNotExist())
             .andExpect(jsonPath("$[0].maxActiveTransactionCount").value("4"))
             .andExpect(jsonPath("$[0].activeTransactionCount").value("0"))
@@ -433,7 +433,8 @@ public class OcppTagsRestControllerTest extends AbstractControllerTest {
         form.setIdTag("id-123");
 
         // when
-        when(ocppTagService.addOcppTag(eq(form))).thenThrow(new SteveException.AlreadyExists("A user with idTag '%s' already exists.", ocppTagPk));
+        when(ocppTagService.addOcppTag(eq(form)))
+            .thenThrow(new SteveException.AlreadyExists("A user with idTag '%s' already exists.", ocppTagPk));
 
         // then
         mockMvc.perform(
@@ -452,7 +453,8 @@ public class OcppTagsRestControllerTest extends AbstractControllerTest {
     @DisplayName("GET all: Query param 'expired' is translated correctly, while others are defaulted")
     public void test19() throws Exception {
         // given
-        ArgumentCaptor<OcppTagQueryForm.OcppTagQueryFormForApi> formToCapture = ArgumentCaptor.forClass(OcppTagQueryForm.OcppTagQueryFormForApi.class);
+        ArgumentCaptor<OcppTagQueryForm.OcppTagQueryFormForApi> formToCapture
+            = ArgumentCaptor.forClass(OcppTagQueryForm.OcppTagQueryFormForApi.class);
 
         // when
         when(ocppTagService.getOverview(any())).thenReturn(Collections.emptyList());
@@ -474,7 +476,8 @@ public class OcppTagsRestControllerTest extends AbstractControllerTest {
     @DisplayName("GET all: Query param 'inTransaction' is translated correctly, while others are defaulted")
     public void test20() throws Exception {
         // given
-        ArgumentCaptor<OcppTagQueryForm.OcppTagQueryFormForApi> formToCapture = ArgumentCaptor.forClass(OcppTagQueryForm.OcppTagQueryFormForApi.class);
+        ArgumentCaptor<OcppTagQueryForm.OcppTagQueryFormForApi> formToCapture
+            = ArgumentCaptor.forClass(OcppTagQueryForm.OcppTagQueryFormForApi.class);
 
         // when
         when(ocppTagService.getOverview(any())).thenReturn(Collections.emptyList());
@@ -496,7 +499,8 @@ public class OcppTagsRestControllerTest extends AbstractControllerTest {
     @DisplayName("GET all: Query param 'inTransaction' is translated correctly, while others are defaulted")
     public void test21() throws Exception {
         // given
-        ArgumentCaptor<OcppTagQueryForm.OcppTagQueryFormForApi> formToCapture = ArgumentCaptor.forClass(OcppTagQueryForm.OcppTagQueryFormForApi.class);
+        ArgumentCaptor<OcppTagQueryForm.OcppTagQueryFormForApi> formToCapture
+            = ArgumentCaptor.forClass(OcppTagQueryForm.OcppTagQueryFormForApi.class);
 
         // when
         when(ocppTagService.getOverview(any())).thenReturn(Collections.emptyList());

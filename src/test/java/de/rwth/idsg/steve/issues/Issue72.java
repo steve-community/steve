@@ -35,8 +35,9 @@ import ocpp.cs._2015._10.StartTransactionResponse;
 import ocpp.cs._2015._10.StopTransactionRequest;
 import ocpp.cs._2015._10.StopTransactionResponse;
 import ocpp.cs._2015._10.UnitOfMeasure;
-import org.joda.time.DateTime;
 import org.junit.jupiter.api.Assertions;
+
+import java.time.OffsetDateTime;
 
 import static de.rwth.idsg.steve.utils.Helpers.getForOcpp16;
 import static de.rwth.idsg.steve.utils.Helpers.getPath;
@@ -60,8 +61,8 @@ public class Issue72 extends StressTest {
         String idTag = __DatabasePreparer__.getRegisteredOcppTag();
         String chargeBoxId = Helpers.getRandomString();
 
-        DateTime startDateTime = DateTime.now();
-        DateTime stopDateTime = startDateTime.plusHours(5);
+        OffsetDateTime startDateTime = OffsetDateTime.now();
+        OffsetDateTime stopDateTime = startDateTime.plusHours(5);
 
         int connectorId = 2;
 

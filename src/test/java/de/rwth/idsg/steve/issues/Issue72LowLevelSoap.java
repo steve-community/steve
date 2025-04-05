@@ -42,8 +42,9 @@ import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
-import org.joda.time.DateTime;
 import org.junit.jupiter.api.Assertions;
+
+import java.time.OffsetDateTime;
 
 import static de.rwth.idsg.steve.utils.Helpers.getForOcpp16;
 import static de.rwth.idsg.steve.utils.Helpers.getPath;
@@ -67,8 +68,8 @@ public class Issue72LowLevelSoap extends StressTest {
         String idTag = __DatabasePreparer__.getRegisteredOcppTag();
         String chargeBoxId = Helpers.getRandomString();
 
-        DateTime startDateTime = DateTime.parse("2018-06-27T01:10:10Z");
-        DateTime stopDateTime = DateTime.parse("2018-06-27T04:10:10Z");
+        OffsetDateTime startDateTime = OffsetDateTime.parse("2018-06-27T01:10:10Z");
+        OffsetDateTime stopDateTime = OffsetDateTime.parse("2018-06-27T04:10:10Z");
 
         int connectorId = 2;
 
@@ -159,7 +160,7 @@ public class Issue72LowLevelSoap extends StressTest {
     }
 
     private static String buildRequest(String chargeBoxId, int transactionId, String idTag,
-                                       DateTime stop, int meterStop) {
+                                       OffsetDateTime stop, int meterStop) {
         return "<soap:Envelope xmlns:soap=\"http://www.w3.org/2003/05/soap-envelope\">" +
                 "<soap:Header><Action xmlns=\"http://www.w3.org/2005/08/addressing\">/StopTransaction</Action>" +
                 "<MessageID xmlns=\"http://www.w3.org/2005/08/addressing\">urn:uuid:47c9e1d9-a278-4e9c-8f08-565c29d86167</MessageID>" +

@@ -19,11 +19,10 @@
 package de.rwth.idsg.steve.web;
 
 import com.google.common.base.Strings;
-import org.joda.time.LocalDate;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
 
 import java.beans.PropertyEditorSupport;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -31,16 +30,18 @@ import java.beans.PropertyEditorSupport;
  */
 public class LocalDateEditor extends PropertyEditorSupport {
 
-    private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormat.forPattern("yyyy-MM-dd");
+    private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
     @Override
     public String getAsText() {
         Object value = getValue();
         if (value == null) {
             return null;
-        } else {
-            return DATE_FORMATTER.print((LocalDate) value);
         }
+        if (value instanceof LocalDate localDate) {
+            return DATE_FORMATTER.format(localDate);
+        }
+        throw new IllegalArgumentException("Cannot convert " + value.getClass() + " to LocalDate");
     }
 
     @Override
@@ -48,7 +49,7 @@ public class LocalDateEditor extends PropertyEditorSupport {
         if (Strings.isNullOrEmpty(text)) {
             setValue(null);
         } else {
-            setValue(DATE_FORMATTER.parseLocalDate(text));
+            setValue(LocalDate.parse(text, DATE_FORMATTER));
         }
     }
 }

@@ -23,8 +23,8 @@ import jooq.steve.db.tables.records.ChargingSchedulePeriodRecord;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.joda.time.DateTime;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -54,7 +54,7 @@ public class ChargingProfile {
         private final int chargingProfilePk;
         private final int stackLevel;
         private final String description, profilePurpose, profileKind, recurrencyKind;
-        private final DateTime validFrom, validTo;
+        private final LocalDateTime validFrom, validTo;
     }
 
     @Getter

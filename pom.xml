@@ -446,26 +446,10 @@
                                     <name>JSON</name>
                                     <includeExpression>.*\.WEB_USER\.(AUTHORITIES)</includeExpression>
                                 </forcedType>
-                                <forcedType>
-                                    <userType>org.joda.time.DateTime</userType>
-                                    <converter>de.rwth.idsg.steve.utils.DateTimeConverter</converter>
-                                    <includeExpression>.*</includeExpression>
-                                    <includeTypes>.*(TIMESTAMP|DATETIME).*</includeTypes>
-                                </forcedType>
-                                <forcedType>
-                                    <userType>org.joda.time.LocalDate</userType>
-                                    <converter>de.rwth.idsg.steve.utils.DateConverter</converter>
-                                    <includeExpression>.*\.BIRTH_DAY</includeExpression>
-                                    <includeTypes>.*(DATE).*</includeTypes>
-                                </forcedType>
                             </forcedTypes>
                         </database>
                         <generate>
                             <fluentSetters>true</fluentSetters>
-                            <!-- https://www.jooq.org/doc/3.14/manual/code-generation/codegen-advanced/codegen-config-generate/codegen-generate-java-time-types/
-                                 JOOQ switching to java.time data types messes up our converters since we use JodaTime.
-                                 Until we as a project completely switch to java.time, I am disabling it. -->
-                            <javaTimeTypes>false</javaTimeTypes>
                         </generate>
 
                         <target>
@@ -521,9 +505,9 @@
             <version>2.0</version>
         </dependency>
         <dependency>
-            <groupId>com.github.steve-community</groupId>
+            <groupId>com.github.juherr</groupId>
             <artifactId>ocpp-jaxb</artifactId>
-            <version>0.0.9</version>
+            <version>feature~java-time-a74e2a0636-1</version>
         </dependency>
         <dependency>
             <groupId>com.sun.mail</groupId>
@@ -542,11 +526,6 @@
             <artifactId>lombok</artifactId>
             <version>${lombok.version}</version>
             <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>joda-time</groupId>
-            <artifactId>joda-time</artifactId>
-            <version>2.13.1</version>
         </dependency>
         <dependency>
             <groupId>org.hibernate.validator</groupId>
@@ -573,10 +552,9 @@
             <artifactId>jackson-annotations</artifactId>
             <version>${jackson.version}</version>
         </dependency>
-        <!-- Needed for Joda fields in de.rwth.idsg.steve.web.api -->
         <dependency>
             <groupId>com.fasterxml.jackson.datatype</groupId>
-            <artifactId>jackson-datatype-joda</artifactId>
+            <artifactId>jackson-datatype-jsr310</artifactId>
             <version>${jackson.version}</version>
         </dependency>
         <dependency>

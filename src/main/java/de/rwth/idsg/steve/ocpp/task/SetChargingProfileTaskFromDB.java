@@ -34,6 +34,8 @@ import ocpp.cp._2015._10.SetChargingProfileRequest;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static de.rwth.idsg.steve.utils.DateTimeUtils.toOffsetDateTime;
+
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 13.03.2018
@@ -86,7 +88,7 @@ public class SetChargingProfileTaskFromDB extends SetChargingProfileTask {
 
         ChargingSchedule schedule = new ChargingSchedule()
                 .withDuration(profile.getDurationInSeconds())
-                .withStartSchedule(profile.getStartSchedule())
+                .withStartSchedule(toOffsetDateTime(profile.getStartSchedule()))
                 .withChargingRateUnit(ChargingRateUnitType.fromValue(profile.getChargingRateUnit()))
                 .withMinChargingRate(profile.getMinChargingRate())
                 .withChargingSchedulePeriod(schedulePeriods);
@@ -97,8 +99,8 @@ public class SetChargingProfileTaskFromDB extends SetChargingProfileTask {
                 .withChargingProfilePurpose(ChargingProfilePurposeType.fromValue(profile.getChargingProfilePurpose()))
                 .withChargingProfileKind(ChargingProfileKindType.fromValue(profile.getChargingProfileKind()))
                 .withRecurrencyKind(profile.getRecurrencyKind() == null ? null : RecurrencyKindType.fromValue(profile.getRecurrencyKind()))
-                .withValidFrom(profile.getValidFrom())
-                .withValidTo(profile.getValidTo())
+                .withValidFrom(toOffsetDateTime(profile.getValidFrom()))
+                .withValidTo(toOffsetDateTime(profile.getValidTo()))
                 .withChargingSchedule(schedule);
 
         var request = new SetChargingProfileRequest()

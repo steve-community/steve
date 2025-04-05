@@ -18,6 +18,7 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 --%>
+<%@ taglib prefix="f" uri="https://www.steve-project.org/tld/datetime" %>
 <%@ include file="../00-header.jsp" %>
 <script type="text/javascript">
     $(document).ready(function () {
@@ -104,8 +105,8 @@
                     <td>${cp.profilePurpose}</td>
                     <td>${cp.profileKind}</td>
                     <td>${cp.recurrencyKind}</td>
-                    <td data-sort-value="${cp.validFrom.millis}">${cp.validFrom}</td>
-                    <td data-sort-value="${cp.validTo.millis}">${cp.validTo}</td>
+                    <td data-sort-value="${f:toMillis(cp.validFrom)}">${cp.validFrom}</td>
+                    <td data-sort-value="${f:toMillis(cp.validTo)}">${cp.validTo}</td>
                     <td>
                         <form:form action="${ctxPath}/manager/chargingProfiles/delete/${cp.chargingProfilePk}">
                             <input type="submit" class="redSubmit" value="Delete">

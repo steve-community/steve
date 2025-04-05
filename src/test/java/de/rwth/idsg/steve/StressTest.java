@@ -21,9 +21,9 @@ package de.rwth.idsg.steve;
 import de.rwth.idsg.steve.utils.__DatabasePreparer__;
 import ocpp.cs._2015._10.MeterValue;
 import ocpp.cs._2015._10.SampledValue;
-import org.joda.time.DateTime;
 import org.junit.jupiter.api.Assertions;
 
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -86,7 +86,7 @@ public abstract class StressTest {
     }
 
     protected static MeterValue createMeterValue(int val) {
-        return new MeterValue().withTimestamp(DateTime.now())
+        return new MeterValue().withTimestamp(OffsetDateTime.now())
                                .withSampledValue(new SampledValue().withValue(Integer.toString(val)));
     }
 }

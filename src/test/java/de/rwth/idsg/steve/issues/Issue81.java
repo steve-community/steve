@@ -27,9 +27,9 @@ import ocpp.cs._2015._10.CentralSystemService;
 import ocpp.cs._2015._10.RegistrationStatus;
 import ocpp.cs._2015._10.StartTransactionRequest;
 import ocpp.cs._2015._10.StartTransactionResponse;
-import org.joda.time.DateTime;
 import org.junit.jupiter.api.Assertions;
 
+import java.time.OffsetDateTime;
 import java.util.concurrent.ThreadLocalRandom;
 
 import static de.rwth.idsg.steve.utils.Helpers.getForOcpp16;
@@ -71,7 +71,7 @@ public class Issue81 extends StressTest {
                 StartTransactionRequest req = new StartTransactionRequest()
                         .withConnectorId(ThreadLocalRandom.current().nextInt())
                         .withIdTag(Helpers.getRandomString())
-                        .withTimestamp(DateTime.now())
+                        .withTimestamp(OffsetDateTime.now())
                         .withMeterStart(ThreadLocalRandom.current().nextInt());
                 txRequest.set(req);
 

@@ -30,10 +30,11 @@ import de.rwth.idsg.steve.service.notification.OcppStationWebSocketDisconnected;
 import de.rwth.idsg.steve.service.notification.OcppTransactionEnded;
 import de.rwth.idsg.steve.service.notification.OcppTransactionStarted;
 import lombok.extern.slf4j.Slf4j;
-import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
 
 import static de.rwth.idsg.steve.NotificationFeature.OcppStationBooted;
 import static de.rwth.idsg.steve.NotificationFeature.OcppStationStatusFailure;
@@ -168,7 +169,7 @@ public class NotificationService {
     }
 
     private static String addTimestamp(String body) {
-        String eventTs = "Timestamp of the event: " + DateTime.now();
+        String eventTs = "Timestamp of the event: " + LocalDateTime.now();
         String newLine = System.lineSeparator() + System.lineSeparator();
 
         if (Strings.isNullOrEmpty(body)) {

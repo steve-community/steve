@@ -29,7 +29,6 @@ import jooq.steve.db.enums.TransactionStopEventActor;
 import jooq.steve.db.tables.records.ConnectorMeterValueRecord;
 import jooq.steve.db.tables.records.TransactionStartRecord;
 import ocpp.cs._2015._10.UnitOfMeasure;
-import org.joda.time.DateTime;
 import org.jooq.Condition;
 import org.jooq.DSLContext;
 import org.jooq.Field;
@@ -42,9 +41,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.io.Writer;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.List;
 
 import static de.rwth.idsg.steve.utils.CustomDSL.date;
+import static de.rwth.idsg.steve.utils.DateTimeUtils.toOffsetDateTime;
 import static jooq.steve.db.tables.ChargeBox.CHARGE_BOX;
 import static jooq.steve.db.tables.Connector.CONNECTOR;
 import static jooq.steve.db.tables.ConnectorMeterValue.CONNECTOR_METER_VALUE;
@@ -101,15 +104,15 @@ public class TransactionRepositoryImpl implements TransactionRepository {
         form.setType(TransactionQueryForm.QueryType.ALL);
         form.setPeriodType(TransactionQueryForm.QueryPeriodType.ALL);
 
-        Record12<Integer, String, Integer, String, DateTime, String, DateTime, String, String, Integer, Integer, TransactionStopEventActor>
+        Record12<Integer, String, Integer, String, LocalDateTime, String, LocalDateTime, String, String, Integer, Integer, TransactionStopEventActor>
                 transaction = getInternal(form).fetchOne();
 
         if (transaction == null) {
             throw new SteveException("There is no transaction with id '%s'", transactionPk);
         }
 
-        DateTime startTimestamp = transaction.value5();
-        DateTime stopTimestamp = transaction.value7();
+        LocalDateTime startTimestamp = transaction.value5();
+      LocalDateTime stopTimestamp = transaction.value7();
         String stopValue = transaction.value8();
         String chargeBoxId = transaction.value2();
         int connectorId = transaction.value3();
@@ -183,7 +186,7 @@ public class TransactionRepositoryImpl implements TransactionRepository {
         //
         Table<ConnectorMeterValueRecord> t1 = transactionQuery.union(timestampQuery).asTable("t1");
 
-        Field<DateTime> dateTimeField = t1.field(2, DateTime.class);
+        Field<LocalDateTime> dateTimeField = t1.field(2, LocalDateTime.class);
 
         List<TransactionDetails.MeterValues> values =
                 ctx.select(
@@ -199,7 +202,7 @@ public class TransactionRepositoryImpl implements TransactionRepository {
                    .orderBy(dateTimeField)
                    .fetch()
                    .map(r -> TransactionDetails.MeterValues.builder()
-                                                           .valueTimestamp(r.value1())
+                                                           .valueTimestamp(toOffsetDateTime(r.value1()))
                                                            .value(r.value2())
                                                            .readingContext(r.value3())
                                                            .format(r.value4())
@@ -221,7 +224,7 @@ public class TransactionRepositoryImpl implements TransactionRepository {
 
     @SuppressWarnings("unchecked")
     private
-    SelectQuery<Record9<Integer, String, Integer, String, DateTime, String, DateTime, String, String>>
+    SelectQuery<Record9<Integer, String, Integer, String, LocalDateTime, String, LocalDateTime, String, String>>
     getInternalCSV(TransactionQueryForm form) {
 
         SelectQuery selectQuery = ctx.selectQuery();
@@ -248,7 +251,7 @@ public class TransactionRepositoryImpl implements TransactionRepository {
      */
     @SuppressWarnings("unchecked")
     private
-    SelectQuery<Record12<Integer, String, Integer, String, DateTime, String, DateTime, String, String, Integer, Integer, TransactionStopEventActor>>
+    SelectQuery<Record12<Integer, String, Integer, String, LocalDateTime, String, LocalDateTime, String, String, Integer, Integer, TransactionStopEventActor>>
     getInternal(TransactionQueryForm form) {
 
         SelectQuery selectQuery = ctx.selectQuery();
@@ -307,18 +310,18 @@ public class TransactionRepositoryImpl implements TransactionRepository {
         switch (form.getPeriodType()) {
             case TODAY:
                 selectQuery.addConditions(
-                        date(TRANSACTION.START_TIMESTAMP).eq(date(DateTime.now()))
+                        date(TRANSACTION.START_TIMESTAMP).eq(LocalDate.now())
                 );
                 break;
 
             case LAST_10:
             case LAST_30:
             case LAST_90:
-                DateTime now = DateTime.now();
+                LocalDate now = LocalDate.now();
                 selectQuery.addConditions(
                         date(TRANSACTION.START_TIMESTAMP).between(
-                                date(now.minusDays(form.getPeriodType().getInterval())),
-                                date(now)
+                                now.minusDays(form.getPeriodType().getInterval()),
+                                now
                         )
                 );
                 break;
@@ -327,8 +330,8 @@ public class TransactionRepositoryImpl implements TransactionRepository {
                 break;
 
             case FROM_TO:
-                DateTime from = form.getFrom().toDateTime();
-                DateTime to = form.getTo().toDateTime();
+                LocalDateTime from = form.getFrom();
+                LocalDateTime to = form.getTo();
 
                 if (form.getType() == TransactionQueryForm.QueryType.ACTIVE) {
                     selectQuery.addConditions(TRANSACTION.START_TIMESTAMP.between(from, to));
@@ -344,18 +347,18 @@ public class TransactionRepositoryImpl implements TransactionRepository {
         }
     }
 
-    private static class TransactionMapper implements RecordMapper<Record12<Integer, String, Integer, String, DateTime, String, DateTime, String, String, Integer, Integer, TransactionStopEventActor>, Transaction> {
+    private static class TransactionMapper implements RecordMapper<Record12<Integer, String, Integer, String, LocalDateTime, String, LocalDateTime, String, String, Integer, Integer, TransactionStopEventActor>, Transaction> {
         @Override
-        public Transaction map(Record12<Integer, String, Integer, String, DateTime, String, DateTime, String, String, Integer, Integer, TransactionStopEventActor> r) {
+        public Transaction map(Record12<Integer, String, Integer, String, LocalDateTime, String, LocalDateTime, String, String, Integer, Integer, TransactionStopEventActor> r) {
             return Transaction.builder()
                               .id(r.value1())
                               .chargeBoxId(r.value2())
                               .connectorId(r.value3())
                               .ocppIdTag(r.value4())
-                              .startTimestamp(r.value5())
+                              .startTimestamp(toOffsetDateTime(r.value5()))
                               .startTimestampFormatted(DateTimeUtils.humanize(r.value5()))
                               .startValue(r.value6())
-                              .stopTimestamp(r.value7())
+                              .stopTimestamp(toOffsetDateTime(r.value7()))
                               .stopTimestampFormatted(DateTimeUtils.humanize(r.value7()))
                               .stopValue(r.value8())
                               .stopReason(r.value9())

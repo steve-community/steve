@@ -22,7 +22,8 @@ import de.rwth.idsg.steve.ocpp.TaskOrigin;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import org.joda.time.DateTime;
+
+import java.time.LocalDateTime;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -33,7 +34,7 @@ import org.joda.time.DateTime;
 @Builder
 public final class TaskOverview implements Comparable<TaskOverview> {
     private final int taskId, responseCount, requestCount;
-    private final DateTime start, end;
+    private final LocalDateTime start, end;
     private final TaskOrigin origin;
 
     /**

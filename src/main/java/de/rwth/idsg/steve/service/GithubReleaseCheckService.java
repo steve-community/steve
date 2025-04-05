@@ -21,7 +21,7 @@ package de.rwth.idsg.steve.service;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
-import com.fasterxml.jackson.datatype.joda.JodaModule;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.github.zafarkhaja.semver.Version;
 import de.rwth.idsg.steve.SteveConfiguration;
 import de.rwth.idsg.steve.web.dto.ReleaseReport;
@@ -77,7 +77,7 @@ public class GithubReleaseCheckService implements ReleaseCheckService {
         HttpComponentsClientHttpRequestFactory factory = new HttpComponentsClientHttpRequestFactory(httpClient);
 
         ObjectMapper mapper = new ObjectMapper()
-                .registerModule(new JodaModule());
+                .registerModule(new JavaTimeModule());
         mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
         mapper.setPropertyNamingStrategy(new PropertyNamingStrategies.SnakeCaseStrategy());
 

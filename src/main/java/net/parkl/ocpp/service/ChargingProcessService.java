@@ -18,6 +18,7 @@
  */
 package net.parkl.ocpp.service;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.parkl.ocpp.entities.Connector;
 import net.parkl.ocpp.entities.OcppChargingProcess;
@@ -25,16 +26,12 @@ import net.parkl.ocpp.entities.TransactionStart;
 import net.parkl.ocpp.repositories.ConnectorRepository;
 import net.parkl.ocpp.repositories.OcppChargingProcessRepository;
 import net.parkl.ocpp.repositories.TransactionStartRepository;
-import net.parkl.ocpp.repositories.TransactionStopRepository;
-import net.parkl.ocpp.service.config.AdvancedChargeBoxConfiguration;
-import net.parkl.ocpp.util.AsyncWaiter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.UUID;
 
@@ -44,6 +41,7 @@ import static net.parkl.ocpp.service.ErrorMessages.INVALID_OCPP_CHARGING_PROCESS
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class ChargingProcessService {
     private static final Logger LOGGER = LoggerFactory.getLogger(ChargingProcessService.class);
 
@@ -51,25 +49,10 @@ public class ChargingProcessService {
 
     private final ConnectorRepository connectorRepo;
 
-    private final AdvancedChargeBoxConfiguration advancedConfig;
 
     private final TransactionStartRepository transactionStartRepository;
-    private final TransactionStopRepository transactionStopRepository;
-    private final RemoteStartService remoteStartService;
 
-    public ChargingProcessService(OcppChargingProcessRepository chargingProcessRepo,
-                                  ConnectorRepository connectorRepo,
-                                  AdvancedChargeBoxConfiguration advancedConfig,
-                                  TransactionStartRepository transactionStartRepository,
-                                  TransactionStopRepository transactionStopRepository,
-                                  RemoteStartService remoteStartService) {
-        this.chargingProcessRepo = chargingProcessRepo;
-        this.connectorRepo = connectorRepo;
-        this.advancedConfig = advancedConfig;
-        this.transactionStartRepository = transactionStartRepository;
-        this.transactionStopRepository = transactionStopRepository;
-        this.remoteStartService = remoteStartService;
-    }
+
 
     public OcppChargingProcess findOpenChargingProcessWithoutTransaction(String chargeBoxId, int connectorId) {
         Connector c = connectorRepo.findByChargeBoxIdAndConnectorId(chargeBoxId, connectorId);
@@ -145,7 +128,7 @@ public class ChargingProcessService {
                 orElseThrow(() -> new IllegalStateException(INVALID_OCPP_CHARGING_PROCESS_ID + processId));
 
         if (cp.getStopRequestDate() != null) {
-            LOGGER.warn("OcppChargingProcess stop already requested: " + processId);
+            LOGGER.warn("OcppChargingProcess stop already requested: {}", processId);
             return cp;
         }
 
@@ -191,11 +174,7 @@ public class ChargingProcessService {
         return chargingProcessRepo.findByOcppTagAndConnectorAndEndDateIsNullAndTransactionStartIsNotNull(rfidTag, connector);
     }
 
-    public boolean hasOpenProcessForRfidTag(String rfidTag, int connectorId, String chargeBoxId) {
-        OcppChargingProcess chargingProcess = findOpenChargingProcessWithoutTransaction(chargeBoxId, connectorId);
 
-        return chargingProcess != null && chargingProcess.getOcppTag().equals(rfidTag);
-    }
 
     public OcppChargingProcess findByTransactionId(int transactionId) {
         TransactionStart transaction = transactionStartRepository
@@ -208,19 +187,9 @@ public class ChargingProcessService {
     }
 
 
-    private OcppChargingProcess waitingForChargingProcessOnConnector(String chargeBoxId, int connectorId, AsyncWaiter<OcppChargingProcess> waiter) {
-        Connector conn = connectorRepo.findByChargeBoxIdAndConnectorId(chargeBoxId, connectorId);
-        if (conn == null) {
-            throw new IllegalArgumentException("Connector not found: " + chargeBoxId + "/" + connectorId);
-        }
-        waiter.setDelayMs(0);
-        waiter.setIntervalMs(200);
-        return waiter.waitFor(() -> chargingProcessRepo.findByConnectorAndTransactionStartIsNullAndEndDateIsNull(conn));
-    }
-
     @Transactional
     public List<OcppChargingProcess> findWithoutTransactionForCleanup(int hoursBefore) {
-        LocalDateTime dateTimeBefore = LocalDateTime.now().minus(hoursBefore, ChronoUnit.HOURS);
+        LocalDateTime dateTimeBefore = LocalDateTime.now().minusHours(hoursBefore);
         return chargingProcessRepo.findWithoutTransactionBefore(dateTimeBefore);
 
     }
@@ -242,6 +211,7 @@ public class ChargingProcessService {
         return chargingProcessRepo.findListByTransactionStart(transaction);
     }
 
+    @Transactional
     public OcppChargingProcess updateChargingProcessWithTransaction(String chargeBoxId, int connectorId, String idTag,
                                                                     TransactionStart transactionStart) {
         Connector c = connectorRepo.findByChargeBoxIdAndConnectorId(chargeBoxId, connectorId);

@@ -5,6 +5,7 @@ import de.rwth.idsg.steve.ocpp.RequestResult;
 import de.rwth.idsg.steve.repository.dto.ChargePointSelect;
 import de.rwth.idsg.steve.web.dto.ocpp.RemoteStartTransactionParams;
 import de.rwth.idsg.steve.web.dto.ocpp.RemoteStopTransactionParams;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import net.parkl.ocpp.entities.*;
 import net.parkl.ocpp.module.esp.EmobilityServiceProvider;
@@ -64,7 +65,8 @@ public class OcppChargingMiddleware extends AbstractOcppMiddleware {
     private OcppConsumptionListener consumptionListener;
     private OcppStopListener stopListener;
 
-    public ESPChargingStartResult startCharging(ESPChargingStartRequest req) {
+    @SneakyThrows
+    public ESPChargingStartResult startCharging(ESPChargingStartRequest req){
         log.info("Starting charging: {}-{} (licensePlate={})...",
                 req.getChargeBoxId(),
                 req.getChargerId(),
@@ -137,6 +139,7 @@ public class OcppChargingMiddleware extends AbstractOcppMiddleware {
             if (result.getResponse() != null) {
                 if (result.getResponse().equals(ACCEPTED.value())) {
                     log.info("Proxy transaction accepted: {}", id.getChargeBoxId());
+                    Thread.sleep(500);
                     OcppChargingProcess process = chargingProcessService.createOrUpdateChargingProcess(id.getChargeBoxId(),
                             id.getConnectorId(),
                             idTag,

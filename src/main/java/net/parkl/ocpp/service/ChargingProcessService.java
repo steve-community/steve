@@ -98,7 +98,7 @@ public class ChargingProcessService {
         if (c == null) {
             throw new IllegalStateException(INVALID_CHARGE_BOX_ID_CONNECTOR_ID + chargeBoxId + "/" + connectorId);
         }
-        LOGGER.info("Creating OcppChargingProcess on {}/{} with id tag {} for: {}...", chargeBoxId, connectorId,
+        LOGGER.info("Creating or updating OcppChargingProcess on {}/{} with id tag {} for: {}...", chargeBoxId, connectorId,
                 idTag, licensePlate);
         OcppChargingProcess occupied = chargingProcessRepo.findByConnectorAndTransactionStartIsNullAndEndDateIsNull(c);
         if (occupied != null) {

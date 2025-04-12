@@ -11,12 +11,13 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.time.Clock;
 import java.time.LocalDateTime;
 import static java.util.Collections.singletonList;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-public class OcppStartTimeoutManagerUnitTest {
+class OcppStartTimeoutManagerUnitTest {
     @InjectMocks
     private OcppStartTimeoutManager startTimeoutManager;
     @Mock
@@ -28,7 +29,7 @@ public class OcppStartTimeoutManagerUnitTest {
     @Mock
     private OcppChargingMiddleware chargingMiddleware;
     @Test
-    public void checkForStartTimeoutNoEnabledCharger() {
+    void checkForStartTimeoutNoEnabledCharger() {
         when(advancedChargeBoxConfiguration.isStartTimeoutEnabledForAny()).thenReturn(false);
 
         startTimeoutManager.checkForStartTimeout();
@@ -37,10 +38,10 @@ public class OcppStartTimeoutManagerUnitTest {
     }
 
     @Test
-    public void checkForStartTimeout() {
+    void checkForStartTimeout() {
         OcppChargingProcess chargingProcess = mock(OcppChargingProcess.class);
         Connector connector = mock(Connector.class);
-        LocalDateTime startDate = LocalDateTime.now().minusMinutes(1);
+        LocalDateTime startDate = LocalDateTime.now(Clock.systemUTC()).minusMinutes(1);
 
         when(advancedChargeBoxConfiguration.isStartTimeoutEnabledForAny()).thenReturn(true);
         when(chargingProcessService.findOpenChargingProcessesWithoutTransaction())
@@ -59,11 +60,11 @@ public class OcppStartTimeoutManagerUnitTest {
     }
 
     @Test
-    public void checkForPreparingTimeout() {
+    void checkForPreparingTimeout() {
         OcppChargingProcess chargingProcess = mock(OcppChargingProcess.class);
         String chargingProcessId = "id1";
         Connector connector = mock(Connector.class);
-        LocalDateTime startDate = LocalDateTime.now().minusMinutes(1);
+        LocalDateTime startDate = LocalDateTime.now(Clock.systemUTC()).minusMinutes(1);
 
         when(advancedChargeBoxConfiguration.isPreparingTimeoutEnabledForAny()).thenReturn(true);
         when(chargingProcessService.findOpenChargingProcessesWithoutTransaction())

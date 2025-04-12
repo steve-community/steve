@@ -22,6 +22,7 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.ZoneId;
+import java.util.UUID;
 
 import static net.parkl.ocpp.entities.TransactionStopEventActor.station;
 import static net.parkl.ocpp.service.OcppConstants.REASON_VEHICLE_CHARGED;
@@ -31,7 +32,7 @@ import static org.mockito.Mockito.*;
 
 @SuppressWarnings("unused")
 @ExtendWith(MockitoExtension.class)
-public class TransactionServiceUnitTest {
+class TransactionServiceUnitTest {
     @InjectMocks
     private TransactionServiceImpl transactionService;
     @Mock
@@ -54,7 +55,7 @@ public class TransactionServiceUnitTest {
     private ReservationService reservationService;
 
     @Test
-    public void updateTransactionNotifyAboutChargingStop() {
+    void updateTransactionNotifyAboutChargingStop() {
         int testTransactionId = 1;
         Transaction testTransaction = mock(Transaction.class);
 
@@ -84,7 +85,7 @@ public class TransactionServiceUnitTest {
     }
 
     @Test
-    public void updateTransactionNotifyAboutConsumption() {
+    void updateTransactionNotifyAboutConsumption() {
         int testTransactionId = 1;
         Transaction testTransaction = mock(Transaction.class);
         TransactionStart testTransactionStart = mock(TransactionStart.class);
@@ -119,7 +120,7 @@ public class TransactionServiceUnitTest {
     }
 
     @Test
-    public void updateTransactionStopFailed() {
+    void updateTransactionStopFailed() {
         int testTransactionId = 1;
         Transaction testTransaction = mock(Transaction.class);
         TransactionStart testTransactionStart = mock(TransactionStart.class);
@@ -153,7 +154,7 @@ public class TransactionServiceUnitTest {
     }
 
     @Test
-    public void insertTransactionWillReturnExisting() {
+    void insertTransactionWillReturnExisting() {
         String testChargeBoxId = "chargeBox";
         int connectorId = 1;
         String testRfidTag = "myRfidTag";
@@ -187,7 +188,7 @@ public class TransactionServiceUnitTest {
     }
 
     @Test
-    public void insertTransactionWithoutActiveChargingProcess() {
+    void insertTransactionWithChargingProcessUpdate() {
         String testChargeBoxId = "chargeBox";
         int connectorId = 1;
         String testRfidTag = "myRfidTag";
@@ -210,47 +211,21 @@ public class TransactionServiceUnitTest {
         TransactionStart transactionStart = new TransactionStart();
         transactionStart.setTransactionPk(testTransactionPk);
 
-        when(transactionStartRepository.save(any())).thenReturn(transactionStart);
+        OcppChargingProcess chargingProcess = new OcppChargingProcess();
+        chargingProcess.setTransactionStart(transactionStart);
+        chargingProcess.setConnector(testConnector);
+        chargingProcess.setOcppChargingProcessId(UUID.randomUUID().toString());
 
+        when(chargingProcessService.updateChargingProcessWithTransaction(anyString(), anyInt(), anyString(), any())).thenReturn(chargingProcess);
+
+        when(transactionStartRepository.save(any())).thenReturn(transactionStart);
         assertThat(transactionService.insertTransaction(params)).isEqualTo(testTransactionPk);
     }
 
-    @Test
-    public void insertTransactionWithChargingProcess() {
-        String testChargeBoxId = "chargeBox";
-        int connectorId = 1;
-        String testRfidTag = "myRfidTag";
 
-        InsertTransactionParams params =
-                InsertTransactionParams.builder()
-                        .chargeBoxId(testChargeBoxId)
-                        .connectorId(connectorId)
-                        .idTag(testRfidTag)
-                        .startTimestamp(DateTime.now())
-                        .startMeterValue(String.valueOf(0))
-                        .reservationId(null)
-                        .eventTimestamp(DateTime.now())
-                        .build();
-
-        Connector testConnector = mock(Connector.class);
-        when(connectorService.createConnectorIfNotExists(testChargeBoxId, connectorId)).thenReturn(testConnector);
-
-        int testTransactionPk = 2;
-        TransactionStart transactionStart = new TransactionStart();
-        transactionStart.setTransactionPk(testTransactionPk);
-
-        when(transactionStartRepository.save(any())).thenReturn(transactionStart);
-
-        OcppChargingProcess testChargingProcess = new OcppChargingProcess();
-        when(chargingProcessService.findOpenChargingProcessWithoutTransaction(
-                anyString(),anyInt()))
-                .thenReturn(testChargingProcess);
-
-        assertThat(transactionService.insertTransaction(params)).isEqualTo(testChargingProcess.getTransactionStart().getTransactionPk());
-    }
 
     @Test
-    public void updateTransactionInvalidTransaction() {
+    void updateTransactionInvalidTransaction() {
         int testTransactionId = 1;
         String testChargeBoxId = "testChargeBox";
 
@@ -270,7 +245,7 @@ public class TransactionServiceUnitTest {
     }
 
     @Test
-    public void updateTransactionNoChargingProcessForTransaction() {
+    void updateTransactionNoChargingProcessForTransaction() {
         int testTransactionId = 1;
         Transaction testTransaction = mock(Transaction.class);
         String testChargeBoxId = "testChargeBox";

@@ -29,7 +29,6 @@ import net.parkl.ocpp.entities.*;
 import net.parkl.ocpp.repositories.*;
 import net.parkl.ocpp.service.ChargingProcessService;
 import net.parkl.ocpp.service.ESPNotificationService;
-import net.parkl.ocpp.util.AsyncWaiter;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -259,10 +258,10 @@ public class TransactionServiceImpl implements TransactionService {
 
         TransactionStart transactionStart = transactionStartRepo.save(createTransactionStart(connector, params));
 
-        log.info("Transaction saved id={}, querying or creating charging suitable process for connector: {}",
+        log.info("Transaction saved id={}, updating suitable process for connector: {}",
                 transactionStart.getTransactionPk(),
                 connector.getConnectorId());
-        OcppChargingProcess chargingProcess = chargingProcessService.createOrUpdateChargingProcessWithTransaction(
+        OcppChargingProcess chargingProcess = chargingProcessService.updateChargingProcessWithTransaction(
                 params.getChargeBoxId(), params.getConnectorId(), params.getIdTag(), transactionStart);
         log.info("Using charging process {} for transaction {}", chargingProcess.getOcppChargingProcessId(),
                 transactionStart.getTransactionPk());

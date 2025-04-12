@@ -125,6 +125,15 @@ public class OcppChargingMiddleware extends AbstractOcppMiddleware {
         remoteStartService.remoteStartRequested(c.getChargeBoxId(), id.getConnectorId(),
                 idTag);
 
+        OcppChargingProcess process = chargingProcessService.createChargingProcess(id.getChargeBoxId(),
+                id.getConnectorId(),
+                idTag,
+                req.getLicensePlate(),
+                req.getLimitKwh(),
+                req.getLimitMin());
+        log.info("Charging process created: {}", process.getOcppChargingProcessId());
+
+
         RemoteStartTransactionParams p = new RemoteStartTransactionParams();
         p.setIdTag(idTag);
         p.setChargePointSelectList(singletonList(c));
@@ -135,41 +144,40 @@ public class OcppChargingMiddleware extends AbstractOcppMiddleware {
         RequestResult result = waitForResult(req.getChargeBoxId(), taskId);
 
         ESPChargingStartResult.ESPChargingStartResultBuilder resultBuilder = ESPChargingStartResult.builder();
+        String errorCode = null;
         if (result != null) {
             if (result.getResponse() != null) {
                 if (result.getResponse().equals(ACCEPTED.value())) {
                     log.info("Proxy transaction accepted: {}", id.getChargeBoxId());
-                    Thread.sleep(500);
-                    OcppChargingProcess process = chargingProcessService.createOrUpdateChargingProcess(id.getChargeBoxId(),
-                            id.getConnectorId(),
-                            idTag,
-                            req.getLicensePlate(),
-                            req.getLimitKwh(),
-                            req.getLimitMin());
-                    log.info("Charging process created: {}", process.getOcppChargingProcessId());
+
                     resultBuilder
                             .externalChargingProcessId(String.valueOf(process.getOcppChargingProcessId()));
 
 
                 } else {
                     log.info("Proxy transaction rejected: {}", id.getChargeBoxId());
-                    resultBuilder.errorCode(ERROR_CODE_CHARGER_ERROR);
+                    errorCode=ERROR_CODE_CHARGER_ERROR;
                 }
             } else if (result.getErrorMessage() != null) {
                 log.info("Proxy transaction error ({}): {}", result.getErrorMessage(), id.getChargeBoxId());
-                resultBuilder.errorCode(ERROR_CODE_CHARGER_ERROR);
+                errorCode=ERROR_CODE_CHARGER_ERROR;
 
             } else {
                 log.info("Proxy start transaction unknown error: {}", id.getChargeBoxId());
-                resultBuilder.errorCode(ERROR_CODE_CHARGER_ERROR);
+                errorCode=ERROR_CODE_CHARGER_ERROR;
 
             }
         } else {
             log.info("Proxy start transaction timeout: {}", id.getChargeBoxId());
-            resultBuilder.errorCode(ERROR_CODE_CHARGER_OFFLINE);
-
+            errorCode=ERROR_CODE_CHARGER_OFFLINE;
         }
 
+        if (errorCode != null) {
+            log.error("Error starting charging: {}", errorCode);
+            chargingProcessService.stopChargingProcess(process.getOcppChargingProcessId(), errorCode);
+        }
+
+        resultBuilder.errorCode(errorCode);
         return resultBuilder.build();
 
     }
@@ -311,7 +319,7 @@ public class OcppChargingMiddleware extends AbstractOcppMiddleware {
         } else {
             //Charging process started without transaction
             log.info("Stopping charging without transaction: {}...", chargingProcess.getOcppChargingProcessId());
-            OcppChargingProcess process = chargingProcessService.stopChargingProcess(chargingProcess.getOcppChargingProcessId());
+            OcppChargingProcess process = chargingProcessService.stopChargingProcess(chargingProcess.getOcppChargingProcessId(),null);
 
             ESPChargingData data = ESPChargingData.builder().start(process.getStartDate()).end(process.getEndDate()).build();
             ESPChargingResult res = ESPChargingResult.builder().chargingData(data).stoppedWithoutTransaction(true).build();
@@ -329,7 +337,7 @@ public class OcppChargingMiddleware extends AbstractOcppMiddleware {
             if (result.getResponse() != null) {
                 if (result.getResponse().equals(ACCEPTED.value())) {
                     log.info("Proxy transaction stop accepted: {}", transactionId);
-                    chargingProcessService.stopChargingProcess(externalChargeId);
+                    chargingProcessService.stopChargingProcess(externalChargeId, null);
                     return ESPChargingResult.builder().stoppedWithoutTransaction(false).build();
                 } else {
                     log.info("Proxy transaction stop rejected: {}", transactionId);

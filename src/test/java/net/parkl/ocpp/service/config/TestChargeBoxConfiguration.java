@@ -31,10 +31,7 @@ public class TestChargeBoxConfiguration implements ChargeBoxConfiguration {
         return chargeBoxId.equals("partialConsumptionUpdateChargeBox");
     }
 
-    @Override
-    public boolean waitingForChargingProcessEnabled(String chargeBoxId) {
-        return false;
-    }
+
 
     @Override
     public boolean isStartTimeoutEnabledForAny() {

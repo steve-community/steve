@@ -137,7 +137,7 @@ public class OcppChargingMiddleware extends AbstractOcppMiddleware {
             if (result.getResponse() != null) {
                 if (result.getResponse().equals(ACCEPTED.value())) {
                     log.info("Proxy transaction accepted: {}", id.getChargeBoxId());
-                    OcppChargingProcess process = chargingProcessService.createChargingProcess(id.getChargeBoxId(),
+                    OcppChargingProcess process = chargingProcessService.createOrUpdateChargingProcess(id.getChargeBoxId(),
                             id.getConnectorId(),
                             idTag,
                             req.getLicensePlate(),

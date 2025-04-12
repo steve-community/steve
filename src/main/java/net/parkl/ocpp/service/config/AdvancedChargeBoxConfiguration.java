@@ -57,9 +57,7 @@ public class AdvancedChargeBoxConfiguration {
         return chargeBoxConfiguration != null && chargeBoxConfiguration.isTransactionPartialEnabled(chargeBoxId);
     }
 
-    public boolean waitingForChargingProcessEnabled(String chargeBoxId) {
-        return chargeBoxConfiguration != null && chargeBoxConfiguration.waitingForChargingProcessEnabled(chargeBoxId);
-    }
+
 
     public boolean isStartTimeoutEnabledForAny() {
         return chargeBoxConfiguration != null && chargeBoxConfiguration.isStartTimeoutEnabledForAny();

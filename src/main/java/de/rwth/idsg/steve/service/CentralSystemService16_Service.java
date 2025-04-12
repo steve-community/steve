@@ -231,7 +231,7 @@ public class CentralSystemService16_Service {
             log.info("No remote start for RFID tag: {} on charger: {}/{}, interpreting as RFID start...",
                     parameters.getIdTag(), chargeBoxIdentity, parameters.getConnectorId());
 
-            chargingProcessService.createChargingProcess(chargeBoxIdentity,
+            chargingProcessService.createOrUpdateChargingProcess(chargeBoxIdentity,
                     parameters.getConnectorId(),
                     parameters.getIdTag(),
                     null,

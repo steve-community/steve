@@ -42,7 +42,7 @@ public interface OcppChargingProcessRepository extends CrudRepository<OcppChargi
 	List<OcppChargingProcess> findActiveByChargeBoxId(String chargeBoxId);
 
 	OcppChargingProcess findByConnectorAndEndDateIsNull(Connector c);
-
+	OcppChargingProcess findByConnectorAndOcppTagAndEndDateIsNull(Connector c, String idTag);
 	List<OcppChargingProcess> findAllByTransactionStartIsNullAndEndDateIsNull();
 
 	@EntityGraph(attributePaths = {"transactionStart"})

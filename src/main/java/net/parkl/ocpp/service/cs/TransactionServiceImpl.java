@@ -259,21 +259,13 @@ public class TransactionServiceImpl implements TransactionService {
 
         TransactionStart transactionStart = transactionStartRepo.save(createTransactionStart(connector, params));
 
-        log.info("Transaction saved id={}, querying charging suitable process for connector: {}",
+        log.info("Transaction saved id={}, querying or creating charging suitable process for connector: {}",
                 transactionStart.getTransactionPk(),
                 connector.getConnectorId());
-        OcppChargingProcess chargingProcess = chargingProcessService.fetchChargingProcess(params.getConnectorId(),
-                params.getChargeBoxId(),
-                new AsyncWaiter<>(90000));
-        if (chargingProcess != null) {
-            log.info("Setting transaction on connector {} to process: {}...",
-                    connector.getConnectorId(),
-                    chargingProcess.getOcppChargingProcessId());
-            chargingProcess.setTransactionStart(transactionStart);
-            chargingProcessService.save(chargingProcess);
-        } else {
-            log.warn("No active charging process found without transaction for connector: {}", connector.getConnectorId());
-        }
+        OcppChargingProcess chargingProcess = chargingProcessService.createOrUpdateChargingProcessWithTransaction(
+                params.getChargeBoxId(), params.getConnectorId(), params.getIdTag(), transactionStart);
+        log.info("Using charging process {} for transaction {}", chargingProcess.getOcppChargingProcessId(),
+                transactionStart.getTransactionPk());
 
         if (params.getReservationId()!=null) {
             reservationService.markReservationAsUsed(transactionStart, params.getReservationId(), params.getChargeBoxId());

@@ -88,43 +88,52 @@ public class ChargingProcessService {
     }
 
     @Transactional
-    public OcppChargingProcess createChargingProcess(String chargeBoxId,
-                                                     int connectorId,
-                                                     String idTag,
-                                                     String licensePlate,
-                                                     Float limitKwh,
-                                                     Integer limitMinute) {
+    public OcppChargingProcess createOrUpdateChargingProcess(String chargeBoxId,
+                                                             int connectorId,
+                                                             String idTag,
+                                                             String licensePlate,
+                                                             Float limitKwh,
+                                                             Integer limitMinute) {
         Connector c = connectorRepo.findByChargeBoxIdAndConnectorId(chargeBoxId, connectorId);
         if (c == null) {
             throw new IllegalStateException(INVALID_CHARGE_BOX_ID_CONNECTOR_ID + chargeBoxId + "/" + connectorId);
         }
         LOGGER.info("Creating OcppChargingProcess on {}/{} with id tag {} for: {}...", chargeBoxId, connectorId,
                 idTag, licensePlate);
-        OcppChargingProcess existing = chargingProcessRepo.findByConnectorAndTransactionStartIsNullAndEndDateIsNull(c);
-        if (existing != null) {
+        OcppChargingProcess occupied = chargingProcessRepo.findByConnectorAndTransactionStartIsNullAndEndDateIsNull(c);
+        if (occupied != null) {
             throw new IllegalStateException("Connector occupied: " + c.getConnectorId());
         }
 
-        TransactionStart startTransaction = null;
-        TransactionStart lastTransaction = transactionStartRepository.findFirstByConnectorAndOcppTagOrderByStartTimestampDesc(c, idTag);
-        if (lastTransaction != null) {
-            if (transactionStopRepository.countByTransactionId(lastTransaction.getTransactionPk())==0 &&
-                    lastTransaction.getStartTimestamp()
-                            .isAfter(remoteStartService.getRemoteStartValidityThreshold(chargeBoxId))) {
-                log.info("Using existing transaction for id tag {}: {}", idTag, lastTransaction.getTransactionPk());
-                startTransaction = lastTransaction;
+        OcppChargingProcess p = chargingProcessRepo.findByConnectorAndOcppTagAndEndDateIsNull(c, idTag);
+
+        if (p==null) {
+            log.info("Creating new process for id tag {}...", idTag);
+            TransactionStart startTransaction = null;
+            TransactionStart lastTransaction = transactionStartRepository.findFirstByConnectorAndOcppTagOrderByStartTimestampDesc(c, idTag);
+            if (lastTransaction != null) {
+                if (transactionStopRepository.countByTransactionId(lastTransaction.getTransactionPk())==0 &&
+                        lastTransaction.getStartTimestamp()
+                                .isAfter(remoteStartService.getRemoteStartValidityThreshold(chargeBoxId))) {
+                    log.info("Using existing transaction for id tag {}: {}", idTag, lastTransaction.getTransactionPk());
+                    startTransaction = lastTransaction;
+                }
+
             }
 
+            p = new OcppChargingProcess();
+            p.setOcppChargingProcessId(UUID.randomUUID().toString());
+            p.setConnector(c);
+            p.setOcppTag(idTag);
+            p.setTransactionStart(startTransaction);
+        } else {
+            log.info("Using existing process for id tag {}: {}", idTag, p.getOcppChargingProcessId());
         }
 
-        OcppChargingProcess p = new OcppChargingProcess();
-        p.setOcppChargingProcessId(UUID.randomUUID().toString());
-        p.setConnector(c);
         p.setLicensePlate(licensePlate);
-        p.setOcppTag(idTag);
         p.setLimitKwh(limitKwh);
         p.setLimitMinute(limitMinute);
-        p.setTransactionStart(startTransaction);
+
         return chargingProcessRepo.save(p);
     }
 
@@ -198,7 +207,7 @@ public class ChargingProcessService {
     }
 
     public boolean hasOpenProcessForRfidTag(String rfidTag, int connectorId, String chargeBoxId) {
-        OcppChargingProcess chargingProcess = fetchChargingProcess(connectorId, chargeBoxId, new AsyncWaiter<>(2000));
+        OcppChargingProcess chargingProcess = findOpenChargingProcessWithoutTransaction(chargeBoxId, connectorId);
 
         return chargingProcess != null && chargingProcess.getOcppTag().equals(rfidTag);
     }
@@ -213,20 +222,6 @@ public class ChargingProcessService {
         return chargingProcessRepo.save(process);
     }
 
-    public OcppChargingProcess fetchChargingProcess(int connectorId, String chargeBoxId, AsyncWaiter<OcppChargingProcess> waiter) {
-        if (advancedConfig.waitingForChargingProcessEnabled(chargeBoxId)) {
-            OcppChargingProcess chargingProcess =
-                    waitingForChargingProcessOnConnector(chargeBoxId,
-                            connectorId,
-                            waiter);
-            if (chargingProcess == null) {
-                log.error("Charging process not found without transaction: {}/{}", chargeBoxId, connectorId);
-                throw new IllegalStateException("Charging process not found without transaction: " + connectorId);
-            }
-            return chargingProcess;
-        }
-        return findOpenChargingProcessWithoutTransaction(chargeBoxId, connectorId);
-    }
 
     private OcppChargingProcess waitingForChargingProcessOnConnector(String chargeBoxId, int connectorId, AsyncWaiter<OcppChargingProcess> waiter) {
         Connector conn = connectorRepo.findByChargeBoxIdAndConnectorId(chargeBoxId, connectorId);
@@ -260,5 +255,27 @@ public class ChargingProcessService {
         TransactionStart transaction = transactionStartRepository
                 .findById(transactionId).orElseThrow(() -> new IllegalStateException("Invalid transaction id"));
         return chargingProcessRepo.findListByTransactionStart(transaction);
+    }
+
+    public OcppChargingProcess createOrUpdateChargingProcessWithTransaction(String chargeBoxId, int connectorId, String idTag,
+                                                                            TransactionStart transactionStart) {
+        Connector c = connectorRepo.findByChargeBoxIdAndConnectorId(chargeBoxId, connectorId);
+        if (c == null) {
+            throw new IllegalStateException(INVALID_CHARGE_BOX_ID_CONNECTOR_ID + chargeBoxId + "/" + connectorId);
+        }
+        OcppChargingProcess existing = chargingProcessRepo.findByConnectorAndOcppTagAndEndDateIsNull(c, idTag);
+        if (existing != null) {
+            log.info("Setting transaction start for existing process: " + existing.getOcppChargingProcessId());
+            existing.setTransactionStart(transactionStart);
+            return chargingProcessRepo.save(existing);
+        } else {
+            log.info("Creating new process for transaction start: {}", transactionStart.getTransactionPk());
+            OcppChargingProcess p = new OcppChargingProcess();
+            p.setOcppChargingProcessId(UUID.randomUUID().toString());
+            p.setConnector(c);
+            p.setOcppTag(idTag);
+            p.setTransactionStart(transactionStart);
+            return chargingProcessRepo.save(p);
+        }
     }
 }

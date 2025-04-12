@@ -242,9 +242,8 @@ public class TransactionServiceUnitTest {
         when(transactionStartRepository.save(any())).thenReturn(transactionStart);
 
         OcppChargingProcess testChargingProcess = new OcppChargingProcess();
-        when(chargingProcessService.fetchChargingProcess(anyInt(),
-                anyString(),
-                any(AsyncWaiter.class)))
+        when(chargingProcessService.findOpenChargingProcessWithoutTransaction(
+                anyString(),anyInt()))
                 .thenReturn(testChargingProcess);
 
         assertThat(transactionService.insertTransaction(params)).isEqualTo(testChargingProcess.getTransactionStart().getTransactionPk());

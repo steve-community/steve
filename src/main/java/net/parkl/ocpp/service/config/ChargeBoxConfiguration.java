@@ -26,7 +26,6 @@ public interface ChargeBoxConfiguration {
     boolean isPreparingTimeoutEnabled(String chargeBoxId);
     int getPreparingTimeoutSecs(String chargeBoxId);
     boolean isTransactionPartialEnabled(String chargeBoxId);
-    boolean waitingForChargingProcessEnabled(String chargeBoxId);
     boolean isStartTimeoutEnabledForAny();
     boolean isPreparingTimeoutEnabledForAny();
     boolean isUsingIntegratedTag(String chargeBoxId);

@@ -49,6 +49,8 @@ import de.rwth.idsg.steve.repository.UserRepository;
 import de.rwth.idsg.steve.repository.dto.Transaction;
 import de.rwth.idsg.steve.repository.dto.UserNotificationFeature;
 import static java.lang.String.format;
+import static de.rwth.idsg.steve.utils.StringUtils.splitByComma;
+import java.util.List;
 import jooq.steve.db.tables.records.UserRecord;
 
 /**
@@ -159,6 +161,7 @@ public class NotificationService {
             return;
         }
 
+        List<String> eMailAddressList = splitByComma(eMailAddress);
         // send email if user with eMail address found
         String bodyUserMail =
                 format("User: %s %s \n\n Connector %d of charging station %s notifies FAULTED! \n\n Error code: %s",
@@ -168,7 +171,7 @@ public class NotificationService {
                         notification.getChargeBoxId(),
                         notification.getErrorCode()
                 );
-        mailService.sendAsync(subject, addTimestamp(bodyUserMail), eMailAddress);
+        mailService.sendAsync(subject, addTimestamp(bodyUserMail), eMailAddressList);
     }
 
     @EventListener
@@ -219,6 +222,7 @@ public class NotificationService {
             return;
         }
 
+        List<String> eMailAddressList = splitByComma(eMailAddress);
         // send email if user with eMail address found
         String bodyUserMail =
                 format("User: '%s' '%s' started transaction '%d' on connector '%s' of charging station '%s'",
@@ -228,7 +232,7 @@ public class NotificationService {
                         notification.getParams().getConnectorId(),
                         notification.getParams().getChargeBoxId()
                 );
-        mailService.sendAsync(subject, addTimestamp(bodyUserMail), eMailAddress);
+        mailService.sendAsync(subject, addTimestamp(bodyUserMail), eMailAddressList);
     }
 
     @EventListener
@@ -291,6 +295,7 @@ public class NotificationService {
             return;
         }
 
+        List<String> eMailAddressList = splitByComma(eMailAddress);
         // send email if user with eMail address found
         String bodyUserMail =
                 format("User: %s %s \n\n Connector %d of charging station %s notifies Suspended_EV",
@@ -299,7 +304,7 @@ public class NotificationService {
                         notification.getConnectorId(),
                         notification.getChargeBoxId()
                 );
-        mailService.sendAsync(subject, addTimestamp(bodyUserMail), eMailAddress);
+        mailService.sendAsync(subject, addTimestamp(bodyUserMail), eMailAddressList);
     }
 
     @EventListener
@@ -332,6 +337,10 @@ public class NotificationService {
 
         Transaction transActParams = transactionRepository.getTransaction(notification.getParams().getTransactionId());
 
+        // if the Transactionstop is received within the first Minute don't send an E-Mail
+        if (!transActParams.getStopTimestamp().isAfter(transActParams.getStartTimestamp().plusMinutes(1))) {
+            return;
+        }
         try {
             userRecord = userRepository.getDetails(transActParams.getOcppIdTag()).getUserRecord();
             if (userRecord.getUserNotificationFeatures()
@@ -347,13 +356,12 @@ public class NotificationService {
             return;
         }
 
-        // if the Transactionstop is received within the first Minute don't send an E-Mail
-        if (transActParams.getStopTimestamp().isAfter(transActParams.getStartTimestamp().plusMinutes(1))) {
-            mailService.sendAsync(subject,
-                    addTimestamp(createContent(transActParams, userRecord)),
-                    eMailAddress
-            );
-        }
+        List<String> eMailAddressList = splitByComma(eMailAddress);
+
+        mailService.sendAsync(subject,
+                addTimestamp(createContent(transActParams, userRecord)),
+                eMailAddressList
+        );
     }
 
     // -------------------------------------------------------------------------

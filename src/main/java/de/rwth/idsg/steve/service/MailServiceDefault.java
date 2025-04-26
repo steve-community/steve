@@ -39,8 +39,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import static de.rwth.idsg.steve.utils.StringUtils.splitByComma;
 import static de.rwth.idsg.steve.utils.StringUtils.isValidAddress;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -62,7 +62,8 @@ public class MailServiceDefault implements MailService {
     @Override
     public void sendTestMail() {
         try {
-            send("Test", "Test", "");
+            List<String> noAddress = new ArrayList();
+            send("Test", "Test", noAddress);
         } catch (MessagingException e) {
             throw new SteveException("Failed to send mail", e);
         }
@@ -72,7 +73,8 @@ public class MailServiceDefault implements MailService {
     public void sendAsync(String subject, String body) {
         asyncTaskExecutor.execute(() -> {
             try {
-                send(subject, body, "");
+                List<String> noAddress = new ArrayList();
+                send(subject, body, noAddress);
             } catch (MessagingException e) {
                 log.error("Failed to send mail", e);
             }
@@ -80,17 +82,17 @@ public class MailServiceDefault implements MailService {
     }
 
     @Override
-    public void sendAsync(String subject, String body, String recipientAddresses) {
+    public void sendAsync(String subject, String body, List<String> eMailAddresses) {
         asyncTaskExecutor.execute(() -> {
             try {
-                send(subject, body, recipientAddresses);
+                send(subject, body, eMailAddresses);
             } catch (MessagingException e) {
                 log.error("Failed to send mail", e);
             }
         });
     }
 
-    private void send(String subject, String body, String recipientAddresses) throws MessagingException {
+    private void send(String subject, String body, List<String> eMailAddresses) throws MessagingException {
         MailSettings settings = getSettings();
         Session session = createSession(settings);
 
@@ -99,12 +101,8 @@ public class MailServiceDefault implements MailService {
         mail.setContent(body, "text/plain");
         mail.setFrom(new InternetAddress(settings.getFrom()));
 
-        List<String> eMailAddresses;
-
-        if (recipientAddresses.isEmpty()) {
+        if (eMailAddresses.isEmpty()) {
             eMailAddresses = settings.getRecipients();
-        } else {
-            eMailAddresses = splitByComma(recipientAddresses);
         }
 
         for (String rep : eMailAddresses) {

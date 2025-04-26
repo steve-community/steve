@@ -19,6 +19,7 @@
 package de.rwth.idsg.steve.service;
 
 import de.rwth.idsg.steve.repository.dto.MailSettings;
+import java.util.List;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -31,6 +32,6 @@ public interface MailService {
     void sendTestMail();
 
     void sendAsync(String subject, String body);
-    
-    void sendAsync(String subject, String body, String recipientAddresses);
+
+    void sendAsync(String subject, String body, List<String> eMailAddresses);
 }

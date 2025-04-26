@@ -31,13 +31,14 @@ import java.util.List;
  */
 public interface TransactionRepository {
     Transaction getTransaction(int transactionPk);
+    
+    Transaction getActiveTransaction(String chargeBoxId, Integer connectorId);
 
     List<Transaction> getTransactions(TransactionQueryForm form);
 
     void writeTransactionsCSV(TransactionQueryForm form, Writer writer);
 
     List<Integer> getActiveTransactionIds(String chargeBoxId);
-    Integer getActiveTransactionId(String chargeBoxId, Integer connectorId);
 
     TransactionDetails getDetails(int transactionPk);
 }

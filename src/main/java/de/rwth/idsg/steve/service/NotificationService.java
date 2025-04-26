@@ -48,7 +48,9 @@ import de.rwth.idsg.steve.repository.TransactionRepository;
 import de.rwth.idsg.steve.repository.UserRepository;
 import de.rwth.idsg.steve.repository.dto.Transaction;
 import de.rwth.idsg.steve.repository.dto.UserNotificationFeature;
+import de.rwth.idsg.steve.web.dto.TransactionQueryForm;
 import static java.lang.String.format;
+import java.util.List;
 import jooq.steve.db.tables.records.UserRecord;
 
 /**
@@ -114,7 +116,7 @@ public class NotificationService {
         // user mail in separate task, so database queries don't block the execution
         asyncTaskExecutor.execute(() -> {
             try {
-                userNotificationocppStationStatusFailure(notification, subject);
+                userNotificationOcppStationStatusFailure(notification, subject);
             } catch (Exception e) {
                 log.error("Failed to execute the user notification of ocppStationStatusFailure.", e);
             }
@@ -130,12 +132,11 @@ public class NotificationService {
         mailService.sendAsync(subject, addTimestamp(body));
     }
 
-    private void userNotificationocppStationStatusFailure(OcppStationStatusFailure notification, String subject) {
+    private void userNotificationOcppStationStatusFailure(OcppStationStatusFailure notification, String subject) {
 
-        Integer transactionPk = transactionRepository.getActiveTransactionId(notification.getChargeBoxId(),
+         Transaction transaction = transactionRepository.getActiveTransaction(notification.getChargeBoxId(),
                 notification.getConnectorId());
-        if (transactionPk != null) {
-            Transaction transaction = transactionRepository.getTransaction(transactionPk);
+        if (transaction != null) {
             String ocppTag = transaction.getOcppIdTag();
             if (ocppTag != null) {
                 String eMailAddress = null;
@@ -249,11 +250,10 @@ public class NotificationService {
     }
 
     private void userNotificationActionSuspendedEV(OcppStationStatusSuspendedEV notification, String subject) {
-
-        Integer transactionPk = transactionRepository.getActiveTransactionId(notification.getChargeBoxId(),
+        
+        Transaction transaction= transactionRepository.getActiveTransaction(notification.getChargeBoxId(),
                 notification.getConnectorId());
-        if (transactionPk != null) {
-            Transaction transaction = transactionRepository.getTransaction(transactionPk);
+        if (transaction != null) {
             String ocppTag = transaction.getOcppIdTag();
             if (ocppTag != null) {
                 // No mail directly after the start of the transaction,

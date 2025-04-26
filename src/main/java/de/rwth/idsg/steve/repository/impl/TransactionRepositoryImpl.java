@@ -75,6 +75,24 @@ public class TransactionRepositoryImpl implements TransactionRepository {
         return getInternal(form).fetch()
                                 .map(new TransactionMapper()).get(0);
     }
+    
+    @Override
+    public Transaction getActiveTransaction(String chargeBoxId, Integer connectorId) {
+        Transaction retVal = null;
+        TransactionQueryForm form = new TransactionQueryForm();
+        form.setChargeBoxId(chargeBoxId);
+        form.setConnectorId(connectorId);
+        form.setReturnCSV(false);
+        form.setType(TransactionQueryForm.QueryType.ACTIVE);
+        Record12<Integer, String, Integer, String, DateTime, String,
+                DateTime, String, String, Integer, Integer, TransactionStopEventActor>
+                transactionRecord = getInternal(form).fetchAny();
+        if (transactionRecord != null) {
+            TransactionMapper mapper = new TransactionMapper();
+            retVal = mapper.map(transactionRecord);
+        }
+        return retVal;   
+    }
 
     @Override
     public List<Transaction> getTransactions(TransactionQueryForm form) {
@@ -97,19 +115,6 @@ public class TransactionRepositoryImpl implements TransactionRepository {
                     .and(CONNECTOR.CHARGE_BOX_ID.equal(chargeBoxId))
                   .where(TRANSACTION.STOP_TIMESTAMP.isNull())
                   .fetch(TRANSACTION.TRANSACTION_PK);
-    }
-
-    @Override
-    public Integer getActiveTransactionId(String chargeBoxId, Integer connectorId) {
-        return ctx.select(TRANSACTION.TRANSACTION_PK)
-                  .from(TRANSACTION)
-                  .join(CONNECTOR)
-                    .on(TRANSACTION.CONNECTOR_PK.equal(CONNECTOR.CONNECTOR_PK))
-                    .and(CONNECTOR.CHARGE_BOX_ID.equal(chargeBoxId))
-                  .where(TRANSACTION.STOP_TIMESTAMP.isNull())
-                    .and(CONNECTOR.CONNECTOR_ID.equal(connectorId))
-                  .orderBy(TRANSACTION.TRANSACTION_PK.desc()) // to avoid fetching ghost transactions, fetch the latest
-                  .fetchAny(TRANSACTION.TRANSACTION_PK);
     }
 
     @Override
@@ -307,6 +312,10 @@ public class TransactionRepositoryImpl implements TransactionRepository {
             selectQuery.addConditions(CONNECTOR.CHARGE_BOX_ID.eq(form.getChargeBoxId()));
         }
 
+        if (form.isConnectorId()) {
+            selectQuery.addConditions(CONNECTOR.CONNECTOR_ID.eq(form.getConnectorId()));
+        }
+        
         if (form.isOcppIdTagSet()) {
             selectQuery.addConditions(TRANSACTION.ID_TAG.eq(form.getOcppIdTag()));
         }

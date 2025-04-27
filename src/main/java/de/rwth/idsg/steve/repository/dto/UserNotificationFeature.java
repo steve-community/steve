@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2024 SteVe Community Team
+ * Copyright (C) 2013-2025 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -19,10 +19,6 @@
 
 package de.rwth.idsg.steve.repository.dto;
 
-//import static de.rwth.idsg.steve.utils.StringUtils.joinByComma;
-//import static de.rwth.idsg.steve.utils.StringUtils.splitByComma;
-//import java.util.List;
-//import java.util.stream.Collectors;
 import static de.rwth.idsg.steve.utils.StringUtils.joinByComma;
 import static de.rwth.idsg.steve.utils.StringUtils.splitByComma;
 import java.util.List;

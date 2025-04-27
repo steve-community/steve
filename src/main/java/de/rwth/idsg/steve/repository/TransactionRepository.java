@@ -31,7 +31,7 @@ import java.util.List;
  */
 public interface TransactionRepository {
     Transaction getTransaction(int transactionPk);
-    
+
     Transaction getActiveTransaction(String chargeBoxId, Integer connectorId);
 
     List<Transaction> getTransactions(TransactionQueryForm form);

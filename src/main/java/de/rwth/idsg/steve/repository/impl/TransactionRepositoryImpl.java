@@ -75,7 +75,7 @@ public class TransactionRepositoryImpl implements TransactionRepository {
         return getInternal(form).fetch()
                                 .map(new TransactionMapper()).get(0);
     }
-    
+
     @Override
     public Transaction getActiveTransaction(String chargeBoxId, Integer connectorId) {
         Transaction retVal = null;
@@ -91,7 +91,7 @@ public class TransactionRepositoryImpl implements TransactionRepository {
             TransactionMapper mapper = new TransactionMapper();
             retVal = mapper.map(transactionRecord);
         }
-        return retVal;   
+        return retVal;
     }
 
     @Override
@@ -315,7 +315,7 @@ public class TransactionRepositoryImpl implements TransactionRepository {
         if (form.isConnectorId()) {
             selectQuery.addConditions(CONNECTOR.CONNECTOR_ID.eq(form.getConnectorId()));
         }
-        
+
         if (form.isOcppIdTagSet()) {
             selectQuery.addConditions(TRANSACTION.ID_TAG.eq(form.getOcppIdTag()));
         }

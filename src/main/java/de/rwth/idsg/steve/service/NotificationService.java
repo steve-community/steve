@@ -265,10 +265,11 @@ public class NotificationService {
 
     private void userNotificationActionSuspendedEV(OcppStationStatusSuspendedEV notification, String subject) {
 
-        Transaction transaction= transactionRepository.getActiveTransaction(notification.getChargeBoxId(),
+        Transaction transaction = transactionRepository.getActiveTransaction(notification.getChargeBoxId(),
                 notification.getConnectorId());
         if (transaction == null) {
-            return;}
+            return;
+        }
 
         String ocppTag = transaction.getOcppIdTag();
         if (ocppTag == null) {

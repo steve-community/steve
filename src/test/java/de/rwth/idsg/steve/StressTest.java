@@ -55,7 +55,7 @@ public abstract class StressTest {
 
         __DatabasePreparer__.prepare();
 
-        Application app = new Application();
+        Application app = new Application(SteveConfiguration.CONFIG);
         try {
             app.start();
             attackInternal();

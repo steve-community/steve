@@ -34,7 +34,11 @@ import java.util.TimeZone;
 @Slf4j
 public class Application {
 
-    private final JettyServer server = new JettyServer(SteveConfiguration.CONFIG);
+    private final JettyServer server;
+
+    public Application(SteveConfiguration config) {
+        server = new JettyServer(config);
+    }
 
     public static void main(String[] args) throws Exception {
         // For Hibernate validator
@@ -53,7 +57,7 @@ public class Application {
             System.out.println("Log file: " + path.get().toAbsolutePath());
         }
 
-        Application app = new Application();
+        Application app = new Application(sc);
 
         try {
             app.start();

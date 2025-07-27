@@ -58,7 +58,7 @@ public class ApplicationTest {
         Assertions.assertEquals(ApplicationProfile.TEST, SteveConfiguration.CONFIG.getProfile());
         __DatabasePreparer__.prepare();
 
-        app = new Application();
+        app = new Application(SteveConfiguration.CONFIG);
         app.start();
     }
 

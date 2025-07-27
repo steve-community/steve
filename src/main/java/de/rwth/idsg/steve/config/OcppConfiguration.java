@@ -88,7 +88,7 @@ public class OcppConfiguration {
         // Just a dummy service to route incoming messages to the appropriate service version. This should be the last
         // one to be created, since in MediatorInInterceptor we go over created/registered services and build a map.
         //
-        List<Interceptor<? extends Message>> mediator = singletonList(new MediatorInInterceptor(springBus()));
+        List<Interceptor<? extends Message>> mediator = singletonList(new MediatorInInterceptor(springBus(), config));
         createOcppService(ocpp12Server, config.getRouterEndpointPath(), mediator, Collections.emptyList());
     }
 

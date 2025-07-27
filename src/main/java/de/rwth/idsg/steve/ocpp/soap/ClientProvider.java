@@ -19,6 +19,7 @@
 package de.rwth.idsg.steve.ocpp.soap;
 
 import com.oneandone.compositejks.SslContextBuilder;
+import de.rwth.idsg.steve.SteveConfiguration;
 import org.apache.cxf.configuration.jsse.TLSClientParameters;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.frontend.ClientProxy;
@@ -28,12 +29,9 @@ import org.apache.cxf.ws.addressing.WSAddressingFeature;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.stereotype.Component;
 
-import jakarta.annotation.PostConstruct;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocketFactory;
 import jakarta.xml.ws.soap.SOAPBinding;
-
-import static de.rwth.idsg.steve.SteveConfiguration.CONFIG;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -42,13 +40,13 @@ import static de.rwth.idsg.steve.SteveConfiguration.CONFIG;
 @Component
 public class ClientProvider {
 
-    @Nullable private TLSClientParameters tlsClientParams;
+    @Nullable private final TLSClientParameters tlsClientParams;
 
-    @PostConstruct
-    private void init() {
-        if (shouldInitSSL()) {
+    public ClientProvider(SteveConfiguration config) {
+        SteveConfiguration.Jetty jettyConfig = config.getJetty();
+        if (shouldInitSSL(jettyConfig)) {
             tlsClientParams = new TLSClientParameters();
-            tlsClientParams.setSSLSocketFactory(setupSSL());
+            tlsClientParams.setSSLSocketFactory(setupSSL(jettyConfig));
         } else {
             tlsClientParams = null;
         }
@@ -77,15 +75,15 @@ public class ClientProvider {
         return f;
     }
 
-    private static boolean shouldInitSSL() {
-        return CONFIG.getJetty().getKeyStorePath() != null && CONFIG.getJetty().getKeyStorePassword() != null;
+    private static boolean shouldInitSSL(SteveConfiguration.Jetty jettyConfig) {
+        return jettyConfig.getKeyStorePath() != null && jettyConfig.getKeyStorePassword() != null;
     }
 
-    private static SSLSocketFactory setupSSL() {
+    private static SSLSocketFactory setupSSL(SteveConfiguration.Jetty jettyConfig) {
         SSLContext ssl;
         try {
-            String keyStorePath = CONFIG.getJetty().getKeyStorePath();
-            String keyStorePwd = CONFIG.getJetty().getKeyStorePassword();
+            String keyStorePath = jettyConfig.getKeyStorePath();
+            String keyStorePwd = jettyConfig.getKeyStorePassword();
             ssl = SslContextBuilder.builder()
                                    .keyStoreFromFile(keyStorePath, keyStorePwd)
                                    .usingTLS()

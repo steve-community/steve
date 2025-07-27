@@ -20,12 +20,14 @@ package de.rwth.idsg.steve.ocpp.ws.ocpp12;
 
 import de.rwth.idsg.ocpp.jaxb.RequestType;
 import de.rwth.idsg.ocpp.jaxb.ResponseType;
+import de.rwth.idsg.steve.SteveConfiguration;
 import de.rwth.idsg.steve.config.DelegatingTaskScheduler;
 import de.rwth.idsg.steve.ocpp.OcppProtocol;
 import de.rwth.idsg.steve.ocpp.OcppVersion;
 import de.rwth.idsg.steve.ocpp.soap.CentralSystemService12_SoapServer;
 import de.rwth.idsg.steve.ocpp.ws.AbstractWebSocketEndpoint;
 import de.rwth.idsg.steve.ocpp.ws.FutureResponseContextStore;
+import de.rwth.idsg.steve.ocpp.ws.SessionContextStoreImpl;
 import de.rwth.idsg.steve.ocpp.ws.pipeline.AbstractCallHandler;
 import de.rwth.idsg.steve.ocpp.ws.pipeline.Deserializer;
 import de.rwth.idsg.steve.ocpp.ws.pipeline.IncomingPipeline;
@@ -59,9 +61,9 @@ public class Ocpp12WebSocketEndpoint extends AbstractWebSocketEndpoint {
     public Ocpp12WebSocketEndpoint(DelegatingTaskScheduler asyncTaskScheduler, OcppServerRepository ocppServerRepository,
                                    FutureResponseContextStore futureResponseContextStore,
                                    ApplicationEventPublisher applicationEventPublisher,
-                                   CentralSystemService12_SoapServer server
-    ) {
-        super(asyncTaskScheduler, ocppServerRepository, futureResponseContextStore, applicationEventPublisher);
+                                   CentralSystemService12_SoapServer server,
+                                   SteveConfiguration config) {
+        super(asyncTaskScheduler, ocppServerRepository, futureResponseContextStore, applicationEventPublisher, new SessionContextStoreImpl(config));
         this.server = server;
         this.futureResponseContextStore = futureResponseContextStore;
     }

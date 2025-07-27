@@ -18,6 +18,7 @@
  */
 package de.rwth.idsg.steve.config;
 
+import de.rwth.idsg.steve.SteveConfiguration;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
@@ -55,13 +56,13 @@ public class SecurityConfiguration {
      * [2] {@link PasswordEncoderFactories#createDelegatingPasswordEncoder()}
      */
     @Bean
-    public PasswordEncoder passwordEncoder() {
-        return CONFIG.getAuth().getPasswordEncoder();
+    public PasswordEncoder passwordEncoder(SteveConfiguration config) {
+        return config.getAuth().getPasswordEncoder();
     }
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        final String prefix = CONFIG.getSpringManagerMapping();
+    public SecurityFilterChain securityFilterChain(HttpSecurity http, SteveConfiguration config) throws Exception {
+        final String prefix = config.getSpringManagerMapping();
 
         RequestMatcher toOverview = request -> {
             String param = request.getParameter("backToOverview");
@@ -73,7 +74,7 @@ public class SecurityConfiguration {
                 req -> req
                     .requestMatchers(
                         "/static/**",
-                        CONFIG.getCxfMapping() + "/**",
+                        config.getCxfMapping() + "/**",
                         WebSocketConfiguration.PATH_INFIX + "**",
                         "/WEB-INF/views/**" // https://github.com/spring-projects/spring-security/issues/13285#issuecomment-1579097065
                     ).permitAll()
@@ -110,7 +111,7 @@ public class SecurityConfiguration {
             // SOAP stations are making POST calls for communication. even though the following path is permitted for
             // all access, there is a global default behaviour from spring security: enable CSRF for all POSTs.
             // we need to disable CSRF for SOAP paths explicitly.
-            .csrf(c -> c.ignoringRequestMatchers(CONFIG.getCxfMapping() + "/**"))
+            .csrf(c -> c.ignoringRequestMatchers(config.getCxfMapping() + "/**"))
             .sessionManagement(
                 req -> req.invalidSessionUrl(prefix + "/signin")
             )
@@ -128,8 +129,9 @@ public class SecurityConfiguration {
 
     @Bean
     @Order(1)
-    public SecurityFilterChain apiKeyFilterChain(HttpSecurity http, ApiAuthenticationManager apiAuthenticationManager) throws Exception {
-        return http.securityMatcher(CONFIG.getApiMapping() + "/**")
+    public SecurityFilterChain apiKeyFilterChain(HttpSecurity http, SteveConfiguration config,
+                                                 ApiAuthenticationManager apiAuthenticationManager) throws Exception {
+        return http.securityMatcher(config.getApiMapping() + "/**")
             .csrf(k -> k.disable())
             .sessionManagement(k -> k.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .addFilter(new BasicAuthenticationFilter(apiAuthenticationManager, apiAuthenticationManager))

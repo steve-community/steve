@@ -37,7 +37,6 @@ import org.springframework.http.converter.json.MappingJackson2HttpMessageConvert
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
-import jakarta.annotation.PostConstruct;
 import java.io.File;
 import java.util.Collections;
 
@@ -60,10 +59,12 @@ public class GithubReleaseCheckService implements ReleaseCheckService {
 
     private static final String FILE_SEPARATOR = File.separator;
 
-    private RestTemplate restTemplate;
+    private final SteveConfiguration config;
+    private final RestTemplate restTemplate;
 
-    @PostConstruct
-    private void init() {
+    public GithubReleaseCheckService(SteveConfiguration config) {
+        this.config = config;
+
         var timeout = Timeout.ofMilliseconds(API_TIMEOUT_IN_MILLIS);
 
         var connectionConfig = ConnectionConfig.custom().setConnectTimeout(timeout).build();
@@ -89,7 +90,7 @@ public class GithubReleaseCheckService implements ReleaseCheckService {
     public ReleaseReport check() {
         try {
             ReleaseResponse response = restTemplate.getForObject(API_URL, ReleaseResponse.class);
-            return getReport(response);
+            return getReport(response, config.getSteveVersion());
 
         } catch (RestClientException e) {
             // Fallback to "there is no new version atm".
@@ -102,10 +103,10 @@ public class GithubReleaseCheckService implements ReleaseCheckService {
     // Private helpers
     // -------------------------------------------------------------------------
 
-    private static ReleaseReport getReport(ReleaseResponse response) {
+    private static ReleaseReport getReport(ReleaseResponse response, String buildVersion) {
         String githubVersion = extractVersion(response);
 
-        Version build = Version.valueOf(SteveConfiguration.CONFIG.getSteveVersion());
+        Version build = Version.valueOf(buildVersion);
         Version github = Version.valueOf(githubVersion);
 
         boolean isGithubMoreRecent = github.greaterThan(build);

@@ -18,7 +18,6 @@
  */
 package de.rwth.idsg.steve.utils;
 
-import de.rwth.idsg.steve.SteveConfiguration;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
@@ -48,18 +47,14 @@ public final class InternetChecker {
             "https://www.facebook.com"
     );
 
-    static {
-        System.setProperty("http.agent", "SteVe/" + SteveConfiguration.CONFIG.getSteveCompositeVersion());
-    }
-
     /**
      * We try every item in the list to compensate for the possibility that one of hosts might be down. If all these
      * big players are down at the same time, that's okay too, because the end of the world must have arrived,
      * obviously.
      */
-    public static boolean isInternetAvailable() {
+    public static boolean isInternetAvailable(String userAgent) {
         for (String s : HOST_LIST) {
-            if (isHostAvailable(s)) {
+            if (isHostAvailable(s, userAgent)) {
                 return true;
             }
         }
@@ -67,11 +62,12 @@ public final class InternetChecker {
         return false;
     }
 
-    private static boolean isHostAvailable(String str) {
+    private static boolean isHostAvailable(String str, String userAgent) {
         try {
             URL url = new URL(str);
             HttpURLConnection con = (HttpURLConnection) url.openConnection();
             con.setRequestProperty("Connection", "close");  // otherwise, default setting is "keep-alive"
+            con.setRequestProperty("User-Agent", userAgent);
             try {
                 con.setConnectTimeout(CONNECT_TIMEOUT);
                 con.connect();

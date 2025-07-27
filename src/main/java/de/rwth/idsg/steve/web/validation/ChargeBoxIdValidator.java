@@ -19,7 +19,6 @@
 package de.rwth.idsg.steve.web.validation;
 
 import com.google.common.base.Strings;
-import de.rwth.idsg.steve.SteveConfiguration;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 
@@ -32,7 +31,12 @@ import java.util.regex.Pattern;
 public class ChargeBoxIdValidator implements ConstraintValidator<ChargeBoxId, String> {
 
     private static final String REGEX = "[^=/()<>]*";
-    private static final Pattern PATTERN = Pattern.compile(getRegexToUse());
+
+    private final Pattern pattern;
+
+    public ChargeBoxIdValidator(String chargeBoxIdValidationRegex) {
+        pattern = Pattern.compile(getRegexToUse(chargeBoxIdValidationRegex));
+    }
 
     @Override
     public void initialize(ChargeBoxId idTag) {
@@ -57,11 +61,10 @@ public class ChargeBoxIdValidator implements ConstraintValidator<ChargeBoxId, St
             return false;
         }
 
-        return PATTERN.matcher(str).matches();
+        return pattern.matcher(str).matches();
     }
 
-    private static String getRegexToUse() {
-        String regexFromConfig = SteveConfiguration.CONFIG.getOcpp().getChargeBoxIdValidationRegex();
-        return Strings.isNullOrEmpty(regexFromConfig) ? REGEX : regexFromConfig;
+    private static String getRegexToUse(String chargeBoxIdValidationRegex) {
+        return Strings.isNullOrEmpty(chargeBoxIdValidationRegex) ? REGEX : chargeBoxIdValidationRegex;
     }
 }

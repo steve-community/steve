@@ -48,8 +48,7 @@ import static de.rwth.idsg.steve.utils.StringUtils.getLastBitFromUrl;
 @RequiredArgsConstructor
 public class OcppWebSocketHandshakeHandler implements HandshakeHandler {
 
-    private static final ChargeBoxIdValidator CHARGE_BOX_ID_VALIDATOR = new ChargeBoxIdValidator();
-
+    private final ChargeBoxIdValidator chargeBoxIdValidator;
     private final DefaultHandshakeHandler delegate;
     private final List<AbstractWebSocketEndpoint> endpoints;
     private final ChargePointRegistrationService chargePointRegistrationService;
@@ -72,7 +71,7 @@ public class OcppWebSocketHandshakeHandler implements HandshakeHandler {
         // -------------------------------------------------------------------------
 
         String chargeBoxId = getLastBitFromUrl(request.getURI().getPath());
-        boolean isValid = CHARGE_BOX_ID_VALIDATOR.isValid(chargeBoxId);
+        boolean isValid = chargeBoxIdValidator.isValid(chargeBoxId);
         if (!isValid) {
             log.error("ChargeBoxId '{}' violates the configured pattern.", chargeBoxId);
             response.setStatusCode(HttpStatus.BAD_REQUEST);

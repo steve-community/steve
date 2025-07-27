@@ -39,6 +39,7 @@ import org.jooq.impl.DefaultConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.core.Ordered;
 import org.springframework.format.support.FormattingConversionService;
 import org.springframework.http.converter.HttpMessageConverter;
@@ -60,6 +61,7 @@ import jakarta.validation.Validator;
 
 import javax.sql.DataSource;
 import java.util.List;
+import java.util.Properties;
 
 /**
  * Configuration and beans of Spring Framework.
@@ -251,5 +253,19 @@ public class BeanConfiguration implements WebMvcConfigurer {
     @Bean
     public SteveConfiguration steveConfiguration() {
         return SteveConfiguration.CONFIG;
+    }
+
+    @Bean
+    public PropertySourcesPlaceholderConfigurer valueConfigurer() {
+        var configurer = new PropertySourcesPlaceholderConfigurer();
+
+        var props = new Properties();
+        var chargeBoxIdValidationRegex = steveConfiguration().getOcpp().getChargeBoxIdValidationRegex();
+        if (chargeBoxIdValidationRegex != null) {
+          props.put("charge-box-id.validation.regex", chargeBoxIdValidationRegex);
+        }
+        configurer.setProperties(props);
+
+        return configurer;
     }
 }

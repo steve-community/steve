@@ -19,32 +19,22 @@
 package de.rwth.idsg.steve.web.validation;
 
 import jakarta.validation.ConstraintValidator;
-import jakarta.validation.ConstraintValidatorContext;
+import jakarta.validation.ConstraintValidatorFactory;
 import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
+import org.springframework.stereotype.Component;
 
-import java.util.List;
-
-/**
- * @author Sevket Goekay <sevketgokay@gmail.com>
- * @since 21.01.2016
- */
+@Component
 @AllArgsConstructor
-public class ChargeBoxIdListValidator implements ConstraintValidator<ChargeBoxId, List<String>> {
+public class SpringConstraintValidatorFactory implements ConstraintValidatorFactory {
 
-    private final ChargeBoxIdValidator validator;
+    private final AutowireCapableBeanFactory beanFactory;
 
     @Override
-    public void initialize(ChargeBoxId constraintAnnotation) {
-        // No-op
+    public <T extends ConstraintValidator<?, ?>> T getInstance(Class<T> key) {
+        return beanFactory.createBean(key);
     }
 
     @Override
-    public boolean isValid(List<String> value, ConstraintValidatorContext context) {
-        for (String s : value) {
-            if (!validator.isValid(s, context)) {
-                return false;
-            }
-        }
-        return true;
-    }
+    public void releaseInstance(ConstraintValidator<?, ?> instance) { }
 }

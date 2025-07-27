@@ -56,7 +56,7 @@ import static de.rwth.idsg.steve.utils.Helpers.getRandomStrings;
  */
 public class StressTestJsonOCPP16 extends StressTest {
 
-    private static final String PATH = getJsonPath();
+    private static final String PATH = getJsonPath(SteveConfiguration.CONFIG);
     private static final OcppVersion VERSION = OcppVersion.V_16;
 
     public static void main(String[] args) throws Exception {

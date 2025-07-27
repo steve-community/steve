@@ -50,7 +50,7 @@ import static de.rwth.idsg.steve.utils.Helpers.getRandomString;
 public class Issue73Fix {
 
     private static final String REGISTERED_OCPP_TAG = __DatabasePreparer__.getRegisteredOcppTag();
-    private static final String path = getPath();
+    private static final String path = getPath(SteveConfiguration.CONFIG);
 
     public static void main(String[] args) throws Exception {
         Assertions.assertEquals(ApplicationProfile.TEST, SteveConfiguration.CONFIG.getProfile());

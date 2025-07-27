@@ -245,4 +245,9 @@ public class BeanConfiguration implements WebMvcConfigurer {
             .map(conv -> ((MappingJackson2HttpMessageConverter) conv).getObjectMapper())
             .orElseThrow(() -> new RuntimeException("There is no MappingJackson2HttpMessageConverter in Spring context"));
     }
+
+    @Bean
+    public SteveConfiguration steveConfiguration() {
+        return SteveConfiguration.CONFIG;
+    }
 }

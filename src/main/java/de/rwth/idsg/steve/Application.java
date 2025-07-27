@@ -34,7 +34,7 @@ import java.util.TimeZone;
 @Slf4j
 public class Application {
 
-    private final JettyServer server = new JettyServer();
+    private final JettyServer server = new JettyServer(SteveConfiguration.CONFIG);
 
     public static void main(String[] args) throws Exception {
         // For Hibernate validator

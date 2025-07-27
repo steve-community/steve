@@ -51,14 +51,14 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
-import static de.rwth.idsg.steve.SteveConfiguration.CONFIG;
-
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 12.12.2014
  */
 @Slf4j
 public class JettyServer {
+
+    private final SteveConfiguration config;
 
     private Server server;
     private SteveAppContext steveAppContext;
@@ -68,6 +68,10 @@ public class JettyServer {
 
     private static final long STOP_TIMEOUT = TimeUnit.SECONDS.toMillis(5);
     private static final long IDLE_TIMEOUT = TimeUnit.MINUTES.toMillis(1);
+
+    public JettyServer(SteveConfiguration config) {
+        this.config = config;
+    }
 
     /**
      * A fully configured Jetty Server instance
@@ -89,7 +93,7 @@ public class JettyServer {
         // HTTP Configuration
         HttpConfiguration httpConfig = new HttpConfiguration();
         httpConfig.setSecureScheme(HttpScheme.HTTPS.asString());
-        httpConfig.setSecurePort(CONFIG.getJetty().getHttpsPort());
+        httpConfig.setSecurePort(config.getJetty().getHttpsPort());
         httpConfig.setOutputBufferSize(32768);
         httpConfig.setRequestHeaderSize(8192);
         httpConfig.setResponseHeaderSize(8192);
@@ -107,11 +111,11 @@ public class JettyServer {
         server.setStopAtShutdown(true);
         server.setStopTimeout(STOP_TIMEOUT);
 
-        if (CONFIG.getJetty().isHttpEnabled()) {
+        if (config.getJetty().isHttpEnabled()) {
             server.addConnector(httpConnector(httpConfig));
         }
 
-        if (CONFIG.getJetty().isHttpsEnabled()) {
+        if (config.getJetty().isHttpsEnabled()) {
             server.addConnector(httpsConnector(httpConfig));
         }
 
@@ -119,33 +123,33 @@ public class JettyServer {
         server.setHandler(steveAppContext.getHandlers());
     }
 
-    private ServerConnector httpConnector(HttpConfiguration httpConfig) {
+    private ServerConnector httpConnector(HttpConfiguration httpconfig) {
         // === jetty-http.xml ===
-        ServerConnector http = new ServerConnector(server, new HttpConnectionFactory(httpConfig));
-        http.setHost(CONFIG.getJetty().getServerHost());
-        http.setPort(CONFIG.getJetty().getHttpPort());
+        ServerConnector http = new ServerConnector(server, new HttpConnectionFactory(httpconfig));
+        http.setHost(config.getJetty().getServerHost());
+        http.setPort(config.getJetty().getHttpPort());
         http.setIdleTimeout(IDLE_TIMEOUT);
         return http;
     }
 
-    private ServerConnector httpsConnector(HttpConfiguration httpConfig) {
+    private ServerConnector httpsConnector(HttpConfiguration httpconfig) {
         // === jetty-https.xml ===
         // SSL Context Factory
         SslContextFactory.Server sslContextFactory = new SslContextFactory.Server();
-        sslContextFactory.setKeyStorePath(CONFIG.getJetty().getKeyStorePath());
-        sslContextFactory.setKeyStorePassword(CONFIG.getJetty().getKeyStorePassword());
-        sslContextFactory.setKeyManagerPassword(CONFIG.getJetty().getKeyStorePassword());
+        sslContextFactory.setKeyStorePath(config.getJetty().getKeyStorePath());
+        sslContextFactory.setKeyStorePassword(config.getJetty().getKeyStorePassword());
+        sslContextFactory.setKeyManagerPassword(config.getJetty().getKeyStorePassword());
 
         // SSL HTTP Configuration
-        HttpConfiguration httpsConfig = new HttpConfiguration(httpConfig);
+        HttpConfiguration httpsConfig = new HttpConfiguration(httpconfig);
         httpsConfig.addCustomizer(new SecureRequestCustomizer());
 
         // SSL Connector
         ServerConnector https = new ServerConnector(server,
                 new SslConnectionFactory(sslContextFactory, HttpVersion.HTTP_1_1.asString()),
                 new HttpConnectionFactory(httpsConfig));
-        https.setHost(CONFIG.getJetty().getServerHost());
-        https.setPort(CONFIG.getJetty().getHttpsPort());
+        https.setHost(config.getJetty().getServerHost());
+        https.setPort(config.getJetty().getHttpsPort());
         https.setIdleTimeout(IDLE_TIMEOUT);
         return https;
     }
@@ -198,12 +202,12 @@ public class JettyServer {
         }
 
         return Arrays.stream(server.getConnectors())
-                     .map(JettyServer::getConnectorPath)
+                     .map(this::getConnectorPath)
                      .flatMap(Collection::stream)
                      .collect(Collectors.toList());
     }
 
-    private static List<String> getConnectorPath(Connector c) {
+    private List<String> getConnectorPath(Connector c) {
         ServerConnector sc = (ServerConnector) c;
 
         final String prefix;
@@ -216,12 +220,12 @@ public class JettyServer {
         Set<String> ips = new HashSet<>();
         String host = sc.getHost();
         if (host == null || host.equals("0.0.0.0")) {
-            ips.addAll(getPossibleIpAddresses());
+            ips.addAll(getPossibleIpAddresses(config.getJetty().getServerHost()));
         } else {
             ips.add(host);
         }
 
-        String layout = "%s://%s:%d" + CONFIG.getContextPath();
+        String layout = "%s://%s:%d" + config.getContextPath();
 
         return ips.stream()
                   .map(k -> String.format(layout, prefix, k, sc.getPort()))
@@ -245,7 +249,7 @@ public class JettyServer {
     /**
      * Uses different APIs to find out the IP of this machine.
      */
-    private static List<String> getPossibleIpAddresses() {
+    private static List<String> getPossibleIpAddresses(String serverHost) {
         final String host = "treibhaus.informatik.rwth-aachen.de";
         final List<String> ips = new ArrayList<>();
 
@@ -292,7 +296,7 @@ public class JettyServer {
         if (ips.isEmpty()) {
             // Well, we failed to read from system, fall back to main.properties.
             // Better than nothing
-            ips.add(CONFIG.getJetty().getServerHost());
+            ips.add(serverHost);
         }
 
         return ips;

@@ -16,6 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+
 package de.rwth.idsg.steve.service;
 
 import jakarta.mail.Authenticator;
@@ -38,6 +39,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import static de.rwth.idsg.steve.utils.StringUtils.isValidAddress;
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 24.01.2016
@@ -57,7 +62,8 @@ public class MailServiceDefault implements MailService {
     @Override
     public void sendTestMail() {
         try {
-            send("Test", "Test");
+            List<String> noAddress = new ArrayList();
+            send("Test", "Test", noAddress);
         } catch (MessagingException e) {
             throw new SteveException("Failed to send mail", e);
         }
@@ -67,7 +73,8 @@ public class MailServiceDefault implements MailService {
     public void sendAsync(String subject, String body) {
         asyncTaskExecutor.execute(() -> {
             try {
-                send(subject, body);
+                List<String> noAddress = new ArrayList();
+                send(subject, body, noAddress);
             } catch (MessagingException e) {
                 log.error("Failed to send mail", e);
             }
@@ -75,7 +82,17 @@ public class MailServiceDefault implements MailService {
     }
 
     @Override
-    public void send(String subject, String body) throws MessagingException {
+    public void sendAsync(String subject, String body, List<String> eMailAddresses) {
+        asyncTaskExecutor.execute(() -> {
+            try {
+                send(subject, body, eMailAddresses);
+            } catch (MessagingException e) {
+                log.error("Failed to send mail", e);
+            }
+        });
+    }
+
+    private void send(String subject, String body, List<String> eMailAddresses) throws MessagingException {
         MailSettings settings = getSettings();
         Session session = createSession(settings);
 
@@ -84,13 +101,24 @@ public class MailServiceDefault implements MailService {
         mail.setContent(body, "text/plain");
         mail.setFrom(new InternetAddress(settings.getFrom()));
 
-        for (String rep : settings.getRecipients()) {
-            mail.addRecipient(Message.RecipientType.TO, new InternetAddress(rep));
+        if (eMailAddresses.isEmpty()) {
+            eMailAddresses = settings.getRecipients();
+        }
+
+        for (String rep : eMailAddresses) {
+            if (isValidAddress(rep)) {
+                mail.addRecipient(Message.RecipientType.TO, new InternetAddress(rep));
+            } else {
+                log.error("Failed to send mail to " + rep + "! Format of the address is invalid.");
+            }
         }
 
         try (Transport transport = session.getTransport()) {
             transport.connect();
             transport.sendMessage(mail, mail.getAllRecipients());
+        }
+        catch (Exception e) {
+            log.error("Failed to send mail(s)! ", e);
         }
     }
 

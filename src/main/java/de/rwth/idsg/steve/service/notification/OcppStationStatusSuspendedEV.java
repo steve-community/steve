@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2025 SteVe Community Team
+ * Copyright (C) 2013-2024 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,24 +16,20 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package de.rwth.idsg.steve.repository;
+package de.rwth.idsg.steve.service.notification;
 
-import de.rwth.idsg.steve.repository.dto.User;
-import de.rwth.idsg.steve.web.dto.UserForm;
-import de.rwth.idsg.steve.web.dto.UserQueryForm;
-
-import java.util.List;
+import lombok.Data;
+import org.joda.time.DateTime;
 
 /**
- * @author Sevket Goekay <sevketgokay@gmail.com>
- * @since 25.11.2015
+ * @author fnkbsi
+ * @since 12.10.2022
  */
-public interface UserRepository {
-    List<User.Overview> getOverview(UserQueryForm form);
-    User.Details getDetails(int userPk);
-    User.Details getDetails(String ocppTag);
 
-    void add(UserForm form);
-    void update(UserForm form);
-    void delete(int userPk);
+@Data
+public class OcppStationStatusSuspendedEV {
+
+  private final String chargeBoxId;
+  private final int connectorId;
+  private final DateTime timestamp;
 }

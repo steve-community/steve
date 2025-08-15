@@ -47,22 +47,17 @@
         <slf4j.version>2.0.17</slf4j.version>
         <plugin.license-maven.version>5.0.0</plugin.license-maven.version>
 
-        <context.path>steve</context.path>
         <server.host>127.0.0.1</server.host>
-        <server.gzip.enabled>false</server.gzip.enabled>
         <http.port>8080</http.port>
         <db.ip>localhost</db.ip>
         <db.port>3306</db.port>
         <db.schema>stevedb</db.schema>
         <db.user>steve</db.user>
         <db.password>changeme</db.password>
-        <db.sql.logging>false</db.sql.logging>
         <auth.user>admin</auth.user>
         <auth.password>1234</auth.password>
         <webapi.key>STEVE-API-KEY</webapi.key>
         <webapi.value></webapi.value>
-        <profile>prod</profile>
-        <appender>CONSOLE</appender>
         <!-- In Mysql: schema == database (http://dev.mysql.com/doc/refman/5.6/en/glossary.html#glos_schema) -->
         <db.jdbcUrl>jdbc:mysql://${db.ip}:${db.port}/${db.schema}?useSSL=true&amp;serverTimezone=UTC</db.jdbcUrl>
     </properties>
@@ -75,8 +70,11 @@
             </activation>
             <properties>
                 <skipTests>true</skipTests>
+                <context.path>steve</context.path>
+                <db.sql.logging>false</db.sql.logging>
                 <server.gzip.enabled>true</server.gzip.enabled>
                 <appender>FILE</appender>
+                <profile>prod</profile>
             </properties>
         </profile>
         <profile>
@@ -85,16 +83,9 @@
                 <skipTests>true</skipTests>
                 <context.path></context.path>
                 <db.sql.logging>true</db.sql.logging>
+                <server.gzip.enabled>false</server.gzip.enabled>
+                <appender>CONSOLE</appender>
                 <profile>dev</profile>
-            </properties>
-        </profile>
-        <profile>
-            <id>test</id>
-            <properties>
-                <skipTests>false</skipTests>
-                <db.sql.logging>true</db.sql.logging>
-                <profile>test</profile>
-                <db.schema>stevedb_test_2aa6a783d47d</db.schema>
             </properties>
         </profile>
     </profiles>

@@ -69,7 +69,7 @@
         <th>Power Limit (in Charging Rate Unit selected above)</th>
         <th>Number Phases</th>
         <th>
-            <input type="button" id="addRow" value="Add Period">
+            <input type="button" id="addRow" class="btnScheduleRow" value="Add Period">
         </th>
     </tr>
     </thead>
@@ -79,7 +79,7 @@
             <td><form:input path="schedulePeriodMap[${schedulePeriodMap.key}].startPeriodInSeconds"/></td>
             <td><form:input path="schedulePeriodMap[${schedulePeriodMap.key}].powerLimit"/></td>
             <td><form:input path="schedulePeriodMap[${schedulePeriodMap.key}].numberPhases" placeholder="if empty, 3 will be assumed"/></td>
-            <td><input type="button" class="removeRow" value="Delete"></td>
+            <td><input type="button" id="removeRow" class="btnScheduleRow" value="Delete"></td>
         </tr>
     </c:forEach>
     </tbody>

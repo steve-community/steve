@@ -80,30 +80,6 @@
             </properties>
         </profile>
         <profile>
-            <id>docker</id>
-            <properties>
-                <skipTests>true</skipTests>
-                <db.ip>mariadb</db.ip>
-                <server.host>0.0.0.0</server.host>
-                <http.port>8180</http.port>
-            </properties>
-        </profile>
-        <profile>
-            <id>kubernetes</id>
-            <properties>
-                <skipTests>true</skipTests>
-                <db.jdbcUrl>jdbc:mysql://$DB_HOST:$DB_PORT/$DB_SCHEMA?useSSL=true&amp;serverTimezone=UTC</db.jdbcUrl>
-                <db.user>$DB_USER</db.user>
-                <db.password>$DB_PASSWORD</db.password>
-                <server.host>0.0.0.0</server.host>
-                <http.port>8180</http.port>
-                <auth.user>$ADMIN_USERNAME</auth.user>
-                <auth.password>$ADMIN_PASSWORD</auth.password>
-                <webapi.key>$WEBAPI_KEY</webapi.key>
-                <webapi.value>$WEBAPI_VALUE</webapi.value>
-            </properties>
-        </profile>
-        <profile>
             <id>dev</id>
             <properties>
                 <skipTests>true</skipTests>

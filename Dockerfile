@@ -18,9 +18,20 @@ VOLUME ["/code"]
 # Copy the application's code
 COPY . /code
 
-# Wait for the db to startup(via dockerize), then 
+# Wait for the db to startup(via dockerize), then
 # Build and run steve, requires a db to be available on port 3306
-CMD dockerize -wait tcp://mariadb:3306 -timeout 60s && \
-	./mvnw clean package -Pdocker -Djdk.tls.client.protocols="TLSv1,TLSv1.1,TLSv1.2" && \
-	java -XX:MaxRAMPercentage=85 -jar target/steve.jar
+CMD dockerize -wait tcp://mariadb:3306 -timeout 60s \
+  && ./mvnw clean package \
+	  -DskipTests \
+	  -Dhttp.port=8180 \
+	  -Dserver.host="0.0.0.0" \
+	  -Ddb.ip="${MYSQL_HOST}" \
+	  -Ddb.port=${MYSQL_PORT} \
+	  -Ddb.schema="${MYSQL_DATABASE}" \
+	  -Ddb.user="${MYSQL_USER}" \
+	  -Ddb.password="${MYSQL_PASSWORD}" \
+	  -Dserver.gzip.enabled=false \
+	  -Dappender="CONSOLE" \
+	  -Djdk.tls.client.protocols="TLSv1,TLSv1.1,TLSv1.2" \
+  && java -XX:MaxRAMPercentage=85 -jar target/steve.jar
 

@@ -47,8 +47,24 @@
         <slf4j.version>2.0.17</slf4j.version>
         <plugin.license-maven.version>5.0.0</plugin.license-maven.version>
 
+        <context.path>steve</context.path>
+        <server.host>127.0.0.1</server.host>
+        <server.gzip.enabled>false</server.gzip.enabled>
+        <http.port>8080</http.port>
+        <db.ip>localhost</db.ip>
+        <db.port>3306</db.port>
+        <db.schema>stevedb</db.schema>
+        <db.user>steve</db.user>
+        <db.password>changeme</db.password>
+        <db.sql.logging>false</db.sql.logging>
+        <auth.user>admin</auth.user>
+        <auth.password>1234</auth.password>
+        <webapi.key>STEVE-API-KEY</webapi.key>
+        <webapi.value></webapi.value>
+        <profile>prod</profile>
+        <appender>CONSOLE</appender>
         <!-- In Mysql: schema == database (http://dev.mysql.com/doc/refman/5.6/en/glossary.html#glos_schema) -->
-        <jdbcUrl>jdbc:mysql://${db.ip}:${db.port}/${db.schema}?useSSL=true&amp;serverTimezone=UTC</jdbcUrl>
+        <db.jdbcUrl>jdbc:mysql://${db.ip}:${db.port}/${db.schema}?useSSL=true&amp;serverTimezone=UTC</db.jdbcUrl>
     </properties>
 
     <profiles>
@@ -58,36 +74,51 @@
                 <activeByDefault>true</activeByDefault>
             </activation>
             <properties>
-                <envName>prod</envName>
                 <skipTests>true</skipTests>
+                <server.gzip.enabled>true</server.gzip.enabled>
+                <appender>FILE</appender>
             </properties>
         </profile>
         <profile>
             <id>docker</id>
             <properties>
-                <envName>docker</envName>
                 <skipTests>true</skipTests>
+                <db.ip>mariadb</db.ip>
+                <server.host>0.0.0.0</server.host>
+                <http.port>8180</http.port>
             </properties>
         </profile>
         <profile>
             <id>kubernetes</id>
             <properties>
-                <envName>kubernetes</envName>
                 <skipTests>true</skipTests>
+                <db.jdbcUrl>jdbc:mysql://$DB_HOST:$DB_PORT/$DB_SCHEMA?useSSL=true&amp;serverTimezone=UTC</db.jdbcUrl>
+                <db.user>$DB_USER</db.user>
+                <db.password>$DB_PASSWORD</db.password>
+                <server.host>0.0.0.0</server.host>
+                <http.port>8180</http.port>
+                <auth.user>$ADMIN_USERNAME</auth.user>
+                <auth.password>$ADMIN_PASSWORD</auth.password>
+                <webapi.key>$WEBAPI_KEY</webapi.key>
+                <webapi.value>$WEBAPI_VALUE</webapi.value>
             </properties>
         </profile>
         <profile>
             <id>dev</id>
             <properties>
-                <envName>dev</envName>
                 <skipTests>true</skipTests>
+                <context.path></context.path>
+                <db.sql.logging>true</db.sql.logging>
+                <profile>dev</profile>
             </properties>
         </profile>
         <profile>
             <id>test</id>
             <properties>
-                <envName>test</envName>
                 <skipTests>false</skipTests>
+                <db.sql.logging>true</db.sql.logging>
+                <profile>test</profile>
+                <db.schema>stevedb_test_2aa6a783d47d</db.schema>
             </properties>
         </profile>
     </profiles>
@@ -96,7 +127,7 @@
         <finalName>${project.artifactId}</finalName>
         <resources>
             <resource>
-                <directory>src/main/resources/config/${envName}</directory>
+                <directory>src/main/resources/config</directory>
                 <filtering>true</filtering>
             </resource>
             <resource>
@@ -253,26 +284,6 @@
                 </configuration>
             </plugin>
 
-            <!-- Read from main.properties the DB configuration -->
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>properties-maven-plugin</artifactId>
-                <version>1.2.1</version>
-                <executions>
-                    <execution>
-                        <phase>initialize</phase>
-                        <goals>
-                            <goal>read-project-properties</goal>
-                        </goals>
-                        <configuration>
-                            <files>
-                                <file>src/main/resources/config/${envName}/main.properties</file>
-                            </files>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-dependency-plugin</artifactId>
@@ -360,7 +371,7 @@
 
                     <cleanDisabled>true</cleanDisabled>
                     <driver>com.mysql.cj.jdbc.Driver</driver>
-                    <url>${jdbcUrl}</url>
+                    <url>${db.jdbcUrl}</url>
                     <user>${db.user}</user>
                     <password>${db.password}</password>
                     <schemas>
@@ -419,7 +430,7 @@
                 <configuration>
                     <jdbc>
                         <driver>com.mysql.cj.jdbc.Driver</driver>
-                        <url>${jdbcUrl}</url>
+                        <url>${db.jdbcUrl}</url>
                         <user>${db.user}</user>
                         <password>${db.password}</password>
                     </jdbc>

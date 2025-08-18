@@ -230,7 +230,6 @@ public class WebUserService implements UserDetailsManager {
                         .webUserPk(r.value1())
                         .webUsername(r.value2())
                         .enabled(r.value3())
-                        //.authorities(fromJsonToString(r.value4()))
                         .authorities(WebUserAuthority.fromJsonValue(r.value4()))
                         .build()
                 );

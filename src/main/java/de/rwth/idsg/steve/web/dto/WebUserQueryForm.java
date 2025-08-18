@@ -1,8 +1,5 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2023 SteVe Community Team
-/*
- * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
  * Copyright (C) 2013-2024 SteVe Community Team
  * All Rights Reserved.
  *
@@ -40,19 +37,14 @@ public class WebUserQueryForm {
     private String apiToken;
 
     public boolean isSetWebUsername() {
-        return webUsername != null;
+        return webUsername != null && !webUsername.isBlank();
     }
 
     public boolean isSetRoles() {
-        return roles != null;
+        return roles != null && !roles.isBlank();
     }
 
     public boolean isSetEnabled() {
         return enabled != null;
     }
-
-    public boolean isSetApiKey() {
-        return apiToken != null;
-    }
-
 }

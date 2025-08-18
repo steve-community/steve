@@ -28,14 +28,12 @@
 			<span>
 				Access denied for the requested page! For further information ask your administrator.
     			<a class="tooltip" href="#"><img src="${ctxPath}/static/images/info.png" style="vertical-align:middle" alt="info_image">
-            		<span>Some information and configuration pages are only accessable for administrators.</span>
+            		<span>Some information and configuration pages are only accessible for administrators.</span>
         		</a>
 			</span>
 		</section>
 
-		<form action="${ctxPath}/manager/home">
-			<input type="submit" value="Home">
-		</form>
+    <a href="${ctxPath}/manager/home">Home</a>
 	</div>
 </div>
 <%@ include file="00-footer.jsp" %>

@@ -63,7 +63,10 @@ public class SecurityConfiguration {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         final String prefix = CONFIG.getSpringManagerMapping();
 
-        RequestMatcher toOverview = (request) -> request.getParameter("backToOverview") != null;
+        RequestMatcher toOverview = request -> {
+            String param = request.getParameter("backToOverview");
+            return param != null && !param.isEmpty();
+        };
 
         return http
             .authorizeHttpRequests(
@@ -77,9 +80,9 @@ public class SecurityConfiguration {
                     .requestMatchers(prefix + "/home").hasAnyAuthority("USER", "ADMIN")
                     // webuser
                         //only allowed to change the own password
-                    .requestMatchers(prefix + "/webusers" + "/password/{name}")
+                    .requestMatchers(prefix + "/webusers/password/{name}")
                         .access(new WebExpressionAuthorizationManager("#name == authentication.name"))
-                    .requestMatchers(prefix + "/webusers" + "/apipassword/{name}")
+                    .requestMatchers(prefix + "/webusers/apipassword/{name}")
                         .access(new WebExpressionAuthorizationManager("#name == authentication.name"))
                         // otherwise denies access on backToOverview!
                     .requestMatchers(toOverview).hasAnyAuthority("USER", "ADMIN")
@@ -87,21 +90,21 @@ public class SecurityConfiguration {
                     .requestMatchers(HttpMethod.POST, prefix + "/webusers/**").hasAuthority("ADMIN")
                     // users
                     .requestMatchers(prefix + "/users").hasAnyAuthority("USER", "ADMIN")
-                    .requestMatchers(prefix + "/users" + "/details/**").hasAnyAuthority("USER", "ADMIN")
+                    .requestMatchers(prefix + "/users/details/**").hasAnyAuthority("USER", "ADMIN")
                      //ocppTags
                     .requestMatchers(prefix + "/ocppTags").hasAnyAuthority("USER", "ADMIN")
-                    .requestMatchers(prefix + "/ocppTags" + "/details/**").hasAnyAuthority("USER", "ADMIN")
+                    .requestMatchers(prefix + "/ocppTags/details/**").hasAnyAuthority("USER", "ADMIN")
                      // chargepoints
                     .requestMatchers(prefix + "/chargepoints").hasAnyAuthority("USER", "ADMIN")
-                    .requestMatchers(prefix + "/chargepoints" + "/details/**").hasAnyAuthority("USER", "ADMIN")
+                    .requestMatchers(prefix + "/chargepoints/details/**").hasAnyAuthority("USER", "ADMIN")
                      // transactions and reservations
                     .requestMatchers(prefix + "/transactions").hasAnyAuthority("USER", "ADMIN")
-                    .requestMatchers(prefix + "/transactions" + "/details/**").hasAnyAuthority("USER", "ADMIN")
+                    .requestMatchers(prefix + "/transactions/details/**").hasAnyAuthority("USER", "ADMIN")
                     .requestMatchers(prefix + "/reservations").hasAnyAuthority("USER", "ADMIN")
-                    .requestMatchers(prefix + "/reservations" + "/**").hasAnyAuthority("ADMIN")
+                    .requestMatchers(prefix + "/reservations/**").hasAnyAuthority("ADMIN")
                      // singout and noAccess
-                    .requestMatchers(prefix + "/signout/" + "**").hasAnyAuthority("USER", "ADMIN")
-                    .requestMatchers(prefix + "/noAccess/" + "**").hasAnyAuthority("USER", "ADMIN")
+                    .requestMatchers(prefix + "/signout/**").hasAnyAuthority("USER", "ADMIN")
+                    .requestMatchers(prefix + "/noAccess/**").hasAnyAuthority("USER", "ADMIN")
                     .requestMatchers(prefix + "/**").hasAuthority("ADMIN")
             )
             // SOAP stations are making POST calls for communication. even though the following path is permitted for

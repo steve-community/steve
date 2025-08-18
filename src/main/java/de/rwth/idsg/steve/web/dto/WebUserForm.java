@@ -22,6 +22,7 @@ import jakarta.validation.constraints.AssertFalse;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
+import lombok.Setter;
 
 
 /**
@@ -31,6 +32,7 @@ import lombok.Getter;
 @Getter
 public class WebUserForm extends WebUserBaseForm {
 
+    @Setter
     @NotNull(message = "Password is required")
     @Size(min = 8, message = "Password requires 8 or more characters")
     private String password = "";
@@ -42,21 +44,15 @@ public class WebUserForm extends WebUserBaseForm {
     @AssertFalse(message = "The repeated password did not match!")
     private Boolean pwError;
 
+    @Setter
     private String apiPassword = "";
 
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
     public void setPasswordComparison(String passwordComparison) {
-        this.pwError = true;
         this.passwordComparison = passwordComparison;
-        if (passwordComparison != null) {
+        if (passwordComparison == null) {
+            this.pwError = true;
+        } else {
             this.pwError = !passwordComparison.equals(this.password);
         }
-    }
-
-    public void setApiPassword(String apiPassword) {
-        this.apiPassword = apiPassword;
     }
 }

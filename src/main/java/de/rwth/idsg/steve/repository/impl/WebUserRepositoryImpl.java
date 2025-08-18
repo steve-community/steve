@@ -25,20 +25,22 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jooq.Condition;
 import org.jooq.DSLContext;
+import org.jooq.Field;
 import org.jooq.JSON;
-import org.springframework.stereotype.Repository;
-
-import static jooq.steve.db.Tables.WEB_USER;
 import org.jooq.Record4;
 import org.jooq.Result;
 import org.jooq.SelectQuery;
+import org.jooq.impl.DSL;
+import org.jooq.impl.SQLDataType;
+import org.springframework.stereotype.Repository;
+
+import static jooq.steve.db.Tables.WEB_USER;
+import static org.jooq.impl.DSL.count;
 
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-
-import static org.jooq.impl.DSL.condition;
-import static org.jooq.impl.DSL.count;
+import java.util.Objects;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -154,7 +156,7 @@ public class WebUserRepositoryImpl implements WebUserRepository {
     }
 
     @Override
-    public WebUserRecord loadUserByUsePk(Integer webUserPk) {
+    public WebUserRecord loadUserByUserPk(Integer webUserPk) {
         return ctx.selectFrom(WEB_USER)
             .where(WEB_USER.WEB_USER_PK.eq(webUserPk))
             .fetchOne();
@@ -180,7 +182,7 @@ public class WebUserRepositoryImpl implements WebUserRepository {
         }
 
         if (form.isSetRoles()) {
-            String[] split = form.getRoles().split(","); //Semicolon seperated String to StringArray
+            String[] split = form.getRoles().split(","); // Comma seperated String to StringArray
             List<String> roles = Arrays.stream(split).map(String::strip).toList();
             selectQuery.addConditions(conditionsForAuthorities(roles));
         }
@@ -190,8 +192,14 @@ public class WebUserRepositoryImpl implements WebUserRepository {
 
     private static List<Condition> conditionsForAuthorities(List<String> authorities) {
         return authorities.stream()
-            .map(it -> JSON.json("\"" + it + "\""))
-            .map(it -> condition("json_contains({0}, {1})", WEB_USER.AUTHORITIES, it))
+            .filter(Objects::nonNull)
+            .filter(it -> !it.trim().isEmpty())
+            .map(WebUserRepositoryImpl::jsonQuote)
+            .map(WEB_USER.AUTHORITIES::contains)
             .toList();
+    }
+
+    private static Field<JSON> jsonQuote(String element) {
+        return DSL.field("JSON_QUOTE({0})", SQLDataType.JSON, DSL.val(element));
     }
 }

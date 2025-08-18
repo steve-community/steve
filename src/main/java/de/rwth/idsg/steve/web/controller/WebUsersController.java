@@ -18,29 +18,25 @@
  */
 package de.rwth.idsg.steve.web.controller;
 
-
 import de.rwth.idsg.steve.service.WebUserService;
 import de.rwth.idsg.steve.web.dto.WebUserAuthority;
 import de.rwth.idsg.steve.web.dto.WebUserBaseForm;
 import de.rwth.idsg.steve.web.dto.WebUserForm;
 import de.rwth.idsg.steve.web.dto.WebUserQueryForm;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.*;
 
 import jakarta.validation.Valid;
 
-
+@RequiredArgsConstructor
 @Controller
 @RequestMapping(value = "/manager/webusers")
 public class WebUsersController {
 
-    @Autowired private WebUserService webUserService;
+    private final WebUserService webUserService;
 
     private static final String PARAMS = "params";
 
@@ -61,13 +57,13 @@ public class WebUsersController {
     // HTTP methods
     // -------------------------------------------------------------------------
 
-    @RequestMapping(method = RequestMethod.GET)
+    @GetMapping
     public String getOverview(Model model) {
         initList(model, new WebUserQueryForm());
         return "data-man/webusers";
     }
 
-    @RequestMapping(value = QUERY_PATH, method = RequestMethod.GET)
+    @GetMapping(value = QUERY_PATH)
     public String getQuery(@ModelAttribute(PARAMS) WebUserQueryForm params, Model model) {
         initList(model, params);
         return "data-man/webusers";
@@ -78,26 +74,29 @@ public class WebUsersController {
         model.addAttribute("webuserList", webUserService.getOverview(params));
     }
 
-    @RequestMapping(value = DETAILS_PATH, method = RequestMethod.GET)
+    @GetMapping(value = DETAILS_PATH)
     public String getDetails(@PathVariable("webUserPk") Integer webUserPk, Model model) {
        WebUserBaseForm form = webUserService.getDetails(webUserPk);
 
         model.addAttribute("webuserForm", form);
+        model.addAttribute("availableAuthorities", WebUserAuthority.values());
         return "data-man/webuserDetails";
     }
 
-    @RequestMapping(value = ADD_PATH, method = RequestMethod.GET)
+    @GetMapping(value = ADD_PATH)
     public String addGet(Model model) {
         WebUserForm webUserForm = new WebUserForm();
         webUserForm.setAuthorities(WebUserAuthority.USER);
         model.addAttribute("webuserForm", webUserForm);
+        model.addAttribute("availableAuthorities", WebUserAuthority.values());
         return "data-man/webuserAdd";
     }
 
-    @RequestMapping(params = "add", value = ADD_PATH, method = RequestMethod.POST)
+    @PostMapping(params = "add", value = ADD_PATH)
     public String addPost(@Valid @ModelAttribute("webuserForm") WebUserForm webuserForm,
                           BindingResult result, Model model) {
         if (result.hasErrors()) {
+            model.addAttribute("availableAuthorities", WebUserAuthority.values());
             return "data-man/webuserAdd";
         }
 
@@ -105,10 +104,11 @@ public class WebUsersController {
         return toOverview();
     }
 
-    @RequestMapping(params = "update", value = UPDATE_PATH, method = RequestMethod.POST)
+    @PostMapping(params = "update", value = UPDATE_PATH)
     public String update(@Valid @ModelAttribute("webuserForm") WebUserBaseForm webuserBaseForm,
                          BindingResult result, Model model) {
         if (result.hasErrors()) {
+            model.addAttribute("availableAuthorities", WebUserAuthority.values());
             return "data-man/webuserDetails";
         }
 
@@ -116,22 +116,26 @@ public class WebUsersController {
         return toOverview();
     }
 
-    @RequestMapping(value = PASSWORD_PATH, method = RequestMethod.GET)
+    @GetMapping(value = PASSWORD_PATH)
     public String passwordChangeGet(@PathVariable("webUserName") String webUserName, Model model) {
-        WebUserForm webUserForm = new WebUserForm();
-        WebUserBaseForm webUserBaseForm = webUserService.getDetails(webUserName);
-        webUserForm.setWebUserPk(webUserBaseForm.getWebUserPk());
-        webUserForm.setWebUsername(webUserBaseForm.getWebUsername());
-        webUserForm.setAuthorities(webUserBaseForm.getAuthorities());
-        webUserForm.setEnabled(webUserBaseForm.getEnabled());
-
+        WebUserBaseForm base = webUserService.getDetails(webUserName);
+        WebUserForm webUserForm = fromBase(base);
         model.addAttribute("webuserForm", webUserForm);
         return "data-man/webuserPassword";
     }
 
-    @RequestMapping(params = "change", value = PASSWORD_PATH, method = RequestMethod.POST)
+    private static WebUserForm fromBase(WebUserBaseForm webUserBaseForm) {
+        WebUserForm webUserForm = new WebUserForm();
+        webUserForm.setWebUserPk(webUserBaseForm.getWebUserPk());
+        webUserForm.setWebUsername(webUserBaseForm.getWebUsername());
+        webUserForm.setAuthorities(webUserBaseForm.getAuthorities());
+        webUserForm.setEnabled(webUserBaseForm.getEnabled());
+        return webUserForm;
+    }
+
+    @PostMapping(params = "change", value = PASSWORD_PATH)
     public String passwordChange(@Valid @ModelAttribute("webuserForm") WebUserForm webuserForm,
-                         BindingResult result, Model model) {
+                         BindingResult result) {
         if (result.hasErrors()) {
             return "data-man/webuserPassword";
         }
@@ -140,22 +144,17 @@ public class WebUsersController {
         return toDetails(webuserForm.getWebUserPk());
     }
 
-    @RequestMapping(value = API_PASSWORD_PATH, method = RequestMethod.GET)
+    @GetMapping(value = API_PASSWORD_PATH)
     public String apiPasswordChangeGet(@PathVariable("webUserName") String webUserName, Model model) {
-        WebUserForm webUserForm = new WebUserForm();
-        WebUserBaseForm webUserBaseForm = webUserService.getDetails(webUserName);
-        webUserForm.setWebUserPk(webUserBaseForm.getWebUserPk());
-        webUserForm.setWebUsername(webUserBaseForm.getWebUsername());
-        webUserForm.setAuthorities(webUserBaseForm.getAuthorities());
-        webUserForm.setEnabled(webUserBaseForm.getEnabled());
-
+        WebUserBaseForm base = webUserService.getDetails(webUserName);
+        WebUserForm webUserForm = fromBase(base);
         model.addAttribute("webuserForm", webUserForm);
         return "data-man/webuserApiPassword";
     }
 
-    @RequestMapping(params = "change", value = API_PASSWORD_PATH, method = RequestMethod.POST)
+    @PostMapping(params = "change", value = API_PASSWORD_PATH)
     public String apiPasswordChange(@Valid @ModelAttribute("webuserForm") WebUserForm webuserForm,
-                         BindingResult result, Model model) {
+                         BindingResult result) {
         if (result.hasErrors()) {
             return "data-man/webuserApiPassword";
         }
@@ -164,7 +163,7 @@ public class WebUsersController {
         return toDetails(webuserForm.getWebUserPk());
     }
 
-    @RequestMapping(value = DELETE_PATH, method = RequestMethod.POST)
+    @PostMapping(value = DELETE_PATH)
     public String delete(@PathVariable("webUserPk") Integer webUserPk) {
         webUserService.deleteUser(webUserPk);
         return toOverview();
@@ -174,34 +173,31 @@ public class WebUsersController {
     // Back to Overview
     // -------------------------------------------------------------------------
 
-    @RequestMapping(params = "backToOverview", value = PASSWORD_PATH, method = RequestMethod.POST)
-    public String passwordBackToOverview(@Valid @ModelAttribute("webuserForm") WebUserForm webuserForm,
-                         BindingResult result, Model model) {
+    @PostMapping(params = "backToOverview", value = PASSWORD_PATH)
+    public String passwordBackToOverview(@Valid @ModelAttribute("webuserForm") WebUserForm webuserForm) {
         return toDetails(webuserForm.getWebUserPk());
     }
 
-    @RequestMapping(params = "backToOverview", value = API_PASSWORD_PATH, method = RequestMethod.POST)
-    public String apiPasswordBackToOverview(@Valid @ModelAttribute("webuserForm") WebUserForm webuserForm,
-                         BindingResult result, Model model) {
+    @PostMapping(params = "backToOverview", value = API_PASSWORD_PATH)
+    public String apiPasswordBackToOverview(@Valid @ModelAttribute("webuserForm") WebUserForm webuserForm) {
         return toDetails(webuserForm.getWebUserPk());
     }
 
-    @RequestMapping(params = "backToOverview", value = ADD_PATH, method = RequestMethod.POST)
+    @PostMapping(params = "backToOverview", value = ADD_PATH)
     public String addBackToOverview() {
         return toOverview();
     }
 
-    @RequestMapping(params = "backToOverview", value = UPDATE_PATH, method = RequestMethod.POST)
+    @PostMapping(params = "backToOverview", value = UPDATE_PATH)
     public String updateBackToOverview() {
         return toOverview();
     }
 
-    private String toOverview() {
+    private static String toOverview() {
         return "redirect:/manager/webusers";
     }
 
-    private String toDetails(Integer userPk) {
-        String redirect_str = String.format("redirect:/manager/webusers/details/%s", userPk);
-        return redirect_str;
+    private static String toDetails(Integer userPk) {
+      return String.format("redirect:/manager/webusers/details/%s", userPk);
     }
 }

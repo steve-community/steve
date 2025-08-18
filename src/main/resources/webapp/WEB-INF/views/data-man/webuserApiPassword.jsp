@@ -31,7 +31,7 @@
 </spring:hasBindErrors>
 <div class="content"><div>
 <section><span>Webuser change password</span></section>
-    <form:form action="${ctxPath}/manager/webusers/apipassword/${webuserForm.webUsername}" modelAttribute="webuserForm">
+    <form:form method="post" action="${ctxPath}/manager/webusers/apipassword/${webuserForm.webUsername}" modelAttribute="webuserForm">
        <table class="userInput">
             <thead><tr><th>Webuser</th><th></th></thead>
             <tbody>

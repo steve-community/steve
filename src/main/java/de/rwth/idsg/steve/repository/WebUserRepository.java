@@ -43,12 +43,12 @@ public interface WebUserRepository  {
     void changePassword(String username, String newPassword);
 
     void changePassword(Integer userPk, String newPassword);
-    
+
     void changeApiPassword(Integer userPk, String newPassword);
 
     boolean userExists(String username);
 
-    WebUserRecord loadUserByUsePk(Integer webUserPk);
+    WebUserRecord loadUserByUserPk(Integer webUserPk);
 
     WebUserRecord loadUserByUsername(String username);
 

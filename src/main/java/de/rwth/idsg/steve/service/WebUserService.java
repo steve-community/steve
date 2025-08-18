@@ -141,9 +141,9 @@ public class WebUserService implements UserDetailsManager {
         }
 
         String username = currentUser.getName();
-        webUserRepository.changePassword(username, newPassword);
+        webUserRepository.changePassword(username, encoder.encode(newPassword));
 
-        Authentication authentication = createNewAuthentication(currentUser, newPassword);
+        Authentication authentication = createNewAuthentication(currentUser);
         SecurityContext context = this.securityContextHolderStrategy.createEmptyContext();
         context.setAuthentication(authentication);
         this.securityContextHolderStrategy.setContext(context);
@@ -197,7 +197,6 @@ public class WebUserService implements UserDetailsManager {
         return count != null && count > 0;
     }
 
-
     // Methods for the website
     public void add(WebUserForm form) {
         createUser(toUserDetails(form));
@@ -216,10 +215,10 @@ public class WebUserService implements UserDetailsManager {
     public void updatePassword(WebUserForm form) {
         webUserRepository.changePassword(form.getWebUserPk(), encoder.encode(form.getPassword()));
     }
-    
+
     public void updateApiPassword(WebUserForm form) {
         String newPassword = null;
-        if (form.getApiPassword() != null) {
+        if (form.getApiPassword() != null && !form.getApiPassword().isEmpty()) {
             newPassword = encoder.encode(form.getApiPassword());
         }
         webUserRepository.changeApiPassword(form.getWebUserPk(), newPassword);
@@ -237,9 +236,8 @@ public class WebUserService implements UserDetailsManager {
                 );
     }
 
-
     public WebUserBaseForm getDetails(Integer webUserPk) {
-        WebUserRecord ur = webUserRepository.loadUserByUsePk(webUserPk);
+        WebUserRecord ur = webUserRepository.loadUserByUserPk(webUserPk);
 
         if (ur == null) {
             throw new SteveException("There is no user with id '%d'", webUserPk);
@@ -252,12 +250,12 @@ public class WebUserService implements UserDetailsManager {
         form.setAuthorities(WebUserAuthority.fromJsonValue(ur.getAuthorities()));
         return form;
     }
-    
+
     public WebUserBaseForm getDetails(String webUserName) {
         WebUserRecord ur = webUserRepository.loadUserByUsername(webUserName);
 
         if (ur == null) {
-            throw new SteveException("There is no user with id '%s'", webUserName);
+            throw new SteveException("There is no user with username '%s'", webUserName);
         }
 
         WebUserBaseForm form = new WebUserBaseForm();
@@ -309,7 +307,6 @@ public class WebUserService implements UserDetailsManager {
     private UserDetails toUserDetails(WebUserForm form) {
         String encPw = "";
         if (form.getPassword() != null) {
-            //encPw = form.getPassword();
             encPw = encoder.encode(form.getPassword());
         }
         return User
@@ -364,7 +361,7 @@ public class WebUserService implements UserDetailsManager {
     /**
      * Lifted from {@link JdbcUserDetailsManager#createNewAuthentication(Authentication, String)}
      */
-    private Authentication createNewAuthentication(Authentication currentAuth, String newPassword) {
+    private Authentication createNewAuthentication(Authentication currentAuth) {
         var user = this.loadUserByUsername(currentAuth.getName());
         var newAuthentication = authenticated(user, null, user.getAuthorities());
         newAuthentication.setDetails(currentAuth.getDetails());

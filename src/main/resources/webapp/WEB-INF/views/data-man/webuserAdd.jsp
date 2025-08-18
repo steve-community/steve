@@ -19,17 +19,12 @@
 
 --%>
 <%@ include file="../00-header.jsp" %>
-<script type="text/javascript">
-    $(document).ready(function() {
-        <%@ include file="../snippets/datePicker-past.js" %>
-    });
-</script>
 <spring:hasBindErrors name="webuserForm">
     <div class="error">
         Error while trying to add a webuser:
         <ul>
             <c:forEach var="error" items="${errors.allErrors}">
-                <li>${error.defaultMessage}</li>
+                <li><c:out value="${error.defaultMessage}"/></li>
             </c:forEach>
         </ul>
     </div>
@@ -45,19 +40,16 @@
             <tr><td>Password confirmation:</td><td><form:password  path="passwordComparison" title="Confirm the password"/></td></tr>
             <tr><td>Roles:</td>
                 <td>
-                    <form><select id="myAuthoritiesList" name="authorities" path="authorities" title="List of roles/authoriies the web-user shall have.">
-                            <c:forEach items="${webuserForm.authorities.values()}" var="auth">
-                                <option value="${auth}" ${auth == webuserForm.authorities ? 'selected' : ''} >"${auth.value}"</option>
-                            </c:forEach>
-                           </select>
-                    </form>
+                    <form:select id="myAuthoritiesList" path="authorities" title="List of roles/authoriies the web-user shall have.">
+                        <c:forEach items="${availableAuthorities}" var="auth">
+                            <form:option value="${auth}" label="${auth.value}"/>
+                        </c:forEach>
+                    </form:select>
                 </td>
             </tr>
             <tr><td>Enabled:</td><td>true<form:hidden path="enabled" value="true"/></td></tr>
             <tr><td></td>
                 <td id="add_space">
-                    <c:set var="submitButtonName" value="add" />
-                    <c:set var="submitButtonValue" value="Add" />
                     <input type="submit" name="add" value="Add">
                     <input type="submit" name="backToOverview" value="Back to Overview">
                 </td>

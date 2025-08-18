@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2024 SteVe Community Team
+ * Copyright (C) 2013-2025 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -18,35 +18,54 @@
  */
 package de.rwth.idsg.steve.web.dto;
 
-import org.jooq.JSON;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import org.jooq.JSON;
 
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
-@RequiredArgsConstructor
 public enum WebUserAuthority {
-    USER(JSON.json("[\"USER\"]"), "USER"),
-    ADMIN(JSON.json("[\"ADMIN\"]"), "ADMIN"),
-    USER_ADMIN(JSON.json("[\"ADMIN\",\"USER\"]"), "USER, ADMIN");
+    USER("USER"),
+    ADMIN("ADMIN"),
+    USER_ADMIN("USER", "ADMIN");
 
-    @Getter private final JSON jsonValue;
-    @Getter private final String value;
+    private static final ObjectMapper MAPPER = new ObjectMapper();
 
-    public static WebUserAuthority fromJsonValue(JSON v) {
-        for (WebUserAuthority c: WebUserAuthority.values()) {
-            if (c.jsonValue.equals(v)) {
-                return c;
-            }
+    private final Set<String> values;
+    @Getter
+    private final JSON jsonValue;
+
+    WebUserAuthority(String... values) {
+        if (values == null || values.length == 0) {
+            throw new IllegalArgumentException("JSON values must not be null or empty");
         }
-        throw new IllegalArgumentException(v.toString());
+        this.values = new HashSet<>(Arrays.asList(values));
+        this.jsonValue = this.values.stream().map(v -> "\"" + v + "\"")
+                .reduce((a, b) -> a + ", " + b)
+                .map(s -> JSON.json("[" + s + "]"))
+                .orElseThrow(() -> new IllegalArgumentException("Failed to create JSON value"));
     }
 
-    public static WebUserAuthority fromValue(String v) {
-        for (WebUserAuthority c: WebUserAuthority.values()) {
-            if (c.value.equals(v)) {
-                return c;
-            }
+    // For jsp
+    public String getValue() {
+        return String.join(", ", values);
+    }
+
+    public static WebUserAuthority fromJsonValue(JSON v) {
+        try {
+            List<String> values = Arrays.asList(MAPPER.readValue(v.data(), String[].class));
+            for (WebUserAuthority c: WebUserAuthority.values()) {
+                if (c.values.containsAll(values)) {
+                    return c;
+                }
+              }
+            throw new IllegalArgumentException(v.toString());
+        } catch (JsonProcessingException e) {
+            throw new IllegalArgumentException(v.toString());
         }
-        throw new IllegalArgumentException(v);
     }
 }

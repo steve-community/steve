@@ -57,7 +57,7 @@
         <thead>
             <tr>
                 <th data-sort="int">User ID</th>
-                <th data-sort="string">Ocpp ID Tag</th>
+                <th data-sort="string">Ocpp ID Tags</th>
                 <th data-sort="string">Name</th>
                 <th data-sort="string">Phone</th>
                 <th data-sort="string">E-Mail</th>
@@ -72,9 +72,9 @@
         <c:forEach items="${userList}" var="cr">
             <tr><td><a href="${ctxPath}/manager/users/details/${cr.userPk}">${cr.userPk}</a></td>
                 <td>
-                    <c:if test="${not empty cr.ocppIdTag}">
-                        <a href="${ctxPath}/manager/ocppTags/details/${cr.ocppTagPk}">${cr.ocppIdTag}</a>
-                    </c:if>
+                    <c:forEach var="it" items="${cr.ocppTagEntries}" varStatus="loop">
+                        <a href="${ctxPath}/manager/ocppTags/details/${it.ocppTagPk}">${it.idTag}</a>${loop.last ? '' : ', '}
+                    </c:forEach>
                 </td>
                 <td>${cr.name}</td>
                 <td>${cr.phone}</td>

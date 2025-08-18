@@ -48,6 +48,7 @@ import static de.rwth.idsg.steve.utils.DateTimeUtils.humanize;
 import static de.rwth.idsg.steve.utils.DateTimeUtils.toDateTime;
 import static jooq.steve.db.tables.OcppTag.OCPP_TAG;
 import static jooq.steve.db.tables.OcppTagActivity.OCPP_TAG_ACTIVITY;
+import static jooq.steve.db.tables.UserOcppTag.USER_OCPP_TAG;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -159,6 +160,16 @@ public class OcppTagRepositoryImpl implements OcppTagRepository {
         return ctx.select(OCPP_TAG.ID_TAG)
                   .from(OCPP_TAG)
                   .fetch(OCPP_TAG.ID_TAG);
+    }
+
+    @Override
+    public List<String> getIdTagsWithoutUser() {
+        return ctx.select(OCPP_TAG.ID_TAG)
+            .from(OCPP_TAG)
+            .leftJoin(USER_OCPP_TAG).on(OCPP_TAG.OCPP_TAG_PK.eq(USER_OCPP_TAG.OCPP_TAG_PK))
+            .where(USER_OCPP_TAG.OCPP_TAG_PK.isNull())
+            .orderBy(OCPP_TAG.ID_TAG)
+            .fetch(OCPP_TAG.ID_TAG);
     }
 
     @Override

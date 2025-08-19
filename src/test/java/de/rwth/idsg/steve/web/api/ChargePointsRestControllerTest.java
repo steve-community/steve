@@ -38,6 +38,7 @@ import java.util.List;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
@@ -85,7 +86,7 @@ public class ChargePointsRestControllerTest extends AbstractControllerTest {
     @Test
     @DisplayName("GET one: Entity not found, expected 404")
     public void testGetOne_notFound() throws Exception {
-        when(chargePointsService.getDetails(any(Integer.class))).thenThrow(new NotFoundException(""));
+        when(chargePointsService.getDetails(anyInt())).thenThrow(new NotFoundException(""));
 
         mockMvc.perform(get("/api/v1/chargeboxes/1"))
             .andExpect(status().isNotFound());

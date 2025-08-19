@@ -22,6 +22,7 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.http.MediaType;
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.test.web.servlet.MockMvc;
@@ -30,8 +31,6 @@ import org.springframework.test.web.servlet.setup.StandaloneMockMvcBuilder;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 
 public abstract class AbstractControllerTest {
-
-    private static final String CONTENT_TYPE = "application/json";
 
     protected final ObjectMapper objectMapper;
 
@@ -52,7 +51,7 @@ public abstract class AbstractControllerTest {
     protected MockMvc buildMockMvc(StandaloneMockMvcBuilder builder) {
         return builder.setControllerAdvice(new ApiControllerAdvice())
             .setMessageConverters(new MappingJackson2HttpMessageConverter(objectMapper))
-            .alwaysExpect(content().contentType(CONTENT_TYPE))
+            .alwaysExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
             .build();
     }
 }

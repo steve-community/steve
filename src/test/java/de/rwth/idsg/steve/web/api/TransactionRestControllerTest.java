@@ -184,7 +184,6 @@ public class TransactionRestControllerTest extends AbstractControllerTest {
             .andExpect(jsonPath("$[0].id").value("1"))
             .andExpect(jsonPath("$[0].chargeBoxId").value("cb-2"))
             .andExpect(jsonPath("$[0].ocppIdTag").value("id-3"))
-            .andExpect(jsonPath("$[0].ocppIdTag").value("id-3"))
             .andExpect(jsonPath("$[0].startTimestamp").value(start.toString()))
             .andExpect(jsonPath("$[0].startTimestampFormatted").doesNotExist())
             .andExpect(jsonPath("$[0].stopTimestamp").value(stop.toString()))

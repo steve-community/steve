@@ -112,6 +112,7 @@ public class WebUsersService implements UserDetailsManager {
         validateUserDetails(user);
         var record = toWebUserRecord(user);
         webUserRepository.createUser(record);
+        userCache.invalidate(user.getUsername());
     }
 
     @Override
@@ -119,11 +120,13 @@ public class WebUsersService implements UserDetailsManager {
         validateUserDetails(user);
         var record = toWebUserRecord(user);
         webUserRepository.updateUser(record);
+        userCache.invalidate(user.getUsername());
     }
 
     @Override
     public void deleteUser(String username) {
         webUserRepository.deleteUser(username);
+        userCache.invalidate(username);
     }
 
     /**
@@ -156,17 +159,17 @@ public class WebUsersService implements UserDetailsManager {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        WebUserRecord record = webUserRepository.loadUserByUsername(username);
+        WebUserRecord webUser = webUserRepository.loadUserByUsername(username);
 
-        if (record == null) {
+        if (webUser == null) {
             throw new UsernameNotFoundException(username);
         }
 
         return User
-            .withUsername(record.getUsername())
-            .password(record.getPassword())
-            .disabled(!record.getEnabled())
-            .authorities(fromJson(record.getAuthorities()))
+            .withUsername(webUser.getUsername())
+            .password(webUser.getPassword())
+            .disabled(!webUser.getEnabled())
+            .authorities(fromJson(webUser.getAuthorities()))
             .build();
     }
 
@@ -190,6 +193,7 @@ public class WebUsersService implements UserDetailsManager {
 
     public void changeStatusOfUser(String username, boolean enabled) {
         webUserRepository.changeStatusOfUser(username, enabled);
+        userCache.invalidate(username);
     }
 
     public boolean hasUserWithAuthority(String authority) {
@@ -210,6 +214,7 @@ public class WebUsersService implements UserDetailsManager {
         record.setEnabled(form.getEnabled());
         record.setAuthorities(form.getAuthorities().getJsonValue());
         webUserRepository.updateUserByPk(record);
+        userCache.invalidate(form.getWebUsername());
     }
 
     public void updatePassword(WebUserForm form) {
@@ -304,10 +309,8 @@ public class WebUsersService implements UserDetailsManager {
     }
 
     private UserDetails toUserDetails(WebUserForm form) {
-        String encPw = "";
-        if (form.getPassword() != null) {
-            encPw = encoder.encode(form.getPassword());
-        }
+        Assert.hasText(form.getPassword(), "Password may not be empty");
+        String encPw = encoder.encode(form.getPassword());
         return User
             .withUsername(form.getWebUsername())
             .password(encPw)

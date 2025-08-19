@@ -26,7 +26,10 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 
 import jakarta.validation.Valid;
+import org.springdoc.core.annotations.ParameterObject;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -34,7 +37,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.util.List;
 
@@ -47,8 +52,8 @@ public class UsersRestController {
     private final UsersService usersService;
 
     @GetMapping
-    public List<User.Overview> getUsers(UserQueryForm form) {
-        return usersService.getUsers(form);
+    public List<User.Overview> getUsers(@ParameterObject UserQueryForm form) {
+        return usersService.getOverview(form);
     }
 
     @GetMapping("/{id}")
@@ -56,12 +61,18 @@ public class UsersRestController {
         return usersService.getDetails(id);
     }
 
-    @PostMapping
-    public User.Details addUser(@Valid @RequestBody UserForm form) {
-        return usersService.add(form);
+    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<User.Details> addUser(@Valid @RequestBody UserForm form) {
+        var body = usersService.add(form);
+        var location = ServletUriComponentsBuilder
+            .fromCurrentRequest()
+            .path("/{id}")
+            .buildAndExpand(body.getUserRecord().getUserPk())
+            .toUri();
+        return ResponseEntity.created(location).body(body);
     }
 
-    @PutMapping("/{id}")
+    @PutMapping(path = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
     public User.Details updateUser(@PathVariable int id, @Valid @RequestBody UserForm form) {
         form.setUserPk(id);
         return usersService.update(form);

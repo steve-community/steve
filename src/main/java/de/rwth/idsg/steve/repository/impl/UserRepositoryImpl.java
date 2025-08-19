@@ -25,7 +25,6 @@ import de.rwth.idsg.steve.repository.UserRepository;
 import de.rwth.idsg.steve.repository.dto.User;
 import de.rwth.idsg.steve.web.dto.UserForm;
 import de.rwth.idsg.steve.web.dto.UserQueryForm;
-import jooq.steve.db.tables.records.UserRecord;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jooq.Condition;
@@ -40,7 +39,11 @@ import org.jooq.impl.DSL;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.CollectionUtils;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 import static de.rwth.idsg.steve.utils.CustomDSL.includes;
 import static jooq.steve.db.Tables.USER_OCPP_TAG;
@@ -94,11 +97,11 @@ public class UserRepositoryImpl implements UserRepository {
     @Override
     public Integer add(UserForm form) {
         return ctx.transactionResult(configuration -> {
-            var ctx = DSL.using(configuration);
+            var tx = DSL.using(configuration);
             try {
-                var addressId = addressRepository.updateOrInsert(ctx, form.getAddress());
-                var userPk = addInternal(ctx, form, addressId);
-                refreshOcppTagsInternal(ctx, form, userPk);
+                var addressId = addressRepository.updateOrInsert(tx, form.getAddress());
+                var userPk = addInternal(tx, form, addressId);
+                refreshOcppTagsInternal(tx, form, userPk);
                 return userPk;
             } catch (DataAccessException e) {
                 throw new SteveException("Failed to add the user", e);
@@ -109,11 +112,11 @@ public class UserRepositoryImpl implements UserRepository {
     @Override
     public void update(UserForm form) {
         ctx.transaction(configuration -> {
-            var ctx = DSL.using(configuration);
+            var tx = DSL.using(configuration);
             try {
-                var addressId = addressRepository.updateOrInsert(ctx, form.getAddress());
-                updateInternal(ctx, form, addressId);
-                refreshOcppTagsInternal(ctx, form, form.getUserPk());
+                var addressId = addressRepository.updateOrInsert(tx, form.getAddress());
+                updateInternal(tx, form, addressId);
+                refreshOcppTagsInternal(tx, form, form.getUserPk());
 
             } catch (DataAccessException e) {
                 throw new SteveException("Failed to update the user", e);
@@ -124,10 +127,10 @@ public class UserRepositoryImpl implements UserRepository {
     @Override
     public void delete(int userPk) {
         ctx.transaction(configuration -> {
-            var ctx = DSL.using(configuration);
+            var tx = DSL.using(configuration);
             try {
-                addressRepository.delete(ctx, selectAddressId(userPk));
-                deleteInternal(ctx, userPk);
+                addressRepository.delete(tx, selectAddressId(userPk));
+                deleteInternal(tx, userPk);
             } catch (DataAccessException e) {
                 throw new SteveException("Failed to delete the user", e);
             }

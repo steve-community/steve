@@ -34,6 +34,7 @@ import lombok.RequiredArgsConstructor;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -45,7 +46,11 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import jakarta.validation.Valid;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+
 import java.util.List;
+
+import static org.springframework.http.ResponseEntity.*;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -98,11 +103,16 @@ public class OcppTagsRestController {
         @ApiResponse(responseCode = "500", description = "Internal Server Error", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorResponse.class))})}
     )
     @PostMapping
-    @ResponseStatus(HttpStatus.CREATED)
-    public OcppTagOverview create(@RequestBody @Valid OcppTagForm params) {
-        int ocppTagPk = ocppTagsService.addOcppTag(params);
+    public ResponseEntity<OcppTagOverview> create(@RequestBody @Valid OcppTagForm params) {
+        var ocppTagPk = ocppTagsService.addOcppTag(params);
+        var body = getOneInternal(ocppTagPk);
 
-        return getOneInternal(ocppTagPk);
+        var location = ServletUriComponentsBuilder
+            .fromCurrentRequest()
+            .path("/{ocppTagPk}")
+            .buildAndExpand(ocppTagPk)
+            .toUri();
+        return created(location).body(body);
     }
 
     @Operation(description = """
@@ -136,7 +146,7 @@ public class OcppTagsRestController {
 
         var results = ocppTagsService.getOverview(params);
         if (results.isEmpty()) {
-            throw new NotFoundException("Could not find this ocppTag");
+            throw new NotFoundException("Could not find ocppTag with id " + ocppTagPk);
         }
         return results.get(0);
     }

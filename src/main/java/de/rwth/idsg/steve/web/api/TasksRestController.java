@@ -41,7 +41,7 @@ import org.springframework.web.bind.annotation.RequestParam;
  * @author fnkbsi
  * @since 18.10.2023
  */
-@Tag(name = "tasks")
+@Tag(name = "tasks", description = "Task management operations")
 @Validated
 @RestController
 @RequestMapping(value = "/api/v1/tasks", produces = MediaType.APPLICATION_JSON_VALUE)

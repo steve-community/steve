@@ -136,7 +136,7 @@ public class ReservationsController {
 
     @GetMapping(value = RESERVATIONS_QUERY_PATH)
     public String getReservationsQuery(@Valid @ModelAttribute(PARAMS) ReservationQueryForm params,
-                                      BindingResult result, Model model) throws IOException {
+                                      BindingResult result, Model model) {
         if (!result.hasErrors()) {
             model.addAttribute("reservList", reservationsService.getReservations(params));
         }

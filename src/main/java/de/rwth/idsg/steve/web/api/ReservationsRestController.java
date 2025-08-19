@@ -28,7 +28,9 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 
 import jakarta.validation.Valid;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -36,6 +38,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.util.List;
 
@@ -48,16 +51,22 @@ public class ReservationsRestController {
     private final ReservationsService reservationsService;
 
     @GetMapping
-    public List<Reservation> getReservations(ReservationQueryForm form) {
+    public List<Reservation> getReservations(@ParameterObject ReservationQueryForm form) {
         return reservationsService.getReservations(form);
     }
 
-    @PostMapping
-    public Reservation addReservation(@Valid @RequestBody ReservationForm form) {
+    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Reservation> addReservation(@Valid @RequestBody ReservationForm form) {
         var id = reservationsService.addReservation(form);
-        return reservationsService.getReservation(id).orElseThrow(
+        var body = reservationsService.getReservation(id).orElseThrow(
             () -> new SteveException("Reservation not found after creation, this should never happen")
         );
+        var location = ServletUriComponentsBuilder
+              .fromCurrentRequest()
+              .path("/{id}")
+              .buildAndExpand(id)
+              .toUri();
+        return ResponseEntity.created(location).body(body);
     }
 
     @DeleteMapping("/{id}")

@@ -28,7 +28,10 @@ import lombok.RequiredArgsConstructor;
 import ocpp.cp._2015._10.GetCompositeScheduleResponse;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -61,20 +64,20 @@ public class TasksController {
     @PostMapping(params = "finished")
     public String clearFinished(Model model) {
         taskStore.clearFinished();
-        return getOverview(model);
+        return "redirect:/manager/operations/tasks";
     }
 
     @PostMapping(params = "unfinished")
     public String clearUnfinished(Model model) {
         taskStore.clearUnfinished();
-        return getOverview(model);
+        return "redirect:/manager/operations/tasks";
     }
 
     @GetMapping(value = TASK_ID_PATH)
     public String getTaskDetails(@PathVariable("taskId") Integer taskId, Model model) {
-        var r = taskStore.get(taskId);
+        var task = taskStore.get(taskId);
         model.addAttribute("taskId", taskId);
-        model.addAttribute("task", r);
+        model.addAttribute("task", task);
         return "taskResult";
     }
 
@@ -83,19 +86,19 @@ public class TasksController {
                                          @PathVariable("chargeBoxId") String chargeBoxId,
                                          Model model) {
 
-        var r = taskStore.get(taskId);
+        var task = taskStore.get(taskId);
 
-        if (r instanceof GetCompositeScheduleTask) {
-            return processForGetCompositeScheduleTask((GetCompositeScheduleTask) r, chargeBoxId, model);
-        } else if (r instanceof GetConfigurationTask) {
-            return processForGetConfigurationTask((GetConfigurationTask) r, chargeBoxId, model);
-        } else {
-            throw new SteveException("Task not found");
+        if (task instanceof GetCompositeScheduleTask) {
+            return processForGetCompositeScheduleTask((GetCompositeScheduleTask) task, chargeBoxId, model);
         }
+        if (task instanceof GetConfigurationTask) {
+            return processForGetConfigurationTask((GetConfigurationTask) task, chargeBoxId, model);
+        }
+        throw new SteveException("Task not found");
     }
 
-    private static String processForGetCompositeScheduleTask(GetCompositeScheduleTask k, String chargeBoxId, Model model) {
-        RequestResult result = extractResult(k, chargeBoxId);
+    private static String processForGetCompositeScheduleTask(GetCompositeScheduleTask task, String chargeBoxId, Model model) {
+        RequestResult result = extractResult(task, chargeBoxId);
         GetCompositeScheduleResponse response = result.getDetails();
 
         model.addAttribute("chargeBoxId", chargeBoxId);
@@ -115,7 +118,7 @@ public class TasksController {
     private static RequestResult extractResult(CommunicationTask<?, ?> task, String chargeBoxId) {
         RequestResult result = task.getResultMap().get(chargeBoxId);
         if (result == null) {
-            throw new SteveException("Result not found");
+            throw new SteveException("Result not found for chargeBoxId '" + chargeBoxId + "'");
         }
         return result;
     }

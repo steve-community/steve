@@ -30,6 +30,7 @@ import de.rwth.idsg.steve.service.notification.OcppStationStatusFailure;
 import de.rwth.idsg.steve.service.notification.OcppTransactionEnded;
 import de.rwth.idsg.steve.service.notification.OcppTransactionStarted;
 import jooq.steve.db.enums.TransactionStopEventActor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import ocpp.cs._2015._10.AuthorizationStatus;
 import ocpp.cs._2015._10.AuthorizeRequest;
@@ -69,14 +70,15 @@ import java.util.Optional;
  */
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class CentralSystemService16_Service {
 
-    @Autowired private OcppServerRepository ocppServerRepository;
-    @Autowired private SettingsRepository settingsRepository;
+    private final OcppServerRepository ocppServerRepository;
+    private final SettingsRepository settingsRepository;
 
-    @Autowired private OcppTagsService ocppTagsService;
-    @Autowired private ApplicationEventPublisher applicationEventPublisher;
-    @Autowired private ChargePointHelperService chargePointHelperService;
+    private final OcppTagsService ocppTagsService;
+    private final ApplicationEventPublisher applicationEventPublisher;
+    private final ChargePointHelperService chargePointHelperService;
 
     public BootNotificationResponse bootNotification(BootNotificationRequest parameters, String chargeBoxIdentity,
                                                      OcppProtocol ocppProtocol) {

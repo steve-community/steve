@@ -28,8 +28,8 @@ import jakarta.validation.Valid;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.core.annotations.ParameterObject;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -37,8 +37,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.util.List;
 
@@ -67,10 +67,15 @@ public class ChargePointsRestController {
     @Operation(description = "Creates a new ChargePoint with the provided parameters.")
     @StandardApiResponses
     @PostMapping
-    @ResponseStatus(HttpStatus.CREATED)
-    public ApiChargePoint create(@RequestBody @Valid ChargePointForm params) {
+    public ResponseEntity<ApiChargePoint> create(@RequestBody @Valid ChargePointForm params) {
         var chargepointPk = chargePointsService.addChargePoint(params);
-        return toDto(chargePointsService.getDetails(chargepointPk));
+        var body = toDto(chargePointsService.getDetails(chargepointPk));
+        var location = ServletUriComponentsBuilder
+            .fromCurrentRequest()
+            .path("/{id}")
+            .buildAndExpand(body.getChargeBoxPk())
+            .toUri();
+        return ResponseEntity.created(location).body(body);
     }
 
     @Operation(description = "Updates an existing ChargePoint with the provided parameters.")

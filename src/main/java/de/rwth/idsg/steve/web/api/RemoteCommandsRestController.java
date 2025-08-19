@@ -220,7 +220,7 @@ public class RemoteCommandsRestController {
                 String.format("Transaction %s not found!", transactionId)
             )
         ).getOcppIdTag();
-        if (!params.getOcppTag().contentEquals(ocppTag)) {
+        if (!ocppTag.contentEquals(params.getOcppTag())) {
              throw new BadRequestException("The transaction was authorised with another OCPP Tag!");
         }
         transactionParams.setTransactionId(transactionId);

@@ -60,26 +60,24 @@ public class ReservationRepositoryImpl implements ReservationRepository {
 
     @Override
     public Optional<Reservation> getReservation(int id) {
-        SelectQuery selectQuery = ctx.selectQuery();
-        selectQuery.addFrom(RESERVATION);
-        selectQuery.addJoin(OCPP_TAG, OCPP_TAG.ID_TAG.eq(RESERVATION.ID_TAG));
-        selectQuery.addJoin(CONNECTOR, CONNECTOR.CONNECTOR_PK.eq(RESERVATION.CONNECTOR_PK));
-        selectQuery.addJoin(CHARGE_BOX, CONNECTOR.CHARGE_BOX_ID.eq(CHARGE_BOX.CHARGE_BOX_ID));
-
-        selectQuery.addSelect(
-                RESERVATION.RESERVATION_PK,
-                RESERVATION.TRANSACTION_PK,
-                OCPP_TAG.OCPP_TAG_PK,
-                CHARGE_BOX.CHARGE_BOX_PK,
-                OCPP_TAG.ID_TAG,
-                CHARGE_BOX.CHARGE_BOX_ID,
-                RESERVATION.START_DATETIME,
-                RESERVATION.EXPIRY_DATETIME,
-                RESERVATION.STATUS,
-                CONNECTOR.CONNECTOR_ID
-        );
-        selectQuery.addConditions(RESERVATION.RESERVATION_PK.eq(id));
-        Reservation result = (Reservation) selectQuery.fetchOne(new ReservationMapper());
+        Reservation result = ctx.select(
+            RESERVATION.RESERVATION_PK,
+            RESERVATION.TRANSACTION_PK,
+            OCPP_TAG.OCPP_TAG_PK,
+            CHARGE_BOX.CHARGE_BOX_PK,
+            OCPP_TAG.ID_TAG,
+            CHARGE_BOX.CHARGE_BOX_ID,
+            RESERVATION.START_DATETIME,
+            RESERVATION.EXPIRY_DATETIME,
+            RESERVATION.STATUS,
+            CONNECTOR.CONNECTOR_ID
+        )
+        .from(RESERVATION)
+        .join(OCPP_TAG).on(OCPP_TAG.ID_TAG.eq(RESERVATION.ID_TAG))
+        .join(CONNECTOR).on(CONNECTOR.CONNECTOR_PK.eq(RESERVATION.CONNECTOR_PK))
+        .join(CHARGE_BOX).on(CONNECTOR.CHARGE_BOX_ID.eq(CHARGE_BOX.CHARGE_BOX_ID))
+        .where(RESERVATION.RESERVATION_PK.eq(id))
+        .fetchOne(new ReservationMapper());
         return Optional.ofNullable(result);
     }
 

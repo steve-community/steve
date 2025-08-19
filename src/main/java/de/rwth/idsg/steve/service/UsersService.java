@@ -21,6 +21,7 @@ package de.rwth.idsg.steve.service;
 import de.rwth.idsg.steve.SteveException;
 import de.rwth.idsg.steve.repository.UserRepository;
 import de.rwth.idsg.steve.repository.dto.User;
+import de.rwth.idsg.steve.web.api.exception.BadRequestException;
 import de.rwth.idsg.steve.web.api.exception.NotFoundException;
 import de.rwth.idsg.steve.web.dto.UserForm;
 import de.rwth.idsg.steve.web.dto.UserQueryForm;
@@ -35,10 +36,6 @@ public class UsersService {
 
     private final UserRepository userRepository;
 
-    public List<User.Overview> getUsers(UserQueryForm form) {
-        return userRepository.getOverview(form);
-    }
-
     public User.Details getDetails(int userPk) {
         return userRepository.getDetails(userPk).orElseThrow(
             () -> new NotFoundException(String.format("User with id %d not found", userPk))
@@ -46,6 +43,9 @@ public class UsersService {
     }
 
     public User.Details add(UserForm form) {
+        if (form.getUserPk() == null) {
+            throw new BadRequestException("userPk must not be null");
+        }
         var id = userRepository.add(form);
         return userRepository.getDetails(id).orElseThrow(
             () -> new SteveException("User not found after creation, this should never happen")

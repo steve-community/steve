@@ -18,26 +18,27 @@
  */
 package de.rwth.idsg.steve.web.dto;
 
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import jakarta.validation.constraints.Future;
-import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import org.joda.time.DateTime;
 
 @Getter
 @Setter
-@ToString
 public class ReservationForm {
 
-    @NotEmpty(message = "ID Tag is required")
+    @NotBlank(message = "ID Tag is required")
     private String idTag;
 
-    @NotEmpty(message = "ChargeBox ID is required")
+    @NotBlank(message = "ChargeBox ID is required")
     private String chargeBoxId;
 
     @NotNull(message = "Connector ID is required")
+    @Min(value = 0, message = "Connector ID must be >= 0")
     private Integer connectorId;
 
     @NotNull(message = "Start timestamp is required")

@@ -25,6 +25,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import jakarta.servlet.http.HttpServletResponse;
+
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
@@ -44,12 +46,14 @@ public class LogController {
     @GetMapping(value = "/log")
     public void log(HttpServletResponse response) {
         response.setContentType("text/plain");
+        response.setCharacterEncoding(StandardCharsets.UTF_8.name());
 
         try (PrintWriter writer = response.getWriter()) {
             Optional<Path> p = LogFileRetriever.INSTANCE.getPath();
             if (p.isPresent()) {
-                Files.lines(p.get(), StandardCharsets.UTF_8)
-                     .forEach(writer::println);
+                try (BufferedReader br = Files.newBufferedReader(p.get(), StandardCharsets.UTF_8)) {
+                    br.lines().forEach(writer::println);
+                }
             } else {
                 writer.write(LogFileRetriever.INSTANCE.getErrorMessage());
             }

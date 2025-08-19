@@ -486,7 +486,7 @@ public class OcppTagsRestControllerTest extends AbstractControllerTest {
     }
 
     @Test
-    @DisplayName("GET all: Query param 'inTransaction' is translated correctly, while others are defaulted")
+    @DisplayName("GET all: Query param 'blocked' is translated correctly, while others are defaulted")
     public void test21() throws Exception {
         // given
         ArgumentCaptor<OcppTagQueryForm.OcppTagQueryFormForApi> formToCapture = ArgumentCaptor.forClass(OcppTagQueryForm.OcppTagQueryFormForApi.class);

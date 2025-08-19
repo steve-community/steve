@@ -80,7 +80,7 @@ public class OcppTagsService {
     }
 
     public String getParentIdtag(String idTag) {
-        return ocppTagRepository.getParentIdtag(idTag);
+        return ocppTagRepository.getParentIdTag(idTag);
     }
 
     public List<AuthorizationData> getAuthDataOfAllTags() {

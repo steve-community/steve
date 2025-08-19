@@ -25,6 +25,7 @@ import de.rwth.idsg.steve.repository.dto.InsertReservationParams;
 import de.rwth.idsg.steve.repository.dto.Reservation;
 import de.rwth.idsg.steve.utils.DateTimeUtils;
 import de.rwth.idsg.steve.web.dto.ReservationQueryForm;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.joda.time.DateTime;
 import org.jooq.DSLContext;
@@ -36,10 +37,10 @@ import org.jooq.SelectConditionStep;
 import org.jooq.SelectQuery;
 import org.jooq.exception.DataAccessException;
 import org.jooq.impl.DSL;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 import static jooq.steve.db.tables.ChargeBox.CHARGE_BOX;
 import static jooq.steve.db.tables.Connector.CONNECTOR;
@@ -52,13 +53,32 @@ import static jooq.steve.db.tables.Reservation.RESERVATION;
  */
 @Slf4j
 @Repository
+@RequiredArgsConstructor
 public class ReservationRepositoryImpl implements ReservationRepository {
 
     private final DSLContext ctx;
 
-    @Autowired
-    public ReservationRepositoryImpl(DSLContext ctx) {
-        this.ctx = ctx;
+    @Override
+    public Optional<Reservation> getReservation(int id) {
+        Reservation result = ctx.select(
+            RESERVATION.RESERVATION_PK,
+            RESERVATION.TRANSACTION_PK,
+            OCPP_TAG.OCPP_TAG_PK,
+            CHARGE_BOX.CHARGE_BOX_PK,
+            OCPP_TAG.ID_TAG,
+            CHARGE_BOX.CHARGE_BOX_ID,
+            RESERVATION.START_DATETIME,
+            RESERVATION.EXPIRY_DATETIME,
+            RESERVATION.STATUS,
+            CONNECTOR.CONNECTOR_ID
+        )
+        .from(RESERVATION)
+        .join(OCPP_TAG).on(OCPP_TAG.ID_TAG.eq(RESERVATION.ID_TAG))
+        .join(CONNECTOR).on(CONNECTOR.CONNECTOR_PK.eq(RESERVATION.CONNECTOR_PK))
+        .join(CHARGE_BOX).on(CONNECTOR.CHARGE_BOX_ID.eq(CHARGE_BOX.CHARGE_BOX_ID))
+        .where(RESERVATION.RESERVATION_PK.eq(id))
+        .fetchOne(new ReservationMapper());
+        return Optional.ofNullable(result);
     }
 
     @Override

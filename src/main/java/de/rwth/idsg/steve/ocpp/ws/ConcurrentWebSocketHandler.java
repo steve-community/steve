@@ -35,8 +35,8 @@ import java.util.concurrent.TimeUnit;
  */
 public abstract class ConcurrentWebSocketHandler implements WebSocketHandler {
 
-    private static final int sendTimeLimit = (int) TimeUnit.SECONDS.toMillis(10);
-    private static final int bufferSizeLimit = 5 * WebSocketConfiguration.MAX_MSG_SIZE;
+    private static final int SEND_TIME_LIMIT = (int) TimeUnit.SECONDS.toMillis(10);
+    private static final int BUFFER_SIZE_LIMIT = 5 * WebSocketConfiguration.MAX_MSG_SIZE;
 
     private final Map<String, ConcurrentWebSocketSessionDecorator> sessions = new ConcurrentHashMap<>();
 
@@ -61,7 +61,7 @@ public abstract class ConcurrentWebSocketHandler implements WebSocketHandler {
     }
 
     private ConcurrentWebSocketSessionDecorator internalGet(WebSocketSession session) {
-        return sessions.computeIfAbsent(session.getId(), s -> new ConcurrentWebSocketSessionDecorator(session, sendTimeLimit, bufferSizeLimit));
+        return sessions.computeIfAbsent(session.getId(), s -> new ConcurrentWebSocketSessionDecorator(session, SEND_TIME_LIMIT, BUFFER_SIZE_LIMIT));
     }
 
     // -------------------------------------------------------------------------

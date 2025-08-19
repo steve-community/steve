@@ -51,7 +51,7 @@ public interface ChargePointRepository {
     Map<String, Integer> getChargeBoxIdPkPair(List<String> chargeBoxIdList);
 
     List<ChargePoint.Overview> getOverview(ChargePointQueryForm form);
-    ChargePoint.Details getDetails(int chargeBoxPk);
+    Optional<ChargePoint.Details> getDetails(int chargeBoxPk);
 
     default List<ConnectorStatus> getChargePointConnectorStatus() {
         return getChargePointConnectorStatus(null);

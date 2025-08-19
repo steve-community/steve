@@ -62,7 +62,7 @@ public class OcppConfiguration {
     @Autowired private ocpp.cs._2015._10.CentralSystemService ocpp16Server;
 
     @Autowired
-    @Qualifier("MessageHeaderInterceptor")
+    @Qualifier("messageHeaderInterceptor")
     private PhaseInterceptor<Message> messageHeaderInterceptor;
 
     @PostConstruct

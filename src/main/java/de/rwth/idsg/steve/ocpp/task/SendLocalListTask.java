@@ -20,7 +20,7 @@ package de.rwth.idsg.steve.ocpp.task;
 
 import de.rwth.idsg.steve.ocpp.Ocpp15AndAboveTask;
 import de.rwth.idsg.steve.ocpp.OcppCallback;
-import de.rwth.idsg.steve.service.OcppTagService;
+import de.rwth.idsg.steve.service.OcppTagsService;
 import de.rwth.idsg.steve.web.dto.ocpp.SendLocalListParams;
 import de.rwth.idsg.steve.web.dto.ocpp.SendLocalListUpdateType;
 import ocpp.cp._2015._10.AuthorizationData;
@@ -40,9 +40,9 @@ public class SendLocalListTask extends Ocpp15AndAboveTask<SendLocalListParams, S
 
     private final ocpp.cp._2015._10.SendLocalListRequest request;
 
-    public SendLocalListTask(SendLocalListParams params, OcppTagService ocppTagService) {
+    public SendLocalListTask(SendLocalListParams params, OcppTagsService ocppTagsService) {
         super(params);
-        this.request = createOcpp16Request(ocppTagService);
+        this.request = createOcpp16Request(ocppTagsService);
     }
 
     @Override
@@ -91,7 +91,7 @@ public class SendLocalListTask extends Ocpp15AndAboveTask<SendLocalListParams, S
     // Helpers
     // -------------------------------------------------------------------------
 
-    private ocpp.cp._2015._10.SendLocalListRequest createOcpp16Request(OcppTagService ocppTagService) {
+    private ocpp.cp._2015._10.SendLocalListRequest createOcpp16Request(OcppTagsService ocppTagsService) {
         // DIFFERENTIAL update
         if (params.getUpdateType() == SendLocalListUpdateType.DIFFERENTIAL) {
             List<ocpp.cp._2015._10.AuthorizationData> auths = new ArrayList<>();
@@ -102,7 +102,7 @@ public class SendLocalListTask extends Ocpp15AndAboveTask<SendLocalListParams, S
             }
 
             // Step 2: For the idTags to be added or updated, insert them with their IdTagInfos
-            auths.addAll(ocppTagService.getAuthData(params.getAddUpdateList()));
+            auths.addAll(ocppTagsService.getAuthData(params.getAddUpdateList()));
 
             return new ocpp.cp._2015._10.SendLocalListRequest()
                     .withListVersion(params.getListVersion())
@@ -114,7 +114,7 @@ public class SendLocalListTask extends Ocpp15AndAboveTask<SendLocalListParams, S
             List<AuthorizationData> values = Collections.emptyList();
 
             if (Boolean.FALSE.equals(params.getSendEmptyListWhenFull())) {
-                values = ocppTagService.getAuthDataOfAllTags();
+                values = ocppTagsService.getAuthDataOfAllTags();
             }
 
             return new ocpp.cp._2015._10.SendLocalListRequest()

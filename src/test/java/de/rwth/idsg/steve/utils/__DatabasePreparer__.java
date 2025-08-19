@@ -143,7 +143,7 @@ public class __DatabasePreparer__ {
         ChargePointRepositoryImpl impl = new ChargePointRepositoryImpl(dslContext, new AddressRepositoryImpl());
         Map<String, Integer> pkMap = impl.getChargeBoxIdPkPair(Arrays.asList(chargeboxID));
         int pk = pkMap.get(chargeboxID);
-        return impl.getDetails(pk);
+        return impl.getDetails(pk).orElseThrow();
     }
 
     private static void runOperation(Consumer<DSLContext> consumer) {

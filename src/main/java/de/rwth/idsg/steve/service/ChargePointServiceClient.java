@@ -68,7 +68,6 @@ import de.rwth.idsg.steve.web.dto.ocpp.UnlockConnectorParams;
 import de.rwth.idsg.steve.web.dto.ocpp.UpdateFirmwareParams;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import ocpp.cp._2015._10.ChargingProfilePurposeType;
 import ocpp.cp._2015._10.GetCompositeScheduleResponse;
 import org.joda.time.DateTime;
 import org.springframework.stereotype.Service;
@@ -86,7 +85,7 @@ public class ChargePointServiceClient {
 
     private final ChargingProfileRepository chargingProfileRepository;
     private final ReservationRepository reservationRepository;
-    private final OcppTagService ocppTagService;
+    private final OcppTagsService ocppTagsService;
 
     private final DelegatingTaskExecutor asyncTaskExecutor;
     private final TaskStore taskStore;
@@ -333,7 +332,7 @@ public class ChargePointServiceClient {
     @SafeVarargs
     public final int sendLocalList(SendLocalListParams params,
                                    OcppCallback<String>... callbacks) {
-        SendLocalListTask task = new SendLocalListTask(params, ocppTagService);
+        SendLocalListTask task = new SendLocalListTask(params, ocppTagsService);
 
         for (var callback : callbacks) {
             task.addCallback(callback);
@@ -364,7 +363,7 @@ public class ChargePointServiceClient {
             .build();
 
         int reservationId = reservationRepository.insert(res);
-        String parentIdTag = ocppTagService.getParentIdtag(params.getIdTag());
+        String parentIdTag = ocppTagsService.getParentIdtag(params.getIdTag());
 
         EnhancedReserveNowParams enhancedParams = new EnhancedReserveNowParams(params, reservationId, parentIdTag);
         ReserveNowTask task = new ReserveNowTask(enhancedParams, reservationRepository);

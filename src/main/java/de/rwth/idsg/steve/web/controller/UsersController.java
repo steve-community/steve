@@ -18,14 +18,13 @@
  */
 package de.rwth.idsg.steve.web.controller;
 
-import de.rwth.idsg.steve.repository.UserRepository;
-import de.rwth.idsg.steve.repository.dto.User;
-import de.rwth.idsg.steve.service.OcppTagService;
+import de.rwth.idsg.steve.service.OcppTagsService;
+import de.rwth.idsg.steve.service.UsersService;
 import de.rwth.idsg.steve.utils.ControllerHelper;
 import de.rwth.idsg.steve.utils.mapper.UserFormMapper;
 import de.rwth.idsg.steve.web.dto.UserForm;
 import de.rwth.idsg.steve.web.dto.UserQueryForm;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -40,13 +39,13 @@ import java.util.List;
  * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 25.11.2015
  */
-@AllArgsConstructor
 @Controller
 @RequestMapping(value = "/manager/users")
+@RequiredArgsConstructor
 public class UsersController {
 
-    private final OcppTagService ocppTagService;
-    private final UserRepository userRepository;
+    private final OcppTagsService ocppTagsService;
+    private final UsersService usersService;
 
     private static final String PARAMS = "params";
 
@@ -79,12 +78,12 @@ public class UsersController {
 
     private void initList(Model model, UserQueryForm params) {
         model.addAttribute(PARAMS, params);
-        model.addAttribute("userList", userRepository.getOverview(params));
+        model.addAttribute("userList", usersService.getOverview(params));
     }
 
     @GetMapping(value = DETAILS_PATH)
     public String getDetails(@PathVariable("userPk") int userPk, Model model) {
-        var details = userRepository.getDetails(userPk);
+        var details = usersService.getDetails(userPk);
         UserForm form = UserFormMapper.toForm(details);
 
         model.addAttribute("userForm", form);
@@ -107,7 +106,7 @@ public class UsersController {
             return "data-man/userAdd";
         }
 
-        userRepository.add(userForm);
+        usersService.add(userForm);
         return toOverview();
     }
 
@@ -119,18 +118,18 @@ public class UsersController {
             return "data-man/userDetails";
         }
 
-        userRepository.update(userForm);
+        usersService.update(userForm);
         return toOverview();
     }
 
     @PostMapping(value = DELETE_PATH)
     public String delete(@PathVariable("userPk") int userPk) {
-        userRepository.delete(userPk);
+        usersService.delete(userPk);
         return toOverview();
     }
 
     private void setTags(Model model, List<String> idTagsFromUser) {
-        var fromDB = ocppTagService.getIdTagsWithoutUser();
+        var fromDB = ocppTagsService.getIdTagsWithoutUser();
 
         // new temp list because we want to have a specific order
         var idTagList = new ArrayList<>(fromDB.size() + idTagsFromUser.size());

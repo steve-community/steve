@@ -20,6 +20,7 @@ package de.rwth.idsg.steve.ocpp.ws.ocpp16;
 
 import de.rwth.idsg.ocpp.jaxb.RequestType;
 import de.rwth.idsg.ocpp.jaxb.ResponseType;
+import de.rwth.idsg.steve.config.DelegatingTaskScheduler;
 import de.rwth.idsg.steve.ocpp.OcppProtocol;
 import de.rwth.idsg.steve.ocpp.OcppVersion;
 import de.rwth.idsg.steve.ocpp.soap.CentralSystemService16_SoapServer;
@@ -28,6 +29,7 @@ import de.rwth.idsg.steve.ocpp.ws.FutureResponseContextStore;
 import de.rwth.idsg.steve.ocpp.ws.pipeline.AbstractCallHandler;
 import de.rwth.idsg.steve.ocpp.ws.pipeline.Deserializer;
 import de.rwth.idsg.steve.ocpp.ws.pipeline.IncomingPipeline;
+import de.rwth.idsg.steve.repository.OcppServerRepository;
 import lombok.RequiredArgsConstructor;
 import ocpp.cs._2015._10.AuthorizeRequest;
 import ocpp.cs._2015._10.BootNotificationRequest;
@@ -39,7 +41,7 @@ import ocpp.cs._2015._10.MeterValuesRequest;
 import ocpp.cs._2015._10.StartTransactionRequest;
 import ocpp.cs._2015._10.StatusNotificationRequest;
 import ocpp.cs._2015._10.StopTransactionRequest;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 
 import jakarta.annotation.PostConstruct;
@@ -51,8 +53,19 @@ import jakarta.annotation.PostConstruct;
 @Component
 public class Ocpp16WebSocketEndpoint extends AbstractWebSocketEndpoint {
 
-    @Autowired private CentralSystemService16_SoapServer server;
-    @Autowired private FutureResponseContextStore futureResponseContextStore;
+    private final CentralSystemService16_SoapServer server;
+    private final FutureResponseContextStore futureResponseContextStore;
+
+    public Ocpp16WebSocketEndpoint(DelegatingTaskScheduler asyncTaskScheduler,
+                                   OcppServerRepository ocppServerRepository,
+                                   FutureResponseContextStore futureResponseContextStore,
+                                   ApplicationEventPublisher applicationEventPublisher,
+                                   CentralSystemService16_SoapServer server
+    ) {
+        super(asyncTaskScheduler, ocppServerRepository, futureResponseContextStore, applicationEventPublisher);
+        this.server = server;
+        this.futureResponseContextStore = futureResponseContextStore;
+    }
 
     @PostConstruct
     public void init() {

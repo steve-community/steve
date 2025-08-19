@@ -23,6 +23,7 @@ import de.rwth.idsg.steve.repository.ChargePointRepository;
 import de.rwth.idsg.steve.repository.TaskStore;
 import de.rwth.idsg.steve.repository.TransactionRepository;
 
+import de.rwth.idsg.steve.repository.dto.ChargePointSelect;
 import de.rwth.idsg.steve.service.ChargePointHelperService;
 import de.rwth.idsg.steve.service.ChargePointServiceClient;
 
@@ -36,6 +37,7 @@ import de.rwth.idsg.steve.web.dto.ocpp.UnlockConnectorParams;
 import de.rwth.idsg.steve.web.api.dto.ApiChargePointList;
 import de.rwth.idsg.steve.web.api.dto.ApiChargePointStart;
 import de.rwth.idsg.steve.web.api.exception.BadRequestException;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
@@ -46,18 +48,19 @@ import org.springframework.web.bind.annotation.RestController;
 
 import jakarta.validation.Valid;
 
+import java.util.ArrayList;
 import java.util.Collections;
 
 /**
  * @author fnkbsi
  * @since 18.10.2023
  */
-
+@Tag(name = "remote-commands")
 @Slf4j
 @RestController
 @RequestMapping(value = "/api/v1/remote", produces = MediaType.APPLICATION_JSON_VALUE)
 @RequiredArgsConstructor
-public class RemoteStartStopRestController {
+public class RemoteCommandsRestController {
 
     private static final String CALLER = "SteveWebApi";
 
@@ -72,7 +75,8 @@ public class RemoteStartStopRestController {
     // -------------------------------------------------------------------------
 
     private ApiChargePointList getChargePoints() {
-        var chargePoints = chargePointHelperService.getChargePoints(OcppVersion.V_12);
+        var chargePoints = new ArrayList<ChargePointSelect>();
+        chargePoints.addAll(chargePointHelperService.getChargePoints(OcppVersion.V_12));
         chargePoints.addAll(chargePointHelperService.getChargePoints(OcppVersion.V_15));
         chargePoints.addAll(chargePointHelperService.getChargePoints(OcppVersion.V_16));
         var lsCp = new ApiChargePointList();
@@ -216,7 +220,7 @@ public class RemoteStartStopRestController {
                 String.format("Transaction %s not found!", transactionId)
             )
         ).getOcppIdTag();
-        if (!params.getOcppTag().contentEquals(ocppTag)) {
+        if (!ocppTag.contentEquals(params.getOcppTag())) {
              throw new BadRequestException("The transaction was authorised with another OCPP Tag!");
         }
         transactionParams.setTransactionId(transactionId);

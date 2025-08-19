@@ -20,7 +20,7 @@ package de.rwth.idsg.steve.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Strings;
-import de.rwth.idsg.steve.service.WebUserService;
+import de.rwth.idsg.steve.service.WebUsersService;
 import de.rwth.idsg.steve.web.api.ApiControllerAdvice;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -52,7 +52,7 @@ import java.io.IOException;
 @RequiredArgsConstructor
 public class ApiAuthenticationManager implements AuthenticationManager, AuthenticationEntryPoint {
 
-    private final WebUserService webUserService;
+    private final WebUsersService webUsersService;
     private final PasswordEncoder passwordEncoder;
     private final ObjectMapper jacksonObjectMapper;
 
@@ -65,7 +65,7 @@ public class ApiAuthenticationManager implements AuthenticationManager, Authenti
             throw new BadCredentialsException("Required parameters missing");
         }
 
-        UserDetails userDetails = webUserService.loadUserByUsernameForApi(username);
+        UserDetails userDetails = webUsersService.loadUserByUsernameForApi(username);
         if (!areValuesSet(userDetails)) {
             throw new DisabledException("The user does not exist, exists but is disabled or has API access disabled.");
         }

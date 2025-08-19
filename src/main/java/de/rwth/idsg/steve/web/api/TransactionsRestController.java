@@ -25,7 +25,6 @@ import de.rwth.idsg.steve.web.dto.TransactionQueryForm;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -39,13 +38,12 @@ import java.util.List;
  * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 13.09.2022
  */
-@Tag(name = "transaction-controller",
+@Tag(name = "transactions",
     description = """
         Operations related to querying transactions.
         A transaction represents a charging session at a charge box (i.e. charging station. The notions 'charge box' and 'charging station' are being used interchangeably).
         """
 )
-@Slf4j
 @RestController
 @RequestMapping(value = "/api/v1/transactions", produces = MediaType.APPLICATION_JSON_VALUE)
 @RequiredArgsConstructor
@@ -60,14 +58,10 @@ public class TransactionsRestController {
     @StandardApiResponses
     @GetMapping(value = "")
     public List<Transaction> get(@Valid @ParameterObject TransactionQueryForm.TransactionQueryFormForApi params) {
-        log.debug("Read request for query: {}", params);
-
         if (params.isReturnCSV()) {
             throw new BadRequestException("returnCSV=true is not supported for API calls");
         }
 
-        var response = transactionRepository.getTransactions(params);
-        log.debug("Read response for query: {}", response);
-        return response;
+        return transactionRepository.getTransactions(params);
     }
 }

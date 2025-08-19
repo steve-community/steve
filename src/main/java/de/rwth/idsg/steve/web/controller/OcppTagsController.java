@@ -18,14 +18,14 @@
  */
 package de.rwth.idsg.steve.web.controller;
 
-import de.rwth.idsg.steve.service.OcppTagService;
+import de.rwth.idsg.steve.service.OcppTagsService;
 import de.rwth.idsg.steve.utils.ControllerHelper;
 import de.rwth.idsg.steve.utils.mapper.OcppTagFormMapper;
 import de.rwth.idsg.steve.web.dto.OcppTagBatchInsertForm;
 import de.rwth.idsg.steve.web.dto.OcppTagForm;
 import de.rwth.idsg.steve.web.dto.OcppTagQueryForm;
 import jooq.steve.db.tables.records.OcppTagActivityRecord;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -36,7 +36,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import jakarta.validation.Valid;
 import java.util.Collections;
-import java.util.List;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -44,9 +43,10 @@ import java.util.List;
  */
 @Controller
 @RequestMapping(value = "/manager/ocppTags")
+@RequiredArgsConstructor
 public class OcppTagsController {
 
-    @Autowired protected OcppTagService ocppTagService;
+    private final OcppTagsService ocppTagsService;
 
     protected static final String PARAMS = "params";
 
@@ -85,7 +85,7 @@ public class OcppTagsController {
 
     @RequestMapping(value = DETAILS_PATH, method = RequestMethod.GET)
     public String getDetails(@PathVariable("ocppTagPk") int ocppTagPk, Model model) {
-        OcppTagActivityRecord record = ocppTagService.getRecord(ocppTagPk);
+        OcppTagActivityRecord record = ocppTagsService.getRecord(ocppTagPk);
         OcppTagForm form = OcppTagFormMapper.toForm(record);
 
         model.addAttribute("activeTransactionCount", record.getActiveTransactionCount());
@@ -111,7 +111,7 @@ public class OcppTagsController {
             return "data-man/ocppTagAdd";
         }
 
-        ocppTagService.addOcppTag(ocppTagForm);
+        ocppTagsService.addOcppTag(ocppTagForm);
         return toOverview();
     }
 
@@ -124,7 +124,7 @@ public class OcppTagsController {
             return "data-man/ocppTagAdd";
         }
 
-        ocppTagService.addOcppTagList(form.getIdList());
+        ocppTagsService.addOcppTagList(form.getIdList());
         return toOverview();
     }
 
@@ -136,38 +136,38 @@ public class OcppTagsController {
             return "data-man/ocppTagDetails";
         }
 
-        ocppTagService.updateOcppTag(ocppTagForm);
+        ocppTagsService.updateOcppTag(ocppTagForm);
         return toOverview();
     }
 
     @RequestMapping(value = DELETE_PATH, method = RequestMethod.POST)
     public String delete(@PathVariable("ocppTagPk") int ocppTagPk) {
-        ocppTagService.deleteOcppTag(ocppTagPk);
+        ocppTagsService.deleteOcppTag(ocppTagPk);
         return toOverview();
     }
 
     @RequestMapping(value = UNKNOWN_ADD_PATH, method = RequestMethod.POST)
     public String addUnknownIdTag(@PathVariable("idTag") String idTag) {
-        ocppTagService.addOcppTagList(Collections.singletonList(idTag));
+        ocppTagsService.addOcppTagList(Collections.singletonList(idTag));
         return toOverview();
     }
 
     @RequestMapping(value = UNKNOWN_REMOVE_PATH, method = RequestMethod.POST)
     public String removeUnknownIdTag(@PathVariable("idTag") String idTag) {
-        ocppTagService.removeUnknown(Collections.singletonList(idTag));
+        ocppTagsService.removeUnknown(Collections.singletonList(idTag));
         return toOverview();
     }
 
     private void initList(Model model, OcppTagQueryForm params) {
         model.addAttribute(PARAMS, params);
-        model.addAttribute("idTagList", ocppTagService.getIdTags());
-        model.addAttribute("parentIdTagList", ocppTagService.getParentIdTags());
-        model.addAttribute("ocppTagList", ocppTagService.getOverview(params));
-        model.addAttribute("unknownList", ocppTagService.getUnknownOcppTags());
+        model.addAttribute("idTagList", ocppTagsService.getIdTags());
+        model.addAttribute("parentIdTagList", ocppTagsService.getParentIdTags());
+        model.addAttribute("ocppTagList", ocppTagsService.getOverview(params));
+        model.addAttribute("unknownList", ocppTagsService.getUnknownOcppTags());
     }
 
     protected void setTags(Model model) {
-        model.addAttribute("idTagList", ControllerHelper.idTagEnhancer(ocppTagService.getIdTags()));
+        model.addAttribute("idTagList", ControllerHelper.idTagEnhancer(ocppTagsService.getIdTags()));
     }
 
     // -------------------------------------------------------------------------

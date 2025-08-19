@@ -212,18 +212,18 @@ public class ChargePointRepositoryImpl implements ChargePointRepository {
     }
 
     @Override
-    public ChargePoint.Details getDetails(int chargeBoxPk) {
+    public Optional<ChargePoint.Details> getDetails(int chargeBoxPk) {
         ChargeBoxRecord cbr = ctx.selectFrom(CHARGE_BOX)
                                  .where(CHARGE_BOX.CHARGE_BOX_PK.equal(chargeBoxPk))
                                  .fetchOne();
 
         if (cbr == null) {
-            throw new SteveException("Charge point not found");
+            return Optional.empty();
         }
 
         AddressRecord ar = addressRepository.get(ctx, cbr.getAddressPk());
 
-        return new ChargePoint.Details(cbr, ar);
+        return Optional.of(new ChargePoint.Details(cbr, ar));
     }
 
     @Override

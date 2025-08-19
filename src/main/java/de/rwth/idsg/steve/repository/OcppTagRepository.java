@@ -44,7 +44,7 @@ public interface OcppTagRepository {
     List<String> getActiveIdTags();
 
     List<String> getParentIdTags();
-    String getParentIdtag(String idTag);
+    String getParentIdTag(String idTag);
 
     void addOcppTagList(List<String> idTagList);
     int addOcppTag(OcppTagForm form);

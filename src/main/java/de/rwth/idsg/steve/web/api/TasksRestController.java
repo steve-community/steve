@@ -23,10 +23,10 @@ import de.rwth.idsg.steve.repository.TaskStore;
 import de.rwth.idsg.steve.web.api.dto.ApiTaskInfo;
 import de.rwth.idsg.steve.web.api.dto.ApiTaskList;
 import de.rwth.idsg.steve.web.api.exception.NotFoundException;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -41,12 +41,12 @@ import org.springframework.web.bind.annotation.RequestParam;
  * @author fnkbsi
  * @since 18.10.2023
  */
-@Slf4j
+@Tag(name = "tasks", description = "Task management operations")
 @Validated
 @RestController
 @RequestMapping(value = "/api/v1/tasks", produces = MediaType.APPLICATION_JSON_VALUE)
 @RequiredArgsConstructor
-public class TaskRestController {
+public class TasksRestController {
 
     private final TaskStore taskStore;
 

@@ -194,7 +194,7 @@ public class OcppTagRepositoryImpl implements OcppTagRepository {
     }
 
     @Override
-    public String getParentIdtag(String idTag) {
+    public String getParentIdTag(String idTag) {
         return ctx.select(OCPP_TAG.PARENT_ID_TAG)
                   .from(OCPP_TAG)
                   .where(OCPP_TAG.ID_TAG.eq(idTag))

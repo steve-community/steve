@@ -40,6 +40,7 @@ public interface OcppTagRepository {
     OcppTagActivityRecord getRecord(int ocppTagPk);
 
     List<String> getIdTags();
+    List<String> getIdTagsWithoutUser();
     List<String> getActiveIdTags();
 
     List<String> getParentIdTags();

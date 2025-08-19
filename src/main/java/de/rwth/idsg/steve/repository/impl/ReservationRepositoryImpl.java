@@ -41,6 +41,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
+import static de.rwth.idsg.steve.repository.impl.RepositoryUtils.ocppTagByUserIdQuery;
 import static jooq.steve.db.tables.ChargeBox.CHARGE_BOX;
 import static jooq.steve.db.tables.Connector.CONNECTOR;
 import static jooq.steve.db.tables.OcppTag.OCPP_TAG;
@@ -89,6 +90,11 @@ public class ReservationRepositoryImpl implements ReservationRepository {
 
         if (form.isOcppIdTagSet()) {
             selectQuery.addConditions(RESERVATION.ID_TAG.eq(form.getOcppIdTag()));
+        }
+
+        if (form.isUserIdSet()) {
+            var query = ocppTagByUserIdQuery(ctx, form.getUserId());
+            selectQuery.addConditions(RESERVATION.ID_TAG.in(query));
         }
 
         if (form.isStatusSet()) {

@@ -42,6 +42,9 @@ public abstract class QueryForm {
     @Schema(description = "The OCPP tag")
     private String ocppIdTag;
 
+    @Schema(description = "The User ID")
+    private Integer userId;
+
     @Schema(description = "Show results that happened after this date/time. Format: ISO8601 without timezone. Example: `2022-10-10T09:00:00`")
     private LocalDateTime from;
 
@@ -67,5 +70,10 @@ public abstract class QueryForm {
     @Schema(hidden = true)
     public boolean isOcppIdTagSet() {
         return ocppIdTag != null;
+    }
+
+    @Schema(hidden = true)
+    public boolean isUserIdSet() {
+        return userId != null;
     }
 }

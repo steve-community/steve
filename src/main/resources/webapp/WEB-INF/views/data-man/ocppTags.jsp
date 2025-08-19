@@ -92,6 +92,10 @@
                     </td>
                 </tr>
                 <tr>
+                    <td>User ID:</td>
+                    <td><form:input path="userId"/></td>
+                </tr>
+                <tr>
                     <td>Expired?:</td>
                     <td><form:select path="expired">
                         <form:options items="${expired}" itemLabel="value"/>

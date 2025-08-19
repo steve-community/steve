@@ -18,6 +18,7 @@
  */
 package de.rwth.idsg.steve.web.dto;
 
+import com.google.common.base.Strings;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -43,7 +44,7 @@ public class UserQueryForm {
     }
 
     public boolean isSetOcppIdTag() {
-        return ocppIdTag != null;
+        return !Strings.isNullOrEmpty(ocppIdTag);
     }
 
     public boolean isSetName() {

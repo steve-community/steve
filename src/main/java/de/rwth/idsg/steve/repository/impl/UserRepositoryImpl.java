@@ -152,6 +152,16 @@ public class UserRepositoryImpl implements UserRepository {
             conditions.add(includes(USER.E_MAIL, form.getEmail()));
         }
 
+        if (form.isSetOcppIdTag()) {
+            conditions.add(DSL.exists(
+                DSL.selectOne()
+                    .from(USER_OCPP_TAG)
+                    .join(OCPP_TAG).on(USER_OCPP_TAG.OCPP_TAG_PK.eq(OCPP_TAG.OCPP_TAG_PK))
+                    .where(USER_OCPP_TAG.USER_PK.eq(USER.USER_PK))
+                    .and(includes(OCPP_TAG.ID_TAG, form.getOcppIdTag()))
+            ));
+        }
+
         if (form.isSetName()) {
             // Concatenate the two columns and search within the resulting representation
             // for flexibility, since the user can search by first or last name, or both.

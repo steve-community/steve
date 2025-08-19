@@ -26,6 +26,7 @@ import de.rwth.idsg.steve.repository.dto.User;
 import de.rwth.idsg.steve.web.dto.UserForm;
 import de.rwth.idsg.steve.web.dto.UserQueryForm;
 import jooq.steve.db.tables.records.UserRecord;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jooq.Condition;
 import org.jooq.DSLContext;
@@ -54,12 +55,13 @@ import static jooq.steve.db.tables.User.USER;
  * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 25.11.2015
  */
+@AllArgsConstructor
 @Slf4j
 @Repository
 public class UserRepositoryImpl implements UserRepository {
 
-    @Autowired private DSLContext ctx;
-    @Autowired private AddressRepository addressRepository;
+    private final DSLContext ctx;
+    private final AddressRepository addressRepository;
 
     @Override
     public List<User.Overview> getOverview(UserQueryForm form) {
@@ -161,6 +163,17 @@ public class UserRepositoryImpl implements UserRepository {
             conditions.add(includes(joinedField, form.getName()));
         }
 
+        // Filter users by OCPP tag when provided
+        if (!Strings.isNullOrEmpty(form.getOcppIdTag())) {
+            conditions.add(DSL.exists(
+                DSL.selectOne()
+                    .from(USER_OCPP_TAG)
+                    .join(OCPP_TAG).on(USER_OCPP_TAG.OCPP_TAG_PK.eq(OCPP_TAG.OCPP_TAG_PK))
+                    .where(USER_OCPP_TAG.USER_PK.eq(USER.USER_PK))
+                    .and(includes(OCPP_TAG.ID_TAG, form.getOcppIdTag()))
+            ));
+        }
+
         return ctx.select(
                 USER.USER_PK,
                 USER.FIRST_NAME,
@@ -214,7 +227,7 @@ public class UserRepositoryImpl implements UserRepository {
 
     private Integer addInternal(DSLContext ctx, UserForm form, Integer addressPk) {
         try {
-            return ctx.insertInto(USER)
+            var r = ctx.insertInto(USER)
                       .set(USER.FIRST_NAME, form.getFirstName())
                       .set(USER.LAST_NAME, form.getLastName())
                       .set(USER.BIRTH_DAY, form.getBirthDay())
@@ -224,8 +237,11 @@ public class UserRepositoryImpl implements UserRepository {
                       .set(USER.NOTE, form.getNote())
                       .set(USER.ADDRESS_PK, addressPk)
                       .returning(USER.USER_PK)
-                      .fetchOne()
-                      .getUserPk();
+                      .fetchOne();
+            if (r == null) {
+                throw new SteveException("Failed to insert the user, no record returned");
+            }
+            return r.getUserPk();
         } catch (DataAccessException e) {
             throw new SteveException("Failed to insert the user", e);
         }
@@ -269,10 +285,12 @@ public class UserRepositoryImpl implements UserRepository {
         //
         // 1. Delete entries that are not in the wanted entries
         if (form.getUserPk() != null) {
-            ctx.deleteFrom(USER_OCPP_TAG)
-                .where(USER_OCPP_TAG.USER_PK.eq(userPk))
-                .and(USER_OCPP_TAG.OCPP_TAG_PK.notIn(wantedOcppTagPks))
-                .execute();
+            var delete = ctx.deleteFrom(USER_OCPP_TAG)
+                .where(USER_OCPP_TAG.USER_PK.eq(userPk));
+            if (!wantedOcppTagPks.isEmpty()) {
+                delete.and(USER_OCPP_TAG.OCPP_TAG_PK.notIn(wantedOcppTagPks));
+            }
+            delete.execute();
         }
 
         // 2. Insert new entries that are not already present

@@ -26,7 +26,6 @@ import org.joda.time.LocalDate;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
 
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -41,7 +40,8 @@ public class UserForm {
     // Internal database id
     private Integer userPk;
 
-    private List<String> idTagList = Collections.emptyList();
+    @NotNull
+    private List<String> idTagList;
 
     private String firstName;
     private String lastName;
@@ -56,5 +56,4 @@ public class UserForm {
     private String eMail;
 
     private Address address;
-
 }

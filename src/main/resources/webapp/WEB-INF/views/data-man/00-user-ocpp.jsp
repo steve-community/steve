@@ -20,7 +20,7 @@
 --%>
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
 <table class="userInput">
-	<thead><tr><th>OCPP ID Tags</th><th></th></thead>
+  <thead><tr><th>OCPP ID Tags</th><th></th></tr></thead>
 	<tbody>
 	<tr>
 		<td style="vertical-align:top">
@@ -28,9 +28,7 @@
 		</td>
 		<td>
 			<form:select path="idTagList" size="5" multiple="true">
-				<c:forEach items="${idTagList}" var="idTag">
-					<form:option value="${idTag}" label="${idTag}"/>
-				</c:forEach>
+				<form:options items="${idTagList}"/>
 			</form:select>
 		</td>
 	</tr>

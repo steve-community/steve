@@ -1,5 +1,3 @@
-START TRANSACTION;
-
 -- 1. create user_ocpp_tag table where a user can have multiple ocpp_tags
 CREATE TABLE user_ocpp_tag
 (
@@ -33,5 +31,3 @@ SELECT user_pk, ocpp_tag_pk FROM user WHERE ocpp_tag_pk IS NOT NULL;
 ALTER TABLE user
     DROP FOREIGN KEY FK_user_ocpp_tag_otpk,
     DROP COLUMN ocpp_tag_pk;
-
-COMMIT;

@@ -73,7 +73,7 @@
             <tr><td><a href="${ctxPath}/manager/users/details/${cr.userPk}">${cr.userPk}</a></td>
                 <td>
                     <c:forEach var="it" items="${cr.ocppTagEntries}" varStatus="loop">
-                        <a href="${ctxPath}/manager/ocppTags/details/${it.ocppTagPk}">${it.idTag}</a>${loop.last ? '' : ', '}
+                        <a href="${ctxPath}/manager/ocppTags/details/${it.ocppTagPk}"><c:out value="${it.idTag}"/></a>${loop.last ? '' : ', '}
                     </c:forEach>
                 </td>
                 <td>${cr.name}</td>

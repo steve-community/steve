@@ -24,6 +24,7 @@ import de.rwth.idsg.steve.ocpp.converter.Convert;
 import de.rwth.idsg.steve.ocpp.converter.Server12to15Impl;
 import de.rwth.idsg.steve.ocpp.converter.Server15to16Impl;
 import de.rwth.idsg.steve.service.CentralSystemService16_Service;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import ocpp.cs._2010._08.AuthorizeRequest;
 import ocpp.cs._2010._08.AuthorizeResponse;
@@ -44,7 +45,6 @@ import ocpp.cs._2010._08.StatusNotificationRequest;
 import ocpp.cs._2010._08.StatusNotificationResponse;
 import ocpp.cs._2010._08.StopTransactionRequest;
 import ocpp.cs._2010._08.StopTransactionResponse;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import jakarta.jws.WebService;
@@ -69,9 +69,10 @@ import java.util.concurrent.Future;
         portName = "CentralSystemServiceSoap12",
         targetNamespace = "urn://Ocpp/Cs/2010/08/",
         endpointInterface = "ocpp.cs._2010._08.CentralSystemService")
+@RequiredArgsConstructor
 public class CentralSystemService12_SoapServer implements CentralSystemService {
 
-    @Autowired private CentralSystemService16_Service service;
+    private final CentralSystemService16_Service service;
 
     public BootNotificationResponse bootNotificationWithTransport(BootNotificationRequest parameters,
                                                                   String chargeBoxIdentity, OcppProtocol protocol) {

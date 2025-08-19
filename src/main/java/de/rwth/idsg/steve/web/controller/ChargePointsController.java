@@ -19,7 +19,7 @@
 package de.rwth.idsg.steve.web.controller;
 
 import de.rwth.idsg.steve.ocpp.OcppProtocol;
-import de.rwth.idsg.steve.service.ChargePointHelperService;
+import de.rwth.idsg.steve.service.ChargePointRegistrationService;
 import de.rwth.idsg.steve.service.ChargePointsService;
 import de.rwth.idsg.steve.utils.ControllerHelper;
 import de.rwth.idsg.steve.utils.mapper.ChargePointDetailsMapper;
@@ -53,7 +53,7 @@ import java.util.stream.Collectors;
 public class ChargePointsController {
 
     private final ChargePointsService chargePointsService;
-    private final ChargePointHelperService chargePointHelperService;
+    private final ChargePointRegistrationService chargePointRegistrationService;
 
     private static final String PARAMS = "params";
 
@@ -104,7 +104,7 @@ public class ChargePointsController {
     private void initList(Model model, ChargePointQueryForm params) {
         model.addAttribute(PARAMS, params);
         model.addAttribute("cpList", chargePointsService.getOverview(params));
-        model.addAttribute("unknownList", chargePointHelperService.getUnknownChargePoints());
+        model.addAttribute("unknownList", chargePointRegistrationService.getUnknownChargePoints());
     }
 
     @GetMapping(value = DETAILS_PATH)
@@ -195,7 +195,7 @@ public class ChargePointsController {
 
     @PostMapping(value = UNKNOWN_REMOVE_PATH)
     public String removeUnknownChargeBoxId(@PathVariable("chargeBoxId") String chargeBoxId) {
-        chargePointHelperService.removeUnknown(Collections.singletonList(chargeBoxId));
+        chargePointRegistrationService.removeUnknown(Collections.singletonList(chargeBoxId));
         return toOverview();
     }
 
@@ -234,11 +234,11 @@ public class ChargePointsController {
 
     private void add(ChargePointForm form) {
         chargePointsService.addChargePoint(form);
-        chargePointHelperService.removeUnknown(Collections.singletonList(form.getChargeBoxId()));
+        chargePointRegistrationService.removeUnknown(Collections.singletonList(form.getChargeBoxId()));
     }
 
     private void add(List<String> idList) {
         chargePointsService.addChargePointList(idList);
-        chargePointHelperService.removeUnknown(idList);
+        chargePointRegistrationService.removeUnknown(idList);
     }
 }

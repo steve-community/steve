@@ -18,32 +18,25 @@
  */
 package de.rwth.idsg.steve.web.dto;
 
-import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.ToString;
 
-import java.util.Map;
 
 /**
- *
- * @author Sevket Goekay <sevketgokay@gmail.com>
- *
+ * @author fnkbsi
+ * @since 01.04.2022
  */
 @Getter
-@Builder
-@ToString
-public final class Statistics {
-    // Number of chargeboxes, ocppTags, users, reservations, transactions
-    private final Integer numChargeBoxes, numOcppTags, numUsers, numReservations, numTransactions,
-    // Received heartbeats
-    heartbeatToday, heartbeatYesterday, heartbeatEarlier,
-    //WebUser
-    numWebUsers;
+@Setter
+public class WebUserBaseForm {
 
-    // Number of connected WebSocket/JSON chargeboxes
-    @Setter private int numOcpp12JChargeBoxes, numOcpp15JChargeBoxes, numOcpp16JChargeBoxes;
+    // Internal database id
+    private Integer webUserPk;
 
-    // Count of connectors based on their status
-    @Setter private Map<String, Integer> statusCountMap;
+    private Boolean enabled;
+
+    private String webUsername;
+
+    private WebUserAuthority authorities;
+
 }

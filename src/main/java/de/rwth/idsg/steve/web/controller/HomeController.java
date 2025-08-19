@@ -24,26 +24,25 @@ import de.rwth.idsg.steve.service.ChargePointHelperService;
 import de.rwth.idsg.steve.utils.ConnectorStatusCountFilter;
 import de.rwth.idsg.steve.utils.ConnectorStatusFilter;
 import de.rwth.idsg.steve.web.dto.ConnectorStatusForm;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 
 import java.util.List;
 
 /**
- *
  * @author Sevket Goekay <sevketgokay@gmail.com>
- *
  */
 @Controller
-@RequestMapping(value = "/manager", method = RequestMethod.GET)
+@RequestMapping(value = "/manager")
+@RequiredArgsConstructor
 public class HomeController {
 
-    @Autowired private ChargePointRepository chargePointRepository;
-    @Autowired private ChargePointHelperService chargePointHelperService;
+    private final ChargePointRepository chargePointRepository;
+    private final ChargePointHelperService chargePointHelperService;
 
     private static final String PARAMS = "params";
 
@@ -60,24 +59,24 @@ public class HomeController {
     // HTTP methods
     // -------------------------------------------------------------------------
 
-    @RequestMapping(value = {"", HOME_PREFIX})
+    @GetMapping(value = {"", HOME_PREFIX})
     public String getHome(Model model) {
         model.addAttribute("stats", chargePointHelperService.getStats());
         return "home";
     }
 
-    @RequestMapping(value = CONNECTOR_STATUS_PATH)
+    @GetMapping(value = CONNECTOR_STATUS_PATH)
     public String getConnectorStatus(Model model) {
         return getConnectorStatusQuery(new ConnectorStatusForm(), model);
     }
 
-    @RequestMapping(value = CONNECTOR_STATUS_QUERY_PATH)
+    @GetMapping(value = CONNECTOR_STATUS_QUERY_PATH)
     public String getConnectorStatusQuery(@ModelAttribute(PARAMS) ConnectorStatusForm params, Model model) {
         model.addAttribute("cpList", chargePointRepository.getChargeBoxIds());
         model.addAttribute("statusValues", ConnectorStatusCountFilter.ALL_STATUS_VALUES);
         model.addAttribute(PARAMS, params);
 
-        List<ConnectorStatus> latestList = chargePointHelperService.getChargePointConnectorStatus(params);
+        var latestList = chargePointHelperService.getChargePointConnectorStatus(params);
         List<ConnectorStatus> filteredList;
         if (params.getStrategy() == ConnectorStatusForm.Strategy.PreferZero) {
             filteredList = ConnectorStatusFilter.filterAndPreferZero(latestList);
@@ -88,7 +87,7 @@ public class HomeController {
         return "connectorStatus";
     }
 
-    @RequestMapping(value = OCPP_JSON_STATUS)
+    @GetMapping(value = OCPP_JSON_STATUS)
     public String getOcppJsonStatus(Model model) {
         model.addAttribute("ocppJsonStatusList", chargePointHelperService.getOcppJsonStatus());
         return "ocppJsonStatus";

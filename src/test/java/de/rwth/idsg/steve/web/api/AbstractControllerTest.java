@@ -21,20 +21,38 @@ package de.rwth.idsg.steve.web.api;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.StandaloneMockMvcBuilder;
 
-public class AbstractControllerTest {
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 
-    ObjectMapper objectMapper;
+public abstract class AbstractControllerTest {
+
+    private static final String CONTENT_TYPE = "application/json";
+
+    protected final ObjectMapper objectMapper;
 
     AbstractControllerTest() {
+        this.objectMapper = createMapper();
+    }
+
+    private static @NotNull ObjectMapper createMapper() {
         ObjectMapper objectMapper = Jackson2ObjectMapperBuilder.json().build();
         objectMapper.findAndRegisterModules();
         // if the client sends unknown props, just ignore them instead of failing
         objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         // default is true
         objectMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
+        return objectMapper;
+    }
 
-        this.objectMapper = objectMapper;
+    protected MockMvc buildMockMvc(StandaloneMockMvcBuilder builder) {
+        return builder.setControllerAdvice(new ApiControllerAdvice())
+            .setMessageConverters(new MappingJackson2HttpMessageConverter(objectMapper))
+            .alwaysExpect(content().contentType(CONTENT_TYPE))
+            .build();
     }
 }

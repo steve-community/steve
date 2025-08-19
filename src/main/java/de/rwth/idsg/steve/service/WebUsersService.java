@@ -70,7 +70,7 @@ import static org.springframework.security.core.context.SecurityContextHolder.ge
  */
 @Service
 @RequiredArgsConstructor
-public class WebUserService implements UserDetailsManager {
+public class WebUsersService implements UserDetailsManager {
 
     // Because Guava's cache does not accept a null value
     private static final UserDetails DUMMY_USER = new User("#", "#", Collections.emptyList());

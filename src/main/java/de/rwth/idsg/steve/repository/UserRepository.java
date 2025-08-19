@@ -23,6 +23,7 @@ import de.rwth.idsg.steve.web.dto.UserForm;
 import de.rwth.idsg.steve.web.dto.UserQueryForm;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -30,9 +31,9 @@ import java.util.List;
  */
 public interface UserRepository {
     List<User.Overview> getOverview(UserQueryForm form);
-    User.Details getDetails(int userPk);
+    Optional<User.Details> getDetails(int userPk);
 
-    void add(UserForm form);
+    Integer add(UserForm form);
     void update(UserForm form);
     void delete(int userPk);
 }

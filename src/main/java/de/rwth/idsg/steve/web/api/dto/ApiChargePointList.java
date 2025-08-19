@@ -41,7 +41,7 @@ public class ApiChargePointList {
 
     @Getter
     @RequiredArgsConstructor
-    static class ChargePointInfo {
+    public static class ChargePointInfo {
         @Schema(description = "Charge Box ID")
         private final String chargeBoxId;
         @Schema(description = "List of the charge box connectors")

@@ -18,14 +18,15 @@
  */
 package de.rwth.idsg.steve.web.api;
 
-import de.rwth.idsg.steve.repository.ChargePointRepository;
 import de.rwth.idsg.steve.repository.dto.ConnectorStatus;
 import de.rwth.idsg.steve.service.ChargePointHelperService;
+import de.rwth.idsg.steve.service.ChargePointsService;
 import de.rwth.idsg.steve.utils.ConnectorStatusFilter;
 import de.rwth.idsg.steve.web.api.dto.ApiConnectorList;
 import de.rwth.idsg.steve.web.dto.ConnectorStatusForm;
 import de.rwth.idsg.steve.web.dto.OcppJsonStatus;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.util.List;
@@ -42,13 +43,14 @@ import org.springframework.web.bind.annotation.RestController;
  * @author fnkbsi
  * @since 20.10.2023
  */
+@Tag(name = "connectors")
 @Slf4j
 @RestController
 @RequestMapping(value = "/api/v1/connectors", produces = MediaType.APPLICATION_JSON_VALUE)
 @RequiredArgsConstructor
-public class ConnectorRestController {
+public class ConnectorsRestController {
 
-    private final ChargePointRepository chargePointRepository;
+    private final ChargePointsService chargePointsService;
     private final ChargePointHelperService chargePointHelperService;
 
     // -------------------------------------------------------------------------
@@ -59,7 +61,7 @@ public class ConnectorRestController {
     @GetMapping(value = "")
     public ApiConnectorList getConnectors(@Valid ConnectorStatusForm queryParams) {
         var conList = new ApiConnectorList();
-        conList.setChargeBoxList(chargePointRepository.getChargeBoxIds());
+        conList.setChargeBoxList(chargePointsService.getChargeBoxIds());
 
         conList.setFiltered(isFiltered(queryParams));
         var latestList = chargePointHelperService.getChargePointConnectorStatus(queryParams);

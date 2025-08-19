@@ -37,14 +37,10 @@ import org.jooq.Result;
 import org.jooq.SelectConditionStep;
 import org.jooq.exception.DataAccessException;
 import org.jooq.impl.DSL;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.CollectionUtils;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static de.rwth.idsg.steve.utils.CustomDSL.includes;
 import static jooq.steve.db.Tables.USER_OCPP_TAG;
@@ -79,31 +75,31 @@ public class UserRepositoryImpl implements UserRepository {
     }
 
     @Override
-    public User.Details getDetails(int userPk) {
-        UserRecord ur = ctx.selectFrom(USER)
+    public Optional<User.Details> getDetails(int userPk) {
+        var ur = ctx.selectFrom(USER)
                            .where(USER.USER_PK.equal(userPk))
                            .fetchOne();
 
         if (ur == null) {
-            throw new SteveException("There is no user with id '%s'", userPk);
+            return Optional.empty();
         }
 
-        return User.Details.builder()
+        return Optional.of(User.Details.builder()
                            .userRecord(ur)
                            .address(addressRepository.get(ctx, ur.getAddressPk()))
                            .ocppTagEntries(getOcppTagsInternal(userPk, null).getOrDefault(userPk, List.of()))
-                           .build();
+                           .build());
     }
 
     @Override
-    public void add(UserForm form) {
-        ctx.transaction(configuration -> {
-            DSLContext ctx = DSL.using(configuration);
+    public Integer add(UserForm form) {
+        return ctx.transactionResult(configuration -> {
+            var ctx = DSL.using(configuration);
             try {
-                Integer addressId = addressRepository.updateOrInsert(ctx, form.getAddress());
-                Integer userPk = addInternal(ctx, form, addressId);
+                var addressId = addressRepository.updateOrInsert(ctx, form.getAddress());
+                var userPk = addInternal(ctx, form, addressId);
                 refreshOcppTagsInternal(ctx, form, userPk);
-
+                return userPk;
             } catch (DataAccessException e) {
                 throw new SteveException("Failed to add the user", e);
             }
@@ -113,9 +109,9 @@ public class UserRepositoryImpl implements UserRepository {
     @Override
     public void update(UserForm form) {
         ctx.transaction(configuration -> {
-            DSLContext ctx = DSL.using(configuration);
+            var ctx = DSL.using(configuration);
             try {
-                Integer addressId = addressRepository.updateOrInsert(ctx, form.getAddress());
+                var addressId = addressRepository.updateOrInsert(ctx, form.getAddress());
                 updateInternal(ctx, form, addressId);
                 refreshOcppTagsInternal(ctx, form, form.getUserPk());
 
@@ -128,11 +124,10 @@ public class UserRepositoryImpl implements UserRepository {
     @Override
     public void delete(int userPk) {
         ctx.transaction(configuration -> {
-            DSLContext ctx = DSL.using(configuration);
+            var ctx = DSL.using(configuration);
             try {
                 addressRepository.delete(ctx, selectAddressId(userPk));
                 deleteInternal(ctx, userPk);
-
             } catch (DataAccessException e) {
                 throw new SteveException("Failed to delete the user", e);
             }
@@ -186,7 +181,7 @@ public class UserRepositoryImpl implements UserRepository {
     }
 
     private Map<Integer, List<User.OcppTagEntry>> getOcppTagsInternal(Integer userPk, String ocppIdTag) {
-        List<Condition> conditions = new ArrayList<>();
+        var conditions = new ArrayList<Condition>();
 
         if (userPk != null) {
             conditions.add(USER_OCPP_TAG.USER_PK.eq(userPk));
@@ -205,7 +200,7 @@ public class UserRepositoryImpl implements UserRepository {
             .where(conditions)
             .fetch();
 
-        Map<Integer, List<User.OcppTagEntry>> map = new HashMap<>();
+        var map = new HashMap<Integer, List<User.OcppTagEntry>>();
         for (var entry : results) {
             map.computeIfAbsent(entry.value1(), k -> new ArrayList<>())
                 .add(new User.OcppTagEntry(entry.value2(), entry.value3()));

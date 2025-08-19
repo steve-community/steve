@@ -24,13 +24,11 @@ import de.rwth.idsg.steve.ocpp.RequestResult;
 import de.rwth.idsg.steve.ocpp.task.GetCompositeScheduleTask;
 import de.rwth.idsg.steve.ocpp.task.GetConfigurationTask;
 import de.rwth.idsg.steve.repository.TaskStore;
+import lombok.RequiredArgsConstructor;
 import ocpp.cp._2015._10.GetCompositeScheduleResponse;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -38,9 +36,10 @@ import org.springframework.web.bind.annotation.RequestMethod;
  */
 @Controller
 @RequestMapping(value = "/manager/operations/tasks")
-public class TaskController {
+@RequiredArgsConstructor
+public class TasksController {
 
-    @Autowired private TaskStore taskStore;
+    private final TaskStore taskStore;
 
     // -------------------------------------------------------------------------
     // Paths
@@ -53,38 +52,38 @@ public class TaskController {
     // HTTP methods
     // -------------------------------------------------------------------------
 
-    @RequestMapping(method = RequestMethod.GET)
+    @GetMapping
     public String getOverview(Model model) {
         model.addAttribute("taskList", taskStore.getOverview());
         return "tasks";
     }
 
-    @RequestMapping(params = "finished", method = RequestMethod.POST)
+    @PostMapping(params = "finished")
     public String clearFinished(Model model) {
         taskStore.clearFinished();
         return getOverview(model);
     }
 
-    @RequestMapping(params = "unfinished", method = RequestMethod.POST)
+    @PostMapping(params = "unfinished")
     public String clearUnfinished(Model model) {
         taskStore.clearUnfinished();
         return getOverview(model);
     }
 
-    @RequestMapping(value = TASK_ID_PATH, method = RequestMethod.GET)
+    @GetMapping(value = TASK_ID_PATH)
     public String getTaskDetails(@PathVariable("taskId") Integer taskId, Model model) {
-        CommunicationTask r = taskStore.get(taskId);
+        var r = taskStore.get(taskId);
         model.addAttribute("taskId", taskId);
         model.addAttribute("task", r);
         return "taskResult";
     }
 
-    @RequestMapping(value = TASK_DETAILS_PATH, method = RequestMethod.GET)
+    @GetMapping(value = TASK_DETAILS_PATH)
     public String getDetailsForChargeBox(@PathVariable("taskId") Integer taskId,
                                          @PathVariable("chargeBoxId") String chargeBoxId,
                                          Model model) {
 
-        CommunicationTask r = taskStore.get(taskId);
+        var r = taskStore.get(taskId);
 
         if (r instanceof GetCompositeScheduleTask) {
             return processForGetCompositeScheduleTask((GetCompositeScheduleTask) r, chargeBoxId, model);
@@ -95,7 +94,7 @@ public class TaskController {
         }
     }
 
-    private String processForGetCompositeScheduleTask(GetCompositeScheduleTask k, String chargeBoxId, Model model) {
+    private static String processForGetCompositeScheduleTask(GetCompositeScheduleTask k, String chargeBoxId, Model model) {
         RequestResult result = extractResult(k, chargeBoxId);
         GetCompositeScheduleResponse response = result.getDetails();
 
@@ -104,7 +103,7 @@ public class TaskController {
         return "op16/GetCompositeScheduleResponse";
     }
 
-    private String processForGetConfigurationTask(GetConfigurationTask k, String chargeBoxId, Model model) {
+    private static String processForGetConfigurationTask(GetConfigurationTask k, String chargeBoxId, Model model) {
         RequestResult result = extractResult(k, chargeBoxId);
         GetConfigurationTask.ResponseWrapper response = result.getDetails();
 

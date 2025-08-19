@@ -22,8 +22,8 @@ import org.springframework.security.web.authentication.logout.CookieClearingLogo
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.security.web.authentication.rememberme.AbstractRememberMeServices;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -36,7 +36,7 @@ import jakarta.servlet.http.HttpServletResponse;
 @RequestMapping(value = "/manager")
 public class SignOutController {
 
-    @RequestMapping(value = "/signout", method = RequestMethod.GET)
+    @GetMapping(value = "/signout")
     public String signOut(HttpServletRequest request, HttpServletResponse response) {
         new SecurityContextLogoutHandler()
                 .logout(request, response, null);

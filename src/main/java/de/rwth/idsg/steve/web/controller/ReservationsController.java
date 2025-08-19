@@ -18,25 +18,27 @@
  */
 package de.rwth.idsg.steve.web.controller;
 
-import de.rwth.idsg.steve.repository.ChargePointRepository;
-import de.rwth.idsg.steve.repository.ReservationRepository;
 import de.rwth.idsg.steve.repository.ReservationStatus;
 import de.rwth.idsg.steve.repository.TransactionRepository;
-import de.rwth.idsg.steve.service.OcppTagService;
+import de.rwth.idsg.steve.service.ChargePointsService;
+import de.rwth.idsg.steve.service.OcppTagsService;
+import de.rwth.idsg.steve.service.ReservationsService;
 import de.rwth.idsg.steve.service.TransactionStopService;
 import de.rwth.idsg.steve.web.dto.ReservationQueryForm;
 import de.rwth.idsg.steve.web.dto.TransactionQueryForm;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+
 import java.io.IOException;
 
 /**
@@ -46,14 +48,15 @@ import java.io.IOException;
  * @since 15.08.2014
  */
 @Controller
-@RequestMapping(value = "/manager", method = RequestMethod.GET)
-public class TransactionsReservationsController {
+@RequestMapping(value = "/manager")
+@RequiredArgsConstructor
+public class ReservationsController {
 
-    @Autowired private TransactionRepository transactionRepository;
-    @Autowired private ReservationRepository reservationRepository;
-    @Autowired private ChargePointRepository chargePointRepository;
-    @Autowired private OcppTagService ocppTagService;
-    @Autowired private TransactionStopService transactionStopService;
+    private final TransactionRepository transactionRepository;
+    private final ReservationsService reservationsService;
+    private final ChargePointsService chargePointsService;
+    private final OcppTagsService ocppTagsService;
+    private final TransactionStopService transactionStopService;
 
     private static final String PARAMS = "params";
 
@@ -72,9 +75,9 @@ public class TransactionsReservationsController {
     // HTTP methods
     // -------------------------------------------------------------------------
 
-    @RequestMapping(value = TRANSACTIONS_PATH)
+    @GetMapping(value = TRANSACTIONS_PATH)
     public String getTransactions(Model model) {
-        TransactionQueryForm params = new TransactionQueryForm();
+        var params = new TransactionQueryForm();
         initList(model);
 
         model.addAttribute("transList", transactionRepository.getTransactions(params));
@@ -82,19 +85,19 @@ public class TransactionsReservationsController {
         return "data-man/transactions";
     }
 
-    @RequestMapping(value = TRANSACTION_STOP_PATH, method = RequestMethod.POST)
+    @PostMapping(value = TRANSACTION_STOP_PATH)
     public String stopTransaction(@PathVariable("transactionPk") int transactionPk) {
         transactionStopService.stop(transactionPk);
         return "redirect:/manager/transactions";
     }
 
-    @RequestMapping(value = TRANSACTIONS_DETAILS_PATH)
+    @GetMapping(value = TRANSACTIONS_DETAILS_PATH)
     public String getTransactionDetails(@PathVariable("transactionPk") int transactionPk, Model model) {
         model.addAttribute("details", transactionRepository.getDetails(transactionPk));
         return "data-man/transactionDetails";
     }
 
-    @RequestMapping(value = TRANSACTIONS_QUERY_PATH)
+    @GetMapping(value = TRANSACTIONS_QUERY_PATH)
     public String getTransactionsQuery(@Valid @ModelAttribute(PARAMS) TransactionQueryForm params,
                                        BindingResult result, Model model,
                                        HttpServletResponse response) throws IOException {
@@ -105,9 +108,9 @@ public class TransactionsReservationsController {
         }
 
         if (params.isReturnCSV()) {
-            String fileName = "transactions.csv";
-            String headerKey = "Content-Disposition";
-            String headerValue = String.format("attachment; filename=\"%s\"", fileName);
+            var fileName = "transactions.csv";
+            var headerKey = "Content-Disposition";
+            var headerValue = String.format("attachment; filename=\"%s\"", fileName);
             response.setContentType("text/csv");
             response.setHeader(headerKey, headerValue);
             transactionRepository.writeTransactionsCSV(params, response.getWriter());
@@ -121,21 +124,21 @@ public class TransactionsReservationsController {
         }
     }
 
-    @RequestMapping(value = RESERVATIONS_PATH)
+    @GetMapping(value = RESERVATIONS_PATH)
     public String getReservations(Model model) {
-        ReservationQueryForm params = new ReservationQueryForm();
+        var params = new ReservationQueryForm();
         initResList(model);
 
-        model.addAttribute("reservList", reservationRepository.getReservations(params));
+        model.addAttribute("reservList", reservationsService.getReservations(params));
         model.addAttribute(PARAMS, params);
         return "data-man/reservations";
     }
 
-    @RequestMapping(value = RESERVATIONS_QUERY_PATH)
+    @GetMapping(value = RESERVATIONS_QUERY_PATH)
     public String getReservationsQuery(@Valid @ModelAttribute(PARAMS) ReservationQueryForm params,
                                       BindingResult result, Model model) throws IOException {
         if (!result.hasErrors()) {
-            model.addAttribute("reservList", reservationRepository.getReservations(params));
+            model.addAttribute("reservList", reservationsService.getReservations(params));
         }
 
         initResList(model);
@@ -144,13 +147,12 @@ public class TransactionsReservationsController {
     }
 
     private void initList(Model model) {
-        model.addAttribute("cpList", chargePointRepository.getChargeBoxIds());
-        model.addAttribute("idTagList", ocppTagService.getIdTags());
+        model.addAttribute("cpList", chargePointsService.getChargeBoxIds());
+        model.addAttribute("idTagList", ocppTagsService.getIdTags());
     }
 
     private void initResList(Model model) {
         initList(model);
         model.addAttribute("statusList", ReservationStatus.getValues());
     }
-
 }

@@ -38,5 +38,4 @@ public class NoAccessController {
     public String accessDenied() {
         return "noAccess";
     }
-
 }

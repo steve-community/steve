@@ -74,7 +74,7 @@ public class CentralSystemService16_Service {
     @Autowired private OcppServerRepository ocppServerRepository;
     @Autowired private SettingsRepository settingsRepository;
 
-    @Autowired private OcppTagService ocppTagService;
+    @Autowired private OcppTagsService ocppTagsService;
     @Autowired private ApplicationEventPublisher applicationEventPublisher;
     @Autowired private ChargePointHelperService chargePointHelperService;
 
@@ -172,7 +172,7 @@ public class CentralSystemService16_Service {
 
     public StartTransactionResponse startTransaction(StartTransactionRequest parameters, String chargeBoxIdentity) {
         // Get the authorization info of the user, before making tx changes (will affectAuthorizationStatus)
-        IdTagInfo info = ocppTagService.getIdTagInfo(
+        IdTagInfo info = ocppTagsService.getIdTagInfo(
                 parameters.getIdTag(),
                 true,
                 chargeBoxIdentity,
@@ -205,7 +205,7 @@ public class CentralSystemService16_Service {
         String stopReason = parameters.isSetReason() ? parameters.getReason().value() : null;
 
         // Get the authorization info of the user, before making tx changes (will affectAuthorizationStatus)
-        IdTagInfo idTagInfo = ocppTagService.getIdTagInfo(
+        IdTagInfo idTagInfo = ocppTagsService.getIdTagInfo(
                 parameters.getIdTag(),
                 false,
                 chargeBoxIdentity,
@@ -242,7 +242,7 @@ public class CentralSystemService16_Service {
 
     public AuthorizeResponse authorize(AuthorizeRequest parameters, String chargeBoxIdentity) {
         // Get the authorization info of the user
-        IdTagInfo idTagInfo = ocppTagService.getIdTagInfo(
+        IdTagInfo idTagInfo = ocppTagsService.getIdTagInfo(
                 parameters.getIdTag(),
                 false,
                 chargeBoxIdentity,

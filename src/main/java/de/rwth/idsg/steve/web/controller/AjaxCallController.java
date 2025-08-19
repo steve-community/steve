@@ -21,17 +21,14 @@ package de.rwth.idsg.steve.web.controller;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import de.rwth.idsg.steve.repository.ChargePointRepository;
-import de.rwth.idsg.steve.repository.ReservationRepository;
 import de.rwth.idsg.steve.repository.TransactionRepository;
+import de.rwth.idsg.steve.service.ChargePointsService;
+import de.rwth.idsg.steve.service.ReservationsService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.HttpServletResponse;
@@ -47,13 +44,13 @@ import java.util.List;
 @ResponseBody
 @RequestMapping(
         value = "/manager/ajax/{chargeBoxId}",
-        method = RequestMethod.GET,
         produces = MediaType.APPLICATION_JSON_VALUE)
+@RequiredArgsConstructor
 public class AjaxCallController {
 
-    @Autowired private ChargePointRepository chargePointRepository;
-    @Autowired private TransactionRepository transactionRepository;
-    @Autowired private ReservationRepository reservationRepository;
+    private final ChargePointsService chargePointsService;
+    private final TransactionRepository transactionRepository;
+    private final ReservationsService reservationsService;
 
     private ObjectMapper objectMapper;
 
@@ -75,24 +72,24 @@ public class AjaxCallController {
     // HTTP methods
     // -------------------------------------------------------------------------
 
-    @RequestMapping(value = CONNECTOR_IDS_PATH)
+    @GetMapping(value = CONNECTOR_IDS_PATH)
     public void getConnectorIds(@PathVariable("chargeBoxId") String chargeBoxId,
                                 HttpServletResponse response) throws IOException {
-        String s = serializeArray(chargePointRepository.getNonZeroConnectorIds(chargeBoxId));
+        var s = serializeArray(chargePointsService.getNonZeroConnectorIds(chargeBoxId));
         writeOutput(response, s);
     }
 
-    @RequestMapping(value = TRANSACTION_IDS_PATH)
+    @GetMapping(value = TRANSACTION_IDS_PATH)
     public void getTransactionIds(@PathVariable("chargeBoxId") String chargeBoxId,
                                   HttpServletResponse response) throws IOException {
-        String s = serializeArray(transactionRepository.getActiveTransactionIds(chargeBoxId));
+        var s = serializeArray(transactionRepository.getActiveTransactionIds(chargeBoxId));
         writeOutput(response, s);
     }
 
-    @RequestMapping(value = RESERVATION_IDS_PATH)
+    @GetMapping(value = RESERVATION_IDS_PATH)
     public void getReservationIds(@PathVariable("chargeBoxId") String chargeBoxId,
                                   HttpServletResponse response) throws IOException {
-        String s = serializeArray(reservationRepository.getActiveReservationIds(chargeBoxId));
+        var s = serializeArray(reservationsService.getActiveReservationIds(chargeBoxId));
         writeOutput(response, s);
     }
 
@@ -113,9 +110,8 @@ public class AjaxCallController {
      *
      * That's why we are directly accessing the low-level HttpServletResponse and manually writing to output.
      */
-    private void writeOutput(HttpServletResponse response, String str) throws IOException {
+    private static void writeOutput(HttpServletResponse response, String str) throws IOException {
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.getWriter().write(str);
     }
-
 }

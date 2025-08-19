@@ -25,12 +25,14 @@ import org.jooq.Record1;
 import org.jooq.Select;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 19.08.2014
  */
 public interface ReservationRepository {
+    Optional<Reservation> getReservation(int id);
     List<Reservation> getReservations(ReservationQueryForm form);
 
     List<Integer> getActiveReservationIds(String chargeBoxId);

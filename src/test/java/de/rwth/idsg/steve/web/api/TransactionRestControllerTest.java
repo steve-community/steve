@@ -29,7 +29,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultMatcher;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -43,7 +42,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -61,11 +59,7 @@ public class TransactionRestControllerTest extends AbstractControllerTest {
 
     @BeforeEach
     public void setup() {
-        mockMvc = MockMvcBuilders.standaloneSetup(new TransactionsRestController(transactionRepository))
-            .setControllerAdvice(new ApiControllerAdvice())
-            .setMessageConverters(new MappingJackson2HttpMessageConverter(objectMapper))
-            .alwaysExpect(content().contentType("application/json"))
-            .build();
+        mockMvc = buildMockMvc(MockMvcBuilders.standaloneSetup(new TransactionsRestController(transactionRepository)));
     }
 
     @Test
@@ -226,8 +220,8 @@ public class TransactionRestControllerTest extends AbstractControllerTest {
         verify(transactionRepository).getTransactions(formToCapture.capture());
         TransactionQueryForm.TransactionQueryFormForApi capturedForm = formToCapture.getValue();
 
-        assertEquals(capturedForm.getType(), TransactionQueryForm.QueryType.ACTIVE);
-        assertEquals(capturedForm.getPeriodType(), TransactionQueryForm.QueryPeriodType.ALL);
+        assertEquals(TransactionQueryForm.QueryType.ACTIVE, capturedForm.getType());
+        assertEquals(TransactionQueryForm.QueryPeriodType.ALL, capturedForm.getPeriodType());
     }
 
     @Test
@@ -247,8 +241,8 @@ public class TransactionRestControllerTest extends AbstractControllerTest {
         verify(transactionRepository).getTransactions(formToCapture.capture());
         TransactionQueryForm.TransactionQueryFormForApi capturedForm = formToCapture.getValue();
 
-        assertEquals(capturedForm.getType(), TransactionQueryForm.QueryType.ALL);
-        assertEquals(capturedForm.getPeriodType(), TransactionQueryForm.QueryPeriodType.LAST_30);
+        assertEquals(TransactionQueryForm.QueryType.ALL, capturedForm.getType());
+        assertEquals(TransactionQueryForm.QueryPeriodType.LAST_30, capturedForm.getPeriodType());
     }
 
     private static ResultMatcher[] errorJsonMatchers() {

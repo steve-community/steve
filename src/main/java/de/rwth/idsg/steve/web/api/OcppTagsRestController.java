@@ -18,9 +18,8 @@
  */
 package de.rwth.idsg.steve.web.api;
 
-import de.rwth.idsg.steve.SteveException;
 import de.rwth.idsg.steve.repository.dto.OcppTag.OcppTagOverview;
-import de.rwth.idsg.steve.service.OcppTagService;
+import de.rwth.idsg.steve.service.OcppTagsService;
 import de.rwth.idsg.steve.web.api.ApiControllerAdvice.ApiErrorResponse;
 import de.rwth.idsg.steve.web.api.exception.NotFoundException;
 import de.rwth.idsg.steve.web.dto.OcppTagForm;
@@ -32,7 +31,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -53,7 +51,7 @@ import java.util.List;
  * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 13.09.2022
  */
-@Tag(name = "ocpp-tag-controller",
+@Tag(name = "tags",
     description = """
         Operations related to managing Ocpp Tags.
         An Ocpp Tag is the identifier of the actor that interacts with the charge box.
@@ -61,13 +59,12 @@ import java.util.List;
         An RFID card is an example of an Ocpp Tag.
         """
 )
-@Slf4j
 @RestController
 @RequestMapping(value = "/api/v1/ocppTags", produces = MediaType.APPLICATION_JSON_VALUE)
 @RequiredArgsConstructor
 public class OcppTagsRestController {
 
-    private final OcppTagService ocppTagService;
+    private final OcppTagsService ocppTagsService;
 
     @Operation(description = """
         Returns a list of Ocpp Tags based on the query parameters.
@@ -76,11 +73,7 @@ public class OcppTagsRestController {
     @StandardApiResponses
     @GetMapping(value = "")
     public List<OcppTagOverview> get(@ParameterObject OcppTagQueryFormForApi params) {
-        log.debug("Read request for query: {}", params);
-
-        var response = ocppTagService.getOverview(params);
-        log.debug("Read response for query: {}", response);
-        return response;
+        return ocppTagsService.getOverview(params);
     }
 
     @Operation(description = """
@@ -89,11 +82,7 @@ public class OcppTagsRestController {
     @StandardApiResponses
     @GetMapping("/{ocppTagPk}")
     public OcppTagOverview getOne(@PathVariable("ocppTagPk") Integer ocppTagPk) {
-        log.debug("Read request for ocppTagPk: {}", ocppTagPk);
-
-        var response = getOneInternal(ocppTagPk);
-        log.debug("Read response: {}", response);
-        return response;
+        return getOneInternal(ocppTagPk);
     }
 
     @Operation(description = """
@@ -111,13 +100,9 @@ public class OcppTagsRestController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public OcppTagOverview create(@RequestBody @Valid OcppTagForm params) {
-        log.debug("Create request: {}", params);
+        int ocppTagPk = ocppTagsService.addOcppTag(params);
 
-        int ocppTagPk = ocppTagService.addOcppTag(params);
-
-        var response = getOneInternal(ocppTagPk);
-        log.debug("Create response: {}", response);
-        return response;
+        return getOneInternal(ocppTagPk);
     }
 
     @Operation(description = """
@@ -127,13 +112,9 @@ public class OcppTagsRestController {
     @PutMapping("/{ocppTagPk}")
     public OcppTagOverview update(@PathVariable("ocppTagPk") Integer ocppTagPk, @RequestBody @Valid OcppTagForm params) {
         params.setOcppTagPk(ocppTagPk); // the one from incoming params does not matter
-        log.debug("Update request: {}", params);
+        ocppTagsService.updateOcppTag(params);
 
-        ocppTagService.updateOcppTag(params);
-
-        var response = getOneInternal(ocppTagPk);
-        log.debug("Update response: {}", response);
-        return response;
+        return getOneInternal(ocppTagPk);
     }
 
     @Operation(description = """
@@ -143,12 +124,9 @@ public class OcppTagsRestController {
     @StandardApiResponses
     @DeleteMapping("/{ocppTagPk}")
     public OcppTagOverview delete(@PathVariable("ocppTagPk") Integer ocppTagPk) {
-        log.debug("Delete request for ocppTagPk: {}", ocppTagPk);
-
         var response = getOneInternal(ocppTagPk);
-        ocppTagService.deleteOcppTag(ocppTagPk);
+        ocppTagsService.deleteOcppTag(ocppTagPk);
 
-        log.debug("Delete response: {}", response);
         return response;
     }
 
@@ -156,7 +134,7 @@ public class OcppTagsRestController {
         var params = new OcppTagQueryFormForApi();
         params.setOcppTagPk(ocppTagPk);
 
-        var results = ocppTagService.getOverview(params);
+        var results = ocppTagsService.getOverview(params);
         if (results.isEmpty()) {
             throw new NotFoundException("Could not find this ocppTag");
         }

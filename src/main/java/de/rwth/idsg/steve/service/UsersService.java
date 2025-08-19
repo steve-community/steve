@@ -43,9 +43,6 @@ public class UsersService {
     }
 
     public User.Details add(UserForm form) {
-        if (form.getUserPk() == null) {
-            throw new BadRequestException("userPk must not be null");
-        }
         var id = userRepository.add(form);
         return userRepository.getDetails(id).orElseThrow(
             () -> new SteveException("User not found after creation, this should never happen")
@@ -53,6 +50,9 @@ public class UsersService {
     }
 
     public User.Details update(UserForm form) {
+        if (form.getUserPk() == null) {
+            throw new BadRequestException("userPk must not be null");
+        }
         userRepository.update(form);
         return userRepository.getDetails(form.getUserPk()).orElseThrow(
             () -> new SteveException("User not found after update, this should never happen")

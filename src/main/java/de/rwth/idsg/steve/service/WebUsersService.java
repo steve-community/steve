@@ -309,8 +309,12 @@ public class WebUsersService implements UserDetailsManager {
     }
 
     private UserDetails toUserDetails(WebUserForm form) {
-        Assert.hasText(form.getPassword(), "Password may not be empty");
-        String encPw = encoder.encode(form.getPassword());
+        var rawPassword = form.getPassword();
+        var encPw = "";
+        if (rawPassword != null) {
+            Assert.hasText(rawPassword, "Password may not be empty");
+            encPw = encoder.encode(rawPassword);
+        }
         return User
             .withUsername(form.getWebUsername())
             .password(encPw)

@@ -78,7 +78,12 @@ public class HomeController {
         model.addAttribute(PARAMS, params);
 
         List<ConnectorStatus> latestList = chargePointHelperService.getChargePointConnectorStatus(params);
-        List<ConnectorStatus> filteredList = ConnectorStatusFilter.filterAndPreferZero(latestList);
+        List<ConnectorStatus> filteredList;
+        if (params.getStrategy() == ConnectorStatusForm.Strategy.PreferZero) {
+            filteredList = ConnectorStatusFilter.filterAndPreferZero(latestList);
+        } else {
+            filteredList = ConnectorStatusFilter.filterAndPreferOthersWithStatusOfZero(latestList);
+        }
         model.addAttribute("connectorStatusList", filteredList);
         return "connectorStatus";
     }

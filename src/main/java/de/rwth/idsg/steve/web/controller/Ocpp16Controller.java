@@ -22,8 +22,8 @@ import de.rwth.idsg.steve.ocpp.OcppVersion;
 import de.rwth.idsg.steve.repository.ChargingProfileRepository;
 import de.rwth.idsg.steve.web.dto.ocpp.ChangeConfigurationParams;
 import de.rwth.idsg.steve.web.dto.ocpp.ClearChargingProfileParams;
-import de.rwth.idsg.steve.web.dto.ocpp.ConfigurationKeyEnum;
-import de.rwth.idsg.steve.web.dto.ocpp.ConfigurationKeyReadWriteEnum;
+import de.rwth.idsg.steve.web.dto.ocpp.ConfigurationKey;
+import de.rwth.idsg.steve.web.dto.ocpp.ConfigurationKeyReadWrite;
 import de.rwth.idsg.steve.web.dto.ocpp.GetCompositeScheduleParams;
 import de.rwth.idsg.steve.web.dto.ocpp.GetConfigurationParams;
 import de.rwth.idsg.steve.web.dto.ocpp.SetChargingProfileParams;
@@ -44,8 +44,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import static de.rwth.idsg.steve.web.dto.ocpp.ConfigurationKeyReadWriteEnum.R;
-import static de.rwth.idsg.steve.web.dto.ocpp.ConfigurationKeyReadWriteEnum.RW;
+import static de.rwth.idsg.steve.web.dto.ocpp.ConfigurationKeyReadWrite.R;
+import static de.rwth.idsg.steve.web.dto.ocpp.ConfigurationKeyReadWrite.RW;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -91,12 +91,12 @@ public class Ocpp16Controller extends Ocpp15Controller {
     }
 
     @Override
-    protected Map<String, String> getConfigurationKeys(ConfigurationKeyReadWriteEnum confEnum) {
+    protected Map<String, String> getConfigurationKeys(ConfigurationKeyReadWrite confEnum) {
         switch (confEnum) {
             case R:
-                return ConfigurationKeyEnum.OCPP_16_MAP_R;
+                return ConfigurationKey.OCPP_16_MAP_R;
             case RW:
-                return ConfigurationKeyEnum.OCPP_16_MAP_RW;
+                return ConfigurationKey.OCPP_16_MAP_RW;
             default:
                 return Collections.emptyMap();
         }

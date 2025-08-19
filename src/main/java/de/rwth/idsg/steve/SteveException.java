@@ -66,11 +66,4 @@ public class SteveException extends RuntimeException {
             super(format(template, arg1));
         }
     }
-
-    public static class NotFound extends SteveException {
-
-        public NotFound(String message) {
-            super(message);
-        }
-    }
 }

@@ -27,15 +27,15 @@ import static com.google.common.collect.Sets.newHashSet;
 import static de.rwth.idsg.steve.ocpp.OcppVersion.V_12;
 import static de.rwth.idsg.steve.ocpp.OcppVersion.V_15;
 import static de.rwth.idsg.steve.ocpp.OcppVersion.V_16;
-import static de.rwth.idsg.steve.web.dto.ocpp.ConfigurationKeyReadWriteEnum.R;
-import static de.rwth.idsg.steve.web.dto.ocpp.ConfigurationKeyReadWriteEnum.RW;
+import static de.rwth.idsg.steve.web.dto.ocpp.ConfigurationKeyReadWrite.R;
+import static de.rwth.idsg.steve.web.dto.ocpp.ConfigurationKeyReadWrite.RW;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
  * @author David Rerimassie <david@rerimassie.nl>
  * @since 02.01.2015
  */
-public enum ConfigurationKeyEnum {
+public enum ConfigurationKey {
 
     // -------------------------------------------------------------------------
     // From OCPP 1.2
@@ -118,7 +118,7 @@ public enum ConfigurationKeyEnum {
 
     private final String value;
     private final String text;
-    private final ConfigurationKeyReadWriteEnum rw;
+    private final ConfigurationKeyReadWrite rw;
     private final Set<OcppVersion> versions;
 
     public static final Map<String, String> OCPP_12_MAP = asMap(OcppVersion.V_12, RW);
@@ -129,7 +129,7 @@ public enum ConfigurationKeyEnum {
     public static final Map<String, String> OCPP_16_MAP_RW = asMap(OcppVersion.V_16, RW);
 
 
-    ConfigurationKeyEnum(String valueType, ConfigurationKeyReadWriteEnum rw, Set<OcppVersion> versions) {
+    ConfigurationKey(String valueType, ConfigurationKeyReadWrite rw, Set<OcppVersion> versions) {
         this.value = this.name();
         this.text = String.format("%s (%s)", value, valueType);
         this.rw = rw;
@@ -140,8 +140,8 @@ public enum ConfigurationKeyEnum {
         return value;
     }
 
-    public static ConfigurationKeyEnum fromValue(String v) {
-        for (ConfigurationKeyEnum c : ConfigurationKeyEnum.values()) {
+    public static ConfigurationKey fromValue(String v) {
+        for (ConfigurationKey c : ConfigurationKey.values()) {
             if (c.value.equals(v)) {
                 return c;
             }
@@ -149,12 +149,12 @@ public enum ConfigurationKeyEnum {
         throw new IllegalArgumentException(v);
     }
 
-    private static Map<String, String> asMap(OcppVersion version, ConfigurationKeyReadWriteEnum rw) {
+    private static Map<String, String> asMap(OcppVersion version, ConfigurationKeyReadWrite rw) {
         Map<String, String> map = new TreeMap<>();
-        for (ConfigurationKeyEnum c : ConfigurationKeyEnum.values()) {
+        for (ConfigurationKey c : ConfigurationKey.values()) {
             if (c.versions.contains(version) && c.rw == rw) {
                 map.put(c.value, c.text);
-            } else if (c.versions.contains(version) && rw == ConfigurationKeyReadWriteEnum.R) {
+            } else if (c.versions.contains(version) && rw == ConfigurationKeyReadWrite.R) {
                 map.put(c.value, c.text);
             }
         }

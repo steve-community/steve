@@ -34,6 +34,10 @@ public class RemoteStopTransactionTask extends CommunicationTask<RemoteStopTrans
         super(params);
     }
 
+    public RemoteStopTransactionTask(RemoteStopTransactionParams params, String caller) {
+        super(params, caller);
+    }
+
     @Override
     public OcppCallback<String> defaultCallback() {
         return new StringOcppCallback();

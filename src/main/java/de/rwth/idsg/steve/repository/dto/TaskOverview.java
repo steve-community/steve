@@ -19,6 +19,7 @@
 package de.rwth.idsg.steve.repository.dto;
 
 import de.rwth.idsg.steve.ocpp.TaskOrigin;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -32,8 +33,17 @@ import org.joda.time.DateTime;
 @EqualsAndHashCode
 @Builder
 public final class TaskOverview implements Comparable<TaskOverview> {
-    private final int taskId, responseCount, requestCount;
-    private final DateTime start, end;
+    @Schema(description = "Task ID")
+    private final int taskId;
+    @Schema(description = "Response count")
+    private final int responseCount;
+    @Schema(description = "Request count")
+    private final int requestCount;
+    @Schema(description = "Start time")
+    private final DateTime start;
+    @Schema(description = "End time")
+    private final DateTime end;
+    @Schema(description = "Task origin (internal or external)")
     private final TaskOrigin origin;
 
     /**

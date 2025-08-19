@@ -21,6 +21,7 @@ package de.rwth.idsg.steve.web.api;
 import de.rwth.idsg.steve.SteveException;
 import de.rwth.idsg.steve.web.LocalDateTimeEditor;
 import de.rwth.idsg.steve.web.api.exception.BadRequestException;
+import de.rwth.idsg.steve.web.api.exception.NotFoundException;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.joda.time.DateTime;
@@ -59,9 +60,9 @@ public class ApiControllerAdvice {
         return createResponse(url, HttpStatus.BAD_REQUEST, "Error understanding the request");
     }
 
-    @ExceptionHandler(SteveException.NotFound.class)
+    @ExceptionHandler(NotFoundException.class)
     @ResponseStatus(value = HttpStatus.NOT_FOUND)
-    public ApiErrorResponse handleNotFoundException(HttpServletRequest req, SteveException.NotFound exception) {
+    public ApiErrorResponse handleNotFoundException(HttpServletRequest req, NotFoundException exception) {
         String url = req.getRequestURL().toString();
         log.error("Request: {} raised following exception.", url, exception);
         return createResponse(url, HttpStatus.NOT_FOUND, exception.getMessage());

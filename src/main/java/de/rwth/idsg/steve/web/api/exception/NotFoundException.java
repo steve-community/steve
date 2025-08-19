@@ -16,21 +16,13 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package de.rwth.idsg.steve.repository;
+package de.rwth.idsg.steve.web.api.exception;
 
-import de.rwth.idsg.steve.ocpp.CommunicationTask;
-import de.rwth.idsg.steve.repository.dto.TaskOverview;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
 
-import java.util.List;
-
-/**
- * @author Sevket Goekay <sevketgokay@gmail.com>
- * @since 29.12.2014
- */
-public interface TaskStore {
-    List<TaskOverview> getOverview();
-    CommunicationTask<?, ?> get(Integer taskId);
-    Integer add(CommunicationTask<?, ?> task);
-    void clearFinished();
-    void clearUnfinished();
+public class NotFoundException extends ResponseStatusException {
+    public NotFoundException(String reason) {
+        super(HttpStatus.NOT_FOUND, reason);
+    }
 }

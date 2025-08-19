@@ -43,6 +43,7 @@ import org.springframework.stereotype.Repository;
 
 import java.io.Writer;
 import java.util.List;
+import java.util.Optional;
 
 import static de.rwth.idsg.steve.utils.CustomDSL.date;
 import static jooq.steve.db.tables.ChargeBox.CHARGE_BOX;
@@ -67,6 +68,16 @@ public class TransactionRepositoryImpl implements TransactionRepository {
     }
 
     @Override
+    public Optional<Transaction> getTransaction(int transactionPk) {
+        var form = new TransactionQueryForm();
+        form.setTransactionPk(transactionPk);
+        form.setReturnCSV(false);
+        form.setType(TransactionQueryForm.QueryType.ALL);
+        var r = getInternal(form).fetchAny(new TransactionMapper());
+        return Optional.ofNullable(r);
+    }
+
+    @Override
     public List<Transaction> getTransactions(TransactionQueryForm form) {
         return getInternal(form).fetch()
                                 .map(new TransactionMapper());
@@ -87,6 +98,21 @@ public class TransactionRepositoryImpl implements TransactionRepository {
                     .and(CONNECTOR.CHARGE_BOX_ID.equal(chargeBoxId))
                   .where(TRANSACTION.STOP_TIMESTAMP.isNull())
                   .fetch(TRANSACTION.TRANSACTION_PK);
+    }
+
+    @Override
+    public Optional<Integer> getActiveTransactionId(String chargeBoxId, int connectorId) {
+        var r = ctx.select(TRANSACTION.TRANSACTION_PK)
+                  .from(TRANSACTION)
+                  .join(CONNECTOR)
+                    .on(TRANSACTION.CONNECTOR_PK.equal(CONNECTOR.CONNECTOR_PK))
+                    .and(CONNECTOR.CHARGE_BOX_ID.equal(chargeBoxId))
+                  .where(TRANSACTION.STOP_TIMESTAMP.isNull())
+                    .and(CONNECTOR.CONNECTOR_ID.equal(connectorId))
+                  .orderBy(TRANSACTION.TRANSACTION_PK.desc()) // to avoid fetching ghost transactions, fetch the latest
+                  .limit(1)
+                  .fetchOne(TRANSACTION.TRANSACTION_PK);
+        return Optional.ofNullable(r);
     }
 
     @Override

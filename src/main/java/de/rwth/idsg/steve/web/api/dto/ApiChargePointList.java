@@ -16,30 +16,35 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package de.rwth.idsg.steve.web.dto;
+package de.rwth.idsg.steve.web.api.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.RequiredArgsConstructor;
 
 /**
- * @author Sevket Goekay <sevketgokay@gmail.com>
- * @since 18.09.2018
+ * @author fnkbsi
+ * @since 18.10.2023
  */
 @Getter
-@Setter
-@ToString
-public class ConnectorStatusForm {
-    @Schema(description = "Charge Box Id")
-    private String chargeBoxId;
-    @Schema(description = "Connector Status")
-    private String status;
-    @Schema(description = "Strategy of listing the connector")
-    private Strategy strategy = Strategy.PreferZero;
+@RequiredArgsConstructor
+public class ApiChargePointList {
+    @Schema(description = "List of charge points")
+    private final List<ChargePointInfo> chargePointList =  new ArrayList<>();
 
-    public enum Strategy {
-        PreferZero,
-        PreferOthersWithStatusOfZero;
+    public void addCP(String chargeBoxId, List<Integer> connectorIds) {
+        ChargePointInfo cp = new ChargePointInfo(chargeBoxId, connectorIds);
+        this.chargePointList.add(cp);
+    }
+
+    @Getter
+    @RequiredArgsConstructor
+    static class ChargePointInfo {
+        @Schema(description = "Charge Box ID")
+        private final String chargeBoxId;
+        @Schema(description = "List of the charge box connectors")
+        private final List<Integer> connectorIds;
     }
 }

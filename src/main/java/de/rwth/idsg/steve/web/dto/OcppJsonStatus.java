@@ -18,7 +18,9 @@
  */
 package de.rwth.idsg.steve.web.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import de.rwth.idsg.steve.ocpp.OcppVersion;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.ToString;
@@ -32,9 +34,18 @@ import org.joda.time.DateTime;
 @Builder
 @ToString
 public final class OcppJsonStatus {
+    @JsonIgnore
+    @Schema(description = "Charge Box Pk", hidden = true)
     private final int chargeBoxPk;
-    private final String chargeBoxId, connectedSince;
+    @Schema(description = "Charge Box Id")
+    private final String chargeBoxId;
+    @JsonIgnore
+    @Schema(description = "Connected since", hidden = true)
+    private final String connectedSince;
+    @Schema(description = "Duration of the Connection")
     private final String connectionDuration;
+    @Schema(description = "Ocpp version")
     private final OcppVersion version;
+    @Schema(description = "Connected since (ISO-8601 timestamp)")
     private final DateTime connectedSinceDT;
 }

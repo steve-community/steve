@@ -16,29 +16,22 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package de.rwth.idsg.steve.repository;
+package de.rwth.idsg.steve.web.dto.ocpp;
 
-import de.rwth.idsg.steve.repository.dto.Transaction;
-import de.rwth.idsg.steve.repository.dto.TransactionDetails;
-import de.rwth.idsg.steve.web.dto.TransactionQueryForm;
-
-import java.io.Writer;
-import java.util.List;
-import java.util.Optional;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
- * @author Sevket Goekay <sevketgokay@gmail.com>
- * @since 19.08.2014
+ * Determines if a configuration key is read-only ("R") or read-write ("RW"). In case the key is read-only, the Central
+ * System can read the value for the key using GetConfiguration, but not write it. In case the accessibility is
+ * read-write, the Central System can also write the value for the key using ChangeConfiguration.
+ *
+ * This distinction was added in OCPP 1.6.
  */
-public interface TransactionRepository {
-    Optional<Transaction> getTransaction(int transactionPk);
-
-    List<Transaction> getTransactions(TransactionQueryForm form);
-
-    void writeTransactionsCSV(TransactionQueryForm form, Writer writer);
-
-    List<Integer> getActiveTransactionIds(String chargeBoxId);
-    Optional<Integer> getActiveTransactionId(String chargeBoxId, int connectorId);
-
-    TransactionDetails getDetails(int transactionPk);
+@Schema(
+    description = "Access mode of a configuration key",
+    example = "RW"
+)
+public enum ConfigurationKeyReadWrite {
+    R,
+    RW
 }

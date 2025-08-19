@@ -22,6 +22,7 @@ import de.rwth.idsg.steve.repository.dto.ConnectorStatus;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.EnumSet;
 import java.util.List;
@@ -37,7 +38,7 @@ import java.util.TreeSet;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class ConnectorStatusCountFilter {
 
-    public static final Set<String> ALL_STATUS_VALUES = allStatusValues();
+    public static final Set<String> ALL_STATUS_VALUES = Collections.unmodifiableSet(allStatusValues());
 
     public static Map<String, Integer> getStatusCountMap(List<ConnectorStatus> latestList) {
         return getStatusCountMap(latestList, false);

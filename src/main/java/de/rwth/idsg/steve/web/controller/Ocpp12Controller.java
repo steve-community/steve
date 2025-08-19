@@ -24,8 +24,8 @@ import de.rwth.idsg.steve.service.ChargePointServiceClient;
 import de.rwth.idsg.steve.service.OcppTagService;
 import de.rwth.idsg.steve.web.dto.ocpp.ChangeAvailabilityParams;
 import de.rwth.idsg.steve.web.dto.ocpp.ChangeConfigurationParams;
-import de.rwth.idsg.steve.web.dto.ocpp.ConfigurationKeyEnum;
-import de.rwth.idsg.steve.web.dto.ocpp.ConfigurationKeyReadWriteEnum;
+import de.rwth.idsg.steve.web.dto.ocpp.ConfigurationKey;
+import de.rwth.idsg.steve.web.dto.ocpp.ConfigurationKeyReadWrite;
 import de.rwth.idsg.steve.web.dto.ocpp.GetDiagnosticsParams;
 import de.rwth.idsg.steve.web.dto.ocpp.MultipleChargePointSelect;
 import de.rwth.idsg.steve.web.dto.ocpp.RemoteStartTransactionParams;
@@ -45,7 +45,7 @@ import jakarta.validation.Valid;
 
 import java.util.Map;
 
-import static de.rwth.idsg.steve.web.dto.ocpp.ConfigurationKeyReadWriteEnum.RW;
+import static de.rwth.idsg.steve.web.dto.ocpp.ConfigurationKeyReadWrite.RW;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -90,9 +90,9 @@ public class Ocpp12Controller {
         model.addAttribute("opVersion", "v1.2");
     }
 
-    protected Map<String, String> getConfigurationKeys(ConfigurationKeyReadWriteEnum confEnum) {
+    protected Map<String, String> getConfigurationKeys(ConfigurationKeyReadWrite confEnum) {
         // this conf enum is only relevant for versions >= occp 1.6
-        return ConfigurationKeyEnum.OCPP_12_MAP;
+        return ConfigurationKey.OCPP_12_MAP;
     }
 
     protected String getRedirectPath() {

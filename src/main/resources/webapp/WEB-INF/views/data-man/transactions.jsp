@@ -58,6 +58,10 @@ Transactions
                 </td>
             </tr>
             <tr>
+                <td>User ID:</td>
+                <td><form:input path="userId"/></td>
+            </tr>
+            <tr>
                 <td>Transaction Type:</td>
                 <td><form:select path="type">
                         <form:options items="${type}" itemLabel="value"/>

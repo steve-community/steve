@@ -58,6 +58,10 @@
                     </form:select>
 				</td>
 			</tr>
+			<tr>
+				<td>User ID:</td>
+				<td><form:input path="userId"/></td>
+			</tr>
             <tr>
                 <td>Reservation Status:</td>
                 <td><form:select path="status">

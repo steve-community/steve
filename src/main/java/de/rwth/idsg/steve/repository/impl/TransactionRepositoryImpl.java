@@ -45,6 +45,7 @@ import java.io.Writer;
 import java.util.List;
 import java.util.Optional;
 
+import static de.rwth.idsg.steve.repository.impl.RepositoryUtils.ocppTagByUserIdQuery;
 import static de.rwth.idsg.steve.utils.CustomDSL.date;
 import static jooq.steve.db.tables.ChargeBox.CHARGE_BOX;
 import static jooq.steve.db.tables.Connector.CONNECTOR;
@@ -312,6 +313,11 @@ public class TransactionRepositoryImpl implements TransactionRepository {
 
         if (form.isOcppIdTagSet()) {
             selectQuery.addConditions(TRANSACTION.ID_TAG.eq(form.getOcppIdTag()));
+        }
+
+        if (form.isUserIdSet()) {
+            var query = ocppTagByUserIdQuery(ctx, form.getUserId());
+            selectQuery.addConditions(TRANSACTION.ID_TAG.in(query));
         }
 
         if (form.getType() == TransactionQueryForm.QueryType.ACTIVE) {

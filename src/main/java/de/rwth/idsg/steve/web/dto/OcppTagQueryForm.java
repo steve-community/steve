@@ -45,6 +45,9 @@ public class OcppTagQueryForm {
     @Schema(description = "The parent OCPP tag of this OCPP tag")
     private String parentIdTag;
 
+    @Schema(description = "The User ID")
+    private Integer userId;
+
     @Schema(description = "Return expired, not expired, or all Ocpp tags? Defaults to ALL")
     private BooleanType expired = BooleanType.FALSE;
 
@@ -75,6 +78,11 @@ public class OcppTagQueryForm {
     @Schema(hidden = true)
     public boolean isNoteSet() {
         return !Strings.isNullOrEmpty(note);
+    }
+
+    @Schema(hidden = true)
+    public boolean isUserIdSet() {
+        return userId != null;
     }
 
     public BooleanType getExpired() {

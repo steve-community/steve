@@ -26,18 +26,17 @@
         </encoder>
     </appender>
 
+    <property name="ROOT_LEVEL" value="INFO"/>
+
     <if condition='p("PROFILE").equals("dev") || p("PROFILE").equals("test")'>
         <then>
-            <root level="DEBUG">
-                <appender-ref ref="${appender}"/>
-            </root>
+            <property name="ROOT_LEVEL" value="DEBUG"/>
         </then>
-        <else>
-            <root level="INFO">
-                <appender-ref ref="${appender}"/>
-            </root>
-        </else>
     </if>
+
+    <root level="${ROOT_LEVEL}">
+        <appender-ref ref="${appender}"/>
+    </root>
 
     <!-- Disable the Jooq logo in logs -->
     <!-- https://github.com/jOOQ/jOOQ/issues/4019 -->

@@ -19,7 +19,6 @@
 package de.rwth.idsg.steve.utils.mapper;
 
 import de.rwth.idsg.steve.repository.dto.User;
-import de.rwth.idsg.steve.utils.ControllerHelper;
 import de.rwth.idsg.steve.web.dto.UserForm;
 import de.rwth.idsg.steve.web.dto.UserSex;
 import jooq.steve.db.tables.records.UserRecord;
@@ -46,7 +45,7 @@ public final class UserFormMapper {
         form.setEMail(userRecord.getEMail());
         form.setNote(userRecord.getNote());
         form.setAddress(AddressMapper.recordToDto(details.getAddress()));
-        form.setOcppIdTag(details.getOcppIdTag().orElse(ControllerHelper.EMPTY_OPTION));
+        form.setIdTagList(details.getOcppTagEntries().stream().map(User.OcppTagEntry::getIdTag).toList());
 
         return form;
     }

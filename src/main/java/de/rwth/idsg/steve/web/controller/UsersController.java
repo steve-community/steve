@@ -36,6 +36,9 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import jakarta.validation.Valid;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 25.11.2015
@@ -87,13 +90,13 @@ public class UsersController {
         UserForm form = UserFormMapper.toForm(details);
 
         model.addAttribute("userForm", form);
-        setTags(model);
+        setTags(model, form.getIdTagList());
         return "data-man/userDetails";
     }
 
     @RequestMapping(value = ADD_PATH, method = RequestMethod.GET)
     public String addGet(Model model) {
-        setTags(model);
+        setTags(model, List.of());
         model.addAttribute("userForm", new UserForm());
         return "data-man/userAdd";
     }
@@ -102,7 +105,7 @@ public class UsersController {
     public String addPost(@Valid @ModelAttribute("userForm") UserForm userForm,
                           BindingResult result, Model model) {
         if (result.hasErrors()) {
-            setTags(model);
+            setTags(model, userForm.getIdTagList());
             return "data-man/userAdd";
         }
 
@@ -114,7 +117,7 @@ public class UsersController {
     public String update(@Valid @ModelAttribute("userForm") UserForm userForm,
                          BindingResult result, Model model) {
         if (result.hasErrors()) {
-            setTags(model);
+            setTags(model, userForm.getIdTagList());
             return "data-man/userDetails";
         }
 
@@ -128,9 +131,16 @@ public class UsersController {
         return toOverview();
     }
 
-    private void setTags(Model model) {
+    private void setTags(Model model, List<String> idTagsFromUser) {
+        List<String> fromDB = ocppTagService.getIdTagsWithoutUser();
+
+        // new temp list because we want to have a specific order
+        List<String> idTagList = new ArrayList<>(fromDB.size() + idTagsFromUser.size());
+        idTagList.addAll(idTagsFromUser);
+        idTagList.addAll(fromDB);
+
         model.addAttribute("countryCodes", ControllerHelper.COUNTRY_DROPDOWN);
-        model.addAttribute("idTagList", ControllerHelper.idTagEnhancer(ocppTagService.getIdTags()));
+        model.addAttribute("idTagList", idTagList);
     }
 
     // -------------------------------------------------------------------------

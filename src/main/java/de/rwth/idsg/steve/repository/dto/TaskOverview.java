@@ -39,11 +39,11 @@ public final class TaskOverview implements Comparable<TaskOverview> {
     private final int responseCount;
     @Schema(description = "Request count")
     private final int requestCount;
-    @Schema(description = "Starttime")
+    @Schema(description = "Start time")
     private final DateTime start;
-    @Schema(description = "Endtime")
+    @Schema(description = "End time")
     private final DateTime end;
-    @Schema(description = "Task triggered internal or external")
+    @Schema(description = "Task origin (internal or external)")
     private final TaskOrigin origin;
 
     /**

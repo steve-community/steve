@@ -16,16 +16,29 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package de.rwth.idsg.steve.web.dto.ocpp;
+package de.rwth.idsg.steve.web.api.dto;
+
+import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
- * Determines if a configuration key is read-only ("R") or read-write ("RW"). In case the key is read-only, the Central
- * System can read the value for the key using GetConfiguration, but not write it. In case the accessibility is
- * read-write, the Central System can also write the value for the key using ChangeConfiguration.
- *
- * This distinction was added in OCPP 1.6.
+ * @author fnkbsi
+ * @since 18.10.2023
  */
-public enum ConfigurationKeyReadWriteEnum {
-    R,
-    RW
+
+@Getter
+@Setter
+public class ApiChargePointStop {
+    @Schema(description = "Charge Box ID", requiredMode = Schema.RequiredMode.REQUIRED)
+    @NotBlank
+    private String chargeBoxId;
+    @Schema(description = "Connector ID", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Min(0)
+    private Integer connectorId;
+    @Schema(description = "OCPP Tag", requiredMode = Schema.RequiredMode.REQUIRED)
+    @NotBlank
+    private String ocppTag;
 }

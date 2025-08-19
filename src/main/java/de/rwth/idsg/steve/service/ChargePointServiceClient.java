@@ -208,6 +208,7 @@ public class ChargePointServiceClient {
         return addRemoteStartTask(task, callbacks);
     }
 
+    @SafeVarargs
     private int addRemoteStartTask(RemoteStartTransactionTask task,
                                             OcppCallback<String>... callbacks) {
         for (var callback : callbacks) {
@@ -225,16 +226,17 @@ public class ChargePointServiceClient {
     public final int remoteStopTransaction(RemoteStopTransactionParams params,
                                            OcppCallback<String>... callbacks) {
         RemoteStopTransactionTask task = new RemoteStopTransactionTask(params);
-        return addRemoteStopTask(task,callbacks);
+        return addRemoteStopTask(task, callbacks);
     }
 
     @SafeVarargs
     public final int remoteStopTransaction(RemoteStopTransactionParams params, String caller,
                                            OcppCallback<String>... callbacks) {
         RemoteStopTransactionTask task = new RemoteStopTransactionTask(params, caller);
-        return addRemoteStopTask(task,callbacks);
+        return addRemoteStopTask(task, callbacks);
     }
 
+    @SafeVarargs
     private int addRemoteStopTask(RemoteStopTransactionTask task,
                                            OcppCallback<String>... callbacks) {
         for (var callback : callbacks) {
@@ -262,6 +264,7 @@ public class ChargePointServiceClient {
         return addUnlockConnectorTask(task, callbacks);
     }
 
+    @SafeVarargs
     private int addUnlockConnectorTask(UnlockConnectorTask task,
                                      OcppCallback<String>... callbacks) {
         for (var callback : callbacks) {

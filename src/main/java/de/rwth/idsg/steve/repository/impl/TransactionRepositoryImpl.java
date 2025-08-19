@@ -43,6 +43,7 @@ import org.springframework.stereotype.Repository;
 
 import java.io.Writer;
 import java.util.List;
+import java.util.Optional;
 
 import static de.rwth.idsg.steve.utils.CustomDSL.date;
 import static jooq.steve.db.tables.ChargeBox.CHARGE_BOX;
@@ -67,12 +68,13 @@ public class TransactionRepositoryImpl implements TransactionRepository {
     }
 
     @Override
-    public Transaction getTransaction(int transactionPk) {
-        TransactionQueryForm form = new TransactionQueryForm();
+    public Optional<Transaction> getTransaction(int transactionPk) {
+        var form = new TransactionQueryForm();
         form.setTransactionPk(transactionPk);
         form.setReturnCSV(false);
         form.setType(TransactionQueryForm.QueryType.ALL);
-        return getInternal(form).fetchAny(new TransactionMapper());
+        var r = getInternal(form).fetchAny(new TransactionMapper());
+        return Optional.ofNullable(r);
     }
 
     @Override
@@ -99,8 +101,8 @@ public class TransactionRepositoryImpl implements TransactionRepository {
     }
 
     @Override
-    public Integer getActiveTransactionId(String chargeBoxId, Integer connectorId) {
-        return ctx.select(TRANSACTION.TRANSACTION_PK)
+    public Optional<Integer> getActiveTransactionId(String chargeBoxId, int connectorId) {
+        var r = ctx.select(TRANSACTION.TRANSACTION_PK)
                   .from(TRANSACTION)
                   .join(CONNECTOR)
                     .on(TRANSACTION.CONNECTOR_PK.equal(CONNECTOR.CONNECTOR_PK))
@@ -108,7 +110,9 @@ public class TransactionRepositoryImpl implements TransactionRepository {
                   .where(TRANSACTION.STOP_TIMESTAMP.isNull())
                     .and(CONNECTOR.CONNECTOR_ID.equal(connectorId))
                   .orderBy(TRANSACTION.TRANSACTION_PK.desc()) // to avoid fetching ghost transactions, fetch the latest
-                  .fetchAny(TRANSACTION.TRANSACTION_PK);
+                  .limit(1)
+                  .fetchOne(TRANSACTION.TRANSACTION_PK);
+        return Optional.ofNullable(r);
     }
 
     @Override

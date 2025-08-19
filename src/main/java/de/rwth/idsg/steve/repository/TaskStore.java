@@ -29,8 +29,8 @@ import java.util.List;
  */
 public interface TaskStore {
     List<TaskOverview> getOverview();
-    CommunicationTask get(Integer taskId);
-    Integer add(CommunicationTask task);
+    CommunicationTask<?, ?> get(Integer taskId);
+    Integer add(CommunicationTask<?, ?> task);
     void clearFinished();
     void clearUnfinished();
 }

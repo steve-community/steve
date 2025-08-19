@@ -24,7 +24,6 @@ import de.rwth.idsg.steve.ocpp.RequestResult;
 import de.rwth.idsg.steve.ocpp.TaskOrigin;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -55,19 +54,18 @@ public class ApiTaskInfo {
     private int resultSize;
 
     @Schema(description = "Starttime")
-    private DateTime startTimestamp = DateTime.now();
+    private DateTime startTimestamp;
     @Schema(description = "Endtime")
     private DateTime endTimestamp;
 
     @Schema(description = "Error count")
-    private AtomicInteger errorCount = new AtomicInteger(0);
+    private int errorCount;
     @Schema(description = "Response count")
-    private AtomicInteger responseCount = new AtomicInteger(0);
+    private int responseCount;
 
 
-    public ApiTaskInfo(Integer taskId, CommunicationTask r) {
+    public ApiTaskInfo(Integer taskId, CommunicationTask<?, ?> r) {
         this.taskId = taskId;
-        //this.ocppVersion = r.getOcppVersion();
         this.operationName = r.getOperationName();
         this.origin = r.getOrigin();
         this.caller = r.getCaller();
@@ -79,8 +77,7 @@ public class ApiTaskInfo {
         this.startTimestamp = r.getStartTimestamp();
         this.endTimestamp = r.getEndTimestamp();
 
-        this.errorCount = r.getErrorCount();
-        this.responseCount = r.getResponseCount();
+        this.errorCount = r.getErrorCount().get();
+        this.responseCount = r.getResponseCount().get();
     }
-
 }

@@ -32,7 +32,6 @@ import lombok.Setter;
 
 @Getter
 @Setter
-//@RequiredArgsConstructor
 public class ApiTaskList {
     @Schema(description = "List of tasks")
     private List<TaskOverview> tasks;

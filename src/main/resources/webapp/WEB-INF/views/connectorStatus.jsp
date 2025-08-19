@@ -52,7 +52,7 @@ Connector Status
 			</td>
 		</tr>
 		<tr>
-			<td>Status:</td>
+			<td>Strategy:</td>
 			<td><form:select path="strategy">
 				<option value="PreferZero" selected >Prefer Connector Zero</option>
 				<option value="PreferOthersWithStatusOfZero">Prefer Others</option>

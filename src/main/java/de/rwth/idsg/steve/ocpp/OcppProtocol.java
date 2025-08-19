@@ -45,6 +45,9 @@ public enum OcppProtocol {
     }
 
     public static OcppProtocol fromCompositeValue(String v) {
+        if (v == null) {
+            return null;
+        }
 
         // If we, in future, decide to use values
         // containing more than one character for OcppTransport,

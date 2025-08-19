@@ -22,6 +22,7 @@ import de.rwth.idsg.steve.SteveException;
 import de.rwth.idsg.steve.repository.dto.OcppTag.OcppTagOverview;
 import de.rwth.idsg.steve.service.OcppTagService;
 import de.rwth.idsg.steve.web.api.ApiControllerAdvice.ApiErrorResponse;
+import de.rwth.idsg.steve.web.api.exception.NotFoundException;
 import de.rwth.idsg.steve.web.dto.OcppTagForm;
 import de.rwth.idsg.steve.web.dto.OcppTagQueryForm.OcppTagQueryFormForApi;
 import io.swagger.v3.oas.annotations.Operation;
@@ -42,7 +43,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -73,14 +73,8 @@ public class OcppTagsRestController {
         Returns a list of Ocpp Tags based on the query parameters.
         The query parameters can be used to filter the Ocpp Tags.
         """)
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "OK"),
-        @ApiResponse(responseCode = "400", description = "Bad Request", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorResponse.class))}),
-        @ApiResponse(responseCode = "401", description = "Unauthorized", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorResponse.class))}),
-        @ApiResponse(responseCode = "500", description = "Internal Server Error", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorResponse.class))})}
-    )
+    @StandardApiResponses
     @GetMapping(value = "")
-    @ResponseBody
     public List<OcppTagOverview> get(@ParameterObject OcppTagQueryFormForApi params) {
         log.debug("Read request for query: {}", params);
 
@@ -92,15 +86,8 @@ public class OcppTagsRestController {
     @Operation(description = """
         Returns a single Ocpp Tag based on the ocppTagPk.
         """)
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "OK"),
-        @ApiResponse(responseCode = "400", description = "Bad Request", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorResponse.class))}),
-        @ApiResponse(responseCode = "401", description = "Unauthorized", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorResponse.class))}),
-        @ApiResponse(responseCode = "404", description = "Not Found", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorResponse.class))}),
-        @ApiResponse(responseCode = "500", description = "Internal Server Error", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorResponse.class))})}
-    )
+    @StandardApiResponses
     @GetMapping("/{ocppTagPk}")
-    @ResponseBody
     public OcppTagOverview getOne(@PathVariable("ocppTagPk") Integer ocppTagPk) {
         log.debug("Read request for ocppTagPk: {}", ocppTagPk);
 
@@ -122,7 +109,6 @@ public class OcppTagsRestController {
         @ApiResponse(responseCode = "500", description = "Internal Server Error", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorResponse.class))})}
     )
     @PostMapping
-    @ResponseBody
     @ResponseStatus(HttpStatus.CREATED)
     public OcppTagOverview create(@RequestBody @Valid OcppTagForm params) {
         log.debug("Create request: {}", params);
@@ -137,15 +123,8 @@ public class OcppTagsRestController {
     @Operation(description = """
         Updates an existing Ocpp Tag with the provided parameters.
         """)
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "OK"),
-        @ApiResponse(responseCode = "400", description = "Bad Request", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorResponse.class))}),
-        @ApiResponse(responseCode = "401", description = "Unauthorized", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorResponse.class))}),
-        @ApiResponse(responseCode = "404", description = "Not Found", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorResponse.class))}),
-        @ApiResponse(responseCode = "500", description = "Internal Server Error", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorResponse.class))})}
-    )
+    @StandardApiResponses
     @PutMapping("/{ocppTagPk}")
-    @ResponseBody
     public OcppTagOverview update(@PathVariable("ocppTagPk") Integer ocppTagPk, @RequestBody @Valid OcppTagForm params) {
         params.setOcppTagPk(ocppTagPk); // the one from incoming params does not matter
         log.debug("Update request: {}", params);
@@ -161,15 +140,8 @@ public class OcppTagsRestController {
         Deletes an existing Ocpp Tag based on the ocppTagPk.
         Returns the deleted Ocpp Tag.
         """)
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "OK"),
-        @ApiResponse(responseCode = "400", description = "Bad Request", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorResponse.class))}),
-        @ApiResponse(responseCode = "401", description = "Unauthorized", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorResponse.class))}),
-        @ApiResponse(responseCode = "404", description = "Not Found", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorResponse.class))}),
-        @ApiResponse(responseCode = "500", description = "Internal Server Error", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorResponse.class))})}
-    )
+    @StandardApiResponses
     @DeleteMapping("/{ocppTagPk}")
-    @ResponseBody
     public OcppTagOverview delete(@PathVariable("ocppTagPk") Integer ocppTagPk) {
         log.debug("Delete request for ocppTagPk: {}", ocppTagPk);
 
@@ -181,12 +153,12 @@ public class OcppTagsRestController {
     }
 
     private OcppTagOverview getOneInternal(int ocppTagPk) {
-        OcppTagQueryFormForApi params = new OcppTagQueryFormForApi();
+        var params = new OcppTagQueryFormForApi();
         params.setOcppTagPk(ocppTagPk);
 
-        List<OcppTagOverview> results = ocppTagService.getOverview(params);
+        var results = ocppTagService.getOverview(params);
         if (results.isEmpty()) {
-            throw new SteveException.NotFound("Could not find this ocppTag");
+            throw new NotFoundException("Could not find this ocppTag");
         }
         return results.get(0);
     }

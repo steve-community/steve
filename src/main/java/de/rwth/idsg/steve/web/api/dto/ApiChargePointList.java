@@ -23,19 +23,16 @@ import java.util.ArrayList;
 import java.util.List;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import lombok.Setter;
 
 /**
  * @author fnkbsi
  * @since 18.10.2023
  */
-
 @Getter
-@Setter
 @RequiredArgsConstructor
 public class ApiChargePointList {
     @Schema(description = "List of charge points")
-    private List<ChargePointInfo> chargePointList =  new ArrayList<>();
+    private final List<ChargePointInfo> chargePointList =  new ArrayList<>();
 
     public void addCP(String chargeBoxId, List<Integer> connectorIds) {
         ChargePointInfo cp = new ChargePointInfo(chargeBoxId, connectorIds);
@@ -43,16 +40,11 @@ public class ApiChargePointList {
     }
 
     @Getter
-    @Setter
-    class ChargePointInfo {
+    @RequiredArgsConstructor
+    static class ChargePointInfo {
         @Schema(description = "Charge Box ID")
-        private String chargeBoxId;
+        private final String chargeBoxId;
         @Schema(description = "List of the charge box connectors")
-        private List<Integer> connectorIds;
-
-        ChargePointInfo(String chargeBoxId, List<Integer> connectorIds) {
-            this.chargeBoxId = chargeBoxId;
-            this.connectorIds = connectorIds;
-        }
+        private final List<Integer> connectorIds;
     }
 }

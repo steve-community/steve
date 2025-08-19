@@ -20,8 +20,8 @@ package de.rwth.idsg.steve.web.controller;
 
 import de.rwth.idsg.steve.ocpp.OcppVersion;
 import de.rwth.idsg.steve.web.dto.ocpp.CancelReservationParams;
-import de.rwth.idsg.steve.web.dto.ocpp.ConfigurationKeyEnum;
-import de.rwth.idsg.steve.web.dto.ocpp.ConfigurationKeyReadWriteEnum;
+import de.rwth.idsg.steve.web.dto.ocpp.ConfigurationKey;
+import de.rwth.idsg.steve.web.dto.ocpp.ConfigurationKeyReadWrite;
 import de.rwth.idsg.steve.web.dto.ocpp.DataTransferParams;
 import de.rwth.idsg.steve.web.dto.ocpp.GetConfigurationParams;
 import de.rwth.idsg.steve.web.dto.ocpp.MultipleChargePointSelect;
@@ -38,7 +38,7 @@ import jakarta.validation.Valid;
 
 import java.util.Map;
 
-import static de.rwth.idsg.steve.web.dto.ocpp.ConfigurationKeyReadWriteEnum.RW;
+import static de.rwth.idsg.steve.web.dto.ocpp.ConfigurationKeyReadWrite.RW;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -70,9 +70,9 @@ public class Ocpp15Controller extends Ocpp12Controller {
     }
 
     @Override
-    protected Map<String, String> getConfigurationKeys(ConfigurationKeyReadWriteEnum confEnum) {
+    protected Map<String, String> getConfigurationKeys(ConfigurationKeyReadWrite confEnum) {
         // this conf enum is only relevant for versions >= occp 1.6
-        return ConfigurationKeyEnum.OCPP_15_MAP;
+        return ConfigurationKey.OCPP_15_MAP;
     }
 
     @Override

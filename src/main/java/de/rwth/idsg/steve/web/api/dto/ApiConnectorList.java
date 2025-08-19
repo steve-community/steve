@@ -18,7 +18,6 @@
  */
 package de.rwth.idsg.steve.web.api.dto;
 
-//import de.rwth.idsg.steve.ocpp.OcppTransport;
 import de.rwth.idsg.steve.repository.dto.ConnectorStatus;
 import de.rwth.idsg.steve.utils.ConnectorStatusCountFilter;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -46,7 +45,7 @@ public class ApiConnectorList {
     private final Set<String> statusFilterValues = ConnectorStatusCountFilter.ALL_STATUS_VALUES;
 
     @Schema(description = "List of connectors is filtered")
-    private Boolean isFiltered = false;
+    private boolean isFiltered = false;
 
     @Schema(description = "List of connectors")
     private List<ConnectorStatus> connectors = new ArrayList<>();

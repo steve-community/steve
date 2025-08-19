@@ -16,29 +16,13 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package de.rwth.idsg.steve.web.api.dto;
+package de.rwth.idsg.steve.web.api.exception;
 
-import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotBlank;
-import lombok.Getter;
-import lombok.Setter;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
 
-/**
- * @author fnkbsi
- * @since 18.10.2023
- */
-
-@Getter
-@Setter
-public class ApiChargePointStart {
-    @Schema(description = "Charge Box ID", requiredMode = Schema.RequiredMode.REQUIRED)
-    @NotBlank
-    private String chargeBoxId;
-    @Schema(description = "Connector ID", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-    @Min(0)
-    private Integer connectorId;
-    @Schema(description = "OCPP Tag", requiredMode = Schema.RequiredMode.REQUIRED)
-    @NotBlank
-    private String ocppTag;
+public class NotFoundException extends ResponseStatusException {
+    public NotFoundException(String reason) {
+        super(HttpStatus.NOT_FOUND, reason);
+    }
 }

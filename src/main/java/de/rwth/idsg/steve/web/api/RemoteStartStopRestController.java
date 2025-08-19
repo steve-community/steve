@@ -18,47 +18,35 @@
  */
 package de.rwth.idsg.steve.web.api;
 
-import de.rwth.idsg.steve.ocpp.CommunicationTask;
 import de.rwth.idsg.steve.ocpp.OcppVersion;
 import de.rwth.idsg.steve.repository.ChargePointRepository;
 import de.rwth.idsg.steve.repository.TaskStore;
 import de.rwth.idsg.steve.repository.TransactionRepository;
-import de.rwth.idsg.steve.repository.dto.ChargePointSelect;
-import de.rwth.idsg.steve.repository.dto.TaskOverview;
 
 import de.rwth.idsg.steve.service.ChargePointHelperService;
 import de.rwth.idsg.steve.service.ChargePointServiceClient;
 
+import de.rwth.idsg.steve.web.api.dto.ApiChargePointStop;
+import de.rwth.idsg.steve.web.api.dto.ApiChargePointUnlock;
 import de.rwth.idsg.steve.web.dto.ocpp.RemoteStartTransactionParams;
 import de.rwth.idsg.steve.web.dto.ocpp.RemoteStopTransactionParams;
 
 import de.rwth.idsg.steve.web.dto.ocpp.UnlockConnectorParams;
 
-import org.springframework.beans.factory.annotation.Autowired;
-
-import de.rwth.idsg.steve.web.api.ApiControllerAdvice.ApiErrorResponse;
 import de.rwth.idsg.steve.web.api.dto.ApiChargePointList;
 import de.rwth.idsg.steve.web.api.dto.ApiChargePointStart;
 import de.rwth.idsg.steve.web.api.exception.BadRequestException;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import jakarta.validation.Valid;
 
-import java.util.List;
-import static java.util.Objects.isNull;
-
-
+import java.util.Collections;
 
 /**
  * @author fnkbsi
@@ -71,44 +59,44 @@ import static java.util.Objects.isNull;
 @RequiredArgsConstructor
 public class RemoteStartStopRestController {
 
-    @Autowired private ChargePointHelperService chargePointHelperService;
-    @Autowired private ChargePointRepository chargePointRepository;
-    @Autowired private TransactionRepository transactionRepository;
-    @Autowired private TaskStore taskStore;
+    private static final String CALLER = "SteveWebApi";
 
-
-    @Autowired
-    private ChargePointServiceClient client;
+    private final ChargePointHelperService chargePointHelperService;
+    private final ChargePointRepository chargePointRepository;
+    private final TransactionRepository transactionRepository;
+    private final TaskStore taskStore;
+    private final ChargePointServiceClient client;
 
     // -------------------------------------------------------------------------
     // Helpers
     // -------------------------------------------------------------------------
 
     private ApiChargePointList getChargePoints() {
-        List<ChargePointSelect> chargePoints = chargePointHelperService.getChargePoints(OcppVersion.V_12);
+        var chargePoints = chargePointHelperService.getChargePoints(OcppVersion.V_12);
         chargePoints.addAll(chargePointHelperService.getChargePoints(OcppVersion.V_15));
         chargePoints.addAll(chargePointHelperService.getChargePoints(OcppVersion.V_16));
-        ApiChargePointList lsCp = new ApiChargePointList();
+        var lsCp = new ApiChargePointList();
         try {
-            for (ChargePointSelect chargeBox : chargePoints) {
-                List<Integer> conList = chargePointRepository.getNonZeroConnectorIds(chargeBox.getChargeBoxId());
+            for (var chargeBox : chargePoints) {
+                var conList = chargePointRepository.getNonZeroConnectorIds(chargeBox.getChargeBoxId());
                 if (!conList.isEmpty()) {
                     lsCp.addCP(chargeBox.getChargeBoxId(), conList);
                 }
             }
         } catch (Exception e) {
-            System.out.println(e.toString());
+            log.warn("Failed to build charge point list", e);
         }
         return lsCp;
     }
 
-    private Boolean activeTaskOnChargeBox(String chargeBoxId) {
-        Boolean retValue = false;
-        List<TaskOverview> taskList = taskStore.getOverview();
-        for (TaskOverview taOverview : taskList) {
-            CommunicationTask task = taskStore.get(taOverview.getTaskId());
+    private boolean activeTaskOnChargeBox(String chargeBoxId) {
+        var retValue = false;
+        var taskList = taskStore.getOverview();
+        for (var taOverview : taskList) {
+            var task = taskStore.get(taOverview.getTaskId());
             if (!task.isFinished()) {
-                if (!isNull(task.getResultMap().get(chargeBoxId))) {
+                var resultMap = task.getResultMap();
+                if (resultMap != null && resultMap.containsKey(chargeBoxId)) {
                     retValue = true;
                     break;
                 }
@@ -121,205 +109,145 @@ public class RemoteStartStopRestController {
     // Http methods (GET)
     // -------------------------------------------------------------------------
 
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "OK"),
-        @ApiResponse(responseCode = "400", description = "Bad Request",
-                content = {@Content(mediaType = "application/json",
-                        schema = @Schema(implementation = ApiErrorResponse.class))}),
-        @ApiResponse(responseCode = "401", description = "Unauthorized",
-                content = {@Content(mediaType = "application/json",
-                        schema = @Schema(implementation = ApiErrorResponse.class))}),
-        @ApiResponse(responseCode = "500", description = "Internal Server Error",
-                content = {@Content(mediaType = "application/json",
-                        schema = @Schema(implementation = ApiErrorResponse.class))})}
-    )
+    @StandardApiResponses
     @GetMapping(value = "")
-    @ResponseBody
     public ApiChargePointList getBase() {
         return getChargePoints();
     }
 
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "OK"),
-        @ApiResponse(responseCode = "400", description = "Bad Request",
-                content = {@Content(mediaType = "application/json",
-                        schema = @Schema(implementation = ApiErrorResponse.class))}),
-        @ApiResponse(responseCode = "401", description = "Unauthorized",
-                content = {@Content(mediaType = "application/json",
-                        schema = @Schema(implementation = ApiErrorResponse.class))}),
-        @ApiResponse(responseCode = "500", description = "Internal Server Error",
-                content = {@Content(mediaType = "application/json",
-                        schema = @Schema(implementation = ApiErrorResponse.class))})}
-    )
+    @StandardApiResponses
     @GetMapping(value = "start")
-    @ResponseBody
     public ApiChargePointList getRemoteStartTx() {
         return getChargePoints();
     }
 
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "OK"),
-        @ApiResponse(responseCode = "400", description = "Bad Request",
-                content = {@Content(mediaType = "application/json",
-                        schema = @Schema(implementation = ApiErrorResponse.class))}),
-        @ApiResponse(responseCode = "401", description = "Unauthorized",
-                content = {@Content(mediaType = "application/json",
-                        schema = @Schema(implementation = ApiErrorResponse.class))}),
-        @ApiResponse(responseCode = "500", description = "Internal Server Error",
-                content = {@Content(mediaType = "application/json",
-                        schema = @Schema(implementation = ApiErrorResponse.class))})}
-    )
+    @StandardApiResponses
     @GetMapping(value = "stop")
-    @ResponseBody
     public ApiChargePointList getRemoteStopTx() {
         return getChargePoints();
     }
 
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "OK"),
-        @ApiResponse(responseCode = "400", description = "Bad Request",
-                content = {@Content(mediaType = "application/json",
-                        schema = @Schema(implementation = ApiErrorResponse.class))}),
-        @ApiResponse(responseCode = "401", description = "Unauthorized",
-                content = {@Content(mediaType = "application/json",
-                        schema = @Schema(implementation = ApiErrorResponse.class))}),
-        @ApiResponse(responseCode = "500", description = "Internal Server Error",
-                content = {@Content(mediaType = "application/json",
-                        schema = @Schema(implementation = ApiErrorResponse.class))})}
-    )
+    @StandardApiResponses
     @GetMapping(value = "unlock")
-    @ResponseBody
     public ApiChargePointList getUnlockCon() {
         return getChargePoints();
     }
 
     // -------------------------------------------------------------------------
     // Http methods (POST)
-    // the methods return the taskID, check the sucess with the TaskRestController
+    // the methods return the taskID, check the success with the TaskRestController
     // -------------------------------------------------------------------------
 
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "OK"),
-        @ApiResponse(responseCode = "400", description = "Bad Request",
-                content = {@Content(mediaType = "application/json",
-                        schema = @Schema(implementation = ApiErrorResponse.class))}),
-        @ApiResponse(responseCode = "401", description = "Unauthorized",
-                content = {@Content(mediaType = "application/json",
-                        schema = @Schema(implementation = ApiErrorResponse.class))}),
-        @ApiResponse(responseCode = "500", description = "Internal Server Error",
-                content = {@Content(mediaType = "application/json",
-                        schema = @Schema(implementation = ApiErrorResponse.class))})}
-    )
+    @StandardApiResponses
     @PostMapping(value = "start")
-    @ResponseBody
     public Integer postRemoteStartTx(@Valid ApiChargePointStart params) {
         // only one active task per charge box over api; to be discussed!
         if (activeTaskOnChargeBox(params.getChargeBoxId())) {
-            String errMsg = String.format("Active task found on ChargeBox %s!",
+            var errMsg = String.format("Active task found on ChargeBox %s!",
                     params.getChargeBoxId()
             );
             throw new BadRequestException(errMsg);
         }
 
-        // Check for acctive transactions on the connector, If a active transaction is found, don't send RemoteStart.
-        Integer transactionId = transactionRepository.getActiveTransactionId(params.getChargeBoxId(),
+        var transactionParams = new RemoteStartTransactionParams();
+
+        // Check for active transactions on the connector, If a active transaction is found, don't send RemoteStart.
+        if (params.getConnectorId() != null && params.getConnectorId() > 0) {
+            var transactionId = transactionRepository.getActiveTransactionId(params.getChargeBoxId(),
                 params.getConnectorId());
-        if (!isNull(transactionId)) {
-            String errMsg = String.format("Active transaction found for connector %s at ChargeBox %s!",
+            if (transactionId.isPresent()) {
+                var errMsg = String.format("Active transaction found for connector %s at ChargeBox %s!",
                     params.getConnectorId(),
                     params.getChargeBoxId()
-            );
-            throw new BadRequestException(errMsg);
+                );
+              throw new BadRequestException(errMsg);
+            }
         }
-        // Check if OCPP-Tag is allowed to use the connector? To be discussed and t.b.d.!
-
-        RemoteStartTransactionParams transactionParams = new RemoteStartTransactionParams();
-        transactionParams.setChargePointSelectList(chargePointRepository.getChargePointSelect(params.getChargeBoxId()));
         transactionParams.setConnectorId(params.getConnectorId());
+
+        var chargePoint = chargePointRepository.getChargePointSelect(params.getChargeBoxId()).orElseThrow(
+            () -> new BadRequestException(
+                String.format("ChargeBox %s not found!", params.getChargeBoxId())
+            )
+        );
+        transactionParams.setChargePointSelectList(Collections.singletonList(chargePoint));
+
+        // Check if OCPP-Tag is allowed to use the connector? To be discussed and t.b.d.!
         transactionParams.setIdTag(params.getOcppTag());
-        return client.remoteStartTransaction(transactionParams, "SteveWebApi");
+
+        return client.remoteStartTransaction(transactionParams, CALLER);
     }
 
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "OK"),
-        @ApiResponse(responseCode = "400", description = "Bad Request",
-                content = {@Content(mediaType = "application/json",
-                        schema = @Schema(implementation = ApiErrorResponse.class))}),
-        @ApiResponse(responseCode = "401", description = "Unauthorized",
-                content = {@Content(mediaType = "application/json",
-                        schema = @Schema(implementation = ApiErrorResponse.class))}),
-        @ApiResponse(responseCode = "500", description = "Internal Server Error",
-                content = {@Content(mediaType = "application/json",
-                        schema = @Schema(implementation = ApiErrorResponse.class))})}
-    )
+    @StandardApiResponses
     @PostMapping(value = "stop")
-    @ResponseBody
-    public Integer postRemoteStopTx(@Valid ApiChargePointStart params) {
+    public Integer postRemoteStopTx(@Valid ApiChargePointStop params) {
         // only one active task per charge box over api; to be discussed!
         if (activeTaskOnChargeBox(params.getChargeBoxId())) {
-            String errMsg = String.format("Active task found on ChargeBox %s!",
+            var errMsg = String.format("Active task found on ChargeBox %s!",
                     params.getChargeBoxId()
             );
             throw new BadRequestException(errMsg);
         }
 
-        RemoteStopTransactionParams transactionParams = new RemoteStopTransactionParams();
-        // set the ChargPointSelectionList, maybe check nessesary that length is one
-        transactionParams.setChargePointSelectList(chargePointRepository.getChargePointSelect(params.getChargeBoxId()));
+        var transactionParams = new RemoteStopTransactionParams();
+
+        // set the ChargPointSelectionList, ensure the length is exactly one
+        var chargePoint = chargePointRepository.getChargePointSelect(params.getChargeBoxId()).orElseThrow(
+            () -> new BadRequestException(
+                String.format("ChargeBox %s not found!", params.getChargeBoxId())
+            )
+        );
+        transactionParams.setChargePointSelectList(Collections.singletonList(chargePoint));
 
         // Get the transactionId of the active transaction on the connector.
         // If no transaction active don't send RemoteStop
-        Integer transactionId = transactionRepository.getActiveTransactionId(params.getChargeBoxId(),
-                params.getConnectorId());
-        if (isNull(transactionId)) {
-            String errMsg = String.format("No active transaction found for connector %s at ChargeBox %s!",
+        var transactionId = transactionRepository.getActiveTransactionId(params.getChargeBoxId(),
+                params.getConnectorId()).orElseThrow(
+            () -> new BadRequestException(
+                String.format("No active transaction found for connector %s at ChargeBox %s!",
                     params.getConnectorId(),
                     params.getChargeBoxId()
-            );
-            throw new BadRequestException(errMsg);
-        }
-
+                )
+            )
+        );
         // check the user is allowed to stop this transaction (actual only the one who started it!)
-        String ocppTag = transactionRepository.getTransaction(transactionId).getOcppIdTag();
+        var ocppTag = transactionRepository.getTransaction(transactionId).orElseThrow(
+            () -> new BadRequestException(
+                String.format("Transaction %s not found!", transactionId)
+            )
+        ).getOcppIdTag();
         if (!params.getOcppTag().contentEquals(ocppTag)) {
              throw new BadRequestException("The transaction was authorised with another OCPP Tag!");
         }
         transactionParams.setTransactionId(transactionId);
 
-        return client.remoteStopTransaction(transactionParams, "SteveWebApi");
+        return client.remoteStopTransaction(transactionParams, CALLER);
     }
 
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "OK"),
-        @ApiResponse(responseCode = "400", description = "Bad Request",
-                content = {@Content(mediaType = "application/json",
-                        schema = @Schema(implementation = ApiErrorResponse.class))}),
-        @ApiResponse(responseCode = "401", description = "Unauthorized",
-                content = {@Content(mediaType = "application/json",
-                        schema = @Schema(implementation = ApiErrorResponse.class))}),
-        @ApiResponse(responseCode = "500", description = "Internal Server Error",
-                content = {@Content(mediaType = "application/json",
-                        schema = @Schema(implementation = ApiErrorResponse.class))})}
-    )
+    @StandardApiResponses
     @PostMapping(value = "unlock")
-    @ResponseBody
-    public Integer postUnlockCon(@Valid ApiChargePointStart params) {
+    public Integer postUnlockCon(@Valid ApiChargePointUnlock params) {
         // only one active task per charge box over api; to be discussed!
         if (activeTaskOnChargeBox(params.getChargeBoxId())) {
-            String errMsg = String.format("Active task found on ChargeBox %s!",
+            var errMsg = String.format("Active task found on ChargeBox %s!",
                     params.getChargeBoxId()
             );
             throw new BadRequestException(errMsg);
         }
 
-        UnlockConnectorParams transactionParams = new UnlockConnectorParams();
-        transactionParams.setChargePointSelectList(chargePointRepository.getChargePointSelect(params.getChargeBoxId()));
+        var transactionParams = new UnlockConnectorParams();
+        var chargePoint = chargePointRepository.getChargePointSelect(params.getChargeBoxId()).orElseThrow(
+            () -> new BadRequestException(
+                String.format("ChargeBox %s not found!", params.getChargeBoxId())
+            )
+        );
+        transactionParams.setChargePointSelectList(Collections.singletonList(chargePoint));
 
         /* If a active transaction is found, don't unlock the connection. */
-        Integer transactionId = transactionRepository.getActiveTransactionId(params.getChargeBoxId(),
+        var transactionId = transactionRepository.getActiveTransactionId(params.getChargeBoxId(),
                 params.getConnectorId());
-        if (!isNull(transactionId)) {
-            String errMsg = String.format("Active transaction found for connector %s at ChargeBox %s!",
+        if (transactionId.isPresent()) {
+            var errMsg = String.format("Active transaction found for connector %s at ChargeBox %s!",
                     params.getConnectorId(),
                     params.getChargeBoxId()
             );
@@ -327,6 +255,6 @@ public class RemoteStartStopRestController {
         }
 
         transactionParams.setConnectorId(params.getConnectorId());
-        return client.unlockConnector(transactionParams, "SteveWebApi");
+        return client.unlockConnector(transactionParams, CALLER);
     }
 }

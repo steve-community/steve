@@ -41,11 +41,11 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
+import static de.rwth.idsg.steve.repository.impl.RepositoryUtils.ocppTagByUserIdQuery;
 import static jooq.steve.db.tables.ChargeBox.CHARGE_BOX;
 import static jooq.steve.db.tables.Connector.CONNECTOR;
 import static jooq.steve.db.tables.OcppTag.OCPP_TAG;
 import static jooq.steve.db.tables.Reservation.RESERVATION;
-import static jooq.steve.db.tables.UserOcppTag.USER_OCPP_TAG;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -93,11 +93,7 @@ public class ReservationRepositoryImpl implements ReservationRepository {
         }
 
         if (form.isUserIdSet()) {
-            var query = ctx.select(OCPP_TAG.ID_TAG)
-                .from(OCPP_TAG)
-                .join(USER_OCPP_TAG).on(USER_OCPP_TAG.OCPP_TAG_PK.eq(OCPP_TAG.OCPP_TAG_PK))
-                .where(USER_OCPP_TAG.USER_PK.eq(form.getUserId()));
-
+            var query = ocppTagByUserIdQuery(ctx, form.getUserId());
             selectQuery.addConditions(RESERVATION.ID_TAG.in(query));
         }
 

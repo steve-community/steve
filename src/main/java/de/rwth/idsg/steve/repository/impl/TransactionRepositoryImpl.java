@@ -44,6 +44,7 @@ import org.springframework.stereotype.Repository;
 import java.io.Writer;
 import java.util.List;
 
+import static de.rwth.idsg.steve.repository.impl.RepositoryUtils.ocppTagByUserIdQuery;
 import static de.rwth.idsg.steve.utils.CustomDSL.date;
 import static jooq.steve.db.tables.ChargeBox.CHARGE_BOX;
 import static jooq.steve.db.tables.Connector.CONNECTOR;
@@ -51,7 +52,6 @@ import static jooq.steve.db.tables.ConnectorMeterValue.CONNECTOR_METER_VALUE;
 import static jooq.steve.db.tables.OcppTag.OCPP_TAG;
 import static jooq.steve.db.tables.Transaction.TRANSACTION;
 import static jooq.steve.db.tables.TransactionStart.TRANSACTION_START;
-import static jooq.steve.db.tables.UserOcppTag.USER_OCPP_TAG;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -290,11 +290,7 @@ public class TransactionRepositoryImpl implements TransactionRepository {
         }
 
         if (form.isUserIdSet()) {
-            var query = ctx.select(OCPP_TAG.ID_TAG)
-                .from(OCPP_TAG)
-                .join(USER_OCPP_TAG).on(USER_OCPP_TAG.OCPP_TAG_PK.eq(OCPP_TAG.OCPP_TAG_PK))
-                .where(USER_OCPP_TAG.USER_PK.eq(form.getUserId()));
-
+            var query = ocppTagByUserIdQuery(ctx, form.getUserId());
             selectQuery.addConditions(TRANSACTION.ID_TAG.in(query));
         }
 

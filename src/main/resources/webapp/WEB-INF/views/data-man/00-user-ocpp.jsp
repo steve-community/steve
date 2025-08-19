@@ -20,7 +20,7 @@
 --%>
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
 <table class="userInput">
-  <thead><tr><th>OCPP ID Tags</th><th></th></tr></thead>
+	<thead><tr><th>OCPP ID Tags</th><th></th></tr></thead>
 	<tbody>
 	<tr>
 		<td style="vertical-align:top">

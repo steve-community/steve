@@ -51,6 +51,7 @@ import static jooq.steve.db.tables.ConnectorMeterValue.CONNECTOR_METER_VALUE;
 import static jooq.steve.db.tables.OcppTag.OCPP_TAG;
 import static jooq.steve.db.tables.Transaction.TRANSACTION;
 import static jooq.steve.db.tables.TransactionStart.TRANSACTION_START;
+import static jooq.steve.db.tables.UserOcppTag.USER_OCPP_TAG;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -286,6 +287,15 @@ public class TransactionRepositoryImpl implements TransactionRepository {
 
         if (form.isOcppIdTagSet()) {
             selectQuery.addConditions(TRANSACTION.ID_TAG.eq(form.getOcppIdTag()));
+        }
+
+        if (form.isUserIdSet()) {
+            var query = ctx.select(OCPP_TAG.ID_TAG)
+                .from(OCPP_TAG)
+                .join(USER_OCPP_TAG).on(USER_OCPP_TAG.OCPP_TAG_PK.eq(OCPP_TAG.OCPP_TAG_PK))
+                .where(USER_OCPP_TAG.USER_PK.eq(form.getUserId()));
+
+            selectQuery.addConditions(TRANSACTION.ID_TAG.in(query));
         }
 
         if (form.getType() == TransactionQueryForm.QueryType.ACTIVE) {

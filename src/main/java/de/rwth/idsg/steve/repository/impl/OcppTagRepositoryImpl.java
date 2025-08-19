@@ -100,6 +100,15 @@ public class OcppTagRepositoryImpl implements OcppTagRepository {
             selectQuery.addConditions(OCPP_TAG_ACTIVITY.PARENT_ID_TAG.eq(form.getParentIdTag()));
         }
 
+        if (form.isUserIdSet()) {
+            var query = ctx.select(OCPP_TAG.ID_TAG)
+                .from(OCPP_TAG)
+                .join(USER_OCPP_TAG).on(USER_OCPP_TAG.OCPP_TAG_PK.eq(OCPP_TAG.OCPP_TAG_PK))
+                .where(USER_OCPP_TAG.USER_PK.eq(form.getUserId()));
+
+            selectQuery.addConditions(OCPP_TAG_ACTIVITY.ID_TAG.in(query));
+        }
+
         if (form.isNoteSet()) {
             selectQuery.addConditions(includes(OCPP_TAG_ACTIVITY.NOTE, form.getNote()));
         }

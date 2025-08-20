@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
+    <property name="PROFILE" value="${profile}"/>
     <property name="LOG_DIR" value="${user.home}/logs" />
     <property name="LOG_PATTERN" value="[%-5level] %d %c \(%thread\) - %msg%n" />
 
@@ -25,16 +26,34 @@
         </encoder>
     </appender>
 
-    <root level="INFO">
-        <appender-ref ref="FILE" />
+    <property name="ROOT_LEVEL" value="INFO"/>
+
+    <if condition='p("PROFILE").equals("dev") || p("PROFILE").equals("test")'>
+        <then>
+            <property name="ROOT_LEVEL" value="DEBUG"/>
+        </then>
+    </if>
+
+    <root level="${ROOT_LEVEL}">
+        <appender-ref ref="${appender}"/>
     </root>
 
     <!-- Disable the Jooq logo in logs -->
     <!-- https://github.com/jOOQ/jOOQ/issues/4019 -->
     <logger name="org.jooq.Constants" level="WARN" />
 
+    <if condition='p("PROFILE").equals("dev") || p("PROFILE").equals("test")'>
+        <then>
+            <logger name="org.apache.cxf" level="INFO"/>
+            <logger name="org.eclipse.jetty" level="INFO"/>
+            <logger name="com.zaxxer.hikari" level="INFO"/>
+            <logger name="org.springframework" level="INFO"/>
+            <logger name="org.springframework.security" level="INFO"/>
+            <logger name="org.springframework.web.servlet" level="INFO"/>
+        </then>
+    </if>
+
     <logger name="org.apache.jasper" level="WARN"/>
     <logger name="org.apache.tomcat.util" level="WARN"/>
     <logger name="jndi" level="WARN"/>
-
 </configuration>

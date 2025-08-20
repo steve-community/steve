@@ -83,9 +83,7 @@ public enum SteveConfiguration {
                      .build();
 
         db = DB.builder()
-               .ip(p.getString("db.ip"))
-               .port(p.getInt("db.port"))
-               .schema(p.getString("db.schema"))
+               .jdbcUrl(p.getString("db.jdbc.url"))
                .userName(p.getString("db.user"))
                .password(p.getString("db.password"))
                .sqlLogging(p.getBoolean("db.sql.logging"))
@@ -177,9 +175,7 @@ public enum SteveConfiguration {
     // Database configuration
     @Builder @Getter
     public static class DB {
-        private final String ip;
-        private final int port;
-        private final String schema;
+        private final String jdbcUrl;
         private final String userName;
         private final String password;
         private final boolean sqlLogging;

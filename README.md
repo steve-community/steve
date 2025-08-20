@@ -72,11 +72,11 @@ SteVe is designed to run standalone, a java servlet container / web server (e.g.
 
 3. Configure SteVe **before** building:
 
-    The basic configuration is defined in [main.properties](src/main/resources/config/prod/main.properties):
-      - You _must_ change [database configuration](src/main/resources/config/prod/main.properties#L9-L13)
-      - You _must_ change [the host](src/main/resources/config/prod/main.properties#L22) to the correct IP address of your server
-      - You _must_ change [web interface credentials](src/main/resources/config/prod/main.properties#L17-L18)
-      - You _can_ access the application via HTTPS, by [enabling it and setting the keystore properties](src/main/resources/config/prod/main.properties#L32-L35)
+    The basic configuration is defined in [main.properties](src/main/resources/config/main.properties):
+      - You _may_ change [database configuration](src/main/resources/config/main.properties#L9-L13)
+      - You _may_ change [the host](src/main/resources/config/main.properties#L22) to the correct IP address of your server
+      - You _may_ change [web interface credentials](src/main/resources/config/main.properties#L17-L18)
+      - You _can_ access the application via HTTPS, by [enabling it and setting the keystore properties](src/main/resources/config/main.properties#L32-L35)
      
     For advanced configuration please see the [Configuration wiki](https://github.com/steve-community/steve/wiki/Configuration)
 
@@ -84,24 +84,29 @@ SteVe is designed to run standalone, a java servlet container / web server (e.g.
 
     To compile SteVe simply use Maven. A runnable `jar` file containing the application and configuration will be created in the subdirectory `steve/target`.
 
+    ```shell
+    ./mvnw package
     ```
-    # ./mvnw package
+   
+    If didn't change the configuration file in step 3, you can override the default by providing properties as build arguments:
+
+    ```shell
+    ./mvnw package -Ddb.ip=<ip> -Ddb.port=<port> -Ddb.schema=<schema> -Ddb.user=<username> -Ddb.password=<password>
     ```
 
 5. Run SteVe:
 
     To start the application run (please do not run SteVe as root):
 
-    ```
-    # java -jar target/steve.jar
+    ```shell
+    java -jar target/steve.jar
     ```
 
 # Docker
 
 If you prefer to build and start this project via docker (you can skip the steps 1, 4 and 5 from above), this can be done as follows: `docker compose up -d`
 
-Because the docker compose file is written to build the project for you, you still have to change the project configuration settings from step 3.
-Instead of changing the [main.properties in the prod directory](src/main/resources/config/prod/main.properties), you have to change the [main.properties in the docker directory](src/main/resources/config/docker/main.properties). There you have to change all configurations which are described in step 3.
+Because the docker compose file is written to build the project for you, you have to change the project configuration settings from step 3.
 The database password for the user "steve" has to be the same as you have configured it in the docker compose file.
 
 With the default docker compose configuration, the web interface will be accessible at: `http://localhost:8180`

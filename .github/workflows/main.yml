@@ -1,6 +1,11 @@
 name: build and run tests
 on: [ push, pull_request ]
 
+env:
+  DB_SCHEMA: stevedb_test_2aa6a783d47d
+  DB_USER: steve
+  DB_PASSWORD: changeme
+
 jobs:
   build:
     strategy:
@@ -17,7 +22,7 @@ jobs:
           MYSQL_ROOT_PASSWORD: root
           MYSQL_DATABASE: root
         ports:
-          - 3306:3306
+          - "3306:3306"
         options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
 
     steps:
@@ -32,12 +37,24 @@ jobs:
       - name: Set up MySQL
         run: |
           mysql -h 127.0.0.1 -P 3306 -uroot -proot -e "SELECT @@VERSION;"
-          mysql -h 127.0.0.1 -P 3306 -uroot -proot -e "CREATE DATABASE stevedb_test_2aa6a783d47d;" -v
-          mysql -h 127.0.0.1 -P 3306 -uroot -proot -e "CREATE USER 'steve'@'%' IDENTIFIED BY 'changeme';" -v
-          mysql -h 127.0.0.1 -P 3306 -uroot -proot -e "GRANT ALL PRIVILEGES ON stevedb_test_2aa6a783d47d.* TO 'steve'@'%';" -v
+          mysql -h 127.0.0.1 -P 3306 -uroot -proot -e "CREATE DATABASE $DB_SCHEMA;" -v
+          mysql -h 127.0.0.1 -P 3306 -uroot -proot -e "CREATE USER '$DB_USER'@'%' IDENTIFIED BY '$DB_PASSWORD';" -v
+          mysql -h 127.0.0.1 -P 3306 -uroot -proot -e "GRANT ALL PRIVILEGES ON $DB_SCHEMA.* TO '$DB_USER'@'%';" -v
 
       - name: Build with Maven
-        run: ./mvnw -B -V -Dmaven.javadoc.skip=true -Ptest clean package --file pom.xml
+        run: |
+          ./mvnw -B -V \
+            -DskipTests=false \
+            -Dmaven.javadoc.skip=true \
+            -Ddb.host="127.0.0.1" \
+            -Ddb.port=3306 \
+            -Ddb.schema="${DB_SCHEMA}" \
+            -Ddb.user="${DB_USER}" \
+            -Ddb.password="${DB_PASSWORD}" \
+            -Ddb.sql.logging=true \
+            -Dprofile=test \
+            -Dappender=CONSOLE \
+            clean package --file pom.xml
 
       - name: Start the app and visit signin web page
         run: |

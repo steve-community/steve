@@ -19,6 +19,7 @@
 package de.rwth.idsg.steve.web.validation;
 
 import com.google.common.base.Strings;
+import jakarta.annotation.PostConstruct;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 import org.springframework.beans.factory.annotation.Value;

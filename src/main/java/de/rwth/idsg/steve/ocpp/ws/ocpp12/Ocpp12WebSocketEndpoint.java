@@ -58,12 +58,14 @@ public class Ocpp12WebSocketEndpoint extends AbstractWebSocketEndpoint {
     private final CentralSystemService12_SoapServer server;
     private final FutureResponseContextStore futureResponseContextStore;
 
-    public Ocpp12WebSocketEndpoint(DelegatingTaskScheduler asyncTaskScheduler, OcppServerRepository ocppServerRepository,
+    public Ocpp12WebSocketEndpoint(DelegatingTaskScheduler asyncTaskScheduler,
+                                   OcppServerRepository ocppServerRepository,
                                    FutureResponseContextStore futureResponseContextStore,
                                    ApplicationEventPublisher applicationEventPublisher,
                                    CentralSystemService12_SoapServer server,
                                    SteveConfiguration config) {
-        super(asyncTaskScheduler, ocppServerRepository, futureResponseContextStore, applicationEventPublisher, new SessionContextStoreImpl(config));
+        super(asyncTaskScheduler, ocppServerRepository, futureResponseContextStore, applicationEventPublisher,
+          new SessionContextStoreImpl(config));
         this.server = server;
         this.futureResponseContextStore = futureResponseContextStore;
     }

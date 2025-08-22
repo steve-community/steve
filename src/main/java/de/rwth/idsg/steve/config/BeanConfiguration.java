@@ -76,9 +76,9 @@ public class BeanConfiguration implements WebMvcConfigurer {
      */
     @Bean
     public DataSource dataSource() {
-      SteveConfiguration config = steveConfiguration();
-      SteveConfiguration.DB dbConfig = config.getDb();
-      return dataSource(dbConfig.getJdbcUrl(), dbConfig.getUserName(), dbConfig.getPassword(), config.getTimeZoneId());
+        SteveConfiguration config = steveConfiguration();
+        SteveConfiguration.DB dbConfig = config.getDb();
+        return dataSource(dbConfig.getJdbcUrl(), dbConfig.getUserName(), dbConfig.getPassword(), config.getTimeZoneId());
     }
 
     public static DataSource dataSource(String dbUrl, String dbUserName, String dbPassword, String dbTimeZoneId) {

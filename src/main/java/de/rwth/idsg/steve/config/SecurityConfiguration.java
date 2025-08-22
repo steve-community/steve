@@ -33,7 +33,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 
-import static de.rwth.idsg.steve.SteveConfiguration.CONFIG;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.web.access.expression.WebExpressionAuthorizationManager;
 import org.springframework.security.web.util.matcher.RequestMatcher;

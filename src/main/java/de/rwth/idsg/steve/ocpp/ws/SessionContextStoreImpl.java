@@ -26,6 +26,7 @@ import de.rwth.idsg.steve.ocpp.ws.custom.WsSessionSelectStrategy;
 import de.rwth.idsg.steve.ocpp.ws.data.SessionContext;
 import lombok.extern.slf4j.Slf4j;
 import org.joda.time.DateTime;
+import org.springframework.stereotype.Component;
 import org.springframework.web.socket.WebSocketSession;
 
 import java.util.ArrayDeque;
@@ -43,6 +44,7 @@ import java.util.concurrent.locks.Lock;
  * @since 17.03.2015
  */
 @Slf4j
+@Component
 public class SessionContextStoreImpl implements SessionContextStore {
 
     /**

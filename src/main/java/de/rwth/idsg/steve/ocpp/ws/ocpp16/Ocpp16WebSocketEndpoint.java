@@ -27,6 +27,7 @@ import de.rwth.idsg.steve.ocpp.OcppVersion;
 import de.rwth.idsg.steve.ocpp.soap.CentralSystemService16_SoapServer;
 import de.rwth.idsg.steve.ocpp.ws.AbstractWebSocketEndpoint;
 import de.rwth.idsg.steve.ocpp.ws.FutureResponseContextStore;
+import de.rwth.idsg.steve.ocpp.ws.SessionContextStore;
 import de.rwth.idsg.steve.ocpp.ws.SessionContextStoreImpl;
 import de.rwth.idsg.steve.ocpp.ws.pipeline.AbstractCallHandler;
 import de.rwth.idsg.steve.ocpp.ws.pipeline.Deserializer;
@@ -63,8 +64,9 @@ public class Ocpp16WebSocketEndpoint extends AbstractWebSocketEndpoint {
                                    FutureResponseContextStore futureResponseContextStore,
                                    ApplicationEventPublisher applicationEventPublisher,
                                    CentralSystemService16_SoapServer server,
-                                   SteveConfiguration config) {
-        super(asyncTaskScheduler, ocppServerRepository, futureResponseContextStore, applicationEventPublisher, new SessionContextStoreImpl(config));
+                                   SessionContextStore sessionStore) {
+        super(asyncTaskScheduler, ocppServerRepository, futureResponseContextStore, applicationEventPublisher,
+          sessionStore);
         this.server = server;
         this.futureResponseContextStore = futureResponseContextStore;
     }
@@ -91,7 +93,8 @@ public class Ocpp16WebSocketEndpoint extends AbstractWebSocketEndpoint {
             ResponseType r;
 
             if (params instanceof BootNotificationRequest) {
-                r = server.bootNotificationWithTransport((BootNotificationRequest) params, chargeBoxId, OcppProtocol.V_16_JSON);
+                r = server.bootNotificationWithTransport((BootNotificationRequest) params, chargeBoxId,
+                    OcppProtocol.V_16_JSON);
 
             } else if (params instanceof FirmwareStatusNotificationRequest) {
                 r = server.firmwareStatusNotification((FirmwareStatusNotificationRequest) params, chargeBoxId);

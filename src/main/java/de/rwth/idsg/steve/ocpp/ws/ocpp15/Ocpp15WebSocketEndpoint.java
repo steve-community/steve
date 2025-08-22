@@ -64,7 +64,8 @@ public class Ocpp15WebSocketEndpoint extends AbstractWebSocketEndpoint {
                                    ApplicationEventPublisher applicationEventPublisher,
                                    CentralSystemService15_SoapServer server,
                                    SteveConfiguration config) {
-        super(asyncTaskScheduler, ocppServerRepository, futureResponseContextStore, applicationEventPublisher, new SessionContextStoreImpl(config));
+        super(asyncTaskScheduler, ocppServerRepository, futureResponseContextStore, applicationEventPublisher,
+          new SessionContextStoreImpl(config));
         this.server = server;
         this.futureResponseContextStore = futureResponseContextStore;
     }
@@ -91,7 +92,8 @@ public class Ocpp15WebSocketEndpoint extends AbstractWebSocketEndpoint {
             ResponseType r;
 
             if (params instanceof BootNotificationRequest) {
-                r = server.bootNotificationWithTransport((BootNotificationRequest) params, chargeBoxId, OcppProtocol.V_15_JSON);
+                r = server.bootNotificationWithTransport((BootNotificationRequest) params, chargeBoxId,
+                    OcppProtocol.V_15_JSON);
 
             } else if (params instanceof FirmwareStatusNotificationRequest) {
                 r = server.firmwareStatusNotification((FirmwareStatusNotificationRequest) params, chargeBoxId);

@@ -30,7 +30,6 @@ import de.rwth.idsg.steve.repository.ChargePointRepository;
 import de.rwth.idsg.steve.repository.GenericRepository;
 import de.rwth.idsg.steve.repository.dto.ChargePointSelect;
 import de.rwth.idsg.steve.repository.dto.ConnectorStatus;
-import de.rwth.idsg.steve.service.dto.UnidentifiedIncomingObject;
 import de.rwth.idsg.steve.utils.ConnectorStatusCountFilter;
 import de.rwth.idsg.steve.utils.DateTimeUtils;
 import de.rwth.idsg.steve.web.dto.ConnectorStatusForm;
@@ -51,11 +50,8 @@ import java.util.Deque;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
-
-import static de.rwth.idsg.steve.SteveConfiguration.CONFIG;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>

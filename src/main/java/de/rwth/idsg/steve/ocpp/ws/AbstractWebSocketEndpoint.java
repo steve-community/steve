@@ -19,7 +19,6 @@
 package de.rwth.idsg.steve.ocpp.ws;
 
 import com.google.common.base.Strings;
-import de.rwth.idsg.steve.SteveConfiguration;
 import de.rwth.idsg.steve.config.WebSocketConfiguration;
 import de.rwth.idsg.steve.config.DelegatingTaskScheduler;
 import de.rwth.idsg.steve.ocpp.OcppTransport;

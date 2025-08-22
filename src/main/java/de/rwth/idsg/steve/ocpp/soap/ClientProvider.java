@@ -30,7 +30,6 @@ import org.jetbrains.annotations.Nullable;
 import org.springframework.stereotype.Component;
 
 import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLSocketFactory;
 import jakarta.xml.ws.soap.SOAPBinding;
 
 /**
@@ -46,7 +45,7 @@ public class ClientProvider {
         SteveConfiguration.Jetty jettyConfig = config.getJetty();
         if (shouldInitSSL(jettyConfig)) {
             tlsClientParams = new TLSClientParameters();
-            tlsClientParams.setSSLSocketFactory(setupSSL(jettyConfig));
+            tlsClientParams.setSslContext(setupSSL(jettyConfig));
         } else {
             tlsClientParams = null;
         }
@@ -76,15 +75,15 @@ public class ClientProvider {
     }
 
     private static boolean shouldInitSSL(SteveConfiguration.Jetty jettyConfig) {
-        return jettyConfig.getKeyStorePath() != null && jettyConfig.getKeyStorePassword() != null;
+        return jettyConfig.getKeyStorePath() != null && !jettyConfig.getKeyStorePath().isBlank()
+          && jettyConfig.getKeyStorePassword() != null && !jettyConfig.getKeyStorePassword().isBlank();
     }
 
-    private static SSLSocketFactory setupSSL(SteveConfiguration.Jetty jettyConfig) {
-        SSLContext ssl;
+    private static SSLContext setupSSL(SteveConfiguration.Jetty jettyConfig) {
         try {
             String keyStorePath = jettyConfig.getKeyStorePath();
             String keyStorePwd = jettyConfig.getKeyStorePassword();
-            ssl = SslContextBuilder.builder()
+            return SslContextBuilder.builder()
                                    .keyStoreFromFile(keyStorePath, keyStorePwd)
                                    .usingTLS()
                                    .usingDefaultAlgorithm()
@@ -93,6 +92,5 @@ public class ClientProvider {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-        return ssl.getSocketFactory();
     }
 }

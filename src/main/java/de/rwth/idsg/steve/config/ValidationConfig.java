@@ -18,36 +18,27 @@
  */
 package de.rwth.idsg.steve.config;
 
-import de.rwth.idsg.steve.web.validation.ChargeBoxIdValidator;
-import de.rwth.idsg.steve.web.validation.SpringConstraintValidatorFactory;
-import jakarta.validation.Validator;
-import org.springframework.beans.factory.annotation.Value;
+import de.rwth.idsg.steve.SteveConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
-import org.springframework.validation.beanvalidation.MethodValidationPostProcessor;
+import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
+
+import java.util.Properties;
 
 @Configuration
 public class ValidationConfig {
 
     @Bean
-    public LocalValidatorFactoryBean validator(SpringConstraintValidatorFactory factory) {
-        LocalValidatorFactoryBean bean = new LocalValidatorFactoryBean();
-        bean.setConstraintValidatorFactory(factory);
-        return bean;
-    }
+    public PropertySourcesPlaceholderConfigurer valueConfigurer(SteveConfiguration config) {
+        var configurer = new PropertySourcesPlaceholderConfigurer();
 
-    @Bean
-    public static MethodValidationPostProcessor methodValidationPostProcessor(Validator validator) {
-        MethodValidationPostProcessor processor = new MethodValidationPostProcessor();
-        processor.setValidator(validator);
-        return processor;
-    }
+        var props = new Properties();
+        var chargeBoxIdValidationRegex = config.getOcpp().getChargeBoxIdValidationRegex();
+        if (chargeBoxIdValidationRegex != null) {
+            props.put("charge-box-id.validation.regex", chargeBoxIdValidationRegex);
+        }
+        configurer.setProperties(props);
 
-    @Bean
-    public ChargeBoxIdValidator chargeBoxIdValidator(
-        @Value("${charge-box-id.validation.regex:#{null}}") String chargeBoxIdValidationRegex) {
-
-        return new ChargeBoxIdValidator(chargeBoxIdValidationRegex);
+        return configurer;
     }
 }

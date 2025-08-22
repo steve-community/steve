@@ -20,12 +20,12 @@ package de.rwth.idsg.steve.web.validation;
 
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorFactory;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.stereotype.Component;
 
 @Component
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class SpringConstraintValidatorFactory implements ConstraintValidatorFactory {
 
     private final AutowireCapableBeanFactory beanFactory;

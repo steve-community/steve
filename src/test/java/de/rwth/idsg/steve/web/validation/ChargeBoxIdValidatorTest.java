@@ -27,7 +27,7 @@ import org.junit.jupiter.api.Test;
  */
 public class ChargeBoxIdValidatorTest {
 
-    ChargeBoxIdValidator validator = new ChargeBoxIdValidator(null);
+    ChargeBoxIdValidator validator = new ChargeBoxIdValidator();
 
     @Test
     public void testNull() {

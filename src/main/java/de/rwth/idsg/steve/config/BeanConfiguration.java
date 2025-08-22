@@ -39,7 +39,6 @@ import org.jooq.impl.DefaultConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.core.Ordered;
 import org.springframework.format.support.FormattingConversionService;
 import org.springframework.http.converter.HttpMessageConverter;
@@ -47,7 +46,6 @@ import org.springframework.http.converter.json.MappingJackson2HttpMessageConvert
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
-import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 import org.springframework.web.accept.ContentNegotiationManager;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
@@ -57,11 +55,8 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter;
 import org.springframework.web.servlet.view.InternalResourceViewResolver;
 
-import jakarta.validation.Validator;
-
 import javax.sql.DataSource;
 import java.util.List;
-import java.util.Properties;
 
 /**
  * Configuration and beans of Spring Framework.
@@ -165,11 +160,6 @@ public class BeanConfiguration implements WebMvcConfigurer {
         return new DelegatingTaskExecutor(executor);
     }
 
-    @Bean
-    public Validator validator() {
-        return new LocalValidatorFactoryBean();
-    }
-
     /**
      * There might be instances deployed in a local/closed network with no internet connection. In such situations,
      * it is unnecessary to try to access Github every time, even though the request will time out and result
@@ -254,19 +244,5 @@ public class BeanConfiguration implements WebMvcConfigurer {
     @Bean
     public SteveConfiguration steveConfiguration() {
         return SteveConfiguration.CONFIG;
-    }
-
-    @Bean
-    public PropertySourcesPlaceholderConfigurer valueConfigurer() {
-        var configurer = new PropertySourcesPlaceholderConfigurer();
-
-        var props = new Properties();
-        var chargeBoxIdValidationRegex = steveConfiguration().getOcpp().getChargeBoxIdValidationRegex();
-        if (chargeBoxIdValidationRegex != null) {
-          props.put("charge-box-id.validation.regex", chargeBoxIdValidationRegex);
-        }
-        configurer.setProperties(props);
-
-        return configurer;
     }
 }

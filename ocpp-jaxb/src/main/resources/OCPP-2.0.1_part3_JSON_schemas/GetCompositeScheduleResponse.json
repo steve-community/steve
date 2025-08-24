@@ -1,0 +1,157 @@
+{
+  "$schema": "http://json-schema.org/draft-06/schema#",
+  "$id": "urn:OCPP:Cp:2:2020:3:GetCompositeScheduleResponse",
+  "comment": "OCPP 2.0.1 FINAL",
+  "definitions": {
+    "CustomDataType": {
+      "description": "This class does not get 'AdditionalProperties = false' in the schema generation, so it can be extended with arbitrary JSON properties to allow adding custom data.",
+      "javaType": "CustomData",
+      "type": "object",
+      "properties": {
+        "vendorId": {
+          "type": "string",
+          "maxLength": 255
+        }
+      },
+      "required": [
+        "vendorId"
+      ]
+    },
+    "ChargingRateUnitEnumType": {
+      "description": "The unit of measure Limit is\r\nexpressed in.\r\n",
+      "javaType": "ChargingRateUnitEnum",
+      "type": "string",
+      "additionalProperties": false,
+      "enum": [
+        "W",
+        "A"
+      ]
+    },
+    "GenericStatusEnumType": {
+      "description": "The Charging Station will indicate if it was\r\nable to process the request\r\n",
+      "javaType": "GenericStatusEnum",
+      "type": "string",
+      "additionalProperties": false,
+      "enum": [
+        "Accepted",
+        "Rejected"
+      ]
+    },
+    "ChargingSchedulePeriodType": {
+      "description": "Charging_ Schedule_ Period\r\nurn:x-oca:ocpp:uid:2:233257\r\nCharging schedule period structure defines a time period in a charging schedule.\r\n",
+      "javaType": "ChargingSchedulePeriod",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "customData": {
+          "$ref": "#/definitions/CustomDataType"
+        },
+        "startPeriod": {
+          "description": "Charging_ Schedule_ Period. Start_ Period. Elapsed_ Time\r\nurn:x-oca:ocpp:uid:1:569240\r\nStart of the period, in seconds from the start of schedule. The value of StartPeriod also defines the stop time of the previous period.\r\n",
+          "type": "integer"
+        },
+        "limit": {
+          "description": "Charging_ Schedule_ Period. Limit. Measure\r\nurn:x-oca:ocpp:uid:1:569241\r\nCharging rate limit during the schedule period, in the applicable chargingRateUnit, for example in Amperes (A) or Watts (W). Accepts at most one digit fraction (e.g. 8.1).\r\n",
+          "type": "number"
+        },
+        "numberPhases": {
+          "description": "Charging_ Schedule_ Period. Number_ Phases. Counter\r\nurn:x-oca:ocpp:uid:1:569242\r\nThe number of phases that can be used for charging. If a number of phases is needed, numberPhases=3 will be assumed unless another number is given.\r\n",
+          "type": "integer"
+        },
+        "phaseToUse": {
+          "description": "Values: 1..3, Used if numberPhases=1 and if the EVSE is capable of switching the phase connected to the EV, i.e. ACPhaseSwitchingSupported is defined and true. It’s not allowed unless both conditions above are true. If both conditions are true, and phaseToUse is omitted, the Charging Station / EVSE will make the selection on its own.\r\n\r\n",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "startPeriod",
+        "limit"
+      ]
+    },
+    "CompositeScheduleType": {
+      "description": "Composite_ Schedule\r\nurn:x-oca:ocpp:uid:2:233362\r\n",
+      "javaType": "CompositeSchedule",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "customData": {
+          "$ref": "#/definitions/CustomDataType"
+        },
+        "chargingSchedulePeriod": {
+          "type": "array",
+          "additionalItems": false,
+          "items": {
+            "$ref": "#/definitions/ChargingSchedulePeriodType"
+          },
+          "minItems": 1
+        },
+        "evseId": {
+          "description": "The ID of the EVSE for which the\r\nschedule is requested. When evseid=0, the\r\nCharging Station calculated the expected\r\nconsumption for the grid connection.\r\n",
+          "type": "integer"
+        },
+        "duration": {
+          "description": "Duration of the schedule in seconds.\r\n",
+          "type": "integer"
+        },
+        "scheduleStart": {
+          "description": "Composite_ Schedule. Start. Date_ Time\r\nurn:x-oca:ocpp:uid:1:569456\r\nDate and time at which the schedule becomes active. All time measurements within the schedule are relative to this timestamp.\r\n",
+          "type": "string",
+          "format": "date-time"
+        },
+        "chargingRateUnit": {
+          "$ref": "#/definitions/ChargingRateUnitEnumType"
+        }
+      },
+      "required": [
+        "evseId",
+        "duration",
+        "scheduleStart",
+        "chargingRateUnit",
+        "chargingSchedulePeriod"
+      ]
+    },
+    "StatusInfoType": {
+      "description": "Element providing more information about the status.\r\n",
+      "javaType": "StatusInfo",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "customData": {
+          "$ref": "#/definitions/CustomDataType"
+        },
+        "reasonCode": {
+          "description": "A predefined code for the reason why the status is returned in this response. The string is case-insensitive.\r\n",
+          "type": "string",
+          "maxLength": 20
+        },
+        "additionalInfo": {
+          "description": "Additional text to provide detailed information.\r\n",
+          "type": "string",
+          "maxLength": 512
+        }
+      },
+      "required": [
+        "reasonCode"
+      ]
+    }
+  },
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "customData": {
+      "$ref": "#/definitions/CustomDataType"
+    },
+    "status": {
+      "$ref": "#/definitions/GenericStatusEnumType"
+    },
+    "statusInfo": {
+      "$ref": "#/definitions/StatusInfoType"
+    },
+    "schedule": {
+      "$ref": "#/definitions/CompositeScheduleType"
+    }
+  },
+  "required": [
+    "status"
+  ]
+}

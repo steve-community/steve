@@ -1,0 +1,548 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+OCPP Central System service description
+
+Copyright e-laad.nl. Free to use without modifications.
+
+See: http://ev-services.net/ocpp/
+-->
+<wsdl:definitions
+        xmlns:s="http://www.w3.org/2001/XMLSchema"
+        xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/"
+        xmlns:http="http://schemas.xmlsoap.org/wsdl/http/"
+        xmlns:tns="urn://Ocpp/Cs/2010/08/"
+        targetNamespace="urn://Ocpp/Cs/2010/08/"
+        xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+        xmlns:wsaw="http://www.w3.org/2006/05/addressing/wsdl"
+        xmlns:wsp="http://schemas.xmlsoap.org/ws/2004/09/policy"
+        xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd">
+
+  <wsp:Policy wsu:Id="ServicePolicy">
+    <wsp:ExactlyOne>
+      <wsp:All>
+        <wsaw:UsingAddressing />
+      </wsp:All>
+    </wsp:ExactlyOne>
+  </wsp:Policy>
+
+  <wsdl:types>
+    <s:schema elementFormDefault="qualified" targetNamespace="urn://Ocpp/Cs/2010/08/">
+
+      <s:simpleType name="AuthorizationStatus">
+        <s:annotation>
+          <s:documentation>Defines the authorization-status-value</s:documentation>
+        </s:annotation>
+        <s:restriction base="s:string">
+          <s:enumeration value="Accepted" />
+          <s:enumeration value="Blocked" />
+          <s:enumeration value="Expired" />
+          <s:enumeration value="Invalid" />
+          <s:enumeration value="ConcurrentTx" />
+        </s:restriction>
+      </s:simpleType>
+
+      <s:complexType name="IdTagInfo">
+        <s:sequence>
+          <s:element name="status" type="tns:AuthorizationStatus" minOccurs="1" maxOccurs="1" />
+          <s:element name="expiryDate" type="s:dateTime" minOccurs="0" maxOccurs="1"/>
+          <s:element name="parentIdTag" type="s:string" minOccurs="0" maxOccurs="1"/>
+        </s:sequence>
+      </s:complexType>
+
+      <s:complexType name="AuthorizeRequest">
+        <s:annotation>
+          <s:documentation>Defines the Authorize.req PDU</s:documentation>
+        </s:annotation>
+        <s:sequence>
+          <s:element name="idTag" type="s:string" minOccurs="1" maxOccurs="1" />
+        </s:sequence>
+      </s:complexType>
+
+      <s:complexType name="AuthorizeResponse">
+        <s:annotation>
+          <s:documentation>Defines the Authorize.conf PDU</s:documentation>
+        </s:annotation>
+        <s:sequence>
+          <s:element name="idTagInfo" type="tns:IdTagInfo" minOccurs="1" maxOccurs="1" />
+        </s:sequence>
+      </s:complexType>
+
+      <s:complexType name="StartTransactionRequest">
+        <s:annotation>
+          <s:documentation>Defines the StartTransaction.req PDU</s:documentation>
+        </s:annotation>
+        <s:sequence>
+          <s:element name="connectorId" type="s:int" minOccurs="1" maxOccurs="1" />
+          <s:element name="idTag" type="s:string" minOccurs="1" maxOccurs="1" />
+          <s:element name="timestamp" type="s:dateTime" minOccurs="1" maxOccurs="1" />
+          <s:element name="meterStart" type="s:int" minOccurs="1" maxOccurs="1" />
+        </s:sequence>
+      </s:complexType>
+
+      <s:complexType name="StartTransactionResponse">
+        <s:annotation>
+          <s:documentation>Defines the StartTransaction.conf PDU</s:documentation>
+        </s:annotation>
+        <s:sequence>
+          <s:element name="transactionId" type="s:int" minOccurs="1" maxOccurs="1" />
+          <s:element name="idTagInfo" type="tns:IdTagInfo" minOccurs="1" maxOccurs="1" />
+        </s:sequence>
+      </s:complexType>
+
+      <s:complexType name="StopTransactionRequest">
+        <s:annotation>
+          <s:documentation>Defines the StopTransaction.req PDU</s:documentation>
+        </s:annotation>
+        <s:sequence>
+          <s:element name="transactionId" type="s:int" minOccurs="1" maxOccurs="1" />
+          <s:element name="idTag" type="s:string" minOccurs="0" maxOccurs="1" />
+          <s:element name="timestamp" type="s:dateTime" minOccurs="1" maxOccurs="1" />
+          <s:element name="meterStop" type="s:int" minOccurs="1" maxOccurs="1" />
+        </s:sequence>
+      </s:complexType>
+
+      <s:complexType name="StopTransactionResponse">
+        <s:annotation>
+          <s:documentation>Defines the StopTransaction.conf PDU</s:documentation>
+        </s:annotation>
+        <s:sequence>
+          <s:element name="idTagInfo" type="tns:IdTagInfo" minOccurs="0" maxOccurs="1" />
+        </s:sequence>
+      </s:complexType>
+
+      <s:complexType name="HeartbeatRequest">
+        <s:annotation>
+          <s:documentation>Defines the Heartbeat.req PDU</s:documentation>
+        </s:annotation>
+      </s:complexType>
+
+      <s:complexType name="HeartbeatResponse">
+        <s:annotation>
+          <s:documentation>Defines the Heartbeat.conf PDU</s:documentation>
+        </s:annotation>
+        <s:sequence>
+          <s:element name="currentTime" type="s:dateTime" minOccurs="1" maxOccurs="1" />
+        </s:sequence>
+      </s:complexType>
+
+      <s:complexType name="MeterValue">
+        <s:annotation>
+          <s:documentation>Defines single value of the meter-value-value</s:documentation>
+        </s:annotation>
+        <s:sequence>
+          <s:element name="timestamp" type="s:dateTime" />
+          <s:element name="value" type="s:int" />
+        </s:sequence>
+      </s:complexType>
+
+      <s:complexType name="MeterValuesRequest">
+        <s:annotation>
+          <s:documentation>Defines the MeterValues.req PDU</s:documentation>
+        </s:annotation>
+        <s:sequence>
+          <s:element name="connectorId" type="s:int" minOccurs="1" maxOccurs="1" />
+          <s:element name="values" type="tns:MeterValue" minOccurs="0" maxOccurs="unbounded" />
+        </s:sequence>
+      </s:complexType>
+
+      <s:complexType name="MeterValuesResponse">
+        <s:annotation>
+          <s:documentation>Defines the MeterValues.conf PDU</s:documentation>
+        </s:annotation>
+      </s:complexType>
+
+      <s:complexType name="BootNotificationRequest">
+        <s:annotation>
+          <s:documentation>Defines the BootNotification.req PDU</s:documentation>
+        </s:annotation>
+        <s:sequence>
+          <s:element name="chargePointVendor" type="s:string" minOccurs="1" maxOccurs="1" />
+          <s:element name="chargePointModel" type="s:string" minOccurs="1" maxOccurs="1" />
+          <s:element name="chargePointSerialNumber"  type="s:string" minOccurs="0" maxOccurs="1" />
+          <s:element name="chargeBoxSerialNumber"  type="s:string" minOccurs="0" maxOccurs="1" />
+          <s:element name="firmwareVersion" type="s:string" minOccurs="0" maxOccurs="1"/>
+          <s:element name="iccid" type="s:string" minOccurs="0" maxOccurs="1" />
+          <s:element name="imsi" type="s:string" minOccurs="0" maxOccurs="1" />
+          <s:element name="meterType" type="s:string" minOccurs="0" maxOccurs="1" />
+          <s:element name="meterSerialNumber" type="s:string" minOccurs="0" maxOccurs="1" />
+        </s:sequence>
+      </s:complexType>
+
+      <s:simpleType name="RegistrationStatus">
+        <s:annotation>
+          <s:documentation>Defines the registration-status-value</s:documentation>
+        </s:annotation>
+        <s:restriction base="s:string">
+          <s:enumeration value="Accepted" />
+          <s:enumeration value="Rejected" />
+        </s:restriction>
+      </s:simpleType>
+
+      <s:complexType name="BootNotificationResponse">
+        <s:annotation>
+          <s:documentation>Defines the BootNotification.conf PDU</s:documentation>
+        </s:annotation>
+        <s:sequence>
+          <s:element name="status" type="tns:RegistrationStatus" minOccurs="1" maxOccurs="1" />
+          <s:element name="currentTime" type="s:dateTime" minOccurs="0" maxOccurs="1" />
+          <s:element name="heartbeatInterval" type="s:int" minOccurs="0" maxOccurs="1" />
+        </s:sequence>
+      </s:complexType>
+
+      <s:simpleType name="ChargePointErrorCode">
+        <s:annotation>
+          <s:documentation>Defines the charge-point-error-value</s:documentation>
+        </s:annotation>
+        <s:restriction base="s:string">
+          <s:enumeration value="ConnectorLockFailure" />
+          <s:enumeration value="HighTemperature" />
+          <s:enumeration value="Mode3Error" />
+          <s:enumeration value="NoError" />
+          <s:enumeration value="PowerMeterFailure" />
+          <s:enumeration value="PowerSwitchFailure" />
+          <s:enumeration value="ReaderFailure" />
+          <s:enumeration value="ResetFailure" />
+        </s:restriction>
+      </s:simpleType>
+
+      <s:simpleType name="ChargePointStatus">
+        <s:annotation>
+          <s:documentation>Defines the charge-point-status-value</s:documentation>
+        </s:annotation>
+        <s:restriction base="s:string">
+          <s:enumeration value="Available" />
+          <s:enumeration value="Occupied" />
+          <s:enumeration value="Faulted" />
+          <s:enumeration value="Unavailable" />
+        </s:restriction>
+      </s:simpleType>
+
+      <s:complexType name="StatusNotificationRequest">
+        <s:annotation>
+          <s:documentation>Defines the StatusNotification.req PDU</s:documentation>
+        </s:annotation>
+        <s:sequence>
+          <s:element name="connectorId" type="s:int" minOccurs="1" maxOccurs="1" />
+          <s:element name="status" type="tns:ChargePointStatus" minOccurs="1" maxOccurs="1" />
+          <s:element name="errorCode" type="tns:ChargePointErrorCode" minOccurs="1" maxOccurs="1" />
+        </s:sequence>
+      </s:complexType>
+
+      <s:complexType name="StatusNotificationResponse">
+        <s:annotation>
+          <s:documentation>Defines the StatusNotification.conf PDU</s:documentation>
+        </s:annotation>
+      </s:complexType>
+
+      <s:simpleType name="FirmwareStatus">
+        <s:annotation>
+          <s:documentation>Defines the firmware-status-value</s:documentation>
+        </s:annotation>
+        <s:restriction base="s:string">
+          <s:enumeration value="Downloaded" />
+          <s:enumeration value="DownloadFailed" />
+          <s:enumeration value="InstallationFailed" />
+          <s:enumeration value="Installed" />
+        </s:restriction>
+      </s:simpleType>
+
+      <s:complexType name="FirmwareStatusNotificationRequest">
+        <s:annotation>
+          <s:documentation>Defines the FirmwareStatusNotification.req PDU</s:documentation>
+        </s:annotation>
+        <s:sequence>
+          <s:element name="status" type="tns:FirmwareStatus" minOccurs="1" maxOccurs="1" />
+        </s:sequence>
+      </s:complexType>
+
+      <s:complexType name="FirmwareStatusNotificationResponse">
+        <s:annotation>
+          <s:documentation>Defines the FirmwareStatusNotification.conf PDU</s:documentation>
+        </s:annotation>
+      </s:complexType>
+
+      <s:simpleType name="DiagnosticsStatus">
+        <s:annotation>
+          <s:documentation>Defines the diagnostics-status-value</s:documentation>
+        </s:annotation>
+        <s:restriction base="s:string">
+          <s:enumeration value="Uploaded" />
+          <s:enumeration value="UploadFailed" />
+        </s:restriction>
+      </s:simpleType>
+
+      <s:complexType name="DiagnosticsStatusNotificationRequest">
+        <s:annotation>
+          <s:documentation>Defines the DiagnosticsStatusNotification.req PDU</s:documentation>
+        </s:annotation>
+        <s:sequence>
+          <s:element name="status" type="tns:DiagnosticsStatus" minOccurs="1" maxOccurs="1" />
+        </s:sequence>
+      </s:complexType>
+
+      <s:complexType name="DiagnosticsStatusNotificationResponse">
+        <s:annotation>
+          <s:documentation>Defines the DiagnosticsStatusNotification.conf PDU</s:documentation>
+        </s:annotation>
+      </s:complexType>
+
+      <s:element name="chargeBoxIdentity" type="s:string" />
+      <s:element name="authorizeRequest" type="tns:AuthorizeRequest" />
+      <s:element name="authorizeResponse" type="tns:AuthorizeResponse" />
+      <s:element name="startTransactionRequest" type="tns:StartTransactionRequest" />
+      <s:element name="startTransactionResponse" type="tns:StartTransactionResponse" />
+      <s:element name="stopTransactionRequest" type="tns:StopTransactionRequest" />
+      <s:element name="stopTransactionResponse" type="tns:StopTransactionResponse" />
+      <s:element name="heartbeatRequest" type="tns:HeartbeatRequest" />
+      <s:element name="heartbeatResponse" type="tns:HeartbeatResponse" />
+      <s:element name="meterValuesRequest" type="tns:MeterValuesRequest" />
+      <s:element name="meterValuesResponse" type="tns:MeterValuesResponse" />
+      <s:element name="bootNotificationRequest" type="tns:BootNotificationRequest" />
+      <s:element name="bootNotificationResponse" type="tns:BootNotificationResponse" />
+      <s:element name="statusNotificationRequest" type="tns:StatusNotificationRequest" />
+      <s:element name="statusNotificationResponse" type="tns:StatusNotificationResponse" />
+      <s:element name="firmwareStatusNotificationRequest" type="tns:FirmwareStatusNotificationRequest" />
+      <s:element name="firmwareStatusNotificationResponse" type="tns:FirmwareStatusNotificationResponse" />
+      <s:element name="diagnosticsStatusNotificationRequest" type="tns:DiagnosticsStatusNotificationRequest" />
+      <s:element name="diagnosticsStatusNotificationResponse" type="tns:DiagnosticsStatusNotificationResponse" />
+    </s:schema>
+  </wsdl:types>
+
+  <wsdl:message name="Header">
+    <wsdl:part name="ChargeBoxIdentity" element="tns:chargeBoxIdentity" />
+  </wsdl:message>
+
+  <wsdl:message name="AuthorizeInput">
+    <wsdl:part name="parameters" element="tns:authorizeRequest" />
+  </wsdl:message>
+
+  <wsdl:message name="AuthorizeOutput">
+    <wsdl:part name="parameters" element="tns:authorizeResponse" />
+  </wsdl:message>
+
+  <wsdl:message name="StartTransactionInput">
+    <wsdl:part name="parameters" element="tns:startTransactionRequest" />
+  </wsdl:message>
+
+  <wsdl:message name="StartTransactionOutput">
+    <wsdl:part name="parameters" element="tns:startTransactionResponse" />
+  </wsdl:message>
+
+  <wsdl:message name="StopTransactionInput">
+    <wsdl:part name="parameters" element="tns:stopTransactionRequest" />
+  </wsdl:message>
+
+  <wsdl:message name="StopTransactionOutput">
+    <wsdl:part name="parameters" element="tns:stopTransactionResponse" />
+  </wsdl:message>
+
+  <wsdl:message name="HeartbeatInput">
+    <wsdl:part name="parameters" element="tns:heartbeatRequest" />
+  </wsdl:message>
+
+  <wsdl:message name="HeartbeatOutput">
+    <wsdl:part name="parameters" element="tns:heartbeatResponse" />
+  </wsdl:message>
+
+  <wsdl:message name="MeterValuesInput">
+    <wsdl:part name="parameters" element="tns:meterValuesRequest" />
+  </wsdl:message>
+
+  <wsdl:message name="MeterValuesOutput">
+    <wsdl:part name="parameters" element="tns:meterValuesResponse" />
+  </wsdl:message>
+
+  <wsdl:message name="BootNotificationInput">
+    <wsdl:part name="parameters" element="tns:bootNotificationRequest" />
+  </wsdl:message>
+
+  <wsdl:message name="BootNotificationOutput">
+    <wsdl:part name="parameters" element="tns:bootNotificationResponse" />
+  </wsdl:message>
+
+  <wsdl:message name="StatusNotificationInput">
+    <wsdl:part name="parameters" element="tns:statusNotificationRequest" />
+  </wsdl:message>
+
+  <wsdl:message name="StatusNotificationOutput">
+    <wsdl:part name="parameters" element="tns:statusNotificationResponse" />
+  </wsdl:message>
+
+  <wsdl:message name="FirmwareStatusNotificationInput">
+    <wsdl:part name="parameters" element="tns:firmwareStatusNotificationRequest" />
+  </wsdl:message>
+
+  <wsdl:message name="FirmwareStatusNotificationOutput">
+    <wsdl:part name="parameters" element="tns:firmwareStatusNotificationResponse" />
+  </wsdl:message>
+
+  <wsdl:message name="DiagnosticsStatusNotificationInput">
+    <wsdl:part name="parameters" element="tns:diagnosticsStatusNotificationRequest" />
+  </wsdl:message>
+
+  <wsdl:message name="DiagnosticsStatusNotificationOutput">
+    <wsdl:part name="parameters" element="tns:diagnosticsStatusNotificationResponse" />
+  </wsdl:message>
+
+  <wsdl:portType name="CentralSystemService">
+
+    <wsdl:operation name="Authorize">
+      <wsdl:input message="tns:AuthorizeInput" wsaw:Action="/Authorize" />
+      <wsdl:output message="tns:AuthorizeOutput" />
+    </wsdl:operation>
+
+    <wsdl:operation name="StartTransaction">
+      <wsdl:input message="tns:StartTransactionInput" wsaw:Action="/StartTransaction"/>
+      <wsdl:output message="tns:StartTransactionOutput" />
+    </wsdl:operation>
+
+    <wsdl:operation name="StopTransaction">
+      <wsdl:input message="tns:StopTransactionInput" wsaw:Action="/StopTransaction" />
+      <wsdl:output message="tns:StopTransactionOutput" />
+    </wsdl:operation>
+
+    <wsdl:operation name="Heartbeat">
+      <wsdl:input message="tns:HeartbeatInput" wsaw:Action="/Heartbeat" />
+      <wsdl:output message="tns:HeartbeatOutput" />
+    </wsdl:operation>
+
+    <wsdl:operation name="MeterValues">
+      <wsdl:input message="tns:MeterValuesInput" wsaw:Action="/MeterValues" />
+      <wsdl:output message="tns:MeterValuesOutput" />
+    </wsdl:operation>
+
+    <wsdl:operation name="BootNotification">
+      <wsdl:input message="tns:BootNotificationInput" wsaw:Action="/BootNotification" />
+      <wsdl:output message="tns:BootNotificationOutput"/>
+    </wsdl:operation>
+
+    <wsdl:operation name="StatusNotification">
+      <wsdl:input message="tns:StatusNotificationInput" wsaw:Action="/StatusNotification" />
+      <wsdl:output message="tns:StatusNotificationOutput" />
+    </wsdl:operation>
+
+    <wsdl:operation name="FirmwareStatusNotification">
+      <wsdl:input message="tns:FirmwareStatusNotificationInput" wsaw:Action="/FirmwareStatusNotification"/>
+      <wsdl:output message="tns:FirmwareStatusNotificationOutput" />
+    </wsdl:operation>
+
+    <wsdl:operation name="DiagnosticsStatusNotification">
+      <wsdl:input message="tns:DiagnosticsStatusNotificationInput" wsaw:Action="/DiagnosticsStatusNotification"/>
+      <wsdl:output message="tns:DiagnosticsStatusNotificationOutput" />
+    </wsdl:operation>
+  </wsdl:portType>
+
+  <wsdl:binding name="CentralSystemServiceSoap" type="tns:CentralSystemService">
+
+    <wsp:PolicyReference URI="#ServicePolicy" />
+    <soap12:binding transport="http://schemas.xmlsoap.org/soap/http" />
+
+    <wsdl:operation name="Authorize">
+      <soap12:operation soapAction="/Authorize" style="document"/>
+      <wsdl:input>
+        <soap12:header use="literal" message="tns:Header" part="ChargeBoxIdentity"/>
+        <soap12:body   use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+
+    <wsdl:operation name="StartTransaction">
+      <soap12:operation soapAction="/StartTransaction" style="document"/>
+      <wsdl:input>
+        <soap12:header use="literal" message="tns:Header" part="ChargeBoxIdentity"/>
+        <soap12:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+
+    <wsdl:operation name="StopTransaction">
+      <soap12:operation soapAction="/StopTransaction" style="document"/>
+      <wsdl:input>
+        <soap12:header use="literal" message="tns:Header" part="ChargeBoxIdentity"/>
+        <soap12:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+
+    <wsdl:operation name="Heartbeat">
+      <soap12:operation soapAction="/Heartbeat" style="document" />
+      <wsdl:input>
+        <soap12:header use="literal" message="tns:Header" part="ChargeBoxIdentity"/>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+
+    <wsdl:operation name="MeterValues">
+      <soap12:operation soapAction="/MeterValues" style="document" />
+      <wsdl:input>
+        <soap12:header use="literal" message="tns:Header" part="ChargeBoxIdentity"/>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+
+    <wsdl:operation name="BootNotification">
+      <soap12:operation soapAction="/BootNotification" style="document" />
+      <wsdl:input>
+        <soap12:header use="literal" message="tns:Header" part="ChargeBoxIdentity"/>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+
+    <wsdl:operation name="StatusNotification">
+      <soap12:operation soapAction="/StatusNotification" style="document" />
+      <wsdl:input>
+        <soap12:header use="literal" message="tns:Header" part="ChargeBoxIdentity"/>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+
+    <wsdl:operation name="FirmwareStatusNotification">
+      <soap12:operation soapAction="/FirmwareStatusNotification" style="document" />
+      <wsdl:input>
+        <soap12:header use="literal" message="tns:Header" part="ChargeBoxIdentity"/>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+
+    <wsdl:operation name="DiagnosticsStatusNotification">
+      <soap12:operation soapAction="/DiagnosticsStatusNotification" style="document" />
+      <wsdl:input>
+        <soap12:header use="literal" message="tns:Header" part="ChargeBoxIdentity"/>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+
+  </wsdl:binding>
+
+  <!-- The OCPP Central System Service -->
+  <wsdl:service name="CentralSystemService">
+    <wsdl:documentation>The Central System Service for the Open Charge Point Protocol</wsdl:documentation>
+    <wsdl:port name="CentralSystemServiceSoap12" binding="tns:CentralSystemServiceSoap">
+      <soap12:address location="http://localhost:8080/" />
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

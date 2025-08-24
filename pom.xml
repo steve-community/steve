@@ -7,6 +7,7 @@
     <packaging>pom</packaging>
 
     <modules>
+        <module>ocpp-jaxb</module>
         <module>steve</module>
         <module>steve-jooq</module>
         <module>steve-ui-jsp</module>

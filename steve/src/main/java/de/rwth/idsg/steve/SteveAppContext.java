@@ -36,6 +36,7 @@ import org.eclipse.jetty.server.handler.ContextHandlerCollection;
 import org.eclipse.jetty.server.handler.gzip.GzipHandler;
 import org.eclipse.jetty.util.component.AbstractLifeCycle;
 import org.eclipse.jetty.websocket.core.WebSocketConstants;
+import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.security.web.context.AbstractSecurityWebApplicationInitializer;
 import org.springframework.web.context.ContextLoaderListener;
@@ -63,6 +64,11 @@ public class SteveAppContext {
     public SteveAppContext(SteveConfiguration config) {
         this.config = config;
         springContext = new AnnotationConfigWebApplicationContext();
+        GenericApplicationContext context = new GenericApplicationContext();
+        context.registerBean(SteveConfiguration.class, () -> config);
+        context.refresh();
+        context.setParent(springContext.getParent());
+        springContext.setParent(context);
         springContext.scan("de.rwth.idsg.steve.config");
         webAppContext = initWebApp();
     }

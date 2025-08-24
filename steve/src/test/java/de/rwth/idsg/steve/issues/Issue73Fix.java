@@ -21,7 +21,7 @@ package de.rwth.idsg.steve.issues;
 import com.google.common.collect.Lists;
 import de.rwth.idsg.steve.Application;
 import de.rwth.idsg.steve.ApplicationProfile;
-import de.rwth.idsg.steve.SteveConfiguration;
+import de.rwth.idsg.steve.SteveConfigurationReader;
 import de.rwth.idsg.steve.utils.__DatabasePreparer__;
 import ocpp.cs._2015._10.AuthorizationStatus;
 import ocpp.cs._2015._10.AuthorizeRequest;
@@ -50,15 +50,19 @@ import static de.rwth.idsg.steve.utils.Helpers.getRandomString;
 public class Issue73Fix {
 
     private static final String REGISTERED_OCPP_TAG = __DatabasePreparer__.getRegisteredOcppTag();
-    private static final String path = getPath(SteveConfiguration.CONFIG);
+
+    private static String path;
 
     public static void main(String[] args) throws Exception {
-        Assertions.assertEquals(ApplicationProfile.TEST, SteveConfiguration.CONFIG.getProfile());
-        Assertions.assertTrue(SteveConfiguration.CONFIG.getOcpp().isAutoRegisterUnknownStations());
+        var config = SteveConfigurationReader.readSteveConfiguration("main.properties");
+        Assertions.assertEquals(ApplicationProfile.TEST, config.getProfile());
+        Assertions.assertTrue(config.getOcpp().isAutoRegisterUnknownStations());
 
         __DatabasePreparer__.prepare();
 
-        Application app = new Application(SteveConfiguration.CONFIG);
+        path = getPath(config);
+
+        Application app = new Application(config);
         try {
             app.start();
             test();

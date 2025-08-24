@@ -38,7 +38,6 @@
 
     <properties>
         <cxf.version>4.1.3</cxf.version>
-        <spring.security.version>6.5.3</spring.security.version>
         <jackson.version>2.19.2</jackson.version>
         <slf4j.version>2.0.17</slf4j.version>
         <plugin.license-maven.version>5.0.0</plugin.license-maven.version>
@@ -228,6 +227,10 @@
     <dependencies>
         <dependency>
             <groupId>de.rwth.idsg</groupId>
+            <artifactId>steve-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>de.rwth.idsg</groupId>
             <artifactId>steve-jooq</artifactId>
         </dependency>
         <dependency>
@@ -249,7 +252,6 @@
         <dependency>
             <groupId>de.rwth.idsg</groupId>
             <artifactId>ocpp-jaxb</artifactId>
-            <version>0.0.9</version>
         </dependency>
         <dependency>
             <groupId>com.sun.mail</groupId>
@@ -259,30 +261,11 @@
         <dependency>
             <groupId>org.jetbrains</groupId>
             <artifactId>annotations</artifactId>
-            <version>26.0.2</version>
-            <scope>compile</scope>
         </dependency>
 
         <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-            <version>${lombok.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>joda-time</groupId>
-            <artifactId>joda-time</artifactId>
-            <version>2.13.1</version>
-        </dependency>
-        <dependency>
-            <groupId>org.hibernate.validator</groupId>
-            <artifactId>hibernate-validator</artifactId>
-            <version>8.0.2.Final</version>
-        </dependency>
-        <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
-            <version>33.4.0-jre</version>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
@@ -333,11 +316,6 @@
         </dependency>
         <dependency>
             <groupId>org.springframework.security</groupId>
-            <artifactId>spring-security-web</artifactId>
-            <version>${spring.security.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-config</artifactId>
             <version>${spring.security.version}</version>
         </dependency>
@@ -346,7 +324,6 @@
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
-            <version>1.5.18</version>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
@@ -472,14 +449,6 @@
             <groupId>com.github.zafarkhaja</groupId>
             <artifactId>java-semver</artifactId>
             <version>0.10.2</version>
-        </dependency>
-
-        <!-- Codes according to ISO standards
-             https://github.com/TakahikoKawasaki/nv-i18n -->
-        <dependency>
-            <groupId>com.neovisionaries</groupId>
-            <artifactId>nv-i18n</artifactId>
-            <version>1.29</version>
         </dependency>
     </dependencies>
 </project>

@@ -20,7 +20,6 @@ package de.rwth.idsg.steve.utils;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
-import lombok.experimental.UtilityClass;
 
 import java.util.HashMap;
 import java.util.List;

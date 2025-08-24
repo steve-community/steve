@@ -21,6 +21,7 @@ package de.rwth.idsg.steve;
 import de.rwth.idsg.steve.ocpp.OcppVersion;
 import de.rwth.idsg.steve.utils.OcppJsonChargePoint;
 import de.rwth.idsg.steve.utils.StressTester;
+import lombok.RequiredArgsConstructor;
 import ocpp.cs._2015._10.AuthorizationStatus;
 import ocpp.cs._2015._10.AuthorizeRequest;
 import ocpp.cs._2015._10.AuthorizeResponse;
@@ -54,13 +55,17 @@ import static de.rwth.idsg.steve.utils.Helpers.getRandomStrings;
  * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 09.05.2018
  */
+@RequiredArgsConstructor
 public class StressTestJsonOCPP16 extends StressTest {
 
-    private static final String PATH = getJsonPath(SteveConfiguration.CONFIG);
     private static final OcppVersion VERSION = OcppVersion.V_16;
 
+    private final String path;
+
     public static void main(String[] args) throws Exception {
-        new StressTestJsonOCPP16().attack();
+        var config = SteveConfigurationReader.readSteveConfiguration("main.properties");
+        var path = getJsonPath(config);
+        new StressTestJsonOCPP16(path).attack();
     }
 
     protected void attackInternal() throws Exception {
@@ -76,7 +81,7 @@ public class StressTestJsonOCPP16 extends StressTest {
                 ThreadLocalRandom localRandom = ThreadLocalRandom.current();
 
                 String chargeBoxId = chargeBoxIds.get(localRandom.nextInt(chargeBoxIds.size()));
-                threadLocalChargePoint.set(new OcppJsonChargePoint(VERSION, chargeBoxId, PATH));
+                threadLocalChargePoint.set(new OcppJsonChargePoint(VERSION, chargeBoxId, path));
 
                 OcppJsonChargePoint chargePoint = threadLocalChargePoint.get();
                 chargePoint.start();

@@ -28,6 +28,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.Properties;
 
 /**
@@ -87,17 +88,17 @@ public class PropertiesFileLoader {
     // Return null if not set
     // -------------------------------------------------------------------------
 
-    public String getOptionalString(String key) {
-        String s = prop.getProperty(key);
+    public Optional<String> getOptionalString(String key) {
+        var s = prop.getProperty(key);
         if (Strings.isNullOrEmpty(s)) {
-            return null;
+            return Optional.empty();
         }
         s = resolveIfSystemEnv(s);
-        return trim(key, s);
+        return Optional.of(trim(key, s));
     }
 
     public List<String> getStringList(String key) {
-        String s = prop.getProperty(key);
+        var s = prop.getProperty(key);
         if (Strings.isNullOrEmpty(s)) {
             return Collections.emptyList();
         }
@@ -108,24 +109,14 @@ public class PropertiesFileLoader {
                        .splitToList(s);
     }
 
-    public boolean getOptionalBoolean(String key) {
-        String s = getOptionalString(key);
-        if (s == null) {
-            // In this special case, to make findbugs happy, we don't return null.
-            // Reason: http://findbugs.sourceforge.net/bugDescriptions.html#NP_BOOLEAN_RETURN_NULL
-            return false;
-        } else {
-            return Boolean.parseBoolean(s);
-        }
+    public Optional<Boolean> getOptionalBoolean(String key) {
+        var s = getOptionalString(key);
+        return s.map(Boolean::parseBoolean);
     }
 
-    public Integer getOptionalInt(String key) {
-        String s = getOptionalString(key);
-        if (s == null) {
-            return null;
-        } else {
-            return Integer.parseInt(s);
-        }
+    public Optional<Integer> getOptionalInt(String key) {
+        var s = getOptionalString(key);
+        return s.map(Integer::parseInt);
     }
 
     // -------------------------------------------------------------------------

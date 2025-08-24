@@ -41,6 +41,7 @@ import de.rwth.idsg.steve.ocpp.task.UpdateFirmwareTask;
 import de.rwth.idsg.steve.ocpp.ws.ChargePointServiceJsonInvoker;
 import de.rwth.idsg.steve.repository.dto.ChargePointSelect;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
 /**
@@ -49,6 +50,7 @@ import org.springframework.stereotype.Service;
  */
 @RequiredArgsConstructor
 @Service
+@Primary
 public class ChargePointServiceInvokerImpl implements ChargePointServiceInvoker {
 
     private final ChargePointServiceSoapInvoker chargePointServiceSoapInvoker;
@@ -63,7 +65,7 @@ public class ChargePointServiceInvokerImpl implements ChargePointServiceInvoker 
         if (cp.isSoap()) {
             chargePointServiceSoapInvoker.reset(cp, task);
         } else {
-            chargePointServiceJsonInvoker.runPipeline(cp, task);
+            chargePointServiceJsonInvoker.reset(cp, task);
         }
     }
 
@@ -72,7 +74,7 @@ public class ChargePointServiceInvokerImpl implements ChargePointServiceInvoker 
         if (cp.isSoap()) {
             chargePointServiceSoapInvoker.clearCache(cp, task);
         } else {
-            chargePointServiceJsonInvoker.runPipeline(cp, task);
+            chargePointServiceJsonInvoker.clearCache(cp, task);
         }
     }
 
@@ -81,7 +83,7 @@ public class ChargePointServiceInvokerImpl implements ChargePointServiceInvoker 
         if (cp.isSoap()) {
             chargePointServiceSoapInvoker.getDiagnostics(cp, task);
         } else {
-            chargePointServiceJsonInvoker.runPipeline(cp, task);
+            chargePointServiceJsonInvoker.getDiagnostics(cp, task);
         }
     }
 
@@ -90,7 +92,7 @@ public class ChargePointServiceInvokerImpl implements ChargePointServiceInvoker 
         if (cp.isSoap()) {
             chargePointServiceSoapInvoker.updateFirmware(cp, task);
         } else {
-            chargePointServiceJsonInvoker.runPipeline(cp, task);
+            chargePointServiceJsonInvoker.updateFirmware(cp, task);
         }
     }
 
@@ -99,7 +101,7 @@ public class ChargePointServiceInvokerImpl implements ChargePointServiceInvoker 
         if (cp.isSoap()) {
             chargePointServiceSoapInvoker.unlockConnector(cp, task);
         } else {
-            chargePointServiceJsonInvoker.runPipeline(cp, task);
+            chargePointServiceJsonInvoker.unlockConnector(cp, task);
         }
     }
 
@@ -107,7 +109,7 @@ public class ChargePointServiceInvokerImpl implements ChargePointServiceInvoker 
         if (cp.isSoap()) {
             chargePointServiceSoapInvoker.changeAvailability(cp, task);
         } else {
-            chargePointServiceJsonInvoker.runPipeline(cp, task);
+            chargePointServiceJsonInvoker.changeAvailability(cp, task);
         }
     }
 
@@ -116,7 +118,7 @@ public class ChargePointServiceInvokerImpl implements ChargePointServiceInvoker 
         if (cp.isSoap()) {
             chargePointServiceSoapInvoker.changeConfiguration(cp, task);
         } else {
-            chargePointServiceJsonInvoker.runPipeline(cp, task);
+            chargePointServiceJsonInvoker.changeConfiguration(cp, task);
         }
     }
 
@@ -125,7 +127,7 @@ public class ChargePointServiceInvokerImpl implements ChargePointServiceInvoker 
         if (cp.isSoap()) {
             chargePointServiceSoapInvoker.remoteStartTransaction(cp, task);
         } else {
-            chargePointServiceJsonInvoker.runPipeline(cp, task);
+            chargePointServiceJsonInvoker.remoteStartTransaction(cp, task);
         }
     }
 
@@ -134,7 +136,7 @@ public class ChargePointServiceInvokerImpl implements ChargePointServiceInvoker 
         if (cp.isSoap()) {
             chargePointServiceSoapInvoker.remoteStopTransaction(cp, task);
         } else {
-            chargePointServiceJsonInvoker.runPipeline(cp, task);
+            chargePointServiceJsonInvoker.remoteStopTransaction(cp, task);
         }
     }
 
@@ -147,7 +149,7 @@ public class ChargePointServiceInvokerImpl implements ChargePointServiceInvoker 
         if (cp.isSoap()) {
             chargePointServiceSoapInvoker.dataTransfer(cp, task);
         } else {
-            chargePointServiceJsonInvoker.runPipeline(cp, task);
+            chargePointServiceJsonInvoker.dataTransfer(cp, task);
         }
     }
 
@@ -156,7 +158,7 @@ public class ChargePointServiceInvokerImpl implements ChargePointServiceInvoker 
         if (cp.isSoap()) {
             chargePointServiceSoapInvoker.getConfiguration(cp, task);
         } else {
-            chargePointServiceJsonInvoker.runPipeline(cp, task);
+            chargePointServiceJsonInvoker.getConfiguration(cp, task);
         }
     }
 
@@ -165,7 +167,7 @@ public class ChargePointServiceInvokerImpl implements ChargePointServiceInvoker 
         if (cp.isSoap()) {
             chargePointServiceSoapInvoker.getLocalListVersion(cp, task);
         } else {
-            chargePointServiceJsonInvoker.runPipeline(cp, task);
+            chargePointServiceJsonInvoker.getLocalListVersion(cp, task);
         }
     }
 
@@ -174,7 +176,7 @@ public class ChargePointServiceInvokerImpl implements ChargePointServiceInvoker 
         if (cp.isSoap()) {
             chargePointServiceSoapInvoker.sendLocalList(cp, task);
         } else {
-            chargePointServiceJsonInvoker.runPipeline(cp, task);
+            chargePointServiceJsonInvoker.sendLocalList(cp, task);
         }
     }
 
@@ -183,7 +185,7 @@ public class ChargePointServiceInvokerImpl implements ChargePointServiceInvoker 
         if (cp.isSoap()) {
             chargePointServiceSoapInvoker.reserveNow(cp, task);
         } else {
-            chargePointServiceJsonInvoker.runPipeline(cp, task);
+            chargePointServiceJsonInvoker.reserveNow(cp, task);
         }
     }
 
@@ -192,7 +194,7 @@ public class ChargePointServiceInvokerImpl implements ChargePointServiceInvoker 
         if (cp.isSoap()) {
             chargePointServiceSoapInvoker.cancelReservation(cp, task);
         } else {
-            chargePointServiceJsonInvoker.runPipeline(cp, task);
+            chargePointServiceJsonInvoker.cancelReservation(cp, task);
         }
     }
 
@@ -205,7 +207,7 @@ public class ChargePointServiceInvokerImpl implements ChargePointServiceInvoker 
         if (cp.isSoap()) {
             chargePointServiceSoapInvoker.clearChargingProfile(cp, task);
         } else {
-            chargePointServiceJsonInvoker.runPipeline(cp, task);
+            chargePointServiceJsonInvoker.clearChargingProfile(cp, task);
         }
     }
 
@@ -214,7 +216,7 @@ public class ChargePointServiceInvokerImpl implements ChargePointServiceInvoker 
         if (cp.isSoap()) {
             chargePointServiceSoapInvoker.setChargingProfile(cp, task);
         } else {
-            chargePointServiceJsonInvoker.runPipeline(cp, task);
+            chargePointServiceJsonInvoker.setChargingProfile(cp, task);
         }
     }
 
@@ -223,7 +225,7 @@ public class ChargePointServiceInvokerImpl implements ChargePointServiceInvoker 
         if (cp.isSoap()) {
             chargePointServiceSoapInvoker.getCompositeSchedule(cp, task);
         } else {
-            chargePointServiceJsonInvoker.runPipeline(cp, task);
+            chargePointServiceJsonInvoker.getCompositeSchedule(cp, task);
         }
     }
 
@@ -232,7 +234,7 @@ public class ChargePointServiceInvokerImpl implements ChargePointServiceInvoker 
         if (cp.isSoap()) {
             chargePointServiceSoapInvoker.triggerMessage(cp, task);
         } else {
-            chargePointServiceJsonInvoker.runPipeline(cp, task);
+            chargePointServiceJsonInvoker.triggerMessage(cp, task);
         }
     }
 }

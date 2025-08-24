@@ -49,16 +49,19 @@ public class ApplicationTest {
 
     private static final String REGISTERED_CHARGE_BOX_ID = __DatabasePreparer__.getRegisteredChargeBoxId();
     private static final String REGISTERED_OCPP_TAG =  __DatabasePreparer__.getRegisteredOcppTag();
-    private static final String path = getPath(SteveConfiguration.CONFIG);
 
+    private static String path;
     private static Application app;
 
     @BeforeAll
     public static void init() throws Exception {
-        Assertions.assertEquals(ApplicationProfile.TEST, SteveConfiguration.CONFIG.getProfile());
+        var config = SteveConfigurationReader.readSteveConfiguration("main.properties");
+        Assertions.assertEquals(ApplicationProfile.TEST, config.getProfile());
         __DatabasePreparer__.prepare();
 
-        app = new Application(SteveConfiguration.CONFIG);
+        path = getPath(config);
+
+        app = new Application(config);
         app.start();
     }
 

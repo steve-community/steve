@@ -32,7 +32,6 @@ import de.rwth.idsg.steve.web.dto.WebUserForm;
 import de.rwth.idsg.steve.web.dto.WebUserQueryForm;
 import jooq.steve.db.tables.records.WebUserRecord;
 import lombok.RequiredArgsConstructor;
-import org.apache.commons.lang3.StringUtils;
 import org.jooq.JSON;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.EventListener;
@@ -94,7 +93,7 @@ public class WebUsersService implements UserDetailsManager {
 
         var headerVal = config.getWebApi().getHeaderValue();
 
-        var encodedApiPassword = StringUtils.isEmpty(headerVal)
+        var encodedApiPassword = headerVal == null || headerVal.isBlank()
             ? null
             : config.getAuth().getPasswordEncoder().encode(headerVal);
 

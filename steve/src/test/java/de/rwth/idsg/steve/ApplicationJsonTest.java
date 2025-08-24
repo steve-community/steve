@@ -54,10 +54,11 @@ public class ApplicationJsonTest {
 
     @BeforeAll
     public static void init() throws Exception {
-        Assertions.assertEquals(ApplicationProfile.TEST, SteveConfiguration.CONFIG.getProfile());
+        var config = SteveConfigurationReader.readSteveConfiguration("main.properties");
+        Assertions.assertEquals(ApplicationProfile.TEST, config.getProfile());
         __DatabasePreparer__.prepare();
 
-        app = new Application(SteveConfiguration.CONFIG);
+        app = new Application(config);
         app.start();
     }
 

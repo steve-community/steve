@@ -60,7 +60,7 @@ import java.util.stream.Collectors;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class ChargePointHelperService {
+public class ChargePointHelperServiceImpl implements ChargePointHelperService {
 
     private final GenericRepository genericRepository;
 

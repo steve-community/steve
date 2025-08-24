@@ -20,7 +20,27 @@ package de.rwth.idsg.steve.ocpp.ws;
 
 import de.rwth.idsg.ocpp.jaxb.RequestType;
 import de.rwth.idsg.steve.SteveException;
+import de.rwth.idsg.steve.ocpp.ChargePointServiceInvoker;
 import de.rwth.idsg.steve.ocpp.CommunicationTask;
+import de.rwth.idsg.steve.ocpp.task.CancelReservationTask;
+import de.rwth.idsg.steve.ocpp.task.ChangeAvailabilityTask;
+import de.rwth.idsg.steve.ocpp.task.ChangeConfigurationTask;
+import de.rwth.idsg.steve.ocpp.task.ClearCacheTask;
+import de.rwth.idsg.steve.ocpp.task.ClearChargingProfileTask;
+import de.rwth.idsg.steve.ocpp.task.DataTransferTask;
+import de.rwth.idsg.steve.ocpp.task.GetCompositeScheduleTask;
+import de.rwth.idsg.steve.ocpp.task.GetConfigurationTask;
+import de.rwth.idsg.steve.ocpp.task.GetDiagnosticsTask;
+import de.rwth.idsg.steve.ocpp.task.GetLocalListVersionTask;
+import de.rwth.idsg.steve.ocpp.task.RemoteStartTransactionTask;
+import de.rwth.idsg.steve.ocpp.task.RemoteStopTransactionTask;
+import de.rwth.idsg.steve.ocpp.task.ReserveNowTask;
+import de.rwth.idsg.steve.ocpp.task.ResetTask;
+import de.rwth.idsg.steve.ocpp.task.SendLocalListTask;
+import de.rwth.idsg.steve.ocpp.task.SetChargingProfileTask;
+import de.rwth.idsg.steve.ocpp.task.TriggerMessageTask;
+import de.rwth.idsg.steve.ocpp.task.UnlockConnectorTask;
+import de.rwth.idsg.steve.ocpp.task.UpdateFirmwareTask;
 import de.rwth.idsg.steve.ocpp.ws.data.ActionResponsePair;
 import de.rwth.idsg.steve.ocpp.ws.data.CommunicationContext;
 import de.rwth.idsg.steve.ocpp.ws.data.FutureResponseContext;
@@ -46,7 +66,7 @@ import java.util.UUID;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class ChargePointServiceJsonInvoker {
+public class ChargePointServiceJsonInvoker implements ChargePointServiceInvoker {
 
     private final OutgoingCallPipeline outgoingCallPipeline;
 
@@ -57,7 +77,7 @@ public class ChargePointServiceJsonInvoker {
     /**
      * Just a wrapper to make try-catch block and exception handling stand out
      */
-    public void runPipeline(ChargePointSelect cps, CommunicationTask task) {
+    private void runPipeline(ChargePointSelect cps, CommunicationTask task) {
         try {
             run(cps, task);
         } catch (Exception e) {
@@ -108,5 +128,100 @@ public class ChargePointServiceJsonInvoker {
         context.setFutureResponseContext(frc);
 
         outgoingCallPipeline.accept(context);
+    }
+
+    @Override
+    public void reset(ChargePointSelect cp, ResetTask task) {
+        runPipeline(cp, task);
+    }
+
+    @Override
+    public void clearCache(ChargePointSelect cp, ClearCacheTask task) {
+        runPipeline(cp, task);
+    }
+
+    @Override
+    public void getDiagnostics(ChargePointSelect cp, GetDiagnosticsTask task) {
+        runPipeline(cp, task);
+    }
+
+    @Override
+    public void updateFirmware(ChargePointSelect cp, UpdateFirmwareTask task) {
+        runPipeline(cp, task);
+    }
+
+    @Override
+    public void unlockConnector(ChargePointSelect cp, UnlockConnectorTask task) {
+        runPipeline(cp, task);
+    }
+
+    @Override
+    public void changeAvailability(ChargePointSelect cp, ChangeAvailabilityTask task) {
+        runPipeline(cp, task);
+    }
+
+    @Override
+    public void changeConfiguration(ChargePointSelect cp, ChangeConfigurationTask task) {
+        runPipeline(cp, task);
+    }
+
+    @Override
+    public void remoteStartTransaction(ChargePointSelect cp, RemoteStartTransactionTask task) {
+        runPipeline(cp, task);
+    }
+
+    @Override
+    public void remoteStopTransaction(ChargePointSelect cp, RemoteStopTransactionTask task) {
+        runPipeline(cp, task);
+    }
+
+    @Override
+    public void dataTransfer(ChargePointSelect cp, DataTransferTask task) {
+        runPipeline(cp, task);
+    }
+
+    @Override
+    public void getConfiguration(ChargePointSelect cp, GetConfigurationTask task) {
+        runPipeline(cp, task);
+    }
+
+    @Override
+    public void getLocalListVersion(ChargePointSelect cp, GetLocalListVersionTask task) {
+        runPipeline(cp, task);
+    }
+
+    @Override
+    public void sendLocalList(ChargePointSelect cp, SendLocalListTask task) {
+        runPipeline(cp, task);
+    }
+
+    @Override
+    public void reserveNow(ChargePointSelect cp, ReserveNowTask task) {
+        runPipeline(cp, task);
+    }
+
+    @Override
+    public void cancelReservation(ChargePointSelect cp, CancelReservationTask task) {
+        runPipeline(cp, task);
+    }
+
+    @Override
+    public void clearChargingProfile(ChargePointSelect cp, ClearChargingProfileTask task) {
+        runPipeline(cp, task);
+    }
+
+    @Override
+    public void setChargingProfile(ChargePointSelect cp, SetChargingProfileTask task) {
+        runPipeline(cp, task);
+    }
+
+    @Override
+    public void getCompositeSchedule(ChargePointSelect cp, GetCompositeScheduleTask task) {
+        runPipeline(cp, task);
+    }
+
+    @Override
+    public void triggerMessage(ChargePointSelect cp, TriggerMessageTask task) {
+        runPipeline(cp, task);
     }
 }

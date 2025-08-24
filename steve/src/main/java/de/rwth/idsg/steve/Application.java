@@ -44,7 +44,7 @@ public class Application {
         // For Hibernate validator
         System.setProperty("org.jboss.logging.provider", "slf4j");
 
-        SteveConfiguration sc = SteveConfiguration.CONFIG;
+        SteveConfiguration sc = SteveConfigurationReader.readSteveConfiguration("main.properties");
         log.info("Loaded the properties. Starting with the '{}' profile", sc.getProfile());
 
         TimeZone.setDefault(TimeZone.getTimeZone(sc.getTimeZoneId()));

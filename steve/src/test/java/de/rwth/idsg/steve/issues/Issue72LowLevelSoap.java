@@ -19,11 +19,12 @@
 package de.rwth.idsg.steve.issues;
 
 import com.google.common.net.MediaType;
-import de.rwth.idsg.steve.SteveConfiguration;
+import de.rwth.idsg.steve.SteveConfigurationReader;
 import de.rwth.idsg.steve.StressTest;
 import de.rwth.idsg.steve.utils.Helpers;
 import de.rwth.idsg.steve.utils.StressTester;
 import de.rwth.idsg.steve.utils.__DatabasePreparer__;
+import lombok.RequiredArgsConstructor;
 import ocpp.cs._2015._10.BootNotificationRequest;
 import ocpp.cs._2015._10.BootNotificationResponse;
 import ocpp.cs._2015._10.CentralSystemService;
@@ -56,12 +57,15 @@ import static de.rwth.idsg.steve.utils.Helpers.getRandomString;
  * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 27.06.2018
  */
+@RequiredArgsConstructor
 public class Issue72LowLevelSoap extends StressTest {
 
-    private static final String path = getPath(SteveConfiguration.CONFIG);
+    private final String path;
 
     public static void main(String[] args) throws Exception {
-        new Issue72LowLevelSoap().attack();
+        var config = SteveConfigurationReader.readSteveConfiguration("main.properties");
+        var path = getPath(config);
+        new Issue72LowLevelSoap(path).attack();
     }
 
     protected void attackInternal() throws Exception {
@@ -95,7 +99,7 @@ public class Issue72LowLevelSoap extends StressTest {
 
         int transactionId = start.getTransactionId();
 
-        String body = buildRequest(chargeBoxId, transactionId, idTag, stopDateTime, meterStop);
+        String body = buildRequest(path, chargeBoxId, transactionId, idTag, stopDateTime, meterStop);
         ContentType contentType = ContentType.create(MediaType.SOAP_XML_UTF_8.type(), MediaType.SOAP_XML_UTF_8.charset().orNull());
 
         HttpUriRequest req = RequestBuilder.post(path)
@@ -159,7 +163,7 @@ public class Issue72LowLevelSoap extends StressTest {
         }
     }
 
-    private static String buildRequest(String chargeBoxId, int transactionId, String idTag,
+    private static String buildRequest(String path, String chargeBoxId, int transactionId, String idTag,
                                        DateTime stop, int meterStop) {
         return "<soap:Envelope xmlns:soap=\"http://www.w3.org/2003/05/soap-envelope\">" +
                 "<soap:Header><Action xmlns=\"http://www.w3.org/2005/08/addressing\">/StopTransaction</Action>" +

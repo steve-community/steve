@@ -26,7 +26,7 @@ import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import java.util.Properties;
 
 @Configuration
-public class ValidationConfig {
+public class PropertyConfig {
 
     // > To avoid these lifecycle issues, mark BFPP-returning @Bean methods as static
     // From [the Spring documentation](https://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework/context/annotation/Bean.html)
@@ -39,6 +39,8 @@ public class ValidationConfig {
         if (chargeBoxIdValidationRegex != null) {
             props.put("charge-box-id.validation.regex", chargeBoxIdValidationRegex);
         }
+        boolean autoRegisterUnknownStations = config.getOcpp().isAutoRegisterUnknownStations();
+        props.put("auto.register.unknown.stations", autoRegisterUnknownStations);
         configurer.setProperties(props);
 
         return configurer;

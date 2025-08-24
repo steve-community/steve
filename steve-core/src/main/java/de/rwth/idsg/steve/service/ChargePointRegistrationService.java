@@ -19,11 +19,11 @@
 package de.rwth.idsg.steve.service;
 
 import com.google.common.util.concurrent.Striped;
-import de.rwth.idsg.steve.SteveConfiguration;
 import de.rwth.idsg.steve.repository.ChargePointRepository;
 import de.rwth.idsg.steve.service.dto.UnidentifiedIncomingObject;
 import lombok.extern.slf4j.Slf4j;
 import ocpp.cs._2015._10.RegistrationStatus;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
@@ -41,9 +41,10 @@ public class ChargePointRegistrationService {
     private final UnidentifiedIncomingObjectService unknownChargePointService = new UnidentifiedIncomingObjectService(100);
     private final ChargePointRepository chargePointRepository;
 
-    public ChargePointRegistrationService(ChargePointRepository chargePointRepository, SteveConfiguration config) {
+    public ChargePointRegistrationService(ChargePointRepository chargePointRepository,
+                                          @Value("${auto.register.unknown.stations}") Boolean autoRegisterUnknownStations) {
         this.chargePointRepository = chargePointRepository;
-        this.autoRegisterUnknownStations = config.getOcpp().isAutoRegisterUnknownStations();
+        this.autoRegisterUnknownStations = autoRegisterUnknownStations;
     }
 
     public Optional<RegistrationStatus> getRegistrationStatus(String chargeBoxId) {

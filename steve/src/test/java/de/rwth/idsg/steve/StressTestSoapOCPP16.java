@@ -19,6 +19,7 @@
 package de.rwth.idsg.steve;
 
 import de.rwth.idsg.steve.utils.StressTester;
+import lombok.RequiredArgsConstructor;
 import ocpp.cs._2015._10.AuthorizationStatus;
 import ocpp.cs._2015._10.AuthorizeRequest;
 import ocpp.cs._2015._10.AuthorizeResponse;
@@ -53,12 +54,15 @@ import static de.rwth.idsg.steve.utils.Helpers.getRandomStrings;
  * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 18.04.2018
  */
+@RequiredArgsConstructor
 public class StressTestSoapOCPP16 extends StressTest {
 
-    private static final String path = getPath(SteveConfiguration.CONFIG);
+    private final String path;
 
     public static void main(String[] args) throws Exception {
-        new StressTestSoapOCPP16().attack();
+        var config = SteveConfigurationReader.readSteveConfiguration("main.properties");
+        var path = getPath(config);
+        new StressTestSoapOCPP16(path).attack();
     }
 
     protected void attackInternal() throws Exception {

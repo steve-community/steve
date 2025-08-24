@@ -19,7 +19,7 @@
 package de.rwth.idsg.steve.service;
 
 import de.rwth.idsg.steve.config.DelegatingTaskExecutor;
-import de.rwth.idsg.steve.ocpp.ChargePointServiceInvokerImpl;
+import de.rwth.idsg.steve.ocpp.ChargePointServiceInvoker;
 import de.rwth.idsg.steve.ocpp.OcppCallback;
 import de.rwth.idsg.steve.ocpp.task.CancelReservationTask;
 import de.rwth.idsg.steve.ocpp.task.ChangeAvailabilityTask;
@@ -89,7 +89,7 @@ public class ChargePointServiceClient {
 
     private final DelegatingTaskExecutor asyncTaskExecutor;
     private final TaskStore taskStore;
-    private final ChargePointServiceInvokerImpl invoker;
+    private final ChargePointServiceInvoker invoker;
 
     // -------------------------------------------------------------------------
     // Multiple Execution - since OCPP 1.2

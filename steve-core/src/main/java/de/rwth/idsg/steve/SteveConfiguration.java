@@ -18,21 +18,16 @@
  */
 package de.rwth.idsg.steve;
 
-import de.rwth.idsg.steve.ocpp.ws.custom.WsSessionSelectStrategy;
-import de.rwth.idsg.steve.ocpp.ws.custom.WsSessionSelectStrategyEnum;
-import de.rwth.idsg.steve.utils.PropertiesFileLoader;
 import lombok.Builder;
 import lombok.Getter;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 19.08.2014
  */
-@Getter
-public enum SteveConfiguration {
-    CONFIG;
+@Builder @Getter
+public class SteveConfiguration {
 
     // Root mapping for Spring
     private final String springMapping = "/";
@@ -61,57 +56,6 @@ public enum SteveConfiguration {
     private final DB db;
     private final Jetty jetty;
 
-    SteveConfiguration() {
-        PropertiesFileLoader p = new PropertiesFileLoader("main.properties");
-
-        contextPath = sanitizeContextPath(p.getOptionalString("context.path"));
-        steveVersion = p.getString("steve.version");
-        gitDescribe = useFallbackIfNotSet(p.getOptionalString("git.describe"), null);
-
-        profile = ApplicationProfile.fromName(p.getString("profile"));
-        System.setProperty("spring.profiles.active", profile.name().toLowerCase());
-
-        jetty = Jetty.builder()
-                     .serverHost(p.getString("server.host"))
-                     .gzipEnabled(p.getBoolean("server.gzip.enabled"))
-                     .httpEnabled(p.getBoolean("http.enabled"))
-                     .httpPort(p.getInt("http.port"))
-                     .httpsEnabled(p.getBoolean("https.enabled"))
-                     .httpsPort(p.getInt("https.port"))
-                     .keyStorePath(p.getOptionalString("keystore.path"))
-                     .keyStorePassword(p.getOptionalString("keystore.password"))
-                     .build();
-
-        db = DB.builder()
-               .jdbcUrl(p.getString("db.jdbc.url"))
-               .userName(p.getString("db.user"))
-               .password(p.getString("db.password"))
-               .sqlLogging(p.getBoolean("db.sql.logging"))
-               .build();
-
-        PasswordEncoder encoder = new BCryptPasswordEncoder();
-
-        auth = Auth.builder()
-                   .passwordEncoder(encoder)
-                   .userName(p.getString("auth.user"))
-                   .encodedPassword(encoder.encode(p.getString("auth.password")))
-                   .build();
-
-        webApi = WebApi.builder()
-                       .headerKey(p.getOptionalString("webapi.key"))
-                       .headerValue(p.getOptionalString("webapi.value"))
-                       .build();
-
-        ocpp = Ocpp.builder()
-                   .autoRegisterUnknownStations(p.getOptionalBoolean("auto.register.unknown.stations"))
-                   .chargeBoxIdValidationRegex(p.getOptionalString("charge-box-id.validation.regex"))
-                   .wsSessionSelectStrategy(
-                           WsSessionSelectStrategyEnum.fromName(p.getString("ws.session.select.strategy")))
-                   .build();
-
-        validate();
-    }
-
     public String getSteveCompositeVersion() {
         if (gitDescribe == null) {
             return steveVersion;
@@ -120,31 +64,7 @@ public enum SteveConfiguration {
         }
     }
 
-    private static String useFallbackIfNotSet(String value, String fallback) {
-        if (value == null) {
-            // if the property is optional, value will be null
-            return fallback;
-        } else if (value.startsWith("${")) {
-            // property value variables start with "${" (if maven is not used, the value will not be set)
-            return fallback;
-        } else {
-            return value;
-        }
-    }
-
-    private String sanitizeContextPath(String s) {
-        if (s == null || "/".equals(s)) {
-            return "";
-
-        } else if (s.startsWith("/")) {
-            return s;
-
-        } else {
-            return "/" + s;
-        }
-    }
-
-    private void validate() {
+    void postConstruct() {
         if (!(jetty.httpEnabled || jetty.httpsEnabled)) {
             throw new IllegalArgumentException(
                     "HTTP and HTTPS are both disabled. Well, how do you want to access the server, then?");
@@ -200,7 +120,6 @@ public enum SteveConfiguration {
     public static class Ocpp {
         private final boolean autoRegisterUnknownStations;
         private final String chargeBoxIdValidationRegex;
-        private final WsSessionSelectStrategy wsSessionSelectStrategy;
+        private final String wsSessionSelectStrategy;
     }
-
 }

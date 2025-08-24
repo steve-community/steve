@@ -18,10 +18,11 @@
  */
 package de.rwth.idsg.steve.issues;
 
-import de.rwth.idsg.steve.SteveConfiguration;
+import de.rwth.idsg.steve.SteveConfigurationReader;
 import de.rwth.idsg.steve.StressTest;
 import de.rwth.idsg.steve.utils.Helpers;
 import de.rwth.idsg.steve.utils.StressTester;
+import lombok.RequiredArgsConstructor;
 import ocpp.cs._2015._10.BootNotificationRequest;
 import ocpp.cs._2015._10.BootNotificationResponse;
 import ocpp.cs._2015._10.CentralSystemService;
@@ -41,12 +42,15 @@ import static de.rwth.idsg.steve.utils.Helpers.getRandomString;
  * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 19.07.2018
  */
+@RequiredArgsConstructor
 public class Issue81 extends StressTest {
 
-    private static final String path = getPath(SteveConfiguration.CONFIG);
+    private final String path;
 
     public static void main(String[] args) throws Exception {
-        new Issue81().attack();
+        var config = SteveConfigurationReader.readSteveConfiguration("main.properties");
+        var path = getPath(config);
+        new Issue81(path).attack();
     }
 
     protected void attackInternal() throws Exception {

@@ -39,7 +39,6 @@ import org.jooq.impl.DefaultConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.Ordered;
 import org.springframework.format.support.FormattingConversionService;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
@@ -48,12 +47,9 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.web.accept.ContentNegotiationManager;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
-import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
-import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupport;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter;
-import org.springframework.web.servlet.view.InternalResourceViewResolver;
 
 import javax.sql.DataSource;
 import java.util.List;
@@ -174,36 +170,6 @@ public class BeanConfiguration implements WebMvcConfigurer {
         } else {
             return new DummyReleaseCheckService();
         }
-    }
-
-    // -------------------------------------------------------------------------
-    // Web config
-    // -------------------------------------------------------------------------
-
-    /**
-     * Resolver for JSP views/templates. Controller classes process the requests
-     * and forward to JSP files for rendering.
-     */
-    @Bean
-    public InternalResourceViewResolver urlBasedViewResolver() {
-        InternalResourceViewResolver resolver = new InternalResourceViewResolver();
-        resolver.setPrefix("/WEB-INF/views/");
-        resolver.setSuffix(".jsp");
-        return resolver;
-    }
-
-    /**
-     * Resource path for static content of the Web interface.
-     */
-    @Override
-    public void addResourceHandlers(final ResourceHandlerRegistry registry) {
-        registry.addResourceHandler("/static/**").addResourceLocations("static/");
-    }
-
-    @Override
-    public void addViewControllers(ViewControllerRegistry registry) {
-        registry.addViewController("/manager/signin").setViewName("signin");
-        registry.setOrder(Ordered.HIGHEST_PRECEDENCE);
     }
 
     // -------------------------------------------------------------------------

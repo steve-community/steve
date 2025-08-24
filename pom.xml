@@ -9,6 +9,7 @@
     <modules>
         <module>steve</module>
         <module>steve-jooq</module>
+        <module>steve-ui-jsp</module>
     </modules>
 
     <properties>
@@ -19,6 +20,7 @@
 
         <lombok.version>1.18.36</lombok.version>
         <mysql.jdbc.version>9.2.0</mysql.jdbc.version>
+        <jetty.version>12.0.18</jetty.version>
     </properties>
 
     <dependencyManagement>
@@ -27,6 +29,25 @@
                 <groupId>de.rwth.idsg</groupId>
                 <artifactId>steve-jooq</artifactId>
                 <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>de.rwth.idsg</groupId>
+                <artifactId>steve-ui-jsp</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-framework-bom</artifactId>
+                <version>6.2.0</version>
+                <scope>import</scope>
+                <type>pom</type>
+            </dependency>
+            <dependency>
+                <groupId>org.junit</groupId>
+                <artifactId>junit-bom</artifactId>
+                <version>5.12.1</version>
+                <type>pom</type>
+                <scope>import</scope>
             </dependency>
         </dependencies>
     </dependencyManagement>

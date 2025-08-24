@@ -38,9 +38,7 @@
 
     <properties>
         <cxf.version>4.1.3</cxf.version>
-        <spring.version>6.2.0</spring.version>
         <spring.security.version>6.5.3</spring.security.version>
-        <jetty.version>12.1.0</jetty.version>
         <jackson.version>2.19.2</jackson.version>
         <slf4j.version>2.0.17</slf4j.version>
         <plugin.license-maven.version>5.0.0</plugin.license-maven.version>
@@ -92,14 +90,6 @@
             <resource>
                 <directory>src/main/resources/config</directory>
                 <filtering>true</filtering>
-            </resource>
-            <resource>
-                <directory>src/main/resources</directory>
-                <filtering>false</filtering>
-                <includes>
-                    <include>webapp/static/**</include>
-                    <include>webapp/WEB-INF/web.xml</include>
-                </includes>
             </resource>
         </resources>
 
@@ -232,53 +222,17 @@
                     </archive>
                 </configuration>
             </plugin>
-
-            <!-- Pre-compiles JSPs -->
-            <plugin>
-                <groupId>org.eclipse.jetty.ee10</groupId>
-                <artifactId>jetty-ee10-jspc-maven-plugin</artifactId>
-                <version>${jetty.version}</version>
-                <executions>
-                    <execution>
-                        <phase>compile</phase>
-                        <id>jspc</id>
-                        <goals>
-                            <goal>jspc</goal>
-                        </goals>
-                        <configuration>
-                            <webAppSourceDirectory>${basedir}/src/main/resources/webapp</webAppSourceDirectory>
-                            <webXml>${basedir}/src/main/resources/webapp/WEB-INF/web.xml</webXml>
-                            <webXmlFragment>${basedir}/target/classes/webapp/WEB-INF/web.xml-frag</webXmlFragment>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
         </plugins>
     </build>
-
-    <dependencyManagement>
-        <dependencies>
-            <dependency>
-                <groupId>org.springframework</groupId>
-                <artifactId>spring-framework-bom</artifactId>
-                <version>${spring.version}</version>
-                <scope>import</scope>
-                <type>pom</type>
-            </dependency>
-            <dependency>
-                <groupId>org.junit</groupId>
-                <artifactId>junit-bom</artifactId>
-                <version>5.12.1</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
 
     <dependencies>
         <dependency>
             <groupId>de.rwth.idsg</groupId>
             <artifactId>steve-jooq</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>de.rwth.idsg</groupId>
+            <artifactId>steve-ui-jsp</artifactId>
         </dependency>
 
         <dependency>
@@ -371,33 +325,8 @@
             <artifactId>jakarta.servlet-api</artifactId>
             <version>6.1.0</version>
         </dependency>
-        <dependency>
-            <groupId>jakarta.servlet.jsp.jstl</groupId>
-            <artifactId>jakarta.servlet.jsp.jstl-api</artifactId>
-            <version>3.0.2</version>
-        </dependency>
-        <dependency>
-            <groupId>org.glassfish.web</groupId>
-            <artifactId>jakarta.servlet.jsp.jstl</artifactId>
-            <version>3.0.1</version>
-        </dependency>
 
         <!-- Spring -->
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-webmvc</artifactId>
-            <exclusions>
-                <!-- http://docs.spring.io/spring/docs/current/spring-framework-reference/html/overview.html#overview-not-using-commons-logging -->
-                <exclusion>
-                    <groupId>commons-logging</groupId>
-                    <artifactId>commons-logging</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.springframework</groupId>
-                    <artifactId>spring-jcl</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-websocket</artifactId>
@@ -468,16 +397,6 @@
             <artifactId>jetty-ee10-annotations</artifactId>
             <version>${jetty.version}</version>
         </dependency>
-        <dependency>
-            <groupId>org.eclipse.jetty.ee10</groupId>
-            <artifactId>jetty-ee10-apache-jsp</artifactId>
-            <version>${jetty.version}</version>
-        </dependency>
-        <!--        <dependency>-->
-        <!--            <groupId>org.eclipse.jetty</groupId>-->
-        <!--            <artifactId>apache-jstl</artifactId>-->
-        <!--            <version>${jetty.version}</version>-->
-        <!--        </dependency>-->
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-rewrite</artifactId>
@@ -561,12 +480,6 @@
             <groupId>com.neovisionaries</groupId>
             <artifactId>nv-i18n</artifactId>
             <version>1.29</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.owasp.encoder</groupId>
-            <artifactId>encoder-jakarta-jsp</artifactId>
-            <version>1.3.1</version>
         </dependency>
     </dependencies>
 </project>

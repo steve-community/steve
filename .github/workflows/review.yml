@@ -17,7 +17,7 @@ jobs:
           cache: maven
 
       - name: Check with Maven
-        run: mvn -B -V license:check --file pom.xml
+        run: ./mvnw -B -V com.mycila:license-maven-plugin:5.0.0:check
   checkstyle:
     runs-on: 'ubuntu-latest'
     steps:
@@ -29,7 +29,7 @@ jobs:
       - name: Run Checkstyle
         uses: nikitasavinov/checkstyle-action@master
         with:
-          checkstyle_config: './checkstyle.xml'
-          workdir: './src/main/java'
+          checkstyle_config: './build-tools/src/main/resources/steve/checkstyle.xml'
+          workdir: '.'
           reporter: 'github-pr-check'
           tool_name: 'checkstyle'

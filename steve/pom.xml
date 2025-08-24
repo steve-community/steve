@@ -11,14 +11,6 @@
     <artifactId>steve</artifactId>
     <packaging>jar</packaging>
 
-    <name>SteVe</name>
-    <description>SteckdosenVerwaltung</description>
-
-    <organization>
-        <name>SteVe Community Team</name>
-        <url>https://github.com/steve-community/steve</url>
-    </organization>
-
     <developers>
         <developer>
             <name>Sevket Goekay</name>

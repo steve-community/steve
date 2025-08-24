@@ -43,7 +43,7 @@ import java.time.Duration;
 @Configuration
 @Slf4j
 @RequiredArgsConstructor
-public class WebSocketConfiguration implements WebSocketConfigurer {
+public class OcppWebSocketConfiguration implements WebSocketConfigurer {
 
     public static final String PATH_INFIX = "/websocket/CentralSystemService/";
     public static final Duration PING_INTERVAL = Duration.ofMinutes(15);

@@ -20,7 +20,6 @@ package de.rwth.idsg.steve.ocpp;
 
 import de.rwth.idsg.ocpp.jaxb.RequestType;
 import de.rwth.idsg.ocpp.jaxb.ResponseType;
-import de.rwth.idsg.steve.ocpp.ws.data.OcppJsonError;
 import de.rwth.idsg.steve.repository.dto.ChargePointSelect;
 import de.rwth.idsg.steve.utils.StringUtils;
 import de.rwth.idsg.steve.web.dto.ocpp.ChargePointSelection;
@@ -173,10 +172,8 @@ public abstract class CommunicationTask<S extends ChargePointSelection, RESPONSE
 
     public abstract class DefaultOcppCallback<RES> implements OcppCallback<RES> {
 
-        public abstract void success(String chargeBoxId, RES response);
-
         @Override
-        public void success(String chargeBoxId, OcppJsonError error) {
+        public void successError(String chargeBoxId, Object error) {
             addNewResponse(chargeBoxId, error.toString());
         }
 

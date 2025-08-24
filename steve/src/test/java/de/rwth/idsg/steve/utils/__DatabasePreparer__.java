@@ -19,6 +19,7 @@
 package de.rwth.idsg.steve.utils;
 
 import com.google.common.collect.Sets;
+import de.rwth.idsg.steve.SteveConfiguration;
 import de.rwth.idsg.steve.config.BeanConfiguration;
 import de.rwth.idsg.steve.repository.dto.ChargePoint;
 import de.rwth.idsg.steve.repository.dto.ConnectorStatus;
@@ -72,9 +73,11 @@ public class __DatabasePreparer__ {
     private static final String REGISTERED_OCPP_TAG = "id_tag_2aa6a783d47d";
 
     private static final BeanConfiguration beanConfiguration = new BeanConfiguration();
-    private static final DSLContext dslContext = beanConfiguration.dslContext(beanConfiguration.dataSource());
 
-    public static void prepare() {
+    private static DSLContext dslContext;
+
+    public static void prepare(SteveConfiguration config) {
+        dslContext = beanConfiguration.dslContext(beanConfiguration.dataSource(config), config);
         runOperation(ctx -> {
             truncateTables(ctx);
             insertChargeBox(ctx);

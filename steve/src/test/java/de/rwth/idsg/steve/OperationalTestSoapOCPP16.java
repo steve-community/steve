@@ -101,7 +101,7 @@ public class OperationalTestSoapOCPP16 {
 
     @BeforeEach
     public void init() throws Exception {
-        __DatabasePreparer__.prepare();
+        __DatabasePreparer__.prepare(config);
     }
 
     @AfterEach

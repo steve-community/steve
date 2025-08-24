@@ -19,7 +19,7 @@
 package de.rwth.idsg.steve.ocpp.ws;
 
 import com.google.common.base.Strings;
-import de.rwth.idsg.steve.config.WebSocketConfiguration;
+import de.rwth.idsg.steve.config.OcppWebSocketConfiguration;
 import de.rwth.idsg.steve.service.ChargePointRegistrationService;
 import de.rwth.idsg.steve.web.validation.ChargeBoxIdValidator;
 import lombok.RequiredArgsConstructor;
@@ -132,7 +132,7 @@ public class OcppWebSocketHandshakeHandler implements HandshakeHandler {
             return "";
         }
 
-        final String substring = WebSocketConfiguration.PATH_INFIX;
+        final String substring = OcppWebSocketConfiguration.PATH_INFIX;
 
         int index = input.indexOf(substring);
         if (index == -1) {

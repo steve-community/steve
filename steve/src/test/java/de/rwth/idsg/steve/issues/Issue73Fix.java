@@ -58,7 +58,7 @@ public class Issue73Fix {
         Assertions.assertEquals(ApplicationProfile.TEST, config.getProfile());
         Assertions.assertTrue(config.getOcpp().isAutoRegisterUnknownStations());
 
-        __DatabasePreparer__.prepare();
+        __DatabasePreparer__.prepare(config);
 
         path = getPath(config);
 

@@ -70,7 +70,7 @@ public class CommunicationContext {
     public void createErrorHandler(CommunicationTask task) {
         // TODO: not so sure about this
         errorHandler = result -> task.defaultCallback()
-                                     .success(chargeBoxId, result);
+                                     .successError(chargeBoxId, result);
     }
 
     @RequiredArgsConstructor(access = AccessLevel.PRIVATE)

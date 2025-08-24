@@ -74,7 +74,7 @@ public class SecurityConfiguration {
                     .requestMatchers(
                         "/static/**",
                         config.getCxfMapping() + "/**",
-                        WebSocketConfiguration.PATH_INFIX + "**",
+                        OcppWebSocketConfiguration.PATH_INFIX + "**",
                         "/WEB-INF/views/**" // https://github.com/spring-projects/spring-security/issues/13285#issuecomment-1579097065
                     ).permitAll()
                     .requestMatchers(prefix + "/home").hasAnyAuthority("USER", "ADMIN")

@@ -48,8 +48,8 @@ import java.io.IOException;
 import java.util.EnumSet;
 import java.util.HashSet;
 
-import static de.rwth.idsg.steve.config.WebSocketConfiguration.IDLE_TIMEOUT;
-import static de.rwth.idsg.steve.config.WebSocketConfiguration.MAX_MSG_SIZE;
+import static de.rwth.idsg.steve.config.OcppWebSocketConfiguration.IDLE_TIMEOUT;
+import static de.rwth.idsg.steve.config.OcppWebSocketConfiguration.MAX_MSG_SIZE;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>

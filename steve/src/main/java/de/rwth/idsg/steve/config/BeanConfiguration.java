@@ -74,8 +74,7 @@ public class BeanConfiguration implements WebMvcConfigurer {
      * https://github.com/brettwooldridge/HikariCP/wiki/MySQL-Configuration
      */
     @Bean
-    public DataSource dataSource() {
-        SteveConfiguration config = steveConfiguration();
+    public DataSource dataSource(SteveConfiguration config) {
         SteveConfiguration.DB dbConfig = config.getDb();
         return dataSource(dbConfig.getJdbcUrl(), dbConfig.getUserName(), dbConfig.getPassword(), config.getTimeZoneId());
     }
@@ -116,7 +115,7 @@ public class BeanConfiguration implements WebMvcConfigurer {
      * - http://stackoverflow.com/questions/32848865/jooq-dslcontext-correct-autowiring-with-spring
      */
     @Bean
-    public DSLContext dslContext(DataSource dataSource) {
+    public DSLContext dslContext(DataSource dataSource, SteveConfiguration config) {
         Settings settings = new Settings()
                 // Normally, the records are "attached" to the Configuration that created (i.e. fetch/insert) them.
                 // This means that they hold an internal reference to the same database connection that was used.
@@ -124,7 +123,7 @@ public class BeanConfiguration implements WebMvcConfigurer {
                 // operations. We do not use or need that.
                 .withAttachRecords(false)
                 // To log or not to log the sql queries, that is the question
-                .withExecuteLogging(steveConfiguration().getDb().isSqlLogging());
+                .withExecuteLogging(config.getDb().isSqlLogging());
 
         // Configuration for JOOQ
         org.jooq.Configuration conf = new DefaultConfiguration()
@@ -166,8 +165,7 @@ public class BeanConfiguration implements WebMvcConfigurer {
      * steps and return a "no new version" report immediately.
      */
     @Bean
-    public ReleaseCheckService releaseCheckService() {
-        var config = steveConfiguration();
+    public ReleaseCheckService releaseCheckService(SteveConfiguration config) {
         if (InternetChecker.isInternetAvailable(config.getSteveCompositeVersion())) {
             return new GithubReleaseCheckService(config);
         } else {

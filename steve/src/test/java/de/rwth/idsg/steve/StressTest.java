@@ -54,7 +54,7 @@ public abstract class StressTest {
         Assertions.assertEquals(ApplicationProfile.TEST, config.getProfile());
         Assertions.assertTrue(config.getOcpp().isAutoRegisterUnknownStations());
 
-        __DatabasePreparer__.prepare();
+        __DatabasePreparer__.prepare(config);
 
         Application app = new Application(config);
         try {

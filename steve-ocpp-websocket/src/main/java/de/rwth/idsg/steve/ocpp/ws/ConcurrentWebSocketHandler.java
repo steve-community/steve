@@ -18,7 +18,7 @@
  */
 package de.rwth.idsg.steve.ocpp.ws;
 
-import de.rwth.idsg.steve.config.WebSocketConfiguration;
+import de.rwth.idsg.steve.config.OcppWebSocketConfiguration;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.WebSocketHandler;
 import org.springframework.web.socket.WebSocketMessage;
@@ -36,7 +36,7 @@ import java.util.concurrent.TimeUnit;
 public abstract class ConcurrentWebSocketHandler implements WebSocketHandler {
 
     private static final int SEND_TIME_LIMIT = (int) TimeUnit.SECONDS.toMillis(10);
-    private static final int BUFFER_SIZE_LIMIT = 5 * WebSocketConfiguration.MAX_MSG_SIZE;
+    private static final int BUFFER_SIZE_LIMIT = 5 * OcppWebSocketConfiguration.MAX_MSG_SIZE;
 
     private final Map<String, ConcurrentWebSocketSessionDecorator> sessions = new ConcurrentHashMap<>();
 

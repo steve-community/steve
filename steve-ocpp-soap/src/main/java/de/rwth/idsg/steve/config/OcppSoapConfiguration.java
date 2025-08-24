@@ -51,7 +51,7 @@ import static java.util.Collections.singletonList;
  * @since 18.11.2014
  */
 @Configuration
-public class OcppConfiguration {
+public class OcppSoapConfiguration {
 
     static {
         LogUtils.setLoggerClass(Slf4jLogger.class);
@@ -64,7 +64,7 @@ public class OcppConfiguration {
 
     private final PhaseInterceptor<Message> messageHeaderInterceptor;
 
-    public OcppConfiguration(CentralSystemService ocpp12Server, ocpp.cs._2012._06.CentralSystemService ocpp15Server,
+    public OcppSoapConfiguration(CentralSystemService ocpp12Server, ocpp.cs._2012._06.CentralSystemService ocpp15Server,
                              ocpp.cs._2015._10.CentralSystemService ocpp16Server,
                              @Qualifier("messageHeaderInterceptor")
                              PhaseInterceptor<Message> messageHeaderInterceptor,

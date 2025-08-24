@@ -57,7 +57,7 @@ public class ApplicationTest {
     public static void init() throws Exception {
         var config = SteveConfigurationReader.readSteveConfiguration("main.properties");
         Assertions.assertEquals(ApplicationProfile.TEST, config.getProfile());
-        __DatabasePreparer__.prepare();
+        __DatabasePreparer__.prepare(config);
 
         path = getPath(config);
 

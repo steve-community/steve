@@ -22,10 +22,11 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.util.concurrent.Striped;
 import de.rwth.idsg.steve.SteveException;
 import de.rwth.idsg.steve.ocpp.ws.custom.WsSessionSelectStrategy;
+import de.rwth.idsg.steve.ocpp.ws.custom.WsSessionSelectStrategyEnum;
 import de.rwth.idsg.steve.ocpp.ws.data.SessionContext;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.joda.time.DateTime;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.WebSocketSession;
 
@@ -45,7 +46,6 @@ import java.util.concurrent.locks.Lock;
  */
 @Slf4j
 @Component
-@RequiredArgsConstructor
 public class SessionContextStoreImpl implements SessionContextStore {
 
     /**
@@ -57,6 +57,10 @@ public class SessionContextStoreImpl implements SessionContextStore {
     private final Striped<Lock> locks = Striped.lock(16);
 
     private final WsSessionSelectStrategy wsSessionSelectStrategy;
+
+    public SessionContextStoreImpl(@Value("${ws.session.select.strategy}") String strategy) {
+        this.wsSessionSelectStrategy = WsSessionSelectStrategyEnum.fromName(strategy);
+    }
 
     @Override
     public void add(String chargeBoxId, WebSocketSession session, ScheduledFuture pingSchedule) {

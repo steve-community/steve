@@ -66,7 +66,7 @@ public class Ocpp16WebSocketEndpoint extends AbstractWebSocketEndpoint {
                                    CentralSystemService16_SoapServer server,
                                    SessionContextStore sessionStore) {
         super(asyncTaskScheduler, ocppServerRepository, futureResponseContextStore, applicationEventPublisher,
-          sessionStore);
+            sessionStore);
         this.server = server;
         this.futureResponseContextStore = futureResponseContextStore;
     }

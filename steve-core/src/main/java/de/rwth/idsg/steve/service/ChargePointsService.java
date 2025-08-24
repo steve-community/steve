@@ -20,11 +20,12 @@ package de.rwth.idsg.steve.service;
 
 import de.rwth.idsg.steve.repository.ChargePointRepository;
 import de.rwth.idsg.steve.repository.dto.ChargePoint;
-import de.rwth.idsg.steve.web.api.exception.NotFoundException;
 import de.rwth.idsg.steve.web.dto.ChargePointForm;
 import de.rwth.idsg.steve.web.dto.ChargePointQueryForm;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -40,7 +41,7 @@ public class ChargePointsService {
 
     public ChargePoint.Details getDetails(int chargeBoxPk) {
         return chargePointRepository.getDetails(chargeBoxPk).orElseThrow(
-            () -> new NotFoundException("Charge Point with ID " + chargeBoxPk + " not found")
+            () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Charge Point with ID " + chargeBoxPk + " not found")
         );
     }
 

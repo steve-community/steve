@@ -39,8 +39,10 @@ public class PropertyConfig {
         if (chargeBoxIdValidationRegex != null) {
             props.put("charge-box-id.validation.regex", chargeBoxIdValidationRegex);
         }
-        boolean autoRegisterUnknownStations = config.getOcpp().isAutoRegisterUnknownStations();
+        var autoRegisterUnknownStations = config.getOcpp().isAutoRegisterUnknownStations();
         props.put("auto.register.unknown.stations", autoRegisterUnknownStations);
+        var wsSessionSelectStrategy = config.getOcpp().getWsSessionSelectStrategy();
+        props.put("ws.session.select.strategy", wsSessionSelectStrategy);
         configurer.setProperties(props);
 
         return configurer;

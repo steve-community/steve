@@ -25,9 +25,6 @@ import com.mysql.cj.conf.PropertyKey;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import de.rwth.idsg.steve.SteveConfiguration;
-import de.rwth.idsg.steve.SteveConfigurationReader;
-import de.rwth.idsg.steve.ocpp.ws.custom.WsSessionSelectStrategy;
-import de.rwth.idsg.steve.ocpp.ws.custom.WsSessionSelectStrategyEnum;
 import de.rwth.idsg.steve.service.DummyReleaseCheckService;
 import de.rwth.idsg.steve.service.GithubReleaseCheckService;
 import de.rwth.idsg.steve.service.ReleaseCheckService;
@@ -206,11 +203,5 @@ public class BeanConfiguration implements WebMvcConfigurer {
             .findAny()
             .map(conv -> ((MappingJackson2HttpMessageConverter) conv).getObjectMapper())
             .orElseThrow(() -> new RuntimeException("There is no MappingJackson2HttpMessageConverter in Spring context"));
-    }
-
-    @Bean
-    public WsSessionSelectStrategy wsSessionSelectStrategy(SteveConfiguration config) {
-        var strategy = config.getOcpp().getWsSessionSelectStrategy();
-        return WsSessionSelectStrategyEnum.fromName(strategy);
     }
 }

@@ -26,8 +26,7 @@ import de.rwth.idsg.steve.ocpp.OcppVersion;
 import de.rwth.idsg.steve.ocpp.soap.CentralSystemService15_SoapServer;
 import de.rwth.idsg.steve.ocpp.ws.AbstractWebSocketEndpoint;
 import de.rwth.idsg.steve.ocpp.ws.FutureResponseContextStore;
-import de.rwth.idsg.steve.ocpp.ws.SessionContextStoreImpl;
-import de.rwth.idsg.steve.ocpp.ws.custom.WsSessionSelectStrategy;
+import de.rwth.idsg.steve.ocpp.ws.SessionContextStore;
 import de.rwth.idsg.steve.ocpp.ws.pipeline.AbstractCallHandler;
 import de.rwth.idsg.steve.ocpp.ws.pipeline.Deserializer;
 import de.rwth.idsg.steve.ocpp.ws.pipeline.IncomingPipeline;
@@ -63,9 +62,9 @@ public class Ocpp15WebSocketEndpoint extends AbstractWebSocketEndpoint {
                                    FutureResponseContextStore futureResponseContextStore,
                                    ApplicationEventPublisher applicationEventPublisher,
                                    CentralSystemService15_SoapServer server,
-                                   WsSessionSelectStrategy wsSessionSelectStrategy) {
+                                   SessionContextStore sessionContextStore) {
         super(asyncTaskScheduler, ocppServerRepository, futureResponseContextStore, applicationEventPublisher,
-          new SessionContextStoreImpl(wsSessionSelectStrategy));
+            sessionContextStore);
         this.server = server;
         this.futureResponseContextStore = futureResponseContextStore;
     }

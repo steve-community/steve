@@ -21,12 +21,12 @@ package de.rwth.idsg.steve.service;
 import de.rwth.idsg.steve.SteveException;
 import de.rwth.idsg.steve.repository.UserRepository;
 import de.rwth.idsg.steve.repository.dto.User;
-import de.rwth.idsg.steve.web.api.exception.BadRequestException;
-import de.rwth.idsg.steve.web.api.exception.NotFoundException;
 import de.rwth.idsg.steve.web.dto.UserForm;
 import de.rwth.idsg.steve.web.dto.UserQueryForm;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -38,7 +38,7 @@ public class UsersService {
 
     public User.Details getDetails(int userPk) {
         return userRepository.getDetails(userPk).orElseThrow(
-            () -> new NotFoundException(String.format("User with id %d not found", userPk))
+            () -> new ResponseStatusException(HttpStatus.NOT_FOUND, String.format("User with id %d not found", userPk))
         );
     }
 
@@ -51,7 +51,7 @@ public class UsersService {
 
     public User.Details update(UserForm form) {
         if (form.getUserPk() == null) {
-            throw new BadRequestException("userPk must not be null");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "userPk must not be null");
         }
         userRepository.update(form);
         return userRepository.getDetails(form.getUserPk()).orElseThrow(
@@ -61,7 +61,7 @@ public class UsersService {
 
     public User.Details delete(int userPk) {
         var user = userRepository.getDetails(userPk).orElseThrow(
-            () -> new NotFoundException(String.format("User with id %d not found", userPk))
+            () -> new ResponseStatusException(HttpStatus.NOT_FOUND, String.format("User with id %d not found", userPk))
         );
         userRepository.delete(userPk);
         return user;

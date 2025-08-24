@@ -20,11 +20,13 @@ package de.rwth.idsg.steve.ocpp.ws;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.util.concurrent.Striped;
+import de.rwth.idsg.steve.SteveConfiguration;
 import de.rwth.idsg.steve.SteveException;
 import de.rwth.idsg.steve.ocpp.ws.custom.WsSessionSelectStrategy;
 import de.rwth.idsg.steve.ocpp.ws.data.SessionContext;
 import lombok.extern.slf4j.Slf4j;
 import org.joda.time.DateTime;
+import org.springframework.stereotype.Component;
 import org.springframework.web.socket.WebSocketSession;
 
 import java.util.ArrayDeque;
@@ -37,13 +39,12 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.locks.Lock;
 
-import static de.rwth.idsg.steve.SteveConfiguration.CONFIG;
-
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 17.03.2015
  */
 @Slf4j
+@Component
 public class SessionContextStoreImpl implements SessionContextStore {
 
     /**
@@ -54,7 +55,11 @@ public class SessionContextStoreImpl implements SessionContextStore {
 
     private final Striped<Lock> locks = Striped.lock(16);
 
-    private final WsSessionSelectStrategy wsSessionSelectStrategy = CONFIG.getOcpp().getWsSessionSelectStrategy();
+    private final WsSessionSelectStrategy wsSessionSelectStrategy;
+
+    public SessionContextStoreImpl(SteveConfiguration config) {
+        wsSessionSelectStrategy = config.getOcpp().getWsSessionSelectStrategy();
+    }
 
     @Override
     public void add(String chargeBoxId, WebSocketSession session, ScheduledFuture pingSchedule) {

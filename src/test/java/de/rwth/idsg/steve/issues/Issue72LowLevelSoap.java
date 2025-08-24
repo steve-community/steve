@@ -19,6 +19,7 @@
 package de.rwth.idsg.steve.issues;
 
 import com.google.common.net.MediaType;
+import de.rwth.idsg.steve.SteveConfiguration;
 import de.rwth.idsg.steve.StressTest;
 import de.rwth.idsg.steve.utils.Helpers;
 import de.rwth.idsg.steve.utils.StressTester;
@@ -57,7 +58,7 @@ import static de.rwth.idsg.steve.utils.Helpers.getRandomString;
  */
 public class Issue72LowLevelSoap extends StressTest {
 
-    private static final String path = getPath();
+    private static final String path = getPath(SteveConfiguration.CONFIG);
 
     public static void main(String[] args) throws Exception {
         new Issue72LowLevelSoap().attack();

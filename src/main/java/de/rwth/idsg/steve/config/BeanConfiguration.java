@@ -46,7 +46,6 @@ import org.springframework.http.converter.json.MappingJackson2HttpMessageConvert
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
-import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 import org.springframework.web.accept.ContentNegotiationManager;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
@@ -56,12 +55,8 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter;
 import org.springframework.web.servlet.view.InternalResourceViewResolver;
 
-import jakarta.validation.Validator;
-
 import javax.sql.DataSource;
 import java.util.List;
-
-import static de.rwth.idsg.steve.SteveConfiguration.CONFIG;
 
 /**
  * Configuration and beans of Spring Framework.
@@ -81,14 +76,18 @@ public class BeanConfiguration implements WebMvcConfigurer {
      */
     @Bean
     public DataSource dataSource() {
-        SteveConfiguration.DB dbConfig = CONFIG.getDb();
+        SteveConfiguration config = steveConfiguration();
+        SteveConfiguration.DB dbConfig = config.getDb();
+        return dataSource(dbConfig.getJdbcUrl(), dbConfig.getUserName(), dbConfig.getPassword(), config.getTimeZoneId());
+    }
 
+    public static DataSource dataSource(String dbUrl, String dbUserName, String dbPassword, String dbTimeZoneId) {
         HikariConfig hc = new HikariConfig();
 
         // set standard params
-        hc.setJdbcUrl(dbConfig.getJdbcUrl());
-        hc.setUsername(dbConfig.getUserName());
-        hc.setPassword(dbConfig.getPassword());
+        hc.setJdbcUrl(dbUrl);
+        hc.setUsername(dbUserName);
+        hc.setPassword(dbPassword);
 
         // set non-standard params
         hc.addDataSourceProperty(PropertyKey.cachePrepStmts.getKeyName(), true);
@@ -96,7 +95,7 @@ public class BeanConfiguration implements WebMvcConfigurer {
         hc.addDataSourceProperty(PropertyKey.prepStmtCacheSize.getKeyName(), 250);
         hc.addDataSourceProperty(PropertyKey.prepStmtCacheSqlLimit.getKeyName(), 2048);
         hc.addDataSourceProperty(PropertyKey.characterEncoding.getKeyName(), "utf8");
-        hc.addDataSourceProperty(PropertyKey.connectionTimeZone.getKeyName(), CONFIG.getTimeZoneId());
+        hc.addDataSourceProperty(PropertyKey.connectionTimeZone.getKeyName(), dbTimeZoneId);
         hc.addDataSourceProperty(PropertyKey.useSSL.getKeyName(), true);
 
         // https://github.com/steve-community/steve/issues/736
@@ -126,7 +125,7 @@ public class BeanConfiguration implements WebMvcConfigurer {
                 // operations. We do not use or need that.
                 .withAttachRecords(false)
                 // To log or not to log the sql queries, that is the question
-                .withExecuteLogging(CONFIG.getDb().isSqlLogging());
+                .withExecuteLogging(steveConfiguration().getDb().isSqlLogging());
 
         // Configuration for JOOQ
         org.jooq.Configuration conf = new DefaultConfiguration()
@@ -161,11 +160,6 @@ public class BeanConfiguration implements WebMvcConfigurer {
         return new DelegatingTaskExecutor(executor);
     }
 
-    @Bean
-    public Validator validator() {
-        return new LocalValidatorFactoryBean();
-    }
-
     /**
      * There might be instances deployed in a local/closed network with no internet connection. In such situations,
      * it is unnecessary to try to access Github every time, even though the request will time out and result
@@ -174,8 +168,9 @@ public class BeanConfiguration implements WebMvcConfigurer {
      */
     @Bean
     public ReleaseCheckService releaseCheckService() {
-        if (InternetChecker.isInternetAvailable()) {
-            return new GithubReleaseCheckService();
+        var config = steveConfiguration();
+        if (InternetChecker.isInternetAvailable(config.getSteveCompositeVersion())) {
+            return new GithubReleaseCheckService(config);
         } else {
             return new DummyReleaseCheckService();
         }
@@ -244,5 +239,10 @@ public class BeanConfiguration implements WebMvcConfigurer {
             .findAny()
             .map(conv -> ((MappingJackson2HttpMessageConverter) conv).getObjectMapper())
             .orElseThrow(() -> new RuntimeException("There is no MappingJackson2HttpMessageConverter in Spring context"));
+    }
+
+    @Bean
+    public SteveConfiguration steveConfiguration() {
+        return SteveConfiguration.CONFIG;
     }
 }

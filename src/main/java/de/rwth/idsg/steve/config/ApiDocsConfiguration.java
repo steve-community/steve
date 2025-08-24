@@ -70,7 +70,7 @@ public class ApiDocsConfiguration {
     }
 
     @Bean
-    public OpenAPI apiDocs() {
+    public OpenAPI apiDocs(SteveConfiguration config) {
         String title = "SteVe REST API Documentation";
 
         String securityName = "basicAuth";
@@ -88,7 +88,7 @@ public class ApiDocsConfiguration {
                     .name("GPL-3.0")
                     .url("https://github.com/steve-community/steve/blob/master/LICENSE.txt")
                 )
-                .version(SteveConfiguration.CONFIG.getSteveVersion())
+                .version(config.getSteveVersion())
             )
             // https://stackoverflow.com/a/68185254
             .servers(List.of(new Server().url("/").description("Default Server URL")))

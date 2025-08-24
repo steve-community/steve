@@ -77,7 +77,7 @@ public class OperationalTestSoapOCPP16 {
     private static final String REGISTERED_CHARGE_BOX_ID = __DatabasePreparer__.getRegisteredChargeBoxId();
     private static final String REGISTERED_CHARGE_BOX_ID_2 = __DatabasePreparer__.getRegisteredChargeBoxId2();
     private static final String REGISTERED_OCPP_TAG = __DatabasePreparer__.getRegisteredOcppTag();
-    private static final String path = getPath();
+    private static final String path = getPath(SteveConfiguration.CONFIG);
     private static final int numConnectors = 5;
     private static Application app;
 
@@ -85,7 +85,7 @@ public class OperationalTestSoapOCPP16 {
     public static void initClass() throws Exception {
         Assertions.assertEquals(ApplicationProfile.TEST, SteveConfiguration.CONFIG.getProfile());
 
-        app = new Application();
+        app = new Application(SteveConfiguration.CONFIG);
         app.start();
     }
 

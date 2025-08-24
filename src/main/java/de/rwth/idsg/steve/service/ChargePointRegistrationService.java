@@ -19,9 +19,9 @@
 package de.rwth.idsg.steve.service;
 
 import com.google.common.util.concurrent.Striped;
+import de.rwth.idsg.steve.SteveConfiguration;
 import de.rwth.idsg.steve.repository.ChargePointRepository;
 import de.rwth.idsg.steve.service.dto.UnidentifiedIncomingObject;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import ocpp.cs._2015._10.RegistrationStatus;
 import org.springframework.stereotype.Service;
@@ -31,18 +31,20 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.locks.Lock;
 
-import static de.rwth.idsg.steve.SteveConfiguration.CONFIG;
-
 @Slf4j
 @Service
-@RequiredArgsConstructor
 public class ChargePointRegistrationService {
 
-    private final boolean autoRegisterUnknownStations = CONFIG.getOcpp().isAutoRegisterUnknownStations();
+    private final boolean autoRegisterUnknownStations;
 
     private final Striped<Lock> isRegisteredLocks = Striped.lock(16);
     private final UnidentifiedIncomingObjectService unknownChargePointService = new UnidentifiedIncomingObjectService(100);
     private final ChargePointRepository chargePointRepository;
+
+    public ChargePointRegistrationService(ChargePointRepository chargePointRepository, SteveConfiguration config) {
+        this.chargePointRepository = chargePointRepository;
+        this.autoRegisterUnknownStations = config.getOcpp().isAutoRegisterUnknownStations();
+    }
 
     public Optional<RegistrationStatus> getRegistrationStatus(String chargeBoxId) {
         Lock l = isRegisteredLocks.get(chargeBoxId);

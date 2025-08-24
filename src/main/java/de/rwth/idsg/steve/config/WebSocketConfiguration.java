@@ -24,6 +24,7 @@ import de.rwth.idsg.steve.ocpp.ws.ocpp12.Ocpp12WebSocketEndpoint;
 import de.rwth.idsg.steve.ocpp.ws.ocpp15.Ocpp15WebSocketEndpoint;
 import de.rwth.idsg.steve.ocpp.ws.ocpp16.Ocpp16WebSocketEndpoint;
 import de.rwth.idsg.steve.service.ChargePointRegistrationService;
+import de.rwth.idsg.steve.web.validation.ChargeBoxIdValidator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Configuration;
@@ -50,6 +51,7 @@ public class WebSocketConfiguration implements WebSocketConfigurer {
     public static final int MAX_MSG_SIZE = 8_388_608; // 8 MB for max message size
 
     private final ChargePointRegistrationService chargePointRegistrationService;
+    private final ChargeBoxIdValidator chargeBoxIdValidator;
 
     private final Ocpp12WebSocketEndpoint ocpp12WebSocketEndpoint;
     private final Ocpp15WebSocketEndpoint ocpp15WebSocketEndpoint;
@@ -59,6 +61,7 @@ public class WebSocketConfiguration implements WebSocketConfigurer {
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
 
         OcppWebSocketHandshakeHandler handshakeHandler = new OcppWebSocketHandshakeHandler(
+            chargeBoxIdValidator,
             new DefaultHandshakeHandler(),
             Lists.newArrayList(ocpp16WebSocketEndpoint, ocpp15WebSocketEndpoint, ocpp12WebSocketEndpoint),
             chargePointRegistrationService

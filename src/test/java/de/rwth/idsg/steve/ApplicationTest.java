@@ -49,7 +49,7 @@ public class ApplicationTest {
 
     private static final String REGISTERED_CHARGE_BOX_ID = __DatabasePreparer__.getRegisteredChargeBoxId();
     private static final String REGISTERED_OCPP_TAG =  __DatabasePreparer__.getRegisteredOcppTag();
-    private static final String path = getPath();
+    private static final String path = getPath(SteveConfiguration.CONFIG);
 
     private static Application app;
 
@@ -58,7 +58,7 @@ public class ApplicationTest {
         Assertions.assertEquals(ApplicationProfile.TEST, SteveConfiguration.CONFIG.getProfile());
         __DatabasePreparer__.prepare();
 
-        app = new Application();
+        app = new Application(SteveConfiguration.CONFIG);
         app.start();
     }
 

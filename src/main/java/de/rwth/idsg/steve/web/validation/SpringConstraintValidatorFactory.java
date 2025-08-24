@@ -19,39 +19,22 @@
 package de.rwth.idsg.steve.web.validation;
 
 import jakarta.validation.ConstraintValidator;
-import jakarta.validation.ConstraintValidatorContext;
-import lombok.NoArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
+import jakarta.validation.ConstraintValidatorFactory;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
-
-/**
- * @author Sevket Goekay <sevketgokay@gmail.com>
- * @since 21.01.2016
- */
 @Component
-// Default constructor for Hibernate Validator
-// Spring will inject the value from properties
-// And then HV will call `initialize`
-@NoArgsConstructor
-public class ChargeBoxIdListValidator implements ConstraintValidator<ChargeBoxId, List<String>> {
+@RequiredArgsConstructor
+public class SpringConstraintValidatorFactory implements ConstraintValidatorFactory {
 
-    @Autowired
-    private ChargeBoxIdValidator validator;
+    private final AutowireCapableBeanFactory beanFactory;
 
     @Override
-    public void initialize(ChargeBoxId constraintAnnotation) {
-        // No-op
+    public <T extends ConstraintValidator<?, ?>> T getInstance(Class<T> key) {
+        return beanFactory.createBean(key);
     }
 
     @Override
-    public boolean isValid(List<String> value, ConstraintValidatorContext context) {
-        for (String s : value) {
-            if (!validator.isValid(s, context)) {
-                return false;
-            }
-        }
-        return true;
-    }
+    public void releaseInstance(ConstraintValidator<?, ?> instance) { }
 }

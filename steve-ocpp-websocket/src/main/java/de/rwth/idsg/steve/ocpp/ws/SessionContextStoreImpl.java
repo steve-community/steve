@@ -25,11 +25,11 @@ import de.rwth.idsg.steve.ocpp.ws.custom.WsSessionSelectStrategy;
 import de.rwth.idsg.steve.ocpp.ws.custom.WsSessionSelectStrategyEnum;
 import de.rwth.idsg.steve.ocpp.ws.data.SessionContext;
 import lombok.extern.slf4j.Slf4j;
-import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.WebSocketSession;
 
+import java.time.LocalDateTime;
 import java.util.ArrayDeque;
 import java.util.Collections;
 import java.util.Deque;
@@ -67,7 +67,7 @@ public class SessionContextStoreImpl implements SessionContextStore {
         Lock l = locks.get(chargeBoxId);
         l.lock();
         try {
-            SessionContext context = new SessionContext(session, pingSchedule, DateTime.now());
+            SessionContext context = new SessionContext(session, pingSchedule, LocalDateTime.now());
 
             Deque<SessionContext> endpointDeque = lookupTable.computeIfAbsent(chargeBoxId, str -> new ArrayDeque<>());
             endpointDeque.addLast(context); // Adding at the end

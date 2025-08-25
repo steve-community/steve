@@ -21,7 +21,6 @@ package de.rwth.idsg.steve.web.api;
 import de.rwth.idsg.steve.repository.TransactionRepository;
 import de.rwth.idsg.steve.repository.dto.Transaction;
 import de.rwth.idsg.steve.web.dto.TransactionQueryForm;
-import org.joda.time.DateTime;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -33,6 +32,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultMatcher;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
+import java.time.OffsetDateTime;
 import java.util.Collections;
 import java.util.List;
 
@@ -153,8 +153,8 @@ public class TransactionRestControllerTest extends AbstractControllerTest {
     @Test
     @DisplayName("Sets all valid params, expected 200")
     public void test8() throws Exception {
-        DateTime start = DateTime.parse("2022-10-01T00:00Z");
-        DateTime stop = start.plusHours(2);
+        var start = OffsetDateTime.parse("2022-10-01T00:00Z");
+        var stop = start.plusHours(2);
 
         // given
         Transaction transaction = Transaction
@@ -184,9 +184,9 @@ public class TransactionRestControllerTest extends AbstractControllerTest {
             .andExpect(jsonPath("$[0].id").value("1"))
             .andExpect(jsonPath("$[0].chargeBoxId").value("cb-2"))
             .andExpect(jsonPath("$[0].ocppIdTag").value("id-3"))
-            .andExpect(jsonPath("$[0].startTimestamp").value(start.toString()))
+            .andExpect(jsonPath("$[0].startTimestamp").value("2022-10-01T00:00:00Z")) //FIXME start.toString()))
             .andExpect(jsonPath("$[0].startTimestampFormatted").doesNotExist())
-            .andExpect(jsonPath("$[0].stopTimestamp").value(stop.toString()))
+            .andExpect(jsonPath("$[0].stopTimestamp").value("2022-10-01T02:00:00Z")) //FIXME stop.toString()))
             .andExpect(jsonPath("$[0].stopTimestampFormatted").doesNotExist());
     }
 

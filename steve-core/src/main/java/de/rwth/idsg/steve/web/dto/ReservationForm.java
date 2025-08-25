@@ -24,7 +24,8 @@ import lombok.Getter;
 import lombok.Setter;
 import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.NotNull;
-import org.joda.time.DateTime;
+
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -41,9 +42,9 @@ public class ReservationForm {
     private Integer connectorId;
 
     @NotNull(message = "Start timestamp is required")
-    private DateTime startTimestamp;
+    private LocalDateTime startTimestamp;
 
     @NotNull(message = "Expiry timestamp is required")
     @Future(message = "Expiry timestamp must be in the future")
-    private DateTime expiryTimestamp;
+    private LocalDateTime expiryTimestamp;
 }

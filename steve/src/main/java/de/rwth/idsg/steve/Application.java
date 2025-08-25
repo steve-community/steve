@@ -20,10 +20,10 @@ package de.rwth.idsg.steve;
 
 import de.rwth.idsg.steve.utils.LogFileRetriever;
 import lombok.extern.slf4j.Slf4j;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
 
 import java.nio.file.Path;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.Optional;
 import java.util.TimeZone;
 
@@ -47,9 +47,10 @@ public class Application {
         SteveConfiguration sc = SteveConfigurationReader.readSteveConfiguration("main.properties");
         log.info("Loaded the properties. Starting with the '{}' profile", sc.getProfile());
 
-        TimeZone.setDefault(TimeZone.getTimeZone(sc.getTimeZoneId()));
-        DateTimeZone.setDefault(DateTimeZone.forID(sc.getTimeZoneId()));
-        log.info("Date/time zone of the application is set to {}. Current date/time: {}", sc.getTimeZoneId(), DateTime.now());
+        var zoneId = ZoneId.of(sc.getTimeZoneId());
+        TimeZone.setDefault(TimeZone.getTimeZone(zoneId));
+        log.info("Date/time zone of the application is set to {}. Current date/time: {}",
+                sc.getTimeZoneId(), ZonedDateTime.now(zoneId));
 
         Optional<Path> path = LogFileRetriever.INSTANCE.getPath();
         boolean loggingToFile = path.isPresent();

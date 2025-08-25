@@ -36,7 +36,6 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import ocpp.cs._2015._10.MeterValue;
-import org.joda.time.DateTime;
 import org.jooq.DSLContext;
 import org.jooq.Record1;
 import org.jooq.SelectConditionStep;
@@ -44,10 +43,12 @@ import org.jooq.impl.DSL;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.CollectionUtils;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.concurrent.locks.Lock;
 import java.util.stream.Collectors;
 
+import static de.rwth.idsg.steve.utils.DateTimeUtils.toLocalDateTime;
 import static jooq.steve.db.tables.ChargeBox.CHARGE_BOX;
 import static jooq.steve.db.tables.Connector.CONNECTOR;
 import static jooq.steve.db.tables.ConnectorMeterValue.CONNECTOR_METER_VALUE;
@@ -113,7 +114,7 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
     public void updateChargeboxFirmwareStatus(String chargeBoxIdentity, String firmwareStatus) {
         ctx.update(CHARGE_BOX)
            .set(CHARGE_BOX.FW_UPDATE_STATUS, firmwareStatus)
-           .set(CHARGE_BOX.FW_UPDATE_TIMESTAMP, DateTime.now())
+           .set(CHARGE_BOX.FW_UPDATE_TIMESTAMP, LocalDateTime.now())
            .where(CHARGE_BOX.CHARGE_BOX_ID.equal(chargeBoxIdentity))
            .execute();
     }
@@ -122,13 +123,13 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
     public void updateChargeboxDiagnosticsStatus(String chargeBoxIdentity, String status) {
         ctx.update(CHARGE_BOX)
            .set(CHARGE_BOX.DIAGNOSTICS_STATUS, status)
-           .set(CHARGE_BOX.DIAGNOSTICS_TIMESTAMP, DateTime.now())
+           .set(CHARGE_BOX.DIAGNOSTICS_TIMESTAMP, LocalDateTime.now())
            .where(CHARGE_BOX.CHARGE_BOX_ID.equal(chargeBoxIdentity))
            .execute();
     }
 
     @Override
-    public void updateChargeboxHeartbeat(String chargeBoxIdentity, DateTime ts) {
+    public void updateChargeboxHeartbeat(String chargeBoxIdentity, LocalDateTime ts) {
         ctx.update(CHARGE_BOX)
            .set(CHARGE_BOX.LAST_HEARTBEAT_TIMESTAMP, ts)
            .where(CHARGE_BOX.CHARGE_BOX_ID.equal(chargeBoxIdentity))
@@ -153,7 +154,7 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
                                                       .where(CONNECTOR.CHARGE_BOX_ID.equal(p.getChargeBoxId()))
                                                       .and(CONNECTOR.CONNECTOR_ID.equal(p.getConnectorId()))
                )
-               .set(CONNECTOR_STATUS.STATUS_TIMESTAMP, p.getTimestamp())
+               .set(CONNECTOR_STATUS.STATUS_TIMESTAMP, toLocalDateTime(p.getTimestamp()))
                .set(CONNECTOR_STATUS.STATUS, p.getStatus())
                .set(CONNECTOR_STATUS.ERROR_CODE, p.getErrorCode())
                .set(CONNECTOR_STATUS.ERROR_INFO, p.getErrorInfo())
@@ -255,7 +256,7 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
         // -------------------------------------------------------------------------
 
         if (shouldInsertConnectorStatusAfterTransactionMsg(p.getChargeBoxId())) {
-            insertConnectorStatus(ctx, connectorPkQuery, p.getStartTimestamp(), p.getStatusUpdate());
+            insertConnectorStatus(ctx, connectorPkQuery, toLocalDateTime(p.getStartTimestamp()), p.getStatusUpdate());
         }
 
         return transactionId;
@@ -274,7 +275,7 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
                .set(TRANSACTION_STOP.TRANSACTION_PK, p.getTransactionId())
                .set(TRANSACTION_STOP.EVENT_TIMESTAMP, p.getEventTimestamp())
                .set(TRANSACTION_STOP.EVENT_ACTOR, p.getEventActor())
-               .set(TRANSACTION_STOP.STOP_TIMESTAMP, p.getStopTimestamp())
+               .set(TRANSACTION_STOP.STOP_TIMESTAMP, toLocalDateTime(p.getStopTimestamp()))
                .set(TRANSACTION_STOP.STOP_VALUE, p.getStopMeterValue())
                .set(TRANSACTION_STOP.STOP_REASON, p.getStopReason())
                .execute();
@@ -294,7 +295,7 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
                        .from(TRANSACTION_START)
                        .where(TRANSACTION_START.TRANSACTION_PK.equal(p.getTransactionId()));
 
-            insertConnectorStatus(ctx, connectorPkQuery, p.getStopTimestamp(), p.getStatusUpdate());
+            insertConnectorStatus(ctx, connectorPkQuery, toLocalDateTime(p.getStopTimestamp()), p.getStatusUpdate());
         }
     }
 
@@ -322,7 +323,7 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
                                     .from(TRANSACTION_START)
                                     .where(TRANSACTION_START.CONNECTOR_PK.eq(connectorPkQuery))
                                     .and(TRANSACTION_START.ID_TAG.eq(p.getIdTag()))
-                                    .and(TRANSACTION_START.START_TIMESTAMP.eq(p.getStartTimestamp()))
+                                    .and(TRANSACTION_START.START_TIMESTAMP.eq(toLocalDateTime(p.getStartTimestamp())))
                                     .and(TRANSACTION_START.START_VALUE.eq(p.getStartMeterValue()))
                                     .fetchOne();
 
@@ -334,7 +335,7 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
                                        .set(TRANSACTION_START.EVENT_TIMESTAMP, p.getEventTimestamp())
                                        .set(TRANSACTION_START.CONNECTOR_PK, connectorPkQuery)
                                        .set(TRANSACTION_START.ID_TAG, p.getIdTag())
-                                       .set(TRANSACTION_START.START_TIMESTAMP, p.getStartTimestamp())
+                                       .set(TRANSACTION_START.START_TIMESTAMP, toLocalDateTime(p.getStartTimestamp()))
                                        .set(TRANSACTION_START.START_VALUE, p.getStartMeterValue())
                                        .returning(TRANSACTION_START.TRANSACTION_PK)
                                        .fetchOne()
@@ -362,7 +363,7 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
      */
     private void insertConnectorStatus(DSLContext ctx,
                                        SelectConditionStep<Record1<Integer>> connectorPkQuery,
-                                       DateTime timestamp,
+                                       LocalDateTime timestamp,
                                        TransactionStatusUpdate statusUpdate) {
         try {
             ctx.insertInto(CONNECTOR_STATUS)
@@ -398,7 +399,7 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
      */
     private boolean insertIgnoreIdTag(DSLContext ctx, InsertTransactionParams p) {
         String note = "This unknown idTag was used in a transaction that started @ " + p.getStartTimestamp()
-                + ". It was reported @ " + DateTime.now() + ".";
+                + ". It was reported @ " + LocalDateTime.now() + ".";
 
         int count = ctx.insertInto(OCPP_TAG)
                        .set(OCPP_TAG.ID_TAG, p.getIdTag())
@@ -437,7 +438,7 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
                                    .map(k -> ctx.newRecord(CONNECTOR_METER_VALUE)
                                                 .setConnectorPk(connectorPk)
                                                 .setTransactionPk(transactionId)
-                                                .setValueTimestamp(t.getTimestamp())
+                                                .setValueTimestamp(toLocalDateTime(t.getTimestamp()))
                                                 .setValue(k.getValue())
                                                 // The following are optional fields!
                                                 .setReadingContext(k.isSetContext() ? k.getContext().value() : null)
@@ -458,7 +459,7 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
                .set(TRANSACTION_STOP_FAILED.CHARGE_BOX_ID, p.getChargeBoxId())
                .set(TRANSACTION_STOP_FAILED.EVENT_TIMESTAMP, p.getEventTimestamp())
                .set(TRANSACTION_STOP_FAILED.EVENT_ACTOR, mapActor(p.getEventActor()))
-               .set(TRANSACTION_STOP_FAILED.STOP_TIMESTAMP, p.getStopTimestamp())
+               .set(TRANSACTION_STOP_FAILED.STOP_TIMESTAMP, toLocalDateTime(p.getStopTimestamp()))
                .set(TRANSACTION_STOP_FAILED.STOP_VALUE, p.getStopMeterValue())
                .set(TRANSACTION_STOP_FAILED.STOP_REASON, p.getStopReason())
                .set(TRANSACTION_STOP_FAILED.FAIL_REASON, Throwables.getStackTraceAsString(e))

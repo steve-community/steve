@@ -24,8 +24,6 @@ import de.rwth.idsg.steve.service.OcppTagsService;
 import de.rwth.idsg.steve.utils.DateTimeUtils;
 import de.rwth.idsg.steve.web.dto.OcppTagForm;
 import de.rwth.idsg.steve.web.dto.OcppTagQueryForm;
-import org.joda.time.DateTime;
-import org.joda.time.LocalDateTime;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -38,6 +36,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultMatcher;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
+import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.Collections;
 import java.util.List;
 
@@ -133,7 +133,7 @@ public class OcppTagsRestControllerTest extends AbstractControllerTest {
     @DisplayName("GET all: Sets all valid params, expected 200")
     public void test5() throws Exception {
         // given
-        DateTime someDate = DateTime.parse("2020-10-01T00:00:00.000Z");
+        var someDate = OffsetDateTime.parse("2020-10-01T00:00:00.000Z");
         OcppTag.OcppTagOverview result = OcppTag.OcppTagOverview.builder()
             .ocppTagPk(121)
             .idTag("id-1")
@@ -168,7 +168,7 @@ public class OcppTagsRestControllerTest extends AbstractControllerTest {
             .andExpect(jsonPath("$[0].parentIdTag").value("parent-id-1"))
             .andExpect(jsonPath("$[0].inTransaction").value("false"))
             .andExpect(jsonPath("$[0].blocked").value("true"))
-            .andExpect(jsonPath("$[0].expiryDate").value("2020-10-01T00:00:00.000Z"))
+            .andExpect(jsonPath("$[0].expiryDate").value("2020-10-01T00:00:00Z"))
             .andExpect(jsonPath("$[0].expiryDateFormatted").doesNotExist())
             .andExpect(jsonPath("$[0].maxActiveTransactionCount").value("4"))
             .andExpect(jsonPath("$[0].activeTransactionCount").value("0"))

@@ -21,12 +21,10 @@ package de.rwth.idsg.steve.web;
 import com.google.common.base.Strings;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
-import org.joda.time.LocalDateTime;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
-import org.joda.time.format.ISODateTimeFormat;
 
 import java.beans.PropertyEditorSupport;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -38,11 +36,11 @@ public class LocalDateTimeEditor extends PropertyEditorSupport {
     private final DateTimeFormatter dateTimeFormatter;
 
     public static LocalDateTimeEditor forMvc() {
-        return new LocalDateTimeEditor(DateTimeFormat.forPattern("yyyy-MM-dd HH:mm"));
+        return new LocalDateTimeEditor(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
     }
 
     public static LocalDateTimeEditor forApi() {
-        return new LocalDateTimeEditor(ISODateTimeFormat.localDateOptionalTimeParser());
+        return new LocalDateTimeEditor(DateTimeFormatter.ISO_LOCAL_DATE_TIME);
     }
 
     @Override
@@ -50,9 +48,11 @@ public class LocalDateTimeEditor extends PropertyEditorSupport {
         Object value = getValue();
         if (value == null) {
             return null;
-        } else {
-            return dateTimeFormatter.print((LocalDateTime) value);
         }
+        if (value instanceof LocalDateTime localdatetime) {
+            return dateTimeFormatter.format(localdatetime);
+        }
+        throw new IllegalArgumentException("Cannot convert " + value.getClass() + " to LocalDateTime");
     }
 
     @Override
@@ -60,7 +60,7 @@ public class LocalDateTimeEditor extends PropertyEditorSupport {
         if (Strings.isNullOrEmpty(text)) {
             setValue(null);
         } else {
-            setValue(dateTimeFormatter.parseLocalDateTime(text));
+            setValue(LocalDateTime.parse(text, dateTimeFormatter));
         }
     }
 }

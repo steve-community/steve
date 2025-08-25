@@ -125,9 +125,8 @@
                     <includeJsr303Annotations>true</includeJsr303Annotations>
                     <includeGeneratedAnnotation>false</includeGeneratedAnnotation>
                     <useJakartaValidation>true</useJakartaValidation>
-                    <useJodaDates>true</useJodaDates>
-                    <useJodaLocalDates>true</useJodaLocalDates>
-                    <useJodaLocalTimes>true</useJodaLocalTimes>
+                    <dateType>java.time.LocalDate</dateType>
+                    <dateTimeType>java.time.OffsetDateTime</dateTimeType>
                 </configuration>
                 <executions>
                     <execution>

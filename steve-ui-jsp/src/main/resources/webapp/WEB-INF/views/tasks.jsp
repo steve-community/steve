@@ -18,6 +18,7 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 --%>
+<%@ taglib prefix="f" uri="https://www.steve-project.org/tld/datetime" %>
 <%@ include file="00-header.jsp" %>
 <script type="text/javascript">
     $(document).ready(function() {
@@ -47,8 +48,8 @@
         <c:forEach items="${taskList}" var="task">
             <tr><td><a href="${ctxPath}/manager/operations/tasks/${task.taskId}">${task.taskId}</a></td>
                 <td>${task.origin}</td>
-                <td data-sort-value="${task.start.millis}">${task.start}</td>
-                <td data-sort-value="${task.end.millis}">${task.end}</td>
+                <td data-sort-value="${f:toMillis(task.start)}">${task.start}</td>
+                <td data-sort-value="${f:toMillis(task.end)}">${task.end}</td>
                 <td>${task.responseCount} / ${task.requestCount}</td>
             </tr>
         </c:forEach>

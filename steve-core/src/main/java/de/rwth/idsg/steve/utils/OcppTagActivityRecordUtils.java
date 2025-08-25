@@ -21,13 +21,14 @@ package de.rwth.idsg.steve.utils;
 import jooq.steve.db.tables.records.OcppTagActivityRecord;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
-import org.joda.time.DateTime;
+
+import java.time.LocalDateTime;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class OcppTagActivityRecordUtils {
 
-    public static boolean isExpired(OcppTagActivityRecord record, DateTime now) {
-        DateTime expiry = record.getExpiryDate();
+    public static boolean isExpired(OcppTagActivityRecord record, LocalDateTime now) {
+        var expiry = record.getExpiryDate();
         return expiry != null && now.isAfter(expiry);
     }
 

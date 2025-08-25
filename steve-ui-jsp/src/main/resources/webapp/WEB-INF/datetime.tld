@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+
+    SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
+    Copyright (C) 2013-2025 SteVe Community Team
+    All Rights Reserved.
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+-->
+<taglib xmlns="http://java.sun.com/xml/ns/javaee"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://java.sun.com/xml/ns/javaee
+                            http://java.sun.com/xml/ns/javaee/web-jsptaglibrary_2_1.xsd"
+        version="2.1">
+
+    <tlib-version>1.0</tlib-version>
+    <short-name>f</short-name>
+    <uri>https://www.steve-project.org/tld/datetime</uri>
+
+    <function>
+        <name>toMillis</name>
+        <function-class>de.rwth.idsg.steve.utils.JspDateTimeUtils</function-class>
+        <function-signature>long toMillis(java.time.LocalDateTime)</function-signature>
+    </function>
+    <function>
+        <name>offsetToMillis</name>
+        <function-class>de.rwth.idsg.steve.utils.JspDateTimeUtils</function-class>
+        <function-signature>long toMillis(java.time.OffsetDateTime)</function-signature>
+    </function>
+</taglib>

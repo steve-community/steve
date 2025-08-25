@@ -1,0 +1,16 @@
+<bindings xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+          xmlns="https://jakarta.ee/xml/ns/jaxws">
+
+    <bindings wsdlLocation="wsdl/chargepointservice.wsdl" node="wsdl:definitions">
+        <enableAsyncMapping>true</enableAsyncMapping>
+    </bindings>
+
+    <bindings wsdlLocation="wsdl/ocpp_chargepointservice_1.5_final.wsdl" node="wsdl:definitions">
+        <enableAsyncMapping>true</enableAsyncMapping>
+    </bindings>
+
+    <bindings wsdlLocation="wsdl/OCPP_ChargePointService_1.6.wsdl" node="wsdl:definitions">
+        <enableAsyncMapping>true</enableAsyncMapping>
+    </bindings>
+
+</bindings>

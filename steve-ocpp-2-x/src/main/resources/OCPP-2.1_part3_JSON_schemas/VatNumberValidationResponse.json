@@ -1,0 +1,132 @@
+{
+    "$schema": "http://json-schema.org/draft-06/schema#",
+    "$id": "urn:OCPP:Cp:2:2025:1:VatNumberValidationResponse",
+    "comment": "OCPP 2.1 Edition 1 (c) OCA, Creative Commons Attribution-NoDerivatives 4.0 International Public License",
+    "definitions": {
+        "GenericStatusEnumType": {
+            "description": "Result of operation.\r\n",
+            "javaType": "GenericStatusEnum",
+            "type": "string",
+            "additionalProperties": false,
+            "enum": [
+                "Accepted",
+                "Rejected"
+            ]
+        },
+        "AddressType": {
+            "description": "*(2.1)* A generic address format.\r\n",
+            "javaType": "Address",
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "name": {
+                    "description": "Name of person/company\r\n",
+                    "type": "string",
+                    "maxLength": 50
+                },
+                "address1": {
+                    "description": "Address line 1\r\n",
+                    "type": "string",
+                    "maxLength": 100
+                },
+                "address2": {
+                    "description": "Address line 2\r\n",
+                    "type": "string",
+                    "maxLength": 100
+                },
+                "city": {
+                    "description": "City\r\n",
+                    "type": "string",
+                    "maxLength": 100
+                },
+                "postalCode": {
+                    "description": "Postal code\r\n",
+                    "type": "string",
+                    "maxLength": 20
+                },
+                "country": {
+                    "description": "Country name\r\n",
+                    "type": "string",
+                    "maxLength": 50
+                },
+                "customData": {
+                    "$ref": "#/definitions/CustomDataType"
+                }
+            },
+            "required": [
+                "name",
+                "address1",
+                "city",
+                "country"
+            ]
+        },
+        "StatusInfoType": {
+            "description": "Element providing more information about the status.\r\n",
+            "javaType": "StatusInfo",
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "reasonCode": {
+                    "description": "A predefined code for the reason why the status is returned in this response. The string is case-insensitive.\r\n",
+                    "type": "string",
+                    "maxLength": 20
+                },
+                "additionalInfo": {
+                    "description": "Additional text to provide detailed information.\r\n",
+                    "type": "string",
+                    "maxLength": 1024
+                },
+                "customData": {
+                    "$ref": "#/definitions/CustomDataType"
+                }
+            },
+            "required": [
+                "reasonCode"
+            ]
+        },
+        "CustomDataType": {
+            "description": "This class does not get 'AdditionalProperties = false' in the schema generation, so it can be extended with arbitrary JSON properties to allow adding custom data.",
+            "javaType": "CustomData",
+            "type": "object",
+            "properties": {
+                "vendorId": {
+                    "type": "string",
+                    "maxLength": 255
+                }
+            },
+            "required": [
+                "vendorId"
+            ]
+        }
+    },
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+        "company": {
+            "$ref": "#/definitions/AddressType"
+        },
+        "statusInfo": {
+            "$ref": "#/definitions/StatusInfoType"
+        },
+        "vatNumber": {
+            "description": "VAT number that was requested.\r\n\r\n",
+            "type": "string",
+            "maxLength": 20
+        },
+        "evseId": {
+            "description": "EVSE id for which check was requested. \r\n\r\n",
+            "type": "integer",
+            "minimum": 0.0
+        },
+        "status": {
+            "$ref": "#/definitions/GenericStatusEnumType"
+        },
+        "customData": {
+            "$ref": "#/definitions/CustomDataType"
+        }
+    },
+    "required": [
+        "vatNumber",
+        "status"
+    ]
+}

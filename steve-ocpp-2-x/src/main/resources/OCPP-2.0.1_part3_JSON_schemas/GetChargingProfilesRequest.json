@@ -1,0 +1,103 @@
+{
+  "$schema": "http://json-schema.org/draft-06/schema#",
+  "$id": "urn:OCPP:Cp:2:2020:3:GetChargingProfilesRequest",
+  "comment": "OCPP 2.0.1 FINAL",
+  "definitions": {
+    "CustomDataType": {
+      "description": "This class does not get 'AdditionalProperties = false' in the schema generation, so it can be extended with arbitrary JSON properties to allow adding custom data.",
+      "javaType": "CustomData",
+      "type": "object",
+      "properties": {
+        "vendorId": {
+          "type": "string",
+          "maxLength": 255
+        }
+      },
+      "required": [
+        "vendorId"
+      ]
+    },
+    "ChargingLimitSourceEnumType": {
+      "javaType": "ChargingLimitSourceEnum",
+      "type": "string",
+      "additionalProperties": false,
+      "enum": [
+        "EMS",
+        "Other",
+        "SO",
+        "CSO"
+      ]
+    },
+    "ChargingProfilePurposeEnumType": {
+      "description": "Charging_ Profile. Charging_ Profile_ Purpose. Charging_ Profile_ Purpose_ Code\r\nurn:x-oca:ocpp:uid:1:569231\r\nDefines the purpose of the schedule transferred by this profile\r\n",
+      "javaType": "ChargingProfilePurposeEnum",
+      "type": "string",
+      "additionalProperties": false,
+      "enum": [
+        "ChargingStationExternalConstraints",
+        "ChargingStationMaxProfile",
+        "TxDefaultProfile",
+        "TxProfile"
+      ]
+    },
+    "ChargingProfileCriterionType": {
+      "description": "Charging_ Profile\r\nurn:x-oca:ocpp:uid:2:233255\r\nA ChargingProfile consists of ChargingSchedule, describing the amount of power or current that can be delivered per time interval.\r\n",
+      "javaType": "ChargingProfileCriterion",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "customData": {
+          "$ref": "#/definitions/CustomDataType"
+        },
+        "chargingProfilePurpose": {
+          "$ref": "#/definitions/ChargingProfilePurposeEnumType"
+        },
+        "stackLevel": {
+          "description": "Charging_ Profile. Stack_ Level. Counter\r\nurn:x-oca:ocpp:uid:1:569230\r\nValue determining level in hierarchy stack of profiles. Higher values have precedence over lower values. Lowest level is 0.\r\n",
+          "type": "integer"
+        },
+        "chargingProfileId": {
+          "description": "List of all the chargingProfileIds requested. Any ChargingProfile that matches one of these profiles will be reported. If omitted, the Charging Station SHALL not filter on chargingProfileId. This field SHALL NOT contain more ids than set in &lt;&lt;configkey-charging-profile-entries,ChargingProfileEntries.maxLimit&gt;&gt;\r\n\r\n",
+          "type": "array",
+          "additionalItems": false,
+          "items": {
+            "type": "integer"
+          },
+          "minItems": 1
+        },
+        "chargingLimitSource": {
+          "description": "For which charging limit sources, charging profiles SHALL be reported. If omitted, the Charging Station SHALL not filter on chargingLimitSource.\r\n",
+          "type": "array",
+          "additionalItems": false,
+          "items": {
+            "$ref": "#/definitions/ChargingLimitSourceEnumType"
+          },
+          "minItems": 1,
+          "maxItems": 4
+        }
+      }
+    }
+  },
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "customData": {
+      "$ref": "#/definitions/CustomDataType"
+    },
+    "requestId": {
+      "description": "Reference identification that is to be used by the Charging Station in the &lt;&lt;reportchargingprofilesrequest, ReportChargingProfilesRequest&gt;&gt; when provided.\r\n",
+      "type": "integer"
+    },
+    "evseId": {
+      "description": "For which EVSE installed charging profiles SHALL be reported. If 0, only charging profiles installed on the Charging Station itself (the grid connection) SHALL be reported. If omitted, all installed charging profiles SHALL be reported.\r\n",
+      "type": "integer"
+    },
+    "chargingProfile": {
+      "$ref": "#/definitions/ChargingProfileCriterionType"
+    }
+  },
+  "required": [
+    "requestId",
+    "chargingProfile"
+  ]
+}

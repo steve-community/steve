@@ -1,0 +1,114 @@
+{
+    "$schema": "http://json-schema.org/draft-06/schema#",
+    "$id": "urn:OCPP:Cp:2:2025:1:BootNotificationRequest",
+    "comment": "OCPP 2.1 Edition 1 (c) OCA, Creative Commons Attribution-NoDerivatives 4.0 International Public License",
+    "definitions": {
+        "BootReasonEnumType": {
+            "description": "This contains the reason for sending this message to the CSMS.\r\n",
+            "javaType": "BootReasonEnum",
+            "type": "string",
+            "additionalProperties": false,
+            "enum": [
+                "ApplicationReset",
+                "FirmwareUpdate",
+                "LocalReset",
+                "PowerUp",
+                "RemoteReset",
+                "ScheduledReset",
+                "Triggered",
+                "Unknown",
+                "Watchdog"
+            ]
+        },
+        "ChargingStationType": {
+            "description": "The physical system where an Electrical Vehicle (EV) can be charged.\r\n",
+            "javaType": "ChargingStation",
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "serialNumber": {
+                    "description": "Vendor-specific device identifier.\r\n",
+                    "type": "string",
+                    "maxLength": 25
+                },
+                "model": {
+                    "description": "Defines the model of the device.\r\n",
+                    "type": "string",
+                    "maxLength": 20
+                },
+                "modem": {
+                    "$ref": "#/definitions/ModemType"
+                },
+                "vendorName": {
+                    "description": "Identifies the vendor (not necessarily in a unique manner).\r\n",
+                    "type": "string",
+                    "maxLength": 50
+                },
+                "firmwareVersion": {
+                    "description": "This contains the firmware version of the Charging Station.\r\n\r\n",
+                    "type": "string",
+                    "maxLength": 50
+                },
+                "customData": {
+                    "$ref": "#/definitions/CustomDataType"
+                }
+            },
+            "required": [
+                "model",
+                "vendorName"
+            ]
+        },
+        "ModemType": {
+            "description": "Defines parameters required for initiating and maintaining wireless communication with other devices.\r\n",
+            "javaType": "Modem",
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "iccid": {
+                    "description": "This contains the ICCID of the modem\u2019s SIM card.\r\n",
+                    "type": "string",
+                    "maxLength": 20
+                },
+                "imsi": {
+                    "description": "This contains the IMSI of the modem\u2019s SIM card.\r\n",
+                    "type": "string",
+                    "maxLength": 20
+                },
+                "customData": {
+                    "$ref": "#/definitions/CustomDataType"
+                }
+            }
+        },
+        "CustomDataType": {
+            "description": "This class does not get 'AdditionalProperties = false' in the schema generation, so it can be extended with arbitrary JSON properties to allow adding custom data.",
+            "javaType": "CustomData",
+            "type": "object",
+            "properties": {
+                "vendorId": {
+                    "type": "string",
+                    "maxLength": 255
+                }
+            },
+            "required": [
+                "vendorId"
+            ]
+        }
+    },
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+        "chargingStation": {
+            "$ref": "#/definitions/ChargingStationType"
+        },
+        "reason": {
+            "$ref": "#/definitions/BootReasonEnumType"
+        },
+        "customData": {
+            "$ref": "#/definitions/CustomDataType"
+        }
+    },
+    "required": [
+        "reason",
+        "chargingStation"
+    ]
+}

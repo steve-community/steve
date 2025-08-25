@@ -1,0 +1,97 @@
+{
+    "$schema": "http://json-schema.org/draft-06/schema#",
+    "$id": "urn:OCPP:Cp:2:2025:1:RequestBatterySwapRequest",
+    "comment": "OCPP 2.1 Edition 1 (c) OCA, Creative Commons Attribution-NoDerivatives 4.0 International Public License",
+    "definitions": {
+        "AdditionalInfoType": {
+            "description": "Contains a case insensitive identifier to use for the authorization and the type of authorization to support multiple forms of identifiers.\r\n",
+            "javaType": "AdditionalInfo",
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "additionalIdToken": {
+                    "description": "*(2.1)* This field specifies the additional IdToken.\r\n",
+                    "type": "string",
+                    "maxLength": 255
+                },
+                "type": {
+                    "description": "_additionalInfo_ can be used to send extra information to CSMS in addition to the regular authorization with _IdToken_. _AdditionalInfo_ contains one or more custom _types_, which need to be agreed upon by all parties involved. When the _type_ is not supported, the CSMS/Charging Station MAY ignore the _additionalInfo_.\r\n\r\n",
+                    "type": "string",
+                    "maxLength": 50
+                },
+                "customData": {
+                    "$ref": "#/definitions/CustomDataType"
+                }
+            },
+            "required": [
+                "additionalIdToken",
+                "type"
+            ]
+        },
+        "IdTokenType": {
+            "description": "Contains a case insensitive identifier to use for the authorization and the type of authorization to support multiple forms of identifiers.\r\n",
+            "javaType": "IdToken",
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "additionalInfo": {
+                    "type": "array",
+                    "additionalItems": false,
+                    "items": {
+                        "$ref": "#/definitions/AdditionalInfoType"
+                    },
+                    "minItems": 1
+                },
+                "idToken": {
+                    "description": "*(2.1)* IdToken is case insensitive. Might hold the hidden id of an RFID tag, but can for example also contain a UUID.\r\n",
+                    "type": "string",
+                    "maxLength": 255
+                },
+                "type": {
+                    "description": "*(2.1)* Enumeration of possible idToken types. Values defined in Appendix as IdTokenEnumStringType.\r\n",
+                    "type": "string",
+                    "maxLength": 20
+                },
+                "customData": {
+                    "$ref": "#/definitions/CustomDataType"
+                }
+            },
+            "required": [
+                "idToken",
+                "type"
+            ]
+        },
+        "CustomDataType": {
+            "description": "This class does not get 'AdditionalProperties = false' in the schema generation, so it can be extended with arbitrary JSON properties to allow adding custom data.",
+            "javaType": "CustomData",
+            "type": "object",
+            "properties": {
+                "vendorId": {
+                    "type": "string",
+                    "maxLength": 255
+                }
+            },
+            "required": [
+                "vendorId"
+            ]
+        }
+    },
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+        "idToken": {
+            "$ref": "#/definitions/IdTokenType"
+        },
+        "requestId": {
+            "description": "Request id to match with BatterySwapRequest.\r\n\r\n",
+            "type": "integer"
+        },
+        "customData": {
+            "$ref": "#/definitions/CustomDataType"
+        }
+    },
+    "required": [
+        "requestId",
+        "idToken"
+    ]
+}

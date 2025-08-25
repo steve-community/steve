@@ -1,0 +1,169 @@
+{
+    "$schema": "http://json-schema.org/draft-06/schema#",
+    "$id": "urn:OCPP:Cp:2:2025:1:BatterySwapRequest",
+    "comment": "OCPP 2.1 Edition 1 (c) OCA, Creative Commons Attribution-NoDerivatives 4.0 International Public License",
+    "definitions": {
+        "BatterySwapEventEnumType": {
+            "description": "Battery in/out\r\n",
+            "javaType": "BatterySwapEventEnum",
+            "type": "string",
+            "additionalProperties": false,
+            "enum": [
+                "BatteryIn",
+                "BatteryOut",
+                "BatteryOutTimeout"
+            ]
+        },
+        "AdditionalInfoType": {
+            "description": "Contains a case insensitive identifier to use for the authorization and the type of authorization to support multiple forms of identifiers.\r\n",
+            "javaType": "AdditionalInfo",
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "additionalIdToken": {
+                    "description": "*(2.1)* This field specifies the additional IdToken.\r\n",
+                    "type": "string",
+                    "maxLength": 255
+                },
+                "type": {
+                    "description": "_additionalInfo_ can be used to send extra information to CSMS in addition to the regular authorization with _IdToken_. _AdditionalInfo_ contains one or more custom _types_, which need to be agreed upon by all parties involved. When the _type_ is not supported, the CSMS/Charging Station MAY ignore the _additionalInfo_.\r\n\r\n",
+                    "type": "string",
+                    "maxLength": 50
+                },
+                "customData": {
+                    "$ref": "#/definitions/CustomDataType"
+                }
+            },
+            "required": [
+                "additionalIdToken",
+                "type"
+            ]
+        },
+        "BatteryDataType": {
+            "javaType": "BatteryData",
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "evseId": {
+                    "description": "Slot number where battery is inserted or removed.\r\n",
+                    "type": "integer",
+                    "minimum": 0.0
+                },
+                "serialNumber": {
+                    "description": "Serial number of battery.\r\n",
+                    "type": "string",
+                    "maxLength": 50
+                },
+                "soC": {
+                    "description": "State of charge\r\n",
+                    "type": "number",
+                    "minimum": 0.0,
+                    "maximum": 100.0
+                },
+                "soH": {
+                    "description": "State of health\r\n\r\n",
+                    "type": "number",
+                    "minimum": 0.0,
+                    "maximum": 100.0
+                },
+                "productionDate": {
+                    "description": "Production date of battery.\r\n\r\n",
+                    "type": "string",
+                    "format": "date-time"
+                },
+                "vendorInfo": {
+                    "description": "Vendor-specific info from battery in undefined format.\r\n",
+                    "type": "string",
+                    "maxLength": 500
+                },
+                "customData": {
+                    "$ref": "#/definitions/CustomDataType"
+                }
+            },
+            "required": [
+                "evseId",
+                "serialNumber",
+                "soC",
+                "soH"
+            ]
+        },
+        "IdTokenType": {
+            "description": "Contains a case insensitive identifier to use for the authorization and the type of authorization to support multiple forms of identifiers.\r\n",
+            "javaType": "IdToken",
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "additionalInfo": {
+                    "type": "array",
+                    "additionalItems": false,
+                    "items": {
+                        "$ref": "#/definitions/AdditionalInfoType"
+                    },
+                    "minItems": 1
+                },
+                "idToken": {
+                    "description": "*(2.1)* IdToken is case insensitive. Might hold the hidden id of an RFID tag, but can for example also contain a UUID.\r\n",
+                    "type": "string",
+                    "maxLength": 255
+                },
+                "type": {
+                    "description": "*(2.1)* Enumeration of possible idToken types. Values defined in Appendix as IdTokenEnumStringType.\r\n",
+                    "type": "string",
+                    "maxLength": 20
+                },
+                "customData": {
+                    "$ref": "#/definitions/CustomDataType"
+                }
+            },
+            "required": [
+                "idToken",
+                "type"
+            ]
+        },
+        "CustomDataType": {
+            "description": "This class does not get 'AdditionalProperties = false' in the schema generation, so it can be extended with arbitrary JSON properties to allow adding custom data.",
+            "javaType": "CustomData",
+            "type": "object",
+            "properties": {
+                "vendorId": {
+                    "type": "string",
+                    "maxLength": 255
+                }
+            },
+            "required": [
+                "vendorId"
+            ]
+        }
+    },
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+        "batteryData": {
+            "type": "array",
+            "additionalItems": false,
+            "items": {
+                "$ref": "#/definitions/BatteryDataType"
+            },
+            "minItems": 1
+        },
+        "eventType": {
+            "$ref": "#/definitions/BatterySwapEventEnumType"
+        },
+        "idToken": {
+            "$ref": "#/definitions/IdTokenType"
+        },
+        "requestId": {
+            "description": "RequestId to correlate BatteryIn/Out events and optional RequestBatterySwapRequest.\r\n\r\n\r\n",
+            "type": "integer"
+        },
+        "customData": {
+            "$ref": "#/definitions/CustomDataType"
+        }
+    },
+    "required": [
+        "eventType",
+        "requestId",
+        "idToken",
+        "batteryData"
+    ]
+}

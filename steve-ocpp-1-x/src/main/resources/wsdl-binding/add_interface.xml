@@ -1,0 +1,27 @@
+<jaxws:bindings xmlns:jaxws="https://jakarta.ee/xml/ns/jaxws"
+                xmlns:xs="http://www.w3.org/2001/XMLSchema"
+                xmlns:jaxb="https://jakarta.ee/xml/ns/jaxb"
+                xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+                xmlns:annox="urn:jaxb.jvnet.org:annox"
+                xmlns:inheritance="urn:jaxb.jvnet.org:plugin:inheritance"
+                jaxb:extensionBindingPrefixes="inheritance annox">
+
+    <jaxws:bindings node="wsdl:definitions/wsdl:types/xs:schema">
+
+        <jaxb:bindings node="xs:complexType">
+            <annox:annotateClass>@lombok.ToString</annox:annotateClass>
+        </jaxb:bindings>
+
+        <!-- select all complex types whose names end with 'Request' -->
+        <jaxb:bindings node="xs:complexType[substring(@name, string-length(@name) - string-length('Request') + 1) = 'Request']">
+            <inheritance:implements>de.rwth.idsg.ocpp.jaxb.RequestType</inheritance:implements>
+        </jaxb:bindings>
+
+        <!-- select all complex types whose names end with 'Response' -->
+        <jaxb:bindings node="xs:complexType[substring(@name, string-length(@name) - string-length('Response') + 1) = 'Response']">
+            <inheritance:implements>de.rwth.idsg.ocpp.jaxb.ResponseType</inheritance:implements>
+        </jaxb:bindings>
+
+    </jaxws:bindings>
+
+</jaxws:bindings>

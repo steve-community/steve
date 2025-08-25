@@ -54,25 +54,23 @@ import jakarta.annotation.PostConstruct;
 @Component
 public class Ocpp12WebSocketEndpoint extends AbstractWebSocketEndpoint {
 
-    private final CentralSystemService12_SoapServer server;
-    private final FutureResponseContextStore futureResponseContextStore;
+    private IncomingPipeline pipeline;
 
     public Ocpp12WebSocketEndpoint(DelegatingTaskScheduler asyncTaskScheduler,
                                    OcppServerRepository ocppServerRepository,
                                    FutureResponseContextStore futureResponseContextStore,
                                    ApplicationEventPublisher applicationEventPublisher,
                                    CentralSystemService12_SoapServer server,
+                                   Ocpp12TypeStore typeStore,
                                    SessionContextStore sessionContextStore) {
         super(asyncTaskScheduler, ocppServerRepository, futureResponseContextStore, applicationEventPublisher,
             sessionContextStore);
-        this.server = server;
-        this.futureResponseContextStore = futureResponseContextStore;
+        Deserializer deserializer = new Deserializer(futureResponseContextStore, typeStore);
+        this.pipeline = new IncomingPipeline(deserializer, new Ocpp12CallHandler(server));
     }
 
     @PostConstruct
     public void init() {
-        Deserializer deserializer = new Deserializer(futureResponseContextStore, Ocpp12TypeStore.INSTANCE);
-        IncomingPipeline pipeline = new IncomingPipeline(deserializer, new Ocpp12CallHandler(server));
         super.init(pipeline);
     }
 

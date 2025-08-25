@@ -19,14 +19,21 @@
 package de.rwth.idsg.steve.config;
 
 import com.google.common.collect.Lists;
+import de.rwth.idsg.steve.ocpp.CommunicationTask;
+import de.rwth.idsg.steve.ocpp.OcppVersion;
+import de.rwth.idsg.steve.ocpp.ws.InvocationContext;
 import de.rwth.idsg.steve.ocpp.ws.OcppWebSocketHandshakeHandler;
+import de.rwth.idsg.steve.ocpp.ws.ocpp12.Ocpp12TypeStore;
 import de.rwth.idsg.steve.ocpp.ws.ocpp12.Ocpp12WebSocketEndpoint;
+import de.rwth.idsg.steve.ocpp.ws.ocpp15.Ocpp15TypeStore;
 import de.rwth.idsg.steve.ocpp.ws.ocpp15.Ocpp15WebSocketEndpoint;
+import de.rwth.idsg.steve.ocpp.ws.ocpp16.Ocpp16TypeStore;
 import de.rwth.idsg.steve.ocpp.ws.ocpp16.Ocpp16WebSocketEndpoint;
 import de.rwth.idsg.steve.service.ChargePointRegistrationService;
 import de.rwth.idsg.steve.web.validation.ChargeBoxIdValidator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.socket.config.annotation.EnableWebSocket;
 import org.springframework.web.socket.config.annotation.WebSocketConfigurer;
@@ -34,6 +41,10 @@ import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry
 import org.springframework.web.socket.server.support.DefaultHandshakeHandler;
 
 import java.time.Duration;
+import java.util.EnumMap;
+import java.util.Map;
+
+import static de.rwth.idsg.steve.ocpp.OcppVersion.*;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -70,5 +81,19 @@ public class OcppWebSocketConfiguration implements WebSocketConfigurer {
         registry.addHandler(handshakeHandler.getDummyWebSocketHandler(), PATH_INFIX + "*")
                 .setHandshakeHandler(handshakeHandler)
                 .setAllowedOrigins("*");
+    }
+
+    @Bean
+    public Map<OcppVersion, InvocationContext> invocationContexts(Ocpp12TypeStore ocpp12TypeStore,
+                                                                  Ocpp15TypeStore ocpp15TypeStore,
+                                                                  Ocpp16TypeStore ocpp16TypeStore) {
+        var invocationContexts = new EnumMap<OcppVersion, InvocationContext>(OcppVersion .class);
+        invocationContexts.put(V_12, new InvocationContext(ocpp12WebSocketEndpoint, ocpp12TypeStore,
+                CommunicationTask::getOcpp12Request));
+        invocationContexts.put(V_15, new InvocationContext(ocpp15WebSocketEndpoint, ocpp15TypeStore,
+                CommunicationTask::getOcpp15Request));
+        invocationContexts.put(V_16, new InvocationContext(ocpp16WebSocketEndpoint, ocpp16TypeStore,
+                CommunicationTask::getOcpp16Request));
+        return invocationContexts;
     }
 }

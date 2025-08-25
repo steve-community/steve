@@ -34,7 +34,7 @@ public class TypeStoreTest {
 
     @Test
     public void ocpp12Test() {
-        Ocpp12TypeStore typeStore = Ocpp12TypeStore.INSTANCE;
+        Ocpp12TypeStore typeStore = new Ocpp12TypeStore();
 
         ActionResponsePair actionResponse = typeStore.findActionResponse(new ocpp.cp._2010._08.ResetRequest());
         Assertions.assertNotNull(actionResponse);
@@ -47,7 +47,7 @@ public class TypeStoreTest {
 
     @Test
     public void ocpp15Test() {
-        Ocpp15TypeStore typeStore = Ocpp15TypeStore.INSTANCE;
+        Ocpp15TypeStore typeStore = new Ocpp15TypeStore();
 
         ActionResponsePair actionResponse = typeStore.findActionResponse(new ocpp.cp._2012._06.UpdateFirmwareRequest());
         Assertions.assertNotNull(actionResponse);
@@ -60,7 +60,7 @@ public class TypeStoreTest {
 
     @Test
     public void ocpp16Test() {
-        Ocpp16TypeStore typeStore = Ocpp16TypeStore.INSTANCE;
+        Ocpp16TypeStore typeStore = new Ocpp16TypeStore();
 
         ActionResponsePair actionResponse = typeStore.findActionResponse(new ocpp.cp._2015._10.UpdateFirmwareRequest());
         Assertions.assertNotNull(actionResponse);

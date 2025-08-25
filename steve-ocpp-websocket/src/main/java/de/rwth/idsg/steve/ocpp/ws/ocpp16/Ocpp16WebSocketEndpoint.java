@@ -20,7 +20,6 @@ package de.rwth.idsg.steve.ocpp.ws.ocpp16;
 
 import de.rwth.idsg.ocpp.jaxb.RequestType;
 import de.rwth.idsg.ocpp.jaxb.ResponseType;
-import de.rwth.idsg.steve.SteveConfiguration;
 import de.rwth.idsg.steve.config.DelegatingTaskScheduler;
 import de.rwth.idsg.steve.ocpp.OcppProtocol;
 import de.rwth.idsg.steve.ocpp.OcppVersion;
@@ -28,7 +27,6 @@ import de.rwth.idsg.steve.ocpp.soap.CentralSystemService16_SoapServer;
 import de.rwth.idsg.steve.ocpp.ws.AbstractWebSocketEndpoint;
 import de.rwth.idsg.steve.ocpp.ws.FutureResponseContextStore;
 import de.rwth.idsg.steve.ocpp.ws.SessionContextStore;
-import de.rwth.idsg.steve.ocpp.ws.SessionContextStoreImpl;
 import de.rwth.idsg.steve.ocpp.ws.pipeline.AbstractCallHandler;
 import de.rwth.idsg.steve.ocpp.ws.pipeline.Deserializer;
 import de.rwth.idsg.steve.ocpp.ws.pipeline.IncomingPipeline;
@@ -56,25 +54,23 @@ import jakarta.annotation.PostConstruct;
 @Component
 public class Ocpp16WebSocketEndpoint extends AbstractWebSocketEndpoint {
 
-    private final CentralSystemService16_SoapServer server;
-    private final FutureResponseContextStore futureResponseContextStore;
+    private final IncomingPipeline pipeline;
 
     public Ocpp16WebSocketEndpoint(DelegatingTaskScheduler asyncTaskScheduler,
                                    OcppServerRepository ocppServerRepository,
                                    FutureResponseContextStore futureResponseContextStore,
                                    ApplicationEventPublisher applicationEventPublisher,
                                    CentralSystemService16_SoapServer server,
+                                   Ocpp16TypeStore typeStore,
                                    SessionContextStore sessionStore) {
         super(asyncTaskScheduler, ocppServerRepository, futureResponseContextStore, applicationEventPublisher,
             sessionStore);
-        this.server = server;
-        this.futureResponseContextStore = futureResponseContextStore;
+        var deserializer = new Deserializer(futureResponseContextStore, typeStore);
+        this.pipeline = new IncomingPipeline(deserializer, new Ocpp16CallHandler(server));
     }
 
     @PostConstruct
     public void init() {
-        Deserializer deserializer = new Deserializer(futureResponseContextStore, Ocpp16TypeStore.INSTANCE);
-        IncomingPipeline pipeline = new IncomingPipeline(deserializer, new Ocpp16CallHandler(server));
         super.init(pipeline);
     }
 

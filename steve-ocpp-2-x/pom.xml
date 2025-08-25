@@ -30,7 +30,7 @@
                 <version>1.5.3</version>
                 <executions>
                     <execution>
-                        <id>add-request-interface</id>
+                        <id>add-request-interface-2-0-1</id>
                         <phase>generate-resources</phase>
                         <goals>
                             <goal>replace</goal>
@@ -38,7 +38,7 @@
                         <configuration>
                             <filesToInclude>${basedir}/src/main/resources/OCPP-2.0.1_part3_JSON_schemas/*Request.json</filesToInclude>
                             <preserveDir>false</preserveDir>
-                            <outputDir>${project.build.directory}/generated-resources</outputDir>
+                            <outputDir>${project.build.directory}/generated-resources/2-0-1</outputDir>
                             <replacements>
                                 <replacement>
                                     <token>"definitions"\s*:</token>
@@ -51,7 +51,7 @@
                         </configuration>
                     </execution>
                     <execution>
-                        <id>add-response-interface</id>
+                        <id>add-response-interface-2-0-1</id>
                         <phase>generate-resources</phase>
                         <goals>
                             <goal>replace</goal>
@@ -59,7 +59,49 @@
                         <configuration>
                             <filesToInclude>${basedir}/src/main/resources/OCPP-2.0.1_part3_JSON_schemas/*Response.json</filesToInclude>
                             <preserveDir>false</preserveDir>
-                            <outputDir>${project.build.directory}/generated-resources</outputDir>
+                            <outputDir>${project.build.directory}/generated-resources/2-0-1</outputDir>
+                            <replacements>
+                                <replacement>
+                                    <token>"definitions"\s*:</token>
+                                    <value>"javaInterfaces": ["de.rwth.idsg.ocpp.jaxb.ResponseType"],
+                                        "definitions":</value>
+                                </replacement>
+                            </replacements>
+                            <regex>true</regex>
+                            <regexFlags>MULTILINE</regexFlags>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>add-request-interface-2-1</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>replace</goal>
+                        </goals>
+                        <configuration>
+                            <filesToInclude>${basedir}/src/main/resources/OCPP-2.1_part3_JSON_schemas/*Request.json</filesToInclude>
+                            <preserveDir>false</preserveDir>
+                            <outputDir>${project.build.directory}/generated-resources/2-1</outputDir>
+                            <replacements>
+                                <replacement>
+                                    <token>"definitions"\s*:</token>
+                                    <value>"javaInterfaces": ["de.rwth.idsg.ocpp.jaxb.RequestType"],
+                                        "definitions":</value>
+                                </replacement>
+                            </replacements>
+                            <regex>true</regex>
+                            <regexFlags>MULTILINE</regexFlags>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>add-response-interface-2-1</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>replace</goal>
+                        </goals>
+                        <configuration>
+                            <filesToInclude>${basedir}/src/main/resources/OCPP-2.1_part3_JSON_schemas/*Response.json</filesToInclude>
+                            <preserveDir>false</preserveDir>
+                            <outputDir>${project.build.directory}/generated-resources/2-1</outputDir>
                             <replacements>
                                 <replacement>
                                     <token>"definitions"\s*:</token>
@@ -78,9 +120,7 @@
                 <artifactId>jsonschema2pojo-maven-plugin</artifactId>
                 <version>1.2.1</version>
                 <configuration>
-                    <sourceDirectory>${project.build.directory}/generated-resources</sourceDirectory>
                     <outputDirectory>${project.build.directory}/generated-sources</outputDirectory>
-                    <targetPackage>ocpp._2020._03</targetPackage>
                     <generateBuilders>true</generateBuilders>
                     <includeJsr303Annotations>true</includeJsr303Annotations>
                     <includeGeneratedAnnotation>false</includeGeneratedAnnotation>
@@ -91,10 +131,26 @@
                 </configuration>
                 <executions>
                     <execution>
+                        <id>generate-2-0-1</id>
                         <phase>process-resources</phase>
                         <goals>
                             <goal>generate</goal>
                         </goals>
+                        <configuration>
+                            <sourceDirectory>${project.build.directory}/generated-resources/2-0-1</sourceDirectory>
+                            <targetPackage>ocpp._2020._03</targetPackage>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>generate-2-1</id>
+                        <phase>process-resources</phase>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                        <configuration>
+                            <sourceDirectory>${project.build.directory}/generated-resources/2-1</sourceDirectory>
+                            <targetPackage>ocpp._2025._01</targetPackage>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>

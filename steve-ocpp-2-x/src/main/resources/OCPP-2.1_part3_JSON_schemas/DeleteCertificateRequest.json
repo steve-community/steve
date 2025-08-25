@@ -1,0 +1,79 @@
+{
+    "$schema": "http://json-schema.org/draft-06/schema#",
+    "$id": "urn:OCPP:Cp:2:2025:1:DeleteCertificateRequest",
+    "comment": "OCPP 2.1 Edition 1 (c) OCA, Creative Commons Attribution-NoDerivatives 4.0 International Public License",
+    "definitions": {
+        "HashAlgorithmEnumType": {
+            "description": "Used algorithms for the hashes provided.\r\n",
+            "javaType": "HashAlgorithmEnum",
+            "type": "string",
+            "additionalProperties": false,
+            "enum": [
+                "SHA256",
+                "SHA384",
+                "SHA512"
+            ]
+        },
+        "CertificateHashDataType": {
+            "javaType": "CertificateHashData",
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "hashAlgorithm": {
+                    "$ref": "#/definitions/HashAlgorithmEnumType"
+                },
+                "issuerNameHash": {
+                    "description": "The hash of the issuer\u2019s distinguished\r\nname (DN), that must be calculated over the DER\r\nencoding of the issuer\u2019s name field in the certificate\r\nbeing checked.\r\n\r\n",
+                    "type": "string",
+                    "maxLength": 128
+                },
+                "issuerKeyHash": {
+                    "description": "The hash of the DER encoded public key:\r\nthe value (excluding tag and length) of the subject\r\npublic key field in the issuer\u2019s certificate.\r\n",
+                    "type": "string",
+                    "maxLength": 128
+                },
+                "serialNumber": {
+                    "description": "The string representation of the\r\nhexadecimal value of the serial number without the\r\nprefix \"0x\" and without leading zeroes.\r\n",
+                    "type": "string",
+                    "maxLength": 40
+                },
+                "customData": {
+                    "$ref": "#/definitions/CustomDataType"
+                }
+            },
+            "required": [
+                "hashAlgorithm",
+                "issuerNameHash",
+                "issuerKeyHash",
+                "serialNumber"
+            ]
+        },
+        "CustomDataType": {
+            "description": "This class does not get 'AdditionalProperties = false' in the schema generation, so it can be extended with arbitrary JSON properties to allow adding custom data.",
+            "javaType": "CustomData",
+            "type": "object",
+            "properties": {
+                "vendorId": {
+                    "type": "string",
+                    "maxLength": 255
+                }
+            },
+            "required": [
+                "vendorId"
+            ]
+        }
+    },
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+        "certificateHashData": {
+            "$ref": "#/definitions/CertificateHashDataType"
+        },
+        "customData": {
+            "$ref": "#/definitions/CustomDataType"
+        }
+    },
+    "required": [
+        "certificateHashData"
+    ]
+}

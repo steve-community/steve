@@ -1,0 +1,41 @@
+{
+    "$schema": "http://json-schema.org/draft-06/schema#",
+    "$id": "urn:OCPP:Cp:2:2025:1:NotifyPriorityChargingRequest",
+    "comment": "OCPP 2.1 Edition 1 (c) OCA, Creative Commons Attribution-NoDerivatives 4.0 International Public License",
+    "definitions": {
+        "CustomDataType": {
+            "description": "This class does not get 'AdditionalProperties = false' in the schema generation, so it can be extended with arbitrary JSON properties to allow adding custom data.",
+            "javaType": "CustomData",
+            "type": "object",
+            "properties": {
+                "vendorId": {
+                    "type": "string",
+                    "maxLength": 255
+                }
+            },
+            "required": [
+                "vendorId"
+            ]
+        }
+    },
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+        "transactionId": {
+            "description": "The transaction for which priority charging is requested.\r\n",
+            "type": "string",
+            "maxLength": 36
+        },
+        "activated": {
+            "description": "True if priority charging was activated. False if it has stopped using the priority charging profile.\r\n",
+            "type": "boolean"
+        },
+        "customData": {
+            "$ref": "#/definitions/CustomDataType"
+        }
+    },
+    "required": [
+        "transactionId",
+        "activated"
+    ]
+}

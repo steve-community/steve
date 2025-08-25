@@ -18,7 +18,6 @@
  */
 package de.rwth.idsg.ocpp.jaxb;
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -27,10 +26,15 @@ import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeParseException;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.stream.Stream;
 
 import static de.rwth.idsg.ocpp.DateTimeUtils.toOffsetDateTime;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import static org.assertj.core.api.Assertions.byLessThan;
 
 class JavaDateTimeConverterTest {
 
@@ -43,10 +47,10 @@ class JavaDateTimeConverterTest {
     void testMarshalNullInput(ZoneId zoneId) {
         var converterUtc = new JavaDateTimeConverter(zoneId, true);
         var valUtc = converterUtc.marshal(null);
-        Assertions.assertNull(valUtc);
+        assertThat(valUtc).isNull();
         var converter = new JavaDateTimeConverter(zoneId, false);
         var val = converter.marshal(null);
-        Assertions.assertNull(val);
+        assertThat(val).isNull();
     }
 
     @ParameterizedTest
@@ -54,11 +58,11 @@ class JavaDateTimeConverterTest {
     void testMarshalUtcValidInput(ZoneId zoneId, OffsetDateTime val, String expected, boolean marshallToUtc) {
         var converter = new JavaDateTimeConverter(zoneId, marshallToUtc);
         var output = converter.marshal(val);
-        Assertions.assertEquals(expected, output);
+        assertThat(output).isEqualTo(expected);
     }
 
     private static Stream<Arguments> provideValidMarshallingInput() {
-        Stream<Arguments> marchallUtcInputs = Stream.of( //
+        var marchallUtcInputs = Stream.of( //
                 Arguments.of("2022-06-30T01:20:52+02:00", "2022-06-29T23:20:52.000Z", true),
                 Arguments.of("2022-06-30T01:20:52Z", "2022-06-30T01:20:52.000Z", true),
                 Arguments.of("2022-06-30T01:20:52+00:00", "2022-06-30T01:20:52.000Z", true),
@@ -75,7 +79,7 @@ class JavaDateTimeConverterTest {
                                 input.get()[1], // expected
                                 input.get()[2] // marshallToUtc
                         )));
-        Stream<Arguments> marchallTzInputs =  Stream.of( //
+        var marchallTzInputs =  Stream.of( //
                 Arguments.of("UTC", "2022-06-30T01:20:52+02:00", "2022-06-29T23:20:52.000Z", false),
                 Arguments.of("Europe/Berlin", "2022-06-30T01:20:52+02:00", "2022-06-30T01:20:52.000+02:00", false),
                 Arguments.of("-05:00", "2022-06-30T01:20:52+02:00", "2022-06-29T18:20:52.000-05:00", false),
@@ -125,28 +129,28 @@ class JavaDateTimeConverterTest {
     void testUnmarshalValid(ZoneId zoneId, String val, ZonedDateTime expected) {
         var converter = new JavaDateTimeConverter(zoneId, true);
         var actual = converter.unmarshal(val);
-        Assertions.assertEquals(expected.toInstant(), actual.toInstant());
+        assertThat(actual).isCloseTo(expected.toOffsetDateTime(), byLessThan(1, ChronoUnit.SECONDS));
     }
 
     @ParameterizedTest
     @MethodSource("provideZoneIds")
     void testUnmarshalNullInput(ZoneId zoneId) {
         var converter = new JavaDateTimeConverter(zoneId, true);
-        Assertions.assertDoesNotThrow(() -> converter.unmarshal(null));
+        assertThatCode(() -> converter.unmarshal(null)).doesNotThrowAnyException();
     }
 
     @ParameterizedTest
     @MethodSource("provideValidEmptyUnmarshallingInput")
     void testUnmarshalEmptyInput(ZoneId zoneId, String val) {
         var converter = new JavaDateTimeConverter(zoneId, true);
-        Assertions.assertDoesNotThrow(() -> converter.unmarshal(val));
+        assertThatCode(() -> converter.unmarshal(val)).doesNotThrowAnyException();
     }
 
     @ParameterizedTest
     @MethodSource("provideInvalidUnmarshallingInput")
     void testUnmarshalInvalid(ZoneId zoneId, String val) {
         var converter = new JavaDateTimeConverter(zoneId, true);
-        Assertions.assertThrows(DateTimeParseException.class, () -> converter.unmarshal(val));
+        assertThatExceptionOfType(DateTimeParseException.class).isThrownBy(() -> converter.unmarshal(val));
     }
 
     private static final List<ZoneId> ZONE_IDS = Stream.of( //
@@ -163,7 +167,7 @@ class JavaDateTimeConverterTest {
     }
 
     private static Stream<Arguments> provideValidUnmarshallingInput() {
-        Stream<Arguments> validInputs = Stream.of( //
+        var validInputs = Stream.of( //
                 Arguments.of("2022-06-30T01:20:52+02:00", "2022-06-29T23:20:52.000Z"),
                 Arguments.of("2022-06-30T01:20:52+02:00", "2022-06-30T01:20:52.000+02:00[Europe/Berlin]"),
                 Arguments.of("2022-06-30T01:20:52+02:00", "2022-06-29T18:20:52.000-05:00[America/New_York]"),
@@ -186,7 +190,7 @@ class JavaDateTimeConverterTest {
         ).flatMap(
                 input -> ZONE_IDS.stream()
                         .map(tz -> Arguments.of(tz, input.get()[0], ZonedDateTime.parse((String) input.get()[1]))));
-        Stream<Arguments> withoutOffsetInputs = Stream.of( //
+        var withoutOffsetInputs = Stream.of( //
                 tz("UTC", "2022-06-30T01:20:52", "2022-06-30T01:20:52.000Z"),
                 tz("Europe/Berlin", "2022-06-30T01:20:52", "2022-06-30T01:20:52.000+02:00[Europe/Berlin]"),
                 tz("-05:00", "2022-06-30T01:20:52", "2022-06-30T01:20:52.000-05:00[America/New_York]"),

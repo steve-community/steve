@@ -29,14 +29,15 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.assertj.MockMvcTester;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.util.Collections;
 import java.util.List;
 
-import static org.hamcrest.Matchers.hasSize;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.verify;
@@ -45,8 +46,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ExtendWith(MockitoExtension.class)
 public class ChargePointsRestControllerTest extends AbstractControllerTest {
@@ -54,7 +53,7 @@ public class ChargePointsRestControllerTest extends AbstractControllerTest {
     @Mock
     private ChargePointsService chargePointsService;
 
-    private MockMvc mockMvc;
+    private MockMvcTester mockMvc;
 
     @BeforeEach
     public void setup() {
@@ -63,44 +62,47 @@ public class ChargePointsRestControllerTest extends AbstractControllerTest {
 
     @Test
     @DisplayName("GET all: Test with empty results, expected 200")
-    public void testGet_withEmptyList() throws Exception {
+    public void testGet_withEmptyList() {
         when(chargePointsService.getOverview(any())).thenReturn(Collections.emptyList());
 
-        mockMvc.perform(get("/api/v1/chargeboxes"))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$", hasSize(0)));
+        assertThat(mockMvc.perform(get("/api/v1/chargeboxes")))
+                .hasStatusOk()
+                .bodyJson()
+                .hasPathSatisfying("$", path -> assertThat(path).asArray().isEmpty());
     }
 
     @Test
     @DisplayName("GET all: Test with one result, expected 200")
-    public void testGet_withOneResult() throws Exception {
+    public void testGet_withOneResult() {
         List<ChargePoint.Overview> results = List.of(ChargePoint.Overview.builder().chargeBoxPk(1).build());
         when(chargePointsService.getOverview(any())).thenReturn(results);
 
-        mockMvc.perform(get("/api/v1/chargeboxes"))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$", hasSize(1)))
-            .andExpect(jsonPath("$[0].chargeBoxPk").value("1"));
+        assertThat(mockMvc.perform(get("/api/v1/chargeboxes")))
+                .hasStatusOk()
+                .bodyJson()
+                .hasPathSatisfying("$", path -> assertThat(path).asArray().hasSize(1))
+                .hasPathSatisfying("$[0].chargeBoxPk", path -> assertThat(path).asNumber().isEqualTo(1));
     }
 
     @Test
     @DisplayName("GET one: Entity not found, expected 404")
-    public void testGetOne_notFound() throws Exception {
+    public void testGetOne_notFound() {
         when(chargePointsService.getDetails(anyInt())).thenThrow(new NotFoundException(""));
 
-        mockMvc.perform(get("/api/v1/chargeboxes/1"))
-            .andExpect(status().isNotFound());
+        assertThat(mockMvc.perform(get("/api/v1/chargeboxes/1")))
+                .hasStatus(HttpStatus.NOT_FOUND);
     }
 
     @Test
     @DisplayName("GET one: One entity found, expected 200")
-    public void testGetOne_found() throws Exception {
+    public void testGetOne_found() {
         ChargePoint.Details result = createDetails(1, null);
         when(chargePointsService.getDetails(1)).thenReturn(result);
 
-        mockMvc.perform(get("/api/v1/chargeboxes/1"))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.chargeBoxPk").value("1"));
+        assertThat(mockMvc.perform(get("/api/v1/chargeboxes/1")))
+                .hasStatusOk()
+                .bodyJson()
+                .hasPathSatisfying("$.chargeBoxPk", path -> assertThat(path).asNumber().isEqualTo(1));
     }
 
     private static ChargePoint.Details createDetails(Integer pk, String chargeBoxId) {
@@ -123,12 +125,14 @@ public class ChargePointsRestControllerTest extends AbstractControllerTest {
         when(chargePointsService.addChargePoint(any(ChargePointForm.class))).thenReturn(1);
         when(chargePointsService.getDetails(1)).thenReturn(result);
 
-        mockMvc.perform(post("/api/v1/chargeboxes")
+        assertThat(mockMvc.perform(post("/api/v1/chargeboxes")
                 .content(objectMapper.writeValueAsString(form))
-                .contentType(MediaType.APPLICATION_JSON_VALUE))
-            .andExpect(status().isCreated())
-            .andExpect(jsonPath("$.chargeBoxPk").value("1"))
-            .andExpect(jsonPath("$.chargeBoxId").value("test-cb"));
+                .contentType(MediaType.APPLICATION_JSON)
+        ))
+                .hasStatus(HttpStatus.CREATED)
+                .bodyJson()
+                .hasPathSatisfying("$.chargeBoxPk", path -> assertThat(path).asNumber().isEqualTo(1))
+                .hasPathSatisfying("$.chargeBoxId", path -> assertThat(path).asString().isEqualTo("test-cb"));
     }
 
     @Test
@@ -143,24 +147,25 @@ public class ChargePointsRestControllerTest extends AbstractControllerTest {
 
         when(chargePointsService.getDetails(1)).thenReturn(result);
 
-        mockMvc.perform(put("/api/v1/chargeboxes/1")
+        assertThat(mockMvc.perform(put("/api/v1/chargeboxes/1")
                 .content(objectMapper.writeValueAsString(form))
-                .contentType(MediaType.APPLICATION_JSON_VALUE))
-            .andExpect(status().isOk());
+                .contentType(MediaType.APPLICATION_JSON)
+        ))
+                .hasStatusOk();
 
         verify(chargePointsService).updateChargePoint(any(ChargePointForm.class));
     }
 
     @Test
     @DisplayName("DELETE: Entity deleted, expected 200")
-    public void testDelete() throws Exception {
+    public void testDelete() {
         var rec = new ChargeBoxRecord();
         rec.setChargeBoxPk(1);
         var result = new ChargePoint.Details(rec, null);
         when(chargePointsService.getDetails(1)).thenReturn(result);
 
-        mockMvc.perform(delete("/api/v1/chargeboxes/1"))
-            .andExpect(status().isOk());
+        assertThat(mockMvc.perform(delete("/api/v1/chargeboxes/1")))
+                .hasStatusOk();
 
         verify(chargePointsService).deleteChargePoint(1);
     }

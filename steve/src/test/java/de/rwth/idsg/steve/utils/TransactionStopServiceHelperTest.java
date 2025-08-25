@@ -19,30 +19,31 @@
 package de.rwth.idsg.steve.utils;
 
 import de.rwth.idsg.steve.repository.dto.TransactionDetails;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class TransactionStopServiceHelperTest {
 
     @Test
     public void testFloatingStringToIntString() {
-        String actual = TransactionStopServiceHelper.floatingStringToIntString("11.01");
+        var actual = TransactionStopServiceHelper.floatingStringToIntString("11.01");
 
-        Assertions.assertEquals("12", actual);
+        assertThat(actual).isEqualTo("12");
     }
 
     @Test
     public void testFloatingStringToIntString2() {
-        String actual = TransactionStopServiceHelper.floatingStringToIntString("234.678");
+        var actual = TransactionStopServiceHelper.floatingStringToIntString("234.678");
 
-        Assertions.assertEquals("235", actual);
+        assertThat(actual).isEqualTo("235");
     }
 
     @Test
     public void testKWhStringToWhString() {
-        String actual = TransactionStopServiceHelper.kWhStringToWhString("12");
+        var actual = TransactionStopServiceHelper.kWhStringToWhString("12");
 
-        Assertions.assertEquals("12000.0", actual);
+        assertThat(actual).isEqualTo("12000.0");
     }
 
     @Test
@@ -50,7 +51,7 @@ public class TransactionStopServiceHelperTest {
         var value = TransactionDetails.MeterValues.builder()
             .build();
 
-        Assertions.assertFalse(TransactionStopServiceHelper.isEnergyValue(value));
+        assertThat(TransactionStopServiceHelper.isEnergyValue(value)).isFalse();
     }
 
     @Test
@@ -59,7 +60,7 @@ public class TransactionStopServiceHelperTest {
             .value("22")
             .build();
 
-        Assertions.assertTrue(TransactionStopServiceHelper.isEnergyValue(value));
+        assertThat(TransactionStopServiceHelper.isEnergyValue(value)).isTrue();
     }
 
     @Test
@@ -68,7 +69,7 @@ public class TransactionStopServiceHelperTest {
             .value("22.5")
             .build();
 
-        Assertions.assertTrue(TransactionStopServiceHelper.isEnergyValue(value));
+        assertThat(TransactionStopServiceHelper.isEnergyValue(value)).isTrue();
     }
 
     @Test
@@ -78,7 +79,7 @@ public class TransactionStopServiceHelperTest {
             .format("SignedData")
             .build();
 
-        Assertions.assertFalse(TransactionStopServiceHelper.isEnergyValue(value));
+        assertThat(TransactionStopServiceHelper.isEnergyValue(value)).isFalse();
     }
 
     @Test
@@ -89,9 +90,8 @@ public class TransactionStopServiceHelperTest {
             .unit("Celsius")
             .build();
 
-        Assertions.assertFalse(TransactionStopServiceHelper.isEnergyValue(value));
+        assertThat(TransactionStopServiceHelper.isEnergyValue(value)).isFalse();
     }
-
 
     @Test
     public void testIsEnergy_notActiveImportMeasurand() {
@@ -102,7 +102,7 @@ public class TransactionStopServiceHelperTest {
             .measurand("Current.Export")
             .build();
 
-        Assertions.assertFalse(TransactionStopServiceHelper.isEnergyValue(value));
+        assertThat(TransactionStopServiceHelper.isEnergyValue(value)).isFalse();
     }
 
     @Test
@@ -114,7 +114,7 @@ public class TransactionStopServiceHelperTest {
             .measurand("Energy.Active.Import.Register")
             .build();
 
-        Assertions.assertTrue(TransactionStopServiceHelper.isEnergyValue(value));
+        assertThat(TransactionStopServiceHelper.isEnergyValue(value)).isTrue();
     }
 
     @Test
@@ -126,7 +126,7 @@ public class TransactionStopServiceHelperTest {
             .measurand("Energy.Active.Import.Register")
             .build();
 
-        Assertions.assertTrue(TransactionStopServiceHelper.isEnergyValue(value));
+        assertThat(TransactionStopServiceHelper.isEnergyValue(value)).isTrue();
     }
 
     @Test
@@ -138,7 +138,7 @@ public class TransactionStopServiceHelperTest {
             .measurand("Energy.Active.Import.Register")
             .build();
 
-        Assertions.assertTrue(TransactionStopServiceHelper.isEnergyValue(value));
+        assertThat(TransactionStopServiceHelper.isEnergyValue(value)).isTrue();
     }
 
     @Test
@@ -150,7 +150,7 @@ public class TransactionStopServiceHelperTest {
             .measurand("Energy.Active.Import.Register")
             .build();
 
-        Assertions.assertFalse(TransactionStopServiceHelper.isEnergyValue(value));
+        assertThat(TransactionStopServiceHelper.isEnergyValue(value)).isFalse();
     }
 
     @Test
@@ -160,6 +160,6 @@ public class TransactionStopServiceHelperTest {
             .unit("Wh")
             .build();
 
-        Assertions.assertTrue(TransactionStopServiceHelper.isEnergyValue(value));
+        assertThat(TransactionStopServiceHelper.isEnergyValue(value)).isTrue();
     }
 }

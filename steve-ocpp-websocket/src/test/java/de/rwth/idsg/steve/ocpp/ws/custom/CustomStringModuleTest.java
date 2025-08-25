@@ -21,8 +21,9 @@ package de.rwth.idsg.steve.ocpp.ws.custom;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.rwth.idsg.steve.ocpp.ws.JsonObjectMapper;
 import lombok.Data;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -34,23 +35,23 @@ public class CustomStringModuleTest {
 
     @Test
     public void testNormalString() throws Exception {
-        SimpleJsonModel input = new SimpleJsonModel("normal string");
-        String output = mapper.writeValueAsString(input);
-        Assertions.assertEquals("{\"someText\":\"normal string\"}", output);
+        var input = new SimpleJsonModel("normal string");
+        var output = mapper.writeValueAsString(input);
+        assertThat(output).isEqualTo("{\"someText\":\"normal string\"}");
     }
 
     @Test
     public void testLink() throws Exception {
-        SimpleJsonModel input = new SimpleJsonModel("<a href=\"link\">Some link</a>");
-        String output = mapper.writeValueAsString(input);
-        Assertions.assertEquals("{\"someText\":\"&lt;a href=&#34;link&#34;&gt;Some link&lt;/a&gt;\"}", output);
+        var input = new SimpleJsonModel("<a href=\"link\">Some link</a>");
+        var output = mapper.writeValueAsString(input);
+        assertThat(output).isEqualTo("{\"someText\":\"&lt;a href=&#34;link&#34;&gt;Some link&lt;/a&gt;\"}");
     }
 
     @Test
     public void testScript() throws Exception {
-        SimpleJsonModel input = new SimpleJsonModel("<script src=\"http://someurl.com/script.js\"/>");
-        String output = mapper.writeValueAsString(input);
-        Assertions.assertEquals("{\"someText\":\"&lt;script src=&#34;http://someurl.com/script.js&#34;/&gt;\"}", output);
+        var input = new SimpleJsonModel("<script src=\"http://someurl.com/script.js\"/>");
+        var output = mapper.writeValueAsString(input);
+        assertThat(output).isEqualTo("{\"someText\":\"&lt;script src=&#34;http://someurl.com/script.js&#34;/&gt;\"}");
     }
 
     @Data

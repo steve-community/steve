@@ -18,28 +18,29 @@
  */
 package de.rwth.idsg.steve.ocpp;
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class OcppVersionTest {
 
     @ParameterizedTest
     @EnumSource(OcppVersion.class)
     public void testFromValue(OcppVersion input) {
-        String toTest = input.getValue();
-        OcppVersion inputBack = OcppVersion.fromValue(toTest);
-        Assertions.assertEquals(input, inputBack);
+        var toTest = input.getValue();
+        var inputBack = OcppVersion.fromValue(toTest);
+        assertThat(inputBack).isEqualTo(input);
     }
 
     @ParameterizedTest
     @EnumSource(OcppTransport.class)
     public void testToProtocol(OcppTransport transport) {
-        for (OcppVersion version : OcppVersion.values()) {
-            OcppProtocol protocol = version.toProtocol(transport);
+        for (var version : OcppVersion.values()) {
+            var protocol = version.toProtocol(transport);
 
-            Assertions.assertEquals(transport, protocol.getTransport());
-            Assertions.assertEquals(version, protocol.getVersion());
+            assertThat(protocol.getTransport()).isEqualTo(transport);
+            assertThat(protocol.getVersion()).isEqualTo(version);
         }
     }
 }

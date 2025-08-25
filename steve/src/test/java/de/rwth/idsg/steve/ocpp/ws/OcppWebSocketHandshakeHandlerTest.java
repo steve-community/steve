@@ -18,78 +18,79 @@
  */
 package de.rwth.idsg.steve.ocpp.ws;
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class OcppWebSocketHandshakeHandlerTest {
 
     @Test
     public void testGetLastBitFromUrl_empty() {
-        String in = "";
-        String out = OcppWebSocketHandshakeHandler.getLastBitFromUrl(in);
-        Assertions.assertEquals("", out);
+        var in = "";
+        var out = OcppWebSocketHandshakeHandler.getLastBitFromUrl(in);
+        assertThat(out).isEmpty();
     }
 
     @Test
     public void testGetLastBitFromUrl_null() {
         String in = null;
-        String out = OcppWebSocketHandshakeHandler.getLastBitFromUrl(in);
-        Assertions.assertEquals("", out);
+        var out = OcppWebSocketHandshakeHandler.getLastBitFromUrl(in);
+        assertThat(out).isEmpty();
     }
 
     @Test
     public void testGetLastBitFromUrl_successFull() {
-        String in = "https://www.google.com/steve/websocket/CentralSystemService/BBEI12";
-        String out = OcppWebSocketHandshakeHandler.getLastBitFromUrl(in);
-        Assertions.assertEquals("BBEI12", out);
+        var in = "https://www.google.com/steve/websocket/CentralSystemService/BBEI12";
+        var out = OcppWebSocketHandshakeHandler.getLastBitFromUrl(in);
+        assertThat(out).isEqualTo("BBEI12");
     }
 
     @Test
     public void testGetLastBitFromUrl_noPostfix() {
-        String in = "/steve/websocket/CentralSystemService/";
-        String out = OcppWebSocketHandshakeHandler.getLastBitFromUrl(in);
-        Assertions.assertEquals("", out);
+        var in = "/steve/websocket/CentralSystemService/";
+        var out = OcppWebSocketHandshakeHandler.getLastBitFromUrl(in);
+        assertThat(out).isEmpty();
     }
 
     @Test
     public void testGetLastBitFromUrl_successPartial() {
-        String in = "/steve/websocket/CentralSystemService/BBEI12";
-        String out = OcppWebSocketHandshakeHandler.getLastBitFromUrl(in);
-        Assertions.assertEquals("BBEI12", out);
+        var in = "/steve/websocket/CentralSystemService/BBEI12";
+        var out = OcppWebSocketHandshakeHandler.getLastBitFromUrl(in);
+        assertThat(out).isEqualTo("BBEI12");
     }
 
     @Test
     public void testGetLastBitFromUrl_successWithPercent() {
-        String in = "/steve/websocket/CentralSystemService/BBE%I12";
-        String out = OcppWebSocketHandshakeHandler.getLastBitFromUrl(in);
-        Assertions.assertEquals("BBE%I12", out);
+        var in = "/steve/websocket/CentralSystemService/BBE%I12";
+        var out = OcppWebSocketHandshakeHandler.getLastBitFromUrl(in);
+        assertThat(out).isEqualTo("BBE%I12");
     }
 
     @Test
     public void testGetLastBitFromUrl_successWithDash() {
-        String in = "/steve/websocket/CentralSystemService/BBE-I12";
-        String out = OcppWebSocketHandshakeHandler.getLastBitFromUrl(in);
-        Assertions.assertEquals("BBE-I12", out);
+        var in = "/steve/websocket/CentralSystemService/BBE-I12";
+        var out = OcppWebSocketHandshakeHandler.getLastBitFromUrl(in);
+        assertThat(out).isEqualTo("BBE-I12");
     }
 
     @Test
     public void testGetLastBitFromUrl_successWithSpace() {
-        String in = "/steve/websocket/CentralSystemService/BBE I12";
-        String out = OcppWebSocketHandshakeHandler.getLastBitFromUrl(in);
-        Assertions.assertEquals("BBE I12", out);
+        var in = "/steve/websocket/CentralSystemService/BBE I12";
+        var out = OcppWebSocketHandshakeHandler.getLastBitFromUrl(in);
+        assertThat(out).isEqualTo("BBE I12");
     }
 
     @Test
     public void testGetLastBitFromUrl_successWithExtraSlash() {
-        String in = "/steve/websocket/CentralSystemService/889/BBEI12";
-        String out = OcppWebSocketHandshakeHandler.getLastBitFromUrl(in);
-        Assertions.assertEquals("889/BBEI12", out);
+        var in = "/steve/websocket/CentralSystemService/889/BBEI12";
+        var out = OcppWebSocketHandshakeHandler.getLastBitFromUrl(in);
+        assertThat(out).isEqualTo("889/BBEI12");
     }
 
     @Test
     public void testGetLastBitFromUrl_successComplex() {
-        String in = "/steve/websocket/CentralSystemService/%889 /BBEI12-";
-        String out = OcppWebSocketHandshakeHandler.getLastBitFromUrl(in);
-        Assertions.assertEquals("%889 /BBEI12-", out);
+        var in = "/steve/websocket/CentralSystemService/%889 /BBEI12-";
+        var out = OcppWebSocketHandshakeHandler.getLastBitFromUrl(in);
+        assertThat(out).isEqualTo("%889 /BBEI12-");
     }
 }

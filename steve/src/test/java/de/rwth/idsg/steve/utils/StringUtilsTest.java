@@ -24,13 +24,11 @@ import de.rwth.idsg.steve.ocpp.task.GetCompositeScheduleTask;
 import de.rwth.idsg.steve.web.dto.ocpp.CancelReservationParams;
 import de.rwth.idsg.steve.web.dto.ocpp.GetCompositeScheduleParams;
 import de.rwth.idsg.steve.web.dto.ocpp.MultipleChargePointSelect;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -41,80 +39,76 @@ public class StringUtilsTest {
     @Test
     public void testOperationName_ocpp12andMultiple() {
         var operationName = StringUtils.getOperationName(new ClearCacheTask(new MultipleChargePointSelect()));
-        Assertions.assertEquals("Clear Cache", operationName);
+        assertThat(operationName).isEqualTo("Clear Cache");
     }
 
     @Test
     public void testOperationName_ocpp15andSingle() {
         var operationName = StringUtils.getOperationName(new CancelReservationTask(new CancelReservationParams(), null));
-        Assertions.assertEquals("Cancel Reservation", operationName);
+        assertThat(operationName).isEqualTo("Cancel Reservation");
     }
 
     @Test
     public void testOperationName_ocpp16() {
         var operationName = StringUtils.getOperationName(new GetCompositeScheduleTask(new GetCompositeScheduleParams()));
-        Assertions.assertEquals("Get Composite Schedule", operationName);
+        assertThat(operationName).isEqualTo("Get Composite Schedule");
     }
 
     @Test
     public void testJoinByComma_inputNull() {
-        String val = StringUtils.joinByComma(null);
-        Assertions.assertNull(val);
+        var val = StringUtils.joinByComma(null);
+        assertThat(val).isNull();
     }
 
     @Test
     public void testJoinByComma_inputEmpty() {
-        String val = StringUtils.joinByComma(new ArrayList<>());
-        Assertions.assertNull(val);
+        var val = StringUtils.joinByComma(List.of());
+        assertThat(val).isNull();
     }
 
     @Test
     public void testJoinByComma_inputOneElement() {
-        String val = StringUtils.joinByComma(Arrays.asList("hey"));
-        Assertions.assertEquals("hey", val);
+        var val = StringUtils.joinByComma(List.of("hey"));
+        assertThat(val).isEqualTo("hey");
     }
 
     @Test
     public void testJoinByComma_inputTwoElements() {
-        String val = StringUtils.joinByComma(Arrays.asList("hey", "ho"));
-        Assertions.assertEquals("hey,ho", val);
+        var val = StringUtils.joinByComma(List.of("hey", "ho"));
+        assertThat(val).isEqualTo("hey,ho");
     }
 
     @Test
     public void testJoinByComma_inputDuplicateElements() {
-        String val = StringUtils.joinByComma(Arrays.asList("hey", "ho", "hey"));
-        Assertions.assertEquals("hey,ho", val);
+        var val = StringUtils.joinByComma(List.of("hey", "ho", "hey"));
+        assertThat(val).isEqualTo("hey,ho");
     }
-
 
     @Test
     public void testSplitByComma_inputNull() {
-        List<String> val = StringUtils.splitByComma(null);
-        Assertions.assertNotNull(val);
-        Assertions.assertTrue(val.isEmpty());
+        var val = StringUtils.splitByComma(null);
+        assertThat(val).isNotNull().isEmpty();
     }
 
     @Test
     public void testSplitByComma_inputEmpty() {
-        List<String> val = StringUtils.splitByComma("");
-        Assertions.assertNotNull(val);
-        Assertions.assertTrue(val.isEmpty());
+        var val = StringUtils.splitByComma("");
+        assertThat(val).isNotNull().isEmpty();
     }
 
     @Test
     public void testSplitByComma_inputOneElement() {
-        List<String> val = StringUtils.splitByComma("1one");
-        Assertions.assertTrue(val.size() == 1);
-        Assertions.assertEquals("1one", val.get(0));
+        var val = StringUtils.splitByComma("1one");
+        assertThat(val).hasSize(1);
+        assertThat(val.get(0)).isEqualTo("1one");
     }
 
     @Test
     public void testSplitByComma_inputTwoElements() {
-        List<String> val = StringUtils.splitByComma("1one,2two");
-        Assertions.assertTrue(val.size() == 2);
+        var val = StringUtils.splitByComma("1one,2two");
+        assertThat(val).hasSize(2);
 
-        List<String> sortedVal = val.stream().sorted().collect(Collectors.toList());
-        Assertions.assertEquals("1one", sortedVal.get(0));
-        Assertions.assertEquals("2two", sortedVal.get(1));
+        var sortedVal = val.stream().sorted().toList();
+        assertThat(sortedVal).containsExactly("1one", "2two");
     }
 }

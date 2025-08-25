@@ -25,25 +25,21 @@ import de.rwth.idsg.steve.utils.StressTester;
 import de.rwth.idsg.steve.utils.__DatabasePreparer__;
 import lombok.RequiredArgsConstructor;
 import ocpp.cs._2015._10.BootNotificationRequest;
-import ocpp.cs._2015._10.BootNotificationResponse;
 import ocpp.cs._2015._10.CentralSystemService;
 import ocpp.cs._2015._10.MeterValue;
 import ocpp.cs._2015._10.MeterValuesRequest;
-import ocpp.cs._2015._10.MeterValuesResponse;
 import ocpp.cs._2015._10.RegistrationStatus;
 import ocpp.cs._2015._10.SampledValue;
 import ocpp.cs._2015._10.StartTransactionRequest;
-import ocpp.cs._2015._10.StartTransactionResponse;
 import ocpp.cs._2015._10.StopTransactionRequest;
-import ocpp.cs._2015._10.StopTransactionResponse;
 import ocpp.cs._2015._10.UnitOfMeasure;
-import org.junit.jupiter.api.Assertions;
 
 import java.time.OffsetDateTime;
 
 import static de.rwth.idsg.steve.utils.Helpers.getForOcpp16;
 import static de.rwth.idsg.steve.utils.Helpers.getPath;
 import static de.rwth.idsg.steve.utils.Helpers.getRandomString;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * https://github.com/steve-community/steve/issues/72
@@ -63,25 +59,25 @@ public class Issue72 extends StressTest {
     }
 
     protected void attackInternal() throws Exception {
-        String idTag = __DatabasePreparer__.getRegisteredOcppTag();
-        String chargeBoxId = Helpers.getRandomString();
+        var idTag = __DatabasePreparer__.getRegisteredOcppTag();
+        var chargeBoxId = Helpers.getRandomString();
 
         var startDateTime = OffsetDateTime.now();
         var stopDateTime = startDateTime.plusHours(5);
 
-        int connectorId = 2;
+        var connectorId = 2;
 
-        int meterStart = 444;
-        int meterStop = 99999;
+        var meterStart = 444;
+        var meterStop = 99999;
 
-        BootNotificationResponse boot = getForOcpp16(path).bootNotification(
+        var boot = getForOcpp16(path).bootNotification(
                 new BootNotificationRequest()
                         .withChargePointVendor(getRandomString())
                         .withChargePointModel(getRandomString()),
                 chargeBoxId);
-        Assertions.assertEquals(RegistrationStatus.ACCEPTED, boot.getStatus());
+        assertThat(boot.getStatus()).isEqualTo(RegistrationStatus.ACCEPTED);
 
-        StartTransactionResponse start = getForOcpp16(path).startTransaction(
+        var start = getForOcpp16(path).startTransaction(
                 new StartTransactionRequest()
                         .withConnectorId(connectorId)
                         .withIdTag(idTag)
@@ -89,11 +85,11 @@ public class Issue72 extends StressTest {
                         .withMeterStart(meterStart),
                 chargeBoxId
         );
-        Assertions.assertNotNull(start);
+        assertThat(start).isNotNull();
 
-        int transactionId = start.getTransactionId();
+        var transactionId = start.getTransactionId();
 
-        StressTester.Runnable runnable = new StressTester.Runnable() {
+        var runnable = new StressTester.Runnable() {
 
             private final ThreadLocal<CentralSystemService> threadLocalClient = new ThreadLocal<>();
 
@@ -104,7 +100,7 @@ public class Issue72 extends StressTest {
 
             @Override
             public void toRepeat() {
-                MeterValuesResponse mvr = threadLocalClient.get().meterValues(
+                var mvr = threadLocalClient.get().meterValues(
                         new MeterValuesRequest()
                                 .withConnectorId(connectorId)
                                 .withTransactionId(transactionId)
@@ -117,9 +113,9 @@ public class Issue72 extends StressTest {
                                                                 .withUnit(UnitOfMeasure.WH))),
                         chargeBoxId
                 );
-                Assertions.assertNotNull(mvr);
+                assertThat(mvr).isNotNull();
 
-                StopTransactionResponse stop = threadLocalClient.get().stopTransaction(
+                var stop = threadLocalClient.get().stopTransaction(
                         new StopTransactionRequest()
                                 .withTransactionId(transactionId)
                                 .withTimestamp(stopDateTime)
@@ -127,7 +123,7 @@ public class Issue72 extends StressTest {
                                 .withMeterStop(meterStop),
                         chargeBoxId
                 );
-                Assertions.assertNotNull(stop);
+                assertThat(stop).isNotNull();
             }
 
             @Override
@@ -136,7 +132,7 @@ public class Issue72 extends StressTest {
             }
         };
 
-        StressTester tester = new StressTester(THREAD_COUNT, REPEAT_COUNT_PER_THREAD);
+        var tester = new StressTester(THREAD_COUNT, REPEAT_COUNT_PER_THREAD);
         tester.test(runnable);
         tester.shutDown();
     }

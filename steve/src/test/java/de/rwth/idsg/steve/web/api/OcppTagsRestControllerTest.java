@@ -31,18 +31,19 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.ResultMatcher;
+import org.springframework.test.json.JsonContent;
+import org.springframework.test.web.servlet.assertj.MockMvcTester;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Consumer;
 
-import static org.hamcrest.Matchers.hasSize;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyList;
@@ -56,8 +57,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -69,7 +68,7 @@ public class OcppTagsRestControllerTest extends AbstractControllerTest {
     @Mock
     private OcppTagsService ocppTagsService;
 
-    private MockMvc mockMvc;
+    private MockMvcTester mockMvc;
 
     @BeforeEach
     public void setup() {
@@ -78,7 +77,7 @@ public class OcppTagsRestControllerTest extends AbstractControllerTest {
 
     @Test
     @DisplayName("GET all: Test with empty results, expected 200")
-    public void test1() throws Exception {
+    public void test1() {
         // given
         List<OcppTag.OcppTagOverview> results = Collections.emptyList();
 
@@ -86,14 +85,15 @@ public class OcppTagsRestControllerTest extends AbstractControllerTest {
         when(ocppTagsService.getOverview(any())).thenReturn(results);
 
         // then
-        mockMvc.perform(get("/api/v1/ocppTags"))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$", hasSize(0)));
+        assertThat(mockMvc.perform(get("/api/v1/ocppTags")))
+                .hasStatusOk()
+                .bodyJson()
+                .extractingPath("$").asArray().isEmpty();
     }
 
     @Test
     @DisplayName("GET all: Test with one result, expected 200")
-    public void test2() throws Exception {
+    public void test2() {
         // given
         List<OcppTag.OcppTagOverview> results = List.of(OcppTag.OcppTagOverview.builder().ocppTagPk(96).build());
 
@@ -101,37 +101,40 @@ public class OcppTagsRestControllerTest extends AbstractControllerTest {
         when(ocppTagsService.getOverview(any())).thenReturn(results);
 
         // then
-        mockMvc.perform(get("/api/v1/ocppTags"))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$", hasSize(1)))
-            .andExpect(jsonPath("$[0].ocppTagPk").value("96"));
+        assertThat(mockMvc.perform(get("/api/v1/ocppTags")))
+                .hasStatusOk()
+                .bodyJson()
+                .hasPathSatisfying("$", path -> assertThat(path).asArray().hasSize(1))
+                .hasPathSatisfying("$[0].ocppTagPk", path -> assertThat(path).asNumber().isEqualTo(96));
     }
 
     @Test
     @DisplayName("GET all: Downstream bean throws exception, expected 500")
-    public void test3() throws Exception {
+    public void test3() {
         // when
         when(ocppTagsService.getOverview(any())).thenThrow(new RuntimeException("failed"));
 
         // then
-        mockMvc.perform(get("/api/v1/ocppTags"))
-            .andExpect(status().isInternalServerError())
-            .andExpectAll(errorJsonMatchers());
+        assertThat(mockMvc.perform(get("/api/v1/ocppTags")))
+                .hasStatus5xxServerError()
+                .bodyJson()
+                .satisfies(errorJsonMatchers());
     }
 
     @Test
     @DisplayName("GET all: Typo in param makes validation fail, expected 400")
-    public void test4() throws Exception {
-        mockMvc.perform(get("/api/v1/ocppTags")
+    public void test4() {
+        assertThat(mockMvc.perform(get("/api/v1/ocppTags")
                 .param("blocked", "FALSE1")
-            )
-            .andExpect(status().isBadRequest())
-            .andExpectAll(errorJsonMatchers());
+        ))
+                .hasStatus4xxClientError()
+                .bodyJson()
+                .satisfies(errorJsonMatchers());
     }
 
     @Test
     @DisplayName("GET all: Sets all valid params, expected 200")
-    public void test5() throws Exception {
+    public void test5() {
         // given
         var someDate = OffsetDateTime.parse("2020-10-01T00:00:00.000Z");
         OcppTag.OcppTagOverview result = OcppTag.OcppTagOverview.builder()
@@ -152,52 +155,57 @@ public class OcppTagsRestControllerTest extends AbstractControllerTest {
         when(ocppTagsService.getOverview(any())).thenReturn(List.of(result));
 
         // then
-        mockMvc.perform(get("/api/v1/ocppTags")
+        assertThat(mockMvc.perform(get("/api/v1/ocppTags")
                 .param("ocppTagPk", String.valueOf(result.getOcppTagPk()))
                 .param("idTag", result.getIdTag())
                 .param("parentIdTag", result.getParentIdTag())
                 .param("expired", "FALSE")
                 .param("inTransaction", "ALL")
                 .param("blocked", "TRUE")
-            )
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$", hasSize(1)))
-            .andExpect(jsonPath("$[0].ocppTagPk").value("121"))
-            .andExpect(jsonPath("$[0].idTag").value("id-1"))
-            .andExpect(jsonPath("$[0].parentOcppTagPk").value("454"))
-            .andExpect(jsonPath("$[0].parentIdTag").value("parent-id-1"))
-            .andExpect(jsonPath("$[0].inTransaction").value("false"))
-            .andExpect(jsonPath("$[0].blocked").value("true"))
-            .andExpect(jsonPath("$[0].expiryDate").value("2020-10-01T00:00:00Z"))
-            .andExpect(jsonPath("$[0].expiryDateFormatted").doesNotExist())
-            .andExpect(jsonPath("$[0].maxActiveTransactionCount").value("4"))
-            .andExpect(jsonPath("$[0].activeTransactionCount").value("0"))
-            .andExpect(jsonPath("$[0].note").value("some note"));
+        ))
+                .hasStatusOk()
+                .bodyJson()
+                .hasPathSatisfying("$", path -> assertThat(path).asArray().hasSize(1))
+                .hasPathSatisfying("$[0].ocppTagPk", path -> assertThat(path).asNumber().isEqualTo(121))
+                .hasPathSatisfying("$[0].idTag", path -> assertThat(path).asString().isEqualTo("id-1"))
+                .hasPathSatisfying("$[0].parentOcppTagPk", path -> assertThat(path).asNumber().isEqualTo(454))
+                .hasPathSatisfying("$[0].parentIdTag", path -> assertThat(path).asString().isEqualTo("parent-id-1"))
+                .hasPathSatisfying("$[0].inTransaction", path -> assertThat(path).asBoolean().isFalse())
+                .hasPathSatisfying("$[0].blocked", path -> assertThat(path).asBoolean().isTrue())
+                .hasPathSatisfying("$[0].expiryDate", path ->
+                        assertThat(path).asString().isEqualTo("2020-10-01T00:00:00Z")
+                )
+                .doesNotHavePath("$[0].expiryDateFormatted")
+                .hasPathSatisfying("$[0].maxActiveTransactionCount", path -> assertThat(path).asNumber().isEqualTo(4))
+                .hasPathSatisfying("$[0].activeTransactionCount", path -> assertThat(path).asNumber().isEqualTo(0))
+                .hasPathSatisfying("$[0].note", path -> assertThat(path).asString().isEqualTo("some note"));
     }
 
     @Test
     @DisplayName("GET one: Wrong path variable format makes validation fail, expected 400")
-    public void test6() throws Exception {
-        mockMvc.perform(get("/api/v1/ocppTags/not-an-integer"))
-            .andExpect(status().isBadRequest())
-            .andExpectAll(errorJsonMatchers());
+    public void test6() {
+        assertThat(mockMvc.perform(get("/api/v1/ocppTags/not-an-integer")))
+                .hasStatus4xxClientError()
+                .bodyJson()
+                .satisfies(errorJsonMatchers());
     }
 
     @Test
     @DisplayName("GET one: Entity not found, expected 404")
-    public void test7() throws Exception {
+    public void test7() {
         // when
         when(ocppTagsService.getOverview(any())).thenReturn(Collections.emptyList());
 
         // then
-        mockMvc.perform(get("/api/v1/ocppTags/12"))
-            .andExpect(status().isNotFound())
-            .andExpectAll(errorJsonMatchers());
+        assertThat(mockMvc.perform(get("/api/v1/ocppTags/12")))
+                .hasStatus(HttpStatus.NOT_FOUND)
+                .bodyJson()
+                .satisfies(errorJsonMatchers());
     }
 
     @Test
     @DisplayName("GET one: One entity found, expected 200")
-    public void test8() throws Exception {
+    public void test8() {
         // given
         OcppTag.OcppTagOverview result = OcppTag.OcppTagOverview.builder().ocppTagPk(12).build();
 
@@ -205,9 +213,10 @@ public class OcppTagsRestControllerTest extends AbstractControllerTest {
         when(ocppTagsService.getOverview(any())).thenReturn(List.of(result));
 
         // then
-        mockMvc.perform(get("/api/v1/ocppTags/12"))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.ocppTagPk").value("12"));
+        assertThat(mockMvc.perform(get("/api/v1/ocppTags/12")))
+                .hasStatusOk()
+                .bodyJson()
+                .hasPathSatisfying("$.ocppTagPk", path -> assertThat(path).asNumber().isEqualTo(12));
     }
 
     @Test
@@ -218,13 +227,14 @@ public class OcppTagsRestControllerTest extends AbstractControllerTest {
         form.setIdTag(null);
 
         // when and then
-        mockMvc.perform(
+        assertThat(mockMvc.perform(
                 post("/api/v1/ocppTags")
-                    .content(objectMapper.writeValueAsString(form))
-                    .contentType(MediaType.APPLICATION_JSON_VALUE)
-            )
-            .andExpect(status().isBadRequest())
-            .andExpectAll(errorJsonMatchers());
+                        .content(objectMapper.writeValueAsString(form))
+                        .contentType(MediaType.APPLICATION_JSON)
+        ))
+                .hasStatus4xxClientError()
+                .bodyJson()
+                .satisfies(errorJsonMatchers());
 
         verifyNoInteractions(ocppTagsService);
     }
@@ -238,13 +248,14 @@ public class OcppTagsRestControllerTest extends AbstractControllerTest {
         form.setExpiryDate(LocalDateTime.parse("1990-10-01T00:00"));
 
         // when and then
-        mockMvc.perform(
+        assertThat(mockMvc.perform(
                 post("/api/v1/ocppTags")
-                    .content(objectMapper.writeValueAsString(form))
-                    .contentType(MediaType.APPLICATION_JSON_VALUE)
-            )
-            .andExpect(status().isBadRequest())
-            .andExpectAll(errorJsonMatchers());
+                        .content(objectMapper.writeValueAsString(form))
+                        .contentType(MediaType.APPLICATION_JSON)
+        ))
+                .hasStatus4xxClientError()
+                .bodyJson()
+                .satisfies(errorJsonMatchers());
 
         verifyNoInteractions(ocppTagsService);
     }
@@ -264,18 +275,19 @@ public class OcppTagsRestControllerTest extends AbstractControllerTest {
             .build();
 
         // when
-        when(ocppTagsService.addOcppTag(eq(form))).thenReturn(ocppTagPk);
+        when(ocppTagsService.addOcppTag(form)).thenReturn(ocppTagPk);
         when(ocppTagsService.getOverview(any())).thenReturn(List.of(result));
 
         // then
-        mockMvc.perform(
+        assertThat(mockMvc.perform(
                 post("/api/v1/ocppTags")
-                    .content(objectMapper.writeValueAsString(form))
-                    .contentType(MediaType.APPLICATION_JSON_VALUE)
-            )
-            .andExpect(status().isCreated())
-            .andExpect(jsonPath("$.ocppTagPk").value("123"))
-            .andExpect(jsonPath("$.idTag").value("id-123"));
+                        .content(objectMapper.writeValueAsString(form))
+                        .contentType(MediaType.APPLICATION_JSON)
+        ))
+                .hasStatus(HttpStatus.CREATED)
+                .bodyJson()
+                .hasPathSatisfying("$.ocppTagPk", path -> assertThat(path).asNumber().isEqualTo(123))
+                .hasPathSatisfying("$.idTag", path -> assertThat(path).asString().isEqualTo("id-123"));
     }
 
     @Test
@@ -299,12 +311,12 @@ public class OcppTagsRestControllerTest extends AbstractControllerTest {
         when(ocppTagsService.getOverview(any())).thenReturn(List.of(result));
 
         // then
-        mockMvc.perform(
+        assertThat(mockMvc.perform(
                 put("/api/v1/ocppTags/" + ocppTagPk)
-                    .content(objectMapper.writeValueAsString(form))
-                    .contentType(MediaType.APPLICATION_JSON_VALUE)
-            )
-            .andExpect(status().isOk());
+                        .content(objectMapper.writeValueAsString(form))
+                        .contentType(MediaType.APPLICATION_JSON)
+        ))
+                .hasStatusOk();
 
         verify(ocppTagsService).updateOcppTag(eq(form));
     }
@@ -320,12 +332,12 @@ public class OcppTagsRestControllerTest extends AbstractControllerTest {
         form.setNote("note-1");
 
         // then
-        mockMvc.perform(
+        assertThat(mockMvc.perform(
                 put("/api/v1/ocppTags/" + ocppTagPk)
-                    .content(objectMapper.writeValueAsString(form))
-                    .contentType(MediaType.APPLICATION_JSON_VALUE)
-            )
-            .andExpect(status().isBadRequest());
+                        .content(objectMapper.writeValueAsString(form))
+                        .contentType(MediaType.APPLICATION_JSON)
+        ))
+                .hasStatus4xxClientError();
 
         verifyNoInteractions(ocppTagsService);
     }
@@ -345,13 +357,14 @@ public class OcppTagsRestControllerTest extends AbstractControllerTest {
         doThrow(new SteveException("failed")).when(ocppTagsService).updateOcppTag(any());
 
         // then
-        mockMvc.perform(
+        assertThat(mockMvc.perform(
                 put("/api/v1/ocppTags/" + ocppTagPk)
-                    .content(objectMapper.writeValueAsString(form))
-                    .contentType(MediaType.APPLICATION_JSON_VALUE)
-            )
-            .andExpect(status().isInternalServerError())
-            .andExpectAll(errorJsonMatchers());
+                        .content(objectMapper.writeValueAsString(form))
+                        .contentType(MediaType.APPLICATION_JSON)
+        ))
+                .hasStatus5xxServerError()
+                .bodyJson()
+                .satisfies(errorJsonMatchers());
     }
 
     @Test
@@ -370,9 +383,10 @@ public class OcppTagsRestControllerTest extends AbstractControllerTest {
         when(ocppTagsService.getOverview(any())).thenReturn(List.of(result));
 
         // then
-        mockMvc.perform(delete("/api/v1/ocppTags/" + ocppTagPk))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.ocppTagPk").value("123"));
+        assertThat(mockMvc.perform(delete("/api/v1/ocppTags/" + ocppTagPk)))
+                .hasStatusOk()
+                .bodyJson()
+                .hasPathSatisfying("$.ocppTagPk", path -> assertThat(path).asNumber().isEqualTo(123));
 
         verify(ocppTagsService).deleteOcppTag(ocppTagPk);
     }
@@ -394,9 +408,10 @@ public class OcppTagsRestControllerTest extends AbstractControllerTest {
         doThrow(new SteveException("failed")).when(ocppTagsService).deleteOcppTag(ocppTagPk);
 
         // then
-        mockMvc.perform(delete("/api/v1/ocppTags/" + ocppTagPk))
-            .andExpect(status().isInternalServerError())
-            .andExpectAll(errorJsonMatchers());
+        assertThat(mockMvc.perform(delete("/api/v1/ocppTags/" + ocppTagPk)))
+                .hasStatus5xxServerError()
+                .bodyJson()
+                .satisfies(errorJsonMatchers());
     }
 
     @Test
@@ -409,9 +424,10 @@ public class OcppTagsRestControllerTest extends AbstractControllerTest {
         when(ocppTagsService.getOverview(any())).thenReturn(List.of());
 
         // then
-        mockMvc.perform(delete("/api/v1/ocppTags/" + ocppTagPk))
-            .andExpect(status().isNotFound())
-            .andExpectAll(errorJsonMatchers());
+        assertThat(mockMvc.perform(delete("/api/v1/ocppTags/" + ocppTagPk)))
+                .hasStatus(HttpStatus.NOT_FOUND)
+                .bodyJson()
+                .satisfies(errorJsonMatchers());
 
         verify(ocppTagsService, times(0)).deleteOcppTag(anyInt());
     }
@@ -426,16 +442,17 @@ public class OcppTagsRestControllerTest extends AbstractControllerTest {
         form.setIdTag("id-123");
 
         // when
-        when(ocppTagsService.addOcppTag(eq(form))).thenThrow(new SteveException.AlreadyExists("A user with idTag '%s' already exists.", ocppTagPk));
+        when(ocppTagsService.addOcppTag(form)).thenThrow(new SteveException.AlreadyExists("A user with idTag '%s' already exists.", ocppTagPk));
 
         // then
-        mockMvc.perform(
+        assertThat(mockMvc.perform(
                 post("/api/v1/ocppTags")
-                    .content(objectMapper.writeValueAsString(form))
-                    .contentType(MediaType.APPLICATION_JSON_VALUE)
-            )
-            .andExpect(status().isUnprocessableEntity())
-            .andExpectAll(errorJsonMatchers());
+                        .content(objectMapper.writeValueAsString(form))
+                        .contentType(MediaType.APPLICATION_JSON)
+        ))
+                .hasStatus(HttpStatus.UNPROCESSABLE_ENTITY)
+                .bodyJson()
+                .satisfies(errorJsonMatchers());
 
         verify(ocppTagsService, times(0)).removeUnknown(anyList());
         verify(ocppTagsService, times(0)).getOverview(any(OcppTagQueryForm.OcppTagQueryFormForApi.class));
@@ -443,7 +460,7 @@ public class OcppTagsRestControllerTest extends AbstractControllerTest {
 
     @Test
     @DisplayName("GET all: Query param 'expired' is translated correctly, while others are defaulted")
-    public void test19() throws Exception {
+    public void test19() {
         // given
         ArgumentCaptor<OcppTagQueryForm.OcppTagQueryFormForApi> formToCapture = ArgumentCaptor.forClass(OcppTagQueryForm.OcppTagQueryFormForApi.class);
 
@@ -451,21 +468,21 @@ public class OcppTagsRestControllerTest extends AbstractControllerTest {
         when(ocppTagsService.getOverview(any())).thenReturn(Collections.emptyList());
 
         // then
-        mockMvc.perform(get("/api/v1/ocppTags")
-                .param("expired", "FALSE"))
-            .andExpect(status().isOk());
+        assertThat(mockMvc.perform(get("/api/v1/ocppTags")
+                .param("expired", "FALSE")))
+                .hasStatusOk();
 
         verify(ocppTagsService).getOverview(formToCapture.capture());
         OcppTagQueryForm.OcppTagQueryFormForApi capturedForm = formToCapture.getValue();
 
-        assertEquals(OcppTagQueryForm.BooleanType.FALSE, capturedForm.getExpired());
-        assertEquals(OcppTagQueryForm.BooleanType.ALL, capturedForm.getInTransaction());
-        assertEquals(OcppTagQueryForm.BooleanType.ALL, capturedForm.getBlocked());
+        assertThat(capturedForm.getExpired()).isEqualTo(OcppTagQueryForm.BooleanType.FALSE);
+        assertThat(capturedForm.getInTransaction()).isEqualTo(OcppTagQueryForm.BooleanType.ALL);
+        assertThat(capturedForm.getBlocked()).isEqualTo(OcppTagQueryForm.BooleanType.ALL);
     }
 
     @Test
     @DisplayName("GET all: Query param 'inTransaction' is translated correctly, while others are defaulted")
-    public void test20() throws Exception {
+    public void test20() {
         // given
         ArgumentCaptor<OcppTagQueryForm.OcppTagQueryFormForApi> formToCapture = ArgumentCaptor.forClass(OcppTagQueryForm.OcppTagQueryFormForApi.class);
 
@@ -473,21 +490,21 @@ public class OcppTagsRestControllerTest extends AbstractControllerTest {
         when(ocppTagsService.getOverview(any())).thenReturn(Collections.emptyList());
 
         // then
-        mockMvc.perform(get("/api/v1/ocppTags")
-                .param("inTransaction", "TRUE"))
-            .andExpect(status().isOk());
+        assertThat(mockMvc.perform(get("/api/v1/ocppTags")
+                .param("inTransaction", "TRUE")))
+                .hasStatusOk();
 
         verify(ocppTagsService).getOverview(formToCapture.capture());
         OcppTagQueryForm.OcppTagQueryFormForApi capturedForm = formToCapture.getValue();
 
-        assertEquals(OcppTagQueryForm.BooleanType.ALL, capturedForm.getExpired());
-        assertEquals(OcppTagQueryForm.BooleanType.TRUE, capturedForm.getInTransaction());
-        assertEquals(OcppTagQueryForm.BooleanType.ALL, capturedForm.getBlocked());
+        assertThat(capturedForm.getExpired()).isEqualTo(OcppTagQueryForm.BooleanType.ALL);
+        assertThat(capturedForm.getInTransaction()).isEqualTo(OcppTagQueryForm.BooleanType.TRUE);
+        assertThat(capturedForm.getBlocked()).isEqualTo(OcppTagQueryForm.BooleanType.ALL);
     }
 
     @Test
     @DisplayName("GET all: Query param 'blocked' is translated correctly, while others are defaulted")
-    public void test21() throws Exception {
+    public void test21() {
         // given
         ArgumentCaptor<OcppTagQueryForm.OcppTagQueryFormForApi> formToCapture = ArgumentCaptor.forClass(OcppTagQueryForm.OcppTagQueryFormForApi.class);
 
@@ -495,26 +512,24 @@ public class OcppTagsRestControllerTest extends AbstractControllerTest {
         when(ocppTagsService.getOverview(any())).thenReturn(Collections.emptyList());
 
         // then
-        mockMvc.perform(get("/api/v1/ocppTags")
-                .param("blocked", "FALSE"))
-            .andExpect(status().isOk());
+        assertThat(mockMvc.perform(get("/api/v1/ocppTags")
+                .param("blocked", "FALSE")))
+                .hasStatusOk();
 
         verify(ocppTagsService).getOverview(formToCapture.capture());
         OcppTagQueryForm.OcppTagQueryFormForApi capturedForm = formToCapture.getValue();
 
-        assertEquals(OcppTagQueryForm.BooleanType.ALL, capturedForm.getExpired());
-        assertEquals(OcppTagQueryForm.BooleanType.ALL, capturedForm.getInTransaction());
-        assertEquals(OcppTagQueryForm.BooleanType.FALSE, capturedForm.getBlocked());
+        assertThat(capturedForm.getExpired()).isEqualTo(OcppTagQueryForm.BooleanType.ALL);
+        assertThat(capturedForm.getInTransaction()).isEqualTo(OcppTagQueryForm.BooleanType.ALL);
+        assertThat(capturedForm.getBlocked()).isEqualTo(OcppTagQueryForm.BooleanType.FALSE);
     }
 
-    private static ResultMatcher[] errorJsonMatchers() {
-        return new ResultMatcher[]{
-            jsonPath("$.timestamp").exists(),
-            jsonPath("$.status").exists(),
-            jsonPath("$.error").exists(),
-            jsonPath("$.message").exists(),
-            jsonPath("$.path").exists()
-        };
+    private static Consumer<JsonContent> errorJsonMatchers() {
+        return content -> content.assertThat()
+                .hasPathSatisfying("$.timestamp", path -> assertThat(path).asString().isNotEmpty())
+                .hasPathSatisfying("$.status", path -> assertThat(path).isNotNull())
+                .hasPathSatisfying("$.error", path -> assertThat(path).asString().isNotEmpty())
+                .hasPathSatisfying("$.message", path -> assertThat(path).asString().isNotEmpty())
+                .hasPathSatisfying("$.path", path -> assertThat(path).asString().isNotEmpty());
     }
-
 }

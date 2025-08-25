@@ -21,12 +21,13 @@ package de.rwth.idsg.steve;
 import de.rwth.idsg.steve.utils.__DatabasePreparer__;
 import ocpp.cs._2015._10.MeterValue;
 import ocpp.cs._2015._10.SampledValue;
-import org.junit.jupiter.api.Assertions;
 
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -51,12 +52,12 @@ public abstract class StressTest {
 
     protected void attack() throws Exception {
         var config = SteveConfigurationReader.readSteveConfiguration("main.properties");
-        Assertions.assertEquals(ApplicationProfile.TEST, config.getProfile());
-        Assertions.assertTrue(config.getOcpp().isAutoRegisterUnknownStations());
+        assertThat(config.getProfile()).isEqualTo(ApplicationProfile.TEST);
+        assertThat(config.getOcpp().isAutoRegisterUnknownStations()).isTrue();
 
         __DatabasePreparer__.prepare(config);
 
-        Application app = new Application(config);
+        var app = new Application(config);
         try {
             app.start();
             attackInternal();
@@ -72,15 +73,15 @@ public abstract class StressTest {
     protected abstract void attackInternal() throws Exception;
 
     protected static List<MeterValue> getMeterValues(int transactionStart, int transactionStop) {
-        final int size = 4;
-        int delta = (transactionStop - transactionStart) / size;
+        final var size = 4;
+        var delta = (transactionStop - transactionStart) / size;
         if (delta == 0) {
             return Collections.emptyList();
         }
 
-        List<MeterValue> list = new ArrayList<>(size);
-        for (int i = 0; i < size; i++) {
-            int meterValue = transactionStart + delta * (i + 1);
+        var list = new ArrayList<MeterValue>(size);
+        for (var i = 0; i < size; i++) {
+            var meterValue = transactionStart + delta * (i + 1);
             list.add(createMeterValue(meterValue));
         }
         return list;

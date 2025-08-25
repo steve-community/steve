@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>de.rwth.idsg</groupId>
+        <artifactId>steve-parent</artifactId>
+        <version>3.8.0-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>steve-ocpp-2-x</artifactId>
+
+    <properties>
+        <plugin.cxf.version>4.0.5</plugin.cxf.version>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>de.rwth.idsg</groupId>
+            <artifactId>steve-ocpp</artifactId>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>com.google.code.maven-replacer-plugin</groupId>
+                <artifactId>replacer</artifactId>
+                <version>1.5.3</version>
+                <executions>
+                    <execution>
+                        <id>add-request-interface</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>replace</goal>
+                        </goals>
+                        <configuration>
+                            <filesToInclude>${basedir}/src/main/resources/OCPP-2.0.1_part3_JSON_schemas/*Request.json</filesToInclude>
+                            <preserveDir>false</preserveDir>
+                            <outputDir>${project.build.directory}/generated-resources</outputDir>
+                            <replacements>
+                                <replacement>
+                                    <token>"definitions"\s*:</token>
+                                    <value>"javaInterfaces": ["de.rwth.idsg.ocpp.jaxb.RequestType"],
+                                        "definitions":</value>
+                                </replacement>
+                            </replacements>
+                            <regex>true</regex>
+                            <regexFlags>MULTILINE</regexFlags>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>add-response-interface</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>replace</goal>
+                        </goals>
+                        <configuration>
+                            <filesToInclude>${basedir}/src/main/resources/OCPP-2.0.1_part3_JSON_schemas/*Response.json</filesToInclude>
+                            <preserveDir>false</preserveDir>
+                            <outputDir>${project.build.directory}/generated-resources</outputDir>
+                            <replacements>
+                                <replacement>
+                                    <token>"definitions"\s*:</token>
+                                    <value>"javaInterfaces": ["de.rwth.idsg.ocpp.jaxb.ResponseType"],
+                                        "definitions":</value>
+                                </replacement>
+                            </replacements>
+                            <regex>true</regex>
+                            <regexFlags>MULTILINE</regexFlags>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.jsonschema2pojo</groupId>
+                <artifactId>jsonschema2pojo-maven-plugin</artifactId>
+                <version>1.2.1</version>
+                <configuration>
+                    <sourceDirectory>${project.build.directory}/generated-resources</sourceDirectory>
+                    <outputDirectory>${project.build.directory}/generated-sources</outputDirectory>
+                    <targetPackage>ocpp._2020._03</targetPackage>
+                    <generateBuilders>true</generateBuilders>
+                    <includeJsr303Annotations>true</includeJsr303Annotations>
+                    <includeGeneratedAnnotation>false</includeGeneratedAnnotation>
+                    <useJakartaValidation>true</useJakartaValidation>
+                    <useJodaDates>true</useJodaDates>
+                    <useJodaLocalDates>true</useJodaLocalDates>
+                    <useJodaLocalTimes>true</useJodaLocalTimes>
+                </configuration>
+                <executions>
+                    <execution>
+                        <phase>process-resources</phase>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+</project>

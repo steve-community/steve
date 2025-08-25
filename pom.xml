@@ -15,11 +15,13 @@
 
     <modules>
         <module>build-tools</module>
-        <module>ocpp-jaxb</module>
         <module>steve</module>
         <module>steve-api</module>
         <module>steve-core</module>
         <module>steve-jooq</module>
+        <module>steve-ocpp</module>
+        <module>steve-ocpp-1-x</module>
+        <module>steve-ocpp-2-x</module>
         <module>steve-ocpp-soap</module>
         <module>steve-ocpp-websocket</module>
         <module>steve-ui-jsp</module>
@@ -57,6 +59,21 @@
             </dependency>
             <dependency>
                 <groupId>de.rwth.idsg</groupId>
+                <artifactId>steve-ocpp</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>de.rwth.idsg</groupId>
+                <artifactId>steve-ocpp-1-x</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>de.rwth.idsg</groupId>
+                <artifactId>steve-ocpp-2-x</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>de.rwth.idsg</groupId>
                 <artifactId>steve-ocpp-soap</artifactId>
                 <version>${project.version}</version>
             </dependency>
@@ -74,11 +91,6 @@
                 <groupId>de.rwth.idsg</groupId>
                 <artifactId>steve-ui-jsp</artifactId>
                 <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>de.rwth.idsg</groupId>
-                <artifactId>ocpp-jaxb</artifactId>
-                <version>0.0.9</version>
             </dependency>
             <dependency>
                 <groupId>org.springframework</groupId>
@@ -247,6 +259,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
                                 <exclude>**/*.txt</exclude>
                                 <exclude>**/*.md</exclude>
                                 <exclude>**/*.xml</exclude>
+                                <exclude>**/*.wsdl</exclude>
                                 <exclude>**/*.properties</exclude>
                                 <exclude>**/*.sql</exclude>
                                 <exclude>**/*.html</exclude>

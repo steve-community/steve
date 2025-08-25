@@ -11,10 +11,6 @@
 
     <artifactId>steve-ocpp-2-x</artifactId>
 
-    <properties>
-        <plugin.cxf.version>4.0.5</plugin.cxf.version>
-    </properties>
-
     <dependencies>
         <dependency>
             <groupId>de.rwth.idsg</groupId>
@@ -28,6 +24,10 @@
                 <groupId>com.google.code.maven-replacer-plugin</groupId>
                 <artifactId>replacer</artifactId>
                 <version>1.5.3</version>
+                <configuration>
+                    <preserveDir>false</preserveDir>
+                    <ignoreMissingFile>false</ignoreMissingFile>
+                </configuration>
                 <executions>
                     <execution>
                         <id>add-request-interface-2-0-1</id>
@@ -36,18 +36,18 @@
                             <goal>replace</goal>
                         </goals>
                         <configuration>
-                            <filesToInclude>${basedir}/src/main/resources/OCPP-2.0.1_part3_JSON_schemas/*Request.json</filesToInclude>
-                            <preserveDir>false</preserveDir>
+                            <filesToInclude>${basedir}/src/main/resources/OCPP-2.0.1_part3_JSON_schemas/*Request.json
+                            </filesToInclude>
                             <outputDir>${project.build.directory}/generated-resources/2-0-1</outputDir>
                             <replacements>
                                 <replacement>
                                     <token>"definitions"\s*:</token>
                                     <value>"javaInterfaces": ["de.rwth.idsg.ocpp.jaxb.RequestType"],
-                                        "definitions":</value>
+                                        "definitions":
+                                    </value>
                                 </replacement>
                             </replacements>
                             <regex>true</regex>
-                            <regexFlags>MULTILINE</regexFlags>
                         </configuration>
                     </execution>
                     <execution>
@@ -57,18 +57,18 @@
                             <goal>replace</goal>
                         </goals>
                         <configuration>
-                            <filesToInclude>${basedir}/src/main/resources/OCPP-2.0.1_part3_JSON_schemas/*Response.json</filesToInclude>
-                            <preserveDir>false</preserveDir>
+                            <filesToInclude>${basedir}/src/main/resources/OCPP-2.0.1_part3_JSON_schemas/*Response.json
+                            </filesToInclude>
                             <outputDir>${project.build.directory}/generated-resources/2-0-1</outputDir>
                             <replacements>
                                 <replacement>
                                     <token>"definitions"\s*:</token>
                                     <value>"javaInterfaces": ["de.rwth.idsg.ocpp.jaxb.ResponseType"],
-                                        "definitions":</value>
+                                        "definitions":
+                                    </value>
                                 </replacement>
                             </replacements>
                             <regex>true</regex>
-                            <regexFlags>MULTILINE</regexFlags>
                         </configuration>
                     </execution>
                     <execution>
@@ -78,18 +78,18 @@
                             <goal>replace</goal>
                         </goals>
                         <configuration>
-                            <filesToInclude>${basedir}/src/main/resources/OCPP-2.1_part3_JSON_schemas/*Request.json</filesToInclude>
-                            <preserveDir>false</preserveDir>
+                            <filesToInclude>${basedir}/src/main/resources/OCPP-2.1_part3_JSON_schemas/*Request.json
+                            </filesToInclude>
                             <outputDir>${project.build.directory}/generated-resources/2-1</outputDir>
                             <replacements>
                                 <replacement>
                                     <token>"definitions"\s*:</token>
                                     <value>"javaInterfaces": ["de.rwth.idsg.ocpp.jaxb.RequestType"],
-                                        "definitions":</value>
+                                        "definitions":
+                                    </value>
                                 </replacement>
                             </replacements>
                             <regex>true</regex>
-                            <regexFlags>MULTILINE</regexFlags>
                         </configuration>
                     </execution>
                     <execution>
@@ -99,18 +99,18 @@
                             <goal>replace</goal>
                         </goals>
                         <configuration>
-                            <filesToInclude>${basedir}/src/main/resources/OCPP-2.1_part3_JSON_schemas/*Response.json</filesToInclude>
-                            <preserveDir>false</preserveDir>
+                            <filesToInclude>${basedir}/src/main/resources/OCPP-2.1_part3_JSON_schemas/*Response.json
+                            </filesToInclude>
                             <outputDir>${project.build.directory}/generated-resources/2-1</outputDir>
                             <replacements>
                                 <replacement>
                                     <token>"definitions"\s*:</token>
                                     <value>"javaInterfaces": ["de.rwth.idsg.ocpp.jaxb.ResponseType"],
-                                        "definitions":</value>
+                                        "definitions":
+                                    </value>
                                 </replacement>
                             </replacements>
                             <regex>true</regex>
-                            <regexFlags>MULTILINE</regexFlags>
                         </configuration>
                     </execution>
                 </executions>

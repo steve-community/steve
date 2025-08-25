@@ -21,29 +21,41 @@ package de.rwth.idsg.steve.web;
 import com.google.common.base.Strings;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
-import org.joda.time.LocalDateTime;
+import org.joda.time.DateTime;
+import org.joda.time.base.AbstractInstant;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
-import org.springframework.security.core.parameters.P;
 
 import java.beans.PropertyEditorSupport;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
- * @since 04.01.2015
+ * @since 25.08.2025
  */
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-public class LocalDateTimeEditor extends PropertyEditorSupport {
+public class DateTimeEditor extends PropertyEditorSupport {
 
-    private final DateTimeFormatter dateTimeFormatter;
+    private final DateTimeFormatter writeFormatter;
+    private final DateTimeFormatter readFormatter;
 
-    public static LocalDateTimeEditor forMvc() {
-        return new LocalDateTimeEditor(DateTimeFormat.forPattern("yyyy-MM-dd HH:mm"));
+    public static DateTimeEditor forMvc() {
+        DateTimeFormatter dtf = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm");
+        return new DateTimeEditor(dtf, dtf);
     }
 
-    public static LocalDateTimeEditor forApi() {
-        return new LocalDateTimeEditor(ISODateTimeFormat.localDateOptionalTimeParser());
+    /**
+     * Uses full ISO 8601 date time format, e.g. "2024-08-25T14:30:00.000Z".
+     * - Writes: The same as Joda DateTime's toString() method {@link AbstractInstant#toString()}
+     * - Reads: A forgiving reader, that does not require all fields to be there. Accepts all ISO 8601 formats,
+     * e.g. "2024-08-25", "2024-08-25T14:30", "2024-08-25T14:30:00Z", etc. The missing fields will be filled with
+     * default values (time: 00:00:00.000, timezone: system default).
+     */
+    public static DateTimeEditor forApi() {
+        return new DateTimeEditor(
+            ISODateTimeFormat.dateTime(),
+            ISODateTimeFormat.dateTimeParser()
+        );
     }
 
     @Override
@@ -52,7 +64,7 @@ public class LocalDateTimeEditor extends PropertyEditorSupport {
         if (value == null) {
             return null;
         } else {
-            return dateTimeFormatter.print((LocalDateTime) value);
+            return writeFormatter.print((DateTime) value);
         }
     }
 
@@ -61,7 +73,7 @@ public class LocalDateTimeEditor extends PropertyEditorSupport {
         if (Strings.isNullOrEmpty(text)) {
             setValue(null);
         } else {
-            setValue(dateTimeFormatter.parseLocalDateTime(text));
+            setValue(readFormatter.parseDateTime(text));
         }
     }
 }

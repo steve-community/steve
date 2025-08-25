@@ -20,7 +20,7 @@ package de.rwth.idsg.steve.web.dto.ocpp;
 
 import lombok.Getter;
 import lombok.Setter;
-import org.joda.time.LocalDateTime;
+import org.joda.time.DateTime;
 
 import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.Min;
@@ -47,10 +47,10 @@ public class GetDiagnosticsParams extends MultipleChargePointSelect {
     private Integer retryInterval;
 
     @Past(message = "Start Date/Time must be in the past")
-    private LocalDateTime start;
+    private DateTime start;
 
     @Past(message = "Stop Date/Time must be in the past")
-    private LocalDateTime stop;
+    private DateTime stop;
 
     @AssertTrue(message = "Stop Date/Time must be after Start Date/Time")
     public boolean isValid() {

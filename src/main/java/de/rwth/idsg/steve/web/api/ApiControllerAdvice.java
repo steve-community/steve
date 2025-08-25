@@ -19,12 +19,11 @@
 package de.rwth.idsg.steve.web.api;
 
 import de.rwth.idsg.steve.SteveException;
-import de.rwth.idsg.steve.web.LocalDateTimeEditor;
+import de.rwth.idsg.steve.web.DateTimeEditor;
 import de.rwth.idsg.steve.web.api.exception.BadRequestException;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.joda.time.DateTime;
-import org.joda.time.LocalDateTime;
 import org.springframework.beans.propertyeditors.StringTrimmerEditor;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.BindException;
@@ -48,7 +47,7 @@ public class ApiControllerAdvice {
     @InitBinder
     public void binder(WebDataBinder binder) {
         binder.registerCustomEditor(String.class, new StringTrimmerEditor(true));
-        binder.registerCustomEditor(LocalDateTime.class, LocalDateTimeEditor.forApi());
+        binder.registerCustomEditor(DateTime.class, DateTimeEditor.forApi());
     }
 
     @ExceptionHandler(BindException.class)

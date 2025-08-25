@@ -24,8 +24,6 @@ import de.rwth.idsg.steve.web.dto.ocpp.GetDiagnosticsParams;
 
 import jakarta.xml.ws.AsyncHandler;
 
-import static de.rwth.idsg.steve.utils.DateTimeUtils.toDateTime;
-
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 09.03.2018
@@ -47,8 +45,8 @@ public class GetDiagnosticsTask extends CommunicationTask<GetDiagnosticsParams, 
                 .withLocation(params.getLocation())
                 .withRetries(params.getRetries())
                 .withRetryInterval(params.getRetryInterval())
-                .withStartTime(toDateTime(params.getStart()))
-                .withStopTime(toDateTime(params.getStop()));
+                .withStartTime(params.getStart())
+                .withStopTime(params.getStop());
     }
 
     @Override
@@ -57,8 +55,8 @@ public class GetDiagnosticsTask extends CommunicationTask<GetDiagnosticsParams, 
                 .withLocation(params.getLocation())
                 .withRetries(params.getRetries())
                 .withRetryInterval(params.getRetryInterval())
-                .withStartTime(toDateTime(params.getStart()))
-                .withStopTime(toDateTime(params.getStop()));
+                .withStartTime(params.getStart())
+                .withStopTime(params.getStop());
     }
 
     @Override
@@ -67,8 +65,8 @@ public class GetDiagnosticsTask extends CommunicationTask<GetDiagnosticsParams, 
                 .withLocation(params.getLocation())
                 .withRetries(params.getRetries())
                 .withRetryInterval(params.getRetryInterval())
-                .withStartTime(toDateTime(params.getStart()))
-                .withStopTime(toDateTime(params.getStop()));
+                .withStartTime(params.getStart())
+                .withStopTime(params.getStop());
     }
 
     @Override

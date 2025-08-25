@@ -228,8 +228,8 @@ public class ReservationRepositoryImpl implements ReservationRepository {
 
             case FROM_TO:
                 selectQuery.addConditions(
-                        RESERVATION.START_DATETIME.greaterOrEqual(form.getFrom().toDateTime()),
-                        RESERVATION.EXPIRY_DATETIME.lessOrEqual(form.getTo().toDateTime())
+                        RESERVATION.START_DATETIME.greaterOrEqual(form.getFrom()),
+                        RESERVATION.EXPIRY_DATETIME.lessOrEqual(form.getTo())
                 );
                 break;
 

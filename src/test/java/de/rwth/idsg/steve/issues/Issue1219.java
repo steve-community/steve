@@ -36,7 +36,6 @@ import jooq.steve.db.enums.TransactionStopEventActor;
 import lombok.RequiredArgsConstructor;
 import org.joda.time.DateTime;
 import org.joda.time.Duration;
-import org.joda.time.LocalDateTime;
 import org.jooq.DSLContext;
 import org.jooq.SQLDialect;
 import org.jooq.impl.DSL;
@@ -200,9 +199,9 @@ public class Issue1219 {
         return null;
     }
 
-    private static LocalDateTime getRandomExpiry() {
+    private static DateTime getRandomExpiry() {
         if (ThreadLocalRandom.current().nextBoolean()) {
-            return LocalDateTime.now().plusDays(ThreadLocalRandom.current().nextInt(1, 365));
+            return DateTime.now().plusDays(ThreadLocalRandom.current().nextInt(1, 365));
         }
         return null;
     }

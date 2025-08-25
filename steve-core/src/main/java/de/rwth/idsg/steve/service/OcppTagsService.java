@@ -18,6 +18,7 @@
  */
 package de.rwth.idsg.steve.service;
 
+import static de.rwth.idsg.steve.utils.DateTimeUtils.toOffsetDateTime;
 import static de.rwth.idsg.steve.utils.OcppTagActivityRecordUtils.isBlocked;
 import static de.rwth.idsg.steve.utils.OcppTagActivityRecordUtils.isExpired;
 
@@ -34,9 +35,9 @@ import ocpp.cp._2015._10.AuthorizationData;
 import ocpp.cs._2015._10.AuthorizationStatus;
 import ocpp.cs._2015._10.IdTagInfo;
 import org.jetbrains.annotations.Nullable;
-import org.joda.time.DateTime;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Supplier;
@@ -84,12 +85,12 @@ public class OcppTagsService {
     }
 
     public List<AuthorizationData> getAuthDataOfAllTags() {
-        DateTime nowDt = DateTime.now();
+        var nowDt = LocalDateTime.now();
         return ocppTagRepository.getRecords().map(record -> mapToAuthorizationData(record, nowDt));
     }
 
     public List<AuthorizationData> getAuthData(List<String> idTagList) {
-        DateTime nowDt = DateTime.now();
+        var nowDt = LocalDateTime.now();
         return ocppTagRepository.getRecords(idTagList).map(record -> mapToAuthorizationData(record, nowDt));
     }
 
@@ -158,7 +159,8 @@ public class OcppTagsService {
     /**
      * ConcurrentTx is only valid for StartTransactionRequest
      */
-    private static ocpp.cp._2015._10.AuthorizationStatus decideStatusForAuthData(OcppTagActivityRecord record, DateTime now) {
+    private static ocpp.cp._2015._10.AuthorizationStatus decideStatusForAuthData(OcppTagActivityRecord record,
+                                                                                 LocalDateTime now) {
         if (isBlocked(record)) {
             return ocpp.cp._2015._10.AuthorizationStatus.BLOCKED;
         } else if (isExpired(record, now)) {
@@ -170,13 +172,13 @@ public class OcppTagsService {
         }
     }
 
-    private static AuthorizationData mapToAuthorizationData(OcppTagActivityRecord record, DateTime nowDt) {
+    private static AuthorizationData mapToAuthorizationData(OcppTagActivityRecord record, LocalDateTime nowDt) {
         return new AuthorizationData().withIdTag(record.getIdTag())
                                       .withIdTagInfo(
                                               new ocpp.cp._2015._10.IdTagInfo()
                                                       .withStatus(decideStatusForAuthData(record, nowDt))
                                                       .withParentIdTag(record.getParentIdTag())
-                                                      .withExpiryDate(record.getExpiryDate())
+                                                      .withExpiryDate(toOffsetDateTime(record.getExpiryDate()))
                                       );
     }
 }

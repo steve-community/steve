@@ -40,12 +40,12 @@ import jooq.steve.db.tables.SchemaVersion;
 import jooq.steve.db.tables.Settings;
 import jooq.steve.db.tables.records.OcppTagActivityRecord;
 import jooq.steve.db.tables.records.TransactionRecord;
-import org.joda.time.DateTime;
 import org.jooq.DSLContext;
 import org.jooq.Schema;
 import org.jooq.Table;
 import org.jooq.impl.DSL;
 
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -91,7 +91,7 @@ public class __DatabasePreparer__ {
                                                                 .chargeBoxId(REGISTERED_CHARGE_BOX_ID)
                                                                 .idTag(REGISTERED_OCPP_TAG)
                                                                 .connectorId(connectorId)
-                                                                .expiryTimestamp(DateTime.now().plusHours(1))
+                                                                .expiryTimestamp(LocalDateTime.now().plusHours(1))
                                                                 .build();
         int reservationId = r.insert(params);
         r.accepted(reservationId);

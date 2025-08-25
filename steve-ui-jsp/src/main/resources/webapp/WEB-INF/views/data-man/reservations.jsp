@@ -18,6 +18,7 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 --%>
+<%@ taglib prefix="f" uri="https://www.steve-project.org/tld/datetime" %>
 <%@ include file="../00-header.jsp" %>
 <%@ include file="../00-op-bind-errors.jsp" %>
 <script type="text/javascript">
@@ -120,8 +121,8 @@
 			<td><a href="${ctxPath}/manager/ocppTags/details/${res.ocppTagPk}">${res.ocppIdTag}</a></td>
 			<td><a href="${ctxPath}/manager/chargepoints/details/${res.chargeBoxPk}">${res.chargeBoxId}</a></td>
 			<td>${res.connectorId}</td>
-			<td data-sort-value="${res.startDatetimeDT.millis}">${res.startDatetime}</td>
-			<td data-sort-value="${res.expiryDatetimeDT.millis}">${res.expiryDatetime}</td>
+			<td data-sort-value="${f:toMillis(res.startDatetimeDT)}">${res.startDatetime}</td>
+			<td data-sort-value="${f:toMillis(res.expiryDatetimeDT)}">${res.expiryDatetime}</td>
 			<td>${res.status}</td>
 		</tr>
 	</c:forEach>

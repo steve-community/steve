@@ -24,8 +24,6 @@ import de.rwth.idsg.steve.web.api.exception.BadRequestException;
 import de.rwth.idsg.steve.web.api.exception.NotFoundException;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
-import org.joda.time.DateTime;
-import org.joda.time.LocalDateTime;
 import org.springframework.beans.propertyeditors.StringTrimmerEditor;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.BindException;
@@ -37,6 +35,8 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import jakarta.servlet.http.HttpServletRequest;
+
+import java.time.LocalDateTime;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -103,7 +103,7 @@ public class ApiControllerAdvice {
     public static ApiErrorResponse createResponse(String url, HttpStatus status, String message) {
         ApiErrorResponse result = new ApiErrorResponse();
 
-        result.setTimestamp(DateTime.now());
+        result.setTimestamp(LocalDateTime.now());
         result.setStatus(status.value());
         result.setError(status.getReasonPhrase());
         result.setMessage(message);
@@ -114,7 +114,7 @@ public class ApiControllerAdvice {
 
     @Data
     public static class ApiErrorResponse {
-        private DateTime timestamp;
+        private LocalDateTime timestamp;
         private int status;
         private String error;
         private String message;

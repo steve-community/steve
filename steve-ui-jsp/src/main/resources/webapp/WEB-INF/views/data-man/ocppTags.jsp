@@ -18,6 +18,7 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 --%>
+<%@ taglib prefix="f" uri="https://www.steve-project.org/tld/datetime" %>
 <%@ include file="../00-header.jsp" %>
 <script type="text/javascript">
     $(document).ready(function () {
@@ -50,7 +51,7 @@
                 <tr>
                     <td><encode:forHtml value="${item.key}" /></td>
                     <td>${item.numberOfAttempts}</td>
-                    <td data-sort-value="${item.lastAttemptTimestamp.millis}">${item.lastAttemptTimestamp}</td>
+                    <td data-sort-value="${f:toMillis(item.lastAttemptTimestamp)}">${item.lastAttemptTimestamp}</td>
                     <td class="inlineWrapper">
                         <form:form cssClass="inline" action="${ctxPath}/manager/ocppTags/unknown/add/${item.key}/" method="post">
                             <input type="submit" class="blueSubmit" value="Add"/>
@@ -153,7 +154,7 @@
                             <a href="${ctxPath}/manager/ocppTags/details/${item.parentOcppTagPk}">${item.parentIdTag}</a>
                         </c:if>
                     </td>
-                    <td data-sort-value="${item.expiryDate.millis}">${item.expiryDateFormatted}</td>
+                    <td data-sort-value="${f:toMillis(item.expiryDate)}">${item.expiryDateFormatted}</td>
                     <td>${item.inTransaction}</td>
                     <td>${item.blocked}</td>
                     <td>

@@ -18,6 +18,7 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 --%>
+<%@ taglib prefix="f" uri="https://www.steve-project.org/tld/datetime" %>
 <%@ include file="../00-header.jsp" %>
 <script type="text/javascript">
     $(document).ready(function() {
@@ -50,7 +51,7 @@
                 <tr>
                     <td><encode:forHtml value="${item.key}" /></td>
                     <td>${item.numberOfAttempts}</td>
-                    <td data-sort-value="${item.lastAttemptTimestamp.millis}">${item.lastAttemptTimestamp}</td>
+                    <td data-sort-value="${f:toMillis(item.lastAttemptTimestamp)}">${item.lastAttemptTimestamp}</td>
                     <td>
                         <form:form cssClass="inline" action="${ctxPath}/manager/chargepoints/unknown/add/${item.key}/" method="post">
                             <input type="submit" class="blueSubmit" value="Add"/>
@@ -130,7 +131,7 @@
                 <tr><td><a href="${ctxPath}/manager/chargepoints/details/${cp.chargeBoxPk}">${cp.chargeBoxId}</a></td>
                     <td>${cp.description}</td>
                     <td>${cp.ocppProtocol}</td>
-                    <td data-sort-value="${cp.lastHeartbeatTimestampDT.millis}">${cp.lastHeartbeatTimestamp}</td>
+                    <td data-sort-value="${f:toMillis(cp.lastHeartbeatTimestampDT)}">${cp.lastHeartbeatTimestamp}</td>
                     <td>
                         <form:form action="${ctxPath}/manager/chargepoints/delete/${cp.chargeBoxPk}">
                             <input type="submit" class="redSubmit" value="Delete">

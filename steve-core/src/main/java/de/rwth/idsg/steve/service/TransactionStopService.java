@@ -28,15 +28,17 @@ import de.rwth.idsg.steve.utils.TransactionStopServiceHelper;
 import jooq.steve.db.enums.TransactionStopEventActor;
 import jooq.steve.db.tables.records.TransactionStartRecord;
 import lombok.Builder;
+import lombok.RequiredArgsConstructor;
 import ocpp.cs._2012._06.UnitOfMeasure;
 import org.jetbrains.annotations.Nullable;
-import org.joda.time.DateTime;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.Comparator;
 import java.util.List;
 
+import static de.rwth.idsg.steve.utils.DateTimeUtils.toOffsetDateTime;
 import static de.rwth.idsg.steve.utils.TransactionStopServiceHelper.floatingStringToIntString;
 import static de.rwth.idsg.steve.utils.TransactionStopServiceHelper.kWhStringToWhString;
 
@@ -45,10 +47,11 @@ import static de.rwth.idsg.steve.utils.TransactionStopServiceHelper.kWhStringToW
  * @since 09.12.2018
  */
 @Service
+@RequiredArgsConstructor
 public class TransactionStopService {
 
-    @Autowired private TransactionRepository transactionRepository;
-    @Autowired private OcppServerRepository ocppServerRepository;
+    private final TransactionRepository transactionRepository;
+    private final OcppServerRepository ocppServerRepository;
 
     public void stop(List<Integer> transactionPkList) {
         transactionPkList.stream()
@@ -73,7 +76,7 @@ public class TransactionStopService {
                                                                       .stopMeterValue(values.stopValue)
                                                                       .stopTimestamp(values.stopTimestamp)
                                                                       .eventActor(TransactionStopEventActor.manual)
-                                                                      .eventTimestamp(DateTime.now())
+                                                                      .eventTimestamp(LocalDateTime.now())
                                                                       .build());
     }
 
@@ -104,13 +107,13 @@ public class TransactionStopService {
             if (Integer.parseInt(nextTx.getStartValue()) > Integer.parseInt(thisTx.getStartValue())) {
                 return TerminationValues.builder()
                                         .stopValue(nextTx.getStartValue())
-                                        .stopTimestamp(nextTx.getStartTimestamp())
+                                        .stopTimestamp(toOffsetDateTime(nextTx.getStartTimestamp()))
                                         .build();
             } else {
                 // this mix of strategies might be really confusing
                 return TerminationValues.builder()
                                         .stopValue(thisTx.getStartValue())
-                                        .stopTimestamp(nextTx.getStartTimestamp())
+                                        .stopTimestamp(toOffsetDateTime(nextTx.getStartTimestamp()))
                                         .build();
             }
         }
@@ -158,6 +161,6 @@ public class TransactionStopService {
     @Builder
     private static class TerminationValues {
         private final String stopValue;
-        private final DateTime stopTimestamp;
+        private final OffsetDateTime stopTimestamp;
     }
 }

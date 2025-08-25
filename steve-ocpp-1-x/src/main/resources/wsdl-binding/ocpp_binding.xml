@@ -7,8 +7,8 @@
 
     <jaxb:globalBindings generateIsSetMethod="true">
 
-        <xjc:javaType name="org.joda.time.DateTime" xmlType="xs:dateTime"
-                      adapter="de.rwth.idsg.ocpp.jaxb.JodaDateTimeConverter" />
+        <xjc:javaType name="java.time.OffsetDateTime" xmlType="xs:dateTime"
+                      adapter="de.rwth.idsg.ocpp.jaxb.JavaDateTimeConverter" />
 
     </jaxb:globalBindings>
 

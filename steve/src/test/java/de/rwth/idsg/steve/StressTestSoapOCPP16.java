@@ -39,9 +39,9 @@ import ocpp.cs._2015._10.StatusNotificationRequest;
 import ocpp.cs._2015._10.StatusNotificationResponse;
 import ocpp.cs._2015._10.StopTransactionRequest;
 import ocpp.cs._2015._10.StopTransactionResponse;
-import org.joda.time.DateTime;
 import org.junit.jupiter.api.Assertions;
 
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -115,7 +115,7 @@ public class StressTestSoapOCPP16 extends StressTest {
                                     .withErrorCode(ChargePointErrorCode.NO_ERROR)
                                     .withStatus(ChargePointStatus.AVAILABLE)
                                     .withConnectorId(i)
-                                    .withTimestamp(DateTime.now()),
+                                    .withTimestamp(OffsetDateTime.now()),
                             chargeBoxId
                     );
                     Assertions.assertNotNull(status);
@@ -131,7 +131,7 @@ public class StressTestSoapOCPP16 extends StressTest {
                         new StartTransactionRequest()
                                 .withConnectorId(connectorId)
                                 .withIdTag(idTag)
-                                .withTimestamp(DateTime.now())
+                                .withTimestamp(OffsetDateTime.now())
                                 .withMeterStart(transactionStart),
                         chargeBoxId
                 );
@@ -142,7 +142,7 @@ public class StressTestSoapOCPP16 extends StressTest {
                                 .withErrorCode(ChargePointErrorCode.NO_ERROR)
                                 .withStatus(ChargePointStatus.CHARGING)
                                 .withConnectorId(connectorId)
-                                .withTimestamp(DateTime.now()),
+                                .withTimestamp(OffsetDateTime.now()),
                         chargeBoxId
                 );
                 Assertions.assertNotNull(statusStart);
@@ -159,7 +159,7 @@ public class StressTestSoapOCPP16 extends StressTest {
                 StopTransactionResponse stop = client.stopTransaction(
                         new StopTransactionRequest()
                                 .withTransactionId(start.getTransactionId())
-                                .withTimestamp(DateTime.now())
+                                .withTimestamp(OffsetDateTime.now())
                                 .withIdTag(idTag)
                                 .withMeterStop(transactionStop),
                         chargeBoxId
@@ -171,7 +171,7 @@ public class StressTestSoapOCPP16 extends StressTest {
                                 .withErrorCode(ChargePointErrorCode.NO_ERROR)
                                 .withStatus(ChargePointStatus.AVAILABLE)
                                 .withConnectorId(connectorId)
-                                .withTimestamp(DateTime.now()),
+                                .withTimestamp(OffsetDateTime.now()),
                         chargeBoxId
                 );
                 Assertions.assertNotNull(statusStop);

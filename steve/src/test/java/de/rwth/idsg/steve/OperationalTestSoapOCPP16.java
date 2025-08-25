@@ -51,7 +51,6 @@ import ocpp.cs._2015._10.StatusNotificationRequest;
 import ocpp.cs._2015._10.StatusNotificationResponse;
 import ocpp.cs._2015._10.StopTransactionRequest;
 import ocpp.cs._2015._10.StopTransactionResponse;
-import org.joda.time.DateTime;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
@@ -60,6 +59,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import jakarta.xml.ws.WebServiceException;
+
+import java.time.OffsetDateTime;
 import java.util.Arrays;
 import java.util.List;
 
@@ -191,7 +192,7 @@ public class OperationalTestSoapOCPP16 {
                 new StartTransactionRequest()
                         .withConnectorId(2)
                         .withIdTag(REGISTERED_OCPP_TAG)
-                        .withTimestamp(DateTime.now())
+                        .withTimestamp(OffsetDateTime.now())
                         .withMeterStart(0),
                 REGISTERED_CHARGE_BOX_ID
         );
@@ -203,7 +204,7 @@ public class OperationalTestSoapOCPP16 {
         StopTransactionResponse stop = client.stopTransaction(
                 new StopTransactionRequest()
                         .withTransactionId(start.getTransactionId())
-                        .withTimestamp(DateTime.now())
+                        .withTimestamp(OffsetDateTime.now())
                         .withIdTag(REGISTERED_OCPP_TAG)
                         .withMeterStop(30),
                 REGISTERED_CHARGE_BOX_ID
@@ -231,7 +232,7 @@ public class OperationalTestSoapOCPP16 {
                     new StartTransactionRequest()
                             .withConnectorId(2)
                             .withIdTag(REGISTERED_OCPP_TAG)
-                            .withTimestamp(DateTime.now())
+                            .withTimestamp(OffsetDateTime.now())
                             .withMeterStart(0),
                     REGISTERED_CHARGE_BOX_ID);
             Assertions.assertTrue(start1.getTransactionId() > 0);
@@ -253,7 +254,7 @@ public class OperationalTestSoapOCPP16 {
                     new StartTransactionRequest()
                             .withConnectorId(2)
                             .withIdTag(REGISTERED_OCPP_TAG)
-                            .withTimestamp(DateTime.now())
+                            .withTimestamp(OffsetDateTime.now())
                             .withMeterStart(0),
                     REGISTERED_CHARGE_BOX_ID_2);
             Assertions.assertTrue(start2.getTransactionId() > 0);
@@ -285,7 +286,7 @@ public class OperationalTestSoapOCPP16 {
                                 .withErrorCode(ChargePointErrorCode.NO_ERROR)
                                 .withStatus(chargePointStatus)
                                 .withConnectorId(i)
-                                .withTimestamp(DateTime.now()),
+                                .withTimestamp(OffsetDateTime.now()),
                         REGISTERED_CHARGE_BOX_ID
                 );
                 Assertions.assertNotNull(status);
@@ -309,7 +310,7 @@ public class OperationalTestSoapOCPP16 {
                         .withErrorCode(ChargePointErrorCode.HIGH_TEMPERATURE)
                         .withStatus(ChargePointStatus.FAULTED)
                         .withConnectorId(faultyConnectorId)
-                        .withTimestamp(DateTime.now()),
+                        .withTimestamp(OffsetDateTime.now()),
                 REGISTERED_CHARGE_BOX_ID
         );
         Assertions.assertNotNull(statusConnectorError);
@@ -352,7 +353,7 @@ public class OperationalTestSoapOCPP16 {
                 new StartTransactionRequest()
                         .withConnectorId(usedConnectorID)
                         .withIdTag(REGISTERED_OCPP_TAG)
-                        .withTimestamp(DateTime.now())
+                        .withTimestamp(OffsetDateTime.now())
                         .withMeterStart(0)
                         .withReservationId(nonExistingReservationId),
                 REGISTERED_CHARGE_BOX_ID
@@ -381,7 +382,7 @@ public class OperationalTestSoapOCPP16 {
                 new StartTransactionRequest()
                         .withConnectorId(3)
                         .withIdTag(getRandomString())
-                        .withTimestamp(DateTime.now())
+                        .withTimestamp(OffsetDateTime.now())
                         .withMeterStart(0)
                         .withReservationId(reservationId),
                 REGISTERED_CHARGE_BOX_ID
@@ -404,7 +405,7 @@ public class OperationalTestSoapOCPP16 {
                 new StartTransactionRequest()
                         .withConnectorId(usedConnectorID)
                         .withIdTag(REGISTERED_OCPP_TAG)
-                        .withTimestamp(DateTime.now())
+                        .withTimestamp(OffsetDateTime.now())
                         .withMeterStart(0)
                         .withReservationId(reservationId),
                 REGISTERED_CHARGE_BOX_ID
@@ -428,7 +429,7 @@ public class OperationalTestSoapOCPP16 {
                 new StartTransactionRequest()
                         .withConnectorId(usedConnectorID)
                         .withIdTag(REGISTERED_OCPP_TAG)
-                        .withTimestamp(DateTime.now())
+                        .withTimestamp(OffsetDateTime.now())
                         .withMeterStart(0)
                         .withReservationId(reservationId),
                 REGISTERED_CHARGE_BOX_ID
@@ -490,7 +491,7 @@ public class OperationalTestSoapOCPP16 {
 
 
         // startTransaction
-        DateTime startTimeStamp = DateTime.now();
+        var startTimeStamp = OffsetDateTime.now();
         StartTransactionResponse start = client.startTransaction(
                 new StartTransactionRequest()
                         .withConnectorId(usedConnectorID)
@@ -522,7 +523,7 @@ public class OperationalTestSoapOCPP16 {
                         .withStatus(ChargePointStatus.CHARGING)
                         .withErrorCode(ChargePointErrorCode.NO_ERROR)
                         .withConnectorId(0)
-                        .withTimestamp(DateTime.now()),
+                        .withTimestamp(OffsetDateTime.now()),
                 REGISTERED_CHARGE_BOX_ID
 
         );
@@ -542,7 +543,7 @@ public class OperationalTestSoapOCPP16 {
         }
 
         // stopTransaction
-        DateTime stopTimeStamp = DateTime.now();
+        var stopTimeStamp = OffsetDateTime.now();
         int stopValue = 30;
         StopTransactionResponse stop = client.stopTransaction(
                 new StopTransactionRequest()
@@ -573,7 +574,7 @@ public class OperationalTestSoapOCPP16 {
                         .withStatus(ChargePointStatus.AVAILABLE)
                         .withErrorCode(ChargePointErrorCode.NO_ERROR)
                         .withConnectorId(usedConnectorID)
-                        .withTimestamp(DateTime.now()),
+                        .withTimestamp(OffsetDateTime.now()),
                 REGISTERED_CHARGE_BOX_ID
         );
         Assertions.assertNotNull(statusStop);
@@ -596,7 +597,7 @@ public class OperationalTestSoapOCPP16 {
                             .withErrorCode(ChargePointErrorCode.NO_ERROR)
                             .withStatus(ChargePointStatus.AVAILABLE)
                             .withConnectorId(i)
-                            .withTimestamp(DateTime.now()),
+                            .withTimestamp(OffsetDateTime.now()),
                     REGISTERED_CHARGE_BOX_ID
             );
             Assertions.assertNotNull(statusBoot);
@@ -640,7 +641,7 @@ public class OperationalTestSoapOCPP16 {
     }
 
     private static MeterValue createMeterValue(String val) {
-        return new MeterValue().withTimestamp(DateTime.now())
+        return new MeterValue().withTimestamp(OffsetDateTime.now())
                                .withSampledValue(new SampledValue().withValue(val));
     }
 }

@@ -23,8 +23,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.Nullable;
-import org.joda.time.DateTime;
 
+import java.time.OffsetDateTime;
 import java.util.List;
 
 /**
@@ -47,7 +47,7 @@ public class TransactionDetails {
     @Getter
     @Builder
     public static class MeterValues {
-        private final DateTime valueTimestamp;
+        private final OffsetDateTime valueTimestamp;
         private final String value, readingContext, format, measurand, location, unit;
 
         // New in OCPP 1.6

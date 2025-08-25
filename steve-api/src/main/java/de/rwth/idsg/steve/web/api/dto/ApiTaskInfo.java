@@ -23,17 +23,17 @@ import de.rwth.idsg.steve.ocpp.OcppVersion;
 import de.rwth.idsg.steve.ocpp.RequestResult;
 import de.rwth.idsg.steve.ocpp.TaskOrigin;
 import io.swagger.v3.oas.annotations.media.Schema;
+
+import java.time.OffsetDateTime;
 import java.util.Map;
 
 import lombok.Getter;
 import lombok.Setter;
-import org.joda.time.DateTime;
 
 /**
  * @author fnkbsi
  * @since 18.10.2023
  */
-
 @Getter
 @Setter
 public class ApiTaskInfo {
@@ -54,9 +54,9 @@ public class ApiTaskInfo {
     private int resultSize;
 
     @Schema(description = "Starttime")
-    private DateTime startTimestamp;
+    private OffsetDateTime startTimestamp;
     @Schema(description = "Endtime")
-    private DateTime endTimestamp;
+    private OffsetDateTime endTimestamp;
 
     @Schema(description = "Error count")
     private int errorCount;

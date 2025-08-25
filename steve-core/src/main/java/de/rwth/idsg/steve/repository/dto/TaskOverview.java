@@ -23,7 +23,8 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import org.joda.time.DateTime;
+
+import java.time.LocalDateTime;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -40,9 +41,9 @@ public final class TaskOverview implements Comparable<TaskOverview> {
     @Schema(description = "Request count")
     private final int requestCount;
     @Schema(description = "Start time")
-    private final DateTime start;
+    private final LocalDateTime start;
     @Schema(description = "End time")
-    private final DateTime end;
+    private final LocalDateTime end;
     @Schema(description = "Task origin (internal or external)")
     private final TaskOrigin origin;
 

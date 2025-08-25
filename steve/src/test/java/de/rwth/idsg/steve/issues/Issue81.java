@@ -29,6 +29,7 @@ import ocpp.cs._2015._10.RegistrationStatus;
 import ocpp.cs._2015._10.StartTransactionRequest;
 
 import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.concurrent.ThreadLocalRandom;
 
 import static de.rwth.idsg.steve.utils.Helpers.getForOcpp16;
@@ -72,10 +73,10 @@ public class Issue81 extends StressTest {
                 assertThat(boot.getStatus()).isEqualTo(RegistrationStatus.ACCEPTED);
 
                 var req = new StartTransactionRequest()
-                        .withConnectorId(ThreadLocalRandom.current().nextInt())
+                        .withConnectorId(ThreadLocalRandom.current().nextInt(1, 8))
                         .withIdTag(Helpers.getRandomString())
-                        .withTimestamp(OffsetDateTime.now())
-                        .withMeterStart(ThreadLocalRandom.current().nextInt());
+                        .withTimestamp(OffsetDateTime.now(ZoneOffset.UTC))
+                        .withMeterStart(ThreadLocalRandom.current().nextInt(0, 1_000_000));
                 txRequest.set(req);
 
                 Integer t1 = sendStartTx(client.get(), txRequest.get(), chargeBoxId.get());

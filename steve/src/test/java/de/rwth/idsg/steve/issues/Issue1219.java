@@ -98,7 +98,7 @@ public class Issue1219 {
         List<OcppTag.OcppTagOverview> values = repository.getOverview(new OcppTagQueryForm());
         var stop = Instant.now();
 
-        System.out.println("took " + Duration.between(stop, start).toMillis());
+        System.out.println("took " + Duration.between(start, stop).toMillis() + " ms");
     }
 
     private List<Integer> insertStopTransactions(List<Integer> insertedTransactionIds) {

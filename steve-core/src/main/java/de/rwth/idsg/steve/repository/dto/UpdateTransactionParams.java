@@ -38,6 +38,7 @@ public class UpdateTransactionParams {
     private final String stopMeterValue;
     private final String stopReason;
 
+    @Builder.Default
     private final TransactionStatusUpdate statusUpdate = TransactionStatusUpdate.AfterStop;
 
     // these two came after splitting transaction table into two tables (start and stop)

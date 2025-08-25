@@ -28,7 +28,6 @@ import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
 import java.time.temporal.ChronoField;
-import java.time.temporal.TemporalAccessor;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class DateTimeUtils {
@@ -92,7 +91,8 @@ public final class DateTimeUtils {
             // between Central Systems and Charge Points.
             dateTime = dateTime.withOffsetSameInstant(ZoneOffset.UTC);
         } else {
-            dateTime = dateTime.withOffsetSameInstant(zoneId.getRules().getOffset(dateTime.toLocalDateTime()));
+            var targetOffset = zoneId.getRules().getOffset(dateTime.toInstant());
+            dateTime = dateTime.withOffsetSameInstant(targetOffset);
         }
         return OCPP_DATETIME_FORMATTER.format(dateTime);
     }

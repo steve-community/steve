@@ -44,7 +44,9 @@ import java.time.Duration;
 import java.util.EnumMap;
 import java.util.Map;
 
-import static de.rwth.idsg.steve.ocpp.OcppVersion.*;
+import static de.rwth.idsg.steve.ocpp.OcppVersion.V_12;
+import static de.rwth.idsg.steve.ocpp.OcppVersion.V_15;
+import static de.rwth.idsg.steve.ocpp.OcppVersion.V_16;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>

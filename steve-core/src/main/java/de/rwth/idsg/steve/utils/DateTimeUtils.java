@@ -105,10 +105,18 @@ public final class DateTimeUtils {
         var seconds = duration.getSeconds();
 
         var sb = new StringBuilder();
-        if (days > 0) sb.append(days).append(days == 1 ? " day" : " days").append(" ");
-        if (hours > 0) sb.append(hours).append(hours == 1 ? " hour" : " hours").append(" ");
-        if (minutes > 0) sb.append(minutes).append(minutes == 1 ? " minute" : " minutes").append(" ");
-        if (seconds > 0 || sb.isEmpty()) sb.append(seconds).append(seconds == 1 ? " second" : " seconds");
+        if (days > 0) {
+            sb.append(days).append(days == 1 ? " day" : " days").append(" ");
+        }
+        if (hours > 0) {
+            sb.append(hours).append(hours == 1 ? " hour" : " hours").append(" ");
+        }
+        if (minutes > 0) {
+            sb.append(minutes).append(minutes == 1 ? " minute" : " minutes").append(" ");
+        }
+        if (seconds > 0 || sb.isEmpty()) {
+            sb.append(seconds).append(seconds == 1 ? " second" : " seconds");
+        }
 
         return sb.toString().trim();
     }

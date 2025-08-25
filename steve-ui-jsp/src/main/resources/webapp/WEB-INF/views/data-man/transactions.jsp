@@ -120,9 +120,9 @@ Transactions
                 <td><a href="${ctxPath}/manager/chargepoints/details/${ta.chargeBoxPk}">${ta.chargeBoxId}</a></td>
                 <td>${ta.connectorId}</td>
                 <td><a href="${ctxPath}/manager/ocppTags/details/${ta.ocppTagPk}">${ta.ocppIdTag}</a></td>
-                <td data-sort-value="${f:toMillis(ta.startTimestamp)}">${ta.startTimestampFormatted}</td>
+                <td data-sort-value="${f:offsetToMillis(ta.startTimestamp)}">${ta.startTimestampFormatted}</td>
                 <td>${ta.startValue}</td>
-                <td data-sort-value="${f:toMillis(ta.stopTimestamp)}">${ta.stopTimestampFormatted}</td>
+                <td data-sort-value="${f:offsetToMillis(ta.stopTimestamp)}">${ta.stopTimestampFormatted}</td>
                 <td>${ta.stopValue}</td>
                 <td><encode:forHtml value="${ta.stopReason}" /></td>
                 <td>

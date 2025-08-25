@@ -25,7 +25,7 @@ import ocpp.cp._2015._10.ChargingProfileKindType;
 import ocpp.cp._2015._10.ChargingProfilePurposeType;
 import ocpp.cp._2015._10.ChargingRateUnitType;
 import ocpp.cp._2015._10.RecurrencyKindType;
-import org.joda.time.LocalDateTime;
+import org.joda.time.DateTime;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.AssertTrue;
@@ -65,15 +65,15 @@ public class ChargingProfileForm {
 
     private RecurrencyKindType recurrencyKind;
 
-    private LocalDateTime validFrom;
+    private DateTime validFrom;
 
     @Future(message = "Valid To must be in future")
-    private LocalDateTime validTo;
+    private DateTime validTo;
 
     @Positive(message = "Duration has to be a positive number")
     private Integer durationInSeconds;
 
-    private LocalDateTime startSchedule;
+    private DateTime startSchedule;
 
     @NotNull(message = "Charging Rate Unit has to be set")
     private ChargingRateUnitType chargingRateUnit;

@@ -326,7 +326,7 @@ public class ChargePointServiceClient {
             .chargeBoxId(list.get(0).getChargeBoxId())
             .connectorId(params.getConnectorId())
             .startTimestamp(DateTime.now())
-            .expiryTimestamp(params.getExpiry().toDateTime())
+            .expiryTimestamp(params.getExpiry())
             .build();
 
         int reservationId = reservationRepository.insert(res);

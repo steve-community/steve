@@ -20,7 +20,7 @@ package de.rwth.idsg.steve.web.dto.ocpp;
 
 import lombok.Getter;
 import lombok.Setter;
-import org.joda.time.LocalDateTime;
+import org.joda.time.DateTime;
 
 import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.Min;
@@ -48,5 +48,5 @@ public class UpdateFirmwareParams extends MultipleChargePointSelect {
 
     @Future(message = "Retrieve Date/Time must be in future")
     @NotNull(message = "Retrieve Date/Time is required")
-    private LocalDateTime retrieve;
+    private DateTime retrieve;
 }

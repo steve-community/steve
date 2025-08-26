@@ -18,7 +18,7 @@
  */
 package de.rwth.idsg.steve.issues;
 
-import de.rwth.idsg.steve.SteveConfigurationReader;
+import de.rwth.idsg.steve.utils.SteveConfigurationReader;
 import de.rwth.idsg.steve.StressTest;
 import de.rwth.idsg.steve.utils.Helpers;
 import de.rwth.idsg.steve.utils.StressTester;

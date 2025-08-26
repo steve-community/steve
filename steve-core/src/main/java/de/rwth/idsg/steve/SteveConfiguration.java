@@ -64,7 +64,7 @@ public class SteveConfiguration {
         }
     }
 
-    void postConstruct() {
+    public void postConstruct() {
         if (!(jetty.httpEnabled || jetty.httpsEnabled)) {
             throw new IllegalArgumentException(
                     "HTTP and HTTPS are both disabled. Well, how do you want to access the server, then?");

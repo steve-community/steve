@@ -21,7 +21,7 @@ package de.rwth.idsg.steve.issues;
 import com.google.common.collect.Lists;
 import de.rwth.idsg.steve.Application;
 import de.rwth.idsg.steve.ApplicationProfile;
-import de.rwth.idsg.steve.SteveConfigurationReader;
+import de.rwth.idsg.steve.utils.SteveConfigurationReader;
 import de.rwth.idsg.steve.utils.__DatabasePreparer__;
 import ocpp.cs._2015._10.AuthorizationStatus;
 import ocpp.cs._2015._10.AuthorizeRequest;

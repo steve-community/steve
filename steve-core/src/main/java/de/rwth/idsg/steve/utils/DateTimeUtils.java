@@ -25,6 +25,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
+import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -83,11 +84,11 @@ public final class DateTimeUtils {
     /**
      * Print the date/time nicer, if it's from today, yesterday or tomorrow.
      */
-    public static String humanize(Instant dt, ZoneOffset timeZone) {
+    public static String humanize(Instant dt, ZoneId timeZone) {
         if (dt == null) {
             return "";
         }
-        return humanize(dt.atOffset(timeZone).toLocalDateTime());
+        return humanize(dt.atZone(timeZone).toLocalDateTime());
     }
 
     public static String humanize(LocalDateTime dt) {

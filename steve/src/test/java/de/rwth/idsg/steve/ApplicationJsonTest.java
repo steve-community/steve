@@ -176,7 +176,7 @@ public class ApplicationJsonTest {
     }
 
     @Test
-    public void tesWithUnauthorizedStation() {
+    public void testWithUnauthorizedStation() {
         var chargePoint = new OcppJsonChargePoint(OCPP_MAPPER, OcppVersion.V_16, "unauth1234", PATH);
         var thrown = catchThrowable(chargePoint::start);
         then(thrown)

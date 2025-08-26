@@ -26,7 +26,7 @@ import de.rwth.idsg.steve.web.dto.OcppJsonStatus;
 import de.rwth.idsg.steve.web.dto.Statistics;
 import ocpp.cs._2015._10.RegistrationStatus;
 
-import java.time.ZoneOffset;
+import java.time.ZoneId;
 import java.util.List;
 
 public interface ChargePointHelperService {
@@ -34,7 +34,7 @@ public interface ChargePointHelperService {
 
     List<ConnectorStatus> getChargePointConnectorStatus(ConnectorStatusForm params);
 
-    List<OcppJsonStatus> getOcppJsonStatus(ZoneOffset timeZone);
+    List<OcppJsonStatus> getOcppJsonStatus(ZoneId timeZone);
 
     List<ChargePointSelect> getChargePoints(OcppVersion version);
     List<ChargePointSelect> getChargePoints(OcppVersion version, List<RegistrationStatus> inStatusFilter);

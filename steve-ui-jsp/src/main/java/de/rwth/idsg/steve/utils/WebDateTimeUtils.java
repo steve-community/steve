@@ -27,9 +27,7 @@ import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.servlet.support.RequestContextUtils;
 
 import java.time.Instant;
-import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.time.ZoneOffset;
 import java.util.TimeZone;
 
 @Slf4j
@@ -40,14 +38,14 @@ public class WebDateTimeUtils {
         return instant == null ? 0 : instant.toEpochMilli();
     }
 
-    public static ZoneOffset resolveZoneFromRequest(NativeWebRequest request) {
-        var defaultTimeZone = ZoneOffset.systemDefault().getRules().getOffset(Instant.now());
+    public static ZoneId resolveZoneFromRequest(NativeWebRequest request) {
+        var defaultTimeZone = ZoneId.systemDefault();
 
         // Header X-Timezone (IANA zone ex: Europe/Paris)
         String zoneId = request.getHeader("X-Timezone");
         if (!Strings.isNullOrEmpty(zoneId)) {
             try {
-                return toOffset(ZoneId.of(zoneId));
+                return ZoneId.of(zoneId);
             } catch (Exception e) {
                 log.warn("Cannot parse ZoneId from request header: {}", zoneId, e);
             }
@@ -58,15 +56,11 @@ public class WebDateTimeUtils {
         if (servletRequest != null) {
             TimeZone tzFromSpring = RequestContextUtils.getTimeZone(servletRequest);
             if (tzFromSpring != null) {
-                return toOffset(tzFromSpring.toZoneId());
+                return tzFromSpring.toZoneId();
             }
         }
 
         // Fallback: default
         return defaultTimeZone;
-    }
-
-    private static ZoneOffset toOffset(ZoneId zoneId) {
-        return zoneId.getRules().getOffset(LocalDateTime.now());
     }
 }

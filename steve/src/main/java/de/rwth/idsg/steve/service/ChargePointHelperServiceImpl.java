@@ -41,7 +41,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
 import java.time.Instant;
-import java.time.ZoneOffset;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -51,7 +51,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import static de.rwth.idsg.steve.utils.DateTimeUtils.*;
 
@@ -108,7 +107,7 @@ public class ChargePointHelperServiceImpl implements ChargePointHelperService {
         return latestList;
     }
 
-    public List<OcppJsonStatus> getOcppJsonStatus(ZoneOffset timeZone) {
+    public List<OcppJsonStatus> getOcppJsonStatus(ZoneId timeZone) {
         Map<String, Deque<SessionContext>> ocpp12Map = ocpp12WebSocketEndpoint.getACopy();
         Map<String, Deque<SessionContext>> ocpp15Map = ocpp15WebSocketEndpoint.getACopy();
         Map<String, Deque<SessionContext>> ocpp16Map = ocpp16WebSocketEndpoint.getACopy();
@@ -187,7 +186,7 @@ public class ChargePointHelperServiceImpl implements ChargePointHelperService {
     }
 
     private static void appendList(Map<String, Deque<SessionContext>> map, List<OcppJsonStatus> returnList,
-                                   Instant now, ZoneOffset timeZone, OcppVersion version,
+                                   Instant now, ZoneId timeZone, OcppVersion version,
                                    Map<String, Integer> primaryKeyLookup) {
 
         for (Map.Entry<String, Deque<SessionContext>> entry : map.entrySet()) {

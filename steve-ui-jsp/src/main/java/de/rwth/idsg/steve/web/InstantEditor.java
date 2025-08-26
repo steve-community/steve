@@ -27,7 +27,7 @@ import org.springframework.web.context.request.NativeWebRequest;
 import java.beans.PropertyEditorSupport;
 import java.time.Instant;
 import java.time.LocalDateTime;
-import java.time.ZoneOffset;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 
 /**
@@ -39,7 +39,7 @@ import java.time.format.DateTimeFormatter;
 public class InstantEditor extends PropertyEditorSupport {
 
     private final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
-    private final ZoneOffset timeZone;
+    private final ZoneId timeZone;
 
     public static InstantEditor fromRequest(NativeWebRequest request) {
         return new InstantEditor(WebDateTimeUtils.resolveZoneFromRequest(request));
@@ -62,7 +62,7 @@ public class InstantEditor extends PropertyEditorSupport {
         if (Strings.isNullOrEmpty(text)) {
             setValue(null);
         } else {
-            setValue(LocalDateTime.parse(text, dateTimeFormatter).toInstant(timeZone));
+            setValue(LocalDateTime.parse(text, dateTimeFormatter).atZone(timeZone).toInstant());
         }
     }
 }

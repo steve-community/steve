@@ -53,7 +53,7 @@ public class OcppTagForm {
     // Is a FK in DB table. No validation needed. Operation will fail if DB constraint fails.
     private String parentIdTag;
 
-    @Schema(description = "A date/time without timezone. Example: 2022-10-10T09:00")
+    @Schema(description = "ISO-8601 instant with timezone. Example: `2024-08-25T14:30:00.000Z`")
     @Future(message = "Expiry Date/Time must be in future")
     private Instant expiryDate;
 

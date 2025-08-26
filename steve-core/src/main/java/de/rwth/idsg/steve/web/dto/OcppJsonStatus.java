@@ -25,7 +25,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.ToString;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -48,5 +48,5 @@ public final class OcppJsonStatus {
     @Schema(description = "Ocpp version")
     private final OcppVersion version;
     @Schema(description = "Connected since (ISO-8601 timestamp)")
-    private final LocalDateTime connectedSinceDT;
+    private final Instant connectedSinceDT;
 }

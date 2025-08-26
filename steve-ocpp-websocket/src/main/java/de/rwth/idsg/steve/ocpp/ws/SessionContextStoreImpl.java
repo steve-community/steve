@@ -29,7 +29,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.WebSocketSession;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.ArrayDeque;
 import java.util.Collections;
 import java.util.Deque;
@@ -67,7 +67,7 @@ public class SessionContextStoreImpl implements SessionContextStore {
         Lock l = locks.get(chargeBoxId);
         l.lock();
         try {
-            SessionContext context = new SessionContext(session, pingSchedule, LocalDateTime.now());
+            SessionContext context = new SessionContext(session, pingSchedule, Instant.now());
 
             Deque<SessionContext> endpointDeque = lookupTable.computeIfAbsent(chargeBoxId, str -> new ArrayDeque<>());
             endpointDeque.addLast(context); // Adding at the end

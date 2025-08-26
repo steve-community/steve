@@ -22,6 +22,7 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
 import java.time.Duration;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
@@ -40,27 +41,53 @@ public final class DateTimeUtils {
     public static OffsetDateTime toOffsetDateTime(LocalDateTime ldt) {
         if (ldt == null) {
             return null;
-        } else {
-            return ldt.atOffset(ZoneOffset.UTC);
         }
+        return ldt.atOffset(ZoneOffset.UTC);
+    }
+
+    public static OffsetDateTime toOffsetDateTime(Instant instant) {
+        if (instant == null) {
+            return null;
+        }
+        return instant.atOffset(ZoneOffset.UTC);
+    }
+
+    public static Instant toInstant(OffsetDateTime odt) {
+        if (odt == null) {
+            return null;
+        }
+        return  odt.toInstant();
+    }
+
+    public static Instant toInstant(LocalDateTime ldt) {
+        if (ldt == null) {
+            return null;
+        }
+        return ldt.toInstant(ZoneOffset.UTC);
     }
 
     public static LocalDateTime toLocalDateTime(OffsetDateTime dt) {
         if (dt == null) {
             return null;
-        } else {
-            return dt.toLocalDateTime();
         }
+        return dt.toLocalDateTime();
+    }
+
+    public static LocalDateTime toLocalDateTime(Instant instant) {
+        if (instant == null) {
+            return null;
+        }
+        return instant.atOffset(ZoneOffset.UTC).toLocalDateTime();
     }
 
     /**
      * Print the date/time nicer, if it's from today, yesterday or tomorrow.
      */
-    public static String humanize(OffsetDateTime dt) {
+    public static String humanize(Instant dt, ZoneOffset timeZone) {
         if (dt == null) {
             return "";
         }
-        return humanize(dt.toLocalDateTime());
+        return humanize(dt.atOffset(timeZone).toLocalDateTime());
     }
 
     public static String humanize(LocalDateTime dt) {
@@ -90,7 +117,7 @@ public final class DateTimeUtils {
         }
     }
 
-    public static String timeElapsed(LocalDateTime from, LocalDateTime to) {
+    public static String timeElapsed(Instant from, Instant to) {
         var duration = Duration.between(from, to).abs();
 
         var days = duration.toDays();

@@ -22,8 +22,7 @@ import jooq.steve.db.enums.TransactionStopEventActor;
 import lombok.Builder;
 import lombok.Getter;
 
-import java.time.LocalDateTime;
-import java.time.OffsetDateTime;
+import java.time.Instant;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -34,7 +33,7 @@ import java.time.OffsetDateTime;
 public class UpdateTransactionParams {
     private final String chargeBoxId;
     private final int transactionId;
-    private final OffsetDateTime stopTimestamp;
+    private final Instant stopTimestamp;
     private final String stopMeterValue;
     private final String stopReason;
 
@@ -43,5 +42,5 @@ public class UpdateTransactionParams {
 
     // these two came after splitting transaction table into two tables (start and stop)
     private final TransactionStopEventActor eventActor;
-    private final LocalDateTime eventTimestamp;
+    private final Instant eventTimestamp;
 }

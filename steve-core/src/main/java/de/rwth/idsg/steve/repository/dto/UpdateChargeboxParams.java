@@ -22,7 +22,7 @@ import de.rwth.idsg.steve.ocpp.OcppProtocol;
 import lombok.Builder;
 import lombok.Getter;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -32,7 +32,7 @@ import java.time.LocalDateTime;
 @Builder
 public final class UpdateChargeboxParams {
     private final OcppProtocol ocppProtocol;
-    private final LocalDateTime heartbeatTimestamp;
+    private final Instant heartbeatTimestamp;
     private final String vendor, model, pointSerial, boxSerial, fwVersion,
             iccid, imsi, meterType, meterSerial, chargeBoxId;
 }

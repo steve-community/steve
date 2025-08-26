@@ -24,7 +24,7 @@ import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -41,9 +41,9 @@ public final class TaskOverview implements Comparable<TaskOverview> {
     @Schema(description = "Request count")
     private final int requestCount;
     @Schema(description = "Start time")
-    private final LocalDateTime start;
+    private final Instant start;
     @Schema(description = "End time")
-    private final LocalDateTime end;
+    private final Instant end;
     @Schema(description = "Task origin (internal or external)")
     private final TaskOrigin origin;
 

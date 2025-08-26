@@ -29,6 +29,7 @@ import de.rwth.idsg.steve.web.dto.OcppJsonStatus;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import java.time.ZoneOffset;
 import java.util.List;
 
 import jakarta.validation.Valid;
@@ -78,7 +79,7 @@ public class ConnectorsRestController {
     @StandardApiResponses
     @GetMapping(value = "OCPP_JSON_STATUS")
     public List<OcppJsonStatus> getOcppJsonStatus() {
-        return chargePointHelperService.getOcppJsonStatus();
+        return chargePointHelperService.getOcppJsonStatus(ZoneOffset.UTC);
     }
 
     // -------------------------------------------------------------------------

@@ -25,7 +25,7 @@ import lombok.Setter;
 import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.NotNull;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 @Getter
 @Setter
@@ -42,9 +42,9 @@ public class ReservationForm {
     private Integer connectorId;
 
     @NotNull(message = "Start timestamp is required")
-    private LocalDateTime startTimestamp;
+    private Instant startTimestamp;
 
     @NotNull(message = "Expiry timestamp is required")
     @Future(message = "Expiry timestamp must be in the future")
-    private LocalDateTime expiryTimestamp;
+    private Instant expiryTimestamp;
 }

@@ -57,7 +57,7 @@ import java.util.stream.Collectors;
 
 import static de.rwth.idsg.steve.utils.CustomDSL.date;
 import static de.rwth.idsg.steve.utils.CustomDSL.includes;
-import static de.rwth.idsg.steve.utils.DateTimeUtils.toOffsetDateTime;
+import static de.rwth.idsg.steve.utils.DateTimeUtils.toInstant;
 import static jooq.steve.db.tables.ChargeBox.CHARGE_BOX;
 import static jooq.steve.db.tables.Connector.CONNECTOR;
 import static jooq.steve.db.tables.ConnectorStatus.CONNECTOR_STATUS;
@@ -145,7 +145,7 @@ public class ChargePointRepositoryImpl implements ChargePointRepository {
                                               .chargeBoxId(r.value2())
                                               .description(r.value3())
                                               .ocppProtocol(r.value4())
-                                              .lastHeartbeatTimestampDT(r.value5())
+                                              .lastHeartbeatTimestampDT(toInstant(r.value5()))
                                               .lastHeartbeatTimestamp(DateTimeUtils.humanize(r.value5()))
                                               .build()
                 );
@@ -286,7 +286,7 @@ public class ChargePointRepositoryImpl implements ChargePointRepository {
                                            .chargeBoxId(r.value2())
                                            .connectorId(r.value3())
                                            .timeStamp(DateTimeUtils.humanize(r.value4()))
-                                           .statusTimestamp(toOffsetDateTime(r.value4()))
+                                           .statusTimestamp(toInstant(r.value4()))
                                            .status(r.value5())
                                            .errorCode(r.value6())
                                            .ocppProtocol(r.value7() == null ? null : OcppProtocol.fromCompositeValue(r.value7()))

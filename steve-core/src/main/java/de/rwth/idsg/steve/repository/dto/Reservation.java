@@ -21,7 +21,7 @@ package de.rwth.idsg.steve.repository.dto;
 import lombok.Builder;
 import lombok.Getter;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -33,6 +33,6 @@ public final class Reservation {
     private final int connectorId;
     private final Integer transactionId;
     private final String ocppIdTag, chargeBoxId, startDatetime, expiryDatetime, status;
-    private final LocalDateTime startDatetimeDT;
-    private final LocalDateTime expiryDatetimeDT;
+    private final Instant startDatetimeDT;
+    private final Instant expiryDatetimeDT;
 }

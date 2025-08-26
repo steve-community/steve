@@ -37,8 +37,8 @@ import org.springframework.test.json.JsonContent;
 import org.springframework.test.web.servlet.assertj.MockMvcTester;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-import java.time.LocalDateTime;
-import java.time.OffsetDateTime;
+import java.time.Instant;
+import java.time.ZoneOffset;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Consumer;
@@ -136,7 +136,7 @@ public class OcppTagsRestControllerTest extends AbstractControllerTest {
     @DisplayName("GET all: Sets all valid params, expected 200")
     public void test5() {
         // given
-        var someDate = OffsetDateTime.parse("2020-10-01T00:00:00.000Z");
+        var someDate = Instant.parse("2020-10-01T00:00:00.000Z");
         OcppTag.OcppTagOverview result = OcppTag.OcppTagOverview.builder()
             .ocppTagPk(121)
             .idTag("id-1")
@@ -145,7 +145,7 @@ public class OcppTagsRestControllerTest extends AbstractControllerTest {
             .inTransaction(false)
             .blocked(true)
             .expiryDate(someDate)
-            .expiryDateFormatted(DateTimeUtils.humanize(someDate))
+            .expiryDateFormatted(DateTimeUtils.humanize(someDate, ZoneOffset.UTC))
             .maxActiveTransactionCount(4)
             .activeTransactionCount(0L)
             .note("some note")
@@ -245,7 +245,7 @@ public class OcppTagsRestControllerTest extends AbstractControllerTest {
         // given
         OcppTagForm form = new OcppTagForm();
         form.setIdTag("id-123");
-        form.setExpiryDate(LocalDateTime.parse("1990-10-01T00:00"));
+        form.setExpiryDate(Instant.parse("1990-10-01T00:00:00Z"));
 
         // when and then
         assertThat(mockMvc.perform(

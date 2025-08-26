@@ -30,9 +30,8 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
-import static de.rwth.idsg.steve.utils.DateTimeUtils.toLocalDateTime;
+import static de.rwth.idsg.steve.utils.DateTimeUtils.toInstant;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -54,14 +53,14 @@ public class TaskStoreImpl implements TaskStore {
                               return TaskOverview.builder()
                                                  .taskId(entry.getKey())
                                                  .origin(r.getOrigin())
-                                                 .start(toLocalDateTime(r.getStartTimestamp()))
-                                                 .end(toLocalDateTime(r.getEndTimestamp()))
+                                                 .start(toInstant(r.getStartTimestamp()))
+                                                 .end(toInstant(r.getEndTimestamp()))
                                                  .responseCount(r.getResponseCount().get())
                                                  .requestCount(r.getResultMap().size())
                                                  .build();
                           })
                           .sorted()
-                          .collect(Collectors.toList());
+                          .toList();
     }
 
     @Override

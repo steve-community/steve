@@ -37,7 +37,7 @@ import ocpp.cs._2015._10.IdTagInfo;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Supplier;
@@ -85,13 +85,13 @@ public class OcppTagsService {
     }
 
     public List<AuthorizationData> getAuthDataOfAllTags() {
-        var nowDt = LocalDateTime.now();
-        return ocppTagRepository.getRecords().map(record -> mapToAuthorizationData(record, nowDt));
+        var now = Instant.now();
+        return ocppTagRepository.getRecords().map(record -> mapToAuthorizationData(record, now));
     }
 
     public List<AuthorizationData> getAuthData(List<String> idTagList) {
-        var nowDt = LocalDateTime.now();
-        return ocppTagRepository.getRecords(idTagList).map(record -> mapToAuthorizationData(record, nowDt));
+        var now = Instant.now();
+        return ocppTagRepository.getRecords(idTagList).map(record -> mapToAuthorizationData(record, now));
     }
 
     public List<UnidentifiedIncomingObject> getUnknownOcppTags() {
@@ -160,7 +160,7 @@ public class OcppTagsService {
      * ConcurrentTx is only valid for StartTransactionRequest
      */
     private static ocpp.cp._2015._10.AuthorizationStatus decideStatusForAuthData(OcppTagActivityRecord record,
-                                                                                 LocalDateTime now) {
+                                                                                 Instant now) {
         if (isBlocked(record)) {
             return ocpp.cp._2015._10.AuthorizationStatus.BLOCKED;
         } else if (isExpired(record, now)) {
@@ -172,7 +172,7 @@ public class OcppTagsService {
         }
     }
 
-    private static AuthorizationData mapToAuthorizationData(OcppTagActivityRecord record, LocalDateTime nowDt) {
+    private static AuthorizationData mapToAuthorizationData(OcppTagActivityRecord record, Instant nowDt) {
         return new AuthorizationData().withIdTag(record.getIdTag())
                                       .withIdTagInfo(
                                               new ocpp.cp._2015._10.IdTagInfo()

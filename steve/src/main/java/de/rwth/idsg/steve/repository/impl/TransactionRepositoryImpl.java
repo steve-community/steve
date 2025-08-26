@@ -31,7 +31,6 @@ import jooq.steve.db.tables.records.TransactionStartRecord;
 import ocpp.cs._2015._10.UnitOfMeasure;
 import org.jooq.Condition;
 import org.jooq.DSLContext;
-import org.jooq.Field;
 import org.jooq.Record12;
 import org.jooq.Record9;
 import org.jooq.RecordMapper;
@@ -48,7 +47,8 @@ import java.util.Optional;
 
 import static de.rwth.idsg.steve.repository.impl.RepositoryUtils.ocppTagByUserIdQuery;
 import static de.rwth.idsg.steve.utils.CustomDSL.date;
-import static de.rwth.idsg.steve.utils.DateTimeUtils.toOffsetDateTime;
+import static de.rwth.idsg.steve.utils.DateTimeUtils.toInstant;
+import static de.rwth.idsg.steve.utils.DateTimeUtils.toLocalDateTime;
 import static jooq.steve.db.tables.ChargeBox.CHARGE_BOX;
 import static jooq.steve.db.tables.Connector.CONNECTOR;
 import static jooq.steve.db.tables.ConnectorMeterValue.CONNECTOR_METER_VALUE;
@@ -229,7 +229,7 @@ public class TransactionRepositoryImpl implements TransactionRepository {
                    .orderBy(dateTimeField)
                    .fetch()
                    .map(r -> TransactionDetails.MeterValues.builder()
-                                                           .valueTimestamp(toOffsetDateTime(r.value1()))
+                                                           .valueTimestamp(toInstant(r.value1()))
                                                            .value(r.value2())
                                                            .readingContext(r.value3())
                                                            .format(r.value4())
@@ -363,8 +363,8 @@ public class TransactionRepositoryImpl implements TransactionRepository {
                 break;
 
             case FROM_TO:
-                var from = form.getFrom();
-                var to = form.getTo();
+                var from = toLocalDateTime(form.getFrom());
+                var to = toLocalDateTime(form.getTo());
 
                 if (form.getType() == TransactionQueryForm.QueryType.ACTIVE) {
                     selectQuery.addConditions(TRANSACTION.START_TIMESTAMP.between(from, to));
@@ -390,10 +390,10 @@ public class TransactionRepositoryImpl implements TransactionRepository {
                               .chargeBoxId(r.value2())
                               .connectorId(r.value3())
                               .ocppIdTag(r.value4())
-                              .startTimestamp(toOffsetDateTime(r.value5()))
+                              .startTimestamp(toInstant(r.value5()))
                               .startTimestampFormatted(DateTimeUtils.humanize(r.value5()))
                               .startValue(r.value6())
-                              .stopTimestamp(toOffsetDateTime(r.value7()))
+                              .stopTimestamp(toInstant(r.value7()))
                               .stopTimestampFormatted(DateTimeUtils.humanize(r.value7()))
                               .stopValue(r.value8())
                               .stopReason(r.value9())

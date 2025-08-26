@@ -24,7 +24,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.ToString;
 
-import java.time.OffsetDateTime;
+import java.time.Instant;
 
 /**
  *
@@ -63,7 +63,7 @@ public final class OcppTag {
         private final String expiryDateFormatted;
 
         @Schema(description = "The date/time at which the OCPP tag will expire (if set)")
-        private final OffsetDateTime expiryDate;
+        private final Instant expiryDate;
 
         @Schema(description = "The maximum number of active transactions allowed for this OCPP tag")
         private final Integer maxActiveTransactionCount;

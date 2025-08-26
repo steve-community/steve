@@ -19,28 +19,30 @@
 package de.rwth.idsg.steve.web;
 
 import com.google.common.base.Strings;
-import lombok.AccessLevel;
+import de.rwth.idsg.steve.utils.WebDateTimeUtils;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.context.request.NativeWebRequest;
 
 import java.beans.PropertyEditorSupport;
+import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 04.01.2015
  */
-@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-public class LocalDateTimeEditor extends PropertyEditorSupport {
+@Slf4j
+@RequiredArgsConstructor
+public class InstantEditor extends PropertyEditorSupport {
 
-    private final DateTimeFormatter dateTimeFormatter;
+    private final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+    private final ZoneOffset timeZone;
 
-    public static LocalDateTimeEditor forMvc() {
-        return new LocalDateTimeEditor(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
-    }
-
-    public static LocalDateTimeEditor forApi() {
-        return new LocalDateTimeEditor(DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+    public static InstantEditor fromRequest(NativeWebRequest request) {
+        return new InstantEditor(WebDateTimeUtils.resolveZoneFromRequest(request));
     }
 
     @Override
@@ -49,10 +51,10 @@ public class LocalDateTimeEditor extends PropertyEditorSupport {
         if (value == null) {
             return null;
         }
-        if (value instanceof LocalDateTime localdatetime) {
-            return dateTimeFormatter.format(localdatetime);
+        if (value instanceof Instant instant) {
+            return dateTimeFormatter.format(instant.atZone(timeZone));
         }
-        throw new IllegalArgumentException("Cannot convert " + value.getClass() + " to LocalDateTime");
+        throw new IllegalArgumentException("Cannot convert " + value.getClass() + " to Instant");
     }
 
     @Override
@@ -60,7 +62,7 @@ public class LocalDateTimeEditor extends PropertyEditorSupport {
         if (Strings.isNullOrEmpty(text)) {
             setValue(null);
         } else {
-            setValue(LocalDateTime.parse(text, dateTimeFormatter));
+            setValue(LocalDateTime.parse(text, dateTimeFormatter).toInstant(timeZone));
         }
     }
 }

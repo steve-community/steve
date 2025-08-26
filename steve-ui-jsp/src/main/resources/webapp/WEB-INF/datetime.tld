@@ -31,12 +31,17 @@
 
     <function>
         <name>toMillis</name>
-        <function-class>de.rwth.idsg.steve.utils.JspDateTimeUtils</function-class>
+        <function-class>de.rwth.idsg.steve.utils.WebDateTimeUtils</function-class>
+        <function-signature>long toMillis(java.time.Instant)</function-signature>
+    </function>
+    <function>
+        <name>localToMillis</name>
+        <function-class>de.rwth.idsg.steve.utils.WebDateTimeUtils</function-class>
         <function-signature>long toMillis(java.time.LocalDateTime)</function-signature>
     </function>
     <function>
         <name>offsetToMillis</name>
-        <function-class>de.rwth.idsg.steve.utils.JspDateTimeUtils</function-class>
+        <function-class>de.rwth.idsg.steve.utils.WebDateTimeUtils</function-class>
         <function-signature>long toMillis(java.time.OffsetDateTime)</function-signature>
     </function>
 </taglib>

@@ -21,7 +21,7 @@ package de.rwth.idsg.steve.service.dto;
 import lombok.Getter;
 import lombok.ToString;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -33,7 +33,7 @@ public class UnidentifiedIncomingObject {
 
     private final String key;
     private int numberOfAttempts = 0;
-    private LocalDateTime lastAttemptTimestamp;
+    private Instant lastAttemptTimestamp;
 
     public UnidentifiedIncomingObject(String key) {
         this.key = key;
@@ -41,6 +41,6 @@ public class UnidentifiedIncomingObject {
 
     public synchronized void updateStats() {
         numberOfAttempts++;
-        lastAttemptTimestamp = LocalDateTime.now();
+        lastAttemptTimestamp = Instant.now();
     }
 }

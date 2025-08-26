@@ -40,13 +40,14 @@ import org.springframework.stereotype.Repository;
 
 import java.sql.SQLIntegrityConstraintViolationException;
 import java.time.LocalDateTime;
-import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import static de.rwth.idsg.steve.repository.impl.RepositoryUtils.ocppTagByUserIdQuery;
 import static de.rwth.idsg.steve.utils.CustomDSL.includes;
 import static de.rwth.idsg.steve.utils.DateTimeUtils.humanize;
+import static de.rwth.idsg.steve.utils.DateTimeUtils.toInstant;
+import static de.rwth.idsg.steve.utils.DateTimeUtils.toLocalDateTime;
 import static jooq.steve.db.tables.OcppTag.OCPP_TAG;
 import static jooq.steve.db.tables.OcppTagActivity.OCPP_TAG_ACTIVITY;
 import static jooq.steve.db.tables.UserOcppTag.USER_OCPP_TAG;
@@ -225,7 +226,7 @@ public class OcppTagRepositoryImpl implements OcppTagRepository {
             return ctx.insertInto(OCPP_TAG)
                       .set(OCPP_TAG.ID_TAG, u.getIdTag())
                       .set(OCPP_TAG.PARENT_ID_TAG, u.getParentIdTag())
-                      .set(OCPP_TAG.EXPIRY_DATE, u.getExpiryDate())
+                      .set(OCPP_TAG.EXPIRY_DATE, toLocalDateTime(u.getExpiryDate()))
                       .set(OCPP_TAG.MAX_ACTIVE_TRANSACTION_COUNT, u.getMaxActiveTransactionCount())
                       .set(OCPP_TAG.NOTE, u.getNote())
                       .returning(OCPP_TAG.OCPP_TAG_PK)
@@ -246,7 +247,7 @@ public class OcppTagRepositoryImpl implements OcppTagRepository {
         try {
             ctx.update(OCPP_TAG)
                .set(OCPP_TAG.PARENT_ID_TAG, u.getParentIdTag())
-               .set(OCPP_TAG.EXPIRY_DATE, u.getExpiryDate())
+               .set(OCPP_TAG.EXPIRY_DATE, toLocalDateTime(u.getExpiryDate()))
                .set(OCPP_TAG.MAX_ACTIVE_TRANSACTION_COUNT, u.getMaxActiveTransactionCount())
                .set(OCPP_TAG.NOTE, u.getNote())
                .where(OCPP_TAG.OCPP_TAG_PK.equal(u.getOcppTagPk()))
@@ -276,15 +277,15 @@ public class OcppTagRepositoryImpl implements OcppTagRepository {
     }
 
     private static class UserMapper
-            implements RecordMapper<Record10<Integer, Integer, String, String, OffsetDateTime, Boolean, Boolean, Integer, Long, String>, OcppTagOverview> {
+            implements RecordMapper<Record10<Integer, Integer, String, String, LocalDateTime, Boolean, Boolean, Integer, Long, String>, OcppTagOverview> {
         @Override
-        public OcppTagOverview map(Record10<Integer, Integer, String, String, OffsetDateTime, Boolean, Boolean, Integer, Long, String> r) {
+        public OcppTagOverview map(Record10<Integer, Integer, String, String, LocalDateTime, Boolean, Boolean, Integer, Long, String> r) {
             return OcppTagOverview.builder()
                           .ocppTagPk(r.value1())
                           .parentOcppTagPk(r.value2())
                           .idTag(r.value3())
                           .parentIdTag(r.value4())
-                          .expiryDate(r.value5())
+                          .expiryDate(toInstant(r.value5()))
                           .expiryDateFormatted(humanize(r.value5()))
                           .inTransaction(r.value6())
                           .blocked(r.value7())

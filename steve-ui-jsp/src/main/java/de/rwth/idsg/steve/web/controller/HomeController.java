@@ -23,6 +23,7 @@ import de.rwth.idsg.steve.repository.dto.ConnectorStatus;
 import de.rwth.idsg.steve.service.ChargePointHelperService;
 import de.rwth.idsg.steve.utils.ConnectorStatusCountFilter;
 import de.rwth.idsg.steve.utils.ConnectorStatusFilter;
+import de.rwth.idsg.steve.utils.WebDateTimeUtils;
 import de.rwth.idsg.steve.web.dto.ConnectorStatusForm;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
@@ -30,6 +31,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.context.request.NativeWebRequest;
 
 import java.util.List;
 
@@ -88,8 +90,9 @@ public class HomeController {
     }
 
     @GetMapping(value = OCPP_JSON_STATUS)
-    public String getOcppJsonStatus(Model model) {
-        model.addAttribute("ocppJsonStatusList", chargePointHelperService.getOcppJsonStatus());
+    public String getOcppJsonStatus(Model model, NativeWebRequest webRequest) {
+        var timeZone = WebDateTimeUtils.resolveZoneFromRequest(webRequest);
+        model.addAttribute("ocppJsonStatusList", chargePointHelperService.getOcppJsonStatus(timeZone));
         return "ocppJsonStatus";
     }
 }

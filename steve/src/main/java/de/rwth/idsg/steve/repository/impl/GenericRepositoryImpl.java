@@ -28,7 +28,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.jooq.DSLContext;
 import org.jooq.DatePart;
 import org.jooq.Field;
-import org.jooq.Record2;
 import org.jooq.Record9;
 import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -82,9 +81,9 @@ public class GenericRepositoryImpl implements GenericRepository {
 
     @Override
     public Statistics getStats() {
-        var nowTime = LocalDateTime.now();
-        var nowDate = nowTime.toLocalDate();
-        var yesterdaysNow = nowDate.minusDays(1);
+        var now = LocalDateTime.now();
+        var today = now.toLocalDate();
+        var yesterday = today.minusDays(1);
 
         Field<Integer> numChargeBoxes =
                 ctx.selectCount()
@@ -104,7 +103,7 @@ public class GenericRepositoryImpl implements GenericRepository {
         Field<Integer> numReservations =
                 ctx.selectCount()
                    .from(RESERVATION)
-                   .where(RESERVATION.EXPIRY_DATETIME.greaterThan(nowTime))
+                   .where(RESERVATION.EXPIRY_DATETIME.greaterThan(now))
                    .and(RESERVATION.STATUS.eq(ReservationStatus.ACCEPTED.name()))
                    .asField("num_reservations");
 
@@ -117,19 +116,19 @@ public class GenericRepositoryImpl implements GenericRepository {
         Field<Integer> heartbeatsToday =
                 ctx.selectCount()
                    .from(CHARGE_BOX)
-                   .where(date(CHARGE_BOX.LAST_HEARTBEAT_TIMESTAMP).eq(nowDate))
+                   .where(date(CHARGE_BOX.LAST_HEARTBEAT_TIMESTAMP).eq(today))
                    .asField("heartbeats_today");
 
         Field<Integer> heartbeatsYesterday =
                 ctx.selectCount()
                    .from(CHARGE_BOX)
-                   .where(date(CHARGE_BOX.LAST_HEARTBEAT_TIMESTAMP).eq(yesterdaysNow))
+                   .where(date(CHARGE_BOX.LAST_HEARTBEAT_TIMESTAMP).eq(yesterday))
                    .asField("heartbeats_yesterday");
 
         Field<Integer> heartbeatsEarlier =
                 ctx.selectCount()
                    .from(CHARGE_BOX)
-                   .where(date(CHARGE_BOX.LAST_HEARTBEAT_TIMESTAMP).lessThan(yesterdaysNow))
+                   .where(date(CHARGE_BOX.LAST_HEARTBEAT_TIMESTAMP).lessThan(yesterday))
                    .asField("heartbeats_earlier");
 
         Field<Integer> numWebUsers =

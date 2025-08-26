@@ -27,7 +27,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Past;
 import jakarta.validation.constraints.Pattern;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -48,10 +48,10 @@ public class GetDiagnosticsParams extends MultipleChargePointSelect {
     private Integer retryInterval;
 
     @Past(message = "Start Date/Time must be in the past")
-    private LocalDateTime start;
+    private Instant start;
 
     @Past(message = "Stop Date/Time must be in the past")
-    private LocalDateTime stop;
+    private Instant stop;
 
     @AssertTrue(message = "Stop Date/Time must be after Start Date/Time")
     public boolean isValid() {

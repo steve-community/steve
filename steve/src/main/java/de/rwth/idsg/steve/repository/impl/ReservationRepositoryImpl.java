@@ -43,6 +43,8 @@ import java.util.List;
 import java.util.Optional;
 
 import static de.rwth.idsg.steve.repository.impl.RepositoryUtils.ocppTagByUserIdQuery;
+import static de.rwth.idsg.steve.utils.DateTimeUtils.toInstant;
+import static de.rwth.idsg.steve.utils.DateTimeUtils.toLocalDateTime;
 import static jooq.steve.db.tables.ChargeBox.CHARGE_BOX;
 import static jooq.steve.db.tables.Connector.CONNECTOR;
 import static jooq.steve.db.tables.OcppTag.OCPP_TAG;
@@ -155,8 +157,8 @@ public class ReservationRepositoryImpl implements ReservationRepository {
         int reservationId = ctx.insertInto(RESERVATION)
                                .set(RESERVATION.CONNECTOR_PK, connectorPkQuery)
                                .set(RESERVATION.ID_TAG, params.getIdTag())
-                               .set(RESERVATION.START_DATETIME, params.getStartTimestamp())
-                               .set(RESERVATION.EXPIRY_DATETIME, params.getExpiryTimestamp())
+                               .set(RESERVATION.START_DATETIME, toLocalDateTime(params.getStartTimestamp()))
+                               .set(RESERVATION.EXPIRY_DATETIME, toLocalDateTime(params.getExpiryTimestamp()))
                                .set(RESERVATION.STATUS, ReservationStatus.WAITING.name())
                                .returning(RESERVATION.RESERVATION_PK)
                                .fetchOne()
@@ -219,9 +221,9 @@ public class ReservationRepositoryImpl implements ReservationRepository {
                               .chargeBoxPk(r.value4())
                               .ocppIdTag(r.value5())
                               .chargeBoxId(r.value6())
-                              .startDatetimeDT(r.value7())
+                              .startDatetimeDT(toInstant(r.value7()))
                               .startDatetime(DateTimeUtils.humanize(r.value7()))
-                              .expiryDatetimeDT(r.value8())
+                              .expiryDatetimeDT(toInstant(r.value8()))
                               .expiryDatetime(DateTimeUtils.humanize(r.value8()))
                               .status(r.value9())
                               .connectorId(r.value10())
@@ -248,8 +250,8 @@ public class ReservationRepositoryImpl implements ReservationRepository {
 
             case FROM_TO:
                 selectQuery.addConditions(
-                        RESERVATION.START_DATETIME.greaterOrEqual(form.getFrom()),
-                        RESERVATION.EXPIRY_DATETIME.lessOrEqual(form.getTo())
+                        RESERVATION.START_DATETIME.greaterOrEqual(toLocalDateTime(form.getFrom())),
+                        RESERVATION.EXPIRY_DATETIME.lessOrEqual(toLocalDateTime(form.getTo()))
                 );
                 break;
 

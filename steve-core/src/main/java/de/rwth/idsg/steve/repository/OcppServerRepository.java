@@ -25,7 +25,7 @@ import de.rwth.idsg.steve.repository.dto.UpdateChargeboxParams;
 import de.rwth.idsg.steve.repository.dto.UpdateTransactionParams;
 import ocpp.cs._2015._10.MeterValue;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.List;
 
 /**
@@ -39,7 +39,7 @@ public interface OcppServerRepository {
     void updateEndpointAddress(String chargeBoxIdentity, String endpointAddress);
     void updateChargeboxFirmwareStatus(String chargeBoxIdentity, String firmwareStatus);
     void updateChargeboxDiagnosticsStatus(String chargeBoxIdentity, String status);
-    void updateChargeboxHeartbeat(String chargeBoxIdentity, LocalDateTime ts);
+    void updateChargeboxHeartbeat(String chargeBoxIdentity, Instant instant);
 
     void insertConnectorStatus(InsertConnectorStatusParams params);
 

@@ -27,7 +27,7 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -43,7 +43,7 @@ public class ReserveNowParams extends SingleChargePointSelect {
 
     @NotNull(message = "Expiry Date/Time is required")
     @Future(message = "Expiry Date/Time must be in future")
-    private LocalDateTime expiry;
+    private Instant expiry;
 
     @NotBlank(message = "User ID Tag is required.")
     @IdTag

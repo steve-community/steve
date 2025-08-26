@@ -24,7 +24,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.List;
 
 /**
@@ -54,7 +54,7 @@ public class ChargingProfile {
         private final int chargingProfilePk;
         private final int stackLevel;
         private final String description, profilePurpose, profileKind, recurrencyKind;
-        private final LocalDateTime validFrom, validTo;
+        private final Instant validFrom, validTo;
     }
 
     @Getter

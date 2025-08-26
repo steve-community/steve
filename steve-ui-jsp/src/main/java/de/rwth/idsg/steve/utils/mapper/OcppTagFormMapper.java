@@ -24,6 +24,8 @@ import jooq.steve.db.tables.records.OcppTagActivityRecord;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
+import static de.rwth.idsg.steve.utils.DateTimeUtils.toInstant;
+
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 23.03.2021
@@ -38,7 +40,7 @@ public final class OcppTagFormMapper {
 
         var expiryDate = record.getExpiryDate();
         if (expiryDate != null) {
-            form.setExpiryDate(expiryDate);
+            form.setExpiryDate(toInstant(expiryDate));
         }
 
         form.setMaxActiveTransactionCount(record.getMaxActiveTransactionCount());

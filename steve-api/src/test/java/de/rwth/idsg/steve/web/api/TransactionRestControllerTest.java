@@ -32,7 +32,8 @@ import org.springframework.test.json.JsonContent;
 import org.springframework.test.web.servlet.assertj.MockMvcTester;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-import java.time.OffsetDateTime;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Consumer;
@@ -155,8 +156,8 @@ public class TransactionRestControllerTest extends AbstractControllerTest {
     @Test
     @DisplayName("Sets all valid params, expected 200")
     public void test8() {
-        var start = OffsetDateTime.parse("2022-10-01T00:00Z");
-        var stop = start.plusHours(2);
+        var start = Instant.parse("2022-10-01T00:00:00Z");
+        var stop = start.plus(2, ChronoUnit.HOURS);
 
         // given
         Transaction transaction = Transaction
@@ -178,8 +179,8 @@ public class TransactionRestControllerTest extends AbstractControllerTest {
                 .param("periodType", "FROM_TO")
                 .param("chargeBoxId", transaction.getChargeBoxId())
                 .param("ocppIdTag", transaction.getOcppIdTag())
-                .param("from", "2022-10-01T00:00")
-                .param("to", "2022-10-08T00:00")
+                .param("from", "2022-10-01T00:00:00Z")
+                .param("to", "2022-10-08T00:00:00Z")
         ))
                 .hasStatusOk()
                 .bodyJson()

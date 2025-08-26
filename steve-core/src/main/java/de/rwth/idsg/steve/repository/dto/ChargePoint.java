@@ -24,7 +24,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -36,7 +36,7 @@ public final class ChargePoint {
     public static final class Overview {
         private final int chargeBoxPk;
         private final String chargeBoxId, description, ocppProtocol, lastHeartbeatTimestamp;
-        private final LocalDateTime lastHeartbeatTimestampDT;
+        private final Instant lastHeartbeatTimestampDT;
     }
 
     @Getter

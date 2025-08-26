@@ -24,7 +24,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.Nullable;
 
-import java.time.OffsetDateTime;
+import java.time.Instant;
 import java.util.List;
 
 /**
@@ -47,7 +47,7 @@ public class TransactionDetails {
     @Getter
     @Builder
     public static class MeterValues {
-        private final OffsetDateTime valueTimestamp;
+        private final Instant valueTimestamp;
         private final String value, readingContext, format, measurand, location, unit;
 
         // New in OCPP 1.6

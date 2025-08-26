@@ -45,7 +45,8 @@ import org.jooq.Schema;
 import org.jooq.Table;
 import org.jooq.impl.DSL;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -91,7 +92,7 @@ public class __DatabasePreparer__ {
                                                                 .chargeBoxId(REGISTERED_CHARGE_BOX_ID)
                                                                 .idTag(REGISTERED_OCPP_TAG)
                                                                 .connectorId(connectorId)
-                                                                .expiryTimestamp(LocalDateTime.now().plusHours(1))
+                                                                .expiryTimestamp(Instant.now().plus(1, ChronoUnit.HOURS))
                                                                 .build();
         int reservationId = r.insert(params);
         r.accepted(reservationId);

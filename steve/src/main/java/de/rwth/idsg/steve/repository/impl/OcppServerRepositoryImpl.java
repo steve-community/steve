@@ -43,6 +43,7 @@ import org.jooq.impl.DSL;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.CollectionUtils;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.concurrent.locks.Lock;
@@ -89,7 +90,7 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
            .set(CHARGE_BOX.IMSI, p.getImsi())
            .set(CHARGE_BOX.METER_TYPE, p.getMeterType())
            .set(CHARGE_BOX.METER_SERIAL_NUMBER, p.getMeterSerial())
-           .set(CHARGE_BOX.LAST_HEARTBEAT_TIMESTAMP, p.getHeartbeatTimestamp())
+           .set(CHARGE_BOX.LAST_HEARTBEAT_TIMESTAMP, toLocalDateTime(p.getHeartbeatTimestamp()))
            .where(CHARGE_BOX.CHARGE_BOX_ID.equal(p.getChargeBoxId()))
            .execute();
     }
@@ -129,9 +130,9 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
     }
 
     @Override
-    public void updateChargeboxHeartbeat(String chargeBoxIdentity, LocalDateTime ts) {
+    public void updateChargeboxHeartbeat(String chargeBoxIdentity, Instant instant) {
         ctx.update(CHARGE_BOX)
-           .set(CHARGE_BOX.LAST_HEARTBEAT_TIMESTAMP, ts)
+           .set(CHARGE_BOX.LAST_HEARTBEAT_TIMESTAMP, toLocalDateTime(instant))
            .where(CHARGE_BOX.CHARGE_BOX_ID.equal(chargeBoxIdentity))
            .execute();
     }
@@ -273,7 +274,7 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
         try {
             ctx.insertInto(TRANSACTION_STOP)
                .set(TRANSACTION_STOP.TRANSACTION_PK, p.getTransactionId())
-               .set(TRANSACTION_STOP.EVENT_TIMESTAMP, p.getEventTimestamp())
+               .set(TRANSACTION_STOP.EVENT_TIMESTAMP, toLocalDateTime(p.getEventTimestamp()))
                .set(TRANSACTION_STOP.EVENT_ACTOR, p.getEventActor())
                .set(TRANSACTION_STOP.STOP_TIMESTAMP, toLocalDateTime(p.getStopTimestamp()))
                .set(TRANSACTION_STOP.STOP_VALUE, p.getStopMeterValue())
@@ -332,7 +333,7 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
             }
 
             Integer transactionId = ctx.insertInto(TRANSACTION_START)
-                                       .set(TRANSACTION_START.EVENT_TIMESTAMP, p.getEventTimestamp())
+                                       .set(TRANSACTION_START.EVENT_TIMESTAMP, toLocalDateTime(p.getEventTimestamp()))
                                        .set(TRANSACTION_START.CONNECTOR_PK, connectorPkQuery)
                                        .set(TRANSACTION_START.ID_TAG, p.getIdTag())
                                        .set(TRANSACTION_START.START_TIMESTAMP, toLocalDateTime(p.getStartTimestamp()))
@@ -457,7 +458,7 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
             ctx.insertInto(TRANSACTION_STOP_FAILED)
                .set(TRANSACTION_STOP_FAILED.TRANSACTION_PK, p.getTransactionId())
                .set(TRANSACTION_STOP_FAILED.CHARGE_BOX_ID, p.getChargeBoxId())
-               .set(TRANSACTION_STOP_FAILED.EVENT_TIMESTAMP, p.getEventTimestamp())
+               .set(TRANSACTION_STOP_FAILED.EVENT_TIMESTAMP, toLocalDateTime(p.getEventTimestamp()))
                .set(TRANSACTION_STOP_FAILED.EVENT_ACTOR, mapActor(p.getEventActor()))
                .set(TRANSACTION_STOP_FAILED.STOP_TIMESTAMP, toLocalDateTime(p.getStopTimestamp()))
                .set(TRANSACTION_STOP_FAILED.STOP_VALUE, p.getStopMeterValue())

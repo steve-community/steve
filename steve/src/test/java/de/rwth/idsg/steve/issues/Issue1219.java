@@ -45,8 +45,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.time.Duration;
 import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.OffsetDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -115,12 +114,12 @@ public class Issue1219 {
             form.setTransactionPk(transactionId);
             Transaction transaction = transactionRepository.getTransactions(form).get(0);
 
-            var stopTimestamp = transaction.getStartTimestamp().plusHours(1);
+            var stopTimestamp = transaction.getStartTimestamp().plus(1, ChronoUnit.HOURS);
             UpdateTransactionParams p = UpdateTransactionParams.builder()
                 .chargeBoxId(transaction.getChargeBoxId())
                 .transactionId(transaction.getId())
                 .stopTimestamp(stopTimestamp)
-                .eventTimestamp(stopTimestamp.toLocalDateTime())
+                .eventTimestamp(stopTimestamp)
                 .stopMeterValue(transaction.getStartValue() + "0")
                 .eventActor(TransactionStopEventActor.station)
                 .build();
@@ -137,14 +136,14 @@ public class Issue1219 {
 
         List<Integer> transactionIds = new ArrayList<>();
         for (int i = 0; i < count; i++) {
-            var now = OffsetDateTime.now();
+            var now = Instant.now();
             InsertTransactionParams params = InsertTransactionParams.builder()
                 .idTag(ocppTags.get(ThreadLocalRandom.current().nextInt(0, ocppTags.size())))
                 .chargeBoxId(chargeBoxIds.get(ThreadLocalRandom.current().nextInt(0, chargeBoxIds.size())))
                 .connectorId(ThreadLocalRandom.current().nextInt(4))
                 .startMeterValue(String.valueOf(ThreadLocalRandom.current().nextLong(5_000, 20_000)))
                 .startTimestamp(now)
-                .eventTimestamp(now.toLocalDateTime())
+                .eventTimestamp(now)
                 .build();
             int transactionId = repository.insertTransaction(params);
             System.out.println("started transaction " + transactionId);
@@ -201,9 +200,9 @@ public class Issue1219 {
         return null;
     }
 
-    private static LocalDateTime getRandomExpiry() {
+    private static Instant getRandomExpiry() {
         if (ThreadLocalRandom.current().nextBoolean()) {
-            return LocalDateTime.now().plusDays(ThreadLocalRandom.current().nextInt(1, 365));
+            return Instant.now().plus(ThreadLocalRandom.current().nextInt(1, 365), ChronoUnit.DAYS);
         }
         return null;
     }

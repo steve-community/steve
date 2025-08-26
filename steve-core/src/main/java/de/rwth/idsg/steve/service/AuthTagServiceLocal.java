@@ -28,7 +28,7 @@ import ocpp.cs._2015._10.IdTagInfo;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.time.OffsetDateTime;
 
 import static de.rwth.idsg.steve.utils.DateTimeUtils.toOffsetDateTime;
@@ -61,7 +61,7 @@ public class AuthTagServiceLocal implements AuthTagService {
                 .withExpiryDate(getExpiryDateOrDefault(record));
         }
 
-        if (isExpired(record, LocalDateTime.now())) {
+        if (isExpired(record, Instant.now())) {
             log.error("The user with idTag '{}' is EXPIRED.", idTag);
             return new IdTagInfo()
                 .withStatus(AuthorizationStatus.EXPIRED)

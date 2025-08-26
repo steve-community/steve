@@ -28,7 +28,7 @@ import lombok.ToString;
 import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.NotEmpty;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.Objects;
 
 /**
@@ -55,7 +55,7 @@ public class OcppTagForm {
 
     @Schema(description = "A date/time without timezone. Example: 2022-10-10T09:00")
     @Future(message = "Expiry Date/Time must be in future")
-    private LocalDateTime expiryDate;
+    private Instant expiryDate;
 
     private Integer maxActiveTransactionCount;
 

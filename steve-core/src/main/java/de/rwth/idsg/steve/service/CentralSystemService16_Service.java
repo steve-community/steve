@@ -60,10 +60,10 @@ import ocpp.cs._2015._10.StopTransactionResponse;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
-import java.time.OffsetDateTime;
+import java.time.Instant;
 import java.util.Optional;
 
+import static de.rwth.idsg.steve.utils.DateTimeUtils.toInstant;
 import static de.rwth.idsg.steve.utils.DateTimeUtils.toOffsetDateTime;
 
 /**
@@ -87,7 +87,7 @@ public class CentralSystemService16_Service {
 
         Optional<RegistrationStatus> status = chargePointRegistrationService.getRegistrationStatus(chargeBoxIdentity);
         applicationEventPublisher.publishEvent(new OccpStationBooted(chargeBoxIdentity, status));
-        var now = LocalDateTime.now();
+        var now = Instant.now();
 
         if (status.isEmpty()) {
             // Applies only to stations not in db (regardless of the registration_status field from db)
@@ -130,7 +130,7 @@ public class CentralSystemService16_Service {
     public StatusNotificationResponse statusNotification(
             StatusNotificationRequest parameters, String chargeBoxIdentity) {
         // Optional field
-        var timestamp = parameters.isSetTimestamp() ? parameters.getTimestamp() : OffsetDateTime.now();
+        var timestamp = parameters.isSetTimestamp() ? toInstant(parameters.getTimestamp()) : Instant.now();
 
         InsertConnectorStatusParams params =
                 InsertConnectorStatusParams.builder()
@@ -189,10 +189,10 @@ public class CentralSystemService16_Service {
                                        .chargeBoxId(chargeBoxIdentity)
                                        .connectorId(parameters.getConnectorId())
                                        .idTag(parameters.getIdTag())
-                                       .startTimestamp(parameters.getTimestamp())
+                                       .startTimestamp(toInstant(parameters.getTimestamp()))
                                        .startMeterValue(Integer.toString(parameters.getMeterStart()))
                                        .reservationId(parameters.getReservationId())
-                                       .eventTimestamp(LocalDateTime.now())
+                                       .eventTimestamp(Instant.now())
                                        .build();
 
         int transactionId = ocppServerRepository.insertTransaction(params);
@@ -221,10 +221,10 @@ public class CentralSystemService16_Service {
                 UpdateTransactionParams.builder()
                                        .chargeBoxId(chargeBoxIdentity)
                                        .transactionId(transactionId)
-                                       .stopTimestamp(parameters.getTimestamp())
+                                       .stopTimestamp(toInstant(parameters.getTimestamp()))
                                        .stopMeterValue(Integer.toString(parameters.getMeterStop()))
                                        .stopReason(stopReason)
-                                       .eventTimestamp(LocalDateTime.now())
+                                       .eventTimestamp(Instant.now())
                                        .eventActor(TransactionStopEventActor.station)
                                        .build();
 
@@ -238,7 +238,7 @@ public class CentralSystemService16_Service {
     }
 
     public HeartbeatResponse heartbeat(HeartbeatRequest parameters, String chargeBoxIdentity) {
-        var now = LocalDateTime.now();
+        var now = Instant.now();
         ocppServerRepository.updateChargeboxHeartbeat(chargeBoxIdentity, now);
 
         return new HeartbeatResponse().withCurrentTime(toOffsetDateTime(now));

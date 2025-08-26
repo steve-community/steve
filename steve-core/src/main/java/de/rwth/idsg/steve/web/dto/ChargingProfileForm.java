@@ -34,7 +34,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.PositiveOrZero;
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.Map;
 import java.util.Objects;
 
@@ -65,15 +65,15 @@ public class ChargingProfileForm {
 
     private RecurrencyKindType recurrencyKind;
 
-    private LocalDateTime validFrom;
+    private Instant validFrom;
 
     @Future(message = "Valid To must be in future")
-    private LocalDateTime validTo;
+    private Instant validTo;
 
     @Positive(message = "Duration has to be a positive number")
     private Integer durationInSeconds;
 
-    private LocalDateTime startSchedule;
+    private Instant startSchedule;
 
     @NotNull(message = "Charging Rate Unit has to be set")
     private ChargingRateUnitType chargingRateUnit;

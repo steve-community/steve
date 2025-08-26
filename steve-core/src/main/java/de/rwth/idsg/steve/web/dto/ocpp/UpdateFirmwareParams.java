@@ -27,7 +27,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -49,5 +49,5 @@ public class UpdateFirmwareParams extends MultipleChargePointSelect {
 
     @Future(message = "Retrieve Date/Time must be in future")
     @NotNull(message = "Retrieve Date/Time is required")
-    private LocalDateTime retrieve;
+    private Instant retrieve;
 }

@@ -26,16 +26,18 @@ import ocpp.cp._2015._10.ChargingProfilePurposeType;
 import ocpp.cp._2015._10.ChargingRateUnitType;
 import ocpp.cp._2015._10.RecurrencyKindType;
 import org.joda.time.DateTime;
+import org.springframework.util.CollectionUtils;
 
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.AssertFalse;
 import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.Future;
-import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.PositiveOrZero;
+
 import java.math.BigDecimal;
-import java.util.Map;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -80,9 +82,8 @@ public class ChargingProfileForm {
 
     private BigDecimal minChargingRate;
 
-    @NotEmpty(message = "Schedule Periods cannot be empty")
     @Valid
-    private Map<String, SchedulePeriod> schedulePeriodMap;
+    private List<SchedulePeriod> schedulePeriods;
 
     @AssertTrue(message = "Valid To must be after Valid From")
     public boolean isFromToValid() {
@@ -117,6 +118,17 @@ public class ChargingProfileForm {
         return true;
     }
 
+    @AssertTrue(message = "Schedule Periods cannot be empty")
+    public boolean isSchedulePeriodsValid() {
+        if (CollectionUtils.isEmpty(schedulePeriods)) {
+            return false;
+        }
+
+        return schedulePeriods.stream()
+            .filter(Objects::nonNull)
+            .anyMatch(SchedulePeriod::isNonEmpty);
+    }
+
     @Getter
     @Setter
     @ToString
@@ -124,20 +136,26 @@ public class ChargingProfileForm {
 
         private static final int defaultNumberPhases = 3;
 
-        @NotNull(message = "Schedule period: Start Period has to be set")
         private Integer startPeriodInSeconds; // from the startSchedule
-
-        @NotNull(message = "Schedule period: Power Limit has to be set")
         private BigDecimal powerLimit;
-
         private Integer numberPhases;
-
-        public Integer getNumberPhases() {
-            return Objects.requireNonNullElse(numberPhases, defaultNumberPhases);
-        }
 
         public void setNumberPhases(Integer numberPhases) {
             this.numberPhases = Objects.requireNonNullElse(numberPhases, defaultNumberPhases);
+        }
+
+        public boolean isNonEmpty() {
+            return (startPeriodInSeconds != null) && (powerLimit != null) && (numberPhases != null);
+        }
+
+        @AssertFalse(message = "Schedule period: Power Limit has to be set")
+        public boolean isPowerLimitMissing() {
+            return (startPeriodInSeconds != null) && (powerLimit == null) && (numberPhases != null);
+        }
+
+        @AssertFalse(message = "Schedule period: Start Period has to be set")
+        public boolean isStartPeriodInSecondsMissing() {
+            return (startPeriodInSeconds == null) && (powerLimit != null) && (numberPhases != null);
         }
     }
 }

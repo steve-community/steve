@@ -41,6 +41,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.CollectionUtils;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -360,13 +361,14 @@ public class ChargingProfileRepositoryImpl implements ChargingProfileRepository 
     }
 
     private static void insertPeriods(DSLContext ctx, ChargingProfileForm form) {
-        if (CollectionUtils.isEmpty(form.getSchedulePeriodMap())) {
+        if (CollectionUtils.isEmpty(form.getSchedulePeriods())) {
             return;
         }
 
-        List<ChargingSchedulePeriodRecord> r = form.getSchedulePeriodMap()
-                                                   .values()
+        List<ChargingSchedulePeriodRecord> r = form.getSchedulePeriods()
                                                    .stream()
+                                                   .filter(ChargingProfileForm.SchedulePeriod::isNonEmpty)
+                                                   .sorted(Comparator.comparingInt(ChargingProfileForm.SchedulePeriod::getStartPeriodInSeconds))
                                                    .map(k -> ctx.newRecord(CHARGING_SCHEDULE_PERIOD)
                                                                 .setChargingProfilePk(form.getChargingProfilePk())
                                                                 .setStartPeriodInSeconds(k.getStartPeriodInSeconds())

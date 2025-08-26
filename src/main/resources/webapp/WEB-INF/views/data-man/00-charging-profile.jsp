@@ -74,11 +74,11 @@
     </tr>
     </thead>
     <tbody>
-    <c:forEach items="${form.schedulePeriodMap}" var="schedulePeriodMap" varStatus="status">
-        <tr id="${schedulePeriodMap.key}">
-            <td><form:input path="schedulePeriodMap[${schedulePeriodMap.key}].startPeriodInSeconds"/></td>
-            <td><form:input path="schedulePeriodMap[${schedulePeriodMap.key}].powerLimit"/></td>
-            <td><form:input path="schedulePeriodMap[${schedulePeriodMap.key}].numberPhases" placeholder="if empty, 3 will be assumed"/></td>
+    <c:forEach items="${form.schedulePeriods}" varStatus="status">
+        <tr id="${status.index}">
+            <td><form:input path="schedulePeriods[${status.index}].startPeriodInSeconds"/></td>
+            <td><form:input path="schedulePeriods[${status.index}].powerLimit"/></td>
+            <td><form:input path="schedulePeriods[${status.index}].numberPhases" placeholder="if empty, 3 will be assumed"/></td>
             <td><input type="button" class="removeRow" value="Delete"></td>
         </tr>
     </c:forEach>

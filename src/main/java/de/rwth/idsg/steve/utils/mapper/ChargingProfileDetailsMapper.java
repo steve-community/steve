@@ -29,10 +29,7 @@ import ocpp.cp._2015._10.ChargingProfilePurposeType;
 import ocpp.cp._2015._10.ChargingRateUnitType;
 import ocpp.cp._2015._10.RecurrencyKindType;
 
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.UUID;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -59,18 +56,16 @@ public final class ChargingProfileDetailsMapper {
         form.setStartSchedule(profile.getStartSchedule());
         form.setChargingRateUnit(ChargingRateUnitType.fromValue(profile.getChargingRateUnit()));
         form.setMinChargingRate(profile.getMinChargingRate());
-
-        Map<String, ChargingProfileForm.SchedulePeriod> periodMap = new LinkedHashMap<>();
-        for (ChargingSchedulePeriodRecord rec : periods) {
-            ChargingProfileForm.SchedulePeriod p = new ChargingProfileForm.SchedulePeriod();
-            p.setStartPeriodInSeconds(rec.getStartPeriodInSeconds());
-            p.setPowerLimit(rec.getPowerLimit());
-            p.setNumberPhases(rec.getNumberPhases());
-
-            periodMap.put(UUID.randomUUID().toString(), p);
-        }
-        form.setSchedulePeriodMap(periodMap);
+        form.setSchedulePeriods(periods.stream().map(ChargingProfileDetailsMapper::mapToFormPeriod).toList());
 
         return form;
+    }
+
+    private static ChargingProfileForm.SchedulePeriod mapToFormPeriod(ChargingSchedulePeriodRecord rec) {
+        ChargingProfileForm.SchedulePeriod p = new ChargingProfileForm.SchedulePeriod();
+        p.setStartPeriodInSeconds(rec.getStartPeriodInSeconds());
+        p.setPowerLimit(rec.getPowerLimit());
+        p.setNumberPhases(rec.getNumberPhases());
+        return p;
     }
 }

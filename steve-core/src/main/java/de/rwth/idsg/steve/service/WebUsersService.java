@@ -75,7 +75,7 @@ public class WebUsersService implements UserDetailsManager {
     private static final UserDetails DUMMY_USER = new User("#", "#", Collections.emptyList());
 
     private final SteveConfiguration config;
-    private final ObjectMapper jacksonObjectMapper;
+    private final ObjectMapper mapper;
     private final WebUserRepository webUserRepository;
     private final SecurityContextHolderStrategy securityContextHolderStrategy = getContextHolderStrategy();
     private final PasswordEncoder encoder;
@@ -235,7 +235,7 @@ public class WebUsersService implements UserDetailsManager {
                         .webUserPk(r.value1())
                         .webUsername(r.value2())
                         .enabled(r.value3())
-                        .authorities(WebUserAuthority.fromJsonValue(r.value4()))
+                        .authorities(WebUserAuthority.fromJsonValue(mapper, r.value4()))
                         .build()
                 );
     }
@@ -251,7 +251,7 @@ public class WebUsersService implements UserDetailsManager {
         form.setWebUserPk(ur.getWebUserPk());
         form.setEnabled(ur.getEnabled());
         form.setWebUsername(ur.getUsername());
-        form.setAuthorities(WebUserAuthority.fromJsonValue(ur.getAuthorities()));
+        form.setAuthorities(WebUserAuthority.fromJsonValue(mapper, ur.getAuthorities()));
         return form;
     }
 
@@ -266,7 +266,7 @@ public class WebUsersService implements UserDetailsManager {
         form.setWebUserPk(ur.getWebUserPk());
         form.setEnabled(ur.getEnabled());
         form.setWebUsername(ur.getUsername());
-        form.setAuthorities(WebUserAuthority.fromJsonValue(ur.getAuthorities()));
+        form.setAuthorities(WebUserAuthority.fromJsonValue(mapper, ur.getAuthorities()));
         return form;
     }
 
@@ -325,7 +325,7 @@ public class WebUsersService implements UserDetailsManager {
 
     private String[] fromJson(JSON jsonArray) {
         try {
-            return jacksonObjectMapper.readValue(jsonArray.data(), String[].class);
+            return mapper.readValue(jsonArray.data(), String[].class);
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
@@ -338,7 +338,7 @@ public class WebUsersService implements UserDetailsManager {
             .collect(Collectors.toCollection(LinkedHashSet::new)); // prevent duplicates
 
         try {
-            String str = jacksonObjectMapper.writeValueAsString(auths);
+            String str = mapper.writeValueAsString(auths);
             return JSON.jsonOrNull(str);
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);

@@ -18,6 +18,7 @@
  */
 package de.rwth.idsg.steve.ocpp.ws.ocpp12;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import de.rwth.idsg.ocpp.jaxb.RequestType;
 import de.rwth.idsg.ocpp.jaxb.ResponseType;
 import de.rwth.idsg.steve.config.DelegatingTaskScheduler;
@@ -27,9 +28,7 @@ import de.rwth.idsg.steve.ocpp.soap.CentralSystemService12_SoapServer;
 import de.rwth.idsg.steve.ocpp.ws.AbstractWebSocketEndpoint;
 import de.rwth.idsg.steve.ocpp.ws.FutureResponseContextStore;
 import de.rwth.idsg.steve.ocpp.ws.SessionContextStore;
-import de.rwth.idsg.steve.ocpp.ws.pipeline.AbstractCallHandler;
-import de.rwth.idsg.steve.ocpp.ws.pipeline.Deserializer;
-import de.rwth.idsg.steve.ocpp.ws.pipeline.IncomingPipeline;
+import de.rwth.idsg.steve.ocpp.ws.pipeline.*;
 import de.rwth.idsg.steve.repository.OcppServerRepository;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -42,6 +41,7 @@ import ocpp.cs._2010._08.MeterValuesRequest;
 import ocpp.cs._2010._08.StartTransactionRequest;
 import ocpp.cs._2010._08.StatusNotificationRequest;
 import ocpp.cs._2010._08.StopTransactionRequest;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 
@@ -54,7 +54,7 @@ import jakarta.annotation.PostConstruct;
 @Component
 public class Ocpp12WebSocketEndpoint extends AbstractWebSocketEndpoint {
 
-    private IncomingPipeline pipeline;
+    private final IncomingPipeline pipeline;
 
     public Ocpp12WebSocketEndpoint(DelegatingTaskScheduler asyncTaskScheduler,
                                    OcppServerRepository ocppServerRepository,
@@ -62,11 +62,15 @@ public class Ocpp12WebSocketEndpoint extends AbstractWebSocketEndpoint {
                                    ApplicationEventPublisher applicationEventPublisher,
                                    CentralSystemService12_SoapServer server,
                                    Ocpp12TypeStore typeStore,
-                                   SessionContextStore sessionContextStore) {
+                                   SessionContextStore sessionContextStore,
+                                   @Qualifier("ocppObjectMapper")
+                                   ObjectMapper ocppMapper,
+                                   Sender sender) {
         super(asyncTaskScheduler, ocppServerRepository, futureResponseContextStore, applicationEventPublisher,
             sessionContextStore);
-        Deserializer deserializer = new Deserializer(futureResponseContextStore, typeStore);
-        this.pipeline = new IncomingPipeline(deserializer, new Ocpp12CallHandler(server));
+        var serializer = new Serializer(ocppMapper);
+        var deserializer = new Deserializer(ocppMapper, futureResponseContextStore, typeStore);
+        this.pipeline = new IncomingPipeline(serializer, deserializer, sender, new Ocpp12CallHandler(server));
     }
 
     @PostConstruct

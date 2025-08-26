@@ -18,6 +18,7 @@
  */
 package de.rwth.idsg.steve.ocpp.ws;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import de.rwth.idsg.steve.ocpp.ChargePointServiceInvoker;
 import de.rwth.idsg.steve.ocpp.CommunicationTask;
 import de.rwth.idsg.steve.ocpp.OcppTransport;
@@ -42,9 +43,10 @@ import de.rwth.idsg.steve.ocpp.task.TriggerMessageTask;
 import de.rwth.idsg.steve.ocpp.task.UnlockConnectorTask;
 import de.rwth.idsg.steve.ocpp.task.UpdateFirmwareTask;
 import de.rwth.idsg.steve.ocpp.ws.pipeline.OutgoingCallPipeline;
+import de.rwth.idsg.steve.ocpp.ws.pipeline.Sender;
+import de.rwth.idsg.steve.ocpp.ws.pipeline.Serializer;
 import de.rwth.idsg.steve.repository.dto.ChargePointSelect;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
@@ -61,11 +63,12 @@ public class ChargePointServiceJsonInvoker implements ChargePointServiceInvoker 
     private final OutgoingCallPipeline outgoingCallPipeline;
     private final Map<OcppVersion, InvocationContext> invocationContexts;
 
-    public ChargePointServiceJsonInvoker(OutgoingCallPipeline outgoingCallPipeline,
-                                         @Autowired
+    public ChargePointServiceJsonInvoker(FutureResponseContextStore store, Sender sender,
+                                         @Qualifier("ocppObjectMapper")
+                                         ObjectMapper ocppMapper,
                                          @Qualifier("invocationContexts")
                                          Map<OcppVersion, InvocationContext> invocationContexts) {
-        this.outgoingCallPipeline = outgoingCallPipeline;
+        this.outgoingCallPipeline = new OutgoingCallPipeline(store, new Serializer(ocppMapper), sender);
         this.invocationContexts = invocationContexts;
     }
 

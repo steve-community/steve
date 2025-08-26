@@ -30,7 +30,6 @@ import de.rwth.idsg.ocpp.jaxb.ResponseType;
 import de.rwth.idsg.steve.SteveException;
 import de.rwth.idsg.steve.ocpp.ws.ErrorFactory;
 import de.rwth.idsg.steve.ocpp.ws.FutureResponseContextStore;
-import de.rwth.idsg.steve.ocpp.ws.JsonObjectMapper;
 import de.rwth.idsg.steve.ocpp.ws.TypeStore;
 import de.rwth.idsg.steve.ocpp.ws.data.CommunicationContext;
 import de.rwth.idsg.steve.ocpp.ws.data.ErrorCode;
@@ -55,8 +54,7 @@ import java.util.function.Consumer;
 @RequiredArgsConstructor
 public class Deserializer implements Consumer<CommunicationContext> {
 
-    private final ObjectMapper mapper = JsonObjectMapper.INSTANCE.getMapper();
-
+    private final ObjectMapper ocppMapper;
     private final FutureResponseContextStore futureResponseContextStore;
     private final TypeStore typeStore;
 
@@ -66,7 +64,7 @@ public class Deserializer implements Consumer<CommunicationContext> {
      */
     @Override
     public void accept(CommunicationContext context) {
-        try (JsonParser parser = mapper.getFactory().createParser(context.getIncomingString())) {
+        try (JsonParser parser = ocppMapper.getFactory().createParser(context.getIncomingString())) {
             parser.nextToken(); // set cursor to '['
 
             parser.nextToken();
@@ -134,7 +132,7 @@ public class Deserializer implements Consumer<CommunicationContext> {
                 requestPayload = new ObjectNode(JsonNodeFactory.instance);
             }
 
-            req = mapper.treeToValue(requestPayload, clazz);
+            req = ocppMapper.treeToValue(requestPayload, clazz);
         } catch (IOException e) {
             log.error("Exception occurred", e);
             context.setOutgoingMessage(ErrorFactory.payloadDeserializeError(messageId, e.getMessage()));
@@ -166,7 +164,7 @@ public class Deserializer implements Consumer<CommunicationContext> {
         try {
             parser.nextToken();
             JsonNode responsePayload = parser.readValueAsTree();
-            res = mapper.treeToValue(responsePayload, responseContext.getResponseClass());
+            res = ocppMapper.treeToValue(responsePayload, responseContext.getResponseClass());
         } catch (IOException e) {
             throw new SteveException("Deserialization of incoming response payload failed", e);
         }
@@ -214,7 +212,7 @@ public class Deserializer implements Consumer<CommunicationContext> {
             parser.nextToken();
             TreeNode detailsNode = parser.readValueAsTree();
             if (detailsNode != null && detailsNode.size() != 0) {
-                details = mapper.writeValueAsString(detailsNode);
+                details = ocppMapper.writeValueAsString(detailsNode);
             }
 
         } catch (IOException e) {

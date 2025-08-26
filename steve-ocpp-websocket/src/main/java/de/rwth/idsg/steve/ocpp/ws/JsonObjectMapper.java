@@ -27,6 +27,7 @@ import de.rwth.idsg.steve.ocpp.ws.custom.CustomStringModule;
 import de.rwth.idsg.steve.ocpp.ws.ocpp12.Ocpp12JacksonModule;
 import de.rwth.idsg.steve.ocpp.ws.ocpp15.Ocpp15JacksonModule;
 import de.rwth.idsg.steve.ocpp.ws.ocpp16.Ocpp16JacksonModule;
+import lombok.experimental.UtilityClass;
 
 import static com.fasterxml.jackson.core.JsonGenerator.Feature.WRITE_BIGDECIMAL_AS_PLAIN;
 import static com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_NULL_FOR_PRIMITIVES;
@@ -38,13 +39,11 @@ import static com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKN
  * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 10.03.2018
  */
-public enum JsonObjectMapper {
-    INSTANCE;
+@UtilityClass
+public class JsonObjectMapper {
 
-    private final ObjectMapper mapper;
-
-    JsonObjectMapper() {
-        mapper = new ObjectMapper();
+    public static ObjectMapper createObjectMapper() {
+        var mapper = new ObjectMapper();
         mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
 
         // OCPP messages contain some mandatory primitive fields (like transactionId), that are not allowed
@@ -71,9 +70,6 @@ public enum JsonObjectMapper {
                         new JakartaXmlBindAnnotationIntrospector(mapper.getTypeFactory())
                 )
         );
-    }
-
-    public ObjectMapper getMapper() {
         return mapper;
     }
 }

@@ -18,7 +18,6 @@
  */
 package de.rwth.idsg.steve.web.controller;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.rwth.idsg.steve.repository.TransactionRepository;
@@ -29,7 +28,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 
-import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -55,14 +53,7 @@ public class AjaxCallController {
     private final ChargePointsService chargePointsService;
     private final TransactionRepository transactionRepository;
     private final ReservationsService reservationsService;
-
-    private ObjectMapper objectMapper;
-
-    @PostConstruct
-    private void init() {
-        objectMapper = new ObjectMapper();
-        objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
-    }
+    private final ObjectMapper mapper;
 
     // -------------------------------------------------------------------------
     // Paths
@@ -99,7 +90,7 @@ public class AjaxCallController {
 
     private String serializeArray(List<?> list) {
         try {
-            return objectMapper.writeValueAsString(list);
+            return mapper.writeValueAsString(list);
         } catch (JsonProcessingException e) {
             // As fallback return empty array, do not let the frontend hang
             log.error("Error occurred during serialization of response. Returning empty array instead!", e);

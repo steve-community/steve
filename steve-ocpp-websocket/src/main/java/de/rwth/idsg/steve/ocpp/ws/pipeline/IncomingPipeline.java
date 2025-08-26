@@ -38,10 +38,9 @@ import java.util.function.Consumer;
 @RequiredArgsConstructor
 public class IncomingPipeline implements Consumer<CommunicationContext> {
 
-    private final Serializer serializer = Serializer.INSTANCE;
-    private final Sender sender = Sender.INSTANCE;
-
+    private final Serializer serializer;
     private final Deserializer deserializer;
+    private final Sender sender;
     private final AbstractCallHandler handler;
 
     @Override

@@ -75,15 +75,18 @@ public class GithubReleaseCheckService implements ReleaseCheckService {
             .setDefaultRequestConfig(requestConfig)
             .build();
 
-        HttpComponentsClientHttpRequestFactory factory = new HttpComponentsClientHttpRequestFactory(httpClient);
+        var factory = new HttpComponentsClientHttpRequestFactory(httpClient);
 
-        ObjectMapper mapper = new ObjectMapper()
-                .registerModule(new JavaTimeModule());
-        mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
-        mapper.setPropertyNamingStrategy(new PropertyNamingStrategies.SnakeCaseStrategy());
-
-        restTemplate = new RestTemplate(Collections.singletonList(new MappingJackson2HttpMessageConverter(mapper)));
+        var githubMapper = createGitHubMapper();
+        restTemplate = new RestTemplate(Collections.singletonList(new MappingJackson2HttpMessageConverter(githubMapper)));
         restTemplate.setRequestFactory(factory);
+    }
+
+    private static ObjectMapper createGitHubMapper() {
+        return new ObjectMapper()
+                .registerModule(new JavaTimeModule())
+                .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
+                .setPropertyNamingStrategy(new PropertyNamingStrategies.SnakeCaseStrategy());
     }
 
     @Override

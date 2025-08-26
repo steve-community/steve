@@ -31,26 +31,26 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 public class CustomStringModuleTest {
 
-    private final ObjectMapper mapper = JsonObjectMapper.INSTANCE.getMapper();
+    private final ObjectMapper ocppMapper = JsonObjectMapper.createObjectMapper();
 
     @Test
     public void testNormalString() throws Exception {
         var input = new SimpleJsonModel("normal string");
-        var output = mapper.writeValueAsString(input);
+        var output = ocppMapper.writeValueAsString(input);
         assertThat(output).isEqualTo("{\"someText\":\"normal string\"}");
     }
 
     @Test
     public void testLink() throws Exception {
         var input = new SimpleJsonModel("<a href=\"link\">Some link</a>");
-        var output = mapper.writeValueAsString(input);
+        var output = ocppMapper.writeValueAsString(input);
         assertThat(output).isEqualTo("{\"someText\":\"&lt;a href=&#34;link&#34;&gt;Some link&lt;/a&gt;\"}");
     }
 
     @Test
     public void testScript() throws Exception {
         var input = new SimpleJsonModel("<script src=\"http://someurl.com/script.js\"/>");
-        var output = mapper.writeValueAsString(input);
+        var output = ocppMapper.writeValueAsString(input);
         assertThat(output).isEqualTo("{\"someText\":\"&lt;script src=&#34;http://someurl.com/script.js&#34;/&gt;\"}");
     }
 

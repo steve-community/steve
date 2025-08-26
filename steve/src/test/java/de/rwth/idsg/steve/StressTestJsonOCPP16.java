@@ -18,7 +18,9 @@
  */
 package de.rwth.idsg.steve;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import de.rwth.idsg.steve.ocpp.OcppVersion;
+import de.rwth.idsg.steve.ocpp.ws.JsonObjectMapper;
 import de.rwth.idsg.steve.utils.OcppJsonChargePoint;
 import de.rwth.idsg.steve.utils.SteveConfigurationReader;
 import de.rwth.idsg.steve.utils.StressTester;
@@ -60,6 +62,7 @@ import static org.assertj.core.api.Assertions.fail;
 public class StressTestJsonOCPP16 extends StressTest {
 
     private static final OcppVersion VERSION = OcppVersion.V_16;
+    private static final ObjectMapper OCPP_MAPPER = JsonObjectMapper.createObjectMapper();
 
     private final String path;
 
@@ -82,7 +85,7 @@ public class StressTestJsonOCPP16 extends StressTest {
                 var localRandom = ThreadLocalRandom.current();
 
                 var chargeBoxId = chargeBoxIds.get(localRandom.nextInt(chargeBoxIds.size()));
-                threadLocalChargePoint.set(new OcppJsonChargePoint(VERSION, chargeBoxId, path));
+                threadLocalChargePoint.set(new OcppJsonChargePoint(OCPP_MAPPER, VERSION, chargeBoxId, path));
 
                 var chargePoint = threadLocalChargePoint.get();
                 chargePoint.start();

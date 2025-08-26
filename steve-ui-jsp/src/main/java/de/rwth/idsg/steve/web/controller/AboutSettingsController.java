@@ -27,8 +27,6 @@ import de.rwth.idsg.steve.service.ReleaseCheckService;
 import de.rwth.idsg.steve.web.dto.EndpointInfo;
 import de.rwth.idsg.steve.web.dto.SettingsForm;
 import lombok.RequiredArgsConstructor;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -38,6 +36,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 
 /**
  * One controller for about and settings pages
@@ -55,6 +56,7 @@ public class AboutSettingsController {
     private final MailService mailService;
     private final ReleaseCheckService releaseCheckService;
     private final SteveConfiguration config;
+    private final EndpointInfo info;
 
     // -------------------------------------------------------------------------
     // Paths
@@ -72,10 +74,10 @@ public class AboutSettingsController {
         model.addAttribute("version", config.getSteveVersion());
         model.addAttribute("db", genericRepository.getDBVersion());
         model.addAttribute("logFile", logController.getLogFilePath());
-        model.addAttribute("systemTime", DateTime.now());
-        model.addAttribute("systemTimeZone", DateTimeZone.getDefault());
+        model.addAttribute("systemTime", LocalDateTime.now());
+        model.addAttribute("systemTimeZone", ZoneId.systemDefault());
         model.addAttribute("releaseReport", releaseCheckService.check());
-        model.addAttribute("endpointInfo", EndpointInfo.INSTANCE);
+        model.addAttribute("endpointInfo", info);
         return "about";
     }
 

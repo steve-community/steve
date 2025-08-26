@@ -69,9 +69,9 @@ import de.rwth.idsg.steve.web.dto.ocpp.UpdateFirmwareParams;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import ocpp.cp._2015._10.GetCompositeScheduleResponse;
-import org.joda.time.DateTime;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.util.List;
 
 /**
@@ -358,8 +358,8 @@ public class ChargePointServiceClient {
             .idTag(params.getIdTag())
             .chargeBoxId(list.get(0).getChargeBoxId())
             .connectorId(params.getConnectorId())
-            .startTimestamp(DateTime.now())
-            .expiryTimestamp(params.getExpiry().toDateTime())
+            .startTimestamp(Instant.now())
+            .expiryTimestamp(params.getExpiry())
             .build();
 
         int reservationId = reservationRepository.insert(res);

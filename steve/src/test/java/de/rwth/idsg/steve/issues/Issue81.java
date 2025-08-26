@@ -18,25 +18,24 @@
  */
 package de.rwth.idsg.steve.issues;
 
-import de.rwth.idsg.steve.SteveConfigurationReader;
+import de.rwth.idsg.steve.utils.SteveConfigurationReader;
 import de.rwth.idsg.steve.StressTest;
 import de.rwth.idsg.steve.utils.Helpers;
 import de.rwth.idsg.steve.utils.StressTester;
 import lombok.RequiredArgsConstructor;
 import ocpp.cs._2015._10.BootNotificationRequest;
-import ocpp.cs._2015._10.BootNotificationResponse;
 import ocpp.cs._2015._10.CentralSystemService;
 import ocpp.cs._2015._10.RegistrationStatus;
 import ocpp.cs._2015._10.StartTransactionRequest;
-import ocpp.cs._2015._10.StartTransactionResponse;
-import org.joda.time.DateTime;
-import org.junit.jupiter.api.Assertions;
 
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.concurrent.ThreadLocalRandom;
 
 import static de.rwth.idsg.steve.utils.Helpers.getForOcpp16;
-import static de.rwth.idsg.steve.utils.Helpers.getPath;
+import static de.rwth.idsg.steve.utils.Helpers.getHttpPath;
 import static de.rwth.idsg.steve.utils.Helpers.getRandomString;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -49,12 +48,12 @@ public class Issue81 extends StressTest {
 
     public static void main(String[] args) throws Exception {
         var config = SteveConfigurationReader.readSteveConfiguration("main.properties");
-        var path = getPath(config);
+        var path = getHttpPath(config);
         new Issue81(path).attack();
     }
 
     protected void attackInternal() throws Exception {
-        StressTester.Runnable runnable = new StressTester.Runnable() {
+        var runnable = new StressTester.Runnable() {
 
             private final ThreadLocal<CentralSystemService> client = new ThreadLocal<>();
             private final ThreadLocal<String> chargeBoxId = new ThreadLocal<>();
@@ -66,18 +65,18 @@ public class Issue81 extends StressTest {
                 client.set(getForOcpp16(path));
                 chargeBoxId.set(Helpers.getRandomString());
 
-                BootNotificationResponse boot = getForOcpp16(path).bootNotification(
+                var boot = getForOcpp16(path).bootNotification(
                         new BootNotificationRequest()
                                 .withChargePointVendor(getRandomString())
                                 .withChargePointModel(getRandomString()),
                         chargeBoxId.get());
-                Assertions.assertEquals(RegistrationStatus.ACCEPTED, boot.getStatus());
+                assertThat(boot.getStatus()).isEqualTo(RegistrationStatus.ACCEPTED);
 
-                StartTransactionRequest req = new StartTransactionRequest()
-                        .withConnectorId(ThreadLocalRandom.current().nextInt())
+                var req = new StartTransactionRequest()
+                        .withConnectorId(ThreadLocalRandom.current().nextInt(1, 8))
                         .withIdTag(Helpers.getRandomString())
-                        .withTimestamp(DateTime.now())
-                        .withMeterStart(ThreadLocalRandom.current().nextInt());
+                        .withTimestamp(OffsetDateTime.now(ZoneOffset.UTC))
+                        .withMeterStart(ThreadLocalRandom.current().nextInt(0, 1_000_000));
                 txRequest.set(req);
 
                 Integer t1 = sendStartTx(client.get(), txRequest.get(), chargeBoxId.get());
@@ -86,8 +85,8 @@ public class Issue81 extends StressTest {
 
             @Override
             public void toRepeat() {
-                Integer t2 = sendStartTx(client.get(), txRequest.get(), chargeBoxId.get());
-                Assertions.assertEquals(txId.get(), t2);
+                var t2 = sendStartTx(client.get(), txRequest.get(), chargeBoxId.get());
+                assertThat(t2).isEqualTo(txId.get());
             }
 
             @Override
@@ -96,14 +95,14 @@ public class Issue81 extends StressTest {
             }
         };
 
-        StressTester tester = new StressTester(THREAD_COUNT, REPEAT_COUNT_PER_THREAD);
+        var tester = new StressTester(THREAD_COUNT, REPEAT_COUNT_PER_THREAD);
         tester.test(runnable);
         tester.shutDown();
     }
 
     private static Integer sendStartTx(CentralSystemService client, StartTransactionRequest req, String chargeBoxId) {
-        StartTransactionResponse start = client.startTransaction(req, chargeBoxId);
-        Assertions.assertNotNull(start);
+        var start = client.startTransaction(req, chargeBoxId);
+        assertThat(start).isNotNull();
         return start.getTransactionId();
     }
 }

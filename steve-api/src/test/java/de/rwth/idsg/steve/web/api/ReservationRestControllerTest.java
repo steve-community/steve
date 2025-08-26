@@ -18,42 +18,44 @@
  */
 package de.rwth.idsg.steve.web.api;
 
-import de.rwth.idsg.steve.service.UsersService;
+import de.rwth.idsg.steve.service.ReservationsService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.assertj.MockMvcTester;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.util.Collections;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ExtendWith(MockitoExtension.class)
-class UsersRestControllerTest extends AbstractControllerTest {
+class ReservationRestControllerTest extends AbstractControllerTest {
 
     @Mock
-    private UsersService usersService;
+    private ReservationsService reservationsService;
 
-    private MockMvc mockMvc;
+    private MockMvcTester mockMvc;
 
     @BeforeEach
     public void setup() {
-        mockMvc = buildMockMvc(MockMvcBuilders.standaloneSetup(new UsersRestController(usersService)));
+        mockMvc = buildMockMvc(MockMvcBuilders.standaloneSetup(new ReservationsRestController(reservationsService)));
     }
 
     @Test
-    void testGetUsers() throws Exception {
-        when(usersService.getOverview(any())).thenReturn(Collections.emptyList());
-        mockMvc.perform(get("/api/users"))
-                .andExpect(status().isOk())
-                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON));
+    void testGetReservations() {
+        when(reservationsService.getReservations(any())).thenReturn(Collections.emptyList());
+
+        assertThat(mockMvc.perform(get("/api/reservations")))
+                .hasStatusOk()
+                .hasContentTypeCompatibleWith(MediaType.APPLICATION_JSON)
+                .bodyJson()
+                .hasPathSatisfying("$", path -> assertThat(path).asArray().isEmpty());
     }
 }

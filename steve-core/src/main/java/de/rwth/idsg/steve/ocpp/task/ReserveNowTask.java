@@ -25,6 +25,8 @@ import de.rwth.idsg.steve.service.dto.EnhancedReserveNowParams;
 
 import jakarta.xml.ws.AsyncHandler;
 
+import static de.rwth.idsg.steve.utils.DateTimeUtils.toOffsetDateTime;
+
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 09.03.2018
@@ -71,7 +73,7 @@ public class ReserveNowTask extends Ocpp15AndAboveTask<EnhancedReserveNowParams,
     public ocpp.cp._2012._06.ReserveNowRequest getOcpp15Request() {
         return new ocpp.cp._2012._06.ReserveNowRequest()
                 .withConnectorId(params.getReserveNowParams().getConnectorId())
-                .withExpiryDate(params.getReserveNowParams().getExpiry().toDateTime())
+                .withExpiryDate(toOffsetDateTime(params.getReserveNowParams().getExpiry()))
                 .withIdTag(params.getReserveNowParams().getIdTag())
                 .withReservationId(params.getReservationId())
                 .withParentIdTag(params.getParentIdTag());
@@ -81,7 +83,7 @@ public class ReserveNowTask extends Ocpp15AndAboveTask<EnhancedReserveNowParams,
     public ocpp.cp._2015._10.ReserveNowRequest getOcpp16Request() {
         return new ocpp.cp._2015._10.ReserveNowRequest()
                 .withConnectorId(params.getReserveNowParams().getConnectorId())
-                .withExpiryDate(params.getReserveNowParams().getExpiry().toDateTime())
+                .withExpiryDate(toOffsetDateTime(params.getReserveNowParams().getExpiry()))
                 .withIdTag(params.getReserveNowParams().getIdTag())
                 .withReservationId(params.getReservationId())
                 .withParentIdTag(params.getParentIdTag());

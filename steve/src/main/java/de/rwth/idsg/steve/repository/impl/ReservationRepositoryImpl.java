@@ -27,7 +27,6 @@ import de.rwth.idsg.steve.utils.DateTimeUtils;
 import de.rwth.idsg.steve.web.dto.ReservationQueryForm;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.joda.time.DateTime;
 import org.jooq.DSLContext;
 import org.jooq.Record1;
 import org.jooq.Record10;
@@ -39,10 +38,13 @@ import org.jooq.exception.DataAccessException;
 import org.jooq.impl.DSL;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
 import static de.rwth.idsg.steve.repository.impl.RepositoryUtils.ocppTagByUserIdQuery;
+import static de.rwth.idsg.steve.utils.DateTimeUtils.toInstant;
+import static de.rwth.idsg.steve.utils.DateTimeUtils.toLocalDateTime;
 import static jooq.steve.db.tables.ChargeBox.CHARGE_BOX;
 import static jooq.steve.db.tables.Connector.CONNECTOR;
 import static jooq.steve.db.tables.OcppTag.OCPP_TAG;
@@ -136,7 +138,7 @@ public class ReservationRepositoryImpl implements ReservationRepository {
                   .where(RESERVATION.CONNECTOR_PK.in(DSL.select(CONNECTOR.CONNECTOR_PK)
                                                         .from(CONNECTOR)
                                                         .where(CONNECTOR.CHARGE_BOX_ID.equal(chargeBoxId))))
-                  .and(RESERVATION.EXPIRY_DATETIME.greaterThan(DateTime.now()))
+                  .and(RESERVATION.EXPIRY_DATETIME.greaterThan(LocalDateTime.now()))
                   .and(RESERVATION.STATUS.equal(ReservationStatus.ACCEPTED.name()))
                   .fetch(RESERVATION.RESERVATION_PK);
     }
@@ -155,8 +157,8 @@ public class ReservationRepositoryImpl implements ReservationRepository {
         int reservationId = ctx.insertInto(RESERVATION)
                                .set(RESERVATION.CONNECTOR_PK, connectorPkQuery)
                                .set(RESERVATION.ID_TAG, params.getIdTag())
-                               .set(RESERVATION.START_DATETIME, params.getStartTimestamp())
-                               .set(RESERVATION.EXPIRY_DATETIME, params.getExpiryTimestamp())
+                               .set(RESERVATION.START_DATETIME, toLocalDateTime(params.getStartTimestamp()))
+                               .set(RESERVATION.EXPIRY_DATETIME, toLocalDateTime(params.getExpiryTimestamp()))
                                .set(RESERVATION.STATUS, ReservationStatus.WAITING.name())
                                .returning(RESERVATION.RESERVATION_PK)
                                .fetchOne()
@@ -208,10 +210,10 @@ public class ReservationRepositoryImpl implements ReservationRepository {
 
     private static class ReservationMapper implements
             RecordMapper<Record10<Integer, Integer, Integer, Integer, String,
-                                  String, DateTime, DateTime, String, Integer>, Reservation> {
+                                  String, LocalDateTime, LocalDateTime, String, Integer>, Reservation> {
         @Override
         public Reservation map(Record10<Integer, Integer, Integer, Integer, String,
-                                        String, DateTime, DateTime, String, Integer> r) {
+                                        String, LocalDateTime, LocalDateTime, String, Integer> r) {
             return Reservation.builder()
                               .id(r.value1())
                               .transactionId(r.value2())
@@ -219,9 +221,9 @@ public class ReservationRepositoryImpl implements ReservationRepository {
                               .chargeBoxPk(r.value4())
                               .ocppIdTag(r.value5())
                               .chargeBoxId(r.value6())
-                              .startDatetimeDT(r.value7())
+                              .startDatetimeDT(toInstant(r.value7()))
                               .startDatetime(DateTimeUtils.humanize(r.value7()))
-                              .expiryDatetimeDT(r.value8())
+                              .expiryDatetimeDT(toInstant(r.value8()))
                               .expiryDatetime(DateTimeUtils.humanize(r.value8()))
                               .status(r.value9())
                               .connectorId(r.value10())
@@ -243,13 +245,13 @@ public class ReservationRepositoryImpl implements ReservationRepository {
     private void processType(SelectQuery selectQuery, ReservationQueryForm form) {
         switch (form.getPeriodType()) {
             case ACTIVE:
-                selectQuery.addConditions(RESERVATION.EXPIRY_DATETIME.greaterThan(DateTime.now()));
+                selectQuery.addConditions(RESERVATION.EXPIRY_DATETIME.greaterThan(LocalDateTime.now()));
                 break;
 
             case FROM_TO:
                 selectQuery.addConditions(
-                        RESERVATION.START_DATETIME.greaterOrEqual(form.getFrom().toDateTime()),
-                        RESERVATION.EXPIRY_DATETIME.lessOrEqual(form.getTo().toDateTime())
+                        RESERVATION.START_DATETIME.greaterOrEqual(toLocalDateTime(form.getFrom())),
+                        RESERVATION.EXPIRY_DATETIME.lessOrEqual(toLocalDateTime(form.getTo()))
                 );
                 break;
 

@@ -18,10 +18,11 @@
  */
 package de.rwth.idsg.steve.ocpp.ws;
 
-import de.rwth.idsg.ocpp.jaxb.RequestType;
-import de.rwth.idsg.steve.SteveException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import de.rwth.idsg.steve.ocpp.ChargePointServiceInvoker;
 import de.rwth.idsg.steve.ocpp.CommunicationTask;
+import de.rwth.idsg.steve.ocpp.OcppTransport;
+import de.rwth.idsg.steve.ocpp.OcppVersion;
 import de.rwth.idsg.steve.ocpp.task.CancelReservationTask;
 import de.rwth.idsg.steve.ocpp.task.ChangeAvailabilityTask;
 import de.rwth.idsg.steve.ocpp.task.ChangeConfigurationTask;
@@ -41,23 +42,15 @@ import de.rwth.idsg.steve.ocpp.task.SetChargingProfileTask;
 import de.rwth.idsg.steve.ocpp.task.TriggerMessageTask;
 import de.rwth.idsg.steve.ocpp.task.UnlockConnectorTask;
 import de.rwth.idsg.steve.ocpp.task.UpdateFirmwareTask;
-import de.rwth.idsg.steve.ocpp.ws.data.ActionResponsePair;
-import de.rwth.idsg.steve.ocpp.ws.data.CommunicationContext;
-import de.rwth.idsg.steve.ocpp.ws.data.FutureResponseContext;
-import de.rwth.idsg.steve.ocpp.ws.data.OcppJsonCall;
-import de.rwth.idsg.steve.ocpp.ws.ocpp12.Ocpp12TypeStore;
-import de.rwth.idsg.steve.ocpp.ws.ocpp12.Ocpp12WebSocketEndpoint;
-import de.rwth.idsg.steve.ocpp.ws.ocpp15.Ocpp15TypeStore;
-import de.rwth.idsg.steve.ocpp.ws.ocpp15.Ocpp15WebSocketEndpoint;
-import de.rwth.idsg.steve.ocpp.ws.ocpp16.Ocpp16TypeStore;
-import de.rwth.idsg.steve.ocpp.ws.ocpp16.Ocpp16WebSocketEndpoint;
 import de.rwth.idsg.steve.ocpp.ws.pipeline.OutgoingCallPipeline;
+import de.rwth.idsg.steve.ocpp.ws.pipeline.Sender;
+import de.rwth.idsg.steve.ocpp.ws.pipeline.Serializer;
 import de.rwth.idsg.steve.repository.dto.ChargePointSelect;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
-import java.util.UUID;
+import java.util.Map;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -65,14 +58,19 @@ import java.util.UUID;
  */
 @Slf4j
 @Service
-@RequiredArgsConstructor
 public class ChargePointServiceJsonInvoker implements ChargePointServiceInvoker {
 
     private final OutgoingCallPipeline outgoingCallPipeline;
+    private final Map<OcppVersion, InvocationContext> invocationContexts;
 
-    private final Ocpp12WebSocketEndpoint ocpp12WebSocketEndpoint;
-    private final Ocpp15WebSocketEndpoint ocpp15WebSocketEndpoint;
-    private final Ocpp16WebSocketEndpoint ocpp16WebSocketEndpoint;
+    public ChargePointServiceJsonInvoker(FutureResponseContextStore store, Sender sender,
+                                         @Qualifier("ocppObjectMapper")
+                                         ObjectMapper ocppMapper,
+                                         @Qualifier("invocationContexts")
+                                         Map<OcppVersion, InvocationContext> invocationContexts) {
+        this.outgoingCallPipeline = new OutgoingCallPipeline(store, new Serializer(ocppMapper), sender);
+        this.invocationContexts = invocationContexts;
+    }
 
     /**
      * Just a wrapper to make try-catch block and exception handling stand out
@@ -90,43 +88,16 @@ public class ChargePointServiceJsonInvoker implements ChargePointServiceInvoker 
     /**
      * Actual processing
      */
-    private void run(ChargePointSelect cps, CommunicationTask task) {
-        var chargeBoxId = cps.getChargeBoxId();
-
-        var endpoint = switch (cps.getOcppProtocol().getVersion()) {
-            case V_12 -> ocpp12WebSocketEndpoint;
-            case V_15 -> ocpp15WebSocketEndpoint;
-            case V_16 -> ocpp16WebSocketEndpoint;
-        };
-
-        var typeStore = switch (cps.getOcppProtocol().getVersion()) {
-            case V_12 -> Ocpp12TypeStore.INSTANCE;
-            case V_15 -> Ocpp15TypeStore.INSTANCE;
-            case V_16 -> Ocpp16TypeStore.INSTANCE;
-        };
-
-        RequestType request = switch (cps.getOcppProtocol().getVersion()) {
-            case V_12 -> task.getOcpp12Request();
-            case V_15 -> task.getOcpp15Request();
-            case V_16 -> task.getOcpp16Request();
-        };
-
-        ActionResponsePair pair = typeStore.findActionResponse(request);
-        if (pair == null) {
-            throw new SteveException("Action name is not found");
+    private void run(ChargePointSelect cps, CommunicationTask<?, ?> task) {
+        var protocol = cps.getOcppProtocol();
+        if (protocol.getTransport() != OcppTransport.JSON) {
+            throw new IllegalArgumentException("Only JSON transport is supported here");
         }
-
-        OcppJsonCall call = new OcppJsonCall();
-        call.setMessageId(UUID.randomUUID().toString());
-        call.setPayload(request);
-        call.setAction(pair.getAction());
-
-        FutureResponseContext frc = new FutureResponseContext(task, pair.getResponseClass());
-
-        CommunicationContext context = new CommunicationContext(endpoint.getSession(chargeBoxId), chargeBoxId);
-        context.setOutgoingMessage(call);
-        context.setFutureResponseContext(frc);
-
+        if (!invocationContexts.containsKey(protocol.getVersion())) {
+            throw new IllegalArgumentException("Unsupported OCPP version: " + protocol.getVersion());
+        }
+        var context = invocationContexts.get(protocol.getVersion())
+                .toCommunicationContext(cps.getChargeBoxId(), task);
         outgoingCallPipeline.accept(context);
     }
 

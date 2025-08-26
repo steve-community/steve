@@ -18,12 +18,12 @@
  */
 package de.rwth.idsg.steve.web.dto;
 
+import de.rwth.idsg.steve.SteveConfiguration;
 import lombok.Getter;
 import lombok.ToString;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -31,12 +31,17 @@ import java.util.stream.Collectors;
  */
 @Getter
 @ToString
-public enum EndpointInfo {
-    INSTANCE;
+public class EndpointInfo {
 
-    private final ItemsWithInfo webInterface = new ItemsWithInfo("Access the web interface using", "/manager/home");
-    private final ItemsWithInfo ocppSoap = new ItemsWithInfo("SOAP endpoint for OCPP", "/services/CentralSystemService");
-    private final ItemsWithInfo ocppWebSocket = new ItemsWithInfo("WebSocket/JSON endpoint for OCPP", "/websocket/CentralSystemService/(chargeBoxId)");
+    private final ItemsWithInfo webInterface;
+    private final ItemsWithInfo ocppSoap;
+    private final ItemsWithInfo ocppWebSocket;
+
+    public EndpointInfo(SteveConfiguration config) {
+        this.webInterface = new ItemsWithInfo("Access the web interface using", config.getPaths().getManagerMapping() + "/home");
+        this.ocppSoap = new ItemsWithInfo("SOAP endpoint for OCPP", config.getPaths().getSoapMapping() + config.getPaths().getRouterEndpointPath());
+        this.ocppWebSocket = new ItemsWithInfo("WebSocket/JSON endpoint for OCPP", config.getPaths().getWebsocketMapping() + config.getPaths().getRouterEndpointPath() + "/(chargeBoxId)");
+    }
 
     @Getter
     @ToString
@@ -54,7 +59,7 @@ public enum EndpointInfo {
         public synchronized void setData(List<String> data) {
             this.data = data.stream()
                             .map(s -> s + dataElementPostFix)
-                            .collect(Collectors.toList());
+                            .toList();
         }
     }
 }

@@ -31,17 +31,17 @@ import de.rwth.idsg.steve.repository.GenericRepository;
 import de.rwth.idsg.steve.repository.dto.ChargePointSelect;
 import de.rwth.idsg.steve.repository.dto.ConnectorStatus;
 import de.rwth.idsg.steve.utils.ConnectorStatusCountFilter;
-import de.rwth.idsg.steve.utils.DateTimeUtils;
 import de.rwth.idsg.steve.web.dto.ConnectorStatusForm;
 import de.rwth.idsg.steve.web.dto.OcppJsonStatus;
 import de.rwth.idsg.steve.web.dto.Statistics;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import ocpp.cs._2015._10.RegistrationStatus;
-import org.joda.time.DateTime;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
+import java.time.Instant;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -51,7 +51,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
+
+import static de.rwth.idsg.steve.utils.DateTimeUtils.*;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -106,7 +107,7 @@ public class ChargePointHelperServiceImpl implements ChargePointHelperService {
         return latestList;
     }
 
-    public List<OcppJsonStatus> getOcppJsonStatus() {
+    public List<OcppJsonStatus> getOcppJsonStatus(ZoneId timeZone) {
         Map<String, Deque<SessionContext>> ocpp12Map = ocpp12WebSocketEndpoint.getACopy();
         Map<String, Deque<SessionContext>> ocpp15Map = ocpp15WebSocketEndpoint.getACopy();
         Map<String, Deque<SessionContext>> ocpp16Map = ocpp16WebSocketEndpoint.getACopy();
@@ -114,12 +115,12 @@ public class ChargePointHelperServiceImpl implements ChargePointHelperService {
         List<String> idList = extractIds(Arrays.asList(ocpp12Map, ocpp15Map, ocpp16Map));
         Map<String, Integer> primaryKeyLookup = chargePointRepository.getChargeBoxIdPkPair(idList);
 
-        DateTime now = DateTime.now();
+        var now = Instant.now();
         List<OcppJsonStatus> returnList = new ArrayList<>();
 
-        appendList(ocpp12Map, returnList, now, OcppVersion.V_12, primaryKeyLookup);
-        appendList(ocpp15Map, returnList, now, OcppVersion.V_15, primaryKeyLookup);
-        appendList(ocpp16Map, returnList, now, OcppVersion.V_16, primaryKeyLookup);
+        appendList(ocpp12Map, returnList, now, timeZone, OcppVersion.V_12, primaryKeyLookup);
+        appendList(ocpp15Map, returnList, now, timeZone, OcppVersion.V_15, primaryKeyLookup);
+        appendList(ocpp16Map, returnList, now, timeZone, OcppVersion.V_16, primaryKeyLookup);
         return returnList;
     }
 
@@ -158,7 +159,7 @@ public class ChargePointHelperServiceImpl implements ChargePointHelperService {
         //
         List<String> statusFilter = inStatusFilter.stream()
                                                   .map(RegistrationStatus::value)
-                                                  .collect(Collectors.toList());
+                                                  .toList();
 
         List<ChargePointSelect> returnList = chargePointRepository.getChargePointSelect(protocol, statusFilter, chargeBoxIdFilter);
 
@@ -166,7 +167,7 @@ public class ChargePointHelperServiceImpl implements ChargePointHelperService {
         //
         List<String> chargeBoxIdList = CollectionUtils.isEmpty(chargeBoxIdFilter)
             ? jsonEndpoint.getChargeBoxIdList()
-            : jsonEndpoint.getChargeBoxIdList().stream().filter(chargeBoxIdFilter::contains).collect(Collectors.toList());
+            : jsonEndpoint.getChargeBoxIdList().stream().filter(chargeBoxIdFilter::contains).toList();
 
         var jsonProtocol = OcppProtocol.from(jsonEndpoint.getVersion(), OcppTransport.JSON);
 
@@ -181,25 +182,26 @@ public class ChargePointHelperServiceImpl implements ChargePointHelperService {
         return ocppMaps.stream()
                        .map(Map::keySet)
                        .flatMap(Collection::stream)
-                       .collect(Collectors.toList());
+                       .toList();
     }
 
     private static void appendList(Map<String, Deque<SessionContext>> map, List<OcppJsonStatus> returnList,
-                                   DateTime now, OcppVersion version, Map<String, Integer> primaryKeyLookup) {
+                                   Instant now, ZoneId timeZone, OcppVersion version,
+                                   Map<String, Integer> primaryKeyLookup) {
 
         for (Map.Entry<String, Deque<SessionContext>> entry : map.entrySet()) {
             String chargeBoxId = entry.getKey();
             Deque<SessionContext> endpointDeque = entry.getValue();
 
             for (SessionContext ctx : endpointDeque) {
-                DateTime openSince = ctx.getOpenSince();
+                var openSince = ctx.getOpenSince();
 
                 OcppJsonStatus status = OcppJsonStatus.builder()
                                                       .chargeBoxPk(primaryKeyLookup.get(chargeBoxId))
                                                       .chargeBoxId(chargeBoxId)
                                                       .connectedSinceDT(openSince)
-                                                      .connectedSince(DateTimeUtils.humanize(openSince))
-                                                      .connectionDuration(DateTimeUtils.timeElapsed(openSince, now))
+                                                      .connectedSince(humanize(openSince, timeZone))
+                                                      .connectionDuration(timeElapsed(openSince, now))
                                                       .version(version)
                                                       .build();
 

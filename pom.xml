@@ -153,6 +153,21 @@
                 <artifactId>annotations</artifactId>
                 <version>26.0.2</version>
             </dependency>
+            <dependency>
+                <groupId>org.assertj</groupId>
+                <artifactId>assertj-core</artifactId>
+                <version>3.27.3</version>
+            </dependency>
+            <dependency>
+                <groupId>org.mockito</groupId>
+                <artifactId>mockito-junit-jupiter</artifactId>
+                <version>5.19.0</version>
+            </dependency>
+            <dependency>
+                <groupId>com.jayway.jsonpath</groupId>
+                <artifactId>json-path</artifactId>
+                <version>2.9.0</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -184,7 +199,7 @@
                                         <version>[17,)</version>
                                     </requireJavaVersion>
                                     <requireMavenVersion>
-                                        <version>[3.3.9,)</version>
+                                        <version>[3.9.0,)</version>
                                     </requireMavenVersion>
                                 </rules>
                             </configuration>

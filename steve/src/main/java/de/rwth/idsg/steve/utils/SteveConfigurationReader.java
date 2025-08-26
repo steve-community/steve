@@ -16,9 +16,10 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package de.rwth.idsg.steve;
+package de.rwth.idsg.steve.utils;
 
-import de.rwth.idsg.steve.utils.PropertiesFileLoader;
+import de.rwth.idsg.steve.ApplicationProfile;
+import de.rwth.idsg.steve.SteveConfiguration;
 import lombok.experimental.UtilityClass;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -35,7 +36,16 @@ public class SteveConfigurationReader {
         PasswordEncoder encoder = new BCryptPasswordEncoder();
 
         var config = SteveConfiguration.builder()
-                .contextPath(sanitizeContextPath(p.getOptionalString("context.path").orElse(null)))
+                .paths(SteveConfiguration.Paths.builder()
+                        .rootMapping("/")
+                        .managerMapping("/manager")
+                        .apiMapping("/api")
+                        .soapMapping("/services")
+                        .websocketMapping("/websocket")
+                        .routerEndpointPath("/CentralSystemService")
+                        .contextPath(sanitizeContextPath(p.getOptionalString("context.path").orElse(null)))
+                        .build())
+                .timeZoneId("UTC")
                 .steveVersion(p.getString("steve.version"))
                 .gitDescribe(useFallbackIfNotSet(p.getOptionalString("git.describe").orElse(null), null))
                 .profile(profile)

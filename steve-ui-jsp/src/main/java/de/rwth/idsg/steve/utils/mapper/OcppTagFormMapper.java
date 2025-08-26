@@ -23,7 +23,8 @@ import de.rwth.idsg.steve.web.dto.OcppTagForm;
 import jooq.steve.db.tables.records.OcppTagActivityRecord;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
-import org.joda.time.DateTime;
+
+import static de.rwth.idsg.steve.utils.DateTimeUtils.toInstant;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -37,9 +38,9 @@ public final class OcppTagFormMapper {
         form.setOcppTagPk(record.getOcppTagPk());
         form.setIdTag(record.getIdTag());
 
-        DateTime expiryDate = record.getExpiryDate();
+        var expiryDate = record.getExpiryDate();
         if (expiryDate != null) {
-            form.setExpiryDate(expiryDate.toLocalDateTime());
+            form.setExpiryDate(toInstant(expiryDate));
         }
 
         form.setMaxActiveTransactionCount(record.getMaxActiveTransactionCount());

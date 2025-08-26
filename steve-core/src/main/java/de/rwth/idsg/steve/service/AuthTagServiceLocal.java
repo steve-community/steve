@@ -26,9 +26,12 @@ import lombok.extern.slf4j.Slf4j;
 import ocpp.cs._2015._10.AuthorizationStatus;
 import ocpp.cs._2015._10.IdTagInfo;
 import org.jetbrains.annotations.Nullable;
-import org.joda.time.DateTime;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
+import java.time.OffsetDateTime;
+
+import static de.rwth.idsg.steve.utils.DateTimeUtils.toOffsetDateTime;
 import static de.rwth.idsg.steve.utils.OcppTagActivityRecordUtils.isBlocked;
 import static de.rwth.idsg.steve.utils.OcppTagActivityRecordUtils.isExpired;
 import static de.rwth.idsg.steve.utils.OcppTagActivityRecordUtils.reachedLimitOfActiveTransactions;
@@ -58,7 +61,7 @@ public class AuthTagServiceLocal implements AuthTagService {
                 .withExpiryDate(getExpiryDateOrDefault(record));
         }
 
-        if (isExpired(record, DateTime.now())) {
+        if (isExpired(record, Instant.now())) {
             log.error("The user with idTag '{}' is EXPIRED.", idTag);
             return new IdTagInfo()
                 .withStatus(AuthorizationStatus.EXPIRED)
@@ -86,9 +89,9 @@ public class AuthTagServiceLocal implements AuthTagService {
      * If the database contains an actual expiry, use it. Otherwise, calculate an expiry for cached info
      */
     @Nullable
-    private DateTime getExpiryDateOrDefault(OcppTagActivityRecord record) {
+    private OffsetDateTime getExpiryDateOrDefault(OcppTagActivityRecord record) {
         if (record.getExpiryDate() != null) {
-            return record.getExpiryDate();
+            return toOffsetDateTime(record.getExpiryDate());
         }
 
         int hoursToExpire = settingsRepository.getHoursToExpire();
@@ -97,7 +100,7 @@ public class AuthTagServiceLocal implements AuthTagService {
         if (hoursToExpire == 0) {
             return null;
         } else {
-            return DateTime.now().plusHours(hoursToExpire);
+            return OffsetDateTime.now().plusHours(hoursToExpire);
         }
     }
 }

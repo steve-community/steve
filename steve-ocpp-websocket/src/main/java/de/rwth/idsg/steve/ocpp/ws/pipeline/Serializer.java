@@ -24,13 +24,13 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import de.rwth.idsg.steve.SteveException;
 import de.rwth.idsg.steve.ocpp.ws.ErrorFactory;
-import de.rwth.idsg.steve.ocpp.ws.JsonObjectMapper;
 import de.rwth.idsg.steve.ocpp.ws.data.CommunicationContext;
 import de.rwth.idsg.steve.ocpp.ws.data.MessageType;
 import de.rwth.idsg.steve.ocpp.ws.data.OcppJsonCall;
 import de.rwth.idsg.steve.ocpp.ws.data.OcppJsonError;
 import de.rwth.idsg.steve.ocpp.ws.data.OcppJsonMessage;
 import de.rwth.idsg.steve.ocpp.ws.data.OcppJsonResult;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
@@ -45,10 +45,10 @@ import java.util.function.Consumer;
  * @since 17.03.2015
  */
 @Slf4j
-public enum Serializer implements Consumer<CommunicationContext> {
-    INSTANCE;
+@RequiredArgsConstructor
+public class Serializer implements Consumer<CommunicationContext> {
 
-    private final ObjectMapper mapper = JsonObjectMapper.INSTANCE.getMapper();
+    private final ObjectMapper ocppMapper;
 
     @Override
     public void accept(CommunicationContext context) {
@@ -74,7 +74,7 @@ public enum Serializer implements Consumer<CommunicationContext> {
         }
 
         try {
-            String result = mapper.writeValueAsString(str);
+            String result = ocppMapper.writeValueAsString(str);
             context.setOutgoingString(result);
         } catch (IOException e) {
             throw new SteveException("The outgoing message could not be serialized", e);
@@ -92,12 +92,12 @@ public enum Serializer implements Consumer<CommunicationContext> {
     private ArrayNode handleCall(OcppJsonCall call) {
         JsonNode payloadNode;
         try {
-            payloadNode = mapper.valueToTree(call.getPayload());
+            payloadNode = ocppMapper.valueToTree(call.getPayload());
         } catch (IllegalArgumentException e) {
             throw new SteveException("The payload of the outgoing call could not be converted to JSON", e);
         }
 
-        return mapper.createArrayNode()
+        return ocppMapper.createArrayNode()
                      .add(call.getMessageType().getTypeNr())
                      .add(call.getMessageId())
                      .add(call.getAction())
@@ -110,13 +110,13 @@ public enum Serializer implements Consumer<CommunicationContext> {
     private ArrayNode handleResult(OcppJsonResult result) {
         JsonNode payloadNode;
         try {
-            payloadNode = mapper.valueToTree(result.getPayload());
+            payloadNode = ocppMapper.valueToTree(result.getPayload());
         } catch (IllegalArgumentException e) {
             log.error("Exception occurred", e);
             return handleError(ErrorFactory.payloadSerializeError(result.getMessageId(), e.getMessage()));
         }
 
-        return mapper.createArrayNode()
+        return ocppMapper.createArrayNode()
                      .add(result.getMessageType().getTypeNr())
                      .add(result.getMessageId())
                      .add(payloadNode);
@@ -138,12 +138,12 @@ public enum Serializer implements Consumer<CommunicationContext> {
         // From spec:
         // ErrorDetails - This JSON object describes error details in an undefined way.
         // If there are no error details you should fill in an empty object {}, missing or null is not allowed
-        ObjectNode detailsNode = mapper.createObjectNode();
+        ObjectNode detailsNode = ocppMapper.createObjectNode();
         if (error.isSetDetails()) {
-            detailsNode.set("errorMsg", mapper.getNodeFactory().textNode(error.toStringErrorDetails()));
+            detailsNode.set("errorMsg", ocppMapper.getNodeFactory().textNode(error.toStringErrorDetails()));
         }
 
-        return mapper.createArrayNode()
+        return ocppMapper.createArrayNode()
                      .add(error.getMessageType().getTypeNr())
                      .add(error.getMessageId())
                      .add(error.getErrorCode().name())

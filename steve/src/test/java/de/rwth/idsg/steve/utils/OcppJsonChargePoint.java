@@ -31,7 +31,6 @@ import de.rwth.idsg.ocpp.jaxb.RequestType;
 import de.rwth.idsg.ocpp.jaxb.ResponseType;
 import de.rwth.idsg.steve.SteveException;
 import de.rwth.idsg.steve.ocpp.OcppVersion;
-import de.rwth.idsg.steve.ocpp.ws.JsonObjectMapper;
 import de.rwth.idsg.steve.ocpp.ws.data.CommunicationContext;
 import de.rwth.idsg.steve.ocpp.ws.data.ErrorCode;
 import de.rwth.idsg.steve.ocpp.ws.data.MessageType;
@@ -77,6 +76,7 @@ import static org.eclipse.jetty.websocket.api.Callback.NOOP;
 @WebSocket
 public class OcppJsonChargePoint {
 
+    private final ObjectMapper ocppMapper;
     private final String version;
     private final String chargeBoxId;
     private final String connectionPath;
@@ -85,6 +85,7 @@ public class OcppJsonChargePoint {
     private final MessageDeserializer deserializer;
     private final WebSocketClient client;
     private final CountDownLatch closeHappenedSignal;
+    private final Serializer serializer;
 
     private final Thread testerThread;
     private RuntimeException testerThreadInterruptReason;
@@ -92,11 +93,12 @@ public class OcppJsonChargePoint {
     private CountDownLatch receivedMessagesSignal;
     private Session session;
 
-    public OcppJsonChargePoint(OcppVersion version, String chargeBoxId, String pathPrefix) {
-        this(version.getValue(), chargeBoxId, pathPrefix);
+    public OcppJsonChargePoint(ObjectMapper ocppMapper, OcppVersion version, String chargeBoxId, String pathPrefix) {
+        this(ocppMapper, version.getValue(), chargeBoxId, pathPrefix);
     }
 
-    public OcppJsonChargePoint(String ocppVersion, String chargeBoxId, String pathPrefix) {
+    public OcppJsonChargePoint(ObjectMapper ocppMapper, String ocppVersion, String chargeBoxId, String pathPrefix) {
+        this.ocppMapper = ocppMapper;
         this.version = ocppVersion;
         this.chargeBoxId = chargeBoxId;
         this.connectionPath = pathPrefix + chargeBoxId;
@@ -106,6 +108,7 @@ public class OcppJsonChargePoint {
         this.client = new WebSocketClient();
         this.closeHappenedSignal = new CountDownLatch(1);
         this.testerThread = Thread.currentThread();
+        this.serializer = new Serializer(ocppMapper);
     }
 
     @OnWebSocketOpen
@@ -181,7 +184,7 @@ public class OcppJsonChargePoint {
         CommunicationContext ctx = new CommunicationContext(null, chargeBoxId);
         ctx.setOutgoingMessage(call);
 
-        Serializer.INSTANCE.accept(ctx);
+        serializer.accept(ctx);
 
         ResponseContext resCtx = new ResponseContext(ctx.getOutgoingString(), responseClass, responseHandler, errorHandler);
         responseContextMap.put(messageId, resCtx);
@@ -191,9 +194,8 @@ public class OcppJsonChargePoint {
         String requestPayload;
         JsonNode responsePayload;
         try {
-            ObjectMapper mapper = JsonObjectMapper.INSTANCE.getMapper();
-            requestPayload = mapper.writeValueAsString(expectedRequest);
-            responsePayload = mapper.valueToTree(plannedResponse);
+            requestPayload = ocppMapper.writeValueAsString(expectedRequest);
+            responsePayload = ocppMapper.valueToTree(plannedResponse);
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
@@ -265,13 +267,13 @@ public class OcppJsonChargePoint {
 
     private void handleCall(OcppJsonCallForTesting call) {
         try {
-            ArrayNode node = JsonObjectMapper.INSTANCE.getMapper()
+            ArrayNode node = ocppMapper
                 .createArrayNode()
                 .add(MessageType.CALL_RESULT.getTypeNr())
                 .add(call.getMessageId())
                 .add(call.getContext().getResponsePayload());
 
-            String str = JsonObjectMapper.INSTANCE.getMapper().writeValueAsString(node);
+            String str = ocppMapper.writeValueAsString(node);
             session.sendText(str, NOOP);
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -305,9 +307,8 @@ public class OcppJsonChargePoint {
     private class MessageDeserializer {
 
         private OcppJsonMessage extract(String msg) throws Exception {
-            ObjectMapper mapper = JsonObjectMapper.INSTANCE.getMapper();
 
-            try (JsonParser parser = mapper.getFactory().createParser(msg)) {
+            try (JsonParser parser = ocppMapper.getFactory().createParser(msg)) {
                 parser.nextToken(); // set cursor to '['
 
                 parser.nextToken();
@@ -334,7 +335,7 @@ public class OcppJsonChargePoint {
             parser.nextToken();
             JsonNode responsePayload = parser.readValueAsTree();
             Class<ResponseType> clazz = responseContextMap.get(messageId).responseClass;
-            ResponseType res = JsonObjectMapper.INSTANCE.getMapper().treeToValue(responsePayload, clazz);
+            ResponseType res = ocppMapper.treeToValue(responsePayload, clazz);
 
             OcppJsonResult result = new OcppJsonResult();
             result.setMessageId(messageId);
@@ -356,7 +357,7 @@ public class OcppJsonChargePoint {
             parser.nextToken();
             TreeNode detailsNode = parser.readValueAsTree();
             if (detailsNode != null && detailsNode.size() != 0) {
-                details = JsonObjectMapper.INSTANCE.getMapper().writeValueAsString(detailsNode);
+                details = ocppMapper.writeValueAsString(detailsNode);
             }
 
             OcppJsonError error = new OcppJsonError();
@@ -415,5 +416,4 @@ public class OcppJsonChargePoint {
     private static class OcppJsonCallForTesting extends OcppJsonCall {
         private RequestContext context;
     }
-
 }

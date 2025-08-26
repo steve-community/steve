@@ -24,7 +24,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-import org.joda.time.LocalDateTime;
+
+import java.time.Instant;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -45,11 +46,11 @@ public abstract class QueryForm {
     @Schema(description = "The User ID")
     private Integer userId;
 
-    @Schema(description = "Show results that happened after this date/time. Format: ISO8601 without timezone. Example: `2022-10-10T09:00:00`")
-    private LocalDateTime from;
+    @Schema(description = "Show results that happened after this date/time. Format: ISO-8601 instant. Example: `2022-10-10T09:00:00Z`")
+    private Instant from;
 
-    @Schema(description = "Show results that happened before this date/time. Format: ISO8601 without timezone. Example: `2022-10-10T12:00:00`")
-    private LocalDateTime to;
+    @Schema(description = "Show results that happened before this date/time. Format: ISO-8601 instant. Example: `2022-10-10T12:00:00Z`")
+    private Instant to;
 
     @Schema(hidden = true)
     @AssertTrue(message = "'To' must be after 'From'")

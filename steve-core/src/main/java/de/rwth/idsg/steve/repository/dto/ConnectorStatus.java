@@ -24,12 +24,11 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
-import org.joda.time.DateTime;
+
+import java.time.Instant;
 
 /**
- *
  * @author Sevket Goekay <sevketgokay@gmail.com>
- *
  */
 @Getter
 @Builder
@@ -52,7 +51,7 @@ public final class ConnectorStatus {
     // For additional internal processing. Not related to the humanized
     // String version above, which is for representation on frontend
     @Schema(description = "Timestamp of the status")
-    private final DateTime statusTimestamp;
+    private final Instant statusTimestamp;
 
     @Schema(description = "OCPP version")
     private final OcppProtocol ocppProtocol;

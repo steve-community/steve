@@ -123,7 +123,7 @@ public class MediatorInInterceptor extends AbstractPhaseInterceptor<SoapMessage>
             String address = info.getAddress();
 
             // exclude the 'dummy' routing server
-            if (config.getRouterEndpointPath().equals(address)) {
+            if (config.getPaths().getRouterEndpointPath().equals(address)) {
                 continue;
             }
 

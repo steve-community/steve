@@ -24,7 +24,8 @@ import lombok.ToString;
 import ocpp.cp._2015._10.ChargingProfileKindType;
 import ocpp.cp._2015._10.ChargingProfilePurposeType;
 import ocpp.cp._2015._10.RecurrencyKindType;
-import org.joda.time.LocalDateTime;
+
+import java.time.Instant;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -40,7 +41,6 @@ public class ChargingProfileQueryForm {
     private ChargingProfilePurposeType profilePurpose;
     private ChargingProfileKindType profileKind;
     private RecurrencyKindType recurrencyKind;
-    private LocalDateTime validFrom;
-    private LocalDateTime validTo;
-
+    private Instant validFrom;
+    private Instant validTo;
 }

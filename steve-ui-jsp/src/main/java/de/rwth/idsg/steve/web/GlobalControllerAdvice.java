@@ -20,16 +20,18 @@ package de.rwth.idsg.steve.web;
 
 import de.rwth.idsg.steve.repository.dto.ChargePointSelect;
 import lombok.extern.slf4j.Slf4j;
-import org.joda.time.LocalDate;
-import org.joda.time.LocalDateTime;
 import org.springframework.beans.propertyeditors.StringTrimmerEditor;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.InitBinder;
+import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.servlet.ModelAndView;
 
 import jakarta.servlet.http.HttpServletRequest;
+
+import java.time.Instant;
+import java.time.LocalDate;
 import java.util.List;
 
 /**
@@ -41,12 +43,12 @@ import java.util.List;
 public class GlobalControllerAdvice {
 
     @InitBinder
-    public void binder(WebDataBinder binder) {
+    public void binder(WebDataBinder binder, NativeWebRequest webRequest) {
         BatchInsertConverter batchInsertConverter = new BatchInsertConverter();
 
         binder.registerCustomEditor(String.class, new StringTrimmerEditor(true));
         binder.registerCustomEditor(LocalDate.class, new LocalDateEditor());
-        binder.registerCustomEditor(LocalDateTime.class, LocalDateTimeEditor.forMvc());
+        binder.registerCustomEditor(Instant.class, InstantEditor.fromRequest(webRequest));
         binder.registerCustomEditor(ChargePointSelect.class, new ChargePointSelectEditor());
 
         binder.registerCustomEditor(List.class, "idList", batchInsertConverter);

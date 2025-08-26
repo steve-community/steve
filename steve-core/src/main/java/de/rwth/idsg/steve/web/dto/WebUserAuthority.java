@@ -33,8 +33,6 @@ public enum WebUserAuthority {
     ADMIN("ADMIN"),
     USER_ADMIN("USER", "ADMIN");
 
-    private static final ObjectMapper MAPPER = new ObjectMapper();
-
     private final Set<String> values;
     @Getter
     private final JSON jsonValue;
@@ -55,9 +53,9 @@ public enum WebUserAuthority {
         return String.join(", ", values);
     }
 
-    public static WebUserAuthority fromJsonValue(JSON v) {
+    public static WebUserAuthority fromJsonValue(ObjectMapper mapper, JSON v) {
         try {
-            List<String> values = Arrays.asList(MAPPER.readValue(v.data(), String[].class));
+            List<String> values = Arrays.asList(mapper.readValue(v.data(), String[].class));
             for (WebUserAuthority c: WebUserAuthority.values()) {
                 if (c.values.containsAll(values)) {
                     return c;

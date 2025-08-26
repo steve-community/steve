@@ -20,7 +20,8 @@ package de.rwth.idsg.steve.repository.dto;
 
 import lombok.Builder;
 import lombok.Getter;
-import org.joda.time.DateTime;
+
+import java.time.Instant;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -31,5 +32,5 @@ import org.joda.time.DateTime;
 public class InsertReservationParams {
     private final String idTag, chargeBoxId;
     private final int connectorId;
-    private final DateTime startTimestamp, expiryTimestamp;
+    private final Instant startTimestamp, expiryTimestamp;
 }

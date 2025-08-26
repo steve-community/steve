@@ -61,7 +61,7 @@ public class SecurityConfiguration {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http, SteveConfiguration config) throws Exception {
-        final String prefix = config.getSpringManagerMapping();
+        final String prefix = config.getPaths().getManagerMapping();
 
         RequestMatcher toOverview = request -> {
             String param = request.getParameter("backToOverview");
@@ -73,7 +73,7 @@ public class SecurityConfiguration {
                 req -> req
                     .requestMatchers(
                         "/static/**",
-                        config.getCxfMapping() + "/**",
+                        config.getPaths().getSoapMapping() + "/**",
                         OcppWebSocketConfiguration.PATH_INFIX + "**",
                         "/WEB-INF/views/**" // https://github.com/spring-projects/spring-security/issues/13285#issuecomment-1579097065
                     ).permitAll()
@@ -110,7 +110,7 @@ public class SecurityConfiguration {
             // SOAP stations are making POST calls for communication. even though the following path is permitted for
             // all access, there is a global default behaviour from spring security: enable CSRF for all POSTs.
             // we need to disable CSRF for SOAP paths explicitly.
-            .csrf(c -> c.ignoringRequestMatchers(config.getCxfMapping() + "/**"))
+            .csrf(c -> c.ignoringRequestMatchers(config.getPaths().getSoapMapping() + "/**"))
             .sessionManagement(
                 req -> req.invalidSessionUrl(prefix + "/signin")
             )
@@ -130,7 +130,7 @@ public class SecurityConfiguration {
     @Order(1)
     public SecurityFilterChain apiKeyFilterChain(HttpSecurity http, SteveConfiguration config,
                                                  ApiAuthenticationManager apiAuthenticationManager) throws Exception {
-        return http.securityMatcher(config.getApiMapping() + "/**")
+        return http.securityMatcher(config.getPaths().getApiMapping() + "/**")
             .csrf(k -> k.disable())
             .sessionManagement(k -> k.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .addFilter(new BasicAuthenticationFilter(apiAuthenticationManager, apiAuthenticationManager))

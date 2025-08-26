@@ -18,8 +18,9 @@
  */
 package de.rwth.idsg.steve.web.validation;
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -27,135 +28,135 @@ import org.junit.jupiter.api.Test;
  */
 public class ChargeBoxIdValidatorTest {
 
-    ChargeBoxIdValidator validator = new ChargeBoxIdValidator();
+    private final ChargeBoxIdValidator validator = new ChargeBoxIdValidator();
 
     @Test
     public void testNull() {
-        Assertions.assertFalse(validator.isValid(null));
+        assertThat(validator.isValid(null)).isFalse();
     }
 
     @Test
     public void testEmpty() {
-        Assertions.assertFalse(validator.isValid(""));
+        assertThat(validator.isValid("")).isFalse();
     }
 
     @Test
     public void testSpace() {
-        Assertions.assertFalse(validator.isValid("  "));
+        assertThat(validator.isValid("  ")).isFalse();
     }
 
     @Test
     public void testAllLowercaseLetters() {
-        Assertions.assertTrue(validator.isValid("test"));
+        assertThat(validator.isValid("test")).isTrue();
     }
 
     @Test
     public void testAllUppercaseLetters() {
-        Assertions.assertTrue(validator.isValid("TEST"));
+        assertThat(validator.isValid("TEST")).isTrue();
     }
 
     @Test
     public void testMixedCaseLetters() {
-        Assertions.assertTrue(validator.isValid("TesT"));
-        Assertions.assertTrue(validator.isValid("tEst"));
+        assertThat(validator.isValid("TesT")).isTrue();
+        assertThat(validator.isValid("tEst")).isTrue();
     }
 
     @Test
     public void testLettersAndNumbers() {
-        Assertions.assertTrue(validator.isValid("test12"));
-        Assertions.assertTrue(validator.isValid("89test"));
-        Assertions.assertTrue(validator.isValid("te9s0t"));
+        assertThat(validator.isValid("test12")).isTrue();
+        assertThat(validator.isValid("89test")).isTrue();
+        assertThat(validator.isValid("te9s0t")).isTrue();
     }
 
     @Test
     public void testDot() {
-        Assertions.assertTrue(validator.isValid(".test"));
-        Assertions.assertTrue(validator.isValid("test."));
-        Assertions.assertTrue(validator.isValid("te..st"));
+        assertThat(validator.isValid(".test")).isTrue();
+        assertThat(validator.isValid("test.")).isTrue();
+        assertThat(validator.isValid("te..st")).isTrue();
     }
 
     @Test
     public void testDash() {
-        Assertions.assertTrue(validator.isValid("-test"));
-        Assertions.assertTrue(validator.isValid("test-"));
-        Assertions.assertTrue(validator.isValid("te--st"));
+        assertThat(validator.isValid("-test")).isTrue();
+        assertThat(validator.isValid("test-")).isTrue();
+        assertThat(validator.isValid("te--st")).isTrue();
     }
 
     @Test
     public void testUnderscore() {
-        Assertions.assertTrue(validator.isValid("_test"));
-        Assertions.assertTrue(validator.isValid("test_"));
-        Assertions.assertTrue(validator.isValid("te__st"));
+        assertThat(validator.isValid("_test")).isTrue();
+        assertThat(validator.isValid("test_")).isTrue();
+        assertThat(validator.isValid("te__st")).isTrue();
     }
 
     @Test
     public void testColon() {
-        Assertions.assertTrue(validator.isValid(":test"));
-        Assertions.assertTrue(validator.isValid("test:"));
-        Assertions.assertTrue(validator.isValid("te::st"));
-        Assertions.assertTrue(validator.isValid("VID:00XXXXXXXXXX"));
+        assertThat(validator.isValid(":test")).isTrue();
+        assertThat(validator.isValid("test:")).isTrue();
+        assertThat(validator.isValid("te::st")).isTrue();
+        assertThat(validator.isValid("VID:00XXXXXXXXXX")).isTrue();
     }
 
     @Test
     public void testPoundSign() {
-        Assertions.assertTrue(validator.isValid("#test"));
-        Assertions.assertTrue(validator.isValid("test#"));
-        Assertions.assertTrue(validator.isValid("te##st"));
-        Assertions.assertTrue(validator.isValid("#FreeCharging"));
+        assertThat(validator.isValid("#test")).isTrue();
+        assertThat(validator.isValid("test#")).isTrue();
+        assertThat(validator.isValid("te##st")).isTrue();
+        assertThat(validator.isValid("#FreeCharging")).isTrue();
     }
 
     @Test
     public void testCombined() {
-        Assertions.assertTrue(validator.isValid("1t.E-S_:t20#"));
+        assertThat(validator.isValid("1t.E-S_:t20#")).isTrue();
     }
 
     @Test
     public void testSpaceAtBeginning() {
-        Assertions.assertFalse(validator.isValid(" test"));
+        assertThat(validator.isValid(" test")).isFalse();
     }
 
     @Test
     public void testSpaceAtEnd() {
-        Assertions.assertFalse(validator.isValid("test "));
+        assertThat(validator.isValid("test ")).isFalse();
     }
 
     @Test
     public void testSpaceInMiddle() {
-        Assertions.assertTrue(validator.isValid("test1 test2"));
+        assertThat(validator.isValid("test1 test2")).isTrue();
     }
 
     @Test
     public void testOpeningParenthesis() {
-        Assertions.assertFalse(validator.isValid("te(st"));
+        assertThat(validator.isValid("te(st")).isFalse();
     }
 
     @Test
     public void testClosingParenthesis() {
-        Assertions.assertFalse(validator.isValid("te)st"));
+        assertThat(validator.isValid("te)st")).isFalse();
     }
 
     @Test
     public void testBiggerSymbol() {
-        Assertions.assertFalse(validator.isValid("te>st"));
+        assertThat(validator.isValid("te>st")).isFalse();
     }
 
     @Test
     public void testSmallerSymbol() {
-        Assertions.assertFalse(validator.isValid("te<st"));
+        assertThat(validator.isValid("te<st")).isFalse();
     }
 
     @Test
     public void testSlash() {
-        Assertions.assertFalse(validator.isValid("te/st"));
+        assertThat(validator.isValid("te/st")).isFalse();
     }
 
     @Test
     public void testEquals() {
-        Assertions.assertFalse(validator.isValid("te=st"));
+        assertThat(validator.isValid("te=st")).isFalse();
     }
 
     @Test
     public void testSpecialCharAsExample() {
-        Assertions.assertTrue(validator.isValid("ÂtestÂ"));
+        assertThat(validator.isValid("ÂtestÂ")).isTrue();
     }
 }

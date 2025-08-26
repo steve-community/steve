@@ -21,7 +21,8 @@ package de.rwth.idsg.steve.repository.dto;
 import jooq.steve.db.enums.TransactionStopEventActor;
 import lombok.Builder;
 import lombok.Getter;
-import org.joda.time.DateTime;
+
+import java.time.Instant;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -32,13 +33,14 @@ import org.joda.time.DateTime;
 public class UpdateTransactionParams {
     private final String chargeBoxId;
     private final int transactionId;
-    private final DateTime stopTimestamp;
+    private final Instant stopTimestamp;
     private final String stopMeterValue;
     private final String stopReason;
 
+    @Builder.Default
     private final TransactionStatusUpdate statusUpdate = TransactionStatusUpdate.AfterStop;
 
     // these two came after splitting transaction table into two tables (start and stop)
     private final TransactionStopEventActor eventActor;
-    private final DateTime eventTimestamp;
+    private final Instant eventTimestamp;
 }

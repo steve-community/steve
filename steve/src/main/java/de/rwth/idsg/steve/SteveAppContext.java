@@ -18,6 +18,7 @@
  */
 package de.rwth.idsg.steve;
 
+import de.rwth.idsg.steve.web.dto.EndpointInfo;
 import jakarta.servlet.DispatcherType;
 import org.apache.cxf.transport.servlet.CXFServlet;
 import org.apache.tomcat.InstanceManager;
@@ -61,11 +62,12 @@ public class SteveAppContext {
     private final AnnotationConfigWebApplicationContext springContext;
     private final WebAppContext webAppContext;
 
-    public SteveAppContext(SteveConfiguration config) {
+    public SteveAppContext(SteveConfiguration config, EndpointInfo info) {
         this.config = config;
         springContext = new AnnotationConfigWebApplicationContext();
         GenericApplicationContext context = new GenericApplicationContext();
         context.registerBean(SteveConfiguration.class, () -> config);
+        context.registerBean(EndpointInfo.class, () -> info);
         context.refresh();
         context.setParent(springContext.getParent());
         springContext.setParent(context);
@@ -101,7 +103,7 @@ public class SteveAppContext {
 
     private WebAppContext initWebApp() {
         WebAppContext ctx = new WebAppContext();
-        ctx.setContextPath(config.getContextPath());
+        ctx.setContextPath(config.getPaths().getContextPath());
         ctx.setBaseResourceAsString(getWebAppURIAsString());
 
         // if during startup an exception happens, do not swallow it, throw it
@@ -110,18 +112,19 @@ public class SteveAppContext {
         // Disable directory listings if no index.html is found.
         ctx.setInitParameter("org.eclipse.jetty.servlet.Default.dirAllowed", "false");
 
-        ServletHolder web = new ServletHolder("spring-dispatcher", new DispatcherServlet(springContext));
-        ServletHolder cxf = new ServletHolder("cxf", new CXFServlet());
-
         ctx.addEventListener(new ContextLoaderListener(springContext));
-        ctx.addServlet(web, config.getSpringMapping());
-        ctx.addServlet(cxf, config.getCxfMapping() + "/*");
+
+        ServletHolder web = new ServletHolder("spring-dispatcher", new DispatcherServlet(springContext));
+        ctx.addServlet(web, config.getPaths().getRootMapping());
+
+        ServletHolder cxf = new ServletHolder("cxf", new CXFServlet());
+        ctx.addServlet(cxf, config.getPaths().getSoapMapping() + "/*");
 
         // add spring security
         ctx.addFilter(
             // The bean name is not arbitrary, but is as expected by Spring
             new FilterHolder(new DelegatingFilterProxy(AbstractSecurityWebApplicationInitializer.DEFAULT_FILTER_NAME)),
-            config.getSpringMapping() + "*",
+            config.getPaths().getRootMapping() + "*",
             EnumSet.allOf(DispatcherType.class)
         );
 
@@ -135,14 +138,14 @@ public class SteveAppContext {
             RedirectPatternRule rule = new RedirectPatternRule();
             rule.setTerminating(true);
             rule.setPattern(redirect);
-            rule.setLocation(config.getContextPath() + "/manager/home");
+            rule.setLocation(config.getPaths().getContextPath() + config.getPaths().getManagerMapping() + "/home");
             rewrite.addRule(rule);
         }
         return rewrite;
     }
 
     private HashSet<String> getRedirectSet() {
-        String path = config.getContextPath();
+        String path = config.getPaths().getContextPath();
 
         HashSet<String> redirectSet = new HashSet<>(3);
         redirectSet.add("");

@@ -89,7 +89,7 @@ public class OcppSoapConfiguration {
         // one to be created, since in MediatorInInterceptor we go over created/registered services and build a map.
         //
         List<Interceptor<? extends Message>> mediator = singletonList(new MediatorInInterceptor(springBus(), config));
-        createOcppService(ocpp12Server, config.getRouterEndpointPath(), mediator, Collections.emptyList());
+        createOcppService(ocpp12Server, config.getPaths().getRouterEndpointPath(), mediator, Collections.emptyList());
     }
 
     @Bean(name = Bus.DEFAULT_BUS_ID, destroyMethod = "shutdown")

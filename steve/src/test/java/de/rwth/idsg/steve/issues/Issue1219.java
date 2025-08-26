@@ -34,9 +34,6 @@ import de.rwth.idsg.steve.web.dto.OcppTagQueryForm;
 import de.rwth.idsg.steve.web.dto.TransactionQueryForm;
 import jooq.steve.db.enums.TransactionStopEventActor;
 import lombok.RequiredArgsConstructor;
-import org.joda.time.DateTime;
-import org.joda.time.Duration;
-import org.joda.time.LocalDateTime;
 import org.jooq.DSLContext;
 import org.jooq.SQLDialect;
 import org.jooq.impl.DSL;
@@ -46,6 +43,9 @@ import org.jooq.tools.jdbc.SingleConnectionDataSource;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.time.Duration;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -93,11 +93,11 @@ public class Issue1219 {
     private void realTest() {
         var repository = new OcppTagRepositoryImpl(ctx);
 
-        long start = System.currentTimeMillis();
+        var start = Instant.now();
         List<OcppTag.OcppTagOverview> values = repository.getOverview(new OcppTagQueryForm());
-        long stop = System.currentTimeMillis();
+        var stop = Instant.now();
 
-        System.out.println("took " + Duration.millis(stop - start));
+        System.out.println("took " + Duration.between(start, stop).toMillis() + " ms");
     }
 
     private List<Integer> insertStopTransactions(List<Integer> insertedTransactionIds) {
@@ -114,7 +114,7 @@ public class Issue1219 {
             form.setTransactionPk(transactionId);
             Transaction transaction = transactionRepository.getTransactions(form).get(0);
 
-            DateTime stopTimestamp = transaction.getStartTimestamp().plusHours(1);
+            var stopTimestamp = transaction.getStartTimestamp().plus(1, ChronoUnit.HOURS);
             UpdateTransactionParams p = UpdateTransactionParams.builder()
                 .chargeBoxId(transaction.getChargeBoxId())
                 .transactionId(transaction.getId())
@@ -136,7 +136,7 @@ public class Issue1219 {
 
         List<Integer> transactionIds = new ArrayList<>();
         for (int i = 0; i < count; i++) {
-            DateTime now = DateTime.now();
+            var now = Instant.now();
             InsertTransactionParams params = InsertTransactionParams.builder()
                 .idTag(ocppTags.get(ThreadLocalRandom.current().nextInt(0, ocppTags.size())))
                 .chargeBoxId(chargeBoxIds.get(ThreadLocalRandom.current().nextInt(0, chargeBoxIds.size())))
@@ -200,9 +200,9 @@ public class Issue1219 {
         return null;
     }
 
-    private static LocalDateTime getRandomExpiry() {
+    private static Instant getRandomExpiry() {
         if (ThreadLocalRandom.current().nextBoolean()) {
-            return LocalDateTime.now().plusDays(ThreadLocalRandom.current().nextInt(1, 365));
+            return Instant.now().plus(ThreadLocalRandom.current().nextInt(1, 365), ChronoUnit.DAYS);
         }
         return null;
     }

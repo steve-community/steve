@@ -19,20 +19,19 @@
 package de.rwth.idsg.steve.ocpp.ws.ocpp15;
 
 import de.rwth.idsg.steve.ocpp.ws.AbstractTypeStore;
+import org.springframework.stereotype.Component;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 15.03.2015
  */
+@Component
 public final class Ocpp15TypeStore extends AbstractTypeStore {
 
-    public static final Ocpp15TypeStore INSTANCE = new Ocpp15TypeStore();
-
-    private Ocpp15TypeStore() {
+    public Ocpp15TypeStore() {
         super(
                 ocpp.cs._2012._06.ObjectFactory.class.getPackage().getName(),
                 ocpp.cp._2012._06.ObjectFactory.class.getPackage().getName()
         );
     }
-
 }

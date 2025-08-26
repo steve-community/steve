@@ -16,31 +16,33 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package de.rwth.idsg.steve.web;
+package de.rwth.idsg.steve.web.api;
 
 import com.google.common.base.Strings;
-import org.joda.time.LocalDate;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 import java.beans.PropertyEditorSupport;
+import java.time.Instant;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
- * @since 25.11.2015
+ * @since 04.01.2015
  */
-public class LocalDateEditor extends PropertyEditorSupport {
-
-    private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormat.forPattern("yyyy-MM-dd");
+@Slf4j
+@RequiredArgsConstructor
+public class InstantEditor extends PropertyEditorSupport {
 
     @Override
     public String getAsText() {
         Object value = getValue();
         if (value == null) {
             return null;
-        } else {
-            return DATE_FORMATTER.print((LocalDate) value);
         }
+        if (value instanceof Instant instant) {
+            return instant.toString();
+        }
+        throw new IllegalArgumentException("Cannot convert " + value.getClass() + " to Instant");
     }
 
     @Override
@@ -48,7 +50,7 @@ public class LocalDateEditor extends PropertyEditorSupport {
         if (Strings.isNullOrEmpty(text)) {
             setValue(null);
         } else {
-            setValue(DATE_FORMATTER.parseLocalDate(text));
+            setValue(Instant.parse(text));
         }
     }
 }

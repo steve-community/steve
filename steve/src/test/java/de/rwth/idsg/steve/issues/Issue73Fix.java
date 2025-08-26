@@ -21,25 +21,22 @@ package de.rwth.idsg.steve.issues;
 import com.google.common.collect.Lists;
 import de.rwth.idsg.steve.Application;
 import de.rwth.idsg.steve.ApplicationProfile;
-import de.rwth.idsg.steve.SteveConfigurationReader;
+import de.rwth.idsg.steve.utils.SteveConfigurationReader;
 import de.rwth.idsg.steve.utils.__DatabasePreparer__;
 import ocpp.cs._2015._10.AuthorizationStatus;
 import ocpp.cs._2015._10.AuthorizeRequest;
-import ocpp.cs._2015._10.AuthorizeResponse;
 import ocpp.cs._2015._10.BootNotificationRequest;
-import ocpp.cs._2015._10.BootNotificationResponse;
 import ocpp.cs._2015._10.CentralSystemService;
 import ocpp.cs._2015._10.RegistrationStatus;
 import ocpp.cs._2015._10.StartTransactionRequest;
-import ocpp.cs._2015._10.StartTransactionResponse;
-import org.joda.time.DateTime;
-import org.junit.jupiter.api.Assertions;
 
+import java.time.OffsetDateTime;
 import java.util.List;
 
 import static de.rwth.idsg.steve.utils.Helpers.getForOcpp16;
-import static de.rwth.idsg.steve.utils.Helpers.getPath;
+import static de.rwth.idsg.steve.utils.Helpers.getHttpPath;
 import static de.rwth.idsg.steve.utils.Helpers.getRandomString;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * https://github.com/steve-community/steve/issues/73
@@ -55,14 +52,14 @@ public class Issue73Fix {
 
     public static void main(String[] args) throws Exception {
         var config = SteveConfigurationReader.readSteveConfiguration("main.properties");
-        Assertions.assertEquals(ApplicationProfile.TEST, config.getProfile());
-        Assertions.assertTrue(config.getOcpp().isAutoRegisterUnknownStations());
+        assertThat(config.getProfile()).isEqualTo(ApplicationProfile.TEST);
+        assertThat(config.getOcpp().isAutoRegisterUnknownStations()).isTrue();
 
         __DatabasePreparer__.prepare(config);
 
-        path = getPath(config);
+        path = getHttpPath(config);
 
-        Application app = new Application(config);
+        var app = new Application(config);
         try {
             app.start();
             test();
@@ -76,10 +73,10 @@ public class Issue73Fix {
     }
 
     private static void test() {
-        ocpp.cs._2015._10.CentralSystemService client = getForOcpp16(path);
+        var client = getForOcpp16(path);
 
-        String chargeBox1 = getRandomString();
-        String chargeBox2 = getRandomString();
+        var chargeBox1 = getRandomString();
+        var chargeBox2 = getRandomString();
 
         sendBoot(client, Lists.newArrayList(chargeBox1, chargeBox2));
 
@@ -93,34 +90,34 @@ public class Issue73Fix {
     }
 
     private static void sendBoot(CentralSystemService client, List<String> chargeBoxIdList) {
-        for (String chargeBoxId : chargeBoxIdList) {
-            BootNotificationResponse boot = client.bootNotification(
+        for (var chargeBoxId : chargeBoxIdList) {
+            var boot = client.bootNotification(
                     new BootNotificationRequest()
                             .withChargePointVendor(getRandomString())
                             .withChargePointModel(getRandomString()),
                     chargeBoxId);
-            Assertions.assertNotNull(boot);
-            Assertions.assertEquals(RegistrationStatus.ACCEPTED, boot.getStatus());
+            assertThat(boot).isNotNull();
+            assertThat(boot.getStatus()).isEqualTo(RegistrationStatus.ACCEPTED);
         }
     }
 
     private static void sendAuth(CentralSystemService client, String chargeBoxId, AuthorizationStatus expected) {
-        AuthorizeResponse auth = client.authorize(new AuthorizeRequest().withIdTag(REGISTERED_OCPP_TAG), chargeBoxId);
-        Assertions.assertNotNull(auth);
-        Assertions.assertEquals(expected, auth.getIdTagInfo().getStatus());
+        var auth = client.authorize(new AuthorizeRequest().withIdTag(REGISTERED_OCPP_TAG), chargeBoxId);
+        assertThat(auth).isNotNull();
+        assertThat(auth.getIdTagInfo().getStatus()).isEqualTo(expected);
     }
 
     private static void sendStartTx(CentralSystemService client, String chargeBoxId) {
-        StartTransactionResponse start = client.startTransaction(
+        var start = client.startTransaction(
                 new StartTransactionRequest()
                         .withConnectorId(2)
                         .withIdTag(REGISTERED_OCPP_TAG)
-                        .withTimestamp(DateTime.now())
+                        .withTimestamp(OffsetDateTime.now())
                         .withMeterStart(0),
                 chargeBoxId
         );
-        Assertions.assertNotNull(start);
-        Assertions.assertTrue(start.getTransactionId() > 0);
-        Assertions.assertTrue(__DatabasePreparer__.getOcppTagRecord(REGISTERED_OCPP_TAG).getInTransaction());
+        assertThat(start).isNotNull();
+        assertThat(start.getTransactionId()).isGreaterThan(0);
+        assertThat(__DatabasePreparer__.getOcppTagRecord(REGISTERED_OCPP_TAG).getInTransaction()).isTrue();
     }
 }

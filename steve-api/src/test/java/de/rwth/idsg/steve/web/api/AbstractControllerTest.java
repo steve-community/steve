@@ -25,7 +25,7 @@ import org.jetbrains.annotations.NotNull;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
-import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.assertj.MockMvcTester;
 import org.springframework.test.web.servlet.setup.StandaloneMockMvcBuilder;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -48,10 +48,10 @@ public abstract class AbstractControllerTest {
         return objectMapper;
     }
 
-    protected MockMvc buildMockMvc(StandaloneMockMvcBuilder builder) {
-        return builder.setControllerAdvice(new ApiControllerAdvice())
+    protected MockMvcTester buildMockMvc(StandaloneMockMvcBuilder builder) {
+        return MockMvcTester.create(builder.setControllerAdvice(new ApiControllerAdvice())
             .setMessageConverters(new MappingJackson2HttpMessageConverter(objectMapper))
             .alwaysExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
-            .build();
+            .build());
     }
 }

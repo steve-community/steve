@@ -18,37 +18,29 @@
  */
 package de.rwth.idsg.steve;
 
+import de.rwth.idsg.steve.utils.SteveConfigurationReader;
 import de.rwth.idsg.steve.utils.StressTester;
 import lombok.RequiredArgsConstructor;
 import ocpp.cs._2015._10.AuthorizationStatus;
 import ocpp.cs._2015._10.AuthorizeRequest;
-import ocpp.cs._2015._10.AuthorizeResponse;
 import ocpp.cs._2015._10.BootNotificationRequest;
-import ocpp.cs._2015._10.BootNotificationResponse;
-import ocpp.cs._2015._10.CentralSystemService;
 import ocpp.cs._2015._10.ChargePointErrorCode;
 import ocpp.cs._2015._10.ChargePointStatus;
 import ocpp.cs._2015._10.HeartbeatRequest;
-import ocpp.cs._2015._10.HeartbeatResponse;
 import ocpp.cs._2015._10.MeterValuesRequest;
-import ocpp.cs._2015._10.MeterValuesResponse;
 import ocpp.cs._2015._10.RegistrationStatus;
 import ocpp.cs._2015._10.StartTransactionRequest;
-import ocpp.cs._2015._10.StartTransactionResponse;
 import ocpp.cs._2015._10.StatusNotificationRequest;
-import ocpp.cs._2015._10.StatusNotificationResponse;
 import ocpp.cs._2015._10.StopTransactionRequest;
-import ocpp.cs._2015._10.StopTransactionResponse;
-import org.joda.time.DateTime;
-import org.junit.jupiter.api.Assertions;
 
-import java.util.List;
+import java.time.OffsetDateTime;
 import java.util.concurrent.ThreadLocalRandom;
 
 import static de.rwth.idsg.steve.utils.Helpers.getForOcpp16;
-import static de.rwth.idsg.steve.utils.Helpers.getPath;
+import static de.rwth.idsg.steve.utils.Helpers.getHttpPath;
 import static de.rwth.idsg.steve.utils.Helpers.getRandomString;
 import static de.rwth.idsg.steve.utils.Helpers.getRandomStrings;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -61,120 +53,120 @@ public class StressTestSoapOCPP16 extends StressTest {
 
     public static void main(String[] args) throws Exception {
         var config = SteveConfigurationReader.readSteveConfiguration("main.properties");
-        var path = getPath(config);
+        var path = getHttpPath(config);
         new StressTestSoapOCPP16(path).attack();
     }
 
     protected void attackInternal() throws Exception {
-        final List<String> idTags = getRandomStrings(ID_TAG_COUNT);
-        final List<String> chargeBoxIds = getRandomStrings(CHARGE_BOX_COUNT);
+        final var idTags = getRandomStrings(ID_TAG_COUNT);
+        final var chargeBoxIds = getRandomStrings(CHARGE_BOX_COUNT);
 
-        StressTester.Runnable runnable = new StressTester.Runnable() {
+        var runnable = new StressTester.Runnable() {
 
             private final ThreadLocal<String> threadLocalChargeBoxId = new ThreadLocal<>();
 
             @Override
             public void beforeRepeat() {
-                CentralSystemService client = getForOcpp16(path);
-                ThreadLocalRandom localRandom = ThreadLocalRandom.current();
+                var client = getForOcpp16(path);
+                var localRandom = ThreadLocalRandom.current();
 
                 threadLocalChargeBoxId.set(chargeBoxIds.get(localRandom.nextInt(chargeBoxIds.size())));
 
-                String chargeBoxId = threadLocalChargeBoxId.get();
+                var chargeBoxId = threadLocalChargeBoxId.get();
 
                 // to insert threadLocalChargeBoxId into db
-                BootNotificationResponse boot = client.bootNotification(
+                var boot = client.bootNotification(
                         new BootNotificationRequest()
                                 .withChargePointVendor(getRandomString())
                                 .withChargePointModel(getRandomString()),
                         chargeBoxId);
-                Assertions.assertEquals(RegistrationStatus.ACCEPTED, boot.getStatus());
+                assertThat(boot.getStatus()).isEqualTo(RegistrationStatus.ACCEPTED);
             }
 
             @Override
             public void toRepeat() {
-                CentralSystemService client = getForOcpp16(path);
-                ThreadLocalRandom localRandom = ThreadLocalRandom.current();
+                var client = getForOcpp16(path);
+                var localRandom = ThreadLocalRandom.current();
 
-                String chargeBoxId = threadLocalChargeBoxId.get();
+                var chargeBoxId = threadLocalChargeBoxId.get();
 
-                String idTag = idTags.get(localRandom.nextInt(idTags.size()));
-                int connectorId = localRandom.nextInt(1, CONNECTOR_COUNT_PER_CHARGE_BOX + 1);
-                int transactionStart = localRandom.nextInt(0, Integer.MAX_VALUE);
-                int transactionStop = localRandom.nextInt(transactionStart + 1, Integer.MAX_VALUE);
+                var idTag = idTags.get(localRandom.nextInt(idTags.size()));
+                var connectorId = localRandom.nextInt(1, CONNECTOR_COUNT_PER_CHARGE_BOX + 1);
+                var transactionStart = localRandom.nextInt(0, Integer.MAX_VALUE);
+                var transactionStop = localRandom.nextInt(transactionStart + 1, Integer.MAX_VALUE);
 
-                HeartbeatResponse heartbeat = client.heartbeat(
+                var heartbeat = client.heartbeat(
                         new HeartbeatRequest(),
                         chargeBoxId
                 );
-                Assertions.assertNotNull(heartbeat);
+                assertThat(heartbeat).isNotNull();
 
-                for (int i = 0; i <= CONNECTOR_COUNT_PER_CHARGE_BOX; i++) {
-                    StatusNotificationResponse status = client.statusNotification(
+                for (var i = 0; i <= CONNECTOR_COUNT_PER_CHARGE_BOX; i++) {
+                    var status = client.statusNotification(
                             new StatusNotificationRequest()
                                     .withErrorCode(ChargePointErrorCode.NO_ERROR)
                                     .withStatus(ChargePointStatus.AVAILABLE)
                                     .withConnectorId(i)
-                                    .withTimestamp(DateTime.now()),
+                                    .withTimestamp(OffsetDateTime.now()),
                             chargeBoxId
                     );
-                    Assertions.assertNotNull(status);
+                    assertThat(status).isNotNull();
                 }
 
-                AuthorizeResponse auth = client.authorize(
+                var auth = client.authorize(
                         new AuthorizeRequest().withIdTag(idTag),
                         chargeBoxId
                 );
-                Assertions.assertNotEquals(AuthorizationStatus.ACCEPTED, auth.getIdTagInfo().getStatus());
+                assertThat(auth.getIdTagInfo().getStatus()).isNotEqualTo(AuthorizationStatus.ACCEPTED);
 
-                StartTransactionResponse start = client.startTransaction(
+                var start = client.startTransaction(
                         new StartTransactionRequest()
                                 .withConnectorId(connectorId)
                                 .withIdTag(idTag)
-                                .withTimestamp(DateTime.now())
+                                .withTimestamp(OffsetDateTime.now())
                                 .withMeterStart(transactionStart),
                         chargeBoxId
                 );
-                Assertions.assertNotNull(start);
+                assertThat(start).isNotNull();
 
-                StatusNotificationResponse statusStart = client.statusNotification(
+                var statusStart = client.statusNotification(
                         new StatusNotificationRequest()
                                 .withErrorCode(ChargePointErrorCode.NO_ERROR)
                                 .withStatus(ChargePointStatus.CHARGING)
                                 .withConnectorId(connectorId)
-                                .withTimestamp(DateTime.now()),
+                                .withTimestamp(OffsetDateTime.now()),
                         chargeBoxId
                 );
-                Assertions.assertNotNull(statusStart);
+                assertThat(statusStart).isNotNull();
 
-                MeterValuesResponse meter = client.meterValues(
+                var meter = client.meterValues(
                         new MeterValuesRequest()
                                 .withConnectorId(connectorId)
                                 .withTransactionId(start.getTransactionId())
                                 .withMeterValue(getMeterValues(transactionStart, transactionStop)),
                         chargeBoxId
                 );
-                Assertions.assertNotNull(meter);
+                assertThat(meter).isNotNull();
 
-                StopTransactionResponse stop = client.stopTransaction(
+                var stop = client.stopTransaction(
                         new StopTransactionRequest()
                                 .withTransactionId(start.getTransactionId())
-                                .withTimestamp(DateTime.now())
+                                .withTimestamp(OffsetDateTime.now())
                                 .withIdTag(idTag)
                                 .withMeterStop(transactionStop),
                         chargeBoxId
                 );
-                Assertions.assertNotNull(stop);
+                assertThat(stop).isNotNull();
 
-                StatusNotificationResponse statusStop = client.statusNotification(
+                var statusStop = client.statusNotification(
                         new StatusNotificationRequest()
                                 .withErrorCode(ChargePointErrorCode.NO_ERROR)
                                 .withStatus(ChargePointStatus.AVAILABLE)
                                 .withConnectorId(connectorId)
-                                .withTimestamp(DateTime.now()),
+                                .withTimestamp(OffsetDateTime.now()),
                         chargeBoxId
                 );
-                Assertions.assertNotNull(statusStop);
+                assertThat(statusStop).isNotNull();
             }
 
             @Override
@@ -183,7 +175,7 @@ public class StressTestSoapOCPP16 extends StressTest {
             }
         };
 
-        StressTester tester = new StressTester(THREAD_COUNT, REPEAT_COUNT_PER_THREAD);
+        var tester = new StressTester(THREAD_COUNT, REPEAT_COUNT_PER_THREAD);
         tester.test(runnable);
         tester.shutDown();
     }

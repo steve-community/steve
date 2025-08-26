@@ -19,13 +19,10 @@
 package de.rwth.idsg.steve.web.api;
 
 import de.rwth.idsg.steve.SteveException;
-import de.rwth.idsg.steve.web.LocalDateTimeEditor;
 import de.rwth.idsg.steve.web.api.exception.BadRequestException;
 import de.rwth.idsg.steve.web.api.exception.NotFoundException;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
-import org.joda.time.DateTime;
-import org.joda.time.LocalDateTime;
 import org.springframework.beans.propertyeditors.StringTrimmerEditor;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.BindException;
@@ -38,6 +35,8 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 
 import jakarta.servlet.http.HttpServletRequest;
 
+import java.time.Instant;
+
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 13.09.2022
@@ -49,7 +48,7 @@ public class ApiControllerAdvice {
     @InitBinder
     public void binder(WebDataBinder binder) {
         binder.registerCustomEditor(String.class, new StringTrimmerEditor(true));
-        binder.registerCustomEditor(LocalDateTime.class, LocalDateTimeEditor.forApi());
+        binder.registerCustomEditor(Instant.class, new InstantEditor());
     }
 
     @ExceptionHandler(BindException.class)
@@ -103,7 +102,7 @@ public class ApiControllerAdvice {
     public static ApiErrorResponse createResponse(String url, HttpStatus status, String message) {
         ApiErrorResponse result = new ApiErrorResponse();
 
-        result.setTimestamp(DateTime.now());
+        result.setTimestamp(Instant.now());
         result.setStatus(status.value());
         result.setError(status.getReasonPhrase());
         result.setMessage(message);
@@ -114,11 +113,10 @@ public class ApiControllerAdvice {
 
     @Data
     public static class ApiErrorResponse {
-        private DateTime timestamp;
+        private Instant timestamp;
         private int status;
         private String error;
         private String message;
         private String path;
     }
-
 }

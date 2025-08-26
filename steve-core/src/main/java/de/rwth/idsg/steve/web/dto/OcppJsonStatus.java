@@ -24,7 +24,8 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.ToString;
-import org.joda.time.DateTime;
+
+import java.time.Instant;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -47,5 +48,5 @@ public final class OcppJsonStatus {
     @Schema(description = "Ocpp version")
     private final OcppVersion version;
     @Schema(description = "Connected since (ISO-8601 timestamp)")
-    private final DateTime connectedSinceDT;
+    private final Instant connectedSinceDT;
 }

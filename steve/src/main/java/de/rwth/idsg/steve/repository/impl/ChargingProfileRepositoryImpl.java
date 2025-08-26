@@ -22,7 +22,6 @@ import de.rwth.idsg.steve.SteveException;
 import de.rwth.idsg.steve.repository.ChargingProfileRepository;
 import de.rwth.idsg.steve.repository.dto.ChargingProfile;
 import de.rwth.idsg.steve.repository.dto.ChargingProfileAssignment;
-import de.rwth.idsg.steve.utils.DateTimeUtils;
 import de.rwth.idsg.steve.web.dto.ChargingProfileAssignmentQueryForm;
 import de.rwth.idsg.steve.web.dto.ChargingProfileForm;
 import de.rwth.idsg.steve.web.dto.ChargingProfileQueryForm;
@@ -46,6 +45,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static de.rwth.idsg.steve.utils.CustomDSL.includes;
+import static de.rwth.idsg.steve.utils.DateTimeUtils.toInstant;
+import static de.rwth.idsg.steve.utils.DateTimeUtils.toLocalDateTime;
 import static jooq.steve.db.Tables.CHARGING_PROFILE;
 import static jooq.steve.db.Tables.CHARGING_SCHEDULE_PERIOD;
 import static jooq.steve.db.Tables.CONNECTOR;
@@ -227,11 +228,11 @@ public class ChargingProfileRepositoryImpl implements ChargingProfileRepository 
         }
 
         if (form.getValidFrom() != null) {
-            conditions = conditions.and(CHARGING_PROFILE.VALID_FROM.greaterOrEqual(form.getValidFrom().toDateTime()));
+            conditions = conditions.and(CHARGING_PROFILE.VALID_FROM.greaterOrEqual(toLocalDateTime(form.getValidFrom())));
         }
 
         if (form.getValidTo() != null) {
-            conditions = conditions.and(CHARGING_PROFILE.VALID_TO.lessOrEqual(form.getValidTo().toDateTime()));
+            conditions = conditions.and(CHARGING_PROFILE.VALID_TO.lessOrEqual(toLocalDateTime(form.getValidTo())));
         }
 
         return ctx.selectFrom(CHARGING_PROFILE)
@@ -244,8 +245,8 @@ public class ChargingProfileRepositoryImpl implements ChargingProfileRepository 
                                                     .profilePurpose(r.getChargingProfilePurpose())
                                                     .profileKind(r.getChargingProfileKind())
                                                     .recurrencyKind(r.getRecurrencyKind())
-                                                    .validFrom(r.getValidFrom())
-                                                    .validTo(r.getValidTo())
+                                                    .validFrom(toInstant(r.getValidFrom()))
+                                                    .validTo(toInstant(r.getValidTo()))
                                                     .build()
                   );
     }
@@ -277,10 +278,10 @@ public class ChargingProfileRepositoryImpl implements ChargingProfileRepository 
                                    .set(CHARGING_PROFILE.CHARGING_PROFILE_PURPOSE, form.getChargingProfilePurpose().value())
                                    .set(CHARGING_PROFILE.CHARGING_PROFILE_KIND, form.getChargingProfileKind().value())
                                    .set(CHARGING_PROFILE.RECURRENCY_KIND, form.getRecurrencyKind() == null ? null : form.getRecurrencyKind().value())
-                                   .set(CHARGING_PROFILE.VALID_FROM, DateTimeUtils.toDateTime(form.getValidFrom()))
-                                   .set(CHARGING_PROFILE.VALID_TO, DateTimeUtils.toDateTime(form.getValidTo()))
+                                   .set(CHARGING_PROFILE.VALID_FROM, toLocalDateTime(form.getValidFrom()))
+                                   .set(CHARGING_PROFILE.VALID_TO, toLocalDateTime(form.getValidTo()))
                                    .set(CHARGING_PROFILE.DURATION_IN_SECONDS, form.getDurationInSeconds())
-                                   .set(CHARGING_PROFILE.START_SCHEDULE, DateTimeUtils.toDateTime(form.getStartSchedule()))
+                                   .set(CHARGING_PROFILE.START_SCHEDULE, toLocalDateTime(form.getStartSchedule()))
                                    .set(CHARGING_PROFILE.CHARGING_RATE_UNIT, form.getChargingRateUnit().value())
                                    .set(CHARGING_PROFILE.MIN_CHARGING_RATE, form.getMinChargingRate())
                                    .returning(CHARGING_SCHEDULE_PERIOD.CHARGING_PROFILE_PK)
@@ -311,10 +312,10 @@ public class ChargingProfileRepositoryImpl implements ChargingProfileRepository 
                    .set(CHARGING_PROFILE.CHARGING_PROFILE_PURPOSE, form.getChargingProfilePurpose().value())
                    .set(CHARGING_PROFILE.CHARGING_PROFILE_KIND, form.getChargingProfileKind().value())
                    .set(CHARGING_PROFILE.RECURRENCY_KIND, form.getRecurrencyKind() == null ? null : form.getRecurrencyKind().value())
-                   .set(CHARGING_PROFILE.VALID_FROM, DateTimeUtils.toDateTime(form.getValidFrom()))
-                   .set(CHARGING_PROFILE.VALID_TO, DateTimeUtils.toDateTime(form.getValidTo()))
+                   .set(CHARGING_PROFILE.VALID_FROM, toLocalDateTime(form.getValidFrom()))
+                   .set(CHARGING_PROFILE.VALID_TO, toLocalDateTime(form.getValidTo()))
                    .set(CHARGING_PROFILE.DURATION_IN_SECONDS, form.getDurationInSeconds())
-                   .set(CHARGING_PROFILE.START_SCHEDULE, DateTimeUtils.toDateTime(form.getStartSchedule()))
+                   .set(CHARGING_PROFILE.START_SCHEDULE, toLocalDateTime(form.getStartSchedule()))
                    .set(CHARGING_PROFILE.CHARGING_RATE_UNIT, form.getChargingRateUnit().value())
                    .set(CHARGING_PROFILE.MIN_CHARGING_RATE, form.getMinChargingRate())
                    .where(CHARGING_PROFILE.CHARGING_PROFILE_PK.eq(form.getChargingProfilePk()))

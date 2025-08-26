@@ -59,7 +59,7 @@
         <tbody>
         <c:forEach items="${details.values}" var="v">
             <tr>
-                <td data-sort-value="${f:offsetToMillis(v.valueTimestamp)}">${v.valueTimestamp}</td>
+                <td data-sort-value="${f:toMillis(v.valueTimestamp)}">${v.valueTimestamp}</td>
                 <td><encode:forHtml value="${v.value}" /></td>
                 <td><encode:forHtml value="${v.readingContext}" /></td>
                 <td><encode:forHtml value="${v.format}" /></td>

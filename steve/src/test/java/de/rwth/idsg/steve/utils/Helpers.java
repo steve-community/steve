@@ -45,7 +45,7 @@ public class Helpers {
         return list;
     }
 
-    public static String getPath(SteveConfiguration config) {
+    public static String getHttpPath(SteveConfiguration config) {
         String prefix;
         int port;
 
@@ -60,10 +60,12 @@ public class Helpers {
         }
 
         return prefix + config.getJetty().getServerHost() + ":" + port
-                + config.getContextPath() + "/services" + config.getRouterEndpointPath();
+                + config.getPaths().getContextPath()
+                + config.getPaths().getSoapMapping()
+                + config.getPaths().getRouterEndpointPath();
     }
 
-    public static String getJsonPath(SteveConfiguration config) {
+    public static String getWsPath(SteveConfiguration config) {
         String prefix;
         int port;
 
@@ -78,7 +80,9 @@ public class Helpers {
         }
 
         return prefix + config.getJetty().getServerHost() + ":" + port
-                + config.getContextPath() + "/websocket/CentralSystemService/";
+                + config.getPaths().getContextPath()
+                + config.getPaths().getWebsocketMapping()
+                + config.getPaths().getRouterEndpointPath() + "/";
     }
 
     public static ocpp.cs._2015._10.CentralSystemService getForOcpp16(String path) {

@@ -29,24 +29,27 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 @Builder @Getter
 public class SteveConfiguration {
 
-    // Root mapping for Spring
-    private final String springMapping = "/";
-    // Web frontend
-    private final String springManagerMapping = "/manager";
-    // Mapping for CXF SOAP services
-    private final String cxfMapping = "/services";
-    // Mapping for Web APIs
-    private final String apiMapping = "/api";
-    // Dummy service path
-    private final String routerEndpointPath = "/CentralSystemService";
+    @Builder @Getter
+    public static class Paths {
+        // Root mapping for Spring
+        private final String rootMapping;
+        // Web frontend
+        private final String managerMapping;
+        // Mapping for SOAP services
+        private final String soapMapping;
+        // Mapping for Websocket services
+        private final String websocketMapping;
+        // Mapping for Web APIs
+        private final String apiMapping;
+        // Dummy service path
+        private final String routerEndpointPath;
+
+        private final String contextPath;
+    }
+
+    private final Paths paths;
     // Time zone for the application and database connections
-    private final String timeZoneId = "UTC";  // or ZoneId.systemDefault().getId();
-
-    // -------------------------------------------------------------------------
-    // main.properties
-    // -------------------------------------------------------------------------
-
-    private final String contextPath;
+    private final String timeZoneId;
     private final String steveVersion;
     private final String gitDescribe;
     private final ApplicationProfile profile;

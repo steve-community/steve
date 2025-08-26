@@ -30,8 +30,8 @@ import jakarta.xml.ws.WebServiceException;
 import static de.rwth.idsg.steve.utils.Helpers.getForOcpp12;
 import static de.rwth.idsg.steve.utils.Helpers.getForOcpp15;
 import static de.rwth.idsg.steve.utils.Helpers.getForOcpp16;
-import static de.rwth.idsg.steve.utils.Helpers.getPath;
 import static de.rwth.idsg.steve.utils.Helpers.getRandomString;
+import static de.rwth.idsg.steve.utils.Helpers.getHttpPath;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
@@ -54,7 +54,7 @@ public class ApplicationTest {
         assertThat(config.getProfile()).isEqualTo(ApplicationProfile.TEST);
         __DatabasePreparer__.prepare(config);
 
-        path = getPath(config);
+        path = getHttpPath(config);
 
         app = new Application(config);
         app.start();

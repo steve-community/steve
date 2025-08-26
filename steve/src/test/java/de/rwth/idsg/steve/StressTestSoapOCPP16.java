@@ -37,7 +37,7 @@ import java.time.OffsetDateTime;
 import java.util.concurrent.ThreadLocalRandom;
 
 import static de.rwth.idsg.steve.utils.Helpers.getForOcpp16;
-import static de.rwth.idsg.steve.utils.Helpers.getPath;
+import static de.rwth.idsg.steve.utils.Helpers.getHttpPath;
 import static de.rwth.idsg.steve.utils.Helpers.getRandomString;
 import static de.rwth.idsg.steve.utils.Helpers.getRandomStrings;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -53,7 +53,7 @@ public class StressTestSoapOCPP16 extends StressTest {
 
     public static void main(String[] args) throws Exception {
         var config = SteveConfigurationReader.readSteveConfiguration("main.properties");
-        var path = getPath(config);
+        var path = getHttpPath(config);
         new StressTestSoapOCPP16(path).attack();
     }
 

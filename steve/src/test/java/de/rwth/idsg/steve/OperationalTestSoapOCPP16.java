@@ -53,7 +53,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import static de.rwth.idsg.steve.utils.Helpers.getForOcpp16;
-import static de.rwth.idsg.steve.utils.Helpers.getPath;
+import static de.rwth.idsg.steve.utils.Helpers.getHttpPath;
 import static de.rwth.idsg.steve.utils.Helpers.getRandomString;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
@@ -80,7 +80,7 @@ public class OperationalTestSoapOCPP16 {
         config = SteveConfigurationReader.readSteveConfiguration("main.properties");
         assertThat(config.getProfile()).isEqualTo(ApplicationProfile.TEST);
 
-        path = getPath(config);
+        path = getHttpPath(config);
 
         app = new Application(config);
         app.start();

@@ -34,7 +34,7 @@ import java.time.OffsetDateTime;
 import java.util.List;
 
 import static de.rwth.idsg.steve.utils.Helpers.getForOcpp16;
-import static de.rwth.idsg.steve.utils.Helpers.getPath;
+import static de.rwth.idsg.steve.utils.Helpers.getHttpPath;
 import static de.rwth.idsg.steve.utils.Helpers.getRandomString;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -57,7 +57,7 @@ public class Issue73Fix {
 
         __DatabasePreparer__.prepare(config);
 
-        path = getPath(config);
+        path = getHttpPath(config);
 
         var app = new Application(config);
         try {

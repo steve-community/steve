@@ -28,7 +28,6 @@ import org.springframework.web.servlet.support.RequestContextUtils;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
-import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.util.TimeZone;
@@ -36,14 +35,6 @@ import java.util.TimeZone;
 @Slf4j
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class WebDateTimeUtils {
-
-    public static long toMillis(LocalDateTime ldt) {
-        return ldt == null ? 0 : ldt.atZone(ZoneOffset.UTC).toInstant().toEpochMilli();
-    }
-
-    public static long toMillis(OffsetDateTime odt) {
-        return odt == null ? 0 : odt.toInstant().toEpochMilli();
-    }
 
     public static long toMillis(Instant instant) {
         return instant == null ? 0 : instant.toEpochMilli();

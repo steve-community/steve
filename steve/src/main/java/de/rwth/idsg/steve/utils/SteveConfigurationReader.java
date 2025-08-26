@@ -36,7 +36,16 @@ public class SteveConfigurationReader {
         PasswordEncoder encoder = new BCryptPasswordEncoder();
 
         var config = SteveConfiguration.builder()
-                .contextPath(sanitizeContextPath(p.getOptionalString("context.path").orElse(null)))
+                .paths(SteveConfiguration.Paths.builder()
+                        .rootMapping("/")
+                        .managerMapping("/manager")
+                        .apiMapping("/api")
+                        .soapMapping("/services")
+                        .websocketMapping("/websocket")
+                        .routerEndpointPath("/CentralSystemService")
+                        .contextPath(sanitizeContextPath(p.getOptionalString("context.path").orElse(null)))
+                        .build())
+                .timeZoneId("UTC")
                 .steveVersion(p.getString("steve.version"))
                 .gitDescribe(useFallbackIfNotSet(p.getOptionalString("git.describe").orElse(null), null))
                 .profile(profile)

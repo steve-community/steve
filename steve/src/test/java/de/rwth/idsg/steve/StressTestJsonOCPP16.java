@@ -48,9 +48,9 @@ import java.time.OffsetDateTime;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static de.rwth.idsg.steve.utils.Helpers.getJsonPath;
 import static de.rwth.idsg.steve.utils.Helpers.getRandomString;
 import static de.rwth.idsg.steve.utils.Helpers.getRandomStrings;
+import static de.rwth.idsg.steve.utils.Helpers.getWsPath;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
 
@@ -68,7 +68,7 @@ public class StressTestJsonOCPP16 extends StressTest {
 
     public static void main(String[] args) throws Exception {
         var config = SteveConfigurationReader.readSteveConfiguration("main.properties");
-        var path = getJsonPath(config);
+        var path = getWsPath(config);
         new StressTestJsonOCPP16(path).attack();
     }
 

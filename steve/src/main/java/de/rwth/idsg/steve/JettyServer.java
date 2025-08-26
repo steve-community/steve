@@ -42,14 +42,14 @@ import java.net.NetworkInterface;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
+import java.util.function.Function;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -59,6 +59,7 @@ import java.util.stream.Collectors;
 public class JettyServer {
 
     private final SteveConfiguration config;
+    private final EndpointInfo info;
 
     private Server server;
     private SteveAppContext steveAppContext;
@@ -71,6 +72,7 @@ public class JettyServer {
 
     public JettyServer(SteveConfiguration config) {
         this.config = config;
+        this.info = new EndpointInfo(config);
     }
 
     /**
@@ -119,7 +121,7 @@ public class JettyServer {
             server.addConnector(httpsConnector(httpConfig));
         }
 
-        steveAppContext = new SteveAppContext(config);
+        steveAppContext = new SteveAppContext(config, info);
         server.setHandler(steveAppContext.getHandlers());
     }
 
@@ -187,62 +189,46 @@ public class JettyServer {
     }
 
     public void populateEndpointInfo() {
-        List<String> list = getConnectorPathList();
-
-        EndpointInfo info = EndpointInfo.INSTANCE;
-
-        info.getWebInterface().setData(buildList(list, false));
-        info.getOcppSoap().setData(buildList(list, false));
-        info.getOcppWebSocket().setData(buildList(list, true));
-    }
-
-    private List<String> getConnectorPathList() {
         if (server == null) {
-            return Collections.emptyList();
+            return;
         }
-
-        return Arrays.stream(server.getConnectors())
-                     .map(this::getConnectorPath)
-                     .flatMap(Collection::stream)
-                     .collect(Collectors.toList());
+        var list = Arrays.stream(server.getConnectors())
+                .map(this::getConnectorPath)
+                .flatMap(ips -> ips.entrySet().stream())
+                .toList();
+        setList(list, isSecured -> isSecured ? "http" : "https", info.getWebInterface(), info.getWebInterface());
+        setList(list, isSecured -> isSecured ? "ws" : "wss", info.getOcppWebSocket());
     }
 
-    private List<String> getConnectorPath(Connector c) {
-        ServerConnector sc = (ServerConnector) c;
+    private Map<String, Boolean> getConnectorPath(Connector c) {
+        var sc = (ServerConnector) c;
 
-        final String prefix;
-        if (sc.getDefaultConnectionFactory() instanceof SslConnectionFactory) {
-            prefix = "https";
-        } else {
-            prefix = "http";
-        }
+        var isSecure = sc.getDefaultConnectionFactory() instanceof SslConnectionFactory;
+        var layout = "://%s:%d" + config.getPaths().getContextPath();
 
-        Set<String> ips = new HashSet<>();
-        String host = sc.getHost();
+        return getIps(sc, config.getJetty().getServerHost())
+                .stream()
+                .map(k -> String.format(layout, k, sc.getPort()))
+                .collect(HashMap::new, (m, v) -> m.put(v, isSecure), HashMap::putAll);
+    }
+
+    private static Set<String> getIps(ServerConnector sc, String serverHost) {
+        var ips = new HashSet<String>();
+        var host = sc.getHost();
         if (host == null || host.equals("0.0.0.0")) {
-            ips.addAll(getPossibleIpAddresses(config.getJetty().getServerHost()));
+            ips.addAll(getPossibleIpAddresses(serverHost));
         } else {
             ips.add(host);
         }
-
-        String layout = "%s://%s:%d" + config.getContextPath();
-
-        return ips.stream()
-                  .map(k -> String.format(layout, prefix, k, sc.getPort()))
-                  .collect(Collectors.toList());
+        return ips;
     }
 
-    private List<String> buildList(List<String> list, boolean replaceHttp) {
-        return list.stream()
-                   .map(s -> getElementPrefix(s, replaceHttp))
-                   .collect(Collectors.toList());
-    }
-
-    private String getElementPrefix(String str, boolean replaceHttp) {
-        if (replaceHttp) {
-            return str.replaceFirst("http", "ws");
-        } else {
-            return str;
+    private static void setList(List<Map.Entry<String, Boolean>> list, Function<Boolean, String> prefix, EndpointInfo.ItemsWithInfo... items) {
+        var ws = list.stream()
+                .map(e -> prefix.apply(e.getValue()) + e.getKey())
+                .toList();
+        for (EndpointInfo.ItemsWithInfo item : items) {
+            item.setData(ws);
         }
     }
 

@@ -43,7 +43,7 @@ import org.apache.http.impl.client.HttpClients;
 import java.time.OffsetDateTime;
 
 import static de.rwth.idsg.steve.utils.Helpers.getForOcpp16;
-import static de.rwth.idsg.steve.utils.Helpers.getPath;
+import static de.rwth.idsg.steve.utils.Helpers.getHttpPath;
 import static de.rwth.idsg.steve.utils.Helpers.getRandomString;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -60,7 +60,7 @@ public class Issue72LowLevelSoap extends StressTest {
 
     public static void main(String[] args) throws Exception {
         var config = SteveConfigurationReader.readSteveConfiguration("main.properties");
-        var path = getPath(config);
+        var path = getHttpPath(config);
         new Issue72LowLevelSoap(path).attack();
     }
 

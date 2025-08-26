@@ -56,6 +56,7 @@ public class AboutSettingsController {
     private final MailService mailService;
     private final ReleaseCheckService releaseCheckService;
     private final SteveConfiguration config;
+    private final EndpointInfo info;
 
     // -------------------------------------------------------------------------
     // Paths
@@ -76,7 +77,7 @@ public class AboutSettingsController {
         model.addAttribute("systemTime", LocalDateTime.now());
         model.addAttribute("systemTimeZone", ZoneId.systemDefault());
         model.addAttribute("releaseReport", releaseCheckService.check());
-        model.addAttribute("endpointInfo", EndpointInfo.INSTANCE);
+        model.addAttribute("endpointInfo", info);
         return "about";
     }
 

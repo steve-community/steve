@@ -318,7 +318,7 @@ public class OperationalTestSoapOCPP16 {
 
     @Test
     public void testReservation() {
-        int usedConnectorID = 1;
+        int usedConnectorId = 1;
 
         var client = getForOcpp16(path);
 
@@ -329,7 +329,7 @@ public class OperationalTestSoapOCPP16 {
         initStationWithBootNotification(client);
         initConnectorsWithStatusNotification(client);
 
-        var reservationId = __DatabasePreparer__.makeReservation(usedConnectorID);
+        var reservationId = __DatabasePreparer__.makeReservation(usedConnectorId);
 
         // -------------------------------------------------------------------------
         // startTransaction (invalid reservationId)
@@ -339,7 +339,7 @@ public class OperationalTestSoapOCPP16 {
 
         var startInvalid = client.startTransaction(
                 new StartTransactionRequest()
-                        .withConnectorId(usedConnectorID)
+                        .withConnectorId(usedConnectorId)
                         .withIdTag(REGISTERED_OCPP_TAG)
                         .withTimestamp(OffsetDateTime.now())
                         .withMeterStart(0)
@@ -391,7 +391,7 @@ public class OperationalTestSoapOCPP16 {
 
         var startValidId = client.startTransaction(
                 new StartTransactionRequest()
-                        .withConnectorId(usedConnectorID)
+                        .withConnectorId(usedConnectorId)
                         .withIdTag(REGISTERED_OCPP_TAG)
                         .withTimestamp(OffsetDateTime.now())
                         .withMeterStart(0)
@@ -415,7 +415,7 @@ public class OperationalTestSoapOCPP16 {
 
         var startValidIdUsedTwice = client.startTransaction(
                 new StartTransactionRequest()
-                        .withConnectorId(usedConnectorID)
+                        .withConnectorId(usedConnectorId)
                         .withIdTag(REGISTERED_OCPP_TAG)
                         .withTimestamp(OffsetDateTime.now())
                         .withMeterStart(0)
@@ -454,7 +454,7 @@ public class OperationalTestSoapOCPP16 {
     }
 
     private void testBody(List<MeterValue> meterValues, List<MeterValue> transactionData) {
-        final var usedConnectorID = 1;
+        final var usedConnectorId = 1;
 
         var client = getForOcpp16(path);
 
@@ -481,7 +481,7 @@ public class OperationalTestSoapOCPP16 {
         var startTimeStamp = OffsetDateTime.now();
         var start = client.startTransaction(
                 new StartTransactionRequest()
-                        .withConnectorId(usedConnectorID)
+                        .withConnectorId(usedConnectorId)
                         .withIdTag(REGISTERED_OCPP_TAG)
                         .withTimestamp(startTimeStamp)
                         .withMeterStart(0),
@@ -520,7 +520,7 @@ public class OperationalTestSoapOCPP16 {
         if (meterValues != null) {
             var meter = client.meterValues(
                     new MeterValuesRequest()
-                            .withConnectorId(usedConnectorID)
+                            .withConnectorId(usedConnectorId)
                             .withTransactionId(transactionID)
                             .withMeterValue(meterValues),
                     REGISTERED_CHARGE_BOX_ID
@@ -560,7 +560,7 @@ public class OperationalTestSoapOCPP16 {
                 new StatusNotificationRequest()
                         .withStatus(ChargePointStatus.AVAILABLE)
                         .withErrorCode(ChargePointErrorCode.NO_ERROR)
-                        .withConnectorId(usedConnectorID)
+                        .withConnectorId(usedConnectorId)
                         .withTimestamp(OffsetDateTime.now()),
                 REGISTERED_CHARGE_BOX_ID
         );

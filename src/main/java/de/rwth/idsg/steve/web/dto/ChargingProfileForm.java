@@ -29,9 +29,12 @@ import org.joda.time.DateTime;
 import org.springframework.util.CollectionUtils;
 
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.AssertFalse;
 import jakarta.validation.constraints.AssertTrue;
+import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.Digits;
 import jakarta.validation.constraints.Future;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.PositiveOrZero;
@@ -82,8 +85,7 @@ public class ChargingProfileForm {
 
     private BigDecimal minChargingRate;
 
-    @Valid
-    private List<SchedulePeriod> schedulePeriods;
+    private List<@Valid SchedulePeriod> schedulePeriods;
 
     @AssertTrue(message = "Valid To must be after Valid From")
     public boolean isFromToValid() {
@@ -134,28 +136,42 @@ public class ChargingProfileForm {
     @ToString
     public static class SchedulePeriod {
 
-        private static final int defaultNumberPhases = 3;
-
+        @Min(value = 0, message = "Start Period has to be a positive number or 0")
         private Integer startPeriodInSeconds; // from the startSchedule
+
+        /**
+         * According to spec: "Accepts at most one digit fraction (e.g. 8.1)"
+         */
+        @DecimalMin(value = "0.0", message = "Power Limit has to be a positive number or 0")
+        @Digits(integer = 6, fraction = 1, message = "Power Limit must be a number with at most 6 digits and 1 fractional digit")
         private BigDecimal powerLimit;
+
+        @Min(value = 1, message = "Number of Phases has to be at least 1")
+        @Max(value = 3, message = "Number of Phases has to be at most 3")
         private Integer numberPhases;
 
-        public void setNumberPhases(Integer numberPhases) {
-            this.numberPhases = Objects.requireNonNullElse(numberPhases, defaultNumberPhases);
+        @AssertTrue(message = "Schedule period: Power Limit has to be set")
+        public boolean isPowerLimitSet() {
+            if (isEmpty()) {
+                return true; // All fields are null, so validation is ignored
+            }
+            return powerLimit != null;
+        }
+
+        @AssertTrue(message = "Schedule period: Start Period has to be set")
+        public boolean isStartPeriodInSecondsSet() {
+            if (isEmpty()) {
+                return true; // All fields are null, so validation is ignored
+            }
+            return startPeriodInSeconds != null;
         }
 
         public boolean isNonEmpty() {
-            return (startPeriodInSeconds != null) && (powerLimit != null) && (numberPhases != null);
+            return !isEmpty();
         }
 
-        @AssertFalse(message = "Schedule period: Power Limit has to be set")
-        public boolean isPowerLimitMissing() {
-            return (startPeriodInSeconds != null) && (powerLimit == null) && (numberPhases != null);
-        }
-
-        @AssertFalse(message = "Schedule period: Start Period has to be set")
-        public boolean isStartPeriodInSecondsMissing() {
-            return (startPeriodInSeconds == null) && (powerLimit != null) && (numberPhases != null);
+        private boolean isEmpty() {
+            return (startPeriodInSeconds == null) && (powerLimit == null) && (numberPhases == null);
         }
     }
 }

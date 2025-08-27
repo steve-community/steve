@@ -18,6 +18,7 @@
  */
 package de.rwth.idsg.steve.service;
 
+import de.rwth.idsg.steve.SteveException;
 import de.rwth.idsg.steve.config.DelegatingTaskExecutor;
 import de.rwth.idsg.steve.ocpp.ChargePointServiceInvoker;
 import de.rwth.idsg.steve.ocpp.OcppCallback;
@@ -45,7 +46,6 @@ import de.rwth.idsg.steve.repository.ChargingProfileRepository;
 import de.rwth.idsg.steve.repository.ReservationRepository;
 import de.rwth.idsg.steve.repository.TaskStore;
 import de.rwth.idsg.steve.repository.dto.ChargePointSelect;
-import de.rwth.idsg.steve.repository.dto.ChargingProfile;
 import de.rwth.idsg.steve.repository.dto.InsertReservationParams;
 import de.rwth.idsg.steve.service.dto.EnhancedReserveNowParams;
 import de.rwth.idsg.steve.web.dto.ocpp.CancelReservationParams;
@@ -413,8 +413,9 @@ public class ChargePointServiceClient {
 
     @SafeVarargs
     public final int setChargingProfile(SetChargingProfileParams params, OcppCallback<String>... callbacks) {
-        ChargingProfile.Details details = chargingProfileRepository.getDetails(params.getChargingProfilePk());
-
+        var details = chargingProfileRepository
+                .getDetails(params.getChargingProfilePk())
+                .orElseThrow(() -> new SteveException.NotFound("Charging Profile not found"));
         SetChargingProfileTaskFromDB task =
                 new SetChargingProfileTaskFromDB(params, details, chargingProfileRepository);
 

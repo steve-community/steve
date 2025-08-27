@@ -29,11 +29,13 @@ import org.jspecify.annotations.Nullable;
 
 import java.math.BigDecimal;
 import java.time.Instant;
-import java.util.Map;
-import java.util.Objects;
+import java.util.List;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.AssertTrue;
+import jakarta.validation.constraints.Digits;
 import jakarta.validation.constraints.Future;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
@@ -74,7 +76,7 @@ public class ChargingProfileForm {
 
     private BigDecimal minChargingRate;
 
-    @NotEmpty(message = "Schedule Periods cannot be empty") @Valid private Map<String, SchedulePeriod> schedulePeriodMap;
+    @NotEmpty(message = "Schedule Periods cannot be empty") private List<@NotNull @Valid SchedulePeriod> schedulePeriods;
 
     @AssertTrue(message = "Valid To must be after Valid From") public boolean isFromToValid() {
         return !(validFrom != null && validTo != null) || validTo.isAfter(validFrom);
@@ -95,15 +97,7 @@ public class ChargingProfileForm {
     @AssertTrue(message = "Valid From/To should not be used with the profile purpose 'TxProfile'") public boolean isFromToAndProfileSettingCorrect() {
         boolean isTxProfile = (chargingProfilePurpose == ChargingProfilePurposeType.TX_PROFILE);
 
-        if (validFrom != null && isTxProfile) {
-            return false;
-        }
-
-        if (validTo != null && isTxProfile) {
-            return false;
-        }
-
-        return true;
+        return (validFrom == null || !isTxProfile) && (validTo == null || !isTxProfile);
     }
 
     @Getter
@@ -111,20 +105,17 @@ public class ChargingProfileForm {
     @ToString
     public static class SchedulePeriod {
 
-        private static final int defaultNumberPhases = 3;
+        @NotNull @PositiveOrZero(message = "Start Period has to be a positive number or 0") private Integer startPeriodInSeconds; // from the startSchedule
 
-        @NotNull(message = "Schedule period: Start Period has to be set") private Integer startPeriodInSeconds; // from the startSchedule
+        /**
+         * According to spec: "Accepts at most one digit fraction (e.g. 8.1)"
+         */
+        @NotNull @PositiveOrZero(message = "Power Limit has to be a positive number or 0") @Digits(
+                integer = 6,
+                fraction = 1,
+                message = "Power Limit must be a number with at most 6 digits and 1 fractional digit")
+        private BigDecimal powerLimit;
 
-        @NotNull(message = "Schedule period: Power Limit has to be set") private BigDecimal powerLimit;
-
-        private Integer numberPhases;
-
-        public Integer getNumberPhases() {
-            return Objects.requireNonNullElse(numberPhases, defaultNumberPhases);
-        }
-
-        public void setNumberPhases(Integer numberPhases) {
-            this.numberPhases = Objects.requireNonNullElse(numberPhases, defaultNumberPhases);
-        }
+        @Min(value = 1, message = "Number of Phases has to be at least 1") @Max(value = 3, message = "Number of Phases has to be at most 3") private Integer numberPhases;
     }
 }

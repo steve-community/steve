@@ -18,6 +18,7 @@
  */
 package de.rwth.idsg.steve.web.controller;
 
+import de.rwth.idsg.steve.SteveException;
 import de.rwth.idsg.steve.repository.ChargingProfileRepository;
 import de.rwth.idsg.steve.service.ChargePointsService;
 import de.rwth.idsg.steve.utils.mapper.ChargingProfileDetailsMapper;
@@ -125,7 +126,10 @@ public class ChargingProfilesController {
 
     @GetMapping(value = DETAILS_PATH)
     public String getDetails(@PathVariable("chargingProfilePk") int chargingProfilePk, Model model) {
-        var details = repository.getDetails(chargingProfilePk);
+        var details = repository
+                .getDetails(chargingProfilePk)
+                .orElseThrow(() -> new SteveException.NotFound("Charging Profile not found"));
+        ;
         var form = ChargingProfileDetailsMapper.mapToForm(details);
 
         model.addAttribute("form", form);

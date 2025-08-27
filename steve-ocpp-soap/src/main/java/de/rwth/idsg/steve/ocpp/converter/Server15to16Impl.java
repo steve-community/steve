@@ -54,6 +54,7 @@ import ocpp.cs._2015._10.StatusNotificationRequest;
 import ocpp.cs._2015._10.StopTransactionRequest;
 import ocpp.cs._2015._10.UnitOfMeasure;
 import ocpp.cs._2015._10.ValueFormat;
+import org.jspecify.annotations.Nullable;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -261,21 +262,18 @@ public enum Server15to16Impl implements Server15to16 {
      * https://github.com/steve-community/steve/issues/59
      */
     private static UnitOfMeasure convertUnit(ocpp.cs._2012._06.UnitOfMeasure unit) {
-        switch (unit) {
-            case AMP:
-                return UnitOfMeasure.A;
-            case VOLT:
-                return UnitOfMeasure.V;
-            default:
-                return UnitOfMeasure.fromValue(unit.value());
-        }
+        return switch (unit) {
+            case AMP -> UnitOfMeasure.A;
+            case VOLT -> UnitOfMeasure.V;
+            default -> UnitOfMeasure.fromValue(unit.value());
+        };
     }
 
     // -------------------------------------------------------------------------
     // Helpers
     // -------------------------------------------------------------------------
 
-    private static IdTagInfo toOcpp15IdTagInfo(ocpp.cs._2015._10.IdTagInfo info16) {
+    private static @Nullable IdTagInfo toOcpp15IdTagInfo(ocpp.cs._2015._10.@Nullable IdTagInfo info16) {
         if (info16 == null) {
             return null;
         }

@@ -20,6 +20,7 @@ package de.rwth.idsg.steve.ocpp.ws.data;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.jspecify.annotations.Nullable;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -28,9 +29,9 @@ import lombok.Setter;
 @Getter
 @Setter
 public final class OcppJsonError extends OcppJsonResponse implements OcppJsonMessage {
-    private ErrorCode errorCode;
-    private String errorDescription;
-    private String errorDetails;
+    private @Nullable ErrorCode errorCode;
+    private @Nullable String errorDescription;
+    private @Nullable String errorDetails;
 
     public OcppJsonError() {
         super(MessageType.CALL_ERROR);

@@ -18,6 +18,7 @@
  */
 package de.rwth.idsg.steve;
 
+import de.rwth.idsg.steve.utils.LogFileRetriever;
 import de.rwth.idsg.steve.web.dto.EndpointInfo;
 import org.apache.cxf.transport.servlet.CXFServlet;
 import org.apache.tomcat.InstanceManager;
@@ -63,11 +64,12 @@ public class SteveAppContext {
     private final AnnotationConfigWebApplicationContext springContext;
     private final WebAppContext webAppContext;
 
-    public SteveAppContext(SteveConfiguration config, EndpointInfo info) {
+    public SteveAppContext(SteveConfiguration config, LogFileRetriever logFileRetriever, EndpointInfo info) {
         this.config = config;
         springContext = new AnnotationConfigWebApplicationContext();
         var context = new GenericApplicationContext();
         context.registerBean(SteveConfiguration.class, () -> config);
+        context.registerBean(LogFileRetriever.class, () -> logFileRetriever);
         context.registerBean(EndpointInfo.class, () -> info);
         context.refresh();
         context.setParent(springContext.getParent());

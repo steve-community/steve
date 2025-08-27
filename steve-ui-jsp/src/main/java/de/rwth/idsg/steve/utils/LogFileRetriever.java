@@ -23,6 +23,7 @@ import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.Appender;
 import ch.qos.logback.core.FileAppender;
 import lombok.extern.slf4j.Slf4j;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.LoggerFactory;
 
 import java.nio.file.Path;
@@ -38,12 +39,10 @@ import java.util.concurrent.ThreadLocalRandom;
  * @since 05.11.2015
  */
 @Slf4j
-public enum LogFileRetriever {
-    INSTANCE;
-
+public class LogFileRetriever {
     private final List<Path> logPathList;
 
-    LogFileRetriever() {
+    public LogFileRetriever() {
         logPathList = getActiveLogFilePaths();
     }
 
@@ -105,11 +104,10 @@ public enum LogFileRetriever {
     /**
      * File appender types do not share a "write-to-file" superclass.
      */
-    private String extractFileName(Appender<ILoggingEvent> a) {
-        if (a instanceof FileAppender) {
-            return ((FileAppender<ILoggingEvent>) a).getFile();
-        } else {
-            return null;
+    private @Nullable String extractFileName(Appender<ILoggingEvent> a) {
+        if (a instanceof FileAppender<ILoggingEvent> fa) {
+            return fa.getFile();
         }
+        return null;
     }
 }

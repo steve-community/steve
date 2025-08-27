@@ -21,11 +21,11 @@ package de.rwth.idsg.steve.utils;
 import com.google.common.base.Splitter;
 import com.google.common.base.Strings;
 import lombok.extern.slf4j.Slf4j;
+import org.jspecify.annotations.Nullable;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -40,7 +40,7 @@ import java.util.Properties;
 @Slf4j
 public class PropertiesFileLoader {
 
-    private Properties prop;
+    private final Properties prop;
 
     /**
      * The name parameter acts as
@@ -48,17 +48,16 @@ public class PropertiesFileLoader {
      * 2) the system property which can be set to load from file system.
      */
     public PropertiesFileLoader(String name) {
-        String externalFileName = System.getProperty(name);
+        var externalFileName = System.getProperty(name);
 
         if (externalFileName == null) {
             log.info(
                     "Hint: The Java system property '{}' can be set to point to an external properties file, "
                             + "which will be prioritized over the bundled one",
                     name);
-            loadFromClasspath(name);
-
+            prop = loadFromClasspath(name);
         } else {
-            loadFromSystem(externalFileName);
+            prop = loadFromSystem(externalFileName);
         }
     }
 
@@ -67,13 +66,13 @@ public class PropertiesFileLoader {
     // -------------------------------------------------------------------------
 
     public String getString(String key) {
-        String s = prop.getProperty(key);
+        var s = prop.getProperty(key);
         // initial property value might be null/empty
-        checkForNullAndEmpty(key, s);
+        s = checkForNullAndEmpty(key, s);
 
         s = resolveIfSystemEnv(s);
         // check again, system env value might be null/empty
-        checkForNullAndEmpty(key, s);
+        s = checkForNullAndEmpty(key, s);
 
         return trim(key, s);
     }
@@ -96,7 +95,7 @@ public class PropertiesFileLoader {
             return Optional.empty();
         }
         s = resolveIfSystemEnv(s);
-        return Optional.of(trim(key, s));
+        return Optional.ofNullable(trim(key, s));
     }
 
     public List<String> getStringList(String key) {
@@ -122,26 +121,28 @@ public class PropertiesFileLoader {
     // Private helpers
     // -------------------------------------------------------------------------
 
-    private void loadFromSystem(String fileName) {
-        try (FileInputStream inputStream = new FileInputStream(fileName)) {
-            prop = new Properties();
+    private static Properties loadFromSystem(String fileName) {
+        var prop = new Properties();
+        try (var inputStream = new FileInputStream(fileName)) {
             prop.load(inputStream);
             log.info("Loaded properties from {}", fileName);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+        return prop;
     }
 
-    private void loadFromClasspath(String fileName) {
-        try (InputStream is = this.getClass().getClassLoader().getResourceAsStream(fileName)) {
+    private static Properties loadFromClasspath(String fileName) {
+        var prop = new Properties();
+        try (var is = PropertiesFileLoader.class.getClassLoader().getResourceAsStream(fileName)) {
             if (is == null) {
                 throw new FileNotFoundException("Property file '" + fileName + "' is not found in classpath");
             }
-            prop = new Properties();
             prop.load(is);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+        return prop;
     }
 
     /**
@@ -151,12 +152,12 @@ public class PropertiesFileLoader {
      * However, if the resolved value is null, we do not use it and fallback to the initial value. This might be the
      * case for example with passwords, which use arbitrary characters and start with a dollar sign.
      */
-    private static String resolveIfSystemEnv(String value) {
+    private static @Nullable String resolveIfSystemEnv(@Nullable String value) {
         if (value == null) {
             return null;
         }
         if ("$".equals(String.valueOf(value.charAt(0)))) {
-            String sysEnvValue = System.getenv(value.substring(1));
+            var sysEnvValue = System.getenv(value.substring(1));
             if (sysEnvValue != null) {
                 return sysEnvValue;
             }
@@ -164,23 +165,24 @@ public class PropertiesFileLoader {
         return value;
     }
 
-    private static String trim(String key, String value) {
+    private static @Nullable String trim(String key, @Nullable String value) {
         if (value == null) {
             return null;
         }
-        String trimmed = value.trim();
+        var trimmed = value.trim();
         if (!trimmed.equals(value)) {
             log.warn("The property '{}' has leading or trailing spaces which were removed!", key);
         }
         return trimmed;
     }
 
-    private static void checkForNullAndEmpty(String key, String value) {
+    private static String checkForNullAndEmpty(String key, @Nullable String value) {
         if (value == null) {
             throw new IllegalArgumentException("The property '" + key + "' is not found");
         }
         if (value.isEmpty()) {
             throw new IllegalArgumentException("The property '" + key + "' has no value set");
         }
+        return value;
     }
 }

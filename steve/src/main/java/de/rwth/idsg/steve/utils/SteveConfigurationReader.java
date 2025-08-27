@@ -21,8 +21,11 @@ package de.rwth.idsg.steve.utils;
 import de.rwth.idsg.steve.ApplicationProfile;
 import de.rwth.idsg.steve.SteveConfiguration;
 import lombok.experimental.UtilityClass;
+import org.jspecify.annotations.Nullable;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+
+import java.util.Locale;
 
 @UtilityClass
 public class SteveConfigurationReader {
@@ -31,7 +34,7 @@ public class SteveConfigurationReader {
         PropertiesFileLoader p = new PropertiesFileLoader(name);
 
         var profile = ApplicationProfile.fromName(p.getString("profile"));
-        System.setProperty("spring.profiles.active", profile.name().toLowerCase());
+        System.setProperty("spring.profiles.active", profile.name().toLowerCase(Locale.getDefault()));
 
         PasswordEncoder encoder = new BCryptPasswordEncoder();
 
@@ -91,7 +94,7 @@ public class SteveConfigurationReader {
         return config;
     }
 
-    private static String useFallbackIfNotSet(String value, String fallback) {
+    private static @Nullable String useFallbackIfNotSet(@Nullable String value, @Nullable String fallback) {
         if (value == null) {
             // if the property is optional, value will be null
             return fallback;
@@ -103,7 +106,7 @@ public class SteveConfigurationReader {
         }
     }
 
-    private static String sanitizeContextPath(String s) {
+    private static String sanitizeContextPath(@Nullable String s) {
         if (s == null || "/".equals(s)) {
             return "";
 

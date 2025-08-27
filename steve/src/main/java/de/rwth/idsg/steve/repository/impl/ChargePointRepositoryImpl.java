@@ -44,6 +44,7 @@ import org.jooq.SelectQuery;
 import org.jooq.Table;
 import org.jooq.exception.DataAccessException;
 import org.jooq.impl.DSL;
+import org.jspecify.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.CollectionUtils;
@@ -177,26 +178,17 @@ public class ChargePointRepositoryImpl implements ChargePointRepository {
         }
 
         switch (form.getHeartbeatPeriod()) {
-            case ALL:
-                break;
-
-            case TODAY:
+            case ALL -> {}
+            case TODAY ->
                 selectQuery.addConditions(
                         date(CHARGE_BOX.LAST_HEARTBEAT_TIMESTAMP).eq(LocalDate.now()));
-                break;
-
-            case YESTERDAY:
+            case YESTERDAY ->
                 selectQuery.addConditions(date(CHARGE_BOX.LAST_HEARTBEAT_TIMESTAMP)
                         .eq(LocalDate.now().minusDays(1)));
-                break;
-
-            case EARLIER:
+            case EARLIER ->
                 selectQuery.addConditions(date(CHARGE_BOX.LAST_HEARTBEAT_TIMESTAMP)
                         .lessThan(LocalDate.now().minusDays(1)));
-                break;
-
-            default:
-                throw new SteveException("Unknown enum type");
+            default -> throw new SteveException("Unknown enum type");
         }
 
         // Default order
@@ -306,9 +298,9 @@ public class ChargePointRepositoryImpl implements ChargePointRepository {
     @Override
     public int addChargePoint(ChargePointForm form) {
         return ctx.transactionResult(configuration -> {
-            DSLContext ctx = DSL.using(configuration);
+            var ctx = DSL.using(configuration);
             try {
-                Integer addressId = addressRepository.updateOrInsert(ctx, form.getAddress());
+                var addressId = addressRepository.updateOrInsert(ctx, form.getAddress());
                 return addChargePointInternal(ctx, form, addressId);
 
             } catch (DataAccessException e) {
@@ -373,7 +365,7 @@ public class ChargePointRepositoryImpl implements ChargePointRepository {
                 .getChargeBoxPk();
     }
 
-    private void updateChargePointInternal(DSLContext ctx, ChargePointForm form, Integer addressPk) {
+    private void updateChargePointInternal(DSLContext ctx, ChargePointForm form, @Nullable Integer addressPk) {
         ctx.update(CHARGE_BOX)
                 .set(CHARGE_BOX.DESCRIPTION, form.getDescription())
                 .set(CHARGE_BOX.LOCATION_LATITUDE, form.getLocationLatitude())

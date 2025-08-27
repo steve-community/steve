@@ -57,7 +57,7 @@ public class CustomStringModule extends SimpleModule {
 
         private static final long serialVersionUID = 1L;
 
-        public CustomStringSerializer() {
+        private CustomStringSerializer() {
             super(String.class, false);
         }
 

@@ -41,7 +41,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import jakarta.validation.Valid;
@@ -104,14 +103,10 @@ public class Ocpp16Controller extends Ocpp15Controller {
 
     @Override
     protected Map<String, String> getConfigurationKeys(ConfigurationKeyReadWrite confEnum) {
-        switch (confEnum) {
-            case R:
-                return ConfigurationKey.OCPP_16_MAP_R;
-            case RW:
-                return ConfigurationKey.OCPP_16_MAP_RW;
-            default:
-                return Collections.emptyMap();
-        }
+        return switch (confEnum) {
+            case R -> ConfigurationKey.OCPP_16_MAP_R;
+            case RW -> ConfigurationKey.OCPP_16_MAP_RW;
+        };
     }
 
     @Override
@@ -129,6 +124,7 @@ public class Ocpp16Controller extends Ocpp15Controller {
     // -------------------------------------------------------------------------
 
     @GetMapping(value = GET_CONF_PATH)
+    @Override
     public String getGetConf(Model model) {
         setCommonAttributes(model);
         model.addAttribute(PARAMS, new GetConfigurationParams());
@@ -137,6 +133,7 @@ public class Ocpp16Controller extends Ocpp15Controller {
     }
 
     @GetMapping(value = CHANGE_CONF_PATH)
+    @Override
     public String getChangeConf(Model model) {
         setCommonAttributes(model);
         model.addAttribute(PARAMS, new ChangeConfigurationParams());
@@ -145,6 +142,7 @@ public class Ocpp16Controller extends Ocpp15Controller {
     }
 
     @PostMapping(value = GET_CONF_PATH)
+    @Override
     public String postGetConf(
             @Valid @ModelAttribute(PARAMS) GetConfigurationParams params, BindingResult result, Model model) {
         if (result.hasErrors()) {

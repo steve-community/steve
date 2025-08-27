@@ -20,6 +20,7 @@ package de.rwth.idsg.steve.utils;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import org.jspecify.annotations.Nullable;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -39,42 +40,42 @@ public final class DateTimeUtils {
     private static final DateTimeFormatter HUMAN_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd 'at' HH:mm");
     private static final DateTimeFormatter TIME_FORMATTER = DateTimeFormatter.ofPattern("HH:mm");
 
-    public static OffsetDateTime toOffsetDateTime(LocalDateTime ldt) {
+    public static @Nullable OffsetDateTime toOffsetDateTime(@Nullable LocalDateTime ldt) {
         if (ldt == null) {
             return null;
         }
         return ldt.atOffset(ZoneOffset.UTC);
     }
 
-    public static OffsetDateTime toOffsetDateTime(Instant instant) {
+    public static @Nullable OffsetDateTime toOffsetDateTime(@Nullable Instant instant) {
         if (instant == null) {
             return null;
         }
         return instant.atOffset(ZoneOffset.UTC);
     }
 
-    public static Instant toInstant(OffsetDateTime odt) {
+    public static @Nullable Instant toInstant(@Nullable OffsetDateTime odt) {
         if (odt == null) {
             return null;
         }
         return odt.toInstant();
     }
 
-    public static Instant toInstant(LocalDateTime ldt) {
+    public static @Nullable Instant toInstant(@Nullable LocalDateTime ldt) {
         if (ldt == null) {
             return null;
         }
         return ldt.toInstant(ZoneOffset.UTC);
     }
 
-    public static LocalDateTime toLocalDateTime(OffsetDateTime dt) {
+    public static @Nullable LocalDateTime toLocalDateTime(@Nullable OffsetDateTime dt) {
         if (dt == null) {
             return null;
         }
         return dt.toLocalDateTime();
     }
 
-    public static LocalDateTime toLocalDateTime(Instant instant) {
+    public static @Nullable LocalDateTime toLocalDateTime(@Nullable Instant instant) {
         if (instant == null) {
             return null;
         }
@@ -84,14 +85,14 @@ public final class DateTimeUtils {
     /**
      * Print the date/time nicer, if it's from today, yesterday or tomorrow.
      */
-    public static String humanize(Instant dt, ZoneId timeZone) {
+    public static String humanize(@Nullable Instant dt, ZoneId timeZone) {
         if (dt == null) {
             return "";
         }
         return humanize(dt.atZone(timeZone).toLocalDateTime());
     }
 
-    public static String humanize(LocalDateTime dt) {
+    public static String humanize(@Nullable LocalDateTime dt) {
         if (dt == null) {
             return "";
         }
@@ -130,7 +131,7 @@ public final class DateTimeUtils {
         var minutes = duration.toMinutes();
         duration = duration.minusMinutes(minutes);
 
-        var seconds = duration.getSeconds();
+        var seconds = duration.toSeconds();
 
         var sb = new StringBuilder();
         if (days > 0) {

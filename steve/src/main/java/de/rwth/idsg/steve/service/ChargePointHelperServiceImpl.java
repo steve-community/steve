@@ -73,6 +73,7 @@ public class ChargePointHelperServiceImpl implements ChargePointHelperService {
     private final Ocpp15WebSocketEndpoint ocpp15WebSocketEndpoint;
     private final Ocpp16WebSocketEndpoint ocpp16WebSocketEndpoint;
 
+    @Override
     public Statistics getStats() {
         var stats = genericRepository.getStats();
         stats.setNumOcpp12JChargeBoxes(ocpp12WebSocketEndpoint.getNumberOfChargeBoxes());
@@ -85,6 +86,7 @@ public class ChargePointHelperServiceImpl implements ChargePointHelperService {
         return stats;
     }
 
+    @Override
     public List<ConnectorStatus> getChargePointConnectorStatus(ConnectorStatusForm params) {
         var ocpp12Map = ocpp12WebSocketEndpoint.getACopy();
         var ocpp15Map = ocpp15WebSocketEndpoint.getACopy();
@@ -107,6 +109,7 @@ public class ChargePointHelperServiceImpl implements ChargePointHelperService {
         return latestList;
     }
 
+    @Override
     public List<OcppJsonStatus> getOcppJsonStatus(ZoneId timeZone) {
         var ocpp12Map = ocpp12WebSocketEndpoint.getACopy();
         var ocpp15Map = ocpp15WebSocketEndpoint.getACopy();
@@ -124,11 +127,13 @@ public class ChargePointHelperServiceImpl implements ChargePointHelperService {
         return returnList;
     }
 
+    @Override
     public List<ChargePointSelect> getChargePoints(OcppVersion version) {
         return getChargePoints(
                 version, Collections.singletonList(RegistrationStatus.ACCEPTED), Collections.emptyList());
     }
 
+    @Override
     public List<ChargePointSelect> getChargePoints(OcppVersion version, List<RegistrationStatus> inStatusFilter) {
         return getChargePoints(version, inStatusFilter, Collections.emptyList());
     }
@@ -139,19 +144,14 @@ public class ChargePointHelperServiceImpl implements ChargePointHelperService {
 
     public List<ChargePointSelect> getChargePoints(
             OcppVersion version, List<RegistrationStatus> inStatusFilter, List<String> chargeBoxIdFilter) {
-        switch (version) {
-            case V_12:
-                return getChargePoints(
-                        OcppProtocol.V_12_SOAP, inStatusFilter, chargeBoxIdFilter, ocpp12WebSocketEndpoint);
-            case V_15:
-                return getChargePoints(
-                        OcppProtocol.V_15_SOAP, inStatusFilter, chargeBoxIdFilter, ocpp15WebSocketEndpoint);
-            case V_16:
-                return getChargePoints(
-                        OcppProtocol.V_16_SOAP, inStatusFilter, chargeBoxIdFilter, ocpp16WebSocketEndpoint);
-            default:
-                throw new IllegalArgumentException("Unknown OCPP version: " + version);
-        }
+        return switch (version) {
+            case V_12 ->
+                getChargePoints(OcppProtocol.V_12_SOAP, inStatusFilter, chargeBoxIdFilter, ocpp12WebSocketEndpoint);
+            case V_15 ->
+                getChargePoints(OcppProtocol.V_15_SOAP, inStatusFilter, chargeBoxIdFilter, ocpp15WebSocketEndpoint);
+            case V_16 ->
+                getChargePoints(OcppProtocol.V_16_SOAP, inStatusFilter, chargeBoxIdFilter, ocpp16WebSocketEndpoint);
+        };
     }
 
     // -------------------------------------------------------------------------

@@ -64,31 +64,21 @@ public class Deserializer implements Consumer<CommunicationContext> {
      */
     @Override
     public void accept(CommunicationContext context) {
-        try (JsonParser parser = ocppMapper.getFactory().createParser(context.getIncomingString())) {
+        try (var parser = ocppMapper.getFactory().createParser(context.getIncomingString())) {
             parser.nextToken(); // set cursor to '['
 
             parser.nextToken();
-            int messageTypeNr = parser.getIntValue();
+            var messageTypeNr = parser.getIntValue();
 
             parser.nextToken();
-            String messageId = parser.getText();
+            var messageId = parser.getText();
 
-            MessageType messageType = MessageType.fromTypeNr(messageTypeNr);
+            var messageType = MessageType.fromTypeNr(messageTypeNr);
             switch (messageType) {
-                case CALL:
-                    handleCall(context, messageId, parser);
-                    break;
-
-                case CALL_RESULT:
-                    handleResult(context, messageId, parser);
-                    break;
-
-                case CALL_ERROR:
-                    handleError(context, messageId, parser);
-                    break;
-
-                default:
-                    throw new SteveException("Unknown enum type");
+                case CALL -> handleCall(context, messageId, parser);
+                case CALL_RESULT -> handleResult(context, messageId, parser);
+                case CALL_ERROR -> handleError(context, messageId, parser);
+                default -> throw new SteveException("Unknown enum type");
             }
         } catch (IOException e) {
             throw new SteveException("Deserialization of incoming string failed: %s", context.getIncomingString(), e);
@@ -115,7 +105,7 @@ public class Deserializer implements Consumer<CommunicationContext> {
         }
 
         // find action class
-        Class<? extends RequestType> clazz = typeStore.findRequestClass(action);
+        var clazz = typeStore.findRequestClass(action);
         if (clazz == null) {
             context.setOutgoingMessage(ErrorFactory.actionNotFound(messageId, action));
             return;
@@ -125,7 +115,7 @@ public class Deserializer implements Consumer<CommunicationContext> {
         RequestType req;
         try {
             parser.nextToken();
-            JsonNode requestPayload = parser.readValueAsTree();
+            var requestPayload = parser.readValueAsTree();
 
             // https://github.com/steve-community/steve/issues/1109
             if (requestPayload instanceof NullNode) {
@@ -139,7 +129,7 @@ public class Deserializer implements Consumer<CommunicationContext> {
             return;
         }
 
-        OcppJsonCall call = new OcppJsonCall();
+        var call = new OcppJsonCall();
         call.setMessageId(messageId);
         call.setAction(action);
         call.setPayload(req);
@@ -168,7 +158,7 @@ public class Deserializer implements Consumer<CommunicationContext> {
             throw new SteveException("Deserialization of incoming response payload failed", e);
         }
 
-        OcppJsonResult result = new OcppJsonResult();
+        var result = new OcppJsonResult();
         result.setMessageId(messageId);
         result.setPayload(res);
 
@@ -181,7 +171,7 @@ public class Deserializer implements Consumer<CommunicationContext> {
      * There is no mechanism in OCPP to report back such erroneous messages.
      */
     private void handleError(CommunicationContext context, String messageId, JsonParser parser) {
-        FutureResponseContext responseContext = futureResponseContextStore.get(context.getSession(), messageId);
+        var responseContext = futureResponseContextStore.get(context.getSession(), messageId);
         if (responseContext == null) {
             throw new SteveException(
                     "An error message was received as response to a not-sent call. The message was: %s",
@@ -217,7 +207,7 @@ public class Deserializer implements Consumer<CommunicationContext> {
             throw new SteveException("Deserialization of incoming error message failed", e);
         }
 
-        OcppJsonError error = new OcppJsonError();
+        var error = new OcppJsonError();
         error.setMessageId(messageId);
         error.setErrorCode(code);
         error.setErrorDescription(desc);

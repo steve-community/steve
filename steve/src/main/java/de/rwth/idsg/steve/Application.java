@@ -37,8 +37,8 @@ public class Application {
 
     private final JettyServer server;
 
-    public Application(SteveConfiguration config) {
-        server = new JettyServer(config);
+    public Application(SteveConfiguration config, LogFileRetriever logFileRetriever) {
+        server = new JettyServer(config, logFileRetriever);
     }
 
     public static void main(String[] args) throws Exception {
@@ -55,13 +55,14 @@ public class Application {
                 sc.getTimeZoneId(),
                 ZonedDateTime.now(zoneId));
 
-        Optional<Path> path = LogFileRetriever.INSTANCE.getPath();
+        LogFileRetriever logFileRetriever = new LogFileRetriever();
+        Optional<Path> path = logFileRetriever.getPath();
         boolean loggingToFile = path.isPresent();
         if (loggingToFile) {
             System.out.println("Log file: " + path.get().toAbsolutePath());
         }
 
-        Application app = new Application(sc);
+        Application app = new Application(sc, logFileRetriever);
 
         try {
             app.start();

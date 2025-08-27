@@ -21,6 +21,7 @@ package de.rwth.idsg.steve;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.rwth.idsg.steve.ocpp.OcppVersion;
 import de.rwth.idsg.steve.ocpp.ws.JsonObjectMapper;
+import de.rwth.idsg.steve.utils.LogFileRetriever;
 import de.rwth.idsg.steve.utils.OcppJsonChargePoint;
 import de.rwth.idsg.steve.utils.SteveConfigurationReader;
 import de.rwth.idsg.steve.utils.__DatabasePreparer__;
@@ -68,7 +69,7 @@ public class ApplicationJsonTest {
 
         path = getWsPath(config);
 
-        app = new Application(config);
+        app = new Application(config, new LogFileRetriever());
         app.start();
     }
 

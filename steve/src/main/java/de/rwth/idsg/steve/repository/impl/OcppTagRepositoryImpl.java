@@ -112,22 +112,16 @@ public class OcppTagRepositoryImpl implements OcppTagRepository {
         }
 
         switch (form.getExpired()) {
-            case ALL:
-                break;
-
-            case TRUE:
-                selectQuery.addConditions(OCPP_TAG_ACTIVITY.EXPIRY_DATE.lessOrEqual(LocalDateTime.now()));
-                break;
-
-            case FALSE:
+            case ALL -> {
+                // want all: no filter
+            }
+            case TRUE -> selectQuery.addConditions(OCPP_TAG_ACTIVITY.EXPIRY_DATE.lessOrEqual(LocalDateTime.now()));
+            case FALSE ->
                 selectQuery.addConditions(OCPP_TAG_ACTIVITY
                         .EXPIRY_DATE
                         .isNull()
                         .or(OCPP_TAG_ACTIVITY.EXPIRY_DATE.greaterThan(LocalDateTime.now())));
-                break;
-
-            default:
-                throw new SteveException("Unknown enum type");
+            default -> throw new SteveException("Unknown enum type");
         }
 
         processBooleanType(selectQuery, OCPP_TAG_ACTIVITY.IN_TRANSACTION, form.getInTransaction());

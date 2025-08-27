@@ -30,6 +30,6 @@ import org.jspecify.annotations.Nullable;
 @Setter
 public class RequestResult<T> {
     private String response;
-    private String errorMessage;
+    private @Nullable String errorMessage;
     private @Nullable T details;
 }

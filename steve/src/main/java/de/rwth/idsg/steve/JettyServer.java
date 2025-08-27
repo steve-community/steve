@@ -18,6 +18,7 @@
  */
 package de.rwth.idsg.steve;
 
+import de.rwth.idsg.steve.utils.LogFileRetriever;
 import de.rwth.idsg.steve.web.dto.EndpointInfo;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.jetty.http.HttpScheme;
@@ -33,6 +34,7 @@ import org.eclipse.jetty.server.SslConnectionFactory;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.eclipse.jetty.util.thread.QueuedThreadPool;
 import org.eclipse.jetty.util.thread.ScheduledExecutorScheduler;
+import org.jspecify.annotations.Nullable;
 
 import java.net.DatagramSocket;
 import java.net.Inet4Address;
@@ -59,9 +61,10 @@ import java.util.function.Function;
 public class JettyServer {
 
     private final SteveConfiguration config;
+    private final LogFileRetriever logFileRetriever;
     private final EndpointInfo info;
 
-    private Server server;
+    private @Nullable Server server;
     private SteveAppContext steveAppContext;
 
     private static final int MIN_THREADS = 4;
@@ -70,8 +73,9 @@ public class JettyServer {
     private static final long STOP_TIMEOUT = TimeUnit.SECONDS.toMillis(5);
     private static final long IDLE_TIMEOUT = TimeUnit.MINUTES.toMillis(1);
 
-    public JettyServer(SteveConfiguration config) {
+    public JettyServer(SteveConfiguration config, LogFileRetriever logFileRetriever) {
         this.config = config;
+        this.logFileRetriever = logFileRetriever;
         this.info = new EndpointInfo(config);
     }
 
@@ -121,7 +125,7 @@ public class JettyServer {
             server.addConnector(httpsConnector(httpConfig));
         }
 
-        steveAppContext = new SteveAppContext(config, info);
+        steveAppContext = new SteveAppContext(config, logFileRetriever, info);
         server.setHandler(steveAppContext.getHandlers());
     }
 

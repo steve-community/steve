@@ -128,13 +128,13 @@ public class ChargePointsController {
 
         var protocol = OcppProtocol.fromCompositeValue(chargeBoxRecord.getOcppProtocol());
         switch (protocol.getVersion()) {
-            case V_12:
-            case V_15:
+            case V_12, V_15 -> {
                 return upToOcpp15RegistrationStatusList;
-            case V_16:
+            }
+            case V_16 -> {
                 return ocpp16RegistrationStatusList;
-            default:
-                throw new IllegalArgumentException("Unknown OCPP version: " + protocol.getVersion());
+            }
+            default -> throw new IllegalArgumentException("Unknown OCPP version: " + protocol.getVersion());
         }
     }
 

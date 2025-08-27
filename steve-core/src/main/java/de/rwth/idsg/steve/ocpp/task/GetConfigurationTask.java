@@ -21,7 +21,6 @@ package de.rwth.idsg.steve.ocpp.task;
 import com.google.common.base.Joiner;
 import de.rwth.idsg.steve.ocpp.Ocpp15AndAboveTask;
 import de.rwth.idsg.steve.ocpp.OcppCallback;
-import de.rwth.idsg.steve.ocpp.RequestResult;
 import de.rwth.idsg.steve.web.dto.ocpp.GetConfigurationParams;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -52,7 +51,7 @@ public class GetConfigurationTask
             public void success(String chargeBoxId, ResponseWrapper response) {
                 addNewResponse(chargeBoxId, "OK");
 
-                RequestResult result = getResultMap().get(chargeBoxId);
+                var result = getResultMap().get(chargeBoxId);
                 result.setDetails(response);
             }
         };

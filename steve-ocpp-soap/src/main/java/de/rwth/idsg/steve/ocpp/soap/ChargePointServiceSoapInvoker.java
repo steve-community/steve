@@ -68,7 +68,7 @@ public class ChargePointServiceSoapInvoker implements ChargePointServiceInvoker 
     // -------------------------------------------------------------------------
     // since Ocpp 1.2
     // -------------------------------------------------------------------------
-
+    @Override
     public void reset(ChargePointSelect cp, ResetTask task) {
         switch (cp.getOcppProtocol().getVersion()) {
             case V_12 ->

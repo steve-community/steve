@@ -19,6 +19,7 @@
 package de.rwth.idsg.steve.web;
 
 import com.google.common.base.Strings;
+import org.jspecify.annotations.Nullable;
 
 import java.beans.PropertyEditorSupport;
 import java.time.LocalDate;
@@ -33,7 +34,7 @@ public class LocalDateEditor extends PropertyEditorSupport {
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
     @Override
-    public String getAsText() {
+    public @Nullable String getAsText() {
         Object value = getValue();
         if (value == null) {
             return null;

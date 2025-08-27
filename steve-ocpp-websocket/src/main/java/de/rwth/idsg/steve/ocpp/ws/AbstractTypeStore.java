@@ -24,6 +24,7 @@ import com.google.common.reflect.ClassPath;
 import de.rwth.idsg.ocpp.jaxb.RequestType;
 import de.rwth.idsg.ocpp.jaxb.ResponseType;
 import de.rwth.idsg.steve.ocpp.ws.data.ActionResponsePair;
+import org.jspecify.annotations.Nullable;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -47,12 +48,12 @@ public abstract class AbstractTypeStore implements TypeStore {
     }
 
     @Override
-    public Class<? extends RequestType> findRequestClass(String action) {
+    public @Nullable Class<? extends RequestType> findRequestClass(String action) {
         return requestClassMap.get(action);
     }
 
     @Override
-    public <T extends RequestType> ActionResponsePair findActionResponse(T requestPayload) {
+    public <T extends RequestType> @Nullable ActionResponsePair findActionResponse(T requestPayload) {
         return actionResponseMap.get(requestPayload.getClass());
     }
 

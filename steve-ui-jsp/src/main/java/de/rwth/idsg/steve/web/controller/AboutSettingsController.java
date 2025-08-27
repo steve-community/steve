@@ -35,7 +35,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.time.ZoneId;
 import jakarta.validation.Valid;
 
@@ -73,7 +73,7 @@ public class AboutSettingsController {
         model.addAttribute("version", config.getSteveVersion());
         model.addAttribute("db", genericRepository.getDBVersion());
         model.addAttribute("logFile", logController.getLogFilePath());
-        model.addAttribute("systemTime", LocalDateTime.now());
+        model.addAttribute("systemTime", Instant.now());
         model.addAttribute("systemTimeZone", ZoneId.systemDefault());
         model.addAttribute("releaseReport", releaseCheckService.check());
         model.addAttribute("endpointInfo", info);

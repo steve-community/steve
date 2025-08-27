@@ -20,6 +20,7 @@ package de.rwth.idsg.steve;
 
 import lombok.Builder;
 import lombok.Getter;
+import org.jspecify.annotations.Nullable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 /**
@@ -46,14 +47,14 @@ public class SteveConfiguration {
         // Dummy service path
         private final String routerEndpointPath;
 
-        private final String contextPath;
+        private final @Nullable String contextPath;
     }
 
     private final Paths paths;
     // Time zone for the application and database connections
     private final String timeZoneId;
     private final String steveVersion;
-    private final String gitDescribe;
+    private final @Nullable String gitDescribe;
     private final ApplicationProfile profile;
     private final Ocpp ocpp;
     private final Auth auth;
@@ -94,8 +95,8 @@ public class SteveConfiguration {
         // HTTPS
         private final boolean httpsEnabled;
         private final int httpsPort;
-        private final String keyStorePath;
-        private final String keyStorePassword;
+        private final @Nullable String keyStorePath;
+        private final @Nullable String keyStorePassword;
     }
 
     // Database configuration
@@ -120,8 +121,8 @@ public class SteveConfiguration {
     @Builder
     @Getter
     public static class WebApi {
-        private final String headerKey;
-        private final String headerValue;
+        private final @Nullable String headerKey;
+        private final @Nullable String headerValue;
     }
 
     // OCPP-related configuration
@@ -129,7 +130,7 @@ public class SteveConfiguration {
     @Getter
     public static class Ocpp {
         private final boolean autoRegisterUnknownStations;
-        private final String chargeBoxIdValidationRegex;
+        private final @Nullable String chargeBoxIdValidationRegex;
         private final String wsSessionSelectStrategy;
     }
 }

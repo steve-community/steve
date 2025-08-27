@@ -46,7 +46,7 @@ public class TransactionDetails {
     @Getter
     @Builder
     public static class MeterValues {
-        private final Instant valueTimestamp;
+        private final @Nullable Instant valueTimestamp;
         private final String value, readingContext, format, measurand, location, unit;
 
         // New in OCPP 1.6

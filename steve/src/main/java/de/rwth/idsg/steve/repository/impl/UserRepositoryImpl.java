@@ -36,6 +36,7 @@ import org.jooq.Result;
 import org.jooq.SelectConditionStep;
 import org.jooq.exception.DataAccessException;
 import org.jooq.impl.DSL;
+import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.CollectionUtils;
 
@@ -182,7 +183,7 @@ public class UserRepositoryImpl implements UserRepository {
                 .fetch();
     }
 
-    private Map<Integer, List<User.OcppTagEntry>> getOcppTagsInternal(Integer userPk, String ocppIdTag) {
+    private Map<Integer, List<User.OcppTagEntry>> getOcppTagsInternal(Integer userPk, @Nullable String ocppIdTag) {
         var conditions = new ArrayList<Condition>();
 
         if (userPk != null) {
@@ -238,7 +239,7 @@ public class UserRepositoryImpl implements UserRepository {
         }
     }
 
-    private void updateInternal(DSLContext ctx, UserForm form, Integer addressPk) {
+    private void updateInternal(DSLContext ctx, UserForm form, @Nullable Integer addressPk) {
         ctx.update(USER)
                 .set(USER.FIRST_NAME, form.getFirstName())
                 .set(USER.LAST_NAME, form.getLastName())

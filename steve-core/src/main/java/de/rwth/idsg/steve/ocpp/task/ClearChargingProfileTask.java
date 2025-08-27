@@ -51,19 +51,18 @@ public class ClearChargingProfileTask extends Ocpp16AndAboveTask<ClearChargingPr
                 addNewResponse(chargeBoxId, statusValue);
 
                 switch (params.getFilterType()) {
-                    case ChargingProfileId:
+                    case ChargingProfileId ->
                         chargingProfileRepository.clearProfile(params.getChargingProfilePk(), chargeBoxId);
-                        break;
-                    case OtherParameters:
+                    case OtherParameters ->
                         chargingProfileRepository.clearProfile(
                                 chargeBoxId,
                                 params.getConnectorId(),
                                 params.getChargingProfilePurpose(),
                                 params.getStackLevel());
-                        break;
-                    default:
+                    default -> {
                         log.warn("Unexpected {} enum value", ClearChargingProfileFilterType.class.getSimpleName());
                         return;
+                    }
                 }
 
                 // https://github.com/steve-community/steve/pull/968

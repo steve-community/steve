@@ -25,6 +25,7 @@ import ocpp.cp._2015._10.ChargingProfileKindType;
 import ocpp.cp._2015._10.ChargingProfilePurposeType;
 import ocpp.cp._2015._10.ChargingRateUnitType;
 import ocpp.cp._2015._10.RecurrencyKindType;
+import org.jspecify.annotations.Nullable;
 
 import java.math.BigDecimal;
 import java.time.Instant;
@@ -59,7 +60,7 @@ public class ChargingProfileForm {
 
     @NotNull(message = "Charging Profile Kind has to be set") private ChargingProfileKindType chargingProfileKind;
 
-    private RecurrencyKindType recurrencyKind;
+    private @Nullable RecurrencyKindType recurrencyKind;
 
     private Instant validFrom;
 

@@ -22,6 +22,7 @@ import de.rwth.idsg.steve.ocpp.OcppProtocol;
 import de.rwth.idsg.steve.ocpp.soap.MessageHeaderInterceptor;
 import de.rwth.idsg.steve.repository.ReservationStatus;
 import de.rwth.idsg.steve.service.CentralSystemService16_Service;
+import de.rwth.idsg.steve.utils.LogFileRetriever;
 import de.rwth.idsg.steve.utils.SteveConfigurationReader;
 import de.rwth.idsg.steve.utils.__DatabasePreparer__;
 import lombok.extern.slf4j.Slf4j;
@@ -81,7 +82,7 @@ public class OperationalTestSoapOCPP16 {
 
         path = getHttpPath(config);
 
-        app = new Application(config);
+        app = new Application(config, new LogFileRetriever());
         app.start();
     }
 

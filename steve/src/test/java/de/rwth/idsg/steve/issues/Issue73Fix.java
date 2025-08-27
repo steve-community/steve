@@ -21,6 +21,7 @@ package de.rwth.idsg.steve.issues;
 import com.google.common.collect.Lists;
 import de.rwth.idsg.steve.Application;
 import de.rwth.idsg.steve.ApplicationProfile;
+import de.rwth.idsg.steve.utils.LogFileRetriever;
 import de.rwth.idsg.steve.utils.SteveConfigurationReader;
 import de.rwth.idsg.steve.utils.__DatabasePreparer__;
 import ocpp.cs._2015._10.AuthorizationStatus;
@@ -59,7 +60,7 @@ public class Issue73Fix {
 
         path = getHttpPath(config);
 
-        var app = new Application(config);
+        var app = new Application(config, new LogFileRetriever());
         try {
             app.start();
             test();

@@ -20,6 +20,7 @@ package de.rwth.idsg.steve.ocpp.ws;
 
 import de.rwth.idsg.steve.ocpp.ws.data.ErrorCode;
 import de.rwth.idsg.steve.ocpp.ws.data.OcppJsonError;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Error generation should be handled by a central component for better control over the codes and messages.
@@ -56,7 +57,7 @@ public final class ErrorFactory {
                 null);
     }
 
-    public static OcppJsonError payloadProcessingError(String messageId, String details) {
+    public static OcppJsonError payloadProcessingError(String messageId, @Nullable String details) {
         return setFields(
                 messageId,
                 ErrorCode.InternalError,
@@ -64,7 +65,7 @@ public final class ErrorFactory {
                 details);
     }
 
-    private static OcppJsonError setFields(String messageId, ErrorCode code, String desc, String details) {
+    private static OcppJsonError setFields(String messageId, ErrorCode code, String desc, @Nullable String details) {
         OcppJsonError error = new OcppJsonError();
         error.setMessageId(messageId);
         error.setErrorCode(code);

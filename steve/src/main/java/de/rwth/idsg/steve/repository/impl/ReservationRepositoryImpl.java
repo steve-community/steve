@@ -269,18 +269,12 @@ public class ReservationRepositoryImpl implements ReservationRepository {
 
     private void processType(SelectQuery selectQuery, ReservationQueryForm form) {
         switch (form.getPeriodType()) {
-            case ACTIVE:
-                selectQuery.addConditions(RESERVATION.EXPIRY_DATETIME.greaterThan(LocalDateTime.now()));
-                break;
-
-            case FROM_TO:
+            case ACTIVE -> selectQuery.addConditions(RESERVATION.EXPIRY_DATETIME.greaterThan(LocalDateTime.now()));
+            case FROM_TO ->
                 selectQuery.addConditions(
                         RESERVATION.START_DATETIME.greaterOrEqual(toLocalDateTime(form.getFrom())),
                         RESERVATION.EXPIRY_DATETIME.lessOrEqual(toLocalDateTime(form.getTo())));
-                break;
-
-            default:
-                throw new SteveException("Unknown enum type");
+            default -> throw new SteveException("Unknown enum type");
         }
     }
 

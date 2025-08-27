@@ -27,6 +27,7 @@ import de.rwth.idsg.steve.service.TransactionStopService;
 import de.rwth.idsg.steve.web.dto.ReservationQueryForm;
 import de.rwth.idsg.steve.web.dto.TransactionQueryForm;
 import lombok.RequiredArgsConstructor;
+import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -97,7 +98,7 @@ public class ReservationsController {
     }
 
     @GetMapping(value = TRANSACTIONS_QUERY_PATH)
-    public String getTransactionsQuery(
+    public @Nullable String getTransactionsQuery(
             @Valid @ModelAttribute(PARAMS) TransactionQueryForm params,
             BindingResult result,
             Model model,

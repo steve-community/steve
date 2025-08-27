@@ -34,7 +34,7 @@ public class NoAccessController {
     // HTTP methods
     // -------------------------------------------------------------------------
 
-    @GetMapping()
+    @GetMapping
     public String accessDenied() {
         return "noAccess";
     }

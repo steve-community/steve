@@ -62,13 +62,12 @@ public class MeterValue15Deserializer extends JsonDeserializer<List<MeterValue>>
 
         if (listNode.isMissingNode()) {
             return Collections.emptyList();
-        } else {
-            List<MeterValue> rootList = new ArrayList<>();
-            for (JsonNode node : listNode) {
-                rootList.add(buildMeterValue(mapper, node));
-            }
-            return rootList;
         }
+        var rootList = new ArrayList<MeterValue>();
+        for (var node : listNode) {
+            rootList.add(buildMeterValue(mapper, node));
+        }
+        return Collections.unmodifiableList(rootList);
     }
 
     // MeterValue

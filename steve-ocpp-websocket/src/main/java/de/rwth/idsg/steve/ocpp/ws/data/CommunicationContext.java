@@ -24,6 +24,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
+import org.jspecify.annotations.Nullable;
 import org.springframework.web.socket.WebSocketSession;
 
 import java.util.Map;
@@ -54,7 +55,7 @@ public class CommunicationContext {
     private OcppJsonMessage incomingMessage;
 
     @Setter
-    private OcppJsonMessage outgoingMessage;
+    private @Nullable OcppJsonMessage outgoingMessage;
 
     @Setter
     private FutureResponseContext futureResponseContext;
@@ -64,7 +65,7 @@ public class CommunicationContext {
     private Consumer<OcppJsonError> errorHandler;
 
     public boolean isSetOutgoingError() {
-        return (outgoingMessage != null) && (outgoingMessage instanceof OcppJsonError);
+        return outgoingMessage instanceof OcppJsonError;
     }
 
     @SuppressWarnings("unchecked")
@@ -83,7 +84,7 @@ public class CommunicationContext {
         private final ResponseType payload;
 
         @Override
-        public Map<String, Object> getContext() {
+        public @Nullable Map<String, Object> getContext() {
             return null;
         }
 

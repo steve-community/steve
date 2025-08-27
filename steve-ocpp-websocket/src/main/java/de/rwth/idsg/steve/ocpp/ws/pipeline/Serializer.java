@@ -25,10 +25,8 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import de.rwth.idsg.steve.SteveException;
 import de.rwth.idsg.steve.ocpp.ws.ErrorFactory;
 import de.rwth.idsg.steve.ocpp.ws.data.CommunicationContext;
-import de.rwth.idsg.steve.ocpp.ws.data.MessageType;
 import de.rwth.idsg.steve.ocpp.ws.data.OcppJsonCall;
 import de.rwth.idsg.steve.ocpp.ws.data.OcppJsonError;
-import de.rwth.idsg.steve.ocpp.ws.data.OcppJsonMessage;
 import de.rwth.idsg.steve.ocpp.ws.data.OcppJsonResult;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -52,29 +50,18 @@ public class Serializer implements Consumer<CommunicationContext> {
 
     @Override
     public void accept(CommunicationContext context) {
-        OcppJsonMessage message = context.getOutgoingMessage();
+        var message = context.getOutgoingMessage();
 
-        ArrayNode str;
-        MessageType messageType = message.getMessageType();
-        switch (messageType) {
-            case CALL:
-                str = handleCall((OcppJsonCall) message);
-                break;
-
-            case CALL_RESULT:
-                str = handleResult((OcppJsonResult) message);
-                break;
-
-            case CALL_ERROR:
-                str = handleError((OcppJsonError) message);
-                break;
-
-            default:
-                throw new SteveException("Unknown enum type");
-        }
+        var messageType = message.getMessageType();
+        var str =
+                switch (messageType) {
+                    case CALL -> handleCall((OcppJsonCall) message);
+                    case CALL_RESULT -> handleResult((OcppJsonResult) message);
+                    case CALL_ERROR -> handleError((OcppJsonError) message);
+                };
 
         try {
-            String result = ocppMapper.writeValueAsString(str);
+            var result = ocppMapper.writeValueAsString(str);
             context.setOutgoingString(result);
         } catch (IOException e) {
             throw new SteveException("The outgoing message could not be serialized", e);

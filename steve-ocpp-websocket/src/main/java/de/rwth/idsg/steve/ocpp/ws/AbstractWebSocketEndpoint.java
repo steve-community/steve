@@ -30,6 +30,7 @@ import de.rwth.idsg.steve.repository.OcppServerRepository;
 import de.rwth.idsg.steve.service.notification.OcppStationWebSocketConnected;
 import de.rwth.idsg.steve.service.notification.OcppStationWebSocketDisconnected;
 import lombok.RequiredArgsConstructor;
+import org.jspecify.annotations.Nullable;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.web.socket.BinaryMessage;
 import org.springframework.web.socket.CloseStatus;
@@ -45,7 +46,6 @@ import java.util.Collections;
 import java.util.Deque;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ScheduledFuture;
 import java.util.function.Consumer;
 
 /**
@@ -67,16 +67,16 @@ public abstract class AbstractWebSocketEndpoint extends ConcurrentWebSocketHandl
     private final List<Consumer<String>> disconnectedCallbackList = new ArrayList<>();
     private final Object sessionContextLock = new Object();
 
-    private IncomingPipeline pipeline;
+    private @Nullable IncomingPipeline pipeline;
 
     public abstract OcppVersion getVersion();
 
     public void init(IncomingPipeline pipeline) {
         this.pipeline = pipeline;
 
-        connectedCallbackList.add((chargeBoxId) ->
-                applicationEventPublisher.publishEvent(new OcppStationWebSocketConnected(chargeBoxId)));
-        disconnectedCallbackList.add((chargeBoxId) ->
+        connectedCallbackList.add(
+                chargeBoxId -> applicationEventPublisher.publishEvent(new OcppStationWebSocketConnected(chargeBoxId)));
+        disconnectedCallbackList.add(chargeBoxId ->
                 applicationEventPublisher.publishEvent(new OcppStationWebSocketDisconnected(chargeBoxId)));
     }
 
@@ -87,23 +87,18 @@ public abstract class AbstractWebSocketEndpoint extends ConcurrentWebSocketHandl
 
     @Override
     public void onMessage(WebSocketSession session, WebSocketMessage<?> message) throws Exception {
-        if (message instanceof TextMessage) {
-            handleTextMessage(session, (TextMessage) message);
-
-        } else if (message instanceof PongMessage) {
-            handlePongMessage(session);
-
-        } else if (message instanceof BinaryMessage) {
-            session.close(CloseStatus.NOT_ACCEPTABLE.withReason("Binary messages not supported"));
-
-        } else {
-            throw new IllegalStateException("Unexpected WebSocket message type: " + message);
+        switch (message) {
+            case TextMessage textMessage -> handleTextMessage(session, textMessage);
+            case PongMessage pongMessage -> handlePongMessage(session);
+            case BinaryMessage binaryMessage ->
+                session.close(CloseStatus.NOT_ACCEPTABLE.withReason("Binary messages not supported"));
+            default -> throw new IllegalStateException("Unexpected WebSocket message type: " + message);
         }
     }
 
-    private void handleTextMessage(WebSocketSession session, TextMessage webSocketMessage) throws Exception {
-        String incomingString = webSocketMessage.getPayload();
-        String chargeBoxId = getChargeBoxId(session);
+    private void handleTextMessage(WebSocketSession session, TextMessage webSocketMessage) {
+        var incomingString = webSocketMessage.getPayload();
+        var chargeBoxId = getChargeBoxId(session);
 
         // https://github.com/steve-community/steve/issues/66
         if (Strings.isNullOrEmpty(incomingString)) {
@@ -113,7 +108,7 @@ public abstract class AbstractWebSocketEndpoint extends ConcurrentWebSocketHandl
 
         WebSocketLogger.receivedText(chargeBoxId, session, incomingString);
 
-        CommunicationContext context = new CommunicationContext(session, chargeBoxId);
+        var context = new CommunicationContext(session, chargeBoxId);
         context.setIncomingString(incomingString);
 
         pipeline.accept(context);
@@ -126,14 +121,14 @@ public abstract class AbstractWebSocketEndpoint extends ConcurrentWebSocketHandl
 
     @Override
     public void onOpen(WebSocketSession session) throws Exception {
-        String chargeBoxId = getChargeBoxId(session);
+        var chargeBoxId = getChargeBoxId(session);
 
         WebSocketLogger.connected(chargeBoxId, session);
         ocppServerRepository.updateOcppProtocol(chargeBoxId, getVersion().toProtocol(OcppTransport.JSON));
 
         // Just to keep the connection alive, such that the servers do not close
         // the connection because of a idle timeout, we ping-pong at fixed intervals.
-        ScheduledFuture pingSchedule = asyncTaskScheduler.scheduleAtFixedRate(
+        var pingSchedule = asyncTaskScheduler.scheduleAtFixedRate(
                 new PingTask(chargeBoxId, session),
                 Instant.now().plus(OcppWebSocketConfiguration.PING_INTERVAL),
                 OcppWebSocketConfiguration.PING_INTERVAL);
@@ -156,7 +151,7 @@ public abstract class AbstractWebSocketEndpoint extends ConcurrentWebSocketHandl
 
     @Override
     public void onClose(WebSocketSession session, CloseStatus closeStatus) throws Exception {
-        String chargeBoxId = getChargeBoxId(session);
+        var chargeBoxId = getChargeBoxId(session);
 
         WebSocketLogger.closed(chargeBoxId, session, closeStatus);
 
@@ -190,7 +185,7 @@ public abstract class AbstractWebSocketEndpoint extends ConcurrentWebSocketHandl
     // Helpers
     // -------------------------------------------------------------------------
 
-    protected String getChargeBoxId(WebSocketSession session) {
+    protected @Nullable String getChargeBoxId(WebSocketSession session) {
         return (String) session.getAttributes().get(CHARGEBOX_ID_KEY);
     }
 

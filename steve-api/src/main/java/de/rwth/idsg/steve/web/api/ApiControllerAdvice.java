@@ -23,6 +23,7 @@ import de.rwth.idsg.steve.web.api.exception.BadRequestException;
 import de.rwth.idsg.steve.web.api.exception.NotFoundException;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
+import org.jspecify.annotations.Nullable;
 import org.springframework.beans.propertyeditors.StringTrimmerEditor;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.BindException;
@@ -100,7 +101,7 @@ public class ApiControllerAdvice {
         return createResponse(url, HttpStatus.INTERNAL_SERVER_ERROR, exception.getMessage());
     }
 
-    public static ApiErrorResponse createResponse(String url, HttpStatus status, String message) {
+    public static ApiErrorResponse createResponse(String url, HttpStatus status, @Nullable String message) {
         ApiErrorResponse result = new ApiErrorResponse();
 
         result.setTimestamp(Instant.now());

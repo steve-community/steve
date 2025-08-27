@@ -21,6 +21,7 @@ package de.rwth.idsg.steve.web.api;
 import com.google.common.base.Strings;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.jspecify.annotations.Nullable;
 
 import java.beans.PropertyEditorSupport;
 import java.time.Instant;
@@ -34,7 +35,7 @@ import java.time.Instant;
 public class InstantEditor extends PropertyEditorSupport {
 
     @Override
-    public String getAsText() {
+    public @Nullable String getAsText() {
         Object value = getValue();
         if (value == null) {
             return null;

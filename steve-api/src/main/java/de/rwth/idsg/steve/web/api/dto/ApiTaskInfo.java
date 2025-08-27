@@ -25,8 +25,9 @@ import de.rwth.idsg.steve.ocpp.TaskOrigin;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
+import org.jspecify.annotations.Nullable;
 
-import java.time.OffsetDateTime;
+import java.time.Instant;
 import java.util.Map;
 
 /**
@@ -40,7 +41,7 @@ public class ApiTaskInfo {
     private Integer taskId;
 
     @Schema(description = "OCPP version")
-    private OcppVersion ocppVersion;
+    private @Nullable OcppVersion ocppVersion;
 
     @Schema(description = "OCPP operation")
     private String operationName;
@@ -58,10 +59,10 @@ public class ApiTaskInfo {
     private int resultSize;
 
     @Schema(description = "Starttime")
-    private OffsetDateTime startTimestamp;
+    private Instant startTimestamp;
 
     @Schema(description = "Endtime")
-    private OffsetDateTime endTimestamp;
+    private @Nullable Instant endTimestamp;
 
     @Schema(description = "Error count")
     private int errorCount;

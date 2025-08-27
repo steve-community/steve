@@ -20,12 +20,13 @@ package de.rwth.idsg.steve.ocpp.ws.data;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.jspecify.annotations.Nullable;
 
 @Getter
 @Setter
 public abstract non-sealed class AbstractOcppJsonMessage implements OcppJsonMessage {
     private final MessageType messageType;
-    private String messageId;
+    private @Nullable String messageId;
 
     protected AbstractOcppJsonMessage(MessageType messageType) {
         this.messageType = messageType;

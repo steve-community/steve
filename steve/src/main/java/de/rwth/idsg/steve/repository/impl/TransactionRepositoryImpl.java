@@ -360,36 +360,26 @@ public class TransactionRepositoryImpl implements TransactionRepository {
 
     private void processType(SelectQuery selectQuery, TransactionQueryForm form) {
         switch (form.getPeriodType()) {
-            case TODAY:
+            case TODAY ->
                 selectQuery.addConditions(date(TRANSACTION.START_TIMESTAMP).eq(LocalDate.now()));
-                break;
-
-            case LAST_10:
-            case LAST_30:
-            case LAST_90:
+            case LAST_10, LAST_30, LAST_90 -> {
                 var now = LocalDate.now();
                 selectQuery.addConditions(date(TRANSACTION.START_TIMESTAMP)
                         .between(now.minusDays(form.getPeriodType().getInterval()), now));
-                break;
-
-            case ALL:
-                break;
-
-            case FROM_TO:
+            }
+            case ALL -> {
+                // want all: no timestamp filter
+            }
+            case FROM_TO -> {
                 var from = toLocalDateTime(form.getFrom());
                 var to = toLocalDateTime(form.getTo());
 
-                if (form.getType() == TransactionQueryForm.QueryType.ACTIVE) {
-                    selectQuery.addConditions(TRANSACTION.START_TIMESTAMP.between(from, to));
-
-                } else if (form.getType() == TransactionQueryForm.QueryType.STOPPED) {
-                    selectQuery.addConditions(TRANSACTION.STOP_TIMESTAMP.between(from, to));
+                switch (form.getType()) {
+                    case ACTIVE -> selectQuery.addConditions(TRANSACTION.START_TIMESTAMP.between(from, to));
+                    case STOPPED -> selectQuery.addConditions(TRANSACTION.STOP_TIMESTAMP.between(from, to));
                 }
-
-                break;
-
-            default:
-                throw new SteveException("Unknown enum type");
+            }
+            default -> throw new SteveException("Unknown enum type");
         }
     }
 

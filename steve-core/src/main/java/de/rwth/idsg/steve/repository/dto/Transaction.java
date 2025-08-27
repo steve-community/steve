@@ -74,7 +74,7 @@ public final class Transaction {
     private final String startValue;
 
     @Schema(description = "The timestamp at which the transaction started")
-    private final Instant startTimestamp;
+    private final @Nullable Instant startTimestamp;
 
     /**
      * Only relevant for the web pages. Disabled for API

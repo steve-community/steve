@@ -18,6 +18,7 @@
  */
 package de.rwth.idsg.steve;
 
+import de.rwth.idsg.steve.utils.LogFileRetriever;
 import de.rwth.idsg.steve.utils.SteveConfigurationReader;
 import de.rwth.idsg.steve.utils.__DatabasePreparer__;
 import lombok.extern.slf4j.Slf4j;
@@ -56,7 +57,7 @@ public class ApplicationTest {
 
         path = getHttpPath(config);
 
-        app = new Application(config);
+        app = new Application(config, new LogFileRetriever());
         app.start();
     }
 

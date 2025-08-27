@@ -19,6 +19,7 @@
 package de.rwth.idsg.ocpp.jaxb;
 
 import de.rwth.idsg.ocpp.DateTimeUtils;
+import org.jspecify.annotations.Nullable;
 
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
@@ -47,12 +48,12 @@ public class JavaDateTimeConverter extends XmlAdapter<String, OffsetDateTime> {
     }
 
     @Override
-    public OffsetDateTime unmarshal(String v) {
+    public @Nullable OffsetDateTime unmarshal(@Nullable String v) {
         return DateTimeUtils.toOffsetDateTime(v, fallbackZoneId);
     }
 
     @Override
-    public String marshal(OffsetDateTime v) {
+    public @Nullable String marshal(@Nullable OffsetDateTime v) {
         return DateTimeUtils.toString(v, marchallToUtc ? null : fallbackZoneId);
     }
 }

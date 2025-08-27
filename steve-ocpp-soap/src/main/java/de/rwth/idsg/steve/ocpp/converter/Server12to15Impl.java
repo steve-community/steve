@@ -44,6 +44,7 @@ import ocpp.cs._2012._06.MeterValuesRequest;
 import ocpp.cs._2012._06.StartTransactionRequest;
 import ocpp.cs._2012._06.StatusNotificationRequest;
 import ocpp.cs._2012._06.StopTransactionRequest;
+import org.jspecify.annotations.Nullable;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -197,7 +198,7 @@ public enum Server12to15Impl implements Server12to15 {
     // Helpers
     // -------------------------------------------------------------------------
 
-    private static IdTagInfo toOcpp12TagInfo(ocpp.cs._2012._06.IdTagInfo info15) {
+    private static @Nullable IdTagInfo toOcpp12TagInfo(ocpp.cs._2012._06.@Nullable IdTagInfo info15) {
         if (info15 == null) {
             return null;
         }

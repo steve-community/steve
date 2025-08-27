@@ -21,6 +21,7 @@ package de.rwth.idsg.steve.ocpp.ws.data;
 import de.rwth.idsg.ocpp.jaxb.RequestType;
 import lombok.Getter;
 import lombok.Setter;
+import org.jspecify.annotations.Nullable;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -29,8 +30,8 @@ import lombok.Setter;
 @Getter
 @Setter
 public final class OcppJsonCall extends AbstractOcppJsonMessage implements OcppJsonMessage {
-    private String action;
-    private RequestType payload;
+    private @Nullable String action;
+    private @Nullable RequestType payload;
 
     public OcppJsonCall() {
         super(MessageType.CALL);

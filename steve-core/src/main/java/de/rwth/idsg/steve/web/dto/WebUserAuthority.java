@@ -25,7 +25,6 @@ import org.jooq.JSON;
 
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 public enum WebUserAuthority {
@@ -55,9 +54,9 @@ public enum WebUserAuthority {
 
     public static WebUserAuthority fromJsonValue(ObjectMapper mapper, JSON v) {
         try {
-            List<String> values = Arrays.asList(mapper.readValue(v.data(), String[].class));
+            var values = new HashSet<>(Arrays.asList(mapper.readValue(v.data(), String[].class)));
             for (WebUserAuthority c: WebUserAuthority.values()) {
-                if (c.values.containsAll(values)) {
+                if (c.values.equals(values)) {
                     return c;
                 }
               }

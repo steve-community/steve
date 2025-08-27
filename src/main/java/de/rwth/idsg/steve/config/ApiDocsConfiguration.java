@@ -67,6 +67,8 @@ public class ApiDocsConfiguration {
         System.setProperty("springdoc.swagger-ui.tagsSorter", "alpha");
         // Sort endpoints (within a controller) alphabetically by their path
         System.setProperty("springdoc.swagger-ui.operationsSorter", "alpha");
+        // Sort schemas/DTOs alphabetically
+        System.setProperty("springdoc.writer-with-order-by-keys", "true");
     }
 
     @Bean

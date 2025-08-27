@@ -11,7 +11,7 @@
 
   <properties>
     <jooq.version>3.19.18</jooq.version>
-    <flyway.version>11.5.0</flyway.version>
+    <flyway.version>11.11.2</flyway.version>
 
     <db.ip>localhost</db.ip>
     <db.port>3306</db.port>

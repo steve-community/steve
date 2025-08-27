@@ -196,8 +196,8 @@ public class JettyServer {
                 .map(this::getConnectorPath)
                 .flatMap(ips -> ips.entrySet().stream())
                 .toList();
-        setList(list, isSecured -> isSecured ? "http" : "https", info.getWebInterface(), info.getWebInterface());
-        setList(list, isSecured -> isSecured ? "ws" : "wss", info.getOcppWebSocket());
+        setList(list, isSecured -> isSecured ? "https" : "http", info.getWebInterface(), info.getOcppSoap());
+        setList(list, isSecured -> isSecured ? "wss" : "ws", info.getOcppWebSocket());
     }
 
     private Map<String, Boolean> getConnectorPath(Connector c) {

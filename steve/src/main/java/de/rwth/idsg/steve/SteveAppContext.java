@@ -48,6 +48,7 @@ import org.springframework.web.servlet.DispatcherServlet;
 import java.io.IOException;
 import java.util.EnumSet;
 import java.util.HashSet;
+import java.util.Set;
 
 import static de.rwth.idsg.steve.config.OcppWebSocketConfiguration.IDLE_TIMEOUT;
 import static de.rwth.idsg.steve.config.OcppWebSocketConfiguration.MAX_MSG_SIZE;
@@ -65,7 +66,7 @@ public class SteveAppContext {
     public SteveAppContext(SteveConfiguration config, EndpointInfo info) {
         this.config = config;
         springContext = new AnnotationConfigWebApplicationContext();
-        GenericApplicationContext context = new GenericApplicationContext();
+        var context = new GenericApplicationContext();
         context.registerBean(SteveConfiguration.class, () -> config);
         context.registerBean(EndpointInfo.class, () -> info);
         context.refresh();
@@ -86,7 +87,7 @@ public class SteveAppContext {
      * Otherwise, defaults come from {@link WebSocketConstants}
      */
     public void configureWebSocket() {
-        JettyWebSocketServerContainer container = JettyWebSocketServerContainer.getContainer(webAppContext.getServletContext());
+        var container = JettyWebSocketServerContainer.getContainer(webAppContext.getServletContext());
         container.setMaxTextMessageSize(MAX_MSG_SIZE);
         container.setIdleTimeout(IDLE_TIMEOUT);
     }
@@ -102,7 +103,7 @@ public class SteveAppContext {
     }
 
     private WebAppContext initWebApp() {
-        WebAppContext ctx = new WebAppContext();
+        var ctx = new WebAppContext();
         ctx.setContextPath(config.getPaths().getContextPath());
         ctx.setBaseResourceAsString(getWebAppURIAsString());
 
@@ -114,10 +115,10 @@ public class SteveAppContext {
 
         ctx.addEventListener(new ContextLoaderListener(springContext));
 
-        ServletHolder web = new ServletHolder("spring-dispatcher", new DispatcherServlet(springContext));
+        var web = new ServletHolder("spring-dispatcher", new DispatcherServlet(springContext));
         ctx.addServlet(web, config.getPaths().getRootMapping());
 
-        ServletHolder cxf = new ServletHolder("cxf", new CXFServlet());
+        var cxf = new ServletHolder("cxf", new CXFServlet());
         ctx.addServlet(cxf, config.getPaths().getSoapMapping() + "/*");
 
         // add spring security
@@ -133,9 +134,9 @@ public class SteveAppContext {
     }
 
     private Handler getRedirectHandler() {
-        RewriteHandler rewrite = new RewriteHandler();
-        for (String redirect : getRedirectSet()) {
-            RedirectPatternRule rule = new RedirectPatternRule();
+        var rewrite = new RewriteHandler();
+        for (var redirect : getRedirectSet()) {
+            var rule = new RedirectPatternRule();
             rule.setTerminating(true);
             rule.setPattern(redirect);
             rule.setLocation(config.getPaths().getContextPath() + config.getPaths().getManagerMapping() + "/home");
@@ -144,12 +145,12 @@ public class SteveAppContext {
         return rewrite;
     }
 
-    private HashSet<String> getRedirectSet() {
-        String path = config.getPaths().getContextPath();
+    private Set<String> getRedirectSet() {
+        var path = config.getPaths().getContextPath();
 
-        HashSet<String> redirectSet = new HashSet<>(3);
+        var redirectSet = HashSet.<String>newHashSet(3);
         redirectSet.add("");
-        redirectSet.add(path + "");
+        redirectSet.add(path);
 
         // Otherwise (if path = ""), we would already be at root of the server ("/")
         // and using the redirection below would cause an infinite loop.
@@ -210,7 +211,7 @@ public class SteveAppContext {
 
         @Override
         protected void doStart() throws Exception {
-            ClassLoader old = Thread.currentThread().getContextClassLoader();
+            var old = Thread.currentThread().getContextClassLoader();
             Thread.currentThread().setContextClassLoader(context.getClassLoader());
             try {
                 sci.onStartup(null, context.getServletContext());

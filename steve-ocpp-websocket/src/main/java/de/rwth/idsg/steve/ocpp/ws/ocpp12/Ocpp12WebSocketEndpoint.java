@@ -28,9 +28,12 @@ import de.rwth.idsg.steve.ocpp.soap.CentralSystemService12_SoapServer;
 import de.rwth.idsg.steve.ocpp.ws.AbstractWebSocketEndpoint;
 import de.rwth.idsg.steve.ocpp.ws.FutureResponseContextStore;
 import de.rwth.idsg.steve.ocpp.ws.SessionContextStore;
-import de.rwth.idsg.steve.ocpp.ws.pipeline.*;
+import de.rwth.idsg.steve.ocpp.ws.pipeline.AbstractCallHandler;
+import de.rwth.idsg.steve.ocpp.ws.pipeline.Deserializer;
+import de.rwth.idsg.steve.ocpp.ws.pipeline.IncomingPipeline;
+import de.rwth.idsg.steve.ocpp.ws.pipeline.Sender;
+import de.rwth.idsg.steve.ocpp.ws.pipeline.Serializer;
 import de.rwth.idsg.steve.repository.OcppServerRepository;
-import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import ocpp.cs._2010._08.AuthorizeRequest;
 import ocpp.cs._2010._08.BootNotificationRequest;
@@ -83,7 +86,7 @@ public class Ocpp12WebSocketEndpoint extends AbstractWebSocketEndpoint {
         return OcppVersion.V_12;
     }
 
-    @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
+    @RequiredArgsConstructor
     private static class Ocpp12CallHandler extends AbstractCallHandler {
 
         private final CentralSystemService12_SoapServer server;

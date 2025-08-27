@@ -48,10 +48,14 @@ public abstract class QueryForm {
     @Positive
     private Integer userId;
 
-    @Schema(description = "Show results that happened after this date/time. Format: ISO-8601 instant. Example: `2022-10-10T09:00:00Z`")
+    @Schema(description = "Show results that happened after this date/time. Format: ISO-8601 instant.",
+            example = "2022-10-10T09:00:00Z")
+    // @DateTimeFormat
     private Instant from;
 
-    @Schema(description = "Show results that happened before this date/time. Format: ISO-8601 instant. Example: `2022-10-10T12:00:00Z`")
+    @Schema(description = "Show results that happened before this date/time. Format: ISO-8601 instant.",
+            example = "2022-10-10T12:00:00Z")
+    // @DateTimeFormat
     private Instant to;
 
     @Schema(hidden = true)

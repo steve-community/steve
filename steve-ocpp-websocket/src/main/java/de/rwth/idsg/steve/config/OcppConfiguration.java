@@ -36,7 +36,9 @@ import org.springframework.context.annotation.Configuration;
 import java.util.EnumMap;
 import java.util.Map;
 
-import static de.rwth.idsg.steve.ocpp.OcppVersion.*;
+import static de.rwth.idsg.steve.ocpp.OcppVersion.V_12;
+import static de.rwth.idsg.steve.ocpp.OcppVersion.V_15;
+import static de.rwth.idsg.steve.ocpp.OcppVersion.V_16;
 
 @Configuration
 public class OcppConfiguration {
@@ -46,7 +48,7 @@ public class OcppConfiguration {
             Ocpp12TypeStore ocpp12TypeStore, Ocpp12WebSocketEndpoint ocpp12WebSocketEndpoint,
             Ocpp15TypeStore ocpp15TypeStore, Ocpp15WebSocketEndpoint ocpp15WebSocketEndpoint,
             Ocpp16TypeStore ocpp16TypeStore, Ocpp16WebSocketEndpoint ocpp16WebSocketEndpoint) {
-        var invocationContexts = new EnumMap<OcppVersion, InvocationContext>(OcppVersion .class);
+        var invocationContexts = new EnumMap<OcppVersion, InvocationContext>(OcppVersion.class);
         invocationContexts.put(V_12, new InvocationContext(ocpp12WebSocketEndpoint, ocpp12TypeStore,
                 CommunicationTask::getOcpp12Request));
         invocationContexts.put(V_15, new InvocationContext(ocpp15WebSocketEndpoint, ocpp15TypeStore,

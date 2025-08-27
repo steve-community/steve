@@ -30,7 +30,7 @@ import jooq.steve.db.tables.records.TransactionStartRecord;
 import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 import ocpp.cs._2012._06.UnitOfMeasure;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -125,7 +125,8 @@ public class TransactionStopService {
                 .build();
     }
 
-    @Nullable private static TransactionDetails.MeterValues findLastMeterValue(List<TransactionDetails.MeterValues> values) {
+    private static TransactionDetails.@Nullable MeterValues findLastMeterValue(
+            List<TransactionDetails.MeterValues> values) {
         TransactionDetails.MeterValues v = values.stream()
                 .filter(TransactionStopServiceHelper::isEnergyValue)
                 .max(Comparator.comparing(TransactionDetails.MeterValues::getValueTimestamp))

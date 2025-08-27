@@ -24,7 +24,7 @@ import jooq.steve.db.enums.TransactionStopEventActor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.ToString;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.time.Instant;
 
@@ -81,17 +81,17 @@ public final class Transaction {
      */
     @JsonIgnore
     @Schema(hidden = true)
-    @Nullable private final String stopTimestampFormatted;
+    private final @Nullable String stopTimestampFormatted;
 
-    @Nullable @Schema(description = "The meter value reading at the end of the transaction")
-    private final String stopValue;
+    @Schema(description = "The meter value reading at the end of the transaction")
+    private final @Nullable String stopValue;
 
-    @Nullable @Schema(description = "The reason for the transaction being stopped")
-    private final String stopReason; // new in OCPP 1.6
+    @Schema(description = "The reason for the transaction being stopped")
+    private final @Nullable String stopReason; // new in OCPP 1.6
 
-    @Nullable @Schema(description = "The timestamp at which the transaction ended")
-    private final Instant stopTimestamp;
+    @Schema(description = "The timestamp at which the transaction ended")
+    private final @Nullable Instant stopTimestamp;
 
-    @Nullable @Schema(description = "The actor who stopped the transaction")
-    private final TransactionStopEventActor stopEventActor;
+    @Schema(description = "The actor who stopped the transaction")
+    private final @Nullable TransactionStopEventActor stopEventActor;
 }

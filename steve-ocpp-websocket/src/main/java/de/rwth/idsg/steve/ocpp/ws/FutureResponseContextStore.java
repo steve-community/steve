@@ -19,7 +19,7 @@
 package de.rwth.idsg.steve.ocpp.ws;
 
 import de.rwth.idsg.steve.ocpp.ws.data.FutureResponseContext;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.springframework.web.socket.WebSocketSession;
 
 /**

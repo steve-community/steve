@@ -52,7 +52,7 @@ public class ApiTaskInfo {
     private String caller;
 
     @Schema(description = "Results")
-    private Map<String, RequestResult> resultMap;
+    private Map<String, ? extends RequestResult<?>> resultMap;
 
     @Schema(description = "Count of Results")
     private int resultSize;

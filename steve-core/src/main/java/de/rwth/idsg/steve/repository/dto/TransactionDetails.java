@@ -22,7 +22,7 @@ import jooq.steve.db.tables.records.TransactionStartRecord;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.time.Instant;
 import java.util.List;
@@ -41,7 +41,7 @@ public class TransactionDetails {
      * Subsequent transaction's start event (to the transaction that we give details about),
      * that is at the same chargebox and connector
      */
-    @Nullable private final TransactionStartRecord nextTransactionStart;
+    private final @Nullable TransactionStartRecord nextTransactionStart;
 
     @Getter
     @Builder

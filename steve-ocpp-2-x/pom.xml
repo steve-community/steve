@@ -113,7 +113,7 @@
           <outputDirectory>${project.build.directory}/generated-sources</outputDirectory>
           <generateBuilders>true</generateBuilders>
           <includeJsr303Annotations>true</includeJsr303Annotations>
-          <includeGeneratedAnnotation>false</includeGeneratedAnnotation>
+          <includeGeneratedAnnotation>true</includeGeneratedAnnotation>
           <useJakartaValidation>true</useJakartaValidation>
           <dateType>java.time.LocalDate</dateType>
           <dateTimeType>java.time.OffsetDateTime</dateTimeType>

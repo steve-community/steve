@@ -25,7 +25,7 @@ import de.rwth.idsg.steve.repository.dto.ConnectorStatus;
 import de.rwth.idsg.steve.web.dto.ChargePointForm;
 import de.rwth.idsg.steve.web.dto.ChargePointQueryForm;
 import de.rwth.idsg.steve.web.dto.ConnectorStatusForm;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Collections;
 import java.util.List;

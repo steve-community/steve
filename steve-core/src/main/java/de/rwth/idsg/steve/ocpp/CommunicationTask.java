@@ -53,7 +53,7 @@ public abstract class CommunicationTask<S extends ChargePointSelection, RESPONSE
     protected final S params;
 
     private final Map<String, OcppVersion> versionMap;
-    private final Map<String, RequestResult> resultMap;
+    private final Map<String, RequestResult<RESPONSE>> resultMap;
     private final int resultSize;
 
     private final OffsetDateTime startTimestamp = OffsetDateTime.now();

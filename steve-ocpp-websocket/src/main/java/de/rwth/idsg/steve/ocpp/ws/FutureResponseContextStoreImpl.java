@@ -22,7 +22,7 @@ import de.rwth.idsg.steve.ocpp.ws.data.FutureResponseContext;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.socket.WebSocketSession;
 
@@ -62,8 +62,8 @@ public class FutureResponseContextStoreImpl implements FutureResponseContextStor
         log.debug("Store size for sessionId '{}': {}", session.getId(), map.size());
     }
 
-    @Nullable @Override
-    public FutureResponseContext get(WebSocketSession session, String messageId) {
+    @Override
+    public @Nullable FutureResponseContext get(WebSocketSession session, String messageId) {
         RemoveFunction removeFunction = new RemoveFunction(messageId);
         lookupTable.computeIfPresent(session, removeFunction);
         return removeFunction.removedContext;
@@ -83,7 +83,7 @@ public class FutureResponseContextStoreImpl implements FutureResponseContextStor
 
         private final String messageId;
 
-        @Nullable private FutureResponseContext removedContext;
+        private @Nullable FutureResponseContext removedContext;
 
         @Override
         public Map<String, FutureResponseContext> apply(

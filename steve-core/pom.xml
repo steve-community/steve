@@ -67,10 +67,5 @@
       <groupId>com.neovisionaries</groupId>
       <artifactId>nv-i18n</artifactId>
     </dependency>
-
-    <dependency>
-      <groupId>org.jetbrains</groupId>
-      <artifactId>annotations</artifactId>
-    </dependency>
   </dependencies>
 </project>

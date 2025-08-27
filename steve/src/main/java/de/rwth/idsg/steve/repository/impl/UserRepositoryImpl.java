@@ -276,7 +276,7 @@ public class UserRepositoryImpl implements UserRepository {
         if (form.getUserPk() != null) {
             var delete = ctx.deleteFrom(USER_OCPP_TAG).where(USER_OCPP_TAG.USER_PK.eq(userPk));
             if (!wantedOcppTagPks.isEmpty()) {
-                delete.and(USER_OCPP_TAG.OCPP_TAG_PK.notIn(wantedOcppTagPks));
+                delete = delete.and(USER_OCPP_TAG.OCPP_TAG_PK.notIn(wantedOcppTagPks));
             }
             delete.execute();
         }

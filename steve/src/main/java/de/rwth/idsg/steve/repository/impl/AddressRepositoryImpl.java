@@ -23,11 +23,11 @@ import de.rwth.idsg.steve.repository.AddressRepository;
 import de.rwth.idsg.steve.web.dto.Address;
 import jooq.steve.db.tables.records.AddressRecord;
 import lombok.extern.slf4j.Slf4j;
-import org.jetbrains.annotations.Nullable;
 import org.jooq.DSLContext;
 import org.jooq.Record1;
 import org.jooq.SelectConditionStep;
 import org.jooq.exception.DataAccessException;
+import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Repository;
 
 import static jooq.steve.db.tables.Address.ADDRESS;
@@ -41,7 +41,7 @@ import static jooq.steve.db.tables.Address.ADDRESS;
 public class AddressRepositoryImpl implements AddressRepository {
 
     @Override
-    @Nullable public AddressRecord get(DSLContext ctx, Integer addressPk) {
+    public @Nullable AddressRecord get(DSLContext ctx, Integer addressPk) {
         if (addressPk == null) {
             return null;
         }
@@ -64,7 +64,7 @@ public class AddressRepositoryImpl implements AddressRepository {
      *
      */
     @Override
-    @Nullable public Integer updateOrInsert(DSLContext ctx, Address address) {
+    public @Nullable Integer updateOrInsert(DSLContext ctx, Address address) {
         if (address.isEmpty()) {
             return null;
 

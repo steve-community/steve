@@ -30,7 +30,7 @@ import lombok.extern.slf4j.Slf4j;
 import ocpp.cp._2015._10.AuthorizationData;
 import ocpp.cs._2015._10.AuthorizationStatus;
 import ocpp.cs._2015._10.IdTagInfo;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -102,7 +102,7 @@ public class OcppTagsService {
         invalidOcppTagService.removeAll(idTagList);
     }
 
-    @Nullable public IdTagInfo getIdTagInfo(
+    public @Nullable IdTagInfo getIdTagInfo(
             @Nullable String idTag,
             boolean isStartTransactionReqContext,
             @Nullable String chargeBoxId,
@@ -121,7 +121,7 @@ public class OcppTagsService {
         return idTagInfo;
     }
 
-    @Nullable public IdTagInfo getIdTagInfo(
+    public @Nullable IdTagInfo getIdTagInfo(
             @Nullable String idTag,
             boolean isStartTransactionReqContext,
             @Nullable String chargeBoxId,

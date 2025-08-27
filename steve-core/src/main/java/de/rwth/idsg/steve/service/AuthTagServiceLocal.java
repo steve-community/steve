@@ -25,7 +25,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import ocpp.cs._2015._10.AuthorizationStatus;
 import ocpp.cs._2015._10.IdTagInfo;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -91,7 +91,7 @@ public class AuthTagServiceLocal implements AuthTagService {
     /**
      * If the database contains an actual expiry, use it. Otherwise, calculate an expiry for cached info
      */
-    @Nullable private OffsetDateTime getExpiryDateOrDefault(OcppTagActivityRecord record) {
+    private @Nullable OffsetDateTime getExpiryDateOrDefault(OcppTagActivityRecord record) {
         if (record.getExpiryDate() != null) {
             return toOffsetDateTime(record.getExpiryDate());
         }

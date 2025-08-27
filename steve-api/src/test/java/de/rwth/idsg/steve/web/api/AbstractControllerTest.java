@@ -21,7 +21,6 @@ package de.rwth.idsg.steve.web.api;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
-import org.jetbrains.annotations.NotNull;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
@@ -38,8 +37,8 @@ public abstract class AbstractControllerTest {
         this.objectMapper = createMapper();
     }
 
-    private static @NotNull ObjectMapper createMapper() {
-        ObjectMapper objectMapper = Jackson2ObjectMapperBuilder.json().build();
+    private static ObjectMapper createMapper() {
+        var objectMapper = Jackson2ObjectMapperBuilder.json().build();
         objectMapper.findAndRegisterModules();
         // if the client sends unknown props, just ignore them instead of failing
         objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);

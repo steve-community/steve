@@ -25,24 +25,20 @@ import de.rwth.idsg.steve.repository.dto.ChargingProfileAssignment;
 import de.rwth.idsg.steve.web.dto.ChargingProfileAssignmentQueryForm;
 import de.rwth.idsg.steve.web.dto.ChargingProfileForm;
 import de.rwth.idsg.steve.web.dto.ChargingProfileQueryForm;
-import jooq.steve.db.tables.records.ChargingProfileRecord;
-import jooq.steve.db.tables.records.ChargingSchedulePeriodRecord;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import ocpp.cp._2015._10.ChargingProfilePurposeType;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.jooq.Condition;
 import org.jooq.DSLContext;
 import org.jooq.Record1;
 import org.jooq.SelectConditionStep;
 import org.jooq.exception.DataAccessException;
 import org.jooq.impl.DSL;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.CollectionUtils;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static de.rwth.idsg.steve.utils.CustomDSL.includes;
 import static de.rwth.idsg.steve.utils.DateTimeUtils.toInstant;
@@ -59,10 +55,10 @@ import static jooq.steve.db.tables.ChargeBox.CHARGE_BOX;
  */
 @Slf4j
 @Repository
+@RequiredArgsConstructor
 public class ChargingProfileRepositoryImpl implements ChargingProfileRepository {
 
-    @Autowired
-    private DSLContext ctx;
+    private final DSLContext ctx;
 
     // -------------------------------------------------------------------------
     // OCPP operations
@@ -96,7 +92,7 @@ public class ChargingProfileRepositoryImpl implements ChargingProfileRepository 
 
     @Override
     public void clearProfile(
-            @NotNull String chargeBoxId,
+            String chargeBoxId,
             @Nullable Integer connectorId,
             @Nullable ChargingProfilePurposeType purpose,
             @Nullable Integer stackLevel) {
@@ -105,10 +101,9 @@ public class ChargingProfileRepositoryImpl implements ChargingProfileRepository 
         // Connector select
         // -------------------------------------------------------------------------
 
-        Condition connectorIdCondition =
-                (connectorId == null) ? DSL.trueCondition() : CONNECTOR.CONNECTOR_ID.eq(connectorId);
+        var connectorIdCondition = (connectorId == null) ? DSL.trueCondition() : CONNECTOR.CONNECTOR_ID.eq(connectorId);
 
-        SelectConditionStep<Record1<Integer>> connectorPkSelect = ctx.select(CONNECTOR.CONNECTOR_PK)
+        var connectorPkSelect = ctx.select(CONNECTOR.CONNECTOR_PK)
                 .from(CONNECTOR)
                 .where(CONNECTOR.CHARGE_BOX_ID.eq(chargeBoxId))
                 .and(connectorIdCondition);
@@ -122,14 +117,14 @@ public class ChargingProfileRepositoryImpl implements ChargingProfileRepository 
         if (purpose == null && stackLevel == null) {
             profilePkCondition = DSL.trueCondition();
         } else {
-            Condition purposeCondition = (purpose == null)
+            var purposeCondition = (purpose == null)
                     ? DSL.trueCondition()
                     : CHARGING_PROFILE.CHARGING_PROFILE_PURPOSE.eq(purpose.value());
 
-            Condition stackLevelCondition =
+            var stackLevelCondition =
                     (stackLevel == null) ? DSL.trueCondition() : CHARGING_PROFILE.STACK_LEVEL.eq(stackLevel);
 
-            SelectConditionStep<Record1<Integer>> profilePkSelect = ctx.select(CHARGING_PROFILE.CHARGING_PROFILE_PK)
+            var profilePkSelect = ctx.select(CHARGING_PROFILE.CHARGING_PROFILE_PK)
                     .from(CHARGING_PROFILE)
                     .where(purposeCondition)
                     .and(stackLevelCondition);
@@ -257,11 +252,11 @@ public class ChargingProfileRepositoryImpl implements ChargingProfileRepository 
 
     @Override
     public ChargingProfile.Details getDetails(int chargingProfilePk) {
-        ChargingProfileRecord profile = ctx.selectFrom(CHARGING_PROFILE)
+        var profile = ctx.selectFrom(CHARGING_PROFILE)
                 .where(CHARGING_PROFILE.CHARGING_PROFILE_PK.eq(chargingProfilePk))
                 .fetchOne();
 
-        List<ChargingSchedulePeriodRecord> periods = ctx.selectFrom(CHARGING_SCHEDULE_PERIOD)
+        var periods = ctx.selectFrom(CHARGING_SCHEDULE_PERIOD)
                 .where(CHARGING_SCHEDULE_PERIOD.CHARGING_PROFILE_PK.eq(chargingProfilePk))
                 .fetch();
 
@@ -271,9 +266,9 @@ public class ChargingProfileRepositoryImpl implements ChargingProfileRepository 
     @Override
     public int add(ChargingProfileForm form) {
         return ctx.transactionResult(configuration -> {
-            DSLContext ctx = DSL.using(configuration);
+            var ctx = DSL.using(configuration);
             try {
-                int profilePk = ctx.insertInto(CHARGING_PROFILE)
+                var profilePk = ctx.insertInto(CHARGING_PROFILE)
                         .set(CHARGING_PROFILE.DESCRIPTION, form.getDescription())
                         .set(CHARGING_PROFILE.NOTE, form.getNote())
                         .set(CHARGING_PROFILE.STACK_LEVEL, form.getStackLevel())
@@ -303,7 +298,6 @@ public class ChargingProfileRepositoryImpl implements ChargingProfileRepository 
                 form.setChargingProfilePk(profilePk);
                 insertPeriods(ctx, form);
                 return profilePk;
-
             } catch (DataAccessException e) {
                 throw new SteveException("Failed to add the charging profile", e);
             }
@@ -315,7 +309,7 @@ public class ChargingProfileRepositoryImpl implements ChargingProfileRepository 
         checkProfileUsage(form.getChargingProfilePk());
 
         ctx.transaction(configuration -> {
-            DSLContext ctx = DSL.using(configuration);
+            var ctx = DSL.using(configuration);
             try {
                 ctx.update(CHARGING_PROFILE)
                         .set(CHARGING_PROFILE.DESCRIPTION, form.getDescription())
@@ -354,7 +348,6 @@ public class ChargingProfileRepositoryImpl implements ChargingProfileRepository 
                         .execute();
 
                 insertPeriods(ctx, form);
-
             } catch (DataAccessException e) {
                 throw new SteveException(
                         "Failed to update the charging profile with id '%s'", form.getChargingProfilePk(), e);
@@ -372,7 +365,7 @@ public class ChargingProfileRepositoryImpl implements ChargingProfileRepository 
     }
 
     private void checkProfileUsage(int chargingProfilePk) {
-        List<String> r = ctx.select(CONNECTOR.CHARGE_BOX_ID)
+        var r = ctx.select(CONNECTOR.CHARGE_BOX_ID)
                 .from(CONNECTOR_CHARGING_PROFILE)
                 .join(CONNECTOR)
                 .on(CONNECTOR.CONNECTOR_PK.eq(CONNECTOR_CHARGING_PROFILE.CONNECTOR_PK))
@@ -389,13 +382,13 @@ public class ChargingProfileRepositoryImpl implements ChargingProfileRepository 
             return;
         }
 
-        List<ChargingSchedulePeriodRecord> r = form.getSchedulePeriodMap().values().stream()
+        var r = form.getSchedulePeriodMap().values().stream()
                 .map(k -> ctx.newRecord(CHARGING_SCHEDULE_PERIOD)
                         .setChargingProfilePk(form.getChargingProfilePk())
                         .setStartPeriodInSeconds(k.getStartPeriodInSeconds())
                         .setPowerLimit(k.getPowerLimit())
                         .setNumberPhases(k.getNumberPhases()))
-                .collect(Collectors.toList());
+                .toList();
 
         ctx.batchInsert(r).execute();
     }

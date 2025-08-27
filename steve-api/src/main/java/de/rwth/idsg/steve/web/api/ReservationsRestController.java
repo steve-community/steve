@@ -26,8 +26,6 @@ import de.rwth.idsg.steve.web.dto.ReservationForm;
 import de.rwth.idsg.steve.web.dto.ReservationQueryForm;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-
-import jakarta.validation.Valid;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -41,6 +39,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.util.List;
+import jakarta.validation.Valid;
 
 @Tag(name = "reservations")
 @RestController
@@ -58,22 +57,22 @@ public class ReservationsRestController {
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Reservation> addReservation(@Valid @RequestBody ReservationForm form) {
         var id = reservationsService.addReservation(form);
-        var body = reservationsService.getReservation(id).orElseThrow(
-            () -> new SteveException("Reservation not found after creation, this should never happen")
-        );
-        var location = ServletUriComponentsBuilder
-              .fromCurrentRequest()
-              .path("/{id}")
-              .buildAndExpand(id)
-              .toUri();
+        var body = reservationsService
+                .getReservation(id)
+                .orElseThrow(
+                        () -> new SteveException("Reservation not found after creation, this should never happen"));
+        var location = ServletUriComponentsBuilder.fromCurrentRequest()
+                .path("/{id}")
+                .buildAndExpand(id)
+                .toUri();
         return ResponseEntity.created(location).body(body);
     }
 
     @DeleteMapping("/{id}")
     public Reservation deleteReservation(@PathVariable int id) {
-        var reservation = reservationsService.getReservation(id).orElseThrow(
-            () -> new NotFoundException(String.format("Reservation with id %d not found", id))
-        );
+        var reservation = reservationsService
+                .getReservation(id)
+                .orElseThrow(() -> new NotFoundException(String.format("Reservation with id %d not found", id)));
         reservationsService.deleteReservation(id);
         return reservation;
     }

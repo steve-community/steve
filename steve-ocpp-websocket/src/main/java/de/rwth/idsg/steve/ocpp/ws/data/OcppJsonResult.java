@@ -21,6 +21,7 @@ package de.rwth.idsg.steve.ocpp.ws.data;
 import de.rwth.idsg.ocpp.jaxb.ResponseType;
 import lombok.Getter;
 import lombok.Setter;
+import org.jspecify.annotations.Nullable;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -28,8 +29,8 @@ import lombok.Setter;
  */
 @Getter
 @Setter
-public class OcppJsonResult extends OcppJsonResponse {
-    private ResponseType payload;
+public final class OcppJsonResult extends OcppJsonResponse implements OcppJsonMessage {
+    private @Nullable ResponseType payload;
 
     public OcppJsonResult() {
         super(MessageType.CALL_RESULT);

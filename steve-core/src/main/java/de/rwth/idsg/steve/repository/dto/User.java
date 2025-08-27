@@ -23,6 +23,7 @@ import jooq.steve.db.tables.records.UserRecord;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import org.jspecify.annotations.Nullable;
 
 import java.util.List;
 
@@ -44,7 +45,7 @@ public class User {
     @Builder
     public static final class Details {
         private final UserRecord userRecord;
-        private final AddressRecord address;
+        private final @Nullable AddressRecord address;
         private final List<OcppTagEntry> ocppTagEntries;
     }
 
@@ -54,5 +55,4 @@ public class User {
         private final Integer ocppTagPk;
         private final String idTag;
     }
-
 }

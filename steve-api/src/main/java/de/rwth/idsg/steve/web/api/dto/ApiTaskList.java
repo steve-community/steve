@@ -20,16 +20,15 @@ package de.rwth.idsg.steve.web.api.dto;
 
 import de.rwth.idsg.steve.repository.dto.TaskOverview;
 import io.swagger.v3.oas.annotations.media.Schema;
-import java.util.List;
-
 import lombok.Getter;
 import lombok.Setter;
+
+import java.util.List;
 
 /**
  * @author fnkbsi
  * @since 18.10.2023
  */
-
 @Getter
 @Setter
 public class ApiTaskList {

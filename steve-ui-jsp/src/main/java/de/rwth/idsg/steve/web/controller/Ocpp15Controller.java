@@ -33,14 +33,13 @@ import de.rwth.idsg.steve.web.dto.ocpp.SendLocalListParams;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-
-import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.util.Map;
+import jakarta.validation.Valid;
 
 import static de.rwth.idsg.steve.web.dto.ocpp.ConfigurationKeyReadWrite.RW;
 
@@ -63,8 +62,10 @@ public class Ocpp15Controller extends Ocpp12Controller {
     private static final String GET_LIST_VERSION_PATH = "/GetLocalListVersion";
     private static final String SEND_LIST_PATH = "/SendLocalList";
 
-    public Ocpp15Controller(ChargePointHelperService chargePointHelperService, OcppTagsService ocppTagsService,
-                            ChargePointServiceClient chargePointServiceClient) {
+    public Ocpp15Controller(
+            ChargePointHelperService chargePointHelperService,
+            OcppTagsService ocppTagsService,
+            ChargePointServiceClient chargePointServiceClient) {
         super(chargePointHelperService, ocppTagsService, chargePointServiceClient);
     }
 
@@ -152,8 +153,8 @@ public class Ocpp15Controller extends Ocpp12Controller {
     // -------------------------------------------------------------------------
 
     @PostMapping(value = RESERVE_PATH)
-    public String postReserveNow(@Valid @ModelAttribute(PARAMS) ReserveNowParams params,
-                                 BindingResult result, Model model) {
+    public String postReserveNow(
+            @Valid @ModelAttribute(PARAMS) ReserveNowParams params, BindingResult result, Model model) {
         if (result.hasErrors()) {
             setCommonAttributes(model);
             setActiveUserIdTagList(model);
@@ -163,8 +164,8 @@ public class Ocpp15Controller extends Ocpp12Controller {
     }
 
     @PostMapping(value = CANCEL_RESERV_PATH)
-    public String postCancelReserv(@Valid @ModelAttribute(PARAMS) CancelReservationParams params,
-                                   BindingResult result, Model model) {
+    public String postCancelReserv(
+            @Valid @ModelAttribute(PARAMS) CancelReservationParams params, BindingResult result, Model model) {
         if (result.hasErrors()) {
             setCommonAttributes(model);
             return getPrefix() + CANCEL_RESERV_PATH;
@@ -173,8 +174,8 @@ public class Ocpp15Controller extends Ocpp12Controller {
     }
 
     @PostMapping(value = DATA_TRANSFER_PATH)
-    public String postDataTransfer(@Valid @ModelAttribute(PARAMS) DataTransferParams params,
-                                   BindingResult result, Model model) {
+    public String postDataTransfer(
+            @Valid @ModelAttribute(PARAMS) DataTransferParams params, BindingResult result, Model model) {
         if (result.hasErrors()) {
             setCommonAttributes(model);
             return getPrefix() + DATA_TRANSFER_PATH;
@@ -183,8 +184,8 @@ public class Ocpp15Controller extends Ocpp12Controller {
     }
 
     @PostMapping(value = GET_CONF_PATH)
-    public String postGetConf(@Valid @ModelAttribute(PARAMS) GetConfigurationParams params,
-                              BindingResult result, Model model) {
+    public String postGetConf(
+            @Valid @ModelAttribute(PARAMS) GetConfigurationParams params, BindingResult result, Model model) {
         if (result.hasErrors()) {
             setCommonAttributes(model);
             model.addAttribute("ocppConfKeys", getConfigurationKeys(RW));
@@ -194,8 +195,8 @@ public class Ocpp15Controller extends Ocpp12Controller {
     }
 
     @PostMapping(value = GET_LIST_VERSION_PATH)
-    public String postListVersion(@Valid @ModelAttribute(PARAMS) MultipleChargePointSelect params,
-                                  BindingResult result, Model model) {
+    public String postListVersion(
+            @Valid @ModelAttribute(PARAMS) MultipleChargePointSelect params, BindingResult result, Model model) {
         if (result.hasErrors()) {
             setCommonAttributes(model);
             return getPrefix() + GET_LIST_VERSION_PATH;
@@ -204,8 +205,8 @@ public class Ocpp15Controller extends Ocpp12Controller {
     }
 
     @PostMapping(value = SEND_LIST_PATH)
-    public String postSendList(@Valid @ModelAttribute(PARAMS) SendLocalListParams params,
-                               BindingResult result, Model model) {
+    public String postSendList(
+            @Valid @ModelAttribute(PARAMS) SendLocalListParams params, BindingResult result, Model model) {
         if (result.hasErrors()) {
             setCommonAttributes(model);
             setAllUserIdTagList(model);

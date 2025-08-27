@@ -31,6 +31,5 @@ import jakarta.validation.constraints.NotNull;
 @Setter
 public class RemoteStopTransactionParams extends SingleChargePointSelect {
 
-    @NotNull(message = "Transaction ID is required")
-    private Integer transactionId;
+    @NotNull(message = "Transaction ID is required") private Integer transactionId;
 }

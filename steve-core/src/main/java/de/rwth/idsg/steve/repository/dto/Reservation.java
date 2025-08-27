@@ -20,6 +20,7 @@ package de.rwth.idsg.steve.repository.dto;
 
 import lombok.Builder;
 import lombok.Getter;
+import org.jspecify.annotations.Nullable;
 
 import java.time.Instant;
 
@@ -33,6 +34,6 @@ public final class Reservation {
     private final int connectorId;
     private final Integer transactionId;
     private final String ocppIdTag, chargeBoxId, startDatetime, expiryDatetime, status;
-    private final Instant startDatetimeDT;
-    private final Instant expiryDatetimeDT;
+    private final @Nullable Instant startDatetimeDT;
+    private final @Nullable Instant expiryDatetimeDT;
 }

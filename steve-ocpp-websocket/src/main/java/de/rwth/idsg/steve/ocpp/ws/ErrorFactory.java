@@ -20,6 +20,7 @@ package de.rwth.idsg.steve.ocpp.ws;
 
 import de.rwth.idsg.steve.ocpp.ws.data.ErrorCode;
 import de.rwth.idsg.steve.ocpp.ws.data.OcppJsonError;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Error generation should be handled by a central component for better control over the codes and messages.
@@ -29,34 +30,42 @@ import de.rwth.idsg.steve.ocpp.ws.data.OcppJsonError;
  * @since 17.03.2015
  */
 public final class ErrorFactory {
-    private ErrorFactory() { }
+    private ErrorFactory() {}
 
     public static OcppJsonError genericDeserializeError(String messageId, String details) {
-        return setFields(messageId, ErrorCode.GenericError,
-                "The incoming string could not be parsed into an array. Is the JSON syntactically correct?", details);
+        return setFields(
+                messageId,
+                ErrorCode.GenericError,
+                "The incoming string could not be parsed into an array. Is the JSON syntactically correct?",
+                details);
     }
 
     public static OcppJsonError payloadDeserializeError(String messageId, String details) {
-        return setFields(messageId, ErrorCode.FormationViolation,
-                "The payload for action could not be deserialized", details);
+        return setFields(
+                messageId, ErrorCode.FormationViolation, "The payload for action could not be deserialized", details);
     }
 
     public static OcppJsonError payloadSerializeError(String messageId, String details) {
-        return setFields(messageId, ErrorCode.InternalError,
-                "The payload for action could not be serialized", details);
+        return setFields(messageId, ErrorCode.InternalError, "The payload for action could not be serialized", details);
     }
 
     public static OcppJsonError actionNotFound(String messageId, String action) {
-        return setFields(messageId, ErrorCode.NotImplemented,
-                "The action '" + action + "' you are looking for is not found", null);
+        return setFields(
+                messageId,
+                ErrorCode.NotImplemented,
+                "The action '" + action + "' you are looking for is not found",
+                null);
     }
 
-    public static OcppJsonError payloadProcessingError(String messageId, String details) {
-        return setFields(messageId, ErrorCode.InternalError,
-                "Internal services failed while processing of the payload", details);
+    public static OcppJsonError payloadProcessingError(String messageId, @Nullable String details) {
+        return setFields(
+                messageId,
+                ErrorCode.InternalError,
+                "Internal services failed while processing of the payload",
+                details);
     }
 
-    private static OcppJsonError setFields(String messageId, ErrorCode code, String desc, String details) {
+    private static OcppJsonError setFields(String messageId, ErrorCode code, String desc, @Nullable String details) {
         OcppJsonError error = new OcppJsonError();
         error.setMessageId(messageId);
         error.setErrorCode(code);
@@ -64,5 +73,4 @@ public final class ErrorFactory {
         error.setErrorDetails(details);
         return error;
     }
-
 }

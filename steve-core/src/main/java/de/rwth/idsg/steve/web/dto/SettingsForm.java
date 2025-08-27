@@ -27,10 +27,10 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
+import java.util.List;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
-import java.util.List;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -48,28 +48,21 @@ public class SettingsForm {
     // OCPP
     // -------------------------------------------------------------------------
 
-    @Min(value = 0, message = "Heartbeat Interval must be at least {value}")
-    @NotNull(message = "Heartbeat Interval is required")
-    private Integer heartbeat;
+    @Min(value = 0, message = "Heartbeat Interval must be at least {value}") @NotNull(message = "Heartbeat Interval is required") private Integer heartbeat;
 
-    @Min(value = 0, message = "Expiration must be at least {value}")
-    @NotNull(message = "Expiration is required")
-    private Integer expiration;
+    @Min(value = 0, message = "Expiration must be at least {value}") @NotNull(message = "Expiration is required") private Integer expiration;
 
     // -------------------------------------------------------------------------
     // Mail notification
     // -------------------------------------------------------------------------
 
-    @NotNull
-    private Boolean enabled;
+    @NotNull private Boolean enabled;
 
-    @Email(message = "'From' field is not a valid e-mail address")
-    private String from;
+    @Email(message = "'From' field is not a valid e-mail address") private String from;
 
     private String mailHost, username, password, protocol;
 
-    @Min(value = 1, message = "Port must be positive")
-    private Integer port;
+    @Min(value = 1, message = "Port must be positive") private Integer port;
 
     @EmailCollection
     private List<String> recipients;

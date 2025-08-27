@@ -41,7 +41,7 @@ public final class ChargePointSelect {
     }
 
     public boolean isEndpointAddressSet() {
-        return !("-".equals(endpointAddress));
+        return !"-".equals(endpointAddress);
     }
 
     public boolean isSoap() {

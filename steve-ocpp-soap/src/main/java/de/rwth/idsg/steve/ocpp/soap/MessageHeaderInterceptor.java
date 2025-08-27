@@ -38,8 +38,8 @@ import org.apache.cxf.ws.addressing.ContextUtils;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
 import org.springframework.stereotype.Component;
 
-import javax.xml.namespace.QName;
 import java.util.Optional;
+import javax.xml.namespace.QName;
 
 import static org.apache.cxf.ws.addressing.JAXWSAConstants.ADDRESSING_PROPERTIES_INBOUND;
 
@@ -66,10 +66,9 @@ public class MessageHeaderInterceptor extends AbstractPhaseInterceptor<Message> 
     private final DelegatingTaskExecutor asyncTaskExecutor;
 
     public MessageHeaderInterceptor(
-        OcppServerRepository ocppServerRepository,
-        ChargePointRegistrationService chargePointRegistrationService,
-        DelegatingTaskExecutor asyncTaskExecutor
-    ) {
+            OcppServerRepository ocppServerRepository,
+            ChargePointRegistrationService chargePointRegistrationService,
+            DelegatingTaskExecutor asyncTaskExecutor) {
         super(Phase.PRE_INVOKE);
         this.ocppServerRepository = ocppServerRepository;
         this.chargePointRegistrationService = chargePointRegistrationService;
@@ -84,7 +83,10 @@ public class MessageHeaderInterceptor extends AbstractPhaseInterceptor<Message> 
         // 1. check registration for operations other than BootNotification
         // -------------------------------------------------------------------------
 
-        QName opName = message.getExchange().getBindingOperationInfo().getOperationInfo().getName();
+        QName opName = message.getExchange()
+                .getBindingOperationInfo()
+                .getOperationInfo()
+                .getName();
 
         if (!BOOT_OPERATION_NAME.equals(opName.getLocalPart())) {
             Optional<RegistrationStatus> status = chargePointRegistrationService.getRegistrationStatus(chargeBoxId);
@@ -121,7 +123,10 @@ public class MessageHeaderInterceptor extends AbstractPhaseInterceptor<Message> 
             }
         }
         // should not happen
-        throw createSpecFault(message.getExchange().getBindingOperationInfo().getOperationInfo().getName());
+        throw createSpecFault(message.getExchange()
+                .getBindingOperationInfo()
+                .getOperationInfo()
+                .getName());
     }
 
     private String getEndpointAddress(Message message) {

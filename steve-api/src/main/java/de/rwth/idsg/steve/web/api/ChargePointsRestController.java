@@ -24,7 +24,6 @@ import de.rwth.idsg.steve.web.dto.ChargePointForm;
 import de.rwth.idsg.steve.web.dto.ChargePointQueryForm;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.validation.Valid;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.core.annotations.ParameterObject;
@@ -41,10 +40,13 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.util.List;
+import jakarta.validation.Valid;
 
 @Tag(name = "charge-points", description = "Operations related to managing ChargePoints.")
 @RestController
-@RequestMapping(value = {"/api/v1/chargepoints", "/api/v1/chargeboxes"}, produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(
+        value = {"/api/v1/chargepoints", "/api/v1/chargeboxes"},
+        produces = MediaType.APPLICATION_JSON_VALUE)
 @RequiredArgsConstructor
 public class ChargePointsRestController {
 
@@ -54,7 +56,9 @@ public class ChargePointsRestController {
     @StandardApiResponses
     @GetMapping
     public List<ApiChargePoint> get(@ParameterObject ChargePointQueryForm params) {
-        return chargePointsService.getOverview(params).stream().map(ChargePointsRestController::toDto).toList();
+        return chargePointsService.getOverview(params).stream()
+                .map(ChargePointsRestController::toDto)
+                .toList();
     }
 
     @Operation(description = "Returns a single ChargePoint based on the ChargePointPk.")
@@ -70,19 +74,18 @@ public class ChargePointsRestController {
     public ResponseEntity<ApiChargePoint> create(@RequestBody @Valid ChargePointForm params) {
         var chargepointPk = chargePointsService.addChargePoint(params);
         var body = toDto(chargePointsService.getDetails(chargepointPk));
-        var location = ServletUriComponentsBuilder
-            .fromCurrentRequest()
-            .path("/{id}")
-            .buildAndExpand(body.getChargeBoxPk())
-            .toUri();
+        var location = ServletUriComponentsBuilder.fromCurrentRequest()
+                .path("/{id}")
+                .buildAndExpand(body.getChargeBoxPk())
+                .toUri();
         return ResponseEntity.created(location).body(body);
     }
 
     @Operation(description = "Updates an existing ChargePoint with the provided parameters.")
     @StandardApiResponses
     @PutMapping("/{chargePointPk}")
-    public ApiChargePoint update(@PathVariable("chargePointPk") Integer chargePointPk,
-                                                     @RequestBody @Valid ChargePointForm params) {
+    public ApiChargePoint update(
+            @PathVariable("chargePointPk") Integer chargePointPk, @RequestBody @Valid ChargePointForm params) {
         params.setChargeBoxPk(chargePointPk);
         chargePointsService.updateChargePoint(params);
         return toDto(chargePointsService.getDetails(chargePointPk));
@@ -102,7 +105,8 @@ public class ChargePointsRestController {
     }
 
     private static ApiChargePoint toDto(ChargePoint.Details details) {
-        return new ApiChargePoint(details.getChargeBox().getChargeBoxPk(), details.getChargeBox().getChargeBoxId());
+        return new ApiChargePoint(
+                details.getChargeBox().getChargeBoxPk(), details.getChargeBox().getChargeBoxId());
     }
 
     @Data

@@ -95,10 +95,7 @@ public class StressTestSoapOCPP16 extends StressTest {
                 var transactionStart = localRandom.nextInt(0, Integer.MAX_VALUE);
                 var transactionStop = localRandom.nextInt(transactionStart + 1, Integer.MAX_VALUE);
 
-                var heartbeat = client.heartbeat(
-                        new HeartbeatRequest(),
-                        chargeBoxId
-                );
+                var heartbeat = client.heartbeat(new HeartbeatRequest(), chargeBoxId);
                 assertThat(heartbeat).isNotNull();
 
                 for (var i = 0; i <= CONNECTOR_COUNT_PER_CHARGE_BOX; i++) {
@@ -108,15 +105,11 @@ public class StressTestSoapOCPP16 extends StressTest {
                                     .withStatus(ChargePointStatus.AVAILABLE)
                                     .withConnectorId(i)
                                     .withTimestamp(OffsetDateTime.now()),
-                            chargeBoxId
-                    );
+                            chargeBoxId);
                     assertThat(status).isNotNull();
                 }
 
-                var auth = client.authorize(
-                        new AuthorizeRequest().withIdTag(idTag),
-                        chargeBoxId
-                );
+                var auth = client.authorize(new AuthorizeRequest().withIdTag(idTag), chargeBoxId);
                 assertThat(auth.getIdTagInfo().getStatus()).isNotEqualTo(AuthorizationStatus.ACCEPTED);
 
                 var start = client.startTransaction(
@@ -125,8 +118,7 @@ public class StressTestSoapOCPP16 extends StressTest {
                                 .withIdTag(idTag)
                                 .withTimestamp(OffsetDateTime.now())
                                 .withMeterStart(transactionStart),
-                        chargeBoxId
-                );
+                        chargeBoxId);
                 assertThat(start).isNotNull();
 
                 var statusStart = client.statusNotification(
@@ -135,8 +127,7 @@ public class StressTestSoapOCPP16 extends StressTest {
                                 .withStatus(ChargePointStatus.CHARGING)
                                 .withConnectorId(connectorId)
                                 .withTimestamp(OffsetDateTime.now()),
-                        chargeBoxId
-                );
+                        chargeBoxId);
                 assertThat(statusStart).isNotNull();
 
                 var meter = client.meterValues(
@@ -144,8 +135,7 @@ public class StressTestSoapOCPP16 extends StressTest {
                                 .withConnectorId(connectorId)
                                 .withTransactionId(start.getTransactionId())
                                 .withMeterValue(getMeterValues(transactionStart, transactionStop)),
-                        chargeBoxId
-                );
+                        chargeBoxId);
                 assertThat(meter).isNotNull();
 
                 var stop = client.stopTransaction(
@@ -154,8 +144,7 @@ public class StressTestSoapOCPP16 extends StressTest {
                                 .withTimestamp(OffsetDateTime.now())
                                 .withIdTag(idTag)
                                 .withMeterStop(transactionStop),
-                        chargeBoxId
-                );
+                        chargeBoxId);
                 assertThat(stop).isNotNull();
 
                 var statusStop = client.statusNotification(
@@ -164,15 +153,12 @@ public class StressTestSoapOCPP16 extends StressTest {
                                 .withStatus(ChargePointStatus.AVAILABLE)
                                 .withConnectorId(connectorId)
                                 .withTimestamp(OffsetDateTime.now()),
-                        chargeBoxId
-                );
+                        chargeBoxId);
                 assertThat(statusStop).isNotNull();
             }
 
             @Override
-            public void afterRepeat() {
-
-            }
+            public void afterRepeat() {}
         };
 
         var tester = new StressTester(THREAD_COUNT, REPEAT_COUNT_PER_THREAD);

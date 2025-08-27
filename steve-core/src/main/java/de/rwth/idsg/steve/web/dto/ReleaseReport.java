@@ -18,9 +18,9 @@
  */
 package de.rwth.idsg.steve.web.dto;
 
+import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import lombok.Setter;
 import lombok.ToString;
 
 /**
@@ -28,14 +28,12 @@ import lombok.ToString;
  * @since 19.04.2016
  */
 @Getter
-@Setter
+@Builder
 @ToString
 @RequiredArgsConstructor
 public class ReleaseReport {
     private final boolean moreRecent;
-
-    private String githubVersion;
-
-    private String htmlUrl;
-    private String downloadUrl;
+    private final String githubVersion;
+    private final String htmlUrl;
+    private final String downloadUrl;
 }

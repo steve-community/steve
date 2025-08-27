@@ -36,14 +36,19 @@ import java.time.Instant;
 public final class TaskOverview implements Comparable<TaskOverview> {
     @Schema(description = "Task ID")
     private final int taskId;
+
     @Schema(description = "Response count")
     private final int responseCount;
+
     @Schema(description = "Request count")
     private final int requestCount;
+
     @Schema(description = "Start time")
     private final Instant start;
+
     @Schema(description = "End time")
     private final Instant end;
+
     @Schema(description = "Task origin (internal or external)")
     private final TaskOrigin origin;
 

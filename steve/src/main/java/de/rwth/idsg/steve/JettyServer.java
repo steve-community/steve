@@ -18,6 +18,7 @@
  */
 package de.rwth.idsg.steve;
 
+import de.rwth.idsg.steve.utils.LogFileRetriever;
 import de.rwth.idsg.steve.web.dto.EndpointInfo;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.jetty.http.HttpScheme;
@@ -33,6 +34,7 @@ import org.eclipse.jetty.server.SslConnectionFactory;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.eclipse.jetty.util.thread.QueuedThreadPool;
 import org.eclipse.jetty.util.thread.ScheduledExecutorScheduler;
+import org.jspecify.annotations.Nullable;
 
 import java.net.DatagramSocket;
 import java.net.Inet4Address;
@@ -59,9 +61,10 @@ import java.util.function.Function;
 public class JettyServer {
 
     private final SteveConfiguration config;
+    private final LogFileRetriever logFileRetriever;
     private final EndpointInfo info;
 
-    private Server server;
+    private @Nullable Server server;
     private SteveAppContext steveAppContext;
 
     private static final int MIN_THREADS = 4;
@@ -70,8 +73,9 @@ public class JettyServer {
     private static final long STOP_TIMEOUT = TimeUnit.SECONDS.toMillis(5);
     private static final long IDLE_TIMEOUT = TimeUnit.MINUTES.toMillis(1);
 
-    public JettyServer(SteveConfiguration config) {
+    public JettyServer(SteveConfiguration config, LogFileRetriever logFileRetriever) {
         this.config = config;
+        this.logFileRetriever = logFileRetriever;
         this.info = new EndpointInfo(config);
     }
 
@@ -121,7 +125,7 @@ public class JettyServer {
             server.addConnector(httpsConnector(httpConfig));
         }
 
-        steveAppContext = new SteveAppContext(config, info);
+        steveAppContext = new SteveAppContext(config, logFileRetriever, info);
         server.setHandler(steveAppContext.getHandlers());
     }
 
@@ -147,7 +151,8 @@ public class JettyServer {
         httpsConfig.addCustomizer(new SecureRequestCustomizer());
 
         // SSL Connector
-        ServerConnector https = new ServerConnector(server,
+        ServerConnector https = new ServerConnector(
+                server,
                 new SslConnectionFactory(sslContextFactory, HttpVersion.HTTP_1_1.asString()),
                 new HttpConnectionFactory(httpsConfig));
         https.setHost(config.getJetty().getServerHost());
@@ -196,8 +201,8 @@ public class JettyServer {
                 .map(this::getConnectorPath)
                 .flatMap(ips -> ips.entrySet().stream())
                 .toList();
-        setList(list, isSecured -> isSecured ? "http" : "https", info.getWebInterface(), info.getWebInterface());
-        setList(list, isSecured -> isSecured ? "ws" : "wss", info.getOcppWebSocket());
+        setList(list, isSecured -> isSecured ? "https" : "http", info.getWebInterface(), info.getOcppSoap());
+        setList(list, isSecured -> isSecured ? "wss" : "ws", info.getOcppWebSocket());
     }
 
     private Map<String, Boolean> getConnectorPath(Connector c) {
@@ -206,8 +211,7 @@ public class JettyServer {
         var isSecure = sc.getDefaultConnectionFactory() instanceof SslConnectionFactory;
         var layout = "://%s:%d" + config.getPaths().getContextPath();
 
-        return getIps(sc, config.getJetty().getServerHost())
-                .stream()
+        return getIps(sc, config.getJetty().getServerHost()).stream()
                 .map(k -> String.format(layout, k, sc.getPort()))
                 .collect(HashMap::new, (m, v) -> m.put(v, isSecure), HashMap::putAll);
     }
@@ -223,10 +227,11 @@ public class JettyServer {
         return ips;
     }
 
-    private static void setList(List<Map.Entry<String, Boolean>> list, Function<Boolean, String> prefix, EndpointInfo.ItemsWithInfo... items) {
-        var ws = list.stream()
-                .map(e -> prefix.apply(e.getValue()) + e.getKey())
-                .toList();
+    private static void setList(
+            List<Map.Entry<String, Boolean>> list,
+            Function<Boolean, String> prefix,
+            EndpointInfo.ItemsWithInfo... items) {
+        var ws = list.stream().map(e -> prefix.apply(e.getValue()) + e.getKey()).toList();
         for (EndpointInfo.ItemsWithInfo item : items) {
             item.setData(ws);
         }
@@ -263,9 +268,10 @@ public class JettyServer {
 
         // https://stackoverflow.com/a/20418809
         try {
-            for (Enumeration<NetworkInterface> ifaces = NetworkInterface.getNetworkInterfaces(); ifaces.hasMoreElements();) {
+            for (Enumeration<NetworkInterface> ifaces = NetworkInterface.getNetworkInterfaces();
+                    ifaces.hasMoreElements(); ) {
                 NetworkInterface iface = ifaces.nextElement();
-                for (Enumeration<InetAddress> inetAddrs = iface.getInetAddresses(); inetAddrs.hasMoreElements();) {
+                for (Enumeration<InetAddress> inetAddrs = iface.getInetAddresses(); inetAddrs.hasMoreElements(); ) {
                     InetAddress inetAddr = inetAddrs.nextElement();
                     if (!inetAddr.isLoopbackAddress() && (inetAddr instanceof Inet4Address)) {
                         ips.add(inetAddr.getHostAddress());

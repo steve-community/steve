@@ -25,7 +25,7 @@ import de.rwth.idsg.steve.repository.dto.ConnectorStatus;
 import de.rwth.idsg.steve.web.dto.ChargePointForm;
 import de.rwth.idsg.steve.web.dto.ChargePointQueryForm;
 import de.rwth.idsg.steve.web.dto.ConnectorStatusForm;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Collections;
 import java.util.List;
@@ -39,7 +39,8 @@ import java.util.Optional;
 public interface ChargePointRepository {
     Optional<String> getRegistrationStatus(String chargeBoxId);
 
-    List<ChargePointSelect> getChargePointSelect(OcppProtocol protocol, List<String> inStatusFilter, List<String> chargeBoxIdFilter);
+    List<ChargePointSelect> getChargePointSelect(
+            OcppProtocol protocol, List<String> inStatusFilter, List<String> chargeBoxIdFilter);
 
     default List<ChargePointSelect> getChargePointSelect(OcppProtocol protocol, List<String> inStatusFilter) {
         return getChargePointSelect(protocol, inStatusFilter, Collections.emptyList());
@@ -48,9 +49,11 @@ public interface ChargePointRepository {
     Optional<ChargePointSelect> getChargePointSelect(String chargeBoxID);
 
     List<String> getChargeBoxIds();
+
     Map<String, Integer> getChargeBoxIdPkPair(List<String> chargeBoxIdList);
 
     List<ChargePoint.Overview> getOverview(ChargePointQueryForm form);
+
     Optional<ChargePoint.Details> getDetails(int chargeBoxPk);
 
     default List<ConnectorStatus> getChargePointConnectorStatus() {
@@ -62,7 +65,10 @@ public interface ChargePointRepository {
     List<Integer> getNonZeroConnectorIds(String chargeBoxId);
 
     void addChargePointList(List<String> chargeBoxIdList);
+
     int addChargePoint(ChargePointForm form);
+
     void updateChargePoint(ChargePointForm form);
+
     void deleteChargePoint(int chargeBoxPk);
 }

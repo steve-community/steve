@@ -30,15 +30,14 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-
-import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.time.ZoneId;
+import jakarta.validation.Valid;
 
 /**
  * One controller for about and settings pages
@@ -74,7 +73,7 @@ public class AboutSettingsController {
         model.addAttribute("version", config.getSteveVersion());
         model.addAttribute("db", genericRepository.getDBVersion());
         model.addAttribute("logFile", logController.getLogFilePath());
-        model.addAttribute("systemTime", LocalDateTime.now());
+        model.addAttribute("systemTime", Instant.now());
         model.addAttribute("systemTimeZone", ZoneId.systemDefault());
         model.addAttribute("releaseReport", releaseCheckService.check());
         model.addAttribute("endpointInfo", info);
@@ -90,8 +89,8 @@ public class AboutSettingsController {
     }
 
     @PostMapping(params = "change", value = SETTINGS_PATH)
-    public String postSettings(@Valid @ModelAttribute("settingsForm") SettingsForm settingsForm,
-                               BindingResult result, Model model) {
+    public String postSettings(
+            @Valid @ModelAttribute("settingsForm") SettingsForm settingsForm, BindingResult result, Model model) {
         if (result.hasErrors()) {
             model.addAttribute("features", NotificationFeature.values());
             return "settings";
@@ -102,8 +101,8 @@ public class AboutSettingsController {
     }
 
     @PostMapping(params = "testMail", value = SETTINGS_PATH)
-    public String testMail(@Valid @ModelAttribute("settingsForm") SettingsForm settingsForm,
-                           BindingResult result, Model model) {
+    public String testMail(
+            @Valid @ModelAttribute("settingsForm") SettingsForm settingsForm, BindingResult result, Model model) {
         if (result.hasErrors()) {
             model.addAttribute("features", NotificationFeature.values());
             return "settings";

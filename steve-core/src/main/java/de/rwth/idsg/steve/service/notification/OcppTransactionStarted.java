@@ -24,6 +24,6 @@ import lombok.Data;
 @Data
 public class OcppTransactionStarted {
 
-  private final int transactionId;
-  private final InsertTransactionParams params;
+    private final int transactionId;
+    private final InsertTransactionParams params;
 }

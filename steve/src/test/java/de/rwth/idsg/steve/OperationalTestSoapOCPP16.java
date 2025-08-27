@@ -22,6 +22,7 @@ import de.rwth.idsg.steve.ocpp.OcppProtocol;
 import de.rwth.idsg.steve.ocpp.soap.MessageHeaderInterceptor;
 import de.rwth.idsg.steve.repository.ReservationStatus;
 import de.rwth.idsg.steve.service.CentralSystemService16_Service;
+import de.rwth.idsg.steve.utils.LogFileRetriever;
 import de.rwth.idsg.steve.utils.SteveConfigurationReader;
 import de.rwth.idsg.steve.utils.__DatabasePreparer__;
 import lombok.extern.slf4j.Slf4j;
@@ -39,8 +40,6 @@ import ocpp.cs._2015._10.SampledValue;
 import ocpp.cs._2015._10.StartTransactionRequest;
 import ocpp.cs._2015._10.StatusNotificationRequest;
 import ocpp.cs._2015._10.StopTransactionRequest;
-
-import jakarta.xml.ws.WebServiceException;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
@@ -51,6 +50,7 @@ import java.time.OffsetDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 import java.util.List;
+import jakarta.xml.ws.WebServiceException;
 
 import static de.rwth.idsg.steve.utils.Helpers.getForOcpp16;
 import static de.rwth.idsg.steve.utils.Helpers.getHttpPath;
@@ -82,7 +82,7 @@ public class OperationalTestSoapOCPP16 {
 
         path = getHttpPath(config);
 
-        app = new Application(config);
+        app = new Application(config, new LogFileRetriever());
         app.start();
     }
 
@@ -153,9 +153,7 @@ public class OperationalTestSoapOCPP16 {
     public void testRegisteredIdTag() {
         var client = getForOcpp16(path);
 
-        var auth = client.authorize(
-                new AuthorizeRequest().withIdTag(REGISTERED_OCPP_TAG),
-                REGISTERED_CHARGE_BOX_ID);
+        var auth = client.authorize(new AuthorizeRequest().withIdTag(REGISTERED_OCPP_TAG), REGISTERED_CHARGE_BOX_ID);
 
         assertThat(auth).isNotNull();
         assertThat(auth.getIdTagInfo().getStatus()).isEqualTo(AuthorizationStatus.ACCEPTED);
@@ -165,9 +163,7 @@ public class OperationalTestSoapOCPP16 {
     public void testUnregisteredIdTag() {
         var client = getForOcpp16(path);
 
-        var auth = client.authorize(
-                new AuthorizeRequest().withIdTag(getRandomString()),
-                REGISTERED_CHARGE_BOX_ID);
+        var auth = client.authorize(new AuthorizeRequest().withIdTag(getRandomString()), REGISTERED_CHARGE_BOX_ID);
 
         assertThat(auth).isNotNull();
         assertThat(auth.getIdTagInfo().getStatus()).isEqualTo(AuthorizationStatus.INVALID);
@@ -183,12 +179,12 @@ public class OperationalTestSoapOCPP16 {
                         .withIdTag(REGISTERED_OCPP_TAG)
                         .withTimestamp(OffsetDateTime.now())
                         .withMeterStart(0),
-                REGISTERED_CHARGE_BOX_ID
-        );
+                REGISTERED_CHARGE_BOX_ID);
 
         assertThat(start).isNotNull();
         assertThat(start.getTransactionId()).isGreaterThan(0);
-        assertThat(__DatabasePreparer__.getOcppTagRecord(REGISTERED_OCPP_TAG).getInTransaction()).isTrue();
+        assertThat(__DatabasePreparer__.getOcppTagRecord(REGISTERED_OCPP_TAG).getInTransaction())
+                .isTrue();
 
         var stop = client.stopTransaction(
                 new StopTransactionRequest()
@@ -196,11 +192,11 @@ public class OperationalTestSoapOCPP16 {
                         .withTimestamp(OffsetDateTime.now())
                         .withIdTag(REGISTERED_OCPP_TAG)
                         .withMeterStop(30),
-                REGISTERED_CHARGE_BOX_ID
-        );
+                REGISTERED_CHARGE_BOX_ID);
 
         assertThat(stop).isNotNull();
-        assertThat(__DatabasePreparer__.getOcppTagRecord(REGISTERED_OCPP_TAG).getInTransaction()).isFalse();
+        assertThat(__DatabasePreparer__.getOcppTagRecord(REGISTERED_OCPP_TAG).getInTransaction())
+                .isFalse();
     }
 
     /**
@@ -212,9 +208,8 @@ public class OperationalTestSoapOCPP16 {
         var client = getForOcpp16(path);
 
         {
-            var auth1 = client.authorize(
-                    new AuthorizeRequest().withIdTag(REGISTERED_OCPP_TAG),
-                    REGISTERED_CHARGE_BOX_ID);
+            var auth1 =
+                    client.authorize(new AuthorizeRequest().withIdTag(REGISTERED_OCPP_TAG), REGISTERED_CHARGE_BOX_ID);
             assertThat(auth1.getIdTagInfo().getStatus()).isEqualTo(AuthorizationStatus.ACCEPTED);
 
             var start1 = client.startTransaction(
@@ -227,16 +222,14 @@ public class OperationalTestSoapOCPP16 {
             assertThat(start1.getTransactionId()).isGreaterThan(0);
             assertThat(start1.getIdTagInfo().getStatus()).isEqualTo(AuthorizationStatus.ACCEPTED);
 
-            var auth1Retry = client.authorize(
-                    new AuthorizeRequest().withIdTag(REGISTERED_OCPP_TAG),
-                    REGISTERED_CHARGE_BOX_ID);
+            var auth1Retry =
+                    client.authorize(new AuthorizeRequest().withIdTag(REGISTERED_OCPP_TAG), REGISTERED_CHARGE_BOX_ID);
             assertThat(auth1Retry.getIdTagInfo().getStatus()).isEqualTo(AuthorizationStatus.ACCEPTED);
         }
 
         {
-            var auth2 = client.authorize(
-                    new AuthorizeRequest().withIdTag(REGISTERED_OCPP_TAG),
-                    REGISTERED_CHARGE_BOX_ID_2);
+            var auth2 =
+                    client.authorize(new AuthorizeRequest().withIdTag(REGISTERED_OCPP_TAG), REGISTERED_CHARGE_BOX_ID_2);
             assertThat(auth2.getIdTagInfo().getStatus()).isEqualTo(AuthorizationStatus.ACCEPTED);
 
             var start2 = client.startTransaction(
@@ -249,9 +242,8 @@ public class OperationalTestSoapOCPP16 {
             assertThat(start2.getTransactionId()).isGreaterThan(0);
             assertThat(start2.getIdTagInfo().getStatus()).isEqualTo(AuthorizationStatus.CONCURRENT_TX);
 
-            var auth2Retry = client.authorize(
-                    new AuthorizeRequest().withIdTag(REGISTERED_OCPP_TAG),
-                    REGISTERED_CHARGE_BOX_ID_2);
+            var auth2Retry =
+                    client.authorize(new AuthorizeRequest().withIdTag(REGISTERED_OCPP_TAG), REGISTERED_CHARGE_BOX_ID_2);
             assertThat(auth2Retry.getIdTagInfo().getStatus()).isEqualTo(AuthorizationStatus.ACCEPTED);
         }
     }
@@ -276,8 +268,7 @@ public class OperationalTestSoapOCPP16 {
                                 .withStatus(chargePointStatus)
                                 .withConnectorId(i)
                                 .withTimestamp(OffsetDateTime.now()),
-                        REGISTERED_CHARGE_BOX_ID
-                );
+                        REGISTERED_CHARGE_BOX_ID);
                 assertThat(status).isNotNull();
             }
 
@@ -300,8 +291,7 @@ public class OperationalTestSoapOCPP16 {
                         .withStatus(ChargePointStatus.FAULTED)
                         .withConnectorId(faultyConnectorId)
                         .withTimestamp(OffsetDateTime.now()),
-                REGISTERED_CHARGE_BOX_ID
-        );
+                REGISTERED_CHARGE_BOX_ID);
         assertThat(statusConnectorError).isNotNull();
 
         var connectorStatusList = __DatabasePreparer__.getChargePointConnectorStatus();
@@ -318,7 +308,7 @@ public class OperationalTestSoapOCPP16 {
 
     @Test
     public void testReservation() {
-        int usedConnectorID = 1;
+        int usedConnectorId = 1;
 
         var client = getForOcpp16(path);
 
@@ -329,7 +319,7 @@ public class OperationalTestSoapOCPP16 {
         initStationWithBootNotification(client);
         initConnectorsWithStatusNotification(client);
 
-        var reservationId = __DatabasePreparer__.makeReservation(usedConnectorID);
+        var reservationId = __DatabasePreparer__.makeReservation(usedConnectorId);
 
         // -------------------------------------------------------------------------
         // startTransaction (invalid reservationId)
@@ -339,13 +329,12 @@ public class OperationalTestSoapOCPP16 {
 
         var startInvalid = client.startTransaction(
                 new StartTransactionRequest()
-                        .withConnectorId(usedConnectorID)
+                        .withConnectorId(usedConnectorId)
                         .withIdTag(REGISTERED_OCPP_TAG)
                         .withTimestamp(OffsetDateTime.now())
                         .withMeterStart(0)
                         .withReservationId(nonExistingReservationId),
-                REGISTERED_CHARGE_BOX_ID
-        );
+                REGISTERED_CHARGE_BOX_ID);
         assertThat(startInvalid).isNotNull();
 
         // validate that the transaction is written to db, even though reservation was invalid
@@ -373,8 +362,7 @@ public class OperationalTestSoapOCPP16 {
                         .withTimestamp(OffsetDateTime.now())
                         .withMeterStart(0)
                         .withReservationId(reservationId),
-                REGISTERED_CHARGE_BOX_ID
-        );
+                REGISTERED_CHARGE_BOX_ID);
         assertThat(startWrongTag).isNotNull();
 
         {
@@ -391,13 +379,12 @@ public class OperationalTestSoapOCPP16 {
 
         var startValidId = client.startTransaction(
                 new StartTransactionRequest()
-                        .withConnectorId(usedConnectorID)
+                        .withConnectorId(usedConnectorId)
                         .withIdTag(REGISTERED_OCPP_TAG)
                         .withTimestamp(OffsetDateTime.now())
                         .withMeterStart(0)
                         .withReservationId(reservationId),
-                REGISTERED_CHARGE_BOX_ID
-        );
+                REGISTERED_CHARGE_BOX_ID);
         assertThat(startValidId).isNotNull();
         var transactionIdValid = startValidId.getTransactionId();
 
@@ -415,13 +402,12 @@ public class OperationalTestSoapOCPP16 {
 
         var startValidIdUsedTwice = client.startTransaction(
                 new StartTransactionRequest()
-                        .withConnectorId(usedConnectorID)
+                        .withConnectorId(usedConnectorId)
                         .withIdTag(REGISTERED_OCPP_TAG)
                         .withTimestamp(OffsetDateTime.now())
                         .withMeterStart(0)
                         .withReservationId(reservationId),
-                REGISTERED_CHARGE_BOX_ID
-        );
+                REGISTERED_CHARGE_BOX_ID);
         assertThat(startValidIdUsedTwice).isNotNull();
 
         {
@@ -454,7 +440,7 @@ public class OperationalTestSoapOCPP16 {
     }
 
     private void testBody(List<MeterValue> meterValues, List<MeterValue> transactionData) {
-        final var usedConnectorID = 1;
+        final var usedConnectorId = 1;
 
         var client = getForOcpp16(path);
 
@@ -462,17 +448,11 @@ public class OperationalTestSoapOCPP16 {
         initConnectorsWithStatusNotification(client);
 
         // heartbeat
-        var heartbeat = client.heartbeat(
-                new HeartbeatRequest(),
-                REGISTERED_CHARGE_BOX_ID
-        );
+        var heartbeat = client.heartbeat(new HeartbeatRequest(), REGISTERED_CHARGE_BOX_ID);
         assertThat(heartbeat).isNotNull();
 
         // Auth
-        var auth = client.authorize(
-                new AuthorizeRequest().withIdTag(REGISTERED_OCPP_TAG),
-                REGISTERED_CHARGE_BOX_ID
-        );
+        var auth = client.authorize(new AuthorizeRequest().withIdTag(REGISTERED_OCPP_TAG), REGISTERED_CHARGE_BOX_ID);
         // Simple request, not much done here
         assertThat(auth).isNotNull();
         assertThat(auth.getIdTagInfo().getStatus()).isEqualTo(AuthorizationStatus.ACCEPTED);
@@ -481,12 +461,11 @@ public class OperationalTestSoapOCPP16 {
         var startTimeStamp = OffsetDateTime.now();
         var start = client.startTransaction(
                 new StartTransactionRequest()
-                        .withConnectorId(usedConnectorID)
+                        .withConnectorId(usedConnectorId)
                         .withIdTag(REGISTERED_OCPP_TAG)
                         .withTimestamp(startTimeStamp)
                         .withMeterStart(0),
-                REGISTERED_CHARGE_BOX_ID
-        );
+                REGISTERED_CHARGE_BOX_ID);
         assertThat(start).isNotNull();
 
         var transactionID = start.getTransactionId();
@@ -496,7 +475,8 @@ public class OperationalTestSoapOCPP16 {
 
         {
             var t = allTransactions.get(0);
-            assertThat(t.getStartTimestamp()).isCloseTo(startTimeStamp.toLocalDateTime(), byLessThan(1, ChronoUnit.SECONDS));
+            assertThat(t.getStartTimestamp())
+                    .isCloseTo(startTimeStamp.toLocalDateTime(), byLessThan(1, ChronoUnit.SECONDS));
             assertThat(t.getStartValue()).isEqualTo("0");
 
             assertThat(t.getStopTimestamp()).isNull();
@@ -511,20 +491,17 @@ public class OperationalTestSoapOCPP16 {
                         .withErrorCode(ChargePointErrorCode.NO_ERROR)
                         .withConnectorId(0)
                         .withTimestamp(OffsetDateTime.now()),
-                REGISTERED_CHARGE_BOX_ID
-
-        );
+                REGISTERED_CHARGE_BOX_ID);
         assertThat(statusStart).isNotNull();
 
         // send meterValues
         if (meterValues != null) {
             var meter = client.meterValues(
                     new MeterValuesRequest()
-                            .withConnectorId(usedConnectorID)
+                            .withConnectorId(usedConnectorId)
                             .withTransactionId(transactionID)
                             .withMeterValue(meterValues),
-                    REGISTERED_CHARGE_BOX_ID
-            );
+                    REGISTERED_CHARGE_BOX_ID);
             assertThat(meter).isNotNull();
             checkMeterValues(meterValues, transactionID);
         }
@@ -539,15 +516,15 @@ public class OperationalTestSoapOCPP16 {
                         .withTimestamp(stopTimeStamp)
                         .withIdTag(REGISTERED_OCPP_TAG)
                         .withMeterStop(stopValue),
-                REGISTERED_CHARGE_BOX_ID
-        );
+                REGISTERED_CHARGE_BOX_ID);
 
         {
             assertThat(stop).isNotNull();
             var transactionsStop = __DatabasePreparer__.getTransactionRecords();
             assertThat(transactionsStop).hasSize(1);
             var t = transactionsStop.get(0);
-            assertThat(t.getStopTimestamp()).isCloseTo(stopTimeStamp.toLocalDateTime(), byLessThan(1, ChronoUnit.SECONDS));
+            assertThat(t.getStopTimestamp())
+                    .isCloseTo(stopTimeStamp.toLocalDateTime(), byLessThan(1, ChronoUnit.SECONDS));
             assertThat(t.getStopValue()).isEqualTo(Integer.toString(stopValue));
 
             if (transactionData != null) {
@@ -560,10 +537,9 @@ public class OperationalTestSoapOCPP16 {
                 new StatusNotificationRequest()
                         .withStatus(ChargePointStatus.AVAILABLE)
                         .withErrorCode(ChargePointErrorCode.NO_ERROR)
-                        .withConnectorId(usedConnectorID)
+                        .withConnectorId(usedConnectorId)
                         .withTimestamp(OffsetDateTime.now()),
-                REGISTERED_CHARGE_BOX_ID
-        );
+                REGISTERED_CHARGE_BOX_ID);
         assertThat(statusStop).isNotNull();
     }
 
@@ -585,8 +561,7 @@ public class OperationalTestSoapOCPP16 {
                             .withStatus(ChargePointStatus.AVAILABLE)
                             .withConnectorId(i)
                             .withTimestamp(OffsetDateTime.now()),
-                    REGISTERED_CHARGE_BOX_ID
-            );
+                    REGISTERED_CHARGE_BOX_ID);
             assertThat(statusBoot).isNotNull();
         }
     }
@@ -612,23 +587,14 @@ public class OperationalTestSoapOCPP16 {
 
     private List<MeterValue> getTransactionData() {
         return Arrays.asList(
-                createMeterValue("0.0"),
-                createMeterValue("10.0"),
-                createMeterValue("20.0"),
-                createMeterValue("30.0")
-        );
+                createMeterValue("0.0"), createMeterValue("10.0"), createMeterValue("20.0"), createMeterValue("30.0"));
     }
 
     private List<MeterValue> getMeterValues() {
-        return Arrays.asList(
-                createMeterValue("3.0"),
-                createMeterValue("13.0"),
-                createMeterValue("23.0")
-        );
+        return Arrays.asList(createMeterValue("3.0"), createMeterValue("13.0"), createMeterValue("23.0"));
     }
 
     private static MeterValue createMeterValue(String val) {
-        return new MeterValue().withTimestamp(OffsetDateTime.now())
-                               .withSampledValue(new SampledValue().withValue(val));
+        return new MeterValue().withTimestamp(OffsetDateTime.now()).withSampledValue(new SampledValue().withValue(val));
     }
 }

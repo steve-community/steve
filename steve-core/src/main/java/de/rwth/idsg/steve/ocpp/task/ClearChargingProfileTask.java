@@ -37,8 +37,8 @@ public class ClearChargingProfileTask extends Ocpp16AndAboveTask<ClearChargingPr
 
     private final ChargingProfileRepository chargingProfileRepository;
 
-    public ClearChargingProfileTask(ClearChargingProfileParams params,
-                                    ChargingProfileRepository chargingProfileRepository) {
+    public ClearChargingProfileTask(
+            ClearChargingProfileParams params, ChargingProfileRepository chargingProfileRepository) {
         super(params);
         this.chargingProfileRepository = chargingProfileRepository;
     }
@@ -51,21 +51,26 @@ public class ClearChargingProfileTask extends Ocpp16AndAboveTask<ClearChargingPr
                 addNewResponse(chargeBoxId, statusValue);
 
                 switch (params.getFilterType()) {
-                    case ChargingProfileId:
+                    case ChargingProfileId ->
                         chargingProfileRepository.clearProfile(params.getChargingProfilePk(), chargeBoxId);
-                        break;
-                    case OtherParameters:
-                        chargingProfileRepository.clearProfile(chargeBoxId,
-                        params.getConnectorId(), params.getChargingProfilePurpose(), params.getStackLevel());
-                        break;
-                    default:
+                    case OtherParameters ->
+                        chargingProfileRepository.clearProfile(
+                                chargeBoxId,
+                                params.getConnectorId(),
+                                params.getChargingProfilePurpose(),
+                                params.getStackLevel());
+                    default -> {
                         log.warn("Unexpected {} enum value", ClearChargingProfileFilterType.class.getSimpleName());
                         return;
+                    }
                 }
 
                 // https://github.com/steve-community/steve/pull/968
                 if (!"Accepted".equalsIgnoreCase(statusValue)) {
-                    log.info("Deleted charging profile(s) for chargebox '{}' from DB even though the response was {}", chargeBoxId, statusValue);
+                    log.info(
+                            "Deleted charging profile(s) for chargebox '{}' from DB even though the response was {}",
+                            chargeBoxId,
+                            statusValue);
                 }
             }
         };

@@ -24,7 +24,7 @@ import jooq.steve.db.enums.TransactionStopEventActor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.ToString;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.time.Instant;
 
@@ -33,7 +33,9 @@ import java.time.Instant;
  * @author Sevket Goekay <sevketgokay@gmail.com>
  *
  */
-@Schema(description = """
+@Schema(
+        description =
+                """
         For active transactions, all 'stop'-prefixed fields would be null.
         The energy consumed during the transaction can be calculated by subtracting the 'startValue' from the 'stopValue'.
         The unit of the 'startValue' and 'stopValue' is watt-hours (Wh).
@@ -72,29 +74,24 @@ public final class Transaction {
     private final String startValue;
 
     @Schema(description = "The timestamp at which the transaction started")
-    private final Instant startTimestamp;
+    private final @Nullable Instant startTimestamp;
 
     /**
      * Only relevant for the web pages. Disabled for API
      */
     @JsonIgnore
     @Schema(hidden = true)
-    @Nullable
-    private final String stopTimestampFormatted;
+    private final @Nullable String stopTimestampFormatted;
 
-    @Nullable
     @Schema(description = "The meter value reading at the end of the transaction")
-    private final String stopValue;
+    private final @Nullable String stopValue;
 
-    @Nullable
     @Schema(description = "The reason for the transaction being stopped")
-    private final String stopReason; // new in OCPP 1.6
+    private final @Nullable String stopReason; // new in OCPP 1.6
 
-    @Nullable
     @Schema(description = "The timestamp at which the transaction ended")
-    private final Instant stopTimestamp;
+    private final @Nullable Instant stopTimestamp;
 
-    @Nullable
     @Schema(description = "The actor who stopped the transaction")
-    private final TransactionStopEventActor stopEventActor;
+    private final @Nullable TransactionStopEventActor stopEventActor;
 }

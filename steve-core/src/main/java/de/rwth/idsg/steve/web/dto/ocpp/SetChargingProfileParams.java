@@ -33,11 +33,7 @@ import jakarta.validation.constraints.Positive;
 @Getter
 public class SetChargingProfileParams extends MultipleChargePointSelect {
 
-    @NotNull
-    @Min(value = 0, message = "Connector ID must be at least {value}")
-    private Integer connectorId;
+    @NotNull @Min(value = 0, message = "Connector ID must be at least {value}") private Integer connectorId;
 
-    @NotNull
-    @Positive
-    private Integer chargingProfilePk;
+    @NotNull @Positive private Integer chargingProfilePk;
 }

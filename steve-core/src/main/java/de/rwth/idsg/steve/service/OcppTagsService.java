@@ -18,10 +18,6 @@
  */
 package de.rwth.idsg.steve.service;
 
-import static de.rwth.idsg.steve.utils.DateTimeUtils.toOffsetDateTime;
-import static de.rwth.idsg.steve.utils.OcppTagActivityRecordUtils.isBlocked;
-import static de.rwth.idsg.steve.utils.OcppTagActivityRecordUtils.isExpired;
-
 import com.google.common.base.Strings;
 import de.rwth.idsg.steve.repository.OcppTagRepository;
 import de.rwth.idsg.steve.repository.dto.OcppTag;
@@ -34,13 +30,17 @@ import lombok.extern.slf4j.Slf4j;
 import ocpp.cp._2015._10.AuthorizationData;
 import ocpp.cs._2015._10.AuthorizationStatus;
 import ocpp.cs._2015._10.IdTagInfo;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Supplier;
+
+import static de.rwth.idsg.steve.utils.DateTimeUtils.toOffsetDateTime;
+import static de.rwth.idsg.steve.utils.OcppTagActivityRecordUtils.isBlocked;
+import static de.rwth.idsg.steve.utils.OcppTagActivityRecordUtils.isExpired;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -102,14 +102,17 @@ public class OcppTagsService {
         invalidOcppTagService.removeAll(idTagList);
     }
 
-    @Nullable
-    public IdTagInfo getIdTagInfo(@Nullable String idTag, boolean isStartTransactionReqContext,
-                                  @Nullable String chargeBoxId, @Nullable Integer connectorId) {
+    public @Nullable IdTagInfo getIdTagInfo(
+            @Nullable String idTag,
+            boolean isStartTransactionReqContext,
+            @Nullable String chargeBoxId,
+            @Nullable Integer connectorId) {
         if (Strings.isNullOrEmpty(idTag)) {
             return null;
         }
 
-        IdTagInfo idTagInfo = authTagService.decideStatus(idTag, isStartTransactionReqContext, chargeBoxId, connectorId);
+        IdTagInfo idTagInfo =
+                authTagService.decideStatus(idTag, isStartTransactionReqContext, chargeBoxId, connectorId);
 
         if (idTagInfo.getStatus() == AuthorizationStatus.INVALID) {
             invalidOcppTagService.processNewUnidentified(idTag);
@@ -118,10 +121,12 @@ public class OcppTagsService {
         return idTagInfo;
     }
 
-    @Nullable
-    public IdTagInfo getIdTagInfo(@Nullable String idTag, boolean isStartTransactionReqContext,
-                                  @Nullable String chargeBoxId, @Nullable Integer connectorId,
-        Supplier<IdTagInfo> supplierWhenException) {
+    public @Nullable IdTagInfo getIdTagInfo(
+            @Nullable String idTag,
+            boolean isStartTransactionReqContext,
+            @Nullable String chargeBoxId,
+            @Nullable Integer connectorId,
+            Supplier<IdTagInfo> supplierWhenException) {
         try {
             return getIdTagInfo(idTag, isStartTransactionReqContext, chargeBoxId, connectorId);
         } catch (Exception e) {
@@ -139,6 +144,7 @@ public class OcppTagsService {
         removeUnknown(Collections.singletonList(form.getIdTag()));
         return id;
     }
+
     public void addOcppTagList(List<String> idTagList) {
         ocppTagRepository.addOcppTagList(idTagList);
         removeUnknown(idTagList);
@@ -159,26 +165,25 @@ public class OcppTagsService {
     /**
      * ConcurrentTx is only valid for StartTransactionRequest
      */
-    private static ocpp.cp._2015._10.AuthorizationStatus decideStatusForAuthData(OcppTagActivityRecord record,
-                                                                                 Instant now) {
+    private static ocpp.cp._2015._10.AuthorizationStatus decideStatusForAuthData(
+            OcppTagActivityRecord record, Instant now) {
         if (isBlocked(record)) {
             return ocpp.cp._2015._10.AuthorizationStatus.BLOCKED;
         } else if (isExpired(record, now)) {
             return ocpp.cp._2015._10.AuthorizationStatus.EXPIRED;
-//        } else if (reachedLimitOfActiveTransactions(record)) {
-//            return ocpp.cp._2015._10.AuthorizationStatus.CONCURRENT_TX;
+            //        } else if (reachedLimitOfActiveTransactions(record)) {
+            //            return ocpp.cp._2015._10.AuthorizationStatus.CONCURRENT_TX;
         } else {
             return ocpp.cp._2015._10.AuthorizationStatus.ACCEPTED;
         }
     }
 
     private static AuthorizationData mapToAuthorizationData(OcppTagActivityRecord record, Instant nowDt) {
-        return new AuthorizationData().withIdTag(record.getIdTag())
-                                      .withIdTagInfo(
-                                              new ocpp.cp._2015._10.IdTagInfo()
-                                                      .withStatus(decideStatusForAuthData(record, nowDt))
-                                                      .withParentIdTag(record.getParentIdTag())
-                                                      .withExpiryDate(toOffsetDateTime(record.getExpiryDate()))
-                                      );
+        return new AuthorizationData()
+                .withIdTag(record.getIdTag())
+                .withIdTagInfo(new ocpp.cp._2015._10.IdTagInfo()
+                        .withStatus(decideStatusForAuthData(record, nowDt))
+                        .withParentIdTag(record.getParentIdTag())
+                        .withExpiryDate(toOffsetDateTime(record.getExpiryDate())));
     }
 }

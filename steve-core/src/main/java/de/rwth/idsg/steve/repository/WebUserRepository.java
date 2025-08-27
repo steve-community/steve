@@ -24,7 +24,7 @@ import org.jooq.JSON;
 import org.jooq.Record4;
 import org.jooq.Result;
 
-public interface WebUserRepository  {
+public interface WebUserRepository {
 
     void createUser(WebUserRecord user);
 

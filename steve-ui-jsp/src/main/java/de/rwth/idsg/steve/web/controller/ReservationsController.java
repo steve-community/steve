@@ -27,12 +27,10 @@ import de.rwth.idsg.steve.service.TransactionStopService;
 import de.rwth.idsg.steve.web.dto.ReservationQueryForm;
 import de.rwth.idsg.steve.web.dto.TransactionQueryForm;
 import lombok.RequiredArgsConstructor;
+import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-
-import jakarta.servlet.http.HttpServletResponse;
-import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -40,6 +38,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.io.IOException;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
 
 /**
  * One controller for transactions and reservations pages
@@ -98,9 +98,12 @@ public class ReservationsController {
     }
 
     @GetMapping(value = TRANSACTIONS_QUERY_PATH)
-    public String getTransactionsQuery(@Valid @ModelAttribute(PARAMS) TransactionQueryForm params,
-                                       BindingResult result, Model model,
-                                       HttpServletResponse response) throws IOException {
+    public @Nullable String getTransactionsQuery(
+            @Valid @ModelAttribute(PARAMS) TransactionQueryForm params,
+            BindingResult result,
+            Model model,
+            HttpServletResponse response)
+            throws IOException {
         if (result.hasErrors()) {
             initList(model);
             model.addAttribute(PARAMS, params);
@@ -135,8 +138,8 @@ public class ReservationsController {
     }
 
     @GetMapping(value = RESERVATIONS_QUERY_PATH)
-    public String getReservationsQuery(@Valid @ModelAttribute(PARAMS) ReservationQueryForm params,
-                                      BindingResult result, Model model) {
+    public String getReservationsQuery(
+            @Valid @ModelAttribute(PARAMS) ReservationQueryForm params, BindingResult result, Model model) {
         if (!result.hasErrors()) {
             model.addAttribute("reservList", reservationsService.getReservations(params));
         }

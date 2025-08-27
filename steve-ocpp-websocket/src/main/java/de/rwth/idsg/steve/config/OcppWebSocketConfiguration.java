@@ -61,11 +61,10 @@ public class OcppWebSocketConfiguration implements WebSocketConfigurer {
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
 
         OcppWebSocketHandshakeHandler handshakeHandler = new OcppWebSocketHandshakeHandler(
-            chargeBoxIdValidator,
-            new DefaultHandshakeHandler(),
-            Lists.newArrayList(ocpp16WebSocketEndpoint, ocpp15WebSocketEndpoint, ocpp12WebSocketEndpoint),
-            chargePointRegistrationService
-        );
+                chargeBoxIdValidator,
+                new DefaultHandshakeHandler(),
+                Lists.newArrayList(ocpp16WebSocketEndpoint, ocpp15WebSocketEndpoint, ocpp12WebSocketEndpoint),
+                chargePointRegistrationService);
 
         registry.addHandler(handshakeHandler.getDummyWebSocketHandler(), PATH_INFIX + "*")
                 .setHandshakeHandler(handshakeHandler)

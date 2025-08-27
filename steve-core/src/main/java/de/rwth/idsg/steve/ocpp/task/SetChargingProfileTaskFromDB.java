@@ -46,9 +46,10 @@ public class SetChargingProfileTaskFromDB extends SetChargingProfileTask {
     private final ChargingProfile.Details details;
     private final ChargingProfileRepository chargingProfileRepository;
 
-    public SetChargingProfileTaskFromDB(SetChargingProfileParams params,
-                                        ChargingProfile.Details details,
-                                        ChargingProfileRepository chargingProfileRepository) {
+    public SetChargingProfileTaskFromDB(
+            SetChargingProfileParams params,
+            ChargingProfile.Details details,
+            ChargingProfileRepository chargingProfileRepository) {
         super(params);
         this.connectorId = params.getConnectorId();
         this.details = details;
@@ -74,17 +75,15 @@ public class SetChargingProfileTaskFromDB extends SetChargingProfileTask {
     public SetChargingProfileRequest getOcpp16Request() {
         ChargingProfileRecord profile = details.getProfile();
 
-        List<ChargingSchedulePeriod> schedulePeriods =
-            details.getPeriods()
-                       .stream()
-                       .map(k -> {
-                           ChargingSchedulePeriod p = new ChargingSchedulePeriod();
-                           p.setStartPeriod(k.getStartPeriodInSeconds());
-                           p.setLimit(k.getPowerLimit());
-                           p.setNumberPhases(k.getNumberPhases());
-                           return p;
-                       })
-                       .collect(Collectors.toList());
+        List<ChargingSchedulePeriod> schedulePeriods = details.getPeriods().stream()
+                .map(k -> {
+                    ChargingSchedulePeriod p = new ChargingSchedulePeriod();
+                    p.setStartPeriod(k.getStartPeriodInSeconds());
+                    p.setLimit(k.getPowerLimit());
+                    p.setNumberPhases(k.getNumberPhases());
+                    return p;
+                })
+                .collect(Collectors.toList());
 
         ChargingSchedule schedule = new ChargingSchedule()
                 .withDuration(profile.getDurationInSeconds())
@@ -98,14 +97,16 @@ public class SetChargingProfileTaskFromDB extends SetChargingProfileTask {
                 .withStackLevel(profile.getStackLevel())
                 .withChargingProfilePurpose(ChargingProfilePurposeType.fromValue(profile.getChargingProfilePurpose()))
                 .withChargingProfileKind(ChargingProfileKindType.fromValue(profile.getChargingProfileKind()))
-                .withRecurrencyKind(profile.getRecurrencyKind() == null ? null : RecurrencyKindType.fromValue(profile.getRecurrencyKind()))
+                .withRecurrencyKind(
+                        profile.getRecurrencyKind() == null
+                                ? null
+                                : RecurrencyKindType.fromValue(profile.getRecurrencyKind()))
                 .withValidFrom(toOffsetDateTime(profile.getValidFrom()))
                 .withValidTo(toOffsetDateTime(profile.getValidTo()))
                 .withChargingSchedule(schedule);
 
-        var request = new SetChargingProfileRequest()
-                .withConnectorId(connectorId)
-                .withCsChargingProfiles(ocppProfile);
+        var request =
+                new SetChargingProfileRequest().withConnectorId(connectorId).withCsChargingProfiles(ocppProfile);
 
         checkAdditionalConstraints(request);
 

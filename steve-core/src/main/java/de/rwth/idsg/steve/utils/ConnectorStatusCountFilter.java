@@ -76,5 +76,4 @@ public final class ConnectorStatusCountFilter {
 
         return set;
     }
-
 }

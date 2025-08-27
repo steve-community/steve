@@ -81,9 +81,9 @@ public class WebUsersService implements UserDetailsManager {
     private final PasswordEncoder encoder;
 
     private final Cache<String, UserDetails> userCache = CacheBuilder.newBuilder()
-        .expireAfterWrite(10, TimeUnit.MINUTES) // TTL
-        .maximumSize(100)
-        .build();
+            .expireAfterWrite(10, TimeUnit.MINUTES) // TTL
+            .maximumSize(100)
+            .build();
 
     @EventListener
     public void afterStart(ContextRefreshedEvent event) {
@@ -94,15 +94,15 @@ public class WebUsersService implements UserDetailsManager {
         var headerVal = config.getWebApi().getHeaderValue();
 
         var encodedApiPassword = headerVal == null || headerVal.isBlank()
-            ? null
-            : config.getAuth().getPasswordEncoder().encode(headerVal);
+                ? null
+                : config.getAuth().getPasswordEncoder().encode(headerVal);
 
         var user = new WebUserRecord()
-            .setUsername(config.getAuth().getUserName())
-            .setPassword(config.getAuth().getEncodedPassword())
-            .setApiPassword(encodedApiPassword)
-            .setEnabled(true)
-            .setAuthorities(toJson(AuthorityUtils.createAuthorityList("ADMIN")));
+                .setUsername(config.getAuth().getUserName())
+                .setPassword(config.getAuth().getEncodedPassword())
+                .setApiPassword(encodedApiPassword)
+                .setEnabled(true)
+                .setAuthorities(toJson(AuthorityUtils.createAuthorityList("ADMIN")));
 
         webUserRepository.createUser(user);
     }
@@ -135,12 +135,12 @@ public class WebUsersService implements UserDetailsManager {
      */
     @Override
     public void changePassword(String oldPassword, String newPassword) {
-        Authentication currentUser = this.securityContextHolderStrategy.getContext().getAuthentication();
+        Authentication currentUser =
+                this.securityContextHolderStrategy.getContext().getAuthentication();
         if (currentUser == null) {
             // This would indicate bad coding somewhere
             throw new AccessDeniedException(
-                "Can't change password as no Authentication object found in context for current user."
-            );
+                    "Can't change password as no Authentication object found in context for current user.");
         }
 
         String username = currentUser.getName();
@@ -165,12 +165,11 @@ public class WebUsersService implements UserDetailsManager {
             throw new UsernameNotFoundException(username);
         }
 
-        return User
-            .withUsername(webUser.getUsername())
-            .password(webUser.getPassword())
-            .disabled(!webUser.getEnabled())
-            .authorities(fromJson(webUser.getAuthorities()))
-            .build();
+        return User.withUsername(webUser.getUsername())
+                .password(webUser.getPassword())
+                .disabled(!webUser.getEnabled())
+                .authorities(fromJson(webUser.getAuthorities()))
+                .build();
     }
 
     public UserDetails loadUserByUsernameForApi(String username) {
@@ -230,14 +229,12 @@ public class WebUsersService implements UserDetailsManager {
     }
 
     public List<WebUserOverview> getOverview(WebUserQueryForm form) {
-        return webUserRepository.getOverview(form)
-                .map(r -> WebUserOverview.builder()
-                        .webUserPk(r.value1())
-                        .webUsername(r.value2())
-                        .enabled(r.value3())
-                        .authorities(WebUserAuthority.fromJsonValue(mapper, r.value4()))
-                        .build()
-                );
+        return webUserRepository.getOverview(form).map(r -> WebUserOverview.builder()
+                .webUserPk(r.value1())
+                .webUsername(r.value2())
+                .enabled(r.value3())
+                .authorities(WebUserAuthority.fromJsonValue(mapper, r.value4()))
+                .build());
     }
 
     public WebUserBaseForm getDetails(Integer webUserPk) {
@@ -283,29 +280,27 @@ public class WebUsersService implements UserDetailsManager {
             apiPassword = "";
         }
 
-        return User
-            .withUsername(record.getUsername())
-            .password(apiPassword)
-            .disabled(!record.getEnabled())
-            .authorities(fromJson(record.getAuthorities()))
-            .build();
+        return User.withUsername(record.getUsername())
+                .password(apiPassword)
+                .disabled(!record.getEnabled())
+                .authorities(fromJson(record.getAuthorities()))
+                .build();
     }
 
     private WebUserRecord toWebUserRecord(UserDetails user) {
         return new WebUserRecord()
-            .setUsername(user.getUsername())
-            .setPassword(user.getPassword())
-            .setEnabled(user.isEnabled())
-            .setAuthorities(toJson(user.getAuthorities()));
+                .setUsername(user.getUsername())
+                .setPassword(user.getPassword())
+                .setEnabled(user.isEnabled())
+                .setAuthorities(toJson(user.getAuthorities()));
     }
 
     private UserDetails toUserDetailsBaseForm(WebUserBaseForm form) {
-        return User
-            .withUsername(form.getWebUsername())
-            .password("")
-            .disabled(!form.getEnabled())
-            .authorities(fromJson(form.getAuthorities().getJsonValue()))
-            .build();
+        return User.withUsername(form.getWebUsername())
+                .password("")
+                .disabled(!form.getEnabled())
+                .authorities(fromJson(form.getAuthorities().getJsonValue()))
+                .build();
     }
 
     private UserDetails toUserDetails(WebUserForm form) {
@@ -315,12 +310,11 @@ public class WebUsersService implements UserDetailsManager {
             Assert.hasText(rawPassword, "Password may not be empty");
             encPw = encoder.encode(rawPassword);
         }
-        return User
-            .withUsername(form.getWebUsername())
-            .password(encPw)
-            .disabled(!form.getEnabled())
-            .authorities(fromJson(form.getAuthorities().getJsonValue()))
-            .build();
+        return User.withUsername(form.getWebUsername())
+                .password(encPw)
+                .disabled(!form.getEnabled())
+                .authorities(fromJson(form.getAuthorities().getJsonValue()))
+                .build();
     }
 
     private String[] fromJson(JSON jsonArray) {
@@ -333,9 +327,9 @@ public class WebUsersService implements UserDetailsManager {
 
     private JSON toJson(Collection<? extends GrantedAuthority> authorities) {
         Collection<String> auths = authorities.stream()
-            .map(GrantedAuthority::getAuthority)
-            .sorted() // keep a stable order of entries
-            .collect(Collectors.toCollection(LinkedHashSet::new)); // prevent duplicates
+                .map(GrantedAuthority::getAuthority)
+                .sorted() // keep a stable order of entries
+                .collect(Collectors.toCollection(LinkedHashSet::new)); // prevent duplicates
 
         try {
             String str = mapper.writeValueAsString(auths);

@@ -18,8 +18,8 @@
  */
 package de.rwth.idsg.steve;
 
+import de.rwth.idsg.steve.utils.LogFileRetriever;
 import de.rwth.idsg.steve.web.dto.EndpointInfo;
-import jakarta.servlet.DispatcherType;
 import org.apache.cxf.transport.servlet.CXFServlet;
 import org.apache.tomcat.InstanceManager;
 import org.apache.tomcat.SimpleInstanceManager;
@@ -48,6 +48,8 @@ import org.springframework.web.servlet.DispatcherServlet;
 import java.io.IOException;
 import java.util.EnumSet;
 import java.util.HashSet;
+import java.util.Set;
+import jakarta.servlet.DispatcherType;
 
 import static de.rwth.idsg.steve.config.OcppWebSocketConfiguration.IDLE_TIMEOUT;
 import static de.rwth.idsg.steve.config.OcppWebSocketConfiguration.MAX_MSG_SIZE;
@@ -62,11 +64,12 @@ public class SteveAppContext {
     private final AnnotationConfigWebApplicationContext springContext;
     private final WebAppContext webAppContext;
 
-    public SteveAppContext(SteveConfiguration config, EndpointInfo info) {
+    public SteveAppContext(SteveConfiguration config, LogFileRetriever logFileRetriever, EndpointInfo info) {
         this.config = config;
         springContext = new AnnotationConfigWebApplicationContext();
-        GenericApplicationContext context = new GenericApplicationContext();
+        var context = new GenericApplicationContext();
         context.registerBean(SteveConfiguration.class, () -> config);
+        context.registerBean(LogFileRetriever.class, () -> logFileRetriever);
         context.registerBean(EndpointInfo.class, () -> info);
         context.refresh();
         context.setParent(springContext.getParent());
@@ -76,17 +79,14 @@ public class SteveAppContext {
     }
 
     public ContextHandlerCollection getHandlers() {
-        return new ContextHandlerCollection(
-            new ContextHandler(getRedirectHandler()),
-            new ContextHandler(getWebApp())
-        );
+        return new ContextHandlerCollection(new ContextHandler(getRedirectHandler()), new ContextHandler(getWebApp()));
     }
 
     /**
      * Otherwise, defaults come from {@link WebSocketConstants}
      */
     public void configureWebSocket() {
-        JettyWebSocketServerContainer container = JettyWebSocketServerContainer.getContainer(webAppContext.getServletContext());
+        var container = JettyWebSocketServerContainer.getContainer(webAppContext.getServletContext());
         container.setMaxTextMessageSize(MAX_MSG_SIZE);
         container.setIdleTimeout(IDLE_TIMEOUT);
     }
@@ -102,7 +102,7 @@ public class SteveAppContext {
     }
 
     private WebAppContext initWebApp() {
-        WebAppContext ctx = new WebAppContext();
+        var ctx = new WebAppContext();
         ctx.setContextPath(config.getPaths().getContextPath());
         ctx.setBaseResourceAsString(getWebAppURIAsString());
 
@@ -114,42 +114,43 @@ public class SteveAppContext {
 
         ctx.addEventListener(new ContextLoaderListener(springContext));
 
-        ServletHolder web = new ServletHolder("spring-dispatcher", new DispatcherServlet(springContext));
+        var web = new ServletHolder("spring-dispatcher", new DispatcherServlet(springContext));
         ctx.addServlet(web, config.getPaths().getRootMapping());
 
-        ServletHolder cxf = new ServletHolder("cxf", new CXFServlet());
+        var cxf = new ServletHolder("cxf", new CXFServlet());
         ctx.addServlet(cxf, config.getPaths().getSoapMapping() + "/*");
 
         // add spring security
         ctx.addFilter(
-            // The bean name is not arbitrary, but is as expected by Spring
-            new FilterHolder(new DelegatingFilterProxy(AbstractSecurityWebApplicationInitializer.DEFAULT_FILTER_NAME)),
-            config.getPaths().getRootMapping() + "*",
-            EnumSet.allOf(DispatcherType.class)
-        );
+                // The bean name is not arbitrary, but is as expected by Spring
+                new FilterHolder(
+                        new DelegatingFilterProxy(AbstractSecurityWebApplicationInitializer.DEFAULT_FILTER_NAME)),
+                config.getPaths().getRootMapping() + "*",
+                EnumSet.allOf(DispatcherType.class));
 
         initJSP(ctx);
         return ctx;
     }
 
     private Handler getRedirectHandler() {
-        RewriteHandler rewrite = new RewriteHandler();
-        for (String redirect : getRedirectSet()) {
-            RedirectPatternRule rule = new RedirectPatternRule();
+        var rewrite = new RewriteHandler();
+        for (var redirect : getRedirectSet()) {
+            var rule = new RedirectPatternRule();
             rule.setTerminating(true);
             rule.setPattern(redirect);
-            rule.setLocation(config.getPaths().getContextPath() + config.getPaths().getManagerMapping() + "/home");
+            rule.setLocation(
+                    config.getPaths().getContextPath() + config.getPaths().getManagerMapping() + "/home");
             rewrite.addRule(rule);
         }
         return rewrite;
     }
 
-    private HashSet<String> getRedirectSet() {
-        String path = config.getPaths().getContextPath();
+    private Set<String> getRedirectSet() {
+        var path = config.getPaths().getContextPath();
 
-        HashSet<String> redirectSet = new HashSet<>(3);
+        var redirectSet = HashSet.<String>newHashSet(3);
         redirectSet.add("");
-        redirectSet.add(path + "");
+        redirectSet.add(path);
 
         // Otherwise (if path = ""), we would already be at root of the server ("/")
         // and using the redirection below would cause an infinite loop.
@@ -210,7 +211,7 @@ public class SteveAppContext {
 
         @Override
         protected void doStart() throws Exception {
-            ClassLoader old = Thread.currentThread().getContextClassLoader();
+            var old = Thread.currentThread().getContextClassLoader();
             Thread.currentThread().setContextClassLoader(context.getClassLoader());
             try {
                 sci.onStartup(null, context.getServletContext());

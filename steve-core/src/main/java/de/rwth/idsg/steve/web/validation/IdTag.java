@@ -18,10 +18,10 @@
  */
 package de.rwth.idsg.steve.web.validation;
 
-import jakarta.validation.Constraint;
-import jakarta.validation.Payload;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
+import jakarta.validation.Constraint;
+import jakarta.validation.Payload;
 
 import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.ElementType.METHOD;
@@ -36,7 +36,8 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Constraint(validatedBy = {IdTagValidator.class, IdTagListValidator.class})
 public @interface IdTag {
 
-    String message() default "ID Tag can only contain upper or lower case letters, numbers and dot, colon, dash, underscore or hash symbols";
+    String message() default
+            "ID Tag can only contain upper or lower case letters, numbers and dot, colon, dash, underscore or hash symbols";
 
     // Required by validation runtime
     Class<?>[] groups() default {};

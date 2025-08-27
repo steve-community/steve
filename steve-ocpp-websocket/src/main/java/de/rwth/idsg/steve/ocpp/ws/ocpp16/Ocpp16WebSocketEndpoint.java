@@ -28,7 +28,11 @@ import de.rwth.idsg.steve.ocpp.soap.CentralSystemService16_SoapServer;
 import de.rwth.idsg.steve.ocpp.ws.AbstractWebSocketEndpoint;
 import de.rwth.idsg.steve.ocpp.ws.FutureResponseContextStore;
 import de.rwth.idsg.steve.ocpp.ws.SessionContextStore;
-import de.rwth.idsg.steve.ocpp.ws.pipeline.*;
+import de.rwth.idsg.steve.ocpp.ws.pipeline.AbstractCallHandler;
+import de.rwth.idsg.steve.ocpp.ws.pipeline.Deserializer;
+import de.rwth.idsg.steve.ocpp.ws.pipeline.IncomingPipeline;
+import de.rwth.idsg.steve.ocpp.ws.pipeline.Sender;
+import de.rwth.idsg.steve.ocpp.ws.pipeline.Serializer;
 import de.rwth.idsg.steve.repository.OcppServerRepository;
 import lombok.RequiredArgsConstructor;
 import ocpp.cs._2015._10.AuthorizeRequest;
@@ -56,18 +60,22 @@ public class Ocpp16WebSocketEndpoint extends AbstractWebSocketEndpoint {
 
     private final IncomingPipeline pipeline;
 
-    public Ocpp16WebSocketEndpoint(DelegatingTaskScheduler asyncTaskScheduler,
-                                   OcppServerRepository ocppServerRepository,
-                                   FutureResponseContextStore futureResponseContextStore,
-                                   ApplicationEventPublisher applicationEventPublisher,
-                                   CentralSystemService16_SoapServer server,
-                                   Ocpp16TypeStore typeStore,
-                                   SessionContextStore sessionStore,
-                                   @Qualifier("ocppObjectMapper")
-                                   ObjectMapper ocppMapper,
-                                   Sender sender) {
-        super(asyncTaskScheduler, ocppServerRepository, futureResponseContextStore, applicationEventPublisher,
-            sessionStore);
+    public Ocpp16WebSocketEndpoint(
+            DelegatingTaskScheduler asyncTaskScheduler,
+            OcppServerRepository ocppServerRepository,
+            FutureResponseContextStore futureResponseContextStore,
+            ApplicationEventPublisher applicationEventPublisher,
+            CentralSystemService16_SoapServer server,
+            Ocpp16TypeStore typeStore,
+            SessionContextStore sessionStore,
+            @Qualifier("ocppObjectMapper") ObjectMapper ocppMapper,
+            Sender sender) {
+        super(
+                asyncTaskScheduler,
+                ocppServerRepository,
+                futureResponseContextStore,
+                applicationEventPublisher,
+                sessionStore);
         var serializer = new Serializer(ocppMapper);
         var deserializer = new Deserializer(ocppMapper, futureResponseContextStore, typeStore);
         this.pipeline = new IncomingPipeline(serializer, deserializer, sender, new Ocpp16CallHandler(server));
@@ -90,43 +98,27 @@ public class Ocpp16WebSocketEndpoint extends AbstractWebSocketEndpoint {
 
         @Override
         protected ResponseType dispatch(RequestType params, String chargeBoxId) {
-            ResponseType r;
-
-            if (params instanceof BootNotificationRequest) {
-                r = server.bootNotificationWithTransport((BootNotificationRequest) params, chargeBoxId,
-                    OcppProtocol.V_16_JSON);
-
-            } else if (params instanceof FirmwareStatusNotificationRequest) {
-                r = server.firmwareStatusNotification((FirmwareStatusNotificationRequest) params, chargeBoxId);
-
-            } else if (params instanceof StatusNotificationRequest) {
-                r = server.statusNotification((StatusNotificationRequest) params, chargeBoxId);
-
-            } else if (params instanceof MeterValuesRequest) {
-                r = server.meterValues((MeterValuesRequest) params, chargeBoxId);
-
-            } else if (params instanceof DiagnosticsStatusNotificationRequest) {
-                r = server.diagnosticsStatusNotification((DiagnosticsStatusNotificationRequest) params, chargeBoxId);
-
-            } else if (params instanceof StartTransactionRequest) {
-                r = server.startTransaction((StartTransactionRequest) params, chargeBoxId);
-
-            } else if (params instanceof StopTransactionRequest) {
-                r = server.stopTransaction((StopTransactionRequest) params, chargeBoxId);
-
-            } else if (params instanceof HeartbeatRequest) {
-                r = server.heartbeat((HeartbeatRequest) params, chargeBoxId);
-
-            } else if (params instanceof AuthorizeRequest) {
-                r = server.authorize((AuthorizeRequest) params, chargeBoxId);
-
-            } else if (params instanceof DataTransferRequest) {
-                r = server.dataTransfer((DataTransferRequest) params, chargeBoxId);
-            } else {
-                throw new IllegalArgumentException("Unexpected RequestType, dispatch method not found");
-            }
-
-            return r;
+            return switch (params) {
+                case BootNotificationRequest bootNotificationRequest ->
+                    server.bootNotificationWithTransport(bootNotificationRequest, chargeBoxId, OcppProtocol.V_16_JSON);
+                case FirmwareStatusNotificationRequest firmwareStatusNotificationRequest ->
+                    server.firmwareStatusNotification(firmwareStatusNotificationRequest, chargeBoxId);
+                case StatusNotificationRequest statusNotificationRequest ->
+                    server.statusNotification(statusNotificationRequest, chargeBoxId);
+                case MeterValuesRequest meterValuesRequest -> server.meterValues(meterValuesRequest, chargeBoxId);
+                case DiagnosticsStatusNotificationRequest diagnosticsStatusNotificationRequest ->
+                    server.diagnosticsStatusNotification(diagnosticsStatusNotificationRequest, chargeBoxId);
+                case StartTransactionRequest startTransactionRequest ->
+                    server.startTransaction(startTransactionRequest, chargeBoxId);
+                case StopTransactionRequest stopTransactionRequest ->
+                    server.stopTransaction(stopTransactionRequest, chargeBoxId);
+                case HeartbeatRequest heartbeatRequest -> server.heartbeat(heartbeatRequest, chargeBoxId);
+                case AuthorizeRequest request -> server.authorize(request, chargeBoxId);
+                case DataTransferRequest dataTransferRequest -> server.dataTransfer(dataTransferRequest, chargeBoxId);
+                default ->
+                    throw new IllegalArgumentException(
+                            "Unexpected RequestType, dispatch method not found for " + params);
+            };
         }
     }
 }

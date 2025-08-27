@@ -72,8 +72,10 @@ public class SessionContextStoreImpl implements SessionContextStore {
             Deque<SessionContext> endpointDeque = lookupTable.computeIfAbsent(chargeBoxId, str -> new ArrayDeque<>());
             endpointDeque.addLast(context); // Adding at the end
 
-            log.debug("A new SessionContext is stored for chargeBoxId '{}'. Store size: {}",
-                    chargeBoxId, endpointDeque.size());
+            log.debug(
+                    "A new SessionContext is stored for chargeBoxId '{}'. Store size: {}",
+                    chargeBoxId,
+                    endpointDeque.size());
         } finally {
             l.unlock();
         }
@@ -107,8 +109,10 @@ public class SessionContextStoreImpl implements SessionContextStore {
                 toRemove.getPingSchedule().cancel(true);
                 // 2. Delete from collection
                 if (endpointDeque.remove(toRemove)) {
-                    log.debug("A SessionContext is removed for chargeBoxId '{}'. Store size: {}",
-                            chargeBoxId, endpointDeque.size());
+                    log.debug(
+                            "A SessionContext is removed for chargeBoxId '{}'. Store size: {}",
+                            chargeBoxId,
+                            endpointDeque.size());
                 }
                 // 3. Delete empty collection from lookup table in order to correctly calculate
                 // the number of connected chargeboxes with getNumberOfChargeBoxes()

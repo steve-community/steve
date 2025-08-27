@@ -63,11 +63,11 @@ public class ChargePointServiceJsonInvoker implements ChargePointServiceInvoker 
     private final OutgoingCallPipeline outgoingCallPipeline;
     private final Map<OcppVersion, InvocationContext> invocationContexts;
 
-    public ChargePointServiceJsonInvoker(FutureResponseContextStore store, Sender sender,
-                                         @Qualifier("ocppObjectMapper")
-                                         ObjectMapper ocppMapper,
-                                         @Qualifier("invocationContexts")
-                                         Map<OcppVersion, InvocationContext> invocationContexts) {
+    public ChargePointServiceJsonInvoker(
+            FutureResponseContextStore store,
+            Sender sender,
+            @Qualifier("ocppObjectMapper") ObjectMapper ocppMapper,
+            @Qualifier("invocationContexts") Map<OcppVersion, InvocationContext> invocationContexts) {
         this.outgoingCallPipeline = new OutgoingCallPipeline(store, new Serializer(ocppMapper), sender);
         this.invocationContexts = invocationContexts;
     }
@@ -96,8 +96,7 @@ public class ChargePointServiceJsonInvoker implements ChargePointServiceInvoker 
         if (!invocationContexts.containsKey(protocol.getVersion())) {
             throw new IllegalArgumentException("Unsupported OCPP version: " + protocol.getVersion());
         }
-        var context = invocationContexts.get(protocol.getVersion())
-                .toCommunicationContext(cps.getChargeBoxId(), task);
+        var context = invocationContexts.get(protocol.getVersion()).toCommunicationContext(cps.getChargeBoxId(), task);
         outgoingCallPipeline.accept(context);
     }
 

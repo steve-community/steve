@@ -20,9 +20,9 @@ package de.rwth.idsg.steve.web.validation;
 
 import org.hibernate.validator.internal.constraintvalidators.bv.EmailValidator;
 
+import java.util.Collection;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
-import java.util.Collection;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>

@@ -18,6 +18,7 @@
  */
 package de.rwth.idsg.steve;
 
+import de.rwth.idsg.steve.utils.LogFileRetriever;
 import de.rwth.idsg.steve.utils.SteveConfigurationReader;
 import de.rwth.idsg.steve.utils.__DatabasePreparer__;
 import ocpp.cs._2015._10.MeterValue;
@@ -58,7 +59,7 @@ public abstract class StressTest {
 
         __DatabasePreparer__.prepare(config);
 
-        var app = new Application(config);
+        var app = new Application(config, new LogFileRetriever());
         try {
             app.start();
             attackInternal();
@@ -89,7 +90,8 @@ public abstract class StressTest {
     }
 
     protected static MeterValue createMeterValue(int val) {
-        return new MeterValue().withTimestamp(OffsetDateTime.now())
-                               .withSampledValue(new SampledValue().withValue(Integer.toString(val)));
+        return new MeterValue()
+                .withTimestamp(OffsetDateTime.now())
+                .withSampledValue(new SampledValue().withValue(Integer.toString(val)));
     }
 }

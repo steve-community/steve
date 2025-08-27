@@ -47,12 +47,14 @@ import java.util.List;
  */
 @Configuration
 @ComponentScan(basePackages = {"org.springdoc"})
-@Import({SpringDocConfiguration.class,
+@Import({
+    SpringDocConfiguration.class,
     SpringDocWebMvcConfiguration.class,
     SwaggerConfig.class,
     SwaggerUiConfigProperties.class,
     SwaggerUiOAuthProperties.class,
-    JacksonAutoConfiguration.class})
+    JacksonAutoConfiguration.class
+})
 public class ApiDocsConfiguration {
 
     static {
@@ -76,25 +78,23 @@ public class ApiDocsConfiguration {
         String securityName = "basicAuth";
 
         SecurityScheme securityScheme = new SecurityScheme()
-            .type(SecurityScheme.Type.HTTP)
-            .scheme("basic")
-            .name(securityName);
+                .type(SecurityScheme.Type.HTTP)
+                .scheme("basic")
+                .name(securityName);
 
         return new OpenAPI()
-            .info(new Info()
-                .title(title)
-                .description(title)
-                .license(new License()
-                    .name("GPL-3.0")
-                    .url("https://github.com/steve-community/steve/blob/master/LICENSE.txt")
-                )
-                .version(config.getSteveVersion())
-            )
-            // https://stackoverflow.com/a/68185254
-            .servers(List.of(new Server().url("/").description("Default Server URL")))
-            // define a security schema
-            .components(new Components().addSecuritySchemes(securityName, securityScheme))
-            // and activate it for all endpoints
-            .addSecurityItem(new SecurityRequirement().addList(securityName));
+                .info(new Info()
+                        .title(title)
+                        .description(title)
+                        .license(new License()
+                                .name("GPL-3.0")
+                                .url("https://github.com/steve-community/steve/blob/master/LICENSE.txt"))
+                        .version(config.getSteveVersion()))
+                // https://stackoverflow.com/a/68185254
+                .servers(List.of(new Server().url("/").description("Default Server URL")))
+                // define a security schema
+                .components(new Components().addSecuritySchemes(securityName, securityScheme))
+                // and activate it for all endpoints
+                .addSecurityItem(new SecurityRequirement().addList(securityName));
     }
 }

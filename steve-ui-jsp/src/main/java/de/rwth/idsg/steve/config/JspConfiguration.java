@@ -27,7 +27,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.view.InternalResourceViewResolver;
 
 @Configuration
-public class JspConfiguration implements WebMvcConfigurer  {
+public class JspConfiguration implements WebMvcConfigurer {
 
     /**
      * Resolver for JSP views/templates. Controller classes process the requests

@@ -21,9 +21,9 @@ package de.rwth.idsg.steve.web.dto.ocpp;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.Objects;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
-import java.util.Objects;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -32,11 +32,10 @@ import java.util.Objects;
 @Getter
 public class ChangeAvailabilityParams extends MultipleChargePointSelect {
 
-    @Min(value = 0, message = "Connector ID must be at least {value}")
-    private Integer connectorId;
+    @Min(value = 0, message = "Connector ID must be at least {value}") private Integer connectorId;
 
-    @NotNull(message = "Availability Type is required")
-    @Setter private AvailabilityType availType;
+    @NotNull(message = "Availability Type is required") @Setter
+    private AvailabilityType availType;
 
     /**
      * if empty, 0 = charge point as a whole

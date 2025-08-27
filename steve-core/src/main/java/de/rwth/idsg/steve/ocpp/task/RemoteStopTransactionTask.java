@@ -45,20 +45,17 @@ public class RemoteStopTransactionTask extends CommunicationTask<RemoteStopTrans
 
     @Override
     public ocpp.cp._2010._08.RemoteStopTransactionRequest getOcpp12Request() {
-        return new ocpp.cp._2010._08.RemoteStopTransactionRequest()
-                .withTransactionId(params.getTransactionId());
+        return new ocpp.cp._2010._08.RemoteStopTransactionRequest().withTransactionId(params.getTransactionId());
     }
 
     @Override
     public ocpp.cp._2012._06.RemoteStopTransactionRequest getOcpp15Request() {
-        return new ocpp.cp._2012._06.RemoteStopTransactionRequest()
-                .withTransactionId(params.getTransactionId());
+        return new ocpp.cp._2012._06.RemoteStopTransactionRequest().withTransactionId(params.getTransactionId());
     }
 
     @Override
     public ocpp.cp._2015._10.RemoteStopTransactionRequest getOcpp16Request() {
-        return new ocpp.cp._2015._10.RemoteStopTransactionRequest()
-                .withTransactionId(params.getTransactionId());
+        return new ocpp.cp._2015._10.RemoteStopTransactionRequest().withTransactionId(params.getTransactionId());
     }
 
     @Override

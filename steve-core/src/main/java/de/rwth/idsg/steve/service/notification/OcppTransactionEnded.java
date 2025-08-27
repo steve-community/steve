@@ -24,5 +24,5 @@ import lombok.Data;
 @Data
 public class OcppTransactionEnded {
 
-  private final UpdateTransactionParams params;
+    private final UpdateTransactionParams params;
 }

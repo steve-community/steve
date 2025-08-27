@@ -22,10 +22,10 @@ import de.rwth.idsg.steve.repository.dto.ChargePointSelect;
 import lombok.Getter;
 import lombok.Setter;
 
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
 import java.util.Collections;
 import java.util.List;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -35,7 +35,5 @@ import java.util.List;
 @Setter
 public class MultipleChargePointSelect implements ChargePointSelection {
 
-    @NotNull(message = "Charge point selection is required")
-    @Size(min = 1, message = "Please select at least {min} charge point")
-    private List<ChargePointSelect> chargePointSelectList = Collections.emptyList();
+    @NotNull(message = "Charge point selection is required") @Size(min = 1, message = "Please select at least {min} charge point") private List<ChargePointSelect> chargePointSelectList = Collections.emptyList();
 }

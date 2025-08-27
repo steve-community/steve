@@ -30,7 +30,6 @@ import java.util.Deque;
  */
 @Getter
 public enum WsSessionSelectStrategyEnum implements WsSessionSelectStrategy {
-
     ALWAYS_LAST {
         /**
          * Always use the last opened session/connection.
@@ -56,7 +55,7 @@ public enum WsSessionSelectStrategyEnum implements WsSessionSelectStrategy {
     };
 
     public static WsSessionSelectStrategy fromName(String v) {
-        for (WsSessionSelectStrategyEnum s: WsSessionSelectStrategyEnum.values()) {
+        for (WsSessionSelectStrategyEnum s : WsSessionSelectStrategyEnum.values()) {
             if (s.name().equals(v)) {
                 return s;
             }

@@ -36,8 +36,9 @@ public class RepositoryUtils {
 
     public static Select<Record1<String>> ocppTagByUserIdQuery(DSLContext ctx, int userId) {
         return ctx.select(OCPP_TAG.ID_TAG)
-            .from(OCPP_TAG)
-            .join(USER_OCPP_TAG).on(USER_OCPP_TAG.OCPP_TAG_PK.eq(OCPP_TAG.OCPP_TAG_PK))
-            .where(USER_OCPP_TAG.USER_PK.eq(userId));
+                .from(OCPP_TAG)
+                .join(USER_OCPP_TAG)
+                .on(USER_OCPP_TAG.OCPP_TAG_PK.eq(OCPP_TAG.OCPP_TAG_PK))
+                .where(USER_OCPP_TAG.USER_PK.eq(userId));
     }
 }

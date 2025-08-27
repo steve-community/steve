@@ -28,9 +28,12 @@ import de.rwth.idsg.steve.ocpp.soap.CentralSystemService12_SoapServer;
 import de.rwth.idsg.steve.ocpp.ws.AbstractWebSocketEndpoint;
 import de.rwth.idsg.steve.ocpp.ws.FutureResponseContextStore;
 import de.rwth.idsg.steve.ocpp.ws.SessionContextStore;
-import de.rwth.idsg.steve.ocpp.ws.pipeline.*;
+import de.rwth.idsg.steve.ocpp.ws.pipeline.AbstractCallHandler;
+import de.rwth.idsg.steve.ocpp.ws.pipeline.Deserializer;
+import de.rwth.idsg.steve.ocpp.ws.pipeline.IncomingPipeline;
+import de.rwth.idsg.steve.ocpp.ws.pipeline.Sender;
+import de.rwth.idsg.steve.ocpp.ws.pipeline.Serializer;
 import de.rwth.idsg.steve.repository.OcppServerRepository;
-import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import ocpp.cs._2010._08.AuthorizeRequest;
 import ocpp.cs._2010._08.BootNotificationRequest;
@@ -56,18 +59,22 @@ public class Ocpp12WebSocketEndpoint extends AbstractWebSocketEndpoint {
 
     private final IncomingPipeline pipeline;
 
-    public Ocpp12WebSocketEndpoint(DelegatingTaskScheduler asyncTaskScheduler,
-                                   OcppServerRepository ocppServerRepository,
-                                   FutureResponseContextStore futureResponseContextStore,
-                                   ApplicationEventPublisher applicationEventPublisher,
-                                   CentralSystemService12_SoapServer server,
-                                   Ocpp12TypeStore typeStore,
-                                   SessionContextStore sessionContextStore,
-                                   @Qualifier("ocppObjectMapper")
-                                   ObjectMapper ocppMapper,
-                                   Sender sender) {
-        super(asyncTaskScheduler, ocppServerRepository, futureResponseContextStore, applicationEventPublisher,
-            sessionContextStore);
+    public Ocpp12WebSocketEndpoint(
+            DelegatingTaskScheduler asyncTaskScheduler,
+            OcppServerRepository ocppServerRepository,
+            FutureResponseContextStore futureResponseContextStore,
+            ApplicationEventPublisher applicationEventPublisher,
+            CentralSystemService12_SoapServer server,
+            Ocpp12TypeStore typeStore,
+            SessionContextStore sessionContextStore,
+            @Qualifier("ocppObjectMapper") ObjectMapper ocppMapper,
+            Sender sender) {
+        super(
+                asyncTaskScheduler,
+                ocppServerRepository,
+                futureResponseContextStore,
+                applicationEventPublisher,
+                sessionContextStore);
         var serializer = new Serializer(ocppMapper);
         var deserializer = new Deserializer(ocppMapper, futureResponseContextStore, typeStore);
         this.pipeline = new IncomingPipeline(serializer, deserializer, sender, new Ocpp12CallHandler(server));
@@ -83,46 +90,30 @@ public class Ocpp12WebSocketEndpoint extends AbstractWebSocketEndpoint {
         return OcppVersion.V_12;
     }
 
-    @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
+    @RequiredArgsConstructor
     private static class Ocpp12CallHandler extends AbstractCallHandler {
 
         private final CentralSystemService12_SoapServer server;
 
         @Override
         protected ResponseType dispatch(RequestType params, String chargeBoxId) {
-            ResponseType r;
-
-            if (params instanceof BootNotificationRequest) {
-                r = server.bootNotificationWithTransport((BootNotificationRequest) params, chargeBoxId, OcppProtocol.V_12_JSON);
-
-            } else if (params instanceof FirmwareStatusNotificationRequest) {
-                r = server.firmwareStatusNotification((FirmwareStatusNotificationRequest) params, chargeBoxId);
-
-            } else if (params instanceof StatusNotificationRequest) {
-                r = server.statusNotification((StatusNotificationRequest) params, chargeBoxId);
-
-            } else if (params instanceof MeterValuesRequest) {
-                r = server.meterValues((MeterValuesRequest) params, chargeBoxId);
-
-            } else if (params instanceof DiagnosticsStatusNotificationRequest) {
-                r = server.diagnosticsStatusNotification((DiagnosticsStatusNotificationRequest) params, chargeBoxId);
-
-            } else if (params instanceof StartTransactionRequest) {
-                r = server.startTransaction((StartTransactionRequest) params, chargeBoxId);
-
-            } else if (params instanceof StopTransactionRequest) {
-                r = server.stopTransaction((StopTransactionRequest) params, chargeBoxId);
-
-            } else if (params instanceof HeartbeatRequest) {
-                r = server.heartbeat((HeartbeatRequest) params, chargeBoxId);
-
-            } else if (params instanceof AuthorizeRequest) {
-                r = server.authorize((AuthorizeRequest) params, chargeBoxId);
-            } else {
-                throw new IllegalArgumentException("Unexpected RequestType, dispatch method not found");
-            }
-
-            return r;
+            return switch (params) {
+                case BootNotificationRequest boot ->
+                    server.bootNotificationWithTransport(boot, chargeBoxId, OcppProtocol.V_12_JSON);
+                case FirmwareStatusNotificationRequest firmware ->
+                    server.firmwareStatusNotification(firmware, chargeBoxId);
+                case StatusNotificationRequest status -> server.statusNotification(status, chargeBoxId);
+                case MeterValuesRequest mv -> server.meterValues(mv, chargeBoxId);
+                case DiagnosticsStatusNotificationRequest diag ->
+                    server.diagnosticsStatusNotification(diag, chargeBoxId);
+                case StartTransactionRequest start -> server.startTransaction(start, chargeBoxId);
+                case StopTransactionRequest stop -> server.stopTransaction(stop, chargeBoxId);
+                case HeartbeatRequest hb -> server.heartbeat(hb, chargeBoxId);
+                case AuthorizeRequest auth -> server.authorize(auth, chargeBoxId);
+                default ->
+                    throw new IllegalArgumentException(
+                            "Unexpected RequestType, dispatch method not found for " + params);
+            };
         }
     }
 }

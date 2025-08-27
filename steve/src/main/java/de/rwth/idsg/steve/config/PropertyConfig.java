@@ -29,7 +29,8 @@ import java.util.Properties;
 public class PropertyConfig {
 
     // > To avoid these lifecycle issues, mark BFPP-returning @Bean methods as static
-    // From [the Spring documentation](https://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework/context/annotation/Bean.html)
+    // From [the Spring
+    // documentation](https://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework/context/annotation/Bean.html)
     @Bean
     public static PropertySourcesPlaceholderConfigurer valueConfigurer(SteveConfiguration config) {
         var configurer = new PropertySourcesPlaceholderConfigurer();

@@ -27,6 +27,6 @@ import de.rwth.idsg.steve.web.dto.ReleaseReport;
 public class DummyReleaseCheckService implements ReleaseCheckService {
     @Override
     public ReleaseReport check() {
-        return new ReleaseReport(false);
+        return ReleaseReport.builder().moreRecent(false).build();
     }
 }

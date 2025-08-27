@@ -20,16 +20,19 @@ package de.rwth.idsg.steve;
 
 import lombok.Builder;
 import lombok.Getter;
+import org.jspecify.annotations.Nullable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 19.08.2014
  */
-@Builder @Getter
+@Builder
+@Getter
 public class SteveConfiguration {
 
-    @Builder @Getter
+    @Builder
+    @Getter
     public static class Paths {
         // Root mapping for Spring
         private final String rootMapping;
@@ -44,14 +47,14 @@ public class SteveConfiguration {
         // Dummy service path
         private final String routerEndpointPath;
 
-        private final String contextPath;
+        private final @Nullable String contextPath;
     }
 
     private final Paths paths;
     // Time zone for the application and database connections
     private final String timeZoneId;
     private final String steveVersion;
-    private final String gitDescribe;
+    private final @Nullable String gitDescribe;
     private final ApplicationProfile profile;
     private final Ocpp ocpp;
     private final Auth auth;
@@ -79,7 +82,8 @@ public class SteveConfiguration {
     // -------------------------------------------------------------------------
 
     // Jetty configuration
-    @Builder @Getter
+    @Builder
+    @Getter
     public static class Jetty {
         private final String serverHost;
         private final boolean gzipEnabled;
@@ -91,12 +95,13 @@ public class SteveConfiguration {
         // HTTPS
         private final boolean httpsEnabled;
         private final int httpsPort;
-        private final String keyStorePath;
-        private final String keyStorePassword;
+        private final @Nullable String keyStorePath;
+        private final @Nullable String keyStorePassword;
     }
 
     // Database configuration
-    @Builder @Getter
+    @Builder
+    @Getter
     public static class DB {
         private final String jdbcUrl;
         private final String userName;
@@ -105,24 +110,27 @@ public class SteveConfiguration {
     }
 
     // Credentials for Web interface access
-    @Builder @Getter
+    @Builder
+    @Getter
     public static class Auth {
         private final PasswordEncoder passwordEncoder;
         private final String userName;
         private final String encodedPassword;
     }
 
-    @Builder @Getter
+    @Builder
+    @Getter
     public static class WebApi {
-        private final String headerKey;
-        private final String headerValue;
+        private final @Nullable String headerKey;
+        private final @Nullable String headerValue;
     }
 
     // OCPP-related configuration
-    @Builder @Getter
+    @Builder
+    @Getter
     public static class Ocpp {
         private final boolean autoRegisterUnknownStations;
-        private final String chargeBoxIdValidationRegex;
+        private final @Nullable String chargeBoxIdValidationRegex;
         private final String wsSessionSelectStrategy;
     }
 }

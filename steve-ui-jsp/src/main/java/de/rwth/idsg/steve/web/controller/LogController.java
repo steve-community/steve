@@ -19,12 +19,11 @@
 package de.rwth.idsg.steve.web.controller;
 
 import de.rwth.idsg.steve.utils.LogFileRetriever;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-
-import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -33,6 +32,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Optional;
+import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -41,7 +41,9 @@ import java.util.Optional;
 @Slf4j
 @Controller
 @RequestMapping(value = "/manager")
+@RequiredArgsConstructor
 public class LogController {
+    private final LogFileRetriever logFileRetriever;
 
     @GetMapping(value = "/log")
     public void log(HttpServletResponse response) {
@@ -49,13 +51,13 @@ public class LogController {
         response.setCharacterEncoding(StandardCharsets.UTF_8.name());
 
         try (PrintWriter writer = response.getWriter()) {
-            Optional<Path> p = LogFileRetriever.INSTANCE.getPath();
+            Optional<Path> p = logFileRetriever.getPath();
             if (p.isPresent()) {
                 try (BufferedReader br = Files.newBufferedReader(p.get(), StandardCharsets.UTF_8)) {
                     br.lines().forEach(writer::println);
                 }
             } else {
-                writer.write(LogFileRetriever.INSTANCE.getErrorMessage());
+                writer.write(logFileRetriever.getErrorMessage());
             }
         } catch (IOException e) {
             log.error("Exception happened", e);
@@ -63,6 +65,6 @@ public class LogController {
     }
 
     public String getLogFilePath() {
-        return LogFileRetriever.INSTANCE.getLogFilePathOrErrorMessage();
+        return logFileRetriever.getLogFilePathOrErrorMessage();
     }
 }

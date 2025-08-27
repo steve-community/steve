@@ -27,18 +27,17 @@ import de.rwth.idsg.steve.SteveConfiguration;
 import de.rwth.idsg.steve.web.dto.ReleaseReport;
 import de.rwth.idsg.steve.web.dto.ReleaseResponse;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.hc.client5.http.config.ConnectionConfig;
 import org.apache.hc.client5.http.config.RequestConfig;
-import org.apache.hc.client5.http.impl.classic.HttpClientBuilder;
-import org.apache.hc.core5.http.io.SocketConfig;
+import org.apache.hc.client5.http.impl.classic.HttpClients;
 import org.apache.hc.core5.util.Timeout;
+import org.springframework.http.MediaType;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
 import java.io.File;
-import java.util.Collections;
+import java.util.List;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -59,46 +58,50 @@ public class GithubReleaseCheckService implements ReleaseCheckService {
 
     private static final String FILE_SEPARATOR = File.separator;
 
-    private final SteveConfiguration config;
+    private final String steveVersion;
     private final RestTemplate restTemplate;
 
     public GithubReleaseCheckService(SteveConfiguration config) {
-        this.config = config;
+        this.steveVersion = config.getSteveVersion();
+        this.restTemplate = createRestTemplate(createGitHubMapper(), "steve/" + config.getSteveVersion());
+    }
 
+    private static RestTemplate createRestTemplate(ObjectMapper mapper, String userAgent) {
         var timeout = Timeout.ofMilliseconds(API_TIMEOUT_IN_MILLIS);
-
-        var connectionConfig = ConnectionConfig.custom().setConnectTimeout(timeout).build();
-        var socketConfig = SocketConfig.custom().setSoTimeout(timeout).build();
-        var requestConfig = RequestConfig.custom().setConnectionRequestTimeout(timeout).build();
-
-        var httpClient = HttpClientBuilder.create()
-            .setDefaultRequestConfig(requestConfig)
-            .build();
-
+        var requestConfig =
+                RequestConfig.custom().setConnectionRequestTimeout(timeout).build();
+        var httpClient =
+                HttpClients.custom().setDefaultRequestConfig(requestConfig).build();
         var factory = new HttpComponentsClientHttpRequestFactory(httpClient);
 
-        var githubMapper = createGitHubMapper();
-        restTemplate = new RestTemplate(Collections.singletonList(new MappingJackson2HttpMessageConverter(githubMapper)));
+        var messageConverter = new MappingJackson2HttpMessageConverter(mapper);
+        var restTemplate = new RestTemplate(List.of(messageConverter));
         restTemplate.setRequestFactory(factory);
+
+        restTemplate.getInterceptors().add((request, body, execution) -> {
+            request.getHeaders().add("User-Agent", userAgent);
+            request.getHeaders().setAccept(List.of(MediaType.valueOf("application/vnd.github+json")));
+            return execution.execute(request, body);
+        });
+        return restTemplate;
     }
 
     private static ObjectMapper createGitHubMapper() {
         return new ObjectMapper()
                 .registerModule(new JavaTimeModule())
                 .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
-                .setPropertyNamingStrategy(new PropertyNamingStrategies.SnakeCaseStrategy());
+                .setPropertyNamingStrategy(PropertyNamingStrategies.SNAKE_CASE);
     }
 
     @Override
     public ReleaseReport check() {
         try {
-            ReleaseResponse response = restTemplate.getForObject(API_URL, ReleaseResponse.class);
-            return getReport(response, config.getSteveVersion());
-
+            var response = restTemplate.getForObject(API_URL, ReleaseResponse.class);
+            return getReport(response, steveVersion);
         } catch (RestClientException e) {
             // Fallback to "there is no new version atm".
             // Probably because Github did not respond within the timeout.
-            return new ReleaseReport(false);
+            return ReleaseReport.builder().moreRecent(false).build();
         }
     }
 
@@ -107,19 +110,20 @@ public class GithubReleaseCheckService implements ReleaseCheckService {
     // -------------------------------------------------------------------------
 
     private static ReleaseReport getReport(ReleaseResponse response, String buildVersion) {
-        String githubVersion = extractVersion(response);
+        var githubVersion = extractVersion(response);
 
-        Version build = Version.valueOf(buildVersion);
-        Version github = Version.valueOf(githubVersion);
+        var build = Version.parse(buildVersion);
+        var github = Version.parse(githubVersion);
 
-        boolean isGithubMoreRecent = github.greaterThan(build);
-        String downloadUrl = decideDownloadUrl(response);
+        var isGithubMoreRecent = github.isHigherThan(build);
+        var downloadUrl = decideDownloadUrl(response);
 
-        ReleaseReport ur = new ReleaseReport(isGithubMoreRecent);
-        ur.setGithubVersion(githubVersion);
-        ur.setDownloadUrl(downloadUrl);
-        ur.setHtmlUrl(response.getHtmlUrl());
-        return ur;
+        return ReleaseReport.builder()
+                .moreRecent(isGithubMoreRecent)
+                .githubVersion(githubVersion)
+                .downloadUrl(downloadUrl)
+                .htmlUrl(response.getHtmlUrl())
+                .build();
     }
 
     private static String decideDownloadUrl(ReleaseResponse response) {
@@ -137,10 +141,10 @@ public class GithubReleaseCheckService implements ReleaseCheckService {
     /**
      * A little bit hacky, but good-enough solution. We only need to find out the family of the os (whether unix
      * or win). Therefore, we don't need full blown os detection, such as
-     *
+     * <p>
      * - https://github.com/apache/commons-lang/blob/master/src/main/java/org/apache/commons/lang3/SystemUtils.java
      * - http://stackoverflow.com/a/24861219
-     *
+     * <p>
      * So, we base or decision on file.separator property. According to
      * https://docs.oracle.com/javase/tutorial/essential/environment/sysprop.html,
      * it is "/" on UNIX and "\" on Windows.

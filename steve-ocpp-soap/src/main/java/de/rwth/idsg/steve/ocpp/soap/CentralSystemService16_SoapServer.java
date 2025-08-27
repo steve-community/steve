@@ -44,15 +44,16 @@ import ocpp.cs._2015._10.StatusNotificationRequest;
 import ocpp.cs._2015._10.StatusNotificationResponse;
 import ocpp.cs._2015._10.StopTransactionRequest;
 import ocpp.cs._2015._10.StopTransactionResponse;
+import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Service;
 
+import java.util.concurrent.Future;
 import jakarta.jws.WebService;
 import jakarta.xml.ws.AsyncHandler;
 import jakarta.xml.ws.BindingType;
 import jakarta.xml.ws.Response;
 import jakarta.xml.ws.soap.Addressing;
 import jakarta.xml.ws.soap.SOAPBinding;
-import java.util.concurrent.Future;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -72,8 +73,8 @@ public class CentralSystemService16_SoapServer implements CentralSystemService {
 
     private final CentralSystemService16_Service service;
 
-    public BootNotificationResponse bootNotificationWithTransport(BootNotificationRequest parameters,
-                                                                  String chargeBoxIdentity, OcppProtocol protocol) {
+    public BootNotificationResponse bootNotificationWithTransport(
+            BootNotificationRequest parameters, String chargeBoxIdentity, OcppProtocol protocol) {
         if (protocol.getVersion() != OcppVersion.V_16) {
             throw new IllegalArgumentException("Unexpected OCPP version: " + protocol.getVersion());
         }
@@ -86,14 +87,14 @@ public class CentralSystemService16_SoapServer implements CentralSystemService {
     }
 
     @Override
-    public FirmwareStatusNotificationResponse firmwareStatusNotification(FirmwareStatusNotificationRequest parameters,
-                                                                         String chargeBoxIdentity) {
+    public FirmwareStatusNotificationResponse firmwareStatusNotification(
+            FirmwareStatusNotificationRequest parameters, String chargeBoxIdentity) {
         return service.firmwareStatusNotification(parameters, chargeBoxIdentity);
     }
 
     @Override
-    public StatusNotificationResponse statusNotification(StatusNotificationRequest parameters,
-                                                         String chargeBoxIdentity) {
+    public StatusNotificationResponse statusNotification(
+            StatusNotificationRequest parameters, String chargeBoxIdentity) {
         return service.statusNotification(parameters, chargeBoxIdentity);
     }
 
@@ -138,120 +139,132 @@ public class CentralSystemService16_SoapServer implements CentralSystemService {
     // -------------------------------------------------------------------------
 
     @Override
-    public Response<StopTransactionResponse> stopTransactionAsync(StopTransactionRequest parameters,
-                                                                  String chargeBoxIdentity) {
+    public @Nullable Response<StopTransactionResponse> stopTransactionAsync(
+            StopTransactionRequest parameters, String chargeBoxIdentity) {
         return null;
     }
 
     @Override
-    public Future<?> stopTransactionAsync(StopTransactionRequest parameters, String chargeBoxIdentity,
-                                          AsyncHandler<StopTransactionResponse> asyncHandler) {
+    public @Nullable Future<?> stopTransactionAsync(
+            StopTransactionRequest parameters,
+            String chargeBoxIdentity,
+            AsyncHandler<StopTransactionResponse> asyncHandler) {
         return null;
     }
 
     @Override
-    public Response<StatusNotificationResponse> statusNotificationAsync(StatusNotificationRequest parameters,
-                                                                        String chargeBoxIdentity) {
+    public @Nullable Response<StatusNotificationResponse> statusNotificationAsync(
+            StatusNotificationRequest parameters, String chargeBoxIdentity) {
         return null;
     }
 
     @Override
-    public Future<?> statusNotificationAsync(StatusNotificationRequest parameters, String chargeBoxIdentity,
-                                             AsyncHandler<StatusNotificationResponse> asyncHandler) {
+    public @Nullable Future<?> statusNotificationAsync(
+            StatusNotificationRequest parameters,
+            String chargeBoxIdentity,
+            AsyncHandler<StatusNotificationResponse> asyncHandler) {
         return null;
     }
 
     @Override
-    public Response<AuthorizeResponse> authorizeAsync(AuthorizeRequest parameters, String chargeBoxIdentity) {
+    public @Nullable Response<AuthorizeResponse> authorizeAsync(AuthorizeRequest parameters, String chargeBoxIdentity) {
         return null;
     }
 
     @Override
-    public Future<?> authorizeAsync(AuthorizeRequest parameters, String chargeBoxIdentity,
-                                    AsyncHandler<AuthorizeResponse> asyncHandler) {
+    public @Nullable Future<?> authorizeAsync(
+            AuthorizeRequest parameters, String chargeBoxIdentity, AsyncHandler<AuthorizeResponse> asyncHandler) {
         return null;
     }
 
     @Override
-    public Response<StartTransactionResponse> startTransactionAsync(StartTransactionRequest parameters,
-                                                                    String chargeBoxIdentity) {
+    public @Nullable Response<StartTransactionResponse> startTransactionAsync(
+            StartTransactionRequest parameters, String chargeBoxIdentity) {
         return null;
     }
 
     @Override
-    public Future<?> startTransactionAsync(StartTransactionRequest parameters, String chargeBoxIdentity,
-                                           AsyncHandler<StartTransactionResponse> asyncHandler) {
+    public @Nullable Future<?> startTransactionAsync(
+            StartTransactionRequest parameters,
+            String chargeBoxIdentity,
+            AsyncHandler<StartTransactionResponse> asyncHandler) {
         return null;
     }
 
     @Override
-    public Response<FirmwareStatusNotificationResponse> firmwareStatusNotificationAsync(
+    public @Nullable Response<FirmwareStatusNotificationResponse> firmwareStatusNotificationAsync(
             FirmwareStatusNotificationRequest parameters, String chargeBoxIdentity) {
         return null;
     }
 
     @Override
-    public Future<?> firmwareStatusNotificationAsync(FirmwareStatusNotificationRequest parameters,
-                                                     String chargeBoxIdentity,
-                                                     AsyncHandler<FirmwareStatusNotificationResponse> asyncHandler) {
+    public @Nullable Future<?> firmwareStatusNotificationAsync(
+            FirmwareStatusNotificationRequest parameters,
+            String chargeBoxIdentity,
+            AsyncHandler<FirmwareStatusNotificationResponse> asyncHandler) {
         return null;
     }
 
     @Override
-    public Response<BootNotificationResponse> bootNotificationAsync(BootNotificationRequest parameters,
-                                                                    String chargeBoxIdentity) {
+    public @Nullable Response<BootNotificationResponse> bootNotificationAsync(
+            BootNotificationRequest parameters, String chargeBoxIdentity) {
         return null;
     }
 
     @Override
-    public Future<?> bootNotificationAsync(BootNotificationRequest parameters, String chargeBoxIdentity,
-                                           AsyncHandler<BootNotificationResponse> asyncHandler) {
+    public @Nullable Future<?> bootNotificationAsync(
+            BootNotificationRequest parameters,
+            String chargeBoxIdentity,
+            AsyncHandler<BootNotificationResponse> asyncHandler) {
         return null;
     }
 
     @Override
-    public Response<HeartbeatResponse> heartbeatAsync(HeartbeatRequest parameters, String chargeBoxIdentity) {
+    public @Nullable Response<HeartbeatResponse> heartbeatAsync(HeartbeatRequest parameters, String chargeBoxIdentity) {
         return null;
     }
 
     @Override
-    public Future<?> heartbeatAsync(HeartbeatRequest parameters, String chargeBoxIdentity,
-                                    AsyncHandler<HeartbeatResponse> asyncHandler) {
+    public @Nullable Future<?> heartbeatAsync(
+            HeartbeatRequest parameters, String chargeBoxIdentity, AsyncHandler<HeartbeatResponse> asyncHandler) {
         return null;
     }
 
     @Override
-    public Response<MeterValuesResponse> meterValuesAsync(MeterValuesRequest parameters, String chargeBoxIdentity) {
+    public @Nullable Response<MeterValuesResponse> meterValuesAsync(
+            MeterValuesRequest parameters, String chargeBoxIdentity) {
         return null;
     }
 
     @Override
-    public Future<?> meterValuesAsync(MeterValuesRequest parameters, String chargeBoxIdentity,
-                                      AsyncHandler<MeterValuesResponse> asyncHandler) {
+    public @Nullable Future<?> meterValuesAsync(
+            MeterValuesRequest parameters, String chargeBoxIdentity, AsyncHandler<MeterValuesResponse> asyncHandler) {
         return null;
     }
 
     @Override
-    public Response<DataTransferResponse> dataTransferAsync(DataTransferRequest parameters, String chargeBoxIdentity) {
+    public @Nullable Response<DataTransferResponse> dataTransferAsync(
+            DataTransferRequest parameters, String chargeBoxIdentity) {
         return null;
     }
 
     @Override
-    public Future<?> dataTransferAsync(DataTransferRequest parameters, String chargeBoxIdentity,
-                                       AsyncHandler<DataTransferResponse> asyncHandler) {
+    public @Nullable Future<?> dataTransferAsync(
+            DataTransferRequest parameters, String chargeBoxIdentity, AsyncHandler<DataTransferResponse> asyncHandler) {
         return null;
     }
 
     @Override
-    public Response<DiagnosticsStatusNotificationResponse> diagnosticsStatusNotificationAsync(
+    public @Nullable Response<DiagnosticsStatusNotificationResponse> diagnosticsStatusNotificationAsync(
             DiagnosticsStatusNotificationRequest parameters, String chargeBoxIdentity) {
         return null;
     }
 
     @Override
-    public Future<?> diagnosticsStatusNotificationAsync(DiagnosticsStatusNotificationRequest parameters,
-                                                        String chargeBoxIdentity,
-                                                        AsyncHandler<DiagnosticsStatusNotificationResponse> asyncHandler) {
+    public @Nullable Future<?> diagnosticsStatusNotificationAsync(
+            DiagnosticsStatusNotificationRequest parameters,
+            String chargeBoxIdentity,
+            AsyncHandler<DiagnosticsStatusNotificationResponse> asyncHandler) {
         return null;
     }
 }

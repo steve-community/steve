@@ -45,5 +45,4 @@ public final class ChargePoint {
         private final ChargeBoxRecord chargeBox;
         private final AddressRecord address;
     }
-
 }

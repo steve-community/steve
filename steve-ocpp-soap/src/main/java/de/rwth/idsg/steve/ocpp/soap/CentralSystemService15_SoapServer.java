@@ -46,16 +46,16 @@ import ocpp.cs._2012._06.StatusNotificationRequest;
 import ocpp.cs._2012._06.StatusNotificationResponse;
 import ocpp.cs._2012._06.StopTransactionRequest;
 import ocpp.cs._2012._06.StopTransactionResponse;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Service;
 
+import java.util.concurrent.Future;
 import jakarta.jws.WebService;
 import jakarta.xml.ws.AsyncHandler;
 import jakarta.xml.ws.BindingType;
 import jakarta.xml.ws.Response;
 import jakarta.xml.ws.soap.Addressing;
 import jakarta.xml.ws.soap.SOAPBinding;
-import java.util.concurrent.Future;
 
 /**
  * Service implementation of OCPP V1.5
@@ -76,85 +76,95 @@ public class CentralSystemService15_SoapServer implements CentralSystemService {
 
     private final CentralSystemService16_Service service;
 
-    public BootNotificationResponse bootNotificationWithTransport(BootNotificationRequest parameters,
-                                                                  String chargeBoxIdentity, OcppProtocol protocol) {
+    public BootNotificationResponse bootNotificationWithTransport(
+            BootNotificationRequest parameters, String chargeBoxIdentity, OcppProtocol protocol) {
         if (protocol.getVersion() != OcppVersion.V_15) {
             throw new IllegalArgumentException("Unexpected OCPP version: " + protocol.getVersion());
         }
         return Convert.start(parameters, Server15to16Impl.SINGLETON::convertRequest)
-                      .andThen(req -> service.bootNotification(req, chargeBoxIdentity, protocol))
-                      .andThen(Server15to16Impl.SINGLETON::convertResponse)
-                      .apply(parameters);
+                .andThen(req -> service.bootNotification(req, chargeBoxIdentity, protocol))
+                .andThen(Server15to16Impl.SINGLETON::convertResponse)
+                .apply(parameters);
     }
 
+    @Override
     public BootNotificationResponse bootNotification(BootNotificationRequest parameters, String chargeBoxIdentity) {
         return this.bootNotificationWithTransport(parameters, chargeBoxIdentity, OcppProtocol.V_15_SOAP);
     }
 
+    @Override
     public FirmwareStatusNotificationResponse firmwareStatusNotification(
             FirmwareStatusNotificationRequest parameters, String chargeBoxIdentity) {
         return Convert.start(parameters, Server15to16Impl.SINGLETON::convertRequest)
-                      .andThen(req -> service.firmwareStatusNotification(req, chargeBoxIdentity))
-                      .andThen(Server15to16Impl.SINGLETON::convertResponse)
-                      .apply(parameters);
+                .andThen(req -> service.firmwareStatusNotification(req, chargeBoxIdentity))
+                .andThen(Server15to16Impl.SINGLETON::convertResponse)
+                .apply(parameters);
     }
 
+    @Override
     public StatusNotificationResponse statusNotification(
             StatusNotificationRequest parameters, String chargeBoxIdentity) {
         return Convert.start(parameters, Server15to16Impl.SINGLETON::convertRequest)
-                      .andThen(req -> service.statusNotification(req, chargeBoxIdentity))
-                      .andThen(Server15to16Impl.SINGLETON::convertResponse)
-                      .apply(parameters);
+                .andThen(req -> service.statusNotification(req, chargeBoxIdentity))
+                .andThen(Server15to16Impl.SINGLETON::convertResponse)
+                .apply(parameters);
     }
 
+    @Override
     public MeterValuesResponse meterValues(MeterValuesRequest parameters, String chargeBoxIdentity) {
         return Convert.start(parameters, Server15to16Impl.SINGLETON::convertRequest)
-                      .andThen(req -> service.meterValues(req, chargeBoxIdentity))
-                      .andThen(Server15to16Impl.SINGLETON::convertResponse)
-                      .apply(parameters);
+                .andThen(req -> service.meterValues(req, chargeBoxIdentity))
+                .andThen(Server15to16Impl.SINGLETON::convertResponse)
+                .apply(parameters);
     }
 
+    @Override
     public DiagnosticsStatusNotificationResponse diagnosticsStatusNotification(
             DiagnosticsStatusNotificationRequest parameters, String chargeBoxIdentity) {
         return Convert.start(parameters, Server15to16Impl.SINGLETON::convertRequest)
-                      .andThen(req -> service.diagnosticsStatusNotification(req, chargeBoxIdentity))
-                      .andThen(Server15to16Impl.SINGLETON::convertResponse)
-                      .apply(parameters);
+                .andThen(req -> service.diagnosticsStatusNotification(req, chargeBoxIdentity))
+                .andThen(Server15to16Impl.SINGLETON::convertResponse)
+                .apply(parameters);
     }
 
+    @Override
     public StartTransactionResponse startTransaction(StartTransactionRequest parameters, String chargeBoxIdentity) {
         return Convert.start(parameters, Server15to16Impl.SINGLETON::convertRequest)
-                      .andThen(req -> service.startTransaction(req, chargeBoxIdentity))
-                      .andThen(Server15to16Impl.SINGLETON::convertResponse)
-                      .apply(parameters);
+                .andThen(req -> service.startTransaction(req, chargeBoxIdentity))
+                .andThen(Server15to16Impl.SINGLETON::convertResponse)
+                .apply(parameters);
     }
 
+    @Override
     public StopTransactionResponse stopTransaction(StopTransactionRequest parameters, String chargeBoxIdentity) {
         return Convert.start(parameters, Server15to16Impl.SINGLETON::convertRequest)
-                      .andThen(req -> service.stopTransaction(req, chargeBoxIdentity))
-                      .andThen(Server15to16Impl.SINGLETON::convertResponse)
-                      .apply(parameters);
+                .andThen(req -> service.stopTransaction(req, chargeBoxIdentity))
+                .andThen(Server15to16Impl.SINGLETON::convertResponse)
+                .apply(parameters);
     }
 
+    @Override
     public HeartbeatResponse heartbeat(HeartbeatRequest parameters, String chargeBoxIdentity) {
         return Convert.start(parameters, Server15to16Impl.SINGLETON::convertRequest)
-                      .andThen(req -> service.heartbeat(req, chargeBoxIdentity))
-                      .andThen(Server15to16Impl.SINGLETON::convertResponse)
-                      .apply(parameters);
+                .andThen(req -> service.heartbeat(req, chargeBoxIdentity))
+                .andThen(Server15to16Impl.SINGLETON::convertResponse)
+                .apply(parameters);
     }
 
+    @Override
     public AuthorizeResponse authorize(AuthorizeRequest parameters, String chargeBoxIdentity) {
         return Convert.start(parameters, Server15to16Impl.SINGLETON::convertRequest)
-                      .andThen(req -> service.authorize(req, chargeBoxIdentity))
-                      .andThen(Server15to16Impl.SINGLETON::convertResponse)
-                      .apply(parameters);
+                .andThen(req -> service.authorize(req, chargeBoxIdentity))
+                .andThen(Server15to16Impl.SINGLETON::convertResponse)
+                .apply(parameters);
     }
 
+    @Override
     public DataTransferResponse dataTransfer(DataTransferRequest parameters, String chargeBoxIdentity) {
         return Convert.start(parameters, Server15to16Impl.SINGLETON::convertRequest)
-                      .andThen(req -> service.dataTransfer(req, chargeBoxIdentity))
-                      .andThen(Server15to16Impl.SINGLETON::convertResponse)
-                      .apply(parameters);
+                .andThen(req -> service.dataTransfer(req, chargeBoxIdentity))
+                .andThen(Server15to16Impl.SINGLETON::convertResponse)
+                .apply(parameters);
     }
 
     // -------------------------------------------------------------------------
@@ -162,120 +172,132 @@ public class CentralSystemService15_SoapServer implements CentralSystemService {
     // -------------------------------------------------------------------------
 
     @Override
-    public Response<HeartbeatResponse> heartbeatAsync(HeartbeatRequest parameters, String chargeBoxIdentity) {
+    public @Nullable Response<HeartbeatResponse> heartbeatAsync(HeartbeatRequest parameters, String chargeBoxIdentity) {
         return null;
     }
 
     @Override
-    public Future<?> heartbeatAsync(HeartbeatRequest parameters, String chargeBoxIdentity,
-                                    AsyncHandler<HeartbeatResponse> asyncHandler) {
+    public @Nullable Future<?> heartbeatAsync(
+            HeartbeatRequest parameters, String chargeBoxIdentity, AsyncHandler<HeartbeatResponse> asyncHandler) {
         return null;
     }
 
     @Override
-    public Response<StartTransactionResponse> startTransactionAsync(StartTransactionRequest parameters,
-                                                                    String chargeBoxIdentity) {
+    public @Nullable Response<StartTransactionResponse> startTransactionAsync(
+            StartTransactionRequest parameters, String chargeBoxIdentity) {
         return null;
     }
 
     @Override
-    public Future<?> startTransactionAsync(StartTransactionRequest parameters, String chargeBoxIdentity,
-                                           AsyncHandler<StartTransactionResponse> asyncHandler) {
+    public @Nullable Future<?> startTransactionAsync(
+            StartTransactionRequest parameters,
+            String chargeBoxIdentity,
+            AsyncHandler<StartTransactionResponse> asyncHandler) {
         return null;
     }
 
     @Override
-    public Response<StopTransactionResponse> stopTransactionAsync(StopTransactionRequest parameters,
-                                                                  String chargeBoxIdentity) {
+    public @Nullable Response<StopTransactionResponse> stopTransactionAsync(
+            StopTransactionRequest parameters, String chargeBoxIdentity) {
         return null;
     }
 
     @Override
-    public Future<?> stopTransactionAsync(StopTransactionRequest parameters, String chargeBoxIdentity,
-                                          AsyncHandler<StopTransactionResponse> asyncHandler) {
+    public @Nullable Future<?> stopTransactionAsync(
+            StopTransactionRequest parameters,
+            String chargeBoxIdentity,
+            AsyncHandler<StopTransactionResponse> asyncHandler) {
         return null;
     }
 
     @Override
-    public Response<DiagnosticsStatusNotificationResponse> diagnosticsStatusNotificationAsync(
+    public @Nullable Response<DiagnosticsStatusNotificationResponse> diagnosticsStatusNotificationAsync(
             DiagnosticsStatusNotificationRequest parameters, String chargeBoxIdentity) {
         return null;
     }
 
     @Override
-    public Future<?> diagnosticsStatusNotificationAsync(
-            DiagnosticsStatusNotificationRequest parameters, String chargeBoxIdentity,
+    public @Nullable Future<?> diagnosticsStatusNotificationAsync(
+            DiagnosticsStatusNotificationRequest parameters,
+            String chargeBoxIdentity,
             AsyncHandler<DiagnosticsStatusNotificationResponse> asyncHandler) {
         return null;
     }
 
     @Override
-    public Response<AuthorizeResponse> authorizeAsync(AuthorizeRequest parameters, String chargeBoxIdentity) {
+    public @Nullable Response<AuthorizeResponse> authorizeAsync(AuthorizeRequest parameters, String chargeBoxIdentity) {
         return null;
     }
 
     @Override
-    public Future<?> authorizeAsync(AuthorizeRequest parameters, String chargeBoxIdentity,
-                                    AsyncHandler<AuthorizeResponse> asyncHandler) {
+    public @Nullable Future<?> authorizeAsync(
+            AuthorizeRequest parameters, String chargeBoxIdentity, AsyncHandler<AuthorizeResponse> asyncHandler) {
         return null;
     }
 
     @Override
-    public Response<BootNotificationResponse> bootNotificationAsync(BootNotificationRequest parameters,
-                                                                    String chargeBoxIdentity) {
+    public @Nullable Response<BootNotificationResponse> bootNotificationAsync(
+            BootNotificationRequest parameters, String chargeBoxIdentity) {
         return null;
     }
 
     @Override
-    public Future<?> bootNotificationAsync(BootNotificationRequest parameters, String chargeBoxIdentity,
-                                           AsyncHandler<BootNotificationResponse> asyncHandler) {
+    public @Nullable Future<?> bootNotificationAsync(
+            BootNotificationRequest parameters,
+            String chargeBoxIdentity,
+            AsyncHandler<BootNotificationResponse> asyncHandler) {
         return null;
     }
 
     @Override
-    public Response<MeterValuesResponse> meterValuesAsync(MeterValuesRequest parameters, String chargeBoxIdentity) {
+    public @Nullable Response<MeterValuesResponse> meterValuesAsync(
+            MeterValuesRequest parameters, String chargeBoxIdentity) {
         return null;
     }
 
     @Override
-    public Future<?> meterValuesAsync(MeterValuesRequest parameters, String chargeBoxIdentity,
-                                      AsyncHandler<MeterValuesResponse> asyncHandler) {
+    public @Nullable Future<?> meterValuesAsync(
+            MeterValuesRequest parameters, String chargeBoxIdentity, AsyncHandler<MeterValuesResponse> asyncHandler) {
         return null;
     }
 
     @Override
-    public Response<FirmwareStatusNotificationResponse> firmwareStatusNotificationAsync(
+    public @Nullable Response<FirmwareStatusNotificationResponse> firmwareStatusNotificationAsync(
             FirmwareStatusNotificationRequest parameters, String chargeBoxIdentity) {
         return null;
     }
 
     @Override
-    public Future<?> firmwareStatusNotificationAsync(FirmwareStatusNotificationRequest parameters,
-                                                     String chargeBoxIdentity,
-                                                     AsyncHandler<FirmwareStatusNotificationResponse> asyncHandler) {
+    public @Nullable Future<?> firmwareStatusNotificationAsync(
+            FirmwareStatusNotificationRequest parameters,
+            String chargeBoxIdentity,
+            AsyncHandler<FirmwareStatusNotificationResponse> asyncHandler) {
         return null;
     }
 
     @Override
-    public Response<DataTransferResponse> dataTransferAsync(DataTransferRequest parameters, String chargeBoxIdentity) {
+    public @Nullable Response<DataTransferResponse> dataTransferAsync(
+            DataTransferRequest parameters, String chargeBoxIdentity) {
         return null;
     }
 
     @Override
-    public Future<?> dataTransferAsync(DataTransferRequest parameters, String chargeBoxIdentity,
-                                       AsyncHandler<DataTransferResponse> asyncHandler) {
+    public @Nullable Future<?> dataTransferAsync(
+            DataTransferRequest parameters, String chargeBoxIdentity, AsyncHandler<DataTransferResponse> asyncHandler) {
         return null;
     }
 
     @Override
-    public Response<StatusNotificationResponse> statusNotificationAsync(StatusNotificationRequest parameters,
-                                                                        String chargeBoxIdentity) {
+    public @Nullable Response<StatusNotificationResponse> statusNotificationAsync(
+            StatusNotificationRequest parameters, String chargeBoxIdentity) {
         return null;
     }
 
     @Override
-    public Future<?> statusNotificationAsync(StatusNotificationRequest parameters, String chargeBoxIdentity,
-                                             AsyncHandler<StatusNotificationResponse> asyncHandler) {
+    public @Nullable Future<?> statusNotificationAsync(
+            StatusNotificationRequest parameters,
+            String chargeBoxIdentity,
+            AsyncHandler<StatusNotificationResponse> asyncHandler) {
         return null;
     }
 }

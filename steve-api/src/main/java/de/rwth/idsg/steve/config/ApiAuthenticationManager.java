@@ -37,11 +37,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.stereotype.Component;
 
-import jakarta.servlet.ServletException;
+import java.io.IOException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-
-import java.io.IOException;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -76,23 +74,17 @@ public class ApiAuthenticationManager implements AuthenticationManager, Authenti
         }
 
         return UsernamePasswordAuthenticationToken.authenticated(
-            authentication.getPrincipal(),
-            authentication.getCredentials(),
-            userDetails.getAuthorities()
-        );
+                authentication.getPrincipal(), authentication.getCredentials(), userDetails.getAuthorities());
     }
 
     @Override
-    public void commence(HttpServletRequest request,
-                         HttpServletResponse response,
-                         AuthenticationException authException) throws IOException, ServletException {
+    public void commence(
+            HttpServletRequest request, HttpServletResponse response, AuthenticationException authException)
+            throws IOException {
         HttpStatus status = HttpStatus.UNAUTHORIZED;
 
         var apiResponse = ApiControllerAdvice.createResponse(
-            request.getRequestURL().toString(),
-            status,
-            authException.getMessage()
-        );
+                request.getRequestURL().toString(), status, authException.getMessage());
 
         response.setStatus(status.value());
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
@@ -111,5 +103,4 @@ public class ApiAuthenticationManager implements AuthenticationManager, Authenti
         }
         return true;
     }
-
 }

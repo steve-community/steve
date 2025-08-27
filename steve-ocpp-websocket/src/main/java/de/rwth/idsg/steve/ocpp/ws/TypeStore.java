@@ -20,6 +20,7 @@ package de.rwth.idsg.steve.ocpp.ws;
 
 import de.rwth.idsg.ocpp.jaxb.RequestType;
 import de.rwth.idsg.steve.ocpp.ws.data.ActionResponsePair;
+import org.jspecify.annotations.Nullable;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -32,12 +33,12 @@ public interface TypeStore {
      *
      * Action field --> Request JAXB class
      */
-    Class<? extends RequestType> findRequestClass(String action);
+    @Nullable Class<? extends RequestType> findRequestClass(String action);
 
     /**
      * For outgoing requests
      *
      * Request JAXB class --> Action field, Response JAXB class
      */
-    <T extends RequestType> ActionResponsePair findActionResponse(T requestPayload);
+    <T extends RequestType> @Nullable ActionResponsePair findActionResponse(T requestPayload);
 }

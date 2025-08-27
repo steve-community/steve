@@ -88,10 +88,11 @@ public class TransactionRestControllerTest extends AbstractControllerTest {
 
         // then
         assertThat(mockMvc.perform(get("/api/v1/transactions")))
-            .hasStatusOk()
-            .bodyJson()
-            .hasPathSatisfying("$", path -> assertThat(path).asArray().hasSize(1))
-            .hasPathSatisfying("$[0].id", path -> assertThat(path).asNumber().isEqualTo(234));
+                .hasStatusOk()
+                .bodyJson()
+                .hasPathSatisfying("$", path -> assertThat(path).asArray().hasSize(1))
+                .hasPathSatisfying(
+                        "$[0].id", path -> assertThat(path).asNumber().isEqualTo(234));
     }
 
     @Test
@@ -110,9 +111,7 @@ public class TransactionRestControllerTest extends AbstractControllerTest {
     @Test
     @DisplayName("Hidden param used, expected 400")
     public void test4() {
-        assertThat(mockMvc.perform(get("/api/v1/transactions")
-                .param("returnCSV", "true")
-        ))
+        assertThat(mockMvc.perform(get("/api/v1/transactions").param("returnCSV", "true")))
                 .hasStatus4xxClientError()
                 .bodyJson()
                 .satisfies(errorJsonMatchers());
@@ -121,9 +120,7 @@ public class TransactionRestControllerTest extends AbstractControllerTest {
     @Test
     @DisplayName("Typo in param makes validation fail, expected 400")
     public void test5() {
-        assertThat(mockMvc.perform(get("/api/v1/transactions")
-                .param("periodType", "TODAYZZZ")
-        ))
+        assertThat(mockMvc.perform(get("/api/v1/transactions").param("periodType", "TODAYZZZ")))
                 .hasStatus4xxClientError()
                 .bodyJson()
                 .satisfies(errorJsonMatchers());
@@ -132,9 +129,7 @@ public class TransactionRestControllerTest extends AbstractControllerTest {
     @Test
     @DisplayName("Param requires other params which are not set, expected 400")
     public void test6() {
-        assertThat(mockMvc.perform(get("/api/v1/transactions")
-                .param("periodType", "FROM_TO")
-        ))
+        assertThat(mockMvc.perform(get("/api/v1/transactions").param("periodType", "FROM_TO")))
                 .hasStatus4xxClientError()
                 .bodyJson()
                 .satisfies(errorJsonMatchers());
@@ -144,10 +139,9 @@ public class TransactionRestControllerTest extends AbstractControllerTest {
     @DisplayName("to is before from when using FROM_TO, expected 400")
     public void test7() {
         assertThat(mockMvc.perform(get("/api/v1/transactions")
-                .param("periodType", "FROM_TO")
-                .param("from", "2022-10-01T00:00")
-                .param("to", "2022-09-01T00:00")
-        ))
+                        .param("periodType", "FROM_TO")
+                        .param("from", "2022-10-01T00:00")
+                        .param("to", "2022-09-01T00:00")))
                 .hasStatus4xxClientError()
                 .bodyJson()
                 .satisfies(errorJsonMatchers());
@@ -160,41 +154,42 @@ public class TransactionRestControllerTest extends AbstractControllerTest {
         var stop = start.plus(2, ChronoUnit.HOURS);
 
         // given
-        Transaction transaction = Transaction
-            .builder()
-            .startTimestamp(start)
-            .stopTimestamp(stop)
-            .id(1)
-            .chargeBoxId("cb-2")
-            .ocppIdTag("id-3")
-            .build();
+        Transaction transaction = Transaction.builder()
+                .startTimestamp(start)
+                .stopTimestamp(stop)
+                .id(1)
+                .chargeBoxId("cb-2")
+                .ocppIdTag("id-3")
+                .build();
 
         // when
         when(transactionRepository.getTransactions(any())).thenReturn(List.of(transaction));
 
         // then
         assertThat(mockMvc.perform(get("/api/v1/transactions")
-                .param("transactionPk", String.valueOf(transaction.getId()))
-                .param("type", "ACTIVE")
-                .param("periodType", "FROM_TO")
-                .param("chargeBoxId", transaction.getChargeBoxId())
-                .param("ocppIdTag", transaction.getOcppIdTag())
-                .param("from", "2022-10-01T00:00:00Z")
-                .param("to", "2022-10-08T00:00:00Z")
-        ))
+                        .param("transactionPk", String.valueOf(transaction.getId()))
+                        .param("type", "ACTIVE")
+                        .param("periodType", "FROM_TO")
+                        .param("chargeBoxId", transaction.getChargeBoxId())
+                        .param("ocppIdTag", transaction.getOcppIdTag())
+                        .param("from", "2022-10-01T00:00:00Z")
+                        .param("to", "2022-10-08T00:00:00Z")))
                 .hasStatusOk()
                 .bodyJson()
                 .hasPathSatisfying("$", path -> assertThat(path).asArray().hasSize(1))
-                .hasPathSatisfying("$[0].id", path -> assertThat(path).asNumber().isEqualTo(1))
-                .hasPathSatisfying("$[0].chargeBoxId", path -> assertThat(path).asString().isEqualTo("cb-2"))
-                .hasPathSatisfying("$[0].ocppIdTag", path -> assertThat(path).asString().isEqualTo("id-3"))
-                .hasPathSatisfying("$[0].startTimestamp", path ->
-                    assertThat(path).asString().isEqualTo("2022-10-01T00:00:00Z")
-                )
+                .hasPathSatisfying(
+                        "$[0].id", path -> assertThat(path).asNumber().isEqualTo(1))
+                .hasPathSatisfying(
+                        "$[0].chargeBoxId", path -> assertThat(path).asString().isEqualTo("cb-2"))
+                .hasPathSatisfying(
+                        "$[0].ocppIdTag", path -> assertThat(path).asString().isEqualTo("id-3"))
+                .hasPathSatisfying(
+                        "$[0].startTimestamp",
+                        path -> assertThat(path).asString().isEqualTo("2022-10-01T00:00:00Z"))
                 .doesNotHavePath("$[0].startTimestampFormatted")
-                .hasPathSatisfying("$[0].stopTimestamp", path ->
-                    assertThat(path).asString().isEqualTo("2022-10-01T02:00:00Z")
-                )
+                .hasPathSatisfying(
+                        "$[0].stopTimestamp",
+                        path -> assertThat(path).asString().isEqualTo("2022-10-01T02:00:00Z"))
                 .doesNotHavePath("$[0].stopTimestampFormatted");
     }
 
@@ -202,10 +197,9 @@ public class TransactionRestControllerTest extends AbstractControllerTest {
     @DisplayName("from and to have are not conform with ISO")
     public void test9() {
         assertThat(mockMvc.perform(get("/api/v1/transactions")
-                .param("periodType", "FROM_TO")
-                .param("from", "2022-10-01 00:00")
-                .param("to", "2023-10-01 00:00")
-        ))
+                        .param("periodType", "FROM_TO")
+                        .param("from", "2022-10-01 00:00")
+                        .param("to", "2023-10-01 00:00")))
                 .hasStatus4xxClientError()
                 .bodyJson()
                 .satisfies(errorJsonMatchers());
@@ -215,15 +209,14 @@ public class TransactionRestControllerTest extends AbstractControllerTest {
     @DisplayName("GET all: Query param 'type' is translated correctly, while others are defaulted")
     public void test10() {
         // given
-        ArgumentCaptor<TransactionQueryForm.TransactionQueryFormForApi> formToCapture = ArgumentCaptor.forClass(TransactionQueryForm.TransactionQueryFormForApi.class);
+        ArgumentCaptor<TransactionQueryForm.TransactionQueryFormForApi> formToCapture =
+                ArgumentCaptor.forClass(TransactionQueryForm.TransactionQueryFormForApi.class);
 
         // when
         when(transactionRepository.getTransactions(any())).thenReturn(Collections.emptyList());
 
         // then
-        assertThat(mockMvc.perform(get("/api/v1/transactions")
-                .param("type", "ACTIVE")
-        ))
+        assertThat(mockMvc.perform(get("/api/v1/transactions").param("type", "ACTIVE")))
                 .hasStatusOk();
 
         verify(transactionRepository).getTransactions(formToCapture.capture());
@@ -237,15 +230,14 @@ public class TransactionRestControllerTest extends AbstractControllerTest {
     @DisplayName("GET all: Query param 'periodType' is translated correctly, while others are defaulted")
     public void test11() {
         // given
-        ArgumentCaptor<TransactionQueryForm.TransactionQueryFormForApi> formToCapture = ArgumentCaptor.forClass(TransactionQueryForm.TransactionQueryFormForApi.class);
+        ArgumentCaptor<TransactionQueryForm.TransactionQueryFormForApi> formToCapture =
+                ArgumentCaptor.forClass(TransactionQueryForm.TransactionQueryFormForApi.class);
 
         // when
         when(transactionRepository.getTransactions(any())).thenReturn(Collections.emptyList());
 
         // then
-        assertThat(mockMvc.perform(get("/api/v1/transactions")
-                .param("periodType", "LAST_30")
-        ))
+        assertThat(mockMvc.perform(get("/api/v1/transactions").param("periodType", "LAST_30")))
                 .hasStatusOk();
 
         verify(transactionRepository).getTransactions(formToCapture.capture());
@@ -256,11 +248,14 @@ public class TransactionRestControllerTest extends AbstractControllerTest {
     }
 
     private static Consumer<JsonContent> errorJsonMatchers() {
-                return content -> content.assertThat()
-                        .hasPathSatisfying("$.timestamp", path -> assertThat(path).asString().isNotEmpty())
-                        .hasPathSatisfying("$.status", path -> assertThat(path).isNotNull())
-                        .hasPathSatisfying("$.error", path -> assertThat(path).asString().isNotEmpty())
-                        .hasPathSatisfying("$.message", path -> assertThat(path).asString().isNotEmpty())
-                        .hasPathSatisfying("$.path", path -> assertThat(path).asString().isNotEmpty());
+        return content -> content.assertThat()
+                .hasPathSatisfying(
+                        "$.timestamp", path -> assertThat(path).asString().isNotEmpty())
+                .hasPathSatisfying("$.status", path -> assertThat(path).isNotNull())
+                .hasPathSatisfying(
+                        "$.error", path -> assertThat(path).asString().isNotEmpty())
+                .hasPathSatisfying(
+                        "$.message", path -> assertThat(path).asString().isNotEmpty())
+                .hasPathSatisfying("$.path", path -> assertThat(path).asString().isNotEmpty());
     }
 }

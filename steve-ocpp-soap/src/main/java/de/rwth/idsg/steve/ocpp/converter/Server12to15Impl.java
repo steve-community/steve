@@ -44,6 +44,7 @@ import ocpp.cs._2012._06.MeterValuesRequest;
 import ocpp.cs._2012._06.StartTransactionRequest;
 import ocpp.cs._2012._06.StatusNotificationRequest;
 import ocpp.cs._2012._06.StopTransactionRequest;
+import org.jspecify.annotations.Nullable;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -74,7 +75,8 @@ public enum Server12to15Impl implements Server12to15 {
     }
 
     @Override
-    public FirmwareStatusNotificationRequest convertRequest(ocpp.cs._2010._08.FirmwareStatusNotificationRequest request) {
+    public FirmwareStatusNotificationRequest convertRequest(
+            ocpp.cs._2010._08.FirmwareStatusNotificationRequest request) {
         return new FirmwareStatusNotificationRequest()
                 .withStatus(FirmwareStatus.fromValue(request.getStatus().value()));
     }
@@ -84,17 +86,17 @@ public enum Server12to15Impl implements Server12to15 {
         return new StatusNotificationRequest()
                 .withConnectorId(request.getConnectorId())
                 .withStatus(ChargePointStatus.fromValue(request.getStatus().value()))
-                .withErrorCode(ChargePointErrorCode.fromValue(request.getErrorCode().value()));
+                .withErrorCode(
+                        ChargePointErrorCode.fromValue(request.getErrorCode().value()));
     }
 
     @Override
     public MeterValuesRequest convertRequest(ocpp.cs._2010._08.MeterValuesRequest request) {
-        List<MeterValue> values15 =
-                request.getValues()
-                       .stream()
-                       .map(e -> new MeterValue().withTimestamp(e.getTimestamp())
-                                                 .withValue(new MeterValue.Value().withValue(Integer.toString(e.getValue()))))
-                       .collect(Collectors.toList());
+        List<MeterValue> values15 = request.getValues().stream()
+                .map(e -> new MeterValue()
+                        .withTimestamp(e.getTimestamp())
+                        .withValue(new MeterValue.Value().withValue(Integer.toString(e.getValue()))))
+                .collect(Collectors.toList());
 
         return new MeterValuesRequest()
                 .withConnectorId(request.getConnectorId())
@@ -102,7 +104,8 @@ public enum Server12to15Impl implements Server12to15 {
     }
 
     @Override
-    public DiagnosticsStatusNotificationRequest convertRequest(ocpp.cs._2010._08.DiagnosticsStatusNotificationRequest request) {
+    public DiagnosticsStatusNotificationRequest convertRequest(
+            ocpp.cs._2010._08.DiagnosticsStatusNotificationRequest request) {
         return new DiagnosticsStatusNotificationRequest()
                 .withStatus(DiagnosticsStatus.fromValue(request.getStatus().value()));
     }
@@ -132,8 +135,7 @@ public enum Server12to15Impl implements Server12to15 {
 
     @Override
     public AuthorizeRequest convertRequest(ocpp.cs._2010._08.AuthorizeRequest request) {
-        return new AuthorizeRequest()
-                .withIdTag(request.getIdTag());
+        return new AuthorizeRequest().withIdTag(request.getIdTag());
     }
 
     // -------------------------------------------------------------------------
@@ -149,7 +151,8 @@ public enum Server12to15Impl implements Server12to15 {
     }
 
     @Override
-    public FirmwareStatusNotificationResponse convertResponse(ocpp.cs._2012._06.FirmwareStatusNotificationResponse response) {
+    public FirmwareStatusNotificationResponse convertResponse(
+            ocpp.cs._2012._06.FirmwareStatusNotificationResponse response) {
         return new FirmwareStatusNotificationResponse();
     }
 
@@ -164,7 +167,8 @@ public enum Server12to15Impl implements Server12to15 {
     }
 
     @Override
-    public DiagnosticsStatusNotificationResponse convertResponse(ocpp.cs._2012._06.DiagnosticsStatusNotificationResponse response) {
+    public DiagnosticsStatusNotificationResponse convertResponse(
+            ocpp.cs._2012._06.DiagnosticsStatusNotificationResponse response) {
         return new DiagnosticsStatusNotificationResponse();
     }
 
@@ -177,27 +181,24 @@ public enum Server12to15Impl implements Server12to15 {
 
     @Override
     public StopTransactionResponse convertResponse(ocpp.cs._2012._06.StopTransactionResponse response) {
-        return new StopTransactionResponse()
-                .withIdTagInfo(toOcpp12TagInfo(response.getIdTagInfo()));
+        return new StopTransactionResponse().withIdTagInfo(toOcpp12TagInfo(response.getIdTagInfo()));
     }
 
     @Override
     public HeartbeatResponse convertResponse(ocpp.cs._2012._06.HeartbeatResponse response) {
-        return new HeartbeatResponse()
-                .withCurrentTime(response.getCurrentTime());
+        return new HeartbeatResponse().withCurrentTime(response.getCurrentTime());
     }
 
     @Override
     public AuthorizeResponse convertResponse(ocpp.cs._2012._06.AuthorizeResponse response) {
-        return new AuthorizeResponse()
-                .withIdTagInfo(toOcpp12TagInfo(response.getIdTagInfo()));
+        return new AuthorizeResponse().withIdTagInfo(toOcpp12TagInfo(response.getIdTagInfo()));
     }
 
     // -------------------------------------------------------------------------
     // Helpers
     // -------------------------------------------------------------------------
 
-    private static IdTagInfo toOcpp12TagInfo(ocpp.cs._2012._06.IdTagInfo info15) {
+    private static @Nullable IdTagInfo toOcpp12TagInfo(ocpp.cs._2012._06.@Nullable IdTagInfo info15) {
         if (info15 == null) {
             return null;
         }

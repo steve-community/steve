@@ -52,8 +52,8 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupp
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter;
 
-import javax.sql.DataSource;
 import java.util.List;
+import javax.sql.DataSource;
 
 /**
  * Configuration and beans of Spring Framework.
@@ -73,12 +73,13 @@ public class BeanConfiguration implements WebMvcConfigurer {
      */
     @Bean
     public DataSource dataSource(SteveConfiguration config) {
-        SteveConfiguration.DB dbConfig = config.getDb();
-        return dataSource(dbConfig.getJdbcUrl(), dbConfig.getUserName(), dbConfig.getPassword(), config.getTimeZoneId());
+        var dbConfig = config.getDb();
+        return dataSource(
+                dbConfig.getJdbcUrl(), dbConfig.getUserName(), dbConfig.getPassword(), config.getTimeZoneId());
     }
 
     public static DataSource dataSource(String dbUrl, String dbUserName, String dbPassword, String dbTimeZoneId) {
-        HikariConfig hc = new HikariConfig();
+        var hc = new HikariConfig();
 
         // set standard params
         hc.setJdbcUrl(dbUrl);
@@ -114,7 +115,7 @@ public class BeanConfiguration implements WebMvcConfigurer {
      */
     @Bean
     public DSLContext dslContext(DataSource dataSource, SteveConfiguration config) {
-        Settings settings = new Settings()
+        var settings = new Settings()
                 // Normally, the records are "attached" to the Configuration that created (i.e. fetch/insert) them.
                 // This means that they hold an internal reference to the same database connection that was used.
                 // The idea behind this is to make CRUD easier for potential subsequent store/refresh/delete
@@ -124,7 +125,7 @@ public class BeanConfiguration implements WebMvcConfigurer {
                 .withExecuteLogging(config.getDb().isSqlLogging());
 
         // Configuration for JOOQ
-        org.jooq.Configuration conf = new DefaultConfiguration()
+        var conf = new DefaultConfiguration()
                 .set(SQLDialect.MYSQL)
                 .set(new DataSourceConnectionProvider(dataSource))
                 .set(settings);
@@ -134,7 +135,7 @@ public class BeanConfiguration implements WebMvcConfigurer {
 
     @Bean(destroyMethod = "close")
     public DelegatingTaskScheduler asyncTaskScheduler() {
-        ThreadPoolTaskScheduler scheduler = new ThreadPoolTaskScheduler();
+        var scheduler = new ThreadPoolTaskScheduler();
         scheduler.setPoolSize(5);
         scheduler.setThreadNamePrefix("SteVe-TaskScheduler-");
         scheduler.setWaitForTasksToCompleteOnShutdown(true);
@@ -146,7 +147,7 @@ public class BeanConfiguration implements WebMvcConfigurer {
 
     @Bean(destroyMethod = "close")
     public DelegatingTaskExecutor asyncTaskExecutor() {
-        ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+        var executor = new ThreadPoolTaskExecutor();
         executor.setCorePoolSize(5);
         executor.setThreadNamePrefix("SteVe-TaskExecutor-");
         executor.setWaitForTasksToCompleteOnShutdown(true);
@@ -177,9 +178,8 @@ public class BeanConfiguration implements WebMvcConfigurer {
 
     @Override
     public void extendMessageConverters(List<HttpMessageConverter<?>> converters) {
-        for (HttpMessageConverter<?> converter : converters) {
-            if (converter instanceof MappingJackson2HttpMessageConverter) {
-                MappingJackson2HttpMessageConverter conv = (MappingJackson2HttpMessageConverter) converter;
+        for (var converter : converters) {
+            if (converter instanceof MappingJackson2HttpMessageConverter conv) {
                 ObjectMapper objectMapper = conv.getObjectMapper();
                 objectMapper.findAndRegisterModules();
                 // if the client sends unknown props, just ignore them instead of failing
@@ -201,9 +201,10 @@ public class BeanConfiguration implements WebMvcConfigurer {
     @Bean
     public ObjectMapper jacksonObjectMapper(RequestMappingHandlerAdapter requestMappingHandlerAdapter) {
         return requestMappingHandlerAdapter.getMessageConverters().stream()
-            .filter(converter -> converter instanceof MappingJackson2HttpMessageConverter)
-            .findAny()
-            .map(conv -> ((MappingJackson2HttpMessageConverter) conv).getObjectMapper())
-            .orElseThrow(() -> new RuntimeException("There is no MappingJackson2HttpMessageConverter in Spring context"));
+                .filter(MappingJackson2HttpMessageConverter.class::isInstance)
+                .findAny()
+                .map(conv -> ((MappingJackson2HttpMessageConverter) conv).getObjectMapper())
+                .orElseThrow(() ->
+                        new IllegalStateException("There is no MappingJackson2HttpMessageConverter in Spring context"));
     }
 }

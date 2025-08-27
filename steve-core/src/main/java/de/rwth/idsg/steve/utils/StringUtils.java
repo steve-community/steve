@@ -24,7 +24,7 @@ import com.google.common.base.Strings;
 import de.rwth.idsg.steve.ocpp.CommunicationTask;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.springframework.util.CollectionUtils;
 
 import java.util.Collection;
@@ -62,8 +62,7 @@ public final class StringUtils {
         return s;
     }
 
-    @Nullable
-    public static String joinByComma(Collection<?> col) {
+    public static @Nullable String joinByComma(Collection<?> col) {
         if (CollectionUtils.isEmpty(col)) {
             return null;
         } else {

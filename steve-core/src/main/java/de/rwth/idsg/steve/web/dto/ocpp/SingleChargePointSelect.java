@@ -22,10 +22,10 @@ import de.rwth.idsg.steve.repository.dto.ChargePointSelect;
 import lombok.Getter;
 import lombok.Setter;
 
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
 import java.util.Collections;
 import java.util.List;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 
 /**
  * Why a list, if the list size == 1?
@@ -38,7 +38,5 @@ import java.util.List;
 @Setter
 public class SingleChargePointSelect implements ChargePointSelection {
 
-    @NotNull(message = "Charge point selection is required")
-    @Size(min = 1, max = 1, message = "It is required to select exactly 1 charge point")
-    private List<ChargePointSelect> chargePointSelectList = Collections.emptyList();
+    @NotNull(message = "Charge point selection is required") @Size(min = 1, max = 1, message = "It is required to select exactly 1 charge point") private List<ChargePointSelect> chargePointSelectList = Collections.emptyList();
 }

@@ -26,7 +26,7 @@ import org.apache.cxf.frontend.ClientProxy;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.apache.cxf.transport.http.HTTPConduit;
 import org.apache.cxf.ws.addressing.WSAddressingFeature;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Component;
 
 import javax.net.ssl.SSLContext;
@@ -39,10 +39,10 @@ import jakarta.xml.ws.soap.SOAPBinding;
 @Component
 public class ClientProvider {
 
-    @Nullable private final TLSClientParameters tlsClientParams;
+    private final @Nullable TLSClientParameters tlsClientParams;
 
     public ClientProvider(SteveConfiguration config) {
-        SteveConfiguration.Jetty jettyConfig = config.getJetty();
+        var jettyConfig = config.getJetty();
         if (shouldInitSSL(jettyConfig)) {
             tlsClientParams = new TLSClientParameters();
             tlsClientParams.setSslContext(setupSSL(jettyConfig));
@@ -52,7 +52,7 @@ public class ClientProvider {
     }
 
     public <T> T createClient(Class<T> clazz, String endpointAddress) {
-        JaxWsProxyFactoryBean bean = getBean(endpointAddress);
+        var bean = getBean(endpointAddress);
         bean.setServiceClass(clazz);
         T clientObject = clazz.cast(bean.create());
 
@@ -66,7 +66,7 @@ public class ClientProvider {
     }
 
     private static JaxWsProxyFactoryBean getBean(String endpointAddress) {
-        JaxWsProxyFactoryBean f = new JaxWsProxyFactoryBean();
+        var f = new JaxWsProxyFactoryBean();
         f.setBindingId(SOAPBinding.SOAP12HTTP_BINDING);
         f.getFeatures().add(LoggingFeatureProxy.INSTANCE.get());
         f.getFeatures().add(new WSAddressingFeature());
@@ -75,20 +75,22 @@ public class ClientProvider {
     }
 
     private static boolean shouldInitSSL(SteveConfiguration.Jetty jettyConfig) {
-        return jettyConfig.getKeyStorePath() != null && !jettyConfig.getKeyStorePath().isBlank()
-          && jettyConfig.getKeyStorePassword() != null && !jettyConfig.getKeyStorePassword().isBlank();
+        return jettyConfig.getKeyStorePath() != null
+                && !jettyConfig.getKeyStorePath().isBlank()
+                && jettyConfig.getKeyStorePassword() != null
+                && !jettyConfig.getKeyStorePassword().isBlank();
     }
 
     private static SSLContext setupSSL(SteveConfiguration.Jetty jettyConfig) {
         try {
-            String keyStorePath = jettyConfig.getKeyStorePath();
-            String keyStorePwd = jettyConfig.getKeyStorePassword();
+            var keyStorePath = jettyConfig.getKeyStorePath();
+            var keyStorePwd = jettyConfig.getKeyStorePassword();
             return SslContextBuilder.builder()
-                                   .keyStoreFromFile(keyStorePath, keyStorePwd)
-                                   .usingTLS()
-                                   .usingDefaultAlgorithm()
-                                   .usingKeyManagerPasswordFromKeyStore()
-                                   .buildMergedWithSystem();
+                    .keyStoreFromFile(keyStorePath, keyStorePwd)
+                    .usingTLS()
+                    .usingDefaultAlgorithm()
+                    .usingKeyManagerPasswordFromKeyStore()
+                    .buildMergedWithSystem();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

@@ -16,25 +16,19 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package de.rwth.idsg.steve.web.api.dto;
+package de.rwth.idsg.steve.ocpp.ws.data;
 
-import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
+import org.jspecify.annotations.Nullable;
 
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotBlank;
-
-/**
- * @author fnkbsi
- * @since 18.10.2023
- */
 @Getter
 @Setter
-public class ApiChargePointUnlock {
-    @Schema(description = "Charge Box ID", requiredMode = Schema.RequiredMode.REQUIRED)
-    @NotBlank private String chargeBoxId;
+public abstract non-sealed class AbstractOcppJsonMessage implements OcppJsonMessage {
+    private final MessageType messageType;
+    private @Nullable String messageId;
 
-    @Schema(description = "Connector ID", requiredMode = Schema.RequiredMode.REQUIRED)
-    @Min(0) private Integer connectorId;
+    protected AbstractOcppJsonMessage(MessageType messageType) {
+        this.messageType = messageType;
+    }
 }

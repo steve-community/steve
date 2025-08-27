@@ -21,6 +21,7 @@ package de.rwth.idsg.steve.web.dto.ocpp;
 import de.rwth.idsg.steve.web.validation.IdTag;
 import lombok.Getter;
 import lombok.Setter;
+import org.jspecify.annotations.Nullable;
 
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
@@ -32,12 +33,11 @@ import jakarta.validation.constraints.NotBlank;
 @Getter
 public class RemoteStartTransactionParams extends SingleChargePointSelect {
 
-    @Min(value = 0, message = "Connector ID must be at least {value}")
-    private Integer connectorId;
+    @Min(value = 0, message = "Connector ID must be at least {value}") @Nullable private Integer connectorId;
 
-    @NotBlank(message = "User ID Tag is required")
-    @IdTag
-    @Setter private String idTag;
+    @NotBlank(message = "User ID Tag is required") @IdTag
+    @Setter
+    private String idTag;
 
     /**
      * Not for a specific connector, when frontend sends the value 0.

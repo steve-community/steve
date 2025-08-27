@@ -21,18 +21,18 @@ package de.rwth.idsg.steve.web.api.dto;
 import de.rwth.idsg.steve.repository.dto.ConnectorStatus;
 import de.rwth.idsg.steve.utils.ConnectorStatusCountFilter;
 import io.swagger.v3.oas.annotations.media.Schema;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 
 /**
  * @author fnkbsi
  * @since 20.10.2023
  */
-
 @Getter
 @Setter
 @RequiredArgsConstructor

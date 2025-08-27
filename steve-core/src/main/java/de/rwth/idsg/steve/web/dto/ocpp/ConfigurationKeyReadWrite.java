@@ -27,10 +27,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
  *
  * This distinction was added in OCPP 1.6.
  */
-@Schema(
-    description = "Access mode of a configuration key",
-    example = "RW"
-)
+@Schema(description = "Access mode of a configuration key", example = "RW")
 public enum ConfigurationKeyReadWrite {
     R,
     RW

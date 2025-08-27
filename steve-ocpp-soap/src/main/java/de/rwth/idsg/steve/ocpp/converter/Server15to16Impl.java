@@ -54,6 +54,7 @@ import ocpp.cs._2015._10.StatusNotificationRequest;
 import ocpp.cs._2015._10.StopTransactionRequest;
 import ocpp.cs._2015._10.UnitOfMeasure;
 import ocpp.cs._2015._10.ValueFormat;
+import org.jspecify.annotations.Nullable;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -108,10 +109,9 @@ public enum Server15to16Impl implements Server15to16 {
 
     @Override
     public MeterValuesRequest convertRequest(ocpp.cs._2012._06.MeterValuesRequest request) {
-        List<MeterValue> values16 = request.getValues()
-                                           .stream()
-                                           .map(Server15to16Impl::toOcpp16MeterValue)
-                                           .collect(Collectors.toList());
+        List<MeterValue> values16 = request.getValues().stream()
+                .map(Server15to16Impl::toOcpp16MeterValue)
+                .collect(Collectors.toList());
 
         return new MeterValuesRequest()
                 .withTransactionId(request.getTransactionId())
@@ -156,8 +156,7 @@ public enum Server15to16Impl implements Server15to16 {
 
     @Override
     public AuthorizeRequest convertRequest(ocpp.cs._2012._06.AuthorizeRequest request) {
-        return new AuthorizeRequest()
-                .withIdTag(request.getIdTag());
+        return new AuthorizeRequest().withIdTag(request.getIdTag());
     }
 
     @Override
@@ -211,20 +210,17 @@ public enum Server15to16Impl implements Server15to16 {
 
     @Override
     public StopTransactionResponse convertResponse(ocpp.cs._2015._10.StopTransactionResponse response) {
-        return new StopTransactionResponse()
-                .withIdTagInfo(toOcpp15IdTagInfo(response.getIdTagInfo()));
+        return new StopTransactionResponse().withIdTagInfo(toOcpp15IdTagInfo(response.getIdTagInfo()));
     }
 
     @Override
     public HeartbeatResponse convertResponse(ocpp.cs._2015._10.HeartbeatResponse response) {
-        return new HeartbeatResponse()
-                .withCurrentTime(response.getCurrentTime());
+        return new HeartbeatResponse().withCurrentTime(response.getCurrentTime());
     }
 
     @Override
     public AuthorizeResponse convertResponse(ocpp.cs._2015._10.AuthorizeResponse response) {
-        return new AuthorizeResponse()
-                .withIdTagInfo(toOcpp15IdTagInfo(response.getIdTagInfo()));
+        return new AuthorizeResponse().withIdTagInfo(toOcpp15IdTagInfo(response.getIdTagInfo()));
     }
 
     @Override
@@ -266,21 +262,18 @@ public enum Server15to16Impl implements Server15to16 {
      * https://github.com/steve-community/steve/issues/59
      */
     private static UnitOfMeasure convertUnit(ocpp.cs._2012._06.UnitOfMeasure unit) {
-        switch (unit) {
-            case AMP:
-                return UnitOfMeasure.A;
-            case VOLT:
-                return UnitOfMeasure.V;
-            default:
-                return UnitOfMeasure.fromValue(unit.value());
-        }
+        return switch (unit) {
+            case AMP -> UnitOfMeasure.A;
+            case VOLT -> UnitOfMeasure.V;
+            default -> UnitOfMeasure.fromValue(unit.value());
+        };
     }
 
     // -------------------------------------------------------------------------
     // Helpers
     // -------------------------------------------------------------------------
 
-    private static IdTagInfo toOcpp15IdTagInfo(ocpp.cs._2015._10.IdTagInfo info16) {
+    private static @Nullable IdTagInfo toOcpp15IdTagInfo(ocpp.cs._2015._10.@Nullable IdTagInfo info16) {
         if (info16 == null) {
             return null;
         }
@@ -292,29 +285,36 @@ public enum Server15to16Impl implements Server15to16 {
 
     private static SampledValue toOcpp16SampledValue(ocpp.cs._2012._06.MeterValue.Value f) {
         return new SampledValue()
-                .withContext(f.isSetContext() ? ReadingContext.fromValue(f.getContext().value()) : null)
-                .withFormat(f.isSetFormat() ? ValueFormat.fromValue(f.getFormat().value()) : null)
-                .withLocation(f.isSetLocation() ? Location.fromValue(f.getLocation().value()) : null)
-                .withMeasurand(f.isSetMeasurand() ? Measurand.fromValue(f.getMeasurand().value()) : null)
+                .withContext(
+                        f.isSetContext()
+                                ? ReadingContext.fromValue(f.getContext().value())
+                                : null)
+                .withFormat(
+                        f.isSetFormat() ? ValueFormat.fromValue(f.getFormat().value()) : null)
+                .withLocation(
+                        f.isSetLocation() ? Location.fromValue(f.getLocation().value()) : null)
+                .withMeasurand(
+                        f.isSetMeasurand()
+                                ? Measurand.fromValue(f.getMeasurand().value())
+                                : null)
                 .withUnit(f.isSetUnit() ? convertUnit(f.getUnit()) : null)
                 .withValue(f.getValue());
     }
 
     private static List<SampledValue> toOcpp16SampledValueList(List<ocpp.cs._2012._06.MeterValue.Value> vals) {
-        return vals.stream()
-                   .map(Server15to16Impl::toOcpp16SampledValue)
-                   .collect(Collectors.toList());
+        return vals.stream().map(Server15to16Impl::toOcpp16SampledValue).collect(Collectors.toList());
     }
 
     private static MeterValue toOcpp16MeterValue(ocpp.cs._2012._06.MeterValue e) {
-        return new MeterValue().withTimestamp(e.getTimestamp())
-                               .withSampledValue(toOcpp16SampledValueList(e.getValue()));
+        return new MeterValue()
+                .withTimestamp(e.getTimestamp())
+                .withSampledValue(toOcpp16SampledValueList(e.getValue()));
     }
 
     private static List<MeterValue> toOcpp16TransactionData(List<TransactionData> transactionData) {
         return transactionData.stream()
-                              .flatMap(data -> data.getValues().stream())
-                              .map(Server15to16Impl::toOcpp16MeterValue)
-                              .collect(Collectors.toList());
+                .flatMap(data -> data.getValues().stream())
+                .map(Server15to16Impl::toOcpp16MeterValue)
+                .collect(Collectors.toList());
     }
 }

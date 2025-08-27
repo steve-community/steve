@@ -18,9 +18,9 @@
  */
 package de.rwth.idsg.steve.web.validation;
 
+import java.util.regex.Pattern;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
-import java.util.regex.Pattern;
 
 /**
  * Allowed characters are:

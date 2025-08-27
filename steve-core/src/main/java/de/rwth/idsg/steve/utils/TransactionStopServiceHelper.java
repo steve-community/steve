@@ -53,9 +53,8 @@ public class TransactionStopServiceHelper {
 
         // edge case handling for format
         {
-            ValueFormat format = Strings.isNullOrEmpty(v.getFormat())
-                ? ValueFormat.RAW
-                : ValueFormat.fromValue(v.getFormat());
+            ValueFormat format =
+                    Strings.isNullOrEmpty(v.getFormat()) ? ValueFormat.RAW : ValueFormat.fromValue(v.getFormat());
 
             // if the format is "SignedData", we cannot make any sense of this entry. we don't know how to decode it.
             // https://github.com/steve-community/steve/issues/816
@@ -67,8 +66,8 @@ public class TransactionStopServiceHelper {
         // edge case handling for measurand
         {
             Measurand measurand = Strings.isNullOrEmpty(v.getMeasurand())
-                ? Measurand.ENERGY_ACTIVE_IMPORT_REGISTER
-                : Measurand.fromValue(v.getMeasurand());
+                    ? Measurand.ENERGY_ACTIVE_IMPORT_REGISTER
+                    : Measurand.fromValue(v.getMeasurand());
 
             if (Measurand.ENERGY_ACTIVE_IMPORT_REGISTER != measurand) {
                 return false;
@@ -77,9 +76,8 @@ public class TransactionStopServiceHelper {
 
         // edge case handling for unit
         {
-            UnitOfMeasure unit = Strings.isNullOrEmpty(v.getUnit())
-                ? UnitOfMeasure.WH
-                : UnitOfMeasure.fromValue(v.getUnit());
+            UnitOfMeasure unit =
+                    Strings.isNullOrEmpty(v.getUnit()) ? UnitOfMeasure.WH : UnitOfMeasure.fromValue(v.getUnit());
 
             if (!isWHOrKWH(unit)) {
                 return false;

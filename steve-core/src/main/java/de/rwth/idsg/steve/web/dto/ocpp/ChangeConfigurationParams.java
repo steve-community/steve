@@ -23,10 +23,11 @@ import de.rwth.idsg.steve.SteveException;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
+import org.jspecify.annotations.Nullable;
 
+import java.util.Objects;
 import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.NotNull;
-import java.util.Objects;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -36,22 +37,20 @@ import java.util.Objects;
 @Setter
 public class ChangeConfigurationParams extends MultipleChargePointSelect {
 
-    private String confKey;
+    private @Nullable String confKey;
 
-    private String customConfKey;
+    private @Nullable String customConfKey;
 
-    @NotNull(message = "Key type is required")
-    private ConfigurationKeyType keyType = ConfigurationKeyType.PREDEFINED;
+    @NotNull(message = "Key type is required") private ConfigurationKeyType keyType = ConfigurationKeyType.PREDEFINED;
 
     // Disabled @NotBlank after https://github.com/steve-community/steve/issues/148
     // @NotBlank(message = "Value is required")
     //
     // Disabled @Pattern after https://github.com/steve-community/steve/issues/920
     // @Pattern(regexp = "\\S+", message = "Value cannot contain any whitespace")
-    private String value;
+    private @Nullable String value;
 
-    @AssertTrue(message = "Custom Configuration Key cannot be left blank")
-    public boolean isValidCustom() {
+    @AssertTrue(message = "Custom Configuration Key cannot be left blank") public boolean isValidCustom() {
         if (keyType == ConfigurationKeyType.CUSTOM) {
             return !Strings.isNullOrEmpty(customConfKey);
         } else {
@@ -59,8 +58,7 @@ public class ChangeConfigurationParams extends MultipleChargePointSelect {
         }
     }
 
-    @AssertTrue(message = "Configuration Key is required")
-    public boolean isValidPredefined() {
+    @AssertTrue(message = "Configuration Key is required") public boolean isValidPredefined() {
         if (keyType == ConfigurationKeyType.PREDEFINED) {
             return confKey != null;
         } else {
@@ -97,7 +95,8 @@ public class ChangeConfigurationParams extends MultipleChargePointSelect {
         PREDEFINED("Predefined"),
         CUSTOM("Custom");
 
-        @Getter private final String value;
+        @Getter
+        private final String value;
 
         public static ConfigurationKeyType fromValue(String v) {
             for (ConfigurationKeyType c : ConfigurationKeyType.values()) {
@@ -108,5 +107,4 @@ public class ChangeConfigurationParams extends MultipleChargePointSelect {
             throw new IllegalArgumentException(v);
         }
     }
-
 }

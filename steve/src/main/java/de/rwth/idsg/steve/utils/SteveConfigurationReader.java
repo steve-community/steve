@@ -21,8 +21,11 @@ package de.rwth.idsg.steve.utils;
 import de.rwth.idsg.steve.ApplicationProfile;
 import de.rwth.idsg.steve.SteveConfiguration;
 import lombok.experimental.UtilityClass;
+import org.jspecify.annotations.Nullable;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+
+import java.util.Locale;
 
 @UtilityClass
 public class SteveConfigurationReader {
@@ -31,7 +34,7 @@ public class SteveConfigurationReader {
         PropertiesFileLoader p = new PropertiesFileLoader(name);
 
         var profile = ApplicationProfile.fromName(p.getString("profile"));
-        System.setProperty("spring.profiles.active", profile.name().toLowerCase());
+        System.setProperty("spring.profiles.active", profile.name().toLowerCase(Locale.getDefault()));
 
         PasswordEncoder encoder = new BCryptPasswordEncoder();
 
@@ -43,11 +46,13 @@ public class SteveConfigurationReader {
                         .soapMapping("/services")
                         .websocketMapping("/websocket")
                         .routerEndpointPath("/CentralSystemService")
-                        .contextPath(sanitizeContextPath(p.getOptionalString("context.path").orElse(null)))
+                        .contextPath(sanitizeContextPath(
+                                p.getOptionalString("context.path").orElse(null)))
                         .build())
                 .timeZoneId("UTC")
                 .steveVersion(p.getString("steve.version"))
-                .gitDescribe(useFallbackIfNotSet(p.getOptionalString("git.describe").orElse(null), null))
+                .gitDescribe(
+                        useFallbackIfNotSet(p.getOptionalString("git.describe").orElse(null), null))
                 .profile(profile)
                 .jetty(SteveConfiguration.Jetty.builder()
                         .serverHost(p.getString("server.host"))
@@ -57,9 +62,11 @@ public class SteveConfigurationReader {
                         .httpsEnabled(p.getBoolean("https.enabled"))
                         .httpsPort(p.getInt("https.port"))
                         .keyStorePath(p.getOptionalString("keystore.path").orElse(null))
-                        .keyStorePassword(p.getOptionalString("keystore.password").orElse(null))
+                        .keyStorePassword(
+                                p.getOptionalString("keystore.password").orElse(null))
                         .build())
-                .db(SteveConfiguration.DB.builder()
+                .db(SteveConfiguration.DB
+                        .builder()
                         .jdbcUrl(p.getString("db.jdbc.url"))
                         .userName(p.getString("db.user"))
                         .password(p.getString("db.password"))
@@ -75,8 +82,10 @@ public class SteveConfigurationReader {
                         .headerValue(p.getOptionalString("webapi.value").orElse(null))
                         .build())
                 .ocpp(SteveConfiguration.Ocpp.builder()
-                        .autoRegisterUnknownStations(p.getOptionalBoolean("auto.register.unknown.stations").orElse(false))
-                        .chargeBoxIdValidationRegex(p.getOptionalString("charge-box-id.validation.regex").orElse(null))
+                        .autoRegisterUnknownStations(p.getOptionalBoolean("auto.register.unknown.stations")
+                                .orElse(false))
+                        .chargeBoxIdValidationRegex(p.getOptionalString("charge-box-id.validation.regex")
+                                .orElse(null))
                         .wsSessionSelectStrategy(p.getString("ws.session.select.strategy"))
                         .build())
                 .build();
@@ -85,7 +94,7 @@ public class SteveConfigurationReader {
         return config;
     }
 
-    private static String useFallbackIfNotSet(String value, String fallback) {
+    private static @Nullable String useFallbackIfNotSet(@Nullable String value, @Nullable String fallback) {
         if (value == null) {
             // if the property is optional, value will be null
             return fallback;
@@ -97,7 +106,7 @@ public class SteveConfigurationReader {
         }
     }
 
-    private static String sanitizeContextPath(String s) {
+    private static String sanitizeContextPath(@Nullable String s) {
         if (s == null || "/".equals(s)) {
             return "";
 

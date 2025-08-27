@@ -50,8 +50,10 @@ import org.springframework.stereotype.Service;
 @Service
 public class ChargePointServiceSoapInvoker implements ChargePointServiceInvoker {
 
-    public static final Exception EXCEPTION_V12 = new IllegalArgumentException("This operation is not supported by this OCPP 1.2 station");
-    public static final Exception EXCEPTION_V15 = new IllegalArgumentException("This operation is not supported by this OCPP 1.5 station");
+    public static final Exception EXCEPTION_V12 =
+            new IllegalArgumentException("This operation is not supported by this OCPP 1.2 station");
+    public static final Exception EXCEPTION_V15 =
+            new IllegalArgumentException("This operation is not supported by this OCPP 1.5 station");
 
     private final ClientProviderWithCache<ocpp.cp._2010._08.ChargePointService> soapV12Helper;
     private final ClientProviderWithCache<ocpp.cp._2012._06.ChargePointService> soapV15Helper;
@@ -66,83 +68,218 @@ public class ChargePointServiceSoapInvoker implements ChargePointServiceInvoker 
     // -------------------------------------------------------------------------
     // since Ocpp 1.2
     // -------------------------------------------------------------------------
-
+    @Override
     public void reset(ChargePointSelect cp, ResetTask task) {
         switch (cp.getOcppProtocol().getVersion()) {
-            case V_12 -> createV12(cp).resetAsync(task.getOcpp12Request(), cp.getChargeBoxId(), task.getOcpp12Handler(cp.getChargeBoxId()));
-            case V_15 -> createV15(cp).resetAsync(task.getOcpp15Request(), cp.getChargeBoxId(), task.getOcpp15Handler(cp.getChargeBoxId()));
-            case V_16 -> createV16(cp).resetAsync(task.getOcpp16Request(), cp.getChargeBoxId(), task.getOcpp16Handler(cp.getChargeBoxId()));
+            case V_12 ->
+                createV12(cp)
+                        .resetAsync(
+                                task.getOcpp12Request(),
+                                cp.getChargeBoxId(),
+                                task.getOcpp12Handler(cp.getChargeBoxId()));
+            case V_15 ->
+                createV15(cp)
+                        .resetAsync(
+                                task.getOcpp15Request(),
+                                cp.getChargeBoxId(),
+                                task.getOcpp15Handler(cp.getChargeBoxId()));
+            case V_16 ->
+                createV16(cp)
+                        .resetAsync(
+                                task.getOcpp16Request(),
+                                cp.getChargeBoxId(),
+                                task.getOcpp16Handler(cp.getChargeBoxId()));
         }
     }
 
     @Override
     public void clearCache(ChargePointSelect cp, ClearCacheTask task) {
         switch (cp.getOcppProtocol().getVersion()) {
-            case V_12 -> createV12(cp).clearCacheAsync(task.getOcpp12Request(), cp.getChargeBoxId(), task.getOcpp12Handler(cp.getChargeBoxId()));
-            case V_15 -> createV15(cp).clearCacheAsync(task.getOcpp15Request(), cp.getChargeBoxId(), task.getOcpp15Handler(cp.getChargeBoxId()));
-            case V_16 -> createV16(cp).clearCacheAsync(task.getOcpp16Request(), cp.getChargeBoxId(), task.getOcpp16Handler(cp.getChargeBoxId()));
+            case V_12 ->
+                createV12(cp)
+                        .clearCacheAsync(
+                                task.getOcpp12Request(),
+                                cp.getChargeBoxId(),
+                                task.getOcpp12Handler(cp.getChargeBoxId()));
+            case V_15 ->
+                createV15(cp)
+                        .clearCacheAsync(
+                                task.getOcpp15Request(),
+                                cp.getChargeBoxId(),
+                                task.getOcpp15Handler(cp.getChargeBoxId()));
+            case V_16 ->
+                createV16(cp)
+                        .clearCacheAsync(
+                                task.getOcpp16Request(),
+                                cp.getChargeBoxId(),
+                                task.getOcpp16Handler(cp.getChargeBoxId()));
         }
     }
 
     @Override
     public void getDiagnostics(ChargePointSelect cp, GetDiagnosticsTask task) {
         switch (cp.getOcppProtocol().getVersion()) {
-            case V_12 -> createV12(cp).getDiagnosticsAsync(task.getOcpp12Request(), cp.getChargeBoxId(), task.getOcpp12Handler(cp.getChargeBoxId()));
-            case V_15 -> createV15(cp).getDiagnosticsAsync(task.getOcpp15Request(), cp.getChargeBoxId(), task.getOcpp15Handler(cp.getChargeBoxId()));
-            case V_16 -> createV16(cp).getDiagnosticsAsync(task.getOcpp16Request(), cp.getChargeBoxId(), task.getOcpp16Handler(cp.getChargeBoxId()));
+            case V_12 ->
+                createV12(cp)
+                        .getDiagnosticsAsync(
+                                task.getOcpp12Request(),
+                                cp.getChargeBoxId(),
+                                task.getOcpp12Handler(cp.getChargeBoxId()));
+            case V_15 ->
+                createV15(cp)
+                        .getDiagnosticsAsync(
+                                task.getOcpp15Request(),
+                                cp.getChargeBoxId(),
+                                task.getOcpp15Handler(cp.getChargeBoxId()));
+            case V_16 ->
+                createV16(cp)
+                        .getDiagnosticsAsync(
+                                task.getOcpp16Request(),
+                                cp.getChargeBoxId(),
+                                task.getOcpp16Handler(cp.getChargeBoxId()));
         }
     }
 
     @Override
     public void updateFirmware(ChargePointSelect cp, UpdateFirmwareTask task) {
         switch (cp.getOcppProtocol().getVersion()) {
-            case V_12 -> createV12(cp).updateFirmwareAsync(task.getOcpp12Request(), cp.getChargeBoxId(), task.getOcpp12Handler(cp.getChargeBoxId()));
-            case V_15 -> createV15(cp).updateFirmwareAsync(task.getOcpp15Request(), cp.getChargeBoxId(), task.getOcpp15Handler(cp.getChargeBoxId()));
-            case V_16 -> createV16(cp).updateFirmwareAsync(task.getOcpp16Request(), cp.getChargeBoxId(), task.getOcpp16Handler(cp.getChargeBoxId()));
+            case V_12 ->
+                createV12(cp)
+                        .updateFirmwareAsync(
+                                task.getOcpp12Request(),
+                                cp.getChargeBoxId(),
+                                task.getOcpp12Handler(cp.getChargeBoxId()));
+            case V_15 ->
+                createV15(cp)
+                        .updateFirmwareAsync(
+                                task.getOcpp15Request(),
+                                cp.getChargeBoxId(),
+                                task.getOcpp15Handler(cp.getChargeBoxId()));
+            case V_16 ->
+                createV16(cp)
+                        .updateFirmwareAsync(
+                                task.getOcpp16Request(),
+                                cp.getChargeBoxId(),
+                                task.getOcpp16Handler(cp.getChargeBoxId()));
         }
     }
 
     @Override
     public void unlockConnector(ChargePointSelect cp, UnlockConnectorTask task) {
         switch (cp.getOcppProtocol().getVersion()) {
-            case V_12 -> createV12(cp).unlockConnectorAsync(task.getOcpp12Request(), cp.getChargeBoxId(), task.getOcpp12Handler(cp.getChargeBoxId()));
-            case V_15 -> createV15(cp).unlockConnectorAsync(task.getOcpp15Request(), cp.getChargeBoxId(), task.getOcpp15Handler(cp.getChargeBoxId()));
-            case V_16 -> createV16(cp).unlockConnectorAsync(task.getOcpp16Request(), cp.getChargeBoxId(), task.getOcpp16Handler(cp.getChargeBoxId()));
+            case V_12 ->
+                createV12(cp)
+                        .unlockConnectorAsync(
+                                task.getOcpp12Request(),
+                                cp.getChargeBoxId(),
+                                task.getOcpp12Handler(cp.getChargeBoxId()));
+            case V_15 ->
+                createV15(cp)
+                        .unlockConnectorAsync(
+                                task.getOcpp15Request(),
+                                cp.getChargeBoxId(),
+                                task.getOcpp15Handler(cp.getChargeBoxId()));
+            case V_16 ->
+                createV16(cp)
+                        .unlockConnectorAsync(
+                                task.getOcpp16Request(),
+                                cp.getChargeBoxId(),
+                                task.getOcpp16Handler(cp.getChargeBoxId()));
         }
     }
 
     public void changeAvailability(ChargePointSelect cp, ChangeAvailabilityTask task) {
         switch (cp.getOcppProtocol().getVersion()) {
-            case V_12 -> createV12(cp).changeAvailabilityAsync(task.getOcpp12Request(), cp.getChargeBoxId(), task.getOcpp12Handler(cp.getChargeBoxId()));
-            case V_15 -> createV15(cp).changeAvailabilityAsync(task.getOcpp15Request(), cp.getChargeBoxId(), task.getOcpp15Handler(cp.getChargeBoxId()));
-            case V_16 -> createV16(cp).changeAvailabilityAsync(task.getOcpp16Request(), cp.getChargeBoxId(), task.getOcpp16Handler(cp.getChargeBoxId()));
+            case V_12 ->
+                createV12(cp)
+                        .changeAvailabilityAsync(
+                                task.getOcpp12Request(),
+                                cp.getChargeBoxId(),
+                                task.getOcpp12Handler(cp.getChargeBoxId()));
+            case V_15 ->
+                createV15(cp)
+                        .changeAvailabilityAsync(
+                                task.getOcpp15Request(),
+                                cp.getChargeBoxId(),
+                                task.getOcpp15Handler(cp.getChargeBoxId()));
+            case V_16 ->
+                createV16(cp)
+                        .changeAvailabilityAsync(
+                                task.getOcpp16Request(),
+                                cp.getChargeBoxId(),
+                                task.getOcpp16Handler(cp.getChargeBoxId()));
         }
     }
 
     @Override
     public void changeConfiguration(ChargePointSelect cp, ChangeConfigurationTask task) {
         switch (cp.getOcppProtocol().getVersion()) {
-            case V_12 -> createV12(cp).changeConfigurationAsync(task.getOcpp12Request(), cp.getChargeBoxId(), task.getOcpp12Handler(cp.getChargeBoxId()));
-            case V_15 -> createV15(cp).changeConfigurationAsync(task.getOcpp15Request(), cp.getChargeBoxId(), task.getOcpp15Handler(cp.getChargeBoxId()));
-            case V_16 -> createV16(cp).changeConfigurationAsync(task.getOcpp16Request(), cp.getChargeBoxId(), task.getOcpp16Handler(cp.getChargeBoxId()));
+            case V_12 ->
+                createV12(cp)
+                        .changeConfigurationAsync(
+                                task.getOcpp12Request(),
+                                cp.getChargeBoxId(),
+                                task.getOcpp12Handler(cp.getChargeBoxId()));
+            case V_15 ->
+                createV15(cp)
+                        .changeConfigurationAsync(
+                                task.getOcpp15Request(),
+                                cp.getChargeBoxId(),
+                                task.getOcpp15Handler(cp.getChargeBoxId()));
+            case V_16 ->
+                createV16(cp)
+                        .changeConfigurationAsync(
+                                task.getOcpp16Request(),
+                                cp.getChargeBoxId(),
+                                task.getOcpp16Handler(cp.getChargeBoxId()));
         }
     }
 
     @Override
     public void remoteStartTransaction(ChargePointSelect cp, RemoteStartTransactionTask task) {
         switch (cp.getOcppProtocol().getVersion()) {
-            case V_12 -> createV12(cp).remoteStartTransactionAsync(task.getOcpp12Request(), cp.getChargeBoxId(), task.getOcpp12Handler(cp.getChargeBoxId()));
-            case V_15 -> createV15(cp).remoteStartTransactionAsync(task.getOcpp15Request(), cp.getChargeBoxId(), task.getOcpp15Handler(cp.getChargeBoxId()));
-            case V_16 -> createV16(cp).remoteStartTransactionAsync(task.getOcpp16Request(), cp.getChargeBoxId(), task.getOcpp16Handler(cp.getChargeBoxId()));
+            case V_12 ->
+                createV12(cp)
+                        .remoteStartTransactionAsync(
+                                task.getOcpp12Request(),
+                                cp.getChargeBoxId(),
+                                task.getOcpp12Handler(cp.getChargeBoxId()));
+            case V_15 ->
+                createV15(cp)
+                        .remoteStartTransactionAsync(
+                                task.getOcpp15Request(),
+                                cp.getChargeBoxId(),
+                                task.getOcpp15Handler(cp.getChargeBoxId()));
+            case V_16 ->
+                createV16(cp)
+                        .remoteStartTransactionAsync(
+                                task.getOcpp16Request(),
+                                cp.getChargeBoxId(),
+                                task.getOcpp16Handler(cp.getChargeBoxId()));
         }
     }
 
     @Override
     public void remoteStopTransaction(ChargePointSelect cp, RemoteStopTransactionTask task) {
         switch (cp.getOcppProtocol().getVersion()) {
-            case V_12 -> createV12(cp).remoteStopTransactionAsync(task.getOcpp12Request(), cp.getChargeBoxId(), task.getOcpp12Handler(cp.getChargeBoxId()));
-            case V_15 -> createV15(cp).remoteStopTransactionAsync(task.getOcpp15Request(), cp.getChargeBoxId(), task.getOcpp15Handler(cp.getChargeBoxId()));
-            case V_16 -> createV16(cp).remoteStopTransactionAsync(task.getOcpp16Request(), cp.getChargeBoxId(), task.getOcpp16Handler(cp.getChargeBoxId()));
+            case V_12 ->
+                createV12(cp)
+                        .remoteStopTransactionAsync(
+                                task.getOcpp12Request(),
+                                cp.getChargeBoxId(),
+                                task.getOcpp12Handler(cp.getChargeBoxId()));
+            case V_15 ->
+                createV15(cp)
+                        .remoteStopTransactionAsync(
+                                task.getOcpp15Request(),
+                                cp.getChargeBoxId(),
+                                task.getOcpp15Handler(cp.getChargeBoxId()));
+            case V_16 ->
+                createV16(cp)
+                        .remoteStopTransactionAsync(
+                                task.getOcpp16Request(),
+                                cp.getChargeBoxId(),
+                                task.getOcpp16Handler(cp.getChargeBoxId()));
         }
     }
 
@@ -154,8 +291,18 @@ public class ChargePointServiceSoapInvoker implements ChargePointServiceInvoker 
     public void dataTransfer(ChargePointSelect cp, DataTransferTask task) {
         switch (cp.getOcppProtocol().getVersion()) {
             case V_12 -> task.failed(cp.getChargeBoxId(), EXCEPTION_V12);
-            case V_15 -> createV15(cp).dataTransferAsync(task.getOcpp15Request(), cp.getChargeBoxId(), task.getOcpp15Handler(cp.getChargeBoxId()));
-            case V_16 -> createV16(cp).dataTransferAsync(task.getOcpp16Request(), cp.getChargeBoxId(), task.getOcpp16Handler(cp.getChargeBoxId()));
+            case V_15 ->
+                createV15(cp)
+                        .dataTransferAsync(
+                                task.getOcpp15Request(),
+                                cp.getChargeBoxId(),
+                                task.getOcpp15Handler(cp.getChargeBoxId()));
+            case V_16 ->
+                createV16(cp)
+                        .dataTransferAsync(
+                                task.getOcpp16Request(),
+                                cp.getChargeBoxId(),
+                                task.getOcpp16Handler(cp.getChargeBoxId()));
         }
     }
 
@@ -163,8 +310,18 @@ public class ChargePointServiceSoapInvoker implements ChargePointServiceInvoker 
     public void getConfiguration(ChargePointSelect cp, GetConfigurationTask task) {
         switch (cp.getOcppProtocol().getVersion()) {
             case V_12 -> task.failed(cp.getChargeBoxId(), EXCEPTION_V12);
-            case V_15 -> createV15(cp).getConfigurationAsync(task.getOcpp15Request(), cp.getChargeBoxId(), task.getOcpp15Handler(cp.getChargeBoxId()));
-            case V_16 -> createV16(cp).getConfigurationAsync(task.getOcpp16Request(), cp.getChargeBoxId(), task.getOcpp16Handler(cp.getChargeBoxId()));
+            case V_15 ->
+                createV15(cp)
+                        .getConfigurationAsync(
+                                task.getOcpp15Request(),
+                                cp.getChargeBoxId(),
+                                task.getOcpp15Handler(cp.getChargeBoxId()));
+            case V_16 ->
+                createV16(cp)
+                        .getConfigurationAsync(
+                                task.getOcpp16Request(),
+                                cp.getChargeBoxId(),
+                                task.getOcpp16Handler(cp.getChargeBoxId()));
         }
     }
 
@@ -172,8 +329,18 @@ public class ChargePointServiceSoapInvoker implements ChargePointServiceInvoker 
     public void getLocalListVersion(ChargePointSelect cp, GetLocalListVersionTask task) {
         switch (cp.getOcppProtocol().getVersion()) {
             case V_12 -> task.failed(cp.getChargeBoxId(), EXCEPTION_V12);
-            case V_15 -> createV15(cp).getLocalListVersionAsync(task.getOcpp15Request(), cp.getChargeBoxId(), task.getOcpp15Handler(cp.getChargeBoxId()));
-            case V_16 -> createV16(cp).getLocalListVersionAsync(task.getOcpp16Request(), cp.getChargeBoxId(), task.getOcpp16Handler(cp.getChargeBoxId()));
+            case V_15 ->
+                createV15(cp)
+                        .getLocalListVersionAsync(
+                                task.getOcpp15Request(),
+                                cp.getChargeBoxId(),
+                                task.getOcpp15Handler(cp.getChargeBoxId()));
+            case V_16 ->
+                createV16(cp)
+                        .getLocalListVersionAsync(
+                                task.getOcpp16Request(),
+                                cp.getChargeBoxId(),
+                                task.getOcpp16Handler(cp.getChargeBoxId()));
         }
     }
 
@@ -181,8 +348,18 @@ public class ChargePointServiceSoapInvoker implements ChargePointServiceInvoker 
     public void sendLocalList(ChargePointSelect cp, SendLocalListTask task) {
         switch (cp.getOcppProtocol().getVersion()) {
             case V_12 -> task.failed(cp.getChargeBoxId(), EXCEPTION_V12);
-            case V_15 -> createV15(cp).sendLocalListAsync(task.getOcpp15Request(), cp.getChargeBoxId(), task.getOcpp15Handler(cp.getChargeBoxId()));
-            case V_16 -> createV16(cp).sendLocalListAsync(task.getOcpp16Request(), cp.getChargeBoxId(), task.getOcpp16Handler(cp.getChargeBoxId()));
+            case V_15 ->
+                createV15(cp)
+                        .sendLocalListAsync(
+                                task.getOcpp15Request(),
+                                cp.getChargeBoxId(),
+                                task.getOcpp15Handler(cp.getChargeBoxId()));
+            case V_16 ->
+                createV16(cp)
+                        .sendLocalListAsync(
+                                task.getOcpp16Request(),
+                                cp.getChargeBoxId(),
+                                task.getOcpp16Handler(cp.getChargeBoxId()));
         }
     }
 
@@ -190,8 +367,18 @@ public class ChargePointServiceSoapInvoker implements ChargePointServiceInvoker 
     public void reserveNow(ChargePointSelect cp, ReserveNowTask task) {
         switch (cp.getOcppProtocol().getVersion()) {
             case V_12 -> task.failed(cp.getChargeBoxId(), EXCEPTION_V12);
-            case V_15 -> createV15(cp).reserveNowAsync(task.getOcpp15Request(), cp.getChargeBoxId(), task.getOcpp15Handler(cp.getChargeBoxId()));
-            case V_16 -> createV16(cp).reserveNowAsync(task.getOcpp16Request(), cp.getChargeBoxId(), task.getOcpp16Handler(cp.getChargeBoxId()));
+            case V_15 ->
+                createV15(cp)
+                        .reserveNowAsync(
+                                task.getOcpp15Request(),
+                                cp.getChargeBoxId(),
+                                task.getOcpp15Handler(cp.getChargeBoxId()));
+            case V_16 ->
+                createV16(cp)
+                        .reserveNowAsync(
+                                task.getOcpp16Request(),
+                                cp.getChargeBoxId(),
+                                task.getOcpp16Handler(cp.getChargeBoxId()));
         }
     }
 
@@ -199,8 +386,18 @@ public class ChargePointServiceSoapInvoker implements ChargePointServiceInvoker 
     public void cancelReservation(ChargePointSelect cp, CancelReservationTask task) {
         switch (cp.getOcppProtocol().getVersion()) {
             case V_12 -> task.failed(cp.getChargeBoxId(), EXCEPTION_V12);
-            case V_15 -> createV15(cp).cancelReservationAsync(task.getOcpp15Request(), cp.getChargeBoxId(), task.getOcpp15Handler(cp.getChargeBoxId()));
-            case V_16 -> createV16(cp).cancelReservationAsync(task.getOcpp16Request(), cp.getChargeBoxId(), task.getOcpp16Handler(cp.getChargeBoxId()));
+            case V_15 ->
+                createV15(cp)
+                        .cancelReservationAsync(
+                                task.getOcpp15Request(),
+                                cp.getChargeBoxId(),
+                                task.getOcpp15Handler(cp.getChargeBoxId()));
+            case V_16 ->
+                createV16(cp)
+                        .cancelReservationAsync(
+                                task.getOcpp16Request(),
+                                cp.getChargeBoxId(),
+                                task.getOcpp16Handler(cp.getChargeBoxId()));
         }
     }
 
@@ -213,7 +410,12 @@ public class ChargePointServiceSoapInvoker implements ChargePointServiceInvoker 
         switch (cp.getOcppProtocol().getVersion()) {
             case V_12 -> task.failed(cp.getChargeBoxId(), EXCEPTION_V12);
             case V_15 -> task.failed(cp.getChargeBoxId(), EXCEPTION_V15);
-            case V_16 -> createV16(cp).clearChargingProfileAsync(task.getOcpp16Request(), cp.getChargeBoxId(), task.getOcpp16Handler(cp.getChargeBoxId()));
+            case V_16 ->
+                createV16(cp)
+                        .clearChargingProfileAsync(
+                                task.getOcpp16Request(),
+                                cp.getChargeBoxId(),
+                                task.getOcpp16Handler(cp.getChargeBoxId()));
         }
     }
 
@@ -222,7 +424,12 @@ public class ChargePointServiceSoapInvoker implements ChargePointServiceInvoker 
         switch (cp.getOcppProtocol().getVersion()) {
             case V_12 -> task.failed(cp.getChargeBoxId(), EXCEPTION_V12);
             case V_15 -> task.failed(cp.getChargeBoxId(), EXCEPTION_V15);
-            case V_16 -> createV16(cp).setChargingProfileAsync(task.getOcpp16Request(), cp.getChargeBoxId(), task.getOcpp16Handler(cp.getChargeBoxId()));
+            case V_16 ->
+                createV16(cp)
+                        .setChargingProfileAsync(
+                                task.getOcpp16Request(),
+                                cp.getChargeBoxId(),
+                                task.getOcpp16Handler(cp.getChargeBoxId()));
         }
     }
 
@@ -231,7 +438,12 @@ public class ChargePointServiceSoapInvoker implements ChargePointServiceInvoker 
         switch (cp.getOcppProtocol().getVersion()) {
             case V_12 -> task.failed(cp.getChargeBoxId(), EXCEPTION_V12);
             case V_15 -> task.failed(cp.getChargeBoxId(), EXCEPTION_V15);
-            case V_16 -> createV16(cp).getCompositeScheduleAsync(task.getOcpp16Request(), cp.getChargeBoxId(), task.getOcpp16Handler(cp.getChargeBoxId()));
+            case V_16 ->
+                createV16(cp)
+                        .getCompositeScheduleAsync(
+                                task.getOcpp16Request(),
+                                cp.getChargeBoxId(),
+                                task.getOcpp16Handler(cp.getChargeBoxId()));
         }
     }
 
@@ -240,7 +452,12 @@ public class ChargePointServiceSoapInvoker implements ChargePointServiceInvoker 
         switch (cp.getOcppProtocol().getVersion()) {
             case V_12 -> task.failed(cp.getChargeBoxId(), EXCEPTION_V12);
             case V_15 -> task.failed(cp.getChargeBoxId(), EXCEPTION_V15);
-            case V_16 -> createV16(cp).triggerMessageAsync(task.getOcpp16Request(), cp.getChargeBoxId(), task.getOcpp16Handler(cp.getChargeBoxId()));
+            case V_16 ->
+                createV16(cp)
+                        .triggerMessageAsync(
+                                task.getOcpp16Request(),
+                                cp.getChargeBoxId(),
+                                task.getOcpp16Handler(cp.getChargeBoxId()));
         }
     }
 

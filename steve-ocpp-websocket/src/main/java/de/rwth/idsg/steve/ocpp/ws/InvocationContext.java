@@ -31,8 +31,7 @@ import java.util.function.Function;
 public record InvocationContext(
         AbstractWebSocketEndpoint endpoint,
         TypeStore typeStore,
-        Function<CommunicationTask<?, ?>, RequestType> request
-) {
+        Function<CommunicationTask<?, ?>, RequestType> request) {
     public CommunicationContext toCommunicationContext(String chargeBoxId, CommunicationTask<?, ?> task) {
         var context = new CommunicationContext(endpoint().getSession(chargeBoxId), chargeBoxId);
 

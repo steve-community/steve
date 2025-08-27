@@ -24,6 +24,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
+import org.jspecify.annotations.Nullable;
 
 import java.time.Instant;
 
@@ -36,13 +37,16 @@ public final class ConnectorStatus {
     @JsonIgnore
     @Schema(description = "Charge Box DB key", hidden = true)
     private final int chargeBoxPk;
+
     @Schema(description = "Charge Box ID")
     private final String chargeBoxId;
+
     @Schema(description = "Connector ID")
     private final int connectorId;
 
     @Schema(description = "Status")
     private final String status;
+
     @Schema(description = "Error code")
     private final String errorCode;
 
@@ -54,7 +58,7 @@ public final class ConnectorStatus {
     private final Instant statusTimestamp;
 
     @Schema(description = "OCPP version")
-    private final OcppProtocol ocppProtocol;
+    private final @Nullable OcppProtocol ocppProtocol;
 
     // This is true, if the chargeBox this connector belongs to is a WS/JSON station
     // and it is disconnected at the moment of building this DTO.

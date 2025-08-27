@@ -44,7 +44,8 @@ public class TriggerMessageTask extends Ocpp16AndAboveTask<TriggerMessageParams,
     public ocpp.cp._2015._10.TriggerMessageRequest getOcpp16Request() {
         return new ocpp.cp._2015._10.TriggerMessageRequest()
                 .withConnectorId(params.getConnectorId())
-                .withRequestedMessage(MessageTrigger.fromValue(params.getTriggerMessage().value()));
+                .withRequestedMessage(
+                        MessageTrigger.fromValue(params.getTriggerMessage().value()));
     }
 
     @Override

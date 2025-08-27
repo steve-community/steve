@@ -20,6 +20,7 @@ package de.rwth.idsg.ocpp;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import org.jspecify.annotations.Nullable;
 
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
@@ -48,7 +49,6 @@ public final class DateTimeUtils {
             .optionalStart()
             .appendOffsetId()
             .optionalEnd()
-
             .parseStrict()
             .toFormatter();
 
@@ -63,7 +63,7 @@ public final class DateTimeUtils {
             .parseStrict()
             .toFormatter();
 
-    public static OffsetDateTime toOffsetDateTime(String value, ZoneId fallbackZoneId) {
+    public static @Nullable OffsetDateTime toOffsetDateTime(@Nullable String value, ZoneId fallbackZoneId) {
         if (value == null || value.isBlank()) {
             return null;
         }
@@ -80,7 +80,7 @@ public final class DateTimeUtils {
         return OffsetDateTime.from(parsed);
     }
 
-    public static String toString(OffsetDateTime dateTime, ZoneId zoneId) {
+    public static @Nullable String toString(@Nullable OffsetDateTime dateTime, ZoneId zoneId) {
         if (dateTime == null) {
             return null;
         }

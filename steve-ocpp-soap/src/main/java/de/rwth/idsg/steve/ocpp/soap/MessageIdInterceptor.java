@@ -62,5 +62,4 @@ public class MessageIdInterceptor extends AbstractPhaseInterceptor<Message> {
             addressProp.setMessageID(ContextUtils.getAttributedURI(ContextUtils.generateUUID()));
         }
     }
-
 }

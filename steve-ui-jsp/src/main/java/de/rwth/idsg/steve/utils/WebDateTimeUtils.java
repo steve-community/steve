@@ -19,7 +19,6 @@
 package de.rwth.idsg.steve.utils;
 
 import com.google.common.base.Strings;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -29,6 +28,7 @@ import org.springframework.web.servlet.support.RequestContextUtils;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.util.TimeZone;
+import jakarta.servlet.http.HttpServletRequest;
 
 @Slf4j
 @NoArgsConstructor(access = AccessLevel.PRIVATE)

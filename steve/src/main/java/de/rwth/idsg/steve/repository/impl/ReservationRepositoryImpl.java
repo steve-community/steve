@@ -64,23 +64,25 @@ public class ReservationRepositoryImpl implements ReservationRepository {
     @Override
     public Optional<Reservation> getReservation(int id) {
         Reservation result = ctx.select(
-            RESERVATION.RESERVATION_PK,
-            RESERVATION.TRANSACTION_PK,
-            OCPP_TAG.OCPP_TAG_PK,
-            CHARGE_BOX.CHARGE_BOX_PK,
-            OCPP_TAG.ID_TAG,
-            CHARGE_BOX.CHARGE_BOX_ID,
-            RESERVATION.START_DATETIME,
-            RESERVATION.EXPIRY_DATETIME,
-            RESERVATION.STATUS,
-            CONNECTOR.CONNECTOR_ID
-        )
-        .from(RESERVATION)
-        .join(OCPP_TAG).on(OCPP_TAG.ID_TAG.eq(RESERVATION.ID_TAG))
-        .join(CONNECTOR).on(CONNECTOR.CONNECTOR_PK.eq(RESERVATION.CONNECTOR_PK))
-        .join(CHARGE_BOX).on(CONNECTOR.CHARGE_BOX_ID.eq(CHARGE_BOX.CHARGE_BOX_ID))
-        .where(RESERVATION.RESERVATION_PK.eq(id))
-        .fetchOne(new ReservationMapper());
+                        RESERVATION.RESERVATION_PK,
+                        RESERVATION.TRANSACTION_PK,
+                        OCPP_TAG.OCPP_TAG_PK,
+                        CHARGE_BOX.CHARGE_BOX_PK,
+                        OCPP_TAG.ID_TAG,
+                        CHARGE_BOX.CHARGE_BOX_ID,
+                        RESERVATION.START_DATETIME,
+                        RESERVATION.EXPIRY_DATETIME,
+                        RESERVATION.STATUS,
+                        CONNECTOR.CONNECTOR_ID)
+                .from(RESERVATION)
+                .join(OCPP_TAG)
+                .on(OCPP_TAG.ID_TAG.eq(RESERVATION.ID_TAG))
+                .join(CONNECTOR)
+                .on(CONNECTOR.CONNECTOR_PK.eq(RESERVATION.CONNECTOR_PK))
+                .join(CHARGE_BOX)
+                .on(CONNECTOR.CHARGE_BOX_ID.eq(CHARGE_BOX.CHARGE_BOX_ID))
+                .where(RESERVATION.RESERVATION_PK.eq(id))
+                .fetchOne(new ReservationMapper());
         return Optional.ofNullable(result);
     }
 
@@ -103,8 +105,7 @@ public class ReservationRepositoryImpl implements ReservationRepository {
                 RESERVATION.START_DATETIME,
                 RESERVATION.EXPIRY_DATETIME,
                 RESERVATION.STATUS,
-                CONNECTOR.CONNECTOR_ID
-        );
+                CONNECTOR.CONNECTOR_ID);
 
         if (form.isChargeBoxIdSet()) {
             selectQuery.addConditions(CHARGE_BOX.CHARGE_BOX_ID.eq(form.getChargeBoxId()));
@@ -134,35 +135,34 @@ public class ReservationRepositoryImpl implements ReservationRepository {
     @Override
     public List<Integer> getActiveReservationIds(String chargeBoxId) {
         return ctx.select(RESERVATION.RESERVATION_PK)
-                  .from(RESERVATION)
-                  .where(RESERVATION.CONNECTOR_PK.in(DSL.select(CONNECTOR.CONNECTOR_PK)
-                                                        .from(CONNECTOR)
-                                                        .where(CONNECTOR.CHARGE_BOX_ID.equal(chargeBoxId))))
-                  .and(RESERVATION.EXPIRY_DATETIME.greaterThan(LocalDateTime.now()))
-                  .and(RESERVATION.STATUS.equal(ReservationStatus.ACCEPTED.name()))
-                  .fetch(RESERVATION.RESERVATION_PK);
+                .from(RESERVATION)
+                .where(RESERVATION.CONNECTOR_PK.in(DSL.select(CONNECTOR.CONNECTOR_PK)
+                        .from(CONNECTOR)
+                        .where(CONNECTOR.CHARGE_BOX_ID.equal(chargeBoxId))))
+                .and(RESERVATION.EXPIRY_DATETIME.greaterThan(LocalDateTime.now()))
+                .and(RESERVATION.STATUS.equal(ReservationStatus.ACCEPTED.name()))
+                .fetch(RESERVATION.RESERVATION_PK);
     }
 
     @Override
     public int insert(InsertReservationParams params) {
         // Check overlapping
-        //isOverlapping(startTimestamp, expiryTimestamp, chargeBoxId);
+        // isOverlapping(startTimestamp, expiryTimestamp, chargeBoxId);
 
-        SelectConditionStep<Record1<Integer>> connectorPkQuery =
-                DSL.select(CONNECTOR.CONNECTOR_PK)
-                   .from(CONNECTOR)
-                   .where(CONNECTOR.CHARGE_BOX_ID.equal(params.getChargeBoxId()))
-                   .and(CONNECTOR.CONNECTOR_ID.equal(params.getConnectorId()));
+        SelectConditionStep<Record1<Integer>> connectorPkQuery = DSL.select(CONNECTOR.CONNECTOR_PK)
+                .from(CONNECTOR)
+                .where(CONNECTOR.CHARGE_BOX_ID.equal(params.getChargeBoxId()))
+                .and(CONNECTOR.CONNECTOR_ID.equal(params.getConnectorId()));
 
         int reservationId = ctx.insertInto(RESERVATION)
-                               .set(RESERVATION.CONNECTOR_PK, connectorPkQuery)
-                               .set(RESERVATION.ID_TAG, params.getIdTag())
-                               .set(RESERVATION.START_DATETIME, toLocalDateTime(params.getStartTimestamp()))
-                               .set(RESERVATION.EXPIRY_DATETIME, toLocalDateTime(params.getExpiryTimestamp()))
-                               .set(RESERVATION.STATUS, ReservationStatus.WAITING.name())
-                               .returning(RESERVATION.RESERVATION_PK)
-                               .fetchOne()
-                               .getReservationPk();
+                .set(RESERVATION.CONNECTOR_PK, connectorPkQuery)
+                .set(RESERVATION.ID_TAG, params.getIdTag())
+                .set(RESERVATION.START_DATETIME, toLocalDateTime(params.getStartTimestamp()))
+                .set(RESERVATION.EXPIRY_DATETIME, toLocalDateTime(params.getExpiryTimestamp()))
+                .set(RESERVATION.STATUS, ReservationStatus.WAITING.name())
+                .returning(RESERVATION.RESERVATION_PK)
+                .fetchOne()
+                .getReservationPk();
 
         log.debug("A new reservation '{}' is inserted.", reservationId);
         return reservationId;
@@ -171,8 +171,8 @@ public class ReservationRepositoryImpl implements ReservationRepository {
     @Override
     public void delete(int reservationId) {
         ctx.delete(RESERVATION)
-           .where(RESERVATION.RESERVATION_PK.equal(reservationId))
-           .execute();
+                .where(RESERVATION.RESERVATION_PK.equal(reservationId))
+                .execute();
 
         log.debug("The reservation '{}' is deleted.", reservationId);
     }
@@ -188,19 +188,22 @@ public class ReservationRepositoryImpl implements ReservationRepository {
     }
 
     @Override
-    public void used(Select<Record1<Integer>> connectorPkSelect, String ocppIdTag, int reservationId, int transactionId) {
+    public void used(
+            Select<Record1<Integer>> connectorPkSelect, String ocppIdTag, int reservationId, int transactionId) {
         int count = ctx.update(RESERVATION)
-                       .set(RESERVATION.STATUS, ReservationStatus.USED.name())
-                       .set(RESERVATION.TRANSACTION_PK, transactionId)
-                       .where(RESERVATION.RESERVATION_PK.equal(reservationId))
-                       .and(RESERVATION.ID_TAG.equal(ocppIdTag))
-                       .and(RESERVATION.CONNECTOR_PK.equal(connectorPkSelect))
-                       .and(RESERVATION.STATUS.eq(ReservationStatus.ACCEPTED.name()))
-                       .execute();
+                .set(RESERVATION.STATUS, ReservationStatus.USED.name())
+                .set(RESERVATION.TRANSACTION_PK, transactionId)
+                .where(RESERVATION.RESERVATION_PK.equal(reservationId))
+                .and(RESERVATION.ID_TAG.equal(ocppIdTag))
+                .and(RESERVATION.CONNECTOR_PK.equal(connectorPkSelect))
+                .and(RESERVATION.STATUS.eq(ReservationStatus.ACCEPTED.name()))
+                .execute();
 
         if (count != 1) {
-            log.warn("Could not mark the reservation '{}' as used: Problems occurred due to sent reservation id, " +
-                    "charge box connector, user id tag or the reservation was used already.", reservationId);
+            log.warn(
+                    "Could not mark the reservation '{}' as used: Problems occurred due to sent reservation id, "
+                            + "charge box connector, user id tag or the reservation was used already.",
+                    reservationId);
         }
     }
 
@@ -208,35 +211,57 @@ public class ReservationRepositoryImpl implements ReservationRepository {
     // Private helpers
     // -------------------------------------------------------------------------
 
-    private static class ReservationMapper implements
-            RecordMapper<Record10<Integer, Integer, Integer, Integer, String,
-                                  String, LocalDateTime, LocalDateTime, String, Integer>, Reservation> {
+    private static class ReservationMapper
+            implements RecordMapper<
+                    Record10<
+                            Integer,
+                            Integer,
+                            Integer,
+                            Integer,
+                            String,
+                            String,
+                            LocalDateTime,
+                            LocalDateTime,
+                            String,
+                            Integer>,
+                    Reservation> {
         @Override
-        public Reservation map(Record10<Integer, Integer, Integer, Integer, String,
-                                        String, LocalDateTime, LocalDateTime, String, Integer> r) {
+        public Reservation map(
+                Record10<
+                                Integer,
+                                Integer,
+                                Integer,
+                                Integer,
+                                String,
+                                String,
+                                LocalDateTime,
+                                LocalDateTime,
+                                String,
+                                Integer>
+                        r) {
             return Reservation.builder()
-                              .id(r.value1())
-                              .transactionId(r.value2())
-                              .ocppTagPk(r.value3())
-                              .chargeBoxPk(r.value4())
-                              .ocppIdTag(r.value5())
-                              .chargeBoxId(r.value6())
-                              .startDatetimeDT(toInstant(r.value7()))
-                              .startDatetime(DateTimeUtils.humanize(r.value7()))
-                              .expiryDatetimeDT(toInstant(r.value8()))
-                              .expiryDatetime(DateTimeUtils.humanize(r.value8()))
-                              .status(r.value9())
-                              .connectorId(r.value10())
-                              .build();
+                    .id(r.value1())
+                    .transactionId(r.value2())
+                    .ocppTagPk(r.value3())
+                    .chargeBoxPk(r.value4())
+                    .ocppIdTag(r.value5())
+                    .chargeBoxId(r.value6())
+                    .startDatetimeDT(toInstant(r.value7()))
+                    .startDatetime(DateTimeUtils.humanize(r.value7()))
+                    .expiryDatetimeDT(toInstant(r.value8()))
+                    .expiryDatetime(DateTimeUtils.humanize(r.value8()))
+                    .status(r.value9())
+                    .connectorId(r.value10())
+                    .build();
         }
     }
 
     private void internalUpdateReservation(int reservationId, ReservationStatus status) {
         try {
             ctx.update(RESERVATION)
-               .set(RESERVATION.STATUS, status.name())
-               .where(RESERVATION.RESERVATION_PK.equal(reservationId))
-               .execute();
+                    .set(RESERVATION.STATUS, status.name())
+                    .where(RESERVATION.RESERVATION_PK.equal(reservationId))
+                    .execute();
         } catch (DataAccessException e) {
             log.error("Updating of reservationId '{}' to status '{}' FAILED.", reservationId, status, e);
         }
@@ -244,40 +269,33 @@ public class ReservationRepositoryImpl implements ReservationRepository {
 
     private void processType(SelectQuery selectQuery, ReservationQueryForm form) {
         switch (form.getPeriodType()) {
-            case ACTIVE:
-                selectQuery.addConditions(RESERVATION.EXPIRY_DATETIME.greaterThan(LocalDateTime.now()));
-                break;
-
-            case FROM_TO:
+            case ACTIVE -> selectQuery.addConditions(RESERVATION.EXPIRY_DATETIME.greaterThan(LocalDateTime.now()));
+            case FROM_TO ->
                 selectQuery.addConditions(
                         RESERVATION.START_DATETIME.greaterOrEqual(toLocalDateTime(form.getFrom())),
-                        RESERVATION.EXPIRY_DATETIME.lessOrEqual(toLocalDateTime(form.getTo()))
-                );
-                break;
-
-            default:
-                throw new SteveException("Unknown enum type");
+                        RESERVATION.EXPIRY_DATETIME.lessOrEqual(toLocalDateTime(form.getTo())));
+            default -> throw new SteveException("Unknown enum type");
         }
     }
 
     /**
      * Throws exception, if there are rows whose date/time ranges overlap with the input
      */
-//    private void isOverlapping(DateTime start, DateTime stop, String chargeBoxId) {
-//        try {
-//            int count = ctx.selectOne()
-//                           .from(RESERVATION)
-//                           .where(RESERVATION.EXPIRY_DATETIME.greaterOrEqual(start))
-//                             .and(RESERVATION.START_DATETIME.lessOrEqual(stop))
-//                             .and(RESERVATION.CHARGE_BOX_ID.equal(chargeBoxId))
-//                           .execute();
-//
-//            if (count != 1) {
-//                throw new SteveException("The desired reservation overlaps with another reservation");
-//            }
-//
-//        } catch (DataAccessException e) {
-//            log.error("Exception occurred", e);
-//        }
-//    }
+    //    private void isOverlapping(DateTime start, DateTime stop, String chargeBoxId) {
+    //        try {
+    //            int count = ctx.selectOne()
+    //                           .from(RESERVATION)
+    //                           .where(RESERVATION.EXPIRY_DATETIME.greaterOrEqual(start))
+    //                             .and(RESERVATION.START_DATETIME.lessOrEqual(stop))
+    //                             .and(RESERVATION.CHARGE_BOX_ID.equal(chargeBoxId))
+    //                           .execute();
+    //
+    //            if (count != 1) {
+    //                throw new SteveException("The desired reservation overlaps with another reservation");
+    //            }
+    //
+    //        } catch (DataAccessException e) {
+    //            log.error("Exception occurred", e);
+    //        }
+    //    }
 }

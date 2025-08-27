@@ -33,6 +33,14 @@ import java.time.Instant;
 public final class UpdateChargeboxParams {
     private final OcppProtocol ocppProtocol;
     private final Instant heartbeatTimestamp;
-    private final String vendor, model, pointSerial, boxSerial, fwVersion,
-            iccid, imsi, meterType, meterSerial, chargeBoxId;
+    private final String vendor,
+            model,
+            pointSerial,
+            boxSerial,
+            fwVersion,
+            iccid,
+            imsi,
+            meterType,
+            meterSerial,
+            chargeBoxId;
 }

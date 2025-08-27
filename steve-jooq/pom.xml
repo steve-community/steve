@@ -1,177 +1,174 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.0.0</modelVersion>
-    <parent>
-        <groupId>de.rwth.idsg</groupId>
-        <artifactId>steve-parent</artifactId>
-        <version>3.8.0-SNAPSHOT</version>
-    </parent>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>de.rwth.idsg</groupId>
+    <artifactId>steve-parent</artifactId>
+    <version>3.8.0-SNAPSHOT</version>
+  </parent>
 
-    <artifactId>steve-jooq</artifactId>
+  <artifactId>steve-jooq</artifactId>
 
-    <properties>
-        <jooq.version>3.19.18</jooq.version>
-        <flyway.version>11.5.0</flyway.version>
+  <properties>
+    <jooq.version>3.19.18</jooq.version>
+    <flyway.version>11.5.0</flyway.version>
 
-        <db.ip>localhost</db.ip>
-        <db.port>3306</db.port>
-        <db.schema>stevedb</db.schema>
-        <db.user>steve</db.user>
-        <db.password>changeme</db.password>
-        <!-- In Mysql: schema == database (http://dev.mysql.com/doc/refman/5.6/en/glossary.html#glos_schema) -->
-        <db.jdbcUrl>jdbc:mysql://${db.ip}:${db.port}/${db.schema}?useSSL=true&amp;serverTimezone=UTC</db.jdbcUrl>
-    </properties>
+    <db.ip>localhost</db.ip>
+    <db.port>3306</db.port>
+    <db.schema>stevedb</db.schema>
+    <db.user>steve</db.user>
+    <db.password>changeme</db.password>
+    <!-- In Mysql: schema == database (http://dev.mysql.com/doc/refman/5.6/en/glossary.html#glos_schema) -->
+    <db.jdbcUrl>jdbc:mysql://${db.ip}:${db.port}/${db.schema}?useSSL=true&amp;serverTimezone=UTC</db.jdbcUrl>
+  </properties>
 
-    <dependencies>
-        <dependency>
-            <groupId>org.jooq</groupId>
-            <artifactId>jooq</artifactId>
-            <version>${jooq.version}</version>
-        </dependency>
-    </dependencies>
+  <dependencies>
+    <dependency>
+      <groupId>org.jooq</groupId>
+      <artifactId>jooq</artifactId>
+      <version>${jooq.version}</version>
+    </dependency>
+  </dependencies>
 
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.flywaydb</groupId>
-                <artifactId>flyway-maven-plugin</artifactId>
-                <version>${flyway.version}</version>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.flywaydb</groupId>
+        <artifactId>flyway-maven-plugin</artifactId>
+        <version>${flyway.version}</version>
 
-                <!-- Must be in the same phase as Jooq -->
-                <executions>
-                    <execution>
-                        <phase>generate-sources</phase>
-                        <goals>
-                            <goal>migrate</goal>
-                        </goals>
-                    </execution>
-                </executions>
-
-                <configuration>
-                    <!-- https://github.com/steve-community/steve/issues/157 -->
-                    <initSql>SET default_storage_engine=InnoDB;</initSql>
-                    <!-- we need this because of extensions. they have a higher version number
+        <configuration>
+          <!-- https://github.com/steve-community/steve/issues/157 -->
+          <initSql>SET default_storage_engine=InnoDB;</initSql>
+          <!-- we need this because of extensions. they have a higher version number
                           namespace reserved (e.g. 8.x.x). new migrations in core version should
                           be executed in the extended version as well -->
-                    <outOfOrder>true</outOfOrder>
+          <outOfOrder>true</outOfOrder>
 
-                    <!-- Because maven produces this warning after upgrading from 4.2.0 to 5.1.0:
+          <!-- Because maven produces this warning after upgrading from 4.2.0 to 5.1.0:
                           [WARNING] Could not find schema history table `stevedb`.`flyway_schema_history`, but found
                           `stevedb`.`schema_version` instead. You are seeing this message because Flyway changed its
                           default for flyway.table in version 5.0.0 to flyway_schema_history and you are still relying
                           on the old default (schema_version). Set flyway.table=schema_version in your configuration to
                           fix this. This fallback mechanism will be removed in Flyway 6.0.0. -->
-                    <table>schema_version</table>
+          <table>schema_version</table>
 
-                    <cleanDisabled>true</cleanDisabled>
-                    <driver>com.mysql.cj.jdbc.Driver</driver>
-                    <url>${db.jdbcUrl}</url>
-                    <user>${db.user}</user>
-                    <password>${db.password}</password>
-                    <schemas>
-                        <schema>${db.schema}</schema>
-                    </schemas>
-                    <locations>
-                        <location>filesystem:src/main/resources/db/migration</location>
-                    </locations>
-                </configuration>
-                <dependencies>
-                    <dependency>
-                        <groupId>org.flywaydb</groupId>
-                        <artifactId>flyway-mysql</artifactId>
-                        <version>${flyway.version}</version>
-                    </dependency>
-                    <dependency>
-                        <groupId>com.mysql</groupId>
-                        <artifactId>mysql-connector-j</artifactId>
-                        <version>${mysql.jdbc.version}</version>
-                    </dependency>
-                </dependencies>
-            </plugin>
+          <cleanDisabled>true</cleanDisabled>
+          <driver>com.mysql.cj.jdbc.Driver</driver>
+          <url>${db.jdbcUrl}</url>
+          <user>${db.user}</user>
+          <password>${db.password}</password>
+          <schemas>
+            <schema>${db.schema}</schema>
+          </schemas>
+          <locations>
+            <location>filesystem:src/main/resources/db/migration</location>
+          </locations>
+        </configuration>
+        <dependencies>
+          <dependency>
+            <groupId>org.flywaydb</groupId>
+            <artifactId>flyway-mysql</artifactId>
+            <version>${flyway.version}</version>
+          </dependency>
+          <dependency>
+            <groupId>com.mysql</groupId>
+            <artifactId>mysql-connector-j</artifactId>
+            <version>${mysql.jdbc.version}</version>
+          </dependency>
+        </dependencies>
 
-            <plugin>
-                <!-- Specify the maven code generator plugin -->
-                <groupId>org.jooq</groupId>
-                <artifactId>jooq-codegen-maven</artifactId>
-                <version>${jooq.version}</version>
+        <!-- Must be in the same phase as Jooq -->
+        <executions>
+          <execution>
+            <goals>
+              <goal>migrate</goal>
+            </goals>
+            <phase>generate-sources</phase>
+          </execution>
+        </executions>
+      </plugin>
 
-                <!-- The plugin should hook into the generate goal -->
-                <executions>
-                    <execution>
-                        <phase>generate-sources</phase>
-                        <goals>
-                            <goal>generate</goal>
-                        </goals>
-                    </execution>
-                </executions>
+      <plugin>
+        <!-- Specify the maven code generator plugin -->
+        <groupId>org.jooq</groupId>
+        <artifactId>jooq-codegen-maven</artifactId>
+        <version>${jooq.version}</version>
 
-                <!-- Manage the plugin's dependency -->
-                <dependencies>
-                    <dependency>
-                        <groupId>org.jooq</groupId>
-                        <artifactId>jooq-meta</artifactId>
-                        <version>${jooq.version}</version>
-                    </dependency>
-                    <dependency>
-                        <groupId>org.jooq</groupId>
-                        <artifactId>jooq-codegen</artifactId>
-                        <version>${jooq.version}</version>
-                    </dependency>
-                    <dependency>
-                        <groupId>com.mysql</groupId>
-                        <artifactId>mysql-connector-j</artifactId>
-                        <version>${mysql.jdbc.version}</version>
-                    </dependency>
-                </dependencies>
-
-                <!-- http://www.jooq.org/doc/3.5/manual/code-generation/codegen-configuration/
+        <!-- http://www.jooq.org/doc/3.5/manual/code-generation/codegen-configuration/
                       http://www.jooq.org/doc/3.5/manual/code-generation/codegen-advanced/ -->
-                <configuration>
-                    <jdbc>
-                        <driver>com.mysql.cj.jdbc.Driver</driver>
-                        <url>${db.jdbcUrl}</url>
-                        <user>${db.user}</user>
-                        <password>${db.password}</password>
-                    </jdbc>
+        <configuration>
+          <jdbc>
+            <driver>com.mysql.cj.jdbc.Driver</driver>
+            <url>${db.jdbcUrl}</url>
+            <user>${db.user}</user>
+            <password>${db.password}</password>
+          </jdbc>
 
-                    <generator>
-                        <database>
-                            <name>org.jooq.meta.mysql.MySQLDatabase</name>
-                            <includes>.*</includes>
-                            <excludes/>
-                            <inputSchema>${db.schema}</inputSchema>
-                            <unsignedTypes>false</unsignedTypes>
+          <generator>
+            <database>
+              <name>org.jooq.meta.mysql.MySQLDatabase</name>
+              <includes>.*</includes>
+              <excludes />
+              <inputSchema>${db.schema}</inputSchema>
+              <unsignedTypes>false</unsignedTypes>
 
-                            <forcedTypes>
-                                <forcedType>
-                                    <name>BOOLEAN</name>
-                                    <!-- https://github.com/jOOQ/jOOQ/issues/7719 -->
-                                    <includeTypes>(?i:(TINY|SMALL|MEDIUM|BIG)?INT(UNSIGNED)?\(1\))</includeTypes>
-                                </forcedType>
-                                <forcedType>
-                                    <name>BOOLEAN</name>
-                                    <includeExpression>.*\.OCPP_TAG_ACTIVITY\.(IN_TRANSACTION|BLOCKED)
-                                    </includeExpression>
-                                </forcedType>
-                                <forcedType>
-                                    <name>JSON</name>
-                                    <includeExpression>.*\.WEB_USER\.(AUTHORITIES)</includeExpression>
-                                </forcedType>
-                            </forcedTypes>
-                        </database>
-                        <generate>
-                            <fluentSetters>true</fluentSetters>
-                        </generate>
+              <forcedTypes>
+                <forcedType>
+                  <name>BOOLEAN</name>
+                  <!-- https://github.com/jOOQ/jOOQ/issues/7719 -->
+                  <includeTypes>(?i:(TINY|SMALL|MEDIUM|BIG)?INT(UNSIGNED)?\(1\))</includeTypes>
+                </forcedType>
+                <forcedType>
+                  <name>BOOLEAN</name>
+                  <includeExpression>.*\.OCPP_TAG_ACTIVITY\.(IN_TRANSACTION|BLOCKED)</includeExpression>
+                </forcedType>
+                <forcedType>
+                  <name>JSON</name>
+                  <includeExpression>.*\.WEB_USER\.(AUTHORITIES)</includeExpression>
+                </forcedType>
+              </forcedTypes>
+            </database>
+            <generate>
+              <fluentSetters>true</fluentSetters>
+            </generate>
 
-                        <target>
-                            <packageName>jooq.steve.db</packageName>
-                            <directory>${project.build.directory}/generated-sources</directory>
-                        </target>
-                    </generator>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
+            <target>
+              <packageName>jooq.steve.db</packageName>
+              <directory>${project.build.directory}/generated-sources</directory>
+            </target>
+          </generator>
+        </configuration>
+
+        <!-- Manage the plugin's dependency -->
+        <dependencies>
+          <dependency>
+            <groupId>org.jooq</groupId>
+            <artifactId>jooq-meta</artifactId>
+            <version>${jooq.version}</version>
+          </dependency>
+          <dependency>
+            <groupId>org.jooq</groupId>
+            <artifactId>jooq-codegen</artifactId>
+            <version>${jooq.version}</version>
+          </dependency>
+          <dependency>
+            <groupId>com.mysql</groupId>
+            <artifactId>mysql-connector-j</artifactId>
+            <version>${mysql.jdbc.version}</version>
+          </dependency>
+        </dependencies>
+
+        <!-- The plugin should hook into the generate goal -->
+        <executions>
+          <execution>
+            <goals>
+              <goal>generate</goal>
+            </goals>
+            <phase>generate-sources</phase>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
 </project>

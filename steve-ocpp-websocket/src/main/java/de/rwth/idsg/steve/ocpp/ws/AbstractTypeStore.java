@@ -24,6 +24,7 @@ import com.google.common.reflect.ClassPath;
 import de.rwth.idsg.ocpp.jaxb.RequestType;
 import de.rwth.idsg.ocpp.jaxb.ResponseType;
 import de.rwth.idsg.steve.ocpp.ws.data.ActionResponsePair;
+import org.jspecify.annotations.Nullable;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -41,19 +42,18 @@ public abstract class AbstractTypeStore implements TypeStore {
     private final Map<String, Class<? extends RequestType>> requestClassMap = new HashMap<>();
     private final Map<Class<? extends RequestType>, ActionResponsePair> actionResponseMap = new HashMap<>();
 
-    public AbstractTypeStore(String packageForRequestClassMap,
-                             String packageForActionResponseMap) {
+    public AbstractTypeStore(String packageForRequestClassMap, String packageForActionResponseMap) {
         populateRequestClassMap(packageForRequestClassMap);
         populateActionResponseMap(packageForActionResponseMap);
     }
 
     @Override
-    public Class<? extends RequestType> findRequestClass(String action) {
+    public @Nullable Class<? extends RequestType> findRequestClass(String action) {
         return requestClassMap.get(action);
     }
 
     @Override
-    public <T extends RequestType> ActionResponsePair findActionResponse(T requestPayload) {
+    public <T extends RequestType> @Nullable ActionResponsePair findActionResponse(T requestPayload) {
         return actionResponseMap.get(requestPayload.getClass());
     }
 
@@ -93,9 +93,9 @@ public abstract class AbstractTypeStore implements TypeStore {
     private static <INTERFACE, IMPL extends INTERFACE> Map<String, Class<IMPL>> getClassesWithInterface(
             String packageName, Class<INTERFACE> interfaceClass) {
         try {
-            ImmutableSet<ClassPath.ClassInfo> classInfos =
-                    ClassPath.from(Thread.currentThread().getContextClassLoader())
-                             .getTopLevelClasses(packageName);
+            ImmutableSet<ClassPath.ClassInfo> classInfos = ClassPath.from(
+                            Thread.currentThread().getContextClassLoader())
+                    .getTopLevelClasses(packageName);
 
             Map<String, Class<IMPL>> map = new HashMap<>();
             for (ClassPath.ClassInfo classInfo : classInfos) {

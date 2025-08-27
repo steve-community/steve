@@ -21,6 +21,7 @@ package de.rwth.idsg.steve;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.rwth.idsg.steve.ocpp.OcppVersion;
 import de.rwth.idsg.steve.ocpp.ws.JsonObjectMapper;
+import de.rwth.idsg.steve.utils.LogFileRetriever;
 import de.rwth.idsg.steve.utils.OcppJsonChargePoint;
 import de.rwth.idsg.steve.utils.SteveConfigurationReader;
 import de.rwth.idsg.steve.utils.__DatabasePreparer__;
@@ -39,6 +40,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 
 import static de.rwth.idsg.steve.utils.Helpers.getRandomString;
+import static de.rwth.idsg.steve.utils.Helpers.getWsPath;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchThrowable;
 import static org.assertj.core.api.Assertions.fail;
@@ -52,11 +54,11 @@ import static org.assertj.core.api.BDDAssertions.then;
 public class ApplicationJsonTest {
 
     private static final ObjectMapper OCPP_MAPPER = JsonObjectMapper.createObjectMapper();
-    private static final String PATH = "ws://localhost:8080/steve/websocket/CentralSystemService/";
 
     private static final String REGISTERED_CHARGE_BOX_ID = __DatabasePreparer__.getRegisteredChargeBoxId();
-    private static final String REGISTERED_OCPP_TAG =  __DatabasePreparer__.getRegisteredOcppTag();
+    private static final String REGISTERED_OCPP_TAG = __DatabasePreparer__.getRegisteredOcppTag();
 
+    private static String path;
     private static Application app;
 
     @BeforeAll
@@ -65,7 +67,9 @@ public class ApplicationJsonTest {
         assertThat(config.getProfile()).isEqualTo(ApplicationProfile.TEST);
         __DatabasePreparer__.prepare(config);
 
-        app = new Application(config);
+        path = getWsPath(config);
+
+        app = new Application(config, new LogFileRetriever());
         app.start();
     }
 
@@ -79,84 +83,97 @@ public class ApplicationJsonTest {
 
     @Test
     public void testOcpp12() {
-        var chargePoint = new OcppJsonChargePoint(OCPP_MAPPER, OcppVersion.V_12, REGISTERED_CHARGE_BOX_ID, PATH);
+        var chargePoint = new OcppJsonChargePoint(OCPP_MAPPER, OcppVersion.V_12, REGISTERED_CHARGE_BOX_ID, path);
         chargePoint.start();
 
         var boot = new ocpp.cs._2010._08.BootNotificationRequest()
-            .withChargePointVendor(getRandomString())
-            .withChargePointModel(getRandomString());
+                .withChargePointVendor(getRandomString())
+                .withChargePointModel(getRandomString());
 
-        chargePoint.prepare(boot, ocpp.cs._2010._08.BootNotificationResponse.class,
-            bootResponse -> assertThat(bootResponse.getStatus()).isEqualTo(ocpp.cs._2010._08.RegistrationStatus.ACCEPTED),
-            error -> fail()
-        );
+        chargePoint.prepare(
+                boot,
+                ocpp.cs._2010._08.BootNotificationResponse.class,
+                bootResponse ->
+                        assertThat(bootResponse.getStatus()).isEqualTo(ocpp.cs._2010._08.RegistrationStatus.ACCEPTED),
+                error -> fail());
 
         var auth = new ocpp.cs._2010._08.AuthorizeRequest().withIdTag(REGISTERED_OCPP_TAG);
 
-        chargePoint.prepare(auth, ocpp.cs._2010._08.AuthorizeResponse.class,
-            authResponse -> assertThat(authResponse.getIdTagInfo().getStatus()).isEqualTo(ocpp.cs._2010._08.AuthorizationStatus.ACCEPTED),
-            error -> fail()
-        );
+        chargePoint.prepare(
+                auth,
+                ocpp.cs._2010._08.AuthorizeResponse.class,
+                authResponse -> assertThat(authResponse.getIdTagInfo().getStatus())
+                        .isEqualTo(ocpp.cs._2010._08.AuthorizationStatus.ACCEPTED),
+                error -> fail());
 
         chargePoint.processAndClose();
     }
 
     @Test
     public void testOcpp15() {
-        var chargePoint = new OcppJsonChargePoint(OCPP_MAPPER, OcppVersion.V_15, REGISTERED_CHARGE_BOX_ID, PATH);
+        var chargePoint = new OcppJsonChargePoint(OCPP_MAPPER, OcppVersion.V_15, REGISTERED_CHARGE_BOX_ID, path);
         chargePoint.start();
 
         var boot = new ocpp.cs._2012._06.BootNotificationRequest()
-            .withChargePointVendor(getRandomString())
-            .withChargePointModel(getRandomString());
+                .withChargePointVendor(getRandomString())
+                .withChargePointModel(getRandomString());
 
-        chargePoint.prepare(boot, ocpp.cs._2012._06.BootNotificationResponse.class,
-            bootResponse -> assertThat(bootResponse.getStatus()).isEqualTo(ocpp.cs._2012._06.RegistrationStatus.ACCEPTED),
-            error -> fail()
-        );
+        chargePoint.prepare(
+                boot,
+                ocpp.cs._2012._06.BootNotificationResponse.class,
+                bootResponse ->
+                        assertThat(bootResponse.getStatus()).isEqualTo(ocpp.cs._2012._06.RegistrationStatus.ACCEPTED),
+                error -> fail());
 
         var auth = new ocpp.cs._2012._06.AuthorizeRequest().withIdTag(REGISTERED_OCPP_TAG);
 
-        chargePoint.prepare(auth, ocpp.cs._2012._06.AuthorizeResponse.class,
-            authResponse -> assertThat(authResponse.getIdTagInfo().getStatus()).isEqualTo(ocpp.cs._2012._06.AuthorizationStatus.ACCEPTED),
-            error -> fail()
-        );
+        chargePoint.prepare(
+                auth,
+                ocpp.cs._2012._06.AuthorizeResponse.class,
+                authResponse -> assertThat(authResponse.getIdTagInfo().getStatus())
+                        .isEqualTo(ocpp.cs._2012._06.AuthorizationStatus.ACCEPTED),
+                error -> fail());
 
         chargePoint.processAndClose();
     }
 
     @Test
     public void testOcpp16() {
-        var chargePoint = new OcppJsonChargePoint(OCPP_MAPPER, OcppVersion.V_16, REGISTERED_CHARGE_BOX_ID, PATH);
+        var chargePoint = new OcppJsonChargePoint(OCPP_MAPPER, OcppVersion.V_16, REGISTERED_CHARGE_BOX_ID, path);
         chargePoint.start();
 
         var boot = new BootNotificationRequest()
                 .withChargePointVendor(getRandomString())
                 .withChargePointModel(getRandomString());
 
-        chargePoint.prepare(boot, BootNotificationResponse.class,
+        chargePoint.prepare(
+                boot,
+                BootNotificationResponse.class,
                 bootResponse -> assertThat(bootResponse.getStatus()).isEqualTo(RegistrationStatus.ACCEPTED),
-                error -> fail()
-        );
+                error -> fail());
 
         var auth = new AuthorizeRequest().withIdTag(REGISTERED_OCPP_TAG);
 
-        chargePoint.prepare(auth, AuthorizeResponse.class,
-                authResponse -> assertThat(authResponse.getIdTagInfo().getStatus()).isEqualTo(AuthorizationStatus.ACCEPTED),
-                error -> fail()
-        );
+        chargePoint.prepare(
+                auth,
+                AuthorizeResponse.class,
+                authResponse ->
+                        assertThat(authResponse.getIdTagInfo().getStatus()).isEqualTo(AuthorizationStatus.ACCEPTED),
+                error -> fail());
 
         chargePoint.processAndClose();
     }
 
     @Test
     public void testWithMissingVersion() {
-        var chargePoint = new OcppJsonChargePoint(OCPP_MAPPER, (String) null, REGISTERED_CHARGE_BOX_ID, PATH);
+        var chargePoint = new OcppJsonChargePoint(OCPP_MAPPER, (String) null, REGISTERED_CHARGE_BOX_ID, path);
         var thrown = catchThrowable(chargePoint::start);
         then(thrown)
                 .isInstanceOf(RuntimeException.class)
                 .hasRootCauseInstanceOf(UpgradeException.class)
-                .rootCause().satisfies(c -> {;
+                .rootCause()
+                .satisfies(c -> {
+                    ;
                     var ue = (UpgradeException) c;
                     assertThat(ue.getResponseStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
                 });
@@ -164,12 +181,13 @@ public class ApplicationJsonTest {
 
     @Test
     public void testWithWrongVersion() {
-        var chargePoint = new OcppJsonChargePoint(OCPP_MAPPER, "ocpp1234", REGISTERED_CHARGE_BOX_ID, PATH);
+        var chargePoint = new OcppJsonChargePoint(OCPP_MAPPER, "ocpp1234", REGISTERED_CHARGE_BOX_ID, path);
         var thrown = catchThrowable(chargePoint::start);
         then(thrown)
                 .isInstanceOf(RuntimeException.class)
                 .hasRootCauseInstanceOf(UpgradeException.class)
-                .rootCause().satisfies(c -> {
+                .rootCause()
+                .satisfies(c -> {
                     var ue = (UpgradeException) c;
                     assertThat(ue.getResponseStatusCode()).isEqualTo(HttpStatus.NOT_FOUND.value());
                 });
@@ -177,12 +195,13 @@ public class ApplicationJsonTest {
 
     @Test
     public void testWithUnauthorizedStation() {
-        var chargePoint = new OcppJsonChargePoint(OCPP_MAPPER, OcppVersion.V_16, "unauth1234", PATH);
+        var chargePoint = new OcppJsonChargePoint(OCPP_MAPPER, OcppVersion.V_16, "unauth1234", path);
         var thrown = catchThrowable(chargePoint::start);
         then(thrown)
                 .isInstanceOf(RuntimeException.class)
                 .hasRootCauseInstanceOf(UpgradeException.class)
-                .rootCause().satisfies(c -> {
+                .rootCause()
+                .satisfies(c -> {
                     var ue = (UpgradeException) c;
                     assertThat(ue.getResponseStatusCode()).isEqualTo(HttpStatus.NOT_FOUND.value());
                 });
@@ -193,13 +212,15 @@ public class ApplicationJsonTest {
      */
     @Test
     public void testWithNullPayload() {
-        var chargePoint = new OcppJsonChargePoint(OCPP_MAPPER, OcppVersion.V_16, REGISTERED_CHARGE_BOX_ID, PATH);
+        var chargePoint = new OcppJsonChargePoint(OCPP_MAPPER, OcppVersion.V_16, REGISTERED_CHARGE_BOX_ID, path);
         chargePoint.start();
 
-        chargePoint.prepare(null, "Heartbeat", HeartbeatResponse.class,
-            response -> assertThat(response.getCurrentTime()).isNotNull(),
-            error -> fail()
-        );
+        chargePoint.prepare(
+                null,
+                "Heartbeat",
+                HeartbeatResponse.class,
+                response -> assertThat(response.getCurrentTime()).isNotNull(),
+                error -> fail());
 
         chargePoint.processAndClose();
     }

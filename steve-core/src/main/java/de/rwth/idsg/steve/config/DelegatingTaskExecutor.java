@@ -44,5 +44,4 @@ public class DelegatingTaskExecutor implements Closeable {
     public void execute(Runnable task) {
         delegate.execute(task);
     }
-
 }

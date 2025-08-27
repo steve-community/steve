@@ -24,5 +24,4 @@ package de.rwth.idsg.ocpp.jaxb;
  * @author Sevket Goekay <goekay@dbis.rwth-aachen.de>
  * @since 12.03.2015
  */
-public interface ResponseType {
-}
+public interface ResponseType {}

@@ -89,7 +89,6 @@ public class RemoteStartTransactionTask extends CommunicationTask<RemoteStartTra
         };
     }
 
-
     @Override
     public AsyncHandler<ocpp.cp._2015._10.RemoteStartTransactionResponse> getOcpp16Handler(String chargeBoxId) {
         return res -> {

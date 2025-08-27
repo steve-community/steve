@@ -24,7 +24,7 @@ import de.rwth.idsg.steve.service.ChargePointRegistrationService;
 import de.rwth.idsg.steve.web.validation.ChargeBoxIdValidator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import ocpp.cs._2015._10.RegistrationStatus;
+import org.jspecify.annotations.Nullable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.http.server.ServerHttpResponse;
@@ -38,7 +38,6 @@ import org.springframework.web.socket.server.support.DefaultHandshakeHandler;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -63,25 +62,29 @@ public class OcppWebSocketHandshakeHandler implements HandshakeHandler {
     }
 
     @Override
-    public boolean doHandshake(ServerHttpRequest request, ServerHttpResponse response,
-                               WebSocketHandler wsHandler, Map<String, Object> attributes) throws HandshakeFailureException {
+    public boolean doHandshake(
+            ServerHttpRequest request,
+            ServerHttpResponse response,
+            WebSocketHandler wsHandler,
+            Map<String, Object> attributes)
+            throws HandshakeFailureException {
 
         // -------------------------------------------------------------------------
         // 1. Check the chargeBoxId
         // -------------------------------------------------------------------------
 
-        String chargeBoxId = getLastBitFromUrl(request.getURI().getPath());
-        boolean isValid = chargeBoxIdValidator.isValid(chargeBoxId);
+        var chargeBoxId = getLastBitFromUrl(request.getURI().getPath());
+        var isValid = chargeBoxIdValidator.isValid(chargeBoxId);
         if (!isValid) {
             log.error("ChargeBoxId '{}' violates the configured pattern.", chargeBoxId);
             response.setStatusCode(HttpStatus.BAD_REQUEST);
             return false;
         }
 
-        Optional<RegistrationStatus> status = chargePointRegistrationService.getRegistrationStatus(chargeBoxId);
+        var status = chargePointRegistrationService.getRegistrationStatus(chargeBoxId);
 
         // Allow connections, if station is in db (registration_status field from db does not matter)
-        boolean allowConnection = status.isPresent();
+        var allowConnection = status.isPresent();
 
         // https://github.com/steve-community/steve/issues/1020
         if (!allowConnection) {
@@ -96,7 +99,7 @@ public class OcppWebSocketHandshakeHandler implements HandshakeHandler {
         // 2. Route according to the selected protocol
         // -------------------------------------------------------------------------
 
-        List<String> requestedProtocols = new WebSocketHttpHeaders(request.getHeaders()).getSecWebSocketProtocol();
+        var requestedProtocols = new WebSocketHttpHeaders(request.getHeaders()).getSecWebSocketProtocol();
 
         if (CollectionUtils.isEmpty(requestedProtocols)) {
             log.error("No protocol (OCPP version) is specified.");
@@ -104,7 +107,7 @@ public class OcppWebSocketHandshakeHandler implements HandshakeHandler {
             return false;
         }
 
-        AbstractWebSocketEndpoint endpoint = selectEndpoint(requestedProtocols);
+        var endpoint = selectEndpoint(requestedProtocols);
 
         if (endpoint == null) {
             log.error("None of the requested protocols '{}' is supported", requestedProtocols);
@@ -112,13 +115,16 @@ public class OcppWebSocketHandshakeHandler implements HandshakeHandler {
             return false;
         }
 
-        log.debug("ChargeBoxId '{}' will be using {}", chargeBoxId, endpoint.getClass().getSimpleName());
+        log.debug(
+                "ChargeBoxId '{}' will be using {}",
+                chargeBoxId,
+                endpoint.getClass().getSimpleName());
         return delegate.doHandshake(request, response, endpoint, attributes);
     }
 
-    private AbstractWebSocketEndpoint selectEndpoint(List<String> requestedProtocols ) {
-        for (String requestedProcotol : requestedProtocols) {
-            for (AbstractWebSocketEndpoint item : endpoints) {
+    private @Nullable AbstractWebSocketEndpoint selectEndpoint(List<String> requestedProtocols) {
+        for (var requestedProcotol : requestedProtocols) {
+            for (var item : endpoints) {
                 if (item.getVersion().getValue().equals(requestedProcotol)) {
                     return item;
                 }
@@ -132,13 +138,12 @@ public class OcppWebSocketHandshakeHandler implements HandshakeHandler {
             return "";
         }
 
-        final String substring = OcppWebSocketConfiguration.PATH_INFIX;
+        var substring = OcppWebSocketConfiguration.PATH_INFIX;
 
-        int index = input.indexOf(substring);
+        var index = input.indexOf(substring);
         if (index == -1) {
             return "";
-        } else {
-            return input.substring(index + substring.length());
         }
+        return input.substring(index + substring.length());
     }
 }

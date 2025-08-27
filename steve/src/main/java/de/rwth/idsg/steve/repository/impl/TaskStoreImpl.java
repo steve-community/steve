@@ -31,8 +31,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Predicate;
 
-import static de.rwth.idsg.steve.utils.DateTimeUtils.toInstant;
-
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 29.12.2014
@@ -46,21 +44,20 @@ public class TaskStoreImpl implements TaskStore {
 
     @Override
     public List<TaskOverview> getOverview() {
-        return lookupTable.entrySet()
-                          .stream()
-                          .map(entry -> {
-                              CommunicationTask r = entry.getValue();
-                              return TaskOverview.builder()
-                                                 .taskId(entry.getKey())
-                                                 .origin(r.getOrigin())
-                                                 .start(toInstant(r.getStartTimestamp()))
-                                                 .end(toInstant(r.getEndTimestamp()))
-                                                 .responseCount(r.getResponseCount().get())
-                                                 .requestCount(r.getResultMap().size())
-                                                 .build();
-                          })
-                          .sorted()
-                          .toList();
+        return lookupTable.entrySet().stream()
+                .map(entry -> {
+                    CommunicationTask r = entry.getValue();
+                    return TaskOverview.builder()
+                            .taskId(entry.getKey())
+                            .origin(r.getOrigin())
+                            .start(r.getStartTimestamp())
+                            .end(r.getEndTimestamp())
+                            .responseCount(r.getResponseCount().get())
+                            .requestCount(r.getResultMap().size())
+                            .build();
+                })
+                .sorted()
+                .toList();
     }
 
     @Override
@@ -91,9 +88,6 @@ public class TaskStoreImpl implements TaskStore {
     }
 
     private void removeTasks(Predicate<Map.Entry<Integer, CommunicationTask>> filterPredicate) {
-        lookupTable.entrySet()
-                   .stream()
-                   .filter(filterPredicate)
-                   .forEach(entry -> lookupTable.remove(entry.getKey()));
+        lookupTable.entrySet().stream().filter(filterPredicate).forEach(entry -> lookupTable.remove(entry.getKey()));
     }
 }

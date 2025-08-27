@@ -23,6 +23,7 @@ import de.rwth.idsg.steve.web.api.exception.BadRequestException;
 import de.rwth.idsg.steve.web.api.exception.NotFoundException;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
+import org.jspecify.annotations.Nullable;
 import org.springframework.beans.propertyeditors.StringTrimmerEditor;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.BindException;
@@ -33,9 +34,8 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
-import jakarta.servlet.http.HttpServletRequest;
-
 import java.time.Instant;
+import jakarta.servlet.http.HttpServletRequest;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -69,7 +69,8 @@ public class ApiControllerAdvice {
 
     @ExceptionHandler(SteveException.AlreadyExists.class)
     @ResponseStatus(value = HttpStatus.UNPROCESSABLE_ENTITY)
-    public ApiErrorResponse handleAlreadyExistsException(HttpServletRequest req, SteveException.AlreadyExists exception) {
+    public ApiErrorResponse handleAlreadyExistsException(
+            HttpServletRequest req, SteveException.AlreadyExists exception) {
         String url = req.getRequestURL().toString();
         log.error("Request: {} raised following exception.", url, exception);
         return createResponse(url, HttpStatus.UNPROCESSABLE_ENTITY, exception.getMessage());
@@ -85,7 +86,8 @@ public class ApiControllerAdvice {
 
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
     @ResponseStatus(value = HttpStatus.BAD_REQUEST)
-    public ApiErrorResponse handleMethodArgumentTypeMismatchException(HttpServletRequest req, MethodArgumentTypeMismatchException exception) {
+    public ApiErrorResponse handleMethodArgumentTypeMismatchException(
+            HttpServletRequest req, MethodArgumentTypeMismatchException exception) {
         String url = req.getRequestURL().toString();
         log.error("Request: {} raised following exception.", url, exception);
         return createResponse(url, HttpStatus.BAD_REQUEST, exception.getMessage());
@@ -99,7 +101,7 @@ public class ApiControllerAdvice {
         return createResponse(url, HttpStatus.INTERNAL_SERVER_ERROR, exception.getMessage());
     }
 
-    public static ApiErrorResponse createResponse(String url, HttpStatus status, String message) {
+    public static ApiErrorResponse createResponse(String url, HttpStatus status, @Nullable String message) {
         ApiErrorResponse result = new ApiErrorResponse();
 
         result.setTimestamp(Instant.now());

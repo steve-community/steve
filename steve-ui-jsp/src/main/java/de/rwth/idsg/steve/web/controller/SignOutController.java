@@ -38,8 +38,7 @@ public class SignOutController {
 
     @GetMapping(value = "/signout")
     public String signOut(HttpServletRequest request, HttpServletResponse response) {
-        new SecurityContextLogoutHandler()
-                .logout(request, response, null);
+        new SecurityContextLogoutHandler().logout(request, response, null);
         new CookieClearingLogoutHandler(AbstractRememberMeServices.SPRING_SECURITY_REMEMBER_ME_COOKIE_KEY)
                 .logout(request, response, null);
         return "redirect:/manager/signin";

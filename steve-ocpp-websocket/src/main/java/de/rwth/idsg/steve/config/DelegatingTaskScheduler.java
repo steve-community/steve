@@ -47,5 +47,4 @@ public class DelegatingTaskScheduler implements Closeable {
     public ScheduledFuture<?> scheduleAtFixedRate(Runnable task, Instant startTime, Duration period) {
         return delegate.scheduleAtFixedRate(task, startTime, period);
     }
-
 }

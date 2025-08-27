@@ -25,17 +25,17 @@ import de.rwth.idsg.steve.utils.StringUtils;
 import de.rwth.idsg.steve.web.dto.ocpp.ChargePointSelection;
 import lombok.AccessLevel;
 import lombok.Getter;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import jakarta.xml.ws.AsyncHandler;
-
-import java.time.OffsetDateTime;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
+import jakarta.xml.ws.AsyncHandler;
 
 /**
  * Contains the context for a request/response communication and callbacks for handling responses/errors.
@@ -54,11 +54,11 @@ public abstract class CommunicationTask<S extends ChargePointSelection, RESPONSE
     protected final S params;
 
     private final Map<String, OcppVersion> versionMap;
-    private final Map<String, RequestResult> resultMap;
+    private final Map<String, RequestResult<RESPONSE>> resultMap;
     private final int resultSize;
 
-    private final OffsetDateTime startTimestamp = OffsetDateTime.now();
-    private OffsetDateTime endTimestamp;
+    private final Instant startTimestamp = Instant.now();
+    private @Nullable Instant endTimestamp;
 
     private final AtomicInteger errorCount = new AtomicInteger(0);
     private final AtomicInteger responseCount = new AtomicInteger(0);
@@ -110,21 +110,26 @@ public abstract class CommunicationTask<S extends ChargePointSelection, RESPONSE
     }
 
     public void addNewResponse(String chargeBoxId, String response) {
-        resultMap.get(chargeBoxId).setResponse(response);
+        var result = resultMap.get(chargeBoxId);
+        if (result == null) {
+            log.warn("Received response for unknown chargeBoxId '{}'", chargeBoxId);
+            return;
+        }
+        result.setResponse(response);
 
         synchronized (lockObject) {
             if (resultSize == (errorCount.get() + responseCount.incrementAndGet())) {
-                endTimestamp = OffsetDateTime.now();
+                endTimestamp = Instant.now();
             }
         }
     }
 
-    public void addNewError(String chargeBoxId, String errorMessage) {
+    public void addNewError(String chargeBoxId, @Nullable String errorMessage) {
         resultMap.get(chargeBoxId).setErrorMessage(errorMessage);
 
         synchronized (lockObject) {
             if (resultSize == (errorCount.incrementAndGet() + responseCount.get())) {
-                endTimestamp = OffsetDateTime.now();
+                endTimestamp = Instant.now();
             }
         }
     }
@@ -149,7 +154,7 @@ public abstract class CommunicationTask<S extends ChargePointSelection, RESPONSE
         }
     }
 
-    public <T extends ResponseType> AsyncHandler<T> getHandler(String chargeBoxId) {
+    public AsyncHandler<ResponseType> getHandler(String chargeBoxId) {
         return switch (versionMap.get(chargeBoxId)) {
             case V_12 -> getOcpp12Handler(chargeBoxId);
             case V_15 -> getOcpp15Handler(chargeBoxId);
@@ -160,11 +165,15 @@ public abstract class CommunicationTask<S extends ChargePointSelection, RESPONSE
     public abstract OcppCallback<RESPONSE> defaultCallback();
 
     public abstract <T extends RequestType> T getOcpp12Request();
+
     public abstract <T extends RequestType> T getOcpp15Request();
+
     public abstract <T extends RequestType> T getOcpp16Request();
 
     public abstract <T extends ResponseType> AsyncHandler<T> getOcpp12Handler(String chargeBoxId);
+
     public abstract <T extends ResponseType> AsyncHandler<T> getOcpp15Handler(String chargeBoxId);
+
     public abstract <T extends ResponseType> AsyncHandler<T> getOcpp16Handler(String chargeBoxId);
 
     // -------------------------------------------------------------------------

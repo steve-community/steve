@@ -25,7 +25,6 @@ import de.rwth.idsg.steve.ocpp.task.GetCompositeScheduleTask;
 import de.rwth.idsg.steve.ocpp.task.GetConfigurationTask;
 import de.rwth.idsg.steve.repository.TaskStore;
 import lombok.RequiredArgsConstructor;
-import ocpp.cp._2015._10.GetCompositeScheduleResponse;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -58,65 +57,69 @@ public class TasksController {
     @GetMapping
     public String getOverview(Model model) {
         model.addAttribute("taskList", taskStore.getOverview());
+
         return "tasks";
     }
 
     @PostMapping(params = "finished")
     public String clearFinished(Model model) {
         taskStore.clearFinished();
+
         return "redirect:/manager/operations/tasks";
     }
 
     @PostMapping(params = "unfinished")
     public String clearUnfinished(Model model) {
         taskStore.clearUnfinished();
+
         return "redirect:/manager/operations/tasks";
     }
 
     @GetMapping(value = TASK_ID_PATH)
     public String getTaskDetails(@PathVariable("taskId") Integer taskId, Model model) {
-        var task = taskStore.get(taskId);
         model.addAttribute("taskId", taskId);
+        var task = taskStore.get(taskId);
         model.addAttribute("task", task);
+
         return "taskResult";
     }
 
     @GetMapping(value = TASK_DETAILS_PATH)
-    public String getDetailsForChargeBox(@PathVariable("taskId") Integer taskId,
-                                         @PathVariable("chargeBoxId") String chargeBoxId,
-                                         Model model) {
+    public String getDetailsForChargeBox(
+            @PathVariable("taskId") Integer taskId, @PathVariable("chargeBoxId") String chargeBoxId, Model model) {
 
         var task = taskStore.get(taskId);
 
-        if (task instanceof GetCompositeScheduleTask) {
-            return processForGetCompositeScheduleTask((GetCompositeScheduleTask) task, chargeBoxId, model);
-        }
-        if (task instanceof GetConfigurationTask) {
-            return processForGetConfigurationTask((GetConfigurationTask) task, chargeBoxId, model);
-        }
-        throw new SteveException("Task not found");
+        return switch (task) {
+            case GetCompositeScheduleTask getCompositeScheduleTask ->
+                processForGetCompositeScheduleTask(getCompositeScheduleTask, chargeBoxId, model);
+            case GetConfigurationTask getConfigurationTask ->
+                processForGetConfigurationTask(getConfigurationTask, chargeBoxId, model);
+            default ->
+                throw new SteveException(
+                        "Task type not supported: " + task.getClass().getName());
+        };
     }
 
-    private static String processForGetCompositeScheduleTask(GetCompositeScheduleTask task, String chargeBoxId, Model model) {
-        RequestResult result = extractResult(task, chargeBoxId);
-        GetCompositeScheduleResponse response = result.getDetails();
-
+    private static String processForGetCompositeScheduleTask(
+            GetCompositeScheduleTask task, String chargeBoxId, Model model) {
         model.addAttribute("chargeBoxId", chargeBoxId);
+        var response = extractResult(task, chargeBoxId).getDetails();
         model.addAttribute("response", response);
+
         return "op16/GetCompositeScheduleResponse";
     }
 
     private static String processForGetConfigurationTask(GetConfigurationTask k, String chargeBoxId, Model model) {
-        RequestResult result = extractResult(k, chargeBoxId);
-        GetConfigurationTask.ResponseWrapper response = result.getDetails();
-
         model.addAttribute("chargeBoxId", chargeBoxId);
+        var response = extractResult(k, chargeBoxId).getDetails();
         model.addAttribute("response", response);
+
         return "GetConfigurationResponse";
     }
 
-    private static RequestResult extractResult(CommunicationTask<?, ?> task, String chargeBoxId) {
-        RequestResult result = task.getResultMap().get(chargeBoxId);
+    private static <T> RequestResult<T> extractResult(CommunicationTask<?, T> task, String chargeBoxId) {
+        var result = task.getResultMap().get(chargeBoxId);
         if (result == null) {
             throw new SteveException("Result not found for chargeBoxId '" + chargeBoxId + "'");
         }

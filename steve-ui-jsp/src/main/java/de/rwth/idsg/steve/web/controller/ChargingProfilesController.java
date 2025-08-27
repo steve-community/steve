@@ -28,13 +28,13 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-
-import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+
+import jakarta.validation.Valid;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -88,8 +88,7 @@ public class ChargingProfilesController {
     }
 
     @PostMapping(params = "add", value = ADD_PATH)
-    public String addPost(@Valid @ModelAttribute("form") ChargingProfileForm form,
-                          BindingResult result, Model model) {
+    public String addPost(@Valid @ModelAttribute("form") ChargingProfileForm form, BindingResult result, Model model) {
         if (result.hasErrors()) {
             return "data-man/chargingProfileAdd";
         }
@@ -99,8 +98,7 @@ public class ChargingProfilesController {
     }
 
     @PostMapping(params = "update", value = UPDATE_PATH)
-    public String update(@Valid @ModelAttribute("form") ChargingProfileForm form,
-                         BindingResult result, Model model) {
+    public String update(@Valid @ModelAttribute("form") ChargingProfileForm form, BindingResult result, Model model) {
         if (result.hasErrors()) {
             return "data-man/chargingProfileDetails";
         }

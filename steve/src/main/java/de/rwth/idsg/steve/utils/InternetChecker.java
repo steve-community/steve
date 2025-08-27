@@ -44,8 +44,7 @@ public final class InternetChecker {
             "https://www.wikipedia.org",
             "https://www.google.com",
             "https://www.apple.com",
-            "https://www.facebook.com"
-    );
+            "https://www.facebook.com");
 
     /**
      * We try every item in the list to compensate for the possibility that one of hosts might be down. If all these
@@ -66,7 +65,7 @@ public final class InternetChecker {
         try {
             URL url = new URL(str);
             HttpURLConnection con = (HttpURLConnection) url.openConnection();
-            con.setRequestProperty("Connection", "close");  // otherwise, default setting is "keep-alive"
+            con.setRequestProperty("Connection", "close"); // otherwise, default setting is "keep-alive"
             con.setRequestProperty("User-Agent", userAgent);
             try {
                 con.setConnectTimeout(CONNECT_TIMEOUT);

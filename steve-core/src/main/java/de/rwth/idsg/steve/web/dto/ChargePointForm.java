@@ -25,9 +25,9 @@ import lombok.ToString;
 import org.hibernate.validator.constraints.Range;
 import org.hibernate.validator.constraints.URL;
 
+import java.math.BigDecimal;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import java.math.BigDecimal;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -41,15 +41,12 @@ public class ChargePointForm {
     // Internal database id
     private Integer chargeBoxPk;
 
-    @NotBlank(message = "ChargeBox ID is required")
-    @ChargeBoxId
+    @NotBlank(message = "ChargeBox ID is required") @ChargeBoxId
     private String chargeBoxId;
 
-    @NotBlank(message = "Registration status is required")
-    private String registrationStatus;
+    @NotBlank(message = "Registration status is required") private String registrationStatus;
 
-    @NotNull
-    private Boolean insertConnectorStatusAfterTransactionMsg;
+    @NotNull private Boolean insertConnectorStatusAfterTransactionMsg;
 
     private Address address;
 

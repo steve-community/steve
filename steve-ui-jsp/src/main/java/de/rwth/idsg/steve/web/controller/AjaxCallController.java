@@ -27,8 +27,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
-
-import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -36,6 +34,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.io.IOException;
 import java.util.List;
+import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -44,9 +43,7 @@ import java.util.List;
 @Slf4j
 @Controller
 @ResponseBody
-@RequestMapping(
-        value = "/manager/ajax/{chargeBoxId}",
-        produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(value = "/manager/ajax/{chargeBoxId}", produces = MediaType.APPLICATION_JSON_VALUE)
 @RequiredArgsConstructor
 public class AjaxCallController {
 
@@ -59,31 +56,31 @@ public class AjaxCallController {
     // Paths
     // -------------------------------------------------------------------------
 
-    private static final String CONNECTOR_IDS_PATH      = "/connectorIds";
-    private static final String TRANSACTION_IDS_PATH    = "/transactionIds";
-    private static final String RESERVATION_IDS_PATH    = "/reservationIds";
+    private static final String CONNECTOR_IDS_PATH = "/connectorIds";
+    private static final String TRANSACTION_IDS_PATH = "/transactionIds";
+    private static final String RESERVATION_IDS_PATH = "/reservationIds";
 
     // -------------------------------------------------------------------------
     // HTTP methods
     // -------------------------------------------------------------------------
 
     @GetMapping(value = CONNECTOR_IDS_PATH)
-    public void getConnectorIds(@PathVariable("chargeBoxId") String chargeBoxId,
-                                HttpServletResponse response) throws IOException {
+    public void getConnectorIds(@PathVariable("chargeBoxId") String chargeBoxId, HttpServletResponse response)
+            throws IOException {
         var s = serializeArray(chargePointsService.getNonZeroConnectorIds(chargeBoxId));
         writeOutput(response, s);
     }
 
     @GetMapping(value = TRANSACTION_IDS_PATH)
-    public void getTransactionIds(@PathVariable("chargeBoxId") String chargeBoxId,
-                                  HttpServletResponse response) throws IOException {
+    public void getTransactionIds(@PathVariable("chargeBoxId") String chargeBoxId, HttpServletResponse response)
+            throws IOException {
         var s = serializeArray(transactionRepository.getActiveTransactionIds(chargeBoxId));
         writeOutput(response, s);
     }
 
     @GetMapping(value = RESERVATION_IDS_PATH)
-    public void getReservationIds(@PathVariable("chargeBoxId") String chargeBoxId,
-                                  HttpServletResponse response) throws IOException {
+    public void getReservationIds(@PathVariable("chargeBoxId") String chargeBoxId, HttpServletResponse response)
+            throws IOException {
         var s = serializeArray(reservationsService.getActiveReservationIds(chargeBoxId));
         writeOutput(response, s);
     }

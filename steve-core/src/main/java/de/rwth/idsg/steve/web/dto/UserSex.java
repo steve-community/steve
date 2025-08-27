@@ -31,11 +31,14 @@ public enum UserSex {
     MALE("m", "Male"),
     OTHER("o", "Other");
 
-    @Getter private final String databaseValue;
-    @Getter private final String value;
+    @Getter
+    private final String databaseValue;
+
+    @Getter
+    private final String value;
 
     public static UserSex fromDatabaseValue(String v) {
-        for (UserSex c: UserSex.values()) {
+        for (UserSex c : UserSex.values()) {
             if (c.databaseValue.equals(v)) {
                 return c;
             }
@@ -44,7 +47,7 @@ public enum UserSex {
     }
 
     public static UserSex fromValue(String v) {
-        for (UserSex c: UserSex.values()) {
+        for (UserSex c : UserSex.values()) {
             if (c.value.equals(v)) {
                 return c;
             }

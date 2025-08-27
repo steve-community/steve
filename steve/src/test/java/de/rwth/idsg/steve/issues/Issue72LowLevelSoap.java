@@ -19,9 +19,9 @@
 package de.rwth.idsg.steve.issues;
 
 import com.google.common.net.MediaType;
-import de.rwth.idsg.steve.utils.SteveConfigurationReader;
 import de.rwth.idsg.steve.StressTest;
 import de.rwth.idsg.steve.utils.Helpers;
+import de.rwth.idsg.steve.utils.SteveConfigurationReader;
 import de.rwth.idsg.steve.utils.StressTester;
 import de.rwth.idsg.steve.utils.__DatabasePreparer__;
 import lombok.RequiredArgsConstructor;
@@ -76,32 +76,35 @@ public class Issue72LowLevelSoap extends StressTest {
         var meterStart = 444;
         var meterStop = 99999;
 
-        var boot = getForOcpp16(path).bootNotification(
-                new BootNotificationRequest()
-                        .withChargePointVendor(getRandomString())
-                        .withChargePointModel(getRandomString()),
-                chargeBoxId);
+        var boot = getForOcpp16(path)
+                .bootNotification(
+                        new BootNotificationRequest()
+                                .withChargePointVendor(getRandomString())
+                                .withChargePointModel(getRandomString()),
+                        chargeBoxId);
         assertThat(boot.getStatus()).isEqualTo(RegistrationStatus.ACCEPTED);
 
-        var start = getForOcpp16(path).startTransaction(
-                new StartTransactionRequest()
-                        .withConnectorId(connectorId)
-                        .withIdTag(idTag)
-                        .withTimestamp(startDateTime)
-                        .withMeterStart(meterStart),
-                chargeBoxId
-        );
+        var start = getForOcpp16(path)
+                .startTransaction(
+                        new StartTransactionRequest()
+                                .withConnectorId(connectorId)
+                                .withIdTag(idTag)
+                                .withTimestamp(startDateTime)
+                                .withMeterStart(meterStart),
+                        chargeBoxId);
         assertThat(start).isNotNull();
 
         var transactionId = start.getTransactionId();
 
         var body = buildRequest(path, chargeBoxId, transactionId, idTag, stopDateTime, meterStop);
-        var contentType = ContentType.create(MediaType.SOAP_XML_UTF_8.type(), MediaType.SOAP_XML_UTF_8.charset().orNull());
+        var contentType = ContentType.create(
+                MediaType.SOAP_XML_UTF_8.type(),
+                MediaType.SOAP_XML_UTF_8.charset().orNull());
 
         var req = RequestBuilder.post(path)
-                                           .addHeader("SOAPAction", "urn://Ocpp/Cs/2015/10/StopTransaction")
-                                           .setEntity(new StringEntity(body, contentType))
-                                           .build();
+                .addHeader("SOAPAction", "urn://Ocpp/Cs/2015/10/StopTransaction")
+                .setEntity(new StringEntity(body, contentType))
+                .build();
 
         var httpClient = HttpClients.createDefault();
 
@@ -117,20 +120,19 @@ public class Issue72LowLevelSoap extends StressTest {
             @Override
             public void toRepeat() {
 
-                var mvr = threadLocalClient.get().meterValues(
-                        new MeterValuesRequest()
-                                .withConnectorId(connectorId)
-                                .withTransactionId(transactionId)
-                                .withMeterValue(
-                                        new MeterValue()
+                var mvr = threadLocalClient
+                        .get()
+                        .meterValues(
+                                new MeterValuesRequest()
+                                        .withConnectorId(connectorId)
+                                        .withTransactionId(transactionId)
+                                        .withMeterValue(new MeterValue()
                                                 .withTimestamp(stopDateTime)
-                                                .withSampledValue(
-                                                        new SampledValue()
-                                                                .withMeasurand(Measurand.ENERGY_ACTIVE_IMPORT_REGISTER)
-                                                                .withValue("555")
-                                                                .withUnit(UnitOfMeasure.WH))),
-                        chargeBoxId
-                );
+                                                .withSampledValue(new SampledValue()
+                                                        .withMeasurand(Measurand.ENERGY_ACTIVE_IMPORT_REGISTER)
+                                                        .withValue("555")
+                                                        .withUnit(UnitOfMeasure.WH))),
+                                chargeBoxId);
                 assertThat(mvr).isNotNull();
 
                 try {
@@ -146,8 +148,7 @@ public class Issue72LowLevelSoap extends StressTest {
             }
 
             @Override
-            public void afterRepeat() {
-            }
+            public void afterRepeat() {}
         };
 
         try {
@@ -159,19 +160,20 @@ public class Issue72LowLevelSoap extends StressTest {
         }
     }
 
-    private static String buildRequest(String path, String chargeBoxId, int transactionId, String idTag,
-                                       OffsetDateTime stop, int meterStop) {
-        return "<soap:Envelope xmlns:soap=\"http://www.w3.org/2003/05/soap-envelope\">" +
-                "<soap:Header><Action xmlns=\"http://www.w3.org/2005/08/addressing\">/StopTransaction</Action>" +
-                "<MessageID xmlns=\"http://www.w3.org/2005/08/addressing\">urn:uuid:47c9e1d9-a278-4e9c-8f08-565c29d86167</MessageID>" +
-                "<To xmlns=\"http://www.w3.org/2005/08/addressing\">" + path + "</To>" +
-                "<ReplyTo xmlns=\"http://www.w3.org/2005/08/addressing\"><Address>http://www.w3.org/2005/08/addressing/anonymous</Address>" +
-                "</ReplyTo><chargeBoxIdentity xmlns=\"urn://Ocpp/Cs/2015/10/\">" + chargeBoxId + "</chargeBoxIdentity>" +
-                "</soap:Header>" +
-                "<soap:Body><stopTransactionRequest xmlns=\"urn://Ocpp/Cs/2015/10/\"><transactionId>" + transactionId + "</transactionId>" +
-                "<idTag>" + idTag + "</idTag>" +
-                "<timestamp>" + stop + "</timestamp>" +
-                "<meterStop>" + meterStop + "</meterStop>" +
-                "</stopTransactionRequest></soap:Body></soap:Envelope>";
+    private static String buildRequest(
+            String path, String chargeBoxId, int transactionId, String idTag, OffsetDateTime stop, int meterStop) {
+        return "<soap:Envelope xmlns:soap=\"http://www.w3.org/2003/05/soap-envelope\">"
+                + "<soap:Header><Action xmlns=\"http://www.w3.org/2005/08/addressing\">/StopTransaction</Action>"
+                + "<MessageID xmlns=\"http://www.w3.org/2005/08/addressing\">urn:uuid:47c9e1d9-a278-4e9c-8f08-565c29d86167</MessageID>"
+                + "<To xmlns=\"http://www.w3.org/2005/08/addressing\">"
+                + path + "</To>"
+                + "<ReplyTo xmlns=\"http://www.w3.org/2005/08/addressing\"><Address>http://www.w3.org/2005/08/addressing/anonymous</Address>"
+                + "</ReplyTo><chargeBoxIdentity xmlns=\"urn://Ocpp/Cs/2015/10/\">"
+                + chargeBoxId + "</chargeBoxIdentity>" + "</soap:Header>"
+                + "<soap:Body><stopTransactionRequest xmlns=\"urn://Ocpp/Cs/2015/10/\"><transactionId>"
+                + transactionId + "</transactionId>" + "<idTag>"
+                + idTag + "</idTag>" + "<timestamp>"
+                + stop + "</timestamp>" + "<meterStop>"
+                + meterStop + "</meterStop>" + "</stopTransactionRequest></soap:Body></soap:Envelope>";
     }
 }

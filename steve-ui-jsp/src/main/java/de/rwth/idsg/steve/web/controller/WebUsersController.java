@@ -97,8 +97,8 @@ public class WebUsersController {
     }
 
     @PostMapping(params = "add", value = ADD_PATH)
-    public String addPost(@Valid @ModelAttribute("webuserForm") WebUserForm webuserForm,
-                          BindingResult result, Model model) {
+    public String addPost(
+            @Valid @ModelAttribute("webuserForm") WebUserForm webuserForm, BindingResult result, Model model) {
         if (result.hasErrors()) {
             model.addAttribute("availableAuthorities", WebUserAuthority.values());
             return "data-man/webuserAdd";
@@ -109,8 +109,8 @@ public class WebUsersController {
     }
 
     @PostMapping(params = "update", value = UPDATE_PATH)
-    public String update(@Valid @ModelAttribute("webuserForm") WebUserBaseForm webuserBaseForm,
-                         BindingResult result, Model model) {
+    public String update(
+            @Valid @ModelAttribute("webuserForm") WebUserBaseForm webuserBaseForm, BindingResult result, Model model) {
         if (result.hasErrors()) {
             model.addAttribute("availableAuthorities", WebUserAuthority.values());
             return "data-man/webuserDetails";
@@ -138,8 +138,7 @@ public class WebUsersController {
     }
 
     @PostMapping(params = "change", value = PASSWORD_PATH)
-    public String passwordChange(@Valid @ModelAttribute("webuserForm") WebUserForm webuserForm,
-                         BindingResult result) {
+    public String passwordChange(@Valid @ModelAttribute("webuserForm") WebUserForm webuserForm, BindingResult result) {
         if (result.hasErrors()) {
             return "data-man/webuserPassword";
         }
@@ -157,8 +156,8 @@ public class WebUsersController {
     }
 
     @PostMapping(params = "change", value = API_PASSWORD_PATH)
-    public String apiPasswordChange(@Valid @ModelAttribute("webuserForm") WebUserForm webuserForm,
-                         BindingResult result) {
+    public String apiPasswordChange(
+            @Valid @ModelAttribute("webuserForm") WebUserForm webuserForm, BindingResult result) {
         if (result.hasErrors()) {
             return "data-man/webuserApiPassword";
         }

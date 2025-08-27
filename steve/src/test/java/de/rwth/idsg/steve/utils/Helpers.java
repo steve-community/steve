@@ -22,10 +22,10 @@ import de.rwth.idsg.steve.SteveConfiguration;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.apache.cxf.ws.addressing.WSAddressingFeature;
 
-import jakarta.xml.ws.soap.SOAPBinding;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import jakarta.xml.ws.soap.SOAPBinding;
 
 /**
  * @author Andreas Heuvels <andreas.heuvels@rwth-aachen.de>
@@ -110,5 +110,4 @@ public class Helpers {
         f.setAddress(endpointAddress);
         return f;
     }
-
 }

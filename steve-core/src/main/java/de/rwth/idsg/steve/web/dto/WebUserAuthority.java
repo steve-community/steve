@@ -25,7 +25,6 @@ import org.jooq.JSON;
 
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 public enum WebUserAuthority {
@@ -34,6 +33,7 @@ public enum WebUserAuthority {
     USER_ADMIN("USER", "ADMIN");
 
     private final Set<String> values;
+
     @Getter
     private final JSON jsonValue;
 
@@ -42,7 +42,8 @@ public enum WebUserAuthority {
             throw new IllegalArgumentException("JSON values must not be null or empty");
         }
         this.values = new HashSet<>(Arrays.asList(values));
-        this.jsonValue = this.values.stream().map(v -> "\"" + v + "\"")
+        this.jsonValue = this.values.stream()
+                .map(v -> "\"" + v + "\"")
                 .reduce((a, b) -> a + ", " + b)
                 .map(s -> JSON.json("[" + s + "]"))
                 .orElseThrow(() -> new IllegalArgumentException("Failed to create JSON value"));
@@ -55,12 +56,12 @@ public enum WebUserAuthority {
 
     public static WebUserAuthority fromJsonValue(ObjectMapper mapper, JSON v) {
         try {
-            List<String> values = Arrays.asList(mapper.readValue(v.data(), String[].class));
-            for (WebUserAuthority c: WebUserAuthority.values()) {
-                if (c.values.containsAll(values)) {
+            var values = new HashSet<>(Arrays.asList(mapper.readValue(v.data(), String[].class)));
+            for (WebUserAuthority c : WebUserAuthority.values()) {
+                if (c.values.equals(values)) {
                     return c;
                 }
-              }
+            }
             throw new IllegalArgumentException(v.toString());
         } catch (JsonProcessingException e) {
             throw new IllegalArgumentException(v.toString());

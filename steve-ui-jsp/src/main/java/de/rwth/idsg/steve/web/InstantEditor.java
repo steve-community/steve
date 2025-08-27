@@ -22,6 +22,7 @@ import com.google.common.base.Strings;
 import de.rwth.idsg.steve.utils.WebDateTimeUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.jspecify.annotations.Nullable;
 import org.springframework.web.context.request.NativeWebRequest;
 
 import java.beans.PropertyEditorSupport;
@@ -46,7 +47,7 @@ public class InstantEditor extends PropertyEditorSupport {
     }
 
     @Override
-    public String getAsText() {
+    public @Nullable String getAsText() {
         Object value = getValue();
         if (value == null) {
             return null;
@@ -62,7 +63,9 @@ public class InstantEditor extends PropertyEditorSupport {
         if (Strings.isNullOrEmpty(text)) {
             setValue(null);
         } else {
-            setValue(LocalDateTime.parse(text, dateTimeFormatter).atZone(timeZone).toInstant());
+            setValue(LocalDateTime.parse(text, dateTimeFormatter)
+                    .atZone(timeZone)
+                    .toInstant());
         }
     }
 }

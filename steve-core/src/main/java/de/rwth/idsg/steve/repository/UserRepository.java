@@ -31,9 +31,12 @@ import java.util.Optional;
  */
 public interface UserRepository {
     List<User.Overview> getOverview(UserQueryForm form);
+
     Optional<User.Details> getDetails(int userPk);
 
     Integer add(UserForm form);
+
     void update(UserForm form);
+
     void delete(int userPk);
 }

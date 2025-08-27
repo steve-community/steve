@@ -28,7 +28,7 @@ import lombok.Setter;
  */
 @Getter
 @Setter
-public class OcppJsonCall extends OcppJsonMessage {
+public final class OcppJsonCall extends AbstractOcppJsonMessage implements OcppJsonMessage {
     private String action;
     private RequestType payload;
 

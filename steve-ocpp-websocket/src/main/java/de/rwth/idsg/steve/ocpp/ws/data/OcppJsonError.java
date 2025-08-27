@@ -27,7 +27,7 @@ import lombok.Setter;
  */
 @Getter
 @Setter
-public class OcppJsonError extends OcppJsonResponse {
+public final class OcppJsonError extends OcppJsonResponse implements OcppJsonMessage {
     private ErrorCode errorCode;
     private String errorDescription;
     private String errorDetails;

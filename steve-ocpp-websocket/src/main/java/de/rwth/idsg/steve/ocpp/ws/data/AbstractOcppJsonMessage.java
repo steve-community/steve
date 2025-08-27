@@ -18,20 +18,16 @@
  */
 package de.rwth.idsg.steve.ocpp.ws.data;
 
-import de.rwth.idsg.ocpp.jaxb.ResponseType;
 import lombok.Getter;
 import lombok.Setter;
 
-/**
- * @author Sevket Goekay <sevketgokay@gmail.com>
- * @since 13.03.2015
- */
 @Getter
 @Setter
-public final class OcppJsonResult extends OcppJsonResponse implements OcppJsonMessage {
-    private ResponseType payload;
+public abstract non-sealed class AbstractOcppJsonMessage implements OcppJsonMessage {
+    private final MessageType messageType;
+    private String messageId;
 
-    public OcppJsonResult() {
-        super(MessageType.CALL_RESULT);
+    protected AbstractOcppJsonMessage(MessageType messageType) {
+        this.messageType = messageType;
     }
 }

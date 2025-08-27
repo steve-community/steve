@@ -21,7 +21,6 @@ package de.rwth.idsg.steve.ocpp.ws.pipeline;
 import de.rwth.idsg.steve.ocpp.ws.data.CommunicationContext;
 import de.rwth.idsg.steve.ocpp.ws.data.OcppJsonCall;
 import de.rwth.idsg.steve.ocpp.ws.data.OcppJsonError;
-import de.rwth.idsg.steve.ocpp.ws.data.OcppJsonMessage;
 import de.rwth.idsg.steve.ocpp.ws.data.OcppJsonResult;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -49,26 +48,26 @@ public class IncomingPipeline implements Consumer<CommunicationContext> {
 
         // When the incoming could not be deserialized
         if (context.isSetOutgoingError()) {
-            serializer.accept(context);
-            sender.accept(context);
+            send(context);
             return;
         }
 
-        OcppJsonMessage msg = context.getIncomingMessage();
-
-        if (msg instanceof OcppJsonCall) {
-            handler.accept(context);
-            serializer.accept(context);
-            sender.accept(context);
-
-        } else if (msg instanceof OcppJsonResult) {
-            context.getResultHandler()
-                   .accept((OcppJsonResult) msg);
-
-        } else if (msg instanceof OcppJsonError) {
-            context.getErrorHandler()
-                   .accept((OcppJsonError) msg);
+        var msg = context.getIncomingMessage();
+        switch (msg) {
+            case OcppJsonCall ocppJsonCall -> {
+                handler.accept(context);
+                send(context);
+            }
+            case OcppJsonResult resultMsg -> context.getResultHandler()
+                    .accept(resultMsg);
+            case OcppJsonError errorMsg -> context.getErrorHandler()
+                    .accept(errorMsg);
+            default -> throw new IllegalStateException("Unexpected value: " + msg);
         }
     }
 
+    private void send(CommunicationContext context) {
+        serializer.accept(context);
+        sender.accept(context);
+    }
 }

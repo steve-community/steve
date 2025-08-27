@@ -25,7 +25,6 @@ import de.rwth.idsg.steve.ocpp.ws.data.OcppJsonCall;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.TextMessage;
-import org.springframework.web.socket.WebSocketSession;
 
 import java.io.IOException;
 import java.util.function.Consumer;
@@ -42,22 +41,22 @@ public class Sender implements Consumer<CommunicationContext> {
 
     @Override
     public void accept(CommunicationContext context) {
-        String outgoingString = context.getOutgoingString();
-        String chargeBoxId = context.getChargeBoxId();
-        WebSocketSession session = context.getSession();
+        var outgoingString = context.getOutgoingString();
 
+        var chargeBoxId = context.getChargeBoxId();
+        var session = context.getSession();
         WebSocketLogger.sending(chargeBoxId, session, outgoingString);
 
-        TextMessage out = new TextMessage(outgoingString);
+        var out = new TextMessage(outgoingString);
         try {
             session.sendMessage(out);
         } catch (IOException e) {
-
             // Do NOT swallow exceptions for outgoing CALLs. For others just log.
-            if (context.getOutgoingMessage() instanceof OcppJsonCall) {
-                throw new SteveException(e.getMessage());
+            if (context.getOutgoingMessage() instanceof OcppJsonCall call) {
+                var msg = "Failed to send outgoing " + call.getAction() + " CALL over WebSocket";
+                throw new SteveException(msg, e);
             } else {
-                log.error("Could not send the outgoing message", e);
+                log.error("Failed to send outgoing message over WebSocket", e);
             }
         }
     }

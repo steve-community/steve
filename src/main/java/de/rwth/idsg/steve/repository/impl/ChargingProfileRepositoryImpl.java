@@ -257,6 +257,10 @@ public class ChargingProfileRepositoryImpl implements ChargingProfileRepository 
                    .where(CHARGING_PROFILE.CHARGING_PROFILE_PK.eq(chargingProfilePk))
                    .fetchOne();
 
+        if (profile == null) {
+            throw new SteveException.NotFound("Charging Profile not found");
+        }
+
         List<ChargingSchedulePeriodRecord> periods =
                 ctx.selectFrom(CHARGING_SCHEDULE_PERIOD)
                    .where(CHARGING_SCHEDULE_PERIOD.CHARGING_PROFILE_PK.eq(chargingProfilePk))
@@ -283,7 +287,7 @@ public class ChargingProfileRepositoryImpl implements ChargingProfileRepository 
                                    .set(CHARGING_PROFILE.START_SCHEDULE, form.getStartSchedule())
                                    .set(CHARGING_PROFILE.CHARGING_RATE_UNIT, form.getChargingRateUnit().value())
                                    .set(CHARGING_PROFILE.MIN_CHARGING_RATE, form.getMinChargingRate())
-                                   .returning(CHARGING_SCHEDULE_PERIOD.CHARGING_PROFILE_PK)
+                                   .returning(CHARGING_PROFILE.CHARGING_PROFILE_PK)
                                    .fetchOne()
                                    .getChargingProfilePk();
 
@@ -304,7 +308,7 @@ public class ChargingProfileRepositoryImpl implements ChargingProfileRepository 
         ctx.transaction(configuration -> {
             DSLContext ctx = DSL.using(configuration);
             try {
-                ctx.update(CHARGING_PROFILE)
+                int updateCount = ctx.update(CHARGING_PROFILE)
                    .set(CHARGING_PROFILE.DESCRIPTION, form.getDescription())
                    .set(CHARGING_PROFILE.NOTE, form.getNote())
                    .set(CHARGING_PROFILE.STACK_LEVEL, form.getStackLevel())
@@ -319,6 +323,12 @@ public class ChargingProfileRepositoryImpl implements ChargingProfileRepository 
                    .set(CHARGING_PROFILE.MIN_CHARGING_RATE, form.getMinChargingRate())
                    .where(CHARGING_PROFILE.CHARGING_PROFILE_PK.eq(form.getChargingProfilePk()))
                    .execute();
+
+                // if there was no update, then the profile does not exist.
+                // operations related to periods should not be executed.
+                if (updateCount != 1) {
+                    return;
+                }
 
                 // -------------------------------------------------------------------------
                 // the form contains all period information for this schedule. instead of

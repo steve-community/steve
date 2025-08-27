@@ -1,4 +1,4 @@
-FROM eclipse-temurin:17-jdk
+FROM eclipse-temurin:21-jdk
 MAINTAINER daynnnnn
 
 ENV LANG=C.UTF-8 LC_ALL=C.UTF-8
@@ -33,4 +33,3 @@ RUN ./mvnw clean package \
       -Djdk.tls.client.protocols="TLSv1,TLSv1.1,TLSv1.2"
 
 CMD java -jar target/steve.jar
-

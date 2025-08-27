@@ -57,15 +57,16 @@ import org.eclipse.jetty.websocket.client.WebSocketClient;
 import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Future;
 import java.util.function.Consumer;
 
+import static java.util.Collections.synchronizedMap;
 import static org.eclipse.jetty.websocket.api.Callback.NOOP;
 
 /**
@@ -102,8 +103,8 @@ public class OcppJsonChargePoint {
         this.version = ocppVersion;
         this.chargeBoxId = chargeBoxId;
         this.connectionPath = pathPrefix + chargeBoxId;
-        this.responseContextMap = new LinkedHashMap<>(); // because we want to keep the insertion order of test cases
-        this.requestContextMap = new HashMap<>();
+        this.responseContextMap = synchronizedMap(new LinkedHashMap<>()); // because we want to keep the insertion order of test cases
+        this.requestContextMap = new ConcurrentHashMap<>();
         this.deserializer = new MessageDeserializer();
         this.client = new WebSocketClient();
         this.closeHappenedSignal = new CountDownLatch(1);

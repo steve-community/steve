@@ -33,7 +33,9 @@ import java.time.Instant;
  * @author Sevket Goekay <sevketgokay@gmail.com>
  *
  */
-@Schema(description = """
+@Schema(
+        description =
+                """
         For active transactions, all 'stop'-prefixed fields would be null.
         The energy consumed during the transaction can be calculated by subtracting the 'startValue' from the 'stopValue'.
         The unit of the 'startValue' and 'stopValue' is watt-hours (Wh).
@@ -79,22 +81,17 @@ public final class Transaction {
      */
     @JsonIgnore
     @Schema(hidden = true)
-    @Nullable
-    private final String stopTimestampFormatted;
+    @Nullable private final String stopTimestampFormatted;
 
-    @Nullable
-    @Schema(description = "The meter value reading at the end of the transaction")
+    @Nullable @Schema(description = "The meter value reading at the end of the transaction")
     private final String stopValue;
 
-    @Nullable
-    @Schema(description = "The reason for the transaction being stopped")
+    @Nullable @Schema(description = "The reason for the transaction being stopped")
     private final String stopReason; // new in OCPP 1.6
 
-    @Nullable
-    @Schema(description = "The timestamp at which the transaction ended")
+    @Nullable @Schema(description = "The timestamp at which the transaction ended")
     private final Instant stopTimestamp;
 
-    @Nullable
-    @Schema(description = "The actor who stopped the transaction")
+    @Nullable @Schema(description = "The actor who stopped the transaction")
     private final TransactionStopEventActor stopEventActor;
 }

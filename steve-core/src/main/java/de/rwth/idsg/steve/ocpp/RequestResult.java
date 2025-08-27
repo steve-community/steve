@@ -34,8 +34,7 @@ public class RequestResult {
     private String errorMessage;
     private Object details;
 
-    @Nullable
-    @SuppressWarnings("unchecked")
+    @Nullable @SuppressWarnings("unchecked")
     public <T> T getDetails() {
         return (T) details;
     }

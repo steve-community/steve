@@ -34,13 +34,13 @@ import org.jooq.impl.DSL;
 import org.jooq.impl.SQLDataType;
 import org.springframework.stereotype.Repository;
 
-import static jooq.steve.db.Tables.WEB_USER;
-import static org.jooq.impl.DSL.count;
-
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+
+import static jooq.steve.db.Tables.WEB_USER;
+import static org.jooq.impl.DSL.count;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -56,122 +56,111 @@ public class WebUserRepositoryImpl implements WebUserRepository {
     @Override
     public void createUser(WebUserRecord user) {
         ctx.insertInto(WEB_USER)
-            .set(WEB_USER.USERNAME, user.getUsername())
-            .set(WEB_USER.PASSWORD, user.getPassword())
-            .set(WEB_USER.API_PASSWORD, user.getApiPassword())
-            .set(WEB_USER.ENABLED, user.getEnabled())
-            .set(WEB_USER.AUTHORITIES, user.getAuthorities())
-            .execute();
+                .set(WEB_USER.USERNAME, user.getUsername())
+                .set(WEB_USER.PASSWORD, user.getPassword())
+                .set(WEB_USER.API_PASSWORD, user.getApiPassword())
+                .set(WEB_USER.ENABLED, user.getEnabled())
+                .set(WEB_USER.AUTHORITIES, user.getAuthorities())
+                .execute();
     }
 
     @Override
     public void updateUser(WebUserRecord user) {
         // To change the password use one of the changePassword methods
         ctx.update(WEB_USER)
-            .set(WEB_USER.ENABLED, user.getEnabled())
-            .set(WEB_USER.AUTHORITIES, user.getAuthorities())
-            .where(WEB_USER.USERNAME.eq(user.getUsername()))
-            .execute();
+                .set(WEB_USER.ENABLED, user.getEnabled())
+                .set(WEB_USER.AUTHORITIES, user.getAuthorities())
+                .where(WEB_USER.USERNAME.eq(user.getUsername()))
+                .execute();
     }
 
     @Override
     public void updateUserByPk(WebUserRecord user) {
         // To change the password use one of the changePassword methods
         ctx.update(WEB_USER)
-            .set(WEB_USER.USERNAME, user.getUsername())
-            .set(WEB_USER.ENABLED, user.getEnabled())
-            .set(WEB_USER.AUTHORITIES, user.getAuthorities())
-            .where(WEB_USER.WEB_USER_PK.eq(user.getWebUserPk()))
-            .execute();
+                .set(WEB_USER.USERNAME, user.getUsername())
+                .set(WEB_USER.ENABLED, user.getEnabled())
+                .set(WEB_USER.AUTHORITIES, user.getAuthorities())
+                .where(WEB_USER.WEB_USER_PK.eq(user.getWebUserPk()))
+                .execute();
     }
 
     @Override
     public void deleteUser(String username) {
-        ctx.delete(WEB_USER)
-            .where(WEB_USER.USERNAME.eq(username))
-            .execute();
+        ctx.delete(WEB_USER).where(WEB_USER.USERNAME.eq(username)).execute();
     }
 
     @Override
     public void deleteUser(int webUserPk) {
-        ctx.delete(WEB_USER)
-            .where(WEB_USER.WEB_USER_PK.eq(webUserPk))
-            .execute();
+        ctx.delete(WEB_USER).where(WEB_USER.WEB_USER_PK.eq(webUserPk)).execute();
     }
 
     @Override
     public void changeStatusOfUser(String username, boolean enabled) {
         ctx.update(WEB_USER)
-            .set(WEB_USER.ENABLED, enabled)
-            .where(WEB_USER.USERNAME.eq(username))
-            .execute();
+                .set(WEB_USER.ENABLED, enabled)
+                .where(WEB_USER.USERNAME.eq(username))
+                .execute();
     }
 
     @Override
     public Integer getUserCountWithAuthority(String authority) {
         return ctx.selectCount()
-            .from(WEB_USER)
-            .where(conditionsForAuthorities(Collections.singletonList(authority)))
-            .fetchOne(count());
+                .from(WEB_USER)
+                .where(conditionsForAuthorities(Collections.singletonList(authority)))
+                .fetchOne(count());
     }
 
     @Override
     public void changePassword(String username, String newPassword) {
         ctx.update(WEB_USER)
-            .set(WEB_USER.PASSWORD, newPassword)
-            .where(WEB_USER.USERNAME.eq(username))
-            .execute();
+                .set(WEB_USER.PASSWORD, newPassword)
+                .where(WEB_USER.USERNAME.eq(username))
+                .execute();
     }
 
     @Override
     public void changePassword(Integer userPk, String newPassword) {
         ctx.update(WEB_USER)
-            .set(WEB_USER.PASSWORD, newPassword)
-            .where(WEB_USER.WEB_USER_PK.eq(userPk))
-            .execute();
+                .set(WEB_USER.PASSWORD, newPassword)
+                .where(WEB_USER.WEB_USER_PK.eq(userPk))
+                .execute();
     }
 
     @Override
     public void changeApiPassword(Integer userPk, String newPassword) {
         ctx.update(WEB_USER)
-            .set(WEB_USER.API_PASSWORD, newPassword)
-            .where(WEB_USER.WEB_USER_PK.eq(userPk))
-            .execute();
+                .set(WEB_USER.API_PASSWORD, newPassword)
+                .where(WEB_USER.WEB_USER_PK.eq(userPk))
+                .execute();
     }
 
     @Override
     public boolean userExists(String username) {
         return ctx.selectOne()
-            .from(WEB_USER)
-            .where(WEB_USER.USERNAME.eq(username))
-            .fetchOptional()
-            .isPresent();
+                .from(WEB_USER)
+                .where(WEB_USER.USERNAME.eq(username))
+                .fetchOptional()
+                .isPresent();
     }
 
     @Override
     public WebUserRecord loadUserByUsername(String username) {
-        return ctx.selectFrom(WEB_USER)
-            .where(WEB_USER.USERNAME.eq(username))
-            .fetchOne();
+        return ctx.selectFrom(WEB_USER).where(WEB_USER.USERNAME.eq(username)).fetchOne();
     }
 
     @Override
     public WebUserRecord loadUserByUserPk(Integer webUserPk) {
         return ctx.selectFrom(WEB_USER)
-            .where(WEB_USER.WEB_USER_PK.eq(webUserPk))
-            .fetchOne();
+                .where(WEB_USER.WEB_USER_PK.eq(webUserPk))
+                .fetchOne();
     }
 
     @Override
     public Result<Record4<Integer, String, Boolean, JSON>> getOverview(WebUserQueryForm form) {
         SelectQuery selectQuery = ctx.selectQuery();
         selectQuery.addFrom(WEB_USER);
-        selectQuery.addSelect(
-                WEB_USER.WEB_USER_PK,
-                WEB_USER.USERNAME,
-                WEB_USER.ENABLED,
-                WEB_USER.AUTHORITIES
-        );
+        selectQuery.addSelect(WEB_USER.WEB_USER_PK, WEB_USER.USERNAME, WEB_USER.ENABLED, WEB_USER.AUTHORITIES);
 
         if (form.isSetWebUsername()) {
             selectQuery.addConditions(WEB_USER.USERNAME.eq(form.getWebUsername()));
@@ -192,11 +181,11 @@ public class WebUserRepositoryImpl implements WebUserRepository {
 
     private static List<Condition> conditionsForAuthorities(List<String> authorities) {
         return authorities.stream()
-            .filter(Objects::nonNull)
-            .filter(it -> !it.trim().isEmpty())
-            .map(WebUserRepositoryImpl::jsonQuote)
-            .map(WEB_USER.AUTHORITIES::contains)
-            .toList();
+                .filter(Objects::nonNull)
+                .filter(it -> !it.trim().isEmpty())
+                .map(WebUserRepositoryImpl::jsonQuote)
+                .map(WEB_USER.AUTHORITIES::contains)
+                .toList();
     }
 
     private static Field<JSON> jsonQuote(String element) {

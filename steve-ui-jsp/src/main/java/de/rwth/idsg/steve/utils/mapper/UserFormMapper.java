@@ -45,7 +45,9 @@ public final class UserFormMapper {
         form.setEMail(userRecord.getEMail());
         form.setNote(userRecord.getNote());
         form.setAddress(AddressMapper.recordToDto(details.getAddress()));
-        form.setIdTagList(details.getOcppTagEntries().stream().map(User.OcppTagEntry::getIdTag).toList());
+        form.setIdTagList(details.getOcppTagEntries().stream()
+                .map(User.OcppTagEntry::getIdTag)
+                .toList());
 
         return form;
     }

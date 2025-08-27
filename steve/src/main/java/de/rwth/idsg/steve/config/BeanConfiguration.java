@@ -52,8 +52,8 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupp
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter;
 
-import javax.sql.DataSource;
 import java.util.List;
+import javax.sql.DataSource;
 
 /**
  * Configuration and beans of Spring Framework.
@@ -74,7 +74,8 @@ public class BeanConfiguration implements WebMvcConfigurer {
     @Bean
     public DataSource dataSource(SteveConfiguration config) {
         var dbConfig = config.getDb();
-        return dataSource(dbConfig.getJdbcUrl(), dbConfig.getUserName(), dbConfig.getPassword(), config.getTimeZoneId());
+        return dataSource(
+                dbConfig.getJdbcUrl(), dbConfig.getUserName(), dbConfig.getPassword(), config.getTimeZoneId());
     }
 
     public static DataSource dataSource(String dbUrl, String dbUserName, String dbPassword, String dbTimeZoneId) {
@@ -200,9 +201,10 @@ public class BeanConfiguration implements WebMvcConfigurer {
     @Bean
     public ObjectMapper jacksonObjectMapper(RequestMappingHandlerAdapter requestMappingHandlerAdapter) {
         return requestMappingHandlerAdapter.getMessageConverters().stream()
-            .filter(MappingJackson2HttpMessageConverter.class::isInstance)
-            .findAny()
-            .map(conv -> ((MappingJackson2HttpMessageConverter) conv).getObjectMapper())
-            .orElseThrow(() -> new IllegalStateException("There is no MappingJackson2HttpMessageConverter in Spring context"));
+                .filter(MappingJackson2HttpMessageConverter.class::isInstance)
+                .findAny()
+                .map(conv -> ((MappingJackson2HttpMessageConverter) conv).getObjectMapper())
+                .orElseThrow(() ->
+                        new IllegalStateException("There is no MappingJackson2HttpMessageConverter in Spring context"));
     }
 }

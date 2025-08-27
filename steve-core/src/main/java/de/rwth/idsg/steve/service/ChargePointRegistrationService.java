@@ -38,11 +38,13 @@ public class ChargePointRegistrationService {
     private final boolean autoRegisterUnknownStations;
 
     private final Striped<Lock> isRegisteredLocks = Striped.lock(16);
-    private final UnidentifiedIncomingObjectService unknownChargePointService = new UnidentifiedIncomingObjectService(100);
+    private final UnidentifiedIncomingObjectService unknownChargePointService =
+            new UnidentifiedIncomingObjectService(100);
     private final ChargePointRepository chargePointRepository;
 
-    public ChargePointRegistrationService(ChargePointRepository chargePointRepository,
-                                          @Value("${auto.register.unknown.stations}") Boolean autoRegisterUnknownStations) {
+    public ChargePointRegistrationService(
+            ChargePointRepository chargePointRepository,
+            @Value("${auto.register.unknown.stations}") Boolean autoRegisterUnknownStations) {
         this.chargePointRepository = chargePointRepository;
         this.autoRegisterUnknownStations = autoRegisterUnknownStations;
     }

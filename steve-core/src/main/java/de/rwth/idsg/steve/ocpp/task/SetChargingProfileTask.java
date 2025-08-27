@@ -56,13 +56,11 @@ public abstract class SetChargingProfileTask extends Ocpp16AndAboveTask<Multiple
     protected static void checkAdditionalConstraints(SetChargingProfileRequest request) {
         ChargingProfilePurposeType purpose = request.getCsChargingProfiles().getChargingProfilePurpose();
 
-        if (ChargingProfilePurposeType.CHARGE_POINT_MAX_PROFILE == purpose
-            && request.getConnectorId() != 0) {
+        if (ChargingProfilePurposeType.CHARGE_POINT_MAX_PROFILE == purpose && request.getConnectorId() != 0) {
             throw new SteveException("ChargePointMaxProfile can only be set at Charge Point ConnectorId 0");
         }
 
-        if (ChargingProfilePurposeType.TX_PROFILE == purpose
-            && request.getConnectorId() < 1) {
+        if (ChargingProfilePurposeType.TX_PROFILE == purpose && request.getConnectorId() < 1) {
             throw new SteveException("TxProfile should only be set at Charge Point ConnectorId > 0");
         }
     }

@@ -30,8 +30,7 @@ public class SetChargingProfileTaskAdhoc extends SetChargingProfileTask {
 
     private final SetChargingProfileRequest request;
 
-    public SetChargingProfileTaskAdhoc(MultipleChargePointSelect params,
-                                       SetChargingProfileRequest request) {
+    public SetChargingProfileTaskAdhoc(MultipleChargePointSelect params, SetChargingProfileRequest request) {
         super(params);
         this.request = request;
         checkAdditionalConstraints(request);

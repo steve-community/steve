@@ -21,11 +21,11 @@ package de.rwth.idsg.steve.web.dto.ocpp;
 import lombok.Getter;
 import lombok.Setter;
 
-import jakarta.validation.constraints.AssertTrue;
-import jakarta.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import jakarta.validation.constraints.AssertTrue;
+import jakarta.validation.constraints.NotNull;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -35,25 +35,22 @@ import java.util.List;
 @Getter
 public class SendLocalListParams extends MultipleChargePointSelect {
 
-    @NotNull(message = "List version is required")
-    private Integer listVersion;
+    @NotNull(message = "List version is required") private Integer listVersion;
 
-    @NotNull(message = "Update Type is required")
-    private SendLocalListUpdateType updateType = SendLocalListUpdateType.FULL;
+    @NotNull(message = "Update Type is required") private SendLocalListUpdateType updateType = SendLocalListUpdateType.FULL;
 
-    @NotNull
-    private Boolean sendEmptyListWhenFull = Boolean.FALSE;
+    @NotNull private Boolean sendEmptyListWhenFull = Boolean.FALSE;
 
     private List<String> deleteList;
     private List<String> addUpdateList;
 
-    @AssertTrue(message = "When Update Type is DIFFERENTIAL, either Add/Update or Delete list should not be empty")
-    public boolean isValidWhenDifferential() {
-        return SendLocalListUpdateType.FULL.equals(updateType) || !getDeleteList().isEmpty() || !getAddUpdateList().isEmpty();
+    @AssertTrue(message = "When Update Type is DIFFERENTIAL, either Add/Update or Delete list should not be empty") public boolean isValidWhenDifferential() {
+        return SendLocalListUpdateType.FULL.equals(updateType)
+                || !getDeleteList().isEmpty()
+                || !getAddUpdateList().isEmpty();
     }
 
-    @AssertTrue(message = "The Add/Update and Delete lists should have no elements in ocpp")
-    public boolean isDisjoint() {
+    @AssertTrue(message = "The Add/Update and Delete lists should have no elements in ocpp") public boolean isDisjoint() {
         return Collections.disjoint(getDeleteList(), getAddUpdateList());
     }
 

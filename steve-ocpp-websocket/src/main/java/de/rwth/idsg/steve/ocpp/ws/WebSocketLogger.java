@@ -29,14 +29,18 @@ import org.springframework.web.socket.WebSocketSession;
 @Slf4j
 public final class WebSocketLogger {
 
-    private WebSocketLogger() { }
+    private WebSocketLogger() {}
 
     public static void connected(String chargeBoxId, WebSocketSession session) {
         log.info("[chargeBoxId={}, sessionId={}] Connection is established", chargeBoxId, session.getId());
     }
 
     public static void closed(String chargeBoxId, WebSocketSession session, CloseStatus closeStatus) {
-        log.warn("[chargeBoxId={}, sessionId={}] Connection is closed, status: {}", chargeBoxId, session.getId(), closeStatus);
+        log.warn(
+                "[chargeBoxId={}, sessionId={}] Connection is closed, status: {}",
+                chargeBoxId,
+                session.getId(),
+                closeStatus);
     }
 
     public static void sending(String chargeBoxId, WebSocketSession session, String msg) {
@@ -56,7 +60,10 @@ public final class WebSocketLogger {
     }
 
     public static void receivedEmptyText(String chargeBoxId, WebSocketSession session) {
-        log.warn("[chargeBoxId={}, sessionId={}] Received empty text message. Will pretend this never happened.", chargeBoxId, session.getId());
+        log.warn(
+                "[chargeBoxId={}, sessionId={}] Received empty text message. Will pretend this never happened.",
+                chargeBoxId,
+                session.getId());
     }
 
     public static void pingError(String chargeBoxId, WebSocketSession session, Throwable t) {

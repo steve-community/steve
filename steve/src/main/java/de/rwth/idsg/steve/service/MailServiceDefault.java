@@ -18,17 +18,6 @@
  */
 package de.rwth.idsg.steve.service;
 
-import jakarta.mail.Authenticator;
-import jakarta.mail.Message;
-import jakarta.mail.MessagingException;
-import jakarta.mail.PasswordAuthentication;
-import jakarta.mail.Session;
-import jakarta.mail.Transport;
-import jakarta.mail.internet.InternetAddress;
-import jakarta.mail.internet.MimeMessage;
-
-import java.util.Properties;
-
 import com.google.common.base.Strings;
 import de.rwth.idsg.steve.SteveException;
 import de.rwth.idsg.steve.config.DelegatingTaskExecutor;
@@ -38,6 +27,16 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Properties;
+import jakarta.mail.Authenticator;
+import jakarta.mail.Message;
+import jakarta.mail.MessagingException;
+import jakarta.mail.PasswordAuthentication;
+import jakarta.mail.Session;
+import jakarta.mail.Transport;
+import jakarta.mail.internet.InternetAddress;
+import jakarta.mail.internet.MimeMessage;
+
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 24.01.2016
@@ -46,8 +45,11 @@ import org.springframework.stereotype.Service;
 @Service
 public class MailServiceDefault implements MailService {
 
-    @Autowired private SettingsRepository settingsRepository;
-    @Autowired private DelegatingTaskExecutor asyncTaskExecutor;
+    @Autowired
+    private SettingsRepository settingsRepository;
+
+    @Autowired
+    private DelegatingTaskExecutor asyncTaskExecutor;
 
     @Override
     public MailSettings getSettings() {

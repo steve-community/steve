@@ -30,7 +30,6 @@ import ocpp.cs._2015._10.ChargePointStatus;
  */
 @Getter
 public enum TransactionStatusUpdate {
-
     AfterStart(ChargePointStatus.CHARGING),
     AfterStop(ChargePointStatus.AVAILABLE);
 

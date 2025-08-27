@@ -38,10 +38,7 @@ public class ChargePointSelectEditor extends PropertyEditorSupport {
             // chargePointItem[1] : chargebox id
             // chargePointItem[2] : endpoint (IP) address
             ChargePointSelect cps = new ChargePointSelect(
-                    OcppProtocol.valueOf(chargePointItem[0]),
-                    chargePointItem[1],
-                    chargePointItem[2]
-            );
+                    OcppProtocol.valueOf(chargePointItem[0]), chargePointItem[1], chargePointItem[2]);
 
             setValue(cps);
         }

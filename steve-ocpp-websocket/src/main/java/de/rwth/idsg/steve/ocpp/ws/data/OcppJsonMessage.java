@@ -37,5 +37,6 @@ package de.rwth.idsg.steve.ocpp.ws.data;
 public sealed interface OcppJsonMessage
         permits AbstractOcppJsonMessage, OcppJsonCall, OcppJsonError, OcppJsonResponse, OcppJsonResult {
     MessageType getMessageType();
+
     String getMessageId();
 }

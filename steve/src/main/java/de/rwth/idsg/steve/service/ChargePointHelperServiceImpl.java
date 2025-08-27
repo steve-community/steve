@@ -125,7 +125,8 @@ public class ChargePointHelperServiceImpl implements ChargePointHelperService {
     }
 
     public List<ChargePointSelect> getChargePoints(OcppVersion version) {
-        return getChargePoints(version, Collections.singletonList(RegistrationStatus.ACCEPTED), Collections.emptyList());
+        return getChargePoints(
+                version, Collections.singletonList(RegistrationStatus.ACCEPTED), Collections.emptyList());
     }
 
     public List<ChargePointSelect> getChargePoints(OcppVersion version, List<RegistrationStatus> inStatusFilter) {
@@ -136,14 +137,18 @@ public class ChargePointHelperServiceImpl implements ChargePointHelperService {
         return getChargePoints(version, Collections.singletonList(RegistrationStatus.ACCEPTED), chargeBoxIdFilter);
     }
 
-    public List<ChargePointSelect> getChargePoints(OcppVersion version, List<RegistrationStatus> inStatusFilter, List<String> chargeBoxIdFilter) {
+    public List<ChargePointSelect> getChargePoints(
+            OcppVersion version, List<RegistrationStatus> inStatusFilter, List<String> chargeBoxIdFilter) {
         switch (version) {
             case V_12:
-                return getChargePoints(OcppProtocol.V_12_SOAP, inStatusFilter, chargeBoxIdFilter, ocpp12WebSocketEndpoint);
+                return getChargePoints(
+                        OcppProtocol.V_12_SOAP, inStatusFilter, chargeBoxIdFilter, ocpp12WebSocketEndpoint);
             case V_15:
-                return getChargePoints(OcppProtocol.V_15_SOAP, inStatusFilter, chargeBoxIdFilter, ocpp15WebSocketEndpoint);
+                return getChargePoints(
+                        OcppProtocol.V_15_SOAP, inStatusFilter, chargeBoxIdFilter, ocpp15WebSocketEndpoint);
             case V_16:
-                return getChargePoints(OcppProtocol.V_16_SOAP, inStatusFilter, chargeBoxIdFilter, ocpp16WebSocketEndpoint);
+                return getChargePoints(
+                        OcppProtocol.V_16_SOAP, inStatusFilter, chargeBoxIdFilter, ocpp16WebSocketEndpoint);
             default:
                 throw new IllegalArgumentException("Unknown OCPP version: " + version);
         }
@@ -153,23 +158,25 @@ public class ChargePointHelperServiceImpl implements ChargePointHelperService {
     // Helpers
     // -------------------------------------------------------------------------
 
-    private List<ChargePointSelect> getChargePoints(OcppProtocol protocol, List<RegistrationStatus> inStatusFilter,
-                                                    List<String> chargeBoxIdFilter, AbstractWebSocketEndpoint jsonEndpoint) {
+    private List<ChargePointSelect> getChargePoints(
+            OcppProtocol protocol,
+            List<RegistrationStatus> inStatusFilter,
+            List<String> chargeBoxIdFilter,
+            AbstractWebSocketEndpoint jsonEndpoint) {
         // soap stations
         //
-        var statusFilter = inStatusFilter.stream()
-                                                  .map(RegistrationStatus::value)
-                                                  .toList();
+        var statusFilter =
+                inStatusFilter.stream().map(RegistrationStatus::value).toList();
 
         var returnList = chargePointRepository.getChargePointSelect(protocol, statusFilter, chargeBoxIdFilter);
 
         // json stations
         //
         var chargeBoxIdList = CollectionUtils.isEmpty(chargeBoxIdFilter)
-            ? jsonEndpoint.getChargeBoxIdList()
-            : jsonEndpoint.getChargeBoxIdList().stream()
-                .filter(chargeBoxIdFilter::contains)
-                .toList();
+                ? jsonEndpoint.getChargeBoxIdList()
+                : jsonEndpoint.getChargeBoxIdList().stream()
+                        .filter(chargeBoxIdFilter::contains)
+                        .toList();
 
         var jsonProtocol = OcppProtocol.from(jsonEndpoint.getVersion(), OcppTransport.JSON);
 
@@ -181,15 +188,16 @@ public class ChargePointHelperServiceImpl implements ChargePointHelperService {
     }
 
     private static List<String> extractIds(List<Map<String, Deque<SessionContext>>> ocppMaps) {
-        return ocppMaps.stream()
-                       .map(Map::keySet)
-                       .flatMap(Collection::stream)
-                       .toList();
+        return ocppMaps.stream().map(Map::keySet).flatMap(Collection::stream).toList();
     }
 
-    private static void appendList(Map<String, Deque<SessionContext>> map, List<OcppJsonStatus> returnList,
-                                   Instant now, ZoneId timeZone, OcppVersion version,
-                                   Map<String, Integer> primaryKeyLookup) {
+    private static void appendList(
+            Map<String, Deque<SessionContext>> map,
+            List<OcppJsonStatus> returnList,
+            Instant now,
+            ZoneId timeZone,
+            OcppVersion version,
+            Map<String, Integer> primaryKeyLookup) {
 
         for (var entry : map.entrySet()) {
             var chargeBoxId = entry.getKey();
@@ -199,13 +207,13 @@ public class ChargePointHelperServiceImpl implements ChargePointHelperService {
                 var openSince = ctx.getOpenSince();
 
                 var status = OcppJsonStatus.builder()
-                                                      .chargeBoxPk(primaryKeyLookup.get(chargeBoxId))
-                                                      .chargeBoxId(chargeBoxId)
-                                                      .connectedSinceDT(openSince)
-                                                      .connectedSince(humanize(openSince, timeZone))
-                                                      .connectionDuration(timeElapsed(openSince, now))
-                                                      .version(version)
-                                                      .build();
+                        .chargeBoxPk(primaryKeyLookup.get(chargeBoxId))
+                        .chargeBoxId(chargeBoxId)
+                        .connectedSinceDT(openSince)
+                        .connectedSince(humanize(openSince, timeZone))
+                        .connectionDuration(timeElapsed(openSince, now))
+                        .version(version)
+                        .build();
 
                 returnList.add(status);
             }

@@ -75,8 +75,10 @@ public class ClientProvider {
     }
 
     private static boolean shouldInitSSL(SteveConfiguration.Jetty jettyConfig) {
-        return jettyConfig.getKeyStorePath() != null && !jettyConfig.getKeyStorePath().isBlank()
-          && jettyConfig.getKeyStorePassword() != null && !jettyConfig.getKeyStorePassword().isBlank();
+        return jettyConfig.getKeyStorePath() != null
+                && !jettyConfig.getKeyStorePath().isBlank()
+                && jettyConfig.getKeyStorePassword() != null
+                && !jettyConfig.getKeyStorePassword().isBlank();
     }
 
     private static SSLContext setupSSL(SteveConfiguration.Jetty jettyConfig) {
@@ -84,11 +86,11 @@ public class ClientProvider {
             String keyStorePath = jettyConfig.getKeyStorePath();
             String keyStorePwd = jettyConfig.getKeyStorePassword();
             return SslContextBuilder.builder()
-                                   .keyStoreFromFile(keyStorePath, keyStorePwd)
-                                   .usingTLS()
-                                   .usingDefaultAlgorithm()
-                                   .usingKeyManagerPasswordFromKeyStore()
-                                   .buildMergedWithSystem();
+                    .keyStoreFromFile(keyStorePath, keyStorePwd)
+                    .usingTLS()
+                    .usingDefaultAlgorithm()
+                    .usingKeyManagerPasswordFromKeyStore()
+                    .buildMergedWithSystem();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

@@ -23,13 +23,12 @@ import de.rwth.idsg.steve.repository.AddressRepository;
 import de.rwth.idsg.steve.web.dto.Address;
 import jooq.steve.db.tables.records.AddressRecord;
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.Nullable;
 import org.jooq.DSLContext;
 import org.jooq.Record1;
 import org.jooq.SelectConditionStep;
 import org.jooq.exception.DataAccessException;
 import org.springframework.stereotype.Repository;
-
-import org.jetbrains.annotations.Nullable;
 
 import static jooq.steve.db.tables.Address.ADDRESS;
 
@@ -42,15 +41,14 @@ import static jooq.steve.db.tables.Address.ADDRESS;
 public class AddressRepositoryImpl implements AddressRepository {
 
     @Override
-    @Nullable
-    public AddressRecord get(DSLContext ctx, Integer addressPk) {
+    @Nullable public AddressRecord get(DSLContext ctx, Integer addressPk) {
         if (addressPk == null) {
             return null;
         }
 
         return ctx.selectFrom(ADDRESS)
-                  .where(ADDRESS.ADDRESS_PK.equal(addressPk))
-                  .fetchOne();
+                .where(ADDRESS.ADDRESS_PK.equal(addressPk))
+                .fetchOne();
     }
 
     /**
@@ -66,8 +64,7 @@ public class AddressRepositoryImpl implements AddressRepository {
      *
      */
     @Override
-    @Nullable
-    public Integer updateOrInsert(DSLContext ctx, Address address) {
+    @Nullable public Integer updateOrInsert(DSLContext ctx, Address address) {
         if (address.isEmpty()) {
             return null;
 
@@ -82,9 +79,7 @@ public class AddressRepositoryImpl implements AddressRepository {
 
     @Override
     public void delete(DSLContext ctx, SelectConditionStep<Record1<Integer>> addressPkSelect) {
-        ctx.delete(ADDRESS)
-           .where(ADDRESS.ADDRESS_PK.eq(addressPkSelect))
-           .execute();
+        ctx.delete(ADDRESS).where(ADDRESS.ADDRESS_PK.eq(addressPkSelect)).execute();
     }
 
     // -------------------------------------------------------------------------
@@ -94,14 +89,14 @@ public class AddressRepositoryImpl implements AddressRepository {
     private Integer insert(DSLContext ctx, Address ad) {
         try {
             return ctx.insertInto(ADDRESS)
-                      .set(ADDRESS.STREET, ad.getStreet())
-                      .set(ADDRESS.HOUSE_NUMBER, ad.getHouseNumber())
-                      .set(ADDRESS.ZIP_CODE, ad.getZipCode())
-                      .set(ADDRESS.CITY, ad.getCity())
-                      .set(ADDRESS.COUNTRY, ad.getCountryAlpha2OrNull())
-                      .returning(ADDRESS.ADDRESS_PK)
-                      .fetchOne()
-                      .getAddressPk();
+                    .set(ADDRESS.STREET, ad.getStreet())
+                    .set(ADDRESS.HOUSE_NUMBER, ad.getHouseNumber())
+                    .set(ADDRESS.ZIP_CODE, ad.getZipCode())
+                    .set(ADDRESS.CITY, ad.getCity())
+                    .set(ADDRESS.COUNTRY, ad.getCountryAlpha2OrNull())
+                    .returning(ADDRESS.ADDRESS_PK)
+                    .fetchOne()
+                    .getAddressPk();
         } catch (DataAccessException e) {
             throw new SteveException("Failed to insert the address");
         }
@@ -109,13 +104,13 @@ public class AddressRepositoryImpl implements AddressRepository {
 
     private void update(DSLContext ctx, Address ad) {
         int count = ctx.update(ADDRESS)
-                       .set(ADDRESS.STREET, ad.getStreet())
-                       .set(ADDRESS.HOUSE_NUMBER, ad.getHouseNumber())
-                       .set(ADDRESS.ZIP_CODE, ad.getZipCode())
-                       .set(ADDRESS.CITY, ad.getCity())
-                       .set(ADDRESS.COUNTRY, ad.getCountryAlpha2OrNull())
-                       .where(ADDRESS.ADDRESS_PK.eq(ad.getAddressPk()))
-                       .execute();
+                .set(ADDRESS.STREET, ad.getStreet())
+                .set(ADDRESS.HOUSE_NUMBER, ad.getHouseNumber())
+                .set(ADDRESS.ZIP_CODE, ad.getZipCode())
+                .set(ADDRESS.CITY, ad.getCity())
+                .set(ADDRESS.COUNTRY, ad.getCountryAlpha2OrNull())
+                .where(ADDRESS.ADDRESS_PK.eq(ad.getAddressPk()))
+                .execute();
 
         if (count != 1) {
             throw new SteveException("Failed to update the address");

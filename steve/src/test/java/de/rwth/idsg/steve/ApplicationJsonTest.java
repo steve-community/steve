@@ -55,7 +55,7 @@ public class ApplicationJsonTest {
     private static final ObjectMapper OCPP_MAPPER = JsonObjectMapper.createObjectMapper();
 
     private static final String REGISTERED_CHARGE_BOX_ID = __DatabasePreparer__.getRegisteredChargeBoxId();
-    private static final String REGISTERED_OCPP_TAG =  __DatabasePreparer__.getRegisteredOcppTag();
+    private static final String REGISTERED_OCPP_TAG = __DatabasePreparer__.getRegisteredOcppTag();
 
     private static String path;
     private static Application app;
@@ -86,20 +86,24 @@ public class ApplicationJsonTest {
         chargePoint.start();
 
         var boot = new ocpp.cs._2010._08.BootNotificationRequest()
-            .withChargePointVendor(getRandomString())
-            .withChargePointModel(getRandomString());
+                .withChargePointVendor(getRandomString())
+                .withChargePointModel(getRandomString());
 
-        chargePoint.prepare(boot, ocpp.cs._2010._08.BootNotificationResponse.class,
-            bootResponse -> assertThat(bootResponse.getStatus()).isEqualTo(ocpp.cs._2010._08.RegistrationStatus.ACCEPTED),
-            error -> fail()
-        );
+        chargePoint.prepare(
+                boot,
+                ocpp.cs._2010._08.BootNotificationResponse.class,
+                bootResponse ->
+                        assertThat(bootResponse.getStatus()).isEqualTo(ocpp.cs._2010._08.RegistrationStatus.ACCEPTED),
+                error -> fail());
 
         var auth = new ocpp.cs._2010._08.AuthorizeRequest().withIdTag(REGISTERED_OCPP_TAG);
 
-        chargePoint.prepare(auth, ocpp.cs._2010._08.AuthorizeResponse.class,
-            authResponse -> assertThat(authResponse.getIdTagInfo().getStatus()).isEqualTo(ocpp.cs._2010._08.AuthorizationStatus.ACCEPTED),
-            error -> fail()
-        );
+        chargePoint.prepare(
+                auth,
+                ocpp.cs._2010._08.AuthorizeResponse.class,
+                authResponse -> assertThat(authResponse.getIdTagInfo().getStatus())
+                        .isEqualTo(ocpp.cs._2010._08.AuthorizationStatus.ACCEPTED),
+                error -> fail());
 
         chargePoint.processAndClose();
     }
@@ -110,20 +114,24 @@ public class ApplicationJsonTest {
         chargePoint.start();
 
         var boot = new ocpp.cs._2012._06.BootNotificationRequest()
-            .withChargePointVendor(getRandomString())
-            .withChargePointModel(getRandomString());
+                .withChargePointVendor(getRandomString())
+                .withChargePointModel(getRandomString());
 
-        chargePoint.prepare(boot, ocpp.cs._2012._06.BootNotificationResponse.class,
-            bootResponse -> assertThat(bootResponse.getStatus()).isEqualTo(ocpp.cs._2012._06.RegistrationStatus.ACCEPTED),
-            error -> fail()
-        );
+        chargePoint.prepare(
+                boot,
+                ocpp.cs._2012._06.BootNotificationResponse.class,
+                bootResponse ->
+                        assertThat(bootResponse.getStatus()).isEqualTo(ocpp.cs._2012._06.RegistrationStatus.ACCEPTED),
+                error -> fail());
 
         var auth = new ocpp.cs._2012._06.AuthorizeRequest().withIdTag(REGISTERED_OCPP_TAG);
 
-        chargePoint.prepare(auth, ocpp.cs._2012._06.AuthorizeResponse.class,
-            authResponse -> assertThat(authResponse.getIdTagInfo().getStatus()).isEqualTo(ocpp.cs._2012._06.AuthorizationStatus.ACCEPTED),
-            error -> fail()
-        );
+        chargePoint.prepare(
+                auth,
+                ocpp.cs._2012._06.AuthorizeResponse.class,
+                authResponse -> assertThat(authResponse.getIdTagInfo().getStatus())
+                        .isEqualTo(ocpp.cs._2012._06.AuthorizationStatus.ACCEPTED),
+                error -> fail());
 
         chargePoint.processAndClose();
     }
@@ -137,17 +145,20 @@ public class ApplicationJsonTest {
                 .withChargePointVendor(getRandomString())
                 .withChargePointModel(getRandomString());
 
-        chargePoint.prepare(boot, BootNotificationResponse.class,
+        chargePoint.prepare(
+                boot,
+                BootNotificationResponse.class,
                 bootResponse -> assertThat(bootResponse.getStatus()).isEqualTo(RegistrationStatus.ACCEPTED),
-                error -> fail()
-        );
+                error -> fail());
 
         var auth = new AuthorizeRequest().withIdTag(REGISTERED_OCPP_TAG);
 
-        chargePoint.prepare(auth, AuthorizeResponse.class,
-                authResponse -> assertThat(authResponse.getIdTagInfo().getStatus()).isEqualTo(AuthorizationStatus.ACCEPTED),
-                error -> fail()
-        );
+        chargePoint.prepare(
+                auth,
+                AuthorizeResponse.class,
+                authResponse ->
+                        assertThat(authResponse.getIdTagInfo().getStatus()).isEqualTo(AuthorizationStatus.ACCEPTED),
+                error -> fail());
 
         chargePoint.processAndClose();
     }
@@ -159,7 +170,9 @@ public class ApplicationJsonTest {
         then(thrown)
                 .isInstanceOf(RuntimeException.class)
                 .hasRootCauseInstanceOf(UpgradeException.class)
-                .rootCause().satisfies(c -> {;
+                .rootCause()
+                .satisfies(c -> {
+                    ;
                     var ue = (UpgradeException) c;
                     assertThat(ue.getResponseStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
                 });
@@ -172,7 +185,8 @@ public class ApplicationJsonTest {
         then(thrown)
                 .isInstanceOf(RuntimeException.class)
                 .hasRootCauseInstanceOf(UpgradeException.class)
-                .rootCause().satisfies(c -> {
+                .rootCause()
+                .satisfies(c -> {
                     var ue = (UpgradeException) c;
                     assertThat(ue.getResponseStatusCode()).isEqualTo(HttpStatus.NOT_FOUND.value());
                 });
@@ -185,7 +199,8 @@ public class ApplicationJsonTest {
         then(thrown)
                 .isInstanceOf(RuntimeException.class)
                 .hasRootCauseInstanceOf(UpgradeException.class)
-                .rootCause().satisfies(c -> {
+                .rootCause()
+                .satisfies(c -> {
                     var ue = (UpgradeException) c;
                     assertThat(ue.getResponseStatusCode()).isEqualTo(HttpStatus.NOT_FOUND.value());
                 });
@@ -199,10 +214,12 @@ public class ApplicationJsonTest {
         var chargePoint = new OcppJsonChargePoint(OCPP_MAPPER, OcppVersion.V_16, REGISTERED_CHARGE_BOX_ID, path);
         chargePoint.start();
 
-        chargePoint.prepare(null, "Heartbeat", HeartbeatResponse.class,
-            response -> assertThat(response.getCurrentTime()).isNotNull(),
-            error -> fail()
-        );
+        chargePoint.prepare(
+                null,
+                "Heartbeat",
+                HeartbeatResponse.class,
+                response -> assertThat(response.getCurrentTime()).isNotNull(),
+                error -> fail());
 
         chargePoint.processAndClose();
     }

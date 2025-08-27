@@ -57,7 +57,9 @@ public class OcppTagQueryForm {
     @Schema(description = "Return blocked, not blocked, or all Ocpp tags? Defaults to ALL")
     private BooleanType blocked = BooleanType.FALSE;
 
-    @Schema(description = "Query by the note associated with the OCPP tag. The value of this field does not have to exactly match the note. A substring is also accepted.")
+    @Schema(
+            description =
+                    "Query by the note associated with the OCPP tag. The value of this field does not have to exactly match the note. A substring is also accepted.")
     private String note;
 
     @Schema(hidden = true)
@@ -103,7 +105,9 @@ public class OcppTagQueryForm {
         TRUE("True", true),
         FALSE("False", false);
 
-        @Getter private final String value;
+        @Getter
+        private final String value;
+
         private final Boolean boolValue;
 
         public boolean getBoolValue() {
@@ -114,7 +118,7 @@ public class OcppTagQueryForm {
         }
 
         public static BooleanType fromValue(String v) {
-            for (BooleanType c: BooleanType.values()) {
+            for (BooleanType c : BooleanType.values()) {
                 if (c.value.equals(v)) {
                     return c;
                 }
@@ -133,5 +137,4 @@ public class OcppTagQueryForm {
             setBlocked(BooleanType.ALL);
         }
     }
-
 }

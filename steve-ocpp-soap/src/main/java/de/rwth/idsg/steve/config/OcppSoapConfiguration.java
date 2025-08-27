@@ -36,10 +36,10 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import jakarta.annotation.PostConstruct;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import jakarta.annotation.PostConstruct;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
@@ -64,21 +64,23 @@ public class OcppSoapConfiguration {
 
     private final PhaseInterceptor<Message> messageHeaderInterceptor;
 
-    public OcppSoapConfiguration(CentralSystemService ocpp12Server, ocpp.cs._2012._06.CentralSystemService ocpp15Server,
-                             ocpp.cs._2015._10.CentralSystemService ocpp16Server,
-                             @Qualifier("messageHeaderInterceptor")
-                             PhaseInterceptor<Message> messageHeaderInterceptor,
-                             SteveConfiguration config) {
-      this.config = config;
-      this.ocpp12Server = ocpp12Server;
-      this.ocpp15Server = ocpp15Server;
-      this.ocpp16Server = ocpp16Server;
-      this.messageHeaderInterceptor = messageHeaderInterceptor;
+    public OcppSoapConfiguration(
+            CentralSystemService ocpp12Server,
+            ocpp.cs._2012._06.CentralSystemService ocpp15Server,
+            ocpp.cs._2015._10.CentralSystemService ocpp16Server,
+            @Qualifier("messageHeaderInterceptor") PhaseInterceptor<Message> messageHeaderInterceptor,
+            SteveConfiguration config) {
+        this.config = config;
+        this.ocpp12Server = ocpp12Server;
+        this.ocpp15Server = ocpp15Server;
+        this.ocpp16Server = ocpp16Server;
+        this.messageHeaderInterceptor = messageHeaderInterceptor;
     }
 
     @PostConstruct
     public void init() {
-        List<Interceptor<? extends Message>> interceptors = asList(new MessageIdInterceptor(), messageHeaderInterceptor);
+        List<Interceptor<? extends Message>> interceptors =
+                asList(new MessageIdInterceptor(), messageHeaderInterceptor);
         List<Feature> logging = singletonList(LoggingFeatureProxy.INSTANCE.get());
 
         createOcppService(ocpp12Server, "/CentralSystemServiceOCPP12", interceptors, logging);
@@ -97,9 +99,11 @@ public class OcppSoapConfiguration {
         return new SpringBus();
     }
 
-    private void createOcppService(Object serviceBean, String address,
-                                   List<Interceptor<? extends Message>> interceptors,
-                                   Collection<? extends Feature> features) {
+    private void createOcppService(
+            Object serviceBean,
+            String address,
+            List<Interceptor<? extends Message>> interceptors,
+            Collection<? extends Feature> features) {
         JaxWsServerFactoryBean f = new JaxWsServerFactoryBean();
         f.setBus(springBus());
         f.setServiceBean(serviceBean);

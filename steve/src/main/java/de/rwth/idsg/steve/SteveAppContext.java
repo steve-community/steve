@@ -19,7 +19,6 @@
 package de.rwth.idsg.steve;
 
 import de.rwth.idsg.steve.web.dto.EndpointInfo;
-import jakarta.servlet.DispatcherType;
 import org.apache.cxf.transport.servlet.CXFServlet;
 import org.apache.tomcat.InstanceManager;
 import org.apache.tomcat.SimpleInstanceManager;
@@ -49,6 +48,7 @@ import java.io.IOException;
 import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.Set;
+import jakarta.servlet.DispatcherType;
 
 import static de.rwth.idsg.steve.config.OcppWebSocketConfiguration.IDLE_TIMEOUT;
 import static de.rwth.idsg.steve.config.OcppWebSocketConfiguration.MAX_MSG_SIZE;
@@ -77,10 +77,7 @@ public class SteveAppContext {
     }
 
     public ContextHandlerCollection getHandlers() {
-        return new ContextHandlerCollection(
-            new ContextHandler(getRedirectHandler()),
-            new ContextHandler(getWebApp())
-        );
+        return new ContextHandlerCollection(new ContextHandler(getRedirectHandler()), new ContextHandler(getWebApp()));
     }
 
     /**
@@ -123,11 +120,11 @@ public class SteveAppContext {
 
         // add spring security
         ctx.addFilter(
-            // The bean name is not arbitrary, but is as expected by Spring
-            new FilterHolder(new DelegatingFilterProxy(AbstractSecurityWebApplicationInitializer.DEFAULT_FILTER_NAME)),
-            config.getPaths().getRootMapping() + "*",
-            EnumSet.allOf(DispatcherType.class)
-        );
+                // The bean name is not arbitrary, but is as expected by Spring
+                new FilterHolder(
+                        new DelegatingFilterProxy(AbstractSecurityWebApplicationInitializer.DEFAULT_FILTER_NAME)),
+                config.getPaths().getRootMapping() + "*",
+                EnumSet.allOf(DispatcherType.class));
 
         initJSP(ctx);
         return ctx;
@@ -139,7 +136,8 @@ public class SteveAppContext {
             var rule = new RedirectPatternRule();
             rule.setTerminating(true);
             rule.setPattern(redirect);
-            rule.setLocation(config.getPaths().getContextPath() + config.getPaths().getManagerMapping() + "/home");
+            rule.setLocation(
+                    config.getPaths().getContextPath() + config.getPaths().getManagerMapping() + "/home");
             rewrite.addRule(rule);
         }
         return rewrite;

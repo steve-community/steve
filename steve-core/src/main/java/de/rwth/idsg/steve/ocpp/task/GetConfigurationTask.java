@@ -28,16 +28,16 @@ import lombok.RequiredArgsConstructor;
 import ocpp.cp._2012._06.GetConfigurationRequest;
 import ocpp.cp._2012._06.GetConfigurationResponse;
 
-import jakarta.xml.ws.AsyncHandler;
-
 import java.util.List;
 import java.util.stream.Collectors;
+import jakarta.xml.ws.AsyncHandler;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 09.03.2018
  */
-public class GetConfigurationTask extends Ocpp15AndAboveTask<GetConfigurationParams, GetConfigurationTask.ResponseWrapper> {
+public class GetConfigurationTask
+        extends Ocpp15AndAboveTask<GetConfigurationParams, GetConfigurationTask.ResponseWrapper> {
 
     private static final Joiner JOINER = Joiner.on(", ");
 
@@ -74,10 +74,9 @@ public class GetConfigurationTask extends Ocpp15AndAboveTask<GetConfigurationPar
             try {
                 GetConfigurationResponse response = res.get();
 
-                List<KeyValue> keyValues = response.getConfigurationKey()
-                                                   .stream()
-                                                   .map(k -> new KeyValue(k.getKey(), k.getValue(), k.isReadonly()))
-                                                   .collect(Collectors.toList());
+                List<KeyValue> keyValues = response.getConfigurationKey().stream()
+                        .map(k -> new KeyValue(k.getKey(), k.getValue(), k.isReadonly()))
+                        .collect(Collectors.toList());
 
                 success(chargeBoxId, new ResponseWrapper(keyValues, response.getUnknownKey()));
             } catch (Exception e) {
@@ -91,10 +90,9 @@ public class GetConfigurationTask extends Ocpp15AndAboveTask<GetConfigurationPar
         return res -> {
             try {
                 ocpp.cp._2015._10.GetConfigurationResponse response = res.get();
-                List<KeyValue> keyValues = response.getConfigurationKey()
-                                                   .stream()
-                                                   .map(k -> new KeyValue(k.getKey(), k.getValue(), k.isReadonly()))
-                                                   .collect(Collectors.toList());
+                List<KeyValue> keyValues = response.getConfigurationKey().stream()
+                        .map(k -> new KeyValue(k.getKey(), k.getValue(), k.isReadonly()))
+                        .collect(Collectors.toList());
 
                 success(chargeBoxId, new ResponseWrapper(keyValues, response.getUnknownKey()));
             } catch (Exception e) {

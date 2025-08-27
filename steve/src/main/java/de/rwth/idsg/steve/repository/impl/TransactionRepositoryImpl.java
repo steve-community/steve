@@ -82,39 +82,37 @@ public class TransactionRepositoryImpl implements TransactionRepository {
 
     @Override
     public List<Transaction> getTransactions(TransactionQueryForm form) {
-        return getInternal(form).fetch()
-                                .map(new TransactionMapper());
+        return getInternal(form).fetch().map(new TransactionMapper());
     }
 
     @Override
     public void writeTransactionsCSV(TransactionQueryForm form, Writer writer) {
-        getInternalCSV(form).fetch()
-                            .formatCSV(writer);
+        getInternalCSV(form).fetch().formatCSV(writer);
     }
 
     @Override
     public List<Integer> getActiveTransactionIds(String chargeBoxId) {
         return ctx.select(TRANSACTION.TRANSACTION_PK)
-                  .from(TRANSACTION)
-                  .join(CONNECTOR)
-                    .on(TRANSACTION.CONNECTOR_PK.equal(CONNECTOR.CONNECTOR_PK))
-                    .and(CONNECTOR.CHARGE_BOX_ID.equal(chargeBoxId))
-                  .where(TRANSACTION.STOP_TIMESTAMP.isNull())
-                  .fetch(TRANSACTION.TRANSACTION_PK);
+                .from(TRANSACTION)
+                .join(CONNECTOR)
+                .on(TRANSACTION.CONNECTOR_PK.equal(CONNECTOR.CONNECTOR_PK))
+                .and(CONNECTOR.CHARGE_BOX_ID.equal(chargeBoxId))
+                .where(TRANSACTION.STOP_TIMESTAMP.isNull())
+                .fetch(TRANSACTION.TRANSACTION_PK);
     }
 
     @Override
     public Optional<Integer> getActiveTransactionId(String chargeBoxId, int connectorId) {
         var r = ctx.select(TRANSACTION.TRANSACTION_PK)
-                  .from(TRANSACTION)
-                  .join(CONNECTOR)
-                    .on(TRANSACTION.CONNECTOR_PK.equal(CONNECTOR.CONNECTOR_PK))
-                    .and(CONNECTOR.CHARGE_BOX_ID.equal(chargeBoxId))
-                  .where(TRANSACTION.STOP_TIMESTAMP.isNull())
-                    .and(CONNECTOR.CONNECTOR_ID.equal(connectorId))
-                  .orderBy(TRANSACTION.TRANSACTION_PK.desc()) // to avoid fetching ghost transactions, fetch the latest
-                  .limit(1)
-                  .fetchOne(TRANSACTION.TRANSACTION_PK);
+                .from(TRANSACTION)
+                .join(CONNECTOR)
+                .on(TRANSACTION.CONNECTOR_PK.equal(CONNECTOR.CONNECTOR_PK))
+                .and(CONNECTOR.CHARGE_BOX_ID.equal(chargeBoxId))
+                .where(TRANSACTION.STOP_TIMESTAMP.isNull())
+                .and(CONNECTOR.CONNECTOR_ID.equal(connectorId))
+                .orderBy(TRANSACTION.TRANSACTION_PK.desc()) // to avoid fetching ghost transactions, fetch the latest
+                .limit(1)
+                .fetchOne(TRANSACTION.TRANSACTION_PK);
         return Optional.ofNullable(r);
     }
 
@@ -130,8 +128,19 @@ public class TransactionRepositoryImpl implements TransactionRepository {
         form.setType(TransactionQueryForm.QueryType.ALL);
         form.setPeriodType(TransactionQueryForm.QueryPeriodType.ALL);
 
-        Record12<Integer, String, Integer, String, LocalDateTime, String, LocalDateTime, String, String, Integer,
-                Integer, TransactionStopEventActor>
+        Record12<
+                        Integer,
+                        String,
+                        Integer,
+                        String,
+                        LocalDateTime,
+                        String,
+                        LocalDateTime,
+                        String,
+                        String,
+                        Integer,
+                        Integer,
+                        TransactionStopEventActor>
                 transaction = getInternal(form).fetchOne();
 
         if (transaction == null) {
@@ -161,20 +170,21 @@ public class TransactionRepositoryImpl implements TransactionRepository {
             //
             // "what is the subsequent transaction at the same chargebox and connector?"
             nextTx = ctx.selectFrom(TRANSACTION_START)
-                        .where(TRANSACTION_START.CONNECTOR_PK.eq(ctx.select(CONNECTOR.CONNECTOR_PK)
-                                                                    .from(CONNECTOR)
-                                                                    .where(CONNECTOR.CHARGE_BOX_ID.equal(chargeBoxId))
-                                                                    .and(CONNECTOR.CONNECTOR_ID.equal(connectorId))))
-                        .and(TRANSACTION_START.START_TIMESTAMP.greaterThan(startTimestamp))
-                        .orderBy(TRANSACTION_START.START_TIMESTAMP)
-                        .limit(1)
-                        .fetchOne();
+                    .where(TRANSACTION_START.CONNECTOR_PK.eq(ctx.select(CONNECTOR.CONNECTOR_PK)
+                            .from(CONNECTOR)
+                            .where(CONNECTOR.CHARGE_BOX_ID.equal(chargeBoxId))
+                            .and(CONNECTOR.CONNECTOR_ID.equal(connectorId))))
+                    .and(TRANSACTION_START.START_TIMESTAMP.greaterThan(startTimestamp))
+                    .orderBy(TRANSACTION_START.START_TIMESTAMP)
+                    .limit(1)
+                    .fetchOne();
 
             if (nextTx == null) {
                 // the last active transaction
                 timestampCondition = CONNECTOR_METER_VALUE.VALUE_TIMESTAMP.greaterOrEqual(startTimestamp);
             } else {
-                timestampCondition = CONNECTOR_METER_VALUE.VALUE_TIMESTAMP.between(startTimestamp, nextTx.getStartTimestamp());
+                timestampCondition =
+                        CONNECTOR_METER_VALUE.VALUE_TIMESTAMP.between(startTimestamp, nextTx.getStartTimestamp());
             }
         } else {
             // finished transaction
@@ -182,28 +192,28 @@ public class TransactionRepositoryImpl implements TransactionRepository {
         }
 
         // https://github.com/steve-community/steve/issues/1514
-        Condition unitCondition = CONNECTOR_METER_VALUE.UNIT.isNull()
-            .or(CONNECTOR_METER_VALUE.UNIT.in("", UnitOfMeasure.WH.value(), UnitOfMeasure.K_WH.value()));
+        Condition unitCondition = CONNECTOR_METER_VALUE
+                .UNIT
+                .isNull()
+                .or(CONNECTOR_METER_VALUE.UNIT.in("", UnitOfMeasure.WH.value(), UnitOfMeasure.K_WH.value()));
 
         // Case 1: Ideal and most accurate case. Station sends meter values with transaction id set.
         //
-        SelectQuery<ConnectorMeterValueRecord> transactionQuery =
-                ctx.selectFrom(CONNECTOR_METER_VALUE)
-                   .where(CONNECTOR_METER_VALUE.TRANSACTION_PK.eq(transactionPk))
-                   .and(unitCondition)
-                   .getQuery();
+        SelectQuery<ConnectorMeterValueRecord> transactionQuery = ctx.selectFrom(CONNECTOR_METER_VALUE)
+                .where(CONNECTOR_METER_VALUE.TRANSACTION_PK.eq(transactionPk))
+                .and(unitCondition)
+                .getQuery();
 
         // Case 2: Fall back to filtering according to time windows
         //
-        SelectQuery<ConnectorMeterValueRecord> timestampQuery =
-                ctx.selectFrom(CONNECTOR_METER_VALUE)
-                   .where(CONNECTOR_METER_VALUE.CONNECTOR_PK.eq(ctx.select(CONNECTOR.CONNECTOR_PK)
-                                                                   .from(CONNECTOR)
-                                                                   .where(CONNECTOR.CHARGE_BOX_ID.eq(chargeBoxId))
-                                                                   .and(CONNECTOR.CONNECTOR_ID.eq(connectorId))))
-                   .and(timestampCondition)
-                   .and(unitCondition)
-                   .getQuery();
+        SelectQuery<ConnectorMeterValueRecord> timestampQuery = ctx.selectFrom(CONNECTOR_METER_VALUE)
+                .where(CONNECTOR_METER_VALUE.CONNECTOR_PK.eq(ctx.select(CONNECTOR.CONNECTOR_PK)
+                        .from(CONNECTOR)
+                        .where(CONNECTOR.CHARGE_BOX_ID.eq(chargeBoxId))
+                        .and(CONNECTOR.CONNECTOR_ID.eq(connectorId))))
+                .and(timestampCondition)
+                .and(unitCondition)
+                .getQuery();
 
         // Actually, either case 1 applies or 2. If we retrieved values using 1, case 2 is should not be
         // executed (best case). In worst case (1 returns empty list and we fall back to case 2) though,
@@ -211,12 +221,13 @@ public class TransactionRepositoryImpl implements TransactionRepository {
         //
         // UNION removes all duplicate records
         //
-        Table<ConnectorMeterValueRecord> t1 = transactionQuery.union(timestampQuery).asTable("t1");
+        Table<ConnectorMeterValueRecord> t1 =
+                transactionQuery.union(timestampQuery).asTable("t1");
 
         var dateTimeField = t1.field(2, LocalDateTime.class);
 
-        List<TransactionDetails.MeterValues> values =
-                ctx.select(
+        List<TransactionDetails.MeterValues> values = ctx
+                .select(
                         dateTimeField,
                         t1.field(3, String.class),
                         t1.field(4, String.class),
@@ -225,22 +236,22 @@ public class TransactionRepositoryImpl implements TransactionRepository {
                         t1.field(7, String.class),
                         t1.field(8, String.class),
                         t1.field(9, String.class))
-                   .from(t1)
-                   .orderBy(dateTimeField)
-                   .fetch()
-                   .map(r -> TransactionDetails.MeterValues.builder()
-                                                           .valueTimestamp(toInstant(r.value1()))
-                                                           .value(r.value2())
-                                                           .readingContext(r.value3())
-                                                           .format(r.value4())
-                                                           .measurand(r.value5())
-                                                           .location(r.value6())
-                                                           .unit(r.value7())
-                                                           .phase(r.value8())
-                                                           .build())
-                   .stream()
-                   .filter(TransactionStopServiceHelper::isEnergyValue)
-                   .toList();
+                .from(t1)
+                .orderBy(dateTimeField)
+                .fetch()
+                .map(r -> TransactionDetails.MeterValues.builder()
+                        .valueTimestamp(toInstant(r.value1()))
+                        .value(r.value2())
+                        .readingContext(r.value3())
+                        .format(r.value4())
+                        .measurand(r.value5())
+                        .location(r.value6())
+                        .unit(r.value7())
+                        .phase(r.value8())
+                        .build())
+                .stream()
+                .filter(TransactionStopServiceHelper::isEnergyValue)
+                .toList();
 
         return new TransactionDetails(new TransactionMapper().map(transaction), values, nextTx);
     }
@@ -250,9 +261,8 @@ public class TransactionRepositoryImpl implements TransactionRepository {
     // -------------------------------------------------------------------------
 
     @SuppressWarnings("unchecked")
-    private
-    SelectQuery<Record9<Integer, String, Integer, String, LocalDateTime, String, LocalDateTime, String, String>>
-    getInternalCSV(TransactionQueryForm form) {
+    private SelectQuery<Record9<Integer, String, Integer, String, LocalDateTime, String, LocalDateTime, String, String>>
+            getInternalCSV(TransactionQueryForm form) {
 
         SelectQuery selectQuery = ctx.selectQuery();
         selectQuery.addFrom(TRANSACTION);
@@ -266,8 +276,7 @@ public class TransactionRepositoryImpl implements TransactionRepository {
                 TRANSACTION.START_VALUE,
                 TRANSACTION.STOP_TIMESTAMP,
                 TRANSACTION.STOP_VALUE,
-                TRANSACTION.STOP_REASON
-        );
+                TRANSACTION.STOP_REASON);
 
         return addConditions(selectQuery, form);
     }
@@ -277,10 +286,21 @@ public class TransactionRepositoryImpl implements TransactionRepository {
      * Joins with CHARGE_BOX and OCPP_TAG tables, selects CHARGE_BOX_PK and OCPP_TAG_PK additionally
      */
     @SuppressWarnings("unchecked")
-    private
-    SelectQuery<Record12<Integer, String, Integer, String, LocalDateTime, String, LocalDateTime, String, String,
-            Integer, Integer, TransactionStopEventActor>>
-    getInternal(TransactionQueryForm form) {
+    private SelectQuery<
+                    Record12<
+                            Integer,
+                            String,
+                            Integer,
+                            String,
+                            LocalDateTime,
+                            String,
+                            LocalDateTime,
+                            String,
+                            String,
+                            Integer,
+                            Integer,
+                            TransactionStopEventActor>>
+            getInternal(TransactionQueryForm form) {
 
         SelectQuery selectQuery = ctx.selectQuery();
         selectQuery.addFrom(TRANSACTION);
@@ -299,8 +319,7 @@ public class TransactionRepositoryImpl implements TransactionRepository {
                 TRANSACTION.STOP_REASON,
                 CHARGE_BOX.CHARGE_BOX_PK,
                 OCPP_TAG.OCPP_TAG_PK,
-                TRANSACTION.STOP_EVENT_ACTOR
-        );
+                TRANSACTION.STOP_EVENT_ACTOR);
 
         return addConditions(selectQuery, form);
     }
@@ -342,21 +361,15 @@ public class TransactionRepositoryImpl implements TransactionRepository {
     private void processType(SelectQuery selectQuery, TransactionQueryForm form) {
         switch (form.getPeriodType()) {
             case TODAY:
-                selectQuery.addConditions(
-                        date(TRANSACTION.START_TIMESTAMP).eq(LocalDate.now())
-                );
+                selectQuery.addConditions(date(TRANSACTION.START_TIMESTAMP).eq(LocalDate.now()));
                 break;
 
             case LAST_10:
             case LAST_30:
             case LAST_90:
                 var now = LocalDate.now();
-                selectQuery.addConditions(
-                        date(TRANSACTION.START_TIMESTAMP).between(
-                                now.minusDays(form.getPeriodType().getInterval()),
-                                now
-                        )
-                );
+                selectQuery.addConditions(date(TRANSACTION.START_TIMESTAMP)
+                        .between(now.minusDays(form.getPeriodType().getInterval()), now));
                 break;
 
             case ALL:
@@ -380,27 +393,54 @@ public class TransactionRepositoryImpl implements TransactionRepository {
         }
     }
 
-    private static class TransactionMapper implements RecordMapper<Record12<Integer, String, Integer, String,
-            LocalDateTime, String, LocalDateTime, String, String, Integer, Integer, TransactionStopEventActor>, Transaction> {
+    private static class TransactionMapper
+            implements RecordMapper<
+                    Record12<
+                            Integer,
+                            String,
+                            Integer,
+                            String,
+                            LocalDateTime,
+                            String,
+                            LocalDateTime,
+                            String,
+                            String,
+                            Integer,
+                            Integer,
+                            TransactionStopEventActor>,
+                    Transaction> {
         @Override
-        public Transaction map(Record12<Integer, String, Integer, String, LocalDateTime, String, LocalDateTime, String,
-                String, Integer, Integer, TransactionStopEventActor> r) {
+        public Transaction map(
+                Record12<
+                                Integer,
+                                String,
+                                Integer,
+                                String,
+                                LocalDateTime,
+                                String,
+                                LocalDateTime,
+                                String,
+                                String,
+                                Integer,
+                                Integer,
+                                TransactionStopEventActor>
+                        r) {
             return Transaction.builder()
-                              .id(r.value1())
-                              .chargeBoxId(r.value2())
-                              .connectorId(r.value3())
-                              .ocppIdTag(r.value4())
-                              .startTimestamp(toInstant(r.value5()))
-                              .startTimestampFormatted(DateTimeUtils.humanize(r.value5()))
-                              .startValue(r.value6())
-                              .stopTimestamp(toInstant(r.value7()))
-                              .stopTimestampFormatted(DateTimeUtils.humanize(r.value7()))
-                              .stopValue(r.value8())
-                              .stopReason(r.value9())
-                              .chargeBoxPk(r.value10())
-                              .ocppTagPk(r.value11())
-                              .stopEventActor(r.value12())
-                              .build();
+                    .id(r.value1())
+                    .chargeBoxId(r.value2())
+                    .connectorId(r.value3())
+                    .ocppIdTag(r.value4())
+                    .startTimestamp(toInstant(r.value5()))
+                    .startTimestampFormatted(DateTimeUtils.humanize(r.value5()))
+                    .startValue(r.value6())
+                    .stopTimestamp(toInstant(r.value7()))
+                    .stopTimestampFormatted(DateTimeUtils.humanize(r.value7()))
+                    .stopValue(r.value8())
+                    .stopReason(r.value9())
+                    .chargeBoxPk(r.value10())
+                    .ocppTagPk(r.value11())
+                    .stopEventActor(r.value12())
+                    .build();
         }
     }
 }

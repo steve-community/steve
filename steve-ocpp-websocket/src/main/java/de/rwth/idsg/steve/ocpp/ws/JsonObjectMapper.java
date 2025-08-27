@@ -64,12 +64,9 @@ public class JsonObjectMapper {
         mapper.registerModule(new Ocpp15JacksonModule());
         mapper.registerModule(new Ocpp16JacksonModule());
 
-        mapper.setAnnotationIntrospector(
-                AnnotationIntrospector.pair(
-                        new JacksonAnnotationIntrospector(),
-                        new JakartaXmlBindAnnotationIntrospector(mapper.getTypeFactory())
-                )
-        );
+        mapper.setAnnotationIntrospector(AnnotationIntrospector.pair(
+                new JacksonAnnotationIntrospector(),
+                new JakartaXmlBindAnnotationIntrospector(mapper.getTypeFactory())));
         return mapper;
     }
 }

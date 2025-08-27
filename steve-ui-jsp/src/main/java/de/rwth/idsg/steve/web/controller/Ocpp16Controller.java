@@ -35,8 +35,6 @@ import ocpp.cs._2015._10.RegistrationStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-
-import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -46,6 +44,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import jakarta.validation.Valid;
 
 import static de.rwth.idsg.steve.web.dto.ocpp.ConfigurationKeyReadWrite.R;
 import static de.rwth.idsg.steve.web.dto.ocpp.ConfigurationKeyReadWrite.RW;
@@ -69,14 +68,16 @@ public class Ocpp16Controller extends Ocpp15Controller {
     private static final String SET_CHARGING_PATH = "/SetChargingProfile";
     private static final String TRIGGER_MESSAGE_PATH = "/TriggerMessage";
 
-  public Ocpp16Controller(ChargePointHelperService chargePointHelperService, OcppTagsService ocppTagsService,
-                          ChargePointServiceClient chargePointServiceClient,
-                          ChargingProfileRepository chargingProfileRepository) {
-    super(chargePointHelperService, ocppTagsService, chargePointServiceClient);
-    this.chargingProfileRepository = chargingProfileRepository;
-  }
+    public Ocpp16Controller(
+            ChargePointHelperService chargePointHelperService,
+            OcppTagsService ocppTagsService,
+            ChargePointServiceClient chargePointServiceClient,
+            ChargingProfileRepository chargingProfileRepository) {
+        super(chargePointHelperService, ocppTagsService, chargePointServiceClient);
+        this.chargingProfileRepository = chargingProfileRepository;
+    }
 
-  // -------------------------------------------------------------------------
+    // -------------------------------------------------------------------------
     // Helpers
     // -------------------------------------------------------------------------
 
@@ -95,7 +96,8 @@ public class Ocpp16Controller extends Ocpp15Controller {
      */
     @Override
     protected void setCommonAttributes(Model model) {
-        List<RegistrationStatus> inStatusFilter = Arrays.asList(RegistrationStatus.ACCEPTED, RegistrationStatus.PENDING);
+        List<RegistrationStatus> inStatusFilter =
+                Arrays.asList(RegistrationStatus.ACCEPTED, RegistrationStatus.PENDING);
         model.addAttribute("cpList", chargePointHelperService.getChargePoints(OcppVersion.V_16, inStatusFilter));
         model.addAttribute("opVersion", "v1.6");
     }
@@ -143,8 +145,8 @@ public class Ocpp16Controller extends Ocpp15Controller {
     }
 
     @PostMapping(value = GET_CONF_PATH)
-    public String postGetConf(@Valid @ModelAttribute(PARAMS) GetConfigurationParams params,
-                              BindingResult result, Model model) {
+    public String postGetConf(
+            @Valid @ModelAttribute(PARAMS) GetConfigurationParams params, BindingResult result, Model model) {
         if (result.hasErrors()) {
             setCommonAttributes(model);
             model.addAttribute("ocppConfKeys", getConfigurationKeys(R));
@@ -192,8 +194,8 @@ public class Ocpp16Controller extends Ocpp15Controller {
     // -------------------------------------------------------------------------
 
     @PostMapping(value = TRIGGER_MESSAGE_PATH)
-    public String postTriggerMessage(@Valid @ModelAttribute(PARAMS) TriggerMessageParams params,
-                                     BindingResult result, Model model) {
+    public String postTriggerMessage(
+            @Valid @ModelAttribute(PARAMS) TriggerMessageParams params, BindingResult result, Model model) {
         if (result.hasErrors()) {
             setCommonAttributes(model);
             return getPrefix() + TRIGGER_MESSAGE_PATH;
@@ -202,8 +204,8 @@ public class Ocpp16Controller extends Ocpp15Controller {
     }
 
     @PostMapping(value = SET_CHARGING_PATH)
-    public String postSetChargingProfile(@Valid @ModelAttribute(PARAMS) SetChargingProfileParams params,
-                                         BindingResult result, Model model) {
+    public String postSetChargingProfile(
+            @Valid @ModelAttribute(PARAMS) SetChargingProfileParams params, BindingResult result, Model model) {
         if (result.hasErrors()) {
             setCommonAttributes(model);
             return getPrefix() + SET_CHARGING_PATH;
@@ -212,8 +214,8 @@ public class Ocpp16Controller extends Ocpp15Controller {
     }
 
     @PostMapping(value = CLEAR_CHARGING_PATH)
-    public String postClearChargingProfile(@Valid @ModelAttribute(PARAMS) ClearChargingProfileParams params,
-                                           BindingResult result, Model model) {
+    public String postClearChargingProfile(
+            @Valid @ModelAttribute(PARAMS) ClearChargingProfileParams params, BindingResult result, Model model) {
         if (result.hasErrors()) {
             setCommonAttributes(model);
             return getPrefix() + CLEAR_CHARGING_PATH;
@@ -222,8 +224,8 @@ public class Ocpp16Controller extends Ocpp15Controller {
     }
 
     @PostMapping(value = GET_COMPOSITE_PATH)
-    public String postGetCompositeSchedule(@Valid @ModelAttribute(PARAMS) GetCompositeScheduleParams params,
-                                           BindingResult result, Model model) {
+    public String postGetCompositeSchedule(
+            @Valid @ModelAttribute(PARAMS) GetCompositeScheduleParams params, BindingResult result, Model model) {
         if (result.hasErrors()) {
             setCommonAttributes(model);
             return getPrefix() + GET_COMPOSITE_PATH;

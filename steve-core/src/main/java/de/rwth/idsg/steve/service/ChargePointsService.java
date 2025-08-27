@@ -40,9 +40,10 @@ public class ChargePointsService {
     }
 
     public ChargePoint.Details getDetails(int chargeBoxPk) {
-        return chargePointRepository.getDetails(chargeBoxPk).orElseThrow(
-            () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Charge Point with ID " + chargeBoxPk + " not found")
-        );
+        return chargePointRepository
+                .getDetails(chargeBoxPk)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND, "Charge Point with ID " + chargeBoxPk + " not found"));
     }
 
     public int addChargePoint(ChargePointForm form) {

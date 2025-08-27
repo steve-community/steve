@@ -30,13 +30,15 @@ public interface Server12to15 {
 
     ocpp.cs._2012._06.BootNotificationRequest convertRequest(ocpp.cs._2010._08.BootNotificationRequest request);
 
-    ocpp.cs._2012._06.FirmwareStatusNotificationRequest convertRequest(ocpp.cs._2010._08.FirmwareStatusNotificationRequest request);
+    ocpp.cs._2012._06.FirmwareStatusNotificationRequest convertRequest(
+            ocpp.cs._2010._08.FirmwareStatusNotificationRequest request);
 
     ocpp.cs._2012._06.StatusNotificationRequest convertRequest(ocpp.cs._2010._08.StatusNotificationRequest request);
 
     ocpp.cs._2012._06.MeterValuesRequest convertRequest(ocpp.cs._2010._08.MeterValuesRequest request);
 
-    ocpp.cs._2012._06.DiagnosticsStatusNotificationRequest convertRequest(ocpp.cs._2010._08.DiagnosticsStatusNotificationRequest request);
+    ocpp.cs._2012._06.DiagnosticsStatusNotificationRequest convertRequest(
+            ocpp.cs._2010._08.DiagnosticsStatusNotificationRequest request);
 
     ocpp.cs._2012._06.StartTransactionRequest convertRequest(ocpp.cs._2010._08.StartTransactionRequest request);
 
@@ -52,13 +54,15 @@ public interface Server12to15 {
 
     ocpp.cs._2010._08.BootNotificationResponse convertResponse(ocpp.cs._2012._06.BootNotificationResponse response);
 
-    ocpp.cs._2010._08.FirmwareStatusNotificationResponse convertResponse(ocpp.cs._2012._06.FirmwareStatusNotificationResponse response);
+    ocpp.cs._2010._08.FirmwareStatusNotificationResponse convertResponse(
+            ocpp.cs._2012._06.FirmwareStatusNotificationResponse response);
 
     ocpp.cs._2010._08.StatusNotificationResponse convertResponse(ocpp.cs._2012._06.StatusNotificationResponse response);
 
     ocpp.cs._2010._08.MeterValuesResponse convertResponse(ocpp.cs._2012._06.MeterValuesResponse response);
 
-    ocpp.cs._2010._08.DiagnosticsStatusNotificationResponse convertResponse(ocpp.cs._2012._06.DiagnosticsStatusNotificationResponse response);
+    ocpp.cs._2010._08.DiagnosticsStatusNotificationResponse convertResponse(
+            ocpp.cs._2012._06.DiagnosticsStatusNotificationResponse response);
 
     ocpp.cs._2010._08.StartTransactionResponse convertResponse(ocpp.cs._2012._06.StartTransactionResponse response);
 

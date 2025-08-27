@@ -33,6 +33,7 @@ import java.util.Optional;
  */
 public interface ReservationRepository {
     Optional<Reservation> getReservation(int id);
+
     List<Reservation> getReservations(ReservationQueryForm form);
 
     List<Integer> getActiveReservationIds(String chargeBoxId);
@@ -50,6 +51,8 @@ public interface ReservationRepository {
     void delete(int reservationId);
 
     void accepted(int reservationId);
+
     void cancelled(int reservationId);
+
     void used(Select<Record1<Integer>> connectorPkSelect, String ocppIdTag, int reservationId, int transactionId);
 }

@@ -48,7 +48,6 @@ public final class DateTimeUtils {
             .optionalStart()
             .appendOffsetId()
             .optionalEnd()
-
             .parseStrict()
             .toFormatter();
 

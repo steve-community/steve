@@ -50,8 +50,10 @@ public class Application {
 
         var zoneId = ZoneId.of(sc.getTimeZoneId());
         TimeZone.setDefault(TimeZone.getTimeZone(zoneId));
-        log.info("Date/time zone of the application is set to {}. Current date/time: {}",
-                sc.getTimeZoneId(), ZonedDateTime.now(zoneId));
+        log.info(
+                "Date/time zone of the application is set to {}. Current date/time: {}",
+                sc.getTimeZoneId(),
+                ZonedDateTime.now(zoneId));
 
         Optional<Path> path = LogFileRetriever.INSTANCE.getPath();
         boolean loggingToFile = path.isPresent();

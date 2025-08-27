@@ -19,10 +19,10 @@
 package de.rwth.idsg.ocpp.jaxb;
 
 import de.rwth.idsg.ocpp.DateTimeUtils;
-import jakarta.xml.bind.annotation.adapters.XmlAdapter;
 
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
+import jakarta.xml.bind.annotation.adapters.XmlAdapter;
 
 /**
  * JavaTime and XSD represent data and time information according to ISO 8601.
@@ -36,7 +36,9 @@ public class JavaDateTimeConverter extends XmlAdapter<String, OffsetDateTime> {
     private final boolean marchallToUtc;
 
     public JavaDateTimeConverter() {
-        this(ZoneId.systemDefault(), System.getProperty("steve.ocpp.marshall-to-utc", "true").equals("true"));
+        this(
+                ZoneId.systemDefault(),
+                System.getProperty("steve.ocpp.marshall-to-utc", "true").equals("true"));
     }
 
     public JavaDateTimeConverter(ZoneId fallbackZoneId, boolean marchallToUtc) {

@@ -62,8 +62,7 @@ public final class StringUtils {
         return s;
     }
 
-    @Nullable
-    public static String joinByComma(Collection<?> col) {
+    @Nullable public static String joinByComma(Collection<?> col) {
         if (CollectionUtils.isEmpty(col)) {
             return null;
         } else {

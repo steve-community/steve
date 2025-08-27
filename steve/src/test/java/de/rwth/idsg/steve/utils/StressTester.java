@@ -64,7 +64,9 @@ public class StressTester {
 
     public interface Runnable {
         void beforeRepeat();
+
         void toRepeat();
+
         void afterRepeat();
     }
 }

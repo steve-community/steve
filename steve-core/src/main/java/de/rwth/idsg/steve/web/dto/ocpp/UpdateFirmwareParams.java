@@ -21,13 +21,12 @@ package de.rwth.idsg.steve.web.dto.ocpp;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.Instant;
 import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
-
-import java.time.Instant;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -37,17 +36,11 @@ import java.time.Instant;
 @Getter
 public class UpdateFirmwareParams extends MultipleChargePointSelect {
 
-    @NotBlank(message = "Location is required")
-    @Pattern(regexp = "\\S+", message = "Location cannot contain any whitespace")
-    private String location;
+    @NotBlank(message = "Location is required") @Pattern(regexp = "\\S+", message = "Location cannot contain any whitespace") private String location;
 
-    @Min(value = 1, message = "Retries must be at least {value}")
-    private Integer retries;
+    @Min(value = 1, message = "Retries must be at least {value}") private Integer retries;
 
-    @Min(value = 1, message = "Retry Interval must be at least {value}")
-    private Integer retryInterval;
+    @Min(value = 1, message = "Retry Interval must be at least {value}") private Integer retryInterval;
 
-    @Future(message = "Retrieve Date/Time must be in future")
-    @NotNull(message = "Retrieve Date/Time is required")
-    private Instant retrieve;
+    @Future(message = "Retrieve Date/Time must be in future") @NotNull(message = "Retrieve Date/Time is required") private Instant retrieve;
 }

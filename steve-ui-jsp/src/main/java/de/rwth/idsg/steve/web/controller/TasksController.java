@@ -82,9 +82,8 @@ public class TasksController {
     }
 
     @GetMapping(value = TASK_DETAILS_PATH)
-    public String getDetailsForChargeBox(@PathVariable("taskId") Integer taskId,
-                                         @PathVariable("chargeBoxId") String chargeBoxId,
-                                         Model model) {
+    public String getDetailsForChargeBox(
+            @PathVariable("taskId") Integer taskId, @PathVariable("chargeBoxId") String chargeBoxId, Model model) {
 
         var task = taskStore.get(taskId);
 
@@ -97,7 +96,8 @@ public class TasksController {
         throw new SteveException("Task not found");
     }
 
-    private static String processForGetCompositeScheduleTask(GetCompositeScheduleTask task, String chargeBoxId, Model model) {
+    private static String processForGetCompositeScheduleTask(
+            GetCompositeScheduleTask task, String chargeBoxId, Model model) {
         RequestResult result = extractResult(task, chargeBoxId);
         GetCompositeScheduleResponse response = result.getDetails();
 

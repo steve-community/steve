@@ -45,8 +45,11 @@ public class AuthTagServiceLocal implements AuthTagService {
     private final SettingsRepository settingsRepository;
 
     @Override
-    public IdTagInfo decideStatus(String idTag, boolean isStartTransactionReqContext,
-                                  @Nullable String chargeBoxId, @Nullable Integer connectorId) {
+    public IdTagInfo decideStatus(
+            String idTag,
+            boolean isStartTransactionReqContext,
+            @Nullable String chargeBoxId,
+            @Nullable Integer connectorId) {
         OcppTagActivityRecord record = ocppTagRepository.getRecord(idTag);
         if (record == null) {
             log.error("The user with idTag '{}' is INVALID (not present in DB).", idTag);
@@ -56,40 +59,39 @@ public class AuthTagServiceLocal implements AuthTagService {
         if (isBlocked(record)) {
             log.error("The user with idTag '{}' is BLOCKED.", idTag);
             return new IdTagInfo()
-                .withStatus(AuthorizationStatus.BLOCKED)
-                .withParentIdTag(record.getParentIdTag())
-                .withExpiryDate(getExpiryDateOrDefault(record));
+                    .withStatus(AuthorizationStatus.BLOCKED)
+                    .withParentIdTag(record.getParentIdTag())
+                    .withExpiryDate(getExpiryDateOrDefault(record));
         }
 
         if (isExpired(record, Instant.now())) {
             log.error("The user with idTag '{}' is EXPIRED.", idTag);
             return new IdTagInfo()
-                .withStatus(AuthorizationStatus.EXPIRED)
-                .withParentIdTag(record.getParentIdTag())
-                .withExpiryDate(getExpiryDateOrDefault(record));
+                    .withStatus(AuthorizationStatus.EXPIRED)
+                    .withParentIdTag(record.getParentIdTag())
+                    .withExpiryDate(getExpiryDateOrDefault(record));
         }
 
         // https://github.com/steve-community/steve/issues/219
         if (isStartTransactionReqContext && reachedLimitOfActiveTransactions(record)) {
             log.warn("The user with idTag '{}' is ALREADY in another transaction(s).", idTag);
             return new IdTagInfo()
-                .withStatus(AuthorizationStatus.CONCURRENT_TX)
-                .withParentIdTag(record.getParentIdTag())
-                .withExpiryDate(getExpiryDateOrDefault(record));
+                    .withStatus(AuthorizationStatus.CONCURRENT_TX)
+                    .withParentIdTag(record.getParentIdTag())
+                    .withExpiryDate(getExpiryDateOrDefault(record));
         }
 
         log.debug("The user with idTag '{}' is ACCEPTED.", record.getIdTag());
         return new IdTagInfo()
-            .withStatus(AuthorizationStatus.ACCEPTED)
-            .withParentIdTag(record.getParentIdTag())
-            .withExpiryDate(getExpiryDateOrDefault(record));
+                .withStatus(AuthorizationStatus.ACCEPTED)
+                .withParentIdTag(record.getParentIdTag())
+                .withExpiryDate(getExpiryDateOrDefault(record));
     }
 
     /**
      * If the database contains an actual expiry, use it. Otherwise, calculate an expiry for cached info
      */
-    @Nullable
-    private OffsetDateTime getExpiryDateOrDefault(OcppTagActivityRecord record) {
+    @Nullable private OffsetDateTime getExpiryDateOrDefault(OcppTagActivityRecord record) {
         if (record.getExpiryDate() != null) {
             return toOffsetDateTime(record.getExpiryDate());
         }

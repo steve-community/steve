@@ -62,8 +62,7 @@ public class FutureResponseContextStoreImpl implements FutureResponseContextStor
         log.debug("Store size for sessionId '{}': {}", session.getId(), map.size());
     }
 
-    @Nullable
-    @Override
+    @Nullable @Override
     public FutureResponseContext get(WebSocketSession session, String messageId) {
         RemoveFunction removeFunction = new RemoveFunction(messageId);
         lookupTable.computeIfPresent(session, removeFunction);
@@ -78,15 +77,17 @@ public class FutureResponseContextStoreImpl implements FutureResponseContextStor
     }
 
     @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-    private static class RemoveFunction implements
-            BiFunction<WebSocketSession, Map<String, FutureResponseContext>, Map<String, FutureResponseContext>> {
+    private static class RemoveFunction
+            implements BiFunction<
+                    WebSocketSession, Map<String, FutureResponseContext>, Map<String, FutureResponseContext>> {
 
         private final String messageId;
+
         @Nullable private FutureResponseContext removedContext;
 
         @Override
-        public Map<String, FutureResponseContext> apply(WebSocketSession session,
-                                                        Map<String, FutureResponseContext> map) {
+        public Map<String, FutureResponseContext> apply(
+                WebSocketSession session, Map<String, FutureResponseContext> map) {
             removedContext = map.remove(messageId);
             log.debug("Store size for sessionId '{}': {}", session.getId(), map.size());
             return map;

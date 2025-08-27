@@ -19,10 +19,11 @@
 package de.rwth.idsg.steve.web.api.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import java.util.ArrayList;
-import java.util.List;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author fnkbsi
@@ -32,7 +33,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class ApiChargePointList {
     @Schema(description = "List of charge points")
-    private final List<ChargePointInfo> chargePointList =  new ArrayList<>();
+    private final List<ChargePointInfo> chargePointList = new ArrayList<>();
 
     public void addCP(String chargeBoxId, List<Integer> connectorIds) {
         ChargePointInfo cp = new ChargePointInfo(chargeBoxId, connectorIds);
@@ -44,6 +45,7 @@ public class ApiChargePointList {
     public static class ChargePointInfo {
         @Schema(description = "Charge Box ID")
         private final String chargeBoxId;
+
         @Schema(description = "List of the charge box connectors")
         private final List<Integer> connectorIds;
     }

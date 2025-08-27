@@ -58,10 +58,8 @@ public class IncomingPipeline implements Consumer<CommunicationContext> {
                 handler.accept(context);
                 send(context);
             }
-            case OcppJsonResult resultMsg -> context.getResultHandler()
-                    .accept(resultMsg);
-            case OcppJsonError errorMsg -> context.getErrorHandler()
-                    .accept(errorMsg);
+            case OcppJsonResult resultMsg -> context.getResultHandler().accept(resultMsg);
+            case OcppJsonError errorMsg -> context.getErrorHandler().accept(errorMsg);
             default -> throw new IllegalStateException("Unexpected value: " + msg);
         }
     }

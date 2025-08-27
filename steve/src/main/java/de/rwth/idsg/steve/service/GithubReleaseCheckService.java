@@ -68,12 +68,10 @@ public class GithubReleaseCheckService implements ReleaseCheckService {
 
     private static RestTemplate createRestTemplate(ObjectMapper mapper, String userAgent) {
         var timeout = Timeout.ofMilliseconds(API_TIMEOUT_IN_MILLIS);
-        var requestConfig = RequestConfig.custom()
-                .setConnectionRequestTimeout(timeout)
-                .build();
-        var httpClient = HttpClients.custom()
-                .setDefaultRequestConfig(requestConfig)
-                .build();
+        var requestConfig =
+                RequestConfig.custom().setConnectionRequestTimeout(timeout).build();
+        var httpClient =
+                HttpClients.custom().setDefaultRequestConfig(requestConfig).build();
         var factory = new HttpComponentsClientHttpRequestFactory(httpClient);
 
         var messageConverter = new MappingJackson2HttpMessageConverter(mapper);
@@ -103,9 +101,7 @@ public class GithubReleaseCheckService implements ReleaseCheckService {
         } catch (RestClientException e) {
             // Fallback to "there is no new version atm".
             // Probably because Github did not respond within the timeout.
-            return ReleaseReport.builder()
-                    .moreRecent(false)
-                    .build();
+            return ReleaseReport.builder().moreRecent(false).build();
         }
     }
 

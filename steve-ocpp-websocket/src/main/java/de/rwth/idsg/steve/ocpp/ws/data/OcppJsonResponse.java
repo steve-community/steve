@@ -22,8 +22,8 @@ package de.rwth.idsg.steve.ocpp.ws.data;
  * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 13.03.2015
  */
-public abstract sealed class OcppJsonResponse extends AbstractOcppJsonMessage
-        implements OcppJsonMessage permits OcppJsonResult, OcppJsonError {
+public abstract sealed class OcppJsonResponse extends AbstractOcppJsonMessage implements OcppJsonMessage
+        permits OcppJsonResult, OcppJsonError {
     protected OcppJsonResponse(MessageType messageType) {
         super(messageType);
     }

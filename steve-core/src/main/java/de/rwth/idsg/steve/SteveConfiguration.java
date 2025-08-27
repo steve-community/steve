@@ -26,10 +26,12 @@ import org.springframework.security.crypto.password.PasswordEncoder;
  * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 19.08.2014
  */
-@Builder @Getter
+@Builder
+@Getter
 public class SteveConfiguration {
 
-    @Builder @Getter
+    @Builder
+    @Getter
     public static class Paths {
         // Root mapping for Spring
         private final String rootMapping;
@@ -79,7 +81,8 @@ public class SteveConfiguration {
     // -------------------------------------------------------------------------
 
     // Jetty configuration
-    @Builder @Getter
+    @Builder
+    @Getter
     public static class Jetty {
         private final String serverHost;
         private final boolean gzipEnabled;
@@ -96,7 +99,8 @@ public class SteveConfiguration {
     }
 
     // Database configuration
-    @Builder @Getter
+    @Builder
+    @Getter
     public static class DB {
         private final String jdbcUrl;
         private final String userName;
@@ -105,21 +109,24 @@ public class SteveConfiguration {
     }
 
     // Credentials for Web interface access
-    @Builder @Getter
+    @Builder
+    @Getter
     public static class Auth {
         private final PasswordEncoder passwordEncoder;
         private final String userName;
         private final String encodedPassword;
     }
 
-    @Builder @Getter
+    @Builder
+    @Getter
     public static class WebApi {
         private final String headerKey;
         private final String headerValue;
     }
 
     // OCPP-related configuration
-    @Builder @Getter
+    @Builder
+    @Getter
     public static class Ocpp {
         private final boolean autoRegisterUnknownStations;
         private final String chargeBoxIdValidationRegex;

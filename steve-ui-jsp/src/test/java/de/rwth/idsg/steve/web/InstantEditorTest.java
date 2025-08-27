@@ -68,9 +68,8 @@ public class InstantEditorTest {
 
     private static Stream<Arguments> provideArgsForMvcTestToJava() {
         return Stream.of(
-            Arguments.of(null, null),
-            Arguments.of("", null),
-            Arguments.of("2024-06-26 14:30", LocalDateTime.of(2024, 6, 26, 14, 30, 0))
-        );
+                Arguments.of(null, null),
+                Arguments.of("", null),
+                Arguments.of("2024-06-26 14:30", LocalDateTime.of(2024, 6, 26, 14, 30, 0)));
     }
 }

@@ -50,8 +50,8 @@ public abstract class AbstractControllerTest {
 
     protected MockMvcTester buildMockMvc(StandaloneMockMvcBuilder builder) {
         return MockMvcTester.create(builder.setControllerAdvice(new ApiControllerAdvice())
-            .setMessageConverters(new MappingJackson2HttpMessageConverter(objectMapper))
-            .alwaysExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
-            .build());
+                .setMessageConverters(new MappingJackson2HttpMessageConverter(objectMapper))
+                .alwaysExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .build());
     }
 }

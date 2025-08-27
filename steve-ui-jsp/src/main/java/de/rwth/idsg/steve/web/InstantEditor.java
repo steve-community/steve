@@ -62,7 +62,9 @@ public class InstantEditor extends PropertyEditorSupport {
         if (Strings.isNullOrEmpty(text)) {
             setValue(null);
         } else {
-            setValue(LocalDateTime.parse(text, dateTimeFormatter).atZone(timeZone).toInstant());
+            setValue(LocalDateTime.parse(text, dateTimeFormatter)
+                    .atZone(timeZone)
+                    .toInstant());
         }
     }
 }

@@ -97,11 +97,12 @@ public class Serializer implements Consumer<CommunicationContext> {
             throw new SteveException("The payload of the outgoing call could not be converted to JSON", e);
         }
 
-        return ocppMapper.createArrayNode()
-                     .add(call.getMessageType().getTypeNr())
-                     .add(call.getMessageId())
-                     .add(call.getAction())
-                     .add(payloadNode);
+        return ocppMapper
+                .createArrayNode()
+                .add(call.getMessageType().getTypeNr())
+                .add(call.getMessageId())
+                .add(call.getAction())
+                .add(payloadNode);
     }
 
     /**
@@ -116,10 +117,11 @@ public class Serializer implements Consumer<CommunicationContext> {
             return handleError(ErrorFactory.payloadSerializeError(result.getMessageId(), e.getMessage()));
         }
 
-        return ocppMapper.createArrayNode()
-                     .add(result.getMessageType().getTypeNr())
-                     .add(result.getMessageId())
-                     .add(payloadNode);
+        return ocppMapper
+                .createArrayNode()
+                .add(result.getMessageType().getTypeNr())
+                .add(result.getMessageId())
+                .add(payloadNode);
     }
 
     /**
@@ -143,11 +145,12 @@ public class Serializer implements Consumer<CommunicationContext> {
             detailsNode.set("errorMsg", ocppMapper.getNodeFactory().textNode(error.toStringErrorDetails()));
         }
 
-        return ocppMapper.createArrayNode()
-                     .add(error.getMessageType().getTypeNr())
-                     .add(error.getMessageId())
-                     .add(error.getErrorCode().name())
-                     .add(description)
-                     .add(detailsNode);
+        return ocppMapper
+                .createArrayNode()
+                .add(error.getMessageType().getTypeNr())
+                .add(error.getMessageId())
+                .add(error.getErrorCode().name())
+                .add(description)
+                .add(detailsNode);
     }
 }

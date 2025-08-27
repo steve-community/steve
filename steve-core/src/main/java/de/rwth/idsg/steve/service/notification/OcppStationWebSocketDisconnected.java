@@ -23,5 +23,5 @@ import lombok.Data;
 @Data
 public class OcppStationWebSocketDisconnected {
 
-  private final String chargeBoxId;
+    private final String chargeBoxId;
 }

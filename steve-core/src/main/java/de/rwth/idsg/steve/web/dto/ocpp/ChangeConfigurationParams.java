@@ -24,9 +24,9 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
+import java.util.Objects;
 import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.NotNull;
-import java.util.Objects;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -40,8 +40,7 @@ public class ChangeConfigurationParams extends MultipleChargePointSelect {
 
     private String customConfKey;
 
-    @NotNull(message = "Key type is required")
-    private ConfigurationKeyType keyType = ConfigurationKeyType.PREDEFINED;
+    @NotNull(message = "Key type is required") private ConfigurationKeyType keyType = ConfigurationKeyType.PREDEFINED;
 
     // Disabled @NotBlank after https://github.com/steve-community/steve/issues/148
     // @NotBlank(message = "Value is required")
@@ -50,8 +49,7 @@ public class ChangeConfigurationParams extends MultipleChargePointSelect {
     // @Pattern(regexp = "\\S+", message = "Value cannot contain any whitespace")
     private String value;
 
-    @AssertTrue(message = "Custom Configuration Key cannot be left blank")
-    public boolean isValidCustom() {
+    @AssertTrue(message = "Custom Configuration Key cannot be left blank") public boolean isValidCustom() {
         if (keyType == ConfigurationKeyType.CUSTOM) {
             return !Strings.isNullOrEmpty(customConfKey);
         } else {
@@ -59,8 +57,7 @@ public class ChangeConfigurationParams extends MultipleChargePointSelect {
         }
     }
 
-    @AssertTrue(message = "Configuration Key is required")
-    public boolean isValidPredefined() {
+    @AssertTrue(message = "Configuration Key is required") public boolean isValidPredefined() {
         if (keyType == ConfigurationKeyType.PREDEFINED) {
             return confKey != null;
         } else {
@@ -97,7 +94,8 @@ public class ChangeConfigurationParams extends MultipleChargePointSelect {
         PREDEFINED("Predefined"),
         CUSTOM("Custom");
 
-        @Getter private final String value;
+        @Getter
+        private final String value;
 
         public static ConfigurationKeyType fromValue(String v) {
             for (ConfigurationKeyType c : ConfigurationKeyType.values()) {
@@ -108,5 +106,4 @@ public class ChangeConfigurationParams extends MultipleChargePointSelect {
             throw new IllegalArgumentException(v);
         }
     }
-
 }

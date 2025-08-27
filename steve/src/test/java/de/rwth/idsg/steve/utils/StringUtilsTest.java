@@ -44,13 +44,15 @@ public class StringUtilsTest {
 
     @Test
     public void testOperationName_ocpp15andSingle() {
-        var operationName = StringUtils.getOperationName(new CancelReservationTask(new CancelReservationParams(), null));
+        var operationName =
+                StringUtils.getOperationName(new CancelReservationTask(new CancelReservationParams(), null));
         assertThat(operationName).isEqualTo("Cancel Reservation");
     }
 
     @Test
     public void testOperationName_ocpp16() {
-        var operationName = StringUtils.getOperationName(new GetCompositeScheduleTask(new GetCompositeScheduleParams()));
+        var operationName =
+                StringUtils.getOperationName(new GetCompositeScheduleTask(new GetCompositeScheduleParams()));
         assertThat(operationName).isEqualTo("Get Composite Schedule");
     }
 

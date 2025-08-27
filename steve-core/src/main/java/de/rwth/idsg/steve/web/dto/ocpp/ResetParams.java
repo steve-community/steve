@@ -31,6 +31,5 @@ import jakarta.validation.constraints.NotNull;
 @Setter
 public class ResetParams extends MultipleChargePointSelect {
 
-    @NotNull(message = "Reset Type is required")
-    private ResetType resetType;
+    @NotNull(message = "Reset Type is required") private ResetType resetType;
 }

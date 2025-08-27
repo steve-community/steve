@@ -33,9 +33,8 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
-import jakarta.servlet.http.HttpServletRequest;
-
 import java.time.Instant;
+import jakarta.servlet.http.HttpServletRequest;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -69,7 +68,8 @@ public class ApiControllerAdvice {
 
     @ExceptionHandler(SteveException.AlreadyExists.class)
     @ResponseStatus(value = HttpStatus.UNPROCESSABLE_ENTITY)
-    public ApiErrorResponse handleAlreadyExistsException(HttpServletRequest req, SteveException.AlreadyExists exception) {
+    public ApiErrorResponse handleAlreadyExistsException(
+            HttpServletRequest req, SteveException.AlreadyExists exception) {
         String url = req.getRequestURL().toString();
         log.error("Request: {} raised following exception.", url, exception);
         return createResponse(url, HttpStatus.UNPROCESSABLE_ENTITY, exception.getMessage());
@@ -85,7 +85,8 @@ public class ApiControllerAdvice {
 
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
     @ResponseStatus(value = HttpStatus.BAD_REQUEST)
-    public ApiErrorResponse handleMethodArgumentTypeMismatchException(HttpServletRequest req, MethodArgumentTypeMismatchException exception) {
+    public ApiErrorResponse handleMethodArgumentTypeMismatchException(
+            HttpServletRequest req, MethodArgumentTypeMismatchException exception) {
         String url = req.getRequestURL().toString();
         log.error("Request: {} raised following exception.", url, exception);
         return createResponse(url, HttpStatus.BAD_REQUEST, exception.getMessage());

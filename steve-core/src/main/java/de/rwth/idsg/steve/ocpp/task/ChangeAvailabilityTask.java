@@ -43,21 +43,24 @@ public class ChangeAvailabilityTask extends CommunicationTask<ChangeAvailability
     public ocpp.cp._2010._08.ChangeAvailabilityRequest getOcpp12Request() {
         return new ocpp.cp._2010._08.ChangeAvailabilityRequest()
                 .withConnectorId(params.getConnectorId())
-                .withType(ocpp.cp._2010._08.AvailabilityType.fromValue(params.getAvailType().value()));
+                .withType(ocpp.cp._2010._08.AvailabilityType.fromValue(
+                        params.getAvailType().value()));
     }
 
     @Override
     public ocpp.cp._2012._06.ChangeAvailabilityRequest getOcpp15Request() {
         return new ocpp.cp._2012._06.ChangeAvailabilityRequest()
                 .withConnectorId(params.getConnectorId())
-                .withType(ocpp.cp._2012._06.AvailabilityType.fromValue(params.getAvailType().value()));
+                .withType(ocpp.cp._2012._06.AvailabilityType.fromValue(
+                        params.getAvailType().value()));
     }
 
     @Override
     public ocpp.cp._2015._10.ChangeAvailabilityRequest getOcpp16Request() {
         return new ocpp.cp._2015._10.ChangeAvailabilityRequest()
                 .withConnectorId(params.getConnectorId())
-                .withType(ocpp.cp._2015._10.AvailabilityType.fromValue(params.getAvailType().value()));
+                .withType(ocpp.cp._2015._10.AvailabilityType.fromValue(
+                        params.getAvailType().value()));
     }
 
     @Override

@@ -38,15 +38,20 @@ public final class OcppJsonStatus {
     @JsonIgnore
     @Schema(description = "Charge Box Pk", hidden = true)
     private final int chargeBoxPk;
+
     @Schema(description = "Charge Box Id")
     private final String chargeBoxId;
+
     @JsonIgnore
     @Schema(description = "Connected since", hidden = true)
     private final String connectedSince;
+
     @Schema(description = "Duration of the Connection")
     private final String connectionDuration;
+
     @Schema(description = "Ocpp version")
     private final OcppVersion version;
+
     @Schema(description = "Connected since (ISO-8601 timestamp)")
     private final Instant connectedSinceDT;
 }

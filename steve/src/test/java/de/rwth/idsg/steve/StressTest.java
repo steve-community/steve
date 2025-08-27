@@ -89,7 +89,8 @@ public abstract class StressTest {
     }
 
     protected static MeterValue createMeterValue(int val) {
-        return new MeterValue().withTimestamp(OffsetDateTime.now())
-                               .withSampledValue(new SampledValue().withValue(Integer.toString(val)));
+        return new MeterValue()
+                .withTimestamp(OffsetDateTime.now())
+                .withSampledValue(new SampledValue().withValue(Integer.toString(val)));
     }
 }

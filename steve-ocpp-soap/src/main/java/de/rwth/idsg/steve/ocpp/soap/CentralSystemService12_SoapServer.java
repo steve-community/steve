@@ -47,13 +47,13 @@ import ocpp.cs._2010._08.StopTransactionRequest;
 import ocpp.cs._2010._08.StopTransactionResponse;
 import org.springframework.stereotype.Service;
 
+import java.util.concurrent.Future;
 import jakarta.jws.WebService;
 import jakarta.xml.ws.AsyncHandler;
 import jakarta.xml.ws.BindingType;
 import jakarta.xml.ws.Response;
 import jakarta.xml.ws.soap.Addressing;
 import jakarta.xml.ws.soap.SOAPBinding;
-import java.util.concurrent.Future;
 
 /**
  * Service implementation of OCPP V1.2
@@ -74,98 +74,97 @@ public class CentralSystemService12_SoapServer implements CentralSystemService {
 
     private final CentralSystemService16_Service service;
 
-    public BootNotificationResponse bootNotificationWithTransport(BootNotificationRequest parameters,
-                                                                  String chargeBoxIdentity, OcppProtocol protocol) {
+    public BootNotificationResponse bootNotificationWithTransport(
+            BootNotificationRequest parameters, String chargeBoxIdentity, OcppProtocol protocol) {
         if (protocol.getVersion() != OcppVersion.V_12) {
             throw new IllegalArgumentException("Unexpected OCPP version: " + protocol.getVersion());
         }
 
         return Convert.start(parameters, Server12to15Impl.SINGLETON::convertRequest)
-                      .andThen(Server15to16Impl.SINGLETON::convertRequest)
-                      .andThen(req -> service.bootNotification(req, chargeBoxIdentity, protocol))
-                      .andThen(Server15to16Impl.SINGLETON::convertResponse)
-                      .andThen(Server12to15Impl.SINGLETON::convertResponse)
-                      .apply(parameters);
+                .andThen(Server15to16Impl.SINGLETON::convertRequest)
+                .andThen(req -> service.bootNotification(req, chargeBoxIdentity, protocol))
+                .andThen(Server15to16Impl.SINGLETON::convertResponse)
+                .andThen(Server12to15Impl.SINGLETON::convertResponse)
+                .apply(parameters);
     }
 
     public BootNotificationResponse bootNotification(BootNotificationRequest parameters, String chargeBoxIdentity) {
         return this.bootNotificationWithTransport(parameters, chargeBoxIdentity, OcppProtocol.V_12_SOAP);
     }
 
-    public FirmwareStatusNotificationResponse firmwareStatusNotification(FirmwareStatusNotificationRequest parameters,
-                                                                         String chargeBoxIdentity) {
+    public FirmwareStatusNotificationResponse firmwareStatusNotification(
+            FirmwareStatusNotificationRequest parameters, String chargeBoxIdentity) {
         return Convert.start(parameters, Server12to15Impl.SINGLETON::convertRequest)
-                      .andThen(Server15to16Impl.SINGLETON::convertRequest)
-                      .andThen(req -> service.firmwareStatusNotification(req, chargeBoxIdentity))
-                      .andThen(Server15to16Impl.SINGLETON::convertResponse)
-                      .andThen(Server12to15Impl.SINGLETON::convertResponse)
-                      .apply(parameters);
-
+                .andThen(Server15to16Impl.SINGLETON::convertRequest)
+                .andThen(req -> service.firmwareStatusNotification(req, chargeBoxIdentity))
+                .andThen(Server15to16Impl.SINGLETON::convertResponse)
+                .andThen(Server12to15Impl.SINGLETON::convertResponse)
+                .apply(parameters);
     }
 
     public StatusNotificationResponse statusNotification(
             StatusNotificationRequest parameters, String chargeBoxIdentity) {
         return Convert.start(parameters, Server12to15Impl.SINGLETON::convertRequest)
-                      .andThen(Server15to16Impl.SINGLETON::convertRequest)
-                      .andThen(req -> service.statusNotification(req, chargeBoxIdentity))
-                      .andThen(Server15to16Impl.SINGLETON::convertResponse)
-                      .andThen(Server12to15Impl.SINGLETON::convertResponse)
-                      .apply(parameters);
+                .andThen(Server15to16Impl.SINGLETON::convertRequest)
+                .andThen(req -> service.statusNotification(req, chargeBoxIdentity))
+                .andThen(Server15to16Impl.SINGLETON::convertResponse)
+                .andThen(Server12to15Impl.SINGLETON::convertResponse)
+                .apply(parameters);
     }
 
     public MeterValuesResponse meterValues(MeterValuesRequest parameters, String chargeBoxIdentity) {
         return Convert.start(parameters, Server12to15Impl.SINGLETON::convertRequest)
-                      .andThen(Server15to16Impl.SINGLETON::convertRequest)
-                      .andThen(req -> service.meterValues(req, chargeBoxIdentity))
-                      .andThen(Server15to16Impl.SINGLETON::convertResponse)
-                      .andThen(Server12to15Impl.SINGLETON::convertResponse)
-                      .apply(parameters);
+                .andThen(Server15to16Impl.SINGLETON::convertRequest)
+                .andThen(req -> service.meterValues(req, chargeBoxIdentity))
+                .andThen(Server15to16Impl.SINGLETON::convertResponse)
+                .andThen(Server12to15Impl.SINGLETON::convertResponse)
+                .apply(parameters);
     }
 
     public DiagnosticsStatusNotificationResponse diagnosticsStatusNotification(
             DiagnosticsStatusNotificationRequest parameters, String chargeBoxIdentity) {
         return Convert.start(parameters, Server12to15Impl.SINGLETON::convertRequest)
-                      .andThen(Server15to16Impl.SINGLETON::convertRequest)
-                      .andThen(req -> service.diagnosticsStatusNotification(req, chargeBoxIdentity))
-                      .andThen(Server15to16Impl.SINGLETON::convertResponse)
-                      .andThen(Server12to15Impl.SINGLETON::convertResponse)
-                      .apply(parameters);
+                .andThen(Server15to16Impl.SINGLETON::convertRequest)
+                .andThen(req -> service.diagnosticsStatusNotification(req, chargeBoxIdentity))
+                .andThen(Server15to16Impl.SINGLETON::convertResponse)
+                .andThen(Server12to15Impl.SINGLETON::convertResponse)
+                .apply(parameters);
     }
 
     public StartTransactionResponse startTransaction(StartTransactionRequest parameters, String chargeBoxIdentity) {
         return Convert.start(parameters, Server12to15Impl.SINGLETON::convertRequest)
-                      .andThen(Server15to16Impl.SINGLETON::convertRequest)
-                      .andThen(req -> service.startTransaction(req, chargeBoxIdentity))
-                      .andThen(Server15to16Impl.SINGLETON::convertResponse)
-                      .andThen(Server12to15Impl.SINGLETON::convertResponse)
-                      .apply(parameters);
+                .andThen(Server15to16Impl.SINGLETON::convertRequest)
+                .andThen(req -> service.startTransaction(req, chargeBoxIdentity))
+                .andThen(Server15to16Impl.SINGLETON::convertResponse)
+                .andThen(Server12to15Impl.SINGLETON::convertResponse)
+                .apply(parameters);
     }
 
     public StopTransactionResponse stopTransaction(StopTransactionRequest parameters, String chargeBoxIdentity) {
         return Convert.start(parameters, Server12to15Impl.SINGLETON::convertRequest)
-                      .andThen(Server15to16Impl.SINGLETON::convertRequest)
-                      .andThen(req -> service.stopTransaction(req, chargeBoxIdentity))
-                      .andThen(Server15to16Impl.SINGLETON::convertResponse)
-                      .andThen(Server12to15Impl.SINGLETON::convertResponse)
-                      .apply(parameters);
+                .andThen(Server15to16Impl.SINGLETON::convertRequest)
+                .andThen(req -> service.stopTransaction(req, chargeBoxIdentity))
+                .andThen(Server15to16Impl.SINGLETON::convertResponse)
+                .andThen(Server12to15Impl.SINGLETON::convertResponse)
+                .apply(parameters);
     }
 
     public HeartbeatResponse heartbeat(HeartbeatRequest parameters, String chargeBoxIdentity) {
         return Convert.start(parameters, Server12to15Impl.SINGLETON::convertRequest)
-                      .andThen(Server15to16Impl.SINGLETON::convertRequest)
-                      .andThen(req -> service.heartbeat(req, chargeBoxIdentity))
-                      .andThen(Server15to16Impl.SINGLETON::convertResponse)
-                      .andThen(Server12to15Impl.SINGLETON::convertResponse)
-                      .apply(parameters);
+                .andThen(Server15to16Impl.SINGLETON::convertRequest)
+                .andThen(req -> service.heartbeat(req, chargeBoxIdentity))
+                .andThen(Server15to16Impl.SINGLETON::convertResponse)
+                .andThen(Server12to15Impl.SINGLETON::convertResponse)
+                .apply(parameters);
     }
 
     public AuthorizeResponse authorize(AuthorizeRequest parameters, String chargeBoxIdentity) {
         return Convert.start(parameters, Server12to15Impl.SINGLETON::convertRequest)
-                      .andThen(Server15to16Impl.SINGLETON::convertRequest)
-                      .andThen(req -> service.authorize(req, chargeBoxIdentity))
-                      .andThen(Server15to16Impl.SINGLETON::convertResponse)
-                      .andThen(Server12to15Impl.SINGLETON::convertResponse)
-                      .apply(parameters);
+                .andThen(Server15to16Impl.SINGLETON::convertRequest)
+                .andThen(req -> service.authorize(req, chargeBoxIdentity))
+                .andThen(Server15to16Impl.SINGLETON::convertResponse)
+                .andThen(Server12to15Impl.SINGLETON::convertResponse)
+                .apply(parameters);
     }
 
     // -------------------------------------------------------------------------
@@ -179,8 +178,10 @@ public class CentralSystemService12_SoapServer implements CentralSystemService {
     }
 
     @Override
-    public Future<?> bootNotificationAsync(BootNotificationRequest parameters, String chargeBoxIdentity,
-                                           AsyncHandler<BootNotificationResponse> asyncHandler) {
+    public Future<?> bootNotificationAsync(
+            BootNotificationRequest parameters,
+            String chargeBoxIdentity,
+            AsyncHandler<BootNotificationResponse> asyncHandler) {
         return null;
     }
 
@@ -192,7 +193,8 @@ public class CentralSystemService12_SoapServer implements CentralSystemService {
 
     @Override
     public Future<?> firmwareStatusNotificationAsync(
-            FirmwareStatusNotificationRequest parameters, String chargeBoxIdentity,
+            FirmwareStatusNotificationRequest parameters,
+            String chargeBoxIdentity,
             AsyncHandler<FirmwareStatusNotificationResponse> asyncHandler) {
         return null;
     }
@@ -203,8 +205,8 @@ public class CentralSystemService12_SoapServer implements CentralSystemService {
     }
 
     @Override
-    public Future<?> meterValuesAsync(MeterValuesRequest parameters, String chargeBoxIdentity,
-                                      AsyncHandler<MeterValuesResponse> asyncHandler) {
+    public Future<?> meterValuesAsync(
+            MeterValuesRequest parameters, String chargeBoxIdentity, AsyncHandler<MeterValuesResponse> asyncHandler) {
         return null;
     }
 
@@ -216,7 +218,8 @@ public class CentralSystemService12_SoapServer implements CentralSystemService {
 
     @Override
     public Future<?> diagnosticsStatusNotificationAsync(
-            DiagnosticsStatusNotificationRequest parameters, String chargeBoxIdentity,
+            DiagnosticsStatusNotificationRequest parameters,
+            String chargeBoxIdentity,
             AsyncHandler<DiagnosticsStatusNotificationResponse> asyncHandler) {
         return null;
     }
@@ -228,20 +231,24 @@ public class CentralSystemService12_SoapServer implements CentralSystemService {
     }
 
     @Override
-    public Future<?> statusNotificationAsync(StatusNotificationRequest parameters, String chargeBoxIdentity,
-                                             AsyncHandler<StatusNotificationResponse> asyncHandler) {
+    public Future<?> statusNotificationAsync(
+            StatusNotificationRequest parameters,
+            String chargeBoxIdentity,
+            AsyncHandler<StatusNotificationResponse> asyncHandler) {
         return null;
     }
 
     @Override
-    public Response<StopTransactionResponse> stopTransactionAsync(StopTransactionRequest parameters,
-                                                                  String chargeBoxIdentity) {
+    public Response<StopTransactionResponse> stopTransactionAsync(
+            StopTransactionRequest parameters, String chargeBoxIdentity) {
         return null;
     }
 
     @Override
-    public Future<?> stopTransactionAsync(StopTransactionRequest parameters, String chargeBoxIdentity,
-                                          AsyncHandler<StopTransactionResponse> asyncHandler) {
+    public Future<?> stopTransactionAsync(
+            StopTransactionRequest parameters,
+            String chargeBoxIdentity,
+            AsyncHandler<StopTransactionResponse> asyncHandler) {
         return null;
     }
 
@@ -251,8 +258,8 @@ public class CentralSystemService12_SoapServer implements CentralSystemService {
     }
 
     @Override
-    public Future<?> authorizeAsync(AuthorizeRequest parameters, String chargeBoxIdentity,
-                                    AsyncHandler<AuthorizeResponse> asyncHandler) {
+    public Future<?> authorizeAsync(
+            AuthorizeRequest parameters, String chargeBoxIdentity, AsyncHandler<AuthorizeResponse> asyncHandler) {
         return null;
     }
 
@@ -262,8 +269,8 @@ public class CentralSystemService12_SoapServer implements CentralSystemService {
     }
 
     @Override
-    public Future<?> heartbeatAsync(HeartbeatRequest parameters, String chargeBoxIdentity,
-                                    AsyncHandler<HeartbeatResponse> asyncHandler) {
+    public Future<?> heartbeatAsync(
+            HeartbeatRequest parameters, String chargeBoxIdentity, AsyncHandler<HeartbeatResponse> asyncHandler) {
         return null;
     }
 
@@ -274,8 +281,10 @@ public class CentralSystemService12_SoapServer implements CentralSystemService {
     }
 
     @Override
-    public Future<?> startTransactionAsync(StartTransactionRequest parameters, String chargeBoxIdentity,
-                                           AsyncHandler<StartTransactionResponse> asyncHandler) {
+    public Future<?> startTransactionAsync(
+            StartTransactionRequest parameters,
+            String chargeBoxIdentity,
+            AsyncHandler<StartTransactionResponse> asyncHandler) {
         return null;
     }
 }

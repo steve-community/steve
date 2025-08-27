@@ -37,7 +37,7 @@ public enum OcppVersion {
     private final String value;
 
     public static OcppVersion fromValue(String v) {
-        for (OcppVersion c: OcppVersion.values()) {
+        for (OcppVersion c : OcppVersion.values()) {
             if (c.getValue().equals(v)) {
                 return c;
             }

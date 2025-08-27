@@ -54,7 +54,8 @@ public final class ChargingProfileDetailsMapper {
         form.setStackLevel(profile.getStackLevel());
         form.setChargingProfilePurpose(ChargingProfilePurposeType.fromValue(profile.getChargingProfilePurpose()));
         form.setChargingProfileKind(ChargingProfileKindType.fromValue(profile.getChargingProfileKind()));
-        form.setRecurrencyKind(profile.getRecurrencyKind() == null ? null : RecurrencyKindType.fromValue(profile.getRecurrencyKind()));
+        form.setRecurrencyKind(
+                profile.getRecurrencyKind() == null ? null : RecurrencyKindType.fromValue(profile.getRecurrencyKind()));
         form.setValidFrom(toInstant(profile.getValidFrom()));
         form.setValidTo(toInstant(profile.getValidTo()));
         form.setDurationInSeconds(profile.getDurationInSeconds());

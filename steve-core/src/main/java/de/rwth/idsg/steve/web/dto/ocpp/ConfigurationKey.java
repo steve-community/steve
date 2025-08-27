@@ -19,6 +19,7 @@
 package de.rwth.idsg.steve.web.dto.ocpp;
 
 import de.rwth.idsg.steve.ocpp.OcppVersion;
+
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
@@ -127,7 +128,6 @@ public enum ConfigurationKey {
     // In OCPP 1.6 some Configuration Keys are Read-Only
     public static final Map<String, String> OCPP_16_MAP_R = asMap(OcppVersion.V_16, R);
     public static final Map<String, String> OCPP_16_MAP_RW = asMap(OcppVersion.V_16, RW);
-
 
     ConfigurationKey(String valueType, ConfigurationKeyReadWrite rw, Set<OcppVersion> versions) {
         this.value = this.name();

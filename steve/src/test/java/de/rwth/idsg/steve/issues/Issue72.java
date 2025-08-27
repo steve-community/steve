@@ -18,9 +18,9 @@
  */
 package de.rwth.idsg.steve.issues;
 
-import de.rwth.idsg.steve.utils.SteveConfigurationReader;
 import de.rwth.idsg.steve.StressTest;
 import de.rwth.idsg.steve.utils.Helpers;
+import de.rwth.idsg.steve.utils.SteveConfigurationReader;
 import de.rwth.idsg.steve.utils.StressTester;
 import de.rwth.idsg.steve.utils.__DatabasePreparer__;
 import lombok.RequiredArgsConstructor;
@@ -70,21 +70,22 @@ public class Issue72 extends StressTest {
         var meterStart = 444;
         var meterStop = 99999;
 
-        var boot = getForOcpp16(path).bootNotification(
-                new BootNotificationRequest()
-                        .withChargePointVendor(getRandomString())
-                        .withChargePointModel(getRandomString()),
-                chargeBoxId);
+        var boot = getForOcpp16(path)
+                .bootNotification(
+                        new BootNotificationRequest()
+                                .withChargePointVendor(getRandomString())
+                                .withChargePointModel(getRandomString()),
+                        chargeBoxId);
         assertThat(boot.getStatus()).isEqualTo(RegistrationStatus.ACCEPTED);
 
-        var start = getForOcpp16(path).startTransaction(
-                new StartTransactionRequest()
-                        .withConnectorId(connectorId)
-                        .withIdTag(idTag)
-                        .withTimestamp(startDateTime)
-                        .withMeterStart(meterStart),
-                chargeBoxId
-        );
+        var start = getForOcpp16(path)
+                .startTransaction(
+                        new StartTransactionRequest()
+                                .withConnectorId(connectorId)
+                                .withIdTag(idTag)
+                                .withTimestamp(startDateTime)
+                                .withMeterStart(meterStart),
+                        chargeBoxId);
         assertThat(start).isNotNull();
 
         var transactionId = start.getTransactionId();
@@ -100,36 +101,34 @@ public class Issue72 extends StressTest {
 
             @Override
             public void toRepeat() {
-                var mvr = threadLocalClient.get().meterValues(
-                        new MeterValuesRequest()
-                                .withConnectorId(connectorId)
-                                .withTransactionId(transactionId)
-                                .withMeterValue(
-                                        new MeterValue()
+                var mvr = threadLocalClient
+                        .get()
+                        .meterValues(
+                                new MeterValuesRequest()
+                                        .withConnectorId(connectorId)
+                                        .withTransactionId(transactionId)
+                                        .withMeterValue(new MeterValue()
                                                 .withTimestamp(stopDateTime)
-                                                .withSampledValue(
-                                                        new SampledValue()
-                                                                .withValue("555")
-                                                                .withUnit(UnitOfMeasure.WH))),
-                        chargeBoxId
-                );
+                                                .withSampledValue(new SampledValue()
+                                                        .withValue("555")
+                                                        .withUnit(UnitOfMeasure.WH))),
+                                chargeBoxId);
                 assertThat(mvr).isNotNull();
 
-                var stop = threadLocalClient.get().stopTransaction(
-                        new StopTransactionRequest()
-                                .withTransactionId(transactionId)
-                                .withTimestamp(stopDateTime)
-                                .withIdTag(idTag)
-                                .withMeterStop(meterStop),
-                        chargeBoxId
-                );
+                var stop = threadLocalClient
+                        .get()
+                        .stopTransaction(
+                                new StopTransactionRequest()
+                                        .withTransactionId(transactionId)
+                                        .withTimestamp(stopDateTime)
+                                        .withIdTag(idTag)
+                                        .withMeterStop(meterStop),
+                                chargeBoxId);
                 assertThat(stop).isNotNull();
             }
 
             @Override
-            public void afterRepeat() {
-
-            }
+            public void afterRepeat() {}
         };
 
         var tester = new StressTester(THREAD_COUNT, REPEAT_COUNT_PER_THREAD);

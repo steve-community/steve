@@ -19,8 +19,8 @@
 package de.rwth.idsg.steve.ocpp.ws;
 
 import com.google.common.base.Strings;
-import de.rwth.idsg.steve.config.OcppWebSocketConfiguration;
 import de.rwth.idsg.steve.config.DelegatingTaskScheduler;
+import de.rwth.idsg.steve.config.OcppWebSocketConfiguration;
 import de.rwth.idsg.steve.ocpp.OcppTransport;
 import de.rwth.idsg.steve.ocpp.OcppVersion;
 import de.rwth.idsg.steve.ocpp.ws.data.CommunicationContext;
@@ -74,8 +74,10 @@ public abstract class AbstractWebSocketEndpoint extends ConcurrentWebSocketHandl
     public void init(IncomingPipeline pipeline) {
         this.pipeline = pipeline;
 
-        connectedCallbackList.add((chargeBoxId) -> applicationEventPublisher.publishEvent(new OcppStationWebSocketConnected(chargeBoxId)));
-        disconnectedCallbackList.add((chargeBoxId) -> applicationEventPublisher.publishEvent(new OcppStationWebSocketDisconnected(chargeBoxId)));
+        connectedCallbackList.add((chargeBoxId) ->
+                applicationEventPublisher.publishEvent(new OcppStationWebSocketConnected(chargeBoxId)));
+        disconnectedCallbackList.add((chargeBoxId) ->
+                applicationEventPublisher.publishEvent(new OcppStationWebSocketDisconnected(chargeBoxId)));
     }
 
     @Override
@@ -134,8 +136,7 @@ public abstract class AbstractWebSocketEndpoint extends ConcurrentWebSocketHandl
         ScheduledFuture pingSchedule = asyncTaskScheduler.scheduleAtFixedRate(
                 new PingTask(chargeBoxId, session),
                 Instant.now().plus(OcppWebSocketConfiguration.PING_INTERVAL),
-                OcppWebSocketConfiguration.PING_INTERVAL
-        );
+                OcppWebSocketConfiguration.PING_INTERVAL);
 
         futureResponseContextStore.addSession(session);
 
@@ -216,5 +217,4 @@ public abstract class AbstractWebSocketEndpoint extends ConcurrentWebSocketHandl
     public WebSocketSession getSession(String chargeBoxId) {
         return sessionContextStore.getSession(chargeBoxId);
     }
-
 }

@@ -34,8 +34,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
-import jakarta.validation.Valid;
 import java.util.Collections;
+import jakarta.validation.Valid;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -103,8 +103,8 @@ public class OcppTagsController {
     }
 
     @RequestMapping(params = "add", value = ADD_SINGLE_PATH, method = RequestMethod.POST)
-    public String addSinglePost(@Valid @ModelAttribute("ocppTagForm") OcppTagForm ocppTagForm,
-                                BindingResult result, Model model) {
+    public String addSinglePost(
+            @Valid @ModelAttribute("ocppTagForm") OcppTagForm ocppTagForm, BindingResult result, Model model) {
         if (result.hasErrors()) {
             setTags(model);
             model.addAttribute("batchInsertForm", new OcppTagBatchInsertForm());
@@ -116,8 +116,8 @@ public class OcppTagsController {
     }
 
     @RequestMapping(value = ADD_BATCH_PATH, method = RequestMethod.POST)
-    public String addBatchPost(@Valid @ModelAttribute("batchInsertForm") OcppTagBatchInsertForm form,
-                               BindingResult result, Model model) {
+    public String addBatchPost(
+            @Valid @ModelAttribute("batchInsertForm") OcppTagBatchInsertForm form, BindingResult result, Model model) {
         if (result.hasErrors()) {
             setTags(model);
             model.addAttribute("ocppTagForm", new OcppTagForm());
@@ -129,8 +129,8 @@ public class OcppTagsController {
     }
 
     @RequestMapping(params = "update", value = UPDATE_PATH, method = RequestMethod.POST)
-    public String update(@Valid @ModelAttribute("ocppTagForm") OcppTagForm ocppTagForm,
-                         BindingResult result, Model model) {
+    public String update(
+            @Valid @ModelAttribute("ocppTagForm") OcppTagForm ocppTagForm, BindingResult result, Model model) {
         if (result.hasErrors()) {
             setTags(model);
             return "data-man/ocppTagDetails";
@@ -187,5 +187,4 @@ public class OcppTagsController {
     protected String toOverview() {
         return "redirect:/manager/ocppTags";
     }
-
 }

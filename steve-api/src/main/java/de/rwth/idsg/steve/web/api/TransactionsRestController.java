@@ -31,19 +31,20 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import jakarta.validation.Valid;
 import java.util.List;
+import jakarta.validation.Valid;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 13.09.2022
  */
-@Tag(name = "transactions",
-    description = """
+@Tag(
+        name = "transactions",
+        description =
+                """
         Operations related to querying transactions.
         A transaction represents a charging session at a charge box (i.e. charging station. The notions 'charge box' and 'charging station' are being used interchangeably).
-        """
-)
+        """)
 @RestController
 @RequestMapping(value = "/api/v1/transactions", produces = MediaType.APPLICATION_JSON_VALUE)
 @RequiredArgsConstructor
@@ -51,7 +52,9 @@ public class TransactionsRestController {
 
     private final TransactionRepository transactionRepository;
 
-    @Operation(description = """
+    @Operation(
+            description =
+                    """
         Returns a list of transactions based on the query parameters.
         The query parameters can be used to filter the transactions.
         """)

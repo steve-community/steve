@@ -23,6 +23,9 @@ import org.jetbrains.annotations.Nullable;
 
 public interface AuthTagService {
 
-    IdTagInfo decideStatus(String idTag, boolean isStartTransactionReqContext,
-                           @Nullable String chargeBoxId, @Nullable Integer connectorId);
+    IdTagInfo decideStatus(
+            String idTag,
+            boolean isStartTransactionReqContext,
+            @Nullable String chargeBoxId,
+            @Nullable Integer connectorId);
 }

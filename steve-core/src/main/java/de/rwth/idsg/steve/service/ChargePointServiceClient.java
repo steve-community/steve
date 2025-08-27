@@ -96,8 +96,7 @@ public class ChargePointServiceClient {
     // -------------------------------------------------------------------------
 
     @SafeVarargs
-    public final int changeAvailability(ChangeAvailabilityParams params,
-                                        OcppCallback<String>... callbacks) {
+    public final int changeAvailability(ChangeAvailabilityParams params, OcppCallback<String>... callbacks) {
         ChangeAvailabilityTask task = new ChangeAvailabilityTask(params);
 
         for (var callback : callbacks) {
@@ -105,15 +104,14 @@ public class ChargePointServiceClient {
         }
 
         BackgroundService.with(asyncTaskExecutor)
-            .forEach(task.getParams().getChargePointSelectList())
-            .execute(c -> invoker.changeAvailability(c, task));
+                .forEach(task.getParams().getChargePointSelectList())
+                .execute(c -> invoker.changeAvailability(c, task));
 
         return taskStore.add(task);
     }
 
     @SafeVarargs
-    public final int changeConfiguration(ChangeConfigurationParams params,
-                                         OcppCallback<String>... callbacks) {
+    public final int changeConfiguration(ChangeConfigurationParams params, OcppCallback<String>... callbacks) {
         ChangeConfigurationTask task = new ChangeConfigurationTask(params);
 
         for (var callback : callbacks) {
@@ -121,15 +119,14 @@ public class ChargePointServiceClient {
         }
 
         BackgroundService.with(asyncTaskExecutor)
-            .forEach(task.getParams().getChargePointSelectList())
-            .execute(c -> invoker.changeConfiguration(c, task));
+                .forEach(task.getParams().getChargePointSelectList())
+                .execute(c -> invoker.changeConfiguration(c, task));
 
         return taskStore.add(task);
     }
 
     @SafeVarargs
-    public final int clearCache(MultipleChargePointSelect params,
-                                OcppCallback<String>... callbacks) {
+    public final int clearCache(MultipleChargePointSelect params, OcppCallback<String>... callbacks) {
         ClearCacheTask task = new ClearCacheTask(params);
 
         for (var callback : callbacks) {
@@ -137,15 +134,14 @@ public class ChargePointServiceClient {
         }
 
         BackgroundService.with(asyncTaskExecutor)
-            .forEach(task.getParams().getChargePointSelectList())
-            .execute(c -> invoker.clearCache(c, task));
+                .forEach(task.getParams().getChargePointSelectList())
+                .execute(c -> invoker.clearCache(c, task));
 
         return taskStore.add(task);
     }
 
     @SafeVarargs
-    public final int getDiagnostics(GetDiagnosticsParams params,
-                                    OcppCallback<String>... callbacks) {
+    public final int getDiagnostics(GetDiagnosticsParams params, OcppCallback<String>... callbacks) {
         GetDiagnosticsTask task = new GetDiagnosticsTask(params);
 
         for (var callback : callbacks) {
@@ -153,15 +149,14 @@ public class ChargePointServiceClient {
         }
 
         BackgroundService.with(asyncTaskExecutor)
-            .forEach(task.getParams().getChargePointSelectList())
-            .execute(c -> invoker.getDiagnostics(c, task));
+                .forEach(task.getParams().getChargePointSelectList())
+                .execute(c -> invoker.getDiagnostics(c, task));
 
         return taskStore.add(task);
     }
 
     @SafeVarargs
-    public final int reset(ResetParams params,
-                           OcppCallback<String>... callbacks) {
+    public final int reset(ResetParams params, OcppCallback<String>... callbacks) {
         ResetTask task = new ResetTask(params);
 
         for (var callback : callbacks) {
@@ -169,15 +164,14 @@ public class ChargePointServiceClient {
         }
 
         BackgroundService.with(asyncTaskExecutor)
-            .forEach(task.getParams().getChargePointSelectList())
-            .execute(c -> invoker.reset(c, task));
+                .forEach(task.getParams().getChargePointSelectList())
+                .execute(c -> invoker.reset(c, task));
 
         return taskStore.add(task);
     }
 
     @SafeVarargs
-    public final int updateFirmware(UpdateFirmwareParams params,
-                                    OcppCallback<String>... callbacks) {
+    public final int updateFirmware(UpdateFirmwareParams params, OcppCallback<String>... callbacks) {
         UpdateFirmwareTask task = new UpdateFirmwareTask(params);
 
         for (var callback : callbacks) {
@@ -185,8 +179,8 @@ public class ChargePointServiceClient {
         }
 
         BackgroundService.with(asyncTaskExecutor)
-            .forEach(task.getParams().getChargePointSelectList())
-            .execute(c -> invoker.updateFirmware(c, task));
+                .forEach(task.getParams().getChargePointSelectList())
+                .execute(c -> invoker.updateFirmware(c, task));
 
         return taskStore.add(task);
     }
@@ -195,84 +189,78 @@ public class ChargePointServiceClient {
     // Single Execution - since OCPP 1.2
     // -------------------------------------------------------------------------
     @SafeVarargs
-    public final int remoteStartTransaction(RemoteStartTransactionParams params,
-                                            OcppCallback<String>... callbacks) {
+    public final int remoteStartTransaction(RemoteStartTransactionParams params, OcppCallback<String>... callbacks) {
         RemoteStartTransactionTask task = new RemoteStartTransactionTask(params);
         return addRemoteStartTask(task, callbacks);
     }
+
     @SafeVarargs
-    public final int remoteStartTransaction(RemoteStartTransactionParams params, String caller,
-                                            OcppCallback<String>... callbacks) {
+    public final int remoteStartTransaction(
+            RemoteStartTransactionParams params, String caller, OcppCallback<String>... callbacks) {
         RemoteStartTransactionTask task = new RemoteStartTransactionTask(params, caller);
         return addRemoteStartTask(task, callbacks);
     }
 
     @SafeVarargs
-    private int addRemoteStartTask(RemoteStartTransactionTask task,
-                                            OcppCallback<String>... callbacks) {
+    private int addRemoteStartTask(RemoteStartTransactionTask task, OcppCallback<String>... callbacks) {
         for (var callback : callbacks) {
             task.addCallback(callback);
         }
 
         BackgroundService.with(asyncTaskExecutor)
-            .forFirst(task.getParams().getChargePointSelectList())
-            .execute(c -> invoker.remoteStartTransaction(c, task));
+                .forFirst(task.getParams().getChargePointSelectList())
+                .execute(c -> invoker.remoteStartTransaction(c, task));
 
         return taskStore.add(task);
     }
 
     @SafeVarargs
-    public final int remoteStopTransaction(RemoteStopTransactionParams params,
-                                           OcppCallback<String>... callbacks) {
+    public final int remoteStopTransaction(RemoteStopTransactionParams params, OcppCallback<String>... callbacks) {
         RemoteStopTransactionTask task = new RemoteStopTransactionTask(params);
         return addRemoteStopTask(task, callbacks);
     }
 
     @SafeVarargs
-    public final int remoteStopTransaction(RemoteStopTransactionParams params, String caller,
-                                           OcppCallback<String>... callbacks) {
+    public final int remoteStopTransaction(
+            RemoteStopTransactionParams params, String caller, OcppCallback<String>... callbacks) {
         RemoteStopTransactionTask task = new RemoteStopTransactionTask(params, caller);
         return addRemoteStopTask(task, callbacks);
     }
 
     @SafeVarargs
-    private int addRemoteStopTask(RemoteStopTransactionTask task,
-                                           OcppCallback<String>... callbacks) {
+    private int addRemoteStopTask(RemoteStopTransactionTask task, OcppCallback<String>... callbacks) {
         for (var callback : callbacks) {
             task.addCallback(callback);
         }
 
         BackgroundService.with(asyncTaskExecutor)
-            .forFirst(task.getParams().getChargePointSelectList())
-            .execute(c -> invoker.remoteStopTransaction(c, task));
+                .forFirst(task.getParams().getChargePointSelectList())
+                .execute(c -> invoker.remoteStopTransaction(c, task));
 
         return taskStore.add(task);
     }
 
     @SafeVarargs
-    public final int unlockConnector(UnlockConnectorParams params,
-                                     OcppCallback<String>... callbacks) {
+    public final int unlockConnector(UnlockConnectorParams params, OcppCallback<String>... callbacks) {
         UnlockConnectorTask task = new UnlockConnectorTask(params);
         return addUnlockConnectorTask(task, callbacks);
     }
 
     @SafeVarargs
-    public final int unlockConnector(UnlockConnectorParams params, String caller,
-                                     OcppCallback<String>... callbacks) {
+    public final int unlockConnector(UnlockConnectorParams params, String caller, OcppCallback<String>... callbacks) {
         UnlockConnectorTask task = new UnlockConnectorTask(params, caller);
         return addUnlockConnectorTask(task, callbacks);
     }
 
     @SafeVarargs
-    private int addUnlockConnectorTask(UnlockConnectorTask task,
-                                     OcppCallback<String>... callbacks) {
+    private int addUnlockConnectorTask(UnlockConnectorTask task, OcppCallback<String>... callbacks) {
         for (var callback : callbacks) {
             task.addCallback(callback);
         }
 
         BackgroundService.with(asyncTaskExecutor)
-            .forFirst(task.getParams().getChargePointSelectList())
-            .execute(c -> invoker.unlockConnector(c, task));
+                .forFirst(task.getParams().getChargePointSelectList())
+                .execute(c -> invoker.unlockConnector(c, task));
 
         return taskStore.add(task);
     }
@@ -282,8 +270,8 @@ public class ChargePointServiceClient {
     // -------------------------------------------------------------------------
 
     @SafeVarargs
-    public final int dataTransfer(DataTransferParams params,
-                                  OcppCallback<DataTransferTask.ResponseWrapper>... callbacks) {
+    public final int dataTransfer(
+            DataTransferParams params, OcppCallback<DataTransferTask.ResponseWrapper>... callbacks) {
         DataTransferTask task = new DataTransferTask(params);
 
         for (var callback : callbacks) {
@@ -291,15 +279,15 @@ public class ChargePointServiceClient {
         }
 
         BackgroundService.with(asyncTaskExecutor)
-            .forEach(task.getParams().getChargePointSelectList())
-            .execute(c -> invoker.dataTransfer(c, task));
+                .forEach(task.getParams().getChargePointSelectList())
+                .execute(c -> invoker.dataTransfer(c, task));
 
         return taskStore.add(task);
     }
 
     @SafeVarargs
-    public final int getConfiguration(GetConfigurationParams params,
-                                      OcppCallback<GetConfigurationTask.ResponseWrapper>... callbacks) {
+    public final int getConfiguration(
+            GetConfigurationParams params, OcppCallback<GetConfigurationTask.ResponseWrapper>... callbacks) {
         GetConfigurationTask task = new GetConfigurationTask(params);
 
         for (var callback : callbacks) {
@@ -307,15 +295,14 @@ public class ChargePointServiceClient {
         }
 
         BackgroundService.with(asyncTaskExecutor)
-            .forEach(task.getParams().getChargePointSelectList())
-            .execute(c -> invoker.getConfiguration(c, task));
+                .forEach(task.getParams().getChargePointSelectList())
+                .execute(c -> invoker.getConfiguration(c, task));
 
         return taskStore.add(task);
     }
 
     @SafeVarargs
-    public final int getLocalListVersion(MultipleChargePointSelect params,
-                                         OcppCallback<String>... callbacks) {
+    public final int getLocalListVersion(MultipleChargePointSelect params, OcppCallback<String>... callbacks) {
         GetLocalListVersionTask task = new GetLocalListVersionTask(params);
 
         for (var callback : callbacks) {
@@ -323,15 +310,14 @@ public class ChargePointServiceClient {
         }
 
         BackgroundService.with(asyncTaskExecutor)
-            .forEach(task.getParams().getChargePointSelectList())
-            .execute(c -> invoker.getLocalListVersion(c, task));
+                .forEach(task.getParams().getChargePointSelectList())
+                .execute(c -> invoker.getLocalListVersion(c, task));
 
         return taskStore.add(task);
     }
 
     @SafeVarargs
-    public final int sendLocalList(SendLocalListParams params,
-                                   OcppCallback<String>... callbacks) {
+    public final int sendLocalList(SendLocalListParams params, OcppCallback<String>... callbacks) {
         SendLocalListTask task = new SendLocalListTask(params, ocppTagsService);
 
         for (var callback : callbacks) {
@@ -339,8 +325,8 @@ public class ChargePointServiceClient {
         }
 
         BackgroundService.with(asyncTaskExecutor)
-            .forEach(task.getParams().getChargePointSelectList())
-            .execute(c -> invoker.sendLocalList(c, task));
+                .forEach(task.getParams().getChargePointSelectList())
+                .execute(c -> invoker.sendLocalList(c, task));
 
         return taskStore.add(task);
     }
@@ -350,17 +336,16 @@ public class ChargePointServiceClient {
     // -------------------------------------------------------------------------
 
     @SafeVarargs
-    public final int reserveNow(ReserveNowParams params,
-                                OcppCallback<String>... callbacks) {
+    public final int reserveNow(ReserveNowParams params, OcppCallback<String>... callbacks) {
         List<ChargePointSelect> list = params.getChargePointSelectList();
 
         InsertReservationParams res = InsertReservationParams.builder()
-            .idTag(params.getIdTag())
-            .chargeBoxId(list.get(0).getChargeBoxId())
-            .connectorId(params.getConnectorId())
-            .startTimestamp(Instant.now())
-            .expiryTimestamp(params.getExpiry())
-            .build();
+                .idTag(params.getIdTag())
+                .chargeBoxId(list.get(0).getChargeBoxId())
+                .connectorId(params.getConnectorId())
+                .startTimestamp(Instant.now())
+                .expiryTimestamp(params.getExpiry())
+                .build();
 
         int reservationId = reservationRepository.insert(res);
         String parentIdTag = ocppTagsService.getParentIdtag(params.getIdTag());
@@ -373,15 +358,14 @@ public class ChargePointServiceClient {
         }
 
         BackgroundService.with(asyncTaskExecutor)
-            .forFirst(task.getParams().getChargePointSelectList())
-            .execute(c -> invoker.reserveNow(c, task));
+                .forFirst(task.getParams().getChargePointSelectList())
+                .execute(c -> invoker.reserveNow(c, task));
 
         return taskStore.add(task);
     }
 
     @SafeVarargs
-    public final int cancelReservation(CancelReservationParams params,
-                                       OcppCallback<String>... callbacks) {
+    public final int cancelReservation(CancelReservationParams params, OcppCallback<String>... callbacks) {
         CancelReservationTask task = new CancelReservationTask(params, reservationRepository);
 
         for (var callback : callbacks) {
@@ -389,8 +373,8 @@ public class ChargePointServiceClient {
         }
 
         BackgroundService.with(asyncTaskExecutor)
-            .forFirst(task.getParams().getChargePointSelectList())
-            .execute(c -> invoker.cancelReservation(c, task));
+                .forFirst(task.getParams().getChargePointSelectList())
+                .execute(c -> invoker.cancelReservation(c, task));
 
         return taskStore.add(task);
     }
@@ -400,8 +384,7 @@ public class ChargePointServiceClient {
     // -------------------------------------------------------------------------
 
     @SafeVarargs
-    public final int triggerMessage(TriggerMessageParams params,
-                                    OcppCallback<String>... callbacks) {
+    public final int triggerMessage(TriggerMessageParams params, OcppCallback<String>... callbacks) {
         TriggerMessageTask task = new TriggerMessageTask(params);
 
         for (var callback : callbacks) {
@@ -409,39 +392,37 @@ public class ChargePointServiceClient {
         }
 
         BackgroundService.with(asyncTaskExecutor)
-            .forEach(task.getParams().getChargePointSelectList())
-            .execute(c -> invoker.triggerMessage(c, task));
+                .forEach(task.getParams().getChargePointSelectList())
+                .execute(c -> invoker.triggerMessage(c, task));
 
         return taskStore.add(task);
     }
 
     @SafeVarargs
-    public final int setChargingProfile(SetChargingProfileTask task,
-                                        OcppCallback<String>... callbacks) {
+    public final int setChargingProfile(SetChargingProfileTask task, OcppCallback<String>... callbacks) {
         for (var callback : callbacks) {
             task.addCallback(callback);
         }
 
         BackgroundService.with(asyncTaskExecutor)
-            .forEach(task.getParams().getChargePointSelectList())
-            .execute(c -> invoker.setChargingProfile(c, task));
+                .forEach(task.getParams().getChargePointSelectList())
+                .execute(c -> invoker.setChargingProfile(c, task));
 
         return taskStore.add(task);
     }
 
     @SafeVarargs
-    public final int setChargingProfile(SetChargingProfileParams params,
-                                        OcppCallback<String>... callbacks) {
+    public final int setChargingProfile(SetChargingProfileParams params, OcppCallback<String>... callbacks) {
         ChargingProfile.Details details = chargingProfileRepository.getDetails(params.getChargingProfilePk());
 
-        SetChargingProfileTaskFromDB task = new SetChargingProfileTaskFromDB(params, details, chargingProfileRepository);
+        SetChargingProfileTaskFromDB task =
+                new SetChargingProfileTaskFromDB(params, details, chargingProfileRepository);
 
         return setChargingProfile(task, callbacks);
     }
 
     @SafeVarargs
-    public final int clearChargingProfile(ClearChargingProfileParams params,
-                                          OcppCallback<String>... callbacks) {
+    public final int clearChargingProfile(ClearChargingProfileParams params, OcppCallback<String>... callbacks) {
         ClearChargingProfileTask task = new ClearChargingProfileTask(params, chargingProfileRepository);
 
         for (var callback : callbacks) {
@@ -449,15 +430,15 @@ public class ChargePointServiceClient {
         }
 
         BackgroundService.with(asyncTaskExecutor)
-            .forEach(task.getParams().getChargePointSelectList())
-            .execute(c -> invoker.clearChargingProfile(c, task));
+                .forEach(task.getParams().getChargePointSelectList())
+                .execute(c -> invoker.clearChargingProfile(c, task));
 
         return taskStore.add(task);
     }
 
     @SafeVarargs
-    public final int getCompositeSchedule(GetCompositeScheduleParams params,
-                                          OcppCallback<GetCompositeScheduleResponse>... callbacks) {
+    public final int getCompositeSchedule(
+            GetCompositeScheduleParams params, OcppCallback<GetCompositeScheduleResponse>... callbacks) {
         GetCompositeScheduleTask task = new GetCompositeScheduleTask(params);
 
         for (var callback : callbacks) {
@@ -465,10 +446,9 @@ public class ChargePointServiceClient {
         }
 
         BackgroundService.with(asyncTaskExecutor)
-            .forEach(task.getParams().getChargePointSelectList())
-            .execute(c -> invoker.getCompositeSchedule(c, task));
+                .forEach(task.getParams().getChargePointSelectList())
+                .execute(c -> invoker.getCompositeSchedule(c, task));
 
         return taskStore.add(task);
     }
-
 }

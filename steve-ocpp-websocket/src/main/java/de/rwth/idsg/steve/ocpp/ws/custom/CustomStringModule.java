@@ -73,8 +73,9 @@ public class CustomStringModule extends SimpleModule {
         }
 
         @Override
-        public final void serializeWithType(Object value, JsonGenerator gen, SerializerProvider provider,
-                                            TypeSerializer typeSer) throws IOException {
+        public final void serializeWithType(
+                Object value, JsonGenerator gen, SerializerProvider provider, TypeSerializer typeSer)
+                throws IOException {
             gen.writeString(objectToString(value));
         }
 
@@ -84,7 +85,8 @@ public class CustomStringModule extends SimpleModule {
         }
 
         @Override
-        public void acceptJsonFormatVisitor(JsonFormatVisitorWrapper visitor, JavaType typeHint) throws JsonMappingException {
+        public void acceptJsonFormatVisitor(JsonFormatVisitorWrapper visitor, JavaType typeHint)
+                throws JsonMappingException {
             visitStringFormat(visitor, typeHint);
         }
 

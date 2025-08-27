@@ -42,11 +42,10 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import jakarta.validation.Valid;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.util.List;
+import jakarta.validation.Valid;
 
 import static org.springframework.http.ResponseEntity.*;
 
@@ -54,14 +53,15 @@ import static org.springframework.http.ResponseEntity.*;
  * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 13.09.2022
  */
-@Tag(name = "tags",
-    description = """
+@Tag(
+        name = "tags",
+        description =
+                """
         Operations related to managing Ocpp Tags.
         An Ocpp Tag is the identifier of the actor that interacts with the charge box.
         It can be used for authorization, but also to start and stop charging sessions.
         An RFID card is an example of an Ocpp Tag.
-        """
-)
+        """)
 @RestController
 @RequestMapping(value = "/api/v1/ocppTags", produces = MediaType.APPLICATION_JSON_VALUE)
 @RequiredArgsConstructor
@@ -69,7 +69,9 @@ public class OcppTagsRestController {
 
     private final OcppTagsService ocppTagsService;
 
-    @Operation(description = """
+    @Operation(
+            description =
+                    """
         Returns a list of Ocpp Tags based on the query parameters.
         The query parameters can be used to filter the Ocpp Tags.
         """)
@@ -88,28 +90,65 @@ public class OcppTagsRestController {
         return getOneInternal(ocppTagPk);
     }
 
-    @Operation(description = """
+    @Operation(
+            description =
+                    """
         Creates a new Ocpp Tag with the provided parameters.
         The request body should contain the necessary information.
         """)
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "201", description = "Created"),
-        @ApiResponse(responseCode = "400", description = "Bad Request", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorResponse.class))}),
-        @ApiResponse(responseCode = "401", description = "Unauthorized", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorResponse.class))}),
-        @ApiResponse(responseCode = "422", description = "Unprocessable Entity", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorResponse.class))}),
-        @ApiResponse(responseCode = "404", description = "Not Found", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorResponse.class))}),
-        @ApiResponse(responseCode = "500", description = "Internal Server Error", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorResponse.class))})}
-    )
+    @ApiResponses(
+            value = {
+                @ApiResponse(responseCode = "201", description = "Created"),
+                @ApiResponse(
+                        responseCode = "400",
+                        description = "Bad Request",
+                        content = {
+                            @Content(
+                                    mediaType = "application/json",
+                                    schema = @Schema(implementation = ApiErrorResponse.class))
+                        }),
+                @ApiResponse(
+                        responseCode = "401",
+                        description = "Unauthorized",
+                        content = {
+                            @Content(
+                                    mediaType = "application/json",
+                                    schema = @Schema(implementation = ApiErrorResponse.class))
+                        }),
+                @ApiResponse(
+                        responseCode = "422",
+                        description = "Unprocessable Entity",
+                        content = {
+                            @Content(
+                                    mediaType = "application/json",
+                                    schema = @Schema(implementation = ApiErrorResponse.class))
+                        }),
+                @ApiResponse(
+                        responseCode = "404",
+                        description = "Not Found",
+                        content = {
+                            @Content(
+                                    mediaType = "application/json",
+                                    schema = @Schema(implementation = ApiErrorResponse.class))
+                        }),
+                @ApiResponse(
+                        responseCode = "500",
+                        description = "Internal Server Error",
+                        content = {
+                            @Content(
+                                    mediaType = "application/json",
+                                    schema = @Schema(implementation = ApiErrorResponse.class))
+                        })
+            })
     @PostMapping
     public ResponseEntity<OcppTagOverview> create(@RequestBody @Valid OcppTagForm params) {
         var ocppTagPk = ocppTagsService.addOcppTag(params);
         var body = getOneInternal(ocppTagPk);
 
-        var location = ServletUriComponentsBuilder
-            .fromCurrentRequest()
-            .path("/{ocppTagPk}")
-            .buildAndExpand(ocppTagPk)
-            .toUri();
+        var location = ServletUriComponentsBuilder.fromCurrentRequest()
+                .path("/{ocppTagPk}")
+                .buildAndExpand(ocppTagPk)
+                .toUri();
         return created(location).body(body);
     }
 
@@ -118,14 +157,17 @@ public class OcppTagsRestController {
         """)
     @StandardApiResponses
     @PutMapping("/{ocppTagPk}")
-    public OcppTagOverview update(@PathVariable("ocppTagPk") Integer ocppTagPk, @RequestBody @Valid OcppTagForm params) {
+    public OcppTagOverview update(
+            @PathVariable("ocppTagPk") Integer ocppTagPk, @RequestBody @Valid OcppTagForm params) {
         params.setOcppTagPk(ocppTagPk); // the one from incoming params does not matter
         ocppTagsService.updateOcppTag(params);
 
         return getOneInternal(ocppTagPk);
     }
 
-    @Operation(description = """
+    @Operation(
+            description =
+                    """
         Deletes an existing Ocpp Tag based on the ocppTagPk.
         Returns the deleted Ocpp Tag.
         """)

@@ -28,14 +28,13 @@ import lombok.Getter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import jakarta.xml.ws.AsyncHandler;
-
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
+import jakarta.xml.ws.AsyncHandler;
 
 /**
  * Contains the context for a request/response communication and callbacks for handling responses/errors.
@@ -160,11 +159,15 @@ public abstract class CommunicationTask<S extends ChargePointSelection, RESPONSE
     public abstract OcppCallback<RESPONSE> defaultCallback();
 
     public abstract <T extends RequestType> T getOcpp12Request();
+
     public abstract <T extends RequestType> T getOcpp15Request();
+
     public abstract <T extends RequestType> T getOcpp16Request();
 
     public abstract <T extends ResponseType> AsyncHandler<T> getOcpp12Handler(String chargeBoxId);
+
     public abstract <T extends ResponseType> AsyncHandler<T> getOcpp15Handler(String chargeBoxId);
+
     public abstract <T extends ResponseType> AsyncHandler<T> getOcpp16Handler(String chargeBoxId);
 
     // -------------------------------------------------------------------------

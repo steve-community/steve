@@ -74,8 +74,7 @@ public class InstantEditorTest {
                 Arguments.of(null, null),
                 Arguments.of("", null),
                 Arguments.of("2024-06-26T14:30:28.000Z", LocalDateTime.of(2024, 6, 26, 14, 30, 28)),
-                Arguments.of("2024-06-26T14:30:28Z", LocalDateTime.of(2024, 6, 26, 14, 30, 28))
-        );
+                Arguments.of("2024-06-26T14:30:28Z", LocalDateTime.of(2024, 6, 26, 14, 30, 28)));
     }
 
     @ParameterizedTest
@@ -83,8 +82,7 @@ public class InstantEditorTest {
     public void apifailTestToJava(String input) {
         var apiEditor = new InstantEditor();
 
-        assertThatExceptionOfType(DateTimeParseException.class)
-                .isThrownBy(() -> apiEditor.setAsText(input));
+        assertThatExceptionOfType(DateTimeParseException.class).isThrownBy(() -> apiEditor.setAsText(input));
     }
 
     private static Stream<Arguments> provideFailArgsForApiTestToJava() {
@@ -96,7 +94,6 @@ public class InstantEditorTest {
                 Arguments.of("2024-06-26T14Z"),
                 Arguments.of("2024-06-26T14"),
                 Arguments.of("2024-06-26TZ"),
-                Arguments.of("2024-06-26")
-        );
+                Arguments.of("2024-06-26"));
     }
 }

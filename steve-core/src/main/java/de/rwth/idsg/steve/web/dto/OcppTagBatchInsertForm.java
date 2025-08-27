@@ -23,8 +23,8 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
-import jakarta.validation.constraints.NotEmpty;
 import java.util.List;
+import jakarta.validation.constraints.NotEmpty;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -36,6 +36,5 @@ import java.util.List;
 public class OcppTagBatchInsertForm {
 
     @IdTag
-    @NotEmpty
-    private List<String> idList;
+    @NotEmpty private List<String> idList;
 }

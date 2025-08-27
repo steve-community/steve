@@ -41,8 +41,7 @@ public abstract class AbstractTypeStore implements TypeStore {
     private final Map<String, Class<? extends RequestType>> requestClassMap = new HashMap<>();
     private final Map<Class<? extends RequestType>, ActionResponsePair> actionResponseMap = new HashMap<>();
 
-    public AbstractTypeStore(String packageForRequestClassMap,
-                             String packageForActionResponseMap) {
+    public AbstractTypeStore(String packageForRequestClassMap, String packageForActionResponseMap) {
         populateRequestClassMap(packageForRequestClassMap);
         populateActionResponseMap(packageForActionResponseMap);
     }
@@ -93,9 +92,9 @@ public abstract class AbstractTypeStore implements TypeStore {
     private static <INTERFACE, IMPL extends INTERFACE> Map<String, Class<IMPL>> getClassesWithInterface(
             String packageName, Class<INTERFACE> interfaceClass) {
         try {
-            ImmutableSet<ClassPath.ClassInfo> classInfos =
-                    ClassPath.from(Thread.currentThread().getContextClassLoader())
-                             .getTopLevelClasses(packageName);
+            ImmutableSet<ClassPath.ClassInfo> classInfos = ClassPath.from(
+                            Thread.currentThread().getContextClassLoader())
+                    .getTopLevelClasses(packageName);
 
             Map<String, Class<IMPL>> map = new HashMap<>();
             for (ClassPath.ClassInfo classInfo : classInfos) {

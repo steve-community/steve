@@ -100,5 +100,4 @@ public class UpdateFirmwareTask extends CommunicationTask<UpdateFirmwareParams, 
             }
         };
     }
-
 }

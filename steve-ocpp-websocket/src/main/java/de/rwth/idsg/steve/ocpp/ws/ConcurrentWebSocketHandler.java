@@ -61,7 +61,9 @@ public abstract class ConcurrentWebSocketHandler implements WebSocketHandler {
     }
 
     private ConcurrentWebSocketSessionDecorator internalGet(WebSocketSession session) {
-        return sessions.computeIfAbsent(session.getId(), s -> new ConcurrentWebSocketSessionDecorator(session, SEND_TIME_LIMIT, BUFFER_SIZE_LIMIT));
+        return sessions.computeIfAbsent(
+                session.getId(),
+                s -> new ConcurrentWebSocketSessionDecorator(session, SEND_TIME_LIMIT, BUFFER_SIZE_LIMIT));
     }
 
     // -------------------------------------------------------------------------
@@ -69,7 +71,10 @@ public abstract class ConcurrentWebSocketHandler implements WebSocketHandler {
     // -------------------------------------------------------------------------
 
     abstract void onMessage(WebSocketSession session, WebSocketMessage<?> message) throws Exception;
+
     abstract void onOpen(WebSocketSession session) throws Exception;
+
     abstract void onClose(WebSocketSession session, CloseStatus closeStatus) throws Exception;
+
     abstract void onError(WebSocketSession session, Throwable throwable) throws Exception;
 }

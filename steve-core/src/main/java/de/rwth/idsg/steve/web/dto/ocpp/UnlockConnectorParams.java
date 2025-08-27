@@ -32,7 +32,5 @@ import jakarta.validation.constraints.NotNull;
 @Getter
 public class UnlockConnectorParams extends SingleChargePointSelect {
 
-    @NotNull(message = "Connector ID is required")
-    @Min(value = 1, message = "Connector ID must be at least {value}")
-    private Integer connectorId;
+    @NotNull(message = "Connector ID is required") @Min(value = 1, message = "Connector ID must be at least {value}") private Integer connectorId;
 }

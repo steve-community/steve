@@ -54,5 +54,4 @@ public class User {
         private final Integer ocppTagPk;
         private final String idTag;
     }
-
 }

@@ -35,24 +35,20 @@ import jakarta.validation.constraints.Positive;
 @Setter
 public class ClearChargingProfileParams extends MultipleChargePointSelect {
 
-    @NotNull(message = "Filter Type is required")
-    private ClearChargingProfileFilterType filterType = ClearChargingProfileFilterType.ChargingProfileId;
+    @NotNull(message = "Filter Type is required") private ClearChargingProfileFilterType filterType = ClearChargingProfileFilterType.ChargingProfileId;
 
-    @Positive
-    private Integer chargingProfilePk;
+    @Positive private Integer chargingProfilePk;
 
     // A connectorId of zero (0) specifies the charging profile for the overall Charge Point.
-    // Absence of this parameter means the clearing applies to all charging profiles that match the other criteria in the request.
-    @Min(value = 0, message = "Connector ID must be at least {value}")
-    private Integer connectorId;
+    // Absence of this parameter means the clearing applies to all charging profiles that match the other criteria in
+    // the request.
+    @Min(value = 0, message = "Connector ID must be at least {value}") private Integer connectorId;
 
     private ChargingProfilePurposeType chargingProfilePurpose;
 
     private Integer stackLevel;
 
-    @AssertTrue(message = "When filtering by id, charging profile id must be set")
-    public boolean isValidWhenFilterById() {
+    @AssertTrue(message = "When filtering by id, charging profile id must be set") public boolean isValidWhenFilterById() {
         return filterType != ClearChargingProfileFilterType.ChargingProfileId || chargingProfilePk != null;
     }
-
 }

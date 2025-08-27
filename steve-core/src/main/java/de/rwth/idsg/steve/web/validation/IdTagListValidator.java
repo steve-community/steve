@@ -18,9 +18,9 @@
  */
 package de.rwth.idsg.steve.web.validation;
 
+import java.util.List;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
-import java.util.List;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>

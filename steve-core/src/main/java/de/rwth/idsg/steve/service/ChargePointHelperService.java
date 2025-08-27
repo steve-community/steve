@@ -37,5 +37,6 @@ public interface ChargePointHelperService {
     List<OcppJsonStatus> getOcppJsonStatus(ZoneId timeZone);
 
     List<ChargePointSelect> getChargePoints(OcppVersion version);
+
     List<ChargePointSelect> getChargePoints(OcppVersion version, List<RegistrationStatus> inStatusFilter);
 }

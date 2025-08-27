@@ -18,12 +18,12 @@
  */
 package de.rwth.idsg.steve.web.dto;
 
-import jakarta.validation.constraints.AssertFalse;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
 
+import jakarta.validation.constraints.AssertFalse;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 
 /**
  * @author fnkbsi
@@ -33,16 +33,11 @@ import lombok.Setter;
 public class WebUserForm extends WebUserBaseForm {
 
     @Setter
-    @NotNull(message = "Password is required")
-    @Size(min = 8, message = "Password requires 8 or more characters")
-    private String password = "";
+    @NotNull(message = "Password is required") @Size(min = 8, message = "Password requires 8 or more characters") private String password = "";
 
-    @NotNull(message = "Password repetition is required")
-    @Size(min = 8, message = "The repeated password also requires 8 or more characters")
-    private String passwordComparison;
+    @NotNull(message = "Password repetition is required") @Size(min = 8, message = "The repeated password also requires 8 or more characters") private String passwordComparison;
 
-    @AssertFalse(message = "The repeated password did not match!")
-    private Boolean pwError;
+    @AssertFalse(message = "The repeated password did not match!") private Boolean pwError;
 
     @Setter
     private String apiPassword = "";

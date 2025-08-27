@@ -147,7 +147,8 @@ public class JettyServer {
         httpsConfig.addCustomizer(new SecureRequestCustomizer());
 
         // SSL Connector
-        ServerConnector https = new ServerConnector(server,
+        ServerConnector https = new ServerConnector(
+                server,
                 new SslConnectionFactory(sslContextFactory, HttpVersion.HTTP_1_1.asString()),
                 new HttpConnectionFactory(httpsConfig));
         https.setHost(config.getJetty().getServerHost());
@@ -206,8 +207,7 @@ public class JettyServer {
         var isSecure = sc.getDefaultConnectionFactory() instanceof SslConnectionFactory;
         var layout = "://%s:%d" + config.getPaths().getContextPath();
 
-        return getIps(sc, config.getJetty().getServerHost())
-                .stream()
+        return getIps(sc, config.getJetty().getServerHost()).stream()
                 .map(k -> String.format(layout, k, sc.getPort()))
                 .collect(HashMap::new, (m, v) -> m.put(v, isSecure), HashMap::putAll);
     }
@@ -223,10 +223,11 @@ public class JettyServer {
         return ips;
     }
 
-    private static void setList(List<Map.Entry<String, Boolean>> list, Function<Boolean, String> prefix, EndpointInfo.ItemsWithInfo... items) {
-        var ws = list.stream()
-                .map(e -> prefix.apply(e.getValue()) + e.getKey())
-                .toList();
+    private static void setList(
+            List<Map.Entry<String, Boolean>> list,
+            Function<Boolean, String> prefix,
+            EndpointInfo.ItemsWithInfo... items) {
+        var ws = list.stream().map(e -> prefix.apply(e.getValue()) + e.getKey()).toList();
         for (EndpointInfo.ItemsWithInfo item : items) {
             item.setData(ws);
         }
@@ -263,9 +264,10 @@ public class JettyServer {
 
         // https://stackoverflow.com/a/20418809
         try {
-            for (Enumeration<NetworkInterface> ifaces = NetworkInterface.getNetworkInterfaces(); ifaces.hasMoreElements();) {
+            for (Enumeration<NetworkInterface> ifaces = NetworkInterface.getNetworkInterfaces();
+                    ifaces.hasMoreElements(); ) {
                 NetworkInterface iface = ifaces.nextElement();
-                for (Enumeration<InetAddress> inetAddrs = iface.getInetAddresses(); inetAddrs.hasMoreElements();) {
+                for (Enumeration<InetAddress> inetAddrs = iface.getInetAddresses(); inetAddrs.hasMoreElements(); ) {
                     InetAddress inetAddr = inetAddrs.nextElement();
                     if (!inetAddr.isLoopbackAddress() && (inetAddr instanceof Inet4Address)) {
                         ips.add(inetAddr.getHostAddress());

@@ -31,8 +31,7 @@ import jakarta.validation.constraints.NotNull;
 @Setter
 public class DataTransferParams extends MultipleChargePointSelect {
 
-    @NotNull(message = "Vendor ID is required")
-    private String vendorId;
+    @NotNull(message = "Vendor ID is required") private String vendorId;
 
     private String messageId;
 

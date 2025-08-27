@@ -67,8 +67,8 @@ public class Issue1219 {
         Connection con = DriverManager.getConnection(url, userName, password);
 
         org.jooq.Configuration conf = new DefaultConfiguration()
-            .set(SQLDialect.MYSQL)
-            .set(new DataSourceConnectionProvider(new SingleConnectionDataSource(con)));
+                .set(SQLDialect.MYSQL)
+                .set(new DataSourceConnectionProvider(new SingleConnectionDataSource(con)));
 
         DSLContext ctx = DSL.using(conf);
 
@@ -112,17 +112,18 @@ public class Issue1219 {
 
             TransactionQueryForm form = new TransactionQueryForm();
             form.setTransactionPk(transactionId);
-            Transaction transaction = transactionRepository.getTransactions(form).get(0);
+            Transaction transaction =
+                    transactionRepository.getTransactions(form).get(0);
 
             var stopTimestamp = transaction.getStartTimestamp().plus(1, ChronoUnit.HOURS);
             UpdateTransactionParams p = UpdateTransactionParams.builder()
-                .chargeBoxId(transaction.getChargeBoxId())
-                .transactionId(transaction.getId())
-                .stopTimestamp(stopTimestamp)
-                .eventTimestamp(stopTimestamp)
-                .stopMeterValue(transaction.getStartValue() + "0")
-                .eventActor(TransactionStopEventActor.station)
-                .build();
+                    .chargeBoxId(transaction.getChargeBoxId())
+                    .transactionId(transaction.getId())
+                    .stopTimestamp(stopTimestamp)
+                    .eventTimestamp(stopTimestamp)
+                    .stopMeterValue(transaction.getStartValue() + "0")
+                    .eventActor(TransactionStopEventActor.station)
+                    .build();
 
             ocppServerRepository.updateTransaction(p);
             System.out.println("stopped transaction " + transactionId);
@@ -138,13 +139,13 @@ public class Issue1219 {
         for (int i = 0; i < count; i++) {
             var now = Instant.now();
             InsertTransactionParams params = InsertTransactionParams.builder()
-                .idTag(ocppTags.get(ThreadLocalRandom.current().nextInt(0, ocppTags.size())))
-                .chargeBoxId(chargeBoxIds.get(ThreadLocalRandom.current().nextInt(0, chargeBoxIds.size())))
-                .connectorId(ThreadLocalRandom.current().nextInt(4))
-                .startMeterValue(String.valueOf(ThreadLocalRandom.current().nextLong(5_000, 20_000)))
-                .startTimestamp(now)
-                .eventTimestamp(now)
-                .build();
+                    .idTag(ocppTags.get(ThreadLocalRandom.current().nextInt(0, ocppTags.size())))
+                    .chargeBoxId(chargeBoxIds.get(ThreadLocalRandom.current().nextInt(0, chargeBoxIds.size())))
+                    .connectorId(ThreadLocalRandom.current().nextInt(4))
+                    .startMeterValue(String.valueOf(ThreadLocalRandom.current().nextLong(5_000, 20_000)))
+                    .startTimestamp(now)
+                    .eventTimestamp(now)
+                    .build();
             int transactionId = repository.insertTransaction(params);
             System.out.println("started transaction " + transactionId);
             transactionIds.add(transactionId);
@@ -155,7 +156,9 @@ public class Issue1219 {
     private List<String> insertChargeBoxes(int count) {
         var repository = new ChargePointRepositoryImpl(ctx, new AddressRepositoryImpl());
 
-        List<String> ids = IntStream.range(0, count).mapToObj(val -> UUID.randomUUID().toString()).collect(Collectors.toList());
+        List<String> ids = IntStream.range(0, count)
+                .mapToObj(val -> UUID.randomUUID().toString())
+                .collect(Collectors.toList());
         repository.addChargePointList(ids);
 
         return ids;
@@ -164,7 +167,9 @@ public class Issue1219 {
     private List<String> insertOcppTags(int count) {
         var repository = new OcppTagRepositoryImpl(ctx);
 
-        List<String> idTags = IntStream.range(0, count).mapToObj(val -> UUID.randomUUID().toString()).collect(Collectors.toList());
+        List<String> idTags = IntStream.range(0, count)
+                .mapToObj(val -> UUID.randomUUID().toString())
+                .collect(Collectors.toList());
         List<String> insertedTags = new ArrayList<>();
 
         for (String idTag : idTags) {

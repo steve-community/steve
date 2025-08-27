@@ -31,8 +31,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-
-import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -43,6 +41,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
+import jakarta.validation.Valid;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -57,13 +56,15 @@ public class ChargePointsController {
 
     private static final String PARAMS = "params";
 
-    private static final List<String> upToOcpp15RegistrationStatusList = Arrays.stream(ocpp.cs._2012._06.RegistrationStatus.values())
-                                                                               .map(ocpp.cs._2012._06.RegistrationStatus::value)
-                                                                               .collect(Collectors.toList());
+    private static final List<String> upToOcpp15RegistrationStatusList = Arrays.stream(
+                    ocpp.cs._2012._06.RegistrationStatus.values())
+            .map(ocpp.cs._2012._06.RegistrationStatus::value)
+            .collect(Collectors.toList());
 
-    private static final List<String> ocpp16RegistrationStatusList = Arrays.stream(ocpp.cs._2015._10.RegistrationStatus.values())
-                                                                           .map(ocpp.cs._2015._10.RegistrationStatus::value)
-                                                                           .collect(Collectors.toList());
+    private static final List<String> ocpp16RegistrationStatusList = Arrays.stream(
+                    ocpp.cs._2015._10.RegistrationStatus.values())
+            .map(ocpp.cs._2015._10.RegistrationStatus::value)
+            .collect(Collectors.toList());
 
     // -------------------------------------------------------------------------
     // Paths
@@ -145,8 +146,10 @@ public class ChargePointsController {
     }
 
     @GetMapping(params = "add", value = ADD_SINGLE_PATH)
-    public String addSinglePost(@Valid @ModelAttribute("chargePointForm") ChargePointForm chargePointForm,
-                                BindingResult result, Model model) {
+    public String addSinglePost(
+            @Valid @ModelAttribute("chargePointForm") ChargePointForm chargePointForm,
+            BindingResult result,
+            Model model) {
         if (result.hasErrors()) {
             setCommonAttributesForSingleAdd(model);
             return "data-man/chargepointAdd";
@@ -157,8 +160,10 @@ public class ChargePointsController {
     }
 
     @PostMapping(value = ADD_BATCH_PATH)
-    public String addBatchPost(@Valid @ModelAttribute("batchChargePointForm") ChargePointBatchInsertForm form,
-                               BindingResult result, Model model) {
+    public String addBatchPost(
+            @Valid @ModelAttribute("batchChargePointForm") ChargePointBatchInsertForm form,
+            BindingResult result,
+            Model model) {
         if (result.hasErrors()) {
             addCountryCodes(model);
             model.addAttribute("chargePointForm", new ChargePointForm());
@@ -170,8 +175,10 @@ public class ChargePointsController {
     }
 
     @PostMapping(params = "update", value = UPDATE_PATH)
-    public String update(@Valid @ModelAttribute("chargePointForm") ChargePointForm chargePointForm,
-                         BindingResult result, Model model) {
+    public String update(
+            @Valid @ModelAttribute("chargePointForm") ChargePointForm chargePointForm,
+            BindingResult result,
+            Model model) {
         if (result.hasErrors()) {
             addCountryCodes(model);
             return "data-man/chargepointDetails";

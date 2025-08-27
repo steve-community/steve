@@ -37,16 +37,17 @@ public class UsersService {
     private final UserRepository userRepository;
 
     public User.Details getDetails(int userPk) {
-        return userRepository.getDetails(userPk).orElseThrow(
-            () -> new ResponseStatusException(HttpStatus.NOT_FOUND, String.format("User with id %d not found", userPk))
-        );
+        return userRepository
+                .getDetails(userPk)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND, String.format("User with id %d not found", userPk)));
     }
 
     public User.Details add(UserForm form) {
         var id = userRepository.add(form);
-        return userRepository.getDetails(id).orElseThrow(
-            () -> new SteveException("User not found after creation, this should never happen")
-        );
+        return userRepository
+                .getDetails(id)
+                .orElseThrow(() -> new SteveException("User not found after creation, this should never happen"));
     }
 
     public User.Details update(UserForm form) {
@@ -54,15 +55,16 @@ public class UsersService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "userPk must not be null");
         }
         userRepository.update(form);
-        return userRepository.getDetails(form.getUserPk()).orElseThrow(
-            () -> new SteveException("User not found after update, this should never happen")
-        );
+        return userRepository
+                .getDetails(form.getUserPk())
+                .orElseThrow(() -> new SteveException("User not found after update, this should never happen"));
     }
 
     public User.Details delete(int userPk) {
-        var user = userRepository.getDetails(userPk).orElseThrow(
-            () -> new ResponseStatusException(HttpStatus.NOT_FOUND, String.format("User with id %d not found", userPk))
-        );
+        var user = userRepository
+                .getDetails(userPk)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND, String.format("User with id %d not found", userPk)));
         userRepository.delete(userPk);
         return user;
     }

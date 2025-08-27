@@ -30,8 +30,8 @@ import jakarta.xml.ws.WebServiceException;
 import static de.rwth.idsg.steve.utils.Helpers.getForOcpp12;
 import static de.rwth.idsg.steve.utils.Helpers.getForOcpp15;
 import static de.rwth.idsg.steve.utils.Helpers.getForOcpp16;
-import static de.rwth.idsg.steve.utils.Helpers.getRandomString;
 import static de.rwth.idsg.steve.utils.Helpers.getHttpPath;
+import static de.rwth.idsg.steve.utils.Helpers.getRandomString;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
@@ -43,7 +43,7 @@ import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 public class ApplicationTest {
 
     private static final String REGISTERED_CHARGE_BOX_ID = __DatabasePreparer__.getRegisteredChargeBoxId();
-    private static final String REGISTERED_OCPP_TAG =  __DatabasePreparer__.getRegisteredOcppTag();
+    private static final String REGISTERED_OCPP_TAG = __DatabasePreparer__.getRegisteredOcppTag();
 
     private static String path;
     private static Application app;
@@ -81,9 +81,7 @@ public class ApplicationTest {
         assertThat(boot.getStatus()).isEqualTo(ocpp.cs._2010._08.RegistrationStatus.ACCEPTED);
 
         var auth = client.authorize(
-                new ocpp.cs._2010._08.AuthorizeRequest()
-                        .withIdTag(REGISTERED_OCPP_TAG),
-                REGISTERED_CHARGE_BOX_ID);
+                new ocpp.cs._2010._08.AuthorizeRequest().withIdTag(REGISTERED_OCPP_TAG), REGISTERED_CHARGE_BOX_ID);
         assertThat(auth).isNotNull();
         assertThat(auth.getIdTagInfo().getStatus()).isEqualTo(ocpp.cs._2010._08.AuthorizationStatus.ACCEPTED);
     }
@@ -101,9 +99,7 @@ public class ApplicationTest {
         assertThat(boot.getStatus()).isEqualTo(ocpp.cs._2012._06.RegistrationStatus.ACCEPTED);
 
         ocpp.cs._2012._06.AuthorizeResponse auth = client.authorize(
-                new ocpp.cs._2012._06.AuthorizeRequest()
-                        .withIdTag(REGISTERED_OCPP_TAG),
-                REGISTERED_CHARGE_BOX_ID);
+                new ocpp.cs._2012._06.AuthorizeRequest().withIdTag(REGISTERED_OCPP_TAG), REGISTERED_CHARGE_BOX_ID);
         assertThat(auth).isNotNull();
         assertThat(auth.getIdTagInfo().getStatus()).isEqualTo(ocpp.cs._2012._06.AuthorizationStatus.ACCEPTED);
     }
@@ -117,17 +113,15 @@ public class ApplicationTest {
 
         assertThatExceptionOfType(WebServiceException.class).isThrownBy(() -> {
             var boot = client.bootNotification(
-                new ocpp.cs._2015._10.BootNotificationRequest()
-                    .withChargePointVendor(getRandomString())
-                    .withChargePointModel(getRandomString()),
-                getRandomString());
+                    new ocpp.cs._2015._10.BootNotificationRequest()
+                            .withChargePointVendor(getRandomString())
+                            .withChargePointModel(getRandomString()),
+                    getRandomString());
             assertThat(boot).isNotNull();
             assertThat(boot.getStatus()).isEqualTo(ocpp.cs._2015._10.RegistrationStatus.REJECTED);
 
             var auth = client.authorize(
-                new ocpp.cs._2015._10.AuthorizeRequest()
-                    .withIdTag(getRandomString()),
-                getRandomString());
+                    new ocpp.cs._2015._10.AuthorizeRequest().withIdTag(getRandomString()), getRandomString());
             assertThat(auth).isNotNull();
             assertThat(auth.getIdTagInfo().getStatus()).isEqualTo(ocpp.cs._2015._10.AuthorizationStatus.INVALID);
         });

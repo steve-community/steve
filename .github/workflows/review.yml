@@ -16,9 +16,9 @@ jobs:
           java-version: '21'
           cache: maven
 
-      - name: Check with Maven
+      - name: Check license headers
         run: ./mvnw -B -V com.mycila:license-maven-plugin:5.0.0:check
-  checkstyle:
+  style-check:
     runs-on: 'ubuntu-latest'
     steps:
       - uses: actions/checkout@v5
@@ -26,10 +26,5 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: '21'
-      - name: Run Checkstyle
-        uses: nikitasavinov/checkstyle-action@master
-        with:
-          checkstyle_config: './build-tools/src/main/resources/steve/checkstyle.xml'
-          workdir: '.'
-          reporter: 'github-pr-check'
-          tool_name: 'checkstyle'
+      - name: Check code style
+        run: ./mvnw spotless:check

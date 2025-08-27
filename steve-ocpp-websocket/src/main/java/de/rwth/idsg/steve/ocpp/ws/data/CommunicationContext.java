@@ -26,10 +26,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import org.springframework.web.socket.WebSocketSession;
 
-import jakarta.xml.ws.Response;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
+import jakarta.xml.ws.Response;
 
 /**
  * Default holder/context of incoming and outgoing messages.
@@ -44,13 +44,20 @@ public class CommunicationContext {
     private final WebSocketSession session;
     private final String chargeBoxId;
 
-    @Setter private String incomingString;
-    @Setter private String outgoingString;
+    @Setter
+    private String incomingString;
 
-    @Setter private OcppJsonMessage incomingMessage;
-    @Setter private OcppJsonMessage outgoingMessage;
+    @Setter
+    private String outgoingString;
 
-    @Setter private FutureResponseContext futureResponseContext;
+    @Setter
+    private OcppJsonMessage incomingMessage;
+
+    @Setter
+    private OcppJsonMessage outgoingMessage;
+
+    @Setter
+    private FutureResponseContext futureResponseContext;
 
     // for incoming responses to previously sent requests
     private Consumer<OcppJsonResult> resultHandler;
@@ -63,14 +70,12 @@ public class CommunicationContext {
     @SuppressWarnings("unchecked")
     public void createResultHandler(CommunicationTask task) {
         // TODO: not so sure about this
-        resultHandler = result -> task.getHandler(chargeBoxId)
-                                      .handleResponse(new DummyResponse(result.getPayload()));
+        resultHandler = result -> task.getHandler(chargeBoxId).handleResponse(new DummyResponse(result.getPayload()));
     }
 
     public void createErrorHandler(CommunicationTask task) {
         // TODO: not so sure about this
-        errorHandler = result -> task.defaultCallback()
-                                     .successError(chargeBoxId, result);
+        errorHandler = result -> task.defaultCallback().successError(chargeBoxId, result);
     }
 
     @RequiredArgsConstructor(access = AccessLevel.PRIVATE)

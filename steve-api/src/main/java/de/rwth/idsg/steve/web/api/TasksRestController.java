@@ -19,23 +19,22 @@
 package de.rwth.idsg.steve.web.api;
 
 import de.rwth.idsg.steve.repository.TaskStore;
-
 import de.rwth.idsg.steve.web.api.dto.ApiTaskInfo;
 import de.rwth.idsg.steve.web.api.dto.ApiTaskList;
 import de.rwth.idsg.steve.web.api.exception.NotFoundException;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import jakarta.validation.Valid;
-import org.springframework.web.bind.annotation.RequestParam;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 
 /**
  * @author fnkbsi
@@ -69,7 +68,6 @@ public class TasksRestController {
     public ApiTaskList getOverview() {
         return getTaskList();
     }
-
 
     @StandardApiResponses
     @PostMapping(value = "clearfinishedtasks")

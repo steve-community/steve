@@ -74,14 +74,16 @@ public class ChargePointsRestControllerTest extends AbstractControllerTest {
     @Test
     @DisplayName("GET all: Test with one result, expected 200")
     public void testGet_withOneResult() {
-        List<ChargePoint.Overview> results = List.of(ChargePoint.Overview.builder().chargeBoxPk(1).build());
+        List<ChargePoint.Overview> results =
+                List.of(ChargePoint.Overview.builder().chargeBoxPk(1).build());
         when(chargePointsService.getOverview(any())).thenReturn(results);
 
         assertThat(mockMvc.perform(get("/api/v1/chargeboxes")))
                 .hasStatusOk()
                 .bodyJson()
                 .hasPathSatisfying("$", path -> assertThat(path).asArray().hasSize(1))
-                .hasPathSatisfying("$[0].chargeBoxPk", path -> assertThat(path).asNumber().isEqualTo(1));
+                .hasPathSatisfying(
+                        "$[0].chargeBoxPk", path -> assertThat(path).asNumber().isEqualTo(1));
     }
 
     @Test
@@ -89,8 +91,7 @@ public class ChargePointsRestControllerTest extends AbstractControllerTest {
     public void testGetOne_notFound() {
         when(chargePointsService.getDetails(anyInt())).thenThrow(new NotFoundException(""));
 
-        assertThat(mockMvc.perform(get("/api/v1/chargeboxes/1")))
-                .hasStatus(HttpStatus.NOT_FOUND);
+        assertThat(mockMvc.perform(get("/api/v1/chargeboxes/1"))).hasStatus(HttpStatus.NOT_FOUND);
     }
 
     @Test
@@ -102,7 +103,8 @@ public class ChargePointsRestControllerTest extends AbstractControllerTest {
         assertThat(mockMvc.perform(get("/api/v1/chargeboxes/1")))
                 .hasStatusOk()
                 .bodyJson()
-                .hasPathSatisfying("$.chargeBoxPk", path -> assertThat(path).asNumber().isEqualTo(1));
+                .hasPathSatisfying(
+                        "$.chargeBoxPk", path -> assertThat(path).asNumber().isEqualTo(1));
     }
 
     private static ChargePoint.Details createDetails(Integer pk, String chargeBoxId) {
@@ -126,13 +128,14 @@ public class ChargePointsRestControllerTest extends AbstractControllerTest {
         when(chargePointsService.getDetails(1)).thenReturn(result);
 
         assertThat(mockMvc.perform(post("/api/v1/chargeboxes")
-                .content(objectMapper.writeValueAsString(form))
-                .contentType(MediaType.APPLICATION_JSON)
-        ))
+                        .content(objectMapper.writeValueAsString(form))
+                        .contentType(MediaType.APPLICATION_JSON)))
                 .hasStatus(HttpStatus.CREATED)
                 .bodyJson()
-                .hasPathSatisfying("$.chargeBoxPk", path -> assertThat(path).asNumber().isEqualTo(1))
-                .hasPathSatisfying("$.chargeBoxId", path -> assertThat(path).asString().isEqualTo("test-cb"));
+                .hasPathSatisfying(
+                        "$.chargeBoxPk", path -> assertThat(path).asNumber().isEqualTo(1))
+                .hasPathSatisfying(
+                        "$.chargeBoxId", path -> assertThat(path).asString().isEqualTo("test-cb"));
     }
 
     @Test
@@ -148,9 +151,8 @@ public class ChargePointsRestControllerTest extends AbstractControllerTest {
         when(chargePointsService.getDetails(1)).thenReturn(result);
 
         assertThat(mockMvc.perform(put("/api/v1/chargeboxes/1")
-                .content(objectMapper.writeValueAsString(form))
-                .contentType(MediaType.APPLICATION_JSON)
-        ))
+                        .content(objectMapper.writeValueAsString(form))
+                        .contentType(MediaType.APPLICATION_JSON)))
                 .hasStatusOk();
 
         verify(chargePointsService).updateChargePoint(any(ChargePointForm.class));
@@ -164,8 +166,7 @@ public class ChargePointsRestControllerTest extends AbstractControllerTest {
         var result = new ChargePoint.Details(rec, null);
         when(chargePointsService.getDetails(1)).thenReturn(result);
 
-        assertThat(mockMvc.perform(delete("/api/v1/chargeboxes/1")))
-                .hasStatusOk();
+        assertThat(mockMvc.perform(delete("/api/v1/chargeboxes/1"))).hasStatusOk();
 
         verify(chargePointsService).deleteChargePoint(1);
     }

@@ -60,18 +60,22 @@ public class Ocpp15WebSocketEndpoint extends AbstractWebSocketEndpoint {
 
     private final IncomingPipeline pipeline;
 
-    public Ocpp15WebSocketEndpoint(DelegatingTaskScheduler asyncTaskScheduler,
-                                   OcppServerRepository ocppServerRepository,
-                                   FutureResponseContextStore futureResponseContextStore,
-                                   ApplicationEventPublisher applicationEventPublisher,
-                                   CentralSystemService15_SoapServer server,
-                                   Ocpp15TypeStore typeStore,
-                                   SessionContextStore sessionContextStore,
-                                   @Qualifier("ocppObjectMapper")
-                                   ObjectMapper ocppMapper,
-                                   Sender sender) {
-        super(asyncTaskScheduler, ocppServerRepository, futureResponseContextStore, applicationEventPublisher,
-            sessionContextStore);
+    public Ocpp15WebSocketEndpoint(
+            DelegatingTaskScheduler asyncTaskScheduler,
+            OcppServerRepository ocppServerRepository,
+            FutureResponseContextStore futureResponseContextStore,
+            ApplicationEventPublisher applicationEventPublisher,
+            CentralSystemService15_SoapServer server,
+            Ocpp15TypeStore typeStore,
+            SessionContextStore sessionContextStore,
+            @Qualifier("ocppObjectMapper") ObjectMapper ocppMapper,
+            Sender sender) {
+        super(
+                asyncTaskScheduler,
+                ocppServerRepository,
+                futureResponseContextStore,
+                applicationEventPublisher,
+                sessionContextStore);
         var serializer = new Serializer(ocppMapper);
         var deserializer = new Deserializer(ocppMapper, futureResponseContextStore, typeStore);
         this.pipeline = new IncomingPipeline(serializer, deserializer, sender, new Ocpp15CallHandler(server));
@@ -97,8 +101,8 @@ public class Ocpp15WebSocketEndpoint extends AbstractWebSocketEndpoint {
             ResponseType r;
 
             if (params instanceof BootNotificationRequest) {
-                r = server.bootNotificationWithTransport((BootNotificationRequest) params, chargeBoxId,
-                    OcppProtocol.V_15_JSON);
+                r = server.bootNotificationWithTransport(
+                        (BootNotificationRequest) params, chargeBoxId, OcppProtocol.V_15_JSON);
 
             } else if (params instanceof FirmwareStatusNotificationRequest) {
                 r = server.firmwareStatusNotification((FirmwareStatusNotificationRequest) params, chargeBoxId);

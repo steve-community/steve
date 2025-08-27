@@ -45,20 +45,17 @@ public class UnlockConnectorTask extends CommunicationTask<UnlockConnectorParams
 
     @Override
     public ocpp.cp._2010._08.UnlockConnectorRequest getOcpp12Request() {
-        return new ocpp.cp._2010._08.UnlockConnectorRequest()
-                .withConnectorId(params.getConnectorId());
+        return new ocpp.cp._2010._08.UnlockConnectorRequest().withConnectorId(params.getConnectorId());
     }
 
     @Override
     public ocpp.cp._2012._06.UnlockConnectorRequest getOcpp15Request() {
-        return new ocpp.cp._2012._06.UnlockConnectorRequest()
-                .withConnectorId(params.getConnectorId());
+        return new ocpp.cp._2012._06.UnlockConnectorRequest().withConnectorId(params.getConnectorId());
     }
 
     @Override
     public ocpp.cp._2015._10.UnlockConnectorRequest getOcpp16Request() {
-        return new ocpp.cp._2015._10.UnlockConnectorRequest()
-                .withConnectorId(params.getConnectorId());
+        return new ocpp.cp._2015._10.UnlockConnectorRequest().withConnectorId(params.getConnectorId());
     }
 
     @Override

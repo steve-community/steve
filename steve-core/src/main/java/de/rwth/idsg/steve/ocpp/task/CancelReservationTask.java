@@ -35,8 +35,7 @@ public class CancelReservationTask extends Ocpp15AndAboveTask<CancelReservationP
 
     private final ReservationRepository reservationRepository;
 
-    public CancelReservationTask(CancelReservationParams params,
-                                 ReservationRepository reservationRepository) {
+    public CancelReservationTask(CancelReservationParams params, ReservationRepository reservationRepository) {
         super(params);
         this.reservationRepository = reservationRepository;
     }
@@ -57,14 +56,12 @@ public class CancelReservationTask extends Ocpp15AndAboveTask<CancelReservationP
 
     @Override
     public CancelReservationRequest getOcpp15Request() {
-        return new CancelReservationRequest()
-                .withReservationId(params.getReservationId());
+        return new CancelReservationRequest().withReservationId(params.getReservationId());
     }
 
     @Override
     public ocpp.cp._2015._10.CancelReservationRequest getOcpp16Request() {
-        return new ocpp.cp._2015._10.CancelReservationRequest()
-                .withReservationId(params.getReservationId());
+        return new ocpp.cp._2015._10.CancelReservationRequest().withReservationId(params.getReservationId());
     }
 
     @Override

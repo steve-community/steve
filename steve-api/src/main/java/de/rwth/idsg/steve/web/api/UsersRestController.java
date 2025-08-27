@@ -24,8 +24,6 @@ import de.rwth.idsg.steve.web.dto.UserForm;
 import de.rwth.idsg.steve.web.dto.UserQueryForm;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-
-import jakarta.validation.Valid;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -40,6 +38,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.util.List;
+import jakarta.validation.Valid;
 
 @Tag(name = "users")
 @RestController
@@ -62,11 +61,10 @@ public class UsersRestController {
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<User.Details> addUser(@Valid @RequestBody UserForm form) {
         var body = usersService.add(form);
-        var location = ServletUriComponentsBuilder
-            .fromCurrentRequest()
-            .path("/{id}")
-            .buildAndExpand(body.getUserRecord().getUserPk())
-            .toUri();
+        var location = ServletUriComponentsBuilder.fromCurrentRequest()
+                .path("/{id}")
+                .buildAndExpand(body.getUserRecord().getUserPk())
+                .toUri();
         return ResponseEntity.created(location).body(body);
     }
 

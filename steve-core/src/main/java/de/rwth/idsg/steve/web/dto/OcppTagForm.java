@@ -25,11 +25,10 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
-import jakarta.validation.constraints.Future;
-import jakarta.validation.constraints.NotEmpty;
-
 import java.time.Instant;
 import java.util.Objects;
+import jakarta.validation.constraints.Future;
+import jakarta.validation.constraints.NotEmpty;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -46,16 +45,14 @@ public class OcppTagForm {
     private Integer ocppTagPk;
 
     @Schema(description = "Will be used in create/insert flows. Will be ignored in update flows.")
-    @NotEmpty(message = "ID Tag is required")
-    @IdTag
+    @NotEmpty(message = "ID Tag is required") @IdTag
     private String idTag;
 
     // Is a FK in DB table. No validation needed. Operation will fail if DB constraint fails.
     private String parentIdTag;
 
     @Schema(description = "ISO-8601 instant with timezone. Example: `2024-08-25T14:30:00.000Z`")
-    @Future(message = "Expiry Date/Time must be in future")
-    private Instant expiryDate;
+    @Future(message = "Expiry Date/Time must be in future") private Instant expiryDate;
 
     private Integer maxActiveTransactionCount;
 

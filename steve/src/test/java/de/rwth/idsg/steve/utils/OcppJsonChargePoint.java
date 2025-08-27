@@ -40,9 +40,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.StatusCode;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketClose;
-import org.eclipse.jetty.websocket.api.annotations.OnWebSocketOpen;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketError;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
+import org.eclipse.jetty.websocket.api.annotations.OnWebSocketOpen;
 import org.eclipse.jetty.websocket.api.annotations.WebSocket;
 import org.eclipse.jetty.websocket.client.ClientUpgradeRequest;
 import org.eclipse.jetty.websocket.client.WebSocketClient;
@@ -95,7 +95,8 @@ public class OcppJsonChargePoint {
         this.version = ocppVersion;
         this.chargeBoxId = chargeBoxId;
         this.connectionPath = pathPrefix + chargeBoxId;
-        this.responseContextMap = synchronizedMap(new LinkedHashMap<>()); // because we want to keep the insertion order of test cases
+        this.responseContextMap =
+                synchronizedMap(new LinkedHashMap<>()); // because we want to keep the insertion order of test cases
         this.requestContextMap = new ConcurrentHashMap<>();
         this.deserializer = new MessageDeserializer();
         this.client = new WebSocketClient();
@@ -163,13 +164,20 @@ public class OcppJsonChargePoint {
         }
     }
 
-    public <T extends ResponseType> void prepare(RequestType request, Class<T> responseClass,
-                                                 Consumer<T> responseHandler, Consumer<OcppJsonError> errorHandler) {
+    public <T extends ResponseType> void prepare(
+            RequestType request,
+            Class<T> responseClass,
+            Consumer<T> responseHandler,
+            Consumer<OcppJsonError> errorHandler) {
         prepare(request, getOperationName(request), responseClass, responseHandler, errorHandler);
     }
 
-    public <T extends ResponseType> void prepare(RequestType payload, String action, Class<T> responseClass,
-                                                 Consumer<T> responseHandler, Consumer<OcppJsonError> errorHandler) {
+    public <T extends ResponseType> void prepare(
+            RequestType payload,
+            String action,
+            Class<T> responseClass,
+            Consumer<T> responseHandler,
+            Consumer<OcppJsonError> errorHandler) {
         var messageId = UUID.randomUUID().toString();
 
         var call = new OcppJsonCall();
@@ -192,7 +200,8 @@ public class OcppJsonChargePoint {
         var responseCount = responseContextMap.size();
         receivedMessagesSignal = new CountDownLatch(requestCount + responseCount);
 
-        // copy the values in a new list to be iterated over, because otherwise we get a ConcurrentModificationException,
+        // copy the values in a new list to be iterated over, because otherwise we get a
+        // ConcurrentModificationException,
         // since the onMessage(..) uses the same responseContextMap to remove an item while looping over its items here.
         var values = new ArrayList<>(responseContextMap.values());
 
@@ -252,10 +261,10 @@ public class OcppJsonChargePoint {
         JsonNode responsePayload = null; // TODO
         try {
             var node = ocppMapper
-                .createArrayNode()
-                .add(MessageType.CALL_RESULT.getTypeNr())
-                .add(call.getMessageId())
-                .add(responsePayload);
+                    .createArrayNode()
+                    .add(MessageType.CALL_RESULT.getTypeNr())
+                    .add(call.getMessageId())
+                    .add(responsePayload);
 
             var str = ocppMapper.writeValueAsString(node);
             session.sendText(str, NOOP);
@@ -271,10 +280,11 @@ public class OcppJsonChargePoint {
         private final Consumer<OcppJsonError> errorHandler;
 
         @SuppressWarnings("unchecked")
-        private <T extends ResponseType> ResponseContext(String outgoingMessage,
-                                                         Class<T> responseClass,
-                                                         Consumer<T> responseHandler,
-                                                         Consumer<OcppJsonError> errorHandler) {
+        private <T extends ResponseType> ResponseContext(
+                String outgoingMessage,
+                Class<T> responseClass,
+                Consumer<T> responseHandler,
+                Consumer<OcppJsonError> errorHandler) {
             this.outgoingMessage = outgoingMessage;
             this.responseClass = (Class<ResponseType>) responseClass;
             this.responseHandler = (Consumer<ResponseType>) responseHandler;

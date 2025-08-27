@@ -32,9 +32,7 @@ import jakarta.validation.constraints.NotNull;
 @Getter
 public class TriggerMessageParams extends MultipleChargePointSelect {
 
-    @NotNull(message = "Requested Message required")
-    private TriggerMessageEnum triggerMessage;
+    @NotNull(message = "Requested Message required") private TriggerMessageEnum triggerMessage;
 
-    @Min(value = 1, message = "Connector ID must be at least {value}")
-    private Integer connectorId;
+    @Min(value = 1, message = "Connector ID must be at least {value}") private Integer connectorId;
 }

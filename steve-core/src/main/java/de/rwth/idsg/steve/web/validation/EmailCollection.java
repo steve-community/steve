@@ -18,10 +18,10 @@
  */
 package de.rwth.idsg.steve.web.validation;
 
-import jakarta.validation.Constraint;
-import jakarta.validation.Payload;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
+import jakarta.validation.Constraint;
+import jakarta.validation.Payload;
 
 import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.ElementType.METHOD;

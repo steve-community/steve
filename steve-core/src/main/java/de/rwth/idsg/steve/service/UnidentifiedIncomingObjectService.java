@@ -42,24 +42,22 @@ public class UnidentifiedIncomingObjectService {
     private final Cache<String, UnidentifiedIncomingObject> objectsHolder;
 
     public UnidentifiedIncomingObjectService(int maxSize) {
-        objectsHolder = CacheBuilder.newBuilder()
-                                    .maximumSize(maxSize)
-                                    .build();
+        objectsHolder = CacheBuilder.newBuilder().maximumSize(maxSize).build();
     }
 
     public List<UnidentifiedIncomingObject> getObjects() {
-        return objectsHolder.asMap()
-                            .values()
-                            .stream()
-                            .sorted(Comparator.comparingInt(UnidentifiedIncomingObject::getNumberOfAttempts).reversed())
-                            .collect(Collectors.toList());
+        return objectsHolder.asMap().values().stream()
+                .sorted(Comparator.comparingInt(UnidentifiedIncomingObject::getNumberOfAttempts)
+                        .reversed())
+                .collect(Collectors.toList());
     }
 
     public void processNewUnidentified(String key) {
         synchronized (changeLock) {
             try {
-                objectsHolder.get(key, () -> new UnidentifiedIncomingObject(key))
-                             .updateStats();
+                objectsHolder
+                        .get(key, () -> new UnidentifiedIncomingObject(key))
+                        .updateStats();
             } catch (ExecutionException e) {
                 log.error("Error occurred", e);
             }

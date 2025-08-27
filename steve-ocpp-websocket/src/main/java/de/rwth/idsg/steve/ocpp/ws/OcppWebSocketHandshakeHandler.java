@@ -63,8 +63,12 @@ public class OcppWebSocketHandshakeHandler implements HandshakeHandler {
     }
 
     @Override
-    public boolean doHandshake(ServerHttpRequest request, ServerHttpResponse response,
-                               WebSocketHandler wsHandler, Map<String, Object> attributes) throws HandshakeFailureException {
+    public boolean doHandshake(
+            ServerHttpRequest request,
+            ServerHttpResponse response,
+            WebSocketHandler wsHandler,
+            Map<String, Object> attributes)
+            throws HandshakeFailureException {
 
         // -------------------------------------------------------------------------
         // 1. Check the chargeBoxId
@@ -112,11 +116,14 @@ public class OcppWebSocketHandshakeHandler implements HandshakeHandler {
             return false;
         }
 
-        log.debug("ChargeBoxId '{}' will be using {}", chargeBoxId, endpoint.getClass().getSimpleName());
+        log.debug(
+                "ChargeBoxId '{}' will be using {}",
+                chargeBoxId,
+                endpoint.getClass().getSimpleName());
         return delegate.doHandshake(request, response, endpoint, attributes);
     }
 
-    private AbstractWebSocketEndpoint selectEndpoint(List<String> requestedProtocols ) {
+    private AbstractWebSocketEndpoint selectEndpoint(List<String> requestedProtocols) {
         for (String requestedProcotol : requestedProtocols) {
             for (AbstractWebSocketEndpoint item : endpoints) {
                 if (item.getVersion().getValue().equals(requestedProcotol)) {

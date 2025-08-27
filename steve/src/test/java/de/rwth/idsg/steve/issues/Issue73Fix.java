@@ -114,10 +114,10 @@ public class Issue73Fix {
                         .withIdTag(REGISTERED_OCPP_TAG)
                         .withTimestamp(OffsetDateTime.now())
                         .withMeterStart(0),
-                chargeBoxId
-        );
+                chargeBoxId);
         assertThat(start).isNotNull();
         assertThat(start.getTransactionId()).isGreaterThan(0);
-        assertThat(__DatabasePreparer__.getOcppTagRecord(REGISTERED_OCPP_TAG).getInTransaction()).isTrue();
+        assertThat(__DatabasePreparer__.getOcppTagRecord(REGISTERED_OCPP_TAG).getInTransaction())
+                .isTrue();
     }
 }

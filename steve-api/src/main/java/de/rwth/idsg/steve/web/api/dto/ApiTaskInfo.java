@@ -23,12 +23,11 @@ import de.rwth.idsg.steve.ocpp.OcppVersion;
 import de.rwth.idsg.steve.ocpp.RequestResult;
 import de.rwth.idsg.steve.ocpp.TaskOrigin;
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.time.OffsetDateTime;
 import java.util.Map;
-
-import lombok.Getter;
-import lombok.Setter;
 
 /**
  * @author fnkbsi
@@ -39,37 +38,42 @@ import lombok.Setter;
 public class ApiTaskInfo {
     @Schema(description = "Task ID")
     private Integer taskId;
+
     @Schema(description = "OCPP version")
     private OcppVersion ocppVersion;
+
     @Schema(description = "OCPP operation")
     private String operationName;
+
     @Schema(description = "external / internal")
     private TaskOrigin origin;
+
     @Schema(description = "Caller of the Task")
     private String caller;
 
     @Schema(description = "Results")
     private Map<String, RequestResult> resultMap;
+
     @Schema(description = "Count of Results")
     private int resultSize;
 
     @Schema(description = "Starttime")
     private OffsetDateTime startTimestamp;
+
     @Schema(description = "Endtime")
     private OffsetDateTime endTimestamp;
 
     @Schema(description = "Error count")
     private int errorCount;
+
     @Schema(description = "Response count")
     private int responseCount;
-
 
     public ApiTaskInfo(Integer taskId, CommunicationTask<?, ?> r) {
         this.taskId = taskId;
         this.operationName = r.getOperationName();
         this.origin = r.getOrigin();
         this.caller = r.getCaller();
-
 
         this.resultMap = r.getResultMap();
         this.resultSize = r.getResultSize();

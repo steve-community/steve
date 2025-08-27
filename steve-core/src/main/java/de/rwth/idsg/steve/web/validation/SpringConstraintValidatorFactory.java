@@ -18,11 +18,12 @@
  */
 package de.rwth.idsg.steve.web.validation;
 
-import jakarta.validation.ConstraintValidator;
-import jakarta.validation.ConstraintValidatorFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.stereotype.Component;
+
+import jakarta.validation.ConstraintValidator;
+import jakarta.validation.ConstraintValidatorFactory;
 
 @Component
 @RequiredArgsConstructor
@@ -36,5 +37,5 @@ public class SpringConstraintValidatorFactory implements ConstraintValidatorFact
     }
 
     @Override
-    public void releaseInstance(ConstraintValidator<?, ?> instance) { }
+    public void releaseInstance(ConstraintValidator<?, ?> instance) {}
 }

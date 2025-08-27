@@ -18,9 +18,9 @@
  */
 package de.rwth.idsg.steve.issues;
 
-import de.rwth.idsg.steve.utils.SteveConfigurationReader;
 import de.rwth.idsg.steve.StressTest;
 import de.rwth.idsg.steve.utils.Helpers;
+import de.rwth.idsg.steve.utils.SteveConfigurationReader;
 import de.rwth.idsg.steve.utils.StressTester;
 import lombok.RequiredArgsConstructor;
 import ocpp.cs._2015._10.BootNotificationRequest;
@@ -65,11 +65,12 @@ public class Issue81 extends StressTest {
                 client.set(getForOcpp16(path));
                 chargeBoxId.set(Helpers.getRandomString());
 
-                var boot = getForOcpp16(path).bootNotification(
-                        new BootNotificationRequest()
-                                .withChargePointVendor(getRandomString())
-                                .withChargePointModel(getRandomString()),
-                        chargeBoxId.get());
+                var boot = getForOcpp16(path)
+                        .bootNotification(
+                                new BootNotificationRequest()
+                                        .withChargePointVendor(getRandomString())
+                                        .withChargePointModel(getRandomString()),
+                                chargeBoxId.get());
                 assertThat(boot.getStatus()).isEqualTo(RegistrationStatus.ACCEPTED);
 
                 var req = new StartTransactionRequest()
@@ -90,9 +91,7 @@ public class Issue81 extends StressTest {
             }
 
             @Override
-            public void afterRepeat() {
-
-            }
+            public void afterRepeat() {}
         };
 
         var tester = new StressTester(THREAD_COUNT, REPEAT_COUNT_PER_THREAD);

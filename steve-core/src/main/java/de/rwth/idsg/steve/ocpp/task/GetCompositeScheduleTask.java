@@ -32,7 +32,8 @@ import jakarta.xml.ws.AsyncHandler;
  * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 13.03.2018
  */
-public class GetCompositeScheduleTask extends Ocpp16AndAboveTask<GetCompositeScheduleParams, GetCompositeScheduleResponse> {
+public class GetCompositeScheduleTask
+        extends Ocpp16AndAboveTask<GetCompositeScheduleParams, GetCompositeScheduleResponse> {
 
     public GetCompositeScheduleTask(GetCompositeScheduleParams params) {
         super(params);

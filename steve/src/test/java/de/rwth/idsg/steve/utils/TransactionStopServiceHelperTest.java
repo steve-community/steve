@@ -48,26 +48,21 @@ public class TransactionStopServiceHelperTest {
 
     @Test
     public void testIsEnergy_empty() {
-        var value = TransactionDetails.MeterValues.builder()
-            .build();
+        var value = TransactionDetails.MeterValues.builder().build();
 
         assertThat(TransactionStopServiceHelper.isEnergyValue(value)).isFalse();
     }
 
     @Test
     public void testIsEnergy_onlyValue() {
-        var value = TransactionDetails.MeterValues.builder()
-            .value("22")
-            .build();
+        var value = TransactionDetails.MeterValues.builder().value("22").build();
 
         assertThat(TransactionStopServiceHelper.isEnergyValue(value)).isTrue();
     }
 
     @Test
     public void testIsEnergy_onlyValueDecimal() {
-        var value = TransactionDetails.MeterValues.builder()
-            .value("22.5")
-            .build();
+        var value = TransactionDetails.MeterValues.builder().value("22.5").build();
 
         assertThat(TransactionStopServiceHelper.isEnergyValue(value)).isTrue();
     }
@@ -75,9 +70,9 @@ public class TransactionStopServiceHelperTest {
     @Test
     public void testIsEnergy_signedData() {
         var value = TransactionDetails.MeterValues.builder()
-            .value("some gibberish that is not an energy value")
-            .format("SignedData")
-            .build();
+                .value("some gibberish that is not an energy value")
+                .format("SignedData")
+                .build();
 
         assertThat(TransactionStopServiceHelper.isEnergyValue(value)).isFalse();
     }
@@ -85,10 +80,10 @@ public class TransactionStopServiceHelperTest {
     @Test
     public void testIsEnergy_notEnergyUnit() {
         var value = TransactionDetails.MeterValues.builder()
-            .value("22")
-            .format("Raw")
-            .unit("Celsius")
-            .build();
+                .value("22")
+                .format("Raw")
+                .unit("Celsius")
+                .build();
 
         assertThat(TransactionStopServiceHelper.isEnergyValue(value)).isFalse();
     }
@@ -96,11 +91,11 @@ public class TransactionStopServiceHelperTest {
     @Test
     public void testIsEnergy_notActiveImportMeasurand() {
         var value = TransactionDetails.MeterValues.builder()
-            .value("22")
-            .format("Raw")
-            .unit("Wh")
-            .measurand("Current.Export")
-            .build();
+                .value("22")
+                .format("Raw")
+                .unit("Wh")
+                .measurand("Current.Export")
+                .build();
 
         assertThat(TransactionStopServiceHelper.isEnergyValue(value)).isFalse();
     }
@@ -108,11 +103,11 @@ public class TransactionStopServiceHelperTest {
     @Test
     public void testIsEnergy_nullFormat() {
         var value = TransactionDetails.MeterValues.builder()
-            .value("22")
-            .format(null)
-            .unit("Wh")
-            .measurand("Energy.Active.Import.Register")
-            .build();
+                .value("22")
+                .format(null)
+                .unit("Wh")
+                .measurand("Energy.Active.Import.Register")
+                .build();
 
         assertThat(TransactionStopServiceHelper.isEnergyValue(value)).isTrue();
     }
@@ -120,11 +115,11 @@ public class TransactionStopServiceHelperTest {
     @Test
     public void testIsEnergy_rawFormat() {
         var value = TransactionDetails.MeterValues.builder()
-            .value("22")
-            .format("Raw")
-            .unit("Wh")
-            .measurand("Energy.Active.Import.Register")
-            .build();
+                .value("22")
+                .format("Raw")
+                .unit("Wh")
+                .measurand("Energy.Active.Import.Register")
+                .build();
 
         assertThat(TransactionStopServiceHelper.isEnergyValue(value)).isTrue();
     }
@@ -132,11 +127,11 @@ public class TransactionStopServiceHelperTest {
     @Test
     public void testIsEnergy_kWhUnit() {
         var value = TransactionDetails.MeterValues.builder()
-            .value("22")
-            .format("Raw")
-            .unit("kWh")
-            .measurand("Energy.Active.Import.Register")
-            .build();
+                .value("22")
+                .format("Raw")
+                .unit("kWh")
+                .measurand("Energy.Active.Import.Register")
+                .build();
 
         assertThat(TransactionStopServiceHelper.isEnergyValue(value)).isTrue();
     }
@@ -144,21 +139,19 @@ public class TransactionStopServiceHelperTest {
     @Test
     public void testIsEnergy_nonNumericValue() {
         var value = TransactionDetails.MeterValues.builder()
-            .value("22a819()b")
-            .format("Raw")
-            .unit("Wh")
-            .measurand("Energy.Active.Import.Register")
-            .build();
+                .value("22a819()b")
+                .format("Raw")
+                .unit("Wh")
+                .measurand("Energy.Active.Import.Register")
+                .build();
 
         assertThat(TransactionStopServiceHelper.isEnergyValue(value)).isFalse();
     }
 
     @Test
     public void testIsEnergy_valueAndUnit() {
-        var value = TransactionDetails.MeterValues.builder()
-            .value("22")
-            .unit("Wh")
-            .build();
+        var value =
+                TransactionDetails.MeterValues.builder().value("22").unit("Wh").build();
 
         assertThat(TransactionStopServiceHelper.isEnergyValue(value)).isTrue();
     }

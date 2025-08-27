@@ -38,9 +38,14 @@ public class EndpointInfo {
     private final ItemsWithInfo ocppWebSocket;
 
     public EndpointInfo(SteveConfiguration config) {
-        this.webInterface = new ItemsWithInfo("Access the web interface using", config.getPaths().getManagerMapping() + "/home");
-        this.ocppSoap = new ItemsWithInfo("SOAP endpoint for OCPP", config.getPaths().getSoapMapping() + config.getPaths().getRouterEndpointPath());
-        this.ocppWebSocket = new ItemsWithInfo("WebSocket/JSON endpoint for OCPP", config.getPaths().getWebsocketMapping() + config.getPaths().getRouterEndpointPath() + "/(chargeBoxId)");
+        this.webInterface = new ItemsWithInfo(
+                "Access the web interface using", config.getPaths().getManagerMapping() + "/home");
+        this.ocppSoap = new ItemsWithInfo(
+                "SOAP endpoint for OCPP",
+                config.getPaths().getSoapMapping() + config.getPaths().getRouterEndpointPath());
+        this.ocppWebSocket = new ItemsWithInfo(
+                "WebSocket/JSON endpoint for OCPP",
+                config.getPaths().getWebsocketMapping() + config.getPaths().getRouterEndpointPath() + "/(chargeBoxId)");
     }
 
     @Getter
@@ -57,9 +62,7 @@ public class EndpointInfo {
         }
 
         public synchronized void setData(List<String> data) {
-            this.data = data.stream()
-                            .map(s -> s + dataElementPostFix)
-                            .toList();
+            this.data = data.stream().map(s -> s + dataElementPostFix).toList();
         }
     }
 }

@@ -19,13 +19,12 @@
 package de.rwth.idsg.steve.web.validation;
 
 import com.google.common.base.Strings;
-import jakarta.annotation.PostConstruct;
-import jakarta.validation.ConstraintValidator;
-import jakarta.validation.ConstraintValidatorContext;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.util.regex.Pattern;
+import jakarta.validation.ConstraintValidator;
+import jakarta.validation.ConstraintValidatorContext;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -38,13 +37,14 @@ public class ChargeBoxIdValidator implements ConstraintValidator<ChargeBoxId, St
 
     @Value("${charge-box-id.validation.regex:#{null}}")
     private String chargeBoxIdValidationRegex;
+
     private Pattern pattern;
 
     // Default constructor for Hibernate Validator
     // Spring will inject the value from properties
     // And then HV will call `initialize`
     public ChargeBoxIdValidator() {
-      initialize(null);
+        initialize(null);
     }
 
     @Override

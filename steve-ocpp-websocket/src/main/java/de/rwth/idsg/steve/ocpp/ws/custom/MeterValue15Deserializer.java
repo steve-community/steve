@@ -72,8 +72,7 @@ public class MeterValue15Deserializer extends JsonDeserializer<List<MeterValue>>
     }
 
     // MeterValue
-    private MeterValue buildMeterValue(ObjectMapper mapper, JsonNode node)
-            throws JsonProcessingException {
+    private MeterValue buildMeterValue(ObjectMapper mapper, JsonNode node) throws JsonProcessingException {
 
         MeterValue meterValue = new MeterValue();
         List<MeterValue.Value> list = meterValue.getValue();

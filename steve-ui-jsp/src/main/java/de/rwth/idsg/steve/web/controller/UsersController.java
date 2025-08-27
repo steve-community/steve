@@ -30,10 +30,9 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
-import jakarta.validation.Valid;
-
 import java.util.ArrayList;
 import java.util.List;
+import jakarta.validation.Valid;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -99,8 +98,7 @@ public class UsersController {
     }
 
     @PostMapping(params = "add", value = ADD_PATH)
-    public String addPost(@Valid @ModelAttribute("userForm") UserForm userForm,
-                          BindingResult result, Model model) {
+    public String addPost(@Valid @ModelAttribute("userForm") UserForm userForm, BindingResult result, Model model) {
         if (result.hasErrors()) {
             setTags(model, userForm.getIdTagList());
             return "data-man/userAdd";
@@ -111,8 +109,7 @@ public class UsersController {
     }
 
     @PostMapping(params = "update", value = UPDATE_PATH)
-    public String update(@Valid @ModelAttribute("userForm") UserForm userForm,
-                         BindingResult result, Model model) {
+    public String update(@Valid @ModelAttribute("userForm") UserForm userForm, BindingResult result, Model model) {
         if (result.hasErrors()) {
             setTags(model, userForm.getIdTagList());
             return "data-man/userDetails";

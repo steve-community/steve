@@ -60,18 +60,22 @@ public class Ocpp16WebSocketEndpoint extends AbstractWebSocketEndpoint {
 
     private final IncomingPipeline pipeline;
 
-    public Ocpp16WebSocketEndpoint(DelegatingTaskScheduler asyncTaskScheduler,
-                                   OcppServerRepository ocppServerRepository,
-                                   FutureResponseContextStore futureResponseContextStore,
-                                   ApplicationEventPublisher applicationEventPublisher,
-                                   CentralSystemService16_SoapServer server,
-                                   Ocpp16TypeStore typeStore,
-                                   SessionContextStore sessionStore,
-                                   @Qualifier("ocppObjectMapper")
-                                   ObjectMapper ocppMapper,
-                                   Sender sender) {
-        super(asyncTaskScheduler, ocppServerRepository, futureResponseContextStore, applicationEventPublisher,
-            sessionStore);
+    public Ocpp16WebSocketEndpoint(
+            DelegatingTaskScheduler asyncTaskScheduler,
+            OcppServerRepository ocppServerRepository,
+            FutureResponseContextStore futureResponseContextStore,
+            ApplicationEventPublisher applicationEventPublisher,
+            CentralSystemService16_SoapServer server,
+            Ocpp16TypeStore typeStore,
+            SessionContextStore sessionStore,
+            @Qualifier("ocppObjectMapper") ObjectMapper ocppMapper,
+            Sender sender) {
+        super(
+                asyncTaskScheduler,
+                ocppServerRepository,
+                futureResponseContextStore,
+                applicationEventPublisher,
+                sessionStore);
         var serializer = new Serializer(ocppMapper);
         var deserializer = new Deserializer(ocppMapper, futureResponseContextStore, typeStore);
         this.pipeline = new IncomingPipeline(serializer, deserializer, sender, new Ocpp16CallHandler(server));
@@ -97,8 +101,8 @@ public class Ocpp16WebSocketEndpoint extends AbstractWebSocketEndpoint {
             ResponseType r;
 
             if (params instanceof BootNotificationRequest) {
-                r = server.bootNotificationWithTransport((BootNotificationRequest) params, chargeBoxId,
-                    OcppProtocol.V_16_JSON);
+                r = server.bootNotificationWithTransport(
+                        (BootNotificationRequest) params, chargeBoxId, OcppProtocol.V_16_JSON);
 
             } else if (params instanceof FirmwareStatusNotificationRequest) {
                 r = server.firmwareStatusNotification((FirmwareStatusNotificationRequest) params, chargeBoxId);

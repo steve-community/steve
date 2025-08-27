@@ -19,23 +19,22 @@
 package de.rwth.idsg.steve.web.api.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.Setter;
+
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
 
 /**
  * @author fnkbsi
  * @since 18.10.2023
  */
-
 @Getter
 @Setter
 public class ApiChargePointUnlock {
     @Schema(description = "Charge Box ID", requiredMode = Schema.RequiredMode.REQUIRED)
-    @NotBlank
-    private String chargeBoxId;
+    @NotBlank private String chargeBoxId;
+
     @Schema(description = "Connector ID", requiredMode = Schema.RequiredMode.REQUIRED)
-    @Min(0)
-    private Integer connectorId;
+    @Min(0) private Integer connectorId;
 }

@@ -25,12 +25,11 @@ import de.rwth.idsg.steve.web.dto.ocpp.SendLocalListParams;
 import de.rwth.idsg.steve.web.dto.ocpp.SendLocalListUpdateType;
 import ocpp.cp._2015._10.AuthorizationData;
 
-import jakarta.xml.ws.AsyncHandler;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
+import jakarta.xml.ws.AsyncHandler;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -56,7 +55,8 @@ public class SendLocalListTask extends Ocpp15AndAboveTask<SendLocalListParams, S
 
         return new ocpp.cp._2012._06.SendLocalListRequest()
                 .withListVersion(ocpp16Request.getListVersion())
-                .withUpdateType(ocpp.cp._2012._06.UpdateType.fromValue(ocpp16Request.getUpdateType().value()))
+                .withUpdateType(ocpp.cp._2012._06.UpdateType.fromValue(
+                        ocpp16Request.getUpdateType().value()))
                 .withLocalAuthorisationList(toOcpp15(ocpp16Request.getLocalAuthorizationList()));
     }
 
@@ -127,15 +127,17 @@ public class SendLocalListTask extends Ocpp15AndAboveTask<SendLocalListParams, S
     private static List<ocpp.cp._2012._06.AuthorisationData> toOcpp15(
             List<ocpp.cp._2015._10.AuthorizationData> ocpp16) {
         return ocpp16.stream()
-                     .map(k -> new ocpp.cp._2012._06.AuthorisationData().withIdTag(k.getIdTag())
-                                                                        .withIdTagInfo(toOcpp15(k.getIdTagInfo())))
-                     .collect(Collectors.toList());
+                .map(k -> new ocpp.cp._2012._06.AuthorisationData()
+                        .withIdTag(k.getIdTag())
+                        .withIdTagInfo(toOcpp15(k.getIdTagInfo())))
+                .collect(Collectors.toList());
     }
 
     private static ocpp.cp._2012._06.IdTagInfo toOcpp15(ocpp.cp._2015._10.IdTagInfo ocpp16) {
         return new ocpp.cp._2012._06.IdTagInfo()
                 .withParentIdTag(ocpp16.getParentIdTag())
                 .withExpiryDate(ocpp16.getExpiryDate())
-                .withStatus(ocpp.cp._2012._06.AuthorizationStatus.fromValue(ocpp16.getStatus().value()));
+                .withStatus(ocpp.cp._2012._06.AuthorizationStatus.fromValue(
+                        ocpp16.getStatus().value()));
     }
 }

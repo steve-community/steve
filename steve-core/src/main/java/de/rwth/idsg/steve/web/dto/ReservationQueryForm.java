@@ -50,8 +50,7 @@ public class ReservationQueryForm extends QueryForm {
         return status != null;
     }
 
-    @AssertTrue(message = "The values 'From' and 'To' must be both set")
-    public boolean isPeriodFromToCorrect() {
+    @AssertTrue(message = "The values 'From' and 'To' must be both set") public boolean isPeriodFromToCorrect() {
         return periodType != QueryPeriodType.FROM_TO || isFromToSet();
     }
 
@@ -64,10 +63,11 @@ public class ReservationQueryForm extends QueryForm {
         ACTIVE("Active"),
         FROM_TO("From/To");
 
-        @Getter private final String value;
+        @Getter
+        private final String value;
 
         public static QueryPeriodType fromValue(String v) {
-            for (QueryPeriodType c: QueryPeriodType.values()) {
+            for (QueryPeriodType c : QueryPeriodType.values()) {
                 if (c.value.equals(v)) {
                     return c;
                 }

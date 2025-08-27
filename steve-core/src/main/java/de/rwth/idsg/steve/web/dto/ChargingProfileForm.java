@@ -26,6 +26,10 @@ import ocpp.cp._2015._10.ChargingProfilePurposeType;
 import ocpp.cp._2015._10.ChargingRateUnitType;
 import ocpp.cp._2015._10.RecurrencyKindType;
 
+import java.math.BigDecimal;
+import java.time.Instant;
+import java.util.Map;
+import java.util.Objects;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.Future;
@@ -33,10 +37,6 @@ import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.PositiveOrZero;
-import java.math.BigDecimal;
-import java.time.Instant;
-import java.util.Map;
-import java.util.Objects;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -53,44 +53,33 @@ public class ChargingProfileForm {
     private String description;
     private String note;
 
-    @NotNull(message = "Stack Level has to be set")
-    @PositiveOrZero(message = "Stack Level has to be a positive number or 0")
-    private Integer stackLevel;
+    @NotNull(message = "Stack Level has to be set") @PositiveOrZero(message = "Stack Level has to be a positive number or 0") private Integer stackLevel;
 
-    @NotNull(message = "Charging Profile Purpose has to be set")
-    private ChargingProfilePurposeType chargingProfilePurpose;
+    @NotNull(message = "Charging Profile Purpose has to be set") private ChargingProfilePurposeType chargingProfilePurpose;
 
-    @NotNull(message = "Charging Profile Kind has to be set")
-    private ChargingProfileKindType chargingProfileKind;
+    @NotNull(message = "Charging Profile Kind has to be set") private ChargingProfileKindType chargingProfileKind;
 
     private RecurrencyKindType recurrencyKind;
 
     private Instant validFrom;
 
-    @Future(message = "Valid To must be in future")
-    private Instant validTo;
+    @Future(message = "Valid To must be in future") private Instant validTo;
 
-    @Positive(message = "Duration has to be a positive number")
-    private Integer durationInSeconds;
+    @Positive(message = "Duration has to be a positive number") private Integer durationInSeconds;
 
     private Instant startSchedule;
 
-    @NotNull(message = "Charging Rate Unit has to be set")
-    private ChargingRateUnitType chargingRateUnit;
+    @NotNull(message = "Charging Rate Unit has to be set") private ChargingRateUnitType chargingRateUnit;
 
     private BigDecimal minChargingRate;
 
-    @NotEmpty(message = "Schedule Periods cannot be empty")
-    @Valid
-    private Map<String, SchedulePeriod> schedulePeriodMap;
+    @NotEmpty(message = "Schedule Periods cannot be empty") @Valid private Map<String, SchedulePeriod> schedulePeriodMap;
 
-    @AssertTrue(message = "Valid To must be after Valid From")
-    public boolean isFromToValid() {
+    @AssertTrue(message = "Valid To must be after Valid From") public boolean isFromToValid() {
         return !(validFrom != null && validTo != null) || validTo.isAfter(validFrom);
     }
 
-    @AssertTrue(message = "Start schedule must be between Valid To and From")
-    public boolean isStartScheduleValid() {
+    @AssertTrue(message = "Start schedule must be between Valid To and From") public boolean isStartScheduleValid() {
         if (validFrom != null && startSchedule != null && !startSchedule.isAfter(validFrom)) {
             return false;
         }
@@ -102,8 +91,7 @@ public class ChargingProfileForm {
         return true;
     }
 
-    @AssertTrue(message = "Valid From/To should not be used with the profile purpose 'TxProfile'")
-    public boolean isFromToAndProfileSettingCorrect() {
+    @AssertTrue(message = "Valid From/To should not be used with the profile purpose 'TxProfile'") public boolean isFromToAndProfileSettingCorrect() {
         boolean isTxProfile = (chargingProfilePurpose == ChargingProfilePurposeType.TX_PROFILE);
 
         if (validFrom != null && isTxProfile) {
@@ -124,11 +112,9 @@ public class ChargingProfileForm {
 
         private static final int defaultNumberPhases = 3;
 
-        @NotNull(message = "Schedule period: Start Period has to be set")
-        private Integer startPeriodInSeconds; // from the startSchedule
+        @NotNull(message = "Schedule period: Start Period has to be set") private Integer startPeriodInSeconds; // from the startSchedule
 
-        @NotNull(message = "Schedule period: Power Limit has to be set")
-        private BigDecimal powerLimit;
+        @NotNull(message = "Schedule period: Power Limit has to be set") private BigDecimal powerLimit;
 
         private Integer numberPhases;
 

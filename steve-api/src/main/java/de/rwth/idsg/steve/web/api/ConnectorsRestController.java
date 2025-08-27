@@ -25,20 +25,17 @@ import de.rwth.idsg.steve.utils.ConnectorStatusFilter;
 import de.rwth.idsg.steve.web.api.dto.ApiConnectorList;
 import de.rwth.idsg.steve.web.dto.ConnectorStatusForm;
 import de.rwth.idsg.steve.web.dto.OcppJsonStatus;
-
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.time.ZoneOffset;
 import java.util.List;
-
 import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-
-import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RestController;
 
 /**
  * @author fnkbsi
@@ -90,8 +87,7 @@ public class ConnectorsRestController {
         if (queryParams == null) {
             return false;
         }
-        return isDefined(queryParams.getChargeBoxId())
-          || isDefined(queryParams.getStatus());
+        return isDefined(queryParams.getChargeBoxId()) || isDefined(queryParams.getStatus());
     }
 
     private static boolean isDefined(String str) {

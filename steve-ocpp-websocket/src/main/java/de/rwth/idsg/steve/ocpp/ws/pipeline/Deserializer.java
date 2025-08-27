@@ -156,8 +156,7 @@ public class Deserializer implements Consumer<CommunicationContext> {
         if (responseContext == null) {
             throw new SteveException(
                     "A result message was received as response to a not-sent call. The message was: %s",
-                    context.getIncomingString()
-            );
+                    context.getIncomingString());
         }
 
         ResponseType res;
@@ -186,8 +185,7 @@ public class Deserializer implements Consumer<CommunicationContext> {
         if (responseContext == null) {
             throw new SteveException(
                     "An error message was received as response to a not-sent call. The message was: %s",
-                    context.getIncomingString()
-            );
+                    context.getIncomingString());
         }
 
         ErrorCode code;
@@ -228,5 +226,4 @@ public class Deserializer implements Consumer<CommunicationContext> {
         context.setIncomingMessage(error);
         context.createErrorHandler(responseContext.getTask());
     }
-
 }

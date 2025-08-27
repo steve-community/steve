@@ -18,33 +18,26 @@
  */
 package de.rwth.idsg.steve.web.dto;
 
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.Setter;
-import jakarta.validation.constraints.Future;
-import jakarta.validation.constraints.NotNull;
 
 import java.time.Instant;
+import jakarta.validation.constraints.Future;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
 @Getter
 @Setter
 public class ReservationForm {
 
-    @NotBlank(message = "ID Tag is required")
-    private String idTag;
+    @NotBlank(message = "ID Tag is required") private String idTag;
 
-    @NotBlank(message = "ChargeBox ID is required")
-    private String chargeBoxId;
+    @NotBlank(message = "ChargeBox ID is required") private String chargeBoxId;
 
-    @NotNull(message = "Connector ID is required")
-    @Min(value = 0, message = "Connector ID must be >= 0")
-    private Integer connectorId;
+    @NotNull(message = "Connector ID is required") @Min(value = 0, message = "Connector ID must be >= 0") private Integer connectorId;
 
-    @NotNull(message = "Start timestamp is required")
-    private Instant startTimestamp;
+    @NotNull(message = "Start timestamp is required") private Instant startTimestamp;
 
-    @NotNull(message = "Expiry timestamp is required")
-    @Future(message = "Expiry timestamp must be in the future")
-    private Instant expiryTimestamp;
+    @NotNull(message = "Expiry timestamp is required") @Future(message = "Expiry timestamp must be in the future") private Instant expiryTimestamp;
 }

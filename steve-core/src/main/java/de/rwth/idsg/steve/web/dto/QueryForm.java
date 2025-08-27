@@ -19,14 +19,14 @@
 package de.rwth.idsg.steve.web.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.AssertTrue;
-import jakarta.validation.constraints.Positive;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
 import java.time.Instant;
+import jakarta.validation.constraints.AssertTrue;
+import jakarta.validation.constraints.Positive;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -45,22 +45,22 @@ public abstract class QueryForm {
     private String ocppIdTag;
 
     @Schema(description = "The User ID")
-    @Positive
-    private Integer userId;
+    @Positive private Integer userId;
 
-    @Schema(description = "Show results that happened after this date/time. Format: ISO-8601 instant.",
+    @Schema(
+            description = "Show results that happened after this date/time. Format: ISO-8601 instant.",
             example = "2022-10-10T09:00:00Z")
     // @DateTimeFormat
     private Instant from;
 
-    @Schema(description = "Show results that happened before this date/time. Format: ISO-8601 instant.",
+    @Schema(
+            description = "Show results that happened before this date/time. Format: ISO-8601 instant.",
             example = "2022-10-10T12:00:00Z")
     // @DateTimeFormat
     private Instant to;
 
     @Schema(hidden = true)
-    @AssertTrue(message = "'To' must be after 'From'")
-    public boolean isFromToValid() {
+    @AssertTrue(message = "'To' must be after 'From'") public boolean isFromToValid() {
         return !isFromToSet() || !to.isBefore(from);
     }
 

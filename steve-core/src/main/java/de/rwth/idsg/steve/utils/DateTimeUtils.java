@@ -57,7 +57,7 @@ public final class DateTimeUtils {
         if (odt == null) {
             return null;
         }
-        return  odt.toInstant();
+        return odt.toInstant();
     }
 
     public static Instant toInstant(LocalDateTime ldt) {
@@ -104,15 +104,15 @@ public final class DateTimeUtils {
         if (inputAtMidnight.equals(todayAtMidnight)) {
             return "Today at " + TIME_FORMATTER.format(dt);
 
-        // Is it yesterday?
+            // Is it yesterday?
         } else if (inputAtMidnight.equals(todayAtMidnight.minusDays(1))) {
             return "Yesterday at " + TIME_FORMATTER.format(dt);
 
-        // Is it tomorrow?
+            // Is it tomorrow?
         } else if (inputAtMidnight.equals(todayAtMidnight.plusDays(1))) {
             return "Tomorrow at " + TIME_FORMATTER.format(dt);
 
-        // So long ago OR in the future...
+            // So long ago OR in the future...
         } else {
             return HUMAN_FORMATTER.format(dt);
         }

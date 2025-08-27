@@ -51,8 +51,10 @@ public class PropertiesFileLoader {
         String externalFileName = System.getProperty(name);
 
         if (externalFileName == null) {
-            log.info("Hint: The Java system property '{}' can be set to point to an external properties file, " +
-                    "which will be prioritized over the bundled one", name);
+            log.info(
+                    "Hint: The Java system property '{}' can be set to point to an external properties file, "
+                            + "which will be prioritized over the bundled one",
+                    name);
             loadFromClasspath(name);
 
         } else {
@@ -67,11 +69,11 @@ public class PropertiesFileLoader {
     public String getString(String key) {
         String s = prop.getProperty(key);
         // initial property value might be null/empty
-        checkForNullAndEmpty(key,s);
+        checkForNullAndEmpty(key, s);
 
         s = resolveIfSystemEnv(s);
         // check again, system env value might be null/empty
-        checkForNullAndEmpty(key,s);
+        checkForNullAndEmpty(key, s);
 
         return trim(key, s);
     }
@@ -103,10 +105,7 @@ public class PropertiesFileLoader {
             return Collections.emptyList();
         }
         s = resolveIfSystemEnv(s);
-        return Splitter.on(",")
-                       .trimResults()
-                       .omitEmptyStrings()
-                       .splitToList(s);
+        return Splitter.on(",").trimResults().omitEmptyStrings().splitToList(s);
     }
 
     public Optional<Boolean> getOptionalBoolean(String key) {

@@ -22,12 +22,11 @@ import de.rwth.idsg.steve.web.validation.IdTag;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.Instant;
 import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-
-import java.time.Instant;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -37,16 +36,10 @@ import java.time.Instant;
 @Setter
 public class ReserveNowParams extends SingleChargePointSelect {
 
-    @NotNull(message = "Connector ID is required")
-    @Min(value = 1, message = "Connector ID must be at least {value}")
-    private Integer connectorId;
+    @NotNull(message = "Connector ID is required") @Min(value = 1, message = "Connector ID must be at least {value}") private Integer connectorId;
 
-    @NotNull(message = "Expiry Date/Time is required")
-    @Future(message = "Expiry Date/Time must be in future")
-    private Instant expiry;
+    @NotNull(message = "Expiry Date/Time is required") @Future(message = "Expiry Date/Time must be in future") private Instant expiry;
 
-    @NotBlank(message = "User ID Tag is required.")
-    @IdTag
+    @NotBlank(message = "User ID Tag is required.") @IdTag
     private String idTag;
-
 }

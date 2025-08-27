@@ -43,11 +43,13 @@ public class SteveConfigurationReader {
                         .soapMapping("/services")
                         .websocketMapping("/websocket")
                         .routerEndpointPath("/CentralSystemService")
-                        .contextPath(sanitizeContextPath(p.getOptionalString("context.path").orElse(null)))
+                        .contextPath(sanitizeContextPath(
+                                p.getOptionalString("context.path").orElse(null)))
                         .build())
                 .timeZoneId("UTC")
                 .steveVersion(p.getString("steve.version"))
-                .gitDescribe(useFallbackIfNotSet(p.getOptionalString("git.describe").orElse(null), null))
+                .gitDescribe(
+                        useFallbackIfNotSet(p.getOptionalString("git.describe").orElse(null), null))
                 .profile(profile)
                 .jetty(SteveConfiguration.Jetty.builder()
                         .serverHost(p.getString("server.host"))
@@ -57,9 +59,11 @@ public class SteveConfigurationReader {
                         .httpsEnabled(p.getBoolean("https.enabled"))
                         .httpsPort(p.getInt("https.port"))
                         .keyStorePath(p.getOptionalString("keystore.path").orElse(null))
-                        .keyStorePassword(p.getOptionalString("keystore.password").orElse(null))
+                        .keyStorePassword(
+                                p.getOptionalString("keystore.password").orElse(null))
                         .build())
-                .db(SteveConfiguration.DB.builder()
+                .db(SteveConfiguration.DB
+                        .builder()
                         .jdbcUrl(p.getString("db.jdbc.url"))
                         .userName(p.getString("db.user"))
                         .password(p.getString("db.password"))
@@ -75,8 +79,10 @@ public class SteveConfigurationReader {
                         .headerValue(p.getOptionalString("webapi.value").orElse(null))
                         .build())
                 .ocpp(SteveConfiguration.Ocpp.builder()
-                        .autoRegisterUnknownStations(p.getOptionalBoolean("auto.register.unknown.stations").orElse(false))
-                        .chargeBoxIdValidationRegex(p.getOptionalString("charge-box-id.validation.regex").orElse(null))
+                        .autoRegisterUnknownStations(p.getOptionalBoolean("auto.register.unknown.stations")
+                                .orElse(false))
+                        .chargeBoxIdValidationRegex(p.getOptionalString("charge-box-id.validation.regex")
+                                .orElse(null))
                         .wsSessionSelectStrategy(p.getString("ws.session.select.strategy"))
                         .build())
                 .build();

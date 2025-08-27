@@ -24,8 +24,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
-import jakarta.validation.constraints.AssertTrue;
 import java.util.Objects;
+import jakarta.validation.constraints.AssertTrue;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -46,12 +46,13 @@ public class TransactionQueryForm extends QueryForm {
     @Schema(description = "Return active or all transactions? Defaults to ALL")
     private QueryType type = QueryType.ACTIVE;
 
-    @Schema(description = "Return the time period of the transactions. If FROM_TO, 'from' and 'to' must be set. Additionally, 'to' must be after 'from'. Defaults to ALL")
+    @Schema(
+            description =
+                    "Return the time period of the transactions. If FROM_TO, 'from' and 'to' must be set. Additionally, 'to' must be after 'from'. Defaults to ALL")
     private QueryPeriodType periodType = QueryPeriodType.ALL;
 
     @Schema(hidden = true)
-    @AssertTrue(message = "The values 'From' and 'To' must be both set")
-    public boolean isPeriodFromToCorrect() {
+    @AssertTrue(message = "The values 'From' and 'To' must be both set") public boolean isPeriodFromToCorrect() {
         return periodType != QueryPeriodType.FROM_TO || isFromToSet();
     }
 
@@ -78,10 +79,11 @@ public class TransactionQueryForm extends QueryForm {
         ACTIVE("Active"),
         STOPPED("Stopped");
 
-        @Getter private final String value;
+        @Getter
+        private final String value;
 
         public static QueryType fromValue(String v) {
-            for (QueryType c: QueryType.values()) {
+            for (QueryType c : QueryType.values()) {
                 if (c.value.equals(v)) {
                     return c;
                 }
@@ -99,7 +101,9 @@ public class TransactionQueryForm extends QueryForm {
         LAST_90("Last 90 days", 90),
         FROM_TO("From/To", -1);
 
-        @Getter private final String value;
+        @Getter
+        private final String value;
+
         private final int interval;
 
         public int getInterval() {
@@ -110,7 +114,7 @@ public class TransactionQueryForm extends QueryForm {
         }
 
         public static QueryPeriodType fromValue(String v) {
-            for (QueryPeriodType c: QueryPeriodType.values()) {
+            for (QueryPeriodType c : QueryPeriodType.values()) {
                 if (c.value.equals(v)) {
                     return c;
                 }

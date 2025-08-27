@@ -23,7 +23,6 @@ package de.rwth.idsg.steve.web.dto.ocpp;
  * @since 13.11.2018
  */
 public enum ClearChargingProfileFilterType {
-
     ChargingProfileId("ChargingProfileId"),
     OtherParameters("OtherParameters");
 

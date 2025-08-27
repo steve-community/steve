@@ -33,8 +33,10 @@ import lombok.ToString;
 public class ConnectorStatusForm {
     @Schema(description = "Charge Box Id")
     private String chargeBoxId;
+
     @Schema(description = "Connector Status")
     private String status;
+
     @Schema(description = "Strategy of listing the connector")
     private Strategy strategy = Strategy.PreferZero;
 

@@ -36,13 +36,16 @@ public final class ConnectorStatus {
     @JsonIgnore
     @Schema(description = "Charge Box DB key", hidden = true)
     private final int chargeBoxPk;
+
     @Schema(description = "Charge Box ID")
     private final String chargeBoxId;
+
     @Schema(description = "Connector ID")
     private final int connectorId;
 
     @Schema(description = "Status")
     private final String status;
+
     @Schema(description = "Error code")
     private final String errorCode;
 

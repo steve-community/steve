@@ -35,15 +35,23 @@ import java.util.Map;
 @ToString
 public final class Statistics {
     // Number of chargeboxes, ocppTags, users, reservations, transactions
-    private final Integer numChargeBoxes, numOcppTags, numUsers, numReservations, numTransactions,
-    // Received heartbeats
-    heartbeatToday, heartbeatYesterday, heartbeatEarlier,
-    //WebUser
-    numWebUsers;
+    private final Integer numChargeBoxes,
+            numOcppTags,
+            numUsers,
+            numReservations,
+            numTransactions,
+            // Received heartbeats
+            heartbeatToday,
+            heartbeatYesterday,
+            heartbeatEarlier,
+            // WebUser
+            numWebUsers;
 
     // Number of connected WebSocket/JSON chargeboxes
-    @Setter private int numOcpp12JChargeBoxes, numOcpp15JChargeBoxes, numOcpp16JChargeBoxes;
+    @Setter
+    private int numOcpp12JChargeBoxes, numOcpp15JChargeBoxes, numOcpp16JChargeBoxes;
 
     // Count of connectors based on their status
-    @Setter private Map<String, Integer> statusCountMap;
+    @Setter
+    private Map<String, Integer> statusCountMap;
 }

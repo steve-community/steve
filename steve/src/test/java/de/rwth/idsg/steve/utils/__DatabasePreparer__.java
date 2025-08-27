@@ -89,11 +89,11 @@ public class __DatabasePreparer__ {
     public static int makeReservation(int connectorId) {
         ReservationRepositoryImpl r = new ReservationRepositoryImpl(dslContext);
         InsertReservationParams params = InsertReservationParams.builder()
-                                                                .chargeBoxId(REGISTERED_CHARGE_BOX_ID)
-                                                                .idTag(REGISTERED_OCPP_TAG)
-                                                                .connectorId(connectorId)
-                                                                .expiryTimestamp(Instant.now().plus(1, ChronoUnit.HOURS))
-                                                                .build();
+                .chargeBoxId(REGISTERED_CHARGE_BOX_ID)
+                .idTag(REGISTERED_OCPP_TAG)
+                .connectorId(connectorId)
+                .expiryTimestamp(Instant.now().plus(1, ChronoUnit.HOURS))
+                .build();
         int reservationId = r.insert(params);
         r.accepted(reservationId);
         return reservationId;
@@ -119,6 +119,7 @@ public class __DatabasePreparer__ {
         TransactionRepositoryImpl impl = new TransactionRepositoryImpl(dslContext);
         return impl.getTransactions(new TransactionQueryForm());
     }
+
     public static List<TransactionRecord> getTransactionRecords() {
         return dslContext.selectFrom(TRANSACTION).fetch();
     }
@@ -160,19 +161,17 @@ public class __DatabasePreparer__ {
                 Settings.SETTINGS,
                 OcppTagActivity.OCPP_TAG_ACTIVITY, // only a view
                 TRANSACTION // only a view
-        );
+                );
 
         ctx.transaction(configuration -> {
-            Schema schema = DefaultCatalog.DEFAULT_CATALOG.getSchemas()
-                                                          .stream()
-                                                          .filter(s -> SCHEMA_TO_TRUNCATE.equals(s.getName()))
-                                                          .findFirst()
-                                                          .orElseThrow(() -> new RuntimeException("Could not find schema"));
+            Schema schema = DefaultCatalog.DEFAULT_CATALOG.getSchemas().stream()
+                    .filter(s -> SCHEMA_TO_TRUNCATE.equals(s.getName()))
+                    .findFirst()
+                    .orElseThrow(() -> new RuntimeException("Could not find schema"));
 
-            List<Table<?>> tables = schema.getTables()
-                                          .stream()
-                                          .filter(t -> !skipList.contains(t))
-                                          .collect(Collectors.toList());
+            List<Table<?>> tables = schema.getTables().stream()
+                    .filter(t -> !skipList.contains(t))
+                    .collect(Collectors.toList());
 
             if (tables.isEmpty()) {
                 throw new RuntimeException("Could not find tables to truncate");
@@ -187,17 +186,15 @@ public class __DatabasePreparer__ {
 
     private static void insertChargeBox(DSLContext ctx) {
         ctx.insertInto(CHARGE_BOX)
-           .set(CHARGE_BOX.CHARGE_BOX_ID, getRegisteredChargeBoxId())
-           .execute();
+                .set(CHARGE_BOX.CHARGE_BOX_ID, getRegisteredChargeBoxId())
+                .execute();
 
         ctx.insertInto(CHARGE_BOX)
-           .set(CHARGE_BOX.CHARGE_BOX_ID, getRegisteredChargeBoxId2())
-           .execute();
+                .set(CHARGE_BOX.CHARGE_BOX_ID, getRegisteredChargeBoxId2())
+                .execute();
     }
 
     private static void insertOcppIdTag(DSLContext ctx) {
-        ctx.insertInto(OCPP_TAG)
-           .set(OCPP_TAG.ID_TAG, getRegisteredOcppTag())
-           .execute();
+        ctx.insertInto(OCPP_TAG).set(OCPP_TAG.ID_TAG, getRegisteredOcppTag()).execute();
     }
 }

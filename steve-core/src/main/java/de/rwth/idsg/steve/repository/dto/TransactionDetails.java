@@ -41,8 +41,7 @@ public class TransactionDetails {
      * Subsequent transaction's start event (to the transaction that we give details about),
      * that is at the same chargebox and connector
      */
-    @Nullable
-    private final TransactionStartRecord nextTransactionStart;
+    @Nullable private final TransactionStartRecord nextTransactionStart;
 
     @Getter
     @Builder

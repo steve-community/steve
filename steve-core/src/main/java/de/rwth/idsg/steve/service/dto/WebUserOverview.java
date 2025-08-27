@@ -17,6 +17,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 package de.rwth.idsg.steve.service.dto;
+
 import de.rwth.idsg.steve.web.dto.WebUserAuthority;
 import lombok.Builder;
 import lombok.Getter;

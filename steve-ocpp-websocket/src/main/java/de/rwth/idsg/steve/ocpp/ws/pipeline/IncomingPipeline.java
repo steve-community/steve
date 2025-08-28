@@ -40,7 +40,7 @@ public class IncomingPipeline implements Consumer<CommunicationContext> {
     private final Serializer serializer;
     private final Deserializer deserializer;
     private final Sender sender;
-    private final AbstractCallHandler handler;
+    private final Consumer<CommunicationContext> handler;
 
     @Override
     public void accept(CommunicationContext context) {

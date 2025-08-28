@@ -39,7 +39,7 @@ public record InvocationContext(
 
         var pair = typeStore().findActionResponse(requestType);
         if (pair == null) {
-            throw new SteveException("Action name is not found");
+            throw new SteveException.InternalError("Action name is not found");
         }
 
         var call = new OcppJsonCall();

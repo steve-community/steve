@@ -18,9 +18,9 @@
  */
 package de.rwth.idsg.steve.web.api;
 
+import de.rwth.idsg.steve.SteveException;
 import de.rwth.idsg.steve.repository.dto.ChargePoint;
 import de.rwth.idsg.steve.service.ChargePointsService;
-import de.rwth.idsg.steve.web.api.exception.NotFoundException;
 import de.rwth.idsg.steve.web.dto.ChargePointForm;
 import jooq.steve.db.tables.records.ChargeBoxRecord;
 import org.junit.jupiter.api.BeforeEach;
@@ -89,7 +89,7 @@ public class ChargePointsRestControllerTest extends AbstractControllerTest {
     @Test
     @DisplayName("GET one: Entity not found, expected 404")
     public void testGetOne_notFound() {
-        when(chargePointsService.getDetails(anyInt())).thenThrow(new NotFoundException(""));
+        when(chargePointsService.getDetails(anyInt())).thenThrow(new SteveException.NotFound(""));
 
         assertThat(mockMvc.perform(get("/api/v1/chargeboxes/1"))).hasStatus(HttpStatus.NOT_FOUND);
     }

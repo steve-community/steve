@@ -98,7 +98,7 @@ public class AddressRepositoryImpl implements AddressRepository {
                     .fetchOne()
                     .getAddressPk();
         } catch (DataAccessException e) {
-            throw new SteveException("Failed to insert the address");
+            throw new SteveException.InternalError("Failed to insert the address");
         }
     }
 
@@ -113,7 +113,7 @@ public class AddressRepositoryImpl implements AddressRepository {
                 .execute();
 
         if (count != 1) {
-            throw new SteveException("Failed to update the address");
+            throw new SteveException.InternalError("Failed to update the address");
         }
     }
 }

@@ -18,9 +18,9 @@
  */
 package de.rwth.idsg.steve.web.api;
 
+import de.rwth.idsg.steve.SteveException;
 import de.rwth.idsg.steve.repository.TransactionRepository;
 import de.rwth.idsg.steve.repository.dto.Transaction;
-import de.rwth.idsg.steve.web.api.exception.BadRequestException;
 import de.rwth.idsg.steve.web.dto.TransactionQueryForm;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -62,7 +62,7 @@ public class TransactionsRestController {
     @GetMapping(value = "")
     public List<Transaction> get(@Valid @ParameterObject TransactionQueryForm.TransactionQueryFormForApi params) {
         if (params.isReturnCSV()) {
-            throw new BadRequestException("returnCSV=true is not supported for API calls");
+            throw new SteveException.BadRequest("returnCSV=true is not supported for API calls");
         }
 
         return transactionRepository.getTransactions(params);

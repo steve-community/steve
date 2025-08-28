@@ -75,7 +75,7 @@ public class GenericRepositoryImpl implements GenericRepository {
                 .getValue(0, Long.class);
 
         if (sql != java) {
-            throw new SteveException(
+            throw new SteveException.InternalError(
                     "MySQL and Java are not using the same time zone. "
                             + "Java offset in seconds (%s) != MySQL offset in seconds (%s)",
                     java, sql);

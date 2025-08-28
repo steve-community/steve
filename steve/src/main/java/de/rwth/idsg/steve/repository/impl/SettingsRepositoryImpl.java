@@ -129,7 +129,7 @@ public class SettingsRepositoryImpl implements SettingsRepository {
                     .execute();
 
         } catch (DataAccessException e) {
-            throw new SteveException("FAILED to save the settings", e);
+            throw new SteveException.InternalError("FAILED to save the settings", e);
         }
     }
 

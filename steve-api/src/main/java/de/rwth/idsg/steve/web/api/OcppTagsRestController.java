@@ -18,10 +18,10 @@
  */
 package de.rwth.idsg.steve.web.api;
 
+import de.rwth.idsg.steve.SteveException;
 import de.rwth.idsg.steve.repository.dto.OcppTag.OcppTagOverview;
 import de.rwth.idsg.steve.service.OcppTagsService;
 import de.rwth.idsg.steve.web.api.ApiControllerAdvice.ApiErrorResponse;
-import de.rwth.idsg.steve.web.api.exception.NotFoundException;
 import de.rwth.idsg.steve.web.dto.OcppTagForm;
 import de.rwth.idsg.steve.web.dto.OcppTagQueryForm.OcppTagQueryFormForApi;
 import io.swagger.v3.oas.annotations.Operation;
@@ -186,7 +186,7 @@ public class OcppTagsRestController {
 
         var results = ocppTagsService.getOverview(params);
         if (results.isEmpty()) {
-            throw new NotFoundException("Could not find ocppTag with id " + ocppTagPk);
+            throw new SteveException.NotFound("Could not find ocppTag with id " + ocppTagPk);
         }
         return results.get(0);
     }

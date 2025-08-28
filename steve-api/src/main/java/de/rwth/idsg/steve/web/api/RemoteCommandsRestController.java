@@ -18,6 +18,7 @@
  */
 package de.rwth.idsg.steve.web.api;
 
+import de.rwth.idsg.steve.SteveException;
 import de.rwth.idsg.steve.ocpp.OcppVersion;
 import de.rwth.idsg.steve.repository.ChargePointRepository;
 import de.rwth.idsg.steve.repository.TaskStore;
@@ -29,7 +30,6 @@ import de.rwth.idsg.steve.web.api.dto.ApiChargePointList;
 import de.rwth.idsg.steve.web.api.dto.ApiChargePointStart;
 import de.rwth.idsg.steve.web.api.dto.ApiChargePointStop;
 import de.rwth.idsg.steve.web.api.dto.ApiChargePointUnlock;
-import de.rwth.idsg.steve.web.api.exception.BadRequestException;
 import de.rwth.idsg.steve.web.dto.ocpp.RemoteStartTransactionParams;
 import de.rwth.idsg.steve.web.dto.ocpp.RemoteStopTransactionParams;
 import de.rwth.idsg.steve.web.dto.ocpp.UnlockConnectorParams;
@@ -143,7 +143,7 @@ public class RemoteCommandsRestController {
         // only one active task per charge box over api; to be discussed!
         if (activeTaskOnChargeBox(params.getChargeBoxId())) {
             var errMsg = String.format("Active task found on ChargeBox %s!", params.getChargeBoxId());
-            throw new BadRequestException(errMsg);
+            throw new SteveException.BadRequest(errMsg);
         }
 
         var transactionParams = new RemoteStartTransactionParams();
@@ -156,15 +156,15 @@ public class RemoteCommandsRestController {
                 var errMsg = String.format(
                         "Active transaction found for connector %s at ChargeBox %s!",
                         params.getConnectorId(), params.getChargeBoxId());
-                throw new BadRequestException(errMsg);
+                throw new SteveException.BadRequest(errMsg);
             }
         }
         transactionParams.setConnectorId(params.getConnectorId());
 
         var chargePoint = chargePointRepository
                 .getChargePointSelect(params.getChargeBoxId())
-                .orElseThrow(() ->
-                        new BadRequestException(String.format("ChargeBox %s not found!", params.getChargeBoxId())));
+                .orElseThrow(() -> new SteveException.BadRequest(
+                        String.format("ChargeBox %s not found!", params.getChargeBoxId())));
         transactionParams.setChargePointSelectList(Collections.singletonList(chargePoint));
 
         // Check if OCPP-Tag is allowed to use the connector? To be discussed and t.b.d.!
@@ -179,7 +179,7 @@ public class RemoteCommandsRestController {
         // only one active task per charge box over api; to be discussed!
         if (activeTaskOnChargeBox(params.getChargeBoxId())) {
             var errMsg = String.format("Active task found on ChargeBox %s!", params.getChargeBoxId());
-            throw new BadRequestException(errMsg);
+            throw new SteveException.BadRequest(errMsg);
         }
 
         var transactionParams = new RemoteStopTransactionParams();
@@ -187,24 +187,25 @@ public class RemoteCommandsRestController {
         // set the ChargPointSelectionList, ensure the length is exactly one
         var chargePoint = chargePointRepository
                 .getChargePointSelect(params.getChargeBoxId())
-                .orElseThrow(() ->
-                        new BadRequestException(String.format("ChargeBox %s not found!", params.getChargeBoxId())));
+                .orElseThrow(() -> new SteveException.BadRequest(
+                        String.format("ChargeBox %s not found!", params.getChargeBoxId())));
         transactionParams.setChargePointSelectList(Collections.singletonList(chargePoint));
 
         // Get the transactionId of the active transaction on the connector.
         // If no transaction active don't send RemoteStop
         var transactionId = transactionRepository
                 .getActiveTransactionId(params.getChargeBoxId(), params.getConnectorId())
-                .orElseThrow(() -> new BadRequestException(String.format(
+                .orElseThrow(() -> new SteveException.BadRequest(String.format(
                         "No active transaction found for connector %s at ChargeBox %s!",
                         params.getConnectorId(), params.getChargeBoxId())));
         // check the user is allowed to stop this transaction (actual only the one who started it!)
         var ocppTag = transactionRepository
                 .getTransaction(transactionId)
-                .orElseThrow(() -> new BadRequestException(String.format("Transaction %s not found!", transactionId)))
+                .orElseThrow(
+                        () -> new SteveException.BadRequest(String.format("Transaction %s not found!", transactionId)))
                 .getOcppIdTag();
         if (!ocppTag.contentEquals(params.getOcppTag())) {
-            throw new BadRequestException("The transaction was authorised with another OCPP Tag!");
+            throw new SteveException.BadRequest("The transaction was authorised with another OCPP Tag!");
         }
         transactionParams.setTransactionId(transactionId);
 
@@ -217,14 +218,14 @@ public class RemoteCommandsRestController {
         // only one active task per charge box over api; to be discussed!
         if (activeTaskOnChargeBox(params.getChargeBoxId())) {
             var errMsg = String.format("Active task found on ChargeBox %s!", params.getChargeBoxId());
-            throw new BadRequestException(errMsg);
+            throw new SteveException.BadRequest(errMsg);
         }
 
         var transactionParams = new UnlockConnectorParams();
         var chargePoint = chargePointRepository
                 .getChargePointSelect(params.getChargeBoxId())
-                .orElseThrow(() ->
-                        new BadRequestException(String.format("ChargeBox %s not found!", params.getChargeBoxId())));
+                .orElseThrow(() -> new SteveException.BadRequest(
+                        String.format("ChargeBox %s not found!", params.getChargeBoxId())));
         transactionParams.setChargePointSelectList(Collections.singletonList(chargePoint));
 
         /* If a active transaction is found, don't unlock the connection. */
@@ -234,7 +235,7 @@ public class RemoteCommandsRestController {
             var errMsg = String.format(
                     "Active transaction found for connector %s at ChargeBox %s!",
                     params.getConnectorId(), params.getChargeBoxId());
-            throw new BadRequestException(errMsg);
+            throw new SteveException.BadRequest(errMsg);
         }
 
         transactionParams.setConnectorId(params.getConnectorId());

@@ -61,7 +61,7 @@ public class MailServiceDefault implements MailService {
         try {
             send("Test", "Test");
         } catch (MessagingException e) {
-            throw new SteveException("Failed to send mail", e);
+            throw new SteveException.InternalError("Failed to send mail", e);
         }
     }
 

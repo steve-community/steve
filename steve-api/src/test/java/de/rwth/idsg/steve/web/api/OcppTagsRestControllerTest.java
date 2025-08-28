@@ -361,7 +361,9 @@ public class OcppTagsRestControllerTest extends AbstractControllerTest {
         form.setNote("note-1");
 
         // when
-        doThrow(new SteveException("failed")).when(ocppTagsService).updateOcppTag(any());
+        doThrow(new SteveException.InternalError("failed"))
+                .when(ocppTagsService)
+                .updateOcppTag(any());
 
         // then
         assertThat(mockMvc.perform(put("/api/v1/ocppTags/" + ocppTagPk)
@@ -411,7 +413,9 @@ public class OcppTagsRestControllerTest extends AbstractControllerTest {
 
         // when
         when(ocppTagsService.getOverview(any())).thenReturn(List.of(result));
-        doThrow(new SteveException("failed")).when(ocppTagsService).deleteOcppTag(ocppTagPk);
+        doThrow(new SteveException.InternalError("failed"))
+                .when(ocppTagsService)
+                .deleteOcppTag(ocppTagPk);
 
         // then
         assertThat(mockMvc.perform(delete("/api/v1/ocppTags/" + ocppTagPk)))

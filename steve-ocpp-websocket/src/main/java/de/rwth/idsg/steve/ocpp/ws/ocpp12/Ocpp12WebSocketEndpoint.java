@@ -30,10 +30,7 @@ import de.rwth.idsg.steve.ocpp.ws.FutureResponseContextStore;
 import de.rwth.idsg.steve.ocpp.ws.SessionContextStore;
 import de.rwth.idsg.steve.ocpp.ws.WebSocketLogger;
 import de.rwth.idsg.steve.ocpp.ws.pipeline.AbstractCallHandler;
-import de.rwth.idsg.steve.ocpp.ws.pipeline.Deserializer;
-import de.rwth.idsg.steve.ocpp.ws.pipeline.IncomingPipeline;
 import de.rwth.idsg.steve.ocpp.ws.pipeline.Sender;
-import de.rwth.idsg.steve.ocpp.ws.pipeline.Serializer;
 import de.rwth.idsg.steve.repository.OcppServerRepository;
 import lombok.RequiredArgsConstructor;
 import ocpp.cs._2010._08.AuthorizeRequest;
@@ -49,8 +46,6 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 
-import jakarta.annotation.PostConstruct;
-
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 12.03.2015
@@ -58,34 +53,28 @@ import jakarta.annotation.PostConstruct;
 @Component
 public class Ocpp12WebSocketEndpoint extends AbstractWebSocketEndpoint {
 
-    private final IncomingPipeline pipeline;
-
     public Ocpp12WebSocketEndpoint(
             WebSocketLogger webSocketLogger,
             DelegatingTaskScheduler asyncTaskScheduler,
             OcppServerRepository ocppServerRepository,
             FutureResponseContextStore futureResponseContextStore,
             ApplicationEventPublisher applicationEventPublisher,
-            CentralSystemService12_SoapServer server,
-            Ocpp12TypeStore typeStore,
             SessionContextStore sessionContextStore,
+            Sender sender,
             @Qualifier("ocppObjectMapper") ObjectMapper ocppMapper,
-            Sender sender) {
+            CentralSystemService12_SoapServer ocpp12Server,
+            Ocpp12TypeStore ocpp12TypeStore) {
         super(
                 webSocketLogger,
                 asyncTaskScheduler,
                 ocppServerRepository,
                 futureResponseContextStore,
                 applicationEventPublisher,
-                sessionContextStore);
-        var serializer = new Serializer(ocppMapper);
-        var deserializer = new Deserializer(ocppMapper, futureResponseContextStore, typeStore);
-        this.pipeline = new IncomingPipeline(serializer, deserializer, sender, new Ocpp12CallHandler(server));
-    }
-
-    @PostConstruct
-    public void init() {
-        super.init(pipeline);
+                sessionContextStore,
+                sender,
+                ocppMapper,
+                ocpp12TypeStore,
+                new Ocpp12CallHandler(ocpp12Server));
     }
 
     @Override

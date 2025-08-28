@@ -306,7 +306,7 @@ public class ChargingProfileRepositoryImpl implements ChargingProfileRepository 
                 insertPeriods(ctx, form);
                 return profilePk;
             } catch (DataAccessException e) {
-                throw new SteveException("Failed to add the charging profile", e);
+                throw new SteveException.InternalError("Failed to add the charging profile", e);
             }
         });
     }
@@ -356,7 +356,7 @@ public class ChargingProfileRepositoryImpl implements ChargingProfileRepository 
 
                 insertPeriods(ctx, form);
             } catch (DataAccessException e) {
-                throw new SteveException(
+                throw new SteveException.InternalError(
                         "Failed to update the charging profile with id '%s'", form.getChargingProfilePk(), e);
             }
         });
@@ -379,7 +379,7 @@ public class ChargingProfileRepositoryImpl implements ChargingProfileRepository 
                 .where(CONNECTOR_CHARGING_PROFILE.CHARGING_PROFILE_PK.eq(chargingProfilePk))
                 .fetch(CONNECTOR.CHARGE_BOX_ID);
         if (!r.isEmpty()) {
-            throw new SteveException(
+            throw new SteveException.InternalError(
                     "Cannot modify this charging profile, since the following stations are still using it: %s", r);
         }
     }

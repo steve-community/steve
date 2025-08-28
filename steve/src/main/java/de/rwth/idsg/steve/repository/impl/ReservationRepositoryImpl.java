@@ -274,7 +274,7 @@ public class ReservationRepositoryImpl implements ReservationRepository {
                 selectQuery.addConditions(
                         RESERVATION.START_DATETIME.greaterOrEqual(toLocalDateTime(form.getFrom())),
                         RESERVATION.EXPIRY_DATETIME.lessOrEqual(toLocalDateTime(form.getTo())));
-            default -> throw new SteveException("Unknown enum type");
+            default -> throw new SteveException.InternalError("Unknown enum type");
         }
     }
 

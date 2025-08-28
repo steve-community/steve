@@ -144,7 +144,7 @@ public class TransactionRepositoryImpl implements TransactionRepository {
                 transaction = getInternal(form).fetchOne();
 
         if (transaction == null) {
-            throw new SteveException("There is no transaction with id '%s'", transactionPk);
+            throw new SteveException.InternalError("There is no transaction with id '%s'", transactionPk);
         }
 
         var startTimestamp = transaction.value5();
@@ -379,7 +379,7 @@ public class TransactionRepositoryImpl implements TransactionRepository {
                     case STOPPED -> selectQuery.addConditions(TRANSACTION.STOP_TIMESTAMP.between(from, to));
                 }
             }
-            default -> throw new SteveException("Unknown enum type");
+            default -> throw new SteveException.InternalError("Unknown enum type");
         }
     }
 

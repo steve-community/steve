@@ -56,7 +56,7 @@ public class Sender implements Consumer<CommunicationContext> {
             // Do NOT swallow exceptions for outgoing CALLs. For others just log.
             if (context.getOutgoingMessage() instanceof OcppJsonCall call) {
                 var msg = "Failed to send outgoing " + call.getAction() + " CALL over WebSocket";
-                throw new SteveException(msg, e);
+                throw new SteveException.InternalError(msg, e);
             } else {
                 log.error("Failed to send outgoing message over WebSocket", e);
             }

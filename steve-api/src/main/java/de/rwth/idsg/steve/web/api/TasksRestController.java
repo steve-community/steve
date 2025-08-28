@@ -18,10 +18,10 @@
  */
 package de.rwth.idsg.steve.web.api;
 
+import de.rwth.idsg.steve.SteveException;
 import de.rwth.idsg.steve.repository.TaskStore;
 import de.rwth.idsg.steve.web.api.dto.ApiTaskInfo;
 import de.rwth.idsg.steve.web.api.dto.ApiTaskList;
-import de.rwth.idsg.steve.web.api.exception.NotFoundException;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
@@ -81,7 +81,7 @@ public class TasksRestController {
     public ApiTaskInfo getTaskDetails(@RequestParam(name = "id") @Valid @NotNull @Positive Integer taskId) {
         var task = taskStore.get(taskId);
         if (task == null) {
-            throw new NotFoundException("Task not found: " + taskId);
+            throw new SteveException.NotFound("Task not found: " + taskId);
         }
         return new ApiTaskInfo(taskId, task);
     }

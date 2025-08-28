@@ -22,8 +22,8 @@ import de.rwth.idsg.steve.SteveException;
 import de.rwth.idsg.steve.ocpp.ws.WebSocketLogger;
 import de.rwth.idsg.steve.ocpp.ws.data.CommunicationContext;
 import de.rwth.idsg.steve.ocpp.ws.data.OcppJsonCall;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
 import org.springframework.web.socket.TextMessage;
 
 import java.io.IOException;
@@ -36,8 +36,10 @@ import java.util.function.Consumer;
  * @since 12.03.2015
  */
 @Slf4j
-@Component
+@RequiredArgsConstructor
 public class Sender implements Consumer<CommunicationContext> {
+
+    private final WebSocketLogger webSocketLogger;
 
     @Override
     public void accept(CommunicationContext context) {
@@ -45,7 +47,7 @@ public class Sender implements Consumer<CommunicationContext> {
 
         var chargeBoxId = context.getChargeBoxId();
         var session = context.getSession();
-        WebSocketLogger.sending(chargeBoxId, session, outgoingString);
+        webSocketLogger.sending(chargeBoxId, session, outgoingString);
 
         var out = new TextMessage(outgoingString);
         try {

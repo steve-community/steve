@@ -28,6 +28,7 @@ import de.rwth.idsg.steve.ocpp.soap.CentralSystemService16_SoapServer;
 import de.rwth.idsg.steve.ocpp.ws.AbstractWebSocketEndpoint;
 import de.rwth.idsg.steve.ocpp.ws.FutureResponseContextStore;
 import de.rwth.idsg.steve.ocpp.ws.SessionContextStore;
+import de.rwth.idsg.steve.ocpp.ws.WebSocketLogger;
 import de.rwth.idsg.steve.ocpp.ws.pipeline.AbstractCallHandler;
 import de.rwth.idsg.steve.ocpp.ws.pipeline.Deserializer;
 import de.rwth.idsg.steve.ocpp.ws.pipeline.IncomingPipeline;
@@ -61,6 +62,7 @@ public class Ocpp16WebSocketEndpoint extends AbstractWebSocketEndpoint {
     private final IncomingPipeline pipeline;
 
     public Ocpp16WebSocketEndpoint(
+            WebSocketLogger webSocketLogger,
             DelegatingTaskScheduler asyncTaskScheduler,
             OcppServerRepository ocppServerRepository,
             FutureResponseContextStore futureResponseContextStore,
@@ -71,6 +73,7 @@ public class Ocpp16WebSocketEndpoint extends AbstractWebSocketEndpoint {
             @Qualifier("ocppObjectMapper") ObjectMapper ocppMapper,
             Sender sender) {
         super(
+                webSocketLogger,
                 asyncTaskScheduler,
                 ocppServerRepository,
                 futureResponseContextStore,

@@ -55,6 +55,7 @@ import java.util.function.Consumer;
 @RequiredArgsConstructor
 public abstract class AbstractWebSocketEndpoint extends ConcurrentWebSocketHandler implements SubProtocolCapable {
 
+    private final WebSocketLogger webSocketLogger;
     private final DelegatingTaskScheduler asyncTaskScheduler;
     private final OcppServerRepository ocppServerRepository;
     private final FutureResponseContextStore futureResponseContextStore;
@@ -102,11 +103,11 @@ public abstract class AbstractWebSocketEndpoint extends ConcurrentWebSocketHandl
 
         // https://github.com/steve-community/steve/issues/66
         if (Strings.isNullOrEmpty(incomingString)) {
-            WebSocketLogger.receivedEmptyText(chargeBoxId, session);
+            webSocketLogger.receivedEmptyText(chargeBoxId, session);
             return;
         }
 
-        WebSocketLogger.receivedText(chargeBoxId, session, incomingString);
+        webSocketLogger.receivedText(chargeBoxId, session, incomingString);
 
         var context = new CommunicationContext(session, chargeBoxId);
         context.setIncomingString(incomingString);
@@ -115,7 +116,7 @@ public abstract class AbstractWebSocketEndpoint extends ConcurrentWebSocketHandl
     }
 
     private void handlePongMessage(WebSocketSession session) {
-        WebSocketLogger.receivedPong(getChargeBoxId(session), session);
+        webSocketLogger.receivedPong(getChargeBoxId(session), session);
         ocppServerRepository.updateChargeboxHeartbeat(getChargeBoxId(session), Instant.now());
     }
 
@@ -123,13 +124,13 @@ public abstract class AbstractWebSocketEndpoint extends ConcurrentWebSocketHandl
     public void onOpen(WebSocketSession session) throws Exception {
         var chargeBoxId = getChargeBoxId(session);
 
-        WebSocketLogger.connected(chargeBoxId, session);
+        webSocketLogger.connected(chargeBoxId, session);
         ocppServerRepository.updateOcppProtocol(chargeBoxId, getVersion().toProtocol(OcppTransport.JSON));
 
         // Just to keep the connection alive, such that the servers do not close
         // the connection because of a idle timeout, we ping-pong at fixed intervals.
         var pingSchedule = asyncTaskScheduler.scheduleAtFixedRate(
-                new PingTask(chargeBoxId, session),
+                new PingTask(webSocketLogger, chargeBoxId, session),
                 Instant.now().plus(OcppWebSocketConfiguration.PING_INTERVAL),
                 OcppWebSocketConfiguration.PING_INTERVAL);
 
@@ -153,7 +154,7 @@ public abstract class AbstractWebSocketEndpoint extends ConcurrentWebSocketHandl
     public void onClose(WebSocketSession session, CloseStatus closeStatus) throws Exception {
         var chargeBoxId = getChargeBoxId(session);
 
-        WebSocketLogger.closed(chargeBoxId, session, closeStatus);
+        webSocketLogger.closed(chargeBoxId, session, closeStatus);
 
         futureResponseContextStore.removeSession(session);
 
@@ -173,7 +174,7 @@ public abstract class AbstractWebSocketEndpoint extends ConcurrentWebSocketHandl
 
     @Override
     public void onError(WebSocketSession session, Throwable throwable) throws Exception {
-        WebSocketLogger.transportError(getChargeBoxId(session), session, throwable);
+        webSocketLogger.transportError(getChargeBoxId(session), session, throwable);
     }
 
     @Override

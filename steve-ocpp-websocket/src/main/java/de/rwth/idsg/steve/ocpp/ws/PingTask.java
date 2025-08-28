@@ -35,6 +35,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 @Slf4j
 @RequiredArgsConstructor
 public class PingTask implements Runnable {
+    private final WebSocketLogger webSocketLogger;
     private final String chargeBoxId;
     private final WebSocketSession session;
 
@@ -42,11 +43,11 @@ public class PingTask implements Runnable {
 
     @Override
     public void run() {
-        WebSocketLogger.sendingPing(chargeBoxId, session);
+        webSocketLogger.sendingPing(chargeBoxId, session);
         try {
             session.sendMessage(PING_MESSAGE);
         } catch (IOException e) {
-            WebSocketLogger.pingError(chargeBoxId, session, e);
+            webSocketLogger.pingError(chargeBoxId, session, e);
             // TODO: Do something about this
         }
     }

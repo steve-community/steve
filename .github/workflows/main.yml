@@ -27,8 +27,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v5
-      - name: Set up Java ${{ matrix.Java }}
-        uses: actions/setup-java@v4
+      - name: Set up Java ${{ matrix.java }}
+        uses: actions/setup-java@v5
         with:
           java-version: ${{ matrix.java }}
           distribution: 'temurin'

@@ -27,7 +27,7 @@ jobs:
 
     steps:
       - uses: actions/checkout@v5
-      - name: Set up Java ${{ matrix.Java }}
+      - name: Set up Java ${{ matrix.java }}
         uses: actions/setup-java@v5
         with:
           java-version: ${{ matrix.java }}

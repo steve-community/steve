@@ -217,6 +217,10 @@
                   <requireMavenVersion>
                     <version>[3.9.0,)</version>
                   </requireMavenVersion>
+                  <banDuplicateClasses>
+                    <findAllDuplicates>true</findAllDuplicates>
+                  </banDuplicateClasses>
+                  <dependencyConvergence />
                 </rules>
               </configuration>
             </execution>

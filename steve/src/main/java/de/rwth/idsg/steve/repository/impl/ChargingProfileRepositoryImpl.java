@@ -38,7 +38,9 @@ import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.CollectionUtils;
 
+import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 
 import static de.rwth.idsg.steve.utils.CustomDSL.includes;
 import static de.rwth.idsg.steve.utils.DateTimeUtils.toInstant;
@@ -251,16 +253,21 @@ public class ChargingProfileRepositoryImpl implements ChargingProfileRepository 
     }
 
     @Override
-    public ChargingProfile.Details getDetails(int chargingProfilePk) {
+    public Optional<ChargingProfile.Details> getDetails(int chargingProfilePk) {
         var profile = ctx.selectFrom(CHARGING_PROFILE)
                 .where(CHARGING_PROFILE.CHARGING_PROFILE_PK.eq(chargingProfilePk))
                 .fetchOne();
 
+        if (profile == null) {
+            return Optional.empty();
+        }
+
         var periods = ctx.selectFrom(CHARGING_SCHEDULE_PERIOD)
                 .where(CHARGING_SCHEDULE_PERIOD.CHARGING_PROFILE_PK.eq(chargingProfilePk))
+                .orderBy(CHARGING_SCHEDULE_PERIOD.START_PERIOD_IN_SECONDS.asc())
                 .fetch();
 
-        return new ChargingProfile.Details(profile, periods);
+        return Optional.of(new ChargingProfile.Details(profile, periods));
     }
 
     @Override
@@ -291,7 +298,7 @@ public class ChargingProfileRepositoryImpl implements ChargingProfileRepository 
                                 CHARGING_PROFILE.CHARGING_RATE_UNIT,
                                 form.getChargingRateUnit().value())
                         .set(CHARGING_PROFILE.MIN_CHARGING_RATE, form.getMinChargingRate())
-                        .returning(CHARGING_SCHEDULE_PERIOD.CHARGING_PROFILE_PK)
+                        .returning(CHARGING_PROFILE.CHARGING_PROFILE_PK)
                         .fetchOne()
                         .getChargingProfilePk();
 
@@ -299,7 +306,7 @@ public class ChargingProfileRepositoryImpl implements ChargingProfileRepository 
                 insertPeriods(ctx, form);
                 return profilePk;
             } catch (DataAccessException e) {
-                throw new SteveException("Failed to add the charging profile", e);
+                throw new SteveException.InternalError("Failed to add the charging profile", e);
             }
         });
     }
@@ -349,7 +356,7 @@ public class ChargingProfileRepositoryImpl implements ChargingProfileRepository 
 
                 insertPeriods(ctx, form);
             } catch (DataAccessException e) {
-                throw new SteveException(
+                throw new SteveException.InternalError(
                         "Failed to update the charging profile with id '%s'", form.getChargingProfilePk(), e);
             }
         });
@@ -372,17 +379,18 @@ public class ChargingProfileRepositoryImpl implements ChargingProfileRepository 
                 .where(CONNECTOR_CHARGING_PROFILE.CHARGING_PROFILE_PK.eq(chargingProfilePk))
                 .fetch(CONNECTOR.CHARGE_BOX_ID);
         if (!r.isEmpty()) {
-            throw new SteveException(
+            throw new SteveException.InternalError(
                     "Cannot modify this charging profile, since the following stations are still using it: %s", r);
         }
     }
 
     private static void insertPeriods(DSLContext ctx, ChargingProfileForm form) {
-        if (CollectionUtils.isEmpty(form.getSchedulePeriodMap())) {
+        if (CollectionUtils.isEmpty(form.getSchedulePeriods())) {
             return;
         }
 
-        var r = form.getSchedulePeriodMap().values().stream()
+        var r = form.getSchedulePeriods().stream()
+                .sorted(Comparator.comparingInt(ChargingProfileForm.SchedulePeriod::getStartPeriodInSeconds))
                 .map(k -> ctx.newRecord(CHARGING_SCHEDULE_PERIOD)
                         .setChargingProfilePk(form.getChargingProfilePk())
                         .setStartPeriodInSeconds(k.getStartPeriodInSeconds())

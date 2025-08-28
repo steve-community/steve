@@ -21,7 +21,6 @@ package de.rwth.idsg.steve.web.api;
 import de.rwth.idsg.steve.SteveException;
 import de.rwth.idsg.steve.repository.dto.Reservation;
 import de.rwth.idsg.steve.service.ReservationsService;
-import de.rwth.idsg.steve.web.api.exception.NotFoundException;
 import de.rwth.idsg.steve.web.dto.ReservationForm;
 import de.rwth.idsg.steve.web.dto.ReservationQueryForm;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -59,8 +58,8 @@ public class ReservationsRestController {
         var id = reservationsService.addReservation(form);
         var body = reservationsService
                 .getReservation(id)
-                .orElseThrow(
-                        () -> new SteveException("Reservation not found after creation, this should never happen"));
+                .orElseThrow(() -> new SteveException.InternalError(
+                        "Reservation not found after creation, this should never happen"));
         var location = ServletUriComponentsBuilder.fromCurrentRequest()
                 .path("/{id}")
                 .buildAndExpand(id)
@@ -72,7 +71,7 @@ public class ReservationsRestController {
     public Reservation deleteReservation(@PathVariable int id) {
         var reservation = reservationsService
                 .getReservation(id)
-                .orElseThrow(() -> new NotFoundException(String.format("Reservation with id %d not found", id)));
+                .orElseThrow(() -> new SteveException.NotFound("Reservation with id %d not found", id));
         reservationsService.deleteReservation(id);
         return reservation;
     }

@@ -19,8 +19,6 @@
 package de.rwth.idsg.steve.web.api;
 
 import de.rwth.idsg.steve.SteveException;
-import de.rwth.idsg.steve.web.api.exception.BadRequestException;
-import de.rwth.idsg.steve.web.api.exception.NotFoundException;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.Nullable;
@@ -59,9 +57,9 @@ public class ApiControllerAdvice {
         return createResponse(url, HttpStatus.BAD_REQUEST, "Error understanding the request");
     }
 
-    @ExceptionHandler(NotFoundException.class)
+    @ExceptionHandler(SteveException.NotFound.class)
     @ResponseStatus(value = HttpStatus.NOT_FOUND)
-    public ApiErrorResponse handleNotFoundException(HttpServletRequest req, NotFoundException exception) {
+    public ApiErrorResponse handleNotFoundException(HttpServletRequest req, SteveException.NotFound exception) {
         String url = req.getRequestURL().toString();
         log.error("Request: {} raised following exception.", url, exception);
         return createResponse(url, HttpStatus.NOT_FOUND, exception.getMessage());
@@ -76,9 +74,9 @@ public class ApiControllerAdvice {
         return createResponse(url, HttpStatus.UNPROCESSABLE_ENTITY, exception.getMessage());
     }
 
-    @ExceptionHandler(BadRequestException.class)
+    @ExceptionHandler(SteveException.BadRequest.class)
     @ResponseStatus(value = HttpStatus.BAD_REQUEST)
-    public ApiErrorResponse handleBadRequestException(HttpServletRequest req, BadRequestException exception) {
+    public ApiErrorResponse handleBadRequestException(HttpServletRequest req, SteveException.BadRequest exception) {
         String url = req.getRequestURL().toString();
         log.error("Request: {} raised following exception.", url, exception);
         return createResponse(url, HttpStatus.BAD_REQUEST, exception.getMessage());

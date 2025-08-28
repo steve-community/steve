@@ -121,7 +121,7 @@ public class OcppTagRepositoryImpl implements OcppTagRepository {
                         .EXPIRY_DATE
                         .isNull()
                         .or(OCPP_TAG_ACTIVITY.EXPIRY_DATE.greaterThan(LocalDateTime.now())));
-            default -> throw new SteveException("Unknown enum type");
+            default -> throw new SteveException.InternalError("Unknown enum type");
         }
 
         processBooleanType(selectQuery, OCPP_TAG_ACTIVITY.IN_TRANSACTION, form.getInTransaction());
@@ -230,7 +230,8 @@ public class OcppTagRepositoryImpl implements OcppTagRepository {
             if (e.getCause() instanceof SQLIntegrityConstraintViolationException) {
                 throw new SteveException.AlreadyExists("A user with idTag '%s' already exists.", u.getIdTag());
             } else {
-                throw new SteveException("Execution of addOcppTag for idTag '%s' FAILED.", u.getIdTag(), e);
+                throw new SteveException.InternalError(
+                        "Execution of addOcppTag for idTag '%s' FAILED.", u.getIdTag(), e);
             }
         }
     }
@@ -246,7 +247,8 @@ public class OcppTagRepositoryImpl implements OcppTagRepository {
                     .where(OCPP_TAG.OCPP_TAG_PK.equal(u.getOcppTagPk()))
                     .execute();
         } catch (DataAccessException e) {
-            throw new SteveException("Execution of updateOcppTag for idTag '%s' FAILED.", u.getIdTag(), e);
+            throw new SteveException.InternalError(
+                    "Execution of updateOcppTag for idTag '%s' FAILED.", u.getIdTag(), e);
         }
     }
 
@@ -255,7 +257,7 @@ public class OcppTagRepositoryImpl implements OcppTagRepository {
         try {
             ctx.delete(OCPP_TAG).where(OCPP_TAG.OCPP_TAG_PK.equal(ocppTagPk)).execute();
         } catch (DataAccessException e) {
-            throw new SteveException("Execution of deleteOcppTag for idTag FAILED.", e);
+            throw new SteveException.InternalError("Execution of deleteOcppTag for idTag FAILED.", e);
         }
     }
 

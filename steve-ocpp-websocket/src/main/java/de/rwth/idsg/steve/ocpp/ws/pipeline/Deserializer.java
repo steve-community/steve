@@ -78,10 +78,11 @@ public class Deserializer implements Consumer<CommunicationContext> {
                 case CALL -> handleCall(context, messageId, parser);
                 case CALL_RESULT -> handleResult(context, messageId, parser);
                 case CALL_ERROR -> handleError(context, messageId, parser);
-                default -> throw new SteveException("Unknown enum type");
+                default -> throw new SteveException.InternalError("Unknown enum type");
             }
         } catch (IOException e) {
-            throw new SteveException("Deserialization of incoming string failed: %s", context.getIncomingString(), e);
+            throw new SteveException.InternalError(
+                    "Deserialization of incoming string failed: %s", context.getIncomingString(), e);
         }
     }
 
@@ -144,7 +145,7 @@ public class Deserializer implements Consumer<CommunicationContext> {
     private void handleResult(CommunicationContext context, String messageId, JsonParser parser) {
         FutureResponseContext responseContext = futureResponseContextStore.get(context.getSession(), messageId);
         if (responseContext == null) {
-            throw new SteveException(
+            throw new SteveException.InternalError(
                     "A result message was received as response to a not-sent call. The message was: %s",
                     context.getIncomingString());
         }
@@ -155,7 +156,7 @@ public class Deserializer implements Consumer<CommunicationContext> {
             JsonNode responsePayload = parser.readValueAsTree();
             res = ocppMapper.treeToValue(responsePayload, responseContext.getResponseClass());
         } catch (IOException e) {
-            throw new SteveException("Deserialization of incoming response payload failed", e);
+            throw new SteveException.InternalError("Deserialization of incoming response payload failed", e);
         }
 
         var result = new OcppJsonResult();
@@ -173,7 +174,7 @@ public class Deserializer implements Consumer<CommunicationContext> {
     private void handleError(CommunicationContext context, String messageId, JsonParser parser) {
         var responseContext = futureResponseContextStore.get(context.getSession(), messageId);
         if (responseContext == null) {
-            throw new SteveException(
+            throw new SteveException.InternalError(
                     "An error message was received as response to a not-sent call. The message was: %s",
                     context.getIncomingString());
         }
@@ -204,7 +205,7 @@ public class Deserializer implements Consumer<CommunicationContext> {
             }
 
         } catch (IOException e) {
-            throw new SteveException("Deserialization of incoming error message failed", e);
+            throw new SteveException.InternalError("Deserialization of incoming error message failed", e);
         }
 
         var error = new OcppJsonError();

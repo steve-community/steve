@@ -64,7 +64,7 @@ public class Serializer implements Consumer<CommunicationContext> {
             var result = ocppMapper.writeValueAsString(str);
             context.setOutgoingString(result);
         } catch (IOException e) {
-            throw new SteveException("The outgoing message could not be serialized", e);
+            throw new SteveException.InternalError("The outgoing message could not be serialized", e);
         }
     }
 
@@ -81,7 +81,8 @@ public class Serializer implements Consumer<CommunicationContext> {
         try {
             payloadNode = ocppMapper.valueToTree(call.getPayload());
         } catch (IllegalArgumentException e) {
-            throw new SteveException("The payload of the outgoing call could not be converted to JSON", e);
+            throw new SteveException.InternalError(
+                    "The payload of the outgoing call could not be converted to JSON", e);
         }
 
         return ocppMapper

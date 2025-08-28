@@ -24,15 +24,15 @@ import static java.lang.String.format;
  * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 28.08.2014
  */
-public class SteveException extends RuntimeException {
+public abstract class SteveException extends RuntimeException {
 
     private static final long serialVersionUID = 3081743035434873349L;
 
-    public SteveException(String message) {
+    protected SteveException(String message) {
         super(message);
     }
 
-    public SteveException(String message, Throwable cause) {
+    protected SteveException(String message, Throwable cause) {
         super(message, cause);
     }
 
@@ -40,19 +40,19 @@ public class SteveException extends RuntimeException {
     // No String/variable interpolation in Java. Use format instead.
     // -------------------------------------------------------------------------
 
-    public SteveException(String template, Object arg1) {
+    protected SteveException(String template, Object arg1) {
         this(format(template, arg1));
     }
 
-    public SteveException(String template, Object arg1, Throwable cause) {
+    protected SteveException(String template, Object arg1, Throwable cause) {
         this(format(template, arg1), cause);
     }
 
-    public SteveException(String template, Object arg1, Object arg2) {
+    protected SteveException(String template, Object arg1, Object arg2) {
         this(format(template, arg1, arg2));
     }
 
-    public SteveException(String template, Object arg1, Object arg2, Throwable cause) {
+    protected SteveException(String template, Object arg1, Object arg2, Throwable cause) {
         this(format(template, arg1, arg2), cause);
     }
 
@@ -60,10 +60,58 @@ public class SteveException extends RuntimeException {
     // Custom/extending classes
     // -------------------------------------------------------------------------
 
+    public static class InternalError extends SteveException {
+
+        public InternalError(String message) {
+            super(message);
+        }
+
+        public InternalError(String message, Throwable cause) {
+            super(message, cause);
+        }
+
+        public InternalError(String template, Object arg1) {
+            this(format(template, arg1));
+        }
+
+        public InternalError(String template, Object arg1, Throwable cause) {
+            this(format(template, arg1), cause);
+        }
+
+        public InternalError(String template, Object arg1, Object arg2) {
+            this(format(template, arg1, arg2));
+        }
+
+        protected InternalError(String template, Object arg1, Object arg2, Throwable cause) {
+            this(format(template, arg1, arg2), cause);
+        }
+    }
+
     public static class AlreadyExists extends SteveException {
 
         public AlreadyExists(String template, Object arg1) {
             super(format(template, arg1));
+        }
+    }
+
+    public static class NotFound extends SteveException {
+
+        public NotFound(String message) {
+            super(message);
+        }
+
+        public NotFound(String template, Object arg1) {
+            this(format(template, arg1));
+        }
+    }
+
+    public static class BadRequest extends SteveException {
+        public BadRequest(String message) {
+            super(message);
+        }
+
+        public BadRequest(String template, Object arg1) {
+            this(format(template, arg1));
         }
     }
 }

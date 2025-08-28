@@ -188,7 +188,7 @@ public class ChargePointRepositoryImpl implements ChargePointRepository {
             case EARLIER ->
                 selectQuery.addConditions(date(CHARGE_BOX.LAST_HEARTBEAT_TIMESTAMP)
                         .lessThan(LocalDate.now().minusDays(1)));
-            default -> throw new SteveException("Unknown enum type");
+            default -> throw new SteveException.InternalError("Unknown enum type");
         }
 
         // Default order
@@ -304,7 +304,7 @@ public class ChargePointRepositoryImpl implements ChargePointRepository {
                 return addChargePointInternal(ctx, form, addressId);
 
             } catch (DataAccessException e) {
-                throw new SteveException(
+                throw new SteveException.InternalError(
                         "Failed to add the charge point with chargeBoxId '%s'", form.getChargeBoxId(), e);
             }
         });
@@ -319,7 +319,7 @@ public class ChargePointRepositoryImpl implements ChargePointRepository {
                 updateChargePointInternal(ctx, form, addressId);
 
             } catch (DataAccessException e) {
-                throw new SteveException(
+                throw new SteveException.InternalError(
                         "Failed to update the charge point with chargeBoxId '%s'", form.getChargeBoxId(), e);
             }
         });
@@ -334,7 +334,7 @@ public class ChargePointRepositoryImpl implements ChargePointRepository {
                 deleteChargePointInternal(ctx, chargeBoxPk);
 
             } catch (DataAccessException e) {
-                throw new SteveException("Failed to delete the charge point", e);
+                throw new SteveException.InternalError("Failed to delete the charge point", e);
             }
         });
     }

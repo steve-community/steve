@@ -101,7 +101,7 @@ public class UserRepositoryImpl implements UserRepository {
                 refreshOcppTagsInternal(tx, form, userPk);
                 return userPk;
             } catch (DataAccessException e) {
-                throw new SteveException("Failed to add the user", e);
+                throw new SteveException.InternalError("Failed to add the user", e);
             }
         });
     }
@@ -116,7 +116,7 @@ public class UserRepositoryImpl implements UserRepository {
                 refreshOcppTagsInternal(tx, form, form.getUserPk());
 
             } catch (DataAccessException e) {
-                throw new SteveException("Failed to update the user", e);
+                throw new SteveException.InternalError("Failed to update the user", e);
             }
         });
     }
@@ -129,7 +129,7 @@ public class UserRepositoryImpl implements UserRepository {
                 addressRepository.delete(tx, selectAddressId(userPk));
                 deleteInternal(tx, userPk);
             } catch (DataAccessException e) {
-                throw new SteveException("Failed to delete the user", e);
+                throw new SteveException.InternalError("Failed to delete the user", e);
             }
         });
     }
@@ -231,11 +231,11 @@ public class UserRepositoryImpl implements UserRepository {
                     .returning(USER.USER_PK)
                     .fetchOne();
             if (r == null) {
-                throw new SteveException("Failed to insert the user, no record returned");
+                throw new SteveException.InternalError("Failed to insert the user, no record returned");
             }
             return r.getUserPk();
         } catch (DataAccessException e) {
-            throw new SteveException("Failed to insert the user", e);
+            throw new SteveException.InternalError("Failed to insert the user", e);
         }
     }
 

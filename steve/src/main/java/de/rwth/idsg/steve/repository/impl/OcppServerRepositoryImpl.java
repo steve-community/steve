@@ -347,7 +347,7 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
 
             // Actually unnecessary, because JOOQ will throw an exception, if something goes wrong
             if (transactionId == null) {
-                throw new SteveException("Failed to INSERT transaction into database");
+                throw new SteveException.InternalError("Failed to INSERT transaction into database");
             }
 
             return new TransactionDataHolder(false, transactionId);

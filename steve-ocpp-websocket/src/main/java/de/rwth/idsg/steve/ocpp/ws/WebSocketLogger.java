@@ -19,6 +19,7 @@
 package de.rwth.idsg.steve.ocpp.ws;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.WebSocketSession;
 
@@ -27,15 +28,14 @@ import org.springframework.web.socket.WebSocketSession;
  * @since 10.05.2018
  */
 @Slf4j
+@Component
 public final class WebSocketLogger {
 
-    private WebSocketLogger() {}
-
-    public static void connected(String chargeBoxId, WebSocketSession session) {
+    public void connected(String chargeBoxId, WebSocketSession session) {
         log.info("[chargeBoxId={}, sessionId={}] Connection is established", chargeBoxId, session.getId());
     }
 
-    public static void closed(String chargeBoxId, WebSocketSession session, CloseStatus closeStatus) {
+    public void closed(String chargeBoxId, WebSocketSession session, CloseStatus closeStatus) {
         log.warn(
                 "[chargeBoxId={}, sessionId={}] Connection is closed, status: {}",
                 chargeBoxId,
@@ -43,38 +43,34 @@ public final class WebSocketLogger {
                 closeStatus);
     }
 
-    public static void sending(String chargeBoxId, WebSocketSession session, String msg) {
+    public void sending(String chargeBoxId, WebSocketSession session, String msg) {
         log.info("[chargeBoxId={}, sessionId={}] Sending: {}", chargeBoxId, session.getId(), msg);
     }
 
-    public static void sendingPing(String chargeBoxId, WebSocketSession session) {
+    public void sendingPing(String chargeBoxId, WebSocketSession session) {
         log.debug("[chargeBoxId={}, sessionId={}] Sending ping message", chargeBoxId, session.getId());
     }
 
-    public static void receivedPong(String chargeBoxId, WebSocketSession session) {
+    public void receivedPong(String chargeBoxId, WebSocketSession session) {
         log.debug("[chargeBoxId={}, sessionId={}] Received pong message", chargeBoxId, session.getId());
     }
 
-    public static void receivedText(String chargeBoxId, WebSocketSession session, String msg) {
+    public void receivedText(String chargeBoxId, WebSocketSession session, String msg) {
         log.info("[chargeBoxId={}, sessionId={}] Received: {}", chargeBoxId, session.getId(), msg);
     }
 
-    public static void receivedEmptyText(String chargeBoxId, WebSocketSession session) {
+    public void receivedEmptyText(String chargeBoxId, WebSocketSession session) {
         log.warn(
                 "[chargeBoxId={}, sessionId={}] Received empty text message. Will pretend this never happened.",
                 chargeBoxId,
                 session.getId());
     }
 
-    public static void pingError(String chargeBoxId, WebSocketSession session, Throwable t) {
-        if (log.isErrorEnabled()) {
-            log.error("[chargeBoxId=" + chargeBoxId + ", sessionId=" + session.getId() + "] Ping error", t);
-        }
+    public void pingError(String chargeBoxId, WebSocketSession session, Throwable t) {
+        log.error("[chargeBoxId={}, sessionId={}] Ping error", chargeBoxId, session.getId(), t);
     }
 
-    public static void transportError(String chargeBoxId, WebSocketSession session, Throwable t) {
-        if (log.isErrorEnabled()) {
-            log.error("[chargeBoxId=" + chargeBoxId + ", sessionId=" + session.getId() + "] Transport error", t);
-        }
+    public void transportError(String chargeBoxId, WebSocketSession session, Throwable t) {
+        log.error("[chargeBoxId={}, sessionId={}] Transport error", chargeBoxId, session.getId(), t);
     }
 }

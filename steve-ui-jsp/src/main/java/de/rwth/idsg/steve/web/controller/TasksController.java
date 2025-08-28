@@ -96,7 +96,7 @@ public class TasksController {
             case GetConfigurationTask getConfigurationTask ->
                 processForGetConfigurationTask(getConfigurationTask, chargeBoxId, model);
             default ->
-                throw new SteveException(
+                throw new SteveException.InternalError(
                         "Task type not supported: " + task.getClass().getName());
         };
     }
@@ -121,7 +121,7 @@ public class TasksController {
     private static <T> RequestResult<T> extractResult(CommunicationTask<?, T> task, String chargeBoxId) {
         var result = task.getResultMap().get(chargeBoxId);
         if (result == null) {
-            throw new SteveException("Result not found for chargeBoxId '" + chargeBoxId + "'");
+            throw new SteveException.InternalError("Result not found for chargeBoxId '" + chargeBoxId + "'");
         }
         return result;
     }

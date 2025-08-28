@@ -64,7 +64,7 @@ public class TaskStoreImpl implements TaskStore {
     public CommunicationTask get(Integer taskId) {
         CommunicationTask r = lookupTable.get(taskId);
         if (r == null) {
-            throw new SteveException("There is no task with taskId '%s'", taskId);
+            throw new SteveException.InternalError("There is no task with taskId '%s'", taskId);
         } else {
             return r;
         }

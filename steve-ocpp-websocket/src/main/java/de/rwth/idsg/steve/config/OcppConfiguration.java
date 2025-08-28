@@ -23,6 +23,7 @@ import de.rwth.idsg.steve.ocpp.CommunicationTask;
 import de.rwth.idsg.steve.ocpp.OcppVersion;
 import de.rwth.idsg.steve.ocpp.ws.InvocationContext;
 import de.rwth.idsg.steve.ocpp.ws.JsonObjectMapper;
+import de.rwth.idsg.steve.ocpp.ws.WebSocketLogger;
 import de.rwth.idsg.steve.ocpp.ws.ocpp12.Ocpp12TypeStore;
 import de.rwth.idsg.steve.ocpp.ws.ocpp12.Ocpp12WebSocketEndpoint;
 import de.rwth.idsg.steve.ocpp.ws.ocpp15.Ocpp15TypeStore;
@@ -70,7 +71,7 @@ public class OcppConfiguration {
     }
 
     @Bean
-    public Sender sender() {
-        return new Sender();
+    public Sender sender(WebSocketLogger webSocketLogger) {
+        return new Sender(webSocketLogger);
     }
 }

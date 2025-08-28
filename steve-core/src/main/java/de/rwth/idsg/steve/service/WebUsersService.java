@@ -241,7 +241,7 @@ public class WebUsersService implements UserDetailsManager {
         WebUserRecord ur = webUserRepository.loadUserByUserPk(webUserPk);
 
         if (ur == null) {
-            throw new SteveException("There is no user with id '%d'", webUserPk);
+            throw new SteveException.NotFound("There is no user with id '%d'", webUserPk);
         }
 
         WebUserBaseForm form = new WebUserBaseForm();
@@ -256,7 +256,7 @@ public class WebUsersService implements UserDetailsManager {
         WebUserRecord ur = webUserRepository.loadUserByUsername(webUserName);
 
         if (ur == null) {
-            throw new SteveException("There is no user with username '%s'", webUserName);
+            throw new SteveException.NotFound("There is no user with username '%s'", webUserName);
         }
 
         WebUserBaseForm form = new WebUserBaseForm();

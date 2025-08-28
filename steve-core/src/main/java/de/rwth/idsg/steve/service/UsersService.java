@@ -47,7 +47,8 @@ public class UsersService {
         var id = userRepository.add(form);
         return userRepository
                 .getDetails(id)
-                .orElseThrow(() -> new SteveException("User not found after creation, this should never happen"));
+                .orElseThrow(() ->
+                        new SteveException.InternalError("User not found after creation, this should never happen"));
     }
 
     public User.Details update(UserForm form) {
@@ -57,7 +58,8 @@ public class UsersService {
         userRepository.update(form);
         return userRepository
                 .getDetails(form.getUserPk())
-                .orElseThrow(() -> new SteveException("User not found after update, this should never happen"));
+                .orElseThrow(() ->
+                        new SteveException.InternalError("User not found after update, this should never happen"));
     }
 
     public User.Details delete(int userPk) {

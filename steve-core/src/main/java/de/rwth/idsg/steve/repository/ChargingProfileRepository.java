@@ -27,6 +27,7 @@ import ocpp.cp._2015._10.ChargingProfilePurposeType;
 import org.jspecify.annotations.Nullable;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -58,7 +59,7 @@ public interface ChargingProfileRepository {
 
     List<ChargingProfile.Overview> getOverview(ChargingProfileQueryForm form);
 
-    ChargingProfile.Details getDetails(int chargingProfilePk);
+    Optional<ChargingProfile.Details> getDetails(int chargingProfilePk);
 
     int add(ChargingProfileForm form);
 

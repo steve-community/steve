@@ -20,7 +20,6 @@ package de.rwth.idsg.steve.utils.mapper;
 
 import de.rwth.idsg.steve.repository.dto.ChargingProfile;
 import de.rwth.idsg.steve.web.dto.ChargingProfileForm;
-import jooq.steve.db.tables.records.ChargingProfileRecord;
 import jooq.steve.db.tables.records.ChargingSchedulePeriodRecord;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -28,11 +27,6 @@ import ocpp.cp._2015._10.ChargingProfileKindType;
 import ocpp.cp._2015._10.ChargingProfilePurposeType;
 import ocpp.cp._2015._10.ChargingRateUnitType;
 import ocpp.cp._2015._10.RecurrencyKindType;
-
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
 
 import static de.rwth.idsg.steve.utils.DateTimeUtils.toInstant;
 
@@ -44,10 +38,10 @@ import static de.rwth.idsg.steve.utils.DateTimeUtils.toInstant;
 public final class ChargingProfileDetailsMapper {
 
     public static ChargingProfileForm mapToForm(ChargingProfile.Details details) {
-        ChargingProfileRecord profile = details.getProfile();
-        List<ChargingSchedulePeriodRecord> periods = details.getPeriods();
+        var profile = details.getProfile();
+        var periods = details.getPeriods();
 
-        ChargingProfileForm form = new ChargingProfileForm();
+        var form = new ChargingProfileForm();
         form.setChargingProfilePk(profile.getChargingProfilePk());
         form.setDescription(profile.getDescription());
         form.setNote(profile.getNote());
@@ -62,18 +56,18 @@ public final class ChargingProfileDetailsMapper {
         form.setStartSchedule(toInstant(profile.getStartSchedule()));
         form.setChargingRateUnit(ChargingRateUnitType.fromValue(profile.getChargingRateUnit()));
         form.setMinChargingRate(profile.getMinChargingRate());
-
-        Map<String, ChargingProfileForm.SchedulePeriod> periodMap = new LinkedHashMap<>();
-        for (ChargingSchedulePeriodRecord rec : periods) {
-            ChargingProfileForm.SchedulePeriod p = new ChargingProfileForm.SchedulePeriod();
-            p.setStartPeriodInSeconds(rec.getStartPeriodInSeconds());
-            p.setPowerLimit(rec.getPowerLimit());
-            p.setNumberPhases(rec.getNumberPhases());
-
-            periodMap.put(UUID.randomUUID().toString(), p);
-        }
-        form.setSchedulePeriodMap(periodMap);
+        form.setSchedulePeriods(periods.stream()
+                .map(ChargingProfileDetailsMapper::mapToFormPeriod)
+                .toList());
 
         return form;
+    }
+
+    private static ChargingProfileForm.SchedulePeriod mapToFormPeriod(ChargingSchedulePeriodRecord rec) {
+        var p = new ChargingProfileForm.SchedulePeriod();
+        p.setStartPeriodInSeconds(rec.getStartPeriodInSeconds());
+        p.setPowerLimit(rec.getPowerLimit());
+        p.setNumberPhases(rec.getNumberPhases());
+        return p;
     }
 }

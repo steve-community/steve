@@ -74,7 +74,7 @@ public class ChangeConfigurationParams extends MultipleChargePointSelect {
         }
 
         // This should not happen
-        throw new SteveException("Cannot determine key (KeyType in illegal state)");
+        throw new SteveException.InternalError("Cannot determine key (KeyType in illegal state)");
     }
 
     /**

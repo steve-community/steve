@@ -28,11 +28,9 @@ import de.rwth.idsg.steve.ocpp.soap.CentralSystemService16_SoapServer;
 import de.rwth.idsg.steve.ocpp.ws.AbstractWebSocketEndpoint;
 import de.rwth.idsg.steve.ocpp.ws.FutureResponseContextStore;
 import de.rwth.idsg.steve.ocpp.ws.SessionContextStore;
+import de.rwth.idsg.steve.ocpp.ws.WebSocketLogger;
 import de.rwth.idsg.steve.ocpp.ws.pipeline.AbstractCallHandler;
-import de.rwth.idsg.steve.ocpp.ws.pipeline.Deserializer;
-import de.rwth.idsg.steve.ocpp.ws.pipeline.IncomingPipeline;
 import de.rwth.idsg.steve.ocpp.ws.pipeline.Sender;
-import de.rwth.idsg.steve.ocpp.ws.pipeline.Serializer;
 import de.rwth.idsg.steve.repository.OcppServerRepository;
 import lombok.RequiredArgsConstructor;
 import ocpp.cs._2015._10.AuthorizeRequest;
@@ -49,8 +47,6 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 
-import jakarta.annotation.PostConstruct;
-
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 13.03.2018
@@ -58,32 +54,28 @@ import jakarta.annotation.PostConstruct;
 @Component
 public class Ocpp16WebSocketEndpoint extends AbstractWebSocketEndpoint {
 
-    private final IncomingPipeline pipeline;
-
     public Ocpp16WebSocketEndpoint(
+            WebSocketLogger webSocketLogger,
             DelegatingTaskScheduler asyncTaskScheduler,
             OcppServerRepository ocppServerRepository,
             FutureResponseContextStore futureResponseContextStore,
             ApplicationEventPublisher applicationEventPublisher,
-            CentralSystemService16_SoapServer server,
-            Ocpp16TypeStore typeStore,
             SessionContextStore sessionStore,
+            Sender sender,
             @Qualifier("ocppObjectMapper") ObjectMapper ocppMapper,
-            Sender sender) {
+            CentralSystemService16_SoapServer ocpp16Server,
+            Ocpp16TypeStore ocpp16TypeStore) {
         super(
+                webSocketLogger,
                 asyncTaskScheduler,
                 ocppServerRepository,
                 futureResponseContextStore,
                 applicationEventPublisher,
-                sessionStore);
-        var serializer = new Serializer(ocppMapper);
-        var deserializer = new Deserializer(ocppMapper, futureResponseContextStore, typeStore);
-        this.pipeline = new IncomingPipeline(serializer, deserializer, sender, new Ocpp16CallHandler(server));
-    }
-
-    @PostConstruct
-    public void init() {
-        super.init(pipeline);
+                sessionStore,
+                sender,
+                ocppMapper,
+                ocpp16TypeStore,
+                new Ocpp16CallHandler(ocpp16Server));
     }
 
     @Override

@@ -69,15 +69,17 @@ public class ApiDocsConfiguration {
         System.setProperty("springdoc.swagger-ui.tagsSorter", "alpha");
         // Sort endpoints (within a controller) alphabetically by their path
         System.setProperty("springdoc.swagger-ui.operationsSorter", "alpha");
+        // Sort schemas/DTOs alphabetically
+        System.setProperty("springdoc.writer-with-order-by-keys", "true");
     }
 
     @Bean
     public OpenAPI apiDocs(SteveConfiguration config) {
-        String title = "SteVe REST API Documentation";
+        var title = "SteVe REST API Documentation";
 
-        String securityName = "basicAuth";
+        var securityName = "basicAuth";
 
-        SecurityScheme securityScheme = new SecurityScheme()
+        var securityScheme = new SecurityScheme()
                 .type(SecurityScheme.Type.HTTP)
                 .scheme("basic")
                 .name(securityName);

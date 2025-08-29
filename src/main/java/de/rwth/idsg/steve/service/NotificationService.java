@@ -21,7 +21,6 @@ package de.rwth.idsg.steve.service;
 import com.google.common.base.Strings;
 import de.rwth.idsg.steve.NotificationFeature;
 import de.rwth.idsg.steve.repository.dto.InsertTransactionParams;
-import de.rwth.idsg.steve.repository.dto.MailSettings;
 import de.rwth.idsg.steve.repository.dto.UpdateTransactionParams;
 import de.rwth.idsg.steve.service.notification.OccpStationBooted;
 import de.rwth.idsg.steve.service.notification.OcppStationStatusFailure;
@@ -29,6 +28,7 @@ import de.rwth.idsg.steve.service.notification.OcppStationWebSocketConnected;
 import de.rwth.idsg.steve.service.notification.OcppStationWebSocketDisconnected;
 import de.rwth.idsg.steve.service.notification.OcppTransactionEnded;
 import de.rwth.idsg.steve.service.notification.OcppTransactionStarted;
+import de.rwth.idsg.steve.web.dto.SettingsForm.MailSettings;
 import lombok.extern.slf4j.Slf4j;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,8 +39,8 @@ import static de.rwth.idsg.steve.NotificationFeature.OcppStationBooted;
 import static de.rwth.idsg.steve.NotificationFeature.OcppStationStatusFailure;
 import static de.rwth.idsg.steve.NotificationFeature.OcppStationWebSocketConnected;
 import static de.rwth.idsg.steve.NotificationFeature.OcppStationWebSocketDisconnected;
-import static de.rwth.idsg.steve.NotificationFeature.OcppTransactionStarted;
 import static de.rwth.idsg.steve.NotificationFeature.OcppTransactionEnded;
+import static de.rwth.idsg.steve.NotificationFeature.OcppTransactionStarted;
 import static java.lang.String.format;
 
 /**
@@ -160,7 +160,7 @@ public class NotificationService {
     private boolean isDisabled(NotificationFeature f) {
         MailSettings settings = mailService.getSettings();
 
-        boolean isEnabled = settings.isEnabled()
+        boolean isEnabled = Boolean.TRUE.equals(settings.getEnabled())
                 && settings.getEnabledFeatures().contains(f)
                 && !settings.getRecipients().isEmpty();
 

@@ -18,7 +18,7 @@
  */
 package de.rwth.idsg.steve.service;
 
-import de.rwth.idsg.steve.repository.dto.MailSettings;
+import de.rwth.idsg.steve.web.dto.SettingsForm.MailSettings;
 
 import jakarta.mail.MessagingException;
 

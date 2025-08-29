@@ -18,8 +18,9 @@
  */
 package de.rwth.idsg.steve.repository;
 
-import de.rwth.idsg.steve.repository.dto.MailSettings;
 import de.rwth.idsg.steve.web.dto.SettingsForm;
+import de.rwth.idsg.steve.web.dto.SettingsForm.MailSettings;
+import de.rwth.idsg.steve.web.dto.SettingsForm.OcppSettings;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -27,8 +28,13 @@ import de.rwth.idsg.steve.web.dto.SettingsForm;
  */
 public interface SettingsRepository {
     SettingsForm getForm();
+    OcppSettings getOcppSettings();
     MailSettings getMailSettings();
+
     int getHeartbeatIntervalInSeconds();
     int getHoursToExpire();
+
     void update(SettingsForm settingsForm);
+    void update(OcppSettings ocppForm);
+    void update(MailSettings mailForm);
 }

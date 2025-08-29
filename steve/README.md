@@ -55,7 +55,8 @@ SteVe is designed to run standalone, a java servlet container / web server (e.g.
     Make sure MySQL is reachable via TCP (e.g., remove `skip-networking` from `my.cnf`).
     The following MySQL statements can be used as database initialization (adjust database name and credentials according to your setup).
 
-    ```
+    ```sql
+    DROP DATABASE stevedb;
     CREATE DATABASE stevedb CHARACTER SET utf8 COLLATE utf8_unicode_ci;
     CREATE USER 'steve'@'localhost' IDENTIFIED BY 'changeme';
     GRANT ALL PRIVILEGES ON stevedb.* TO 'steve'@'localhost';
@@ -64,7 +65,7 @@ SteVe is designed to run standalone, a java servlet container / web server (e.g.
 2. Download and extract tarball:
 
     You can download and extract the SteVe releases using the following commands (replace X.X.X with the desired version number):
-    ```
+    ```shell
     wget https://github.com/steve-community/steve/archive/steve-X.X.X.tar.gz
     tar xzvf steve-X.X.X.tar.gz
     cd steve-X.X.X
@@ -115,9 +116,13 @@ With the default docker compose configuration, the web interface will be accessi
 
 First build your image, and push it to a registry your K8S cluster can access. Make sure the build args in the docker build command are set with the same database configuration that the main deployment will use.
 
-`docker build --build-arg DB_HOST= --build-arg DB_PORT= --build-arg DB_USERNAME= --build-arg DB_PASSWORD= --build-arg DB_DATABASE=  -f k8s/docker/Dockerfile -t <IMAGE_NAME> .`
+```shell
+docker build --build-arg DB_HOST= --build-arg DB_PORT= --build-arg DB_USERNAME= --build-arg DB_PASSWORD= --build-arg DB_DATABASE=  -f k8s/docker/Dockerfile -t <IMAGE_NAME> .
+```
 
-`docker push <IMAGE_NAME>`
+```shell
+docker push <IMAGE_NAME>
+```
 
 
 Then go to `k8s/yaml/Deployment.yaml` and change `### YOUR BUILT IMAGE HERE ###` to your image tag, and fill in the environment variables with the same database connection that you used at build time.

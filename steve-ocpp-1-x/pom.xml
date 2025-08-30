@@ -10,7 +10,7 @@
   <artifactId>steve-ocpp-1-x</artifactId>
 
   <properties>
-    <plugin.cxf.version>4.0.5</plugin.cxf.version>
+    <plugin.cxf.version>4.1.3</plugin.cxf.version>
   </properties>
 
   <dependencies>

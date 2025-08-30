@@ -10,6 +10,7 @@
   <artifactId>steve-ocpp-1-x</artifactId>
 
   <properties>
+    <jaxb.version>4.0.9</jaxb.version>
     <plugin.cxf.version>4.1.3</plugin.cxf.version>
   </properties>
 
@@ -54,12 +55,12 @@
           <dependency>
             <groupId>org.jvnet.jaxb</groupId>
             <artifactId>jaxb-plugins</artifactId>
-            <version>4.0.8</version>
+            <version>${jaxb.version}</version>
           </dependency>
           <dependency>
             <groupId>org.jvnet.jaxb</groupId>
             <artifactId>jaxb-plugin-annotate</artifactId>
-            <version>4.0.8</version>
+            <version>${jaxb.version}</version>
           </dependency>
         </dependencies>
         <executions>

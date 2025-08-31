@@ -33,7 +33,7 @@ import com.google.common.base.Strings;
 import de.rwth.idsg.steve.SteveException;
 import de.rwth.idsg.steve.config.DelegatingTaskExecutor;
 import de.rwth.idsg.steve.repository.SettingsRepository;
-import de.rwth.idsg.steve.repository.dto.MailSettings;
+import de.rwth.idsg.steve.web.dto.SettingsForm.MailSettings;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

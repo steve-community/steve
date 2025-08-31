@@ -18,12 +18,11 @@
  */
 package de.rwth.idsg.steve.repository.dto;
 
-import jooq.steve.db.tables.records.ChargingProfileRecord;
-import jooq.steve.db.tables.records.ChargingSchedulePeriodRecord;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
+import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.List;
 
@@ -58,9 +57,29 @@ public class ChargingProfile {
     }
 
     @Getter
-    @RequiredArgsConstructor
+    @Builder
     public static final class Details {
-        private final ChargingProfileRecord profile;
-        private final List<ChargingSchedulePeriodRecord> periods;
+        // from ChargingProfileRecord
+        private final int chargingProfilePk;
+        private final int stackLevel;
+        private final String chargingProfilePurpose;
+        private final String chargingProfileKind;
+        private final String recurrencyKind;
+        private final Instant validFrom;
+        private final Instant validTo;
+        private final Integer durationInSeconds;
+        private final Instant startSchedule;
+        private final String chargingRateUnit;
+        private final BigDecimal minChargingRate;
+        // from ChargingSchedulePeriodRecord
+        private final List<ChargingSchedulePeriod> periods;
+    }
+
+    @Getter
+    @RequiredArgsConstructor
+    public static final class ChargingSchedulePeriod {
+        private final int startPeriodInSeconds;
+        private final BigDecimal powerLimit;
+        private final Integer numberPhases;
     }
 }

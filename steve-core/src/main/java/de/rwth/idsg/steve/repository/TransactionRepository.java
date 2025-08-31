@@ -41,5 +41,5 @@ public interface TransactionRepository {
 
     Optional<Integer> getActiveTransactionId(String chargeBoxId, int connectorId);
 
-    TransactionDetails getDetails(int transactionPk);
+    Optional<TransactionDetails> getDetails(int transactionPk);
 }

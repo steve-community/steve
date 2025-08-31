@@ -16,31 +16,26 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package de.rwth.idsg.steve.web.dto;
+package de.rwth.idsg.steve.repository.dto;
 
+import de.rwth.idsg.steve.web.dto.WebUserAuthority;
+import lombok.Builder;
 import lombok.Getter;
-import lombok.Setter;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Set;
 
-/**
- * @author fnkbsi
- * @since 01.04.2022
- */
 @Getter
-@Setter
-public class WebUserBaseForm {
-
-    // Internal database id
-    private Integer webUserPk;
-
-    private Boolean enabled;
-
-    private String webUsername;
-
-    private WebUserAuthority authorities;
-
-    public Set<String> getAuthoritiesAsStrings() {
-        return authorities.getValues();
-    }
+@Builder
+public class WebUser {
+    private final @Nullable Integer webUserPk;
+    private final String login;
+    private final @Nullable String password;
+    private final @Nullable String salt;
+    private final @Nullable String firstname;
+    private final @Nullable String lastname;
+    private final @Nullable String email;
+    private final boolean enabled;
+    private final Set<WebUserAuthority> authorities;
+    private final @Nullable String apiPassword;
 }

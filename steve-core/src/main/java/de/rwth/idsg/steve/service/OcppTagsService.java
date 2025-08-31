@@ -21,10 +21,10 @@ package de.rwth.idsg.steve.service;
 import com.google.common.base.Strings;
 import de.rwth.idsg.steve.repository.OcppTagRepository;
 import de.rwth.idsg.steve.repository.dto.OcppTag;
+import de.rwth.idsg.steve.repository.dto.OcppTagActivity;
 import de.rwth.idsg.steve.service.dto.UnidentifiedIncomingObject;
 import de.rwth.idsg.steve.web.dto.OcppTagForm;
 import de.rwth.idsg.steve.web.dto.OcppTagQueryForm;
-import jooq.steve.db.tables.records.OcppTagActivityRecord;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import ocpp.cp._2015._10.AuthorizationData;
@@ -37,10 +37,6 @@ import java.time.Instant;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Supplier;
-
-import static de.rwth.idsg.steve.utils.DateTimeUtils.toOffsetDateTime;
-import static de.rwth.idsg.steve.utils.OcppTagActivityRecordUtils.isBlocked;
-import static de.rwth.idsg.steve.utils.OcppTagActivityRecordUtils.isExpired;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -60,8 +56,8 @@ public class OcppTagsService {
         return ocppTagRepository.getOverview(form);
     }
 
-    public OcppTagActivityRecord getRecord(int ocppTagPk) {
-        return ocppTagRepository.getRecord(ocppTagPk);
+    public OcppTagActivity getRecord(int ocppTagPk) {
+        return ocppTagRepository.getRecord(ocppTagPk).orElse(null);
     }
 
     public List<String> getIdTags() {
@@ -86,12 +82,16 @@ public class OcppTagsService {
 
     public List<AuthorizationData> getAuthDataOfAllTags() {
         var now = Instant.now();
-        return ocppTagRepository.getRecords().map(record -> mapToAuthorizationData(record, now));
+        return ocppTagRepository.getRecords().stream()
+                .map(tag -> tag.mapToAuthorizationData(now))
+                .toList();
     }
 
     public List<AuthorizationData> getAuthData(List<String> idTagList) {
         var now = Instant.now();
-        return ocppTagRepository.getRecords(idTagList).map(record -> mapToAuthorizationData(record, now));
+        return ocppTagRepository.getRecords(idTagList).stream()
+                .map(tag -> tag.mapToAuthorizationData(now))
+                .toList();
     }
 
     public List<UnidentifiedIncomingObject> getUnknownOcppTags() {
@@ -156,34 +156,5 @@ public class OcppTagsService {
 
     public void deleteOcppTag(int ocppTagPk) {
         ocppTagRepository.deleteOcppTag(ocppTagPk);
-    }
-
-    // -------------------------------------------------------------------------
-    // Private helpers
-    // -------------------------------------------------------------------------
-
-    /**
-     * ConcurrentTx is only valid for StartTransactionRequest
-     */
-    private static ocpp.cp._2015._10.AuthorizationStatus decideStatusForAuthData(
-            OcppTagActivityRecord record, Instant now) {
-        if (isBlocked(record)) {
-            return ocpp.cp._2015._10.AuthorizationStatus.BLOCKED;
-        } else if (isExpired(record, now)) {
-            return ocpp.cp._2015._10.AuthorizationStatus.EXPIRED;
-            //        } else if (reachedLimitOfActiveTransactions(record)) {
-            //            return ocpp.cp._2015._10.AuthorizationStatus.CONCURRENT_TX;
-        } else {
-            return ocpp.cp._2015._10.AuthorizationStatus.ACCEPTED;
-        }
-    }
-
-    private static AuthorizationData mapToAuthorizationData(OcppTagActivityRecord record, Instant nowDt) {
-        return new AuthorizationData()
-                .withIdTag(record.getIdTag())
-                .withIdTagInfo(new ocpp.cp._2015._10.IdTagInfo()
-                        .withStatus(decideStatusForAuthData(record, nowDt))
-                        .withParentIdTag(record.getParentIdTag())
-                        .withExpiryDate(toOffsetDateTime(record.getExpiryDate())));
     }
 }

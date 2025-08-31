@@ -38,6 +38,23 @@ import jakarta.validation.constraints.NotNull;
 @ToString
 public class ChargePointForm {
 
+    public ChargePointForm() {}
+
+    public static ChargePointForm fromDetails(de.rwth.idsg.steve.repository.dto.ChargePoint.Details details) {
+        var form = new ChargePointForm();
+        form.chargeBoxPk = details.getChargeBoxPk();
+        form.chargeBoxId = details.getChargeBoxId();
+        form.note = details.getNote();
+        form.description = details.getDescription();
+        form.locationLatitude = details.getLocationLatitude();
+        form.locationLongitude = details.getLocationLongitude();
+        form.insertConnectorStatusAfterTransactionMsg = details.isInsertConnectorStatusAfterTransactionMsg();
+        form.adminAddress = details.getAdminAddress();
+        form.registrationStatus = details.getRegistrationStatus();
+        form.address = details.getAddress();
+        return form;
+    }
+
     // Internal database id
     private Integer chargeBoxPk;
 

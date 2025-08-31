@@ -63,7 +63,7 @@ public class UsersRestController {
         var body = usersService.add(form);
         var location = ServletUriComponentsBuilder.fromCurrentRequest()
                 .path("/{id}")
-                .buildAndExpand(body.getUserRecord().getUserPk())
+                .buildAndExpand(body.getUserPk())
                 .toUri();
         return ResponseEntity.created(location).body(body);
     }

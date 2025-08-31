@@ -19,16 +19,17 @@
 package de.rwth.idsg.steve.repository.impl;
 
 import de.rwth.idsg.steve.SteveException;
+import de.rwth.idsg.steve.jooq.mapper.AddressMapper;
 import de.rwth.idsg.steve.repository.AddressRepository;
 import de.rwth.idsg.steve.web.dto.Address;
-import jooq.steve.db.tables.records.AddressRecord;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jooq.DSLContext;
-import org.jooq.Record1;
-import org.jooq.SelectConditionStep;
 import org.jooq.exception.DataAccessException;
 import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Repository;
+
+import java.util.Optional;
 
 import static jooq.steve.db.tables.Address.ADDRESS;
 
@@ -38,17 +39,20 @@ import static jooq.steve.db.tables.Address.ADDRESS;
  */
 @Slf4j
 @Repository
+@RequiredArgsConstructor
 public class AddressRepositoryImpl implements AddressRepository {
 
+    private final DSLContext ctx;
+
     @Override
-    public @Nullable AddressRecord get(DSLContext ctx, Integer addressPk) {
+    public Optional<Address> get(Integer addressPk) {
         if (addressPk == null) {
-            return null;
+            return Optional.empty();
         }
 
         return ctx.selectFrom(ADDRESS)
                 .where(ADDRESS.ADDRESS_PK.equal(addressPk))
-                .fetchOne();
+                .fetchOptional(AddressMapper::fromRecord);
     }
 
     /**
@@ -64,29 +68,31 @@ public class AddressRepositoryImpl implements AddressRepository {
      *
      */
     @Override
-    public @Nullable Integer updateOrInsert(DSLContext ctx, Address address) {
+    public @Nullable Integer updateOrInsert(Address address) {
         if (address.isEmpty()) {
             return null;
 
         } else if (address.getAddressPk() == null) {
-            return insert(ctx, address);
+            return insert(address);
 
         } else {
-            update(ctx, address);
+            update(address);
             return address.getAddressPk();
         }
     }
 
     @Override
-    public void delete(DSLContext ctx, SelectConditionStep<Record1<Integer>> addressPkSelect) {
-        ctx.delete(ADDRESS).where(ADDRESS.ADDRESS_PK.eq(addressPkSelect)).execute();
+    public void delete(Integer addressPk) {
+        if (addressPk != null) {
+            ctx.delete(ADDRESS).where(ADDRESS.ADDRESS_PK.eq(addressPk)).execute();
+        }
     }
 
     // -------------------------------------------------------------------------
     // Private helpers
     // -------------------------------------------------------------------------
 
-    private Integer insert(DSLContext ctx, Address ad) {
+    private Integer insert(Address ad) {
         try {
             return ctx.insertInto(ADDRESS)
                     .set(ADDRESS.STREET, ad.getStreet())
@@ -102,8 +108,8 @@ public class AddressRepositoryImpl implements AddressRepository {
         }
     }
 
-    private void update(DSLContext ctx, Address ad) {
-        int count = ctx.update(ADDRESS)
+    private void update(Address ad) {
+        var count = ctx.update(ADDRESS)
                 .set(ADDRESS.STREET, ad.getStreet())
                 .set(ADDRESS.HOUSE_NUMBER, ad.getHouseNumber())
                 .set(ADDRESS.ZIP_CODE, ad.getZipCode())

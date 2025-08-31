@@ -16,31 +16,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package de.rwth.idsg.steve.web.dto;
+package de.rwth.idsg.steve.repository.dto;
 
-import lombok.Getter;
-import lombok.Setter;
-
-import java.util.Set;
-
-/**
- * @author fnkbsi
- * @since 01.04.2022
- */
-@Getter
-@Setter
-public class WebUserBaseForm {
-
-    // Internal database id
-    private Integer webUserPk;
-
-    private Boolean enabled;
-
-    private String webUsername;
-
-    private WebUserAuthority authorities;
-
-    public Set<String> getAuthoritiesAsStrings() {
-        return authorities.getValues();
-    }
+public enum TransactionStopEventActor {
+    STATION,
+    MANUAL
 }

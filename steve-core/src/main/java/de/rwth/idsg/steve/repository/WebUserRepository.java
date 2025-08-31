@@ -18,19 +18,20 @@
  */
 package de.rwth.idsg.steve.repository;
 
+import de.rwth.idsg.steve.repository.dto.WebUser;
+import de.rwth.idsg.steve.service.dto.WebUserOverview;
 import de.rwth.idsg.steve.web.dto.WebUserQueryForm;
-import jooq.steve.db.tables.records.WebUserRecord;
-import org.jooq.JSON;
-import org.jooq.Record4;
-import org.jooq.Result;
+
+import java.util.List;
+import java.util.Optional;
 
 public interface WebUserRepository {
 
-    void createUser(WebUserRecord user);
+    void createUser(WebUser user);
 
-    void updateUser(WebUserRecord user);
+    void updateUser(WebUser user);
 
-    void updateUserByPk(WebUserRecord user);
+    void updateUserByPk(WebUser user);
 
     void deleteUser(String username);
 
@@ -48,9 +49,9 @@ public interface WebUserRepository {
 
     boolean userExists(String username);
 
-    WebUserRecord loadUserByUserPk(Integer webUserPk);
+    Optional<WebUser> loadUserByUserPk(Integer webUserPk);
 
-    WebUserRecord loadUserByUsername(String username);
+    Optional<WebUser> loadUserByUsername(String username);
 
-    Result<Record4<Integer, String, Boolean, JSON>> getOverview(WebUserQueryForm form);
+    List<WebUserOverview> getOverview(WebUserQueryForm form);
 }

@@ -28,7 +28,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.jooq.DSLContext;
 import org.jooq.DatePart;
 import org.jooq.Field;
-import org.jooq.Record9;
 import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.event.ContextRefreshedEvent;
@@ -68,9 +67,9 @@ public class GenericRepositoryImpl implements GenericRepository {
 
     @Override
     public void checkJavaAndMySQLOffsets() {
-        long java = DateTimeUtils.getOffsetFromUtcInSeconds();
+        var java = DateTimeUtils.getOffsetFromUtcInSeconds();
 
-        long sql = ctx.select(timestampDiff(DatePart.SECOND, utcTimestamp(), DSL.currentTimestamp()))
+        var sql = ctx.select(timestampDiff(DatePart.SECOND, utcTimestamp(), DSL.currentTimestamp()))
                 .fetchOne()
                 .getValue(0, Long.class);
 
@@ -122,7 +121,7 @@ public class GenericRepositoryImpl implements GenericRepository {
 
         Field<Integer> numWebUsers = ctx.selectCount().from(WEB_USER).asField("num_webusers");
 
-        Record9<Integer, Integer, Integer, Integer, Integer, Integer, Integer, Integer, Integer> gs = ctx.select(
+        var gs = ctx.select(
                         numChargeBoxes,
                         numOcppTags,
                         numUsers,
@@ -155,7 +154,7 @@ public class GenericRepositoryImpl implements GenericRepository {
                         select(max(SCHEMA_VERSION.INSTALLED_RANK)).from(SCHEMA_VERSION)))
                 .fetchOne();
 
-        String ts = DateTimeUtils.humanize(record.value2());
+        var ts = DateTimeUtils.humanize(record.value2());
         return DbVersion.builder().version(record.value1()).updateTimestamp(ts).build();
     }
 }

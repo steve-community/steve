@@ -20,7 +20,7 @@ package de.rwth.idsg.steve.service;
 
 import de.rwth.idsg.steve.repository.OcppTagRepository;
 import de.rwth.idsg.steve.repository.SettingsRepository;
-import jooq.steve.db.tables.records.OcppTagActivityRecord;
+import de.rwth.idsg.steve.repository.dto.OcppTagActivity;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import ocpp.cs._2015._10.AuthorizationStatus;
@@ -32,9 +32,6 @@ import java.time.Instant;
 import java.time.OffsetDateTime;
 
 import static de.rwth.idsg.steve.utils.DateTimeUtils.toOffsetDateTime;
-import static de.rwth.idsg.steve.utils.OcppTagActivityRecordUtils.isBlocked;
-import static de.rwth.idsg.steve.utils.OcppTagActivityRecordUtils.isExpired;
-import static de.rwth.idsg.steve.utils.OcppTagActivityRecordUtils.reachedLimitOfActiveTransactions;
 
 @Slf4j
 @Service
@@ -50,48 +47,48 @@ public class AuthTagServiceLocal implements AuthTagService {
             boolean isStartTransactionReqContext,
             @Nullable String chargeBoxId,
             @Nullable Integer connectorId) {
-        OcppTagActivityRecord record = ocppTagRepository.getRecord(idTag);
-        if (record == null) {
+        var tag = ocppTagRepository.getRecord(idTag).orElse(null);
+        if (tag == null) {
             log.error("The user with idTag '{}' is INVALID (not present in DB).", idTag);
             return new IdTagInfo().withStatus(AuthorizationStatus.INVALID);
         }
 
-        if (isBlocked(record)) {
+        if (tag.isBlocked()) {
             log.error("The user with idTag '{}' is BLOCKED.", idTag);
             return new IdTagInfo()
                     .withStatus(AuthorizationStatus.BLOCKED)
-                    .withParentIdTag(record.getParentIdTag())
-                    .withExpiryDate(getExpiryDateOrDefault(record));
+                    .withParentIdTag(tag.getParentIdTag())
+                    .withExpiryDate(getExpiryDateOrDefault(tag));
         }
 
-        if (isExpired(record, Instant.now())) {
+        if (tag.isExpired(Instant.now())) {
             log.error("The user with idTag '{}' is EXPIRED.", idTag);
             return new IdTagInfo()
                     .withStatus(AuthorizationStatus.EXPIRED)
-                    .withParentIdTag(record.getParentIdTag())
-                    .withExpiryDate(getExpiryDateOrDefault(record));
+                    .withParentIdTag(tag.getParentIdTag())
+                    .withExpiryDate(getExpiryDateOrDefault(tag));
         }
 
         // https://github.com/steve-community/steve/issues/219
-        if (isStartTransactionReqContext && reachedLimitOfActiveTransactions(record)) {
+        if (isStartTransactionReqContext && tag.hasReachedLimitOfActiveTransactions()) {
             log.warn("The user with idTag '{}' is ALREADY in another transaction(s).", idTag);
             return new IdTagInfo()
                     .withStatus(AuthorizationStatus.CONCURRENT_TX)
-                    .withParentIdTag(record.getParentIdTag())
-                    .withExpiryDate(getExpiryDateOrDefault(record));
+                    .withParentIdTag(tag.getParentIdTag())
+                    .withExpiryDate(getExpiryDateOrDefault(tag));
         }
 
-        log.debug("The user with idTag '{}' is ACCEPTED.", record.getIdTag());
+        log.debug("The user with idTag '{}' is ACCEPTED.", tag.getIdTag());
         return new IdTagInfo()
                 .withStatus(AuthorizationStatus.ACCEPTED)
-                .withParentIdTag(record.getParentIdTag())
-                .withExpiryDate(getExpiryDateOrDefault(record));
+                .withParentIdTag(tag.getParentIdTag())
+                .withExpiryDate(getExpiryDateOrDefault(tag));
     }
 
     /**
      * If the database contains an actual expiry, use it. Otherwise, calculate an expiry for cached info
      */
-    private @Nullable OffsetDateTime getExpiryDateOrDefault(OcppTagActivityRecord record) {
+    private @Nullable OffsetDateTime getExpiryDateOrDefault(OcppTagActivity record) {
         if (record.getExpiryDate() != null) {
             return toOffsetDateTime(record.getExpiryDate());
         }

@@ -28,11 +28,8 @@ import de.rwth.idsg.steve.web.dto.ReservationQueryForm;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jooq.DSLContext;
-import org.jooq.Record1;
 import org.jooq.Record10;
 import org.jooq.RecordMapper;
-import org.jooq.Select;
-import org.jooq.SelectConditionStep;
 import org.jooq.SelectQuery;
 import org.jooq.exception.DataAccessException;
 import org.jooq.impl.DSL;
@@ -63,7 +60,7 @@ public class ReservationRepositoryImpl implements ReservationRepository {
 
     @Override
     public Optional<Reservation> getReservation(int id) {
-        Reservation result = ctx.select(
+        var result = ctx.select(
                         RESERVATION.RESERVATION_PK,
                         RESERVATION.TRANSACTION_PK,
                         OCPP_TAG.OCPP_TAG_PK,
@@ -149,12 +146,12 @@ public class ReservationRepositoryImpl implements ReservationRepository {
         // Check overlapping
         // isOverlapping(startTimestamp, expiryTimestamp, chargeBoxId);
 
-        SelectConditionStep<Record1<Integer>> connectorPkQuery = DSL.select(CONNECTOR.CONNECTOR_PK)
+        var connectorPkQuery = DSL.select(CONNECTOR.CONNECTOR_PK)
                 .from(CONNECTOR)
                 .where(CONNECTOR.CHARGE_BOX_ID.equal(params.getChargeBoxId()))
                 .and(CONNECTOR.CONNECTOR_ID.equal(params.getConnectorId()));
 
-        int reservationId = ctx.insertInto(RESERVATION)
+        var reservationId = ctx.insertInto(RESERVATION)
                 .set(RESERVATION.CONNECTOR_PK, connectorPkQuery)
                 .set(RESERVATION.ID_TAG, params.getIdTag())
                 .set(RESERVATION.START_DATETIME, toLocalDateTime(params.getStartTimestamp()))
@@ -188,14 +185,13 @@ public class ReservationRepositoryImpl implements ReservationRepository {
     }
 
     @Override
-    public void used(
-            Select<Record1<Integer>> connectorPkSelect, String ocppIdTag, int reservationId, int transactionId) {
-        int count = ctx.update(RESERVATION)
+    public void used(int connectorPk, String ocppIdTag, int reservationId, int transactionId) {
+        var count = ctx.update(RESERVATION)
                 .set(RESERVATION.STATUS, ReservationStatus.USED.name())
                 .set(RESERVATION.TRANSACTION_PK, transactionId)
                 .where(RESERVATION.RESERVATION_PK.equal(reservationId))
                 .and(RESERVATION.ID_TAG.equal(ocppIdTag))
-                .and(RESERVATION.CONNECTOR_PK.equal(connectorPkSelect))
+                .and(RESERVATION.CONNECTOR_PK.equal(connectorPk))
                 .and(RESERVATION.STATUS.eq(ReservationStatus.ACCEPTED.name()))
                 .execute();
 

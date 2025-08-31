@@ -22,7 +22,6 @@ import de.rwth.idsg.steve.ocpp.OcppCallback;
 import de.rwth.idsg.steve.repository.ChargingProfileRepository;
 import de.rwth.idsg.steve.repository.dto.ChargingProfile;
 import de.rwth.idsg.steve.web.dto.ocpp.SetChargingProfileParams;
-import jooq.steve.db.tables.records.ChargingProfileRecord;
 import ocpp.cp._2015._10.ChargingProfileKindType;
 import ocpp.cp._2015._10.ChargingProfilePurposeType;
 import ocpp.cp._2015._10.ChargingRateUnitType;
@@ -64,7 +63,7 @@ public class SetChargingProfileTaskFromDB extends SetChargingProfileTask {
                 addNewResponse(chargeBoxId, statusValue);
 
                 if ("Accepted".equalsIgnoreCase(statusValue)) {
-                    int chargingProfilePk = details.getProfile().getChargingProfilePk();
+                    int chargingProfilePk = details.getChargingProfilePk();
                     chargingProfileRepository.setProfile(chargingProfilePk, chargeBoxId, connectorId);
                 }
             }
@@ -73,8 +72,6 @@ public class SetChargingProfileTaskFromDB extends SetChargingProfileTask {
 
     @Override
     public SetChargingProfileRequest getOcpp16Request() {
-        ChargingProfileRecord profile = details.getProfile();
-
         List<ChargingSchedulePeriod> schedulePeriods = details.getPeriods().stream()
                 .map(k -> {
                     ChargingSchedulePeriod p = new ChargingSchedulePeriod();
@@ -86,23 +83,23 @@ public class SetChargingProfileTaskFromDB extends SetChargingProfileTask {
                 .collect(Collectors.toList());
 
         ChargingSchedule schedule = new ChargingSchedule()
-                .withDuration(profile.getDurationInSeconds())
-                .withStartSchedule(toOffsetDateTime(profile.getStartSchedule()))
-                .withChargingRateUnit(ChargingRateUnitType.fromValue(profile.getChargingRateUnit()))
-                .withMinChargingRate(profile.getMinChargingRate())
+                .withDuration(details.getDurationInSeconds())
+                .withStartSchedule(toOffsetDateTime(details.getStartSchedule()))
+                .withChargingRateUnit(ChargingRateUnitType.fromValue(details.getChargingRateUnit()))
+                .withMinChargingRate(details.getMinChargingRate())
                 .withChargingSchedulePeriod(schedulePeriods);
 
         ocpp.cp._2015._10.ChargingProfile ocppProfile = new ocpp.cp._2015._10.ChargingProfile()
-                .withChargingProfileId(profile.getChargingProfilePk())
-                .withStackLevel(profile.getStackLevel())
-                .withChargingProfilePurpose(ChargingProfilePurposeType.fromValue(profile.getChargingProfilePurpose()))
-                .withChargingProfileKind(ChargingProfileKindType.fromValue(profile.getChargingProfileKind()))
+                .withChargingProfileId(details.getChargingProfilePk())
+                .withStackLevel(details.getStackLevel())
+                .withChargingProfilePurpose(ChargingProfilePurposeType.fromValue(details.getChargingProfilePurpose()))
+                .withChargingProfileKind(ChargingProfileKindType.fromValue(details.getChargingProfileKind()))
                 .withRecurrencyKind(
-                        profile.getRecurrencyKind() == null
+                        details.getRecurrencyKind() == null
                                 ? null
-                                : RecurrencyKindType.fromValue(profile.getRecurrencyKind()))
-                .withValidFrom(toOffsetDateTime(profile.getValidFrom()))
-                .withValidTo(toOffsetDateTime(profile.getValidTo()))
+                                : RecurrencyKindType.fromValue(details.getRecurrencyKind()))
+                .withValidFrom(toOffsetDateTime(details.getValidFrom()))
+                .withValidTo(toOffsetDateTime(details.getValidTo()))
                 .withChargingSchedule(schedule);
 
         var request =

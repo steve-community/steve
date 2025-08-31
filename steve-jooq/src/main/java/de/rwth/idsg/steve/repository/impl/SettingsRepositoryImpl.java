@@ -57,10 +57,10 @@ public class SettingsRepositoryImpl implements SettingsRepository {
 
     @Override
     public SettingsForm getForm() {
-        SettingsRecord r = getInternal();
+        var r = getInternal();
 
-        List<String> eMails = splitByComma(r.getMailRecipients());
-        List<NotificationFeature> features = splitFeatures(r.getNotificationFeatures());
+        var eMails = splitByComma(r.getMailRecipients());
+        var features = splitFeatures(r.getNotificationFeatures());
 
         return SettingsForm.builder()
                 .heartbeat(toMin(r.getHeartbeatIntervalInSeconds()))
@@ -79,10 +79,10 @@ public class SettingsRepositoryImpl implements SettingsRepository {
 
     @Override
     public MailSettings getMailSettings() {
-        SettingsRecord r = getInternal();
+        var r = getInternal();
 
-        List<String> eMails = splitByComma(r.getMailRecipients());
-        List<NotificationFeature> features = splitFeatures(r.getNotificationFeatures());
+        var eMails = splitByComma(r.getMailRecipients());
+        var features = splitFeatures(r.getNotificationFeatures());
 
         return MailSettings.builder()
                 .enabled(r.getMailEnabled())
@@ -109,8 +109,8 @@ public class SettingsRepositoryImpl implements SettingsRepository {
 
     @Override
     public void update(SettingsForm form) {
-        String eMails = joinByComma(form.getRecipients());
-        String features = joinByComma(form.getEnabledFeatures());
+        var eMails = joinByComma(form.getRecipients());
+        var features = joinByComma(form.getEnabledFeatures());
 
         try {
             ctx.update(SETTINGS)

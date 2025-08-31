@@ -21,8 +21,6 @@ package de.rwth.idsg.steve.repository;
 import de.rwth.idsg.steve.repository.dto.InsertReservationParams;
 import de.rwth.idsg.steve.repository.dto.Reservation;
 import de.rwth.idsg.steve.web.dto.ReservationQueryForm;
-import org.jooq.Record1;
-import org.jooq.Select;
 
 import java.util.List;
 import java.util.Optional;
@@ -54,5 +52,5 @@ public interface ReservationRepository {
 
     void cancelled(int reservationId);
 
-    void used(Select<Record1<Integer>> connectorPkSelect, String ocppIdTag, int reservationId, int transactionId);
+    void used(int connectorPk, String ocppIdTag, int reservationId, int transactionId);
 }

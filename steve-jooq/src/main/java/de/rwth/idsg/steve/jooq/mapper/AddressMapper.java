@@ -16,31 +16,25 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package de.rwth.idsg.steve.web.dto;
+package de.rwth.idsg.steve.jooq.mapper;
 
-import lombok.Getter;
-import lombok.Setter;
+import com.neovisionaries.i18n.CountryCode;
+import de.rwth.idsg.steve.web.dto.Address;
+import jooq.steve.db.tables.records.AddressRecord;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 
-import java.util.Set;
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
+public final class AddressMapper {
 
-/**
- * @author fnkbsi
- * @since 01.04.2022
- */
-@Getter
-@Setter
-public class WebUserBaseForm {
-
-    // Internal database id
-    private Integer webUserPk;
-
-    private Boolean enabled;
-
-    private String webUsername;
-
-    private WebUserAuthority authorities;
-
-    public Set<String> getAuthoritiesAsStrings() {
-        return authorities.getValues();
+    public static Address fromRecord(AddressRecord r) {
+        var a = new Address();
+        a.setAddressPk(r.getAddressPk());
+        a.setStreet(r.getStreet());
+        a.setHouseNumber(r.getHouseNumber());
+        a.setZipCode(r.getZipCode());
+        a.setCity(r.getCity());
+        a.setCountry(CountryCode.getByCode(r.getCountry()));
+        return a;
     }
 }

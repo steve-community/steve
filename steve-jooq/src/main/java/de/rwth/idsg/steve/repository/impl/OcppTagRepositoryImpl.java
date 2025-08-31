@@ -19,19 +19,18 @@
 package de.rwth.idsg.steve.repository.impl;
 
 import de.rwth.idsg.steve.SteveException;
+import de.rwth.idsg.steve.jooq.mapper.OcppTagMapper;
 import de.rwth.idsg.steve.repository.OcppTagRepository;
 import de.rwth.idsg.steve.repository.dto.OcppTag.OcppTagOverview;
+import de.rwth.idsg.steve.repository.dto.OcppTagActivity;
 import de.rwth.idsg.steve.web.dto.OcppTagForm;
 import de.rwth.idsg.steve.web.dto.OcppTagQueryForm;
-import jooq.steve.db.tables.OcppTagActivity;
 import jooq.steve.db.tables.records.OcppTagActivityRecord;
-import jooq.steve.db.tables.records.OcppTagRecord;
 import lombok.extern.slf4j.Slf4j;
 import org.jooq.DSLContext;
 import org.jooq.JoinType;
 import org.jooq.Record10;
 import org.jooq.RecordMapper;
-import org.jooq.Result;
 import org.jooq.SelectQuery;
 import org.jooq.TableField;
 import org.jooq.exception.DataAccessException;
@@ -41,6 +40,7 @@ import org.springframework.stereotype.Repository;
 import java.sql.SQLIntegrityConstraintViolationException;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static de.rwth.idsg.steve.repository.impl.RepositoryUtils.ocppTagByUserIdQuery;
@@ -68,12 +68,11 @@ public class OcppTagRepositoryImpl implements OcppTagRepository {
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public List<OcppTagOverview> getOverview(OcppTagQueryForm form) {
         SelectQuery selectQuery = ctx.selectQuery();
         selectQuery.addFrom(OCPP_TAG_ACTIVITY);
 
-        OcppTagActivity parentTable = OCPP_TAG_ACTIVITY.as("parent");
+        var parentTable = OCPP_TAG_ACTIVITY.as("parent");
 
         selectQuery.addSelect(
                 OCPP_TAG_ACTIVITY.OCPP_TAG_PK,
@@ -131,29 +130,29 @@ public class OcppTagRepositoryImpl implements OcppTagRepository {
     }
 
     @Override
-    public Result<OcppTagActivityRecord> getRecords() {
-        return ctx.selectFrom(OCPP_TAG_ACTIVITY).fetch();
+    public List<OcppTagActivity> getRecords() {
+        return ctx.selectFrom(OCPP_TAG_ACTIVITY).fetch(OcppTagMapper::fromRecord);
     }
 
     @Override
-    public Result<OcppTagActivityRecord> getRecords(List<String> idTagList) {
+    public List<OcppTagActivity> getRecords(List<String> idTagList) {
         return ctx.selectFrom(OCPP_TAG_ACTIVITY)
                 .where(OCPP_TAG_ACTIVITY.ID_TAG.in(idTagList))
-                .fetch();
+                .fetch(OcppTagMapper::fromRecord);
     }
 
     @Override
-    public OcppTagActivityRecord getRecord(String idTag) {
+    public Optional<OcppTagActivity> getRecord(String idTag) {
         return ctx.selectFrom(OCPP_TAG_ACTIVITY)
                 .where(OCPP_TAG_ACTIVITY.ID_TAG.equal(idTag))
-                .fetchOne();
+                .fetchOptional(OcppTagMapper::fromRecord);
     }
 
     @Override
-    public OcppTagActivityRecord getRecord(int ocppTagPk) {
+    public Optional<OcppTagActivity> getRecord(int ocppTagPk) {
         return ctx.selectFrom(OCPP_TAG_ACTIVITY)
                 .where(OCPP_TAG_ACTIVITY.OCPP_TAG_PK.equal(ocppTagPk))
-                .fetchOne();
+                .fetchOptional(OcppTagMapper::fromRecord);
     }
 
     @Override
@@ -207,7 +206,7 @@ public class OcppTagRepositoryImpl implements OcppTagRepository {
 
     @Override
     public void addOcppTagList(List<String> idTagList) {
-        List<OcppTagRecord> batch =
+        var batch =
                 idTagList.stream().map(s -> ctx.newRecord(OCPP_TAG).setIdTag(s)).collect(Collectors.toList());
 
         ctx.batchInsert(batch).execute();

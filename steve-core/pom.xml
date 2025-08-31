@@ -12,10 +12,6 @@
   <dependencies>
     <dependency>
       <groupId>de.rwth.idsg</groupId>
-      <artifactId>steve-jooq</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>de.rwth.idsg</groupId>
       <artifactId>steve-ocpp-1-x</artifactId>
     </dependency>
     <dependency>

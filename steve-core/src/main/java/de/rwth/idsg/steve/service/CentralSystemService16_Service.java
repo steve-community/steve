@@ -23,13 +23,13 @@ import de.rwth.idsg.steve.repository.OcppServerRepository;
 import de.rwth.idsg.steve.repository.SettingsRepository;
 import de.rwth.idsg.steve.repository.dto.InsertConnectorStatusParams;
 import de.rwth.idsg.steve.repository.dto.InsertTransactionParams;
+import de.rwth.idsg.steve.repository.dto.TransactionStopEventActor;
 import de.rwth.idsg.steve.repository.dto.UpdateChargeboxParams;
 import de.rwth.idsg.steve.repository.dto.UpdateTransactionParams;
 import de.rwth.idsg.steve.service.notification.OccpStationBooted;
 import de.rwth.idsg.steve.service.notification.OcppStationStatusFailure;
 import de.rwth.idsg.steve.service.notification.OcppTransactionEnded;
 import de.rwth.idsg.steve.service.notification.OcppTransactionStarted;
-import jooq.steve.db.enums.TransactionStopEventActor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import ocpp.cs._2015._10.AuthorizationStatus;
@@ -212,7 +212,7 @@ public class CentralSystemService16_Service {
                 .stopMeterValue(Integer.toString(parameters.getMeterStop()))
                 .stopReason(stopReason)
                 .eventTimestamp(Instant.now())
-                .eventActor(TransactionStopEventActor.station)
+                .eventActor(TransactionStopEventActor.STATION)
                 .build();
 
         ocppServerRepository.updateTransaction(params);

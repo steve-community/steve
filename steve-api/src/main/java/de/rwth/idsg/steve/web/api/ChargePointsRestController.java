@@ -105,8 +105,7 @@ public class ChargePointsRestController {
     }
 
     private static ApiChargePoint toDto(ChargePoint.Details details) {
-        return new ApiChargePoint(
-                details.getChargeBox().getChargeBoxPk(), details.getChargeBox().getChargeBoxId());
+        return new ApiChargePoint(details.getChargeBoxPk(), details.getChargeBoxId());
     }
 
     @Data

@@ -31,7 +31,6 @@ import de.rwth.idsg.steve.repository.dto.UpdateChargeboxParams;
 import de.rwth.idsg.steve.repository.dto.UpdateTransactionParams;
 import jooq.steve.db.enums.TransactionStopEventActor;
 import jooq.steve.db.enums.TransactionStopFailedEventActor;
-import jooq.steve.db.tables.records.ConnectorMeterValueRecord;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -140,7 +139,7 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
     @Override
     public void insertConnectorStatus(InsertConnectorStatusParams p) {
         ctx.transaction(configuration -> {
-            DSLContext ctx = DSL.using(configuration);
+            var ctx = DSL.using(configuration);
 
             // Step 1
             insertIgnoreConnector(ctx, p.getChargeBoxId(), p.getConnectorId());
@@ -177,10 +176,10 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
 
         ctx.transaction(configuration -> {
             try {
-                DSLContext ctx = DSL.using(configuration);
+                var ctx = DSL.using(configuration);
 
                 insertIgnoreConnector(ctx, chargeBoxIdentity, connectorId);
-                int connectorPk = getConnectorPkFromConnector(ctx, chargeBoxIdentity, connectorId);
+                var connectorPk = getConnectorPkFromConnector(ctx, chargeBoxIdentity, connectorId);
                 batchInsertMeterValues(ctx, list, connectorPk, transactionId);
             } catch (Exception e) {
                 log.error("Exception occurred", e);
@@ -196,10 +195,10 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
 
         ctx.transaction(configuration -> {
             try {
-                DSLContext ctx = DSL.using(configuration);
+                var ctx = DSL.using(configuration);
 
                 // First, get connector primary key from transaction table
-                int connectorPk = ctx.select(TRANSACTION_START.CONNECTOR_PK)
+                var connectorPk = ctx.select(TRANSACTION_START.CONNECTOR_PK)
                         .from(TRANSACTION_START)
                         .where(TRANSACTION_START.TRANSACTION_PK.equal(transactionId))
                         .fetchOne()
@@ -215,7 +214,7 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
     @Override
     public int insertTransaction(InsertTransactionParams p) {
 
-        SelectConditionStep<Record1<Integer>> connectorPkQuery = DSL.select(CONNECTOR.CONNECTOR_PK)
+        var connectorPkQuery = DSL.select(CONNECTOR.CONNECTOR_PK)
                 .from(CONNECTOR)
                 .where(CONNECTOR.CHARGE_BOX_ID.equal(p.getChargeBoxId()))
                 .and(CONNECTOR.CONNECTOR_ID.equal(p.getConnectorId()));
@@ -227,14 +226,14 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
         insertIgnoreConnector(ctx, p.getChargeBoxId(), p.getConnectorId());
 
         // it is important to insert idTag before transaction, since the transaction table references it
-        boolean unknownTagInserted = insertIgnoreIdTag(ctx, p);
+        var unknownTagInserted = insertIgnoreIdTag(ctx, p);
 
         // -------------------------------------------------------------------------
         // Step 2: Insert transaction if it does not exist already
         // -------------------------------------------------------------------------
 
-        TransactionDataHolder data = insertIgnoreTransaction(p, connectorPkQuery);
-        int transactionId = data.transactionId;
+        var data = insertIgnoreTransaction(p, connectorPkQuery);
+        var transactionId = data.transactionId;
 
         if (data.existsAlready) {
             return transactionId;
@@ -252,8 +251,10 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
         // Step 3 for OCPP >= 1.5: A startTransaction may be related to a reservation
         // -------------------------------------------------------------------------
 
+        var connectorPk = getConnectorPkFromConnector(ctx, p.getChargeBoxId(), p.getConnectorId());
+
         if (p.isSetReservationId()) {
-            reservationRepository.used(connectorPkQuery, p.getIdTag(), p.getReservationId(), transactionId);
+            reservationRepository.used(connectorPk, p.getIdTag(), p.getReservationId(), transactionId);
         }
 
         // -------------------------------------------------------------------------
@@ -261,7 +262,7 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
         // -------------------------------------------------------------------------
 
         if (shouldInsertConnectorStatusAfterTransactionMsg(p.getChargeBoxId())) {
-            insertConnectorStatus(ctx, connectorPkQuery, toLocalDateTime(p.getStartTimestamp()), p.getStatusUpdate());
+            insertConnectorStatus(ctx, connectorPk, toLocalDateTime(p.getStartTimestamp()), p.getStatusUpdate());
         }
 
         return transactionId;
@@ -279,7 +280,7 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
             ctx.insertInto(TRANSACTION_STOP)
                     .set(TRANSACTION_STOP.TRANSACTION_PK, p.getTransactionId())
                     .set(TRANSACTION_STOP.EVENT_TIMESTAMP, toLocalDateTime(p.getEventTimestamp()))
-                    .set(TRANSACTION_STOP.EVENT_ACTOR, p.getEventActor())
+                    .set(TRANSACTION_STOP.EVENT_ACTOR, toJooq(p.getEventActor()))
                     .set(TRANSACTION_STOP.STOP_TIMESTAMP, toLocalDateTime(p.getStopTimestamp()))
                     .set(TRANSACTION_STOP.STOP_VALUE, p.getStopMeterValue())
                     .set(TRANSACTION_STOP.STOP_REASON, p.getStopReason())
@@ -295,11 +296,13 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
         // -------------------------------------------------------------------------
 
         if (shouldInsertConnectorStatusAfterTransactionMsg(p.getChargeBoxId())) {
-            SelectConditionStep<Record1<Integer>> connectorPkQuery = DSL.select(TRANSACTION_START.CONNECTOR_PK)
+            var connectorPk = DSL.select(TRANSACTION_START.CONNECTOR_PK)
                     .from(TRANSACTION_START)
-                    .where(TRANSACTION_START.TRANSACTION_PK.equal(p.getTransactionId()));
+                    .where(TRANSACTION_START.TRANSACTION_PK.equal(p.getTransactionId()))
+                    .fetchOne()
+                    .value1();
 
-            insertConnectorStatus(ctx, connectorPkQuery, toLocalDateTime(p.getStopTimestamp()), p.getStatusUpdate());
+            insertConnectorStatus(ctx, connectorPk, toLocalDateTime(p.getStopTimestamp()), p.getStatusUpdate());
         }
     }
 
@@ -320,10 +323,10 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
      */
     private TransactionDataHolder insertIgnoreTransaction(
             InsertTransactionParams p, SelectConditionStep<Record1<Integer>> connectorPkQuery) {
-        Lock l = transactionTableLocks.get(p.getChargeBoxId());
+        var l = transactionTableLocks.get(p.getChargeBoxId());
         l.lock();
         try {
-            Record1<Integer> r = ctx.select(TRANSACTION_START.TRANSACTION_PK)
+            var r = ctx.select(TRANSACTION_START.TRANSACTION_PK)
                     .from(TRANSACTION_START)
                     .where(TRANSACTION_START.CONNECTOR_PK.eq(connectorPkQuery))
                     .and(TRANSACTION_START.ID_TAG.eq(p.getIdTag()))
@@ -335,7 +338,7 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
                 return new TransactionDataHolder(true, r.value1());
             }
 
-            Integer transactionId = ctx.insertInto(TRANSACTION_START)
+            var transactionId = ctx.insertInto(TRANSACTION_START)
                     .set(TRANSACTION_START.EVENT_TIMESTAMP, toLocalDateTime(p.getEventTimestamp()))
                     .set(TRANSACTION_START.CONNECTOR_PK, connectorPkQuery)
                     .set(TRANSACTION_START.ID_TAG, p.getIdTag())
@@ -366,13 +369,10 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
      * and we have a "more recent" status, it will still be the current status.
      */
     private void insertConnectorStatus(
-            DSLContext ctx,
-            SelectConditionStep<Record1<Integer>> connectorPkQuery,
-            LocalDateTime timestamp,
-            TransactionStatusUpdate statusUpdate) {
+            DSLContext ctx, int connectorPk, LocalDateTime timestamp, TransactionStatusUpdate statusUpdate) {
         try {
             ctx.insertInto(CONNECTOR_STATUS)
-                    .set(CONNECTOR_STATUS.CONNECTOR_PK, connectorPkQuery)
+                    .set(CONNECTOR_STATUS.CONNECTOR_PK, connectorPk)
                     .set(CONNECTOR_STATUS.STATUS_TIMESTAMP, timestamp)
                     .set(CONNECTOR_STATUS.STATUS, statusUpdate.getStatus())
                     .set(CONNECTOR_STATUS.ERROR_CODE, statusUpdate.getErrorCode())
@@ -386,7 +386,7 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
      * If the connector information was not received before, insert it. Otherwise, ignore.
      */
     public static void insertIgnoreConnector(DSLContext ctx, String chargeBoxIdentity, int connectorId) {
-        int count = ctx.insertInto(CONNECTOR, CONNECTOR.CHARGE_BOX_ID, CONNECTOR.CONNECTOR_ID)
+        var count = ctx.insertInto(CONNECTOR, CONNECTOR.CHARGE_BOX_ID, CONNECTOR.CONNECTOR_ID)
                 .values(chargeBoxIdentity, connectorId)
                 .onDuplicateKeyIgnore() // Important detail
                 .execute();
@@ -402,10 +402,10 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
      * details will not be inserted into DB and we will lose valuable information.
      */
     private boolean insertIgnoreIdTag(DSLContext ctx, InsertTransactionParams p) {
-        String note = "This unknown idTag was used in a transaction that started @ " + p.getStartTimestamp()
+        var note = "This unknown idTag was used in a transaction that started @ " + p.getStartTimestamp()
                 + ". It was reported @ " + LocalDateTime.now() + ".";
 
-        int count = ctx.insertInto(OCPP_TAG)
+        var count = ctx.insertInto(OCPP_TAG)
                 .set(OCPP_TAG.ID_TAG, p.getIdTag())
                 .set(OCPP_TAG.NOTE, note)
                 .set(OCPP_TAG.MAX_ACTIVE_TRANSACTION_COUNT, 0)
@@ -416,7 +416,7 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
     }
 
     private boolean shouldInsertConnectorStatusAfterTransactionMsg(String chargeBoxId) {
-        Record1<Integer> r = ctx.selectOne()
+        var r = ctx.selectOne()
                 .from(CHARGE_BOX)
                 .where(CHARGE_BOX.CHARGE_BOX_ID.eq(chargeBoxId))
                 .and(CHARGE_BOX.INSERT_CONNECTOR_STATUS_AFTER_TRANSACTION_MSG.isTrue())
@@ -435,7 +435,7 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
     }
 
     private void batchInsertMeterValues(DSLContext ctx, List<MeterValue> list, int connectorPk, Integer transactionId) {
-        List<ConnectorMeterValueRecord> batch = list.stream()
+        var batch = list.stream()
                 .flatMap(t -> t.getSampledValue().stream().map(k -> ctx.newRecord(CONNECTOR_METER_VALUE)
                         .setConnectorPk(connectorPk)
                         .setTransactionPk(transactionId)
@@ -471,13 +471,21 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
         }
     }
 
-    private static TransactionStopFailedEventActor mapActor(TransactionStopEventActor a) {
-        for (TransactionStopFailedEventActor b : TransactionStopFailedEventActor.values()) {
-            if (b.getLiteral().equalsIgnoreCase(a.getLiteral())) {
+    private static TransactionStopFailedEventActor mapActor(
+            de.rwth.idsg.steve.repository.dto.TransactionStopEventActor a) {
+        for (var b : TransactionStopFailedEventActor.values()) {
+            if (b.name().equalsIgnoreCase(a.name())) {
                 return b;
             }
         }
         // if unknown, do not throw exceptions. just insert manual.
         return TransactionStopFailedEventActor.manual;
+    }
+
+    private static TransactionStopEventActor toJooq(de.rwth.idsg.steve.repository.dto.TransactionStopEventActor actor) {
+        if (actor == null) {
+            return null;
+        }
+        return TransactionStopEventActor.valueOf(actor.name());
     }
 }

@@ -21,7 +21,6 @@ package de.rwth.idsg.steve.web.dto;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Getter;
-import org.jooq.JSON;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -32,10 +31,11 @@ public enum WebUserAuthority {
     ADMIN("ADMIN"),
     USER_ADMIN("USER", "ADMIN");
 
+    @Getter
     private final Set<String> values;
 
     @Getter
-    private final JSON jsonValue;
+    private final String jsonValue;
 
     WebUserAuthority(String... values) {
         if (values == null || values.length == 0) {
@@ -45,7 +45,7 @@ public enum WebUserAuthority {
         this.jsonValue = this.values.stream()
                 .map(v -> "\"" + v + "\"")
                 .reduce((a, b) -> a + ", " + b)
-                .map(s -> JSON.json("[" + s + "]"))
+                .map(s -> "[" + s + "]")
                 .orElseThrow(() -> new IllegalArgumentException("Failed to create JSON value"));
     }
 
@@ -54,17 +54,35 @@ public enum WebUserAuthority {
         return String.join(", ", values);
     }
 
-    public static WebUserAuthority fromJsonValue(ObjectMapper mapper, JSON v) {
+    public static WebUserAuthority fromJsonValue(ObjectMapper mapper, String v) {
         try {
-            var values = new HashSet<>(Arrays.asList(mapper.readValue(v.data(), String[].class)));
+            var values = new HashSet<>(Arrays.asList(mapper.readValue(v, String[].class)));
             for (WebUserAuthority c : WebUserAuthority.values()) {
                 if (c.values.equals(values)) {
                     return c;
                 }
             }
-            throw new IllegalArgumentException(v.toString());
+            throw new IllegalArgumentException(v);
         } catch (JsonProcessingException e) {
-            throw new IllegalArgumentException(v.toString());
+            throw new IllegalArgumentException(v);
         }
+    }
+
+    public static WebUserAuthority fromAuthorities(Set<String> authorities) {
+        for (WebUserAuthority c : WebUserAuthority.values()) {
+            if (c.values.equals(authorities)) {
+                return c;
+            }
+        }
+        throw new IllegalArgumentException("No matching authority for: " + authorities);
+    }
+
+    public static WebUserAuthority fromAuthority(String authority) {
+        for (WebUserAuthority c : WebUserAuthority.values()) {
+            if (c.values.contains(authority)) {
+                return c;
+            }
+        }
+        throw new IllegalArgumentException("No matching authority for: " + authority);
     }
 }

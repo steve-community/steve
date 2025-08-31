@@ -19,12 +19,12 @@
 package de.rwth.idsg.steve.repository;
 
 import de.rwth.idsg.steve.repository.dto.OcppTag;
+import de.rwth.idsg.steve.repository.dto.OcppTagActivity;
 import de.rwth.idsg.steve.web.dto.OcppTagForm;
 import de.rwth.idsg.steve.web.dto.OcppTagQueryForm;
-import jooq.steve.db.tables.records.OcppTagActivityRecord;
-import org.jooq.Result;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -33,13 +33,13 @@ import java.util.List;
 public interface OcppTagRepository {
     List<OcppTag.OcppTagOverview> getOverview(OcppTagQueryForm form);
 
-    Result<OcppTagActivityRecord> getRecords();
+    List<OcppTagActivity> getRecords();
 
-    Result<OcppTagActivityRecord> getRecords(List<String> idTagList);
+    List<OcppTagActivity> getRecords(List<String> idTagList);
 
-    OcppTagActivityRecord getRecord(String idTag);
+    Optional<OcppTagActivity> getRecord(String idTag);
 
-    OcppTagActivityRecord getRecord(int ocppTagPk);
+    Optional<OcppTagActivity> getRecord(int ocppTagPk);
 
     List<String> getIdTags();
 

@@ -22,7 +22,6 @@ import de.rwth.idsg.steve.SteveException;
 import de.rwth.idsg.steve.repository.dto.ChargePoint;
 import de.rwth.idsg.steve.service.ChargePointsService;
 import de.rwth.idsg.steve.web.dto.ChargePointForm;
-import jooq.steve.db.tables.records.ChargeBoxRecord;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -108,10 +107,10 @@ public class ChargePointsRestControllerTest extends AbstractControllerTest {
     }
 
     private static ChargePoint.Details createDetails(Integer pk, String chargeBoxId) {
-        ChargeBoxRecord cbr = new ChargeBoxRecord();
-        cbr.setChargeBoxPk(pk);
-        cbr.setChargeBoxId(chargeBoxId);
-        return new ChargePoint.Details(cbr, null);
+        return ChargePoint.Details.builder()
+                .chargeBoxPk(pk)
+                .chargeBoxId(chargeBoxId)
+                .build();
     }
 
     @Test
@@ -161,9 +160,7 @@ public class ChargePointsRestControllerTest extends AbstractControllerTest {
     @Test
     @DisplayName("DELETE: Entity deleted, expected 200")
     public void testDelete() {
-        var rec = new ChargeBoxRecord();
-        rec.setChargeBoxPk(1);
-        var result = new ChargePoint.Details(rec, null);
+        var result = createDetails(1, "test-cb");
         when(chargePointsService.getDetails(1)).thenReturn(result);
 
         assertThat(mockMvc.perform(delete("/api/v1/chargeboxes/1"))).hasStatusOk();

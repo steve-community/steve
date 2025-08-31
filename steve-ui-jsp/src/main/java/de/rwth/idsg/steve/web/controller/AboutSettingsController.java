@@ -71,7 +71,7 @@ public class AboutSettingsController {
     @GetMapping(value = ABOUT_PATH)
     public String getAbout(Model model) {
         model.addAttribute("version", config.getSteveVersion());
-        model.addAttribute("db", genericRepository.getDBVersion());
+        model.addAttribute("db", genericRepository.getDBVersion().orElse(null));
         model.addAttribute("logFile", logController.getLogFilePath());
         model.addAttribute("systemTime", Instant.now());
         model.addAttribute("systemTimeZone", ZoneId.systemDefault());

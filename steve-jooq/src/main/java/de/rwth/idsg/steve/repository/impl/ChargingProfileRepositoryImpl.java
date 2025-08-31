@@ -252,20 +252,17 @@ public class ChargingProfileRepositoryImpl implements ChargingProfileRepository 
 
     @Override
     public Optional<ChargingProfile.Details> getDetails(int chargingProfilePk) {
-        var profile = ctx.selectFrom(CHARGING_PROFILE)
+        return ctx.selectFrom(CHARGING_PROFILE)
                 .where(CHARGING_PROFILE.CHARGING_PROFILE_PK.eq(chargingProfilePk))
-                .fetchOne();
+                .fetchOptional()
+                .map(profile -> {
+                    var periods = ctx.selectFrom(CHARGING_SCHEDULE_PERIOD)
+                            .where(CHARGING_SCHEDULE_PERIOD.CHARGING_PROFILE_PK.eq(chargingProfilePk))
+                            .orderBy(CHARGING_SCHEDULE_PERIOD.START_PERIOD_IN_SECONDS.asc())
+                            .fetch();
 
-        if (profile == null) {
-            return Optional.empty();
-        }
-
-        var periods = ctx.selectFrom(CHARGING_SCHEDULE_PERIOD)
-                .where(CHARGING_SCHEDULE_PERIOD.CHARGING_PROFILE_PK.eq(chargingProfilePk))
-                .orderBy(CHARGING_SCHEDULE_PERIOD.START_PERIOD_IN_SECONDS.asc())
-                .fetch();
-
-        return Optional.of(ChargingProfileMapper.fromRecord(profile, periods));
+                    return ChargingProfileMapper.fromRecord(profile, periods);
+                });
     }
 
     @Override
@@ -355,7 +352,7 @@ public class ChargingProfileRepositoryImpl implements ChargingProfileRepository 
                 insertPeriods(ctx, form);
             } catch (DataAccessException e) {
                 throw new SteveException.InternalError(
-                        "Failed to update the charging profile with id '%s'", form.getChargingProfilePk(), e);
+                        "Failed to update the charging profile with id '%s'".formatted(form.getChargingProfilePk()), e);
             }
         });
     }
@@ -378,7 +375,8 @@ public class ChargingProfileRepositoryImpl implements ChargingProfileRepository 
                 .fetch(CONNECTOR.CHARGE_BOX_ID);
         if (!r.isEmpty()) {
             throw new SteveException.InternalError(
-                    "Cannot modify this charging profile, since the following stations are still using it: %s", r);
+                    "Cannot modify this charging profile, since the following stations are still using it: %s"
+                            .formatted(r));
         }
     }
 

@@ -136,7 +136,7 @@ public class ReservationRepositoryImpl implements ReservationRepository {
                 .where(RESERVATION.CONNECTOR_PK.in(DSL.select(CONNECTOR.CONNECTOR_PK)
                         .from(CONNECTOR)
                         .where(CONNECTOR.CHARGE_BOX_ID.equal(chargeBoxId))))
-                .and(RESERVATION.EXPIRY_DATETIME.greaterThan(LocalDateTime.now()))
+                .and(RESERVATION.EXPIRY_DATETIME.greaterThan(DSL.currentLocalDateTime()))
                 .and(RESERVATION.STATUS.equal(ReservationStatus.ACCEPTED.name()))
                 .fetch(RESERVATION.RESERVATION_PK);
     }
@@ -265,7 +265,8 @@ public class ReservationRepositoryImpl implements ReservationRepository {
 
     private void processType(SelectQuery selectQuery, ReservationQueryForm form) {
         switch (form.getPeriodType()) {
-            case ACTIVE -> selectQuery.addConditions(RESERVATION.EXPIRY_DATETIME.greaterThan(LocalDateTime.now()));
+            case ACTIVE ->
+                selectQuery.addConditions(RESERVATION.EXPIRY_DATETIME.greaterThan(DSL.currentLocalDateTime()));
             case FROM_TO ->
                 selectQuery.addConditions(
                         RESERVATION.START_DATETIME.greaterOrEqual(toLocalDateTime(form.getFrom())),

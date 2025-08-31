@@ -453,7 +453,8 @@ public class OcppTagsRestControllerTest extends AbstractControllerTest {
 
         // when
         when(ocppTagsService.addOcppTag(form))
-                .thenThrow(new SteveException.AlreadyExists("A user with idTag '%s' already exists.", ocppTagPk));
+                .thenThrow(new SteveException.AlreadyExists(
+                        "A user with idTag '%s' already exists.".formatted(ocppTagPk)));
 
         // then
         assertThat(mockMvc.perform(post("/api/v1/ocppTags")

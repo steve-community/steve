@@ -21,6 +21,8 @@ package de.rwth.idsg.steve.repository;
 import de.rwth.idsg.steve.repository.dto.DbVersion;
 import de.rwth.idsg.steve.web.dto.Statistics;
 
+import java.util.Optional;
+
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 19.08.2014
@@ -35,5 +37,5 @@ public interface GenericRepository {
      * Returns database version of SteVe and last database update timestamp
      *
      */
-    DbVersion getDBVersion();
+    Optional<DbVersion> getDBVersion();
 }

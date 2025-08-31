@@ -76,7 +76,7 @@ public class ChargePointsRestController {
         var body = toDto(chargePointsService.getDetails(chargepointPk));
         var location = ServletUriComponentsBuilder.fromCurrentRequest()
                 .path("/{id}")
-                .buildAndExpand(body.getChargeBoxPk())
+                .buildAndExpand(chargepointPk)
                 .toUri();
         return ResponseEntity.created(location).body(body);
     }

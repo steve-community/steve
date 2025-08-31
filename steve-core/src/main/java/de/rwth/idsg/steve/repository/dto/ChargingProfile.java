@@ -62,6 +62,8 @@ public class ChargingProfile {
         // from ChargingProfileRecord
         private final int chargingProfilePk;
         private final int stackLevel;
+        private final String description;
+        private final String note;
         private final String chargingProfilePurpose;
         private final String chargingProfileKind;
         private final String recurrencyKind;

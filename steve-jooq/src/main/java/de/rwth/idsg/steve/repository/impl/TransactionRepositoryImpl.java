@@ -29,14 +29,12 @@ import ocpp.cs._2015._10.UnitOfMeasure;
 import org.jooq.Condition;
 import org.jooq.DSLContext;
 import org.jooq.Record;
-import org.jooq.Record9;
 import org.jooq.SelectQuery;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.io.Writer;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -200,6 +198,11 @@ public class TransactionRepositoryImpl implements TransactionRepository {
                         .where(CONNECTOR.CHARGE_BOX_ID.equal(chargeBoxId))
                         .and(CONNECTOR.CONNECTOR_ID.equal(connectorId))))
                 .and(timestampCondition)
+                // avoid duplicates already returned by transactionQuery
+                .and(CONNECTOR_METER_VALUE
+                        .TRANSACTION_PK
+                        .isNull()
+                        .or(CONNECTOR_METER_VALUE.TRANSACTION_PK.ne(transactionPk)))
                 .and(unitCondition)
                 .getQuery();
 
@@ -207,34 +210,32 @@ public class TransactionRepositoryImpl implements TransactionRepository {
         // executed (best case). In worst case (1 returns empty list and we fall back to case 2) though,
         // we make two db calls. Alternatively, we can pass both queries in one go, and make the db work.
         //
-        // UNION removes all duplicate records
-        //
-        var t1 = transactionQuery.union(timestampQuery).asTable("t1");
+        // UNION ALL doesn't remove all duplicate records but it is faster than UNION DISTINCT which does
+        // and we avoid duplicates by query design anyway.
+        var t1 = transactionQuery.unionAll(timestampQuery).asTable("t1");
 
-        var dateTimeField = t1.field(2, LocalDateTime.class);
-
+        var ts = t1.field(CONNECTOR_METER_VALUE.VALUE_TIMESTAMP);
+        var val = t1.field(CONNECTOR_METER_VALUE.VALUE);
+        var ctxf = t1.field(CONNECTOR_METER_VALUE.READING_CONTEXT);
+        var fmt = t1.field(CONNECTOR_METER_VALUE.FORMAT);
+        var mea = t1.field(CONNECTOR_METER_VALUE.MEASURAND);
+        var loc = t1.field(CONNECTOR_METER_VALUE.LOCATION);
+        var unit = t1.field(CONNECTOR_METER_VALUE.UNIT);
+        var ph = t1.field(CONNECTOR_METER_VALUE.PHASE);
         var values = ctx
-                .select(
-                        dateTimeField,
-                        t1.field(3, String.class),
-                        t1.field(4, String.class),
-                        t1.field(5, String.class),
-                        t1.field(6, String.class),
-                        t1.field(7, String.class),
-                        t1.field(8, String.class),
-                        t1.field(9, String.class))
+                .select(ts, val, ctxf, fmt, mea, loc, unit, ph)
                 .from(t1)
-                .orderBy(dateTimeField)
+                .orderBy(ts)
                 .fetch()
                 .map(r -> TransactionDetails.MeterValues.builder()
-                        .valueTimestamp(toInstant(r.value1()))
-                        .value(r.value2())
-                        .readingContext(r.value3())
-                        .format(r.value4())
-                        .measurand(r.value5())
-                        .location(r.value6())
-                        .unit(r.value7())
-                        .phase(r.value8())
+                        .valueTimestamp(toInstant(r.get(ts)))
+                        .value(r.get(val))
+                        .readingContext(r.get(ctxf))
+                        .format(r.get(fmt))
+                        .measurand(r.get(mea))
+                        .location(r.get(loc))
+                        .unit(r.get(unit))
+                        .phase(r.get(ph))
                         .build())
                 .stream()
                 .filter(TransactionStopServiceHelper::isEnergyValue)
@@ -247,8 +248,7 @@ public class TransactionRepositoryImpl implements TransactionRepository {
     // Private helpers
     // -------------------------------------------------------------------------
 
-    private SelectQuery<Record9<Integer, String, Integer, String, LocalDateTime, String, LocalDateTime, String, String>>
-            getInternalCSV(TransactionQueryForm form) {
+    private SelectQuery<Record> getInternalCSV(TransactionQueryForm form) {
 
         var selectQuery = ctx.selectQuery();
         selectQuery.addFrom(TRANSACTION);
@@ -285,7 +285,7 @@ public class TransactionRepositoryImpl implements TransactionRepository {
         return addConditions(selectQuery, form);
     }
 
-    private SelectQuery addConditions(SelectQuery selectQuery, TransactionQueryForm form) {
+    private <R extends Record> SelectQuery<R> addConditions(SelectQuery<R> selectQuery, TransactionQueryForm form) {
         if (form.isTransactionPkSet()) {
             selectQuery.addConditions(TRANSACTION.TRANSACTION_PK.eq(form.getTransactionPk()));
         }
@@ -318,7 +318,7 @@ public class TransactionRepositoryImpl implements TransactionRepository {
         return selectQuery;
     }
 
-    private void processType(SelectQuery selectQuery, TransactionQueryForm form) {
+    private <R extends Record> void processType(SelectQuery<R> selectQuery, TransactionQueryForm form) {
         switch (form.getPeriodType()) {
             case TODAY ->
                 selectQuery.addConditions(date(TRANSACTION.START_TIMESTAMP).eq(LocalDate.now()));
@@ -337,6 +337,9 @@ public class TransactionRepositoryImpl implements TransactionRepository {
                 switch (form.getType()) {
                     case ACTIVE -> selectQuery.addConditions(TRANSACTION.START_TIMESTAMP.between(from, to));
                     case STOPPED -> selectQuery.addConditions(TRANSACTION.STOP_TIMESTAMP.between(from, to));
+                    case ALL -> {
+                        // want all: no timestamp filter
+                    }
                 }
             }
             default -> throw new SteveException.InternalError("Unknown enum type");

@@ -114,7 +114,7 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
     public void updateChargeboxFirmwareStatus(String chargeBoxIdentity, String firmwareStatus) {
         ctx.update(CHARGE_BOX)
                 .set(CHARGE_BOX.FW_UPDATE_STATUS, firmwareStatus)
-                .set(CHARGE_BOX.FW_UPDATE_TIMESTAMP, LocalDateTime.now())
+                .set(CHARGE_BOX.FW_UPDATE_TIMESTAMP, DSL.currentLocalDateTime())
                 .where(CHARGE_BOX.CHARGE_BOX_ID.equal(chargeBoxIdentity))
                 .execute();
     }
@@ -123,7 +123,7 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
     public void updateChargeboxDiagnosticsStatus(String chargeBoxIdentity, String status) {
         ctx.update(CHARGE_BOX)
                 .set(CHARGE_BOX.DIAGNOSTICS_STATUS, status)
-                .set(CHARGE_BOX.DIAGNOSTICS_TIMESTAMP, LocalDateTime.now())
+                .set(CHARGE_BOX.DIAGNOSTICS_TIMESTAMP, DSL.currentLocalDateTime())
                 .where(CHARGE_BOX.CHARGE_BOX_ID.equal(chargeBoxIdentity))
                 .execute();
     }
@@ -201,8 +201,9 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
                 var connectorPk = ctx.select(TRANSACTION_START.CONNECTOR_PK)
                         .from(TRANSACTION_START)
                         .where(TRANSACTION_START.TRANSACTION_PK.equal(transactionId))
-                        .fetchOne()
-                        .value1();
+                        .fetchOptional(TRANSACTION_START.CONNECTOR_PK)
+                        .orElseThrow(() ->
+                                new SteveException.InternalError("No connectorPk for transactionId=" + transactionId));
 
                 batchInsertMeterValues(ctx, list, connectorPk, transactionId);
             } catch (Exception e) {
@@ -430,8 +431,9 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
                 .from(CONNECTOR)
                 .where(CONNECTOR.CHARGE_BOX_ID.equal(chargeBoxIdentity))
                 .and(CONNECTOR.CONNECTOR_ID.equal(connectorId))
-                .fetchOne()
-                .value1();
+                .fetchOptional(CONNECTOR.CONNECTOR_PK)
+                .orElseThrow(() -> new SteveException.InternalError(
+                        "No connectorPk for %s/%d".formatted(chargeBoxIdentity, connectorId)));
     }
 
     private void batchInsertMeterValues(DSLContext ctx, List<MeterValue> list, int connectorPk, Integer transactionId) {

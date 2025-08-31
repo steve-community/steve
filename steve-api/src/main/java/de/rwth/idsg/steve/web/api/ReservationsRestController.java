@@ -71,7 +71,7 @@ public class ReservationsRestController {
     public Reservation deleteReservation(@PathVariable int id) {
         var reservation = reservationsService
                 .getReservation(id)
-                .orElseThrow(() -> new SteveException.NotFound("Reservation with id %d not found", id));
+                .orElseThrow(() -> new SteveException.NotFound("Reservation with id %d not found".formatted(id)));
         reservationsService.deleteReservation(id);
         return reservation;
     }

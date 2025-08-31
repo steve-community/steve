@@ -49,6 +49,7 @@ import org.springframework.util.Assert;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.EnumSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -93,7 +94,7 @@ public class WebUsersService implements UserDetailsManager {
                 .login(config.getAuth().getUserName())
                 .password(config.getAuth().getEncodedPassword())
                 .enabled(true)
-                .authorities(new LinkedHashSet<>(Set.of(WebUserAuthority.ADMIN)))
+                .authorities(EnumSet.of(WebUserAuthority.ADMIN))
                 .build();
 
         webUserRepository.createUser(user);
@@ -181,7 +182,11 @@ public class WebUsersService implements UserDetailsManager {
     }
 
     public void deleteUser(int webUserPk) {
+        var existing = webUserRepository.loadUserByUserPk(webUserPk).orElse(null);
         webUserRepository.deleteUser(webUserPk);
+        if (existing != null) {
+            userCache.invalidate(existing.getLogin());
+        }
     }
 
     public void changeStatusOfUser(String username, boolean enabled) {
@@ -191,7 +196,7 @@ public class WebUsersService implements UserDetailsManager {
 
     public boolean hasUserWithAuthority(String authority) {
         var count = webUserRepository.getUserCountWithAuthority(authority);
-        return count != null && count > 0;
+        return count > 0;
     }
 
     // Methods for the website
@@ -230,7 +235,7 @@ public class WebUsersService implements UserDetailsManager {
     public WebUserBaseForm getDetails(Integer webUserPk) {
         var ur = webUserRepository
                 .loadUserByUserPk(webUserPk)
-                .orElseThrow(() -> new SteveException.NotFound("There is no user with id '%d'", webUserPk));
+                .orElseThrow(() -> new SteveException.NotFound("There is no user with id '%d'".formatted(webUserPk)));
 
         return getWebUserBaseForm(ur);
     }
@@ -238,7 +243,8 @@ public class WebUsersService implements UserDetailsManager {
     public WebUserBaseForm getDetails(String webUserName) {
         var ur = webUserRepository
                 .loadUserByUsername(webUserName)
-                .orElseThrow(() -> new SteveException.NotFound("There is no user with username '%s'", webUserName));
+                .orElseThrow(() ->
+                        new SteveException.NotFound("There is no user with username '%s'".formatted(webUserName)));
 
         return getWebUserBaseForm(ur);
     }

@@ -56,6 +56,8 @@ public class ChargingProfileForm {
         var form = new ChargingProfileForm();
         form.chargingProfilePk = details.getChargingProfilePk();
         form.stackLevel = details.getStackLevel();
+        form.description = details.getDescription();
+        form.note = details.getNote();
         form.chargingProfilePurpose = ChargingProfilePurposeType.fromValue(details.getChargingProfilePurpose());
         form.chargingProfileKind = ChargingProfileKindType.fromValue(details.getChargingProfileKind());
         form.recurrencyKind =

@@ -24,16 +24,15 @@ import de.rwth.idsg.steve.repository.SettingsRepository;
 import de.rwth.idsg.steve.repository.dto.MailSettings;
 import de.rwth.idsg.steve.web.dto.SettingsForm;
 import jooq.steve.db.tables.records.SettingsRecord;
+import lombok.RequiredArgsConstructor;
 import org.jooq.DSLContext;
 import org.jooq.exception.DataAccessException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 
 import static de.rwth.idsg.steve.utils.StringUtils.joinByComma;
 import static de.rwth.idsg.steve.utils.StringUtils.splitByComma;
@@ -44,6 +43,7 @@ import static jooq.steve.db.tables.Settings.SETTINGS;
  * @since 06.11.2015
  */
 @Repository
+@RequiredArgsConstructor
 public class SettingsRepositoryImpl implements SettingsRepository {
 
     // Totally unnecessary to specify charset here. We just do it to make findbugs plugin happy.
@@ -52,15 +52,24 @@ public class SettingsRepositoryImpl implements SettingsRepository {
             Base64.getEncoder().encode("SteckdosenVerwaltung".getBytes(StandardCharsets.UTF_8)),
             StandardCharsets.UTF_8);
 
-    @Autowired
-    private DSLContext ctx;
+    private static List<String> parseRecipients(SettingsRecord r) {
+        return splitByComma(r.getMailRecipients());
+    }
+
+    private static List<NotificationFeature> parseEnabledFeatures(SettingsRecord r) {
+        return splitByComma(r.getNotificationFeatures()).stream()
+                .map(NotificationFeature::fromName)
+                .toList();
+    }
+
+    private final DSLContext ctx;
 
     @Override
     public SettingsForm getForm() {
         var r = getInternal();
 
-        var eMails = splitByComma(r.getMailRecipients());
-        var features = splitFeatures(r.getNotificationFeatures());
+        var emails = parseRecipients(r);
+        var features = parseEnabledFeatures(r);
 
         return SettingsForm.builder()
                 .heartbeat(toMin(r.getHeartbeatIntervalInSeconds()))
@@ -72,7 +81,7 @@ public class SettingsRepositoryImpl implements SettingsRepository {
                 .from(r.getMailFrom())
                 .protocol(r.getMailProtocol())
                 .port(r.getMailPort())
-                .recipients(eMails)
+                .recipients(emails)
                 .enabledFeatures(features)
                 .build();
     }
@@ -81,8 +90,8 @@ public class SettingsRepositoryImpl implements SettingsRepository {
     public MailSettings getMailSettings() {
         var r = getInternal();
 
-        var eMails = splitByComma(r.getMailRecipients());
-        var features = splitFeatures(r.getNotificationFeatures());
+        var eMails = parseRecipients(r);
+        var features = parseEnabledFeatures(r);
 
         return MailSettings.builder()
                 .enabled(r.getMailEnabled())
@@ -143,9 +152,5 @@ public class SettingsRepositoryImpl implements SettingsRepository {
 
     private static int toSec(int minutes) {
         return (int) TimeUnit.MINUTES.toSeconds(minutes);
-    }
-
-    private List<NotificationFeature> splitFeatures(String str) {
-        return splitByComma(str).stream().map(NotificationFeature::fromName).collect(Collectors.toList());
     }
 }

@@ -95,7 +95,9 @@ public class JooqConfiguration {
         // Configuration for JOOQ
         var conf = new DefaultConfiguration()
                 .set(SQLDialect.MYSQL)
-                .set(new DataSourceConnectionProvider(dataSource))
+                .set(new DataSourceConnectionProvider(
+                        // new org.springframework.jdbc.datasource.TransactionAwareDataSourceProxy()
+                        dataSource))
                 .set(settings);
 
         return DSL.using(conf);

@@ -18,6 +18,7 @@
  */
 package de.rwth.idsg.steve.web.controller;
 
+import de.rwth.idsg.steve.SteveException;
 import de.rwth.idsg.steve.repository.ReservationStatus;
 import de.rwth.idsg.steve.repository.TransactionRepository;
 import de.rwth.idsg.steve.service.ChargePointsService;
@@ -93,7 +94,11 @@ public class ReservationsController {
 
     @GetMapping(value = TRANSACTIONS_DETAILS_PATH)
     public String getTransactionDetails(@PathVariable("transactionPk") int transactionPk, Model model) {
-        model.addAttribute("details", transactionRepository.getDetails(transactionPk));
+        var details = transactionRepository
+                .getDetails(transactionPk)
+                .orElseThrow(() ->
+                        new SteveException.NotFound("Transaction with pk %d not found.".formatted(transactionPk)));
+        model.addAttribute("details", details);
         return "data-man/transactionDetails";
     }
 

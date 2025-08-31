@@ -299,7 +299,7 @@ public class ChargePointRepositoryImpl implements ChargePointRepository {
 
             } catch (DataAccessException e) {
                 throw new SteveException.InternalError(
-                        "Failed to add the charge point with chargeBoxId '%s'", form.getChargeBoxId(), e);
+                        "Failed to add the charge point with chargeBoxId '%s'".formatted(form.getChargeBoxId()), e);
             }
         });
     }
@@ -314,7 +314,7 @@ public class ChargePointRepositoryImpl implements ChargePointRepository {
 
             } catch (DataAccessException e) {
                 throw new SteveException.InternalError(
-                        "Failed to update the charge point with chargeBoxId '%s'", form.getChargeBoxId(), e);
+                        "Failed to update the charge point with chargeBoxId '%s'".formatted(form.getChargeBoxId()), e);
             }
         });
     }

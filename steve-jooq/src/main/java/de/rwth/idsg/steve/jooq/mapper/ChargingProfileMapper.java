@@ -37,6 +37,8 @@ public final class ChargingProfileMapper {
         return ChargingProfile.Details.builder()
                 .chargingProfilePk(profile.getChargingProfilePk())
                 .stackLevel(profile.getStackLevel())
+                .description(profile.getDescription())
+                .note(profile.getNote())
                 .chargingProfilePurpose(profile.getChargingProfilePurpose())
                 .chargingProfileKind(profile.getChargingProfileKind())
                 .recurrencyKind(profile.getRecurrencyKind())

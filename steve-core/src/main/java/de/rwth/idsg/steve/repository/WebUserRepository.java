@@ -39,7 +39,7 @@ public interface WebUserRepository {
 
     void changeStatusOfUser(String username, boolean enabled);
 
-    Integer getUserCountWithAuthority(String authority);
+    int getUserCountWithAuthority(String authority);
 
     void changePassword(String username, String newPassword);
 

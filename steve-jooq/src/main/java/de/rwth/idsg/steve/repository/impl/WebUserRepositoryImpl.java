@@ -115,11 +115,12 @@ public class WebUserRepositoryImpl implements WebUserRepository {
     }
 
     @Override
-    public Integer getUserCountWithAuthority(String authority) {
-        return ctx.selectCount()
+    public int getUserCountWithAuthority(String authority) {
+        var count = ctx.selectCount()
                 .from(WEB_USER)
                 .where(conditionsForAuthorities(Collections.singletonList(authority)))
                 .fetchOne(count());
+        return count != null ? count : 0;
     }
 
     @Override

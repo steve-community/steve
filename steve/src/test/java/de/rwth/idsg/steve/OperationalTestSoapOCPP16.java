@@ -146,7 +146,7 @@ public class OperationalTestSoapOCPP16 {
         initStationWithBootNotification(client);
 
         var details = __DatabasePreparer__.getCBDetails(REGISTERED_CHARGE_BOX_ID);
-        assertThat(details.getChargeBox().getOcppProtocol()).contains("ocpp1.6");
+        assertThat(details.getOcppProtocol()).contains("ocpp1.6");
     }
 
     @Test

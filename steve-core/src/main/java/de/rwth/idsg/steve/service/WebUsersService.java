@@ -25,21 +25,18 @@ import com.google.common.cache.CacheBuilder;
 import de.rwth.idsg.steve.SteveConfiguration;
 import de.rwth.idsg.steve.SteveException;
 import de.rwth.idsg.steve.repository.WebUserRepository;
+import de.rwth.idsg.steve.repository.dto.WebUser;
 import de.rwth.idsg.steve.service.dto.WebUserOverview;
 import de.rwth.idsg.steve.web.dto.WebUserAuthority;
 import de.rwth.idsg.steve.web.dto.WebUserBaseForm;
 import de.rwth.idsg.steve.web.dto.WebUserForm;
 import de.rwth.idsg.steve.web.dto.WebUserQueryForm;
-import jooq.steve.db.tables.records.WebUserRecord;
 import lombok.RequiredArgsConstructor;
-import org.jooq.JSON;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.AuthorityUtils;
-import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolderStrategy;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -52,8 +49,10 @@ import org.springframework.util.Assert;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.EnumSet;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -91,18 +90,12 @@ public class WebUsersService implements UserDetailsManager {
             return;
         }
 
-        var headerVal = config.getWebApi().getHeaderValue();
-
-        var encodedApiPassword = headerVal == null || headerVal.isBlank()
-                ? null
-                : config.getAuth().getPasswordEncoder().encode(headerVal);
-
-        var user = new WebUserRecord()
-                .setUsername(config.getAuth().getUserName())
-                .setPassword(config.getAuth().getEncodedPassword())
-                .setApiPassword(encodedApiPassword)
-                .setEnabled(true)
-                .setAuthorities(toJson(AuthorityUtils.createAuthorityList("ADMIN")));
+        var user = WebUser.builder()
+                .login(config.getAuth().getUserName())
+                .password(config.getAuth().getEncodedPassword())
+                .enabled(true)
+                .authorities(EnumSet.of(WebUserAuthority.ADMIN))
+                .build();
 
         webUserRepository.createUser(user);
     }
@@ -110,16 +103,16 @@ public class WebUsersService implements UserDetailsManager {
     @Override
     public void createUser(UserDetails user) {
         validateUserDetails(user);
-        var record = toWebUserRecord(user);
-        webUserRepository.createUser(record);
+        var webUser = toWebUser(user);
+        webUserRepository.createUser(webUser);
         userCache.invalidate(user.getUsername());
     }
 
     @Override
     public void updateUser(UserDetails user) {
         validateUserDetails(user);
-        var record = toWebUserRecord(user);
-        webUserRepository.updateUser(record);
+        var webUser = toWebUser(user);
+        webUserRepository.updateUser(webUser);
         userCache.invalidate(user.getUsername());
     }
 
@@ -135,19 +128,18 @@ public class WebUsersService implements UserDetailsManager {
      */
     @Override
     public void changePassword(String oldPassword, String newPassword) {
-        Authentication currentUser =
-                this.securityContextHolderStrategy.getContext().getAuthentication();
+        var currentUser = this.securityContextHolderStrategy.getContext().getAuthentication();
         if (currentUser == null) {
             // This would indicate bad coding somewhere
             throw new AccessDeniedException(
                     "Can't change password as no Authentication object found in context for current user.");
         }
 
-        String username = currentUser.getName();
+        var username = currentUser.getName();
         webUserRepository.changePassword(username, encoder.encode(newPassword));
 
-        Authentication authentication = createNewAuthentication(currentUser);
-        SecurityContext context = this.securityContextHolderStrategy.createEmptyContext();
+        var authentication = createNewAuthentication(currentUser);
+        var context = this.securityContextHolderStrategy.createEmptyContext();
         context.setAuthentication(authentication);
         this.securityContextHolderStrategy.setContext(context);
     }
@@ -159,23 +151,26 @@ public class WebUsersService implements UserDetailsManager {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        WebUserRecord webUser = webUserRepository.loadUserByUsername(username);
+        var webUser = webUserRepository.loadUserByUsername(username).orElse(null);
 
         if (webUser == null) {
             throw new UsernameNotFoundException(username);
         }
 
-        return User.withUsername(webUser.getUsername())
+        return User.withUsername(webUser.getLogin())
                 .password(webUser.getPassword())
-                .disabled(!webUser.getEnabled())
-                .authorities(fromJson(webUser.getAuthorities()))
+                .disabled(!webUser.isEnabled())
+                .authorities(webUser.getAuthorities().stream()
+                        .map(WebUserAuthority::getValues)
+                        .flatMap(Set::stream)
+                        .toArray(String[]::new))
                 .build();
     }
 
     public UserDetails loadUserByUsernameForApi(String username) {
         try {
-            UserDetails userExt = userCache.get(username, () -> {
-                UserDetails user = this.loadUserByUsernameForApiInternal(username);
+            var userExt = userCache.get(username, () -> {
+                var user = this.loadUserByUsernameForApiInternal(username);
                 // map null to dummy
                 return (user == null) ? DUMMY_USER : user;
             });
@@ -187,7 +182,11 @@ public class WebUsersService implements UserDetailsManager {
     }
 
     public void deleteUser(int webUserPk) {
+        var existing = webUserRepository.loadUserByUserPk(webUserPk).orElse(null);
         webUserRepository.deleteUser(webUserPk);
+        if (existing != null) {
+            userCache.invalidate(existing.getLogin());
+        }
     }
 
     public void changeStatusOfUser(String username, boolean enabled) {
@@ -196,8 +195,8 @@ public class WebUsersService implements UserDetailsManager {
     }
 
     public boolean hasUserWithAuthority(String authority) {
-        Integer count = webUserRepository.getUserCountWithAuthority(authority);
-        return count != null && count > 0;
+        var count = webUserRepository.getUserCountWithAuthority(authority);
+        return count > 0;
     }
 
     // Methods for the website
@@ -207,12 +206,13 @@ public class WebUsersService implements UserDetailsManager {
 
     public void update(WebUserBaseForm form) {
         validateUserDetails(toUserDetailsBaseForm(form));
-        WebUserRecord record = new WebUserRecord();
-        record.setWebUserPk(form.getWebUserPk());
-        record.setUsername(form.getWebUsername());
-        record.setEnabled(form.getEnabled());
-        record.setAuthorities(form.getAuthorities().getJsonValue());
-        webUserRepository.updateUserByPk(record);
+        var webUser = WebUser.builder()
+                .webUserPk(form.getWebUserPk())
+                .login(form.getWebUsername())
+                .enabled(form.getEnabled())
+                .authorities(Set.of(form.getAuthorities()))
+                .build();
+        webUserRepository.updateUserByPk(webUser);
         userCache.invalidate(form.getWebUsername());
     }
 
@@ -229,77 +229,78 @@ public class WebUsersService implements UserDetailsManager {
     }
 
     public List<WebUserOverview> getOverview(WebUserQueryForm form) {
-        return webUserRepository.getOverview(form).map(r -> WebUserOverview.builder()
-                .webUserPk(r.value1())
-                .webUsername(r.value2())
-                .enabled(r.value3())
-                .authorities(WebUserAuthority.fromJsonValue(mapper, r.value4()))
-                .build());
+        return webUserRepository.getOverview(form);
     }
 
     public WebUserBaseForm getDetails(Integer webUserPk) {
-        WebUserRecord ur = webUserRepository.loadUserByUserPk(webUserPk);
+        var ur = webUserRepository
+                .loadUserByUserPk(webUserPk)
+                .orElseThrow(() -> new SteveException.NotFound("There is no user with id '%d'".formatted(webUserPk)));
 
-        if (ur == null) {
-            throw new SteveException.NotFound("There is no user with id '%d'", webUserPk);
-        }
-
-        WebUserBaseForm form = new WebUserBaseForm();
-        form.setWebUserPk(ur.getWebUserPk());
-        form.setEnabled(ur.getEnabled());
-        form.setWebUsername(ur.getUsername());
-        form.setAuthorities(WebUserAuthority.fromJsonValue(mapper, ur.getAuthorities()));
-        return form;
+        return getWebUserBaseForm(ur);
     }
 
     public WebUserBaseForm getDetails(String webUserName) {
-        WebUserRecord ur = webUserRepository.loadUserByUsername(webUserName);
+        var ur = webUserRepository
+                .loadUserByUsername(webUserName)
+                .orElseThrow(() ->
+                        new SteveException.NotFound("There is no user with username '%s'".formatted(webUserName)));
 
-        if (ur == null) {
-            throw new SteveException.NotFound("There is no user with username '%s'", webUserName);
-        }
+        return getWebUserBaseForm(ur);
+    }
 
-        WebUserBaseForm form = new WebUserBaseForm();
+    private static WebUserBaseForm getWebUserBaseForm(WebUser ur) {
+        var form = new WebUserBaseForm();
         form.setWebUserPk(ur.getWebUserPk());
-        form.setEnabled(ur.getEnabled());
-        form.setWebUsername(ur.getUsername());
-        form.setAuthorities(WebUserAuthority.fromJsonValue(mapper, ur.getAuthorities()));
+        form.setEnabled(ur.isEnabled());
+        form.setWebUsername(ur.getLogin());
+        form.setAuthorities(WebUserAuthority.fromAuthorities(
+                ur.getAuthorities().stream().map(WebUserAuthority::name).collect(Collectors.toSet())));
         return form;
     }
 
     // Helpers
     private UserDetails loadUserByUsernameForApiInternal(String username) {
-        WebUserRecord record = webUserRepository.loadUserByUsername(username);
-        if (record == null) {
+        var webUser = webUserRepository.loadUserByUsername(username).orElse(null);
+        if (webUser == null) {
             return null;
         }
 
         // the builder User.password(..) does not allow null values
-        String apiPassword = record.getApiPassword();
+        var apiPassword = webUser.getApiPassword();
         if (apiPassword == null) {
             apiPassword = "";
         }
 
-        return User.withUsername(record.getUsername())
+        return User.withUsername(webUser.getLogin())
                 .password(apiPassword)
-                .disabled(!record.getEnabled())
-                .authorities(fromJson(record.getAuthorities()))
+                .disabled(!webUser.isEnabled())
+                .authorities(webUser.getAuthorities().stream()
+                        .map(WebUserAuthority::name)
+                        .toArray(String[]::new))
                 .build();
     }
 
-    private WebUserRecord toWebUserRecord(UserDetails user) {
-        return new WebUserRecord()
-                .setUsername(user.getUsername())
-                .setPassword(user.getPassword())
-                .setEnabled(user.isEnabled())
-                .setAuthorities(toJson(user.getAuthorities()));
+    private WebUser toWebUser(UserDetails user) {
+        var authorities = user.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .map(String::toUpperCase)
+                .map(WebUserAuthority::valueOf)
+                .collect(Collectors.toSet());
+
+        return WebUser.builder()
+                .login(user.getUsername())
+                .password(user.getPassword())
+                .enabled(user.isEnabled())
+                .authorities(authorities)
+                .build();
     }
 
     private UserDetails toUserDetailsBaseForm(WebUserBaseForm form) {
         return User.withUsername(form.getWebUsername())
                 .password("")
                 .disabled(!form.getEnabled())
-                .authorities(fromJson(form.getAuthorities().getJsonValue()))
+                .authorities(form.getAuthoritiesAsStrings().toArray(new String[0]))
                 .build();
     }
 
@@ -313,27 +314,26 @@ public class WebUsersService implements UserDetailsManager {
         return User.withUsername(form.getWebUsername())
                 .password(encPw)
                 .disabled(!form.getEnabled())
-                .authorities(fromJson(form.getAuthorities().getJsonValue()))
+                .authorities(form.getAuthoritiesAsStrings().toArray(new String[0]))
                 .build();
     }
 
-    private String[] fromJson(JSON jsonArray) {
+    private String[] fromJson(String jsonArray) {
         try {
-            return mapper.readValue(jsonArray.data(), String[].class);
+            return mapper.readValue(jsonArray, String[].class);
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
     }
 
-    private JSON toJson(Collection<? extends GrantedAuthority> authorities) {
-        Collection<String> auths = authorities.stream()
+    private String toJson(Collection<? extends GrantedAuthority> authorities) {
+        var auths = authorities.stream()
                 .map(GrantedAuthority::getAuthority)
                 .sorted() // keep a stable order of entries
                 .collect(Collectors.toCollection(LinkedHashSet::new)); // prevent duplicates
 
         try {
-            String str = mapper.writeValueAsString(auths);
-            return JSON.jsonOrNull(str);
+            return mapper.writeValueAsString(auths);
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
@@ -352,7 +352,7 @@ public class WebUsersService implements UserDetailsManager {
      */
     private static void validateAuthorities(Collection<? extends GrantedAuthority> authorities) {
         Assert.notNull(authorities, "Authorities list must not be null");
-        for (GrantedAuthority authority : authorities) {
+        for (var authority : authorities) {
             Assert.notNull(authority, "Authorities list contains a null entry");
             Assert.hasText(authority.getAuthority(), "getAuthority() method must return a non-empty string");
         }

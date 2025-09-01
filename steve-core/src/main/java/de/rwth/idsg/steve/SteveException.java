@@ -18,8 +18,6 @@
  */
 package de.rwth.idsg.steve;
 
-import static java.lang.String.format;
-
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 28.08.2014
@@ -37,26 +35,6 @@ public abstract class SteveException extends RuntimeException {
     }
 
     // -------------------------------------------------------------------------
-    // No String/variable interpolation in Java. Use format instead.
-    // -------------------------------------------------------------------------
-
-    protected SteveException(String template, Object arg1) {
-        this(format(template, arg1));
-    }
-
-    protected SteveException(String template, Object arg1, Throwable cause) {
-        this(format(template, arg1), cause);
-    }
-
-    protected SteveException(String template, Object arg1, Object arg2) {
-        this(format(template, arg1, arg2));
-    }
-
-    protected SteveException(String template, Object arg1, Object arg2, Throwable cause) {
-        this(format(template, arg1, arg2), cause);
-    }
-
-    // -------------------------------------------------------------------------
     // Custom/extending classes
     // -------------------------------------------------------------------------
 
@@ -69,28 +47,16 @@ public abstract class SteveException extends RuntimeException {
         public InternalError(String message, Throwable cause) {
             super(message, cause);
         }
-
-        public InternalError(String template, Object arg1) {
-            this(format(template, arg1));
-        }
-
-        public InternalError(String template, Object arg1, Throwable cause) {
-            this(format(template, arg1), cause);
-        }
-
-        public InternalError(String template, Object arg1, Object arg2) {
-            this(format(template, arg1, arg2));
-        }
-
-        protected InternalError(String template, Object arg1, Object arg2, Throwable cause) {
-            this(format(template, arg1, arg2), cause);
-        }
     }
 
     public static class AlreadyExists extends SteveException {
 
-        public AlreadyExists(String template, Object arg1) {
-            super(format(template, arg1));
+        public AlreadyExists(String message) {
+            super(message);
+        }
+
+        public AlreadyExists(String message, Throwable cause) {
+            super(message, cause);
         }
     }
 
@@ -100,8 +66,8 @@ public abstract class SteveException extends RuntimeException {
             super(message);
         }
 
-        public NotFound(String template, Object arg1) {
-            this(format(template, arg1));
+        public NotFound(String message, Throwable cause) {
+            super(message, cause);
         }
     }
 
@@ -110,8 +76,8 @@ public abstract class SteveException extends RuntimeException {
             super(message);
         }
 
-        public BadRequest(String template, Object arg1) {
-            this(format(template, arg1));
+        public BadRequest(String message, Throwable cause) {
+            super(message, cause);
         }
     }
 }

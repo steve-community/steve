@@ -21,7 +21,6 @@ package de.rwth.idsg.steve.web.controller;
 import de.rwth.idsg.steve.SteveException;
 import de.rwth.idsg.steve.repository.ChargingProfileRepository;
 import de.rwth.idsg.steve.service.ChargePointsService;
-import de.rwth.idsg.steve.utils.mapper.ChargingProfileDetailsMapper;
 import de.rwth.idsg.steve.web.dto.ChargingProfileAssignmentQueryForm;
 import de.rwth.idsg.steve.web.dto.ChargingProfileForm;
 import de.rwth.idsg.steve.web.dto.ChargingProfileQueryForm;
@@ -129,8 +128,8 @@ public class ChargingProfilesController {
         var details = repository
                 .getDetails(chargingProfilePk)
                 .orElseThrow(() -> new SteveException.NotFound("Charging Profile not found"));
-        ;
-        var form = ChargingProfileDetailsMapper.mapToForm(details);
+
+        var form = ChargingProfileForm.fromDetails(details);
 
         model.addAttribute("form", form);
         return "data-man/chargingProfileDetails";

@@ -18,12 +18,12 @@
  */
 package de.rwth.idsg.steve.repository.dto;
 
-import jooq.steve.db.tables.records.AddressRecord;
-import jooq.steve.db.tables.records.ChargeBoxRecord;
+import com.neovisionaries.i18n.CountryCode;
+import de.rwth.idsg.steve.web.dto.Address;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 
+import java.math.BigDecimal;
 import java.time.Instant;
 
 /**
@@ -40,9 +40,32 @@ public final class ChargePoint {
     }
 
     @Getter
-    @RequiredArgsConstructor
+    @Builder
     public static final class Details {
-        private final ChargeBoxRecord chargeBox;
-        private final AddressRecord address;
+        private final Integer chargeBoxPk;
+        private final String chargeBoxId;
+        private final String ocppProtocol;
+        private final String description;
+        private final BigDecimal locationLatitude;
+        private final BigDecimal locationLongitude;
+        private final String note;
+        private final String adminAddress;
+        private final boolean insertConnectorStatusAfterTransactionMsg;
+        private final String registrationStatus;
+        private final String street;
+        private final String houseNumber;
+        private final String zipCode;
+        private final String city;
+        private final CountryCode country;
+
+        public Address getAddress() {
+            var address = new Address();
+            address.setStreet(street);
+            address.setHouseNumber(houseNumber);
+            address.setZipCode(zipCode);
+            address.setCity(city);
+            address.setCountry(country);
+            return address;
+        }
     }
 }

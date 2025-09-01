@@ -82,7 +82,7 @@ public class Deserializer implements Consumer<CommunicationContext> {
             }
         } catch (IOException e) {
             throw new SteveException.InternalError(
-                    "Deserialization of incoming string failed: %s", context.getIncomingString(), e);
+                    "Deserialization of incoming string failed: %s".formatted(context.getIncomingString()), e);
         }
     }
 
@@ -146,8 +146,8 @@ public class Deserializer implements Consumer<CommunicationContext> {
         FutureResponseContext responseContext = futureResponseContextStore.get(context.getSession(), messageId);
         if (responseContext == null) {
             throw new SteveException.InternalError(
-                    "A result message was received as response to a not-sent call. The message was: %s",
-                    context.getIncomingString());
+                    "A result message was received as response to a not-sent call. The message was: %s"
+                            .formatted(context.getIncomingString()));
         }
 
         ResponseType res;
@@ -175,8 +175,8 @@ public class Deserializer implements Consumer<CommunicationContext> {
         var responseContext = futureResponseContextStore.get(context.getSession(), messageId);
         if (responseContext == null) {
             throw new SteveException.InternalError(
-                    "An error message was received as response to a not-sent call. The message was: %s",
-                    context.getIncomingString());
+                    "An error message was received as response to a not-sent call. The message was: %s"
+                            .formatted(context.getIncomingString()));
         }
 
         ErrorCode code;

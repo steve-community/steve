@@ -19,14 +19,13 @@
 package de.rwth.idsg.steve.web.controller;
 
 import de.rwth.idsg.steve.ocpp.OcppProtocol;
+import de.rwth.idsg.steve.repository.dto.ChargePoint;
 import de.rwth.idsg.steve.service.ChargePointRegistrationService;
 import de.rwth.idsg.steve.service.ChargePointsService;
 import de.rwth.idsg.steve.utils.ControllerHelper;
-import de.rwth.idsg.steve.utils.mapper.ChargePointDetailsMapper;
 import de.rwth.idsg.steve.web.dto.ChargePointBatchInsertForm;
 import de.rwth.idsg.steve.web.dto.ChargePointForm;
 import de.rwth.idsg.steve.web.dto.ChargePointQueryForm;
-import jooq.steve.db.tables.records.ChargeBoxRecord;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -111,31 +110,27 @@ public class ChargePointsController {
     @GetMapping(value = DETAILS_PATH)
     public String getDetails(@PathVariable("chargeBoxPk") int chargeBoxPk, Model model) {
         var cp = chargePointsService.getDetails(chargeBoxPk);
-        var form = ChargePointDetailsMapper.mapToForm(cp);
+        var form = ChargePointForm.fromDetails(cp);
 
         model.addAttribute("chargePointForm", form);
         model.addAttribute("cp", cp);
-        model.addAttribute("registrationStatusList", getRegistrationStatusList(cp.getChargeBox()));
+        model.addAttribute("registrationStatusList", getRegistrationStatusList(cp));
         addCountryCodes(model);
 
         return "data-man/chargepointDetails";
     }
 
-    private static List<String> getRegistrationStatusList(ChargeBoxRecord chargeBoxRecord) {
-        if (chargeBoxRecord.getOcppProtocol() == null) {
+    private static List<String> getRegistrationStatusList(ChargePoint.Details chargePoint) {
+        if (chargePoint.getOcppProtocol() == null) {
             return upToOcpp15RegistrationStatusList;
         }
 
-        var protocol = OcppProtocol.fromCompositeValue(chargeBoxRecord.getOcppProtocol());
-        switch (protocol.getVersion()) {
-            case V_12, V_15 -> {
-                return upToOcpp15RegistrationStatusList;
-            }
-            case V_16 -> {
-                return ocpp16RegistrationStatusList;
-            }
+        var protocol = OcppProtocol.fromCompositeValue(chargePoint.getOcppProtocol());
+        return switch (protocol.getVersion()) {
+            case V_12, V_15 -> upToOcpp15RegistrationStatusList;
+            case V_16 -> ocpp16RegistrationStatusList;
             default -> throw new IllegalArgumentException("Unknown OCPP version: " + protocol.getVersion());
-        }
+        };
     }
 
     @GetMapping(value = ADD_PATH)

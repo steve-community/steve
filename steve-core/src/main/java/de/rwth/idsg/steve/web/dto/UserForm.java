@@ -36,6 +36,25 @@ import jakarta.validation.constraints.NotNull;
 @ToString
 public class UserForm {
 
+    public UserForm() {}
+
+    public static UserForm fromDetails(de.rwth.idsg.steve.repository.dto.User.Details details) {
+        var form = new UserForm();
+        form.userPk = details.getUserPk();
+        form.firstName = details.getFirstName();
+        form.lastName = details.getLastName();
+        form.birthDay = details.getBirthDay();
+        form.phone = details.getPhone();
+        form.sex = UserSex.fromDatabaseValue(details.getSex());
+        form.eMail = details.getEMail();
+        form.note = details.getNote();
+        form.address = details.getAddress();
+        form.idTagList = details.getOcppTagEntries().stream()
+                .map(de.rwth.idsg.steve.repository.dto.User.OcppTagEntry::getIdTag)
+                .toList();
+        return form;
+    }
+
     // Internal database id
     private Integer userPk;
 

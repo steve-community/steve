@@ -20,6 +20,7 @@ package de.rwth.idsg.steve.repository.impl;
 
 import com.google.common.base.Strings;
 import de.rwth.idsg.steve.SteveException;
+import de.rwth.idsg.steve.jooq.mapper.UserMapper;
 import de.rwth.idsg.steve.repository.AddressRepository;
 import de.rwth.idsg.steve.repository.UserRepository;
 import de.rwth.idsg.steve.repository.dto.User;
@@ -29,11 +30,8 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jooq.Condition;
 import org.jooq.DSLContext;
-import org.jooq.Field;
-import org.jooq.Record1;
 import org.jooq.Record5;
 import org.jooq.Result;
-import org.jooq.SelectConditionStep;
 import org.jooq.exception.DataAccessException;
 import org.jooq.impl.DSL;
 import org.jspecify.annotations.Nullable;
@@ -84,11 +82,10 @@ public class UserRepositoryImpl implements UserRepository {
             return Optional.empty();
         }
 
-        return Optional.of(User.Details.builder()
-                .userRecord(ur)
-                .address(addressRepository.get(ctx, ur.getAddressPk()))
-                .ocppTagEntries(getOcppTagsInternal(userPk, null).getOrDefault(userPk, List.of()))
-                .build());
+        var address = addressRepository.get(ur.getAddressPk());
+        var ocppTagEntries = getOcppTagsInternal(userPk, null).getOrDefault(userPk, List.of());
+
+        return Optional.of(UserMapper.fromRecord(ur, address, ocppTagEntries));
     }
 
     @Override
@@ -96,7 +93,7 @@ public class UserRepositoryImpl implements UserRepository {
         return ctx.transactionResult(configuration -> {
             var tx = DSL.using(configuration);
             try {
-                var addressId = addressRepository.updateOrInsert(tx, form.getAddress());
+                var addressId = addressRepository.updateOrInsert(form.getAddress());
                 var userPk = addInternal(tx, form, addressId);
                 refreshOcppTagsInternal(tx, form, userPk);
                 return userPk;
@@ -111,7 +108,7 @@ public class UserRepositoryImpl implements UserRepository {
         ctx.transaction(configuration -> {
             var tx = DSL.using(configuration);
             try {
-                var addressId = addressRepository.updateOrInsert(tx, form.getAddress());
+                var addressId = addressRepository.updateOrInsert(form.getAddress());
                 updateInternal(tx, form, addressId);
                 refreshOcppTagsInternal(tx, form, form.getUserPk());
 
@@ -126,7 +123,8 @@ public class UserRepositoryImpl implements UserRepository {
         ctx.transaction(configuration -> {
             var tx = DSL.using(configuration);
             try {
-                addressRepository.delete(tx, selectAddressId(userPk));
+                var addressPk = selectAddressId(userPk);
+                addressRepository.delete(addressPk);
                 deleteInternal(tx, userPk);
             } catch (DataAccessException e) {
                 throw new SteveException.InternalError("Failed to delete the user", e);
@@ -161,7 +159,7 @@ public class UserRepositoryImpl implements UserRepository {
         if (form.isSetName()) {
             // Concatenate the two columns and search within the resulting representation
             // for flexibility, since the user can search by first or last name, or both.
-            Field<String> joinedField = DSL.concat(USER.FIRST_NAME, USER.LAST_NAME);
+            var joinedField = DSL.concat(USER.FIRST_NAME, USER.LAST_NAME);
 
             // Find a matching sequence anywhere within the concatenated representation
             conditions.add(includes(joinedField, form.getName()));
@@ -209,12 +207,11 @@ public class UserRepositoryImpl implements UserRepository {
         return map;
     }
 
-    private SelectConditionStep<Record1<Integer>> selectAddressId(int userPk) {
-        return ctx.select(USER.ADDRESS_PK).from(USER).where(USER.USER_PK.eq(userPk));
-    }
-
-    private SelectConditionStep<Record1<Integer>> selectOcppTagPk(String ocppIdTag) {
-        return ctx.select(OCPP_TAG.OCPP_TAG_PK).from(OCPP_TAG).where(OCPP_TAG.ID_TAG.eq(ocppIdTag));
+    private Integer selectAddressId(int userPk) {
+        return ctx.select(USER.ADDRESS_PK)
+                .from(USER)
+                .where(USER.USER_PK.eq(userPk))
+                .fetchOne(USER.ADDRESS_PK);
     }
 
     private Integer addInternal(DSLContext ctx, UserForm form, Integer addressPk) {

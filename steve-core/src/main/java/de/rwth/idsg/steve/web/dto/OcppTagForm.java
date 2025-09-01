@@ -40,6 +40,19 @@ import jakarta.validation.constraints.NotEmpty;
 @EqualsAndHashCode
 public class OcppTagForm {
 
+    public OcppTagForm() {}
+
+    public static OcppTagForm fromRecord(de.rwth.idsg.steve.repository.dto.OcppTagActivity tag) {
+        var form = new OcppTagForm();
+        form.ocppTagPk = tag.getOcppTagPk();
+        form.idTag = tag.getIdTag();
+        form.parentIdTag = tag.getParentIdTag();
+        form.expiryDate = tag.getExpiryDate();
+        form.maxActiveTransactionCount = tag.getMaxActiveTransactionCount();
+        form.note = tag.getNote();
+        return form;
+    }
+
     // Internal database id
     @Schema(hidden = true)
     private Integer ocppTagPk;

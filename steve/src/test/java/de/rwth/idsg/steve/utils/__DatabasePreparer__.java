@@ -20,7 +20,7 @@ package de.rwth.idsg.steve.utils;
 
 import com.google.common.collect.Sets;
 import de.rwth.idsg.steve.SteveConfiguration;
-import de.rwth.idsg.steve.config.BeanConfiguration;
+import de.rwth.idsg.steve.jooq.config.JooqConfiguration;
 import de.rwth.idsg.steve.repository.dto.ChargePoint;
 import de.rwth.idsg.steve.repository.dto.ConnectorStatus;
 import de.rwth.idsg.steve.repository.dto.InsertReservationParams;
@@ -41,19 +41,15 @@ import jooq.steve.db.tables.Settings;
 import jooq.steve.db.tables.records.OcppTagActivityRecord;
 import jooq.steve.db.tables.records.TransactionRecord;
 import org.jooq.DSLContext;
-import org.jooq.Schema;
-import org.jooq.Table;
 import org.jooq.impl.DSL;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
 
+import static de.rwth.idsg.steve.utils.DateTimeUtils.toLocalDateTime;
 import static jooq.steve.db.tables.ChargeBox.CHARGE_BOX;
 import static jooq.steve.db.tables.OcppTag.OCPP_TAG;
 import static jooq.steve.db.tables.Transaction.TRANSACTION;
@@ -73,12 +69,18 @@ public class __DatabasePreparer__ {
     private static final String REGISTERED_CHARGE_BOX_ID_2 = "charge_box_2aa6a783d47d_2";
     private static final String REGISTERED_OCPP_TAG = "id_tag_2aa6a783d47d";
 
-    private static final BeanConfiguration beanConfiguration = new BeanConfiguration();
+    private static final JooqConfiguration jooqConfiguration = new JooqConfiguration();
 
     private static DSLContext dslContext;
 
     public static void prepare(SteveConfiguration config) {
-        dslContext = beanConfiguration.dslContext(beanConfiguration.dataSource(config), config);
+        dslContext = jooqConfiguration.dslContext(
+                JooqConfiguration.dataSource(
+                        config.getDb().getJdbcUrl(),
+                        config.getDb().getUserName(),
+                        config.getDb().getPassword(),
+                        config.getTimeZoneId()),
+                config);
         runOperation(ctx -> {
             truncateTables(ctx);
             insertChargeBox(ctx);
@@ -87,14 +89,14 @@ public class __DatabasePreparer__ {
     }
 
     public static int makeReservation(int connectorId) {
-        ReservationRepositoryImpl r = new ReservationRepositoryImpl(dslContext);
-        InsertReservationParams params = InsertReservationParams.builder()
+        var r = new ReservationRepositoryImpl(dslContext);
+        var params = InsertReservationParams.builder()
                 .chargeBoxId(REGISTERED_CHARGE_BOX_ID)
                 .idTag(REGISTERED_OCPP_TAG)
                 .connectorId(connectorId)
                 .expiryTimestamp(Instant.now().plus(1, ChronoUnit.HOURS))
                 .build();
-        int reservationId = r.insert(params);
+        var reservationId = r.insert(params);
         r.accepted(reservationId);
         return reservationId;
     }
@@ -116,7 +118,7 @@ public class __DatabasePreparer__ {
     }
 
     public static List<Transaction> getTransactions() {
-        TransactionRepositoryImpl impl = new TransactionRepositoryImpl(dslContext);
+        var impl = new TransactionRepositoryImpl(dslContext);
         return impl.getTransactions(new TransactionQueryForm());
     }
 
@@ -125,28 +127,39 @@ public class __DatabasePreparer__ {
     }
 
     public static List<Reservation> getReservations() {
-        ReservationRepositoryImpl impl = new ReservationRepositoryImpl(dslContext);
+        var impl = new ReservationRepositoryImpl(dslContext);
         return impl.getReservations(new ReservationQueryForm());
     }
 
     public static List<ConnectorStatus> getChargePointConnectorStatus() {
-        ChargePointRepositoryImpl impl = new ChargePointRepositoryImpl(dslContext, new AddressRepositoryImpl());
+        var impl = new ChargePointRepositoryImpl(dslContext, new AddressRepositoryImpl(dslContext));
         return impl.getChargePointConnectorStatus();
     }
 
     public static TransactionDetails getDetails(int transactionPk) {
-        TransactionRepositoryImpl impl = new TransactionRepositoryImpl(dslContext);
-        return impl.getDetails(transactionPk);
+        var impl = new TransactionRepositoryImpl(dslContext);
+        return impl.getDetails(transactionPk).orElseThrow();
     }
 
     public static OcppTagActivityRecord getOcppTagRecord(String idTag) {
-        OcppTagRepositoryImpl impl = new OcppTagRepositoryImpl(dslContext);
-        return impl.getRecord(idTag);
+        var impl = new OcppTagRepositoryImpl(dslContext);
+        var dto = impl.getRecord(idTag).orElseThrow();
+        var activity = new OcppTagActivityRecord();
+        activity.setOcppTagPk(dto.getOcppTagPk());
+        activity.setIdTag(dto.getIdTag());
+        activity.setParentIdTag(dto.getParentIdTag());
+        activity.setExpiryDate(toLocalDateTime(dto.getExpiryDate()));
+        activity.setInTransaction(dto.isInTransaction());
+        activity.setBlocked(dto.isBlocked());
+        activity.setMaxActiveTransactionCount(dto.getMaxActiveTransactionCount());
+        activity.setActiveTransactionCount(dto.getActiveTransactionCount());
+        activity.setNote(dto.getNote());
+        return activity;
     }
 
     public static ChargePoint.Details getCBDetails(String chargeboxID) {
-        ChargePointRepositoryImpl impl = new ChargePointRepositoryImpl(dslContext, new AddressRepositoryImpl());
-        Map<String, Integer> pkMap = impl.getChargeBoxIdPkPair(Arrays.asList(chargeboxID));
+        var impl = new ChargePointRepositoryImpl(dslContext, new AddressRepositoryImpl(dslContext));
+        var pkMap = impl.getChargeBoxIdPkPair(Collections.singletonList(chargeboxID));
         int pk = pkMap.get(chargeboxID);
         return impl.getDetails(pk).orElseThrow();
     }
@@ -156,7 +169,7 @@ public class __DatabasePreparer__ {
     }
 
     private static void truncateTables(DSLContext ctx) {
-        Set<Table<?>> skipList = Sets.newHashSet(
+        var skipList = Sets.newHashSet(
                 SchemaVersion.SCHEMA_VERSION,
                 Settings.SETTINGS,
                 OcppTagActivity.OCPP_TAG_ACTIVITY, // only a view
@@ -164,20 +177,20 @@ public class __DatabasePreparer__ {
                 );
 
         ctx.transaction(configuration -> {
-            Schema schema = DefaultCatalog.DEFAULT_CATALOG.getSchemas().stream()
+            var schema = DefaultCatalog.DEFAULT_CATALOG.getSchemas().stream()
                     .filter(s -> SCHEMA_TO_TRUNCATE.equals(s.getName()))
                     .findFirst()
                     .orElseThrow(() -> new RuntimeException("Could not find schema"));
 
-            List<Table<?>> tables = schema.getTables().stream()
+            var tables = schema.getTables().stream()
                     .filter(t -> !skipList.contains(t))
-                    .collect(Collectors.toList());
+                    .toList();
 
             if (tables.isEmpty()) {
                 throw new RuntimeException("Could not find tables to truncate");
             }
 
-            DSLContext internalCtx = DSL.using(configuration);
+            var internalCtx = DSL.using(configuration);
             internalCtx.execute("SET FOREIGN_KEY_CHECKS=0");
             tables.forEach(t -> internalCtx.truncate(t).execute());
             internalCtx.execute("SET FOREIGN_KEY_CHECKS=1");

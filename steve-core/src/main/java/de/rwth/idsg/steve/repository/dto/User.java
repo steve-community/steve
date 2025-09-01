@@ -18,13 +18,13 @@
  */
 package de.rwth.idsg.steve.repository.dto;
 
-import jooq.steve.db.tables.records.AddressRecord;
-import jooq.steve.db.tables.records.UserRecord;
+import com.neovisionaries.i18n.CountryCode;
+import de.rwth.idsg.steve.web.dto.Address;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.jspecify.annotations.Nullable;
 
+import java.time.LocalDate;
 import java.util.List;
 
 /**
@@ -44,9 +44,33 @@ public class User {
     @Getter
     @Builder
     public static final class Details {
-        private final UserRecord userRecord;
-        private final @Nullable AddressRecord address;
+        // from UserRecord
+        private final Integer userPk;
+        private final String firstName;
+        private final String lastName;
+        private final LocalDate birthDay;
+        private final String phone;
+        private final String sex;
+        private final String eMail;
+        private final String note;
+        // from AddressRecord
+        private final String street;
+        private final String houseNumber;
+        private final String zipCode;
+        private final String city;
+        private final CountryCode country;
+        // from OcppTag
         private final List<OcppTagEntry> ocppTagEntries;
+
+        public Address getAddress() {
+            var address = new Address();
+            address.setStreet(street);
+            address.setHouseNumber(houseNumber);
+            address.setZipCode(zipCode);
+            address.setCity(city);
+            address.setCountry(country);
+            return address;
+        }
     }
 
     @Getter

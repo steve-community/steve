@@ -24,18 +24,18 @@ import de.rwth.idsg.steve.repository.ReservationStatus;
 import de.rwth.idsg.steve.repository.dto.DbVersion;
 import de.rwth.idsg.steve.utils.DateTimeUtils;
 import de.rwth.idsg.steve.web.dto.Statistics;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jooq.DSLContext;
 import org.jooq.DatePart;
 import org.jooq.Field;
-import org.jooq.Record9;
 import org.jooq.impl.DSL;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 import static de.rwth.idsg.steve.utils.CustomDSL.date;
 import static de.rwth.idsg.steve.utils.CustomDSL.timestampDiff;
@@ -56,10 +56,10 @@ import static org.jooq.impl.DSL.select;
  */
 @Slf4j
 @Repository
+@RequiredArgsConstructor
 public class GenericRepositoryImpl implements GenericRepository {
 
-    @Autowired
-    private DSLContext ctx;
+    private final DSLContext ctx;
 
     @EventListener
     public void afterStart(ContextRefreshedEvent event) {
@@ -68,17 +68,15 @@ public class GenericRepositoryImpl implements GenericRepository {
 
     @Override
     public void checkJavaAndMySQLOffsets() {
-        long java = DateTimeUtils.getOffsetFromUtcInSeconds();
+        var java = DateTimeUtils.getOffsetFromUtcInSeconds();
 
-        long sql = ctx.select(timestampDiff(DatePart.SECOND, utcTimestamp(), DSL.currentTimestamp()))
+        var sql = ctx.select(timestampDiff(DatePart.SECOND, utcTimestamp(), DSL.currentTimestamp()))
                 .fetchOne()
                 .getValue(0, Long.class);
 
-        if (sql != java) {
-            throw new SteveException.InternalError(
-                    "MySQL and Java are not using the same time zone. "
-                            + "Java offset in seconds (%s) != MySQL offset in seconds (%s)",
-                    java, sql);
+        if (sql == null || sql != java) {
+            throw new SteveException.InternalError("MySQL and Java are not using the same time zone. "
+                    + "Java offset in seconds (%s) != MySQL offset in seconds (%s)".formatted(java, sql));
         }
     }
 
@@ -122,7 +120,7 @@ public class GenericRepositoryImpl implements GenericRepository {
 
         Field<Integer> numWebUsers = ctx.selectCount().from(WEB_USER).asField("num_webusers");
 
-        Record9<Integer, Integer, Integer, Integer, Integer, Integer, Integer, Integer, Integer> gs = ctx.select(
+        var row = ctx.select(
                         numChargeBoxes,
                         numOcppTags,
                         numUsers,
@@ -132,30 +130,35 @@ public class GenericRepositoryImpl implements GenericRepository {
                         heartbeatsYesterday,
                         heartbeatsEarlier,
                         numWebUsers)
-                .fetchOne();
+                .fetchSingle();
 
         return Statistics.builder()
-                .numChargeBoxes(gs.value1())
-                .numOcppTags(gs.value2())
-                .numUsers(gs.value3())
-                .numReservations(gs.value4())
-                .numTransactions(gs.value5())
-                .heartbeatToday(gs.value6())
-                .heartbeatYesterday(gs.value7())
-                .heartbeatEarlier(gs.value8())
-                .numWebUsers(gs.value9())
+                .numChargeBoxes(row.get(numChargeBoxes))
+                .numOcppTags(row.get(numOcppTags))
+                .numUsers(row.get(numUsers))
+                .numReservations(row.get(numReservations))
+                .numTransactions(row.get(numTransactions))
+                .heartbeatToday(row.get(heartbeatsToday))
+                .heartbeatYesterday(row.get(heartbeatsYesterday))
+                .heartbeatEarlier(row.get(heartbeatsEarlier))
+                .numWebUsers(row.get(numWebUsers))
                 .build();
     }
 
     @Override
-    public DbVersion getDBVersion() {
-        var record = ctx.select(SCHEMA_VERSION.VERSION, SCHEMA_VERSION.INSTALLED_ON)
+    public Optional<DbVersion> getDBVersion() {
+        var schemaVersion = ctx.select(SCHEMA_VERSION.VERSION, SCHEMA_VERSION.INSTALLED_ON)
                 .from(SCHEMA_VERSION)
                 .where(SCHEMA_VERSION.INSTALLED_RANK.eq(
                         select(max(SCHEMA_VERSION.INSTALLED_RANK)).from(SCHEMA_VERSION)))
                 .fetchOne();
-
-        String ts = DateTimeUtils.humanize(record.value2());
-        return DbVersion.builder().version(record.value1()).updateTimestamp(ts).build();
+        if (schemaVersion == null) {
+            return Optional.empty();
+        }
+        var ts = DateTimeUtils.humanize(schemaVersion.value2());
+        return Optional.of(DbVersion.builder()
+                .version(schemaVersion.value1())
+                .updateTimestamp(ts)
+                .build());
     }
 }

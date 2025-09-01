@@ -21,6 +21,8 @@ package de.rwth.idsg.steve.web.dto;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.Set;
+
 /**
  * @author fnkbsi
  * @since 01.04.2022
@@ -37,4 +39,8 @@ public class WebUserBaseForm {
     private String webUsername;
 
     private WebUserAuthority authorities;
+
+    public Set<String> getAuthoritiesAsStrings() {
+        return authorities.getValues();
+    }
 }

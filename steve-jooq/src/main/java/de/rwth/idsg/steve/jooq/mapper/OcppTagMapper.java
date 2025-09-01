@@ -16,31 +16,29 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package de.rwth.idsg.steve.utils.mapper;
+package de.rwth.idsg.steve.jooq.mapper;
 
-import com.neovisionaries.i18n.CountryCode;
-import de.rwth.idsg.steve.web.dto.Address;
-import jooq.steve.db.tables.records.AddressRecord;
+import de.rwth.idsg.steve.repository.dto.OcppTagActivity;
+import jooq.steve.db.tables.records.OcppTagActivityRecord;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
-/**
- * @author Sevket Goekay <sevketgokay@gmail.com>
- * @since 23.03.2021
- */
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
-public final class AddressMapper {
+import static de.rwth.idsg.steve.utils.DateTimeUtils.toInstant;
 
-    public static Address recordToDto(AddressRecord record) {
-        Address address = new Address();
-        if (record != null) {
-            address.setAddressPk(record.getAddressPk());
-            address.setStreet(record.getStreet());
-            address.setHouseNumber(record.getHouseNumber());
-            address.setZipCode(record.getZipCode());
-            address.setCity(record.getCity());
-            address.setCountry(CountryCode.getByCode(record.getCountry()));
-        }
-        return address;
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
+public final class OcppTagMapper {
+
+    public static OcppTagActivity fromRecord(OcppTagActivityRecord r) {
+        return OcppTagActivity.builder()
+                .ocppTagPk(r.getOcppTagPk())
+                .idTag(r.getIdTag())
+                .expiryDate(toInstant(r.getExpiryDate()))
+                .maxActiveTransactionCount(r.getMaxActiveTransactionCount())
+                .note(r.getNote())
+                .parentIdTag(r.getParentIdTag())
+                .blocked(r.getBlocked())
+                .inTransaction(r.getInTransaction())
+                .activeTransactionCount(r.getActiveTransactionCount())
+                .build();
     }
 }

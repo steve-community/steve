@@ -19,6 +19,7 @@
 package de.rwth.idsg.steve.repository.impl;
 
 import de.rwth.idsg.steve.SteveException;
+import de.rwth.idsg.steve.jooq.mapper.ChargePointMapper;
 import de.rwth.idsg.steve.ocpp.OcppProtocol;
 import de.rwth.idsg.steve.repository.AddressRepository;
 import de.rwth.idsg.steve.repository.ChargePointRepository;
@@ -29,19 +30,13 @@ import de.rwth.idsg.steve.utils.DateTimeUtils;
 import de.rwth.idsg.steve.web.dto.ChargePointForm;
 import de.rwth.idsg.steve.web.dto.ChargePointQueryForm;
 import de.rwth.idsg.steve.web.dto.ConnectorStatusForm;
-import jooq.steve.db.tables.records.AddressRecord;
-import jooq.steve.db.tables.records.ChargeBoxRecord;
 import lombok.extern.slf4j.Slf4j;
 import ocpp.cs._2015._10.RegistrationStatus;
 import org.jooq.Condition;
 import org.jooq.DSLContext;
-import org.jooq.Field;
-import org.jooq.Record1;
 import org.jooq.Record5;
 import org.jooq.Result;
-import org.jooq.SelectConditionStep;
 import org.jooq.SelectQuery;
-import org.jooq.Table;
 import org.jooq.exception.DataAccessException;
 import org.jooq.impl.DSL;
 import org.jspecify.annotations.Nullable;
@@ -82,7 +77,7 @@ public class ChargePointRepositoryImpl implements ChargePointRepository {
 
     @Override
     public Optional<String> getRegistrationStatus(String chargeBoxId) {
-        String status = ctx.select(CHARGE_BOX.REGISTRATION_STATUS)
+        var status = ctx.select(CHARGE_BOX.REGISTRATION_STATUS)
                 .from(CHARGE_BOX)
                 .where(CHARGE_BOX.CHARGE_BOX_ID.eq(chargeBoxId))
                 .fetchOne(CHARGE_BOX.REGISTRATION_STATUS);
@@ -93,7 +88,7 @@ public class ChargePointRepositoryImpl implements ChargePointRepository {
     @Override
     public List<ChargePointSelect> getChargePointSelect(
             OcppProtocol protocol, List<String> inStatusFilter, List<String> chargeBoxIdFilter) {
-        Condition chargeBoxIdCondition = CollectionUtils.isEmpty(chargeBoxIdFilter)
+        var chargeBoxIdCondition = CollectionUtils.isEmpty(chargeBoxIdFilter)
                 ? DSL.trueCondition()
                 : CHARGE_BOX.CHARGE_BOX_ID.in(chargeBoxIdFilter);
 
@@ -146,7 +141,6 @@ public class ChargePointRepositoryImpl implements ChargePointRepository {
                 .build());
     }
 
-    @SuppressWarnings("unchecked")
     private Result<Record5<Integer, String, String, String, LocalDateTime>> getOverviewInternal(
             ChargePointQueryForm form) {
         SelectQuery selectQuery = ctx.selectQuery();
@@ -199,7 +193,7 @@ public class ChargePointRepositoryImpl implements ChargePointRepository {
 
     @Override
     public Optional<ChargePoint.Details> getDetails(int chargeBoxPk) {
-        ChargeBoxRecord cbr = ctx.selectFrom(CHARGE_BOX)
+        var cbr = ctx.selectFrom(CHARGE_BOX)
                 .where(CHARGE_BOX.CHARGE_BOX_PK.equal(chargeBoxPk))
                 .fetchOne();
 
@@ -207,27 +201,27 @@ public class ChargePointRepositoryImpl implements ChargePointRepository {
             return Optional.empty();
         }
 
-        AddressRecord ar = addressRepository.get(ctx, cbr.getAddressPk());
+        var ar = addressRepository.get(cbr.getAddressPk());
 
-        return Optional.of(new ChargePoint.Details(cbr, ar));
+        return Optional.of(ChargePointMapper.fromRecord(cbr, ar));
     }
 
     @Override
     public List<ConnectorStatus> getChargePointConnectorStatus(ConnectorStatusForm form) {
         // find out the latest timestamp for each connector
-        Field<Integer> t1Pk = CONNECTOR_STATUS.CONNECTOR_PK.as("t1_pk");
+        var t1Pk = CONNECTOR_STATUS.CONNECTOR_PK.as("t1_pk");
         var t1TsMax = DSL.max(CONNECTOR_STATUS.STATUS_TIMESTAMP).as("t1_ts_max");
-        Table<?> t1 = ctx.select(t1Pk, t1TsMax)
+        var t1 = ctx.select(t1Pk, t1TsMax)
                 .from(CONNECTOR_STATUS)
                 .groupBy(CONNECTOR_STATUS.CONNECTOR_PK)
                 .asTable("t1");
 
         // get the status table with latest timestamps only
-        Field<Integer> t2Pk = CONNECTOR_STATUS.CONNECTOR_PK.as("t2_pk");
+        var t2Pk = CONNECTOR_STATUS.CONNECTOR_PK.as("t2_pk");
         var t2Ts = CONNECTOR_STATUS.STATUS_TIMESTAMP.as("t2_ts");
-        Field<String> t2Status = CONNECTOR_STATUS.STATUS.as("t2_status");
-        Field<String> t2Error = CONNECTOR_STATUS.ERROR_CODE.as("t2_error");
-        Table<?> t2 = ctx.selectDistinct(t2Pk, t2Ts, t2Status, t2Error)
+        var t2Status = CONNECTOR_STATUS.STATUS.as("t2_status");
+        var t2Error = CONNECTOR_STATUS.ERROR_CODE.as("t2_error");
+        var t2 = ctx.selectDistinct(t2Pk, t2Ts, t2Status, t2Error)
                 .from(CONNECTOR_STATUS)
                 .join(t1)
                 .on(CONNECTOR_STATUS.CONNECTOR_PK.equal(t1.field(t1Pk)))
@@ -235,13 +229,13 @@ public class ChargePointRepositoryImpl implements ChargePointRepository {
                 .asTable("t2");
 
         // https://github.com/steve-community/steve/issues/691
-        Condition chargeBoxCondition = CHARGE_BOX.REGISTRATION_STATUS.eq(RegistrationStatus.ACCEPTED.value());
+        var chargeBoxCondition = CHARGE_BOX.REGISTRATION_STATUS.eq(RegistrationStatus.ACCEPTED.value());
 
         if (form != null && form.getChargeBoxId() != null) {
             chargeBoxCondition = chargeBoxCondition.and(CHARGE_BOX.CHARGE_BOX_ID.eq(form.getChargeBoxId()));
         }
 
-        final Condition statusCondition;
+        Condition statusCondition;
         if (form == null || form.getStatus() == null) {
             statusCondition = DSL.noCondition();
         } else {
@@ -287,7 +281,7 @@ public class ChargePointRepositoryImpl implements ChargePointRepository {
 
     @Override
     public void addChargePointList(List<String> chargeBoxIdList) {
-        List<ChargeBoxRecord> batch = chargeBoxIdList.stream()
+        var batch = chargeBoxIdList.stream()
                 .map(s ->
                         ctx.newRecord(CHARGE_BOX).setChargeBoxId(s).setInsertConnectorStatusAfterTransactionMsg(false))
                 .collect(Collectors.toList());
@@ -298,14 +292,14 @@ public class ChargePointRepositoryImpl implements ChargePointRepository {
     @Override
     public int addChargePoint(ChargePointForm form) {
         return ctx.transactionResult(configuration -> {
-            var ctx = DSL.using(configuration);
+            var transactionCtx = DSL.using(configuration);
             try {
-                var addressId = addressRepository.updateOrInsert(ctx, form.getAddress());
-                return addChargePointInternal(ctx, form, addressId);
+                var addressId = addressRepository.updateOrInsert(form.getAddress());
+                return addChargePointInternal(transactionCtx, form, addressId);
 
             } catch (DataAccessException e) {
                 throw new SteveException.InternalError(
-                        "Failed to add the charge point with chargeBoxId '%s'", form.getChargeBoxId(), e);
+                        "Failed to add the charge point with chargeBoxId '%s'".formatted(form.getChargeBoxId()), e);
             }
         });
     }
@@ -313,14 +307,14 @@ public class ChargePointRepositoryImpl implements ChargePointRepository {
     @Override
     public void updateChargePoint(ChargePointForm form) {
         ctx.transaction(configuration -> {
-            DSLContext ctx = DSL.using(configuration);
+            var transactionCtx = DSL.using(configuration);
             try {
-                Integer addressId = addressRepository.updateOrInsert(ctx, form.getAddress());
-                updateChargePointInternal(ctx, form, addressId);
+                var addressId = addressRepository.updateOrInsert(form.getAddress());
+                updateChargePointInternal(transactionCtx, form, addressId);
 
             } catch (DataAccessException e) {
                 throw new SteveException.InternalError(
-                        "Failed to update the charge point with chargeBoxId '%s'", form.getChargeBoxId(), e);
+                        "Failed to update the charge point with chargeBoxId '%s'".formatted(form.getChargeBoxId()), e);
             }
         });
     }
@@ -328,10 +322,11 @@ public class ChargePointRepositoryImpl implements ChargePointRepository {
     @Override
     public void deleteChargePoint(int chargeBoxPk) {
         ctx.transaction(configuration -> {
-            DSLContext ctx = DSL.using(configuration);
+            var transactionCtx = DSL.using(configuration);
             try {
-                addressRepository.delete(ctx, selectAddressId(chargeBoxPk));
-                deleteChargePointInternal(ctx, chargeBoxPk);
+                var addressPk = selectAddressId(chargeBoxPk);
+                addressRepository.delete(addressPk);
+                deleteChargePointInternal(transactionCtx, chargeBoxPk);
 
             } catch (DataAccessException e) {
                 throw new SteveException.InternalError("Failed to delete the charge point", e);
@@ -343,12 +338,16 @@ public class ChargePointRepositoryImpl implements ChargePointRepository {
     // Helpers
     // -------------------------------------------------------------------------
 
-    private SelectConditionStep<Record1<Integer>> selectAddressId(int chargeBoxPk) {
-        return ctx.select(CHARGE_BOX.ADDRESS_PK).from(CHARGE_BOX).where(CHARGE_BOX.CHARGE_BOX_PK.eq(chargeBoxPk));
+    private Integer selectAddressId(int chargeBoxPk) {
+        return ctx.select(CHARGE_BOX.ADDRESS_PK)
+                .from(CHARGE_BOX)
+                .where(CHARGE_BOX.CHARGE_BOX_PK.eq(chargeBoxPk))
+                .fetchOne(CHARGE_BOX.ADDRESS_PK);
     }
 
-    private int addChargePointInternal(DSLContext ctx, ChargePointForm form, Integer addressPk) {
-        return ctx.insertInto(CHARGE_BOX)
+    private int addChargePointInternal(DSLContext transactionCtx, ChargePointForm form, Integer addressPk) {
+        return transactionCtx
+                .insertInto(CHARGE_BOX)
                 .set(CHARGE_BOX.CHARGE_BOX_ID, form.getChargeBoxId())
                 .set(CHARGE_BOX.DESCRIPTION, form.getDescription())
                 .set(CHARGE_BOX.LOCATION_LATITUDE, form.getLocationLatitude())
@@ -365,8 +364,10 @@ public class ChargePointRepositoryImpl implements ChargePointRepository {
                 .getChargeBoxPk();
     }
 
-    private void updateChargePointInternal(DSLContext ctx, ChargePointForm form, @Nullable Integer addressPk) {
-        ctx.update(CHARGE_BOX)
+    private void updateChargePointInternal(
+            DSLContext transactionCtx, ChargePointForm form, @Nullable Integer addressPk) {
+        transactionCtx
+                .update(CHARGE_BOX)
                 .set(CHARGE_BOX.DESCRIPTION, form.getDescription())
                 .set(CHARGE_BOX.LOCATION_LATITUDE, form.getLocationLatitude())
                 .set(CHARGE_BOX.LOCATION_LONGITUDE, form.getLocationLongitude())
@@ -381,8 +382,9 @@ public class ChargePointRepositoryImpl implements ChargePointRepository {
                 .execute();
     }
 
-    private void deleteChargePointInternal(DSLContext ctx, int chargeBoxPk) {
-        ctx.delete(CHARGE_BOX)
+    private void deleteChargePointInternal(DSLContext transactionCtx, int chargeBoxPk) {
+        transactionCtx
+                .delete(CHARGE_BOX)
                 .where(CHARGE_BOX.CHARGE_BOX_PK.equal(chargeBoxPk))
                 .execute();
     }

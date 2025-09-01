@@ -21,7 +21,6 @@ package de.rwth.idsg.steve.web.controller;
 import de.rwth.idsg.steve.service.OcppTagsService;
 import de.rwth.idsg.steve.service.UsersService;
 import de.rwth.idsg.steve.utils.ControllerHelper;
-import de.rwth.idsg.steve.utils.mapper.UserFormMapper;
 import de.rwth.idsg.steve.web.dto.UserForm;
 import de.rwth.idsg.steve.web.dto.UserQueryForm;
 import lombok.RequiredArgsConstructor;
@@ -83,7 +82,7 @@ public class UsersController {
     @GetMapping(value = DETAILS_PATH)
     public String getDetails(@PathVariable("userPk") int userPk, Model model) {
         var details = usersService.getDetails(userPk);
-        UserForm form = UserFormMapper.toForm(details);
+        var form = UserForm.fromDetails(details);
 
         model.addAttribute("userForm", form);
         setTags(model, form.getIdTagList());

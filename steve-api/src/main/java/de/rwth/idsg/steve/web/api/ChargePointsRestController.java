@@ -76,7 +76,7 @@ public class ChargePointsRestController {
         var body = toDto(chargePointsService.getDetails(chargepointPk));
         var location = ServletUriComponentsBuilder.fromCurrentRequest()
                 .path("/{id}")
-                .buildAndExpand(body.getChargeBoxPk())
+                .buildAndExpand(chargepointPk)
                 .toUri();
         return ResponseEntity.created(location).body(body);
     }
@@ -105,8 +105,7 @@ public class ChargePointsRestController {
     }
 
     private static ApiChargePoint toDto(ChargePoint.Details details) {
-        return new ApiChargePoint(
-                details.getChargeBox().getChargeBoxPk(), details.getChargeBox().getChargeBoxId());
+        return new ApiChargePoint(details.getChargeBoxPk(), details.getChargeBoxId());
     }
 
     @Data

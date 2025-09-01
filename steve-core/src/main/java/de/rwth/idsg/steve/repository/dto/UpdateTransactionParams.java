@@ -18,7 +18,6 @@
  */
 package de.rwth.idsg.steve.repository.dto;
 
-import jooq.steve.db.enums.TransactionStopEventActor;
 import lombok.Builder;
 import lombok.Getter;
 

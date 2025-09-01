@@ -50,6 +50,36 @@ import jakarta.validation.constraints.PositiveOrZero;
 @ToString
 public class ChargingProfileForm {
 
+    public ChargingProfileForm() {}
+
+    public static ChargingProfileForm fromDetails(de.rwth.idsg.steve.repository.dto.ChargingProfile.Details details) {
+        var form = new ChargingProfileForm();
+        form.chargingProfilePk = details.getChargingProfilePk();
+        form.stackLevel = details.getStackLevel();
+        form.description = details.getDescription();
+        form.note = details.getNote();
+        form.chargingProfilePurpose = ChargingProfilePurposeType.fromValue(details.getChargingProfilePurpose());
+        form.chargingProfileKind = ChargingProfileKindType.fromValue(details.getChargingProfileKind());
+        form.recurrencyKind =
+                details.getRecurrencyKind() == null ? null : RecurrencyKindType.fromValue(details.getRecurrencyKind());
+        form.validFrom = details.getValidFrom();
+        form.validTo = details.getValidTo();
+        form.durationInSeconds = details.getDurationInSeconds();
+        form.startSchedule = details.getStartSchedule();
+        form.chargingRateUnit = ChargingRateUnitType.fromValue(details.getChargingRateUnit());
+        form.minChargingRate = details.getMinChargingRate();
+        form.schedulePeriods = details.getPeriods().stream()
+                .map(p -> {
+                    SchedulePeriod sp = new SchedulePeriod();
+                    sp.setStartPeriodInSeconds(p.getStartPeriodInSeconds());
+                    sp.setPowerLimit(p.getPowerLimit());
+                    sp.setNumberPhases(p.getNumberPhases());
+                    return sp;
+                })
+                .toList();
+        return form;
+    }
+
     // Internal database id
     private Integer chargingProfilePk;
 

@@ -19,6 +19,7 @@
 package de.rwth.idsg.steve.repository.impl;
 
 import de.rwth.idsg.steve.SteveException;
+import de.rwth.idsg.steve.jooq.mapper.ChargingProfileMapper;
 import de.rwth.idsg.steve.repository.ChargingProfileRepository;
 import de.rwth.idsg.steve.repository.dto.ChargingProfile;
 import de.rwth.idsg.steve.repository.dto.ChargingProfileAssignment;
@@ -30,8 +31,6 @@ import lombok.extern.slf4j.Slf4j;
 import ocpp.cp._2015._10.ChargingProfilePurposeType;
 import org.jooq.Condition;
 import org.jooq.DSLContext;
-import org.jooq.Record1;
-import org.jooq.SelectConditionStep;
 import org.jooq.exception.DataAccessException;
 import org.jooq.impl.DSL;
 import org.jspecify.annotations.Nullable;
@@ -70,7 +69,7 @@ public class ChargingProfileRepositoryImpl implements ChargingProfileRepository 
     public void setProfile(int chargingProfilePk, String chargeBoxId, int connectorId) {
         OcppServerRepositoryImpl.insertIgnoreConnector(ctx, chargeBoxId, connectorId);
 
-        SelectConditionStep<Record1<Integer>> connectorPkSelect = ctx.select(CONNECTOR.CONNECTOR_PK)
+        var connectorPkSelect = ctx.select(CONNECTOR.CONNECTOR_PK)
                 .from(CONNECTOR)
                 .where(CONNECTOR.CHARGE_BOX_ID.eq(chargeBoxId))
                 .and(CONNECTOR.CONNECTOR_ID.eq(connectorId));
@@ -83,7 +82,7 @@ public class ChargingProfileRepositoryImpl implements ChargingProfileRepository 
 
     @Override
     public void clearProfile(int chargingProfilePk, String chargeBoxId) {
-        SelectConditionStep<Record1<Integer>> connectorPkSelect =
+        var connectorPkSelect =
                 ctx.select(CONNECTOR.CONNECTOR_PK).from(CONNECTOR).where(CONNECTOR.CHARGE_BOX_ID.eq(chargeBoxId));
 
         ctx.delete(CONNECTOR_CHARGING_PROFILE)
@@ -115,7 +114,6 @@ public class ChargingProfileRepositoryImpl implements ChargingProfileRepository 
         // -------------------------------------------------------------------------
 
         Condition profilePkCondition;
-
         if (purpose == null && stackLevel == null) {
             profilePkCondition = DSL.trueCondition();
         } else {
@@ -254,20 +252,17 @@ public class ChargingProfileRepositoryImpl implements ChargingProfileRepository 
 
     @Override
     public Optional<ChargingProfile.Details> getDetails(int chargingProfilePk) {
-        var profile = ctx.selectFrom(CHARGING_PROFILE)
+        return ctx.selectFrom(CHARGING_PROFILE)
                 .where(CHARGING_PROFILE.CHARGING_PROFILE_PK.eq(chargingProfilePk))
-                .fetchOne();
+                .fetchOptional()
+                .map(profile -> {
+                    var periods = ctx.selectFrom(CHARGING_SCHEDULE_PERIOD)
+                            .where(CHARGING_SCHEDULE_PERIOD.CHARGING_PROFILE_PK.eq(chargingProfilePk))
+                            .orderBy(CHARGING_SCHEDULE_PERIOD.START_PERIOD_IN_SECONDS.asc())
+                            .fetch();
 
-        if (profile == null) {
-            return Optional.empty();
-        }
-
-        var periods = ctx.selectFrom(CHARGING_SCHEDULE_PERIOD)
-                .where(CHARGING_SCHEDULE_PERIOD.CHARGING_PROFILE_PK.eq(chargingProfilePk))
-                .orderBy(CHARGING_SCHEDULE_PERIOD.START_PERIOD_IN_SECONDS.asc())
-                .fetch();
-
-        return Optional.of(new ChargingProfile.Details(profile, periods));
+                    return ChargingProfileMapper.fromRecord(profile, periods);
+                });
     }
 
     @Override
@@ -357,7 +352,7 @@ public class ChargingProfileRepositoryImpl implements ChargingProfileRepository 
                 insertPeriods(ctx, form);
             } catch (DataAccessException e) {
                 throw new SteveException.InternalError(
-                        "Failed to update the charging profile with id '%s'", form.getChargingProfilePk(), e);
+                        "Failed to update the charging profile with id '%s'".formatted(form.getChargingProfilePk()), e);
             }
         });
     }
@@ -380,7 +375,8 @@ public class ChargingProfileRepositoryImpl implements ChargingProfileRepository 
                 .fetch(CONNECTOR.CHARGE_BOX_ID);
         if (!r.isEmpty()) {
             throw new SteveException.InternalError(
-                    "Cannot modify this charging profile, since the following stations are still using it: %s", r);
+                    "Cannot modify this charging profile, since the following stations are still using it: %s"
+                            .formatted(r));
         }
     }
 

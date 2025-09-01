@@ -20,11 +20,9 @@ package de.rwth.idsg.steve.web.controller;
 
 import de.rwth.idsg.steve.service.OcppTagsService;
 import de.rwth.idsg.steve.utils.ControllerHelper;
-import de.rwth.idsg.steve.utils.mapper.OcppTagFormMapper;
 import de.rwth.idsg.steve.web.dto.OcppTagBatchInsertForm;
 import de.rwth.idsg.steve.web.dto.OcppTagForm;
 import de.rwth.idsg.steve.web.dto.OcppTagQueryForm;
-import jooq.steve.db.tables.records.OcppTagActivityRecord;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -85,10 +83,10 @@ public class OcppTagsController {
 
     @RequestMapping(value = DETAILS_PATH, method = RequestMethod.GET)
     public String getDetails(@PathVariable("ocppTagPk") int ocppTagPk, Model model) {
-        OcppTagActivityRecord record = ocppTagsService.getRecord(ocppTagPk);
-        OcppTagForm form = OcppTagFormMapper.toForm(record);
+        var tag = ocppTagsService.getRecord(ocppTagPk);
+        var form = OcppTagForm.fromRecord(tag);
 
-        model.addAttribute("activeTransactionCount", record.getActiveTransactionCount());
+        model.addAttribute("activeTransactionCount", tag.getActiveTransactionCount());
         model.addAttribute("ocppTagForm", form);
         setTags(model);
         return "data-man/ocppTagDetails";

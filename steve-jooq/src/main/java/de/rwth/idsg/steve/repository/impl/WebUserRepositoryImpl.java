@@ -18,18 +18,19 @@
  */
 package de.rwth.idsg.steve.repository.impl;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import de.rwth.idsg.steve.jooq.mapper.WebUserMapper;
 import de.rwth.idsg.steve.repository.WebUserRepository;
+import de.rwth.idsg.steve.repository.dto.WebUser;
+import de.rwth.idsg.steve.service.dto.WebUserOverview;
 import de.rwth.idsg.steve.web.dto.WebUserQueryForm;
-import jooq.steve.db.tables.records.WebUserRecord;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jooq.Condition;
 import org.jooq.DSLContext;
 import org.jooq.Field;
 import org.jooq.JSON;
-import org.jooq.Record4;
-import org.jooq.Result;
-import org.jooq.SelectQuery;
 import org.jooq.impl.DSL;
 import org.jooq.impl.SQLDataType;
 import org.springframework.stereotype.Repository;
@@ -38,6 +39,9 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import static jooq.steve.db.Tables.WEB_USER;
 import static org.jooq.impl.DSL.count;
@@ -52,35 +56,42 @@ import static org.jooq.impl.DSL.count;
 public class WebUserRepositoryImpl implements WebUserRepository {
 
     private final DSLContext ctx;
+    private final ObjectMapper objectMapper;
 
     @Override
-    public void createUser(WebUserRecord user) {
+    public void createUser(WebUser user) {
         ctx.insertInto(WEB_USER)
-                .set(WEB_USER.USERNAME, user.getUsername())
+                .set(WEB_USER.USERNAME, user.getLogin())
                 .set(WEB_USER.PASSWORD, user.getPassword())
                 .set(WEB_USER.API_PASSWORD, user.getApiPassword())
-                .set(WEB_USER.ENABLED, user.getEnabled())
-                .set(WEB_USER.AUTHORITIES, user.getAuthorities())
+                .set(WEB_USER.ENABLED, user.isEnabled())
+                .set(
+                        WEB_USER.AUTHORITIES,
+                        toJSON(user.getAuthorities().stream().map(Enum::name).collect(Collectors.toSet())))
                 .execute();
     }
 
     @Override
-    public void updateUser(WebUserRecord user) {
+    public void updateUser(WebUser user) {
         // To change the password use one of the changePassword methods
         ctx.update(WEB_USER)
-                .set(WEB_USER.ENABLED, user.getEnabled())
-                .set(WEB_USER.AUTHORITIES, user.getAuthorities())
-                .where(WEB_USER.USERNAME.eq(user.getUsername()))
+                .set(WEB_USER.ENABLED, user.isEnabled())
+                .set(
+                        WEB_USER.AUTHORITIES,
+                        toJSON(user.getAuthorities().stream().map(Enum::name).collect(Collectors.toSet())))
+                .where(WEB_USER.USERNAME.eq(user.getLogin()))
                 .execute();
     }
 
     @Override
-    public void updateUserByPk(WebUserRecord user) {
+    public void updateUserByPk(WebUser user) {
         // To change the password use one of the changePassword methods
         ctx.update(WEB_USER)
-                .set(WEB_USER.USERNAME, user.getUsername())
-                .set(WEB_USER.ENABLED, user.getEnabled())
-                .set(WEB_USER.AUTHORITIES, user.getAuthorities())
+                .set(WEB_USER.USERNAME, user.getLogin())
+                .set(WEB_USER.ENABLED, user.isEnabled())
+                .set(
+                        WEB_USER.AUTHORITIES,
+                        toJSON(user.getAuthorities().stream().map(Enum::name).collect(Collectors.toSet())))
                 .where(WEB_USER.WEB_USER_PK.eq(user.getWebUserPk()))
                 .execute();
     }
@@ -104,11 +115,12 @@ public class WebUserRepositoryImpl implements WebUserRepository {
     }
 
     @Override
-    public Integer getUserCountWithAuthority(String authority) {
-        return ctx.selectCount()
+    public int getUserCountWithAuthority(String authority) {
+        var count = ctx.selectCount()
                 .from(WEB_USER)
                 .where(conditionsForAuthorities(Collections.singletonList(authority)))
                 .fetchOne(count());
+        return count != null ? count : 0;
     }
 
     @Override
@@ -145,22 +157,22 @@ public class WebUserRepositoryImpl implements WebUserRepository {
     }
 
     @Override
-    public WebUserRecord loadUserByUsername(String username) {
-        return ctx.selectFrom(WEB_USER).where(WEB_USER.USERNAME.eq(username)).fetchOne();
+    public Optional<WebUser> loadUserByUsername(String username) {
+        return ctx.selectFrom(WEB_USER)
+                .where(WEB_USER.USERNAME.eq(username))
+                .fetchOptional(r -> WebUserMapper.fromRecord(r, objectMapper));
     }
 
     @Override
-    public WebUserRecord loadUserByUserPk(Integer webUserPk) {
+    public Optional<WebUser> loadUserByUserPk(Integer webUserPk) {
         return ctx.selectFrom(WEB_USER)
                 .where(WEB_USER.WEB_USER_PK.eq(webUserPk))
-                .fetchOne();
+                .fetchOptional(r -> WebUserMapper.fromRecord(r, objectMapper));
     }
 
     @Override
-    public Result<Record4<Integer, String, Boolean, JSON>> getOverview(WebUserQueryForm form) {
-        SelectQuery selectQuery = ctx.selectQuery();
-        selectQuery.addFrom(WEB_USER);
-        selectQuery.addSelect(WEB_USER.WEB_USER_PK, WEB_USER.USERNAME, WEB_USER.ENABLED, WEB_USER.AUTHORITIES);
+    public List<WebUserOverview> getOverview(WebUserQueryForm form) {
+        var selectQuery = ctx.selectFrom(WEB_USER).getQuery();
 
         if (form.isSetWebUsername()) {
             selectQuery.addConditions(WEB_USER.USERNAME.eq(form.getWebUsername()));
@@ -171,12 +183,21 @@ public class WebUserRepositoryImpl implements WebUserRepository {
         }
 
         if (form.isSetRoles()) {
-            String[] split = form.getRoles().split(","); // Comma seperated String to StringArray
-            List<String> roles = Arrays.stream(split).map(String::strip).toList();
+            var split = form.getRoles().split(","); // Comma seperated String to StringArray
+            var roles = Arrays.stream(split).map(String::strip).toList();
             selectQuery.addConditions(conditionsForAuthorities(roles));
         }
 
-        return selectQuery.fetch();
+        return selectQuery.fetch().map(r -> WebUserMapper.overviewFromRecord(r, objectMapper));
+    }
+
+    private JSON toJSON(Set<String> authorities) {
+        try {
+            return JSON.valueOf(objectMapper.writeValueAsString(authorities));
+        } catch (JsonProcessingException e) {
+            log.error("Failed to serialize authorities to JSON", e);
+            return JSON.valueOf("[]");
+        }
     }
 
     private static List<Condition> conditionsForAuthorities(List<String> authorities) {

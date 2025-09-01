@@ -16,26 +16,25 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package de.rwth.idsg.steve.repository;
+package de.rwth.idsg.steve.jooq.mapper;
 
-import de.rwth.idsg.steve.repository.dto.DbVersion;
-import de.rwth.idsg.steve.web.dto.Statistics;
+import com.neovisionaries.i18n.CountryCode;
+import de.rwth.idsg.steve.web.dto.Address;
+import jooq.steve.db.tables.records.AddressRecord;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 
-import java.util.Optional;
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
+public final class AddressMapper {
 
-/**
- * @author Sevket Goekay <sevketgokay@gmail.com>
- * @since 19.08.2014
- */
-public interface GenericRepository {
-
-    void checkJavaAndMySQLOffsets();
-
-    Statistics getStats();
-
-    /**
-     * Returns database version of SteVe and last database update timestamp
-     *
-     */
-    Optional<DbVersion> getDBVersion();
+    public static Address fromRecord(AddressRecord r) {
+        var a = new Address();
+        a.setAddressPk(r.getAddressPk());
+        a.setStreet(r.getStreet());
+        a.setHouseNumber(r.getHouseNumber());
+        a.setZipCode(r.getZipCode());
+        a.setCity(r.getCity());
+        a.setCountry(CountryCode.getByCode(r.getCountry()));
+        return a;
+    }
 }

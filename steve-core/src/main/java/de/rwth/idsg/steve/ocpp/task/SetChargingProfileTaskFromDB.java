@@ -22,7 +22,6 @@ import de.rwth.idsg.steve.ocpp.OcppCallback;
 import de.rwth.idsg.steve.repository.ChargingProfileRepository;
 import de.rwth.idsg.steve.repository.dto.ChargingProfile;
 import de.rwth.idsg.steve.web.dto.ocpp.SetChargingProfileParams;
-import jooq.steve.db.tables.records.ChargingProfileRecord;
 import ocpp.cp._2015._10.ChargingProfileKindType;
 import ocpp.cp._2015._10.ChargingProfilePurposeType;
 import ocpp.cp._2015._10.ChargingRateUnitType;
@@ -31,8 +30,7 @@ import ocpp.cp._2015._10.ChargingSchedulePeriod;
 import ocpp.cp._2015._10.RecurrencyKindType;
 import ocpp.cp._2015._10.SetChargingProfileRequest;
 
-import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Optional;
 
 import static de.rwth.idsg.steve.utils.DateTimeUtils.toOffsetDateTime;
 
@@ -64,7 +62,7 @@ public class SetChargingProfileTaskFromDB extends SetChargingProfileTask {
                 addNewResponse(chargeBoxId, statusValue);
 
                 if ("Accepted".equalsIgnoreCase(statusValue)) {
-                    int chargingProfilePk = details.getProfile().getChargingProfilePk();
+                    var chargingProfilePk = details.getChargingProfilePk();
                     chargingProfileRepository.setProfile(chargingProfilePk, chargeBoxId, connectorId);
                 }
             }
@@ -73,9 +71,7 @@ public class SetChargingProfileTaskFromDB extends SetChargingProfileTask {
 
     @Override
     public SetChargingProfileRequest getOcpp16Request() {
-        ChargingProfileRecord profile = details.getProfile();
-
-        List<ChargingSchedulePeriod> schedulePeriods = details.getPeriods().stream()
+        var schedulePeriods = details.getPeriods().stream()
                 .map(k -> {
                     ChargingSchedulePeriod p = new ChargingSchedulePeriod();
                     p.setStartPeriod(k.getStartPeriodInSeconds());
@@ -83,26 +79,27 @@ public class SetChargingProfileTaskFromDB extends SetChargingProfileTask {
                     p.setNumberPhases(k.getNumberPhases());
                     return p;
                 })
-                .collect(Collectors.toList());
+                .toList();
 
-        ChargingSchedule schedule = new ChargingSchedule()
-                .withDuration(profile.getDurationInSeconds())
-                .withStartSchedule(toOffsetDateTime(profile.getStartSchedule()))
-                .withChargingRateUnit(ChargingRateUnitType.fromValue(profile.getChargingRateUnit()))
-                .withMinChargingRate(profile.getMinChargingRate())
+        var schedule = new ChargingSchedule()
+                .withDuration(details.getDurationInSeconds())
+                .withStartSchedule(toOffsetDateTime(details.getStartSchedule()))
+                .withChargingRateUnit(ChargingRateUnitType.fromValue(details.getChargingRateUnit()))
+                .withMinChargingRate(details.getMinChargingRate())
                 .withChargingSchedulePeriod(schedulePeriods);
 
-        ocpp.cp._2015._10.ChargingProfile ocppProfile = new ocpp.cp._2015._10.ChargingProfile()
-                .withChargingProfileId(profile.getChargingProfilePk())
-                .withStackLevel(profile.getStackLevel())
-                .withChargingProfilePurpose(ChargingProfilePurposeType.fromValue(profile.getChargingProfilePurpose()))
-                .withChargingProfileKind(ChargingProfileKindType.fromValue(profile.getChargingProfileKind()))
-                .withRecurrencyKind(
-                        profile.getRecurrencyKind() == null
-                                ? null
-                                : RecurrencyKindType.fromValue(profile.getRecurrencyKind()))
-                .withValidFrom(toOffsetDateTime(profile.getValidFrom()))
-                .withValidTo(toOffsetDateTime(profile.getValidTo()))
+        var ocppProfile = new ocpp.cp._2015._10.ChargingProfile()
+                .withChargingProfileId(details.getChargingProfilePk())
+                .withStackLevel(details.getStackLevel())
+                // .withDescription(details.getDescription())
+                // .withNote(details.getNote())
+                .withChargingProfilePurpose(ChargingProfilePurposeType.fromValue(details.getChargingProfilePurpose()))
+                .withChargingProfileKind(ChargingProfileKindType.fromValue(details.getChargingProfileKind()))
+                .withRecurrencyKind(Optional.ofNullable(details.getRecurrencyKind())
+                        .map(RecurrencyKindType::fromValue)
+                        .orElse(null))
+                .withValidFrom(toOffsetDateTime(details.getValidFrom()))
+                .withValidTo(toOffsetDateTime(details.getValidTo()))
                 .withChargingSchedule(schedule);
 
         var request =

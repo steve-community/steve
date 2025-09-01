@@ -20,7 +20,7 @@ package de.rwth.idsg.steve.service;
 
 import de.rwth.idsg.steve.repository.OcppTagRepository;
 import de.rwth.idsg.steve.repository.SettingsRepository;
-import jooq.steve.db.tables.records.OcppTagActivityRecord;
+import de.rwth.idsg.steve.repository.dto.OcppTagActivity;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import ocpp.cs._2015._10.AuthorizationStatus;
@@ -32,9 +32,6 @@ import java.time.Instant;
 import java.time.OffsetDateTime;
 
 import static de.rwth.idsg.steve.utils.DateTimeUtils.toOffsetDateTime;
-import static de.rwth.idsg.steve.utils.OcppTagActivityRecordUtils.isBlocked;
-import static de.rwth.idsg.steve.utils.OcppTagActivityRecordUtils.isExpired;
-import static de.rwth.idsg.steve.utils.OcppTagActivityRecordUtils.reachedLimitOfActiveTransactions;
 
 @Slf4j
 @Service
@@ -50,50 +47,46 @@ public class AuthTagServiceLocal implements AuthTagService {
             boolean isStartTransactionReqContext,
             @Nullable String chargeBoxId,
             @Nullable Integer connectorId) {
-        OcppTagActivityRecord record = ocppTagRepository.getRecord(idTag);
-        if (record == null) {
+        var tagOpt = ocppTagRepository.getRecord(idTag);
+        if (tagOpt.isEmpty()) {
             log.error("The user with idTag '{}' is INVALID (not present in DB).", idTag);
             return new IdTagInfo().withStatus(AuthorizationStatus.INVALID);
         }
 
-        if (isBlocked(record)) {
+        var tag = tagOpt.get();
+        if (tag.isBlocked()) {
             log.error("The user with idTag '{}' is BLOCKED.", idTag);
-            return new IdTagInfo()
-                    .withStatus(AuthorizationStatus.BLOCKED)
-                    .withParentIdTag(record.getParentIdTag())
-                    .withExpiryDate(getExpiryDateOrDefault(record));
+            return buildIdTagInfo(tag, AuthorizationStatus.BLOCKED);
         }
 
-        if (isExpired(record, Instant.now())) {
+        if (tag.isExpired(Instant.now())) {
             log.error("The user with idTag '{}' is EXPIRED.", idTag);
-            return new IdTagInfo()
-                    .withStatus(AuthorizationStatus.EXPIRED)
-                    .withParentIdTag(record.getParentIdTag())
-                    .withExpiryDate(getExpiryDateOrDefault(record));
+            return buildIdTagInfo(tag, AuthorizationStatus.EXPIRED);
         }
 
         // https://github.com/steve-community/steve/issues/219
-        if (isStartTransactionReqContext && reachedLimitOfActiveTransactions(record)) {
+        if (isStartTransactionReqContext && tag.hasReachedLimitOfActiveTransactions()) {
             log.warn("The user with idTag '{}' is ALREADY in another transaction(s).", idTag);
-            return new IdTagInfo()
-                    .withStatus(AuthorizationStatus.CONCURRENT_TX)
-                    .withParentIdTag(record.getParentIdTag())
-                    .withExpiryDate(getExpiryDateOrDefault(record));
+            return buildIdTagInfo(tag, AuthorizationStatus.CONCURRENT_TX);
         }
 
-        log.debug("The user with idTag '{}' is ACCEPTED.", record.getIdTag());
+        log.debug("The user with idTag '{}' is ACCEPTED.", idTag);
+        return buildIdTagInfo(tag, AuthorizationStatus.ACCEPTED);
+    }
+
+    private IdTagInfo buildIdTagInfo(OcppTagActivity tag, AuthorizationStatus status) {
         return new IdTagInfo()
-                .withStatus(AuthorizationStatus.ACCEPTED)
-                .withParentIdTag(record.getParentIdTag())
-                .withExpiryDate(getExpiryDateOrDefault(record));
+                .withStatus(status)
+                .withParentIdTag(tag.getParentIdTag())
+                .withExpiryDate(getExpiryDateOrDefault(tag));
     }
 
     /**
      * If the database contains an actual expiry, use it. Otherwise, calculate an expiry for cached info
      */
-    private @Nullable OffsetDateTime getExpiryDateOrDefault(OcppTagActivityRecord record) {
-        if (record.getExpiryDate() != null) {
-            return toOffsetDateTime(record.getExpiryDate());
+    private @Nullable OffsetDateTime getExpiryDateOrDefault(OcppTagActivity tag) {
+        if (tag.getExpiryDate() != null) {
+            return toOffsetDateTime(tag.getExpiryDate());
         }
 
         int hoursToExpire = settingsRepository.getHoursToExpire();
@@ -101,8 +94,7 @@ public class AuthTagServiceLocal implements AuthTagService {
         // From web page: The value 0 disables this functionality (i.e. no expiry date will be set).
         if (hoursToExpire == 0) {
             return null;
-        } else {
-            return OffsetDateTime.now().plusHours(hoursToExpire);
         }
+        return OffsetDateTime.now().plusHours(hoursToExpire);
     }
 }

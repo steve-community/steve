@@ -19,29 +19,29 @@
 package de.rwth.idsg.steve.repository.impl;
 
 import de.rwth.idsg.steve.SteveException;
+import de.rwth.idsg.steve.jooq.mapper.OcppTagMapper;
 import de.rwth.idsg.steve.repository.OcppTagRepository;
 import de.rwth.idsg.steve.repository.dto.OcppTag.OcppTagOverview;
+import de.rwth.idsg.steve.repository.dto.OcppTagActivity;
 import de.rwth.idsg.steve.web.dto.OcppTagForm;
 import de.rwth.idsg.steve.web.dto.OcppTagQueryForm;
-import jooq.steve.db.tables.OcppTagActivity;
 import jooq.steve.db.tables.records.OcppTagActivityRecord;
-import jooq.steve.db.tables.records.OcppTagRecord;
 import lombok.extern.slf4j.Slf4j;
 import org.jooq.DSLContext;
 import org.jooq.JoinType;
 import org.jooq.Record10;
 import org.jooq.RecordMapper;
-import org.jooq.Result;
 import org.jooq.SelectQuery;
 import org.jooq.TableField;
 import org.jooq.exception.DataAccessException;
+import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.sql.SQLIntegrityConstraintViolationException;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Optional;
 
 import static de.rwth.idsg.steve.repository.impl.RepositoryUtils.ocppTagByUserIdQuery;
 import static de.rwth.idsg.steve.utils.CustomDSL.includes;
@@ -68,12 +68,11 @@ public class OcppTagRepositoryImpl implements OcppTagRepository {
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public List<OcppTagOverview> getOverview(OcppTagQueryForm form) {
         SelectQuery selectQuery = ctx.selectQuery();
         selectQuery.addFrom(OCPP_TAG_ACTIVITY);
 
-        OcppTagActivity parentTable = OCPP_TAG_ACTIVITY.as("parent");
+        var parentTable = OCPP_TAG_ACTIVITY.as("parent");
 
         selectQuery.addSelect(
                 OCPP_TAG_ACTIVITY.OCPP_TAG_PK,
@@ -115,12 +114,13 @@ public class OcppTagRepositoryImpl implements OcppTagRepository {
             case ALL -> {
                 // want all: no filter
             }
-            case TRUE -> selectQuery.addConditions(OCPP_TAG_ACTIVITY.EXPIRY_DATE.lessOrEqual(LocalDateTime.now()));
+            case TRUE ->
+                selectQuery.addConditions(OCPP_TAG_ACTIVITY.EXPIRY_DATE.lessOrEqual(DSL.currentLocalDateTime()));
             case FALSE ->
                 selectQuery.addConditions(OCPP_TAG_ACTIVITY
                         .EXPIRY_DATE
                         .isNull()
-                        .or(OCPP_TAG_ACTIVITY.EXPIRY_DATE.greaterThan(LocalDateTime.now())));
+                        .or(OCPP_TAG_ACTIVITY.EXPIRY_DATE.greaterThan(DSL.currentLocalDateTime())));
             default -> throw new SteveException.InternalError("Unknown enum type");
         }
 
@@ -131,29 +131,29 @@ public class OcppTagRepositoryImpl implements OcppTagRepository {
     }
 
     @Override
-    public Result<OcppTagActivityRecord> getRecords() {
-        return ctx.selectFrom(OCPP_TAG_ACTIVITY).fetch();
+    public List<OcppTagActivity> getRecords() {
+        return ctx.selectFrom(OCPP_TAG_ACTIVITY).fetch(OcppTagMapper::fromRecord);
     }
 
     @Override
-    public Result<OcppTagActivityRecord> getRecords(List<String> idTagList) {
+    public List<OcppTagActivity> getRecords(List<String> idTagList) {
         return ctx.selectFrom(OCPP_TAG_ACTIVITY)
                 .where(OCPP_TAG_ACTIVITY.ID_TAG.in(idTagList))
-                .fetch();
+                .fetch(OcppTagMapper::fromRecord);
     }
 
     @Override
-    public OcppTagActivityRecord getRecord(String idTag) {
+    public Optional<OcppTagActivity> getRecord(String idTag) {
         return ctx.selectFrom(OCPP_TAG_ACTIVITY)
                 .where(OCPP_TAG_ACTIVITY.ID_TAG.equal(idTag))
-                .fetchOne();
+                .fetchOptional(OcppTagMapper::fromRecord);
     }
 
     @Override
-    public OcppTagActivityRecord getRecord(int ocppTagPk) {
+    public Optional<OcppTagActivity> getRecord(int ocppTagPk) {
         return ctx.selectFrom(OCPP_TAG_ACTIVITY)
                 .where(OCPP_TAG_ACTIVITY.OCPP_TAG_PK.equal(ocppTagPk))
-                .fetchOne();
+                .fetchOptional(OcppTagMapper::fromRecord);
     }
 
     @Override
@@ -184,7 +184,7 @@ public class OcppTagRepositoryImpl implements OcppTagRepository {
                 .and(OCPP_TAG_ACTIVITY
                         .EXPIRY_DATE
                         .isNull()
-                        .or(OCPP_TAG_ACTIVITY.EXPIRY_DATE.greaterThan(LocalDateTime.now())))
+                        .or(OCPP_TAG_ACTIVITY.EXPIRY_DATE.greaterThan(DSL.currentLocalDateTime())))
                 .fetch(OCPP_TAG_ACTIVITY.ID_TAG);
     }
 
@@ -207,8 +207,8 @@ public class OcppTagRepositoryImpl implements OcppTagRepository {
 
     @Override
     public void addOcppTagList(List<String> idTagList) {
-        List<OcppTagRecord> batch =
-                idTagList.stream().map(s -> ctx.newRecord(OCPP_TAG).setIdTag(s)).collect(Collectors.toList());
+        var batch =
+                idTagList.stream().map(s -> ctx.newRecord(OCPP_TAG).setIdTag(s)).toList();
 
         ctx.batchInsert(batch).execute();
     }
@@ -228,10 +228,11 @@ public class OcppTagRepositoryImpl implements OcppTagRepository {
 
         } catch (DataAccessException e) {
             if (e.getCause() instanceof SQLIntegrityConstraintViolationException) {
-                throw new SteveException.AlreadyExists("A user with idTag '%s' already exists.", u.getIdTag());
+                throw new SteveException.AlreadyExists(
+                        "A user with idTag '%s' already exists.".formatted(u.getIdTag()), e);
             } else {
                 throw new SteveException.InternalError(
-                        "Execution of addOcppTag for idTag '%s' FAILED.", u.getIdTag(), e);
+                        "Execution of addOcppTag for idTag '%s' FAILED.".formatted(u.getIdTag()), e);
             }
         }
     }
@@ -248,7 +249,7 @@ public class OcppTagRepositoryImpl implements OcppTagRepository {
                     .execute();
         } catch (DataAccessException e) {
             throw new SteveException.InternalError(
-                    "Execution of updateOcppTag for idTag '%s' FAILED.", u.getIdTag(), e);
+                    "Execution of updateOcppTag for idTag '%s' FAILED.".formatted(u.getIdTag()), e);
         }
     }
 

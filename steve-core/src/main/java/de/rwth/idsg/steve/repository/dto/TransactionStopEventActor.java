@@ -16,26 +16,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package de.rwth.idsg.steve.repository;
+package de.rwth.idsg.steve.repository.dto;
 
-import de.rwth.idsg.steve.repository.dto.DbVersion;
-import de.rwth.idsg.steve.web.dto.Statistics;
-
-import java.util.Optional;
-
-/**
- * @author Sevket Goekay <sevketgokay@gmail.com>
- * @since 19.08.2014
- */
-public interface GenericRepository {
-
-    void checkJavaAndMySQLOffsets();
-
-    Statistics getStats();
-
-    /**
-     * Returns database version of SteVe and last database update timestamp
-     *
-     */
-    Optional<DbVersion> getDBVersion();
+public enum TransactionStopEventActor {
+    STATION,
+    MANUAL
 }

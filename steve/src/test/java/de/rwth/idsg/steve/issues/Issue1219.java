@@ -22,6 +22,7 @@ import de.rwth.idsg.steve.SteveException;
 import de.rwth.idsg.steve.repository.dto.InsertTransactionParams;
 import de.rwth.idsg.steve.repository.dto.OcppTag;
 import de.rwth.idsg.steve.repository.dto.Transaction;
+import de.rwth.idsg.steve.repository.dto.TransactionStopEventActor;
 import de.rwth.idsg.steve.repository.dto.UpdateTransactionParams;
 import de.rwth.idsg.steve.repository.impl.AddressRepositoryImpl;
 import de.rwth.idsg.steve.repository.impl.ChargePointRepositoryImpl;
@@ -32,7 +33,6 @@ import de.rwth.idsg.steve.repository.impl.TransactionRepositoryImpl;
 import de.rwth.idsg.steve.web.dto.OcppTagForm;
 import de.rwth.idsg.steve.web.dto.OcppTagQueryForm;
 import de.rwth.idsg.steve.web.dto.TransactionQueryForm;
-import jooq.steve.db.enums.TransactionStopEventActor;
 import lombok.RequiredArgsConstructor;
 import org.jooq.DSLContext;
 import org.jooq.SQLDialect;
@@ -122,7 +122,7 @@ public class Issue1219 {
                     .stopTimestamp(stopTimestamp)
                     .eventTimestamp(stopTimestamp)
                     .stopMeterValue(transaction.getStartValue() + "0")
-                    .eventActor(TransactionStopEventActor.station)
+                    .eventActor(TransactionStopEventActor.STATION)
                     .build();
 
             ocppServerRepository.updateTransaction(p);
@@ -154,7 +154,7 @@ public class Issue1219 {
     }
 
     private List<String> insertChargeBoxes(int count) {
-        var repository = new ChargePointRepositoryImpl(ctx, new AddressRepositoryImpl());
+        var repository = new ChargePointRepositoryImpl(ctx, new AddressRepositoryImpl(ctx));
 
         List<String> ids = IntStream.range(0, count)
                 .mapToObj(val -> UUID.randomUUID().toString())

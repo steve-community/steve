@@ -34,6 +34,10 @@ public class UnlockConnectorTask extends CommunicationTask<UnlockConnectorParams
         super(params);
     }
 
+    public UnlockConnectorTask(UnlockConnectorParams params, String caller) {
+        super(params, caller);
+    }
+
     @Override
     public OcppCallback<String> defaultCallback() {
         return new StringOcppCallback();

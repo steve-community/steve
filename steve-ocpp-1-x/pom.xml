@@ -9,11 +9,6 @@
 
   <artifactId>steve-ocpp-1-x</artifactId>
 
-  <properties>
-    <jaxb.version>4.0.9</jaxb.version>
-    <plugin.cxf.version>4.1.3</plugin.cxf.version>
-  </properties>
-
   <dependencies>
     <dependency>
       <groupId>de.rwth.idsg</groupId>

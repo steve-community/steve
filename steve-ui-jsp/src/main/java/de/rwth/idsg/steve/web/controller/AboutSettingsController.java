@@ -49,6 +49,8 @@ import jakarta.validation.Valid;
 @RequiredArgsConstructor
 public class AboutSettingsController {
 
+    private static final String PASSWORD_PLACEHOLDER = "********";
+
     private final GenericRepository genericRepository;
     private final LogController logController;
     private final SettingsRepository settingsRepository;
@@ -83,6 +85,9 @@ public class AboutSettingsController {
     @GetMapping(value = SETTINGS_PATH)
     public String getSettings(Model model) {
         var form = settingsRepository.getForm();
+        if (form.getMailSettings().getPassword() != null) {
+            form.getMailSettings().setPassword(PASSWORD_PLACEHOLDER);
+        }
         model.addAttribute("features", NotificationFeature.values());
         model.addAttribute("settingsForm", form);
         return "settings";
@@ -96,6 +101,9 @@ public class AboutSettingsController {
             return "settings";
         }
 
+        if (PASSWORD_PLACEHOLDER.equals(settingsForm.getMailSettings().getPassword())) {
+            settingsForm.getMailSettings().setPassword(null);
+        }
         settingsRepository.update(settingsForm);
         return "redirect:/manager/settings";
     }
@@ -108,8 +116,7 @@ public class AboutSettingsController {
             return "settings";
         }
 
-        settingsRepository.update(settingsForm);
-        mailService.sendTestMail();
+        mailService.sendTestMail(settingsForm.getMailSettings());
 
         return "redirect:/manager/settings";
     }

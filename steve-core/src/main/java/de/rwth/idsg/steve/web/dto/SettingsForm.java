@@ -22,15 +22,18 @@ import de.rwth.idsg.steve.NotificationFeature;
 import de.rwth.idsg.steve.web.validation.EmailCollection;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
 import java.util.List;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.PositiveOrZero;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -44,28 +47,45 @@ import jakarta.validation.constraints.NotNull;
 @ToString
 public class SettingsForm {
 
-    // -------------------------------------------------------------------------
-    // OCPP
-    // -------------------------------------------------------------------------
+    @NotNull @Valid private OcppSettings ocppSettings;
 
-    @Min(value = 0, message = "Heartbeat Interval must be at least {value}") @NotNull(message = "Heartbeat Interval is required") private Integer heartbeat;
+    @NotNull @Valid private MailSettings mailSettings;
 
-    @Min(value = 0, message = "Expiration must be at least {value}") @NotNull(message = "Expiration is required") private Integer expiration;
+    @Data
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class OcppSettings {
+        @PositiveOrZero(message = "Heartbeat Interval must be at least {value}") @NotNull(message = "Heartbeat Interval is required") private int heartbeat;
 
-    // -------------------------------------------------------------------------
-    // Mail notification
-    // -------------------------------------------------------------------------
+        @PositiveOrZero(message = "Expiration must be at least {value}") @NotNull(message = "Expiration is required") private int expiration;
+    }
 
-    @NotNull private Boolean enabled;
+    @Data
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class MailSettings {
+        @NotNull @Builder.Default
+        private boolean enabled = false;
 
-    @Email(message = "'From' field is not a valid e-mail address") private String from;
+        @Builder.Default
+        private String protocol = "smtp";
 
-    private String mailHost, username, password, protocol;
+        private String mailHost;
 
-    @Min(value = 1, message = "Port must be positive") private Integer port;
+        @Positive(message = "Port must be positive") private Integer port;
 
-    @EmailCollection
-    private List<String> recipients;
+        @Email(message = "'From' field is not a valid e-mail address") private String from;
 
-    private List<NotificationFeature> enabledFeatures;
+        private String username;
+        private String password;
+
+        @EmailCollection
+        @Builder.Default
+        private List<String> recipients = List.of();
+
+        @Builder.Default
+        private List<NotificationFeature> enabledFeatures = List.of();
+    }
 }

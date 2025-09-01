@@ -21,12 +21,14 @@ package de.rwth.idsg.steve.repository.impl;
 import de.rwth.idsg.steve.NotificationFeature;
 import de.rwth.idsg.steve.SteveException;
 import de.rwth.idsg.steve.repository.SettingsRepository;
-import de.rwth.idsg.steve.repository.dto.MailSettings;
 import de.rwth.idsg.steve.web.dto.SettingsForm;
+import de.rwth.idsg.steve.web.dto.SettingsForm.MailSettings;
+import de.rwth.idsg.steve.web.dto.SettingsForm.OcppSettings;
 import jooq.steve.db.tables.records.SettingsRecord;
 import lombok.RequiredArgsConstructor;
 import org.jooq.DSLContext;
 import org.jooq.exception.DataAccessException;
+import org.jooq.impl.DSL;
 import org.springframework.stereotype.Repository;
 
 import java.nio.charset.StandardCharsets;
@@ -52,58 +54,28 @@ public class SettingsRepositoryImpl implements SettingsRepository {
             Base64.getEncoder().encode("SteckdosenVerwaltung".getBytes(StandardCharsets.UTF_8)),
             StandardCharsets.UTF_8);
 
-    private static List<String> parseRecipients(SettingsRecord r) {
-        return splitByComma(r.getMailRecipients());
-    }
-
-    private static List<NotificationFeature> parseEnabledFeatures(SettingsRecord r) {
-        return splitByComma(r.getNotificationFeatures()).stream()
-                .map(NotificationFeature::fromName)
-                .toList();
-    }
-
     private final DSLContext ctx;
 
     @Override
     public SettingsForm getForm() {
         var r = getInternal();
 
-        var emails = parseRecipients(r);
-        var features = parseEnabledFeatures(r);
+        var form = new SettingsForm();
+        form.setOcppSettings(mapToOcppSettings(r));
+        form.setMailSettings(mapToMailSettings(r));
+        return form;
+    }
 
-        return SettingsForm.builder()
-                .heartbeat(toMin(r.getHeartbeatIntervalInSeconds()))
-                .expiration(r.getHoursToExpire())
-                .enabled(r.getMailEnabled())
-                .mailHost(r.getMailHost())
-                .username(r.getMailUsername())
-                .password(r.getMailPassword())
-                .from(r.getMailFrom())
-                .protocol(r.getMailProtocol())
-                .port(r.getMailPort())
-                .recipients(emails)
-                .enabledFeatures(features)
-                .build();
+    @Override
+    public OcppSettings getOcppSettings() {
+        var r = getInternal();
+        return mapToOcppSettings(r);
     }
 
     @Override
     public MailSettings getMailSettings() {
         var r = getInternal();
-
-        var eMails = parseRecipients(r);
-        var features = parseEnabledFeatures(r);
-
-        return MailSettings.builder()
-                .enabled(r.getMailEnabled())
-                .mailHost(r.getMailHost())
-                .username(r.getMailUsername())
-                .password(r.getMailPassword())
-                .from(r.getMailFrom())
-                .protocol(r.getMailProtocol())
-                .port(r.getMailPort())
-                .recipients(eMails)
-                .enabledFeatures(features)
-                .build();
+        return mapToMailSettings(r);
     }
 
     @Override
@@ -118,32 +90,90 @@ public class SettingsRepositoryImpl implements SettingsRepository {
 
     @Override
     public void update(SettingsForm form) {
-        var eMails = joinByComma(form.getRecipients());
-        var features = joinByComma(form.getEnabledFeatures());
+        ctx.transaction(configuration -> {
+            var ctx = DSL.using(configuration);
+            try {
+                updateInternal(ctx, form.getOcppSettings());
+                updateInternal(ctx, form.getMailSettings());
+            } catch (DataAccessException e) {
+                throw new SteveException.InternalError("FAILED to save the settings", e);
+            }
+        });
+    }
 
+    @Override
+    public void update(OcppSettings ocppForm) {
         try {
-            ctx.update(SETTINGS)
-                    .set(SETTINGS.HEARTBEAT_INTERVAL_IN_SECONDS, toSec(form.getHeartbeat()))
-                    .set(SETTINGS.HOURS_TO_EXPIRE, form.getExpiration())
-                    .set(SETTINGS.MAIL_ENABLED, form.getEnabled())
-                    .set(SETTINGS.MAIL_HOST, form.getMailHost())
-                    .set(SETTINGS.MAIL_USERNAME, form.getUsername())
-                    .set(SETTINGS.MAIL_PASSWORD, form.getPassword())
-                    .set(SETTINGS.MAIL_FROM, form.getFrom())
-                    .set(SETTINGS.MAIL_PROTOCOL, form.getProtocol())
-                    .set(SETTINGS.MAIL_PORT, form.getPort())
-                    .set(SETTINGS.MAIL_RECIPIENTS, eMails)
-                    .set(SETTINGS.NOTIFICATION_FEATURES, features)
-                    .where(SETTINGS.APP_ID.eq(APP_ID))
-                    .execute();
-
+            updateInternal(ctx, ocppForm);
         } catch (DataAccessException e) {
-            throw new SteveException.InternalError("FAILED to save the settings", e);
+            throw new SteveException.InternalError("FAILED to save Ocpp settings", e);
+        }
+    }
+
+    @Override
+    public void update(MailSettings mailForm) {
+        try {
+            updateInternal(ctx, mailForm);
+        } catch (DataAccessException e) {
+            throw new SteveException.InternalError("FAILED to save mail settings", e);
         }
     }
 
     private SettingsRecord getInternal() {
         return ctx.selectFrom(SETTINGS).where(SETTINGS.APP_ID.eq(APP_ID)).fetchOne();
+    }
+
+    private static void updateInternal(DSLContext ctx, OcppSettings ocppForm) {
+        ctx.update(SETTINGS)
+                .set(SETTINGS.HEARTBEAT_INTERVAL_IN_SECONDS, toSec(ocppForm.getHeartbeat()))
+                .set(SETTINGS.HOURS_TO_EXPIRE, ocppForm.getExpiration())
+                .where(SETTINGS.APP_ID.eq(APP_ID))
+                .execute();
+    }
+
+    private static void updateInternal(DSLContext ctx, MailSettings mailForm) {
+        var eMails = joinByComma(mailForm.getRecipients());
+        var features = joinByComma(mailForm.getEnabledFeatures());
+
+        ctx.update(SETTINGS)
+                .set(SETTINGS.MAIL_ENABLED, mailForm.getEnabled())
+                .set(SETTINGS.MAIL_HOST, mailForm.getMailHost())
+                .set(SETTINGS.MAIL_USERNAME, mailForm.getUsername())
+                .set(SETTINGS.MAIL_PASSWORD, mailForm.getPassword())
+                .set(SETTINGS.MAIL_FROM, mailForm.getFrom())
+                .set(SETTINGS.MAIL_PROTOCOL, mailForm.getProtocol())
+                .set(SETTINGS.MAIL_PORT, mailForm.getPort())
+                .set(SETTINGS.MAIL_RECIPIENTS, eMails)
+                .set(SETTINGS.NOTIFICATION_FEATURES, features)
+                .where(SETTINGS.APP_ID.eq(APP_ID))
+                .execute();
+    }
+
+    private static OcppSettings mapToOcppSettings(SettingsRecord r) {
+        return OcppSettings.builder()
+                .heartbeat(toMin(r.getHeartbeatIntervalInSeconds()))
+                .expiration(r.getHoursToExpire())
+                .build();
+    }
+
+    private static MailSettings mapToMailSettings(SettingsRecord r) {
+        List<String> eMails = splitByComma(r.getMailRecipients());
+
+        List<NotificationFeature> features = splitByComma(r.getNotificationFeatures()).stream()
+                .map(NotificationFeature::fromName)
+                .toList();
+
+        return MailSettings.builder()
+                .enabled(r.getMailEnabled())
+                .mailHost(r.getMailHost())
+                .username(r.getMailUsername())
+                .password(r.getMailPassword())
+                .from(r.getMailFrom())
+                .protocol(r.getMailProtocol())
+                .port(r.getMailPort())
+                .recipients(eMails)
+                .enabledFeatures(features)
+                .build();
     }
 
     private static int toMin(int seconds) {

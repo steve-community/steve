@@ -21,8 +21,8 @@
     <module>steve-ocpp</module>
     <module>steve-ocpp-1-x</module>
     <module>steve-ocpp-2-x</module>
-    <module>steve-ocpp-soap</module>
-    <module>steve-ocpp-websocket</module>
+    <module>steve-ocpp-transport-soap</module>
+    <module>steve-ocpp-transport-websocket</module>
     <module>steve-ui-jsp</module>
   </modules>
 
@@ -72,12 +72,12 @@
       </dependency>
       <dependency>
         <groupId>de.rwth.idsg</groupId>
-        <artifactId>steve-ocpp-soap</artifactId>
+        <artifactId>steve-ocpp-transport-soap</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
         <groupId>de.rwth.idsg</groupId>
-        <artifactId>steve-ocpp-websocket</artifactId>
+        <artifactId>steve-ocpp-transport-websocket</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>

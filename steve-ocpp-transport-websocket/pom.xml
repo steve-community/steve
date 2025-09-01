@@ -7,7 +7,7 @@
     <version>3.8.0-SNAPSHOT</version>
   </parent>
 
-  <artifactId>steve-ocpp-websocket</artifactId>
+  <artifactId>steve-ocpp-transport-websocket</artifactId>
 
   <dependencies>
     <dependency>
@@ -16,7 +16,7 @@
     </dependency>
     <dependency>
       <groupId>de.rwth.idsg</groupId>
-      <artifactId>steve-ocpp-soap</artifactId>
+      <artifactId>steve-ocpp-transport-soap</artifactId>
     </dependency>
 
     <dependency>

@@ -31,9 +31,9 @@ import lombok.ToString;
 import java.util.List;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.PositiveOrZero;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -47,18 +47,18 @@ import jakarta.validation.constraints.Positive;
 @ToString
 public class SettingsForm {
 
-    @Valid private OcppSettings ocppSettings;
+    @NotNull @Valid private OcppSettings ocppSettings;
 
-    @Valid private MailSettings mailSettings;
+    @NotNull @Valid private MailSettings mailSettings;
 
     @Data
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
     public static class OcppSettings {
-        @Min(value = 0, message = "Heartbeat Interval must be at least {value}") @NotNull(message = "Heartbeat Interval is required") private Integer heartbeat;
+        @PositiveOrZero(message = "Heartbeat Interval must be at least {value}") @NotNull(message = "Heartbeat Interval is required") private int heartbeat;
 
-        @Min(value = 0, message = "Expiration must be at least {value}") @NotNull(message = "Expiration is required") private Integer expiration;
+        @PositiveOrZero(message = "Expiration must be at least {value}") @NotNull(message = "Expiration is required") private int expiration;
     }
 
     @Data
@@ -66,9 +66,12 @@ public class SettingsForm {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class MailSettings {
-        @NotNull private Boolean enabled;
+        @NotNull @Builder.Default
+        private boolean enabled = false;
 
-        private String protocol;
+        @Builder.Default
+        private String protocol = "smtp";
+
         private String mailHost;
 
         @Positive(message = "Port must be positive") private Integer port;
@@ -79,8 +82,10 @@ public class SettingsForm {
         private String password;
 
         @EmailCollection
-        private List<String> recipients;
+        @Builder.Default
+        private List<String> recipients = List.of();
 
-        private List<NotificationFeature> enabledFeatures;
+        @Builder.Default
+        private List<NotificationFeature> enabledFeatures = List.of();
     }
 }

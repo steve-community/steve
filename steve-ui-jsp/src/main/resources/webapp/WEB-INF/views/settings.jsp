@@ -34,14 +34,14 @@
     <section><span>OCPP Settings</span></section>
     <table class="userInputFullPage">
         <tr><td>Heartbeat Interval:</td><td>
-            <form:input path="ocppSettings.heartbeat"/>
+            <form:input path="ocppSettings.heartbeat" htmlEscape="true" type="number" min="0"/>
         </td></tr>
         <tr><td><i>
             The time interval in <b>minutes</b> for how often a charge point <br> should request the current time from SteVe.<br>
             The value 0 requests clients to use reasonable default values.
         </i></td><td></td></tr>
         <tr><td>Expiration:</td><td>
-            <form:input path="ocppSettings.expiration"/>
+            <form:input path="ocppSettings.expiration" htmlEscape="true" type="number" min="0"/>
         </td></tr>
         <tr><td><i>
             The amount of time in <b>hours</b> for how long a charge point should cache <br> the authorization info of an
@@ -52,16 +52,21 @@
     <br>
 
     <section><span>
-        Mail Notification Setting
+        Mail Notification Settings
         <a class="tooltip" href="#"><img src="${ctxPath}/static/images/info.png" style="vertical-align:middle">
             <span>Specify the recipients of the notifications by entering one e-mail address per line</span>
         </a>
     </span></section>
     <table class="userInputFullPage">
         <tr><td>Enable Notifications?:</td><td><form:checkbox path="mailSettings.enabled"/></td></tr>
-        <tr><td>Protocol:</td><td><form:input path="mailSettings.protocol"/></td></tr>
+        <tr><td>Protocol:</td><td>
+            <form:select path="mailSettings.protocol">
+                <form:option value="smtp" label="SMTP (STARTTLS)"/>
+                <form:option value="smtps" label="SMTPS (Implicit SSL)"/>
+            </form:select>
+        </td></tr>
         <tr><td>Host:</td><td><form:input path="mailSettings.mailHost"/></td></tr>
-        <tr><td>Port:</td><td><form:input path="mailSettings.port"/></td></tr>
+        <tr><td>Port:</td><td><form:input path="mailSettings.port" htmlEscape="true" type="number" min="0"/></td></tr>
         <tr><td>From:</td><td><form:input path="mailSettings.from"/></td></tr>
         <tr><td>User name:</td><td><form:input path="mailSettings.username"/></td></tr>
         <tr><td>Password:</td><td><form:input path="mailSettings.password"/></td></tr>

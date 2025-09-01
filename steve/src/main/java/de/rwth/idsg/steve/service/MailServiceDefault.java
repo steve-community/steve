@@ -23,8 +23,8 @@ import de.rwth.idsg.steve.SteveException;
 import de.rwth.idsg.steve.config.DelegatingTaskExecutor;
 import de.rwth.idsg.steve.repository.SettingsRepository;
 import de.rwth.idsg.steve.web.dto.SettingsForm.MailSettings;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Properties;
@@ -33,7 +33,6 @@ import jakarta.mail.Message;
 import jakarta.mail.MessagingException;
 import jakarta.mail.PasswordAuthentication;
 import jakarta.mail.Session;
-import jakarta.mail.Transport;
 import jakarta.mail.internet.InternetAddress;
 import jakarta.mail.internet.MimeMessage;
 
@@ -43,13 +42,11 @@ import jakarta.mail.internet.MimeMessage;
  */
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class MailServiceDefault implements MailService {
 
-    @Autowired
-    private SettingsRepository settingsRepository;
-
-    @Autowired
-    private DelegatingTaskExecutor asyncTaskExecutor;
+    private final SettingsRepository settingsRepository;
+    private final DelegatingTaskExecutor asyncTaskExecutor;
 
     @Override
     public MailSettings getSettings() {
@@ -57,9 +54,9 @@ public class MailServiceDefault implements MailService {
     }
 
     @Override
-    public void sendTestMail() {
+    public void sendTestMail(MailSettings settings) {
         try {
-            send("Test", "Test");
+            send("Test", "Test", settings);
         } catch (MessagingException e) {
             throw new SteveException.InternalError("Failed to send mail", e);
         }
@@ -78,19 +75,22 @@ public class MailServiceDefault implements MailService {
 
     @Override
     public void send(String subject, String body) throws MessagingException {
-        MailSettings settings = getSettings();
-        Session session = createSession(settings);
+        send(subject, body, settingsRepository.getMailSettings());
+    }
 
-        Message mail = new MimeMessage(session);
+    private void send(String subject, String body, MailSettings settings) throws MessagingException {
+        var session = createSession(settings);
+
+        var mail = new MimeMessage(session);
         mail.setSubject("[SteVe] " + subject);
         mail.setContent(body, "text/plain");
         mail.setFrom(new InternetAddress(settings.getFrom()));
 
-        for (String rep : settings.getRecipients()) {
+        for (var rep : settings.getRecipients()) {
             mail.addRecipient(Message.RecipientType.TO, new InternetAddress(rep));
         }
 
-        try (Transport transport = session.getTransport()) {
+        try (var transport = session.getTransport()) {
             transport.connect();
             transport.sendMessage(mail, mail.getAllRecipients());
         }
@@ -101,8 +101,8 @@ public class MailServiceDefault implements MailService {
     // -------------------------------------------------------------------------
 
     private static Session createSession(MailSettings settings) {
-        Properties props = new Properties();
-        String protocol = settings.getProtocol();
+        var props = new Properties();
+        var protocol = settings.getProtocol();
 
         props.setProperty("mail.host", "" + settings.getMailHost());
         props.setProperty("mail.transport.protocol", "" + protocol);
@@ -115,8 +115,8 @@ public class MailServiceDefault implements MailService {
             props.setProperty("mail." + protocol + ".starttls.enable", "" + true);
         }
 
-        boolean isUserSet = !Strings.isNullOrEmpty(settings.getUsername());
-        boolean isPassSet = !Strings.isNullOrEmpty(settings.getPassword());
+        var isUserSet = !Strings.isNullOrEmpty(settings.getUsername());
+        var isPassSet = !Strings.isNullOrEmpty(settings.getPassword());
 
         if (isUserSet && isPassSet) {
             props.setProperty("mail." + protocol + ".auth", "" + true);

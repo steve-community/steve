@@ -189,7 +189,7 @@ public class NotificationService {
     private boolean isDisabled(NotificationFeature f) {
         var settings = mailService.getSettings();
 
-        boolean isEnabled = Boolean.TRUE.equals(settings.getEnabled())
+        boolean isEnabled = settings.isEnabled()
                 && settings.getEnabledFeatures().contains(f)
                 && !settings.getRecipients().isEmpty();
 

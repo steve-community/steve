@@ -33,7 +33,6 @@ import org.springframework.stereotype.Repository;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import static de.rwth.idsg.steve.utils.StringUtils.joinByComma;
@@ -120,7 +119,7 @@ public class SettingsRepositoryImpl implements SettingsRepository {
     }
 
     private SettingsRecord getInternal() {
-        return ctx.selectFrom(SETTINGS).where(SETTINGS.APP_ID.eq(APP_ID)).fetchOne();
+        return ctx.selectFrom(SETTINGS).where(SETTINGS.APP_ID.eq(APP_ID)).fetchSingle();
     }
 
     private static void updateInternal(DSLContext ctx, OcppSettings ocppForm) {
@@ -135,11 +134,14 @@ public class SettingsRepositoryImpl implements SettingsRepository {
         var eMails = joinByComma(mailForm.getRecipients());
         var features = joinByComma(mailForm.getEnabledFeatures());
 
-        ctx.update(SETTINGS)
-                .set(SETTINGS.MAIL_ENABLED, mailForm.getEnabled())
+        var updateRequest = ctx.update(SETTINGS)
+                .set(SETTINGS.MAIL_ENABLED, mailForm.isEnabled())
                 .set(SETTINGS.MAIL_HOST, mailForm.getMailHost())
-                .set(SETTINGS.MAIL_USERNAME, mailForm.getUsername())
-                .set(SETTINGS.MAIL_PASSWORD, mailForm.getPassword())
+                .set(SETTINGS.MAIL_USERNAME, mailForm.getUsername());
+        if (mailForm.getPassword() != null) {
+            updateRequest = updateRequest.set(SETTINGS.MAIL_PASSWORD, mailForm.getPassword());
+        }
+        updateRequest
                 .set(SETTINGS.MAIL_FROM, mailForm.getFrom())
                 .set(SETTINGS.MAIL_PROTOCOL, mailForm.getProtocol())
                 .set(SETTINGS.MAIL_PORT, mailForm.getPort())
@@ -157,20 +159,24 @@ public class SettingsRepositoryImpl implements SettingsRepository {
     }
 
     private static MailSettings mapToMailSettings(SettingsRecord r) {
-        List<String> eMails = splitByComma(r.getMailRecipients());
+        var eMails = splitByComma(r.getMailRecipients());
 
-        List<NotificationFeature> features = splitByComma(r.getNotificationFeatures()).stream()
+        var features = splitByComma(r.getNotificationFeatures()).stream()
                 .map(NotificationFeature::fromName)
                 .toList();
 
-        return MailSettings.builder()
-                .enabled(r.getMailEnabled())
-                .mailHost(r.getMailHost())
+        var builder = MailSettings.builder();
+        if (r.getMailEnabled() != null) {
+            builder.enabled(r.getMailEnabled());
+        }
+        builder.mailHost(r.getMailHost())
                 .username(r.getMailUsername())
                 .password(r.getMailPassword())
-                .from(r.getMailFrom())
-                .protocol(r.getMailProtocol())
-                .port(r.getMailPort())
+                .from(r.getMailFrom());
+        if (r.getMailProtocol() != null) {
+            builder.protocol(r.getMailProtocol());
+        }
+        return builder.port(r.getMailPort())
                 .recipients(eMails)
                 .enabledFeatures(features)
                 .build();

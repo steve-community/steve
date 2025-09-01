@@ -30,7 +30,7 @@ public interface MailService {
 
     MailSettings getSettings();
 
-    void sendTestMail();
+    void sendTestMail(MailSettings settings);
 
     void sendAsync(String subject, String body);
 

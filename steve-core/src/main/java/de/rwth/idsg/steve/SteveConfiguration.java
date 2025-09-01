@@ -107,6 +107,8 @@ public class SteveConfiguration {
         private final String userName;
         private final String password;
         private final boolean sqlLogging;
+        private final String schemaSource;
+        private final @Nullable String schema;
     }
 
     // Credentials for Web interface access

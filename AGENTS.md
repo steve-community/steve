@@ -21,7 +21,7 @@ Evolve is designed using a hexagonal architecture (also known as Ports and Adapt
 The other modules act as "adapters" that implement the ports defined in `steve-core` or drive the application.
 
 -   **Database Adapter:** `steve-jooq` implements the database persistence logic using the jOOQ framework. It connects the core application to a MySQL/MariaDB database.
--   **OCPP Adapters:** The `steve-ocpp-*` modules (`steve-ocpp-soap`, `steve-ocpp-websocket`) handle communication with charging stations using different versions and transports of the OCPP protocol.
+-   **OCPP Adapters:** The `steve-ocpp-*` modules handle communication with charging stations using different versions and transports of the OCPP protocol.
 -   **UI Adapter:** `steve-ui-jsp` provides a web-based user interface using JavaServer Pages (JSP).
 
 ### Key Frameworks

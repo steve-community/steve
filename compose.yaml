@@ -1,0 +1,51 @@
+volumes:
+  db-data:
+
+services:
+  db:
+    # Pinning MariaDB to point release 10.4.30 works around the issues with the
+    # database migrations seen with 10.4.31 in issue #1212.
+    #
+    # TODO: Get database migrations to work with the latest point releases of
+    # MariaDB 10.4.
+    image: mariadb:10.4.30
+    restart: unless-stopped
+    #ports:
+    #  - '3306:3306' # expose DB to host if needed only
+    environment:
+      MYSQL_RANDOM_ROOT_PASSWORD: 'yes'
+      MYSQL_DATABASE: stevedb
+      MYSQL_USER: steve
+      MYSQL_PASSWORD: changeme
+    volumes:
+      - db-data:/var/lib/mysql
+      - ./docker/mysql-conf.d:/etc/mysql/conf.d:ro
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "--protocol=tcp", "-h", "127.0.0.1", "-usteve", "-pchangeme"]
+      timeout: 3s
+      retries: 20
+
+  app:
+    build:
+      context: .
+    image: steve:test
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DB_HOST: db #host.docker.internal
+      DB_PORT: 3306
+      DB_DATABASE: stevedb
+      DB_USER: steve
+      DB_PASSWORD: changeme
+      PORT: 8180
+    ports:
+      - '8180:8180'
+      - '8443:8443'
+    healthcheck:
+      # (Spring Boot will be: /actuator/health)
+      test: ['CMD', 'sh', '-c', 'printf "GET / HTTP/1.0\r\n\r\n" | nc -w 2 localhost 8180 >/dev/null 2>&1']
+      interval: 10s
+      timeout: 3s
+      retries: 20

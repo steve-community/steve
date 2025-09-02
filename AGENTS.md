@@ -38,7 +38,7 @@ The easiest way to get the project up and running is by using Docker Compose. Th
 
 To start the project from the repository root, run:
 ```bash
-docker compose -f steve/docker-compose.yml up -d
+docker compose -f compose.yaml up -d
 ```
 The web interface will be available at `http://localhost:8180`.
 
@@ -72,16 +72,18 @@ The default configuration is in `steve/src/main/resources/config/main.properties
 
 ### Maven Profiles and Properties
 
-The project uses two Maven profiles defined in `steve/pom.xml`:
--   `prod`: Active by default. Configured for production usage (e.g., file-based logging).
--   `dev`: Can be activated with `-Pdev`. Configured for development (e.g., console logging).
+The project uses Maven profiles defined in `pom.xml` files that can be activated with the `-P` flag:
+-   `prod`: Active by default. Configured default properties for production usage (e.g., file-based logging).
+-   `dev`: Configured default properties for development (e.g., console logging).
+-   `useTestContainers`: Active by default. Activates the use of Testcontainers for database related generated classes.
+-   `useRealDatabase`: Uses a real database for code generation and migrations.
 
-You can override database properties using the `-D` flag. The primary properties are:
--   `db.ip`
--   `db.port`
+You can override properties using the `-D` flag. The primary properties are:
+-   `db.jdbc.url`
 -   `db.schema`
 -   `db.user`
 -   `db.password`
+-   `server.port`
 
 ### Running the Build
 
@@ -92,7 +94,7 @@ To build the project, run:
 
 Example with overridden properties:
 ```bash
-./mvnw package -Ddb.ip=<ip> -Ddb.port=<port> -Ddb.schema=<schema> -Ddb.user=<username> -Ddb.password=<password>
+./mvnw package -Ddb.jdbc.url=<jdbcUrl> -Ddb.schema=<schema> -Ddb.user=<username> -Ddb.password=<password>
 ```
 
 A runnable JAR file will be created at `steve/target/steve.jar`.
@@ -102,6 +104,11 @@ A runnable JAR file will be created at `steve/target/steve.jar`.
 After building, you can run the application with the following command:
 ```bash
 java -jar steve/target/steve.jar
+```
+
+Example with overridden properties:
+```bash
+java -jar steve/target/steve.jar -Ddb.jdbc.url=<jdbcUrl> -Ddb.schema=<schema> -Ddb.user=<username> -Ddb.password=<password>
 ```
 
 ## Running Tests

@@ -10,13 +10,11 @@
   <artifactId>steve-jooq</artifactId>
 
   <properties>
-    <db.ip>localhost</db.ip>
-    <db.port>3306</db.port>
     <db.schema>stevedb</db.schema>
     <db.user>steve</db.user>
     <db.password>changeme</db.password>
     <!-- In Mysql: schema == database (http://dev.mysql.com/doc/refman/5.6/en/glossary.html#glos_schema) -->
-    <db.jdbcUrl>jdbc:mysql://${db.ip}:${db.port}/${db.schema}?useSSL=true&amp;serverTimezone=UTC</db.jdbcUrl>
+    <db.jdbc.url>jdbc:mysql://localhost:3306/stevedb?useSSL=true&amp;serverTimezone=UTC</db.jdbc.url>
   </properties>
 
   <dependencies>
@@ -90,7 +88,7 @@
 
               <cleanDisabled>true</cleanDisabled>
               <driver>com.mysql.cj.jdbc.Driver</driver>
-              <url>${db.jdbcUrl}</url>
+              <url>${db.jdbc.url}</url>
               <user>${db.user}</user>
               <password>${db.password}</password>
               <schemas>
@@ -135,7 +133,7 @@
             <configuration>
               <jdbc>
                 <driver>com.mysql.cj.jdbc.Driver</driver>
-                <url>${db.jdbcUrl}</url>
+                <url>${db.jdbc.url}</url>
                 <user>${db.user}</user>
                 <password>${db.password}</password>
               </jdbc>

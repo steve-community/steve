@@ -18,7 +18,6 @@
  */
 package de.rwth.idsg.steve.utils;
 
-import com.google.common.base.Splitter;
 import com.google.common.base.Strings;
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.Nullable;
@@ -26,8 +25,6 @@ import org.jspecify.annotations.Nullable;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.Collections;
-import java.util.List;
 import java.util.Optional;
 import java.util.Properties;
 
@@ -66,15 +63,9 @@ public class PropertiesFileLoader {
     // -------------------------------------------------------------------------
 
     public String getString(String key) {
-        var s = prop.getProperty(key);
-        // initial property value might be null/empty
-        s = checkForNullAndEmpty(key, s);
-
-        s = resolveIfSystemEnv(s);
-        // check again, system env value might be null/empty
-        s = checkForNullAndEmpty(key, s);
-
-        return trim(key, s);
+        var value = getOptionalString(key).orElse(null);
+        checkForNullAndEmpty(key, value);
+        return value;
     }
 
     public boolean getBoolean(String key) {
@@ -90,31 +81,17 @@ public class PropertiesFileLoader {
     // -------------------------------------------------------------------------
 
     public Optional<String> getOptionalString(String key) {
-        var s = prop.getProperty(key);
-        if (Strings.isNullOrEmpty(s)) {
+        var value = System.getProperty(key, prop.getProperty(key));
+        if (Strings.isNullOrEmpty(value)) {
             return Optional.empty();
         }
-        s = resolveIfSystemEnv(s);
-        return Optional.ofNullable(trim(key, s));
-    }
-
-    public List<String> getStringList(String key) {
-        var s = prop.getProperty(key);
-        if (Strings.isNullOrEmpty(s)) {
-            return Collections.emptyList();
-        }
-        s = resolveIfSystemEnv(s);
-        return Splitter.on(",").trimResults().omitEmptyStrings().splitToList(s);
+        value = resolveIfSystemEnv(value);
+        return Optional.ofNullable(value).map(v -> trim(key, v));
     }
 
     public Optional<Boolean> getOptionalBoolean(String key) {
         var s = getOptionalString(key);
         return s.map(Boolean::parseBoolean);
-    }
-
-    public Optional<Integer> getOptionalInt(String key) {
-        var s = getOptionalString(key);
-        return s.map(Integer::parseInt);
     }
 
     // -------------------------------------------------------------------------
@@ -165,10 +142,7 @@ public class PropertiesFileLoader {
         return value;
     }
 
-    private static @Nullable String trim(String key, @Nullable String value) {
-        if (value == null) {
-            return null;
-        }
+    private static String trim(String key, String value) {
         var trimmed = value.trim();
         if (!trimmed.equals(value)) {
             log.warn("The property '{}' has leading or trailing spaces which were removed!", key);
@@ -176,13 +150,12 @@ public class PropertiesFileLoader {
         return trimmed;
     }
 
-    private static String checkForNullAndEmpty(String key, @Nullable String value) {
+    private static void checkForNullAndEmpty(String key, @Nullable String value) {
         if (value == null) {
             throw new IllegalArgumentException("The property '" + key + "' is not found");
         }
         if (value.isEmpty()) {
             throw new IllegalArgumentException("The property '" + key + "' has no value set");
         }
-        return value;
     }
 }

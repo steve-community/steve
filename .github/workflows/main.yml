@@ -44,6 +44,7 @@ jobs:
       - name: Build with Maven
         run: |
           ./mvnw -B -V \
+            -Pdev,useRealDatabase \
             -DskipTests=false \
             -Dmaven.javadoc.skip=true \
             -Ddb.host="127.0.0.1" \

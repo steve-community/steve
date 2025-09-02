@@ -24,6 +24,8 @@ import com.zaxxer.hikari.HikariDataSource;
 import de.rwth.idsg.steve.SteveConfiguration;
 import org.jooq.DSLContext;
 import org.jooq.SQLDialect;
+import org.jooq.conf.MappedSchema;
+import org.jooq.conf.RenderMapping;
 import org.jooq.conf.Settings;
 import org.jooq.impl.DSL;
 import org.jooq.impl.DataSourceConnectionProvider;
@@ -91,6 +93,17 @@ public class JooqConfiguration {
                 .withAttachRecords(false)
                 // To log or not to log the sql queries, that is the question
                 .withExecuteLogging(config.getDb().isSqlLogging());
+        var dbSchema = config.getDb().getSchema();
+        if (dbSchema != null && !dbSchema.equals(config.getDb().getSchemaSource())) {
+            // This is needed if the schema in the database is different from the one
+            // that was used to generate the jOOQ classes.
+            // Example: Database schema is "steve", but jOOQ classes were generated with "public".
+            // Note: This does NOT set the default schema for the connection!
+            settings = settings.withRenderMapping(new RenderMapping()
+                    .withSchemata(new MappedSchema()
+                            .withInput(config.getDb().getSchemaSource())
+                            .withOutput(config.getDb().getSchema())));
+        }
 
         // Configuration for JOOQ
         var conf = new DefaultConfiguration()

@@ -71,6 +71,8 @@ public class SteveConfigurationReader {
                         .userName(p.getString("db.user"))
                         .password(p.getString("db.password"))
                         .sqlLogging(p.getBoolean("db.sql.logging"))
+                        .schema(p.getOptionalString("db.schema").orElse(null))
+                        .schemaSource(p.getOptionalString("db.schema-source").orElse("stevedb"))
                         .build())
                 .auth(SteveConfiguration.Auth.builder()
                         .passwordEncoder(encoder)

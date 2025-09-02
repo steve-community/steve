@@ -1,0 +1,23 @@
+services:
+  dev:
+    image: mcr.microsoft.com/devcontainers/java:1-21
+    command: sleep infinity
+    working_dir: /workspace
+    volumes:
+      - ..:/workspace:cached
+      - m2-cache:/home/vscode/.m2
+    environment:
+      DB_HOST: db
+      DB_PORT: 3306
+      DB_DATABASE: stevedb
+      DB_USER: steve
+      DB_PASSWORD: changeme
+      PORT: 8180
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - default
+
+volumes:
+  m2-cache:

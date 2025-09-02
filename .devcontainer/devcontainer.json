@@ -1,0 +1,25 @@
+{
+  "name": "steve-dev",
+  "dockerComposeFile": [
+    "../compose.yaml",
+    "docker-compose.devcontainer.yml"
+  ],
+  "service": "dev",
+  "workspaceFolder": "/workspace",
+  "runServices": ["db", "dev"],
+  "shutdownAction": "stopCompose",
+  "overrideCommand": true,
+  "forwardPorts": [8180, 8443],
+  "containerEnv": {
+    "DB_HOST": "db",
+    "DB_PORT": "3306",
+    "DB_DATABASE": "stevedb",
+    "DB_USER": "steve",
+    "DB_PASSWORD": "changeme",
+    "PORT": "8180"
+  },
+  "mounts": [
+    "source=m2-cache,target=/home/vscode/.m2,type=volume"
+  ],
+  "updateRemoteUserUID": true
+}

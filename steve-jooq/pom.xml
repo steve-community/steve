@@ -11,10 +11,11 @@
 
   <properties>
     <db.schema>stevedb</db.schema>
+    <db.schema-source>stevedb</db.schema-source>
     <db.user>steve</db.user>
     <db.password>changeme</db.password>
     <!-- In Mysql: schema == database (http://dev.mysql.com/doc/refman/5.6/en/glossary.html#glos_schema) -->
-    <db.jdbc.url>jdbc:mysql://localhost:3306/stevedb?useSSL=true&amp;serverTimezone=UTC</db.jdbc.url>
+    <db.jdbc.url>jdbc:mysql://localhost:3306/${db.schema}?sslMode=PREFERRED&amp;serverTimezone=UTC</db.jdbc.url>
   </properties>
 
   <dependencies>
@@ -114,6 +115,7 @@
             <!-- Must be in the same phase as Jooq -->
             <executions>
               <execution>
+                <id>1-flyway</id>
                 <goals>
                   <goal>migrate</goal>
                 </goals>
@@ -123,7 +125,6 @@
           </plugin>
 
           <plugin>
-            <!-- Specify the maven code generator plugin -->
             <groupId>org.jooq</groupId>
             <artifactId>jooq-codegen-maven</artifactId>
             <version>${jooq.version}</version>
@@ -172,8 +173,6 @@
                 </target>
               </generator>
             </configuration>
-
-            <!-- Manage the plugin's dependency -->
             <dependencies>
               <dependency>
                 <groupId>org.jooq</groupId>
@@ -195,6 +194,7 @@
             <!-- The plugin should hook into the generate goal -->
             <executions>
               <execution>
+                <id>2-jooq</id>
                 <goals>
                   <goal>generate</goal>
                 </goals>
@@ -241,7 +241,7 @@
                     <containerImage>mysql:8.0</containerImage>
                     <username>root</username>
                     <!-- Use root because of permissions -->
-                    <databaseName>stevedb</databaseName>
+                    <databaseName>${db.schema}</databaseName>
                   </database>
                   <flyway>
                     <!-- https://github.com/steve-community/steve/issues/157 -->
@@ -272,7 +272,7 @@
                         <includes>.*</includes>
                         <!--excludes>schema_version</excludes-->
                         <!-- Exclude flyway table but used by the project -->
-                        <inputSchema>stevedb</inputSchema>
+                        <inputSchema>${db.schema}</inputSchema>
                         <unsignedTypes>false</unsignedTypes>
 
                         <forcedTypes>

@@ -47,7 +47,7 @@ jobs:
             -Pdev,useRealDatabase \
             -DskipTests=false \
             -Dmaven.javadoc.skip=true \
-            -Ddb.jdbcUrl="jdbc:mysql://localhost:3306/${DB_SCHEMA}?useSSL=true&serverTimezone=UTC" \
+            -Ddb.jdbc.url="jdbc:mysql://127.0.0.1:3306/${DB_SCHEMA}?sslMode=PREFERRED&serverTimezone=UTC" \
             -Ddb.schema="${DB_SCHEMA}" \
             -Ddb.user="${DB_USER}" \
             -Ddb.password="${DB_PASSWORD}" \

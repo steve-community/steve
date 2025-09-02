@@ -32,30 +32,23 @@ WORKDIR /code
 ENV LANG=C.UTF-8 LC_ALL=C.UTF-8
 
 # Build-time DB args (needed by jooq codegen)
-ARG DB_HOST=db
+ARG DB_HOST=localhost
 ARG DB_PORT=3306
-ARG DB_DATABASE=steve
+ARG DB_DATABASE=stevedb
 ARG DB_USER=steve
-ARG DB_PASSWORD=steve
+ARG DB_PASSWORD=changeme
 ARG PORT=8180
-# dockerize version (to wait for DB)
-ARG DOCKERIZE_VERSION=v0.19.0
 
 # Now copy the whole project sources
 COPY . /code
 
-# Install dockerize to wait for DB
-RUN curl -sfL "https://github.com/powerman/dockerize/releases/download/${DOCKERIZE_VERSION}/dockerize-$(uname -s)-$(uname -m)" \
-    | install /dev/stdin /usr/local/bin/dockerize
-
 # Wait for DB, then build
 # TODO should only skip integration tests using a real database and/or testcontainers
 RUN --mount=type=cache,target=/root/.m2 \
-    dockerize -wait tcp://${DB_HOST}:${DB_PORT} -timeout 60s && \
     ./mvnw -B clean package \
       -PuseRealDatabase \
       -DskipTests \
-      -Ddb.jdbc.url="jdbc:mysql://${DB_HOST}:${DB_PORT}/${DB_DATABASE}?useSSL=true&serverTimezone=UTC" \
+      -Ddb.jdbc.url="jdbc:mysql://${DB_HOST}:${DB_PORT}/${DB_DATABASE}?sslMode=PREFERRED&serverTimezone=UTC" \
       -Ddb.schema="${DB_DATABASE}" \
       -Ddb.user="${DB_USER}" \
       -Ddb.password="${DB_PASSWORD}" \
@@ -66,14 +59,23 @@ FROM eclipse-temurin:21-jre
 WORKDIR /app
 ENV LANG=C.UTF-8 LC_ALL=C.UTF-8
 
-ARG DB_HOST=db
-ARG DB_PORT=3306
-ARG DB_DATABASE=steve
-ARG DB_USER=steve
-ARG DB_PASSWORD=steve
-ARG PORT=8180
+ENV DB_HOST=localhost \
+    DB_PORT=3306 \
+    DB_DATABASE=stevedb \
+    DB_USER=steve \
+    DB_PASSWORD=changeme \
+    PORT=8180
 
-ENV JAVA_TOOL_OPTIONS="-Dserver.host=0.0.0.0 -Dhttp.port=${PORT} -Ddb.jdbc.url='jdbc:mysql://${DB_HOST}:${DB_PORT}/${DB_DATABASE}?useSSL=true&serverTimezone=UTC' -Ddb.schema=${DB_DATABASE} -Ddb.user=${DB_USER} -Ddb.password=${DB_PASSWORD} -Djdk.tls.client.protocols='TLSv1,TLSv1.1,TLSv1.2' -Dserver.gzip.enabled=false"
+# Healthcheck dependencies for dev and compose
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends curl netcat-openbsd \
+    && rm -rf /var/lib/apt/lists/*
+
+# (Spring Boot will be: /actuator/health)
+HEALTHCHECK --interval=10s --timeout=3s --retries=20 \
+  CMD curl -fsS "http://127.0.0.1:${PORT}/" || exit 1
+
+ENV JAVA_TOOL_OPTIONS="-Dserver.host=0.0.0.0 -Dhttp.port=${PORT} -Ddb.jdbc.url='jdbc:mysql://${DB_HOST}:${DB_PORT}/${DB_DATABASE}?sslMode=PREFERRED&serverTimezone=UTC' -Ddb.schema=${DB_DATABASE} -Ddb.user=${DB_USER} -Ddb.password=${DB_PASSWORD} -Djdk.tls.client.protocols='TLSv1,TLSv1.1,TLSv1.2' -Dserver.gzip.enabled=false"
 
 RUN addgroup --system app && adduser --system --ingroup app app
 

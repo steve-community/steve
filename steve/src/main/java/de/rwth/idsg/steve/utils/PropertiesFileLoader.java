@@ -81,7 +81,8 @@ public class PropertiesFileLoader {
     // -------------------------------------------------------------------------
 
     public Optional<String> getOptionalString(String key) {
-        var value = System.getProperty(key, prop.getProperty(key));
+        var sys = System.getProperty(key);
+        var value = Strings.isNullOrEmpty(sys) ? prop.getProperty(key) : sys;
         if (Strings.isNullOrEmpty(value)) {
             return Optional.empty();
         }
@@ -145,7 +146,7 @@ public class PropertiesFileLoader {
     private static String trim(String key, String value) {
         var trimmed = value.trim();
         if (!trimmed.equals(value)) {
-            log.warn("The property '{}' has leading or trailing spaces which were removed!", key);
+            log.debug("The property '{}' has leading or trailing spaces which were removed!", key);
         }
         return trimmed;
     }

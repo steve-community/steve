@@ -38,7 +38,7 @@ The easiest way to get the project up and running is by using Docker Compose. Th
 
 To start the project from the repository root, run:
 ```bash
-docker compose -f compose.yaml up -d
+docker compose up -d
 ```
 The web interface will be available at `http://localhost:8180`.
 
@@ -75,7 +75,7 @@ The default configuration is in `steve/src/main/resources/config/main.properties
 The project uses Maven profiles defined in `pom.xml` files that can be activated with the `-P` flag:
 -   `prod`: Active by default. Configured default properties for production usage (e.g., file-based logging).
 -   `dev`: Configured default properties for development (e.g., console logging).
--   `useTestContainers`: Active by default. Activates the use of Testcontainers for database related generated classes.
+-   `useTestContainers`: Active by default. Activates the use of Testcontainers for database-related generated classes.
 -   `useRealDatabase`: Uses a real database for code generation and migrations.
 
 You can override properties using the `-D` flag. The primary properties are:
@@ -108,7 +108,7 @@ java -jar steve/target/steve.jar
 
 Example with overridden properties:
 ```bash
-java -jar steve/target/steve.jar -Ddb.jdbc.url=<jdbcUrl> -Ddb.schema=<schema> -Ddb.user=<username> -Ddb.password=<password>
+java -Ddb.jdbc.url=<jdbcUrl> -Ddb.schema=<schema> -Ddb.user=<username> -Ddb.password=<password> -jar steve/target/steve.jar
 ```
 
 ## Running Tests

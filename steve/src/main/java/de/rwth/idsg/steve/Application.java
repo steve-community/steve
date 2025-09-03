@@ -35,10 +35,12 @@ import java.util.TimeZone;
 @Slf4j
 public class Application {
 
+    private final SteveConfiguration config;
     private final JettyServer server;
 
     public Application(SteveConfiguration config, LogFileRetriever logFileRetriever) {
-        server = new JettyServer(config, logFileRetriever);
+        this.config = config;
+        this.server = new JettyServer(config, logFileRetriever);
     }
 
     public static void main(String[] args) throws Exception {

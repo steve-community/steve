@@ -39,6 +39,8 @@ public class UserQueryForm {
     private String name;
     private String email;
 
+    private OcppTagFilter ocppTagFilter = OcppTagFilter.All;
+
     public boolean isSetUserPk() {
         return userPk != null;
     }
@@ -54,4 +56,11 @@ public class UserQueryForm {
     public boolean isSetEmail() {
         return email != null;
     }
+
+    public enum OcppTagFilter {
+        All,
+        OnlyUsersWithTags,
+        OnlyUsersWithoutTags
+    }
+
 }

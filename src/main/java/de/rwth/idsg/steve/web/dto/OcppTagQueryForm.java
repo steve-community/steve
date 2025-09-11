@@ -60,6 +60,9 @@ public class OcppTagQueryForm {
     @Schema(description = "Query by the note associated with the OCPP tag. The value of this field does not have to exactly match the note. A substring is also accepted.")
     private String note;
 
+    @Schema(description = "Filter by whether the OCPP tag is associated with a user or not. Defaults to All")
+    private UserFilter userFilter = UserFilter.All;
+
     @Schema(hidden = true)
     public boolean isOcppTagPkSet() {
         return ocppTagPk != null;
@@ -121,6 +124,12 @@ public class OcppTagQueryForm {
             }
             throw new IllegalArgumentException(v);
         }
+    }
+
+    public enum UserFilter {
+        All,
+        OnlyTagsWithUser,
+        OnlyTagsWithoutUser
     }
 
     @ToString(callSuper = true)

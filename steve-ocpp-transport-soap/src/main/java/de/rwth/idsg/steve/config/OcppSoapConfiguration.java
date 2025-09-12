@@ -63,25 +63,28 @@ public class OcppSoapConfiguration {
     private final ocpp.cs._2015._10.CentralSystemService ocpp16Server;
 
     private final PhaseInterceptor<Message> messageHeaderInterceptor;
+    private final LoggingFeatureProxy loggingFeatureProxy;
 
     public OcppSoapConfiguration(
             CentralSystemService ocpp12Server,
             ocpp.cs._2012._06.CentralSystemService ocpp15Server,
             ocpp.cs._2015._10.CentralSystemService ocpp16Server,
             @Qualifier("messageHeaderInterceptor") PhaseInterceptor<Message> messageHeaderInterceptor,
-            SteveConfiguration config) {
+            SteveConfiguration config,
+            LoggingFeatureProxy loggingFeatureProxy) {
         this.config = config;
         this.ocpp12Server = ocpp12Server;
         this.ocpp15Server = ocpp15Server;
         this.ocpp16Server = ocpp16Server;
         this.messageHeaderInterceptor = messageHeaderInterceptor;
+        this.loggingFeatureProxy = loggingFeatureProxy;
     }
 
     @PostConstruct
     public void init() {
         List<Interceptor<? extends Message>> interceptors =
                 asList(new MessageIdInterceptor(), messageHeaderInterceptor);
-        List<Feature> logging = singletonList(LoggingFeatureProxy.INSTANCE.get());
+        List<Feature> logging = singletonList(loggingFeatureProxy.get());
 
         createOcppService(ocpp12Server, "/CentralSystemServiceOCPP12", interceptors, logging);
         createOcppService(ocpp15Server, "/CentralSystemServiceOCPP15", interceptors, logging);

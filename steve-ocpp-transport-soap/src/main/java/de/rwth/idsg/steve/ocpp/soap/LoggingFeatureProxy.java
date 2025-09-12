@@ -22,6 +22,7 @@ import org.apache.cxf.ext.logging.LoggingFeature;
 import org.apache.cxf.ext.logging.event.LogEvent;
 import org.apache.cxf.ext.logging.slf4j.Slf4jEventSender;
 import org.apache.cxf.ext.logging.slf4j.Slf4jVerboseEventSender;
+import org.springframework.stereotype.Component;
 
 /**
  * Since {@link Slf4jEventSender} logs only the message and {@link Slf4jVerboseEventSender} logs everything, this
@@ -30,12 +31,12 @@ import org.apache.cxf.ext.logging.slf4j.Slf4jVerboseEventSender;
  * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 03.04.2018
  */
-public enum LoggingFeatureProxy {
-    INSTANCE;
+@Component
+public final class LoggingFeatureProxy {
 
     private final LoggingFeature feature;
 
-    LoggingFeatureProxy() {
+    public LoggingFeatureProxy() {
         feature = new LoggingFeature();
         feature.setSender(new CustomSlf4jEventSender());
     }

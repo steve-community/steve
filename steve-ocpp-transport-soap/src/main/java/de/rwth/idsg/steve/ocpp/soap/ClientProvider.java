@@ -40,8 +40,10 @@ import jakarta.xml.ws.soap.SOAPBinding;
 public class ClientProvider {
 
     private final @Nullable TLSClientParameters tlsClientParams;
+    private final LoggingFeatureProxy loggingFeatureProxy;
 
-    public ClientProvider(SteveConfiguration config) {
+    public ClientProvider(SteveConfiguration config, LoggingFeatureProxy loggingFeatureProxy) {
+        this.loggingFeatureProxy = loggingFeatureProxy;
         var jettyConfig = config.getJetty();
         if (shouldInitSSL(jettyConfig)) {
             tlsClientParams = new TLSClientParameters();
@@ -65,10 +67,10 @@ public class ClientProvider {
         return clientObject;
     }
 
-    private static JaxWsProxyFactoryBean getBean(String endpointAddress) {
+    private JaxWsProxyFactoryBean getBean(String endpointAddress) {
         var f = new JaxWsProxyFactoryBean();
         f.setBindingId(SOAPBinding.SOAP12HTTP_BINDING);
-        f.getFeatures().add(LoggingFeatureProxy.INSTANCE.get());
+        f.getFeatures().add(loggingFeatureProxy.get());
         f.getFeatures().add(new WSAddressingFeature());
         f.setAddress(endpointAddress);
         return f;

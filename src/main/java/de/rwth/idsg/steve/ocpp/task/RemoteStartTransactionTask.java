@@ -18,9 +18,14 @@
  */
 package de.rwth.idsg.steve.ocpp.task;
 
+import de.rwth.idsg.steve.SteveException;
 import de.rwth.idsg.steve.ocpp.CommunicationTask;
 import de.rwth.idsg.steve.ocpp.OcppCallback;
+import de.rwth.idsg.steve.repository.ChargingProfileRepository;
+import de.rwth.idsg.steve.repository.dto.ChargingProfile;
+import de.rwth.idsg.steve.utils.mapper.ChargingProfileDetailsMapper;
 import de.rwth.idsg.steve.web.dto.ocpp.RemoteStartTransactionParams;
+import ocpp.cp._2015._10.ChargingProfilePurposeType;
 
 import jakarta.xml.ws.AsyncHandler;
 
@@ -30,8 +35,12 @@ import jakarta.xml.ws.AsyncHandler;
  */
 public class RemoteStartTransactionTask extends CommunicationTask<RemoteStartTransactionParams, String> {
 
-    public RemoteStartTransactionTask(RemoteStartTransactionParams params) {
+    private final ChargingProfileRepository chargingProfileRepository;
+
+    public RemoteStartTransactionTask(RemoteStartTransactionParams params,
+                                      ChargingProfileRepository chargingProfileRepository) {
         super(params);
+        this.chargingProfileRepository = chargingProfileRepository;
     }
 
     @Override
@@ -53,14 +62,23 @@ public class RemoteStartTransactionTask extends CommunicationTask<RemoteStartTra
                 .withConnectorId(params.getConnectorId());
     }
 
-    /**
-     * TODO: RemoteStartTransactionRequest.chargingProfile not implemented
-     */
     @Override
     public ocpp.cp._2015._10.RemoteStartTransactionRequest getOcpp16Request() {
+        ocpp.cp._2015._10.ChargingProfile chargingProfile = null;
+
+        Integer chargingProfilePk = params.getChargingProfilePk();
+        if (chargingProfilePk != null) {
+            ChargingProfile.Details details = chargingProfileRepository.getDetails(chargingProfilePk);
+            chargingProfile = ChargingProfileDetailsMapper.mapToOcpp(details);
+            if (chargingProfile.getChargingProfilePurpose() != ChargingProfilePurposeType.TX_PROFILE) {
+                throw new SteveException("ChargingProfilePurposeType is not TX_PROFILE");
+            }
+        }
+
         return new ocpp.cp._2015._10.RemoteStartTransactionRequest()
                 .withIdTag(params.getIdTag())
-                .withConnectorId(params.getConnectorId());
+                .withConnectorId(params.getConnectorId())
+                .withChargingProfile(chargingProfile);
     }
 
     @Override

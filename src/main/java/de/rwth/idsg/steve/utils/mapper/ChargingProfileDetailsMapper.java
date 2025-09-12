@@ -27,9 +27,12 @@ import lombok.NoArgsConstructor;
 import ocpp.cp._2015._10.ChargingProfileKindType;
 import ocpp.cp._2015._10.ChargingProfilePurposeType;
 import ocpp.cp._2015._10.ChargingRateUnitType;
+import ocpp.cp._2015._10.ChargingSchedule;
+import ocpp.cp._2015._10.ChargingSchedulePeriod;
 import ocpp.cp._2015._10.RecurrencyKindType;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -37,6 +40,39 @@ import java.util.List;
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class ChargingProfileDetailsMapper {
+
+    public static ocpp.cp._2015._10.ChargingProfile mapToOcpp(ChargingProfile.Details details) {
+        ChargingProfileRecord profile = details.getProfile();
+
+        List<ChargingSchedulePeriod> schedulePeriods =
+            details.getPeriods()
+                .stream()
+                .map(k -> {
+                    ChargingSchedulePeriod p = new ChargingSchedulePeriod();
+                    p.setStartPeriod(k.getStartPeriodInSeconds());
+                    p.setLimit(k.getPowerLimit());
+                    p.setNumberPhases(k.getNumberPhases());
+                    return p;
+                })
+                .collect(Collectors.toList());
+
+        ChargingSchedule schedule = new ChargingSchedule()
+            .withDuration(profile.getDurationInSeconds())
+            .withStartSchedule(profile.getStartSchedule())
+            .withChargingRateUnit(ChargingRateUnitType.fromValue(profile.getChargingRateUnit()))
+            .withMinChargingRate(profile.getMinChargingRate())
+            .withChargingSchedulePeriod(schedulePeriods);
+
+        return new ocpp.cp._2015._10.ChargingProfile()
+            .withChargingProfileId(profile.getChargingProfilePk())
+            .withStackLevel(profile.getStackLevel())
+            .withChargingProfilePurpose(ChargingProfilePurposeType.fromValue(profile.getChargingProfilePurpose()))
+            .withChargingProfileKind(ChargingProfileKindType.fromValue(profile.getChargingProfileKind()))
+            .withRecurrencyKind(profile.getRecurrencyKind() == null ? null : RecurrencyKindType.fromValue(profile.getRecurrencyKind()))
+            .withValidFrom(profile.getValidFrom())
+            .withValidTo(profile.getValidTo())
+            .withChargingSchedule(schedule);
+    }
 
     public static ChargingProfileForm mapToForm(ChargingProfile.Details details) {
         ChargingProfileRecord profile = details.getProfile();

@@ -44,6 +44,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
+import java.util.function.BiConsumer;
+
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 05.01.2025
@@ -56,185 +58,153 @@ public class ChargePointServiceInvokerImpl implements ChargePointServiceInvoker 
     private final ChargePointServiceSoapInvoker chargePointServiceSoapInvoker;
     private final ChargePointServiceJsonInvoker chargePointServiceJsonInvoker;
 
-    // -------------------------------------------------------------------------
-    // since Ocpp 1.2
-    // -------------------------------------------------------------------------
+    private <T extends CommunicationTask<?, ?>> void invoke(
+            ChargePointSelect cp,
+            T task,
+            BiConsumer<ChargePointSelect, T> soapAction,
+            BiConsumer<ChargePointSelect, T> jsonAction) {
+        if (cp.isSoap()) {
+            soapAction.accept(cp, task);
+        } else {
+            jsonAction.accept(cp, task);
+        }
+    }
 
     @Override
     public void reset(ChargePointSelect cp, ResetTask task) {
-        if (cp.isSoap()) {
-            chargePointServiceSoapInvoker.reset(cp, task);
-        } else {
-            chargePointServiceJsonInvoker.reset(cp, task);
-        }
+        invoke(cp, task, chargePointServiceSoapInvoker::reset, chargePointServiceJsonInvoker::reset);
     }
 
     @Override
     public void clearCache(ChargePointSelect cp, ClearCacheTask task) {
-        if (cp.isSoap()) {
-            chargePointServiceSoapInvoker.clearCache(cp, task);
-        } else {
-            chargePointServiceJsonInvoker.clearCache(cp, task);
-        }
+        invoke(cp, task, chargePointServiceSoapInvoker::clearCache, chargePointServiceJsonInvoker::clearCache);
     }
 
     @Override
     public void getDiagnostics(ChargePointSelect cp, GetDiagnosticsTask task) {
-        if (cp.isSoap()) {
-            chargePointServiceSoapInvoker.getDiagnostics(cp, task);
-        } else {
-            chargePointServiceJsonInvoker.getDiagnostics(cp, task);
-        }
+        invoke(cp, task, chargePointServiceSoapInvoker::getDiagnostics, chargePointServiceJsonInvoker::getDiagnostics);
     }
 
     @Override
     public void updateFirmware(ChargePointSelect cp, UpdateFirmwareTask task) {
-        if (cp.isSoap()) {
-            chargePointServiceSoapInvoker.updateFirmware(cp, task);
-        } else {
-            chargePointServiceJsonInvoker.updateFirmware(cp, task);
-        }
+        invoke(cp, task, chargePointServiceSoapInvoker::updateFirmware, chargePointServiceJsonInvoker::updateFirmware);
     }
 
     @Override
     public void unlockConnector(ChargePointSelect cp, UnlockConnectorTask task) {
-        if (cp.isSoap()) {
-            chargePointServiceSoapInvoker.unlockConnector(cp, task);
-        } else {
-            chargePointServiceJsonInvoker.unlockConnector(cp, task);
-        }
+        invoke(
+                cp,
+                task,
+                chargePointServiceSoapInvoker::unlockConnector,
+                chargePointServiceJsonInvoker::unlockConnector);
     }
 
     public void changeAvailability(ChargePointSelect cp, ChangeAvailabilityTask task) {
-        if (cp.isSoap()) {
-            chargePointServiceSoapInvoker.changeAvailability(cp, task);
-        } else {
-            chargePointServiceJsonInvoker.changeAvailability(cp, task);
-        }
+        invoke(
+                cp,
+                task,
+                chargePointServiceSoapInvoker::changeAvailability,
+                chargePointServiceJsonInvoker::changeAvailability);
     }
 
     @Override
     public void changeConfiguration(ChargePointSelect cp, ChangeConfigurationTask task) {
-        if (cp.isSoap()) {
-            chargePointServiceSoapInvoker.changeConfiguration(cp, task);
-        } else {
-            chargePointServiceJsonInvoker.changeConfiguration(cp, task);
-        }
+        invoke(
+                cp,
+                task,
+                chargePointServiceSoapInvoker::changeConfiguration,
+                chargePointServiceJsonInvoker::changeConfiguration);
     }
 
     @Override
     public void remoteStartTransaction(ChargePointSelect cp, RemoteStartTransactionTask task) {
-        if (cp.isSoap()) {
-            chargePointServiceSoapInvoker.remoteStartTransaction(cp, task);
-        } else {
-            chargePointServiceJsonInvoker.remoteStartTransaction(cp, task);
-        }
+        invoke(
+                cp,
+                task,
+                chargePointServiceSoapInvoker::remoteStartTransaction,
+                chargePointServiceJsonInvoker::remoteStartTransaction);
     }
 
     @Override
     public void remoteStopTransaction(ChargePointSelect cp, RemoteStopTransactionTask task) {
-        if (cp.isSoap()) {
-            chargePointServiceSoapInvoker.remoteStopTransaction(cp, task);
-        } else {
-            chargePointServiceJsonInvoker.remoteStopTransaction(cp, task);
-        }
+        invoke(
+                cp,
+                task,
+                chargePointServiceSoapInvoker::remoteStopTransaction,
+                chargePointServiceJsonInvoker::remoteStopTransaction);
     }
-
-    // -------------------------------------------------------------------------
-    // since Ocpp 1.5
-    // -------------------------------------------------------------------------
 
     @Override
     public void dataTransfer(ChargePointSelect cp, DataTransferTask task) {
-        if (cp.isSoap()) {
-            chargePointServiceSoapInvoker.dataTransfer(cp, task);
-        } else {
-            chargePointServiceJsonInvoker.dataTransfer(cp, task);
-        }
+        invoke(cp, task, chargePointServiceSoapInvoker::dataTransfer, chargePointServiceJsonInvoker::dataTransfer);
     }
 
     @Override
     public void getConfiguration(ChargePointSelect cp, GetConfigurationTask task) {
-        if (cp.isSoap()) {
-            chargePointServiceSoapInvoker.getConfiguration(cp, task);
-        } else {
-            chargePointServiceJsonInvoker.getConfiguration(cp, task);
-        }
+        invoke(
+                cp,
+                task,
+                chargePointServiceSoapInvoker::getConfiguration,
+                chargePointServiceJsonInvoker::getConfiguration);
     }
 
     @Override
     public void getLocalListVersion(ChargePointSelect cp, GetLocalListVersionTask task) {
-        if (cp.isSoap()) {
-            chargePointServiceSoapInvoker.getLocalListVersion(cp, task);
-        } else {
-            chargePointServiceJsonInvoker.getLocalListVersion(cp, task);
-        }
+        invoke(
+                cp,
+                task,
+                chargePointServiceSoapInvoker::getLocalListVersion,
+                chargePointServiceJsonInvoker::getLocalListVersion);
     }
 
     @Override
     public void sendLocalList(ChargePointSelect cp, SendLocalListTask task) {
-        if (cp.isSoap()) {
-            chargePointServiceSoapInvoker.sendLocalList(cp, task);
-        } else {
-            chargePointServiceJsonInvoker.sendLocalList(cp, task);
-        }
+        invoke(cp, task, chargePointServiceSoapInvoker::sendLocalList, chargePointServiceJsonInvoker::sendLocalList);
     }
 
     @Override
     public void reserveNow(ChargePointSelect cp, ReserveNowTask task) {
-        if (cp.isSoap()) {
-            chargePointServiceSoapInvoker.reserveNow(cp, task);
-        } else {
-            chargePointServiceJsonInvoker.reserveNow(cp, task);
-        }
+        invoke(cp, task, chargePointServiceSoapInvoker::reserveNow, chargePointServiceJsonInvoker::reserveNow);
     }
 
     @Override
     public void cancelReservation(ChargePointSelect cp, CancelReservationTask task) {
-        if (cp.isSoap()) {
-            chargePointServiceSoapInvoker.cancelReservation(cp, task);
-        } else {
-            chargePointServiceJsonInvoker.cancelReservation(cp, task);
-        }
+        invoke(
+                cp,
+                task,
+                chargePointServiceSoapInvoker::cancelReservation,
+                chargePointServiceJsonInvoker::cancelReservation);
     }
-
-    // -------------------------------------------------------------------------
-    // since Ocpp 1.6
-    // -------------------------------------------------------------------------
 
     @Override
     public void clearChargingProfile(ChargePointSelect cp, ClearChargingProfileTask task) {
-        if (cp.isSoap()) {
-            chargePointServiceSoapInvoker.clearChargingProfile(cp, task);
-        } else {
-            chargePointServiceJsonInvoker.clearChargingProfile(cp, task);
-        }
+        invoke(
+                cp,
+                task,
+                chargePointServiceSoapInvoker::clearChargingProfile,
+                chargePointServiceJsonInvoker::clearChargingProfile);
     }
 
     @Override
     public void setChargingProfile(ChargePointSelect cp, SetChargingProfileTask task) {
-        if (cp.isSoap()) {
-            chargePointServiceSoapInvoker.setChargingProfile(cp, task);
-        } else {
-            chargePointServiceJsonInvoker.setChargingProfile(cp, task);
-        }
+        invoke(
+                cp,
+                task,
+                chargePointServiceSoapInvoker::setChargingProfile,
+                chargePointServiceJsonInvoker::setChargingProfile);
     }
 
     @Override
     public void getCompositeSchedule(ChargePointSelect cp, GetCompositeScheduleTask task) {
-        if (cp.isSoap()) {
-            chargePointServiceSoapInvoker.getCompositeSchedule(cp, task);
-        } else {
-            chargePointServiceJsonInvoker.getCompositeSchedule(cp, task);
-        }
+        invoke(
+                cp,
+                task,
+                chargePointServiceSoapInvoker::getCompositeSchedule,
+                chargePointServiceJsonInvoker::getCompositeSchedule);
     }
 
     @Override
     public void triggerMessage(ChargePointSelect cp, TriggerMessageTask task) {
-        if (cp.isSoap()) {
-            chargePointServiceSoapInvoker.triggerMessage(cp, task);
-        } else {
-            chargePointServiceJsonInvoker.triggerMessage(cp, task);
-        }
+        invoke(cp, task, chargePointServiceSoapInvoker::triggerMessage, chargePointServiceJsonInvoker::triggerMessage);
     }
 }

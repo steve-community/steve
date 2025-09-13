@@ -18,43 +18,56 @@
  */
 package de.rwth.idsg.steve.ocpp.task;
 
-import de.rwth.idsg.steve.ocpp.Ocpp16AndAboveTask;
+import de.rwth.idsg.steve.ocpp.CommunicationTask;
 import de.rwth.idsg.steve.ocpp.OcppCallback;
+import de.rwth.idsg.steve.ocpp.OcppVersion;
+import de.rwth.idsg.steve.ocpp.task.impl.OcppVersionHandler;
+import de.rwth.idsg.steve.ocpp.task.impl.TaskDefinition;
 import de.rwth.idsg.steve.web.dto.ocpp.TriggerMessageParams;
 import ocpp.cp._2015._10.MessageTrigger;
+import ocpp.cp._2015._10.TriggerMessageResponse;
 
-import jakarta.xml.ws.AsyncHandler;
+import java.util.Map;
 
-/**
- * @author Sevket Goekay <sevketgokay@gmail.com>
- * @since 13.03.2018
- */
-public class TriggerMessageTask extends Ocpp16AndAboveTask<TriggerMessageParams, String> {
+public class TriggerMessageTask extends CommunicationTask<TriggerMessageParams, String> {
+
+    private static final TaskDefinition<TriggerMessageParams, String> TASK_DEFINITION =
+            TaskDefinition.<TriggerMessageParams, String>builder()
+                    .versionHandlers(Map.of(
+                            OcppVersion.V_16,
+                            new OcppVersionHandler<>(
+                                    task -> new ocpp.cp._2015._10.TriggerMessageRequest()
+                                            .withConnectorId(task.getParams().getConnectorId())
+                                            .withRequestedMessage(MessageTrigger.fromValue(task.getParams()
+                                                    .getTriggerMessage()
+                                                    .value())),
+                                    (TriggerMessageResponse r) -> r.getStatus().value())))
+                    .build();
 
     public TriggerMessageTask(TriggerMessageParams params) {
-        super(params);
+        super(params, TASK_DEFINITION);
+    }
+
+    public TriggerMessageTask(TriggerMessageParams params, String caller) {
+        super(params, caller, TASK_DEFINITION);
     }
 
     @Override
     public OcppCallback<String> defaultCallback() {
-        return new StringOcppCallback();
-    }
+        return new OcppCallback<>() {
+            @Override
+            public void success(String chargeBoxId, String response) {
+                addNewResponse(chargeBoxId, response);
+            }
 
-    @Override
-    public ocpp.cp._2015._10.TriggerMessageRequest getOcpp16Request() {
-        return new ocpp.cp._2015._10.TriggerMessageRequest()
-                .withConnectorId(params.getConnectorId())
-                .withRequestedMessage(
-                        MessageTrigger.fromValue(params.getTriggerMessage().value()));
-    }
+            @Override
+            public void successError(String chargeBoxId, Object error) {
+                addNewError(chargeBoxId, error.toString());
+            }
 
-    @Override
-    public AsyncHandler<ocpp.cp._2015._10.TriggerMessageResponse> getOcpp16Handler(String chargeBoxId) {
-        return res -> {
-            try {
-                success(chargeBoxId, res.get().getStatus().value());
-            } catch (Exception e) {
-                failed(chargeBoxId, e);
+            @Override
+            public void failed(String chargeBoxId, Exception e) {
+                addNewError(chargeBoxId, e.getMessage());
             }
         };
     }

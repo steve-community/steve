@@ -16,19 +16,18 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package de.rwth.idsg.steve.ocpp;
+package de.rwth.idsg.steve.ocpp.task.impl;
 
+import de.rwth.idsg.ocpp.jaxb.RequestType;
+import de.rwth.idsg.ocpp.jaxb.ResponseType;
+import de.rwth.idsg.steve.ocpp.CommunicationTask;
+import de.rwth.idsg.steve.web.dto.ocpp.ChargePointSelection;
 import lombok.Getter;
-import lombok.Setter;
-import org.jspecify.annotations.Nullable;
+import lombok.RequiredArgsConstructor;
 
-/**
- * @author Sevket Goekay <sevketgokay@gmail.com>
- * @since 13.10.2015
- */
+@RequiredArgsConstructor
 @Getter
-@Setter
-public class RequestResult<T> {
-    private @Nullable T response;
-    private @Nullable String errorMessage;
+public class OcppVersionHandler<S extends ChargePointSelection, U> {
+    private final RequestMapper<? extends CommunicationTask<S, U>, ? extends RequestType> requestMapper;
+    private final ResponseMapper<? extends ResponseType, U> responseMapper;
 }

@@ -16,19 +16,17 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package de.rwth.idsg.steve.ocpp;
+package de.rwth.idsg.steve.ocpp.task.impl;
 
+import de.rwth.idsg.steve.ocpp.OcppVersion;
+import de.rwth.idsg.steve.web.dto.ocpp.ChargePointSelection;
+import lombok.Builder;
 import lombok.Getter;
-import lombok.Setter;
-import org.jspecify.annotations.Nullable;
 
-/**
- * @author Sevket Goekay <sevketgokay@gmail.com>
- * @since 13.10.2015
- */
+import java.util.Map;
+
+@Builder
 @Getter
-@Setter
-public class RequestResult<T> {
-    private @Nullable T response;
-    private @Nullable String errorMessage;
+public class TaskDefinition<S extends ChargePointSelection, U> {
+    private final Map<OcppVersion, OcppVersionHandler<S, U>> versionHandlers;
 }

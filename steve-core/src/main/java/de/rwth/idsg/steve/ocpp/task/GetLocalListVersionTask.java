@@ -18,55 +18,56 @@
  */
 package de.rwth.idsg.steve.ocpp.task;
 
-import de.rwth.idsg.steve.ocpp.Ocpp15AndAboveTask;
+import de.rwth.idsg.steve.ocpp.CommunicationTask;
 import de.rwth.idsg.steve.ocpp.OcppCallback;
+import de.rwth.idsg.steve.ocpp.OcppVersion;
+import de.rwth.idsg.steve.ocpp.task.impl.OcppVersionHandler;
+import de.rwth.idsg.steve.ocpp.task.impl.TaskDefinition;
 import de.rwth.idsg.steve.web.dto.ocpp.MultipleChargePointSelect;
 
-import jakarta.xml.ws.AsyncHandler;
+import java.util.Map;
 
-/**
- * @author Sevket Goekay <sevketgokay@gmail.com>
- * @since 09.03.2018
- */
-public class GetLocalListVersionTask extends Ocpp15AndAboveTask<MultipleChargePointSelect, String> {
+public class GetLocalListVersionTask extends CommunicationTask<MultipleChargePointSelect, String> {
+
+    private static final TaskDefinition<MultipleChargePointSelect, String> TASK_DEFINITION =
+            TaskDefinition.<MultipleChargePointSelect, String>builder()
+                    .versionHandlers(Map.of(
+                            OcppVersion.V_15,
+                                    new OcppVersionHandler<>(
+                                            task -> new ocpp.cp._2012._06.GetLocalListVersionRequest(),
+                                            (ocpp.cp._2012._06.GetLocalListVersionResponse r) ->
+                                                    String.valueOf(r.getListVersion())),
+                            OcppVersion.V_16,
+                                    new OcppVersionHandler<>(
+                                            task -> new ocpp.cp._2015._10.GetLocalListVersionRequest(),
+                                            (ocpp.cp._2015._10.GetLocalListVersionResponse r) ->
+                                                    String.valueOf(r.getListVersion()))))
+                    .build();
 
     public GetLocalListVersionTask(MultipleChargePointSelect params) {
-        super(params);
+        super(params, TASK_DEFINITION);
+    }
+
+    public GetLocalListVersionTask(MultipleChargePointSelect params, String caller) {
+        super(params, caller, TASK_DEFINITION);
     }
 
     @Override
     public OcppCallback<String> defaultCallback() {
-        return new StringOcppCallback();
-    }
-
-    @Override
-    public ocpp.cp._2012._06.GetLocalListVersionRequest getOcpp15Request() {
-        return new ocpp.cp._2012._06.GetLocalListVersionRequest();
-    }
-
-    @Override
-    public ocpp.cp._2015._10.GetLocalListVersionRequest getOcpp16Request() {
-        return new ocpp.cp._2015._10.GetLocalListVersionRequest();
-    }
-
-    @Override
-    public AsyncHandler<ocpp.cp._2012._06.GetLocalListVersionResponse> getOcpp15Handler(String chargeBoxId) {
-        return res -> {
-            try {
-                success(chargeBoxId, String.valueOf(res.get().getListVersion()));
-            } catch (Exception e) {
-                failed(chargeBoxId, e);
+        return new OcppCallback<>() {
+            @Override
+            public void success(String chargeBoxId, String response) {
+                addNewResponse(chargeBoxId, response);
             }
-        };
-    }
 
-    @Override
-    public AsyncHandler<ocpp.cp._2015._10.GetLocalListVersionResponse> getOcpp16Handler(String chargeBoxId) {
-        return res -> {
-            try {
-                success(chargeBoxId, String.valueOf(res.get().getListVersion()));
-            } catch (Exception e) {
-                failed(chargeBoxId, e);
+            @Override
+            public void successError(String chargeBoxId, Object error) {
+                addNewError(chargeBoxId, error.toString());
+            }
+
+            @Override
+            public void failed(String chargeBoxId, Exception e) {
+                addNewError(chargeBoxId, e.getMessage());
             }
         };
     }

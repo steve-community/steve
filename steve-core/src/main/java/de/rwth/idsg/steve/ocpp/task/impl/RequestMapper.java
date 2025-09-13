@@ -16,34 +16,12 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package de.rwth.idsg.steve.ocpp;
+package de.rwth.idsg.steve.ocpp.task.impl;
 
 import de.rwth.idsg.ocpp.jaxb.RequestType;
-import de.rwth.idsg.ocpp.jaxb.ResponseType;
-import de.rwth.idsg.steve.web.dto.ocpp.ChargePointSelection;
+import de.rwth.idsg.steve.ocpp.CommunicationTask;
 
-import jakarta.xml.ws.AsyncHandler;
-
-/**
- * @author Sevket Goekay <sevketgokay@gmail.com>
- * @since 30.10.2018
- */
-public abstract class Ocpp16AndAboveTask<S extends ChargePointSelection, RESPONSE>
-        extends Ocpp15AndAboveTask<S, RESPONSE> {
-
-    public Ocpp16AndAboveTask(S params) {
-        super(params);
-    }
-
-    @Deprecated
-    @Override
-    public <T extends RequestType> T getOcpp15Request() {
-        throw new RuntimeException("Not supported");
-    }
-
-    @Deprecated
-    @Override
-    public <T extends ResponseType> AsyncHandler<T> getOcpp15Handler(String chargeBoxId) {
-        throw new RuntimeException("Not supported");
-    }
+@FunctionalInterface
+public interface RequestMapper<T extends CommunicationTask<?, ?>, R extends RequestType> {
+    R map(T task);
 }

@@ -18,54 +18,62 @@
  */
 package de.rwth.idsg.steve.ocpp.task;
 
-import de.rwth.idsg.steve.ocpp.Ocpp16AndAboveTask;
+import de.rwth.idsg.steve.ocpp.CommunicationTask;
 import de.rwth.idsg.steve.ocpp.OcppCallback;
+import de.rwth.idsg.steve.ocpp.OcppVersion;
+import de.rwth.idsg.steve.ocpp.task.impl.OcppVersionHandler;
+import de.rwth.idsg.steve.ocpp.task.impl.TaskDefinition;
 import de.rwth.idsg.steve.repository.ChargingProfileRepository;
 import de.rwth.idsg.steve.web.dto.ocpp.ClearChargingProfileFilterType;
 import de.rwth.idsg.steve.web.dto.ocpp.ClearChargingProfileParams;
 import lombok.extern.slf4j.Slf4j;
 import ocpp.cp._2015._10.ClearChargingProfileRequest;
+import ocpp.cp._2015._10.ClearChargingProfileResponse;
 
-import jakarta.xml.ws.AsyncHandler;
+import java.util.Map;
 
-/**
- * @author Sevket Goekay <sevketgokay@gmail.com>
- * @since 13.03.2018
- */
 @Slf4j
-public class ClearChargingProfileTask extends Ocpp16AndAboveTask<ClearChargingProfileParams, String> {
+public class ClearChargingProfileTask extends CommunicationTask<ClearChargingProfileParams, String> {
 
-    private final ChargingProfileRepository chargingProfileRepository;
+    private static final TaskDefinition<ClearChargingProfileParams, String> TASK_DEFINITION =
+            TaskDefinition.<ClearChargingProfileParams, String>builder()
+                    .versionHandlers(Map.of(
+                            OcppVersion.V_16,
+                            new OcppVersionHandler<>(
+                                    task -> new ClearChargingProfileRequest()
+                                            .withId(task.getParams().getChargingProfilePk())
+                                            .withConnectorId(task.getParams().getConnectorId())
+                                            .withChargingProfilePurpose(
+                                                    task.getParams().getChargingProfilePurpose())
+                                            .withStackLevel(task.getParams().getStackLevel()),
+                                    (ClearChargingProfileResponse r) ->
+                                            r.getStatus().value())))
+                    .build();
 
     public ClearChargingProfileTask(
-            ClearChargingProfileParams params, ChargingProfileRepository chargingProfileRepository) {
-        super(params);
-        this.chargingProfileRepository = chargingProfileRepository;
-    }
+            ClearChargingProfileParams params, ChargingProfileRepository chargingProfileRepository, String caller) {
+        super(params, caller, TASK_DEFINITION);
 
-    @Override
-    public OcppCallback<String> defaultCallback() {
-        return new DefaultOcppCallback<String>() {
+        addCallback(new OcppCallback<>() {
             @Override
             public void success(String chargeBoxId, String statusValue) {
                 addNewResponse(chargeBoxId, statusValue);
 
-                switch (params.getFilterType()) {
+                switch (getParams().getFilterType()) {
                     case ChargingProfileId ->
-                        chargingProfileRepository.clearProfile(params.getChargingProfilePk(), chargeBoxId);
+                        chargingProfileRepository.clearProfile(getParams().getChargingProfilePk(), chargeBoxId);
                     case OtherParameters ->
                         chargingProfileRepository.clearProfile(
                                 chargeBoxId,
-                                params.getConnectorId(),
-                                params.getChargingProfilePurpose(),
-                                params.getStackLevel());
+                                getParams().getConnectorId(),
+                                getParams().getChargingProfilePurpose(),
+                                getParams().getStackLevel());
                     default -> {
                         log.warn("Unexpected {} enum value", ClearChargingProfileFilterType.class.getSimpleName());
                         return;
                     }
                 }
 
-                // https://github.com/steve-community/steve/pull/968
                 if (!"Accepted".equalsIgnoreCase(statusValue)) {
                     log.info(
                             "Deleted charging profile(s) for chargebox '{}' from DB even though the response was {}",
@@ -73,25 +81,40 @@ public class ClearChargingProfileTask extends Ocpp16AndAboveTask<ClearChargingPr
                             statusValue);
                 }
             }
-        };
+
+            @Override
+            public void successError(String chargeBoxId, Object error) {
+                addNewError(chargeBoxId, error.toString());
+            }
+
+            @Override
+            public void failed(String chargeBoxId, Exception e) {
+                addNewError(chargeBoxId, e.getMessage());
+            }
+        });
+    }
+
+    public ClearChargingProfileTask(
+            ClearChargingProfileParams params, ChargingProfileRepository chargingProfileRepository) {
+        this(params, chargingProfileRepository, "SteVe");
     }
 
     @Override
-    public ocpp.cp._2015._10.ClearChargingProfileRequest getOcpp16Request() {
-        return new ClearChargingProfileRequest()
-                .withId(params.getChargingProfilePk())
-                .withConnectorId(params.getConnectorId())
-                .withChargingProfilePurpose(params.getChargingProfilePurpose())
-                .withStackLevel(params.getStackLevel());
-    }
+    public OcppCallback<String> defaultCallback() {
+        return new OcppCallback<>() {
+            @Override
+            public void success(String chargeBoxId, String response) {
+                addNewResponse(chargeBoxId, response);
+            }
 
-    @Override
-    public AsyncHandler<ocpp.cp._2015._10.ClearChargingProfileResponse> getOcpp16Handler(String chargeBoxId) {
-        return res -> {
-            try {
-                success(chargeBoxId, res.get().getStatus().value());
-            } catch (Exception e) {
-                failed(chargeBoxId, e);
+            @Override
+            public void successError(String chargeBoxId, Object error) {
+                addNewError(chargeBoxId, error.toString());
+            }
+
+            @Override
+            public void failed(String chargeBoxId, Exception e) {
+                addNewError(chargeBoxId, e.getMessage());
             }
         };
     }

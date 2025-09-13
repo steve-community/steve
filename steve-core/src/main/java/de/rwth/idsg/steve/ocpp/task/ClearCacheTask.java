@@ -20,69 +20,59 @@ package de.rwth.idsg.steve.ocpp.task;
 
 import de.rwth.idsg.steve.ocpp.CommunicationTask;
 import de.rwth.idsg.steve.ocpp.OcppCallback;
+import de.rwth.idsg.steve.ocpp.OcppVersion;
+import de.rwth.idsg.steve.ocpp.task.impl.OcppVersionHandler;
+import de.rwth.idsg.steve.ocpp.task.impl.TaskDefinition;
 import de.rwth.idsg.steve.web.dto.ocpp.MultipleChargePointSelect;
 
-import jakarta.xml.ws.AsyncHandler;
+import java.util.Map;
 
-/**
- * @author Sevket Goekay <sevketgokay@gmail.com>
- * @since 09.03.2018
- */
 public class ClearCacheTask extends CommunicationTask<MultipleChargePointSelect, String> {
 
+    private static final TaskDefinition<MultipleChargePointSelect, String> TASK_DEFINITION =
+            TaskDefinition.<MultipleChargePointSelect, String>builder()
+                    .versionHandlers(Map.of(
+                            OcppVersion.V_12,
+                                    new OcppVersionHandler<>(
+                                            task -> new ocpp.cp._2010._08.ClearCacheRequest(),
+                                            (ocpp.cp._2010._08.ClearCacheResponse r) ->
+                                                    r.getStatus().value()),
+                            OcppVersion.V_15,
+                                    new OcppVersionHandler<>(
+                                            task -> new ocpp.cp._2012._06.ClearCacheRequest(),
+                                            (ocpp.cp._2012._06.ClearCacheResponse r) ->
+                                                    r.getStatus().value()),
+                            OcppVersion.V_16,
+                                    new OcppVersionHandler<>(
+                                            task -> new ocpp.cp._2015._10.ClearCacheRequest(),
+                                            (ocpp.cp._2015._10.ClearCacheResponse r) ->
+                                                    r.getStatus().value())))
+                    .build();
+
     public ClearCacheTask(MultipleChargePointSelect params) {
-        super(params);
+        super(params, TASK_DEFINITION);
+    }
+
+    public ClearCacheTask(MultipleChargePointSelect params, String caller) {
+        super(params, caller, TASK_DEFINITION);
     }
 
     @Override
     public OcppCallback<String> defaultCallback() {
-        return new StringOcppCallback();
-    }
-
-    @Override
-    public ocpp.cp._2010._08.ClearCacheRequest getOcpp12Request() {
-        return new ocpp.cp._2010._08.ClearCacheRequest();
-    }
-
-    @Override
-    public ocpp.cp._2012._06.ClearCacheRequest getOcpp15Request() {
-        return new ocpp.cp._2012._06.ClearCacheRequest();
-    }
-
-    @Override
-    public ocpp.cp._2015._10.ClearCacheRequest getOcpp16Request() {
-        return new ocpp.cp._2015._10.ClearCacheRequest();
-    }
-
-    @Override
-    public AsyncHandler<ocpp.cp._2010._08.ClearCacheResponse> getOcpp12Handler(String chargeBoxId) {
-        return res -> {
-            try {
-                success(chargeBoxId, res.get().getStatus().value());
-            } catch (Exception e) {
-                failed(chargeBoxId, e);
+        return new OcppCallback<>() {
+            @Override
+            public void success(String chargeBoxId, String response) {
+                addNewResponse(chargeBoxId, response);
             }
-        };
-    }
 
-    @Override
-    public AsyncHandler<ocpp.cp._2012._06.ClearCacheResponse> getOcpp15Handler(String chargeBoxId) {
-        return res -> {
-            try {
-                success(chargeBoxId, res.get().getStatus().value());
-            } catch (Exception e) {
-                failed(chargeBoxId, e);
+            @Override
+            public void successError(String chargeBoxId, Object error) {
+                addNewError(chargeBoxId, error.toString());
             }
-        };
-    }
 
-    @Override
-    public AsyncHandler<ocpp.cp._2015._10.ClearCacheResponse> getOcpp16Handler(String chargeBoxId) {
-        return res -> {
-            try {
-                ClearCacheTask.this.success(chargeBoxId, res.get().getStatus().value());
-            } catch (Exception e) {
-                ClearCacheTask.this.failed(chargeBoxId, e);
+            @Override
+            public void failed(String chargeBoxId, Exception e) {
+                addNewError(chargeBoxId, e.getMessage());
             }
         };
     }

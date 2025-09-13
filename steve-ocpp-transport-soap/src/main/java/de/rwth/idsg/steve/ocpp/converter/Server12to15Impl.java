@@ -45,16 +45,16 @@ import ocpp.cs._2012._06.StartTransactionRequest;
 import ocpp.cs._2012._06.StatusNotificationRequest;
 import ocpp.cs._2012._06.StopTransactionRequest;
 import org.jspecify.annotations.Nullable;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * @author Andreas Heuvels <andreas.heuvels@rwth-aachen.de>
  * @since 07.03.18
  */
-public enum Server12to15Impl implements Server12to15 {
-    SINGLETON;
+@Component
+public final class Server12to15Impl implements Server12to15 {
 
     // -------------------------------------------------------------------------
     // Requests
@@ -96,7 +96,7 @@ public enum Server12to15Impl implements Server12to15 {
                 .map(e -> new MeterValue()
                         .withTimestamp(e.getTimestamp())
                         .withValue(new MeterValue.Value().withValue(Integer.toString(e.getValue()))))
-                .collect(Collectors.toList());
+                .toList();
 
         return new MeterValuesRequest()
                 .withConnectorId(request.getConnectorId())

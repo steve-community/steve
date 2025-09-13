@@ -21,7 +21,7 @@ package de.rwth.idsg.steve.ocpp.soap;
 import de.rwth.idsg.steve.ocpp.OcppProtocol;
 import de.rwth.idsg.steve.ocpp.OcppVersion;
 import de.rwth.idsg.steve.ocpp.converter.Convert;
-import de.rwth.idsg.steve.ocpp.converter.Server15to16Impl;
+import de.rwth.idsg.steve.ocpp.converter.Server15to16;
 import de.rwth.idsg.steve.service.CentralSystemService16_Service;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -75,15 +75,16 @@ import jakarta.xml.ws.soap.SOAPBinding;
 public class CentralSystemService15_SoapServer implements CentralSystemService {
 
     private final CentralSystemService16_Service service;
+    private final Server15to16 server15to16;
 
     public BootNotificationResponse bootNotificationWithTransport(
             BootNotificationRequest parameters, String chargeBoxIdentity, OcppProtocol protocol) {
         if (protocol.getVersion() != OcppVersion.V_15) {
             throw new IllegalArgumentException("Unexpected OCPP version: " + protocol.getVersion());
         }
-        return Convert.start(parameters, Server15to16Impl.SINGLETON::convertRequest)
+        return Convert.start(parameters, server15to16::convertRequest)
                 .andThen(req -> service.bootNotification(req, chargeBoxIdentity, protocol))
-                .andThen(Server15to16Impl.SINGLETON::convertResponse)
+                .andThen(server15to16::convertResponse)
                 .apply(parameters);
     }
 
@@ -95,75 +96,75 @@ public class CentralSystemService15_SoapServer implements CentralSystemService {
     @Override
     public FirmwareStatusNotificationResponse firmwareStatusNotification(
             FirmwareStatusNotificationRequest parameters, String chargeBoxIdentity) {
-        return Convert.start(parameters, Server15to16Impl.SINGLETON::convertRequest)
+        return Convert.start(parameters, server15to16::convertRequest)
                 .andThen(req -> service.firmwareStatusNotification(req, chargeBoxIdentity))
-                .andThen(Server15to16Impl.SINGLETON::convertResponse)
+                .andThen(server15to16::convertResponse)
                 .apply(parameters);
     }
 
     @Override
     public StatusNotificationResponse statusNotification(
             StatusNotificationRequest parameters, String chargeBoxIdentity) {
-        return Convert.start(parameters, Server15to16Impl.SINGLETON::convertRequest)
+        return Convert.start(parameters, server15to16::convertRequest)
                 .andThen(req -> service.statusNotification(req, chargeBoxIdentity))
-                .andThen(Server15to16Impl.SINGLETON::convertResponse)
+                .andThen(server15to16::convertResponse)
                 .apply(parameters);
     }
 
     @Override
     public MeterValuesResponse meterValues(MeterValuesRequest parameters, String chargeBoxIdentity) {
-        return Convert.start(parameters, Server15to16Impl.SINGLETON::convertRequest)
+        return Convert.start(parameters, server15to16::convertRequest)
                 .andThen(req -> service.meterValues(req, chargeBoxIdentity))
-                .andThen(Server15to16Impl.SINGLETON::convertResponse)
+                .andThen(server15to16::convertResponse)
                 .apply(parameters);
     }
 
     @Override
     public DiagnosticsStatusNotificationResponse diagnosticsStatusNotification(
             DiagnosticsStatusNotificationRequest parameters, String chargeBoxIdentity) {
-        return Convert.start(parameters, Server15to16Impl.SINGLETON::convertRequest)
+        return Convert.start(parameters, server15to16::convertRequest)
                 .andThen(req -> service.diagnosticsStatusNotification(req, chargeBoxIdentity))
-                .andThen(Server15to16Impl.SINGLETON::convertResponse)
+                .andThen(server15to16::convertResponse)
                 .apply(parameters);
     }
 
     @Override
     public StartTransactionResponse startTransaction(StartTransactionRequest parameters, String chargeBoxIdentity) {
-        return Convert.start(parameters, Server15to16Impl.SINGLETON::convertRequest)
+        return Convert.start(parameters, server15to16::convertRequest)
                 .andThen(req -> service.startTransaction(req, chargeBoxIdentity))
-                .andThen(Server15to16Impl.SINGLETON::convertResponse)
+                .andThen(server15to16::convertResponse)
                 .apply(parameters);
     }
 
     @Override
     public StopTransactionResponse stopTransaction(StopTransactionRequest parameters, String chargeBoxIdentity) {
-        return Convert.start(parameters, Server15to16Impl.SINGLETON::convertRequest)
+        return Convert.start(parameters, server15to16::convertRequest)
                 .andThen(req -> service.stopTransaction(req, chargeBoxIdentity))
-                .andThen(Server15to16Impl.SINGLETON::convertResponse)
+                .andThen(server15to16::convertResponse)
                 .apply(parameters);
     }
 
     @Override
     public HeartbeatResponse heartbeat(HeartbeatRequest parameters, String chargeBoxIdentity) {
-        return Convert.start(parameters, Server15to16Impl.SINGLETON::convertRequest)
+        return Convert.start(parameters, server15to16::convertRequest)
                 .andThen(req -> service.heartbeat(req, chargeBoxIdentity))
-                .andThen(Server15to16Impl.SINGLETON::convertResponse)
+                .andThen(server15to16::convertResponse)
                 .apply(parameters);
     }
 
     @Override
     public AuthorizeResponse authorize(AuthorizeRequest parameters, String chargeBoxIdentity) {
-        return Convert.start(parameters, Server15to16Impl.SINGLETON::convertRequest)
+        return Convert.start(parameters, server15to16::convertRequest)
                 .andThen(req -> service.authorize(req, chargeBoxIdentity))
-                .andThen(Server15to16Impl.SINGLETON::convertResponse)
+                .andThen(server15to16::convertResponse)
                 .apply(parameters);
     }
 
     @Override
     public DataTransferResponse dataTransfer(DataTransferRequest parameters, String chargeBoxIdentity) {
-        return Convert.start(parameters, Server15to16Impl.SINGLETON::convertRequest)
+        return Convert.start(parameters, server15to16::convertRequest)
                 .andThen(req -> service.dataTransfer(req, chargeBoxIdentity))
-                .andThen(Server15to16Impl.SINGLETON::convertResponse)
+                .andThen(server15to16::convertResponse)
                 .apply(parameters);
     }
 

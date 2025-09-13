@@ -55,16 +55,16 @@ import ocpp.cs._2015._10.StopTransactionRequest;
 import ocpp.cs._2015._10.UnitOfMeasure;
 import ocpp.cs._2015._10.ValueFormat;
 import org.jspecify.annotations.Nullable;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 13.03.2018
  */
-public enum Server15to16Impl implements Server15to16 {
-    SINGLETON;
+@Component
+public final class Server15to16Impl implements Server15to16 {
 
     // -------------------------------------------------------------------------
     // Requests
@@ -111,7 +111,7 @@ public enum Server15to16Impl implements Server15to16 {
     public MeterValuesRequest convertRequest(ocpp.cs._2012._06.MeterValuesRequest request) {
         List<MeterValue> values16 = request.getValues().stream()
                 .map(Server15to16Impl::toOcpp16MeterValue)
-                .collect(Collectors.toList());
+                .toList();
 
         return new MeterValuesRequest()
                 .withTransactionId(request.getTransactionId())
@@ -302,7 +302,7 @@ public enum Server15to16Impl implements Server15to16 {
     }
 
     private static List<SampledValue> toOcpp16SampledValueList(List<ocpp.cs._2012._06.MeterValue.Value> vals) {
-        return vals.stream().map(Server15to16Impl::toOcpp16SampledValue).collect(Collectors.toList());
+        return vals.stream().map(Server15to16Impl::toOcpp16SampledValue).toList();
     }
 
     private static MeterValue toOcpp16MeterValue(ocpp.cs._2012._06.MeterValue e) {
@@ -315,6 +315,6 @@ public enum Server15to16Impl implements Server15to16 {
         return transactionData.stream()
                 .flatMap(data -> data.getValues().stream())
                 .map(Server15to16Impl::toOcpp16MeterValue)
-                .collect(Collectors.toList());
+                .toList();
     }
 }

@@ -26,7 +26,6 @@ import lombok.extern.slf4j.Slf4j;
 import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
-import java.util.stream.Collectors;
 
 /**
  * The name of this class was inspired by UFO (Unidentified flying object) and enterprise software development.
@@ -49,7 +48,7 @@ public class UnidentifiedIncomingObjectService {
         return objectsHolder.asMap().values().stream()
                 .sorted(Comparator.comparingInt(UnidentifiedIncomingObject::getNumberOfAttempts)
                         .reversed())
-                .collect(Collectors.toList());
+                .toList();
     }
 
     public void processNewUnidentified(String key) {

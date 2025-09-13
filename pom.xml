@@ -36,16 +36,16 @@
     <plugin.license-maven.version>5.0.0</plugin.license-maven.version>
     <plugin.cxf.version>4.1.3</plugin.cxf.version>
 
-    <lombok.version>1.18.38</lombok.version>
+    <lombok.version>1.18.40</lombok.version>
     <jetty.version>12.0.18</jetty.version>
     <mysql.jdbc.version>9.4.0</mysql.jdbc.version>
     <owasp-encoder.version>1.3.1</owasp-encoder.version>
     <slf4j.version>2.0.17</slf4j.version>
     <jooq.version>3.19.18</jooq.version>
-    <flyway.version>11.11.2</flyway.version>
+    <flyway.version>11.12.0</flyway.version>
     <jaxb.version>4.0.9</jaxb.version>
     <cxf.version>4.1.3</cxf.version>
-    <testcontainers.version>1.20.6</testcontainers.version>
+    <testcontainers.version>1.21.3</testcontainers.version>
   </properties>
 
   <dependencyManagement>
@@ -98,7 +98,7 @@
       <dependency>
         <groupId>org.springframework</groupId>
         <artifactId>spring-framework-bom</artifactId>
-        <version>6.2.0</version>
+        <version>6.2.10</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
@@ -112,7 +112,7 @@
       <dependency>
         <groupId>org.junit</groupId>
         <artifactId>junit-bom</artifactId>
-        <version>5.12.1</version>
+        <version>5.13.4</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
@@ -131,7 +131,7 @@
       <dependency>
         <groupId>jakarta.annotation</groupId>
         <artifactId>jakarta.annotation-api</artifactId>
-        <version>2.1.1</version>
+        <version>3.0.0</version>
       </dependency>
       <dependency>
         <groupId>jakarta.mail</groupId>
@@ -359,7 +359,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
       <plugin>
         <groupId>com.github.spotbugs</groupId>
         <artifactId>spotbugs-maven-plugin</artifactId>
-        <version>4.9.2.0</version>
+        <version>4.9.4.1</version>
         <configuration>
           <failOnError>false</failOnError>
           <onlyAnalyze>de.rwth.idsg.steve.-</onlyAnalyze>

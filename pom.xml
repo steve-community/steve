@@ -98,7 +98,7 @@
       <dependency>
         <groupId>org.springframework</groupId>
         <artifactId>spring-framework-bom</artifactId>
-        <version>6.2.10</version>
+        <version>6.2.11</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>

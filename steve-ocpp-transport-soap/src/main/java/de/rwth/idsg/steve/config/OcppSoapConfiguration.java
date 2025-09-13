@@ -19,7 +19,6 @@
 package de.rwth.idsg.steve.config;
 
 import de.rwth.idsg.steve.SteveConfiguration;
-import de.rwth.idsg.steve.ocpp.soap.LoggingFeatureProxy;
 import de.rwth.idsg.steve.ocpp.soap.MediatorInInterceptor;
 import de.rwth.idsg.steve.ocpp.soap.MessageIdInterceptor;
 import ocpp.cs._2010._08.CentralSystemService;
@@ -27,6 +26,9 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.bus.spring.SpringBus;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.logging.Slf4jLogger;
+import org.apache.cxf.ext.logging.LoggingFeature;
+import org.apache.cxf.ext.logging.event.LogEvent;
+import org.apache.cxf.ext.logging.slf4j.Slf4jEventSender;
 import org.apache.cxf.feature.Feature;
 import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.jaxws.JaxWsServerFactoryBean;
@@ -63,28 +65,25 @@ public class OcppSoapConfiguration {
     private final ocpp.cs._2015._10.CentralSystemService ocpp16Server;
 
     private final PhaseInterceptor<Message> messageHeaderInterceptor;
-    private final LoggingFeatureProxy loggingFeatureProxy;
 
     public OcppSoapConfiguration(
             CentralSystemService ocpp12Server,
             ocpp.cs._2012._06.CentralSystemService ocpp15Server,
             ocpp.cs._2015._10.CentralSystemService ocpp16Server,
             @Qualifier("messageHeaderInterceptor") PhaseInterceptor<Message> messageHeaderInterceptor,
-            SteveConfiguration config,
-            LoggingFeatureProxy loggingFeatureProxy) {
+            SteveConfiguration config) {
         this.config = config;
         this.ocpp12Server = ocpp12Server;
         this.ocpp15Server = ocpp15Server;
         this.ocpp16Server = ocpp16Server;
         this.messageHeaderInterceptor = messageHeaderInterceptor;
-        this.loggingFeatureProxy = loggingFeatureProxy;
     }
 
     @PostConstruct
     public void init() {
         List<Interceptor<? extends Message>> interceptors =
                 asList(new MessageIdInterceptor(), messageHeaderInterceptor);
-        List<Feature> logging = singletonList(loggingFeatureProxy.get());
+        List<Feature> logging = singletonList(loggingFeature());
 
         createOcppService(ocpp12Server, "/CentralSystemServiceOCPP12", interceptors, logging);
         createOcppService(ocpp15Server, "/CentralSystemServiceOCPP15", interceptors, logging);
@@ -114,5 +113,26 @@ public class OcppSoapConfiguration {
         f.getFeatures().addAll(features);
         f.getInInterceptors().addAll(interceptors);
         f.create();
+    }
+
+    @Bean
+    public LoggingFeature loggingFeature() {
+        var feature = new LoggingFeature();
+        feature.setSender(new Slf4jEventSender() {
+            @Override
+            protected String getLogMessage(LogEvent event) {
+                var b = new StringBuilder();
+
+                b.append('\n') // Start from the next line to have the output well-aligned
+                        .append("    ExchangeId: ")
+                        .append(event.getExchangeId())
+                        .append('\n')
+                        .append("    Payload: ")
+                        .append(event.getPayload());
+
+                return b.toString();
+            }
+        });
+        return feature;
     }
 }

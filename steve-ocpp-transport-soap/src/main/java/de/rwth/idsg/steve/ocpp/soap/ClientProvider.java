@@ -22,6 +22,7 @@ import com.oneandone.compositejks.SslContextBuilder;
 import de.rwth.idsg.steve.SteveConfiguration;
 import org.apache.cxf.configuration.jsse.TLSClientParameters;
 import org.apache.cxf.endpoint.Client;
+import org.apache.cxf.ext.logging.LoggingFeature;
 import org.apache.cxf.frontend.ClientProxy;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.apache.cxf.transport.http.HTTPConduit;
@@ -40,10 +41,10 @@ import jakarta.xml.ws.soap.SOAPBinding;
 public class ClientProvider {
 
     private final @Nullable TLSClientParameters tlsClientParams;
-    private final LoggingFeatureProxy loggingFeatureProxy;
+    private final LoggingFeature loggingFeature;
 
-    public ClientProvider(SteveConfiguration config, LoggingFeatureProxy loggingFeatureProxy) {
-        this.loggingFeatureProxy = loggingFeatureProxy;
+    public ClientProvider(SteveConfiguration config, LoggingFeature loggingFeature) {
+        this.loggingFeature = loggingFeature;
         var jettyConfig = config.getJetty();
         if (shouldInitSSL(jettyConfig)) {
             tlsClientParams = new TLSClientParameters();
@@ -54,7 +55,7 @@ public class ClientProvider {
     }
 
     public <T> T createClient(Class<T> clazz, String endpointAddress) {
-        var bean = getBean(endpointAddress);
+        var bean = createBean(endpointAddress);
         bean.setServiceClass(clazz);
         T clientObject = clazz.cast(bean.create());
 
@@ -67,10 +68,10 @@ public class ClientProvider {
         return clientObject;
     }
 
-    private JaxWsProxyFactoryBean getBean(String endpointAddress) {
+    private JaxWsProxyFactoryBean createBean(String endpointAddress) {
         var f = new JaxWsProxyFactoryBean();
         f.setBindingId(SOAPBinding.SOAP12HTTP_BINDING);
-        f.getFeatures().add(loggingFeatureProxy.get());
+        f.getFeatures().add(loggingFeature);
         f.getFeatures().add(new WSAddressingFeature());
         f.setAddress(endpointAddress);
         return f;

@@ -65,7 +65,7 @@ public final class ConnectorStatusFilter {
     private static List<ConnectorStatus> processAndFilterList(List<ConnectorStatus> initialList, Strategy strategy) {
         return initialList.stream().collect(Collectors.groupingBy(ConnectorStatus::getChargeBoxId)).values().stream()
                 .flatMap(val -> processForOneStation(val, strategy).stream())
-                .collect(Collectors.toList());
+                .toList();
     }
 
     private static List<ConnectorStatus> processForOneStation(List<ConnectorStatus> statsList, Strategy strategy) {
@@ -135,7 +135,7 @@ public final class ConnectorStatusFilter {
                                 .ocppProtocol(cs.getOcppProtocol())
                                 .jsonAndDisconnected(cs.isJsonAndDisconnected())
                                 .build())
-                        .collect(Collectors.toList());
+                        .toList();
             }
         }
     }

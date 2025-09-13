@@ -51,7 +51,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
-import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 @RequiredArgsConstructor
@@ -158,7 +157,7 @@ public class Issue1219 {
 
         List<String> ids = IntStream.range(0, count)
                 .mapToObj(val -> UUID.randomUUID().toString())
-                .collect(Collectors.toList());
+                .toList();
         repository.addChargePointList(ids);
 
         return ids;
@@ -169,7 +168,7 @@ public class Issue1219 {
 
         List<String> idTags = IntStream.range(0, count)
                 .mapToObj(val -> UUID.randomUUID().toString())
-                .collect(Collectors.toList());
+                .toList();
         List<String> insertedTags = new ArrayList<>();
 
         for (String idTag : idTags) {

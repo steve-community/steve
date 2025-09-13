@@ -49,7 +49,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import static de.rwth.idsg.steve.utils.CustomDSL.date;
 import static de.rwth.idsg.steve.utils.CustomDSL.includes;
@@ -284,7 +283,7 @@ public class ChargePointRepositoryImpl implements ChargePointRepository {
         var batch = chargeBoxIdList.stream()
                 .map(s ->
                         ctx.newRecord(CHARGE_BOX).setChargeBoxId(s).setInsertConnectorStatusAfterTransactionMsg(false))
-                .collect(Collectors.toList());
+                .toList();
 
         ctx.batchInsert(batch).execute();
     }

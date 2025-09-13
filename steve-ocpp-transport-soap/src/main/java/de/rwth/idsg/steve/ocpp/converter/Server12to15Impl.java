@@ -48,7 +48,6 @@ import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * @author Andreas Heuvels <andreas.heuvels@rwth-aachen.de>
@@ -97,7 +96,7 @@ public final class Server12to15Impl implements Server12to15 {
                 .map(e -> new MeterValue()
                         .withTimestamp(e.getTimestamp())
                         .withValue(new MeterValue.Value().withValue(Integer.toString(e.getValue()))))
-                .collect(Collectors.toList());
+                .toList();
 
         return new MeterValuesRequest()
                 .withConnectorId(request.getConnectorId())

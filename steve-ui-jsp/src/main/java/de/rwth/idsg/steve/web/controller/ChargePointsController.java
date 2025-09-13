@@ -39,7 +39,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 import jakarta.validation.Valid;
 
 /**
@@ -58,12 +57,12 @@ public class ChargePointsController {
     private static final List<String> upToOcpp15RegistrationStatusList = Arrays.stream(
                     ocpp.cs._2012._06.RegistrationStatus.values())
             .map(ocpp.cs._2012._06.RegistrationStatus::value)
-            .collect(Collectors.toList());
+            .toList();
 
     private static final List<String> ocpp16RegistrationStatusList = Arrays.stream(
                     ocpp.cs._2015._10.RegistrationStatus.values())
             .map(ocpp.cs._2015._10.RegistrationStatus::value)
-            .collect(Collectors.toList());
+            .toList();
 
     // -------------------------------------------------------------------------
     // Paths

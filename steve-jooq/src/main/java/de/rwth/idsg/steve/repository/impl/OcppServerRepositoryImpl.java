@@ -46,7 +46,6 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.concurrent.locks.Lock;
-import java.util.stream.Collectors;
 
 import static de.rwth.idsg.steve.utils.DateTimeUtils.toLocalDateTime;
 import static jooq.steve.db.tables.ChargeBox.CHARGE_BOX;
@@ -450,7 +449,7 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
                         .setLocation(k.isSetLocation() ? k.getLocation().value() : null)
                         .setUnit(k.isSetUnit() ? k.getUnit().value() : null)
                         .setPhase(k.isSetPhase() ? k.getPhase().value() : null)))
-                .collect(Collectors.toList());
+                .toList();
 
         ctx.batchInsert(batch).execute();
     }

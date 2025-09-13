@@ -28,7 +28,6 @@ import ocpp.cp._2015._10.AuthorizationData;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 import jakarta.xml.ws.AsyncHandler;
 
 /**
@@ -130,7 +129,7 @@ public class SendLocalListTask extends Ocpp15AndAboveTask<SendLocalListParams, S
                 .map(k -> new ocpp.cp._2012._06.AuthorisationData()
                         .withIdTag(k.getIdTag())
                         .withIdTagInfo(toOcpp15(k.getIdTagInfo())))
-                .collect(Collectors.toList());
+                .toList();
     }
 
     private static ocpp.cp._2012._06.IdTagInfo toOcpp15(ocpp.cp._2015._10.IdTagInfo ocpp16) {

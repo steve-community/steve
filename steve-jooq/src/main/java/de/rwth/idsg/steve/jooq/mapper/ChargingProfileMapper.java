@@ -25,7 +25,6 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static de.rwth.idsg.steve.utils.DateTimeUtils.toInstant;
 
@@ -48,7 +47,7 @@ public final class ChargingProfileMapper {
                 .startSchedule(toInstant(profile.getStartSchedule()))
                 .chargingRateUnit(profile.getChargingRateUnit())
                 .minChargingRate(profile.getMinChargingRate())
-                .periods(periods.stream().map(ChargingProfileMapper::fromRecord).collect(Collectors.toList()))
+                .periods(periods.stream().map(ChargingProfileMapper::fromRecord).toList())
                 .build();
     }
 

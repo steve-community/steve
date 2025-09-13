@@ -28,7 +28,6 @@ import ocpp.cp._2012._06.GetConfigurationRequest;
 import ocpp.cp._2012._06.GetConfigurationResponse;
 
 import java.util.List;
-import java.util.stream.Collectors;
 import jakarta.xml.ws.AsyncHandler;
 
 /**
@@ -75,7 +74,7 @@ public class GetConfigurationTask
 
                 List<KeyValue> keyValues = response.getConfigurationKey().stream()
                         .map(k -> new KeyValue(k.getKey(), k.getValue(), k.isReadonly()))
-                        .collect(Collectors.toList());
+                        .toList();
 
                 success(chargeBoxId, new ResponseWrapper(keyValues, response.getUnknownKey()));
             } catch (Exception e) {
@@ -91,7 +90,7 @@ public class GetConfigurationTask
                 ocpp.cp._2015._10.GetConfigurationResponse response = res.get();
                 List<KeyValue> keyValues = response.getConfigurationKey().stream()
                         .map(k -> new KeyValue(k.getKey(), k.getValue(), k.isReadonly()))
-                        .collect(Collectors.toList());
+                        .toList();
 
                 success(chargeBoxId, new ResponseWrapper(keyValues, response.getUnknownKey()));
             } catch (Exception e) {

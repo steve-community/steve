@@ -64,14 +64,38 @@ public class UserRepositoryImpl implements UserRepository {
     @Override
     public List<User.Overview> getOverview(UserQueryForm form) {
         var ocppTagsPerUser = getOcppTagsInternal(form.getUserPk(), form.getOcppIdTag());
+        var userResults = getOverviewInternal(form);
 
-        return getOverviewInternal(form).map(r -> User.Overview.builder()
-                .userPk(r.value1())
-                .name(r.value2() + " " + r.value3())
-                .phone(r.value4())
-                .email(r.value5())
-                .ocppTagEntries(ocppTagsPerUser.getOrDefault(r.value1(), List.of()))
-                .build());
+        List<User.Overview> userOverviews = new ArrayList<>();
+        for (var r : userResults) {
+            var tags = ocppTagsPerUser.getOrDefault(r.value1(), List.of());
+
+            var user = User.Overview.builder()
+                    .userPk(r.value1())
+                    .name(r.value2() + " " + r.value3())
+                    .phone(r.value4())
+                    .email(r.value5())
+                    .ocppTagEntries(tags)
+                    .build();
+
+            // TODO: Improve later. This is not efficient, because we filter after fetching all results. However, this
+            //       should be acceptable since the number of users (and tags) are usually not very high, and this
+            //       overview query will probably not be in the hot path.
+            switch (form.getOcppTagFilter()) {
+                case OnlyUsersWithTags -> {
+                    if (!tags.isEmpty()) {
+                        userOverviews.add(user);
+                    }
+                }
+                case OnlyUsersWithoutTags -> {
+                    if (tags.isEmpty()) {
+                        userOverviews.add(user);
+                    }
+                }
+                default -> userOverviews.add(user);
+            }
+        }
+        return userOverviews;
     }
 
     @Override

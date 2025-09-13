@@ -37,6 +37,14 @@
                 <td><form:input path="ocppIdTag"/></td>
             </tr>
             <tr>
+                <td>Ocpp ID Tag Relationship:</td>
+                <td>
+                    <form:select path="ocppTagFilter">
+                        <form:options items="${ocppTagFilter}"/>
+                    </form:select>
+                </td>
+            </tr>
+            <tr>
                 <td>Name:</td>
                 <td><form:input path="name"/></td>
             </tr>

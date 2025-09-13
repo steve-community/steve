@@ -29,7 +29,7 @@ import jooq.steve.db.tables.records.OcppTagActivityRecord;
 import lombok.extern.slf4j.Slf4j;
 import org.jooq.DSLContext;
 import org.jooq.JoinType;
-import org.jooq.Record10;
+import org.jooq.Record11;
 import org.jooq.RecordMapper;
 import org.jooq.SelectQuery;
 import org.jooq.TableField;
@@ -43,7 +43,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
-import static de.rwth.idsg.steve.repository.impl.RepositoryUtils.ocppTagByUserIdQuery;
 import static de.rwth.idsg.steve.utils.CustomDSL.includes;
 import static de.rwth.idsg.steve.utils.DateTimeUtils.humanize;
 import static de.rwth.idsg.steve.utils.DateTimeUtils.toInstant;
@@ -73,6 +72,7 @@ public class OcppTagRepositoryImpl implements OcppTagRepository {
         selectQuery.addFrom(OCPP_TAG_ACTIVITY);
 
         var parentTable = OCPP_TAG_ACTIVITY.as("parent");
+        var userOcppTagTable = USER_OCPP_TAG.as("user_ocpp_tag");
 
         selectQuery.addSelect(
                 OCPP_TAG_ACTIVITY.OCPP_TAG_PK,
@@ -84,10 +84,15 @@ public class OcppTagRepositoryImpl implements OcppTagRepository {
                 OCPP_TAG_ACTIVITY.BLOCKED,
                 OCPP_TAG_ACTIVITY.MAX_ACTIVE_TRANSACTION_COUNT,
                 OCPP_TAG_ACTIVITY.ACTIVE_TRANSACTION_COUNT,
-                OCPP_TAG_ACTIVITY.NOTE);
+                OCPP_TAG_ACTIVITY.NOTE,
+                userOcppTagTable.USER_PK);
 
         selectQuery.addJoin(
                 parentTable, JoinType.LEFT_OUTER_JOIN, parentTable.ID_TAG.eq(OCPP_TAG_ACTIVITY.PARENT_ID_TAG));
+        selectQuery.addJoin(
+                userOcppTagTable,
+                JoinType.LEFT_OUTER_JOIN,
+                userOcppTagTable.OCPP_TAG_PK.eq(OCPP_TAG_ACTIVITY.OCPP_TAG_PK));
 
         if (form.isOcppTagPkSet()) {
             selectQuery.addConditions(OCPP_TAG_ACTIVITY.OCPP_TAG_PK.eq(form.getOcppTagPk()));
@@ -102,12 +107,22 @@ public class OcppTagRepositoryImpl implements OcppTagRepository {
         }
 
         if (form.isUserIdSet()) {
-            var query = ocppTagByUserIdQuery(ctx, form.getUserId());
-            selectQuery.addConditions(OCPP_TAG_ACTIVITY.ID_TAG.in(query));
+            selectQuery.addConditions(userOcppTagTable.USER_PK.eq(form.getUserId()));
         }
 
         if (form.isNoteSet()) {
             selectQuery.addConditions(includes(OCPP_TAG_ACTIVITY.NOTE, form.getNote()));
+        }
+
+        switch (form.getUserFilter()) {
+            case OnlyTagsWithUser:
+                selectQuery.addConditions(userOcppTagTable.USER_PK.isNotNull());
+                break;
+            case OnlyTagsWithoutUser:
+                selectQuery.addConditions(userOcppTagTable.USER_PK.isNull());
+                break;
+            default:
+                break;
         }
 
         switch (form.getExpired()) {
@@ -273,11 +288,34 @@ public class OcppTagRepositoryImpl implements OcppTagRepository {
 
     private static class UserMapper
             implements RecordMapper<
-                    Record10<Integer, Integer, String, String, LocalDateTime, Boolean, Boolean, Integer, Long, String>,
+                    Record11<
+                            Integer,
+                            Integer,
+                            String,
+                            String,
+                            LocalDateTime,
+                            Boolean,
+                            Boolean,
+                            Integer,
+                            Long,
+                            String,
+                            Integer>,
                     OcppTagOverview> {
         @Override
         public OcppTagOverview map(
-                Record10<Integer, Integer, String, String, LocalDateTime, Boolean, Boolean, Integer, Long, String> r) {
+                Record11<
+                                Integer,
+                                Integer,
+                                String,
+                                String,
+                                LocalDateTime,
+                                Boolean,
+                                Boolean,
+                                Integer,
+                                Long,
+                                String,
+                                Integer>
+                        r) {
             return OcppTagOverview.builder()
                     .ocppTagPk(r.value1())
                     .parentOcppTagPk(r.value2())

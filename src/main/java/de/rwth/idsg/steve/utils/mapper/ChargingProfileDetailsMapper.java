@@ -41,7 +41,8 @@ import java.util.stream.Collectors;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class ChargingProfileDetailsMapper {
 
-    public static ocpp.cp._2015._10.ChargingProfile mapToOcpp(ChargingProfile.Details details) {
+    public static ocpp.cp._2015._10.ChargingProfile mapToOcpp(ChargingProfile.Details details,
+                                                              Integer transactionId) {
         ChargingProfileRecord profile = details.getProfile();
 
         List<ChargingSchedulePeriod> schedulePeriods =
@@ -65,6 +66,7 @@ public final class ChargingProfileDetailsMapper {
 
         return new ocpp.cp._2015._10.ChargingProfile()
             .withChargingProfileId(profile.getChargingProfilePk())
+            .withTransactionId(transactionId)
             .withStackLevel(profile.getStackLevel())
             .withChargingProfilePurpose(ChargingProfilePurposeType.fromValue(profile.getChargingProfilePurpose()))
             .withChargingProfileKind(ChargingProfileKindType.fromValue(profile.getChargingProfileKind()))

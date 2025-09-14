@@ -74,9 +74,7 @@ public class SetChargingProfileTaskFromDB extends SetChargingProfileTask {
 
     @Override
     public SetChargingProfileRequest getOcpp16Request() {
-        ocpp.cp._2015._10.ChargingProfile ocppProfile = ChargingProfileDetailsMapper.mapToOcpp(details);
-
-        ocppProfile.setTransactionId(transactionId);
+        ocpp.cp._2015._10.ChargingProfile ocppProfile = ChargingProfileDetailsMapper.mapToOcpp(details, transactionId);
 
         var request = new SetChargingProfileRequest()
                 .withConnectorId(connectorId)

@@ -41,5 +41,6 @@ public class SetChargingProfileParams extends MultipleChargePointSelect {
     @Positive
     private Integer chargingProfilePk;
 
+    @Positive
     private Integer transactionId;
 }

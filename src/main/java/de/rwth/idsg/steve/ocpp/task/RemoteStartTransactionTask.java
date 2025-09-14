@@ -30,8 +30,12 @@ import jakarta.xml.ws.AsyncHandler;
  */
 public class RemoteStartTransactionTask extends CommunicationTask<RemoteStartTransactionParams, String> {
 
-    public RemoteStartTransactionTask(RemoteStartTransactionParams params) {
+    private final ocpp.cp._2015._10.ChargingProfile chargingProfile;
+
+    public RemoteStartTransactionTask(RemoteStartTransactionParams params,
+                                      ocpp.cp._2015._10.ChargingProfile chargingProfile) {
         super(params);
+        this.chargingProfile = chargingProfile;
     }
 
     @Override
@@ -53,14 +57,12 @@ public class RemoteStartTransactionTask extends CommunicationTask<RemoteStartTra
                 .withConnectorId(params.getConnectorId());
     }
 
-    /**
-     * TODO: RemoteStartTransactionRequest.chargingProfile not implemented
-     */
     @Override
     public ocpp.cp._2015._10.RemoteStartTransactionRequest getOcpp16Request() {
         return new ocpp.cp._2015._10.RemoteStartTransactionRequest()
                 .withIdTag(params.getIdTag())
-                .withConnectorId(params.getConnectorId());
+                .withConnectorId(params.getConnectorId())
+                .withChargingProfile(chargingProfile);
     }
 
     @Override

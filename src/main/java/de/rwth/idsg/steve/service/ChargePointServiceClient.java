@@ -18,6 +18,7 @@
  */
 package de.rwth.idsg.steve.service;
 
+import de.rwth.idsg.steve.SteveException;
 import de.rwth.idsg.steve.config.DelegatingTaskExecutor;
 import de.rwth.idsg.steve.ocpp.ChargePointServiceInvokerImpl;
 import de.rwth.idsg.steve.ocpp.OcppCallback;
@@ -48,6 +49,7 @@ import de.rwth.idsg.steve.repository.dto.ChargePointSelect;
 import de.rwth.idsg.steve.repository.dto.ChargingProfile;
 import de.rwth.idsg.steve.repository.dto.InsertReservationParams;
 import de.rwth.idsg.steve.service.dto.EnhancedReserveNowParams;
+import de.rwth.idsg.steve.utils.mapper.ChargingProfileDetailsMapper;
 import de.rwth.idsg.steve.web.dto.ocpp.CancelReservationParams;
 import de.rwth.idsg.steve.web.dto.ocpp.ChangeAvailabilityParams;
 import de.rwth.idsg.steve.web.dto.ocpp.ChangeConfigurationParams;
@@ -199,7 +201,17 @@ public class ChargePointServiceClient {
     @SafeVarargs
     public final int remoteStartTransaction(RemoteStartTransactionParams params,
                                             OcppCallback<String>... callbacks) {
-        RemoteStartTransactionTask task = new RemoteStartTransactionTask(params);
+        ocpp.cp._2015._10.ChargingProfile chargingProfile = null;
+        Integer chargingProfilePk = params.getChargingProfilePk();
+        if (chargingProfilePk != null) {
+            ChargingProfile.Details details = chargingProfileRepository.getDetails(chargingProfilePk);
+            chargingProfile = ChargingProfileDetailsMapper.mapToOcpp(details);
+            if (chargingProfile.getChargingProfilePurpose() != ChargingProfilePurposeType.TX_PROFILE) {
+                throw new SteveException("ChargingProfilePurposeType is not TX_PROFILE");
+            }
+        }
+
+        RemoteStartTransactionTask task = new RemoteStartTransactionTask(params, chargingProfile);
 
         for (var callback : callbacks) {
             task.addCallback(callback);

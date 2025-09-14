@@ -45,7 +45,7 @@ public final class OcppTag {
         private final String idTag;
 
         @Schema(description = "PK of the user this OCPP tag belongs to (if any)")
-        private final Integer userPk;
+        private final @Nullable Integer userPk;
 
         @Schema(description = "PK of the parent OCPP tag of this OCPP tag")
         private final Integer parentOcppTagPk;

@@ -66,7 +66,7 @@ public class UserRepositoryImpl implements UserRepository {
         var ocppTagsPerUser = getOcppTagsInternal(form.getUserPk(), form.getOcppIdTag());
         var userResults = getOverviewInternal(form);
 
-        List<User.Overview> userOverviews = new ArrayList<>();
+        var userOverviews = new ArrayList<User.Overview>(userResults.size());
         for (var r : userResults) {
             var tags = ocppTagsPerUser.getOrDefault(r.value1(), List.of());
 
@@ -171,6 +171,7 @@ public class UserRepositoryImpl implements UserRepository {
             conditions.add(includes(USER.E_MAIL, form.getEmail()));
         }
 
+        // Filter users by OCPP tag when provided
         if (form.isSetOcppIdTag()) {
             conditions.add(DSL.exists(DSL.selectOne()
                     .from(USER_OCPP_TAG)
@@ -187,16 +188,6 @@ public class UserRepositoryImpl implements UserRepository {
 
             // Find a matching sequence anywhere within the concatenated representation
             conditions.add(includes(joinedField, form.getName()));
-        }
-
-        // Filter users by OCPP tag when provided
-        if (!Strings.isNullOrEmpty(form.getOcppIdTag())) {
-            conditions.add(DSL.exists(DSL.selectOne()
-                    .from(USER_OCPP_TAG)
-                    .join(OCPP_TAG)
-                    .on(USER_OCPP_TAG.OCPP_TAG_PK.eq(OCPP_TAG.OCPP_TAG_PK))
-                    .where(USER_OCPP_TAG.USER_PK.eq(USER.USER_PK))
-                    .and(includes(OCPP_TAG.ID_TAG, form.getOcppIdTag()))));
         }
 
         return ctx.select(USER.USER_PK, USER.FIRST_NAME, USER.LAST_NAME, USER.PHONE, USER.E_MAIL)

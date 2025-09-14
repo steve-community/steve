@@ -158,7 +158,14 @@
             <c:forEach items="${ocppTagList}" var="item">
                 <tr>
                     <td><a href="${ctxPath}/manager/ocppTags/details/${item.ocppTagPk}">${item.idTag}</a></td>
-                    <td><a href="${ctxPath}/manager/users/details/${item.userPk}">${item.userPk}</a></td>
+                    <td>
+                        <c:choose>
+                            <c:when test="${not empty item.userPk}">
+                                <a href="${ctxPath}/manager/users/details/${item.userPk}">${item.userPk}</a>
+                            </c:when>
+                            <c:otherwise>-</c:otherwise>
+                        </c:choose>
+                    </td>
                     <td>
                         <c:if test="${not empty item.parentIdTag}">
                             <a href="${ctxPath}/manager/ocppTags/details/${item.parentOcppTagPk}">${item.parentIdTag}</a>

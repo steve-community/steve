@@ -142,7 +142,7 @@ public class OcppTagRepositoryImpl implements OcppTagRepository {
         processBooleanType(selectQuery, OCPP_TAG_ACTIVITY.IN_TRANSACTION, form.getInTransaction());
         processBooleanType(selectQuery, OCPP_TAG_ACTIVITY.BLOCKED, form.getBlocked());
 
-        return selectQuery.fetch().map(new UserMapper());
+        return selectQuery.fetch().map(new OcppTagOverviewMapper());
     }
 
     @Override
@@ -244,7 +244,7 @@ public class OcppTagRepositoryImpl implements OcppTagRepository {
         } catch (DataAccessException e) {
             if (e.getCause() instanceof SQLIntegrityConstraintViolationException) {
                 throw new SteveException.AlreadyExists(
-                        "A user with idTag '%s' already exists.".formatted(u.getIdTag()), e);
+                        "An OCPP tag with id '%s' already exists.".formatted(u.getIdTag()), e);
             } else {
                 throw new SteveException.InternalError(
                         "Execution of addOcppTag for idTag '%s' FAILED.".formatted(u.getIdTag()), e);
@@ -286,7 +286,7 @@ public class OcppTagRepositoryImpl implements OcppTagRepository {
         }
     }
 
-    private static class UserMapper
+    private static class OcppTagOverviewMapper
             implements RecordMapper<
                     Record11<
                             Integer,
@@ -328,6 +328,7 @@ public class OcppTagRepositoryImpl implements OcppTagRepository {
                     .maxActiveTransactionCount(r.value8())
                     .activeTransactionCount(r.value9())
                     .note(r.value10())
+                    .userPk(r.value11())
                     .build();
         }
     }

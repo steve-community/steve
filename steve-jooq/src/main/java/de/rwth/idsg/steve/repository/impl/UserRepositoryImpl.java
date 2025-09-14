@@ -64,14 +64,38 @@ public class UserRepositoryImpl implements UserRepository {
     @Override
     public List<User.Overview> getOverview(UserQueryForm form) {
         var ocppTagsPerUser = getOcppTagsInternal(form.getUserPk(), form.getOcppIdTag());
+        var userResults = getOverviewInternal(form);
 
-        return getOverviewInternal(form).map(r -> User.Overview.builder()
-                .userPk(r.value1())
-                .name(r.value2() + " " + r.value3())
-                .phone(r.value4())
-                .email(r.value5())
-                .ocppTagEntries(ocppTagsPerUser.getOrDefault(r.value1(), List.of()))
-                .build());
+        var userOverviews = new ArrayList<User.Overview>(userResults.size());
+        for (var r : userResults) {
+            var tags = ocppTagsPerUser.getOrDefault(r.value1(), List.of());
+
+            var user = User.Overview.builder()
+                    .userPk(r.value1())
+                    .name(r.value2() + " " + r.value3())
+                    .phone(r.value4())
+                    .email(r.value5())
+                    .ocppTagEntries(tags)
+                    .build();
+
+            // TODO: Improve later. This is not efficient, because we filter after fetching all results. However, this
+            //       should be acceptable since the number of users (and tags) are usually not very high, and this
+            //       overview query will probably not be in the hot path.
+            switch (form.getOcppTagFilter()) {
+                case OnlyUsersWithTags -> {
+                    if (!tags.isEmpty()) {
+                        userOverviews.add(user);
+                    }
+                }
+                case OnlyUsersWithoutTags -> {
+                    if (tags.isEmpty()) {
+                        userOverviews.add(user);
+                    }
+                }
+                default -> userOverviews.add(user);
+            }
+        }
+        return userOverviews;
     }
 
     @Override
@@ -147,6 +171,7 @@ public class UserRepositoryImpl implements UserRepository {
             conditions.add(includes(USER.E_MAIL, form.getEmail()));
         }
 
+        // Filter users by OCPP tag when provided
         if (form.isSetOcppIdTag()) {
             conditions.add(DSL.exists(DSL.selectOne()
                     .from(USER_OCPP_TAG)
@@ -163,16 +188,6 @@ public class UserRepositoryImpl implements UserRepository {
 
             // Find a matching sequence anywhere within the concatenated representation
             conditions.add(includes(joinedField, form.getName()));
-        }
-
-        // Filter users by OCPP tag when provided
-        if (!Strings.isNullOrEmpty(form.getOcppIdTag())) {
-            conditions.add(DSL.exists(DSL.selectOne()
-                    .from(USER_OCPP_TAG)
-                    .join(OCPP_TAG)
-                    .on(USER_OCPP_TAG.OCPP_TAG_PK.eq(OCPP_TAG.OCPP_TAG_PK))
-                    .where(USER_OCPP_TAG.USER_PK.eq(USER.USER_PK))
-                    .and(includes(OCPP_TAG.ID_TAG, form.getOcppIdTag()))));
         }
 
         return ctx.select(USER.USER_PK, USER.FIRST_NAME, USER.LAST_NAME, USER.PHONE, USER.E_MAIL)

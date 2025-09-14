@@ -97,6 +97,14 @@
                     <td><form:input path="userId"/></td>
                 </tr>
                 <tr>
+                    <td>User Relationship:</td>
+                    <td>
+                        <form:select path="userFilter">
+                            <form:options items="${userFilter}"/>
+                        </form:select>
+                    </td>
+                </tr>
+                <tr>
                     <td>Expired?:</td>
                     <td><form:select path="expired">
                         <form:options items="${expired}" itemLabel="value"/>
@@ -134,6 +142,7 @@
             <thead>
             <tr>
                 <th data-sort="string">ID Tag</th>
+                <th data-sort="int">User ID</th>
                 <th data-sort="string">Parent ID Tag</th>
                 <th data-sort="date">Expiry Date/Time</th>
                 <th data-sort="string">In Transaction?</th>
@@ -149,6 +158,14 @@
             <c:forEach items="${ocppTagList}" var="item">
                 <tr>
                     <td><a href="${ctxPath}/manager/ocppTags/details/${item.ocppTagPk}">${item.idTag}</a></td>
+                    <td>
+                        <c:choose>
+                            <c:when test="${not empty item.userPk}">
+                                <a href="${ctxPath}/manager/users/details/${item.userPk}">${item.userPk}</a>
+                            </c:when>
+                            <c:otherwise>-</c:otherwise>
+                        </c:choose>
+                    </td>
                     <td>
                         <c:if test="${not empty item.parentIdTag}">
                             <a href="${ctxPath}/manager/ocppTags/details/${item.parentOcppTagPk}">${item.parentIdTag}</a>

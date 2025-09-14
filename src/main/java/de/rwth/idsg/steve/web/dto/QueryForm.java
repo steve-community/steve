@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2019 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
+ * Copyright (C) 2013-2025 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -18,13 +18,14 @@
  */
 package de.rwth.idsg.steve.web.dto;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-import org.joda.time.LocalDateTime;
+import org.joda.time.DateTime;
 
-import javax.validation.constraints.AssertTrue;
+import jakarta.validation.constraints.AssertTrue;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -36,26 +37,44 @@ import javax.validation.constraints.AssertTrue;
 @ToString
 public abstract class QueryForm {
 
+    @Schema(description = "The identifier of the chargebox (i.e. charging station)")
     private String chargeBoxId;
+
+    @Schema(description = "The OCPP tag")
     private String ocppIdTag;
 
-    private LocalDateTime from;
-    private LocalDateTime to;
+    @Schema(description = "The User ID")
+    private Integer userId;
 
+    @Schema(description = "Show results that happened after this date/time. Format: ISO 8601 with timezone. Example: `2024-08-25T14:30:00.000Z`")
+    private DateTime from;
+
+    @Schema(description = "Show results that happened before this date/time. Format: ISO 8601 with timezone. Example: `2024-08-25T14:30:00.000Z`")
+    private DateTime to;
+
+    @Schema(hidden = true)
     @AssertTrue(message = "'To' must be after 'From'")
     public boolean isFromToValid() {
         return !isFromToSet() || to.isAfter(from);
     }
 
+    @Schema(hidden = true)
     boolean isFromToSet() {
         return from != null && to != null;
     }
 
+    @Schema(hidden = true)
     public boolean isChargeBoxIdSet() {
         return chargeBoxId != null;
     }
 
+    @Schema(hidden = true)
     public boolean isOcppIdTagSet() {
         return ocppIdTag != null;
+    }
+
+    @Schema(hidden = true)
+    public boolean isUserIdSet() {
+        return userId != null;
     }
 }

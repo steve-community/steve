@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2019 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
+ * Copyright (C) 2013-2025 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -41,6 +41,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
+import static de.rwth.idsg.steve.repository.impl.RepositoryUtils.ocppTagByUserIdQuery;
 import static jooq.steve.db.tables.ChargeBox.CHARGE_BOX;
 import static jooq.steve.db.tables.Connector.CONNECTOR;
 import static jooq.steve.db.tables.OcppTag.OCPP_TAG;
@@ -89,6 +90,11 @@ public class ReservationRepositoryImpl implements ReservationRepository {
 
         if (form.isOcppIdTagSet()) {
             selectQuery.addConditions(RESERVATION.ID_TAG.eq(form.getOcppIdTag()));
+        }
+
+        if (form.isUserIdSet()) {
+            var query = ocppTagByUserIdQuery(ctx, form.getUserId());
+            selectQuery.addConditions(RESERVATION.ID_TAG.in(query));
         }
 
         if (form.isStatusSet()) {
@@ -222,8 +228,8 @@ public class ReservationRepositoryImpl implements ReservationRepository {
 
             case FROM_TO:
                 selectQuery.addConditions(
-                        RESERVATION.START_DATETIME.greaterOrEqual(form.getFrom().toDateTime()),
-                        RESERVATION.EXPIRY_DATETIME.lessOrEqual(form.getTo().toDateTime())
+                        RESERVATION.START_DATETIME.greaterOrEqual(form.getFrom()),
+                        RESERVATION.EXPIRY_DATETIME.lessOrEqual(form.getTo())
                 );
                 break;
 

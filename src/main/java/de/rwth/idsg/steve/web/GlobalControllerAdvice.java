@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2019 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
+ * Copyright (C) 2013-2025 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -20,8 +20,8 @@ package de.rwth.idsg.steve.web;
 
 import de.rwth.idsg.steve.repository.dto.ChargePointSelect;
 import lombok.extern.slf4j.Slf4j;
+import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
-import org.joda.time.LocalDateTime;
 import org.springframework.beans.propertyeditors.StringTrimmerEditor;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -29,7 +29,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.servlet.ModelAndView;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 import java.util.List;
 
 /**
@@ -46,7 +46,7 @@ public class GlobalControllerAdvice {
 
         binder.registerCustomEditor(String.class, new StringTrimmerEditor(true));
         binder.registerCustomEditor(LocalDate.class, new LocalDateEditor());
-        binder.registerCustomEditor(LocalDateTime.class, new LocalDateTimeEditor());
+        binder.registerCustomEditor(DateTime.class, DateTimeEditor.forMvc());
         binder.registerCustomEditor(ChargePointSelect.class, new ChargePointSelectEditor());
 
         binder.registerCustomEditor(List.class, "idList", batchInsertConverter);

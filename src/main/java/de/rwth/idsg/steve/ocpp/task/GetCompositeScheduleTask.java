@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2019 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
+ * Copyright (C) 2013-2025 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -20,14 +20,13 @@ package de.rwth.idsg.steve.ocpp.task;
 
 import de.rwth.idsg.steve.ocpp.Ocpp16AndAboveTask;
 import de.rwth.idsg.steve.ocpp.OcppCallback;
-import de.rwth.idsg.steve.ocpp.OcppVersion;
 import de.rwth.idsg.steve.ocpp.RequestResult;
 import de.rwth.idsg.steve.web.dto.ocpp.GetCompositeScheduleParams;
 import ocpp.cp._2015._10.GetCompositeScheduleRequest;
 import ocpp.cp._2015._10.GetCompositeScheduleResponse;
 import ocpp.cp._2015._10.GetCompositeScheduleStatus;
 
-import javax.xml.ws.AsyncHandler;
+import jakarta.xml.ws.AsyncHandler;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -35,9 +34,8 @@ import javax.xml.ws.AsyncHandler;
  */
 public class GetCompositeScheduleTask extends Ocpp16AndAboveTask<GetCompositeScheduleParams, GetCompositeScheduleResponse> {
 
-    public GetCompositeScheduleTask(OcppVersion ocppVersion,
-                                    GetCompositeScheduleParams params) {
-        super(ocppVersion, params);
+    public GetCompositeScheduleTask(GetCompositeScheduleParams params) {
+        super(params);
     }
 
     @Override

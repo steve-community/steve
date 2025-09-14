@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2019 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
+ * Copyright (C) 2013-2025 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -22,7 +22,6 @@ import de.rwth.idsg.steve.SteveException;
 import de.rwth.idsg.steve.repository.ChargingProfileRepository;
 import de.rwth.idsg.steve.repository.dto.ChargingProfile;
 import de.rwth.idsg.steve.repository.dto.ChargingProfileAssignment;
-import de.rwth.idsg.steve.utils.DateTimeUtils;
 import de.rwth.idsg.steve.web.dto.ChargingProfileAssignmentQueryForm;
 import de.rwth.idsg.steve.web.dto.ChargingProfileForm;
 import de.rwth.idsg.steve.web.dto.ChargingProfileQueryForm;
@@ -42,6 +41,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.CollectionUtils;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -68,6 +68,8 @@ public class ChargingProfileRepositoryImpl implements ChargingProfileRepository 
 
     @Override
     public void setProfile(int chargingProfilePk, String chargeBoxId, int connectorId) {
+        OcppServerRepositoryImpl.insertIgnoreConnector(ctx, chargeBoxId, connectorId);
+
         SelectConditionStep<Record1<Integer>> connectorPkSelect = ctx.select(CONNECTOR.CONNECTOR_PK)
                                                                      .from(CONNECTOR)
                                                                      .where(CONNECTOR.CHARGE_BOX_ID.eq(chargeBoxId))
@@ -225,11 +227,11 @@ public class ChargingProfileRepositoryImpl implements ChargingProfileRepository 
         }
 
         if (form.getValidFrom() != null) {
-            conditions = conditions.and(CHARGING_PROFILE.VALID_FROM.greaterOrEqual(form.getValidFrom().toDateTime()));
+            conditions = conditions.and(CHARGING_PROFILE.VALID_FROM.greaterOrEqual(form.getValidFrom()));
         }
 
         if (form.getValidTo() != null) {
-            conditions = conditions.and(CHARGING_PROFILE.VALID_TO.lessOrEqual(form.getValidTo().toDateTime()));
+            conditions = conditions.and(CHARGING_PROFILE.VALID_TO.lessOrEqual(form.getValidTo()));
         }
 
         return ctx.selectFrom(CHARGING_PROFILE)
@@ -255,6 +257,10 @@ public class ChargingProfileRepositoryImpl implements ChargingProfileRepository 
                    .where(CHARGING_PROFILE.CHARGING_PROFILE_PK.eq(chargingProfilePk))
                    .fetchOne();
 
+        if (profile == null) {
+            throw new SteveException.NotFound("Charging Profile not found");
+        }
+
         List<ChargingSchedulePeriodRecord> periods =
                 ctx.selectFrom(CHARGING_SCHEDULE_PERIOD)
                    .where(CHARGING_SCHEDULE_PERIOD.CHARGING_PROFILE_PK.eq(chargingProfilePk))
@@ -275,13 +281,13 @@ public class ChargingProfileRepositoryImpl implements ChargingProfileRepository 
                                    .set(CHARGING_PROFILE.CHARGING_PROFILE_PURPOSE, form.getChargingProfilePurpose().value())
                                    .set(CHARGING_PROFILE.CHARGING_PROFILE_KIND, form.getChargingProfileKind().value())
                                    .set(CHARGING_PROFILE.RECURRENCY_KIND, form.getRecurrencyKind() == null ? null : form.getRecurrencyKind().value())
-                                   .set(CHARGING_PROFILE.VALID_FROM, DateTimeUtils.toDateTime(form.getValidFrom()))
-                                   .set(CHARGING_PROFILE.VALID_TO, DateTimeUtils.toDateTime(form.getValidTo()))
+                                   .set(CHARGING_PROFILE.VALID_FROM, form.getValidFrom())
+                                   .set(CHARGING_PROFILE.VALID_TO, form.getValidTo())
                                    .set(CHARGING_PROFILE.DURATION_IN_SECONDS, form.getDurationInSeconds())
-                                   .set(CHARGING_PROFILE.START_SCHEDULE, DateTimeUtils.toDateTime(form.getStartSchedule()))
+                                   .set(CHARGING_PROFILE.START_SCHEDULE, form.getStartSchedule())
                                    .set(CHARGING_PROFILE.CHARGING_RATE_UNIT, form.getChargingRateUnit().value())
                                    .set(CHARGING_PROFILE.MIN_CHARGING_RATE, form.getMinChargingRate())
-                                   .returning(CHARGING_SCHEDULE_PERIOD.CHARGING_PROFILE_PK)
+                                   .returning(CHARGING_PROFILE.CHARGING_PROFILE_PK)
                                    .fetchOne()
                                    .getChargingProfilePk();
 
@@ -302,21 +308,27 @@ public class ChargingProfileRepositoryImpl implements ChargingProfileRepository 
         ctx.transaction(configuration -> {
             DSLContext ctx = DSL.using(configuration);
             try {
-                ctx.update(CHARGING_PROFILE)
+                int updateCount = ctx.update(CHARGING_PROFILE)
                    .set(CHARGING_PROFILE.DESCRIPTION, form.getDescription())
                    .set(CHARGING_PROFILE.NOTE, form.getNote())
                    .set(CHARGING_PROFILE.STACK_LEVEL, form.getStackLevel())
                    .set(CHARGING_PROFILE.CHARGING_PROFILE_PURPOSE, form.getChargingProfilePurpose().value())
                    .set(CHARGING_PROFILE.CHARGING_PROFILE_KIND, form.getChargingProfileKind().value())
                    .set(CHARGING_PROFILE.RECURRENCY_KIND, form.getRecurrencyKind() == null ? null : form.getRecurrencyKind().value())
-                   .set(CHARGING_PROFILE.VALID_FROM, DateTimeUtils.toDateTime(form.getValidFrom()))
-                   .set(CHARGING_PROFILE.VALID_TO, DateTimeUtils.toDateTime(form.getValidTo()))
+                   .set(CHARGING_PROFILE.VALID_FROM, form.getValidFrom())
+                   .set(CHARGING_PROFILE.VALID_TO, form.getValidTo())
                    .set(CHARGING_PROFILE.DURATION_IN_SECONDS, form.getDurationInSeconds())
-                   .set(CHARGING_PROFILE.START_SCHEDULE, DateTimeUtils.toDateTime(form.getStartSchedule()))
+                   .set(CHARGING_PROFILE.START_SCHEDULE, form.getStartSchedule())
                    .set(CHARGING_PROFILE.CHARGING_RATE_UNIT, form.getChargingRateUnit().value())
                    .set(CHARGING_PROFILE.MIN_CHARGING_RATE, form.getMinChargingRate())
                    .where(CHARGING_PROFILE.CHARGING_PROFILE_PK.eq(form.getChargingProfilePk()))
                    .execute();
+
+                // if there was no update, then the profile does not exist.
+                // operations related to periods should not be executed.
+                if (updateCount != 1) {
+                    return;
+                }
 
                 // -------------------------------------------------------------------------
                 // the form contains all period information for this schedule. instead of
@@ -359,13 +371,14 @@ public class ChargingProfileRepositoryImpl implements ChargingProfileRepository 
     }
 
     private static void insertPeriods(DSLContext ctx, ChargingProfileForm form) {
-        if (CollectionUtils.isEmpty(form.getSchedulePeriodMap())) {
+        if (CollectionUtils.isEmpty(form.getSchedulePeriods())) {
             return;
         }
 
-        List<ChargingSchedulePeriodRecord> r = form.getSchedulePeriodMap()
-                                                   .values()
+        List<ChargingSchedulePeriodRecord> r = form.getSchedulePeriods()
                                                    .stream()
+                                                   .filter(ChargingProfileForm.SchedulePeriod::isNonEmpty)
+                                                   .sorted(Comparator.comparingInt(ChargingProfileForm.SchedulePeriod::getStartPeriodInSeconds))
                                                    .map(k -> ctx.newRecord(CHARGING_SCHEDULE_PERIOD)
                                                                 .setChargingProfilePk(form.getChargingProfilePk())
                                                                 .setStartPeriodInSeconds(k.getStartPeriodInSeconds())

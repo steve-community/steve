@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2019 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
+ * Copyright (C) 2013-2025 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -92,8 +92,19 @@ public class IdTagValidatorTest {
     }
 
     @Test
+    public void testPoundSign() {
+        Assertions.assertTrue(validator.isValid("#test", null));
+        Assertions.assertTrue(validator.isValid("test#", null));
+        Assertions.assertTrue(validator.isValid("te##st", null));
+
+        // Tag provided by Webasto charge points
+        // https://github.com/steve-community/steve/pull/1322
+        Assertions.assertTrue(validator.isValid("#FreeCharging", null));
+    }
+
+    @Test
     public void testCombined() {
-        Assertions.assertTrue(validator.isValid("1t.E-S_:t20", null));
+        Assertions.assertTrue(validator.isValid("1t.E-S_:t20#", null));
     }
 
 }

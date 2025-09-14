@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2019 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
+ * Copyright (C) 2013-2025 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -20,10 +20,9 @@ package de.rwth.idsg.steve.ocpp.task;
 
 import de.rwth.idsg.steve.ocpp.CommunicationTask;
 import de.rwth.idsg.steve.ocpp.OcppCallback;
-import de.rwth.idsg.steve.ocpp.OcppVersion;
 import de.rwth.idsg.steve.web.dto.ocpp.UnlockConnectorParams;
 
-import javax.xml.ws.AsyncHandler;
+import jakarta.xml.ws.AsyncHandler;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -31,8 +30,8 @@ import javax.xml.ws.AsyncHandler;
  */
 public class UnlockConnectorTask extends CommunicationTask<UnlockConnectorParams, String> {
 
-    public UnlockConnectorTask(OcppVersion ocppVersion, UnlockConnectorParams params) {
-        super(ocppVersion, params);
+    public UnlockConnectorTask(UnlockConnectorParams params) {
+        super(params);
     }
 
     @Override

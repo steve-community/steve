@@ -1,7 +1,7 @@
 <%--
 
     SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
-    Copyright (C) 2013-2019 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
+    Copyright (C) 2013-2025 SteVe Community Team
     All Rights Reserved.
 
     This program is free software: you can redistribute it and/or modify
@@ -48,7 +48,7 @@
             <tbody>
             <c:forEach items="${unknownList}" var="item">
                 <tr>
-                    <td>${item.key}</td>
+                    <td><encode:forHtml value="${item.key}" /></td>
                     <td>${item.numberOfAttempts}</td>
                     <td data-sort-value="${item.lastAttemptTimestamp.millis}">${item.lastAttemptTimestamp}</td>
                     <td class="inlineWrapper">
@@ -92,6 +92,18 @@
                     </td>
                 </tr>
                 <tr>
+                    <td>User ID:</td>
+                    <td><form:input path="userId"/></td>
+                </tr>
+                <tr>
+                    <td>User Relationship:</td>
+                    <td>
+                        <form:select path="userFilter">
+                            <form:options items="${userFilter}"/>
+                        </form:select>
+                    </td>
+                </tr>
+                <tr>
                     <td>Expired?:</td>
                     <td><form:select path="expired">
                         <form:options items="${expired}" itemLabel="value"/>
@@ -113,6 +125,10 @@
                     </td>
                 </tr>
                 <tr>
+                    <td>Note:</td>
+                    <td><form:input path="note"/></td>
+                </tr>
+                <tr>
                     <td></td>
                     <td id="add_space">
                         <input type="submit" value="Get">
@@ -125,6 +141,7 @@
             <thead>
             <tr>
                 <th data-sort="string">ID Tag</th>
+                <th data-sort="int">User ID</th>
                 <th data-sort="string">Parent ID Tag</th>
                 <th data-sort="date">Expiry Date/Time</th>
                 <th data-sort="string">In Transaction?</th>
@@ -140,6 +157,7 @@
             <c:forEach items="${ocppTagList}" var="item">
                 <tr>
                     <td><a href="${ctxPath}/manager/ocppTags/details/${item.ocppTagPk}">${item.idTag}</a></td>
+                    <td><a href="${ctxPath}/manager/users/details/${item.userPk}">${item.userPk}</a></td>
                     <td>
                         <c:if test="${not empty item.parentIdTag}">
                             <a href="${ctxPath}/manager/ocppTags/details/${item.parentOcppTagPk}">${item.parentIdTag}</a>

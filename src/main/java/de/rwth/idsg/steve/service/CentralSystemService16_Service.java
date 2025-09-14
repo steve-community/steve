@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2019 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
+ * Copyright (C) 2013-2025 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -151,11 +151,13 @@ public class CentralSystemService16_Service {
     }
 
     public MeterValuesResponse meterValues(MeterValuesRequest parameters, String chargeBoxIdentity) {
+        Integer transactionId = getTransactionId(parameters);
+
         ocppServerRepository.insertMeterValues(
                 chargeBoxIdentity,
                 parameters.getMeterValue(),
                 parameters.getConnectorId(),
-                parameters.getTransactionId()
+                transactionId
         );
 
         return new MeterValuesResponse();
@@ -173,6 +175,8 @@ public class CentralSystemService16_Service {
         IdTagInfo info = ocppTagService.getIdTagInfo(
                 parameters.getIdTag(),
                 true,
+                chargeBoxIdentity,
+                parameters.getConnectorId(),
                 () -> new IdTagInfo().withStatus(AuthorizationStatus.INVALID) // IdTagInfo is required
         );
 
@@ -204,6 +208,8 @@ public class CentralSystemService16_Service {
         IdTagInfo idTagInfo = ocppTagService.getIdTagInfo(
                 parameters.getIdTag(),
                 false,
+                chargeBoxIdentity,
+                null,
                 () -> null
         );
 
@@ -239,6 +245,8 @@ public class CentralSystemService16_Service {
         IdTagInfo idTagInfo = ocppTagService.getIdTagInfo(
                 parameters.getIdTag(),
                 false,
+                chargeBoxIdentity,
+                null,
                 () -> new IdTagInfo().withStatus(AuthorizationStatus.INVALID)
         );
 
@@ -260,5 +268,23 @@ public class CentralSystemService16_Service {
         // OCPP requires a status to be set. Since this is a dummy impl, set it to "Accepted".
         // https://github.com/steve-community/steve/pull/36
         return new DataTransferResponse().withStatus(DataTransferStatus.ACCEPTED);
+    }
+
+    // -------------------------------------------------------------------------
+    // Helpers
+    // -------------------------------------------------------------------------
+
+    /**
+     * https://github.com/steve-community/steve/issues/1415
+     */
+    private Integer getTransactionId(MeterValuesRequest parameters) {
+        Integer transactionId = parameters.getTransactionId();
+        if (transactionId == null) {
+            return null;
+        } else if (transactionId < 1) {
+            log.warn("MeterValues transactionId is invalid ({}), ignoring it", transactionId);
+            return null;
+        }
+        return transactionId;
     }
 }

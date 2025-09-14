@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2019 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
+ * Copyright (C) 2013-2025 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -18,32 +18,35 @@
  */
 package de.rwth.idsg.steve.repository.impl;
 
+import com.google.common.base.Strings;
 import de.rwth.idsg.steve.SteveException;
 import de.rwth.idsg.steve.repository.AddressRepository;
 import de.rwth.idsg.steve.repository.UserRepository;
 import de.rwth.idsg.steve.repository.dto.User;
 import de.rwth.idsg.steve.web.dto.UserForm;
 import de.rwth.idsg.steve.web.dto.UserQueryForm;
-import jooq.steve.db.tables.records.AddressRecord;
 import jooq.steve.db.tables.records.UserRecord;
 import lombok.extern.slf4j.Slf4j;
+import org.jooq.Condition;
 import org.jooq.DSLContext;
 import org.jooq.Field;
-import org.jooq.JoinType;
 import org.jooq.Record1;
-import org.jooq.Record7;
+import org.jooq.Record5;
 import org.jooq.Result;
 import org.jooq.SelectConditionStep;
-import org.jooq.SelectQuery;
 import org.jooq.exception.DataAccessException;
 import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
+import org.springframework.util.CollectionUtils;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Optional;
+import java.util.Map;
 
 import static de.rwth.idsg.steve.utils.CustomDSL.includes;
+import static jooq.steve.db.Tables.USER_OCPP_TAG;
 import static jooq.steve.db.tables.OcppTag.OCPP_TAG;
 import static jooq.steve.db.tables.User.USER;
 
@@ -60,25 +63,44 @@ public class UserRepositoryImpl implements UserRepository {
 
     @Override
     public List<User.Overview> getOverview(UserQueryForm form) {
-        return getOverviewInternal(form)
-                .map(r -> User.Overview.builder()
-                                       .userPk(r.value1())
-                                       .ocppTagPk(r.value2())
-                                       .ocppIdTag(r.value3())
-                                       .name(r.value4() + " " + r.value5())
-                                       .phone(r.value6())
-                                       .email(r.value7())
-                                       .build()
-                );
+        var ocppTagsPerUser = getOcppTagsInternal(form.getUserPk(), form.getOcppIdTag());
+        var userResults = getOverviewInternal(form);
+
+        List<User.Overview> userOverviews = new ArrayList<>();
+        for (var r : userResults) {
+            var tags = ocppTagsPerUser.getOrDefault(r.value1(), List.of());
+
+            var user = User.Overview.builder()
+                .userPk(r.value1())
+                .name(r.value2() + " " + r.value3())
+                .phone(r.value4())
+                .email(r.value5())
+                .ocppTagEntries(tags)
+                .build();
+
+            // TODO: Improve later. This is not efficient, because we filter after fetching all results. However, this
+            //       should be acceptable since the number of users (and tags) are usually not very high, and this
+            //       overview query will probably not be in the hot path.
+            switch (form.getOcppTagFilter()) {
+                case OnlyUsersWithTags -> {
+                    if (!tags.isEmpty()) {
+                        userOverviews.add(user);
+                    }
+                }
+                case OnlyUsersWithoutTags -> {
+                    if (tags.isEmpty()) {
+                        userOverviews.add(user);
+                    }
+                }
+                default -> userOverviews.add(user);
+            }
+        }
+
+        return userOverviews;
     }
 
     @Override
     public User.Details getDetails(int userPk) {
-
-        // -------------------------------------------------------------------------
-        // 1. user table
-        // -------------------------------------------------------------------------
-
         UserRecord ur = ctx.selectFrom(USER)
                            .where(USER.USER_PK.equal(userPk))
                            .fetchOne();
@@ -87,32 +109,10 @@ public class UserRepositoryImpl implements UserRepository {
             throw new SteveException("There is no user with id '%s'", userPk);
         }
 
-        // -------------------------------------------------------------------------
-        // 2. address table
-        // -------------------------------------------------------------------------
-
-        AddressRecord ar = addressRepository.get(ctx, ur.getAddressPk());
-
-        // -------------------------------------------------------------------------
-        // 3. ocpp_tag table
-        // -------------------------------------------------------------------------
-
-        String ocppIdTag = null;
-        if (ur.getOcppTagPk() != null) {
-            Record1<String> record = ctx.select(OCPP_TAG.ID_TAG)
-                                        .from(OCPP_TAG)
-                                        .where(OCPP_TAG.OCPP_TAG_PK.eq(ur.getOcppTagPk()))
-                                        .fetchOne();
-
-            if (record != null) {
-                ocppIdTag = record.value1();
-            }
-        }
-
         return User.Details.builder()
                            .userRecord(ur)
-                           .address(ar)
-                           .ocppIdTag(Optional.ofNullable(ocppIdTag))
+                           .address(addressRepository.get(ctx, ur.getAddressPk()))
+                           .ocppTagEntries(getOcppTagsInternal(userPk, null).getOrDefault(userPk, List.of()))
                            .build();
     }
 
@@ -122,7 +122,8 @@ public class UserRepositoryImpl implements UserRepository {
             DSLContext ctx = DSL.using(configuration);
             try {
                 Integer addressId = addressRepository.updateOrInsert(ctx, form.getAddress());
-                addInternal(ctx, form, addressId);
+                Integer userPk = addInternal(ctx, form, addressId);
+                refreshOcppTagsInternal(ctx, form, userPk);
 
             } catch (DataAccessException e) {
                 throw new SteveException("Failed to add the user", e);
@@ -137,6 +138,7 @@ public class UserRepositoryImpl implements UserRepository {
             try {
                 Integer addressId = addressRepository.updateOrInsert(ctx, form.getAddress());
                 updateInternal(ctx, form, addressId);
+                refreshOcppTagsInternal(ctx, form, form.getUserPk());
 
             } catch (DataAccessException e) {
                 throw new SteveException("Failed to update the user", e);
@@ -162,44 +164,73 @@ public class UserRepositoryImpl implements UserRepository {
     // Private helpers
     // -------------------------------------------------------------------------
 
-    @SuppressWarnings("unchecked")
-    private Result<Record7<Integer, Integer, String, String, String, String, String>> getOverviewInternal(UserQueryForm form) {
-        SelectQuery selectQuery = ctx.selectQuery();
-        selectQuery.addFrom(USER);
-        selectQuery.addJoin(OCPP_TAG, JoinType.LEFT_OUTER_JOIN, USER.OCPP_TAG_PK.eq(OCPP_TAG.OCPP_TAG_PK));
-        selectQuery.addSelect(
-                USER.USER_PK,
-                USER.OCPP_TAG_PK,
-                OCPP_TAG.ID_TAG,
-                USER.FIRST_NAME,
-                USER.LAST_NAME,
-                USER.PHONE,
-                USER.E_MAIL
-        );
+    private Result<Record5<Integer, String, String, String, String>> getOverviewInternal(UserQueryForm form) {
+        List<Condition> conditions = new ArrayList<>();
 
         if (form.isSetUserPk()) {
-            selectQuery.addConditions(USER.USER_PK.eq(form.getUserPk()));
-        }
-
-        if (form.isSetOcppIdTag()) {
-            selectQuery.addConditions(includes(OCPP_TAG.ID_TAG, form.getOcppIdTag()));
+            conditions.add(USER.USER_PK.eq(form.getUserPk()));
         }
 
         if (form.isSetEmail()) {
-            selectQuery.addConditions(includes(USER.E_MAIL, form.getEmail()));
+            conditions.add(includes(USER.E_MAIL, form.getEmail()));
+        }
+
+        if (form.isSetOcppIdTag()) {
+            conditions.add(DSL.exists(
+                DSL.selectOne()
+                    .from(USER_OCPP_TAG)
+                    .join(OCPP_TAG).on(USER_OCPP_TAG.OCPP_TAG_PK.eq(OCPP_TAG.OCPP_TAG_PK))
+                    .where(USER_OCPP_TAG.USER_PK.eq(USER.USER_PK))
+                    .and(includes(OCPP_TAG.ID_TAG, form.getOcppIdTag()))
+            ));
         }
 
         if (form.isSetName()) {
-
             // Concatenate the two columns and search within the resulting representation
             // for flexibility, since the user can search by first or last name, or both.
             Field<String> joinedField = DSL.concat(USER.FIRST_NAME, USER.LAST_NAME);
 
             // Find a matching sequence anywhere within the concatenated representation
-            selectQuery.addConditions(includes(joinedField, form.getName()));
+            conditions.add(includes(joinedField, form.getName()));
         }
 
-        return selectQuery.fetch();
+        return ctx.select(
+                USER.USER_PK,
+                USER.FIRST_NAME,
+                USER.LAST_NAME,
+                USER.PHONE,
+                USER.E_MAIL)
+            .from(USER)
+            .where(conditions)
+            .fetch();
+    }
+
+    private Map<Integer, List<User.OcppTagEntry>> getOcppTagsInternal(Integer userPk, String ocppIdTag) {
+        List<Condition> conditions = new ArrayList<>();
+
+        if (userPk != null) {
+            conditions.add(USER_OCPP_TAG.USER_PK.eq(userPk));
+        }
+
+        if (!Strings.isNullOrEmpty(ocppIdTag)) {
+            conditions.add(includes(OCPP_TAG.ID_TAG, ocppIdTag));
+        }
+
+        var results = ctx.select(
+                USER_OCPP_TAG.USER_PK,
+                OCPP_TAG.OCPP_TAG_PK,
+                OCPP_TAG.ID_TAG)
+            .from(USER_OCPP_TAG)
+            .join(OCPP_TAG).on(USER_OCPP_TAG.OCPP_TAG_PK.eq(OCPP_TAG.OCPP_TAG_PK))
+            .where(conditions)
+            .fetch();
+
+        Map<Integer, List<User.OcppTagEntry>> map = new HashMap<>();
+        for (var entry : results) {
+            map.computeIfAbsent(entry.value1(), k -> new ArrayList<>())
+                .add(new User.OcppTagEntry(entry.value2(), entry.value3()));
+        }
+        return map;
     }
 
     private SelectConditionStep<Record1<Integer>> selectAddressId(int userPk) {
@@ -214,21 +245,22 @@ public class UserRepositoryImpl implements UserRepository {
                   .where(OCPP_TAG.ID_TAG.eq(ocppIdTag));
     }
 
-    private void addInternal(DSLContext ctx, UserForm form, Integer addressPk) {
-        int count = ctx.insertInto(USER)
-                       .set(USER.FIRST_NAME, form.getFirstName())
-                       .set(USER.LAST_NAME, form.getLastName())
-                       .set(USER.BIRTH_DAY, form.getBirthDay())
-                       .set(USER.SEX, form.getSex().getDatabaseValue())
-                       .set(USER.PHONE, form.getPhone())
-                       .set(USER.E_MAIL, form.getEMail())
-                       .set(USER.NOTE, form.getNote())
-                       .set(USER.ADDRESS_PK, addressPk)
-                       .set(USER.OCPP_TAG_PK, selectOcppTagPk(form.getOcppIdTag()))
-                       .execute();
-
-        if (count != 1) {
-            throw new SteveException("Failed to insert the user");
+    private Integer addInternal(DSLContext ctx, UserForm form, Integer addressPk) {
+        try {
+            return ctx.insertInto(USER)
+                      .set(USER.FIRST_NAME, form.getFirstName())
+                      .set(USER.LAST_NAME, form.getLastName())
+                      .set(USER.BIRTH_DAY, form.getBirthDay())
+                      .set(USER.SEX, form.getSex().getDatabaseValue())
+                      .set(USER.PHONE, form.getPhone())
+                      .set(USER.E_MAIL, form.getEMail())
+                      .set(USER.NOTE, form.getNote())
+                      .set(USER.ADDRESS_PK, addressPk)
+                      .returning(USER.USER_PK)
+                      .fetchOne()
+                      .getUserPk();
+        } catch (DataAccessException e) {
+            throw new SteveException("Failed to insert the user", e);
         }
     }
 
@@ -242,7 +274,6 @@ public class UserRepositoryImpl implements UserRepository {
            .set(USER.E_MAIL, form.getEMail())
            .set(USER.NOTE, form.getNote())
            .set(USER.ADDRESS_PK, addressPk)
-           .set(USER.OCPP_TAG_PK, selectOcppTagPk(form.getOcppIdTag()))
            .where(USER.USER_PK.eq(form.getUserPk()))
            .execute();
     }
@@ -251,5 +282,38 @@ public class UserRepositoryImpl implements UserRepository {
         ctx.delete(USER)
            .where(USER.USER_PK.equal(userPk))
            .execute();
+    }
+
+    /**
+     * Refresh the full the OCPP tag associations for a user:
+     * - 1. Delete existing OCPP tags that are not in the form.
+     * - 2. Insert new OCPP tags from the form that do not already exist for the user.
+     */
+    private void refreshOcppTagsInternal(DSLContext ctx, UserForm form, Integer userPk) {
+        List<Integer> wantedOcppTagPks = CollectionUtils.isEmpty(form.getIdTagList())
+            ? List.of() // This user wants no OCPP tags
+            : ctx.select(OCPP_TAG.OCPP_TAG_PK)
+            .from(OCPP_TAG)
+            .where(OCPP_TAG.ID_TAG.in(form.getIdTagList()))
+            .fetch(OCPP_TAG.OCPP_TAG_PK);
+
+        // Optimization: Execute the delete query only if we are processing an existing user.
+        // A new user will not have any existing OCPP tags, so no delete is needed.
+        //
+        // 1. Delete entries that are not in the wanted entries
+        if (form.getUserPk() != null) {
+            ctx.deleteFrom(USER_OCPP_TAG)
+                .where(USER_OCPP_TAG.USER_PK.eq(userPk))
+                .and(USER_OCPP_TAG.OCPP_TAG_PK.notIn(wantedOcppTagPks))
+                .execute();
+        }
+
+        // 2. Insert new entries that are not already present
+        if (!wantedOcppTagPks.isEmpty()) {
+            ctx.insertInto(USER_OCPP_TAG, USER_OCPP_TAG.USER_PK, USER_OCPP_TAG.OCPP_TAG_PK)
+                .valuesOfRows(wantedOcppTagPks.stream().map(pk -> DSL.row(userPk, pk)).toList())
+                .onDuplicateKeyIgnore() // Ignore if already exists
+                .execute();
+        }
     }
 }

@@ -1,7 +1,7 @@
 <%--
 
     SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
-    Copyright (C) 2013-2019 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
+    Copyright (C) 2013-2025 SteVe Community Team
     All Rights Reserved.
 
     This program is free software: you can redistribute it and/or modify
@@ -85,8 +85,8 @@ Connector Status
 				</td>
 				<td>${cs.connectorId}</td>
 				<td data-sort-value="${cs.statusTimestamp.millis}">${cs.timeStamp}</td>
-				<td>${cs.status}</td>
-				<td>${cs.errorCode}</td>
+				<td><encode:forHtml value="${cs.status}" /></td>
+				<td><encode:forHtml value="${cs.errorCode}" /></td>
 			</tr>
 		</c:forEach>
 	</tbody>

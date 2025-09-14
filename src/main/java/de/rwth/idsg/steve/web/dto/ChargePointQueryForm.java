@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2019 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
+ * Copyright (C) 2013-2025 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -18,6 +18,7 @@
  */
 package de.rwth.idsg.steve.web.dto;
 
+import com.google.common.base.Strings;
 import de.rwth.idsg.steve.ocpp.OcppVersion;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -35,6 +36,7 @@ public class ChargePointQueryForm {
 
     private String chargeBoxId;
     private String description;
+    private String note;
     private OcppVersion ocppVersion;
     private QueryPeriodType heartbeatPeriod;
 
@@ -55,6 +57,10 @@ public class ChargePointQueryForm {
 
     public boolean isSetChargeBoxId() {
         return chargeBoxId != null;
+    }
+
+    public boolean isSetNote() {
+        return !Strings.isNullOrEmpty(note);
     }
 
     @RequiredArgsConstructor

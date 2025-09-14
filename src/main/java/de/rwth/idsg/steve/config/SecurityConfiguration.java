@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2019 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
+ * Copyright (C) 2013-2025 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -18,20 +18,19 @@
  */
 package de.rwth.idsg.steve.config;
 
-import de.rwth.idsg.steve.SteveProdCondition;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.DelegatingPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 
 import static de.rwth.idsg.steve.SteveConfiguration.CONFIG;
 
@@ -39,9 +38,10 @@ import static de.rwth.idsg.steve.SteveConfiguration.CONFIG;
  * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 07.01.2015
  */
+@Slf4j
+@RequiredArgsConstructor
 @Configuration
 @EnableWebSecurity
-@Conditional(SteveProdCondition.class)
 public class SecurityConfiguration {
 
     /**
@@ -57,36 +57,44 @@ public class SecurityConfiguration {
     }
 
     @Bean
-    public UserDetailsService userDetailsService() {
-        UserDetails webPageUser = User.builder()
-                .username(CONFIG.getAuth().getUserName())
-                .password(CONFIG.getAuth().getEncodedPassword())
-                .roles("ADMIN")
-                .build();
-
-        return new InMemoryUserDetailsManager(webPageUser);
-    }
-
-    @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        final String prefix = "/manager/";
+        final String prefix = CONFIG.getSpringManagerMapping();
 
         return http
             .authorizeHttpRequests(
                 req -> req
-                    .antMatchers("/static/**").permitAll()
-                    .antMatchers(prefix + "**").hasRole("ADMIN")
+                    .requestMatchers(
+                        "/static/**",
+                        CONFIG.getCxfMapping() + "/**",
+                        WebSocketConfiguration.PATH_INFIX + "**",
+                        "/WEB-INF/views/**" // https://github.com/spring-projects/spring-security/issues/13285#issuecomment-1579097065
+                    ).permitAll()
+                    .requestMatchers(prefix + "/**").hasAuthority("ADMIN")
             )
+            // SOAP stations are making POST calls for communication. even though the following path is permitted for
+            // all access, there is a global default behaviour from spring security: enable CSRF for all POSTs.
+            // we need to disable CSRF for SOAP paths explicitly.
+            .csrf(c -> c.ignoringRequestMatchers(CONFIG.getCxfMapping() + "/**"))
             .sessionManagement(
-                req -> req.invalidSessionUrl(prefix + "signin")
+                req -> req.invalidSessionUrl(prefix + "/signin")
             )
             .formLogin(
-                req -> req.loginPage(prefix + "signin").permitAll()
+                req -> req.loginPage(prefix + "/signin").permitAll()
             )
             .logout(
-                req -> req.logoutUrl(prefix + "signout")
+                req -> req.logoutUrl(prefix + "/signout")
             )
             .build();
     }
 
+    @Bean
+    @Order(1)
+    public SecurityFilterChain apiKeyFilterChain(HttpSecurity http, ApiAuthenticationManager apiAuthenticationManager) throws Exception {
+        return http.securityMatcher(CONFIG.getApiMapping() + "/**")
+            .csrf(k -> k.disable())
+            .sessionManagement(k -> k.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+            .addFilter(new BasicAuthenticationFilter(apiAuthenticationManager, apiAuthenticationManager))
+            .authorizeHttpRequests(k -> k.anyRequest().authenticated())
+            .build();
+    }
 }

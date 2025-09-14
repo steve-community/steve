@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2019 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
+ * Copyright (C) 2013-2025 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -18,8 +18,9 @@
  */
 package de.rwth.idsg.steve.repository;
 
-import de.rwth.idsg.steve.repository.dto.MailSettings;
 import de.rwth.idsg.steve.web.dto.SettingsForm;
+import de.rwth.idsg.steve.web.dto.SettingsForm.MailSettings;
+import de.rwth.idsg.steve.web.dto.SettingsForm.OcppSettings;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -27,8 +28,13 @@ import de.rwth.idsg.steve.web.dto.SettingsForm;
  */
 public interface SettingsRepository {
     SettingsForm getForm();
+    OcppSettings getOcppSettings();
     MailSettings getMailSettings();
+
     int getHeartbeatIntervalInSeconds();
     int getHoursToExpire();
+
     void update(SettingsForm settingsForm);
+    void update(OcppSettings ocppForm);
+    void update(MailSettings mailForm);
 }

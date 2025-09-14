@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2019 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
+ * Copyright (C) 2013-2025 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -47,6 +47,7 @@ import org.jooq.exception.DataAccessException;
 import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
+import org.springframework.util.CollectionUtils;
 
 import java.util.List;
 import java.util.Map;
@@ -87,14 +88,19 @@ public class ChargePointRepositoryImpl implements ChargePointRepository {
     }
 
     @Override
-    public List<ChargePointSelect> getChargePointSelect(OcppProtocol protocol, List<String> inStatusFilter) {
+    public List<ChargePointSelect> getChargePointSelect(OcppProtocol protocol, List<String> inStatusFilter, List<String> chargeBoxIdFilter) {
+        Condition chargeBoxIdCondition = CollectionUtils.isEmpty(chargeBoxIdFilter)
+            ? DSL.trueCondition()
+            : CHARGE_BOX.CHARGE_BOX_ID.in(chargeBoxIdFilter);
+
         return ctx.select(CHARGE_BOX.CHARGE_BOX_ID, CHARGE_BOX.ENDPOINT_ADDRESS)
                   .from(CHARGE_BOX)
                   .where(CHARGE_BOX.OCPP_PROTOCOL.equal(protocol.getCompositeValue()))
                   .and(CHARGE_BOX.ENDPOINT_ADDRESS.isNotNull())
                   .and(CHARGE_BOX.REGISTRATION_STATUS.in(inStatusFilter))
+                  .and(chargeBoxIdCondition)
                   .fetch()
-                  .map(r -> new ChargePointSelect(protocol.getTransport(), r.value1(), r.value2()));
+                  .map(r -> new ChargePointSelect(protocol, r.value1(), r.value2()));
     }
 
     @Override
@@ -150,6 +156,10 @@ public class ChargePointRepositoryImpl implements ChargePointRepository {
 
         if (form.isSetChargeBoxId()) {
             selectQuery.addConditions(includes(CHARGE_BOX.CHARGE_BOX_ID, form.getChargeBoxId()));
+        }
+
+        if (form.isSetNote()) {
+            selectQuery.addConditions(includes(CHARGE_BOX.NOTE, form.getNote()));
         }
 
         switch (form.getHeartbeatPeriod()) {

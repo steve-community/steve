@@ -1,0 +1,35 @@
+name: analyze and review code
+on: [ push, pull_request ]
+
+jobs:
+  license-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Set up Java 17
+        uses: actions/setup-java@v5
+        with:
+          java-version: 17
+          distribution: 'temurin'
+          cache: maven
+
+      - name: Check with Maven
+        run: mvn -B -V license:check --file pom.xml
+  checkstyle:
+    runs-on: 'ubuntu-latest'
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-java@v5
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+      - name: Run Checkstyle
+        uses: nikitasavinov/checkstyle-action@master
+        with:
+          checkstyle_config: './checkstyle.xml'
+          workdir: './src/main/java'
+          reporter: 'github-pr-check'
+          tool_name: 'checkstyle'

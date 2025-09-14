@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2019 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
+ * Copyright (C) 2013-2025 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -30,7 +30,7 @@ import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.xml.ws.AsyncHandler;
+import jakarta.xml.ws.AsyncHandler;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -48,12 +48,12 @@ public abstract class CommunicationTask<S extends ChargePointSelection, RESPONSE
 
     private final Logger log = LoggerFactory.getLogger(getClass());
 
-    private final OcppVersion ocppVersion;
     private final String operationName;
     private final TaskOrigin origin;
     private final String caller;
     protected final S params;
 
+    private final Map<String, OcppVersion> versionMap;
     private final Map<String, RequestResult> resultMap;
     private final int resultSize;
 
@@ -69,25 +69,26 @@ public abstract class CommunicationTask<S extends ChargePointSelection, RESPONSE
     // The default initial capacity is 10. We probably won't need that much.
     private final ArrayList<OcppCallback<RESPONSE>> callbackList = new ArrayList<>(2);
 
-    public CommunicationTask(OcppVersion ocppVersion, S params) {
-        this(ocppVersion, params, TaskOrigin.INTERNAL, "SteVe");
+    public CommunicationTask(S params) {
+        this(params, TaskOrigin.INTERNAL, "SteVe");
     }
 
     /**
      * Do not expose the constructor, make it package-private
      */
-    CommunicationTask(OcppVersion ocppVersion, S params, TaskOrigin origin, String caller) {
+    CommunicationTask(S params, TaskOrigin origin, String caller) {
         List<ChargePointSelect> cpsList = params.getChargePointSelectList();
 
-        this.ocppVersion = ocppVersion;
         this.resultSize = cpsList.size();
         this.origin = origin;
         this.caller = caller;
         this.params = params;
 
         resultMap = new HashMap<>(resultSize);
+        versionMap = new HashMap<>(resultSize);
         for (ChargePointSelect cps : cpsList) {
             resultMap.put(cps.getChargeBoxId(), new RequestResult());
+            versionMap.put(cps.getChargeBoxId(), cps.getOcppProtocol().getVersion());
         }
 
         callbackList.add(defaultCallback());
@@ -124,7 +125,7 @@ public abstract class CommunicationTask<S extends ChargePointSelection, RESPONSE
         }
     }
 
-    protected void success(String chargeBoxId, RESPONSE response) {
+    public void success(String chargeBoxId, RESPONSE response) {
         for (OcppCallback<RESPONSE> c : callbackList) {
             try {
                 c.success(chargeBoxId, response);
@@ -134,7 +135,7 @@ public abstract class CommunicationTask<S extends ChargePointSelection, RESPONSE
         }
     }
 
-    protected void failed(String chargeBoxId, Exception exception) {
+    public void failed(String chargeBoxId, Exception exception) {
         for (OcppCallback<RESPONSE> c : callbackList) {
             try {
                 c.failed(chargeBoxId, exception);
@@ -144,22 +145,12 @@ public abstract class CommunicationTask<S extends ChargePointSelection, RESPONSE
         }
     }
 
-    public RequestType getRequest() {
-        switch (ocppVersion) {
-            case V_12: return getOcpp12Request();
-            case V_15: return getOcpp15Request();
-            case V_16: return getOcpp16Request();
-            default: throw new RuntimeException("Request type not found");
-        }
-    }
-
     public <T extends ResponseType> AsyncHandler<T> getHandler(String chargeBoxId) {
-        switch (ocppVersion) {
-            case V_12: return getOcpp12Handler(chargeBoxId);
-            case V_15: return getOcpp15Handler(chargeBoxId);
-            case V_16: return getOcpp16Handler(chargeBoxId);
-            default: throw new RuntimeException("ResponseType handler not found");
-        }
+        return switch (versionMap.get(chargeBoxId)) {
+            case V_12 -> getOcpp12Handler(chargeBoxId);
+            case V_15 -> getOcpp15Handler(chargeBoxId);
+            case V_16 -> getOcpp16Handler(chargeBoxId);
+        };
     }
 
     public abstract OcppCallback<RESPONSE> defaultCallback();

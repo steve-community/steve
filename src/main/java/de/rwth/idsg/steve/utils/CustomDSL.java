@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2019 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
+ * Copyright (C) 2013-2025 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -22,10 +22,11 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.joda.time.DateTime;
 import org.jooq.Condition;
-import org.jooq.DSLContext;
+import org.jooq.DataType;
 import org.jooq.DatePart;
 import org.jooq.Field;
 import org.jooq.impl.DSL;
+import org.jooq.impl.SQLDataType;
 
 import java.sql.Timestamp;
 
@@ -38,12 +39,15 @@ import static org.jooq.impl.DSL.field;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class CustomDSL {
 
+    // https://github.com/steve-community/steve/issues/1520
+    private static final DataType<DateTime> DATE_TIME_TYPE = SQLDataType.TIMESTAMP.asConvertedDataType(new DateTimeConverter());
+
     public static Field<DateTime> date(DateTime dt) {
-        return date(DSL.val(dt, DateTime.class));
+        return date(DSL.val(dt, DATE_TIME_TYPE));
     }
 
     public static Field<DateTime> date(Field<DateTime> dt) {
-        return field("date({0})", DateTime.class, dt);
+        return field("date({0})", DATE_TIME_TYPE, dt);
     }
 
     /**
@@ -66,24 +70,14 @@ public final class CustomDSL {
         return field.like("%" + input + "%");
     }
 
-    public static Long selectOffsetFromUtcInSeconds(DSLContext ctx) {
-        return ctx.select(timestampDiffBetweenUtcAndCurrent(DatePart.SECOND))
-                  .fetchOne()
-                  .getValue(0, Long.class);
-    }
-
-    private static Field<Long> timestampDiffBetweenUtcAndCurrent(DatePart part) {
-        return timestampDiff(part, utcTimestamp(), DSL.currentTimestamp());
-    }
-
     /**
      * Taken from https://github.com/jOOQ/jOOQ/issues/4303#issuecomment-105519975
      */
-    private static Field<Long> timestampDiff(DatePart part, Field<Timestamp> t1, Field<Timestamp> t2) {
+    public static Field<Long> timestampDiff(DatePart part, Field<Timestamp> t1, Field<Timestamp> t2) {
         return field("timestampdiff({0}, {1}, {2})", Long.class, DSL.keyword(part.toSQL()), t1, t2);
     }
 
-    private static Field<Timestamp> utcTimestamp() {
+    public static Field<Timestamp> utcTimestamp() {
         return field("{utc_timestamp()}", Timestamp.class);
     }
 }

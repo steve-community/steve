@@ -1,4 +1,4 @@
-FROM maven:3.6.1-jdk-11
+FROM eclipse-temurin:17-jdk
 MAINTAINER daynnnnn
 
 ENV LANG=C.UTF-8 LC_ALL=C.UTF-8
@@ -21,7 +21,7 @@ RUN sed -i 's|${db.user}|${env.DB_USERNAME}|g' pom.xml
 RUN sed -i 's|${db.password}|${env.DB_PASSWORD}|g' pom.xml
 RUN sed -i 's|${db.schema}|${env.DB_DATABASE}|g' pom.xml
 
-RUN mvn clean package -Pkubernetes -Djdk.tls.client.protocols="TLSv1,TLSv1.1,TLSv1.2"
+RUN ./mvnw clean package -Pkubernetes -Djdk.tls.client.protocols="TLSv1,TLSv1.1,TLSv1.2"
 
 CMD java -jar target/steve.jar
 

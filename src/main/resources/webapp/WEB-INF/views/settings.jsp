@@ -1,7 +1,7 @@
 <%--
 
     SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
-    Copyright (C) 2013-2019 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
+    Copyright (C) 2013-2025 SteVe Community Team
     All Rights Reserved.
 
     This program is free software: you can redistribute it and/or modify
@@ -34,13 +34,14 @@
     <section><span>OCPP Settings</span></section>
     <table class="userInputFullPage">
         <tr><td>Heartbeat Interval:</td><td>
-            <form:input path="heartbeat"/>
+            <form:input path="ocppSettings.heartbeat"/>
         </td></tr>
         <tr><td><i>
-            The time interval in <b>minutes</b> for how often a charge point <br> should request the current time from SteVe.
+            The time interval in <b>minutes</b> for how often a charge point <br> should request the current time from SteVe.<br>
+            The value 0 requests clients to use reasonable default values.
         </i></td><td></td></tr>
         <tr><td>Expiration:</td><td>
-            <form:input path="expiration"/>
+            <form:input path="ocppSettings.expiration"/>
         </td></tr>
         <tr><td><i>
             The amount of time in <b>hours</b> for how long a charge point should cache <br> the authorization info of an
@@ -57,21 +58,21 @@
         </a>
     </span></section>
     <table class="userInputFullPage">
-        <tr><td>Enable Notifications?:</td><td><form:checkbox path="enabled"/></td></tr>
-        <tr><td>Protocol:</td><td><form:input path="protocol"/></td></tr>
-        <tr><td>Host:</td><td><form:input path="host"/></td></tr>
-        <tr><td>Port:</td><td><form:input path="port"/></td></tr>
-        <tr><td>From:</td><td><form:input path="from"/></td></tr>
-        <tr><td>User name:</td><td><form:input path="username"/></td></tr>
-        <tr><td>Password:</td><td><form:input path="password"/></td></tr>
+        <tr><td>Enable Notifications?:</td><td><form:checkbox path="mailSettings.enabled"/></td></tr>
+        <tr><td>Protocol:</td><td><form:input path="mailSettings.protocol"/></td></tr>
+        <tr><td>Host:</td><td><form:input path="mailSettings.mailHost"/></td></tr>
+        <tr><td>Port:</td><td><form:input path="mailSettings.port"/></td></tr>
+        <tr><td>From:</td><td><form:input path="mailSettings.from"/></td></tr>
+        <tr><td>User name:</td><td><form:input path="mailSettings.username"/></td></tr>
+        <tr><td>Password:</td><td><form:input path="mailSettings.password"/></td></tr>
 
         <tr><td>Recipients:</td>
-            <td><form:textarea path="recipients"/></td>
+            <td><form:textarea path="mailSettings.recipients"/></td>
         </tr>
         <tr>
             <td>Notify when... </td>
             <td>
-                <form:checkboxes items="${features}" path="enabledFeatures"
+                <form:checkboxes items="${features}" path="mailSettings.enabledFeatures"
                                  itemLabel="text" delimiter="<br/>"/>
             </td>
         </tr>

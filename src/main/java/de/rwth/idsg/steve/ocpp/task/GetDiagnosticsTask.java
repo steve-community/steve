@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2019 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
+ * Copyright (C) 2013-2025 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -20,12 +20,9 @@ package de.rwth.idsg.steve.ocpp.task;
 
 import de.rwth.idsg.steve.ocpp.CommunicationTask;
 import de.rwth.idsg.steve.ocpp.OcppCallback;
-import de.rwth.idsg.steve.ocpp.OcppVersion;
 import de.rwth.idsg.steve.web.dto.ocpp.GetDiagnosticsParams;
 
-import javax.xml.ws.AsyncHandler;
-
-import static de.rwth.idsg.steve.utils.DateTimeUtils.toDateTime;
+import jakarta.xml.ws.AsyncHandler;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -33,8 +30,8 @@ import static de.rwth.idsg.steve.utils.DateTimeUtils.toDateTime;
  */
 public class GetDiagnosticsTask extends CommunicationTask<GetDiagnosticsParams, String> {
 
-    public GetDiagnosticsTask(OcppVersion ocppVersion, GetDiagnosticsParams params) {
-        super(ocppVersion, params);
+    public GetDiagnosticsTask(GetDiagnosticsParams params) {
+        super(params);
     }
 
     @Override
@@ -48,8 +45,8 @@ public class GetDiagnosticsTask extends CommunicationTask<GetDiagnosticsParams, 
                 .withLocation(params.getLocation())
                 .withRetries(params.getRetries())
                 .withRetryInterval(params.getRetryInterval())
-                .withStartTime(toDateTime(params.getStart()))
-                .withStopTime(toDateTime(params.getStop()));
+                .withStartTime(params.getStart())
+                .withStopTime(params.getStop());
     }
 
     @Override
@@ -58,8 +55,8 @@ public class GetDiagnosticsTask extends CommunicationTask<GetDiagnosticsParams, 
                 .withLocation(params.getLocation())
                 .withRetries(params.getRetries())
                 .withRetryInterval(params.getRetryInterval())
-                .withStartTime(toDateTime(params.getStart()))
-                .withStopTime(toDateTime(params.getStop()));
+                .withStartTime(params.getStart())
+                .withStopTime(params.getStop());
     }
 
     @Override
@@ -68,8 +65,8 @@ public class GetDiagnosticsTask extends CommunicationTask<GetDiagnosticsParams, 
                 .withLocation(params.getLocation())
                 .withRetries(params.getRetries())
                 .withRetryInterval(params.getRetryInterval())
-                .withStartTime(toDateTime(params.getStart()))
-                .withStopTime(toDateTime(params.getStop()));
+                .withStartTime(params.getStart())
+                .withStopTime(params.getStop());
     }
 
     @Override

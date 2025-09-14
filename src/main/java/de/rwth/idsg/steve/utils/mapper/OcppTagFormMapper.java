@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2019 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
+ * Copyright (C) 2013-2025 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -23,7 +23,6 @@ import de.rwth.idsg.steve.web.dto.OcppTagForm;
 import jooq.steve.db.tables.records.OcppTagActivityRecord;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
-import org.joda.time.DateTime;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -37,11 +36,7 @@ public final class OcppTagFormMapper {
         form.setOcppTagPk(record.getOcppTagPk());
         form.setIdTag(record.getIdTag());
 
-        DateTime expiryDate = record.getExpiryDate();
-        if (expiryDate != null) {
-            form.setExpiryDate(expiryDate.toLocalDateTime());
-        }
-
+        form.setExpiryDate(record.getExpiryDate());
         form.setMaxActiveTransactionCount(record.getMaxActiveTransactionCount());
         form.setNote(record.getNote());
 

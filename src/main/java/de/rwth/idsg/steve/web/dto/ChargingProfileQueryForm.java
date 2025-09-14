@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2019 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
+ * Copyright (C) 2013-2025 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -24,7 +24,7 @@ import lombok.ToString;
 import ocpp.cp._2015._10.ChargingProfileKindType;
 import ocpp.cp._2015._10.ChargingProfilePurposeType;
 import ocpp.cp._2015._10.RecurrencyKindType;
-import org.joda.time.LocalDateTime;
+import org.joda.time.DateTime;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -40,7 +40,7 @@ public class ChargingProfileQueryForm {
     private ChargingProfilePurposeType profilePurpose;
     private ChargingProfileKindType profileKind;
     private RecurrencyKindType recurrencyKind;
-    private LocalDateTime validFrom;
-    private LocalDateTime validTo;
+    private DateTime validFrom;
+    private DateTime validTo;
 
 }

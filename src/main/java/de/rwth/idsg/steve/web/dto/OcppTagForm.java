@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2019 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
+ * Copyright (C) 2013-2025 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -19,13 +19,16 @@
 package de.rwth.idsg.steve.web.dto;
 
 import de.rwth.idsg.steve.web.validation.IdTag;
+import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
-import org.joda.time.LocalDateTime;
+import org.joda.time.DateTime;
 
-import javax.validation.constraints.Future;
-import javax.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.Future;
+import jakarta.validation.constraints.NotEmpty;
+
 import java.util.Objects;
 
 /**
@@ -35,11 +38,14 @@ import java.util.Objects;
 @Getter
 @Setter
 @ToString
+@EqualsAndHashCode
 public class OcppTagForm {
 
     // Internal database id
+    @Schema(hidden = true)
     private Integer ocppTagPk;
 
+    @Schema(description = "Will be used in create/insert flows. Will be ignored in update flows.")
     @NotEmpty(message = "ID Tag is required")
     @IdTag
     private String idTag;
@@ -47,8 +53,9 @@ public class OcppTagForm {
     // Is a FK in DB table. No validation needed. Operation will fail if DB constraint fails.
     private String parentIdTag;
 
+    @Schema(description = "ISO 8601 date/time with timezone. Example: `2024-08-25T14:30:00.000Z`")
     @Future(message = "Expiry Date/Time must be in future")
-    private LocalDateTime expiryDate;
+    private DateTime expiryDate;
 
     private Integer maxActiveTransactionCount;
 

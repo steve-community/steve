@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2019 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
+ * Copyright (C) 2013-2025 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -36,9 +36,5 @@ public interface TransactionRepository {
 
     List<Integer> getActiveTransactionIds(String chargeBoxId);
 
-    TransactionDetails getDetails(int transactionPk, boolean firstArrivingMeterValueIfMultiple);
-
-    default TransactionDetails getDetails(int transactionPk) {
-        return getDetails(transactionPk, true);
-    }
+    TransactionDetails getDetails(int transactionPk);
 }

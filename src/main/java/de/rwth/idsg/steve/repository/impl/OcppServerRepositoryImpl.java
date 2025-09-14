@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2019 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
+ * Copyright (C) 2013-2025 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -41,7 +41,6 @@ import org.jooq.DSLContext;
 import org.jooq.Record1;
 import org.jooq.SelectConditionStep;
 import org.jooq.impl.DSL;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.CollectionUtils;
 
@@ -68,10 +67,11 @@ import static jooq.steve.db.tables.TransactionStopFailed.TRANSACTION_STOP_FAILED
  */
 @Slf4j
 @Repository
+@RequiredArgsConstructor
 public class OcppServerRepositoryImpl implements OcppServerRepository {
 
-    @Autowired private DSLContext ctx;
-    @Autowired private ReservationRepository reservationRepository;
+    private final DSLContext ctx;
+    private final ReservationRepository reservationRepository;
 
     private final Striped<Lock> transactionTableLocks = Striped.lock(16);
 
@@ -379,7 +379,7 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
     /**
      * If the connector information was not received before, insert it. Otherwise, ignore.
      */
-    private void insertIgnoreConnector(DSLContext ctx, String chargeBoxIdentity, int connectorId) {
+    public static void insertIgnoreConnector(DSLContext ctx, String chargeBoxIdentity, int connectorId) {
         int count = ctx.insertInto(CONNECTOR,
                             CONNECTOR.CHARGE_BOX_ID, CONNECTOR.CONNECTOR_ID)
                        .values(chargeBoxIdentity, connectorId)
@@ -455,6 +455,7 @@ public class OcppServerRepositoryImpl implements OcppServerRepository {
         try {
             ctx.insertInto(TRANSACTION_STOP_FAILED)
                .set(TRANSACTION_STOP_FAILED.TRANSACTION_PK, p.getTransactionId())
+               .set(TRANSACTION_STOP_FAILED.CHARGE_BOX_ID, p.getChargeBoxId())
                .set(TRANSACTION_STOP_FAILED.EVENT_TIMESTAMP, p.getEventTimestamp())
                .set(TRANSACTION_STOP_FAILED.EVENT_ACTOR, mapActor(p.getEventActor()))
                .set(TRANSACTION_STOP_FAILED.STOP_TIMESTAMP, p.getStopTimestamp())

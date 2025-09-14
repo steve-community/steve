@@ -14,6 +14,10 @@ SteVe is considered as an open platform to implement, test and evaluate novel id
 The project is distributed under [GPL](LICENSE.txt) and is free to use. 
 If you are going to deploy it we are happy to see the [logo](website/logo/managed-by-steve.pdf) on a charge point.
 
+## Relation to Powerfill
+
+[Powerfill](https://powerfill.co/) is a SaaS company to expand beyond the basics of SteVe: While SteVe covers the basics of OCPP functionality in a DIY sense, Powerfill offers more and enterprise features with ease of use. [See the announcement](https://github.com/steve-community/steve/issues/1643) and [sign up for early access](https://powerfill.co/early-access/).
+
 ### Charge Point Support
 
 Electric charge points using the following OCPP versions are supported:
@@ -25,15 +29,18 @@ Electric charge points using the following OCPP versions are supported:
 * OCPP1.6S
 * OCPP1.6J
 
+⚠️ Currently, Steve doesn't support [the OCPP-1.6 security whitepaper](https://openchargealliance.org/wp-content/uploads/2023/11/OCPP-1.6-security-whitepaper-edition-3-2.zip) yet (see [#100](https://github.com/steve-community/steve/issues/100)) and anyone can send events to a public steve instance once the chargebox id is known.
+Please, don't expose a Steve instance without knowing that risk.
+
 For Charging Station compatibility please check:
 https://github.com/steve-community/steve/wiki/Charging-Station-Compatibility
 
 ### System Requirements
 
 SteVe requires 
-* JDK 11 (both Oracle JDK and OpenJDK are supported)
+* JDK 17 or newer
 * Maven 
-* MariaDB 10.2.1 or later. MySQL 5.7.7 or later works as well, but especially MySQL 8 introduces more hassle. We suggest MariaDB 10.3.
+* MySQL or MariaDB. You should use [one of these](.github/workflows/main.yml#L11) supported versions.
 
 to build and run. 
 
@@ -47,26 +54,12 @@ SteVe is designed to run standalone, a java servlet container / web server (e.g.
 
     Make sure MySQL is reachable via TCP (e.g., remove `skip-networking` from `my.cnf`).
     The following MySQL statements can be used as database initialization (adjust database name and credentials according to your setup).
-    
-    * For MariaDB (all versions) and MySQL 5.7:
-        ```
-        CREATE DATABASE stevedb CHARACTER SET utf8 COLLATE utf8_unicode_ci;
-        CREATE USER 'steve'@'localhost' IDENTIFIED BY 'changeme';
-        GRANT ALL PRIVILEGES ON stevedb.* TO 'steve'@'localhost';
-        GRANT SELECT ON mysql.proc TO 'steve'@'localhost';
-        ```
-    
-    * For MySQL 8:
-        ```
-        CREATE DATABASE stevedb CHARACTER SET utf8 COLLATE utf8_unicode_ci;
-        CREATE USER 'steve'@'localhost' IDENTIFIED BY 'changeme';
-        GRANT ALL PRIVILEGES ON stevedb.* TO 'steve'@'localhost';
-        GRANT SUPER ON *.* TO 'steve'@'localhost';
-        ```
-        Note: The statement `GRANT SUPER [...]` is only necessary to execute some of the previous migration files and is only needed for the initial database setup. Afterwards, you can remove this privilege by executing 
-        ```
-        REVOKE SUPER ON *.* FROM 'steve'@'localhost';
-        ```
+
+    ```
+    CREATE DATABASE stevedb CHARACTER SET utf8 COLLATE utf8_unicode_ci;
+    CREATE USER 'steve'@'localhost' IDENTIFIED BY 'changeme';
+    GRANT ALL PRIVILEGES ON stevedb.* TO 'steve'@'localhost';
+    ```
         
 2. Download and extract tarball:
 
@@ -92,7 +85,7 @@ SteVe is designed to run standalone, a java servlet container / web server (e.g.
     To compile SteVe simply use Maven. A runnable `jar` file containing the application and configuration will be created in the subdirectory `steve/target`.
 
     ```
-    # mvn package
+    # ./mvnw package
     ```
 
 5. Run SteVe:
@@ -105,13 +98,13 @@ SteVe is designed to run standalone, a java servlet container / web server (e.g.
 
 # Docker
 
-If you prefer to build and start this project via docker (you can skip the steps 1, 4 and 5 from above), this can be done as follows: `docker-compose up -d`
+If you prefer to build and start this project via docker (you can skip the steps 1, 4 and 5 from above), this can be done as follows: `docker compose up -d`
 
-Because the docker-compose file is written to build the project for you, you still have to change the project configuration settings from step 3.
+Because the docker compose file is written to build the project for you, you still have to change the project configuration settings from step 3.
 Instead of changing the [main.properties in the prod directory](src/main/resources/config/prod/main.properties), you have to change the [main.properties in the docker directory](src/main/resources/config/docker/main.properties). There you have to change all configurations which are described in step 3.
-The database password for the user "steve" has to be the same as you have configured it in the docker-compose file.
+The database password for the user "steve" has to be the same as you have configured it in the docker compose file.
 
-With the default docker-compose configuration, the web interface will be accessible at: `http://localhost:8180`
+With the default docker compose configuration, the web interface will be accessible at: `http://localhost:8180`
 
 # Kubernetes
 
@@ -143,7 +136,6 @@ After SteVe has successfully started, you can access the web interface using the
 
     http://<your-server-ip>:<port>/steve/manager
     
-The default port number is 8080.
 
 ### Add a charge point
 

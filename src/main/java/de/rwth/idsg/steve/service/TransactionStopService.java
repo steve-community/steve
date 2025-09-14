@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2019 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
+ * Copyright (C) 2013-2025 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -57,7 +57,7 @@ public class TransactionStopService {
     }
 
     public void stop(Integer transactionPk) {
-        TransactionDetails thisTxDetails = transactionRepository.getDetails(transactionPk, false);
+        TransactionDetails thisTxDetails = transactionRepository.getDetails(transactionPk);
         Transaction thisTx = thisTxDetails.getTransaction();
 
         // early exit, if transaction is already stopped

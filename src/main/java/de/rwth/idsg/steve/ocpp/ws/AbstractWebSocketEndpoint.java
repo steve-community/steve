@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2019 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
+ * Copyright (C) 2013-2025 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -20,6 +20,7 @@ package de.rwth.idsg.steve.ocpp.ws;
 
 import com.google.common.base.Strings;
 import de.rwth.idsg.steve.config.WebSocketConfiguration;
+import de.rwth.idsg.steve.config.DelegatingTaskScheduler;
 import de.rwth.idsg.steve.ocpp.OcppTransport;
 import de.rwth.idsg.steve.ocpp.OcppVersion;
 import de.rwth.idsg.steve.ocpp.ws.data.CommunicationContext;
@@ -39,14 +40,13 @@ import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketMessage;
 import org.springframework.web.socket.WebSocketSession;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Deque;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
 /**
@@ -55,14 +55,14 @@ import java.util.function.Consumer;
  */
 public abstract class AbstractWebSocketEndpoint extends ConcurrentWebSocketHandler implements SubProtocolCapable {
 
-    @Autowired private ScheduledExecutorService service;
+    @Autowired private DelegatingTaskScheduler asyncTaskScheduler;
     @Autowired private OcppServerRepository ocppServerRepository;
     @Autowired private FutureResponseContextStore futureResponseContextStore;
     @Autowired private ApplicationEventPublisher applicationEventPublisher;
 
     public static final String CHARGEBOX_ID_KEY = "CHARGEBOX_ID_KEY";
 
-    private final SessionContextStore sessionContextStore = new SessionContextStore();
+    private final SessionContextStore sessionContextStore = new SessionContextStoreImpl();
     private final List<Consumer<String>> connectedCallbackList = new ArrayList<>();
     private final List<Consumer<String>> disconnectedCallbackList = new ArrayList<>();
     private final Object sessionContextLock = new Object();
@@ -131,11 +131,11 @@ public abstract class AbstractWebSocketEndpoint extends ConcurrentWebSocketHandl
 
         // Just to keep the connection alive, such that the servers do not close
         // the connection because of a idle timeout, we ping-pong at fixed intervals.
-        ScheduledFuture pingSchedule = service.scheduleAtFixedRate(
+        ScheduledFuture pingSchedule = asyncTaskScheduler.scheduleAtFixedRate(
                 new PingTask(chargeBoxId, session),
-                WebSocketConfiguration.PING_INTERVAL,
-                WebSocketConfiguration.PING_INTERVAL,
-                TimeUnit.MINUTES);
+                Instant.now().plus(WebSocketConfiguration.PING_INTERVAL),
+                WebSocketConfiguration.PING_INTERVAL
+        );
 
         futureResponseContextStore.addSession(session);
 

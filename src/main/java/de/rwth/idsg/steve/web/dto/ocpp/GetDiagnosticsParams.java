@@ -1,6 +1,6 @@
 /*
  * SteVe - SteckdosenVerwaltung - https://github.com/steve-community/steve
- * Copyright (C) 2013-2019 RWTH Aachen University - Information Systems - Intelligent Distributed Systems Group (IDSG).
+ * Copyright (C) 2013-2025 SteVe Community Team
  * All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -20,13 +20,13 @@ package de.rwth.idsg.steve.web.dto.ocpp;
 
 import lombok.Getter;
 import lombok.Setter;
-import org.joda.time.LocalDateTime;
+import org.joda.time.DateTime;
 
-import javax.validation.constraints.AssertTrue;
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Past;
-import javax.validation.constraints.Pattern;
+import jakarta.validation.constraints.AssertTrue;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Past;
+import jakarta.validation.constraints.Pattern;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
@@ -47,10 +47,10 @@ public class GetDiagnosticsParams extends MultipleChargePointSelect {
     private Integer retryInterval;
 
     @Past(message = "Start Date/Time must be in the past")
-    private LocalDateTime start;
+    private DateTime start;
 
     @Past(message = "Stop Date/Time must be in the past")
-    private LocalDateTime stop;
+    private DateTime stop;
 
     @AssertTrue(message = "Stop Date/Time must be after Start Date/Time")
     public boolean isValid() {

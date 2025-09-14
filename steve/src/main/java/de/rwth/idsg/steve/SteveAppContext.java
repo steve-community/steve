@@ -23,6 +23,8 @@ import de.rwth.idsg.steve.web.dto.EndpointInfo;
 import org.apache.cxf.transport.servlet.CXFServlet;
 import org.apache.tomcat.InstanceManager;
 import org.apache.tomcat.SimpleInstanceManager;
+import org.eclipse.jetty.compression.gzip.GzipCompression;
+import org.eclipse.jetty.compression.server.CompressionHandler;
 import org.eclipse.jetty.ee10.apache.jsp.JettyJasperInitializer;
 import org.eclipse.jetty.ee10.servlet.FilterHolder;
 import org.eclipse.jetty.ee10.servlet.ServletContextHandler;
@@ -34,7 +36,6 @@ import org.eclipse.jetty.rewrite.handler.RewriteHandler;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.handler.ContextHandler;
 import org.eclipse.jetty.server.handler.ContextHandlerCollection;
-import org.eclipse.jetty.server.handler.gzip.GzipHandler;
 import org.eclipse.jetty.util.component.AbstractLifeCycle;
 import org.eclipse.jetty.websocket.core.WebSocketConstants;
 import org.springframework.context.support.GenericApplicationContext;
@@ -97,8 +98,9 @@ public class SteveAppContext {
         }
 
         // Wraps the whole web app in a gzip handler to make Jetty return compressed content
-        // http://www.eclipse.org/jetty/documentation/current/gzip-filter.html
-        return new GzipHandler(webAppContext);
+        var handler = new CompressionHandler(webAppContext);
+        handler.putCompression(new GzipCompression());
+        return handler;
     }
 
     private WebAppContext initWebApp() {

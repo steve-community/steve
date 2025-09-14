@@ -111,27 +111,30 @@
     <dependency>
       <groupId>org.eclipse.jetty</groupId>
       <artifactId>jetty-server</artifactId>
-      <version>${jetty.version}</version>
     </dependency>
     <dependency>
       <groupId>org.eclipse.jetty.ee10</groupId>
       <artifactId>jetty-ee10-webapp</artifactId>
-      <version>${jetty.version}</version>
     </dependency>
     <dependency>
       <groupId>org.eclipse.jetty.ee10</groupId>
       <artifactId>jetty-ee10-annotations</artifactId>
-      <version>${jetty.version}</version>
     </dependency>
     <dependency>
       <groupId>org.eclipse.jetty</groupId>
       <artifactId>jetty-rewrite</artifactId>
-      <version>${jetty.version}</version>
     </dependency>
     <dependency>
       <groupId>org.eclipse.jetty.ee10.websocket</groupId>
       <artifactId>jetty-ee10-websocket-jetty-server</artifactId>
-      <version>${jetty.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.jetty.compression</groupId>
+      <artifactId>jetty-compression-server</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.jetty.compression</groupId>
+      <artifactId>jetty-compression-gzip</artifactId>
     </dependency>
 
     <!-- DB -->
@@ -155,7 +158,6 @@
     <dependency>
       <groupId>org.eclipse.jetty.websocket</groupId>
       <artifactId>jetty-websocket-jetty-client</artifactId>
-      <version>${jetty.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>

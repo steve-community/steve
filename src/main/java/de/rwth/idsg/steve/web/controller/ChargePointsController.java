@@ -21,7 +21,7 @@ package de.rwth.idsg.steve.web.controller;
 import de.rwth.idsg.steve.ocpp.OcppProtocol;
 import de.rwth.idsg.steve.repository.ChargePointRepository;
 import de.rwth.idsg.steve.repository.dto.ChargePoint;
-import de.rwth.idsg.steve.service.ChargePointHelperService;
+import de.rwth.idsg.steve.service.ChargePointRegistrationService;
 import de.rwth.idsg.steve.utils.ControllerHelper;
 import de.rwth.idsg.steve.utils.mapper.ChargePointDetailsMapper;
 import de.rwth.idsg.steve.web.dto.ChargePointBatchInsertForm;
@@ -55,7 +55,7 @@ import java.util.stream.Collectors;
 public class ChargePointsController {
 
     protected final ChargePointRepository chargePointRepository;
-    protected final ChargePointHelperService chargePointHelperService;
+    protected final ChargePointRegistrationService chargePointRegistrationService;
 
     protected static final String PARAMS = "params";
 
@@ -106,7 +106,7 @@ public class ChargePointsController {
     private void initList(Model model, ChargePointQueryForm params) {
         model.addAttribute(PARAMS, params);
         model.addAttribute("cpList", chargePointRepository.getOverview(params));
-        model.addAttribute("unknownList", chargePointHelperService.getUnknownChargePoints());
+        model.addAttribute("unknownList", chargePointRegistrationService.getUnknownChargePoints());
     }
 
     @RequestMapping(value = DETAILS_PATH, method = RequestMethod.GET)
@@ -197,7 +197,7 @@ public class ChargePointsController {
 
     @RequestMapping(value = UNKNOWN_REMOVE_PATH, method = RequestMethod.POST)
     public String removeUnknownChargeBoxId(@PathVariable("chargeBoxId") String chargeBoxId) {
-        chargePointHelperService.removeUnknown(Collections.singletonList(chargeBoxId));
+        chargePointRegistrationService.removeUnknown(Collections.singletonList(chargeBoxId));
         return toOverview();
     }
 
@@ -236,11 +236,11 @@ public class ChargePointsController {
 
     private void add(ChargePointForm form) {
         chargePointRepository.addChargePoint(form);
-        chargePointHelperService.removeUnknown(Collections.singletonList(form.getChargeBoxId()));
+        chargePointRegistrationService.removeUnknown(Collections.singletonList(form.getChargeBoxId()));
     }
 
     private void add(List<String> idList) {
         chargePointRepository.addChargePointList(idList);
-        chargePointHelperService.removeUnknown(idList);
+        chargePointRegistrationService.removeUnknown(idList);
     }
 }

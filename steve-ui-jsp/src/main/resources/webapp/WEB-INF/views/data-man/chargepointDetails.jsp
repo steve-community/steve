@@ -84,21 +84,21 @@
                             </a>
                         </td>
                     </tr>
-                    <tr><td>Endpoint Address:</td><td><encode:forHtml value="${cp.chargeBox.endpointAddress}" /></td></tr>
-                    <tr><td>Ocpp Protocol:</td><td><encode:forHtml value="${cp.chargeBox.ocppProtocol}" /></td></tr>
-                    <tr><td>Charge Point Vendor:</td><td><encode:forHtml value="${cp.chargeBox.chargePointVendor}" /></td></tr>
-                    <tr><td>Charge Point Model:</td><td><encode:forHtml value="${cp.chargeBox.chargePointModel}" /></td></tr>
-                    <tr><td>Charge Point Serial Number:</td><td><encode:forHtml value="${cp.chargeBox.chargePointSerialNumber}" /></td></tr>
-                    <tr><td>Charge Box Serial Number:</td><td><encode:forHtml value="${cp.chargeBox.chargeBoxSerialNumber}" /></td></tr>
-                    <tr><td>Firmware Version:</td><td><encode:forHtml value="${cp.chargeBox.fwVersion}" /></td></tr>
-                    <tr><td>Firmware Update Timestamp:</td><td><encode:forHtml value="${cp.chargeBox.fwUpdateTimestamp}" /></td></tr>
-                    <tr><td>Iccid:</td><td><encode:forHtml value="${cp.chargeBox.iccid}" /></td></tr>
-                    <tr><td>Imsi:</td><td><encode:forHtml value="${cp.chargeBox.imsi}" /></td></tr>
-                    <tr><td>Meter Type:</td><td><encode:forHtml value="${cp.chargeBox.meterType}" /></td></tr>
-                    <tr><td>Meter Serial Number:</td><td><encode:forHtml value="${cp.chargeBox.meterSerialNumber}" /></td></tr>
-                    <tr><td>Diagnostics Status:</td><td><encode:forHtml value="${cp.chargeBox.diagnosticsStatus}" /></td></tr>
-                    <tr><td>Diagnostics Timestamp:</td><td><encode:forHtml value="${cp.chargeBox.diagnosticsTimestamp}" /></td></tr>
-                    <tr><td>Last Heartbeat Timestamp:</td><td><encode:forHtml value="${cp.chargeBox.lastHeartbeatTimestamp}" /></td></tr>
+                    <tr><td>Endpoint Address:</td><td><encode:forHtml value="${cp.endpointAddress}" /></td></tr>
+                    <tr><td>Ocpp Protocol:</td><td><encode:forHtml value="${cp.ocppProtocol}" /></td></tr>
+                    <tr><td>Charge Point Vendor:</td><td><encode:forHtml value="${cp.chargePointVendor}" /></td></tr>
+                    <tr><td>Charge Point Model:</td><td><encode:forHtml value="${cp.chargePointModel}" /></td></tr>
+                    <tr><td>Charge Point Serial Number:</td><td><encode:forHtml value="${cp.chargePointSerialNumber}" /></td></tr>
+                    <tr><td>Charge Box Serial Number:</td><td><encode:forHtml value="${cp.chargeBoxSerialNumber}" /></td></tr>
+                    <tr><td>Firmware Version:</td><td><encode:forHtml value="${cp.fwVersion}" /></td></tr>
+                    <tr><td>Firmware Update Timestamp:</td><td><encode:forHtml value="${cp.fwUpdateTimestamp}" /></td></tr>
+                    <tr><td>Iccid:</td><td><encode:forHtml value="${cp.iccid}" /></td></tr>
+                    <tr><td>Imsi:</td><td><encode:forHtml value="${cp.imsi}" /></td></tr>
+                    <tr><td>Meter Type:</td><td><encode:forHtml value="${cp.meterType}" /></td></tr>
+                    <tr><td>Meter Serial Number:</td><td><encode:forHtml value="${cp.meterSerialNumber}" /></td></tr>
+                    <tr><td>Diagnostics Status:</td><td><encode:forHtml value="${cp.diagnosticsStatus}" /></td></tr>
+                    <tr><td>Diagnostics Timestamp:</td><td><encode:forHtml value="${cp.diagnosticsTimestamp}" /></td></tr>
+                    <tr><td>Last Heartbeat Timestamp:</td><td><encode:forHtml value="${cp.lastHeartbeatTimestamp}" /></td></tr>
                     <tr>
                         <td>Insert connector status after start/stop transaction:
                         </td>

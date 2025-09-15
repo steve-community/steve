@@ -19,77 +19,46 @@
 package de.rwth.idsg.steve.ocpp.task;
 
 import de.rwth.idsg.steve.ocpp.CommunicationTask;
-import de.rwth.idsg.steve.ocpp.OcppCallback;
+import de.rwth.idsg.steve.ocpp.OcppVersion;
+import de.rwth.idsg.steve.ocpp.task.impl.OcppVersionHandler;
+import de.rwth.idsg.steve.ocpp.task.impl.TaskDefinition;
 import de.rwth.idsg.steve.web.dto.ocpp.ChangeConfigurationParams;
 
-import jakarta.xml.ws.AsyncHandler;
-
-/**
- * @author Sevket Goekay <sevketgokay@gmail.com>
- * @since 09.03.2018
- */
 public class ChangeConfigurationTask extends CommunicationTask<ChangeConfigurationParams, String> {
 
+    private static final TaskDefinition<ChangeConfigurationParams, String> TASK_DEFINITION =
+            TaskDefinition.<ChangeConfigurationParams, String>builder()
+                    .versionHandler(
+                            OcppVersion.V_12,
+                            new OcppVersionHandler<>(
+                                    task -> new ocpp.cp._2010._08.ChangeConfigurationRequest()
+                                            .withKey(task.getParams().getKey())
+                                            .withValue(task.getParams().getValue()),
+                                    (ocpp.cp._2010._08.ChangeConfigurationResponse r) ->
+                                            r.getStatus().value()))
+                    .versionHandler(
+                            OcppVersion.V_15,
+                            new OcppVersionHandler<>(
+                                    task -> new ocpp.cp._2012._06.ChangeConfigurationRequest()
+                                            .withKey(task.getParams().getKey())
+                                            .withValue(task.getParams().getValue()),
+                                    (ocpp.cp._2012._06.ChangeConfigurationResponse r) ->
+                                            r.getStatus().value()))
+                    .versionHandler(
+                            OcppVersion.V_16,
+                            new OcppVersionHandler<>(
+                                    task -> new ocpp.cp._2015._10.ChangeConfigurationRequest()
+                                            .withKey(task.getParams().getKey())
+                                            .withValue(task.getParams().getValue()),
+                                    (ocpp.cp._2015._10.ChangeConfigurationResponse r) ->
+                                            r.getStatus().value()))
+                    .build();
+
     public ChangeConfigurationTask(ChangeConfigurationParams params) {
-        super(params);
+        super(TASK_DEFINITION, params);
     }
 
-    @Override
-    public OcppCallback<String> defaultCallback() {
-        return new StringOcppCallback();
-    }
-
-    @Override
-    public ocpp.cp._2010._08.ChangeConfigurationRequest getOcpp12Request() {
-        return new ocpp.cp._2010._08.ChangeConfigurationRequest()
-                .withKey(params.getKey())
-                .withValue(params.getValue());
-    }
-
-    @Override
-    public ocpp.cp._2012._06.ChangeConfigurationRequest getOcpp15Request() {
-        return new ocpp.cp._2012._06.ChangeConfigurationRequest()
-                .withKey(params.getKey())
-                .withValue(params.getValue());
-    }
-
-    @Override
-    public ocpp.cp._2015._10.ChangeConfigurationRequest getOcpp16Request() {
-        return new ocpp.cp._2015._10.ChangeConfigurationRequest()
-                .withKey(params.getKey())
-                .withValue(params.getValue());
-    }
-
-    @Override
-    public AsyncHandler<ocpp.cp._2010._08.ChangeConfigurationResponse> getOcpp12Handler(String chargeBoxId) {
-        return res -> {
-            try {
-                success(chargeBoxId, res.get().getStatus().value());
-            } catch (Exception e) {
-                failed(chargeBoxId, e);
-            }
-        };
-    }
-
-    @Override
-    public AsyncHandler<ocpp.cp._2012._06.ChangeConfigurationResponse> getOcpp15Handler(String chargeBoxId) {
-        return res -> {
-            try {
-                success(chargeBoxId, res.get().getStatus().value());
-            } catch (Exception e) {
-                failed(chargeBoxId, e);
-            }
-        };
-    }
-
-    @Override
-    public AsyncHandler<ocpp.cp._2015._10.ChangeConfigurationResponse> getOcpp16Handler(String chargeBoxId) {
-        return res -> {
-            try {
-                success(chargeBoxId, res.get().getStatus().value());
-            } catch (Exception e) {
-                failed(chargeBoxId, e);
-            }
-        };
+    public ChangeConfigurationTask(ChangeConfigurationParams params, String caller) {
+        super(TASK_DEFINITION, params, caller);
     }
 }

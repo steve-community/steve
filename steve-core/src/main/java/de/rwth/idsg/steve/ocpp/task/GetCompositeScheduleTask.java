@@ -18,59 +18,37 @@
  */
 package de.rwth.idsg.steve.ocpp.task;
 
-import de.rwth.idsg.steve.ocpp.Ocpp16AndAboveTask;
-import de.rwth.idsg.steve.ocpp.OcppCallback;
-import de.rwth.idsg.steve.ocpp.RequestResult;
+import de.rwth.idsg.steve.ocpp.CommunicationTask;
+import de.rwth.idsg.steve.ocpp.OcppVersion;
+import de.rwth.idsg.steve.ocpp.task.impl.OcppVersionHandler;
+import de.rwth.idsg.steve.ocpp.task.impl.TaskDefinition;
 import de.rwth.idsg.steve.web.dto.ocpp.GetCompositeScheduleParams;
 import ocpp.cp._2015._10.GetCompositeScheduleRequest;
 import ocpp.cp._2015._10.GetCompositeScheduleResponse;
-import ocpp.cp._2015._10.GetCompositeScheduleStatus;
 
-import jakarta.xml.ws.AsyncHandler;
-
-/**
- * @author Sevket Goekay <sevketgokay@gmail.com>
- * @since 13.03.2018
- */
 public class GetCompositeScheduleTask
-        extends Ocpp16AndAboveTask<GetCompositeScheduleParams, GetCompositeScheduleResponse> {
+        extends CommunicationTask<GetCompositeScheduleParams, GetCompositeScheduleResponse> {
+
+    private static final TaskDefinition<GetCompositeScheduleParams, GetCompositeScheduleResponse> TASK_DEFINITION =
+            TaskDefinition.<GetCompositeScheduleParams, GetCompositeScheduleResponse>builder()
+                    .versionHandler(
+                            OcppVersion.V_16,
+                            new OcppVersionHandler<>(
+                                    task -> {
+                                        GetCompositeScheduleParams p = task.getParams();
+                                        return new GetCompositeScheduleRequest()
+                                                .withConnectorId(p.getConnectorId())
+                                                .withDuration(p.getDurationInSeconds())
+                                                .withChargingRateUnit(p.getChargingRateUnit());
+                                    },
+                                    (GetCompositeScheduleResponse r) -> r))
+                    .build();
 
     public GetCompositeScheduleTask(GetCompositeScheduleParams params) {
-        super(params);
+        super(TASK_DEFINITION, params);
     }
 
-    @Override
-    public OcppCallback<GetCompositeScheduleResponse> defaultCallback() {
-        return new DefaultOcppCallback<GetCompositeScheduleResponse>() {
-
-            @Override
-            public void success(String chargeBoxId, GetCompositeScheduleResponse response) {
-                addNewResponse(chargeBoxId, response.getStatus().value());
-
-                if (response.getStatus() == GetCompositeScheduleStatus.ACCEPTED) {
-                    RequestResult result = getResultMap().get(chargeBoxId);
-                    result.setDetails(response);
-                }
-            }
-        };
-    }
-
-    @Override
-    public GetCompositeScheduleRequest getOcpp16Request() {
-        return new GetCompositeScheduleRequest()
-                .withConnectorId(params.getConnectorId())
-                .withDuration(params.getDurationInSeconds())
-                .withChargingRateUnit(params.getChargingRateUnit());
-    }
-
-    @Override
-    public AsyncHandler<GetCompositeScheduleResponse> getOcpp16Handler(String chargeBoxId) {
-        return res -> {
-            try {
-                success(chargeBoxId, res.get());
-            } catch (Exception e) {
-                failed(chargeBoxId, e);
-            }
-        };
+    public GetCompositeScheduleTask(GetCompositeScheduleParams params, String caller) {
+        super(TASK_DEFINITION, params, caller);
     }
 }

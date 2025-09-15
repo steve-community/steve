@@ -24,6 +24,7 @@ import de.rwth.idsg.steve.utils.DateTimeUtils;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jooq.Record;
+import org.jspecify.annotations.Nullable;
 
 import static de.rwth.idsg.steve.utils.DateTimeUtils.toInstant;
 import static jooq.steve.db.Tables.CHARGE_BOX;
@@ -53,10 +54,11 @@ public final class TransactionMapper {
                 .build();
     }
 
-    private static TransactionStopEventActor toDto(jooq.steve.db.enums.TransactionStopEventActor actor) {
+    private static @Nullable TransactionStopEventActor toDto(
+            jooq.steve.db.enums.@Nullable TransactionStopEventActor actor) {
         if (actor == null) {
             return null;
         }
-        return TransactionStopEventActor.valueOf(actor.name());
+        return TransactionStopEventActor.valueOf(actor.getLiteral().toUpperCase());
     }
 }

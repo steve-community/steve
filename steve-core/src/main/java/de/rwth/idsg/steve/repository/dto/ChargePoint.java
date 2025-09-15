@@ -22,6 +22,7 @@ import com.neovisionaries.i18n.CountryCode;
 import de.rwth.idsg.steve.web.dto.Address;
 import lombok.Builder;
 import lombok.Getter;
+import org.jspecify.annotations.Nullable;
 
 import java.math.BigDecimal;
 import java.time.Instant;
@@ -44,7 +45,21 @@ public final class ChargePoint {
     public static final class Details {
         private final Integer chargeBoxPk;
         private final String chargeBoxId;
+        private final @Nullable String endpointAddress;
         private final String ocppProtocol;
+        private final @Nullable String chargePointVendor;
+        private final @Nullable String chargePointModel;
+        private final @Nullable String chargePointSerialNumber;
+        private final @Nullable String chargeBoxSerialNumber;
+        private final @Nullable String fwVersion;
+        private final @Nullable Instant fwUpdateTimestamp;
+        private final @Nullable String iccid;
+        private final @Nullable String imsi;
+        private final @Nullable String meterType;
+        private final @Nullable String meterSerialNumber;
+        private final @Nullable String diagnosticsStatus;
+        private final @Nullable Instant diagnosticsTimestamp;
+        private final @Nullable Instant lastHeartbeatTimestamp;
         private final String description;
         private final BigDecimal locationLatitude;
         private final BigDecimal locationLongitude;

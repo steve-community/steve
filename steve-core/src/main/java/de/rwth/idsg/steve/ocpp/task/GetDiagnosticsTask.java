@@ -19,88 +19,60 @@
 package de.rwth.idsg.steve.ocpp.task;
 
 import de.rwth.idsg.steve.ocpp.CommunicationTask;
-import de.rwth.idsg.steve.ocpp.OcppCallback;
+import de.rwth.idsg.steve.ocpp.OcppVersion;
+import de.rwth.idsg.steve.ocpp.task.impl.OcppVersionHandler;
+import de.rwth.idsg.steve.ocpp.task.impl.TaskDefinition;
 import de.rwth.idsg.steve.web.dto.ocpp.GetDiagnosticsParams;
-
-import jakarta.xml.ws.AsyncHandler;
 
 import static de.rwth.idsg.steve.utils.DateTimeUtils.toOffsetDateTime;
 
-/**
- * @author Sevket Goekay <sevketgokay@gmail.com>
- * @since 09.03.2018
- */
 public class GetDiagnosticsTask extends CommunicationTask<GetDiagnosticsParams, String> {
 
+    private static final TaskDefinition<GetDiagnosticsParams, String> TASK_DEFINITION =
+            TaskDefinition.<GetDiagnosticsParams, String>builder()
+                    .versionHandler(
+                            OcppVersion.V_12,
+                            new OcppVersionHandler<>(
+                                    task -> new ocpp.cp._2010._08.GetDiagnosticsRequest()
+                                            .withLocation(task.getParams().getLocation())
+                                            .withRetries(task.getParams().getRetries())
+                                            .withRetryInterval(task.getParams().getRetryInterval())
+                                            .withStartTime(toOffsetDateTime(
+                                                    task.getParams().getStart()))
+                                            .withStopTime(toOffsetDateTime(
+                                                    task.getParams().getStop())),
+                                    (ocpp.cp._2010._08.GetDiagnosticsResponse r) -> r.getFileName()))
+                    .versionHandler(
+                            OcppVersion.V_15,
+                            new OcppVersionHandler<>(
+                                    task -> new ocpp.cp._2012._06.GetDiagnosticsRequest()
+                                            .withLocation(task.getParams().getLocation())
+                                            .withRetries(task.getParams().getRetries())
+                                            .withRetryInterval(task.getParams().getRetryInterval())
+                                            .withStartTime(toOffsetDateTime(
+                                                    task.getParams().getStart()))
+                                            .withStopTime(toOffsetDateTime(
+                                                    task.getParams().getStop())),
+                                    (ocpp.cp._2012._06.GetDiagnosticsResponse r) -> r.getFileName()))
+                    .versionHandler(
+                            OcppVersion.V_16,
+                            new OcppVersionHandler<>(
+                                    task -> new ocpp.cp._2015._10.GetDiagnosticsRequest()
+                                            .withLocation(task.getParams().getLocation())
+                                            .withRetries(task.getParams().getRetries())
+                                            .withRetryInterval(task.getParams().getRetryInterval())
+                                            .withStartTime(toOffsetDateTime(
+                                                    task.getParams().getStart()))
+                                            .withStopTime(toOffsetDateTime(
+                                                    task.getParams().getStop())),
+                                    (ocpp.cp._2015._10.GetDiagnosticsResponse r) -> r.getFileName()))
+                    .build();
+
     public GetDiagnosticsTask(GetDiagnosticsParams params) {
-        super(params);
+        super(TASK_DEFINITION, params);
     }
 
-    @Override
-    public OcppCallback<String> defaultCallback() {
-        return new StringOcppCallback();
-    }
-
-    @Override
-    public ocpp.cp._2010._08.GetDiagnosticsRequest getOcpp12Request() {
-        return new ocpp.cp._2010._08.GetDiagnosticsRequest()
-                .withLocation(params.getLocation())
-                .withRetries(params.getRetries())
-                .withRetryInterval(params.getRetryInterval())
-                .withStartTime(toOffsetDateTime(params.getStart()))
-                .withStopTime(toOffsetDateTime(params.getStop()));
-    }
-
-    @Override
-    public ocpp.cp._2012._06.GetDiagnosticsRequest getOcpp15Request() {
-        return new ocpp.cp._2012._06.GetDiagnosticsRequest()
-                .withLocation(params.getLocation())
-                .withRetries(params.getRetries())
-                .withRetryInterval(params.getRetryInterval())
-                .withStartTime(toOffsetDateTime(params.getStart()))
-                .withStopTime(toOffsetDateTime(params.getStop()));
-    }
-
-    @Override
-    public ocpp.cp._2015._10.GetDiagnosticsRequest getOcpp16Request() {
-        return new ocpp.cp._2015._10.GetDiagnosticsRequest()
-                .withLocation(params.getLocation())
-                .withRetries(params.getRetries())
-                .withRetryInterval(params.getRetryInterval())
-                .withStartTime(toOffsetDateTime(params.getStart()))
-                .withStopTime(toOffsetDateTime(params.getStop()));
-    }
-
-    @Override
-    public AsyncHandler<ocpp.cp._2010._08.GetDiagnosticsResponse> getOcpp12Handler(String chargeBoxId) {
-        return res -> {
-            try {
-                success(chargeBoxId, res.get().getFileName());
-            } catch (Exception e) {
-                failed(chargeBoxId, e);
-            }
-        };
-    }
-
-    @Override
-    public AsyncHandler<ocpp.cp._2012._06.GetDiagnosticsResponse> getOcpp15Handler(String chargeBoxId) {
-        return res -> {
-            try {
-                success(chargeBoxId, res.get().getFileName());
-            } catch (Exception e) {
-                failed(chargeBoxId, e);
-            }
-        };
-    }
-
-    @Override
-    public AsyncHandler<ocpp.cp._2015._10.GetDiagnosticsResponse> getOcpp16Handler(String chargeBoxId) {
-        return res -> {
-            try {
-                success(chargeBoxId, res.get().getFileName());
-            } catch (Exception e) {
-                failed(chargeBoxId, e);
-            }
-        };
+    public GetDiagnosticsTask(GetDiagnosticsParams params, String caller) {
+        super(TASK_DEFINITION, params, caller);
     }
 }

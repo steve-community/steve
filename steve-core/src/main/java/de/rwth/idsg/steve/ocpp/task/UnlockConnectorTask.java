@@ -19,75 +19,43 @@
 package de.rwth.idsg.steve.ocpp.task;
 
 import de.rwth.idsg.steve.ocpp.CommunicationTask;
-import de.rwth.idsg.steve.ocpp.OcppCallback;
+import de.rwth.idsg.steve.ocpp.OcppVersion;
+import de.rwth.idsg.steve.ocpp.task.impl.OcppVersionHandler;
+import de.rwth.idsg.steve.ocpp.task.impl.TaskDefinition;
 import de.rwth.idsg.steve.web.dto.ocpp.UnlockConnectorParams;
 
-import jakarta.xml.ws.AsyncHandler;
-
-/**
- * @author Sevket Goekay <sevketgokay@gmail.com>
- * @since 09.03.2018
- */
 public class UnlockConnectorTask extends CommunicationTask<UnlockConnectorParams, String> {
 
+    private static final TaskDefinition<UnlockConnectorParams, String> TASK_DEFINITION =
+            TaskDefinition.<UnlockConnectorParams, String>builder()
+                    .versionHandler(
+                            OcppVersion.V_12,
+                            new OcppVersionHandler<>(
+                                    task -> new ocpp.cp._2010._08.UnlockConnectorRequest()
+                                            .withConnectorId(task.getParams().getConnectorId()),
+                                    (ocpp.cp._2010._08.UnlockConnectorResponse r) ->
+                                            r.getStatus().value()))
+                    .versionHandler(
+                            OcppVersion.V_15,
+                            new OcppVersionHandler<>(
+                                    task -> new ocpp.cp._2012._06.UnlockConnectorRequest()
+                                            .withConnectorId(task.getParams().getConnectorId()),
+                                    (ocpp.cp._2012._06.UnlockConnectorResponse r) ->
+                                            r.getStatus().value()))
+                    .versionHandler(
+                            OcppVersion.V_16,
+                            new OcppVersionHandler<>(
+                                    task -> new ocpp.cp._2015._10.UnlockConnectorRequest()
+                                            .withConnectorId(task.getParams().getConnectorId()),
+                                    (ocpp.cp._2015._10.UnlockConnectorResponse r) ->
+                                            r.getStatus().value()))
+                    .build();
+
     public UnlockConnectorTask(UnlockConnectorParams params) {
-        super(params);
+        super(TASK_DEFINITION, params);
     }
 
     public UnlockConnectorTask(UnlockConnectorParams params, String caller) {
-        super(params, caller);
-    }
-
-    @Override
-    public OcppCallback<String> defaultCallback() {
-        return new StringOcppCallback();
-    }
-
-    @Override
-    public ocpp.cp._2010._08.UnlockConnectorRequest getOcpp12Request() {
-        return new ocpp.cp._2010._08.UnlockConnectorRequest().withConnectorId(params.getConnectorId());
-    }
-
-    @Override
-    public ocpp.cp._2012._06.UnlockConnectorRequest getOcpp15Request() {
-        return new ocpp.cp._2012._06.UnlockConnectorRequest().withConnectorId(params.getConnectorId());
-    }
-
-    @Override
-    public ocpp.cp._2015._10.UnlockConnectorRequest getOcpp16Request() {
-        return new ocpp.cp._2015._10.UnlockConnectorRequest().withConnectorId(params.getConnectorId());
-    }
-
-    @Override
-    public AsyncHandler<ocpp.cp._2010._08.UnlockConnectorResponse> getOcpp12Handler(String chargeBoxId) {
-        return res -> {
-            try {
-                success(chargeBoxId, res.get().getStatus().value());
-            } catch (Exception e) {
-                failed(chargeBoxId, e);
-            }
-        };
-    }
-
-    @Override
-    public AsyncHandler<ocpp.cp._2012._06.UnlockConnectorResponse> getOcpp15Handler(String chargeBoxId) {
-        return res -> {
-            try {
-                success(chargeBoxId, res.get().getStatus().value());
-            } catch (Exception e) {
-                failed(chargeBoxId, e);
-            }
-        };
-    }
-
-    @Override
-    public AsyncHandler<ocpp.cp._2015._10.UnlockConnectorResponse> getOcpp16Handler(String chargeBoxId) {
-        return res -> {
-            try {
-                success(chargeBoxId, res.get().getStatus().value());
-            } catch (Exception e) {
-                failed(chargeBoxId, e);
-            }
-        };
+        super(TASK_DEFINITION, params, caller);
     }
 }

@@ -19,85 +19,54 @@
 package de.rwth.idsg.steve.ocpp.task;
 
 import de.rwth.idsg.steve.ocpp.CommunicationTask;
-import de.rwth.idsg.steve.ocpp.OcppCallback;
+import de.rwth.idsg.steve.ocpp.OcppVersion;
+import de.rwth.idsg.steve.ocpp.task.impl.OcppVersionHandler;
+import de.rwth.idsg.steve.ocpp.task.impl.TaskDefinition;
 import de.rwth.idsg.steve.web.dto.ocpp.UpdateFirmwareParams;
-
-import jakarta.xml.ws.AsyncHandler;
 
 import static de.rwth.idsg.steve.utils.DateTimeUtils.toOffsetDateTime;
 
-/**
- * @author Sevket Goekay <sevketgokay@gmail.com>
- * @since 09.03.2018
- */
 public class UpdateFirmwareTask extends CommunicationTask<UpdateFirmwareParams, String> {
 
+    private static final TaskDefinition<UpdateFirmwareParams, String> TASK_DEFINITION =
+            TaskDefinition.<UpdateFirmwareParams, String>builder()
+                    .versionHandler(
+                            OcppVersion.V_12,
+                            new OcppVersionHandler<>(
+                                    task -> new ocpp.cp._2010._08.UpdateFirmwareRequest()
+                                            .withLocation(task.getParams().getLocation())
+                                            .withRetrieveDate(toOffsetDateTime(
+                                                    task.getParams().getRetrieve()))
+                                            .withRetries(task.getParams().getRetries())
+                                            .withRetryInterval(task.getParams().getRetryInterval()),
+                                    r -> "OK"))
+                    .versionHandler(
+                            OcppVersion.V_15,
+                            new OcppVersionHandler<>(
+                                    task -> new ocpp.cp._2012._06.UpdateFirmwareRequest()
+                                            .withLocation(task.getParams().getLocation())
+                                            .withRetrieveDate(toOffsetDateTime(
+                                                    task.getParams().getRetrieve()))
+                                            .withRetries(task.getParams().getRetries())
+                                            .withRetryInterval(task.getParams().getRetryInterval()),
+                                    r -> "OK"))
+                    .versionHandler(
+                            OcppVersion.V_16,
+                            new OcppVersionHandler<>(
+                                    task -> new ocpp.cp._2015._10.UpdateFirmwareRequest()
+                                            .withLocation(task.getParams().getLocation())
+                                            .withRetrieveDate(toOffsetDateTime(
+                                                    task.getParams().getRetrieve()))
+                                            .withRetries(task.getParams().getRetries())
+                                            .withRetryInterval(task.getParams().getRetryInterval()),
+                                    r -> "OK"))
+                    .build();
+
     public UpdateFirmwareTask(UpdateFirmwareParams params) {
-        super(params);
+        super(TASK_DEFINITION, params);
     }
 
-    @Override
-    public OcppCallback<String> defaultCallback() {
-        return new StringOcppCallback();
-    }
-
-    @Override
-    public ocpp.cp._2010._08.UpdateFirmwareRequest getOcpp12Request() {
-        return new ocpp.cp._2010._08.UpdateFirmwareRequest()
-                .withLocation(params.getLocation())
-                .withRetrieveDate(toOffsetDateTime(params.getRetrieve()))
-                .withRetries(params.getRetries())
-                .withRetryInterval(params.getRetryInterval());
-    }
-
-    @Override
-    public ocpp.cp._2012._06.UpdateFirmwareRequest getOcpp15Request() {
-        return new ocpp.cp._2012._06.UpdateFirmwareRequest()
-                .withLocation(params.getLocation())
-                .withRetrieveDate(toOffsetDateTime(params.getRetrieve()))
-                .withRetries(params.getRetries())
-                .withRetryInterval(params.getRetryInterval());
-    }
-
-    @Override
-    public ocpp.cp._2015._10.UpdateFirmwareRequest getOcpp16Request() {
-        return new ocpp.cp._2015._10.UpdateFirmwareRequest()
-                .withLocation(params.getLocation())
-                .withRetrieveDate(toOffsetDateTime(params.getRetrieve()))
-                .withRetries(params.getRetries())
-                .withRetryInterval(params.getRetryInterval());
-    }
-
-    @Override
-    public AsyncHandler<ocpp.cp._2010._08.UpdateFirmwareResponse> getOcpp12Handler(String chargeBoxId) {
-        return res -> {
-            try {
-                success(chargeBoxId, "OK");
-            } catch (Exception e) {
-                failed(chargeBoxId, e);
-            }
-        };
-    }
-
-    @Override
-    public AsyncHandler<ocpp.cp._2012._06.UpdateFirmwareResponse> getOcpp15Handler(String chargeBoxId) {
-        return res -> {
-            try {
-                success(chargeBoxId, "OK");
-            } catch (Exception e) {
-                failed(chargeBoxId, e);
-            }
-        };
-    }
-
-    @Override
-    public AsyncHandler<ocpp.cp._2015._10.UpdateFirmwareResponse> getOcpp16Handler(String chargeBoxId) {
-        return res -> {
-            try {
-                success(chargeBoxId, "OK");
-            } catch (Exception e) {
-                failed(chargeBoxId, e);
-            }
-        };
+    public UpdateFirmwareTask(UpdateFirmwareParams params, String caller) {
+        super(TASK_DEFINITION, params, caller);
     }
 }

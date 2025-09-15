@@ -19,84 +19,57 @@
 package de.rwth.idsg.steve.ocpp.task;
 
 import com.google.common.base.Joiner;
-import de.rwth.idsg.steve.ocpp.Ocpp15AndAboveTask;
-import de.rwth.idsg.steve.ocpp.OcppCallback;
+import de.rwth.idsg.steve.ocpp.CommunicationTask;
+import de.rwth.idsg.steve.ocpp.OcppVersion;
+import de.rwth.idsg.steve.ocpp.task.impl.OcppVersionHandler;
+import de.rwth.idsg.steve.ocpp.task.impl.TaskDefinition;
 import de.rwth.idsg.steve.web.dto.ocpp.GetConfigurationParams;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import ocpp.cp._2012._06.GetConfigurationRequest;
-import ocpp.cp._2012._06.GetConfigurationResponse;
 
 import java.util.List;
-import jakarta.xml.ws.AsyncHandler;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 09.03.2018
  */
 public class GetConfigurationTask
-        extends Ocpp15AndAboveTask<GetConfigurationParams, GetConfigurationTask.ResponseWrapper> {
+        extends CommunicationTask<GetConfigurationParams, GetConfigurationTask.ResponseWrapper> {
 
     private static final Joiner JOINER = Joiner.on(", ");
 
+    private static final TaskDefinition<GetConfigurationParams, ResponseWrapper> TASK_DEFINITION =
+            TaskDefinition.<GetConfigurationParams, ResponseWrapper>builder()
+                    .versionHandler(
+                            OcppVersion.V_15,
+                            new OcppVersionHandler<>(
+                                    task -> new ocpp.cp._2012._06.GetConfigurationRequest()
+                                            .withKey(task.getParams().getAllKeys()),
+                                    (ocpp.cp._2012._06.GetConfigurationResponse r) -> {
+                                        var keyValues = r.getConfigurationKey().stream()
+                                                .map(k -> new KeyValue(k.getKey(), k.getValue(), k.isReadonly()))
+                                                .toList();
+                                        return new ResponseWrapper(keyValues, r.getUnknownKey());
+                                    }))
+                    .versionHandler(
+                            OcppVersion.V_16,
+                            new OcppVersionHandler<>(
+                                    task -> new ocpp.cp._2015._10.GetConfigurationRequest()
+                                            .withKey(task.getParams().getAllKeys()),
+                                    (ocpp.cp._2015._10.GetConfigurationResponse r) -> {
+                                        var keyValues = r.getConfigurationKey().stream()
+                                                .map(k -> new KeyValue(k.getKey(), k.getValue(), k.isReadonly()))
+                                                .toList();
+                                        return new ResponseWrapper(keyValues, r.getUnknownKey());
+                                    }))
+                    .build();
+
     public GetConfigurationTask(GetConfigurationParams params) {
-        super(params);
+        super(TASK_DEFINITION, params);
     }
 
-    @Override
-    public OcppCallback<ResponseWrapper> defaultCallback() {
-        return new DefaultOcppCallback<ResponseWrapper>() {
-            @Override
-            public void success(String chargeBoxId, ResponseWrapper response) {
-                addNewResponse(chargeBoxId, "OK");
-
-                var result = getResultMap().get(chargeBoxId);
-                result.setDetails(response);
-            }
-        };
-    }
-
-    @Override
-    public ocpp.cp._2012._06.GetConfigurationRequest getOcpp15Request() {
-        return new GetConfigurationRequest().withKey(params.getAllKeys());
-    }
-
-    @Override
-    public ocpp.cp._2015._10.GetConfigurationRequest getOcpp16Request() {
-        return new ocpp.cp._2015._10.GetConfigurationRequest().withKey(params.getAllKeys());
-    }
-
-    @Override
-    public AsyncHandler<ocpp.cp._2012._06.GetConfigurationResponse> getOcpp15Handler(String chargeBoxId) {
-        return res -> {
-            try {
-                GetConfigurationResponse response = res.get();
-
-                List<KeyValue> keyValues = response.getConfigurationKey().stream()
-                        .map(k -> new KeyValue(k.getKey(), k.getValue(), k.isReadonly()))
-                        .toList();
-
-                success(chargeBoxId, new ResponseWrapper(keyValues, response.getUnknownKey()));
-            } catch (Exception e) {
-                failed(chargeBoxId, e);
-            }
-        };
-    }
-
-    @Override
-    public AsyncHandler<ocpp.cp._2015._10.GetConfigurationResponse> getOcpp16Handler(String chargeBoxId) {
-        return res -> {
-            try {
-                ocpp.cp._2015._10.GetConfigurationResponse response = res.get();
-                List<KeyValue> keyValues = response.getConfigurationKey().stream()
-                        .map(k -> new KeyValue(k.getKey(), k.getValue(), k.isReadonly()))
-                        .toList();
-
-                success(chargeBoxId, new ResponseWrapper(keyValues, response.getUnknownKey()));
-            } catch (Exception e) {
-                failed(chargeBoxId, e);
-            }
-        };
+    public GetConfigurationTask(GetConfigurationParams params, String caller) {
+        super(TASK_DEFINITION, params, caller);
     }
 
     @Getter

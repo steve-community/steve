@@ -20,7 +20,9 @@ package de.rwth.idsg.steve.ocpp;
 
 import de.rwth.idsg.ocpp.jaxb.RequestType;
 import de.rwth.idsg.ocpp.jaxb.ResponseType;
-import de.rwth.idsg.steve.repository.dto.ChargePointSelect;
+import de.rwth.idsg.steve.ocpp.task.impl.RequestMapper;
+import de.rwth.idsg.steve.ocpp.task.impl.ResponseMapper;
+import de.rwth.idsg.steve.ocpp.task.impl.TaskDefinition;
 import de.rwth.idsg.steve.utils.StringUtils;
 import de.rwth.idsg.steve.web.dto.ocpp.ChargePointSelection;
 import lombok.AccessLevel;
@@ -52,6 +54,7 @@ public abstract class CommunicationTask<S extends ChargePointSelection, RESPONSE
     private final TaskOrigin origin;
     private final String caller;
     protected final S params;
+    protected final TaskDefinition<S, RESPONSE> taskDefinition;
 
     private final Map<String, OcppVersion> versionMap;
     private final Map<String, RequestResult<RESPONSE>> resultMap;
@@ -66,37 +69,41 @@ public abstract class CommunicationTask<S extends ChargePointSelection, RESPONSE
     @Getter(AccessLevel.NONE) // disable getter generation
     private final Object lockObject = new Object();
 
-    // The default initial capacity is 10. We probably won't need that much.
-    private final ArrayList<OcppCallback<RESPONSE>> callbackList = new ArrayList<>(2);
+    private final List<OcppCallback<RESPONSE>> callbackList;
 
-    public CommunicationTask(S params) {
-        this(params, TaskOrigin.INTERNAL, "SteVe");
+    @Getter
+    private final OcppCallback<RESPONSE> defaultCallback;
+
+    protected CommunicationTask(TaskDefinition<S, RESPONSE> taskDefinition, S params) {
+        this(taskDefinition, params, TaskOrigin.INTERNAL, "SteVe");
     }
 
-    public CommunicationTask(S params, String caller) {
-        this(params, TaskOrigin.EXTERNAL, caller);
+    protected CommunicationTask(TaskDefinition<S, RESPONSE> taskDefinition, S params, String caller) {
+        this(taskDefinition, params, TaskOrigin.EXTERNAL, caller);
     }
 
-    /**
-     * Do not expose the constructor, make it package-private
-     */
-    CommunicationTask(S params, TaskOrigin origin, String caller) {
-        List<ChargePointSelect> cpsList = params.getChargePointSelectList();
+    private CommunicationTask(TaskDefinition<S, RESPONSE> taskDefinition, S params, TaskOrigin origin, String caller) {
+        var cpsList = params.getChargePointSelectList();
 
         this.resultSize = cpsList.size();
         this.origin = origin;
         this.caller = caller;
         this.params = params;
+        this.taskDefinition = taskDefinition;
 
-        resultMap = new HashMap<>(resultSize);
-        versionMap = new HashMap<>(resultSize);
-        for (ChargePointSelect cps : cpsList) {
-            resultMap.put(cps.getChargeBoxId(), new RequestResult());
+        this.resultMap = HashMap.newHashMap(resultSize);
+        this.versionMap = HashMap.newHashMap(resultSize);
+        for (var cps : cpsList) {
+            resultMap.put(cps.getChargeBoxId(), new RequestResult<>());
             versionMap.put(cps.getChargeBoxId(), cps.getOcppProtocol().getVersion());
         }
 
-        callbackList.add(defaultCallback());
-        operationName = StringUtils.getOperationName(this);
+        this.callbackList = new ArrayList<>(2);
+
+        this.defaultCallback = createDefaultCallback();
+        callbackList.add(this.defaultCallback);
+
+        this.operationName = StringUtils.getOperationName(this);
     }
 
     public void addCallback(OcppCallback<RESPONSE> cb) {
@@ -109,7 +116,7 @@ public abstract class CommunicationTask<S extends ChargePointSelection, RESPONSE
         }
     }
 
-    public void addNewResponse(String chargeBoxId, String response) {
+    public void addNewResponse(String chargeBoxId, RESPONSE response) {
         var result = resultMap.get(chargeBoxId);
         if (result == null) {
             log.warn("Received response for unknown chargeBoxId '{}'", chargeBoxId);
@@ -135,7 +142,7 @@ public abstract class CommunicationTask<S extends ChargePointSelection, RESPONSE
     }
 
     public void success(String chargeBoxId, RESPONSE response) {
-        for (OcppCallback<RESPONSE> c : callbackList) {
+        for (var c : callbackList) {
             try {
                 c.success(chargeBoxId, response);
             } catch (Exception e) {
@@ -145,7 +152,7 @@ public abstract class CommunicationTask<S extends ChargePointSelection, RESPONSE
     }
 
     public void failed(String chargeBoxId, Exception exception) {
-        for (OcppCallback<RESPONSE> c : callbackList) {
+        for (var c : callbackList) {
             try {
                 c.failed(chargeBoxId, exception);
             } catch (Exception e) {
@@ -154,50 +161,51 @@ public abstract class CommunicationTask<S extends ChargePointSelection, RESPONSE
         }
     }
 
-    public AsyncHandler<ResponseType> getHandler(String chargeBoxId) {
-        return switch (versionMap.get(chargeBoxId)) {
-            case V_12 -> getOcpp12Handler(chargeBoxId);
-            case V_15 -> getOcpp15Handler(chargeBoxId);
-            case V_16 -> getOcpp16Handler(chargeBoxId);
+    protected OcppCallback<RESPONSE> createDefaultCallback() {
+        return new OcppCallback<>() {
+            @Override
+            public void success(String chargeBoxId, RESPONSE response) {
+                addNewResponse(chargeBoxId, response);
+            }
+
+            @Override
+            public void successError(String chargeBoxId, Object error) {
+                addNewError(chargeBoxId, error.toString());
+            }
+
+            @Override
+            public void failed(String chargeBoxId, Exception e) {
+                addNewError(chargeBoxId, e.getMessage());
+            }
         };
     }
 
-    public abstract OcppCallback<RESPONSE> defaultCallback();
-
-    public abstract <T extends RequestType> T getOcpp12Request();
-
-    public abstract <T extends RequestType> T getOcpp15Request();
-
-    public abstract <T extends RequestType> T getOcpp16Request();
-
-    public abstract <T extends ResponseType> AsyncHandler<T> getOcpp12Handler(String chargeBoxId);
-
-    public abstract <T extends ResponseType> AsyncHandler<T> getOcpp15Handler(String chargeBoxId);
-
-    public abstract <T extends ResponseType> AsyncHandler<T> getOcpp16Handler(String chargeBoxId);
-
-    // -------------------------------------------------------------------------
-    // Classes
-    // -------------------------------------------------------------------------
-
-    public abstract class DefaultOcppCallback<RES> implements OcppCallback<RES> {
-
-        @Override
-        public void successError(String chargeBoxId, Object error) {
-            addNewResponse(chargeBoxId, error.toString());
+    @SuppressWarnings("unchecked")
+    public <T extends RequestType> T getRequest(OcppVersion version) {
+        var handler = taskDefinition.getVersionHandlers().get(version);
+        if (handler == null) {
+            throw new UnsupportedOperationException("Operation not supported for version " + version);
         }
-
-        @Override
-        public void failed(String chargeBoxId, Exception e) {
-            addNewError(chargeBoxId, e.getMessage());
-        }
+        var mapper = (RequestMapper<CommunicationTask<S, RESPONSE>, T>) handler.getRequestMapper();
+        return mapper.map(this);
     }
 
-    public class StringOcppCallback extends DefaultOcppCallback<String> {
-
-        @Override
-        public void success(String chargeBoxId, String response) {
-            addNewResponse(chargeBoxId, response);
+    @SuppressWarnings("unchecked")
+    public <T extends ResponseType> AsyncHandler<T> createHandler(String chargeBoxId) {
+        var version = versionMap.get(chargeBoxId);
+        var handler = taskDefinition.getVersionHandlers().get(version);
+        if (handler == null) {
+            throw new UnsupportedOperationException("Operation not supported for version " + version);
         }
+        var mapper = (ResponseMapper<T, RESPONSE>) handler.getResponseMapper();
+
+        return res -> {
+            try {
+                var mappedResponse = mapper.map(res.get());
+                success(chargeBoxId, mappedResponse);
+            } catch (Exception e) {
+                failed(chargeBoxId, e);
+            }
+        };
     }
 }

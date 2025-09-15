@@ -61,22 +61,22 @@ public class CommunicationContext {
     private FutureResponseContext futureResponseContext;
 
     // for incoming responses to previously sent requests
-    private Consumer<OcppJsonResult> resultHandler;
-    private Consumer<OcppJsonError> errorHandler;
+    private @Nullable Consumer<OcppJsonResult> resultHandler;
+    private @Nullable Consumer<OcppJsonError> errorHandler;
 
     public boolean isSetOutgoingError() {
         return outgoingMessage instanceof OcppJsonError;
     }
 
-    @SuppressWarnings("unchecked")
-    public void createResultHandler(CommunicationTask task) {
+    public void createResultHandler(CommunicationTask<?, ?> task) {
         // TODO: not so sure about this
-        resultHandler = result -> task.getHandler(chargeBoxId).handleResponse(new DummyResponse(result.getPayload()));
+        resultHandler =
+                result -> task.createHandler(chargeBoxId).handleResponse(new DummyResponse(result.getPayload()));
     }
 
-    public void createErrorHandler(CommunicationTask task) {
+    public void createErrorHandler(CommunicationTask<?, ?> task) {
         // TODO: not so sure about this
-        errorHandler = result -> task.defaultCallback().successError(chargeBoxId, result);
+        errorHandler = result -> task.getDefaultCallback().successError(chargeBoxId, result);
     }
 
     @RequiredArgsConstructor(access = AccessLevel.PRIVATE)

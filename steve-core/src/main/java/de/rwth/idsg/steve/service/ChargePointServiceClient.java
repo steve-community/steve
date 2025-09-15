@@ -38,7 +38,6 @@ import de.rwth.idsg.steve.ocpp.task.ReserveNowTask;
 import de.rwth.idsg.steve.ocpp.task.ResetTask;
 import de.rwth.idsg.steve.ocpp.task.SendLocalListTask;
 import de.rwth.idsg.steve.ocpp.task.SetChargingProfileTask;
-import de.rwth.idsg.steve.ocpp.task.SetChargingProfileTaskFromDB;
 import de.rwth.idsg.steve.ocpp.task.TriggerMessageTask;
 import de.rwth.idsg.steve.ocpp.task.UnlockConnectorTask;
 import de.rwth.idsg.steve.ocpp.task.UpdateFirmwareTask;
@@ -366,7 +365,7 @@ public class ChargePointServiceClient {
 
     @SafeVarargs
     public final int cancelReservation(CancelReservationParams params, OcppCallback<String>... callbacks) {
-        CancelReservationTask task = new CancelReservationTask(params, reservationRepository);
+        CancelReservationTask task = new CancelReservationTask(params, reservationRepository, "SteVe");
 
         for (var callback : callbacks) {
             task.addCallback(callback);
@@ -416,8 +415,7 @@ public class ChargePointServiceClient {
         var details = chargingProfileRepository
                 .getDetails(params.getChargingProfilePk())
                 .orElseThrow(() -> new SteveException.NotFound("Charging Profile not found"));
-        SetChargingProfileTaskFromDB task =
-                new SetChargingProfileTaskFromDB(params, details, chargingProfileRepository);
+        SetChargingProfileTask task = new SetChargingProfileTask(params, details, chargingProfileRepository, "SteVe");
 
         return setChargingProfile(task, callbacks);
     }

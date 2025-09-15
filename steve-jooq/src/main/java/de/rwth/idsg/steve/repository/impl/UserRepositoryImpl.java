@@ -109,7 +109,7 @@ public class UserRepositoryImpl implements UserRepository {
         var address = addressRepository.get(ur.getAddressPk());
         var ocppTagEntries = getOcppTagsInternal(userPk, null).getOrDefault(userPk, List.of());
 
-        return Optional.of(UserMapper.fromRecord(ur, address, ocppTagEntries));
+        return Optional.of(UserMapper.fromRecord(ur, address.orElse(null), ocppTagEntries));
     }
 
     @Override

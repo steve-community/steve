@@ -19,75 +19,43 @@
 package de.rwth.idsg.steve.ocpp.task;
 
 import de.rwth.idsg.steve.ocpp.CommunicationTask;
-import de.rwth.idsg.steve.ocpp.OcppCallback;
+import de.rwth.idsg.steve.ocpp.OcppVersion;
+import de.rwth.idsg.steve.ocpp.task.impl.OcppVersionHandler;
+import de.rwth.idsg.steve.ocpp.task.impl.TaskDefinition;
 import de.rwth.idsg.steve.web.dto.ocpp.RemoteStopTransactionParams;
 
-import jakarta.xml.ws.AsyncHandler;
-
-/**
- * @author Sevket Goekay <sevketgokay@gmail.com>
- * @since 09.03.2018
- */
 public class RemoteStopTransactionTask extends CommunicationTask<RemoteStopTransactionParams, String> {
 
+    private static final TaskDefinition<RemoteStopTransactionParams, String> TASK_DEFINITION =
+            TaskDefinition.<RemoteStopTransactionParams, String>builder()
+                    .versionHandler(
+                            OcppVersion.V_12,
+                            new OcppVersionHandler<>(
+                                    task -> new ocpp.cp._2010._08.RemoteStopTransactionRequest()
+                                            .withTransactionId(task.getParams().getTransactionId()),
+                                    (ocpp.cp._2010._08.RemoteStopTransactionResponse r) ->
+                                            r.getStatus().value()))
+                    .versionHandler(
+                            OcppVersion.V_15,
+                            new OcppVersionHandler<>(
+                                    task -> new ocpp.cp._2012._06.RemoteStopTransactionRequest()
+                                            .withTransactionId(task.getParams().getTransactionId()),
+                                    (ocpp.cp._2012._06.RemoteStopTransactionResponse r) ->
+                                            r.getStatus().value()))
+                    .versionHandler(
+                            OcppVersion.V_16,
+                            new OcppVersionHandler<>(
+                                    task -> new ocpp.cp._2015._10.RemoteStopTransactionRequest()
+                                            .withTransactionId(task.getParams().getTransactionId()),
+                                    (ocpp.cp._2015._10.RemoteStopTransactionResponse r) ->
+                                            r.getStatus().value()))
+                    .build();
+
     public RemoteStopTransactionTask(RemoteStopTransactionParams params) {
-        super(params);
+        super(TASK_DEFINITION, params);
     }
 
     public RemoteStopTransactionTask(RemoteStopTransactionParams params, String caller) {
-        super(params, caller);
-    }
-
-    @Override
-    public OcppCallback<String> defaultCallback() {
-        return new StringOcppCallback();
-    }
-
-    @Override
-    public ocpp.cp._2010._08.RemoteStopTransactionRequest getOcpp12Request() {
-        return new ocpp.cp._2010._08.RemoteStopTransactionRequest().withTransactionId(params.getTransactionId());
-    }
-
-    @Override
-    public ocpp.cp._2012._06.RemoteStopTransactionRequest getOcpp15Request() {
-        return new ocpp.cp._2012._06.RemoteStopTransactionRequest().withTransactionId(params.getTransactionId());
-    }
-
-    @Override
-    public ocpp.cp._2015._10.RemoteStopTransactionRequest getOcpp16Request() {
-        return new ocpp.cp._2015._10.RemoteStopTransactionRequest().withTransactionId(params.getTransactionId());
-    }
-
-    @Override
-    public AsyncHandler<ocpp.cp._2010._08.RemoteStopTransactionResponse> getOcpp12Handler(String chargeBoxId) {
-        return res -> {
-            try {
-                success(chargeBoxId, res.get().getStatus().value());
-            } catch (Exception e) {
-                failed(chargeBoxId, e);
-            }
-        };
-    }
-
-    @Override
-    public AsyncHandler<ocpp.cp._2012._06.RemoteStopTransactionResponse> getOcpp15Handler(String chargeBoxId) {
-        return res -> {
-            try {
-                success(chargeBoxId, res.get().getStatus().value());
-            } catch (Exception e) {
-                failed(chargeBoxId, e);
-            }
-        };
-    }
-
-    @Override
-    public AsyncHandler<ocpp.cp._2015._10.RemoteStopTransactionResponse> getOcpp16Handler(String chargeBoxId) {
-        return res -> {
-            try {
-                success(chargeBoxId, res.get().getStatus().value());
-            } catch (Exception e) {
-                failed(chargeBoxId, e);
-            }
-        };
+        super(TASK_DEFINITION, params, caller);
     }
 }

@@ -19,77 +19,49 @@
 package de.rwth.idsg.steve.ocpp.task;
 
 import de.rwth.idsg.steve.ocpp.CommunicationTask;
-import de.rwth.idsg.steve.ocpp.OcppCallback;
+import de.rwth.idsg.steve.ocpp.OcppVersion;
+import de.rwth.idsg.steve.ocpp.task.impl.OcppVersionHandler;
+import de.rwth.idsg.steve.ocpp.task.impl.TaskDefinition;
 import de.rwth.idsg.steve.web.dto.ocpp.ResetParams;
 
-import jakarta.xml.ws.AsyncHandler;
-
-/**
- * @author Sevket Goekay <sevketgokay@gmail.com>
- * @since 09.03.2018
- */
 public class ResetTask extends CommunicationTask<ResetParams, String> {
 
+    private static final TaskDefinition<ResetParams, String> TASK_DEFINITION =
+            TaskDefinition.<ResetParams, String>builder()
+                    .versionHandler(
+                            OcppVersion.V_12,
+                            new OcppVersionHandler<>(
+                                    task -> new ocpp.cp._2010._08.ResetRequest()
+                                            .withType(ocpp.cp._2010._08.ResetType.fromValue(task.getParams()
+                                                    .getResetType()
+                                                    .value())),
+                                    (ocpp.cp._2010._08.ResetResponse r) ->
+                                            r.getStatus().value()))
+                    .versionHandler(
+                            OcppVersion.V_15,
+                            new OcppVersionHandler<>(
+                                    task -> new ocpp.cp._2012._06.ResetRequest()
+                                            .withType(ocpp.cp._2012._06.ResetType.fromValue(task.getParams()
+                                                    .getResetType()
+                                                    .value())),
+                                    (ocpp.cp._2012._06.ResetResponse r) ->
+                                            r.getStatus().value()))
+                    .versionHandler(
+                            OcppVersion.V_16,
+                            new OcppVersionHandler<>(
+                                    task -> new ocpp.cp._2015._10.ResetRequest()
+                                            .withType(ocpp.cp._2015._10.ResetType.fromValue(task.getParams()
+                                                    .getResetType()
+                                                    .value())),
+                                    (ocpp.cp._2015._10.ResetResponse r) ->
+                                            r.getStatus().value()))
+                    .build();
+
     public ResetTask(ResetParams params) {
-        super(params);
+        super(TASK_DEFINITION, params);
     }
 
-    @Override
-    public OcppCallback<String> defaultCallback() {
-        return new StringOcppCallback();
-    }
-
-    @Override
-    public ocpp.cp._2010._08.ResetRequest getOcpp12Request() {
-        return new ocpp.cp._2010._08.ResetRequest()
-                .withType(ocpp.cp._2010._08.ResetType.fromValue(
-                        params.getResetType().value()));
-    }
-
-    @Override
-    public ocpp.cp._2012._06.ResetRequest getOcpp15Request() {
-        return new ocpp.cp._2012._06.ResetRequest()
-                .withType(ocpp.cp._2012._06.ResetType.fromValue(
-                        params.getResetType().value()));
-    }
-
-    @Override
-    public ocpp.cp._2015._10.ResetRequest getOcpp16Request() {
-        return new ocpp.cp._2015._10.ResetRequest()
-                .withType(ocpp.cp._2015._10.ResetType.fromValue(
-                        params.getResetType().value()));
-    }
-
-    @Override
-    public AsyncHandler<ocpp.cp._2010._08.ResetResponse> getOcpp12Handler(String chargeBoxId) {
-        return res -> {
-            try {
-                success(chargeBoxId, res.get().getStatus().value());
-            } catch (Exception e) {
-                failed(chargeBoxId, e);
-            }
-        };
-    }
-
-    @Override
-    public AsyncHandler<ocpp.cp._2012._06.ResetResponse> getOcpp15Handler(String chargeBoxId) {
-        return res -> {
-            try {
-                success(chargeBoxId, res.get().getStatus().value());
-            } catch (Exception e) {
-                failed(chargeBoxId, e);
-            }
-        };
-    }
-
-    @Override
-    public AsyncHandler<ocpp.cp._2015._10.ResetResponse> getOcpp16Handler(String chargeBoxId) {
-        return res -> {
-            try {
-                success(chargeBoxId, res.get().getStatus().value());
-            } catch (Exception e) {
-                failed(chargeBoxId, e);
-            }
-        };
+    public ResetTask(ResetParams params, String caller) {
+        super(TASK_DEFINITION, params, caller);
     }
 }

@@ -27,6 +27,7 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jooq.JSON;
+import org.jspecify.annotations.Nullable;
 
 import java.io.IOException;
 import java.util.Collections;
@@ -60,12 +61,12 @@ public final class WebUserMapper {
                 .build();
     }
 
-    private static Set<WebUserAuthority> fromJSON(JSON json, ObjectMapper objectMapper) {
+    private static Set<WebUserAuthority> fromJSON(@Nullable JSON json, ObjectMapper objectMapper) {
         if (json == null) {
             return Collections.emptySet();
         }
         try {
-            Set<String> strings = objectMapper.readValue(
+            var strings = objectMapper.<Set<String>>readValue(
                     json.data(), objectMapper.getTypeFactory().constructCollectionType(Set.class, String.class));
             return strings.stream().map(WebUserAuthority::fromAuthority).collect(Collectors.toSet());
         } catch (IOException e) {

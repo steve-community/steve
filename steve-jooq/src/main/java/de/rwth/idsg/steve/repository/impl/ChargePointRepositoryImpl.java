@@ -206,7 +206,7 @@ public class ChargePointRepositoryImpl implements ChargePointRepository {
     }
 
     @Override
-    public List<ConnectorStatus> getChargePointConnectorStatus(ConnectorStatusForm form) {
+    public List<ConnectorStatus> getChargePointConnectorStatus(@Nullable ConnectorStatusForm form) {
         // find out the latest timestamp for each connector
         var t1Pk = CONNECTOR_STATUS.CONNECTOR_PK.as("t1_pk");
         var t1TsMax = DSL.max(CONNECTOR_STATUS.STATUS_TIMESTAMP).as("t1_ts_max");

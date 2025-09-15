@@ -36,7 +36,7 @@ public class DataTransferTask extends CommunicationTask<DataTransferParams, Data
 
         @Override
         public String toString() {
-            StringBuilder builder = new StringBuilder(status);
+            var builder = new StringBuilder(status);
             if (data != null) {
                 builder.append(" / Data: ").append(data);
             }

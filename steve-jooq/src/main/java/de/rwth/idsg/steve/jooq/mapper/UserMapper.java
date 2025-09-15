@@ -25,13 +25,11 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
-import java.util.Optional;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class UserMapper {
 
-    public static User.Details fromRecord(
-            UserRecord r, Optional<Address> address, List<User.OcppTagEntry> ocppTagEntries) {
+    public static User.Details fromRecord(UserRecord r, Address address, List<User.OcppTagEntry> ocppTagEntries) {
         var builder = User.Details.builder()
                 .userPk(r.getUserPk())
                 .firstName(r.getFirstName())
@@ -43,11 +41,13 @@ public final class UserMapper {
                 .note(r.getNote())
                 .ocppTagEntries(ocppTagEntries);
 
-        address.ifPresent(a -> builder.street(a.getStreet())
-                .houseNumber(a.getHouseNumber())
-                .zipCode(a.getZipCode())
-                .city(a.getCity())
-                .country(a.getCountry()));
+        if (address != null) {
+            builder.street(address.getStreet())
+                    .houseNumber(address.getHouseNumber())
+                    .zipCode(address.getZipCode())
+                    .city(address.getCity())
+                    .country(address.getCountry());
+        }
 
         return builder.build();
     }

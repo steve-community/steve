@@ -31,7 +31,6 @@ import static de.rwth.idsg.steve.utils.DateTimeUtils.toInstant;
 public final class ChargePointMapper {
 
     public static ChargePoint.Details fromRecord(ChargeBoxRecord r, @Nullable Address address) {
-        r.getAdminAddress();
         var builder = ChargePoint.Details.builder()
                 .chargeBoxPk(r.getChargeBoxPk())
                 .chargeBoxId(r.getChargeBoxId())

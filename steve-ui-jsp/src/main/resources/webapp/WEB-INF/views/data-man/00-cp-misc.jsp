@@ -34,7 +34,7 @@
 	<tr><td>Latitude:</td><td><form:input path="locationLatitude"/></td></tr>
 	<tr><td>Longitude:</td><td><form:input path="locationLongitude"/></td></tr>
 
-	<c:if test="${(not empty cp.locationLongitude) and (not empty cp.locationLongitude)}">
+	<c:if test="${(not empty cp.locationLatitude) and (not empty cp.locationLongitude)}">
 		<tr>
 			<td></td>
 			<td><a target="_blank"

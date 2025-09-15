@@ -58,7 +58,7 @@ public class ChargePointServiceInvokerImpl implements ChargePointServiceInvoker 
     private final ChargePointServiceSoapInvoker chargePointServiceSoapInvoker;
     private final ChargePointServiceJsonInvoker chargePointServiceJsonInvoker;
 
-    private <T extends CommunicationTask<?, ?>> void invoke(
+    private static <T extends CommunicationTask<?, ?>> void invoke(
             ChargePointSelect cp,
             T task,
             BiConsumer<ChargePointSelect, T> soapAction,
@@ -99,6 +99,7 @@ public class ChargePointServiceInvokerImpl implements ChargePointServiceInvoker 
                 chargePointServiceJsonInvoker::unlockConnector);
     }
 
+    @Override
     public void changeAvailability(ChargePointSelect cp, ChangeAvailabilityTask task) {
         invoke(
                 cp,

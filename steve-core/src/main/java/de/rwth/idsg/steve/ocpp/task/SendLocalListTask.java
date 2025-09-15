@@ -26,6 +26,7 @@ import de.rwth.idsg.steve.service.OcppTagsService;
 import de.rwth.idsg.steve.web.dto.ocpp.SendLocalListParams;
 import de.rwth.idsg.steve.web.dto.ocpp.SendLocalListUpdateType;
 import ocpp.cp._2015._10.AuthorizationData;
+import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -80,8 +81,8 @@ public class SendLocalListTask extends CommunicationTask<SendLocalListParams, St
 
     private ocpp.cp._2015._10.SendLocalListRequest createOcpp16Request(OcppTagsService ocppTagsService) {
         if (getParams().getUpdateType() == SendLocalListUpdateType.DIFFERENTIAL) {
-            List<ocpp.cp._2015._10.AuthorizationData> auths = new ArrayList<>();
-            for (String idTag : getParams().getDeleteList()) {
+            var auths = new ArrayList<ocpp.cp._2015._10.AuthorizationData>();
+            for (var idTag : getParams().getDeleteList()) {
                 auths.add(new ocpp.cp._2015._10.AuthorizationData().withIdTag(idTag));
             }
             auths.addAll(ocppTagsService.getAuthData(getParams().getAddUpdateList()));
@@ -90,7 +91,7 @@ public class SendLocalListTask extends CommunicationTask<SendLocalListParams, St
                     .withUpdateType(ocpp.cp._2015._10.UpdateType.DIFFERENTIAL)
                     .withLocalAuthorizationList(auths);
         } else {
-            List<AuthorizationData> values = Collections.emptyList();
+            var values = Collections.<AuthorizationData>emptyList();
             if (Boolean.FALSE.equals(getParams().getSendEmptyListWhenFull())) {
                 values = ocppTagsService.getAuthDataOfAllTags();
             }
@@ -110,7 +111,7 @@ public class SendLocalListTask extends CommunicationTask<SendLocalListParams, St
                 .toList();
     }
 
-    private static ocpp.cp._2012._06.IdTagInfo toOcpp15(ocpp.cp._2015._10.IdTagInfo ocpp16) {
+    private static ocpp.cp._2012._06.@Nullable IdTagInfo toOcpp15(ocpp.cp._2015._10.@Nullable IdTagInfo ocpp16) {
         if (ocpp16 == null) {
             return null;
         }

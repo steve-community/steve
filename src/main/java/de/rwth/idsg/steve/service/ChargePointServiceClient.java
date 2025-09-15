@@ -205,7 +205,7 @@ public class ChargePointServiceClient {
         Integer chargingProfilePk = params.getChargingProfilePk();
         if (chargingProfilePk != null) {
             ChargingProfile.Details details = chargingProfileRepository.getDetails(chargingProfilePk);
-            chargingProfile = ChargingProfileDetailsMapper.mapToOcpp(details);
+            chargingProfile = ChargingProfileDetailsMapper.mapToOcpp(details, null);
             if (chargingProfile.getChargingProfilePurpose() != ChargingProfilePurposeType.TX_PROFILE) {
                 throw new SteveException("ChargingProfilePurposeType is not TX_PROFILE");
             }

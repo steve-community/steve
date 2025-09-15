@@ -42,6 +42,7 @@ import java.util.stream.Collectors;
 public class SetChargingProfileTaskFromDB extends SetChargingProfileTask {
 
     private final int connectorId;
+    private final Integer transactionId;
     private final ChargingProfile.Details details;
     private final ChargingProfileRepository chargingProfileRepository;
 
@@ -50,6 +51,7 @@ public class SetChargingProfileTaskFromDB extends SetChargingProfileTask {
                                         ChargingProfileRepository chargingProfileRepository) {
         super(params);
         this.connectorId = params.getConnectorId();
+        this.transactionId = params.getTransactionId();
         this.details = details;
         this.chargingProfileRepository = chargingProfileRepository;
     }
@@ -59,9 +61,10 @@ public class SetChargingProfileTaskFromDB extends SetChargingProfileTask {
         return new DefaultOcppCallback<String>() {
             @Override
             public void success(String chargeBoxId, String statusValue) {
+                ChargingProfilePurposeType purpose = ChargingProfilePurposeType.fromValue(details.getProfile().getChargingProfilePurpose());
                 addNewResponse(chargeBoxId, statusValue);
 
-                if ("Accepted".equalsIgnoreCase(statusValue)) {
+                if ("Accepted".equalsIgnoreCase(statusValue) && ChargingProfilePurposeType.TX_PROFILE != purpose) {
                     int chargingProfilePk = details.getProfile().getChargingProfilePk();
                     chargingProfileRepository.setProfile(chargingProfilePk, chargeBoxId, connectorId);
                 }
@@ -71,7 +74,7 @@ public class SetChargingProfileTaskFromDB extends SetChargingProfileTask {
 
     @Override
     public SetChargingProfileRequest getOcpp16Request() {
-        ocpp.cp._2015._10.ChargingProfile ocppProfile = ChargingProfileDetailsMapper.mapToOcpp(details);
+        ocpp.cp._2015._10.ChargingProfile ocppProfile = ChargingProfileDetailsMapper.mapToOcpp(details, transactionId);
 
         var request = new SetChargingProfileRequest()
                 .withConnectorId(connectorId)

@@ -18,6 +18,15 @@
  */
 package de.rwth.idsg.steve.service;
 
+import com.google.common.base.Strings;
+import de.rwth.idsg.steve.SteveException;
+import de.rwth.idsg.steve.config.DelegatingTaskExecutor;
+import de.rwth.idsg.steve.repository.SettingsRepository;
+import de.rwth.idsg.steve.web.dto.SettingsForm.MailSettings;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+
 import jakarta.mail.Authenticator;
 import jakarta.mail.Message;
 import jakarta.mail.MessagingException;
@@ -29,25 +38,17 @@ import jakarta.mail.internet.MimeMessage;
 
 import java.util.Properties;
 
-import com.google.common.base.Strings;
-import de.rwth.idsg.steve.SteveException;
-import de.rwth.idsg.steve.config.DelegatingTaskExecutor;
-import de.rwth.idsg.steve.repository.SettingsRepository;
-import de.rwth.idsg.steve.web.dto.SettingsForm.MailSettings;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 24.01.2016
  */
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class MailServiceDefault implements MailService {
 
-    @Autowired private SettingsRepository settingsRepository;
-    @Autowired private DelegatingTaskExecutor asyncTaskExecutor;
+    private final SettingsRepository settingsRepository;
+    private final DelegatingTaskExecutor asyncTaskExecutor;
 
     @Override
     public MailSettings getSettings() {

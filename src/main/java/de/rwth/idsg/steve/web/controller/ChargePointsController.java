@@ -28,7 +28,7 @@ import de.rwth.idsg.steve.web.dto.ChargePointBatchInsertForm;
 import de.rwth.idsg.steve.web.dto.ChargePointForm;
 import de.rwth.idsg.steve.web.dto.ChargePointQueryForm;
 import jooq.steve.db.tables.records.ChargeBoxRecord;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -38,6 +38,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import jakarta.validation.Valid;
+
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -49,11 +50,12 @@ import java.util.stream.Collectors;
  *
  */
 @Controller
+@RequiredArgsConstructor
 @RequestMapping(value = "/manager/chargepoints")
 public class ChargePointsController {
 
-    @Autowired protected ChargePointRepository chargePointRepository;
-    @Autowired protected ChargePointHelperService chargePointHelperService;
+    protected final ChargePointRepository chargePointRepository;
+    protected final ChargePointHelperService chargePointHelperService;
 
     protected static final String PARAMS = "params";
 

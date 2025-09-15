@@ -37,10 +37,10 @@ import de.rwth.idsg.steve.utils.DateTimeUtils;
 import de.rwth.idsg.steve.web.dto.ConnectorStatusForm;
 import de.rwth.idsg.steve.web.dto.OcppJsonStatus;
 import de.rwth.idsg.steve.web.dto.Statistics;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import ocpp.cs._2015._10.RegistrationStatus;
 import org.joda.time.DateTime;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
@@ -65,22 +65,22 @@ import static de.rwth.idsg.steve.SteveConfiguration.CONFIG;
  */
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class ChargePointHelperService {
 
     private final boolean autoRegisterUnknownStations = CONFIG.getOcpp().isAutoRegisterUnknownStations();
     private final Striped<Lock> isRegisteredLocks = Striped.lock(16);
+    private final UnidentifiedIncomingObjectService unknownChargePointService = new UnidentifiedIncomingObjectService(100);
 
-    @Autowired private GenericRepository genericRepository;
+    private final GenericRepository genericRepository;
 
     // SOAP-based charge points are stored in DB with an endpoint address
-    @Autowired private ChargePointRepository chargePointRepository;
+    private final ChargePointRepository chargePointRepository;
 
     // For WebSocket-based charge points, the active sessions are stored in memory
-    @Autowired private Ocpp12WebSocketEndpoint ocpp12WebSocketEndpoint;
-    @Autowired private Ocpp15WebSocketEndpoint ocpp15WebSocketEndpoint;
-    @Autowired private Ocpp16WebSocketEndpoint ocpp16WebSocketEndpoint;
-
-    private final UnidentifiedIncomingObjectService unknownChargePointService = new UnidentifiedIncomingObjectService(100);
+    private final Ocpp12WebSocketEndpoint ocpp12WebSocketEndpoint;
+    private final Ocpp15WebSocketEndpoint ocpp15WebSocketEndpoint;
+    private final Ocpp16WebSocketEndpoint ocpp16WebSocketEndpoint;
 
     public Optional<RegistrationStatus> getRegistrationStatus(String chargeBoxId) {
         Lock l = isRegisteredLocks.get(chargeBoxId);

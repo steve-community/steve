@@ -91,7 +91,8 @@ public class SetChargingProfileTask extends CommunicationTask<SetChargingProfile
             @Override
             public void success(String chargeBoxId, String statusValue) {
                 addNewResponse(chargeBoxId, statusValue);
-                if ("Accepted".equalsIgnoreCase(statusValue)) {
+                var purpose = ChargingProfilePurposeType.fromValue(details.getChargingProfilePurpose());
+                if ("Accepted".equalsIgnoreCase(statusValue) && ChargingProfilePurposeType.TX_PROFILE != purpose) {
                     repo.setProfile(details.getChargingProfilePk(), chargeBoxId, params.getConnectorId());
                 }
             }
@@ -110,6 +111,14 @@ public class SetChargingProfileTask extends CommunicationTask<SetChargingProfile
 
     private static SetChargingProfileRequest buildRequestFromDb(
             SetChargingProfileParams params, ChargingProfile.Details details) {
+        var ocppProfile = mapToOcpp(details, params.getTransactionId());
+
+        return new SetChargingProfileRequest()
+                .withConnectorId(params.getConnectorId())
+                .withCsChargingProfiles(ocppProfile);
+    }
+
+    public static ocpp.cp._2015._10.ChargingProfile mapToOcpp(ChargingProfile.Details details, Integer transactionId) {
         var schedulePeriods = details.getPeriods().stream()
                 .map(k -> {
                     ChargingSchedulePeriod p = new ChargingSchedulePeriod();
@@ -127,8 +136,9 @@ public class SetChargingProfileTask extends CommunicationTask<SetChargingProfile
                 .withMinChargingRate(details.getMinChargingRate())
                 .withChargingSchedulePeriod(schedulePeriods);
 
-        var ocppProfile = new ocpp.cp._2015._10.ChargingProfile()
+        return new ocpp.cp._2015._10.ChargingProfile()
                 .withChargingProfileId(details.getChargingProfilePk())
+                .withTransactionId(transactionId)
                 .withStackLevel(details.getStackLevel())
                 .withChargingProfilePurpose(ChargingProfilePurposeType.fromValue(details.getChargingProfilePurpose()))
                 .withChargingProfileKind(ChargingProfileKindType.fromValue(details.getChargingProfileKind()))
@@ -138,10 +148,6 @@ public class SetChargingProfileTask extends CommunicationTask<SetChargingProfile
                 .withValidFrom(toOffsetDateTime(details.getValidFrom()))
                 .withValidTo(toOffsetDateTime(details.getValidTo()))
                 .withChargingSchedule(schedule);
-
-        return new SetChargingProfileRequest()
-                .withConnectorId(params.getConnectorId())
-                .withCsChargingProfiles(ocppProfile);
     }
 
     private static void checkAdditionalConstraints(SetChargingProfileRequest request) {
@@ -157,6 +163,16 @@ public class SetChargingProfileTask extends CommunicationTask<SetChargingProfile
                     if (purpose == ChargingProfilePurposeType.TX_PROFILE && request.getConnectorId() < 1) {
                         throw new SteveException.InternalError(
                                 "TxProfile should only be set at Charge Point ConnectorId > 0");
+                    }
+
+                    if (ChargingProfilePurposeType.TX_PROFILE == purpose
+                            && request.getCsChargingProfiles().getTransactionId() == null) {
+                        throw new SteveException.InternalError("transaction id is required for TxProfile");
+                    }
+
+                    if (ChargingProfilePurposeType.TX_PROFILE != purpose
+                            && request.getCsChargingProfiles().getTransactionId() != null) {
+                        throw new SteveException.InternalError("transaction id should only be set for TxProfile");
                     }
                 });
     }

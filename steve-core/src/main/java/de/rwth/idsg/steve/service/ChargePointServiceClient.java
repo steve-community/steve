@@ -189,14 +189,14 @@ public class ChargePointServiceClient {
     // -------------------------------------------------------------------------
     @SafeVarargs
     public final int remoteStartTransaction(RemoteStartTransactionParams params, OcppCallback<String>... callbacks) {
-        RemoteStartTransactionTask task = new RemoteStartTransactionTask(params);
+        RemoteStartTransactionTask task = new RemoteStartTransactionTask(params, chargingProfileRepository);
         return addRemoteStartTask(task, callbacks);
     }
 
     @SafeVarargs
     public final int remoteStartTransaction(
             RemoteStartTransactionParams params, String caller, OcppCallback<String>... callbacks) {
-        RemoteStartTransactionTask task = new RemoteStartTransactionTask(params, caller);
+        RemoteStartTransactionTask task = new RemoteStartTransactionTask(params, caller, chargingProfileRepository);
         return addRemoteStartTask(task, callbacks);
     }
 

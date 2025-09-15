@@ -25,19 +25,22 @@ import org.jspecify.annotations.Nullable;
 
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Positive;
 
 /**
  * @author Sevket Goekay <sevketgokay@gmail.com>
  * @since 01.01.2015
  */
 @Getter
+@Setter
 public class RemoteStartTransactionParams extends SingleChargePointSelect {
 
     @Min(value = 0, message = "Connector ID must be at least {value}") @Nullable private Integer connectorId;
 
     @NotBlank(message = "User ID Tag is required") @IdTag
-    @Setter
     private String idTag;
+
+    @Positive private @Nullable Integer chargingProfilePk;
 
     /**
      * Not for a specific connector, when frontend sends the value 0.

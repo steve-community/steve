@@ -18,16 +18,22 @@
  */
 package de.rwth.idsg.steve.ocpp.task;
 
+import de.rwth.idsg.steve.SteveException;
 import de.rwth.idsg.steve.ocpp.CommunicationTask;
 import de.rwth.idsg.steve.ocpp.OcppVersion;
 import de.rwth.idsg.steve.ocpp.task.impl.OcppVersionHandler;
 import de.rwth.idsg.steve.ocpp.task.impl.TaskDefinition;
+import de.rwth.idsg.steve.repository.ChargingProfileRepository;
 import de.rwth.idsg.steve.web.dto.ocpp.RemoteStartTransactionParams;
+import ocpp.cp._2015._10.ChargingProfile;
+import ocpp.cp._2015._10.ChargingProfilePurposeType;
+import org.jspecify.annotations.Nullable;
 
-public class RemoteStartTransactionTask extends CommunicationTask<RemoteStartTransactionParams, String> {
+public class RemoteStartTransactionTask
+        extends CommunicationTask<RemoteStartTransactionTask.RemoteStartTransactionWithProfileParams, String> {
 
-    private static final TaskDefinition<RemoteStartTransactionParams, String> TASK_DEFINITION =
-            TaskDefinition.<RemoteStartTransactionParams, String>builder()
+    private static final TaskDefinition<RemoteStartTransactionWithProfileParams, String> TASK_DEFINITION =
+            TaskDefinition.<RemoteStartTransactionWithProfileParams, String>builder()
                     .versionHandler(
                             OcppVersion.V_12,
                             new OcppVersionHandler<>(
@@ -49,16 +55,62 @@ public class RemoteStartTransactionTask extends CommunicationTask<RemoteStartTra
                             new OcppVersionHandler<>(
                                     task -> new ocpp.cp._2015._10.RemoteStartTransactionRequest()
                                             .withIdTag(task.getParams().getIdTag())
-                                            .withConnectorId(task.getParams().getConnectorId()),
+                                            .withConnectorId(task.getParams().getConnectorId())
+                                            .withChargingProfile(task.getParams().chargingProfile),
                                     (ocpp.cp._2015._10.RemoteStartTransactionResponse r) ->
                                             r.getStatus().value()))
                     .build();
 
-    public RemoteStartTransactionTask(RemoteStartTransactionParams params) {
-        super(TASK_DEFINITION, params);
+    public RemoteStartTransactionTask(
+            RemoteStartTransactionParams params, ChargingProfileRepository chargingProfileRepository) {
+        super(
+                TASK_DEFINITION,
+                new RemoteStartTransactionWithProfileParams(
+                        params, createChargingProfile(params.getChargingProfilePk(), chargingProfileRepository)));
     }
 
-    public RemoteStartTransactionTask(RemoteStartTransactionParams params, String caller) {
-        super(TASK_DEFINITION, params, caller);
+    public RemoteStartTransactionTask(
+            RemoteStartTransactionParams params, String caller, ChargingProfileRepository chargingProfileRepository) {
+        super(
+                TASK_DEFINITION,
+                new RemoteStartTransactionWithProfileParams(
+                        params, createChargingProfile(params.getChargingProfilePk(), chargingProfileRepository)),
+                caller);
+    }
+
+    public static class RemoteStartTransactionWithProfileParams extends RemoteStartTransactionParams {
+        private final ocpp.cp._2015._10.@Nullable ChargingProfile chargingProfile;
+
+        public RemoteStartTransactionWithProfileParams(
+                RemoteStartTransactionParams params, ocpp.cp._2015._10.@Nullable ChargingProfile chargingProfile) {
+            super();
+            this.setIdTag(params.getIdTag());
+            this.setConnectorId(params.getConnectorId());
+            this.chargingProfile = chargingProfile;
+        }
+
+        @Override
+        public @Nullable Integer getChargingProfilePk() {
+            if (chargingProfile == null) {
+                return null;
+            }
+            return chargingProfile.getChargingProfileId();
+        }
+    }
+
+    private static @Nullable ChargingProfile createChargingProfile(
+            @Nullable Integer chargingProfilePk, ChargingProfileRepository chargingProfileRepository) {
+        if (chargingProfilePk == null) {
+            return null;
+        }
+        de.rwth.idsg.steve.repository.dto.ChargingProfile.Details details = chargingProfileRepository
+                .getDetails(chargingProfilePk)
+                .orElseThrow(() ->
+                        new SteveException.BadRequest("ChargingProfile with PK " + chargingProfilePk + " not found"));
+        ocpp.cp._2015._10.ChargingProfile chargingProfile = SetChargingProfileTask.mapToOcpp(details, null);
+        if (chargingProfile.getChargingProfilePurpose() != ChargingProfilePurposeType.TX_PROFILE) {
+            throw new SteveException.BadRequest("ChargingProfilePurposeType is not TX_PROFILE");
+        }
+        return chargingProfile;
     }
 }

@@ -32,11 +32,17 @@
         </tr>
         <tr>
             <td>Connector ID (integer):</td>
-            <td><form:input path="connectorId" placeholder="0 = charge point as a whole"/></td>
+            <td>
+                <form:input path="connectorId" type="number" inputmode="numeric" min="0" step="1" placeholder="0 = charge point as a whole"/>
+                <form:errors path="connectorId" cssClass="error"/>
+            </td>
         </tr>
         <tr>
             <td>Transaction ID (integer):</td>
-            <td><form:input path="transactionId" placeholder="only necessary for TxProfile"/></td>
+            <td>
+                <form:input path="transactionId" type="number" inputmode="numeric" min="1" step="1" placeholder="only necessary for TxProfile"/>
+                <form:errors path="transactionId" cssClass="error"/>
+            </td>
         </tr>
         <tr><td></td><td><div class="submit-button"><input type="submit" value="Perform"></div></td></tr>
     </table>

@@ -38,7 +38,7 @@
                 <td>Charging Profile ID:</td>
                 <td>
                     <form:select path="chargingProfilePk">
-                        <option value="" selected>-- Empty --</option>
+                        <form:option value="">-- Empty --</form:option>
                         <form:options items="${profileList}" itemLabel="itemDescription" itemValue="chargingProfilePk"/>
                     </form:select>
                 </td>

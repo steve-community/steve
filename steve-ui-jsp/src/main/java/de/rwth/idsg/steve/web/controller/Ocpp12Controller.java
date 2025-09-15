@@ -82,6 +82,14 @@ public class Ocpp12Controller {
     // Helpers
     // -------------------------------------------------------------------------
 
+    /**
+     * https://github.com/steve-community/steve/issues/1759
+     * used to create form in order to send charging profile within remote start tx for ocpp 1.6.
+     */
+    protected void setCommonAttributesForRemoteStartTx(Model model) {
+        // nothing to do for versions below 1.6
+    }
+
     protected void setCommonAttributesForTx(Model model) {
         setCommonAttributes(model);
     }
@@ -150,6 +158,7 @@ public class Ocpp12Controller {
     public String getRemoteStartTx(Model model) {
         setCommonAttributesForTx(model);
         setActiveUserIdTagList(model);
+        setCommonAttributesForRemoteStartTx(model);
         model.addAttribute(PARAMS, new RemoteStartTransactionParams());
         return getPrefix() + REMOTE_START_TX_PATH;
     }
@@ -233,6 +242,7 @@ public class Ocpp12Controller {
         if (result.hasErrors()) {
             setCommonAttributesForTx(model);
             setActiveUserIdTagList(model);
+            setCommonAttributesForRemoteStartTx(model);
             return getPrefix() + REMOTE_START_TX_PATH;
         }
         return REDIRECT_TASKS_PATH + chargePointServiceClient.remoteStartTransaction(params);

@@ -80,6 +80,11 @@ public class Ocpp16Controller extends Ocpp15Controller {
     // Helpers
     // -------------------------------------------------------------------------
 
+    protected void setCommonAttributesForRemoteStartTx(Model model) {
+        model.addAttribute("profileForRemoteStartTx", Boolean.TRUE);
+        model.addAttribute("profileList", chargingProfileRepository.getBasicInfo());
+    }
+
     @Override
     protected void setCommonAttributesForTx(Model model) {
         model.addAttribute("cpList", chargePointHelperService.getChargePoints(OcppVersion.V_16));
